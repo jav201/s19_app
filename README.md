@@ -21,13 +21,13 @@
 Install locally in editable mode:
 
 ```bash
-git clone https://github.com/jav201/s19tool.git
+git clone https://github.com/jav201/s19_app.git
 cd s19tool  # or S19_APP
 pip install -e .
 
 ---
 
-## 📦 Usage
+# 📦 Usage
 🔍 General Info
 
 s19tool firmware.s19 info
