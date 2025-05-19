@@ -348,12 +348,13 @@ class S19File:
         return self.load_errors
     
     # Visualization
-    def visualize_memory(self, start: int, length: int = 64, encoding: str = 'ascii', width: int = 16):
-        """
-        Displays memory contents in hex + ASCII format using rich styling.
-        """
-        mem_map = {}  # address -> byte
+    def visualize_memory(self, start: int, length: int = 64, encoding: str = 'ascii', width: int = 16, output_stream=None):
+        from rich.console import Console
+        from rich.text import Text
 
+        console = Console(file=output_stream, highlight=False)
+
+        mem_map = {}
         for record in self.records:
             addr = record.address
             for offset, byte in enumerate(record.data):
@@ -362,18 +363,14 @@ class S19File:
         console.print("[bold underline]Memory View[/bold underline]")
         for row_addr in range(start, start + length, width):
             line = Text()
-
-            # Address
             line.append(f"0x{row_addr:08X}  ", style="bold cyan")
 
-            # Hex and ASCII views
             hex_part = Text()
             ascii_part = Text()
 
             for i in range(width):
                 addr = row_addr + i
                 byte = mem_map.get(addr)
-
                 if byte is None:
                     hex_part.append("   ")
                     ascii_part.append(" ", style="dim")
@@ -381,18 +378,15 @@ class S19File:
                     hex_part.append(f"{byte:02X} ", style="white")
                     try:
                         char = bytes([byte]).decode(encoding)
-                        if 32 <= ord(char) <= 126:
-                            ascii_part.append(char, style="green")
-                        else:
-                            ascii_part.append(".", style="dim")
+                        ascii_part.append(char if 32 <= ord(char) <= 126 else ".", style="green" if 32 <= ord(char) <= 126 else "dim")
                     except Exception:
                         ascii_part.append("�", style="red")
 
-            # Combine views
             line.append(hex_part)
             line.append(" | ")
             line.append(ascii_part)
             console.print(line)
+
 
     def visualize_all(self, encoding: str = 'ascii', width: int = 16):
         """
@@ -413,6 +407,25 @@ class S19File:
         end_addr = all_addresses[-1] + (width - all_addresses[-1] % width)
 
         self.visualize_memory(start=start_addr, length=(end_addr - start_addr), encoding=encoding, width=width)
+
+    def visualize_by_ranges(self, encoding: str = 'ascii', width: int = 16, output_stream=None):
+        """
+        Dumps memory contents per used memory range using rich hex visualization.
+        If output_stream is provided, writes to that stream (e.g., file).
+        """
+        from rich.console import Console
+
+        console = Console(file=output_stream, highlight=False)
+        console.print("[bold underline]Memory Dump by Used Ranges[/bold underline]\n")
+        ranges = self._get_memory_ranges()
+
+        if not ranges:
+            console.print("[yellow]No memory data found.[/yellow]")
+            return
+
+        for i, (start, end) in enumerate(ranges):
+            console.print(f"\n[bold cyan]Range {i + 1}: 0x{start:08X} - 0x{end - 1:08X} ({end - start} bytes)[/bold cyan]\n")
+            self.visualize_memory(start=start, length=end - start, encoding=encoding, width=width, output_stream=output_stream)
 
     # Read memory layout
     def _get_memory_ranges(self) -> List[tuple[int, int]]:

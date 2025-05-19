@@ -39,6 +39,10 @@ def main():
     dump_parser.add_argument("--start", type=lambda x: int(x, 0), required=True)
     dump_parser.add_argument("--length", type=int, default=64)
 
+    # dump-by-range
+    dump_range_parser = subparsers.add_parser("dump-by-range", help="Visualize memory grouped by used ranges")
+    dump_range_parser.add_argument("--output", type=str, help="Optional path to save the memory dump")
+
     # dump-all
     subparsers.add_parser("dump-all", help="Visualize entire memory")
 
@@ -107,7 +111,13 @@ def main():
         for record in s19.records:
             record.checksum = record._calculate_checksum()
         console.print(f"[cyan]🔄 All checksums updated based on current data.[/cyan]")
-
+    elif args.command == "dump-by-range":
+        if args.output:
+            with open(args.output, "w") as f:
+                s19.visualize_by_ranges(output_stream=f)
+            console.print(f"[green]Memory dump saved to {args.output}[/green]")
+        else:
+            s19.visualize_by_ranges()
     else:
         parser.print_help()
 
