@@ -1,0 +1,22 @@
+# S19_APP/pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "s19tool"
+version = "0.1.0"
+description = "A CLI tool for visualizing and patching Motorola S19 files"
+authors = [
+    { name = "Your Name", email = "your.email@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+dependencies = [
+    "rich>=13.0",
+]
+
+[project.scripts]
+s19tool = "s19_app.cli:main"

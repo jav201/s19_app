@@ -1,0 +1,3 @@
+# S19_APP/requirements.txt
+
+rich>=13.0
