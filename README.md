@@ -27,7 +27,8 @@ pip install -e .
 
 ---
 
-# 📦 Usage
+## 📦 Usage
+
 🔍 General Info
 
 s19tool firmware.s19 info
@@ -51,3 +52,4 @@ s19tool firmware.s19 patch-str --addr 0x8000 --text "05182025"
 
 s19tool firmware.s19 save --output modified.s19
 
+---
