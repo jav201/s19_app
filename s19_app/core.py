@@ -350,13 +350,19 @@ class S19File:
     def set_string_at(self, address: int, text: str, encoding: str = 'ascii'):
         """
         Encodes and writes a string into the memory at the specified address.
-        Assumes contiguous space is available in existing records.
-        
-        :param address: Memory address where the string should be written
-        :param text: The string to encode and patch into memory
-        :param encoding: The character encoding to use (e.g., ascii, utf-8)
+        Assumes contiguous space exists in existing records.
+        Raises ValueError if any address is written by multiple records.
         """
         byte_data = list(text.encode(encoding))
+        overlap_map = self._build_overlap_map()
+
+        for i in range(len(byte_data)):
+            addr = address + i
+            writers = overlap_map.get(addr, [])
+            if len(writers) > 1:
+                raise ValueError(f"Cannot patch address 0x{addr:08X}: written by multiple records.")
+
+        # proceed with patch
         size = len(byte_data)
         remaining = size
         offset = 0
@@ -371,6 +377,35 @@ class S19File:
 
             offset += to_write
             remaining -= to_write
+
+    def set_bytes_at(self, address: int, byte_list: list[int]):
+        """
+        Writes raw byte values into memory at a given address.
+        Performs overlap check before applying patch.
+        """
+        overlap_map = self._build_overlap_map()
+
+        for i in range(len(byte_list)):
+            addr = address + i
+            writers = overlap_map.get(addr, [])
+            if len(writers) > 1:
+                raise ValueError(f"Cannot patch address 0x{addr:08X}: written by multiple records.")
+
+        # Proceed with patching
+        size = len(byte_list)
+        remaining = size
+        offset = 0
+
+        while remaining > 0:
+            record, rec_offset = self.get_record_for_address(address + offset)
+            available = len(record.data) - rec_offset
+            to_write = min(available, remaining)
+
+            record.data[rec_offset:rec_offset + to_write] = byte_list[offset:offset + to_write]
+
+            offset += to_write
+            remaining -= to_write
+
 
     def get_record_for_address(self, address: int) -> tuple["SRecord", int]:
         """
@@ -387,6 +422,18 @@ class S19File:
                 offset = address - start
                 return record, offset
         raise ValueError(f"No record found for address 0x{address:08X}")
+
+    def _build_overlap_map(self) -> dict[int, list["SRecord"]]:
+        """
+        Builds a mapping of memory addresses to the list of records that write to them.
+        If any address maps to more than one record, it’s an overlap.
+        """
+        addr_map = {}
+        for record in self.records:
+            for i, byte in enumerate(record.data):
+                addr = record.address + i
+                addr_map.setdefault(addr, []).append(record)
+        return addr_map
 
     
     # Visualization

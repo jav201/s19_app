@@ -52,6 +52,12 @@ def main():
     patch_parser.add_argument("--text", type=str, required=True)
     patch_parser.add_argument("--encoding", type=str, default='ascii')
 
+    #patch-hex
+    patch_hex_parser = subparsers.add_parser("patch-hex", help="Patch raw hex bytes into memory")
+    patch_hex_parser.add_argument("--addr", type=lambda x: int(x, 0), required=True, help="Start memory address")
+    patch_hex_parser.add_argument("--bytes", required=True, help="Hex byte values, space-separated (e.g., '01 02 FF')")
+    patch_hex_parser.add_argument("--save-as", type=str, help="Optional output file for saving patched result")
+
     # save
     save_parser = subparsers.add_parser("save", help="Export patched S19 file")
     save_parser.add_argument("--output", type=str, required=True)
@@ -132,8 +138,28 @@ def main():
             console.print(f"[green]Memory dump saved to {args.output}[/green]")
         else:
             s19.visualize_by_ranges()
+    
+    elif args.command == "patch-hex":
+        try:
+            # Parse hex string into a list of integers
+            hex_values = args.bytes.strip().split()
+            byte_list = [int(h, 16) for h in hex_values]
+
+            s19.set_bytes_at(args.addr, byte_list)
+            console.print(f"[green]Patched {len(byte_list)} bytes at 0x{args.addr:08X}[/green]")
+
+            if args.save_as:
+                with open(args.save_as, "w", encoding="utf-8") as f:
+                    for record in s19.records:
+                        f.write(str(record) + "\n")
+                console.print(f"[cyan]Saved modified file to: {args.save_as}[/cyan]")
+
+        except ValueError as e:
+            console.print(f"[red]Error:[/red] {str(e)}")
+
     else:
         parser.print_help()
+        
 
 if __name__ == "__main__":
     main()
