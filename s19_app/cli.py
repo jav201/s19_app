@@ -56,6 +56,9 @@ def main():
     save_parser = subparsers.add_parser("save", help="Export patched S19 file")
     save_parser.add_argument("--output", type=str, required=True)
 
+    # save-as
+    patch_parser.add_argument("--save-as", type=str, help="Optional output path to save the patched file immediately")
+
     args = parser.parse_args()
     s19 = S19File(args.file)
 
