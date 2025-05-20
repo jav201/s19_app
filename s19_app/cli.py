@@ -86,7 +86,7 @@ def main():
         console.print(f"[green]Patched string '{args.text}' at 0x{args.addr:X}[/green]")
 
     elif args.command == "save":
-        with open(args.output, 'w') as f:
+        with open(args.output, 'w', encoding='utf-8') as f:
             for record in s19.records:
                 f.write(str(record) + '\n')
         console.print(f"[bold green]Saved modified file to:[/bold green] {args.output}")
@@ -113,7 +113,7 @@ def main():
         console.print(f"[cyan]🔄 All checksums updated based on current data.[/cyan]")
     elif args.command == "dump-by-range":
         if args.output:
-            with open(args.output, "w") as f:
+            with open(args.output, "w", encoding='utf-8') as f:
                 s19.visualize_by_ranges(output_stream=f)
             console.print(f"[green]Memory dump saved to {args.output}[/green]")
         else:

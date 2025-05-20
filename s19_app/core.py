@@ -346,6 +346,32 @@ class S19File:
         Each error is a dict with keys: line, segment, error
         """
         return self.load_errors
+
+    def set_string_at(self, address: int, text: str, encoding: str = 'ascii'):
+        """
+        Encodes and writes a string into the memory at the specified address.
+        Assumes contiguous space is available in existing records.
+        
+        :param address: Memory address where the string should be written
+        :param text: The string to encode and patch into memory
+        :param encoding: The character encoding to use (e.g., ascii, utf-8)
+        """
+        byte_data = list(text.encode(encoding))
+        size = len(byte_data)
+        remaining = size
+        offset = 0
+
+        while remaining > 0:
+            record, rec_offset = self.get_record_for_address(address + offset)
+
+            available = len(record.data) - rec_offset
+            to_write = min(available, remaining)
+
+            record.data[rec_offset:rec_offset + to_write] = byte_data[offset:offset + to_write]
+
+            offset += to_write
+            remaining -= to_write
+
     
     # Visualization
     def visualize_memory(self, start: int, length: int = 64, encoding: str = 'ascii', width: int = 16, output_stream=None):
