@@ -372,6 +372,22 @@ class S19File:
             offset += to_write
             remaining -= to_write
 
+    def get_record_for_address(self, address: int) -> tuple["SRecord", int]:
+        """
+        Finds the record that contains the given memory address.
+
+        :param address: The absolute memory address to locate
+        :return: A tuple of (record, offset within record)
+        :raises ValueError: if no record contains the given address
+        """
+        for record in self.records:
+            start = record.address
+            end = start + len(record.data)
+            if start <= address < end:
+                offset = address - start
+                return record, offset
+        raise ValueError(f"No record found for address 0x{address:08X}")
+
     
     # Visualization
     def visualize_memory(self, start: int, length: int = 64, encoding: str = 'ascii', width: int = 16, output_stream=None):
