@@ -82,8 +82,18 @@ def main():
         s19.visualize_all()
 
     elif args.command == "patch-str":
-        s19.set_string_at(address=args.addr, text=args.text, encoding=args.encoding)
-        console.print(f"[green]Patched string '{args.text}' at 0x{args.addr:X}[/green]")
+        try:
+            s19.set_string_at(address=args.addr, text=args.text, encoding=args.encoding)
+            console.print(f"[green]Patched string '{args.text}' at 0x{args.addr:08X}[/green]")
+
+            if args.save_as:
+                with open(args.save_as, 'w', encoding='utf-8') as f:
+                    for record in s19.records:
+                        f.write(str(record) + '\n')
+                console.print(f"[cyan]Saved modified file to: {args.save_as}[/cyan]")
+
+        except ValueError as e:
+            console.print(f"[red]Error:[/red] {str(e)}")
 
     elif args.command == "save":
         with open(args.output, 'w', encoding='utf-8') as f:
@@ -107,6 +117,7 @@ def main():
                 console.print(f"  [yellow]Line {i + 1}[/yellow] at 0x{record.address:08X} — Type: {record.type}")
                 for err in record.validation_errors:
                     console.print(f"    [red]- {err}[/red]")
+
     elif args.command == "update-checksums":
         for record in s19.records:
             record.checksum = record._calculate_checksum()

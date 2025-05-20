@@ -46,7 +46,7 @@ s19tool firmware.s19 dump-all
 
 ✏️ Patching Memory
 
-s19tool firmware.s19 patch-str --addr 0x8000 --text "05182025"
+s19tool firmware.s19 patch-str --addr 0x00000000 --text "HELLO" --save-as modified.s19
 
 💾 Save Modified File
 
