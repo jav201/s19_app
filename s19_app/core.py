@@ -40,6 +40,30 @@ Summary Table of S-Record Types:
 
 byte_count:
     byte_count = len(address in bytes) + len(data in bytes) + 1 (for checksum byte)
+
+# Example S0 line (Header): S015000044656275675C73746D38733030332E736D38CF
+# |-- S0 (type) --|-- 15 (byte count) --|-- 0000 (address) --|-- 44656275675C73746D38733030332E736D38 (data) --|-- CF (checksum) --|
+
+# Example S1 line (16-bit data): S1238083AE03FF9490CE8080AE8082F62725A5602717BF00EE03BF03BE00EE0190F6F75C0A
+# |-- S1 (type) --|-- 23 (byte count) --|-- 8083 (address) --|-- AE03FF9490CE8080AE8082F62725A5602717BF00EE03BF03BE00EE0190F6F75C (data) --|-- 0A (checksum) --|
+
+# Example S2 line (24-bit data): S12380A3905C90B30326F5BE00909390EE031C000520D8AE00002002F75CA3000626F9AE58
+# |-- S2 (type) --|-- 23 (byte count) --|-- 80A390 (address) --|-- 5C90B30326F5BE00909390EE031C000520D8AE00002002F75CA3000626F9AE (data) --|-- 58 (checksum) --|
+
+# Example S3 line (32-bit data): S12380C301002002F75CA3010026F9CD80D320FE725F50C7725F50CA20FE80808080808031
+# |-- S3 (type) --|-- 23 (byte count) --|-- 80C30100 (address) --|-- 2002F75CA3010026F9CD80D320FE725F50C7725F50CA20FE808080808080 (data) --|-- 31 (checksum) --|
+
+# Example S5 line (record count): S11280E38080808080808080808080808080800A
+# |-- S5 (type) --|-- 12 (byte count) --|-- 80E3 (address) --|-- 8080808080808080808080808080 (data) --|-- 0A (checksum) --|
+
+# Example S7 line (start address, S3): S123800082008083820080DE820080DF820080E0820080E1820080E2820080E3820080E4A2
+# |-- S7 (type) --|-- 23 (byte count) --|-- 80008200 (address) --|-- 83820080DE820080DF820080E0820080E1820080E2820080E3820080E4 (data) --|-- A2 (checksum) --|
+
+# Example S8 line (start address, S2): S1238020820080E5820080E6820080DD820080DD820080E7820080E8820080E9820080EA05
+# |-- S8 (type) --|-- 23 (byte count) --|-- 802082 (address) --|-- 0080E5820080E6820080DD820080DD820080E7820080E8820080E9820080EA (data) --|-- 05 (checksum) --|
+
+# Example S9 line (start address, S1): S1238040820080EB820080DD820080DD820080EC820080ED820080EE820080DD820080DDE6
+# |-- S9 (type) --|-- 23 (byte count) --|-- 8040 (address) --|-- 820080EB820080DD820080DD820080EC820080ED820080EE820080DD820080DD (data) --|-- E6 (checksum) --|
 """
 console = Console()
 
@@ -79,24 +103,60 @@ class SRecord:
             raise ValueError(f"Unsupported S-record type: {self.type}")
 
         # Parse byte count field (2 hex digits)
-        self.byte_count = int(self.raw_line[2:4], 16)
+        try:
+            self.byte_count = int(self.raw_line[2:4], 16)
+        except ValueError as exc:
+            raise ValueError(f"Invalid byte count hex: {self.raw_line[2:4]}") from exc
+
+        # Validate overall line length against byte count
+        expected_total_len = 4 + (self.byte_count * 2)
+        if len(self.raw_line) != expected_total_len:
+            raise ValueError(
+                f"Length mismatch: expected {expected_total_len} chars, found {len(self.raw_line)}"
+            )
 
         # Determine address length in bytes
         self.address_length = self.ADDRESS_LENGTH_MAP[self.type]
         address_field_end = 4 + self.address_length * 2
 
+        if address_field_end > len(self.raw_line) - 2:
+            raise ValueError("Line too short for address field")
+
         # Parse address field
-        self.address = int(self.raw_line[4:address_field_end], 16)
+        try:
+            self.address = int(self.raw_line[4:address_field_end], 16)
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid address hex: {self.raw_line[4:address_field_end]}"
+            ) from exc
+
+        # Validate data length based on byte count
+        data_len_bytes = self.byte_count - self.address_length - 1
+        if data_len_bytes < 0:
+            raise ValueError(
+                f"Invalid byte count: {self.byte_count} too small for address length"
+            )
+        expected_data_field_end = address_field_end + (data_len_bytes * 2)
 
         # Parse data bytes (excluding checksum)
         data_field_end = len(self.raw_line) - 2
-        self.data = [
-            int(self.raw_line[i:i + 2], 16)
-            for i in range(address_field_end, data_field_end, 2)
-        ]
+        if expected_data_field_end != data_field_end:
+            raise ValueError(
+                "Data length mismatch with byte count and address length"
+            )
+        self.data = []
+        for i in range(address_field_end, data_field_end, 2):
+            byte_str = self.raw_line[i:i + 2]
+            try:
+                self.data.append(int(byte_str, 16))
+            except ValueError as exc:
+                raise ValueError(f"Invalid data byte hex: {byte_str}") from exc
 
         # Parse checksum (last 2 hex digits)
-        self.checksum = int(self.raw_line[-2:], 16)
+        try:
+            self.checksum = int(self.raw_line[-2:], 16)
+        except ValueError as exc:
+            raise ValueError(f"Invalid checksum hex: {self.raw_line[-2:]}") from exc
 
         # Validate structure
         self.valid = self._validate()
