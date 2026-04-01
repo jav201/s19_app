@@ -230,6 +230,15 @@ def extract_a2l_tags(sections: list[dict]) -> list[dict]:
                     "name": meta.split()[0] if meta else "UNKNOWN",
                     "address": None,
                     "length": None,
+                    "source": "assigned",
+                    "unit": None,
+                    "lower_limit": None,
+                    "upper_limit": None,
+                    "bit_org": None,
+                    "endian": None,
+                    "virtual": False,
+                    "function_group": None,
+                    "access": None,
                 }
                 for line in lines:
                     stripped = line.strip()
@@ -244,6 +253,31 @@ def extract_a2l_tags(sections: list[dict]) -> list[dict]:
                             tag["length"] = int(parts[1], 0)
                         except ValueError:
                             tag["length"] = None
+                    if len(parts) >= 2 and parts[0] == "LOWER_LIMIT":
+                        tag["lower_limit"] = parts[1]
+                    if len(parts) >= 2 and parts[0] == "UPPER_LIMIT":
+                        tag["upper_limit"] = parts[1]
+                    if len(parts) >= 2 and parts[0] == "UNIT":
+                        tag["unit"] = parts[1]
+                    if len(parts) >= 2 and parts[0] == "BYTE_ORDER":
+                        tag["endian"] = parts[1]
+                    if len(parts) >= 2 and parts[0] == "BIT_MASK":
+                        tag["bit_org"] = parts[1]
+                    if len(parts) >= 2 and parts[0] == "DATA_TYPE":
+                        tag["bit_org"] = parts[1]
+                    if len(parts) >= 2 and parts[0] == "FUNCTION":
+                        tag["function_group"] = parts[1]
+                    if len(parts) >= 1 and parts[0] == "VIRTUAL":
+                        tag["virtual"] = True
+                    if len(parts) >= 2 and parts[0] == "COMPU_METHOD":
+                        if parts[1] != "NO_COMPU_METHOD":
+                            tag["source"] = "formula"
+                    if len(parts) >= 1 and parts[0] == "FORMULA":
+                        tag["source"] = "formula"
+                    if len(parts) >= 1 and parts[0] == "READ_ONLY":
+                        tag["access"] = "read_only"
+                    if len(parts) >= 1 and parts[0] == "CALIBRATABLE":
+                        tag["access"] = "calibratable"
                 tags.append(tag)
             if section.get("children"):
                 walk(section["children"])
@@ -259,7 +293,7 @@ def validate_a2l_tags(tags: list[dict], mem_map: Dict[int, int]) -> list[dict]:
         address = tag.get("address")
         length = tag.get("length")
         if address is None or length is None:
-            results.append({**tag, "valid": False, "reason": "missing address/length"})
+            results.append({**tag, "valid": False, "reason": "missing address/length", "in_memory": False})
             continue
         missing = []
         for offset in range(length):
@@ -268,9 +302,9 @@ def validate_a2l_tags(tags: list[dict], mem_map: Dict[int, int]) -> list[dict]:
                 missing.append(addr)
                 break
         if missing:
-            results.append({**tag, "valid": False, "reason": "address range missing"})
+            results.append({**tag, "valid": False, "reason": "address range missing", "in_memory": False})
         else:
-            results.append({**tag, "valid": True, "reason": ""})
+            results.append({**tag, "valid": True, "reason": "", "in_memory": True})
     return results
 
 
@@ -640,6 +674,9 @@ class LoadA2LScreen(ModalScreen[Optional[Path]]):
         self.dismiss(name)
 
 
+### Removed modal field selector; using compact in-tile menu.
+
+
 class S19TuiApp(App):
     """Main TUI app with workarea, project management, and views."""
     TITLE = "Hex Edit Tool"
@@ -674,8 +711,8 @@ class S19TuiApp(App):
 
     #alt_layout {
         layout: grid;
-        grid-size: 3 2;
-        grid-columns: 2fr 1fr 2fr;
+        grid-size: 2 2;
+        grid-columns: 2fr 1fr;
         grid-rows: 1fr 1fr;
         grid-gutter: 1;
         height: 100%;
@@ -730,6 +767,26 @@ class S19TuiApp(App):
         row-span: 2;
     }
 
+    #a2l_tags_filters {
+        layout: horizontal;
+        height: auto;
+        padding-bottom: 1;
+    }
+
+    #a2l_tags_filter_input {
+        width: 1fr;
+    }
+
+    #a2l_filter_menu {
+        border: round $primary;
+        padding: 1;
+        height: 8;
+    }
+
+    #a2l_filter_menu.hidden {
+        display: none;
+    }
+
     #progress_bar {
         margin-top: 1;
     }
@@ -769,9 +826,8 @@ class S19TuiApp(App):
         overflow: auto;
     }
 
-    #a2l_tags_scroll {
+    #a2l_tags_list {
         height: 100%;
-        overflow: auto;
     }
 
     #alt_hex_scroll {
@@ -833,6 +889,24 @@ class S19TuiApp(App):
     last_search_text: Optional[str] = None
     last_search_address: Optional[int] = None
     log_lines: deque[str]
+    a2l_tags_filter_mode: str = "all"
+    a2l_tags_filter_text: str = ""
+    a2l_tags_filter_field: str = "name"
+    a2l_tags_filter_fields = [
+        "all",
+        "name",
+        "address",
+        "length",
+        "source",
+        "in_memory",
+        "limits",
+        "unit",
+        "bits",
+        "endian",
+        "virtual",
+        "function_group",
+        "access",
+    ]
 
     def __init__(self, base_dir: Optional[Path] = None, load_path: Optional[Path] = None):
         super().__init__()
@@ -902,16 +976,21 @@ class S19TuiApp(App):
         yield Container(
             Container(
                 Label("A2L Tags", id="a2l_tags_title"),
-                ScrollableContainer(
-                    Static("", id="a2l_tags_view", markup=False),
-                    id="a2l_tags_scroll",
+                Container(
+                    Input(placeholder="Filter tags", id="a2l_tags_filter_input"),
+                    Button("Field: name", id="a2l_filter_field"),
+                    Button("All", id="a2l_filter_all"),
+                    Button("Invalid", id="a2l_filter_invalid"),
+                    Button("In-Memory", id="a2l_filter_inmem"),
+                    id="a2l_tags_filters",
                 ),
+                Container(
+                    ListView(id="a2l_filter_menu_list"),
+                    id="a2l_filter_menu",
+                    classes="hidden",
+                ),
+                ListView(id="a2l_tags_list"),
                 id="alt_tags_panel",
-            ),
-            Container(
-                Label("Actions", id="alt_actions_title"),
-                Static("Placeholder content", id="alt_content_2"),
-                id="alt_actions_panel",
             ),
             Container(
                 Label("Hex Viewer", id="alt_hex_title"),
@@ -935,6 +1014,7 @@ class S19TuiApp(App):
 
     def on_mount(self) -> None:
         self.refresh_files()
+        self._update_a2l_filter_menu()
         if self.load_path:
             self.logger.info("Startup load requested: %s", self.load_path)
             self.load_from_path(self.load_path)
@@ -1212,6 +1292,18 @@ class S19TuiApp(App):
                 return
             self._jump_to_section(event.item)
             return
+        if event.list_view.id == "a2l_tags_list":
+            if event.item is None:
+                return
+            self._jump_to_tag(event.item)
+            return
+        if event.list_view.id == "a2l_filter_menu_list":
+            if event.item is None:
+                return
+            field = getattr(event.item, "data", None)
+            if field:
+                self._set_a2l_filter_field(field)
+            return
 
     def _load_from_item(self, item: ListItem) -> None:
         label_widget = item.query_one(Label)
@@ -1229,6 +1321,15 @@ class S19TuiApp(App):
         if section_range:
             start, _ = section_range
             self.update_hex_view(start)
+
+    def _jump_to_tag(self, item: ListItem) -> None:
+        tag_info = getattr(item, "data", None)
+        if not tag_info:
+            return
+        addr = tag_info.get("address")
+        if isinstance(addr, int):
+            self.update_alt_hex_view(addr)
+            self.set_status(f"Tag at 0x{addr:08X}")
 
     def load_selected_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> None:
         """Parse S19/HEX and update all dependent views."""
@@ -1360,11 +1461,23 @@ class S19TuiApp(App):
         if self.current_file:
             tag_checks = validate_a2l_tags(self.current_a2l_data.get("tags", []), self.current_file.mem_map)
         a2l_view.update(render_a2l_view(self.current_a2l_data, tag_checks))
-        self.update_a2l_tags_view(self.current_a2l_data.get("tags", []))
+        tags = self.current_a2l_data.get("tags", [])
+        if tag_checks:
+            check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
+            enriched = []
+            for tag in tags:
+                key = (tag.get("section"), tag.get("name"))
+                enriched.append({**tag, **check_map.get(key, {})})
+            tags = enriched
+        filter_input = self.query_one("#a2l_tags_filter_input", Input)
+        self.a2l_tags_filter_text = filter_input.value.strip()
+        tags = self._filter_a2l_tags(tags)
+        self.update_a2l_tags_view(tags)
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
-        a2l_tags_view = self.query_one("#a2l_tags_view", Static)
+        a2l_tags_list = self.query_one("#a2l_tags_list", ListView)
+        a2l_tags_list.clear()
         if not tags:
-            a2l_tags_view.update("No A2L tags.")
+            a2l_tags_list.append(ListItem(Label("No A2L tags.")))
             return
         rows = []
         for tag in tags[:400]:
@@ -1373,18 +1486,159 @@ class S19TuiApp(App):
             addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
             len_text = str(length) if isinstance(length, int) else "n/a"
             name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
-            rows.append((name_text, addr_text, len_text))
+            source_text = str(tag.get("source") or "assigned")
+            in_mem_text = "yes" if tag.get("in_memory") else "no"
+            limits_text = ""
+            if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
+                limits_text = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
+            unit_text = str(tag.get("unit") or "")
+            bit_text = str(tag.get("bit_org") or "")
+            endian_text = str(tag.get("endian") or "")
+            virt_text = "yes" if tag.get("virtual") else "no"
+            func_text = str(tag.get("function_group") or "")
+            access_text = str(tag.get("access") or "")
+            rows.append((
+                name_text, addr_text, len_text, source_text, in_mem_text,
+                limits_text, unit_text, bit_text, endian_text, virt_text,
+                func_text, access_text,
+            ))
 
         name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
         addr_width = max(len("Address"), *(len(row[1]) for row in rows))
         len_width = max(len("Length"), *(len(row[2]) for row in rows))
+        source_width = max(len("Source"), *(len(row[3]) for row in rows))
+        mem_width = max(len("InMem"), *(len(row[4]) for row in rows))
+        limits_width = max(len("Limits"), *(len(row[5]) for row in rows))
+        unit_width = max(len("Unit"), *(len(row[6]) for row in rows))
+        bit_width = max(len("Bits"), *(len(row[7]) for row in rows))
+        endian_width = max(len("Endian"), *(len(row[8]) for row in rows))
+        virt_width = max(len("Virt"), *(len(row[9]) for row in rows))
+        func_width = max(len("Func"), *(len(row[10]) for row in rows))
+        access_width = max(len("Access"), *(len(row[11]) for row in rows))
 
-        header = f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | {'Length'.ljust(len_width)}"
-        lines = [header]
-        for name_text, addr_text, len_text in rows:
-            trimmed_name = name_text[:name_width].ljust(name_width)
-            lines.append(f"{trimmed_name} | {addr_text.ljust(addr_width)} | {len_text.ljust(len_width)}")
-        a2l_tags_view.update("\n".join(lines))
+        header = (
+            f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
+            f"{'Length'.ljust(len_width)} | {'Source'.ljust(source_width)} | "
+            f"{'InMem'.ljust(mem_width)} | {'Limits'.ljust(limits_width)} | "
+            f"{'Unit'.ljust(unit_width)} | {'Bits'.ljust(bit_width)} | "
+            f"{'Endian'.ljust(endian_width)} | {'Virt'.ljust(virt_width)} | "
+            f"{'Func'.ljust(func_width)} | {'Access'.ljust(access_width)}"
+        )
+        a2l_tags_list.append(ListItem(Label(header)))
+        for row in rows:
+            name_text = row[0][:name_width].ljust(name_width)
+            line = (
+                f"{name_text} | {row[1].ljust(addr_width)} | {row[2].ljust(len_width)} | "
+                f"{row[3].ljust(source_width)} | {row[4].ljust(mem_width)} | "
+                f"{row[5].ljust(limits_width)} | {row[6].ljust(unit_width)} | "
+                f"{row[7].ljust(bit_width)} | {row[8].ljust(endian_width)} | "
+                f"{row[9].ljust(virt_width)} | {row[10].ljust(func_width)} | "
+                f"{row[11].ljust(access_width)}"
+            )
+            label = Label(line)
+            if row[4] == "no":
+                label.add_class("invalid")
+            item = ListItem(label)
+            item.data = {"address": row[1], "name": row[0]}
+            # Store the integer address if available for jump
+            if row[1].startswith("0x"):
+                try:
+                    item.data["address"] = int(row[1], 16)
+                except ValueError:
+                    pass
+            a2l_tags_list.append(item)
+
+    def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:
+        mode = self.a2l_tags_filter_mode
+        text = (self.a2l_tags_filter_text or "").lower()
+        filtered = []
+        for tag in tags:
+            if mode == "invalid" and tag.get("in_memory") is True:
+                continue
+            if mode == "inmem" and tag.get("in_memory") is not True:
+                continue
+            if text:
+                if not self._tag_matches_filter(tag, text):
+                    continue
+            filtered.append(tag)
+        return filtered
+
+    def _tag_matches_filter(self, tag: dict, text: str) -> bool:
+        field = self.a2l_tags_filter_field
+        if field == "all":
+            haystack = " ".join(
+                [
+                    str(tag.get("name") or ""),
+                    str(tag.get("address") or ""),
+                    str(tag.get("length") or ""),
+                    str(tag.get("source") or ""),
+                    str(tag.get("in_memory") or ""),
+                    str(tag.get("lower_limit") or ""),
+                    str(tag.get("upper_limit") or ""),
+                    str(tag.get("unit") or ""),
+                    str(tag.get("bit_org") or ""),
+                    str(tag.get("endian") or ""),
+                    str(tag.get("virtual") or ""),
+                    str(tag.get("function_group") or ""),
+                    str(tag.get("access") or ""),
+                ]
+            ).lower()
+            return text in haystack
+
+        value = ""
+        if field == "name":
+            value = str(tag.get("name") or "")
+        elif field == "address":
+            value = str(tag.get("address") or "")
+        elif field == "length":
+            value = str(tag.get("length") or "")
+        elif field == "source":
+            value = str(tag.get("source") or "")
+        elif field == "in_memory":
+            value = "yes" if tag.get("in_memory") else "no"
+        elif field == "limits":
+            value = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
+        elif field == "unit":
+            value = str(tag.get("unit") or "")
+        elif field == "bits":
+            value = str(tag.get("bit_org") or "")
+        elif field == "endian":
+            value = str(tag.get("endian") or "")
+        elif field == "virtual":
+            value = "yes" if tag.get("virtual") else "no"
+        elif field == "function_group":
+            value = str(tag.get("function_group") or "")
+        elif field == "access":
+            value = str(tag.get("access") or "")
+        return text in value.lower()
+
+    def _toggle_a2l_filter_menu(self) -> None:
+        menu = self.query_one("#a2l_filter_menu")
+        if "hidden" in menu.classes:
+            self._update_a2l_filter_menu()
+            menu.remove_class("hidden")
+        else:
+            menu.add_class("hidden")
+
+    def _update_a2l_filter_menu(self) -> None:
+        menu_list = self.query_one("#a2l_filter_menu_list", ListView)
+        menu_list.clear()
+        for field in self.a2l_tags_filter_fields:
+            label = f"(*) {field}" if field == self.a2l_tags_filter_field else f"( ) {field}"
+            item = ListItem(Label(label))
+            item.data = field
+            menu_list.append(item)
+
+    def _set_a2l_filter_field(self, field: str) -> None:
+        if field not in self.a2l_tags_filter_fields:
+            return
+        self.a2l_tags_filter_field = field
+        button = self.query_one("#a2l_filter_field", Button)
+        button.label = f"Field: {field}"
+        menu = self.query_one("#a2l_filter_menu")
+        menu.add_class("hidden")
+        self._update_a2l_filter_menu()
+        self.update_a2l_view()
 
     def update_project_labels(self) -> None:
         """Refresh project/A2L labels in the status tile."""
@@ -1408,6 +1662,22 @@ class S19TuiApp(App):
             self._handle_search_alt()
         elif event.button.id == "alt_goto_button":
             self._handle_goto_alt()
+        elif event.button.id == "a2l_filter_all":
+            self.a2l_tags_filter_mode = "all"
+            self.update_a2l_view()
+        elif event.button.id == "a2l_filter_invalid":
+            self.a2l_tags_filter_mode = "invalid"
+            self.update_a2l_view()
+        elif event.button.id == "a2l_filter_inmem":
+            self.a2l_tags_filter_mode = "inmem"
+            self.update_a2l_view()
+        elif event.button.id == "a2l_filter_field":
+            self._toggle_a2l_filter_menu()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if event.input.id == "a2l_tags_filter_input":
+            self.a2l_tags_filter_text = event.value.strip()
+            self.update_a2l_view()
 
     def _handle_search(self) -> None:
         if not self.current_file:

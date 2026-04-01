@@ -186,11 +186,18 @@ summary, show parse errors if present, and indicate tag validation status.
   `test_render_a2l_view_shows_errors`,
   `test_validate_a2l_tags_matches_memory`)
 
-**R-A2L-006**: The UI must display A2L tags (name, address, length) in the
-A2L View.
+**R-A2L-006**: The UI must display A2L tags with columns for name, address,
+length, source type (assigned/formula), memory presence, limits, units, bit
+organization, endianess, virtual flag, function group, and access.
 
 - Code: `s19_app/tui.py` (`update_a2l_tags_view`, `A2L Tags` tile)
 - Tests: Manual (load A2L and verify tag listing)
+
+**R-A2L-007**: The A2L Tags tile must support filtering by field and
+filter modes (All/Invalid/In-Memory).
+
+- Code: `s19_app/tui.py` (`_filter_a2l_tags`, `_cycle_a2l_filter_field`)
+- Tests: Manual (use filter input and buttons)
 
 
 **R-A2L-005**: The tool must extract tag address/length metadata for
