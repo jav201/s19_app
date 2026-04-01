@@ -1,1 +1,8 @@
 /notebook_sand.ipynb
+.venv/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.egg-info/
+.s19tool/
+.cursor/
