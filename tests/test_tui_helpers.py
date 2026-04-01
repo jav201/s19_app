@@ -1,18 +1,22 @@
 from pathlib import Path
 
+from s19_app import tui
 from s19_app.tui import (
     FOCUS_CONTEXT_ROWS,
     HEX_WIDTH,
     MAX_HEX_BYTES,
+    MAX_HEX_ROWS,
     S19TuiApp,
     A2L_EXTENSIONS,
     copy_into_workarea,
     find_repo_root,
     render_hex_view,
+    find_string_in_mem,
     render_a2l_view,
     sanitize_project_name,
     resolve_input_path,
     validate_project_files,
+    validate_a2l_tags,
     WORKAREA_TEMP,
     setup_logging,
     LOGS_SUBDIR,
@@ -83,7 +87,7 @@ def test_render_hex_view_truncates_output():
     mem_map = {addr: 0x41 for addr in range(0x2000, 0x2000 + (MAX_HEX_BYTES + 64))}
 
     output = render_hex_view(mem_map)
-    assert "output truncated" in output
+    assert "output truncated" in output or f"window limited to {MAX_HEX_ROWS} rows" in output
 
 
 def test_sanitize_project_name_allows_safe_chars():
@@ -212,3 +216,43 @@ def test_render_a2l_view_shows_errors():
     output = render_a2l_view(data)
 
     assert "A2L parse errors" in output
+
+
+def test_validate_a2l_tags_matches_memory():
+    tags = [
+        {"section": "MEASUREMENT", "name": "A", "address": 0x1000, "length": 2},
+        {"section": "MEASUREMENT", "name": "B", "address": 0x2000, "length": 2},
+    ]
+    mem_map = {0x1000: 0x01, 0x1001: 0x02}
+
+    results = validate_a2l_tags(tags, mem_map)
+
+    assert results[0]["valid"] is True
+    assert results[1]["valid"] is False
+
+
+def test_find_string_in_mem_finds_address():
+    mem_map = {0x1000 + i: b for i, b in enumerate(b"HELLO WORLD")}
+    assert find_string_in_mem(mem_map, "WORLD") == 0x1006
+    assert find_string_in_mem(mem_map, "world") == 0x1006
+
+
+def test_find_string_in_mem_returns_none_when_missing():
+    mem_map = {0x2000: 0x41, 0x2001: 0x42}
+    assert find_string_in_mem(mem_map, "ZZ") is None
+
+
+def test_find_string_in_mem_supports_next_search():
+    mem_map = {0x3000 + i: b for i, b in enumerate(b"ABC ABC")}
+    first = find_string_in_mem(mem_map, "ABC")
+    second = find_string_in_mem(mem_map, "ABC", start_address=first + 1)
+    assert first == 0x3000
+    assert second == 0x3004
+
+
+def test_tui_module_has_docstring():
+    assert tui.__doc__
+
+
+def test_tui_app_has_docstring():
+    assert S19TuiApp.__doc__

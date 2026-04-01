@@ -178,12 +178,27 @@ structure capturing sections and parse errors.
   `test_parse_a2l_file_reports_unclosed_section`)
 
 **R-A2L-002**: The A2L view tile must display parsed A2L content in a readable
-summary and show parse errors if present.
+summary, show parse errors if present, and indicate tag validation status.
 
 - Code: `s19_app/tui.py` (`render_a2l_view`, `update_a2l_view`)
 - Tests: `tests/test_tui_helpers.py`
   (`test_render_a2l_view_shows_sections`,
-  `test_render_a2l_view_shows_errors`)
+  `test_render_a2l_view_shows_errors`,
+  `test_validate_a2l_tags_matches_memory`)
+
+**R-A2L-006**: The UI must display A2L tags (name, address, length) in the
+A2L View.
+
+- Code: `s19_app/tui.py` (`update_a2l_tags_view`, `A2L Tags` tile)
+- Tests: Manual (load A2L and verify tag listing)
+
+
+**R-A2L-005**: The tool must extract tag address/length metadata for
+MEASUREMENT and CHARACTERISTIC sections.
+
+- Code: `s19_app/tui.py` (`extract_a2l_tags`)
+- Tests: `tests/test_tui_helpers.py`
+  (`test_parse_a2l_file_captures_sections`)
 
 **R-A2L-003**: The tool must allow exporting parsed A2L data to JSON via a
 keyboard binding.
@@ -216,3 +231,19 @@ the loaded A2L filename.
 
 - Code: `s19_app/tui.py` (`update_project_labels`, status labels)
 - Tests: Manual (load/save project, load A2L)
+
+**R-DOC-001**: The TUI module must include high-level documentation and
+key method docstrings to aid maintenance.
+
+- Code: `s19_app/tui.py` (module docstring, key method docstrings)
+- Tests: `tests/test_tui_helpers.py`
+  (`test_tui_module_has_docstring`,
+  `test_tui_app_has_docstring`)
+
+**R-TUI-017**: The hex view must support case-insensitive ASCII search
+(with find-next behavior), highlight matches, and go to a specific address.
+
+- Code: `s19_app/tui.py` (`find_string_in_mem`, `_handle_search`, `_handle_goto`)
+- Tests: `tests/test_tui_helpers.py`
+  (`test_find_string_in_mem_finds_address`,
+  `test_find_string_in_mem_returns_none_when_missing`)
