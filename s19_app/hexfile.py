@@ -24,6 +24,8 @@ class IntelHexFile:
 
     def _load(self) -> None:
         upper_address = 0
+        segment_base = 0
+        use_segment = False
         try:
             with open(self.path, "r", encoding="utf-8") as handle:
                 for line_number, raw_line in enumerate(handle, 1):
@@ -87,11 +89,23 @@ class IntelHexFile:
                         )
 
                     if record_type == 0x00:
-                        base = (upper_address << 16) + address
+                        base = segment_base if use_segment else (upper_address << 16)
+                        base += address
                         for offset, value in enumerate(data):
                             self.memory[base + offset] = value
                     elif record_type == 0x01:
                         break
+                    elif record_type == 0x02:
+                        if len(data) != 2:
+                            self._add_error(
+                                line_number,
+                                line,
+                                "type",
+                                "Invalid extended segment address record length",
+                            )
+                            continue
+                        segment_base = ((data[0] << 8) | data[1]) << 4
+                        use_segment = True
                     elif record_type == 0x04:
                         if len(data) != 2:
                             self._add_error(
@@ -102,6 +116,10 @@ class IntelHexFile:
                             )
                             continue
                         upper_address = (data[0] << 8) | data[1]
+                        use_segment = False
+                    elif record_type in {0x03, 0x05}:
+                        # Start segment/linear address records: informational only.
+                        continue
                     else:
                         self._add_error(
                             line_number,

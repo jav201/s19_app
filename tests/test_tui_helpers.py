@@ -228,7 +228,60 @@ def test_validate_a2l_tags_matches_memory():
     results = validate_a2l_tags(tags, mem_map)
 
     assert results[0]["valid"] is True
-    assert results[1]["valid"] is False
+    assert results[1]["valid"] is True
+    assert results[1]["in_memory"] is False
+
+
+def test_a2l_tag_filters_by_mode_and_field(tmp_path):
+    app = S19TuiApp(base_dir=tmp_path)
+    tags = [
+        {
+            "name": "FOO",
+            "address": 0x1000,
+            "length": 2,
+            "source": "assigned",
+            "in_memory": True,
+            "lower_limit": "0",
+            "upper_limit": "10",
+            "unit": "rpm",
+            "bit_org": "u16",
+            "endian": "BIG",
+            "virtual": False,
+            "function_group": "ENG",
+            "access": "read_only",
+        },
+        {
+            "name": "BAR",
+            "address": 0x2000,
+            "length": 2,
+            "source": "formula",
+            "in_memory": False,
+            "lower_limit": None,
+            "upper_limit": None,
+            "unit": "",
+            "bit_org": "",
+            "endian": "",
+            "virtual": True,
+            "function_group": "",
+            "access": "calibratable",
+        },
+    ]
+
+    app.a2l_tags_filter_mode = "invalid"
+    app.a2l_tags_filter_text = ""
+    filtered = app._filter_a2l_tags(tags)
+    assert [tag["name"] for tag in filtered] == ["BAR"]
+
+    app.a2l_tags_filter_mode = "all"
+    app.a2l_tags_filter_field = "name"
+    app.a2l_tags_filter_text = "foo"
+    filtered = app._filter_a2l_tags(tags)
+    assert [tag["name"] for tag in filtered] == ["FOO"]
+
+    app.a2l_tags_filter_field = "limits"
+    app.a2l_tags_filter_text = "0..10"
+    filtered = app._filter_a2l_tags(tags)
+    assert [tag["name"] for tag in filtered] == ["FOO"]
 
 
 def test_find_string_in_mem_finds_address():
