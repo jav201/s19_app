@@ -812,6 +812,29 @@ class S19TuiApp(App):
             self.set_status(f"Tag at 0x{addr:08X}")
 
     def _jump_to_mac_record(self, item: ListItem) -> None:
+        """
+        Summary:
+            Focus the MAC hex panel on the address carried by a selected MAC table row.
+
+        Args:
+            item (ListItem): Row from ``#mac_records_list``; ``item.data`` may include
+                ``address`` (int) when the row parsed successfully.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read optional ``address`` from list item payload.
+            - Call ``update_mac_hex_view`` when address is an integer.
+            - Update status line with formatted address.
+
+        Dependencies:
+            Uses:
+                - ``update_mac_hex_view``
+                - ``set_status``
+            Used by:
+                - ``on_list_view_selected`` for ``mac_records_list``
+        """
         info = getattr(item, "data", None)
         if not info:
             return
@@ -820,8 +843,93 @@ class S19TuiApp(App):
             self.update_mac_hex_view(addr)
             self.set_status(f"MAC tag at 0x{addr:08X}")
 
+    def _load_mac_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> LoadedFile:
+        """
+        Summary:
+            Parse a ``.mac`` address map, attach optional A2L metadata, and build a
+            ``LoadedFile`` suitable for the MAC viewer and hex panel.
+
+        Args:
+            path (Path): Path to the ``.mac`` file (UTF-8 text).
+            a2l_files (Optional[list[Path]]): If provided, first entry is parsed as A2L;
+                otherwise ``current_a2l_path`` / ``current_a2l_data`` are used when set.
+
+        Returns:
+            LoadedFile: ``file_type`` ``mac``, sparse ``mem_map`` at parsed addresses,
+            ``mac_records`` / ``mac_diagnostics`` from the parser, and merged A2L fields.
+
+        Data Flow:
+            - Run ``parse_mac_file`` to obtain records and diagnostics.
+            - Build ``mem_map`` as a single-byte placeholder per successfully parsed address.
+            - Derive ``row_bases`` via ``build_row_bases``; empty ``ranges`` for MAC-only load.
+            - Resolve A2L path/data from project load arguments or current session state.
+
+        Dependencies:
+            Uses:
+                - ``parse_mac_file``
+                - ``parse_a2l_file``
+                - ``build_row_bases``
+            Used by:
+                - ``load_selected_file`` MAC extension branch
+        """
+        mac_data = parse_mac_file(path)
+        records = mac_data.get("records", [])
+        diagnostics = [str(item) for item in mac_data.get("diagnostics", [])]
+        valid_addresses = sorted(
+            {
+                int(item["address"])
+                for item in records
+                if item.get("parse_ok") and isinstance(item.get("address"), int)
+            }
+        )
+        mem_map = {addr: 0 for addr in valid_addresses}
+        row_bases = build_row_bases(mem_map)
+        ranges: list[tuple[int, int]] = []
+        range_validity: list[bool] = []
+        errors = [{"line": None, "message": entry} for entry in diagnostics]
+        a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
+        a2l_data = parse_a2l_file(a2l_path) if a2l_path else self.current_a2l_data
+        return LoadedFile(
+            path=path,
+            file_type="mac",
+            mem_map=mem_map,
+            row_bases=row_bases,
+            ranges=ranges,
+            range_validity=range_validity,
+            errors=errors,
+            a2l_path=a2l_path,
+            a2l_data=a2l_data,
+            mac_records=records,
+            mac_diagnostics=diagnostics,
+        )
+
     def load_selected_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> None:
-        """Parse supported data file and update all dependent views."""
+        """
+        Summary:
+            Load S19, Intel HEX, or MAC data from disk and refresh all TUI panels that depend
+            on ``current_file`` and optional A2L state.
+
+        Args:
+            path (Path): File to parse (extension selects loader branch).
+            a2l_files (Optional[list[Path]]): Optional A2L paths when loading from a project
+                directory (first file used).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Dispatch on suffix to S19, HEX, or MAC construction of ``LoadedFile``.
+            - Assign ``current_file`` and sync global A2L fields when payload includes them.
+            - Refresh sections, hex views, MAC table, A2L views, and status labels.
+
+        Dependencies:
+            Uses:
+                - ``S19File`` / ``IntelHexFile`` / ``_load_mac_file``
+                - ``build_mem_map_s19``, ``build_row_bases``, range validity builders
+                - ``parse_a2l_file``
+            Used by:
+                - ``load_from_path``, project load handler, workarea file list selection
+        """
         suffix = path.suffix.lower()
         try:
             self.logger.info("Loading file: %s", path)
@@ -866,36 +974,7 @@ class S19TuiApp(App):
                     a2l_data=a2l_data,
                 )
             elif suffix in MAC_EXTENSIONS:
-                mac_data = parse_mac_file(path)
-                records = mac_data.get("records", [])
-                diagnostics = [str(item) for item in mac_data.get("diagnostics", [])]
-                valid_addresses = sorted(
-                    {
-                        int(item["address"])
-                        for item in records
-                        if item.get("parse_ok") and isinstance(item.get("address"), int)
-                    }
-                )
-                mem_map = {addr: 0 for addr in valid_addresses}
-                row_bases = build_row_bases(mem_map)
-                ranges: list[tuple[int, int]] = []
-                range_validity: list[bool] = []
-                errors = [{"line": None, "message": entry} for entry in diagnostics]
-                a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
-                a2l_data = parse_a2l_file(a2l_path) if a2l_path else self.current_a2l_data
-                loaded = LoadedFile(
-                    path=path,
-                    file_type="mac",
-                    mem_map=mem_map,
-                    row_bases=row_bases,
-                    ranges=ranges,
-                    range_validity=range_validity,
-                    errors=errors,
-                    a2l_path=a2l_path,
-                    a2l_data=a2l_data,
-                    mac_records=records,
-                    mac_diagnostics=diagnostics,
-                )
+                loaded = self._load_mac_file(path, a2l_files)
             else:
                 self.set_status(f"Unsupported file type: {suffix}")
                 self.logger.warning("Unsupported file type in loader: %s", suffix)
@@ -993,7 +1072,31 @@ class S19TuiApp(App):
         )
 
     def update_mac_view(self) -> None:
-        """Render parsed MAC records with validation/status columns."""
+        """
+        Summary:
+            Populate the MAC viewer list with parsed ``.mac`` rows, A2L cross-check columns,
+            combined status coloring, and aggregate counts.
+
+        Args:
+            (none; reads ``current_file``, ``current_a2l_data``, and widget ``#mac_records_list``.)
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clear and repopulate ``#mac_records_list`` with header, fixed-width rows, summary.
+            - Build case-insensitive A2L name index from loaded tags.
+            - For each MAC record, compute parse validity, A2L membership, optional image check,
+              row status string, and CSS class (``valid`` / ``invalid``).
+
+        Dependencies:
+            Uses:
+                - ``_build_a2l_name_index``
+                - ``query_one`` / ``ListView`` / ``Label`` / ``ListItem``
+            Used by:
+                - ``load_selected_file`` post-load refresh
+                - ``update_a2l_view`` when A2L data changes
+        """
         mac_list = self.query_one("#mac_records_list", ListView)
         mac_list.clear()
         if not self.current_file or self.current_file.file_type != "mac":
