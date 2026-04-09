@@ -2,6 +2,7 @@ from pathlib import Path
 
 from s19_app.tui.a2l import (
     extract_a2l_tags,
+    format_tag_validation_status,
     parse_a2l_file,
     render_a2l_view,
     validate_a2l_tags,
@@ -88,9 +89,11 @@ def test_validate_a2l_tags_marks_missing_address_or_length_invalid():
             "name": "RPM",
             "address": None,
             "length": 2,
+            "schema_ok": False,
+            "memory_checked": False,
             "valid": False,
             "reason": "missing address/length",
-            "in_memory": False,
+            "in_memory": None,
         }
     ]
 
@@ -107,6 +110,7 @@ def test_render_a2l_view_shows_tag_validation_status():
             "name": "RPM",
             "address": 0x1000,
             "length": 2,
+            "schema_ok": False,
             "valid": False,
             "reason": "missing address/length",
         }
@@ -115,3 +119,29 @@ def test_render_a2l_view_shows_tag_validation_status():
     output = render_a2l_view(a2l_data, tag_checks)
 
     assert "MEASUREMENT RPM: 0x00001000 len=2 mem=unknown ERR (missing address/length)" in output
+
+
+def test_validate_a2l_tags_without_mem_map_skips_image_check():
+    tags = [{"section": "MEASUREMENT", "name": "A", "address": 0x1000, "length": 2}]
+
+    results = validate_a2l_tags(tags, None)
+
+    assert results[0]["schema_ok"] is True
+    assert results[0]["memory_checked"] is False
+    assert results[0]["in_memory"] is None
+
+
+def test_validate_a2l_tags_virtual_without_address_skips_range():
+    tags = [{"section": "MEASUREMENT", "name": "V", "virtual": True, "address": None, "length": None}]
+
+    results = validate_a2l_tags(tags, {0x1000: 0x01})
+
+    assert results[0]["schema_ok"] is True
+    assert results[0]["memory_checked"] is False
+    assert results[0]["in_memory"] is None
+
+
+def test_render_a2l_view_shows_out_of_image_status():
+    assert format_tag_validation_status(
+        {"schema_ok": True, "memory_checked": True, "in_memory": False}
+    ) == "OUT(image)"

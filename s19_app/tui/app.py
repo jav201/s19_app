@@ -48,6 +48,20 @@ from .workspace import (
 )
 
 
+def _a2l_tag_in_memory_display(tag: dict) -> str:
+    if not tag.get("memory_checked"):
+        return "n/a"
+    if tag.get("in_memory") is True:
+        return "yes"
+    return "no"
+
+
+def _a2l_tag_row_invalid(tag: dict) -> bool:
+    if not tag.get("schema_ok", True):
+        return True
+    return bool(tag.get("memory_checked") and tag.get("in_memory") is False)
+
+
 class S19TuiApp(App):
     """Main TUI app with workarea, project management, and views."""
 
@@ -919,18 +933,16 @@ class S19TuiApp(App):
             a2l_view.update("No A2L loaded.")
             self.update_a2l_tags_view([])
             return
-        tag_checks = None
-        if self.current_file:
-            tag_checks = validate_a2l_tags(self.current_a2l_data.get("tags", []), self.current_file.mem_map)
+        mem_map = self.current_file.mem_map if self.current_file else None
+        tag_checks = validate_a2l_tags(self.current_a2l_data.get("tags", []), mem_map)
         a2l_view.update(render_a2l_view(self.current_a2l_data, tag_checks))
         tags = self.current_a2l_data.get("tags", [])
-        if tag_checks:
-            check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
-            enriched = []
-            for tag in tags:
-                key = (tag.get("section"), tag.get("name"))
-                enriched.append({**tag, **check_map.get(key, {})})
-            tags = enriched
+        check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
+        enriched = []
+        for tag in tags:
+            key = (tag.get("section"), tag.get("name"))
+            enriched.append({**tag, **check_map.get(key, {})})
+        tags = enriched
         filter_input = self.query_one("#a2l_tags_filter_input", Input)
         self.a2l_tags_filter_text = filter_input.value.strip()
         tags = self._filter_a2l_tags(tags)
@@ -942,15 +954,16 @@ class S19TuiApp(App):
         if not tags:
             a2l_tags_list.append(ListItem(Label("No A2L tags.")))
             return
-        rows = []
-        for tag in tags[:400]:
+        rows: list[tuple] = []
+        row_tags: list[dict] = []
+        for tag in tags:
             addr = tag.get("address")
             length = tag.get("length")
             addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
             len_text = str(length) if isinstance(length, int) else "n/a"
             name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
             source_text = str(tag.get("source") or "assigned")
-            in_mem_text = "yes" if tag.get("in_memory") else "no"
+            in_mem_text = _a2l_tag_in_memory_display(tag)
             region_text = str(tag.get("memory_region") or "unknown")
             limits_text = ""
             if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
@@ -980,6 +993,7 @@ class S19TuiApp(App):
                     dtype_text,
                 )
             )
+            row_tags.append(tag)
 
         name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
         addr_width = max(len("Address"), *(len(row[1]) for row in rows))
@@ -1006,7 +1020,7 @@ class S19TuiApp(App):
             f"{'Access'.ljust(access_width)} | {'Dtype'.ljust(dtype_width)}"
         )
         a2l_tags_list.append(ListItem(Label(header)))
-        for row in rows:
+        for i, row in enumerate(rows):
             name_text = row[0][:name_width].ljust(name_width)
             line = (
                 f"{name_text} | {row[1].ljust(addr_width)} | {row[2].ljust(len_width)} | "
@@ -1018,7 +1032,7 @@ class S19TuiApp(App):
                 f"{row[13][:dtype_width].ljust(dtype_width)}"
             )
             label = Label(line)
-            if row[4] == "no":
+            if _a2l_tag_row_invalid(row_tags[i]):
                 label.add_class("invalid")
             item = ListItem(label)
             item.data = {"address": row[1], "name": row[0]}
@@ -1034,8 +1048,12 @@ class S19TuiApp(App):
         text = (self.a2l_tags_filter_text or "").lower()
         filtered = []
         for tag in tags:
-            if mode == "invalid" and tag.get("in_memory") is True:
-                continue
+            if mode == "invalid":
+                show = (not tag.get("schema_ok", True)) or (
+                    tag.get("memory_checked") and tag.get("in_memory") is False
+                )
+                if not show:
+                    continue
             if mode == "inmem" and tag.get("in_memory") is not True:
                 continue
             if text:
@@ -1053,7 +1071,7 @@ class S19TuiApp(App):
                     str(tag.get("address") or ""),
                     str(tag.get("length") or ""),
                     str(tag.get("source") or ""),
-                    str(tag.get("in_memory") or ""),
+                    _a2l_tag_in_memory_display(tag),
                     str(tag.get("lower_limit") or ""),
                     str(tag.get("upper_limit") or ""),
                     str(tag.get("unit") or ""),
@@ -1079,7 +1097,7 @@ class S19TuiApp(App):
         elif field == "source":
             value = str(tag.get("source") or "")
         elif field == "in_memory":
-            value = "yes" if tag.get("in_memory") else "no"
+            value = _a2l_tag_in_memory_display(tag)
         elif field == "limits":
             value = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
         elif field == "unit":

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 # Common ASAP2 primitives → size in bytes (address granularity byte).
 DATATYPE_SIZES: dict[str, int] = {
@@ -543,26 +543,105 @@ def parse_a2l_file(path: Path) -> dict:
     }
 
 
-def validate_a2l_tags(tags: list[dict], mem_map: Dict[int, int]) -> list[dict]:
-    """Validate tags against loaded memory map (address + length)."""
+def _memory_range_in_map(address: int, length: int, mem_map: Dict[int, int]) -> bool:
+    """Check if a memory range is in a memory map."""
+    for offset in range(length):
+        if address + offset not in mem_map:
+            return False
+    return True
+
+
+def _tag_schema_and_applicability(tag: dict) -> tuple[bool, bool, str]:
+    """Return (schema_ok, memory_check_applicable, reason_if_schema_bad)."""
+    virtual = tag.get("virtual") is True
+    address = tag.get("address")
+    length = tag.get("length")
+    if virtual and address is None:
+        return True, False, ""
+    if address is None or length is None:
+        return False, False, "missing address/length"
+    return True, True, ""
+
+
+def validate_a2l_tags(tags: list[dict], mem_map: Optional[Dict[int, int]] = None) -> list[dict]:
+    """Enrich tags with schema and optional image coverage (ECU range vs loaded mem_map).
+
+    When ``mem_map`` is None, no byte-range check is performed: ``memory_checked`` is False
+    and ``in_memory`` is None. When a map is given and a range applies, ``memory_checked`` is
+    True and ``in_memory`` reflects full coverage.
+
+    ``valid`` is kept as an alias for ``schema_ok`` for older call sites.
+    """
     results: list[dict] = []
     for tag in tags:
-        address = tag.get("address")
-        length = tag.get("length")
-        if address is None or length is None:
-            results.append({**tag, "valid": False, "reason": "missing address/length", "in_memory": False})
+        schema_ok, applicable, reason = _tag_schema_and_applicability(tag)
+        if mem_map is None or not applicable:
+            results.append(
+                {
+                    **tag,
+                    "schema_ok": schema_ok,
+                    "memory_checked": False,
+                    "in_memory": None,
+                    "reason": reason if not schema_ok else "",
+                    "valid": schema_ok,
+                }
+            )
             continue
-        missing = []
-        for offset in range(length):
-            addr = address + offset
-            if addr not in mem_map:
-                missing.append(addr)
-                break
-        if missing:
-            results.append({**tag, "valid": True, "reason": "", "in_memory": False})
-        else:
-            results.append({**tag, "valid": True, "reason": "", "in_memory": True})
+        addr = tag.get("address")
+        ln = tag.get("length")
+        if addr is None or ln is None:
+            results.append(
+                {
+                    **tag,
+                    "schema_ok": False,
+                    "memory_checked": False,
+                    "in_memory": None,
+                    "reason": "missing address/length",
+                    "valid": False,
+                }
+            )
+            continue
+        in_mem = _memory_range_in_map(addr, ln, mem_map)
+        results.append(
+            {
+                **tag,
+                "schema_ok": True,
+                "memory_checked": True,
+                "in_memory": in_mem,
+                "reason": "",
+                "valid": True,
+            }
+        )
     return results
+
+
+def format_tag_validation_status(check: dict) -> str:
+    """Short status for summary text (A2L view tile)."""
+    if not check.get("schema_ok", True):
+        r = (check.get("reason") or "schema").strip()
+        return f"ERR ({r})" if r else "ERR"
+    if check.get("memory_checked") and check.get("in_memory") is False:
+        return "OUT(image)"
+    if check.get("memory_checked") and check.get("in_memory") is True:
+        return "OK"
+    return ""
+
+
+def iter_section_lines(sections: List[dict], depth: int = 0) -> List[str]:
+    """Depth-first lines for /begin tree (indented)."""
+    lines: list[str] = []
+    indent = "  " * depth
+    for section in sections:
+        name = section.get("name", "UNKNOWN")
+        meta = section.get("meta", "")
+        start = section.get("start_line")
+        end = section.get("end_line")
+        label = f"{name} {meta}".strip()
+        lines.append(f"{indent}- {label} (lines {start}-{end})")
+        children = section.get("children") or []
+        if children:
+            lines.extend(iter_section_lines(children, depth + 1))
+    return lines
 
 
 def render_a2l_view(a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None) -> str:
@@ -576,18 +655,11 @@ def render_a2l_view(a2l_data: Optional[dict], tag_checks: Optional[list[dict]] =
     tags = a2l_data.get("tags", [])
     if not sections:
         return "No A2L sections found."
-    lines_out = ["A2L Sections:"]
-    for section in sections:
-        name = section.get("name", "UNKNOWN")
-        meta = section.get("meta", "")
-        start = section.get("start_line")
-        end = section.get("end_line")
-        label = f"{name} {meta}".strip()
-        lines_out.append(f"- {label} (lines {start}-{end})")
+    lines_out = ["A2L Sections:", *iter_section_lines(sections)]
     if tags:
         lines_out.append("")
         lines_out.append("A2L Tags:")
-        for tag in tags[:200]:
+        for tag in tags:
             addr = tag.get("address")
             length = tag.get("length")
             addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
@@ -604,9 +676,10 @@ def render_a2l_view(a2l_data: Optional[dict], tag_checks: Optional[list[dict]] =
                     None,
                 )
                 if match:
-                    status = "OK" if match.get("valid") else f"ERR ({match.get('reason')})"
+                    status = format_tag_validation_status(match)
             reg = tag.get("memory_region") or "unknown"
+            tail = f" {status}" if status else ""
             lines_out.append(
-                f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg} {status}".strip()
+                f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg}{tail}".strip()
             )
     return "\n".join(lines_out)

@@ -210,6 +210,34 @@ def test_render_a2l_view_shows_sections():
     assert "PROJECT Demo" in output
 
 
+def test_render_a2l_view_shows_nested_sections():
+    data = {
+        "sections": [
+            {
+                "name": "PROJECT",
+                "meta": "Demo",
+                "start_line": 1,
+                "end_line": 5,
+                "children": [
+                    {
+                        "name": "MODULE",
+                        "meta": "Engine",
+                        "start_line": 2,
+                        "end_line": 4,
+                        "children": [],
+                    }
+                ],
+            }
+        ],
+        "errors": [],
+    }
+
+    output = render_a2l_view(data)
+
+    assert "- PROJECT Demo (lines 1-5)" in output
+    assert "  - MODULE Engine (lines 2-4)" in output
+
+
 def test_render_a2l_view_shows_errors():
     data = {"sections": [], "errors": ["Line 1: /end without /begin"]}
 
@@ -228,7 +256,12 @@ def test_validate_a2l_tags_matches_memory():
     results = validate_a2l_tags(tags, mem_map)
 
     assert results[0]["valid"] is True
+    assert results[0]["schema_ok"] is True
+    assert results[0]["memory_checked"] is True
+    assert results[0]["in_memory"] is True
     assert results[1]["valid"] is True
+    assert results[1]["schema_ok"] is True
+    assert results[1]["memory_checked"] is True
     assert results[1]["in_memory"] is False
 
 
@@ -240,6 +273,8 @@ def test_a2l_tag_filters_by_mode_and_field(tmp_path):
             "address": 0x1000,
             "length": 2,
             "source": "assigned",
+            "schema_ok": True,
+            "memory_checked": True,
             "in_memory": True,
             "lower_limit": "0",
             "upper_limit": "10",
@@ -255,6 +290,8 @@ def test_a2l_tag_filters_by_mode_and_field(tmp_path):
             "address": 0x2000,
             "length": 2,
             "source": "formula",
+            "schema_ok": True,
+            "memory_checked": True,
             "in_memory": False,
             "lower_limit": None,
             "upper_limit": None,
