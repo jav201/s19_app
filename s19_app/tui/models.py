@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -16,3 +16,5 @@ class LoadedFile:
     errors: List[dict]
     a2l_path: Optional[Path]
     a2l_data: Optional[dict]
+    mac_records: List[dict] = field(default_factory=list)
+    mac_diagnostics: List[str] = field(default_factory=list)

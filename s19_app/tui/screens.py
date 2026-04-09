@@ -10,12 +10,12 @@ from textual.widgets import Button, Input, Label, ListItem, ListView
 
 
 class LoadFileScreen(ModalScreen[Optional[Path]]):
-    """Modal dialog for loading S19/HEX files."""
+    """Modal dialog for loading S19/HEX/MAC files."""
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Load file (S19/HEX):"),
-            Input(placeholder="C:\\path\\to\\file.s19 or .hex", id="load_path"),
+            Label("Load file (S19/HEX/MAC):"),
+            Input(placeholder="C:\\path\\to\\file.s19 or .hex or .mac", id="load_path"),
             Container(
                 Button("Load", id="load_ok"),
                 Button("Cancel", id="load_cancel"),

@@ -31,10 +31,13 @@ from .hexview import (
     find_string_in_mem,
     render_hex_view_text,
 )
+from .mac import parse_mac_file
 from .models import LoadedFile
 from .screens import LoadA2LScreen, LoadFileScreen, LoadProjectScreen, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
+    HEX_EXTENSIONS,
+    MAC_EXTENSIONS,
     PROJECT_DATA_EXTENSIONS,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
@@ -60,6 +63,19 @@ def _a2l_tag_row_invalid(tag: dict) -> bool:
     if not tag.get("schema_ok", True):
         return True
     return bool(tag.get("memory_checked") and tag.get("in_memory") is False)
+
+
+def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
+    index: dict[str, list[dict]] = {}
+    if not a2l_data:
+        return index
+    for tag in a2l_data.get("tags", []):
+        name = str(tag.get("name") or "").strip()
+        if not name:
+            continue
+        key = name.lower()
+        index.setdefault(key, []).append(tag)
+    return index
 
 
 class S19TuiApp(App):
@@ -433,7 +449,7 @@ class S19TuiApp(App):
             Container(
                 Label("MAC File Content", id="mac_title"),
                 ScrollableContainer(
-                    Static("No MAC loaded.", id="mac_view", markup=False),
+                    ListView(id="mac_records_list"),
                     id="mac_scroll",
                 ),
                 id="mac_content_panel",
@@ -479,7 +495,7 @@ class S19TuiApp(App):
         self.refresh_files()
 
     def action_load_file(self) -> None:
-        """Open file picker for S19/HEX."""
+        """Open file picker for S19/HEX/MAC."""
         self.logger.info("Load file action triggered.")
         self.push_screen(LoadFileScreen(), self._handle_load_dialog)
 
@@ -678,7 +694,7 @@ class S19TuiApp(App):
         self.load_from_path(path)
 
     def load_from_path(self, path: Path) -> None:
-        """Load S19/HEX file into temp and render views."""
+        """Load supported data file into temp and render views."""
         normalized = resolve_input_path(path, self.base_dir)
         if not normalized:
             self.set_status(f"File not found: {path}")
@@ -763,6 +779,11 @@ class S19TuiApp(App):
             if field:
                 self._set_a2l_filter_field(field)
             return
+        if event.list_view.id == "mac_records_list":
+            if event.item is None:
+                return
+            self._jump_to_mac_record(event.item)
+            return
 
     def _load_from_item(self, item: ListItem) -> None:
         label_widget = item.query_one(Label)
@@ -790,8 +811,17 @@ class S19TuiApp(App):
             self.update_alt_hex_view(addr)
             self.set_status(f"Tag at 0x{addr:08X}")
 
+    def _jump_to_mac_record(self, item: ListItem) -> None:
+        info = getattr(item, "data", None)
+        if not info:
+            return
+        addr = info.get("address")
+        if isinstance(addr, int):
+            self.update_mac_hex_view(addr)
+            self.set_status(f"MAC tag at 0x{addr:08X}")
+
     def load_selected_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> None:
-        """Parse S19/HEX and update all dependent views."""
+        """Parse supported data file and update all dependent views."""
         suffix = path.suffix.lower()
         try:
             self.logger.info("Loading file: %s", path)
@@ -815,7 +845,7 @@ class S19TuiApp(App):
                     a2l_path=a2l_path,
                     a2l_data=a2l_data,
                 )
-            else:
+            elif suffix in HEX_EXTENSIONS:
                 hex_file = IntelHexFile(str(path))
                 mem_map = dict(hex_file.memory)
                 row_bases = build_row_bases(mem_map)
@@ -835,6 +865,41 @@ class S19TuiApp(App):
                     a2l_path=a2l_path,
                     a2l_data=a2l_data,
                 )
+            elif suffix in MAC_EXTENSIONS:
+                mac_data = parse_mac_file(path)
+                records = mac_data.get("records", [])
+                diagnostics = [str(item) for item in mac_data.get("diagnostics", [])]
+                valid_addresses = sorted(
+                    {
+                        int(item["address"])
+                        for item in records
+                        if item.get("parse_ok") and isinstance(item.get("address"), int)
+                    }
+                )
+                mem_map = {addr: 0 for addr in valid_addresses}
+                row_bases = build_row_bases(mem_map)
+                ranges: list[tuple[int, int]] = []
+                range_validity: list[bool] = []
+                errors = [{"line": None, "message": entry} for entry in diagnostics]
+                a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
+                a2l_data = parse_a2l_file(a2l_path) if a2l_path else self.current_a2l_data
+                loaded = LoadedFile(
+                    path=path,
+                    file_type="mac",
+                    mem_map=mem_map,
+                    row_bases=row_bases,
+                    ranges=ranges,
+                    range_validity=range_validity,
+                    errors=errors,
+                    a2l_path=a2l_path,
+                    a2l_data=a2l_data,
+                    mac_records=records,
+                    mac_diagnostics=diagnostics,
+                )
+            else:
+                self.set_status(f"Unsupported file type: {suffix}")
+                self.logger.warning("Unsupported file type in loader: %s", suffix)
+                return
         except Exception as exc:
             self.set_status(f"Load failed: {exc}")
             self.logger.exception("Load failed for %s", path)
@@ -847,6 +912,7 @@ class S19TuiApp(App):
         self.update_hex_view()
         self.update_alt_hex_view()
         self.update_mac_hex_view()
+        self.update_mac_view()
         self.update_a2l_view()
         self.update_project_labels()
         self.set_file_status(f"Loaded {path.name}")
@@ -926,12 +992,142 @@ class S19TuiApp(App):
             )
         )
 
+    def update_mac_view(self) -> None:
+        """Render parsed MAC records with validation/status columns."""
+        mac_list = self.query_one("#mac_records_list", ListView)
+        mac_list.clear()
+        if not self.current_file or self.current_file.file_type != "mac":
+            mac_list.append(ListItem(Label("No MAC loaded.")))
+            return
+        records = self.current_file.mac_records or []
+        if not records:
+            mac_list.append(ListItem(Label("No MAC records parsed.")))
+            return
+
+        a2l_name_index = _build_a2l_name_index(self.current_a2l_data)
+        rows: list[tuple] = []
+        row_meta: list[dict] = []
+        total_valid = 0
+        total_invalid = 0
+        total_in_a2l = 0
+        total_out_of_mem = 0
+        total_parse_errors = 0
+
+        for record in records:
+            line_no = int(record.get("line_number") or 0)
+            name = str(record.get("name") or "").strip()
+            address = record.get("address")
+            parse_ok = bool(record.get("parse_ok"))
+            parse_error = str(record.get("parse_error") or "")
+            if not parse_ok:
+                total_parse_errors += 1
+
+            in_a2l = False
+            a2l_match_text = ""
+            if name:
+                matches = a2l_name_index.get(name.lower(), [])
+                if matches:
+                    in_a2l = True
+                    total_in_a2l += 1
+                    best = matches[0]
+                    a2l_match_text = f"{best.get('section', '?')}:{best.get('name', name)}"
+
+            memory_checked = False
+            in_memory = None
+            if self.current_file.file_type in {"s19", "hex"} and isinstance(address, int):
+                memory_checked = True
+                in_memory = address in self.current_file.mem_map
+
+            in_mem_text = "n/a"
+            if memory_checked:
+                in_mem_text = "yes" if in_memory else "no"
+                if not in_memory:
+                    total_out_of_mem += 1
+
+            if not parse_ok:
+                status = "ERR_PARSE"
+                is_invalid = True
+            elif not in_a2l:
+                status = "NOT_IN_A2L"
+                is_invalid = True
+            elif memory_checked and in_memory is False:
+                status = "OUT_OF_IMAGE"
+                is_invalid = True
+            else:
+                status = "OK"
+                is_invalid = False
+
+            if is_invalid:
+                total_invalid += 1
+            else:
+                total_valid += 1
+
+            addr_text = f"0x{address:08X}" if isinstance(address, int) else "n/a"
+            rows.append(
+                (
+                    name or "(invalid)",
+                    addr_text,
+                    "yes" if in_a2l else "no",
+                    in_mem_text,
+                    status,
+                    str(line_no),
+                    parse_error,
+                    a2l_match_text,
+                )
+            )
+            row_meta.append(
+                {
+                    "is_invalid": is_invalid,
+                    "address": address if isinstance(address, int) else None,
+                }
+            )
+
+        name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
+        addr_width = max(len("Address"), *(len(row[1]) for row in rows))
+        in_a2l_width = max(len("InA2L"), *(len(row[2]) for row in rows))
+        in_mem_width = max(len("InMem"), *(len(row[3]) for row in rows))
+        status_width = max(len("Status"), *(len(row[4]) for row in rows))
+        line_width = max(len("SourceLine"), *(len(row[5]) for row in rows))
+        parse_width = min(36, max(len("ParseErr"), *(len(row[6]) for row in rows)))
+        match_width = min(36, max(len("A2LMatch"), *(len(row[7]) for row in rows)))
+
+        header = (
+            f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
+            f"{'InA2L'.ljust(in_a2l_width)} | {'InMem'.ljust(in_mem_width)} | "
+            f"{'Status'.ljust(status_width)} | {'SourceLine'.ljust(line_width)} | "
+            f"{'ParseErr'.ljust(parse_width)} | {'A2LMatch'.ljust(match_width)}"
+        )
+        mac_list.append(ListItem(Label(header)))
+
+        for index, row in enumerate(rows):
+            line = (
+                f"{row[0][:name_width].ljust(name_width)} | {row[1].ljust(addr_width)} | "
+                f"{row[2].ljust(in_a2l_width)} | {row[3].ljust(in_mem_width)} | "
+                f"{row[4].ljust(status_width)} | {row[5].ljust(line_width)} | "
+                f"{row[6][:parse_width].ljust(parse_width)} | {row[7][:match_width].ljust(match_width)}"
+            )
+            label = Label(line)
+            if row_meta[index]["is_invalid"]:
+                label.add_class("invalid")
+            else:
+                label.add_class("valid")
+            item = ListItem(label)
+            item.data = {"address": row_meta[index]["address"]}
+            mac_list.append(item)
+
+        summary = (
+            f"Total={len(records)}  Valid={total_valid}  Invalid={total_invalid}  "
+            f"InA2L={total_in_a2l}  OutOfMem={total_out_of_mem}  ParseErrs={total_parse_errors}"
+        )
+        mac_list.append(ListItem(Label(summary)))
+
     def update_a2l_view(self) -> None:
         """Render the A2L summary view."""
         a2l_view = self.query_one("#a2l_view", Static)
         if not self.current_a2l_data:
             a2l_view.update("No A2L loaded.")
             self.update_a2l_tags_view([])
+            self.update_mac_view()
             return
         mem_map = self.current_file.mem_map if self.current_file else None
         tag_checks = validate_a2l_tags(self.current_a2l_data.get("tags", []), mem_map)
@@ -947,6 +1143,7 @@ class S19TuiApp(App):
         self.a2l_tags_filter_text = filter_input.value.strip()
         tags = self._filter_a2l_tags(tags)
         self.update_a2l_tags_view(tags)
+        self.update_mac_view()
 
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
         a2l_tags_list = self.query_one("#a2l_tags_list", ListView)
@@ -1350,7 +1547,7 @@ class S19TuiApp(App):
 def main() -> None:
     import argparse
 
-    parser = argparse.ArgumentParser(description="S19/HEX TUI Viewer")
+    parser = argparse.ArgumentParser(description="S19/HEX/MAC TUI Viewer")
     parser.add_argument("--load", help="Optional path to load at startup")
     args = parser.parse_args()
     load_path = Path(args.load) if args.load else None

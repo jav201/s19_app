@@ -14,8 +14,9 @@ LOGS_SUBDIR = "logs"
 LOG_FILENAME = "s19tui.log"
 S19_EXTENSIONS = {".s19", ".srec"}
 HEX_EXTENSIONS = {".hex", ".ihex"}
+MAC_EXTENSIONS = {".mac"}
 A2L_EXTENSIONS = {".a2l"}
-SUPPORTED_EXTENSIONS = S19_EXTENSIONS | HEX_EXTENSIONS
+SUPPORTED_EXTENSIONS = S19_EXTENSIONS | HEX_EXTENSIONS | MAC_EXTENSIONS
 PROJECT_DATA_EXTENSIONS = SUPPORTED_EXTENSIONS
 
 
@@ -106,7 +107,7 @@ def validate_project_files(project_dir: Path) -> tuple[list[Path], list[Path], O
         elif suffix in A2L_EXTENSIONS:
             a2l_files.append(item)
     if len(data_files) > 1:
-        return data_files, a2l_files, "Project already has more than one S19/HEX file."
+        return data_files, a2l_files, "Project already has more than one S19/HEX/MAC file."
     if len(a2l_files) > 1:
         return data_files, a2l_files, "Project already has more than one A2L file."
     return data_files, a2l_files, None
