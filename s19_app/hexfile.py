@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 from typing import List, Dict
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -106,6 +109,12 @@ class IntelHexFile:
                             continue
                         segment_base = ((data[0] << 8) | data[1]) << 4
                         use_segment = True
+                        logger.debug(
+                            "HEX segment base update: path=%s line=%d segment_base=0x%08X",
+                            self.path,
+                            line_number,
+                            segment_base,
+                        )
                     elif record_type == 0x04:
                         if len(data) != 2:
                             self._add_error(
@@ -117,6 +126,12 @@ class IntelHexFile:
                             continue
                         upper_address = (data[0] << 8) | data[1]
                         use_segment = False
+                        logger.debug(
+                            "HEX upper linear update: path=%s line=%d upper_address=0x%04X",
+                            self.path,
+                            line_number,
+                            upper_address,
+                        )
                     elif record_type in {0x03, 0x05}:
                         # Start segment/linear address records: informational only.
                         continue
@@ -128,9 +143,24 @@ class IntelHexFile:
                             f"Unsupported record type: {record_type:02X}",
                         )
         except FileNotFoundError:
+            logger.error("HEX file not found: path=%s", self.path)
             raise
+        logger.info(
+            "HEX load summary: path=%s records=%d addresses=%d errors=%d",
+            self.path,
+            len(self.records),
+            len(self.memory),
+            len(self.load_errors),
+        )
 
     def _add_error(self, line_number: int, line: str, segment: str, error: str) -> None:
+        logger.debug(
+            "HEX parse issue: path=%s line=%d segment=%s error=%s",
+            self.path,
+            line_number,
+            segment,
+            error,
+        )
         self.load_errors.append(
             {
                 "line_number": line_number,

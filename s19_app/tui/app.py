@@ -3,7 +3,8 @@ from __future__ import annotations
 from collections import deque
 import json
 from pathlib import Path
-from typing import List, Optional
+import time
+from typing import Any, List, Optional
 
 from textual.app import App, ComposeResult
 from textual.containers import Container, ScrollableContainer
@@ -340,6 +341,8 @@ class S19TuiApp(App):
         "description",
         "memory_region",
     ]
+    large_a2l_warn_bytes: int = 2 * 1024 * 1024
+    slow_parse_warn_seconds: float = 2.5
 
     def __init__(self, base_dir: Optional[Path] = None, load_path: Optional[Path] = None):
         super().__init__()
@@ -348,6 +351,8 @@ class S19TuiApp(App):
         self.workarea = ensure_workarea(self.base_dir)
         self.load_path = load_path
         self.log_lines = deque(maxlen=4)
+        self._a2l_cache_key: Optional[tuple[str, int, int]] = None
+        self._a2l_cache_data: Optional[dict[str, Any]] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def compose(self) -> ComposeResult:
@@ -710,10 +715,17 @@ class S19TuiApp(App):
             return
         temp_dir = self.workarea / WORKAREA_TEMP
         self.set_progress(10, "Copying into workarea temp...")
+        copy_started = time.perf_counter()
         copied = copy_into_workarea(normalized, temp_dir)
+        copy_elapsed = time.perf_counter() - copy_started
         self.refresh_files()
         self.set_progress(50, f"Loading {copied.name}...")
-        self.logger.info("File copied to temp: %s", copied)
+        self.logger.info(
+            "File copied to temp: path=%s size_bytes=%d copy_seconds=%.3f",
+            copied,
+            copied.stat().st_size,
+            copy_elapsed,
+        )
         self.load_selected_file(copied)
         self.set_progress(100, f"Loaded {copied.name}")
 
@@ -743,16 +755,47 @@ class S19TuiApp(App):
                 self.logger.warning("Project already has A2L file: %s", project_dir)
                 return
         temp_dir = self.workarea / WORKAREA_TEMP
+        source_size = normalized.stat().st_size
+        if source_size >= self.large_a2l_warn_bytes:
+            self.logger.warning(
+                "Large A2L detected before copy: path=%s size_bytes=%d threshold_bytes=%d",
+                normalized,
+                source_size,
+                self.large_a2l_warn_bytes,
+            )
         self.set_progress(10, "Copying A2L into workarea temp...")
+        copy_started = time.perf_counter()
         copied = copy_into_workarea(normalized, temp_dir)
+        copy_elapsed = time.perf_counter() - copy_started
         self.refresh_files()
+        copied_size = copied.stat().st_size
+        self.logger.info(
+            "A2L copy complete: path=%s size_bytes=%d copy_seconds=%.3f",
+            copied,
+            copied_size,
+            copy_elapsed,
+        )
         self.set_progress(50, f"Parsing {copied.name}...")
         self.current_a2l_path = copied
-        self.current_a2l_data = parse_a2l_file(copied)
+        parse_started = time.perf_counter()
+        self.current_a2l_data = self._load_a2l_data_with_cache(copied)
+        parse_elapsed = time.perf_counter() - parse_started
+        self._log_a2l_parse_summary(copied, self.current_a2l_data, parse_elapsed)
         if self.current_file:
             self.current_file.a2l_path = copied
             self.current_file.a2l_data = self.current_a2l_data
+        view_started = time.perf_counter()
         self.update_a2l_view()
+        view_elapsed = time.perf_counter() - view_started
+        if view_elapsed > self.slow_parse_warn_seconds:
+            self.logger.warning(
+                "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
+                copied,
+                view_elapsed,
+                self.slow_parse_warn_seconds,
+            )
+        else:
+            self.logger.info("A2L view refresh complete: path=%s elapsed_seconds=%.3f", copied, view_elapsed)
         self.update_project_labels()
         self.set_progress(100, f"Loaded {copied.name}")
         self.set_status(f"A2L loaded: {copied.name}")
@@ -896,7 +939,16 @@ class S19TuiApp(App):
         range_validity: list[bool] = []
         errors = [{"line": None, "message": entry} for entry in diagnostics]
         a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
-        a2l_data = parse_a2l_file(a2l_path) if a2l_path else self.current_a2l_data
+        a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
+        self.logger.info(
+            "MAC parse summary: path=%s total_records=%d parse_ok=%d diagnostics=%d valid_addresses=%d a2l_path=%s",
+            path,
+            len(records),
+            len([item for item in records if item.get("parse_ok")]),
+            len(diagnostics),
+            len(valid_addresses),
+            a2l_path,
+        )
         return LoadedFile(
             path=path,
             file_type="mac",
@@ -940,7 +992,8 @@ class S19TuiApp(App):
         """
         suffix = path.suffix.lower()
         try:
-            self.logger.info("Loading file: %s", path)
+            load_started = time.perf_counter()
+            self.logger.info("Loading file: path=%s suffix=%s project=%s", path, suffix, self.current_project)
             if suffix in S19_EXTENSIONS:
                 s19 = S19File(str(path))
                 mem_map = build_mem_map_s19(s19)
@@ -949,7 +1002,7 @@ class S19TuiApp(App):
                 range_validity = build_range_validity_s19(s19, ranges)
                 errors = s19.get_errors()
                 a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
-                a2l_data = parse_a2l_file(a2l_path) if a2l_path else self.current_a2l_data
+                a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
                 loaded = LoadedFile(
                     path=path,
                     file_type="s19",
@@ -961,6 +1014,13 @@ class S19TuiApp(App):
                     a2l_path=a2l_path,
                     a2l_data=a2l_data,
                 )
+                self._log_loaded_file_summary(
+                    file_type="s19",
+                    path=path,
+                    mem_map=mem_map,
+                    ranges=ranges,
+                    errors=errors,
+                )
             elif suffix in HEX_EXTENSIONS:
                 hex_file = IntelHexFile(str(path))
                 mem_map = dict(hex_file.memory)
@@ -969,7 +1029,7 @@ class S19TuiApp(App):
                 range_validity = build_range_validity_hex(hex_file, ranges)
                 errors = hex_file.get_errors()
                 a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
-                a2l_data = parse_a2l_file(a2l_path) if a2l_path else self.current_a2l_data
+                a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
                 loaded = LoadedFile(
                     path=path,
                     file_type="hex",
@@ -981,15 +1041,29 @@ class S19TuiApp(App):
                     a2l_path=a2l_path,
                     a2l_data=a2l_data,
                 )
+                self._log_loaded_file_summary(
+                    file_type="hex",
+                    path=path,
+                    mem_map=mem_map,
+                    ranges=ranges,
+                    errors=errors,
+                )
             elif suffix in MAC_EXTENSIONS:
                 loaded = self._load_mac_file(path, a2l_files)
+                self._log_loaded_file_summary(
+                    file_type="mac",
+                    path=path,
+                    mem_map=loaded.mem_map,
+                    ranges=loaded.ranges,
+                    errors=loaded.errors,
+                )
             else:
                 self.set_status(f"Unsupported file type: {suffix}")
                 self.logger.warning("Unsupported file type in loader: %s", suffix)
                 return
         except Exception as exc:
             self.set_status(f"Load failed: {exc}")
-            self.logger.exception("Load failed for %s", path)
+            self.logger.exception("Load failed for path=%s suffix=%s project=%s", path, suffix, self.current_project)
             return
         self.current_file = loaded
         if loaded.a2l_data:
@@ -1004,7 +1078,147 @@ class S19TuiApp(App):
         self.update_project_labels()
         self.set_file_status(f"Loaded {path.name}")
         self._append_log_line(f"Loaded {path.name}")
-        self.logger.info("Loaded file successfully: %s", path)
+        total_elapsed = time.perf_counter() - load_started
+        self.logger.info("Loaded file successfully: path=%s elapsed_seconds=%.3f", path, total_elapsed)
+
+    def _load_a2l_data_with_cache(self, path: Optional[Path]) -> Optional[dict[str, Any]]:
+        """
+        Summary:
+            Parse A2L once per unchanged file metadata and reuse cached payload for repeated loads.
+
+        Args:
+            path (Optional[Path]): A2L file path; when None, no parse is attempted.
+
+        Returns:
+            Optional[dict[str, Any]]: Parsed A2L payload from cache or fresh parse, or None for empty path.
+
+        Data Flow:
+            - Build cache key from resolved path string, mtime, and byte size.
+            - Return cached payload when key matches previous parsed file.
+            - Parse with ``parse_a2l_file`` on cache miss, then store key and payload.
+            - Emit cache hit/miss logs for diagnostics.
+
+        Dependencies:
+            Uses:
+                - ``parse_a2l_file``
+                - ``Path.stat``
+            Used by:
+                - ``load_a2l_from_path``
+                - ``load_selected_file``
+                - ``_load_mac_file``
+        """
+        if not path:
+            return None
+        stat = path.stat()
+        cache_key = (str(path.resolve()), stat.st_mtime_ns, stat.st_size)
+        if self._a2l_cache_key == cache_key and self._a2l_cache_data is not None:
+            self.logger.info("A2L cache hit: path=%s size_bytes=%d", path, stat.st_size)
+            return self._a2l_cache_data
+        self.logger.info("A2L cache miss: path=%s size_bytes=%d", path, stat.st_size)
+        parsed = parse_a2l_file(path)
+        self._a2l_cache_key = cache_key
+        self._a2l_cache_data = parsed
+        return parsed
+
+    def _log_a2l_parse_summary(self, path: Path, a2l_data: Optional[dict[str, Any]], elapsed_seconds: float) -> None:
+        """
+        Summary:
+            Log a normalized A2L parse result summary and emit warnings for slow or error-heavy loads.
+
+        Args:
+            path (Path): Parsed A2L path.
+            a2l_data (Optional[dict[str, Any]]): Parse payload from ``parse_a2l_file``.
+            elapsed_seconds (float): Total parse stage duration in seconds.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Derive section, tag, and parse error counts from payload.
+            - Emit INFO summary with elapsed time and payload dimensions.
+            - Emit WARNING when elapsed time exceeds configured threshold.
+            - Emit WARNING with sample parse errors when parser reports structural issues.
+
+        Dependencies:
+            Uses:
+                - ``logger.info`` / ``logger.warning``
+            Used by:
+                - ``load_a2l_from_path``
+        """
+        payload = a2l_data or {}
+        sections = payload.get("sections", [])
+        tags = payload.get("tags", [])
+        errors = payload.get("errors", [])
+        self.logger.info(
+            "A2L parse summary: path=%s elapsed_seconds=%.3f sections=%d tags=%d errors=%d",
+            path,
+            elapsed_seconds,
+            len(sections),
+            len(tags),
+            len(errors),
+        )
+        if elapsed_seconds > self.slow_parse_warn_seconds:
+            self.logger.warning(
+                "A2L parse exceeded threshold: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
+                path,
+                elapsed_seconds,
+                self.slow_parse_warn_seconds,
+            )
+        if errors:
+            sample = "; ".join(str(item) for item in errors[:3])
+            self.logger.warning("A2L parse reported structural errors: path=%s sample=%s", path, sample)
+
+    def _log_loaded_file_summary(
+        self,
+        file_type: str,
+        path: Path,
+        mem_map: dict[int, int],
+        ranges: list[tuple[int, int]],
+        errors: list[dict[str, Any]],
+    ) -> None:
+        """
+        Summary:
+            Emit standardized post-parse diagnostics for S19, HEX, and MAC load branches.
+
+        Args:
+            file_type (str): Loader branch identifier (``s19``, ``hex``, ``mac``).
+            path (Path): Parsed file path.
+            mem_map (dict[int, int]): Materialized memory map keyed by absolute address.
+            ranges (list[tuple[int, int]]): Contiguous ranges as ``(start, end_exclusive)``.
+            errors (list[dict[str, Any]]): Parser diagnostics in normalized dict form.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Compute aggregate metrics (address count, total bytes, range count, error count).
+            - Emit INFO summary for searchable diagnostics.
+            - Emit WARNING with compact samples when parser errors exist.
+
+        Dependencies:
+            Uses:
+                - ``logger.info`` / ``logger.warning``
+            Used by:
+                - ``load_selected_file``
+        """
+        range_bytes = sum(max(0, end - start) for start, end in ranges)
+        self.logger.info(
+            "Load summary: file_type=%s path=%s addresses=%d range_count=%d range_bytes=%d errors=%d",
+            file_type,
+            path,
+            len(mem_map),
+            len(ranges),
+            range_bytes,
+            len(errors),
+        )
+        if errors:
+            sample = []
+            for item in errors[:3]:
+                segment = item.get("segment")
+                line_number = item.get("line_number")
+                message = item.get("error") or item.get("message")
+                sample.append(f"line={line_number} segment={segment} error={message}")
+            self.logger.warning("Load diagnostics: file_type=%s path=%s sample=%s", file_type, path, " | ".join(sample))
 
     def update_sections(self) -> None:
         """Update the ranges list with validity coloring."""

@@ -314,13 +314,23 @@ class S19File:
                             'segment': 'SRecord constructor',
                             'error': str(e)
                         })
-                        logger.warning(f"Skipping line {line_number}: {line} -> {e}")
+                        logger.debug("S19 parse failure: path=%s line=%d segment=%s error=%s", self.path, line_number, "SRecord constructor", e)
         except FileNotFoundError:
             logger.error(f"File not found: {self.path}")
             raise
         except Exception as e:
             logger.exception(f"Unexpected error while loading file: {e}")
             raise
+        validation_errors = sum(1 for item in self.load_errors if item.get("segment") == "validation")
+        constructor_errors = sum(1 for item in self.load_errors if item.get("segment") == "SRecord constructor")
+        logger.info(
+            "S19 load summary: path=%s records=%d errors=%d validation_errors=%d parse_errors=%d",
+            self.path,
+            len(self.records),
+            len(self.load_errors),
+            validation_errors,
+            constructor_errors,
+        )
 
     def _autodetect_endian(self) -> str:
         """

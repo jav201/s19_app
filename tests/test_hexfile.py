@@ -171,3 +171,17 @@ def test_hex_missing_file_raises(tmp_path):
 
     with pytest.raises(FileNotFoundError):
         IntelHexFile(str(missing))
+
+
+def test_hex_loader_emits_summary_log(tmp_path, caplog: pytest.LogCaptureFixture):
+    lines = [
+        _build_record(1, 0x0010, 0x00, [0xAA]),
+        _build_record(0, 0x0000, 0x01, []),
+    ]
+    hex_path = tmp_path / "summary.hex"
+    hex_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    with caplog.at_level("INFO"):
+        IntelHexFile(str(hex_path))
+
+    assert any("HEX load summary:" in message for message in caplog.messages)

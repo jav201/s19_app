@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
+import time
 from typing import Dict, List, Optional
 
 # Common ASAP2 primitives → size in bytes (address granularity byte).
@@ -59,19 +61,51 @@ MEASUREMENT_BODY_KEYWORDS = frozenset(
     }
 )
 
+logger = logging.getLogger(__name__)
+
 
 def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
-    """Parse A2L into a tree of /begin…/end sections and collect errors."""
+    """
+    Summary:
+        Parse an A2L file into nested ``/begin``/``/end`` sections while collecting structural errors.
+
+    Args:
+        path (Path): File path to A2L text input (UTF-8 with replacement for invalid bytes).
+
+    Returns:
+        tuple[list[dict], list[str]]: Section tree list and parser error messages.
+
+    Raises:
+        OSError: Re-raised for read errors other than missing file.
+
+    Data Flow:
+        - Stream file line-by-line and detect ``/begin`` and ``/end`` markers.
+        - Push/pop section nodes on a stack to preserve hierarchy.
+        - Attach raw non-marker lines to current open section.
+        - Record structural mismatches and unclosed blocks as soft errors.
+
+    Dependencies:
+        Uses:
+            - ``Path.open``
+            - parser stack state in local lists
+        Used by:
+            - ``parse_a2l_file``
+    """
     sections: list[dict] = []
     stack: list[dict] = []
     errors: list[str] = []
+    line_count = 0
+    begin_count = 0
+    end_count = 0
 
     try:
         with path.open("r", encoding="utf-8", errors="replace") as handle:
             for line_number, raw in enumerate(handle, 1):
+                line_count += 1
                 line = raw.rstrip()
                 stripped = line.strip()
                 if stripped.lower().startswith("/begin"):
+                    begin_count += 1
                     parts = stripped.split(maxsplit=2)
                     section_name = parts[1] if len(parts) > 1 else "UNKNOWN"
                     section_meta = parts[2] if len(parts) > 2 else ""
@@ -89,6 +123,7 @@ def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
                     stack.append(entry)
                     continue
                 if stripped.lower().startswith("/end"):
+                    end_count += 1
                     if stack:
                         stack[-1]["end_line"] = line_number
                         stack.pop()
@@ -99,9 +134,24 @@ def build_section_tree(path: Path) -> tuple[list[dict], list[str]]:
                     stack[-1]["lines"].append(line)
     except FileNotFoundError:
         errors.append("File not found.")
+        logger.warning("A2L section parse failed: path=%s reason=file_not_found", path)
+    except OSError:
+        logger.exception("A2L section parse failed: path=%s reason=os_error", path)
+        raise
 
     if stack:
         errors.append("Unclosed /begin sections detected.")
+    logger.info(
+        "A2L section tree built: path=%s lines=%d begins=%d ends=%d root_sections=%d errors=%d",
+        path,
+        line_count,
+        begin_count,
+        end_count,
+        len(sections),
+        len(errors),
+    )
+    if errors:
+        logger.warning("A2L section tree has structural errors: path=%s sample=%s", path, "; ".join(errors[:3]))
 
     return sections, errors
 
@@ -532,9 +582,66 @@ def extract_a2l_tags(sections: list[dict]) -> list[dict]:
 
 
 def parse_a2l_file(path: Path) -> dict:
-    """Parse A2L file to section tree and extracted tags."""
+    """
+    Summary:
+        Parse an A2L file into section tree, extracted tags, and parse diagnostics.
+
+    Args:
+        path (Path): Path to A2L file on disk.
+
+    Returns:
+        dict: Payload with ``path``, ``sections``, ``errors``, and ``tags`` keys.
+
+    Raises:
+        OSError: Re-raised for read errors other than missing file from section parsing.
+
+    Data Flow:
+        - Build section tree and structural errors via ``build_section_tree``.
+        - Extract tags from section tree using ASAP2 field parsers.
+        - Return parser payload dictionary used by TUI and validation layer.
+        - Emit stage timing and size logs for load diagnostics.
+
+    Dependencies:
+        Uses:
+            - ``build_section_tree``
+            - ``extract_a2l_tags``
+            - ``extract_memory_segments``
+        Used by:
+            - ``S19TuiApp`` A2L load paths
+            - tests in ``tests/test_tui_a2l.py``
+    """
+    parse_started = time.perf_counter()
     sections, errors = build_section_tree(path)
+    tag_started = time.perf_counter()
     tags = extract_a2l_tags(sections)
+    tag_elapsed = time.perf_counter() - tag_started
+    parse_elapsed = time.perf_counter() - parse_started
+    segment_counts: dict[str, int] = {"flash": 0, "ram": 0, "unknown": 0}
+    for segment in extract_memory_segments(sections):
+        region = classify_address(segment.get("base"), [segment])
+        if region in segment_counts:
+            segment_counts[region] += 1
+        else:
+            segment_counts["unknown"] += 1
+    measurement_count = len([tag for tag in tags if tag.get("section") == "MEASUREMENT"])
+    characteristic_count = len([tag for tag in tags if tag.get("section") == "CHARACTERISTIC"])
+    logger.info(
+        "A2L parse stages: path=%s total_seconds=%.3f tag_extract_seconds=%.3f tags=%d measurement=%d characteristic=%d errors=%d",
+        path,
+        parse_elapsed,
+        tag_elapsed,
+        len(tags),
+        measurement_count,
+        characteristic_count,
+        len(errors),
+    )
+    logger.debug(
+        "A2L memory segment distribution: path=%s flash=%d ram=%d unknown=%d",
+        path,
+        segment_counts["flash"],
+        segment_counts["ram"],
+        segment_counts["unknown"],
+    )
     return {
         "path": str(path),
         "sections": sections,

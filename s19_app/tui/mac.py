@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class MacFileParser:
@@ -131,6 +134,7 @@ class MacFileParser:
         try:
             lines = path.read_text(encoding="utf-8").splitlines()
         except Exception as exc:
+            logger.warning("MAC read failed: path=%s error=%s", path, exc)
             return {
                 "path": str(path),
                 "records": [],
@@ -146,6 +150,16 @@ class MacFileParser:
             if diag:
                 diagnostics.append(diag)
 
+        parse_ok_count = len([record for record in records if record.get("parse_ok")])
+        valid_address_count = len([record for record in records if isinstance(record.get("address"), int)])
+        logger.info(
+            "MAC parse summary: path=%s rows=%d parse_ok=%d diagnostics=%d valid_addresses=%d",
+            path,
+            len(records),
+            parse_ok_count,
+            len(diagnostics),
+            valid_address_count,
+        )
         return {"path": str(path), "records": records, "diagnostics": diagnostics}
 
 

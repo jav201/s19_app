@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from s19_app.tui.a2l import (
     extract_a2l_tags,
     format_tag_validation_status,
@@ -145,3 +147,14 @@ def test_render_a2l_view_shows_out_of_image_status():
     assert format_tag_validation_status(
         {"schema_ok": True, "memory_checked": True, "in_memory": False}
     ) == "OUT(image)"
+
+
+def test_parse_a2l_file_emits_stage_logs(tmp_path: Path, caplog: pytest.LogCaptureFixture):
+    a2l = tmp_path / "stage.a2l"
+    a2l.write_text("/begin PROJECT Demo\n/end PROJECT\n", encoding="utf-8")
+
+    with caplog.at_level("INFO"):
+        parse_a2l_file(a2l)
+
+    assert any("A2L section tree built:" in message for message in caplog.messages)
+    assert any("A2L parse stages:" in message for message in caplog.messages)

@@ -107,3 +107,14 @@ def test_s19file_collects_errors(tmp_path: Path):
     assert [error["line_number"] for error in parsed.get_errors()] == [3, 4]
     assert parsed.get_errors()[0]["segment"] == "SRecord constructor"
     assert parsed.get_errors()[1]["segment"] == "validation"
+
+
+def test_s19file_emits_load_summary_log(tmp_path: Path, caplog: pytest.LogCaptureFixture):
+    valid = _build_srecord("S1", 0x1000, [0xAA])
+    s19_path = tmp_path / "summary.s19"
+    s19_path.write_text(valid + "\n", encoding="utf-8")
+
+    with caplog.at_level("INFO", logger="s19_app.core"):
+        S19File(str(s19_path), endian="big")
+
+    assert any("S19 load summary:" in message for message in caplog.messages)
