@@ -702,6 +702,19 @@ class S19TuiApp(App):
     def _load_path_from_user_input(self, path: Path) -> None:
         """Resolve path and dispatch to data load (S19/HEX/MAC) or A2L load."""
         normalized = resolve_input_path(path, self.base_dir)
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H4",
+            location="s19_app/tui/app.py:_load_path_from_user_input",
+            message="Resolved path for load",
+            data={
+                "input_path": str(path),
+                "resolved_path": str(normalized) if normalized else None,
+                "suffix": normalized.suffix.lower() if normalized else None,
+            },
+        )
+        # endregion
         if not normalized:
             self.set_status(f"File not found: {path}")
             self.logger.warning("File not found: %s", path)
@@ -709,6 +722,15 @@ class S19TuiApp(App):
         suffix = normalized.suffix.lower()
         if suffix in A2L_EXTENSIONS:
             self.load_a2l_from_path(path)
+            # region agent log
+            self._debug_log(
+                run_id="initial",
+                hypothesis_id="H4",
+                location="s19_app/tui/app.py:_load_path_from_user_input",
+                message="Returned from load_a2l_from_path",
+                data={"resolved_path": str(normalized)},
+            )
+            # endregion
         elif suffix in SUPPORTED_EXTENSIONS:
             self.load_from_path(path)
         else:
@@ -716,9 +738,27 @@ class S19TuiApp(App):
             self.logger.warning("Unsupported file type: %s", normalized.suffix)
 
     def _handle_load_dialog(self, path: Optional[Path]) -> None:
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H4",
+            location="s19_app/tui/app.py:_handle_load_dialog",
+            message="Entered load dialog callback",
+            data={"path_is_none": path is None, "path": str(path) if path else None},
+        )
+        # endregion
         if path is None:
             return
         self._load_path_from_user_input(path)
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H4",
+            location="s19_app/tui/app.py:_handle_load_dialog",
+            message="Completed load dialog callback",
+            data={"path": str(path)},
+        )
+        # endregion
 
     def load_from_path(self, path: Path) -> None:
         """Load supported data file into temp and render views."""
@@ -850,6 +890,15 @@ class S19TuiApp(App):
         self.update_project_labels()
         self.set_progress(100, f"Loaded {copied.name}")
         self.set_status(f"A2L loaded: {copied.name}")
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H5",
+            location="s19_app/tui/app.py:load_a2l_from_path",
+            message="A2L load function reached completion",
+            data={"path": str(copied)},
+        )
+        # endregion
         self.logger.info("A2L loaded: %s", copied)
 
         if self.current_project:
