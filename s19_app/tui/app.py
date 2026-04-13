@@ -702,6 +702,7 @@ class S19TuiApp(App):
     def _load_path_from_user_input(self, path: Path) -> None:
         """Resolve path and dispatch to data load (S19/HEX/MAC) or A2L load."""
         normalized = resolve_input_path(path, self.base_dir)
+        self.logger.info("DBG H4 path resolution: input=%s resolved=%s", path, normalized)
         # region agent log
         self._debug_log(
             run_id="initial",
@@ -722,6 +723,7 @@ class S19TuiApp(App):
         suffix = normalized.suffix.lower()
         if suffix in A2L_EXTENSIONS:
             self.load_a2l_from_path(path)
+            self.logger.info("DBG H4 returned from load_a2l_from_path: resolved=%s", normalized)
             # region agent log
             self._debug_log(
                 run_id="initial",
@@ -738,6 +740,7 @@ class S19TuiApp(App):
             self.logger.warning("Unsupported file type: %s", normalized.suffix)
 
     def _handle_load_dialog(self, path: Optional[Path]) -> None:
+        self.logger.info("DBG H4 load dialog callback entry: path=%s", path)
         # region agent log
         self._debug_log(
             run_id="initial",
@@ -750,6 +753,7 @@ class S19TuiApp(App):
         if path is None:
             return
         self._load_path_from_user_input(path)
+        self.logger.info("DBG H4 load dialog callback exit: path=%s", path)
         # region agent log
         self._debug_log(
             run_id="initial",
@@ -890,6 +894,7 @@ class S19TuiApp(App):
         self.update_project_labels()
         self.set_progress(100, f"Loaded {copied.name}")
         self.set_status(f"A2L loaded: {copied.name}")
+        self.logger.info("DBG H5 load_a2l_from_path reached completion: path=%s", copied)
         # region agent log
         self._debug_log(
             run_id="initial",

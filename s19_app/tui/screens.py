@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import List, Optional
 
@@ -7,6 +8,8 @@ from textual.app import ComposeResult
 from textual.containers import Container
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, ListItem, ListView
+
+logger = logging.getLogger("s19tui")
 
 
 class LoadFileScreen(ModalScreen[Optional[Path]]):
@@ -29,12 +32,15 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "load_cancel":
+            logger.info("LoadFileScreen dismissed by cancel.")
             self.dismiss(None)
             return
         if event.button.id == "load_ok":
             value = self.query_one("#load_path", Input).value.strip()
+            logger.info("LoadFileScreen load_ok pressed. has_value=%s", bool(value))
             if not value:
                 return
+            logger.info("LoadFileScreen dismissing with path=%s", value)
             self.dismiss(Path(value))
 
 
