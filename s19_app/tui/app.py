@@ -355,6 +355,24 @@ class S19TuiApp(App):
         self._a2l_cache_data: Optional[dict[str, Any]] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
+    def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
+        # region agent log
+        try:
+            payload = {
+                "sessionId": "cdc3df",
+                "runId": run_id,
+                "hypothesisId": hypothesis_id,
+                "location": location,
+                "message": message,
+                "data": data,
+                "timestamp": int(time.time() * 1000),
+            }
+            with (self.base_dir / "debug-cdc3df.log").open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
+        except Exception:
+            pass
+        # endregion
+
     def compose(self) -> ComposeResult:
         """Lay out the grid tiles and widgets."""
         yield Header()
@@ -780,13 +798,46 @@ class S19TuiApp(App):
         parse_started = time.perf_counter()
         self.current_a2l_data = self._load_a2l_data_with_cache(copied)
         parse_elapsed = time.perf_counter() - parse_started
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H1",
+            location="s19_app/tui/app.py:load_a2l_from_path",
+            message="A2L parse stage complete",
+            data={
+                "path": str(copied),
+                "size_bytes": copied_size,
+                "parse_elapsed_seconds": round(parse_elapsed, 3),
+                "tag_count": len((self.current_a2l_data or {}).get("tags", [])),
+                "section_count": len((self.current_a2l_data or {}).get("sections", [])),
+            },
+        )
+        # endregion
         self._log_a2l_parse_summary(copied, self.current_a2l_data, parse_elapsed)
         if self.current_file:
             self.current_file.a2l_path = copied
             self.current_file.a2l_data = self.current_a2l_data
         view_started = time.perf_counter()
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H1",
+            location="s19_app/tui/app.py:load_a2l_from_path",
+            message="Entering update_a2l_view",
+            data={"tag_count": len((self.current_a2l_data or {}).get("tags", []))},
+        )
+        # endregion
         self.update_a2l_view()
         view_elapsed = time.perf_counter() - view_started
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H1",
+            location="s19_app/tui/app.py:load_a2l_from_path",
+            message="Finished update_a2l_view",
+            data={"view_elapsed_seconds": round(view_elapsed, 3)},
+        )
+        # endregion
         if view_elapsed > self.slow_parse_warn_seconds:
             self.logger.warning(
                 "A2L view refresh was slow: path=%s elapsed_seconds=%.3f threshold_seconds=%.3f",
@@ -1455,7 +1506,29 @@ class S19TuiApp(App):
             self.update_mac_view()
             return
         mem_map = self.current_file.mem_map if self.current_file else None
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H2",
+            location="s19_app/tui/app.py:update_a2l_view",
+            message="Starting validate_a2l_tags",
+            data={
+                "tag_count": len(self.current_a2l_data.get("tags", [])),
+                "has_mem_map": mem_map is not None,
+                "mem_map_size": len(mem_map) if mem_map is not None else 0,
+            },
+        )
+        # endregion
         tag_checks = validate_a2l_tags(self.current_a2l_data.get("tags", []), mem_map)
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H2",
+            location="s19_app/tui/app.py:update_a2l_view",
+            message="Finished validate_a2l_tags",
+            data={"check_count": len(tag_checks)},
+        )
+        # endregion
         a2l_view.update(render_a2l_view(self.current_a2l_data, tag_checks))
         tags = self.current_a2l_data.get("tags", [])
         check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
@@ -1467,12 +1540,30 @@ class S19TuiApp(App):
         filter_input = self.query_one("#a2l_tags_filter_input", Input)
         self.a2l_tags_filter_text = filter_input.value.strip()
         tags = self._filter_a2l_tags(tags)
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H3",
+            location="s19_app/tui/app.py:update_a2l_view",
+            message="About to render A2L tag list",
+            data={"filtered_tag_count": len(tags), "filter_mode": self.a2l_tags_filter_mode},
+        )
+        # endregion
         self.update_a2l_tags_view(tags)
         self.update_mac_view()
 
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
         a2l_tags_list = self.query_one("#a2l_tags_list", ListView)
         a2l_tags_list.clear()
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H3",
+            location="s19_app/tui/app.py:update_a2l_tags_view",
+            message="Entered update_a2l_tags_view",
+            data={"incoming_tag_count": len(tags)},
+        )
+        # endregion
         if not tags:
             a2l_tags_list.append(ListItem(Label("No A2L tags.")))
             return
@@ -1564,6 +1655,15 @@ class S19TuiApp(App):
                 except ValueError:
                     pass
             a2l_tags_list.append(item)
+        # region agent log
+        self._debug_log(
+            run_id="initial",
+            hypothesis_id="H3",
+            location="s19_app/tui/app.py:update_a2l_tags_view",
+            message="Finished update_a2l_tags_view",
+            data={"rendered_tag_rows": len(rows)},
+        )
+        # endregion
 
     def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:
         mode = self.a2l_tags_filter_mode
