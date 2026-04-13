@@ -54,3 +54,33 @@ def test_a2l_cache_reuses_parse_for_unchanged_file(tmp_path: Path, monkeypatch: 
 
     assert calls["count"] == 1
     assert first == second
+
+
+def test_window_bounds_and_shift_logic(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    start, end = app._get_window_bounds(total=1000, start=950, window_size=200)
+    assert (start, end) == (950, 1000)
+
+    app.a2l_window_overscan = 20
+    shifted = app._shift_window_for_index(total=1000, index=399, start=200, window_size=200)
+    assert shifted > 200
+
+
+def test_refresh_a2l_filtered_tags_resets_anchor(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app._a2l_enriched_tags = [
+        {"name": "RPM", "schema_ok": True, "memory_checked": False},
+        {"name": "TORQUE", "schema_ok": False, "memory_checked": False},
+    ]
+    app.a2l_tags_filter_mode = "invalid"
+    app._a2l_window_start = 150
+    captured: dict[str, int] = {}
+
+    def fake_update(tags: list[dict]) -> None:
+        captured["count"] = len(tags)
+
+    monkeypatch.setattr(app, "update_a2l_tags_view", fake_update)
+    app._refresh_a2l_filtered_tags(preserve_anchor=False)
+
+    assert app._a2l_window_start == 0
+    assert captured["count"] == 1

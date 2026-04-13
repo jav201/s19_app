@@ -343,6 +343,9 @@ class S19TuiApp(App):
     ]
     large_a2l_warn_bytes: int = 2 * 1024 * 1024
     slow_parse_warn_seconds: float = 2.5
+    a2l_window_size: int = 300
+    a2l_window_overscan: int = 80
+    a2l_summary_window_size: int = 500
 
     def __init__(self, base_dir: Optional[Path] = None, load_path: Optional[Path] = None):
         super().__init__()
@@ -353,6 +356,13 @@ class S19TuiApp(App):
         self.log_lines = deque(maxlen=4)
         self._a2l_cache_key: Optional[tuple[str, int, int]] = None
         self._a2l_cache_data: Optional[dict[str, Any]] = None
+        self._a2l_enriched_tags: list[dict[str, Any]] = []
+        self._a2l_enriched_key: Optional[tuple[int, int]] = None
+        self._a2l_filtered_tags: list[dict[str, Any]] = []
+        self._a2l_window_start: int = 0
+        self._a2l_summary_lines: list[str] = []
+        self._a2l_summary_start: int = 0
+        self._a2l_filter_debounce_token: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -372,6 +382,75 @@ class S19TuiApp(App):
         except Exception:
             pass
         # endregion
+
+    def _get_window_bounds(self, total: int, start: int, window_size: int) -> tuple[int, int]:
+        """
+        Summary:
+            Clamp a requested window start and return a safe half-open render range.
+
+        Args:
+            total (int): Total available rows/lines.
+            start (int): Requested window start index.
+            window_size (int): Number of rows/lines to render in one window.
+
+        Returns:
+            tuple[int, int]: ``(start, end)`` bounds clamped to ``[0, total]``.
+
+        Data Flow:
+            - Clamp ``start`` to a valid source index.
+            - Compute ``end`` from clamped start plus window size.
+            - Clamp ``end`` to source length.
+
+        Dependencies:
+            Uses:
+                - built-in ``max`` / ``min`` arithmetic
+            Used by:
+                - A2L tags and summary buffered render helpers
+        """
+        if total <= 0:
+            return 0, 0
+        safe_start = max(0, min(start, total - 1))
+        safe_end = min(total, safe_start + max(1, window_size))
+        return safe_start, safe_end
+
+    def _shift_window_for_index(self, total: int, index: int, start: int, window_size: int) -> int:
+        """
+        Summary:
+            Shift a window start so a selected/highlighted absolute index stays within buffered margins.
+
+        Args:
+            total (int): Total source rows.
+            index (int): Absolute row index that should remain in the buffered viewport.
+            start (int): Current window start index.
+            window_size (int): Number of rows rendered in one window.
+
+        Returns:
+            int: Updated window start index.
+
+        Data Flow:
+            - Compute current window bounds.
+            - If index is near top/bottom overscan thresholds, move start forward/backward.
+            - Clamp final start to source range.
+
+        Dependencies:
+            Uses:
+                - ``_get_window_bounds``
+            Used by:
+                - A2L tags selection/highlight handlers
+        """
+        if total <= 0:
+            return 0
+        index = max(0, min(index, total - 1))
+        current_start, current_end = self._get_window_bounds(total, start, window_size)
+        top_threshold = current_start + self.a2l_window_overscan
+        bottom_threshold = current_end - self.a2l_window_overscan
+        if index < top_threshold:
+            new_start = max(0, index - self.a2l_window_overscan)
+            return new_start
+        if index >= bottom_threshold:
+            new_start = max(0, index - (window_size - self.a2l_window_overscan - 1))
+            return min(new_start, max(0, total - window_size))
+        return current_start
 
     def compose(self) -> ComposeResult:
         """Lay out the grid tiles and widgets."""
@@ -937,6 +1016,48 @@ class S19TuiApp(App):
                 return
             self._jump_to_mac_record(event.item)
             return
+
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
+        """
+        Summary:
+            Shift buffered A2L tag window as highlight nears current window edges.
+
+        Args:
+            event (ListView.Highlighted): Highlight change event emitted by list views.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Ignore non-A2L list events and rows without absolute index metadata.
+            - Compute adjusted window start using overscan thresholds.
+            - Re-render buffered A2L tag rows when window start changes.
+
+        Dependencies:
+            Uses:
+                - ``_shift_window_for_index``
+                - ``update_a2l_tags_view``
+            Used by:
+                - Textual list highlight event loop
+        """
+        if event.list_view.id != "a2l_tags_list" or event.item is None:
+            return
+        info = getattr(event.item, "data", None)
+        if not isinstance(info, dict):
+            return
+        absolute_index = info.get("absolute_index")
+        if not isinstance(absolute_index, int):
+            return
+        total = len(self._a2l_filtered_tags)
+        shifted_start = self._shift_window_for_index(
+            total=total,
+            index=absolute_index,
+            start=self._a2l_window_start,
+            window_size=self.a2l_window_size,
+        )
+        if shifted_start != self._a2l_window_start:
+            self._a2l_window_start = shifted_start
+            self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def _load_from_item(self, item: ListItem) -> None:
         label_widget = item.query_one(Label)
@@ -1551,59 +1672,129 @@ class S19TuiApp(App):
         )
         mac_list.append(ListItem(Label(summary)))
 
-    def update_a2l_view(self) -> None:
-        """Render the A2L summary view."""
-        a2l_view = self.query_one("#a2l_view", Static)
+    def _compute_a2l_enriched_tags(self) -> list[dict[str, Any]]:
+        """
+        Summary:
+            Build and cache validated A2L tag payload used by summary, filters, and buffered list rendering.
+
+        Args:
+            None
+
+        Returns:
+            list[dict[str, Any]]: Enriched A2L tags with schema/memory validation fields.
+
+        Data Flow:
+            - Derive cache key from current A2L payload identity and memory map size.
+            - Reuse previous enriched list when key is unchanged.
+            - Run ``validate_a2l_tags`` and merge results onto source tags on cache miss.
+
+        Dependencies:
+            Uses:
+                - ``validate_a2l_tags``
+            Used by:
+                - ``update_a2l_view``
+                - A2L filter debounce render path
+        """
         if not self.current_a2l_data:
+            self._a2l_enriched_tags = []
+            self._a2l_enriched_key = None
+            return []
+        mem_map = self.current_file.mem_map if self.current_file else None
+        mem_size = len(mem_map) if mem_map is not None else -1
+        key = (id(self.current_a2l_data), mem_size)
+        if self._a2l_enriched_key == key:
+            return self._a2l_enriched_tags
+        source_tags = self.current_a2l_data.get("tags", [])
+        tag_checks = validate_a2l_tags(source_tags, mem_map)
+        check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
+        enriched: list[dict[str, Any]] = []
+        for tag in source_tags:
+            lookup = (tag.get("section"), tag.get("name"))
+            enriched.append({**tag, **check_map.get(lookup, {})})
+        self._a2l_enriched_tags = enriched
+        self._a2l_enriched_key = key
+        self._a2l_summary_lines = render_a2l_view(self.current_a2l_data, tag_checks, max_tag_lines=500).splitlines()
+        self._a2l_summary_start = 0
+        return enriched
+
+    def _update_a2l_summary_buffer(self) -> None:
+        """
+        Summary:
+            Render a buffered slice of A2L summary lines into the summary panel.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clamp summary window start/end indices.
+            - Build header describing visible slice.
+            - Push visible lines only into ``#a2l_view`` widget.
+
+        Dependencies:
+            Uses:
+                - ``_get_window_bounds``
+            Used by:
+                - ``update_a2l_view``
+        """
+        a2l_view = self.query_one("#a2l_view", Static)
+        if not self._a2l_summary_lines:
             a2l_view.update("No A2L loaded.")
+            return
+        total = len(self._a2l_summary_lines)
+        start, end = self._get_window_bounds(total, self._a2l_summary_start, self.a2l_summary_window_size)
+        self._a2l_summary_start = start
+        visible = self._a2l_summary_lines[start:end]
+        header = f"A2L summary lines {start + 1}-{end} / {total}"
+        a2l_view.update("\n".join([header, "-" * len(header), *visible]))
+
+    def _refresh_a2l_filtered_tags(self, preserve_anchor: bool) -> None:
+        """
+        Summary:
+            Rebuild filtered A2L tag source list and render a buffered window.
+
+        Args:
+            preserve_anchor (bool): Keep current buffered start when possible; otherwise reset to top.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Apply active filter mode/text to cached enriched tags.
+            - Optionally reset buffered start index on filter model changes.
+            - Render only current buffered window to list view.
+
+        Dependencies:
+            Uses:
+                - ``_filter_a2l_tags``
+                - ``update_a2l_tags_view``
+            Used by:
+                - ``update_a2l_view``
+                - filter and debounce handlers
+        """
+        self._a2l_filtered_tags = self._filter_a2l_tags(self._a2l_enriched_tags)
+        if not preserve_anchor:
+            self._a2l_window_start = 0
+        self.update_a2l_tags_view(self._a2l_filtered_tags)
+
+    def update_a2l_view(self) -> None:
+        """Render buffered A2L summary and tags views."""
+        if not self.current_a2l_data:
+            self._a2l_enriched_tags = []
+            self._a2l_filtered_tags = []
+            self._a2l_summary_lines = []
+            self._a2l_window_start = 0
+            self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
             self.update_mac_view()
             return
-        mem_map = self.current_file.mem_map if self.current_file else None
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H2",
-            location="s19_app/tui/app.py:update_a2l_view",
-            message="Starting validate_a2l_tags",
-            data={
-                "tag_count": len(self.current_a2l_data.get("tags", [])),
-                "has_mem_map": mem_map is not None,
-                "mem_map_size": len(mem_map) if mem_map is not None else 0,
-            },
-        )
-        # endregion
-        tag_checks = validate_a2l_tags(self.current_a2l_data.get("tags", []), mem_map)
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H2",
-            location="s19_app/tui/app.py:update_a2l_view",
-            message="Finished validate_a2l_tags",
-            data={"check_count": len(tag_checks)},
-        )
-        # endregion
-        a2l_view.update(render_a2l_view(self.current_a2l_data, tag_checks))
-        tags = self.current_a2l_data.get("tags", [])
-        check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
-        enriched = []
-        for tag in tags:
-            key = (tag.get("section"), tag.get("name"))
-            enriched.append({**tag, **check_map.get(key, {})})
-        tags = enriched
+        self._compute_a2l_enriched_tags()
         filter_input = self.query_one("#a2l_tags_filter_input", Input)
         self.a2l_tags_filter_text = filter_input.value.strip()
-        tags = self._filter_a2l_tags(tags)
-        # region agent log
-        self._debug_log(
-            run_id="initial",
-            hypothesis_id="H3",
-            location="s19_app/tui/app.py:update_a2l_view",
-            message="About to render A2L tag list",
-            data={"filtered_tag_count": len(tags), "filter_mode": self.a2l_tags_filter_mode},
-        )
-        # endregion
-        self.update_a2l_tags_view(tags)
+        self._refresh_a2l_filtered_tags(preserve_anchor=False)
+        self._update_a2l_summary_buffer()
         self.update_mac_view()
 
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
@@ -1621,9 +1812,13 @@ class S19TuiApp(App):
         if not tags:
             a2l_tags_list.append(ListItem(Label("No A2L tags.")))
             return
+        total_tags = len(tags)
+        start, end = self._get_window_bounds(total_tags, self._a2l_window_start, self.a2l_window_size)
+        self._a2l_window_start = start
+        visible_tags = tags[start:end]
         rows: list[tuple] = []
         row_tags: list[dict] = []
-        for tag in tags:
+        for tag in visible_tags:
             addr = tag.get("address")
             length = tag.get("length")
             addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
@@ -1686,6 +1881,8 @@ class S19TuiApp(App):
             f"{'Virt'.ljust(virt_width)} | {'Func'.ljust(func_width)} | "
             f"{'Access'.ljust(access_width)} | {'Dtype'.ljust(dtype_width)}"
         )
+        summary = f"Rows {start + 1}-{end} / {total_tags} (window {self.a2l_window_size})"
+        a2l_tags_list.append(ListItem(Label(summary)))
         a2l_tags_list.append(ListItem(Label(header)))
         for i, row in enumerate(rows):
             name_text = row[0][:name_width].ljust(name_width)
@@ -1703,6 +1900,7 @@ class S19TuiApp(App):
                 label.add_class("invalid")
             item = ListItem(label)
             item.data = {"address": row[1], "name": row[0]}
+            item.data["absolute_index"] = start + i
             if isinstance(row[1], str) and row[1].startswith("0x"):
                 try:
                     item.data["address"] = int(row[1], 16)
@@ -1715,7 +1913,7 @@ class S19TuiApp(App):
             hypothesis_id="H3",
             location="s19_app/tui/app.py:update_a2l_tags_view",
             message="Finished update_a2l_tags_view",
-            data={"rendered_tag_rows": len(rows)},
+            data={"rendered_tag_rows": len(rows), "total_rows": total_tags, "start": start, "end": end},
         )
         # endregion
 
@@ -1822,7 +2020,40 @@ class S19TuiApp(App):
         menu = self.query_one("#a2l_filter_menu")
         menu.add_class("hidden")
         self._update_a2l_filter_menu()
-        self.update_a2l_view()
+        self._refresh_a2l_filtered_tags(preserve_anchor=False)
+
+    def _schedule_a2l_filter_refresh(self) -> None:
+        """
+        Summary:
+            Debounce rapid filter-input events and refresh only buffered A2L tags window.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Increment debounce token for each new keystroke.
+            - Schedule short delayed callback.
+            - Refresh filtered buffered rows only if token matches latest request.
+
+        Dependencies:
+            Uses:
+                - ``set_timer``
+                - ``_refresh_a2l_filtered_tags``
+            Used by:
+                - ``on_input_changed`` for A2L filter input
+        """
+        self._a2l_filter_debounce_token += 1
+        expected_token = self._a2l_filter_debounce_token
+
+        def _apply_filter() -> None:
+            if expected_token != self._a2l_filter_debounce_token:
+                return
+            self._refresh_a2l_filtered_tags(preserve_anchor=False)
+
+        self.set_timer(0.15, _apply_filter)
 
     def update_project_labels(self) -> None:
         """Refresh project/A2L labels in the status tile."""
@@ -1853,20 +2084,20 @@ class S19TuiApp(App):
             self._handle_goto_mac()
         elif event.button.id == "a2l_filter_all":
             self.a2l_tags_filter_mode = "all"
-            self.update_a2l_view()
+            self._refresh_a2l_filtered_tags(preserve_anchor=False)
         elif event.button.id == "a2l_filter_invalid":
             self.a2l_tags_filter_mode = "invalid"
-            self.update_a2l_view()
+            self._refresh_a2l_filtered_tags(preserve_anchor=False)
         elif event.button.id == "a2l_filter_inmem":
             self.a2l_tags_filter_mode = "inmem"
-            self.update_a2l_view()
+            self._refresh_a2l_filtered_tags(preserve_anchor=False)
         elif event.button.id == "a2l_filter_field":
             self._toggle_a2l_filter_menu()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "a2l_tags_filter_input":
             self.a2l_tags_filter_text = event.value.strip()
-            self.update_a2l_view()
+            self._schedule_a2l_filter_refresh()
 
     def _handle_search(self) -> None:
         if not self.current_file:

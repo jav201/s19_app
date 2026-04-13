@@ -158,3 +158,22 @@ def test_parse_a2l_file_emits_stage_logs(tmp_path: Path, caplog: pytest.LogCaptu
 
     assert any("A2L section tree built:" in message for message in caplog.messages)
     assert any("A2L parse stages:" in message for message in caplog.messages)
+
+
+def test_render_a2l_view_supports_tag_line_truncation():
+    a2l_data = {
+        "sections": [{"name": "PROJECT", "meta": "Demo", "start_line": 1, "end_line": 8, "children": []}],
+        "errors": [],
+        "tags": [
+            {"section": "MEASUREMENT", "name": "A", "address": 0x1000, "length": 1},
+            {"section": "MEASUREMENT", "name": "B", "address": 0x1001, "length": 1},
+            {"section": "MEASUREMENT", "name": "C", "address": 0x1002, "length": 1},
+        ],
+    }
+
+    output = render_a2l_view(a2l_data, max_tag_lines=2)
+
+    assert "MEASUREMENT A:" in output
+    assert "MEASUREMENT B:" in output
+    assert "MEASUREMENT C:" not in output
+    assert "truncated" in output

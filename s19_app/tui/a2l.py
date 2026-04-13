@@ -751,7 +751,9 @@ def iter_section_lines(sections: List[dict], depth: int = 0) -> List[str]:
     return lines
 
 
-def render_a2l_view(a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None) -> str:
+def render_a2l_view(
+    a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None, max_tag_lines: Optional[int] = None
+) -> str:
     """Render a concise, human-readable A2L summary or errors."""
     if not a2l_data:
         return "No A2L loaded."
@@ -766,27 +768,32 @@ def render_a2l_view(a2l_data: Optional[dict], tag_checks: Optional[list[dict]] =
     if tags:
         lines_out.append("")
         lines_out.append("A2L Tags:")
+        check_map = {}
+        if tag_checks:
+            check_map = {(item.get("section"), item.get("name")): item for item in tag_checks}
+        truncated = False
+        emitted_tag_lines = 0
         for tag in tags:
+            if isinstance(max_tag_lines, int) and max_tag_lines > 0:
+                if emitted_tag_lines >= max_tag_lines:
+                    truncated = True
+                    break
             addr = tag.get("address")
             length = tag.get("length")
             addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
             len_text = str(length) if isinstance(length, int) else "n/a"
             status = ""
-            if tag_checks:
-                match = next(
-                    (
-                        item
-                        for item in tag_checks
-                        if item.get("name") == tag.get("name")
-                        and item.get("section") == tag.get("section")
-                    ),
-                    None,
-                )
-                if match:
+            if check_map:
+                match = check_map.get((tag.get("section"), tag.get("name")))
+                if match is not None:
                     status = format_tag_validation_status(match)
             reg = tag.get("memory_region") or "unknown"
             tail = f" {status}" if status else ""
             lines_out.append(
                 f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg}{tail}".strip()
             )
+            emitted_tag_lines += 1
+        if truncated:
+            remaining = max(0, len(tags) - max_tag_lines)
+            lines_out.append(f"... truncated {remaining} additional tag lines ...")
     return "\n".join(lines_out)
