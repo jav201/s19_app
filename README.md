@@ -55,8 +55,7 @@ s19tui
 ```
 
 Key bindings:
-- `L` Load S19/HEX into workarea temp
-- `A` Load A2L file
+- `L` Load file (S19/HEX/MAC/A2L into workarea temp)
 - `S` Save project (copies data + A2L into project folder)
 - `P` Load project
 - `J` Dump A2L JSON into workarea temp

@@ -26,7 +26,7 @@ from .hexview import (
     render_hex_view_text,
 )
 from .models import LoadedFile
-from .screens import LoadA2LScreen, LoadFileScreen, LoadProjectScreen, SaveProjectScreen
+from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -54,7 +54,6 @@ __all__ = [
     "HEX_WIDTH",
     "LOG_FILENAME",
     "LOGS_SUBDIR",
-    "LoadA2LScreen",
     "LoadFileScreen",
     "LoadProjectScreen",
     "LoadedFile",

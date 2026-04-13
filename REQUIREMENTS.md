@@ -250,8 +250,9 @@ keyboard binding.
 **R-A2L-004**: The tool must allow loading an A2L file and show its parsed
 content in the A2L view.
 
-- Code: `s19_app/tui/screens.py` (`LoadA2LScreen`),
-  `s19_app/tui/app.py` (`load_a2l_from_path`, `update_a2l_view`)
+- Code: `s19_app/tui/screens.py` (`LoadFileScreen`),
+  `s19_app/tui/app.py` (`_load_path_from_user_input`, `load_a2l_from_path`,
+  `update_a2l_view`)
 - Validation: `Manual` (load a `.a2l` file in the TUI)
 
 **R-A2L-005**: The tool must extract tag address/length metadata for
@@ -292,7 +293,8 @@ and the loaded A2L file into the project folder when available.
 must copy it into the corresponding project folder (respecting limits).
 
 - Code: `s19_app/tui/app.py` (`_sync_loaded_file_to_project`,
-  `_sync_loaded_a2l_to_project`, `load_from_path`, `load_a2l_from_path`)
+  `_sync_loaded_a2l_to_project`, `load_from_path`, `load_a2l_from_path`,
+  `_load_path_from_user_input`)
 - Validation: `Manual` (save a project, then load replacement files)
 
 **R-TUI-016**: The status tile must display the active project name and

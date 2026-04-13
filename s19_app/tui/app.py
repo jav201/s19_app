@@ -33,7 +33,7 @@ from .hexview import (
 )
 from .mac import parse_mac_file
 from .models import LoadedFile
-from .screens import LoadA2LScreen, LoadFileScreen, LoadProjectScreen, SaveProjectScreen
+from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -300,7 +300,6 @@ class S19TuiApp(App):
 
     BINDINGS = [
         ("l", "load_file", "Load file"),
-        ("a", "load_a2l", "Load A2L"),
         ("r", "refresh_files", "Refresh workarea"),
         ("o", "open_workarea", "Open workarea"),
         ("s", "save_project", "Save project"),
@@ -479,7 +478,7 @@ class S19TuiApp(App):
         self._update_a2l_filter_menu()
         if self.load_path:
             self.logger.info("Startup load requested: %s", self.load_path)
-            self.load_from_path(self.load_path)
+            self._load_path_from_user_input(self.load_path)
 
     def refresh_files(self) -> None:
         """Refresh file list from the workarea temp folder."""
@@ -495,14 +494,9 @@ class S19TuiApp(App):
         self.refresh_files()
 
     def action_load_file(self) -> None:
-        """Open file picker for S19/HEX/MAC."""
+        """Open path dialog for S19/HEX/MAC/A2L."""
         self.logger.info("Load file action triggered.")
         self.push_screen(LoadFileScreen(), self._handle_load_dialog)
-
-    def action_load_a2l(self) -> None:
-        """Open file picker for A2L."""
-        self.logger.info("Load A2L action triggered.")
-        self.push_screen(LoadA2LScreen(), self._handle_a2l_dialog)
 
     def action_open_workarea(self) -> None:
         """Open the workarea directory in Explorer."""
@@ -619,12 +613,6 @@ class S19TuiApp(App):
         self.update_project_labels()
         self.refresh_files()
 
-    def _handle_a2l_dialog(self, path: Optional[Path]) -> None:
-        if path is None:
-            self.logger.info("Load A2L canceled.")
-            return
-        self.load_a2l_from_path(path)
-
     def _handle_load_project(self, name: Optional[str]) -> None:
         if name is None:
             self.logger.info("Load project canceled.")
@@ -688,10 +676,26 @@ class S19TuiApp(App):
         copy_into_workarea(self.current_a2l_path, project_dir)
         self.logger.info("Synced A2L file into project: %s", project_dir)
 
+    def _load_path_from_user_input(self, path: Path) -> None:
+        """Resolve path and dispatch to data load (S19/HEX/MAC) or A2L load."""
+        normalized = resolve_input_path(path, self.base_dir)
+        if not normalized:
+            self.set_status(f"File not found: {path}")
+            self.logger.warning("File not found: %s", path)
+            return
+        suffix = normalized.suffix.lower()
+        if suffix in A2L_EXTENSIONS:
+            self.load_a2l_from_path(path)
+        elif suffix in SUPPORTED_EXTENSIONS:
+            self.load_from_path(path)
+        else:
+            self.set_status(f"Unsupported file type: {normalized.suffix}")
+            self.logger.warning("Unsupported file type: %s", normalized.suffix)
+
     def _handle_load_dialog(self, path: Optional[Path]) -> None:
         if path is None:
             return
-        self.load_from_path(path)
+        self._load_path_from_user_input(path)
 
     def load_from_path(self, path: Path) -> None:
         """Load supported data file into temp and render views."""
@@ -741,6 +745,7 @@ class S19TuiApp(App):
         temp_dir = self.workarea / WORKAREA_TEMP
         self.set_progress(10, "Copying A2L into workarea temp...")
         copied = copy_into_workarea(normalized, temp_dir)
+        self.refresh_files()
         self.set_progress(50, f"Parsing {copied.name}...")
         self.current_a2l_path = copied
         self.current_a2l_data = parse_a2l_file(copied)
@@ -794,7 +799,10 @@ class S19TuiApp(App):
         candidate = self.workarea / filename
         if candidate.exists():
             self.logger.info("Loading from workarea selection: %s", candidate)
-            self.load_selected_file(candidate)
+            if candidate.suffix.lower() in A2L_EXTENSIONS:
+                self.load_a2l_from_path(candidate)
+            else:
+                self.load_selected_file(candidate)
 
     def _jump_to_section(self, item: ListItem) -> None:
         section_range = getattr(item, "data", None)

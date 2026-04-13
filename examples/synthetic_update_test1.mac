@@ -5,7 +5,7 @@
 #
 # Suggested workflow:
 #   1. Start the TUI and load this file as the data file (.mac).
-#   2. Load A2L -> choose examples/update_test1.a2l
+#   2. Press L and enter path to examples/update_test1.a2l (same dialog as data files)
 #   3. Switch to MAC view (MAC view button).
 #   4. Expect mostly green rows for the real symbols below (InA2L=yes, Status=OK).
 #   5. Expect red for UNKNOWN_TAG_NOT_IN_A2L (NOT_IN_A2L), malformed lines (ERR_PARSE).

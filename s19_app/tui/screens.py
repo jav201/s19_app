@@ -10,12 +10,15 @@ from textual.widgets import Button, Input, Label, ListItem, ListView
 
 
 class LoadFileScreen(ModalScreen[Optional[Path]]):
-    """Modal dialog for loading S19/HEX/MAC files."""
+    """Modal dialog for loading S19/HEX/MAC data files or an A2L file."""
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Load file (S19/HEX/MAC):"),
-            Input(placeholder="C:\\path\\to\\file.s19 or .hex or .mac", id="load_path"),
+            Label("Load file (S19/HEX/MAC/A2L):"),
+            Input(
+                placeholder="C:\\path\\to\\file.s19, .hex, .mac, or .a2l",
+                id="load_path",
+            ),
             Container(
                 Button("Load", id="load_ok"),
                 Button("Cancel", id="load_cancel"),
@@ -94,36 +97,3 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
             label_widget = selected.query_one(Label)
             name = label_widget.text if hasattr(label_widget, "text") else str(label_widget)
             self.dismiss(name)
-
-
-class LoadA2LScreen(ModalScreen[Optional[Path]]):
-    """Modal dialog for loading an A2L file."""
-
-    def compose(self) -> ComposeResult:
-        yield Container(
-            Label("Load A2L file:"),
-            Input(placeholder="C:\\path\\to\\file.a2l", id="a2l_path"),
-            Container(
-                Button("Load", id="a2l_ok"),
-                Button("Cancel", id="a2l_cancel"),
-                id="load_buttons",
-            ),
-            id="load_dialog",
-        )
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "a2l_cancel":
-            self.dismiss(None)
-            return
-        if event.button.id == "a2l_ok":
-            value = self.query_one("#a2l_path", Input).value.strip()
-            if not value:
-                return
-            self.dismiss(Path(value))
-
-    def on_list_view_selected(self, event: ListView.Selected) -> None:
-        if event.list_view.id != "project_list":
-            return
-        label_widget = event.item.query_one(Label)
-        name = label_widget.text if hasattr(label_widget, "text") else str(label_widget)
-        self.dismiss(name)
