@@ -1,0 +1,5 @@
+; Synthetic MAC / symbol listing for S19Tool validation
+; Address, Type, Size, Name
+0x80000000, ASCII, 13, HEADER_TEXT
+0x80000010, U8_ARRAY, 16, CAL_BLOCK_A
+0x80000040, U8_ARRAY, 64, CAL_BLOCK_B

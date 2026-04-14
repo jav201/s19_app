@@ -34,7 +34,7 @@ from .hexview import (
 )
 from .mac import parse_mac_file
 from .models import LoadedFile
-from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectScreen
+from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -77,6 +77,58 @@ def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
         key = name.lower()
         index.setdefault(key, []).append(tag)
     return index
+
+
+def _mac_record_ui_state(
+    record: dict[str, Any],
+    a2l_name_index: dict[str, list[dict]],
+    has_a2l: bool,
+    memory_checked: bool,
+    in_memory: Optional[bool],
+) -> tuple[str, str]:
+    """
+    Summary:
+        Derive MAC table status text and CSS class for one parsed ``.mac`` record.
+
+    Args:
+        record (dict[str, Any]): Parser record with ``parse_ok``, ``name``, ``address``, etc.
+        a2l_name_index (dict[str, list[dict]]): Map of lowercased A2L tag name to tag dicts.
+        has_a2l (bool): Whether an A2L dataset is loaded for cross-check.
+        memory_checked (bool): True when an S19/HEX image is available for address membership.
+        in_memory (Optional[bool]): Image membership when ``memory_checked`` is True.
+
+    Returns:
+        tuple[str, str]: ``(status, css_class)`` where ``css_class`` is ``invalid``, ``valid``,
+        or ``neutral`` (default terminal color; no green/red).
+
+    Data Flow:
+        - Fail parse and out-of-image rows to invalid.
+        - When A2L is absent or the tag name is missing, mark neutral.
+        - When the name is absent from A2L, mark neutral.
+        - When the name exists, require a matching ECU address on some A2L tag for ``valid``.
+
+    Dependencies:
+        Used by:
+            - ``S19TuiApp.update_mac_view``
+    """
+    if not record.get("parse_ok"):
+        return "ERR_PARSE", "invalid"
+    name = str(record.get("name") or "").strip()
+    address = record.get("address")
+    if memory_checked and in_memory is False:
+        return "OUT_OF_IMAGE", "invalid"
+    if not has_a2l or not name:
+        return "NO_A2L", "neutral"
+    matches = a2l_name_index.get(name.lower(), [])
+    if not matches:
+        return "NOT_IN_A2L", "neutral"
+    if not isinstance(address, int):
+        return "NO_ADDR", "neutral"
+    for tag in matches:
+        tag_addr = tag.get("address")
+        if isinstance(tag_addr, int) and tag_addr == address:
+            return "OK", "valid"
+    return "A2L_ADDR_MISMATCH", "invalid"
 
 
 class S19TuiApp(App):
@@ -318,6 +370,8 @@ class S19TuiApp(App):
         ("-", "a2l_tags_page_prev", "Tags-"),
         ("ctrl+right_square_bracket", "a2l_tags_page_next", "Tags next"),
         ("ctrl+left_square_bracket", "a2l_tags_page_prev", "Tags prev"),
+        ("comma", "mac_records_page_prev", "MAC-"),
+        ("period", "mac_records_page_next", "MAC+"),
     ]
 
     workarea: Path
@@ -353,7 +407,8 @@ class S19TuiApp(App):
     slow_parse_warn_seconds: float = 2.5
     a2l_window_size: int = 300
     a2l_window_overscan: int = 80
-    a2l_tags_page_size: int = 20
+    a2l_tags_page_size: int = 200
+    mac_records_page_size: int = 200
     a2l_summary_window_size: int = 500
     a2l_tag_hex_highlight_max_bytes: int = 4096
 
@@ -376,6 +431,8 @@ class S19TuiApp(App):
         self._a2l_tag_hex_highlight: Optional[tuple[int, int]] = None
         self._a2l_tag_find_query: str = ""
         self._a2l_tag_find_last_index: int = -1
+        self.current_project_dir: Optional[Path] = None
+        self._mac_window_start: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -452,6 +509,59 @@ class S19TuiApp(App):
         aligned = (max(0, self._a2l_window_start) // ps) * ps
         max_start = max(0, ((total_tags - 1) // ps) * ps)
         return max(0, min(aligned, max_start))
+
+    def _mac_clamp_page_start(self, total_records: int) -> int:
+        """
+        Summary:
+            Clamp ``_mac_window_start`` to a legal page start for MAC record paging.
+
+        Args:
+            total_records (int): Number of parsed MAC records.
+
+        Returns:
+            int: Page-aligned start index in ``[0, total_records)`` (or ``0`` when empty).
+
+        Data Flow:
+            - Align the current MAC window start to ``mac_records_page_size`` boundaries.
+            - Clamp to the last legal page when the list shrinks.
+
+        Dependencies:
+            Used by:
+                - ``update_mac_view``
+                - MAC page navigation actions
+        """
+        ps = max(1, self.mac_records_page_size)
+        if total_records <= 0 or ps <= 0:
+            return 0
+        aligned = (max(0, self._mac_window_start) // ps) * ps
+        max_start = max(0, ((total_records - 1) // ps) * ps)
+        return max(0, min(aligned, max_start))
+
+    def _active_project_dir(self) -> Optional[Path]:
+        """
+        Summary:
+            Return the absolute directory for the active saved project, if any.
+
+        Args:
+            None
+
+        Returns:
+            Optional[Path]: Resolved project folder, or ``None`` when no project is active.
+
+        Data Flow:
+            - Prefer ``current_project_dir`` when set (external or explicit path).
+            - Fall back to ``workarea / current_project`` for workarea-only projects.
+
+        Dependencies:
+            Used by:
+                - A2L/data sync helpers
+                - ``load_a2l_from_path`` project guard
+        """
+        if self.current_project_dir is not None:
+            return self.current_project_dir
+        if self.current_project:
+            return (self.workarea / self.current_project).resolve()
+        return None
 
     def _shift_window_for_index(self, total: int, index: int, start: int, window_size: int) -> int:
         """
@@ -662,7 +772,7 @@ class S19TuiApp(App):
             self.logger.info("Save project action triggered for %s", self.current_file.path)
         else:
             self.logger.info("Save project action triggered with A2L only.")
-        self.push_screen(SaveProjectScreen(), self._handle_save_dialog)
+        self.push_screen(SaveProjectScreen(self.workarea), self._handle_save_dialog)
 
     def action_load_project(self) -> None:
         """Prompt to load an existing project."""
@@ -771,20 +881,87 @@ class S19TuiApp(App):
         self._a2l_window_start = max(0, self._a2l_window_start - page_size)
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
+    def action_mac_records_page_next(self) -> None:
+        """
+        Summary:
+            Advance the MAC records table by one page of ``mac_records_page_size`` rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bump ``_mac_window_start`` by one page and clamp to the last legal page start.
+            - Re-render the MAC list.
+
+        Dependencies:
+            Uses:
+                - ``update_mac_view``
+        """
+        if not self.current_file or self.current_file.file_type != "mac":
+            return
+        records = self.current_file.mac_records or []
+        total = len(records)
+        if total <= 0:
+            return
+        page_size = max(1, self.mac_records_page_size)
+        max_start = max(0, ((total - 1) // page_size) * page_size)
+        self._mac_window_start = min(max_start, self._mac_window_start + page_size)
+        self.update_mac_view()
+
+    def action_mac_records_page_prev(self) -> None:
+        """
+        Summary:
+            Move the MAC records table back by one page of ``mac_records_page_size`` rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Decrement ``_mac_window_start`` by one page and clamp at zero.
+            - Re-render the MAC list.
+
+        Dependencies:
+            Uses:
+                - ``update_mac_view``
+        """
+        if not self.current_file or self.current_file.file_type != "mac":
+            return
+        records = self.current_file.mac_records or []
+        if not records:
+            return
+        page_size = max(1, self.mac_records_page_size)
+        self._mac_window_start = max(0, self._mac_window_start - page_size)
+        self.update_mac_view()
+
     def action_a2l_tag_find_next(self) -> None:
         """Invoke the A2L tag find-next scan (same as the Find-next button)."""
         self._handle_a2l_tag_find_next()
 
-    def _handle_save_dialog(self, name: Optional[str]) -> None:
-        if name is None:
+    def _handle_save_dialog(self, payload: Optional[SaveProjectPayload]) -> None:
+        if payload is None:
             self.logger.info("Save project canceled.")
             return
-        cleaned = sanitize_project_name(name)
+        if not self.current_file and not self.current_a2l_path:
+            self.set_status("Nothing to save: load a data file or A2L first.")
+            self.logger.info("Save project dismissed: no loaded file or A2L.")
+            return
+        parent_resolved = resolve_input_path(Path(payload.parent_folder), self.base_dir)
+        if not parent_resolved or not parent_resolved.is_dir():
+            self.set_status("Parent folder not found or not a directory.")
+            self.logger.warning("Invalid parent folder: %s", payload.parent_folder)
+            return
+        cleaned = sanitize_project_name(payload.project_name)
         if not cleaned:
             self.set_status("Invalid project name.")
-            self.logger.warning("Invalid project name: %s", name)
+            self.logger.warning("Invalid project name: %s", payload.project_name)
             return
-        project_dir = self.workarea / cleaned
+        project_dir = (parent_resolved / cleaned).resolve()
         project_dir.mkdir(parents=True, exist_ok=True)
         data_files, a2l_files, error = validate_project_files(project_dir)
         if error:
@@ -806,10 +983,8 @@ class S19TuiApp(App):
             saved_a2l = copy_into_workarea(self.current_a2l_path, project_dir)
             self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
         self.current_project = cleaned
-        if self.current_file:
-            self.set_status(f"Saved project '{cleaned}' -> {self.current_file.path.name}")
-        else:
-            self.set_status(f"Saved project '{cleaned}'")
+        self.current_project_dir = project_dir
+        self.set_status(f"Saved project to {project_dir}")
         self.update_project_labels()
         self.refresh_files()
 
@@ -832,6 +1007,7 @@ class S19TuiApp(App):
             self.logger.warning("No data files in project: %s", name)
             return
         self.current_project = name
+        self.current_project_dir = project_dir.resolve()
         self.load_selected_file(data_files[0], a2l_files)
         self.set_status(f"Loaded project '{name}' -> {data_files[0].name}")
         self.logger.info("Project loaded. name=%s file=%s", name, data_files[0])
@@ -844,11 +1020,13 @@ class S19TuiApp(App):
                 projects.append(item.name)
         return projects
 
-    def _sync_loaded_file_to_project(self, project_name: str) -> None:
+    def _sync_loaded_file_to_project(self) -> None:
         """Copy loaded data file into active project if allowed."""
         if not self.current_file:
             return
-        project_dir = self.workarea / project_name
+        project_dir = self._active_project_dir()
+        if not project_dir:
+            return
         project_dir.mkdir(parents=True, exist_ok=True)
         data_files, a2l_files, error = validate_project_files(project_dir)
         if error:
@@ -860,11 +1038,13 @@ class S19TuiApp(App):
         copy_into_workarea(self.current_file.path, project_dir)
         self.logger.info("Synced data file into project: %s", project_dir)
 
-    def _sync_loaded_a2l_to_project(self, project_name: str) -> None:
+    def _sync_loaded_a2l_to_project(self) -> None:
         """Copy loaded A2L file into active project if allowed."""
         if not self.current_a2l_path:
             return
-        project_dir = self.workarea / project_name
+        project_dir = self._active_project_dir()
+        if not project_dir:
+            return
         project_dir.mkdir(parents=True, exist_ok=True)
         data_files, a2l_files, error = validate_project_files(project_dir)
         if error:
@@ -969,7 +1149,7 @@ class S19TuiApp(App):
         self.set_progress(100, f"Loaded {copied.name}")
 
         if self.current_project:
-            self._sync_loaded_file_to_project(self.current_project)
+            self._sync_loaded_file_to_project()
 
     def load_a2l_from_path(self, path: Path) -> None:
         """Load A2L file into temp, parse it, and update view."""
@@ -983,16 +1163,19 @@ class S19TuiApp(App):
             self.logger.warning("Unsupported A2L type: %s", normalized.suffix)
             return
         if self.current_project:
-            project_dir = self.workarea / self.current_project
-            _, a2l_files, error = validate_project_files(project_dir)
-            if error:
-                self.set_status(error)
-                self.logger.warning("Project validation failed: %s", error)
-                return
-            if a2l_files:
-                self.set_status("Project already has an A2L file.")
-                self.logger.warning("Project already has A2L file: %s", project_dir)
-                return
+            project_dir = self._active_project_dir()
+            if project_dir:
+                _, a2l_files, error = validate_project_files(project_dir)
+                if error:
+                    self.set_status(error)
+                    self.logger.warning("Project validation failed: %s", error)
+                    return
+                if a2l_files:
+                    self.set_status("Project already has an A2L file.")
+                    self.logger.warning("Project already has A2L file: %s", project_dir)
+                    return
+            else:
+                self.logger.warning("current_project set but project directory could not be resolved; skipping project guard.")
         temp_dir = self.workarea / WORKAREA_TEMP
         source_size = normalized.stat().st_size
         if source_size >= self.large_a2l_warn_bytes:
@@ -1084,7 +1267,7 @@ class S19TuiApp(App):
         self.logger.info("A2L loaded: %s", copied)
 
         if self.current_project:
-            self._sync_loaded_a2l_to_project(self.current_project)
+            self._sync_loaded_a2l_to_project()
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         if event.list_view.id == "files_list":
@@ -1541,6 +1724,7 @@ class S19TuiApp(App):
             self.logger.exception("Load failed for path=%s suffix=%s project=%s", path, suffix, self.current_project)
             return
         self.current_file = loaded
+        self._mac_window_start = 0
         self._a2l_tag_hex_highlight = None
         if loaded.a2l_data:
             self.current_a2l_path = loaded.a2l_path
@@ -1797,8 +1981,8 @@ class S19TuiApp(App):
     def update_mac_view(self) -> None:
         """
         Summary:
-            Populate the MAC viewer list with parsed ``.mac`` rows, A2L cross-check columns,
-            combined status coloring, and aggregate counts.
+            Populate the MAC viewer list with a paged window of ``.mac`` rows, A2L cross-check
+            columns, validation coloring, and aggregate counts.
 
         Args:
             (none; reads ``current_file``, ``current_a2l_data``, and widget ``#mac_records_list``.)
@@ -1807,18 +1991,20 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Clear and repopulate ``#mac_records_list`` with header, fixed-width rows, summary.
-            - Build case-insensitive A2L name index from loaded tags.
-            - For each MAC record, compute parse validity, A2L membership, optional image check,
-              row status string, and CSS class (``valid`` / ``invalid``).
+            - Build full-row metadata for every MAC record (global counts).
+            - Slice one page of rows using ``mac_records_page_size`` and ``_mac_window_start``.
+            - Color rows via ``_mac_record_ui_state``: green when A2L name+address match, red on parse/out-of-image/address mismatch, default when not verifiable against A2L.
 
         Dependencies:
             Uses:
                 - ``_build_a2l_name_index``
+                - ``_mac_record_ui_state``
+                - ``_mac_clamp_page_start`` / ``_get_window_bounds``
                 - ``query_one`` / ``ListView`` / ``Label`` / ``ListItem``
             Used by:
                 - ``load_selected_file`` post-load refresh
                 - ``update_a2l_view`` when A2L data changes
+                - MAC paging actions
         """
         mac_list = self.query_one("#mac_records_list", ListView)
         mac_list.clear()
@@ -1830,11 +2016,13 @@ class S19TuiApp(App):
             mac_list.append(ListItem(Label("No MAC records parsed.")))
             return
 
+        has_a2l = bool(self.current_a2l_data)
         a2l_name_index = _build_a2l_name_index(self.current_a2l_data)
         rows: list[tuple] = []
-        row_meta: list[dict] = []
-        total_valid = 0
+        row_meta: list[dict[str, Any]] = []
+        total_verified = 0
         total_invalid = 0
+        total_neutral = 0
         total_in_a2l = 0
         total_out_of_mem = 0
         total_parse_errors = 0
@@ -1870,23 +2058,15 @@ class S19TuiApp(App):
                 if not in_memory:
                     total_out_of_mem += 1
 
-            if not parse_ok:
-                status = "ERR_PARSE"
-                is_invalid = True
-            elif not in_a2l:
-                status = "NOT_IN_A2L"
-                is_invalid = True
-            elif memory_checked and in_memory is False:
-                status = "OUT_OF_IMAGE"
-                is_invalid = True
-            else:
-                status = "OK"
-                is_invalid = False
-
-            if is_invalid:
+            status, css_class = _mac_record_ui_state(
+                record, a2l_name_index, has_a2l, memory_checked, in_memory
+            )
+            if css_class == "valid":
+                total_verified += 1
+            elif css_class == "invalid":
                 total_invalid += 1
             else:
-                total_valid += 1
+                total_neutral += 1
 
             addr_text = f"0x{address:08X}" if isinstance(address, int) else "n/a"
             rows.append(
@@ -1903,10 +2083,18 @@ class S19TuiApp(App):
             )
             row_meta.append(
                 {
-                    "is_invalid": is_invalid,
+                    "css_class": css_class,
                     "address": address if isinstance(address, int) else None,
                 }
             )
+
+        total = len(rows)
+        self._mac_window_start = self._mac_clamp_page_start(total)
+        page_size = max(1, self.mac_records_page_size)
+        start, end = self._get_window_bounds(total, self._mac_window_start, page_size)
+        self._mac_window_start = start
+        visible_rows = rows[start:end]
+        visible_meta = row_meta[start:end]
 
         name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
         addr_width = max(len("Address"), *(len(row[1]) for row in rows))
@@ -1917,6 +2105,14 @@ class S19TuiApp(App):
         parse_width = min(36, max(len("ParseErr"), *(len(row[6]) for row in rows)))
         match_width = min(36, max(len("A2LMatch"), *(len(row[7]) for row in rows)))
 
+        page_num = start // page_size + 1
+        total_pages = max(1, (total + page_size - 1) // page_size)
+        page_line = (
+            f"Page {page_num}/{total_pages} | rows {start + 1}-{end} / {total} "
+            f"(page size {page_size}; comma/period for MAC page)"
+        )
+        mac_list.append(ListItem(Label(page_line)))
+
         header = (
             f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
             f"{'InA2L'.ljust(in_a2l_width)} | {'InMem'.ljust(in_mem_width)} | "
@@ -1925,7 +2121,7 @@ class S19TuiApp(App):
         )
         mac_list.append(ListItem(Label(header)))
 
-        for index, row in enumerate(rows):
+        for index, row in enumerate(visible_rows):
             line = (
                 f"{row[0][:name_width].ljust(name_width)} | {row[1].ljust(addr_width)} | "
                 f"{row[2].ljust(in_a2l_width)} | {row[3].ljust(in_mem_width)} | "
@@ -1933,17 +2129,18 @@ class S19TuiApp(App):
                 f"{row[6][:parse_width].ljust(parse_width)} | {row[7][:match_width].ljust(match_width)}"
             )
             label = Label(line)
-            if row_meta[index]["is_invalid"]:
+            css_class = visible_meta[index]["css_class"]
+            if css_class == "invalid":
                 label.add_class("invalid")
-            else:
+            elif css_class == "valid":
                 label.add_class("valid")
             item = ListItem(label)
-            item.data = {"address": row_meta[index]["address"]}
+            item.data = {"address": visible_meta[index]["address"]}
             mac_list.append(item)
 
         summary = (
-            f"Total={len(records)}  Valid={total_valid}  Invalid={total_invalid}  "
-            f"InA2L={total_in_a2l}  OutOfMem={total_out_of_mem}  ParseErrs={total_parse_errors}"
+            f"Total={total}  Verified={total_verified}  Invalid={total_invalid}  Neutral={total_neutral}  "
+            f"NameInA2L={total_in_a2l}  OutOfMem={total_out_of_mem}  ParseErrs={total_parse_errors}"
         )
         mac_list.append(ListItem(Label(summary)))
 

@@ -26,7 +26,7 @@ from .hexview import (
     render_hex_view_text,
 )
 from .models import LoadedFile
-from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectScreen
+from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -64,6 +64,7 @@ __all__ = [
     "S19TuiApp",
     "S19_EXTENSIONS",
     "SUPPORTED_EXTENSIONS",
+    "SaveProjectPayload",
     "SaveProjectScreen",
     "WORKAREA_DIRNAME",
     "WORKAREA_SUBDIR",

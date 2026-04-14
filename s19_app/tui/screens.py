@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
@@ -10,6 +11,14 @@ from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, ListItem, ListView
 
 logger = logging.getLogger("s19tui")
+
+
+@dataclass(frozen=True)
+class SaveProjectPayload:
+    """Parent directory (as entered or browsed) and project folder name for save."""
+
+    parent_folder: str
+    project_name: str
 
 
 class LoadFileScreen(ModalScreen[Optional[Path]]):
@@ -44,13 +53,26 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
             self.dismiss(Path(value))
 
 
-class SaveProjectScreen(ModalScreen[Optional[str]]):
-    """Modal dialog for saving a project name."""
+class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
+    """Modal dialog for destination folder, optional browse, and project name."""
+
+    def __init__(self, default_parent: Path) -> None:
+        super().__init__()
+        self.default_parent = default_parent
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Save project as:"),
-            Input(placeholder="Project name (letters, numbers, - _)", id="project_name"),
+            Label("Save project folder under:"),
+            Input(
+                placeholder="C:\\path\\to\\parent\\folder",
+                id="project_parent_path",
+            ),
+            Container(
+                Button("Browse...", id="save_browse"),
+                id="save_browse_row",
+            ),
+            Label("Project name (new folder name):"),
+            Input(placeholder="letters, numbers, - _", id="project_name"),
             Container(
                 Button("Save", id="save_ok"),
                 Button("Cancel", id="save_cancel"),
@@ -59,15 +81,34 @@ class SaveProjectScreen(ModalScreen[Optional[str]]):
             id="load_dialog",
         )
 
+    def on_mount(self) -> None:
+        self.query_one("#project_parent_path", Input).value = str(self.default_parent)
+
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "save_cancel":
             self.dismiss(None)
             return
-        if event.button.id == "save_ok":
-            value = self.query_one("#project_name", Input).value.strip()
-            if not value:
+        if event.button.id == "save_browse":
+            try:
+                import tkinter as tk
+                from tkinter import filedialog
+            except Exception as exc:
+                logger.warning("Folder browse unavailable: %s", exc)
                 return
-            self.dismiss(value)
+            root = tk.Tk()
+            root.withdraw()
+            root.attributes("-topmost", True)
+            picked = filedialog.askdirectory()
+            root.destroy()
+            if picked:
+                self.query_one("#project_parent_path", Input).value = picked
+            return
+        if event.button.id == "save_ok":
+            parent = self.query_one("#project_parent_path", Input).value.strip()
+            name = self.query_one("#project_name", Input).value.strip()
+            if not parent or not name:
+                return
+            self.dismiss(SaveProjectPayload(parent_folder=parent, project_name=name))
 
 
 class LoadProjectScreen(ModalScreen[Optional[str]]):

@@ -2,8 +2,109 @@ from pathlib import Path
 
 import pytest
 
-from s19_app.tui.app import S19TuiApp
+from s19_app.tui.app import S19TuiApp, _mac_record_ui_state
+from s19_app.tui.models import LoadedFile
+from s19_app.tui.screens import SaveProjectPayload
 from s19_app.tui.workspace import WORKAREA_TEMP
+
+
+def test_default_tag_and_mac_page_sizes(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    assert app.a2l_tags_page_size == 200
+    assert app.mac_records_page_size == 200
+
+
+def test_mac_record_ui_state_a2l_verification_buckets():
+    idx = {"rpm": [{"name": "RPM", "address": 0x1000, "section": "MEASUREMENT"}]}
+    assert _mac_record_ui_state(
+        {"parse_ok": True, "name": "RPM", "address": 0x1000}, idx, True, False, None
+    ) == ("OK", "valid")
+    assert _mac_record_ui_state(
+        {"parse_ok": True, "name": "RPM", "address": 0x2000}, idx, True, False, None
+    )[1] == "invalid"
+    assert _mac_record_ui_state(
+        {"parse_ok": True, "name": "MISSING", "address": 0x1000}, idx, True, False, None
+    ) == ("NOT_IN_A2L", "neutral")
+    assert _mac_record_ui_state(
+        {"parse_ok": True, "name": "RPM", "address": 0x1000}, idx, False, False, None
+    )[1] == "neutral"
+    assert _mac_record_ui_state(
+        {"parse_ok": False, "name": "RPM", "address": 0x1000}, idx, True, False, None
+    )[1] == "invalid"
+
+
+def test_save_project_writes_under_chosen_parent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    ensure = tmp_path / ".s19tool" / "workarea"
+    ensure.mkdir(parents=True)
+    src = tmp_path / "data.mac"
+    src.write_text("A=0x10\n", encoding="utf-8")
+    parent = tmp_path / "dest"
+    parent.mkdir()
+    app = S19TuiApp(base_dir=tmp_path)
+    app.workarea = ensure
+    monkeypatch.setattr(app, "set_status", lambda _m: None)
+    monkeypatch.setattr(app, "update_project_labels", lambda: None)
+    monkeypatch.setattr(app, "refresh_files", lambda: None)
+    app.current_file = LoadedFile(
+        path=src,
+        file_type="mac",
+        mem_map={16: 0},
+        row_bases=[0],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=[],
+    )
+    app.current_a2l_path = None
+    app._handle_save_dialog(SaveProjectPayload(parent_folder=str(parent), project_name="P1"))
+    assert (parent / "P1" / "data.mac").exists()
+    assert app.current_project == "P1"
+    assert app.current_project_dir == (parent / "P1").resolve()
+
+
+def test_active_project_dir_prefers_explicit_path(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.workarea = tmp_path / "wa"
+    app.workarea.mkdir()
+    app.current_project = "Alpha"
+    app.current_project_dir = None
+    assert app._active_project_dir() == (app.workarea / "Alpha").resolve()
+    external = (tmp_path / "ext" / "Beta").resolve()
+    app.current_project_dir = external
+    assert app._active_project_dir() == external
+
+
+def test_mac_records_page_next_prev(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    recs = [
+        {"parse_ok": True, "name": f"T{i}", "address": 0x1000 + i, "line_number": i + 1}
+        for i in range(250)
+    ]
+    app.current_file = LoadedFile(
+        path=tmp_path / "x.mac",
+        file_type="mac",
+        mem_map={},
+        row_bases=[],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=recs,
+    )
+    app.mac_records_page_size = 100
+    monkeypatch.setattr(app, "update_mac_view", lambda: None)
+    app._mac_window_start = 0
+    app.action_mac_records_page_next()
+    assert app._mac_window_start == 100
+    app.action_mac_records_page_next()
+    assert app._mac_window_start == 200
+    app.action_mac_records_page_next()
+    assert app._mac_window_start == 200
+    app.action_mac_records_page_prev()
+    assert app._mac_window_start == 100
 
 
 def test_list_projects_skips_files_and_sorts_names(tmp_path: Path):
