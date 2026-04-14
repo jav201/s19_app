@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from s19_app.tui.a2l import (
+    build_a2l_summary_lines,
     extract_a2l_tags,
     format_tag_validation_status,
     parse_a2l_file,
@@ -158,6 +159,22 @@ def test_parse_a2l_file_emits_stage_logs(tmp_path: Path, caplog: pytest.LogCaptu
 
     assert any("A2L section tree built:" in message for message in caplog.messages)
     assert any("A2L parse stages:" in message for message in caplog.messages)
+
+
+def test_build_a2l_summary_lines_includes_all_tags():
+    tags = [
+        {"section": "MEASUREMENT", "name": f"T{i}", "address": 0x1000 + i, "length": 1} for i in range(120)
+    ]
+    a2l_data = {
+        "sections": [{"name": "PROJECT", "meta": "Demo", "start_line": 1, "end_line": 8, "children": []}],
+        "errors": [],
+        "tags": tags,
+    }
+    checks = validate_a2l_tags(tags, None)
+    lines = build_a2l_summary_lines(a2l_data, checks)
+    header_i = lines.index("A2L Tags:")
+    tag_bullets = [ln for ln in lines[header_i + 1 :] if ln.startswith("- ")]
+    assert len(tag_bullets) == 120
 
 
 def test_render_a2l_view_supports_tag_line_truncation():

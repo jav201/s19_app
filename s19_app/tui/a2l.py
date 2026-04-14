@@ -751,49 +751,127 @@ def iter_section_lines(sections: List[dict], depth: int = 0) -> List[str]:
     return lines
 
 
+def _a2l_tag_summary_line(tag: dict, check_map: dict[tuple[Optional[str], Optional[str]], dict]) -> str:
+    """Format one A2L tag as a single summary line (used by full summary line list)."""
+    addr = tag.get("address")
+    length = tag.get("length")
+    addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
+    len_text = str(length) if isinstance(length, int) else "n/a"
+    status = ""
+    if check_map:
+        match = check_map.get((tag.get("section"), tag.get("name")))
+        if match is not None:
+            status = format_tag_validation_status(match)
+    reg = tag.get("memory_region") or "unknown"
+    tail = f" {status}" if status else ""
+    return f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg}{tail}".strip()
+
+
+def build_a2l_summary_lines(
+    a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None
+) -> list[str]:
+    """
+    Summary:
+        Build the full A2L summary as discrete lines for windowed rendering (sections + all tags).
+
+    Args:
+        a2l_data (Optional[dict]): Parsed A2L payload (``sections``, ``tags``, ``errors``).
+        tag_checks (Optional[list[dict]]): Validation rows from ``validate_a2l_tags`` aligned to tags.
+
+    Returns:
+        list[str]: Lines to show in the A2L summary viewer (no truncation).
+
+    Data Flow:
+        - Return parse-error lines when ``errors`` is non-empty.
+        - Emit section tree via ``iter_section_lines``.
+        - Append every tag as one line with optional validation status from ``tag_checks``.
+
+    Dependencies:
+        Uses:
+            - ``iter_section_lines``
+            - ``format_tag_validation_status``
+        Used by:
+            - ``S19TuiApp`` buffered A2L summary
+            - ``render_a2l_view`` (optional truncation for tests)
+    """
+    if not a2l_data:
+        return []
+    if a2l_data.get("errors"):
+        return ["A2L parse errors:", *[f"- {err}" for err in a2l_data["errors"]]]
+    sections = a2l_data.get("sections", [])
+    tags = a2l_data.get("tags", [])
+    if not sections:
+        return ["No A2L sections found."]
+    lines_out = ["A2L Sections:", *iter_section_lines(sections)]
+    if not tags:
+        return lines_out
+    check_map: dict[tuple[Optional[str], Optional[str]], dict] = {}
+    if tag_checks:
+        check_map = {(item.get("section"), item.get("name")): item for item in tag_checks}
+    lines_out.append("")
+    lines_out.append("A2L Tags:")
+    for tag in tags:
+        lines_out.append(_a2l_tag_summary_line(tag, check_map))
+    return lines_out
+
+
+def _truncate_a2l_summary_tag_lines(lines: list[str], max_tag_lines: int) -> list[str]:
+    """
+    Summary:
+        Truncate in-memory summary lines after the ``A2L Tags:`` header for bounded string output.
+
+    Args:
+        lines (list[str]): Full summary lines from ``build_a2l_summary_lines``.
+        max_tag_lines (int): Maximum number of tag lines to keep after ``A2L Tags:``.
+
+    Returns:
+        list[str]: Possibly truncated copy with a trailing ``truncated`` marker.
+
+    Data Flow:
+        - Copy lines until ``A2L Tags:`` is found.
+        - Emit at most ``max_tag_lines`` lines that look like tag bullets (``- `` prefix).
+        - Append count of omitted tag lines when truncated.
+
+    Dependencies:
+        Uses:
+            - line prefix checks only
+        Used by:
+            - ``render_a2l_view`` for tests and small previews
+    """
+    try:
+        tag_header_index = lines.index("A2L Tags:")
+    except ValueError:
+        return list(lines)
+    out = list(lines[: tag_header_index + 1])
+    emitted = 0
+    remaining_tag_lines = 0
+    i = tag_header_index + 1
+    while i < len(lines):
+        line = lines[i]
+        if not line.startswith("- "):
+            out.append(line)
+            i += 1
+            continue
+        if emitted < max_tag_lines:
+            out.append(line)
+            emitted += 1
+        else:
+            remaining_tag_lines += 1
+        i += 1
+    if remaining_tag_lines:
+        out.append(f"... truncated {remaining_tag_lines} additional tag lines ...")
+    return out
+
+
 def render_a2l_view(
     a2l_data: Optional[dict], tag_checks: Optional[list[dict]] = None, max_tag_lines: Optional[int] = None
 ) -> str:
     """Render a concise, human-readable A2L summary or errors."""
     if not a2l_data:
         return "No A2L loaded."
-    if a2l_data.get("errors"):
-        errors = "\n".join(f"- {err}" for err in a2l_data["errors"])
-        return f"A2L parse errors:\n{errors}"
-    sections = a2l_data.get("sections", [])
-    tags = a2l_data.get("tags", [])
-    if not sections:
-        return "No A2L sections found."
-    lines_out = ["A2L Sections:", *iter_section_lines(sections)]
-    if tags:
-        lines_out.append("")
-        lines_out.append("A2L Tags:")
-        check_map = {}
-        if tag_checks:
-            check_map = {(item.get("section"), item.get("name")): item for item in tag_checks}
-        truncated = False
-        emitted_tag_lines = 0
-        for tag in tags:
-            if isinstance(max_tag_lines, int) and max_tag_lines > 0:
-                if emitted_tag_lines >= max_tag_lines:
-                    truncated = True
-                    break
-            addr = tag.get("address")
-            length = tag.get("length")
-            addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
-            len_text = str(length) if isinstance(length, int) else "n/a"
-            status = ""
-            if check_map:
-                match = check_map.get((tag.get("section"), tag.get("name")))
-                if match is not None:
-                    status = format_tag_validation_status(match)
-            reg = tag.get("memory_region") or "unknown"
-            tail = f" {status}" if status else ""
-            lines_out.append(
-                f"- {tag.get('section')} {tag.get('name')}: {addr_text} len={len_text} mem={reg}{tail}".strip()
-            )
-            emitted_tag_lines += 1
-        if truncated:
-            remaining = max(0, len(tags) - max_tag_lines)
-            lines_out.append(f"... truncated {remaining} additional tag lines ...")
+    lines_out = build_a2l_summary_lines(a2l_data, tag_checks)
+    if not lines_out:
+        return "No A2L loaded."
+    if isinstance(max_tag_lines, int) and max_tag_lines > 0:
+        lines_out = _truncate_a2l_summary_tag_lines(lines_out, max_tag_lines)
     return "\n".join(lines_out)

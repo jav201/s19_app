@@ -23,7 +23,7 @@ from textual.widgets import (
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
-from .a2l import parse_a2l_file, render_a2l_view, validate_a2l_tags
+from .a2l import build_a2l_summary_lines, parse_a2l_file, validate_a2l_tags
 from .hexview import (
     build_mem_map_s19,
     build_range_validity_hex,
@@ -197,6 +197,10 @@ class S19TuiApp(App):
         padding-bottom: 1;
     }
 
+    #a2l_tag_find_input {
+        width: 1fr;
+    }
+
     #a2l_tags_filter_input {
         width: 1fr;
     }
@@ -229,6 +233,16 @@ class S19TuiApp(App):
         layout: horizontal;
         height: auto;
         padding-bottom: 1;
+    }
+
+    #a2l_summary_controls {
+        layout: horizontal;
+        height: auto;
+        padding-bottom: 1;
+    }
+
+    #a2l_summary_find_input {
+        width: 2fr;
     }
 
     #search_input, #goto_input {
@@ -310,6 +324,8 @@ class S19TuiApp(App):
         ("2", "view_alt", "Alt view"),
         ("3", "view_mac", "MAC view"),
         ("q", "quit", "Quit"),
+        ("ctrl+shift+pageup", "a2l_summary_page_up", "A2L sum prev"),
+        ("ctrl+shift+pagedown", "a2l_summary_page_down", "A2L sum next"),
     ]
 
     workarea: Path
@@ -363,6 +379,13 @@ class S19TuiApp(App):
         self._a2l_summary_lines: list[str] = []
         self._a2l_summary_start: int = 0
         self._a2l_filter_debounce_token: int = 0
+        self._a2l_tag_column_widths: Optional[tuple[int, ...]] = None
+        self._a2l_tag_find_query: str = ""
+        self._a2l_tag_find_last_index: int = -1
+        self._a2l_summary_find_query: str = ""
+        self._a2l_summary_find_last_line_index: int = -1
+        self._a2l_tag_find_debounce_token: int = 0
+        self._a2l_summary_find_debounce_token: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -452,6 +475,233 @@ class S19TuiApp(App):
             return min(new_start, max(0, total - window_size))
         return current_start
 
+    def _a2l_tag_find_haystack(self, tag: dict) -> str:
+        """
+        Summary:
+            Build a lowercase search string for substring matching across tag table columns.
+
+        Args:
+            tag (dict): Enriched A2L tag row.
+
+        Returns:
+            str: Concatenated lowercase fields for find-next scans.
+
+        Data Flow:
+            - Mirror ``_tag_matches_filter`` ``all`` field aggregation for consistent UX.
+
+        Dependencies:
+            Used by:
+                - ``_handle_a2l_tag_find_next``
+        """
+        return " ".join(
+            [
+                str(tag.get("name") or ""),
+                str(tag.get("address") or ""),
+                str(tag.get("length") or ""),
+                str(tag.get("source") or ""),
+                _a2l_tag_in_memory_display(tag),
+                str(tag.get("lower_limit") or ""),
+                str(tag.get("upper_limit") or ""),
+                str(tag.get("unit") or ""),
+                str(tag.get("bit_org") or ""),
+                str(tag.get("endian") or ""),
+                str(tag.get("virtual") or ""),
+                str(tag.get("function_group") or ""),
+                str(tag.get("access") or ""),
+                str(tag.get("datatype") or ""),
+                str(tag.get("description") or ""),
+                str(tag.get("memory_region") or ""),
+                str(tag.get("section") or ""),
+            ]
+        ).lower()
+
+    def _recompute_a2l_tag_column_widths(self, tags: list[dict]) -> None:
+        """
+        Summary:
+            Compute stable column widths from the full filtered tag list for aligned table rendering.
+
+        Args:
+            tags (list[dict]): Filtered enriched tags (entire result set, not only the visible window).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Scan all tags once for maximum string lengths per displayed column.
+            - Apply the same width caps used when rendering visible rows.
+            - Store result on ``self._a2l_tag_column_widths`` for ``update_a2l_tags_view``.
+
+        Dependencies:
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+        """
+        name_width = len("Tag")
+        addr_width = len("Address")
+        len_width = len("Length")
+        source_width = len("Source")
+        mem_width = len("InMem")
+        region_width = len("Region")
+        limits_width = len("Limits")
+        unit_width = len("Unit")
+        bit_width = len("Bits")
+        endian_width = len("Endian")
+        virt_width = len("Virt")
+        func_width = len("Func")
+        access_width = len("Access")
+        dtype_max = 0
+        for tag in tags:
+            addr = tag.get("address")
+            length = tag.get("length")
+            addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
+            len_text = str(length) if isinstance(length, int) else "n/a"
+            name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
+            source_text = str(tag.get("source") or "assigned")
+            in_mem_text = _a2l_tag_in_memory_display(tag)
+            region_text = str(tag.get("memory_region") or "unknown")
+            limits_text = ""
+            if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
+                limits_text = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
+            unit_text = str(tag.get("unit") or "")
+            bit_text = str(tag.get("bit_org") or "")
+            endian_text = str(tag.get("endian") or "")
+            virt_text = "yes" if tag.get("virtual") else "no"
+            func_text = str(tag.get("function_group") or "")
+            access_text = str(tag.get("access") or "")
+            dtype_text = str(tag.get("datatype") or "")
+            name_width = max(name_width, min(48, len(name_text)))
+            addr_width = max(addr_width, len(addr_text))
+            len_width = max(len_width, len(len_text))
+            source_width = max(source_width, len(source_text))
+            mem_width = max(mem_width, len(in_mem_text))
+            region_width = max(region_width, len(region_text))
+            limits_width = max(limits_width, len(limits_text))
+            unit_width = max(unit_width, len(unit_text))
+            bit_width = max(bit_width, len(bit_text))
+            endian_width = max(endian_width, len(endian_text))
+            virt_width = max(virt_width, len(virt_text))
+            func_width = max(func_width, len(func_text))
+            access_width = max(access_width, len(access_text))
+            dtype_max = max(dtype_max, len(dtype_text))
+        dtype_width = max(len("Dtype"), min(12, dtype_max))
+        self._a2l_tag_column_widths = (
+            name_width,
+            addr_width,
+            len_width,
+            source_width,
+            mem_width,
+            region_width,
+            limits_width,
+            unit_width,
+            bit_width,
+            endian_width,
+            virt_width,
+            func_width,
+            access_width,
+            dtype_width,
+        )
+
+    def _focus_a2l_tag_absolute_index(self, absolute_index: int) -> None:
+        """
+        Summary:
+            Scroll the virtual tag window so ``absolute_index`` is visible and focus the matching row.
+
+        Args:
+            absolute_index (int): Index into ``self._a2l_filtered_tags``.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_shift_window_for_index``
+                - ``update_a2l_tags_view``
+        """
+        tags = self._a2l_filtered_tags
+        total = len(tags)
+        if total <= 0 or absolute_index < 0 or absolute_index >= total:
+            return
+        self._a2l_window_start = self._shift_window_for_index(
+            total=total,
+            index=absolute_index,
+            start=self._a2l_window_start,
+            window_size=self.a2l_window_size,
+        )
+        self.update_a2l_tags_view(tags)
+        list_view = self.query_one("#a2l_tags_list", ListView)
+        local = 2 + (absolute_index - self._a2l_window_start)
+        if 0 <= local < len(list_view.children):
+            list_view.index = local
+
+    def _handle_a2l_tag_find_next(self) -> None:
+        """Find next tag row matching substring in ``#a2l_tag_find_input`` (wraps, full filtered list)."""
+        raw = self.query_one("#a2l_tag_find_input", Input).value.strip().lower()
+        tags = self._a2l_filtered_tags
+        if not raw:
+            self.set_status("Tag find query is empty.")
+            return
+        if not tags:
+            self.set_status("No tags to search.")
+            return
+        n = len(tags)
+        if self._a2l_tag_find_query != raw:
+            self._a2l_tag_find_query = raw
+            self._a2l_tag_find_last_index = -1
+        start_search = (self._a2l_tag_find_last_index + 1) % n
+        for offset in range(n):
+            idx = (start_search + offset) % n
+            if raw in self._a2l_tag_find_haystack(tags[idx]):
+                self._a2l_tag_find_last_index = idx
+                self._focus_a2l_tag_absolute_index(idx)
+                self.set_status(f"Tag find: match {idx + 1}/{n}")
+                return
+        self.set_status("Tag find: no match")
+
+    def _handle_a2l_summary_find_next(self) -> None:
+        """Find next summary line matching substring in ``#a2l_summary_find_input`` (wraps)."""
+        raw = self.query_one("#a2l_summary_find_input", Input).value.strip().lower()
+        lines = self._a2l_summary_lines
+        if not raw:
+            self.set_status("Summary find query is empty.")
+            return
+        if not lines:
+            self.set_status("No summary lines.")
+            return
+        n = len(lines)
+        if self._a2l_summary_find_query != raw:
+            self._a2l_summary_find_query = raw
+            self._a2l_summary_find_last_line_index = -1
+        start_search = (self._a2l_summary_find_last_line_index + 1) % n
+        for offset in range(n):
+            idx = (start_search + offset) % n
+            if raw in lines[idx].lower():
+                self._a2l_summary_find_last_line_index = idx
+                self._a2l_summary_start = self._shift_window_for_index(
+                    total=n,
+                    index=idx,
+                    start=self._a2l_summary_start,
+                    window_size=self.a2l_summary_window_size,
+                )
+                self._update_a2l_summary_buffer()
+                self.set_status(f"Summary find: line {idx + 1}/{n}")
+                return
+        self.set_status("Summary find: no match")
+
+    def _a2l_summary_page_delta(self, delta: int) -> None:
+        """Move summary text window by ``delta`` lines (clamped)."""
+        total = len(self._a2l_summary_lines)
+        if total <= 0:
+            return
+        self._a2l_summary_start = max(0, min(self._a2l_summary_start + delta, max(0, total - 1)))
+        self._update_a2l_summary_buffer()
+
+    def _a2l_summary_jump_to(self, start: int) -> None:
+        """Set summary window start and refresh."""
+        total = len(self._a2l_summary_lines)
+        if total <= 0:
+            return
+        self._a2l_summary_start = max(0, min(start, max(0, total - 1)))
+        self._update_a2l_summary_buffer()
+
     def compose(self) -> ComposeResult:
         """Lay out the grid tiles and widgets."""
         yield Header()
@@ -489,6 +739,15 @@ class S19TuiApp(App):
             ),
             Container(
                 Label("A2L View", id="a2l_title"),
+                Container(
+                    Input(placeholder="Find in summary text", id="a2l_summary_find_input"),
+                    Button("Find next", id="a2l_summary_find_next"),
+                    Button("PgUp", id="a2l_summary_page_up"),
+                    Button("PgDn", id="a2l_summary_page_down"),
+                    Button("Top", id="a2l_summary_top"),
+                    Button("End", id="a2l_summary_end"),
+                    id="a2l_summary_controls",
+                ),
                 ScrollableContainer(
                     Static("", id="a2l_view", markup=False),
                     id="a2l_scroll",
@@ -518,6 +777,8 @@ class S19TuiApp(App):
                     Button("All", id="a2l_filter_all"),
                     Button("Invalid", id="a2l_filter_invalid"),
                     Button("In-Memory", id="a2l_filter_inmem"),
+                    Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
+                    Button("Find next", id="a2l_tag_find_next"),
                     id="a2l_tags_filters",
                 ),
                 Container(
@@ -676,6 +937,14 @@ class S19TuiApp(App):
         main_layout.add_class("hidden")
         alt_layout.add_class("hidden")
         mac_layout.remove_class("hidden")
+
+    def action_a2l_summary_page_up(self) -> None:
+        """Page the A2L summary text window backward."""
+        self._a2l_summary_page_delta(-self.a2l_summary_window_size)
+
+    def action_a2l_summary_page_down(self) -> None:
+        """Page the A2L summary text window forward."""
+        self._a2l_summary_page_delta(self.a2l_summary_window_size)
 
     def _handle_save_dialog(self, name: Optional[str]) -> None:
         if name is None:
@@ -1687,10 +1956,12 @@ class S19TuiApp(App):
             - Derive cache key from current A2L payload identity and memory map size.
             - Reuse previous enriched list when key is unchanged.
             - Run ``validate_a2l_tags`` and merge results onto source tags on cache miss.
+            - On cache miss, rebuild ``self._a2l_summary_lines`` via ``build_a2l_summary_lines`` (full line list).
 
         Dependencies:
             Uses:
                 - ``validate_a2l_tags``
+                - ``build_a2l_summary_lines``
             Used by:
                 - ``update_a2l_view``
                 - A2L filter debounce render path
@@ -1713,8 +1984,20 @@ class S19TuiApp(App):
             enriched.append({**tag, **check_map.get(lookup, {})})
         self._a2l_enriched_tags = enriched
         self._a2l_enriched_key = key
-        self._a2l_summary_lines = render_a2l_view(self.current_a2l_data, tag_checks, max_tag_lines=500).splitlines()
+        summary_started = time.perf_counter()
+        self._a2l_summary_lines = build_a2l_summary_lines(self.current_a2l_data, tag_checks)
+        summary_elapsed = time.perf_counter() - summary_started
+        if summary_elapsed > self.slow_parse_warn_seconds:
+            self.logger.warning(
+                "A2L summary line build slow: tag_count=%d line_count=%d elapsed=%.2fs threshold=%.2fs",
+                len(source_tags),
+                len(self._a2l_summary_lines),
+                summary_elapsed,
+                self.slow_parse_warn_seconds,
+            )
         self._a2l_summary_start = 0
+        self._a2l_summary_find_last_line_index = -1
+        self._a2l_summary_find_query = ""
         return enriched
 
     def _update_a2l_summary_buffer(self) -> None:
@@ -1775,6 +2058,8 @@ class S19TuiApp(App):
                 - filter and debounce handlers
         """
         self._a2l_filtered_tags = self._filter_a2l_tags(self._a2l_enriched_tags)
+        self._a2l_tag_find_last_index = -1
+        self._recompute_a2l_tag_column_widths(self._a2l_filtered_tags)
         if not preserve_anchor:
             self._a2l_window_start = 0
         self.update_a2l_tags_view(self._a2l_filtered_tags)
@@ -1786,6 +2071,11 @@ class S19TuiApp(App):
             self._a2l_filtered_tags = []
             self._a2l_summary_lines = []
             self._a2l_window_start = 0
+            self._a2l_tag_column_widths = None
+            self._a2l_tag_find_query = ""
+            self._a2l_tag_find_last_index = -1
+            self._a2l_summary_find_query = ""
+            self._a2l_summary_find_last_line_index = -1
             self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
             self.update_mac_view()
@@ -1857,20 +2147,38 @@ class S19TuiApp(App):
             )
             row_tags.append(tag)
 
-        name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
-        addr_width = max(len("Address"), *(len(row[1]) for row in rows))
-        len_width = max(len("Length"), *(len(row[2]) for row in rows))
-        source_width = max(len("Source"), *(len(row[3]) for row in rows))
-        mem_width = max(len("InMem"), *(len(row[4]) for row in rows))
-        region_width = max(len("Region"), *(len(row[5]) for row in rows))
-        limits_width = max(len("Limits"), *(len(row[6]) for row in rows))
-        unit_width = max(len("Unit"), *(len(row[7]) for row in rows))
-        bit_width = max(len("Bits"), *(len(row[8]) for row in rows))
-        endian_width = max(len("Endian"), *(len(row[9]) for row in rows))
-        virt_width = max(len("Virt"), *(len(row[10]) for row in rows))
-        func_width = max(len("Func"), *(len(row[11]) for row in rows))
-        access_width = max(len("Access"), *(len(row[12]) for row in rows))
-        dtype_width = max(len("Dtype"), min(12, max((len(row[13]) for row in rows), default=0)))
+        if self._a2l_tag_column_widths is not None:
+            (
+                name_width,
+                addr_width,
+                len_width,
+                source_width,
+                mem_width,
+                region_width,
+                limits_width,
+                unit_width,
+                bit_width,
+                endian_width,
+                virt_width,
+                func_width,
+                access_width,
+                dtype_width,
+            ) = self._a2l_tag_column_widths
+        else:
+            name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
+            addr_width = max(len("Address"), *(len(row[1]) for row in rows))
+            len_width = max(len("Length"), *(len(row[2]) for row in rows))
+            source_width = max(len("Source"), *(len(row[3]) for row in rows))
+            mem_width = max(len("InMem"), *(len(row[4]) for row in rows))
+            region_width = max(len("Region"), *(len(row[5]) for row in rows))
+            limits_width = max(len("Limits"), *(len(row[6]) for row in rows))
+            unit_width = max(len("Unit"), *(len(row[7]) for row in rows))
+            bit_width = max(len("Bits"), *(len(row[8]) for row in rows))
+            endian_width = max(len("Endian"), *(len(row[9]) for row in rows))
+            virt_width = max(len("Virt"), *(len(row[10]) for row in rows))
+            func_width = max(len("Func"), *(len(row[11]) for row in rows))
+            access_width = max(len("Access"), *(len(row[12]) for row in rows))
+            dtype_width = max(len("Dtype"), min(12, max((len(row[13]) for row in rows), default=0)))
 
         header = (
             f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
@@ -2055,6 +2363,70 @@ class S19TuiApp(App):
 
         self.set_timer(0.15, _apply_filter)
 
+    def _schedule_a2l_tag_find_refresh(self) -> None:
+        """
+        Summary:
+            Debounce A2L tag find input and run find-next after typing pauses.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bump debounce token for each keystroke.
+            - Schedule ``_handle_a2l_tag_find_next`` only if the token still matches.
+
+        Dependencies:
+            Uses:
+                - ``set_timer``
+                - ``_handle_a2l_tag_find_next``
+            Used by:
+                - ``on_input_changed`` for ``#a2l_tag_find_input``
+        """
+        self._a2l_tag_find_debounce_token += 1
+        expected = self._a2l_tag_find_debounce_token
+
+        def _run() -> None:
+            if expected != self._a2l_tag_find_debounce_token:
+                return
+            self._handle_a2l_tag_find_next()
+
+        self.set_timer(0.15, _run)
+
+    def _schedule_a2l_summary_find_refresh(self) -> None:
+        """
+        Summary:
+            Debounce A2L summary find input and run find-next after typing pauses.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bump debounce token for each keystroke.
+            - Schedule ``_handle_a2l_summary_find_next`` only if the token still matches.
+
+        Dependencies:
+            Uses:
+                - ``set_timer``
+                - ``_handle_a2l_summary_find_next``
+            Used by:
+                - ``on_input_changed`` for ``#a2l_summary_find_input``
+        """
+        self._a2l_summary_find_debounce_token += 1
+        expected = self._a2l_summary_find_debounce_token
+
+        def _run() -> None:
+            if expected != self._a2l_summary_find_debounce_token:
+                return
+            self._handle_a2l_summary_find_next()
+
+        self.set_timer(0.15, _run)
+
     def update_project_labels(self) -> None:
         """Refresh project/A2L labels in the status tile."""
         project_label = self.query_one("#project_text", Label)
@@ -2093,11 +2465,37 @@ class S19TuiApp(App):
             self._refresh_a2l_filtered_tags(preserve_anchor=False)
         elif event.button.id == "a2l_filter_field":
             self._toggle_a2l_filter_menu()
+        elif event.button.id == "a2l_summary_find_next":
+            self._handle_a2l_summary_find_next()
+        elif event.button.id == "a2l_summary_page_up":
+            self._a2l_summary_page_delta(-self.a2l_summary_window_size)
+        elif event.button.id == "a2l_summary_page_down":
+            self._a2l_summary_page_delta(self.a2l_summary_window_size)
+        elif event.button.id == "a2l_summary_top":
+            self._a2l_summary_jump_to(0)
+        elif event.button.id == "a2l_summary_end":
+            total = len(self._a2l_summary_lines)
+            if total:
+                self._a2l_summary_jump_to(max(0, total - self.a2l_summary_window_size))
+        elif event.button.id == "a2l_tag_find_next":
+            self._handle_a2l_tag_find_next()
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "a2l_tag_find_input":
+            self._handle_a2l_tag_find_next()
+        elif event.input.id == "a2l_summary_find_input":
+            self._handle_a2l_summary_find_next()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "a2l_tags_filter_input":
             self.a2l_tags_filter_text = event.value.strip()
             self._schedule_a2l_filter_refresh()
+        elif event.input.id == "a2l_tag_find_input":
+            if event.value.strip():
+                self._schedule_a2l_tag_find_refresh()
+        elif event.input.id == "a2l_summary_find_input":
+            if event.value.strip():
+                self._schedule_a2l_summary_find_refresh()
 
     def _handle_search(self) -> None:
         if not self.current_file:

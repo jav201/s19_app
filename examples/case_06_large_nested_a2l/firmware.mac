@@ -1,0 +1,4 @@
+; Synthetic MAC / symbol listing for S19Tool validation
+; Address, Type, Size, Name
+0x80100000, U8_ARRAY, 1024, BIG_TABLE
+0x80102000, ASCII, 17, LARGE_A2L_TARGETS
