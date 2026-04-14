@@ -1,5 +1,3 @@
-; Synthetic MAC / symbol listing for S19Tool validation
-; Address, Type, Size, Name
-0x80010000, ASCII, 34, DATE_FIELD
-0x80010080, HEX, 16, PATCH_BYTES
-0x80010120, U8_ARRAY, 32, TABLE_1
+; Synthetic MAC
+DATE_FIELD=80010000
+BLOCK_B=80010100

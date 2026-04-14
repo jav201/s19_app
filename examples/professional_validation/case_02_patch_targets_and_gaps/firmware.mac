@@ -1,0 +1,4 @@
+; Synthetic MAC file - professional validation suite
+DATE_FIELD=80010005
+PATCH_BYTES=80010080
+TABLE_1=80010140

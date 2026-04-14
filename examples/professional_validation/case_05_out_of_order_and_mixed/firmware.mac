@@ -1,0 +1,4 @@
+; Synthetic MAC file - professional validation suite
+VECTOR_LIKE_HEADER_01=80040000
+RAW_PATTERN=80040080
+DATE_PLACEHOLDER=80040100

@@ -1,0 +1,1 @@
+Caso 07: inconsistencias intencionales entre S19/MAC/A2L. Ideal para validación cruzada.

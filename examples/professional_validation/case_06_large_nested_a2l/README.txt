@@ -1,0 +1,1 @@
+Caso 06: A2L grande (~52 MB) + MAC masivo (12k+ entries). Diseñado para stress de parsing, indexado y lookup.

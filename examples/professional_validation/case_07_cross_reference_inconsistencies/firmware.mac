@@ -1,0 +1,7 @@
+; Synthetic MAC file - professional validation suite
+; Contains addresses outside S19 and alias collisions by address.
+VALID_BLOCK=80200000
+VALID_TARGET=80200100
+MISSING_IN_S19=8020F000
+ALIAS_1=80200010
+ALIAS_2=80200010

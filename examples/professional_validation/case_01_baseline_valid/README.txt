@@ -1,0 +1,1 @@
+Caso 01: baseline limpio. Debe pasar verify sin errores ni overlaps.

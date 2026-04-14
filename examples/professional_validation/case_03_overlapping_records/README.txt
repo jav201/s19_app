@@ -1,0 +1,1 @@
+Caso 03: overlap intencional. verify debe reportarlo. patching sobre addresses overlapped debe fallar.

@@ -1,0 +1,1 @@
+Caso 05: records desordenados + contenido mixto. Útil para probar parser robusto y dump-by-range.

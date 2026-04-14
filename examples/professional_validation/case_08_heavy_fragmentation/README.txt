@@ -1,0 +1,1 @@
+Caso 08: fragmentación pesada. Excelente para probar ranges, gaps, dump-by-range y performance.

@@ -1,0 +1,4 @@
+; Synthetic MAC file - professional validation suite
+HEADER_OK=80000000
+CAL_A=80000010
+CAL_B=80000080

@@ -1,0 +1,1 @@
+Caso 04: checksums corruptos. verify debe fallar checksum validation.

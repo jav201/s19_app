@@ -1,0 +1,1 @@
+Caso 02: ideal para patch-str y patch-hex. También contiene gaps visibles.

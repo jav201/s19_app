@@ -1,0 +1,5 @@
+; Synthetic MAC file - professional validation suite
+; Contains intentional overlapping address ranges.
+OVER_A=80020000
+OVER_B=80020008
+SAFE_BLOCK=80020030
