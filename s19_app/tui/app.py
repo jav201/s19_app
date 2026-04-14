@@ -40,6 +40,7 @@ from .workspace import (
     HEX_EXTENSIONS,
     MAC_EXTENSIONS,
     PROJECT_DATA_EXTENSIONS,
+    PROJECT_PRIMARY_DATA_EXTENSIONS,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
     WORKAREA_TEMP,
@@ -329,6 +330,10 @@ class S19TuiApp(App):
 
     .invalid {
         color: red;
+    }
+
+    .mac_out_of_range {
+        color: orange;
     }
 
     #load_dialog {
@@ -900,7 +905,7 @@ class S19TuiApp(App):
             Uses:
                 - ``update_mac_view``
         """
-        if not self.current_file or self.current_file.file_type != "mac":
+        if not self.current_file:
             return
         records = self.current_file.mac_records or []
         total = len(records)
@@ -930,7 +935,7 @@ class S19TuiApp(App):
             Uses:
                 - ``update_mac_view``
         """
-        if not self.current_file or self.current_file.file_type != "mac":
+        if not self.current_file:
             return
         records = self.current_file.mac_records or []
         if not records:
@@ -968,10 +973,19 @@ class S19TuiApp(App):
             self.set_status(error)
             self.logger.warning("Project validation failed: %s", error)
             return
-        if data_files and self.current_file and self.current_file.path.suffix.lower() in PROJECT_DATA_EXTENSIONS:
-            self.set_status("Project already has a data file.")
-            self.logger.warning("Project already has data file: %s", project_dir)
-            return
+        existing_suffixes = {item.suffix.lower() for item in data_files}
+        if self.current_file and self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
+            has_primary = any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes)
+            if has_primary and self.current_file.path.suffix.lower() not in existing_suffixes:
+                self.set_status("Project already has an S19/HEX file.")
+                self.logger.warning("Project already has primary data file: %s", project_dir)
+                return
+        if self.current_file and self.current_file.mac_path:
+            has_mac = ".mac" in existing_suffixes
+            if has_mac and self.current_file.mac_path.name not in {item.name for item in data_files}:
+                self.set_status("Project already has a MAC file.")
+                self.logger.warning("Project already has MAC file: %s", project_dir)
+                return
         if a2l_files and self.current_a2l_path and self.current_a2l_path.suffix.lower() in A2L_EXTENSIONS:
             self.set_status("Project already has an A2L file.")
             self.logger.warning("Project already has A2L file: %s", project_dir)
@@ -979,6 +993,9 @@ class S19TuiApp(App):
         if self.current_file:
             saved = copy_into_workarea(self.current_file.path, project_dir)
             self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
+            if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
+                saved_mac = copy_into_workarea(self.current_file.mac_path, project_dir)
+                self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
         if self.current_a2l_path:
             saved_a2l = copy_into_workarea(self.current_a2l_path, project_dir)
             self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
@@ -1006,11 +1023,21 @@ class S19TuiApp(App):
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No data files in project: %s", name)
             return
+        primary_file = next((item for item in data_files if item.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS), None)
+        mac_file = next((item for item in data_files if item.suffix.lower() in MAC_EXTENSIONS), None)
+        selected_file = primary_file or mac_file
+        if selected_file is None:
+            self.set_status(f"No supported files in project: {name}")
+            self.logger.warning("No loadable data file in project: %s", name)
+            return
         self.current_project = name
         self.current_project_dir = project_dir.resolve()
-        self.load_selected_file(data_files[0], a2l_files)
-        self.set_status(f"Loaded project '{name}' -> {data_files[0].name}")
-        self.logger.info("Project loaded. name=%s file=%s", name, data_files[0])
+        self.load_selected_file(selected_file, a2l_files)
+        if primary_file and mac_file:
+            self.load_selected_file(mac_file, a2l_files)
+        status_target = f"{selected_file.name} + {mac_file.name}" if primary_file and mac_file else selected_file.name
+        self.set_status(f"Loaded project '{name}' -> {status_target}")
+        self.logger.info("Project loaded. name=%s file=%s mac=%s", name, selected_file, mac_file)
         self.update_project_labels()
 
     def list_projects(self) -> List[str]:
@@ -1033,10 +1060,24 @@ class S19TuiApp(App):
             self.logger.warning("Project validation failed during sync: %s", error)
             return
         if data_files:
-            self.logger.info("Project already has data file, skipping sync: %s", project_dir)
-            return
-        copy_into_workarea(self.current_file.path, project_dir)
-        self.logger.info("Synced data file into project: %s", project_dir)
+            existing_suffixes = {item.suffix.lower() for item in data_files}
+        else:
+            existing_suffixes = set()
+        if self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
+            if not any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes):
+                copy_into_workarea(self.current_file.path, project_dir)
+                self.logger.info("Synced primary data file into project: %s", project_dir)
+        elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
+            copy_into_workarea(self.current_file.path, project_dir)
+            self.logger.info("Synced MAC data file into project: %s", project_dir)
+        if (
+            self.current_file.mac_path
+            and self.current_file.mac_path != self.current_file.path
+            and self.current_file.mac_path.suffix.lower() in MAC_EXTENSIONS
+            and ".mac" not in existing_suffixes
+        ):
+            copy_into_workarea(self.current_file.mac_path, project_dir)
+            self.logger.info("Synced attached MAC file into project: %s", project_dir)
 
     def _sync_loaded_a2l_to_project(self) -> None:
         """Copy loaded A2L file into active project if allowed."""
@@ -1620,9 +1661,41 @@ class S19TuiApp(App):
             errors=errors,
             a2l_path=a2l_path,
             a2l_data=a2l_data,
+            mac_path=path,
             mac_records=records,
             mac_diagnostics=diagnostics,
         )
+
+    def _mac_address_in_ranges(self, address: int, ranges: list[tuple[int, int]]) -> bool:
+        """Return whether an address belongs to any loaded image section."""
+        for start, end in ranges:
+            if start <= address < end:
+                return True
+        return False
+
+    def _collect_mac_out_of_range_addresses(self, loaded: Optional[LoadedFile]) -> set[int]:
+        """Return parsed MAC addresses that are outside loaded S19/HEX ranges."""
+        if not loaded or loaded.file_type not in {"s19", "hex"}:
+            return set()
+        out_of_range: set[int] = set()
+        for record in loaded.mac_records or []:
+            address = record.get("address")
+            if not (record.get("parse_ok") and isinstance(address, int)):
+                continue
+            if not self._mac_address_in_ranges(address, loaded.ranges):
+                out_of_range.add(address)
+        return out_of_range
+
+    def _collect_mac_highlight_addresses(self, loaded: Optional[LoadedFile]) -> set[int]:
+        """Return parsed MAC addresses for optional orange hex overlays."""
+        if not loaded:
+            return set()
+        addresses: set[int] = set()
+        for record in loaded.mac_records or []:
+            address = record.get("address")
+            if record.get("parse_ok") and isinstance(address, int):
+                addresses.add(address)
+        return addresses
 
     def load_selected_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> None:
         """
@@ -1674,6 +1747,9 @@ class S19TuiApp(App):
                     errors=errors,
                     a2l_path=a2l_path,
                     a2l_data=a2l_data,
+                    mac_path=None,
+                    mac_records=[],
+                    mac_diagnostics=[],
                 )
                 self._log_loaded_file_summary(
                     file_type="s19",
@@ -1701,6 +1777,9 @@ class S19TuiApp(App):
                     errors=errors,
                     a2l_path=a2l_path,
                     a2l_data=a2l_data,
+                    mac_path=None,
+                    mac_records=[],
+                    mac_diagnostics=[],
                 )
                 self._log_loaded_file_summary(
                     file_type="hex",
@@ -1710,14 +1789,38 @@ class S19TuiApp(App):
                     errors=errors,
                 )
             elif suffix in MAC_EXTENSIONS:
-                loaded = self._load_mac_file(path, a2l_files)
-                self._log_loaded_file_summary(
-                    file_type="mac",
-                    path=path,
-                    mem_map=loaded.mem_map,
-                    ranges=loaded.ranges,
-                    errors=loaded.errors,
-                )
+                mac_loaded = self._load_mac_file(path, a2l_files)
+                if self.current_file and self.current_file.file_type in {"s19", "hex"}:
+                    loaded = LoadedFile(
+                        path=self.current_file.path,
+                        file_type=self.current_file.file_type,
+                        mem_map=self.current_file.mem_map,
+                        row_bases=self.current_file.row_bases,
+                        ranges=self.current_file.ranges,
+                        range_validity=self.current_file.range_validity,
+                        errors=self.current_file.errors,
+                        a2l_path=mac_loaded.a2l_path or self.current_file.a2l_path,
+                        a2l_data=mac_loaded.a2l_data or self.current_file.a2l_data,
+                        mac_path=path,
+                        mac_records=mac_loaded.mac_records,
+                        mac_diagnostics=mac_loaded.mac_diagnostics,
+                    )
+                    self._log_loaded_file_summary(
+                        file_type=f"{loaded.file_type}+mac",
+                        path=path,
+                        mem_map=loaded.mem_map,
+                        ranges=loaded.ranges,
+                        errors=loaded.errors,
+                    )
+                else:
+                    loaded = mac_loaded
+                    self._log_loaded_file_summary(
+                        file_type="mac",
+                        path=path,
+                        mem_map=loaded.mem_map,
+                        ranges=loaded.ranges,
+                        errors=loaded.errors,
+                    )
             else:
                 self.set_status(f"Unsupported file type: {suffix}")
                 self.logger.warning("Unsupported file type in loader: %s", suffix)
@@ -1898,6 +2001,13 @@ class S19TuiApp(App):
             item = ListItem(label)
             item.data = (start, end)
             sections.append(item)
+        out_of_range = sorted(self._collect_mac_out_of_range_addresses(self.current_file))
+        for address in out_of_range:
+            label = Label(f"MAC out-of-range @ 0x{address:08X}")
+            label.add_class("mac_out_of_range")
+            item = ListItem(label)
+            item.data = (address, address + 1)
+            sections.append(item)
         self.logger.info("Sections updated. count=%d", len(self.current_file.ranges))
 
     def update_hex_view(self, focus_address: Optional[int] = None) -> None:
@@ -1909,12 +2019,14 @@ class S19TuiApp(App):
         highlight = None
         if self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
+        mac_highlights = self._collect_mac_highlight_addresses(self.current_file)
         hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
                 focus_address,
                 self.current_file.row_bases,
                 highlight,
+                mac_highlights,
             )
         )
         if focus_address is not None:
@@ -1954,12 +2066,14 @@ class S19TuiApp(App):
             highlight = self._a2l_tag_hex_highlight
         elif self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
+        mac_highlights = self._collect_mac_highlight_addresses(self.current_file)
         alt_hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
                 focus_address,
                 self.current_file.row_bases,
                 highlight,
+                mac_highlights,
             )
         )
 
@@ -1972,12 +2086,14 @@ class S19TuiApp(App):
         highlight = None
         if self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
+        mac_highlights = self._collect_mac_highlight_addresses(self.current_file)
         mac_hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
                 focus_address,
                 self.current_file.row_bases,
                 highlight,
+                mac_highlights,
             )
         )
 
@@ -2011,7 +2127,7 @@ class S19TuiApp(App):
         """
         mac_list = self.query_one("#mac_records_list", ListView)
         mac_list.clear()
-        if not self.current_file or self.current_file.file_type != "mac":
+        if not self.current_file or not self.current_file.mac_records:
             mac_list.append(ListItem(Label("No MAC loaded.")))
             return
         records = self.current_file.mac_records or []
@@ -2053,7 +2169,7 @@ class S19TuiApp(App):
             in_memory = None
             if self.current_file.file_type in {"s19", "hex"} and isinstance(address, int):
                 memory_checked = True
-                in_memory = address in self.current_file.mem_map
+                in_memory = self._mac_address_in_ranges(address, self.current_file.ranges)
 
             in_mem_text = "n/a"
             if memory_checked:

@@ -107,6 +107,79 @@ def test_mac_records_page_next_prev(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert app._mac_window_start == 100
 
 
+def test_load_selected_file_attaches_mac_to_loaded_binary(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={0x1000: 0x11},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    mac_loaded = LoadedFile(
+        path=tmp_path / "tags.mac",
+        file_type="mac",
+        mem_map={0x2000: 0},
+        row_bases=[0x2000],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_path=tmp_path / "tags.mac",
+        mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x2000}],
+        mac_diagnostics=[],
+    )
+
+    monkeypatch.setattr(app, "_load_mac_file", lambda path, a2l_files=None: mac_loaded)
+    monkeypatch.setattr(app, "update_sections", lambda: None)
+    monkeypatch.setattr(app, "update_hex_view", lambda focus_address=None: None)
+    monkeypatch.setattr(app, "update_alt_hex_view", lambda focus_address=None: None)
+    monkeypatch.setattr(app, "update_mac_hex_view", lambda focus_address=None: None)
+    monkeypatch.setattr(app, "update_mac_view", lambda: None)
+    monkeypatch.setattr(app, "update_a2l_view", lambda: None)
+    monkeypatch.setattr(app, "update_project_labels", lambda: None)
+    monkeypatch.setattr(app, "set_file_status", lambda _: None)
+    monkeypatch.setattr(app, "_append_log_line", lambda _: None)
+
+    app.load_selected_file(tmp_path / "tags.mac")
+
+    assert app.current_file is not None
+    assert app.current_file.file_type == "s19"
+    assert app.current_file.mem_map == {0x1000: 0x11}
+    assert app.current_file.mac_path == (tmp_path / "tags.mac")
+    assert len(app.current_file.mac_records) == 1
+
+
+def test_collect_mac_out_of_range_addresses_uses_ranges(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    loaded = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={0x1000: 0x11},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1010)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=[
+            {"parse_ok": True, "address": 0x1005},
+            {"parse_ok": True, "address": 0x2200},
+            {"parse_ok": False, "address": 0x3300},
+        ],
+    )
+
+    out_of_range = app._collect_mac_out_of_range_addresses(loaded)
+
+    assert out_of_range == {0x2200}
+
+
 def test_list_projects_skips_files_and_sorts_names(tmp_path: Path):
     workarea = tmp_path / "workarea"
     workarea.mkdir()

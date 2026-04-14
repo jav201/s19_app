@@ -11,6 +11,7 @@ from s19_app.tui import (
     copy_into_workarea,
     find_repo_root,
     render_hex_view,
+    render_hex_view_text,
     find_string_in_mem,
     render_a2l_view,
     sanitize_project_name,
@@ -90,6 +91,21 @@ def test_render_hex_view_truncates_output():
     assert "output truncated" in output or f"window limited to {MAX_HEX_ROWS} rows" in output
 
 
+def test_render_hex_view_text_includes_rows_for_mac_overlay_addresses():
+    mem_map = {0x1000: 0x41}
+
+    text = render_hex_view_text(
+        mem_map=mem_map,
+        focus_address=None,
+        row_bases=[0x1000],
+        highlight=None,
+        mac_highlight_addresses={0x2200},
+    )
+
+    output = str(text)
+    assert "0x00002200" in output
+
+
 def test_sanitize_project_name_allows_safe_chars():
     assert sanitize_project_name("My_Project-1") == "My_Project-1"
 
@@ -139,6 +155,18 @@ def test_validate_project_files_rejects_multiple_data(tmp_path):
     _, _, error = validate_project_files(project)
 
     assert error is not None
+
+
+def test_validate_project_files_allows_primary_plus_mac(tmp_path):
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "one.s19").write_text("S0", encoding="utf-8")
+    (project / "tags.mac").write_text("RPM=0x1000", encoding="utf-8")
+
+    data_files, _, error = validate_project_files(project)
+
+    assert error is None
+    assert sorted(path.suffix.lower() for path in data_files) == [".mac", ".s19"]
 
 
 def test_validate_project_files_rejects_multiple_a2l(tmp_path):

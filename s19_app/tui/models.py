@@ -16,5 +16,6 @@ class LoadedFile:
     errors: List[dict]
     a2l_path: Optional[Path]
     a2l_data: Optional[dict]
+    mac_path: Optional[Path] = None
     mac_records: List[dict] = field(default_factory=list)
     mac_diagnostics: List[str] = field(default_factory=list)

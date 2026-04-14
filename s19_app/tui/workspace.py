@@ -18,6 +18,7 @@ MAC_EXTENSIONS = {".mac"}
 A2L_EXTENSIONS = {".a2l"}
 SUPPORTED_EXTENSIONS = S19_EXTENSIONS | HEX_EXTENSIONS | MAC_EXTENSIONS
 PROJECT_DATA_EXTENSIONS = SUPPORTED_EXTENSIONS
+PROJECT_PRIMARY_DATA_EXTENSIONS = S19_EXTENSIONS | HEX_EXTENSIONS
 
 
 def ensure_workarea(base_dir: Path) -> Path:
@@ -97,6 +98,8 @@ def sanitize_project_name(name: str) -> Optional[str]:
 def validate_project_files(project_dir: Path) -> tuple[list[Path], list[Path], Optional[str]]:
     """Return (data_files, a2l_files, error_message) enforcing project rules."""
     data_files = []
+    primary_data_files = []
+    mac_files = []
     a2l_files = []
     for item in project_dir.iterdir():
         if not item.is_file():
@@ -104,10 +107,16 @@ def validate_project_files(project_dir: Path) -> tuple[list[Path], list[Path], O
         suffix = item.suffix.lower()
         if suffix in PROJECT_DATA_EXTENSIONS:
             data_files.append(item)
+            if suffix in PROJECT_PRIMARY_DATA_EXTENSIONS:
+                primary_data_files.append(item)
+            elif suffix in MAC_EXTENSIONS:
+                mac_files.append(item)
         elif suffix in A2L_EXTENSIONS:
             a2l_files.append(item)
-    if len(data_files) > 1:
-        return data_files, a2l_files, "Project already has more than one S19/HEX/MAC file."
+    if len(primary_data_files) > 1:
+        return data_files, a2l_files, "Project already has more than one S19/HEX file."
+    if len(mac_files) > 1:
+        return data_files, a2l_files, "Project already has more than one MAC file."
     if len(a2l_files) > 1:
         return data_files, a2l_files, "Project already has more than one A2L file."
     return data_files, a2l_files, None

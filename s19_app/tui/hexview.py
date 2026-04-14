@@ -103,8 +103,12 @@ def _collect_hex_rows(
     mem_map: Dict[int, int],
     focus_address: Optional[int] = None,
     row_bases: Optional[List[int]] = None,
+    extra_addresses: Optional[set[int]] = None,
 ) -> tuple[List[str], List[Tuple[int, List[Optional[int]]]]]:
-    bases = row_bases or build_row_bases(mem_map)
+    base_set = set(row_bases or build_row_bases(mem_map))
+    for addr in extra_addresses or set():
+        base_set.add(addr - (addr % HEX_WIDTH))
+    bases = sorted(base_set)
     if not bases:
         return ["No data available."], []
 
@@ -148,9 +152,10 @@ def render_hex_view(
     mem_map: Dict[int, int],
     focus_address: Optional[int] = None,
     row_bases: Optional[List[int]] = None,
+    extra_addresses: Optional[set[int]] = None,
 ) -> str:
     """Render a windowed hex+ASCII view for responsive UI."""
-    header_lines, rows = _collect_hex_rows(mem_map, focus_address, row_bases)
+    header_lines, rows = _collect_hex_rows(mem_map, focus_address, row_bases, extra_addresses)
     if rows == [] and header_lines:
         return "\n".join(header_lines)
 
@@ -167,9 +172,10 @@ def render_hex_view_text(
     focus_address: Optional[int],
     row_bases: Optional[List[int]],
     highlight: Optional[Tuple[int, int]],
+    mac_highlight_addresses: Optional[set[int]] = None,
 ) -> Text:
     """Render hex view with optional highlighted match range."""
-    header_lines, rows = _collect_hex_rows(mem_map, focus_address, row_bases)
+    header_lines, rows = _collect_hex_rows(mem_map, focus_address, row_bases, mac_highlight_addresses)
     text = Text()
     for line in header_lines:
         text.append(line + "\n")
@@ -179,6 +185,8 @@ def render_hex_view_text(
     highlight_start = highlight[0] if highlight else None
     highlight_end = highlight_start + highlight[1] if highlight else None
     highlight_style = "bold yellow"
+    mac_highlight_style = "bold orange3"
+    mac_addresses = mac_highlight_addresses or set()
 
     for row_addr, row_bytes in rows:
         text.append(f"0x{row_addr:08X}  ")
@@ -187,7 +195,7 @@ def render_hex_view_text(
             style = (
                 highlight_style
                 if highlight_start is not None and highlight_start <= addr < highlight_end
-                else None
+                else mac_highlight_style if addr in mac_addresses else None
             )
             if value is None:
                 text.append("   ")
@@ -199,7 +207,7 @@ def render_hex_view_text(
             style = (
                 highlight_style
                 if highlight_start is not None and highlight_start <= addr < highlight_end
-                else None
+                else mac_highlight_style if addr in mac_addresses else None
             )
             if value is None:
                 text.append(" ")
