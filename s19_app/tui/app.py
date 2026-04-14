@@ -1437,24 +1437,27 @@ class S19TuiApp(App):
         return True
 
     def _a2l_tag_find_haystack(self, tag: dict) -> str:
+        def _safe(value: Any) -> str:
+            return "" if value is None else str(value)
+
         return " ".join(
             [
-                str(tag.get("name") or ""),
-                str(tag.get("address") or ""),
-                str(tag.get("length") or ""),
-                str(tag.get("source") or ""),
+                _safe(tag.get("name")),
+                _safe(tag.get("address")),
+                _safe(tag.get("length")),
+                _safe(tag.get("source")),
                 _a2l_tag_in_memory_display(tag),
-                str(tag.get("lower_limit") or ""),
-                str(tag.get("upper_limit") or ""),
-                str(tag.get("unit") or ""),
-                str(tag.get("bit_org") or ""),
-                str(tag.get("endian") or ""),
-                str(tag.get("virtual") or ""),
-                str(tag.get("function_group") or ""),
-                str(tag.get("access") or ""),
-                str(tag.get("datatype") or ""),
-                str(tag.get("description") or ""),
-                str(tag.get("memory_region") or ""),
+                _safe(tag.get("lower_limit")),
+                _safe(tag.get("upper_limit")),
+                _safe(tag.get("unit")),
+                _safe(tag.get("bit_org")),
+                _safe(tag.get("endian")),
+                _safe(tag.get("virtual")),
+                _safe(tag.get("function_group")),
+                _safe(tag.get("access")),
+                _safe(tag.get("datatype")),
+                _safe(tag.get("description")),
+                _safe(tag.get("memory_region")),
             ]
         ).lower()
 

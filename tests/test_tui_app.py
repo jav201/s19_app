@@ -233,3 +233,29 @@ def test_a2l_tags_page_next_prev_and_focus_snap(tmp_path: Path, monkeypatch: pyt
     assert app._focus_a2l_tag_absolute_index(5) is True
     assert app._a2l_window_start == 0
     assert fake_lv.index == 2 + 5
+
+
+def test_a2l_tag_find_haystack_keeps_zero_numeric_values(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    tag = {
+        "name": "RPM",
+        "address": 0,
+        "length": 0,
+        "source": "assigned",
+        "lower_limit": 0,
+        "upper_limit": 100,
+        "unit": "rpm",
+        "bit_org": 0,
+        "endian": "little",
+        "virtual": False,
+        "function_group": "FG",
+        "access": "rw",
+        "datatype": "UWORD",
+        "description": "desc",
+        "memory_region": "region",
+        "memory_checked": True,
+        "in_memory": True,
+    }
+
+    haystack = app._a2l_tag_find_haystack(tag)
+    assert " 0 " in f" {haystack} "
