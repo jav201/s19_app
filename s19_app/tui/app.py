@@ -23,7 +23,7 @@ from textual.widgets import (
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
-from .a2l import parse_a2l_file, render_a2l_view, validate_a2l_tags
+from .a2l import parse_a2l_file, render_a2l_view, validate_a2l_internal_issues, validate_a2l_tags
 from .hexview import (
     build_mem_map_s19,
     build_range_validity_hex,
@@ -36,7 +36,7 @@ from .mac import parse_mac_file
 from .models import LoadedFile
 from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
 from .color_policy import css_class_for_severity
-from ..validation import ValidationSeverity, validate_artifact_consistency
+from ..validation import ValidationIssue, ValidationReport, ValidationSeverity, validate_artifact_consistency
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -354,6 +354,17 @@ class S19TuiApp(App):
         color: orange;
     }
 
+    #validation_issues_filters {
+        layout: horizontal;
+        height: auto;
+        padding-top: 1;
+    }
+
+    #validation_issues_list {
+        height: 12;
+        border: round $primary;
+    }
+
     #load_dialog {
         border: round $accent;
         padding: 1;
@@ -434,6 +445,7 @@ class S19TuiApp(App):
     mac_records_page_size: int = 200
     a2l_summary_window_size: int = 500
     a2l_tag_hex_highlight_max_bytes: int = 4096
+    validation_issue_filter_mode: str = "all"
 
     def __init__(self, base_dir: Optional[Path] = None, load_path: Optional[Path] = None):
         super().__init__()
@@ -454,6 +466,8 @@ class S19TuiApp(App):
         self._a2l_tag_hex_highlight: Optional[tuple[int, int]] = None
         self._a2l_tag_find_query: str = ""
         self._a2l_tag_find_last_index: int = -1
+        self._validation_report: Optional[ValidationReport] = None
+        self._validation_issues: list[ValidationIssue] = []
         self.current_project_dir: Optional[Path] = None
         self._mac_window_start: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
@@ -673,6 +687,13 @@ class S19TuiApp(App):
                 Label("Ready.", id="status_text"),
                 Label("Project: (none)", id="project_text"),
                 Label("A2L: (none)", id="a2l_text"),
+                Container(
+                    Button("Issues: All", id="issues_filter_all"),
+                    Button("Errors", id="issues_filter_error"),
+                    Button("Warnings", id="issues_filter_warning"),
+                    id="validation_issues_filters",
+                ),
+                ListView(id="validation_issues_list"),
                 ProgressBar(total=100, id="progress_bar"),
                 Label("", id="log_line_1"),
                 Label("", id="log_line_2"),
@@ -753,6 +774,7 @@ class S19TuiApp(App):
     def on_mount(self) -> None:
         self.refresh_files()
         self._update_a2l_filter_menu()
+        self.update_validation_issues_view()
         if self.load_path:
             self.logger.info("Startup load requested: %s", self.load_path)
             self._load_path_from_user_input(self.load_path)
@@ -1356,6 +1378,11 @@ class S19TuiApp(App):
                 return
             self._jump_to_mac_record(event.item)
             return
+        if event.list_view.id == "validation_issues_list":
+            if event.item is None:
+                return
+            self._jump_to_validation_issue(event.item)
+            return
 
     def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
         """
@@ -1613,6 +1640,102 @@ class S19TuiApp(App):
         if isinstance(addr, int):
             self.update_mac_hex_view(addr)
             self.set_status(f"MAC tag at 0x{addr:08X}")
+
+    def _jump_to_validation_issue(self, item: ListItem) -> None:
+        """Focus related hex/tag context for a selected validation issue row."""
+        info = getattr(item, "data", None)
+        if not isinstance(info, dict):
+            return
+        address = info.get("address")
+        if isinstance(address, int) and self.current_file:
+            self.update_hex_view(address)
+            self.update_alt_hex_view(address)
+            self.update_mac_hex_view(address)
+            self.set_status(f"Issue at 0x{address:08X}: {info.get('code', 'validation')}")
+            return
+        symbol = str(info.get("symbol") or "").strip()
+        if symbol and self._a2l_filtered_tags:
+            for index, tag in enumerate(self._a2l_filtered_tags):
+                if str(tag.get("name") or "").strip().lower() == symbol.lower():
+                    if self._focus_a2l_tag_absolute_index(index):
+                        self.action_view_alt()
+                        self.set_status(f"Issue symbol focused: {symbol}")
+                    return
+
+    def _deduplicate_issues(self, issues: list[ValidationIssue]) -> list[ValidationIssue]:
+        """Drop duplicate issues by stable identity tuple while preserving order."""
+        deduped: list[ValidationIssue] = []
+        seen: set[tuple[Any, ...]] = set()
+        for issue in issues:
+            key = (
+                issue.code,
+                issue.severity.value,
+                issue.message,
+                issue.artifact,
+                issue.symbol,
+                issue.address,
+                issue.line_number,
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(issue)
+        return deduped
+
+    def _filtered_validation_issues(self) -> list[ValidationIssue]:
+        """Return cached validation issues filtered by active severity mode."""
+        if self.validation_issue_filter_mode == "error":
+            return [item for item in self._validation_issues if item.severity == ValidationSeverity.ERROR]
+        if self.validation_issue_filter_mode == "warning":
+            return [item for item in self._validation_issues if item.severity == ValidationSeverity.WARNING]
+        return list(self._validation_issues)
+
+    def _format_validation_issue_line(self, issue: ValidationIssue) -> str:
+        symbol = issue.symbol or "-"
+        addr = f"0x{issue.address:08X}" if isinstance(issue.address, int) else "-"
+        line_no = str(issue.line_number) if isinstance(issue.line_number, int) else "-"
+        return (
+            f"[{issue.severity.value.upper()}] {issue.code} | {issue.artifact} | "
+            f"sym={symbol} addr={addr} line={line_no} | {issue.message}"
+        )
+
+    def update_validation_issues_view(self) -> None:
+        """Render the validation issue panel with active severity filter."""
+        issue_list = self.query_one("#validation_issues_list", ListView)
+        issue_list.clear()
+        filtered = self._filtered_validation_issues()
+        if not filtered:
+            issue_list.append(ListItem(Label("No validation issues.")))
+            return
+        error_count = len([item for item in self._validation_issues if item.severity == ValidationSeverity.ERROR])
+        warning_count = len([item for item in self._validation_issues if item.severity == ValidationSeverity.WARNING])
+        info_count = len([item for item in self._validation_issues if item.severity == ValidationSeverity.INFO])
+        issue_list.append(
+            ListItem(
+                Label(
+                    " | ".join(
+                        [
+                            f"total={len(self._validation_issues)}",
+                            f"errors={error_count}",
+                            f"warnings={warning_count}",
+                            f"info={info_count}",
+                            f"filter={self.validation_issue_filter_mode}",
+                        ]
+                    )
+                )
+            )
+        )
+        for issue in filtered:
+            label = Label(self._format_validation_issue_line(issue))
+            label.add_class(css_class_for_severity(issue.severity))
+            item = ListItem(label)
+            item.data = {
+                "code": issue.code,
+                "symbol": issue.symbol,
+                "address": issue.address,
+                "line_number": issue.line_number,
+            }
+            issue_list.append(item)
 
     def _load_mac_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> LoadedFile:
         """
@@ -2148,10 +2271,16 @@ class S19TuiApp(App):
         mac_list.clear()
         if not self.current_file or not self.current_file.mac_records:
             mac_list.append(ListItem(Label("No MAC loaded.")))
+            self._validation_report = None
+            self._validation_issues = []
+            self.update_validation_issues_view()
             return
         records = self.current_file.mac_records or []
         if not records:
             mac_list.append(ListItem(Label("No MAC records parsed.")))
+            self._validation_report = None
+            self._validation_issues = []
+            self.update_validation_issues_view()
             return
 
         has_a2l = bool(self.current_a2l_data)
@@ -2286,6 +2415,17 @@ class S19TuiApp(App):
                 s19_ranges=self.current_file.ranges,
                 overlapped_addresses=set(),
             )
+            extra_a2l_issues = (
+                validate_a2l_internal_issues(
+                    self.current_a2l_data or {"sections": [], "errors": [], "tags": []},
+                    tag_checks=self._a2l_enriched_tags,
+                )
+                if self.current_a2l_data
+                else []
+            )
+            report.issues = self._deduplicate_issues(report.issues + extra_a2l_issues)
+            self._validation_report = report
+            self._validation_issues = report.issues
             coverage_line = (
                 f"Coverage MAC->S19={report.coverage.mac_in_s19_pct():.1f}%  "
                 f"A2L->S19={report.coverage.a2l_in_s19_pct():.1f}%  "
@@ -2294,6 +2434,10 @@ class S19TuiApp(App):
             coverage_label = Label(coverage_line)
             coverage_label.add_class("sev-info")
             mac_list.append(ListItem(coverage_label))
+        else:
+            self._validation_report = None
+            self._validation_issues = []
+        self.update_validation_issues_view()
 
     def _compute_a2l_enriched_tags(self) -> list[dict[str, Any]]:
         """
@@ -2417,6 +2561,10 @@ class S19TuiApp(App):
             self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
             self.update_mac_view()
+            if not self.current_file:
+                self._validation_report = None
+                self._validation_issues = []
+                self.update_validation_issues_view()
             return
         self._compute_a2l_enriched_tags()
         filter_input = self.query_one("#a2l_tags_filter_input", Input)
@@ -2755,6 +2903,15 @@ class S19TuiApp(App):
             self._toggle_a2l_filter_menu()
         elif event.button.id == "a2l_tag_find_next":
             self._handle_a2l_tag_find_next()
+        elif event.button.id == "issues_filter_all":
+            self.validation_issue_filter_mode = "all"
+            self.update_validation_issues_view()
+        elif event.button.id == "issues_filter_error":
+            self.validation_issue_filter_mode = "error"
+            self.update_validation_issues_view()
+        elif event.button.id == "issues_filter_warning":
+            self.validation_issue_filter_mode = "warning"
+            self.update_validation_issues_view()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "a2l_tags_filter_input":
