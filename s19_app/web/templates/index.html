@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Upload — s19tool viewer{% endblock %}
+{% block body %}
+<section class="panel upload-panel">
+  <h1>Load file</h1>
+  <p class="muted">S19/SREC, Intel HEX, or MAC. Optional A2L. Served only on <code>127.0.0.1</code>.</p>
+  <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" class="upload-form">
+    <label>Data file <input type="file" name="data_file" required accept=".s19,.srec,.hex,.ihex,.mac"></label>
+    <label>A2L (optional) <input type="file" name="a2l_file" accept=".a2l"></label>
+    <button type="submit" class="btn primary">Open</button>
+  </form>
+</section>
+{% endblock %}

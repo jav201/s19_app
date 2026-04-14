@@ -19,6 +19,12 @@ dependencies = [
     "textual",
 ]
 
+[project.optional-dependencies]
+web = [
+    "flask>=3.0.0",
+]
+
 [project.scripts]
 s19tool = "s19_app.cli:main"
 s19tui = "s19_app.tui:main"
+s19web = "s19_app.web.cli:main"

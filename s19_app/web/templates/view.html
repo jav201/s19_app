@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}{{ loaded.path.name }} — s19tool viewer{% endblock %}
+{% block body %}
+<div class="view-toolbar">
+  <form action="{{ url_for('clear') }}" method="post"><button type="submit" class="btn">Clear session</button></form>
+  <span class="muted">{{ loaded.file_type|upper }} · {{ loaded.path.name }}</span>
+</div>
+
+<div class="view-grid">
+  <section class="panel hex-panel">
+    <h2>Hex</h2>
+    <div class="hex-controls">
+      <input type="text" id="search-q" placeholder="Search ASCII">
+      <button type="button" class="btn" id="search-btn">Find next</button>
+      <input type="text" id="goto-addr" placeholder="Goto 0xADDR">
+      <button type="button" class="btn" id="goto-btn">Goto</button>
+      <span id="hex-status" class="muted"></span>
+    </div>
+    <div class="hex-viewport" id="hex-viewport">
+      <pre id="hex-body" class="hex-pre"></pre>
+    </div>
+    <p class="muted small" id="hex-meta"></p>
+  </section>
+
+  <section class="panel sections-panel">
+    <h2>Sections / ranges</h2>
+    {% if sections %}
+      <ul class="range-list">
+        {% for (start, end), ok in sections %}
+          <li class="{% if ok %}ok{% else %}bad{% endif %}">0x{{ "%08X"|format(start) }} — 0x{{ "%08X"|format(end) }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No ranges (e.g. MAC-only).</p>
+    {% endif %}
+  </section>
+
+  <section class="panel a2l-summary-panel">
+    <h2>A2L summary</h2>
+    {% if a2l_summary_lines %}
+      <pre class="scroll-pre">{{ "\n".join(a2l_summary_lines) }}</pre>
+    {% else %}
+      <p class="muted">No A2L lines (upload an .a2l or use a file with embedded A2L).</p>
+    {% endif %}
+  </section>
+
+  <section class="panel a2l-tags-panel">
+    <h2>A2L tags</h2>
+    {% if enriched_tags %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Address</th><th>Len</th><th>Source</th><th>InMem</th><th>Region</th><th>Schema</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in enriched_tags %}
+              <tr class="{% if t.get('memory_checked') and t.get('in_memory') == false %}bad{% elif not t.get('schema_ok', true) %}bad{% endif %}">
+                <td>{{ t.get('name','') }}</td>
+                <td>{% if t.get('address') is not none %}0x{{ "%08X"|format(t.address) }}{% else %}n/a{% endif %}</td>
+                <td>{{ t.get('length','') }}</td>
+                <td>{{ t.get('source','') }}</td>
+                <td>{% if t.get('memory_checked') %}{% if t.get('in_memory') %}yes{% elif t.get('in_memory') == false %}no{% else %}?{% endif %}{% else %}n/a{% endif %}</td>
+                <td>{{ t.get('memory_region','') }}</td>
+                <td>{{ 'ok' if t.get('schema_ok', true) else 'bad' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No enriched tags.</p>
+    {% endif %}
+  </section>
+
+  {% if loaded.file_type == 'mac' %}
+  <section class="panel mac-panel">
+    <h2>MAC records</h2>
+    {% if mac_rows %}
+      <p class="muted small">Total={{ mac_counts.total }} Valid={{ mac_counts.valid }} Invalid={{ mac_counts.invalid }}</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Tag</th><th>Address</th><th>InA2L</th><th>InMem</th><th>Status</th><th>Line</th><th>ParseErr</th><th>A2L match</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in mac_rows %}
+              <tr class="{% if r.invalid %}bad{% else %}ok{% endif %}">
+                <td>{{ r.name }}</td>
+                <td>{{ r.address }}</td>
+                <td>{{ r.in_a2l }}</td>
+                <td>{{ r.in_mem }}</td>
+                <td>{{ r.status }}</td>
+                <td>{{ r.line_no }}</td>
+                <td>{{ r.parse_error }}</td>
+                <td>{{ r.a2l_match }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No MAC rows.</p>
+    {% endif %}
+  </section>
+  {% endif %}
+</div>
+
+<script>
+(function() {
+  const totalRows = {{ total_hex_rows|int }};
+  let loadedRows = {{ initial_row_count|int }};
+  const chunk = 128;
+  const viewport = document.getElementById('hex-viewport');
+  const hexBody = document.getElementById('hex-body');
+  const hexMeta = document.getElementById('hex-meta');
+  const hexStatus = document.getElementById('hex-status');
+  const initialLines = {{ initial_lines|tojson }};
+
+  function setMeta() {
+    hexMeta.textContent = 'Rows loaded: ' + loadedRows + ' / ' + totalRows + ' (scroll down to load more)';
+  }
+
+  hexBody.textContent = initialLines.join('\n');
+  setMeta();
+
+  let loading = false;
+  async function loadMore() {
+    if (loading || loadedRows >= totalRows) return;
+    loading = true;
+    try {
+      const res = await fetch('{{ url_for("api_hex_rows") }}?start=' + loadedRows + '&count=' + chunk);
+      if (!res.ok) throw new Error('hex-rows ' + res.status);
+      const data = await res.json();
+      if (data.lines && data.lines.length) {
+        hexBody.textContent += '\n' + data.lines.join('\n');
+        loadedRows += data.lines.length;
+        setMeta();
+      }
+    } catch (e) {
+      hexStatus.textContent = String(e);
+    } finally {
+      loading = false;
+    }
+  }
+
+  viewport.addEventListener('scroll', function() {
+    if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 80) {
+      loadMore();
+    }
+  });
+
+  async function jumpToRow(ri) {
+    if (ri < 0 || ri == null) {
+      hexStatus.textContent = 'Row not found.';
+      return;
+    }
+    hexStatus.textContent = 'Loading from row ' + ri + '…';
+    const res = await fetch('{{ url_for("api_hex_rows") }}?start=' + ri + '&count=' + chunk);
+    if (!res.ok) {
+      hexStatus.textContent = 'Load failed.';
+      return;
+    }
+    const data = await res.json();
+    hexBody.textContent = (data.lines || []).join('\n');
+    loadedRows = ri + (data.lines || []).length;
+    viewport.scrollTop = 0;
+    setMeta();
+    hexStatus.textContent = 'Jumped.';
+  }
+
+  document.getElementById('search-btn').addEventListener('click', async function() {
+    const q = document.getElementById('search-q').value.trim();
+    if (!q) { hexStatus.textContent = 'Empty search.'; return; }
+    const res = await fetch('{{ url_for("api_search") }}', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({q: q})
+    });
+    const data = await res.json();
+    if (!data.found) { hexStatus.textContent = 'Not found.'; return; }
+    hexStatus.textContent = '0x' + data.address.toString(16);
+    await jumpToRow(data.row_index);
+  });
+
+  document.getElementById('goto-btn').addEventListener('click', async function() {
+    const addr = document.getElementById('goto-addr').value.trim();
+    const res = await fetch('{{ url_for("api_goto") }}', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({addr: addr})
+    });
+    const data = await res.json();
+    if (!data.found) { hexStatus.textContent = 'Address not in image.'; return; }
+    hexStatus.textContent = '0x' + data.address.toString(16);
+    await jumpToRow(data.row_index);
+  });
+})();
+</script>
+{% endblock %}

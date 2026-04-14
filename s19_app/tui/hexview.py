@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from typing import Dict, List, Optional, Tuple
 
 from rich.text import Text
@@ -97,6 +98,87 @@ def find_string_in_mem(
             return run_addrs[0] + idx
         idx_base = run_end
     return None
+
+
+def row_index_for_address(row_bases: List[int], address: int) -> int:
+    """
+    Summary:
+        Map a byte address to the index of its hex row in ``row_bases`` (aligned row start).
+
+    Args:
+        row_bases (List[int]): Sorted row-start addresses (typically from ``build_row_bases``).
+        address (int): Any byte address in the image.
+
+    Returns:
+        int: Index into ``row_bases`` for the row containing ``address``, or ``-1`` if none.
+
+    Data Flow:
+        - Align ``address`` down to ``HEX_WIDTH``.
+        - Binary-search sorted ``row_bases`` for that base.
+
+    Dependencies:
+        Used by:
+            - Web hex goto/search helpers
+    """
+    if not row_bases:
+        return -1
+    base = address - (address % HEX_WIDTH)
+    i = bisect.bisect_left(row_bases, base)
+    if i < len(row_bases) and row_bases[i] == base:
+        return i
+    return -1
+
+
+def format_hex_row_lines(
+    mem_map: Dict[int, int],
+    row_bases: List[int],
+    start_index: int,
+    row_count: int,
+) -> tuple[list[str], int]:
+    """
+    Summary:
+        Format a contiguous slice of hex+ASCII rows for HTTP APIs (no TUI row/byte caps).
+
+    Args:
+        mem_map (Dict[int, int]): Address to byte value.
+        row_bases (List[int]): Row start addresses (same order as ``build_row_bases``).
+        start_index (int): First row index to render (clamped).
+        row_count (int): Number of rows to render (at least 1 after clamping).
+
+    Returns:
+        tuple[list[str], int]: Rendered text lines and total row count for paging.
+
+    Data Flow:
+        - Clamp ``start_index`` and compute an end bound within ``row_bases``.
+        - For each row start, read up to ``HEX_WIDTH`` bytes from ``mem_map``.
+        - Emit one monospace-friendly line per row.
+
+    Dependencies:
+        Uses:
+            - ``HEX_WIDTH``
+        Used by:
+            - Flask web hex panel chunk loader
+    """
+    if not row_bases:
+        return [], 0
+    total = len(row_bases)
+    if start_index >= total:
+        return [], total
+    start = max(0, start_index)
+    n = max(1, row_count)
+    end = min(total, start + n)
+    lines: list[str] = []
+    for row_addr in row_bases[start:end]:
+        row_bytes: List[Optional[int]] = []
+        for offset in range(HEX_WIDTH):
+            addr = row_addr + offset
+            row_bytes.append(mem_map.get(addr))
+        hex_part = " ".join(f"{b:02X}" if b is not None else "  " for b in row_bytes)
+        ascii_part = "".join(
+            chr(b) if b is not None and 32 <= b <= 126 else "." for b in row_bytes
+        )
+        lines.append(f"0x{row_addr:08X}  {hex_part}  |{ascii_part}|")
+    return lines, total
 
 
 def _collect_hex_rows(
