@@ -84,3 +84,51 @@ def test_refresh_a2l_filtered_tags_resets_anchor(tmp_path: Path, monkeypatch: py
 
     assert app._a2l_window_start == 0
     assert captured["count"] == 1
+
+
+def test_a2l_clamp_page_start_aligns_and_clamps(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.a2l_tags_page_size = 10
+    app._a2l_window_start = 15
+    assert app._a2l_clamp_page_start(25) == 10
+    app._a2l_window_start = 0
+    assert app._a2l_clamp_page_start(25) == 0
+    app._a2l_window_start = 200
+    assert app._a2l_clamp_page_start(25) == 20
+
+
+def test_a2l_tags_page_next_prev_and_focus_snap(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.a2l_tags_page_size = 10
+    app._a2l_filtered_tags = [{"name": f"T{i}", "address": 0x1000 + i, "length": 4} for i in range(25)]
+
+    monkeypatch.setattr(app, "update_a2l_tags_view", lambda tags: None)
+
+    app._a2l_window_start = 0
+    app.action_a2l_tags_page_next()
+    assert app._a2l_window_start == 10
+    app.action_a2l_tags_page_next()
+    assert app._a2l_window_start == 20
+    app.action_a2l_tags_page_next()
+    assert app._a2l_window_start == 20
+    app.action_a2l_tags_page_prev()
+    assert app._a2l_window_start == 10
+
+    class _FakeListView:
+        def __init__(self) -> None:
+            self.index = -1
+
+    fake_lv = _FakeListView()
+
+    def _fake_query_one(selector: str, *args: object, **kwargs: object) -> object:
+        if selector == "#a2l_tags_list":
+            return fake_lv
+        raise AssertionError(selector)
+
+    monkeypatch.setattr(app, "query_one", _fake_query_one)
+    assert app._focus_a2l_tag_absolute_index(17) is True
+    assert app._a2l_window_start == 10
+    assert fake_lv.index == 2 + (17 - 10)
+    assert app._focus_a2l_tag_absolute_index(5) is True
+    assert app._a2l_window_start == 0
+    assert fake_lv.index == 2 + 5

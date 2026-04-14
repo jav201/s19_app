@@ -201,6 +201,10 @@ class S19TuiApp(App):
         width: 1fr;
     }
 
+    #a2l_tag_find_input {
+        width: 1fr;
+    }
+
     #a2l_filter_menu {
         border: round $primary;
         padding: 1;
@@ -310,6 +314,10 @@ class S19TuiApp(App):
         ("2", "view_alt", "Alt view"),
         ("3", "view_mac", "MAC view"),
         ("q", "quit", "Quit"),
+        ("+", "a2l_tags_page_next", "Tags+"),
+        ("-", "a2l_tags_page_prev", "Tags-"),
+        ("ctrl+right_square_bracket", "a2l_tags_page_next", "Tags next"),
+        ("ctrl+left_square_bracket", "a2l_tags_page_prev", "Tags prev"),
     ]
 
     workarea: Path
@@ -345,7 +353,9 @@ class S19TuiApp(App):
     slow_parse_warn_seconds: float = 2.5
     a2l_window_size: int = 300
     a2l_window_overscan: int = 80
+    a2l_tags_page_size: int = 20
     a2l_summary_window_size: int = 500
+    a2l_tag_hex_highlight_max_bytes: int = 4096
 
     def __init__(self, base_dir: Optional[Path] = None, load_path: Optional[Path] = None):
         super().__init__()
@@ -363,6 +373,9 @@ class S19TuiApp(App):
         self._a2l_summary_lines: list[str] = []
         self._a2l_summary_start: int = 0
         self._a2l_filter_debounce_token: int = 0
+        self._a2l_tag_hex_highlight: Optional[tuple[int, int]] = None
+        self._a2l_tag_find_query: str = ""
+        self._a2l_tag_find_last_index: int = -1
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -412,6 +425,33 @@ class S19TuiApp(App):
         safe_start = max(0, min(start, total - 1))
         safe_end = min(total, safe_start + max(1, window_size))
         return safe_start, safe_end
+
+    def _a2l_clamp_page_start(self, total_tags: int) -> int:
+        """
+        Summary:
+            Clamp ``_a2l_window_start`` to a legal page-aligned index for the A2L tags table.
+
+        Args:
+            total_tags (int): Number of rows in ``_a2l_filtered_tags``.
+
+        Returns:
+            int: Page-aligned start index in ``[0, total_tags)`` (or ``0`` when empty).
+
+        Data Flow:
+            - Align the current start down to ``a2l_tags_page_size`` boundaries.
+            - Clamp to the last valid page start when the list shrinks.
+
+        Dependencies:
+            Used by:
+                - ``update_a2l_tags_view``
+                - ``_refresh_a2l_filtered_tags``
+        """
+        ps = self.a2l_tags_page_size
+        if total_tags <= 0 or ps <= 0:
+            return 0
+        aligned = (max(0, self._a2l_window_start) // ps) * ps
+        max_start = max(0, ((total_tags - 1) // ps) * ps)
+        return max(0, min(aligned, max_start))
 
     def _shift_window_for_index(self, total: int, index: int, start: int, window_size: int) -> int:
         """
@@ -518,6 +558,8 @@ class S19TuiApp(App):
                     Button("All", id="a2l_filter_all"),
                     Button("Invalid", id="a2l_filter_invalid"),
                     Button("In-Memory", id="a2l_filter_inmem"),
+                    Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
+                    Button("Find next", id="a2l_tag_find_next"),
                     id="a2l_tags_filters",
                 ),
                 Container(
@@ -676,6 +718,62 @@ class S19TuiApp(App):
         main_layout.add_class("hidden")
         alt_layout.add_class("hidden")
         mac_layout.remove_class("hidden")
+
+    def action_a2l_tags_page_next(self) -> None:
+        """
+        Summary:
+            Advance the A2L tags table by one page of ``a2l_tags_page_size`` rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bump ``_a2l_window_start`` by one page and clamp to the last legal page start.
+            - Re-render the current filtered tag slice.
+
+        Dependencies:
+            Uses:
+                - ``update_a2l_tags_view``
+        """
+        total = len(self._a2l_filtered_tags)
+        if total <= 0:
+            return
+        page_size = max(1, self.a2l_tags_page_size)
+        max_start = max(0, ((total - 1) // page_size) * page_size)
+        self._a2l_window_start = min(max_start, self._a2l_window_start + page_size)
+        self.update_a2l_tags_view(self._a2l_filtered_tags)
+
+    def action_a2l_tags_page_prev(self) -> None:
+        """
+        Summary:
+            Move the A2L tags table back by one page of ``a2l_tags_page_size`` rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Decrement ``_a2l_window_start`` by one page and clamp at zero.
+            - Re-render the current filtered tag slice.
+
+        Dependencies:
+            Uses:
+                - ``update_a2l_tags_view``
+        """
+        if not self._a2l_filtered_tags:
+            return
+        page_size = max(1, self.a2l_tags_page_size)
+        self._a2l_window_start = max(0, self._a2l_window_start - page_size)
+        self.update_a2l_tags_view(self._a2l_filtered_tags)
+
+    def action_a2l_tag_find_next(self) -> None:
+        """Invoke the A2L tag find-next scan (same as the Find-next button)."""
+        self._handle_a2l_tag_find_next()
 
     def _handle_save_dialog(self, name: Optional[str]) -> None:
         if name is None:
@@ -1020,7 +1118,7 @@ class S19TuiApp(App):
     def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
         """
         Summary:
-            Shift buffered A2L tag window as highlight nears current window edges.
+            Reserved for list highlight hooks; A2L tags use explicit page keys instead.
 
         Args:
             event (ListView.Highlighted): Highlight change event emitted by list views.
@@ -1029,35 +1127,14 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Ignore non-A2L list events and rows without absolute index metadata.
-            - Compute adjusted window start using overscan thresholds.
-            - Re-render buffered A2L tag rows when window start changes.
+            - A2L tag paging is driven by ``+`` / ``-`` and find; moving highlight does not repage.
 
         Dependencies:
-            Uses:
-                - ``_shift_window_for_index``
-                - ``update_a2l_tags_view``
             Used by:
                 - Textual list highlight event loop
         """
-        if event.list_view.id != "a2l_tags_list" or event.item is None:
+        if event.list_view.id == "a2l_tags_list":
             return
-        info = getattr(event.item, "data", None)
-        if not isinstance(info, dict):
-            return
-        absolute_index = info.get("absolute_index")
-        if not isinstance(absolute_index, int):
-            return
-        total = len(self._a2l_filtered_tags)
-        shifted_start = self._shift_window_for_index(
-            total=total,
-            index=absolute_index,
-            start=self._a2l_window_start,
-            window_size=self.a2l_window_size,
-        )
-        if shifted_start != self._a2l_window_start:
-            self._a2l_window_start = shifted_start
-            self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def _load_from_item(self, item: ListItem) -> None:
         label_widget = item.query_one(Label)
@@ -1079,14 +1156,186 @@ class S19TuiApp(App):
             start, _ = section_range
             self.update_hex_view(start)
 
+    def _a2l_tag_byte_length_for_hex_highlight(self, tag: dict) -> int:
+        """
+        Summary:
+            Choose a byte span for alt-hex highlighting from an A2L tag record.
+
+        Args:
+            tag (dict): Enriched tag row including optional integer ``length``.
+
+        Returns:
+            int: Positive byte length, capped by ``a2l_tag_hex_highlight_max_bytes``.
+
+        Data Flow:
+            - Prefer parsed ``length`` when it is a positive integer.
+            - Fall back to a single-byte span when length is unknown.
+
+        Dependencies:
+            Used by:
+                - ``_jump_to_tag``
+                - ``_handle_a2l_tag_find_next``
+        """
+        raw = tag.get("length")
+        if isinstance(raw, int) and raw > 0:
+            return min(raw, self.a2l_tag_hex_highlight_max_bytes)
+        return 1
+
     def _jump_to_tag(self, item: ListItem) -> None:
+        """
+        Summary:
+            Focus the alt hex panel on a selected tag address with a byte-range highlight.
+
+        Args:
+            item (ListItem): A2L tags table row; ``item.data`` carries ``address`` and ``tag``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read optional integer address and full tag payload from list metadata.
+            - Store ``_a2l_tag_hex_highlight`` so ``update_alt_hex_view`` can paint a span.
+            - Re-render alt hex centered on the tag address.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_tag_byte_length_for_hex_highlight``
+                - ``update_alt_hex_view``
+                - ``set_status``
+            Used by:
+                - ``on_list_view_selected`` for ``a2l_tags_list``
+        """
         tag_info = getattr(item, "data", None)
         if not tag_info:
             return
+        if tag_info.get("absolute_index") is None:
+            return
         addr = tag_info.get("address")
-        if isinstance(addr, int):
-            self.update_alt_hex_view(addr)
-            self.set_status(f"Tag at 0x{addr:08X}")
+        if not isinstance(addr, int):
+            return
+        tag = tag_info.get("tag")
+        span = self._a2l_tag_byte_length_for_hex_highlight(tag if isinstance(tag, dict) else {})
+        self._a2l_tag_hex_highlight = (addr, span)
+        self.update_alt_hex_view(addr)
+        self.set_status(f"Tag at 0x{addr:08X}")
+
+    def _focus_a2l_tag_absolute_index(self, absolute_index: int) -> bool:
+        """
+        Summary:
+            Snap the tags table to the page that contains a tag and move list focus to that row.
+
+        Args:
+            absolute_index (int): Index into ``_a2l_filtered_tags``.
+
+        Returns:
+            bool: True when focus was applied; False when the index is out of range or the list is empty.
+
+        Data Flow:
+            - Align ``_a2l_window_start`` to ``(absolute_index // page_size) * page_size``.
+            - Rebuild the visible page via ``update_a2l_tags_view``.
+            - Set ``ListView.index`` to the summary/header offset plus the in-page row.
+
+        Dependencies:
+            Uses:
+                - ``update_a2l_tags_view``
+            Used by:
+                - ``_handle_a2l_tag_find_next``
+        """
+        tags = self._a2l_filtered_tags
+        total = len(tags)
+        if total == 0 or absolute_index < 0 or absolute_index >= total:
+            return False
+        page_size = max(1, self.a2l_tags_page_size)
+        self._a2l_window_start = (absolute_index // page_size) * page_size
+        self.update_a2l_tags_view(tags)
+        list_view = self.query_one("#a2l_tags_list", ListView)
+        row_index = 2 + (absolute_index - self._a2l_window_start)
+        list_view.index = row_index
+        return True
+
+    def _a2l_tag_find_haystack(self, tag: dict) -> str:
+        return " ".join(
+            [
+                str(tag.get("name") or ""),
+                str(tag.get("address") or ""),
+                str(tag.get("length") or ""),
+                str(tag.get("source") or ""),
+                _a2l_tag_in_memory_display(tag),
+                str(tag.get("lower_limit") or ""),
+                str(tag.get("upper_limit") or ""),
+                str(tag.get("unit") or ""),
+                str(tag.get("bit_org") or ""),
+                str(tag.get("endian") or ""),
+                str(tag.get("virtual") or ""),
+                str(tag.get("function_group") or ""),
+                str(tag.get("access") or ""),
+                str(tag.get("datatype") or ""),
+                str(tag.get("description") or ""),
+                str(tag.get("memory_region") or ""),
+            ]
+        ).lower()
+
+    def _a2l_tag_matches_find_query(self, tag: dict, query: str) -> bool:
+        if not query.strip():
+            return False
+        return query.lower() in self._a2l_tag_find_haystack(tag)
+
+    def _handle_a2l_tag_find_next(self) -> None:
+        """
+        Summary:
+            Find the next filtered A2L tag matching the tag-find query, then page and highlight it.
+
+        Args:
+            None (reads ``#a2l_tag_find_input`` and ``_a2l_filtered_tags``).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Normalize query and reset cyclic cursor when the query string changes.
+            - Scan forward from the prior match with wrap-around.
+            - Snap the table, set alt hex span highlight, and refresh the alt panel.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_tag_matches_find_query``
+                - ``_focus_a2l_tag_absolute_index``
+                - ``_a2l_tag_byte_length_for_hex_highlight``
+                - ``update_alt_hex_view``
+                - ``set_status``
+            Used by:
+                - ``on_button_pressed`` for ``a2l_tag_find_next``
+                - ``action_a2l_tag_find_next``
+        """
+        query = self.query_one("#a2l_tag_find_input", Input).value.strip()
+        if not query:
+            self.set_status("Tag find query is empty.")
+            return
+        tags = self._a2l_filtered_tags
+        if not tags:
+            self.set_status("No A2L tags to search.")
+            return
+        if query != self._a2l_tag_find_query:
+            self._a2l_tag_find_query = query
+            self._a2l_tag_find_last_index = -1
+        n = len(tags)
+        start = (self._a2l_tag_find_last_index + 1) % n
+        for k in range(n):
+            i = (start + k) % n
+            if self._a2l_tag_matches_find_query(tags[i], query):
+                self._a2l_tag_find_last_index = i
+                self._focus_a2l_tag_absolute_index(i)
+                addr = tags[i].get("address")
+                if isinstance(addr, int):
+                    span = self._a2l_tag_byte_length_for_hex_highlight(tags[i])
+                    self._a2l_tag_hex_highlight = (addr, span)
+                    self.update_alt_hex_view(addr)
+                else:
+                    self.update_alt_hex_view()
+                name = str(tags[i].get("name") or "")
+                self.set_status(f"Tag find: {name} (row {i + 1})")
+                return
+        self.set_status("Tag find: no match.")
 
     def _jump_to_mac_record(self, item: ListItem) -> None:
         """
@@ -1292,6 +1541,7 @@ class S19TuiApp(App):
             self.logger.exception("Load failed for path=%s suffix=%s project=%s", path, suffix, self.current_project)
             return
         self.current_file = loaded
+        self._a2l_tag_hex_highlight = None
         if loaded.a2l_data:
             self.current_a2l_path = loaded.a2l_path
             self.current_a2l_data = loaded.a2l_data
@@ -1484,13 +1734,38 @@ class S19TuiApp(App):
             self.logger.info("Hex view focused at 0x%08X", focus_address)
 
     def update_alt_hex_view(self, focus_address: Optional[int] = None) -> None:
-        """Render alt hex view around a focus address if provided."""
+        """
+        Summary:
+            Render the alternate hex panel with optional focus and a highlight span.
+
+        Args:
+            focus_address (Optional[int]): Center the view on this address when set.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Prefer ``_a2l_tag_hex_highlight`` (address, length) when present.
+            - Otherwise use ASCII alt-search hit span from ``last_search_*``.
+            - Render via ``render_hex_view_text`` into ``#alt_hex_view``.
+
+        Dependencies:
+            Uses:
+                - ``render_hex_view_text``
+            Used by:
+                - ``load_selected_file``
+                - ``_jump_to_tag``
+                - ``_handle_a2l_tag_find_next``
+                - ``_handle_search_alt`` / ``_handle_goto_alt``
+        """
         alt_hex_view = self.query_one("#alt_hex_view", Static)
         if not self.current_file:
             alt_hex_view.update("No file loaded.")
             return
         highlight = None
-        if self.last_search_address is not None and self.last_search_text:
+        if self._a2l_tag_hex_highlight is not None:
+            highlight = self._a2l_tag_hex_highlight
+        elif self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
         alt_hex_view.update(
             render_hex_view_text(
@@ -1777,6 +2052,8 @@ class S19TuiApp(App):
         self._a2l_filtered_tags = self._filter_a2l_tags(self._a2l_enriched_tags)
         if not preserve_anchor:
             self._a2l_window_start = 0
+        else:
+            self._a2l_window_start = self._a2l_clamp_page_start(len(self._a2l_filtered_tags))
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def update_a2l_view(self) -> None:
@@ -1786,6 +2063,9 @@ class S19TuiApp(App):
             self._a2l_filtered_tags = []
             self._a2l_summary_lines = []
             self._a2l_window_start = 0
+            self._a2l_tag_hex_highlight = None
+            self._a2l_tag_find_query = ""
+            self._a2l_tag_find_last_index = -1
             self._update_a2l_summary_buffer()
             self.update_a2l_tags_view([])
             self.update_mac_view()
@@ -1798,6 +2078,31 @@ class S19TuiApp(App):
         self.update_mac_view()
 
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
+        """
+        Summary:
+            Render one page of A2L tag rows with fixed page size and a page-oriented summary line.
+
+        Args:
+            tags (list[dict]): Filtered enriched tags to display (may be empty).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clamp ``_a2l_window_start`` to a legal page boundary for ``a2l_tags_page_size``.
+            - Slice ``tags`` for the current page only and build fixed-width table rows.
+            - Attach ``absolute_index`` and full ``tag`` dict on each data ``ListItem``.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_clamp_page_start``
+                - ``_get_window_bounds``
+                - ``_a2l_tag_row_invalid``
+            Used by:
+                - ``_refresh_a2l_filtered_tags``
+                - ``update_a2l_view``
+                - A2L tag paging and find actions
+        """
         a2l_tags_list = self.query_one("#a2l_tags_list", ListView)
         a2l_tags_list.clear()
         # region agent log
@@ -1810,10 +2115,13 @@ class S19TuiApp(App):
         )
         # endregion
         if not tags:
+            self._a2l_window_start = 0
             a2l_tags_list.append(ListItem(Label("No A2L tags.")))
             return
         total_tags = len(tags)
-        start, end = self._get_window_bounds(total_tags, self._a2l_window_start, self.a2l_window_size)
+        self._a2l_window_start = self._a2l_clamp_page_start(total_tags)
+        page_size = max(1, self.a2l_tags_page_size)
+        start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
         self._a2l_window_start = start
         visible_tags = tags[start:end]
         rows: list[tuple] = []
@@ -1881,7 +2189,12 @@ class S19TuiApp(App):
             f"{'Virt'.ljust(virt_width)} | {'Func'.ljust(func_width)} | "
             f"{'Access'.ljust(access_width)} | {'Dtype'.ljust(dtype_width)}"
         )
-        summary = f"Rows {start + 1}-{end} / {total_tags} (window {self.a2l_window_size})"
+        page_num = start // page_size + 1
+        total_pages = max(1, (total_tags + page_size - 1) // page_size)
+        summary = (
+            f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
+            f"(page size {page_size}; +/- or Ctrl+[ / Ctrl+] to change page)"
+        )
         a2l_tags_list.append(ListItem(Label(summary)))
         a2l_tags_list.append(ListItem(Label(header)))
         for i, row in enumerate(rows):
@@ -1899,7 +2212,7 @@ class S19TuiApp(App):
             if _a2l_tag_row_invalid(row_tags[i]):
                 label.add_class("invalid")
             item = ListItem(label)
-            item.data = {"address": row[1], "name": row[0]}
+            item.data = {"address": row[1], "name": row[0], "tag": row_tags[i]}
             item.data["absolute_index"] = start + i
             if isinstance(row[1], str) and row[1].startswith("0x"):
                 try:
@@ -2093,11 +2406,15 @@ class S19TuiApp(App):
             self._refresh_a2l_filtered_tags(preserve_anchor=False)
         elif event.button.id == "a2l_filter_field":
             self._toggle_a2l_filter_menu()
+        elif event.button.id == "a2l_tag_find_next":
+            self._handle_a2l_tag_find_next()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "a2l_tags_filter_input":
             self.a2l_tags_filter_text = event.value.strip()
             self._schedule_a2l_filter_refresh()
+        elif event.input.id == "a2l_tag_find_input":
+            self._a2l_tag_find_last_index = -1
 
     def _handle_search(self) -> None:
         if not self.current_file:
@@ -2144,6 +2461,7 @@ class S19TuiApp(App):
         if not self.current_file:
             self.set_status("No file loaded.")
             return
+        self._a2l_tag_hex_highlight = None
         query = self.query_one("#alt_search_input", Input).value.strip()
         if not query:
             self.set_status("Search text is empty.")
@@ -2169,6 +2487,7 @@ class S19TuiApp(App):
         if not self.current_file:
             self.set_status("No file loaded.")
             return
+        self._a2l_tag_hex_highlight = None
         raw = self.query_one("#alt_goto_input", Input).value.strip()
         if not raw:
             self.set_status("Goto address is empty.")
