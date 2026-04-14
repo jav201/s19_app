@@ -118,14 +118,34 @@ def main():
         for i, record in enumerate(s19.records):
             if not record._validate():
                 failed.append((i, record))
-        if not failed:
-            console.print("[green]✅ All record checksums are valid.[/green]")
-        else:
+        overlaps = s19.get_overlap_addresses()
+        out_of_order = s19.get_out_of_order_records()
+        if failed:
             console.print(f"[red]❌ {len(failed)} record(s) have invalid checksums:[/red]")
             for i, record in failed:
                 console.print(f"  [yellow]Line {i + 1}[/yellow] at 0x{record.address:08X} — Type: {record.type}")
                 for err in record.validation_errors:
                     console.print(f"    [red]- {err}[/red]")
+        else:
+            console.print("[green]All record checksums are valid.[/green]")
+        if overlaps:
+            console.print(f"[red]Overlap addresses detected:[/red] {len(overlaps)}")
+            for address in overlaps[:10]:
+                console.print(f"  [red]- 0x{address:08X}[/red]")
+            if len(overlaps) > 10:
+                console.print(f"  [yellow]... {len(overlaps) - 10} more[/yellow]")
+        if out_of_order:
+            console.print(f"[yellow]Out-of-order records detected:[/yellow] {len(out_of_order)}")
+            for item in out_of_order[:10]:
+                console.print(
+                    "  [yellow]- "
+                    f"Line {item['line_number']} at 0x{item['address']:08X} follows 0x{item['prev_address']:08X}"
+                    "[/yellow]"
+                )
+            if len(out_of_order) > 10:
+                console.print(f"  [yellow]... {len(out_of_order) - 10} more[/yellow]")
+        if not failed and not overlaps and not out_of_order:
+            console.print("[green]Validation summary: no checksum, overlap, or ordering issues found.[/green]")
 
     elif args.command == "update-checksums":
         for record in s19.records:

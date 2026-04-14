@@ -505,6 +505,69 @@ class S19File:
                 addr_map.setdefault(addr, []).append(record)
         return addr_map
 
+    def get_overlap_addresses(self) -> List[int]:
+        """
+        Summary:
+            Return sorted addresses written by more than one S-record data payload.
+
+        Args:
+            None
+
+        Returns:
+            List[int]: Sorted absolute addresses with two or more record writers.
+
+        Data Flow:
+            - Build address-writer map from all records.
+            - Filter entries where writer count exceeds one.
+            - Sort and return addresses for deterministic reporting.
+
+        Dependencies:
+            Uses:
+            - ``_build_overlap_map``
+            Used by:
+            - CLI ``verify`` command
+            - Cross-artifact validation integration
+        """
+        overlap_map = self._build_overlap_map()
+        return sorted(addr for addr, writers in overlap_map.items() if len(writers) > 1)
+
+    def get_out_of_order_records(self) -> List[dict]:
+        """
+        Summary:
+            Detect non-monotonic data-record address order across S1/S2/S3 payload records.
+
+        Args:
+            None
+
+        Returns:
+            List[dict]: Entries with keys ``line_number``, ``address``, and ``prev_address``.
+
+        Data Flow:
+            - Iterate records in source order.
+            - Track previous data-record start address.
+            - Emit finding when current address is lower than previous address.
+
+        Dependencies:
+            Used by:
+            - CLI ``verify`` command
+            - Validation warning summaries
+        """
+        findings: List[dict] = []
+        previous_address: Optional[int] = None
+        for line_number, record in enumerate(self.records, start=1):
+            if record.type not in {"S1", "S2", "S3"}:
+                continue
+            if previous_address is not None and record.address < previous_address:
+                findings.append(
+                    {
+                        "line_number": line_number,
+                        "address": record.address,
+                        "prev_address": previous_address,
+                    }
+                )
+            previous_address = record.address
+        return findings
+
     
     # Visualization
     def visualize_memory(self, start: int, length: int = 64, encoding: str = 'ascii', width: int = 16, output_stream=None):

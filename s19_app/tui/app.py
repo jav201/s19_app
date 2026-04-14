@@ -35,6 +35,8 @@ from .hexview import (
 from .mac import parse_mac_file
 from .models import LoadedFile
 from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
+from .color_policy import css_class_for_severity
+from ..validation import ValidationSeverity, validate_artifact_consistency
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -61,10 +63,14 @@ def _a2l_tag_in_memory_display(tag: dict) -> str:
     return "no"
 
 
-def _a2l_tag_row_invalid(tag: dict) -> bool:
+def _a2l_tag_row_severity(tag: dict) -> ValidationSeverity:
     if not tag.get("schema_ok", True):
-        return True
-    return bool(tag.get("memory_checked") and tag.get("in_memory") is False)
+        return ValidationSeverity.ERROR
+    if bool(tag.get("memory_checked") and tag.get("in_memory") is False):
+        return ValidationSeverity.ERROR
+    if tag.get("memory_checked") and tag.get("in_memory") is True:
+        return ValidationSeverity.OK
+    return ValidationSeverity.NEUTRAL
 
 
 def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
@@ -113,23 +119,23 @@ def _mac_record_ui_state(
             - ``S19TuiApp.update_mac_view``
     """
     if not record.get("parse_ok"):
-        return "ERR_PARSE", "invalid"
+        return "ERR_PARSE", ValidationSeverity.ERROR.value
     name = str(record.get("name") or "").strip()
     address = record.get("address")
     if memory_checked and in_memory is False:
-        return "OUT_OF_IMAGE", "invalid"
+        return "OUT_OF_IMAGE", ValidationSeverity.ERROR.value
     if not has_a2l or not name:
-        return "NO_A2L", "neutral"
+        return "NO_A2L", ValidationSeverity.NEUTRAL.value
     matches = a2l_name_index.get(name.lower(), [])
     if not matches:
-        return "NOT_IN_A2L", "neutral"
+        return "NOT_IN_A2L", ValidationSeverity.WARNING.value
     if not isinstance(address, int):
-        return "NO_ADDR", "neutral"
+        return "NO_ADDR", ValidationSeverity.ERROR.value
     for tag in matches:
         tag_addr = tag.get("address")
         if isinstance(tag_addr, int) and tag_addr == address:
-            return "OK", "valid"
-    return "A2L_ADDR_MISMATCH", "invalid"
+            return "OK", ValidationSeverity.OK.value
+    return "A2L_ADDR_MISMATCH", ValidationSeverity.ERROR.value
 
 
 class S19TuiApp(App):
@@ -324,12 +330,24 @@ class S19TuiApp(App):
     }
 
 
-    .valid {
+    .sev-ok {
         color: green;
     }
 
-    .invalid {
+    .sev-error {
         color: red;
+    }
+
+    .sev-warning {
+        color: orange1;
+    }
+
+    .sev-info {
+        color: cyan;
+    }
+
+    .sev-neutral {
+        color: grey70;
     }
 
     .mac_out_of_range {
@@ -1997,7 +2015,8 @@ class S19TuiApp(App):
         ):
             size = end - start
             label = Label(f"0x{start:08X} - 0x{end - 1:08X} ({size} bytes)")
-            label.add_class("valid" if is_valid else "invalid")
+            severity = ValidationSeverity.OK if is_valid else ValidationSeverity.ERROR
+            label.add_class(css_class_for_severity(severity))
             item = ListItem(label)
             item.data = (start, end)
             sections.append(item)
@@ -2177,12 +2196,13 @@ class S19TuiApp(App):
                 if not in_memory:
                     total_out_of_mem += 1
 
-            status, css_class = _mac_record_ui_state(
+            status, severity_text = _mac_record_ui_state(
                 record, a2l_name_index, has_a2l, memory_checked, in_memory
             )
-            if css_class == "valid":
+            severity = ValidationSeverity(severity_text)
+            if severity == ValidationSeverity.OK:
                 total_verified += 1
-            elif css_class == "invalid":
+            elif severity == ValidationSeverity.ERROR:
                 total_invalid += 1
             else:
                 total_neutral += 1
@@ -2202,7 +2222,7 @@ class S19TuiApp(App):
             )
             row_meta.append(
                 {
-                    "css_class": css_class,
+                    "severity": severity,
                     "address": address if isinstance(address, int) else None,
                 }
             )
@@ -2248,11 +2268,7 @@ class S19TuiApp(App):
                 f"{row[6][:parse_width].ljust(parse_width)} | {row[7][:match_width].ljust(match_width)}"
             )
             label = Label(line)
-            css_class = visible_meta[index]["css_class"]
-            if css_class == "invalid":
-                label.add_class("invalid")
-            elif css_class == "valid":
-                label.add_class("valid")
+            label.add_class(css_class_for_severity(visible_meta[index]["severity"]))
             item = ListItem(label)
             item.data = {"address": visible_meta[index]["address"]}
             mac_list.append(item)
@@ -2262,6 +2278,22 @@ class S19TuiApp(App):
             f"NameInA2L={total_in_a2l}  OutOfMem={total_out_of_mem}  ParseErrs={total_parse_errors}"
         )
         mac_list.append(ListItem(Label(summary)))
+        if self.current_file.file_type in {"s19", "hex"}:
+            report = validate_artifact_consistency(
+                mac_records=records,
+                a2l_tags=self._a2l_enriched_tags or (self.current_a2l_data or {}).get("tags", []),
+                a2l_data=self.current_a2l_data,
+                s19_ranges=self.current_file.ranges,
+                overlapped_addresses=set(),
+            )
+            coverage_line = (
+                f"Coverage MAC->S19={report.coverage.mac_in_s19_pct():.1f}%  "
+                f"A2L->S19={report.coverage.a2l_in_s19_pct():.1f}%  "
+                f"A2L<->MAC={report.coverage.a2l_mac_match_pct():.1f}%"
+            )
+            coverage_label = Label(coverage_line)
+            coverage_label.add_class("sev-info")
+            mac_list.append(ListItem(coverage_label))
 
     def _compute_a2l_enriched_tags(self) -> list[dict[str, Any]]:
         """
@@ -2525,8 +2557,7 @@ class S19TuiApp(App):
                 f"{row[13][:dtype_width].ljust(dtype_width)}"
             )
             label = Label(line)
-            if _a2l_tag_row_invalid(row_tags[i]):
-                label.add_class("invalid")
+            label.add_class(css_class_for_severity(_a2l_tag_row_severity(row_tags[i])))
             item = ListItem(label)
             item.data = {"address": row[1], "name": row[0], "tag": row_tags[i]}
             item.data["absolute_index"] = start + i

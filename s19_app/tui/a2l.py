@@ -4,6 +4,8 @@ import logging
 from pathlib import Path
 import time
 from typing import Dict, List, Optional
+from ..validation.rules import validate_a2l_structure
+from ..validation.model import ValidationIssue
 
 # Common ASAP2 primitives → size in bytes (address granularity byte).
 DATATYPE_SIZES: dict[str, int] = {
@@ -797,3 +799,30 @@ def render_a2l_view(
             remaining = max(0, len(tags) - max_tag_lines)
             lines_out.append(f"... truncated {remaining} additional tag lines ...")
     return "\n".join(lines_out)
+
+
+def validate_a2l_internal_issues(a2l_data: dict, tag_checks: Optional[list[dict]] = None) -> list[ValidationIssue]:
+    """
+    Summary:
+        Generate typed A2L internal validation issues from parsed structure and optional tag checks.
+
+    Args:
+        a2l_data (dict): Parsed A2L payload from ``parse_a2l_file``.
+        tag_checks (Optional[list[dict]]): Optional enriched tags from ``validate_a2l_tags``.
+
+    Returns:
+        list[ValidationIssue]: Structural, schema, duplicate, and reference-level findings.
+
+    Data Flow:
+        - Select validation source tags (``tag_checks`` when present, otherwise raw A2L tags).
+        - Delegate internal A2L rule evaluation to shared validation module.
+        - Return typed issue list for UI and tests.
+
+    Dependencies:
+        Uses:
+        - ``validate_a2l_structure``
+        Used by:
+        - Cross-validation and A2L diagnostics surfaces
+    """
+    source_tags = tag_checks if tag_checks is not None else a2l_data.get("tags", [])
+    return validate_a2l_structure(a2l_data, tags=source_tags)

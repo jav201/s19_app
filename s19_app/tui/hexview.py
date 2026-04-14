@@ -6,6 +6,7 @@ from rich.text import Text
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
+from .color_policy import FOCUS_HIGHLIGHT_STYLE, MAC_ADDRESS_OVERLAY_STYLE
 
 
 MAX_HEX_BYTES = 65536
@@ -184,8 +185,8 @@ def render_hex_view_text(
 
     highlight_start = highlight[0] if highlight else None
     highlight_end = highlight_start + highlight[1] if highlight else None
-    highlight_style = "bold yellow"
-    mac_highlight_style = "bold orange3"
+    highlight_style = FOCUS_HIGHLIGHT_STYLE
+    mac_highlight_style = MAC_ADDRESS_OVERLAY_STYLE
     mac_addresses = mac_highlight_addresses or set()
 
     for row_addr, row_bytes in rows:

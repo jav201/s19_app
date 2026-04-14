@@ -18,19 +18,19 @@ def test_mac_record_ui_state_a2l_verification_buckets():
     idx = {"rpm": [{"name": "RPM", "address": 0x1000, "section": "MEASUREMENT"}]}
     assert _mac_record_ui_state(
         {"parse_ok": True, "name": "RPM", "address": 0x1000}, idx, True, False, None
-    ) == ("OK", "valid")
+    ) == ("OK", "ok")
     assert _mac_record_ui_state(
         {"parse_ok": True, "name": "RPM", "address": 0x2000}, idx, True, False, None
-    )[1] == "invalid"
+    )[1] == "error"
     assert _mac_record_ui_state(
         {"parse_ok": True, "name": "MISSING", "address": 0x1000}, idx, True, False, None
-    ) == ("NOT_IN_A2L", "neutral")
+    ) == ("NOT_IN_A2L", "warning")
     assert _mac_record_ui_state(
         {"parse_ok": True, "name": "RPM", "address": 0x1000}, idx, False, False, None
     )[1] == "neutral"
     assert _mac_record_ui_state(
         {"parse_ok": False, "name": "RPM", "address": 0x1000}, idx, True, False, None
-    )[1] == "invalid"
+    )[1] == "error"
 
 
 def test_save_project_writes_under_chosen_parent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
