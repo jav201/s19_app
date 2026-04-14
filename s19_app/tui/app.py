@@ -339,7 +339,7 @@ class S19TuiApp(App):
     }
 
     .sev-warning {
-        color: orange1;
+        color: orange;
     }
 
     .sev-info {
@@ -347,7 +347,7 @@ class S19TuiApp(App):
     }
 
     .sev-neutral {
-        color: grey70;
+        color: grey;
     }
 
     .mac_out_of_range {
