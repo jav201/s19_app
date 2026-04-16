@@ -55,6 +55,17 @@ def test_collect_hex_rows_reports_missing_focus_address():
     assert rows[0][0] == 0x1000
 
 
+def test_collect_hex_rows_honors_start_and_row_limit():
+    mem_map = {0x1000 + i: 0x41 for i in range(16 * 8)}
+    row_bases = build_row_bases(mem_map)
+
+    lines, rows = _collect_hex_rows(mem_map, row_bases=row_bases, start_row_index=3, max_rows=2)
+
+    assert rows[0][0] == 0x1030
+    assert len(rows) == 2
+    assert "... window limited to 2 rows ..." in lines
+
+
 def test_render_hex_view_text_highlights_match_range():
     mem_map = {0x1000: ord("A"), 0x1001: ord("B"), 0x1002: ord("C")}
 

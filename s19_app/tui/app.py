@@ -274,6 +274,17 @@ class S19TuiApp(App):
         display: none;
     }
 
+    #settings_menu {
+        border: round $primary;
+        padding: 1;
+        width: 48;
+        height: 12;
+    }
+
+    #settings_menu.hidden {
+        display: none;
+    }
+
     #progress_bar {
         margin-top: 1;
     }
@@ -400,12 +411,10 @@ class S19TuiApp(App):
         ("2", "view_alt", "Alt view"),
         ("3", "view_mac", "MAC view"),
         ("q", "quit", "Quit"),
-        ("+", "a2l_tags_page_next", "Tags+"),
-        ("-", "a2l_tags_page_prev", "Tags-"),
-        ("ctrl+right_square_bracket", "a2l_tags_page_next", "Tags next"),
-        ("ctrl+left_square_bracket", "a2l_tags_page_prev", "Tags prev"),
-        ("comma", "mac_records_page_prev", "MAC-"),
-        ("period", "mac_records_page_next", "MAC+"),
+        ("+", "page_next_context", "Page+"),
+        ("-", "page_prev_context", "Page-"),
+        ("comma", "hex_page_prev", "Hex-"),
+        ("period", "hex_page_next", "Hex+"),
     ]
 
     workarea: Path
@@ -441,8 +450,11 @@ class S19TuiApp(App):
     slow_parse_warn_seconds: float = 2.5
     a2l_window_size: int = 300
     a2l_window_overscan: int = 80
+    viewer_page_size_max: int = 200
+    viewer_page_size_options: tuple[int, ...] = (25, 50, 100, 150, 200)
     a2l_tags_page_size: int = 200
-    mac_records_page_size: int = 200
+    mac_records_page_size: int = 100
+    hex_rows_page_size: int = 200
     a2l_summary_window_size: int = 500
     a2l_tag_hex_highlight_max_bytes: int = 4096
     validation_issue_filter_mode: str = "all"
@@ -470,6 +482,7 @@ class S19TuiApp(App):
         self._validation_issues: list[ValidationIssue] = []
         self.current_project_dir: Optional[Path] = None
         self._mac_window_start: int = 0
+        self._hex_window_start: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -540,7 +553,7 @@ class S19TuiApp(App):
                 - ``update_a2l_tags_view``
                 - ``_refresh_a2l_filtered_tags``
         """
-        ps = self.a2l_tags_page_size
+        ps = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         if total_tags <= 0 or ps <= 0:
             return 0
         aligned = (max(0, self._a2l_window_start) // ps) * ps
@@ -567,12 +580,45 @@ class S19TuiApp(App):
                 - ``update_mac_view``
                 - MAC page navigation actions
         """
-        ps = max(1, self.mac_records_page_size)
+        ps = self._clamp_viewer_page_size(self.mac_records_page_size)
         if total_records <= 0 or ps <= 0:
             return 0
         aligned = (max(0, self._mac_window_start) // ps) * ps
         max_start = max(0, ((total_records - 1) // ps) * ps)
         return max(0, min(aligned, max_start))
+
+    def _clamp_viewer_page_size(self, value: int) -> int:
+        """
+        Summary:
+            Normalize viewer page-size settings into the allowed configured range.
+
+        Args:
+            value (int): Requested per-view page-size value.
+
+        Returns:
+            int: Clamped page-size in ``[1, viewer_page_size_max]``.
+
+        Data Flow:
+            - Coerce non-positive values to ``1``.
+            - Clamp upper bound to ``viewer_page_size_max``.
+
+        Dependencies:
+            Used by:
+                - Settings menu application handlers
+        """
+        return max(1, min(int(value), self.viewer_page_size_max))
+
+    def _is_layout_visible(self, layout_id: str) -> bool:
+        """Return True when a layout container is currently visible."""
+        return "hidden" not in self.query_one(layout_id).classes
+
+    def _active_view_name(self) -> str:
+        """Return ``main``, ``alt``, or ``mac`` according to visible layout state."""
+        if self._is_layout_visible("#alt_layout"):
+            return "alt"
+        if self._is_layout_visible("#mac_layout"):
+            return "mac"
+        return "main"
 
     def _active_project_dir(self) -> Optional[Path]:
         """
@@ -646,7 +692,13 @@ class S19TuiApp(App):
             Button("Main View", id="view_hex_button"),
             Button("A2L View", id="view_a2l_button"),
             Button("MAC View", id="view_mac_button"),
+            Button("Settings", id="settings_button"),
             id="view_bar",
+        )
+        yield Container(
+            ListView(id="settings_menu_list"),
+            id="settings_menu",
+            classes="hidden",
         )
         yield Container(
             Container(
@@ -774,6 +826,7 @@ class S19TuiApp(App):
     def on_mount(self) -> None:
         self.refresh_files()
         self._update_a2l_filter_menu()
+        self._update_settings_menu()
         self.update_validation_issues_view()
         if self.load_path:
             self.logger.info("Startup load requested: %s", self.load_path)
@@ -874,6 +927,120 @@ class S19TuiApp(App):
         alt_layout.add_class("hidden")
         mac_layout.remove_class("hidden")
 
+    def action_page_next_context(self) -> None:
+        """
+        Summary:
+            Route context page-next to the active non-main viewer table.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Inspect current visible layout.
+            - Forward to A2L or MAC page-next action.
+
+        Dependencies:
+            Uses:
+                - ``_active_view_name``
+                - ``action_a2l_tags_page_next``
+                - ``action_mac_records_page_next``
+        """
+        active = self._active_view_name()
+        if active == "alt":
+            self.action_a2l_tags_page_next()
+        elif active == "mac":
+            self.action_mac_records_page_next()
+
+    def action_page_prev_context(self) -> None:
+        """
+        Summary:
+            Route context page-prev to the active non-main viewer table.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Inspect current visible layout.
+            - Forward to A2L or MAC page-prev action.
+
+        Dependencies:
+            Uses:
+                - ``_active_view_name``
+                - ``action_a2l_tags_page_prev``
+                - ``action_mac_records_page_prev``
+        """
+        active = self._active_view_name()
+        if active == "alt":
+            self.action_a2l_tags_page_prev()
+        elif active == "mac":
+            self.action_mac_records_page_prev()
+
+    def action_hex_page_next(self) -> None:
+        """
+        Summary:
+            Advance the main hex viewer window by one configured page of rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Guard on active layout and loaded row-base data.
+            - Move ``_hex_window_start`` forward by ``hex_rows_page_size``.
+            - Re-render main hex panel.
+
+        Dependencies:
+            Uses:
+                - ``_active_view_name``
+                - ``update_hex_view``
+        """
+        if self._active_view_name() != "main":
+            return
+        if not self.current_file or not self.current_file.row_bases:
+            return
+        page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
+        total = len(self.current_file.row_bases)
+        max_start = max(0, ((total - 1) // page_size) * page_size)
+        self._hex_window_start = min(max_start, self._hex_window_start + page_size)
+        self.update_hex_view()
+
+    def action_hex_page_prev(self) -> None:
+        """
+        Summary:
+            Move the main hex viewer window back by one configured page of rows.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Guard on active layout and loaded row-base data.
+            - Move ``_hex_window_start`` backward by ``hex_rows_page_size``.
+            - Re-render main hex panel.
+
+        Dependencies:
+            Uses:
+                - ``_active_view_name``
+                - ``update_hex_view``
+        """
+        if self._active_view_name() != "main":
+            return
+        if not self.current_file or not self.current_file.row_bases:
+            return
+        page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
+        self._hex_window_start = max(0, self._hex_window_start - page_size)
+        self.update_hex_view()
+
     def action_a2l_tags_page_next(self) -> None:
         """
         Summary:
@@ -896,7 +1063,7 @@ class S19TuiApp(App):
         total = len(self._a2l_filtered_tags)
         if total <= 0:
             return
-        page_size = max(1, self.a2l_tags_page_size)
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         max_start = max(0, ((total - 1) // page_size) * page_size)
         self._a2l_window_start = min(max_start, self._a2l_window_start + page_size)
         self.update_a2l_tags_view(self._a2l_filtered_tags)
@@ -922,7 +1089,7 @@ class S19TuiApp(App):
         """
         if not self._a2l_filtered_tags:
             return
-        page_size = max(1, self.a2l_tags_page_size)
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         self._a2l_window_start = max(0, self._a2l_window_start - page_size)
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
@@ -951,7 +1118,7 @@ class S19TuiApp(App):
         total = len(records)
         if total <= 0:
             return
-        page_size = max(1, self.mac_records_page_size)
+        page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         max_start = max(0, ((total - 1) // page_size) * page_size)
         self._mac_window_start = min(max_start, self._mac_window_start + page_size)
         self.update_mac_view()
@@ -980,7 +1147,7 @@ class S19TuiApp(App):
         records = self.current_file.mac_records or []
         if not records:
             return
-        page_size = max(1, self.mac_records_page_size)
+        page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         self._mac_window_start = max(0, self._mac_window_start - page_size)
         self.update_mac_view()
 
@@ -1373,6 +1540,18 @@ class S19TuiApp(App):
             if field:
                 self._set_a2l_filter_field(field)
             return
+        if event.list_view.id == "settings_menu_list":
+            if event.item is None:
+                return
+            payload = getattr(event.item, "data", None)
+            if (
+                isinstance(payload, tuple)
+                and len(payload) == 2
+                and isinstance(payload[0], str)
+                and isinstance(payload[1], int)
+            ):
+                self._apply_viewer_setting(payload[0], payload[1])
+            return
         if event.list_view.id == "mac_records_list":
             if event.item is None:
                 return
@@ -1514,7 +1693,7 @@ class S19TuiApp(App):
         total = len(tags)
         if total == 0 or absolute_index < 0 or absolute_index >= total:
             return False
-        page_size = max(1, self.a2l_tags_page_size)
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         self._a2l_window_start = (absolute_index // page_size) * page_size
         self.update_a2l_tags_view(tags)
         list_view = self.query_one("#a2l_tags_list", ListView)
@@ -2158,6 +2337,18 @@ class S19TuiApp(App):
         if not self.current_file:
             hex_view.update("No file loaded.")
             return
+        row_bases = self.current_file.row_bases or []
+        page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
+        if row_bases:
+            if isinstance(focus_address, int):
+                focus_base = focus_address - (focus_address % 16)
+                if focus_base in row_bases:
+                    focus_index = row_bases.index(focus_base)
+                    self._hex_window_start = (focus_index // page_size) * page_size
+            max_start = max(0, ((len(row_bases) - 1) // page_size) * page_size)
+            self._hex_window_start = max(0, min(self._hex_window_start, max_start))
+        else:
+            self._hex_window_start = 0
         highlight = None
         if self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
@@ -2166,9 +2357,11 @@ class S19TuiApp(App):
             render_hex_view_text(
                 self.current_file.mem_map,
                 focus_address,
-                self.current_file.row_bases,
+                row_bases,
                 highlight,
                 mac_highlights,
+                max_rows=page_size,
+                start_row_index=self._hex_window_start,
             )
         )
         if focus_address is not None:
@@ -2216,6 +2409,7 @@ class S19TuiApp(App):
                 self.current_file.row_bases,
                 highlight,
                 mac_highlights,
+                max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
             )
         )
 
@@ -2236,6 +2430,7 @@ class S19TuiApp(App):
                 self.current_file.row_bases,
                 highlight,
                 mac_highlights,
+                max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
             )
         )
 
@@ -2358,7 +2553,7 @@ class S19TuiApp(App):
 
         total = len(rows)
         self._mac_window_start = self._mac_clamp_page_start(total)
-        page_size = max(1, self.mac_records_page_size)
+        page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         start, end = self._get_window_bounds(total, self._mac_window_start, page_size)
         self._mac_window_start = start
         visible_rows = rows[start:end]
@@ -2377,7 +2572,7 @@ class S19TuiApp(App):
         total_pages = max(1, (total + page_size - 1) // page_size)
         page_line = (
             f"Page {page_num}/{total_pages} | rows {start + 1}-{end} / {total} "
-            f"(page size {page_size}; comma/period for MAC page)"
+            f"(page size {page_size}; +/- for MAC page)"
         )
         mac_list.append(ListItem(Label(page_line)))
 
@@ -2616,7 +2811,7 @@ class S19TuiApp(App):
             return
         total_tags = len(tags)
         self._a2l_window_start = self._a2l_clamp_page_start(total_tags)
-        page_size = max(1, self.a2l_tags_page_size)
+        page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
         self._a2l_window_start = start
         visible_tags = tags[start:end]
@@ -2689,7 +2884,7 @@ class S19TuiApp(App):
         total_pages = max(1, (total_tags + page_size - 1) // page_size)
         summary = (
             f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
-            f"(page size {page_size}; +/- or Ctrl+[ / Ctrl+] to change page)"
+            f"(page size {page_size}; +/- to change page)"
         )
         a2l_tags_list.append(ListItem(Label(summary)))
         a2l_tags_list.append(ListItem(Label(header)))
@@ -2810,6 +3005,56 @@ class S19TuiApp(App):
         else:
             menu.add_class("hidden")
 
+    def _toggle_settings_menu(self) -> None:
+        """Show or hide the viewer settings dropdown menu."""
+        menu = self.query_one("#settings_menu")
+        if "hidden" in menu.classes:
+            self._update_settings_menu()
+            menu.remove_class("hidden")
+        else:
+            menu.add_class("hidden")
+
+    def _update_settings_menu(self) -> None:
+        """Populate settings menu rows with current viewer limits."""
+        menu_list = self.query_one("#settings_menu_list", ListView)
+        menu_list.clear()
+        menu_list.append(ListItem(Label("Viewer limits (max 200)")))
+        menu_list.append(ListItem(Label("-" * 30)))
+        target_rows = [
+            ("hex_rows_page_size", "Hex rows"),
+            ("a2l_tags_page_size", "A2L tags"),
+            ("mac_records_page_size", "MAC rows"),
+        ]
+        for attr_name, label in target_rows:
+            current = self._clamp_viewer_page_size(getattr(self, attr_name))
+            for option in self.viewer_page_size_options:
+                marker = "*" if option == current else " "
+                item = ListItem(Label(f"[{marker}] {label}: {option}"))
+                item.data = (attr_name, option)
+                menu_list.append(item)
+
+    def _apply_viewer_setting(self, setting_name: str, setting_value: int) -> None:
+        """Apply a viewer page-size setting and refresh dependent views."""
+        safe_value = self._clamp_viewer_page_size(setting_value)
+        if setting_name == "hex_rows_page_size":
+            self.hex_rows_page_size = safe_value
+            self.update_hex_view()
+            self.update_alt_hex_view()
+            self.update_mac_hex_view()
+        elif setting_name == "a2l_tags_page_size":
+            self.a2l_tags_page_size = safe_value
+            self._a2l_window_start = self._a2l_clamp_page_start(len(self._a2l_filtered_tags))
+            self.update_a2l_tags_view(self._a2l_filtered_tags)
+        elif setting_name == "mac_records_page_size":
+            self.mac_records_page_size = safe_value
+            total_records = len(self.current_file.mac_records or []) if self.current_file else 0
+            self._mac_window_start = self._mac_clamp_page_start(total_records)
+            self.update_mac_view()
+        else:
+            return
+        self.set_status(f"Updated {setting_name} to {safe_value}.")
+        self._update_settings_menu()
+
     def _update_a2l_filter_menu(self) -> None:
         menu_list = self.query_one("#a2l_filter_menu_list", ListView)
         menu_list.clear()
@@ -2882,6 +3127,8 @@ class S19TuiApp(App):
             self.action_view_alt()
         elif event.button.id == "view_mac_button":
             self.action_view_mac()
+        elif event.button.id == "settings_button":
+            self._toggle_settings_menu()
         elif event.button.id == "alt_search_button":
             self._handle_search_alt()
         elif event.button.id == "alt_goto_button":

@@ -105,6 +105,8 @@ def _collect_hex_rows(
     focus_address: Optional[int] = None,
     row_bases: Optional[List[int]] = None,
     extra_addresses: Optional[set[int]] = None,
+    max_rows: Optional[int] = None,
+    start_row_index: Optional[int] = None,
 ) -> tuple[List[str], List[Tuple[int, List[Optional[int]]]]]:
     base_set = set(row_bases or build_row_bases(mem_map))
     for addr in extra_addresses or set():
@@ -116,8 +118,11 @@ def _collect_hex_rows(
     lines: List[str] = []
     rows: List[Tuple[int, List[Optional[int]]]] = []
 
+    row_limit = max(1, max_rows) if isinstance(max_rows, int) else MAX_HEX_ROWS
     start_index = 0
-    if focus_address is not None:
+    if isinstance(start_row_index, int):
+        start_index = max(0, min(start_row_index, max(0, len(bases) - 1)))
+    elif focus_address is not None:
         focus_base = focus_address - (focus_address % HEX_WIDTH)
         if focus_base in bases:
             focus_index = bases.index(focus_base)
@@ -128,9 +133,9 @@ def _collect_hex_rows(
     if start_index > 0:
         lines.append(f"... showing from 0x{bases[start_index]:08X} (context preserved) ...")
 
-    end_index = min(len(bases), start_index + MAX_HEX_ROWS)
+    end_index = min(len(bases), start_index + row_limit)
     if end_index < len(bases):
-        lines.append(f"... window limited to {MAX_HEX_ROWS} rows ...")
+        lines.append(f"... window limited to {row_limit} rows ...")
 
     bytes_rendered = 0
     for row_addr in bases[start_index:end_index]:
@@ -154,9 +159,18 @@ def render_hex_view(
     focus_address: Optional[int] = None,
     row_bases: Optional[List[int]] = None,
     extra_addresses: Optional[set[int]] = None,
+    max_rows: Optional[int] = None,
+    start_row_index: Optional[int] = None,
 ) -> str:
     """Render a windowed hex+ASCII view for responsive UI."""
-    header_lines, rows = _collect_hex_rows(mem_map, focus_address, row_bases, extra_addresses)
+    header_lines, rows = _collect_hex_rows(
+        mem_map,
+        focus_address,
+        row_bases,
+        extra_addresses,
+        max_rows=max_rows,
+        start_row_index=start_row_index,
+    )
     if rows == [] and header_lines:
         return "\n".join(header_lines)
 
@@ -174,9 +188,18 @@ def render_hex_view_text(
     row_bases: Optional[List[int]],
     highlight: Optional[Tuple[int, int]],
     mac_highlight_addresses: Optional[set[int]] = None,
+    max_rows: Optional[int] = None,
+    start_row_index: Optional[int] = None,
 ) -> Text:
     """Render hex view with optional highlighted match range."""
-    header_lines, rows = _collect_hex_rows(mem_map, focus_address, row_bases, mac_highlight_addresses)
+    header_lines, rows = _collect_hex_rows(
+        mem_map,
+        focus_address,
+        row_bases,
+        mac_highlight_addresses,
+        max_rows=max_rows,
+        start_row_index=start_row_index,
+    )
     text = Text()
     for line in header_lines:
         text.append(line + "\n")

@@ -12,7 +12,8 @@ from s19_app.validation import ValidationIssue, ValidationSeverity
 def test_default_tag_and_mac_page_sizes(tmp_path: Path):
     app = S19TuiApp(base_dir=tmp_path)
     assert app.a2l_tags_page_size == 200
-    assert app.mac_records_page_size == 200
+    assert app.mac_records_page_size == 100
+    assert app.hex_rows_page_size == 200
 
 
 def test_mac_record_ui_state_a2l_verification_buckets():
@@ -106,6 +107,69 @@ def test_mac_records_page_next_prev(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert app._mac_window_start == 200
     app.action_mac_records_page_prev()
     assert app._mac_window_start == 100
+
+
+def test_context_page_actions_route_by_active_view(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    calls = {"a2l_next": 0, "a2l_prev": 0, "mac_next": 0, "mac_prev": 0}
+    monkeypatch.setattr(app, "action_a2l_tags_page_next", lambda: calls.__setitem__("a2l_next", calls["a2l_next"] + 1))
+    monkeypatch.setattr(app, "action_a2l_tags_page_prev", lambda: calls.__setitem__("a2l_prev", calls["a2l_prev"] + 1))
+    monkeypatch.setattr(app, "action_mac_records_page_next", lambda: calls.__setitem__("mac_next", calls["mac_next"] + 1))
+    monkeypatch.setattr(app, "action_mac_records_page_prev", lambda: calls.__setitem__("mac_prev", calls["mac_prev"] + 1))
+    monkeypatch.setattr(app, "_active_view_name", lambda: "alt")
+    app.action_page_next_context()
+    app.action_page_prev_context()
+    assert calls["a2l_next"] == 1
+    assert calls["a2l_prev"] == 1
+    monkeypatch.setattr(app, "_active_view_name", lambda: "mac")
+    app.action_page_next_context()
+    app.action_page_prev_context()
+    assert calls["mac_next"] == 1
+    assert calls["mac_prev"] == 1
+
+
+def test_apply_viewer_setting_clamps_to_200(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    monkeypatch.setattr(app, "update_hex_view", lambda addr=None: None)
+    monkeypatch.setattr(app, "update_alt_hex_view", lambda addr=None: None)
+    monkeypatch.setattr(app, "update_mac_hex_view", lambda addr=None: None)
+    monkeypatch.setattr(app, "update_a2l_tags_view", lambda tags: None)
+    monkeypatch.setattr(app, "update_mac_view", lambda: None)
+    monkeypatch.setattr(app, "set_status", lambda _msg: None)
+    monkeypatch.setattr(app, "_update_settings_menu", lambda: None)
+    app._a2l_filtered_tags = [{"name": "X"}]
+    app._apply_viewer_setting("hex_rows_page_size", 999)
+    app._apply_viewer_setting("a2l_tags_page_size", 999)
+    app._apply_viewer_setting("mac_records_page_size", 999)
+    assert app.hex_rows_page_size == 200
+    assert app.a2l_tags_page_size == 200
+    assert app.mac_records_page_size == 200
+
+
+def test_hex_page_actions_only_work_in_main_view(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "x.s19",
+        file_type="s19",
+        mem_map={0x1000 + i: i for i in range(16 * 12)},
+        row_bases=[0x1000 + (i * 16) for i in range(12)],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+    app.hex_rows_page_size = 5
+    app._hex_window_start = 0
+    monkeypatch.setattr(app, "update_hex_view", lambda addr=None: None)
+    monkeypatch.setattr(app, "_active_view_name", lambda: "main")
+    app.action_hex_page_next()
+    assert app._hex_window_start == 5
+    app.action_hex_page_prev()
+    assert app._hex_window_start == 0
+    monkeypatch.setattr(app, "_active_view_name", lambda: "alt")
+    app.action_hex_page_next()
+    assert app._hex_window_start == 0
 
 
 def test_load_selected_file_attaches_mac_to_loaded_binary(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
