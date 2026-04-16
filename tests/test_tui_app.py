@@ -399,6 +399,21 @@ def test_a2l_tag_find_haystack_keeps_zero_numeric_values(tmp_path: Path):
     assert " 0 " in f" {haystack} "
 
 
+def test_filter_a2l_tags_supports_raw_and_physical_value_fields(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    tags = [
+        {"name": "RPM", "raw_value": 10, "physical_value": 25.0},
+        {"name": "LOAD", "raw_value": 2, "physical_value": 4.0},
+    ]
+    app.a2l_tags_filter_mode = "all"
+    app.a2l_tags_filter_field = "raw_value"
+    app.a2l_tags_filter_text = "10"
+    assert [tag["name"] for tag in app._filter_a2l_tags(tags)] == ["RPM"]
+    app.a2l_tags_filter_field = "physical_value"
+    app.a2l_tags_filter_text = "4.0"
+    assert [tag["name"] for tag in app._filter_a2l_tags(tags)] == ["LOAD"]
+
+
 def test_validation_issue_filtering_and_format(tmp_path: Path):
     app = S19TuiApp(base_dir=tmp_path)
     app._validation_issues = [

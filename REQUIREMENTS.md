@@ -1,3 +1,129 @@
+# Application Requirements
+
+## A2L Structural Parsing
+
+The application shall parse and retain the following A2L structures for decode and display workflows:
+
+- `CHARACTERISTIC`
+- `COMPU_METHOD`
+- `RECORD_LAYOUT`
+- `BYTE_ORDER`
+- `COMPU_TAB` / `COMPU_VTAB`
+- `AXIS_DESCR`
+
+The parser shall expose indexed maps in the A2L payload:
+
+- `record_layouts_by_name`
+- `compu_methods_by_name`
+- `compu_tabs_by_name`
+
+Each parsed tag shall preserve backward-compatible fields and may include additional normalized fields:
+
+- `record_layout_name`
+- `compu_method_name`
+- `effective_byte_order`
+- `axis_meta`
+
+## RECORD_LAYOUT Interpretation
+
+The application shall resolve a record layout into decode metadata:
+
+- `decode_type` (canonical scalar type)
+- `element_count`
+- `byte_size`
+- `decode_endian`
+
+Byte-order resolution shall follow this precedence:
+
+1. Tag-level explicit byte order
+2. Layout-level byte order
+3. Existing tag endian fallback
+4. Default little-endian fallback
+
+## Raw Memory Extraction
+
+Given tag address and resolved byte size, the application shall:
+
+- locate bytes in S19/HEX memory map
+- extract `N` bytes when available
+- report missing bytes/ranges
+- retain overlap/conflict marker fields for diagnostics
+
+Per-tag extraction fields:
+
+- `raw_bytes`
+- `raw_available`
+- `missing_ranges`
+- `overlap_conflict`
+
+## Raw Value Decoding
+
+The application shall decode extracted bytes into raw values with endianness support:
+
+- unsigned integer decode
+- signed integer decode (two's complement)
+- IEEE754 float decode (`FLOAT32_IEEE`, `FLOAT64_IEEE`)
+- array decode for multi-element layouts
+
+Decode results shall provide:
+
+- `raw_value`
+- `decode_error` (empty when decode succeeds)
+
+## COMPU_METHOD Execution
+
+The application shall support the following conversion behaviors:
+
+| Method | Required behavior |
+| --- | --- |
+| `IDENTICAL` | return raw value |
+| `LINEAR` | apply `a*x + b` |
+| `RAT_FUNC` | apply rational polynomial from coefficients |
+| `TAB_NOINTP` | table lookup without interpolation |
+| `TAB_INTP` | table lookup with interpolation |
+| `FORM` | explicit guarded/unsupported status unless safe evaluation is enabled |
+
+Conversion results shall provide:
+
+- `physical_value`
+- `conversion_status`
+- `conversion_error`
+
+## Validation Requirements
+
+Validation output shall detect and expose at least:
+
+- characteristic address not in S19
+- layout missing
+- compu method missing
+- byte order unresolved/missing
+- size mismatch
+- value outside configured limits
+
+Validation enhancements shall remain additive and preserve existing compatibility fields:
+
+- `schema_ok`
+- `memory_checked`
+- `in_memory`
+
+## Viewer Requirements
+
+The A2L viewer shall:
+
+- enrich tag rows with decoded payload before rendering
+- display `Raw` and `Physical` columns
+- support find/filter matching for raw and physical values
+- display unavailable or invalid values with stable fallback text (`n/a`, `ERR`, `MISS`, or equivalent)
+
+## Output API Requirements
+
+The decode/validation layer shall expose deterministic accessor APIs:
+
+- `get_raw_value(name)`
+- `get_physical_value(name)`
+- `validate_characteristic(name)`
+
+Each API response shall include both value payload and status/error metadata.
 # S19 File Requirements
 
 This document captures functional requirements for reading, parsing, and

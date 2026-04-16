@@ -3,10 +3,14 @@ from pathlib import Path
 import pytest
 
 from s19_app.tui.a2l import (
+    enrich_a2l_tags_with_values,
     extract_a2l_tags,
     format_tag_validation_status,
+    get_physical_value,
+    get_raw_value,
     parse_a2l_file,
     render_a2l_view,
+    validate_characteristic,
     validate_a2l_tags,
 )
 
@@ -177,3 +181,111 @@ def test_render_a2l_view_supports_tag_line_truncation():
     assert "MEASUREMENT B:" in output
     assert "MEASUREMENT C:" not in output
     assert "truncated" in output
+
+
+def test_parse_a2l_file_extracts_layout_and_compu_maps(tmp_path: Path):
+    a2l = tmp_path / "maps.a2l"
+    a2l.write_text(
+        "/begin PROJECT Demo\n"
+        "  /begin MODULE Engine\n"
+        "    /begin RECORD_LAYOUT RL_U8\n"
+        "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
+        "    /end RECORD_LAYOUT\n"
+        "    /begin COMPU_METHOD CM_LINEAR \"%.2\" LINEAR \"%.2\" \"rpm\"\n"
+        "      COEFFS_LINEAR 2 5\n"
+        "    /end COMPU_METHOD\n"
+        "    /begin COMPU_TAB TAB_A\n"
+        "      TAB_NOINTP\n"
+        "      0 10\n"
+        "      1 20\n"
+        "    /end COMPU_TAB\n"
+        "    /begin CHARACTERISTIC RPM \"RPM\"\n"
+        "      VALUE 0x1000 RL_U8 0 CM_LINEAR 0 255\n"
+        "    /end CHARACTERISTIC\n"
+        "  /end MODULE\n"
+        "/end PROJECT\n",
+        encoding="utf-8",
+    )
+    data = parse_a2l_file(a2l)
+    assert "RL_U8" in data["record_layouts_by_name"]
+    assert "CM_LINEAR" in data["compu_methods_by_name"]
+    assert "TAB_A" in data["compu_tabs_by_name"]
+
+
+def test_enrich_a2l_tags_with_values_decodes_and_converts_linear(tmp_path: Path):
+    a2l = tmp_path / "linear.a2l"
+    a2l.write_text(
+        "/begin PROJECT Demo\n"
+        "  /begin MODULE Engine\n"
+        "    /begin RECORD_LAYOUT RL_U8\n"
+        "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
+        "    /end RECORD_LAYOUT\n"
+        "    /begin COMPU_METHOD CM_LINEAR \"%.2\" LINEAR \"%.2\" \"rpm\"\n"
+        "      COEFFS_LINEAR 2 5\n"
+        "    /end COMPU_METHOD\n"
+        "    /begin CHARACTERISTIC RPM \"RPM\"\n"
+        "      VALUE 0x1000 RL_U8 0 CM_LINEAR 0 255\n"
+        "    /end CHARACTERISTIC\n"
+        "  /end MODULE\n"
+        "/end PROJECT\n",
+        encoding="utf-8",
+    )
+    data = parse_a2l_file(a2l)
+    enriched = enrich_a2l_tags_with_values(data, {0x1000: 10})
+    assert enriched[0]["raw_value"] == 10
+    assert enriched[0]["physical_value"] == 25
+    assert enriched[0]["conversion_status"] == "ok"
+
+
+def test_enrich_a2l_tags_with_values_uses_tab_interp(tmp_path: Path):
+    a2l = tmp_path / "tab.a2l"
+    a2l.write_text(
+        "/begin PROJECT Demo\n"
+        "  /begin MODULE Engine\n"
+        "    /begin RECORD_LAYOUT RL_U8\n"
+        "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
+        "    /end RECORD_LAYOUT\n"
+        "    /begin COMPU_METHOD CM_TAB \"%.2\" TAB_INTP \"%.2\" \"rpm\"\n"
+        "      COMPU_TAB_REF TAB_1\n"
+        "    /end COMPU_METHOD\n"
+        "    /begin COMPU_TAB TAB_1\n"
+        "      TAB_INTP\n"
+        "      0 0\n"
+        "      10 100\n"
+        "    /end COMPU_TAB\n"
+        "    /begin CHARACTERISTIC RPM \"RPM\"\n"
+        "      VALUE 0x1000 RL_U8 0 CM_TAB 0 255\n"
+        "    /end CHARACTERISTIC\n"
+        "  /end MODULE\n"
+        "/end PROJECT\n",
+        encoding="utf-8",
+    )
+    data = parse_a2l_file(a2l)
+    enriched = enrich_a2l_tags_with_values(data, {0x1000: 5})
+    assert enriched[0]["physical_value"] == pytest.approx(50.0)
+
+
+def test_characteristic_accessor_payloads(tmp_path: Path):
+    a2l = tmp_path / "accessor.a2l"
+    a2l.write_text(
+        "/begin PROJECT Demo\n"
+        "  /begin MODULE Engine\n"
+        "    /begin RECORD_LAYOUT RL_U8\n"
+        "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
+        "    /end RECORD_LAYOUT\n"
+        "    /begin COMPU_METHOD CM_IDENT \"%.2\" IDENTICAL \"%.2\" \"rpm\"\n"
+        "    /end COMPU_METHOD\n"
+        "    /begin CHARACTERISTIC RPM \"RPM\"\n"
+        "      VALUE 0x1000 RL_U8 0 CM_IDENT 0 255\n"
+        "    /end CHARACTERISTIC\n"
+        "  /end MODULE\n"
+        "/end PROJECT\n",
+        encoding="utf-8",
+    )
+    data = parse_a2l_file(a2l)
+    raw = get_raw_value("RPM", data, {0x1000: 3})
+    physical = get_physical_value("RPM", data, {0x1000: 3})
+    validation = validate_characteristic("RPM", data, {0x1000: 3})
+    assert raw["raw_value"] == 3
+    assert physical["physical_value"] == 3
+    assert validation["ok"] is True

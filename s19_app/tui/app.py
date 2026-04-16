@@ -23,7 +23,13 @@ from textual.widgets import (
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
-from .a2l import parse_a2l_file, render_a2l_view, validate_a2l_internal_issues, validate_a2l_tags
+from .a2l import (
+    enrich_a2l_tags_with_values,
+    parse_a2l_file,
+    render_a2l_view,
+    validate_a2l_internal_issues,
+    validate_a2l_tags,
+)
 from .hexview import (
     build_mem_map_s19,
     build_range_validity_hex,
@@ -433,6 +439,8 @@ class S19TuiApp(App):
         "name",
         "address",
         "length",
+        "raw_value",
+        "physical_value",
         "source",
         "in_memory",
         "limits",
@@ -1711,6 +1719,8 @@ class S19TuiApp(App):
                 _safe(tag.get("address")),
                 _safe(tag.get("length")),
                 _safe(tag.get("source")),
+                _safe(tag.get("raw_value")),
+                _safe(tag.get("physical_value")),
                 _a2l_tag_in_memory_display(tag),
                 _safe(tag.get("lower_limit")),
                 _safe(tag.get("upper_limit")),
@@ -2666,7 +2676,7 @@ class S19TuiApp(App):
         key = (id(self.current_a2l_data), mem_size)
         if self._a2l_enriched_key == key:
             return self._a2l_enriched_tags
-        source_tags = self.current_a2l_data.get("tags", [])
+        source_tags = enrich_a2l_tags_with_values(self.current_a2l_data, mem_map)
         tag_checks = validate_a2l_tags(source_tags, mem_map)
         check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
         enriched: list[dict[str, Any]] = []
@@ -2824,6 +2834,10 @@ class S19TuiApp(App):
             len_text = str(length) if isinstance(length, int) else "n/a"
             name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
             source_text = str(tag.get("source") or "assigned")
+            raw_value_text = str(tag.get("raw_value") if tag.get("raw_value") is not None else "")
+            physical_value_text = str(
+                tag.get("physical_value") if tag.get("physical_value") is not None else ""
+            )
             in_mem_text = _a2l_tag_in_memory_display(tag)
             region_text = str(tag.get("memory_region") or "unknown")
             limits_text = ""
@@ -2842,6 +2856,8 @@ class S19TuiApp(App):
                     addr_text,
                     len_text,
                     source_text,
+                    raw_value_text,
+                    physical_value_text,
                     in_mem_text,
                     region_text,
                     limits_text,
@@ -2860,20 +2876,23 @@ class S19TuiApp(App):
         addr_width = max(len("Address"), *(len(row[1]) for row in rows))
         len_width = max(len("Length"), *(len(row[2]) for row in rows))
         source_width = max(len("Source"), *(len(row[3]) for row in rows))
-        mem_width = max(len("InMem"), *(len(row[4]) for row in rows))
-        region_width = max(len("Region"), *(len(row[5]) for row in rows))
-        limits_width = max(len("Limits"), *(len(row[6]) for row in rows))
-        unit_width = max(len("Unit"), *(len(row[7]) for row in rows))
-        bit_width = max(len("Bits"), *(len(row[8]) for row in rows))
-        endian_width = max(len("Endian"), *(len(row[9]) for row in rows))
-        virt_width = max(len("Virt"), *(len(row[10]) for row in rows))
-        func_width = max(len("Func"), *(len(row[11]) for row in rows))
-        access_width = max(len("Access"), *(len(row[12]) for row in rows))
-        dtype_width = max(len("Dtype"), min(12, max((len(row[13]) for row in rows), default=0)))
+        raw_width = max(len("Raw"), min(12, max((len(row[4]) for row in rows), default=0)))
+        phys_width = max(len("Physical"), min(12, max((len(row[5]) for row in rows), default=0)))
+        mem_width = max(len("InMem"), *(len(row[6]) for row in rows))
+        region_width = max(len("Region"), *(len(row[7]) for row in rows))
+        limits_width = max(len("Limits"), *(len(row[8]) for row in rows))
+        unit_width = max(len("Unit"), *(len(row[9]) for row in rows))
+        bit_width = max(len("Bits"), *(len(row[10]) for row in rows))
+        endian_width = max(len("Endian"), *(len(row[11]) for row in rows))
+        virt_width = max(len("Virt"), *(len(row[12]) for row in rows))
+        func_width = max(len("Func"), *(len(row[13]) for row in rows))
+        access_width = max(len("Access"), *(len(row[14]) for row in rows))
+        dtype_width = max(len("Dtype"), min(12, max((len(row[15]) for row in rows), default=0)))
 
         header = (
             f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
             f"{'Length'.ljust(len_width)} | {'Source'.ljust(source_width)} | "
+            f"{'Raw'.ljust(raw_width)} | {'Physical'.ljust(phys_width)} | "
             f"{'InMem'.ljust(mem_width)} | {'Region'.ljust(region_width)} | "
             f"{'Limits'.ljust(limits_width)} | {'Unit'.ljust(unit_width)} | "
             f"{'Bits'.ljust(bit_width)} | {'Endian'.ljust(endian_width)} | "
@@ -2892,12 +2911,13 @@ class S19TuiApp(App):
             name_text = row[0][:name_width].ljust(name_width)
             line = (
                 f"{name_text} | {row[1].ljust(addr_width)} | {row[2].ljust(len_width)} | "
-                f"{row[3].ljust(source_width)} | {row[4].ljust(mem_width)} | "
-                f"{row[5].ljust(region_width)} | {row[6].ljust(limits_width)} | "
-                f"{row[7].ljust(unit_width)} | {row[8].ljust(bit_width)} | "
-                f"{row[9].ljust(endian_width)} | {row[10].ljust(virt_width)} | "
-                f"{row[11].ljust(func_width)} | {row[12].ljust(access_width)} | "
-                f"{row[13][:dtype_width].ljust(dtype_width)}"
+                f"{row[3].ljust(source_width)} | {row[4][:raw_width].ljust(raw_width)} | "
+                f"{row[5][:phys_width].ljust(phys_width)} | {row[6].ljust(mem_width)} | "
+                f"{row[7].ljust(region_width)} | {row[8].ljust(limits_width)} | "
+                f"{row[9].ljust(unit_width)} | {row[10].ljust(bit_width)} | "
+                f"{row[11].ljust(endian_width)} | {row[12].ljust(virt_width)} | "
+                f"{row[13].ljust(func_width)} | {row[14].ljust(access_width)} | "
+                f"{row[15][:dtype_width].ljust(dtype_width)}"
             )
             label = Label(line)
             label.add_class(css_class_for_severity(_a2l_tag_row_severity(row_tags[i])))
@@ -2948,6 +2968,8 @@ class S19TuiApp(App):
                     str(tag.get("address") or ""),
                     str(tag.get("length") or ""),
                     str(tag.get("source") or ""),
+                    str(tag.get("raw_value") or ""),
+                    str(tag.get("physical_value") or ""),
                     _a2l_tag_in_memory_display(tag),
                     str(tag.get("lower_limit") or ""),
                     str(tag.get("upper_limit") or ""),
@@ -2973,6 +2995,10 @@ class S19TuiApp(App):
             value = str(tag.get("length") or "")
         elif field == "source":
             value = str(tag.get("source") or "")
+        elif field == "raw_value":
+            value = str(tag.get("raw_value") or "")
+        elif field == "physical_value":
+            value = str(tag.get("physical_value") or "")
         elif field == "in_memory":
             value = _a2l_tag_in_memory_display(tag)
         elif field == "limits":
