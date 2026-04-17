@@ -69,6 +69,40 @@ def _a2l_tag_in_memory_display(tag: dict) -> str:
     return "no"
 
 
+def _a2l_tag_unit_display(tag: dict) -> str:
+    """
+    Summary:
+        Choose the best display unit for an A2L tag, preferring explicit ``UNIT`` then COMPU method unit.
+
+    Args:
+        tag (dict): Enriched A2L tag dictionary.
+
+    Returns:
+        str: Unit text for tables, find, and filter surfaces.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Prefer ``tag["unit"]`` when present.
+        - Fall back to ``tag["compu_method_unit"]`` from resolved ``COMPU_METHOD``.
+        - Normalize absent values to an empty string.
+
+    Dependencies:
+        Uses:
+        - none
+        Used by:
+        - ``S19TuiApp.update_a2l_tags_view``
+        - ``S19TuiApp._a2l_tag_find_haystack``
+        - ``S19TuiApp._tag_matches_filter``
+    """
+    explicit = tag.get("unit")
+    if explicit not in (None, ""):
+        return str(explicit)
+    compu_unit = tag.get("compu_method_unit")
+    return "" if compu_unit in (None, "") else str(compu_unit)
+
+
 def _a2l_tag_row_severity(tag: dict) -> ValidationSeverity:
     if not tag.get("schema_ok", True):
         return ValidationSeverity.ERROR
@@ -1729,7 +1763,7 @@ class S19TuiApp(App):
                 _a2l_tag_in_memory_display(tag),
                 _safe(tag.get("lower_limit")),
                 _safe(tag.get("upper_limit")),
-                _safe(tag.get("unit")),
+                _a2l_tag_unit_display(tag),
                 _safe(tag.get("bit_org")),
                 _safe(tag.get("endian")),
                 _safe(tag.get("virtual")),
@@ -3004,7 +3038,7 @@ class S19TuiApp(App):
             limits_text = ""
             if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
                 limits_text = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
-            unit_text = str(tag.get("unit") or "")
+            unit_text = _a2l_tag_unit_display(tag)
             bit_text = str(tag.get("bit_org") or "")
             endian_text = str(tag.get("endian") or "")
             virt_text = "yes" if tag.get("virtual") else "no"
@@ -3134,7 +3168,7 @@ class S19TuiApp(App):
                     _a2l_tag_in_memory_display(tag),
                     str(tag.get("lower_limit") or ""),
                     str(tag.get("upper_limit") or ""),
-                    str(tag.get("unit") or ""),
+                    _a2l_tag_unit_display(tag),
                     str(tag.get("bit_org") or ""),
                     str(tag.get("endian") or ""),
                     str(tag.get("virtual") or ""),
@@ -3165,7 +3199,7 @@ class S19TuiApp(App):
         elif field == "limits":
             value = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
         elif field == "unit":
-            value = str(tag.get("unit") or "")
+            value = _a2l_tag_unit_display(tag)
         elif field == "bits":
             value = str(tag.get("bit_org") or "")
         elif field == "endian":

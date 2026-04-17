@@ -191,7 +191,8 @@ def test_parse_a2l_file_extracts_layout_and_compu_maps(tmp_path: Path):
         "    /begin RECORD_LAYOUT RL_U8\n"
         "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
         "    /end RECORD_LAYOUT\n"
-        "    /begin COMPU_METHOD CM_LINEAR \"%.2\" LINEAR \"%.2\" \"rpm\"\n"
+        "    /begin COMPU_METHOD CM_LINEAR \"\"\n"
+        "      LINEAR \"%.2\" \"rpm\"\n"
         "      COEFFS_LINEAR 2 5\n"
         "    /end COMPU_METHOD\n"
         "    /begin COMPU_TAB TAB_A\n"
@@ -209,7 +210,28 @@ def test_parse_a2l_file_extracts_layout_and_compu_maps(tmp_path: Path):
     data = parse_a2l_file(a2l)
     assert "RL_U8" in data["record_layouts_by_name"]
     assert "CM_LINEAR" in data["compu_methods_by_name"]
+    assert data["compu_methods_by_name"]["CM_LINEAR"]["unit"] == "rpm"
     assert "TAB_A" in data["compu_tabs_by_name"]
+
+
+def test_parse_compu_method_extracts_unit_from_body_conversion_line(tmp_path: Path):
+    a2l = tmp_path / "compu_unit_body.a2l"
+    a2l.write_text(
+        "/begin PROJECT Demo\n"
+        "  /begin MODULE Engine\n"
+        "    /begin COMPU_METHOD wParam_OUT1_DESC.Conversion_M \"\"\n"
+        "      LINEAR \"%.3\" \"kOhm\"\n"
+        "      COEFFS_LINEAR 1 0\n"
+        "    /end COMPU_METHOD\n"
+        "  /end MODULE\n"
+        "/end PROJECT\n",
+        encoding="utf-8",
+    )
+    data = parse_a2l_file(a2l)
+    method = data["compu_methods_by_name"]["wParam_OUT1_DESC.Conversion_M"]
+    assert method["conversion_type"] == "LINEAR"
+    assert method["format"] == "%.3"
+    assert method["unit"] == "kOhm"
 
 
 def test_enrich_a2l_tags_with_values_decodes_and_converts_linear(tmp_path: Path):
@@ -220,7 +242,8 @@ def test_enrich_a2l_tags_with_values_decodes_and_converts_linear(tmp_path: Path)
         "    /begin RECORD_LAYOUT RL_U8\n"
         "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
         "    /end RECORD_LAYOUT\n"
-        "    /begin COMPU_METHOD CM_LINEAR \"%.2\" LINEAR \"%.2\" \"rpm\"\n"
+        "    /begin COMPU_METHOD CM_LINEAR \"\"\n"
+        "      LINEAR \"%.2\" \"rpm\"\n"
         "      COEFFS_LINEAR 2 5\n"
         "    /end COMPU_METHOD\n"
         "    /begin CHARACTERISTIC RPM \"RPM\"\n"
@@ -235,6 +258,7 @@ def test_enrich_a2l_tags_with_values_decodes_and_converts_linear(tmp_path: Path)
     assert enriched[0]["raw_value"] == 10
     assert enriched[0]["physical_value"] == 25
     assert enriched[0]["conversion_status"] == "ok"
+    assert enriched[0]["compu_method_unit"] == "rpm"
 
 
 def test_enrich_a2l_tags_with_values_uses_tab_interp(tmp_path: Path):
@@ -245,7 +269,8 @@ def test_enrich_a2l_tags_with_values_uses_tab_interp(tmp_path: Path):
         "    /begin RECORD_LAYOUT RL_U8\n"
         "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
         "    /end RECORD_LAYOUT\n"
-        "    /begin COMPU_METHOD CM_TAB \"%.2\" TAB_INTP \"%.2\" \"rpm\"\n"
+        "    /begin COMPU_METHOD CM_TAB \"\"\n"
+        "      TAB_INTP \"%.2\" \"rpm\"\n"
         "      COMPU_TAB_REF TAB_1\n"
         "    /end COMPU_METHOD\n"
         "    /begin COMPU_TAB TAB_1\n"
@@ -263,6 +288,7 @@ def test_enrich_a2l_tags_with_values_uses_tab_interp(tmp_path: Path):
     data = parse_a2l_file(a2l)
     enriched = enrich_a2l_tags_with_values(data, {0x1000: 5})
     assert enriched[0]["physical_value"] == pytest.approx(50.0)
+    assert enriched[0]["compu_method_unit"] == "rpm"
 
 
 def test_characteristic_accessor_payloads(tmp_path: Path):
@@ -273,7 +299,8 @@ def test_characteristic_accessor_payloads(tmp_path: Path):
         "    /begin RECORD_LAYOUT RL_U8\n"
         "      FNC_VALUES 1 UBYTE COLUMN_DIR DIRECT\n"
         "    /end RECORD_LAYOUT\n"
-        "    /begin COMPU_METHOD CM_IDENT \"%.2\" IDENTICAL \"%.2\" \"rpm\"\n"
+        "    /begin COMPU_METHOD CM_IDENT \"\"\n"
+        "      IDENTICAL \"%.2\" \"rpm\"\n"
         "    /end COMPU_METHOD\n"
         "    /begin CHARACTERISTIC RPM \"RPM\"\n"
         "      VALUE 0x1000 RL_U8 0 CM_IDENT 0 255\n"

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from s19_app.tui.app import S19TuiApp, _mac_record_ui_state
+from s19_app.tui.app import S19TuiApp, _a2l_tag_unit_display, _mac_record_ui_state
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.screens import SaveProjectPayload
 from s19_app.tui.workspace import WORKAREA_TEMP
@@ -479,6 +479,16 @@ def test_a2l_tag_find_haystack_keeps_zero_numeric_values(tmp_path: Path):
 
     haystack = app._a2l_tag_find_haystack(tag)
     assert " 0 " in f" {haystack} "
+
+
+def test_a2l_tag_unit_display_prefers_explicit_unit_over_compu(tmp_path: Path):
+    tag = {"unit": "V", "compu_method_unit": "kOhm"}
+    assert _a2l_tag_unit_display(tag) == "V"
+
+
+def test_a2l_tag_unit_display_falls_back_to_compu_method_unit(tmp_path: Path):
+    tag = {"compu_method_unit": "kOhm"}
+    assert _a2l_tag_unit_display(tag) == "kOhm"
 
 
 def test_filter_a2l_tags_supports_raw_and_physical_value_fields(tmp_path: Path):

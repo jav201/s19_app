@@ -45,6 +45,17 @@ DATATYPE_STRUCT_CODES: dict[str, str] = {
 
 BYTE_ORDER_TOKENS = frozenset({"MSB_FIRST", "MSB_LAST", "BIG_ENDIAN", "LITTLE_ENDIAN"})
 
+COMPU_CONVERSION_KEYWORDS = frozenset(
+    {
+        "IDENTICAL",
+        "LINEAR",
+        "RAT_FUNC",
+        "TAB_INTP",
+        "TAB_NOINTP",
+        "FORM",
+    }
+)
+
 CHARACTERISTIC_KINDS = frozenset(
     {
         "VALUE",
@@ -407,6 +418,120 @@ def extract_record_layouts(sections: list[dict]) -> dict[str, dict]:
     return out
 
 
+def _parse_compu_conversion_tokens(tokens: list[str]) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Summary:
+        Parse ASAP2 ``COMPU_METHOD`` conversion line tokens into conversion type, display format, and physical unit.
+
+    Args:
+        tokens (list[str]): Token list from ``_split_line_respecting_quotes`` for one non-empty line.
+
+    Returns:
+        tuple[Optional[str], Optional[str], Optional[str]]: ``(conversion_type, format, unit)`` when recognized.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Detect a leading conversion keyword token.
+        - Treat the next quoted token as display format when present.
+        - Treat the following quoted token as physical unit when present.
+
+    Dependencies:
+        Uses:
+        - ``COMPU_CONVERSION_KEYWORDS``
+        Used by:
+        - ``extract_compu_methods``
+    """
+    if not tokens:
+        return None, None, None
+    head = tokens[0]
+    if head not in COMPU_CONVERSION_KEYWORDS:
+        return None, None, None
+    conversion_type = head
+    fmt = tokens[1] if len(tokens) > 1 else None
+    unit = tokens[2] if len(tokens) > 2 else None
+    return conversion_type, fmt, unit
+
+
+def _parse_compu_method_conversion_from_body(lines: list[str]) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Summary:
+        Scan ``COMPU_METHOD`` body lines for the primary conversion declaration.
+
+    Args:
+        lines (list[str]): Raw lines inside a ``COMPU_METHOD`` section.
+
+    Returns:
+        tuple[Optional[str], Optional[str], Optional[str]]: ``(conversion_type, format, unit)`` when found.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Skip blank lines.
+        - Tokenize each line with quote-aware splitting.
+        - Return the first line that begins with a known conversion keyword.
+
+    Dependencies:
+        Uses:
+        - ``_split_line_respecting_quotes``
+        - ``_parse_compu_conversion_tokens``
+        Used by:
+        - ``extract_compu_methods``
+    """
+    for raw in lines:
+        stripped = raw.strip()
+        if not stripped:
+            continue
+        tokens = _split_line_respecting_quotes(stripped)
+        parsed = _parse_compu_conversion_tokens(tokens)
+        if parsed[0] is not None:
+            return parsed
+    return None, None, None
+
+
+def _parse_compu_method_conversion_from_meta(meta_tokens: list[str]) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Summary:
+        Best-effort parse of conversion type, format, and unit from ``/begin COMPU_METHOD`` meta tokens.
+
+    Args:
+        meta_tokens (list[str]): Token list from ``_split_line_respecting_quotes`` applied to meta text.
+
+    Returns:
+        tuple[Optional[str], Optional[str], Optional[str]]: ``(conversion_type, format, unit)`` when a conversion keyword is found.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Locate a conversion keyword token inside meta.
+        - If preceded by a quoted token, treat it as format.
+        - If followed by quoted tokens, treat them as format/unit depending on position.
+
+    Dependencies:
+        Uses:
+        - ``COMPU_CONVERSION_KEYWORDS``
+        Used by:
+        - ``extract_compu_methods``
+    """
+    if not meta_tokens:
+        return None, None, None
+    for index, token in enumerate(meta_tokens):
+        if token not in COMPU_CONVERSION_KEYWORDS:
+            continue
+        conversion_type = token
+        fmt = meta_tokens[index - 1] if index >= 1 else None
+        unit = None
+        if index + 1 < len(meta_tokens):
+            candidate = meta_tokens[index + 1]
+            if candidate not in COMPU_CONVERSION_KEYWORDS:
+                unit = candidate
+        return conversion_type, fmt, unit
+    return None, None, None
+
+
 def extract_compu_methods(sections: list[dict]) -> dict[str, dict]:
     """Extract COMPU_METHOD definitions keyed by method name."""
     out: dict[str, dict] = {}
@@ -415,14 +540,16 @@ def extract_compu_methods(sections: list[dict]) -> dict[str, dict]:
         meta_tokens = _split_line_respecting_quotes(meta)
         method_name = meta_tokens[0] if meta_tokens else "UNKNOWN"
         lines = section.get("lines") or []
-        first_line = _find_first_non_empty_line(lines)
-        tokens = _split_line_respecting_quotes(first_line or "")
-        conversion_type = meta_tokens[2] if len(meta_tokens) >= 3 else (tokens[0] if tokens else None)
+        body_conversion = _parse_compu_method_conversion_from_body(lines)
+        meta_conversion = _parse_compu_method_conversion_from_meta(meta_tokens)
+        conversion_type = body_conversion[0] or meta_conversion[0]
+        fmt = body_conversion[1] or meta_conversion[1]
+        unit = body_conversion[2] or meta_conversion[2]
         method = {
             "name": method_name,
             "conversion_type": conversion_type,
-            "format": meta_tokens[1] if len(meta_tokens) > 1 else (tokens[1] if len(tokens) > 1 else None),
-            "unit": meta_tokens[4] if len(meta_tokens) > 4 else (tokens[2] if len(tokens) > 2 else None),
+            "format": fmt,
+            "unit": unit,
             "coeffs_linear": None,
             "coeffs": None,
             "compu_tab_ref": None,
@@ -434,6 +561,15 @@ def extract_compu_methods(sections: list[dict]) -> dict[str, dict]:
             if not parts:
                 continue
             head = parts[0]
+            if head in COMPU_CONVERSION_KEYWORDS:
+                line_conv, line_fmt, line_unit = _parse_compu_conversion_tokens(parts)
+                if line_conv is not None:
+                    method["conversion_type"] = line_conv
+                    if line_fmt is not None:
+                        method["format"] = line_fmt
+                    if line_unit is not None:
+                        method["unit"] = line_unit
+                continue
             if head == "COEFFS_LINEAR" and len(parts) >= 3:
                 method["coeffs_linear"] = [_to_float(parts[1]), _to_float(parts[2])]
             elif head == "COEFFS" and len(parts) >= 7:
@@ -1044,6 +1180,9 @@ def enrich_a2l_tags_with_values(a2l_data: dict, mem_map: Optional[Dict[int, int]
 
         method_name = str(tag.get("compu_method_name") or tag.get("conversion") or "")
         method = compu_methods_by_name.get(method_name)
+        compu_method_unit = None
+        if isinstance(method, dict):
+            compu_method_unit = method.get("unit")
         physical_value, conversion_status, conversion_error = _apply_compu_method(raw_value, method, compu_tabs_by_name)
         lower_limit = _to_float(tag.get("lower_limit"))
         upper_limit = _to_float(tag.get("upper_limit"))
@@ -1070,6 +1209,7 @@ def enrich_a2l_tags_with_values(a2l_data: dict, mem_map: Optional[Dict[int, int]
                 "conversion_status": conversion_status,
                 "conversion_error": conversion_error,
                 "value_outside_limits": outside_limits,
+                "compu_method_unit": compu_method_unit,
             }
         )
     return enriched

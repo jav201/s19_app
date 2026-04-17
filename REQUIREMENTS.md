@@ -115,6 +115,11 @@ The A2L viewer shall:
 - support find/filter matching for raw and physical values
 - display unavailable or invalid values with stable fallback text (`n/a`, `ERR`, `MISS`, or equivalent)
 
+Unit display precedence for A2L tags:
+
+1. Use the explicit `UNIT` keyword on the tag when present.
+2. Otherwise use the physical unit string from the referenced `COMPU_METHOD` conversion body line (for example `LINEAR "%.3" "kOhm"`).
+
 ## Output API Requirements
 
 The decode/validation layer shall expose deterministic accessor APIs:
