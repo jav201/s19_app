@@ -490,6 +490,11 @@ class S19TuiApp(App):
         self._validation_issues: list[ValidationIssue] = []
         self.current_project_dir: Optional[Path] = None
         self._mac_window_start: int = 0
+        self._mac_view_cache_key: Optional[tuple[Any, ...]] = None
+        self._mac_view_cache_rows: list[tuple[str, str, str, str, str, str, str, str]] = []
+        self._mac_view_cache_meta: list[dict[str, Any]] = []
+        self._mac_view_cache_summary: dict[str, int] = {}
+        self._mac_view_cache_coverage_line: Optional[str] = None
         self._hex_window_start: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
@@ -1955,6 +1960,7 @@ class S19TuiApp(App):
             Used by:
                 - ``load_selected_file`` MAC extension branch
         """
+        parse_started = time.perf_counter()
         mac_data = parse_mac_file(path)
         records = mac_data.get("records", [])
         diagnostics = [str(item) for item in mac_data.get("diagnostics", [])]
@@ -1973,13 +1979,14 @@ class S19TuiApp(App):
         a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
         a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
         self.logger.info(
-            "MAC parse summary: path=%s total_records=%d parse_ok=%d diagnostics=%d valid_addresses=%d a2l_path=%s",
+            "MAC parse summary: path=%s total_records=%d parse_ok=%d diagnostics=%d valid_addresses=%d a2l_path=%s elapsed_seconds=%.3f",
             path,
             len(records),
             len([item for item in records if item.get("parse_ok")]),
             len(diagnostics),
             len(valid_addresses),
             a2l_path,
+            time.perf_counter() - parse_started,
         )
         return LoadedFile(
             path=path,
@@ -2026,6 +2033,254 @@ class S19TuiApp(App):
             if record.get("parse_ok") and isinstance(address, int):
                 addresses.add(address)
         return addresses
+
+    def _merge_primary_with_existing_mac(self, primary_loaded: LoadedFile) -> LoadedFile:
+        """
+        Summary:
+            Preserve currently attached MAC payload when a new S19/HEX primary image is loaded.
+
+        Args:
+            primary_loaded (LoadedFile): Newly parsed primary artifact payload (``s19`` or ``hex``).
+
+        Returns:
+            LoadedFile: Primary payload with MAC metadata copied from the current session when available.
+
+        Data Flow:
+            - Return incoming primary payload unchanged when no current file exists.
+            - If the current file has MAC metadata, copy ``mac_path``, ``mac_records``, and diagnostics.
+            - Keep primary fields (memory map/ranges/errors) from the newly loaded artifact.
+
+        Dependencies:
+            Uses:
+                - ``LoadedFile`` dataclass constructor
+            Used by:
+                - ``load_selected_file`` primary branches
+        """
+        existing = self.current_file
+        if existing is None:
+            return primary_loaded
+        if not existing.mac_path and not existing.mac_records and not existing.mac_diagnostics:
+            return primary_loaded
+        return LoadedFile(
+            path=primary_loaded.path,
+            file_type=primary_loaded.file_type,
+            mem_map=primary_loaded.mem_map,
+            row_bases=primary_loaded.row_bases,
+            ranges=primary_loaded.ranges,
+            range_validity=primary_loaded.range_validity,
+            errors=primary_loaded.errors,
+            a2l_path=primary_loaded.a2l_path or existing.a2l_path,
+            a2l_data=primary_loaded.a2l_data or existing.a2l_data,
+            mac_path=existing.mac_path,
+            mac_records=existing.mac_records,
+            mac_diagnostics=existing.mac_diagnostics,
+        )
+
+    def _merge_mac_with_existing_primary(self, mac_loaded: LoadedFile) -> LoadedFile:
+        """
+        Summary:
+            Attach parsed MAC metadata to the active S19/HEX payload when one is already loaded.
+
+        Args:
+            mac_loaded (LoadedFile): Parsed MAC payload from ``_load_mac_file``.
+
+        Returns:
+            LoadedFile: Existing primary payload with refreshed MAC fields, or ``mac_loaded`` when no primary exists.
+
+        Data Flow:
+            - Detect whether current state contains a primary ``s19``/``hex`` payload.
+            - When primary exists, keep its memory/range fields and overlay MAC fields from ``mac_loaded``.
+            - Keep the best available A2L path/data between primary and MAC payload.
+
+        Dependencies:
+            Uses:
+                - ``LoadedFile`` dataclass constructor
+            Used by:
+                - ``load_selected_file`` MAC branch
+        """
+        existing = self.current_file
+        if not existing or existing.file_type not in {"s19", "hex"}:
+            return mac_loaded
+        return LoadedFile(
+            path=existing.path,
+            file_type=existing.file_type,
+            mem_map=existing.mem_map,
+            row_bases=existing.row_bases,
+            ranges=existing.ranges,
+            range_validity=existing.range_validity,
+            errors=existing.errors,
+            a2l_path=mac_loaded.a2l_path or existing.a2l_path,
+            a2l_data=mac_loaded.a2l_data or existing.a2l_data,
+            mac_path=mac_loaded.mac_path,
+            mac_records=mac_loaded.mac_records,
+            mac_diagnostics=mac_loaded.mac_diagnostics,
+        )
+
+    def _invalidate_mac_view_cache(self) -> None:
+        """
+        Summary:
+            Clear cached MAC table/validation material so next render recomputes from current state.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reset cache key and cached row/meta payload.
+            - Reset cached summaries and coverage line.
+
+        Dependencies:
+            Used by:
+                - ``load_selected_file`` after artifact changes
+                - settings handlers that alter MAC row semantics
+        """
+        self._mac_view_cache_key = None
+        self._mac_view_cache_rows = []
+        self._mac_view_cache_meta = []
+        self._mac_view_cache_summary = {}
+        self._mac_view_cache_coverage_line = None
+
+    def _build_mac_view_cache(self) -> None:
+        """
+        Summary:
+            Build and cache full MAC row metadata and cross-validation output for stable artifact inputs.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Iterate MAC records once to build row tuples, severity metadata, and aggregate counters.
+            - Run cross-artifact validation only when current file is primary-backed (S19/HEX).
+            - Store rows, summary counters, and report-derived lines into cache members.
+
+        Dependencies:
+            Uses:
+                - ``_build_a2l_name_index``
+                - ``_mac_record_ui_state``
+                - ``validate_artifact_consistency``
+                - ``validate_a2l_internal_issues``
+            Used by:
+                - ``update_mac_view``
+        """
+        started = time.perf_counter()
+        records = self.current_file.mac_records if self.current_file else []
+        has_a2l = bool(self.current_a2l_data)
+        a2l_name_index = _build_a2l_name_index(self.current_a2l_data)
+        rows: list[tuple[str, str, str, str, str, str, str, str]] = []
+        row_meta: list[dict[str, Any]] = []
+        total_verified = 0
+        total_invalid = 0
+        total_neutral = 0
+        total_in_a2l = 0
+        total_out_of_mem = 0
+        total_parse_errors = 0
+        for record in records or []:
+            line_no = int(record.get("line_number") or 0)
+            name = str(record.get("name") or "").strip()
+            address = record.get("address")
+            parse_ok = bool(record.get("parse_ok"))
+            parse_error = str(record.get("parse_error") or "")
+            if not parse_ok:
+                total_parse_errors += 1
+            in_a2l = False
+            a2l_match_text = ""
+            if name:
+                matches = a2l_name_index.get(name.lower(), [])
+                if matches:
+                    in_a2l = True
+                    total_in_a2l += 1
+                    best = matches[0]
+                    a2l_match_text = f"{best.get('section', '?')}:{best.get('name', name)}"
+            memory_checked = False
+            in_memory = None
+            if self.current_file and self.current_file.file_type in {"s19", "hex"} and isinstance(address, int):
+                memory_checked = True
+                in_memory = self._mac_address_in_ranges(address, self.current_file.ranges)
+            in_mem_text = "n/a"
+            if memory_checked:
+                in_mem_text = "yes" if in_memory else "no"
+                if not in_memory:
+                    total_out_of_mem += 1
+            status, severity_text = _mac_record_ui_state(record, a2l_name_index, has_a2l, memory_checked, in_memory)
+            severity = ValidationSeverity(severity_text)
+            if severity == ValidationSeverity.OK:
+                total_verified += 1
+            elif severity == ValidationSeverity.ERROR:
+                total_invalid += 1
+            else:
+                total_neutral += 1
+            addr_text = f"0x{address:08X}" if isinstance(address, int) else "n/a"
+            rows.append(
+                (
+                    name or "(invalid)",
+                    addr_text,
+                    "yes" if in_a2l else "no",
+                    in_mem_text,
+                    status,
+                    str(line_no),
+                    parse_error,
+                    a2l_match_text,
+                )
+            )
+            row_meta.append({"severity": severity, "address": address if isinstance(address, int) else None})
+        summary = {
+            "total": len(rows),
+            "verified": total_verified,
+            "invalid": total_invalid,
+            "neutral": total_neutral,
+            "in_a2l": total_in_a2l,
+            "out_of_mem": total_out_of_mem,
+            "parse_errors": total_parse_errors,
+        }
+        coverage_line = None
+        if self.current_file and self.current_file.file_type in {"s19", "hex"}:
+            validate_started = time.perf_counter()
+            report = validate_artifact_consistency(
+                mac_records=records,
+                a2l_tags=self._a2l_enriched_tags or (self.current_a2l_data or {}).get("tags", []),
+                a2l_data=self.current_a2l_data,
+                s19_ranges=self.current_file.ranges,
+                overlapped_addresses=set(),
+            )
+            extra_a2l_issues = (
+                validate_a2l_internal_issues(
+                    self.current_a2l_data or {"sections": [], "errors": [], "tags": []},
+                    tag_checks=self._a2l_enriched_tags,
+                )
+                if self.current_a2l_data
+                else []
+            )
+            report.issues = self._deduplicate_issues(report.issues + extra_a2l_issues)
+            self._validation_report = report
+            self._validation_issues = report.issues
+            coverage_line = (
+                f"Coverage MAC->S19={report.coverage.mac_in_s19_pct():.1f}%  "
+                f"A2L->S19={report.coverage.a2l_in_s19_pct():.1f}%  "
+                f"A2L<->MAC={report.coverage.a2l_mac_match_pct():.1f}%"
+            )
+            self.logger.info(
+                "MAC validation computed: records=%d issues=%d elapsed_seconds=%.3f",
+                len(records or []),
+                len(report.issues),
+                time.perf_counter() - validate_started,
+            )
+        else:
+            self._validation_report = None
+            self._validation_issues = []
+        self._mac_view_cache_rows = rows
+        self._mac_view_cache_meta = row_meta
+        self._mac_view_cache_summary = summary
+        self._mac_view_cache_coverage_line = coverage_line
+        self.logger.info(
+            "MAC row cache built: records=%d elapsed_seconds=%.3f",
+            len(records or []),
+            time.perf_counter() - started,
+        )
 
     def load_selected_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> None:
         """
@@ -2081,6 +2336,7 @@ class S19TuiApp(App):
                     mac_records=[],
                     mac_diagnostics=[],
                 )
+                loaded = self._merge_primary_with_existing_mac(loaded)
                 self._log_loaded_file_summary(
                     file_type="s19",
                     path=path,
@@ -2111,6 +2367,7 @@ class S19TuiApp(App):
                     mac_records=[],
                     mac_diagnostics=[],
                 )
+                loaded = self._merge_primary_with_existing_mac(loaded)
                 self._log_loaded_file_summary(
                     file_type="hex",
                     path=path,
@@ -2120,21 +2377,8 @@ class S19TuiApp(App):
                 )
             elif suffix in MAC_EXTENSIONS:
                 mac_loaded = self._load_mac_file(path, a2l_files)
-                if self.current_file and self.current_file.file_type in {"s19", "hex"}:
-                    loaded = LoadedFile(
-                        path=self.current_file.path,
-                        file_type=self.current_file.file_type,
-                        mem_map=self.current_file.mem_map,
-                        row_bases=self.current_file.row_bases,
-                        ranges=self.current_file.ranges,
-                        range_validity=self.current_file.range_validity,
-                        errors=self.current_file.errors,
-                        a2l_path=mac_loaded.a2l_path or self.current_file.a2l_path,
-                        a2l_data=mac_loaded.a2l_data or self.current_file.a2l_data,
-                        mac_path=path,
-                        mac_records=mac_loaded.mac_records,
-                        mac_diagnostics=mac_loaded.mac_diagnostics,
-                    )
+                loaded = self._merge_mac_with_existing_primary(mac_loaded)
+                if loaded.file_type in {"s19", "hex"}:
                     self._log_loaded_file_summary(
                         file_type=f"{loaded.file_type}+mac",
                         path=path,
@@ -2143,7 +2387,6 @@ class S19TuiApp(App):
                         errors=loaded.errors,
                     )
                 else:
-                    loaded = mac_loaded
                     self._log_loaded_file_summary(
                         file_type="mac",
                         path=path,
@@ -2160,6 +2403,7 @@ class S19TuiApp(App):
             self.logger.exception("Load failed for path=%s suffix=%s project=%s", path, suffix, self.current_project)
             return
         self.current_file = loaded
+        self._invalidate_mac_view_cache()
         self._mac_window_start = 0
         self._a2l_tag_hex_highlight = None
         if loaded.a2l_data:
@@ -2169,7 +2413,6 @@ class S19TuiApp(App):
         self.update_hex_view()
         self.update_alt_hex_view()
         self.update_mac_hex_view()
-        self.update_mac_view()
         self.update_a2l_view()
         self.update_project_labels()
         self.set_file_status(f"Loaded {path.name}")
@@ -2487,81 +2730,20 @@ class S19TuiApp(App):
             self._validation_issues = []
             self.update_validation_issues_view()
             return
-
-        has_a2l = bool(self.current_a2l_data)
-        a2l_name_index = _build_a2l_name_index(self.current_a2l_data)
-        rows: list[tuple] = []
-        row_meta: list[dict[str, Any]] = []
-        total_verified = 0
-        total_invalid = 0
-        total_neutral = 0
-        total_in_a2l = 0
-        total_out_of_mem = 0
-        total_parse_errors = 0
-
-        for record in records:
-            line_no = int(record.get("line_number") or 0)
-            name = str(record.get("name") or "").strip()
-            address = record.get("address")
-            parse_ok = bool(record.get("parse_ok"))
-            parse_error = str(record.get("parse_error") or "")
-            if not parse_ok:
-                total_parse_errors += 1
-
-            in_a2l = False
-            a2l_match_text = ""
-            if name:
-                matches = a2l_name_index.get(name.lower(), [])
-                if matches:
-                    in_a2l = True
-                    total_in_a2l += 1
-                    best = matches[0]
-                    a2l_match_text = f"{best.get('section', '?')}:{best.get('name', name)}"
-
-            memory_checked = False
-            in_memory = None
-            if self.current_file.file_type in {"s19", "hex"} and isinstance(address, int):
-                memory_checked = True
-                in_memory = self._mac_address_in_ranges(address, self.current_file.ranges)
-
-            in_mem_text = "n/a"
-            if memory_checked:
-                in_mem_text = "yes" if in_memory else "no"
-                if not in_memory:
-                    total_out_of_mem += 1
-
-            status, severity_text = _mac_record_ui_state(
-                record, a2l_name_index, has_a2l, memory_checked, in_memory
-            )
-            severity = ValidationSeverity(severity_text)
-            if severity == ValidationSeverity.OK:
-                total_verified += 1
-            elif severity == ValidationSeverity.ERROR:
-                total_invalid += 1
-            else:
-                total_neutral += 1
-
-            addr_text = f"0x{address:08X}" if isinstance(address, int) else "n/a"
-            rows.append(
-                (
-                    name or "(invalid)",
-                    addr_text,
-                    "yes" if in_a2l else "no",
-                    in_mem_text,
-                    status,
-                    str(line_no),
-                    parse_error,
-                    a2l_match_text,
-                )
-            )
-            row_meta.append(
-                {
-                    "severity": severity,
-                    "address": address if isinstance(address, int) else None,
-                }
-            )
-
-        total = len(rows)
+        cache_key = (
+            id(records),
+            len(records),
+            id(self.current_a2l_data),
+            self.current_file.file_type,
+            tuple(self.current_file.ranges),
+            len(self.current_file.mem_map),
+        )
+        if self._mac_view_cache_key != cache_key:
+            self._mac_view_cache_key = cache_key
+            self._build_mac_view_cache()
+        rows = self._mac_view_cache_rows
+        row_meta = self._mac_view_cache_meta
+        total = self._mac_view_cache_summary.get("total", len(rows))
         self._mac_window_start = self._mac_clamp_page_start(total)
         page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         start, end = self._get_window_bounds(total, self._mac_window_start, page_size)
@@ -2608,40 +2790,19 @@ class S19TuiApp(App):
             mac_list.append(item)
 
         summary = (
-            f"Total={total}  Verified={total_verified}  Invalid={total_invalid}  Neutral={total_neutral}  "
-            f"NameInA2L={total_in_a2l}  OutOfMem={total_out_of_mem}  ParseErrs={total_parse_errors}"
+            f"Total={total}  Verified={self._mac_view_cache_summary.get('verified', 0)}  "
+            f"Invalid={self._mac_view_cache_summary.get('invalid', 0)}  "
+            f"Neutral={self._mac_view_cache_summary.get('neutral', 0)}  "
+            f"NameInA2L={self._mac_view_cache_summary.get('in_a2l', 0)}  "
+            f"OutOfMem={self._mac_view_cache_summary.get('out_of_mem', 0)}  "
+            f"ParseErrs={self._mac_view_cache_summary.get('parse_errors', 0)}"
         )
         mac_list.append(ListItem(Label(summary)))
-        if self.current_file.file_type in {"s19", "hex"}:
-            report = validate_artifact_consistency(
-                mac_records=records,
-                a2l_tags=self._a2l_enriched_tags or (self.current_a2l_data or {}).get("tags", []),
-                a2l_data=self.current_a2l_data,
-                s19_ranges=self.current_file.ranges,
-                overlapped_addresses=set(),
-            )
-            extra_a2l_issues = (
-                validate_a2l_internal_issues(
-                    self.current_a2l_data or {"sections": [], "errors": [], "tags": []},
-                    tag_checks=self._a2l_enriched_tags,
-                )
-                if self.current_a2l_data
-                else []
-            )
-            report.issues = self._deduplicate_issues(report.issues + extra_a2l_issues)
-            self._validation_report = report
-            self._validation_issues = report.issues
-            coverage_line = (
-                f"Coverage MAC->S19={report.coverage.mac_in_s19_pct():.1f}%  "
-                f"A2L->S19={report.coverage.a2l_in_s19_pct():.1f}%  "
-                f"A2L<->MAC={report.coverage.a2l_mac_match_pct():.1f}%"
-            )
+        if self.current_file.file_type in {"s19", "hex"} and self._mac_view_cache_coverage_line:
+            coverage_line = self._mac_view_cache_coverage_line
             coverage_label = Label(coverage_line)
             coverage_label.add_class("sev-info")
             mac_list.append(ListItem(coverage_label))
-        else:
-            self._validation_report = None
-            self._validation_issues = []
         self.update_validation_issues_view()
 
     def _compute_a2l_enriched_tags(self) -> list[dict[str, Any]]:

@@ -221,6 +221,88 @@ def test_load_selected_file_attaches_mac_to_loaded_binary(tmp_path: Path, monkey
     assert len(app.current_file.mac_records) == 1
 
 
+def test_merge_primary_with_existing_mac_keeps_mac_payload(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "old.s19",
+        file_type="s19",
+        mem_map={0x1000: 0xAA},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_path=tmp_path / "tags.mac",
+        mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x2000}],
+        mac_diagnostics=["ok"],
+    )
+    primary_loaded = LoadedFile(
+        path=tmp_path / "new.hex",
+        file_type="hex",
+        mem_map={0x3000: 0x11},
+        row_bases=[0x3000],
+        ranges=[(0x3000, 0x3001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    merged = app._merge_primary_with_existing_mac(primary_loaded)
+
+    assert merged.file_type == "hex"
+    assert merged.mem_map == {0x3000: 0x11}
+    assert merged.mac_path == (tmp_path / "tags.mac")
+    assert len(merged.mac_records) == 1
+    assert merged.mac_diagnostics == ["ok"]
+
+
+def test_update_mac_view_reuses_cached_model_between_pages(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={0x1000: 0x10},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=[
+            {"parse_ok": True, "name": f"T{i}", "address": 0x1000, "line_number": i + 1, "parse_error": ""}
+            for i in range(150)
+        ],
+    )
+    app.mac_records_page_size = 50
+    calls = {"build": 0}
+
+    class FakeList:
+        def clear(self) -> None:
+            return
+
+        def append(self, _item: object) -> None:
+            return
+
+    fake_list = FakeList()
+
+    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: fake_list if selector == "#mac_records_list" else None)
+    monkeypatch.setattr(app, "update_validation_issues_view", lambda: None)
+    original = app._build_mac_view_cache
+
+    def wrapped() -> None:
+        calls["build"] += 1
+        original()
+
+    monkeypatch.setattr(app, "_build_mac_view_cache", wrapped)
+
+    app.update_mac_view()
+    app.action_mac_records_page_next()
+
+    assert calls["build"] == 1
+
+
 def test_collect_mac_out_of_range_addresses_uses_ranges(tmp_path: Path):
     app = S19TuiApp(base_dir=tmp_path)
     loaded = LoadedFile(
