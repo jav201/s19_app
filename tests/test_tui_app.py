@@ -563,6 +563,225 @@ def test_jump_to_validation_issue_prefers_address(tmp_path: Path, monkeypatch: p
     assert called["mac"] == 0x1000
 
 
+def test_parse_loaded_file_mac_after_s19_preserves_both(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={0x1000: 0x11},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    mac_loaded = LoadedFile(
+        path=tmp_path / "tags.mac",
+        file_type="mac",
+        mem_map={0x2000: 0},
+        row_bases=[0x2000],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_path=tmp_path / "tags.mac",
+        mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x2000}],
+        mac_diagnostics=[],
+    )
+
+    monkeypatch.setattr(app, "_load_mac_file", lambda path, a2l_files=None: mac_loaded)
+
+    merged = app._parse_loaded_file(tmp_path / "tags.mac")
+
+    assert merged is not None
+    assert merged.file_type == "s19"
+    assert merged.mem_map == {0x1000: 0x11}
+    assert merged.ranges == [(0x1000, 0x1001)]
+    assert merged.mac_path == (tmp_path / "tags.mac")
+    assert len(merged.mac_records) == 1
+    assert merged.mac_records[0]["name"] == "RPM"
+
+
+def test_parse_loaded_file_primary_after_mac_keeps_mac_payload(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "tags.mac",
+        file_type="mac",
+        mem_map={0x2000: 0},
+        row_bases=[0x2000],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_path=tmp_path / "tags.mac",
+        mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x2000}],
+        mac_diagnostics=["ok"],
+    )
+
+    primary_loaded = LoadedFile(
+        path=tmp_path / "new.hex",
+        file_type="hex",
+        mem_map={0x3000: 0x11},
+        row_bases=[0x3000],
+        ranges=[(0x3000, 0x3001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    monkeypatch.setattr(
+        "s19_app.tui.app.IntelHexFile",
+        lambda _path: type(
+            "FakeHex",
+            (),
+            {
+                "memory": primary_loaded.mem_map,
+                "get_ranges": lambda self: primary_loaded.ranges,
+                "get_errors": lambda self: [],
+            },
+        )(),
+    )
+    monkeypatch.setattr(
+        "s19_app.tui.app.build_range_validity_hex",
+        lambda _f, _r: primary_loaded.range_validity,
+    )
+
+    merged = app._parse_loaded_file(tmp_path / "new.hex")
+
+    assert merged is not None
+    assert merged.file_type == "hex"
+    assert merged.mem_map == {0x3000: 0x11}
+    assert merged.ranges == [(0x3000, 0x3001)]
+    assert merged.mac_path == (tmp_path / "tags.mac")
+    assert len(merged.mac_records) == 1
+    assert merged.mac_diagnostics == ["ok"]
+
+
+def test_format_coexistence_status_signals_primary_plus_mac(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    loaded = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={},
+        row_bases=[],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_path=tmp_path / "tags.mac",
+        mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x1000}],
+    )
+
+    message = app._format_coexistence_status(loaded, tmp_path / "base.s19")
+    assert "S19+MAC" in message
+    assert "tags.mac" in message
+
+
+def test_format_coexistence_status_primary_only(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    loaded = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={},
+        row_bases=[],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    assert app._format_coexistence_status(loaded, tmp_path / "base.s19") == "Loaded base.s19 (S19 only)"
+
+
+def test_format_coexistence_status_mac_only(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    loaded = LoadedFile(
+        path=tmp_path / "tags.mac",
+        file_type="mac",
+        mem_map={},
+        row_bases=[],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_path=tmp_path / "tags.mac",
+        mac_records=[{"parse_ok": True, "name": "RPM", "address": 0x1000}],
+    )
+
+    assert app._format_coexistence_status(loaded, tmp_path / "tags.mac") == "Loaded tags.mac (MAC only)"
+
+
+def test_get_range_index_caches_and_speeds_up_membership(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    ranges = [(0x1000, 0x1010), (0x2000, 0x2020), (0x3000, 0x3040)]
+    loaded = LoadedFile(
+        path=tmp_path / "x.s19",
+        file_type="s19",
+        mem_map={},
+        row_bases=[],
+        ranges=ranges,
+        range_validity=[True, True, True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    first = app._get_range_index(loaded)
+    second = app._get_range_index(loaded)
+
+    assert first is second
+    assert first[0] == [0x1000, 0x2000, 0x3000]
+    assert first[1] == [0x1010, 0x2020, 0x3040]
+
+
+def test_build_mac_view_cache_scales_under_load(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Perf smoke: 5k MAC records over 2k fragmented ranges must finish under a tight budget."""
+    app = S19TuiApp(base_dir=tmp_path)
+    num_ranges = 2000
+    ranges = [(i * 0x100, i * 0x100 + 0x80) for i in range(num_ranges)]
+    mac_records = [
+        {
+            "parse_ok": True,
+            "name": f"T{i}",
+            "address": i * 0x20,
+            "line_number": i + 1,
+            "parse_error": "",
+        }
+        for i in range(5000)
+    ]
+    app.current_file = LoadedFile(
+        path=tmp_path / "big.s19",
+        file_type="s19",
+        mem_map={},
+        row_bases=[],
+        ranges=ranges,
+        range_validity=[True] * num_ranges,
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=mac_records,
+    )
+
+    import time as _time
+
+    started = _time.perf_counter()
+    app._build_mac_view_cache()
+    elapsed = _time.perf_counter() - started
+
+    # Binary-search lookups make this O((N + R) log R); on any laptop this should finish
+    # well under 2 seconds even without a JIT. Keep the budget generous to avoid flakes.
+    assert elapsed < 2.0, f"_build_mac_view_cache too slow: {elapsed:.3f}s"
+    assert app._mac_view_cache_rows, "cache should populate rows"
+
+
 def test_update_validation_issues_view_empty_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     app = S19TuiApp(base_dir=tmp_path)
     captured: list[object] = []

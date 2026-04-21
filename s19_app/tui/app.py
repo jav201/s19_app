@@ -6,6 +6,7 @@ from pathlib import Path
 import time
 from typing import Any, List, Optional
 
+from textual import work
 from textual.app import App, ComposeResult
 from textual.containers import Container, ScrollableContainer
 from textual.reactive import reactive
@@ -31,10 +32,12 @@ from .a2l import (
     validate_a2l_tags,
 )
 from .hexview import (
+    address_in_sorted_ranges,
     build_mem_map_s19,
     build_range_validity_hex,
     build_range_validity_s19,
     build_row_bases,
+    build_sorted_range_index,
     find_string_in_mem,
     render_hex_view_text,
 )
@@ -1417,7 +1420,31 @@ class S19TuiApp(App):
         # endregion
 
     def load_from_path(self, path: Path) -> None:
-        """Load supported data file into temp and render views."""
+        """
+        Summary:
+            Resolve a user-supplied path, copy the source into the workarea temp folder, and
+            launch an off-thread worker that parses the file and refreshes the UI.
+
+        Args:
+            path (Path): Path entered in the load dialog (relative or absolute).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Validate/resolve the path and check the extension is supported.
+            - Copy into ``workarea/temp`` while keeping the UI responsive.
+            - Dispatch ``_start_load_worker`` so the heavy parse runs off the event loop.
+
+        Dependencies:
+            Uses:
+                - ``resolve_input_path``
+                - ``copy_into_workarea``
+                - ``refresh_files`` / ``set_progress``
+                - ``_start_load_worker``
+            Used by:
+                - ``_load_path_from_user_input`` (load dialog + startup path)
+        """
         normalized = resolve_input_path(path, self.base_dir)
         if not normalized:
             self.set_status(f"File not found: {path}")
@@ -1433,18 +1460,14 @@ class S19TuiApp(App):
         copied = copy_into_workarea(normalized, temp_dir)
         copy_elapsed = time.perf_counter() - copy_started
         self.refresh_files()
-        self.set_progress(50, f"Loading {copied.name}...")
+        self.set_progress(50, f"Parsing {copied.name}...")
         self.logger.info(
             "File copied to temp: path=%s size_bytes=%d copy_seconds=%.3f",
             copied,
             copied.stat().st_size,
             copy_elapsed,
         )
-        self.load_selected_file(copied)
-        self.set_progress(100, f"Loaded {copied.name}")
-
-        if self.current_project:
-            self._sync_loaded_file_to_project()
+        self._start_load_worker(copied)
 
     def load_a2l_from_path(self, path: Path) -> None:
         """Load A2L file into temp, parse it, and update view."""
@@ -2037,23 +2060,113 @@ class S19TuiApp(App):
             mac_diagnostics=diagnostics,
         )
 
+    def _get_range_index(self, loaded: Optional[LoadedFile]) -> tuple[list[int], list[int]]:
+        """
+        Summary:
+            Return a cached sorted (starts, ends) index for a ``LoadedFile``'s ranges, building
+            it lazily on first access so repeated address-in-ranges checks scale at O(log R).
+
+        Args:
+            loaded (Optional[LoadedFile]): Payload whose ranges should be indexed; ``None``
+                yields an empty index.
+
+        Returns:
+            tuple[list[int], list[int]]: Parallel ``(starts, ends)`` lists suitable for
+            ``address_in_sorted_ranges``.
+
+        Data Flow:
+            - Return empty index when ``loaded`` is missing or carries no ranges.
+            - Reuse cached ``loaded.range_index`` when present.
+            - Build and cache via ``build_sorted_range_index`` otherwise.
+
+        Dependencies:
+            Uses:
+                - ``build_sorted_range_index``
+            Used by:
+                - ``_mac_address_in_ranges``
+                - ``_collect_mac_out_of_range_addresses``
+                - ``_build_mac_view_cache``
+        """
+        if loaded is None or not loaded.ranges:
+            return ([], [])
+        cached = getattr(loaded, "range_index", None)
+        if cached is not None:
+            return cached
+        index = build_sorted_range_index(loaded.ranges)
+        try:
+            loaded.range_index = index
+        except Exception:
+            # If LoadedFile was constructed by test code without the new field, fall back
+            # to returning the fresh index without mutating the payload.
+            pass
+        return index
+
     def _mac_address_in_ranges(self, address: int, ranges: list[tuple[int, int]]) -> bool:
-        """Return whether an address belongs to any loaded image section."""
-        for start, end in ranges:
-            if start <= address < end:
-                return True
-        return False
+        """
+        Summary:
+            Test an address against a list of ranges using binary search over a sorted index.
+
+        Args:
+            address (int): Address to check.
+            ranges (list[tuple[int, int]]): Half-open ``(start, end)`` ranges; these are
+                indexed once per call, which keeps the signature stable but is slower than
+                passing a pre-built index via ``_get_range_index``.
+
+        Returns:
+            bool: True when ``address`` falls inside any of the provided ranges.
+
+        Data Flow:
+            - Build a sorted ``(starts, ends)`` index on the fly.
+            - Delegate the actual check to ``address_in_sorted_ranges``.
+
+        Dependencies:
+            Uses:
+                - ``build_sorted_range_index``
+                - ``address_in_sorted_ranges``
+        """
+        if not ranges:
+            return False
+        return address_in_sorted_ranges(address, build_sorted_range_index(ranges))
 
     def _collect_mac_out_of_range_addresses(self, loaded: Optional[LoadedFile]) -> set[int]:
-        """Return parsed MAC addresses that are outside loaded S19/HEX ranges."""
+        """
+        Summary:
+            Collect MAC addresses that fall outside the current primary image's ranges.
+
+        Args:
+            loaded (Optional[LoadedFile]): Active payload; must be an S19/HEX primary for
+                the check to apply.
+
+        Returns:
+            set[int]: Out-of-range MAC addresses.
+
+        Data Flow:
+            - Short-circuit when no primary image is attached.
+            - Resolve the cached sorted range index once via ``_get_range_index``.
+            - Iterate MAC records and test each parsed address against the index.
+
+        Dependencies:
+            Uses:
+                - ``_get_range_index``
+                - ``address_in_sorted_ranges``
+            Used by:
+                - ``update_sections``
+        """
         if not loaded or loaded.file_type not in {"s19", "hex"}:
             return set()
+        range_index = self._get_range_index(loaded)
+        if not range_index[0]:
+            return {
+                int(record["address"])
+                for record in (loaded.mac_records or [])
+                if record.get("parse_ok") and isinstance(record.get("address"), int)
+            }
         out_of_range: set[int] = set()
         for record in loaded.mac_records or []:
             address = record.get("address")
             if not (record.get("parse_ok") and isinstance(address, int)):
                 continue
-            if not self._mac_address_in_ranges(address, loaded.ranges):
+            if not address_in_sorted_ranges(address, range_index):
                 out_of_range.add(address)
         return out_of_range
 
@@ -2205,6 +2318,12 @@ class S19TuiApp(App):
         records = self.current_file.mac_records if self.current_file else []
         has_a2l = bool(self.current_a2l_data)
         a2l_name_index = _build_a2l_name_index(self.current_a2l_data)
+        primary_file = (
+            self.current_file
+            if self.current_file and self.current_file.file_type in {"s19", "hex"}
+            else None
+        )
+        range_index = self._get_range_index(primary_file)
         rows: list[tuple[str, str, str, str, str, str, str, str]] = []
         row_meta: list[dict[str, Any]] = []
         total_verified = 0
@@ -2232,9 +2351,9 @@ class S19TuiApp(App):
                     a2l_match_text = f"{best.get('section', '?')}:{best.get('name', name)}"
             memory_checked = False
             in_memory = None
-            if self.current_file and self.current_file.file_type in {"s19", "hex"} and isinstance(address, int):
+            if primary_file is not None and isinstance(address, int):
                 memory_checked = True
-                in_memory = self._mac_address_in_ranges(address, self.current_file.ranges)
+                in_memory = address_in_sorted_ranges(address, range_index)
             in_mem_text = "n/a"
             if memory_checked:
                 in_mem_text = "yes" if in_memory else "no"
@@ -2319,8 +2438,8 @@ class S19TuiApp(App):
     def load_selected_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> None:
         """
         Summary:
-            Load S19, Intel HEX, or MAC data from disk and refresh all TUI panels that depend
-            on ``current_file`` and optional A2L state.
+            Synchronously load S19, Intel HEX, or MAC data from disk and refresh all TUI panels
+            that depend on ``current_file`` and optional A2L state.
 
         Args:
             path (Path): File to parse (extension selects loader branch).
@@ -2331,111 +2450,199 @@ class S19TuiApp(App):
             None
 
         Data Flow:
+            - Parse the file into a ``LoadedFile`` via ``_parse_loaded_file`` (pure CPU work).
+            - On parse error, surface the error through ``set_status`` and abort.
+            - On unsupported extension, return with a status message.
+            - Otherwise apply the payload to reactive state and refresh views via
+              ``_apply_loaded_file``.
+
+        Dependencies:
+            Uses:
+                - ``_parse_loaded_file``
+                - ``_apply_loaded_file``
+            Used by:
+                - ``load_from_path`` fallback path
+                - project load handler (``_handle_load_project``)
+                - workarea file list selection
+                - unit tests that drive the synchronous pipeline directly
+        """
+        load_started = time.perf_counter()
+        try:
+            loaded = self._parse_loaded_file(path, a2l_files)
+        except Exception as exc:
+            self.set_status(f"Load failed: {exc}")
+            self.logger.exception(
+                "Load failed for path=%s suffix=%s project=%s",
+                path,
+                path.suffix.lower(),
+                self.current_project,
+            )
+            return
+        if loaded is None:
+            suffix = path.suffix.lower()
+            self.set_status(f"Unsupported file type: {suffix}")
+            self.logger.warning("Unsupported file type in loader: %s", suffix)
+            return
+        self._apply_loaded_file(loaded, path, load_started)
+
+    def _parse_loaded_file(
+        self, path: Path, a2l_files: Optional[list[Path]] = None
+    ) -> Optional[LoadedFile]:
+        """
+        Summary:
+            Parse an S19/HEX/MAC file into a ``LoadedFile`` payload without touching UI state.
+
+        Args:
+            path (Path): File to parse (extension selects loader branch).
+            a2l_files (Optional[list[Path]]): Optional A2L paths when loading from a project
+                directory (first file used).
+
+        Returns:
+            Optional[LoadedFile]: Parsed and merged payload ready for application, or ``None``
+            when the suffix is unsupported.
+
+        Raises:
+            Exception: Propagates any parsing exception; callers must handle or log.
+
+        Data Flow:
             - Dispatch on suffix to S19, HEX, or MAC construction of ``LoadedFile``.
-            - Assign ``current_file`` and sync global A2L fields when payload includes them.
-            - Refresh sections, hex views, MAC table, A2L views, and status labels.
+            - For primary (S19/HEX) images, merge any existing MAC payload via
+              ``_merge_primary_with_existing_mac``.
+            - For MAC files, overlay on existing primary via ``_merge_mac_with_existing_primary``.
+            - Log loader-specific summaries.
 
         Dependencies:
             Uses:
                 - ``S19File`` / ``IntelHexFile`` / ``_load_mac_file``
                 - ``build_mem_map_s19``, ``build_row_bases``, range validity builders
-                - ``parse_a2l_file``
+                - ``_load_a2l_data_with_cache``
+                - ``_merge_primary_with_existing_mac`` / ``_merge_mac_with_existing_primary``
             Used by:
-                - ``load_from_path``, project load handler, workarea file list selection
+                - ``load_selected_file`` (synchronous path)
+                - ``_start_load_worker`` (threaded path)
         """
         suffix = path.suffix.lower()
-        try:
-            load_started = time.perf_counter()
-            self.logger.info("Loading file: path=%s suffix=%s project=%s", path, suffix, self.current_project)
-            if suffix in S19_EXTENSIONS:
-                s19 = S19File(str(path))
-                mem_map = build_mem_map_s19(s19)
-                row_bases = build_row_bases(mem_map)
-                ranges = s19._get_memory_ranges()
-                range_validity = build_range_validity_s19(s19, ranges)
-                errors = s19.get_errors()
-                a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
-                a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
-                loaded = LoadedFile(
-                    path=path,
-                    file_type="s19",
-                    mem_map=mem_map,
-                    row_bases=row_bases,
-                    ranges=ranges,
-                    range_validity=range_validity,
-                    errors=errors,
-                    a2l_path=a2l_path,
-                    a2l_data=a2l_data,
-                    mac_path=None,
-                    mac_records=[],
-                    mac_diagnostics=[],
-                )
-                loaded = self._merge_primary_with_existing_mac(loaded)
+        self.logger.info(
+            "Loading file: path=%s suffix=%s project=%s",
+            path,
+            suffix,
+            self.current_project,
+        )
+        if suffix in S19_EXTENSIONS:
+            s19 = S19File(str(path))
+            mem_map = build_mem_map_s19(s19)
+            row_bases = build_row_bases(mem_map)
+            ranges = s19._get_memory_ranges()
+            range_validity = build_range_validity_s19(s19, ranges)
+            errors = s19.get_errors()
+            a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
+            a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
+            loaded = LoadedFile(
+                path=path,
+                file_type="s19",
+                mem_map=mem_map,
+                row_bases=row_bases,
+                ranges=ranges,
+                range_validity=range_validity,
+                errors=errors,
+                a2l_path=a2l_path,
+                a2l_data=a2l_data,
+                mac_path=None,
+                mac_records=[],
+                mac_diagnostics=[],
+            )
+            loaded = self._merge_primary_with_existing_mac(loaded)
+            self._log_loaded_file_summary(
+                file_type="s19",
+                path=path,
+                mem_map=mem_map,
+                ranges=ranges,
+                errors=errors,
+            )
+            return loaded
+        if suffix in HEX_EXTENSIONS:
+            hex_file = IntelHexFile(str(path))
+            mem_map = dict(hex_file.memory)
+            row_bases = build_row_bases(mem_map)
+            ranges = hex_file.get_ranges()
+            range_validity = build_range_validity_hex(hex_file, ranges)
+            errors = hex_file.get_errors()
+            a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
+            a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
+            loaded = LoadedFile(
+                path=path,
+                file_type="hex",
+                mem_map=mem_map,
+                row_bases=row_bases,
+                ranges=ranges,
+                range_validity=range_validity,
+                errors=errors,
+                a2l_path=a2l_path,
+                a2l_data=a2l_data,
+                mac_path=None,
+                mac_records=[],
+                mac_diagnostics=[],
+            )
+            loaded = self._merge_primary_with_existing_mac(loaded)
+            self._log_loaded_file_summary(
+                file_type="hex",
+                path=path,
+                mem_map=mem_map,
+                ranges=ranges,
+                errors=errors,
+            )
+            return loaded
+        if suffix in MAC_EXTENSIONS:
+            mac_loaded = self._load_mac_file(path, a2l_files)
+            loaded = self._merge_mac_with_existing_primary(mac_loaded)
+            if loaded.file_type in {"s19", "hex"}:
                 self._log_loaded_file_summary(
-                    file_type="s19",
+                    file_type=f"{loaded.file_type}+mac",
                     path=path,
-                    mem_map=mem_map,
-                    ranges=ranges,
-                    errors=errors,
+                    mem_map=loaded.mem_map,
+                    ranges=loaded.ranges,
+                    errors=loaded.errors,
                 )
-            elif suffix in HEX_EXTENSIONS:
-                hex_file = IntelHexFile(str(path))
-                mem_map = dict(hex_file.memory)
-                row_bases = build_row_bases(mem_map)
-                ranges = hex_file.get_ranges()
-                range_validity = build_range_validity_hex(hex_file, ranges)
-                errors = hex_file.get_errors()
-                a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
-                a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
-                loaded = LoadedFile(
-                    path=path,
-                    file_type="hex",
-                    mem_map=mem_map,
-                    row_bases=row_bases,
-                    ranges=ranges,
-                    range_validity=range_validity,
-                    errors=errors,
-                    a2l_path=a2l_path,
-                    a2l_data=a2l_data,
-                    mac_path=None,
-                    mac_records=[],
-                    mac_diagnostics=[],
-                )
-                loaded = self._merge_primary_with_existing_mac(loaded)
-                self._log_loaded_file_summary(
-                    file_type="hex",
-                    path=path,
-                    mem_map=mem_map,
-                    ranges=ranges,
-                    errors=errors,
-                )
-            elif suffix in MAC_EXTENSIONS:
-                mac_loaded = self._load_mac_file(path, a2l_files)
-                loaded = self._merge_mac_with_existing_primary(mac_loaded)
-                if loaded.file_type in {"s19", "hex"}:
-                    self._log_loaded_file_summary(
-                        file_type=f"{loaded.file_type}+mac",
-                        path=path,
-                        mem_map=loaded.mem_map,
-                        ranges=loaded.ranges,
-                        errors=loaded.errors,
-                    )
-                else:
-                    self._log_loaded_file_summary(
-                        file_type="mac",
-                        path=path,
-                        mem_map=loaded.mem_map,
-                        ranges=loaded.ranges,
-                        errors=loaded.errors,
-                    )
             else:
-                self.set_status(f"Unsupported file type: {suffix}")
-                self.logger.warning("Unsupported file type in loader: %s", suffix)
-                return
-        except Exception as exc:
-            self.set_status(f"Load failed: {exc}")
-            self.logger.exception("Load failed for path=%s suffix=%s project=%s", path, suffix, self.current_project)
-            return
+                self._log_loaded_file_summary(
+                    file_type="mac",
+                    path=path,
+                    mem_map=loaded.mem_map,
+                    ranges=loaded.ranges,
+                    errors=loaded.errors,
+                )
+            return loaded
+        return None
+
+    def _apply_loaded_file(self, loaded: LoadedFile, path: Path, load_started: float) -> None:
+        """
+        Summary:
+            Attach a parsed ``LoadedFile`` to reactive state and refresh every dependent UI panel.
+
+        Args:
+            loaded (LoadedFile): Parsed payload from ``_parse_loaded_file``.
+            path (Path): Source path used for status messaging and log lines.
+            load_started (float): ``time.perf_counter`` value captured at pipeline start.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Mutate ``current_file``, invalidate MAC view cache, reset paging anchors.
+            - Sync A2L path/data onto the app when the loaded payload carries them.
+            - Refresh sections, hex views, MAC table, A2L view, and project labels.
+            - Update status/progress widgets and append a coexistence-aware log line.
+
+        Dependencies:
+            Uses:
+                - ``_invalidate_mac_view_cache``
+                - ``update_sections`` / ``update_hex_view`` / ``update_alt_hex_view`` /
+                  ``update_mac_hex_view`` / ``update_a2l_view`` / ``update_project_labels``
+                - ``set_file_status`` / ``_append_log_line`` / ``set_progress``
+            Used by:
+                - ``load_selected_file`` (synchronous path)
+                - ``_start_load_worker`` via ``call_from_thread`` (threaded path)
+        """
         self.current_file = loaded
         self._invalidate_mac_view_cache()
         self._mac_window_start = 0
@@ -2449,10 +2656,127 @@ class S19TuiApp(App):
         self.update_mac_hex_view()
         self.update_a2l_view()
         self.update_project_labels()
-        self.set_file_status(f"Loaded {path.name}")
-        self._append_log_line(f"Loaded {path.name}")
+        status_message = self._format_coexistence_status(loaded, path)
+        self.set_file_status(status_message)
+        self._append_log_line(status_message)
         total_elapsed = time.perf_counter() - load_started
-        self.logger.info("Loaded file successfully: path=%s elapsed_seconds=%.3f", path, total_elapsed)
+        self.logger.info(
+            "Loaded file successfully: path=%s file_type=%s elapsed_seconds=%.3f has_mac=%s",
+            path,
+            loaded.file_type,
+            total_elapsed,
+            bool(loaded.mac_records),
+        )
+
+    def _format_coexistence_status(self, loaded: LoadedFile, path: Path) -> str:
+        """
+        Summary:
+            Compose a short status line that reflects whether S19/HEX and MAC coexist.
+
+        Args:
+            loaded (LoadedFile): Payload about to be rendered.
+            path (Path): Current source file used for the human-readable name.
+
+        Returns:
+            str: Status text for the file-status label, activity log, and progress bar.
+
+        Data Flow:
+            - Classify the loaded payload as primary-only, MAC-only, or primary+MAC.
+            - Include the source file name and, when available, an attached MAC name.
+
+        Dependencies:
+            Used by:
+                - ``_apply_loaded_file``
+        """
+        if loaded.file_type in {"s19", "hex"} and loaded.mac_records:
+            if loaded.mac_path and loaded.mac_path != path:
+                return (
+                    f"Loaded {path.name} ({loaded.file_type.upper()}+MAC: "
+                    f"{loaded.mac_path.name})"
+                )
+            return f"Loaded {path.name} ({loaded.file_type.upper()}+MAC)"
+        if loaded.file_type in {"s19", "hex"}:
+            return f"Loaded {path.name} ({loaded.file_type.upper()} only)"
+        if loaded.file_type == "mac":
+            return f"Loaded {path.name} (MAC only)"
+        return f"Loaded {path.name}"
+
+    @work(thread=True, exclusive=True, group="load")
+    def _start_load_worker(
+        self, path: Path, a2l_files: Optional[list[Path]] = None
+    ) -> None:
+        """
+        Summary:
+            Off-thread worker that parses a file and schedules UI refresh on the main thread.
+
+        Args:
+            path (Path): Already-copied workarea file to parse.
+            a2l_files (Optional[list[Path]]): Optional A2L paths from project load.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Run ``_parse_loaded_file`` in the worker thread (no UI widget access).
+            - On success, dispatch ``_apply_loaded_file`` via ``call_from_thread``.
+            - On unsupported suffix or exception, dispatch ``_handle_load_error``.
+
+        Dependencies:
+            Uses:
+                - ``_parse_loaded_file``
+                - ``call_from_thread``
+                - ``_apply_loaded_file`` / ``_handle_load_error``
+            Used by:
+                - ``load_from_path`` (load dialog and startup path)
+        """
+        load_started = time.perf_counter()
+        try:
+            loaded = self._parse_loaded_file(path, a2l_files)
+        except Exception as exc:
+            self.call_from_thread(self._handle_load_error, path, exc)
+            return
+        if loaded is None:
+            suffix = path.suffix.lower()
+            self.call_from_thread(
+                self._handle_load_error,
+                path,
+                ValueError(f"Unsupported file type: {suffix}"),
+            )
+            return
+        self.call_from_thread(self._apply_loaded_file, loaded, path, load_started)
+        self.call_from_thread(self.set_progress, 100, f"Loaded {path.name}")
+        if self.current_project:
+            self.call_from_thread(self._sync_loaded_file_to_project)
+
+    def _handle_load_error(self, path: Path, exc: Exception) -> None:
+        """
+        Summary:
+            UI-thread handler for load-worker failures: update status/progress and log.
+
+        Args:
+            path (Path): Source path that failed to load.
+            exc (Exception): Exception raised during parsing.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Log the failure with full context.
+            - Update status line and progress bar so the user sees the error.
+
+        Dependencies:
+            Used by:
+                - ``_start_load_worker``
+        """
+        self.logger.error(
+            "Load failed for path=%s suffix=%s project=%s: %s",
+            path,
+            path.suffix.lower(),
+            self.current_project,
+            exc,
+        )
+        self.set_status(f"Load failed: {exc}")
+        self.set_progress(100, "Load failed")
 
     def _load_a2l_data_with_cache(self, path: Optional[Path]) -> Optional[dict[str, Any]]:
         """

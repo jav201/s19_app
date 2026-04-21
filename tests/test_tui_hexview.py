@@ -2,10 +2,13 @@ from types import SimpleNamespace
 
 from s19_app.tui.hexview import (
     _collect_hex_rows,
+    address_in_sorted_ranges,
     build_mem_map_s19,
     build_range_validity_hex,
     build_range_validity_s19,
     build_row_bases,
+    build_sorted_range_index,
+    range_in_sorted_ranges,
     render_hex_view_text,
 )
 
@@ -74,3 +77,88 @@ def test_render_hex_view_text_highlights_match_range():
     assert "0x00001000" in text.plain
     assert "|ABC" in text.plain
     assert any("bold yellow" in str(span.style) for span in text.spans)
+
+
+def test_build_sorted_range_index_empty_returns_empty_pair():
+    assert build_sorted_range_index([]) == ([], [])
+
+
+def test_build_sorted_range_index_sorts_by_start():
+    starts, ends = build_sorted_range_index([(0x2000, 0x2010), (0x1000, 0x1010)])
+
+    assert starts == [0x1000, 0x2000]
+    assert ends == [0x1010, 0x2010]
+
+
+def test_address_in_sorted_ranges_boundary_cases():
+    index = build_sorted_range_index([(0x1000, 0x1010), (0x2000, 0x2020)])
+
+    assert address_in_sorted_ranges(0x0FFF, index) is False
+    assert address_in_sorted_ranges(0x1000, index) is True
+    assert address_in_sorted_ranges(0x100F, index) is True
+    assert address_in_sorted_ranges(0x1010, index) is False
+    assert address_in_sorted_ranges(0x1800, index) is False
+    assert address_in_sorted_ranges(0x2000, index) is True
+    assert address_in_sorted_ranges(0x201F, index) is True
+    assert address_in_sorted_ranges(0x2020, index) is False
+
+
+def test_address_in_sorted_ranges_empty_index_is_false():
+    assert address_in_sorted_ranges(0x1000, ([], [])) is False
+
+
+def test_address_in_sorted_ranges_single_range():
+    index = build_sorted_range_index([(0x4000, 0x4004)])
+
+    assert address_in_sorted_ranges(0x3FFF, index) is False
+    assert address_in_sorted_ranges(0x4003, index) is True
+    assert address_in_sorted_ranges(0x4004, index) is False
+
+
+def test_range_in_sorted_ranges_span_containment():
+    index = build_sorted_range_index([(0x1000, 0x1010), (0x2000, 0x2020)])
+
+    assert range_in_sorted_ranges(0x1000, 0x10, index) is True
+    assert range_in_sorted_ranges(0x1000, 0x11, index) is False
+    assert range_in_sorted_ranges(0x100F, 0x01, index) is True
+    assert range_in_sorted_ranges(0x100F, 0x02, index) is False
+    assert range_in_sorted_ranges(0x1FFF, 0x21, index) is False
+    assert range_in_sorted_ranges(0x2000, 0, index) is False
+    assert range_in_sorted_ranges(0x2000, -1, index) is False
+
+
+def test_collect_hex_rows_reuses_row_bases_when_no_extras():
+    mem_map = {0x1000 + i: 0x41 for i in range(32)}
+    row_bases = build_row_bases(mem_map)
+    sentinel = [*row_bases]
+
+    lines, rows = _collect_hex_rows(mem_map, row_bases=row_bases, extra_addresses=None)
+
+    assert rows[0][0] == 0x1000
+    assert row_bases == sentinel
+
+
+def test_collect_hex_rows_fast_path_when_extras_already_covered():
+    mem_map = {0x1000 + i: 0x41 for i in range(32)}
+    row_bases = build_row_bases(mem_map)
+
+    lines, rows = _collect_hex_rows(
+        mem_map,
+        row_bases=row_bases,
+        extra_addresses={0x1005, 0x1011},
+    )
+
+    assert [addr for addr, _ in rows] == [0x1000, 0x1010]
+
+
+def test_collect_hex_rows_adds_new_bases_when_extras_outside_row_bases():
+    mem_map = {0x1000 + i: 0x41 for i in range(16)}
+    row_bases = build_row_bases(mem_map)
+
+    lines, rows = _collect_hex_rows(
+        mem_map,
+        row_bases=row_bases,
+        extra_addresses={0x2005},
+    )
+
+    assert [addr for addr, _ in rows] == [0x1000, 0x2000]

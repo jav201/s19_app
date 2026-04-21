@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from typing import Dict, List, Optional, Tuple
 
 from rich.text import Text
@@ -14,6 +15,110 @@ HEX_WIDTH = 16
 FOCUS_CONTEXT_ROWS = 64
 MAX_HEX_ROWS = 512
 SEARCH_ENCODING = "ascii"
+
+RangeIndex = Tuple[List[int], List[int]]
+
+
+def build_sorted_range_index(ranges: List[Tuple[int, int]]) -> RangeIndex:
+    """
+    Summary:
+        Precompute a sorted (starts, ends) index so repeated address-in-ranges checks can
+        use binary search instead of scanning all ranges.
+
+    Args:
+        ranges (List[Tuple[int, int]]): Half-open ``(start, end)`` address ranges, possibly
+            unsorted and possibly overlapping.
+
+    Returns:
+        RangeIndex: Two parallel lists ``(starts, ends)``, both sorted by ``start``.
+
+    Data Flow:
+        - Sort a shallow copy of the input by ``start``.
+        - Split into two parallel lists kept aligned by index.
+
+    Dependencies:
+        Used by:
+            - ``address_in_sorted_ranges``
+            - ``S19TuiApp`` MAC/A2L address membership checks
+            - ``s19_app.validation.engine`` cross-artifact validation
+    """
+    if not ranges:
+        return ([], [])
+    sorted_ranges = sorted(ranges, key=lambda item: item[0])
+    starts = [start for start, _ in sorted_ranges]
+    ends = [end for _, end in sorted_ranges]
+    return starts, ends
+
+
+def address_in_sorted_ranges(addr: int, index: RangeIndex) -> bool:
+    """
+    Summary:
+        Test whether ``addr`` falls inside any half-open range described by ``index``.
+
+    Args:
+        addr (int): Address to test.
+        index (RangeIndex): Output of ``build_sorted_range_index``.
+
+    Returns:
+        bool: True when ``starts[i] <= addr < ends[i]`` for some ``i``.
+
+    Data Flow:
+        - Use ``bisect_right`` on ``starts`` to find the rightmost candidate range whose
+          start is ``<= addr``.
+        - Confirm the candidate is valid and that ``addr`` lies below its end.
+
+    Dependencies:
+        Uses:
+            - ``bisect.bisect_right``
+        Used by:
+            - ``S19TuiApp._mac_address_in_ranges``
+            - ``S19TuiApp._collect_mac_out_of_range_addresses``
+            - ``S19TuiApp._build_mac_view_cache``
+            - ``s19_app.validation.engine.validate_artifact_consistency``
+    """
+    starts, ends = index
+    if not starts:
+        return False
+    candidate = bisect.bisect_right(starts, addr) - 1
+    if candidate < 0:
+        return False
+    return addr < ends[candidate]
+
+
+def range_in_sorted_ranges(addr: int, length: int, index: RangeIndex) -> bool:
+    """
+    Summary:
+        Test whether a contiguous span ``[addr, addr + length)`` fits entirely inside a single
+        range of ``index`` (no spanning across gaps).
+
+    Args:
+        addr (int): Span start address.
+        length (int): Positive length in bytes.
+        index (RangeIndex): Output of ``build_sorted_range_index``.
+
+    Returns:
+        bool: True when one indexed range fully covers the span.
+
+    Data Flow:
+        - Reject zero/negative lengths (matches legacy semantics).
+        - Binary search for the candidate range whose start is ``<= addr``.
+        - Confirm ``addr + length`` does not exceed that range's end.
+
+    Dependencies:
+        Uses:
+            - ``bisect.bisect_right``
+        Used by:
+            - ``s19_app.validation.engine.validate_artifact_consistency``
+    """
+    if length <= 0:
+        return False
+    starts, ends = index
+    if not starts:
+        return False
+    candidate = bisect.bisect_right(starts, addr) - 1
+    if candidate < 0:
+        return False
+    return addr >= starts[candidate] and (addr + length) <= ends[candidate]
 
 
 def build_mem_map_s19(s19: S19File) -> Dict[int, int]:
@@ -108,10 +213,19 @@ def _collect_hex_rows(
     max_rows: Optional[int] = None,
     start_row_index: Optional[int] = None,
 ) -> tuple[List[str], List[Tuple[int, List[Optional[int]]]]]:
-    base_set = set(row_bases or build_row_bases(mem_map))
-    for addr in extra_addresses or set():
-        base_set.add(addr - (addr % HEX_WIDTH))
-    bases = sorted(base_set)
+    base_row_bases = row_bases if row_bases is not None else build_row_bases(mem_map)
+    extra = extra_addresses or set()
+    if not extra:
+        # Hot path: no extra bases to splice in, so reuse the pre-sorted row_bases as-is.
+        # This avoids rebuilding a set of millions of addresses on every hex-view refresh.
+        bases: List[int] = base_row_bases if isinstance(base_row_bases, list) else list(base_row_bases)
+    else:
+        extra_bases = {addr - (addr % HEX_WIDTH) for addr in extra}
+        existing = set(base_row_bases)
+        if extra_bases.issubset(existing):
+            bases = base_row_bases if isinstance(base_row_bases, list) else list(base_row_bases)
+        else:
+            bases = sorted(existing | extra_bases)
     if not bases:
         return ["No data available."], []
 
@@ -124,8 +238,8 @@ def _collect_hex_rows(
         start_index = max(0, min(start_row_index, max(0, len(bases) - 1)))
     elif focus_address is not None:
         focus_base = focus_address - (focus_address % HEX_WIDTH)
-        if focus_base in bases:
-            focus_index = bases.index(focus_base)
+        focus_index = bisect.bisect_left(bases, focus_base)
+        if focus_index < len(bases) and bases[focus_index] == focus_base:
             start_index = max(0, focus_index - FOCUS_CONTEXT_ROWS)
         else:
             lines.append(f"... address 0x{focus_address:08X} not present ...")

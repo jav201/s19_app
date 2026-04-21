@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from dataclasses import dataclass
 from typing import Optional
 
@@ -13,21 +14,60 @@ class ValidationReport:
     coverage: CoverageMetrics
 
 
-def _address_in_ranges(address: int, ranges: list[tuple[int, int]]) -> bool:
-    for start, end in ranges:
-        if start <= address < end:
-            return True
-    return False
+def _build_range_index(
+    ranges: list[tuple[int, int]],
+) -> tuple[list[int], list[int]]:
+    """
+    Summary:
+        Build a sorted parallel ``(starts, ends)`` index so address membership checks
+        can be answered in ``O(log R)`` rather than ``O(R)`` per record.
+
+    Args:
+        ranges (list[tuple[int, int]]): Half-open ``(start, end)`` ranges.
+
+    Returns:
+        tuple[list[int], list[int]]: Parallel lists sorted by ``start``.
+
+    Data Flow:
+        - Sort a shallow copy of ``ranges`` by start address.
+        - Split into two aligned lists for binary search.
+
+    Dependencies:
+        Used by:
+            - ``validate_artifact_consistency``
+    """
+    if not ranges:
+        return ([], [])
+    sorted_ranges = sorted(ranges, key=lambda item: item[0])
+    starts = [start for start, _ in sorted_ranges]
+    ends = [end for _, end in sorted_ranges]
+    return starts, ends
 
 
-def _range_in_ranges(address: int, length: int, ranges: list[tuple[int, int]]) -> bool:
+def _address_in_ranges(address: int, index: tuple[list[int], list[int]]) -> bool:
+    """Binary-search membership test: ``starts[i] <= address < ends[i]``."""
+    starts, ends = index
+    if not starts:
+        return False
+    candidate = bisect.bisect_right(starts, address) - 1
+    if candidate < 0:
+        return False
+    return address < ends[candidate]
+
+
+def _range_in_ranges(
+    address: int, length: int, index: tuple[list[int], list[int]]
+) -> bool:
+    """Binary-search span-containment test preserving the ``length <= 0`` guard."""
     if length <= 0:
         return False
-    end_address = address + length
-    for start, end in ranges:
-        if start <= address and end_address <= end:
-            return True
-    return False
+    starts, ends = index
+    if not starts:
+        return False
+    candidate = bisect.bisect_right(starts, address) - 1
+    if candidate < 0:
+        return False
+    return address >= starts[candidate] and (address + length) <= ends[candidate]
 
 
 def validate_artifact_consistency(
@@ -69,6 +109,7 @@ def validate_artifact_consistency(
     """
 
     overlap_set = overlapped_addresses or set()
+    range_index = _build_range_index(s19_ranges)
     issues: list[ValidationIssue] = []
     issues.extend(validate_mac_records(mac_records, alias_policy=alias_policy))
     if a2l_data is not None:
@@ -86,7 +127,7 @@ def validate_artifact_consistency(
         if name:
             mac_by_name[name.lower()] = record
         metrics.mac_total += 1
-        if _address_in_ranges(addr, s19_ranges):
+        if _address_in_ranges(addr, range_index):
             metrics.mac_in_s19 += 1
         else:
             issues.append(
@@ -124,7 +165,7 @@ def validate_artifact_consistency(
             a2l_by_name[name.lower()] = tag
         metrics.a2l_total += 1
         byte_len = int(length) if isinstance(length, int) else 1
-        if _range_in_ranges(addr, max(1, byte_len), s19_ranges):
+        if _range_in_ranges(addr, max(1, byte_len), range_index):
             metrics.a2l_in_s19 += 1
         else:
             issues.append(
