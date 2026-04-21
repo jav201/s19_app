@@ -162,3 +162,92 @@ def test_collect_hex_rows_adds_new_bases_when_extras_outside_row_bases():
     )
 
     assert [addr for addr, _ in rows] == [0x1000, 0x2000]
+
+
+def test_collect_hex_rows_uses_row_bases_set_without_rebuilding():
+    """When extras are covered, the caller-provided membership set must drive the fast path even when ``row_bases`` is not a set."""
+    import s19_app.tui.hexview as hexview
+
+    mem_map = {0x1000 + i: 0x41 for i in range(32)}
+    row_bases = build_row_bases(mem_map)
+
+    real_set = set
+    call_count = {"n": 0}
+
+    def _tracking_set(*args, **kwargs):
+        call_count["n"] += 1
+        return real_set(*args, **kwargs)
+
+    original_set = hexview.__builtins__["set"] if isinstance(hexview.__builtins__, dict) else set  # noqa: F841
+    try:
+        hexview.set = _tracking_set  # type: ignore[attr-defined]
+        lines, rows = _collect_hex_rows(
+            mem_map,
+            row_bases=row_bases,
+            extra_addresses={0x1005, 0x1011},
+            row_bases_set=frozenset(row_bases),
+        )
+    finally:
+        if hasattr(hexview, "set"):
+            delattr(hexview, "set")
+
+    assert [addr for addr, _ in rows] == row_bases
+    # The fast path uses ``row_bases_set`` directly without constructing a new ``set(base_row_bases)``.
+    assert call_count["n"] == 0
+
+
+def test_collect_hex_rows_without_row_bases_set_still_rebuilds():
+    """Without ``row_bases_set``, ``set(base_row_bases)`` is constructed as before (regression guard)."""
+    import s19_app.tui.hexview as hexview
+
+    mem_map = {0x1000 + i: 0x41 for i in range(32)}
+    row_bases = build_row_bases(mem_map)
+
+    real_set = set
+    call_count = {"n": 0}
+
+    def _tracking_set(*args, **kwargs):
+        call_count["n"] += 1
+        return real_set(*args, **kwargs)
+
+    try:
+        hexview.set = _tracking_set  # type: ignore[attr-defined]
+        _collect_hex_rows(mem_map, row_bases=row_bases, extra_addresses={0x1005, 0x1011})
+    finally:
+        if hasattr(hexview, "set"):
+            delattr(hexview, "set")
+
+    # Without an injected membership set, the legacy fast path rebuilds one per call.
+    assert call_count["n"] >= 1
+
+
+def test_collect_hex_rows_row_bases_set_merges_when_extras_outside():
+    """If extras fall outside row_bases_set, the union is computed from provided bases."""
+    mem_map = {0x1000 + i: 0x41 for i in range(16)}
+    row_bases = build_row_bases(mem_map)
+    injected = frozenset(row_bases)
+
+    lines, rows = _collect_hex_rows(
+        mem_map,
+        row_bases=row_bases,
+        extra_addresses={0x2005},
+        row_bases_set=injected,
+    )
+
+    assert [addr for addr, _ in rows] == [0x1000, 0x2000]
+
+
+def test_render_hex_view_text_accepts_row_bases_set():
+    """``render_hex_view_text`` forwards ``row_bases_set`` into ``_collect_hex_rows``."""
+    mem_map = {0x1000 + i: 0x41 for i in range(16)}
+    row_bases = build_row_bases(mem_map)
+    text = render_hex_view_text(
+        mem_map,
+        focus_address=None,
+        row_bases=row_bases,
+        highlight=None,
+        mac_highlight_addresses={0x1005},
+        row_bases_set=frozenset(row_bases),
+    )
+    rendered = text.plain
+    assert "0x00001000" in rendered

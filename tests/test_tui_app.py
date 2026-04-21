@@ -797,3 +797,239 @@ def test_update_validation_issues_view_empty_state(tmp_path: Path, monkeypatch: 
     app._validation_issues = []
     app.update_validation_issues_view()
     assert len(captured) == 1
+
+
+def _make_validation_issues(n: int) -> list[ValidationIssue]:
+    """Build ``n`` synthetic validation issues for paging tests."""
+    issues: list[ValidationIssue] = []
+    for i in range(n):
+        severity = ValidationSeverity.ERROR if i % 3 == 0 else ValidationSeverity.WARNING
+        issues.append(
+            ValidationIssue(
+                code=f"CODE_{i}",
+                severity=severity,
+                message=f"issue {i}",
+                artifact="mac",
+                symbol=f"sym{i}",
+                address=0x1000 + i,
+                line_number=i + 1,
+            )
+        )
+    return issues
+
+
+def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """With thousands of issues, the panel must render at most one page-sized slice plus header lines."""
+    app = S19TuiApp(base_dir=tmp_path)
+    captured: list[object] = []
+
+    class FakeList:
+        def clear(self) -> None:
+            captured.clear()
+
+        def append(self, item: object) -> None:
+            captured.append(item)
+
+    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#validation_issues_list" else None)
+    total = 5000
+    app._validation_issues = _make_validation_issues(total)
+    app.validation_issues_page_size = 150
+    app._validation_issues_window_start = 0
+
+    app.update_validation_issues_view()
+
+    # 1 summary line + 1 page indicator + up to page_size issue rows.
+    assert 2 < len(captured) <= 2 + 150
+    assert len(captured) == 2 + 150
+
+
+def test_validation_issues_paging_actions_advance_window(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    renders: list[int] = []
+
+    class FakeList:
+        def clear(self) -> None:
+            return
+
+        def append(self, _item: object) -> None:
+            return
+
+    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#validation_issues_list" else None)
+    app._validation_issues = _make_validation_issues(450)
+    app.validation_issues_page_size = 100
+    app._validation_issues_window_start = 0
+
+    original = app.update_validation_issues_view
+
+    def wrapped() -> None:
+        renders.append(app._validation_issues_window_start)
+        original()
+
+    monkeypatch.setattr(app, "update_validation_issues_view", wrapped)
+
+    app.action_validation_issues_page_next()
+    app.action_validation_issues_page_next()
+    app.action_validation_issues_page_prev()
+
+    assert renders == [100, 200, 100]
+    # Advance past the end should clamp.
+    app._validation_issues_window_start = 400
+    app.action_validation_issues_page_next()
+    assert app._validation_issues_window_start == 400
+
+
+def test_compute_mac_view_payload_matches_build_cache(tmp_path: Path):
+    """``_compute_mac_view_payload`` returns the same rows/summary as ``_build_mac_view_cache``."""
+    app = S19TuiApp(base_dir=tmp_path)
+    loaded = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={0x1000 + i: 0x11 for i in range(0x20)},
+        row_bases=[0x1000, 0x1010],
+        ranges=[(0x1000, 0x1020)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=[
+            {"parse_ok": True, "name": "RPM", "address": 0x1000, "line_number": 1, "parse_error": ""},
+            {"parse_ok": True, "name": "TEMP", "address": 0x5000, "line_number": 2, "parse_error": ""},
+            {"parse_ok": False, "name": "BAD", "address": None, "line_number": 3, "parse_error": "x"},
+        ],
+    )
+
+    payload = app._compute_mac_view_payload(loaded, None)
+
+    app.current_file = loaded
+    app.current_a2l_data = None
+    app._build_mac_view_cache()
+
+    assert payload["rows"] == app._mac_view_cache_rows
+    assert payload["meta"] == app._mac_view_cache_meta
+    assert payload["summary"] == app._mac_view_cache_summary
+    assert payload["coverage_line"] == app._mac_view_cache_coverage_line
+    assert len(payload["issues"]) == len(app._validation_issues)
+
+
+def test_prepare_load_payload_fills_bases_highlights_and_cache_key(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    loaded = LoadedFile(
+        path=tmp_path / "base.s19",
+        file_type="s19",
+        mem_map={0x1000 + i: 0x11 for i in range(0x20)},
+        row_bases=[0x1000, 0x1010],
+        ranges=[(0x1000, 0x1020)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=[
+            {"parse_ok": True, "name": "RPM", "address": 0x1008, "line_number": 1, "parse_error": ""},
+            {"parse_ok": True, "name": "OOR", "address": 0x5000, "line_number": 2, "parse_error": ""},
+        ],
+    )
+
+    prepared = app._prepare_load_payload(loaded)
+
+    assert prepared.precomputed is True
+    assert 0x1008 in prepared.mac_highlights
+    assert 0x5000 in prepared.mac_highlights
+    assert prepared.mac_out_of_range == [0x5000]
+    assert prepared.bases_set == frozenset({0x1000, 0x1010})
+    assert prepared.mac_cache_key is not None
+    assert prepared.mac_cache_key[1] == 2  # len(records)
+    assert prepared.mac_rows, "rows populated"
+
+
+def test_update_sections_caps_mac_out_of_range(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from s19_app.tui import app as app_module
+
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_file = LoadedFile(
+        path=tmp_path / "big.s19",
+        file_type="s19",
+        mem_map={0x1000: 0x11},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1010)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    captured_labels: list[str] = []
+
+    class FakeLabel:
+        def __init__(self, text: str) -> None:
+            self.text = text
+
+        def add_class(self, _cls: str) -> None:
+            return
+
+    class FakeItem:
+        def __init__(self, label: FakeLabel) -> None:
+            self.label = label
+            self.data = None
+
+    class FakeList:
+        def clear(self) -> None:
+            captured_labels.clear()
+
+        def append(self, item: object) -> None:
+            label = getattr(item, "label", None) or getattr(item, "_label", None)
+            captured_labels.append(label.text if label is not None else str(item))
+
+    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#sections_list" else None)
+    monkeypatch.setattr(app_module, "Label", FakeLabel)
+    monkeypatch.setattr(app_module, "ListItem", FakeItem)
+
+    precomputed = list(range(0x5000, 0x5000 + app_module.MAX_SECTIONS_OUT_OF_RANGE * 3))
+    app.update_sections(precomputed_out_of_range=precomputed)
+
+    # 1 range row + MAX_SECTIONS_OUT_OF_RANGE MAC rows + 1 truncation marker.
+    assert len(captured_labels) == 1 + app_module.MAX_SECTIONS_OUT_OF_RANGE + 1
+    assert captured_labels[-1].startswith("...")
+    assert f"{len(precomputed) - app_module.MAX_SECTIONS_OUT_OF_RANGE}" in captured_labels[-1]
+
+
+@pytest.mark.slow
+def test_end_to_end_load_pipeline_under_budget(tmp_path: Path):
+    """Perf smoke: 32k MAC records + 2k ranges + 625k row_bases finish prepare+compute in time."""
+    import time as _time
+
+    app = S19TuiApp(base_dir=tmp_path)
+    num_ranges = 2000
+    ranges = [(i * 0x100, i * 0x100 + 0x80) for i in range(num_ranges)]
+    row_bases = [i * 16 for i in range(625_000)]
+    mac_records = [
+        {
+            "parse_ok": (i % 3 != 0),
+            "name": f"T{i}",
+            "address": i * 0x20,
+            "line_number": i + 1,
+            "parse_error": "err" if i % 3 == 0 else "",
+        }
+        for i in range(32_000)
+    ]
+    loaded = LoadedFile(
+        path=tmp_path / "big.s19",
+        file_type="s19",
+        mem_map={},
+        row_bases=row_bases,
+        ranges=ranges,
+        range_validity=[True] * num_ranges,
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=mac_records,
+    )
+
+    started = _time.perf_counter()
+    prepared = app._prepare_load_payload(loaded)
+    elapsed = _time.perf_counter() - started
+
+    assert prepared.precomputed is True
+    assert len(prepared.mac_rows) == len(mac_records)
+    # Keep the CI budget generous; the point is the pipeline finishes in seconds,
+    # not the original "frozen for an hour" user reported.
+    assert elapsed < 10.0, f"end-to-end prepare too slow: {elapsed:.3f}s"

@@ -212,7 +212,40 @@ def _collect_hex_rows(
     extra_addresses: Optional[set[int]] = None,
     max_rows: Optional[int] = None,
     start_row_index: Optional[int] = None,
+    row_bases_set: Optional[set[int]] = None,
 ) -> tuple[List[str], List[Tuple[int, List[Optional[int]]]]]:
+    """
+    Summary:
+        Materialize the hex-view row list for a window around ``focus_address`` while
+        reusing precomputed row-base containers so very large images stay responsive.
+
+    Args:
+        mem_map (Dict[int, int]): Address-to-byte map backing the render.
+        focus_address (Optional[int]): Preferred center address when no explicit start row.
+        row_bases (Optional[List[int]]): Sorted 16-byte-aligned row anchors.
+        extra_addresses (Optional[set[int]]): Additional addresses (e.g. MAC highlights)
+            that must be visible, even when they fall outside ``row_bases``.
+        max_rows (Optional[int]): Upper bound on rendered rows (defaults to ``MAX_HEX_ROWS``).
+        start_row_index (Optional[int]): Explicit start index into the resolved bases list.
+        row_bases_set (Optional[set[int]]): Precomputed ``set(row_bases)`` reused as the
+            fast-path membership check so we never rebuild a multi-million-entry set per
+            render.
+
+    Returns:
+        tuple[List[str], List[Tuple[int, List[Optional[int]]]]]: Header lines plus the
+        rendered row data (base address + 16 byte slots).
+
+    Data Flow:
+        - Choose the active bases list (skip ``set(...)`` rebuild when ``row_bases_set``
+          is supplied and the extra addresses form a subset).
+        - Clamp a window around ``focus_address`` / ``start_row_index``.
+        - Stream row tuples from ``mem_map`` up to the byte budget.
+
+    Dependencies:
+        Used by:
+            - ``render_hex_view``
+            - ``render_hex_view_text``
+    """
     base_row_bases = row_bases if row_bases is not None else build_row_bases(mem_map)
     extra = extra_addresses or set()
     if not extra:
@@ -221,7 +254,13 @@ def _collect_hex_rows(
         bases: List[int] = base_row_bases if isinstance(base_row_bases, list) else list(base_row_bases)
     else:
         extra_bases = {addr - (addr % HEX_WIDTH) for addr in extra}
-        existing = set(base_row_bases)
+        # Prefer the caller-provided membership set so multi-million-row images skip the
+        # O(n) set(base_row_bases) rebuild on every hex render.
+        existing: set[int]
+        if row_bases_set is not None:
+            existing = row_bases_set
+        else:
+            existing = set(base_row_bases)
         if extra_bases.issubset(existing):
             bases = base_row_bases if isinstance(base_row_bases, list) else list(base_row_bases)
         else:
@@ -275,6 +314,7 @@ def render_hex_view(
     extra_addresses: Optional[set[int]] = None,
     max_rows: Optional[int] = None,
     start_row_index: Optional[int] = None,
+    row_bases_set: Optional[set[int]] = None,
 ) -> str:
     """Render a windowed hex+ASCII view for responsive UI."""
     header_lines, rows = _collect_hex_rows(
@@ -284,6 +324,7 @@ def render_hex_view(
         extra_addresses,
         max_rows=max_rows,
         start_row_index=start_row_index,
+        row_bases_set=row_bases_set,
     )
     if rows == [] and header_lines:
         return "\n".join(header_lines)
@@ -304,6 +345,7 @@ def render_hex_view_text(
     mac_highlight_addresses: Optional[set[int]] = None,
     max_rows: Optional[int] = None,
     start_row_index: Optional[int] = None,
+    row_bases_set: Optional[set[int]] = None,
 ) -> Text:
     """Render hex view with optional highlighted match range."""
     header_lines, rows = _collect_hex_rows(
@@ -313,6 +355,7 @@ def render_hex_view_text(
         mac_highlight_addresses,
         max_rows=max_rows,
         start_row_index=start_row_index,
+        row_bases_set=row_bases_set,
     )
     text = Text()
     for line in header_lines:

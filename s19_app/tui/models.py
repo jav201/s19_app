@@ -45,3 +45,4 @@ class LoadedFile:
     mac_records: List[dict] = field(default_factory=list)
     mac_diagnostics: List[str] = field(default_factory=list)
     range_index: Optional[Any] = field(default=None, repr=False, compare=False)
+    bases_set: Optional[Any] = field(default=None, repr=False, compare=False)

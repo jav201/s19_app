@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
+from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import time
@@ -114,6 +115,58 @@ def _a2l_tag_row_severity(tag: dict) -> ValidationSeverity:
     if tag.get("memory_checked") and tag.get("in_memory") is True:
         return ValidationSeverity.OK
     return ValidationSeverity.NEUTRAL
+
+
+MAX_SECTIONS_OUT_OF_RANGE = 50
+"""Max MAC out-of-range rows the Sections panel renders before adding a truncation marker."""
+
+
+@dataclass
+class PreparedLoad:
+    """
+    Summary:
+        Bundle of pre-computed artifacts produced by the load worker so the main UI
+        thread only needs to install them onto widgets.
+
+    Args:
+        loaded (LoadedFile): Parsed file payload ready to become ``current_file``.
+        precomputed (bool): True when the worker populated MAC cache/validation fields.
+        mac_cache_key (Optional[tuple]): Cache key that matches the one ``update_mac_view``
+            will recompute, so MAC rendering treats the worker output as a cache hit.
+        mac_rows / mac_meta / mac_summary / mac_coverage_line: MAC table payload mirroring
+            the fields normally populated by ``_build_mac_view_cache``.
+        validation_report / validation_issues: Cross-artifact validation output.
+        mac_highlights (frozenset[int]): Addresses flagged for orange hex overlay.
+        mac_out_of_range (list[int]): Sorted MAC addresses outside the primary image.
+        bases_set (Optional[frozenset[int]]): ``frozenset(row_bases)`` for fast hex render.
+        a2l_enriched_tags / a2l_enriched_key / a2l_summary_lines: Precomputed A2L enrichment
+            state ready to install into ``_a2l_enriched_*`` caches.
+
+    Data Flow:
+        - Built inside ``S19TuiApp._prepare_load_payload`` on the worker thread.
+        - Consumed by ``S19TuiApp._apply_prepared_load`` on the Textual main thread.
+
+    Dependencies:
+        Used by:
+            - ``S19TuiApp._start_load_worker``
+            - ``S19TuiApp._apply_loaded_file`` (synchronous fallback)
+    """
+
+    loaded: LoadedFile
+    precomputed: bool = False
+    mac_cache_key: Optional[tuple] = None
+    mac_rows: list = field(default_factory=list)
+    mac_meta: list = field(default_factory=list)
+    mac_summary: dict = field(default_factory=dict)
+    mac_coverage_line: Optional[str] = None
+    validation_report: Optional[ValidationReport] = None
+    validation_issues: list = field(default_factory=list)
+    mac_highlights: frozenset = field(default_factory=frozenset)
+    mac_out_of_range: list = field(default_factory=list)
+    bases_set: Optional[frozenset] = None
+    a2l_enriched_tags: list = field(default_factory=list)
+    a2l_enriched_key: Optional[tuple] = None
+    a2l_summary_lines: list = field(default_factory=list)
 
 
 def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
@@ -503,6 +556,7 @@ class S19TuiApp(App):
     a2l_summary_window_size: int = 500
     a2l_tag_hex_highlight_max_bytes: int = 4096
     validation_issue_filter_mode: str = "all"
+    validation_issues_page_size: int = 200
 
     def __init__(self, base_dir: Optional[Path] = None, load_path: Optional[Path] = None):
         super().__init__()
@@ -525,6 +579,7 @@ class S19TuiApp(App):
         self._a2l_tag_find_last_index: int = -1
         self._validation_report: Optional[ValidationReport] = None
         self._validation_issues: list[ValidationIssue] = []
+        self._validation_issues_window_start: int = 0
         self.current_project_dir: Optional[Path] = None
         self._mac_window_start: int = 0
         self._mac_view_cache_key: Optional[tuple[Any, ...]] = None
@@ -1445,6 +1500,7 @@ class S19TuiApp(App):
             Used by:
                 - ``_load_path_from_user_input`` (load dialog + startup path)
         """
+        self.logger.info("Load phase boundary: dialog_callback_entry path=%s", path)
         normalized = resolve_input_path(path, self.base_dir)
         if not normalized:
             self.set_status(f"File not found: {path}")
@@ -1459,15 +1515,24 @@ class S19TuiApp(App):
         copy_started = time.perf_counter()
         copied = copy_into_workarea(normalized, temp_dir)
         copy_elapsed = time.perf_counter() - copy_started
-        self.refresh_files()
         self.set_progress(50, f"Parsing {copied.name}...")
-        self.logger.info(
-            "File copied to temp: path=%s size_bytes=%d copy_seconds=%.3f",
-            copied,
-            copied.stat().st_size,
-            copy_elapsed,
-        )
+        # Kick the worker off before anything else so the modal-dismiss callback yields
+        # control back to the event loop promptly. Workarea refresh + diagnostic log are
+        # dispatched via ``call_later`` so they run on the next idle frame.
         self._start_load_worker(copied)
+        copied_size = copied.stat().st_size
+
+        def _post_worker_launch() -> None:
+            self.refresh_files()
+            self.logger.info(
+                "File copied to temp: path=%s size_bytes=%d copy_seconds=%.3f",
+                copied,
+                copied_size,
+                copy_elapsed,
+            )
+            self.logger.info("Load phase boundary: worker_spawned path=%s", copied.name)
+
+        self.call_later(_post_worker_launch)
 
     def load_a2l_from_path(self, path: Path) -> None:
         """Load A2L file into temp, parse it, and update view."""
@@ -1951,16 +2016,43 @@ class S19TuiApp(App):
         )
 
     def update_validation_issues_view(self) -> None:
-        """Render the validation issue panel with active severity filter."""
+        """
+        Summary:
+            Render a paginated window of validation issues so very large issue lists
+            never mount thousands of ``ListItem`` widgets synchronously.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clear ``#validation_issues_list`` and short-circuit when no issues are loaded.
+            - Append a summary header line (totals + active filter).
+            - Clamp ``_validation_issues_window_start`` against the filtered total and
+              append a page indicator line.
+            - Append at most ``validation_issues_page_size`` issue rows for the current page.
+
+        Dependencies:
+            Uses:
+                - ``_filtered_validation_issues``
+                - ``_clamp_viewer_page_size`` / ``_get_window_bounds``
+                - ``_format_validation_issue_line``
+            Used by:
+                - ``_apply_prepared_load`` (post-load refresh)
+                - ``update_mac_view`` (when MAC/validation input changes)
+                - issue filter buttons and paging actions
+        """
         issue_list = self.query_one("#validation_issues_list", ListView)
         issue_list.clear()
         filtered = self._filtered_validation_issues()
         if not filtered:
             issue_list.append(ListItem(Label("No validation issues.")))
             return
-        error_count = len([item for item in self._validation_issues if item.severity == ValidationSeverity.ERROR])
-        warning_count = len([item for item in self._validation_issues if item.severity == ValidationSeverity.WARNING])
-        info_count = len([item for item in self._validation_issues if item.severity == ValidationSeverity.INFO])
+        error_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.ERROR)
+        warning_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.WARNING)
+        info_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.INFO)
         issue_list.append(
             ListItem(
                 Label(
@@ -1976,7 +2068,21 @@ class S19TuiApp(App):
                 )
             )
         )
-        for issue in filtered:
+        total = len(filtered)
+        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        # Clamp window start onto a page boundary so +/- advance feels natural.
+        max_start = max(0, ((total - 1) // page_size) * page_size) if total else 0
+        self._validation_issues_window_start = max(0, min(self._validation_issues_window_start, max_start))
+        start, end = self._get_window_bounds(total, self._validation_issues_window_start, page_size)
+        self._validation_issues_window_start = start
+        page_num = start // page_size + 1
+        total_pages = max(1, (total + page_size - 1) // page_size)
+        page_line = (
+            f"Page {page_num}/{total_pages} | rows {start + 1}-{end} / {total} "
+            f"(page size {page_size}; +/- for Issues page)"
+        )
+        issue_list.append(ListItem(Label(page_line)))
+        for issue in filtered[start:end]:
             label = Label(self._format_validation_issue_line(issue))
             label.add_class(css_class_for_severity(issue.severity))
             item = ListItem(label)
@@ -1987,6 +2093,28 @@ class S19TuiApp(App):
                 "line_number": issue.line_number,
             }
             issue_list.append(item)
+
+    def action_validation_issues_page_next(self) -> None:
+        """Advance the validation-issues viewer window by one configured page."""
+        total = len(self._filtered_validation_issues())
+        if total == 0:
+            return
+        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        max_start = max(0, ((total - 1) // page_size) * page_size)
+        self._validation_issues_window_start = min(
+            max_start, self._validation_issues_window_start + page_size
+        )
+        self.update_validation_issues_view()
+
+    def action_validation_issues_page_prev(self) -> None:
+        """Rewind the validation-issues viewer window by one configured page."""
+        if not self._validation_issues:
+            return
+        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        self._validation_issues_window_start = max(
+            0, self._validation_issues_window_start - page_size
+        )
+        self.update_validation_issues_view()
 
     def _load_mac_file(self, path: Path, a2l_files: Optional[list[Path]] = None) -> LoadedFile:
         """
@@ -2289,41 +2417,62 @@ class S19TuiApp(App):
         self._mac_view_cache_summary = {}
         self._mac_view_cache_coverage_line = None
 
-    def _build_mac_view_cache(self) -> None:
+    def _compute_mac_view_payload(
+        self,
+        loaded: Optional[LoadedFile],
+        a2l_data: Optional[dict],
+        a2l_enriched_tags: Optional[list[dict[str, Any]]] = None,
+    ) -> dict[str, Any]:
         """
         Summary:
-            Build and cache full MAC row metadata and cross-validation output for stable artifact inputs.
+            Pure (thread-safe) builder for the MAC table rows, summary counters, and the
+            cross-artifact validation report that feeds the Issues panel.
 
         Args:
-            None
+            loaded (Optional[LoadedFile]): Parsed payload to validate; may be ``None``.
+            a2l_data (Optional[dict]): Parsed A2L payload used for name-index lookup.
+            a2l_enriched_tags (Optional[list[dict]]): Pre-enriched A2L tag list; falls back
+                to raw ``a2l_data["tags"]`` when missing so the function stays self-contained.
 
         Returns:
-            None
+            dict[str, Any]: ``{"rows", "meta", "summary", "coverage_line", "report",
+                "issues"}``. ``report`` and ``issues`` are ``None``/``[]`` when ``loaded``
+                is not an S19/HEX primary.
 
         Data Flow:
-            - Iterate MAC records once to build row tuples, severity metadata, and aggregate counters.
-            - Run cross-artifact validation only when current file is primary-backed (S19/HEX).
-            - Store rows, summary counters, and report-derived lines into cache members.
+            - Classify the payload as primary-backed or MAC-only.
+            - Walk MAC records once to build row tuples, severity metadata, and counters,
+              using the sorted range index for O(log R) membership checks.
+            - On primary payloads, run ``validate_artifact_consistency`` plus the A2L
+              internal-issue pass and dedupe the resulting issue list.
 
         Dependencies:
             Uses:
                 - ``_build_a2l_name_index``
                 - ``_mac_record_ui_state``
-                - ``validate_artifact_consistency``
-                - ``validate_a2l_internal_issues``
+                - ``build_sorted_range_index`` / ``address_in_sorted_ranges``
+                - ``validate_artifact_consistency`` / ``validate_a2l_internal_issues``
+                - ``_deduplicate_issues``
             Used by:
-                - ``update_mac_view``
+                - ``_prepare_load_payload`` (worker thread)
+                - ``_build_mac_view_cache`` (synchronous fallback)
         """
-        started = time.perf_counter()
-        records = self.current_file.mac_records if self.current_file else []
-        has_a2l = bool(self.current_a2l_data)
-        a2l_name_index = _build_a2l_name_index(self.current_a2l_data)
+        records = loaded.mac_records if loaded else []
+        has_a2l = bool(a2l_data)
+        a2l_name_index = _build_a2l_name_index(a2l_data)
         primary_file = (
-            self.current_file
-            if self.current_file and self.current_file.file_type in {"s19", "hex"}
+            loaded
+            if loaded is not None and loaded.file_type in {"s19", "hex"}
             else None
         )
-        range_index = self._get_range_index(primary_file)
+        if primary_file is not None:
+            cached_index = getattr(primary_file, "range_index", None)
+            if cached_index is not None:
+                range_index = cached_index
+            else:
+                range_index = build_sorted_range_index(primary_file.ranges)
+        else:
+            range_index = ([], [])
         rows: list[tuple[str, str, str, str, str, str, str, str]] = []
         row_meta: list[dict[str, Any]] = []
         total_verified = 0
@@ -2390,27 +2539,29 @@ class S19TuiApp(App):
             "out_of_mem": total_out_of_mem,
             "parse_errors": total_parse_errors,
         }
-        coverage_line = None
-        if self.current_file and self.current_file.file_type in {"s19", "hex"}:
+        coverage_line: Optional[str] = None
+        report: Optional[ValidationReport] = None
+        issues: list[ValidationIssue] = []
+        if primary_file is not None:
             validate_started = time.perf_counter()
+            tags_for_validation = a2l_enriched_tags or (a2l_data or {}).get("tags", [])
             report = validate_artifact_consistency(
                 mac_records=records,
-                a2l_tags=self._a2l_enriched_tags or (self.current_a2l_data or {}).get("tags", []),
-                a2l_data=self.current_a2l_data,
-                s19_ranges=self.current_file.ranges,
+                a2l_tags=tags_for_validation,
+                a2l_data=a2l_data,
+                s19_ranges=primary_file.ranges,
                 overlapped_addresses=set(),
             )
             extra_a2l_issues = (
                 validate_a2l_internal_issues(
-                    self.current_a2l_data or {"sections": [], "errors": [], "tags": []},
-                    tag_checks=self._a2l_enriched_tags,
+                    a2l_data or {"sections": [], "errors": [], "tags": []},
+                    tag_checks=a2l_enriched_tags or [],
                 )
-                if self.current_a2l_data
+                if a2l_data
                 else []
             )
             report.issues = self._deduplicate_issues(report.issues + extra_a2l_issues)
-            self._validation_report = report
-            self._validation_issues = report.issues
+            issues = list(report.issues)
             coverage_line = (
                 f"Coverage MAC->S19={report.coverage.mac_in_s19_pct():.1f}%  "
                 f"A2L->S19={report.coverage.a2l_in_s19_pct():.1f}%  "
@@ -2419,19 +2570,55 @@ class S19TuiApp(App):
             self.logger.info(
                 "MAC validation computed: records=%d issues=%d elapsed_seconds=%.3f",
                 len(records or []),
-                len(report.issues),
+                len(issues),
                 time.perf_counter() - validate_started,
             )
-        else:
-            self._validation_report = None
-            self._validation_issues = []
-        self._mac_view_cache_rows = rows
-        self._mac_view_cache_meta = row_meta
-        self._mac_view_cache_summary = summary
-        self._mac_view_cache_coverage_line = coverage_line
+        return {
+            "rows": rows,
+            "meta": row_meta,
+            "summary": summary,
+            "coverage_line": coverage_line,
+            "report": report,
+            "issues": issues,
+        }
+
+    def _build_mac_view_cache(self) -> None:
+        """
+        Summary:
+            Populate the MAC view cache members from ``_compute_mac_view_payload`` for the
+            synchronous fallback path (tests, project load, and non-worker invocations).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Call ``_compute_mac_view_payload`` with the currently attached file and A2L data.
+            - Mirror its result onto ``self._mac_view_cache_*`` and the validation members.
+
+        Dependencies:
+            Uses:
+                - ``_compute_mac_view_payload``
+            Used by:
+                - ``update_mac_view`` when the cache key has not been pre-populated
+        """
+        started = time.perf_counter()
+        payload = self._compute_mac_view_payload(
+            self.current_file,
+            self.current_a2l_data,
+            a2l_enriched_tags=self._a2l_enriched_tags,
+        )
+        self._mac_view_cache_rows = payload["rows"]
+        self._mac_view_cache_meta = payload["meta"]
+        self._mac_view_cache_summary = payload["summary"]
+        self._mac_view_cache_coverage_line = payload["coverage_line"]
+        self._validation_report = payload["report"]
+        self._validation_issues = list(payload["issues"])
         self.logger.info(
             "MAC row cache built: records=%d elapsed_seconds=%.3f",
-            len(records or []),
+            len(self.current_file.mac_records) if self.current_file else 0,
             time.perf_counter() - started,
         )
 
@@ -2617,7 +2804,8 @@ class S19TuiApp(App):
     def _apply_loaded_file(self, loaded: LoadedFile, path: Path, load_started: float) -> None:
         """
         Summary:
-            Attach a parsed ``LoadedFile`` to reactive state and refresh every dependent UI panel.
+            Synchronous-path wrapper: build a non-precomputed ``PreparedLoad`` and delegate
+            to ``_apply_prepared_load`` so tests and project load share one install code path.
 
         Args:
             loaded (LoadedFile): Parsed payload from ``_parse_loaded_file``.
@@ -2628,32 +2816,97 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Mutate ``current_file``, invalidate MAC view cache, reset paging anchors.
-            - Sync A2L path/data onto the app when the loaded payload carries them.
-            - Refresh sections, hex views, MAC table, A2L view, and project labels.
-            - Update status/progress widgets and append a coexistence-aware log line.
+            - Wrap ``loaded`` into a ``PreparedLoad(precomputed=False)``.
+            - Forward to ``_apply_prepared_load`` so legacy callers keep working without
+              the worker-thread precompute step.
+
+        Dependencies:
+            Uses:
+                - ``_apply_prepared_load``
+            Used by:
+                - ``load_selected_file`` (synchronous path)
+        """
+        self._apply_prepared_load(PreparedLoad(loaded=loaded), path, load_started)
+
+    def _apply_prepared_load(
+        self, prepared: PreparedLoad, path: Path, load_started: float
+    ) -> None:
+        """
+        Summary:
+            Install a ``PreparedLoad`` onto reactive state and refresh every dependent UI
+            panel, relying on worker-precomputed caches to avoid heavy main-thread work.
+
+        Args:
+            prepared (PreparedLoad): Bundle of parsed payload plus optional precomputed
+                MAC cache, validation issues, highlights, out-of-range list, and bases set.
+            path (Path): Source path used for status messaging and log lines.
+            load_started (float): ``time.perf_counter`` value captured at pipeline start.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Mutate ``current_file``, reset MAC/hex/issues paging anchors, and sync A2L.
+            - When ``precomputed`` is True, copy MAC cache + validation results into the
+              app's cache members so ``update_mac_view`` treats them as a cache hit.
+            - Attach ``bases_set`` to the ``LoadedFile`` for fast hex rendering.
+            - Refresh sections (with precomputed MAC out-of-range list when available),
+              hex views, MAC view, A2L view, and project labels.
+            - Append a coexistence-aware status/log line.
 
         Dependencies:
             Uses:
                 - ``_invalidate_mac_view_cache``
                 - ``update_sections`` / ``update_hex_view`` / ``update_alt_hex_view`` /
-                  ``update_mac_hex_view`` / ``update_a2l_view`` / ``update_project_labels``
-                - ``set_file_status`` / ``_append_log_line`` / ``set_progress``
+                  ``update_mac_hex_view`` / ``update_mac_view`` / ``update_a2l_view`` /
+                  ``update_project_labels``
             Used by:
-                - ``load_selected_file`` (synchronous path)
-                - ``_start_load_worker`` via ``call_from_thread`` (threaded path)
+                - ``_start_load_worker`` (threaded path)
+                - ``_apply_loaded_file`` (synchronous fallback)
         """
+        loaded = prepared.loaded
         self.current_file = loaded
         self._invalidate_mac_view_cache()
         self._mac_window_start = 0
+        self._validation_issues_window_start = 0
         self._a2l_tag_hex_highlight = None
         if loaded.a2l_data:
             self.current_a2l_path = loaded.a2l_path
             self.current_a2l_data = loaded.a2l_data
-        self.update_sections()
+        # Attach worker-precomputed bases_set so hex renders skip rebuilding sets of
+        # millions of addresses on every refresh.
+        try:
+            if prepared.bases_set is not None:
+                loaded.bases_set = prepared.bases_set
+        except Exception:
+            # Legacy LoadedFile in test fixtures may not support the attribute; ignore.
+            pass
+        if prepared.precomputed:
+            self._mac_view_cache_key = prepared.mac_cache_key
+            self._mac_view_cache_rows = prepared.mac_rows
+            self._mac_view_cache_meta = prepared.mac_meta
+            self._mac_view_cache_summary = prepared.mac_summary
+            self._mac_view_cache_coverage_line = prepared.mac_coverage_line
+            self._validation_report = prepared.validation_report
+            self._validation_issues = list(prepared.validation_issues)
+            if prepared.a2l_enriched_key is not None:
+                self._a2l_enriched_tags = prepared.a2l_enriched_tags
+                self._a2l_enriched_key = prepared.a2l_enriched_key
+                self._a2l_summary_lines = prepared.a2l_summary_lines
+                self._a2l_summary_start = 0
+        self.logger.info("Load phase boundary: apply_start path=%s", path.name)
+        # Pass the precomputed out-of-range list only when available so tests that
+        # monkeypatch ``update_sections`` with a no-argument stub keep working.
+        if prepared.precomputed:
+            self.update_sections(precomputed_out_of_range=prepared.mac_out_of_range)
+        else:
+            self.update_sections()
         self.update_hex_view()
         self.update_alt_hex_view()
         self.update_mac_hex_view()
+        # ``update_a2l_view`` invokes ``update_mac_view`` internally in both A2L
+        # present/absent branches, which in turn installs the precomputed cache and
+        # renders the validation-issues window.
         self.update_a2l_view()
         self.update_project_labels()
         status_message = self._format_coexistence_status(loaded, path)
@@ -2661,11 +2914,12 @@ class S19TuiApp(App):
         self._append_log_line(status_message)
         total_elapsed = time.perf_counter() - load_started
         self.logger.info(
-            "Loaded file successfully: path=%s file_type=%s elapsed_seconds=%.3f has_mac=%s",
+            "Loaded file successfully: path=%s file_type=%s elapsed_seconds=%.3f has_mac=%s precomputed=%s",
             path,
             loaded.file_type,
             total_elapsed,
             bool(loaded.mac_records),
+            prepared.precomputed,
         )
 
     def _format_coexistence_status(self, loaded: LoadedFile, path: Path) -> str:
@@ -2701,13 +2955,109 @@ class S19TuiApp(App):
             return f"Loaded {path.name} (MAC only)"
         return f"Loaded {path.name}"
 
+    def _prepare_load_payload(self, loaded: LoadedFile) -> PreparedLoad:
+        """
+        Summary:
+            Build every derived artifact the UI needs from a freshly parsed ``LoadedFile``,
+            so the main thread only has to install them onto widgets.
+
+        Args:
+            loaded (LoadedFile): Parsed payload from ``_parse_loaded_file``.
+
+        Returns:
+            PreparedLoad: Bundle with MAC cache, validation report, highlights,
+            out-of-range list, ``bases_set``, and A2L enrichment state.
+
+        Data Flow:
+            - Pre-compute enriched A2L tags (or skip when no A2L present).
+            - Run ``_compute_mac_view_payload`` to produce the MAC table + validation output.
+            - Derive MAC highlights and sorted out-of-range lists using the cached
+              ``range_index``.
+            - Freeze the ``row_bases`` into a ``frozenset`` so hex renders avoid rebuilding
+              million-entry sets on every refresh.
+            - Pack everything into a ``PreparedLoad`` with a matching ``mac_cache_key`` so
+              ``update_mac_view`` treats the payload as a cache hit.
+
+        Dependencies:
+            Uses:
+                - ``enrich_a2l_tags_with_values`` / ``validate_a2l_tags`` / ``render_a2l_view``
+                - ``_compute_mac_view_payload``
+                - ``_get_range_index`` / ``address_in_sorted_ranges``
+            Used by:
+                - ``_start_load_worker``
+        """
+        range_index = self._get_range_index(loaded if loaded.file_type in {"s19", "hex"} else None)
+        a2l_data = loaded.a2l_data
+        a2l_enriched_tags: list[dict[str, Any]] = []
+        a2l_enriched_key: Optional[tuple] = None
+        a2l_summary_lines: list[str] = []
+        if a2l_data:
+            mem_map = loaded.mem_map
+            source_tags = enrich_a2l_tags_with_values(a2l_data, mem_map)
+            tag_checks = validate_a2l_tags(source_tags, mem_map)
+            check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
+            merged: list[dict[str, Any]] = []
+            for tag in source_tags:
+                lookup = (tag.get("section"), tag.get("name"))
+                merged.append({**tag, **check_map.get(lookup, {})})
+            a2l_enriched_tags = merged
+            a2l_enriched_key = (id(a2l_data), len(mem_map))
+            a2l_summary_lines = render_a2l_view(
+                a2l_data, tag_checks, max_tag_lines=500
+            ).splitlines()
+        mac_payload = self._compute_mac_view_payload(
+            loaded, a2l_data, a2l_enriched_tags=a2l_enriched_tags
+        )
+        mac_highlights: set[int] = set()
+        out_of_range: set[int] = set()
+        has_primary = loaded.file_type in {"s19", "hex"}
+        has_range_index = bool(range_index[0])
+        for record in loaded.mac_records or []:
+            addr = record.get("address")
+            if not (record.get("parse_ok") and isinstance(addr, int)):
+                continue
+            mac_highlights.add(addr)
+            if has_primary:
+                if not has_range_index:
+                    out_of_range.add(addr)
+                elif not address_in_sorted_ranges(addr, range_index):
+                    out_of_range.add(addr)
+        bases_set = frozenset(loaded.row_bases) if loaded.row_bases else frozenset()
+        records = loaded.mac_records or []
+        mac_cache_key = (
+            id(records),
+            len(records),
+            id(a2l_data),
+            loaded.file_type,
+            tuple(loaded.ranges),
+            len(loaded.mem_map),
+        )
+        return PreparedLoad(
+            loaded=loaded,
+            precomputed=True,
+            mac_cache_key=mac_cache_key,
+            mac_rows=mac_payload["rows"],
+            mac_meta=mac_payload["meta"],
+            mac_summary=mac_payload["summary"],
+            mac_coverage_line=mac_payload["coverage_line"],
+            validation_report=mac_payload["report"],
+            validation_issues=list(mac_payload["issues"]),
+            mac_highlights=frozenset(mac_highlights),
+            mac_out_of_range=sorted(out_of_range),
+            bases_set=bases_set,
+            a2l_enriched_tags=a2l_enriched_tags,
+            a2l_enriched_key=a2l_enriched_key,
+            a2l_summary_lines=a2l_summary_lines,
+        )
+
     @work(thread=True, exclusive=True, group="load")
     def _start_load_worker(
         self, path: Path, a2l_files: Optional[list[Path]] = None
     ) -> None:
         """
         Summary:
-            Off-thread worker that parses a file and schedules UI refresh on the main thread.
+            Off-thread worker that parses a file, precomputes every derived artifact,
+            and schedules a single UI install on the Textual main thread.
 
         Args:
             path (Path): Already-copied workarea file to parse.
@@ -2717,19 +3067,24 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Run ``_parse_loaded_file`` in the worker thread (no UI widget access).
-            - On success, dispatch ``_apply_loaded_file`` via ``call_from_thread``.
-            - On unsupported suffix or exception, dispatch ``_handle_load_error``.
+            - Log a ``worker_parse_start`` phase marker and run ``_parse_loaded_file``.
+            - Log ``worker_parse_done`` then call ``_prepare_load_payload`` to build the
+              MAC cache, validation report, highlights, out-of-range list, and bases set.
+            - Dispatch ``_apply_prepared_load`` via ``call_from_thread`` so the UI install
+              is the only main-thread work performed for this load.
+            - On parse or prepare exceptions, fall back to installing the minimal
+              non-precomputed payload (or surface the error when the parse itself failed).
 
         Dependencies:
             Uses:
-                - ``_parse_loaded_file``
+                - ``_parse_loaded_file`` / ``_prepare_load_payload``
                 - ``call_from_thread``
-                - ``_apply_loaded_file`` / ``_handle_load_error``
+                - ``_apply_prepared_load`` / ``_handle_load_error``
             Used by:
                 - ``load_from_path`` (load dialog and startup path)
         """
         load_started = time.perf_counter()
+        self.logger.info("Load phase boundary: worker_parse_start path=%s", path.name)
         try:
             loaded = self._parse_loaded_file(path, a2l_files)
         except Exception as exc:
@@ -2743,7 +3098,25 @@ class S19TuiApp(App):
                 ValueError(f"Unsupported file type: {suffix}"),
             )
             return
-        self.call_from_thread(self._apply_loaded_file, loaded, path, load_started)
+        self.logger.info(
+            "Load phase boundary: worker_parse_done path=%s elapsed=%.3fs",
+            path.name,
+            time.perf_counter() - load_started,
+        )
+        prepare_started = time.perf_counter()
+        try:
+            prepared = self._prepare_load_payload(loaded)
+        except Exception as exc:
+            # Fall back to the slow-path install so users still see the file.
+            self.logger.exception("Prepare load payload failed; falling back: %s", exc)
+            prepared = PreparedLoad(loaded=loaded)
+        self.logger.info(
+            "Load phase boundary: worker_compute_done path=%s precomputed=%s elapsed=%.3fs",
+            path.name,
+            prepared.precomputed,
+            time.perf_counter() - prepare_started,
+        )
+        self.call_from_thread(self._apply_prepared_load, prepared, path, load_started)
         self.call_from_thread(self.set_progress, 100, f"Loaded {path.name}")
         if self.current_project:
             self.call_from_thread(self._sync_loaded_file_to_project)
@@ -2917,8 +3290,33 @@ class S19TuiApp(App):
                 sample.append(f"line={line_number} segment={segment} error={message}")
             self.logger.warning("Load diagnostics: file_type=%s path=%s sample=%s", file_type, path, " | ".join(sample))
 
-    def update_sections(self) -> None:
-        """Update the ranges list with validity coloring."""
+    def update_sections(self, precomputed_out_of_range: Optional[list[int]] = None) -> None:
+        """
+        Summary:
+            Render the ranges/Sections panel and cap appended MAC out-of-range rows so
+            very large MAC misalignments never mount thousands of widgets synchronously.
+
+        Args:
+            precomputed_out_of_range (Optional[list[int]]): Sorted MAC out-of-range
+                addresses produced by the load worker; when ``None`` the app falls back
+                to ``_collect_mac_out_of_range_addresses``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clear widget and short-circuit when no file is loaded.
+            - Append one ``ListItem`` per memory range with OK/ERROR coloring.
+            - Append at most ``MAX_SECTIONS_OUT_OF_RANGE`` MAC out-of-range rows; when
+              truncated, add a single summary row pointing users at the Issues panel.
+
+        Dependencies:
+            Uses:
+                - ``_collect_mac_out_of_range_addresses``
+                - ``css_class_for_severity``
+            Used by:
+                - ``_apply_prepared_load``
+        """
         sections = self.query_one("#sections_list", ListView)
         sections.clear()
         if not self.current_file:
@@ -2933,14 +3331,31 @@ class S19TuiApp(App):
             item = ListItem(label)
             item.data = (start, end)
             sections.append(item)
-        out_of_range = sorted(self._collect_mac_out_of_range_addresses(self.current_file))
-        for address in out_of_range:
+        if precomputed_out_of_range is not None:
+            out_of_range = precomputed_out_of_range
+        else:
+            out_of_range = sorted(self._collect_mac_out_of_range_addresses(self.current_file))
+        total_oor = len(out_of_range)
+        cap = MAX_SECTIONS_OUT_OF_RANGE
+        visible = out_of_range[:cap]
+        for address in visible:
             label = Label(f"MAC out-of-range @ 0x{address:08X}")
             label.add_class("mac_out_of_range")
             item = ListItem(label)
             item.data = (address, address + 1)
             sections.append(item)
-        self.logger.info("Sections updated. count=%d", len(self.current_file.ranges))
+        if total_oor > cap:
+            truncation_label = Label(
+                f"... {total_oor - cap} more MAC out-of-range (see Issues panel) ..."
+            )
+            truncation_label.add_class("mac_out_of_range")
+            sections.append(ListItem(truncation_label))
+        self.logger.info(
+            "Sections updated. count=%d mac_out_of_range_total=%d rendered=%d",
+            len(self.current_file.ranges),
+            total_oor,
+            min(total_oor, cap),
+        )
 
     def update_hex_view(self, focus_address: Optional[int] = None) -> None:
         """Render hex view around a focus address if provided."""
@@ -2973,6 +3388,7 @@ class S19TuiApp(App):
                 mac_highlights,
                 max_rows=page_size,
                 start_row_index=self._hex_window_start,
+                row_bases_set=getattr(self.current_file, "bases_set", None),
             )
         )
         if focus_address is not None:
@@ -3021,6 +3437,7 @@ class S19TuiApp(App):
                 highlight,
                 mac_highlights,
                 max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
+                row_bases_set=getattr(self.current_file, "bases_set", None),
             )
         )
 
@@ -3042,6 +3459,7 @@ class S19TuiApp(App):
                 highlight,
                 mac_highlights,
                 max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
+                row_bases_set=getattr(self.current_file, "bases_set", None),
             )
         )
 
@@ -3697,12 +4115,15 @@ class S19TuiApp(App):
             self._handle_a2l_tag_find_next()
         elif event.button.id == "issues_filter_all":
             self.validation_issue_filter_mode = "all"
+            self._validation_issues_window_start = 0
             self.update_validation_issues_view()
         elif event.button.id == "issues_filter_error":
             self.validation_issue_filter_mode = "error"
+            self._validation_issues_window_start = 0
             self.update_validation_issues_view()
         elif event.button.id == "issues_filter_warning":
             self.validation_issue_filter_mode = "warning"
+            self._validation_issues_window_start = 0
             self.update_validation_issues_view()
 
     def on_input_changed(self, event: Input.Changed) -> None:

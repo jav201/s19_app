@@ -22,3 +22,8 @@ dependencies = [
 [project.scripts]
 s19tool = "s19_app.cli:main"
 s19tui = "s19_app.tui:main"
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')",
+]
