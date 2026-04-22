@@ -121,6 +121,15 @@ MAX_SECTIONS_OUT_OF_RANGE = 50
 """Max MAC out-of-range rows the Sections panel renders before adding a truncation marker."""
 
 
+MAX_SECTIONS_PRIMARY_RANGES = 200
+"""Max primary memory-range rows the Sections panel mounts before adding a truncation marker.
+
+Textual's ``ListView.append`` incurs per-item DOM + CSS cost, so uncapped range lists
+with thousands of entries can stall the main thread for many seconds. Capping keeps the
+install step bounded regardless of how fragmented the S19/HEX image is.
+"""
+
+
 @dataclass
 class PreparedLoad:
     """
@@ -607,6 +616,34 @@ class S19TuiApp(App):
         except Exception:
             pass
         # endregion
+
+    def _flush_logger(self) -> None:
+        """
+        Summary:
+            Flush every handler on ``self.logger`` so phase-boundary lines are persisted
+            to disk even if the next step hangs the thread.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Iterate ``self.logger.handlers`` and call ``flush`` guarded by ``try/except``.
+            - Silently ignore handlers that cannot flush (e.g., after shutdown).
+
+        Dependencies:
+            Used by:
+                - ``_handle_load_dialog`` / ``load_from_path`` / ``_parse_loaded_file``
+                - ``_load_mac_file`` / ``_prepare_load_payload`` / ``_start_load_worker``
+                - ``_apply_prepared_load`` phase chain steps
+        """
+        for handler in getattr(self.logger, "handlers", []):
+            try:
+                handler.flush()
+            except Exception:
+                pass
 
     def _get_window_bounds(self, total: int, start: int, window_size: int) -> tuple[int, int]:
         """
@@ -1450,6 +1487,31 @@ class S19TuiApp(App):
             self.logger.warning("Unsupported file type: %s", normalized.suffix)
 
     def _handle_load_dialog(self, path: Optional[Path]) -> None:
+        """
+        Summary:
+            Handle the LoadFileScreen result callback and defer the actual load work
+            so Textual can process the screen-pop message before any blocking code runs.
+
+        Args:
+            path (Optional[Path]): Path entered in the dialog, or ``None`` on cancel.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Return immediately on cancel.
+            - Log a ``modal_dismiss_scheduled`` phase boundary and flush the handler.
+            - Schedule ``_load_path_from_user_input`` via ``call_after_refresh`` so the
+              modal-pop message processes before the load starts on the main thread.
+
+        Dependencies:
+            Uses:
+                - ``_load_path_from_user_input``
+                - ``_flush_logger``
+                - ``call_after_refresh``
+            Used by:
+                - ``action_load_file`` (LoadFileScreen result callback)
+        """
         self.logger.info("DBG H4 load dialog callback entry: path=%s", path)
         # region agent log
         self._debug_log(
@@ -1462,14 +1524,20 @@ class S19TuiApp(App):
         # endregion
         if path is None:
             return
-        self._load_path_from_user_input(path)
-        self.logger.info("DBG H4 load dialog callback exit: path=%s", path)
+        self.logger.info("Load phase boundary: modal_dismiss_scheduled path=%s", path)
+        self._flush_logger()
+        # Defer the load so Textual's pop_screen message queued by Screen.dismiss()
+        # is processed first; otherwise the modal stays visible for the duration of
+        # the copy/parse/install pipeline because dismiss() invokes this callback
+        # synchronously before scheduling the pop.
+        self.call_after_refresh(self._load_path_from_user_input, path)
+        self.logger.info("DBG H4 load dialog callback exit (deferred): path=%s", path)
         # region agent log
         self._debug_log(
             run_id="initial",
             hypothesis_id="H4",
             location="s19_app/tui/app.py:_handle_load_dialog",
-            message="Completed load dialog callback",
+            message="Scheduled deferred load after modal pop",
             data={"path": str(path)},
         )
         # endregion
@@ -1501,6 +1569,7 @@ class S19TuiApp(App):
                 - ``_load_path_from_user_input`` (load dialog + startup path)
         """
         self.logger.info("Load phase boundary: dialog_callback_entry path=%s", path)
+        self._flush_logger()
         normalized = resolve_input_path(path, self.base_dir)
         if not normalized:
             self.set_status(f"File not found: {path}")
@@ -1512,9 +1581,17 @@ class S19TuiApp(App):
             return
         temp_dir = self.workarea / WORKAREA_TEMP
         self.set_progress(10, "Copying into workarea temp...")
+        self.logger.info("Load phase boundary: copy_started path=%s", normalized)
+        self._flush_logger()
         copy_started = time.perf_counter()
         copied = copy_into_workarea(normalized, temp_dir)
         copy_elapsed = time.perf_counter() - copy_started
+        self.logger.info(
+            "Load phase boundary: copy_done path=%s elapsed=%.3fs",
+            copied.name,
+            copy_elapsed,
+        )
+        self._flush_logger()
         self.set_progress(50, f"Parsing {copied.name}...")
         # Kick the worker off before anything else so the modal-dismiss callback yields
         # control back to the event loop promptly. Workarea refresh + diagnostic log are
@@ -1531,6 +1608,7 @@ class S19TuiApp(App):
                 copy_elapsed,
             )
             self.logger.info("Load phase boundary: worker_spawned path=%s", copied.name)
+            self._flush_logger()
 
         self.call_later(_post_worker_launch)
 
@@ -2145,10 +2223,35 @@ class S19TuiApp(App):
             Used by:
                 - ``load_selected_file`` MAC extension branch
         """
+        self.logger.info("Load phase boundary: mac_parse_entry path=%s", path.name)
+        self._flush_logger()
         parse_started = time.perf_counter()
         mac_data = parse_mac_file(path)
         records = mac_data.get("records", [])
         diagnostics = [str(item) for item in mac_data.get("diagnostics", [])]
+        self.logger.info(
+            "Load phase boundary: mac_parse_done path=%s rows=%d diagnostics=%d elapsed=%.3fs",
+            path.name,
+            len(records),
+            len(diagnostics),
+            time.perf_counter() - parse_started,
+        )
+        # Mirror the mac.py-level summary into the s19tui logger so users who only
+        # check the app's rotating log file see the same key/value breakdown that
+        # the root logger emits.
+        parse_ok_count = len([item for item in records if item.get("parse_ok")])
+        valid_from_records = len(
+            [item for item in records if isinstance(item.get("address"), int)]
+        )
+        self.logger.info(
+            "MAC parse summary (mirrored): path=%s rows=%d parse_ok=%d diagnostics=%d valid_addresses=%d",
+            path,
+            len(records),
+            parse_ok_count,
+            len(diagnostics),
+            valid_from_records,
+        )
+        self._flush_logger()
         valid_addresses = sorted(
             {
                 int(item["address"])
@@ -2162,17 +2265,30 @@ class S19TuiApp(App):
         range_validity: list[bool] = []
         errors = [{"line": None, "message": entry} for entry in diagnostics]
         a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
+        self.logger.info(
+            "Load phase boundary: mac_a2l_resolve_entry path=%s a2l_path=%s",
+            path.name,
+            a2l_path,
+        )
+        self._flush_logger()
         a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
+        self.logger.info(
+            "Load phase boundary: mac_a2l_resolve_done path=%s has_a2l_data=%s",
+            path.name,
+            bool(a2l_data),
+        )
+        self._flush_logger()
         self.logger.info(
             "MAC parse summary: path=%s total_records=%d parse_ok=%d diagnostics=%d valid_addresses=%d a2l_path=%s elapsed_seconds=%.3f",
             path,
             len(records),
-            len([item for item in records if item.get("parse_ok")]),
+            parse_ok_count,
             len(diagnostics),
             len(valid_addresses),
             a2l_path,
             time.perf_counter() - parse_started,
         )
+        self._flush_logger()
         return LoadedFile(
             path=path,
             file_type="mac",
@@ -2715,6 +2831,12 @@ class S19TuiApp(App):
             suffix,
             self.current_project,
         )
+        self.logger.info(
+            "Load phase boundary: parse_branch_entry path=%s suffix=%s",
+            path.name,
+            suffix,
+        )
+        self._flush_logger()
         if suffix in S19_EXTENSIONS:
             s19 = S19File(str(path))
             mem_map = build_mem_map_s19(s19)
@@ -2746,6 +2868,11 @@ class S19TuiApp(App):
                 ranges=ranges,
                 errors=errors,
             )
+            self.logger.info(
+                "Load phase boundary: parse_branch_done path=%s branch=s19",
+                path.name,
+            )
+            self._flush_logger()
             return loaded
         if suffix in HEX_EXTENSIONS:
             hex_file = IntelHexFile(str(path))
@@ -2778,10 +2905,30 @@ class S19TuiApp(App):
                 ranges=ranges,
                 errors=errors,
             )
+            self.logger.info(
+                "Load phase boundary: parse_branch_done path=%s branch=hex",
+                path.name,
+            )
+            self._flush_logger()
             return loaded
         if suffix in MAC_EXTENSIONS:
             mac_loaded = self._load_mac_file(path, a2l_files)
+            self.logger.info(
+                "Load phase boundary: mac_merge_entry path=%s has_primary=%s",
+                path.name,
+                bool(
+                    self.current_file
+                    and self.current_file.file_type in {"s19", "hex"}
+                ),
+            )
+            self._flush_logger()
             loaded = self._merge_mac_with_existing_primary(mac_loaded)
+            self.logger.info(
+                "Load phase boundary: mac_merge_done path=%s file_type=%s",
+                path.name,
+                loaded.file_type,
+            )
+            self._flush_logger()
             if loaded.file_type in {"s19", "hex"}:
                 self._log_loaded_file_summary(
                     file_type=f"{loaded.file_type}+mac",
@@ -2798,6 +2945,11 @@ class S19TuiApp(App):
                     ranges=loaded.ranges,
                     errors=loaded.errors,
                 )
+            self.logger.info(
+                "Load phase boundary: parse_branch_done path=%s branch=mac",
+                path.name,
+            )
+            self._flush_logger()
             return loaded
         return None
 
@@ -2850,13 +3002,15 @@ class S19TuiApp(App):
             - When ``precomputed`` is True, copy MAC cache + validation results into the
               app's cache members so ``update_mac_view`` treats them as a cache hit.
             - Attach ``bases_set`` to the ``LoadedFile`` for fast hex rendering.
-            - Refresh sections (with precomputed MAC out-of-range list when available),
-              hex views, MAC view, A2L view, and project labels.
-            - Append a coexistence-aware status/log line.
+            - Set the coexistence status line immediately so the user sees the new file.
+            - Schedule sections, hex, A2L, and project-label refreshes via ``call_later``
+              so the event loop can process the modal-pop message and repaint between
+              each phase instead of blocking the UI for the full install duration.
 
         Dependencies:
             Uses:
-                - ``_invalidate_mac_view_cache``
+                - ``_invalidate_mac_view_cache`` / ``_flush_logger``
+                - ``call_later`` (yielding chain)
                 - ``update_sections`` / ``update_hex_view`` / ``update_alt_hex_view`` /
                   ``update_mac_hex_view`` / ``update_mac_view`` / ``update_a2l_view`` /
                   ``update_project_labels``
@@ -2894,33 +3048,74 @@ class S19TuiApp(App):
                 self._a2l_enriched_key = prepared.a2l_enriched_key
                 self._a2l_summary_lines = prepared.a2l_summary_lines
                 self._a2l_summary_start = 0
-        self.logger.info("Load phase boundary: apply_start path=%s", path.name)
-        # Pass the precomputed out-of-range list only when available so tests that
-        # monkeypatch ``update_sections`` with a no-argument stub keep working.
-        if prepared.precomputed:
-            self.update_sections(precomputed_out_of_range=prepared.mac_out_of_range)
-        else:
-            self.update_sections()
-        self.update_hex_view()
-        self.update_alt_hex_view()
-        self.update_mac_hex_view()
-        # ``update_a2l_view`` invokes ``update_mac_view`` internally in both A2L
-        # present/absent branches, which in turn installs the precomputed cache and
-        # renders the validation-issues window.
-        self.update_a2l_view()
-        self.update_project_labels()
+        # Surface the new file name right away so the user sees immediate feedback
+        # even before the deferred sections/hex/a2l refreshes complete.
         status_message = self._format_coexistence_status(loaded, path)
         self.set_file_status(status_message)
         self._append_log_line(status_message)
-        total_elapsed = time.perf_counter() - load_started
         self.logger.info(
-            "Loaded file successfully: path=%s file_type=%s elapsed_seconds=%.3f has_mac=%s precomputed=%s",
-            path,
-            loaded.file_type,
-            total_elapsed,
-            bool(loaded.mac_records),
+            "Load phase boundary: apply_install_state path=%s precomputed=%s",
+            path.name,
             prepared.precomputed,
         )
+        self._flush_logger()
+
+        precomputed_oor = prepared.mac_out_of_range if prepared.precomputed else None
+
+        def _step_sections() -> None:
+            try:
+                if precomputed_oor is not None:
+                    self.update_sections(precomputed_out_of_range=precomputed_oor)
+                else:
+                    self.update_sections()
+            finally:
+                self.logger.info(
+                    "Load phase boundary: apply_sections_done path=%s", path.name
+                )
+                self._flush_logger()
+                self.call_later(_step_hex)
+
+        def _step_hex() -> None:
+            try:
+                self.update_hex_view()
+                self.update_alt_hex_view()
+                self.update_mac_hex_view()
+            finally:
+                self.logger.info(
+                    "Load phase boundary: apply_hex_done path=%s", path.name
+                )
+                self._flush_logger()
+                self.call_later(_step_a2l)
+
+        def _step_a2l() -> None:
+            try:
+                # ``update_a2l_view`` invokes ``update_mac_view`` internally in both
+                # A2L present/absent branches, which in turn installs the precomputed
+                # cache and renders the validation-issues window.
+                self.update_a2l_view()
+            finally:
+                self.logger.info(
+                    "Load phase boundary: apply_a2l_done path=%s", path.name
+                )
+                self._flush_logger()
+                self.call_later(_step_finalize)
+
+        def _step_finalize() -> None:
+            try:
+                self.update_project_labels()
+            finally:
+                total_elapsed = time.perf_counter() - load_started
+                self.logger.info(
+                    "Loaded file successfully: path=%s file_type=%s elapsed_seconds=%.3f has_mac=%s precomputed=%s",
+                    path,
+                    loaded.file_type,
+                    total_elapsed,
+                    bool(loaded.mac_records),
+                    prepared.precomputed,
+                )
+                self._flush_logger()
+
+        self.call_later(_step_sections)
 
     def _format_coexistence_status(self, loaded: LoadedFile, path: Path) -> str:
         """
@@ -2986,6 +3181,12 @@ class S19TuiApp(App):
             Used by:
                 - ``_start_load_worker``
         """
+        self.logger.info(
+            "Load phase boundary: prepare_entry path=%s file_type=%s",
+            loaded.path.name if getattr(loaded, "path", None) else "?",
+            loaded.file_type,
+        )
+        self._flush_logger()
         range_index = self._get_range_index(loaded if loaded.file_type in {"s19", "hex"} else None)
         a2l_data = loaded.a2l_data
         a2l_enriched_tags: list[dict[str, Any]] = []
@@ -3005,9 +3206,21 @@ class S19TuiApp(App):
             a2l_summary_lines = render_a2l_view(
                 a2l_data, tag_checks, max_tag_lines=500
             ).splitlines()
+        self.logger.info(
+            "Load phase boundary: prepare_a2l_done has_a2l=%s enriched_tags=%d",
+            bool(a2l_data),
+            len(a2l_enriched_tags),
+        )
+        self._flush_logger()
         mac_payload = self._compute_mac_view_payload(
             loaded, a2l_data, a2l_enriched_tags=a2l_enriched_tags
         )
+        self.logger.info(
+            "Load phase boundary: prepare_mac_payload_done rows=%d issues=%d",
+            len(mac_payload.get("rows", [])),
+            len(mac_payload.get("issues", [])),
+        )
+        self._flush_logger()
         mac_highlights: set[int] = set()
         out_of_range: set[int] = set()
         has_primary = loaded.file_type in {"s19", "hex"}
@@ -3022,7 +3235,18 @@ class S19TuiApp(App):
                     out_of_range.add(addr)
                 elif not address_in_sorted_ranges(addr, range_index):
                     out_of_range.add(addr)
+        self.logger.info(
+            "Load phase boundary: prepare_highlights_done highlights=%d out_of_range=%d",
+            len(mac_highlights),
+            len(out_of_range),
+        )
+        self._flush_logger()
         bases_set = frozenset(loaded.row_bases) if loaded.row_bases else frozenset()
+        self.logger.info(
+            "Load phase boundary: prepare_bases_done row_bases=%d",
+            len(bases_set),
+        )
+        self._flush_logger()
         records = loaded.mac_records or []
         mac_cache_key = (
             id(records),
@@ -3032,6 +3256,8 @@ class S19TuiApp(App):
             tuple(loaded.ranges),
             len(loaded.mem_map),
         )
+        self.logger.info("Load phase boundary: prepare_done records=%d", len(records))
+        self._flush_logger()
         return PreparedLoad(
             loaded=loaded,
             precomputed=True,
@@ -3085,6 +3311,7 @@ class S19TuiApp(App):
         """
         load_started = time.perf_counter()
         self.logger.info("Load phase boundary: worker_parse_start path=%s", path.name)
+        self._flush_logger()
         try:
             loaded = self._parse_loaded_file(path, a2l_files)
         except Exception as exc:
@@ -3103,6 +3330,7 @@ class S19TuiApp(App):
             path.name,
             time.perf_counter() - load_started,
         )
+        self._flush_logger()
         prepare_started = time.perf_counter()
         try:
             prepared = self._prepare_load_payload(loaded)
@@ -3116,6 +3344,12 @@ class S19TuiApp(App):
             prepared.precomputed,
             time.perf_counter() - prepare_started,
         )
+        self._flush_logger()
+        self.logger.info(
+            "Load phase boundary: call_from_thread_apply_dispatched path=%s",
+            path.name,
+        )
+        self._flush_logger()
         self.call_from_thread(self._apply_prepared_load, prepared, path, load_started)
         self.call_from_thread(self.set_progress, 100, f"Loaded {path.name}")
         if self.current_project:
@@ -3306,7 +3540,8 @@ class S19TuiApp(App):
 
         Data Flow:
             - Clear widget and short-circuit when no file is loaded.
-            - Append one ``ListItem`` per memory range with OK/ERROR coloring.
+            - Append at most ``MAX_SECTIONS_PRIMARY_RANGES`` memory-range rows with
+              OK/ERROR coloring, then a truncation row when more exist.
             - Append at most ``MAX_SECTIONS_OUT_OF_RANGE`` MAC out-of-range rows; when
               truncated, add a single summary row pointing users at the Issues panel.
 
@@ -3321,9 +3556,12 @@ class S19TuiApp(App):
         sections.clear()
         if not self.current_file:
             return
-        for (start, end), is_valid in zip(
-            self.current_file.ranges, self.current_file.range_validity
-        ):
+        ranges = self.current_file.ranges
+        validity = self.current_file.range_validity
+        total_ranges = len(ranges)
+        range_cap = MAX_SECTIONS_PRIMARY_RANGES
+        visible_ranges = list(zip(ranges[:range_cap], validity[:range_cap]))
+        for (start, end), is_valid in visible_ranges:
             size = end - start
             label = Label(f"0x{start:08X} - 0x{end - 1:08X} ({size} bytes)")
             severity = ValidationSeverity.OK if is_valid else ValidationSeverity.ERROR
@@ -3331,30 +3569,40 @@ class S19TuiApp(App):
             item = ListItem(label)
             item.data = (start, end)
             sections.append(item)
+        if total_ranges > range_cap:
+            extra_ranges = total_ranges - range_cap
+            truncation_label = Label(
+                f"... {extra_ranges} more ranges (see log) ..."
+            )
+            truncation_label.add_class(css_class_for_severity(ValidationSeverity.NEUTRAL))
+            truncation_item = ListItem(truncation_label)
+            truncation_item.data = None
+            sections.append(truncation_item)
         if precomputed_out_of_range is not None:
             out_of_range = precomputed_out_of_range
         else:
             out_of_range = sorted(self._collect_mac_out_of_range_addresses(self.current_file))
         total_oor = len(out_of_range)
-        cap = MAX_SECTIONS_OUT_OF_RANGE
-        visible = out_of_range[:cap]
+        oor_cap = MAX_SECTIONS_OUT_OF_RANGE
+        visible = out_of_range[:oor_cap]
         for address in visible:
             label = Label(f"MAC out-of-range @ 0x{address:08X}")
             label.add_class("mac_out_of_range")
             item = ListItem(label)
             item.data = (address, address + 1)
             sections.append(item)
-        if total_oor > cap:
+        if total_oor > oor_cap:
             truncation_label = Label(
-                f"... {total_oor - cap} more MAC out-of-range (see Issues panel) ..."
+                f"... {total_oor - oor_cap} more MAC out-of-range (see Issues panel) ..."
             )
             truncation_label.add_class("mac_out_of_range")
             sections.append(ListItem(truncation_label))
         self.logger.info(
-            "Sections updated. count=%d mac_out_of_range_total=%d rendered=%d",
-            len(self.current_file.ranges),
+            "Sections updated. count=%d rendered_ranges=%d mac_out_of_range_total=%d rendered_oor=%d",
+            total_ranges,
+            min(total_ranges, range_cap),
             total_oor,
-            min(total_oor, cap),
+            min(total_oor, oor_cap),
         )
 
     def update_hex_view(self, focus_address: Optional[int] = None) -> None:

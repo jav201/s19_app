@@ -1033,3 +1033,192 @@ def test_end_to_end_load_pipeline_under_budget(tmp_path: Path):
     # Keep the CI budget generous; the point is the pipeline finishes in seconds,
     # not the original "frozen for an hour" user reported.
     assert elapsed < 10.0, f"end-to-end prepare too slow: {elapsed:.3f}s"
+
+
+def test_handle_load_dialog_defers_load_until_after_modal_dismiss(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """``_handle_load_dialog`` must schedule the load via ``call_after_refresh`` so
+    Textual pops the modal before the heavy copy/parse/install pipeline begins.
+    """
+    app = S19TuiApp(base_dir=tmp_path)
+
+    load_calls: list[Path] = []
+    monkeypatch.setattr(
+        app, "_load_path_from_user_input", lambda path: load_calls.append(path)
+    )
+
+    scheduled: list[tuple] = []
+    monkeypatch.setattr(
+        app,
+        "call_after_refresh",
+        lambda callback, *args, **kwargs: scheduled.append((callback, args, kwargs)),
+    )
+
+    target = tmp_path / "sample.s19"
+    app._handle_load_dialog(target)
+
+    assert load_calls == [], "load must not run synchronously before modal pops"
+    assert len(scheduled) == 1, "a single deferred load must be queued"
+    callback, args, kwargs = scheduled[0]
+    assert callback == app._load_path_from_user_input
+    assert args == (target,)
+    assert kwargs == {}
+
+    callback(*args, **kwargs)
+    assert load_calls == [target]
+
+
+def test_handle_load_dialog_none_path_skips_scheduling(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Cancelling the load dialog must not schedule any deferred work."""
+    app = S19TuiApp(base_dir=tmp_path)
+    scheduled: list[tuple] = []
+    monkeypatch.setattr(
+        app,
+        "call_after_refresh",
+        lambda callback, *args, **kwargs: scheduled.append((callback, args, kwargs)),
+    )
+    loaded: list[Path] = []
+    monkeypatch.setattr(
+        app, "_load_path_from_user_input", lambda path: loaded.append(path)
+    )
+
+    app._handle_load_dialog(None)
+
+    assert scheduled == []
+    assert loaded == []
+
+
+def test_apply_prepared_load_chains_updates_via_call_later(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """``_apply_prepared_load`` must install reactive state synchronously and defer
+    every heavy UI refresh through ``call_later`` so the event loop can repaint.
+    """
+    from s19_app.tui.app import PreparedLoad
+
+    app = S19TuiApp(base_dir=tmp_path)
+
+    deferred: list = []
+    monkeypatch.setattr(
+        app, "call_later", lambda callback, *args, **kwargs: deferred.append(callback)
+    )
+
+    call_log: list[str] = []
+
+    def record(name: str):
+        def _inner(*_a, **_k):
+            call_log.append(name)
+
+        return _inner
+
+    monkeypatch.setattr(app, "update_sections", record("sections"))
+    monkeypatch.setattr(app, "update_hex_view", record("hex"))
+    monkeypatch.setattr(app, "update_alt_hex_view", record("alt_hex"))
+    monkeypatch.setattr(app, "update_mac_hex_view", record("mac_hex"))
+    monkeypatch.setattr(app, "update_a2l_view", record("a2l"))
+    monkeypatch.setattr(app, "update_project_labels", record("labels"))
+    monkeypatch.setattr(app, "set_file_status", record("status"))
+    monkeypatch.setattr(app, "_append_log_line", record("log_line"))
+
+    loaded = LoadedFile(
+        path=tmp_path / "big.s19",
+        file_type="s19",
+        mem_map={0x1000: 0x11},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1010)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+    prepared = PreparedLoad(loaded=loaded)
+
+    app._apply_prepared_load(prepared, tmp_path / "big.s19", 0.0)
+
+    # Synchronous effects: status + log line appended before any deferred step runs.
+    assert "status" in call_log
+    assert "log_line" in call_log
+    assert app.current_file is loaded
+    assert "sections" not in call_log, "sections must be deferred, not sync"
+    assert "hex" not in call_log, "hex must be deferred, not sync"
+
+    assert len(deferred) == 1, "first chain step must be queued via call_later"
+    deferred[0]()
+    assert "sections" in call_log
+
+    assert len(deferred) == 2
+    deferred[1]()
+    assert "hex" in call_log
+    assert "alt_hex" in call_log
+    assert "mac_hex" in call_log
+
+    assert len(deferred) == 3
+    deferred[2]()
+    assert "a2l" in call_log
+
+    assert len(deferred) == 4
+    deferred[3]()
+    assert "labels" in call_log
+
+
+def test_update_sections_caps_primary_ranges(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """Primary ranges list must truncate to ``MAX_SECTIONS_PRIMARY_RANGES`` rows."""
+    from s19_app.tui import app as app_module
+
+    app = S19TuiApp(base_dir=tmp_path)
+    total_ranges = app_module.MAX_SECTIONS_PRIMARY_RANGES + 100
+    ranges = [(i * 0x10, i * 0x10 + 0x10) for i in range(total_ranges)]
+    app.current_file = LoadedFile(
+        path=tmp_path / "big.s19",
+        file_type="s19",
+        mem_map={start: 0 for start, _ in ranges},
+        row_bases=[start for start, _ in ranges],
+        ranges=ranges,
+        range_validity=[True] * total_ranges,
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+    captured_labels: list[str] = []
+
+    class FakeLabel:
+        def __init__(self, text: str) -> None:
+            self.text = text
+
+        def add_class(self, _cls: str) -> None:
+            return
+
+    class FakeItem:
+        def __init__(self, label: FakeLabel) -> None:
+            self.label = label
+            self.data = None
+
+    class FakeList:
+        def clear(self) -> None:
+            captured_labels.clear()
+
+        def append(self, item: object) -> None:
+            label = getattr(item, "label", None) or getattr(item, "_label", None)
+            captured_labels.append(label.text if label is not None else str(item))
+
+    monkeypatch.setattr(
+        app,
+        "query_one",
+        lambda selector, *_a, **_k: FakeList() if selector == "#sections_list" else None,
+    )
+    monkeypatch.setattr(app_module, "Label", FakeLabel)
+    monkeypatch.setattr(app_module, "ListItem", FakeItem)
+
+    app.update_sections(precomputed_out_of_range=[])
+
+    # MAX_SECTIONS_PRIMARY_RANGES range rows + 1 truncation marker + 0 MAC rows.
+    assert len(captured_labels) == app_module.MAX_SECTIONS_PRIMARY_RANGES + 1
+    assert captured_labels[-1].startswith("...")
+    extra = total_ranges - app_module.MAX_SECTIONS_PRIMARY_RANGES
+    assert f"{extra} more ranges" in captured_labels[-1]
