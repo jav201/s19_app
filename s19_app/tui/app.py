@@ -13,6 +13,7 @@ from textual.containers import Container, ScrollableContainer
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
+    DataTable,
     Footer,
     Header,
     Input,
@@ -22,6 +23,8 @@ from textual.widgets import (
     ProgressBar,
     Static,
 )
+from textual.widgets.data_table import RowDoesNotExist
+from rich.text import Text
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
@@ -176,6 +179,18 @@ class PreparedLoad:
     a2l_enriched_tags: list = field(default_factory=list)
     a2l_enriched_key: Optional[tuple] = None
     a2l_summary_lines: list = field(default_factory=list)
+    # DataTable-oriented precompute (populated by the load worker):
+    # - ``mac_widths``: 8-tuple of column widths matching the historical inline computation
+    #   in ``update_mac_view`` so the main thread never rescans full row vectors.
+    # - ``mac_cell_rows``: list of 8-string tuples ready to hand to ``DataTable.add_rows``.
+    # - ``mac_cell_styles``: parallel list of severity style strings per row.
+    # - ``issue_cell_rows``: list of 6-string tuples for the Issues DataTable.
+    # - ``issue_cell_styles``: parallel severity style strings per issue row.
+    mac_widths: Optional[tuple] = None
+    mac_cell_rows: list = field(default_factory=list)
+    mac_cell_styles: list = field(default_factory=list)
+    issue_cell_rows: list = field(default_factory=list)
+    issue_cell_styles: list = field(default_factory=list)
 
 
 def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
@@ -241,6 +256,156 @@ def _mac_record_ui_state(
         if isinstance(tag_addr, int) and tag_addr == address:
             return "OK", ValidationSeverity.OK.value
     return "A2L_ADDR_MISMATCH", ValidationSeverity.ERROR.value
+
+
+_MAC_COLUMN_HEADERS: tuple[str, ...] = (
+    "Tag",
+    "Address",
+    "InA2L",
+    "InMem",
+    "Status",
+    "SourceLine",
+    "ParseErr",
+    "A2LMatch",
+)
+
+
+_SEVERITY_TO_RICH_STYLE: dict[ValidationSeverity, str] = {
+    ValidationSeverity.OK: "green",
+    ValidationSeverity.ERROR: "red",
+    ValidationSeverity.WARNING: "orange3",
+    ValidationSeverity.INFO: "cyan",
+    ValidationSeverity.NEUTRAL: "grey70",
+}
+
+
+def _severity_style(severity: ValidationSeverity) -> str:
+    """
+    Summary:
+        Map a ``ValidationSeverity`` to a Rich-compatible style string usable by
+        ``rich.text.Text`` cells inside a Textual ``DataTable``.
+
+    Args:
+        severity (ValidationSeverity): Severity to convert.
+
+    Returns:
+        str: Style string (e.g. ``"red"``, ``"green"``). Empty string when unknown.
+
+    Dependencies:
+        Used by:
+            - ``precompute_mac_datatable_payload``
+            - ``precompute_issue_datatable_payload``
+    """
+    return _SEVERITY_TO_RICH_STYLE.get(severity, "")
+
+
+def precompute_mac_datatable_payload(
+    mac_rows: list[tuple],
+    mac_meta: list[dict],
+) -> tuple[tuple[int, ...], list[tuple[str, ...]], list[str]]:
+    """
+    Summary:
+        Compute the column widths, row tuples, and per-row severity styles the MAC
+        DataTable needs, using the raw row vectors produced by
+        ``_compute_mac_view_payload`` so the work happens off the UI thread.
+
+    Args:
+        mac_rows (list[tuple]): 8-tuples in display order (Tag, Address, InA2L,
+            InMem, Status, SourceLine, ParseErr, A2LMatch).
+        mac_meta (list[dict]): Parallel metadata with ``severity`` keys.
+
+    Returns:
+        tuple[tuple[int, ...], list[tuple[str, ...]], list[str]]:
+            ``(widths, cell_rows, styles)`` where ``widths`` has length 8 and mirrors
+            the historical inline width computation in ``update_mac_view``, and
+            ``styles`` is a Rich style string per row.
+
+    Data Flow:
+        - Single pass over ``mac_rows`` to compute per-column ``max(len(cell))``.
+        - Clamp Tag/ParseErr/A2LMatch to 48 chars matching the current renderer.
+        - Copy rows verbatim into the returned cell-row list (strings as-is).
+        - Pull severity from ``mac_meta`` and map via ``_severity_style``.
+
+    Dependencies:
+        Uses:
+            - ``_severity_style``
+        Used by:
+            - ``S19TuiApp._prepare_load_payload``
+    """
+    if not mac_rows:
+        widths = tuple([len(label) for label in _MAC_COLUMN_HEADERS])
+        return widths, [], []
+    cell_rows: list[tuple[str, ...]] = [tuple(str(cell) for cell in row) for row in mac_rows]
+    col_count = len(_MAC_COLUMN_HEADERS)
+    widths_list = [len(header) for header in _MAC_COLUMN_HEADERS]
+    for row in cell_rows:
+        for idx in range(col_count):
+            if idx < len(row):
+                cell_len = len(row[idx])
+                if cell_len > widths_list[idx]:
+                    widths_list[idx] = cell_len
+    # Clamp the three wide textual columns to match the historical inline computation.
+    widths_list[0] = min(widths_list[0], 48)  # Tag
+    widths_list[6] = min(widths_list[6], 48)  # ParseErr
+    widths_list[7] = min(widths_list[7], 48)  # A2LMatch
+    styles: list[str] = []
+    for meta in mac_meta or []:
+        severity = meta.get("severity") if isinstance(meta, dict) else None
+        if isinstance(severity, ValidationSeverity):
+            styles.append(_severity_style(severity))
+        else:
+            styles.append("")
+    # Pad styles list to row count if meta was shorter than rows.
+    while len(styles) < len(cell_rows):
+        styles.append("")
+    return tuple(widths_list), cell_rows, styles
+
+
+def precompute_issue_datatable_payload(
+    issues: list[ValidationIssue],
+) -> tuple[list[tuple[str, ...]], list[str]]:
+    """
+    Summary:
+        Format validation issues into ready-to-render 7-tuple cell rows and per-row
+        severity styles so the main thread only calls ``DataTable.add_rows``.
+
+    Args:
+        issues (list[ValidationIssue]): Validation issues from the worker.
+
+    Returns:
+        tuple[list[tuple[str, ...]], list[str]]: ``(cell_rows, styles)`` where each
+        cell row is ``(severity, code, artifact, symbol, address, line, message)``.
+
+    Data Flow:
+        - Iterate issues once.
+        - Format address as ``0x%08X`` and line number as str when available.
+        - Map severity enum to a Rich style string for the first cell.
+
+    Dependencies:
+        Uses:
+            - ``_severity_style``
+        Used by:
+            - ``S19TuiApp._prepare_load_payload``
+    """
+    cell_rows: list[tuple[str, ...]] = []
+    styles: list[str] = []
+    for issue in issues or []:
+        symbol = issue.symbol or "-"
+        addr = f"0x{issue.address:08X}" if isinstance(issue.address, int) else "-"
+        line_no = str(issue.line_number) if isinstance(issue.line_number, int) else "-"
+        cell_rows.append(
+            (
+                issue.severity.value.upper(),
+                str(issue.code or ""),
+                str(issue.artifact or ""),
+                symbol,
+                addr,
+                line_no,
+                str(issue.message or ""),
+            )
+        )
+        styles.append(_severity_style(issue.severity))
+    return cell_rows, styles
 
 
 class S19TuiApp(App):
@@ -437,7 +602,23 @@ class S19TuiApp(App):
     }
 
     #a2l_tags_list {
-        height: 100%;
+        height: 1fr;
+    }
+
+    #a2l_tags_summary {
+        height: auto;
+        padding: 0 1;
+        color: $text;
+    }
+
+    #mac_records_list {
+        height: 1fr;
+    }
+
+    #mac_records_summary {
+        height: auto;
+        padding: 0 1;
+        color: $text;
     }
 
     #alt_hex_scroll {
@@ -479,6 +660,12 @@ class S19TuiApp(App):
     #validation_issues_list {
         height: 12;
         border: round $primary;
+    }
+
+    #validation_issues_summary {
+        height: auto;
+        padding: 0 1;
+        color: $text;
     }
 
     #load_dialog {
@@ -596,6 +783,16 @@ class S19TuiApp(App):
         self._mac_view_cache_meta: list[dict[str, Any]] = []
         self._mac_view_cache_summary: dict[str, int] = {}
         self._mac_view_cache_coverage_line: Optional[str] = None
+        self._mac_view_cache_widths: Optional[tuple[int, ...]] = None
+        self._mac_view_cache_cell_rows: list[tuple[str, ...]] = []
+        self._mac_view_cache_cell_styles: list[str] = []
+        self._validation_issue_cell_rows: list[tuple[str, ...]] = []
+        self._validation_issue_cell_styles: list[str] = []
+        # Per-DataTable maps from visible row_key back to the underlying record so
+        # the shared ``on_data_table_row_selected`` handler can jump correctly.
+        self._mac_row_key_to_address: dict[str, int] = {}
+        self._issue_row_key_to_index: dict[str, int] = {}
+        self._a2l_row_key_to_tag: dict[str, dict[str, Any]] = {}
         self._hex_window_start: int = 0
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
@@ -852,7 +1049,7 @@ class S19TuiApp(App):
                 Label("Data Sections", id="sections_title"),
                 ListView(id="sections_list"),
                 id="sections_panel",
-            ),
+            ),  # sections stays as ListView (capped; small count)
             Container(
                 Label("Hex Viewer", id="hex_title"),
                 Container(
@@ -887,7 +1084,8 @@ class S19TuiApp(App):
                     Button("Warnings", id="issues_filter_warning"),
                     id="validation_issues_filters",
                 ),
-                ListView(id="validation_issues_list"),
+                DataTable(id="validation_issues_list", zebra_stripes=True, cursor_type="row"),
+                Label("", id="validation_issues_summary"),
                 ProgressBar(total=100, id="progress_bar"),
                 Label("", id="log_line_1"),
                 Label("", id="log_line_2"),
@@ -915,7 +1113,8 @@ class S19TuiApp(App):
                     id="a2l_filter_menu",
                     classes="hidden",
                 ),
-                ListView(id="a2l_tags_list"),
+                DataTable(id="a2l_tags_list", zebra_stripes=True, cursor_type="row"),
+                Label("", id="a2l_tags_summary"),
                 id="alt_tags_panel",
             ),
             Container(
@@ -939,8 +1138,9 @@ class S19TuiApp(App):
         yield Container(
             Container(
                 Label("MAC File Content", id="mac_title"),
-                ScrollableContainer(
-                    ListView(id="mac_records_list"),
+                Container(
+                    DataTable(id="mac_records_list", zebra_stripes=True, cursor_type="row"),
+                    Label("", id="mac_records_summary"),
                     id="mac_scroll",
                 ),
                 id="mac_content_panel",
@@ -966,6 +1166,7 @@ class S19TuiApp(App):
         yield Footer()
 
     def on_mount(self) -> None:
+        self._setup_datatable_columns()
         self.refresh_files()
         self._update_a2l_filter_menu()
         self._update_settings_menu()
@@ -973,6 +1174,81 @@ class S19TuiApp(App):
         if self.load_path:
             self.logger.info("Startup load requested: %s", self.load_path)
             self._load_path_from_user_input(self.load_path)
+
+    def _setup_datatable_columns(self) -> None:
+        """
+        Summary:
+            Install the fixed column headers on the MAC, Issues, and A2L tag DataTables
+            exactly once at mount so subsequent refreshes only call ``clear`` + ``add_rows``.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Query the three DataTables by id and add their static column labels.
+            - Silently ignore duplicate-column errors so repeated mounts are harmless.
+
+        Dependencies:
+            Uses:
+                - ``DataTable.add_columns``
+            Used by:
+                - ``on_mount``
+        """
+        try:
+            mac_table = self.query_one("#mac_records_list", DataTable)
+            if not mac_table.columns:
+                mac_table.add_columns(
+                    "Tag",
+                    "Address",
+                    "InA2L",
+                    "InMem",
+                    "Status",
+                    "SourceLine",
+                    "ParseErr",
+                    "A2LMatch",
+                )
+        except Exception:
+            self.logger.debug("MAC DataTable columns already initialized or missing.")
+        try:
+            issues_table = self.query_one("#validation_issues_list", DataTable)
+            if not issues_table.columns:
+                issues_table.add_columns(
+                    "Severity",
+                    "Code",
+                    "Artifact",
+                    "Symbol",
+                    "Address",
+                    "Line",
+                    "Message",
+                )
+        except Exception:
+            self.logger.debug("Issues DataTable columns already initialized or missing.")
+        try:
+            a2l_table = self.query_one("#a2l_tags_list", DataTable)
+            if not a2l_table.columns:
+                a2l_table.add_columns(
+                    "Tag",
+                    "Address",
+                    "Length",
+                    "Source",
+                    "Raw",
+                    "Physical",
+                    "InMem",
+                    "Region",
+                    "Limits",
+                    "Unit",
+                    "Bits",
+                    "Endian",
+                    "Virt",
+                    "Func",
+                    "Access",
+                    "Dtype",
+                )
+        except Exception:
+            self.logger.debug("A2L DataTable columns already initialized or missing.")
 
     def refresh_files(self) -> None:
         """Refresh file list from the workarea temp folder."""
@@ -1741,11 +2017,6 @@ class S19TuiApp(App):
                 return
             self._jump_to_section(event.item)
             return
-        if event.list_view.id == "a2l_tags_list":
-            if event.item is None:
-                return
-            self._jump_to_tag(event.item)
-            return
         if event.list_view.id == "a2l_filter_menu_list":
             if event.item is None:
                 return
@@ -1765,15 +2036,57 @@ class S19TuiApp(App):
             ):
                 self._apply_viewer_setting(payload[0], payload[1])
             return
-        if event.list_view.id == "mac_records_list":
-            if event.item is None:
-                return
-            self._jump_to_mac_record(event.item)
+        # ``mac_records_list``, ``validation_issues_list``, and ``a2l_tags_list`` are
+        # now ``DataTable`` widgets; selection for those IDs arrives via
+        # ``on_data_table_row_selected`` instead of this ListView handler.
+
+    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+        """
+        Summary:
+            Dispatch a ``DataTable.RowSelected`` event to the correct jump helper by
+            looking at the selected table's id and the encoded row_key.
+
+        Args:
+            event (DataTable.RowSelected): Event payload with ``data_table`` and
+                ``row_key`` attributes.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Pull the table id from ``event.data_table`` and the row_key value.
+            - MAC rows -> ``_jump_to_mac_address`` via the ``_mac_row_key_to_address`` map.
+            - Issue rows -> ``_jump_to_validation_issue_by_index`` via the filtered list.
+            - A2L rows -> ``_jump_to_tag_by_data`` via the ``_a2l_row_key_to_tag`` map.
+
+        Dependencies:
+            Uses:
+                - ``_jump_to_mac_address``
+                - ``_jump_to_validation_issue_by_index``
+                - ``_jump_to_tag_by_data``
+            Used by:
+                - Textual event dispatch for ``DataTable.RowSelected``
+        """
+        table = getattr(event, "data_table", None)
+        table_id = getattr(table, "id", None) if table is not None else None
+        row_key = getattr(event, "row_key", None)
+        key_value = getattr(row_key, "value", row_key)
+        if not isinstance(key_value, str):
             return
-        if event.list_view.id == "validation_issues_list":
-            if event.item is None:
-                return
-            self._jump_to_validation_issue(event.item)
+        if table_id == "mac_records_list":
+            address = self._mac_row_key_to_address.get(key_value)
+            if isinstance(address, int):
+                self._jump_to_mac_address(address)
+            return
+        if table_id == "validation_issues_list":
+            absolute_index = self._issue_row_key_to_index.get(key_value)
+            if isinstance(absolute_index, int):
+                self._jump_to_validation_issue_by_index(absolute_index)
+            return
+        if table_id == "a2l_tags_list":
+            tag = self._a2l_row_key_to_tag.get(key_value)
+            if isinstance(tag, dict):
+                self._jump_to_tag_by_data(tag)
             return
 
     def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
@@ -1845,16 +2158,40 @@ class S19TuiApp(App):
     def _jump_to_tag(self, item: ListItem) -> None:
         """
         Summary:
-            Focus the alt hex panel on a selected tag address with a byte-range highlight.
+            Legacy ListView adapter that unpacks ``item.data`` into the shared
+            ``_jump_to_tag_by_data`` helper so both DataTable and ListView paths
+            share one implementation.
 
         Args:
-            item (ListItem): A2L tags table row; ``item.data`` carries ``address`` and ``tag``.
+            item (ListItem): A2L tags table row with ``item.data`` holding ``tag``.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_jump_to_tag_by_data``
+        """
+        tag_info = getattr(item, "data", None)
+        if not isinstance(tag_info, dict):
+            return
+        tag = tag_info.get("tag")
+        if isinstance(tag, dict):
+            self._jump_to_tag_by_data(tag)
+
+    def _jump_to_tag_by_data(self, tag: dict) -> None:
+        """
+        Summary:
+            Focus the alt hex panel on an A2L tag's address with a byte-range highlight.
+
+        Args:
+            tag (dict): Enriched A2L tag dict carrying ``address`` and optionally ``length``.
 
         Returns:
             None
 
         Data Flow:
-            - Read optional integer address and full tag payload from list metadata.
+            - Return early when no integer address is present.
             - Store ``_a2l_tag_hex_highlight`` so ``update_alt_hex_view`` can paint a span.
             - Re-render alt hex centered on the tag address.
 
@@ -1864,17 +2201,12 @@ class S19TuiApp(App):
                 - ``update_alt_hex_view``
                 - ``set_status``
             Used by:
-                - ``on_list_view_selected`` for ``a2l_tags_list``
+                - ``on_data_table_row_selected`` for the A2L DataTable
+                - ``_jump_to_tag`` (legacy ListView adapter)
         """
-        tag_info = getattr(item, "data", None)
-        if not tag_info:
-            return
-        if tag_info.get("absolute_index") is None:
-            return
-        addr = tag_info.get("address")
+        addr = tag.get("address") if isinstance(tag, dict) else None
         if not isinstance(addr, int):
             return
-        tag = tag_info.get("tag")
         span = self._a2l_tag_byte_length_for_hex_highlight(tag if isinstance(tag, dict) else {})
         self._a2l_tag_hex_highlight = (addr, span)
         self.update_alt_hex_view(addr)
@@ -1909,9 +2241,14 @@ class S19TuiApp(App):
         page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         self._a2l_window_start = (absolute_index // page_size) * page_size
         self.update_a2l_tags_view(tags)
-        list_view = self.query_one("#a2l_tags_list", ListView)
-        row_index = 2 + (absolute_index - self._a2l_window_start)
-        list_view.index = row_index
+        try:
+            a2l_table = self.query_one("#a2l_tags_list", DataTable)
+            row_offset = absolute_index - self._a2l_window_start
+            if 0 <= row_offset < a2l_table.row_count:
+                a2l_table.move_cursor(row=row_offset)
+        except Exception:
+            # Widget may not be fully mounted in test harnesses; focus is best-effort.
+            pass
         return True
 
     def _a2l_tag_find_haystack(self, tag: dict) -> str:
@@ -2004,50 +2341,107 @@ class S19TuiApp(App):
         self.set_status("Tag find: no match.")
 
     def _jump_to_mac_record(self, item: ListItem) -> None:
+        """Legacy ListView adapter that forwards to ``_jump_to_mac_address``."""
+        info = getattr(item, "data", None)
+        if not info:
+            return
+        addr = info.get("address")
+        if isinstance(addr, int):
+            self._jump_to_mac_address(addr)
+
+    def _jump_to_mac_address(self, address: int) -> None:
         """
         Summary:
-            Focus the MAC hex panel on the address carried by a selected MAC table row.
+            Focus the MAC hex panel on a MAC row's address and surface a status note.
 
         Args:
-            item (ListItem): Row from ``#mac_records_list``; ``item.data`` may include
-                ``address`` (int) when the row parsed successfully.
+            address (int): Absolute memory address for the selected MAC record.
 
         Returns:
             None
-
-        Data Flow:
-            - Read optional ``address`` from list item payload.
-            - Call ``update_mac_hex_view`` when address is an integer.
-            - Update status line with formatted address.
 
         Dependencies:
             Uses:
                 - ``update_mac_hex_view``
                 - ``set_status``
             Used by:
-                - ``on_list_view_selected`` for ``mac_records_list``
+                - ``on_data_table_row_selected`` for the MAC DataTable
+                - ``_jump_to_mac_record`` (legacy ListView adapter)
         """
-        info = getattr(item, "data", None)
-        if not info:
-            return
-        addr = info.get("address")
-        if isinstance(addr, int):
-            self.update_mac_hex_view(addr)
-            self.set_status(f"MAC tag at 0x{addr:08X}")
+        self.update_mac_hex_view(address)
+        self.set_status(f"MAC tag at 0x{address:08X}")
 
     def _jump_to_validation_issue(self, item: ListItem) -> None:
-        """Focus related hex/tag context for a selected validation issue row."""
+        """Legacy ListView adapter that forwards to ``_jump_to_validation_issue_object``."""
         info = getattr(item, "data", None)
         if not isinstance(info, dict):
             return
-        address = info.get("address")
+        issue_stub = ValidationIssue(
+            code=str(info.get("code") or ""),
+            severity=ValidationSeverity.INFO,
+            artifact="",
+            message="",
+            symbol=str(info.get("symbol") or "") or None,
+            address=info.get("address") if isinstance(info.get("address"), int) else None,
+            line_number=info.get("line_number") if isinstance(info.get("line_number"), int) else None,
+        )
+        self._jump_to_validation_issue_object(issue_stub)
+
+    def _jump_to_validation_issue_by_index(self, absolute_index: int) -> None:
+        """
+        Summary:
+            Look up a validation issue by its absolute index in the current filtered
+            list and jump to its hex/tag context.
+
+        Args:
+            absolute_index (int): Index into ``_filtered_validation_issues()`` result.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_filtered_validation_issues``
+                - ``_jump_to_validation_issue_object``
+            Used by:
+                - ``on_data_table_row_selected`` for the Issues DataTable
+        """
+        filtered = self._filtered_validation_issues()
+        if 0 <= absolute_index < len(filtered):
+            self._jump_to_validation_issue_object(filtered[absolute_index])
+
+    def _jump_to_validation_issue_object(self, issue: ValidationIssue) -> None:
+        """
+        Summary:
+            Focus related hex/tag context for a selected validation issue.
+
+        Args:
+            issue (ValidationIssue): Issue whose address (if any) or symbol drives the jump.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Prefer the integer address field when present: refresh all three hex views.
+            - Otherwise fall back to the symbol and look it up in the filtered A2L tags.
+
+        Dependencies:
+            Uses:
+                - ``update_hex_view`` / ``update_alt_hex_view`` / ``update_mac_hex_view``
+                - ``_focus_a2l_tag_absolute_index``
+                - ``set_status``
+            Used by:
+                - ``_jump_to_validation_issue_by_index``
+                - ``_jump_to_validation_issue`` (legacy adapter)
+        """
+        address = issue.address
         if isinstance(address, int) and self.current_file:
             self.update_hex_view(address)
             self.update_alt_hex_view(address)
             self.update_mac_hex_view(address)
-            self.set_status(f"Issue at 0x{address:08X}: {info.get('code', 'validation')}")
+            self.set_status(f"Issue at 0x{address:08X}: {issue.code or 'validation'}")
             return
-        symbol = str(info.get("symbol") or "").strip()
+        symbol = (issue.symbol or "").strip()
         if symbol and self._a2l_filtered_tags:
             for index, tag in enumerate(self._a2l_filtered_tags):
                 if str(tag.get("name") or "").strip().lower() == symbol.lower():
@@ -2096,8 +2490,8 @@ class S19TuiApp(App):
     def update_validation_issues_view(self) -> None:
         """
         Summary:
-            Render a paginated window of validation issues so very large issue lists
-            never mount thousands of ``ListItem`` widgets synchronously.
+            Render a paged window of validation issues into the Issues ``DataTable``
+            and push aggregate totals into the adjacent summary ``Label``.
 
         Args:
             None
@@ -2106,71 +2500,131 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Clear ``#validation_issues_list`` and short-circuit when no issues are loaded.
-            - Append a summary header line (totals + active filter).
-            - Clamp ``_validation_issues_window_start`` against the filtered total and
-              append a page indicator line.
-            - Append at most ``validation_issues_page_size`` issue rows for the current page.
+            - Resolve the filtered list via ``_filtered_validation_issues``.
+            - Short-circuit with a summary-only message when there are no issues.
+            - Compute aggregate counts (errors/warnings/info) and a page-number line.
+            - Use worker-precomputed cell rows/styles when the filter is ``all``, else
+              format the filtered subset on the fly (cheap, already filtered down).
+            - Insert the page rows via ``DataTable.add_row`` with row_keys of the form
+              ``issue:<absolute_index>`` so ``on_data_table_row_selected`` can jump.
 
         Dependencies:
             Uses:
                 - ``_filtered_validation_issues``
                 - ``_clamp_viewer_page_size`` / ``_get_window_bounds``
-                - ``_format_validation_issue_line``
+                - ``precompute_issue_datatable_payload`` (fallback)
             Used by:
                 - ``_apply_prepared_load`` (post-load refresh)
                 - ``update_mac_view`` (when MAC/validation input changes)
                 - issue filter buttons and paging actions
         """
-        issue_list = self.query_one("#validation_issues_list", ListView)
-        issue_list.clear()
+        populate_started = time.perf_counter()
+        issue_table = self.query_one("#validation_issues_list", DataTable)
+        summary_label = self.query_one("#validation_issues_summary", Label)
+        self._issue_row_key_to_index = {}
+        issue_table.clear(columns=False)
         filtered = self._filtered_validation_issues()
         if not filtered:
-            issue_list.append(ListItem(Label("No validation issues.")))
+            summary_label.update("No validation issues.")
+            self.logger.info(
+                "Load phase boundary: populate_issues_table_done rows=0 elapsed=%.3f",
+                time.perf_counter() - populate_started,
+            )
+            self._flush_logger()
             return
         error_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.ERROR)
         warning_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.WARNING)
         info_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.INFO)
-        issue_list.append(
-            ListItem(
-                Label(
-                    " | ".join(
-                        [
-                            f"total={len(self._validation_issues)}",
-                            f"errors={error_count}",
-                            f"warnings={warning_count}",
-                            f"info={info_count}",
-                            f"filter={self.validation_issue_filter_mode}",
-                        ]
-                    )
-                )
-            )
-        )
         total = len(filtered)
         page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
-        # Clamp window start onto a page boundary so +/- advance feels natural.
         max_start = max(0, ((total - 1) // page_size) * page_size) if total else 0
         self._validation_issues_window_start = max(0, min(self._validation_issues_window_start, max_start))
         start, end = self._get_window_bounds(total, self._validation_issues_window_start, page_size)
         self._validation_issues_window_start = start
         page_num = start // page_size + 1
         total_pages = max(1, (total + page_size - 1) // page_size)
-        page_line = (
-            f"Page {page_num}/{total_pages} | rows {start + 1}-{end} / {total} "
-            f"(page size {page_size}; +/- for Issues page)"
+        summary_text = " | ".join(
+            [
+                f"total={len(self._validation_issues)}",
+                f"errors={error_count}",
+                f"warnings={warning_count}",
+                f"info={info_count}",
+                f"filter={self.validation_issue_filter_mode}",
+                f"page {page_num}/{total_pages} rows {start + 1}-{end}/{total}",
+            ]
         )
-        issue_list.append(ListItem(Label(page_line)))
-        for issue in filtered[start:end]:
-            label = Label(self._format_validation_issue_line(issue))
-            label.add_class(css_class_for_severity(issue.severity))
-            item = ListItem(label)
-            item.data = {
-                "code": issue.code,
-                "symbol": issue.symbol,
-                "address": issue.address,
-                "line_number": issue.line_number,
-            }
-            issue_list.append(item)
+        summary_label.update(summary_text)
+        use_precomputed = (
+            self.validation_issue_filter_mode == "all"
+            and len(self._validation_issue_cell_rows) == len(self._validation_issues)
+        )
+        if use_precomputed:
+            cell_rows = self._validation_issue_cell_rows
+            styles = self._validation_issue_cell_styles
+            index_base = start
+            visible_rows = cell_rows[start:end]
+            visible_styles = styles[start:end]
+            visible_issues = filtered[start:end]
+        else:
+            visible_issues = filtered[start:end]
+            visible_rows, visible_styles = precompute_issue_datatable_payload(visible_issues)
+            index_base = start
+        self._populate_issues_datatable(
+            issue_table, visible_rows, visible_styles, visible_issues, index_base
+        )
+        self.logger.info(
+            "Load phase boundary: populate_issues_table_done rows=%d total=%d elapsed=%.3f",
+            len(visible_rows),
+            total,
+            time.perf_counter() - populate_started,
+        )
+        self._flush_logger()
+
+    def _populate_issues_datatable(
+        self,
+        issue_table: "DataTable",
+        visible_rows: list[tuple[str, ...]],
+        visible_styles: list[str],
+        visible_issues: list[ValidationIssue],
+        index_base: int,
+    ) -> None:
+        """
+        Summary:
+            Insert a page of issue rows into the Issues ``DataTable`` using Rich
+            ``Text`` cells styled by severity, and record the row_key -> filtered
+            index map that ``on_data_table_row_selected`` consumes.
+
+        Args:
+            issue_table (DataTable): Target issues table.
+            visible_rows (list[tuple[str, ...]]): Pre-formatted 7-tuple cells.
+            visible_styles (list[str]): Per-row Rich style strings.
+            visible_issues (list[ValidationIssue]): Parallel issue objects (for jump).
+            index_base (int): Absolute index of the first visible row for row_keys.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Build styled ``Text`` cells so severity color applies to every column.
+            - Emit a unique row_key per row (``issue:<index>``).
+            - Call ``DataTable.add_row`` per row; O(1) dict insert per row (no mount).
+            - Remember the filtered-list index on ``_issue_row_key_to_index``.
+
+        Dependencies:
+            Used by:
+                - ``update_validation_issues_view``
+        """
+        for i, row in enumerate(visible_rows):
+            style = visible_styles[i] if i < len(visible_styles) else ""
+            rich_cells = tuple(Text(str(cell), style=style) if style else Text(str(cell)) for cell in row)
+            absolute_index = index_base + i
+            row_key = f"issue:{absolute_index}"
+            if i < len(visible_issues):
+                self._issue_row_key_to_index[row_key] = absolute_index
+            try:
+                issue_table.add_row(*rich_cells, key=row_key)
+            except Exception:
+                issue_table.add_row(*rich_cells)
 
     def action_validation_issues_page_next(self) -> None:
         """Advance the validation-issues viewer window by one configured page."""
@@ -2532,6 +2986,11 @@ class S19TuiApp(App):
         self._mac_view_cache_meta = []
         self._mac_view_cache_summary = {}
         self._mac_view_cache_coverage_line = None
+        self._mac_view_cache_widths = None
+        self._mac_view_cache_cell_rows = []
+        self._mac_view_cache_cell_styles = []
+        self._validation_issue_cell_rows = []
+        self._validation_issue_cell_styles = []
 
     def _compute_mac_view_payload(
         self,
@@ -2732,6 +3191,15 @@ class S19TuiApp(App):
         self._mac_view_cache_coverage_line = payload["coverage_line"]
         self._validation_report = payload["report"]
         self._validation_issues = list(payload["issues"])
+        widths, cell_rows, cell_styles = precompute_mac_datatable_payload(
+            payload["rows"], payload["meta"]
+        )
+        self._mac_view_cache_widths = widths
+        self._mac_view_cache_cell_rows = cell_rows
+        self._mac_view_cache_cell_styles = cell_styles
+        issue_cells, issue_styles = precompute_issue_datatable_payload(list(payload["issues"]))
+        self._validation_issue_cell_rows = issue_cells
+        self._validation_issue_cell_styles = issue_styles
         self.logger.info(
             "MAC row cache built: records=%d elapsed_seconds=%.3f",
             len(self.current_file.mac_records) if self.current_file else 0,
@@ -3043,6 +3511,13 @@ class S19TuiApp(App):
             self._mac_view_cache_coverage_line = prepared.mac_coverage_line
             self._validation_report = prepared.validation_report
             self._validation_issues = list(prepared.validation_issues)
+            # Stash worker-precomputed DataTable payloads so the populate helpers
+            # skip re-formatting cells on the UI thread.
+            self._mac_view_cache_widths = prepared.mac_widths
+            self._mac_view_cache_cell_rows = list(prepared.mac_cell_rows)
+            self._mac_view_cache_cell_styles = list(prepared.mac_cell_styles)
+            self._validation_issue_cell_rows = list(prepared.issue_cell_rows)
+            self._validation_issue_cell_styles = list(prepared.issue_cell_styles)
             if prepared.a2l_enriched_key is not None:
                 self._a2l_enriched_tags = prepared.a2l_enriched_tags
                 self._a2l_enriched_key = prepared.a2l_enriched_key
@@ -3256,6 +3731,19 @@ class S19TuiApp(App):
             tuple(loaded.ranges),
             len(loaded.mem_map),
         )
+        mac_widths, mac_cell_rows, mac_cell_styles = precompute_mac_datatable_payload(
+            mac_payload["rows"], mac_payload["meta"]
+        )
+        issue_cell_rows, issue_cell_styles = precompute_issue_datatable_payload(
+            list(mac_payload["issues"])
+        )
+        self.logger.info(
+            "Load phase boundary: prepare_datatable_done mac_rows=%d issues=%d widths=%s",
+            len(mac_cell_rows),
+            len(issue_cell_rows),
+            mac_widths,
+        )
+        self._flush_logger()
         self.logger.info("Load phase boundary: prepare_done records=%d", len(records))
         self._flush_logger()
         return PreparedLoad(
@@ -3274,6 +3762,11 @@ class S19TuiApp(App):
             a2l_enriched_tags=a2l_enriched_tags,
             a2l_enriched_key=a2l_enriched_key,
             a2l_summary_lines=a2l_summary_lines,
+            mac_widths=mac_widths,
+            mac_cell_rows=mac_cell_rows,
+            mac_cell_styles=mac_cell_styles,
+            issue_cell_rows=issue_cell_rows,
+            issue_cell_styles=issue_cell_styles,
         )
 
     @work(thread=True, exclusive=True, group="load")
@@ -3714,45 +4207,66 @@ class S19TuiApp(App):
     def update_mac_view(self) -> None:
         """
         Summary:
-            Populate the MAC viewer list with a paged window of ``.mac`` rows, A2L cross-check
-            columns, validation coloring, and aggregate counts.
+            Populate the MAC DataTable with a paged window of ``.mac`` rows plus an
+            off-table summary label, consuming worker-precomputed cell rows so the UI
+            thread only issues one ``clear`` + ``add_rows`` call.
 
         Args:
-            (none; reads ``current_file``, ``current_a2l_data``, and widget ``#mac_records_list``.)
+            None (reads ``current_file``, ``current_a2l_data``, ``#mac_records_list``,
+            and ``#mac_records_summary``.)
 
         Returns:
             None
 
         Data Flow:
-            - Build full-row metadata for every MAC record (global counts).
-            - Slice one page of rows using ``mac_records_page_size`` and ``_mac_window_start``.
-            - Color rows via ``_mac_record_ui_state``: green when A2L name+address match, red on parse/out-of-image/address mismatch, default when not verifiable against A2L.
+            - Short-circuit when no MAC records are loaded (empty table + summary).
+            - Ensure the DataTable's MAC cache matches the current loaded state.
+            - Slice one page of precomputed cell rows using ``mac_records_page_size``.
+            - Build ``rich.text.Text`` cells keyed by severity and insert them via
+              ``DataTable.add_rows`` in a single O(page_size) dict update.
+            - Render aggregate counts and coverage into ``#mac_records_summary`` so the
+              DataTable never has to hold summary rows.
 
         Dependencies:
             Uses:
-                - ``_build_a2l_name_index``
-                - ``_mac_record_ui_state``
-                - ``_mac_clamp_page_start`` / ``_get_window_bounds``
-                - ``query_one`` / ``ListView`` / ``Label`` / ``ListItem``
+                - ``_populate_mac_datatable``
+                - ``update_validation_issues_view``
             Used by:
-                - ``load_selected_file`` post-load refresh
+                - ``_apply_prepared_load`` post-load refresh
                 - ``update_a2l_view`` when A2L data changes
                 - MAC paging actions
         """
-        mac_list = self.query_one("#mac_records_list", ListView)
-        mac_list.clear()
+        populate_started = time.perf_counter()
+        mac_table = self.query_one("#mac_records_list", DataTable)
+        summary_label = self.query_one("#mac_records_summary", Label)
+        self._mac_row_key_to_address = {}
+        mac_table.clear(columns=False)
         if not self.current_file or not self.current_file.mac_records:
-            mac_list.append(ListItem(Label("No MAC loaded.")))
+            summary_label.update("No MAC loaded.")
             self._validation_report = None
             self._validation_issues = []
+            self._validation_issue_cell_rows = []
+            self._validation_issue_cell_styles = []
             self.update_validation_issues_view()
+            self.logger.info(
+                "Load phase boundary: populate_mac_table_done rows=0 elapsed=%.3f",
+                time.perf_counter() - populate_started,
+            )
+            self._flush_logger()
             return
         records = self.current_file.mac_records or []
         if not records:
-            mac_list.append(ListItem(Label("No MAC records parsed.")))
+            summary_label.update("No MAC records parsed.")
             self._validation_report = None
             self._validation_issues = []
+            self._validation_issue_cell_rows = []
+            self._validation_issue_cell_styles = []
             self.update_validation_issues_view()
+            self.logger.info(
+                "Load phase boundary: populate_mac_table_done rows=0 elapsed=%.3f",
+                time.perf_counter() - populate_started,
+            )
+            self._flush_logger()
             return
         cache_key = (
             id(records),
@@ -3765,55 +4279,22 @@ class S19TuiApp(App):
         if self._mac_view_cache_key != cache_key:
             self._mac_view_cache_key = cache_key
             self._build_mac_view_cache()
-        rows = self._mac_view_cache_rows
-        row_meta = self._mac_view_cache_meta
-        total = self._mac_view_cache_summary.get("total", len(rows))
+        cell_rows = self._mac_view_cache_cell_rows or []
+        cell_styles = self._mac_view_cache_cell_styles or []
+        total = self._mac_view_cache_summary.get("total", len(cell_rows))
         self._mac_window_start = self._mac_clamp_page_start(total)
         page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         start, end = self._get_window_bounds(total, self._mac_window_start, page_size)
         self._mac_window_start = start
-        visible_rows = rows[start:end]
-        visible_meta = row_meta[start:end]
-
-        name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
-        addr_width = max(len("Address"), *(len(row[1]) for row in rows))
-        in_a2l_width = max(len("InA2L"), *(len(row[2]) for row in rows))
-        in_mem_width = max(len("InMem"), *(len(row[3]) for row in rows))
-        status_width = max(len("Status"), *(len(row[4]) for row in rows))
-        line_width = max(len("SourceLine"), *(len(row[5]) for row in rows))
-        parse_width = min(36, max(len("ParseErr"), *(len(row[6]) for row in rows)))
-        match_width = min(36, max(len("A2LMatch"), *(len(row[7]) for row in rows)))
-
+        visible_rows = cell_rows[start:end]
+        visible_styles = cell_styles[start:end]
+        visible_meta = self._mac_view_cache_meta[start:end]
+        self._populate_mac_datatable(mac_table, visible_rows, visible_styles, visible_meta, start)
         page_num = start // page_size + 1
         total_pages = max(1, (total + page_size - 1) // page_size)
-        page_line = (
+        summary_text = (
             f"Page {page_num}/{total_pages} | rows {start + 1}-{end} / {total} "
-            f"(page size {page_size}; +/- for MAC page)"
-        )
-        mac_list.append(ListItem(Label(page_line)))
-
-        header = (
-            f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
-            f"{'InA2L'.ljust(in_a2l_width)} | {'InMem'.ljust(in_mem_width)} | "
-            f"{'Status'.ljust(status_width)} | {'SourceLine'.ljust(line_width)} | "
-            f"{'ParseErr'.ljust(parse_width)} | {'A2LMatch'.ljust(match_width)}"
-        )
-        mac_list.append(ListItem(Label(header)))
-
-        for index, row in enumerate(visible_rows):
-            line = (
-                f"{row[0][:name_width].ljust(name_width)} | {row[1].ljust(addr_width)} | "
-                f"{row[2].ljust(in_a2l_width)} | {row[3].ljust(in_mem_width)} | "
-                f"{row[4].ljust(status_width)} | {row[5].ljust(line_width)} | "
-                f"{row[6][:parse_width].ljust(parse_width)} | {row[7][:match_width].ljust(match_width)}"
-            )
-            label = Label(line)
-            label.add_class(css_class_for_severity(visible_meta[index]["severity"]))
-            item = ListItem(label)
-            item.data = {"address": visible_meta[index]["address"]}
-            mac_list.append(item)
-
-        summary = (
+            f"(page size {page_size}; +/- for MAC page)  "
             f"Total={total}  Verified={self._mac_view_cache_summary.get('verified', 0)}  "
             f"Invalid={self._mac_view_cache_summary.get('invalid', 0)}  "
             f"Neutral={self._mac_view_cache_summary.get('neutral', 0)}  "
@@ -3821,13 +4302,72 @@ class S19TuiApp(App):
             f"OutOfMem={self._mac_view_cache_summary.get('out_of_mem', 0)}  "
             f"ParseErrs={self._mac_view_cache_summary.get('parse_errors', 0)}"
         )
-        mac_list.append(ListItem(Label(summary)))
         if self.current_file.file_type in {"s19", "hex"} and self._mac_view_cache_coverage_line:
-            coverage_line = self._mac_view_cache_coverage_line
-            coverage_label = Label(coverage_line)
-            coverage_label.add_class("sev-info")
-            mac_list.append(ListItem(coverage_label))
+            summary_text = f"{summary_text}\n{self._mac_view_cache_coverage_line}"
+        summary_label.update(summary_text)
         self.update_validation_issues_view()
+        self.logger.info(
+            "Load phase boundary: populate_mac_table_done rows=%d total=%d elapsed=%.3f",
+            len(visible_rows),
+            total,
+            time.perf_counter() - populate_started,
+        )
+        self._flush_logger()
+
+    def _populate_mac_datatable(
+        self,
+        mac_table: "DataTable",
+        visible_rows: list[tuple[str, ...]],
+        visible_styles: list[str],
+        visible_meta: list[dict[str, Any]],
+        start: int,
+    ) -> None:
+        """
+        Summary:
+            Insert one page of MAC rows into the MAC ``DataTable`` via a single
+            ``add_rows`` call, recording a ``row_key -> address`` map so selection
+            handlers can jump to the corresponding hex address.
+
+        Args:
+            mac_table (DataTable): Target table widget.
+            visible_rows (list[tuple[str, ...]]): Precomputed cell strings for the page.
+            visible_styles (list[str]): Rich style strings parallel to ``visible_rows``.
+            visible_meta (list[dict]): Severity/address metadata parallel to rows.
+            start (int): Absolute index of the first row in the page.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Construct ``rich.text.Text`` cells so severity coloring renders correctly.
+            - Build row-key strings of the form ``mac:<absolute_index>``.
+            - Record the per-row address in ``_mac_row_key_to_address`` for jump logic.
+            - Invoke ``DataTable.add_rows`` once with the fully-assembled iterable.
+
+        Dependencies:
+            Used by:
+                - ``update_mac_view``
+        """
+        if not visible_rows:
+            return
+        rendered_rows: list[tuple] = []
+        keys: list[str] = []
+        for i, row in enumerate(visible_rows):
+            style = visible_styles[i] if i < len(visible_styles) else ""
+            rich_cells = tuple(Text(str(cell), style=style) if style else Text(str(cell)) for cell in row)
+            rendered_rows.append(rich_cells)
+            absolute_index = start + i
+            row_key = f"mac:{absolute_index}"
+            keys.append(row_key)
+            meta = visible_meta[i] if i < len(visible_meta) else {}
+            address = meta.get("address") if isinstance(meta, dict) else None
+            if isinstance(address, int):
+                self._mac_row_key_to_address[row_key] = address
+        for key, row in zip(keys, rendered_rows):
+            try:
+                mac_table.add_row(*row, key=key)
+            except Exception:
+                mac_table.add_row(*row)
 
     def _compute_a2l_enriched_tags(self) -> list[dict[str, Any]]:
         """
@@ -3966,7 +4506,8 @@ class S19TuiApp(App):
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
         """
         Summary:
-            Render one page of A2L tag rows with fixed page size and a page-oriented summary line.
+            Render one page of A2L tag rows into the A2L DataTable with row_keys
+            that map back to the enriched tag dicts for jump handling.
 
         Args:
             tags (list[dict]): Filtered enriched tags to display (may be empty).
@@ -3975,23 +4516,28 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Clamp ``_a2l_window_start`` to a legal page boundary for ``a2l_tags_page_size``.
-            - Slice ``tags`` for the current page only and build fixed-width table rows.
-            - Attach ``absolute_index`` and full ``tag`` dict on each data ``ListItem``.
+            - Clear the DataTable (keep columns) and reset the row_key -> tag map.
+            - Short-circuit when ``tags`` is empty (update summary text only).
+            - Slice one page using ``_a2l_clamp_page_start`` and window bounds.
+            - Build 16-cell tuples with the same fields the prior renderer produced,
+              wrap each cell in a severity-styled ``rich.text.Text``, and insert
+              via per-row ``add_row`` with ``a2l:<absolute_index>`` keys.
 
         Dependencies:
             Uses:
-                - ``_a2l_clamp_page_start``
-                - ``_get_window_bounds``
-                - ``_a2l_tag_row_invalid``
+                - ``_a2l_clamp_page_start`` / ``_get_window_bounds``
+                - ``_a2l_tag_row_severity`` / ``_severity_style``
+                - ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display``
             Used by:
                 - ``_refresh_a2l_filtered_tags``
                 - ``update_a2l_view``
                 - A2L tag paging and find actions
         """
-        a2l_tags_list = self.query_one("#a2l_tags_list", ListView)
-        a2l_tags_list.clear()
-        # region agent log
+        populate_started = time.perf_counter()
+        a2l_table = self.query_one("#a2l_tags_list", DataTable)
+        summary_label = self.query_one("#a2l_tags_summary", Label)
+        self._a2l_row_key_to_tag = {}
+        a2l_table.clear(columns=False)
         self._debug_log(
             run_id="initial",
             hypothesis_id="H3",
@@ -3999,10 +4545,14 @@ class S19TuiApp(App):
             message="Entered update_a2l_tags_view",
             data={"incoming_tag_count": len(tags)},
         )
-        # endregion
         if not tags:
             self._a2l_window_start = 0
-            a2l_tags_list.append(ListItem(Label("No A2L tags.")))
+            summary_label.update("No A2L tags.")
+            self.logger.info(
+                "Load phase boundary: populate_a2l_table_done rows=0 elapsed=%.3f",
+                time.perf_counter() - populate_started,
+            )
+            self._flush_logger()
             return
         total_tags = len(tags)
         self._a2l_window_start = self._a2l_clamp_page_start(total_tags)
@@ -4010,120 +4560,103 @@ class S19TuiApp(App):
         start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
         self._a2l_window_start = start
         visible_tags = tags[start:end]
-        rows: list[tuple] = []
-        row_tags: list[dict] = []
-        for tag in visible_tags:
-            addr = tag.get("address")
-            length = tag.get("length")
-            addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
-            len_text = str(length) if isinstance(length, int) else "n/a"
-            name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
-            source_text = str(tag.get("source") or "assigned")
-            raw_value_text = str(tag.get("raw_value") if tag.get("raw_value") is not None else "")
-            physical_value_text = str(
-                tag.get("physical_value") if tag.get("physical_value") is not None else ""
-            )
-            in_mem_text = _a2l_tag_in_memory_display(tag)
-            region_text = str(tag.get("memory_region") or "unknown")
-            limits_text = ""
-            if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
-                limits_text = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
-            unit_text = _a2l_tag_unit_display(tag)
-            bit_text = str(tag.get("bit_org") or "")
-            endian_text = str(tag.get("endian") or "")
-            virt_text = "yes" if tag.get("virtual") else "no"
-            func_text = str(tag.get("function_group") or "")
-            access_text = str(tag.get("access") or "")
-            dtype_text = str(tag.get("datatype") or "")
-            rows.append(
-                (
-                    name_text,
-                    addr_text,
-                    len_text,
-                    source_text,
-                    raw_value_text,
-                    physical_value_text,
-                    in_mem_text,
-                    region_text,
-                    limits_text,
-                    unit_text,
-                    bit_text,
-                    endian_text,
-                    virt_text,
-                    func_text,
-                    access_text,
-                    dtype_text,
-                )
-            )
-            row_tags.append(tag)
-
-        name_width = min(48, max(len("Tag"), *(len(row[0]) for row in rows)))
-        addr_width = max(len("Address"), *(len(row[1]) for row in rows))
-        len_width = max(len("Length"), *(len(row[2]) for row in rows))
-        source_width = max(len("Source"), *(len(row[3]) for row in rows))
-        raw_width = max(len("Raw"), min(12, max((len(row[4]) for row in rows), default=0)))
-        phys_width = max(len("Physical"), min(12, max((len(row[5]) for row in rows), default=0)))
-        mem_width = max(len("InMem"), *(len(row[6]) for row in rows))
-        region_width = max(len("Region"), *(len(row[7]) for row in rows))
-        limits_width = max(len("Limits"), *(len(row[8]) for row in rows))
-        unit_width = max(len("Unit"), *(len(row[9]) for row in rows))
-        bit_width = max(len("Bits"), *(len(row[10]) for row in rows))
-        endian_width = max(len("Endian"), *(len(row[11]) for row in rows))
-        virt_width = max(len("Virt"), *(len(row[12]) for row in rows))
-        func_width = max(len("Func"), *(len(row[13]) for row in rows))
-        access_width = max(len("Access"), *(len(row[14]) for row in rows))
-        dtype_width = max(len("Dtype"), min(12, max((len(row[15]) for row in rows), default=0)))
-
-        header = (
-            f"{'Tag'.ljust(name_width)} | {'Address'.ljust(addr_width)} | "
-            f"{'Length'.ljust(len_width)} | {'Source'.ljust(source_width)} | "
-            f"{'Raw'.ljust(raw_width)} | {'Physical'.ljust(phys_width)} | "
-            f"{'InMem'.ljust(mem_width)} | {'Region'.ljust(region_width)} | "
-            f"{'Limits'.ljust(limits_width)} | {'Unit'.ljust(unit_width)} | "
-            f"{'Bits'.ljust(bit_width)} | {'Endian'.ljust(endian_width)} | "
-            f"{'Virt'.ljust(virt_width)} | {'Func'.ljust(func_width)} | "
-            f"{'Access'.ljust(access_width)} | {'Dtype'.ljust(dtype_width)}"
-        )
+        for i, tag in enumerate(visible_tags):
+            absolute_index = start + i
+            row_key = f"a2l:{absolute_index}"
+            self._a2l_row_key_to_tag[row_key] = tag
+            cells = self._build_a2l_table_cells(tag)
+            severity = _a2l_tag_row_severity(tag)
+            style = _severity_style(severity)
+            rich_cells = tuple(Text(cell, style=style) if style else Text(cell) for cell in cells)
+            try:
+                a2l_table.add_row(*rich_cells, key=row_key)
+            except Exception:
+                a2l_table.add_row(*rich_cells)
         page_num = start // page_size + 1
         total_pages = max(1, (total_tags + page_size - 1) // page_size)
-        summary = (
+        summary_label.update(
             f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
             f"(page size {page_size}; +/- to change page)"
         )
-        a2l_tags_list.append(ListItem(Label(summary)))
-        a2l_tags_list.append(ListItem(Label(header)))
-        for i, row in enumerate(rows):
-            name_text = row[0][:name_width].ljust(name_width)
-            line = (
-                f"{name_text} | {row[1].ljust(addr_width)} | {row[2].ljust(len_width)} | "
-                f"{row[3].ljust(source_width)} | {row[4][:raw_width].ljust(raw_width)} | "
-                f"{row[5][:phys_width].ljust(phys_width)} | {row[6].ljust(mem_width)} | "
-                f"{row[7].ljust(region_width)} | {row[8].ljust(limits_width)} | "
-                f"{row[9].ljust(unit_width)} | {row[10].ljust(bit_width)} | "
-                f"{row[11].ljust(endian_width)} | {row[12].ljust(virt_width)} | "
-                f"{row[13].ljust(func_width)} | {row[14].ljust(access_width)} | "
-                f"{row[15][:dtype_width].ljust(dtype_width)}"
-            )
-            label = Label(line)
-            label.add_class(css_class_for_severity(_a2l_tag_row_severity(row_tags[i])))
-            item = ListItem(label)
-            item.data = {"address": row[1], "name": row[0], "tag": row_tags[i]}
-            item.data["absolute_index"] = start + i
-            if isinstance(row[1], str) and row[1].startswith("0x"):
-                try:
-                    item.data["address"] = int(row[1], 16)
-                except ValueError:
-                    pass
-            a2l_tags_list.append(item)
-        # region agent log
         self._debug_log(
             run_id="initial",
             hypothesis_id="H3",
             location="s19_app/tui/app.py:update_a2l_tags_view",
             message="Finished update_a2l_tags_view",
-            data={"rendered_tag_rows": len(rows), "total_rows": total_tags, "start": start, "end": end},
+            data={"rendered_tag_rows": len(visible_tags), "total_rows": total_tags, "start": start, "end": end},
         )
-        # endregion
+        self.logger.info(
+            "Load phase boundary: populate_a2l_table_done rows=%d total=%d elapsed=%.3f",
+            len(visible_tags),
+            total_tags,
+            time.perf_counter() - populate_started,
+        )
+        self._flush_logger()
+
+    def _build_a2l_table_cells(self, tag: dict) -> tuple[str, ...]:
+        """
+        Summary:
+            Project one enriched A2L tag into the 16-cell tuple the DataTable row
+            expects, keeping every field the previous ListView renderer surfaced.
+
+        Args:
+            tag (dict): Enriched A2L tag with value, memory, and schema fields.
+
+        Returns:
+            tuple[str, ...]: 16-string tuple aligned with the DataTable columns.
+
+        Data Flow:
+            - Format address/length/limits defensively so missing fields stay blank.
+            - Reuse ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display`` helpers
+              so display conventions remain centralized.
+
+        Dependencies:
+            Uses:
+                - ``_a2l_tag_in_memory_display``
+                - ``_a2l_tag_unit_display``
+            Used by:
+                - ``update_a2l_tags_view``
+        """
+        addr = tag.get("address")
+        length = tag.get("length")
+        addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
+        len_text = str(length) if isinstance(length, int) else "n/a"
+        name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
+        source_text = str(tag.get("source") or "assigned")
+        raw_value_text = str(tag.get("raw_value") if tag.get("raw_value") is not None else "")
+        physical_value_text = str(
+            tag.get("physical_value") if tag.get("physical_value") is not None else ""
+        )
+        in_mem_text = _a2l_tag_in_memory_display(tag)
+        region_text = str(tag.get("memory_region") or "unknown")
+        limits_text = ""
+        if tag.get("lower_limit") is not None or tag.get("upper_limit") is not None:
+            limits_text = f"{tag.get('lower_limit','')}..{tag.get('upper_limit','')}"
+        unit_text = _a2l_tag_unit_display(tag)
+        bit_text = str(tag.get("bit_org") or "")
+        endian_text = str(tag.get("endian") or "")
+        virt_text = "yes" if tag.get("virtual") else "no"
+        func_text = str(tag.get("function_group") or "")
+        access_text = str(tag.get("access") or "")
+        dtype_text = str(tag.get("datatype") or "")
+        return (
+            name_text,
+            addr_text,
+            len_text,
+            source_text,
+            raw_value_text,
+            physical_value_text,
+            in_mem_text,
+            region_text,
+            limits_text,
+            unit_text,
+            bit_text,
+            endian_text,
+            virt_text,
+            func_text,
+            access_text,
+            dtype_text,
+        )
 
     def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:
         mode = self.a2l_tags_filter_mode

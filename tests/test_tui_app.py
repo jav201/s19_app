@@ -2,7 +2,14 @@ from pathlib import Path
 
 import pytest
 
-from s19_app.tui.app import S19TuiApp, _a2l_tag_unit_display, _mac_record_ui_state
+from s19_app.tui.app import (
+    S19TuiApp,
+    _a2l_tag_unit_display,
+    _mac_record_ui_state,
+    _severity_style,
+    precompute_issue_datatable_payload,
+    precompute_mac_datatable_payload,
+)
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.screens import SaveProjectPayload
 from s19_app.tui.workspace import WORKAREA_TEMP
@@ -278,16 +285,31 @@ def test_update_mac_view_reuses_cached_model_between_pages(tmp_path: Path, monke
     app.mac_records_page_size = 50
     calls = {"build": 0}
 
-    class FakeList:
-        def clear(self) -> None:
+    class FakeTable:
+        columns = ["Tag", "Address"]
+        row_count = 0
+
+        def clear(self, columns: bool = True) -> None:
             return
 
-        def append(self, _item: object) -> None:
+        def add_row(self, *_cells: object, key: object = None) -> None:
             return
 
-    fake_list = FakeList()
+    class FakeLabel:
+        def update(self, _text: str) -> None:
+            return
 
-    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: fake_list if selector == "#mac_records_list" else None)
+    fake_table = FakeTable()
+    fake_label = FakeLabel()
+
+    def _query(selector: str, *_a, **_k):
+        if selector == "#mac_records_list":
+            return fake_table
+        if selector == "#mac_records_summary":
+            return fake_label
+        return None
+
+    monkeypatch.setattr(app, "query_one", _query)
     monkeypatch.setattr(app, "update_validation_issues_view", lambda: None)
     original = app._build_mac_view_cache
 
@@ -435,24 +457,28 @@ def test_a2l_tags_page_next_prev_and_focus_snap(tmp_path: Path, monkeypatch: pyt
     app.action_a2l_tags_page_prev()
     assert app._a2l_window_start == 10
 
-    class _FakeListView:
+    class _FakeDataTable:
         def __init__(self) -> None:
-            self.index = -1
+            self.row_count = 50
+            self.cursor_row = -1
 
-    fake_lv = _FakeListView()
+        def move_cursor(self, *, row: int) -> None:
+            self.cursor_row = row
+
+    fake_table = _FakeDataTable()
 
     def _fake_query_one(selector: str, *args: object, **kwargs: object) -> object:
         if selector == "#a2l_tags_list":
-            return fake_lv
+            return fake_table
         raise AssertionError(selector)
 
     monkeypatch.setattr(app, "query_one", _fake_query_one)
     assert app._focus_a2l_tag_absolute_index(17) is True
     assert app._a2l_window_start == 10
-    assert fake_lv.index == 2 + (17 - 10)
+    assert fake_table.cursor_row == 17 - 10
     assert app._focus_a2l_tag_absolute_index(5) is True
     assert app._a2l_window_start == 0
-    assert fake_lv.index == 2 + 5
+    assert fake_table.cursor_row == 5
 
 
 def test_a2l_tag_find_haystack_keeps_zero_numeric_values(tmp_path: Path):
@@ -784,19 +810,35 @@ def test_build_mac_view_cache_scales_under_load(tmp_path: Path, monkeypatch: pyt
 
 def test_update_validation_issues_view_empty_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     app = S19TuiApp(base_dir=tmp_path)
-    captured: list[object] = []
+    summary_text: list[str] = []
 
-    class FakeList:
-        def clear(self) -> None:
-            captured.clear()
+    class FakeTable:
+        columns = ["Severity"]
 
-        def append(self, item: object) -> None:
-            captured.append(item)
+        def clear(self, columns: bool = True) -> None:
+            return
 
-    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#validation_issues_list" else None)
+        def add_row(self, *_cells: object, key: object = None) -> None:
+            summary_text.append("row")
+
+    class FakeLabel:
+        def update(self, text: str) -> None:
+            summary_text.append(text)
+
+    fake_table = FakeTable()
+    fake_label = FakeLabel()
+
+    def _query(selector: str, *_a, **_k):
+        if selector == "#validation_issues_list":
+            return fake_table
+        if selector == "#validation_issues_summary":
+            return fake_label
+        return None
+
+    monkeypatch.setattr(app, "query_one", _query)
     app._validation_issues = []
     app.update_validation_issues_view()
-    assert len(captured) == 1
+    assert summary_text and summary_text[0] == "No validation issues."
 
 
 def _make_validation_issues(n: int) -> list[ValidationIssue]:
@@ -819,18 +861,35 @@ def _make_validation_issues(n: int) -> list[ValidationIssue]:
 
 
 def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """With thousands of issues, the panel must render at most one page-sized slice plus header lines."""
+    """With thousands of issues, the panel must render at most one page-sized slice into the DataTable."""
     app = S19TuiApp(base_dir=tmp_path)
-    captured: list[object] = []
+    row_keys: list[object] = []
+    summary_captured: list[str] = []
 
-    class FakeList:
-        def clear(self) -> None:
-            captured.clear()
+    class FakeTable:
+        columns = ["Severity"]
 
-        def append(self, item: object) -> None:
-            captured.append(item)
+        def clear(self, columns: bool = True) -> None:
+            row_keys.clear()
 
-    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#validation_issues_list" else None)
+        def add_row(self, *_cells: object, key: object = None) -> None:
+            row_keys.append(key)
+
+    class FakeLabel:
+        def update(self, text: str) -> None:
+            summary_captured.append(text)
+
+    fake_table = FakeTable()
+    fake_label = FakeLabel()
+
+    def _query(selector: str, *_a, **_k):
+        if selector == "#validation_issues_list":
+            return fake_table
+        if selector == "#validation_issues_summary":
+            return fake_label
+        return None
+
+    monkeypatch.setattr(app, "query_one", _query)
     total = 5000
     app._validation_issues = _make_validation_issues(total)
     app.validation_issues_page_size = 150
@@ -838,23 +897,40 @@ def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, mo
 
     app.update_validation_issues_view()
 
-    # 1 summary line + 1 page indicator + up to page_size issue rows.
-    assert 2 < len(captured) <= 2 + 150
-    assert len(captured) == 2 + 150
+    # One add_row call per visible issue; no summary rows bleed into the table.
+    assert len(row_keys) == 150
+    assert all(isinstance(key, str) and key.startswith("issue:") for key in row_keys)
+    assert summary_captured and "page 1/" in summary_captured[-1]
 
 
 def test_validation_issues_paging_actions_advance_window(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     app = S19TuiApp(base_dir=tmp_path)
     renders: list[int] = []
 
-    class FakeList:
-        def clear(self) -> None:
+    class FakeTable:
+        columns = ["Severity"]
+
+        def clear(self, columns: bool = True) -> None:
             return
 
-        def append(self, _item: object) -> None:
+        def add_row(self, *_cells: object, key: object = None) -> None:
             return
 
-    monkeypatch.setattr(app, "query_one", lambda selector, *_a, **_k: FakeList() if selector == "#validation_issues_list" else None)
+    class FakeLabel:
+        def update(self, _text: str) -> None:
+            return
+
+    fake_table = FakeTable()
+    fake_label = FakeLabel()
+
+    def _query(selector: str, *_a, **_k):
+        if selector == "#validation_issues_list":
+            return fake_table
+        if selector == "#validation_issues_summary":
+            return fake_label
+        return None
+
+    monkeypatch.setattr(app, "query_one", _query)
     app._validation_issues = _make_validation_issues(450)
     app.validation_issues_page_size = 100
     app._validation_issues_window_start = 0
@@ -1033,6 +1109,99 @@ def test_end_to_end_load_pipeline_under_budget(tmp_path: Path):
     # Keep the CI budget generous; the point is the pipeline finishes in seconds,
     # not the original "frozen for an hour" user reported.
     assert elapsed < 10.0, f"end-to-end prepare too slow: {elapsed:.3f}s"
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("load_order", ["s19_first", "mac_first"])
+def test_stress_load_s19_then_a2l_then_mac(
+    tmp_path: Path, load_order: str
+) -> None:
+    """
+    Summary:
+        End-to-end stress test: generate a realistic S19 + A2L + MAC triple on disk
+        and push it through ``_parse_loaded_file`` and ``_prepare_load_payload``
+        within a generous time budget for both load orders.
+
+    Data Flow:
+        - Write large S19 / A2L / MAC fixtures via the shared generators.
+        - Seed ``current_a2l_path`` so the primary branch attaches A2L data naturally.
+        - Call ``_parse_loaded_file`` for each artifact in the requested order,
+          propagating ``current_file`` between calls so the merge helpers see prior state.
+        - Run ``_prepare_load_payload`` once on the final merged ``LoadedFile``.
+        - Assert coexistence, precomputed shape, and total elapsed time under budget.
+    """
+    import os
+    import time as _time
+
+    from tests.conftest import make_large_a2l, make_large_mac, make_large_s19
+
+    s19_path = make_large_s19(
+        tmp_path / "stress.s19", num_ranges=80, bytes_per_range=4096
+    )
+    a2l_path = make_large_a2l(
+        tmp_path / "stress.a2l",
+        num_measurements=1500,
+        num_characteristics=300,
+        memory_span_bytes=80 * 4096,
+    )
+    mac_path = make_large_mac(
+        tmp_path / "stress.mac",
+        num_records=8000,
+        num_diagnostics=3000,
+        memory_span_bytes=80 * 4096,
+        num_a2l_tags=1500,
+    )
+
+    app = S19TuiApp(base_dir=tmp_path)
+    app.current_a2l_path = a2l_path
+
+    phase_times: dict[str, float] = {}
+    started_total = _time.perf_counter()
+
+    if load_order == "s19_first":
+        steps = [("s19", s19_path), ("mac", mac_path)]
+    else:
+        steps = [("mac", mac_path), ("s19", s19_path)]
+
+    final_loaded: LoadedFile | None = None
+    for label, path in steps:
+        phase_start = _time.perf_counter()
+        loaded = app._parse_loaded_file(path)
+        phase_times[f"parse_{label}"] = _time.perf_counter() - phase_start
+        assert loaded is not None, f"_parse_loaded_file returned None for {label}"
+        app.current_file = loaded
+        final_loaded = loaded
+
+    assert final_loaded is not None
+
+    phase_start = _time.perf_counter()
+    prepared = app._prepare_load_payload(final_loaded)
+    phase_times["prepare"] = _time.perf_counter() - phase_start
+
+    elapsed_total = _time.perf_counter() - started_total
+
+    # Coexistence: after both loads, the merged payload always resolves to the
+    # primary image but carries the MAC records alongside.
+    assert final_loaded.file_type in {"s19", "hex"}, (
+        f"primary image must win after merge; got {final_loaded.file_type}"
+    )
+    assert final_loaded.mac_path == mac_path
+    assert final_loaded.mac_records, "MAC records must coexist with primary image"
+    assert final_loaded.a2l_data is not None, "A2L must be attached to the primary payload"
+
+    # Prepared payload shape: precomputed DataTable artifacts are present.
+    assert prepared.precomputed is True
+    assert len(prepared.mac_rows) == len(final_loaded.mac_records)
+    assert len(prepared.mac_cell_rows) == len(final_loaded.mac_records)
+    assert len(prepared.issue_cell_rows) == len(prepared.validation_issues)
+    assert prepared.mac_widths is not None and len(prepared.mac_widths) == 8
+
+    # Perf budget: default 20s on CI, overridable for slower hardware via env var.
+    budget_s = float(os.environ.get("S19_APP_STRESS_BUDGET_S", "20.0"))
+    assert elapsed_total < budget_s, (
+        f"stress load over budget: order={load_order} elapsed={elapsed_total:.2f}s "
+        f"phases={phase_times}"
+    )
 
 
 def test_handle_load_dialog_defers_load_until_after_modal_dismiss(
@@ -1222,3 +1391,259 @@ def test_update_sections_caps_primary_ranges(
     assert captured_labels[-1].startswith("...")
     extra = total_ranges - app_module.MAX_SECTIONS_PRIMARY_RANGES
     assert f"{extra} more ranges" in captured_labels[-1]
+
+
+# --- DataTable populate / precompute / selection -----------------------------
+
+
+def _build_mac_row_vector(n: int) -> tuple[list[tuple], list[dict]]:
+    rows = []
+    meta = []
+    severities = [
+        ValidationSeverity.OK,
+        ValidationSeverity.ERROR,
+        ValidationSeverity.WARNING,
+        ValidationSeverity.NEUTRAL,
+    ]
+    for i in range(n):
+        name = f"TAG_{i:05d}"
+        addr = f"0x{0x1000 + i:08X}"
+        rows.append(
+            (
+                name,
+                addr,
+                "yes" if i % 2 == 0 else "no",
+                "yes" if i % 3 == 0 else "no",
+                "OK",
+                str(i),
+                "",
+                "MEAS:RPM",
+            )
+        )
+        meta.append({"severity": severities[i % len(severities)], "address": 0x1000 + i})
+    return rows, meta
+
+
+def test_precompute_mac_datatable_payload_returns_widths_rows_and_styles():
+    rows, meta = _build_mac_row_vector(10)
+    widths, cell_rows, styles = precompute_mac_datatable_payload(rows, meta)
+    assert len(widths) == 8
+    assert widths[0] >= len("Tag")
+    # Address column width should be at least the formatted address length (10 chars for 0x%08X).
+    assert widths[1] >= 10
+    assert len(cell_rows) == 10
+    assert all(isinstance(row, tuple) and len(row) == 8 for row in cell_rows)
+    assert len(styles) == 10
+    assert styles[0] == _severity_style(ValidationSeverity.OK)
+    assert styles[1] == _severity_style(ValidationSeverity.ERROR)
+
+
+def test_precompute_mac_datatable_payload_clamps_wide_columns():
+    wide_name = "X" * 200
+    rows = [(wide_name, "0x00001000", "no", "no", "OK", "1", "also wide " * 50, "match " * 50)]
+    meta = [{"severity": ValidationSeverity.OK, "address": 0x1000}]
+    widths, _cells, _styles = precompute_mac_datatable_payload(rows, meta)
+    assert widths[0] == 48  # Tag clamp.
+    assert widths[6] == 48  # ParseErr clamp.
+    assert widths[7] == 48  # A2LMatch clamp.
+
+
+def test_precompute_issue_datatable_payload_emits_seven_columns_and_styles():
+    issues = [
+        ValidationIssue(
+            code="E001",
+            severity=ValidationSeverity.ERROR,
+            message="addr missing",
+            artifact="mac",
+            symbol="RPM",
+            address=0x1000,
+            line_number=7,
+        ),
+        ValidationIssue(
+            code="W002",
+            severity=ValidationSeverity.WARNING,
+            message="not in a2l",
+            artifact="mac",
+            symbol=None,
+            address=None,
+            line_number=None,
+        ),
+    ]
+    cell_rows, styles = precompute_issue_datatable_payload(issues)
+    assert len(cell_rows) == 2
+    assert all(len(row) == 7 for row in cell_rows)
+    assert cell_rows[0][0] == "ERROR"
+    assert cell_rows[0][4] == "0x00001000"
+    assert cell_rows[1][3] == "-"  # missing symbol is rendered as dash
+    assert cell_rows[1][4] == "-"  # missing address is rendered as dash
+    assert styles == [_severity_style(ValidationSeverity.ERROR), _severity_style(ValidationSeverity.WARNING)]
+
+
+def test_prepare_load_payload_precomputes_datatable_fields(tmp_path: Path):
+    app = S19TuiApp(base_dir=tmp_path)
+    mac_records = [
+        {"parse_ok": True, "name": f"TAG{i}", "address": 0x1000 + i, "line_number": i}
+        for i in range(25)
+    ]
+    loaded = LoadedFile(
+        path=tmp_path / "demo.s19",
+        file_type="s19",
+        mem_map={0x1000 + i: i & 0xFF for i in range(25)},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1020)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+        mac_records=mac_records,
+    )
+    prepared = app._prepare_load_payload(loaded)
+    assert prepared.mac_widths is not None and len(prepared.mac_widths) == 8
+    assert len(prepared.mac_cell_rows) == 25
+    assert all(isinstance(row, tuple) for row in prepared.mac_cell_rows)
+    assert len(prepared.mac_cell_styles) == 25
+    # issue_cell_rows parallels validation_issues.
+    assert len(prepared.issue_cell_rows) == len(prepared.validation_issues)
+    assert len(prepared.issue_cell_styles) == len(prepared.validation_issues)
+
+
+def test_populate_mac_datatable_emits_row_keys_and_records_addresses(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    app = S19TuiApp(base_dir=tmp_path)
+    visible_rows = [
+        ("TAG_A", "0x00001000", "yes", "yes", "OK", "1", "", "MEAS:A"),
+        ("TAG_B", "0x00001004", "no", "yes", "OK", "2", "", "MEAS:B"),
+    ]
+    visible_styles = [_severity_style(ValidationSeverity.OK), _severity_style(ValidationSeverity.ERROR)]
+    visible_meta = [
+        {"severity": ValidationSeverity.OK, "address": 0x1000},
+        {"severity": ValidationSeverity.ERROR, "address": 0x1004},
+    ]
+
+    captured_keys: list[object] = []
+    captured_rows: list[tuple] = []
+
+    class _FakeTable:
+        def add_row(self, *cells: object, key: object = None) -> None:
+            captured_keys.append(key)
+            captured_rows.append(cells)
+
+    app._mac_row_key_to_address = {}
+    app._populate_mac_datatable(_FakeTable(), visible_rows, visible_styles, visible_meta, start=10)
+    assert captured_keys == ["mac:10", "mac:11"]
+    assert len(captured_rows) == 2
+    assert app._mac_row_key_to_address == {"mac:10": 0x1000, "mac:11": 0x1004}
+
+
+def test_populate_issues_datatable_records_filtered_index(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    app = S19TuiApp(base_dir=tmp_path)
+    issues = [
+        ValidationIssue(
+            code=f"C{i}",
+            severity=ValidationSeverity.ERROR if i % 2 == 0 else ValidationSeverity.WARNING,
+            message="m",
+            artifact="mac",
+            symbol=f"s{i}",
+            address=0x1000 + i,
+            line_number=i,
+        )
+        for i in range(3)
+    ]
+    cell_rows, styles = precompute_issue_datatable_payload(issues)
+
+    captured_keys: list[object] = []
+
+    class _FakeTable:
+        def add_row(self, *_cells: object, key: object = None) -> None:
+            captured_keys.append(key)
+
+    app._issue_row_key_to_index = {}
+    app._populate_issues_datatable(_FakeTable(), cell_rows, styles, issues, index_base=5)
+    assert captured_keys == ["issue:5", "issue:6", "issue:7"]
+    assert app._issue_row_key_to_index == {"issue:5": 5, "issue:6": 6, "issue:7": 7}
+
+
+def test_on_data_table_row_selected_dispatches_by_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from s19_app.tui import app as app_module
+
+    app = S19TuiApp(base_dir=tmp_path)
+    jumps: dict[str, object] = {}
+
+    monkeypatch.setattr(app, "_jump_to_mac_address", lambda addr: jumps.setdefault("mac", addr))
+    monkeypatch.setattr(
+        app,
+        "_jump_to_validation_issue_by_index",
+        lambda idx: jumps.setdefault("issue", idx),
+    )
+    monkeypatch.setattr(app, "_jump_to_tag_by_data", lambda tag: jumps.setdefault("a2l", tag))
+
+    app._mac_row_key_to_address = {"mac:3": 0xABCD}
+    app._issue_row_key_to_index = {"issue:2": 2}
+    tag_dict = {"name": "RPM", "address": 0x2000}
+    app._a2l_row_key_to_tag = {"a2l:0": tag_dict}
+
+    class _Evt:
+        def __init__(self, table_id: str, key: str) -> None:
+            class _T:
+                id = table_id
+
+            class _K:
+                value = key
+
+            self.data_table = _T()
+            self.row_key = _K()
+
+    app.on_data_table_row_selected(_Evt("mac_records_list", "mac:3"))
+    app.on_data_table_row_selected(_Evt("validation_issues_list", "issue:2"))
+    app.on_data_table_row_selected(_Evt("a2l_tags_list", "a2l:0"))
+
+    assert jumps == {"mac": 0xABCD, "issue": 2, "a2l": tag_dict}
+
+
+def test_update_validation_issues_view_uses_worker_precomputed_cells(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    app = S19TuiApp(base_dir=tmp_path)
+    issues = _make_validation_issues(20)
+    precomputed_rows, precomputed_styles = precompute_issue_datatable_payload(issues)
+    app._validation_issues = issues
+    app._validation_issue_cell_rows = precomputed_rows
+    app._validation_issue_cell_styles = precomputed_styles
+    app.validation_issues_page_size = 10
+    app.validation_issue_filter_mode = "all"
+
+    recorded: list[tuple[str, ...]] = []
+
+    class FakeTable:
+        columns = ["Severity"]
+
+        def clear(self, columns: bool = True) -> None:
+            recorded.clear()
+
+        def add_row(self, *cells: object, key: object = None) -> None:
+            recorded.append(tuple(str(cell) for cell in cells))
+
+    class FakeLabel:
+        def update(self, _text: str) -> None:
+            return
+
+    fake_table = FakeTable()
+    fake_label = FakeLabel()
+
+    def _query(selector: str, *_a, **_k):
+        if selector == "#validation_issues_list":
+            return fake_table
+        if selector == "#validation_issues_summary":
+            return fake_label
+        return None
+
+    monkeypatch.setattr(app, "query_one", _query)
+
+    app.update_validation_issues_view()
+    assert len(recorded) == 10
+    assert recorded[0][0] == precomputed_rows[0][0]  # severity cell reused verbatim
+
+
