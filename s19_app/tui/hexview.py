@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 from typing import Dict, List, Optional, Tuple
 
 from rich.text import Text

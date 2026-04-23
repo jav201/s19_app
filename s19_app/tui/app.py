@@ -3130,13 +3130,18 @@ class S19TuiApp(App):
             if primary_file.file_type == "s19":
                 try:
                     overlap_set = set(S19File(str(primary_file.path)).get_overlap_addresses())
-                except Exception:
+                except Exception as exc:
+                    self.logger.warning(
+                        "Failed to compute overlap set for %s: %s",
+                        primary_file.path,
+                        exc,
+                    )
                     overlap_set = set()
             report, issues, coverage_line = build_validation_report(
                 records=records,
                 primary_file=primary_file,
                 a2l_data=a2l_data,
-                a2l_enriched_tags=a2l_enriched_tags or [],
+                a2l_enriched_tags=a2l_enriched_tags,
                 dedupe_issues=self._deduplicate_issues,
                 overlapped_addresses=overlap_set,
             )

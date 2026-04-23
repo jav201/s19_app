@@ -1,17 +1,20 @@
 from __future__ import annotations
 
+import logging
 from typing import Callable, Optional
 
 from ...validation import ValidationIssue, ValidationReport, validate_artifact_consistency
 from ..a2l_validate import validate_a2l_internal_issues
 from ..models import LoadedFile
 
+logger = logging.getLogger(__name__)
+
 
 def build_validation_report(
     records: list[dict],
     primary_file: Optional[LoadedFile],
     a2l_data: Optional[dict],
-    a2l_enriched_tags: list[dict],
+    a2l_enriched_tags: Optional[list[dict]],
     dedupe_issues: Callable[[list[ValidationIssue]], list[ValidationIssue]],
     overlapped_addresses: Optional[set[int]] = None,
 ) -> tuple[Optional[ValidationReport], list[ValidationIssue], Optional[str]]:
@@ -20,7 +23,10 @@ def build_validation_report(
     """
     if primary_file is None:
         return None, [], None
-    tags_for_validation = a2l_enriched_tags or (a2l_data or {}).get("tags", [])
+    if a2l_enriched_tags is None:
+        tags_for_validation = (a2l_data or {}).get("tags", [])
+    else:
+        tags_for_validation = a2l_enriched_tags
     report = validate_artifact_consistency(
         mac_records=records,
         a2l_tags=tags_for_validation,

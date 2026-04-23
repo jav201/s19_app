@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from s19_app.validation.model import CoverageMetrics
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.services import a2l_service, validation_service
 
@@ -46,3 +47,89 @@ def test_build_validation_report_uses_overlap_addresses():
     assert report is not None
     assert coverage is not None
     assert any(issue.code == "CROSS_MAC_S19_OVERLAP_AMBIGUOUS" for issue in issues)
+
+
+def test_build_validation_report_keeps_explicit_empty_enriched_tags(monkeypatch):
+    loaded = LoadedFile(
+        path=Path("firmware.s19"),
+        file_type="s19",
+        mem_map={0x1000: 0x12},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1004)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data={"sections": [], "errors": [], "tags": [{"name": "RAW", "address": 0x1000, "length": 1}]},
+        mac_records=[{"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000}],
+        mac_diagnostics=[],
+    )
+    captured: dict[str, list[dict]] = {}
+
+    def _fake_validate_artifact_consistency(**kwargs):
+        captured["a2l_tags"] = kwargs["a2l_tags"]
+        return validation_service.ValidationReport(issues=[], coverage=CoverageMetrics())
+
+    monkeypatch.setattr(
+        validation_service,
+        "validate_artifact_consistency",
+        _fake_validate_artifact_consistency,
+    )
+    monkeypatch.setattr(
+        validation_service,
+        "validate_a2l_internal_issues",
+        lambda *_args, **_kwargs: [],
+    )
+
+    validation_service.build_validation_report(
+        records=loaded.mac_records,
+        primary_file=loaded,
+        a2l_data=loaded.a2l_data,
+        a2l_enriched_tags=[],
+        dedupe_issues=lambda items: items,
+        overlapped_addresses=set(),
+    )
+
+    assert captured["a2l_tags"] == []
+
+
+def test_build_validation_report_falls_back_to_raw_tags_when_enriched_is_none(monkeypatch):
+    loaded = LoadedFile(
+        path=Path("firmware.s19"),
+        file_type="s19",
+        mem_map={0x1000: 0x12},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1004)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data={"sections": [], "errors": [], "tags": [{"name": "RAW", "address": 0x1000, "length": 1}]},
+        mac_records=[{"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000}],
+        mac_diagnostics=[],
+    )
+    captured: dict[str, list[dict]] = {}
+
+    def _fake_validate_artifact_consistency(**kwargs):
+        captured["a2l_tags"] = kwargs["a2l_tags"]
+        return validation_service.ValidationReport(issues=[], coverage=CoverageMetrics())
+
+    monkeypatch.setattr(
+        validation_service,
+        "validate_artifact_consistency",
+        _fake_validate_artifact_consistency,
+    )
+    monkeypatch.setattr(
+        validation_service,
+        "validate_a2l_internal_issues",
+        lambda *_args, **_kwargs: [],
+    )
+
+    validation_service.build_validation_report(
+        records=loaded.mac_records,
+        primary_file=loaded,
+        a2l_data=loaded.a2l_data,
+        a2l_enriched_tags=None,
+        dedupe_issues=lambda items: items,
+        overlapped_addresses=set(),
+    )
+
+    assert captured["a2l_tags"] == loaded.a2l_data["tags"]
