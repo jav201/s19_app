@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-import bisect
 from typing import Dict, List, Optional, Tuple
 
 from rich.text import Text
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
+from ..range_index import (
+    RangeIndex,
+    address_in_sorted_ranges as _address_in_sorted_ranges,
+    build_sorted_range_index as _build_sorted_range_index,
+    range_in_sorted_ranges as _range_in_sorted_ranges,
+)
 from .color_policy import FOCUS_HIGHLIGHT_STYLE, MAC_ADDRESS_OVERLAY_STYLE
 
 
@@ -15,9 +20,6 @@ HEX_WIDTH = 16
 FOCUS_CONTEXT_ROWS = 64
 MAX_HEX_ROWS = 512
 SEARCH_ENCODING = "ascii"
-
-RangeIndex = Tuple[List[int], List[int]]
-
 
 def build_sorted_range_index(ranges: List[Tuple[int, int]]) -> RangeIndex:
     """
@@ -42,12 +44,7 @@ def build_sorted_range_index(ranges: List[Tuple[int, int]]) -> RangeIndex:
             - ``S19TuiApp`` MAC/A2L address membership checks
             - ``s19_app.validation.engine`` cross-artifact validation
     """
-    if not ranges:
-        return ([], [])
-    sorted_ranges = sorted(ranges, key=lambda item: item[0])
-    starts = [start for start, _ in sorted_ranges]
-    ends = [end for _, end in sorted_ranges]
-    return starts, ends
+    return _build_sorted_range_index(ranges)
 
 
 def address_in_sorted_ranges(addr: int, index: RangeIndex) -> bool:
@@ -76,13 +73,7 @@ def address_in_sorted_ranges(addr: int, index: RangeIndex) -> bool:
             - ``S19TuiApp._build_mac_view_cache``
             - ``s19_app.validation.engine.validate_artifact_consistency``
     """
-    starts, ends = index
-    if not starts:
-        return False
-    candidate = bisect.bisect_right(starts, addr) - 1
-    if candidate < 0:
-        return False
-    return addr < ends[candidate]
+    return _address_in_sorted_ranges(addr, index)
 
 
 def range_in_sorted_ranges(addr: int, length: int, index: RangeIndex) -> bool:
@@ -110,15 +101,7 @@ def range_in_sorted_ranges(addr: int, length: int, index: RangeIndex) -> bool:
         Used by:
             - ``s19_app.validation.engine.validate_artifact_consistency``
     """
-    if length <= 0:
-        return False
-    starts, ends = index
-    if not starts:
-        return False
-    candidate = bisect.bisect_right(starts, addr) - 1
-    if candidate < 0:
-        return False
-    return addr >= starts[candidate] and (addr + length) <= ends[candidate]
+    return _range_in_sorted_ranges(addr, length, index)
 
 
 def build_mem_map_s19(s19: S19File) -> Dict[int, int]:

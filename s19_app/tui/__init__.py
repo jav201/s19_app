@@ -9,13 +9,10 @@ High-level responsibilities:
 - Provide actions/bindings for common workflows and export helpers.
 """
 
-from .a2l import (
-    extract_a2l_tags,
-    parse_a2l_file,
-    render_a2l_view,
-    validate_a2l_internal_issues,
-    validate_a2l_tags,
-)
+from .a2l_extract import extract_a2l_tags
+from .a2l_parse import parse_a2l_file
+from .a2l_render import render_a2l_view
+from .a2l_validate import validate_a2l_internal_issues, validate_a2l_tags
 from .app import S19TuiApp, main
 from .hexview import (
     FOCUS_CONTEXT_ROWS,

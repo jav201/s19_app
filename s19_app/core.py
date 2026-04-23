@@ -1,7 +1,5 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 import logging
-from rich.console import Console
-from rich.text import Text
 
 """
 S19 RECORD STRUCTURE REFERENCE
@@ -65,7 +63,7 @@ byte_count:
 # Example S9 line (start address, S1): S1238040820080EB820080DD820080DD820080EC820080ED820080EE820080DD820080DDE6
 # |-- S9 (type) --|-- 23 (byte count) --|-- 8040 (address) --|-- 820080EB820080DD820080DD820080EC820080ED820080EE820080DD820080DD (data) --|-- E6 (checksum) --|
 """
-console = Console()
+logger = logging.getLogger(__name__)
 
 class SRecord:
     """
@@ -204,48 +202,6 @@ class SRecord:
             'checksum': self.checksum,
             'valid': self.valid
         }
-    # Endianess
-    def get_record_for_address(self, address: int) -> tuple["SRecord", int]:
-        """
-        Finds the SRecord and offset corresponding to a given memory address.
-        :param address: Absolute address in memory.
-        :return: (SRecord, offset_in_data)
-        :raises: ValueError if no matching record is found.
-        """
-        for record in self.records:
-            record_start = record.address
-            record_end = record.address + len(record.data)
-            if record_start <= address < record_end:
-                offset = address - record_start
-                return record, offset
-        raise ValueError(f"No record contains address: 0x{address:X}")
-
-
-    def get_word_at(self, address: int, size: int = 2, endian: str = 'big') -> int:
-        """
-        Reads a word from the S19 file at the given absolute address.
-        :param address: Absolute memory address to read from.
-        :param size: Number of bytes to read.
-        :param endian: Byte order ('big' or 'little').
-        :return: Integer value
-        """
-        record, offset = self.get_record_for_address(address)
-        return record.get_word(offset, size=size, endian=endian)
-
-
-    def set_word_at(self, address: int, value: int, size: int = 2, endian: str = 'big'):
-        """
-        Writes a word into the S19 file at the given absolute address.
-        This function works better to write numbers
-        :param address: Absolute memory address to write to.
-        :param value: Integer value to write.
-        :param size: Number of bytes to write.
-        :param endian: Byte order ('big' or 'little').
-        """
-        record, offset = self.get_record_for_address(address)
-        record.set_word(offset, value=value, size=size, endian=endian)
-
-
     # Representation
     def __str__(self):
         """
@@ -505,6 +461,58 @@ class S19File:
                 addr_map.setdefault(addr, []).append(record)
         return addr_map
 
+    def get_word_at(self, address: int, size: int = 2, endian: str = "big") -> int:
+        """
+        Read an integer word from absolute memory.
+        """
+        if size <= 0:
+            raise ValueError("size must be > 0")
+        data = bytearray()
+        for offset in range(size):
+            record, rec_offset = self.get_record_for_address(address + offset)
+            data.append(record.data[rec_offset])
+        return int.from_bytes(data, byteorder=endian, signed=False)
+
+    def set_word_at(self, address: int, value: int, size: int = 2, endian: str = "big") -> None:
+        """
+        Write an integer word at absolute memory.
+        """
+        if size <= 0:
+            raise ValueError("size must be > 0")
+        encoded = value.to_bytes(size, byteorder=endian, signed=False)
+        self.set_bytes_at(address, list(encoded))
+
+    def get_memory_map(self) -> Dict[int, int]:
+        """
+        Build an address-to-byte map of data records.
+        """
+        mem_map: Dict[int, int] = {}
+        for record in self.records:
+            addr = record.address
+            for offset, byte in enumerate(record.data):
+                mem_map[addr + offset] = byte
+        return mem_map
+
+    def get_memory_ranges(self) -> List[tuple[int, int]]:
+        """
+        Collect contiguous memory ranges written by records.
+        """
+        addresses = sorted(self.get_memory_map().keys())
+        if not addresses:
+            return []
+        ranges = []
+        start = addresses[0]
+        prev = addresses[0]
+        for addr in addresses[1:]:
+            if addr == prev + 1:
+                prev = addr
+            else:
+                ranges.append((start, prev + 1))
+                start = addr
+                prev = addr
+        ranges.append((start, prev + 1))
+        return ranges
+
     def get_overlap_addresses(self) -> List[int]:
         """
         Summary:
@@ -575,12 +583,7 @@ class S19File:
         from rich.text import Text
 
         console = Console(file=output_stream, highlight=False)
-
-        mem_map = {}
-        for record in self.records:
-            addr = record.address
-            for offset, byte in enumerate(record.data):
-                mem_map[addr + offset] = byte
+        mem_map = self.get_memory_map()
 
         console.print("[bold underline]Memory View[/bold underline]")
         for row_addr in range(start, start + length, width):
@@ -614,11 +617,9 @@ class S19File:
         """
         Displays the entire memory map using rich colorized hex+ASCII format.
         """
-        mem_map = {}
-        for record in self.records:
-            addr = record.address
-            for offset, byte in enumerate(record.data):
-                mem_map[addr + offset] = byte
+        from rich.console import Console
+        console = Console(highlight=False)
+        mem_map = self.get_memory_map()
 
         all_addresses = sorted(mem_map.keys())
         if not all_addresses:
@@ -639,7 +640,7 @@ class S19File:
 
         console = Console(file=output_stream, highlight=False)
         console.print("[bold underline]Memory Dump by Used Ranges[/bold underline]\n")
-        ranges = self._get_memory_ranges()
+        ranges = self.get_memory_ranges()
 
         if not ranges:
             console.print("[yellow]No memory data found.[/yellow]")
@@ -655,36 +656,13 @@ class S19File:
         Collects all bytes written by records and returns a list of contiguous memory ranges.
         :return: List of (start_addr, end_addr) pairs where end_addr is exclusive.
         """
-        addresses = sorted({
-            record.address + i
-            for record in self.records
-            for i in range(len(record.data))
-        })
-
-        if not addresses:
-            return []
-
-        # Group into contiguous ranges
-        ranges = []
-        start = addresses[0]
-        prev = addresses[0]
-
-        for addr in addresses[1:]:
-            if addr == prev + 1:
-                prev = addr
-            else:
-                ranges.append((start, prev + 1))  # end is exclusive
-                start = addr
-                prev = addr
-
-        ranges.append((start, prev + 1))  # last range
-        return ranges
+        return self.get_memory_ranges()
 
     def show_memory_ranges(self):
         """
         Displays contiguous memory ranges covered by S-records.
         """
-        ranges = self._get_memory_ranges()
+        ranges = self.get_memory_ranges()
         print("[INFO] Memory Ranges Used:")
         for start, end in ranges:
             print(f"  0x{start:08X} - 0x{end - 1:08X} ({end - start} bytes)")
@@ -693,7 +671,7 @@ class S19File:
         """
         Displays memory address gaps between used ranges.
         """
-        ranges = self._get_memory_ranges()
+        ranges = self.get_memory_ranges()
         print("[INFO] Memory Gaps Between Ranges:")
         for i in range(len(ranges) - 1):
             gap_start = ranges[i][1]
@@ -704,7 +682,7 @@ class S19File:
         """
         Displays both used memory ranges and the gaps between them in order.
         """
-        ranges = self._get_memory_ranges()
+        ranges = self.get_memory_ranges()
         print("[INFO] Memory Layout (Ranges and Gaps):")
         for i in range(len(ranges)):
             start, end = ranges[i]
@@ -713,11 +691,3 @@ class S19File:
                 next_start = ranges[i + 1][0]
                 print(f"  [GAP]  0x{end:08X} - 0x{next_start - 1:08X} ({next_start - end} bytes)")
 
-
-# Configure the root logger
-logging.basicConfig(
-    level=logging.INFO,
-    format='[%(levelname)s] %(message)s'
-)
-
-logger = logging.getLogger(__name__)

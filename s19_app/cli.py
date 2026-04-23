@@ -1,72 +1,112 @@
 import argparse
+import logging
+from pathlib import Path
 from .core import S19File
 from rich.console import Console
 from .version import __version__
-from .utils import format_bytes, safe_decode
 
 
 console = Console()
+logger = logging.getLogger(__name__)
 
 
-def main():
-    parser = argparse.ArgumentParser(description="S19 Patcher and Viewer Tool")
+def _configure_logging() -> None:
+    logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+
+
+def _add_file_argument(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("file", help="Path to .s19 file")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="S19 Patcher and Viewer Tool")
     subparsers = parser.add_subparsers(dest="command")
 
     # info
-    subparsers.add_parser("info", help="Show general file info")
+    info_parser = subparsers.add_parser("info", help="Show general file info")
+    _add_file_argument(info_parser)
 
     # layout
-    subparsers.add_parser("layout", help="Show memory layout (ranges + gaps)")
+    layout_parser = subparsers.add_parser("layout", help="Show memory layout (ranges + gaps)")
+    _add_file_argument(layout_parser)
 
     # ranges
-    subparsers.add_parser("ranges", help="Show memory ranges")
+    ranges_parser = subparsers.add_parser("ranges", help="Show memory ranges")
+    _add_file_argument(ranges_parser)
 
     # gaps
-    subparsers.add_parser("gaps", help="Show memory gaps")
+    gaps_parser = subparsers.add_parser("gaps", help="Show memory gaps")
+    _add_file_argument(gaps_parser)
 
     # version
     subparsers.add_parser("version", help="Show tool version")
 
     #verify
-    subparsers.add_parser("verify", help="Verify checksums of all records")
+    verify_parser = subparsers.add_parser("verify", help="Verify checksums of all records")
+    _add_file_argument(verify_parser)
 
     #update-checksums (Not expected to be used but rather haveit as a safety net)
-    subparsers.add_parser("update-checksums", help="Force re-calculation of checksums for all records")
+    update_checksums_parser = subparsers.add_parser("update-checksums", help="Force re-calculation of checksums for all records")
+    _add_file_argument(update_checksums_parser)
 
     # dump
     dump_parser = subparsers.add_parser("dump", help="Visualize memory window")
+    _add_file_argument(dump_parser)
     dump_parser.add_argument("--start", type=lambda x: int(x, 0), required=True)
     dump_parser.add_argument("--length", type=int, default=64)
 
     # dump-by-range
     dump_range_parser = subparsers.add_parser("dump-by-range", help="Visualize memory grouped by used ranges")
+    _add_file_argument(dump_range_parser)
     dump_range_parser.add_argument("--output", type=str, help="Optional path to save the memory dump")
 
     # dump-all
-    subparsers.add_parser("dump-all", help="Visualize entire memory")
+    dump_all_parser = subparsers.add_parser("dump-all", help="Visualize entire memory")
+    _add_file_argument(dump_all_parser)
 
     # patch-str
     patch_parser = subparsers.add_parser("patch-str", help="Patch a string into memory")
+    _add_file_argument(patch_parser)
     patch_parser.add_argument("--addr", type=lambda x: int(x, 0), required=True)
     patch_parser.add_argument("--text", type=str, required=True)
     patch_parser.add_argument("--encoding", type=str, default='ascii')
+    patch_parser.add_argument("--save-as", type=str, help="Optional output path to save the patched file immediately")
 
     #patch-hex
     patch_hex_parser = subparsers.add_parser("patch-hex", help="Patch raw hex bytes into memory")
+    _add_file_argument(patch_hex_parser)
     patch_hex_parser.add_argument("--addr", type=lambda x: int(x, 0), required=True, help="Start memory address")
     patch_hex_parser.add_argument("--bytes", required=True, help="Hex byte values, space-separated (e.g., '01 02 FF')")
     patch_hex_parser.add_argument("--save-as", type=str, help="Optional output file for saving patched result")
 
     # save
     save_parser = subparsers.add_parser("save", help="Export patched S19 file")
+    _add_file_argument(save_parser)
     save_parser.add_argument("--output", type=str, required=True)
+    return parser
 
-    # save-as
-    patch_parser.add_argument("--save-as", type=str, help="Optional output path to save the patched file immediately")
 
-    args = parser.parse_args()
-    s19 = S19File(args.file)
+def _write_s19(path: str, s19: S19File) -> None:
+    out_path = Path(path)
+    with out_path.open('w', encoding='utf-8') as handle:
+        for record in s19.records:
+            handle.write(str(record) + '\n')
+    logger.info("Saved S19 to %s", out_path)
+
+
+def _load_s19(path: str) -> S19File:
+    return S19File(path)
+
+
+def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
+    if args.command == "version":
+        console.print(f"[bold cyan]S19Tool version:[/bold cyan] {__version__}")
+        return 0
+    if not args.command:
+        parser.print_help()
+        return 0
+
+    s19 = _load_s19(args.file)
 
     if args.command == "info":
         console.print(f"[bold cyan]File:[/bold cyan] {args.file}")
@@ -96,22 +136,16 @@ def main():
             console.print(f"[green]Patched string '{args.text}' at 0x{args.addr:08X}[/green]")
 
             if args.save_as:
-                with open(args.save_as, 'w', encoding='utf-8') as f:
-                    for record in s19.records:
-                        f.write(str(record) + '\n')
+                _write_s19(args.save_as, s19)
                 console.print(f"[cyan]Saved modified file to: {args.save_as}[/cyan]")
 
         except ValueError as e:
             console.print(f"[red]Error:[/red] {str(e)}")
+            return 1
 
     elif args.command == "save":
-        with open(args.output, 'w', encoding='utf-8') as f:
-            for record in s19.records:
-                f.write(str(record) + '\n')
+        _write_s19(args.output, s19)
         console.print(f"[bold green]Saved modified file to:[/bold green] {args.output}")
-    
-    elif args.command == "version":
-        console.print(f"[bold cyan]S19Tool version:[/bold cyan] {__version__}")
 
     elif args.command == "verify":
         failed = []
@@ -176,10 +210,19 @@ def main():
 
         except ValueError as e:
             console.print(f"[red]Error:[/red] {str(e)}")
+            return 1
 
     else:
         parser.print_help()
-        
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    _configure_logging()
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    return dispatch(args, parser)
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

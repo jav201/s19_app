@@ -28,13 +28,7 @@ from rich.text import Text
 
 from ..core import S19File
 from ..hexfile import IntelHexFile
-from .a2l import (
-    enrich_a2l_tags_with_values,
-    parse_a2l_file,
-    render_a2l_view,
-    validate_a2l_internal_issues,
-    validate_a2l_tags,
-)
+from .a2l_parse import parse_a2l_file
 from .hexview import (
     address_in_sorted_ranges,
     build_mem_map_s19,
@@ -49,7 +43,10 @@ from .mac import parse_mac_file
 from .models import LoadedFile
 from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
 from .color_policy import css_class_for_severity
-from ..validation import ValidationIssue, ValidationReport, ValidationSeverity, validate_artifact_consistency
+from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
+from .services.a2l_service import enrich_tags_and_render
+from .services.load_service import build_loaded_hex, build_loaded_s19
+from .services.validation_service import build_validation_report
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -3129,28 +3126,19 @@ class S19TuiApp(App):
         issues: list[ValidationIssue] = []
         if primary_file is not None:
             validate_started = time.perf_counter()
-            tags_for_validation = a2l_enriched_tags or (a2l_data or {}).get("tags", [])
-            report = validate_artifact_consistency(
-                mac_records=records,
-                a2l_tags=tags_for_validation,
+            overlap_set = set()
+            if primary_file.file_type == "s19":
+                try:
+                    overlap_set = set(S19File(str(primary_file.path)).get_overlap_addresses())
+                except Exception:
+                    overlap_set = set()
+            report, issues, coverage_line = build_validation_report(
+                records=records,
+                primary_file=primary_file,
                 a2l_data=a2l_data,
-                s19_ranges=primary_file.ranges,
-                overlapped_addresses=set(),
-            )
-            extra_a2l_issues = (
-                validate_a2l_internal_issues(
-                    a2l_data or {"sections": [], "errors": [], "tags": []},
-                    tag_checks=a2l_enriched_tags or [],
-                )
-                if a2l_data
-                else []
-            )
-            report.issues = self._deduplicate_issues(report.issues + extra_a2l_issues)
-            issues = list(report.issues)
-            coverage_line = (
-                f"Coverage MAC->S19={report.coverage.mac_in_s19_pct():.1f}%  "
-                f"A2L->S19={report.coverage.a2l_in_s19_pct():.1f}%  "
-                f"A2L<->MAC={report.coverage.a2l_mac_match_pct():.1f}%"
+                a2l_enriched_tags=a2l_enriched_tags or [],
+                dedupe_issues=self._deduplicate_issues,
+                overlapped_addresses=overlap_set,
             )
             self.logger.info(
                 "MAC validation computed: records=%d issues=%d elapsed_seconds=%.3f",
@@ -3317,34 +3305,16 @@ class S19TuiApp(App):
         self._flush_logger()
         if suffix in S19_EXTENSIONS:
             s19 = S19File(str(path))
-            mem_map = build_mem_map_s19(s19)
-            row_bases = build_row_bases(mem_map)
-            ranges = s19._get_memory_ranges()
-            range_validity = build_range_validity_s19(s19, ranges)
-            errors = s19.get_errors()
             a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
             a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
-            loaded = LoadedFile(
-                path=path,
-                file_type="s19",
-                mem_map=mem_map,
-                row_bases=row_bases,
-                ranges=ranges,
-                range_validity=range_validity,
-                errors=errors,
-                a2l_path=a2l_path,
-                a2l_data=a2l_data,
-                mac_path=None,
-                mac_records=[],
-                mac_diagnostics=[],
-            )
+            loaded = build_loaded_s19(path, s19, a2l_path, a2l_data)
             loaded = self._merge_primary_with_existing_mac(loaded)
             self._log_loaded_file_summary(
                 file_type="s19",
                 path=path,
-                mem_map=mem_map,
-                ranges=ranges,
-                errors=errors,
+                mem_map=loaded.mem_map,
+                ranges=loaded.ranges,
+                errors=loaded.errors,
             )
             self.logger.info(
                 "Load phase boundary: parse_branch_done path=%s branch=s19",
@@ -3354,34 +3324,16 @@ class S19TuiApp(App):
             return loaded
         if suffix in HEX_EXTENSIONS:
             hex_file = IntelHexFile(str(path))
-            mem_map = dict(hex_file.memory)
-            row_bases = build_row_bases(mem_map)
-            ranges = hex_file.get_ranges()
-            range_validity = build_range_validity_hex(hex_file, ranges)
-            errors = hex_file.get_errors()
             a2l_path = a2l_files[0] if a2l_files else self.current_a2l_path
             a2l_data = self._load_a2l_data_with_cache(a2l_path) if a2l_path else self.current_a2l_data
-            loaded = LoadedFile(
-                path=path,
-                file_type="hex",
-                mem_map=mem_map,
-                row_bases=row_bases,
-                ranges=ranges,
-                range_validity=range_validity,
-                errors=errors,
-                a2l_path=a2l_path,
-                a2l_data=a2l_data,
-                mac_path=None,
-                mac_records=[],
-                mac_diagnostics=[],
-            )
+            loaded = build_loaded_hex(path, hex_file, a2l_path, a2l_data)
             loaded = self._merge_primary_with_existing_mac(loaded)
             self._log_loaded_file_summary(
                 file_type="hex",
                 path=path,
-                mem_map=mem_map,
-                ranges=ranges,
-                errors=errors,
+                mem_map=loaded.mem_map,
+                ranges=loaded.ranges,
+                errors=loaded.errors,
             )
             self.logger.info(
                 "Load phase boundary: parse_branch_done path=%s branch=hex",
@@ -3660,7 +3612,7 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``enrich_a2l_tags_with_values`` / ``validate_a2l_tags`` / ``render_a2l_view``
+                - ``enrich_tags_and_render``
                 - ``_compute_mac_view_payload``
                 - ``_get_range_index`` / ``address_in_sorted_ranges``
             Used by:
@@ -3679,18 +3631,12 @@ class S19TuiApp(App):
         a2l_summary_lines: list[str] = []
         if a2l_data:
             mem_map = loaded.mem_map
-            source_tags = enrich_a2l_tags_with_values(a2l_data, mem_map)
-            tag_checks = validate_a2l_tags(source_tags, mem_map)
-            check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
-            merged: list[dict[str, Any]] = []
-            for tag in source_tags:
-                lookup = (tag.get("section"), tag.get("name"))
-                merged.append({**tag, **check_map.get(lookup, {})})
-            a2l_enriched_tags = merged
+            a2l_enriched_tags, a2l_summary_lines = enrich_tags_and_render(
+                a2l_data,
+                mem_map,
+                max_tag_lines=500,
+            )
             a2l_enriched_key = (id(a2l_data), len(mem_map))
-            a2l_summary_lines = render_a2l_view(
-                a2l_data, tag_checks, max_tag_lines=500
-            ).splitlines()
         self.logger.info(
             "Load phase boundary: prepare_a2l_done has_a2l=%s enriched_tags=%d",
             bool(a2l_data),
@@ -4451,11 +4397,11 @@ class S19TuiApp(App):
         Data Flow:
             - Derive cache key from current A2L payload identity and memory map size.
             - Reuse previous enriched list when key is unchanged.
-            - Run ``validate_a2l_tags`` and merge results onto source tags on cache miss.
+            - Use ``enrich_tags_and_render`` to compute merged tags and summary lines on cache miss.
 
         Dependencies:
             Uses:
-                - ``validate_a2l_tags``
+                - ``enrich_tags_and_render``
             Used by:
                 - ``update_a2l_view``
                 - A2L filter debounce render path
@@ -4469,16 +4415,14 @@ class S19TuiApp(App):
         key = (id(self.current_a2l_data), mem_size)
         if self._a2l_enriched_key == key:
             return self._a2l_enriched_tags
-        source_tags = enrich_a2l_tags_with_values(self.current_a2l_data, mem_map)
-        tag_checks = validate_a2l_tags(source_tags, mem_map)
-        check_map = {(t.get("section"), t.get("name")): t for t in tag_checks}
-        enriched: list[dict[str, Any]] = []
-        for tag in source_tags:
-            lookup = (tag.get("section"), tag.get("name"))
-            enriched.append({**tag, **check_map.get(lookup, {})})
+        enriched, summary_lines = enrich_tags_and_render(
+            self.current_a2l_data,
+            mem_map,
+            max_tag_lines=500,
+        )
         self._a2l_enriched_tags = enriched
         self._a2l_enriched_key = key
-        self._a2l_summary_lines = render_a2l_view(self.current_a2l_data, tag_checks, max_tag_lines=500).splitlines()
+        self._a2l_summary_lines = summary_lines
         self._a2l_summary_start = 0
         return enriched
 
