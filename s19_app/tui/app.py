@@ -113,10 +113,12 @@ def _a2l_tag_unit_display(tag: dict) -> str:
 def _a2l_tag_row_severity(tag: dict) -> ValidationSeverity:
     if not tag.get("schema_ok", True):
         return ValidationSeverity.ERROR
-    if bool(tag.get("memory_checked") and tag.get("in_memory") is False):
-        return ValidationSeverity.ERROR
     if tag.get("memory_checked") and tag.get("in_memory") is True:
         return ValidationSeverity.OK
+    if tag.get("memory_checked") and tag.get("in_memory") is False:
+        return ValidationSeverity.INFO
+    if tag.get("virtual") or str(tag.get("source") or "").lower() == "formula":
+        return ValidationSeverity.INFO
     return ValidationSeverity.NEUTRAL
 
 
@@ -229,9 +231,10 @@ def _mac_record_ui_state(
         or ``neutral`` (default terminal color; no green/red).
 
     Data Flow:
-        - Fail parse and out-of-image rows to invalid.
+        - Fail parse rows to invalid.
         - When A2L is absent or the tag name is missing, mark neutral.
-        - When the name is absent from A2L, mark neutral.
+        - Keep out-of-image rows as non-hard findings (info).
+        - When the name is absent from A2L, mark warning.
         - When the name exists, require a matching ECU address on some A2L tag for ``valid``.
 
     Dependencies:
@@ -243,7 +246,7 @@ def _mac_record_ui_state(
     name = str(record.get("name") or "").strip()
     address = record.get("address")
     if memory_checked and in_memory is False:
-        return "OUT_OF_IMAGE", ValidationSeverity.ERROR.value
+        return "OUT_OF_IMAGE", ValidationSeverity.INFO.value
     if not has_a2l or not name:
         return "NO_A2L", ValidationSeverity.NEUTRAL.value
     matches = a2l_name_index.get(name.lower(), [])
@@ -274,7 +277,7 @@ _SEVERITY_TO_RICH_STYLE: dict[ValidationSeverity, str] = {
     ValidationSeverity.OK: "green",
     ValidationSeverity.ERROR: "red",
     ValidationSeverity.WARNING: "orange3",
-    ValidationSeverity.INFO: "cyan",
+    ValidationSeverity.INFO: "white",
     ValidationSeverity.NEUTRAL: "grey70",
 }
 
@@ -1106,6 +1109,8 @@ class S19TuiApp(App):
                     Button("In-Memory", id="a2l_filter_inmem"),
                     Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
                     Button("Find next", id="a2l_tag_find_next"),
+                    Button("Page Prev", id="a2l_page_prev_button"),
+                    Button("Page Next", id="a2l_page_next_button"),
                     id="a2l_tags_filters",
                 ),
                 Container(
@@ -1138,6 +1143,11 @@ class S19TuiApp(App):
         yield Container(
             Container(
                 Label("MAC File Content", id="mac_title"),
+                Container(
+                    Button("Page Prev", id="mac_page_prev_button"),
+                    Button("Page Next", id="mac_page_next_button"),
+                    id="mac_page_controls",
+                ),
                 Container(
                     DataTable(id="mac_records_list", zebra_stripes=True, cursor_type="row"),
                     Label("", id="mac_records_summary"),
@@ -2209,7 +2219,7 @@ class S19TuiApp(App):
             return
         span = self._a2l_tag_byte_length_for_hex_highlight(tag if isinstance(tag, dict) else {})
         self._a2l_tag_hex_highlight = (addr, span)
-        self.update_alt_hex_view(addr)
+        self.update_alt_hex_view(addr, near_top=True, reset_scroll=True)
         self.set_status(f"Tag at 0x{addr:08X}")
 
     def _focus_a2l_tag_absolute_index(self, absolute_index: int) -> bool:
@@ -2368,7 +2378,7 @@ class S19TuiApp(App):
                 - ``on_data_table_row_selected`` for the MAC DataTable
                 - ``_jump_to_mac_record`` (legacy ListView adapter)
         """
-        self.update_mac_hex_view(address)
+        self.update_mac_hex_view(address, near_top=True, reset_scroll=True)
         self.set_status(f"MAC tag at 0x{address:08X}")
 
     def _jump_to_validation_issue(self, item: ListItem) -> None:
@@ -4135,13 +4145,52 @@ class S19TuiApp(App):
         if focus_address is not None:
             self.logger.info("Hex view focused at 0x%08X", focus_address)
 
-    def update_alt_hex_view(self, focus_address: Optional[int] = None) -> None:
+    def _row_start_for_near_top_focus(
+        self,
+        focus_address: Optional[int],
+        row_bases: list[int],
+        context_rows: int = 1,
+    ) -> Optional[int]:
+        """Return a start-row index that keeps ``focus_address`` near the top."""
+        if not isinstance(focus_address, int) or not row_bases:
+            return None
+        focus_base = focus_address - (focus_address % 16)
+        try:
+            focus_index = row_bases.index(focus_base)
+        except ValueError:
+            return None
+        return max(0, focus_index - max(0, context_rows))
+
+    def _reset_scroll_to_top(self, container_id: str) -> None:
+        """Best-effort scroll reset for a hex scroll container."""
+        try:
+            container = self.query_one(container_id, ScrollableContainer)
+        except Exception:
+            return
+        try:
+            container.scroll_home(animate=False)
+            return
+        except Exception:
+            pass
+        try:
+            container.scroll_y = 0
+        except Exception:
+            pass
+
+    def update_alt_hex_view(
+        self,
+        focus_address: Optional[int] = None,
+        near_top: bool = False,
+        reset_scroll: bool = False,
+    ) -> None:
         """
         Summary:
             Render the alternate hex panel with optional focus and a highlight span.
 
         Args:
-            focus_address (Optional[int]): Center the view on this address when set.
+            focus_address (Optional[int]): Focus the view on this address when set.
+            near_top (bool): When True, anchor the focused address near the top rows.
+            reset_scroll (bool): When True, reset alt hex scroll position to top.
 
         Returns:
             None
@@ -4170,19 +4219,31 @@ class S19TuiApp(App):
         elif self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
         mac_highlights = self._collect_mac_highlight_addresses(self.current_file)
+        row_bases = self.current_file.row_bases or []
+        start_row_index = (
+            self._row_start_for_near_top_focus(focus_address, row_bases) if near_top else None
+        )
         alt_hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
                 focus_address,
-                self.current_file.row_bases,
+                row_bases,
                 highlight,
                 mac_highlights,
                 max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
+                start_row_index=start_row_index,
                 row_bases_set=getattr(self.current_file, "bases_set", None),
             )
         )
+        if reset_scroll:
+            self._reset_scroll_to_top("#alt_hex_scroll")
 
-    def update_mac_hex_view(self, focus_address: Optional[int] = None) -> None:
+    def update_mac_hex_view(
+        self,
+        focus_address: Optional[int] = None,
+        near_top: bool = False,
+        reset_scroll: bool = False,
+    ) -> None:
         """Render MAC hex view around a focus address if provided."""
         mac_hex_view = self.query_one("#mac_hex_view", Static)
         if not self.current_file:
@@ -4192,17 +4253,24 @@ class S19TuiApp(App):
         if self.last_search_address is not None and self.last_search_text:
             highlight = (self.last_search_address, len(self.last_search_text))
         mac_highlights = self._collect_mac_highlight_addresses(self.current_file)
+        row_bases = self.current_file.row_bases or []
+        start_row_index = (
+            self._row_start_for_near_top_focus(focus_address, row_bases) if near_top else None
+        )
         mac_hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
                 focus_address,
-                self.current_file.row_bases,
+                row_bases,
                 highlight,
                 mac_highlights,
                 max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
+                start_row_index=start_row_index,
                 row_bases_set=getattr(self.current_file, "bases_set", None),
             )
         )
+        if reset_scroll:
+            self._reset_scroll_to_top("#mac_hex_scroll")
 
     def update_mac_view(self) -> None:
         """
@@ -4894,6 +4962,14 @@ class S19TuiApp(App):
             self._toggle_a2l_filter_menu()
         elif event.button.id == "a2l_tag_find_next":
             self._handle_a2l_tag_find_next()
+        elif event.button.id == "a2l_page_prev_button":
+            self.action_a2l_tags_page_prev()
+        elif event.button.id == "a2l_page_next_button":
+            self.action_a2l_tags_page_next()
+        elif event.button.id == "mac_page_prev_button":
+            self.action_mac_records_page_prev()
+        elif event.button.id == "mac_page_next_button":
+            self.action_mac_records_page_next()
         elif event.button.id == "issues_filter_all":
             self.validation_issue_filter_mode = "all"
             self._validation_issues_window_start = 0

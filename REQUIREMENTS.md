@@ -93,7 +93,6 @@ Conversion results shall provide:
 
 Validation output shall detect and expose at least:
 
-- characteristic address not in S19
 - layout missing
 - compu method missing
 - byte order unresolved/missing
@@ -105,6 +104,43 @@ Validation enhancements shall remain additive and preserve existing compatibilit
 - `schema_ok`
 - `memory_checked`
 - `in_memory`
+
+### A2L Tag/Parameter Validation Criteria
+
+A2L row severity/color semantics shall follow:
+
+- `Red`: structural/schema failure for the declared object type, malformed required field, invalid required reference, and duplicate symbol when configured as a hard error.
+- `Green`: memory checked and tag/range fully found in the loaded S19/HEX image.
+- `White`: valid A2L record with no hard inconsistency, including valid records not found in image and records whose value is not expected to come directly from image bytes.
+- `Grey`: memory not checked yet or no primary S19/HEX context loaded.
+
+Notes:
+
+- Absence from S19/HEX does not invalidate an A2L record.
+- Schema validity must be judged by A2L object type, not by image presence.
+
+### MAC Tag/Parameter Validation Criteria
+
+MAC row severity/color semantics shall follow:
+
+- `Red`: MAC parse failed, invalid/missing name, invalid/missing hexadecimal address, and same-name A2L↔MAC address mismatch.
+- `Orange`: symbol exists in MAC but not in A2L, duplicate-address alias when alias policy is warning, and overlap ambiguity findings.
+- `Green`: exact name+address match with A2L (with optional future promotion for image-backed value-resolvable states).
+- `White`: structurally valid MAC entry with no hard inconsistency but not positively cross-confirmed.
+- `Grey`: no A2L loaded or validation context missing.
+
+Notes:
+
+- Address absence from S19/HEX is not a MAC-invalid condition.
+- Out-of-image facts may still appear as warning/info in Issues.
+
+### Issues Tile Severity Policy
+
+The Issues panel shall classify at least the following:
+
+- `Errors`: MAC parse error, empty name, invalid/missing address, duplicate MAC symbol name, A2L parser/structure errors, invalid A2L address field type, duplicate A2L symbol, broken GROUP/FUNCTION references, and A2L↔MAC same-name address mismatch.
+- `Warnings`: MAC address out of S19 range, A2L range out of S19 range, overlap ambiguity, symbol-only-in-MAC, symbol-only-in-A2L, and duplicate-address alias when policy emits warning.
+- `Optional info`: valid-but-not-image-backed, not-checked-without-primary-image, and virtual/dependent/non-memory-backed object notes.
 
 ## Viewer Requirements
 
@@ -452,3 +488,26 @@ key method docstrings to aid maintenance.
   `test_find_string_in_mem_supports_next_search`) and
   `tests/test_tui_hexview.py` (`test_render_hex_view_text_highlights_match_range`);
   still verify the interactive goto flow manually
+
+**R-TUI-018**: Clicking an A2L tag row or MAC row must focus the corresponding
+hex panel with the target address/range visible near the top of the viewport,
+reset the panel scroll position to top, and update status text.
+
+- Code: `s19_app/tui/app.py` (`_jump_to_tag_by_data`, `_jump_to_mac_address`,
+  `update_alt_hex_view`, `update_mac_hex_view`), `s19_app/tui/hexview.py`
+  (`_collect_hex_rows`, `render_hex_view_text`)
+- Validation: `Automated` via `tests/test_tui_app.py` (selection jump behavior)
+
+**R-TUI-019**: The A2L and MAC viewers must expose page navigation buttons
+without removing existing keyboard paging shortcuts.
+
+- Code: `s19_app/tui/app.py` (`compose`, button handlers, paging actions)
+- Validation: `Automated` via `tests/test_tui_app.py`
+
+**R-TUI-020**: Context paging (`+` / `-`) must continue to route to A2L/MAC
+table paging while explicit page buttons trigger the same underlying actions.
+
+- Code: `s19_app/tui/app.py` (`action_page_next_context`, `action_page_prev_context`,
+  `action_a2l_tags_page_next`, `action_a2l_tags_page_prev`,
+  `action_mac_records_page_next`, `action_mac_records_page_prev`)
+- Validation: `Automated` via `tests/test_tui_app.py`

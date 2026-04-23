@@ -133,7 +133,7 @@ def validate_artifact_consistency(
             issues.append(
                 ValidationIssue(
                     code="CROSS_MAC_S19_OUT_OF_RANGE",
-                    severity=ValidationSeverity.ERROR,
+                    severity=ValidationSeverity.WARNING,
                     message=f"MAC symbol '{name or '?'}' address 0x{addr:08X} not present in S19 image.",
                     artifact="cross",
                     symbol=name or None,
@@ -171,7 +171,7 @@ def validate_artifact_consistency(
             issues.append(
                 ValidationIssue(
                     code="CROSS_A2L_S19_OUT_OF_RANGE",
-                    severity=ValidationSeverity.ERROR,
+                    severity=ValidationSeverity.WARNING,
                     message=f"A2L symbol '{name or '?'}' range is not fully present in S19 image.",
                     artifact="cross",
                     symbol=name or None,

@@ -4,6 +4,7 @@ import pytest
 
 from s19_app.tui.app import (
     S19TuiApp,
+    _a2l_tag_row_severity,
     _a2l_tag_unit_display,
     _mac_record_ui_state,
     _severity_style,
@@ -32,6 +33,9 @@ def test_mac_record_ui_state_a2l_verification_buckets():
         {"parse_ok": True, "name": "RPM", "address": 0x2000}, idx, True, False, None
     )[1] == "error"
     assert _mac_record_ui_state(
+        {"parse_ok": True, "name": "RPM", "address": 0x2000}, idx, True, True, False
+    ) == ("OUT_OF_IMAGE", "info")
+    assert _mac_record_ui_state(
         {"parse_ok": True, "name": "MISSING", "address": 0x1000}, idx, True, False, None
     ) == ("NOT_IN_A2L", "warning")
     assert _mac_record_ui_state(
@@ -40,6 +44,14 @@ def test_mac_record_ui_state_a2l_verification_buckets():
     assert _mac_record_ui_state(
         {"parse_ok": False, "name": "RPM", "address": 0x1000}, idx, True, False, None
     )[1] == "error"
+
+
+def test_a2l_tag_row_severity_matches_updated_policy():
+    assert _a2l_tag_row_severity({"schema_ok": False}) == ValidationSeverity.ERROR
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": True, "in_memory": True}) == ValidationSeverity.OK
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": True, "in_memory": False}) == ValidationSeverity.INFO
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False, "source": "formula"}) == ValidationSeverity.INFO
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False}) == ValidationSeverity.NEUTRAL
 
 
 def test_save_project_writes_under_chosen_parent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -1601,6 +1613,56 @@ def test_on_data_table_row_selected_dispatches_by_id(tmp_path: Path, monkeypatch
     app.on_data_table_row_selected(_Evt("a2l_tags_list", "a2l:0"))
 
     assert jumps == {"mac": 0xABCD, "issue": 2, "a2l": tag_dict}
+
+
+def test_on_button_pressed_routes_new_page_buttons(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    calls = {"a2l_prev": 0, "a2l_next": 0, "mac_prev": 0, "mac_next": 0}
+    monkeypatch.setattr(app, "action_a2l_tags_page_prev", lambda: calls.__setitem__("a2l_prev", calls["a2l_prev"] + 1))
+    monkeypatch.setattr(app, "action_a2l_tags_page_next", lambda: calls.__setitem__("a2l_next", calls["a2l_next"] + 1))
+    monkeypatch.setattr(app, "action_mac_records_page_prev", lambda: calls.__setitem__("mac_prev", calls["mac_prev"] + 1))
+    monkeypatch.setattr(app, "action_mac_records_page_next", lambda: calls.__setitem__("mac_next", calls["mac_next"] + 1))
+
+    class _Event:
+        def __init__(self, button_id: str) -> None:
+            class _Button:
+                id = button_id
+
+            self.button = _Button()
+
+    app.on_button_pressed(_Event("a2l_page_prev_button"))  # type: ignore[arg-type]
+    app.on_button_pressed(_Event("a2l_page_next_button"))  # type: ignore[arg-type]
+    app.on_button_pressed(_Event("mac_page_prev_button"))  # type: ignore[arg-type]
+    app.on_button_pressed(_Event("mac_page_next_button"))  # type: ignore[arg-type]
+
+    assert calls == {"a2l_prev": 1, "a2l_next": 1, "mac_prev": 1, "mac_next": 1}
+
+
+def test_jump_actions_request_near_top_focus_and_scroll_reset(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    app = S19TuiApp(base_dir=tmp_path)
+    a2l_calls: list[tuple[int | None, bool, bool]] = []
+    mac_calls: list[tuple[int | None, bool, bool]] = []
+    monkeypatch.setattr(
+        app,
+        "update_alt_hex_view",
+        lambda focus_address=None, near_top=False, reset_scroll=False: a2l_calls.append(
+            (focus_address, near_top, reset_scroll)
+        ),
+    )
+    monkeypatch.setattr(
+        app,
+        "update_mac_hex_view",
+        lambda focus_address=None, near_top=False, reset_scroll=False: mac_calls.append(
+            (focus_address, near_top, reset_scroll)
+        ),
+    )
+    monkeypatch.setattr(app, "set_status", lambda _msg: None)
+
+    app._jump_to_tag_by_data({"name": "RPM", "address": 0x1000, "length": 4})
+    app._jump_to_mac_address(0x2000)
+
+    assert a2l_calls == [(0x1000, True, True)]
+    assert mac_calls == [(0x2000, True, True)]
 
 
 def test_update_validation_issues_view_uses_worker_precomputed_cells(

@@ -25,6 +25,8 @@ def test_validate_artifact_consistency_reports_cross_mismatches():
     assert "TRIPLE_NAME_ADDRESS_MISMATCH" in codes
     assert "CROSS_MAC_S19_OUT_OF_RANGE" in codes
     assert "CROSS_A2L_S19_OVERLAP_AMBIGUOUS" in codes
+    severity_by_code = {issue.code: issue.severity for issue in report.issues}
+    assert severity_by_code["CROSS_MAC_S19_OUT_OF_RANGE"] == ValidationSeverity.WARNING
     assert report.coverage.mac_total == 2
     assert report.coverage.mac_in_s19 == 1
     assert report.coverage.a2l_total == 2
