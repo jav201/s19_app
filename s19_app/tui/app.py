@@ -3124,10 +3124,10 @@ class S19TuiApp(App):
         coverage_line: Optional[str] = None
         report: Optional[ValidationReport] = None
         issues: list[ValidationIssue] = []
-        if primary_file is not None:
+        if loaded is not None:
             validate_started = time.perf_counter()
             overlap_set = set()
-            if primary_file.file_type == "s19":
+            if primary_file is not None and primary_file.file_type == "s19":
                 try:
                     overlap_set = set(S19File(str(primary_file.path)).get_overlap_addresses())
                 except Exception as exc:

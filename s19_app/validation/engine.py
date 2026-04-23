@@ -59,7 +59,14 @@ def validate_artifact_consistency(
     overlap_set = overlapped_addresses or set()
     range_index = build_sorted_range_index(s19_ranges)
     issues: list[ValidationIssue] = []
-    issues.extend(validate_mac_records(mac_records, alias_policy=alias_policy))
+    issues.extend(
+        validate_mac_records(
+            mac_records,
+            alias_policy=alias_policy,
+            a2l_tags=a2l_tags,
+            overlapped_addresses=overlap_set,
+        )
+    )
     if a2l_data is not None:
         issues.extend(validate_a2l_structure(a2l_data, tags=a2l_tags))
 

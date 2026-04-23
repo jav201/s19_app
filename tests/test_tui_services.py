@@ -133,3 +133,22 @@ def test_build_validation_report_falls_back_to_raw_tags_when_enriched_is_none(mo
     )
 
     assert captured["a2l_tags"] == loaded.a2l_data["tags"]
+
+
+def test_build_validation_report_mac_only_emits_duplicate_classification_issue():
+    records = [
+        {"parse_ok": True, "line_number": 1, "name": "RPM", "address": 0x1000},
+        {"parse_ok": True, "line_number": 2, "name": "TORQUE", "address": 0x1000},
+    ]
+    report, issues, coverage = validation_service.build_validation_report(
+        records=records,
+        primary_file=None,
+        a2l_data=None,
+        a2l_enriched_tags=None,
+        dedupe_issues=lambda items: items,
+        overlapped_addresses=None,
+    )
+    assert report is not None
+    assert coverage is None
+    duplicate_issue = next(issue for issue in issues if issue.code == "MAC_DUPLICATE_ADDRESS")
+    assert duplicate_issue.details.get("classification") == "alias candidate"
