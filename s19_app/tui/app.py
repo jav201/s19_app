@@ -56,6 +56,7 @@ from .workspace import (
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
     WORKAREA_TEMP,
+    WorkareaContainmentError,
     copy_into_workarea,
     ensure_workarea,
     resolve_input_path,
@@ -1622,15 +1623,20 @@ class S19TuiApp(App):
             self.set_status("Project already has an A2L file.")
             self.logger.warning("Project already has A2L file: %s", project_dir)
             return
-        if self.current_file:
-            saved = copy_into_workarea(self.current_file.path, project_dir)
-            self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
-            if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
-                saved_mac = copy_into_workarea(self.current_file.mac_path, project_dir)
-                self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
-        if self.current_a2l_path:
-            saved_a2l = copy_into_workarea(self.current_a2l_path, project_dir)
-            self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
+        try:
+            if self.current_file:
+                saved = copy_into_workarea(self.current_file.path, project_dir)
+                self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
+                if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
+                    saved_mac = copy_into_workarea(self.current_file.mac_path, project_dir)
+                    self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
+            if self.current_a2l_path:
+                saved_a2l = copy_into_workarea(self.current_a2l_path, project_dir)
+                self.logger.info("Project saved A2L. name=%s file=%s", cleaned, saved_a2l)
+        except WorkareaContainmentError as exc:
+            self.set_status(f"Cannot save project: {exc}")
+            self.logger.warning("Project save rejected by workarea guard: %s", exc)
+            return
         self.current_project = cleaned
         self.current_project_dir = project_dir
         self.set_status(f"Saved project to {project_dir}")
@@ -1695,21 +1701,25 @@ class S19TuiApp(App):
             existing_suffixes = {item.suffix.lower() for item in data_files}
         else:
             existing_suffixes = set()
-        if self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
-            if not any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes):
+        try:
+            if self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
+                if not any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes):
+                    copy_into_workarea(self.current_file.path, project_dir)
+                    self.logger.info("Synced primary data file into project: %s", project_dir)
+            elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
                 copy_into_workarea(self.current_file.path, project_dir)
-                self.logger.info("Synced primary data file into project: %s", project_dir)
-        elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
-            copy_into_workarea(self.current_file.path, project_dir)
-            self.logger.info("Synced MAC data file into project: %s", project_dir)
-        if (
-            self.current_file.mac_path
-            and self.current_file.mac_path != self.current_file.path
-            and self.current_file.mac_path.suffix.lower() in MAC_EXTENSIONS
-            and ".mac" not in existing_suffixes
-        ):
-            copy_into_workarea(self.current_file.mac_path, project_dir)
-            self.logger.info("Synced attached MAC file into project: %s", project_dir)
+                self.logger.info("Synced MAC data file into project: %s", project_dir)
+            if (
+                self.current_file.mac_path
+                and self.current_file.mac_path != self.current_file.path
+                and self.current_file.mac_path.suffix.lower() in MAC_EXTENSIONS
+                and ".mac" not in existing_suffixes
+            ):
+                copy_into_workarea(self.current_file.mac_path, project_dir)
+                self.logger.info("Synced attached MAC file into project: %s", project_dir)
+        except WorkareaContainmentError as exc:
+            self.set_status(f"Project sync rejected: {exc}")
+            self.logger.warning("Project sync rejected by workarea guard: %s", exc)
 
     def _sync_loaded_a2l_to_project(self) -> None:
         """Copy loaded A2L file into active project if allowed."""
@@ -1726,8 +1736,12 @@ class S19TuiApp(App):
         if a2l_files:
             self.logger.info("Project already has A2L file, skipping sync: %s", project_dir)
             return
-        copy_into_workarea(self.current_a2l_path, project_dir)
-        self.logger.info("Synced A2L file into project: %s", project_dir)
+        try:
+            copy_into_workarea(self.current_a2l_path, project_dir)
+            self.logger.info("Synced A2L file into project: %s", project_dir)
+        except WorkareaContainmentError as exc:
+            self.set_status(f"A2L sync rejected: {exc}")
+            self.logger.warning("A2L sync rejected by workarea guard: %s", exc)
 
     def _load_path_from_user_input(self, path: Path) -> None:
         """Resolve path and dispatch to data load (S19/HEX/MAC) or A2L load."""
@@ -1867,7 +1881,13 @@ class S19TuiApp(App):
         self.logger.info("Load phase boundary: copy_started path=%s", normalized)
         self._flush_logger()
         copy_started = time.perf_counter()
-        copied = copy_into_workarea(normalized, temp_dir)
+        try:
+            copied = copy_into_workarea(normalized, temp_dir)
+        except WorkareaContainmentError as exc:
+            self.set_progress(0, "")
+            self.set_status(f"Cannot load file: {exc}")
+            self.logger.warning("Load rejected by workarea guard: %s", exc)
+            return
         copy_elapsed = time.perf_counter() - copy_started
         self.logger.info(
             "Load phase boundary: copy_done path=%s elapsed=%.3fs",
@@ -1931,7 +1951,13 @@ class S19TuiApp(App):
             )
         self.set_progress(10, "Copying A2L into workarea temp...")
         copy_started = time.perf_counter()
-        copied = copy_into_workarea(normalized, temp_dir)
+        try:
+            copied = copy_into_workarea(normalized, temp_dir)
+        except WorkareaContainmentError as exc:
+            self.set_progress(0, "")
+            self.set_status(f"Cannot load A2L: {exc}")
+            self.logger.warning("A2L load rejected by workarea guard: %s", exc)
+            return
         copy_elapsed = time.perf_counter() - copy_started
         self.refresh_files()
         copied_size = copied.stat().st_size

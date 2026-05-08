@@ -54,13 +54,15 @@ def test_a2l_tag_row_severity_matches_updated_policy():
     assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False}) == ValidationSeverity.NEUTRAL
 
 
-def test_save_project_writes_under_chosen_parent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_save_project_writes_under_workarea(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    # Updated for LLR-005.3 (increment 1.5): the save dialog now rejects
+    # parent folders outside `.s19tool/workarea/` via WorkareaContainmentError,
+    # so the parent must be the workarea itself.
     ensure = tmp_path / ".s19tool" / "workarea"
     ensure.mkdir(parents=True)
     src = tmp_path / "data.mac"
     src.write_text("A=0x10\n", encoding="utf-8")
-    parent = tmp_path / "dest"
-    parent.mkdir()
+    parent = ensure
     app = S19TuiApp(base_dir=tmp_path)
     app.workarea = ensure
     monkeypatch.setattr(app, "set_status", lambda _m: None)
@@ -1709,3 +1711,307 @@ def test_update_validation_issues_view_uses_worker_precomputed_cells(
     assert recorded[0][0] == precomputed_rows[0][0]  # severity cell reused verbatim
 
 
+# ---------------------------------------------------------------------------
+# Snapshot-harness skeleton (LLR-007.4 / R-7).
+#
+# The harness drives ``S19TuiApp`` headlessly via ``App.run_test()`` and reads
+# back the codes rendered into the Issues panel ``DataTable``. The full
+# parametric per-class snapshot tests (TC-064 / TC-065) land in a later
+# increment; this is just a smoke test proving the harness skeleton works.
+# ---------------------------------------------------------------------------
+
+
+def _query_issues_panel_codes(app: S19TuiApp) -> list[str]:
+    """
+    Summary:
+        Read the ``Code`` cell of every row currently rendered in the Issues
+        panel ``DataTable`` (``#validation_issues_list``). Used by snapshot
+        tests to assert which ``ValidationIssue.code`` strings made it past
+        the engine-emit boundary all the way into the panel widget tree.
+
+    Args:
+        app (S19TuiApp): A running app instance under ``App.run_test()``.
+
+    Returns:
+        list[str]: Code cell values, one per visible row, in render order.
+    """
+    from textual.widgets import DataTable
+
+    table = app.query_one("#validation_issues_list", DataTable)
+    codes: list[str] = []
+    for row_index in range(table.row_count):
+        row = table.get_row_at(row_index)
+        # Row layout per ``precompute_issue_datatable_payload``:
+        # (severity, code, artifact, symbol, address, line, message)
+        if len(row) >= 2:
+            codes.append(str(row[1]))
+    return codes
+
+
+# Stands in for TC-064 (single-class smoke; parametric per-class tests are TC-065.a..h).
+def test_snapshot_harness_renders_issues_panel(
+    tmp_path: Path, large_project: dict[str, Path]
+) -> None:
+    """Smoke for LLR-007.4 harness; TC-064/065 land in a later increment.
+
+    Spins up ``S19TuiApp`` headlessly, populates the Issues panel from a
+    ``ValidationReport`` produced by ``validate_artifact_consistency`` on the
+    ``large_project`` fixture, and asserts that ``_query_issues_panel_codes``
+    returns at least one code that also appears in the report's ``issues``
+    list. This proves the harness can observe the panel widget tree end to
+    end. Per-class fixtures (TC-062.a/g/h) and the parametric panel-render
+    snapshots (TC-064 / TC-065) are introduced in increments 5 and 6.
+    """
+    import asyncio
+
+    from s19_app.core import S19File
+    from s19_app.tui.a2l import parse_a2l_file
+    from s19_app.tui.mac import parse_mac_file
+    from s19_app.validation import validate_artifact_consistency
+
+    # Build a real ValidationReport from the large_project artefacts so the
+    # smoke test exercises the same code path the production load uses; the
+    # harness assertion just checks that at least one of those codes appears
+    # in the rendered panel.
+    s19 = S19File(str(large_project["s19"]))
+    a2l_data = parse_a2l_file(large_project["a2l"])
+    mac_payload = parse_mac_file(large_project["mac"])
+    report = validate_artifact_consistency(
+        mac_records=mac_payload.get("records", []),
+        a2l_tags=(a2l_data or {}).get("tags", []),
+        a2l_data=a2l_data,
+        s19_ranges=s19.get_memory_ranges(),
+    )
+    expected_codes = {issue.code for issue in report.issues}
+    assert expected_codes, (
+        "large_project should yield at least one validation issue; if this "
+        "regresses, the smoke test cannot prove the harness is functional."
+    )
+
+    async def _drive() -> list[str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            # Populate the panel directly. The smoke test's contract is
+            # "harness can read the panel", not "the worker thread completed";
+            # the per-class tests in increments 5/6 will drive an end-to-end
+            # load via ``load_path=`` and pilot.pause() to await the worker.
+            app._validation_issues = list(report.issues)
+            app._validation_issues_window_start = 0
+            app.update_validation_issues_view()
+            await pilot.pause()
+            return _query_issues_panel_codes(app)
+
+    rendered_codes = asyncio.run(_drive())
+    assert rendered_codes, "Issues panel rendered no rows for a non-empty report."
+    assert set(rendered_codes) & expected_codes, (
+        "No rendered code intersects the report's issue codes; the harness "
+        "is observing a widget that does not reflect engine output."
+    )
+
+
+# ---------------------------------------------------------------------------
+# LLR-007.4 / TC-065.a..h — panel-render snapshots for the 8 cross-file
+# incompatibility classes. Mirrors the engine-side
+# ``TestCrossFileCompatibilityCoEmission`` from ``tests/test_validation_engine``
+# but asserts against the rendered Issues panel rather than the raw
+# ``ValidationReport``. Locks the engine→panel co-render contract (HLR-007b).
+# ---------------------------------------------------------------------------
+
+
+class TestCrossFileCompatibilityPanelRender:
+    """LLR-007.4 — Issues panel renders one ``ValidationIssue`` per class.
+
+    Each test parses the per-class fixture, calls
+    ``validate_artifact_consistency`` directly (mirroring
+    ``validation_service.build_validation_report``), drives ``S19TuiApp``
+    headlessly via ``App.run_test()``, populates ``_validation_issues``,
+    calls ``update_validation_issues_view()``, and asserts the expected
+    issue ``code`` is present in the rows read back by
+    ``_query_issues_panel_codes``.
+    """
+
+    @staticmethod
+    def _engine_inputs_from_paths(s19_path=None, a2l_path=None, mac_path=None):
+        """Parse artefacts and return kwargs for
+        ``validate_artifact_consistency``. Same shape as the helper in
+        ``tests/test_validation_engine.py``; duplicated locally to keep test
+        modules import-independent."""
+        from s19_app.core import S19File
+        from s19_app.tui.a2l import parse_a2l_file
+        from s19_app.tui.mac import parse_mac_file
+
+        if s19_path is not None:
+            s19 = S19File(str(s19_path))
+            ranges = s19.get_memory_ranges()
+            overlap = set(s19.get_overlap_addresses())
+        else:
+            ranges = []
+            overlap = set()
+        if a2l_path is not None:
+            a2l_data = parse_a2l_file(a2l_path)
+            a2l_tags = a2l_data.get("tags", [])
+        else:
+            a2l_data = None
+            a2l_tags = []
+        if mac_path is not None:
+            mac_records = parse_mac_file(mac_path).get("records", [])
+        else:
+            mac_records = []
+        return dict(
+            mac_records=mac_records,
+            a2l_tags=a2l_tags,
+            a2l_data=a2l_data,
+            s19_ranges=ranges,
+            overlapped_addresses=overlap,
+        )
+
+    @staticmethod
+    def _drive_panel(tmp_path: Path, issues) -> list[str]:
+        """Spin up ``S19TuiApp`` headlessly, populate ``_validation_issues``,
+        render the panel, and return the codes read back from the DataTable.
+        Same sync-wrapper pattern as ``test_snapshot_harness_renders_issues_panel``.
+
+        The Issues panel pages at ``validation_issues_page_size`` (default 200,
+        clamped to ``viewer_page_size_max=200``). For per-class assertions to
+        hold against the multi-thousand-issue ``large_project`` report we widen
+        both ceilings on the test instance so the entire issues list renders in
+        a single page. This is test-side configuration only; no product change.
+        """
+        import asyncio
+
+        from s19_app.tui.app import S19TuiApp
+
+        async def _drive() -> list[str]:
+            app = S19TuiApp(base_dir=tmp_path)
+            # Widen page-size ceiling so all issues land on the first page.
+            app.viewer_page_size_max = max(app.viewer_page_size_max, len(issues) + 1)
+            app.validation_issues_page_size = max(
+                app.validation_issues_page_size, len(issues) + 1
+            )
+            async with app.run_test() as pilot:
+                app._validation_issues = list(issues)
+                app._validation_issues_window_start = 0
+                app.update_validation_issues_view()
+                await pilot.pause()
+                return _query_issues_panel_codes(app)
+
+        return asyncio.run(_drive())
+
+    # TC-065.a — S19/HEX overlap (carries engine gap F-7.2-01)
+    @pytest.mark.xfail(
+        reason=(
+            "Carry-through from LLR-007.1 / Finding F-7.2-01: engine has no "
+            "CROSS_S19_HEX_OVERLAP code, so the panel cannot render an issue "
+            "for this class. Closes when the engine gap is closed."
+        ),
+        strict=False,
+    )
+    def test_tc_065_a_s19_hex_overlap_panel_render(self, tmp_path, overlap_s19_hex):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(s19_path=overlap_s19_hex["s19"])
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "CROSS_S19_HEX_OVERLAP" in codes
+
+    # TC-065.b — A2L tag range out of S19
+    def test_tc_065_b_a2l_range_out_of_s19_panel_render(self, tmp_path, large_project):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(
+            s19_path=large_project["s19"],
+            a2l_path=large_project["a2l"],
+            mac_path=large_project["mac"],
+        )
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "CROSS_A2L_S19_OUT_OF_RANGE" in codes, (
+            f"expected CROSS_A2L_S19_OUT_OF_RANGE in rendered panel; got {sorted(set(codes))}"
+        )
+
+    # TC-065.c — MAC out of S19 range
+    def test_tc_065_c_mac_address_out_of_s19_panel_render(self, tmp_path, large_project):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(
+            s19_path=large_project["s19"],
+            a2l_path=large_project["a2l"],
+            mac_path=large_project["mac"],
+        )
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "CROSS_MAC_S19_OUT_OF_RANGE" in codes, (
+            f"expected CROSS_MAC_S19_OUT_OF_RANGE in rendered panel; got {sorted(set(codes))}"
+        )
+
+    # TC-065.d — A2L↔MAC same-name address mismatch
+    def test_tc_065_d_a2l_mac_name_address_mismatch_panel_render(self, tmp_path, large_project):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(
+            s19_path=large_project["s19"],
+            a2l_path=large_project["a2l"],
+            mac_path=large_project["mac"],
+        )
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "TRIPLE_NAME_ADDRESS_MISMATCH" in codes, (
+            f"expected TRIPLE_NAME_ADDRESS_MISMATCH in rendered panel; got {sorted(set(codes))}"
+        )
+
+    # TC-065.e — symbol-only-in-MAC
+    def test_tc_065_e_symbol_only_in_mac_panel_render(self, tmp_path, large_project):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(
+            s19_path=large_project["s19"],
+            a2l_path=large_project["a2l"],
+            mac_path=large_project["mac"],
+        )
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "CROSS_MAC_ONLY_SYMBOL" in codes, (
+            f"expected CROSS_MAC_ONLY_SYMBOL in rendered panel; got {sorted(set(codes))}"
+        )
+
+    # TC-065.f — symbol-only-in-A2L
+    def test_tc_065_f_symbol_only_in_a2l_panel_render(self, tmp_path, large_project):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(
+            s19_path=large_project["s19"],
+            a2l_path=large_project["a2l"],
+            mac_path=large_project["mac"],
+        )
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "CROSS_A2L_ONLY_SYMBOL" in codes, (
+            f"expected CROSS_A2L_ONLY_SYMBOL in rendered panel; got {sorted(set(codes))}"
+        )
+
+    # TC-065.g — duplicate-address alias (alias_policy="warn" => WARNING tier)
+    def test_tc_065_g_duplicate_address_alias_panel_render(self, tmp_path, duplicate_alias_mac):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(mac_path=duplicate_alias_mac)
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "MAC_DUPLICATE_ADDRESS" in codes, (
+            f"expected MAC_DUPLICATE_ADDRESS in rendered panel; got {sorted(set(codes))}"
+        )
+
+    # TC-065.h — parsed-record corruption.
+    # MAC subset only — S19 + A2L corruption are not engine-visible per F-7.2-02.
+    def test_tc_065_h_parsed_record_corruption_panel_render(self, tmp_path, corrupt_records):
+        from s19_app.validation import validate_artifact_consistency
+
+        kwargs = self._engine_inputs_from_paths(
+            s19_path=corrupt_records["s19"],
+            a2l_path=corrupt_records["a2l"],
+            mac_path=corrupt_records["mac"],
+        )
+        report = validate_artifact_consistency(**kwargs)
+        codes = self._drive_panel(tmp_path, report.issues)
+        assert "MAC_PARSE_ERROR" in codes, (
+            f"expected MAC_PARSE_ERROR in rendered panel; got {sorted(set(codes))}"
+        )
