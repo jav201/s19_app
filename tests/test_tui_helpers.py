@@ -27,7 +27,8 @@ from s19_app.tui import (
 
 
 def test_copy_into_workarea_creates_unique_names(tmp_path):
-    workarea = tmp_path / "workarea"
+    # Destination must resolve under <base>/.s19tool/workarea/ per LLR-005.3.
+    workarea = tmp_path / ".s19tool" / "workarea" / "temp"
     source = tmp_path / "sample.s19"
     source.write_text("S0", encoding="utf-8")
 

@@ -329,3 +329,212 @@ def large_project(tmp_path: Path) -> dict[str, Path]:
     a2l = make_large_a2l(tmp_path / "stress.a2l")
     mac = make_large_mac(tmp_path / "stress.mac")
     return {"s19": s19, "a2l": a2l, "mac": mac}
+
+
+# ---------------------------------------------------------------------------
+# Cross-file incompatibility builders (LLR-007.2)
+#
+# Each builder produces the smallest deterministic input that triggers exactly
+# one cross-file class not covered by ``large_project``. They follow the same
+# style as ``make_large_s19/a2l/mac``: ``seed: int = 0`` default, programmatic
+# content (no static fixture files on disk), and the same checksum/format
+# helpers. These are intentionally tiny — the goal is "smallest input that
+# triggers exactly one class", not stress.
+# ---------------------------------------------------------------------------
+
+
+def _intel_hex_data_record(address: int, data: bytes) -> str:
+    """Format one Intel HEX type-00 (data) record with the trailing checksum."""
+    byte_count = len(data)
+    record_type = 0x00
+    total = byte_count + ((address >> 8) & 0xFF) + (address & 0xFF) + record_type
+    for value in data:
+        total += value
+    checksum = (-total) & 0xFF
+    return (
+        f":{byte_count:02X}{address:04X}{record_type:02X}"
+        + data.hex().upper()
+        + f"{checksum:02X}"
+    )
+
+
+def _intel_hex_eof_record() -> str:
+    """Format the Intel HEX type-01 end-of-file record."""
+    return ":00000001FF"
+
+
+def make_overlap_s19_hex(
+    tmp_path: Path,
+    *,
+    seed: int = 0,
+) -> dict[str, Path]:
+    """
+    Summary:
+        Build a tiny S19 file and a tiny Intel HEX file whose data ranges
+        overlap on the same low-address window. The two artefacts disagree on
+        the byte values written to the shared addresses, which is the
+        S19/HEX overlap class (TC-062.a).
+
+    Args:
+        tmp_path (Path): Directory to write into (typically the pytest fixture).
+        seed (int): Deterministic PRNG seed for the data bytes.
+
+    Returns:
+        dict[str, Path]: ``{"s19": path, "hex": path}``.
+
+    Data Flow:
+        - Emit one S19 S0 header, one S3 data record at 0x00001000, and an S7 terminator.
+        - Emit one Intel HEX :10 data record at the same 0x1000 with different bytes,
+          followed by the EOF marker.
+
+    Dependencies:
+        Uses:
+            - ``_s19_data_record`` / ``_s19_header_record`` / ``_s19_terminator``
+            - ``_intel_hex_data_record`` / ``_intel_hex_eof_record``
+        Used by:
+            - ``overlap_s19_hex`` fixture
+    """
+    rng = random.Random(seed)
+    s19_path = tmp_path / "overlap.s19"
+    hex_path = tmp_path / "overlap.hex"
+    address = 0x0000_1000
+    s19_bytes = bytes(rng.randrange(0, 256) for _ in range(16))
+    hex_bytes = bytes(rng.randrange(0, 256) for _ in range(16))
+    with s19_path.open("w", encoding="ascii", newline="\n") as handle:
+        handle.write(_s19_header_record() + "\n")
+        handle.write(_s19_data_record(address, s19_bytes) + "\n")
+        handle.write(_s19_terminator() + "\n")
+    with hex_path.open("w", encoding="ascii", newline="\n") as handle:
+        handle.write(_intel_hex_data_record(address, hex_bytes) + "\n")
+        handle.write(_intel_hex_eof_record() + "\n")
+    return {"s19": s19_path, "hex": hex_path}
+
+
+def make_duplicate_alias_mac(
+    tmp_path: Path,
+    *,
+    seed: int = 0,
+) -> Path:
+    """
+    Summary:
+        Build a tiny MAC file with two distinct symbol names mapped to the
+        same hex address (the duplicate-address alias class, TC-062.g).
+        Under the default ``warn`` alias policy the validation engine emits a
+        ``MAC_DUPLICATE_ADDRESS`` issue at WARNING severity.
+
+    Args:
+        tmp_path (Path): Directory to write into.
+        seed (int): Reserved for parity with the other builders; the file
+            content is fixed (deterministic regardless of seed) because
+            duplicate-alias requires exact-address collision.
+
+    Returns:
+        Path: The written MAC file path.
+
+    Dependencies:
+        Used by:
+            - ``duplicate_alias_mac`` fixture
+    """
+    del seed  # deterministic content; parameter retained for builder-style parity
+    path = tmp_path / "dup_alias.mac"
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("# Duplicate-address alias fixture\n")
+        handle.write("ALPHA=0x08000000\n")
+        handle.write("BETA=0x08000000\n")
+    return path
+
+
+def make_corrupt_records(
+    tmp_path: Path,
+    *,
+    seed: int = 0,
+) -> dict[str, Path]:
+    """
+    Summary:
+        Build small S19, A2L, and MAC files that each contain one intentionally
+        corrupted record (parsed-record corruption class, TC-062.h):
+
+        - S19: one valid S3 record plus a second record with a corrupted
+          checksum byte. ``S19File`` collects the per-line error without
+          aborting the load.
+        - A2L: a malformed CHARACTERISTIC block missing its required
+          ``ECU_ADDRESS`` line.
+        - MAC: a line with invalid hex on the right-hand side.
+
+    Args:
+        tmp_path (Path): Directory to write into.
+        seed (int): Deterministic PRNG seed for the valid S19 data bytes.
+
+    Returns:
+        dict[str, Path]: ``{"s19": path, "a2l": path, "mac": path}``.
+
+    Dependencies:
+        Uses:
+            - ``_s19_data_record`` / ``_s19_header_record`` / ``_s19_terminator``
+        Used by:
+            - ``corrupt_records`` fixture
+    """
+    rng = random.Random(seed)
+    s19_path = tmp_path / "corrupt.s19"
+    a2l_path = tmp_path / "corrupt.a2l"
+    mac_path = tmp_path / "corrupt.mac"
+
+    valid_bytes = bytes(rng.randrange(0, 256) for _ in range(16))
+    valid_record = _s19_data_record(0x0800_0000, valid_bytes)
+    # Mutate the trailing checksum byte to force a checksum mismatch on the
+    # second record while leaving every other field structurally valid.
+    second_record = _s19_data_record(0x0800_0010, valid_bytes)
+    bad_checksum = f"{(int(second_record[-2:], 16) ^ 0xFF):02X}"
+    corrupted_record = second_record[:-2] + bad_checksum
+    with s19_path.open("w", encoding="ascii", newline="\n") as handle:
+        handle.write(_s19_header_record() + "\n")
+        handle.write(valid_record + "\n")
+        handle.write(corrupted_record + "\n")
+        handle.write(_s19_terminator() + "\n")
+
+    with a2l_path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(
+            "ASAP2_VERSION 1 71\n"
+            "/begin PROJECT CorruptProject\n"
+            "  /begin MODULE CorruptModule\n"
+            "    /begin CHARACTERISTIC BAD_CHAR\n"
+            # ECU_ADDRESS deliberately omitted — required field missing.
+            "      LENGTH 4\n"
+            "      BYTE_ORDER LITTLE_ENDIAN\n"
+            "    /end CHARACTERISTIC\n"
+            "  /end MODULE\n"
+            "/end PROJECT\n"
+        )
+
+    with mac_path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write("# Corrupt-record fixture\n")
+        handle.write("BADHEX=not_a_hex_value\n")
+
+    return {"s19": s19_path, "a2l": a2l_path, "mac": mac_path}
+
+
+@pytest.fixture
+def overlap_s19_hex(tmp_path: Path) -> dict[str, Path]:
+    """
+    Summary:
+        Pair of S19 + Intel HEX files with overlapping data ranges (TC-062.a).
+    """
+    return make_overlap_s19_hex(tmp_path)
+
+
+@pytest.fixture
+def duplicate_alias_mac(tmp_path: Path) -> Path:
+    """
+    Summary:
+        MAC file containing two symbol names mapped to the same hex address (TC-062.g).
+    """
+    return make_duplicate_alias_mac(tmp_path)
+
+
+@pytest.fixture
+def corrupt_records(tmp_path: Path) -> dict[str, Path]:
+    """
+    Summary:
+        Trio of S19/A2L/MAC fixtures with one intentionally corrupted record each (TC-062.h).
+    """
+    return make_corrupt_records(tmp_path)
