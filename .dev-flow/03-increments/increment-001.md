@@ -92,7 +92,23 @@ A pre-existing TUI app test is now red — see §5 Risks for full disclosure.
 Deferrals folded in (per `.dev-flow/02-review.md` §Deferrals):
 
 - **A-N02 — closure criterion stated.** Increment-1 closure criterion: *"Implementation lands; TC-044/045/046 green on Linux CI; TC-047 green on a manual Windows run with stdout attached to this packet."* All four are green on this Windows host (output captured in §4). The Linux-CI portion will be confirmed by the next CI run; capture and append the Linux output to this section once available.
-- **Q-N01 — manual Windows run command captured.** The exact command is documented in §3 above and inside the TC-047 docstring. The Windows pytest output is captured verbatim in §4. To be re-executed before the Phase 4 gate on the canonical Windows host of record.
+- **Q-N01 — CLOSED.** Canonical Windows-host re-run of TC-047 attached below. The deferred re-execution requirement from `02-review.md` §Deferrals is satisfied.
+
+  ```text
+  $ python -m pytest -v tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_junction_rejected_on_windows
+  ============================= test session starts =============================
+  platform win32 -- Python 3.14.4, pytest-9.0.3, pluggy-1.6.0 -- C:\Python314\python.exe
+  cachedir: .pytest_cache
+  rootdir: C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.claude\worktrees\lucid-margulis-a63fd4
+  configfile: pyproject.toml
+  collecting ... collected 1 item
+
+  tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_junction_rejected_on_windows PASSED [100%]
+
+  ============================== 1 passed in 0.47s ==============================
+  ```
+
+  Captured 2026-05-07 on the canonical Windows host (Windows 11, Python 3.14.4, pytest 9.0.3). PASSED, exit 0. Closes Phase 2 blocker S-002 (NTFS-junction follow-through) at the canonical level.
 - **S-N01 — confirmed.** Implementation uses `Path.is_symlink()` AND `os.lstat().st_file_attributes & FILE_ATTRIBUTE_REPARSE_POINT` on Windows; not `Path.resolve()` alone. See `_is_reparse_point` and `_path_traverses_reparse_point` in `s19_app/tui/workspace.py`.
 - **S-N02 — confirmed.** The 256 MB cap rationale comment is in `workspace.py` next to `DEFAULT_COPY_SIZE_CAP_BYTES`, repeating the wording from finding S-N02.
 - **S-N04 — actual file count: 5.** Source/test files modified: `s19_app/tui/workspace.py`, `s19_app/tui/app.py`, `tests/test_tui_workspace.py`, `tests/test_tui_helpers.py`. Plus this review packet = 5 total. The deferral predicted ≥4 source/test files; final count is 4 source/test + 1 packet = 5. Within cap.

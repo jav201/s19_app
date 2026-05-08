@@ -24,7 +24,7 @@ The Phase 3 audit batch produced 17 code/test increments (1, 1.5, 2–9) plus a 
 | §5.3 bullets pass | 11 of 14 (3 noted `gap`) |
 | Open Findings | 18 (3 major + 15 minor) |
 
-**Verdict:** **gap** — Phase 4 closes pass-with-known-gaps. The gaps are bounded to (a) demo-method evidence capture under TC-032, (b) the manual Windows TC-047 stdout attachment per Q-N01, and (c) a Linux-CI confirmation run for TC-044/045/046 per A-N02. None require code or test changes. User decides whether to capture demo evidence inside this batch or defer to Phase 6 docs.
+**Verdict:** **gap** — Phase 4 closes pass-with-known-gaps. **Update 2026-05-07:** Gap B (TC-047 Windows manual stdout) closed — canonical Windows-host run PASSED, attached to [`increment-001.md` §6](03-increments/increment-001.md), and Q-N01 marked CLOSED in [`02-review.md` §Deferrals](02-review.md). The remaining gaps are bounded to (a) demo-method evidence capture under TC-032 and (c) a Linux-CI confirmation run for TC-044/045/046 per A-N02. None require code or test changes. User decides whether to capture demo evidence inside this batch or defer to Phase 6 docs.
 
 ---
 
@@ -86,7 +86,7 @@ Verdict legend: `pass` (asserting test green / matrix complete), `xfail` (docume
 | TC-044 | LLR-005.3 | test (unit) | pass | `tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_source_size_over_cap_rejected` — increment 1 §4 | — |
 | TC-045 | LLR-005.3 | test (unit) | pass | `tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_source_symlink_rejected` — increment 1 §4 | — |
 | TC-046 | LLR-005.3 | test (unit) | pass | `tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_destination_outside_workarea_rejected` — increment 1 §4. Closes Phase 2 blocker S-001. | — |
-| TC-047 | LLR-005.3 | test (unit) | **gap** | `tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_junction_rejected_on_windows` — passed locally on Windows in increment 1 §4. Per Q-N01 deferral the canonical Windows-host pytest stdout still needs to be re-attached to `increment-001.md` §6 before Phase 4 close. **In CI (Linux) the test SKIPS** — that is by design. | manual Windows-host stdout pending |
+| TC-047 | LLR-005.3 | test (unit) | **pass** *(closed 2026-05-07)* | `tests/test_tui_workspace.py::TestCopyIntoWorkareaContainment::test_junction_rejected_on_windows` — canonical Windows-host re-run captured 2026-05-07 (Windows 11 / Python 3.14.4 / pytest 9.0.3); PASSED, exit 0. Stdout attached to [`increment-001.md` §6](03-increments/increment-001.md). Q-N01 closed in `02-review.md` §Deferrals. **In CI (Linux) the test SKIPS** by design. | — |
 | TC-048 | LLR-005.4 | test (unit) | pass | `tests/test_tui_workspace.py::TestValidateProjectFilesSymlinkAndCase` — 3 cases (symlink rejection, case-only collision, cardinality). Self-flip guard on F-7.7-05 (current code follows symlinks; Finding open). Increment 7 §1. | — |
 | TC-049 | LLR-005.5 | test (unit) | pass | `tests/test_tui_workspace.py::TestSetupLoggingSurface` — 3 cases (5 MB cap + backupCount, handler reuse, non-writable dir clean error / fallback). Increment 7 §1. | — |
 | TC-050 | HLR-006 | inspection | pass | `increment-009.md` §2 (Output API row) — `get_raw_value`, `get_physical_value`, `validate_characteristic` mapped to symbols and tests | — |
@@ -122,7 +122,7 @@ Verdict legend: `pass` (asserting test green / matrix complete), `xfail` (docume
 **Roll-up of TC verdicts:**
 - pass: 49
 - xfail (documented Finding): 3 (TC-062.a, TC-065.a, TC-052 outside-memory)
-- gap (evidence/manual run pending): 2 (TC-032 demo packs, TC-047 Windows manual stdout)
+- gap (evidence pending): 1 (TC-032 demo packs) — *(TC-047 Windows manual stdout was closed 2026-05-07)*
 - fail (blocker): 0
 
 The 9 demo evidence packs grouped under TC-032 (one per `R-*` row called out in §5.1 Demo) collapse into a single TC-032 row because §5.2 names TC-032 once; for accounting purposes they are one `gap` row, with the per-`R-*` shopping list captured in §5.
@@ -162,7 +162,7 @@ Consolidated from `02-review.md` §Deferrals + Phase 3 increment §6 sections. A
 | ID | Severity | Source | Status | Closure plan |
 |---|---|---|---|---|
 | **A-N02** | major (deferral) | `02-review.md` iter-2 §A-N02 | partially closed | Increment 1 §6 stated the closure criterion ("Pass = TC-044/045/046 green on Linux CI; TC-047 green on manual Windows run"). Local Windows pass captured (increment 1 §4). **Linux CI run still pending — fold into next CI execution.** |
-| **Q-N01** | major (deferral) | `02-review.md` iter-2 §Q-N01 | partially closed | Increment 1 §4 captured local Windows TC-047 PASS. **Re-execute on canonical Windows host of record and append stdout to `increment-001.md` §6 before Phase 4 final close.** |
+| **Q-N01** | major (deferral) | `02-review.md` iter-2 §Q-N01 | **CLOSED 2026-05-07** | Canonical Windows-host re-run of TC-047 captured (Windows 11 / Python 3.14.4 / pytest 9.0.3); PASSED, exit 0. Stdout attached to [`increment-001.md` §6](03-increments/increment-001.md). Phase 2 blocker S-002 closed at the canonical level. |
 | **Q-N02** | major (deferral) | `02-review.md` iter-2 §Q-N02 | closed by code, doc pending | Increment 3 split TC-090 into TC-090.a (scrub) and TC-090.b (truncate) in test code. **`01-requirements.md` §5.2 row text still reads `TC-090`; doc edit deferred to Phase 6 docs sweep.** |
 | **Q-N03** | major (deferral) | `02-review.md` iter-2 §Q-N03 | closed | Increment 6 §6 chose Option A — annotated `test_snapshot_harness_renders_issues_panel` as TC-064 stand-in; TC-065.a..h play the parametric role. No further work. |
 | **F-7.2-01** | major | `increment-005.md` §6 | open | Engine code + rule `CROSS_S19_HEX_OVERLAP` does not exist. TC-062.a / TC-065.a held as `xfail(strict=False)` so closure naturally surfaces as `xpass`. **Follow-up batch (engine work, out of audit scope).** |
