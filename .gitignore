@@ -10,3 +10,4 @@ __pycache__/
 *.log
 snapshot_report.html
 .screenshot_cache/
+tests/_artifacts/
