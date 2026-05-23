@@ -529,11 +529,23 @@ Screen {
  * PLACEHOLDER caption — no second-file load path, no diff computation.
  * Both are purely presentational on the Calm Dark token set.
  */
-#patch_editor_panel,
 #ab_diff_panel {
     width: 100%;
     height: 1fr;
     padding: 1 2;
+}
+
+/* The Patch Editor stacks two change-list halves plus several input / button
+ * rows; that content is taller than the terminal, so the panel is a
+ * ScrollableContainer and scrolls vertically (`overflow-y: auto`) — both
+ * DataTables and the unified-file Export row below stay reachable. The two
+ * tables are bounded (see `#patch_changelist_table`) so the scroll layout is
+ * well-defined rather than two competing `1fr` regions. */
+#patch_editor_panel {
+    width: 100%;
+    height: 1fr;
+    padding: 1 2;
+    overflow-y: auto;
 }
 
 /* The diff deferral notice carries the `sev-warning` class so its color
@@ -557,10 +569,14 @@ Screen {
  * laid out below the batch-03 parameter-change half. Each half has its own
  * DataTable + empty-state line; the empty-state replaces the table when that
  * half has no entries (LLR-009.1). Section titles separate the two halves. */
+/* The two change-list tables are bounded to a fixed height (their own
+ * internal scroll handles many rows) so the parent ScrollableContainer has a
+ * well-defined layout — two `1fr` tables would each try to fill the panel and
+ * push the input / button rows below off-screen. */
 #patch_changelist_table,
 #patch_memory_table {
     width: 100%;
-    height: 1fr;
+    height: 10;
     margin-bottom: 1;
 }
 

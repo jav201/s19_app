@@ -42,7 +42,7 @@ from __future__ import annotations
 from typing import List, Optional, Sequence, Tuple
 
 from textual.app import ComposeResult
-from textual.containers import Container, Horizontal
+from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
 from textual.widgets import Button, DataTable, Input, Label, Static
 
@@ -319,7 +319,7 @@ class BookmarksPlaceholder(Static):
         super().__init__(self.PLACEHOLDER_TEXT, id="bookmarks_placeholder", markup=False)
 
 
-class PatchEditorPanel(Container):
+class PatchEditorPanel(ScrollableContainer):
     """Functional Patch Editor rail screen — parameter + memory change build.
 
     Summary:
@@ -333,6 +333,12 @@ class PatchEditorPanel(Container):
         remove, and unified-file save / load plus a selective-export action —
         all alongside the batch-03 parameter controls without removing them
         (LLR-009.1..009.3).
+
+        The panel is a :class:`ScrollableContainer` so its two bounded
+        ``DataTable``s and the stacked input / button rows below them stay
+        reachable by vertical scroll when the combined content is taller than
+        the terminal — the Export button and the unified-file row are never
+        clipped off-screen.
 
         The panel stays **presentational**: a control press does not call the
         ``cdfx`` package directly — it posts a :class:`PatchEditorPanel.
@@ -451,7 +457,10 @@ class PatchEditorPanel(Container):
             buttons, the ``.cdfx`` save / load row; then the memory-change
             ``DataTable`` and its empty-state line, the address / new-bytes
             input row with memory add / edit / remove buttons, and the
-            unified-file save / load / export row (LLR-009.1..009.3).
+            unified-file save / load / export row (LLR-009.1..009.3). The
+            panel is a :class:`ScrollableContainer`, so this stacked content
+            scrolls vertically when it exceeds the terminal height — both
+            change-list halves and every input / button row stay reachable.
 
         Args:
             None
@@ -461,7 +470,7 @@ class PatchEditorPanel(Container):
 
         Dependencies:
             Used by:
-                - Textual ``Container`` compose lifecycle
+                - Textual ``ScrollableContainer`` compose lifecycle
         """
         # --- Parameter-change half (batch-03) ---
         yield Label("Parameter changes", classes="patch-section-title")

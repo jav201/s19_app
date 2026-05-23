@@ -29,7 +29,8 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from textual.widgets import DataTable
+from textual.containers import ScrollableContainer
+from textual.widgets import Button, DataTable
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens_directionb import PatchEditorPanel
@@ -551,4 +552,57 @@ def test_service_owns_a_unified_change_set() -> None:
     assert service.unified.is_empty(), "a fresh service must be empty"
     assert service.change_list is service.unified.parameters, (
         "the change_list property must alias the unified parameter half"
+    )
+
+
+# ===========================================================================
+# Increment 10 — the Patch Editor panel scrolls so the bottom controls
+# (memory half + unified-file Export row) stay reachable.
+# ===========================================================================
+
+
+def test_patch_editor_panel_scrolls_to_reach_export_button(
+    tmp_path: Path,
+) -> None:
+    """The Patch Editor scrolls and the Export button is reachable.
+
+    Intent: the corrective increment fixes a clipped Patch Editor — the panel
+    must be a vertical-scroll container so the memory half and the
+    unified-file ``Export`` button below the fold are reachable, not lost off
+    the bottom edge. At a short 120x30 terminal the stacked content exceeds
+    the viewport, so the panel must report a positive scrollable height and
+    must be able to scroll the bottom control into view. A non-scrolling
+    container would clip the export row and this test would fail.
+    """
+
+    async def _drive() -> tuple[bool, int, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            # The Export button must exist in the widget tree regardless of
+            # whether it is currently within the viewport.
+            export = app.query_one("#patch_export_button", Button)
+            is_scrollable = isinstance(panel, ScrollableContainer)
+            # Content taller than the viewport => positive max scroll offset.
+            max_scroll_y = panel.max_scroll_y
+            # Scroll the Export button fully into view; with a plain clipping
+            # Container this is a no-op and the button stays off-screen.
+            panel.scroll_to_widget(export, animate=False)
+            await pilot.pause()
+            export_visible = app.screen.region.contains_region(
+                export.region
+            )
+            return is_scrollable, max_scroll_y, export_visible
+
+    is_scrollable, max_scroll_y, export_visible = asyncio.run(_drive())
+    assert is_scrollable, "the Patch Editor panel must be a scroll container"
+    assert max_scroll_y > 0, (
+        "the stacked Patch Editor content must exceed a 120x30 viewport so "
+        "the panel actually has somewhere to scroll"
+    )
+    assert export_visible, (
+        "scrolling must bring the Export button into the visible region"
     )
