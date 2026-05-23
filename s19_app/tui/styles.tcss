@@ -1,0 +1,764 @@
+/* s19_app/tui/styles.tcss
+ *
+ * Direction B "Calm Dark" theme for the s19tui Textual app.
+ *
+ * Origin: extracted verbatim from the former inline `S19TuiApp.CSS` block in
+ * app.py (carried 1:1, every `#id` rule preserved), then re-themed onto the
+ * Calm Dark token set. This is the LLR-005.1 / LLR-005.2 deliverable for
+ * Phase 3 increment 1 of batch-02-direction-b-restyle.
+ *
+ * Theme contract (TC-012 token budget):
+ *  - exactly ONE accent hue, declared as the custom variable `$accent-calm`;
+ *  - dark-only background / foreground / rule tokens (no light variant);
+ *  - the five `sev-*` rules keep their class names and severity meaning
+ *    (color_policy.SEVERITY_CLASS_MAP) — only the hex values are tuned;
+ *  - the `.mac_out_of_range` MAC overlay rule is preserved.
+ *
+ * color_policy.py is NOT touched: SEVERITY_CLASS_MAP, css_class_for_severity,
+ * MAC_ADDRESS_OVERLAY_STYLE and FOCUS_HIGHLIGHT_STYLE stay byte-identical.
+ */
+
+/* --- Calm Dark token set -------------------------------------------------
+ * One accent hue + dark-only structural tokens. Textual's own `$primary`,
+ * `$accent`, `$text`, `$background` are theme built-ins; the tokens below are
+ * the batch-02 Calm Dark layer. `$accent-calm` is the single accent hue.
+ */
+$accent-calm: #4ec9d4;          /* the one Calm Dark accent — cyan-blue */
+$bg-base: #11141a;              /* dark-only app background */
+$bg-panel: #171b23;             /* dark-only panel surface */
+$fg-base: #c8ccd4;              /* dark-only primary foreground */
+$rule: #2a2f3a;                 /* dark-only border / divider tone */
+
+Screen {
+    layout: vertical;
+    padding: 1;
+    background: $bg-base;
+    color: $fg-base;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- Direction B app shell (batch-02 increment 2) ------------------------
+ * `#workspace_shell` is the horizontal split of the activity-rail slot and
+ * the 8-screen `#workspace_body`. The rail/command-bar widgets land in
+ * increments 3-4; their mount slots are placed here now. The two-regime
+ * width layout (LLR-007.1) is governed by the `width-narrow` class, toggled
+ * on `#workspace_body` below the 120-column breakpoint.
+ */
+#command_bar_slot {
+    height: auto;
+}
+
+/* --- Direction B command bar (batch-02 increment 4) ---------------------
+ * `#command_bar` is the persistent top bar: a single-row `#command_bar_row`
+ * (accent `›` prompt, project/A2L context labels, find + go-to inputs) and
+ * a `#command_palette` dropdown hidden until `Ctrl+K`. LLR-003.1 / 003.2 /
+ * 003.3 / 004.1 / 004.2 / 004.3 / 011.3.
+ */
+#command_bar {
+    height: auto;
+    width: 100%;
+}
+
+#command_bar_row {
+    height: 3;
+    width: 100%;
+    background: $bg-panel;
+    border: round $rule;
+}
+
+#command_bar_prompt {
+    width: 3;
+    content-align: center middle;
+    color: $accent-calm;
+    text-style: bold;
+}
+
+#cmdbar_project {
+    width: auto;
+    min-width: 16;
+    content-align: left middle;
+    padding: 0 2;
+    color: $fg-base;
+}
+
+#cmdbar_a2l {
+    width: auto;
+    min-width: 16;
+    content-align: left middle;
+    padding: 0 2;
+    color: $fg-base;
+}
+
+#find_input {
+    width: 1fr;
+}
+
+#cmdbar_goto_input {
+    width: 1fr;
+}
+
+#command_palette {
+    height: auto;
+    width: 100%;
+    background: $bg-panel;
+    border: round $accent-calm;
+}
+
+#command_palette.hidden {
+    display: none;
+}
+
+#palette_list {
+    height: auto;
+    max-height: 12;
+    background: $bg-panel;
+}
+
+#workspace_shell {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#rail_slot {
+    width: auto;
+    height: 100%;
+}
+
+#workspace_body {
+    width: 1fr;
+    height: 100%;
+}
+
+/* Each rail screen container fills the workspace body; `.hidden` hides the
+ * inactive seven so exactly one screen is visible at a time (LLR-002.1). */
+.db-screen {
+    width: 100%;
+    height: 100%;
+}
+
+.db-screen-title {
+    text-align: center;
+    width: 100%;
+    background: $accent-calm;
+    color: $bg-base;
+    padding: 0 1;
+    margin-bottom: 1;
+    text-style: bold;
+}
+
+/* LLR-002.3 empty-state panel — neutral no-file-loaded prompt. */
+#empty_state_panel {
+    width: 100%;
+    height: auto;
+    padding: 2 2;
+    color: $fg-base;
+}
+
+/* --- Density variants (LLR-006.1 / LLR-006.2) ----------------------------
+ * Comfortable is the default startup density (set on `#workspace_body` in
+ * `on_mount`). Compact tightens pane padding; A2L/MAC density tuning lands
+ * with those screens in increment 6.
+ */
+#workspace_body.density-comfortable #workspace_panes .db-pane {
+    padding: 1;
+}
+
+#workspace_body.density-compact #workspace_panes .db-pane {
+    padding: 0 1;
+}
+
+/* --- Workspace 3-pane re-layout (batch-02 increment 5, LLR-008.1) --------
+ * The Direction B Workspace replaces the pre-batch 5-tile `#main_layout`
+ * grid with a horizontal three-pane split: left data ranges/sections,
+ * center hex view, right context. Two width regimes (LLR-007.1):
+ *   - terminal width >= 120: fixed side panes (left 22, right 40), center 1fr
+ *   - terminal width  < 120: proportional side panes (left 24%, right 30%),
+ *     center 1fr — applied via the `width-narrow` class toggled on
+ *     `#workspace_body` by `on_resize`.
+ */
+#workspace_panes {
+    layout: horizontal;
+    height: 100%;
+}
+
+/* >= 120-column fixed-width regime (LLR-008.1). */
+#ws_left {
+    width: 22;
+    height: 100%;
+}
+
+#ws_center {
+    width: 1fr;
+    height: 100%;
+}
+
+#ws_right {
+    width: 40;
+    height: 100%;
+}
+
+/* < 120-column proportional regime (LLR-008.1 / LLR-007.1). */
+#workspace_body.width-narrow #ws_left {
+    width: 24%;
+}
+
+#workspace_body.width-narrow #ws_right {
+    width: 30%;
+}
+
+/* The center hex pane stays `1fr` in both regimes — it always receives the
+ * strictly-positive remainder after the side panes (LLR-008.1). */
+#workspace_body.width-narrow #ws_center {
+    width: 1fr;
+}
+
+.db-pane {
+    border: round $rule;
+    background: $bg-panel;
+    padding: 1;
+    height: 100%;
+}
+
+#ws_left #sections_list {
+    height: 1fr;
+}
+
+#ws_left #files_list {
+    height: 8;
+}
+
+/* --- A2L Explorer 2-pane re-layout (batch-02 increment 6 / 13, LLR-009.1) -
+ * The Direction B A2L Explorer replaces the pre-batch 2x2 `#alt_layout`
+ * grid with a horizontal two-pane split: left tags table, right hex view.
+ * Increment 13 (review feedback — the fixed-40 hex pane was too narrow to
+ * show hex content correctly) supersedes the increment-6 two-regime
+ * `40 / 35%` split FOR A2L ONLY with a flat proportional 3:4 ratio: the
+ * hex pane is `3fr` and the tags pane `4fr`, so the hex pane is exactly
+ * 3/7 of the A2L content width at ALL terminal widths. Because the ratio
+ * is already proportional, no `width-narrow` rule is needed for A2L.
+ * MAC View (`#mac_*`, LLR-010.1) keeps the increment-6 two-regime layout.
+ * Every widget subtree is reused verbatim; no renderer/paging/jump/filter
+ * logic is touched (LLR-009.2).
+ */
+#a2l_panes {
+    layout: horizontal;
+    height: 100%;
+}
+
+/* Flat 3:4 proportional ratio at every terminal width (LLR-009.1,
+ * increment 13). The hex pane is 3/7 of the A2L content width; the tags
+ * pane is the 4/7 remainder. */
+#a2l_tags_pane {
+    width: 4fr;
+    height: 100%;
+}
+
+#a2l_hex_pane {
+    width: 3fr;
+    height: 100%;
+}
+
+/* --- MAC View 2-pane re-layout (batch-02 increment 6, LLR-010.1) --------
+ * The MAC View keeps the increment-6 two-regime width layout (LLR-010.1 /
+ * LLR-007.1) — unchanged by increment 13:
+ *   - terminal width >= 120: fixed-width hex pane (40), records pane `1fr`
+ *   - terminal width  < 120: proportional hex pane (35%), records pane
+ *     `1fr`, applied via the `width-narrow` class on `#workspace_body`.
+ */
+#mac_panes {
+    layout: horizontal;
+    height: 100%;
+}
+
+/* >= 120-column fixed-width regime (LLR-010.1). */
+#mac_records_pane {
+    width: 1fr;
+    height: 100%;
+}
+
+#mac_hex_pane {
+    width: 40;
+    height: 100%;
+}
+
+/* < 120-column proportional regime (LLR-010.1 / LLR-007.1).
+ * The hex pane takes 35% of the body; the records pane stays `1fr` and
+ * receives the strictly-positive remainder. */
+#workspace_body.width-narrow #mac_hex_pane {
+    width: 35%;
+}
+
+#workspace_body.width-narrow #mac_records_pane {
+    width: 1fr;
+}
+
+#a2l_tags_filters {
+    layout: horizontal;
+    height: auto;
+    padding-bottom: 1;
+}
+
+#a2l_tags_filter_input {
+    width: 1fr;
+}
+
+#a2l_tag_find_input {
+    width: 1fr;
+}
+
+#a2l_filter_menu {
+    border: round $rule;
+    background: $bg-panel;
+    padding: 1;
+    height: 8;
+}
+
+#a2l_filter_menu.hidden {
+    display: none;
+}
+
+#settings_menu {
+    border: round $rule;
+    background: $bg-panel;
+    padding: 1;
+    width: 48;
+    height: 12;
+}
+
+#settings_menu.hidden {
+    display: none;
+}
+
+/* --- Persistent status bar (batch-02 increment 7) -----------------------
+ * `#workspace_status_bar` is the Direction B home for the status text,
+ * progress bar and 4-line log tail re-homed from the dismantled Workspace
+ * Status tile. It sits above the footer and is visible on every screen so
+ * `set_status` / `set_file_status` / `set_progress` and the log tail keep
+ * a stable render target (LLR-013.2 status-bar area).
+ */
+#workspace_status_bar {
+    height: auto;
+    border-top: solid $rule;
+    background: $bg-panel;
+    padding: 0 1;
+}
+
+#workspace_status_bar #status_text {
+    height: auto;
+    color: $fg-base;
+}
+
+#workspace_status_bar Label {
+    height: auto;
+}
+
+#progress_bar {
+    margin-top: 1;
+}
+
+#a2l_view {
+    height: 100%;
+    overflow: auto;
+}
+
+#hex_scroll {
+    height: 100%;
+    overflow: auto;
+}
+
+#hex_controls {
+    layout: horizontal;
+    height: auto;
+    padding-bottom: 1;
+}
+
+#search_input, #goto_input {
+    width: 1fr;
+}
+
+#alt_hex_controls,
+#mac_hex_controls {
+    layout: horizontal;
+    height: auto;
+    padding-bottom: 1;
+}
+
+#alt_search_input, #alt_goto_input,
+#mac_search_input, #mac_goto_input {
+    width: 1fr;
+}
+
+#a2l_scroll {
+    height: 100%;
+    overflow: auto;
+}
+
+#mac_scroll {
+    height: 100%;
+    overflow: auto;
+}
+
+#a2l_tags_list {
+    height: 1fr;
+}
+
+#a2l_tags_summary {
+    height: auto;
+    padding: 0 1;
+    color: $fg-base;
+}
+
+#mac_records_list {
+    height: 1fr;
+}
+
+#mac_records_summary {
+    height: auto;
+    padding: 0 1;
+    color: $fg-base;
+}
+
+#alt_hex_scroll {
+    height: 100%;
+    overflow: auto;
+}
+
+
+/* --- Severity classes (LLR-005.2) ----------------------------------------
+ * Class names and severity meaning are fixed by color_policy.SEVERITY_CLASS_MAP
+ * and MUST NOT change. Only the hex values are tuned to the Calm Dark palette.
+ */
+.sev-ok {
+    color: #5fb98a;
+}
+
+.sev-error {
+    color: #e06c75;
+}
+
+.sev-warning {
+    color: #d9a35b;
+}
+
+.sev-info {
+    color: #4ec9d4;
+}
+
+.sev-neutral {
+    color: #6b7280;
+}
+
+/* MAC out-of-range overlay — preserved (pairs with MAC_ADDRESS_OVERLAY_STYLE). */
+.mac_out_of_range {
+    color: #d9a35b;
+}
+
+/* --- Issues Report dedicated rail screen (batch-02 increment 7) ----------
+ * LLR-011.1: the validation Issues `DataTable`, its severity filter row and
+ * the summary line — promoted out of the old Workspace Status tile into
+ * `#screen_issues`. The table fills the screen instead of a fixed 12-row
+ * tile; severity coloring / filters / paging are unchanged (LLR-011.2).
+ */
+#issues_content {
+    width: 100%;
+    height: 1fr;
+}
+
+#issues_content.hidden {
+    display: none;
+}
+
+#validation_issues_filters {
+    layout: horizontal;
+    height: auto;
+    padding-top: 1;
+}
+
+#validation_issues_list {
+    height: 1fr;
+    border: round $rule;
+}
+
+#validation_issues_summary {
+    height: auto;
+    padding: 0 1;
+    color: $fg-base;
+}
+
+/* --- Memory Map + Bookmarks scaffolds (batch-02 increment 9) -------------
+ * LLR-012.1: the Memory Map is a read-only coverage visualization rendered
+ * from the existing `LoadedFile.ranges` / `range_validity` — `#map_content`
+ * scrolls the coverage map; an `EmptyStatePanel` shows when no file is
+ * loaded (LLR-002.3). LLR-002.2: the Bookmarks screen is a neutral "coming
+ * soon" placeholder with no persistence logic.
+ */
+#map_content {
+    width: 100%;
+    height: 1fr;
+    border: round $rule;
+    background: $bg-panel;
+}
+
+#map_content.hidden {
+    display: none;
+}
+
+#memory_map_panel {
+    width: 100%;
+    height: auto;
+    padding: 1 2;
+    color: $fg-base;
+}
+
+#bookmarks_placeholder {
+    width: 100%;
+    height: auto;
+    padding: 2 2;
+    color: $fg-base;
+}
+
+/* --- Patch Editor + A2B Diff (batch-02 increment 10 / batch-03 increment 9)
+ * batch-03 increment 9 makes the Patch Editor functional: a change-list
+ * DataTable, name/index/value inputs wired to add/edit/remove, save/load
+ * action buttons and a path input, and a neutral empty-state line
+ * (LLR-007.1..007.6). LLR-012.3: the A2B Diff stays a static three-column
+ * placeholder (range list, hex A, hex B) with constant sample rows and a
+ * PLACEHOLDER caption — no second-file load path, no diff computation.
+ * Both are purely presentational on the Calm Dark token set.
+ */
+#patch_editor_panel,
+#ab_diff_panel {
+    width: 100%;
+    height: 1fr;
+    padding: 1 2;
+}
+
+/* The diff deferral notice carries the `sev-warning` class so its color
+ * comes from the single `color_policy` severity source of truth
+ * (LLR-005.2), not a hard-coded hue. The rule below only sets layout. */
+#diff_deferral_notice {
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+    margin-bottom: 1;
+    text-style: bold;
+}
+
+#diff_columns {
+    width: 100%;
+    height: 1fr;
+}
+
+/* Patch Editor — batch-04 increment 8 adds the memory-change half: a second
+ * DataTable, address / new-bytes inputs and a unified save/load/export row,
+ * laid out below the batch-03 parameter-change half. Each half has its own
+ * DataTable + empty-state line; the empty-state replaces the table when that
+ * half has no entries (LLR-009.1). Section titles separate the two halves. */
+#patch_changelist_table,
+#patch_memory_table {
+    width: 100%;
+    height: 1fr;
+    margin-bottom: 1;
+}
+
+#patch_empty_state,
+#patch_memory_empty_state {
+    width: 100%;
+    height: auto;
+    padding: 1;
+    margin-bottom: 1;
+    color: $fg-base;
+}
+
+.patch-section-title {
+    width: 100%;
+    height: auto;
+    color: $fg-base;
+    text-style: bold;
+    padding: 0 1;
+}
+
+#patch_inputs,
+#patch_file_row,
+#patch_mem_inputs,
+#patch_unified_row {
+    width: 100%;
+    height: auto;
+    padding-top: 1;
+}
+
+#patch_entry_buttons,
+#patch_file_buttons,
+#patch_mem_entry_buttons,
+#patch_unified_buttons {
+    width: 100%;
+    height: auto;
+}
+
+.patch-field-label {
+    color: $fg-base;
+    padding: 0 1;
+}
+
+#patch_name_input,
+#patch_index_input,
+#patch_value_input,
+#patch_path_input,
+#patch_address_input,
+#patch_bytes_input,
+#patch_unified_input {
+    border: round $rule;
+    background: $bg-base;
+    color: $fg-base;
+    margin-bottom: 1;
+}
+
+#diff_range_list,
+#diff_hex_a,
+#diff_hex_b {
+    width: 1fr;
+    height: 100%;
+    border: round $rule;
+    background: $bg-panel;
+    color: $fg-base;
+    padding: 1;
+    margin-right: 1;
+}
+
+/* --- Calm Dark modal re-skin (batch-02 increment 8, LLR-015.1) -----------
+ * Shared rules for the three Load / Save / Load-Project modals in
+ * `screens.py` (the only `ModalScreen` subclasses in the app). Each modal's
+ * `Container` carries the `.modal-dialog` class (and keeps the legacy
+ * `#load_dialog` id), so all three pick up the single Calm Dark accent
+ * border, panel surface and foreground tone from the token set above — no
+ * hard-coded hex color, no second accent, no light variant (TC-033
+ * checklist). These rules live here, not in a per-screen `DEFAULT_CSS`,
+ * because the Calm Dark `$bg-*` / `$fg-*` / `$rule` token variables only
+ * resolve inside the app-level stylesheet. This is a visual re-skin only;
+ * modal behavior, `validate_project_files` and the `.s19tool/` workarea
+ * layout are untouched (LLR-015.2).
+ */
+ModalScreen {
+    align: center middle;
+    background: $bg-base 70%;
+}
+
+.modal-dialog,
+#load_dialog {
+    border: round $accent-calm;
+    background: $bg-panel;
+    color: $fg-base;
+    padding: 1 2;
+    width: 70%;
+    height: auto;
+}
+
+.modal-title {
+    color: $accent-calm;
+    text-style: bold;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+.modal-buttons,
+#load_buttons {
+    layout: horizontal;
+    height: auto;
+    align-horizontal: right;
+    padding-top: 1;
+    dock: bottom;
+}
+
+.modal-buttons Button {
+    margin-left: 2;
+}
+
+/* The confirm button carries the single Calm Dark accent so the primary
+ * action reads against the panel surface without introducing a second hue. */
+.modal-confirm {
+    background: $accent-calm;
+    color: $bg-base;
+    text-style: bold;
+}
+
+.modal-dialog Input {
+    border: round $rule;
+    background: $bg-base;
+    color: $fg-base;
+}
+
+.modal-dialog Input:focus {
+    border: round $accent-calm;
+}
+
+#project_list {
+    border: round $rule;
+    background: $bg-base;
+    height: 10;
+}
+
+#files_title, #sections_title, #hex_title, #a2l_title, #a2l_tags_title, #alt_hex_title, #alt_actions_title {
+    text-align: center;
+    width: 100%;
+    background: $accent-calm;
+    color: $bg-base;
+    padding: 0 1;
+    margin-bottom: 1;
+    text-style: bold;
+}
+
+/* --- Activity rail (batch-02 increment 3, LLR-001.1/001.2/001.3) ----------
+ * `Rail` is the vertical 8-item navigation column mounted in `#rail_slot`.
+ * Each `RailItem` is one row; the active item carries `.-active`, marked
+ * with the single Calm Dark accent (`$accent-calm`) — the LLR-001.2
+ * single-active-marker invariant. The wide-regime rail is 22 columns; the
+ * `<120`-column collapsed (icon-only) regime is handled below.
+ */
+#activity_rail {
+    width: 22;
+    height: 100%;
+    background: $bg-panel;
+    border-right: solid $rule;
+    padding: 1 0;
+}
+
+.rail-item {
+    height: 1;
+    width: 100%;
+    padding: 0 1;
+    color: $fg-base;
+    border-left: vkey $bg-panel;
+}
+
+.rail-item:hover {
+    background: $bg-base;
+}
+
+.rail-item.-active {
+    color: $accent-calm;
+    background: $bg-base;
+    border-left: vkey $accent-calm;
+    text-style: bold;
+}
+
+/* --- Two-regime width layout (LLR-007.1 / CV-02) -------------------------
+ * `width-narrow` is toggled by `on_resize` below the 120-column breakpoint
+ * on both `#workspace_shell` and `#workspace_body` (see `_apply_width_regime`).
+ * The rail-collapse rule is keyed on `#workspace_shell` because `#rail_slot`
+ * is a sibling of `#workspace_body`, not a descendant of it. In the narrow
+ * regime the activity rail collapses to an icon-only fixed width (4 columns,
+ * within the 4±1 tolerance of LLR-001.1 CV-02 / LLR-008.1); the single active
+ * marker is preserved. The proportional per-screen pane widths
+ * (LLR-008.1 / LLR-009.1 / LLR-010.1) are keyed on `#workspace_body`.
+ */
+#workspace_shell.width-narrow #rail_slot,
+#workspace_shell.width-narrow #activity_rail {
+    width: 4;
+}
+
+#workspace_shell.width-narrow .rail-item {
+    padding: 0;
+}

@@ -1303,6 +1303,8 @@ def test_apply_prepared_load_chains_updates_via_call_later(
     monkeypatch.setattr(app, "update_mac_hex_view", record("mac_hex"))
     monkeypatch.setattr(app, "update_a2l_view", record("a2l"))
     monkeypatch.setattr(app, "update_project_labels", record("labels"))
+    # Increment 9: the Memory Map renderer joins the finalize chain step.
+    monkeypatch.setattr(app, "update_memory_map", record("memory_map"))
     monkeypatch.setattr(app, "set_file_status", record("status"))
     monkeypatch.setattr(app, "_append_log_line", record("log_line"))
 
@@ -1345,6 +1347,7 @@ def test_apply_prepared_load_chains_updates_via_call_later(
     assert len(deferred) == 4
     deferred[3]()
     assert "labels" in call_log
+    assert "memory_map" in call_log, "Memory Map refresh runs in the finalize step"
 
 
 def test_update_sections_caps_primary_ranges(

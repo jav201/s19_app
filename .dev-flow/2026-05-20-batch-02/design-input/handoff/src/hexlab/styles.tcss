@@ -1,0 +1,76 @@
+/* Hex Lab — Calm Dark theme.
+ *
+ * Ported from tokens.css. Textual CSS doesn't support oklch() — values below
+ * are pre-converted to hex for parity with the HTML mock. Re-derive with a
+ * color tool if you change the accent hue.
+ *
+ *   --bg-0          oklch(0.18 0.005 250)  →  #1d2026
+ *   --bg-1          oklch(0.205 …)          →  #22252b
+ *   --bg-2          oklch(0.235 …)          →  #292d34
+ *   --bg-titlebar   oklch(0.165 …)          →  #1a1d23
+ *   --fg            oklch(0.92 …)           →  #e6e8ec
+ *   --fg-muted      oklch(0.72 …)           →  #a8acb3
+ *   --fg-faint      oklch(0.42 …)           →  #5a5f67
+ *   --rule          oklch(0.32 …)           →  #424650
+ *   --rule-soft     oklch(0.27 …)           →  #353940
+ *   --accent        oklch(0.78 0.12 215)    →  #7fb8d4   (calm cyan-blue)
+ *   --sev-warn      oklch(0.82 0.12 80)     →  #d9b264
+ *   --sev-error     oklch(0.72 0.16 25)     →  #d77b6a
+ *   --sev-ok        oklch(0.78 0.13 155)    →  #76c098
+ */
+
+$bg-0: #1d2026;
+$bg-1: #22252b;
+$bg-2: #292d34;
+$bg-3: #303540;
+$bg-titlebar: #1a1d23;
+
+$fg: #e6e8ec;
+$fg-muted: #a8acb3;
+$fg-faint: #5a5f67;
+
+$rule: #424650;
+$rule-soft: #353940;
+
+$accent: #7fb8d4;
+$accent-dim: #5a8aa3;
+
+$sev-ok: #76c098;
+$sev-warn: #d9b264;
+$sev-error: #d77b6a;
+
+/* ── Globals ─────────────────────────────────────────────────────────── */
+
+Screen {
+    background: $bg-0;
+    color: $fg;
+}
+
+Header {
+    background: $bg-titlebar;
+    color: $fg-muted;
+}
+
+Footer {
+    background: $bg-titlebar;
+    color: $fg-muted;
+}
+
+#body {
+    height: 1fr;
+}
+
+#main {
+    width: 1fr;
+    height: 1fr;
+    background: $bg-1;
+}
+
+/* ── Density variants ───────────────────────────────────────────────── */
+/* Toggled by HexLabApp.action_cycle_density. The widgets read these by
+ * inheriting padding from the screen — keep tweaks here, not per-widget. */
+
+.density-dense HexView      { padding: 0 1; }
+.density-dense MemoryMap    { height: 1; padding: 0 1; }
+.density-comfortable HexView   { padding: 2 3; }
+.density-comfortable MemoryMap { height: 5; padding: 2 3; }

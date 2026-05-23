@@ -7,9 +7,10 @@ from pathlib import Path
 import time
 from typing import Any, List, Optional
 
-from textual import work
+from textual import events, work
 from textual.app import App, ComposeResult
-from textual.containers import Container, ScrollableContainer
+from textual.binding import Binding
+from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.reactive import reactive
 from textual.widgets import (
     Button,
@@ -39,12 +40,23 @@ from .hexview import (
     find_string_in_mem,
     render_hex_view_text,
 )
+from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile
+from .rail import Rail, RailItem
 from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
+from .screens_directionb import (
+    AbDiffPanel,
+    BookmarksPlaceholder,
+    EmptyStatePanel,
+    MemoryMapPanel,
+    PatchEditorPanel,
+)
 from .color_policy import css_class_for_severity
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
+from .cdfx import ExportResult
+from .services.cdfx_service import CdfxActionResult, CdfxService
 from .services.load_service import build_loaded_hex, build_loaded_s19
 from .services.validation_service import build_validation_report
 from .workspace import (
@@ -413,299 +425,46 @@ class S19TuiApp(App):
     """Main TUI app with workarea, project management, and views."""
 
     TITLE = "Hex Edit Tool"
-    CSS = """
-    Screen {
-        layout: vertical;
-        padding: 1;
-    }
+    CSS_PATH = "styles.tcss"
 
-    #view_bar {
-        layout: horizontal;
-        height: auto;
-        padding-bottom: 1;
-    }
-
-    #view_bar Button {
-        margin-right: 1;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    #main_layout {
-        layout: grid;
-        grid-size: 3 2;
-        grid-columns: 1fr 1fr 2fr;
-        grid-rows: 1fr 1fr;
-        grid-gutter: 1;
-        height: 100%;
-    }
-
-    #alt_layout {
-        layout: grid;
-        grid-size: 2 2;
-        grid-columns: 2fr 1fr;
-        grid-rows: 1fr 1fr;
-        grid-gutter: 1;
-        height: 100%;
-    }
-
-    #mac_layout {
-        layout: grid;
-        grid-size: 2 2;
-        grid-columns: 2fr 1fr;
-        grid-rows: 1fr 1fr;
-        grid-gutter: 1;
-        height: 100%;
-    }
-
-    #files_panel {
-        border: round $primary;
-        padding: 1;
-    }
-
-    #sections_panel {
-        border: round $primary;
-        padding: 1;
-    }
-
-    #hex_panel {
-        border: round $primary;
-        padding: 1;
-        row-span: 2;
-    }
-
-    #a2l_panel {
-        border: round $primary;
-        padding: 1;
-    }
-
-    #status_panel {
-        border: round $primary;
-        padding: 1;
-    }
-
-    .alt_panel {
-        border: round $primary;
-        padding: 1;
-    }
-
-    #alt_hex_panel {
-        border: round $primary;
-        padding: 1;
-        row-span: 2;
-    }
-
-    #alt_tags_panel {
-        border: round $primary;
-        padding: 1;
-        row-span: 2;
-    }
-
-    #mac_hex_panel {
-        border: round $primary;
-        padding: 1;
-        row-span: 2;
-    }
-
-    #mac_content_panel {
-        border: round $primary;
-        padding: 1;
-        row-span: 2;
-    }
-
-    #alt_actions_panel {
-        border: round $primary;
-        padding: 1;
-        row-span: 2;
-    }
-
-    #a2l_tags_filters {
-        layout: horizontal;
-        height: auto;
-        padding-bottom: 1;
-    }
-
-    #a2l_tags_filter_input {
-        width: 1fr;
-    }
-
-    #a2l_tag_find_input {
-        width: 1fr;
-    }
-
-    #a2l_filter_menu {
-        border: round $primary;
-        padding: 1;
-        height: 8;
-    }
-
-    #a2l_filter_menu.hidden {
-        display: none;
-    }
-
-    #settings_menu {
-        border: round $primary;
-        padding: 1;
-        width: 48;
-        height: 12;
-    }
-
-    #settings_menu.hidden {
-        display: none;
-    }
-
-    #progress_bar {
-        margin-top: 1;
-    }
-
-    #a2l_view {
-        height: 100%;
-        overflow: auto;
-    }
-
-    #hex_scroll {
-        height: 100%;
-        overflow: auto;
-    }
-
-    #hex_controls {
-        layout: horizontal;
-        height: auto;
-        padding-bottom: 1;
-    }
-
-    #search_input, #goto_input {
-        width: 1fr;
-    }
-
-    #alt_hex_controls,
-    #mac_hex_controls {
-        layout: horizontal;
-        height: auto;
-        padding-bottom: 1;
-    }
-
-    #alt_search_input, #alt_goto_input,
-    #mac_search_input, #mac_goto_input {
-        width: 1fr;
-    }
-
-    #a2l_scroll {
-        height: 100%;
-        overflow: auto;
-    }
-
-    #mac_scroll {
-        height: 100%;
-        overflow: auto;
-    }
-
-    #a2l_tags_list {
-        height: 1fr;
-    }
-
-    #a2l_tags_summary {
-        height: auto;
-        padding: 0 1;
-        color: $text;
-    }
-
-    #mac_records_list {
-        height: 1fr;
-    }
-
-    #mac_records_summary {
-        height: auto;
-        padding: 0 1;
-        color: $text;
-    }
-
-    #alt_hex_scroll {
-        height: 100%;
-        overflow: auto;
-    }
-
-
-    .sev-ok {
-        color: green;
-    }
-
-    .sev-error {
-        color: red;
-    }
-
-    .sev-warning {
-        color: orange;
-    }
-
-    .sev-info {
-        color: cyan;
-    }
-
-    .sev-neutral {
-        color: grey;
-    }
-
-    .mac_out_of_range {
-        color: orange;
-    }
-
-    #validation_issues_filters {
-        layout: horizontal;
-        height: auto;
-        padding-top: 1;
-    }
-
-    #validation_issues_list {
-        height: 12;
-        border: round $primary;
-    }
-
-    #validation_issues_summary {
-        height: auto;
-        padding: 0 1;
-        color: $text;
-    }
-
-    #load_dialog {
-        border: round $accent;
-        padding: 1;
-        width: 70%;
-    }
-
-    #load_buttons {
-        layout: horizontal;
-        height: auto;
-        padding-top: 1;
-        dock: bottom;
-    }
-
-    #files_title, #sections_title, #hex_title, #status_title, #a2l_title, #a2l_tags_title, #alt_hex_title, #alt_actions_title {
-        text-align: center;
-        width: 100%;
-        background: $primary;
-        color: $text;
-        padding: 0 1;
-        margin-bottom: 1;
-        text-style: bold;
-    }
-    """
-
+    # Direction B keymap (batch-02 keymap-proposal.md, owner-approved).
+    # Rail keys 1-8 route screens via `action_show_screen`; the legacy
+    # `1`/`2`/`3` view-toggle meaning is intentionally superseded (LLR-004.4).
+    # `ctrl+d` cycles layout density (LLR-006.1). `ctrl+k` / `/` / `g` focus
+    # the command-bar palette / find / go-to (LLR-004.1/004.2/004.3). The
+    # `ctrl+l` / `ctrl+s` aliases keep load/save footer-discoverable and
+    # operable while a command-bar input holds focus (keymap proposal §2);
+    # the legacy unmodified `l`/`r`/`o`/`s`/`p`/`j` and the rail digits
+    # `1`-`8` stay reachable but `show=False` so the footer is not crowded.
+    # `Binding(..., show=False)` is the Textual form for an un-shown key.
+    # The four `ctrl+*` bindings are `priority=True` so they stay live while
+    # a command-bar `Input` is focused (keymap §4 — modified keys stay live);
+    # without this the focused `Input`'s own `ctrl+k` / `ctrl+d` line-editing
+    # bindings would shadow them.
     BINDINGS = [
-        ("l", "load_file", "Load file"),
-        ("r", "refresh_files", "Refresh workarea"),
-        ("o", "open_workarea", "Open workarea"),
-        ("s", "save_project", "Save project"),
-        ("p", "load_project", "Load project"),
-        ("j", "dump_a2l_json", "Dump A2L JSON"),
-        ("1", "view_main", "Main view"),
-        ("2", "view_alt", "Alt view"),
-        ("3", "view_mac", "MAC view"),
+        Binding("ctrl+k", "focus_palette", "Palette", priority=True),
+        Binding("ctrl+d", "cycle_density", "Density", priority=True),
+        Binding("ctrl+l", "load_file", "Load", priority=True),
+        Binding("ctrl+s", "save_project", "Save", priority=True),
+        ("slash", "focus_find", "Find"),
+        ("g", "focus_goto", "Go-to"),
         ("q", "quit", "Quit"),
-        ("+", "page_next_context", "Page+"),
-        ("-", "page_prev_context", "Page-"),
+        Binding("l", "load_file", "Load file", show=False),
+        Binding("r", "refresh_files", "Refresh workarea", show=False),
+        Binding("o", "open_workarea", "Open workarea", show=False),
+        Binding("s", "save_project", "Save project", show=False),
+        Binding("p", "load_project", "Load project", show=False),
+        Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
+        Binding("1", "show_screen('workspace')", "Workspace", show=False),
+        Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
+        Binding("3", "show_screen('mac')", "MAC View", show=False),
+        Binding("4", "show_screen('map')", "Memory Map", show=False),
+        Binding("5", "show_screen('issues')", "Issues Report", show=False),
+        Binding("6", "show_screen('patch')", "Patch Editor", show=False),
+        Binding("7", "show_screen('diff')", "A2B Diff", show=False),
+        Binding("8", "show_screen('bookmarks')", "Bookmarks", show=False),
+        ("plus", "page_next_context", "Page+"),
+        ("minus", "page_prev_context", "Page-"),
         ("comma", "hex_page_prev", "Hex-"),
         ("period", "hex_page_next", "Hex+"),
     ]
@@ -795,6 +554,9 @@ class S19TuiApp(App):
         self._issue_row_key_to_index: dict[str, int] = {}
         self._a2l_row_key_to_tag: dict[str, dict[str, Any]] = {}
         self._hex_window_start: int = 0
+        #: Patch Editor change-list orchestration — owns the change-list and
+        #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
+        self._cdfx_service = CdfxService()
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -953,10 +715,31 @@ class S19TuiApp(App):
         return "hidden" not in self.query_one(layout_id).classes
 
     def _active_view_name(self) -> str:
-        """Return ``main``, ``alt``, or ``mac`` according to visible layout state."""
-        if self._is_layout_visible("#alt_layout"):
+        """
+        Summary:
+            Report which legacy view (``main`` / ``alt`` / ``mac``) is the
+            visible Direction B rail screen.
+
+        Args:
+            None
+
+        Returns:
+            str: ``"alt"`` when A2L Explorer is visible, ``"mac"`` when MAC
+            View is visible, otherwise ``"main"`` (Workspace or any other
+            rail screen).
+
+        Data Flow:
+            - Reads the ``.hidden`` class on the ``#screen_a2l`` /
+              ``#screen_mac`` rail screen containers.
+
+        Dependencies:
+            Used by:
+                - The paging actions (``action_page_*``, ``action_hex_page_*``)
+                  that route by active view.
+        """
+        if self._is_layout_visible("#screen_a2l"):
             return "alt"
-        if self._is_layout_visible("#mac_layout"):
+        if self._is_layout_visible("#screen_mac"):
             return "mac"
         return "main"
 
@@ -1026,162 +809,731 @@ class S19TuiApp(App):
         return current_start
 
     def compose(self) -> ComposeResult:
-        """Lay out the grid tiles and widgets."""
+        """
+        Summary:
+            Lay out the Direction B app shell: a header, the command-bar and
+            rail mount slots, an 8-child ``#workspace_body`` of ``.hidden``-
+            toggled rail screen containers, and a footer.
+
+        Args:
+            None
+
+        Returns:
+            ComposeResult: The Textual widget tree for ``S19TuiApp``.
+
+        Data Flow:
+            - Screens 1-3 (Workspace / A2L / MAC) are Direction B two/three-
+              pane re-layouts (increments 5-6); every ``update_*`` renderer
+              keeps its widget ids since each pane reuses the pre-batch
+              widget subtrees verbatim.
+            - Screen 5 (Issues Report) is a dedicated rail screen
+              (increment 7) holding the Issues ``DataTable`` + filters +
+              summary promoted out of the old Workspace Status tile.
+            - Screen 4 (Memory Map) renders a read-only coverage map of the
+              loaded image, and screen 8 (Bookmarks) shows a neutral
+              "coming soon" placeholder (increment 9).
+            - Screen 6 (Patch Editor) is an inert before/after view shell
+              and screen 7 (A2B Diff) is a static three-column placeholder
+              (increment 10); neither wires patch or diff logic.
+            - The persistent ``#workspace_status_bar`` (above the footer)
+              hosts the re-homed status text, progress bar and log-tail
+              labels — the renderer targets the old Status tile carried.
+            - Only ``#screen_workspace`` is visible at startup; the other
+              seven screen containers carry the ``.hidden`` class.
+
+        Dependencies:
+            Uses:
+                - ``Rail``
+            Used by:
+                - Textual ``App`` mount lifecycle
+        """
         yield Header()
+        # Direction B command bar — palette (Ctrl+K), find (/), go-to (g)
+        # and the project/A2L context labels relocated from the old Status
+        # tile (LLR-011.3). The palette command list is built 1:1 from
+        # `BINDINGS` so every action is reachable (LLR-003.2).
         yield Container(
-            Button("Main View", id="view_hex_button"),
-            Button("A2L View", id="view_a2l_button"),
-            Button("MAC View", id="view_mac_button"),
-            Button("Settings", id="settings_button"),
-            id="view_bar",
+            CommandBar(self._build_palette_entries()),
+            id="command_bar_slot",
         )
         yield Container(
             ListView(id="settings_menu_list"),
             id="settings_menu",
             classes="hidden",
         )
-        yield Container(
+        # Activity rail (left) + the 8-screen workspace body (right).
+        # The rail emits `Rail.Selected`; `on_rail_selected` routes it.
+        yield Horizontal(
+            Container(Rail(active="workspace"), id="rail_slot"),
             Container(
-                Label("Workarea Files", id="files_title"),
-                ListView(id="files_list"),
-                id="files_panel",
+                self._compose_screen_workspace(),
+                self._compose_screen_a2l(),
+                self._compose_screen_mac(),
+                self._compose_screen_map(),
+                self._compose_screen_issues(),
+                self._compose_screen_patch(),
+                self._compose_screen_diff(),
+                self._compose_screen_bookmarks(),
+                id="workspace_body",
             ),
-            Container(
-                Label("Data Sections", id="sections_title"),
-                ListView(id="sections_list"),
-                id="sections_panel",
-            ),  # sections stays as ListView (capped; small count)
-            Container(
-                Label("Hex Viewer", id="hex_title"),
-                Container(
-                    Input(placeholder="Search ASCII text", id="search_input"),
-                    Button("Find Next", id="search_button"),
-                    Input(placeholder="Goto 0xADDR", id="goto_input"),
-                    Button("Goto", id="goto_button"),
-                    id="hex_controls",
-                ),
-                ScrollableContainer(
-                    Static("", id="hex_view", markup=False),
-                    id="hex_scroll",
-                ),
-                id="hex_panel",
-            ),
-            Container(
-                Label("A2L View", id="a2l_title"),
-                ScrollableContainer(
-                    Static("", id="a2l_view", markup=False),
-                    id="a2l_scroll",
-                ),
-                id="a2l_panel",
-            ),
-            Container(
-                Label("Status", id="status_title"),
-                Label("Ready.", id="status_text"),
-                Label("Project: (none)", id="project_text"),
-                Label("A2L: (none)", id="a2l_text"),
-                Container(
-                    Button("Issues: All", id="issues_filter_all"),
-                    Button("Errors", id="issues_filter_error"),
-                    Button("Warnings", id="issues_filter_warning"),
-                    id="validation_issues_filters",
-                ),
-                DataTable(id="validation_issues_list", zebra_stripes=True, cursor_type="row"),
-                Label("", id="validation_issues_summary"),
-                ProgressBar(total=100, id="progress_bar"),
-                Label("", id="log_line_1"),
-                Label("", id="log_line_2"),
-                Label("", id="log_line_3"),
-                Label("", id="log_line_4"),
-                id="status_panel",
-            ),
-            id="main_layout",
+            id="workspace_shell",
         )
+        # Persistent status bar — the re-homed status text, progress bar and
+        # log-tail labels that the old Workspace Status tile carried. Kept
+        # above the footer so `set_status` / `set_file_status` / `set_progress`
+        # / the log tail keep a stable target on every screen (increment 7).
         yield Container(
-            Container(
-                Label("A2L Tags", id="a2l_tags_title"),
-                Container(
-                    Input(placeholder="Filter tags", id="a2l_tags_filter_input"),
-                    Button("Field: name", id="a2l_filter_field"),
-                    Button("All", id="a2l_filter_all"),
-                    Button("Invalid", id="a2l_filter_invalid"),
-                    Button("In-Memory", id="a2l_filter_inmem"),
-                    Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
-                    Button("Find next", id="a2l_tag_find_next"),
-                    Button("Page Prev", id="a2l_page_prev_button"),
-                    Button("Page Next", id="a2l_page_next_button"),
-                    id="a2l_tags_filters",
-                ),
-                Container(
-                    ListView(id="a2l_filter_menu_list"),
-                    id="a2l_filter_menu",
-                    classes="hidden",
-                ),
-                DataTable(id="a2l_tags_list", zebra_stripes=True, cursor_type="row"),
-                Label("", id="a2l_tags_summary"),
-                id="alt_tags_panel",
-            ),
-            Container(
-                Label("Hex Viewer", id="alt_hex_title"),
-                Container(
-                    Input(placeholder="Search ASCII text", id="alt_search_input"),
-                    Button("Find Next", id="alt_search_button"),
-                    Input(placeholder="Goto 0xADDR", id="alt_goto_input"),
-                    Button("Goto", id="alt_goto_button"),
-                    id="alt_hex_controls",
-                ),
-                ScrollableContainer(
-                    Static("", id="alt_hex_view", markup=False),
-                    id="alt_hex_scroll",
-                ),
-                id="alt_hex_panel",
-            ),
-            id="alt_layout",
-            classes="hidden",
-        )
-        yield Container(
-            Container(
-                Label("MAC File Content", id="mac_title"),
-                Container(
-                    Button("Page Prev", id="mac_page_prev_button"),
-                    Button("Page Next", id="mac_page_next_button"),
-                    id="mac_page_controls",
-                ),
-                Container(
-                    DataTable(id="mac_records_list", zebra_stripes=True, cursor_type="row"),
-                    Label("", id="mac_records_summary"),
-                    id="mac_scroll",
-                ),
-                id="mac_content_panel",
-            ),
-            Container(
-                Label("Hex Viewer", id="mac_hex_title"),
-                Container(
-                    Input(placeholder="Search ASCII text", id="mac_search_input"),
-                    Button("Find Next", id="mac_search_button"),
-                    Input(placeholder="Goto 0xADDR", id="mac_goto_input"),
-                    Button("Goto", id="mac_goto_button"),
-                    id="mac_hex_controls",
-                ),
-                ScrollableContainer(
-                    Static("", id="mac_hex_view", markup=False),
-                    id="mac_hex_scroll",
-                ),
-                id="mac_hex_panel",
-            ),
-            id="mac_layout",
-            classes="hidden",
+            Label("Ready.", id="status_text"),
+            ProgressBar(total=100, id="progress_bar"),
+            Label("", id="log_line_1"),
+            Label("", id="log_line_2"),
+            Label("", id="log_line_3"),
+            Label("", id="log_line_4"),
+            id="workspace_status_bar",
         )
         yield Footer()
 
+    def _compose_screen_workspace(self) -> Container:
+        """
+        Summary:
+            Build the Direction B Workspace rail screen (``#screen_workspace``)
+            as a three-pane horizontal layout — left data ranges/sections,
+            center hex view, right context — per LLR-008.1.
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_workspace`` holding ``#workspace_panes``
+            (the three-pane ``Horizontal``) and an ``EmptyStatePanel``.
+            Visible at startup (no ``.hidden`` class).
+
+        Data Flow:
+            - Center pane reuses the pre-batch hex subtree verbatim
+              (``#hex_controls`` with ``#search_input`` / ``#goto_input`` /
+              ``#search_button`` / ``#goto_button``, and ``#hex_scroll`` /
+              ``#hex_view``) so ``update_hex_view``, ``_handle_goto``,
+              ``_handle_search`` and the increment-4 command-bar adapters keep
+              working unmodified (LLR-008.2 / C-1).
+            - Left pane hosts ``#files_list`` (Workarea Files) and
+              ``#sections_list`` — the latter is the ``update_sections``
+              render target, unchanged.
+            - Right context pane hosts ``#a2l_view`` (the A2L summary that
+              ``update_a2l_view`` writes to), unchanged.
+            - An ``EmptyStatePanel`` is composed alongside the panes;
+              ``_apply_empty_state`` shows it (and hides ``#workspace_panes``)
+              while no ``LoadedFile`` is present (LLR-002.3).
+
+        Dependencies:
+            Uses:
+                - ``EmptyStatePanel``
+            Used by:
+                - ``compose``
+        """
+        _left_pane = Container(
+            Label("Workarea Files", id="files_title"),
+            ListView(id="files_list"),
+            Label("Data Sections", id="sections_title"),
+            ListView(id="sections_list"),
+            id="ws_left",
+            classes="db-pane",
+        )
+        _center_pane = Container(
+            Label("Hex View", id="hex_title"),
+            Container(
+                Input(placeholder="Search ASCII text", id="search_input"),
+                Button("Find Next", id="search_button"),
+                Input(placeholder="Goto 0xADDR", id="goto_input"),
+                Button("Goto", id="goto_button"),
+                id="hex_controls",
+            ),
+            ScrollableContainer(
+                Static("", id="hex_view", markup=False),
+                id="hex_scroll",
+            ),
+            id="ws_center",
+            classes="db-pane",
+        )
+        _right_pane = Container(
+            Label("Context", id="a2l_title"),
+            ScrollableContainer(
+                Static("", id="a2l_view", markup=False),
+                id="a2l_scroll",
+            ),
+            id="ws_right",
+            classes="db-pane",
+        )
+        _panes = Horizontal(
+            _left_pane,
+            _center_pane,
+            _right_pane,
+            id="workspace_panes",
+        )
+        return Container(
+            _panes,
+            EmptyStatePanel(),
+            id="screen_workspace",
+            classes="db-screen",
+        )
+
+    def _compose_screen_issues(self) -> Container:
+        """
+        Summary:
+            Build the Direction B Issues Report rail screen (``#screen_issues``)
+            as a dedicated full screen carrying the validation Issues
+            ``DataTable``, its severity filter row and the summary line —
+            promoted out of the old Workspace Status tile (LLR-011.1).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_issues`` holding the filter row
+            (``#validation_issues_filters``), the Issues ``DataTable``
+            (``#validation_issues_list``), the ``#validation_issues_summary``
+            label and an ``EmptyStatePanel``. Hidden at startup.
+
+        Data Flow:
+            - Lifts the ``#validation_issues_filters`` / ``#validation_issues_list``
+              / ``#validation_issues_summary`` subtree intact out of the
+              former hidden ``#workspace_carryover`` container; every id
+              ``update_validation_issues_view``, the ``issues_filter_*``
+              button handlers and ``action_validation_issues_page_*`` query
+              is preserved, so no renderer / paging / filter logic changes
+              (LLR-011.2 / C-1).
+            - An ``EmptyStatePanel`` is composed alongside; while no
+              ``LoadedFile`` is present ``_apply_empty_state`` shows it and
+              hides the Issues content (LLR-002.3).
+
+        Dependencies:
+            Uses:
+                - ``EmptyStatePanel``
+            Used by:
+                - ``compose``
+        """
+        _issues_content = Container(
+            Container(
+                Button("Issues: All", id="issues_filter_all"),
+                Button("Errors", id="issues_filter_error"),
+                Button("Warnings", id="issues_filter_warning"),
+                id="validation_issues_filters",
+            ),
+            DataTable(
+                id="validation_issues_list", zebra_stripes=True, cursor_type="row"
+            ),
+            Label("", id="validation_issues_summary"),
+            id="issues_content",
+        )
+        return Container(
+            Label("Issues Report", classes="db-screen-title"),
+            _issues_content,
+            EmptyStatePanel(),
+            id="screen_issues",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_map(self) -> Container:
+        """
+        Summary:
+            Build the Direction B Memory Map rail screen (``#screen_map``) —
+            a read-only coverage visualization of the loaded image's memory
+            ranges and gaps (LLR-012.1).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_map`` holding a title label, a scrollable
+            ``MemoryMapPanel`` (the ``#map_content`` coverage view) and an
+            ``EmptyStatePanel``. Hidden at startup.
+
+        Data Flow:
+            - The ``MemoryMapPanel`` is driven by ``update_memory_map``,
+              which reads the already-computed ``LoadedFile.ranges`` and
+              ``LoadedFile.range_validity`` — no coverage is computed here
+              (LLR-012.1 / LLR-012.4).
+            - An ``EmptyStatePanel`` is composed alongside; while no
+              ``LoadedFile`` is present ``_apply_empty_state`` shows it and
+              hides ``#map_content`` (LLR-002.3).
+
+        Dependencies:
+            Uses:
+                - ``MemoryMapPanel``
+                - ``EmptyStatePanel``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            Label("Memory Map", classes="db-screen-title"),
+            ScrollableContainer(
+                MemoryMapPanel(),
+                id="map_content",
+            ),
+            EmptyStatePanel(),
+            id="screen_map",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_bookmarks(self) -> Container:
+        """
+        Summary:
+            Build the Direction B Bookmarks rail screen (``#screen_bookmarks``)
+            as a neutral "coming soon" placeholder — no persistence logic is
+            wired (LLR-002.2 / LLR-012.4).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_bookmarks`` holding a title label and a
+            ``BookmarksPlaceholder`` static notice. Hidden at startup.
+
+        Data Flow:
+            - Static composition only. Activating the Bookmarks rail item
+              shows this container; no bookmark state is read or written.
+
+        Dependencies:
+            Uses:
+                - ``BookmarksPlaceholder``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            Label("Bookmarks", classes="db-screen-title"),
+            BookmarksPlaceholder(),
+            id="screen_bookmarks",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_patch(self) -> Container:
+        """
+        Summary:
+            Build the Direction B Patch Editor rail screen (``#screen_patch``)
+            as the functional change-list editor — a change-list table, wired
+            add / edit / remove inputs, save / load actions and an empty state
+            (batch-03 increment 9, LLR-007.1..007.6).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_patch`` holding a title label and a
+            ``PatchEditorPanel``. Hidden at startup.
+
+        Data Flow:
+            - Composition only. The ``PatchEditorPanel`` is presentational —
+              its controls emit ``PatchEditorPanel.ActionRequested`` messages
+              that ``on_patch_editor_panel_action_requested`` routes to
+              ``self._cdfx_service``. No XML / change-list model logic is
+              built here (constraint C-8 / LLR-007.5).
+
+        Dependencies:
+            Uses:
+                - ``PatchEditorPanel``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            Label("Patch Editor", classes="db-screen-title"),
+            PatchEditorPanel(),
+            id="screen_patch",
+            classes="db-screen hidden",
+        )
+
+    def on_patch_editor_panel_action_requested(
+        self, event: PatchEditorPanel.ActionRequested
+    ) -> None:
+        """
+        Summary:
+            Route a Patch Editor control action to the CDFX service and feed
+            the result back to the screen (LLR-007.2..007.4 / LLR-007.5).
+
+        Args:
+            event (PatchEditorPanel.ActionRequested): The message a Patch
+                Editor control posted — its ``action`` plus the current
+                name / index / value / path input-field text.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Parameter add / edit / remove and memory add / edit / remove
+              mutate ``self._cdfx_service``'s unified change-set, then re-render
+              both tables.
+            - save / load round-trip the parameter half to a ``.cdfx``;
+              save_unified / load_unified round-trip the whole change-set to a
+              JSON file; export splits it into a ``.cdfx`` plus a memory-field
+              JSON file.
+            - Every action's outcome and any ``ValidationIssue`` it produced
+              is surfaced through ``set_status`` (the existing status path);
+              an input error (blank name, bad index/address, missing entry) is
+              caught and reported, never raised into the UI.
+            - Both Patch Editor tables are re-rendered after every action.
+
+        Dependencies:
+            Uses:
+                - ``CdfxService``
+                - ``_compute_a2l_enriched_tags``
+                - ``PatchEditorPanel.refresh_rows`` / ``refresh_memory_rows``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        a2l_tags = self._compute_a2l_enriched_tags()
+        loaded_ranges = (
+            self.current_file.ranges if self.current_file is not None else None
+        )
+        try:
+            if event.action == "add":
+                self._cdfx_service.add_entry(
+                    event.parameter_name, event.index_text, event.value_text
+                )
+                self.set_status("Patch Editor: entry added.")
+            elif event.action == "edit":
+                self._cdfx_service.edit_entry(
+                    event.parameter_name, event.index_text, event.value_text
+                )
+                self.set_status("Patch Editor: entry updated.")
+            elif event.action == "remove":
+                self._cdfx_service.remove_entry(
+                    event.parameter_name, event.index_text
+                )
+                self.set_status("Patch Editor: entry removed.")
+            elif event.action == "save":
+                result = self._cdfx_service.save(self.base_dir, a2l_tags)
+                self._report_cdfx_result(result)
+            elif event.action == "load":
+                if not event.path_text.strip():
+                    self.set_status("Patch Editor: enter a .cdfx path to load.")
+                else:
+                    result = self._cdfx_service.load(
+                        event.path_text, self.base_dir, a2l_tags
+                    )
+                    self._report_cdfx_result(result)
+            elif event.action == "add_memory":
+                self._cdfx_service.add_memory_change(
+                    event.address_text, event.bytes_text
+                )
+                self.set_status("Patch Editor: memory change added.")
+            elif event.action == "edit_memory":
+                self._cdfx_service.edit_memory_change(
+                    event.address_text, event.bytes_text
+                )
+                self.set_status("Patch Editor: memory change updated.")
+            elif event.action == "remove_memory":
+                self._cdfx_service.remove_memory_change(event.address_text)
+                self.set_status("Patch Editor: memory change removed.")
+            elif event.action == "save_unified":
+                result = self._cdfx_service.save_unified(self.base_dir)
+                self._report_cdfx_result(result)
+            elif event.action == "load_unified":
+                if not event.unified_path_text.strip():
+                    self.set_status(
+                        "Patch Editor: enter a unified-file path to load."
+                    )
+                else:
+                    result = self._cdfx_service.load_unified(
+                        event.unified_path_text, self.base_dir
+                    )
+                    self._report_cdfx_result(result)
+            elif event.action == "export":
+                export = self._cdfx_service.export_selective(
+                    self.base_dir, a2l_tags
+                )
+                self._report_export_result(export)
+        except (ValueError, KeyError) as exc:
+            self.set_status(f"Patch Editor: {exc}")
+
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        panel.refresh_rows(self._cdfx_service.rows(a2l_tags))
+        panel.refresh_memory_rows(
+            self._cdfx_service.memory_rows(loaded_ranges)
+        )
+
+    def _report_cdfx_result(self, result: CdfxActionResult) -> None:
+        """
+        Summary:
+            Surface a CDFX save / load result and its issues on the status
+            path (LLR-007.3 / LLR-007.4 issue-surfacing arm).
+
+        Args:
+            result (CdfxActionResult): The outcome of a ``CdfxService.save``
+                or ``CdfxService.load`` call.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Emit the result's summary message, then one status line per
+              ``ValidationIssue`` so the engineer sees every finding.
+
+        Dependencies:
+            Uses:
+                - ``set_status``
+            Used by:
+                - ``on_patch_editor_panel_action_requested``
+        """
+        self.set_status(f"Patch Editor: {result.message}")
+        for issue in result.issues:
+            self.set_status(
+                f"Patch Editor [{issue.code}] {issue.severity.value}: "
+                f"{issue.message}"
+            )
+
+    def _report_export_result(self, result: ExportResult) -> None:
+        """
+        Summary:
+            Surface a selective-export result and its per-half issues on the
+            status path (LLR-009.3 export issue-surfacing arm).
+
+        Args:
+            result (ExportResult): The outcome of a
+                ``CdfxService.export_selective`` call — the two written file
+                paths and the combined, per-half-tagged ``ValidationIssue``
+                list.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Emit one status line per written file (or a rejection note when a
+              path is ``None``), then one line per ``ValidationIssue`` so the
+              engineer sees every finding and its originating half.
+
+        Dependencies:
+            Uses:
+                - ``set_status``
+            Used by:
+                - ``on_patch_editor_panel_action_requested``
+        """
+        cdfx = result.cdfx_path
+        memory = result.memory_field_path
+        self.set_status(
+            "Patch Editor: export - "
+            f"CDFX {cdfx if cdfx is not None else 'rejected'}; "
+            f"memory-field {memory if memory is not None else 'rejected'}"
+        )
+        for issue in result.issues:
+            self.set_status(
+                f"Patch Editor [{issue.code}] {issue.severity.value} "
+                f"({issue.artifact}): {issue.message}"
+            )
+
+    def _compose_screen_diff(self) -> Container:
+        """
+        Summary:
+            Build the Direction B A2B Diff rail screen (``#screen_diff``) as
+            a static three-column placeholder — range list, hex A and hex B
+            columns filled with constant sample rows and a "diff deferred"
+            notice. No second-file load path and no diff computation are
+            wired (LLR-012.3 / LLR-012.4).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_diff`` holding a title label and an
+            ``AbDiffPanel``. Hidden at startup.
+
+        Data Flow:
+            - Static composition only. The three columns carry constant
+              placeholder hex rows — not data from any ``LoadedFile`` and
+              not produced by any diff computation.
+
+        Dependencies:
+            Uses:
+                - ``AbDiffPanel``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            Label("A2B Diff", classes="db-screen-title"),
+            AbDiffPanel(),
+            id="screen_diff",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_a2l(self) -> Container:
+        """
+        Summary:
+            Build the Direction B A2L Explorer rail screen (``#screen_a2l``)
+            as a two-pane horizontal layout — a ``1fr`` tags-table pane on
+            the left and a fixed/proportional hex pane on the right
+            (LLR-009.1).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_a2l`` holding ``#a2l_panes`` (the two-pane
+            ``Horizontal``). Hidden at startup.
+
+        Data Flow:
+            - Replaces the pre-batch ``#alt_layout`` 2x2 grid with a
+              ``Horizontal`` of a left tags pane (``#a2l_tags_pane``,
+              ``1fr``) and a right hex pane (``#a2l_hex_pane``, fixed-40 at
+              >=120 cols / 35% under ``width-narrow`` — LLR-009.1).
+            - Every widget subtree is reused verbatim so the A2L renderers
+              keep working unchanged: the tags pane keeps ``#a2l_tags_list``,
+              ``#a2l_tags_summary``, the filter row inputs/buttons, the
+              ``#a2l_filter_menu`` overlay and its list; the hex pane keeps
+              ``#alt_hex_view`` / ``#alt_hex_scroll`` / ``#alt_search_input`` /
+              ``#alt_goto_input`` and the find/goto buttons. No
+              renderer / paging / jump / filter logic is touched (LLR-009.2).
+
+        Dependencies:
+            Used by:
+                - ``compose``
+        """
+        _tags_pane = Container(
+            Label("A2L Tags", id="a2l_tags_title"),
+            Container(
+                Input(placeholder="Filter tags", id="a2l_tags_filter_input"),
+                Button("Field: name", id="a2l_filter_field"),
+                Button("All", id="a2l_filter_all"),
+                Button("Invalid", id="a2l_filter_invalid"),
+                Button("In-Memory", id="a2l_filter_inmem"),
+                Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
+                Button("Find next", id="a2l_tag_find_next"),
+                Button("Page Prev", id="a2l_page_prev_button"),
+                Button("Page Next", id="a2l_page_next_button"),
+                id="a2l_tags_filters",
+            ),
+            Container(
+                ListView(id="a2l_filter_menu_list"),
+                id="a2l_filter_menu",
+                classes="hidden",
+            ),
+            DataTable(id="a2l_tags_list", zebra_stripes=True, cursor_type="row"),
+            Label("", id="a2l_tags_summary"),
+            id="a2l_tags_pane",
+            classes="db-pane",
+        )
+        _hex_pane = Container(
+            Label("Hex Viewer", id="alt_hex_title"),
+            Container(
+                Input(placeholder="Search ASCII text", id="alt_search_input"),
+                Button("Find Next", id="alt_search_button"),
+                Input(placeholder="Goto 0xADDR", id="alt_goto_input"),
+                Button("Goto", id="alt_goto_button"),
+                id="alt_hex_controls",
+            ),
+            ScrollableContainer(
+                Static("", id="alt_hex_view", markup=False),
+                id="alt_hex_scroll",
+            ),
+            id="a2l_hex_pane",
+            classes="db-pane",
+        )
+        _panes = Horizontal(
+            _tags_pane,
+            _hex_pane,
+            id="a2l_panes",
+        )
+        return Container(
+            _panes, id="screen_a2l", classes="db-screen hidden"
+        )
+
+    def _compose_screen_mac(self) -> Container:
+        """
+        Summary:
+            Build the Direction B MAC View rail screen (``#screen_mac``) as a
+            two-pane horizontal layout — a ``1fr`` records-table pane on the
+            left and a fixed/proportional hex pane on the right (LLR-010.1).
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_mac`` holding ``#mac_panes`` (the two-pane
+            ``Horizontal``). Hidden at startup.
+
+        Data Flow:
+            - Replaces the pre-batch ``#mac_layout`` 2x2 grid with a
+              ``Horizontal`` of a left records pane (``#mac_records_pane``,
+              ``1fr``) and a right hex pane (``#mac_hex_pane``, fixed-40 at
+              >=120 cols / 35% under ``width-narrow`` — LLR-010.1).
+            - Every widget subtree is reused verbatim so the MAC renderers
+              keep working unchanged: the records pane keeps the page
+              controls, ``#mac_records_list``, ``#mac_records_summary`` and
+              the ``#mac_scroll`` wrapper; the hex pane keeps
+              ``#mac_hex_view`` / ``#mac_hex_scroll`` / ``#mac_search_input`` /
+              ``#mac_goto_input`` and the find/goto buttons. No renderer /
+              paging / jump logic is touched, and the MAC-overlay hex
+              highlight is preserved (LLR-010.2).
+
+        Dependencies:
+            Used by:
+                - ``compose``
+        """
+        _records_pane = Container(
+            Label("MAC File Content", id="mac_title"),
+            Container(
+                Button("Page Prev", id="mac_page_prev_button"),
+                Button("Page Next", id="mac_page_next_button"),
+                id="mac_page_controls",
+            ),
+            Container(
+                DataTable(id="mac_records_list", zebra_stripes=True, cursor_type="row"),
+                Label("", id="mac_records_summary"),
+                id="mac_scroll",
+            ),
+            id="mac_records_pane",
+            classes="db-pane",
+        )
+        _hex_pane = Container(
+            Label("Hex Viewer", id="mac_hex_title"),
+            Container(
+                Input(placeholder="Search ASCII text", id="mac_search_input"),
+                Button("Find Next", id="mac_search_button"),
+                Input(placeholder="Goto 0xADDR", id="mac_goto_input"),
+                Button("Goto", id="mac_goto_button"),
+                id="mac_hex_controls",
+            ),
+            ScrollableContainer(
+                Static("", id="mac_hex_view", markup=False),
+                id="mac_hex_scroll",
+            ),
+            id="mac_hex_pane",
+            classes="db-pane",
+        )
+        _panes = Horizontal(
+            _records_pane,
+            _hex_pane,
+            id="mac_panes",
+        )
+        return Container(
+            _panes, id="screen_mac", classes="db-screen hidden"
+        )
+
     def on_mount(self) -> None:
         self._setup_datatable_columns()
+        # LLR-006.2: Comfortable is the default startup density.
+        self.query_one("#workspace_body").add_class("density-comfortable")
         self.refresh_files()
         self._update_a2l_filter_menu()
         self._update_settings_menu()
         self.update_validation_issues_view()
+        # LLR-002.3: show the no-file empty-state panels until a file loads.
+        self._apply_empty_state()
+        # Keep startup focus off the command-bar inputs so the unmodified
+        # single-key bindings (rail digits 1-8, `/`, `g`, paging) fire
+        # normally until the user explicitly focuses an input (LLR-004.5 —
+        # suppression applies only *while* a command-bar input has focus).
+        self._focus_activity_rail()
         if self.load_path:
             self.logger.info("Startup load requested: %s", self.load_path)
             self._load_path_from_user_input(self.load_path)
+
+    def _focus_activity_rail(self) -> None:
+        """Move keyboard focus to the active activity-rail item, if present."""
+        try:
+            rail = self.query_one(Rail)
+        except Exception:
+            return
+        for item in rail.query(RailItem):
+            if item.has_class("-active"):
+                item.focus()
+                return
 
     def _setup_datatable_columns(self) -> None:
         """
@@ -1326,32 +1678,462 @@ class S19TuiApp(App):
         self.set_status(f"A2L JSON saved: {output.name}")
         self.logger.info("A2L JSON exported: %s", output)
 
+    #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
+    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Bookmarks —
+    #: the rail order of the keymap proposal (keys 1-8).
+    SCREEN_CONTAINER_IDS = {
+        "workspace": "screen_workspace",
+        "a2l": "screen_a2l",
+        "mac": "screen_mac",
+        "map": "screen_map",
+        "issues": "screen_issues",
+        "patch": "screen_patch",
+        "diff": "screen_diff",
+        "bookmarks": "screen_bookmarks",
+    }
+
+    #: One extra command-palette command outside ``BINDINGS``: the viewer
+    #: page-size settings menu lost its ``#view_bar`` trigger in increment 2
+    #: (G-1) — it is resurfaced here so it stays keyboard-reachable (C-9).
+    EXTRA_PALETTE_ENTRIES = (("Viewer settings", "open_settings_menu"),)
+
+    def _build_palette_entries(self) -> tuple[PaletteEntry, ...]:
+        """
+        Summary:
+            Build the command-palette command list 1:1 from ``BINDINGS`` so
+            every key-bound action has exactly one palette entry that
+            dispatches the same action id (LLR-003.2 parity by construction).
+
+        Args:
+            None
+
+        Returns:
+            tuple[PaletteEntry, ...]: One ``PaletteEntry`` per ``BINDINGS``
+            action id (de-duplicated — the ``ctrl+l``/``l`` aliases share
+            one action and one entry) plus the resurfaced "Viewer settings"
+            command.
+
+        Data Flow:
+            - Walks ``BINDINGS``, keeping the first description seen for
+              each distinct action id so aliased keys collapse to one entry.
+            - Appends ``EXTRA_PALETTE_ENTRIES`` (the keyboard-reachable
+              viewer settings command).
+
+        Dependencies:
+            Used by:
+                - ``compose`` (the ``CommandBar`` palette)
+        """
+        entries: list[PaletteEntry] = []
+        seen_actions: set[str] = set()
+        for binding in self.BINDINGS:
+            if isinstance(binding, Binding):
+                action = binding.action
+                description = binding.description
+            else:
+                action = binding[1]
+                description = binding[2]
+            if action in seen_actions:
+                continue
+            seen_actions.add(action)
+            entries.append(PaletteEntry(description, action))
+        for label, action in self.EXTRA_PALETTE_ENTRIES:
+            entries.append(PaletteEntry(label, action))
+        return tuple(entries)
+
+    def action_show_screen(self, screen_key: str) -> None:
+        """
+        Summary:
+            Activate a Direction B rail screen, showing its container and
+            hiding the other seven (LLR-002.1).
+
+        Args:
+            screen_key (str): One of the keys of ``SCREEN_CONTAINER_IDS``
+                (``workspace`` / ``a2l`` / ``mac`` / ``map`` / ``issues`` /
+                ``patch`` / ``diff`` / ``bookmarks``).
+
+        Returns:
+            None
+
+        Raises:
+            None: An unknown ``screen_key`` is ignored (no screen change).
+
+        Data Flow:
+            - Reuses the existing ``.hidden``-class show/hide mechanism: the
+              target ``#screen_*`` container loses ``.hidden`` and every
+              other rail screen gains it. No ``push_screen`` is used, so the
+              persistent command bar, rail and footer stay mounted.
+            - Moves the activity rail's single active marker to the target
+              screen via ``Rail.set_active`` (LLR-001.2), so the rail
+              reflects the active screen for both the ``1``-``8`` key path
+              and the rail-click path.
+
+        Dependencies:
+            Uses:
+                - ``SCREEN_CONTAINER_IDS``
+                - ``Rail.set_active``
+            Used by:
+                - The ``1``-``8`` key bindings
+                - ``on_rail_selected`` (the activity rail click path)
+
+        Example:
+            >>> # bound to key "2"
+            >>> app.action_show_screen("a2l")
+        """
+        if screen_key not in self.SCREEN_CONTAINER_IDS:
+            return
+        target_id = self.SCREEN_CONTAINER_IDS[screen_key]
+        for container_id in self.SCREEN_CONTAINER_IDS.values():
+            container = self.query_one(f"#{container_id}")
+            if container_id == target_id:
+                container.remove_class("hidden")
+            else:
+                container.add_class("hidden")
+        self.query_one(Rail).set_active(screen_key)
+        self._apply_empty_state()
+
+    # Screens that own both real content and an `EmptyStatePanel`; the panel
+    # is shown only while no file is loaded (LLR-002.3). Each tuple is the
+    # screen container id and the id of its real-content child to hide.
+    _EMPTY_STATE_SCREENS = (
+        ("screen_workspace", "workspace_panes"),
+        ("screen_issues", "issues_content"),
+        ("screen_map", "map_content"),
+    )
+
+    def _apply_empty_state(self) -> None:
+        """
+        Summary:
+            Toggle the no-file empty-state panels of the content-bearing rail
+            screens — show the ``EmptyStatePanel`` and hide the real content
+            while no file is loaded, and the reverse once a file is present
+            (LLR-002.3).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - For each screen in ``_EMPTY_STATE_SCREENS``, resolve its real
+              content child and its ``EmptyStatePanel``.
+            - When ``current_file`` is unset, hide the content child and show
+              the panel; otherwise show the content and hide the panel.
+            - A missing widget tree (app not yet mounted) is tolerated — the
+              helper is a no-op then, matching ``_focus_activity_rail``.
+
+        Dependencies:
+            Uses:
+                - ``EmptyStatePanel``
+            Used by:
+                - ``action_show_screen``
+                - ``_apply_prepared_load`` (post-load refresh)
+        """
+        no_file = self.current_file is None
+        for screen_id, content_id in self._EMPTY_STATE_SCREENS:
+            try:
+                screen = self.query_one(f"#{screen_id}")
+                content = screen.query_one(f"#{content_id}")
+                panel = screen.query_one(EmptyStatePanel)
+            except Exception:
+                # App not mounted (e.g. headless unit tests of the load
+                # pipeline) — empty-state has no tree to toggle yet.
+                continue
+            content.set_class(no_file, "hidden")
+            panel.set_class(not no_file, "hidden")
+
+    def on_rail_selected(self, event: Rail.Selected) -> None:
+        """
+        Summary:
+            Route an activity-rail click to ``action_show_screen`` (LLR-002.1).
+
+        Args:
+            event (Rail.Selected): The rail-selection message carrying the
+                clicked item's screen key.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Delegates to ``action_show_screen`` so the rail-click path and
+              the ``1``-``8`` key path share one routing implementation
+              (including the active-marker move).
+
+        Dependencies:
+            Uses:
+                - ``action_show_screen``
+            Used by:
+                - Textual message dispatch (``Rail.Selected`` bubbles up)
+        """
+        self.action_show_screen(event.key)
+
+    def action_focus_palette(self) -> None:
+        """Open and focus the command-bar palette (``Ctrl+K`` — LLR-004.3)."""
+        self.query_one(CommandBar).open_palette()
+
+    def action_focus_find(self) -> None:
+        """Focus the command-bar find input (``/`` — LLR-004.1)."""
+        self.query_one(CommandBar).focus_find()
+
+    def action_focus_goto(self) -> None:
+        """Focus the command-bar go-to-address input (``g`` — LLR-004.2)."""
+        self.query_one(CommandBar).focus_goto()
+
+    def action_open_settings_menu(self) -> None:
+        """Open the viewer page-size settings menu (resurfaced via the palette)."""
+        menu = self.query_one("#settings_menu")
+        if "hidden" in menu.classes:
+            self._update_settings_menu()
+            menu.remove_class("hidden")
+
+    def on_command_bar_find(self, event: CommandBar.Find) -> None:
+        """
+        Summary:
+            Route a command-bar find submission to the existing validated
+            search handler (LLR-004.6) without adding new decoding code.
+
+        Args:
+            event (CommandBar.Find): The find message carrying the raw
+                typed query text.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Copies the typed text into the existing ``#search_input``
+              widget that ``_handle_search`` already reads, then calls
+              ``_handle_search`` unchanged — so the search runs through the
+              existing ``find_string_in_mem`` path and reports misses /
+              malformed input via ``set_status`` exactly as today. No new
+              search or string-decoding code is introduced (S-1).
+
+        Dependencies:
+            Uses:
+                - ``_handle_search`` (which calls ``find_string_in_mem``)
+            Used by:
+                - Textual message dispatch (``CommandBar.Find`` bubbles up)
+        """
+        self.query_one("#search_input", Input).value = event.query
+        self._handle_search()
+
+    def on_command_bar_goto(self, event: CommandBar.Goto) -> None:
+        """
+        Summary:
+            Route a command-bar go-to submission to the existing validated
+            ``_handle_goto`` handler (LLR-004.2) without adding new
+            address-parsing code.
+
+        Args:
+            event (CommandBar.Goto): The go-to message carrying the raw
+                typed address text.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Copies the typed text into the existing ``#goto_input`` widget
+              that ``_handle_goto`` already reads off the widget tree, then
+              calls ``_handle_goto`` unchanged — so the address is parsed
+              and validated as today and malformed input is reported via
+              ``set_status``. No new address-parsing code is introduced
+              (S-1); ``_handle_goto``'s signature is unchanged.
+
+        Dependencies:
+            Uses:
+                - ``_handle_goto``
+            Used by:
+                - Textual message dispatch (``CommandBar.Goto`` bubbles up)
+        """
+        self.query_one("#goto_input", Input).value = event.address_text
+        self._handle_goto()
+
+    async def on_command_bar_palette_action(
+        self, event: CommandBar.PaletteAction
+    ) -> None:
+        """
+        Summary:
+            Dispatch a chosen command-palette command through the standard
+            Textual action runner so it executes the *same* handler as the
+            command's key binding (LLR-003.2).
+
+        Args:
+            event (CommandBar.PaletteAction): The palette message carrying
+                the action id (e.g. ``"load_file"``, ``"show_screen('a2l')"``).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Awaits ``run_action`` so the palette dispatch path is
+              identical to a key binding firing the same action id.
+
+        Dependencies:
+            Uses:
+                - ``run_action``
+            Used by:
+                - Textual message dispatch (``CommandBar.PaletteAction``)
+        """
+        await self.run_action(event.action)
+
+    def _command_bar_input_focused(self) -> bool:
+        """Return True while a command-bar ``Input`` holds keyboard focus."""
+        focused = self.focused
+        if not isinstance(focused, Input):
+            return False
+        try:
+            command_bar = self.query_one(CommandBar)
+        except Exception:
+            return False
+        return focused in command_bar.query(Input)
+
+    #: Unmodified single-key bindings that, while a command-bar ``Input``
+    #: holds focus, must be routed into the input as text rather than fired
+    #: (keymap proposal §4 / LLR-004.5). Textual's focused ``Input`` already
+    #: consumes most printable keys before they reach ``on_key``; in
+    #: practice only ``period`` leaks (it reaches ``on_key`` with no
+    #: ``character`` and would otherwise fire its paging binding), but the
+    #: full keymap-§4 set is mapped so the suppression is explicit and
+    #: version-robust. ``ctrl+*`` keys are absent — they stay live.
+    _COMMAND_BAR_SUPPRESSED_KEYS = {
+        "period": ".",
+        "comma": ",",
+        "plus": "+",
+        "minus": "-",
+        "g": "g",
+        "q": "q",
+        "slash": "/",
+    }
+
+    def on_key(self, event: events.Key) -> None:
+        """
+        Summary:
+            Suppress unmodified single-key bindings while a command-bar
+            ``Input`` holds focus, routing the keystroke into the input as
+            text instead (LLR-004.5 / keymap proposal §4).
+
+        Args:
+            event (events.Key): The key event delivered to the app after
+                the focused widget declined to consume it.
+
+        Returns:
+            None
+
+        Data Flow:
+            - This handler only sees keys the focused ``Input`` did not
+              already consume (Textual delivers an unhandled key up the
+              focus chain). The focused ``Input`` already consumes the
+              printable single keys; this handler catches the residual
+              leaked single-key bindings (notably ``.``) that would
+              otherwise fire a paging / navigation action.
+            - While a command-bar input is focused and the key is one of
+              ``_COMMAND_BAR_SUPPRESSED_KEYS``, its character is inserted
+              into the focused input and the event is stopped, so the
+              binding action does not fire. Modified-key bindings
+              (``ctrl+*``) are not in the suppressed set and stay live.
+
+        Dependencies:
+            Uses:
+                - ``_command_bar_input_focused``
+            Used by:
+                - Textual key-event dispatch
+        """
+        if event.key not in self._COMMAND_BAR_SUPPRESSED_KEYS:
+            return
+        if not self._command_bar_input_focused():
+            return
+        focused = self.focused
+        if isinstance(focused, Input):
+            focused.insert_text_at_cursor(self._COMMAND_BAR_SUPPRESSED_KEYS[event.key])
+        event.stop()
+        event.prevent_default()
+
     def action_view_main(self) -> None:
-        """Switch to the main view."""
-        main_layout = self.query_one("#main_layout")
-        alt_layout = self.query_one("#alt_layout")
-        mac_layout = self.query_one("#mac_layout")
-        main_layout.remove_class("hidden")
-        alt_layout.add_class("hidden")
-        mac_layout.add_class("hidden")
+        """Legacy alias: activate the Workspace rail screen (superseded by key ``1``)."""
+        self.action_show_screen("workspace")
 
     def action_view_alt(self) -> None:
-        """Switch to the alternate view."""
-        main_layout = self.query_one("#main_layout")
-        alt_layout = self.query_one("#alt_layout")
-        mac_layout = self.query_one("#mac_layout")
-        main_layout.add_class("hidden")
-        alt_layout.remove_class("hidden")
-        mac_layout.add_class("hidden")
+        """Legacy alias: activate the A2L Explorer rail screen (superseded by key ``2``)."""
+        self.action_show_screen("a2l")
 
     def action_view_mac(self) -> None:
-        """Switch to the MAC view."""
-        main_layout = self.query_one("#main_layout")
-        alt_layout = self.query_one("#alt_layout")
-        mac_layout = self.query_one("#mac_layout")
-        main_layout.add_class("hidden")
-        alt_layout.add_class("hidden")
-        mac_layout.remove_class("hidden")
+        """Legacy alias: activate the MAC View rail screen (superseded by key ``3``)."""
+        self.action_show_screen("mac")
+
+    def action_cycle_density(self) -> None:
+        """
+        Summary:
+            Cycle the workspace layout density between compact and
+            comfortable (LLR-006.1), toggling a density CSS class on the
+            ``#workspace_body`` root.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads the current ``density-compact`` / ``density-comfortable``
+              class on ``#workspace_body``, swaps to the other, and reports
+              the new mode via ``set_status``.
+
+        Dependencies:
+            Uses:
+                - ``set_status``
+            Used by:
+                - The ``ctrl+d`` key binding
+
+        Example:
+            >>> app.action_cycle_density()  # comfortable -> compact
+        """
+        body = self.query_one("#workspace_body")
+        if body.has_class("density-compact"):
+            body.remove_class("density-compact")
+            body.add_class("density-comfortable")
+            self.set_status("Density: comfortable")
+        else:
+            body.remove_class("density-comfortable")
+            body.add_class("density-compact")
+            self.set_status("Density: compact")
+
+    def _apply_width_regime(self, width: int) -> None:
+        """
+        Summary:
+            Toggle the ``width-narrow`` class for the two-regime width
+            layout (LLR-007.1): narrow below the 120-column breakpoint,
+            wide at or above it. The class is set on both ``#workspace_shell``
+            and ``#workspace_body``.
+
+        Args:
+            width (int): Current terminal width in columns.
+
+        Returns:
+            None
+
+        Data Flow:
+            - At ``width < 120`` the ``width-narrow`` class is set so the
+              proportional-pane and collapsed-rail rules apply; at
+              ``width >= 120`` it is cleared so the fixed-width rules apply.
+            - The class is set on ``#workspace_shell`` so the collapsed-rail
+              rule can reach ``#rail_slot`` (a sibling of ``#workspace_body``,
+              not a descendant), and also on ``#workspace_body`` so the
+              per-screen proportional-pane rules keep their existing selector.
+
+        Dependencies:
+            Used by:
+                - ``on_resize``
+        """
+        narrow = width < 120
+        for widget_id in ("#workspace_shell", "#workspace_body"):
+            widget = self.query_one(widget_id)
+            if narrow:
+                widget.add_class("width-narrow")
+            else:
+                widget.remove_class("width-narrow")
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Update the two-regime width layout class on terminal resize."""
+        self._apply_width_regime(event.size.width)
 
     def action_page_next_context(self) -> None:
         """
@@ -3474,13 +4256,17 @@ class S19TuiApp(App):
                 - ``call_later`` (yielding chain)
                 - ``update_sections`` / ``update_hex_view`` / ``update_alt_hex_view`` /
                   ``update_mac_hex_view`` / ``update_mac_view`` / ``update_a2l_view`` /
-                  ``update_project_labels``
+                  ``update_project_labels`` / ``update_memory_map``
             Used by:
                 - ``_start_load_worker`` (threaded path)
                 - ``_apply_loaded_file`` (synchronous fallback)
         """
         loaded = prepared.loaded
         self.current_file = loaded
+        # A file is now present — reveal the real content of the
+        # content-bearing rail screens and hide their empty-state panels
+        # (LLR-002.3).
+        self._apply_empty_state()
         self._invalidate_mac_view_cache()
         self._mac_window_start = 0
         self._validation_issues_window_start = 0
@@ -3571,6 +4357,7 @@ class S19TuiApp(App):
         def _step_finalize() -> None:
             try:
                 self.update_project_labels()
+                self.update_memory_map()
             finally:
                 total_elapsed = time.perf_counter() - load_started
                 self.logger.info(
@@ -4083,6 +4870,45 @@ class S19TuiApp(App):
             min(total_ranges, range_cap),
             total_oor,
             min(total_oor, oor_cap),
+        )
+
+    def update_memory_map(self) -> None:
+        """
+        Summary:
+            Refresh the Memory Map screen's coverage visualization from the
+            current ``LoadedFile`` (LLR-012.1).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - When no file is loaded, hand empty lists to ``MemoryMapPanel``
+              so it shows its neutral no-file note.
+            - Otherwise pass ``current_file.ranges`` and
+              ``current_file.range_validity`` straight through to
+              ``MemoryMapPanel.render_ranges``. The renderer reads these
+              already-computed model fields verbatim — it adds no coverage
+              computation, parsing or analysis (LLR-012.1 / LLR-012.4).
+
+        Dependencies:
+            Uses:
+                - ``MemoryMapPanel.render_ranges``
+            Used by:
+                - ``_apply_prepared_load`` (post-load refresh)
+        """
+        panel = self.query_one("#memory_map_panel", MemoryMapPanel)
+        if not self.current_file:
+            panel.render_ranges([], [])
+            return
+        panel.render_ranges(
+            self.current_file.ranges,
+            self.current_file.range_validity,
+        )
+        self.logger.info(
+            "Memory Map updated. ranges=%d", len(self.current_file.ranges)
         )
 
     def update_hex_view(self, focus_address: Optional[int] = None) -> None:
@@ -4896,26 +5722,42 @@ class S19TuiApp(App):
         self.set_timer(0.15, _apply_filter)
 
     def update_project_labels(self) -> None:
-        """Refresh project/A2L labels in the status tile."""
-        project_label = self.query_one("#project_text", Label)
-        a2l_label = self.query_one("#a2l_text", Label)
-        project_label.update(f"Project: {self.current_project or '(none)'}")
+        """
+        Summary:
+            Refresh the project-name / A2L-filename context labels in the
+            persistent command bar so the project context stays visible from
+            every Direction B screen (LLR-011.3).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Formats the project name and A2L filename (or a "(none)"
+              sentinel) and writes them into the command bar's context
+              labels — the command bar is the canonical home since the old
+              Status tile was dismantled in increment 7.
+
+        Dependencies:
+            Uses:
+                - ``CommandBar.set_context_labels``
+            Used by:
+                - Project / A2L load handlers
+        """
+        project_name = self.current_project or "(none)"
         a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
-        a2l_label.update(f"A2L: {a2l_name}")
+        self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+        # The Direction B restyle retires the `#view_bar` button bar
+        # (view_hex/a2l/mac_button, settings_button) — rail items 1-3
+        # supersede the view-toggle buttons (LLR-004.4 / A-07).
         if event.button.id == "search_button":
             self._handle_search()
         elif event.button.id == "goto_button":
             self._handle_goto()
-        elif event.button.id == "view_hex_button":
-            self.action_view_main()
-        elif event.button.id == "view_a2l_button":
-            self.action_view_alt()
-        elif event.button.id == "view_mac_button":
-            self.action_view_mac()
-        elif event.button.id == "settings_button":
-            self._toggle_settings_menu()
         elif event.button.id == "alt_search_button":
             self._handle_search_alt()
         elif event.button.id == "alt_goto_button":

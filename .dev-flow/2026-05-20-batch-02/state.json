@@ -1,0 +1,32 @@
+{
+  "project": "s19_app",
+  "batch_id": "2026-05-20-batch-02",
+  "batch_objective": "Restyle the s19_app Textual TUI to Direction B (Rail + Command). View-layer only: no data-processing changes, no new runtime dependencies. Deferred: CRC engine, patch undo/redo, bookmark persistence, PDF export.",
+  "current_phase": 6,
+  "phase_status": "awaiting-gate",
+  "iterations_per_phase": {"1": 4, "2": 2, "3": 12, "4": 1, "5": 1, "6": 1},
+  "artifacts": {
+    "1": ".dev-flow/2026-05-20-batch-02/01-requirements.md",
+    "2": ".dev-flow/2026-05-20-batch-02/02-review.md",
+    "3": ".dev-flow/2026-05-20-batch-02/03-increments/",
+    "4": ".dev-flow/2026-05-20-batch-02/04-validation.md",
+    "5": ".dev-flow/2026-05-20-batch-02/05-postmortem.md",
+    "6": ".dev-flow/2026-05-20-batch-02/06-docs/"
+  },
+  "branch": "dev-flow/batch-02-direction-b-restyle",
+  "previous_batches": ["2026-05-05-batch-01"],
+  "batch_layout": "Each batch is archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. Living project documentation (REQUIREMENTS.md, tests/, docs/diagrams/) is maintained outside the batch archive and kept current every batch.",
+  "living_documentation": {
+    "requirements": "REQUIREMENTS.md (repo root) - R-* traceability updated as behavior lands",
+    "tests": "tests/ - suite kept green and extended each batch",
+    "diagrams": "docs/diagrams/ - architecture/sequence diagrams kept current"
+  },
+  "decisions_log": [
+    {"phase": 0, "date": "2026-05-20", "decision": "batch-created", "notes": "batch-02 opened on branch dev-flow/batch-02-direction-b-restyle. .dev-flow/ restructured to date-organized layout. Scope = Direction B restyle of existing s19_app/tui/, view-layer only."},
+    {"phase": 1, "date": "2026-05-20", "decision": "approved", "notes": "Phase 1 (4 iterations): 14 US / 15 HLR / 38 LLR / 38 active TC. 13 OQs resolved, all 24 Phase-2 findings folded in."},
+    {"phase": 2, "date": "2026-05-20", "decision": "approved", "notes": "Phase 2 (2 iterations): 24 findings raised and all closed; closure verdict pass (0 blockers, 0 majors). 5 minor/cosmetic CV items to fold into Phase 3 increment 1. User approved -> Phase 3."},
+    {"phase": 3, "date": "2026-05-20", "decision": "started", "notes": Phase 3 implementation. Increment plan produced: 12 increments, all 38 LLR/38 TC traced. User approved the plan and increment 1.}
+  ],
+  "obsidian_synced": false,
+  "created_at": "2026-05-20T00:00:00Z"
+}

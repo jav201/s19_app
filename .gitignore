@@ -8,3 +8,5 @@ __pycache__/
 .cursor/
 .claude/
 *.log
+snapshot_report.html
+.screenshot_cache/
