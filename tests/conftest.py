@@ -15,9 +15,14 @@ from __future__ import annotations
 
 import random
 from pathlib import Path
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import pytest
+
+if TYPE_CHECKING:
+    from s19_app.tui.cdfx import ChangeList, MemoryChangeList, UnifiedChangeSet
+    from s19_app.tui.cdfx.resolve import ResolutionResult
+    from s19_app.tui.models import LoadedFile
 
 
 # ---------------------------------------------------------------------------
@@ -538,3 +543,717 @@ def corrupt_records(tmp_path: Path) -> dict[str, Path]:
         Trio of S19/A2L/MAC fixtures with one intentionally corrupted record each (TC-062.h).
     """
     return make_corrupt_records(tmp_path)
+
+
+# ---------------------------------------------------------------------------
+# CDFX change-list factory (batch-03, increment 10)
+#
+# Relocated here from ``tests/test_cdfx_changelist.py`` (deferred to increment
+# 10 by the increment plan §A.4 / increment-005 packet) so the writer /
+# round-trip CDFX test modules share one fixture builder. ``change_list_factory``
+# now also carries the **adversarial-float arm** — three IEEE binary64 values
+# (``0.1``, the denormal ``5e-324``, a 17-significant-digit value) that no lossy
+# ``str()`` / ``%g`` / fixed-width text representation can round-trip, so the
+# round-trip test TC-024 genuinely fails if the writer ever drops full
+# ``repr()`` precision (LLR-004.8).
+# ---------------------------------------------------------------------------
+
+
+# The three adversarial IEEE binary64 floats (requirements §5.5). Module-level
+# so a test can assert the round-tripped value against the exact same object.
+ADVERSARIAL_FLOATS: tuple[float, float, float] = (
+    0.1,            # no short exact decimal — naive formatting loses precision.
+    5e-324,         # smallest positive binary64 denormal — fixed-width → 0.0.
+    8.98846567431158e307,  # a 17-significant-digit value — %g drops the tail.
+)
+
+
+def change_list_factory() -> "ChangeList":
+    """
+    Summary:
+        Build a small change-list of resolved parameters — one scalar, one
+        1-D array, one ASCII string, plus a 1-D array of the three adversarial
+        IEEE floats — for reuse across the CDFX writer / round-trip tests.
+
+    Returns:
+        ChangeList: A change-list with, in insertion order:
+            - ``IGN_ADVANCE_BASE`` — scalar, ``array_index=None``, value ``23``.
+            - ``FUEL_TRIM_TABLE[0..2]`` — three array elements carrying integer
+              indices 0/1/2, values 23/24/25.
+            - ``CAL_LABEL`` — ASCII string, ``array_index=None``, value
+              ``"REV_C"``.
+            - ``FLOAT_ADV_BLOCK[0..2]`` — three array elements carrying the
+              three :data:`ADVERSARIAL_FLOATS` (``0.1``, the denormal
+              ``5e-324``, a 17-digit value).
+        Every entry has status ``RESOLVED``.
+
+    Data Flow:
+        - Constructs an empty ``ChangeList`` and appends the entries in a fixed
+          order so dependent tests can assert on that order. A scalar / string
+          parameter carries ``array_index=None`` (LLR-001.1); an array
+          parameter contributes one per-element ``(name, k)`` entry. The
+          adversarial floats are carried as an array group so the round-trip
+          exercises both the float-precision (LLR-004.8) and the coalesce →
+          expand (LLR-004.9 / LLR-005.6) paths on the same entries.
+
+    Dependencies:
+        Uses:
+            - ChangeList
+        Used by:
+            - TC-003 / TC-010 (``test_cdfx_changelist.py``); TC-024
+              (``test_cdfx_roundtrip.py``).
+    """
+    from s19_app.tui.cdfx import ChangeList, ResolutionStatus
+
+    cl = ChangeList()
+    cl.add("IGN_ADVANCE_BASE", None, 23, ResolutionStatus.RESOLVED)
+    cl.add("FUEL_TRIM_TABLE", 0, 23, ResolutionStatus.RESOLVED)
+    cl.add("FUEL_TRIM_TABLE", 1, 24, ResolutionStatus.RESOLVED)
+    cl.add("FUEL_TRIM_TABLE", 2, 25, ResolutionStatus.RESOLVED)
+    cl.add("CAL_LABEL", None, "REV_C", ResolutionStatus.RESOLVED)
+    for index, value in enumerate(ADVERSARIAL_FLOATS):
+        cl.add("FLOAT_ADV_BLOCK", index, value, ResolutionStatus.RESOLVED)
+    return cl
+
+
+def change_list_resolution(change_list: "ChangeList") -> "ResolutionResult":
+    """
+    Summary:
+        Build the ``ResolutionResult`` matching :func:`change_list_factory` so a
+        write test can call ``write_cdfx`` without running the A2L pipeline.
+
+    Args:
+        change_list (ChangeList): A change-list — normally the one returned by
+            :func:`change_list_factory`. Each entry's ``ResolvedType`` is keyed
+            into the result by entry identity.
+
+    Returns:
+        ResolutionResult: A result whose ``resolved_types`` map carries, per
+        entry identity, the ``ResolvedType`` the resolver (increment 2) would
+        produce for that parameter — ``VALUE`` for a scalar integer, ``ASCII``
+        for the string entry, ``VAL_BLK`` for the two array groups.
+
+    Data Flow:
+        - For each entry, pick the ``ResolvedType`` from the parameter name: an
+          integer-valued scalar → ``VALUE``/``UWORD``; the ASCII string →
+          ``ASCII``; an integer-``array_index`` entry → ``VAL_BLK``, with
+          ``element_count`` the size of that parameter's array group. This is
+          the exact shape ``write_cdfx`` reads via ``ResolutionResult.type_for``.
+
+    Dependencies:
+        Uses:
+            - ResolutionResult
+            - ResolvedType
+        Used by:
+            - TC-024 (``test_cdfx_roundtrip.py``).
+    """
+    from s19_app.tui.cdfx.resolve import ResolutionResult, ResolvedType
+
+    # Per-parameter array-group sizes, so a VAL_BLK ResolvedType reports the
+    # element_count the writer's coalescing produces a VG of.
+    array_counts: dict[str, int] = {}
+    for entry in change_list.entries:
+        if isinstance(entry.array_index, int):
+            array_counts[entry.parameter_name] = (
+                array_counts.get(entry.parameter_name, 0) + 1
+            )
+
+    result = ResolutionResult(change_list=change_list)
+    for entry in change_list.entries:
+        if isinstance(entry.array_index, int):
+            resolved = ResolvedType(
+                char_type="VAL_BLK",
+                datatype="FLOAT64_IEEE"
+                if isinstance(entry.value, float)
+                else "UWORD",
+                element_count=array_counts[entry.parameter_name],
+            )
+        elif isinstance(entry.value, str):
+            resolved = ResolvedType(
+                char_type="ASCII", datatype=None, element_count=8
+            )
+        else:
+            resolved = ResolvedType(
+                char_type="VALUE", datatype="UWORD", element_count=1
+            )
+        result.resolved_types[entry.key] = resolved
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Memory-change factory (batch-04, increments 1 + 2)
+#
+# Per requirements §5.4, ``memory_change_factory`` is the in-memory
+# ``MemoryChangeList`` builder for the batch-04 memory-field tests. Increment 1
+# shipped the **bare-list build path** — the address-keyed entries and the
+# overlap pair — for TC-001..TC-004 and TC-008's ValueError arms. Increment 2
+# adds the range-coupled ``partial`` / ``outside`` / gap-spanning variants and
+# ``make_ranged_s19``, the real ``LoadedFile`` they are validated against.
+#
+# The pinned addresses are chosen relative to the ``make_ranged_s19`` ranges
+# below so the increment-2 validator lands the ``inside`` / ``partial`` /
+# ``outside`` / gap-spanning verdicts deterministically.
+#
+#   make_ranged_s19 ranges (half-open):
+#     range 1  [0x100, 0x180)   128 bytes
+#     gap      [0x180, 0x200)   no image data
+#     range 2  [0x200, 0x280)   128 bytes
+#     post-last addresses are >= 0x280.
+# ---------------------------------------------------------------------------
+
+
+# The two disjoint, gap-separated ranges ``make_ranged_s19`` writes. Module
+# level so a test can assert verdicts against the exact same boundaries the
+# fixture produced.
+RANGED_S19_RANGES: tuple[tuple[int, int], tuple[int, int]] = (
+    (0x100, 0x180),  # range 1 — 128 bytes
+    (0x200, 0x280),  # range 2 — 128 bytes; gap [0x180, 0x200) between them
+)
+
+
+# The overlap pair (requirements §5.4, finding Q-03) — two entries built at
+# DISTINCT start addresses whose byte runs intersect: ranges [0x100, 0x108) and
+# [0x104, 0x10C) overlap on [0x104, 0x108). Distinct ``address`` keys mean the
+# LLR-001.3 identity rule does not collapse them, so the overlap warning is
+# genuinely provoked in increment 2's TC-008.
+MEMORY_OVERLAP_PAIR: tuple[tuple[int, int], tuple[int, int]] = (
+    (0x100, 8),  # (address, run length)
+    (0x104, 8),
+)
+
+
+def memory_change_factory(variant: str = "base") -> "MemoryChangeList":
+    """
+    Summary:
+        Build a ``MemoryChangeList`` of well-formed memory-change entries for
+        reuse across the batch-04 memory-field model, validation and container
+        tests. The ``variant`` argument selects which range-coupled outcome the
+        list is shaped for, all against the :data:`RANGED_S19_RANGES` /
+        ``make_ranged_s19`` ranges.
+
+    Args:
+        variant (str): Which list to build. One of:
+            - ``"base"`` (default) — the increment-1 bare-list build path: an
+              ``inside``-sized entry plus the pinned overlap pair. Entry
+              addresses ``[0x200, 0x100, 0x104]``.
+            - ``"partial"`` — one entry ``0x178 len 0x10`` whose run starts
+              inside range 1 and crosses its ``0x180`` end edge (``partial``).
+            - ``"outside"`` — one entry ``0x190 len 8`` whose run falls wholly
+              in the inter-range gap ``[0x180, 0x200)`` (``outside``).
+            - ``"gap-spanning"`` — one entry ``0x170 len 0x100`` whose run
+              starts in range 1, crosses the gap, and ends in range 2 — the
+              single-``partial``, single-issue multi-range case (LLR-002.1).
+
+    Returns:
+        MemoryChangeList: A memory-change list in deterministic insertion
+        order. Every entry carries the default ``UNVALIDATED_NO_IMAGE`` status;
+        the increment-2 validator stamps the real status against a loaded
+        image.
+
+    Data Flow:
+        - Constructs an empty ``MemoryChangeList`` and appends entries in a
+          fixed order so dependent tests can assert on that order (LLR-001.4).
+        - The ``"base"`` overlap-pair entries are added at distinct ``address``
+          keys so the LLR-001.3 identity rule keeps them as two entries.
+
+    Dependencies:
+        Uses:
+            - MemoryChangeList
+        Used by:
+            - TC-001..TC-008 (``test_memory_changelist.py`` /
+              ``test_memory_validate.py``); the container tests of increment 4.
+
+    Example:
+        >>> [e.address for e in memory_change_factory().entries]
+        [512, 256, 260]
+        >>> [e.address for e in memory_change_factory("partial").entries]
+        [376]
+    """
+    from s19_app.tui.cdfx import MemoryChangeList
+
+    ml = MemoryChangeList()
+    if variant == "base":
+        # An entry sized to fall fully inside loaded range 2 (`inside`).
+        ml.add(0x200, [0xDE, 0xAD, 0xBE, 0xEF])
+        # The pinned overlap pair — distinct start addresses, intersecting runs.
+        for address, run_length in MEMORY_OVERLAP_PAIR:
+            ml.add(
+                address,
+                [(address + offset) & 0xFF for offset in range(run_length)],
+            )
+        return ml
+    if variant == "partial":
+        # Starts inside range 1, runs past its 0x180 end edge.
+        ml.add(0x178, [(0x178 + offset) & 0xFF for offset in range(0x10)])
+        return ml
+    if variant == "outside":
+        # Falls wholly in the inter-range gap [0x180, 0x200).
+        ml.add(0x190, [(0x190 + offset) & 0xFF for offset in range(8)])
+        return ml
+    if variant == "gap-spanning":
+        # Starts in range 1, crosses the gap, ends in range 2 — one `partial`.
+        ml.add(0x170, [(0x170 + offset) & 0xFF for offset in range(0x100)])
+        return ml
+    raise ValueError(f"unknown memory_change_factory variant: {variant!r}")
+
+
+def make_ranged_s19(
+    path: Path,
+    *,
+    seed: int = 0,
+) -> Path:
+    """
+    Summary:
+        Write a tiny synthetic S19 file with two known, disjoint,
+        gap-separated 128-byte address ranges, so the batch-04 memory-change
+        validator can be exercised against a real loaded image rather than a
+        hand-built range stub. The exact ranges are :data:`RANGED_S19_RANGES`.
+
+    Args:
+        path (Path): Output file path (overwritten if it exists).
+        seed (int): Deterministic PRNG seed for the data bytes.
+
+    Returns:
+        Path: The written file path.
+
+    Data Flow:
+        - For each of the two ranges in :data:`RANGED_S19_RANGES`, walk the
+          range 16 bytes at a time and emit one S3 data record per chunk, so
+          ``S19File`` coalesces each range into one contiguous ``(start, end)``
+          range with the documented inter-range gap left empty.
+        - Emit one S7 terminator. No S0 header record is written: an S0
+          carries a data payload at address 0, which would otherwise surface
+          as a spurious third low ``(0, n)`` range; ``S19File`` parses a
+          header-less file cleanly.
+
+    Dependencies:
+        Uses:
+            - ``_s19_data_record`` / ``_s19_terminator``
+        Used by:
+            - ``ranged_s19`` fixture; TC-005, TC-006, TC-008
+              (``test_memory_validate.py``).
+    """
+    rng = random.Random(seed)
+    chunk_size = 16
+    with path.open("w", encoding="ascii", newline="\n") as handle:
+        for range_start, range_end in RANGED_S19_RANGES:
+            for address in range(range_start, range_end, chunk_size):
+                data = bytes(rng.randrange(0, 256) for _ in range(chunk_size))
+                handle.write(_s19_data_record(address, data) + "\n")
+        handle.write(_s19_terminator() + "\n")
+    return path
+
+
+@pytest.fixture
+def ranged_s19(tmp_path: Path) -> "LoadedFile":
+    """
+    Summary:
+        Load a :func:`make_ranged_s19` image through the real ``load_service``
+        so the memory-change validator consumes the actual ``LoadedFile.ranges``
+        snapshot — two disjoint ranges with a documented gap (TC-005/006/008).
+
+    Returns:
+        LoadedFile: The loaded snapshot; ``ranges`` is ``RANGED_S19_RANGES``.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    s19_path = make_ranged_s19(tmp_path / "ranged.s19")
+    s19 = S19File(str(s19_path))
+    return build_loaded_s19(s19_path, s19, a2l_path=None, a2l_data=None)
+
+
+# ---------------------------------------------------------------------------
+# Unified change-set factory (batch-04, increment 4)
+#
+# Per requirements §5.4, ``unified_changeset_factory`` is the in-memory
+# ``UnifiedChangeSet`` builder for the batch-04 unified-change-set container,
+# write, read, round-trip and export tests. It **composes** the two halves
+# from the existing per-kind factories — it does not hand-build entries — so
+# the unified tests inherit exactly the parameter and memory entries the
+# batch-03 / increment-1 tests already exercise:
+#
+#   - the parameter half is ``change_list_factory()`` — one scalar, one 1-D
+#     array, one ASCII string, plus the three adversarial IEEE binary64 floats
+#     (the Q-09 note: the adversarial floats are inherited from
+#     ``change_list_factory``, not re-declared here), so the round-trip test
+#     TC-025 genuinely stresses full binary64 precision.
+#   - the memory half is ``memory_change_factory(variant)`` — by default the
+#     "base" bare-list build path (an inside-sized entry plus the pinned
+#     overlap pair).
+# ---------------------------------------------------------------------------
+
+
+def unified_changeset_factory(memory_variant: str = "base") -> "UnifiedChangeSet":
+    """
+    Summary:
+        Build a ``UnifiedChangeSet`` whose two halves are composed from the
+        existing :func:`change_list_factory` and :func:`memory_change_factory`
+        generators, for reuse across the batch-04 unified container, write,
+        read, round-trip and export tests.
+
+    Args:
+        memory_variant (str): The ``memory_change_factory`` variant selecting
+            which memory-field half to compose — ``"base"`` (default),
+            ``"partial"``, ``"outside"`` or ``"gap-spanning"``.
+
+    Returns:
+        UnifiedChangeSet: A container whose ``parameters`` half is the
+        :func:`change_list_factory` change-list (scalar + 1-D array + ASCII
+        string + the three adversarial IEEE floats) and whose ``memory`` half
+        is the :func:`memory_change_factory` list for ``memory_variant``. The
+        two halves are populated by replaying each source factory's entries
+        into the container's own halves, so the container's identity-keyed
+        insertion order matches each source factory exactly.
+
+    Data Flow:
+        - Construct an empty ``UnifiedChangeSet``.
+        - Replay every :func:`change_list_factory` entry into the container's
+          ``parameters`` half via ``ChangeList.add`` (preserving identity,
+          value, resolution status and insertion order).
+        - Replay every :func:`memory_change_factory` entry into the container's
+          ``memory`` half via ``MemoryChangeList.add`` (preserving address,
+          byte run and insertion order).
+
+    Dependencies:
+        Uses:
+            - UnifiedChangeSet
+            - change_list_factory
+            - memory_change_factory
+        Used by:
+            - TC-012, TC-013, TC-026 (``test_unified_changeset.py``); the
+              unified write / read / round-trip / export tests of increments
+              5-7 and 9.
+
+    Example:
+        >>> cs = unified_changeset_factory()
+        >>> cs.counts()
+        (8, 3)
+        >>> cs.is_empty()
+        False
+    """
+    from s19_app.tui.cdfx import UnifiedChangeSet
+
+    changeset = UnifiedChangeSet()
+
+    source_parameters = change_list_factory()
+    for entry in source_parameters.entries:
+        changeset.parameters.add(
+            entry.parameter_name,
+            entry.array_index,
+            entry.value,
+            entry.status,
+        )
+
+    source_memory = memory_change_factory(memory_variant)
+    for memory_entry in source_memory.entries:
+        changeset.memory.add(
+            memory_entry.address,
+            memory_entry.new_bytes,
+            memory_entry.status,
+        )
+
+    return changeset
+
+
+# ---------------------------------------------------------------------------
+# Unified change-set file helper (batch-04, increment 5)
+#
+# ``make_unified_file`` writes a well-formed unified change-set JSON file to a
+# real path, using the production serializer ``serialize_unified`` so the file
+# on disk is exactly what the writer emits — not a hand-built JSON literal that
+# could silently drift from the format contract. Introduced in increment 5
+# (the writer produces it); consumed by the increment-6 reader / round-trip
+# tests (TC-019, TC-025).
+# ---------------------------------------------------------------------------
+
+
+def make_unified_file(
+    path: Path,
+    *,
+    memory_variant: str = "base",
+) -> Path:
+    """
+    Summary:
+        Write a well-formed unified change-set JSON file to ``path`` using the
+        production :func:`~s19_app.tui.cdfx.unified_io.serialize_unified`
+        serializer, so the on-disk file is byte-identical to what the writer
+        emits for an :func:`unified_changeset_factory` change-set.
+
+    Args:
+        path (Path): Output file path (overwritten if it exists). The file is
+            written directly with ``serialize_unified`` bytes — no work-area
+            containment is applied here; this helper is for *read*-side tests
+            that need a real, well-formed unified file on disk.
+        memory_variant (str): The ``memory_change_factory`` variant selecting
+            the memory-field half — forwarded to :func:`unified_changeset_factory`.
+
+    Returns:
+        Path: The written file path. The file is a valid unified-change-set
+        JSON document carrying the format identifier, version, the parameter
+        half (scalar + 1-D array + ASCII + the three adversarial floats) and
+        the memory-field half (array of objects, ``address`` as an integer
+        field).
+
+    Data Flow:
+        - Build a ``UnifiedChangeSet`` via :func:`unified_changeset_factory`.
+        - Serialize it with the production ``serialize_unified`` and write the
+          bytes to ``path``.
+
+    Dependencies:
+        Uses:
+            - unified_changeset_factory
+            - serialize_unified
+        Used by:
+            - TC-019, TC-025 (the unified-file read / round-trip tests,
+              increments 6 and 9).
+
+    Example:
+        >>> p = make_unified_file(tmp_path / "cs.json")  # doctest: +SKIP
+    """
+    from s19_app.tui.cdfx import serialize_unified
+
+    changeset = unified_changeset_factory(memory_variant)
+    path.write_bytes(serialize_unified(changeset))
+    return path
+
+
+# ---------------------------------------------------------------------------
+# Unified change-set READ fixtures (batch-04, increment 6)
+#
+# Per requirements §5.4, these helpers manufacture the adversarial unified
+# files the increment-6 read TCs feed to ``read_unified``: malformed JSON,
+# per-entry / version rule violations, deeply-nested JSON (the RecursionError
+# arm), and over-ceiling structures (the decoded-structure ceiling arm). Every
+# file is synthetic and built in-test (constraint C-9). The fixtures write
+# *crafted* JSON literals — not the production serializer — precisely because
+# they must produce shapes the writer would never emit.
+# ---------------------------------------------------------------------------
+
+
+def make_malformed_unified_file(path: Path, *, variant: str = "truncated") -> Path:
+    """
+    Summary:
+        Write a unified-file path whose content is **not** a well-formed
+        unified change-set document, for the ``MF-JSON-PARSE`` /
+        ``MF-BAD-STRUCTURE`` read TCs (TC-020, TC-014).
+
+    Args:
+        path (Path): Output file path (overwritten if it exists).
+        variant (str): Which malformed content to write. One of:
+            - ``"truncated"`` (default) — a syntactically truncated JSON object
+              (``{"format": "s19app-unified-changeset", "param``) — provokes a
+              ``json.JSONDecodeError`` → ``MF-JSON-PARSE``.
+            - ``"garbage"`` — non-JSON bytes (``not json at all {{{``) →
+              ``MF-JSON-PARSE``.
+            - ``"bare-list"`` — a well-formed JSON ``[]`` with no halves →
+              ``MF-BAD-STRUCTURE``.
+            - ``"bare-int"`` — a well-formed JSON ``42`` → ``MF-BAD-STRUCTURE``.
+            - ``"bare-string"`` — a well-formed JSON string → ``MF-BAD-STRUCTURE``.
+            - ``"no-halves"`` — a well-formed JSON object ``{"foo": 1}`` with
+              no recognised parameter / memory halves → ``MF-BAD-STRUCTURE``.
+
+    Returns:
+        Path: The written file path.
+
+    Data Flow:
+        - Maps ``variant`` to a fixed byte payload and writes it verbatim.
+
+    Dependencies:
+        Used by:
+            - TC-020 (``test_unified_rules.py``), TC-014 (``test_unified_read.py``).
+
+    Example:
+        >>> p = make_malformed_unified_file(tmp_path / "bad.json")  # doctest: +SKIP
+    """
+    payloads: dict[str, bytes] = {
+        "truncated": b'{"format": "s19app-unified-changeset", "param',
+        "garbage": b"not json at all {{{",
+        "bare-list": b"[]",
+        "bare-int": b"42",
+        "bare-string": b'"just a string"',
+        "no-halves": b'{"foo": 1, "bar": 2}',
+    }
+    if variant not in payloads:
+        raise ValueError(f"unknown make_malformed_unified_file variant: {variant!r}")
+    path.write_bytes(payloads[variant])
+    return path
+
+
+def make_rule_violation_unified_file(path: Path, *, variant: str) -> Path:
+    """
+    Summary:
+        Write a **well-formed-JSON** unified file whose memory-field half or
+        version trips exactly one per-entry / version ``MF-*`` rule, for the
+        per-entry rule read TCs (TC-023, TC-024).
+
+    Args:
+        path (Path): Output file path (overwritten if it exists).
+        variant (str): Which single rule to provoke. One of:
+            - ``"no-address"`` — a memory entry with no ``address`` field →
+              ``MF-NO-ADDRESS``.
+            - ``"empty-bytes"`` — a memory entry with an empty ``new_bytes``
+              run → ``MF-EMPTY-BYTES``.
+            - ``"byte-range"`` — a memory entry with a ``new_bytes`` value of
+              ``256`` → ``MF-BYTE-RANGE``.
+            - ``"version-unknown"`` — a structurally valid file declaring an
+              unrecognised version token → ``MF-VERSION-UNKNOWN`` (info).
+        Every variant keeps one **clean** memory entry alongside the offending
+        one so a test can assert the clean entry still loads (collect-don't-abort).
+
+    Returns:
+        Path: The written file path.
+
+    Data Flow:
+        - Builds a unified-document ``dict`` with the format-id header, one
+          clean memory entry, and one entry crafted to trip ``variant``'s rule,
+          then dumps it with stdlib ``json``.
+
+    Dependencies:
+        Used by:
+            - TC-023, TC-024 (``test_unified_rules.py``).
+
+    Example:
+        >>> p = make_rule_violation_unified_file(tmp_path / "v.json", variant="no-address")  # doctest: +SKIP
+    """
+    import json as _json
+
+    clean_entry = {"address": 0x100, "new_bytes": [0x41, 0x42], "status": "inside"}
+    version = "1.0"
+    if variant == "no-address":
+        bad_entry: dict[str, object] = {"new_bytes": [0x01], "status": "inside"}
+        memory = [clean_entry, bad_entry]
+    elif variant == "empty-bytes":
+        bad_entry = {"address": 0x200, "new_bytes": [], "status": "inside"}
+        memory = [clean_entry, bad_entry]
+    elif variant == "byte-range":
+        bad_entry = {"address": 0x200, "new_bytes": [0x01, 256], "status": "inside"}
+        memory = [clean_entry, bad_entry]
+    elif variant == "version-unknown":
+        version = "99.0-from-the-future"
+        memory = [clean_entry]
+    else:
+        raise ValueError(
+            f"unknown make_rule_violation_unified_file variant: {variant!r}"
+        )
+    document = {
+        "format": "s19app-unified-changeset",
+        "version": version,
+        "parameters": [],
+        "memory": memory,
+    }
+    path.write_bytes((_json.dumps(document, indent=2) + "\n").encode("utf-8"))
+    return path
+
+
+def make_deeply_nested_unified_file(path: Path, *, depth: int = 120_000) -> Path:
+    """
+    Summary:
+        Write a unified-file path whose content is a JSON document nested deep
+        enough to overflow the stdlib ``json`` parser's recursion and raise
+        ``RecursionError`` — the LLR-006.2 / TC-035 deeply-nested arm.
+
+    Args:
+        path (Path): Output file path (overwritten if it exists).
+        depth (int): Nesting depth — the number of stacked JSON arrays. The
+            default (120_000) is far past the stdlib parser's recursion limit
+            on any platform, so the reader's ``RecursionError`` catch is
+            genuinely exercised. The file itself stays tiny (a few hundred KB).
+
+    Returns:
+        Path: The written file path. The content is ``[[[...]]]`` — ``depth``
+        open brackets, then ``depth`` close brackets — well-formed JSON that
+        the stdlib parser cannot decode without overflowing its recursion.
+
+    Data Flow:
+        - Writes ``depth`` ``[`` characters, then ``depth`` ``]`` characters.
+
+    Dependencies:
+        Used by:
+            - TC-035 (``test_unified_read.py``).
+
+    Example:
+        >>> p = make_deeply_nested_unified_file(tmp_path / "deep.json")  # doctest: +SKIP
+    """
+    path.write_bytes(b"[" * depth + b"]" * depth)
+    return path
+
+
+def make_over_ceiling_unified_file(path: Path, *, variant: str) -> Path:
+    """
+    Summary:
+        Write a **well-formed, sub-256-MB** unified file whose decoded
+        structure breaches a documented decoded-structure ceiling, for the
+        LLR-006.5 / TC-037 read TC.
+
+    Args:
+        path (Path): Output file path (overwritten if it exists).
+        variant (str): Which ceiling to breach. One of:
+            - ``"entry-count"`` — declares ``MF_ENTRY_COUNT_CEILING + 5``
+              memory-field entries; the reader drops the 5 past the ceiling
+              with one ``MF-ENTRY-LIMIT`` issue and keeps the in-ceiling prefix.
+            - ``"run-length"`` — declares two clean memory entries plus one
+              whose ``new_bytes`` run is ``MF_RUN_LENGTH_CEILING + 1`` bytes
+              long; the reader drops that one entry with one ``MF-ENTRY-LIMIT``
+              issue and keeps the two clean entries.
+        Both files stay comfortably under the 256 MB on-disk size cap — the
+        point of the ceiling is to catch a structure the file-size cap does not.
+
+    Returns:
+        Path: The written file path.
+
+    Data Flow:
+        - Builds the unified document with stdlib ``json`` for the
+          ``entry-count`` variant; for ``run-length`` it streams the long run
+          rather than holding a giant Python list, keeping the fixture fast.
+
+    Dependencies:
+        Uses:
+            - ``unified_io.MF_ENTRY_COUNT_CEILING`` / ``MF_RUN_LENGTH_CEILING``
+              — the ceilings are read from the module so the fixture and the
+              reader can never disagree.
+        Used by:
+            - TC-037 (``test_unified_read.py``).
+
+    Example:
+        >>> p = make_over_ceiling_unified_file(tmp_path / "big.json", variant="run-length")  # doctest: +SKIP
+    """
+    import json as _json
+
+    from s19_app.tui.cdfx.unified_io import (
+        MF_ENTRY_COUNT_CEILING,
+        MF_RUN_LENGTH_CEILING,
+    )
+
+    if variant == "entry-count":
+        memory = [
+            {"address": index, "new_bytes": [index & 0xFF], "status": "inside"}
+            for index in range(MF_ENTRY_COUNT_CEILING + 5)
+        ]
+        document = {
+            "format": "s19app-unified-changeset",
+            "version": "1.0",
+            "parameters": [],
+            "memory": memory,
+        }
+        path.write_bytes((_json.dumps(document) + "\n").encode("utf-8"))
+        return path
+    if variant == "run-length":
+        # Two clean entries kept; one over-run-length entry dropped. The long
+        # run is streamed straight into the file as text so the fixture never
+        # materialises a giant Python list.
+        head = (
+            b'{"format": "s19app-unified-changeset", "version": "1.0", '
+            b'"parameters": [], "memory": ['
+            b'{"address": 256, "new_bytes": [1, 2], "status": "inside"}, '
+            b'{"address": 512, "new_bytes": [3, 4], "status": "inside"}, '
+            b'{"address": 1024, "new_bytes": ['
+        )
+        tail = b'], "status": "inside"}]}\n'
+        with path.open("wb") as handle:
+            handle.write(head)
+            over = MF_RUN_LENGTH_CEILING + 1
+            handle.write(b",".join(b"0" for _ in range(over)))
+            handle.write(tail)
+        return path
+    raise ValueError(f"unknown make_over_ceiling_unified_file variant: {variant!r}")
