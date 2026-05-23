@@ -36,24 +36,37 @@ from s19_app.tui.services.validation_service import build_validation_report
 EXAMPLES_ROOT = Path(__file__).resolve().parent.parent / "examples"
 
 
-def _discover_cases() -> list[tuple[str, Path]]:
+# Cases that take a long time in the smoke pipeline (~minutes vs ~seconds).
+# Marked @pytest.mark.slow so CI default with `-m "not slow"` excludes them;
+# opt in with `-m slow`. The outlier pv__case_06_large_nested_a2l takes ~490s
+# through enrich_tags_and_render + validate_artifact_consistency over a very
+# large A2L (external validation review observation).
+SLOW_CASE_IDS = {"pv__case_06_large_nested_a2l"}
+
+
+def _discover_cases() -> list:
     """
     Discover every example case directory.
 
     Returns:
-        list[tuple[str, Path]]: ``(case_id, case_dir)`` pairs. ``case_id`` is
-        unique across the top-level and ``professional_validation`` namespaces.
+        list: ``pytest.param`` entries. ``case_id`` is unique across the
+        top-level and ``professional_validation`` namespaces. Cases in
+        ``SLOW_CASE_IDS`` carry the ``@pytest.mark.slow`` marker so the
+        default test run skips them.
     """
-    cases: list[tuple[str, Path]] = []
+    cases: list = []
     for entry in sorted(EXAMPLES_ROOT.iterdir()):
         if not entry.is_dir():
             continue
         if entry.name == "professional_validation":
             for sub in sorted(entry.iterdir()):
                 if sub.is_dir():
-                    cases.append((f"pv__{sub.name}", sub))
+                    case_id = f"pv__{sub.name}"
+                    marks = (pytest.mark.slow,) if case_id in SLOW_CASE_IDS else ()
+                    cases.append(pytest.param(case_id, sub, marks=marks, id=case_id))
             continue
-        cases.append((entry.name, entry))
+        case_id = entry.name
+        cases.append(pytest.param(case_id, entry, id=case_id))
     return cases
 
 
@@ -97,7 +110,6 @@ _CASES = _discover_cases()
 @pytest.mark.parametrize(
     ("case_id", "case_dir"),
     _CASES,
-    ids=[c[0] for c in _CASES],
 )
 def test_case_loads_through_service_layer(case_id: str, case_dir: Path) -> None:
     """End-to-end smoke: load primary image, enrich A2L, build validation."""
