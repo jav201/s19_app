@@ -16,7 +16,19 @@ requires-python = ">=3.8"
 license = "MIT"
 dependencies = [
     "rich>=13.0",
-    "textual",
+    # Lower-bound floor (C-8 / OQ-13). Set to the currently-installed version
+    # so nothing breaks; no upper ceiling. Required-minimum bound for the
+    # dev-only pytest-textual-snapshot extra below.
+    "textual>=8.0.2",
+]
+
+[project.optional-dependencies]
+# Dev-only snapshot-testing extra (C-2 scoped exception, OQ-5 approved).
+# pytest-textual-snapshot is NEVER added to [project] dependencies — it does
+# not affect the s19tui runtime footprint. Install with: pip install -e .[dev]
+# Version: pinned for CI-reproducible snapshot baselines (S-5 resolved).
+dev = [
+    "pytest-textual-snapshot==1.1.0",
 ]
 
 [project.scripts]
@@ -28,4 +40,5 @@ include = ["s19_app*"]
 [tool.pytest.ini_options]
 markers = [
     "slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')",
+    "snapshot: marks pytest-textual-snapshot layout-drift tests (deselect with -m 'not snapshot')",
 ]

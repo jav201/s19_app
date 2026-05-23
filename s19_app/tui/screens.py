@@ -13,6 +13,25 @@ from textual.widgets import Button, Input, Label, ListItem, ListView
 logger = logging.getLogger("s19tui")
 
 
+# --- Calm Dark modal re-skin (batch-02 increment 8, LLR-015.1) --------------
+# The three Load / Save / Load-Project modals adopt the Calm Dark token set
+# defined in ``styles.tcss`` (`$accent-calm` + the shared dark `$bg-*` /
+# `$fg-*` / `$rule` tokens). All modal styling — the dimmed `ModalScreen`
+# backdrop, the dialog border / panel surface, the title, the buttons and the
+# inputs — lives in ``styles.tcss`` keyed on the `.modal-dialog` /
+# `.modal-title` / `.modal-buttons` / `.modal-confirm` classes (and the
+# carried-over `#load_dialog` id). No per-screen ``DEFAULT_CSS`` is used: the
+# Calm Dark `$bg-*` / `$fg-*` / `$rule` token variables are only in scope for
+# the app-level stylesheet (`CSS_PATH = "styles.tcss"`), so the modal rules
+# must live there to resolve the tokens. The three modals therefore share one
+# accent and one backdrop tone (TC-033 single-accent rule).
+#
+# This is a VISUAL-ONLY re-skin: no behavior, no path handling, no
+# ``validate_project_files`` / ``SaveProjectPayload`` / ``.s19tool/`` workarea
+# logic is changed (LLR-015.2 / C-1 / A-5). No hard-coded hex color is used —
+# every modal color resolves through a Calm Dark token in ``styles.tcss``.
+
+
 @dataclass(frozen=True)
 class SaveProjectPayload:
     """Parent directory (as entered or browsed) and project folder name for save."""
@@ -22,21 +41,29 @@ class SaveProjectPayload:
 
 
 class LoadFileScreen(ModalScreen[Optional[Path]]):
-    """Modal dialog for loading S19/HEX/MAC data files or an A2L file."""
+    """Modal dialog for loading S19/HEX/MAC data files or an A2L file.
+
+    Re-skinned to the Calm Dark theme in batch-02 increment 8 (LLR-015.1):
+    the dialog carries the shared ``.modal-dialog`` class so it picks up the
+    Calm Dark accent border, panel background and foreground tokens from
+    ``styles.tcss``. Behavior is unchanged (LLR-015.2).
+    """
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Load file (S19/HEX/MAC/A2L):"),
+            Label("Load file (S19/HEX/MAC/A2L):", classes="modal-title"),
             Input(
                 placeholder="C:\\path\\to\\file.s19, .hex, .mac, or .a2l",
                 id="load_path",
             ),
             Container(
-                Button("Load", id="load_ok"),
+                Button("Load", id="load_ok", classes="modal-confirm"),
                 Button("Cancel", id="load_cancel"),
                 id="load_buttons",
+                classes="modal-buttons",
             ),
             id="load_dialog",
+            classes="modal-dialog",
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -54,7 +81,13 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
 
 
 class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
-    """Modal dialog for destination folder, optional browse, and project name."""
+    """Modal dialog for destination folder, optional browse, and project name.
+
+    Re-skinned to the Calm Dark theme in batch-02 increment 8 (LLR-015.1):
+    the dialog carries the shared ``.modal-dialog`` class. Behavior — the
+    browse fallback, ``SaveProjectPayload`` construction and the
+    ``.s19tool/`` workarea destination — is unchanged (LLR-015.2 / A-5).
+    """
 
     def __init__(self, default_parent: Path) -> None:
         super().__init__()
@@ -62,7 +95,7 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Save project folder under:"),
+            Label("Save project folder under:", classes="modal-title"),
             Input(
                 placeholder="C:\\path\\to\\parent\\folder",
                 id="project_parent_path",
@@ -71,14 +104,16 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
                 Button("Browse...", id="save_browse"),
                 id="save_browse_row",
             ),
-            Label("Project name (new folder name):"),
+            Label("Project name (new folder name):", classes="modal-title"),
             Input(placeholder="letters, numbers, - _", id="project_name"),
             Container(
-                Button("Save", id="save_ok"),
+                Button("Save", id="save_ok", classes="modal-confirm"),
                 Button("Cancel", id="save_cancel"),
                 id="load_buttons",
+                classes="modal-buttons",
             ),
             id="load_dialog",
+            classes="modal-dialog",
         )
 
     def on_mount(self) -> None:
@@ -112,7 +147,12 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
 
 
 class LoadProjectScreen(ModalScreen[Optional[str]]):
-    """Modal dialog for selecting an existing project."""
+    """Modal dialog for selecting an existing project.
+
+    Re-skinned to the Calm Dark theme in batch-02 increment 8 (LLR-015.1):
+    the dialog carries the shared ``.modal-dialog`` class. The project list
+    selection behavior is unchanged (LLR-015.2).
+    """
 
     def __init__(self, projects: List[str]):
         super().__init__()
@@ -120,17 +160,19 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
 
     def compose(self) -> ComposeResult:
         yield Container(
-            Label("Load project:"),
+            Label("Load project:", classes="modal-title"),
             ListView(
                 *[ListItem(Label(name)) for name in self.projects],
                 id="project_list",
             ),
             Container(
-                Button("Load", id="project_ok"),
+                Button("Load", id="project_ok", classes="modal-confirm"),
                 Button("Cancel", id="project_cancel"),
                 id="load_buttons",
+                classes="modal-buttons",
             ),
             id="load_dialog",
+            classes="modal-dialog",
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
