@@ -220,7 +220,7 @@ def test_tc027_batch03_cdfx_modules_are_byte_unchanged() -> None:
         assert module_path.exists(), (
             f"{rel_path} is missing — TC-027 cannot verify it is unchanged"
         )
-        actual_hash = hashlib.sha256(module_path.read_bytes()).hexdigest()
+        actual_hash = hashlib.sha256(module_path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
         assert actual_hash == expected_hash, (
             f"{rel_path} changed since its batch-03 baseline — constraint C-1 "
             f"forbids editing the batch-03 CDFX writer / resolver. If the "

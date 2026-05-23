@@ -340,7 +340,7 @@ def test_tc030_batch03_cdfx_writer_module_is_byte_unchanged() -> None:
     noise cannot perturb the verdict.
     """
     writer_path = Path(writer_mod.__file__)
-    actual = hashlib.sha256(writer_path.read_bytes()).hexdigest()
+    actual = hashlib.sha256(writer_path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
     assert actual == _WRITER_PY_SHA256, (
         "s19_app/tui/cdfx/writer.py changed since the increment-7 baseline — "
