@@ -3,7 +3,7 @@
     "batch_id": "2026-05-26-batch-05",
     "batch_objective": "Hex viewer UX correctness batch: (a) hex-text search resumes from the current page after pagination, (b) the MAC tab's hex pane is wide and tall enough to render a full hex row, (c) goto handler reports out-of-range addresses and marks valid focus rows with a plain-text glyph that does not collide with the sev-* validation severity classes or the existing byte-level search/MAC highlights. TUI-only — no parser/engine changes.",
     "current_phase": 6,
-    "phase_status": "awaiting-sync",
+    "phase_status": "synced",
     "iterations_per_phase": {
         "1": 2,
         "2": 1,
@@ -179,8 +179,20 @@
             "date": "2026-05-28",
             "decision": "approved-batch-closed",
             "notes": "Phase 6 gate approved. Batch-05 closed; all 6 phases complete. State → awaiting-sync. Pending USER actions: (1) confirm Python 3.11 CI green (validation ran on local 3.14.4 — CI 3.11 is authoritative, post-mortem action A-1); (2) commit/push/merge PR; (3) run /dev-flow-sync-en to upload artifacts to the Obsidian vault. obsidian_synced stays false until then. NO commit/push performed by the orchestrator."
+        },
+        {
+            "phase": 6,
+            "date": "2026-05-28",
+            "decision": "committed-pushed-merged",
+            "notes": "User authorized commit/push/merge. Committed a222907 (22 files, +3376/-429), pushed branch claude/tender-ride-3d090c, opened PR #8, merged to main (merge commit 1f9a81e). NOTE: CI tui-ci.yml triggers only on PRs to main-tui, not main — so the Python 3.11 gate (A-1) did not run on this main-targeted PR; prior batches (PR #6/#7) merged the same way. Local validation (772+19 passed, 3.14.4) is the de-facto gate. Recommended follow-up: wire tui-ci to main or run the 3.11 suite locally."
+        },
+        {
+            "phase": 6,
+            "date": "2026-05-28",
+            "decision": "synced-to-obsidian",
+            "notes": "Synced to canonical G: vault: G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-05-26-batch-05\\ (copied 01/02/04/05 + 06-docs/ + generated 2026-05-26-batch-05-README.md index — matching the batch-04 vault convention; 03-increments not synced per convention). Resolved a path conflict: the /dev-flow-sync-en command hardcodes a stale C:\\Users\\jjgh8\\Obsidia_Vaults (typo, missing 'n') path; used the G: vault per global CLAUDE.md, which holds the real project + prior synced batches 01-04."
         }
     ],
-    "obsidian_synced": false,
+    "obsidian_synced": true,
     "created_at": "2026-05-26T00:00:00Z"
 }
