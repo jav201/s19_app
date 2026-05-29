@@ -280,8 +280,16 @@ Screen {
 }
 
 #mac_hex_pane {
-    width: 40;
+    width: 82;
     height: 100%;
+}
+
+/* Inner scroll container of the MAC hex pane — mirrors `#hex_scroll` so the
+ * embedded hex viewer fills the vertical extent below the title/controls
+ * (HLR-002 / LLR-002.2). */
+#mac_hex_scroll {
+    height: 100%;
+    overflow: auto;
 }
 
 /* < 120-column proportional regime (LLR-010.1 / LLR-007.1).

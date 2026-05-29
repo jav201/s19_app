@@ -330,8 +330,53 @@ def render_hex_view_text(
     max_rows: Optional[int] = None,
     start_row_index: Optional[int] = None,
     row_bases_set: Optional[set[int]] = None,
+    *,
+    focus_row_marker_address: Optional[int] = None,
 ) -> Text:
-    """Render hex view with optional highlighted match range."""
+    """
+    Summary:
+        Render a windowed hex+ASCII view as Rich ``Text``, optionally painting the
+        search/MAC byte highlights and prepending a plain-text goto focus marker to
+        the row that contains ``focus_row_marker_address``.
+
+    Args:
+        mem_map (Dict[int, int]): Address-to-byte map backing the render.
+        focus_address (Optional[int]): Preferred center address when no explicit start row.
+        row_bases (Optional[List[int]]): Sorted 16-byte-aligned row anchors.
+        highlight (Optional[Tuple[int, int]]): ``(start, length)`` span painted with
+            ``FOCUS_HIGHLIGHT_STYLE`` (yellow search highlight).
+        mac_highlight_addresses (Optional[set[int]]): Addresses painted with
+            ``MAC_ADDRESS_OVERLAY_STYLE`` (orange MAC overlay).
+        max_rows (Optional[int]): Upper bound on rendered rows.
+        start_row_index (Optional[int]): Explicit start index into the resolved bases list.
+        row_bases_set (Optional[set[int]]): Precomputed ``set(row_bases)`` membership set.
+        focus_row_marker_address (Optional[int]): When set, the row whose half-open
+            ``[row_addr, row_addr + HEX_WIDTH)`` window contains this address is prefixed
+            with ``"> "``; every other row is prefixed with ``"  "`` (two spaces) so the
+            address column stays aligned. ``None`` (the default) prepends ``"  "`` to every
+            row, preserving the pre-marker layout for all existing callers.
+
+    Returns:
+        Text: Rich ``Text`` with header lines plus one line per rendered hex row.
+
+    Data Flow:
+        - Materialize rows via ``_collect_hex_rows``.
+        - For each row, append the 2-cell marker prefix (no ``style=``), then the address,
+          the hex byte cells, and the ASCII gutter with their existing highlight styles.
+
+    Dependencies:
+        Uses:
+            - ``_collect_hex_rows``
+            - ``FOCUS_HIGHLIGHT_STYLE`` / ``MAC_ADDRESS_OVERLAY_STYLE``
+        Used by:
+            - ``S19TuiApp.update_hex_view`` / ``update_alt_hex_view`` / ``update_mac_hex_view``
+
+    Example:
+        >>> text = render_hex_view_text({0x1000: 0x41}, None, [0x1000], None,
+        ...                             focus_row_marker_address=0x1000)
+        >>> text.plain.splitlines()[0].startswith("> ")
+        True
+    """
     header_lines, rows = _collect_hex_rows(
         mem_map,
         focus_address,
@@ -354,6 +399,13 @@ def render_hex_view_text(
     mac_addresses = mac_highlight_addresses or set()
 
     for row_addr, row_bytes in rows:
+        if (
+            focus_row_marker_address is not None
+            and row_addr <= focus_row_marker_address < row_addr + HEX_WIDTH
+        ):
+            text.append("> ")
+        else:
+            text.append("  ")
         text.append(f"0x{row_addr:08X}  ")
         for offset, value in enumerate(row_bytes):
             addr = row_addr + offset

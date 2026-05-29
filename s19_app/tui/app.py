@@ -554,6 +554,19 @@ class S19TuiApp(App):
         self._issue_row_key_to_index: dict[str, int] = {}
         self._a2l_row_key_to_tag: dict[str, dict[str, Any]] = {}
         self._hex_window_start: int = 0
+        # First-visible row-base address caches for the alt / mac hex panes,
+        # written by ``update_alt_hex_view`` / ``update_mac_hex_view`` and read
+        # by ``_first_visible_hex_address`` (LLR-001.3 / LLR-001.4).
+        self._alt_first_visible_address: Optional[int] = None
+        self._mac_first_visible_address: Optional[int] = None
+        # Per-view goto focus addresses, set by ``_apply_goto`` on a valid hit and
+        # rendered as a plain-text ``> `` marker on the focus row by
+        # ``render_hex_view_text``. Cleared on the per-view triggers enumerated in
+        # LLR-003.6 (pagination, new search, parse-error goto, tag/record selection,
+        # file load/unload). Persist across tab switches.
+        self._goto_focus_address: Optional[int] = None
+        self._alt_goto_focus_address: Optional[int] = None
+        self._mac_goto_focus_address: Optional[int] = None
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
         self._cdfx_service = CdfxService()
@@ -2218,6 +2231,8 @@ class S19TuiApp(App):
         total = len(self.current_file.row_bases)
         max_start = max(0, ((total - 1) // page_size) * page_size)
         self._hex_window_start = min(max_start, self._hex_window_start + page_size)
+        self.last_search_address = None
+        self._goto_focus_address = None
         self.update_hex_view()
 
     def action_hex_page_prev(self) -> None:
@@ -2247,6 +2262,8 @@ class S19TuiApp(App):
             return
         page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
         self._hex_window_start = max(0, self._hex_window_start - page_size)
+        self.last_search_address = None
+        self._goto_focus_address = None
         self.update_hex_view()
 
     def action_a2l_tags_page_next(self) -> None:
@@ -2274,6 +2291,7 @@ class S19TuiApp(App):
         page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         max_start = max(0, ((total - 1) // page_size) * page_size)
         self._a2l_window_start = min(max_start, self._a2l_window_start + page_size)
+        self._alt_goto_focus_address = None
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def action_a2l_tags_page_prev(self) -> None:
@@ -2299,6 +2317,7 @@ class S19TuiApp(App):
             return
         page_size = self._clamp_viewer_page_size(self.a2l_tags_page_size)
         self._a2l_window_start = max(0, self._a2l_window_start - page_size)
+        self._alt_goto_focus_address = None
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def action_mac_records_page_next(self) -> None:
@@ -2329,6 +2348,7 @@ class S19TuiApp(App):
         page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         max_start = max(0, ((total - 1) // page_size) * page_size)
         self._mac_window_start = min(max_start, self._mac_window_start + page_size)
+        self._mac_goto_focus_address = None
         self.update_mac_view()
 
     def action_mac_records_page_prev(self) -> None:
@@ -2357,6 +2377,7 @@ class S19TuiApp(App):
             return
         page_size = self._clamp_viewer_page_size(self.mac_records_page_size)
         self._mac_window_start = max(0, self._mac_window_start - page_size)
+        self._mac_goto_focus_address = None
         self.update_mac_view()
 
     def action_a2l_tag_find_next(self) -> None:
@@ -3024,6 +3045,8 @@ class S19TuiApp(App):
             return
         span = self._a2l_tag_byte_length_for_hex_highlight(tag if isinstance(tag, dict) else {})
         self._a2l_tag_hex_highlight = (addr, span)
+        self.last_search_address = None
+        self._alt_goto_focus_address = None
         self.update_alt_hex_view(addr, near_top=True, reset_scroll=True)
         self.set_status(f"Tag at 0x{addr:08X}")
 
@@ -3144,6 +3167,8 @@ class S19TuiApp(App):
                 self._a2l_tag_find_last_index = i
                 self._focus_a2l_tag_absolute_index(i)
                 addr = tags[i].get("address")
+                self.last_search_address = None
+                self._alt_goto_focus_address = None
                 if isinstance(addr, int):
                     span = self._a2l_tag_byte_length_for_hex_highlight(tags[i])
                     self._a2l_tag_hex_highlight = (addr, span)
@@ -3183,6 +3208,8 @@ class S19TuiApp(App):
                 - ``on_data_table_row_selected`` for the MAC DataTable
                 - ``_jump_to_mac_record`` (legacy ListView adapter)
         """
+        self.last_search_address = None
+        self._mac_goto_focus_address = None
         self.update_mac_hex_view(address, near_top=True, reset_scroll=True)
         self.set_status(f"MAC tag at 0x{address:08X}")
 
@@ -4271,6 +4298,10 @@ class S19TuiApp(App):
         self._mac_window_start = 0
         self._validation_issues_window_start = 0
         self._a2l_tag_hex_highlight = None
+        # A new file invalidates every per-view goto focus address (LLR-003.6 file-load).
+        self._goto_focus_address = None
+        self._alt_goto_focus_address = None
+        self._mac_goto_focus_address = None
         if loaded.a2l_data:
             self.current_a2l_path = loaded.a2l_path
             self.current_a2l_data = loaded.a2l_data
@@ -4916,6 +4947,7 @@ class S19TuiApp(App):
         hex_view = self.query_one("#hex_view", Static)
         if not self.current_file:
             hex_view.update("No file loaded.")
+            self._goto_focus_address = None
             return
         row_bases = self.current_file.row_bases or []
         page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
@@ -4943,6 +4975,7 @@ class S19TuiApp(App):
                 max_rows=page_size,
                 start_row_index=self._hex_window_start,
                 row_bases_set=getattr(self.current_file, "bases_set", None),
+                focus_row_marker_address=self._goto_focus_address,
             )
         )
         if focus_address is not None:
@@ -5015,6 +5048,8 @@ class S19TuiApp(App):
         alt_hex_view = self.query_one("#alt_hex_view", Static)
         if not self.current_file:
             alt_hex_view.update("No file loaded.")
+            self._alt_first_visible_address = None
+            self._alt_goto_focus_address = None
             return
         highlight = None
         if self._a2l_tag_hex_highlight is not None:
@@ -5026,6 +5061,12 @@ class S19TuiApp(App):
         start_row_index = (
             self._row_start_for_near_top_focus(focus_address, row_bases) if near_top else None
         )
+        if row_bases:
+            effective_start = start_row_index if isinstance(start_row_index, int) else 0
+            effective_start = max(0, min(effective_start, len(row_bases) - 1))
+            self._alt_first_visible_address = row_bases[effective_start]
+        else:
+            self._alt_first_visible_address = None
         alt_hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
@@ -5036,6 +5077,7 @@ class S19TuiApp(App):
                 max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
                 start_row_index=start_row_index,
                 row_bases_set=getattr(self.current_file, "bases_set", None),
+                focus_row_marker_address=self._alt_goto_focus_address,
             )
         )
         if reset_scroll:
@@ -5051,6 +5093,8 @@ class S19TuiApp(App):
         mac_hex_view = self.query_one("#mac_hex_view", Static)
         if not self.current_file:
             mac_hex_view.update("No file loaded.")
+            self._mac_first_visible_address = None
+            self._mac_goto_focus_address = None
             return
         highlight = None
         if self.last_search_address is not None and self.last_search_text:
@@ -5060,6 +5104,12 @@ class S19TuiApp(App):
         start_row_index = (
             self._row_start_for_near_top_focus(focus_address, row_bases) if near_top else None
         )
+        if row_bases:
+            effective_start = start_row_index if isinstance(start_row_index, int) else 0
+            effective_start = max(0, min(effective_start, len(row_bases) - 1))
+            self._mac_first_visible_address = row_bases[effective_start]
+        else:
+            self._mac_first_visible_address = None
         mac_hex_view.update(
             render_hex_view_text(
                 self.current_file.mem_map,
@@ -5070,6 +5120,7 @@ class S19TuiApp(App):
                 max_rows=self._clamp_viewer_page_size(self.hex_rows_page_size),
                 start_row_index=start_row_index,
                 row_bases_set=getattr(self.current_file, "bases_set", None),
+                focus_row_marker_address=self._mac_goto_focus_address,
             )
         )
         if reset_scroll:
@@ -5807,6 +5858,34 @@ class S19TuiApp(App):
         elif event.input.id == "a2l_tag_find_input":
             self._a2l_tag_find_last_index = -1
 
+    def _first_visible_hex_address(self, view: str) -> Optional[int]:
+        """
+        Summary:
+            Return the base address of the first row currently visible in the named
+            hex view, or ``None`` when the view has no rendered rows.
+
+        Args:
+            view (str): One of ``"main"``, ``"alt"``, or ``"mac"``.
+
+        Returns:
+            Optional[int]: First-visible row-base address; ``None`` when unavailable.
+        """
+        if view == "main":
+            if not self.current_file:
+                return None
+            row_bases = self.current_file.row_bases or []
+            if not row_bases:
+                return None
+            index = self._hex_window_start
+            if not isinstance(index, int) or index < 0 or index >= len(row_bases):
+                return None
+            return row_bases[index]
+        if view == "alt":
+            return self._alt_first_visible_address
+        if view == "mac":
+            return self._mac_first_visible_address
+        return None
+
     def _handle_search(self) -> None:
         if not self.current_file:
             self.set_status("No file loaded.")
@@ -5815,13 +5894,17 @@ class S19TuiApp(App):
         if not query:
             self.set_status("Search text is empty.")
             return
-        if self.last_search_text != query:
+        is_new_query = self.last_search_text != query
+        if is_new_query:
             self.last_search_text = query
             self.last_search_address = None
+            self._goto_focus_address = None
 
         start_address = None
         if self.last_search_address is not None:
             start_address = self.last_search_address + 1
+        elif not is_new_query:
+            start_address = self._first_visible_hex_address("main")
 
         addr = find_string_in_mem(self.current_file.mem_map, query, start_address)
         if addr is None:
@@ -5832,18 +5915,63 @@ class S19TuiApp(App):
         self.update_hex_view(addr)
         self.set_status(f"Found at 0x{addr:08X}")
 
+    def _apply_goto(self, view: str, addr: int) -> bool:
+        """
+        Summary:
+            Validate a parsed goto address against the current file's loaded ranges and,
+            on a hit, record the per-view focus address that drives the hex-row marker.
+
+        Args:
+            view (str): One of ``"main"``, ``"alt"``, or ``"mac"`` — selects the
+                ``_<view>_goto_focus_address`` field updated on a hit.
+            addr (int): Parsed integer goto address.
+
+        Returns:
+            bool: True when ``addr`` lies inside a loaded range (focus address set);
+            False when out of range (status emitted, focus field left unchanged).
+
+        Data Flow:
+            - Resolve the cached sorted range index via ``_get_range_index``.
+            - On a membership miss, emit the ``Address 0x... not in loaded file.`` status
+              and return False without mutating any focus field.
+            - On a hit, set the matching ``_<view>_goto_focus_address`` and return True.
+
+        Dependencies:
+            Uses:
+                - ``_get_range_index``
+                - ``address_in_sorted_ranges``
+                - ``set_status``
+            Used by:
+                - ``_handle_goto`` / ``_handle_goto_alt`` / ``_handle_goto_mac``
+        """
+        range_index = self._get_range_index(self.current_file)
+        if not address_in_sorted_ranges(addr, range_index):
+            self.set_status(f"Address 0x{addr:08X} not in loaded file.")
+            return False
+        if view == "main":
+            self._goto_focus_address = addr
+        elif view == "alt":
+            self._alt_goto_focus_address = addr
+        elif view == "mac":
+            self._mac_goto_focus_address = addr
+        return True
+
     def _handle_goto(self) -> None:
         if not self.current_file:
             self.set_status("No file loaded.")
             return
         raw = self.query_one("#goto_input", Input).value.strip()
         if not raw:
+            self._goto_focus_address = None
             self.set_status("Goto address is empty.")
             return
         try:
             addr = int(raw, 0)
         except ValueError:
+            self._goto_focus_address = None
             self.set_status("Invalid address format.")
+            return
+        if not self._apply_goto("main", addr):
             return
         self.update_hex_view(addr)
         self.set_status(f"Goto 0x{addr:08X}")
@@ -5857,13 +5985,17 @@ class S19TuiApp(App):
         if not query:
             self.set_status("Search text is empty.")
             return
-        if self.last_search_text != query:
+        is_new_query = self.last_search_text != query
+        if is_new_query:
             self.last_search_text = query
             self.last_search_address = None
+            self._alt_goto_focus_address = None
 
         start_address = None
         if self.last_search_address is not None:
             start_address = self.last_search_address + 1
+        elif not is_new_query:
+            start_address = self._first_visible_hex_address("alt")
 
         addr = find_string_in_mem(self.current_file.mem_map, query, start_address)
         if addr is None:
@@ -5881,12 +6013,16 @@ class S19TuiApp(App):
         self._a2l_tag_hex_highlight = None
         raw = self.query_one("#alt_goto_input", Input).value.strip()
         if not raw:
+            self._alt_goto_focus_address = None
             self.set_status("Goto address is empty.")
             return
         try:
             addr = int(raw, 0)
         except ValueError:
+            self._alt_goto_focus_address = None
             self.set_status("Invalid address format.")
+            return
+        if not self._apply_goto("alt", addr):
             return
         self.update_alt_hex_view(addr)
         self.set_status(f"Goto 0x{addr:08X}")
@@ -5899,13 +6035,17 @@ class S19TuiApp(App):
         if not query:
             self.set_status("Search text is empty.")
             return
-        if self.last_search_text != query:
+        is_new_query = self.last_search_text != query
+        if is_new_query:
             self.last_search_text = query
             self.last_search_address = None
+            self._mac_goto_focus_address = None
 
         start_address = None
         if self.last_search_address is not None:
             start_address = self.last_search_address + 1
+        elif not is_new_query:
+            start_address = self._first_visible_hex_address("mac")
 
         addr = find_string_in_mem(self.current_file.mem_map, query, start_address)
         if addr is None:
@@ -5922,12 +6062,16 @@ class S19TuiApp(App):
             return
         raw = self.query_one("#mac_goto_input", Input).value.strip()
         if not raw:
+            self._mac_goto_focus_address = None
             self.set_status("Goto address is empty.")
             return
         try:
             addr = int(raw, 0)
         except ValueError:
+            self._mac_goto_focus_address = None
             self.set_status("Invalid address format.")
+            return
+        if not self._apply_goto("mac", addr):
             return
         self.update_mac_hex_view(addr)
         self.set_status(f"Goto 0x{addr:08X}")

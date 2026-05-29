@@ -1,57 +1,186 @@
 {
-    "project":  "s19_app",
-    "batch_id":  "2026-05-21-batch-04",
-    "batch_objective":  "Extend the Patch Editor to edit raw MEMORY values (memory address -\u003e value/bytes), not only A2L parameters. A unified change-set file holds BOTH the A2L parameter change-list (batch-03) and the memory-field changes. Selective export from the unified file: a CDFX for the parameter half (reusing the batch-03 CDFX writer) + a separate JSON file for the memory-field half. SCOPE: memory-change model + unified change-set file read/write + selective export. NOT in scope: applying changes to the firmware image / exporting modified S19 (remains deferred).",
-    "current_phase":  6,
-    "phase_status":  "synced",
-    "iterations_per_phase":  {
-                                 "1":  2,
-                                 "2":  2,
-                                 "3":  9,
-                                 "4":  1,
-                                 "5":  1,
-                                 "6":  1
-                             },
-    "artifacts":  {
-                      "1":  ".dev-flow/2026-05-21-batch-04/01-requirements.md",
-                      "2":  ".dev-flow/2026-05-21-batch-04/02-review.md",
-                      "4":  ".dev-flow/2026-05-21-batch-04/04-validation.md",
-                      "5":  ".dev-flow/2026-05-21-batch-04/05-postmortem.md",
-                      "6":  ".dev-flow/2026-05-21-batch-04/06-docs/"
-                  },
-    "branch":  "dev-flow/batch-02-direction-b-restyle (shared working tree - batches 02/03/04 accumulating uncommitted; owner to split/commit)",
-    "previous_batches":  [
-                             "2026-05-05-batch-01",
-                             "2026-05-20-batch-02",
-                             "2026-05-21-batch-03"
-                         ],
-    "batch_layout":  "Each batch archived under .dev-flow/\u003cYYYY-MM-DD\u003e-batch-NN/. Living docs (REQUIREMENTS.md, tests/, docs/diagrams/) kept current.",
-    "living_documentation":  {
-                                 "requirements":  "REQUIREMENTS.md (repo root)",
-                                 "tests":  "tests/",
-                                 "diagrams":  "docs/diagrams/"
-                             },
-    "autonomous_mode":  "User instructed \u0027continue for 5 more hours\u0027. Orchestrator runs batch-04 and follow-on batches autonomously: best-criteria defaults for open questions, auto-approve clean increments, gate/stop only on genuine blockers, NO commit/push/PR. Full report on user return.",
-    "decisions_log":  [
-                          {
-                              "phase":  0,
-                              "date":  "2026-05-21",
-                              "decision":  "batch-created",
-                              "notes":  "batch-04 opened (autonomous run). Memory-value editing + unified change-set + selective export. Builds on batch-03 cdfx/ package + Patch Editor. Engine consumed read-only. Note: a transient Anthropic API incident delayed the start ~12 min."
-                          },
-                          {
-                              "phase":  1,
-                              "date":  "2026-05-21",
-                              "decision":  "started",
-                              "notes":  "Phase 1. architect dispatched to derive US/HLR/LLR; open questions resolved by best-criteria defaults (user away)."
-                          },
-                          {
-                              "phase":  6,
-                              "date":  "2026-05-22",
-                              "decision":  "synced-to-obsidian",
-                              "notes":  "All 4 batches synced to vault by /dev-flow-sync-en after PR #6 merge."
-                          }
-                      ],
-    "obsidian_synced":  true,
-    "created_at":  "2026-05-21T00:00:00Z"
+    "project": "s19_app",
+    "batch_id": "2026-05-26-batch-05",
+    "batch_objective": "Hex viewer UX correctness batch: (a) hex-text search resumes from the current page after pagination, (b) the MAC tab's hex pane is wide and tall enough to render a full hex row, (c) goto handler reports out-of-range addresses and marks valid focus rows with a plain-text glyph that does not collide with the sev-* validation severity classes or the existing byte-level search/MAC highlights. TUI-only — no parser/engine changes.",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {
+        "1": 2,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1
+    },
+    "artifacts": {
+        "1": ".dev-flow/2026-05-26-batch-05/01-requirements.md",
+        "2": ".dev-flow/2026-05-26-batch-05/02-review.md",
+        "3-inc-1": ".dev-flow/2026-05-26-batch-05/03-increments/increment-001.md",
+        "3-inc-2": ".dev-flow/2026-05-26-batch-05/03-increments/increment-002.md",
+        "3-inc-3": ".dev-flow/2026-05-26-batch-05/03-increments/increment-003.md",
+        "4": ".dev-flow/2026-05-26-batch-05/04-validation.md",
+        "5": ".dev-flow/2026-05-26-batch-05/05-postmortem.md",
+        "6": ".dev-flow/2026-05-26-batch-05/06-docs/"
+    },
+    "branch": "claude/tender-ride-3d090c (worktree off main)",
+    "previous_batches": [
+        "2026-05-05-batch-01",
+        "2026-05-20-batch-02",
+        "2026-05-21-batch-03",
+        "2026-05-21-batch-04"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. Living docs (REQUIREMENTS.md, tests/, docs/diagrams/) kept current.",
+    "living_documentation": {
+        "requirements": "REQUIREMENTS.md (repo root)",
+        "tests": "tests/",
+        "diagrams": "docs/diagrams/"
+    },
+    "decisions_log": [
+        {
+            "phase": 0,
+            "date": "2026-05-21",
+            "decision": "batch-created",
+            "notes": "batch-04 opened (autonomous run). Memory-value editing + unified change-set + selective export. Builds on batch-03 cdfx/ package + Patch Editor. Engine consumed read-only."
+        },
+        {
+            "phase": 1,
+            "date": "2026-05-21",
+            "decision": "started",
+            "notes": "Phase 1. architect dispatched to derive US/HLR/LLR; open questions resolved by best-criteria defaults (user away)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-05-22",
+            "decision": "synced-to-obsidian",
+            "notes": "All 4 batches synced to vault by /dev-flow-sync-en after PR #6 merge."
+        },
+        {
+            "phase": 0,
+            "date": "2026-05-26",
+            "decision": "batch-05-created",
+            "notes": "Three hex-viewer UX defects surfaced from operator use of the batch-04 build: (a) search anchor stale after pagination, (b) MAC view hex pane width=40 too narrow, (c) goto handler silent on invalid/out-of-range addresses + no row marker. Plan approved (C:/Users/jjgh8/.claude/plans/user-stories-the-quiet-alpaca.md). Worktree: .claude/worktrees/tender-ride-3d090c."
+        },
+        {
+            "phase": 1,
+            "date": "2026-05-26",
+            "decision": "started",
+            "notes": "Phase 1. Source US-001/002/003 seeded in 01-requirements.md sections 1-2. architect + qa-reviewer dispatched in parallel to fill HLR (§3), LLR (§4), and validation strategy (§5)."
+        },
+        {
+            "phase": 1,
+            "date": "2026-05-27",
+            "decision": "approved",
+            "notes": "Phase 1 approved at gate. 3 HLR / 11 LLR / 13 TC-IDs. 0 'should' inside HLR/LLR statements. 5 architect-flagged assumptions accepted as decided defaults (MAC paging treats record-shift as pagination; per-view focus fields; _apply_goto helper; file-unload as focus-clear trigger; 'Address 0x... not in loaded file.' status copy). One minor finding for Phase 2: LLR-003.3 line 203 references tests/test_hexview.py — actual file is tests/test_tui_hexview.py."
+        },
+        {
+            "phase": 2,
+            "date": "2026-05-27",
+            "decision": "started",
+            "notes": "Phase 2. architect (re-review) + qa-reviewer + security-reviewer dispatched in parallel. Output: .dev-flow/2026-05-26-batch-05/02-review.md."
+        },
+        {
+            "phase": 2,
+            "date": "2026-05-27",
+            "decision": "forced-iterate",
+            "notes": "Phase 2 returned 3 blockers / 7 majors / 11 minors / 0 sec. Per dev-flow rule, blockers force Phase 1 iteration. Key blockers: F-A-01 (LLR-001.3 cites non-existent _alt_hex_window_start / _mac_hex_window_start — alt/MAC panes slave off tag/record selection), F-A-02 (MAC paging trigger undefined normatively), F-Q-01 (tests/test_hexview.py → tests/test_tui_hexview.py). User also decided to switch marker glyph from ▶ (U+25B6 — East-Asian-Width Ambiguous) to ASCII `>`. Width 78 → 82 per F-A-03 arithmetic."
+        },
+        {
+            "phase": 1,
+            "date": "2026-05-27",
+            "decision": "iteration-2-started",
+            "notes": "Phase 1 iteration #2. architect dispatched with full fix list — apply 3 blockers + 7 majors + 11 minors + glyph swap to 01-requirements.md, then qa-reviewer polish §5."
+        },
+        {
+            "phase": 1,
+            "date": "2026-05-27",
+            "decision": "iteration-2-completed",
+            "notes": "Phase 1 iteration #2 done. 3 HLR / 14 LLR (added LLR-001.4 for MAC record-selection trigger; LLR-002.4 for records-pane positive-width invariant). Glyph switched to ASCII `>`. Width 78 → 82. All 6 affected LLRs relabeled `test (integration)`. tests/test_hexview.py → tests/test_tui_hexview.py. §5.3 PowerShell-compatible. Orchestrator appended re-confirmation §5 to 02-review.md — all 3 blockers + 7 majors + 11 minors verified closed."
+        },
+        {
+            "phase": 2,
+            "date": "2026-05-27",
+            "decision": "approved-iteration-2",
+            "notes": "Phase 2 re-confirmation gate approved. All Phase-2 findings closed. Advancing to Phase 3 — supervised-incremental-development with 3 increments. Two open items deferred to implementer: (a) verify _handle_goto_alt / _handle_goto_mac exist as separate methods, (b) wire _first_visible_hex_address cache inside renderers, not search handler."
+        },
+        {
+            "phase": 3,
+            "date": "2026-05-27",
+            "decision": "increment-1-started",
+            "notes": "Phase 3 Increment 1 — US-01 (hex-search anchor reset on pagination + first-visible resume) across main/alt/MAC variants. Covers LLR-001.1/.2/.3/.4 and TC-001/002/002b/002c/003/003b. Scope target: s19_app/tui/app.py + tests/test_tui_app.py (2 files, well under 5-file budget)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-05-27",
+            "decision": "increment-1-approved",
+            "notes": "Increment 1 approved. 2 files (s19_app/tui/app.py + tests/test_tui_search_pagination.py). 6 new tests pass, 106 passed broader suite, 0 regressions. Deviation: LLR-001.4 named _on_mac_records_row_highlighted but actual entry-point is _jump_to_mac_address (app.py:2891-2895); impl uses real name — Phase 6 doc to amend LLR-001.4. Forward-ref for Inc-3: _<view>_goto_focus_address clears go on same 5 entry-points; consider _jump_to_validation_issue_by_index too."
+        },
+        {
+            "phase": 3,
+            "date": "2026-05-27",
+            "decision": "increment-2-started",
+            "notes": "Phase 3 Increment 2 — US-02 (MAC hex pane CSS). LLR-002.1 (#mac_hex_pane width 82), LLR-002.2 (#mac_hex_scroll height 100% overflow auto), LLR-002.3 (width-narrow preserved byte-identical), LLR-002.4 (records-pane ≥1 cell at 120). TC-004/005/006/013. Scope: styles.tcss + tests/test_tui_hexview.py (2 files)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-05-27",
+            "decision": "increment-2-approved",
+            "notes": "Increment 2 approved. 3 files (styles.tcss + tests/test_tui_mac_layout.py new + tests/test_tui_directionb.py TC-021 band update 38-42→80-84). 4 new tests pass, 101 directionb + 26 hexview, 0 regressions. Two judgment calls: TC-005 height softened to structural invariant (pane stacks title+controls above scroll — pixel equality impossible); TC-006 narrow % is proportional to #workspace_body (~113) not terminal width. Phase 6 doc: reconcile HLR-002 TC-005 wording."
+        },
+        {
+            "phase": 3,
+            "date": "2026-05-27",
+            "decision": "increment-3-started",
+            "notes": "Phase 3 Increment 3 — US-03 (goto out-of-range status + ASCII '>' focus-row marker). LLR-003.1..003.6. Spans app.py + hexview.py + tests. Per-view focus fields _goto_focus_address/_alt_goto_focus_address/_mac_goto_focus_address; _apply_goto shared helper; focus-clear reuses the 5 entry-points from Inc-1. Largest increment — may use full 5-file budget."
+        },
+        {
+            "phase": 3,
+            "date": "2026-05-28",
+            "decision": "increment-3-approved-phase-3-complete",
+            "notes": "Increment 3 approved; Phase 3 complete. 3 files (hexview.py + app.py + tests/test_tui_goto_marker.py new). 15 new tests pass, 87 hexview+app, 0 regressions, color_policy.py byte-identical. Phase-3 cumulative: 8 files (app.py, hexview.py, styles.tcss, 3 new test files, 1 updated test test_tui_directionb.py), 25 new tests. Deviation: LLR-003.1 said current_file.sorted_ranges — real attr is .ranges; impl reused _get_range_index() cached accessor. Phase 6 doc to amend LLR-003.1 + LLR-001.4 (_jump_to_mac_address)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-05-28",
+            "decision": "started",
+            "notes": "Phase 4 Validation. qa-reviewer runs full pytest suite (-m 'not slow' then full incl slow) on the §5.2 TC matrix, executes inspection items (CSS presence, git diff width-narrow + color_policy), fills 04-validation.md with per-requirement pass/fail + evidence."
+        },
+        {
+            "phase": 4,
+            "date": "2026-05-28",
+            "decision": "completed-pass-with-notes",
+            "notes": "Phase 4 PASS-WITH-NOTES. Lean path: 772 passed / 0 failed / 19 deselected / 29 skipped / 3 xfailed (xfails pre-existing). New suites 25/25 pass; slow suite 19/19. Both critical inspections pass: styles.tcss width-narrow byte-identical (diff +9/-1, only #mac_hex_pane width + #mac_hex_scroll block), color_policy.py empty diff. 0 normative 'should'. All 3 HLR + 14 LLR PASS; all 7 §5.3 criteria met; 0 blocker fails. 3 doc-only deviations for Phase 6: LLR-001.4 (_jump_to_mac_address), LLR-003.1 (_get_range_index/.ranges), HLR-002/TC-005 (structural height invariant). Caveat: local Python 3.14.4 — CI 3.11 is authoritative gate."
+        },
+        {
+            "phase": 5,
+            "date": "2026-05-28",
+            "decision": "completed",
+            "notes": "Phase 5 post-mortem co-authored by architect (§0-3,6,7) + qa-reviewer (§4-5). Metrics: 5 total iterations (Phase 1=2 forced by Phase-2 blockers, 2/3/4/5=1). 21/21 findings closed in one iteration; 0 open; 0 security defects. 25 new tests across 3 suites; 8 cumulative files; 100% LLR→TC. Lean 772 passed/0 failed; slow 19/19. Key lesson: V-model Phase-2 re-review caught F-A-01 (fabricated _alt/_mac_hex_window_start fields) before any code. Proposed preventive control: LLR symbol-citation rule (every LLR naming a private field/method/widget-id must cite grep-verified file:line at draft; layout constants flagged 'assumed — verify Phase 3'). Scope held — no creep. Action items captured incl. A-1: confirm Python 3.11 CI green pre-merge."
+        },
+        {
+            "phase": 5,
+            "date": "2026-05-28",
+            "decision": "approved",
+            "notes": "Phase 5 approved → advance to Phase 6. User added two directives: (1) adopt the LLR symbol-citation preventive control in the dev-flow req-template (DONE — added to ~/.claude/templates/dev-flow/req-template-en.md after the testing-strategy-vs-ADR rule; PROJECT_RULES.md is scoped to code docstrings so not applicable). (2) Regroup the living REQUIREMENTS.md by functional subsystem (grouping only — traceability/R-* IDs unchanged). batch-05 gets 3 new R-IDs: R-TUI-038 (US-01 search-after-pagination), R-TUI-039 (US-02 MAC pane width), R-TUI-040 (US-03 goto feedback + marker)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-05-28",
+            "decision": "started",
+            "notes": "Phase 6 Documentation. 3 parallel agents on disjoint files: (A) docs-writer regroups REQUIREMENTS.md by subsystem + adds R-TUI-038/039/040 (74→77 R-IDs, preservation invariant enforced); (B) docs-writer writes 06-docs/traceability-matrix.md + functionality.md + diagrams/*.md + reconciles 3 doc-debt edits in 01-requirements.md (LLR-001.4, LLR-003.1, HLR-002/TC-005); (C) presentation-builder writes 06-docs/executive-summary.md."
+        },
+        {
+            "phase": 6,
+            "date": "2026-05-28",
+            "decision": "completed",
+            "notes": "Phase 6 complete. REQUIREMENTS.md regrouped into 10 functional-subsystem sections (S19/HEX parsing, A2L, Validation Engine, Hex Viewer, MAC View, TUI Shell/Layout, Workspace & I/O, CDFX/Patch Editor, Memory-value Editing, Project/Doc meta); 74→77 R-IDs verified, 0 dropped, only R-TUI-038/039/040 added — traceability byte-for-byte preserved per operator constraint. 06-docs: traceability-matrix.md (0 gaps, 14 LLRs), functionality.md, executive-summary.md, 3 Mermaid diagrams. 3 doc-debt reconciliations applied to 01-requirements.md with audit notes (LLR-001.4 _jump_to_mac_address; LLR-003.1 _get_range_index/.ranges; HLR-002/TC-005 structural height). Orchestrator fixed 2 residual stale _on_mac_records_row_highlighted refs in LLR-003.6/TC-012. Symbol-citation preventive control added to req-template-en.md. Pending sync to Obsidian via /dev-flow-sync-en after PR merge."
+        },
+        {
+            "phase": 6,
+            "date": "2026-05-28",
+            "decision": "approved-batch-closed",
+            "notes": "Phase 6 gate approved. Batch-05 closed; all 6 phases complete. State → awaiting-sync. Pending USER actions: (1) confirm Python 3.11 CI green (validation ran on local 3.14.4 — CI 3.11 is authoritative, post-mortem action A-1); (2) commit/push/merge PR; (3) run /dev-flow-sync-en to upload artifacts to the Obsidian vault. obsidian_synced stays false until then. NO commit/push performed by the orchestrator."
+        }
+    ],
+    "obsidian_synced": false,
+    "created_at": "2026-05-26T00:00:00Z"
 }

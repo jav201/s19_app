@@ -1353,12 +1353,17 @@ def test_tc019_a2l_pane_order_table_then_hex(tmp_path: Path) -> None:
 
 
 def test_tc021_mac_two_panes_fixed_regime(tmp_path: Path) -> None:
-    """At >=120 columns the MAC View shows a 1fr table + fixed-40 hex pane.
+    """At >=120 columns the MAC View shows a 1fr table + fixed-82 hex pane.
 
     Intent: LLR-010.1 — the Direction B MAC View is a horizontal two-pane
     layout, a ``1fr`` records-table pane and a hex pane. At terminal
-    widths >= 120 columns the hex pane uses the fixed-width regime (40
-    +/-2 columns) and the records pane takes the ``1fr`` remainder.
+    widths >= 120 columns the hex pane uses the fixed-width regime and the
+    records pane takes the ``1fr`` remainder.
+
+    batch-05 LLR-002.1 widened the comfortable-regime ``#mac_hex_pane``
+    from 40 to 82 columns so a full hex row (marker + address + 16 bytes +
+    ASCII gutter) fits without wrapping; this test's fixed-regime bound is
+    updated from 40+/-2 to 82+/-2 to track that change.
     Asserted at both pinned fixed-regime sizes 120x30 and 160x40.
     """
 
@@ -1381,8 +1386,8 @@ def test_tc021_mac_two_panes_fixed_regime(tmp_path: Path) -> None:
             f"at {size} (>=120 cols) the MAC fixed regime must be active "
             f"(width-narrow must be unset)"
         )
-        assert 38 <= dims["hex"] <= 42, (
-            f"at {size} the MAC hex pane must be the fixed 40+/-2 cols, "
+        assert 80 <= dims["hex"] <= 84, (
+            f"at {size} the MAC hex pane must be the fixed 82+/-2 cols, "
             f"got {dims['hex']}"
         )
         assert dims["records"] > 0, (
