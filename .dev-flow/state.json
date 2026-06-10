@@ -19,7 +19,7 @@
         "5": ".dev-flow/2026-06-10-batch-07/05-postmortem.md",
         "6": ".dev-flow/2026-06-10-batch-07/06-docs/"
     },
-    "branch": "claude/sweet-yonath-bd8bd2 (worktree off main; batch-07 increments branch per-increment as needed)",
+    "branch": "claude/batch-07 (worktree; branched off main post-PR-#11; one local commit per increment, PR at batch close)",
     "previous_batches": [
         "2026-05-05-batch-01",
         "2026-05-20-batch-02",
@@ -94,6 +94,18 @@
             "date": "2026-06-10",
             "decision": "increment-E1-started",
             "notes": "E1 — changes/ package core: model.py + io.py + validate.py + tests/test_changes_schema.py + tests/test_changes_collision.py (5 files, at cap). Covers LLR-001.1..001.5 + 001.7 + 001.8 (TC-001..005, 007, 008). LLR-001.6 containment + its test file ride E2 (needs loaded-image fixtures; keeps E1 at budget). software-dev dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E1-awaiting-gate",
+            "notes": "E1 implemented + orchestrator-verified. 6 physical files (5 budget + minimal __init__ facade, reported). All Phase-2 security fixes in code: _is_text_encoding allowlist (F-S-02), v1-precedes-format (F-A-03), pre-encode guard (F-S-04), broadened exceptions, metadata-fatal->0-entries (F-A-16), strict wire grammar (F-Q-04), C-9 addresses-only messages. Results: new suites 42 passed (re-run independently 0.52s); lean 817 passed / 0 failed / 3 xfailed — reconciliation EXACT 775+42=817 (ledger R=0, sumN=42). No-Textual grep 0. 0 deviations. Local commit 809cebe — landed on stale chore/tui-ci-main-trigger branch (never switched back post-PR-#11); corrected by branching claude/batch-07 at HEAD (content intact, chore branch untouched remotely). Review packet: 03-increments/increment-E1.md. Awaiting increment gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E1-approved-E2-started",
+            "notes": "E1 approved ('Apruebo'). E2 started — apply engine + ChangeSummary + linkage + S19 save-back emitter (engine half; TUI prompt halves of 002.7/002.8 ride E3a) + containment validation. Files: changes/apply.py (NEW), changes/io.py (emit_s19_from_mem_map + filename sanitizer added), tests/test_changes_apply.py + test_changes_linkage.py + test_changes_containment.py = 5. Covers LLR-001.6, 002.1-.6 + engine halves of 002.7/.8 (TC-006, TC-009..014, TC-051-engine)."
         }
     ],
     "obsidian_synced": false,

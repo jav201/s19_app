@@ -1,20 +1,40 @@
 """
 v2 hex-first change system (`s19app-changeset`) — re-export facade.
 
-Public surface of the ``changes`` package (batch-07, HLR-001): the object
-model (``model.py``), the JSON reader/writer and rule-code constants
-(``io.py``), and the intra-document collision rule (``validate.py``).
+Public surface of the ``changes`` package (batch-07, HLR-001/HLR-002): the
+object model and change summary (``model.py``), the JSON reader/writer,
+rule-code constants, and S19 emitter (``io.py``), the intra-document
+collision rule (``validate.py``), and the apply engine (``apply.py``).
 Import from here; the modules stay the implementation detail.
 """
 
 from .model import (
     CHANGES_ARTIFACT,
+    DISPOSITION_APPLIED,
+    DISPOSITION_BLOCKED,
+    DISPOSITION_DOMAIN,
+    DISPOSITION_SKIPPED_NO_IMAGE,
+    DISPOSITION_SKIPPED_OUTSIDE,
+    DISPOSITION_SKIPPED_PARTIAL,
+    LINKAGE_A2L,
+    LINKAGE_BOTH,
+    LINKAGE_MAC,
+    LINKAGE_STANDALONE,
     ChangeDocument,
     ChangeEntry,
+    ChangeSummary,
+    ChangeSummaryEntry,
     MemoryStatus,
 )
 from .validate import CHG_COLLISION, collision_issues
+from .apply import (
+    CHG_HEX_SAVE_UNSUPPORTED,
+    apply_change_document,
+    classify_containment,
+    save_patched_image,
+)
 from .io import (
+    emit_s19_from_mem_map,
     CHG_ADDRESS_SYNTAX,
     CHG_BYTES_SYNTAX,
     CHG_ENCODE_FAIL,
@@ -48,9 +68,26 @@ __all__ = [
     "CHANGES_ARTIFACT",
     "ChangeDocument",
     "ChangeEntry",
+    "ChangeSummary",
+    "ChangeSummaryEntry",
     "MemoryStatus",
+    "DISPOSITION_APPLIED",
+    "DISPOSITION_BLOCKED",
+    "DISPOSITION_DOMAIN",
+    "DISPOSITION_SKIPPED_NO_IMAGE",
+    "DISPOSITION_SKIPPED_OUTSIDE",
+    "DISPOSITION_SKIPPED_PARTIAL",
+    "LINKAGE_A2L",
+    "LINKAGE_BOTH",
+    "LINKAGE_MAC",
+    "LINKAGE_STANDALONE",
     "CHG_COLLISION",
     "collision_issues",
+    "CHG_HEX_SAVE_UNSUPPORTED",
+    "apply_change_document",
+    "classify_containment",
+    "save_patched_image",
+    "emit_s19_from_mem_map",
     "CHG_ADDRESS_SYNTAX",
     "CHG_BYTES_SYNTAX",
     "CHG_ENCODE_FAIL",

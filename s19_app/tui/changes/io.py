@@ -92,6 +92,7 @@ __all__ = [
     "read_change_document",
     "serialize_change_document",
     "write_change_document",
+    "emit_s19_from_mem_map",
 ]
 
 # ---------------------------------------------------------------------------
@@ -339,6 +340,8 @@ def read_change_document(
     """
     issues: list[ValidationIssue] = []
 
+    resolved: Optional[Path] = None
+
     def _empty(found: Optional[dict] = None) -> ChangeDocument:
         fmt, version, kind, encoding, value_mode = _document_metadata(found)
         return ChangeDocument(
@@ -349,6 +352,7 @@ def read_change_document(
             value_mode=value_mode,
             entries=[],
             issues=issues,
+            source_path=resolved,
         )
 
     # --- Path resolution (LLR-001.7) ----------------------------------------
@@ -448,6 +452,7 @@ def read_change_document(
         value_mode=value_mode,
         entries=entries,
         issues=issues,
+        source_path=resolved,
     )
 
 
@@ -1282,3 +1287,123 @@ def _safe_name(file_name: str) -> str:
     if not bare.lower().endswith(".json"):
         bare = f"{bare}.json"
     return bare
+
+
+# ---------------------------------------------------------------------------
+# S19 emitter (LLR-002.7 / D-1) — mem_map-pure save-back serializer.
+# ---------------------------------------------------------------------------
+
+
+def emit_s19_from_mem_map(
+    mem_map: dict[int, int],
+    ranges: list[tuple[int, int]],
+) -> str:
+    """
+    Summary:
+        Serialize a sparse memory map into structurally valid Motorola S19
+        text — the NEW mem_map-based emitter of LLR-002.7 (the CLI
+        ``patch-hex --save-as`` path serializes an ``S19File`` object and is
+        not reusable here, F-A-05).
+
+    Args:
+        mem_map (dict[int, int]): Address-to-byte map of the (post-apply)
+            image. Every address inside ``ranges`` must be present — the
+            ranges are derived from the map's keys by the parse layer, and
+            the apply engine mutates values only at existing keys, so the
+            contract holds for every internal caller.
+        ranges (list[tuple[int, int]]): The image's contiguous half-open
+            ``(start, end)`` ranges (``LoadedFile.ranges`` ordering), driving
+            record emission order.
+
+    Returns:
+        str: S19 text, one record per line with a trailing newline: an empty
+        S0 header (optional per the format; emitted data-free so re-parsing
+        adds nothing to the memory map), data records of 16 data bytes max,
+        and the matching terminator. The data record type is chosen from the
+        highest emitted address — S1/S9 up to 0xFFFF, S2/S8 up to 0xFFFFFF,
+        S3/S7 above — and every record carries the one's-complement checksum
+        ``core.SRecord._calculate_checksum`` validates.
+
+    Raises:
+        KeyError: If ``ranges`` claims an address absent from ``mem_map`` —
+            a programming error in the caller, not a data-quality fault.
+
+    Data Flow:
+        - Pick the address width from the highest ``end − 1`` over ``ranges``.
+        - Emit ``S0`` (no data), then walk each range in 16-byte rows reading
+          bytes from ``mem_map``, then emit the width-matched terminator
+          (address 0, no data).
+        - Acceptance contract: the emitted text re-parses via
+          ``s19_app.core.S19File`` to a memory map equal to ``mem_map`` with
+          zero load errors.
+
+    Dependencies:
+        Uses:
+            - _s19_record
+        Used by:
+            - changes.apply.save_patched_image
+            - tests/test_changes_apply.py (round-trip assertions)
+
+    Example:
+        >>> emit_s19_from_mem_map({0x10: 0xAB}, [(0x10, 0x11)]).splitlines()[1]
+        'S1040010AB40'
+    """
+    highest = max((end - 1 for _, end in ranges), default=0)
+    if highest <= 0xFFFF:
+        data_type, address_length, terminator_type = "S1", 2, "S9"
+    elif highest <= 0xFFFFFF:
+        data_type, address_length, terminator_type = "S2", 3, "S8"
+    else:
+        data_type, address_length, terminator_type = "S3", 4, "S7"
+
+    lines = [_s19_record("S0", 2, 0, ())]
+    for start, end in ranges:
+        for row_start in range(start, end, 16):
+            row_end = min(row_start + 16, end)
+            data = tuple(mem_map[addr] for addr in range(row_start, row_end))
+            lines.append(_s19_record(data_type, address_length, row_start, data))
+    lines.append(_s19_record(terminator_type, address_length, 0, ()))
+    return "\n".join(lines) + "\n"
+
+
+def _s19_record(
+    record_type: str,
+    address_length: int,
+    address: int,
+    data: tuple[int, ...],
+) -> str:
+    """
+    Summary:
+        Build one S-record line: type, byte count, zero-padded address, data
+        bytes, and the one's-complement checksum (the ``core.py`` reference
+        structure).
+
+    Args:
+        record_type (str): The two-character record tag (``"S0"``…``"S9"``).
+        address_length (int): Address field width in bytes (2, 3, or 4 — the
+            ``ADDRESS_LENGTH_MAP`` widths).
+        address (int): The record address; must fit ``address_length`` bytes.
+        data (tuple[int, ...]): The data bytes — empty for the header and
+            terminator records this module emits.
+
+    Returns:
+        str: The uppercase-hex record line without a newline. ``byte_count``
+        is ``address_length + len(data) + 1``; the checksum is the
+        one's-complement of the LSB of ``byte_count + address bytes + data``
+        (matching ``SRecord._calculate_checksum``).
+
+    Dependencies:
+        Used by:
+            - emit_s19_from_mem_map
+    """
+    byte_count = address_length + len(data) + 1
+    address_bytes = [
+        (address >> (8 * shift)) & 0xFF
+        for shift in reversed(range(address_length))
+    ]
+    checksum = (~(byte_count + sum(address_bytes) + sum(data))) & 0xFF
+    data_text = "".join(f"{byte:02X}" for byte in data)
+    return (
+        f"{record_type}{byte_count:02X}"
+        f"{address:0{address_length * 2}X}{data_text}{checksum:02X}"
+    )

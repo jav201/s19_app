@@ -28,6 +28,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Optional, Union
 
 from ...validation.model import ValidationIssue, ValidationSeverity
@@ -202,6 +203,11 @@ class ChangeDocument:
             content is not interpreted under a faulted envelope (F-A-16).
         issues (list[ValidationIssue]): Every collected schema, metadata,
             per-entry, collision, and resource-ceiling finding.
+        source_path (Optional[Path]): The resolved on-disk path the document
+            was read from — stamped by ``changes.io.read_change_document`` so
+            the E2 apply engine can record it as ``ChangeSummary.source_path``
+            (§6.2 C-6). ``None`` for a programmatically composed document or
+            when path resolution failed.
 
     Returns:
         None: Dataclass container.
@@ -237,6 +243,7 @@ class ChangeDocument:
     value_mode: str
     entries: list[ChangeEntry] = field(default_factory=list)
     issues: list[ValidationIssue] = field(default_factory=list)
+    source_path: Optional[Path] = None
 
     @property
     def has_errors(self) -> bool:
@@ -252,3 +259,259 @@ class ChangeDocument:
         return any(
             issue.severity is ValidationSeverity.ERROR for issue in self.issues
         )
+
+
+# ---------------------------------------------------------------------------
+# E2 apply-summary vocabulary (LLR-002.5 / §6.2 C-6).
+# ---------------------------------------------------------------------------
+
+#: Disposition token — the entry's encoded run was written to the memory map
+#: (its containment verdict was ``INSIDE``, LLR-002.2).
+DISPOSITION_APPLIED = "applied"
+
+#: Disposition token — unwritten: the run straddles a loaded-range edge or
+#: spans an inter-range gap (``PARTIAL``, LLR-002.2).
+DISPOSITION_SKIPPED_PARTIAL = "skipped-partial"
+
+#: Disposition token — unwritten: the run overlaps no loaded range
+#: (``OUTSIDE``, LLR-002.2).
+DISPOSITION_SKIPPED_OUTSIDE = "skipped-outside"
+
+#: Disposition token — unwritten: no firmware image is loaded
+#: (``UNVALIDATED_NO_IMAGE``, LLR-002.2).
+DISPOSITION_SKIPPED_NO_IMAGE = "skipped-no-image"
+
+#: Disposition token — unwritten: the apply gate refused the whole document
+#: (an ERROR-severity issue, or ``kind`` ≠ ``"change"`` — LLR-002.1).
+DISPOSITION_BLOCKED = "blocked"
+
+#: The full disposition domain in its canonical order (F-A-04). Every
+#: ``ChangeSummary.counts`` dict carries exactly these keys, all present even
+#: when zero, so report tables never branch on missing keys.
+DISPOSITION_DOMAIN: tuple[str, ...] = (
+    DISPOSITION_APPLIED,
+    DISPOSITION_SKIPPED_PARTIAL,
+    DISPOSITION_SKIPPED_OUTSIDE,
+    DISPOSITION_SKIPPED_NO_IMAGE,
+    DISPOSITION_BLOCKED,
+)
+
+#: Linkage token — the entry's range touches no MAC record and no A2L tag
+#: range (LLR-002.6).
+LINKAGE_STANDALONE = "standalone"
+
+#: Linkage token — the entry's range contains at least one MAC record
+#: address (LLR-002.6).
+LINKAGE_MAC = "mac-linked"
+
+#: Linkage token — the entry's range intersects at least one A2L tag range
+#: (LLR-002.6).
+LINKAGE_A2L = "a2l-linked"
+
+#: Linkage token — both a MAC record and an A2L tag range are touched
+#: (LLR-002.6).
+LINKAGE_BOTH = "both"
+
+
+@dataclass(slots=True)
+class ChangeSummaryEntry:
+    """
+    Summary:
+        One per-entry record of a :class:`ChangeSummary` — the §6.2 C-6
+        canonical per-entry field set produced by the E2 apply engine
+        (LLR-002.5).
+
+    Args:
+        entry_type (str): The source entry's kind — ``"string"`` or
+            ``"bytes"``.
+        address_start (int): Inclusive start of the entry's addressed byte
+            range (``ChangeEntry.addressed_range[0]``).
+        address_end (int): Exclusive end of the addressed byte range —
+            ``address_end − address_start`` is the encoded byte length.
+        before_bytes (Optional[tuple[int, ...]]): The prior byte values read
+            from the memory map immediately before mutation (LLR-002.3).
+            ``None`` for every non-``applied`` disposition — no bytes were
+            read because none were written.
+        after_bytes (tuple[int, ...]): The entry's declared encoded run — what
+            the range holds after an ``applied`` write, and what it *would*
+            have held for a skipped or blocked entry.
+        disposition (str): One token of :data:`DISPOSITION_DOMAIN`.
+        linkage (str): The informative classification —
+            :data:`LINKAGE_STANDALONE` / :data:`LINKAGE_MAC` /
+            :data:`LINKAGE_A2L` / :data:`LINKAGE_BOTH` (LLR-002.6). Never
+            affects ``disposition``.
+        linkage_symbol (Optional[str]): The matching MAC/A2L symbol name when
+            linked (MAC name preferred on a ``both`` classification);
+            ``None`` when standalone or the matching record is unnamed.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by ``changes.apply.apply_change_document``, one per document
+          entry in document order; consumed by ``ChangeSummary.to_dict`` and,
+          in later increments, by the report generator (LLR-007.4).
+
+    Dependencies:
+        Used by:
+            - ChangeSummary
+            - changes.apply.apply_change_document
+    """
+
+    entry_type: str
+    address_start: int
+    address_end: int
+    before_bytes: Optional[tuple[int, ...]]
+    after_bytes: tuple[int, ...]
+    disposition: str
+    linkage: str
+    linkage_symbol: Optional[str]
+
+
+@dataclass(slots=True)
+class ChangeSummary:
+    """
+    Summary:
+        The change-summary object returned by the E2 apply engine — the §6.2
+        C-6 canonical producer schema consumed by the execution and report
+        layers (LLR-002.5, extended per B-1/B-2/F-A-04).
+
+    Args:
+        source_path (Optional[Path]): The change file the document was read
+            from (``ChangeDocument.source_path``); ``None`` for a
+            programmatically composed document.
+        kind (str): The document discriminator as declared — ``"change"`` for
+            an applicable document; a non-``"change"`` kind is part of why a
+            summary came back all-``blocked``.
+        encoding (str): The document's declared text codec.
+        value_mode (str): The document's declared value mode.
+        timestamp_utc (str): ISO-8601 UTC timestamp of the apply run, taken
+            from the engine's injectable ``now_fn`` clock (B-4).
+        variant_id (Optional[str]): The project variant the apply targeted;
+            ``None`` outside multi-variant execution (US-005 arrives at E5/E6).
+        counts (dict[str, int]): Aggregate entry counts keyed by every token
+            of :data:`DISPOSITION_DOMAIN` — all five keys always present
+            (F-A-04).
+        entries (list[ChangeSummaryEntry]): Per-entry records in document
+            order.
+        issues (list[ValidationIssue]): The document's collected declaration
+            faults, carried so they reach the Patch Editor panel and the
+            project report (LLR-002.8).
+        saved_path (Optional[Path]): Where the patched image was persisted
+            (LLR-002.7) — recorded by the save-back caller after
+            ``changes.apply.save_patched_image`` succeeds; ``None`` when the
+            operator declined, the image was Intel HEX, or no save happened.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by ``changes.apply.apply_change_document``; ``saved_path`` is
+          stamped afterwards by the save-back flow (TUI prompt at E3a,
+          explicit filename parameter headless).
+        - ``to_dict`` is the serialization consumed by the report generator
+          (LLR-007.4) and by determinism tests (LLR-002.5).
+
+    Dependencies:
+        Uses:
+            - ChangeSummaryEntry
+            - ValidationIssue
+        Used by:
+            - changes.apply.apply_change_document
+            - The E6 execution layer and E7 report generator (later
+              increments).
+
+    Example:
+        >>> summary = ChangeSummary(
+        ...     source_path=None, kind="change", encoding="utf-8",
+        ...     value_mode="text", timestamp_utc="2026-06-10T12:00:00+00:00",
+        ...     variant_id=None,
+        ...     counts={token: 0 for token in DISPOSITION_DOMAIN},
+        ... )
+        >>> summary.to_dict()["counts"]["applied"]
+        0
+    """
+
+    source_path: Optional[Path]
+    kind: str
+    encoding: str
+    value_mode: str
+    timestamp_utc: str
+    variant_id: Optional[str]
+    counts: dict[str, int]
+    entries: list[ChangeSummaryEntry] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
+    saved_path: Optional[Path] = None
+
+    def to_dict(self) -> dict[str, object]:
+        """
+        Summary:
+            Serialize this summary to a deterministic plain-data dict — same
+            object, same dict, every call; entries in document order
+            (LLR-002.5).
+
+        Returns:
+            dict[str, object]: JSON-compatible mapping: paths as strings (or
+            ``None``), byte tuples as lists, ``counts`` with all five
+            :data:`DISPOSITION_DOMAIN` keys in canonical order, ``issues`` as
+            ``{code, severity, message, artifact, symbol, address}`` dicts,
+            and ``entries`` as per-entry dicts in document order.
+
+        Data Flow:
+            - Rebuilt from the dataclass fields on every call — no caching,
+              no mutation — so two calls on one object compare equal and two
+              applies over deep-copied inputs under a fixed clock compare
+              equal (B-4).
+
+        Dependencies:
+            Uses:
+                - ChangeSummaryEntry
+            Used by:
+                - tests/test_changes_apply.py (determinism assertions)
+                - The E7 report generator (later increment).
+        """
+        return {
+            "source_path": (
+                str(self.source_path) if self.source_path is not None else None
+            ),
+            "kind": self.kind,
+            "encoding": self.encoding,
+            "value_mode": self.value_mode,
+            "timestamp_utc": self.timestamp_utc,
+            "variant_id": self.variant_id,
+            "counts": {
+                token: self.counts.get(token, 0)
+                for token in DISPOSITION_DOMAIN
+            },
+            "saved_path": (
+                str(self.saved_path) if self.saved_path is not None else None
+            ),
+            "issues": [
+                {
+                    "code": issue.code,
+                    "severity": issue.severity.value,
+                    "message": issue.message,
+                    "artifact": issue.artifact,
+                    "symbol": issue.symbol,
+                    "address": issue.address,
+                }
+                for issue in self.issues
+            ],
+            "entries": [
+                {
+                    "entry_type": entry.entry_type,
+                    "address_start": entry.address_start,
+                    "address_end": entry.address_end,
+                    "before_bytes": (
+                        list(entry.before_bytes)
+                        if entry.before_bytes is not None
+                        else None
+                    ),
+                    "after_bytes": list(entry.after_bytes),
+                    "disposition": entry.disposition,
+                    "linkage": entry.linkage,
+                    "linkage_symbol": entry.linkage_symbol,
+                }
+                for entry in self.entries
+            ],
+        }
