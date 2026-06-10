@@ -38,6 +38,10 @@ s19tui = "s19_app.tui:main"
 include = ["s19_app*"]
 
 [tool.pytest.ini_options]
+# Make the repo root importable so `from tests.conftest import ...` works
+# under a bare `pytest` invocation (CI) exactly as it does under
+# `python -m pytest` (which prepends the cwd to sys.path itself).
+pythonpath = ["."]
 markers = [
     "slow: marks tests as slow perf smoke tests (deselect with -m 'not slow')",
     "snapshot: marks pytest-textual-snapshot layout-drift tests (deselect with -m 'not snapshot')",
