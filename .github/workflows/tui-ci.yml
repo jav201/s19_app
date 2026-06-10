@@ -3,6 +3,7 @@ name: tui-ci
 on:
   pull_request:
     branches:
+      - main
       - main-tui
   push:
     branches:
@@ -25,6 +26,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install pytest
+          # Test-only dependency: tests/test_examples_pilot_gifs.py imports
+          # PIL to render the example GIFs (dev tooling, not a runtime dep).
+          python -m pip install pillow
           python -m pip install -e .
 
       - name: Run test suite

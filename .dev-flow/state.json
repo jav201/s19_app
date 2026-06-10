@@ -150,6 +150,18 @@
             "date": "2026-06-10",
             "decision": "approved-batch-closed",
             "notes": "Phase 6 gate approved by operator ('apruebo'). Batch-06 closed; all 6 phases complete. State -> awaiting-sync. A-1 (env-measurement rule into req template) and A-3 (tui-ci trigger fix) remain UNCONFIRMED by operator after two asks — not executed, carried as open action items. Proceeding with pre-authorized commit/push/PR/review/merge; obsidian_synced stays false until /dev-flow-sync runs post-merge."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-10",
+            "decision": "committed-pushed-merged",
+            "notes": "Committed 649a543 (17 files, +1208/-210), pushed claude/sweet-yonath-bd8bd2, opened PR #10, code-review at medium effort (verdict: Approve — 0 critical, 2 informational notes), merged to main (merge commit 9fb25b2). NOTE: tui-ci.yml did not run (triggers only on main-tui PRs — open action A-3); local validation 775/0 + slow 19/19 is the de-facto gate, same as PRs #6-#10. Pending USER actions: (1) run /dev-flow-sync to upload batch artifacts to the Obsidian G: vault (use the canonical G: path, NOT the stale hardcoded path in the sync command — see project memory); (2) decide A-1 (env-measurement rule into req template) and A-3 (CI trigger fix). This state.json update is uncommitted — it rides with the post-sync record commit, matching the batch-05 pattern (e9cb496)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-10",
+            "decision": "postmortem-action-items-applied",
+            "notes": "Operator decided the open post-mortem items: A-1 APPROVED — the Environmental-measurement citation rule (verbatim from 05-postmortem.md §5) inserted into ~/.claude/templates/dev-flow/req-template-en.md immediately after the LLR symbol-citation rule block (template lives outside the repo; no git). A-3 APPROVED — 'main' added to the pull_request trigger branches in .github/workflows/tui-ci.yml (push trigger left main-tui-only by design: PR gate is the goal), shipped via mini-branch + PR + merge (pre-authorized). A-5 DISCARDED by operator (typo; A-3 resolves the interpreter gap as a side effect — the 3.11 CI gate now runs on every PR to main). Remaining open from the post-mortem: A-4/A-6/A-9 (batch-07 method items), A-7 (watch item), A-8 (sync — in progress)."
         }
     ],
     "obsidian_synced": false,
