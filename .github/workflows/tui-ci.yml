@@ -3,6 +3,7 @@ name: tui-ci
 on:
   pull_request:
     branches:
+      - main
       - main-tui
   push:
     branches:
