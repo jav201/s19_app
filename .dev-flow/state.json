@@ -154,6 +154,18 @@
             "date": "2026-06-10",
             "decision": "increment-E4-approved-E5a-started",
             "notes": "E4 approved. E5a started — multi-variant workspace + models: LLR-005.1 (remove 1-S19 limit, keep MAC/A2L singles, deterministic (name.lower(), name) sort), 005.2 (VariantDescriptor + ProjectVariantSet NEW in models.py; LoadedFile additive variant_id only), 005.3 (single-S19 backward compat). Files: workspace.py, models.py, tests/test_workspace_variants.py NEW (+ survival-guard runs of test_tui_app/test_tui_services). E5b takes the TUI selector (005.4/.5); manifest-dependent default (005.6) rides E6 per F-A-06."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E5a-awaiting-gate",
+            "notes": "E5a implemented + orchestrator-verified. 7 files (4 planned + 3 legacy lock-test flips, 49 lines, surfaced for ratification — they asserted the exact 1-S19 cardinality US-005 removes; conflict rule applied: newer requirement supersedes). Results: 12 new tests; targeted 45 passed; survival guards 66 passed (LoadedFile compat proven, 0 rewrites); lean 630/0 — ledger exact 618+12. FLAGS for next gates: duplicate variant_id when fw.s19+fw.hex coexist (stems collide — E6 manifest decision); _sync_loaded_file_to_project silently skips 2nd-S19 sync (E5b decides append-as-variant); _handle_save_project cross-suffix guard now contradicts variant model (E5b reworks). Commit 06ca1df. Packet: increment-E5a.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E5a-approved-E5b-started",
+            "notes": "E5a approved with the 3 lock-test flips ratified. E5b started — variant selector UI: LLR-005.4 (activation through the existing worker-thread load pipeline, zero new parse call sites), 005.5 (SelectVariantScreen modal + action_select_variant + update_project_labels '(i/N)'), 005.6-partial (first-variant default on project load; manifest override rides E6), + the two E5a app.py findings: rework _handle_save_project cross-suffix guard (contradicts variant model) and make 2nd-S19 sync append-as-variant with a status line (was silent skip). Files: app.py, screens.py, tests/test_tui_variants.py NEW (+styles.tcss if modal css needed) <= 5."
         }
     ],
     "obsidian_synced": false,

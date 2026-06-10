@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from textual.app import ComposeResult
 from textual.containers import Container
@@ -186,3 +186,77 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
             label_widget = selected.query_one(Label)
             name = label_widget.text if hasattr(label_widget, "text") else str(label_widget)
             self.dismiss(name)
+
+
+class SelectVariantScreen(ModalScreen[Optional[str]]):
+    """Modal dialog for selecting the active S19/HEX variant of a project.
+
+    Follows the ``LoadProjectScreen`` pattern (LLR-005.5): a ``ListView`` of
+    display labels plus confirm/cancel buttons, dismissing with the chosen
+    ``variant_id`` or ``None`` on cancel. The caller supplies pre-computed
+    ``(variant_id, display_label)`` pairs — when two variants share a
+    filename stem (e.g. ``fw.s19`` + ``fw.hex``) the app passes the full
+    filename as the display label — and the selection resolves by list
+    index, never by parsing label text back. Styling reuses the shared
+    Calm Dark ``.modal-dialog`` token classes from ``styles.tcss``.
+    """
+
+    def __init__(
+        self,
+        project_name: str,
+        options: List[Tuple[str, str]],
+        active_index: int,
+    ) -> None:
+        super().__init__()
+        self.project_name = project_name
+        self.options = options
+        self.active_index = active_index
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label(
+                f"Select variant (project '{self.project_name}'):",
+                classes="modal-title",
+            ),
+            ListView(
+                *[
+                    ListItem(
+                        Label(
+                            f"{display} (active)"
+                            if index == self.active_index
+                            else display
+                        )
+                    )
+                    for index, (_variant_id, display) in enumerate(self.options)
+                ],
+                id="variant_list",
+            ),
+            Container(
+                Button("Activate", id="variant_ok", classes="modal-confirm"),
+                Button("Cancel", id="variant_cancel"),
+                id="load_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        list_view = self.query_one("#variant_list", ListView)
+        if 0 <= self.active_index < len(self.options):
+            list_view.index = self.active_index
+        list_view.focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "variant_cancel":
+            logger.info("SelectVariantScreen dismissed by cancel.")
+            self.dismiss(None)
+            return
+        if event.button.id == "variant_ok":
+            list_view = self.query_one("#variant_list", ListView)
+            index = list_view.index
+            if index is None or not (0 <= index < len(self.options)):
+                return
+            variant_id = self.options[index][0]
+            logger.info("SelectVariantScreen dismissing with variant_id=%s", variant_id)
+            self.dismiss(variant_id)

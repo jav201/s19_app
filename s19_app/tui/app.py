@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import deque
+from collections import Counter, deque
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
@@ -42,9 +42,15 @@ from .hexview import (
 )
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
-from .models import LoadedFile
+from .models import LoadedFile, ProjectVariantSet
 from .rail import Rail, RailItem
-from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
+from .screens import (
+    LoadFileScreen,
+    LoadProjectScreen,
+    SaveProjectPayload,
+    SaveProjectScreen,
+    SelectVariantScreen,
+)
 from .screens_directionb import (
     AbDiffPanel,
     BookmarksPlaceholder,
@@ -68,6 +74,7 @@ from .workspace import (
     SUPPORTED_EXTENSIONS,
     WORKAREA_TEMP,
     WorkareaContainmentError,
+    build_variant_set,
     copy_into_workarea,
     ensure_workarea,
     resolve_input_path,
@@ -471,6 +478,7 @@ class S19TuiApp(App):
         Binding("o", "open_workarea", "Open workarea", show=False),
         Binding("s", "save_project", "Save project", show=False),
         Binding("p", "load_project", "Load project", show=False),
+        Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
@@ -587,6 +595,17 @@ class S19TuiApp(App):
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
         self._change_service = ChangeService()
+        #: Multi-variant project state (LLR-005.5/005.6): the active project's
+        #: ordered S19/HEX variant inventory, or ``None`` when no project is
+        #: active. Built by ``workspace.build_variant_set`` on project
+        #: load/save and updated on variant switch / variant append.
+        self._variant_set: Optional[ProjectVariantSet] = None
+        #: Variant id to stamp onto the next applied primary ``LoadedFile``.
+        #: Set on the main thread immediately before a load dispatch and
+        #: consumed by ``_apply_prepared_load`` on the main thread, so the
+        #: parse worker signature stays untouched and the worker never reads
+        #: this field (LLR-005.4 thread contract). Cleared on load failure.
+        self._pending_variant_id: Optional[str] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -1714,6 +1733,146 @@ class S19TuiApp(App):
         self.logger.info("Load project action triggered. projects=%s", projects)
         self.push_screen(LoadProjectScreen(projects), self._handle_load_project)
 
+    def action_select_variant(self) -> None:
+        """
+        Summary:
+            Open the variant-selector modal for the active project (LLR-005.5).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail with a status message when no project variant set exists.
+            - Build ``(variant_id, display)`` options via
+              ``_variant_display_options`` and locate the active index.
+            - Push ``SelectVariantScreen`` with ``_handle_select_variant`` as
+              the dismiss callback.
+
+        Dependencies:
+            Uses:
+                - ``_variant_display_options``
+                - ``SelectVariantScreen`` / ``push_screen``
+            Used by:
+                - ``v`` keybinding / command palette entry
+        """
+        variant_set = self._variant_set
+        if variant_set is None or not variant_set.variants:
+            self.set_status("No project variants to select.")
+            self.logger.info("Select variant action triggered with no variant set.")
+            return
+        options = self._variant_display_options(variant_set)
+        active_index = next(
+            (
+                index
+                for index, variant in enumerate(variant_set.variants)
+                if variant.variant_id == variant_set.active_id
+            ),
+            0,
+        )
+        self.logger.info(
+            "Select variant action triggered. variants=%s active=%s",
+            [variant.variant_id for variant in variant_set.variants],
+            variant_set.active_id,
+        )
+        self.push_screen(
+            SelectVariantScreen(variant_set.project_name, options, active_index),
+            self._handle_select_variant,
+        )
+
+    def _handle_select_variant(self, variant_id: Optional[str]) -> None:
+        """
+        Summary:
+            Activate the variant chosen in ``SelectVariantScreen`` through the
+            existing threaded load pipeline (LLR-005.4).
+
+        Args:
+            variant_id (Optional[str]): Chosen variant id, or ``None`` on cancel.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Resolve the descriptor in the current variant set (first match
+              when duplicate ids exist — E6 decides duplicate-id policy).
+            - Stamp ``_pending_variant_id`` on the main thread, then dispatch
+              ``load_from_path`` so parsing runs on the load worker thread and
+              ``_apply_prepared_load`` installs + stamps on the main thread.
+
+        Dependencies:
+            Uses:
+                - ``load_from_path`` (existing load pipeline)
+            Used by:
+                - ``action_select_variant`` (modal dismiss callback)
+        """
+        if variant_id is None:
+            self.logger.info("Select variant canceled.")
+            return
+        variant_set = self._variant_set
+        if variant_set is None:
+            return
+        descriptor = next(
+            (
+                variant
+                for variant in variant_set.variants
+                if variant.variant_id == variant_id
+            ),
+            None,
+        )
+        if descriptor is None:
+            self.set_status(f"Variant not found: {variant_id}")
+            self.logger.warning("Variant not found in set: %s", variant_id)
+            return
+        if not descriptor.path.exists():
+            self.set_status(f"Variant file missing: {descriptor.path.name}")
+            self.logger.warning("Variant file missing on disk: %s", descriptor.path)
+            return
+        self.logger.info(
+            "Activating variant '%s' via load pipeline: %s",
+            variant_id,
+            descriptor.path,
+        )
+        self._pending_variant_id = variant_id
+        self.load_from_path(descriptor.path)
+
+    def _variant_display_options(
+        self, variant_set: ProjectVariantSet
+    ) -> list[tuple[str, str]]:
+        """
+        Summary:
+            Build ``(variant_id, display_label)`` pairs for the variant
+            selector and the project context label.
+
+        Args:
+            variant_set (ProjectVariantSet): Variant inventory to label.
+
+        Returns:
+            list[tuple[str, str]]: One pair per variant in set order. The
+            display label is the ``variant_id`` (filename stem), or the full
+            filename when two variants share a stem (e.g. ``fw.s19`` +
+            ``fw.hex`` — display-only disambiguation; the duplicate-id model
+            itself is an E6 decision).
+
+        Data Flow:
+            - Count variant_id occurrences, then map each variant to its stem
+              or, on duplicates, its ``path.name``.
+
+        Dependencies:
+            Used by:
+                - ``action_select_variant``
+                - ``update_project_labels``
+        """
+        counts = Counter(variant.variant_id for variant in variant_set.variants)
+        return [
+            (
+                variant.variant_id,
+                variant.path.name if counts[variant.variant_id] > 1 else variant.variant_id,
+            )
+            for variant in variant_set.variants
+        ]
+
     def action_dump_a2l_json(self) -> None:
         """Dump parsed A2L data into JSON in temp."""
         if not self.current_a2l_data:
@@ -2451,12 +2610,11 @@ class S19TuiApp(App):
             self.logger.warning("Project validation failed: %s", error)
             return
         existing_suffixes = {item.suffix.lower() for item in data_files}
-        if self.current_file and self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
-            has_primary = any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes)
-            if has_primary and self.current_file.path.suffix.lower() not in existing_suffixes:
-                self.set_status("Project already has an S19/HEX file.")
-                self.logger.warning("Project already has primary data file: %s", project_dir)
-                return
+        # Multi-variant model (E5b, US-005): saving an S19/HEX into a project
+        # that already holds primaries is a legitimate variant addition — the
+        # pre-batch cross-suffix rejection is retired. Filename collisions are
+        # deduplicated by ``copy_into_workarea`` (`_<N>` suffix); the single-MAC
+        # and single-A2L guards below are preserved (LLR-005.1).
         if self.current_file and self.current_file.mac_path:
             has_mac = ".mac" in existing_suffixes
             if has_mac and self.current_file.mac_path.name not in {item.name for item in data_files}:
@@ -2467,10 +2625,13 @@ class S19TuiApp(App):
             self.set_status("Project already has an A2L file.")
             self.logger.warning("Project already has A2L file: %s", project_dir)
             return
+        saved_variant_id: Optional[str] = None
         try:
             if self.current_file:
                 saved = copy_into_workarea(self.current_file.path, project_dir)
                 self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
+                if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
+                    saved_variant_id = saved.stem
                 if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
                     saved_mac = copy_into_workarea(self.current_file.mac_path, project_dir)
                     self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
@@ -2483,7 +2644,26 @@ class S19TuiApp(App):
             return
         self.current_project = cleaned
         self.current_project_dir = project_dir
-        self.set_status(f"Saved project to {project_dir}")
+        # Rebuild the variant inventory from the on-disk project so the saved
+        # image becomes the active variant (multi-variant model, E5b).
+        saved_data_files, _saved_a2l_files, variant_error = validate_project_files(project_dir)
+        if variant_error is None:
+            self._variant_set = build_variant_set(
+                cleaned, saved_data_files, active_id=saved_variant_id
+            )
+            if saved_variant_id and self.current_file:
+                self.current_file.variant_id = saved_variant_id
+        else:
+            self._variant_set = None
+            self.logger.warning(
+                "Variant set not built after save: %s", variant_error
+            )
+        if saved_variant_id:
+            self.set_status(
+                f"Saved project to {project_dir} (variant '{saved_variant_id}')"
+            )
+        else:
+            self.set_status(f"Saved project to {project_dir}")
         self.update_project_labels()
         self.refresh_files()
 
@@ -2505,7 +2685,12 @@ class S19TuiApp(App):
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No data files in project: %s", name)
             return
-        primary_file = next((item for item in data_files if item.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS), None)
+        # Multi-variant model (LLR-005.6): activate the FIRST variant in the
+        # deterministic ``(name.lower(), name)`` order of ``build_variant_set``.
+        # The manifest-recorded ``active_variant`` override ships in E6.
+        variant_set = build_variant_set(name, data_files)
+        active_variant = variant_set.variants[0] if variant_set.variants else None
+        primary_file = active_variant.path if active_variant else None
         mac_file = next((item for item in data_files if item.suffix.lower() in MAC_EXTENSIONS), None)
         selected_file = primary_file or mac_file
         if selected_file is None:
@@ -2514,6 +2699,10 @@ class S19TuiApp(App):
             return
         self.current_project = name
         self.current_project_dir = project_dir.resolve()
+        self._variant_set = variant_set
+        self._pending_variant_id = (
+            active_variant.variant_id if active_variant else None
+        )
         self.load_selected_file(selected_file, a2l_files)
         if primary_file and mac_file:
             self.load_selected_file(mac_file, a2l_files)
@@ -2530,7 +2719,37 @@ class S19TuiApp(App):
         return projects
 
     def _sync_loaded_file_to_project(self) -> None:
-        """Copy loaded data file into active project if allowed."""
+        """
+        Summary:
+            Copy the freshly loaded data file into the active project —
+            appending S19/HEX loads as new project variants (E5a finding 2:
+            the pre-batch silent skip is retired).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail when no file or no active project directory exists.
+            - Primary (S19/HEX) loads: skip when ``current_file.variant_id``
+              already names a variant in ``_variant_set`` (a variant
+              activation reload); otherwise copy the file in, rebuild the
+              variant set with the new file active, stamp
+              ``current_file.variant_id``, and report the appended variant in
+              the status line.
+            - MAC loads keep the pre-batch single-MAC sync rules.
+
+        Dependencies:
+            Uses:
+                - ``validate_project_files`` / ``build_variant_set`` /
+                  ``copy_into_workarea``
+                - ``update_project_labels`` / ``set_status``
+            Used by:
+                - ``_start_load_worker`` (via ``call_from_thread``, after
+                  ``_apply_prepared_load`` installed the load)
+        """
         if not self.current_file:
             return
         project_dir = self._active_project_dir()
@@ -2547,9 +2766,42 @@ class S19TuiApp(App):
             existing_suffixes = set()
         try:
             if self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
-                if not any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes):
-                    copy_into_workarea(self.current_file.path, project_dir)
-                    self.logger.info("Synced primary data file into project: %s", project_dir)
+                known_variant_ids = (
+                    {variant.variant_id for variant in self._variant_set.variants}
+                    if self._variant_set is not None
+                    else set()
+                )
+                if (
+                    self.current_file.variant_id is not None
+                    and self.current_file.variant_id in known_variant_ids
+                ):
+                    # Variant activation reload — the image already belongs to
+                    # the project; nothing to append.
+                    self.logger.info(
+                        "Sync skipped: variant '%s' already in project %s",
+                        self.current_file.variant_id,
+                        project_dir,
+                    )
+                else:
+                    saved = copy_into_workarea(self.current_file.path, project_dir)
+                    project_name = self.current_project or project_dir.name
+                    synced_files, _synced_a2l, sync_error = validate_project_files(project_dir)
+                    if sync_error is None:
+                        self._variant_set = build_variant_set(
+                            project_name, synced_files, active_id=saved.stem
+                        )
+                        self.current_file.variant_id = saved.stem
+                        self.update_project_labels()
+                    else:
+                        self.logger.warning(
+                            "Variant set not rebuilt during sync: %s", sync_error
+                        )
+                    self.set_status(
+                        f"Added variant '{saved.stem}' to project '{project_name}'"
+                    )
+                    self.logger.info(
+                        "Appended variant '%s' into project: %s", saved.stem, project_dir
+                    )
             elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
                 copy_into_workarea(self.current_file.path, project_dir)
                 self.logger.info("Synced MAC data file into project: %s", project_dir)
@@ -2713,10 +2965,12 @@ class S19TuiApp(App):
         self._flush_logger()
         normalized = resolve_input_path(path, self.base_dir)
         if not normalized:
+            self._pending_variant_id = None
             self.set_status(f"File not found: {path}")
             self.logger.warning("File not found: %s", path)
             return
         if normalized.suffix.lower() not in SUPPORTED_EXTENSIONS:
+            self._pending_variant_id = None
             self.set_status(f"Unsupported file type: {normalized.suffix}")
             self.logger.warning("Unsupported file type: %s", normalized.suffix)
             return
@@ -2728,6 +2982,7 @@ class S19TuiApp(App):
         try:
             copied = copy_into_workarea(normalized, temp_dir)
         except WorkareaContainmentError as exc:
+            self._pending_variant_id = None
             self.set_progress(0, "")
             self.set_status(f"Cannot load file: {exc}")
             self.logger.warning("Load rejected by workarea guard: %s", exc)
@@ -3802,6 +4057,9 @@ class S19TuiApp(App):
             mac_path=existing.mac_path,
             mac_records=existing.mac_records,
             mac_diagnostics=existing.mac_diagnostics,
+            # A new primary is a new image: keep the incoming payload's
+            # variant identity (stamped at apply time), never the old one.
+            variant_id=primary_loaded.variant_id,
         )
 
     def _merge_mac_with_existing_primary(self, mac_loaded: LoadedFile) -> LoadedFile:
@@ -3842,6 +4100,9 @@ class S19TuiApp(App):
             mac_path=mac_loaded.mac_path,
             mac_records=mac_loaded.mac_records,
             mac_diagnostics=mac_loaded.mac_diagnostics,
+            # The primary image is unchanged — its variant identity survives
+            # the MAC overlay (project MAC follow-up load, LLR-005.6).
+            variant_id=existing.variant_id,
         )
 
     def _invalidate_mac_view_cache(self) -> None:
@@ -4120,6 +4381,7 @@ class S19TuiApp(App):
         try:
             loaded = self._parse_loaded_file(path, a2l_files)
         except Exception as exc:
+            self._pending_variant_id = None
             self.set_status(f"Load failed: {exc}")
             self.logger.exception(
                 "Load failed for path=%s suffix=%s project=%s",
@@ -4129,6 +4391,7 @@ class S19TuiApp(App):
             )
             return
         if loaded is None:
+            self._pending_variant_id = None
             suffix = path.suffix.lower()
             self.set_status(f"Unsupported file type: {suffix}")
             self.logger.warning("Unsupported file type in loader: %s", suffix)
@@ -4330,6 +4593,19 @@ class S19TuiApp(App):
                 - ``_apply_loaded_file`` (synchronous fallback)
         """
         loaded = prepared.loaded
+        # Variant stamping happens HERE, at apply time on the main UI thread:
+        # the pending id was set on the main thread by the dispatching handler
+        # (project load / variant selector), the parse worker never reads it,
+        # and the worker signatures stay untouched (LLR-005.4 thread contract).
+        pending_variant = self._pending_variant_id
+        if pending_variant is not None and loaded.file_type in {"s19", "hex"}:
+            loaded.variant_id = pending_variant
+            self._pending_variant_id = None
+            if self._variant_set is not None and any(
+                variant.variant_id == pending_variant
+                for variant in self._variant_set.variants
+            ):
+                self._variant_set.active_id = pending_variant
         self.current_file = loaded
         # A file is now present — reveal the real content of the
         # content-bearing rail screens and hide their empty-state panels
@@ -4714,6 +4990,7 @@ class S19TuiApp(App):
             Used by:
                 - ``_start_load_worker``
         """
+        self._pending_variant_id = None
         self.logger.error(
             "Load failed for path=%s suffix=%s project=%s: %s",
             path,
@@ -5831,14 +6108,42 @@ class S19TuiApp(App):
               sentinel) and writes them into the command bar's context
               labels — the command bar is the canonical home since the old
               Status tile was dismantled in increment 7.
+            - Multi-variant projects (LLR-005.5): when the variant set holds
+              N > 1 variants, the project label reads
+              ``«project»:«variant» (i/N)`` with ``i`` the 1-based index of
+              the active variant; single-variant projects keep the plain
+              project name (LLR-005.3 back-compat).
 
         Dependencies:
             Uses:
                 - ``CommandBar.set_context_labels``
+                - ``_variant_display_options``
             Used by:
                 - Project / A2L load handlers
+                - ``_sync_loaded_file_to_project`` (variant append)
         """
         project_name = self.current_project or "(none)"
+        variant_set = self._variant_set
+        if (
+            self.current_project
+            and variant_set is not None
+            and len(variant_set.variants) > 1
+            and variant_set.active_id is not None
+        ):
+            options = self._variant_display_options(variant_set)
+            active_index = next(
+                (
+                    index
+                    for index, variant in enumerate(variant_set.variants)
+                    if variant.variant_id == variant_set.active_id
+                ),
+                0,
+            )
+            display = options[active_index][1]
+            project_name = (
+                f"{self.current_project}:{display} "
+                f"({active_index + 1}/{len(variant_set.variants)})"
+            )
         a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
         self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
 

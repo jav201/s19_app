@@ -709,7 +709,7 @@ ModalScreen {
     border: round $accent-calm;
 }
 
-#project_list {
+#project_list, #variant_list {
     border: round $rule;
     background: $bg-base;
     height: 10;
