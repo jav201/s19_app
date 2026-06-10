@@ -1,16 +1,31 @@
-"""MAC View hex-pane layout tests — batch-05 increment 2 (HLR-002).
+"""MAC View hex-pane layout tests — batch-05 increment 2 + batch-06 increment 1.
 
-Covers the CSS-sizing LLRs added by batch-2026-05-26-batch-05:
-  - LLR-002.1 / TC-004 — ``#mac_hex_pane`` is >=82 cols at the comfortable
-    (>=120-column) regime, so a full hex row fits without wrapping.
-  - LLR-002.2 / TC-005 — ``#mac_hex_scroll`` fills the vertical extent of the
-    pane below the title + controls (mirrors the ``#hex_scroll`` rule).
-  - LLR-002.3 / TC-006 — the ``width-narrow`` (<120-column) regime is still the
-    rule that drives the layout: the pane is ~35 % of the body, not the fixed 82.
-  - LLR-002.4 / TC-013 — the records pane keeps a strictly-positive width at
+Batch-06 (HLR-001) supersedes the batch-05 fixed-82 / ``width-narrow 35%``
+two-regime MAC layout with A2L's flat proportional split plus a full-row
+floor: ``#mac_records_pane 4fr``, ``#mac_hex_pane 3fr; min-width: 82``, so
+the hex pane width equals ``max(82, round(3/7 * body_w))`` at every width.
+
+Surviving batch-05 coverage:
+  - LLR-002.1 — ``#mac_hex_pane`` is >=82 cols at 120 columns (now via the
+    ``min-width`` floor instead of the retired fixed ``width: 82``).
+  - LLR-002.2 — ``#mac_hex_scroll`` fills the vertical extent of the pane
+    below the title + controls (mirrors the ``#hex_scroll`` rule).
+  - LLR-002.4 / TC-006 — the records pane keeps a strictly-positive width at
     120 columns so the record list never collapses to zero.
 
-All four drive the live Textual app via ``App.run_test(size=(W, 30))`` and read
+Batch-06 coverage (LLR-001.1-.4):
+  - TC-002 / LLR-001.1 — the hex pane grows proportionally (~3/7 of the
+    body) at a 250-column terminal, past the old fixed-82 cap.
+  - TC-003 / LLR-001.2 — the records pane holds the ~4/7 share and is wider
+    than the hex pane where proportional dominates.
+  - TC-004 / LLR-001.3 — at 120 columns the ``min-width: 82`` floor, not the
+    3/7 proportional share (~41), sizes the hex pane.
+  - TC-005 / LLR-001.4 — the floor holds on both sides of the retired
+    120-column MAC breakpoint (the ``width-narrow`` MAC rules are deleted).
+    The batch-05 narrow-regime test (``hex_w < 82`` at 119 cols) asserted the
+    retired ``35%`` regime and was deleted in favor of TC-005.
+
+All tests drive the live Textual app via ``App.run_test(size=(W, H))`` and read
 ``.region`` geometry, matching the established pattern in
 ``tests/test_tui_directionb.py::test_tc021_*``. The MAC View is activated with
 ``action_show_screen("mac")``; no file load is required — the two panes exist in
@@ -136,36 +151,94 @@ def test_mac_hex_scroll_fills_pane_height(tmp_path: Path) -> None:
     )
 
 
-def test_mac_hex_pane_narrow_regime_unchanged(tmp_path: Path) -> None:
-    """TC-006 / LLR-002.3 — the <120-col proportional regime still drives layout.
+def test_mac_hex_pane_proportional_at_wide_terminal(tmp_path: Path) -> None:
+    """TC-002 / LLR-001.1 — the hex pane is proportional (3fr) at 250 columns.
 
-    Intent: below the 120-column breakpoint the ``width-narrow`` class must be
-    set and the ``#workspace_body.width-narrow #mac_hex_pane { width: 35% }``
-    rule must win — NOT the new comfortable-regime fixed 82. This proves the
-    batch-05 widening did not leak into the narrow regime.
-
-    Note on the assertion form: the 35 % is proportional to the *body* width,
-    not the raw terminal width. At 119 cols the body is ~113 cols, so the pane
-    lands at ~39 cols (34.5 % of the body) — not ``round(119 * 0.35) = 42``.
-    Asserting against the body width (the form already used by
-    ``test_tc021_mac_two_panes_proportional_regime``) is the robust check; the
-    raw-terminal ``round(119 * 0.35)`` formula in the brief would be off by 3.
+    Intent: batch-06 replaces the fixed ``width: 82`` cap with ``width: 3fr``
+    mirroring ``#a2l_hex_pane``, so on a terminal wide enough that the 3/7
+    proportional share exceeds the 82-cell floor (body >= 192, terminal ~216
+    cols) the MAC hex pane GROWS past 82 and holds ~3/7 (~=42.9%) of the
+    workspace body — the retired fixed cap would have pinned it at 82.
     """
-    dims = _mac_layout_dims(tmp_path, (119, 30))
+    dims = _mac_layout_dims(tmp_path, (250, 40))
 
-    assert dims["narrow"] == 1, (
-        "at 119 cols (<120) the proportional (width-narrow) regime must be "
-        "active (width-narrow must be set)"
+    assert dims["hex_w"] > 86, (
+        f"at 250 cols the MAC hex pane (3fr) must grow past the 82-cell "
+        f"floor, got {dims['hex_w']}"
     )
     hex_pct = 100 * dims["hex_w"] / dims["body_w"]
-    assert 31 <= hex_pct <= 39, (
-        f"at 119 cols the MAC hex pane must be 35%+/-4 points of the body "
-        f"(proportional regime), got {hex_pct:.1f}%"
+    assert 37 <= hex_pct <= 49, (
+        f"at 250 cols the MAC hex pane must be 3/7 (~=42.9%) +/-6 points of "
+        f"the body (proportional regime above the floor), got {hex_pct:.1f}% "
+        f"(hex={dims['hex_w']}, body={dims['body_w']})"
     )
-    assert dims["hex_w"] < 82, (
-        f"at 119 cols the comfortable fixed-82 rule must NOT apply, "
-        f"got hex pane width {dims['hex_w']}"
+
+
+def test_mac_records_pane_proportional_at_wide_terminal(tmp_path: Path) -> None:
+    """TC-003 / LLR-001.2 — the records pane is proportional (4fr) at 250 cols.
+
+    Intent: ``#mac_records_pane`` moves from ``1fr`` (the remainder of a
+    fixed-82 hex pane) to ``4fr`` mirroring ``#a2l_tags_pane``, so where the
+    proportional split dominates the records pane holds the larger ~4/7
+    (~=57.1%) share of the workspace body and stays wider than the hex pane.
+    """
+    dims = _mac_layout_dims(tmp_path, (250, 40))
+
+    records_pct = 100 * dims["records_w"] / dims["body_w"]
+    assert 51 <= records_pct <= 63, (
+        f"at 250 cols the MAC records pane must be 4/7 (~=57.1%) +/-6 points "
+        f"of the body, got {records_pct:.1f}% "
+        f"(records={dims['records_w']}, body={dims['body_w']})"
     )
+    assert dims["records_w"] > dims["hex_w"], (
+        f"at 250 cols the records pane (4fr) must be wider than the hex pane "
+        f"(3fr), got records={dims['records_w']} vs hex={dims['hex_w']}"
+    )
+
+
+def test_mac_hex_pane_floor_at_120(tmp_path: Path) -> None:
+    """TC-004 / LLR-001.3 — the ``min-width: 82`` floor sizes the pane at 120.
+
+    Intent: at the 120-column documented minimum the body is ~96 cells, so
+    the 3/7 proportional share would be ~41 — narrower than a full hex row.
+    The ``min-width: 82`` floor must clamp the ``3fr`` pane up to 82 so a full
+    hex row (``> `` marker + address + 16 bytes + ASCII gutter) renders
+    without truncation. The second assertion proves the FLOOR, not the
+    proportional share, is the rule in effect.
+    """
+    dims = _mac_layout_dims(tmp_path, (120, 30))
+
+    assert 80 <= dims["hex_w"] <= 86, (
+        f"at 120 cols the MAC hex pane must be held at the 82-cell floor "
+        f"(80..86), got {dims['hex_w']}"
+    )
+    share = round(3 / 7 * dims["body_w"])
+    assert abs(dims["hex_w"] - share) > 3, (
+        f"at 120 cols the hex pane width ({dims['hex_w']}) must come from the "
+        f"min-width floor, NOT the 3/7 proportional share "
+        f"(~{share} of body={dims['body_w']})"
+    )
+
+
+def test_mac_hex_floor_holds_across_retired_breakpoint(tmp_path: Path) -> None:
+    """TC-005 / LLR-001.4 — the floor holds on both sides of the retired
+    120-column MAC breakpoint.
+
+    Intent: the ``width-narrow`` MAC rules (``35%`` hex pane below 120 cols)
+    are deleted, so the single proportional+floor regime must apply on BOTH
+    sides of the former breakpoint: at 121 and 119 cols the 3/7 share is below
+    82, so the hex pane is floored to 82 either way — no MAC-rule regime
+    switch remains. Note: a residual *body-width* jump at 120 cols persists
+    because the workspace activity rail collapses below 120; that is the
+    rail's discontinuity, not a MAC selector's, and is out of scope here.
+    """
+    for size in [(121, 30), (119, 30)]:
+        dims = _mac_layout_dims(tmp_path, size)
+        assert 80 <= dims["hex_w"] <= 86, (
+            f"at {size} the MAC hex pane must be held at the 82-cell floor "
+            f"(80..86) — the retired width-narrow 35% regime must NOT apply, "
+            f"got {dims['hex_w']} (body={dims['body_w']})"
+        )
 
 
 def test_mac_records_pane_positive_width_at_wide_terminal(tmp_path: Path) -> None:
