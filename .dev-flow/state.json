@@ -118,6 +118,18 @@
             "date": "2026-06-10",
             "decision": "increment-E2-approved-E3a-started",
             "notes": "E2 approved. E3a started — consolidated v2 Patch Editor panel + services/change_service.py + UI halves of 002.7 (save prompt) / 002.8 (persistent fault visibility). Files: screens_directionb.py (panel rewrite), app.py (router shrink to v2 action set), services/change_service.py (NEW), tests/test_tui_patch_editor_v2.py (NEW), tests/test_change_service.py (NEW) = 5. SEQUENCE NOTE: consolidation makes old-widget UI tests red TRANSIENTLY; the red set must MATCH the §6.6 RETIRE/REWRITE predictions for UI files (table validation); E3b enacts dispositions immediately after and restores lean-green. E3a gate presents targeted results + predicted-vs-actual red comparison."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E3a-awaiting-gate",
+            "notes": "E3a implemented + verified. 5 files (change_service.py NEW; PatchEditorPanel rewritten to single v2 section w/ 6 patch_doc_* ids + persistent fault area + save prompt; app.py router -> 8-action PATCH_ACTIONS_V2, SaveBackDecision separate message keeps set at 8 per F-A-15; 2 new test files). Results: new 24 passed; engine regression 65/65; app sanity 66 passed. INTERIM REDS: 35 (patch_editor 14 + containment 4 + memory_patch 12 + directionb 5) — orchestrator diffed vs §6.6: ALL 35 are predicted RETIRE/REWRITE rows incl. D3 (export-button scroll test, now resolved by measurement); remaining RETIRE rows green only because cdfx/ modules still exist (fall at E3b as modeled). TABLE VALIDATED 35/35. One judgment-call deviation flagged: HEX-unsupported communicated via status line, not a dead prompt (Phase-6 LLR-002.7 wording reconciliation or gate revert). Local commit 0cd3111. Packet: increment-E3a.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E3a-approved-E3b-started",
+            "notes": "E3a approved; HEX-status-line deviation ACCEPTED (Phase-6 LLR-002.7 wording reconciliation). E3b started — the retirement enactment under the approved ~20-25-file budget exception: delete cdfx/ package (7 modules + memory.py/memory_validate.py after migration) + services/cdfx_service.py; migrate memory_display.py -> changes/display.py; enact §6.6 (229 RETIRE incl. 11 whole cdfx test files, 50 REWRITE, 69 SURVIVES import re-pointing); self-tested grep -E retirement probe (must hit pre-delete, 0 post); fold E3a DEFAULT_CSS into styles.tcss; restore lean suite green."
         }
     ],
     "obsidian_synced": false,

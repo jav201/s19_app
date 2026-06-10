@@ -394,47 +394,8 @@ class PatchEditorPanel(ScrollableContainer):
 
     _ENTRIES_COLUMNS = ("Kind", "Address", "Value / bytes", "Status", "Linkage")
 
-    # Layout for the E3a widgets whose ids are new this increment; folded
-    # into styles.tcss when E3b retires the old ids' rules.
-    DEFAULT_CSS = """
-    #patch_doc_entries_table {
-        width: 100%;
-        height: 10;
-        margin-bottom: 1;
-    }
-    #patch_doc_empty_state {
-        width: 100%;
-        height: auto;
-        padding: 1;
-        margin-bottom: 1;
-    }
-    #patch_doc_entry_inputs,
-    #patch_doc_file_row,
-    #patch_saveback_row {
-        width: 100%;
-        height: auto;
-        padding-top: 1;
-    }
-    #patch_doc_entry_buttons,
-    #patch_doc_controls,
-    #patch_saveback_buttons {
-        width: 100%;
-        height: auto;
-    }
-    #patch_entry_address_input,
-    #patch_entry_value_input,
-    #patch_entry_bytes_input,
-    #patch_doc_path_input,
-    #patch_saveback_name_input {
-        margin-bottom: 1;
-    }
-    #patch_doc_issues,
-    #patch_checks_results {
-        width: 100%;
-        height: auto;
-        padding: 0 1;
-    }
-    """
+    # Layout rules for the v2 widget ids live in styles.tcss (folded there
+    # at E3b when the retired batch-03/04 ids' rules were removed).
 
     class ActionRequested(Message):
         """A Patch Editor control was triggered — ``app.py`` should act.

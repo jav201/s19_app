@@ -3285,83 +3285,26 @@ def test_tc028_scaffold_screens_activate_without_error(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# TC-026 — Patch Editor screen renders the functional change-list editor
+# TC-026 — Patch Editor screen (v2 consolidated panel, batch-07 E3a/E3b)
 #
-# batch-03 increment 9 (LLR-007.1..007.6) supersedes the batch-02 inert
-# Patch Editor shell (R-TUI-027 / LLR-012.2): the screen now renders a
-# change-list table, wired add/edit/remove inputs and save/load controls.
-# The three batch-02 tests below were rewritten from the inert-shell
-# assertions to the functional-screen ones — a requirement-driven test
-# change, not a regression. The deferral-notice test is replaced by the
-# LLR-007.6 empty-state test.
+# batch-03 increment 9 superseded the batch-02 inert shell with the
+# functional parameter editor; batch-07 consolidated the Patch Editor to the
+# single v2 JSON change flow (LLR-003.1) and retired the parameter section.
+# The two parameter-widget render tests RETIRED with that section (their v2
+# replacements live in ``test_tui_patch_editor_v2.py::
+# test_panel_composition``); the presentational and empty-state guards below
+# are REWRITTEN to the v2 panel.
 # ---------------------------------------------------------------------------
 
 
-def test_tc026_patch_editor_renders_changelist_table(tmp_path: Path) -> None:
-    """The Patch Editor renders the change-list table (LLR-007.1).
-
-    Intent: LLR-007.1 — the functional Patch Editor renders the current
-    change-list as a ``DataTable`` (one row per entry: parameter name,
-    array index, value, status), replacing the batch-02 inert before/after
-    hex panes. The table must be present once the screen is active.
-    """
-    from textual.widgets import DataTable
-
-    async def _drive() -> bool:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            app.action_show_screen("patch")
-            await pilot.pause()
-            screen = app.query_one("#screen_patch")
-            table = screen.query("#patch_changelist_table")
-            return bool(table) and isinstance(table.first(), DataTable)
-
-    has_table = asyncio.run(_drive())
-    assert has_table, "the Patch Editor must render a change-list DataTable"
-
-
-def test_tc026_patch_editor_renders_entry_inputs(
-    tmp_path: Path,
-) -> None:
-    """The Patch Editor exposes the name/index/value inputs (LLR-007.2).
-
-    Intent: LLR-007.2 — the functional Patch Editor carries the
-    parameter-name, array-index and value input fields wired to the
-    add/edit/remove change-list operations. They must be present as real
-    ``Input`` widgets so the editor is operable.
-    """
-    from textual.widgets import Input
-
-    async def _drive() -> tuple[bool, bool, bool]:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            app.action_show_screen("patch")
-            await pilot.pause()
-            screen = app.query_one("#screen_patch")
-            name = screen.query("#patch_name_input")
-            index = screen.query("#patch_index_input")
-            value = screen.query("#patch_value_input")
-            return (
-                bool(name) and isinstance(name.first(), Input),
-                bool(index) and isinstance(index.first(), Input),
-                bool(value) and isinstance(value.first(), Input),
-            )
-
-    name_ok, index_ok, value_ok = asyncio.run(_drive())
-    assert name_ok, "the Patch Editor must expose a parameter-name Input"
-    assert index_ok, "the Patch Editor must expose an array-index Input"
-    assert value_ok, "the Patch Editor must expose a value Input"
-
-
 def test_tc026_patch_editor_panel_is_presentational() -> None:
-    """The Patch Editor widget holds no cdfx-package logic (LLR-007.5).
+    """The Patch Editor widget holds no changes-package logic (LLR-003.1).
 
-    Intent: LLR-007.5 / constraint C-8 — the CDFX read/write and
-    change-list model logic lives in ``services.cdfx_service``, not in the
-    view widget. The ``PatchEditorPanel`` must import nothing from the
-    ``cdfx`` package and must perform its work by posting an
+    Intent (carried from batch-03 C-8, re-pinned to the v2 module names at
+    E3b): the change-document read/write and model logic lives in
+    ``services.change_service``, not in the view widget. The
+    ``PatchEditorPanel`` must import nothing from the ``changes`` package
+    (nor the retired ``cdfx`` one) and must perform its work by posting an
     ``ActionRequested`` message rather than calling a writer/reader itself.
     """
     import ast
@@ -3376,8 +3319,8 @@ def test_tc026_patch_editor_panel_is_presentational() -> None:
         "the Patch Editor must emit an ActionRequested message"
     )
 
-    # The widget module must not import the cdfx format handler — that is
-    # the service's job (C-8).
+    # The widget module must not import the change-format handler — that is
+    # the service's job.
     source = inspect.getsource(inspect.getmodule(PatchEditorPanel))
     tree = ast.parse(source)
     imported: set[str] = set()
@@ -3386,19 +3329,27 @@ def test_tc026_patch_editor_panel_is_presentational() -> None:
             imported.add(node.module)
         elif isinstance(node, ast.Import):
             imported.update(alias.name for alias in node.names)
-    cdfx_imports = [name for name in imported if "cdfx" in name]
-    assert cdfx_imports == [], (
-        f"the Patch Editor widget must not import the cdfx package; "
-        f"found {cdfx_imports}"
+    model_imports = [
+        name
+        for name in imported
+        if "cdfx" in name
+        or name.endswith(".changes")
+        or ".changes." in name
+        or name == "changes"
+    ]
+    assert model_imports == [], (
+        f"the Patch Editor widget must not import the changes/cdfx model "
+        f"packages; found {model_imports}"
     )
 
 
 def test_tc026_patch_editor_shows_empty_state(tmp_path: Path) -> None:
-    """The Patch Editor shows a neutral empty state (LLR-007.6).
+    """The Patch Editor shows a neutral empty state (v2 panel).
 
-    Intent: LLR-007.6 — while the Patch Editor is open with an empty
-    change-list it shows a single neutral add-or-load prompt line, not a
-    blank pane, an error or a stack trace.
+    Intent (carried from batch-03 LLR-007.6, re-pinned to the v2 ids at
+    E3b): while the Patch Editor is open with an empty change document it
+    shows a single neutral add-or-load prompt line, not a blank pane, an
+    error or a stack trace.
     """
     from s19_app.tui.screens_directionb import PatchEditorPanel
 
@@ -3408,7 +3359,7 @@ def test_tc026_patch_editor_shows_empty_state(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("patch")
             await pilot.pause()
-            empty = app.query("#patch_empty_state")
+            empty = app.query("#patch_doc_empty_state")
             visible = bool(empty) and not empty.first().has_class("hidden")
             return visible, PatchEditorPanel.EMPTY_STATE_TEXT.lower()
 
@@ -3696,10 +3647,11 @@ def test_tc028_every_scaffold_screen_activates_without_error(
                 except Exception:  # pragma: no cover - failure path
                     results[key] = False
             # The A2B Diff screen still carries its deferral marker; the
-            # Patch Editor is functional and carries its empty-state line.
+            # Patch Editor is functional and carries its empty-state line
+            # (the v2 consolidated panel's id — batch-07 E3b).
             markers_present = bool(
                 app.query("#diff_deferral_notice")
-            ) and bool(app.query("#patch_empty_state"))
+            ) and bool(app.query("#patch_doc_empty_state"))
         return {**results, "markers_present": markers_present}
 
     results = asyncio.run(_drive())
@@ -4027,36 +3979,6 @@ def test_tc029_density_toggle_reachable_by_keyboard(tmp_path: Path) -> None:
     assert before_compact != after_compact, (
         "'ctrl+d' must toggle the density class on the workspace body"
     )
-
-
-def test_tc029_scaffold_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
-    """The Patch Editor inputs are keyboard-focusable controls.
-
-    Intent: LLR-013.1 — the Patch Editor parameter-name/value ``Input``
-    fields are interactive controls and must be keyboard-reachable, not
-    mouse-only. ``Input`` is ``can_focus`` by default; this asserts the
-    controls accept keyboard focus via ``focus()``. (The input ids changed
-    from the batch-02 inert shell to the batch-03 functional editor.)
-    """
-
-    async def _drive() -> tuple[bool, bool]:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            app.action_show_screen("patch")
-            await pilot.pause()
-            name = app.query_one("#patch_name_input", Input)
-            value = app.query_one("#patch_value_input", Input)
-            name.focus()
-            await pilot.pause()
-            name_focused = app.focused is name
-            value.focus()
-            await pilot.pause()
-            value_focused = app.focused is value
-        return name_focused, value_focused
-
-    name_focused, value_focused = asyncio.run(_drive())
-    assert name_focused, "the Patch Editor name input must accept keyboard focus"
-    assert value_focused, "the Patch Editor value input must accept keyboard focus"
 
 
 def test_tc029_single_keys_suppressed_during_input_focus(tmp_path: Path) -> None:

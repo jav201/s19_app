@@ -372,8 +372,25 @@ _RESTYLED_CELLS = [
 ]
 
 # 3 cells: the additive scaffolds at the 120x30 primary size, comfortable.
+# The patch cell's baseline predates the batch-07 consolidated v2 Patch
+# Editor (§6.6: exactly this ONE baseline regenerates — in the canonical CI
+# env only, never locally); until that regen lands the cell is an expected
+# mismatch.
 _SCAFFOLD_CELLS = [
-    pytest.param(screen, "comfortable", "120x30", id=f"{screen}-comfortable-120x30")
+    pytest.param(
+        screen,
+        "comfortable",
+        "120x30",
+        id=f"{screen}-comfortable-120x30",
+        marks=(
+            pytest.mark.xfail(
+                reason="baseline regen pending in CI env (batch-07 E3b)",
+                strict=False,
+            ),
+        )
+        if screen == "patch"
+        else (),
+    )
     for screen in _SCAFFOLD_SCREENS
 ]
 

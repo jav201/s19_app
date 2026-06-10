@@ -1245,7 +1245,8 @@ def write_change_document(
             _issue(
                 MF_WRITE_CONTAINMENT,
                 f"the change-file write target failed work-area containment "
-                f"validation — no file was written: {exc}",
+                f"validation — no file was written: "
+                f"{type(exc).__name__}: {exc}",
                 severity=ValidationSeverity.WARNING,
             )
         )

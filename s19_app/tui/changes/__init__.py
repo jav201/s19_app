@@ -27,6 +27,13 @@ from .model import (
     MemoryStatus,
 )
 from .validate import CHG_COLLISION, collision_issues
+from .display import (
+    ASCII_PLACEHOLDER,
+    PRINTABLE_ASCII_MAX,
+    PRINTABLE_ASCII_MIN,
+    MemoryValueRendering,
+    format_memory_value,
+)
 from .apply import (
     CHG_HEX_SAVE_UNSUPPORTED,
     apply_change_document,
@@ -83,6 +90,11 @@ __all__ = [
     "LINKAGE_STANDALONE",
     "CHG_COLLISION",
     "collision_issues",
+    "ASCII_PLACEHOLDER",
+    "PRINTABLE_ASCII_MAX",
+    "PRINTABLE_ASCII_MIN",
+    "MemoryValueRendering",
+    "format_memory_value",
     "CHG_HEX_SAVE_UNSUPPORTED",
     "apply_change_document",
     "classify_containment",
