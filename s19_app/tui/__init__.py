@@ -31,7 +31,7 @@ from .hexview import (
     render_hex_view,
     render_hex_view_text,
 )
-from .models import LoadedFile
+from .models import LoadedFile, ProjectVariantSet, VariantDescriptor
 from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
 from .workspace import (
     A2L_EXTENSIONS,
@@ -44,6 +44,7 @@ from .workspace import (
     WORKAREA_DIRNAME,
     WORKAREA_SUBDIR,
     WORKAREA_TEMP,
+    build_variant_set,
     copy_into_workarea,
     ensure_workarea,
     find_repo_root,
@@ -66,6 +67,7 @@ __all__ = [
     "MAX_HEX_BYTES",
     "MAX_HEX_ROWS",
     "PROJECT_DATA_EXTENSIONS",
+    "ProjectVariantSet",
     "SEARCH_ENCODING",
     "S19TuiApp",
     "S19_EXTENSIONS",
@@ -75,8 +77,10 @@ __all__ = [
     "WORKAREA_DIRNAME",
     "WORKAREA_SUBDIR",
     "WORKAREA_TEMP",
+    "VariantDescriptor",
     "address_in_sorted_ranges",
     "build_mem_map_s19",
+    "build_variant_set",
     "build_range_validity_hex",
     "build_range_validity_s19",
     "build_row_bases",

@@ -2600,12 +2600,15 @@ def test_tc033_no_severity_class_misuse_in_modal_block() -> None:
 def test_tc034_validate_project_files_cardinality_unchanged(
     tmp_path: Path,
 ) -> None:
-    """``validate_project_files`` still enforces the one-of-each rule.
+    """``validate_project_files`` still enforces the MAC/A2L one-each rule.
 
     TC-034 (LLR-015.2): the re-skin is visual-only — the project-file
-    cardinality rule (one S19/HEX + one MAC + one A2L per project) is
-    untouched. A clean triple passes; a second S19, a second MAC and a
-    second A2L each fail with their specific message.
+    cardinality rules are untouched by it. A clean triple passes; a second
+    MAC and a second A2L each fail with their specific message.
+
+    Batch-07 LLR-005.1 superseded the original one-S19/HEX clause: multiple
+    primaries are now project variants and must be ACCEPTED (the multi-variant
+    coverage lives in tests/test_workspace_variants.py).
 
     Intent: a re-skin that accidentally edited ``workspace.py`` would change
     this verdict; re-running the cardinality boundary against the current
@@ -2624,14 +2627,14 @@ def test_tc034_validate_project_files_cardinality_unchanged(
     assert len(a2l_files) == 1
     assert sorted(p.suffix.lower() for p in data_files) == [".mac", ".s19"]
 
-    # Two S19 files — rejected.
+    # Two S19 files — accepted as variants since LLR-005.1 (batch-07).
     two_s19 = tmp_path / "two_s19"
     two_s19.mkdir()
     (two_s19 / "a.s19").write_text("S0", encoding="utf-8")
     (two_s19 / "b.s19").write_text("S0", encoding="utf-8")
     _, _, error = validate_project_files(two_s19)
-    assert error is not None and "S19/HEX" in error, (
-        f"two S19 files must be rejected, got {error!r}"
+    assert error is None, (
+        f"two S19 files are variants and must be accepted, got {error!r}"
     )
 
     # Two MAC files — rejected.

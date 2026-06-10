@@ -142,6 +142,18 @@
             "date": "2026-06-10",
             "decision": "increment-E3b-approved-E4-started",
             "notes": "E3b approved with all 3 ratifications (6-row re-disposition, io.py production edit, fold-with-named-targets). E4 started — real check engine: changes/check.py (run_check_document + run_checks_for_project, LLR-004.1-.4) injected into the E3a check_runner seam; TC-024 display test re-pinned from stub to real 2-1-2 fixture (LLR-004.5). Files: changes/check.py NEW, change_service.py (seam injection), tests/test_checks_engine.py NEW, tests/test_tui_patch_editor_v2.py (TC-024 update) = 4."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E4-awaiting-gate",
+            "notes": "E4 implemented + orchestrator-verified. 6 files (check.py NEW 209L; CheckRunResult in model.py; real engine into the seam; run_checks_for_project in change_service.py service-level; test_checks_engine.py NEW 441L; TC-024 re-pinned to real 2-1-2). Check gate = apply-gate mirror (designed-and-flagged choice, documented in module docstring). Results: targeted 31 passed; engine regression 65; lean 618/0 — ledger exact 611+7=618; no-Textual 0. Commit 7cca586. Packet: increment-E4.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E4-approved-E5a-started",
+            "notes": "E4 approved. E5a started — multi-variant workspace + models: LLR-005.1 (remove 1-S19 limit, keep MAC/A2L singles, deterministic (name.lower(), name) sort), 005.2 (VariantDescriptor + ProjectVariantSet NEW in models.py; LoadedFile additive variant_id only), 005.3 (single-S19 backward compat). Files: workspace.py, models.py, tests/test_workspace_variants.py NEW (+ survival-guard runs of test_tui_app/test_tui_services). E5b takes the TUI selector (005.4/.5); manifest-dependent default (005.6) rides E6 per F-A-06."
         }
     ],
     "obsidian_synced": false,

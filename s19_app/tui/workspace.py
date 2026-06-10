@@ -7,7 +7,9 @@ import stat
 import sys
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Sequence
+
+from .models import ProjectVariantSet, VariantDescriptor
 
 
 WORKAREA_DIRNAME = ".s19tool"
@@ -316,9 +318,40 @@ def sanitize_project_name(name: str) -> Optional[str]:
 
 
 def validate_project_files(project_dir: Path) -> tuple[list[Path], list[Path], Optional[str]]:
-    """Return (data_files, a2l_files, error_message) enforcing project rules."""
+    """
+    Summary:
+        Scan ``project_dir`` and return its data/A2L files, enforcing the
+        project cardinality rules: any number of S19/HEX variants
+        (multi-variant model, LLR-005.1), at most one MAC, at most one A2L.
+
+    Args:
+        project_dir (Path): Project directory to scan. Only direct children
+            that are regular files are considered; subdirectories (e.g. a
+            ``reports/`` output folder, LLR-007.7) are skipped.
+
+    Returns:
+        tuple[list[Path], list[Path], Optional[str]]: ``(data_files,
+            a2l_files, error_message)``. ``data_files`` holds S19/HEX/MAC
+            entries sorted by ``(name.lower(), name)`` so variant order is
+            deterministic across operating systems; ``a2l_files`` holds A2L
+            entries; ``error_message`` is ``None`` when the rules hold.
+
+    Data Flow:
+        - Iterate direct children, skipping non-files.
+        - Bucket by suffix into data (primary S19/HEX vs MAC) and A2L lists.
+        - Reject >1 MAC or >1 A2L; multiple S19/HEX files are accepted as
+          project variants.
+        - Sort ``data_files`` deterministically before returning.
+
+    Dependencies:
+        Uses:
+            - PROJECT_DATA_EXTENSIONS / PROJECT_PRIMARY_DATA_EXTENSIONS /
+              MAC_EXTENSIONS / A2L_EXTENSIONS
+        Used by:
+            - s19_app.tui.app.S19TuiApp (save/load/sync project paths)
+            - build_variant_set callers (variant selector, E5b/E6)
+    """
     data_files = []
-    primary_data_files = []
     mac_files = []
     a2l_files = []
     for item in project_dir.iterdir():
@@ -327,19 +360,90 @@ def validate_project_files(project_dir: Path) -> tuple[list[Path], list[Path], O
         suffix = item.suffix.lower()
         if suffix in PROJECT_DATA_EXTENSIONS:
             data_files.append(item)
-            if suffix in PROJECT_PRIMARY_DATA_EXTENSIONS:
-                primary_data_files.append(item)
-            elif suffix in MAC_EXTENSIONS:
+            if suffix in MAC_EXTENSIONS:
                 mac_files.append(item)
         elif suffix in A2L_EXTENSIONS:
             a2l_files.append(item)
-    if len(primary_data_files) > 1:
-        return data_files, a2l_files, "Project already has more than one S19/HEX file."
+    data_files.sort(key=lambda item: (item.name.lower(), item.name))
     if len(mac_files) > 1:
         return data_files, a2l_files, "Project already has more than one MAC file."
     if len(a2l_files) > 1:
         return data_files, a2l_files, "Project already has more than one A2L file."
     return data_files, a2l_files, None
+
+
+def build_variant_set(
+    project_name: str,
+    data_files: Sequence[Path],
+    active_id: Optional[str] = None,
+) -> ProjectVariantSet:
+    """
+    Summary:
+        Build the ``ProjectVariantSet`` for a project from the data files
+        returned by ``validate_project_files``, keeping only S19/HEX images
+        as variants (MAC files are overlays, not variants).
+
+    Args:
+        project_name (str): Name of the project the variants belong to.
+        data_files (Sequence[Path]): Data files of the project, typically the
+            first element of the ``validate_project_files`` return. Non-primary
+            entries (e.g. ``.mac``) are ignored.
+        active_id (Optional[str]): Variant to mark active. Defaults to the
+            first variant in deterministic order, or ``None`` when the project
+            has no variants.
+
+    Returns:
+        ProjectVariantSet: Variants ordered by ``(name.lower(), name)`` with
+            ``active_id`` resolved per the rule above.
+
+    Raises:
+        ValueError: When ``active_id`` is given but does not match any
+            variant id (e.g. a stale manifest override, LLR-006.1).
+
+    Data Flow:
+        - Filter ``data_files`` to S19/HEX suffixes.
+        - Sort by ``(name.lower(), name)`` (LLR-005.1 order) and wrap each
+          path in a ``VariantDescriptor`` (``variant_id`` = filename stem).
+        - Resolve ``active_id``: explicit value validated against the variant
+          ids, otherwise first variant (or ``None`` when empty).
+
+    Dependencies:
+        Uses:
+            - s19_app.tui.models.VariantDescriptor / ProjectVariantSet
+            - S19_EXTENSIONS / PROJECT_PRIMARY_DATA_EXTENSIONS
+        Used by:
+            - Variant selector and execution layers (E5b/E6 consumers)
+
+    Example:
+        >>> vset = build_variant_set("proj", [Path("b.s19"), Path("a.s19")])
+        >>> [v.variant_id for v in vset.variants]
+        ['a', 'b']
+        >>> vset.active_id
+        'a'
+    """
+    primaries = sorted(
+        (item for item in data_files if item.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS),
+        key=lambda item: (item.name.lower(), item.name),
+    )
+    variants = tuple(
+        VariantDescriptor(
+            variant_id=item.stem,
+            path=item,
+            file_type="s19" if item.suffix.lower() in S19_EXTENSIONS else "hex",
+        )
+        for item in primaries
+    )
+    if active_id is None:
+        resolved_active = variants[0].variant_id if variants else None
+    else:
+        if active_id not in {variant.variant_id for variant in variants}:
+            raise ValueError(f"active_id {active_id!r} does not match any project variant")
+        resolved_active = active_id
+    return ProjectVariantSet(
+        project_name=project_name,
+        variants=variants,
+        active_id=resolved_active,
+    )
 
 
 def find_repo_root(start: Path) -> Optional[Path]:

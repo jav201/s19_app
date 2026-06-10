@@ -147,15 +147,18 @@ def test_validate_project_files_allows_single_data_and_a2l(tmp_path):
     assert (A2L_EXTENSIONS and a2l_files[0].suffix.lower() in A2L_EXTENSIONS)
 
 
-def test_validate_project_files_rejects_multiple_data(tmp_path):
+def test_validate_project_files_accepts_multiple_primary_variants(tmp_path):
+    # Batch-07 LLR-005.1: multiple S19/HEX files are project variants, no
+    # longer a cardinality violation (superseded the pre-batch rejection).
     project = tmp_path / "project"
     project.mkdir()
     (project / "one.s19").write_text("S0", encoding="utf-8")
     (project / "two.hex").write_text(":00", encoding="utf-8")
 
-    _, _, error = validate_project_files(project)
+    data_files, _, error = validate_project_files(project)
 
-    assert error is not None
+    assert error is None
+    assert [item.name for item in data_files] == ["one.s19", "two.hex"]
 
 
 def test_validate_project_files_allows_primary_plus_mac(tmp_path):

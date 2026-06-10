@@ -298,8 +298,8 @@ class TestValidateProjectFilesSymlinkAndCase:
     that point at files, so symlinked entries are NOT rejected. Case-only collision
     is NOT detected because counting matches by suffix, but on case-insensitive
     filesystems the two filenames resolve to one entry anyway -- on case-sensitive
-    Linux they survive as two distinct files which is then caught by the
-    existing cardinality rule (>1 primary data files). The findings below lock
+    Linux they survive as two distinct files, which since batch-07 LLR-005.1
+    (multi-variant model) validate as two variants. The findings below lock
     those behaviours so a future tightening surfaces as a clear test failure.
     """
 
@@ -326,11 +326,13 @@ class TestValidateProjectFilesSymlinkAndCase:
         # Locked behaviour today: the symlink survives.
         assert any(p.name == "linked.s19" for p in data_files)
 
-    def test_tc_048_case_only_collision_on_case_sensitive_fs_caught_by_cardinality(self, tmp_path: Path):
+    def test_tc_048_case_only_collision_accepted_as_variants_since_llr_005_1(self, tmp_path: Path):
         # TC-048 -- on a case-sensitive FS, ``prj.S19`` and ``prj.s19`` are two
-        # distinct files; cardinality (>1 primary) catches them. On case-insensitive
-        # FS (NTFS, APFS default) only one entry exists at all so the test is
-        # vacuous. We assert the ``error`` outcome holds either way.
+        # distinct files. The pre-batch-07 cardinality rule (>1 primary) caught
+        # them; LLR-005.1 (batch-07 multi-variant model) removed that rejection,
+        # so today they validate as two variants in deterministic
+        # ``(name.lower(), name)`` order. On case-insensitive FS (NTFS, APFS
+        # default) only one entry exists at all. We lock the outcome either way.
         project = tmp_path / "project"
         project.mkdir()
         upper = project / "prj.S19"
@@ -349,10 +351,11 @@ class TestValidateProjectFilesSymlinkAndCase:
             assert len(data_files) == 1
             return
 
-        # Case-sensitive FS: cardinality rule catches the duplicate-primary case.
-        _, _, error = validate_project_files(project)
-        assert error is not None
-        assert "S19/HEX" in error
+        # Case-sensitive FS: both survive as variants (case-only collision is
+        # no longer flagged -- a future tightening would surface here).
+        data_files, _, error = validate_project_files(project)
+        assert error is None
+        assert [p.name for p in data_files] == ["prj.S19", "prj.s19"]
 
     def test_tc_048_cardinality_one_each(self, tmp_path: Path):
         # TC-048 -- explicit happy-path cardinality boundary: exactly one of each
