@@ -261,26 +261,32 @@ Screen {
     height: 100%;
 }
 
-/* --- MAC View 2-pane re-layout (batch-02 increment 6, LLR-010.1) --------
- * The MAC View keeps the increment-6 two-regime width layout (LLR-010.1 /
- * LLR-007.1) — unchanged by increment 13:
- *   - terminal width >= 120: fixed-width hex pane (40), records pane `1fr`
- *   - terminal width  < 120: proportional hex pane (35%), records pane
- *     `1fr`, applied via the `width-narrow` class on `#workspace_body`.
+/* --- MAC View 2-pane re-layout (batch-06 increment 1, LLR-001.1-.4) -----
+ * Batch-06 supersedes the increment-6 two-regime MAC layout with the same
+ * flat proportional split A2L adopted in increment 13: the records pane
+ * is `4fr` and the hex pane `3fr` (3/7 of the MAC content width) at ALL
+ * terminal widths, plus a `min-width` floor on the hex pane so a full hex
+ * row (`> ` marker + address + 16 bytes + ASCII gutter, 82 cells) never
+ * truncates when the proportional share would be smaller. This single
+ * proportional+floor regime applies everywhere — the former `width-narrow`
+ * MAC rules are removed (the class itself still toggles at 120 cols for
+ * the workspace activity rail, which is unrelated to MAC sizing).
  */
 #mac_panes {
     layout: horizontal;
     height: 100%;
 }
 
-/* >= 120-column fixed-width regime (LLR-010.1). */
+/* Flat 4:3 proportional ratio with a full-row floor on the hex pane
+ * (batch-06 LLR-001.1 / LLR-001.2 / LLR-001.3). */
 #mac_records_pane {
-    width: 1fr;
+    width: 4fr;
     height: 100%;
 }
 
 #mac_hex_pane {
-    width: 82;
+    width: 3fr;
+    min-width: 82;
     height: 100%;
 }
 
@@ -290,17 +296,6 @@ Screen {
 #mac_hex_scroll {
     height: 100%;
     overflow: auto;
-}
-
-/* < 120-column proportional regime (LLR-010.1 / LLR-007.1).
- * The hex pane takes 35% of the body; the records pane stays `1fr` and
- * receives the strictly-positive remainder. */
-#workspace_body.width-narrow #mac_hex_pane {
-    width: 35%;
-}
-
-#workspace_body.width-narrow #mac_records_pane {
-    width: 1fr;
 }
 
 #a2l_tags_filters {

@@ -445,11 +445,11 @@ reset the panel scroll position to top, and update status text.
 
 # 5. MAC View
 
-**R-TUI-039**: The MAC tab's hex pane renders a full hex row (address + 16 hex bytes + ASCII gutter) at terminal width ≥120 columns, and its inner scroll container fills the available vertical space; the `<120`-column proportional regime is preserved.
+**R-TUI-039**: The MAC tab lays out the records table and the hex pane as a single-regime proportional split with a floor, at every terminal width: the records pane occupies 4fr and the hex pane 3fr of the MAC panes content width, with the hex pane clamped to a minimum of 82 columns so a full hex row (address + 16 hex bytes + ASCII gutter) always renders; the hex pane's inner scroll container fills the available vertical space. Effective hex width = `max(82, round(3/7 · body_width))`. There are no `width-narrow` MAC pane rules — this supersedes the batch-05 fixed model (`#mac_hex_pane width: 82` at ≥120 columns plus a `width-narrow` 35% proportional regime below 120 columns), bringing the MAC View to parity with the A2L Explorer split of `R-TUI-037` (batch `2026-06-09-batch-06`).
 
-- Code: `s19_app/tui/styles.tcss` (`#mac_hex_pane { width: 82 }`, `#mac_hex_scroll { height: 100%; overflow: auto }`)
-- Validation: `Automated` via `tests/test_tui_mac_layout.py` (TC-004/005/006/013) and the updated `tests/test_tui_directionb.py::test_tc021_mac_two_panes_fixed_regime`
-- Status: Added in batch `2026-05-26-batch-05` (US-02 / HLR-002 / LLR-002.1–002.4)
+- Code: `s19_app/tui/styles.tcss` (`#mac_records_pane { width: 4fr }`, `#mac_hex_pane { width: 3fr; min-width: 82 }`, `#mac_hex_scroll { height: 100%; overflow: auto }`)
+- Validation: `Automated` via `tests/test_tui_mac_layout.py` (`test_mac_hex_pane_proportional_at_wide_terminal`, `test_mac_records_pane_proportional_at_wide_terminal`, `test_mac_hex_pane_floor_at_120`, `test_mac_hex_floor_holds_across_retired_breakpoint`, `test_mac_hex_pane_width_at_wide_terminal`, `test_mac_records_pane_positive_width_at_wide_terminal`, `test_mac_hex_scroll_fills_pane_height`) and `tests/test_tui_directionb.py` (`test_tc021_mac_two_panes_fixed_regime` re-banded to 80–86, `test_tc021_mac_two_panes_floor_below_minimum`)
+- Status: Added in batch `2026-05-26-batch-05` (US-02 / HLR-002 / LLR-002.1–002.4); amended to proportional+floor in batch `2026-06-09-batch-06` (US-001)
 
 ---
 
@@ -489,9 +489,11 @@ go-to-address input, reachable from every Direction B screen.
 comfortable, default Comfortable) that does not break any screen layout at the
 supported terminal sizes (80×24, 120×30, 160×40), observing a two-regime width
 layout — fixed pane widths at terminal width `>= 120` columns and proportional
-pane widths at terminal width `< 120` columns — for the Workspace and MAC View
-screens. The A2L Explorer hex/tags panes are the exception: they use a flat
-3/7 hex : 4/7 tags proportional ratio at all terminal widths (see `R-TUI-037`).
+pane widths at terminal width `< 120` columns — for the Workspace screen. The
+A2L Explorer hex/tags panes are the exception: they use a flat 3/7 hex : 4/7
+tags proportional ratio at all terminal widths (see `R-TUI-037`). Since batch
+`2026-06-09-batch-06` the MAC View panes follow the same single-regime
+proportional+floor model (see `R-TUI-039`) and are no longer two-regime.
 
 - Code: `s19_app/tui/styles.tcss` (density classes, two-regime layout rules),
   `s19_app/tui/app.py` (`action_cycle_density`)
@@ -633,8 +635,9 @@ There is no 120-column regime split for the A2L panes. Amended by batch
 two-regime A2L split — a fixed 40-column hex pane at terminal width `>= 120`
 columns and a 35% proportional hex pane below 120 columns — was superseded
 because the 40-column hex pane was too narrow to render the hex view
-correctly. This change is A2L-only; the MAC View keeps the two-regime layout
-of `R-TUI-023`.
+correctly. The change was A2L-only at the time; in batch `2026-06-09-batch-06`
+the MAC View adopted the same proportional model with an 82-column floor (see
+`R-TUI-039`), retiring the MAC two-regime layout.
 
 - Code: `s19_app/tui/styles.tcss` (`#a2l_hex_pane`, `#a2l_tags_pane` widths),
   `s19_app/tui/app.py` (`_compose_screen_a2l`)

@@ -1347,24 +1347,22 @@ def test_tc019_a2l_pane_order_table_then_hex(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# TC-021 — MAC View presents two panes at the two-regime tolerances
-#          (LLR-010.1)
+# TC-021 — MAC View presents two panes under the batch-06 proportional+floor
+#          model (4fr records : 3fr hex, hex min-width 82)
 # ---------------------------------------------------------------------------
 
 
 def test_tc021_mac_two_panes_fixed_regime(tmp_path: Path) -> None:
-    """At >=120 columns the MAC View shows a 1fr table + fixed-82 hex pane.
+    """At >=120 columns the MAC hex pane is held at the 82-cell floor.
 
-    Intent: LLR-010.1 — the Direction B MAC View is a horizontal two-pane
-    layout, a ``1fr`` records-table pane and a hex pane. At terminal
-    widths >= 120 columns the hex pane uses the fixed-width regime and the
-    records pane takes the ``1fr`` remainder.
-
-    batch-05 LLR-002.1 widened the comfortable-regime ``#mac_hex_pane``
-    from 40 to 82 columns so a full hex row (marker + address + 16 bytes +
-    ASCII gutter) fits without wrapping; this test's fixed-regime bound is
-    updated from 40+/-2 to 82+/-2 to track that change.
-    Asserted at both pinned fixed-regime sizes 120x30 and 160x40.
+    Intent: batch-06 (HLR-001) supersedes the batch-05 fixed ``width: 82``
+    cap with the A2L-style proportional+floor model — ``#mac_records_pane
+    4fr``, ``#mac_hex_pane 3fr; min-width: 82`` — so the hex pane width is
+    ``max(82, round(3/7 * body_w))``. At 120x30 and 160x40 the 3/7
+    proportional share (~41 and ~58 of the body) is below the floor, so the
+    pane must sit at 82 on both sizes; the band is the floor band 80..86
+    (was the fixed-cap band 80..84). The ``4fr`` records pane takes the
+    strictly-positive remainder.
     """
 
     async def _drive(size: tuple[int, int]) -> dict[str, int]:
@@ -1383,26 +1381,30 @@ def test_tc021_mac_two_panes_fixed_regime(tmp_path: Path) -> None:
     for size in [(120, 30), (160, 40)]:
         dims = asyncio.run(_drive(size))
         assert dims["narrow"] == 0, (
-            f"at {size} (>=120 cols) the MAC fixed regime must be active "
-            f"(width-narrow must be unset)"
+            f"at {size} (>=120 cols) the width-narrow class must be unset "
+            f"(it only drives the activity rail, below 120 cols)"
         )
-        assert 80 <= dims["hex"] <= 84, (
-            f"at {size} the MAC hex pane must be the fixed 82+/-2 cols, "
-            f"got {dims['hex']}"
+        assert 80 <= dims["hex"] <= 86, (
+            f"at {size} the MAC hex pane must be held at the 82-cell "
+            f"min-width floor (80..86), got {dims['hex']}"
         )
         assert dims["records"] > 0, (
-            f"at {size} the MAC records pane (1fr) must be strictly "
+            f"at {size} the MAC records pane (4fr) must be strictly "
             f"positive, got {dims['records']}"
         )
 
 
-def test_tc021_mac_two_panes_proportional_regime(tmp_path: Path) -> None:
-    """At <120 columns the MAC View hex pane is proportional (LLR-010.1).
+def test_tc021_mac_two_panes_floor_below_minimum(tmp_path: Path) -> None:
+    """Below the 120-col documented minimum the hex-pane floor still holds.
 
-    Intent: below the 120-column breakpoint the MAC View switches to the
-    proportional regime — the hex pane is 35% +/-4 points of the
-    workspace body width, the records pane the ``1fr`` strictly-positive
-    remainder. Asserted at the 80x24 minimum supported size.
+    Intent: batch-06 (LLR-001.3 / LLR-001.4) deletes the ``width-narrow``
+    MAC rules (the retired ``35%`` proportional regime), so even at the
+    sub-minimum 80x24 size the single proportional+floor model applies: the
+    3/7 share of the ~74-cell body is far below 82, so ``min-width: 82``
+    must keep the hex pane at the full-row floor — a full hex row stays
+    readable instead of shrinking to ~35% of the body. (The records pane
+    may clip toward zero here; that is graceful clipping below the
+    documented 120-col minimum and is not asserted.)
     """
 
     async def _drive() -> dict[str, int]:
@@ -1415,23 +1417,18 @@ def test_tc021_mac_two_panes_proportional_regime(tmp_path: Path) -> None:
             return {
                 "narrow": int(body.has_class("width-narrow")),
                 "body": body.region.width,
-                "records": app.query_one("#mac_records_pane").region.width,
                 "hex": app.query_one("#mac_hex_pane").region.width,
             }
 
     dims = asyncio.run(_drive())
     assert dims["narrow"] == 1, (
-        "at 80x24 (<120 cols) the MAC proportional regime must be active "
-        "(width-narrow must be set)"
+        "at 80x24 (<120 cols) the width-narrow class is still set (it "
+        "drives the activity rail) but no MAC rule may attach to it"
     )
-    hex_pct = 100 * dims["hex"] / dims["body"]
-    assert 31 <= hex_pct <= 39, (
-        f"at 80x24 the MAC hex pane must be 35%+/-4 points of the body, "
-        f"got {hex_pct:.1f}%"
-    )
-    assert dims["records"] > 0, (
-        f"at 80x24 the MAC records pane (1fr) must be strictly positive, "
-        f"got {dims['records']}"
+    assert 80 <= dims["hex"] <= 86, (
+        f"at 80x24 the MAC hex pane must be held at the 82-cell min-width "
+        f"floor (80..86) — the retired width-narrow 35% regime must NOT "
+        f"apply, got {dims['hex']} (body={dims['body']})"
     )
 
 
