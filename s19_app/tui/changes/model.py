@@ -1,12 +1,13 @@
 """
-v2 change-file object model — s19_app batch-07, increment E1.
+v2 change-file object model — s19_app batch-07, increments E1/E2/E4.
 
 This module is the **pure-data half** of the v2 hex-first change system
 (`s19app-changeset`, HLR-001): the per-entry container :class:`ChangeEntry`,
-the document container :class:`ChangeDocument`, and the
-:class:`MemoryStatus` containment verdict migrated from
-``cdfx/memory.py`` (the cdfx original is untouched here — increment E3b
-performs the deletions).
+the document container :class:`ChangeDocument`, the
+:class:`MemoryStatus` containment verdict migrated from ``cdfx/memory.py``,
+the E2 apply-summary carriers (:class:`ChangeSummary`), and the E4
+check-result carriers (:class:`CheckRunResult` — the §6.2 C-6 canonical
+results object of LLR-004.3).
 
 A v2 entry comes in exactly two kinds (LLR-001.2): a **string patch**
 (``entry_type="string"``) whose declared ``value`` is resolved to bytes via
@@ -509,6 +510,226 @@ class ChangeSummary:
                     ),
                     "after_bytes": list(entry.after_bytes),
                     "disposition": entry.disposition,
+                    "linkage": entry.linkage,
+                    "linkage_symbol": entry.linkage_symbol,
+                }
+                for entry in self.entries
+            ],
+        }
+
+
+# ---------------------------------------------------------------------------
+# E4 check-result vocabulary (LLR-004.2 / LLR-004.3 / §6.2 C-6).
+# ---------------------------------------------------------------------------
+
+#: Result token — the entry's expected bytes equal the bytes read from the
+#: loaded image over its addressed range (LLR-004.2).
+CHECK_PASS = "pass"
+
+#: Result token — the addressed range was fully readable but the actual
+#: bytes differ from the expected bytes (LLR-004.2).
+CHECK_FAIL = "fail"
+
+#: Result token — no comparison was possible: the range is not fully inside
+#: the loaded image (``PARTIAL`` / ``OUTSIDE``), no image is loaded, or the
+#: document itself is not runnable (ERROR-faulted or ``kind`` != ``"check"``
+#: — the apply-gate mirror, LLR-004.1/004.2).
+CHECK_UNCHECKABLE = "uncheckable"
+
+#: The full check-result domain in its canonical order.
+CHECK_RESULT_DOMAIN: tuple[str, ...] = (
+    CHECK_PASS,
+    CHECK_FAIL,
+    CHECK_UNCHECKABLE,
+)
+
+#: The aggregate-count keys of :attr:`CheckRunResult.aggregates` in their
+#: canonical order — all three always present, even when zero, mirroring
+#: :data:`DISPOSITION_DOMAIN` (F-A-04), so report tables never branch on
+#: missing keys.
+CHECK_AGGREGATE_KEYS: tuple[str, ...] = ("passed", "failed", "uncheckable")
+
+
+@dataclass(slots=True)
+class CheckRunEntry:
+    """
+    Summary:
+        One per-entry record of a :class:`CheckRunResult` — the §6.2 C-6
+        canonical per-entry field set produced by the E4 check engine
+        (LLR-004.3).
+
+    Args:
+        entry_type (str): The source entry's kind — ``"string"`` or
+            ``"bytes"``.
+        address_start (int): Inclusive start of the entry's addressed byte
+            range (``ChangeEntry.addressed_range[0]``).
+        address_end (int): Exclusive end of the addressed byte range —
+            ``address_end - address_start`` is the expected byte length.
+        expected_bytes (tuple[int, ...]): The entry's declared encoded run —
+            the **source of expected values** (US-003).
+        actual_bytes (Optional[tuple[int, ...]]): The bytes read from the
+            loaded image over the addressed range — captured only when the
+            range was fully readable (``pass`` / ``fail``); ``None`` on
+            every ``uncheckable`` outcome (LLR-004.2).
+        result (str): One token of :data:`CHECK_RESULT_DOMAIN`.
+        linkage (str): The informative classification —
+            :data:`LINKAGE_STANDALONE` / :data:`LINKAGE_MAC` /
+            :data:`LINKAGE_A2L` / :data:`LINKAGE_BOTH`. Never affects
+            ``result``.
+        linkage_symbol (Optional[str]): The matching MAC/A2L symbol name
+            when linked; ``None`` when standalone or unnamed.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by ``changes.check.run_check_document``, one per document
+          entry in document order; consumed by ``CheckRunResult.to_dict``,
+          the Patch Editor check rows (LLR-004.5), and the E7 report
+          generator.
+
+    Dependencies:
+        Used by:
+            - CheckRunResult
+            - changes.check.run_check_document
+    """
+
+    entry_type: str
+    address_start: int
+    address_end: int
+    expected_bytes: tuple[int, ...]
+    actual_bytes: Optional[tuple[int, ...]]
+    result: str
+    linkage: str
+    linkage_symbol: Optional[str]
+
+
+@dataclass(slots=True)
+class CheckRunResult:
+    """
+    Summary:
+        The check-results object returned by the E4 check engine — the §6.2
+        C-6 canonical producer schema (LLR-004.3) consumed by the Patch
+        Editor display, the execution layer, and the report generator. The
+        **single complete carrier** of a check run (B-2): aggregates,
+        per-entry records, and the check document's collected declaration
+        faults travel together.
+
+    Args:
+        source_path (Optional[Path]): The check file the document was read
+            from (``ChangeDocument.source_path``); ``None`` for a
+            programmatically composed document.
+        timestamp_utc (str): ISO-8601 UTC timestamp of the check run, taken
+            from the engine's injectable ``now_fn`` clock (B-4).
+        variant_id (Optional[str]): The project variant the run targeted;
+            ``None`` outside multi-variant execution (US-005 arrives at
+            E5/E6).
+        aggregates (dict[str, int]): Aggregate entry counts keyed by every
+            token of :data:`CHECK_AGGREGATE_KEYS` — all three keys always
+            present.
+        entries (list[CheckRunEntry]): Per-entry records in document order.
+        issues (list[ValidationIssue]): The check document's collected
+            declaration faults, mirroring ``ChangeSummary.issues`` — without
+            this carrier, check declaration faults would be silently dropped
+            on the execution-to-report chain (B-2).
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by ``changes.check.run_check_document``; ``to_dict`` is the
+          serialization consumed by the E7 report generator (LLR-007.4) and
+          by determinism tests (LLR-004.3).
+
+    Dependencies:
+        Uses:
+            - CheckRunEntry
+            - ValidationIssue
+        Used by:
+            - changes.check.run_check_document
+            - services.change_service (run-checks display + headless entry)
+            - The E6 execution layer and E7 report generator (later
+              increments).
+
+    Example:
+        >>> result = CheckRunResult(
+        ...     source_path=None,
+        ...     timestamp_utc="2026-06-10T12:00:00+00:00",
+        ...     variant_id=None,
+        ...     aggregates={key: 0 for key in CHECK_AGGREGATE_KEYS},
+        ... )
+        >>> result.to_dict()["aggregates"]["passed"]
+        0
+    """
+
+    source_path: Optional[Path]
+    timestamp_utc: str
+    variant_id: Optional[str]
+    aggregates: dict[str, int]
+    entries: list[CheckRunEntry] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, object]:
+        """
+        Summary:
+            Serialize this result to a deterministic plain-data dict — same
+            object, same dict, every call; entries in document order
+            (LLR-004.3).
+
+        Returns:
+            dict[str, object]: JSON-compatible mapping: ``source_path`` as a
+            string (or ``None``), ``aggregates`` with all three
+            :data:`CHECK_AGGREGATE_KEYS` in canonical order, ``issues`` as
+            ``{code, severity, message, artifact, symbol, address}`` dicts,
+            and ``entries`` as per-entry dicts (byte tuples as lists,
+            ``actual_bytes`` ``None`` when uncheckable) in document order.
+
+        Data Flow:
+            - Rebuilt from the dataclass fields on every call — no caching,
+              no mutation — so two calls on one object compare equal and two
+              runs over the same inputs under a fixed clock compare equal
+              (B-4).
+
+        Dependencies:
+            Uses:
+                - CheckRunEntry
+            Used by:
+                - tests/test_checks_engine.py (determinism assertions)
+                - The E7 report generator (later increment).
+        """
+        return {
+            "source_path": (
+                str(self.source_path) if self.source_path is not None else None
+            ),
+            "timestamp_utc": self.timestamp_utc,
+            "variant_id": self.variant_id,
+            "aggregates": {
+                key: self.aggregates.get(key, 0)
+                for key in CHECK_AGGREGATE_KEYS
+            },
+            "issues": [
+                {
+                    "code": issue.code,
+                    "severity": issue.severity.value,
+                    "message": issue.message,
+                    "artifact": issue.artifact,
+                    "symbol": issue.symbol,
+                    "address": issue.address,
+                }
+                for issue in self.issues
+            ],
+            "entries": [
+                {
+                    "entry_type": entry.entry_type,
+                    "address_start": entry.address_start,
+                    "address_end": entry.address_end,
+                    "expected_bytes": list(entry.expected_bytes),
+                    "actual_bytes": (
+                        list(entry.actual_bytes)
+                        if entry.actual_bytes is not None
+                        else None
+                    ),
+                    "result": entry.result,
                     "linkage": entry.linkage,
                     "linkage_symbol": entry.linkage_symbol,
                 }

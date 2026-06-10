@@ -12,8 +12,8 @@ These tests verdict ``services/change_service.py`` — the v2 evolution of
 - legacy-path rejection passthrough (v1 JSON → exactly one
   ``CHG-V1-FORMAT`` ERROR);
 - retired-method-names-absent inspection (HLR-003 statement 2);
-- the run-checks E4 seam (pending finding without a runner; aggregate
-  shaping with an injected stub).
+- the run-checks seam (the REAL E4 engine by default since increment E4;
+  aggregate shaping with an injected stub — the seam stays injectable).
 
 The service is headless by contract: the no-Textual-import case inspects
 the module source (an in-session ``sys.modules`` assertion is unreliable —
@@ -29,9 +29,16 @@ from types import SimpleNamespace
 import pytest
 
 from s19_app.validation.model import ValidationSeverity
-from s19_app.tui.changes import CHG_COLLISION, CHG_V1_FORMAT
+from s19_app.tui.changes import (
+    CHG_COLLISION,
+    CHG_V1_FORMAT,
+    ChangeDocument,
+    ChangeEntry,
+    FORMAT_ID,
+    FORMAT_VERSION,
+)
+from s19_app.tui.changes.check import run_check_document
 from s19_app.tui.services.change_service import (
-    CHG_CHECKS_PENDING,
     ChangeService,
     parse_address,
     parse_new_bytes,
@@ -320,25 +327,40 @@ def test_retired_method_names_absent() -> None:
 
 
 # ===========================================================================
-# F-Q-15 case 8 — the run-checks E4 seam
+# F-Q-15 case 8 — the run-checks seam (real E4 engine by default)
 # ===========================================================================
 
 
-def test_run_checks_without_engine_reports_pending() -> None:
-    """With no injected runner, run_checks reports the E4-pending finding.
+def test_run_checks_default_seam_is_real_engine() -> None:
+    """A fresh service runs checks through the real E4 engine.
 
-    Intent: LLR-004.5 at E3a — the check engine does not exist until E4, so
-    the seam must surface exactly one clear ``CHG-CHECKS-PENDING`` status
-    finding and execute nothing.
+    Intent: LLR-004.4/004.5 at E4 — ``CHG-CHECKS-PENDING`` is gone: the
+    ``check_runner`` seam defaults to ``run_check_document`` (re-pinned
+    from the E3a pending-finding contract), so a check document executes
+    with no injection and the status line states the three real aggregate
+    counts.
     """
     service, mem_map, ranges = _service_with_image()
+    assert service.check_runner is run_check_document
+    service.document = ChangeDocument(
+        format=FORMAT_ID,
+        version=FORMAT_VERSION,
+        kind="check",
+        encoding="utf-8",
+        value_mode="text",
+        entries=[
+            ChangeEntry("bytes", 0x100, (0x00,)),  # pass (image is zeroed)
+            ChangeEntry("bytes", 0x500, (0x01,)),  # OUTSIDE -> uncheckable
+        ],
+    )
     result = service.run_checks(mem_map, ranges)
-    assert not result.ok
-    assert "check engine pending (E4)" in result.message
-    assert len(result.issues) == 1
-    assert result.issues[0].code == CHG_CHECKS_PENDING
-    assert service.last_check_result is None
-    assert service.check_rows() == []
+    assert result.ok
+    assert result.message == "Checks: 1 passed, 0 failed, 1 uncheckable"
+    assert service.last_check_result is not None
+    assert [row.css_class for row in service.check_rows()] == [
+        "sev-ok",
+        "sev-warning",
+    ]
 
 
 def test_run_checks_with_injected_runner_shapes_display() -> None:

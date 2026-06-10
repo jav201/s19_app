@@ -21,9 +21,9 @@ screen + router + service seam:
 - **TC-052** — declaration-fault persistence (LLR-002.8, F-Q-11 3 stages):
   faults render persistently, survive unrelated UI actions, and clear on a
   clean re-validate.
-- **TC-024** — check-run display (LLR-004.5) on a stubbed result through
-  the service's E4 seam: per-row ``sev-*`` classes + the three-aggregate
-  status line.
+- **TC-024** — check-run display (LLR-004.5) fed by the REAL E4 engine on
+  the loaded-image 2-1-2 fixture: per-row ``sev-*`` classes + the
+  three-aggregate status line (re-pinned from the E3a stub at E4).
 
 Engine unit behavior is covered by ``tests/test_changes_*``; service unit
 behavior by ``tests/test_change_service.py``. This file covers the widget →
@@ -35,7 +35,6 @@ from __future__ import annotations
 import asyncio
 import json
 from pathlib import Path
-from types import SimpleNamespace
 from typing import Optional
 
 import pytest
@@ -266,11 +265,13 @@ def test_action_routing_observable_effects(tmp_path: Path) -> None:
             workarea = tmp_path / ".s19tool" / "workarea"
             outcomes["saved_files"] = len(list(workarea.glob("changes*.json")))
 
-            # run_checks (seam unfilled at E3a)
+            # run_checks (real E4 engine; kind="change" document with no
+            # image -> not runnable, both entries uncheckable)
             panel.request_action("run_checks")
             await pilot.pause()
             outcomes["checks_line"] = any(
-                "check engine pending (E4)" in line for line in app.log_lines
+                "Checks: 0 passed, 0 failed, 2 uncheckable" in line
+                for line in app.log_lines
             )
 
             # retired action -> status error, not a crash
@@ -600,43 +601,37 @@ def test_declaration_faults_visible(tmp_path: Path) -> None:
 
 
 # ===========================================================================
-# TC-024 — check-run display (LLR-004.5, via the E4 service seam)
+# TC-024 — check-run display (LLR-004.5, fed by the REAL E4 engine)
 # ===========================================================================
 
 
 def test_check_run_display(tmp_path: Path) -> None:
-    """A (stubbed) check run renders coloured rows + the 3-count line.
+    """A real check run renders coloured rows + the 3-count line.
 
-    Intent: LLR-004.5 — one row per check entry coloured through
-    ``css_class_for_severity`` (pass→``sev-ok``, fail→``sev-error``,
-    uncheckable→``sev-warning``) and a status line stating the three
-    aggregate counts, on the loaded-image 2-1-2 fixture shape of LLR-004.2.
-    The check ENGINE arrives at E4; this display test injects a stubbed
-    result object through the service's documented ``check_runner`` seam.
+    Intent: LLR-004.5 re-pinned at E4 — a ``kind="check"`` document loaded
+    through the panel and executed by the REAL engine
+    (``run_check_document``, the service's default ``check_runner``) on the
+    loaded-image 2-1-2 fixture of LLR-004.2 renders one row per entry
+    coloured through ``css_class_for_severity`` (pass→``sev-ok``,
+    fail→``sev-error``, uncheckable→``sev-warning``) and a status line
+    stating the three aggregate counts. No stub is injected anywhere.
     """
     from textual.widgets import Label, Static
 
-    def _record(start: int, end: int, expected, actual, result):
-        return SimpleNamespace(
-            address_start=start,
-            address_end=end,
-            expected_bytes=expected,
-            actual_bytes=actual,
-            result=result,
-        )
-
-    stub = SimpleNamespace(
-        entries=[
-            _record(0x100, 0x102, (0xAA, 0xBB), (0xAA, 0xBB), "pass"),
-            _record(0x104, 0x105, (0x01,), (0x01,), "pass"),
-            _record(0x106, 0x107, (0x02,), (0x03,), "fail"),
-            _record(0x10E, 0x112, (0x01, 0x02, 0x03, 0x04), None, "uncheckable"),
-            _record(0x500, 0x502, (0x05, 0x06), None, "uncheckable"),
+    # 2-1-2 against the all-zero 16-byte image at 0x100: two matching
+    # expectations, one mismatch (expected 02, actual 00), one PARTIAL
+    # straddle at the image edge, one fully OUTSIDE entry.
+    check_path = _write_v2_document(
+        tmp_path / "checks.json",
+        [
+            {"type": "bytes", "address": "0x100", "bytes": "00 00"},
+            {"type": "bytes", "address": "0x104", "bytes": "00"},
+            {"type": "bytes", "address": "0x106", "bytes": "02"},
+            {"type": "bytes", "address": "0x10E", "bytes": "01 02 03 04"},
+            {"type": "bytes", "address": "0x500", "bytes": "05 06"},
         ],
-        aggregates={"passed": 2, "failed": 1, "uncheckable": 2},
-        issues=[],
+        kind="check",
     )
-
     image_path = _make_s19_image(tmp_path)
 
     async def _drive() -> dict[str, object]:
@@ -647,8 +642,10 @@ def test_check_run_display(tmp_path: Path) -> None:
             _load_image(app, image_path)
             app.action_show_screen("patch")
             await pilot.pause()
-            app._change_service.check_runner = lambda *args, **kwargs: stub
             panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(check_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
             panel.request_action("run_checks")
             await pilot.pause()
             result_rows = list(
@@ -663,6 +660,9 @@ def test_check_run_display(tmp_path: Path) -> None:
             outcomes["row_count"] = len(result_rows)
             status = app.query_one("#patch_checks_status", Label)
             outcomes["status_line"] = str(status.render())
+            result = app._change_service.last_check_result
+            outcomes["engine_aggregates"] = dict(result.aggregates)
+            outcomes["fail_actual"] = result.entries[2].actual_bytes
         return outcomes
 
     outcomes = asyncio.run(_drive())
@@ -675,3 +675,11 @@ def test_check_run_display(tmp_path: Path) -> None:
         "sev-warning",
     ]
     assert outcomes["status_line"] == "Checks: 2 passed, 1 failed, 2 uncheckable"
+    # The result came from the real engine, not a display stub: the actual
+    # bytes of the failing entry were read from the loaded image.
+    assert outcomes["engine_aggregates"] == {
+        "passed": 2,
+        "failed": 1,
+        "uncheckable": 2,
+    }
+    assert outcomes["fail_actual"] == (0x00,)

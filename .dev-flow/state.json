@@ -130,6 +130,18 @@
             "date": "2026-06-10",
             "decision": "increment-E3a-approved-E3b-started",
             "notes": "E3a approved; HEX-status-line deviation ACCEPTED (Phase-6 LLR-002.7 wording reconciliation). E3b started — the retirement enactment under the approved ~20-25-file budget exception: delete cdfx/ package (7 modules + memory.py/memory_validate.py after migration) + services/cdfx_service.py; migrate memory_display.py -> changes/display.py; enact §6.6 (229 RETIRE incl. 11 whole cdfx test files, 50 REWRITE, 69 SURVIVES import re-pointing); self-tested grep -E retirement probe (must hit pre-delete, 0 post); fold E3a DEFAULT_CSS into styles.tcss; restore lean suite green."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E3b-awaiting-gate",
+            "notes": "E3b implemented + orchestrator-verified. 46 files (+1,550/-16,212): cdfx/ package (11 modules) + cdfx_service.py DELETED after memory_display->changes/display.py migration; 15 test files deleted (229 RETIRE enacted); TC-027 guard relocated to test_engine_unchanged.py; REWRITE/SURVIVES rows enacted per §6.6 ledger (R=28/50 returned, 22 folded w/ named targets); snapshot patch cell xfail (CI-env regen pending); probe SELF-TESTED 164 pre -> 0 post (orchestrator re-verified 0); collection 915->662 (orchestrator re-verified 662); lean 611 passed / 0 failed (orchestrator re-ran: 611/0). THREE ratification items at gate: (1) 6 test_memory_validate SURVIVES rows re-dispositioned to intent-preserving REWRITE (MEMV-* warnings eliminated by v2 design — containment became dispositions); (2) one production edit beyond deletions (io.py message names exception type, pinned by surviving S57-02 test); (3) unified_changeset/export REWRITE rows enacted as folds w/ named targets per whole-file-delete work order. Local commit 74f2df5. Packet: increment-E3b.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E3b-approved-E4-started",
+            "notes": "E3b approved with all 3 ratifications (6-row re-disposition, io.py production edit, fold-with-named-targets). E4 started — real check engine: changes/check.py (run_check_document + run_checks_for_project, LLR-004.1-.4) injected into the E3a check_runner seam; TC-024 display test re-pinned from stub to real 2-1-2 fixture (LLR-004.5). Files: changes/check.py NEW, change_service.py (seam injection), tests/test_checks_engine.py NEW, tests/test_tui_patch_editor_v2.py (TC-024 update) = 4."
         }
     ],
     "obsidian_synced": false,

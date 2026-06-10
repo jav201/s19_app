@@ -8,16 +8,27 @@ Patch Editor needs — entry add / edit / remove for **both** entry kinds
 (``"string"`` / ``"bytes"``), v2 JSON load / save (``read_change_document`` /
 ``write_change_document``), validation (collision rule + image containment),
 apply (``apply_change_document``) with the LLR-002.7 save-back flow
-(``save_patched_image``), and the LLR-004.5 run-checks surface behind a thin
-injectable seam the E4 check engine fills (``check_runner``).
+(``save_patched_image``), and the LLR-004.5 run-checks surface through the
+``check_runner`` seam — filled by the real E4 engine
+(``changes.check.run_check_document``) since increment E4, still injectable
+for tests.
+
+It also hosts the LLR-004.4 **headless project entry point**,
+:func:`run_checks_for_project` — service-level per the LLR's wording: paths
+in, one :class:`CheckRunResult` out, reusing the load-service parse path
+(``build_loaded_s19`` / ``build_loaded_hex``) plus the MAC / A2L parsers for
+the informative linkage sources. No TUI interaction anywhere on that path.
 
 The retired parameter-by-name methods and the selective-``.cdfx`` export of
 ``CdfxService`` deliberately do not exist here (HLR-003 statement 2); the
-``cdfx_service.py`` file itself is deleted at increment E3b.
+``cdfx_service.py`` file itself was deleted at increment E3b.
 
-This module imports stdlib + the ``changes`` package + ``validation.model`` +
-``color_policy`` only — **no Textual import** (service-layer contract; the
-screen and ``app.py`` stay presentational, constraint C-7).
+This module imports stdlib + the parse layer (``core`` / ``hexfile`` /
+``mac`` / ``a2l_parse``) + the ``changes`` package + sibling services +
+``validation.model`` + ``color_policy`` only — **no Textual import**
+(service-layer contract; the screen and ``app.py`` stay presentational,
+constraint C-7; verified by the subprocess-isolated probe in
+``tests/test_checks_engine.py``, F-Q-07).
 """
 
 from __future__ import annotations
@@ -26,9 +37,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+from ...core import S19File
+from ...hexfile import IntelHexFile
 from ...validation.model import ValidationIssue, ValidationSeverity
+from ..a2l_parse import parse_a2l_file
 from ..changes import (
-    CHANGES_ARTIFACT,
     CHG_COLLISION,
     ChangeDocument,
     ChangeEntry,
@@ -43,14 +56,12 @@ from ..changes import (
     save_patched_image,
     write_change_document,
 )
+from ..changes.check import run_check_document
+from ..changes.model import CheckRunResult
 from ..color_policy import css_class_for_severity
-
-#: Stable ``ValidationIssue.code`` for the E3a run-checks seam: the check
-#: engine (``run_check_document``) does not exist until increment E4, so a
-#: run-checks request with no injected ``check_runner`` reports exactly one
-#: finding carrying this code instead of executing anything (documented E4
-#: indirection — the LLR-004.5 display rides the same seam once E4 lands).
-CHG_CHECKS_PENDING = "CHG-CHECKS-PENDING"
+from ..mac import parse_mac_file
+from .a2l_service import enrich_tags_and_render
+from .load_service import build_loaded_hex, build_loaded_s19
 
 #: The two v2 entry kinds (LLR-001.2 wire field ``type``).
 ENTRY_KIND_STRING = "string"
@@ -298,8 +309,8 @@ class ChangeService:
           containment; ``apply`` runs the E2 engine and records the summary;
           ``save_patched`` persists the patched image and stamps
           ``ChangeSummary.saved_path``.
-        - ``run_checks`` delegates to the injectable ``check_runner`` seam —
-          absent (pre-E4) it reports one ``CHG-CHECKS-PENDING`` finding.
+        - ``run_checks`` delegates to the ``check_runner`` seam — the real
+          E4 engine by default, injectable for tests.
         - ``rows`` / ``issue_lines`` / ``check_rows`` shape display data for
           the screen.
 
@@ -319,14 +330,16 @@ class ChangeService:
         #: The summary of the most recent apply run (``None`` before any
         #: apply); its ``saved_path`` is stamped by :meth:`save_patched`.
         self.last_summary: Optional[ChangeSummary] = None
-        #: The E4 check-engine seam (LLR-004.5): a callable
+        #: The check-engine seam (LLR-004.5): a callable
         #: ``(document, mem_map, ranges, mac_records, a2l_tags) -> result``
-        #: returning the LLR-004.3 ``CheckRunResult`` duck shape —
-        #: ``entries`` records with ``address_start`` / ``address_end`` /
+        #: returning the LLR-004.3 ``CheckRunResult`` shape — ``entries``
+        #: records with ``address_start`` / ``address_end`` /
         #: ``expected_bytes`` / ``actual_bytes`` / ``result``, plus an
         #: ``aggregates`` mapping with ``passed`` / ``failed`` /
-        #: ``uncheckable`` keys. ``None`` until E4 wires the real engine.
-        self.check_runner: Optional[Callable[..., object]] = None
+        #: ``uncheckable`` keys. Defaults to the real E4 engine
+        #: (``changes.check.run_check_document``); kept injectable so tests
+        #: can substitute a stub.
+        self.check_runner: Callable[..., object] = run_check_document
         #: The result object of the most recent check run (``None`` before
         #: any run or when the seam is unfilled).
         self.last_check_result: Optional[object] = None
@@ -847,7 +860,7 @@ class ChangeService:
         )
 
     # ------------------------------------------------------------------
-    # Run checks — E4 seam (LLR-004.5 surface)
+    # Run checks — the E4 engine through the injectable seam (LLR-004.5)
     # ------------------------------------------------------------------
 
     def run_checks(
@@ -859,16 +872,15 @@ class ChangeService:
     ) -> ChangeActionResult:
         """
         Summary:
-            Execute the owned check document through the injectable
-            ``check_runner`` seam (LLR-004.5). The check engine
-            (``run_check_document``) does not exist until increment E4: with
-            no runner injected, the request reports exactly one
-            ``CHG-CHECKS-PENDING`` finding and executes nothing — the
-            documented E3a indirection E4 fills.
+            Execute the owned check document through the ``check_runner``
+            seam (LLR-004.5) — the real E4 engine
+            (``changes.check.run_check_document``) by default, injectable
+            for tests.
 
         Args:
             mem_map (Optional[Dict[int, int]]): The loaded image's
-                address-to-byte map (never mutated by a check run).
+                address-to-byte map (never mutated by a check run —
+                LLR-004.2).
             ranges (Optional[Sequence[Tuple[int, int]]]): The image's
                 contiguous ranges.
             mac_records (Optional[Sequence[dict]]): Parsed MAC records for
@@ -877,44 +889,22 @@ class ChangeService:
                 linkage.
 
         Returns:
-            ChangeActionResult: With no runner — ``ok`` ``False``, one
-            ``CHG-CHECKS-PENDING`` INFO finding, message ``"Run checks:
-            check engine pending (E4)"``. With a runner — the three
-            aggregate counts in ``message`` (LLR-004.5 status line),
-            ``ok`` ``True`` when nothing failed, and the result object
-            stored as ``last_check_result`` for :meth:`check_rows`.
+            ChangeActionResult: The three aggregate counts in ``message``
+            (the LLR-004.5 status line), ``ok`` ``True`` when nothing
+            failed, the result's carried ``issues`` (B-2), and the result
+            object stored as ``last_check_result`` for :meth:`check_rows`.
 
         Data Flow:
-            - Seam unfilled → one pending finding, ``last_check_result``
-              reset.
-            - Seam filled → call
-              ``check_runner(document, mem_map, ranges, mac_records,
-              a2l_tags)``; read the ``aggregates`` mapping for the status
-              counts.
+            - Call ``check_runner(document, mem_map, ranges, mac_records,
+              a2l_tags)``; store the result; read its ``aggregates``
+              mapping for the status counts.
 
         Dependencies:
             Uses:
-                - self.check_runner (the E4 seam)
+                - self.check_runner (run_check_document by default)
             Used by:
                 - app.py ``run_checks`` action routing
         """
-        if self.check_runner is None:
-            self.last_check_result = None
-            return ChangeActionResult(
-                message="Run checks: check engine pending (E4)",
-                issues=[
-                    ValidationIssue(
-                        code=CHG_CHECKS_PENDING,
-                        severity=ValidationSeverity.INFO,
-                        message=(
-                            "the declarative check engine arrives at "
-                            "increment E4 - no checks were executed"
-                        ),
-                        artifact=CHANGES_ARTIFACT,
-                    )
-                ],
-                ok=False,
-            )
         result = self.check_runner(
             self.document, mem_map, ranges, mac_records, a2l_tags
         )
@@ -1084,3 +1074,97 @@ class ChangeService:
             f"[{issue.code}] {issue.severity.value}: {issue.message}"
             for issue in self.document.issues
         ]
+
+
+# ---------------------------------------------------------------------------
+# Headless project entry point (LLR-004.4)
+# ---------------------------------------------------------------------------
+
+
+def run_checks_for_project(
+    check_path: Path,
+    image_path: Path,
+    mac_path: Optional[Path] = None,
+    a2l_path: Optional[Path] = None,
+) -> CheckRunResult:
+    """
+    Summary:
+        Execute one check file against one project image entirely headless —
+        the LLR-004.4 service-level entry point: path inputs, ONE
+        :class:`CheckRunResult` out, carrying its own declaration-fault
+        ``issues`` (B-2). No Textual app is constructed anywhere on this
+        path (verified by the subprocess-isolated import probe in
+        ``tests/test_checks_engine.py`` — F-Q-07).
+
+    Args:
+        check_path (Path): The v2 ``kind="check"`` JSON document to run.
+            Read through ``read_change_document`` (the one shared reader,
+            LLR-004.1) with the file's own directory as the resolution base.
+        image_path (Path): The S19 or Intel HEX image to check against —
+            ``.hex`` / ``.ihex`` suffixes parse as Intel HEX, anything else
+            as S19, matching the loader split of the TUI load path.
+        mac_path (Optional[Path]): Optional ``.mac`` file parsed via
+            ``parse_mac_file`` for the informative linkage classification.
+        a2l_path (Optional[Path]): Optional A2L file parsed via
+            ``parse_a2l_file`` and enriched against the image
+            (``enrich_tags_and_render``) for the linkage classification.
+
+    Returns:
+        CheckRunResult: The §6.2 C-6 results object (LLR-004.3) —
+        ``variant_id`` is the image filename stem, ``source_path`` the
+        resolved check file, ``issues`` the check document's collected
+        declaration faults. A faulted or wrong-kind document yields the
+        all-``uncheckable`` not-runnable outcome with its issues carried.
+
+    Data Flow:
+        - ``read_change_document(check_path)`` → the check document
+          (collect-don't-abort; faults ride the result).
+        - Parse the image and build the ``LoadedFile`` snapshot through the
+          load-service parse path (``build_loaded_s19`` /
+          ``build_loaded_hex``) — the same enrichment the TUI worker uses,
+          minus any UI thread.
+        - Parse the optional MAC / A2L linkage sources.
+        - Delegate to :func:`~s19_app.tui.changes.check.run_check_document`.
+
+    Dependencies:
+        Uses:
+            - read_change_document
+            - S19File / IntelHexFile
+            - build_loaded_s19 / build_loaded_hex
+            - parse_mac_file / parse_a2l_file / enrich_tags_and_render
+            - run_check_document
+        Used by:
+            - tests/test_checks_engine.py::test_headless_project_run
+            - The E6 variant-execution layer (later increment).
+
+    Example:
+        >>> result = run_checks_for_project(
+        ...     Path("checks.json"), Path("prg.s19"),
+        ... )  # doctest: +SKIP
+    """
+    document = read_change_document(str(check_path), check_path.parent)
+    a2l_data = parse_a2l_file(a2l_path) if a2l_path is not None else None
+    if image_path.suffix.lower() in {".hex", ".ihex"}:
+        loaded = build_loaded_hex(
+            image_path, IntelHexFile(str(image_path)), a2l_path, a2l_data
+        )
+    else:
+        loaded = build_loaded_s19(
+            image_path, S19File(str(image_path)), a2l_path, a2l_data
+        )
+    mac_records = (
+        parse_mac_file(mac_path)["records"] if mac_path is not None else None
+    )
+    a2l_tags = (
+        enrich_tags_and_render(a2l_data, loaded.mem_map)[0]
+        if a2l_data
+        else None
+    )
+    return run_check_document(
+        document,
+        loaded.mem_map,
+        loaded.ranges,
+        mac_records,
+        a2l_tags,
+        variant_id=image_path.stem,
+    )
