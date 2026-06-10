@@ -22,15 +22,18 @@ Increment 10 (batch-02) added the last two scaffold contents:
     hex B) filled with constant, clearly-labelled sample hex rows and a
     visible "PLACEHOLDER / diff deferred" marker (LLR-012.3).
 
-batch-03 increment 9 makes the Patch Editor functional, replacing the inert
-``PatchEditorPanel`` shell:
-  - ``PatchEditorPanel`` — a functional Patch Editor: a change-list
-    ``DataTable``, name / index / value ``Input``s wired to add / edit /
-    remove, save / load action ``Button``s and a path ``Input``, and a
-    neutral empty-state line (LLR-007.1..007.6). The widget stays
-    presentational — it emits ``PatchEditorPanel.ActionRequested`` messages and
-    renders rows the screen hands back; the ``cdfx``-package work (build /
-    resolve / format / write / read) is done by ``services.cdfx_service``.
+batch-07 increment E3a consolidates the Patch Editor to the single v2 JSON
+change flow (LLR-003.1), superseding the batch-03 parameter editor and the
+batch-04 memory/unified halves:
+  - ``PatchEditorPanel`` — one change-flow section: an entries ``DataTable``
+    (kind / address / value-or-bytes / status / linkage), entry inputs for
+    both v2 kinds, a Load / Validate / Apply / Save / Run-checks control
+    row, the persistent declaration-fault area (LLR-002.8), the post-apply
+    save-back prompt (LLR-002.7), and the check-results display
+    (LLR-004.5). The widget stays presentational — it emits
+    ``PatchEditorPanel.ActionRequested`` / ``SaveBackDecision`` messages
+    and renders rows the app hands back; the ``changes``-package work is
+    done by ``services.change_service``.
 
 No engine code is imported here — these are presentational widgets that
 receive their data via method calls and emit messages back to ``app.py``. The
@@ -320,32 +323,41 @@ class BookmarksPlaceholder(Static):
 
 
 class PatchEditorPanel(ScrollableContainer):
-    """Functional Patch Editor rail screen — parameter + memory change build.
+    """Consolidated Patch Editor rail screen — the single v2 change flow.
 
     Summary:
-        Lays out the Direction B Patch Editor as a working tool. Batch-03
-        increment 9 made it functional for **parameter** changes — a
-        change-list ``DataTable``, name / index / value inputs wired to
-        add / edit / remove, and ``.cdfx`` save / load. Batch-04 increment 8
-        extends it with the **memory-field** change kind: a second
-        ``DataTable`` (one row per memory change — address, hex value, status),
-        memory-address / new-bytes ``Input`` fields wired to add / edit /
-        remove, and unified-file save / load plus a selective-export action —
-        all alongside the batch-03 parameter controls without removing them
-        (LLR-009.1..009.3).
+        Lays out the Direction B Patch Editor as **one** change-flow section
+        operating on v2 ``s19app-changeset`` JSON documents (LLR-003.1,
+        batch-07 increment E3a): an entries ``DataTable`` (kind / address /
+        value-or-bytes / status / linkage), address + string-value + bytes
+        ``Input`` fields wired to add / edit / remove for **both** entry
+        kinds, and one control row — Load / Validate / Apply / Save /
+        Run checks — over a change-file path ``Input``. The batch-03
+        parameter section, the ``.cdfx`` file row, and the batch-04
+        selective-export control no longer exist (HLR-003 statement 2).
 
-        The panel is a :class:`ScrollableContainer` so its two bounded
-        ``DataTable``s and the stacked input / button rows below them stay
-        reachable by vertical scroll when the combined content is taller than
-        the terminal — the Export button and the unified-file row are never
-        clipped off-screen.
+        Two further surfaces ride the panel:
 
-        The panel stays **presentational**: a control press does not call the
-        ``cdfx`` package directly — it posts a :class:`PatchEditorPanel.
-        ActionRequested` message that ``app.py`` handles by calling
-        ``services.cdfx_service``. The screen then hands resolved display rows
-        back via :meth:`refresh_rows` / :meth:`refresh_memory_rows`. No XML /
-        JSON / model logic lives in this widget (constraint C-7 / LLR-009.2).
+        - **Declaration faults** (LLR-002.8) — a persistent fault listing
+          plus a count line, re-rendered from the service's issue store
+          after every action and cleared only by a clean re-validate or a
+          clean re-load; never a transient status-line-only message.
+        - **Save-back prompt** (LLR-002.7 UI half) — an inline row, hidden
+          until an apply writes ≥1 entry on an S19 image, carrying an
+          editable filename ``Input`` pre-filled with the
+          ``<variant_id>-patched.s19`` suggestion and confirm / decline
+          buttons that post a :class:`SaveBackDecision` message.
+        - **Check results** (LLR-004.5) — one ``Static`` row per check
+          entry coloured by its ``sev-*`` class, plus an aggregate-count
+          status line.
+
+        The panel stays **presentational**: a control press does not call
+        the ``changes`` package directly — it posts an
+        :class:`ActionRequested` (or :class:`SaveBackDecision`) message that
+        ``app.py`` handles by calling ``services.change_service``; the
+        screen then receives display rows back via the ``refresh_*``
+        methods. No JSON / model logic lives in this widget (constraint
+        C-7).
 
     Args:
         None
@@ -354,19 +366,19 @@ class PatchEditorPanel(ScrollableContainer):
         None
 
     Data Flow:
-        - The parameter and memory add / edit / remove controls, the ``.cdfx``
-          save / load controls and the unified save / load / export controls
-          each post an ``ActionRequested`` message; ``app.py`` routes it to
-          ``CdfxService`` and calls :meth:`refresh_rows` /
-          :meth:`refresh_memory_rows` with the result.
-        - :meth:`refresh_rows` fills the parameter ``DataTable`` from the
-          ``PatchRow`` list; :meth:`refresh_memory_rows` fills the memory
-          ``DataTable`` from the ``MemoryPatchRow`` list. Each shows its own
-          empty-state line when its half is empty.
+        - Every control posts ``ActionRequested``; ``app.py`` routes it to
+          ``ChangeService`` and calls :meth:`refresh_entries` /
+          :meth:`refresh_issues` (and :meth:`refresh_check_results` after a
+          check run) with the shaped results.
+        - The save-back confirm / decline controls post
+          ``SaveBackDecision`` — deliberately **not** an ``ActionRequested``
+          action, so the routed action set stays exactly the LLR-003.2
+          eight.
 
     Dependencies:
         Used by:
-            - ``S19TuiApp._compose_screen_patch`` / ``S19TuiApp`` action wiring
+            - ``S19TuiApp._compose_screen_patch`` / ``S19TuiApp`` action
+              wiring
 
     Example:
         >>> panel = PatchEditorPanel()
@@ -375,49 +387,77 @@ class PatchEditorPanel(ScrollableContainer):
     """
 
     EMPTY_STATE_TEXT = (
-        "No change-list entries yet - type a parameter name, an optional "
-        "array index and a value then press Add, or load a .cdfx file."
+        "No change entries yet - type an address (0x...) plus a string "
+        "value or a run of hex bytes and press Add, or load a v2 "
+        "change-set JSON file."
     )
 
-    MEMORY_EMPTY_STATE_TEXT = (
-        "No memory changes yet - type a memory address (0x...) and a run of "
-        "new bytes then press Add Mem, or load a unified change-set file."
-    )
+    _ENTRIES_COLUMNS = ("Kind", "Address", "Value / bytes", "Status", "Linkage")
 
-    _TABLE_COLUMNS = ("Parameter", "Index", "Value", "Status")
-
-    _MEMORY_TABLE_COLUMNS = ("Address", "New bytes (hex)", "Status")
+    # Layout for the E3a widgets whose ids are new this increment; folded
+    # into styles.tcss when E3b retires the old ids' rules.
+    DEFAULT_CSS = """
+    #patch_doc_entries_table {
+        width: 100%;
+        height: 10;
+        margin-bottom: 1;
+    }
+    #patch_doc_empty_state {
+        width: 100%;
+        height: auto;
+        padding: 1;
+        margin-bottom: 1;
+    }
+    #patch_doc_entry_inputs,
+    #patch_doc_file_row,
+    #patch_saveback_row {
+        width: 100%;
+        height: auto;
+        padding-top: 1;
+    }
+    #patch_doc_entry_buttons,
+    #patch_doc_controls,
+    #patch_saveback_buttons {
+        width: 100%;
+        height: auto;
+    }
+    #patch_entry_address_input,
+    #patch_entry_value_input,
+    #patch_entry_bytes_input,
+    #patch_doc_path_input,
+    #patch_saveback_name_input {
+        margin-bottom: 1;
+    }
+    #patch_doc_issues,
+    #patch_checks_results {
+        width: 100%;
+        height: auto;
+        padding: 0 1;
+    }
+    """
 
     class ActionRequested(Message):
         """A Patch Editor control was triggered — ``app.py`` should act.
 
         Summary:
-            Posted by a parameter or memory add / edit / remove control, a
-            ``.cdfx`` save / load control, or a unified save / load / export
-            control. The widget carries **no** ``cdfx``-package logic; this
-            message hands the action and the current input-field values to
-            ``app.py``, which calls ``CdfxService`` and feeds the result back
-            via :meth:`PatchEditorPanel.refresh_rows` /
-            :meth:`refresh_memory_rows`.
+            Posted by the entry add / edit / remove controls and the
+            document control row. The widget carries **no**
+            ``changes``-package logic; this message hands the action and
+            the current input-field values to ``app.py``, which calls
+            ``ChangeService`` and feeds the shaped rows back via the
+            panel's ``refresh_*`` methods. The routable action set is
+            exactly the LLR-003.2 v2 eight at E3a (extended by
+            ``execute_scope`` at E6).
 
         Args:
-            action (str): One of the parameter actions ``"add"`` / ``"edit"`` /
-                ``"remove"`` / ``"save"`` / ``"load"``, the memory actions
-                ``"add_memory"`` / ``"edit_memory"`` / ``"remove_memory"``, or
-                the unified actions ``"save_unified"`` / ``"load_unified"`` /
-                ``"export"``.
-            parameter_name (str): The parameter-name input's current text.
-            index_text (str): The array-index input's current text — blank
-                for a scalar / string entry.
-            value_text (str): The value input's current text.
-            path_text (str): The ``.cdfx`` path input's current text — used by
-                the ``"load"`` action.
-            address_text (str): The memory-address input's current text — used
-                by the memory actions.
-            bytes_text (str): The new-bytes input's current text — used by the
-                memory add / edit actions.
-            unified_path_text (str): The unified-file path input's current
-                text — used by the ``"load_unified"`` action.
+            action (str): One of ``"add_entry"`` / ``"edit_entry"`` /
+                ``"remove_entry"`` / ``"load_doc"`` / ``"validate_doc"`` /
+                ``"apply_doc"`` / ``"save_doc"`` / ``"run_checks"``.
+            address_text (str): The entry-address input's current text.
+            value_text (str): The string-value input's current text.
+            bytes_text (str): The hex-bytes input's current text.
+            path_text (str): The change-file path input's current text —
+                used by the ``"load_doc"`` action.
 
         Dependencies:
             Used by:
@@ -427,40 +467,58 @@ class PatchEditorPanel(ScrollableContainer):
         def __init__(
             self,
             action: str,
-            parameter_name: str,
-            index_text: str,
-            value_text: str,
-            path_text: str,
             address_text: str = "",
+            value_text: str = "",
             bytes_text: str = "",
-            unified_path_text: str = "",
+            path_text: str = "",
         ) -> None:
             super().__init__()
             self.action = action
-            self.parameter_name = parameter_name
-            self.index_text = index_text
-            self.value_text = value_text
-            self.path_text = path_text
             self.address_text = address_text
+            self.value_text = value_text
             self.bytes_text = bytes_text
-            self.unified_path_text = unified_path_text
+            self.path_text = path_text
+
+    class SaveBackDecision(Message):
+        """The operator answered the post-apply save prompt (LLR-002.7).
+
+        Summary:
+            Posted by the save-back confirm / decline buttons. Deliberately
+            a separate message class — not an ``ActionRequested`` action —
+            so the LLR-003.2 routed action set stays exactly eight at E3a.
+
+        Args:
+            filename (Optional[str]): The (possibly edited) target filename
+                when the operator confirmed; ``None`` when declined — the
+                app persists nothing and ``ChangeSummary.saved_path`` stays
+                ``None``.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_save_back_decision``
+        """
+
+        def __init__(self, filename: Optional[str]) -> None:
+            super().__init__()
+            self.filename = filename
 
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
 
     def compose(self) -> ComposeResult:
-        """Lay out the functional Patch Editor widget tree.
+        """Lay out the consolidated v2 Patch Editor widget tree.
 
         Summary:
-            Yield the parameter-change ``DataTable`` and its empty-state line,
-            the name / index / value input row with add / edit / remove
-            buttons, the ``.cdfx`` save / load row; then the memory-change
-            ``DataTable`` and its empty-state line, the address / new-bytes
-            input row with memory add / edit / remove buttons, and the
-            unified-file save / load / export row (LLR-009.1..009.3). The
-            panel is a :class:`ScrollableContainer`, so this stacked content
-            scrolls vertically when it exceeds the terminal height — both
-            change-list halves and every input / button row stay reachable.
+            Yield the single change-flow section (LLR-003.1): the entries
+            ``DataTable`` and its empty-state line, the address / value /
+            bytes input row with add / edit / remove buttons, the
+            change-file path ``Input`` with the Load / Validate / Apply /
+            Save / Run-checks control row, the persistent declaration-fault
+            area (count line + listing, LLR-002.8), the hidden save-back
+            prompt row (LLR-002.7), and the check-results area
+            (LLR-004.5). The panel is a :class:`ScrollableContainer`, so the
+            stacked content scrolls vertically when it exceeds the terminal
+            height.
 
         Args:
             None
@@ -472,189 +530,187 @@ class PatchEditorPanel(ScrollableContainer):
             Used by:
                 - Textual ``ScrollableContainer`` compose lifecycle
         """
-        # --- Parameter-change half (batch-03) ---
-        yield Label("Parameter changes", classes="patch-section-title")
+        yield Label(
+            "Change document (v2 JSON)", classes="patch-section-title"
+        )
         yield DataTable(
-            id="patch_changelist_table",
+            id="patch_doc_entries_table",
             zebra_stripes=True,
             cursor_type="row",
         )
         yield Static(
             self.EMPTY_STATE_TEXT,
-            id="patch_empty_state",
-            markup=False,
-        )
-        yield Container(
-            Label("Parameter", classes="patch-field-label"),
-            Input(placeholder="A2L parameter name", id="patch_name_input"),
-            Label("Index", classes="patch-field-label"),
-            Input(placeholder="(blank = scalar)", id="patch_index_input"),
-            Label("Value", classes="patch-field-label"),
-            Input(placeholder="physical value", id="patch_value_input"),
-            Horizontal(
-                Button("Add", id="patch_add_button"),
-                Button("Edit", id="patch_edit_button"),
-                Button("Remove", id="patch_remove_button"),
-                id="patch_entry_buttons",
-            ),
-            id="patch_inputs",
-        )
-        yield Container(
-            Label("CDFX file", classes="patch-field-label"),
-            Input(placeholder="path to .cdfx", id="patch_path_input"),
-            Horizontal(
-                Button("Save .cdfx", id="patch_save_button"),
-                Button("Load .cdfx", id="patch_load_button"),
-                id="patch_file_buttons",
-            ),
-            id="patch_file_row",
-        )
-        # --- Memory-field change half (batch-04, increment 8) ---
-        yield Label("Memory changes", classes="patch-section-title")
-        yield DataTable(
-            id="patch_memory_table",
-            zebra_stripes=True,
-            cursor_type="row",
-        )
-        yield Static(
-            self.MEMORY_EMPTY_STATE_TEXT,
-            id="patch_memory_empty_state",
+            id="patch_doc_empty_state",
             markup=False,
         )
         yield Container(
             Label("Address", classes="patch-field-label"),
-            Input(placeholder="0x100", id="patch_address_input"),
-            Label("New bytes", classes="patch-field-label"),
-            Input(placeholder="DE AD BE EF", id="patch_bytes_input"),
-            Horizontal(
-                Button("Add Mem", id="patch_mem_add_button"),
-                Button("Edit Mem", id="patch_mem_edit_button"),
-                Button("Remove Mem", id="patch_mem_remove_button"),
-                id="patch_mem_entry_buttons",
+            Input(placeholder="0x100", id="patch_entry_address_input"),
+            Label("String value", classes="patch-field-label"),
+            Input(
+                placeholder="text (document encoding)",
+                id="patch_entry_value_input",
             ),
-            id="patch_mem_inputs",
+            Label("Bytes", classes="patch-field-label"),
+            Input(placeholder="DE AD BE EF", id="patch_entry_bytes_input"),
+            Horizontal(
+                Button("Add", id="patch_entry_add_button"),
+                Button("Edit", id="patch_entry_edit_button"),
+                Button("Remove", id="patch_entry_remove_button"),
+                id="patch_doc_entry_buttons",
+            ),
+            id="patch_doc_entry_inputs",
         )
         yield Container(
-            Label("Unified file", classes="patch-field-label"),
-            Input(placeholder="path to unified .json", id="patch_unified_input"),
-            Horizontal(
-                Button("Save unified", id="patch_unified_save_button"),
-                Button("Load unified", id="patch_unified_load_button"),
-                Button("Export", id="patch_export_button"),
-                id="patch_unified_buttons",
+            Label("Change file", classes="patch-field-label"),
+            Input(
+                placeholder="path to v2 change-set .json",
+                id="patch_doc_path_input",
             ),
-            id="patch_unified_row",
+            Horizontal(
+                Button("Load", id="patch_doc_load_button"),
+                Button("Validate", id="patch_doc_validate_button"),
+                Button("Apply", id="patch_doc_apply_button"),
+                Button("Save", id="patch_doc_save_button"),
+                Button("Run checks", id="patch_checks_run_button"),
+                id="patch_doc_controls",
+            ),
+            id="patch_doc_file_row",
         )
+        yield Label("", id="patch_doc_issue_count", classes="patch-field-label")
+        yield Static("", id="patch_doc_issues", markup=False, classes="hidden")
+        yield Container(
+            Label("Save patched image as:", classes="patch-field-label"),
+            Input(id="patch_saveback_name_input"),
+            Horizontal(
+                Button("Write file", id="patch_saveback_confirm_button"),
+                Button("Don't save", id="patch_saveback_decline_button"),
+                id="patch_saveback_buttons",
+            ),
+            id="patch_saveback_row",
+            classes="hidden",
+        )
+        yield Label("", id="patch_checks_status", classes="patch-field-label")
+        yield Container(id="patch_checks_results")
 
     def on_mount(self) -> None:
-        """Initialise both table columns and both empty states.
+        """Initialise the entries table columns and the empty state.
 
         Summary:
-            Add the parameter ``DataTable`` columns and the memory ``DataTable``
-            columns once the widget is mounted, and show both empty-state lines
-            for the initially-empty change-set.
+            Add the entries ``DataTable`` columns once the widget is
+            mounted and show the empty-state line for the initially-empty
+            document.
 
         Dependencies:
             Used by:
                 - Textual mount lifecycle
         """
-        table = self.query_one("#patch_changelist_table", DataTable)
-        table.add_columns(*self._TABLE_COLUMNS)
-        memory_table = self.query_one("#patch_memory_table", DataTable)
-        memory_table.add_columns(*self._MEMORY_TABLE_COLUMNS)
-        self.refresh_rows([])
-        self.refresh_memory_rows([])
+        table = self.query_one("#patch_doc_entries_table", DataTable)
+        table.add_columns(*self._ENTRIES_COLUMNS)
+        self.refresh_entries([])
 
     def request_action(self, action: str) -> None:
         """Post an :class:`ActionRequested` message for ``action``.
 
         Summary:
-            Read every input field — parameter, ``.cdfx`` path, memory and
-            unified-file — and post an ``ActionRequested`` message so
-            ``app.py`` can call ``CdfxService``. The widget itself performs no
-            ``cdfx``-package work — it only forwards the request.
+            Read the entry and path input fields and post an
+            ``ActionRequested`` message so ``app.py`` can call
+            ``ChangeService``. The widget itself performs no
+            ``changes``-package work — it only forwards the request.
 
         Args:
-            action (str): One of the parameter actions ``"add"`` / ``"edit"`` /
-                ``"remove"`` / ``"save"`` / ``"load"``, the memory actions
-                ``"add_memory"`` / ``"edit_memory"`` / ``"remove_memory"``, or
-                the unified actions ``"save_unified"`` / ``"load_unified"`` /
-                ``"export"``.
+            action (str): One of the eight LLR-003.2 v2 actions —
+                ``"add_entry"`` / ``"edit_entry"`` / ``"remove_entry"`` /
+                ``"load_doc"`` / ``"validate_doc"`` / ``"apply_doc"`` /
+                ``"save_doc"`` / ``"run_checks"``.
 
         Dependencies:
             Uses:
                 - ``ActionRequested``
             Used by:
-                - the panel's parameter, memory and unified-file controls
+                - the panel's entry and document controls
         """
         self.post_message(
             self.ActionRequested(
                 action=action,
-                parameter_name=self.query_one("#patch_name_input", Input).value,
-                index_text=self.query_one("#patch_index_input", Input).value,
-                value_text=self.query_one("#patch_value_input", Input).value,
-                path_text=self.query_one("#patch_path_input", Input).value,
                 address_text=self.query_one(
-                    "#patch_address_input", Input
+                    "#patch_entry_address_input", Input
                 ).value,
-                bytes_text=self.query_one("#patch_bytes_input", Input).value,
-                unified_path_text=self.query_one(
-                    "#patch_unified_input", Input
+                value_text=self.query_one(
+                    "#patch_entry_value_input", Input
+                ).value,
+                bytes_text=self.query_one(
+                    "#patch_entry_bytes_input", Input
+                ).value,
+                path_text=self.query_one(
+                    "#patch_doc_path_input", Input
                 ).value,
             )
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Translate any Patch Editor button press into an action.
+        """Translate any Patch Editor button press into a message.
 
         Summary:
-            Map the pressed button id to a parameter / memory / unified action
-            and forward it via :meth:`request_action`. Stops the event so it
-            does not also reach the app-level ``on_button_pressed``.
+            Map the pressed button id to one of the eight v2 actions and
+            forward it via :meth:`request_action`; the save-back confirm /
+            decline buttons post a :class:`SaveBackDecision` instead. Stops
+            the event so it does not also reach the app-level
+            ``on_button_pressed``.
 
         Args:
             event (Button.Pressed): The Textual button-press event.
 
         Dependencies:
             Uses:
-                - ``request_action``
+                - ``request_action`` / ``SaveBackDecision``
             Used by:
                 - Textual button-press dispatch
         """
+        button_id = event.button.id or ""
+        if button_id == "patch_saveback_confirm_button":
+            event.stop()
+            self.post_message(
+                self.SaveBackDecision(
+                    self.query_one("#patch_saveback_name_input", Input).value
+                )
+            )
+            return
+        if button_id == "patch_saveback_decline_button":
+            event.stop()
+            self.post_message(self.SaveBackDecision(None))
+            return
         actions = {
-            "patch_add_button": "add",
-            "patch_edit_button": "edit",
-            "patch_remove_button": "remove",
-            "patch_save_button": "save",
-            "patch_load_button": "load",
-            "patch_mem_add_button": "add_memory",
-            "patch_mem_edit_button": "edit_memory",
-            "patch_mem_remove_button": "remove_memory",
-            "patch_unified_save_button": "save_unified",
-            "patch_unified_load_button": "load_unified",
-            "patch_export_button": "export",
+            "patch_entry_add_button": "add_entry",
+            "patch_entry_edit_button": "edit_entry",
+            "patch_entry_remove_button": "remove_entry",
+            "patch_doc_load_button": "load_doc",
+            "patch_doc_validate_button": "validate_doc",
+            "patch_doc_apply_button": "apply_doc",
+            "patch_doc_save_button": "save_doc",
+            "patch_checks_run_button": "run_checks",
         }
-        action = actions.get(event.button.id or "")
+        action = actions.get(button_id)
         if action is not None:
             event.stop()
             self.request_action(action)
 
-    def refresh_rows(self, rows: Sequence[object]) -> None:
-        """Repopulate the change-list table from resolved display rows.
+    def refresh_entries(self, rows: Sequence[object]) -> None:
+        """Repopulate the entries table from shaped display rows.
 
         Summary:
             Replace every ``DataTable`` row with the supplied
-            ``PatchRow`` list (parameter name, array index, displayed value,
-            status). When the list is empty, show the neutral empty-state line
-            and hide the table; otherwise hide the empty-state line and show
-            the table (LLR-007.1 / LLR-007.6).
+            ``ChangeEntryRow`` list (kind, address, value-or-bytes, status,
+            linkage). When the list is empty, show the neutral empty-state
+            line and hide the table; otherwise hide the empty-state line
+            and show the table (LLR-003.1).
 
         Args:
-            rows (Sequence[object]): The ``PatchRow`` objects produced by
-                ``CdfxService.rows`` — each exposes ``parameter_name``,
-                ``index_text``, ``value_text`` and ``status_text``. Typed as
-                ``object`` so this view widget imports nothing from the
-                service layer.
+            rows (Sequence[object]): The ``ChangeEntryRow`` objects produced
+                by ``ChangeService.rows`` — each exposes ``kind_text``,
+                ``address_text``, ``value_text``, ``status_text`` and
+                ``linkage_text``. Typed as ``object`` so this view widget
+                imports nothing from the service layer.
 
         Data Flow:
             - Clear and refill the table from the row list.
@@ -665,15 +721,16 @@ class PatchEditorPanel(ScrollableContainer):
             Used by:
                 - ``S19TuiApp`` Patch Editor action handler
         """
-        table = self.query_one("#patch_changelist_table", DataTable)
-        empty_state = self.query_one("#patch_empty_state", Static)
+        table = self.query_one("#patch_doc_entries_table", DataTable)
+        empty_state = self.query_one("#patch_doc_empty_state", Static)
         table.clear()
         for row in rows:
             table.add_row(
-                row.parameter_name,
-                row.index_text,
+                row.kind_text,
+                row.address_text,
                 row.value_text,
                 row.status_text,
+                row.linkage_text,
             )
         if rows:
             table.remove_class("hidden")
@@ -682,46 +739,100 @@ class PatchEditorPanel(ScrollableContainer):
             table.add_class("hidden")
             empty_state.remove_class("hidden")
 
-    def refresh_memory_rows(self, rows: Sequence[object]) -> None:
-        """Repopulate the memory-change table from validated display rows.
+    def refresh_issues(self, lines: Sequence[str]) -> None:
+        """Render the persistent declaration-fault area (LLR-002.8).
 
         Summary:
-            Replace every memory ``DataTable`` row with the supplied
-            ``MemoryPatchRow`` list (memory address, hex rendering of the new
-            bytes, validation status). When the list is empty, show the neutral
-            memory empty-state line and hide the table; otherwise hide the
-            line and show the table (LLR-009.1).
+            Show one line per declaration fault plus a count line. The
+            rendering persists across unrelated UI actions because it is
+            widget state, not a transient status message — it changes only
+            when this method is called again with a different issue list
+            (a clean re-validate or re-load clears it with an empty list).
 
         Args:
-            rows (Sequence[object]): The ``MemoryPatchRow`` objects produced by
-                ``CdfxService.memory_rows`` — each exposes ``address_text``,
-                ``value_text`` and ``status_text``. Typed as ``object`` so this
-                view widget imports nothing from the service layer.
+            lines (Sequence[str]): The ``ChangeService.issue_lines`` output
+                — ``[CODE] severity: message`` per fault; empty when the
+                document is clean.
 
         Data Flow:
-            - Clear and refill the memory table from the row list.
-            - Toggle the ``.hidden`` class on the memory table and its
-              empty-state line by whether the list is empty.
+            - Non-empty → count label ``Declaration faults: N`` and the
+              joined listing, listing un-hidden.
+            - Empty → blank count label, listing cleared and hidden.
 
         Dependencies:
             Used by:
                 - ``S19TuiApp`` Patch Editor action handler
         """
-        table = self.query_one("#patch_memory_table", DataTable)
-        empty_state = self.query_one("#patch_memory_empty_state", Static)
-        table.clear()
-        for row in rows:
-            table.add_row(
-                row.address_text,
-                row.value_text,
-                row.status_text,
-            )
-        if rows:
-            table.remove_class("hidden")
-            empty_state.add_class("hidden")
+        count_label = self.query_one("#patch_doc_issue_count", Label)
+        listing = self.query_one("#patch_doc_issues", Static)
+        if lines:
+            count_label.update(f"Declaration faults: {len(lines)}")
+            listing.update("\n".join(lines))
+            listing.remove_class("hidden")
         else:
-            table.add_class("hidden")
-            empty_state.remove_class("hidden")
+            count_label.update("")
+            listing.update("")
+            listing.add_class("hidden")
+
+    def show_save_prompt(self, suggestion: str) -> None:
+        """Show the post-apply save-back prompt (LLR-002.7 UI half).
+
+        Summary:
+            Un-hide the save-back row and pre-fill the filename ``Input``
+            with the editable ``<variant_id>-patched.s19`` suggestion.
+
+        Args:
+            suggestion (str): The pre-filled target filename suggestion.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp`` apply-action handling
+        """
+        self.query_one("#patch_saveback_name_input", Input).value = suggestion
+        self.query_one("#patch_saveback_row", Container).remove_class("hidden")
+
+    def hide_save_prompt(self) -> None:
+        """Hide the save-back prompt after a confirm / decline.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_save_back_decision``
+        """
+        self.query_one("#patch_saveback_row", Container).add_class("hidden")
+
+    def refresh_check_results(
+        self, rows: Sequence[object], status_line: str
+    ) -> None:
+        """Render the check-run display (LLR-004.5).
+
+        Summary:
+            Replace the check-results area with one ``Static`` per result
+            row, each carrying its ``sev-*`` class (the
+            ``css_class_for_severity`` colour the service shaped), and set
+            the aggregate-count status line.
+
+        Args:
+            rows (Sequence[object]): The ``ChangeService.check_rows``
+                output — each exposes ``text`` and ``css_class``. Typed as
+                ``object`` so this view widget imports nothing from the
+                service layer.
+            status_line (str): The three-aggregate-count line (``Checks: P
+                passed, F failed, U uncheckable``) or the pending-seam
+                message.
+
+        Data Flow:
+            - Update the status label, remove prior result children, mount
+              one classed ``Static`` per row.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp`` run-checks action handling
+        """
+        self.query_one("#patch_checks_status", Label).update(status_line)
+        container = self.query_one("#patch_checks_results", Container)
+        container.remove_children()
+        for row in rows:
+            container.mount(Static(row.text, classes=row.css_class, markup=False))
 
 
 class AbDiffPanel(Container):

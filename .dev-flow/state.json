@@ -106,6 +106,18 @@
             "date": "2026-06-10",
             "decision": "increment-E1-approved-E2-started",
             "notes": "E1 approved ('Apruebo'). E2 started — apply engine + ChangeSummary + linkage + S19 save-back emitter (engine half; TUI prompt halves of 002.7/002.8 ride E3a) + containment validation. Files: changes/apply.py (NEW), changes/io.py (emit_s19_from_mem_map + filename sanitizer added), tests/test_changes_apply.py + test_changes_linkage.py + test_changes_containment.py = 5. Covers LLR-001.6, 002.1-.6 + engine halves of 002.7/.8 (TC-006, TC-009..014, TC-051-engine)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E2-awaiting-gate",
+            "notes": "E2 implemented + orchestrator-verified. 5 files (apply.py NEW 779L; model.py ChangeSummary canonical C-6 w/ saved_path+issues+now_fn; io.py emit_s19_from_mem_map; 3 new test files). Spot-verified: F-S-01 sanitizer w/ Windows reserved names; HEX refusal source_kind!=s19; injectable clock. Results: E2 suites 23 passed; E1 regression 42 passed; lean 840/0/3xf — ledger EXACT 817+23=840 (sumN=65). 0 deviations; core.py untouched (emitter needed no parser change). Local commit 3e00739. Packet: increment-E2.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E2-approved-E3a-started",
+            "notes": "E2 approved. E3a started — consolidated v2 Patch Editor panel + services/change_service.py + UI halves of 002.7 (save prompt) / 002.8 (persistent fault visibility). Files: screens_directionb.py (panel rewrite), app.py (router shrink to v2 action set), services/change_service.py (NEW), tests/test_tui_patch_editor_v2.py (NEW), tests/test_change_service.py (NEW) = 5. SEQUENCE NOTE: consolidation makes old-widget UI tests red TRANSIENTLY; the red set must MATCH the §6.6 RETIRE/REWRITE predictions for UI files (table validation); E3b enacts dispositions immediately after and restores lean-green. E3a gate presents targeted results + predicted-vs-actual red comparison."
         }
     ],
     "obsidian_synced": false,

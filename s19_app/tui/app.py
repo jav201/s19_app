@@ -55,8 +55,7 @@ from .screens_directionb import (
 from .color_policy import css_class_for_severity
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
-from .cdfx import ExportResult
-from .services.cdfx_service import CdfxActionResult, CdfxService
+from .services.change_service import ChangeActionResult, ChangeService
 from .services.load_service import build_loaded_hex, build_loaded_s19
 from .services.validation_service import build_validation_report
 from .workspace import (
@@ -75,6 +74,24 @@ from .workspace import (
     sanitize_project_name,
     setup_logging,
     validate_project_files,
+)
+
+#: The Patch Editor's routable action set (LLR-003.2) — exactly these eight
+#: v2 actions at increment E3a; increment E6 extends the set by exactly one
+#: further action, ``execute_scope`` (the stated F-A-15 extension, re-pinned
+#: to nine there). A non-member action is reported as a status error, never
+#: a crash.
+PATCH_ACTIONS_V2: frozenset[str] = frozenset(
+    {
+        "add_entry",
+        "edit_entry",
+        "remove_entry",
+        "load_doc",
+        "validate_doc",
+        "apply_doc",
+        "save_doc",
+        "run_checks",
+    }
 )
 
 
@@ -569,7 +586,7 @@ class S19TuiApp(App):
         self._mac_goto_focus_address: Optional[int] = None
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
-        self._cdfx_service = CdfxService()
+        self._change_service = ChangeService()
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -1122,9 +1139,10 @@ class S19TuiApp(App):
         """
         Summary:
             Build the Direction B Patch Editor rail screen (``#screen_patch``)
-            as the functional change-list editor — a change-list table, wired
-            add / edit / remove inputs, save / load actions and an empty state
-            (batch-03 increment 9, LLR-007.1..007.6).
+            as the consolidated v2 change-flow editor — one entries table,
+            both-kind entry inputs, the Load / Validate / Apply / Save /
+            Run-checks control row and an empty state (batch-07 increment
+            E3a, LLR-003.1).
 
         Args:
             None
@@ -1137,8 +1155,8 @@ class S19TuiApp(App):
             - Composition only. The ``PatchEditorPanel`` is presentational —
               its controls emit ``PatchEditorPanel.ActionRequested`` messages
               that ``on_patch_editor_panel_action_requested`` routes to
-              ``self._cdfx_service``. No XML / change-list model logic is
-              built here (constraint C-8 / LLR-007.5).
+              ``self._change_service``. No JSON / change-document model
+              logic is built here (constraint C-7 / LLR-003.2).
 
         Dependencies:
             Uses:
@@ -1158,119 +1176,181 @@ class S19TuiApp(App):
     ) -> None:
         """
         Summary:
-            Route a Patch Editor control action to the CDFX service and feed
-            the result back to the screen (LLR-007.2..007.4 / LLR-007.5).
+            Route a Patch Editor control action to the change service and
+            feed the shaped rows back to the screen — exactly the eight
+            LLR-003.2 v2 actions (``PATCH_ACTIONS_V2``); a retired or
+            unknown action is one status error, never a crash.
 
         Args:
             event (PatchEditorPanel.ActionRequested): The message a Patch
                 Editor control posted — its ``action`` plus the current
-                name / index / value / path input-field text.
+                address / value / bytes / path input-field text.
 
         Returns:
             None
 
         Data Flow:
-            - Parameter add / edit / remove and memory add / edit / remove
-              mutate ``self._cdfx_service``'s unified change-set, then re-render
-              both tables.
-            - save / load round-trip the parameter half to a ``.cdfx``;
-              save_unified / load_unified round-trip the whole change-set to a
-              JSON file; export splits it into a ``.cdfx`` plus a memory-field
-              JSON file.
-            - Every action's outcome and any ``ValidationIssue`` it produced
-              is surfaced through ``set_status`` (the existing status path);
-              an input error (blank name, bad index/address, missing entry) is
+            - ``add_entry`` / ``edit_entry`` / ``remove_entry`` mutate the
+              service's v2 document (both entry kinds).
+            - ``load_doc`` / ``validate_doc`` / ``save_doc`` round-trip and
+              re-validate the document; ``apply_doc`` runs the E2 engine
+              and, with ≥1 applied entry, opens the save-back prompt (S19)
+              or states HEX save-back is unsupported (LLR-002.7).
+            - ``run_checks`` rides the E4 service seam and renders the
+              LLR-004.5 display.
+            - Every action's outcome and findings surface through
+              ``_report_change_result`` / ``set_status``; an input error is
               caught and reported, never raised into the UI.
-            - Both Patch Editor tables are re-rendered after every action.
+            - The entries table and the persistent declaration-fault area
+              are re-rendered after every action (LLR-002.8).
 
         Dependencies:
             Uses:
-                - ``CdfxService``
+                - ``ChangeService``
                 - ``_compute_a2l_enriched_tags``
-                - ``PatchEditorPanel.refresh_rows`` / ``refresh_memory_rows``
+                - ``PatchEditorPanel.refresh_entries`` / ``refresh_issues``
+                  / ``refresh_check_results`` / ``show_save_prompt``
             Used by:
                 - Textual message dispatch for ``PatchEditorPanel``
         """
-        a2l_tags = self._compute_a2l_enriched_tags()
-        loaded_ranges = (
-            self.current_file.ranges if self.current_file is not None else None
-        )
+        service = self._change_service
+        loaded = self.current_file
+        mem_map = loaded.mem_map if loaded is not None else None
+        loaded_ranges = loaded.ranges if loaded is not None else None
+        mac_records = loaded.mac_records if loaded is not None else None
+        a2l_tags = self._compute_a2l_enriched_tags() or None
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
         try:
-            if event.action == "add":
-                self._cdfx_service.add_entry(
-                    event.parameter_name, event.index_text, event.value_text
+            if event.action not in PATCH_ACTIONS_V2:
+                self.set_status(
+                    f"Patch Editor: unsupported action {event.action!r}"
+                )
+            elif event.action == "add_entry":
+                service.add_entry(
+                    event.address_text, event.value_text, event.bytes_text
                 )
                 self.set_status("Patch Editor: entry added.")
-            elif event.action == "edit":
-                self._cdfx_service.edit_entry(
-                    event.parameter_name, event.index_text, event.value_text
+            elif event.action == "edit_entry":
+                service.edit_entry(
+                    event.address_text, event.value_text, event.bytes_text
                 )
                 self.set_status("Patch Editor: entry updated.")
-            elif event.action == "remove":
-                self._cdfx_service.remove_entry(
-                    event.parameter_name, event.index_text
-                )
+            elif event.action == "remove_entry":
+                service.remove_entry(event.address_text)
                 self.set_status("Patch Editor: entry removed.")
-            elif event.action == "save":
-                result = self._cdfx_service.save(self.base_dir, a2l_tags)
-                self._report_cdfx_result(result)
-            elif event.action == "load":
+            elif event.action == "load_doc":
                 if not event.path_text.strip():
-                    self.set_status("Patch Editor: enter a .cdfx path to load.")
-                else:
-                    result = self._cdfx_service.load(
-                        event.path_text, self.base_dir, a2l_tags
-                    )
-                    self._report_cdfx_result(result)
-            elif event.action == "add_memory":
-                self._cdfx_service.add_memory_change(
-                    event.address_text, event.bytes_text
-                )
-                self.set_status("Patch Editor: memory change added.")
-            elif event.action == "edit_memory":
-                self._cdfx_service.edit_memory_change(
-                    event.address_text, event.bytes_text
-                )
-                self.set_status("Patch Editor: memory change updated.")
-            elif event.action == "remove_memory":
-                self._cdfx_service.remove_memory_change(event.address_text)
-                self.set_status("Patch Editor: memory change removed.")
-            elif event.action == "save_unified":
-                result = self._cdfx_service.save_unified(self.base_dir)
-                self._report_cdfx_result(result)
-            elif event.action == "load_unified":
-                if not event.unified_path_text.strip():
                     self.set_status(
-                        "Patch Editor: enter a unified-file path to load."
+                        "Patch Editor: enter a change-file path to load."
                     )
                 else:
-                    result = self._cdfx_service.load_unified(
-                        event.unified_path_text, self.base_dir
-                    )
-                    self._report_cdfx_result(result)
-            elif event.action == "export":
-                export = self._cdfx_service.export_selective(
-                    self.base_dir, a2l_tags
+                    result = service.load(event.path_text, self.base_dir)
+                    self._report_change_result(result)
+            elif event.action == "validate_doc":
+                self._report_change_result(service.validate(loaded_ranges))
+            elif event.action == "apply_doc":
+                variant_id = loaded.path.stem if loaded is not None else None
+                summary = service.apply(
+                    mem_map,
+                    loaded_ranges,
+                    mac_records,
+                    a2l_tags,
+                    variant_id=variant_id,
                 )
-                self._report_export_result(export)
+                counts = summary.counts
+                skipped = (
+                    counts["skipped-partial"]
+                    + counts["skipped-outside"]
+                    + counts["skipped-no-image"]
+                )
+                self.set_status(
+                    f"Apply: {counts['applied']} applied, "
+                    f"{skipped} skipped, {counts['blocked']} blocked"
+                )
+                if counts["applied"] > 0 and loaded is not None:
+                    if loaded.file_type == "s19":
+                        panel.show_save_prompt(f"{variant_id}-patched.s19")
+                    else:
+                        self.set_status(
+                            "HEX save-back not supported this batch"
+                        )
+            elif event.action == "save_doc":
+                self._report_change_result(service.save(self.base_dir))
+            elif event.action == "run_checks":
+                result = service.run_checks(
+                    mem_map, loaded_ranges, mac_records, a2l_tags
+                )
+                self._report_change_result(result)
+                panel.refresh_check_results(
+                    service.check_rows(), result.message
+                )
         except (ValueError, KeyError) as exc:
             self.set_status(f"Patch Editor: {exc}")
 
-        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        panel.refresh_rows(self._cdfx_service.rows(a2l_tags))
-        panel.refresh_memory_rows(
-            self._cdfx_service.memory_rows(loaded_ranges)
-        )
+        panel.refresh_entries(service.rows(loaded_ranges))
+        panel.refresh_issues(service.issue_lines())
 
-    def _report_cdfx_result(self, result: CdfxActionResult) -> None:
+    def on_patch_editor_panel_save_back_decision(
+        self, event: PatchEditorPanel.SaveBackDecision
+    ) -> None:
         """
         Summary:
-            Surface a CDFX save / load result and its issues on the status
-            path (LLR-007.3 / LLR-007.4 issue-surfacing arm).
+            Handle the operator's answer to the post-apply save-back prompt
+            (LLR-002.7 UI half): persist the patched image under the typed
+            filename, or persist nothing on decline (``saved_path`` stays
+            ``None``).
 
         Args:
-            result (CdfxActionResult): The outcome of a ``CdfxService.save``
-                or ``CdfxService.load`` call.
+            event (PatchEditorPanel.SaveBackDecision): The prompt outcome —
+                the (possibly edited) filename, or ``None`` when declined.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Hide the prompt either way.
+            - Decline → one status line, no write.
+            - Confirm → ``ChangeService.save_patched`` into the active
+              project directory (work-area root when no project is active);
+              the typed name passes the engine's F-S-01 sanitizer; the
+              result and its findings surface on the status path.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.save_patched``
+                - ``_active_project_dir``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        panel.hide_save_prompt()
+        if event.filename is None:
+            self.set_status("Patch Editor: save-back declined")
+            return
+        loaded = self.current_file
+        if loaded is None:
+            self.set_status("Patch Editor: no image loaded - nothing saved")
+            return
+        dest_dir = self._active_project_dir() or self.workarea
+        result = self._change_service.save_patched(
+            loaded.mem_map,
+            loaded.ranges,
+            dest_dir,
+            event.filename,
+            source_kind=loaded.file_type,
+        )
+        self._report_change_result(result)
+
+    def _report_change_result(self, result: ChangeActionResult) -> None:
+        """
+        Summary:
+            Surface a change-service action result and its issues on the
+            status path (the LLR-003.2 issue-surfacing arm — the evolved
+            ``_report_cdfx_result`` pattern).
+
+        Args:
+            result (ChangeActionResult): The outcome of a ``ChangeService``
+                load / validate / save / save-back / run-checks call.
 
         Returns:
             None
@@ -1284,51 +1364,12 @@ class S19TuiApp(App):
                 - ``set_status``
             Used by:
                 - ``on_patch_editor_panel_action_requested``
+                - ``on_patch_editor_panel_save_back_decision``
         """
-        self.set_status(f"Patch Editor: {result.message}")
+        self.set_status(result.message)
         for issue in result.issues:
             self.set_status(
-                f"Patch Editor [{issue.code}] {issue.severity.value}: "
-                f"{issue.message}"
-            )
-
-    def _report_export_result(self, result: ExportResult) -> None:
-        """
-        Summary:
-            Surface a selective-export result and its per-half issues on the
-            status path (LLR-009.3 export issue-surfacing arm).
-
-        Args:
-            result (ExportResult): The outcome of a
-                ``CdfxService.export_selective`` call — the two written file
-                paths and the combined, per-half-tagged ``ValidationIssue``
-                list.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Emit one status line per written file (or a rejection note when a
-              path is ``None``), then one line per ``ValidationIssue`` so the
-              engineer sees every finding and its originating half.
-
-        Dependencies:
-            Uses:
-                - ``set_status``
-            Used by:
-                - ``on_patch_editor_panel_action_requested``
-        """
-        cdfx = result.cdfx_path
-        memory = result.memory_field_path
-        self.set_status(
-            "Patch Editor: export - "
-            f"CDFX {cdfx if cdfx is not None else 'rejected'}; "
-            f"memory-field {memory if memory is not None else 'rejected'}"
-        )
-        for issue in result.issues:
-            self.set_status(
-                f"Patch Editor [{issue.code}] {issue.severity.value} "
-                f"({issue.artifact}): {issue.message}"
+                f"[{issue.code}] {issue.severity.value}: {issue.message}"
             )
 
     def _compose_screen_diff(self) -> Container:
