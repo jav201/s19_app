@@ -492,6 +492,12 @@ class VariantExecutionResult:
         diagnostics (list[str]): Human-readable notes — the failure text on
             an ``"error"`` status, save-back refusals, and the HEX
             save-back-unsupported note.
+        mem_map (Optional[dict[int, int]]): The variant's POST-CHANGE
+            address-to-byte map — the E7 report generator's hexdump input
+            (LLR-007.8, additive E7 extension). Captured only when the
+            caller requested ``capture_mem_maps=True``; ``None`` otherwise,
+            preserving the LLR-006.3 release-each-image memory profile for
+            callers that produce no report.
 
     Returns:
         None: Dataclass container.
@@ -500,12 +506,13 @@ class VariantExecutionResult:
         - Built by :func:`execute_variant_plan`, one per planned variant —
           ``len(results)`` always equals the planned variant count.
         - Consumed by the E6 TUI status reporting and the E7 report
-          generator (later increment).
+          generator (``services/report_service.py``).
 
     Dependencies:
         Used by:
             - execute_variant_plan / execute_project_variants
             - s19_app.tui.app.S19TuiApp (execute_scope reporting)
+            - s19_app.tui.services.report_service.generate_project_report
     """
 
     variant_id: str
@@ -513,6 +520,7 @@ class VariantExecutionResult:
     change_summaries: list[ChangeSummary] = field(default_factory=list)
     check_results: list[CheckRunResult] = field(default_factory=list)
     diagnostics: list[str] = field(default_factory=list)
+    mem_map: Optional[dict[int, int]] = None
 
 
 def plan_variant_executions(
@@ -603,6 +611,7 @@ def _execute_one_variant(
     project_dir: Path,
     mac_records: Optional[Sequence[dict]],
     a2l_data: Optional[dict],
+    capture_mem_map: bool = False,
 ) -> VariantExecutionResult:
     """
     Summary:
@@ -622,6 +631,11 @@ def _execute_one_variant(
         a2l_data (Optional[dict]): Parsed project A2L payload (shared
             linkage source), or ``None`` — enriched against THIS variant's
             memory map before use.
+        capture_mem_map (bool): When ``True``, the variant's memory map is
+            referenced on ``result.mem_map`` — the apply engine mutates it
+            in place, so the reference IS the post-change map the E7
+            report generator consumes (LLR-007.8). Defaults to ``False``
+            (the LLR-006.3 release-each-image profile).
 
     Returns:
         VariantExecutionResult: ``status="ok"`` with the per-file engine
@@ -662,6 +676,8 @@ def _execute_one_variant(
             loaded = build_loaded_s19(
                 variant.path, S19File(str(variant.path)), None, a2l_data
             )
+        if capture_mem_map:
+            result.mem_map = loaded.mem_map
         a2l_tags = (
             enrich_tags_and_render(a2l_data, loaded.mem_map)[0]
             if a2l_data
@@ -723,6 +739,7 @@ def execute_variant_plan(
     mac_path: Optional[Path] = None,
     a2l_path: Optional[Path] = None,
     status_callback: Optional[StatusCallback] = None,
+    capture_mem_maps: bool = False,
 ) -> list[VariantExecutionResult]:
     """
     Summary:
@@ -742,6 +759,11 @@ def execute_variant_plan(
         status_callback (Optional[StatusCallback]): Receives one line as
             each variant starts and one as it finishes — the TUI worker
             passes a ``call_from_thread``-wrapped ``set_status``.
+        capture_mem_maps (bool): When ``True``, every result retains its
+            variant's post-change memory map for the E7 report generator
+            (LLR-007.8) — N maps stay alive for the caller's lifetime.
+            Defaults to ``False``: the LLR-006.3 one-image-at-a-time
+            memory profile is preserved.
 
     Returns:
         list[VariantExecutionResult]: Exactly ``len(plan)`` results in plan
@@ -752,7 +774,8 @@ def execute_variant_plan(
         - Parse the shared MAC / A2L linkage sources once.
         - Loop the plan; each iteration delegates to
           :func:`_execute_one_variant` and drops the variant's parsed image
-          before the next iteration begins (one image at a time).
+          before the next iteration begins (one image at a time) — unless
+          ``capture_mem_maps`` pins each map onto its result.
 
     Dependencies:
         Uses:
@@ -774,7 +797,12 @@ def execute_variant_plan(
                 f"({len(files)} file(s))..."
             )
         result = _execute_one_variant(
-            variant, files, project_dir, mac_records, a2l_data
+            variant,
+            files,
+            project_dir,
+            mac_records,
+            a2l_data,
+            capture_mem_map=capture_mem_maps,
         )
         results.append(result)
         if status_callback is not None:
@@ -793,6 +821,7 @@ def execute_project_variants(
     scope: str = SCOPE_ALL,
     fallback_batch: Sequence[Path] = (),
     status_callback: Optional[StatusCallback] = None,
+    capture_mem_maps: bool = False,
 ) -> Tuple[list[VariantExecutionResult], list[ValidationIssue]]:
     """
     Summary:
@@ -811,6 +840,10 @@ def execute_project_variants(
             list (LLR-006.1 batch mode over all variants).
         status_callback (Optional[StatusCallback]): Forwarded to
             :func:`execute_variant_plan` (F-Q-18).
+        capture_mem_maps (bool): Forwarded to
+            :func:`execute_variant_plan` — ``True`` retains each variant's
+            post-change memory map for the E7 report generator
+            (LLR-007.8).
 
     Returns:
         Tuple[list[VariantExecutionResult], list[ValidationIssue]]: The
@@ -858,5 +891,6 @@ def execute_project_variants(
         mac_path=mac_path,
         a2l_path=a2l_path,
         status_callback=status_callback,
+        capture_mem_maps=capture_mem_maps,
     )
     return results, manifest_issues

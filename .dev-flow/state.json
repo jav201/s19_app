@@ -178,6 +178,18 @@
             "date": "2026-06-10",
             "decision": "increment-E5b-approved-E6-started",
             "notes": "E5b approved. E6 started — project.json manifest (LLR-006.1 w/ F-S-03 containment: paths resolved against project dir ONLY, capped read) + LLR-005.6 completion (manifest active_variant override) + variant_execution_service (LLR-006.2 deterministic order, 006.3 headless sequential parse, 006.4 per-variant isolation/VariantExecutionResult, 006.5 C-6 consumption) + execute_scope UI (006.6, routed action set 8->9 per F-A-15) + duplicate-variant-id decision (stems collide -> ids become full filenames, deterministic, consistent w/ E5b display fallback). Files ~6: variant_execution_service.py NEW, manifest io, app.py, screens_directionb.py, tests/test_variant_execution.py NEW (+manifest tests)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E6-awaiting-gate",
+            "notes": "E6 implemented + orchestrator-verified. 7 files (<=6 + 2 contract-mandated test pins, surfaced). variant_execution_service.py NEW ~870L no-Textual: F-S-03 manifest containment (project-dir-only, capped read, escape->ERROR+skip, absent->batch-all), deterministic plan, isolated loop len(results)==N, kind-discriminated engine consumption, headless save-back. execute_scope 9th action in thread worker w/ per-variant status (F-Q-18); active_variant override (005.6 done); duplicate stems -> filename ids (ratified). Results: 11 new passed; targeted 27 (orchestrator); stack 51; lean 649/0 (orchestrator re-run) — ledger exact 638+11. OPEN: manifest READ-ONLY (hand-authored; writer = E8/batch-08 candidate). Commit a3b7f91. Packet: increment-E6.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E6-approved-E7-started",
+            "notes": "E6 approved (manifest read-only noted; writer = E8/batch-08 candidate). E7 started — report generator: services/report_service.py NEW (LLR-007.1-.8: headless generate_project_report; ReportOptions w/ context_bytes domain 0..REPORT_CONTEXT_BYTES_MAX per F-S-05; clamped window formula per F-Q-06 + 2 edge fixtures; render_hex_view headless variant only per F-Q-19 inspection; pinned filename <ts>(-NN zero-padded)?-report.md per F-Q-05; REPORT_MAX_* caps w/ explicit markers, measured w/ large_project per env rule; inputs per F-A-09: C-6 objects + mem_maps + ProjectVariantSet + ReportOptions + __version__; F-S-07 confidentiality line; F-A-17 execution mode in header; declaration-error subsection; saved_path in modified-files). Files: report_service.py NEW + tests/test_report_service.py NEW (+version accessor if needed)."
         }
     ],
     "obsidian_synced": false,
