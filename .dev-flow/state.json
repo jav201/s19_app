@@ -2,15 +2,15 @@
     "project": "s19_app",
     "batch_id": "2026-06-10-batch-07",
     "batch_objective": "US-002..US-005 as one interconnected feature set: (002) single hex-first JSON change system — address-only entries, encoding-aware string/byte patches, intra-file collision checks, change summary with informative MAC/A2L linkage; retires the cfdx/.cdfx parameter flow and consolidates the Patch Editor UI. (003) declarative check files (expected values vs loaded S19), automatable per project. (004) Markdown project report under .s19tool/workarea/<project>/reports/ — modified files, before->after values, executed checks, +/-64-byte adjustable hexdumps — also viewable in the TUI. (005) N S19 variants per project sharing one A2L + one MAC, batch or per-variant application, all reflected in the report. Plus CI-1: two-tier CI gate (PRs -m 'not slow', full suite on main push) in the first PR. Engine/parsers consumed read-only.",
-    "current_phase": 3,
-    "phase_status": "in-progress",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
     "iterations_per_phase": {
         "1": 2,
         "2": 1,
         "3": 1,
-        "4": 0,
-        "5": 0,
-        "6": 0
+        "4": 1,
+        "5": 1,
+        "6": 1
     },
     "artifacts": {
         "1": ".dev-flow/2026-06-10-batch-07/01-requirements.md",
@@ -196,6 +196,72 @@
             "date": "2026-06-10",
             "decision": "increment-E7-approved-E8-started",
             "notes": "E7 implemented, orchestrator-verified, operator-approved ('Apruebo, sigue' — approval given while lean confirmed at 662/0, ledger exact 649+13 lean +1 slow). 3 files: report_service.py NEW (all LLR-007.x + F-S-05/07; window clamp+merge w/ edge fixtures; measured REPORT_MAX_* constants HOLD on large_s19 ~11ms); VariantExecutionResult additive opt-in mem_map capture; 14 tests. Conflict surfaced+resolved: window upper clamp vs LLR-007.2 wording — clamped form implemented, Phase-4/6 alignment flagged. Commit 3c39d68. E8 STARTED — final increment: ReportViewerScreen (open_links=False, size-capped, ts-descending listing, F-S-06), action_view_reports keybound (NO 9th rail item — LLR-008.2), generation trigger dialog (context_bytes -> service w/ capture_mem_maps=True, results dropped post-generation), tests/test_tui_report_view.py NEW. Files: screens.py, app.py, styles.tcss?, test file <= 5."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E8-awaiting-gate-phase-3-complete",
+            "notes": "E8 implemented + orchestrator-verified — PHASE 3 COMPLETE (all 10 increments E1,E2,E3a,E3b,E4,E5a,E5b,E6,E7,E8). E8: ReportViewerScreen (open_links=False pinned code+test per F-S-06; VIEWER_SIZE_CAP=2x report budget; ts-descending; empty states), action_view_reports keybound 't' (rail.py diff EMPTY — 8 items preserved per LLR-008.2), generation trigger (context_bytes dialog -> capture_mem_maps=True -> _last_execution consumed+dropped post-generation — E7 risk closed), scope->mode mapping keeps report vocabulary out of app.py. Results: 8 new pilots; stack regression 41; lean 670/0 — ledger exact 662+8 (chain E1..E8 exact at every gate: 775->817->840->(E3a interim)->611->618->630->638->649->662->670). Commit b1cde0c; 15 commits on claude/batch-07. Awaiting E8 gate = Phase-3 completion gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E8-approved-phase-3-complete",
+            "notes": "E8 approved; Phase 3 COMPLETE — 10/10 increments, all 4 US delivered, ledger chain exact at every gate, all F-S-* mitigations implemented+tested."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-10",
+            "decision": "started",
+            "notes": "Phase 4 Validation. Run-ownership per A-6: qa-reviewer executes the per-LLR TC matrix (TC-001..053) + all inspections (retirement probe, no-Textual probes, rail diff, F-S pins, suite-count reconciliation ledger) + fills 04-validation.md; orchestrator runs lean+slow ONCE (no duplicate full-suite runs)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-11",
+            "decision": "completed-pass-with-notes",
+            "notes": "Phase 4 PASS-WITH-NOTES (qa-reviewer 2026-06-11 + orchestrator slow append). Targeted: 196/196 across 9 clusters, 0 failures. Inspections ALL PASS (retirement probe 0, cdfx empty, no-Textual 0, rail diff empty, F-S-01/F-S-06 pins, app.py orchestration-only, engine guard, 0 local SVG regens). Orchestrator-owned: lean 670/0 (E8), slow 20 passed/0 failed (19+1 E7 measurement). RECONCILIATION EXACT: corrected pre-batch collection basis 826 (the circulated 794 omitted 29 skipped + 3 xfailed); 826 +149 new -229 RETIRE -1 D3 -23 folds -1+1 TC-027 relocation = 722 measured, all 3 checkpoints (915/662/722) exact; E3b 23-vs-22 fold wording resolved (1 of the 6 re-dispositioned rows was a fold). NOTES: (1) CI-1 two-tier gate NOT in tree — §5.3 criterion 5 OPEN, the ~3-line tui-ci.yml edit MUST ride the batch PR (operator-decided in Phase 1); (2) DEV-8 doc-only node-id drift (test_generation_is_headless_no_app vs spec name) -> Phase 6; (3) snapshot patch cell xfail pending CI-env regen; (4) 3.11 confirmation lands on the PR. 8-row deviation register consolidated w/ Phase-6 actions. Awaiting Phase-4 gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-11",
+            "decision": "approved",
+            "notes": "Phase 4 approved ('Apruebo, sigue'). CI-1 to ride the batch PR (already operator-decided). Advancing to Phase 5 post-mortem."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-11",
+            "decision": "started",
+            "notes": "Phase 5. architect (process half) + qa-reviewer (validation half) dispatched in parallel; orchestrator merges into 05-postmortem.md."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-11",
+            "decision": "completed",
+            "notes": "Phase 5 post-mortem merged. One-line takeaway: b05 symbols->grep, b06 measurements->regime, b07 the spec's OWN CHECKS must be executed (all 4 blockers = 'asserted but never run'). Both b06 controls paid off at scale (disposition table 98.3% first-pass, 35/35 interim validation, +85% over the estimate; env rule zero B-1-class findings + drove the E7 measurement). Security-in-P2-with-runtime-verification = 0 P3/P4 security findings. Ledger exact at 11 checkpoints; caught the 32-unit basis error (794 passed vs 826 collected). TWO new template controls proposed: probe self-test rule (B-3 false-passing grep on a 16k-line deletion = highest-stakes near-miss to date; B-4 unpassable determinism) + contract-touch rule (C-6 stale same-day from gate-decision edits). qa: semantic SURVIVES screening for 100% disposition accuracy (V-1); units rule (V-2); node-id copy-paste (V-3); ONE E2E pilot for batch-08 (V-4); A-9 knee test -> fixed task (V-5). 12 action items incl. CI-1 at PR (A-1), template adoption (A-2), Phase-3 run-ownership (A-6), batch-08 candidates (A-7: US-006 + manifest writer + HEX emitter + E2E + knee). Awaiting Phase-5 gate."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-11",
+            "decision": "approved",
+            "notes": "Phase 5 approved ('Apruebo continua'). A-2 (template adoption of probe-self-test + contract-touch rules) carried to the close checklist for explicit confirmation (batch-06 precedent). Advancing to Phase 6."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-11",
+            "decision": "started",
+            "notes": "Phase 6 Documentation. 3 parallel agents on disjoint files: (A) docs-writer — living REQUIREMENTS.md: §8-9 R-CDFX-*/memory-editing supersession notes (IDs preserved) + new batch-07 R-IDs (JSON change system, checks, variants, report) + the 3 doc-debt reconciliations in 01-requirements.md (DEV-1 LLR-002.7 HEX wording, DEV-7 007.2 clamp, DEV-8 node id) + §6.6 archive annotations; (B) docs-writer — 06-docs/traceability-matrix.md (51 LLRs) + functionality.md + diagrams/; (C) presentation-builder — executive-summary.md."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-11",
+            "decision": "completed",
+            "notes": "Phase 6 complete. (A) REQUIREMENTS.md: 20 supersessions (all 18 R-CDFX-* + R-MEM-003/005) + 3 evolutions (R-MEM-001/002/004) — statements preserved as historical record; 9 NEW R-IDs in 3 new sections (§10 R-CHG-001..004, §11 R-VAR-001/002 + R-CHK-001, §12 R-RPT-001/002), every Code:/Validation: pointer grep-verified; R-ID count 84 -> 93 (orchestrator-verified: zero renumbered/dropped); 4 stale live-voice refs reconciled, historical narrative intact; 01-requirements.md DEV-1/7/8 reconciliations + §6.6 archive annotation applied audit-note style. (B) 06-docs: traceability-matrix.md (12 cluster rows, grep-verified anchors at HEAD b1cde0c, 0 gaps, TC-050 retired-unassigned noted), functionality.md (operator-voice walkthrough of the 4 capabilities w/ C-1 JSON verbatim + linkage sense-check rationale), diagrams/change-check-report-flow.md (Mermaid w/ 4 security-gate callouts). (C) executive-summary.md (~2pp, operator-language, the 16k-line near-miss as the quality story). Awaiting Phase-6 gate; on approval -> awaiting-sync, then CI-1 + commit + PR + review + merge + /dev-flow-sync."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-11",
+            "decision": "approved-batch-closed",
+            "notes": "Phase 6 gate approved ('Apruebo continua' — second combined ask, read as approving A-2 per the consistent pattern). Batch-07 closed; all 6 phases complete; state -> awaiting-sync. A-2 APPLIED: probe-self-test + contract-touch rules inserted verbatim into ~/.claude/templates/dev-flow/req-template-en.md after the environmental-measurement rule (template now carries 4 generations of preventive controls: symbol-citation b05, env-measurement b06, probe-self-test + contract-touch b07). CI-1 APPLIED: tui-ci.yml two-tier — PR job 'pytest -q -m \"not slow\"', push job (main + main-tui) full 'pytest -q'. Proceeding: final commit + push + PR + code review + CI green + merge + /dev-flow-sync."
         }
     ],
     "obsidian_synced": false,

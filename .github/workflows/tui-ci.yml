@@ -1,5 +1,9 @@
 name: tui-ci
 
+# Two-tier gate (batch-07 CI-1, operator decision 2026-06-10):
+#  - PRs run the fast lean suite (-m "not slow", ~10 min) for quick feedback.
+#  - Pushes to main / main-tui run the FULL suite (incl. slow perf smoke
+#    tests, ~35 min) as the exhaustive post-merge gate.
 on:
   pull_request:
     branches:
@@ -7,6 +11,7 @@ on:
       - main-tui
   push:
     branches:
+      - main
       - main-tui
 
 jobs:
@@ -31,5 +36,10 @@ jobs:
           python -m pip install pillow
           python -m pip install -e .
 
-      - name: Run test suite
+      - name: Run lean test suite (pull requests)
+        if: github.event_name == 'pull_request'
+        run: pytest -q -m "not slow"
+
+      - name: Run full test suite (pushes)
+        if: github.event_name == 'push'
         run: pytest -q
