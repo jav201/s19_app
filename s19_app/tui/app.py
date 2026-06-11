@@ -47,6 +47,7 @@ from .rail import Rail, RailItem
 from .screens import (
     LoadFileScreen,
     LoadProjectScreen,
+    ReportViewerScreen,
     SaveProjectPayload,
     SaveProjectScreen,
     SelectVariantScreen,
@@ -63,6 +64,14 @@ from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
 from .services.change_service import ChangeActionResult, ChangeService
 from .services.load_service import build_loaded_hex, build_loaded_s19
+from .services.report_service import (
+    EXECUTION_SCOPE_TO_REPORT_MODE,
+    REPORT_SOURCE_DEFAULT,
+    REPORT_SOURCE_MANIFEST,
+    ReportOptions,
+    generate_project_report,
+    list_project_reports,
+)
 from .services.validation_service import build_validation_report
 from .services.variant_execution_service import (
     EXECUTION_SCOPES,
@@ -487,6 +496,7 @@ class S19TuiApp(App):
         Binding("p", "load_project", "Load project", show=False),
         Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
+        Binding("t", "view_reports", "View reports", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
         Binding("3", "show_screen('mac')", "MAC View", show=False),
@@ -613,6 +623,19 @@ class S19TuiApp(App):
         #: parse worker signature stays untouched and the worker never reads
         #: this field (LLR-005.4 thread contract). Cleared on load failure.
         self._pending_variant_id: Optional[str] = None
+        #: Most recent ``execute_scope`` outcome retained for "generate
+        #: report from last execution" (E8 / LLR-008.5):
+        #: ``(project_dir, scope, assignment_source, results)``. The
+        #: results carry their captured post-change mem_maps
+        #: (``capture_mem_maps=True``), making this the app's ONLY mem_map
+        #: retention point (the E7 risk item). Retention is bounded three
+        #: ways: REPLACED by every new execution run, IGNORED (treated as
+        #: absent) when the active project directory differs at generation
+        #: time, and DROPPED (reset to ``None``) immediately after a
+        #: successful report generation.
+        self._last_execution: Optional[
+            tuple[Path, str, str, List[VariantExecutionResult]]
+        ] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -1445,15 +1468,19 @@ class S19TuiApp(App):
             return
         source_path = self._change_service.document.source_path
         fallback_batch = [source_path] if source_path is not None else []
-        if not fallback_batch and read_project_manifest(project_dir) is None:
+        manifest_present = read_project_manifest(project_dir) is not None
+        if not fallback_batch and not manifest_present:
             self.set_status(
                 "Execute: no manifest and no loaded change/check file - "
                 "nothing to execute."
             )
             return
+        assignment_source = (
+            REPORT_SOURCE_MANIFEST if manifest_present else REPORT_SOURCE_DEFAULT
+        )
         self.set_status(f"Execute: scope '{scope}' started...")
         self._start_execute_scope_worker(
-            project_dir, variant_set, scope, fallback_batch
+            project_dir, variant_set, scope, fallback_batch, assignment_source
         )
 
     @work(thread=True, exclusive=True, group="execute_scope")
@@ -1463,6 +1490,7 @@ class S19TuiApp(App):
         variant_set: ProjectVariantSet,
         scope: str,
         fallback_batch: list[Path],
+        assignment_source: str,
     ) -> None:
         """
         Summary:
@@ -1478,6 +1506,9 @@ class S19TuiApp(App):
             scope (str): The validated execution scope.
             fallback_batch (list[Path]): The manifest-absent default file
                 list.
+            assignment_source (str): The report-vocabulary token
+                (``manifest`` / ``default``) recorded at trigger time for
+                the E8 retention snapshot.
 
         Returns:
             None
@@ -1485,6 +1516,11 @@ class S19TuiApp(App):
         Data Flow:
             - The service parses each variant's image itself (LLR-006.3);
               this worker never touches ``current_file``.
+            - ``capture_mem_maps=True`` pins each variant's post-change
+              memory map onto its result so a later "generate report from
+              last execution" (E8 / LLR-008.5) can hexdump without
+              re-running; ``_report_execution_results`` owns the bounded
+              retention.
             - Status lines and the final report run on the UI thread via
               ``call_from_thread``; a service-level crash surfaces as one
               status line, never an unhandled worker exception.
@@ -1502,6 +1538,7 @@ class S19TuiApp(App):
                 variant_set,
                 scope=scope,
                 fallback_batch=fallback_batch,
+                capture_mem_maps=True,
                 status_callback=lambda message: self.call_from_thread(
                     self.set_status, message
                 ),
@@ -1513,23 +1550,36 @@ class S19TuiApp(App):
             )
             return
         self.call_from_thread(
-            self._report_execution_results, scope, results, manifest_issues
+            self._report_execution_results,
+            project_dir,
+            scope,
+            assignment_source,
+            results,
+            manifest_issues,
         )
 
     def _report_execution_results(
         self,
+        project_dir: Path,
         scope: str,
+        assignment_source: str,
         results: List[VariantExecutionResult],
         manifest_issues: List[ValidationIssue],
     ) -> None:
         """
         Summary:
-            UI-thread report of an E6 execution run: one status line per
-            manifest finding and per variant result, plus the closing
-            aggregate line.
+            UI-thread report of an E6 execution run: retain the run as the
+            "last execution" snapshot for E8 report generation, then one
+            status line per manifest finding and per variant result, plus
+            the closing aggregate line.
 
         Args:
+            project_dir (Path): The executed project directory — pinned in
+                the retention snapshot so a later project switch
+                invalidates it.
             scope (str): The executed scope token.
+            assignment_source (str): ``manifest`` / ``default`` (report
+                vocabulary, recorded at trigger time).
             results (List[VariantExecutionResult]): The per-variant
                 outcomes in execution order.
             manifest_issues (List[ValidationIssue]): The manifest's
@@ -1539,6 +1589,10 @@ class S19TuiApp(App):
             None
 
         Data Flow:
+            - ``_last_execution`` is REPLACED first (LLR-008.5 retention:
+              results + their captured mem_maps live until the next run,
+              a project switch, or a successful report generation drops
+              them).
             - Manifest findings first (the F-S-03 skip visibility), then
               one ``ok``/``error`` line per variant with its change/check
               counts and diagnostics, then the run summary.
@@ -1549,6 +1603,7 @@ class S19TuiApp(App):
             Used by:
                 - ``_start_execute_scope_worker`` (via ``call_from_thread``)
         """
+        self._last_execution = (project_dir, scope, assignment_source, results)
         for issue in manifest_issues:
             self.set_status(
                 f"[{issue.code}] {issue.severity.value}: {issue.message}"
@@ -1568,6 +1623,243 @@ class S19TuiApp(App):
         self.set_status(
             f"Execute: scope '{scope}' finished - {len(results)} variant(s), "
             f"{error_count} error(s)"
+        )
+
+    def action_view_reports(self) -> None:
+        """
+        Summary:
+            Open the read-only report viewer modal for the active project
+            (LLR-008.1/008.3) — key-bound (``t``) and palette-reachable,
+            NOT a 9th rail item (LLR-008.2).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail with one neutral status line when no project is active.
+            - ``list_project_reports`` supplies the newest-first listing
+              (the F-Q-05 parsed sort key); the screen renders it verbatim
+              and shows its own neutral empty state when it is empty.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``list_project_reports``
+                - ``ReportViewerScreen`` / ``push_screen``
+            Used by:
+                - ``t`` keybinding / command palette entry
+        """
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self.set_status("Reports: no active project - load a project first.")
+            self.logger.info("View reports action triggered with no project.")
+            return
+        reports = list_project_reports(project_dir)
+        project_name = self.current_project or project_dir.name
+        self.logger.info(
+            "View reports action. project=%s count=%d", project_name, len(reports)
+        )
+        self.push_screen(ReportViewerScreen(project_name, reports))
+
+    def on_report_viewer_screen_generate_requested(
+        self, message: ReportViewerScreen.GenerateRequested
+    ) -> None:
+        """
+        Summary:
+            Route the viewer's Generate request to the generation flow
+            (LLR-008.5) — pure dispatch, no report logic here.
+
+        Args:
+            message (ReportViewerScreen.GenerateRequested): Carries the
+                collected ``context_bytes``.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_trigger_generate_report``
+            Used by:
+                - ``ReportViewerScreen`` (bubbled message)
+        """
+        self._trigger_generate_report(message.context_bytes)
+
+    def _trigger_generate_report(self, context_bytes: int) -> None:
+        """
+        Summary:
+            UI-thread gate for E8 report generation (LLR-008.5): reuse the
+            retained last-execution results when they belong to the active
+            project, otherwise run the active-variant scope first — the
+            minimal coherent flow, announced with a status line rather
+            than a second confirmation dialog.
+
+        Args:
+            context_bytes (int): The collected hexdump context size —
+                domain-validated later by ``ReportOptions`` (F-S-05).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Refuse with one neutral status line when no project /
+              variant set is active.
+            - A retained snapshot from a DIFFERENT project directory is
+              stale and treated as absent.
+            - Without a usable snapshot, the same manifest-or-loaded-file
+              guard as ``_trigger_execute_scope`` decides whether an
+              active-scope run is even possible; the worker then executes
+              with ``capture_mem_maps=True`` and generates in one pass.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``read_project_manifest``
+                - ``_start_generate_report_worker``
+            Used by:
+                - ``on_report_viewer_screen_generate_requested``
+        """
+        project_dir = self._active_project_dir()
+        variant_set = self._variant_set
+        if project_dir is None or variant_set is None or not variant_set.variants:
+            self.set_status("Report: no project variants - load a project first.")
+            return
+        last = self._last_execution
+        if last is not None and last[0] != project_dir:
+            self.logger.info(
+                "Stale last-execution snapshot ignored (project changed)."
+            )
+            last = None
+        fallback_batch: list[Path] = []
+        if last is None:
+            source_path = self._change_service.document.source_path
+            fallback_batch = [source_path] if source_path is not None else []
+            if not fallback_batch and read_project_manifest(project_dir) is None:
+                self.set_status(
+                    "Report: no manifest and no loaded change/check file - "
+                    "nothing to report."
+                )
+                return
+            self.set_status("Report: no prior execution - running active scope...")
+        else:
+            self.set_status("Report: generating from last execution...")
+        self._start_generate_report_worker(
+            project_dir, variant_set, context_bytes, last, fallback_batch
+        )
+
+    @work(thread=True, exclusive=True, group="generate_report")
+    def _start_generate_report_worker(
+        self,
+        project_dir: Path,
+        variant_set: ProjectVariantSet,
+        context_bytes: int,
+        last: Optional[tuple[Path, str, str, List[VariantExecutionResult]]],
+        fallback_batch: list[Path],
+    ) -> None:
+        """
+        Summary:
+            Off-thread E8 generation worker: resolve the execution results
+            (retained snapshot, or a fresh ``capture_mem_maps=True``
+            active-scope run), build ``ReportOptions``, and call
+            ``generate_project_report`` — every report-assembly decision
+            lives in the service (LLR-008.5).
+
+        Args:
+            project_dir (Path): The active project directory.
+            variant_set (ProjectVariantSet): The project's variant
+                inventory at trigger time.
+            context_bytes (int): The collected hexdump context size.
+            last (Optional[tuple]): The validated retention snapshot
+                ``(project_dir, scope, assignment_source, results)``, or
+                ``None`` to execute the active scope first.
+            fallback_batch (list[Path]): The manifest-absent default file
+                list for the fresh-run path.
+
+        Returns:
+            None
+
+        Data Flow:
+            - The fresh-run results are LOCAL to this worker — they are
+              never retained, so their mem_maps release on return.
+            - A ``ValueError`` (the F-S-05 out-of-domain ``context_bytes``
+              ERROR) and any service crash each surface as one status
+              line; the retained snapshot is kept on failure so the
+              operator can retry.
+            - Success dispatches ``_finish_generate_report`` to the UI
+              thread, which drops the retention and shows the path.
+
+        Dependencies:
+            Uses:
+                - ``execute_project_variants`` / ``ReportOptions``
+                - ``generate_project_report``
+                - ``call_from_thread`` / ``_finish_generate_report``
+            Used by:
+                - ``_trigger_generate_report``
+        """
+        try:
+            if last is None:
+                scope = SCOPE_ACTIVE
+                assignment_source = (
+                    REPORT_SOURCE_MANIFEST
+                    if read_project_manifest(project_dir) is not None
+                    else REPORT_SOURCE_DEFAULT
+                )
+                results, _manifest_issues = execute_project_variants(
+                    project_dir,
+                    variant_set,
+                    scope=scope,
+                    fallback_batch=fallback_batch,
+                    capture_mem_maps=True,
+                    status_callback=lambda message: self.call_from_thread(
+                        self.set_status, message
+                    ),
+                )
+            else:
+                _last_dir, scope, assignment_source, results = last
+            options = ReportOptions(
+                context_bytes=context_bytes,
+                execution_mode=EXECUTION_SCOPE_TO_REPORT_MODE[scope],
+                assignment_source=assignment_source,
+            )
+            report_path = generate_project_report(
+                project_dir, results, options, variant_set=variant_set
+            )
+        except ValueError as exc:
+            self.call_from_thread(self.set_status, f"Report rejected: {exc}")
+            return
+        except Exception as exc:
+            self.logger.exception("Report generation failed: %s", exc)
+            self.call_from_thread(
+                self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
+            )
+            return
+        self.call_from_thread(self._finish_generate_report, report_path)
+
+    def _finish_generate_report(self, report_path: Path) -> None:
+        """
+        Summary:
+            UI-thread close of a successful generation: DROP the retained
+            execution results (and their mem_maps — the E7 risk item),
+            then show the written report's project-relative path in the
+            status line (LLR-008.5; project-relative because the status
+            log trims lines to 50 characters).
+
+        Args:
+            report_path (Path): The written report file.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``set_status``
+            Used by:
+                - ``_start_generate_report_worker`` (via ``call_from_thread``)
+        """
+        self._last_execution = None
+        self.logger.info("Report generated: %s", report_path)
+        self.set_status(
+            f"Report: {report_path.parent.name}/{report_path.name}"
         )
 
     def _compose_screen_diff(self) -> Container:

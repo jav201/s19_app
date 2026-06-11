@@ -190,6 +190,12 @@
             "date": "2026-06-10",
             "decision": "increment-E6-approved-E7-started",
             "notes": "E6 approved (manifest read-only noted; writer = E8/batch-08 candidate). E7 started — report generator: services/report_service.py NEW (LLR-007.1-.8: headless generate_project_report; ReportOptions w/ context_bytes domain 0..REPORT_CONTEXT_BYTES_MAX per F-S-05; clamped window formula per F-Q-06 + 2 edge fixtures; render_hex_view headless variant only per F-Q-19 inspection; pinned filename <ts>(-NN zero-padded)?-report.md per F-Q-05; REPORT_MAX_* caps w/ explicit markers, measured w/ large_project per env rule; inputs per F-A-09: C-6 objects + mem_maps + ProjectVariantSet + ReportOptions + __version__; F-S-07 confidentiality line; F-A-17 execution mode in header; declaration-error subsection; saved_path in modified-files). Files: report_service.py NEW + tests/test_report_service.py NEW (+version accessor if needed)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E7-approved-E8-started",
+            "notes": "E7 implemented, orchestrator-verified, operator-approved ('Apruebo, sigue' — approval given while lean confirmed at 662/0, ledger exact 649+13 lean +1 slow). 3 files: report_service.py NEW (all LLR-007.x + F-S-05/07; window clamp+merge w/ edge fixtures; measured REPORT_MAX_* constants HOLD on large_s19 ~11ms); VariantExecutionResult additive opt-in mem_map capture; 14 tests. Conflict surfaced+resolved: window upper clamp vs LLR-007.2 wording — clamped form implemented, Phase-4/6 alignment flagged. Commit 3c39d68. E8 STARTED — final increment: ReportViewerScreen (open_links=False, size-capped, ts-descending listing, F-S-06), action_view_reports keybound (NO 9th rail item — LLR-008.2), generation trigger dialog (context_bytes -> service w/ capture_mem_maps=True, results dropped post-generation), tests/test_tui_report_view.py NEW. Files: screens.py, app.py, styles.tcss?, test file <= 5."
         }
     ],
     "obsidian_synced": false,

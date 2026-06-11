@@ -715,6 +715,39 @@ ModalScreen {
     height: 10;
 }
 
+/* --- Report viewer modal (batch-07 E8, LLR-008.1/008.5) --------------------
+ * Listing strip on top, scrollable Markdown render area filling the rest,
+ * generation row (context-bytes input + buttons) docked at the bottom via
+ * the shared `.modal-buttons` rule. Colors all resolve through the shared
+ * Calm Dark modal tokens — no new hue. */
+#report_dialog {
+    height: 80%;
+}
+
+#report_list {
+    border: round $rule;
+    background: $bg-base;
+    height: 8;
+    margin-bottom: 1;
+}
+
+#report_empty_state {
+    color: $fg-base;
+    padding: 1 1;
+    height: auto;
+    margin-bottom: 1;
+}
+
+#report_markdown_scroll {
+    border: round $rule;
+    background: $bg-base;
+    height: 1fr;
+}
+
+#report_context_bytes {
+    width: 12;
+}
+
 #files_title, #sections_title, #hex_title, #a2l_title, #a2l_tags_title, #alt_hex_title, #alt_actions_title {
     text-align: center;
     width: 100%;

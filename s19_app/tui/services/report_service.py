@@ -48,7 +48,12 @@ from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..models import ProjectVariantSet
-from .variant_execution_service import VariantExecutionResult
+from .variant_execution_service import (
+    SCOPE_ACTIVE,
+    SCOPE_ALL,
+    SCOPE_ASSIGNMENTS,
+    VariantExecutionResult,
+)
 
 #: Default ± surrounding-byte count of every modified-region hexdump
 #: (LLR-007.2; US-004 "±64, adjustable").
@@ -103,6 +108,15 @@ REPORT_FILENAME_REGEX = re.compile(r"^\d{8}T\d{6}Z(-\d{2})?-report\.md$")
 #: Reports subdirectory inside a project work area, created on demand
 #: (LLR-007.7).
 REPORTS_DIR_NAME = "reports"
+
+#: E6 execution-scope token → report ``execution_mode`` token (F-A-17),
+#: so the E8 trigger records HOW the reported run was scoped without any
+#: report vocabulary leaking into ``app.py`` (LLR-008.5).
+EXECUTION_SCOPE_TO_REPORT_MODE: dict[str, str] = {
+    SCOPE_ACTIVE: REPORT_MODE_ACTIVE,
+    SCOPE_ALL: REPORT_MODE_BATCH,
+    SCOPE_ASSIGNMENTS: REPORT_MODE_PER_ASSIGNMENT,
+}
 
 #: Injectable UTC clock type (LLR-007.5 ``now_fn``, the B-4 pattern).
 NowFn = Callable[[], datetime]
@@ -379,6 +393,63 @@ def _report_filename(reports_dir: Path, timestamp: datetime) -> str:
         f"100 reports already exist for second {base} - refusing to "
         f"overwrite an existing report"
     )
+
+
+def list_project_reports(project_dir: Path) -> List[Path]:
+    """
+    Summary:
+        List the project's ``reports/*.md`` newest-first (LLR-008.3): files
+        matching :data:`REPORT_FILENAME_REGEX` sort by the parsed key
+        ``(timestamp, NN)`` descending, with a missing ``-NN`` counter
+        sorting as ``00``; non-matching ``.md`` files list LAST,
+        unsorted-as-found.
+
+    Args:
+        project_dir (Path): The project work area
+            (``.s19tool/workarea/<project>/``).
+
+    Returns:
+        List[Path]: Report paths, newest first, foreign ``.md`` files at
+        the end. Empty when ``reports/`` does not exist or holds no
+        ``.md`` file.
+
+    Data Flow:
+        - The parsed sort key is REQUIRED inside a same-second collision
+          group (F-Q-05): raw filename-descending would put the
+          un-suffixed base AFTER its ``-NN`` siblings, but the base is the
+          group's FIRST (oldest) report — ``NN=00`` keys it correctly, so
+          descending order reads ``-02``, ``-01``, base.
+        - Non-``.md`` directory entries are ignored entirely (the listing
+          contract is ``reports/*.md``).
+
+    Dependencies:
+        Uses:
+            - REPORT_FILENAME_REGEX / REPORTS_DIR_NAME
+        Used by:
+            - s19_app.tui.app.S19TuiApp.action_view_reports (E8)
+            - tests/test_tui_report_view.py
+
+    Example:
+        >>> list_project_reports(Path("missing"))
+        []
+    """
+    reports_dir = Path(project_dir) / REPORTS_DIR_NAME
+    if not reports_dir.is_dir():
+        return []
+    timestamp_length = len("00000000T000000Z")
+    keyed: List[Tuple[Tuple[str, int], Path]] = []
+    foreign: List[Path] = []
+    for path in reports_dir.iterdir():
+        if not path.is_file() or path.suffix.lower() != ".md":
+            continue
+        match = REPORT_FILENAME_REGEX.match(path.name)
+        if match is None:
+            foreign.append(path)
+            continue
+        counter = int(match.group(1)[1:]) if match.group(1) else 0
+        keyed.append(((path.name[:timestamp_length], counter), path))
+    keyed.sort(key=lambda item: item[0], reverse=True)
+    return [path for _key, path in keyed] + foreign
 
 
 def _header_lines(
