@@ -373,7 +373,9 @@ class PatchEditorPanel(ScrollableContainer):
         - The save-back confirm / decline controls post
           ``SaveBackDecision`` — deliberately **not** an ``ActionRequested``
           action, so the routed action set stays exactly the LLR-003.2
-          eight.
+          eight plus the single E6 extension (``execute_scope`` — nine
+          total, F-A-15). The scope-cycling button is selector state only
+          and posts no message.
 
     Dependencies:
         Used by:
@@ -393,6 +395,17 @@ class PatchEditorPanel(ScrollableContainer):
     )
 
     _ENTRIES_COLUMNS = ("Kind", "Address", "Value / bytes", "Status", "Linkage")
+
+    #: The E6 execution scopes in selector cycle order (LLR-006.6) and their
+    #: button labels. The scope tokens are the service vocabulary
+    #: (``variant_execution_service.EXECUTION_SCOPES``) spelled locally so
+    #: this view widget imports nothing from the service layer.
+    EXECUTE_SCOPES = ("active", "all", "assignments")
+    _SCOPE_LABELS = {
+        "active": "active variant",
+        "all": "all variants",
+        "assignments": "per assignment",
+    }
 
     # Layout rules for the v2 widget ids live in styles.tcss (folded there
     # at E3b when the retired batch-03/04 ids' rules were removed).
@@ -419,6 +432,10 @@ class PatchEditorPanel(ScrollableContainer):
             bytes_text (str): The hex-bytes input's current text.
             path_text (str): The change-file path input's current text —
                 used by the ``"load_doc"`` action.
+            scope_text (str): The execution scope the selector currently
+                shows (one of ``EXECUTE_SCOPES``) — used by the E6
+                ``"execute_scope"`` action; empty default keeps the E3a
+                constructions unchanged.
 
         Dependencies:
             Used by:
@@ -432,6 +449,7 @@ class PatchEditorPanel(ScrollableContainer):
             value_text: str = "",
             bytes_text: str = "",
             path_text: str = "",
+            scope_text: str = "",
         ) -> None:
             super().__init__()
             self.action = action
@@ -439,6 +457,7 @@ class PatchEditorPanel(ScrollableContainer):
             self.value_text = value_text
             self.bytes_text = bytes_text
             self.path_text = path_text
+            self.scope_text = scope_text
 
     class SaveBackDecision(Message):
         """The operator answered the post-apply save prompt (LLR-002.7).
@@ -465,6 +484,10 @@ class PatchEditorPanel(ScrollableContainer):
 
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
+        #: The execution scope the selector currently shows (LLR-006.6) —
+        #: cycled by ``#patch_execute_scope_button``; carried on the
+        #: ``execute_scope`` ``ActionRequested``.
+        self._execute_scope: str = self.EXECUTE_SCOPES[0]
 
     def compose(self) -> ComposeResult:
         """Lay out the consolidated v2 Patch Editor widget tree.
@@ -551,6 +574,18 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_saveback_row",
             classes="hidden",
         )
+        yield Container(
+            Label("Execute over variants", classes="patch-field-label"),
+            Horizontal(
+                Button(
+                    f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
+                    id="patch_execute_scope_button",
+                ),
+                Button("Execute scope", id="patch_execute_run_button"),
+                id="patch_execute_buttons",
+            ),
+            id="patch_execute_row",
+        )
         yield Label("", id="patch_checks_status", classes="patch-field-label")
         yield Container(id="patch_checks_results")
 
@@ -583,7 +618,8 @@ class PatchEditorPanel(ScrollableContainer):
             action (str): One of the eight LLR-003.2 v2 actions —
                 ``"add_entry"`` / ``"edit_entry"`` / ``"remove_entry"`` /
                 ``"load_doc"`` / ``"validate_doc"`` / ``"apply_doc"`` /
-                ``"save_doc"`` / ``"run_checks"``.
+                ``"save_doc"`` / ``"run_checks"`` — or the E6 extension
+                ``"execute_scope"`` (LLR-006.6).
 
         Dependencies:
             Uses:
@@ -606,6 +642,7 @@ class PatchEditorPanel(ScrollableContainer):
                 path_text=self.query_one(
                     "#patch_doc_path_input", Input
                 ).value,
+                scope_text=self._execute_scope,
             )
         )
 
@@ -641,6 +678,18 @@ class PatchEditorPanel(ScrollableContainer):
             event.stop()
             self.post_message(self.SaveBackDecision(None))
             return
+        if button_id == "patch_execute_scope_button":
+            # Selector state only — cycle the scope and relabel; no message
+            # is posted, so the routed action set stays exactly nine.
+            event.stop()
+            index = self.EXECUTE_SCOPES.index(self._execute_scope)
+            self._execute_scope = self.EXECUTE_SCOPES[
+                (index + 1) % len(self.EXECUTE_SCOPES)
+            ]
+            event.button.label = (
+                f"Scope: {self._SCOPE_LABELS[self._execute_scope]}"
+            )
+            return
         actions = {
             "patch_entry_add_button": "add_entry",
             "patch_entry_edit_button": "edit_entry",
@@ -650,6 +699,7 @@ class PatchEditorPanel(ScrollableContainer):
             "patch_doc_apply_button": "apply_doc",
             "patch_doc_save_button": "save_doc",
             "patch_checks_run_button": "run_checks",
+            "patch_execute_run_button": "execute_scope",
         }
         action = actions.get(button_id)
         if action is not None:

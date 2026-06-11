@@ -5,6 +5,7 @@ import os
 import shutil
 import stat
 import sys
+from collections import Counter
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Optional, Sequence
@@ -394,7 +395,12 @@ def build_variant_set(
 
     Returns:
         ProjectVariantSet: Variants ordered by ``(name.lower(), name)`` with
-            ``active_id`` resolved per the rule above.
+            ``active_id`` resolved per the rule above. The ``variant_id`` is
+            the filename stem, EXCEPT when two or more variants share a stem
+            (e.g. ``fw.s19`` + ``fw.hex``): every colliding variant's id is
+            then its FULL FILENAME — deterministic and consistent with the
+            E5b display fallback (the operator-ratified E6 duplicate-id
+            decision).
 
     Raises:
         ValueError: When ``active_id`` is given but does not match any
@@ -403,7 +409,8 @@ def build_variant_set(
     Data Flow:
         - Filter ``data_files`` to S19/HEX suffixes.
         - Sort by ``(name.lower(), name)`` (LLR-005.1 order) and wrap each
-          path in a ``VariantDescriptor`` (``variant_id`` = filename stem).
+          path in a ``VariantDescriptor`` — ``variant_id`` is the stem, or
+          the full filename when the stem collides with another variant.
         - Resolve ``active_id``: explicit value validated against the variant
           ids, otherwise first variant (or ``None`` when empty).
 
@@ -425,9 +432,10 @@ def build_variant_set(
         (item for item in data_files if item.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS),
         key=lambda item: (item.name.lower(), item.name),
     )
+    stem_counts = Counter(item.stem for item in primaries)
     variants = tuple(
         VariantDescriptor(
-            variant_id=item.stem,
+            variant_id=item.name if stem_counts[item.stem] > 1 else item.stem,
             path=item,
             file_type="s19" if item.suffix.lower() in S19_EXTENSIONS else "hex",
         )

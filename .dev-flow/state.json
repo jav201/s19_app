@@ -166,6 +166,18 @@
             "date": "2026-06-10",
             "decision": "increment-E5a-approved-E5b-started",
             "notes": "E5a approved with the 3 lock-test flips ratified. E5b started — variant selector UI: LLR-005.4 (activation through the existing worker-thread load pipeline, zero new parse call sites), 005.5 (SelectVariantScreen modal + action_select_variant + update_project_labels '(i/N)'), 005.6-partial (first-variant default on project load; manifest override rides E6), + the two E5a app.py findings: rework _handle_save_project cross-suffix guard (contradicts variant model) and make 2nd-S19 sync append-as-variant with a status line (was silent skip). Files: app.py, screens.py, tests/test_tui_variants.py NEW (+styles.tcss if modal css needed) <= 5."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E5b-awaiting-gate",
+            "notes": "E5b implemented + orchestrator-verified. 4 files. SelectVariantScreen modal (keybound v) + (i/N) label + first-variant activation; variant_id stamping via main-thread _pending_variant_id consumed in _apply_prepared_load (worker untouched, exclusive group=load single-in-flight, cleared on all failure paths); MAC-merge carries variant_id; E5a findings reworked (cross-suffix guard retired; 2nd-S19 sync appends as variant w/ status). LLR-005.4 verified: zero new _parse_loaded_file call sites (AST + grep, orchestrator re-checked). Results: 8 new pilots passed (re-run independently); guards 78+111; lean 638/0 (orchestrator re-run) — ledger exact 630+8. Duplicate-stem display falls back to filename (id model = E6). Commit 794b846. Packet: increment-E5b.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-10",
+            "decision": "increment-E5b-approved-E6-started",
+            "notes": "E5b approved. E6 started — project.json manifest (LLR-006.1 w/ F-S-03 containment: paths resolved against project dir ONLY, capped read) + LLR-005.6 completion (manifest active_variant override) + variant_execution_service (LLR-006.2 deterministic order, 006.3 headless sequential parse, 006.4 per-variant isolation/VariantExecutionResult, 006.5 C-6 consumption) + execute_scope UI (006.6, routed action set 8->9 per F-A-15) + duplicate-variant-id decision (stems collide -> ids become full filenames, deterministic, consistent w/ E5b display fallback). Files ~6: variant_execution_service.py NEW, manifest io, app.py, screens_directionb.py, tests/test_variant_execution.py NEW (+manifest tests)."
         }
     ],
     "obsidian_synced": false,

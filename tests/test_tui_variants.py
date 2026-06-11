@@ -26,10 +26,11 @@ Coverage map:
   reports the saved variant.
 - Variant stamping — ``test_direct_load_variant_id_is_none``: non-project
   loads carry ``variant_id is None``.
-- Duplicate-stem display — ``test_duplicate_stem_display_uses_filename``:
-  when two variants share a filename stem (``fw.s19`` + ``fw.hex``) the
-  label falls back to the full filename (display-only disambiguation; the
-  duplicate-id model itself is an E6 decision).
+- Duplicate-stem ids — ``test_duplicate_stem_ids_are_filenames``: when two
+  variants share a filename stem (``fw.s19`` + ``fw.hex``) each
+  ``variant_id`` is the FULL FILENAME (the operator-ratified E6 model
+  decision applied in ``workspace.build_variant_set``), and the label /
+  selector options show the filenames.
 
 Harness: the ``App.run_test()`` pilot pattern of ``tests/test_tui_app.py`` /
 ``tests/test_tui_directionb.py`` — ``async def _drive()`` wrapped by
@@ -368,16 +369,18 @@ def test_save_second_s19_into_project_appends_variant(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Duplicate-stem display fallback (E5a flag — model decision rides E6)
+# Duplicate-stem ids (operator-ratified at E6: colliding ids = full filename)
 # ---------------------------------------------------------------------------
 
 
-def test_duplicate_stem_display_uses_filename(tmp_path: Path) -> None:
-    """Variants sharing a stem are displayed by filename, not by stem.
+def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
+    """Variants sharing a stem get FULL-FILENAME ids; display follows.
 
-    Intent: ``fw.s19`` + ``fw.hex`` collapse to one ``variant_id`` (``fw``,
-    E5a flagged; E6 decides the model). E5b disambiguates the DISPLAY only:
-    the label and the selector options fall back to the full filename.
+    Intent: the E6 duplicate-id decision — when two variants' stems collide
+    (``fw.s19`` + ``fw.hex``), each ``variant_id`` IS the full filename
+    (deterministic, consistent with the E5b display fallback). The selector
+    options and the project label therefore show the filenames, and the two
+    variants are individually addressable.
     """
 
     async def _drive() -> tuple:
@@ -391,6 +394,6 @@ def test_duplicate_stem_display_uses_filename(tmp_path: Path) -> None:
             return (_project_label(app), options)
 
     label, options = asyncio.run(_drive())
-    # Deterministic order: fw.hex < fw.s19; both displays are filenames.
-    assert options == [("fw", "fw.hex"), ("fw", "fw.s19")]
+    # Deterministic order: fw.hex < fw.s19; ids AND displays are filenames.
+    assert options == [("fw.hex", "fw.hex"), ("fw.s19", "fw.s19")]
     assert "proj:fw.hex (1/2)" in label, f"duplicate-stem label must show the filename, got {label!r}"

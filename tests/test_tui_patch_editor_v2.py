@@ -7,9 +7,10 @@ screen + router + service seam:
 - **TC-015** — panel composition (LLR-003.1): the 6 new ``patch_doc_*`` /
   ``patch_checks_run_button`` ids exist; the 7 retired batch-03/04 ids do
   not (13 queries).
-- **TC-016** — action routing (LLR-003.2): the router routes exactly the
-  eight v2 actions at E3a — the set extends by exactly one further action,
-  ``execute_scope``, at E6 (F-A-15) — each with an observable effect; a
+- **TC-016** — action routing (LLR-003.2): the router routes exactly nine
+  actions since E6 — the E3a eight plus the single ``execute_scope``
+  extension (F-A-15) — the eight with observable effects here (the
+  ``execute_scope`` behavior rides ``tests/test_variant_execution.py``); a
   retired action is a status error, never a crash.
 - **TC-019** — legacy-load UX (LLR-003.5): a ``.cdfx`` XML path and a v1
   unified JSON each load as exactly one ERROR finding with the app
@@ -162,14 +163,14 @@ def test_panel_composition(tmp_path: Path) -> None:
 # ===========================================================================
 
 
-def test_action_routing_pins_exactly_eight_v2_actions() -> None:
-    """The routable action set is exactly the eight v2 actions at E3a.
+def test_action_routing_pins_exactly_nine_v2_actions() -> None:
+    """The routable action set is exactly nine actions at E6.
 
-    Intent: LLR-003.2 — the router routes exactly {add_entry, edit_entry,
-    remove_entry, load_doc, validate_doc, apply_doc, save_doc, run_checks}
-    at E3a; the set is extended by exactly one further action,
-    ``execute_scope``, at increment E6 (the stated F-A-15 extension — this
-    pin is re-asserted as nine there).
+    Intent: LLR-003.2 + LLR-006.6 (F-A-15) — the E3a eight {add_entry,
+    edit_entry, remove_entry, load_doc, validate_doc, apply_doc, save_doc,
+    run_checks} extended by exactly ONE further action at increment E6,
+    ``execute_scope`` (the stated F-A-15 extension clause — the E3a
+    eight-action pin re-asserted as nine here).
     """
     assert PATCH_ACTIONS_V2 == frozenset(
         {
@@ -181,6 +182,7 @@ def test_action_routing_pins_exactly_eight_v2_actions() -> None:
             "apply_doc",
             "save_doc",
             "run_checks",
+            "execute_scope",
         }
     )
 
