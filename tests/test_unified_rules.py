@@ -1,58 +1,53 @@
 """
-Unified change-set file MF-* rule-set tests — s19_app batch-04, increment 6.
+Change-set file rule tests — s19_app batch-04, increment 6; re-pointed to the
+v2 reader (``s19_app/tui/changes/io.py::read_change_document``) at batch-07
+E3b (§6.6 dispositions).
 
-Covers the per-entry / version / parse rules of the ``MF-*`` rule set the
-unified change-set reader (``s19_app/tui/cdfx/unified_io.py::read_unified``)
-applies on read — the HLR-008 rule set, the part not exercised by the
-structural / resource-bound TCs of ``test_unified_read.py``:
+Covers the parse-rejection and version arms of the read rule set:
 
-  - TC-020 — malformed JSON (LLR-006.2 / HLR-008): a truncated / garbage file
-             → exactly one ``MF-JSON-PARSE`` error ``ValidationIssue``, an
-             empty change-set, and no escaping exception.
-  - TC-023 — the per-entry structural rules (LLR-008.1): a memory-field entry
-             with no ``address`` → ``MF-NO-ADDRESS``; an empty ``new_bytes``
-             run → ``MF-EMPTY-BYTES``; a byte outside 0-255 → ``MF-BYTE-RANGE``
-             — each one issue, the offending entry dropped, the rest kept
-             (collect-don't-abort).
-  - TC-024 — the version rule (LLR-008.2): a file declaring an unrecognised
-             version token → one **info**-level ``MF-VERSION-UNKNOWN`` issue,
-             and the file is still read.
+  - TC-020 — malformed JSON (truncated / garbage bytes) → exactly one
+             ``MF-JSON-PARSE`` error issue, an empty document, no exception;
+             and the parse-issue message never embeds the file's raw bytes
+             (C-9).
+  - TC-023 — FOLDED at E3b: the per-entry rule arms (missing address, empty
+             bytes, out-of-range byte, skip-and-continue, no-KeyError, C-9
+             message discipline) are carried by
+             ``test_changes_schema.py::test_entry_faults`` — the v2 wire
+             grammar renamed the rule codes (``CHG-ADDRESS-SYNTAX`` /
+             ``CHG-VALUE-EMPTY`` / ``CHG-BYTES-SYNTAX``) and that suite
+             asserts each exact code with a trailing clean entry kept.
+  - TC-024 — REWRITTEN to the v2 envelope: the v2 metadata rules validate
+             ``format`` / ``kind`` / ``encoding`` / ``value_mode`` but are
+             deliberately version-tolerant — an unrecognised ``version``
+             token produces no finding and the file is still read (the
+             forward-compat intent the batch-04 INFO-level
+             ``MF-VERSION-UNKNOWN`` carried), and the current ``"2.0"``
+             token produces no finding either.
 
-These tests encode WHY each rule matters. Each ``MF-*`` rule has a stable code
-and a documented severity (every read-path rule is ``ERROR`` except
-``MF-VERSION-UNKNOWN``, which is ``INFO`` — an unknown version is informative,
-not fatal, so an old reader still loads a future file). The collect-don't-abort
-contract means a single bad entry is dropped while every clean entry around it
-still loads — each per-entry test asserts the clean entry survives, not merely
-that the bad one was flagged, so a reader that aborts on the first fault fails.
-
-Every fixture is synthetic and built in-test (constraint C-9).
+The collect-don't-abort intent is unchanged: a parse rejection is a collected
+``ValidationIssue``, never an escaping exception, and never a leak of file
+content into the message text. Every fixture is synthetic and built in-test
+(constraint C-9).
 """
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
 
-from s19_app.tui.cdfx import read_unified
-from s19_app.tui.cdfx.unified_io import (
-    MF_BYTE_RANGE,
-    MF_EMPTY_BYTES,
+from s19_app.tui.changes.io import (
     MF_JSON_PARSE,
-    MF_NO_ADDRESS,
-    MF_VERSION_UNKNOWN,
+    read_change_document,
 )
 from s19_app.validation.model import ValidationSeverity
 
-from tests.conftest import (
-    make_malformed_unified_file,
-    make_rule_violation_unified_file,
-)
+from tests.conftest import make_malformed_unified_file
 
 
 # ---------------------------------------------------------------------------
-# TC-020 — malformed JSON (LLR-006.2 / HLR-008)
+# TC-020 — malformed JSON is one parse issue, never an exception
 # ---------------------------------------------------------------------------
 
 
@@ -60,25 +55,25 @@ from tests.conftest import (
 def test_tc020_malformed_json_yields_one_parse_issue_no_exception(
     tmp_path: Path, variant: str
 ) -> None:
-    """TC-020 — a malformed file → exactly one MF-JSON-PARSE, no crash (LLR-006.2).
+    """TC-020 — a malformed file → exactly one MF-JSON-PARSE, no crash.
 
-    A truncated or garbage file is not well-formed JSON. The collect-don't-abort
-    contract requires the reader to surface this as exactly one
-    ``MF-JSON-PARSE`` error issue and return an empty change-set — never an
-    escaping exception. This asserts the call *returns* (the load-bearing
-    assertion) for both a truncated and a pure-garbage payload.
+    A truncated or garbage file is not well-formed JSON. The
+    collect-don't-abort contract requires the reader to surface this as
+    exactly one ``MF-JSON-PARSE`` error issue and return an empty document —
+    never an escaping exception. This asserts the call *returns* (the
+    load-bearing assertion) for both a truncated and a pure-garbage payload.
     """
     bad_path = make_malformed_unified_file(
         tmp_path / f"{variant}.json", variant=variant
     )
 
     # The load-bearing assertion — the call returns, it does NOT raise.
-    changeset, issues = read_unified(str(bad_path), tmp_path)
+    document = read_change_document(str(bad_path), tmp_path)
 
-    assert changeset.is_empty()
-    codes = [i.code for i in issues]
+    assert document.entries == []
+    codes = [i.code for i in document.issues]
     assert codes == [MF_JSON_PARSE]
-    assert issues[0].severity is ValidationSeverity.ERROR
+    assert document.issues[0].severity is ValidationSeverity.ERROR
 
 
 def test_tc020_parse_issue_message_carries_no_file_bytes(tmp_path: Path) -> None:
@@ -86,141 +81,71 @@ def test_tc020_parse_issue_message_carries_no_file_bytes(tmp_path: Path) -> None
 
     A parse-error message that echoed the failing file content would put
     arbitrary (possibly proprietary) bytes into the 5 MB rotating log
-    (constraint C-9). This asserts the message names only the failure kind, not
-    the garbage payload — so the message is safe to log.
+    (constraint C-9). This asserts the message names only the failure kind,
+    not the garbage payload — so the message is safe to log.
     """
     bad_path = make_malformed_unified_file(
         tmp_path / "garbage.json", variant="garbage"
     )
 
-    _, issues = read_unified(str(bad_path), tmp_path)
+    document = read_change_document(str(bad_path), tmp_path)
 
-    message = issues[0].message
+    message = document.issues[0].message
     assert "not json at all" not in message
 
 
 # ---------------------------------------------------------------------------
-# TC-023 — the per-entry structural rules (LLR-008.1)
+# TC-024 — version tolerance (REWRITTEN to the v2 envelope)
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize(
-    "variant,expected_code",
-    [
-        ("no-address", MF_NO_ADDRESS),
-        ("empty-bytes", MF_EMPTY_BYTES),
-        ("byte-range", MF_BYTE_RANGE),
-    ],
-)
-def test_tc023_per_entry_rule_flags_one_entry_keeps_the_clean_one(
-    tmp_path: Path, variant: str, expected_code: str
-) -> None:
-    """TC-023 — a bad memory entry → one issue, the clean entry still loads (LLR-008.1).
-
-    LLR-008.1 fixes three per-entry structural rules: a missing ``address``
-    (``MF-NO-ADDRESS``), an empty ``new_bytes`` run (``MF-EMPTY-BYTES``), and a
-    byte outside 0-255 (``MF-BYTE-RANGE``). Collect-don't-abort means the
-    offending entry is dropped while every clean entry around it survives. Each
-    fixture carries one clean entry plus one offending entry; this asserts
-    exactly one issue of the expected code **and** that the clean entry loaded
-    — a reader that aborts on the first fault fails the second assertion.
-    """
-    bad_path = make_rule_violation_unified_file(
-        tmp_path / f"{variant}.json", variant=variant
-    )
-
-    changeset, issues = read_unified(str(bad_path), tmp_path)
-
-    matching = [i for i in issues if i.code == expected_code]
-    assert len(matching) == 1
-    assert matching[0].severity is ValidationSeverity.ERROR
-    # Collect-don't-abort — the clean entry (address 0x100) still loaded.
-    assert len(changeset.memory) == 1
-    assert changeset.memory.get(0x100) is not None
+def _v2_payload_with_version(version: object) -> bytes:
+    """A minimal valid v2 document carrying the given version token."""
+    return (
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": version,
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": [
+                    {"type": "bytes", "address": "0x100", "bytes": "41 42"}
+                ],
+            }
+        )
+        + "\n"
+    ).encode("utf-8")
 
 
-def test_tc023_no_address_issue_does_not_raise_keyerror(tmp_path: Path) -> None:
-    """TC-023 — a memory entry missing 'address' is handled, not crashed.
-
-    A memory-field object with no ``address`` field would raise ``KeyError`` if
-    the reader indexed the field directly. This asserts the call returns
-    normally — the reader uses ``.get`` and the ``MF-NO-ADDRESS`` rule, not a
-    raw index — so a malformed entry is a collected issue, never a crash.
-    """
-    bad_path = make_rule_violation_unified_file(
-        tmp_path / "no-address.json", variant="no-address"
-    )
-
-    # The load-bearing assertion — the call returns, it does NOT raise.
-    changeset, issues = read_unified(str(bad_path), tmp_path)
-
-    assert any(i.code == MF_NO_ADDRESS for i in issues)
-    assert len(changeset.memory) == 1
-
-
-def test_tc023_byte_range_issue_carries_no_raw_bytes(tmp_path: Path) -> None:
-    """TC-023 — the MF-BYTE-RANGE message references the address, not raw bytes (C-9).
-
-    Constraint C-9 keeps firmware bytes out of the rotating log: a memory-field
-    finding references the entry's ``address`` and a summary, never the raw
-    ``new_bytes`` content. This asserts the ``MF-BYTE-RANGE`` message names the
-    offending entry's address (``512`` / ``0x200``) but does not echo the bad
-    byte run verbatim.
-    """
-    bad_path = make_rule_violation_unified_file(
-        tmp_path / "byte-range.json", variant="byte-range"
-    )
-
-    _, issues = read_unified(str(bad_path), tmp_path)
-
-    message = next(i.message for i in issues if i.code == MF_BYTE_RANGE)
-    assert "512" in message
-
-
-# ---------------------------------------------------------------------------
-# TC-024 — the version rule (LLR-008.2)
-# ---------------------------------------------------------------------------
-
-
-def test_tc024_unknown_version_is_info_level_and_file_is_still_read(
+def test_tc024_unknown_version_is_tolerated_and_file_is_still_read(
     tmp_path: Path,
 ) -> None:
-    """TC-024 — an unknown version → one info MF-VERSION-UNKNOWN, file still read (LLR-008.2).
+    """TC-024 — a future version token produces no finding; entries are read.
 
-    LLR-008.2 makes the version field forward-tolerant: an unrecognised version
-    token is **informative**, not fatal — an old reader still loads a future
-    file. This feeds a structurally valid file declaring an unknown version and
-    asserts exactly one ``MF-VERSION-UNKNOWN`` issue at **INFO** severity, and
-    that the file's memory-field entry still loaded — the version finding did
-    not abort the load.
+    The v2 envelope rules (LLR-001.3) validate ``format`` / ``kind`` /
+    ``encoding`` / ``value_mode`` and are deliberately tolerant of the
+    ``version`` field, so a file written by a newer tool still loads — the
+    forward-compat intent of the batch-04 INFO-level version finding, now
+    with no finding at all. A regression that starts hard-rejecting unknown
+    versions fails this test.
     """
-    versioned_path = make_rule_violation_unified_file(
-        tmp_path / "future.json", variant="version-unknown"
-    )
+    path = tmp_path / "future.json"
+    path.write_bytes(_v2_payload_with_version("99.0-from-the-future"))
 
-    changeset, issues = read_unified(str(versioned_path), tmp_path)
+    document = read_change_document(str(path), tmp_path)
 
-    version_issues = [i for i in issues if i.code == MF_VERSION_UNKNOWN]
-    assert len(version_issues) == 1
-    # An unknown version is informative, not an error.
-    assert version_issues[0].severity is ValidationSeverity.INFO
-    # The load was not aborted — the clean entry still parsed.
-    assert len(changeset.memory) == 1
+    assert document.issues == []
+    assert [e.address for e in document.entries] == [0x100]
+    assert document.version == "99.0-from-the-future"
 
 
 def test_tc024_known_version_produces_no_version_issue(tmp_path: Path) -> None:
-    """TC-024 — the recognised version token produces no MF-VERSION-UNKNOWN issue.
+    """TC-024 — the current ``"2.0"`` version token produces no finding."""
+    path = tmp_path / "current.json"
+    path.write_bytes(_v2_payload_with_version("2.0"))
 
-    The version rule must fire **only** on an unrecognised token. A file
-    written by the production writer carries the recognised version; this
-    reads such a file (via the rule-violation fixture's other variants, all of
-    which keep version ``1.0``) and asserts no ``MF-VERSION-UNKNOWN`` issue
-    appears — so the rule does not false-positive on a current file.
-    """
-    current_path = make_rule_violation_unified_file(
-        tmp_path / "current.json", variant="empty-bytes"
-    )
+    document = read_change_document(str(path), tmp_path)
 
-    _, issues = read_unified(str(current_path), tmp_path)
-
-    assert [i for i in issues if i.code == MF_VERSION_UNKNOWN] == []
+    assert document.issues == []
+    assert len(document.entries) == 1

@@ -3,14 +3,31 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from textual.app import ComposeResult
-from textual.containers import Container
+from textual.containers import Container, ScrollableContainer
+from textual.message import Message
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label, ListItem, ListView
+from textual.widgets import Button, Input, Label, ListItem, ListView, Markdown, Static
+
+from .services.report_service import (
+    REPORT_CONTEXT_BYTES_DEFAULT,
+    REPORT_MAX_TOTAL_BYTES,
+)
 
 logger = logging.getLogger("s19tui")
+
+#: Report-viewer render cap (LLR-008.1 / F-S-06). Chosen as 2x the
+#: generator's whole-document budget rather than the 256 MB global
+#: ``READ_SIZE_CAP_BYTES``: every self-generated report fits (the
+#: LLR-007.6 budget is enforced at hexdump-block granularity, so explicit
+#: TRUNCATED markers may push a legitimate report slightly past
+#: ``REPORT_MAX_TOTAL_BYTES``), while a foreign oversized ``.md`` dropped
+#: into ``reports/`` is refused long before the Markdown widget would
+#: freeze the TUI rendering it. Referenced as a module global at call
+#: time so tests can lower it without multi-MB fixtures.
+VIEWER_SIZE_CAP_BYTES = 2 * REPORT_MAX_TOTAL_BYTES
 
 
 # --- Calm Dark modal re-skin (batch-02 increment 8, LLR-015.1) --------------
@@ -186,3 +203,276 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
             label_widget = selected.query_one(Label)
             name = label_widget.text if hasattr(label_widget, "text") else str(label_widget)
             self.dismiss(name)
+
+
+class SelectVariantScreen(ModalScreen[Optional[str]]):
+    """Modal dialog for selecting the active S19/HEX variant of a project.
+
+    Follows the ``LoadProjectScreen`` pattern (LLR-005.5): a ``ListView`` of
+    display labels plus confirm/cancel buttons, dismissing with the chosen
+    ``variant_id`` or ``None`` on cancel. The caller supplies pre-computed
+    ``(variant_id, display_label)`` pairs — when two variants share a
+    filename stem (e.g. ``fw.s19`` + ``fw.hex``) the app passes the full
+    filename as the display label — and the selection resolves by list
+    index, never by parsing label text back. Styling reuses the shared
+    Calm Dark ``.modal-dialog`` token classes from ``styles.tcss``.
+    """
+
+    def __init__(
+        self,
+        project_name: str,
+        options: List[Tuple[str, str]],
+        active_index: int,
+    ) -> None:
+        super().__init__()
+        self.project_name = project_name
+        self.options = options
+        self.active_index = active_index
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label(
+                f"Select variant (project '{self.project_name}'):",
+                classes="modal-title",
+            ),
+            ListView(
+                *[
+                    ListItem(
+                        Label(
+                            f"{display} (active)"
+                            if index == self.active_index
+                            else display
+                        )
+                    )
+                    for index, (_variant_id, display) in enumerate(self.options)
+                ],
+                id="variant_list",
+            ),
+            Container(
+                Button("Activate", id="variant_ok", classes="modal-confirm"),
+                Button("Cancel", id="variant_cancel"),
+                id="load_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        list_view = self.query_one("#variant_list", ListView)
+        if 0 <= self.active_index < len(self.options):
+            list_view.index = self.active_index
+        list_view.focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "variant_cancel":
+            logger.info("SelectVariantScreen dismissed by cancel.")
+            self.dismiss(None)
+            return
+        if event.button.id == "variant_ok":
+            list_view = self.query_one("#variant_list", ListView)
+            index = list_view.index
+            if index is None or not (0 <= index < len(self.options)):
+                return
+            variant_id = self.options[index][0]
+            logger.info("SelectVariantScreen dismissing with variant_id=%s", variant_id)
+            self.dismiss(variant_id)
+
+
+class ReportViewerScreen(ModalScreen[None]):
+    """Read-only report viewer + generation trigger modal (LLR-008.1/008.5).
+
+    Summary:
+        Lists the active project's reports newest-first (the caller passes
+        the ``list_project_reports`` result, LLR-008.3) and renders the
+        selected one through ``textual.widgets.Markdown`` constructed with
+        ``open_links=False`` — render-only per F-S-06: no link navigation,
+        no file inclusion, no URL opening, and NO ``Markdown.LinkClicked``
+        handler is registered here or in the app. Files larger than
+        :data:`VIEWER_SIZE_CAP_BYTES` are refused with a neutral message
+        instead of being rendered. The bottom row collects ``context_bytes``
+        (prefilled with the LLR-007.2 default) and posts
+        :class:`ReportViewerScreen.GenerateRequested` to the app — the
+        screen itself assembles nothing (LLR-008.5).
+
+    Args:
+        project_name (str): The active project's display name.
+        reports (List[Path]): Report paths newest-first (LLR-008.3 order
+            is the CALLER's contract; this screen preserves it verbatim).
+
+    Returns:
+        None: ``ModalScreen[None]`` — always dismisses with ``None``.
+
+    Data Flow:
+        - Selection resolves by list index into ``self.reports`` (never by
+          parsing label text back).
+        - ``Generate new report`` parses the context input as a plain
+          decimal int; an unparsable value is ignored (the LoadFileScreen
+          empty-input pattern) while DOMAIN errors (F-S-05) surface later
+          via the app's ``ReportOptions`` status line.
+
+    Dependencies:
+        Uses:
+            - VIEWER_SIZE_CAP_BYTES / REPORT_CONTEXT_BYTES_DEFAULT
+        Used by:
+            - s19_app.tui.app.S19TuiApp.action_view_reports
+
+    Example:
+        >>> screen = ReportViewerScreen("proj", [])  # doctest: +SKIP
+    """
+
+    EMPTY_TEXT = "No reports in this project yet - use 'Generate new report' below."
+    TOO_LARGE_TEXT = (
+        "This report file is larger than the viewer cap and was not "
+        "rendered. It remains available on disk."
+    )
+    UNREADABLE_TEXT = "This report file could not be read."
+
+    class GenerateRequested(Message):
+        """Operator asked for a new report with the given context size.
+
+        Summary:
+            Posted (then the screen dismisses) when the Generate button is
+            pressed with a parsable integer in the context input; bubbles
+            to ``S19TuiApp`` which owns the generation flow (LLR-008.5).
+
+        Args:
+            context_bytes (int): The collected hexdump context size —
+                domain validation is deferred to ``ReportOptions``
+                (F-S-05: out-of-domain is an explicit ERROR, never a
+                silent clamp).
+
+        Dependencies:
+            Used by:
+                - s19_app.tui.app.S19TuiApp.on_report_viewer_screen_generate_requested
+        """
+
+        def __init__(self, context_bytes: int) -> None:
+            super().__init__()
+            self.context_bytes = context_bytes
+
+    def __init__(self, project_name: str, reports: List[Path]) -> None:
+        super().__init__()
+        self.project_name = project_name
+        self.reports = reports
+        self.selected_path: Optional[Path] = None
+
+    def compose(self) -> ComposeResult:
+        if self.reports:
+            listing: ListView | Static = ListView(
+                *[ListItem(Label(path.name)) for path in self.reports],
+                id="report_list",
+            )
+        else:
+            listing = Static(self.EMPTY_TEXT, id="report_empty_state", markup=False)
+        yield Container(
+            Label(
+                f"Reports (project '{self.project_name}'):",
+                classes="modal-title",
+            ),
+            listing,
+            ScrollableContainer(
+                Markdown("", open_links=False, id="report_markdown"),
+                id="report_markdown_scroll",
+            ),
+            Container(
+                Label("Context bytes:"),
+                Input(
+                    value=str(REPORT_CONTEXT_BYTES_DEFAULT),
+                    id="report_context_bytes",
+                ),
+                Button(
+                    "Generate new report",
+                    id="report_generate",
+                    classes="modal-confirm",
+                ),
+                Button("Close", id="report_close"),
+                id="load_buttons",
+                classes="modal-buttons",
+            ),
+            id="report_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        if self.reports:
+            self.query_one("#report_list", ListView).focus()
+
+    async def on_list_view_selected(self, event: ListView.Selected) -> None:
+        index = event.list_view.index
+        if index is None or not (0 <= index < len(self.reports)):
+            return
+        await self._render_report(self.reports[index])
+
+    async def _render_report(self, path: Path) -> None:
+        """
+        Summary:
+            Render one report into the Markdown widget, refusing files
+            over the viewer cap with a neutral message (F-S-06) — never
+            rendering past the cap.
+
+        Args:
+            path (Path): The selected report file.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Probe the on-disk size FIRST; over the (call-time module
+              global) ``VIEWER_SIZE_CAP_BYTES`` → the too-large message
+              replaces the render and ``selected_path`` stays ``None``
+              for that file.
+            - Decode errors never crash the modal: ``errors="replace"``
+              plus an unreadable-message fallback on ``OSError``.
+
+        Dependencies:
+            Uses:
+                - VIEWER_SIZE_CAP_BYTES
+            Used by:
+                - on_list_view_selected
+        """
+        markdown = self.query_one("#report_markdown", Markdown)
+        try:
+            size_bytes = path.stat().st_size
+        except OSError:
+            self.selected_path = None
+            await markdown.update(self.UNREADABLE_TEXT)
+            return
+        if size_bytes > VIEWER_SIZE_CAP_BYTES:
+            logger.info(
+                "Report viewer refused oversized file (%d bytes): %s",
+                size_bytes,
+                path.name,
+            )
+            self.selected_path = None
+            await markdown.update(self.TOO_LARGE_TEXT)
+            return
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            self.selected_path = None
+            await markdown.update(self.UNREADABLE_TEXT)
+            return
+        self.selected_path = path
+        await markdown.update(text)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "report_close":
+            logger.info("ReportViewerScreen dismissed by close.")
+            self.dismiss(None)
+            return
+        if event.button.id == "report_generate":
+            raw = self.query_one("#report_context_bytes", Input).value.strip()
+            try:
+                context_bytes = int(raw)
+            except ValueError:
+                logger.info("ReportViewerScreen ignored non-integer context: %r", raw)
+                return
+            logger.info(
+                "ReportViewerScreen requesting generation. context_bytes=%d",
+                context_bytes,
+            )
+            # Posted straight to the app's queue (not bubbled) so the
+            # immediately following dismiss can never drop it.
+            self.app.post_message(self.GenerateRequested(context_bytes))
+            self.dismiss(None)

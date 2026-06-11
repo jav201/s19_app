@@ -1,7 +1,9 @@
 """
 Memory-field change value display tests — s19_app batch-04, increment 3.
 
-Covers the pure display layer (``s19_app/tui/cdfx/memory_display.py``):
+Covers the pure display layer (``s19_app/tui/changes/display.py`` — migrated
+from ``cdfx/memory_display.py`` at batch-07 E3b, public names preserved;
+F-Q-09):
 
   - TC-009 — hex display of the stored bytes (LLR-003.1): a byte run renders
              as space-separated two-digit uppercase hexadecimal tokens.
@@ -26,12 +28,12 @@ path writes back to ``new_bytes``.
 
 from __future__ import annotations
 
-from s19_app.tui.cdfx import (
-    MemoryChange,
+from s19_app.tui.changes import (
+    ChangeEntry,
     MemoryValueRendering,
     format_memory_value,
 )
-from s19_app.tui.cdfx.memory_display import ASCII_PLACEHOLDER
+from s19_app.tui.changes.display import ASCII_PLACEHOLDER
 
 
 # ---------------------------------------------------------------------------
@@ -176,13 +178,13 @@ def test_tc011_stored_bytes_unchanged_after_rendering() -> None:
     snapshots the run, renders all three forms, and asserts the stored tuple is
     unchanged — identity and value both.
     """
-    entry = MemoryChange(address=0x100, new_bytes=[0x41, 0x00, 0xFF])
-    before = entry.new_bytes
+    entry = ChangeEntry("bytes", 0x100, [0x41, 0x00, 0xFF])
+    before = entry.encoded_bytes
 
-    rendering = format_memory_value(entry.new_bytes)
+    rendering = format_memory_value(entry.encoded_bytes)
 
-    assert entry.new_bytes == (0x41, 0x00, 0xFF)
-    assert entry.new_bytes is before
+    assert entry.encoded_bytes == (0x41, 0x00, 0xFF)
+    assert entry.encoded_bytes is before
     # The rendering is genuinely derived, not a no-op.
     assert rendering.hex == "41 00 FF"
 
@@ -194,13 +196,13 @@ def test_tc011_repeated_rendering_is_stable_and_non_mutating() -> None:
     changed run and produce different text. Identical output across two calls,
     plus an unchanged stored run, pins the no-side-effect contract.
     """
-    entry = MemoryChange(address=0x200, new_bytes=[0x10, 0x7E, 0x80])
+    entry = ChangeEntry("bytes", 0x200, [0x10, 0x7E, 0x80])
 
-    first = format_memory_value(entry.new_bytes)
-    second = format_memory_value(entry.new_bytes)
+    first = format_memory_value(entry.encoded_bytes)
+    second = format_memory_value(entry.encoded_bytes)
 
     assert first == second
-    assert entry.new_bytes == (0x10, 0x7E, 0x80)
+    assert entry.encoded_bytes == (0x10, 0x7E, 0x80)
 
 
 def test_tc011_rendering_does_not_mutate_a_caller_supplied_list() -> None:

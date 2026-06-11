@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import deque
+from collections import Counter, deque
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
@@ -42,9 +42,16 @@ from .hexview import (
 )
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
-from .models import LoadedFile
+from .models import LoadedFile, ProjectVariantSet
 from .rail import Rail, RailItem
-from .screens import LoadFileScreen, LoadProjectScreen, SaveProjectPayload, SaveProjectScreen
+from .screens import (
+    LoadFileScreen,
+    LoadProjectScreen,
+    ReportViewerScreen,
+    SaveProjectPayload,
+    SaveProjectScreen,
+    SelectVariantScreen,
+)
 from .screens_directionb import (
     AbDiffPanel,
     BookmarksPlaceholder,
@@ -55,10 +62,24 @@ from .screens_directionb import (
 from .color_policy import css_class_for_severity
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
-from .cdfx import ExportResult
-from .services.cdfx_service import CdfxActionResult, CdfxService
+from .services.change_service import ChangeActionResult, ChangeService
 from .services.load_service import build_loaded_hex, build_loaded_s19
+from .services.report_service import (
+    EXECUTION_SCOPE_TO_REPORT_MODE,
+    REPORT_SOURCE_DEFAULT,
+    REPORT_SOURCE_MANIFEST,
+    ReportOptions,
+    generate_project_report,
+    list_project_reports,
+)
 from .services.validation_service import build_validation_report
+from .services.variant_execution_service import (
+    EXECUTION_SCOPES,
+    SCOPE_ACTIVE,
+    VariantExecutionResult,
+    execute_project_variants,
+    read_project_manifest,
+)
 from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
@@ -69,12 +90,31 @@ from .workspace import (
     SUPPORTED_EXTENSIONS,
     WORKAREA_TEMP,
     WorkareaContainmentError,
+    build_variant_set,
     copy_into_workarea,
     ensure_workarea,
     resolve_input_path,
     sanitize_project_name,
     setup_logging,
     validate_project_files,
+)
+
+#: The Patch Editor's routable action set (LLR-003.2) — the eight v2
+#: actions of increment E3a extended by exactly one further action at E6,
+#: ``execute_scope`` (the stated F-A-15 extension, LLR-006.6 — nine total).
+#: A non-member action is reported as a status error, never a crash.
+PATCH_ACTIONS_V2: frozenset[str] = frozenset(
+    {
+        "add_entry",
+        "edit_entry",
+        "remove_entry",
+        "load_doc",
+        "validate_doc",
+        "apply_doc",
+        "save_doc",
+        "run_checks",
+        "execute_scope",
+    }
 )
 
 
@@ -454,7 +494,9 @@ class S19TuiApp(App):
         Binding("o", "open_workarea", "Open workarea", show=False),
         Binding("s", "save_project", "Save project", show=False),
         Binding("p", "load_project", "Load project", show=False),
+        Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
+        Binding("t", "view_reports", "View reports", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
         Binding("3", "show_screen('mac')", "MAC View", show=False),
@@ -569,7 +611,31 @@ class S19TuiApp(App):
         self._mac_goto_focus_address: Optional[int] = None
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
-        self._cdfx_service = CdfxService()
+        self._change_service = ChangeService()
+        #: Multi-variant project state (LLR-005.5/005.6): the active project's
+        #: ordered S19/HEX variant inventory, or ``None`` when no project is
+        #: active. Built by ``workspace.build_variant_set`` on project
+        #: load/save and updated on variant switch / variant append.
+        self._variant_set: Optional[ProjectVariantSet] = None
+        #: Variant id to stamp onto the next applied primary ``LoadedFile``.
+        #: Set on the main thread immediately before a load dispatch and
+        #: consumed by ``_apply_prepared_load`` on the main thread, so the
+        #: parse worker signature stays untouched and the worker never reads
+        #: this field (LLR-005.4 thread contract). Cleared on load failure.
+        self._pending_variant_id: Optional[str] = None
+        #: Most recent ``execute_scope`` outcome retained for "generate
+        #: report from last execution" (E8 / LLR-008.5):
+        #: ``(project_dir, scope, assignment_source, results)``. The
+        #: results carry their captured post-change mem_maps
+        #: (``capture_mem_maps=True``), making this the app's ONLY mem_map
+        #: retention point (the E7 risk item). Retention is bounded three
+        #: ways: REPLACED by every new execution run, IGNORED (treated as
+        #: absent) when the active project directory differs at generation
+        #: time, and DROPPED (reset to ``None``) immediately after a
+        #: successful report generation.
+        self._last_execution: Optional[
+            tuple[Path, str, str, List[VariantExecutionResult]]
+        ] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -1122,9 +1188,10 @@ class S19TuiApp(App):
         """
         Summary:
             Build the Direction B Patch Editor rail screen (``#screen_patch``)
-            as the functional change-list editor — a change-list table, wired
-            add / edit / remove inputs, save / load actions and an empty state
-            (batch-03 increment 9, LLR-007.1..007.6).
+            as the consolidated v2 change-flow editor — one entries table,
+            both-kind entry inputs, the Load / Validate / Apply / Save /
+            Run-checks control row and an empty state (batch-07 increment
+            E3a, LLR-003.1).
 
         Args:
             None
@@ -1137,8 +1204,8 @@ class S19TuiApp(App):
             - Composition only. The ``PatchEditorPanel`` is presentational —
               its controls emit ``PatchEditorPanel.ActionRequested`` messages
               that ``on_patch_editor_panel_action_requested`` routes to
-              ``self._cdfx_service``. No XML / change-list model logic is
-              built here (constraint C-8 / LLR-007.5).
+              ``self._change_service``. No JSON / change-document model
+              logic is built here (constraint C-7 / LLR-003.2).
 
         Dependencies:
             Uses:
@@ -1158,119 +1225,187 @@ class S19TuiApp(App):
     ) -> None:
         """
         Summary:
-            Route a Patch Editor control action to the CDFX service and feed
-            the result back to the screen (LLR-007.2..007.4 / LLR-007.5).
+            Route a Patch Editor control action to the change service and
+            feed the shaped rows back to the screen — exactly the nine
+            ``PATCH_ACTIONS_V2`` actions (the LLR-003.2 eight plus the E6
+            ``execute_scope`` extension, LLR-006.6); a retired or unknown
+            action is one status error, never a crash.
 
         Args:
             event (PatchEditorPanel.ActionRequested): The message a Patch
                 Editor control posted — its ``action`` plus the current
-                name / index / value / path input-field text.
+                address / value / bytes / path input-field text.
 
         Returns:
             None
 
         Data Flow:
-            - Parameter add / edit / remove and memory add / edit / remove
-              mutate ``self._cdfx_service``'s unified change-set, then re-render
-              both tables.
-            - save / load round-trip the parameter half to a ``.cdfx``;
-              save_unified / load_unified round-trip the whole change-set to a
-              JSON file; export splits it into a ``.cdfx`` plus a memory-field
-              JSON file.
-            - Every action's outcome and any ``ValidationIssue`` it produced
-              is surfaced through ``set_status`` (the existing status path);
-              an input error (blank name, bad index/address, missing entry) is
+            - ``add_entry`` / ``edit_entry`` / ``remove_entry`` mutate the
+              service's v2 document (both entry kinds).
+            - ``load_doc`` / ``validate_doc`` / ``save_doc`` round-trip and
+              re-validate the document; ``apply_doc`` runs the E2 engine
+              and, with ≥1 applied entry, opens the save-back prompt (S19)
+              or states HEX save-back is unsupported (LLR-002.7).
+            - ``run_checks`` rides the E4 service seam and renders the
+              LLR-004.5 display.
+            - ``execute_scope`` hands the selector's scope to
+              ``_trigger_execute_scope``, which guards on the UI thread and
+              starts the E6 execution worker (LLR-006.6).
+            - Every action's outcome and findings surface through
+              ``_report_change_result`` / ``set_status``; an input error is
               caught and reported, never raised into the UI.
-            - Both Patch Editor tables are re-rendered after every action.
+            - The entries table and the persistent declaration-fault area
+              are re-rendered after every action (LLR-002.8).
 
         Dependencies:
             Uses:
-                - ``CdfxService``
+                - ``ChangeService``
                 - ``_compute_a2l_enriched_tags``
-                - ``PatchEditorPanel.refresh_rows`` / ``refresh_memory_rows``
+                - ``PatchEditorPanel.refresh_entries`` / ``refresh_issues``
+                  / ``refresh_check_results`` / ``show_save_prompt``
             Used by:
                 - Textual message dispatch for ``PatchEditorPanel``
         """
-        a2l_tags = self._compute_a2l_enriched_tags()
-        loaded_ranges = (
-            self.current_file.ranges if self.current_file is not None else None
-        )
+        service = self._change_service
+        loaded = self.current_file
+        mem_map = loaded.mem_map if loaded is not None else None
+        loaded_ranges = loaded.ranges if loaded is not None else None
+        mac_records = loaded.mac_records if loaded is not None else None
+        a2l_tags = self._compute_a2l_enriched_tags() or None
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
         try:
-            if event.action == "add":
-                self._cdfx_service.add_entry(
-                    event.parameter_name, event.index_text, event.value_text
+            if event.action not in PATCH_ACTIONS_V2:
+                self.set_status(
+                    f"Patch Editor: unsupported action {event.action!r}"
+                )
+            elif event.action == "add_entry":
+                service.add_entry(
+                    event.address_text, event.value_text, event.bytes_text
                 )
                 self.set_status("Patch Editor: entry added.")
-            elif event.action == "edit":
-                self._cdfx_service.edit_entry(
-                    event.parameter_name, event.index_text, event.value_text
+            elif event.action == "edit_entry":
+                service.edit_entry(
+                    event.address_text, event.value_text, event.bytes_text
                 )
                 self.set_status("Patch Editor: entry updated.")
-            elif event.action == "remove":
-                self._cdfx_service.remove_entry(
-                    event.parameter_name, event.index_text
-                )
+            elif event.action == "remove_entry":
+                service.remove_entry(event.address_text)
                 self.set_status("Patch Editor: entry removed.")
-            elif event.action == "save":
-                result = self._cdfx_service.save(self.base_dir, a2l_tags)
-                self._report_cdfx_result(result)
-            elif event.action == "load":
+            elif event.action == "load_doc":
                 if not event.path_text.strip():
-                    self.set_status("Patch Editor: enter a .cdfx path to load.")
-                else:
-                    result = self._cdfx_service.load(
-                        event.path_text, self.base_dir, a2l_tags
-                    )
-                    self._report_cdfx_result(result)
-            elif event.action == "add_memory":
-                self._cdfx_service.add_memory_change(
-                    event.address_text, event.bytes_text
-                )
-                self.set_status("Patch Editor: memory change added.")
-            elif event.action == "edit_memory":
-                self._cdfx_service.edit_memory_change(
-                    event.address_text, event.bytes_text
-                )
-                self.set_status("Patch Editor: memory change updated.")
-            elif event.action == "remove_memory":
-                self._cdfx_service.remove_memory_change(event.address_text)
-                self.set_status("Patch Editor: memory change removed.")
-            elif event.action == "save_unified":
-                result = self._cdfx_service.save_unified(self.base_dir)
-                self._report_cdfx_result(result)
-            elif event.action == "load_unified":
-                if not event.unified_path_text.strip():
                     self.set_status(
-                        "Patch Editor: enter a unified-file path to load."
+                        "Patch Editor: enter a change-file path to load."
                     )
                 else:
-                    result = self._cdfx_service.load_unified(
-                        event.unified_path_text, self.base_dir
-                    )
-                    self._report_cdfx_result(result)
-            elif event.action == "export":
-                export = self._cdfx_service.export_selective(
-                    self.base_dir, a2l_tags
+                    result = service.load(event.path_text, self.base_dir)
+                    self._report_change_result(result)
+            elif event.action == "validate_doc":
+                self._report_change_result(service.validate(loaded_ranges))
+            elif event.action == "apply_doc":
+                variant_id = loaded.path.stem if loaded is not None else None
+                summary = service.apply(
+                    mem_map,
+                    loaded_ranges,
+                    mac_records,
+                    a2l_tags,
+                    variant_id=variant_id,
                 )
-                self._report_export_result(export)
+                counts = summary.counts
+                skipped = (
+                    counts["skipped-partial"]
+                    + counts["skipped-outside"]
+                    + counts["skipped-no-image"]
+                )
+                self.set_status(
+                    f"Apply: {counts['applied']} applied, "
+                    f"{skipped} skipped, {counts['blocked']} blocked"
+                )
+                if counts["applied"] > 0 and loaded is not None:
+                    if loaded.file_type == "s19":
+                        panel.show_save_prompt(f"{variant_id}-patched.s19")
+                    else:
+                        self.set_status(
+                            "HEX save-back not supported this batch"
+                        )
+            elif event.action == "save_doc":
+                self._report_change_result(service.save(self.base_dir))
+            elif event.action == "run_checks":
+                result = service.run_checks(
+                    mem_map, loaded_ranges, mac_records, a2l_tags
+                )
+                self._report_change_result(result)
+                panel.refresh_check_results(
+                    service.check_rows(), result.message
+                )
+            elif event.action == "execute_scope":
+                self._trigger_execute_scope(event.scope_text or SCOPE_ACTIVE)
         except (ValueError, KeyError) as exc:
             self.set_status(f"Patch Editor: {exc}")
 
-        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        panel.refresh_rows(self._cdfx_service.rows(a2l_tags))
-        panel.refresh_memory_rows(
-            self._cdfx_service.memory_rows(loaded_ranges)
-        )
+        panel.refresh_entries(service.rows(loaded_ranges))
+        panel.refresh_issues(service.issue_lines())
 
-    def _report_cdfx_result(self, result: CdfxActionResult) -> None:
+    def on_patch_editor_panel_save_back_decision(
+        self, event: PatchEditorPanel.SaveBackDecision
+    ) -> None:
         """
         Summary:
-            Surface a CDFX save / load result and its issues on the status
-            path (LLR-007.3 / LLR-007.4 issue-surfacing arm).
+            Handle the operator's answer to the post-apply save-back prompt
+            (LLR-002.7 UI half): persist the patched image under the typed
+            filename, or persist nothing on decline (``saved_path`` stays
+            ``None``).
 
         Args:
-            result (CdfxActionResult): The outcome of a ``CdfxService.save``
-                or ``CdfxService.load`` call.
+            event (PatchEditorPanel.SaveBackDecision): The prompt outcome —
+                the (possibly edited) filename, or ``None`` when declined.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Hide the prompt either way.
+            - Decline → one status line, no write.
+            - Confirm → ``ChangeService.save_patched`` into the active
+              project directory (work-area root when no project is active);
+              the typed name passes the engine's F-S-01 sanitizer; the
+              result and its findings surface on the status path.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.save_patched``
+                - ``_active_project_dir``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        panel.hide_save_prompt()
+        if event.filename is None:
+            self.set_status("Patch Editor: save-back declined")
+            return
+        loaded = self.current_file
+        if loaded is None:
+            self.set_status("Patch Editor: no image loaded - nothing saved")
+            return
+        dest_dir = self._active_project_dir() or self.workarea
+        result = self._change_service.save_patched(
+            loaded.mem_map,
+            loaded.ranges,
+            dest_dir,
+            event.filename,
+            source_kind=loaded.file_type,
+        )
+        self._report_change_result(result)
+
+    def _report_change_result(self, result: ChangeActionResult) -> None:
+        """
+        Summary:
+            Surface a change-service action result and its issues on the
+            status path (the LLR-003.2 issue-surfacing arm — the evolved
+            ``_report_cdfx_result`` pattern).
+
+        Args:
+            result (ChangeActionResult): The outcome of a ``ChangeService``
+                load / validate / save / save-back / run-checks call.
 
         Returns:
             None
@@ -1284,52 +1419,448 @@ class S19TuiApp(App):
                 - ``set_status``
             Used by:
                 - ``on_patch_editor_panel_action_requested``
+                - ``on_patch_editor_panel_save_back_decision``
         """
-        self.set_status(f"Patch Editor: {result.message}")
+        self.set_status(result.message)
         for issue in result.issues:
             self.set_status(
-                f"Patch Editor [{issue.code}] {issue.severity.value}: "
-                f"{issue.message}"
+                f"[{issue.code}] {issue.severity.value}: {issue.message}"
             )
 
-    def _report_export_result(self, result: ExportResult) -> None:
+    def _trigger_execute_scope(self, scope: str) -> None:
         """
         Summary:
-            Surface a selective-export result and its per-half issues on the
-            status path (LLR-009.3 export issue-surfacing arm).
+            UI-thread gate for the E6 ``execute_scope`` action (LLR-006.6):
+            validate the scope and the project/variant context, pick the
+            manifest-absent fallback file, and start the execution worker.
 
         Args:
-            result (ExportResult): The outcome of a
-                ``CdfxService.export_selective`` call — the two written file
-                paths and the combined, per-half-tagged ``ValidationIssue``
-                list.
+            scope (str): The selector's scope token — one of
+                ``EXECUTION_SCOPES`` (``active`` / ``all`` /
+                ``assignments``).
 
         Returns:
             None
 
         Data Flow:
-            - Emit one status line per written file (or a rejection note when a
-              path is ``None``), then one line per ``ValidationIssue`` so the
-              engineer sees every finding and its originating half.
+            - Refuse an unknown scope, a missing project directory, or an
+              empty variant set with one status line each.
+            - The manifest-absent fallback batch (LLR-006.1 default) is the
+              change service's loaded document ``source_path`` when it has
+              one — the file the operator loaded in the Patch Editor.
+            - Hand off to ``_start_execute_scope_worker`` (thread worker) so
+              long runs never freeze the UI; all execution work happens in
+              ``services.variant_execution_service``.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``_start_execute_scope_worker``
+            Used by:
+                - ``on_patch_editor_panel_action_requested``
+        """
+        if scope not in EXECUTION_SCOPES:
+            self.set_status(f"Execute: unknown scope {scope!r}")
+            return
+        project_dir = self._active_project_dir()
+        variant_set = self._variant_set
+        if project_dir is None or variant_set is None or not variant_set.variants:
+            self.set_status("Execute: no project variants - load a project first.")
+            return
+        source_path = self._change_service.document.source_path
+        fallback_batch = [source_path] if source_path is not None else []
+        manifest_present = read_project_manifest(project_dir) is not None
+        if not fallback_batch and not manifest_present:
+            self.set_status(
+                "Execute: no manifest and no loaded change/check file - "
+                "nothing to execute."
+            )
+            return
+        assignment_source = (
+            REPORT_SOURCE_MANIFEST if manifest_present else REPORT_SOURCE_DEFAULT
+        )
+        self.set_status(f"Execute: scope '{scope}' started...")
+        self._start_execute_scope_worker(
+            project_dir, variant_set, scope, fallback_batch, assignment_source
+        )
+
+    @work(thread=True, exclusive=True, group="execute_scope")
+    def _start_execute_scope_worker(
+        self,
+        project_dir: Path,
+        variant_set: ProjectVariantSet,
+        scope: str,
+        fallback_batch: list[Path],
+        assignment_source: str,
+    ) -> None:
+        """
+        Summary:
+            Off-thread E6 execution worker: run
+            ``execute_project_variants`` and surface per-variant status
+            lines between variants via ``call_from_thread`` (F-Q-18), then
+            dispatch the result report to the UI thread.
+
+        Args:
+            project_dir (Path): The active project directory.
+            variant_set (ProjectVariantSet): The project's variant
+                inventory at trigger time.
+            scope (str): The validated execution scope.
+            fallback_batch (list[Path]): The manifest-absent default file
+                list.
+            assignment_source (str): The report-vocabulary token
+                (``manifest`` / ``default``) recorded at trigger time for
+                the E8 retention snapshot.
+
+        Returns:
+            None
+
+        Data Flow:
+            - The service parses each variant's image itself (LLR-006.3);
+              this worker never touches ``current_file``.
+            - ``capture_mem_maps=True`` pins each variant's post-change
+              memory map onto its result so a later "generate report from
+              last execution" (E8 / LLR-008.5) can hexdump without
+              re-running; ``_report_execution_results`` owns the bounded
+              retention.
+            - Status lines and the final report run on the UI thread via
+              ``call_from_thread``; a service-level crash surfaces as one
+              status line, never an unhandled worker exception.
+
+        Dependencies:
+            Uses:
+                - ``execute_project_variants``
+                - ``call_from_thread`` / ``_report_execution_results``
+            Used by:
+                - ``_trigger_execute_scope``
+        """
+        try:
+            results, manifest_issues = execute_project_variants(
+                project_dir,
+                variant_set,
+                scope=scope,
+                fallback_batch=fallback_batch,
+                capture_mem_maps=True,
+                status_callback=lambda message: self.call_from_thread(
+                    self.set_status, message
+                ),
+            )
+        except Exception as exc:
+            self.logger.exception("Execute scope worker failed: %s", exc)
+            self.call_from_thread(
+                self.set_status, f"Execute failed: {type(exc).__name__}: {exc}"
+            )
+            return
+        self.call_from_thread(
+            self._report_execution_results,
+            project_dir,
+            scope,
+            assignment_source,
+            results,
+            manifest_issues,
+        )
+
+    def _report_execution_results(
+        self,
+        project_dir: Path,
+        scope: str,
+        assignment_source: str,
+        results: List[VariantExecutionResult],
+        manifest_issues: List[ValidationIssue],
+    ) -> None:
+        """
+        Summary:
+            UI-thread report of an E6 execution run: retain the run as the
+            "last execution" snapshot for E8 report generation, then one
+            status line per manifest finding and per variant result, plus
+            the closing aggregate line.
+
+        Args:
+            project_dir (Path): The executed project directory — pinned in
+                the retention snapshot so a later project switch
+                invalidates it.
+            scope (str): The executed scope token.
+            assignment_source (str): ``manifest`` / ``default`` (report
+                vocabulary, recorded at trigger time).
+            results (List[VariantExecutionResult]): The per-variant
+                outcomes in execution order.
+            manifest_issues (List[ValidationIssue]): The manifest's
+                collected findings (containment skips, parse faults).
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_last_execution`` is REPLACED first (LLR-008.5 retention:
+              results + their captured mem_maps live until the next run,
+              a project switch, or a successful report generation drops
+              them).
+            - Manifest findings first (the F-S-03 skip visibility), then
+              one ``ok``/``error`` line per variant with its change/check
+              counts and diagnostics, then the run summary.
 
         Dependencies:
             Uses:
                 - ``set_status``
             Used by:
-                - ``on_patch_editor_panel_action_requested``
+                - ``_start_execute_scope_worker`` (via ``call_from_thread``)
         """
-        cdfx = result.cdfx_path
-        memory = result.memory_field_path
-        self.set_status(
-            "Patch Editor: export - "
-            f"CDFX {cdfx if cdfx is not None else 'rejected'}; "
-            f"memory-field {memory if memory is not None else 'rejected'}"
-        )
-        for issue in result.issues:
+        self._last_execution = (project_dir, scope, assignment_source, results)
+        for issue in manifest_issues:
             self.set_status(
-                f"Patch Editor [{issue.code}] {issue.severity.value} "
-                f"({issue.artifact}): {issue.message}"
+                f"[{issue.code}] {issue.severity.value}: {issue.message}"
             )
+        for result in results:
+            line = (
+                f"Variant '{result.variant_id}': {result.status} - "
+                f"{len(result.change_summaries)} change, "
+                f"{len(result.check_results)} check"
+            )
+            self.set_status(line)
+            for diagnostic in result.diagnostics:
+                self.set_status(
+                    f"Variant '{result.variant_id}': {diagnostic}"
+                )
+        error_count = sum(1 for result in results if result.status == "error")
+        self.set_status(
+            f"Execute: scope '{scope}' finished - {len(results)} variant(s), "
+            f"{error_count} error(s)"
+        )
+
+    def action_view_reports(self) -> None:
+        """
+        Summary:
+            Open the read-only report viewer modal for the active project
+            (LLR-008.1/008.3) — key-bound (``t``) and palette-reachable,
+            NOT a 9th rail item (LLR-008.2).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail with one neutral status line when no project is active.
+            - ``list_project_reports`` supplies the newest-first listing
+              (the F-Q-05 parsed sort key); the screen renders it verbatim
+              and shows its own neutral empty state when it is empty.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``list_project_reports``
+                - ``ReportViewerScreen`` / ``push_screen``
+            Used by:
+                - ``t`` keybinding / command palette entry
+        """
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self.set_status("Reports: no active project - load a project first.")
+            self.logger.info("View reports action triggered with no project.")
+            return
+        reports = list_project_reports(project_dir)
+        project_name = self.current_project or project_dir.name
+        self.logger.info(
+            "View reports action. project=%s count=%d", project_name, len(reports)
+        )
+        self.push_screen(ReportViewerScreen(project_name, reports))
+
+    def on_report_viewer_screen_generate_requested(
+        self, message: ReportViewerScreen.GenerateRequested
+    ) -> None:
+        """
+        Summary:
+            Route the viewer's Generate request to the generation flow
+            (LLR-008.5) — pure dispatch, no report logic here.
+
+        Args:
+            message (ReportViewerScreen.GenerateRequested): Carries the
+                collected ``context_bytes``.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_trigger_generate_report``
+            Used by:
+                - ``ReportViewerScreen`` (bubbled message)
+        """
+        self._trigger_generate_report(message.context_bytes)
+
+    def _trigger_generate_report(self, context_bytes: int) -> None:
+        """
+        Summary:
+            UI-thread gate for E8 report generation (LLR-008.5): reuse the
+            retained last-execution results when they belong to the active
+            project, otherwise run the active-variant scope first — the
+            minimal coherent flow, announced with a status line rather
+            than a second confirmation dialog.
+
+        Args:
+            context_bytes (int): The collected hexdump context size —
+                domain-validated later by ``ReportOptions`` (F-S-05).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Refuse with one neutral status line when no project /
+              variant set is active.
+            - A retained snapshot from a DIFFERENT project directory is
+              stale and treated as absent.
+            - Without a usable snapshot, the same manifest-or-loaded-file
+              guard as ``_trigger_execute_scope`` decides whether an
+              active-scope run is even possible; the worker then executes
+              with ``capture_mem_maps=True`` and generates in one pass.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``read_project_manifest``
+                - ``_start_generate_report_worker``
+            Used by:
+                - ``on_report_viewer_screen_generate_requested``
+        """
+        project_dir = self._active_project_dir()
+        variant_set = self._variant_set
+        if project_dir is None or variant_set is None or not variant_set.variants:
+            self.set_status("Report: no project variants - load a project first.")
+            return
+        last = self._last_execution
+        if last is not None and last[0] != project_dir:
+            self.logger.info(
+                "Stale last-execution snapshot ignored (project changed)."
+            )
+            last = None
+        fallback_batch: list[Path] = []
+        if last is None:
+            source_path = self._change_service.document.source_path
+            fallback_batch = [source_path] if source_path is not None else []
+            if not fallback_batch and read_project_manifest(project_dir) is None:
+                self.set_status(
+                    "Report: no manifest and no loaded change/check file - "
+                    "nothing to report."
+                )
+                return
+            self.set_status("Report: no prior execution - running active scope...")
+        else:
+            self.set_status("Report: generating from last execution...")
+        self._start_generate_report_worker(
+            project_dir, variant_set, context_bytes, last, fallback_batch
+        )
+
+    @work(thread=True, exclusive=True, group="generate_report")
+    def _start_generate_report_worker(
+        self,
+        project_dir: Path,
+        variant_set: ProjectVariantSet,
+        context_bytes: int,
+        last: Optional[tuple[Path, str, str, List[VariantExecutionResult]]],
+        fallback_batch: list[Path],
+    ) -> None:
+        """
+        Summary:
+            Off-thread E8 generation worker: resolve the execution results
+            (retained snapshot, or a fresh ``capture_mem_maps=True``
+            active-scope run), build ``ReportOptions``, and call
+            ``generate_project_report`` — every report-assembly decision
+            lives in the service (LLR-008.5).
+
+        Args:
+            project_dir (Path): The active project directory.
+            variant_set (ProjectVariantSet): The project's variant
+                inventory at trigger time.
+            context_bytes (int): The collected hexdump context size.
+            last (Optional[tuple]): The validated retention snapshot
+                ``(project_dir, scope, assignment_source, results)``, or
+                ``None`` to execute the active scope first.
+            fallback_batch (list[Path]): The manifest-absent default file
+                list for the fresh-run path.
+
+        Returns:
+            None
+
+        Data Flow:
+            - The fresh-run results are LOCAL to this worker — they are
+              never retained, so their mem_maps release on return.
+            - A ``ValueError`` (the F-S-05 out-of-domain ``context_bytes``
+              ERROR) and any service crash each surface as one status
+              line; the retained snapshot is kept on failure so the
+              operator can retry.
+            - Success dispatches ``_finish_generate_report`` to the UI
+              thread, which drops the retention and shows the path.
+
+        Dependencies:
+            Uses:
+                - ``execute_project_variants`` / ``ReportOptions``
+                - ``generate_project_report``
+                - ``call_from_thread`` / ``_finish_generate_report``
+            Used by:
+                - ``_trigger_generate_report``
+        """
+        try:
+            if last is None:
+                scope = SCOPE_ACTIVE
+                assignment_source = (
+                    REPORT_SOURCE_MANIFEST
+                    if read_project_manifest(project_dir) is not None
+                    else REPORT_SOURCE_DEFAULT
+                )
+                results, _manifest_issues = execute_project_variants(
+                    project_dir,
+                    variant_set,
+                    scope=scope,
+                    fallback_batch=fallback_batch,
+                    capture_mem_maps=True,
+                    status_callback=lambda message: self.call_from_thread(
+                        self.set_status, message
+                    ),
+                )
+            else:
+                _last_dir, scope, assignment_source, results = last
+            options = ReportOptions(
+                context_bytes=context_bytes,
+                execution_mode=EXECUTION_SCOPE_TO_REPORT_MODE[scope],
+                assignment_source=assignment_source,
+            )
+            report_path = generate_project_report(
+                project_dir, results, options, variant_set=variant_set
+            )
+        except ValueError as exc:
+            self.call_from_thread(self.set_status, f"Report rejected: {exc}")
+            return
+        except Exception as exc:
+            self.logger.exception("Report generation failed: %s", exc)
+            self.call_from_thread(
+                self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
+            )
+            return
+        self.call_from_thread(self._finish_generate_report, report_path)
+
+    def _finish_generate_report(self, report_path: Path) -> None:
+        """
+        Summary:
+            UI-thread close of a successful generation: DROP the retained
+            execution results (and their mem_maps — the E7 risk item),
+            then show the written report's project-relative path in the
+            status line (LLR-008.5; project-relative because the status
+            log trims lines to 50 characters).
+
+        Args:
+            report_path (Path): The written report file.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``set_status``
+            Used by:
+                - ``_start_generate_report_worker`` (via ``call_from_thread``)
+        """
+        self._last_execution = None
+        self.logger.info("Report generated: %s", report_path)
+        self.set_status(
+            f"Report: {report_path.parent.name}/{report_path.name}"
+        )
 
     def _compose_screen_diff(self) -> Container:
         """
@@ -1672,6 +2203,146 @@ class S19TuiApp(App):
             return
         self.logger.info("Load project action triggered. projects=%s", projects)
         self.push_screen(LoadProjectScreen(projects), self._handle_load_project)
+
+    def action_select_variant(self) -> None:
+        """
+        Summary:
+            Open the variant-selector modal for the active project (LLR-005.5).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail with a status message when no project variant set exists.
+            - Build ``(variant_id, display)`` options via
+              ``_variant_display_options`` and locate the active index.
+            - Push ``SelectVariantScreen`` with ``_handle_select_variant`` as
+              the dismiss callback.
+
+        Dependencies:
+            Uses:
+                - ``_variant_display_options``
+                - ``SelectVariantScreen`` / ``push_screen``
+            Used by:
+                - ``v`` keybinding / command palette entry
+        """
+        variant_set = self._variant_set
+        if variant_set is None or not variant_set.variants:
+            self.set_status("No project variants to select.")
+            self.logger.info("Select variant action triggered with no variant set.")
+            return
+        options = self._variant_display_options(variant_set)
+        active_index = next(
+            (
+                index
+                for index, variant in enumerate(variant_set.variants)
+                if variant.variant_id == variant_set.active_id
+            ),
+            0,
+        )
+        self.logger.info(
+            "Select variant action triggered. variants=%s active=%s",
+            [variant.variant_id for variant in variant_set.variants],
+            variant_set.active_id,
+        )
+        self.push_screen(
+            SelectVariantScreen(variant_set.project_name, options, active_index),
+            self._handle_select_variant,
+        )
+
+    def _handle_select_variant(self, variant_id: Optional[str]) -> None:
+        """
+        Summary:
+            Activate the variant chosen in ``SelectVariantScreen`` through the
+            existing threaded load pipeline (LLR-005.4).
+
+        Args:
+            variant_id (Optional[str]): Chosen variant id, or ``None`` on cancel.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Resolve the descriptor in the current variant set (first match
+              when duplicate ids exist — E6 decides duplicate-id policy).
+            - Stamp ``_pending_variant_id`` on the main thread, then dispatch
+              ``load_from_path`` so parsing runs on the load worker thread and
+              ``_apply_prepared_load`` installs + stamps on the main thread.
+
+        Dependencies:
+            Uses:
+                - ``load_from_path`` (existing load pipeline)
+            Used by:
+                - ``action_select_variant`` (modal dismiss callback)
+        """
+        if variant_id is None:
+            self.logger.info("Select variant canceled.")
+            return
+        variant_set = self._variant_set
+        if variant_set is None:
+            return
+        descriptor = next(
+            (
+                variant
+                for variant in variant_set.variants
+                if variant.variant_id == variant_id
+            ),
+            None,
+        )
+        if descriptor is None:
+            self.set_status(f"Variant not found: {variant_id}")
+            self.logger.warning("Variant not found in set: %s", variant_id)
+            return
+        if not descriptor.path.exists():
+            self.set_status(f"Variant file missing: {descriptor.path.name}")
+            self.logger.warning("Variant file missing on disk: %s", descriptor.path)
+            return
+        self.logger.info(
+            "Activating variant '%s' via load pipeline: %s",
+            variant_id,
+            descriptor.path,
+        )
+        self._pending_variant_id = variant_id
+        self.load_from_path(descriptor.path)
+
+    def _variant_display_options(
+        self, variant_set: ProjectVariantSet
+    ) -> list[tuple[str, str]]:
+        """
+        Summary:
+            Build ``(variant_id, display_label)`` pairs for the variant
+            selector and the project context label.
+
+        Args:
+            variant_set (ProjectVariantSet): Variant inventory to label.
+
+        Returns:
+            list[tuple[str, str]]: One pair per variant in set order. The
+            display label is the ``variant_id`` (filename stem), or the full
+            filename when two variants share a stem (e.g. ``fw.s19`` +
+            ``fw.hex`` — display-only disambiguation; the duplicate-id model
+            itself is an E6 decision).
+
+        Data Flow:
+            - Count variant_id occurrences, then map each variant to its stem
+              or, on duplicates, its ``path.name``.
+
+        Dependencies:
+            Used by:
+                - ``action_select_variant``
+                - ``update_project_labels``
+        """
+        counts = Counter(variant.variant_id for variant in variant_set.variants)
+        return [
+            (
+                variant.variant_id,
+                variant.path.name if counts[variant.variant_id] > 1 else variant.variant_id,
+            )
+            for variant in variant_set.variants
+        ]
 
     def action_dump_a2l_json(self) -> None:
         """Dump parsed A2L data into JSON in temp."""
@@ -2410,12 +3081,11 @@ class S19TuiApp(App):
             self.logger.warning("Project validation failed: %s", error)
             return
         existing_suffixes = {item.suffix.lower() for item in data_files}
-        if self.current_file and self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
-            has_primary = any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes)
-            if has_primary and self.current_file.path.suffix.lower() not in existing_suffixes:
-                self.set_status("Project already has an S19/HEX file.")
-                self.logger.warning("Project already has primary data file: %s", project_dir)
-                return
+        # Multi-variant model (E5b, US-005): saving an S19/HEX into a project
+        # that already holds primaries is a legitimate variant addition — the
+        # pre-batch cross-suffix rejection is retired. Filename collisions are
+        # deduplicated by ``copy_into_workarea`` (`_<N>` suffix); the single-MAC
+        # and single-A2L guards below are preserved (LLR-005.1).
         if self.current_file and self.current_file.mac_path:
             has_mac = ".mac" in existing_suffixes
             if has_mac and self.current_file.mac_path.name not in {item.name for item in data_files}:
@@ -2426,10 +3096,14 @@ class S19TuiApp(App):
             self.set_status("Project already has an A2L file.")
             self.logger.warning("Project already has A2L file: %s", project_dir)
             return
+        saved_variant_id: Optional[str] = None
+        saved_primary_name: Optional[str] = None
         try:
             if self.current_file:
                 saved = copy_into_workarea(self.current_file.path, project_dir)
                 self.logger.info("Project saved. name=%s file=%s", cleaned, saved)
+                if saved.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
+                    saved_primary_name = saved.name
                 if self.current_file.mac_path and self.current_file.mac_path != self.current_file.path:
                     saved_mac = copy_into_workarea(self.current_file.mac_path, project_dir)
                     self.logger.info("Project saved MAC. name=%s file=%s", cleaned, saved_mac)
@@ -2442,7 +3116,37 @@ class S19TuiApp(App):
             return
         self.current_project = cleaned
         self.current_project_dir = project_dir
-        self.set_status(f"Saved project to {project_dir}")
+        # Rebuild the variant inventory from the on-disk project so the saved
+        # image becomes the active variant (multi-variant model, E5b). The id
+        # is resolved AFTER the build by filename match because a stem
+        # collision makes the id the full filename (E6 duplicate-id rule).
+        saved_data_files, _saved_a2l_files, variant_error = validate_project_files(project_dir)
+        if variant_error is None:
+            self._variant_set = build_variant_set(cleaned, saved_data_files)
+            if saved_primary_name:
+                saved_variant_id = next(
+                    (
+                        variant.variant_id
+                        for variant in self._variant_set.variants
+                        if variant.path.name == saved_primary_name
+                    ),
+                    None,
+                )
+            if saved_variant_id:
+                self._variant_set.active_id = saved_variant_id
+                if self.current_file:
+                    self.current_file.variant_id = saved_variant_id
+        else:
+            self._variant_set = None
+            self.logger.warning(
+                "Variant set not built after save: %s", variant_error
+            )
+        if saved_variant_id:
+            self.set_status(
+                f"Saved project to {project_dir} (variant '{saved_variant_id}')"
+            )
+        else:
+            self.set_status(f"Saved project to {project_dir}")
         self.update_project_labels()
         self.refresh_files()
 
@@ -2464,7 +3168,36 @@ class S19TuiApp(App):
             self.set_status(f"No supported files in project: {name}")
             self.logger.warning("No data files in project: %s", name)
             return
-        primary_file = next((item for item in data_files if item.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS), None)
+        # Multi-variant model (LLR-005.6, completed at E6): the manifest's
+        # recorded ``active_variant`` wins when present AND valid; otherwise
+        # the FIRST variant in the deterministic ``(name.lower(), name)``
+        # order of ``build_variant_set`` (with a status warning when the
+        # manifest names an unknown variant).
+        variant_set = build_variant_set(name, data_files)
+        manifest = read_project_manifest(project_dir)
+        if manifest is not None and manifest.active_variant is not None:
+            known_ids = {variant.variant_id for variant in variant_set.variants}
+            if manifest.active_variant in known_ids:
+                variant_set.active_id = manifest.active_variant
+            else:
+                self.set_status(
+                    f"Manifest active_variant '{manifest.active_variant}' "
+                    "not found - activating the first variant."
+                )
+                self.logger.warning(
+                    "Manifest active_variant unknown: %s (known: %s)",
+                    manifest.active_variant,
+                    sorted(known_ids),
+                )
+        active_variant = next(
+            (
+                variant
+                for variant in variant_set.variants
+                if variant.variant_id == variant_set.active_id
+            ),
+            None,
+        )
+        primary_file = active_variant.path if active_variant else None
         mac_file = next((item for item in data_files if item.suffix.lower() in MAC_EXTENSIONS), None)
         selected_file = primary_file or mac_file
         if selected_file is None:
@@ -2473,6 +3206,10 @@ class S19TuiApp(App):
             return
         self.current_project = name
         self.current_project_dir = project_dir.resolve()
+        self._variant_set = variant_set
+        self._pending_variant_id = (
+            active_variant.variant_id if active_variant else None
+        )
         self.load_selected_file(selected_file, a2l_files)
         if primary_file and mac_file:
             self.load_selected_file(mac_file, a2l_files)
@@ -2489,7 +3226,37 @@ class S19TuiApp(App):
         return projects
 
     def _sync_loaded_file_to_project(self) -> None:
-        """Copy loaded data file into active project if allowed."""
+        """
+        Summary:
+            Copy the freshly loaded data file into the active project —
+            appending S19/HEX loads as new project variants (E5a finding 2:
+            the pre-batch silent skip is retired).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail when no file or no active project directory exists.
+            - Primary (S19/HEX) loads: skip when ``current_file.variant_id``
+              already names a variant in ``_variant_set`` (a variant
+              activation reload); otherwise copy the file in, rebuild the
+              variant set with the new file active, stamp
+              ``current_file.variant_id``, and report the appended variant in
+              the status line.
+            - MAC loads keep the pre-batch single-MAC sync rules.
+
+        Dependencies:
+            Uses:
+                - ``validate_project_files`` / ``build_variant_set`` /
+                  ``copy_into_workarea``
+                - ``update_project_labels`` / ``set_status``
+            Used by:
+                - ``_start_load_worker`` (via ``call_from_thread``, after
+                  ``_apply_prepared_load`` installed the load)
+        """
         if not self.current_file:
             return
         project_dir = self._active_project_dir()
@@ -2506,9 +3273,53 @@ class S19TuiApp(App):
             existing_suffixes = set()
         try:
             if self.current_file.path.suffix.lower() in PROJECT_PRIMARY_DATA_EXTENSIONS:
-                if not any(sfx in PROJECT_PRIMARY_DATA_EXTENSIONS for sfx in existing_suffixes):
-                    copy_into_workarea(self.current_file.path, project_dir)
-                    self.logger.info("Synced primary data file into project: %s", project_dir)
+                known_variant_ids = (
+                    {variant.variant_id for variant in self._variant_set.variants}
+                    if self._variant_set is not None
+                    else set()
+                )
+                if (
+                    self.current_file.variant_id is not None
+                    and self.current_file.variant_id in known_variant_ids
+                ):
+                    # Variant activation reload — the image already belongs to
+                    # the project; nothing to append.
+                    self.logger.info(
+                        "Sync skipped: variant '%s' already in project %s",
+                        self.current_file.variant_id,
+                        project_dir,
+                    )
+                else:
+                    saved = copy_into_workarea(self.current_file.path, project_dir)
+                    project_name = self.current_project or project_dir.name
+                    appended_id = saved.stem
+                    synced_files, _synced_a2l, sync_error = validate_project_files(project_dir)
+                    if sync_error is None:
+                        # Resolve the id AFTER the build by filename match —
+                        # a stem collision makes the id the full filename
+                        # (E6 duplicate-id rule).
+                        self._variant_set = build_variant_set(project_name, synced_files)
+                        appended_id = next(
+                            (
+                                variant.variant_id
+                                for variant in self._variant_set.variants
+                                if variant.path.name == saved.name
+                            ),
+                            saved.stem,
+                        )
+                        self._variant_set.active_id = appended_id
+                        self.current_file.variant_id = appended_id
+                        self.update_project_labels()
+                    else:
+                        self.logger.warning(
+                            "Variant set not rebuilt during sync: %s", sync_error
+                        )
+                    self.set_status(
+                        f"Added variant '{appended_id}' to project '{project_name}'"
+                    )
+                    self.logger.info(
+                        "Appended variant '%s' into project: %s", appended_id, project_dir
+                    )
             elif self.current_file.path.suffix.lower() in MAC_EXTENSIONS and ".mac" not in existing_suffixes:
                 copy_into_workarea(self.current_file.path, project_dir)
                 self.logger.info("Synced MAC data file into project: %s", project_dir)
@@ -2672,10 +3483,12 @@ class S19TuiApp(App):
         self._flush_logger()
         normalized = resolve_input_path(path, self.base_dir)
         if not normalized:
+            self._pending_variant_id = None
             self.set_status(f"File not found: {path}")
             self.logger.warning("File not found: %s", path)
             return
         if normalized.suffix.lower() not in SUPPORTED_EXTENSIONS:
+            self._pending_variant_id = None
             self.set_status(f"Unsupported file type: {normalized.suffix}")
             self.logger.warning("Unsupported file type: %s", normalized.suffix)
             return
@@ -2687,6 +3500,7 @@ class S19TuiApp(App):
         try:
             copied = copy_into_workarea(normalized, temp_dir)
         except WorkareaContainmentError as exc:
+            self._pending_variant_id = None
             self.set_progress(0, "")
             self.set_status(f"Cannot load file: {exc}")
             self.logger.warning("Load rejected by workarea guard: %s", exc)
@@ -3761,6 +4575,9 @@ class S19TuiApp(App):
             mac_path=existing.mac_path,
             mac_records=existing.mac_records,
             mac_diagnostics=existing.mac_diagnostics,
+            # A new primary is a new image: keep the incoming payload's
+            # variant identity (stamped at apply time), never the old one.
+            variant_id=primary_loaded.variant_id,
         )
 
     def _merge_mac_with_existing_primary(self, mac_loaded: LoadedFile) -> LoadedFile:
@@ -3801,6 +4618,9 @@ class S19TuiApp(App):
             mac_path=mac_loaded.mac_path,
             mac_records=mac_loaded.mac_records,
             mac_diagnostics=mac_loaded.mac_diagnostics,
+            # The primary image is unchanged — its variant identity survives
+            # the MAC overlay (project MAC follow-up load, LLR-005.6).
+            variant_id=existing.variant_id,
         )
 
     def _invalidate_mac_view_cache(self) -> None:
@@ -4079,6 +4899,7 @@ class S19TuiApp(App):
         try:
             loaded = self._parse_loaded_file(path, a2l_files)
         except Exception as exc:
+            self._pending_variant_id = None
             self.set_status(f"Load failed: {exc}")
             self.logger.exception(
                 "Load failed for path=%s suffix=%s project=%s",
@@ -4088,6 +4909,7 @@ class S19TuiApp(App):
             )
             return
         if loaded is None:
+            self._pending_variant_id = None
             suffix = path.suffix.lower()
             self.set_status(f"Unsupported file type: {suffix}")
             self.logger.warning("Unsupported file type in loader: %s", suffix)
@@ -4289,6 +5111,19 @@ class S19TuiApp(App):
                 - ``_apply_loaded_file`` (synchronous fallback)
         """
         loaded = prepared.loaded
+        # Variant stamping happens HERE, at apply time on the main UI thread:
+        # the pending id was set on the main thread by the dispatching handler
+        # (project load / variant selector), the parse worker never reads it,
+        # and the worker signatures stay untouched (LLR-005.4 thread contract).
+        pending_variant = self._pending_variant_id
+        if pending_variant is not None and loaded.file_type in {"s19", "hex"}:
+            loaded.variant_id = pending_variant
+            self._pending_variant_id = None
+            if self._variant_set is not None and any(
+                variant.variant_id == pending_variant
+                for variant in self._variant_set.variants
+            ):
+                self._variant_set.active_id = pending_variant
         self.current_file = loaded
         # A file is now present — reveal the real content of the
         # content-bearing rail screens and hide their empty-state panels
@@ -4673,6 +5508,7 @@ class S19TuiApp(App):
             Used by:
                 - ``_start_load_worker``
         """
+        self._pending_variant_id = None
         self.logger.error(
             "Load failed for path=%s suffix=%s project=%s: %s",
             path,
@@ -5790,14 +6626,42 @@ class S19TuiApp(App):
               sentinel) and writes them into the command bar's context
               labels — the command bar is the canonical home since the old
               Status tile was dismantled in increment 7.
+            - Multi-variant projects (LLR-005.5): when the variant set holds
+              N > 1 variants, the project label reads
+              ``«project»:«variant» (i/N)`` with ``i`` the 1-based index of
+              the active variant; single-variant projects keep the plain
+              project name (LLR-005.3 back-compat).
 
         Dependencies:
             Uses:
                 - ``CommandBar.set_context_labels``
+                - ``_variant_display_options``
             Used by:
                 - Project / A2L load handlers
+                - ``_sync_loaded_file_to_project`` (variant append)
         """
         project_name = self.current_project or "(none)"
+        variant_set = self._variant_set
+        if (
+            self.current_project
+            and variant_set is not None
+            and len(variant_set.variants) > 1
+            and variant_set.active_id is not None
+        ):
+            options = self._variant_display_options(variant_set)
+            active_index = next(
+                (
+                    index
+                    for index, variant in enumerate(variant_set.variants)
+                    if variant.variant_id == variant_set.active_id
+                ),
+                0,
+            )
+            display = options[active_index][1]
+            project_name = (
+                f"{self.current_project}:{display} "
+                f"({active_index + 1}/{len(variant_set.variants)})"
+            )
         a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
         self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
 

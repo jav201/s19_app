@@ -538,12 +538,11 @@ Screen {
     padding: 1 2;
 }
 
-/* The Patch Editor stacks two change-list halves plus several input / button
- * rows; that content is taller than the terminal, so the panel is a
- * ScrollableContainer and scrolls vertically (`overflow-y: auto`) — both
- * DataTables and the unified-file Export row below stay reachable. The two
- * tables are bounded (see `#patch_changelist_table`) so the scroll layout is
- * well-defined rather than two competing `1fr` regions. */
+/* The Patch Editor stacks the v2 entries table plus several input / button
+ * rows; that content can be taller than the terminal, so the panel is a
+ * ScrollableContainer and scrolls vertically (`overflow-y: auto`). The
+ * entries table is bounded (see `#patch_doc_entries_table`) so the scroll
+ * layout is well-defined rather than a competing `1fr` region. */
 #patch_editor_panel {
     width: 100%;
     height: 1fr;
@@ -567,29 +566,26 @@ Screen {
     height: 1fr;
 }
 
-/* Patch Editor — batch-04 increment 8 adds the memory-change half: a second
- * DataTable, address / new-bytes inputs and a unified save/load/export row,
- * laid out below the batch-03 parameter-change half. Each half has its own
- * DataTable + empty-state line; the empty-state replaces the table when that
- * half has no entries (LLR-009.1). Section titles separate the two halves. */
-/* The two change-list tables are bounded to a fixed height (their own
- * internal scroll handles many rows) so the parent ScrollableContainer has a
- * well-defined layout — two `1fr` tables would each try to fill the panel and
- * push the input / button rows below off-screen. */
-#patch_changelist_table,
-#patch_memory_table {
+/* Patch Editor — the batch-07 consolidated v2 panel: ONE change-flow section
+ * (entries DataTable, both-kind entry inputs, document control row, the
+ * persistent declaration-fault area, the save-back prompt row and the check
+ * results). Rules folded here from the E3a `PatchEditorPanel.DEFAULT_CSS`
+ * (visual parity preserved) when E3b retired the batch-03/04 ids' rules. */
+/* The entries table is bounded to a fixed height (its own internal scroll
+ * handles many rows) so the parent ScrollableContainer has a well-defined
+ * layout — a `1fr` table would try to fill the panel and push the input /
+ * button rows below off-screen. */
+#patch_doc_entries_table {
     width: 100%;
     height: 10;
     margin-bottom: 1;
 }
 
-#patch_empty_state,
-#patch_memory_empty_state {
+#patch_doc_empty_state {
     width: 100%;
     height: auto;
     padding: 1;
     margin-bottom: 1;
-    color: $fg-base;
 }
 
 .patch-section-title {
@@ -600,19 +596,17 @@ Screen {
     padding: 0 1;
 }
 
-#patch_inputs,
-#patch_file_row,
-#patch_mem_inputs,
-#patch_unified_row {
+#patch_doc_entry_inputs,
+#patch_doc_file_row,
+#patch_saveback_row {
     width: 100%;
     height: auto;
     padding-top: 1;
 }
 
-#patch_entry_buttons,
-#patch_file_buttons,
-#patch_mem_entry_buttons,
-#patch_unified_buttons {
+#patch_doc_entry_buttons,
+#patch_doc_controls,
+#patch_saveback_buttons {
     width: 100%;
     height: auto;
 }
@@ -622,17 +616,19 @@ Screen {
     padding: 0 1;
 }
 
-#patch_name_input,
-#patch_index_input,
-#patch_value_input,
-#patch_path_input,
-#patch_address_input,
-#patch_bytes_input,
-#patch_unified_input {
-    border: round $rule;
-    background: $bg-base;
-    color: $fg-base;
+#patch_entry_address_input,
+#patch_entry_value_input,
+#patch_entry_bytes_input,
+#patch_doc_path_input,
+#patch_saveback_name_input {
     margin-bottom: 1;
+}
+
+#patch_doc_issues,
+#patch_checks_results {
+    width: 100%;
+    height: auto;
+    padding: 0 1;
 }
 
 #diff_range_list,
@@ -713,10 +709,43 @@ ModalScreen {
     border: round $accent-calm;
 }
 
-#project_list {
+#project_list, #variant_list {
     border: round $rule;
     background: $bg-base;
     height: 10;
+}
+
+/* --- Report viewer modal (batch-07 E8, LLR-008.1/008.5) --------------------
+ * Listing strip on top, scrollable Markdown render area filling the rest,
+ * generation row (context-bytes input + buttons) docked at the bottom via
+ * the shared `.modal-buttons` rule. Colors all resolve through the shared
+ * Calm Dark modal tokens — no new hue. */
+#report_dialog {
+    height: 80%;
+}
+
+#report_list {
+    border: round $rule;
+    background: $bg-base;
+    height: 8;
+    margin-bottom: 1;
+}
+
+#report_empty_state {
+    color: $fg-base;
+    padding: 1 1;
+    height: auto;
+    margin-bottom: 1;
+}
+
+#report_markdown_scroll {
+    border: round $rule;
+    background: $bg-base;
+    height: 1fr;
+}
+
+#report_context_bytes {
+    width: 12;
 }
 
 #files_title, #sections_title, #hex_title, #a2l_title, #a2l_tags_title, #alt_hex_title, #alt_actions_title {

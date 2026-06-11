@@ -1,7 +1,10 @@
 # Application Requirements
 
 This document captures functional requirements for reading, parsing, and
-validating S19, Intel HEX, A2L, MAC, CDFX, and TUI behavior.
+validating S19, Intel HEX, A2L, MAC, and TUI behavior, plus the v2 JSON
+change/check system, multi-variant projects, and project reporting. (CDFX
+read/write support was retired in batch `2026-06-10-batch-07`; sections 8–9
+are retained as historical record.)
 
 It is organized by **functional subsystem** so that every requirement for a
 given system function lives together and is easy to find. (Earlier revisions
@@ -26,9 +29,12 @@ Functional subsystems:
 5. MAC View
 6. TUI Shell · Layout · Navigation (Direction B)
 7. Workspace & File I/O
-8. CDFX / Patch Editor
-9. Memory-value Editing & Unified Change-set
-10. Project / Documentation meta
+8. CDFX / Patch Editor *(historical — superseded in batch `2026-06-10-batch-07`)*
+9. Memory-value Editing & Unified Change-set *(historical — superseded/evolved in batch `2026-06-10-batch-07`)*
+10. Hex-first Change & Check System (v2 Patch Editor)
+11. Multi-variant Projects & Execution
+12. Project Report
+13. Project / Documentation meta
 
 ---
 
@@ -674,7 +680,9 @@ notice. Patch logic is deferred to a follow-up batch.
   Patch Editor that builds, edits and removes change-list entries and
   saves/loads them as ASAM CDFX `.cdfx` files; the `R-TUI-027` deferral
   notice is removed. This row is retained for history (intended supersession,
-  not a regression).
+  not a regression). `R-CDFX-016` was itself superseded in batch
+  `2026-06-10-batch-07` by the consolidated v2 Patch Editor — see
+  `R-CHG-004`.
 
 ---
 
@@ -791,6 +799,13 @@ the loaded A2L filename.
 
 # 8. CDFX / Patch Editor
 
+> **Historical section.** Batch `2026-06-10-batch-07` (US-002) retired the
+> entire cfdx/.cdfx parameter flow — CDFX XML read/write, the
+> parameter-by-name change list, and the selective `.cdfx` export — in favor
+> of the v2 address-only JSON change system (see §10, `R-CHG-*` /
+> `R-CHK-001`). The statements below are unchanged historical record; each
+> entry's `Status:` line carries the supersession.
+
 The functional Patch Editor + ASAM CDFX (`.cdfx`) read/write batch
 (`2026-05-21-batch-03`) makes the Patch Editor rail screen functional: it lets a
 calibration engineer build a parameter change-list, resolve each entry against
@@ -821,6 +836,7 @@ entry order.
 - Validation: `Automated` via `tests/test_cdfx_changelist.py` (TC-001 entry
   construction, TC-002 add/edit/remove + identity de-duplication, TC-003
   deterministic ordering) — covers LLR-001.1, LLR-001.2, LLR-001.3, LLR-001.4
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-002**: The tool must resolve each change-list entry against the loaded
 A2L through the enriched A2L pipeline (`parse_a2l_file` →
@@ -835,6 +851,7 @@ exception when the name, index or A2L is absent.
   known parameter, TC-005 unresolved-name, TC-006 array-index range check,
   TC-007 resolution without an A2L) — covers LLR-002.1, LLR-002.2, LLR-002.3,
   LLR-002.4
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-003**: The tool must display a change-list entry's value in the form
 determined by the resolved A2L data type — decimal for unsigned integers (with
@@ -847,6 +864,7 @@ entry's value as plain decimal text without error.
 - Validation: `Automated` via `tests/test_cdfx_display.py` (TC-008 type-driven
   display-format selection, TC-009 unresolved-entry fallback) — covers
   LLR-003.1, LLR-003.2
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-004**: The change-list must store the entered value as the parameter's
 physical value; the hexadecimal / ASCII rendering must be derived for display
@@ -857,6 +875,7 @@ only and must not alter the stored value.
 - Validation: `Automated` via `tests/test_cdfx_display.py` and
   `tests/test_cdfx_changelist.py` (TC-010 physical value stored, display
   derived) — covers LLR-003.3
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-005**: The CDFX writer must emit a structurally valid CDF 2.0 `.cdfx`
 file — an `MSRSW` root with a `SHORT-NAME`, a `CATEGORY` of `CDF20`, and the
@@ -867,6 +886,7 @@ container carrying a `SHORT-NAME` — using the Python standard library
 - Code: `s19_app/tui/cdfx/writer.py` (`write_cdfx`, `_build_backbone`)
 - Validation: `Automated` via `tests/test_cdfx_writer.py` (TC-011 CDF 2.0
   backbone, TC-014 well-formed UTF-8 XML) — covers LLR-004.1, LLR-004.4
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-006**: The CDFX writer must emit exactly one `SW-INSTANCE` per distinct
 resolved `parameter_name` — a scalar/string parameter from its single entry, a
@@ -880,6 +900,7 @@ never emitting a `SW-ARRAY-INDEX` element.
 - Validation: `Automated` via `tests/test_cdfx_writer.py` (TC-012 one
   `SW-INSTANCE` per resolved parameter, TC-013 scalar/array/string value
   encoding) — covers LLR-004.2, LLR-004.3
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-007**: The CDFX writer must reject a sparse or non-zero-based 1-D array
 group — whose integer indices are not the contiguous gapless zero-based
@@ -893,6 +914,7 @@ value for a missing index.
 - Validation: `Automated` via `tests/test_cdfx_writer.py` and
   `tests/test_cdfx_w_rules.py` (TC-038 writer coalescing + sparse-array
   rejection) — covers LLR-004.9
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-008**: When a write request contains unresolved / index-out-of-range
 entries or has zero writable entries, the CDFX writer must exclude those entries
@@ -905,6 +927,7 @@ writable entry remains.
 - Validation: `Automated` via `tests/test_cdfx_w_rules.py` and
   `tests/test_cdfx_writer.py` (TC-019d unresolved-exclusion, TC-019h empty +
   all-unresolved) — covers LLR-004.5, LLR-004.6
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-009**: The CDFX writer must emit a leading `Created with s19_app CDF
 2.0 Writer` tool-identification XML comment, and must emit IEEE float `V` values
@@ -916,6 +939,7 @@ representation so a write→read cycle is exact with no float tolerance required
   `tests/test_cdfx_roundtrip.py` (TC-032 tool-identification note, TC-033
   round-trip-safe float values, TC-024 round-trip) — covers LLR-004.7,
   LLR-004.8
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-010**: The CDFX writer must apply the eight write-time `W-*` structural
 rules of `design-input/cdfx-research.md` §7 (`W-XML-WELLFORMED`,
@@ -929,6 +953,7 @@ code and severity per violation.
 - Validation: `Automated` via `tests/test_cdfx_w_rules.py` (TC-019a..TC-019h —
   each of the eight `W-*` structural codes provoked and asserted) — covers
   LLR-006.1
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-011**: The CDFX reader must parse a well-formed `.cdfx` file with
 `xml.etree.ElementTree`, locate each `SW-INSTANCE` scoped to the
@@ -944,6 +969,7 @@ hexadecimal notation.
   `tests/test_cdfx_roundtrip.py` (TC-015 well-formed parse, TC-018 numeric
   notation decode, TC-039 `VAL_BLK` expansion, TC-024 round-trip) — covers
   LLR-005.1, LLR-005.4, LLR-005.6
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-012**: The CDFX reader must tolerate malformed XML and
 producer-specific variation — emitting one `R-XML-PARSE` error issue and an
@@ -958,6 +984,7 @@ or embedded writer / tool-identification XML comment as non-significant content.
   `tests/test_cdfx_r_rules.py` (TC-016 malformed-XML tolerance, TC-017
   producer-variation tolerance, TC-034 tool-note tolerance) — covers
   LLR-005.2, LLR-005.3, LLR-006.7
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-013**: The CDFX reader must apply the read-time `R-*` structural rules
 of `design-input/cdfx-research.md` §7 (`R-XML-PARSE`, `R-ROOT-MSRSW`,
@@ -975,6 +1002,7 @@ without aborting the load.
   rule violations, TC-021 version-token tolerance, TC-022 `ValidationIssue`
   reuse, TC-023 unsupported categories read-only) — covers LLR-006.2,
   LLR-006.3, LLR-006.4, LLR-006.5
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-014**: The CDFX reader must reject any `.cdfx` containing a `DOCTYPE`
 or `<!ENTITY>` declaration via an `xml.etree.ElementTree.XMLParser` whose
@@ -990,6 +1018,7 @@ exception.
 - Validation: `Automated` via `tests/test_cdfx_safety.py` (TC-027a
   billion-laughs rejection, TC-027b external-entity rejection, TC-035
   size / nesting-depth bound) — covers LLR-006.6, LLR-006.8
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-015**: When a `.cdfx` is loaded while an A2L is loaded, the CDFX reader
 must cross-check each parsed `SW-INSTANCE` against the A2L — emitting a warning
@@ -1003,6 +1032,7 @@ loaded.
 - Validation: `Automated` via `tests/test_cdfx_r_rules.py` (TC-029 name
   cross-check, TC-030 array-length cross-check, TC-031 cross-check skipped
   without an A2L) — covers LLR-008.1, LLR-008.2, LLR-008.3
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-016**: The TUI must present the Patch Editor rail screen as a
 functional tool — rendering the change-list as a row per entry, wiring the
@@ -1016,6 +1046,7 @@ prompt for an empty change-list — replacing the inert view shell delivered und
 - Validation: `Automated` via `tests/test_tui_patch_editor.py` (TC-025 render /
   edit / empty state, TC-026 save and load actions) — covers LLR-007.1,
   LLR-007.2, LLR-007.3, LLR-007.4, LLR-007.6
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-017**: The CDFX read/write and change-list-model logic must reside in
 a dedicated service-style module (the `s19_app/tui/cdfx/` package plus
@@ -1029,6 +1060,7 @@ parse/serialize call.
   (`test_tc028_app_py_holds_no_cdfx_xml_logic`,
   `test_tc028_patch_action_handler_routes_through_the_service`); TC-028 is an
   inspection checklist backed by these tests — covers LLR-007.5
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-018**: The CDFX write path must resolve and containment-validate its
 target the same way `s19_app/tui/workspace.py` `copy_into_workarea` does — the
@@ -1047,10 +1079,18 @@ exception.
   `tests/test_tui_patch_containment.py` (TC-036 write target
   work-area-contained, TC-037 load path resolves the user-supplied path) —
   covers LLR-005.5, LLR-007.7
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 ---
 
 # 9. Memory-value Editing & Unified Change-set
+
+> **Historical section.** Batch `2026-06-10-batch-07` (US-002) superseded the
+> v1 unified JSON container and the selective `.cdfx` export, and evolved the
+> memory-change model, the containment-validated JSON writes, and the
+> resource ceilings into the v2 change system (`s19_app/tui/changes/` — see
+> §10, `R-CHG-*`). Each entry's `Status:` line marks it Superseded or
+> Evolved; statements are unchanged historical record.
 
 The memory-value editing + unified change-set + selective export batch
 (`2026-05-21-batch-04`) extends the Patch Editor so it can also edit **raw
@@ -1092,6 +1132,7 @@ negative byte, a byte greater than 255, or an empty `new_bytes` run by raising
   construction, TC-002 add/edit/remove + identity de-duplication, TC-003
   deterministic ordering, TC-004 model coherence, TC-008 `ValueError` arms) —
   covers LLR-001.1, LLR-001.2, LLR-001.3, LLR-001.4, LLR-002.5
+- Status: Evolved into the v2 system in batch `2026-06-10-batch-07` (see R-CHG-*). Statement retained as historical record of the batch-04 contract.
 
 **R-MEM-002**: The tool must validate each memory-change entry's addressed byte
 range against the loaded firmware image's address ranges (consuming the
@@ -1115,6 +1156,7 @@ content.
   + decimal companions with the pinned `.` `0x2E` placeholder, TC-011 display
   never mutates the stored bytes) — covers LLR-002.1, LLR-002.2, LLR-002.3,
   LLR-002.4, LLR-003.1, LLR-003.2, LLR-003.3, LLR-008.3
+- Status: Evolved into the v2 system in batch `2026-06-10-batch-07` (see R-CHG-*). Statement retained as historical record of the batch-04 contract.
 
 **R-MEM-003**: The tool must provide a unified change-set container holding both
 the batch-03 parameter `ChangeList` and the batch-04 `MemoryChangeList` by
@@ -1131,6 +1173,7 @@ query; the parameter half is a plain resolution-free `ChangeList`.
   (TC-027 compose-not-subclass + `app.py`-clean inspection checklist; the
   batch-03 `changelist.py` / `reader.py` / `writer.py` / `resolve.py` confirmed
   byte-unchanged) — covers LLR-004.1, LLR-004.2, LLR-004.3, LLR-004.4, LLR-004.5
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-MEM-004**: The tool must write the unified change-set to a single JSON file
 (stdlib `json`, no new dependency) carrying a format-identifier
@@ -1163,6 +1206,7 @@ aborting the load (no escaping `KeyError`, no escaping `RecursionError`).
   (TC-025 write→read structural equality) — covers LLR-005.1, LLR-005.2,
   LLR-005.3, LLR-005.4, LLR-006.1, LLR-006.2, LLR-006.3, LLR-006.4, LLR-006.5,
   LLR-008.1, LLR-008.2
+- Status: Evolved into the v2 system in batch `2026-06-10-batch-07` (see R-CHG-*). Statement retained as historical record of the batch-04 contract.
 
 **R-MEM-005**: The tool must selectively export the unified change-set as two
 distinct work-area files — a CDFX `.cdfx` file from the parameter half produced
@@ -1191,10 +1235,292 @@ routes through `CdfxService`.
   Editor renders the memory-change list, TC-033 memory-change controls wired,
   TC-034 save/load/selective-export actions) — covers LLR-007.1, LLR-007.2,
   LLR-007.3, LLR-007.4, LLR-007.5, LLR-009.1, LLR-009.2, LLR-009.3
+- Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 ---
 
-# 10. Project / Documentation meta
+# 10. Hex-first Change & Check System (v2 Patch Editor)
+
+The single-JSON hex-first change system batch (`2026-06-10-batch-07`, US-002 /
+US-003) replaces the batch-03/04 three-subflow change system (§8–9) with one
+declarative, address-only JSON family: **change files** (`kind = "change"`)
+that patch the loaded image and **check files** (`kind = "check"`) whose
+entries are expected values compared against it. All logic lives in the
+`s19_app/tui/changes/` package plus `s19_app/tui/services/change_service.py`;
+`app.py` stays orchestration-only. Each row traces to the batch HLR/LLR/TC set
+in `.dev-flow/2026-06-10-batch-07/01-requirements.md`.
+
+**R-CHG-001**: The tool must define a single v2 JSON change-file format — a
+document carrying `format` (`s19app-changeset`), `version` (`2.0`), `kind`,
+`encoding` (text codecs only), and `value_mode` (`text` / `codes`) metadata
+plus an `entries` array of address-only entries of exactly two kinds: string
+patches (`type: "string"`, `value` encoded per `encoding`/`value_mode`) and
+byte patches (`type: "bytes"`, strict whitespace-separated two-hex-digit wire
+grammar) — with no symbolic addressing field. The reader must collect every
+schema, metadata, per-entry, collision, and resource-ceiling finding as a
+`ValidationIssue` without raising; intersecting (or identical-address) target
+ranges in one document must record an ERROR-severity `CHG-COLLISION` finding
+per colliding entry; resource ceilings (pre-parse size cap, entry-count
+ceiling, encoded run-length ceiling with a pre-encode guard) must be enforced;
+and a v1 unified document (`s19app-unified-changeset`) must be rejected with
+exactly one ERROR `CHG-V1-FORMAT` finding and an empty document (hard break,
+no read shim).
+
+- Code: `s19_app/tui/changes/model.py` (`ChangeEntry`, `ChangeDocument`,
+  `MemoryStatus`), `s19_app/tui/changes/io.py` (`read_change_document`,
+  `write_change_document`, `serialize_change_document`),
+  `s19_app/tui/changes/validate.py` (`collision_issues`)
+- Validation: `Automated` via `tests/test_changes_schema.py`
+  (`test_metadata_roundtrip`, `test_entry_shapes`, `test_metadata_faults`,
+  `test_entry_faults`, the `test_resource_ceilings_*` group,
+  `test_v1_rejected`), `tests/test_changes_collision.py`
+  (`test_collision_geometries`, `test_collision_messages_name_both_addresses`,
+  `test_collision_uses_encoded_length_not_char_count`) and
+  `tests/test_changes_containment.py` (`test_containment_status_with_image`,
+  `test_no_image_stamps_every_entry_unvalidated_with_no_issues`)
+- Status: Added in batch `2026-06-10-batch-07` (US-002 / HLR-001)
+
+**R-CHG-002**: The apply engine must refuse to write anything when the change
+document carries any ERROR-severity issue or `kind != "change"` (every
+disposition `blocked`); otherwise it must write only fully-`INSIDE` entries
+into the loaded image's memory map, capturing each written range's prior
+bytes before mutation, and must return a `ChangeSummary` recording per entry
+the target range, `before_bytes`/`after_bytes`, disposition (applied /
+skipped-partial / skipped-outside / skipped-no-image / blocked), and an
+informative linkage classification (standalone / mac-linked / a2l-linked /
+both, with the matching symbol) computed via the sorted-range primitives —
+linkage never influences whether an entry is applied. The summary carries the
+document's collected `ValidationIssue` list, aggregate per-disposition counts,
+and a deterministic `to_dict()` under an injectable UTC clock.
+
+- Code: `s19_app/tui/changes/apply.py` (`apply_change_document`,
+  `classify_containment`), `s19_app/tui/changes/model.py` (`ChangeSummary`,
+  `ChangeSummaryEntry`), reusing `s19_app/range_index.py`
+- Validation: `Automated` via `tests/test_changes_apply.py`
+  (`test_error_blocks_apply_zero_writes_all_blocked`,
+  `test_non_change_kind_blocks_apply`,
+  `test_dispositions_inside_partial_outside`, `test_disposition_no_image`,
+  `test_before_after_capture_exact_tuples_outside_keys_unchanged`,
+  `test_summary_shape_and_serialization_determinism`) and
+  `tests/test_changes_linkage.py`
+  (`test_four_linkage_classifications_with_symbols`,
+  `test_both_linked_outside_entry_is_still_skipped`)
+- Status: Added in batch `2026-06-10-batch-07` (US-002 / HLR-002)
+
+**R-CHG-003**: After an apply with at least one applied entry on an
+S19-loaded image, the tool must offer to persist the patched image to
+`.s19tool/workarea/<project>/` under an operator-provided filename (headless
+callers pass the filename explicitly), emitting the file from the post-apply
+memory map via a dedicated S19 emitter. The typed filename must pass an
+extension-preserving sanitizer — path separators, traversal segments,
+absolute/drive-qualified paths, and Windows reserved device names rejected or
+neutralized — and the resolved target must remain inside the project work
+area. The written path is recorded in `ChangeSummary.saved_path` (`None` when
+the operator declines). Save-back is S19-only this batch: on an Intel
+HEX-loaded image the tool reports that HEX save-back is not supported and
+persists nothing (Intel HEX emitter is a batch-08 candidate).
+
+- Code: `s19_app/tui/changes/apply.py` (`save_patched_image`,
+  `_sanitize_s19_filename`), `s19_app/tui/changes/io.py`
+  (`emit_s19_from_mem_map`)
+- Validation: `Automated` via `tests/test_changes_apply.py`
+  (`test_emit_s19_reparses_to_equal_mem_map`,
+  `test_emit_s19_roundtrips_public_example_file`,
+  `test_save_back_written_file_reparses_to_post_apply_map`,
+  `test_save_back_declined_saved_path_none_and_no_file`,
+  `test_save_back_adversarial_filenames_contained_or_refused`,
+  `test_save_back_hex_source_refused_with_clear_issue`) and
+  `tests/test_tui_patch_editor_v2.py` (`test_save_back_prompt`)
+- Status: Added in batch `2026-06-10-batch-07` (US-002 / HLR-002, LLR-002.7;
+  S19-only per operator decision D-1)
+
+**R-CHG-004**: The Patch Editor rail screen must present exactly one
+change-flow section operating on v2 JSON documents (entries table, entry
+inputs for both kinds, Load/Validate/Apply/Save/Run-checks controls), routing
+exactly nine actions (`add_entry`, `edit_entry`, `remove_entry`, `load_doc`,
+`validate_doc`, `apply_doc`, `save_doc`, `run_checks`, `execute_scope`)
+through the consolidated `ChangeService`; loading a `.cdfx` file or a v1
+unified JSON document must surface exactly one ERROR-severity
+unsupported-format finding without crashing; and declaration faults must
+remain persistently visible (per-entry status in the entries table plus an
+issue count in the panel, surviving unrelated UI actions) until the document
+is re-validated clean. This **supersedes `R-CDFX-016`** (and with it the
+batch-03/04 parameter and unified sections of the panel).
+
+- Code: `s19_app/tui/screens_directionb.py` (`PatchEditorPanel`, v2
+  single-section), `s19_app/tui/services/change_service.py` (`ChangeService`),
+  `s19_app/tui/app.py` (action router, UI wiring only)
+- Validation: `Automated` via `tests/test_tui_patch_editor_v2.py`
+  (`test_panel_composition`, `test_action_routing_pins_exactly_nine_v2_actions`,
+  `test_action_routing_observable_effects`, `test_legacy_load_rejected`,
+  `test_declaration_faults_visible`) and `tests/test_change_service.py`
+  (`test_v2_save_load_round_trip`, `test_validate_flags_interactive_collision`,
+  `test_clean_revalidate_clears_stale_collision_faults`,
+  `test_legacy_v1_load_rejected_with_single_error`,
+  `test_retired_method_names_absent`,
+  `test_change_service_module_imports_no_textual`)
+- Status: Added in batch `2026-06-10-batch-07` (US-002 / HLR-003)
+
+**R-CHK-001**: The tool must accept check documents in the same v2 schema
+family, discriminated by `kind = "check"` (identical entry shapes, metadata
+rules, collision ERROR, containment statuses, and ceilings — one reader, one
+rule set), and execute them against a loaded image producing per entry exactly
+one of pass / fail / uncheckable — uncheckable covering any entry whose target
+range is not fully inside the loaded image or when no image is loaded — while
+mutating nothing. The `CheckRunResult` carries per-entry expected/actual bytes
+and linkage classification, aggregate pass/fail/uncheckable counts, and the
+check document's collected declaration-fault issues; a headless service entry
+point (`run_checks_for_project`) executes a check document against project
+files with no TUI interaction, and the TUI renders results with severity
+colours plus the three aggregate counts.
+
+- Code: `s19_app/tui/changes/check.py` (`run_check_document`),
+  `s19_app/tui/changes/model.py` (`CheckRunEntry`, `CheckRunResult`),
+  `s19_app/tui/services/change_service.py` (`run_checks_for_project`)
+- Validation: `Automated` via `tests/test_checks_engine.py`
+  (`test_check_schema_shared`, `test_results_two_one_two_with_immutability`,
+  `test_results_no_image_all_uncheckable`,
+  `test_faulted_or_wrong_kind_document_not_runnable`,
+  `test_result_shape_deterministic`, `test_headless_project_run`,
+  `test_no_textual_in_static_import_graph`) and
+  `tests/test_tui_patch_editor_v2.py` (`test_check_run_display`)
+- Status: Added in batch `2026-06-10-batch-07` (US-003 / HLR-004)
+
+---
+
+# 11. Multi-variant Projects & Execution
+
+The multi-S19 variant batch (`2026-06-10-batch-07`, US-005) relaxes the
+1-S19-per-project limit: a project may hold N ≥ 1 S19/HEX variants of the same
+software sharing one MAC and one A2L, with change/check files executed in
+batch or per-variant.
+
+**R-VAR-001**: A project directory containing N ≥ 1 S19/HEX files, at most one
+MAC file, and at most one A2L file must validate as a project, with the
+S19/HEX files enumerated as an ordered variant set under a deterministic
+`(name.lower(), name)` sort and exactly one active variant rendered in the TUI
+at any time — parsed on a worker thread and applied on the main UI thread (the
+pre-batch thread contract is preserved, and a single-S19 project loads
+identically to before). The variant model is additive: `VariantDescriptor` /
+`ProjectVariantSet` dataclasses plus one defaulted `LoadedFile.variant_id`
+field. A modal variant selector and a `«project»:«variant_id» (i/N)` project
+label expose switching when N > 1.
+
+- Code: `s19_app/tui/workspace.py` (`validate_project_files`, multi-S19
+  relaxation), `s19_app/tui/models.py` (`VariantDescriptor`,
+  `ProjectVariantSet`, `LoadedFile.variant_id`), `s19_app/tui/screens.py`
+  (`SelectVariantScreen`), `s19_app/tui/app.py` (`action_select_variant`,
+  project-label suffix)
+- Validation: `Automated` via `tests/test_workspace_variants.py`
+  (`test_three_s19_variants_accepted_in_deterministic_order`,
+  `test_variants_with_two_mac_files_still_rejected`,
+  `test_two_a2l_files_still_rejected`,
+  `test_single_s19_project_loads_equivalently`,
+  `test_build_variant_set_orders_variants_and_defaults_active_to_first`) and
+  `tests/test_tui_variants.py` (`test_project_load_activates_first_variant`,
+  `test_select_variant_updates_label`,
+  `test_no_new_parse_loaded_file_call_sites`,
+  `test_load_second_s19_appends_variant`)
+- Status: Added in batch `2026-06-10-batch-07` (US-005 / HLR-005)
+
+**R-VAR-002**: Execution of change and/or check files against a multi-variant
+project must follow the optional `.s19tool/workarea/<project>/project.json`
+manifest (schema version, `active_variant` load override, per-variant
+`assignments`, `batch` list) — manifest absent means batch mode over all
+variants — with every manifest path resolved strictly inside the project
+directory (traversal, absolute, drive-qualified, or reparse-point escapes
+produce one ERROR issue and the entry is skipped) and the manifest read
+size-capped before parse. Execution runs in deterministic order, parses each
+assigned non-active variant headlessly via the load service (never mutating
+the TUI's active snapshot), isolates per-variant failures
+(collect-don't-abort; result count always equals assigned-variant count), and
+produces exactly one `ChangeSummary` and/or `CheckRunResult` per assigned
+variant, consumed intact by the report layer. The TUI exposes a scope
+selector (active variant / all variants / per assignment) via the
+`execute_scope` Patch Editor action.
+
+- Code: `s19_app/tui/services/variant_execution_service.py`
+  (`ProjectManifest`, `read_project_manifest`, `plan_variant_executions`,
+  `execute_variant_plan`, `execute_project_variants`,
+  `VariantExecutionResult`), `s19_app/tui/app.py` (`execute_scope` routing,
+  `_trigger_execute_scope`)
+- Validation: `Automated` via `tests/test_variant_execution.py`
+  (`test_manifest_absent_defaults_to_batch_all`, `test_manifest_round_trip`,
+  `test_load_project_honors_manifest_active_variant`,
+  `test_load_project_unknown_active_variant_falls_back`,
+  `test_manifest_containment_skips_unsafe_entries`,
+  `test_double_run_orderings_identical`,
+  `test_failing_variant_never_aborts_the_rest`,
+  `test_batch_execution_stamps_variant_ids`,
+  `test_save_back_files_land_under_project_dir`)
+- Status: Added in batch `2026-06-10-batch-07` (US-005 / HLR-006)
+
+---
+
+# 12. Project Report
+
+The project-report batch (`2026-06-10-batch-07`, US-004) adds an auditable
+Markdown artifact per project plus a read-only TUI viewer.
+
+**R-RPT-001**: On request, the tool must generate a Markdown report at
+`.s19tool/workarea/<project>/reports/<timestamp>-report.md` (UTC
+`%Y%m%dT%H%M%SZ` timestamp; same-second collisions take a zero-padded `-NN`
+counter, never a silent overwrite) containing (a) the project and variant
+inventory with a consolidated overview, (b) the modified files (including
+`saved_path` when present), (c) per-modification before→after values with
+linkage annotation and a declaration-error subsection, (d) each executed
+checklist with per-entry pass/fail/uncheckable results, and (e) a hexdump of
+every modified region with ±`context_bytes` (default 64, adjustable per
+invocation, domain-validated — out-of-domain values rejected, never silently
+clamped) of surrounding memory, the window computed as
+`[max(0, align16(start − c)), min(align16_up(end + c), align16_up(top)))`
+with overlapping/adjacent windows merged. Size caps
+(`REPORT_MAX_REGIONS_PER_VARIANT`, `REPORT_MAX_TOTAL_BYTES`) truncate with an
+explicit in-document marker stating the omitted count. Reports live only
+under the gitignored `.s19tool/` tree and report body bytes are never written
+to the rotating log.
+
+- Code: `s19_app/tui/services/report_service.py` (`generate_project_report`,
+  `ReportOptions`, `compute_hexdump_windows`, `list_project_reports`),
+  reusing `s19_app/tui/hexview.py` (`render_hex_view`)
+- Validation: `Automated` via `tests/test_report_service.py`
+  (`test_full_report_content`,
+  `test_filename_regex_and_same_second_collision`,
+  `test_window_math_region_at_address_zero`,
+  `test_window_math_region_at_image_top`,
+  `test_window_math_adjacent_windows_merge`,
+  `test_report_level_edge_windows`,
+  `test_context_bytes_out_of_domain_rejected`,
+  `test_region_cap_marker_exact_omitted_count`,
+  `test_total_bytes_cap_marker`, `test_inspection_no_forbidden_symbols`,
+  `test_execution_capture_feeds_report_end_to_end`)
+- Status: Added in batch `2026-06-10-batch-07` (US-004 / HLR-007)
+
+**R-RPT-002**: The TUI must list the active project's reports newest-first by
+the parsed `(timestamp, NN)` sort key and render the selected report
+read-only in a modal Markdown viewer constructed with `open_links=False` and a
+render size cap (an explicit too-large message instead of rendering past the
+cap), reached via the key-bound `action_view_reports` — the activity rail
+stays at exactly eight items (no 9th rail item). Report generation must also
+be available headlessly: invoking the service entry point constructs no
+Textual `App`.
+
+- Code: `s19_app/tui/screens.py` (`ReportViewerScreen`),
+  `s19_app/tui/app.py` (`action_view_reports`, generation trigger),
+  `s19_app/tui/services/report_service.py` (`generate_project_report`,
+  `list_project_reports`)
+- Validation: `Automated` via `tests/test_tui_report_view.py`
+  (`test_view_reports_no_project_neutral_status`,
+  `test_list_project_reports_order`, `test_report_viewer_lists_newest_first`,
+  `test_select_renders_markdown_open_links_false`,
+  `test_oversized_report_refused`, `test_empty_reports_dir_empty_state`,
+  `test_generate_trigger_calls_service_and_drops_results`) and
+  `tests/test_report_service.py` (`test_generation_is_headless_no_app`)
+- Status: Added in batch `2026-06-10-batch-07` (US-004 / HLR-008)
+
+---
+
+# 13. Project / Documentation meta
 
 **R-DOC-001**: The TUI module must include high-level documentation and
 key method docstrings to aid maintenance.
