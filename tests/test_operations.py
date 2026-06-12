@@ -27,14 +27,19 @@ anywhere:
   round-trips all 3 ids.
 - **TC-006** — ``test_unknown_operation_raises`` (LLR-002.3): an unknown id
   raises ``KeyError`` whose message contains the requested id verbatim.
+- **TC-007** — ``test_run_operation_service`` (LLR-003.1, increment I2):
+  ``run_operation`` returns an ``OperationResult`` with matching
+  ``operation_id`` for all 3 placeholder ids, propagates the LLR-002.3
+  ``KeyError`` unchanged for an unknown id, forwards ``now_fn`` unchanged,
+  and resolves through the injectable ``operation_resolver`` seam
+  (stub substitution observed).
 - **TC-009** — ``test_operation_interface`` (LLR-001.1): non-empty unique
   ``operation_id``, non-empty ``title`` and ``describe()`` per placeholder;
   a subclass omitting ``execute`` is rejected by the ABC machinery
   (``TypeError`` on instantiation).
 
-TC-007 (``test_run_operation_service``, LLR-003.1) rides increment I2 with
-``tui/services/operation_service.py``. Every fixture is public
-(``examples/case_00_public/``) or synthetic in-test.
+Every fixture is public (``examples/case_00_public/``) or synthetic
+in-test.
 """
 
 from __future__ import annotations
@@ -57,7 +62,9 @@ from s19_app.tui.operations import (
     get_operation,
     list_operation_ids,
 )
+from s19_app.tui.services import operation_service
 from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
+from s19_app.tui.services.operation_service import run_operation
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_S19 = REPO_ROOT / "examples" / "case_00_public" / "prg.s19"
@@ -186,6 +193,51 @@ def test_unknown_operation_raises():
     with pytest.raises(KeyError) as excinfo:
         get_operation("no_such_operation")
     assert "no_such_operation" in str(excinfo.value)
+
+
+def test_run_operation_service(tmp_path, monkeypatch):
+    """TC-007 / LLR-003.1 — registry-routed execution, ``now_fn`` forwarding,
+    ``KeyError`` propagation, and seam substitution."""
+    loaded = _load_hex_snapshot(tmp_path)
+
+    for operation_id in ("crc", "extract", "split_by_segment"):
+        result = run_operation(operation_id, loaded, now_fn=_fixed_clock)
+        assert isinstance(result, OperationResult)
+        assert result.operation_id == operation_id
+
+    with pytest.raises(KeyError) as excinfo:
+        run_operation("no_such_operation", loaded)
+    assert "no_such_operation" in str(excinfo.value)
+
+    class _StubOperation(Operation):
+        operation_id = "stub"
+        title = "Stub"
+
+        def __init__(self) -> None:
+            self.seen_now_fn: object = None
+
+        def describe(self) -> str:
+            return "seam-substitution stub"
+
+        def execute(self, loaded, *, now_fn=None):
+            self.seen_now_fn = now_fn
+            return OperationResult(
+                operation_id=self.operation_id,
+                status="ok",
+                input_path=loaded.path,
+                variant_id=loaded.variant_id,
+                output=loaded,
+                notes=["stub executed"],
+                timestamp_utc=_fixed_clock().isoformat(),
+            )
+
+    stub = _StubOperation()
+    monkeypatch.setattr(
+        operation_service, "operation_resolver", lambda operation_id: stub
+    )
+    result = run_operation("stub", loaded, now_fn=_fixed_clock)
+    assert result.notes == ["stub executed"]
+    assert stub.seen_now_fn is _fixed_clock
 
 
 def test_operation_interface():
