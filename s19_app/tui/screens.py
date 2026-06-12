@@ -11,6 +11,9 @@ from textual.message import Message
 from textual.screen import ModalScreen
 from textual.widgets import Button, Input, Label, ListItem, ListView, Markdown, Static
 
+from .hexview import MAX_HEX_ROWS, render_hex_view_text
+from .models import LoadedFile
+from .services import operation_service
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_MAX_TOTAL_BYTES,
@@ -476,3 +479,158 @@ class ReportViewerScreen(ModalScreen[None]):
             # immediately following dismiss can never drop it.
             self.app.post_message(self.GenerateRequested(context_bytes))
             self.dismiss(None)
+
+
+class OperationsScreen(ModalScreen[None]):
+    """Operations modal: select a registered operation, execute, view result.
+
+    Summary:
+        Lists the registered operations (batch-08 HLR-004 / LLR-004.1) in a
+        ``ListView`` following the ``SelectVariantScreen`` pattern: the
+        caller supplies pre-computed ``(operation_id, title)`` pairs in
+        registry order and the selection resolves by list index, never by
+        parsing label text back. Pressing ``Execute`` runs the selected
+        operation EXCLUSIVELY through the ``run_operation`` service seam
+        (LLR-004.2 — no direct ``Operation.execute`` call here) synchronously
+        on the UI thread (LLR-004.4 — placeholders do no I/O and no parsing),
+        then presents the ``OperationResult``'s ``status`` and ``notes`` in
+        ``#operation_result_status`` plus a hex render of
+        ``result.output.mem_map`` in ``#operation_result_hex`` produced with
+        the LLR-004.3 pinned ``render_hex_view_text`` argument tuple.
+        Styling reuses the shared Calm Dark ``.modal-dialog`` token classes.
+
+    Args:
+        options (List[Tuple[str, str]]): Pre-computed ``(operation_id,
+            title)`` pairs in registry order (the LLR-004.1 caller-supplies-
+            options contract — enumeration happens in the app via
+            ``list_operation_ids``, not here).
+        loaded (LoadedFile): The currently loaded image snapshot the
+            selected operation executes against (the app guards against
+            pushing this screen with no file loaded).
+
+    Returns:
+        None: ``ModalScreen[None]`` — always dismisses with ``None``.
+
+    Data Flow:
+        - Execute resolves the row index into ``self.options`` →
+          ``operation_service.run_operation(operation_id, self.loaded)`` →
+          status/notes text into ``#operation_result_status`` and the pinned
+          hex render into ``#operation_result_hex``.
+        - A registry ``KeyError`` (LLR-002.3) surfaces as an app status-line
+          error, never a crash (LLR-004.2 acceptance criterion).
+
+    Dependencies:
+        Uses:
+            - operation_service.run_operation (the LLR-003.1 seam)
+            - render_hex_view_text / MAX_HEX_ROWS
+        Used by:
+            - s19_app.tui.app.S19TuiApp.action_operations_view
+
+    Example:
+        >>> screen = OperationsScreen([("crc", "CRC")], loaded)  # doctest: +SKIP
+    """
+
+    def __init__(self, options: List[Tuple[str, str]], loaded: LoadedFile) -> None:
+        super().__init__()
+        self.options = options
+        self.loaded = loaded
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Operations:", classes="modal-title"),
+            ListView(
+                *[
+                    ListItem(Label(f"{operation_id} - {title}"))
+                    for operation_id, title in self.options
+                ],
+                id="operations_list",
+            ),
+            Static("", id="operation_result_status", markup=False),
+            ScrollableContainer(
+                Static("", id="operation_result_hex"),
+                id="operation_result_hex_scroll",
+            ),
+            Container(
+                Button("Execute", id="operations_execute", classes="modal-confirm"),
+                Button("Close", id="operations_close"),
+                id="load_buttons",
+                classes="modal-buttons",
+            ),
+            id="operations_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        list_view = self.query_one("#operations_list", ListView)
+        if self.options:
+            list_view.index = 0
+        list_view.focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "operations_close":
+            logger.info("OperationsScreen dismissed by close.")
+            self.dismiss(None)
+            return
+        if event.button.id == "operations_execute":
+            self._execute_selected()
+
+    def _execute_selected(self) -> None:
+        """
+        Summary:
+            Execute the highlighted operation through the ``run_operation``
+            service seam and present the result (LLR-004.2 / LLR-004.3) —
+            synchronously, on the UI thread (LLR-004.4).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Resolve the ``ListView`` index into ``self.options`` (no
+              label-text parsing); bail silently on no selection.
+            - ``operation_service.run_operation(operation_id, self.loaded)``
+              — the ONLY execution route (no direct ``.execute`` call).
+            - ``status`` + ``notes`` → ``#operation_result_status``; the
+              LLR-004.3 PINNED render call
+              ``render_hex_view_text(result.output.mem_map,
+              focus_address=None, row_bases=None, highlight=None,
+              mac_highlight_addresses=None, max_rows=MAX_HEX_ROWS)`` →
+              ``#operation_result_hex``.
+            - A registry ``KeyError`` becomes an app status-line message
+              (LLR-004.2 acceptance criterion), never a crash.
+
+        Dependencies:
+            Uses:
+                - operation_service.run_operation
+                - render_hex_view_text / MAX_HEX_ROWS
+            Used by:
+                - on_button_pressed (Execute button)
+        """
+        list_view = self.query_one("#operations_list", ListView)
+        index = list_view.index
+        if index is None or not (0 <= index < len(self.options)):
+            return
+        operation_id = self.options[index][0]
+        logger.info("OperationsScreen executing operation: %s", operation_id)
+        try:
+            result = operation_service.run_operation(operation_id, self.loaded)
+        except KeyError as exc:
+            logger.warning("OperationsScreen unknown operation id: %s", exc)
+            self.app.set_status(f"Operations error: unknown operation {operation_id}")
+            return
+        status_lines = [f"status: {result.status}"]
+        status_lines.extend(result.notes)
+        self.query_one("#operation_result_status", Static).update(
+            "\n".join(status_lines)
+        )
+        rendered = render_hex_view_text(
+            result.output.mem_map,
+            focus_address=None,
+            row_bases=None,
+            highlight=None,
+            mac_highlight_addresses=None,
+            max_rows=MAX_HEX_ROWS,
+        )
+        self.query_one("#operation_result_hex", Static).update(rendered)

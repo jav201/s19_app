@@ -43,10 +43,12 @@ from .hexview import (
 from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile, ProjectVariantSet
+from .operations import get_operation, list_operation_ids
 from .rail import Rail, RailItem
 from .screens import (
     LoadFileScreen,
     LoadProjectScreen,
+    OperationsScreen,
     ReportViewerScreen,
     SaveProjectPayload,
     SaveProjectScreen,
@@ -497,6 +499,7 @@ class S19TuiApp(App):
         Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
         Binding("t", "view_reports", "View reports", show=False),
+        Binding("x", "operations_view", "Operations", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
         Binding("3", "show_screen('mac')", "MAC View", show=False),
@@ -2307,6 +2310,49 @@ class S19TuiApp(App):
         )
         self._pending_variant_id = variant_id
         self.load_from_path(descriptor.path)
+
+    def action_operations_view(self) -> None:
+        """
+        Summary:
+            Open the operations modal for the current loaded file (batch-08
+            HLR-004 / LLR-004.1) — key-bound (``x``) and palette-reachable.
+            Orchestration only: enumeration comes from the registry, and the
+            modal owns execution (through ``run_operation``) and result
+            rendering; no operation or render logic lives here. Synchronous,
+            no ``@work`` worker (LLR-004.4).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Bail with one status line when no file is loaded (LLR-004.2
+              guard) — no screen pushed, no service invoked.
+            - Build ``(operation_id, title)`` options via
+              ``list_operation_ids`` / ``get_operation`` (LLR-002.2) and
+              push ``OperationsScreen`` with the current snapshot.
+
+        Dependencies:
+            Uses:
+                - ``list_operation_ids`` / ``get_operation``
+                - ``OperationsScreen`` / ``push_screen``
+            Used by:
+                - ``x`` keybinding / command palette entry
+        """
+        if self.current_file is None:
+            self.set_status("Operations: no file loaded - load a file first.")
+            self.logger.info("Operations view action triggered with no file loaded.")
+            return
+        options = [
+            (operation_id, get_operation(operation_id).title)
+            for operation_id in list_operation_ids()
+        ]
+        self.logger.info(
+            "Operations view action. options=%s", [oid for oid, _ in options]
+        )
+        self.push_screen(OperationsScreen(options, self.current_file))
 
     def _variant_display_options(
         self, variant_set: ProjectVariantSet

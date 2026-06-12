@@ -35,6 +35,7 @@ Functional subsystems:
 11. Multi-variant Projects & Execution
 12. Project Report
 13. Project / Documentation meta
+14. Operation Framework (batch-08)
 
 ---
 
@@ -1528,3 +1529,107 @@ key method docstrings to aid maintenance.
 - Code: `s19_app/tui/__init__.py`, `s19_app/tui/app.py`
 - Validation: `Automated` via `tests/test_tui_helpers.py`
   (`test_tui_module_has_docstring`, `test_tui_app_has_docstring`)
+
+---
+
+# 14. Operation Framework (batch-08)
+
+The operation-framework batch (`2026-06-11-batch-08`, US-007) adds a
+placeholder operations skeleton — Operation abstraction, structured result
+envelope, deterministic registry, headless service seam, and a TUI operations
+view — so each future operation (CRC, extract, split per memory segment) can
+receive real behavior without re-plumbing the app. All three shipped
+operations are placeholders: identity passthrough over the loaded snapshot,
+`status="placeholder"`, zero operation logic.
+
+**R-OPS-001**: The system must define an `Operation` abstract base class
+(class-level `operation_id` and `title`, `describe()`, and
+`execute(loaded: LoadedFile, *, now_fn=...) -> OperationResult` with an
+injectable UTC clock seam) and an `OperationResult` dataclass carrying exactly
+the 7 canonical fields (`operation_id`, `status`, `input_path`, `variant_id`,
+`output`, `notes`, `timestamp_utc`), with `status` constrained to the closed
+domain {`placeholder`, `ok`, `error`} (`STATUS_DOMAIN`; out-of-domain raises
+`ValueError`) and a deterministic `to_dict()` that serializes `output` as
+exactly `{path, file_type, byte_count}` — never the `mem_map` payload. The
+three placeholder operations (`CrcOperation`, `ExtractOperation`,
+`SplitBySegmentOperation`) must perform an identity passthrough for both S19-
+and HEX-built snapshots: `result.output is loaded`, `mem_map`/`ranges`/`errors`
+unmutated, `status == "placeholder"`, and exactly one note of the form
+`"placeholder: <operation_id> not yet implemented"`.
+
+- Code: `s19_app/tui/operations/model.py` (`Operation`, `OperationResult`,
+  `STATUS_DOMAIN`, `OperationResult.to_dict`),
+  `s19_app/tui/operations/placeholders.py` (`CrcOperation`,
+  `ExtractOperation`, `SplitBySegmentOperation`)
+- Validation: `Automated` via `tests/test_operations.py`
+  (`test_operation_interface`, `test_operation_result_schema`,
+  `test_identity_passthrough_s19`, `test_identity_passthrough_hex`,
+  `test_placeholders_registered`)
+- Status: Added in batch `2026-06-11-batch-08` (US-007 / HLR-001, HLR-002(1))
+
+**R-OPS-002**: The system must provide a deterministic, code-driven operation
+registry — a static in-module mapping exposing
+`list_operation_ids() -> ["crc", "extract", "split_by_segment"]` in that fixed
+order on every call and `get_operation(operation_id)` resolving to the
+registered instance, raising `KeyError` naming the requested id verbatim for
+unknown ids (no fallback, no fuzzy match, no model involvement in dispatch) —
+plus a headless service entry point
+`run_operation(operation_id, loaded, *, now_fn=...)` that resolves through an
+injectable registry-lookup seam (`operation_resolver`, default
+`get_operation`), forwards `now_fn` unchanged to the operation's `execute`,
+propagates the registry `KeyError` unchanged, and performs no I/O, no disk
+writes, and no parsing. The operations package and the service module must
+import no Textual modules and no TUI view module (`s19_app.tui.app`,
+`s19_app.tui.screens`) — the view imports the service, never the reverse.
+
+- Code: `s19_app/tui/operations/registry.py` (`_REGISTRY`,
+  `list_operation_ids`, `get_operation`),
+  `s19_app/tui/services/operation_service.py` (`run_operation`,
+  `operation_resolver`)
+- Validation: `Automated` via `tests/test_operations.py`
+  (`test_registry_deterministic_order`, `test_unknown_operation_raises`,
+  `test_run_operation_service`); import/filesystem bans checked by inspection
+  probes (batch-08 `04-validation.md` §2.1–2.3: textual-import +
+  reverse-import + filesystem-call probes, 0 hits)
+- Status: Added in batch `2026-06-11-batch-08` (US-007 / HLR-002(2–3),
+  HLR-003)
+
+**R-OPS-003**: The TUI must provide an `OperationsScreen` modal, reachable via
+the key binding `x` (`action_operations_view`), that lists exactly the
+registry's operation ids in registry order labelled with each operation's
+`title` (option pairs pre-computed by the app — enumeration happens in the
+app, not the screen). Confirming a selection must execute the operation
+inside the modal exclusively through the `run_operation` service seam
+(`OperationsScreen._execute_selected`; no direct `.execute(` call in
+`app.py`/`screens.py`), synchronously on the UI thread (no `@work` worker —
+valid only while operations are placeholder no-ops), and present the result's
+`status` and `notes` plus a hex render of `result.output.mem_map` produced by
+`render_hex_view_text` with the pinned argument tuple (`focus_address=None`,
+`row_bases=None`, `highlight=None`, `mac_highlight_addresses=None`,
+`max_rows=MAX_HEX_ROWS`) into the `#operation_result_hex` widget. If no file
+is loaded, the action must set a status-line message and must not push the
+screen nor invoke the service. The activity rail stays at exactly eight items
+(no 9th rail entry; `rail.py` unmodified by the batch).
+
+- Code: `s19_app/tui/screens.py` (`OperationsScreen`,
+  `OperationsScreen._execute_selected`), `s19_app/tui/app.py`
+  (`action_operations_view`, `Binding("x", "operations_view", ...)`)
+- Validation: `Automated` via `tests/test_tui_operations_view.py`
+  (`test_operations_view_lists_registry_ids`,
+  `test_operations_view_executes_via_service`,
+  `test_operations_view_result_hex_render_matches_baseline`)
+- Status: Added in batch `2026-06-11-batch-08` (US-007 / HLR-004)
+
+## Per-operation requirements convention (C-7)
+
+Each operation's REAL behavior (the future fill-in replacing a placeholder's
+`execute`) gets its own HLR/LLR requirements set, SEPARATE from the
+application's requirements, co-located with the module at
+`s19_app/tui/operations/requirements/REQ-<operation_id>.md` — created by that
+operation's fill-in batch, not by batch-08 (the directory does not exist yet).
+This document and the `.dev-flow/` batch documents only REFERENCE those local
+documents; they never carry the operation requirements themselves. Rationale
+(operator decision, 2026-06-11, batch-08 `01-requirements.md` §6.2 C-7):
+operations may become ad-hoc functions reused in different applications, so
+their requirements must travel with the module, not bind to the main
+application.
