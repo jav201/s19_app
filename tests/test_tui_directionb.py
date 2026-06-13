@@ -3183,12 +3183,18 @@ def test_tc028_no_new_processing_module_added_outside_view_layer() -> None:
     package_root = Path(s19_app.__file__).resolve().parent
     # The pre-batch modules at the s19_app/ package root. Increment 9 adds
     # nothing here — its new code lives entirely under s19_app/tui/.
+    # batch-09 (US-006, D-7): the headless diff engine ``compare.py`` is
+    # deliberately added at the package root beside ``range_index.py`` — the
+    # newer requirement supersedes this batch-04 "nothing new at root"
+    # invariant for that one module; the guard still catches any OTHER
+    # unexpected root module.
     engine_root_modules = {
         "__init__.py",
         "cli.py",
         "core.py",
         "hexfile.py",
         "range_index.py",
+        "compare.py",
         "utils.py",
         "version.py",
     }
@@ -3542,12 +3548,17 @@ def test_tc028_no_new_processing_module_added_outside_view_layer_inc10() -> None
     import s19_app
 
     package_root = Path(s19_app.__file__).resolve().parent
+    # batch-09 (US-006, D-7): ``compare.py`` headless diff engine added at the
+    # package root by design; newer requirement supersedes the batch-04
+    # "nothing new at root" invariant for that module. Guard still flags any
+    # OTHER unexpected root module.
     engine_root_modules = {
         "__init__.py",
         "cli.py",
         "core.py",
         "hexfile.py",
         "range_index.py",
+        "compare.py",
         "utils.py",
         "version.py",
     }
