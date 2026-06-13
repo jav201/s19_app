@@ -1,27 +1,46 @@
 """
-Markdown diff-report generator — s19_app batch-09, increment I3 (HLR-004).
+Diff-report generator (Markdown + self-contained HTML) — s19_app batch-09,
+increment I3 (HLR-004).
 
-Headless service: :func:`generate_diff_report` writes one Markdown **diff
-report** describing a completed image comparison — the §6.2 C-9
-:class:`ComparisonResult` produced by ``compare_service`` (increment I2),
-plus the two compared memory maps the engine diffed. The report contains, in
-order (LLR-004.3): a header (both image identities and source kinds, the
-artifact-usage notes, the generation UTC instant, the tool version), a
-statistics table (per-classification run/byte counts), a run table (start,
-end, length, classification, best-effort symbol annotation — LLR-004.4), and
-per-run bounded hex windows of image A and image B rendered through the
-plain-string ``hexview.render_hex_view``.
+Headless service producing a COMPLETE diff report for a finished image
+comparison in two output formats:
+
+- :func:`generate_diff_report` writes one **Markdown** diff report.
+- :func:`generate_diff_report_html` writes one **self-contained HTML** diff
+  report (inline CSS only, every embedded value ``html.escape``-d, no
+  ``<script>`` / external resource / CDN / network).
+
+Both consume the §6.2 C-9 :class:`ComparisonResult` produced by
+``compare_service`` (increment I2) plus the two memory maps the engine diffed.
+Each report contains, in order (LLR-004.3 / LLR-004.7): a header (both image
+identities and source kinds, the artifact-usage notes, the generation UTC
+instant, the tool version), a statistics table (per-classification run/byte
+counts), a run table (start, end, length, classification, best-effort symbol
+annotation — LLR-004.4), and per-run bounded hex windows of image A and image B
+rendered through the plain-string ``hexview.render_hex_view``. In the Markdown
+report each ``changed`` run additionally renders as a fenced ```diff block with
+image A's bytes as ``-`` lines and image B's bytes as ``+`` lines; the HTML
+report colours the three run kinds with inline CSS.
+
+**Completeness (G-9, I3 gate, BINDING):** the WRITTEN files are COMPLETE —
+every run present, no per-report run cap, no ``REPORT_MAX_TOTAL_BYTES`` byte
+truncation, and no ``TRUNCATED`` marker anywhere. The batch-07 display caps
+(``REPORT_MAX_TOTAL_BYTES``, the per-report run-dump cap) bound only the TUI
+DISPLAY render path (relocated to increment I4 / LLR-005.2); they never bound
+these files.
 
 This module **reuses** the batch-07 report conventions as a PATTERN (D-5): it
 imports ``REPORTS_DIR_NAME`` / ``REPORT_TIMESTAMP_FORMAT`` /
-``REPORT_MAX_TOTAL_BYTES`` and ``compute_hexdump_windows`` from
+``REPORT_CONTEXT_BYTES_DEFAULT`` and ``compute_hexdump_windows`` from
 ``report_service`` and the plain ``render_hex_view`` from ``hexview``, but it
 does **not** edit ``report_service`` at all. In particular it owns its own
-listing scheme — :data:`DIFF_REPORT_FILENAME_REGEX` + :func:`list_diff_reports`
-(LLR-004.2, G-4) — leaving the shared ``REPORT_FILENAME_REGEX`` and
+filename schemes — :data:`DIFF_REPORT_FILENAME_REGEX` /
+:data:`DIFF_REPORT_HTML_FILENAME_REGEX` + :func:`list_diff_reports`
+(LLR-004.2 / LLR-004.7, G-4) — leaving the shared ``REPORT_FILENAME_REGEX`` and
 ``list_project_reports`` byte-for-byte untouched.
 
-Destination resolution (LLR-004.6, G-5 + G-8 + M-4, security):
+Destination resolution (LLR-004.6, G-5 + G-8 + M-4, security) — shared by both
+formats:
 
 - While a project is active the report is written into
   ``<project_dir>/reports/`` inside the gitignored ``.s19tool/`` tree
@@ -38,11 +57,11 @@ Destination resolution (LLR-004.6, G-5 + G-8 + M-4, security):
   ``sanitize_project_name`` is deliberately NOT used — it is a single-token
   name cleaner, structurally incapable of validating a directory path (M-4).
 
-Both branches apply the SAME no-silent-overwrite collision discipline in the
-resolved directory (LLR-004.1 / M-5): a zero-padded ``-NN`` counter,
-``FileExistsError`` after 99, never an overwrite. The filename is generated
-wholly by this module from the UTC timestamp — no operator-supplied string
-forms any component of the filename.
+Both branches and both formats apply the SAME no-silent-overwrite collision
+discipline in the resolved directory (LLR-004.1 / M-5): a zero-padded ``-NN``
+counter, ``FileExistsError`` after 99, never an overwrite. The filename is
+generated wholly by this module from the UTC timestamp — no operator-supplied
+string forms any component of the filename.
 
 Confidentiality (F-S-07, LLR-004.5): diff reports carry raw memory bytes.
 This module performs NO logging at all — so report body content can never
@@ -52,6 +71,7 @@ public example data exclusively.
 
 from __future__ import annotations
 
+import html
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -71,25 +91,34 @@ from ...version import __version__
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
-    REPORT_MAX_TOTAL_BYTES,
     REPORT_TIMESTAMP_FORMAT,
     REPORTS_DIR_NAME,
     compute_hexdump_windows,
 )
 
-#: Self-contained diff-report filename regex (LLR-004.2, G-4). Owned HERE so
-#: the shared ``report_service.REPORT_FILENAME_REGEX`` is never edited; it
-#: matches exactly the LLR-004.1 ``<UTC %Y%m%dT%H%M%SZ>(-NN)?-diff-report.md``
-#: scheme.
+#: Self-contained Markdown diff-report filename regex (LLR-004.2, G-4). Owned
+#: HERE so the shared ``report_service.REPORT_FILENAME_REGEX`` is never edited;
+#: it matches exactly the LLR-004.1
+#: ``<UTC %Y%m%dT%H%M%SZ>(-NN)?-diff-report.md`` scheme.
 DIFF_REPORT_FILENAME_REGEX = re.compile(
     r"^\d{8}T\d{6}Z(-\d{2})?-diff-report\.md$"
 )
 
-#: Maximum runs whose hex windows are dumped per report (LLR-004.3). Sized to
-#: mirror the ``REPORT_MAX_REGIONS_PER_VARIANT=128`` precedent
-#: (``report_service.py:72``); the run TABLE always lists every run, the cap
-#: only bounds the (expensive) per-run hex windows.
-DIFF_REPORT_MAX_RUN_DUMPS = 128
+#: Self-contained HTML diff-report filename regex (LLR-004.7, G-4). Sibling of
+#: :data:`DIFF_REPORT_FILENAME_REGEX` for the
+#: ``<UTC %Y%m%dT%H%M%SZ>(-NN)?-diff-report.html`` scheme; the shared
+#: ``report_service.REPORT_FILENAME_REGEX`` is NOT edited.
+DIFF_REPORT_HTML_FILENAME_REGEX = re.compile(
+    r"^\d{8}T\d{6}Z(-\d{2})?-diff-report\.html$"
+)
+
+#: Inline-CSS colours distinguishing the three run kinds in the HTML export
+#: (LLR-004.7). Self-contained named CSS colours — no external font/resource.
+_HTML_KIND_COLOUR = {
+    KIND_CHANGED: "#b58900",   # amber — present in both, byte differs
+    KIND_ONLY_A: "#dc322f",    # red   — mapped in A only
+    KIND_ONLY_B: "#268bd2",    # blue  — mapped in B only
+}
 
 #: Injectable UTC clock type (the ``report_service`` ``now_fn`` / B-4 pattern).
 NowFn = Callable[[], datetime]
@@ -107,6 +136,7 @@ def _default_now() -> datetime:
     Dependencies:
         Used by:
             - generate_diff_report
+            - generate_diff_report_html
     """
     return datetime.now(timezone.utc)
 
@@ -131,12 +161,14 @@ class DiffReportResult:
         None: Dataclass container.
 
     Data Flow:
-        - Built by :func:`generate_diff_report`; consumed by the TUI report
-          trigger (increment I4, LLR-005.4) and the tests.
+        - Built by :func:`generate_diff_report` / :func:`generate_diff_report_html`;
+          consumed by the TUI report trigger (increment I4, LLR-005.4) and the
+          tests.
 
     Dependencies:
         Used by:
             - generate_diff_report
+            - generate_diff_report_html
             - s19_app.tui.app.S19TuiApp (increment I4)
     """
 
@@ -145,24 +177,31 @@ class DiffReportResult:
     diagnostics: List[str] = field(default_factory=list)
 
 
-def _diff_report_filename(dest_dir: Path, timestamp: datetime) -> str:
+def _diff_report_filename(
+    dest_dir: Path, timestamp: datetime, suffix: str
+) -> str:
     """
     Summary:
-        Build the diff-report filename for ``timestamp``, resolving a
-        same-second collision with a zero-padded two-digit counter
-        (LLR-004.1 / M-5: ``<ts>-diff-report.md``, then
-        ``<ts>-01-diff-report.md`` .. ``<ts>-99-diff-report.md``) — the
+        Build a diff-report filename for ``timestamp`` with the given file
+        ``suffix`` (``.md`` or ``.html``), resolving a same-second collision
+        with a zero-padded two-digit counter (LLR-004.1 / M-5:
+        ``<ts>-diff-report<suffix>``, then ``<ts>-01-diff-report<suffix>`` ..
+        ``<ts>-99-diff-report<suffix>``) — the
         ``report_service._report_filename`` pattern with the diff kind suffix,
-        applied unchanged in both the project and no-project destinations.
+        applied unchanged in both the project and no-project destinations and
+        for both output formats.
 
     Args:
         dest_dir (Path): The resolved destination directory.
         timestamp (datetime): The (UTC) generation instant from the injectable
             clock.
+        suffix (str): The file extension including the dot — ``".md"`` for the
+            Markdown report, ``".html"`` for the HTML report.
 
     Returns:
-        str: A filename matching :data:`DIFF_REPORT_FILENAME_REGEX` that does
-        not yet exist inside ``dest_dir``.
+        str: A filename matching :data:`DIFF_REPORT_FILENAME_REGEX` (``.md``)
+        or :data:`DIFF_REPORT_HTML_FILENAME_REGEX` (``.html``) that does not
+        yet exist inside ``dest_dir``.
 
     Raises:
         FileExistsError: When the base name and all 99 counter slots for this
@@ -175,18 +214,19 @@ def _diff_report_filename(dest_dir: Path, timestamp: datetime) -> str:
     Dependencies:
         Used by:
             - generate_diff_report
+            - generate_diff_report_html
     """
     base = timestamp.strftime(REPORT_TIMESTAMP_FORMAT)
-    candidate = f"{base}-diff-report.md"
+    candidate = f"{base}-diff-report{suffix}"
     if not (dest_dir / candidate).exists():
         return candidate
     for counter in range(1, 100):
-        candidate = f"{base}-{counter:02d}-diff-report.md"
+        candidate = f"{base}-{counter:02d}-diff-report{suffix}"
         if not (dest_dir / candidate).exists():
             return candidate
     raise FileExistsError(
-        f"100 diff reports already exist for second {base} - refusing to "
-        f"overwrite an existing report"
+        f"100 diff reports already exist for second {base}{suffix} - refusing "
+        f"to overwrite an existing report"
     )
 
 
@@ -280,6 +320,7 @@ def _resolve_destination(
     Dependencies:
         Used by:
             - generate_diff_report
+            - generate_diff_report_html
     """
     if project_dir is not None:
         dest_dir = Path(project_dir) / REPORTS_DIR_NAME
@@ -377,6 +418,7 @@ def _annotate_run(
             - build_sorted_range_index / address_in_sorted_ranges
         Used by:
             - _run_table_lines
+            - _html_run_rows
     """
     if not symbol_addresses:
         return "-"
@@ -488,8 +530,7 @@ def _run_table_lines(
     Summary:
         Build the run table (LLR-004.3 / LLR-004.4): one row per run with
         start, end, length, classification, and best-effort symbol annotation.
-        Every run is listed (no cap on the table — the cap bounds only the hex
-        windows).
+        Every run is listed.
 
     Args:
         comparison (ComparisonResult): The completed comparison.
@@ -525,49 +566,115 @@ def _run_table_lines(
     return lines
 
 
+def _window_rows(mem_map: Dict[int, int], low: int, high: int) -> List[str]:
+    """
+    Summary:
+        Render the plain-string hex+ASCII rows for the window ``[low, high)`` of
+        ``mem_map`` via ``hexview.render_hex_view`` (LLR-004.3) — the shared
+        row source for the Markdown ```text / ```diff blocks and the HTML
+        ``<pre>`` windows.
+
+    Args:
+        mem_map (Dict[int, int]): The image memory map to render.
+        low (int): Inclusive window start (row-aligned by the caller).
+        high (int): Exclusive window end.
+
+    Returns:
+        List[str]: One string per rendered row (header + hex lines).
+
+    Dependencies:
+        Uses:
+            - render_hex_view
+        Used by:
+            - _hex_windows_lines
+            - _diff_block_lines
+            - _html_hex_windows
+    """
+    row_bases = list(range(low, high, HEX_WIDTH))
+    rendered = render_hex_view(mem_map, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
+    return rendered.splitlines()
+
+
+def _diff_block_lines(
+    run: DiffRun,
+    mem_map_a: Dict[int, int],
+    mem_map_b: Dict[int, int],
+    context_bytes: int,
+    top_a: int,
+    top_b: int,
+) -> List[str]:
+    """
+    Summary:
+        Build the fenced ```diff block for one ``changed`` run (LLR-004.3):
+        image A's window rows as ``-``-prefixed lines, image B's window rows as
+        ``+``-prefixed lines, so the block renders red/green on
+        GitHub/VS Code/Obsidian and degrades to plain text elsewhere.
+
+    Args:
+        run (DiffRun): The ``changed`` run.
+        mem_map_a (Dict[int, int]): Image A's memory map.
+        mem_map_b (Dict[int, int]): Image B's memory map.
+        context_bytes (int): ± surrounding bytes per run window.
+        top_a (int): One-past-the-last mapped address of A (window clamp).
+        top_b (int): One-past-the-last mapped address of B (window clamp).
+
+    Returns:
+        List[str]: Markdown lines for the ```diff block, trailing blank
+        included.
+
+    Dependencies:
+        Uses:
+            - compute_hexdump_windows / _window_rows
+        Used by:
+            - _hex_windows_lines
+    """
+    out: List[str] = ["```diff"]
+    for low, high in compute_hexdump_windows([(run.start, run.end)], context_bytes, top_a):
+        for row in _window_rows(mem_map_a, low, high):
+            out.append(f"-{row}")
+    for low, high in compute_hexdump_windows([(run.start, run.end)], context_bytes, top_b):
+        for row in _window_rows(mem_map_b, low, high):
+            out.append(f"+{row}")
+    out.extend(["```", ""])
+    return out
+
+
 def _hex_windows_lines(
     comparison: ComparisonResult,
     mem_map_a: Dict[int, int],
     mem_map_b: Dict[int, int],
     context_bytes: int,
-    run_dump_cap: int,
-    budget_limit: int,
 ) -> List[str]:
     """
     Summary:
         Build per-run bounded hex windows for image A and image B (LLR-004.3),
         rendered through the plain ``render_hex_view`` over windows from
-        ``compute_hexdump_windows``, enforcing both the run-dump cap and the
-        whole-document byte budget with explicit ``TRUNCATED`` markers stating
-        the exact omitted counts — never a silent cut.
+        ``compute_hexdump_windows``. The written file is COMPLETE (G-9): every
+        run is dumped, there is no run cap, no byte budget, and no ``TRUNCATED``
+        marker. Each ``changed`` run additionally carries a fenced ```diff
+        block (A bytes as ``-`` lines, B bytes as ``+`` lines).
 
     Args:
         comparison (ComparisonResult): The completed comparison.
         mem_map_a (Dict[int, int]): Image A's memory map.
         mem_map_b (Dict[int, int]): Image B's memory map.
         context_bytes (int): ± surrounding bytes per run window.
-        run_dump_cap (int): Maximum runs whose windows are dumped.
-        budget_limit (int): Whole-document byte budget (read at call time so
-            tests can shrink it).
 
     Returns:
         List[str]: Markdown lines, trailing blank included.
 
     Data Flow:
-        - Runs over the cap -> keep the first cap-many in document order, emit
-          the run-cap TRUNCATED marker stating the exact omitted count.
-        - Per kept run: one merged window per image (clamped at each image's
-          top); a block that no longer fits the budget is omitted and counted,
-          ending in the byte-budget TRUNCATED marker.
+        - Per run: a ```text window per image (clamped at each image's top);
+          a ``changed`` run additionally emits a ```diff block via
+          :func:`_diff_block_lines`. No omission, no marker (G-9).
 
     Dependencies:
         Uses:
-            - compute_hexdump_windows / render_hex_view
+            - compute_hexdump_windows / _window_rows / _diff_block_lines
         Used by:
             - generate_diff_report
     """
     out: List[str] = ["## Hex windows", ""]
-    used = sum(len(line.encode("utf-8")) + 1 for line in out)
 
     runs = comparison.runs
     if not runs:
@@ -577,30 +684,15 @@ def _hex_windows_lines(
         out.extend(["Memory maps unavailable - hex windows omitted.", ""])
         return out
 
-    total_runs = len(runs)
-    if total_runs > run_dump_cap:
-        omitted = total_runs - run_dump_cap
-        runs = runs[:run_dump_cap]
-        out.extend(
-            [
-                f"> TRUNCATED: {omitted} of {total_runs} run hex windows "
-                f"omitted (cap: {run_dump_cap} runs per report).",
-                "",
-            ]
-        )
-
     top_a = max(mem_map_a) + 1 if mem_map_a else 0
     top_b = max(mem_map_b) + 1 if mem_map_b else 0
-    omitted_blocks = 0
 
     def _block(mem_map: Dict[int, int], low: int, high: int, who: str) -> List[str]:
-        row_bases = list(range(low, high, HEX_WIDTH))
-        rendered = render_hex_view(mem_map, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
         return [
             f"Image {who} window 0x{low:08X}-0x{high:08X}:",
             "",
             "```text",
-            *rendered.splitlines(),
+            *_window_rows(mem_map, low, high),
             "```",
             "",
         ]
@@ -610,27 +702,18 @@ def _hex_windows_lines(
             f"### Run 0x{run.start:08X}-0x{run.end:08X} ({_kind_label(run.kind)})"
         )
         out.append("")
-        used += sum(len(line.encode("utf-8")) + 1 for line in out[-2:])
+        if run.kind == KIND_CHANGED:
+            out.extend(
+                _diff_block_lines(
+                    run, mem_map_a, mem_map_b, context_bytes, top_a, top_b
+                )
+            )
         for who, mem_map, top in (("A", mem_map_a, top_a), ("B", mem_map_b, top_b)):
             for low, high in compute_hexdump_windows(
                 [(run.start, run.end)], context_bytes, top
             ):
-                block = _block(mem_map, low, high, who)
-                cost = sum(len(line.encode("utf-8")) + 1 for line in block)
-                if used + cost > budget_limit:
-                    omitted_blocks += 1
-                    continue
-                out.extend(block)
-                used += cost
+                out.extend(_block(mem_map, low, high, who))
 
-    if omitted_blocks:
-        out.extend(
-            [
-                f"> TRUNCATED: {omitted_blocks} hex window block(s) omitted "
-                f"(report size cap: {budget_limit} bytes).",
-                "",
-            ]
-        )
     return out
 
 
@@ -644,16 +727,16 @@ def generate_diff_report(
     a2l_records: Optional[Sequence[dict]] = None,
     mac_records: Optional[Sequence[dict]] = None,
     context_bytes: int = REPORT_CONTEXT_BYTES_DEFAULT,
-    run_dump_cap: int = DIFF_REPORT_MAX_RUN_DUMPS,
-    budget_limit: int = REPORT_MAX_TOTAL_BYTES,
     now_fn: Optional[NowFn] = None,
 ) -> DiffReportResult:
     """
     Summary:
-        Generate one Markdown diff report for a completed comparison (HLR-004)
-        and return a :class:`DiffReportResult` carrying the written path, or a
-        diagnostic-bearing refusal when the no-project destination fails
-        validation (LLR-004.6). Headless; performs no logging (LLR-004.5).
+        Generate one COMPLETE Markdown diff report for a completed comparison
+        (HLR-004 / LLR-004.3) and return a :class:`DiffReportResult` carrying
+        the written path, or a diagnostic-bearing refusal when the no-project
+        destination fails validation (LLR-004.6). The written file is complete
+        — every run present, no cap, no byte truncation, no ``TRUNCATED`` marker
+        (G-9). Headless; performs no logging (LLR-004.5).
 
     Args:
         comparison (ComparisonResult): The §6.2 C-9 result from
@@ -676,11 +759,6 @@ def generate_diff_report(
         mac_records (Optional[Sequence[dict]]): MAC records for best-effort run
             annotation; ``None`` -> no MAC annotation (non-gating).
         context_bytes (int): ± surrounding bytes per run hex window.
-        run_dump_cap (int): Maximum runs whose hex windows are dumped
-            (LLR-004.3 cap).
-        budget_limit (int): Whole-document byte budget (LLR-004.3) — defaults
-            to :data:`REPORT_MAX_TOTAL_BYTES`; tests shrink it to force the
-            byte-budget TRUNCATED marker.
         now_fn (Optional[NowFn]): Injectable UTC clock; ``None`` resolves to
             ``datetime.now(timezone.utc)``.
 
@@ -701,7 +779,7 @@ def generate_diff_report(
         - Build the filename with the no-silent-overwrite collision counter
           (:func:`_diff_report_filename`, M-5) in the resolved directory.
         - Emit header -> stats -> run table (best-effort annotation) -> per-run
-          hex windows (caps + TRUNCATED markers), then write once.
+          hex windows + ```diff cue, then write once (COMPLETE — G-9).
 
     Dependencies:
         Uses:
@@ -720,7 +798,7 @@ def generate_diff_report(
 
     clock = now_fn if now_fn is not None else _default_now
     generated_at = clock()
-    filename = _diff_report_filename(dest_dir, generated_at)
+    filename = _diff_report_filename(dest_dir, generated_at, ".md")
 
     symbol_addresses = _artifact_addresses_with_names(
         a2l_records
@@ -731,15 +809,314 @@ def generate_diff_report(
     lines.extend(_stats_lines(comparison))
     lines.extend(_run_table_lines(comparison, symbol_addresses))
     lines.extend(
-        _hex_windows_lines(
-            comparison,
-            mem_map_a,
-            mem_map_b,
-            context_bytes,
-            run_dump_cap,
-            budget_limit,
-        )
+        _hex_windows_lines(comparison, mem_map_a, mem_map_b, context_bytes)
     )
+
+    target = dest_dir / filename
+    target.write_text("\n".join(lines), encoding="utf-8")
+    return DiffReportResult(path=target, written=True, diagnostics=[])
+
+
+# ---------------------------------------------------------------------------
+# HTML export (LLR-004.7, G-9) — self-contained, html.escape-d, no script /
+# external resource; COMPLETE (no cap / truncation).
+# ---------------------------------------------------------------------------
+
+
+def _esc(value: object) -> str:
+    """Escape ``value`` for safe HTML embedding via stdlib ``html.escape``."""
+    return html.escape(str(value), quote=True)
+
+
+def _html_header(comparison: ComparisonResult, generated_at: datetime) -> List[str]:
+    """
+    Summary:
+        Build the HTML header block (LLR-004.7): image identities/sources,
+        per-image artifact-usage notes, the UTC instant, and the tool version —
+        every embedded value ``html.escape``-d.
+
+    Args:
+        comparison (ComparisonResult): The completed comparison.
+        generated_at (datetime): The clock's generation instant.
+
+    Returns:
+        List[str]: HTML lines.
+
+    Dependencies:
+        Uses:
+            - _esc
+        Used by:
+            - generate_diff_report_html
+    """
+
+    def _img(label: str, image) -> str:
+        variant = f" variant={image.variant_id}" if image.variant_id else ""
+        return (
+            f"<li>Image {label}: {_esc(image.label or '(unnamed)')} "
+            f"[{_esc(image.source_kind)}{_esc(variant)}] "
+            f"path=<code>{_esc(image.path)}</code> "
+            f"parse-errors={_esc(image.parse_error_count)}</li>"
+        )
+
+    def _usage(label: str, usage) -> str:
+        if usage is None:
+            return f"<li>Image {label} artifacts: none</li>"
+
+        def _note(note) -> str:
+            if note.status == "absent":
+                return "absent"
+            return f"{_esc(note.status)} ({_esc(note.covered)}/{_esc(note.total)})"
+
+        return (
+            f"<li>Image {label} artifacts: summary={_esc(usage.summary)}; "
+            f"a2l={_note(usage.a2l)}; mac={_note(usage.mac)}</li>"
+        )
+
+    return [
+        "<h1>Diff report</h1>",
+        "<ul>",
+        f"<li>Generated (UTC): {_esc(generated_at.isoformat())}</li>",
+        f"<li>Tool version: {_esc(__version__)}</li>",
+        _img("A", comparison.image_a),
+        _img("B", comparison.image_b),
+        _usage("A", comparison.notes.get("image_a")),
+        _usage("B", comparison.notes.get("image_b")),
+        "</ul>",
+    ]
+
+
+def _html_stats(comparison: ComparisonResult) -> List[str]:
+    """Build the HTML statistics table (LLR-004.7), values escaped."""
+    stats = comparison.stats
+    lines = [
+        "<h2>Statistics</h2>",
+        "<table>",
+        "<tr><th>Classification</th><th>Runs</th><th>Bytes</th></tr>",
+    ]
+    for kind in DIFF_KIND_DOMAIN:
+        colour = _HTML_KIND_COLOUR.get(kind, "#000000")
+        lines.append(
+            f'<tr><td style="color:{colour}">{_esc(_kind_label(kind))}</td>'
+            f"<td>{_esc(stats.run_counts.get(kind, 0))}</td>"
+            f"<td>{_esc(stats.byte_counts.get(kind, 0))}</td></tr>"
+        )
+    lines.append("</table>")
+    return lines
+
+
+def _html_run_rows(
+    comparison: ComparisonResult, symbol_addresses: Sequence[Tuple[int, str]]
+) -> List[str]:
+    """
+    Summary:
+        Build the HTML run table (LLR-004.7 / LLR-004.4): one row per run with
+        start, end, length, classification (coloured by inline CSS per kind),
+        and best-effort symbol annotation. Every run is listed; all values
+        ``html.escape``-d.
+
+    Args:
+        comparison (ComparisonResult): The completed comparison.
+        symbol_addresses (Sequence[Tuple[int, str]]): Shared artifact
+            ``(address, name)`` pairs; empty when no context (annotation ``-``).
+
+    Returns:
+        List[str]: HTML lines.
+
+    Dependencies:
+        Uses:
+            - _annotate_run / _esc
+        Used by:
+            - generate_diff_report_html
+    """
+    lines = ["<h2>Runs</h2>"]
+    if not comparison.runs:
+        lines.append("<p>No differing runs - the images are identical.</p>")
+        return lines
+    lines.extend(
+        [
+            "<table>",
+            "<tr><th>Start</th><th>End</th><th>Length</th>"
+            "<th>Classification</th><th>Symbols</th></tr>",
+        ]
+    )
+    for run in comparison.runs:
+        colour = _HTML_KIND_COLOUR.get(run.kind, "#000000")
+        lines.append(
+            f"<tr><td>0x{run.start:08X}</td><td>0x{run.end:08X}</td>"
+            f"<td>{_esc(run.length)}</td>"
+            f'<td style="color:{colour}">{_esc(_kind_label(run.kind))}</td>'
+            f"<td>{_esc(_annotate_run(run, symbol_addresses))}</td></tr>"
+        )
+    lines.append("</table>")
+    return lines
+
+
+def _html_hex_windows(
+    comparison: ComparisonResult,
+    mem_map_a: Dict[int, int],
+    mem_map_b: Dict[int, int],
+    context_bytes: int,
+) -> List[str]:
+    """
+    Summary:
+        Build the HTML per-run hex windows for image A and image B (LLR-004.7).
+        COMPLETE (G-9): every run dumped, no cap / byte budget / ``TRUNCATED``
+        marker. Each window is an escaped ``<pre>`` block coloured by the run
+        kind via inline CSS.
+
+    Args:
+        comparison (ComparisonResult): The completed comparison.
+        mem_map_a (Dict[int, int]): Image A's memory map.
+        mem_map_b (Dict[int, int]): Image B's memory map.
+        context_bytes (int): ± surrounding bytes per run window.
+
+    Returns:
+        List[str]: HTML lines.
+
+    Dependencies:
+        Uses:
+            - compute_hexdump_windows / _window_rows / _esc
+        Used by:
+            - generate_diff_report_html
+    """
+    lines = ["<h2>Hex windows</h2>"]
+    runs = comparison.runs
+    if not runs:
+        lines.append("<p>No differing runs to dump.</p>")
+        return lines
+    if not mem_map_a and not mem_map_b:
+        lines.append("<p>Memory maps unavailable - hex windows omitted.</p>")
+        return lines
+
+    top_a = max(mem_map_a) + 1 if mem_map_a else 0
+    top_b = max(mem_map_b) + 1 if mem_map_b else 0
+
+    for run in runs:
+        colour = _HTML_KIND_COLOUR.get(run.kind, "#000000")
+        lines.append(
+            f'<h3 style="color:{colour}">'
+            f"Run 0x{run.start:08X}-0x{run.end:08X} "
+            f"({_esc(_kind_label(run.kind))})</h3>"
+        )
+        for who, mem_map, top in (("A", mem_map_a, top_a), ("B", mem_map_b, top_b)):
+            for low, high in compute_hexdump_windows(
+                [(run.start, run.end)], context_bytes, top
+            ):
+                body = "\n".join(_window_rows(mem_map, low, high))
+                lines.append(
+                    f"<p>Image {who} window 0x{low:08X}-0x{high:08X}:</p>"
+                )
+                lines.append(
+                    f'<pre style="color:{colour}">{_esc(body)}</pre>'
+                )
+    return lines
+
+
+def generate_diff_report_html(
+    comparison: ComparisonResult,
+    *,
+    mem_map_a: Dict[int, int],
+    mem_map_b: Dict[int, int],
+    project_dir: Optional[Path] = None,
+    dest_input: Optional[str] = None,
+    a2l_records: Optional[Sequence[dict]] = None,
+    mac_records: Optional[Sequence[dict]] = None,
+    context_bytes: int = REPORT_CONTEXT_BYTES_DEFAULT,
+    now_fn: Optional[NowFn] = None,
+) -> DiffReportResult:
+    """
+    Summary:
+        Generate one COMPLETE, self-contained HTML diff report for a completed
+        comparison (HLR-004 / LLR-004.7) and return a :class:`DiffReportResult`.
+        The HTML carries the same content as the Markdown report (identities,
+        artifact-usage notes, statistics, run table with best-effort
+        annotation, per-run hex windows for A and B), uses inline CSS ONLY with
+        the three run kinds in distinct colours, escapes every embedded value
+        via ``html.escape``, and contains NO ``<script>`` / external resource /
+        font / CDN / network reference. The written file is COMPLETE — no cap,
+        no byte truncation, no ``TRUNCATED`` marker (G-9). Headless; performs no
+        logging (LLR-004.5).
+
+    Args:
+        comparison (ComparisonResult): The §6.2 C-9 result from
+            ``compare_service`` (increment I2).
+        mem_map_a (Dict[int, int]): Image A's memory map; the hex-window source.
+        mem_map_b (Dict[int, int]): Image B's memory map; the hex-window source.
+        project_dir (Optional[Path]): Active project work area — report written
+            to ``<project_dir>/reports/`` inside ``.s19tool/`` (LLR-004.1).
+        dest_input (Optional[str]): Operator-supplied destination directory for
+            the no-project branch (LLR-004.6, G-8). Required when ``project_dir``
+            is ``None``; ignored otherwise. There is NO implicit default.
+        a2l_records (Optional[Sequence[dict]]): Enriched A2L tags for best-effort
+            run annotation (LLR-004.4); ``None`` -> no A2L annotation.
+        mac_records (Optional[Sequence[dict]]): MAC records for best-effort run
+            annotation; ``None`` -> no MAC annotation.
+        context_bytes (int): ± surrounding bytes per run hex window.
+        now_fn (Optional[NowFn]): Injectable UTC clock; ``None`` resolves to
+            ``datetime.now(timezone.utc)``.
+
+    Returns:
+        DiffReportResult: ``written=True`` with the ``.html`` path on success,
+        or ``written=False`` with diagnostics naming the rejected no-project
+        destination (LLR-004.6). Never raises for a bad destination.
+
+    Raises:
+        FileExistsError: When 100 HTML diff reports already exist for the same
+            second in the resolved directory — never a silent overwrite (M-5).
+
+    Data Flow:
+        - Same destination resolution (:func:`_resolve_destination`) and
+          collision counter (:func:`_diff_report_filename`, ``.html`` suffix)
+          as the Markdown report.
+        - Emit a self-contained ``<html>`` document: inline ``<style>`` ->
+          escaped header / stats / run table / hex windows, then write once
+          (COMPLETE — G-9).
+
+    Dependencies:
+        Uses:
+            - _resolve_destination / _diff_report_filename
+            - _html_header / _html_stats / _html_run_rows / _html_hex_windows
+        Used by:
+            - s19_app.tui.app.S19TuiApp (increment I4)
+            - tests/test_diff_report_service.py
+
+    Example:
+        >>> # see tests/test_diff_report_service.py for executable usage
+    """
+    dest_dir, diagnostics = _resolve_destination(project_dir, dest_input)
+    if dest_dir is None:
+        return DiffReportResult(path=None, written=False, diagnostics=diagnostics)
+
+    clock = now_fn if now_fn is not None else _default_now
+    generated_at = clock()
+    filename = _diff_report_filename(dest_dir, generated_at, ".html")
+
+    symbol_addresses = _artifact_addresses_with_names(
+        a2l_records
+    ) + _artifact_addresses_with_names(mac_records)
+
+    style = (
+        "body{font-family:monospace;background:#fdf6e3;color:#073642;}"
+        "table{border-collapse:collapse;}"
+        "th,td{border:1px solid #93a1a1;padding:2px 6px;text-align:left;}"
+        "pre{border:1px solid #93a1a1;padding:6px;overflow:auto;}"
+    )
+
+    lines: List[str] = [
+        "<!DOCTYPE html>",
+        '<html lang="en">',
+        "<head>",
+        '<meta charset="utf-8">',
+        "<title>Diff report</title>",
+        f"<style>{style}</style>",
+        "</head>",
+        "<body>",
+    ]
+    lines.extend(_html_header(comparison, generated_at))
+    lines.extend(_html_stats(comparison))
+    lines.extend(_html_run_rows(comparison, symbol_addresses))
+    lines.extend(_html_hex_windows(comparison, mem_map_a, mem_map_b, context_bytes))
+    lines.extend(["</body>", "</html>"])
 
     target = dest_dir / filename
     target.write_text("\n".join(lines), encoding="utf-8")

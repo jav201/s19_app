@@ -1,5 +1,6 @@
 """
-Diff-report generator tests — s19_app batch-09, increment I3 (HLR-004).
+Diff-report generator tests — s19_app batch-09, increment I3 (HLR-004),
+amended at the I3 gate (G-9: complete files, ```diff cue, HTML export).
 
 Test -> TC -> LLR map:
     test_filename_scheme_and_same_second_collision   TC-016  LLR-004.1
@@ -7,8 +8,7 @@ Test -> TC -> LLR map:
     test_self_contained_listing_newest_first          TC-017  LLR-004.2 (G-4)
     test_report_service_regex_unedited                TC-017  LLR-004.2 (G-4 NON-edit)
     test_report_sections_present_in_order             TC-018  LLR-004.3
-    test_run_dump_cap_emits_truncated_marker          TC-018  LLR-004.3 (caps)
-    test_byte_budget_emits_truncated_marker           TC-018  LLR-004.3 (caps)
+    test_generation_is_deterministic_fixed_clock      TC-018  LLR-004.3 (determinism)
     test_symbol_annotation_only_intersecting_run      TC-019  LLR-004.4 (G-2)
     test_annotation_absent_without_context            TC-019  LLR-004.4 (non-gating)
     test_module_performs_no_logging                   TC-020  LLR-004.5 (F-S-07)
@@ -17,7 +17,11 @@ Test -> TC -> LLR map:
     test_no_project_nonexistent_dir_refused           TC-025  LLR-004.6 (G-8 refuse)
     test_no_project_collision_no_overwrite            TC-025  LLR-004.6 (M-5)
     test_no_sanitize_project_name_in_validator        TC-025  LLR-004.6 (M-4 source probe)
-    test_generation_is_deterministic_fixed_clock      TC-018  LLR-004.3 (determinism)
+    test_markdown_file_is_complete_no_truncation      TC-026  LLR-004.3 (G-9 complete)
+    test_changed_run_emits_diff_fenced_block          TC-027  LLR-004.3 (```diff cue)
+    test_html_export_complete_and_safe                TC-028  LLR-004.7 (G-9 HTML)
+    test_html_escapes_embedded_payload                TC-028  LLR-004.7 (html.escape)
+    test_html_filename_scheme_and_collision           TC-028  LLR-004.7 (M-5 / regex)
 
 Element-style thresholds are inline on each test.
 
@@ -28,6 +32,7 @@ never operator firmware.
 from __future__ import annotations
 
 import inspect
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -37,6 +42,7 @@ import pytest
 from s19_app.compare import (
     KIND_CHANGED,
     KIND_ONLY_A,
+    KIND_ONLY_B,
     ComparisonResult,
     DiffRun,
     DiffStats,
@@ -46,12 +52,18 @@ from s19_app.tui.services import diff_report_service
 from s19_app.tui.services.compare_service import ArtifactNote, ArtifactUsage
 from s19_app.tui.services.diff_report_service import (
     DIFF_REPORT_FILENAME_REGEX,
+    DIFF_REPORT_HTML_FILENAME_REGEX,
     DiffReportResult,
     generate_diff_report,
+    generate_diff_report_html,
     list_diff_reports,
 )
 
 FIXED_NOW = datetime(2026, 6, 11, 12, 0, 0, tzinfo=timezone.utc)
+
+#: External-resource patterns that a self-contained HTML report must NOT carry
+#: (LLR-004.7 / probe P-19 regime).
+_EXTERNAL_RESOURCE_RE = re.compile(r"<script|https?://|@import|src=|url\(")
 
 
 def _fixed_clock() -> datetime:
@@ -82,12 +94,14 @@ def _comparison(
     runs: Optional[List[DiffRun]] = None,
     stats: Optional[DiffStats] = None,
     with_notes: bool = True,
+    image_a: Optional[ImageRef] = None,
+    image_b: Optional[ImageRef] = None,
 ) -> ComparisonResult:
     """A self-contained, non-refused comparison fixture (no parse needed)."""
     runs = runs if runs is not None else [DiffRun(0x100, 0x104, KIND_CHANGED)]
     stats = stats if stats is not None else _stats(changed_runs=1, changed_bytes=4)
-    image_a = ImageRef(label="A.s19", path="/tmp/a.s19", source_kind="external")
-    image_b = ImageRef(label="B.s19", path="/tmp/b.s19", source_kind="external")
+    image_a = image_a or ImageRef(label="A.s19", path="/tmp/a.s19", source_kind="external")
+    image_b = image_b or ImageRef(label="B.s19", path="/tmp/b.s19", source_kind="external")
     notes = {"image_a": _usage(), "image_b": _usage()} if with_notes else {}
     return ComparisonResult(
         image_a=image_a,
@@ -102,6 +116,26 @@ def _comparison(
 
 def _mem(start: int, byte: int, length: int) -> Dict[int, int]:
     return {start + i: byte for i in range(length)}
+
+
+def _planted_diff(run_count: int) -> tuple:
+    """Build a comparison + two memory maps with ``run_count`` changed runs.
+
+    Each run is a distinct 4-byte changed block 0x100 apart; A and B differ at
+    every byte. Returns ``(comparison, mem_a, mem_b, run_starts)``.
+    """
+    runs: List[DiffRun] = []
+    mem_a: Dict[int, int] = {}
+    mem_b: Dict[int, int] = {}
+    starts: List[int] = []
+    for i in range(run_count):
+        start = 0x1000 + i * 0x100
+        starts.append(start)
+        runs.append(DiffRun(start, start + 4, KIND_CHANGED))
+        mem_a.update(_mem(start, 0xAA, 4))
+        mem_b.update(_mem(start, 0xBB, 4))
+    comparison = _comparison(runs=runs, stats=_stats(run_count, run_count * 4))
+    return comparison, mem_a, mem_b, starts
 
 
 # ---------------------------------------------------------------------------
@@ -202,7 +236,7 @@ def test_report_service_regex_unedited() -> None:
 
 
 # ---------------------------------------------------------------------------
-# TC-018 — LLR-004.3 — sections in order + caps + TRUNCATED + determinism
+# TC-018 — LLR-004.3 — sections in order + determinism
 # ---------------------------------------------------------------------------
 
 
@@ -246,58 +280,8 @@ def test_report_sections_present_in_order(tmp_path: Path) -> None:
     # run table exact rows
     assert "| 0x00000100 | 0x00000104 | 4 | changed | - |" in text
     assert "| 0x00000200 | 0x00000202 | 2 | only in A | - |" in text
-    # no caps fired → no TRUNCATED
+    # the written file is complete (G-9) → never a TRUNCATED marker
     assert "TRUNCATED" not in text
-
-
-def test_run_dump_cap_emits_truncated_marker(tmp_path: Path) -> None:
-    """More runs than the dump cap → a TRUNCATED marker with the exact omitted count.
-
-    Intent: LLR-004.3 — the run-dump cap fires an explicit marker, never a
-    silent cut. Threshold: marker present; stated omitted count == actual
-    omission (3 runs, cap 1 → 2 omitted).
-    """
-    runs = [
-        DiffRun(0x100, 0x104, KIND_CHANGED),
-        DiffRun(0x200, 0x204, KIND_CHANGED),
-        DiffRun(0x300, 0x304, KIND_CHANGED),
-    ]
-    comparison = _comparison(runs=runs, stats=_stats(3, 12))
-    result = generate_diff_report(
-        comparison,
-        mem_map_a=_mem(0x100, 1, 4) | _mem(0x200, 1, 4) | _mem(0x300, 1, 4),
-        mem_map_b=_mem(0x100, 2, 4) | _mem(0x200, 2, 4) | _mem(0x300, 2, 4),
-        project_dir=tmp_path,
-        run_dump_cap=1,
-        now_fn=_fixed_clock,
-    )
-    text = result.path.read_text(encoding="utf-8")
-
-    assert "> TRUNCATED: 2 of 3 run hex windows omitted (cap: 1 runs per report)." in text
-    # the run TABLE still lists all 3 runs (only the windows are capped)
-    assert text.count(" | changed | - |") == 3
-
-
-def test_byte_budget_emits_truncated_marker(tmp_path: Path) -> None:
-    """A tiny byte budget → a hex-window TRUNCATED marker with the omitted count.
-
-    Intent: LLR-004.3 — the whole-document byte budget fires an explicit
-    block-omission marker. Threshold: marker present stating ≥ 1 omitted block.
-    """
-    runs = [DiffRun(0x100, 0x104, KIND_CHANGED)]
-    comparison = _comparison(runs=runs, stats=_stats(1, 4))
-    result = generate_diff_report(
-        comparison,
-        mem_map_a=_mem(0x100, 1, 4),
-        mem_map_b=_mem(0x100, 2, 4),
-        project_dir=tmp_path,
-        budget_limit=1,  # forces every hex block to be omitted
-        now_fn=_fixed_clock,
-    )
-    text = result.path.read_text(encoding="utf-8")
-
-    assert "> TRUNCATED:" in text
-    assert "hex window block(s) omitted (report size cap: 1 bytes)." in text
 
 
 def test_generation_is_deterministic_fixed_clock(tmp_path: Path) -> None:
@@ -320,6 +304,74 @@ def test_generation_is_deterministic_fixed_clock(tmp_path: Path) -> None:
         comparison, mem_map_a=mem_a, mem_map_b=mem_b, project_dir=b, now_fn=_fixed_clock
     )
     assert r1.path.read_text(encoding="utf-8") == r2.path.read_text(encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# TC-026 — LLR-004.3 — complete export (G-9): every run, 0 TRUNCATED
+# ---------------------------------------------------------------------------
+
+
+def test_markdown_file_is_complete_no_truncation(tmp_path: Path) -> None:
+    """A large planted diff → every run present, 0 TRUNCATED markers (G-9).
+
+    Intent: LLR-004.3 / G-9 — the WRITTEN file is complete: no run cap, no byte
+    truncation, no marker. Threshold: 0 ``TRUNCATED`` occurrences; every
+    planted run's hex-window heading is present (200 runs).
+    """
+    comparison, mem_a, mem_b, starts = _planted_diff(200)
+    result = generate_diff_report(
+        comparison,
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert text.count("TRUNCATED") == 0
+    # every run's window section heading is present (complete, uncapped)
+    for start in starts:
+        assert f"### Run 0x{start:08X}" in text
+    # the run table lists all 200 runs
+    assert text.count(" | changed | - |") == 200
+
+
+# ---------------------------------------------------------------------------
+# TC-027 — LLR-004.3 — changed run renders as a fenced ```diff block
+# ---------------------------------------------------------------------------
+
+
+def test_changed_run_emits_diff_fenced_block(tmp_path: Path) -> None:
+    """A changed run emits a ```diff block: A bytes as `-`, B bytes as `+`.
+
+    Intent: LLR-004.3 — the format-appropriate Markdown cue. Threshold: a
+    ```diff fence exists; inside it ≥ 1 ``-`` line (image A byte 0xAA) and ≥ 1
+    ``+`` line (image B byte 0xBB).
+    """
+    comparison = _comparison(
+        runs=[DiffRun(0x100, 0x104, KIND_CHANGED)],
+        stats=_stats(1, 4),
+    )
+    result = generate_diff_report(
+        comparison,
+        mem_map_a=_mem(0x100, 0xAA, 4),
+        mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert "```diff" in text
+    # carve out the diff fence body and assert -/+ lines with the image bytes
+    fence_start = text.index("```diff")
+    fence_body = text[fence_start + len("```diff"):]
+    fence_body = fence_body[: fence_body.index("```")]
+    minus_lines = [ln for ln in fence_body.splitlines() if ln.startswith("-")]
+    plus_lines = [ln for ln in fence_body.splitlines() if ln.startswith("+")]
+    assert len(minus_lines) >= 1
+    assert len(plus_lines) >= 1
+    assert any("AA" in ln for ln in minus_lines)  # image A byte
+    assert any("BB" in ln for ln in plus_lines)   # image B byte
 
 
 # ---------------------------------------------------------------------------
@@ -495,3 +547,101 @@ def test_no_sanitize_project_name_in_validator() -> None:
     """
     source = inspect.getsource(diff_report_service._resolve_destination)
     assert "sanitize_project_name" not in source
+
+
+# ---------------------------------------------------------------------------
+# TC-028 — LLR-004.7 — self-contained HTML export (G-9): complete + safe
+# ---------------------------------------------------------------------------
+
+
+def test_html_export_complete_and_safe(tmp_path: Path) -> None:
+    """A large planted diff → complete, self-contained, safe HTML (LLR-004.7).
+
+    Intent: LLR-004.7 / G-9 — the HTML is complete (0 TRUNCATED, every run
+    present), self-contained (0 ``<script>``, 0 external-resource matches), and
+    colour-cued (≥ 1 inline-CSS colour per run kind). Threshold encoded inline.
+    """
+    comparison, mem_a, mem_b, starts = _planted_diff(120)
+    # mix in an only-A and only-B run so all three colour cues appear
+    comparison.runs.append(DiffRun(0x9000, 0x9004, KIND_ONLY_A))
+    comparison.runs.append(DiffRun(0xA000, 0xA004, KIND_ONLY_B))
+    mem_a.update(_mem(0x9000, 0xAA, 4))
+    mem_b.update(_mem(0xA000, 0xBB, 4))
+
+    result = generate_diff_report_html(
+        comparison,
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    # completeness (G-9)
+    assert text.count("TRUNCATED") == 0
+    for start in starts:
+        assert f"0x{start:08X}" in text
+    # self-contained / no injection surface
+    assert text.count("<script") == 0
+    assert _EXTERNAL_RESOURCE_RE.search(text) is None
+    # colour cues for the three run kinds (inline CSS)
+    assert "#b58900" in text   # changed
+    assert "#dc322f" in text   # only-A
+    assert "#268bd2" in text   # only-B
+    assert "style=" in text
+    # the file actually ends in </html> (self-contained document)
+    assert text.rstrip().endswith("</html>")
+    assert DIFF_REPORT_HTML_FILENAME_REGEX.match(result.path.name)
+
+
+def test_html_escapes_embedded_payload(tmp_path: Path) -> None:
+    """An escapable payload in a path round-trips as its html.escape form.
+
+    Intent: LLR-004.7 — every embedded value is ``html.escape``-d. Threshold:
+    a path containing ``<script>`` & ``"`` appears escaped (``&lt;``/``&amp;``/
+    ``&quot;``), NOT raw; 0 ``<script`` tags; 0 external-resource matches.
+    """
+    payload = '<script>alert("x")</script>&'
+    image_a = ImageRef(label=payload, path=payload, source_kind="external")
+    comparison = _comparison(image_a=image_a)
+
+    result = generate_diff_report_html(
+        comparison,
+        mem_map_a=_mem(0x100, 1, 4),
+        mem_map_b=_mem(0x100, 2, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert payload not in text          # the raw payload never appears
+    assert "&lt;script&gt;" in text     # escaped form present
+    assert "&amp;" in text
+    assert "&quot;" in text
+    assert text.count("<script") == 0   # no live script tag
+    assert _EXTERNAL_RESOURCE_RE.search(text) is None
+
+
+def test_html_filename_scheme_and_collision(tmp_path: Path) -> None:
+    """HTML filename matches its own regex; a same-second collision → -01 (M-5).
+
+    Intent: LLR-004.7 — own ``.html`` filename scheme + collision discipline,
+    shared regex untouched. Threshold: base + ``-01`` siblings, both matching
+    DIFF_REPORT_HTML_FILENAME_REGEX; the Markdown regex does NOT match.
+    """
+    mem_a = _mem(0x100, 1, 4)
+    mem_b = _mem(0x100, 2, 4)
+    first = generate_diff_report_html(
+        _comparison(), mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, now_fn=_fixed_clock,
+    )
+    second = generate_diff_report_html(
+        _comparison(), mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, now_fn=_fixed_clock,
+    )
+
+    assert first.path.name == "20260611T120000Z-diff-report.html"
+    assert second.path.name == "20260611T120000Z-01-diff-report.html"
+    assert DIFF_REPORT_HTML_FILENAME_REGEX.match(first.path.name)
+    assert DIFF_REPORT_HTML_FILENAME_REGEX.match(second.path.name)
+    assert not DIFF_REPORT_FILENAME_REGEX.match(first.path.name)
