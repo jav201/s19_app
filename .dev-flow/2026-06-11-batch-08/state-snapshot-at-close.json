@@ -1,0 +1,133 @@
+{
+    "project": "s19_app",
+    "batch_id": "2026-06-11-batch-08",
+    "batch_objective": "US-007: placeholder operation classes for special operations on loaded HEX/S19 files (e.g. CRC, extract, split per memory segment) — wired into the code now so each can later be filled with real requirements without re-plumbing. Operator's working contract: input = the loaded HEX/S19 file, output = identical to input (identity passthrough); explicitly open to a better pattern proposed at Phase 1. One placeholder will receive real requirements in a follow-up batch/iteration. Scope = this story ONLY (operator decision at init): US-006 hex-compare stays queued; batch-07 A-7 candidates (manifest writer, HEX emitter, E2E pilot, knee test) remain queued.",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {
+        "1": 3,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1
+    },
+    "artifacts": {
+        "1": ".dev-flow/2026-06-11-batch-08/01-requirements.md",
+        "2": ".dev-flow/2026-06-11-batch-08/02-review.md",
+        "3": ".dev-flow/2026-06-11-batch-08/03-increments/",
+        "4": ".dev-flow/2026-06-11-batch-08/04-validation.md",
+        "5": ".dev-flow/2026-06-11-batch-08/05-postmortem.md",
+        "6": ".dev-flow/2026-06-11-batch-08/06-docs/"
+    },
+    "branch": "claude/competent-clarke-1e8940 (worktree; branched off main post-PR-#12)",
+    "previous_batches": [
+        "2026-05-05-batch-01",
+        "2026-05-20-batch-02",
+        "2026-05-21-batch-03",
+        "2026-05-21-batch-04",
+        "2026-05-26-batch-05",
+        "2026-06-09-batch-06",
+        "2026-06-10-batch-07"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. Living docs (REQUIREMENTS.md, tests/, docs/diagrams/) kept current. On batch advance, the closing batch's state.json is snapshotted into its folder as state-snapshot-at-close.json before the shared state.json is trimmed to the new batch.",
+    "living_documentation": {
+        "requirements": "REQUIREMENTS.md (repo root)",
+        "tests": "tests/",
+        "diagrams": "docs/diagrams/"
+    },
+    "decisions_log": [
+        {
+            "phase": 0,
+            "date": "2026-06-11",
+            "decision": "batch-07-closed-and-synced",
+            "notes": "Batch-07 (US-002..US-005 + CI-1) fully closed: 6 phases, 10 increments, PR #12 merged (ec453a2). Obsidian sync VERIFIED rather than re-executed: vault folder ...\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-10-batch-07 already held the full artifact set + README (written 2026-06-11 08:30); orchestrator diff-compared every artifact vs merged main — all identical modulo LF/CRLF; only the obsidian_synced flag had never been flipped. Flag set, state snapshotted to .dev-flow/2026-06-10-batch-07/state-snapshot-at-close.json. Full batch-07 history lives in that snapshot."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-11",
+            "decision": "batch-08-created",
+            "notes": "Operator ran /dev-flow-init-en with the US-007 placeholder-operations story. Operator decisions at init: (1) sync batch-07 first, then open batch-08; (2) batch scope = US-007 ONLY — US-006 (hex compare mode, persistent memory project_us006_hex_compare_mode.md) stays queued, as do the batch-07 A-7 candidates (manifest writer, HEX emitter, E2E pilot, A-9 knee test). Story seeded into 01-requirements.md §2.6 with the numbering note (US-006 reserved -> this story is US-007) and the operator's explicit invitation to propose a better placeholder pattern than identity passthrough at Phase 1. Scaffolded .dev-flow/2026-06-11-batch-08/ per project convention from req-template-en.md (now carrying 4 generations of preventive controls) + traceability-matrix-en.md."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-11",
+            "decision": "awaiting-gate",
+            "notes": "Phase 1 wave 1 executed: architect (HLR/LLR derivation + design-alternatives evaluation the operator requested) + qa-reviewer (measured validation groundwork) in parallel. Result: 1 US / 3 HLR / 9 LLR / TC-001..009 in NEW tests/test_operations.py. Design recommendation C-1: Operation ABC + OperationResult envelope (closed status domain placeholder/ok/error, injectable now_fn mirroring changes/apply.py:217, deterministic to_dict modeled on ChangeSummary) + 3 placeholder classes (crc/extract/split_by_segment) in NEW s19_app/tui/operations/ + static code-driven registry + headless run_operation seam in NEW services/operation_service.py (check_runner precedent change_service.py:342) — literal identity functions REJECTED (real CRC changes the return shape -> guaranteed re-plumbing; fails the story's benefit clause). C-2 OperationResult contract w/ producer/consumer table. Probe ledger P1-P6 all EXECUTED w/ pre-states (probe self-test rule): P4 = qa MEASURED S19 emit byte-identity infeasible (9544->10774 bytes, mem_map/ranges equal) -> identity must be semantic, grounds C-3/G-2; P6 = collection baseline 722. Orchestrator integrated qa findings (P4/P6 into ledger, stale 792 figure replaced w/ measured 722 reconciliation criterion, pytest-unpinned note). Architect shall/should self-check: 0 'should' in statements. 4 gate-confirmable items (G-1 invocation surface service-only; G-2 identity semantics in-memory; G-3 package location tui/operations/; G-4 placeholder set = the 3 story examples) + R-4 six-new-files vs 5-file cap -> Phase-3 split into 2 increments. Awaiting gate + operator answers."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-11",
+            "decision": "iteration-2-completed",
+            "notes": "PHASE 1 APPROVED at gate-2 ('Aprobado'). G-5 implicitly accepted (keybound modal, no contest — annotated in §6.3). Final: 4 HLR / 13 LLR / 12 TC / probes P1-P10 executed / §6.4 audit 8 rows. Advanced to Phase 2 cross-review. — Iteration-2 record: Gate-1 operator decisions: (1) skeleton boundary CONFIRMED — full plumbing, ZERO logic in the 3 placeholders (operator rationale recorded: operations need proper definition before implementation; this batch builds only the control/log plumbing around them); (2) G-1 REVERSED — TUI view (operation selection + result on hex viewer) IS in this batch; (3) G-2/G-3/G-4 implicitly accepted. Architect iteration 2 applied: doc now 4 HLR / 13 LLR / 12 TC (TC-010..012 appended, no renumbering; NEW pilot file tests/test_tui_operations_view.py). HLR-004 = keybound modal OperationsScreen (SelectVariantScreen precedent screens.py:208; key 'x' free per probe P9; rail stays at 8 per batch-07 LLR-008.2), execution SYNCHRONOUS on UI thread (placeholders do no I/O — cited vs both worker precedents; migration to execute_scope worker = fill-in-batch requirement, NEW risk R-6), result = status/notes + render_hex_view_text(hexview.py:324) of output.mem_map, TC-012 pilot equality render(result)==render(input) is the end-to-end identity demo. C-2 contract re-opened per contract-touch rule: TUI consumer row added, field-set re-check 7=7=7=7 recorded in audit row D-4. Probes P7-P10 executed w/ pre-states (incl. P8 .execute( ban w/ synthetic positive control, P10 pilot file exit 4). §6.4 audit table: 8 rows D-1..D-8, body-first. File budget recount: ~10 files (7 new + 3 modified) -> Phase-3 = 3 increments each <=5 files. NEW gate-confirmable G-5: modal vs 9th rail screen (modal recommended). Self-check: 0 'should' in statements. Orchestrator independently spot-verified: HLR-004/G-5/D-1..D-8 present; citations screens.py:208, rail.py:78, hexview.py:324 exact. Awaiting gate-2."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-11",
+            "decision": "awaiting-gate-blockers-found",
+            "notes": "Phase 2 executed: architect + qa-reviewer + security-reviewer in parallel -> 02-review.md. Consolidated: 2 blockers (B-1 nonexistent .hex fixture in LLR-001.4 AC — found independently by architect AND qa, batch-05 'looks like it should exist' class; B-2 TC-008 reverse-import probe under-covers two-dot relatives/from-import/indented forms + out-of-regime positive control — sole verification of LLR-003.2, probe self-test blocker class b), 5 majors (M-1 execute/now_fn signature contradiction making TC-001 unpassable, B-4 class caught at review; M-2 TC-012 render-equality vacuous-or-unassertable, needs pinned render call shape; M-3 pytest 8.x asserted vs measured 9.0.3; M-4 title absent from parent HLR-001 enumeration; M-5 _flush citation 85->70), 10 minors (incl. security advisories F-S-01 no-I/O inspection probe, F-S-02 disclosure assertion into TC-001 threshold, F-S-04 R-6 confirmation-hardening clause). CLEAN: 0 should-in-statements, C-2 identity 7=7=7=7, audit table 8/8 mechanical pass, 30+ anchors exact, probe ledger P1-P10 ALL reproduce on today's tree (independently re-run by 2 reviewers), assertion arithmetic sound 10/10 formulas, coverage 13/13, no SVG-snapshot TC. SECURITY PASS: no blockers/majors — hex render hard-bounded by MAX_HEX_BYTES truncation, no persistence path, no new input-trust surface, batch-07 F-S-06 fix intact, modal list-selection-only, 0 new deps. Blockers force Phase-1 iteration per dev-flow rule; fixes are verification-substance only, requirement-set shape (4 HLR/13 LLR/12 TC) unchanged. Awaiting gate."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-11",
+            "decision": "iteration-3-completed",
+            "notes": "PHASE 2 APPROVED at re-confirmation gate ('apruebo'). 0 open findings. Advancing to Phase 3: increments I1 (operations package: model/placeholders/registry/__init__ + tests/test_operations.py TC-001..006+009, 5 files at cap), I2 (operation_service.py + TC-007 into test_operations.py + conditional services/__init__), I3 (OperationsScreen: screens.py/app.py/styles.tcss + tests/test_tui_operations_view.py TC-010..012). Local commit per increment. — Iteration-3 record: Operator gate decision: 'Iterar' with recommended B-1 resolution (inline-HEX/tmp_path idiom, no committed fixture). Architect applied the FULL 02-review.md register to 01-requirements.md (364->388 lines): 17/17 findings CLOSED (folds: m-8->M-2, m-10->B-2). Load-bearing closures orchestrator-verified independently: B-2 widened probe re-executed by orchestrator — hits all 3 violation forms (two-dot relative / module-object / indented textual), does NOT match legitimate intra-package from .model import, 0 hits on negative control; B-1 tmp_path idiom + test_hexfile.py:16-21 citation present; M-1 execute(loaded, *, now_fn) at parent+LLR+forwarding (3 hits); M-3 measured 9.0.3 x4; m-5 N=11/733 pinned; §6.4 new series E-1..E-15 (15 rows, D-rows untouched); C-2 contract-touch re-run #2 recorded (E-3, 7=7=7=7, signature adds parameter not field); 0 'should' in statements; NEW probe P11 (filesystem-call inspection) executed w/ positive control 7 hits on changes/io.py. Housekeeping: ~35 pre-existing double-encoded em-dashes from iteration-1 text flagged for optional Phase-6 cleanup (cosmetic). Re-confirmation appended to 02-review.md: 0 open findings. Awaiting Phase-2 re-confirmation gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-11",
+            "decision": "increment-I1-awaiting-gate",
+            "notes": "I1 implemented + orchestrator-verified. 5 files at cap (operations/__init__ 29L, model.py 261L, placeholders.py 291L, registry.py 75L, tests/test_operations.py 212L). TC-001..006+009 all pass; thresholds met incl. m-7 disclosure assertions (mem_map not in to_dict output, key set == {path,file_type,byte_count}); B-1 idiom honored (HEX via tmp_path inline records, no committed fixture); M-1 signature execute(loaded,*,now_fn) implemented. Results: new suite 7 passed (orchestrator re-ran independently 0.40s); engine guard 23 passed; lean 677 passed/0 failed/29 skipped/3 xfailed — ledger EXACT 670+7=677; collection 729 (orchestrator re-verified) — ledger EXACT 722+7=729; no-textual probe 0 hits; widened reverse-import probe 0 hits. 5 judgment calls flagged none spec-breaking (frozenset STATUS_DOMAIN, describe abstract, shared 15-assertion helper, literal status string, bash rg for probes). Local commit 0b1999e. Packet: 03-increments/increment-I1.md. Awaiting increment gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-11",
+            "decision": "C-7-per-operation-requirements-convention-and-I1-approved",
+            "notes": "At the I1 gate the operator established a NEW cross-batch convention (recorded as C-7 in 01-requirements.md §6.2 + persistent memory project_operations_module_conventions.md): each operation's REAL behavior gets its OWN HLR/LLR set, SEPARATE from app requirements, co-located with the module at s19_app/tui/operations/requirements/REQ-<operation_id>.md (created by that operation's fill-in batch); app-level docs (REQUIREMENTS.md, batch 01-requirements) carry REFERENCES only. Operator intent: operations may become ad-hoc functions reused in other applications — requirements travel with the module. Two operator answers at this gate: (1) co-located location CONFIRMED; (2) LoadedFile input-contract decoupling DEFERRED to the first fill-in (R-2 updated): the first real operation's local requirements define the neutral input contract and land the adaptation once. No LLR statement/threshold changed (informative §6.2/§6.3 additions only — no audit row required); I1 code unaffected (package already app-import-free by probe). Operator follow-up: 'Si choca con lo actual, relégalo al siguiente batch' — orchestrator verified NO clash (convention is prospective only; the one potential clash, LoadedFile decoupling, was already deferred). I1 then APPROVED ('Apruebo'). I2 started: services/operation_service.py NEW (run_operation w/ injectable registry seam per check_runner precedent, now_fn forwarding, KeyError propagation) + TC-007 appended to tests/test_operations.py (+ conditional services/__init__.py)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-11",
+            "decision": "increment-I2-awaiting-gate",
+            "notes": "I2 APPROVED ('apruebo'). I3 started — final increment: OperationsScreen modal (screens.py, SelectVariantScreen pattern), key 'x' + action routing (app.py), modal CSS (s19_app/tui/styles.tcss if needed), tests/test_tui_operations_view.py NEW (TC-010..012 pilots). Record: I2 implemented + orchestrator-verified. 2 files (operation_service.py NEW 91L w/ module-level injectable operation_resolver seam mirroring check_runner change_service.py:342, now_fn forwarded unchanged, KeyError propagation; tests/test_operations.py 212->264L, TC-007 appended w/ 8 assertions incl. forwarding observation). Conditional services/__init__.py NOT edited (1-line docstring, zero re-exports — adding one would invent a convention; m-4 conditional resolved NO). Results: suite 8 passed (orchestrator re-ran independently); services guard 21 passed; lean 678/0 — ledger EXACT 677+1=678; collection 730 (orchestrator re-verified) — EXACT 729+1=730; probes no-textual/reverse-import/filesystem all 0 hits. 0 deviations (one extra assertion beyond the 5-assertion floor to observe now_fn forwarding, flagged). Local commit 601b576. Packet: increment-I2.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-11",
+            "decision": "increment-I3-awaiting-gate-phase-3-complete",
+            "notes": "I3 implemented — PHASE 3 COMPLETE (all 3 increments I1/I2/I3). 4 files (screens.py +OperationsScreen modal w/ stable widget ids, registry-order listing, execution via run_operation ONLY, result status/notes + hex render with the LLR-004.3 PINNED arg tuple; app.py +Binding('x','operations_view',show=False) + guarded action, orchestration-only; styles.tcss modal CSS; tests/test_tui_operations_view.py NEW TC-010..012 pilots incl. non-vacuous TC-012 widget-.plain-vs-independent-baseline). Software-dev agent terminated mid-lean-run; orchestrator ran ALL final verifications itself: pilots 3 passed; test_operations 8 passed; TUI stack guard 24 passed (incl. AST parse guard); lean 681 passed/0 failed — ledger EXACT 678+3=681; collection 733 — EXACT 730+3 AND equals §5.3 pinned 722+N(11)=733; rail.py diff EMPTY (8 items preserved); probes no-textual/reverse-import/P11 filesystem all 0 hits on operations+service. Ledger chain exact at every gate: 722->729->730->733. Local commit 34fc43a (3 increment commits on claude/competent-clarke-1e8940). Packet: increment-I3.md. Awaiting I3 gate = Phase-3 completion gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-11",
+            "decision": "started-under-standing-approval",
+            "notes": "Operator: 'Do the suggested tasks. Once finished if without issues, approve and continue.' — I3/Phase-3 APPROVED under this standing directive; orchestrator proceeds through phases 4-6 autonomously, STOPPING if any issue surfaces. Phase 4 run-ownership per batch-07 A-6: qa-reviewer executes the per-LLR TC matrix (TC-001..012) + all inspections + fills 04-validation.md; orchestrator runs lean+full ONCE (no duplicate full-suite runs)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-11",
+            "decision": "completed-pass-with-notes-approved-under-standing-directive",
+            "notes": "Phase 4 PASS-WITH-NOTES. qa half: 11/11 TC nodes pass individually (0 skips), all 9 inspections PASS (TC-008 widened probe 0 hits; P11 0 hits w/ positive control 7; pinned render args EXACT at screens.py:628-635; sync execution 0 @work on HLR-004 paths; rail diff EMPTY; app.py orchestration-only; registry-order + stable ids; C-2 7-fields + disclosure in code; parse-guard 1 passed), every LLR threshold formula re-counted from test SOURCE and met/exceeded. Orchestrator half: lean 681/0 (I3 gate) + FULL suite 701 passed/0 failed/29 skipped/3 xfailed in 587.6s — reconciliation EXACT 701+29+3=733 collected, 681+20 slow=701. File budget: 10 files +1532/-0 purely additive, conditional __init__ not needed. NOTES: DEV-1 (3 pilot node ids drift from §4-pinned names — spec ids collect nothing; functions map 1:1 and pass) and DEV-2 (LLR-004.2 says dismiss-callback invokes run_operation; built+verified mechanism is modal-internal execution, normative core fully verified) -> BOTH assigned to Phase 6 doc reconciliation (batch-07 DEV-8 precedent); N-1 excess assertions, N-2 guard placement, N-3 cosmetic load_buttons id reuse (hygiene candidate, future batch). Gate disposition recorded in 04-validation.md under the operator standing approval; Phase 4 APPROVED, advancing to Phase 5."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-11",
+            "decision": "completed-approved-under-standing-directive",
+            "notes": "Phase 5 merged (architect process half + qa validation half) -> 05-postmortem.md. One-line takeaway: b08 = executed checks must cover the full citation surface (AC artifacts) and run in the target's REGIME; spec pins whose referents are created in Phase 3 (node ids, UI mechanisms) need first verification at the creating increment's gate. Wins: probe self-test caught B-2 (class moved one generation deeper as designed); 4 independent reviewer convergences (strongest depth signal recorded); M-1 = batch-07 B-4 class caught at review pre-implementation (left-shift); P4 measurement prevented an unachievable AC from entering the spec; contract-touch exercised twice w/ recorded re-runs; basis-error class structurally killed (P6 measured baseline + pinned N + dual closure). Root causes: B-1 = rule-surface gap (ACs not enumerated by symbol-citation rule); B-2 = control regime implicit; DEV-1/DEV-2 = forward references unverifiable at Phase 2, checkable at increment gates. Scope: both mid-stream injections (G-1 reversal, C-7 convention) absorbed through the machinery, no uncontrolled drift. Actions A-1..A-8 (A-1/A-2 template extensions deferred to next batch Phase 0 for explicit operator confirmation per batch-06/07 precedent; A-5 = this batch Phase 6 DEV-1/DEV-2 supersessions; A-7 next-batch queue incl. first operation fill-in per C-7). V-1..V-7 validation recommendations. Phase 5 APPROVED under standing directive (analysis, no open defects); advancing to Phase 6."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-11",
+            "decision": "completed-batch-closed-under-standing-directive",
+            "notes": "Phase 6 complete, 3 parallel agents on disjoint files. (A) REQUIREMENTS.md: NEW §14 Operation Framework w/ R-OPS-001 (contract+placeholders identity), R-OPS-002 (registry+service+headless bans), R-OPS-003 (OperationsScreen) — 27 pointers grep-verified, purely additive, R-ID count 93->96; C-7 convention documented (requirements/ dir NOT created — fill-in batches create it); 01-requirements.md DEV-1 amended in 5 places + DEV-2 mechanism clause reworded (8 inline supersession audit notes), amended node ids run individually 3/3 pass; A-5 mojibake cleanup DONE byte-level (38 sequences -> 0, em-dash 238->273 exact reconciliation, strict UTF-8 decode verified). (B) 06-docs: traceability-matrix.md (US-007->4 HLR->13 LLR->12 TC->file:line, 54 anchors grep-verified at HEAD 34fc43a, DEV-1/2 recorded RESOLVED, N-3 carried, sign-off filled), functionality.md (stakeholder walkthrough w/ extension-point table), diagrams/operations-flow.md (Mermaid + guard-rails table). (C) executive-summary.md (~1.5pp EN, sourced numbers only, 2-blockers-pre-implementation as the quality story). Agent-B reported @work baseline line drift (app.py:1486->1489, :5412->:5458 from this batch's additive edits) — informative, 04-validation already used current values. Orchestrator spot-verified: 3 R-OPS, 0 mojibake, 8 supersession notes, all 06-docs files present. Phase 6 APPROVED under standing directive; batch-08 CLOSED; state -> awaiting-sync. Proceeding: close commit + push + PR (operator reviews/merges, then /dev-flow-sync-en). A-1/A-2 template adoptions deferred to next batch Phase 0 for explicit operator confirmation."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-11",
+            "decision": "merged-and-synced-to-obsidian",
+            "notes": "Operator: 'haz revisión y merge del PR'. Orchestrator code review of PR #13 (1,532 additive lines): 0 critical issues, 3 non-blocking suggestions (KeyError scope in _execute_selected for the fill-in batch; N-3 load_buttons id reuse already carried; status validation construction-only) — verdict Approve. CI green (tui-ci pass 4m48s). MERGED 2026-06-12T02:23Z as merge commit a0aa16d (batch convention). Synced to G:\\...\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-11-batch-08 (01/02/04/05 + 06-docs recursive + README index; 03-increments excluded per convention). Operator chose OPTION B for next batch: US-006 hex compare mode -> batch-09."
+        }
+    ],
+    "obsidian_synced": true,
+    "created_at": "2026-06-11T00:00:00Z"
+}
