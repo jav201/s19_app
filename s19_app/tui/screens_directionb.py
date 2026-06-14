@@ -47,7 +47,7 @@ from typing import List, Optional, Sequence, Tuple
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
-from textual.widgets import Button, DataTable, Input, Label, Static
+from textual.widgets import Button, DataTable, Input, Label, Select, Static
 
 
 class EmptyStatePanel(Static):
@@ -847,17 +847,25 @@ class PatchEditorPanel(ScrollableContainer):
 
 
 class AbDiffPanel(Container):
-    """Static three-column placeholder for the A2B Firmware Diff screen.
+    """Inline A↔B image-diff panel for the A2B Firmware Diff screen.
 
     Summary:
-        Lays out the Direction B A2B Diff as a static three-column shell —
-        a range-list column, a hex-A column and a hex-B column — each filled
-        with a small fixed set of constant, clearly-labelled sample hex rows
-        and a visible "PLACEHOLDER" caption (LLR-012.3). There is no control
-        to load a second ("B") firmware file and no diff computation: the
-        rows are module-level constants, not data from any ``LoadedFile`` or
-        any diff engine (LLR-012.3 / LLR-012.4). A visible notice states
-        that diff computation and the second-file load path are deferred.
+        Completes the Direction B A2B Diff surface (HLR-005): an INLINE
+        image-pair selection row (G-6 — not a modal), a status line, and a
+        three-column result area (run list + bounded hex windows of image A
+        and image B). The panel is presentational only: it emits
+        :class:`CompareRequested` / :class:`ReportRequested` messages and
+        renders the :class:`ComparisonResult` the app hands back via
+        :meth:`render_comparison`. It computes no run classification, no
+        coverage count, and no report content itself — every comparison goes
+        through ``compare_service`` and every report through
+        ``diff_report_service`` (LLR-005.1). The static placeholder constants
+        are gone (LLR-005.2).
+
+        The selection row prefills two ``Select`` dropdowns from the active
+        project's ``ProjectVariantSet`` (set via :meth:`set_variants`), plus
+        two ``Input``s for external file paths, a Compare button, a no-project
+        destination ``Input`` and a Report button.
 
     Args:
         None
@@ -866,12 +874,23 @@ class AbDiffPanel(Container):
         None
 
     Data Flow:
-        - Static composition only; reads no engine state and no
-          ``LoadedFile``. All hex rows are constant placeholder text.
+        - Operator picks sources -> Compare button -> :class:`CompareRequested`
+          -> ``app.py`` calls ``compare_service.compare_images`` and feeds the
+          result back via :meth:`render_comparison` (or :meth:`set_status` on
+          refusal, LLR-005.3).
+        - Operator picks a run in the range list -> the selected run's hex
+          windows render in the A / B columns (LLR-005.2).
+        - Report button -> :class:`ReportRequested` -> ``app.py`` calls the
+          diff-report generators and surfaces the written path(s) or the
+          refusal diagnostic via :meth:`set_status` (LLR-005.4).
 
     Dependencies:
+        Uses:
+            - ``hexview.render_hex_view`` (plain hex window renderer)
         Used by:
             - ``S19TuiApp._compose_screen_diff``
+            - ``S19TuiApp.on_ab_diff_panel_compare_requested``
+            - ``S19TuiApp.on_ab_diff_panel_report_requested``
 
     Example:
         >>> panel = AbDiffPanel()
@@ -879,61 +898,433 @@ class AbDiffPanel(Container):
         'ab_diff_panel'
     """
 
-    DEFERRAL_TEXT = (
-        "PLACEHOLDER - diff computation and the second-file (B) load path "
-        "are deferred to a follow-up batch. The three columns below show "
-        "static sample rows, not real diff output."
-    )
+    #: Relocated DISPLAY caps (G-9 / LLR-005.2). These bound only what the
+    #: PANEL renders — never the persisted report files (which stay complete,
+    #: I3). They mirror the batch-07 report caps
+    #: (``report_service.REPORT_MAX_REGIONS_PER_VARIANT`` = 128,
+    #: ``report_service.REPORT_MAX_TOTAL_BYTES`` = 2_097_152).
+    DISPLAY_MAX_RUNS = 128
+    DISPLAY_MAX_TOTAL_BYTES = 2_097_152
 
-    _RANGE_LIST_PLACEHOLDER = (
-        "Ranges (PLACEHOLDER)\n"
-        "0x00000000-0x0000000F\n"
-        "0x00000010-0x0000001F\n"
-        "0x00000020-0x0000002F"
-    )
-    _HEX_A_PLACEHOLDER = (
-        "Hex A (PLACEHOLDER)\n"
-        "00000000  DE AD BE EF 00 11 22 33\n"
-        "00000010  44 55 66 77 88 99 AA BB\n"
-        "00000020  CC DD EE FF 01 02 03 04"
-    )
-    _HEX_B_PLACEHOLDER = (
-        "Hex B (PLACEHOLDER)\n"
-        "00000000  DE AD BE EF 00 11 22 33\n"
-        "00000010  44 55 66 77 88 99 A0 BB\n"
-        "00000020  CC DD EE FF 01 02 03 04"
-    )
+    #: Per-run hex-window context (± bytes) for the on-screen windows.
+    DISPLAY_CONTEXT_BYTES = 16
+
+    #: Rich colour per diff classification token (the panel's colour cue,
+    #: LLR-005.2). ``changed`` / ``only_a`` / ``only_b`` are visually distinct.
+    _KIND_MARKUP = {
+        "changed": "#d9a35b",  # amber  — present in both, byte differs
+        "only_a": "#e06c75",   # red    — mapped in A only
+        "only_b": "#4ec9d4",   # cyan   — mapped in B only
+    }
+
+    _KIND_LABEL = {
+        "changed": "changed",
+        "only_a": "only A",
+        "only_b": "only B",
+    }
+
+    #: ``Select`` sentinel for "use the external-path input instead".
+    _EXTERNAL_OPTION = "__external__"
+
+    class CompareRequested(Message):
+        """The operator asked to compare two images (LLR-005.1).
+
+        Summary:
+            Posted by the Compare button. Carries the raw selection for each
+            side — the chosen variant id (or the external sentinel) and the
+            external-path input text — leaving all resolution, parsing and
+            classification to ``app.py`` + ``compare_service`` (the panel
+            performs none).
+
+        Args:
+            variant_a (Optional[str]): The variant id chosen for image A, or
+                ``None`` when the external path is to be used.
+            path_a (str): The external-path input text for image A.
+            variant_b (Optional[str]): The variant id chosen for image B, or
+                ``None`` when the external path is to be used.
+            path_b (str): The external-path input text for image B.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_ab_diff_panel_compare_requested``
+        """
+
+        def __init__(
+            self,
+            variant_a: Optional[str],
+            path_a: str,
+            variant_b: Optional[str],
+            path_b: str,
+        ) -> None:
+            super().__init__()
+            self.variant_a = variant_a
+            self.path_a = path_a
+            self.variant_b = variant_b
+            self.path_b = path_b
+
+    class ReportRequested(Message):
+        """The operator asked to generate the diff report (LLR-005.4).
+
+        Summary:
+            Posted by the Report button. Carries the operator-typed
+            destination directory (the no-project branch, G-8); ``app.py``
+            ignores it when a project is active. The panel computes no report
+            content — generation is routed through ``diff_report_service``.
+
+        Args:
+            dest_input (str): The operator-supplied destination directory text
+                for the no-project case; empty when a project is active.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_ab_diff_panel_report_requested``
+        """
+
+        def __init__(self, dest_input: str) -> None:
+            super().__init__()
+            self.dest_input = dest_input
 
     def __init__(self) -> None:
         super().__init__(id="ab_diff_panel")
+        #: The most recent comparison runs (display-capped) the operator can
+        #: select between; rendered into ``#diff_range_list``.
+        self._runs: List[Tuple[int, int, str]] = []
+        #: The two memory maps of the most recent comparison, for the per-run
+        #: hex windows. Display-only — never the source of any classification.
+        self._mem_map_a: dict = {}
+        self._mem_map_b: dict = {}
+        #: Whether a comparison result has been rendered (the report guard).
+        self._has_result: bool = False
 
     def compose(self) -> ComposeResult:
-        """Lay out the static three-column A2B Diff placeholder.
+        """Lay out the inline selection row, status line and result columns.
 
         Summary:
-            Yield the deferral notice and the three placeholder columns —
-            range list, hex A and hex B — each carrying constant sample
-            rows and a visible PLACEHOLDER caption.
+            Yield the inline image-pair selection row (two variant ``Select``
+            dropdowns + two external-path ``Input``s + Compare/Report buttons
+            + a no-project destination ``Input``), a status ``Static``, and the
+            three result columns (``#diff_range_list`` / ``#diff_hex_a`` /
+            ``#diff_hex_b``) reused from the placeholder. No placeholder
+            constants are composed (LLR-005.2).
 
         Args:
             None
 
         Returns:
-            ComposeResult: The A2B Diff placeholder widget tree.
+            ComposeResult: The A2B Diff panel widget tree.
 
         Dependencies:
             Used by:
                 - Textual ``Container`` compose lifecycle
         """
+        empty: List[Tuple[str, str]] = [("(external path below)", self._EXTERNAL_OPTION)]
+        yield Horizontal(
+            Label("A:", classes="diff-field-label"),
+            Select(empty, id="diff_select_a", allow_blank=False),
+            Input(placeholder="external path A", id="diff_path_a"),
+            id="diff_select_row_a",
+        )
+        yield Horizontal(
+            Label("B:", classes="diff-field-label"),
+            Select(empty, id="diff_select_b", allow_blank=False),
+            Input(placeholder="external path B", id="diff_path_b"),
+            id="diff_select_row_b",
+        )
+        yield Horizontal(
+            Button("Compare", id="diff_compare_button"),
+            Button("Report", id="diff_report_button"),
+            Input(
+                placeholder="report destination dir (no-project only)",
+                id="diff_report_dest",
+            ),
+            id="diff_action_row",
+        )
         yield Static(
-            self.DEFERRAL_TEXT,
-            id="diff_deferral_notice",
-            classes="sev-warning",
+            "Select two images and press Compare.",
+            id="diff_status",
+            classes="sev-info",
             markup=False,
         )
         yield Horizontal(
-            Static(self._RANGE_LIST_PLACEHOLDER, id="diff_range_list", markup=False),
-            Static(self._HEX_A_PLACEHOLDER, id="diff_hex_a", markup=False),
-            Static(self._HEX_B_PLACEHOLDER, id="diff_hex_b", markup=False),
+            Static("Runs", id="diff_range_list", markup=True),
+            Static("Image A", id="diff_hex_a", markup=False),
+            Static("Image B", id="diff_hex_b", markup=False),
             id="diff_columns",
         )
+
+    def set_variants(self, variants: Sequence[Tuple[str, str]]) -> None:
+        """Prefill the A / B variant ``Select`` dropdowns (LLR-005.1).
+
+        Summary:
+            Replace both dropdowns' options with the active project's variants
+            plus the trailing "external path" sentinel, so the operator can
+            pick an in-project variant or fall through to the external-path
+            input. Called by ``app.py`` when the diff screen activates.
+
+        Args:
+            variants (Sequence[Tuple[str, str]]): ``(label, variant_id)`` pairs
+                from the active ``ProjectVariantSet``; empty when no project is
+                active.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.action_show_screen`` (diff activation)
+        """
+        options = list(variants) + [
+            ("(external path below)", self._EXTERNAL_OPTION)
+        ]
+        for select_id in ("#diff_select_a", "#diff_select_b"):
+            select = self.query_one(select_id, Select)
+            select.set_options(options)
+            select.value = options[0][1]
+
+    def set_status(self, message: str, css_class: str = "sev-info") -> None:
+        """Render a full (untruncated) status line in the panel (LLR-005.3/4).
+
+        Summary:
+            Update the panel's own ``#diff_status`` line with ``message`` and
+            its severity class. This is the panel's status surface — distinct
+            from the app's 50-char rolling log — so full report destination
+            path(s) and refusal diagnostics are shown in full (LLR-005.4).
+
+        Args:
+            message (str): The status / diagnostic text.
+            css_class (str): One of the ``sev-*`` colour classes.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_ab_diff_panel_compare_requested``
+                - ``S19TuiApp.on_ab_diff_panel_report_requested``
+        """
+        status = self.query_one("#diff_status", Static)
+        status.set_classes(css_class)
+        status.update(message)
+
+    def _selected_variant(self, select_id: str) -> Optional[str]:
+        """Return the chosen variant id, or ``None`` for the external option."""
+        value = self.query_one(select_id, Select).value
+        if value in (self._EXTERNAL_OPTION, Select.BLANK):
+            return None
+        return str(value)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Translate the Compare / Report button presses into messages.
+
+        Summary:
+            Compare -> :class:`CompareRequested` with the raw selection;
+            Report -> :class:`ReportRequested` with the destination input. The
+            panel performs no comparison or report work itself (LLR-005.1).
+            Stops the event so it does not also reach the app-level handler.
+
+        Args:
+            event (Button.Pressed): The Textual button-press event.
+
+        Dependencies:
+            Uses:
+                - ``CompareRequested`` / ``ReportRequested``
+            Used by:
+                - Textual button-press dispatch
+        """
+        button_id = event.button.id or ""
+        if button_id == "diff_compare_button":
+            event.stop()
+            self.post_message(
+                self.CompareRequested(
+                    variant_a=self._selected_variant("#diff_select_a"),
+                    path_a=self.query_one("#diff_path_a", Input).value,
+                    variant_b=self._selected_variant("#diff_select_b"),
+                    path_b=self.query_one("#diff_path_b", Input).value,
+                )
+            )
+        elif button_id == "diff_report_button":
+            event.stop()
+            self.post_message(
+                self.ReportRequested(
+                    self.query_one("#diff_report_dest", Input).value
+                )
+            )
+
+    def render_comparison(
+        self,
+        runs: Sequence[Tuple[int, int, str]],
+        mem_map_a: dict,
+        mem_map_b: dict,
+        summary_a: str,
+        summary_b: str,
+    ) -> None:
+        """Render a completed comparison into the three columns (LLR-005.2).
+
+        Summary:
+            Replace the result columns with the real comparison output: the
+            classified run list (Rich-coloured per kind, with the per-image
+            artifact-usage summaries), then the hex windows of the FIRST run
+            for image A and image B. The on-screen run list is bounded by the
+            relocated display caps (:attr:`DISPLAY_MAX_RUNS` /
+            :attr:`DISPLAY_MAX_TOTAL_BYTES`, G-9) — the persisted report files
+            stay complete. The static placeholder is never shown again.
+
+        Args:
+            runs (Sequence[Tuple[int, int, str]]): ``(start, end, kind)`` for
+                every run of the comparison (already engine-ordered).
+            mem_map_a (dict): Image A's memory map (hex-window source only).
+            mem_map_b (dict): Image B's memory map.
+            summary_a (str): Image A's ``both``/``one``/``none`` usage summary.
+            summary_b (str): Image B's usage summary.
+
+        Data Flow:
+            - Apply the run-count + byte-budget display caps, store the capped
+              runs + maps, render the range list, then the first run's windows.
+
+        Dependencies:
+            Uses:
+                - ``_render_run_list`` / ``_render_run_windows``
+            Used by:
+                - ``S19TuiApp.on_ab_diff_panel_compare_requested``
+        """
+        capped = self._apply_display_caps(runs)
+        self._runs = capped
+        self._mem_map_a = mem_map_a
+        self._mem_map_b = mem_map_b
+        self._has_result = True
+        self._render_run_list(len(runs), summary_a, summary_b)
+        if capped:
+            self._render_run_windows(0)
+        else:
+            self.query_one("#diff_hex_a", Static).update("Image A — no differing runs")
+            self.query_one("#diff_hex_b", Static).update("Image B — no differing runs")
+
+    def _apply_display_caps(
+        self, runs: Sequence[Tuple[int, int, str]]
+    ) -> List[Tuple[int, int, str]]:
+        """Bound the on-screen run list by the relocated display caps (G-9).
+
+        Summary:
+            Keep at most :attr:`DISPLAY_MAX_RUNS` runs and stop once the
+            accumulated run bytes would exceed :attr:`DISPLAY_MAX_TOTAL_BYTES`.
+            This bounds only what the PANEL renders — the persisted report
+            (I3) is complete and untouched.
+
+        Args:
+            runs (Sequence[Tuple[int, int, str]]): All runs of the comparison.
+
+        Returns:
+            List[Tuple[int, int, str]]: The display-capped prefix.
+
+        Dependencies:
+            Used by:
+                - ``render_comparison``
+        """
+        capped: List[Tuple[int, int, str]] = []
+        total = 0
+        for start, end, kind in runs:
+            if len(capped) >= self.DISPLAY_MAX_RUNS:
+                break
+            total += end - start
+            if total > self.DISPLAY_MAX_TOTAL_BYTES and capped:
+                break
+            capped.append((start, end, kind))
+        return capped
+
+    def _render_run_list(
+        self, total_runs: int, summary_a: str, summary_b: str
+    ) -> None:
+        """Render the Rich-coloured run list + artifact-usage notes.
+
+        Summary:
+            Build the range-list column: a header carrying the per-image
+            ``both``/``one``/``none`` artifact-usage summaries, then one
+            coloured line per displayed run, then a "showing N of M" line when
+            the display caps elided runs (G-9).
+
+        Args:
+            total_runs (int): The complete run count before display capping.
+            summary_a (str): Image A's usage summary.
+            summary_b (str): Image B's usage summary.
+
+        Dependencies:
+            Uses:
+                - ``_KIND_MARKUP`` / ``_KIND_LABEL``
+            Used by:
+                - ``render_comparison``
+        """
+        from rich.markup import escape
+
+        lines = [
+            f"Runs: {total_runs}",
+            f"A artifacts: {escape(summary_a)}",
+            f"B artifacts: {escape(summary_b)}",
+            "",
+        ]
+        for index, (start, end, kind) in enumerate(self._runs):
+            colour = self._KIND_MARKUP.get(kind, "#ffffff")
+            label = self._KIND_LABEL.get(kind, kind)
+            lines.append(
+                f"[{colour}]{index:>3} 0x{start:08X}-0x{end:08X} "
+                f"{label}[/]"
+            )
+        if len(self._runs) < total_runs:
+            lines.append("")
+            lines.append(
+                f"[#6b7280](showing {len(self._runs)} of {total_runs} runs — "
+                f"full report is complete)[/]"
+            )
+        self.query_one("#diff_range_list", Static).update("\n".join(lines))
+
+    def _render_run_windows(self, run_index: int) -> None:
+        """Render the selected run's bounded hex windows for A and B.
+
+        Summary:
+            Render image A's and image B's hex+ASCII windows around the
+            selected run, each window respecting the ``hexview`` row caps
+            (``MAX_HEX_ROWS``). The window spans the run ± a small context.
+
+        Args:
+            run_index (int): Index into :attr:`_runs` of the run to window.
+
+        Dependencies:
+            Uses:
+                - ``hexview.render_hex_view``
+            Used by:
+                - ``render_comparison``
+                - ``on_data_table_row_selected`` (run selection)
+        """
+        from .hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+
+        if not (0 <= run_index < len(self._runs)):
+            return
+        start, end, _kind = self._runs[run_index]
+        low = max(0, start - self.DISPLAY_CONTEXT_BYTES)
+        low -= low % HEX_WIDTH
+        high = end + self.DISPLAY_CONTEXT_BYTES
+        row_bases = list(range(low, high, HEX_WIDTH))
+        text_a = render_hex_view(self._mem_map_a, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
+        text_b = render_hex_view(self._mem_map_b, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
+        header = f"Run #{run_index} 0x{start:08X}-0x{end:08X}"
+        self.query_one("#diff_hex_a", Static).update(f"Image A — {header}\n{text_a}")
+        self.query_one("#diff_hex_b", Static).update(f"Image B — {header}\n{text_b}")
+
+    def has_comparison(self) -> bool:
+        """Return whether a comparison result is currently rendered (LLR-005.4).
+
+        Summary:
+            ``app.py`` guards the Report trigger on this so a report request
+            with no completed comparison is one status message, not a crash.
+
+        Returns:
+            bool: ``True`` once :meth:`render_comparison` has stored runs/maps.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_ab_diff_panel_report_requested``
+        """
+        return self._has_result
+
+    @property
+    def mem_map_a(self) -> dict:
+        """Image A's memory map from the last comparison (report input)."""
+        return self._mem_map_a
+
+    @property
+    def mem_map_b(self) -> dict:
+        """Image B's memory map from the last comparison (report input)."""
+        return self._mem_map_b

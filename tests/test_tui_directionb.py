@@ -3183,12 +3183,18 @@ def test_tc028_no_new_processing_module_added_outside_view_layer() -> None:
     package_root = Path(s19_app.__file__).resolve().parent
     # The pre-batch modules at the s19_app/ package root. Increment 9 adds
     # nothing here — its new code lives entirely under s19_app/tui/.
+    # batch-09 (US-006, D-7): the headless diff engine ``compare.py`` is
+    # deliberately added at the package root beside ``range_index.py`` — the
+    # newer requirement supersedes this batch-04 "nothing new at root"
+    # invariant for that one module; the guard still catches any OTHER
+    # unexpected root module.
     engine_root_modules = {
         "__init__.py",
         "cli.py",
         "core.py",
         "hexfile.py",
         "range_index.py",
+        "compare.py",
         "utils.py",
         "version.py",
     }
@@ -3376,16 +3382,21 @@ def test_tc026_patch_editor_shows_empty_state(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# TC-027 — A2B Diff view shell renders three columns (LLR-012.3)
+# A↔B Diff panel — completed in batch-09 I4 (HLR-005). The four placeholder
+# tests below were SUPERSEDED from the batch-04 LLR-012.3/012.4 census: the
+# panel is no longer a static placeholder, so the assertions now pin the new
+# behavior (inline selection, service-routed compare, Rich render, no
+# placeholder constants). See increment-I4.md §R-8 disposition.
 # ---------------------------------------------------------------------------
 
 
 def test_tc027_ab_diff_renders_three_columns(tmp_path: Path) -> None:
-    """The A2B Diff renders a three-column placeholder layout (LLR-012.3).
+    """The A2B Diff renders the three result columns (HLR-005, superseding LLR-012.3).
 
-    Intent: the A2B Diff is a Direction B three-column view shell — a range
-    list, a hex-A column and a hex-B column. All three must be present in
-    the rendered widget tree once the screen is active.
+    Intent: the A2B Diff keeps its three-column result layout — a range list,
+    a hex-A column and a hex-B column. All three must be present in the
+    rendered widget tree once the screen is active. (Unchanged from the
+    placeholder era: the new panel reuses the same column ids.)
     """
 
     async def _drive() -> dict[str, bool]:
@@ -3406,95 +3417,100 @@ def test_tc027_ab_diff_renders_three_columns(tmp_path: Path) -> None:
         assert present, f"the A2B Diff must render the {name} column"
 
 
-def test_tc027_ab_diff_columns_carry_static_placeholder_rows() -> None:
-    """Each A2B Diff column shows constant, labelled placeholder hex rows.
+def test_tc027_ab_diff_has_no_placeholder_constants() -> None:
+    """The A2B Diff panel carries no static placeholder constants (LLR-005.2).
 
-    Intent: LLR-012.3 — "placeholder data" is defined as static, constant
-    sample hex rows in each column, visibly marked as placeholder content.
-    The three column constants must each carry a PLACEHOLDER caption and
-    hex-like sample rows, and must not be sourced from a LoadedFile.
+    Intent: the placeholder constants (``_RANGE_LIST_PLACEHOLDER`` /
+    ``_HEX_A_PLACEHOLDER`` / ``_HEX_B_PLACEHOLDER`` / ``DEFERRAL_TEXT``) are
+    gone — the panel renders real comparison output, not constant sample rows.
+    This is the LLR-005.2 named-constant probe expressed as a unit test.
     """
     from s19_app.tui.screens_directionb import AbDiffPanel
 
-    columns = (
-        AbDiffPanel._RANGE_LIST_PLACEHOLDER,
-        AbDiffPanel._HEX_A_PLACEHOLDER,
-        AbDiffPanel._HEX_B_PLACEHOLDER,
-    )
-    for column_text in columns:
-        assert "PLACEHOLDER" in column_text, (
-            f"each A2B Diff column must be marked PLACEHOLDER; "
-            f"column was:\n{column_text}"
+    for removed in (
+        "_RANGE_LIST_PLACEHOLDER",
+        "_HEX_A_PLACEHOLDER",
+        "_HEX_B_PLACEHOLDER",
+        "DEFERRAL_TEXT",
+    ):
+        assert not hasattr(AbDiffPanel, removed), (
+            f"the completed A2B Diff panel must not keep the placeholder "
+            f"constant {removed!r}"
         )
-        # A column with at least two newline-separated lines below its
-        # caption — a small fixed set of constant sample rows.
-        assert column_text.count("\n") >= 2, (
-            f"each A2B Diff column must carry static sample rows; "
-            f"column was:\n{column_text}"
-        )
-    # The hex-A / hex-B columns must look like hex rows (constant content).
-    assert "DE AD BE EF" in AbDiffPanel._HEX_A_PLACEHOLDER
-    assert "DE AD BE EF" in AbDiffPanel._HEX_B_PLACEHOLDER
 
 
-def test_tc027_ab_diff_states_diff_deferred_and_has_no_second_file_load(
-    tmp_path: Path,
-) -> None:
-    """The A2B Diff states diff/second-file load is deferred (LLR-012.3).
+def test_tc027_ab_diff_renders_inline_selection_surface(tmp_path: Path) -> None:
+    """The A2B Diff renders an INLINE image-pair selection surface (G-6/LLR-005.1).
 
-    Intent: LLR-012.3 — the screen must carry a visible notice that diff
-    computation and the second-file (B) load path are deferred, and must
-    expose NO control to load a second firmware file this batch.
+    Intent: G-6 — source selection is inline within the diff screen, not a
+    modal. The screen must expose the two variant ``Select`` dropdowns, the
+    two external-path inputs, and the Compare button, all mounted inside the
+    diff screen (no separate ModalScreen pushed).
     """
-    from s19_app.tui.screens_directionb import AbDiffPanel
+    from textual.widgets import Button, Input, Select
 
-    async def _drive() -> tuple[bool, bool, str]:
+    async def _drive() -> dict[str, bool]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             app.action_show_screen("diff")
             await pilot.pause()
             screen = app.query_one("#screen_diff")
-            notice = bool(screen.query("#diff_deferral_notice"))
-            # No second-file load control: no Button anywhere on the screen.
-            from textual.widgets import Button
+            return {
+                "select_a": bool(screen.query("#diff_select_a")),
+                "select_b": bool(screen.query("#diff_select_b")),
+                "path_a": bool(screen.query("#diff_path_a")),
+                "path_b": bool(screen.query("#diff_path_b")),
+                "compare": bool(screen.query("#diff_compare_button")),
+                "selects_are_select": all(
+                    isinstance(w, Select) for w in screen.query("#diff_select_a")
+                ),
+                "compare_is_button": all(
+                    isinstance(w, Button)
+                    for w in screen.query("#diff_compare_button")
+                ),
+                "paths_are_input": all(
+                    isinstance(w, Input) for w in screen.query("#diff_path_a")
+                ),
+            }
 
-            has_load_button = bool(screen.query(Button))
-            return notice, has_load_button, AbDiffPanel.DEFERRAL_TEXT.lower()
-
-    notice_present, has_load_button, text = asyncio.run(_drive())
-    assert notice_present, "the A2B Diff must render a deferral notice"
-    assert not has_load_button, (
-        "the A2B Diff must expose no second-file (B) load control this batch"
-    )
-    assert "deferred" in text, (
-        f"the deferral notice must state diff computation is deferred; "
-        f"text was {text!r}"
-    )
-    assert "placeholder" in text, (
-        "the deferral notice must mark the columns as placeholder content"
-    )
+    surface = asyncio.run(_drive())
+    for name, present in surface.items():
+        assert present, f"the inline selection surface must expose {name}"
 
 
-def test_tc027_ab_diff_panel_holds_no_loaded_file_data() -> None:
-    """The A2B Diff panel exposes no second-file / diff-computation surface.
+def test_tc027_ab_diff_panel_routes_through_service() -> None:
+    """The A2B Diff panel exposes a service-routed surface, not a diff engine.
 
-    Intent: LLR-012.3 / LLR-012.4 — the panel renders only static constants;
-    it must not carry a method that loads a second file or computes a diff.
+    Intent: LLR-005.1 — the panel is presentational: it emits
+    ``CompareRequested`` / ``ReportRequested`` messages and renders results the
+    app hands back. It must carry NO method that classifies runs or computes a
+    report itself (no ``diff_mem_maps`` / coverage / generate-report helper).
     """
     from s19_app.tui.screens_directionb import AbDiffPanel
 
-    panel = AbDiffPanel()
-    forbidden = ("diff", "compare", "load_b", "second_file", "load_file")
-    surface = [name for name in dir(panel) if not name.startswith("_")]
+    # The message + render surface the app routes through must exist.
+    assert hasattr(AbDiffPanel, "CompareRequested")
+    assert hasattr(AbDiffPanel, "ReportRequested")
+    assert hasattr(AbDiffPanel, "render_comparison")
+
+    # The panel must not embed any engine/report computation helper.
+    forbidden = (
+        "diff_mem_maps",
+        "classify",
+        "coverage",
+        "generate_diff_report",
+        "generate_report",
+    )
+    surface = [name for name in dir(AbDiffPanel)]
     leaked = [
         name
         for name in surface
         if any(token in name.lower() for token in forbidden)
     ]
     assert leaked == [], (
-        f"the A2B Diff shell must expose no diff/second-file methods, "
-        f"found {leaked}"
+        f"the A2B Diff panel must route compute through the services, not "
+        f"embed it; found {leaked}"
     )
 
 
@@ -3542,12 +3558,17 @@ def test_tc028_no_new_processing_module_added_outside_view_layer_inc10() -> None
     import s19_app
 
     package_root = Path(s19_app.__file__).resolve().parent
+    # batch-09 (US-006, D-7): ``compare.py`` headless diff engine added at the
+    # package root by design; newer requirement supersedes the batch-04
+    # "nothing new at root" invariant for that module. Guard still flags any
+    # OTHER unexpected root module.
     engine_root_modules = {
         "__init__.py",
         "cli.py",
         "core.py",
         "hexfile.py",
         "range_index.py",
+        "compare.py",
         "utils.py",
         "version.py",
     }
@@ -3628,13 +3649,13 @@ def test_tc028_diff_renderer_invokes_no_diff_logic() -> None:
 def test_tc028_every_scaffold_screen_activates_without_error(
     tmp_path: Path,
 ) -> None:
-    """All four rail screens activate without raising (LLR-012.4).
+    """All four rail screens activate without raising (LLR-012.4 / HLR-005).
 
-    Intent: completes TC-028 (d) — the Memory Map, Patch Editor, A2B Diff
-    and Bookmarks rail screens each activate cleanly with no file loaded,
-    never an error. The A2B Diff stays a deferred placeholder and must still
-    carry its deferral marker; the Patch Editor is functional as of batch-03
-    increment 9 (LLR-007.1) and instead carries its empty-state line.
+    Intent: the Memory Map, Patch Editor, A2B Diff and Bookmarks rail screens
+    each activate cleanly with no file loaded, never an error. The A2B Diff is
+    now the completed panel (batch-09 I4, HLR-005) and carries its inline
+    status line in place of the retired deferral notice; the Patch Editor is
+    functional and carries its empty-state line (batch-07 E3b).
     """
 
     async def _drive() -> dict[str, bool]:
@@ -3649,12 +3670,14 @@ def test_tc028_every_scaffold_screen_activates_without_error(
                     results[key] = True
                 except Exception:  # pragma: no cover - failure path
                     results[key] = False
-            # The A2B Diff screen still carries its deferral marker; the
-            # Patch Editor is functional and carries its empty-state line
-            # (the v2 consolidated panel's id — batch-07 E3b).
-            markers_present = bool(
-                app.query("#diff_deferral_notice")
-            ) and bool(app.query("#patch_doc_empty_state"))
+            # The completed A2B Diff carries its inline status line; the Patch
+            # Editor carries its empty-state line. The retired deferral notice
+            # must be GONE (LLR-005.2 placeholder removal).
+            markers_present = (
+                bool(app.query("#diff_status"))
+                and bool(app.query("#patch_doc_empty_state"))
+                and not bool(app.query("#diff_deferral_notice"))
+            )
         return {**results, "markers_present": markers_present}
 
     results = asyncio.run(_drive())
@@ -3668,6 +3691,8 @@ def test_tc028_every_scaffold_screen_activates_without_error(
 
 # ===========================================================================
 # INCREMENT 11 — no-regression / behavior verification sweep
+
+
 # ===========================================================================
 #
 # This block is the dedicated cross-cutting regression increment. It does NOT

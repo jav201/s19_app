@@ -549,6 +549,10 @@ diff computation this batch. Diff logic is deferred to a follow-up batch.
 - Validation: `Automated` via `tests/test_tui_directionb.py`
   (`tc027` three-column placeholder, `tc028` deferred-logic guard) — covers
   LLR-012.3, LLR-012.4
+- Status: **Superseded by R-CMP-006** (batch-09, US-006). The placeholder shell
+  is now the completed `AbDiffPanel` with real compare/render; the `tc027`
+  family + the `#diff_deferral_notice` activation guard were superseded at the
+  I4 gate (statement preserved here as historical record).
 
 **R-TUI-029**: The TUI must present the data ranges/sections, the hex view, and
 a context pane as a three-pane Direction B Workspace screen populated from the
@@ -1633,3 +1637,137 @@ documents; they never carry the operation requirements themselves. Rationale
 operations may become ad-hoc functions reused in different applications, so
 their requirements must travel with the module, not bind to the main
 application.
+
+# 15. Hex Compare Mode (batch-09)
+
+The hex-compare batch (`2026-06-11-batch-09`, US-006) adds a pairwise
+comparison mode for two HEX/S19 images — in-project variants or external
+files — sharing the same A2L/MAC artifacts: a reusable headless diff engine, a
+service that resolves sources and computes per-image artifact-usage notes, a
+complete two-format (Markdown + HTML) diff report, and the completed A↔B Diff
+TUI screen. Pairwise (two images) by deliberate decision (G-1); N-way deferred.
+
+**R-CMP-001**: The system must provide a headless diff engine
+(`diff_mem_maps`) that compares two sparse memory maps and returns a
+`ComparisonResult` carrying exactly the canonical field set (`image_a`,
+`image_b`, `runs`, `stats`, `notes`, `diagnostics`, `refused`). Differences
+must be reported as classified contiguous runs (`DiffRun` with kind ∈
+{`changed`, `only_a`, `only_b`}) in ascending-start order, with `DiffStats`
+giving per-kind run and byte counts. Output must be deterministic for fixed
+inputs and symmetric (diff(A,B).only_a == diff(B,A).only_b). The engine imports
+no Textual and no parser (S19File/IntelHexFile) — package-root headless module.
+A large-image diff (two `make_large_s19` maps) must complete within ≤ 2.0 s
+(measured 1.39 s).
+
+- Code: `s19_app/compare.py` (`ComparisonResult` :183, `DiffRun`, `DiffStats`,
+  `_classify_address`, `diff_mem_maps` :272), `s19_app/range_index.py`
+  (`build_sorted_range_index`, `address_in_sorted_ranges`)
+- Validation: `Automated` via `tests/test_compare_engine.py`
+  (`test_classification_set_equality`, `test_adjacency_merge_same_kind_merges`,
+  `test_boundary_cases`, `test_stats_byte_count_equals_run_lengths`,
+  `test_symmetry_swap_only_a_only_b`, `test_large_image_perf` [`@slow`])
+- Status: Added in batch `2026-06-11-batch-09` (US-006 / HLR-001)
+
+**R-CMP-002**: The system must provide a headless comparison service
+(`compare_images`) that resolves the two sources — in-project variant by id
+from a `ProjectVariantSet` and/or external file via `resolve_input_path`
+(read-only, existence-checked) — parses each through the existing load path,
+invokes the engine, and assembles the `ComparisonResult`. A per-source parse
+failure or unresolvable path must yield a `refused` result, never raise. The
+service imports no Textual.
+
+- Code: `s19_app/tui/services/compare_service.py` (`compare_images` :451,
+  `_resolve_source`, `_load_image`, `_refused`)
+- Validation: `Automated` via `tests/test_compare_service.py`
+  (`test_variant_pair_matches_engine`, `test_external_unresolvable_returns_refused`,
+  `test_mixed_source_pairings_record_identity`,
+  `test_parse_failure_isolated_to_refused`,
+  `test_result_field_set_matches_c9_contract`)
+- Status: Added in batch `2026-06-11-batch-09` (US-006 / HLR-002)
+
+**R-CMP-003**: For each image, the system must compute an artifact-usage note
+(`both` / `one` / `none`) recording which of the shared A2L/MAC artifacts the
+image covers, where "used" means coverage of ≥ 1 artifact address within the
+image's ranges (via `range_index`). The note is informative and must never gate
+or alter the binary diff.
+
+- Code: `s19_app/tui/services/compare_service.py` (`_coverage_count` :276,
+  `_artifact_note` :324, `_build_usage` :385)
+- Validation: `Automated` via `tests/test_compare_service.py`
+  (`test_coverage_counts_match_hand_computed`,
+  `test_usage_summary_all_four_outcomes`, `test_absent_artifacts_summary_none`,
+  `test_artifact_context_applies_to_external`)
+- Status: Added in batch `2026-06-11-batch-09` (US-006 / HLR-003)
+
+**R-CMP-004**: The system must generate a diff report from a `ComparisonResult`
+as a COMPLETE file (no run cap, no byte truncation, no TRUNCATED markers — the
+display caps bound only the TUI view, never the file) in two formats: (a)
+Markdown rendering `changed` runs as fenced ```diff blocks (A bytes as `-`
+lines, B bytes as `+` lines) with best-effort A2L/MAC symbol annotation; (b) a
+self-contained HTML export with inline-CSS colour (changed/only-A/only-B
+distinct), `html.escape` applied to all embedded content, and no `<script>`, no
+external resources/fonts/CDN, no network. Each format owns its own filename
+regex (`DIFF_REPORT_FILENAME_REGEX` / `DIFF_REPORT_HTML_FILENAME_REGEX`); the
+shared `report_service.REPORT_FILENAME_REGEX` is not edited (G-4). The module
+performs no logging (F-S-07).
+
+- Code: `s19_app/tui/services/diff_report_service.py` (`generate_diff_report`
+  :720, `generate_diff_report_html` :1015, `DIFF_REPORT_HTML_FILENAME_REGEX`,
+  `list_diff_reports` :233, `_annotate_run`, `_esc`)
+- Validation: `Automated` via `tests/test_diff_report_service.py`
+  (`test_markdown_file_is_complete_no_truncation`,
+  `test_changed_run_emits_diff_fenced_block`,
+  `test_html_export_complete_and_safe`, `test_html_escapes_embedded_payload`,
+  `test_module_performs_no_logging`, `test_self_contained_listing_newest_first`,
+  `test_report_service_regex_unedited`)
+- Status: Added in batch `2026-06-11-batch-09` (US-006 / HLR-004; G-9 complete-export + HTML)
+
+**R-CMP-005**: The diff-report destination must resolve to
+`<project>/reports/` when a project is active, and to an operator-prompted
+directory when no project is loaded — validated by
+`Path(input).expanduser().resolve()` then requiring `is_dir()`, else REFUSE
+with a diagnostic and write no file. There is no implicit Downloads default
+(G-8 solo-prompt) and `sanitize_project_name` is not used as the path validator
+(it is a name-token cleaner). The tool-generated timestamp filename carries no
+operator-supplied string; both branches use the no-silent-overwrite collision
+counter (M-5).
+
+- Code: `s19_app/tui/services/diff_report_service.py` (`_resolve_destination`
+  :287, `_diff_report_filename`)
+- Validation: `Automated` via `tests/test_diff_report_service.py`
+  (`test_no_project_valid_directory_writes_one_file`,
+  `test_no_project_nonexistent_dir_refused`,
+  `test_no_project_collision_no_overwrite`,
+  `test_collision_never_overwrites_existing_file`,
+  `test_no_sanitize_project_name_in_validator`)
+- Status: Added in batch `2026-06-11-batch-09` (US-006 / HLR-004 / LLR-004.6; G-8)
+
+**R-CMP-006**: The TUI must provide the completed A↔B Diff rail screen
+(`AbDiffPanel`, reachable via rail key `7`): inline selection of the two
+comparison sources (not a modal — G-6), execution exclusively through
+`compare_images` (never the engine directly), Rich-coloured rendering of the
+classified runs (changed/only-A/only-B) plus the per-image artifact-usage
+notes, and an operator prompt for the no-project report destination. The
+display caps (`DISPLAY_MAX_RUNS`=128 / `DISPLAY_MAX_TOTAL_BYTES`=2 MB) bound the
+on-screen render only — the persisted report file stays complete. The activity
+rail stays at exactly eight items (`rail.py` unmodified). This supersedes the
+batch-04 A↔B Diff placeholder (see R-TUI-028).
+
+- Code: `s19_app/tui/screens_directionb.py` (`AbDiffPanel` :849), `s19_app/tui/app.py`
+  (`compare_images` wiring, report-trigger handlers)
+- Validation: `Automated` via `tests/test_tui_diff_screen.py`
+  (`test_tc021_compare_routes_through_service`,
+  `test_tc022_render_shows_runs_and_hex_windows`,
+  `test_tc023_refused_compare_surfaces_diagnostic`,
+  `test_tc024_report_trigger_surfaces_paths`,
+  `test_tc029_display_caps_bound_on_screen_runs`)
+- Status: Added in batch `2026-06-11-batch-09` (US-006 / HLR-005); supersedes the batch-04 placeholder
+
+> **Reusable substrate note:** `s19_app/compare.py` (R-CMP-001) is a
+> general-purpose diff engine. Its first planned downstream consumer is the
+> batch-10 verify-on-save pair (save → re-read → diff against intent). The
+> batch-04 package-root module allowlist (the two
+> `test_tc028_no_new_processing_module_added_outside_view_layer` guards) was
+> updated to include `compare.py` — the newer requirement (HLR-001/D-7, an
+> engine module at the package root) supersedes the batch-04 7-module
+> invariant; the guard still flags any OTHER unexpected root module.

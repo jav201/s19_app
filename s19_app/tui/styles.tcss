@@ -550,10 +550,26 @@ Screen {
     overflow-y: auto;
 }
 
-/* The diff deferral notice carries the `sev-warning` class so its color
- * comes from the single `color_policy` severity source of truth
- * (LLR-005.2), not a hard-coded hue. The rule below only sets layout. */
-#diff_deferral_notice {
+/* A↔B Diff panel (batch-09 I4, HLR-005): the inline image-pair selection
+ * rows, the action row, the panel status line and the three result columns.
+ * The status line's colour comes from the `sev-*` classes (the single
+ * `color_policy` source of truth, LLR-005.2); the rules below only set
+ * layout. */
+#diff_select_row_a,
+#diff_select_row_b,
+#diff_action_row {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1;
+}
+
+.diff-field-label {
+    width: 3;
+    color: $fg-base;
+    padding: 1 1 0 1;
+}
+
+#diff_status {
     width: 100%;
     height: auto;
     padding: 0 1;
