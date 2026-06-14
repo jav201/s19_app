@@ -93,6 +93,8 @@ __all__ = [
     "serialize_change_document",
     "write_change_document",
     "emit_s19_from_mem_map",
+    "emit_intel_hex_from_mem_map",
+    "HEX_DATA_BYTES_PER_RECORD",
 ]
 
 # ---------------------------------------------------------------------------
@@ -1408,3 +1410,122 @@ def _s19_record(
         f"{record_type}{byte_count:02X}"
         f"{address:0{address_length * 2}X}{data_text}{checksum:02X}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Intel HEX emitter (HLR-001 / LLR-001.1..4 / D-A=(a) relocated to io.py for
+# emission-purpose cohesion alongside emit_s19_from_mem_map) — the mem_map-pure
+# write counterpart of hexfile.IntelHexFile's read path.
+# ---------------------------------------------------------------------------
+
+HEX_DATA_BYTES_PER_RECORD = 16
+
+
+def emit_intel_hex_from_mem_map(
+    mem_map: dict[int, int],
+    ranges: list[tuple[int, int]],
+) -> str:
+    """
+    Summary:
+        Serialize a sparse memory map into structurally valid Intel HEX text —
+        the write counterpart of ``hexfile.IntelHexFile`` (HLR-001). Mirrors
+        the shape of the S19 emitter (``emit_s19_from_mem_map`` above): a pure
+        ``(mem_map, ranges) -> str`` with no I/O side effect, headless
+        (stdlib-only, no ``textual`` import).
+
+    Args:
+        mem_map (dict[int, int]): Address-to-byte map of the image. Every
+            address inside ``ranges`` must be present — the apply engine only
+            mutates values at existing keys, so the contract holds for every
+            internal caller.
+        ranges (list[tuple[int, int]]): The image's contiguous half-open
+            ``(start, end)`` ranges, driving record emission order. The
+            function sorts them so output is deterministic and ascending
+            regardless of caller ordering.
+
+    Returns:
+        str: Intel HEX text, one record per line with a trailing newline:
+        type-0x04 extended-linear-address records whenever the active upper-16
+        bits of the address change (including the first address above 0xFFFF),
+        type-0x00 data records of at most 16 data bytes each, and exactly one
+        type-0x01 EOF record (``:00000001FF``). Empty input emits the EOF
+        record alone. Each record carries the Intel HEX checksum: the two's
+        complement of the low byte of the sum of all preceding record bytes.
+
+    Raises:
+        KeyError: If ``ranges`` claims an address absent from ``mem_map`` — a
+            programming error in the caller, not a data-quality fault.
+
+    Data Flow:
+        - Sort ``ranges`` ascending for deterministic output.
+        - Walk each range in 16-byte rows; before each row, if the row's
+          upper-16 address differs from the active upper-16, emit a type-0x04
+          ELA record and update the active upper-16.
+        - Emit a type-0x00 data record per row using the low-16 of the row
+          address (the upper-16 is carried by the active ELA).
+        - Terminate with one type-0x01 EOF record.
+        - Acceptance contract (LLR-001.4): the emitted text, written to a file
+          and re-parsed via ``hexfile.IntelHexFile``, reconstructs a memory map
+          equal to ``mem_map`` with zero load errors.
+
+    Dependencies:
+        Uses:
+            - _intel_hex_record
+        Used by:
+            - tests/test_hex_emit.py (round-trip assertions)
+            - changes.apply.save_patched_image (HEX branch — I3, future)
+
+    Example:
+        >>> emit_intel_hex_from_mem_map({0x10: 0xAB}, [(0x10, 0x11)]).splitlines()
+        [':01001000AB44', ':00000001FF']
+    """
+    lines: list[str] = []
+    active_upper = None
+    for start, end in sorted(ranges):
+        for row_start in range(start, end, HEX_DATA_BYTES_PER_RECORD):
+            row_end = min(row_start + HEX_DATA_BYTES_PER_RECORD, end)
+            upper = (row_start >> 16) & 0xFFFF
+            if upper != active_upper:
+                lines.append(_intel_hex_record(0x04, 0, [upper >> 8, upper & 0xFF]))
+                active_upper = upper
+            data = [mem_map[addr] for addr in range(row_start, row_end)]
+            lines.append(_intel_hex_record(0x00, row_start & 0xFFFF, data))
+    lines.append(_intel_hex_record(0x01, 0, []))
+    return "\n".join(lines) + "\n"
+
+
+def _intel_hex_record(
+    record_type: int,
+    address: int,
+    data: list[int],
+) -> str:
+    """
+    Summary:
+        Build one Intel HEX record line ``:LLAAAATT[DD..]CC`` with the
+        two's-complement-of-sum checksum the ``hexfile.IntelHexFile`` reader
+        verifies (``hexfile.py:66-74``).
+
+    Args:
+        record_type (int): The record type byte — 0x00 data, 0x01 EOF, 0x04
+            extended linear address.
+        address (int): The 16-bit address field; the low-16 of the data
+            address for type-0x00, 0 for type-0x01/0x04.
+        data (list[int]): The data bytes (<= 16 for data records; the two
+            upper-address bytes for ELA; empty for EOF).
+
+    Returns:
+        str: The uppercase-hex record line without a newline. ``byte_count``
+        is ``len(data)``; the checksum is the two's complement of the low byte
+        of ``byte_count + addr_hi + addr_lo + record_type + sum(data)`` — so
+        the reader's full-line sum (``hexfile.py:66-74``) is 0 mod 256.
+
+    Dependencies:
+        Used by:
+            - emit_intel_hex_from_mem_map
+    """
+    byte_count = len(data)
+    addr_hi = (address >> 8) & 0xFF
+    addr_lo = address & 0xFF
+    checksum = (-(byte_count + addr_hi + addr_lo + record_type + sum(data))) & 0xFF
+    data_text = "".join(f"{byte:02X}" for byte in data)
+    return f":{byte_count:02X}{address:04X}{record_type:02X}{data_text}{checksum:02X}"
