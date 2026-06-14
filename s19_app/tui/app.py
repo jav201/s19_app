@@ -65,6 +65,16 @@ from .color_policy import css_class_for_severity
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
 from .services.change_service import ChangeActionResult, ChangeService
+from .services.compare_service import (
+    SOURCE_EXTERNAL,
+    SOURCE_PROJECT_VARIANT,
+    ImageSource,
+    compare_images,
+)
+from .services.diff_report_service import (
+    generate_diff_report,
+    generate_diff_report_html,
+)
 from .services.load_service import build_loaded_hex, build_loaded_s19
 from .services.report_service import (
     EXECUTION_SCOPE_TO_REPORT_MODE,
@@ -620,6 +630,9 @@ class S19TuiApp(App):
         #: active. Built by ``workspace.build_variant_set`` on project
         #: load/save and updated on variant switch / variant append.
         self._variant_set: Optional[ProjectVariantSet] = None
+        #: Most recent A↔B comparison result, retained so the diff-report
+        #: trigger (LLR-005.4) can report the same comparison the panel shows.
+        self._diff_last_result: Optional[Any] = None
         #: Variant id to stamp onto the next applied primary ``LoadedFile``.
         #: Set on the main thread immediately before a load dispatch and
         #: consumed by ``_apply_prepared_load`` on the main thread, so the
@@ -1869,10 +1882,11 @@ class S19TuiApp(App):
         """
         Summary:
             Build the Direction B A2B Diff rail screen (``#screen_diff``) as
-            a static three-column placeholder — range list, hex A and hex B
-            columns filled with constant sample rows and a "diff deferred"
-            notice. No second-file load path and no diff computation are
-            wired (LLR-012.3 / LLR-012.4).
+            a title label plus the functional ``AbDiffPanel`` (HLR-005). The
+            panel owns the inline image-pair selection, the comparison result
+            columns and the report trigger; this builder constructs only the
+            shell so the comparison/report logic stays in the panel + services
+            (LLR-005.1), never in ``app.py``.
 
         Args:
             None
@@ -1882,9 +1896,10 @@ class S19TuiApp(App):
             ``AbDiffPanel``. Hidden at startup.
 
         Data Flow:
-            - Static composition only. The three columns carry constant
-              placeholder hex rows — not data from any ``LoadedFile`` and
-              not produced by any diff computation.
+            - Shell composition only: the ``AbDiffPanel`` emits
+              ``CompareRequested`` / ``ReportRequested`` messages that
+              ``on_ab_diff_panel_*`` route through ``compare_service`` /
+              ``diff_report_service``; this builder does no diff computation.
 
         Dependencies:
             Uses:
@@ -1897,6 +1912,231 @@ class S19TuiApp(App):
             AbDiffPanel(),
             id="screen_diff",
             classes="db-screen hidden",
+        )
+
+    def _prefill_diff_variants(self) -> None:
+        """
+        Summary:
+            Prefill the A↔B Diff panel's variant ``Select`` dropdowns from the
+            active project's ``ProjectVariantSet`` (LLR-005.1). Called when the
+            diff screen activates; a no-project session yields an empty list
+            (the panel keeps only its external-path option).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Map each ``VariantDescriptor`` to a ``(label, variant_id)`` pair
+              and hand them to ``AbDiffPanel.set_variants``.
+
+        Dependencies:
+            Uses:
+                - ``AbDiffPanel.set_variants``
+            Used by:
+                - ``action_show_screen`` (diff activation)
+        """
+        panel = self.query_one("#ab_diff_panel", AbDiffPanel)
+        variants = (
+            [(v.variant_id, v.variant_id) for v in self._variant_set.variants]
+            if self._variant_set is not None
+            else []
+        )
+        panel.set_variants(variants)
+
+    def _diff_image_source(self, variant_id: Optional[str], raw_path: str) -> ImageSource:
+        """
+        Summary:
+            Build one ``compare_service.ImageSource`` from the panel's raw
+            selection — an in-project variant when ``variant_id`` is set, else
+            an external path (LLR-005.1). The service does the resolution; this
+            only packages the request.
+
+        Args:
+            variant_id (Optional[str]): The chosen project variant id, or
+                ``None`` to use the external path.
+            raw_path (str): The operator-typed external path.
+
+        Returns:
+            ImageSource: The packaged source for one comparison side.
+
+        Dependencies:
+            Used by:
+                - ``on_ab_diff_panel_compare_requested``
+        """
+        if variant_id is not None:
+            return ImageSource(kind=SOURCE_PROJECT_VARIANT, variant_id=variant_id)
+        return ImageSource(kind=SOURCE_EXTERNAL, raw_path=raw_path)
+
+    def on_ab_diff_panel_compare_requested(
+        self, event: AbDiffPanel.CompareRequested
+    ) -> None:
+        """
+        Summary:
+            Route an A↔B compare request exclusively through
+            ``compare_service.compare_images`` (LLR-005.1) and feed the result
+            back to the panel; a refused comparison surfaces its diagnostic in
+            the panel status and the screen keeps running (LLR-005.3). The app
+            computes no run classification or coverage itself.
+
+        Args:
+            event (AbDiffPanel.CompareRequested): The raw image-pair selection
+                the panel posted (variant id or external path per side).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Package each side as an ``ImageSource`` (``_diff_image_source``).
+            - Call ``compare_images`` with the active project's variant set and
+              shared A2L/MAC context; never the TUI snapshot for the images.
+            - Refused -> ``panel.set_status`` with the joined diagnostics.
+            - Otherwise re-parse the two maps for display via the service-
+              returned result is run-only; the panel renders runs + windows.
+
+        Dependencies:
+            Uses:
+                - ``compare_images`` / ``_diff_image_source``
+                - ``AbDiffPanel.render_comparison`` / ``set_status``
+            Used by:
+                - Textual message dispatch for ``AbDiffPanel``
+        """
+        panel = self.query_one("#ab_diff_panel", AbDiffPanel)
+        loaded = self.current_file
+        mac_records = loaded.mac_records if loaded is not None else None
+        result = compare_images(
+            self._diff_image_source(event.variant_a, event.path_a),
+            self._diff_image_source(event.variant_b, event.path_b),
+            variant_set=self._variant_set,
+            base_dir=self.base_dir,
+            a2l_data=self.current_a2l_data,
+            mac_records=mac_records,
+        )
+        if result.refused:
+            panel.set_status(
+                "Compare refused: " + "; ".join(result.diagnostics),
+                "sev-error",
+            )
+            return
+        mem_map_a, mem_map_b = self._diff_load_maps(result)
+        runs = [(run.start, run.end, run.kind) for run in result.runs]
+        usage_a = result.notes.get("image_a")
+        usage_b = result.notes.get("image_b")
+        panel.render_comparison(
+            runs,
+            mem_map_a,
+            mem_map_b,
+            usage_a.summary if usage_a is not None else "none",
+            usage_b.summary if usage_b is not None else "none",
+        )
+        panel.set_status(
+            f"Compared {result.image_a.label} vs {result.image_b.label}: "
+            f"{len(result.runs)} runs.",
+            "sev-ok",
+        )
+        self._diff_last_result = result
+
+    def _diff_load_maps(self, result) -> tuple[dict, dict]:
+        """
+        Summary:
+            Re-load the two compared images' memory maps for the on-screen hex
+            windows and the report (LLR-005.2 / LLR-005.4). The comparison
+            service returns runs but not the maps; the panel and the report
+            generator both need the raw bytes, so this re-parses by path
+            through the existing headless loaders.
+
+        Args:
+            result (ComparisonResult): The completed comparison.
+
+        Returns:
+            tuple[dict, dict]: ``(mem_map_a, mem_map_b)``; an unreadable image
+            yields an empty map (the hex window then shows nothing — non-fatal).
+
+        Dependencies:
+            Uses:
+                - ``build_loaded_s19`` / ``build_loaded_hex``
+            Used by:
+                - ``on_ab_diff_panel_compare_requested``
+        """
+        def _load(image) -> dict:
+            if not image.path:
+                return {}
+            path = Path(image.path)
+            try:
+                if path.suffix.lower() in (".hex", ".ihex"):
+                    return build_loaded_hex(path, IntelHexFile(str(path)), None, None).mem_map
+                return build_loaded_s19(path, S19File(str(path)), None, None).mem_map
+            except Exception:  # noqa: BLE001 — display-side, non-fatal
+                return {}
+
+        return _load(result.image_a), _load(result.image_b)
+
+    def on_ab_diff_panel_report_requested(
+        self, event: AbDiffPanel.ReportRequested
+    ) -> None:
+        """
+        Summary:
+            Generate the diff report (Markdown + HTML) exclusively through
+            ``diff_report_service`` (LLR-005.1) and surface the written
+            path(s) — or the refusal diagnostic — in the panel status
+            (LLR-005.4). The app computes no report content itself.
+
+        Args:
+            event (AbDiffPanel.ReportRequested): The operator-typed no-project
+                destination directory (ignored when a project is active).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Guard: no completed comparison -> one status line, no write.
+            - Build the annotation inputs (enriched A2L tags + project MAC).
+            - Call both generators with the project ``reports/`` dir, or the
+              operator destination when no project is active (G-8).
+            - Both written -> status with both paths; either refused -> the
+              refusal diagnostic; the screen keeps running.
+
+        Dependencies:
+            Uses:
+                - ``generate_diff_report`` / ``generate_diff_report_html``
+                - ``AbDiffPanel.set_status``
+            Used by:
+                - Textual message dispatch for ``AbDiffPanel``
+        """
+        panel = self.query_one("#ab_diff_panel", AbDiffPanel)
+        result = getattr(self, "_diff_last_result", None)
+        if result is None or not panel.has_comparison():
+            panel.set_status("No comparison yet — press Compare first.", "sev-warning")
+            return
+        project_dir = self._active_project_dir()
+        dest_input = event.dest_input if project_dir is None else None
+        loaded = self.current_file
+        mac_records = loaded.mac_records if loaded is not None else None
+        a2l_tags = self._compute_a2l_enriched_tags() or None
+        kwargs = dict(
+            mem_map_a=panel.mem_map_a,
+            mem_map_b=panel.mem_map_b,
+            project_dir=project_dir,
+            dest_input=dest_input,
+            a2l_records=a2l_tags,
+            mac_records=mac_records,
+        )
+        md = generate_diff_report(result, **kwargs)
+        if not md.written:
+            panel.set_status(
+                "Report refused: " + "; ".join(md.diagnostics), "sev-error"
+            )
+            return
+        html = generate_diff_report_html(result, **kwargs)
+        if not html.written:
+            panel.set_status(
+                "HTML report refused: " + "; ".join(html.diagnostics), "sev-error"
+            )
+            return
+        panel.set_status(
+            f"Diff report written: {md.path}  |  {html.path}", "sev-ok"
         )
 
     def _compose_screen_a2l(self) -> Container:
@@ -2520,6 +2760,8 @@ class S19TuiApp(App):
                 container.add_class("hidden")
         self.query_one(Rail).set_active(screen_key)
         self._apply_empty_state()
+        if screen_key == "diff":
+            self._prefill_diff_variants()
 
     # Screens that own both real content and an `EmptyStatePanel`; the panel
     # is shown only while no file is loaded (LLR-002.3). Each tuple is the
