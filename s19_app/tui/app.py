@@ -86,6 +86,12 @@ from .services.report_service import (
     generate_project_report,
     list_project_reports,
 )
+from .services.manifest_writer import (
+    ManifestVerifyResult,
+    MANIFEST_VERIFIED,
+    verify_written_manifest,
+    write_project_manifest,
+)
 from .services.validation_service import build_validation_report
 from .services.variant_execution_service import (
     EXECUTION_SCOPES,
@@ -3526,8 +3532,116 @@ class S19TuiApp(App):
             )
         else:
             self.set_status(f"Saved project to {project_dir}")
+        self._write_and_verify_manifest(project_dir)
         self.update_project_labels()
         self.refresh_files()
+
+    def _write_and_verify_manifest(self, project_dir: Path) -> None:
+        """
+        Summary:
+            Persist the active project's ``project.json`` and verify-check the
+            write, then surface the outcome (HLR-004 / LLR-004.1). After the
+            file-copy save, serialize the current ``ProjectVariantSet`` (its
+            ``active_variant`` selection) into the canonical manifest envelope,
+            write it atomically into the contained work area, re-read it, and
+            hand the :class:`ManifestVerifyResult` to
+            :meth:`_surface_manifest_verify_result`. Orchestration-only — the
+            serialize / write / verify logic lives in the headless
+            ``manifest_writer`` service; this method only calls it and renders.
+
+        Args:
+            project_dir (Path): The just-saved project directory the manifest is
+                written into (``project.json`` lands directly here).
+
+        Returns:
+            None
+
+        Data Flow:
+            - No ``_variant_set`` (an empty / failed save) → no manifest write.
+            - ``write_project_manifest`` returns ``(None, issues)`` on a refused
+              serialize or a containment / IO failure (collect-don't-abort);
+              that is surfaced as an error notice, never raised.
+            - On a successful write, ``verify_written_manifest`` re-reads the
+              canonical ``project.json`` and the result is surfaced (quiet on
+              verified, loud on mismatch).
+
+        Dependencies:
+            Uses:
+                - write_project_manifest / verify_written_manifest
+                - _surface_manifest_verify_result
+            Used by:
+                - _handle_save_dialog
+        """
+        variant_set = self._variant_set
+        if variant_set is None:
+            return
+        written, issues = write_project_manifest(
+            variant_set, project_dir, self.base_dir
+        )
+        if written is None:
+            detail = "; ".join(issue.message for issue in issues) or "unknown error"
+            self.set_status("Manifest write failed")
+            self.notify(
+                detail,
+                title="Manifest write failed - project.json not written",
+                severity="error",
+                timeout=10.0,
+            )
+            self.logger.warning("Manifest write refused: %s", detail)
+            return
+        result = verify_written_manifest(project_dir, variant_set, project_dir)
+        self._surface_manifest_verify_result(result)
+
+    def _surface_manifest_verify_result(
+        self, result: ManifestVerifyResult
+    ) -> None:
+        """
+        Summary:
+            Surface a manifest verify-on-write outcome (LLR-004.2), mirroring
+            the batch-10 ``_surface_verify_result`` quiet/loud shape: a concise
+            "manifest verified" status line on success, and on mismatch a status
+            line plus a prominent error notice naming the drifting key(s) and
+            the re-read reader issue messages. Reader-issue messages are
+            attacker-influenceable, so they are passed as PLAIN text to
+            ``notify`` (no Rich-markup interpolation) — a crafted path cannot
+            inject markup.
+
+        Args:
+            result (ManifestVerifyResult): The already-computed verify outcome
+                (status / drift / issues / written_path).
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``verified`` → one status line, no notice.
+            - ``mismatch`` → one status line + a ``severity="error"`` notice
+              built from the ``drift`` key names and the plain-text
+              ``issue.message`` strings (no raw markup).
+
+        Dependencies:
+            Uses:
+                - set_status / notify
+            Used by:
+                - _write_and_verify_manifest
+        """
+        if result.status == MANIFEST_VERIFIED:
+            self.set_status("Project saved + manifest verified")
+            return
+        parts: list[str] = []
+        if result.drift:
+            parts.append("drift: " + ", ".join(result.drift))
+        if result.issues:
+            parts.extend(issue.message for issue in result.issues)
+        detail = "; ".join(parts) or "manifest re-read did not match intent"
+        self.set_status("Manifest verify MISMATCH")
+        self.notify(
+            detail,
+            title="Manifest verify mismatch - project.json may be wrong",
+            severity="error",
+            timeout=10.0,
+        )
+        self.logger.warning("Manifest verify mismatch: %s", detail)
 
     def _handle_load_project(self, name: Optional[str]) -> None:
         if name is None:

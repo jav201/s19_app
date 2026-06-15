@@ -1,0 +1,221 @@
+{
+    "project": "s19_app",
+    "batch_id": "2026-06-13-batch-10",
+    "batch_objective": "US-008 Intel HEX emitter (the writer the repo lacks — closes batch-07 D-1/F-A-05) + US-009 verify-on-save (write -> re-read -> diff against the intended mem_map using the batch-09 compare.py engine; report/notice on mismatch). Hygiene N-3 (load_buttons id) + OperationsScreen except-KeyError folded into the TUI-touching increment. Queued NOT in scope: project.json manifest writer; optional E2E/knee. CRC first-operation fill-in POSTPONED to a later batch (operator, 2026-06-13).",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {
+        "1": 3,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1
+    },
+    "artifacts": {
+        "1": ".dev-flow/2026-06-13-batch-10/01-requirements.md",
+        "2": ".dev-flow/2026-06-13-batch-10/02-review.md",
+        "3": ".dev-flow/2026-06-13-batch-10/03-increments/",
+        "4": ".dev-flow/2026-06-13-batch-10/04-validation.md",
+        "5": ".dev-flow/2026-06-13-batch-10/05-postmortem.md",
+        "6": ".dev-flow/2026-06-13-batch-10/06-docs/"
+    },
+    "branch": "claude/batch-10 (worktree; created at I1 from the post-PR-#14 base; origin/main now 82defdb; git log origin/main..HEAD = only batch-10 commits)",
+    "previous_batches": [
+        "2026-05-05-batch-01",
+        "2026-05-20-batch-02",
+        "2026-05-21-batch-03",
+        "2026-05-21-batch-04",
+        "2026-05-26-batch-05",
+        "2026-06-09-batch-06",
+        "2026-06-10-batch-07",
+        "2026-06-11-batch-08",
+        "2026-06-11-batch-09"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. Living docs (REQUIREMENTS.md, tests/, docs/diagrams/) kept current. On batch advance, the closing batch's state.json is snapshotted into its folder as state-snapshot-at-close.json before the shared state.json is trimmed to the new batch.",
+    "living_documentation": {
+        "requirements": "REQUIREMENTS.md (repo root)",
+        "tests": "tests/",
+        "diagrams": "docs/diagrams/"
+    },
+    "carried_from_batch_09": {
+        "template_widenings_pending_operator_confirmation": "A-8 (post-mortem): V-3 add a supersession-completeness inspection row to the Phase-4 matrix (grep ALL guard/placeholder classes, assert survivors are negative assertions); V-4 tighten the purity probe from substring `textual` to `import textual|from textual|Textual`; V-5 widen the A-3 provisional flag to ALL implementer-owned identifiers (test FILE paths + -k tokens, not only node ids). To confirm at this batch's Phase 0 — operator asked to confirm them at init.",
+        "checklist_items_adopted": "A-1 census-completeness probe (census must grep BOTH behavioral-placeholder AND structural/placement/allowlist + AST guards) — CRITICAL this batch: HEX emitter + verify-on-save add modules at new locations and reuse the compare-engine pattern, so both batch-09 lessons recur. A-2 increment gate = requirement-validation point (re-examine inherited sibling patterns vs new intent). A-3 post-Phase-2 scope-change re-routes security. A-4/A-5 KEEPs (signed-balance + C-9 re-check; AC-artifact + probe-regime). V-1/V-2/V-6 validation practices.",
+        "reusable_substrate": "s19_app/compare.py (R-CMP-001, ComparisonResult/DiffRun/DiffStats + diff_mem_maps) — US-009 verify-on-save is its first downstream consumer. S19 emitter precedent: emit_s19_from_mem_map in s19_app/tui/changes/io.py. NO Intel HEX writer exists in hexfile.py (the US-008 gap, measured batch-07 P3 + batch-09 P-03).",
+        "queued_stories": "project.json manifest writer; hygiene N-3 load_buttons + OperationsScreen except-KeyError (fold into TUI increment this batch if it touches the panel); optional E2E pilot / perf-knee test; CRC first-operation fill-in (postponed by operator, awaits CRC definition).",
+        "suite_baseline_note": "Post-batch-09 tree (merged at main): 782 collected / full 750 passed / lean 729 passed. Re-measure at Phase-1 draft per V-7 (do not assume)."
+    },
+    "decisions_log": [
+        {
+            "phase": 0,
+            "date": "2026-06-13",
+            "decision": "batch-09-closed-merged-synced",
+            "notes": "Batch-09 (US-006 hex compare) fully closed: 6 phases, 6 increments, PR #14 merged 2026-06-14T05:24Z (CI green 5m14s), synced to the G: vault (artifacts + README; 03-increments excluded), full suite 750 passed/0 failed, REQUIREMENTS.md §15 R-CMP-001..006. Full batch-09 history: .dev-flow/2026-06-11-batch-09/state-snapshot-at-close.json."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-13",
+            "decision": "batch-10-created",
+            "notes": "Operator: 'Arrancamos batch-10 con /dev-flow-init-en, postponemos CRC para el siguiente batch.' Scope = US-008 (Intel HEX emitter — the writer hexfile.py lacks; closes batch-07 D-1/F-A-05) + US-009 (verify-on-save: write -> re-read -> diff against intended mem_map via batch-09 compare.py; report on mismatch). US-009 is the first downstream consumer of the compare engine. Hygiene N-3 + OperationsScreen except-KeyError folded into the TUI-touching increment. Queued NOT in scope: project.json manifest writer, optional E2E/knee. CRC fill-in POSTPONED to a later batch. Stories seeded into 01-requirements.md §2.6 (US-008/009). Scaffolded .dev-flow/2026-06-13-batch-10/ per project convention (UTF-8 no-BOM, 0 mojibake; req-template-en.md now carrying 6 control generations). Branch claude/batch-10 to be cut off origin/main post-PR-#14 at Phase-1 approval. A-8 template widenings (V-3/V-4/V-5) pending operator confirmation at this Phase 0 (asked)."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-13",
+            "decision": "A-8-template-widenings-confirmed-scope-confirmed",
+            "notes": "Operator confirmed BOTH at Phase 0: (1) adopt all three A-8 widenings; (2) scope = US-008 + US-009 (star pair), manifest writer + E2E/knee stay queued, CRC postponed. Applied to ~/.claude/templates/dev-flow/req-template-en.md after the probe-regime rule: Supersession-census-completeness rule (V-3 census half — grep behavioral + structural/placement/allowlist + AST guard families; origin batch-09 Lesson 1), Phase-4 supersession-completeness inspection (V-3 matrix half), Provisional-identifier scope rule (V-5 — flag covers file paths + -k + node ids; origin DEV-1), Purity-probe form rule (V-4 — match import statements not bare token; origin DEV-5). Template now carries 7 generations of preventive controls (b05 symbol-citation, b06 env-measurement, b07 probe-self-test + contract-touch, b08 AC-artifact + probe-regime, b09 census-completeness + V-3/V-4/V-5). These bind from batch-10 Phase 1. CRITICAL for this batch: A-1/census-completeness directly applies — US-008/009 add modules at new locations (hexfile writer + verify-on-save service) and US-009 reuses the compare.py sibling pattern, so both batch-09 lessons recur."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-13",
+            "decision": "awaiting-gate",
+            "notes": "Phase 1 wave 1: architect + qa-reviewer in parallel. Result: 2 US (008/009) / 5 HLR / 14 LLR / TC-001..013 (provisional per V-5). Operator answers baked in: TUI-only (0 CLI LLRs); D-A and D-B delegated -> recommendations produced. D-A (emitter location): RECOMMEND hexfile.py option (a) format-cohesion — Intel-HEX read+write knowledge in one module, avoids the stranded-S19-emitter anti-pattern (emit_s19_from_mem_map lives orphaned in tui/changes/io.py:1298), trips ZERO census guards; the package-root alternative (b) would trip the two test_tc028 allowlist guards (inc9:3191 + inc10:3565) — census-completeness applied PREVENTIVELY per A-1. D-B (verify trigger): RECOMMEND hybrid (3) — verify always (cheap: P-15 ~165-172ms reread + ~215ms diff on 819KB), quiet pass indicator, loud notice/report ONLY on mismatch; alternatives auto-always-shown (banner blindness) / explicit (operator forgets) laid out. Verify scope RESOLVED: verify_written_image(..., file_type) handles BOTH s19+hex (IntelHexFile/S19File dispatch) — not an open question. ELA high-address (>=0x10000) is the load-bearing emitter edge (qa: round-trip fixture MUST include >=0x10000 to exercise type-0x04 records) -> TC-002. Byte-stability = measure-don't-assume (semantic round-trip is the pass property, like S19 P-04). Measured baseline 782 collected (both agents). Probes P-1..P-6 executed w/ regimes (V-4 form). Census preventive: hexfile.py placement (a) trips nothing; no-textual import-graph guard test_checks_engine.py:400 enforced by P-1/P-2; save_patched_image return-shape change (C-10) has 2 callers change_service.py:845 + variant_execution_service.py:711. Gate-confirmables G-1 (emitter loc), G-2 (verify trigger + mismatch surface), G-3 (verify_written_image/VerifyResult home + save return carrier), G-4 (on-disk mismatch report deferred). 0 should in statements, 0 mojibake. Increment plan I1 emitter / I2 verify engine / I3 HEX save-back / I4 TUI + folded hygiene. Awaiting gate + operator answers to G-1/G-2."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-13",
+            "decision": "approved",
+            "notes": "Phase 1 APPROVED ('Apruebo, sigue tus recomendaciones para los confirmables restantes'). All recommendations locked: G-1 emitter in hexfile.py (format-cohesion, trips no census guard); G-2 hybrid verify-on-save (verify always, quiet pass, loud only on mismatch); G-3 dedicated verify_written_image/VerifyResult helper home + save_patched_image return carrier; G-4 on-disk mismatch report DEFERRED (inline DiffStats summary this batch). Verify applies to both s19+hex (file_type dispatch). 5 HLR / 14 LLR / TC-001..013. Advancing to Phase 2 cross-review."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-13",
+            "decision": "started",
+            "notes": "Phase 2. architect (completeness/contradictions/derivation/contract C-10/anchors/7-gen-rule-compliance incl. census-completeness + V-3/V-4/V-5) + qa-reviewer (testability/probe-reexec/ELA round-trip viability/threshold soundness/coverage) + security-reviewer (REAL surface: NEW HEX file writes to disk via save-back, destination/collision/no-overwrite, save_patched_image return-shape change blast radius, verify re-read of just-written files) dispatched in parallel -> 02-review.md."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-14",
+            "decision": "awaiting-gate-no-blockers-4-majors",
+            "notes": "Phase 2: 0 BLOCKERS / 4 unique majors / ~8 minors; security OK-to-ship. Majors (all spec-substance, NO design change, NO new operator decision): M-1 (F-A-01/F-Q-03/F-S-03) C-10 3-tuple save_patched_image return has 5-site blast radius (R-10-CONTRACT named 2 prod callers but missed test_changes_apply.py:330/376/394 + variant_execution_service not in I3 budget) -> resolve via BACK-COMPATIBLE carrier (attach VerifyResult to existing summary, don't widen tuple = 0 sites, the G-3 recommendation already delegated); M-2 (F-Q-01) LLR-003.2 threshold DiffRun(kind=,length=) not constructible (length is @property compare.py:137 not a field) -> restate len(runs)==1/runs[0].kind/runs[0].length; M-3 (F-Q-02) LLR-005.2 'narrow the try' not implementable (run_operation does resolve+execute in one call) -> cite operation_resolver seam operation_service.py:35 inside narrow try; M-4 (F-Q-04) TC-007 conflates fault models (dropped byte = only_a not changed) -> pick one fault model per TC. CLEAN: census-completeness VERIFIED COMPLETE (V-3/A-1, batch-09 I1 escape pre-empted — hexfile.py trips 0 guards); security OK (workarea containment + collision + sanitize reuse, 0 byte-leak via VerifyResult, no new deps); probes P-1..P-6 reproduce; ELA round-trip present; byte-stability measure-don't-assume; 0 should in statements; V-5 provisional flags. No blocker = no forced iteration; orchestrator recommends iterate-to-fix M-1..M-4 + folds. Awaiting gate."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-14",
+            "decision": "iteration-2-completed",
+            "notes": "Operator: 'iterar como recomiendas'. Architect applied full register: 12/12 closed (4 majors + 8 minors), §6.4 audit H-1..H-4. M-1 BACK-COMPATIBLE carrier pinned (save_patched_image keeps 2-tuple apply.py:564, VerifyResult rides ChangeService.last_summary; 5-site census recorded, blast radius 0, LLR-002.1 AC now true, variant_execution_service off I3 budget); M-2 property-read threshold len(runs)==1/runs[0].kind/runs[0].length (length is @property compare.py:138); M-3 operation_resolver seam (operation_service.py:35) inside narrow try + execute outside, TC-013 monkeypatches; M-4 fault models split mutated->changed / dropped->only_a. Minors m-1..m-8 all landed (anchors, §5.2 spans, ELA oracle records+record_type==0x04, §5.3 signed-balance 782-0+N, parametric suffix sanitizer apply.py:691, variant-exec out-of-scope note). C-10 contract re-check: 2-tuple gains 0 fields, VerifyResult separate channel, HOLDS. Orchestrator verified: 4 H-rows, property-read x4, operation_resolver x6, last_summary x3, 0 mojibake, 0 should in statements, 5 HLR/14 LLR consistent. Re-confirmation appended to 02-review.md, 0 open findings. Awaiting Phase-2 re-confirmation gate."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-14",
+            "decision": "approved-iteration-2",
+            "notes": "Phase-2 re-confirmation gate approved ('Apruebo'). 0 open findings, 5 HLR / 14 LLR / TC-001..013. Advancing to Phase 3 — increment plan: I1 Intel HEX emitter (hexfile.py emit_intel_hex_from_mem_map + tests/test_hex_emit.py), I2 verify engine (verify_written_image + VerifyResult, last_summary carrier), I3 HEX save-back (retire CHG_HEX_SAVE_UNSUPPORTED refusal, parametric suffix sanitizer, verify wired into save-back), I4 TUI surface (hybrid verify notice + folded hygiene N-3 load_buttons + OperationsScreen except KeyError). Local commit per increment; A-3/V-5 increment-gate discipline (run spec-pinned node ids verbatim). PR + CI at batch close. NOTE: per-gate cadence for batch-10 (no standing autonomous directive unless operator re-grants)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I1-started",
+            "notes": "I1 — Intel HEX emitter: emit_intel_hex_from_mem_map (NEW) added to hexfile.py (G-1 format-cohesion: read+write in one module; trips 0 census guards per the verified 8-module allowlist incl. hexfile.py). Hand-rolled (no bincopy/crcmod — dep guard), headless (stdlib only, no textual), two's-complement-of-sum checksum matching the reader oracle hexfile.py:66-74, type-0x04 ELA records for addresses >0xFFFF, semantic round-trip (not byte-identity). Files: hexfile.py + tests/test_hex_emit.py NEW (TC-001..005: low-addr round-trip, ELA high-addr >=0x10000 forcing 0x04, empty, public-example, byte-stability MEASURE). software-dev dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I1-awaiting-gate-after-R2-relocation",
+            "notes": "I1 hit a real BLOCKER (the batch-09 census-completeness lesson recurring with a 4TH guard family the V-3 rule missed): emitter in hexfile.py tripped 3 engine-frozen/no-diff-vs-main guards (test_engine_unchanged.py::test_tc027 + test_tc031 x2; _ENGINE_PATHS freezes core/hexfile/range_index/validation/a2l/mac/color_policy). software-dev STOPPED correctly. Operator decision R2: relocate emitter to tui/changes/io.py (next to emit_s19_from_mem_map, emission-purpose cohesion; io.py NOT frozen -> 0 guards; G-1/D-A location REVERSED hexfile.py->io.py). Phase-1 iteration 3 (architect): spec amended body-first — LLR-001.1/HLR-001/D-A->io.py, §6.3 R-10-ENGINE-FROZEN risk (4th-guard-family, batch-10 post-mortem feeder), §6.4 H-5 row, io.py purity pre-state 0 textual, frozen-set grep confirmed io.py not frozen, 25 remaining hexfile.py mentions all reader-side, 5 HLR/14 LLR unchanged, C-10 untouched. software-dev redo: hexfile.py reverted PRISTINE (git diff empty — clears the 3 guards), emit_intel_hex_from_mem_map + _intel_hex_record + HEX_DATA_BYTES_PER_RECORD moved to io.py (1232->1337L, re-exported in __all__), test re-pointed. Orchestrator-verified: hexfile.py diff EMPTY; 3 engine-frozen guards + 2 allowlist guards + 10 hex_emit tests all pass; io.py regression test_changes_apply 16 passed; lean 739 passed/0 failed (prior attempt 3 failed -> 0); collection 792 EXACT 782+10; 0 textual in io.py. BRANCH FIX: I1 commit initially landed on claude/batch-09 (the merged branch); created claude/batch-10 at HEAD, fetched origin (main now 82defdb post-PR-#14), verified git log origin/main..HEAD = only the I1 commit. Local commit 636434c on claude/batch-10. Packet: increment-I1.md (redo section). Awaiting I1 gate. RATIFICATION: the R2 relocation (G-1 reversal) + the 4th-guard-family finding."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I1-approved-I2-started",
+            "notes": "I1 APPROVED ('Aprobar') — R2 relocation + 4th-guard-family finding ratified. Per-gate cadence continues (operator did not re-grant autonomous mode). I2 started — verify engine: verify_written_image(written_path, intended_mem_map, file_type) -> VerifyResult (NEW, headless, dispatches IntelHexFile for hex / S19File for s19 to re-read, calls compare.diff_mem_maps(intended, reread), VerifyResult{status, runs, stats, written_path}); home per G-3 (dedicated helper). Corrected Phase-2 thresholds applied: M-2 property-read form len(runs)==1/runs[0].kind/runs[0].length; M-4 fault models split (mutated->changed, dropped->only_a). Files: the verify helper module + tests/test_verify_on_save.py (TC-006..009: identity zero-runs, mutated-byte changed, dropped-byte only_a, both file_types). Reuses compare.py read-only; no textual. save-back wiring (last_summary carrier) is I3. software-dev dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I2-awaiting-gate",
+            "notes": "I2 implemented + orchestrator-verified. verify.py NEW 171L in tui/changes/ (G-3 home = NEW dedicated module, not apply.py; headless, 0 textual): verify_written_image(written_path, intended_mem_map, file_type) -> VerifyResult{status, runs, stats, written_path}; dispatches IntelHexFile(hex)/S19File(s19) for re-read, diffs via compare.diff_mem_maps(intended, reread) (A=intended so dropped byte -> only_a). STATUS_VERIFIED/STATUS_MISMATCH. M-2 property-read thresholds + M-4 fault models (mutated->changed, dropped->only_a) implemented. test_verify_on_save.py NEW 8 nodes (identity/mutated/dropped x both file_types + 2 guards). Results: verify suite 8 passed (orchestrator re-ran 0.41s); I1 regression 10 passed; lean 747/0 — ledger EXACT 739+8; collection 800 — EXACT 792+8 (signed-balance D=0); 0 textual; engine-frozen guard still green. Back-compatible: save_patched_image untouched (wiring is I3). Deviations: TC-numbering brief(006-008) vs spec §5.2(008-010) both provisional V-5 -> Phase-4 reconcile; __init__ facade re-export deferred to I3. Local commit 089b8b2. Packet: increment-I2.md. Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I2-approved-I3-started",
+            "notes": "I2 APPROVED ('Apruebo'). Operator minor: verify increment-I2.md path — confirmed correct on disk at .dev-flow/2026-06-13-batch-10/03-increments/increment-I2.md (the gate-message link had a 2026-06-11 typo; no wrong folder exists). I3 started — HEX save-back: retire CHG_HEX_SAVE_UNSUPPORTED refusal in apply.py (source_kind!='s19' block at apply.py:636) so HEX save-back emits via emit_intel_hex_from_mem_map; parametric suffix on the SINGLE _sanitize_s19_filename (apply.py:691, m-7 — keep all 3 rejection rules in one place); wire verify_written_image into the save path with VerifyResult on the BACK-COMPATIBLE carrier ChangeService.last_summary (M-1, save_patched_image keeps its 2-tuple); changes/__init__ facade re-export of verify symbols (deferred from I2). Files: apply.py, change_service.py, changes/__init__.py, tests/test_changes_apply.py (+test_change_service.py if needed) <=5. apply.py NOT engine-frozen (changes/ pkg). software-dev dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I3-awaiting-gate",
+            "notes": "I3 implemented + orchestrator-verified. 6 files (CAP EXCEPTION +1, flagged for ratification): apply.py (+108: _SAVE_BACK_EMITTERS emitter/suffix table, HEX refusal retired but kept for mac/non-s19-hex, _sanitize_s19_filename parametric suffix all 3 rules unforked); change_service.py (+26: verify_written_image post-save, stamps last_summary.verify_result); model.py (+14: ChangeSummary.verify_result slotted field, TYPE_CHECKING import, off to_dict — THE cap-exception file: ChangeSummary is slots=True so the carrier field has no other home); changes/__init__ (+15 facade re-export); test_changes_apply.py (+195); test_change_service.py (+52). M-1 back-compat PROVEN: save_patched_image return Tuple[Optional[Path],List[ValidationIssue]] UNCHANGED at apply.py:581, 5 unpack sites intact (verify runs in service handler not save_patched_image). m-7 parametric sanitizer done. Results: I3 suites 61 passed (orchestrator re-ran); I1+I2 regression 18 passed; lean 758/0 (orchestrator ran — EXACT 747+11); collection 811 — EXACT 800+11 signed-balance D=0; engine-frozen guard green; back-compat grep confirmed. TC-005 HEX writes/.hex/adversarial, TC-006 mac still refused, TC-007 engine-half (surface=I4), TC-010 verified+dropped-byte only_a file-kept. Local commit 0637858. Packet: increment-I3.md. RATIFICATION: 6-file cap exception (model.py for the slotted carrier — contract fidelity over cap). Awaiting gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I3-approved-I4-started",
+            "notes": "I3 APPROVED ('Aprobar') — 6-file cap exception ratified (model.py slotted carrier). I4 started — FINAL increment, TUI surface + hygiene: HLR-004 hybrid verify notice (quiet status on pass 'saved + verified', loud notice/inline DiffStats on mismatch — read last_summary.verify_result in the save-back handler app.py:1364/_report_change_result app.py:1415); LLR-002.3 format-aware save filename suggestion in app.py (currently hardcodes .s19 at app.py:1341); HLR-005 hygiene: N-3 rename reused load_buttons id in OperationsScreen (screens.py:556, .modal-buttons class already co-applied so no CSS loss) + M-3 narrow the except KeyError in OperationsScreen._execute_selected (screens.py:617-622) to call operation_resolver (operation_service.py:35) inside the try, .execute() outside. Files: app.py, screens.py, styles.tcss?, tests/test_tui_*.py <=5. run_test pilots. software-dev dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "increment-I4-approved-phase-3-complete",
+            "notes": "I4 implemented + orchestrator-verified — PHASE 3 COMPLETE (I1,I2,I3,I4; all 5 HLR delivered). 5 files: app.py (+97: _surface_verify_result quiet/loud hybrid reading last_summary.verify_result, format-aware .hex/.s19 filename, DiffStats counts only no raw bytes); screens.py (+30/-20: M-3 resolver-inside-try/execute-outside, N-3 load_buttons->screen-unique ids x6 screens); styles.tcss (dropped dead #load_buttons selector, .modal-buttons preserved); 2 TUI test files. Orchestrator-verified: I4 pilots+OperationsScreen regression 16 passed; rail.py diff EMPTY; app.py 0 diff_mem_maps/verify_written_image (orchestration-only); load_buttons id 0 remaining; lean 763/0 (orchestrator ran — EXACT 758+5); collection 816 — EXACT 811+5 signed-balance D=0; engine-frozen+tc031 green. Hybrid surface: quiet 'Saved+verified' on pass, loud error notice w/ DiffStats on mismatch (file kept). Deviations: N-3 broadened to all 6 modal screens (satisfies LLR-005.1 P-3 zero-cross-screen-shared-ids); TC test home test_tui_operations_view.py not provisional test_operations.py (V-5); emit_intel_hex_from_mem_map not re-exported from changes/__init__ (tidy follow-up chip, tests import from .changes.io). Initial commit attempt failed (here-string quoting w/ inner double-quotes/+), recommitted clean. Local commit 4cb5371. Ledger chain exact every gate: 782->792->800->811->816. Packet: increment-I4.md. PHASE 3 COMPLETE. Advancing to Phase 4.",
+            "deviation_note": "increment-I2.md path in a prior gate message had a 2026-06-11 typo; file is correctly at 2026-06-13-batch-10/ (operator-flagged, verified)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-14",
+            "decision": "I4-approved-phase-3-complete-phase-4-started",
+            "notes": "I4 awaiting gate (Phase-3-completion gate). On approval, Phase 4 plan: A-6 run-ownership — qa-reviewer per-TC matrix TC-001..013 (verbatim node ids per V-5 + provisional->implemented renames as DEV doc-reconciliation) + inspections (emitter purity, hexfile.py-pristine engine-frozen, verify no-byte-leak, M-1 back-compat 2-tuple, N-3/M-3 hygiene, ELA oracle, V-3 supersession-completeness incl. 4th guard family, byte-stability measure); orchestrator runs lean+full ONCE. Per-gate cadence (no standing autonomous directive this batch)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-14",
+            "decision": "completed-pass-with-notes-awaiting-gate",
+            "notes": "Phase 4 PASS-WITH-NOTES. qa half: 35/35 targeted node-results pass (13 spec TCs -> implemented nodes, all green), every LLR threshold met from source (M-2 property-read, M-4 fault models, ELA record_type==0x04 oracle); 10 inspections PASS (io.py + verify.py purity; hexfile.py git-diff-vs-main EMPTY + 3 engine-frozen guards green; V-3 4-family census confirms io.py/verify.py trip none; M-1 2-tuple preserved + 5 unpack sites intact; no-byte-leak; N-3 load_buttons id 0; M-3 resolve-inside/execute-outside; byte-stability measure-not-gated). Orchestrator half: lean 763/0 (I4) + FULL suite 784 passed/0 failed/29 skipped/3 xfailed in 658.73s exit 0 — reconciliation EXACT 784+29+3=816, 763 lean+21 slow=784. Signed-balance 816=782-0+34 (I1+10/I2+8/I3+11/I4+5). 9 DEV notes all non-blocking: DEV-1..6 V-5 renames (incl. DEV-6 D-A option-letter typo (a)->(c)), DEV-7 4th-guard-family census-rule extension (post-mortem feeder + template widening candidate), DEV-8 emit_intel_hex __init__ re-export tidy, DEV-9 byte-stability measure. 0 code defects. Gate disposition in 04-validation.md; awaiting Phase-4 gate (per-gate cadence)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-14",
+            "decision": "approved",
+            "notes": "Phase 4 APPROVED ('Aprobar'). PASS-WITH-NOTES, full suite 784/0, 9 DEV notes non-blocking. Advancing to Phase 5 post-mortem."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-14",
+            "decision": "started",
+            "notes": "Phase 5 post-mortem. architect (process) + qa-reviewer (validation) in parallel -> 05-postmortem.md. HEADLINE lesson: the 4th guard family (engine-frozen / no-diff-vs-main, _ENGINE_PATHS) that the census MISSED even after the V-3 widening — forced R2 at the I1 gate (emitter hexfile.py->io.py). This is a recurrence of the batch-09 census-incompleteness class -> the supersession-census-completeness rule needs the engine-frozen family added (DEV-7). What worked: conflict-rule + per-gate cadence caught it at I1 (not Phase 4); M-1 back-compatible carrier (2-tuple preserved) zero-cost; signed-balance exact; emitter co-location (R2) preserved the frozen-engine contract. Generate batch-11 actions (manifest writer, CRC fill-in still queued, DEV-8 __init__ tidy, the census-rule template widening)."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-14",
+            "decision": "completed-awaiting-gate",
+            "notes": "Phase 5 merged (architect process + qa validation) -> 05-postmortem.md. HEADLINE: enumerated-pattern census is structurally incomplete — missed the 4th guard family (engine-frozen/_ENGINE_PATHS) even after the b09 V-3 widening -> R2 at I1; the GATE not the census is the completeness guarantee, never stamp census COMPLETE again. What worked: per-gate+conflict-rule caught it at I1 (one-redo cost); M-1 back-compat carrier (0 vs 5 broken sites); signed-balance exact 782->816 D=0; R2 preserved frozen-engine contract; 3 Phase-2 QA majors landed as non-vacuous tests. 0 behavior leaks (DEV-1..9 doc/cosmetic). Merged actions A-1..A-9: A-1 census=completeness-principle/change-first-dry-run (template), A-2 ban VERIFIED-COMPLETE stamp/gate-confirmed, A-3 new-symbol-into-existing-file mutability probe, A-4 document frozen-engine invariant in CLAUDE.md, A-5/A-6/A-7 KEEPs, A-8/A-9 Phase-6 doc (DEV reconciliation + REQUIREMENTS.md R-* + DEV-8 re-export). Batch-11 slate: manifest writer (verify-checkable via the new substrate), CRC fill-in still queued, A-1/A-2/A-4 widenings -> batch-11 Phase 0 operator-confirm. Per-gate cadence; awaiting Phase-5 gate."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-14",
+            "decision": "approved",
+            "notes": "Phase 5 APPROVED ('Aprobar'). Advancing to Phase 6 documentation."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-14",
+            "decision": "started",
+            "notes": "Phase 6 documentation. 3 parallel agents on disjoint files: (A) docs-writer REQUIREMENTS.md new section US-008/US-009 R-* (emitter R-HEX-*, verify-on-save R-VFY-*, save-back, TUI surface, N-3/M-3 hygiene) + A-4 frozen-engine invariant note in CLAUDE.md + DEV-8 emit_intel_hex re-export from changes/__init__ + 01-requirements DEV-1..6 reconciliations (A-8: node-id/file renames, DEV-6 D-A=(c) docstring fix); (B) docs-writer 06-docs traceability-matrix.md (14 LLR, TC-001..013 implemented node ids) + functionality.md + diagrams/emit-verify-flow Mermaid; (C) presentation-builder executive-summary.md. Encoding UTF-8 no-BOM, verify 0 mojibake."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-14",
+            "decision": "completed-awaiting-gate",
+            "notes": "Phase 6 complete. (A) REQUIREMENTS.md NEW §16 (R-HEX-EMIT-001, R-HEX-SAVE-001, R-HEX-VERIFY-001/002, R-HEX-HYGIENE-001; ~28 code + 25 test pointers grep-verified; io.py-not-hexfile.py rationale recorded) — orchestrator independently re-verified §16 landed (batch-09 lesson: agent-A REQUIREMENTS edit had silently failed last time; this time confirmed lines 1777-1899). A-4 CLAUDE.md frozen-engine note (set grep-matched _ENGINE_PATHS). DEV-8 emit_intel_hex re-export in changes/__init__ (import resolves; engine guards green). 01-requirements DEV-1..6 reconciliations applied (node-id/file renames, DEV-6 D-A=(c) fix, §5.2 rebuilt w/ implemented-node-id column). (B) 06-docs: traceability-matrix.md (US-008/009->5 HLR->14 LLR->TC-001..013->file:line, 41 anchors verified, DEV-1..9 dispositioned, sign-off), functionality.md, diagrams/emit-verify-flow.md (Mermaid + 4 guard-rail callouts). (C) executive-summary.md (~1.5pp EN, sourced numbers, frozen-engine-catch as the quality story). Sibling agents flagged 2 pre-existing doc-drifts (no _emit_ela_record symbol — single _intel_hex_record; TC-007 location = test_tui_patch_editor_v2.py) both already in the DEV register. Orchestrator verified: §16 present, CLAUDE note, DEV-8 x2, all 06-docs files, 0 mojibake, collection 816 intact, facade imports resolve. Per-gate cadence; awaiting Phase-6 gate. On approval -> awaiting-sync, close commit + push + PR + review + CI + merge + /dev-flow-sync-en. A-1/A-2/A-4 template/doc widenings -> batch-11 Phase 0."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-14",
+            "decision": "approved-batch-closed-autonomous-close",
+            "notes": "Phase 6 APPROVED ('Apruebo, despues /dev-flow-sync-en. Sigue en modo autonomo para cerrar al batch [10 like] 09'). Autonomous close mode RE-GRANTED for batch-10 (commit + push + PR + orchestrator review + CI green + merge + /dev-flow-sync-en; stop only on blocker). Batch-10 CLOSED; all 6 phases complete; state -> awaiting-sync. Proceeding with the close sequence."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-14",
+            "decision": "close-commit-pushed-PR-15-code-review-done",
+            "notes": "Close commit 3dd674f on claude/batch-10 (branch carries only batch-10 commits over origin/main 82defdb). Pushed; PR #15 opened (MERGEABLE). Orchestrator code review of the two core modules: emit_intel_hex_from_mem_map (io.py) + verify_written_image/VerifyResult (verify.py) — both correct + well-documented (checksum matches reader oracle, ELA on upper-16 change, semantic round-trip; verify diff direction A=intended so dropped=only_a, no byte leak, ValueError on bad file_type, headless). ONE finding: the emit_intel_hex docstring example/Returns understated output — the emitter writes a leading 0x0000 base ELA (valid, round-trip-stable, non-minimal), so output is 3 lines not 2 and low-address images carry a base ELA. Empirically confirmed ([':020000040000FA',':01001000AB44',':00000001FF']). Docstring-only fix committed f4b5fdf (behavior unchanged, round-trip tests already green — re-ran 10 passed); pushed (CI re-runs on f4b5fdf). Verdict: APPROVE. Awaiting CI green to merge + /dev-flow-sync-en. Note for batch-11 slate: the base-0-ELA non-minimality is intentional+documented, not a bug (no action)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-14",
+            "decision": "merged-and-synced-to-obsidian-batch-closed",
+            "notes": "PR #15 CI green (tui-ci pass 5m33s on the docstring-fix HEAD), MERGEABLE -> merged 2026-06-15T03:16Z. Synced to G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-13-batch-10 (canonical G: vault per memory obsidian-vault-path, NOT the command's stale C: hardcode): 01/02/04/05 + 06-docs recursive + README index; 03-increments excluded per convention; UTF-8 no-BOM. obsidian_synced=true. State snapshot -> .dev-flow/2026-06-13-batch-10/state-snapshot-at-close.json. Batch-10 FULLY CLOSED. Carried to batch-11: A-1 census=completeness-principle/change-first-dry-run + A-2 ban VERIFIED-COMPLETE stamp (template widenings, operator-confirm at batch-11 Phase 0); A-4 frozen-engine note already in CLAUDE.md (done); manifest writer (verify-checkable via verify_written_image) + CRC fill-in (pending operator definition) queued."
+        }
+    ],
+    "obsidian_synced": true,
+    "created_at": "2026-06-13T23:30:00-06:00"
+}
