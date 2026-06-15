@@ -79,7 +79,7 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
             Container(
                 Button("Load", id="load_ok", classes="modal-confirm"),
                 Button("Cancel", id="load_cancel"),
-                id="load_buttons",
+                id="loadfile_buttons",
                 classes="modal-buttons",
             ),
             id="load_dialog",
@@ -129,7 +129,7 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
             Container(
                 Button("Save", id="save_ok", classes="modal-confirm"),
                 Button("Cancel", id="save_cancel"),
-                id="load_buttons",
+                id="saveproject_buttons",
                 classes="modal-buttons",
             ),
             id="load_dialog",
@@ -188,7 +188,7 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
             Container(
                 Button("Load", id="project_ok", classes="modal-confirm"),
                 Button("Cancel", id="project_cancel"),
-                id="load_buttons",
+                id="loadproject_buttons",
                 classes="modal-buttons",
             ),
             id="load_dialog",
@@ -254,7 +254,7 @@ class SelectVariantScreen(ModalScreen[Optional[str]]):
             Container(
                 Button("Activate", id="variant_ok", classes="modal-confirm"),
                 Button("Cancel", id="variant_cancel"),
-                id="load_buttons",
+                id="selectvariant_buttons",
                 classes="modal-buttons",
             ),
             id="load_dialog",
@@ -390,7 +390,7 @@ class ReportViewerScreen(ModalScreen[None]):
                     classes="modal-confirm",
                 ),
                 Button("Close", id="report_close"),
-                id="load_buttons",
+                id="reportviewer_buttons",
                 classes="modal-buttons",
             ),
             id="report_dialog",
@@ -489,9 +489,11 @@ class OperationsScreen(ModalScreen[None]):
         ``ListView`` following the ``SelectVariantScreen`` pattern: the
         caller supplies pre-computed ``(operation_id, title)`` pairs in
         registry order and the selection resolves by list index, never by
-        parsing label text back. Pressing ``Execute`` runs the selected
-        operation EXCLUSIVELY through the ``run_operation`` service seam
-        (LLR-004.2 — no direct ``Operation.execute`` call here) synchronously
+        parsing label text back. Pressing ``Execute`` resolves the selected
+        id through the ``operation_service.operation_resolver`` seam
+        (LLR-004.2) inside a narrow ``except KeyError`` and runs the resolved
+        operation's ``.execute`` OUTSIDE that catch (M-3 / LLR-005.2 — the
+        catch covers only the registry miss, not execution) synchronously
         on the UI thread (LLR-004.4 — placeholders do no I/O and no parsing),
         then presents the ``OperationResult``'s ``status`` and ``notes`` in
         ``#operation_result_status`` plus a hex render of
@@ -513,15 +515,19 @@ class OperationsScreen(ModalScreen[None]):
 
     Data Flow:
         - Execute resolves the row index into ``self.options`` →
-          ``operation_service.run_operation(operation_id, self.loaded)`` →
-          status/notes text into ``#operation_result_status`` and the pinned
-          hex render into ``#operation_result_hex``.
+          ``operation_service.operation_resolver(operation_id)`` (in a narrow
+          ``try``) → resolved op ``.execute(self.loaded, now_fn=None)`` (out
+          of the ``try``) → status/notes text into
+          ``#operation_result_status`` and the pinned hex render into
+          ``#operation_result_hex``.
         - A registry ``KeyError`` (LLR-002.3) surfaces as an app status-line
-          error, never a crash (LLR-004.2 acceptance criterion).
+          error, never a crash (LLR-004.2 acceptance criterion); a KeyError
+          raised inside ``.execute`` is NOT caught here (M-3, LLR-005.2).
 
     Dependencies:
         Uses:
-            - operation_service.run_operation (the LLR-003.1 seam)
+            - operation_service.operation_resolver (the LLR-003.1 seam)
+              / Operation.execute
             - render_hex_view_text / MAX_HEX_ROWS
         Used by:
             - s19_app.tui.app.S19TuiApp.action_operations_view
@@ -553,7 +559,7 @@ class OperationsScreen(ModalScreen[None]):
             Container(
                 Button("Execute", id="operations_execute", classes="modal-confirm"),
                 Button("Close", id="operations_close"),
-                id="load_buttons",
+                id="operations_buttons",
                 classes="modal-buttons",
             ),
             id="operations_dialog",
@@ -590,8 +596,11 @@ class OperationsScreen(ModalScreen[None]):
         Data Flow:
             - Resolve the ``ListView`` index into ``self.options`` (no
               label-text parsing); bail silently on no selection.
-            - ``operation_service.run_operation(operation_id, self.loaded)``
-              — the ONLY execution route (no direct ``.execute`` call).
+            - Resolve the id through ``operation_service.operation_resolver``
+              inside a narrow ``try``/``except KeyError`` (a registry miss
+              becomes a status line); call the resolved operation's
+              ``.execute(self.loaded, now_fn=None)`` OUTSIDE that ``try`` so
+              an execute-internal ``KeyError`` is NOT masked (M-3, LLR-005.2).
             - ``status`` + ``notes`` → ``#operation_result_status``; the
               LLR-004.3 PINNED render call
               ``render_hex_view_text(result.output.mem_map,
@@ -603,7 +612,7 @@ class OperationsScreen(ModalScreen[None]):
 
         Dependencies:
             Uses:
-                - operation_service.run_operation
+                - operation_service.operation_resolver / Operation.execute
                 - render_hex_view_text / MAX_HEX_ROWS
             Used by:
                 - on_button_pressed (Execute button)
@@ -614,12 +623,17 @@ class OperationsScreen(ModalScreen[None]):
             return
         operation_id = self.options[index][0]
         logger.info("OperationsScreen executing operation: %s", operation_id)
+        # M-3 (LLR-005.2): the KeyError catch guards ONLY the registry
+        # resolution (operation_resolver raises KeyError on a miss). Execute
+        # runs OUTSIDE the try so a KeyError from inside the operation's own
+        # logic propagates rather than being misreported as "unknown operation".
         try:
-            result = operation_service.run_operation(operation_id, self.loaded)
+            operation = operation_service.operation_resolver(operation_id)
         except KeyError as exc:
             logger.warning("OperationsScreen unknown operation id: %s", exc)
             self.app.set_status(f"Operations error: unknown operation {operation_id}")
             return
+        result = operation.execute(self.loaded, now_fn=None)
         status_lines = [f"status: {result.status}"]
         status_lines.extend(result.notes)
         self.query_one("#operation_result_status", Static).update(

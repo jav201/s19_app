@@ -27,9 +27,11 @@ from textual.widgets import (
 from textual.widgets.data_table import RowDoesNotExist
 from rich.text import Text
 
+from ..compare import DIFF_KIND_DOMAIN
 from ..core import S19File
 from ..hexfile import IntelHexFile
 from .a2l_parse import parse_a2l_file
+from .changes import STATUS_VERIFIED, VerifyResult
 from .hexview import (
     address_in_sorted_ranges,
     build_mem_map_s19,
@@ -1337,11 +1339,12 @@ class S19TuiApp(App):
                     f"{skipped} skipped, {counts['blocked']} blocked"
                 )
                 if counts["applied"] > 0 and loaded is not None:
-                    if loaded.file_type == "s19":
-                        panel.show_save_prompt(f"{variant_id}-patched.s19")
+                    if loaded.file_type in ("s19", "hex"):
+                        suffix = ".hex" if loaded.file_type == "hex" else ".s19"
+                        panel.show_save_prompt(f"{variant_id}-patched{suffix}")
                     else:
                         self.set_status(
-                            "HEX save-back not supported this batch"
+                            f"{loaded.file_type} save-back not supported"
                         )
             elif event.action == "save_doc":
                 self._report_change_result(service.save(self.base_dir))
@@ -1411,6 +1414,94 @@ class S19TuiApp(App):
             source_kind=loaded.file_type,
         )
         self._report_change_result(result)
+        if result.ok:
+            self._surface_verify_result()
+
+    def _surface_verify_result(self) -> None:
+        """
+        Summary:
+            Surface the verify-on-save outcome riding on
+            ``ChangeService.last_summary.verify_result`` (HLR-004, hybrid
+            D-B option 3): a quiet "saved + verified" status line on a clean
+            verify (LLR-004.1), a prominent error notice naming the file and
+            the per-kind run/byte mismatch summary on a ``mismatch``
+            (LLR-004.2). The written file is left in place either way
+            (collect-don't-abort) — surfacing only reads the already-computed
+            ``VerifyResult``, it does not re-diff or re-verify.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read ``last_summary.verify_result`` (the §6.2 C-10 carrier
+              stamped by ``ChangeService.save_patched``); absent → no-op.
+            - ``verified`` → one status line, no notice.
+            - ``mismatch`` → one status line + a ``severity="error"`` notice
+              built from ``stats.run_counts`` / ``byte_counts`` over
+              ``DIFF_KIND_DOMAIN`` (counts/addresses only, never raw bytes —
+              the F-S-05 no-byte-leak precedent).
+
+        Dependencies:
+            Uses:
+                - set_status / notify
+                - _verify_mismatch_summary
+            Used by:
+                - on_patch_editor_panel_save_back_decision
+        """
+        summary = self._change_service.last_summary
+        if summary is None or summary.verify_result is None:
+            return
+        verify = summary.verify_result
+        name = (
+            verify.written_path.name
+            if verify.written_path is not None
+            else "image"
+        )
+        if verify.status == STATUS_VERIFIED:
+            self.set_status(f"Saved + verified: {name}")
+            return
+        detail = self._verify_mismatch_summary(verify)
+        self.set_status(f"Verify MISMATCH: {name}")
+        self.notify(
+            f"{name}: {detail}",
+            title="Verify mismatch - file may not match",
+            severity="error",
+            timeout=10.0,
+        )
+
+    @staticmethod
+    def _verify_mismatch_summary(verify: VerifyResult) -> str:
+        """
+        Summary:
+            Render a one-line mismatch summary from an already-computed
+            ``VerifyResult`` (LLR-004.2) — per-kind run and byte counts over
+            the canonical ``DIFF_KIND_DOMAIN`` order. Pure rendering: it reads
+            ``verify.stats`` only and never re-diffs (the diff was computed in
+            the verify engine), and it emits counts/addresses only, never raw
+            image bytes (F-S-05 no-byte-leak precedent).
+
+        Args:
+            verify (VerifyResult): The mismatch outcome to summarize.
+
+        Returns:
+            str: e.g. ``"changed 1 run / 1 byte, only_a 0 run / 0 byte, ..."``.
+
+        Dependencies:
+            Uses:
+                - DIFF_KIND_DOMAIN
+            Used by:
+                - _surface_verify_result
+        """
+        stats = verify.stats
+        parts = [
+            f"{kind} {stats.run_counts.get(kind, 0)} run / "
+            f"{stats.byte_counts.get(kind, 0)} byte"
+            for kind in DIFF_KIND_DOMAIN
+        ]
+        return ", ".join(parts)
 
     def _report_change_result(self, result: ChangeActionResult) -> None:
         """

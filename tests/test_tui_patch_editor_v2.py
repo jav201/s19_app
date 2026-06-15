@@ -40,11 +40,20 @@ from typing import Optional
 
 import pytest
 
+import s19_app.tui.services.change_service as change_service_module
+from s19_app.compare import DiffRun, DiffStats
 from s19_app.core import S19File
+from s19_app.hexfile import IntelHexFile
 from s19_app.tui.app import PATCH_ACTIONS_V2, S19TuiApp
-from s19_app.tui.changes import emit_s19_from_mem_map
+from s19_app.tui.changes import (
+    STATUS_MISMATCH,
+    STATUS_VERIFIED,
+    VerifyResult,
+    emit_s19_from_mem_map,
+)
+from s19_app.tui.changes.io import emit_intel_hex_from_mem_map
 from s19_app.tui.screens_directionb import PatchEditorPanel
-from s19_app.tui.services.load_service import build_loaded_s19
+from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
 
 NEW_WIDGET_IDS = (
     "patch_doc_path_input",
@@ -685,3 +694,178 @@ def test_check_run_display(tmp_path: Path) -> None:
         "uncheckable": 2,
     }
     assert outcomes["fail_actual"] == (0x00,)
+
+
+# ===========================================================================
+# I4 — verify-on-save surface (HLR-004) + format-aware filename (LLR-002.3)
+# ===========================================================================
+
+
+def _make_hex_image(tmp_path: Path, name: str = "img.hex") -> Path:
+    """Emit a 16-byte synthetic Intel HEX image at 0x100 (public data only)."""
+    mem_map = {0x100 + offset: 0x00 for offset in range(16)}
+    text = emit_intel_hex_from_mem_map(mem_map, [(0x100, 0x110)])
+    path = tmp_path / name
+    path.write_text(text, encoding="ascii")
+    return path
+
+
+def _load_hex_image(app: S19TuiApp, hex_path: Path) -> None:
+    """Install a HEX ``LoadedFile`` snapshot on the app (test shortcut)."""
+    hex_file = IntelHexFile(str(hex_path))
+    app.current_file = build_loaded_hex(
+        hex_path, hex_file, a2l_path=None, a2l_data=None
+    )
+
+
+async def _apply_one_entry(app: S19TuiApp, pilot, panel: PatchEditorPanel) -> None:
+    """Add one entry and apply it so the save-back prompt appears."""
+    _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+    panel.request_action("add_entry")
+    await pilot.pause()
+    panel.request_action("apply_doc")
+    await pilot.pause()
+
+
+# TC-007 — format-aware save filename suggestion (LLR-002.3)
+def test_save_back_suggestion_is_format_aware(tmp_path: Path) -> None:
+    """The post-apply prompt suggests ``.hex`` for a HEX image, ``.s19`` for
+    an S19 image.
+
+    Intent: LLR-002.3 — the suggested default filename suffix tracks
+    ``LoadedFile.file_type`` (previously hard-coded ``.s19``); a HEX-loaded
+    image must offer a ``.hex`` suggestion so the format-faithful save-back
+    of US-008 is the default the operator sees.
+    """
+    from textual.widgets import Input
+
+    hex_path = _make_hex_image(tmp_path)
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_hex_image(app, hex_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            await _apply_one_entry(app, pilot, panel)
+            return app.query_one("#patch_saveback_name_input", Input).value
+
+    suggestion = asyncio.run(_drive())
+    assert suggestion.endswith(".hex"), suggestion
+    assert suggestion == "img-patched.hex", suggestion
+
+
+# TC-011a — quiet "saved + verified" status on a faithful save (LLR-004.1)
+def test_verify_quiet_pass_on_faithful_hex_save(tmp_path: Path) -> None:
+    """A faithful HEX save-back surfaces one "saved + verified" status line
+    and raises NO error notification.
+
+    Intent: LLR-004.1 (HLR-004 hybrid) — a clean verify is quiet: a single
+    concise status line, no modal/notice. The real emitter + real
+    verify_written_image round-trip cleanly here, so the status comes from
+    a genuine ``verified`` VerifyResult riding ``last_summary``.
+    """
+    from textual.widgets import Button
+
+    hex_path = _make_hex_image(tmp_path)
+    workarea = tmp_path / ".s19tool" / "workarea"
+
+    async def _drive() -> tuple[list[str], int, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_hex_image(app, hex_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            await _apply_one_entry(app, pilot, panel)
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+            error_notices = [
+                n
+                for n in app._notifications
+                if getattr(n, "severity", None) == "error"
+            ]
+            return (
+                list(app.log_lines),
+                len(error_notices),
+                app._change_service.last_summary.verify_result,
+            )
+
+    log_lines, error_count, verify_result = asyncio.run(_drive())
+
+    assert verify_result is not None
+    assert verify_result.status == STATUS_VERIFIED
+    assert any("Saved + verified" in line for line in log_lines), log_lines
+    assert error_count == 0, "a clean verify must raise no error notice"
+    hex_files = sorted(p.name for p in workarea.rglob("*.hex"))
+    assert hex_files == ["img-patched.hex"], hex_files
+
+
+# TC-011b — loud mismatch notice on an injected verify mismatch (LLR-004.2)
+def test_verify_loud_mismatch_notice(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A verify mismatch surfaces a prominent error notice naming the file
+    and the per-kind run/byte summary, while the written file stays on disk.
+
+    Intent: LLR-004.2 (HLR-004 hybrid) — on a mismatch the surface is loud:
+    an error-severity notification that names the written file and carries
+    a non-zero run/byte count built from ``DiffStats``. The save is NOT
+    aborted (collect-don't-abort): the file written by the real save engine
+    remains on disk. The mismatch is injected by substituting
+    ``verify_written_image`` so the surfacing logic is exercised against a
+    known ``mismatch`` VerifyResult (the file itself is faithfully written).
+    """
+    from textual.widgets import Button
+
+    hex_path = _make_hex_image(tmp_path)
+    workarea = tmp_path / ".s19tool" / "workarea"
+
+    def _mismatch_verify(written_path, intended_mem_map, file_type):
+        # One changed run of length 1 — the canonical one-byte-mutation fault.
+        runs = [DiffRun(start=0x100, end=0x101, kind="changed")]
+        stats = DiffStats(
+            run_counts={"changed": 1, "only_a": 0, "only_b": 0},
+            byte_counts={"changed": 1, "only_a": 0, "only_b": 0},
+        )
+        return VerifyResult(
+            status=STATUS_MISMATCH,
+            runs=runs,
+            stats=stats,
+            written_path=written_path,
+        )
+
+    monkeypatch.setattr(
+        change_service_module, "verify_written_image", _mismatch_verify
+    )
+
+    async def _drive() -> tuple[list[str], list[str], list[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_hex_image(app, hex_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            await _apply_one_entry(app, pilot, panel)
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+            error_notices = [
+                str(n.message)
+                for n in app._notifications
+                if getattr(n, "severity", None) == "error"
+            ]
+            written = sorted(p.name for p in workarea.rglob("*.hex"))
+            return list(app.log_lines), error_notices, written
+
+    log_lines, error_notices, written = asyncio.run(_drive())
+    assert any("Verify MISMATCH" in line for line in log_lines), log_lines
+    assert len(error_notices) == 1, error_notices
+    notice = error_notices[0]
+    assert "img-patched.hex" in notice, notice
+    assert "changed 1 run / 1 byte" in notice, notice
+    # collect-don't-abort: the file the real engine wrote is still on disk.
+    assert written == ["img-patched.hex"], written

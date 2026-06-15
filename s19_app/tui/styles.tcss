@@ -694,8 +694,7 @@ ModalScreen {
     margin-bottom: 1;
 }
 
-.modal-buttons,
-#load_buttons {
+.modal-buttons {
     layout: horizontal;
     height: auto;
     align-horizontal: right;
