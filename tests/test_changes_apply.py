@@ -19,18 +19,23 @@ from pathlib import Path
 import pytest
 
 from s19_app.core import S19File
+from s19_app.hexfile import IntelHexFile
 from s19_app.tui.changes import (
     DISPOSITION_DOMAIN,
     FORMAT_ID,
     FORMAT_VERSION,
     MF_WRITE_CONTAINMENT,
+    STATUS_MISMATCH,
+    STATUS_VERIFIED,
     ChangeDocument,
     ChangeEntry,
     apply_change_document,
     collision_issues,
     emit_s19_from_mem_map,
     save_patched_image,
+    verify_written_image,
 )
+import s19_app.tui.changes.apply as apply_module
 from s19_app.tui.workspace import ensure_workarea
 
 EXAMPLE_S19 = (
@@ -387,12 +392,20 @@ def test_save_back_adversarial_filenames_contained_or_refused(
     assert not (tmp_path / ".s19tool" / "escape.s19").exists()
 
 
-def test_save_back_hex_source_refused_with_clear_issue(tmp_path: Path) -> None:
+def test_save_back_unsupported_source_refused_with_clear_issue(
+    tmp_path: Path,
+) -> None:
+    """TC-006 — a non-(s19|hex) source is still refused; no file written.
+
+    Intent: LLR-002.2 — the ``CHG-HEX-SAVE-UNSUPPORTED`` code stays defined
+    and refuses any source that is neither ``"s19"`` nor ``"hex"`` (here
+    ``"mac"``), with zero writes; only HEX was promoted, not everything.
+    """
     mem_map = _image_mem_map()
     dest_dir = _project_dir(tmp_path)
 
     saved_path, issues = save_patched_image(
-        mem_map, IMAGE_RANGES, dest_dir, "patched.s19", source_kind="hex"
+        mem_map, IMAGE_RANGES, dest_dir, "patched.mac", source_kind="mac"
     )
 
     assert saved_path is None
@@ -401,3 +414,181 @@ def test_save_back_hex_source_refused_with_clear_issue(tmp_path: Path) -> None:
     assert "not supported" in issues[0].message
     if dest_dir.exists():
         assert list(dest_dir.glob("*")) == []
+
+
+# ---------------------------------------------------------------------------
+# TC-005/TC-006 — HEX save-back (LLR-002.1/002.2) — engine half.
+# ---------------------------------------------------------------------------
+
+
+def test_hex_save_writes_hex_file_that_reparses_to_post_apply_map(
+    tmp_path: Path,
+) -> None:
+    """TC-005 — a HEX source writes one .hex file re-reading to the map.
+
+    Intent: LLR-002.1 — a ``"hex"`` source is NOT refused; it serializes via
+    ``emit_intel_hex_from_mem_map``, lands a ``.hex`` file inside the work
+    area, and ``IntelHexFile`` re-reads it to the intended post-apply map.
+    """
+    document = _document([ChangeEntry("bytes", 0x104, (0xAA, 0xBB))])
+    mem_map = _image_mem_map()
+    summary = apply_change_document(document, mem_map, IMAGE_RANGES, None, None)
+    assert summary.counts["applied"] == 1
+    dest_dir = _project_dir(tmp_path)
+
+    saved_path, issues = save_patched_image(
+        mem_map, IMAGE_RANGES, dest_dir, "patched.hex", source_kind="hex"
+    )
+
+    assert issues == []
+    assert saved_path is not None
+    assert saved_path.is_file()
+    assert saved_path.suffix == ".hex"
+    assert dest_dir.resolve() in saved_path.resolve().parents
+    reparsed = IntelHexFile(str(saved_path))
+    assert reparsed.get_errors() == []
+    assert reparsed.memory == mem_map
+
+
+def test_hex_save_forces_hex_suffix_when_name_lacks_it(tmp_path: Path) -> None:
+    """TC-005 — the sanitizer forces .hex on the HEX branch (m-7).
+
+    Intent: LLR-002.1 — a suffix-less (or wrong-suffix) name on a HEX save
+    is normalized to ``.hex`` by the one parametric sanitizer, not by a
+    forked HEX-only path.
+    """
+    mem_map = _image_mem_map()
+    dest_dir = _project_dir(tmp_path)
+
+    saved_path, issues = save_patched_image(
+        mem_map, IMAGE_RANGES, dest_dir, "patched", source_kind="hex"
+    )
+
+    assert issues == []
+    assert saved_path is not None
+    assert saved_path.name == "patched.hex"
+
+
+def test_s19_save_still_forces_s19_suffix(tmp_path: Path) -> None:
+    """TC-007 — the default suffix stays .s19 for an S19 source.
+
+    Intent: LLR-002.1 AC — making the sanitizer parametric must not change
+    the S19 default: a suffix-less S19 save still becomes ``.s19``.
+    """
+    mem_map = _image_mem_map()
+    dest_dir = _project_dir(tmp_path)
+
+    saved_path, issues = save_patched_image(
+        mem_map, IMAGE_RANGES, dest_dir, "patched", source_kind="s19"
+    )
+
+    assert issues == []
+    assert saved_path is not None
+    assert saved_path.name == "patched.s19"
+
+
+@pytest.mark.parametrize(
+    "hostile_name",
+    [
+        pytest.param("..\\escape.hex", id="relative-traversal"),
+        pytest.param("C:\\Windows\\Temp\\escape.hex", id="absolute-drive-path"),
+        pytest.param("CON.hex", id="windows-reserved-device"),
+        pytest.param("escape.hex.", id="trailing-dot"),
+    ],
+)
+def test_hex_save_adversarial_filenames_contained_or_refused(
+    tmp_path: Path, hostile_name: str
+) -> None:
+    """TC-005 — the three rejection rules still hold on the HEX branch.
+
+    Intent: LLR-002.1 AC — traversal, reserved device names, and trailing
+    dot/space are rejected the same way for ``.hex`` as for ``.s19`` (the
+    rules live unforked in one sanitizer); nothing escapes the work area.
+    """
+    mem_map = _image_mem_map()
+    dest_dir = _project_dir(tmp_path)
+
+    saved_path, issues = save_patched_image(
+        mem_map, IMAGE_RANGES, dest_dir, hostile_name, source_kind="hex"
+    )
+
+    if saved_path is None:
+        assert [issue.code for issue in issues] == [MF_WRITE_CONTAINMENT]
+    else:
+        assert issues == []
+        assert saved_path.suffix == ".hex"
+        assert dest_dir.resolve() in saved_path.resolve().parents
+    assert not (tmp_path / "escape.hex").exists()
+    assert not (tmp_path / ".s19tool" / "escape.hex").exists()
+
+
+# ---------------------------------------------------------------------------
+# TC-010 — verify-on-save wired in, collect-don't-abort (LLR-003.3).
+# ---------------------------------------------------------------------------
+
+
+def test_verify_written_hex_image_is_verified(tmp_path: Path) -> None:
+    """TC-010 — a faithful HEX write verifies clean against the intended map.
+
+    Intent: LLR-003.3 — re-reading the just-written .hex and diffing it
+    against the intended map yields an empty diff and status ``verified``.
+    """
+    mem_map = _image_mem_map()
+    dest_dir = _project_dir(tmp_path)
+    saved_path, issues = save_patched_image(
+        mem_map, IMAGE_RANGES, dest_dir, "patched.hex", source_kind="hex"
+    )
+    assert saved_path is not None and issues == []
+
+    result = verify_written_image(saved_path, mem_map, "hex")
+
+    assert result.status == STATUS_VERIFIED
+    assert result.runs == []
+
+
+def test_verify_on_dropped_byte_is_mismatch_file_kept(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-010 — an emitter that DROPS a byte yields a mismatch; file kept.
+
+    Intent: LLR-003.3 — inject an emitter dropping one address; the file is
+    still written (collect-don't-abort), and verifying it against the
+    intended map yields exactly one ``only_a`` run of length 1 (the dropped
+    byte is absent from re-read map B, so it classifies ``only_a``).
+    """
+    mem_map = _image_mem_map()
+    dest_dir = _project_dir(tmp_path)
+    dropped_addr = 0x104
+
+    real_emit = apply_module.emit_intel_hex_from_mem_map
+
+    def _dropping_emit(map_arg, ranges_arg):
+        trimmed = {a: v for a, v in map_arg.items() if a != dropped_addr}
+        trimmed_ranges = []
+        for s, e in ranges_arg:
+            if s <= dropped_addr < e:
+                # Split the range so ONLY the dropped address is omitted.
+                if s < dropped_addr:
+                    trimmed_ranges.append((s, dropped_addr))
+                if dropped_addr + 1 < e:
+                    trimmed_ranges.append((dropped_addr + 1, e))
+            else:
+                trimmed_ranges.append((s, e))
+        return real_emit(trimmed, trimmed_ranges)
+
+    monkeypatch.setitem(
+        apply_module._SAVE_BACK_EMITTERS, "hex", (_dropping_emit, ".hex")
+    )
+
+    saved_path, issues = save_patched_image(
+        mem_map, IMAGE_RANGES, dest_dir, "patched.hex", source_kind="hex"
+    )
+    assert saved_path is not None and saved_path.is_file()
+
+    result = verify_written_image(saved_path, mem_map, "hex")
+
+    assert saved_path.is_file()  # collect-don't-abort: file not unlinked
+    assert result.status == STATUS_MISMATCH
+    assert len(result.runs) == 1
+    assert result.runs[0].kind == "only_a"
+    assert result.runs[0].length == 1

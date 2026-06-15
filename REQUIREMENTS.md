@@ -1771,3 +1771,147 @@ batch-04 A↔B Diff placeholder (see R-TUI-028).
 > updated to include `compare.py` — the newer requirement (HLR-001/D-7, an
 > engine module at the package root) supersedes the batch-04 7-module
 > invariant; the guard still flags any OTHER unexpected root module.
+
+---
+
+# 16. HEX Emitter + Verify-on-Save (batch-10)
+
+The HEX-emitter / verify-on-save batch (`2026-06-13-batch-10`, US-008 + US-009)
+closes the read/write asymmetry in the firmware-format layer — the repo could
+*read* Intel HEX (`IntelHexFile`) but only *write* Motorola S19 — and adds
+post-write certainty by re-reading the written file and diffing it against the
+intended memory map with the batch-09 compare engine (`compare.diff_mem_maps`).
+It is the first downstream consumer of `compare.py` outside the comparison
+feature. Folded TUI hygiene (N-3 modal button-id de-collision, M-3 `KeyError`
+scoping) rides the TUI-touching increment. The parsing-layer engine modules
+stayed git-frozen throughout (see the design note below).
+
+> **Design note — emitter location (the batch's key learning).** The Intel HEX
+> emitter lives in `s19_app/tui/changes/io.py` (next to `emit_s19_from_mem_map`,
+> emission-purpose cohesion) and **NOT** in `s19_app/hexfile.py`, even though
+> `hexfile.py` holds the *reader* half. `hexfile.py` is in the git-frozen engine
+> set `_ENGINE_PATHS` (`tests/test_engine_unchanged.py:120-127`,
+> `tests/test_tui_directionb.py:3738-3746`): any diff to it vs `main` trips the
+> engine-frozen guards (`test_tc027_engine_modules_unchanged_vs_main`,
+> `test_tc031_engine_modules_have_no_diff_vs_main` /
+> `..._no_name_only_diff_vs_main`). The original placement in `hexfile.py` was
+> reversed at the I1 gate after it tripped that guard family; `io.py` is neither
+> engine-frozen nor a package-root module, so it trips zero guards. `hexfile.py`
+> remains the round-trip *oracle* (reader) only. (Batch-10 `01-requirements.md`
+> §6.2 D-A reversal record + §6.3 R-10-ENGINE-FROZEN; `04-validation.md` §2.3.)
+
+**R-HEX-EMIT-001**: The system must serialize a sparse memory map and its
+contiguous ranges into structurally valid Intel HEX text via
+`emit_intel_hex_from_mem_map(mem_map, ranges) -> str` — type-0x00 data records
+(≤ 16 data bytes per record), a type-0x04 extended-linear-address (ELA) record
+whenever the active upper-16 of the next data address changes (including the
+first address above 0xFFFF), and exactly one terminating type-0x01 EOF record
+(`:00000001FF`) — each record carrying the Intel HEX two's-complement-of-sum
+checksum. Re-parsing the emitted text through `s19_app.hexfile.IntelHexFile`
+must reconstruct a memory map equal to the input with zero load errors. The
+emitter is pure (stdlib only, no Textual import, no I/O side effect) and lives
+in `io.py` for emission-purpose cohesion — `hexfile.py` is git-frozen and is
+not edited (see the design note above; HLR-001).
+
+- Code: `s19_app/tui/changes/io.py` (`emit_intel_hex_from_mem_map` :1424,
+  `_intel_hex_record` :1497 with the two's-complement checksum at :1529, inline
+  ELA emission at :1489, `HEX_DATA_BYTES_PER_RECORD` :1421)
+- Validation: `Automated` via `tests/test_hex_emit.py`
+  (`test_low_address_roundtrip`, `test_data_records_max_16_bytes_and_checksum`,
+  `test_ela_high_address_roundtrip`, `test_ela_record_emitted_per_upper16_change`,
+  `test_empty_mem_map_emits_eof_only`, `test_output_terminates_with_single_eof`,
+  `test_public_example_roundtrips_as_hex`)
+- Status: Added in batch `2026-06-13-batch-10` (US-008 / HLR-001 / LLR-001.1–001.4)
+
+**R-HEX-SAVE-001**: When the operator confirms a save-back for an image whose
+`LoadedFile.file_type` is `"hex"`, the system must persist the post-apply image
+as Intel HEX through the save engine — `save_patched_image` serializes with
+`emit_intel_hex_from_mem_map`, forces a `.hex` suffix via the single
+parametric-`suffix` filename sanitizer (default `.s19`, `.hex` on the HEX
+branch — traversal / reserved-device-name / trailing-dot rejection unforked),
+and stages/places the file through the existing `copy_into_workarea`
+containment + no-silent-overwrite machinery — instead of refusing with
+`CHG-HEX-SAVE-UNSUPPORTED`. The refusal code stays defined and continues to
+refuse any source that is neither `"s19"` nor `"hex"` (e.g. `"mac"`).
+`save_patched_image`'s 2-tuple return `(Optional[Path], List[ValidationIssue])`
+is preserved unchanged. Variant-execution HEX persist remains out of scope this
+batch (HLR-002).
+
+- Code: `s19_app/tui/changes/apply.py` (`save_patched_image` :574, HEX branch /
+  retired refusal near `CHG_HEX_SAVE_UNSUPPORTED` :94 / :658,
+  `_sanitize_s19_filename` parametric `suffix` :711),
+  `s19_app/tui/services/change_service.py` (`save_patched` :807)
+- Validation: `Automated` via `tests/test_changes_apply.py`
+  (`test_hex_save_writes_hex_file_that_reparses_to_post_apply_map`,
+  `test_hex_save_forces_hex_suffix_when_name_lacks_it`,
+  `test_s19_save_still_forces_s19_suffix`,
+  `test_hex_save_adversarial_filenames_contained_or_refused`,
+  `test_save_back_unsupported_source_refused_with_clear_issue`)
+- Status: Added in batch `2026-06-13-batch-10` (US-008 / HLR-002 / LLR-002.1–002.3)
+
+**R-HEX-VERIFY-001**: When a save-back has written a file, the system must
+re-read the written file with the parser matching its format — `IntelHexFile`
+for `"hex"`, `S19File` for `"s19"` — diff the re-read memory map against the
+intended memory map using `compare.diff_mem_maps`, and return a `VerifyResult`
+carrying exactly `(status, runs, stats, written_path)` with `status ==
+"verified"` when the diff is empty and `status == "mismatch"` (carrying the
+diff runs/stats) otherwise. The verify helper is headless (no Textual import).
+The `VerifyResult` reaches callers on a back-compatible carrier —
+`ChangeService.last_summary.verify_result` — leaving `save_patched_image`'s
+2-tuple return unchanged; a mismatch must not delete or suppress the written
+file (collect-don't-abort). `VerifyResult` exposes only run/byte counts and the
+file name — never raw memory bytes (HLR-003).
+
+- Code: `s19_app/tui/changes/verify.py` (`VerifyResult` :35,
+  `verify_written_image` :119, `STATUS_VERIFIED` / `STATUS_MISMATCH`),
+  `s19_app/compare.py` (`diff_mem_maps` :272, `DiffRun` :100 / `.length`
+  `@property` :138, `DiffStats` :150, `DIFF_KIND_DOMAIN` :53),
+  `s19_app/tui/services/change_service.py` (verify call + `last_summary`
+  stamping :867-869)
+- Validation: `Automated` via `tests/test_verify_on_save.py`
+  (`test_identity_write_is_verified`, `test_mutated_byte_is_mismatch_changed`,
+  `test_dropped_byte_is_mismatch_only_a`, `test_unsupported_file_type_raises`,
+  `test_written_path_is_stamped`) and `tests/test_changes_apply.py`
+  (`test_verify_written_hex_image_is_verified`,
+  `test_verify_on_dropped_byte_is_mismatch_file_kept`) and
+  `tests/test_change_service.py`
+  (`test_hex_save_stamps_verified_result_on_summary`,
+  `test_refused_save_leaves_verify_result_none`)
+- Status: Added in batch `2026-06-13-batch-10` (US-009 / HLR-003 / LLR-003.1–003.3)
+
+**R-HEX-VERIFY-002**: While a save-back completes, the TUI must surface a single
+concise "Saved + verified" status line on a clean verify and must not raise a
+modal or notice; on a verify mismatch it must surface a prominent error notice
+naming the written file and the per-kind run/byte mismatch summary (built from
+`DiffStats.run_counts` / `byte_counts` over `DIFF_KIND_DOMAIN`), while leaving
+the written file in place. The default suggested save filename is format-aware
+(`.hex` for a `"hex"` image, `.s19` for an `"s19"` image) (HLR-004; hybrid
+trigger — verify always runs, only a mismatch interrupts).
+
+- Code: `s19_app/tui/app.py` (`_surface_verify_result` :1420 reading
+  `last_summary.verify_result`, `_verify_mismatch_summary` :1476,
+  `_report_change_result` :1506)
+- Validation: `Automated` via `tests/test_tui_patch_editor_v2.py`
+  (`test_verify_quiet_pass_on_faithful_hex_save`,
+  `test_verify_loud_mismatch_notice`)
+- Status: Added in batch `2026-06-13-batch-10` (US-009 / HLR-004 / LLR-004.1–004.2)
+
+**R-HEX-HYGIENE-001**: Where the batch touches the TUI modal screens, each
+modal must give its button-row container a screen-unique widget id (eliminating
+the `load_buttons` id formerly shared across six screens), preserving the
+shared `.modal-buttons` styling; and `OperationsScreen._execute_selected` must
+resolve the operation id through the module-level `operation_service.
+operation_resolver` seam inside a narrow `try`/`except KeyError` and call the
+resolved operation's `.execute(...)` OUTSIDE that `try`, so a `KeyError` raised
+inside operation execution propagates rather than being misreported as "unknown
+operation" (HLR-005; folded N-3 + M-3 hygiene).
+
+- Code: `s19_app/tui/screens.py` (`OperationsScreen` button row id
+  `operations_buttons` :562, `_execute_selected` :583 with the narrowed
+  `operation_resolver` call :631 inside `try`/`except KeyError` :632 and
+  `operation.execute(...)` :636 outside)
+- Validation: `Automated` via `tests/test_tui_operations_view.py`
+  (`test_operations_button_row_has_screen_unique_id`,
+  `test_execute_internal_keyerror_not_masked_as_unknown_operation`)
+- Status: Added in batch `2026-06-13-batch-10` (US-008/US-009 folded /
+  HLR-005 / LLR-005.1–005.2)

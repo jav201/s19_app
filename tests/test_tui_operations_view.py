@@ -286,3 +286,135 @@ def test_operations_view_result_hex_render_matches_baseline(
     assert "0x00001000" in widget_plain, widget_plain[:80]
     assert "status: placeholder" in status_text, status_text
     assert "placeholder: crc not yet implemented" in status_text, status_text
+
+
+# ---------------------------------------------------------------------------
+# TC-013 / LLR-005.2 (M-3) — KeyError scope excludes execution
+# ---------------------------------------------------------------------------
+
+
+def test_execute_internal_keyerror_not_masked_as_unknown_operation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A KeyError raised INSIDE ``.execute`` propagates; only a registry
+    miss is reported as "unknown operation".
+
+    Intent: LLR-005.2 (M-3) — the ``except KeyError`` in
+    ``_execute_selected`` guards ONLY the ``operation_resolver`` registry
+    resolution. Phase A: a resolver that raises ``KeyError`` (a registry
+    miss) surfaces exactly one "unknown operation" status line and no crash.
+    Phase B: a stub that RESOLVES cleanly but whose ``.execute`` raises
+    ``KeyError`` must NOT be reported as "unknown operation" — the catch is
+    narrow enough to let the execute-internal error escape (proving the
+    resolve/execute split). A wide catch would mask it and fail here.
+    """
+    s19_path = _write_s19(tmp_path)
+
+    # Phase A — a registry miss (resolver raises) IS reported as unknown.
+    def _missing_resolver(operation_id: str):
+        raise KeyError(operation_id)
+
+    monkeypatch.setattr(
+        operation_service_module, "operation_resolver", _missing_resolver
+    )
+
+    async def _drive_miss() -> list[str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            app.action_operations_view()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, OperationsScreen)
+            screen.query_one("#operations_list", ListView).index = 0
+            await pilot.pause()
+            screen.query_one("#operations_execute", Button).press()
+            await pilot.pause()
+            return list(app.log_lines)
+
+    miss_log = asyncio.run(_drive_miss())
+    assert any("unknown operation" in line for line in miss_log), miss_log
+
+    # Phase B — resolve succeeds, .execute raises KeyError: NOT masked.
+    class _ExecKeyErrorOperation:
+        operation_id = "crc"
+        title = "CRC"
+
+        def describe(self) -> str:
+            return "stub"
+
+        def execute(self, loaded: LoadedFile, *, now_fn=None) -> OperationResult:
+            raise KeyError("internal lookup miss inside execute")
+
+    monkeypatch.setattr(
+        operation_service_module,
+        "operation_resolver",
+        lambda operation_id: _ExecKeyErrorOperation(),
+    )
+
+    async def _drive_exec_error() -> tuple[bool, list[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            app.action_operations_view()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, OperationsScreen)
+            screen.query_one("#operations_list", ListView).index = 0
+            await pilot.pause()
+            raised = False
+            try:
+                screen._execute_selected()
+            except KeyError:
+                raised = True
+            return raised, list(app.log_lines)
+
+    raised, exec_log = asyncio.run(_drive_exec_error())
+    assert raised, (
+        "a KeyError raised inside .execute must propagate, not be swallowed "
+        "by the registry-miss catch"
+    )
+    assert not any("unknown operation" in line for line in exec_log), (
+        "an execute-internal KeyError must NOT be misreported as "
+        f"'unknown operation': {exec_log}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-012-N3 / LLR-005.1 (N-3) — screen-unique button-row id, styling intact
+# ---------------------------------------------------------------------------
+
+
+def test_operations_button_row_has_screen_unique_id(tmp_path: Path) -> None:
+    """The OperationsScreen button row uses ``operations_buttons`` (not the
+    retired shared ``load_buttons``) and keeps the ``.modal-buttons`` class.
+
+    Intent: LLR-005.1 (N-3) — the de-collided per-screen id resolves, the
+    old shared id does not, and the styling that ``.modal-buttons`` provides
+    is co-applied so no layout is lost by dropping the borrowed id.
+    """
+    from textual.containers import Container
+
+    s19_path = _write_s19(tmp_path)
+
+    async def _drive() -> tuple[bool, bool, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            app.action_operations_view()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, OperationsScreen)
+            row = screen.query_one("#operations_buttons", Container)
+            has_unique_id = row.id == "operations_buttons"
+            has_modal_class = row.has_class("modal-buttons")
+            old_id_gone = len(screen.query("#load_buttons")) == 0
+            return has_unique_id, has_modal_class, old_id_gone
+
+    has_unique_id, has_modal_class, old_id_gone = asyncio.run(_drive())
+    assert has_unique_id, "the button row must use the screen-unique id"
+    assert has_modal_class, ".modal-buttons styling must be preserved"
+    assert old_id_gone, "the retired shared load_buttons id must be gone"

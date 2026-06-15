@@ -30,9 +30,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 from ...validation.model import ValidationIssue, ValidationSeverity
+
+if TYPE_CHECKING:  # annotation-only; keeps model.py free of the verify import
+    from .verify import VerifyResult
 
 #: ``ValidationIssue.artifact`` tag for every finding the v2 change system
 #: produces (reader, writer, collision rule), so a consumer can tell a
@@ -401,7 +404,13 @@ class ChangeSummary:
         saved_path (Optional[Path]): Where the patched image was persisted
             (LLR-002.7) — recorded by the save-back caller after
             ``changes.apply.save_patched_image`` succeeds; ``None`` when the
-            operator declined, the image was Intel HEX, or no save happened.
+            operator declined or no save happened.
+        verify_result (Optional[VerifyResult]): The verify-on-save outcome
+            (HLR-003, §6.2 C-10 back-compatible carrier) — stamped by the
+            save-back handler after a successful write via
+            ``changes.verify.verify_written_image``; ``None`` when no save
+            happened. Kept off :meth:`to_dict` (a runtime-only carrier the TUI
+            reads, not part of the deterministic serialized summary).
 
     Returns:
         None: Dataclass container.
@@ -443,6 +452,7 @@ class ChangeSummary:
     entries: list[ChangeSummaryEntry] = field(default_factory=list)
     issues: list[ValidationIssue] = field(default_factory=list)
     saved_path: Optional[Path] = None
+    verify_result: Optional["VerifyResult"] = None
 
     def to_dict(self) -> dict[str, object]:
         """
