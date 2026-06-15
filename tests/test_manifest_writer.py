@@ -19,11 +19,24 @@ Maps each test to its TC id and LLR:
   AND an absolute-path entry → ``serialize_manifest`` returns
   ``(None, [finding, ...])`` and emits no text; on a clean composition
   findings are empty.
+- TC-002a / LLR-002.1 — ``write_project_manifest`` stages + atomically
+  ``os.replace``-es the manifest at the fixed ``project.json`` name; the
+  written file re-reads cleanly via ``read_project_manifest``; TWO saves into
+  the same project dir leave EXACTLY ONE ``project.json`` and ZERO
+  ``project_1.json`` (the M-1 regression), and the 2nd save's content wins.
+- TC-002b / LLR-002.2 — the written file's ``.name`` is fixed to
+  ``project.json``; the staged temp file is removed after the call.
+- TC-002c / LLR-002.3 — a destination escaping the work area (a
+  ``project_root`` with no ``.s19tool/workarea`` ancestor) yields
+  ``(None, [finding])`` with a ``MANIFEST-WRITE-CONTAINMENT`` code, writes no
+  file, and never raises.
 
 These tests encode WHY: the reader is the schema oracle, so correctness is
 defined as "the reader reads our output back as intent, with no findings"
 (round-trip fidelity), and a path the reader would reject must never be
-written (the silent-divergence security hazard).
+written (the silent-divergence security hazard). The fixed-name atomic
+overwrite (no dedup) is the security-critical contract — a ``project_1.json``
+the reader never opens would let a stale manifest silently survive a re-save.
 """
 from __future__ import annotations
 
@@ -34,8 +47,10 @@ import pytest
 
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services.manifest_writer import (
+    MANIFEST_WRITE_CONTAINMENT,
     MANIFEST_WRITE_ESCAPE,
     serialize_manifest,
+    write_project_manifest,
 )
 from s19_app.tui.services.variant_execution_service import (
     MANIFEST_PATH_ESCAPE,
@@ -285,3 +300,152 @@ def test_refusal_emits_no_file_when_caller_would_write(tmp_path: Path) -> None:
     if text is not None:  # pragma: no cover - defensive
         (tmp_path / PROJECT_MANIFEST_NAME).write_text(text, encoding="utf-8")
     assert not (tmp_path / PROJECT_MANIFEST_NAME).exists()
+
+
+# --------------------------------------------------------------------------- #
+# I2 (HLR-002) — contained atomic write
+# --------------------------------------------------------------------------- #
+
+
+def _project_dir(tmp_path: Path, name: str = "proj") -> Path:
+    """Create ``<tmp>/.s19tool/workarea/<name>/`` — the reader-visible home.
+
+    Mirrors the ``test_variant_execution.py`` ``_make_project`` idiom so the
+    destination passes ``copy_into_workarea``'s containment checks naturally
+    and ``read_project_manifest`` later finds ``project.json`` there.
+    """
+    project_dir = tmp_path / ".s19tool" / "workarea" / name
+    project_dir.mkdir(parents=True, exist_ok=True)
+    return project_dir
+
+
+# --------------------------------------------------------------------------- #
+# TC-002a / LLR-002.1 — staged + atomic os.replace; two saves -> one file
+# --------------------------------------------------------------------------- #
+
+
+def test_write_places_manifest_and_reads_back(tmp_path: Path) -> None:
+    """write_project_manifest lands project.json that re-reads as intent.
+
+    Intent (LLR-002.1): the staged-then-atomic-replace write must produce a
+    manifest the reader oracle parses back without findings — the write side of
+    the round-trip.
+    """
+    project_dir = _project_dir(tmp_path)
+    vset = _variant_set("b", "a", "b")
+
+    written, issues = write_project_manifest(
+        vset,
+        project_dir,
+        tmp_path,
+        batch=["doc.json"],
+        assignments={"b": ["extra.json"]},
+    )
+
+    assert issues == []
+    assert written == project_dir / PROJECT_MANIFEST_NAME
+    assert written.exists()
+
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.issues == []
+    assert manifest.active_variant == "b"
+    assert manifest.batch == [(project_dir / "doc.json").resolve()]
+    assert manifest.assignments == {"b": [(project_dir / "extra.json").resolve()]}
+
+
+def test_two_saves_leave_exactly_one_manifest_second_wins(tmp_path: Path) -> None:
+    """Two saves -> ONE project.json, NO project_1.json, 2nd content wins.
+
+    Intent (LLR-002.1 / M-1 regression): the writer must NOT route through
+    ``copy_into_workarea``'s dedup body — a re-save overwrites the fixed name in
+    place. A ``project_1.json`` would be invisible to the reader (it opens only
+    ``project_dir / PROJECT_MANIFEST_NAME``), letting a stale manifest survive
+    a re-save: the silent-divergence security hazard this test guards.
+    """
+    project_dir = _project_dir(tmp_path)
+
+    first, issues_first = write_project_manifest(
+        _variant_set("a", "a", "b"), project_dir, tmp_path
+    )
+    second, issues_second = write_project_manifest(
+        _variant_set("b", "a", "b"), project_dir, tmp_path
+    )
+
+    assert issues_first == [] and issues_second == []
+    assert first == second == project_dir / PROJECT_MANIFEST_NAME
+
+    manifests = sorted(p.name for p in project_dir.glob("project*.json"))
+    assert manifests == ["project.json"]
+    assert not (project_dir / "project_1.json").exists()
+
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.active_variant == "b"  # the 2nd save's content
+
+
+# --------------------------------------------------------------------------- #
+# TC-002b / LLR-002.2 — fixed name + staged temp removed
+# --------------------------------------------------------------------------- #
+
+
+def test_fixed_name_and_staged_temp_removed(tmp_path: Path) -> None:
+    """Written name is the fixed project.json; the staged temp file is gone.
+
+    Intent (LLR-002.2): the name is fixed (no caller-supplied component, no
+    dedup), and the staging file under ``temp/`` must not be left behind.
+    """
+    project_dir = _project_dir(tmp_path)
+    written, issues = write_project_manifest(
+        _variant_set("a", "a"), project_dir, tmp_path
+    )
+
+    assert issues == []
+    assert written is not None
+    assert written.name == PROJECT_MANIFEST_NAME
+
+    staged = tmp_path / ".s19tool" / "workarea" / "temp" / PROJECT_MANIFEST_NAME
+    assert not staged.exists()
+
+
+# --------------------------------------------------------------------------- #
+# TC-002c / LLR-002.3 — containment failure -> (None, finding), no raise
+# --------------------------------------------------------------------------- #
+
+
+def test_destination_outside_workarea_returns_finding(tmp_path: Path) -> None:
+    """A project_root with no .s19tool/workarea ancestor -> (None, finding).
+
+    Intent (LLR-002.3): a destination that fails containment must be a returned
+    ``MANIFEST-WRITE-CONTAINMENT`` finding (collect-don't-abort), never an
+    uncaught exception, and no file is written.
+    """
+    escaping_root = tmp_path / "not_a_workarea"
+    escaping_root.mkdir(parents=True, exist_ok=True)
+
+    written, issues = write_project_manifest(
+        _variant_set("a", "a"), escaping_root, tmp_path
+    )
+
+    assert written is None
+    assert len(issues) >= 1
+    assert all(i.code == MANIFEST_WRITE_CONTAINMENT for i in issues)
+    assert not (escaping_root / PROJECT_MANIFEST_NAME).exists()
+
+
+def test_refused_serialize_short_circuits_without_writing(tmp_path: Path) -> None:
+    """An escaping entry refuses serialize -> (None, escape finding), no file.
+
+    Intent (LLR-001.5 ∩ HLR-002): the write helper must short-circuit on a
+    refused serialize and write nothing — the refusal finding propagates, no
+    ``MANIFEST-WRITE-CONTAINMENT`` is manufactured.
+    """
+    project_dir = _project_dir(tmp_path)
+    written, issues = write_project_manifest(
+        _variant_set("a", "a"), project_dir, tmp_path, batch=["../../x.json"]
+    )
+
+    assert written is None
+    assert issues
+    assert all(i.code == MANIFEST_WRITE_ESCAPE for i in issues)
+    assert not (project_dir / PROJECT_MANIFEST_NAME).exists()

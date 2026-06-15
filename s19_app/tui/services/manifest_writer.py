@@ -8,8 +8,13 @@ without findings — the round-trip-to-reader correctness criterion (D-2), the
 JSON analogue of the batch-10 emitter that round-trips against
 ``IntelHexFile``.
 
-Increment I1 covers SERIALIZE ONLY (HLR-001 + LLR-001.1..001.5). The contained
-write (HLR-002) and verify-on-write (HLR-003) land in later increments.
+Increment I1 covers SERIALIZE (HLR-001 + LLR-001.1..001.5). Increment I2 adds
+the CONTAINED WRITE (HLR-002 + LLR-002.1..002.3): stage the serialized bytes
+under ``.s19tool/workarea/temp/``, re-run ``copy_into_workarea``'s containment
+CHECKS against the destination, then ATOMIC ``os.replace`` onto the fixed
+``project.json`` name (D-3 locked mechanism) — NOT ``copy_into_workarea``'s
+dedup body, so a re-save overwrites in place rather than producing
+``project_1.json``. Verify-on-write (HLR-003) lands in I3.
 
 Headless by contract (C-3 / LLR-004.3): stdlib + sibling-service imports only,
 no ``textual`` symbol and no ``logging`` — so the serializer stays reusable and
@@ -24,13 +29,22 @@ path-safety implementation.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..models import ProjectVariantSet
+from ..workspace import (
+    WORKAREA_TEMP,
+    WorkareaContainmentError,
+    _find_workarea_root,
+    _path_traverses_reparse_point,
+    ensure_workarea,
+)
 from .variant_execution_service import (
     MANIFEST_ARTIFACT,
+    PROJECT_MANIFEST_NAME,
     _resolve_manifest_entry,
 )
 
@@ -44,6 +58,13 @@ DEFAULT_SCHEMA_VERSION = 1
 #: is refused (LLR-001.5). Distinct from the reader's read-path
 #: ``MANIFEST-PATH-ESCAPE`` so a refusal-to-write reads unambiguously.
 MANIFEST_WRITE_ESCAPE = "MANIFEST-WRITE-ESCAPE"
+
+#: Write-path containment finding: the destination failed the work-area
+#: containment checks, or staging / the atomic ``os.replace`` raised an
+#: ``OSError`` (LLR-002.3). Collect-don't-abort — the write returns
+#: ``(None, [finding])`` instead of raising, mirroring ``write_change_document``'s
+#: ``MF-WRITE-CONTAINMENT`` (``io.py``).
+MANIFEST_WRITE_CONTAINMENT = "MANIFEST-WRITE-CONTAINMENT"
 
 
 def _manifest_write_issue(
@@ -77,6 +98,38 @@ def _manifest_write_issue(
     return ValidationIssue(
         code=MANIFEST_WRITE_ESCAPE,
         severity=severity,
+        message=message,
+        artifact=MANIFEST_ARTIFACT,
+    )
+
+
+def _manifest_write_containment_issue(message: str) -> ValidationIssue:
+    """
+    Summary:
+        Build one write-path ``ValidationIssue`` tagged
+        ``artifact=MANIFEST_ARTIFACT`` with the ``MANIFEST-WRITE-CONTAINMENT``
+        code at WARNING severity (LLR-002.3), mirroring
+        ``write_change_document``'s ``MF-WRITE-CONTAINMENT`` finding.
+
+    Args:
+        message (str): Human-readable finding describing the failed write.
+
+    Returns:
+        ValidationIssue: The finding.
+
+    Data Flow:
+        - Created only on the containment / IO failure path of
+          :func:`write_project_manifest`.
+
+    Dependencies:
+        Uses:
+            - ValidationIssue / ValidationSeverity
+        Used by:
+            - write_project_manifest
+    """
+    return ValidationIssue(
+        code=MANIFEST_WRITE_CONTAINMENT,
+        severity=ValidationSeverity.WARNING,
         message=message,
         artifact=MANIFEST_ARTIFACT,
     )
@@ -250,3 +303,160 @@ def serialize_manifest(
         },
     }
     return json.dumps(envelope, indent=2), []
+
+
+def _check_destination_contained(destination: Path) -> None:
+    """
+    Summary:
+        Re-run ``copy_into_workarea``'s containment CHECKS against the manifest
+        destination ``project.json`` path: locate its ``.s19tool/workarea``
+        root, confirm the resolved path stays inside it, and confirm no parent
+        up to the workarea root traverses a symlink / NTFS junction (LLR-002.1).
+        This validates the FINAL target before the atomic replace, reusing the
+        reader-side checks rather than the copy-with-dedup body.
+
+    Args:
+        destination (Path): The intended ``project_dir / "project.json"`` path.
+
+    Returns:
+        None: The destination is contained when the function returns normally.
+
+    Raises:
+        WorkareaContainmentError: When the destination has no ``.s19tool/
+            workarea`` ancestor, escapes that root, or traverses a reparse
+            point — the same rejection conditions ``copy_into_workarea`` raises.
+
+    Data Flow:
+        - Resolve the destination, then apply ``_find_workarea_root`` +
+          ``is_relative_to(workarea_root)`` + ``_path_traverses_reparse_point``
+          (``workspace.py`` containment seam) — the exact checks
+          ``copy_into_workarea`` runs before placing a file.
+
+    Dependencies:
+        Uses:
+            - _find_workarea_root
+            - _path_traverses_reparse_point
+        Used by:
+            - write_project_manifest
+    """
+    resolved = destination.resolve()
+    workarea_root = _find_workarea_root(resolved)
+    if workarea_root is None or not resolved.is_relative_to(workarea_root):
+        raise WorkareaContainmentError(
+            "Refusing to write manifest: destination is not contained inside a "
+            f".s19tool/workarea/ root: {resolved}"
+        )
+    if _path_traverses_reparse_point(resolved, stop_at=workarea_root.parent):
+        raise WorkareaContainmentError(
+            "Refusing to write manifest: destination traverses a symbolic link "
+            f"or reparse point: {resolved}"
+        )
+
+
+def write_project_manifest(
+    variant_set: ProjectVariantSet,
+    project_root: Path,
+    base_dir: Path,
+    *,
+    batch: Sequence[str] = (),
+    assignments: Optional[Mapping[str, Sequence[str]]] = None,
+    schema_version: int = DEFAULT_SCHEMA_VERSION,
+) -> tuple[Optional[Path], list[ValidationIssue]]:
+    """
+    Summary:
+        Serialize a project composition and WRITE it atomically to
+        ``project_root / "project.json"`` inside the contained work area
+        (HLR-002 / LLR-002.1..002.3). The bytes are staged under
+        ``.s19tool/workarea/temp/``, the final destination is validated with
+        ``copy_into_workarea``'s containment CHECKS, and the staged file is then
+        moved onto the FIXED ``project.json`` name via an atomic ``os.replace``
+        (D-3 locked mechanism). A re-save overwrites the prior manifest in place
+        — the writer never dedup-suffixes to ``project_1.json`` (LLR-002.2),
+        which the reader (opening only ``project_dir / PROJECT_MANIFEST_NAME``)
+        would never see.
+
+    Args:
+        variant_set (ProjectVariantSet): The in-memory variant inventory —
+            passed through to :func:`serialize_manifest`.
+        project_root (Path): The project directory the manifest is written
+            into; ``project.json`` lands directly here. Must be a
+            ``.s19tool/workarea/<project>/`` directory so the destination
+            passes containment and the reader finds it later.
+        base_dir (Path): The app base directory whose ``.s19tool/workarea/`` is
+            the staging + containment root; created if absent
+            (``ensure_workarea``). Source (``temp/``) and destination share
+            this work-area tree, so they sit on one filesystem and the
+            ``os.replace`` is atomic.
+        batch (Sequence[str]): Project-wide change/check entries — see
+            :func:`serialize_manifest`.
+        assignments (Optional[Mapping[str, Sequence[str]]]): Per-variant file
+            entries — see :func:`serialize_manifest`.
+        schema_version (int): The literal written for ``schema_version``.
+
+    Returns:
+        tuple[Optional[Path], list[ValidationIssue]]: ``(written_path, [])`` on
+        success, where ``written_path`` is ``project_root / "project.json"``;
+        ``(None, [finding, ...])`` when serialization is refused (LLR-001.5
+        escape findings) OR when the destination fails containment / staging /
+        the atomic replace raises ``OSError`` (one ``MANIFEST-WRITE-CONTAINMENT``
+        finding).
+
+    Raises:
+        None: A refused serialize, a containment failure, or an ``OSError`` is a
+            returned finding, never an exception (collect-don't-abort, C-5).
+
+    Data Flow:
+        - :func:`serialize_manifest` first; a ``None`` text short-circuits to
+          ``(None, refusal_findings)`` — nothing is staged or written.
+        - ``ensure_workarea(base_dir)`` → stage the text under ``temp/`` →
+          :func:`_check_destination_contained` on ``project_root / "project.json"``
+          → atomic ``os.replace(staged, destination)``.
+        - The staged temp file is always removed in a ``finally``.
+
+    Dependencies:
+        Uses:
+            - serialize_manifest
+            - ensure_workarea
+            - _check_destination_contained
+            - os.replace
+        Used by:
+            - verify_written_manifest (I3, NEW)
+            - the TUI project-save pipeline (I4, NEW)
+
+    Example:
+        >>> path, issues = write_project_manifest(  # doctest: +SKIP
+        ...     vset, project_dir, base_dir
+        ... )
+    """
+    text, findings = serialize_manifest(
+        variant_set,
+        project_root,
+        batch=batch,
+        assignments=assignments,
+        schema_version=schema_version,
+    )
+    if text is None:
+        return None, findings
+
+    destination = project_root / PROJECT_MANIFEST_NAME
+    workarea = ensure_workarea(base_dir)
+    staged = workarea / WORKAREA_TEMP / PROJECT_MANIFEST_NAME
+    try:
+        _check_destination_contained(destination)
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        staged.write_text(text, encoding="utf-8")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(staged, destination)
+        return destination, []
+    except (WorkareaContainmentError, OSError) as exc:
+        return None, [
+            _manifest_write_containment_issue(
+                "the manifest write target failed work-area containment "
+                f"validation — no file was written: {type(exc).__name__}: {exc}"
+            )
+        ]
+    finally:
+        try:
+            staged.unlink()
+        except OSError:
+            pass
