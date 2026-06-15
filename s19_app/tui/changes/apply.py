@@ -19,12 +19,14 @@ The three public functions:
   ERROR issue or ``kind`` ≠ ``"change"`` → zero writes, every disposition
   ``blocked``), per-entry dispositions, before-capture, linkage
   classification, and the deterministic :class:`ChangeSummary`.
-- :func:`save_patched_image` — the engine half of LLR-002.7 (D-1, S19-only
-  this batch): sanitize the operator-provided filename (F-S-01), emit the
-  patched image via ``changes.io.emit_s19_from_mem_map``, and place it
+- :func:`save_patched_image` — the engine half of LLR-002.1/002.2 (US-008):
+  sanitize the operator-provided filename (F-S-01, suffix-parametric), emit
+  the patched image via ``changes.io.emit_s19_from_mem_map`` for an S19
+  source or ``emit_intel_hex_from_mem_map`` for a HEX source, and place it
   through the staged-containment pattern (``.s19tool/workarea/temp/`` then
-  ``workspace.copy_into_workarea``). Intel HEX is refused with one clear
-  issue and no write.
+  ``workspace.copy_into_workarea``). Any source that is neither ``"s19"``
+  nor ``"hex"`` (e.g. ``"mac"``) is refused with one
+  ``CHG-HEX-SAVE-UNSUPPORTED`` issue and no write.
 
 Thread placement (LLR-002.4): everything here is a pure function over its
 arguments with **no Textual import**; the TUI invokes it on the main UI
@@ -54,7 +56,12 @@ from ..workspace import (
     WorkareaContainmentError,
     copy_into_workarea,
 )
-from .io import MF_WRITE_CONTAINMENT, _issue, emit_s19_from_mem_map
+from .io import (
+    MF_WRITE_CONTAINMENT,
+    _issue,
+    emit_intel_hex_from_mem_map,
+    emit_s19_from_mem_map,
+)
 from .model import (
     DISPOSITION_APPLIED,
     DISPOSITION_BLOCKED,
@@ -80,10 +87,19 @@ __all__ = [
     "save_patched_image",
 ]
 
-#: Stable ``ValidationIssue.code`` for a save-back request on an Intel
-#: HEX-loaded image — refused this batch (LLR-002.7 / D-1: S19-only;
-#: an Intel HEX emitter is a batch-08 candidate). NEW — created in Phase 3.
+#: Stable ``ValidationIssue.code`` for a save-back request on a source that
+#: cannot be persisted — only ``"s19"`` and ``"hex"`` images can be written
+#: (LLR-002.2). The code keeps its historical name (a contract constant in
+#: ``__all__``) but now refuses any other source (e.g. ``"mac"``), not HEX.
 CHG_HEX_SAVE_UNSUPPORTED = "CHG-HEX-SAVE-UNSUPPORTED"
+
+#: Save-back source kinds the engine can serialize (LLR-002.1/002.2): an S19
+#: image via ``emit_s19_from_mem_map`` (suffix ``.s19``) and an Intel HEX
+#: image via ``emit_intel_hex_from_mem_map`` (suffix ``.hex``).
+_SAVE_BACK_EMITTERS = {
+    "s19": (emit_s19_from_mem_map, ".s19"),
+    "hex": (emit_intel_hex_from_mem_map, ".hex"),
+}
 
 #: Windows reserved device basenames (F-S-01): a filename whose first
 #: dot-delimited segment matches one of these — with or without an extension
@@ -584,17 +600,18 @@ def save_patched_image(
         filename (str): The operator-provided target name. Sanitized per
             F-S-01: reduced to its bare name (``PureWindowsPath(...).name``,
             so both separator styles and drive prefixes are stripped on any
-            platform), the ``.s19`` suffix forced on, and rejected outright —
+            platform), the format-matched suffix forced on (``.s19`` for an
+            S19 source, ``.hex`` for a HEX source), and rejected outright —
             one ``MF-WRITE-CONTAINMENT`` issue, nothing written — when empty
             after stripping, carrying a trailing dot or space, or matching a
             Windows reserved device basename (``CON`` / ``PRN`` / ``AUX`` /
             ``NUL`` / ``COM1``-``COM9`` / ``LPT1``-``LPT9``, with or without
             extension).
         source_kind (str): The loaded image's loader classification
-            (``LoadedFile.file_type``). Anything but ``"s19"`` — i.e. Intel
-            HEX — is refused with one ``CHG-HEX-SAVE-UNSUPPORTED`` issue
-            stating HEX save-back is not supported this batch, and nothing
-            is written (D-1).
+            (``LoadedFile.file_type``). ``"s19"`` emits Motorola S19;
+            ``"hex"`` emits Intel HEX (LLR-002.1). Any other value (e.g.
+            ``"mac"``) is refused with one ``CHG-HEX-SAVE-UNSUPPORTED`` issue
+            and nothing is written (LLR-002.2).
 
     Returns:
         Tuple[Optional[Path], List[ValidationIssue]]: The absolute path of
@@ -610,15 +627,16 @@ def save_patched_image(
             file names and reasons — never image byte content (C-9).
 
     Data Flow:
-        - Refuse non-S19 sources (D-1); sanitize the filename (F-S-01).
-        - Locate the ``.s19tool/workarea/`` ancestor of ``dest_dir``; emit
-          the S19 text (``emit_s19_from_mem_map``); stage it under
-          ``<workarea>/temp/``; place with ``copy_into_workarea``; unlink
-          the staged file either way.
+        - Select the emitter + suffix by ``source_kind`` (``_SAVE_BACK_EMITTERS``)
+          or refuse an unsupported source (LLR-002.2); sanitize the filename
+          with the format-matched suffix (F-S-01).
+        - Locate the ``.s19tool/workarea/`` ancestor of ``dest_dir``; emit the
+          format text (S19 or Intel HEX); stage it under ``<workarea>/temp/``;
+          place with ``copy_into_workarea``; unlink the staged file either way.
 
     Dependencies:
         Uses:
-            - emit_s19_from_mem_map
+            - emit_s19_from_mem_map / emit_intel_hex_from_mem_map
             - copy_into_workarea
             - _sanitize_s19_filename / _find_workarea_ancestor
             - _issue
@@ -633,19 +651,21 @@ def save_patched_image(
     """
     issues: List[ValidationIssue] = []
 
-    if source_kind != "s19":
+    emitter_spec = _SAVE_BACK_EMITTERS.get(source_kind)
+    if emitter_spec is None:
         issues.append(
             _issue(
                 CHG_HEX_SAVE_UNSUPPORTED,
-                "Intel HEX save-back is not supported this batch — only an "
-                "S19-loaded image can be persisted; the patched image was "
-                "not written",
+                f"save-back is not supported for a {source_kind!r} source — "
+                "only an S19- or Intel HEX-loaded image can be persisted; the "
+                "patched image was not written",
                 severity=ValidationSeverity.WARNING,
             )
         )
         return None, issues
+    emit, suffix = emitter_spec
 
-    safe_name, rejection = _sanitize_s19_filename(filename)
+    safe_name, rejection = _sanitize_s19_filename(filename, suffix=suffix)
     if safe_name is None:
         assert rejection is not None
         issues.append(rejection)
@@ -664,7 +684,7 @@ def save_patched_image(
         )
         return None, issues
 
-    text = emit_s19_from_mem_map(dict(mem_map), list(ranges))
+    text = emit(dict(mem_map), list(ranges))
     staged = workarea_root / WORKAREA_TEMP / safe_name
     try:
         staged.parent.mkdir(parents=True, exist_ok=True)
@@ -690,36 +710,42 @@ def save_patched_image(
 
 def _sanitize_s19_filename(
     filename: str,
+    *,
+    suffix: str = ".s19",
 ) -> Tuple[Optional[str], Optional[ValidationIssue]]:
     """
     Summary:
         Reduce an operator-provided save-back filename to a contained bare
-        ``.s19`` name, or reject it (F-S-01) — the ``_safe_name`` pattern
-        generalized to preserve the S19 extension instead of forcing
-        ``.json``.
+        name carrying ``suffix``, or reject it (F-S-01, m-7) — the
+        ``_safe_name`` pattern generalized to force a parametric format
+        suffix (``.s19`` by default, ``.hex`` on the HEX branch) instead of
+        ``.json``. The three rejection rules stay in this one function,
+        unforked across formats.
 
     Args:
         filename (str): The typed target name — possibly carrying path
             separators (either style), traversal segments, a drive-qualified
             absolute prefix, a reserved device basename, or a trailing dot
             or space.
+        suffix (str): The format extension to force on (``.s19`` for an S19
+            save-back, ``.hex`` for a HEX save-back); compared and appended
+            case-insensitively, the same way the old hard-coded ``.s19`` was.
 
     Returns:
         Tuple[Optional[str], Optional[ValidationIssue]]: ``(name, None)``
-        with directory components stripped and the ``.s19`` suffix forced
-        on, or ``(None, issue)`` — one ``MF-WRITE-CONTAINMENT`` issue —
-        when the bare name is empty, ends with a dot or space (Windows
-        strips those at the filesystem layer, which would bypass later
-        comparisons), or its first dot-delimited segment is a Windows
-        reserved device basename.
+        with directory components stripped and ``suffix`` forced on, or
+        ``(None, issue)`` — one ``MF-WRITE-CONTAINMENT`` issue — when the
+        bare name is empty, ends with a dot or space (Windows strips those
+        at the filesystem layer, which would bypass later comparisons), or
+        its first dot-delimited segment is a Windows reserved device
+        basename.
 
     Data Flow:
         - ``PureWindowsPath(...).name`` strips both separator styles and any
           drive prefix on every platform (a POSIX ``Path`` would treat
-          ``..\\evil.s19`` as one opaque name).
-        - Reject empties and trailing dot/space; force the ``.s19`` suffix;
-          reject reserved basenames case-insensitively, with or without
-          extension.
+          ``..\\evil.hex`` as one opaque name).
+        - Reject empties and trailing dot/space; force ``suffix``; reject
+          reserved basenames case-insensitively, with or without extension.
 
     Dependencies:
         Uses:
@@ -737,8 +763,8 @@ def _sanitize_s19_filename(
             f"written: {filename!r}",
             severity=ValidationSeverity.WARNING,
         )
-    if not bare.lower().endswith(".s19"):
-        bare = f"{bare}.s19"
+    if not bare.lower().endswith(suffix.lower()):
+        bare = f"{bare}{suffix}"
     if bare.split(".", 1)[0].strip().upper() in _WINDOWS_RESERVED_BASENAMES:
         return None, _issue(
             MF_WRITE_CONTAINMENT,

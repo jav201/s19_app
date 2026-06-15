@@ -3,8 +3,9 @@ v2 hex-first change system (`s19app-changeset`) — re-export facade.
 
 Public surface of the ``changes`` package (batch-07, HLR-001/HLR-002): the
 object model and change summary (``model.py``), the JSON reader/writer,
-rule-code constants, and S19 emitter (``io.py``), the intra-document
-collision rule (``validate.py``), and the apply engine (``apply.py``).
+rule-code constants, and S19/Intel HEX emitters (``io.py``), the
+intra-document collision rule (``validate.py``), the apply engine
+(``apply.py``), and the verify-on-save engine (``verify.py``).
 Import from here; the modules stay the implementation detail.
 """
 
@@ -70,6 +71,12 @@ from .io import (
     serialize_change_document,
     write_change_document,
 )
+from .verify import (
+    STATUS_MISMATCH,
+    STATUS_VERIFIED,
+    VerifyResult,
+    verify_written_image,
+)
 
 __all__ = [
     "CHANGES_ARTIFACT",
@@ -127,4 +134,8 @@ __all__ = [
     "read_change_document",
     "serialize_change_document",
     "write_change_document",
+    "STATUS_MISMATCH",
+    "STATUS_VERIFIED",
+    "VerifyResult",
+    "verify_written_image",
 ]

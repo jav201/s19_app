@@ -54,6 +54,7 @@ from ..changes import (
     collision_issues,
     read_change_document,
     save_patched_image,
+    verify_written_image,
     write_change_document,
 )
 from ..changes.check import run_check_document
@@ -815,10 +816,13 @@ class ChangeService:
         """
         Summary:
             Persist the post-apply image under the operator-confirmed
-            filename via ``save_patched_image`` and stamp the written path
-            onto ``last_summary.saved_path`` (the LLR-002.7 service half;
-            the F-S-01 sanitizer and the staged containment live in the
-            engine).
+            filename via ``save_patched_image``, stamp the written path onto
+            ``last_summary.saved_path``, then verify-on-save: re-read the
+            written file and diff it against the intended map, stamping the
+            ``VerifyResult`` onto ``last_summary.verify_result`` (HLR-002
+            service half + HLR-003 wiring, §6.2 C-10 back-compatible carrier).
+            The F-S-01 sanitizer and the staged containment live in the
+            engine; ``save_patched_image``'s 2-tuple return is unchanged (M-1).
 
         Args:
             mem_map (Dict[int, int]): The post-apply address-to-byte map.
@@ -828,8 +832,9 @@ class ChangeService:
                 root when no project is active).
             filename (str): The operator-typed target name — sanitized /
                 refused by the engine (F-S-01).
-            source_kind (str): ``LoadedFile.file_type``; non-``"s19"`` is
-                refused with the ``CHG-HEX-SAVE-UNSUPPORTED`` finding (D-1).
+            source_kind (str): ``LoadedFile.file_type``; ``"s19"`` and
+                ``"hex"`` are persisted (US-008), any other source (e.g.
+                ``"mac"``) is refused with ``CHG-HEX-SAVE-UNSUPPORTED``.
 
         Returns:
             ChangeActionResult: ``ok`` ``True`` with the written file name
@@ -839,6 +844,7 @@ class ChangeService:
         Dependencies:
             Uses:
                 - save_patched_image
+                - verify_written_image
             Used by:
                 - app.py save-back confirm handling
         """
@@ -853,6 +859,14 @@ class ChangeService:
                 issues=issues,
                 ok=False,
             )
+        # Verify-on-save (HLR-003, §6.2 C-10 back-compatible carrier): re-read
+        # the just-written file and diff it against the intended map. The
+        # VerifyResult rides last_summary — save_patched_image's 2-tuple return
+        # is untouched (M-1). collect-don't-abort: a mismatch never unlinks the
+        # written file; surfacing is the TUI's job (HLR-004, I4).
+        verify = verify_written_image(path, mem_map, source_kind)
+        if self.last_summary is not None:
+            self.last_summary.verify_result = verify
         return ChangeActionResult(
             message=f"Patched image saved as {path.name}",
             issues=issues,

@@ -36,6 +36,7 @@ from s19_app.tui.changes import (
     ChangeEntry,
     FORMAT_ID,
     FORMAT_VERSION,
+    STATUS_VERIFIED,
 )
 from s19_app.tui.changes.check import run_check_document
 from s19_app.tui.services.change_service import (
@@ -236,6 +237,57 @@ def test_apply_with_save_stamps_saved_path(tmp_path: Path) -> None:
     assert summary.saved_path is not None
     assert summary.saved_path.is_file()
     assert workarea in summary.saved_path.parents
+
+
+def test_hex_save_stamps_verified_result_on_summary(tmp_path: Path) -> None:
+    """A HEX save persists a .hex and stamps a verified VerifyResult.
+
+    Intent: HLR-002 + HLR-003 / §6.2 C-10 — a ``"hex"`` source is persisted
+    (refusal retired) and verify-on-save rides the back-compatible carrier:
+    ``last_summary.verify_result`` is stamped ``verified`` on a faithful
+    write, with ``save_patched``'s ChangeActionResult still ``ok``.
+    """
+    service, mem_map, ranges = _service_with_image()
+    service.add_entry("0x100", "", "AA BB")
+
+    summary = service.apply(mem_map, ranges, None, None, variant_id="img")
+    assert summary.counts["applied"] == 1
+    assert summary.verify_result is None  # nothing saved yet
+
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    project_dir.mkdir(parents=True)
+    result = service.save_patched(
+        mem_map, ranges, project_dir, "img-patched.hex", source_kind="hex"
+    )
+
+    assert result.ok, result.message
+    assert summary.saved_path is not None
+    assert summary.saved_path.suffix == ".hex"
+    assert summary.verify_result is not None
+    assert summary.verify_result.status == STATUS_VERIFIED
+    assert summary.verify_result.written_path == summary.saved_path
+
+
+def test_refused_save_leaves_verify_result_none(tmp_path: Path) -> None:
+    """A refused save never runs verify — verify_result stays None.
+
+    Intent: §6.2 C-10 — verify is wired AFTER a successful write only; a
+    refusal (here a ``"mac"`` source) returns early with no VerifyResult
+    stamped on the summary.
+    """
+    service, mem_map, ranges = _service_with_image()
+    service.add_entry("0x100", "", "AA")
+    summary = service.apply(mem_map, ranges, None, None)
+
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    project_dir.mkdir(parents=True)
+    result = service.save_patched(
+        mem_map, ranges, project_dir, "img.mac", source_kind="mac"
+    )
+
+    assert not result.ok
+    assert summary.saved_path is None
+    assert summary.verify_result is None
 
 
 def test_declined_or_refused_save_leaves_saved_path_none(
