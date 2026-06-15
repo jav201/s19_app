@@ -14,7 +14,19 @@ under ``.s19tool/workarea/temp/``, re-run ``copy_into_workarea``'s containment
 CHECKS against the destination, then ATOMIC ``os.replace`` onto the fixed
 ``project.json`` name (D-3 locked mechanism) — NOT ``copy_into_workarea``'s
 dedup body, so a re-save overwrites in place rather than producing
-``project_1.json``. Verify-on-write (HLR-003) lands in I3.
+``project_1.json``.
+
+Increment I3 adds VERIFY-ON-WRITE (HLR-003 + LLR-003.1..003.3): re-read the
+just-written ``project.json`` via ``read_project_manifest`` addressed by the
+CANONICAL fixed name (``project_dir / PROJECT_MANIFEST_NAME``, M-1) — never the
+path the write helper returned — and compare the re-read
+``active_variant`` / ``batch`` / ``assignments`` against the intended
+composition in the C-1 canonical comparison form (intent resolved against
+``project_root``). The outcome is a :class:`ManifestVerifyResult` modeled on
+the batch-10 ``VerifyResult`` SHAPE (status / drift / issues / written_path)
+but compared key-wise over the manifest dict, NOT via ``diff_mem_maps`` (D-1:
+a manifest is a JSON dict, not a mem_map). Any re-read reader ``issues`` force
+MISMATCH (R-1) — a write the reader degrades must never falsely verify.
 
 Headless by contract (C-3 / LLR-004.3): stdlib + sibling-service imports only,
 no ``textual`` symbol and no ``logging`` — so the serializer stays reusable and
@@ -30,6 +42,7 @@ from __future__ import annotations
 
 import json
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Mapping, Optional, Sequence
 
@@ -46,6 +59,7 @@ from .variant_execution_service import (
     MANIFEST_ARTIFACT,
     PROJECT_MANIFEST_NAME,
     _resolve_manifest_entry,
+    read_project_manifest,
 )
 
 #: The manifest schema version the serializer emits. The reader accepts any
@@ -460,3 +474,210 @@ def write_project_manifest(
             staged.unlink()
         except OSError:
             pass
+
+
+#: Verify-on-write outcome — the re-read manifest equals intent with zero
+#: reader issues. Mirrors ``verify.py``'s ``STATUS_VERIFIED`` (HLR-003).
+MANIFEST_VERIFIED = "verified"
+
+#: Verify-on-write outcome — the re-read manifest drifts from intent OR the
+#: reader collected issues on the re-read (R-1). Mirrors ``verify.py``'s
+#: ``STATUS_MISMATCH``.
+MANIFEST_MISMATCH = "mismatch"
+
+
+@dataclass(slots=True)
+class ManifestVerifyResult:
+    """
+    Summary:
+        The outcome of a manifest verify-on-write check (HLR-003) — the JSON
+        analogue of the batch-10 :class:`~s19_app.tui.changes.verify.VerifyResult`.
+        ``status`` is :data:`MANIFEST_VERIFIED` when the re-read manifest
+        equals the intended composition (in the C-1 canonical comparison form)
+        AND carries no reader ``issues``; :data:`MANIFEST_MISMATCH` otherwise.
+        ``drift`` names the canonical-form fields that differed; ``issues``
+        carries the re-read reader findings so a consumer can name what failed.
+
+    Args:
+        status (str): :data:`MANIFEST_VERIFIED` or :data:`MANIFEST_MISMATCH`.
+        drift (list[str]): The subset of ``{"active_variant", "batch",
+            "assignments"}`` whose re-read value differs from intent — empty
+            iff the three compared fields all matched (a reader-issue-only
+            mismatch has an empty ``drift`` but a non-empty ``issues``).
+        issues (list[ValidationIssue]): The re-read ``ProjectManifest.issues``
+            — non-empty forces MISMATCH (R-1: a write the reader degrades must
+            never falsely verify). Empty on a faithful write.
+        written_path (Optional[Path]): The canonical manifest path that was
+            re-read (``project_dir / PROJECT_MANIFEST_NAME``) — stamped so a
+            mismatch notice can name it (LLR-004.2). ``None`` only when the
+            manifest file was absent at the canonical name.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Produced by :func:`verify_written_manifest` from the re-read
+          ``ProjectManifest`` and the resolved intended composition.
+        - Consumed by the TUI project-save surfacing (LLR-004.1/004.2, I4).
+
+    Dependencies:
+        Uses:
+            - ValidationIssue
+        Used by:
+            - verify_written_manifest
+
+    Example:
+        >>> result = verify_written_manifest(  # doctest: +SKIP
+        ...     project_dir, vset, project_dir
+        ... )
+        >>> result.status
+        'verified'
+    """
+
+    status: str
+    drift: list[str] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
+    written_path: Optional[Path] = None
+
+
+def _resolve_intended_entries(
+    project_root: Path,
+    raw_entries: Sequence[str],
+) -> list[Path]:
+    """
+    Summary:
+        Resolve intended ``batch`` / ``assignments`` path strings against
+        ``project_root`` into resolved-absolute ``Path``s — the C-1 canonical
+        comparison form, so the intent compares against the reader's resolved
+        re-read ``Path``s on the same footing (LLR-003.1).
+
+    Args:
+        project_root (Path): The project directory intent resolves against —
+            the same root the reader uses (``read_project_manifest`` resolves
+            ``project_dir.resolve()``).
+        raw_entries (Sequence[str]): Project-relative path strings as held in
+            the intended composition.
+
+    Returns:
+        list[Path]: ``(project_root / entry).resolve()`` for each entry, in
+        input order — matching the reader-side idiom
+        ``test_variant_execution.py:163``.
+
+    Data Flow:
+        - Pure transform over already-safe entries (the serializer refused any
+          escaping entry up front, LLR-001.5), so no containment re-check is
+          needed here — this only mirrors the reader's relative→absolute
+          resolution for an apples-to-apples comparison.
+
+    Dependencies:
+        Used by:
+            - verify_written_manifest
+    """
+    root = project_root.resolve()
+    return [(root / entry).resolve() for entry in raw_entries]
+
+
+def verify_written_manifest(
+    project_dir: Path,
+    variant_set: ProjectVariantSet,
+    project_root: Path,
+    *,
+    batch: Sequence[str] = (),
+    assignments: Optional[Mapping[str, Sequence[str]]] = None,
+) -> ManifestVerifyResult:
+    """
+    Summary:
+        Re-read the just-written ``project.json`` and compare it against the
+        intended composition, returning a :class:`ManifestVerifyResult`
+        (HLR-003 / LLR-003.1..003.3). The re-read is addressed by the CANONICAL
+        fixed name ``project_dir / PROJECT_MANIFEST_NAME`` (M-1) — NOT a path a
+        write helper returned — so a stale dedup-suffixed file can never
+        produce a false verify. The status is :data:`MANIFEST_VERIFIED` iff the
+        re-read ``active_variant`` / ``batch`` / ``assignments`` equal intent in
+        the C-1 canonical comparison form AND the re-read carries no reader
+        ``issues``; otherwise :data:`MANIFEST_MISMATCH` naming the drift.
+
+    Args:
+        project_dir (Path): The project directory the manifest was written
+            into; the re-read opens ``project_dir / PROJECT_MANIFEST_NAME``.
+        variant_set (ProjectVariantSet): The intended composition's variant
+            inventory; ``active_variant`` intent is its ``active_id``.
+        project_root (Path): The project directory intent's ``batch`` /
+            ``assignments`` entries resolve against — the same root the reader
+            resolves against (normally equal to ``project_dir``).
+        batch (Sequence[str]): The intended project-wide entries as the
+            project-relative strings passed to :func:`write_project_manifest`.
+        assignments (Optional[Mapping[str, Sequence[str]]]): The intended
+            per-variant entries, keyed by ``variant_id``. ``None`` → empty.
+
+    Returns:
+        ManifestVerifyResult: ``status`` + ``drift`` + ``issues`` +
+        ``written_path``. ``drift`` lists every field of
+        ``{"active_variant", "batch", "assignments"}`` that differs; ``issues``
+        carries any re-read reader findings (non-empty → MISMATCH, R-1).
+
+    Raises:
+        None: A reader fault is a collected re-read ``issue`` classified as
+            MISMATCH, never an exception (collect-don't-abort, C-5).
+
+    Data Flow:
+        - ``read_project_manifest(project_dir)`` re-reads the canonical name.
+        - An ABSENT manifest (reader returns ``None``) → MISMATCH with an
+          ``active_variant`` drift and ``written_path=None`` (nothing to read).
+        - Resolve intended ``batch`` / ``assignments`` against ``project_root``
+          (:func:`_resolve_intended_entries`); compare each field against the
+          re-read manifest; collect the differing field names into ``drift``.
+        - ``status`` is VERIFIED iff ``drift`` is empty AND the re-read
+          ``issues`` are empty; MISMATCH otherwise (R-1 honors reader issues).
+
+    Dependencies:
+        Uses:
+            - read_project_manifest
+            - _resolve_intended_entries
+        Used by:
+            - the TUI project-save pipeline (I4, NEW)
+
+    Example:
+        >>> verify_written_manifest(  # doctest: +SKIP
+        ...     project_dir, vset, project_dir, batch=["doc.json"]
+        ... ).status
+        'verified'
+    """
+    assignments = assignments or {}
+    canonical_path = project_dir / PROJECT_MANIFEST_NAME
+
+    manifest = read_project_manifest(project_dir)
+    if manifest is None:
+        return ManifestVerifyResult(
+            status=MANIFEST_MISMATCH,
+            drift=["active_variant", "batch", "assignments"],
+            issues=[],
+            written_path=None,
+        )
+
+    intended_active = variant_set.active_id
+    intended_batch = _resolve_intended_entries(project_root, list(batch))
+    intended_assignments = {
+        variant_id: _resolve_intended_entries(project_root, list(entries))
+        for variant_id, entries in assignments.items()
+    }
+
+    drift: list[str] = []
+    if manifest.active_variant != intended_active:
+        drift.append("active_variant")
+    if manifest.batch != intended_batch:
+        drift.append("batch")
+    if manifest.assignments != intended_assignments:
+        drift.append("assignments")
+
+    status = (
+        MANIFEST_VERIFIED
+        if not drift and not manifest.issues
+        else MANIFEST_MISMATCH
+    )
+    return ManifestVerifyResult(
+        status=status,
+        drift=drift,
+        issues=list(manifest.issues),
+        written_path=canonical_path,
+    )
