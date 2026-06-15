@@ -36,6 +36,9 @@ Functional subsystems:
 12. Project Report
 13. Project / Documentation meta
 14. Operation Framework (batch-08)
+15. Hex Compare Mode (batch-09)
+16. HEX Emitter + Verify-on-Save (batch-10)
+17. Project Manifest Writer (batch-11)
 
 ---
 
@@ -1460,6 +1463,13 @@ selector (active variant / all variants / per assignment) via the
   `test_save_back_files_land_under_project_dir`)
 - Status: Added in batch `2026-06-10-batch-07` (US-005 / HLR-006)
 
+> **The manifest WRITER (batch-11) is documented in §17.** Batch-06/E6 added
+> only the manifest *reader* (`R-VAR-002`); batch-11 (US-010) adds the missing
+> write + verify-on-write side. To keep all US-010 requirements together they
+> live in their own subsystem section — see **§17 Project Manifest Writer**
+> (`R-MAN-SER-001` / `R-MAN-WRITE-001` / `R-MAN-VERIFY-001` / `R-MAN-TUI-001`).
+
+
 ---
 
 # 12. Project Report
@@ -1915,3 +1925,162 @@ operation" (HLR-005; folded N-3 + M-3 hygiene).
   `test_execute_internal_keyerror_not_masked_as_unknown_operation`)
 - Status: Added in batch `2026-06-13-batch-10` (US-008/US-009 folded /
   HLR-005 / LLR-005.1–005.2)
+
+---
+
+# 17. Project Manifest Writer (batch-11)
+
+The project-manifest-writer batch (`2026-06-14-batch-11`, US-010) closes the
+read/write asymmetry in the project layer — the repo could *read* the
+per-project `.s19tool/workarea/<project>/project.json` manifest (`R-VAR-002`)
+but the file had to be hand-authored — by adding the WRITE side plus
+post-write certainty: re-read the written manifest and compare the parse
+against the intended composition. It is the JSON analogue of the batch-10
+verify-on-save discipline (write image → re-read → diff,
+§16 `R-HEX-VERIFY-001`). The manifest *reader* `read_project_manifest`
+(`s19_app/tui/services/variant_execution_service.py`) is the schema oracle and
+stays unchanged; the writer round-trips against it (the batch-10
+emitter→`IntelHexFile` precedent). Each row traces to the batch HLR/LLR/TC
+set in `.dev-flow/2026-06-14-batch-11/01-requirements.md` and the per-test
+verdicts in `.dev-flow/2026-06-14-batch-11/04-validation.md` (PASS-WITH-NOTES;
+targeted matrix 23/23 PASS; full suite 807 passed / 0 failed / 29 skipped /
+3 xfailed; signed balance `839 = 816 − 0 + 23`).
+
+> **Design note — writer location + atomic placement (the batch's key
+> learning).** The serialize/write/verify logic lives in
+> `s19_app/tui/services/manifest_writer.py`, a service-layer module beside the
+> reader's home rationale — NOT in any git-frozen engine module and NOT at
+> the `s19_app/` package root, so it trips zero structural guards
+> (`test_engine_unchanged.py`, the `s19_app/` root-module guards in
+> `tests/test_tui_directionb.py`) and stays headless (no `textual`, no
+> `logging` import). The contained write REUSES `copy_into_workarea`'s
+> containment CHECKS (`_find_workarea_root` + `is_relative_to` +
+> `_path_traverses_reparse_point`, `s19_app/tui/workspace.py`) against the
+> destination, then performs an atomic `os.replace(staged, project.json)` at
+> the fixed name — it does NOT route through `copy_into_workarea`'s
+> copy-with-dedup body, which would append `_<N>` on collision and produce a
+> `project_1.json` invisible to the reader (which opens only the fixed
+> `project_dir / PROJECT_MANIFEST_NAME`). A re-save therefore overwrites in
+> place atomically, never dedup-suffixed. (Batch-11 `01-requirements.md` §6.2
+> D-3 locked mechanism; `04-validation.md` I-2.)
+
+**R-MAN-SER-001**: The system must serialize an in-memory project composition
+into the canonical manifest envelope — a JSON object with exactly the four
+keys `{schema_version, active_variant, batch, assignments}`, emitted via the
+stdlib `json` encoder (never string assembly), where `active_variant` is the
+`ProjectVariantSet.active_id`, `batch` is the project-wide change/check file
+list, and `assignments` maps each `variant_id` to its file list, with every
+`batch`/`assignments` entry written as a project-relative forward-slash path
+string. Correctness is defined by round-trip to the reader (the oracle): the
+serialized dict, written and re-read through `read_project_manifest`, must
+yield a `ProjectManifest` with zero `issues` and `active_variant`/`batch`/
+`assignments` equal to intent in the canonical comparison form (intended
+entries resolved against the same `project_root` before comparison). Output is
+byte-deterministic for a given composition. As a security input gate, if any
+`batch`/`assignments` entry is absolute or resolves outside `project_root`,
+the serializer must REFUSE the whole operation — returning `(None, [finding])`
+and writing nothing — reusing the reader's own rejection predicate
+(`_resolve_manifest_entry`), never emitting a string the reader would later
+silently skip (HLR-001 incl. LLR-001.5).
+
+- Code: `s19_app/tui/services/manifest_writer.py` (`serialize_manifest` :224,
+  `_reject_unsafe_entry` :178 reusing `variant_execution_service.
+  _resolve_manifest_entry`, `_posix_entries` :152, `MANIFEST_WRITE_ESCAPE` :74
+  value `"MANIFEST-WRITE-ESCAPE"`), round-trip oracle
+  `s19_app/tui/services/variant_execution_service.py` (`read_project_manifest`)
+- Validation: `Automated` via `tests/test_manifest_writer.py`
+  (`test_envelope_keys_and_active_variant`,
+  `test_envelope_empty_project_active_variant_is_null`,
+  `test_relative_paths_resolve_with_no_escape`,
+  `test_windows_backslashes_normalized_to_forward_slash`,
+  `test_roundtrip_equals_intent_in_canonical_form`,
+  `test_roundtrip_schema_version_survives`,
+  `test_deterministic_byte_identical_output`,
+  `test_refuse_escape_and_absolute_entries_writes_nothing`,
+  `test_clean_composition_passes_the_gate`,
+  `test_refusal_emits_no_file_when_caller_would_write`)
+- Status: Added in batch `2026-06-14-batch-11` (US-010 / HLR-001 /
+  LLR-001.1–001.5)
+
+**R-MAN-WRITE-001**: When a serialized manifest is written, the system must
+stage the bytes under `.s19tool/workarea/temp/`, validate the final
+destination `project_dir / "project.json"` with the SAME containment checks
+`copy_into_workarea` applies (`_find_workarea_root` + `is_relative_to` +
+`_path_traverses_reparse_point`), and then perform an ATOMIC `os.replace` onto
+the fixed `project.json` name (`PROJECT_MANIFEST_NAME`) — so a re-save
+overwrites the existing manifest in place and two saves into one project dir
+leave exactly one `project.json` and zero `project_1.json` (no dedup-suffix).
+It must NOT route the manifest through `copy_into_workarea`'s copy-with-dedup
+function body, and must remove the staged temp file afterward. If the
+destination fails the containment check (`WorkareaContainmentError`) or the
+stage / `os.replace` raises an `OSError`, the writer must return
+`(None, [finding])` with a `MANIFEST-WRITE-CONTAINMENT` issue rather than
+raise (collect-don't-abort) (HLR-002).
+
+- Code: `s19_app/tui/services/manifest_writer.py` (`write_project_manifest`
+  :370, atomic `os.replace(staged, destination)` :463,
+  `_check_destination_contained` :322 reusing `s19_app/tui/workspace.py`
+  containment checks, `MANIFEST_WRITE_CONTAINMENT` :81 value
+  `"MANIFEST-WRITE-CONTAINMENT"`)
+- Validation: `Automated` via `tests/test_manifest_writer.py`
+  (`test_write_places_manifest_and_reads_back`,
+  `test_two_saves_leave_exactly_one_manifest_second_wins`,
+  `test_fixed_name_and_staged_temp_removed`,
+  `test_destination_outside_workarea_returns_finding`,
+  `test_refused_serialize_short_circuits_without_writing`)
+- Status: Added in batch `2026-06-14-batch-11` (US-010 / HLR-002 /
+  LLR-002.1–002.3; atomic same-name `os.replace` is the locked D-3 mechanism)
+
+**R-MAN-VERIFY-001**: When a manifest has been written, the system must
+re-read `project.json` via `read_project_manifest` addressed by the CANONICAL
+`project_dir / PROJECT_MANIFEST_NAME` (not the path the writer returns) and
+compare the re-read `active_variant`/`batch`/`assignments` against the intended
+composition (key-wise dict equality in the canonical comparison form, NOT
+`compare.diff_mem_maps` — a manifest is a JSON dict, not a memory map),
+returning a `ManifestVerifyResult` whose `status` is `"verified"` iff all
+three keys are equal AND the re-read `issues` list is empty, and `"mismatch"`
+otherwise. A mismatch result must enumerate the drifting key(s) and carry the
+re-read reader issues; a write the reader degrades or rejects (size cap, JSON
+parse, bad structure, path escape) must classify as mismatch, not a false
+verify (the R-1 guard). The verify module is headless (HLR-003).
+
+- Code: `s19_app/tui/services/manifest_writer.py` (`verify_written_manifest`
+  :580, `ManifestVerifyResult` :490, `_resolve_intended_entries` :543,
+  `MANIFEST_VERIFIED` :481 value `"verified"`, `MANIFEST_MISMATCH` :486 value
+  `"mismatch"`), re-read oracle
+  `s19_app/tui/services/variant_execution_service.py` (`read_project_manifest`)
+- Validation: `Automated` via `tests/test_manifest_verify.py`
+  (`test_faithful_write_verifies`,
+  `test_tampered_active_variant_mismatches_naming_the_key`,
+  `test_reader_issues_force_mismatch_even_if_surviving_keys_match`,
+  `test_verify_reads_canonical_name_not_a_stray_suffixed_file`)
+- Status: Added in batch `2026-06-14-batch-11` (US-010 / HLR-003 /
+  LLR-003.1–003.3)
+
+**R-MAN-TUI-001**: Where the operator triggers project save, the TUI must
+invoke the serialize→write→verify pipeline for the active project (without
+changing the existing project file-copy save behavior) and surface the verify
+outcome: a concise quiet "manifest verified" status on success, and a loud
+notice naming the drifting key(s) / plain-text reader-issue messages on
+mismatch or write-refusal (reader-issue text rendered as PLAIN text, never
+interpolated into Rich markup, so a crafted path string cannot inject markup;
+severity colour via the frozen `color_policy.SEVERITY_CLASS_MAP`). A
+write-failure surfaces an error notice without crashing the save flow
+(HLR-004).
+
+- Code: `s19_app/tui/app.py` (`_handle_save_dialog` :3443 calling
+  `_write_and_verify_manifest` :3539, which calls `write_project_manifest`
+  :3578 + `verify_written_manifest` :3592 and routes to
+  `_surface_manifest_verify_result` :3595; service imports :92–93)
+- Validation: `Automated` via `tests/test_tui_manifest_save.py`
+  (`test_project_save_writes_and_verifies_manifest`,
+  `test_manifest_mismatch_surfaces_loud_notice_naming_drift`,
+  `test_manifest_write_refusal_surfaces_error_notice_no_crash`,
+  `test_manifest_writer_module_is_headless`)
+- Status: Added in batch `2026-06-14-batch-11` (US-010 / HLR-004 /
+  LLR-004.1–004.3). **Scope note (SCOPE-1, per `04-validation.md` §4):** the
+  serialize/write/verify engine fully supports and tests `batch` and
+  `assignments`, but the TUI save handler this batch composes only
+  `active_variant` (it calls `write_project_manifest` with empty `batch`/
+  `assignments`). Persisting `batch`/`assignments` from the loaded project
+  state via the save UI is a batch-12 candidate; this row does not claim it.
