@@ -1446,11 +1446,13 @@ def emit_intel_hex_from_mem_map(
     Returns:
         str: Intel HEX text, one record per line with a trailing newline:
         type-0x04 extended-linear-address records whenever the active upper-16
-        bits of the address change (including the first address above 0xFFFF),
-        type-0x00 data records of at most 16 data bytes each, and exactly one
-        type-0x01 EOF record (``:00000001FF``). Empty input emits the EOF
-        record alone. Each record carries the Intel HEX checksum: the two's
-        complement of the low byte of the sum of all preceding record bytes.
+        bits of the address change — which includes the very first data row, so
+        a low-address-only image still carries an explicit ``0x0000`` base ELA
+        (valid and round-trip-stable, if non-minimal) — type-0x00 data records
+        of at most 16 data bytes each, and exactly one type-0x01 EOF record
+        (``:00000001FF``). Empty input emits the EOF record alone. Each record
+        carries the Intel HEX checksum: the two's complement of the low byte of
+        the sum of all preceding record bytes.
 
     Raises:
         KeyError: If ``ranges`` claims an address absent from ``mem_map`` — a
@@ -1477,7 +1479,7 @@ def emit_intel_hex_from_mem_map(
 
     Example:
         >>> emit_intel_hex_from_mem_map({0x10: 0xAB}, [(0x10, 0x11)]).splitlines()
-        [':01001000AB44', ':00000001FF']
+        [':020000040000FA', ':01001000AB44', ':00000001FF']
     """
     lines: list[str] = []
     active_upper = None
