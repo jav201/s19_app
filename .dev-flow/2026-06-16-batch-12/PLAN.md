@@ -6,9 +6,10 @@
 
 ## 0. Where we are RIGHT NOW
 
-**Phase 3 (Implementation), increment I2 (config + check) — IN PROGRESS.**
-- ✅ I1a committed (neutral contract). ✅ I1b committed (CRC engine). ▶️ I2 starting now, with mid-step checkpoints.
-- Suite: **850 collected / 797 lean-pass / 0 failures**. KAT (the "is it really CRC-32" anchor) green.
+**Phase 3 (Implementation), increment I2 (config + check) — AWAITING YOUR GATE.**
+- ✅ I1a (contract) + ✅ I1b (engine) committed. ✅ I2 (config + check) implemented + reviewed CLEAN (0 findings). ⏳ I2 needs your `approve` to commit and move to I3a.
+- Suite: **860 collected / 807 lean-pass / 0 failures**. KAT green. First real check behavior (compute + compare vs stored) now exists headlessly.
+- **Re-plan:** I3 splits into **I3a (operation wiring)** + **I3b (TUI surface)** to keep each ≤5 files — see §2.
 
 ---
 
@@ -30,12 +31,13 @@ Add a **CRC32 operation** to s19tool: compute a CRC32 over configured memory reg
 |---|-----------|-------|------|--------|
 | **I1a** | Neutral contract | `OperationInput` + `from_loaded`; `execute` retyped off `LoadedFile` (both call-sites migrated atomically); `OperationResult` +`crc_regions` | LLR-005.1/.2 | ✅ **committed** (dd665b0) |
 | **I1b** | CRC engine (headless) | Parameterized CRC32 + region assembly + 4-byte LE codec; `REQ-crc.md`; engine tests | LLR-001.1/.2/.3, LLR-005.3 | ✅ **committed** |
-| **I2** | Config + check | dummy JSON template, config reader (resolve+size-cap+collect), read-stored-4LE + compare + populate `crc_regions` | LLR-004.1, LLR-002.1/.2 | ▶️ **in progress** |
-| **I3** | TUI surface | config text widget + per-region result rows in op-result view + worker-thread (R-6) | LLR-004.2, LLR-002.3/.4 | ⬜ pending |
+| **I2** | Config + check (headless) | dummy JSON template, config reader (resolve+size-cap+collect), read-stored-4LE + compare → `CrcRegionResult[]` | LLR-004.1, LLR-002.1/.2 | ✅ **reviewed CLEAN, awaiting gate** |
+| **I3a** | Operation wiring | make `CrcOperation.execute` REAL (consume `check_regions` → `OperationResult{status=ok, crc_regions}`); replace the placeholder (`registry.py`/`placeholders.py`/`test_operations.py`) | LLR-002.2 (assembly) | ⬜ pending |
+| **I3b** | TUI surface | config text widget (dummy pre-fill) + per-region result rows in op-result view + worker-thread (R-6) | LLR-004.2, LLR-002.3/.4 | ⬜ pending |
 | **I4** | Persistent report | CRC section in `report_service.py` (check + write outcomes) | LLR-002.5, LLR-003.5 | ⬜ pending |
 | **I5** | Inject + emit + verify + confirm | 4-byte LE inject (extend on gap) + `emit_s19_from_mem_map` + reader-as-oracle verify + two-stage confirm (R-6 + security sign-off) | LLR-003.1/.2/.3/.4 | ⬜ pending |
 
-**Dependency order is linear:** I1a → I1b → I2 → I3 → I4 → I5. No increment depends on a later one.
+**Dependency order is linear:** I1a → I1b → I2 → I3a → I3b → I4 → I5. No increment depends on a later one. (I3 split into I3a/I3b at the I2 gate: making `CrcOperation` real + replacing the placeholder + the TUI surface together exceed ≤5 files.)
 
 ---
 
@@ -84,6 +86,7 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | Batch-11 close (baseline) | 839 | 786 | re-measured (V-7) |
 | After I1a | 841 | 788 | +2 (TC-108/109) |
 | After I1b | 850 | 797 | +9 (TC-101..107, TC-106b, no-mutation) |
+| After I2 | 860 | 807 | +10 (6 config + 4 check); review CLEAN |
 
 - Frozen-engine guards: **green** at every step (CRC lives in new files; `range_index`/`core` reuse import-only). A-4 census stress-test: **CLEAR**.
 - KAT TC-101: **green**.
@@ -99,7 +102,8 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | 2026-06-16 | 1 | 5 HLR / 18 LLR — **approved** |
 | 2026-06-16 | 2 | 0 blockers / 8 majors / 11 minors → **iterated** → all closed → **re-confirmed approved** |
 | 2026-06-16 | 3 / I1a | implemented, reviewed (0 HIGH), **approved + committed** |
-| 2026-06-16 | 3 / I1b | implemented, reviewed (1 HIGH fixed), **awaiting gate** |
+| 2026-06-16 | 3 / I1b | implemented, reviewed (1 HIGH fixed), **approved + committed** (d7e862e) |
+| 2026-06-16 | 3 / I2 | config + check (headless), reviewed **CLEAN (0 findings)**, **awaiting gate** |
 
 Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
@@ -107,4 +111,4 @@ Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
 ## 8. What's next
 
-You approve I1b → I commit it → I start **I2 (config + check)**. After I2 you'll see the first end-to-end check behavior (compute a CRC and compare against a stored value) in tests.
+You approve I2 → I commit it → I start **I3a (operation wiring)**: `CrcOperation.execute` becomes real (consumes `check_regions`, returns an `OperationResult` with the per-region `crc_regions` payload and `status="ok"`), replacing the placeholder. After I3a the CRC operation actually runs end-to-end through the service; I3b then surfaces it in the TUI.

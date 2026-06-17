@@ -21,6 +21,8 @@ import zlib
 from typing import Iterable, Optional
 
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
+from .crc_config import CrcConfig
+from .model import CrcRegionResult, OperationInput
 
 #: zlib/PKZIP CRC-32 default convention (§6.2 D-4). With these params the
 #: engine reproduces ``zlib.crc32`` exactly (the LLR-001.1 oracle).
@@ -372,3 +374,142 @@ def decode_le32(data: Iterable[int]) -> int:
             f"decode_le32 expects {LE32_WIDTH} bytes, got {len(payload)}"
         )
     return int.from_bytes(payload, "little")
+
+
+def read_stored_crc_le(
+    op_input: OperationInput, output_address: int
+) -> Optional[int]:
+    """
+    Summary:
+        Read the 4-byte little-endian value stored at ``output_address`` in the
+        input's ``mem_map`` (LLR-002.1, §6.2 D-5 FIXED codec): the bytes at
+        ``output_address .. output_address + 3`` decoded low-byte-first via
+        :func:`decode_le32`. If ANY of the four addresses is absent from
+        ``mem_map`` the region has "no stored value" and ``None`` is returned —
+        the function never raises on a missing address.
+
+    Args:
+        op_input (OperationInput): The neutral operation input; only its
+            ``mem_map`` is read (never mutated).
+        output_address (int): The address at which the region's CRC is stored;
+            the four consecutive addresses are read low-byte-first.
+
+    Returns:
+        Optional[int]: The decoded 32-bit stored value, or ``None`` when any of
+        the four addresses is not present in ``mem_map``.
+
+    Raises:
+        None: A missing address yields ``None``; the codec ``decode_le32`` is
+            only ever handed exactly four present bytes, so it never raises.
+
+    Data Flow:
+        - Probe the four addresses ``output_address + i`` in ``mem_map``; if any
+          is absent return ``None``; else decode the four bytes via
+          :func:`decode_le32`.
+
+    Dependencies:
+        Uses:
+            - :func:`decode_le32`
+        Used by:
+            - :func:`check_regions`
+            - tests/test_crc_operation.py (TC-111, TC-112, missing-bytes case)
+
+    Example:
+        >>> from pathlib import Path
+        >>> op_input = OperationInput(
+        ...     mem_map={0x100: 0x26, 0x101: 0x39, 0x102: 0xF4, 0x103: 0xCB},
+        ...     ranges=[(0x100, 0x104)], input_path=None, variant_id=None,
+        ...     file_type="s19",
+        ... )
+        >>> hex(read_stored_crc_le(op_input, 0x100))
+        '0xcbf43926'
+    """
+    addresses = range(output_address, output_address + LE32_WIDTH)
+    if any(addr not in op_input.mem_map for addr in addresses):
+        return None
+    return decode_le32(op_input.mem_map[addr] for addr in addresses)
+
+
+def check_regions(
+    op_input: OperationInput, config: CrcConfig
+) -> list[CrcRegionResult]:
+    """
+    Summary:
+        Run the non-mutating CRC check over every configured region (LLR-002.2):
+        for each :class:`CrcRegion` compute the CRC over ``(start, end)`` with
+        ``config``'s algorithm params, read the stored 4-byte LE value at the
+        region's output address via :func:`read_stored_crc_le`, and build one
+        :class:`CrcRegionResult` per region in config order. ``matched`` is
+        ``True`` when a stored value is present and equals the computed CRC,
+        ``False`` when present and differing, and ``None`` when there is no
+        stored value to compare. ``written`` is always ``False`` (the check path
+        never mutates). ``op_input.mem_map`` is only read.
+
+    Args:
+        op_input (OperationInput): The neutral operation input; its ``mem_map``
+            is read for both the CRC compute and the stored-value read, never
+            mutated.
+        config (CrcConfig): The parsed CRC config supplying the regions and the
+            algorithm params (polynomial / init / reverse / final_xor).
+
+    Returns:
+        list[CrcRegionResult]: One result per region, in ``config.regions``
+        order, each carrying ``output_address`` / ``computed_crc`` /
+        ``stored_value`` / ``matched`` / ``written=False``.
+
+    Raises:
+        None: Missing stored bytes yield ``stored_value=None`` /
+            ``matched=None`` (collect-don't-abort), not an exception.
+
+    Data Flow:
+        - For each region: :func:`compute_region_crc` over ``(start, end)`` with
+          ``config``'s params → :func:`read_stored_crc_le` at
+          ``region.output_address`` → assemble one :class:`CrcRegionResult`.
+
+    Dependencies:
+        Uses:
+            - :func:`compute_region_crc`
+            - :func:`read_stored_crc_le`
+            - :class:`s19_app.tui.operations.model.CrcRegionResult`
+        Used by:
+            - the CRC operation check path (CrcOperation.execute, increment I3)
+            - tests/test_crc_operation.py (TC-111, TC-112, multi-region order)
+
+    Example:
+        >>> from pathlib import Path
+        >>> from s19_app.tui.operations.crc_config import CrcConfig, CrcRegion
+        >>> op_input = OperationInput(
+        ...     mem_map={0: 0x31, 1: 0x32, 2: 0x33}, ranges=[(0, 3)],
+        ...     input_path=None, variant_id=None, file_type="s19",
+        ... )
+        >>> config = CrcConfig(
+        ...     regions=[CrcRegion(start=0, end=3, output_address=0x10)],
+        ...     polynomial=DEFAULT_POLYNOMIAL, init=DEFAULT_INIT,
+        ...     reverse=DEFAULT_REVERSE, final_xor=DEFAULT_FINAL_XOR,
+        ... )
+        >>> check_regions(op_input, config)[0].matched is None
+        True
+    """
+    results: list[CrcRegionResult] = []
+    for region in config.regions:
+        computed = compute_region_crc(
+            op_input.mem_map,
+            region.start,
+            region.end,
+            polynomial=config.polynomial,
+            init=config.init,
+            reverse=config.reverse,
+            final_xor=config.final_xor,
+        )
+        stored = read_stored_crc_le(op_input, region.output_address)
+        matched = None if stored is None else (stored == computed)
+        results.append(
+            CrcRegionResult(
+                output_address=region.output_address,
+                computed_crc=computed,
+                stored_value=stored,
+                matched=matched,
+                written=False,
+            )
+        )
+    return results

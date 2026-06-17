@@ -131,6 +131,12 @@
             "date": "2026-06-16",
             "decision": "I1b-approved-committed-comms-recalibrated",
             "notes": "I1b APPROVED (operator 'Aprobar I1b'). COMMS FEEDBACK mid-batch: operator flagged communication 'almost disappeared' during long execution stretches + wanted a plan/compendium. CORRECTIVE: created living PLAN.md (batch-12 index: where-we-are/roadmap/reqs/decisions/risks/ledger/log/next), saved feedback memory devflow-living-compendium, and recalibrated to (a) full 7-section review packet IN-CONVERSATION at each gate, (b) MID-implementation checkpoints during each increment (operator chose 'more/more often'), not just end-gate. Increment GATE stays the approval point; mid-step checkpoints are visibility. Committing I1b now. Next: I2 (config + check) implemented in visible narrated sub-steps with checkpoints."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I2-implemented-awaiting-gate",
+            "notes": "I2 (config + check, headless) implemented in 2 narrated sub-steps via software-dev. Step A: crc_config.py (CrcRegion/CrcConfig + read_crc_config: resolve_input_path + READ_SIZE_CAP_BYTES before read + collect-don't-abort, never raises; bool-as-int guard; SizeProbe seam) + examples/crc_config.example.json dummy + test_crc_config.py (TC-113/114 + 4 fault modes). Step B: crc.py +read_stored_crc_le (4-byte LE, missing->None KeyError-safe) +check_regions (compute via I1b engine w/ config params + compare -> CrcRegionResult[], matched True/False/None tri-state, non-mutating) + test_crc_operation.py (TC-111 match/TC-112 mismatch/missing/multi-region). 5 files total (3+2, <=5). NO OperationResult assembly/CrcOperation-real/TUI (deferred to I3). code-reviewer: CLEAN, 0 findings — all 3 rule-ons passed (collect-don't-abort no escape incl OSError-on-read catch; read_stored_crc_le KeyError-safe full-span guard; TC-111 non-vacuous independent oracle). LEDGER orchestrator re-ran lean=807 (797+10 EXACT: A+6/B+4), collection 850->860. ruff clean, 0 frozen edits, F-S-02 read-only/size-capped no write path. s5.2 TC-111/112 path reconciled test_crc_check->test_crc_operation (V-5 provisional). RE-PLAN: I3 -> I3a (op wiring: CrcOperation real + OperationResult assembly + replace placeholder, touches registry/placeholders/test_operations) + I3b (TUI surface: config widget + per-region rows + worker R-6); PLAN.md updated. NOT autonomous — awaiting I2 increment gate. Not committed."
         }
     ],
     "obsidian_synced": false,
