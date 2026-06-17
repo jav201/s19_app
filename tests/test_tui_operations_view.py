@@ -143,17 +143,21 @@ def test_operations_view_lists_registry_ids(tmp_path: Path) -> None:
 def test_operations_view_executes_via_service(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Execute shows the crc result; the service seam is observed.
+    """Execute shows the result; the service seam is observed.
 
-    Intent: LLR-004.2 — phase A executes the real ``crc`` operation through
-    the generic no-config service path and the presented text carries
-    ``status: ok`` plus the nothing-to-check note. Phase B injects a stub
-    through the LLR-003.1
-    ``operation_resolver`` seam: the stub is what executes (with the same
-    snapshot the app handed to the screen), proving the view routes through
-    ``run_operation`` and never bypasses the service — a direct
-    ``registry.get_operation(...).execute(...)`` call in the view would
-    leave the stub unreached and fail here.
+    Intent: LLR-004.2 — phase A executes the real ``extract`` placeholder
+    through the generic synchronous service path and the presented text
+    carries ``status: placeholder`` plus its placeholder note. Phase B injects
+    a stub through the LLR-003.1 ``operation_resolver`` seam: the stub is what
+    executes (with the same snapshot the app handed to the screen), proving
+    the view routes through the resolver seam and never bypasses it — a direct
+    ``registry.get_operation(...).execute(...)`` call in the view would leave
+    the stub unreached and fail here.
+
+    Note (batch-12 I3b): the synchronous-path contracts are exercised through
+    a NON-CRC row (``extract``, index 1) — the ``crc`` row migrated to a
+    config-fed ``@work(thread=True)`` worker (LLR-002.3/004.2), covered by
+    ``tests/test_tui_crc_surface.py``.
     """
     s19_path = _write_s19(tmp_path)
 
@@ -166,7 +170,7 @@ def test_operations_view_executes_via_service(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             screen.query_one("#operations_execute", Button).press()
             await pilot.pause()
@@ -175,14 +179,14 @@ def test_operations_view_executes_via_service(
             )
 
     status_text = asyncio.run(_drive_real())
-    assert "status: ok" in status_text, status_text
-    assert "CRC: no config supplied — nothing to check" in status_text, status_text
+    assert "status: placeholder" in status_text, status_text
+    assert "placeholder: extract not yet implemented" in status_text, status_text
 
     calls: list[OperationInput] = []
 
     class _StubOperation:
-        operation_id = "crc"
-        title = "CRC"
+        operation_id = "extract"
+        title = "Extract"
 
         def describe(self) -> str:
             return "stub"
@@ -202,7 +206,7 @@ def test_operations_view_executes_via_service(
                 variant_id=op_input.variant_id,
             )
             return OperationResult(
-                operation_id="crc",
+                operation_id="extract",
                 status="placeholder",
                 input_path=op_input.input_path,
                 variant_id=op_input.variant_id,
@@ -226,7 +230,7 @@ def test_operations_view_executes_via_service(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             screen.query_one("#operations_execute", Button).press()
             await pilot.pause()
@@ -260,10 +264,14 @@ def test_operations_view_result_hex_render_matches_baseline(
     INPUT snapshot's ``mem_map`` (captured before execution), with the
     pinned argument tuple; the compared text is read from the LIVE
     ``#operation_result_hex`` widget after the modal executed the real
-    ``crc`` operation with no config. The check path never mutates
-    ``mem_map``, so the two hex texts must be equal (the end-to-end
-    unchanged-image acceptance demo). Status and note visibility ride along
-    per the TC-012 threshold.
+    ``extract`` placeholder. The placeholder echoes ``mem_map`` unchanged,
+    so the two hex texts must be equal (the end-to-end unchanged-image
+    acceptance demo). Status and note visibility ride along per the TC-012
+    threshold.
+
+    Note (batch-12 I3b): exercised through the NON-CRC ``extract`` row (the
+    ``crc`` row migrated to a config-fed worker; its pinned hex render is
+    covered by ``tests/test_tui_crc_surface.py``).
     """
     s19_path = _write_s19(tmp_path)
 
@@ -286,7 +294,7 @@ def test_operations_view_result_hex_render_matches_baseline(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             screen.query_one("#operations_execute", Button).press()
             await pilot.pause()
@@ -304,8 +312,8 @@ def test_operations_view_result_hex_render_matches_baseline(
         "pinned-args baseline"
     )
     assert "0x00001000" in widget_plain, widget_plain[:80]
-    assert "status: ok" in status_text, status_text
-    assert "CRC: no config supplied — nothing to check" in status_text, status_text
+    assert "status: placeholder" in status_text, status_text
+    assert "placeholder: extract not yet implemented" in status_text, status_text
 
 
 # ---------------------------------------------------------------------------
@@ -357,9 +365,13 @@ def test_execute_internal_keyerror_not_masked_as_unknown_operation(
     assert any("unknown operation" in line for line in miss_log), miss_log
 
     # Phase B — resolve succeeds, .execute raises KeyError: NOT masked.
+    # Exercised through the NON-CRC ``extract`` row (index 1): the synchronous
+    # in-handler execute is reserved for non-CRC ops (the CRC row dispatches to
+    # a thread-worker, batch-12 I3b), and that synchronous call is where the
+    # M-3 resolve/execute KeyError split must hold.
     class _ExecKeyErrorOperation:
-        operation_id = "crc"
-        title = "CRC"
+        operation_id = "extract"
+        title = "Extract"
 
         def describe(self) -> str:
             return "stub"
@@ -382,7 +394,7 @@ def test_execute_internal_keyerror_not_masked_as_unknown_operation(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             raised = False
             try:

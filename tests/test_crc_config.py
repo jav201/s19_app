@@ -14,8 +14,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from s19_app.tui.operations.crc_config import (
+    DUMMY_CONFIG_TEXT,
     CrcConfig,
     CrcRegion,
+    parse_crc_config,
     read_crc_config,
 )
 
@@ -180,6 +182,106 @@ def test_missing_field_collects_one_error(tmp_path: Path) -> None:
     )
 
     config, errors = read_crc_config(str(config_path))
+
+    assert config is None
+    assert len(errors) == 1
+
+
+# ---------------------------------------------------------------------------
+# parse_crc_config — the text-level seam the TUI editor routes through
+# (LLR-004.2). read_crc_config delegates here after resolve+size-cap+read,
+# so its tests above stay green via delegation.
+# ---------------------------------------------------------------------------
+
+
+def test_parse_crc_config_valid_text_populates_config() -> None:
+    """Valid JSON text parses into a fully-populated CrcConfig, no error.
+
+    Encodes WHY: LLR-004.2 routes the operator's EDITED config text (never
+    written to disk) through parse_crc_config; if hex parsing or field wiring
+    regresses on the text path, the TUI surface computes against wrong/null
+    values. Mirrors the TC-113 field assertions on in-memory text.
+    """
+    text = """
+    {
+      "polynomial": "0x04C11DB7",
+      "init": "0xFFFFFFFF",
+      "reverse": true,
+      "final_xor": "0xFFFFFFFF",
+      "regions": [
+        { "start": "0x00001000", "end": "0x00002000", "output_address": "0x00001FFC" }
+      ]
+    }
+    """
+
+    config, errors = parse_crc_config(text)
+
+    assert errors == []
+    assert isinstance(config, CrcConfig)
+    assert config.polynomial == 0x04C11DB7
+    assert config.init == 0xFFFFFFFF
+    assert config.reverse is True
+    assert config.final_xor == 0xFFFFFFFF
+    assert config.regions == [
+        CrcRegion(start=0x1000, end=0x2000, output_address=0x1FFC),
+    ]
+
+
+def test_parse_crc_config_dummy_prefill_is_valid() -> None:
+    """The DUMMY_CONFIG_TEXT pre-fill itself parses cleanly (no error).
+
+    Encodes WHY: the TUI editor (LLR-004.2) pre-fills DUMMY_CONFIG_TEXT for
+    format guidance; if the embedded template ever drifts to invalid JSON the
+    operator would see a parse error on an untouched dummy. This pins the
+    pre-fill as valid config text with the documented dummy values.
+    """
+    config, errors = parse_crc_config(DUMMY_CONFIG_TEXT)
+
+    assert errors == []
+    assert isinstance(config, CrcConfig)
+    assert config.regions == [
+        CrcRegion(start=0x00010000, end=0x00020000, output_address=0x0001FFFC),
+        CrcRegion(start=0x00020000, end=0x00030000, output_address=0x0002FFFC),
+    ]
+
+
+def test_parse_crc_config_malformed_text_collects_one_error() -> None:
+    """Malformed JSON text → (None, [1 error]); no raise (collect-don't-abort).
+
+    Encodes WHY: LLR-004.2 mandates a config-load fault on the edited text
+    surface to a single collected error and run NO computation — never an
+    unhandled JSONDecodeError that would crash the operation.
+    """
+    config, errors = parse_crc_config("{ this is not valid json")
+
+    assert config is None
+    assert len(errors) == 1
+
+
+def test_parse_crc_config_non_object_top_level_collects_one_error() -> None:
+    """A JSON array (not an object) → (None, [1 error]); no raise.
+
+    Encodes WHY: a structurally valid JSON that is not the expected config
+    object is still a data-quality fault that must be collected, not raised.
+    """
+    config, errors = parse_crc_config("[1, 2, 3]")
+
+    assert config is None
+    assert len(errors) == 1
+
+
+def test_parse_crc_config_missing_field_collects_one_error() -> None:
+    """Text missing a required field → (None, [1 error]); no raise.
+
+    Encodes WHY: the typed-build path must collect a missing/invalid field on
+    the text seam exactly as the file path does (LLR-004.2 / LLR-004.1 parity).
+    """
+    text = (
+        '{"polynomial":"0x04C11DB7","init":"0xFFFFFFFF","reverse":true,'
+        '"regions":[{"start":"0x0","end":"0x4","output_address":"0x0"}]}'
+    )
+
+    config, errors = parse_crc_config(text)
 
     assert config is None
     assert len(errors) == 1

@@ -3,22 +3,37 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
+from textual import work
 from textual.app import ComposeResult
 from textual.containers import Container, ScrollableContainer
 from textual.message import Message
 from textual.screen import ModalScreen
-from textual.widgets import Button, Input, Label, ListItem, ListView, Markdown, Static
+from textual.widgets import (
+    Button,
+    Input,
+    Label,
+    ListItem,
+    ListView,
+    Markdown,
+    Static,
+    TextArea,
+)
 
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .models import LoadedFile
-from .operations.model import OperationInput
+from .operations.crc_config import DUMMY_CONFIG_TEXT, parse_crc_config
+from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_MAX_TOTAL_BYTES,
 )
+
+if TYPE_CHECKING:
+    from .operations.crc_config import CrcConfig
+    from .operations.model import Operation
 
 logger = logging.getLogger("s19tui")
 
@@ -537,10 +552,28 @@ class OperationsScreen(ModalScreen[None]):
         >>> screen = OperationsScreen([("crc", "CRC")], loaded)  # doctest: +SKIP
     """
 
+    #: Registry id of the CRC operation — the only operation that takes a
+    #: ``CrcConfig`` and renders per-region rows, so it is the only one whose
+    #: editable config TextArea is shown (LLR-004.2). Other operations keep
+    #: the synchronous, config-less behavior unchanged.
+    CRC_OPERATION_ID: str = "crc"
+
+    #: Status text for a CRC run with no usable config (F-L1): a parse error
+    #: or empty editor must NOT read like a passed check.
+    NO_CONFIG_TEXT = "CRC config error - no check was run:"
+
     def __init__(self, options: List[Tuple[str, str]], loaded: LoadedFile) -> None:
         super().__init__()
         self.options = options
         self.loaded = loaded
+        #: Monotonic dispatch token (F1). Every Execute press bumps it; the CRC
+        #: worker captures the value at dispatch and ``_present_result`` only
+        #: lands a result whose token still matches. A thread worker cannot be
+        #: interrupted mid-run, so this is the safety net that guarantees a
+        #: stale (superseded or error-branch-bypassed) worker can never
+        #: overwrite the current surface — cancellation alone cannot, since the
+        #: running thread still reaches ``call_from_thread``.
+        self._crc_dispatch_token = 0
 
     def compose(self) -> ComposeResult:
         yield Container(
@@ -552,6 +585,8 @@ class OperationsScreen(ModalScreen[None]):
                 ],
                 id="operations_list",
             ),
+            Label("CRC config (editable JSON):", id="operation_config_label"),
+            TextArea(DUMMY_CONFIG_TEXT, id="operation_config"),
             Static("", id="operation_result_status", markup=False),
             ScrollableContainer(
                 Static("", id="operation_result_hex"),
@@ -571,7 +606,83 @@ class OperationsScreen(ModalScreen[None]):
         list_view = self.query_one("#operations_list", ListView)
         if self.options:
             list_view.index = 0
+        self._sync_config_visibility()
         list_view.focus()
+
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
+        """
+        Summary:
+            Show the editable CRC config surface only while the CRC row is
+            highlighted (LLR-004.2): non-CRC operations take no config, so
+            their config editor is hidden to keep their behavior unchanged.
+
+        Args:
+            event (ListView.Highlighted): The highlight-change event from the
+                operations list.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Re-derive visibility from the current highlighted index via
+              :meth:`_sync_config_visibility`.
+
+        Dependencies:
+            Used by:
+                - the Textual message pump (highlight changes)
+        """
+        if event.list_view.id == "operations_list":
+            self._sync_config_visibility()
+
+    def _selected_operation_id(self) -> Optional[str]:
+        """
+        Summary:
+            Resolve the highlighted operations-list row index into its
+            ``operation_id`` (no label-text parsing), or ``None`` when there
+            is no valid selection.
+
+        Args:
+            None
+
+        Returns:
+            Optional[str]: The highlighted operation id, or ``None``.
+
+        Data Flow:
+            - ``ListView.index`` → ``self.options[index][0]``.
+
+        Dependencies:
+            Used by:
+                - _sync_config_visibility / _execute_selected
+        """
+        index = self.query_one("#operations_list", ListView).index
+        if index is None or not (0 <= index < len(self.options)):
+            return None
+        return self.options[index][0]
+
+    def _sync_config_visibility(self) -> None:
+        """
+        Summary:
+            Display the CRC config label + editor iff the CRC operation is
+            highlighted; hide them for every other operation (LLR-004.2).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_selected_operation_id() == CRC_OPERATION_ID`` toggles the
+              ``display`` style of ``#operation_config_label`` and
+              ``#operation_config``.
+
+        Dependencies:
+            Used by:
+                - on_mount / on_list_view_highlighted
+        """
+        is_crc = self._selected_operation_id() == self.CRC_OPERATION_ID
+        self.query_one("#operation_config_label", Label).display = is_crc
+        self.query_one("#operation_config", TextArea).display = is_crc
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "operations_close":
@@ -618,11 +729,9 @@ class OperationsScreen(ModalScreen[None]):
             Used by:
                 - on_button_pressed (Execute button)
         """
-        list_view = self.query_one("#operations_list", ListView)
-        index = list_view.index
-        if index is None or not (0 <= index < len(self.options)):
+        operation_id = self._selected_operation_id()
+        if operation_id is None:
             return
-        operation_id = self.options[index][0]
         logger.info("OperationsScreen executing operation: %s", operation_id)
         # M-3 (LLR-005.2): the KeyError catch guards ONLY the registry
         # resolution (operation_resolver raises KeyError on a miss). Execute
@@ -634,9 +743,152 @@ class OperationsScreen(ModalScreen[None]):
             logger.warning("OperationsScreen unknown operation id: %s", exc)
             self.app.set_status(f"Operations error: unknown operation {operation_id}")
             return
-        result = operation.execute(OperationInput.from_loaded(self.loaded), now_fn=None)
+        op_input = OperationInput.from_loaded(self.loaded)
+        if operation_id == self.CRC_OPERATION_ID:
+            config, issues = parse_crc_config(
+                self.query_one("#operation_config", TextArea).text
+            )
+            if issues:
+                # F-L1: a config/parse error must NOT look like a passed
+                # check — surface the error, render no per-region rows and no
+                # hex, and run no computation (LLR-004.2 config-error path).
+                #
+                # F1: bump the dispatch token and cancel the in-flight CRC
+                # worker group BEFORE painting the error. The token bump is the
+                # safety net (a still-running thread worker reaches
+                # ``call_from_thread`` even after cancel, but its captured token
+                # is now stale so ``_present_result`` drops it); cancel_group
+                # releases the worker slot promptly. Without this, a prior valid
+                # run could complete after the error paint and overwrite it with
+                # a stale "status: ok" + MATCH surface.
+                self._crc_dispatch_token += 1
+                self.workers.cancel_group(self, "crc_operation")
+                logger.info("OperationsScreen CRC config error: %s", issues)
+                self.query_one("#operation_result_status", Static).update(
+                    "\n".join([self.NO_CONFIG_TEXT, *issues])
+                )
+                self.query_one("#operation_result_hex", Static).update("")
+                return
+            # R-6 (LLR-002.3): the real CRC execute runs on a Textual
+            # thread-worker, not synchronously on the UI thread. Bump the
+            # dispatch token so this run's result is the only one that can land
+            # (F1: supersedes any prior in-flight worker).
+            self._crc_dispatch_token += 1
+            self._run_crc_worker(operation, op_input, config, self._crc_dispatch_token)
+            return
+        # Non-CRC operations stay on the synchronous, config-less path
+        # (placeholders do no I/O and no parsing, LLR-004.4).
+        result = operation.execute(op_input, now_fn=None)
+        self._present_result(result)
+
+    @work(thread=True, exclusive=True, group="crc_operation")
+    def _run_crc_worker(
+        self,
+        operation: "Operation",
+        op_input: OperationInput,
+        config: Optional["CrcConfig"],
+        token: int,
+    ) -> None:
+        """
+        Summary:
+            Off-thread CRC execute worker (R-6 / LLR-002.3): run the resolved
+            operation's ``execute`` with the parsed ``CrcConfig`` on a Textual
+            thread-worker — never on the UI thread — and marshal the
+            :class:`OperationResult` back to the UI thread via
+            ``call_from_thread`` so the per-region rows render on the main
+            thread (the ``app.py:1599`` ``execute_scope`` precedent).
+
+        Args:
+            operation (Operation): The resolved CRC ``Operation`` (annotated
+                under ``TYPE_CHECKING`` only — the ABC is never imported at
+                runtime into this UI module; only its ``execute`` is called).
+            op_input (OperationInput): The neutral input built from
+                ``self.loaded``.
+            config (Optional[CrcConfig]): The parsed ``CrcConfig`` (validated
+                non-error in the caller).
+            token (int): The dispatch token captured at Execute (F1).
+                :meth:`_present_result` lands this result only if the token
+                still matches ``self._crc_dispatch_token`` — a superseded or
+                error-branch-bypassed run carries a stale token and is dropped.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``operation.execute(op_input, now_fn=None, config=config)`` runs
+              on the worker thread; the result is handed to
+              :meth:`_present_result` on the UI thread via
+              ``call_from_thread`` together with ``token`` so a stale run is
+              dropped. A worker-side crash surfaces as one status line, never
+              an unhandled worker exception.
+
+        Dependencies:
+            Uses:
+                - call_from_thread / _present_result
+            Used by:
+                - _execute_selected (CRC path)
+        """
+        try:
+            result = operation.execute(op_input, now_fn=None, config=config)
+        except Exception as exc:  # noqa: BLE001 - surfaced, never swallowed
+            logger.exception("CRC operation worker failed: %s", exc)
+            self.app.call_from_thread(
+                self.app.set_status,
+                f"CRC operation failed: {type(exc).__name__}: {exc}",
+            )
+            return
+        self.app.call_from_thread(self._present_result, result, token)
+
+    def _present_result(
+        self, result: OperationResult, token: Optional[int] = None
+    ) -> None:
+        """
+        Summary:
+            Render an :class:`OperationResult` into the result surface: the
+            status + notes into ``#operation_result_status`` (followed by one
+            per-region row per ``crc_regions`` entry when present, LLR-002.4),
+            and the LLR-004.3 pinned hex render of ``result.output.mem_map``
+            into ``#operation_result_hex``. Runs on the UI thread.
+
+        Args:
+            result (OperationResult): The result to present (from the CRC
+                worker or the synchronous non-CRC path).
+            token (Optional[int]): The CRC worker's captured dispatch token
+                (F1). When supplied, the result is dropped unless it still
+                matches ``self._crc_dispatch_token`` — this is what makes a
+                stale worker (one the config-error branch bypassed-cancel, or a
+                superseded earlier run) unable to overwrite the current surface,
+                since a thread worker cannot be interrupted once running. The
+                synchronous non-CRC path passes ``None`` (always present — it
+                runs inline on the UI thread and can never be stale).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Token-stale CRC results are dropped before any widget write.
+            - ``status`` + ``notes`` (+ per-region rows from
+              :meth:`_crc_region_lines`) → ``#operation_result_status``; the
+              pinned ``render_hex_view_text`` tuple → ``#operation_result_hex``.
+
+        Dependencies:
+            Uses:
+                - _crc_region_lines / render_hex_view_text / MAX_HEX_ROWS
+            Used by:
+                - _execute_selected (non-CRC) / _run_crc_worker (CRC)
+        """
+        if token is not None and token != self._crc_dispatch_token:
+            # F1: a superseded / bypassed-cancel CRC worker landed late. Drop
+            # it so it cannot overwrite the current (error or newer) surface.
+            logger.info(
+                "OperationsScreen dropping stale CRC result (token %s != %s)",
+                token,
+                self._crc_dispatch_token,
+            )
+            return
         status_lines = [f"status: {result.status}"]
         status_lines.extend(result.notes)
+        status_lines.extend(self._crc_region_lines(result.crc_regions))
         self.query_one("#operation_result_status", Static).update(
             "\n".join(status_lines)
         )
@@ -649,3 +901,54 @@ class OperationsScreen(ModalScreen[None]):
             max_rows=MAX_HEX_ROWS,
         )
         self.query_one("#operation_result_hex", Static).update(rendered)
+
+    @staticmethod
+    def _crc_region_lines(
+        crc_regions: Optional[List[CrcRegionResult]],
+    ) -> List[str]:
+        """
+        Summary:
+            Build one human-readable row per CRC region (LLR-002.4): output
+            address, computed CRC, stored value, and a clear match/mismatch
+            verdict. Returns an empty list when there is no CRC payload (a
+            non-CRC op, or a config-error run handled upstream), so the
+            result surface only shows verdict rows for an actual check
+            (F-L1: no payload never reads as "matched").
+
+        Args:
+            crc_regions (Optional[List[CrcRegionResult]]): The per-region
+                check results in config order, or ``None``.
+
+        Returns:
+            List[str]: One verdict row per region, or ``[]`` when
+            ``crc_regions`` is ``None``.
+
+        Data Flow:
+            - Map each :class:`CrcRegionResult` tri-state ``matched`` (True /
+              False / None) to ``MATCH`` / ``MISMATCH`` / ``no stored value``.
+
+        Dependencies:
+            Used by:
+                - _present_result
+        """
+        if crc_regions is None:
+            return []
+        lines: List[str] = []
+        for region in crc_regions:
+            if region.matched is True:
+                verdict = "MATCH"
+            elif region.matched is False:
+                verdict = "MISMATCH"
+            else:
+                verdict = "no stored value"
+            stored = (
+                f"0x{region.stored_value:08X}"
+                if region.stored_value is not None
+                else "(absent)"
+            )
+            lines.append(
+                f"region @ 0x{region.output_address:08X}: "
+                f"computed 0x{region.computed_crc:08X}, "
+                f"stored {stored} -> {verdict}"
+            )
+        return lines

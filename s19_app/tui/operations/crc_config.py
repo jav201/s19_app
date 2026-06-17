@@ -38,6 +38,24 @@ from ..workspace import resolve_input_path
 #: to a real ``Path.stat().st_size`` at call time.
 SizeProbe = Callable[[Path], int]
 
+#: Dummy CRC config text used to pre-fill the TUI config editor for format
+#: guidance (LLR-004.2). Byte-for-byte the committed
+#: ``examples/crc_config.example.json`` dummy template — FAKE poly / init /
+#: ranges / output-addresses only, never real per-firmware values (§1.2
+#: out-of-scope, RK-5). It parses cleanly through :func:`parse_crc_config`,
+#: so a TC can assert the pre-fill is itself valid config text.
+DUMMY_CONFIG_TEXT: str = """{
+  "polynomial": "0x04C11DB7",
+  "init": "0xFFFFFFFF",
+  "reverse": true,
+  "final_xor": "0xFFFFFFFF",
+  "regions": [
+    { "start": "0x00010000", "end": "0x00020000", "output_address": "0x0001FFFC" },
+    { "start": "0x00020000", "end": "0x00030000", "output_address": "0x0002FFFC" }
+  ]
+}
+"""
+
 
 @dataclass(frozen=True)
 class CrcRegion:
@@ -218,8 +236,58 @@ def read_crc_config(
     except OSError as exc:
         return None, [f"CRC config file could not be read: {exc}"]
 
+    return parse_crc_config(raw_text)
+
+
+def parse_crc_config(text: str) -> tuple[Optional[CrcConfig], list[str]]:
+    """
+    Summary:
+        Parse already-in-memory CRC config JSON ``text`` into a typed
+        :class:`CrcConfig`, under the same collect-don't-abort contract as
+        :func:`read_crc_config` — every parse/structure fault returns
+        ``(None, [one error string])`` and the function NEVER raises. This is
+        the text-level seam the TUI editor surface (LLR-004.2) routes its
+        edited config through, and the body :func:`read_crc_config` delegates
+        to after it has resolved + size-capped + read the file.
+
+    Args:
+        text (str): The raw JSON config text (from the TUI editor or a file
+            already read by :func:`read_crc_config`).
+
+    Returns:
+        tuple[Optional[CrcConfig], list[str]]: ``(config, [])`` on success;
+        ``(None, [one error string])`` on any parse or structure fault. The
+        list carries exactly one error on failure and is empty on success.
+
+    Raises:
+        None: Every failure mode is a collected error string
+            (collect-don't-abort), matching :func:`read_crc_config`.
+
+    Data Flow:
+        - Parse ``text`` with stdlib ``json`` catching parse/decode errors →
+          one error.
+        - Reject a non-object top level → one error.
+        - Build the typed :class:`CrcConfig`; any missing/invalid field →
+          one error.
+
+    Dependencies:
+        Uses:
+            - json (stdlib parse)
+            - _build_config
+        Used by:
+            - read_crc_config (file path delegates here after read)
+            - the CRC TUI config surface (LLR-004.2, edited-text parse)
+            - tests/test_crc_config.py (parse_crc_config tests)
+
+    Example:
+        >>> config, errors = parse_crc_config(DUMMY_CONFIG_TEXT)
+        >>> errors
+        []
+        >>> config.polynomial
+        79764919
+    """
     try:
-        data = json.loads(raw_text)
+        data = json.loads(text)
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
         return None, [f"CRC config is not valid JSON: {exc}"]
 
