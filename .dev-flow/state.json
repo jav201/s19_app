@@ -3,9 +3,9 @@
     "language": "en",
     "batch_id": "2026-06-16-batch-12",
     "batch_objective": "CRC_F2 operation (custom name, adjustable) — CRC32 IEEE region calculator/checker for Motorola S19/S3 firmware. Operator FR1-FR9 draft: accept S19 (incl. S3/32-bit), one+ hex memory ranges to CRC + per-range output address, polynomial/init/reverse-flag/final-XOR params, ascending-address sort, region filtering, gap-split contiguous-segment reconstruction (no gap byte insertion), segment-chained CRC (no reset between segments), final XOR, and a TWO-STAGE finalization: compare computed CRC vs value already in the specified memory region (check-only, default non-mutating), then on operator confirmation write the CRC into the output address and emit a modified S19 — surfaced in the s19_app report. Also the named A-4 census STRESS-TEST: CRC computation must NOT land in frozen core.py.",
-    "current_phase": 5,
-    "phase_status": "awaiting-gate",
-    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 1, "6": 0},
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
     "artifacts": {
         "1": ".dev-flow/2026-06-16-batch-12/01-requirements.md",
         "2": ".dev-flow/2026-06-16-batch-12/02-review.md",
@@ -191,6 +191,24 @@
             "date": "2026-06-17",
             "decision": "awaiting-gate",
             "notes": "Phase 5 post-mortem. architect wrote 05-postmortem.md (process/architecture) + qa-reviewer retrospective merged. HEADLINE: closed clean w/ 1 in-flight re-scope (J-3); A-4 census stress-test HELD under a real adversary (CRC abuts frozen core.py/hexfile.py, stayed out); KAT anchor caught a real seed bug; A-5 surface-reachability HELD (SCOPE-1 did NOT recur — write dims pilot-driven). TOP LESSONS: (1) J-3 root cause = 'named-but-not-read' (report_service bound as CRC consumer without reading its VariantExecutionResult input contract) — same class as the Phase-1 majors; (2) increment budgeting under-counted facade/test blast-radius (both <=5 exceptions were re-export churn + test recon, not feature code); (3) comms collapsed mid-batch (operator-flagged, corrected w/ living PLAN.md + saved feedback control). METRICS: iters sum 6 {0:1,1:2,2:1,3:1,4:1,5:1}; Phase-2 19/19 findings closed (0 blocker/8 major/11 minor); per-increment review 5/5 closed (I1b HIGH, I3b MED, I5b MED, I5a sec-LOW, I1a 2 LOW); ledger 839->879 D0/A40; full 847/0; cap-trips 0. 2 NEW CONTROLS PROPOSED: (a) extend symbol-citation rule to CONSUMER input contracts (would have caught J-3 at Phase 1); (b) Phase-1 facade/test blast-radius budgeting. 7 next-batch items incl. A-3 save-flow (b11 carry), RK-3 device vector, CLI ops, CI trigger gap, CODIFY reader-as-oracle (4th use). Recommended ADR: report_service should NOT carry a CRC section (per-operation vs per-variant scope). 0 code defects. Awaiting Phase 5 gate."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-17",
+            "decision": "approved-committed",
+            "notes": "Phase 5 APPROVED ('apruebo') + committed b012e30. Advancing to Phase 6 documentation."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate",
+            "notes": "Phase 6 docs. 3 parallel agents, disjoint files. (A) docs-writer -> REQUIREMENTS.md NEW section 18 'CRC Operation (CRC_F2)': R-CRC-ENGINE-001/002 (002=RK-3 carve-out: default zlib Automated via KAT, non-default device convention Partial/Manual pending operator vector), R-CRC-CHECK-001 (notes LLR-002.5 WITHDRAWN), R-CRC-WRITE-001 (notes LLR-003.5 RE-SCOPED), R-CRC-CONFIG-001, R-CRC-CONTRACT-001 + back-reference line to s19_app/tui/operations/requirements/REQ-crc.md (C-7) — closes the Phase-5-flagged gap; matches the s17 R-MAN format; references-not-inlines. (B) docs-writer -> 06-docs/traceability-matrix.md (18 LLR rows, real node ids from 04-validation, LLR-002.5 WITHDRAWN/003.5 RE-SCOPED marked not-gaps), functionality.md (operator walkthrough), diagrams/crc-check-write-flow.md (Mermaid check+confirmed-write + guard-rail callouts). (C) presentation-builder -> executive-summary.md (~1.5pp, real numbers 847/0, 40 new, PASS-WITH-NOTES). Orchestrator INDEPENDENTLY re-verified (batch-09 silent-fail lesson): REQUIREMENTS.md s18 landed (14 R-CRC/REQ-crc matches), 4 06-docs files present, Mermaid block present, 0 mojibake. Encoding UTF-8 no-BOM. Awaiting Phase 6 gate; on approval state -> awaiting-sync (close commit + push + PR + review + CI + merge + /dev-flow-sync)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-17",
+            "decision": "approved-batch-content-closed-awaiting-sync",
+            "notes": "Phase 6 APPROVED ('apruebo'). Batch-12 CONTENT CLOSED. Docs committed locally (REQUIREMENTS.md s18 + 06-docs + PLAN + state). state -> awaiting-sync. REMAINING (outward-facing, operator-confirm BEFORE remote per hard rules): push branch claude/determined-curran-a4b557 -> open PR to main -> /code-review or review -> CI (NOTE: tui-ci.yml fires on main-tui only, NOT main/PRs-to-main -> the 3.11 gate will NOT auto-run on this PR; the CI-trigger-gap carry is directly relevant here) -> merge -> /dev-flow-sync to G: vault (06-docs + 01/02/04/05 + README; NOT 03-increments). Branch is a worktree off main incl. batch-11. Full batch-12: 7 increments, 839->879 collected, 847/0 full suite, PASS-WITH-NOTES, 0 defects, 9 commits 71cef36..b012e30 + the pending docs close commit."
         }
     ],
     "obsidian_synced": false,

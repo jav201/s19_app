@@ -6,11 +6,10 @@
 
 ## 0. Where we are RIGHT NOW
 
-**Phase 5 (Post-mortem) — COMPLETE, AWAITING YOUR GATE.**
-- ✅ Phases 0-4 done & committed (Phase 4 = 272b4a7). ✅ Phase 5: [`05-postmortem.md`](05-postmortem.md) co-authored (architect process + qa-reviewer test-strategy retrospective).
-- **Headline:** closed clean with one in-flight re-scope (J-3); the A-4 census stress-test HELD under a real adversary, the KAT anchor caught a real bug, and the A-5 surface-reachability control prevented a SCOPE-1 recurrence. 0 code defects.
-- **2 new controls proposed:** (a) extend the symbol-citation rule to **consumer input contracts** (would have caught J-3 at Phase 1); (b) Phase-1 **facade/test blast-radius** budgeting. **7 next-batch items** (A-3 save-flow carry, RK-3 device vector, CLI `ops`, CI trigger gap, codify reader-as-oracle, …).
-- ⏳ Phase 5 needs your `approve` → **Phase 6 (documentation)** — the last phase before close.
+**Phase 6 (Documentation) — COMPLETE, AWAITING YOUR GATE. This is the last phase.**
+- ✅ Phases 0-5 done & committed (Phase 5 = b012e30). ✅ Phase 6: `REQUIREMENTS.md` §18 CRC Operation (R-CRC-* + the REQ-crc.md back-ref), [`06-docs/traceability-matrix.md`](06-docs/traceability-matrix.md), [`functionality.md`](06-docs/functionality.md), [`diagrams/crc-check-write-flow.md`](06-docs/diagrams/crc-check-write-flow.md), [`executive-summary.md`](06-docs/executive-summary.md).
+- Orchestrator independently re-verified the docs landed (REQUIREMENTS.md §18 present, 4 06-docs files, Mermaid OK, 0 mojibake).
+- ⏳ Phase 6 needs your `approve` → state moves to **awaiting-sync**. Then: **close commit + push + PR + review + CI + merge + `/dev-flow-sync`** to the Obsidian vault.
 
 ---
 
@@ -117,7 +116,8 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | 2026-06-16 | 3 / I5a | inject + emit + verify (headless write mechanics); **code-reviewer OK + security-reviewer CLEAN** (mandatory write-path sign-off), F-S-06 folded, **approved + committed** (d67ff48) |
 | 2026-06-16 | 3 / I5b | TUI two-stage confirm + write surface; code-reviewer OK (1 MEDIUM F1 fixed); no-write-without-confirm mutation-tested; **approved + committed** (43a2b0f) — **Phase 3 complete** |
 | 2026-06-17 | 4 | Validation **PASS-WITH-NOTES** (0 FAIL): 5 HLR/12 LLR PASS, full suite 847/0, surface-reachability CLEAR; **approved + committed** (272b4a7) |
-| 2026-06-17 | 5 | Post-mortem (architect + qa): A-4/A-5/KAT controls HELD; J-3 root cause = "named-but-not-read"; 2 new controls + 7 next-batch items; **awaiting gate** |
+| 2026-06-17 | 5 | Post-mortem (architect + qa): A-4/A-5/KAT controls HELD; J-3 root cause = "named-but-not-read"; 2 new controls + 7 next-batch items; **approved + committed** (b012e30) |
+| 2026-06-17 | 6 | Docs: REQUIREMENTS.md §18 (R-CRC-* + REQ-crc.md back-ref) + 06-docs (traceability/functionality/Mermaid/exec-summary); orchestrator re-verified landed; **awaiting gate** |
 
 Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
