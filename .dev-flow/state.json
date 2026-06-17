@@ -3,9 +3,9 @@
     "language": "en",
     "batch_id": "2026-06-16-batch-12",
     "batch_objective": "CRC_F2 operation (custom name, adjustable) — CRC32 IEEE region calculator/checker for Motorola S19/S3 firmware. Operator FR1-FR9 draft: accept S19 (incl. S3/32-bit), one+ hex memory ranges to CRC + per-range output address, polynomial/init/reverse-flag/final-XOR params, ascending-address sort, region filtering, gap-split contiguous-segment reconstruction (no gap byte insertion), segment-chained CRC (no reset between segments), final XOR, and a TWO-STAGE finalization: compare computed CRC vs value already in the specified memory region (check-only, default non-mutating), then on operator confirmation write the CRC into the output address and emit a modified S19 — surfaced in the s19_app report. Also the named A-4 census STRESS-TEST: CRC computation must NOT land in frozen core.py.",
-    "current_phase": 3,
-    "phase_status": "in-progress",
-    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 0, "5": 0, "6": 0},
+    "current_phase": 4,
+    "phase_status": "awaiting-gate",
+    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 0, "6": 0},
     "artifacts": {
         "1": ".dev-flow/2026-06-16-batch-12/01-requirements.md",
         "2": ".dev-flow/2026-06-16-batch-12/02-review.md",
@@ -167,6 +167,18 @@
             "date": "2026-06-16",
             "decision": "I5a-approved-committed-I5b-implemented-awaiting-gate",
             "notes": "I5a APPROVED ('approve') + committed d67ff48. I5b (LAST impl increment) implemented via software-dev (it paused for plan-approval; orchestrator re-dispatched with the pre-approved 2-file plan since SendMessage unavailable). screens.py: ConfirmWriteScreen(ModalScreen[bool]) + Write CRC button (disabled until a check lands crc_regions, hidden non-crc) -> confirm modal (FR9 stage-2) -> decline/None=no write/0 files; confirm -> re-parse TextArea -> @work(thread=True,exclusive,group=crc_write) worker (2nd token _crc_write_token guard) -> write_crc_image(workarea_base=self.app.base_dir) -> assemble OperationResult -> render. F-L1 verified/mismatch/write-failed. test_tui_crc_surface.py +TC-124/125. 2 files. code-reviewer: OK 0 HIGH; NO-write-without-confirm AIRTIGHT (mutation-tested: removing decline guard makes TC-124 emit a file -> fails); write-token guard SOUND; F-L1 distinct. 1 MEDIUM F1 (verified corrective write rendered STALE pre-write MISMATCH row since inject_crcs carries forward matched) FIXED by orchestrator: write path now renders write-oriented rows ('region @ 0x..: wrote 0x.. (4 LE bytes)'), check verdict kept only for WRITE FAILED; TC-125 strengthened (mismatching-stored fixture asserts '(4 LE bytes)' present + 'MISMATCH' absent). F2 (hex re-derivation) LOW left. INTEGRITY INCIDENT HANDLED: code-reviewer ran a git checkout that discarded uncommitted screens.py, reconstructed from diff; orchestrator verified git status = only screens.py+test modified, committed crc.py/crc_config.py intact, all I5b symbols+TC-124/125 present, lean 826 green -> reconstruction clean. LEDGER orchestrator re-ran lean=826 (824+2 EXACT; collection 877->879). ruff clean, 0 frozen edits. PHASE 3 COMPLETE on I5b approval (7 increments: I1a/I1b/I2/I3a/I3b/I5a/I5b; I4 withdrawn). NOT autonomous — awaiting I5b gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I5b-approved-committed-PHASE-3-COMPLETE",
+            "notes": "I5b APPROVED ('apruebo') + committed 43a2b0f. PHASE 3 COMPLETE: 7 increments (I1a/I1b/I2/I3a/I3b/I5a/I5b; I4 withdrawn J-3). Full CRC feature end-to-end in the TUI: config editor -> check (per-region MATCH/MISMATCH) -> Write CRC -> confirm modal -> inject+emit contained S19+verify -> write-outcome rows; no write without confirmation (mutation-tested). Branch commits: 71cef36 (Phase 0-2) / dd665b0 (I1a) / d7e862e (I1b) / ae73288 (I2) / 7658d4e (I3a) / 4312dcd (I3b) / 8c02f52 (J-3) / d67ff48 (I5a) / 43a2b0f (I5b). Advancing to Phase 4."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate-PASS-WITH-NOTES",
+            "notes": "Phase 4 validation. qa-reviewer wrote 04-validation.md: VERDICT PASS-WITH-NOTES, 0 FAIL/0 blockers. 5/5 HLR + 12/12 in-scope LLR PASS; LLR-002.5 WITHDRAWN (J-3, not a gap). TC reconciliation CLEAN (every in-scope spec TC -> a real collect-verified passing node; TC-117 correctly absent; 0 orphans — extra nodes trace to named LLRs). Surface-reachability A-5/SCOPE-1 CLEAR (all 8 US dimensions through the shipped TUI handler; write dims pilot-driven via ConfirmWriteScreen #confirm_write_ok/cancel — SCOPE-1 does NOT recur). 10/10 inspections PASS (KAT gating 0xCBF43926; reader-as-oracle injected-map non-tautological; config collect-don't-abort; write containment workarea seam + no arbitrary path; no-write-without-confirm; F-L1; original immutable; frozen-set CLEAR test_engine_unchanged 1 passed; REQ-crc.md co-located; output=input-snapshot). ORCHESTRATOR ran full suite ONCE: 847 passed / 0 failed / 29 skipped / 3 xfailed exit 0 (822s); lean 826; signed-balance 879=839+40 (D0/A40 EXACT: I1a2/I1b9/I2 10/I3a2/I3b9/I5a6/I5b2). NOTES (non-blocking): RK-3 non-default *device* vector still 'assumed' (partial-closed by TC-106b published-KATs); REQUIREMENTS.md->REQ-crc.md back-ref is a Phase-6 task; A2L/CLI/report_service(J-3) out-of-scope. 0 code defects. Awaiting Phase 4 gate."
         }
     ],
     "obsidian_synced": false,

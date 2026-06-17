@@ -6,9 +6,11 @@
 
 ## 0. Where we are RIGHT NOW
 
-**Phase 3 (Implementation) — COMPLETE pending the I5b gate.** I5b (the last increment) implemented + reviewed.
-- ✅ I1a · I1b · I2 · I3a · I3b · I5a committed. **I4 WITHDRAWN** (§6.4 J-3). ✅ I5b (TUI two-stage confirm + write surface) implemented + reviewed (code-reviewer OK, 0 HIGH; 1 MEDIUM F1 fixed — no stale MISMATCH on a verified write). ⏳ I5b needs your `approve` to commit; then **Phase 3 closes → Phase 4 (validation)**.
-- Suite: **879 collected / 826 lean-pass / 0 failures**. KAT green. **The full CRC feature now works end-to-end in the TUI:** edit config → check (per-region MATCH/MISMATCH) → "Write CRC" → confirm → inject + emit modified S19 (contained) + verify → write-outcome rows. No write without confirmation (mutation-tested).
+**Phase 4 (Validation) — COMPLETE, AWAITING YOUR GATE.** Verdict **PASS-WITH-NOTES** (0 FAIL / 0 blockers).
+- ✅ Phase 3 done & committed (7 increments through 43a2b0f). ✅ Phase 4: qa-reviewer wrote [`04-validation.md`](04-validation.md); orchestrator ran the full suite once.
+- **Full suite: 847 passed / 0 failed / 29 skipped / 3 xfailed (exit 0).** Lean 826. Signed-balance **879 = 839 + 40** (EXACT). KAT gating green; frozen-set CLEAR.
+- 5/5 HLR + 12/12 in-scope LLR PASS; LLR-002.5 WITHDRAWN (J-3). TC reconciliation clean (0 orphans). Surface-reachability CLEAR (all 8 US dimensions through the shipped handler — SCOPE-1 does not recur).
+- ⏳ Phase 4 needs your `approve` → Phase 5 (post-mortem).
 
 ---
 
@@ -91,6 +93,7 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | After I3b | 871 | 818 | +9 (5 parse + 3 pilot + 1 race regression); 1 MEDIUM fixed |
 | After I5a | 877 | 824 | +6 (inject/emit/verify/no-write/result/containment); security CLEAN, F-S-06 folded |
 | After I5b | 879 | 826 | +2 (TC-124 confirm-gate / TC-125 through-handler); 1 MEDIUM F1 fixed. **Phase 3 done.** |
+| Phase 4 full suite | 879 | **847 full** | `pytest -q` (incl. slow): 847 passed / 0 failed / 29 skipped / 3 xfailed; signed-balance 879 = 839 + 40 (EXACT) |
 
 - Frozen-engine guards: **green** at every step (CRC lives in new files; `range_index`/`core` reuse import-only). A-4 census stress-test: **CLEAR**.
 - KAT TC-101: **green**.
@@ -112,7 +115,8 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | 2026-06-16 | 3 / I3b | TUI surface (config editor + worker + rows), reviewed (1 MEDIUM race fixed, 0 HIGH), **approved + committed** (4312dcd) |
 | 2026-06-16 | 3 / J-3 | **Re-scope: I4 withdrawn** — CRC persistent record = operation's emitted S19 + `OperationResult` (not the project/variant report). Folded into I5. |
 | 2026-06-16 | 3 / I5a | inject + emit + verify (headless write mechanics); **code-reviewer OK + security-reviewer CLEAN** (mandatory write-path sign-off), F-S-06 folded, **approved + committed** (d67ff48) |
-| 2026-06-16 | 3 / I5b | TUI two-stage confirm + write surface; code-reviewer OK (1 MEDIUM F1 fixed); no-write-without-confirm mutation-tested; **awaiting gate — Phase 3 closes on approval** |
+| 2026-06-16 | 3 / I5b | TUI two-stage confirm + write surface; code-reviewer OK (1 MEDIUM F1 fixed); no-write-without-confirm mutation-tested; **approved + committed** (43a2b0f) — **Phase 3 complete** |
+| 2026-06-17 | 4 | Validation **PASS-WITH-NOTES** (0 FAIL): 5 HLR/12 LLR PASS, full suite 847/0, surface-reachability CLEAR, 10/10 inspections; **awaiting gate** |
 
 Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
