@@ -24,6 +24,161 @@ STATUS_DOMAIN: frozenset[str] = frozenset({"placeholder", "ok", "error"})
 
 
 @dataclass
+class OperationInput:
+    """
+    Summary:
+        The neutral operation input (§6.2 D-1 / LLR-005.1) every
+        ``Operation.execute`` receives, replacing the direct
+        ``LoadedFile`` binding. It carries only the minimal surface a
+        headless operation needs — the memory map and ranges for compute,
+        plus identifying metadata for reporting — so an operation never
+        depends on the Textual-side ``LoadedFile`` (``row_bases`` /
+        ``range_validity`` / ``a2l_*`` are intentionally dropped).
+
+    Args:
+        mem_map (dict[int, int]): Address-to-byte map the operation reads.
+        ranges (list[tuple[int, int]]): Contiguous memory ranges
+            ``(start, end)``.
+        input_path (Optional[Path]): Source file of the input snapshot
+            (``LoadedFile.path``); ``None`` when unknown.
+        variant_id (Optional[str]): Project variant the snapshot belongs to
+            (``LoadedFile.variant_id``); ``None`` outside multi-variant
+            loads.
+        file_type (str): Loader classification (``"s19"`` / ``"hex"`` /
+            ``"mac"``), from ``LoadedFile.file_type``.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Built by :meth:`from_loaded` at the two migrated call-sites
+          (``operation_service.run_operation`` and the
+          ``OperationsScreen`` execute handler), then handed to
+          ``Operation.execute``.
+
+    Dependencies:
+        Uses:
+            - LoadedFile (only inside :meth:`from_loaded`)
+        Used by:
+            - Operation.execute implementations (operations.placeholders)
+            - tui.services.operation_service.run_operation
+
+    Example:
+        >>> op_input = OperationInput(
+        ...     mem_map={0: 0xAA}, ranges=[(0, 1)], input_path=None,
+        ...     variant_id=None, file_type="s19",
+        ... )
+        >>> op_input.ranges
+        [(0, 1)]
+    """
+
+    mem_map: dict[int, int]
+    ranges: list[tuple[int, int]]
+    input_path: Optional[Path]
+    variant_id: Optional[str]
+    file_type: str
+
+    @classmethod
+    def from_loaded(cls, loaded: LoadedFile) -> "OperationInput":
+        """
+        Summary:
+            Build a neutral :class:`OperationInput` from a ``LoadedFile``,
+            mapping the five fields a headless operation needs and dropping
+            the rest (``row_bases`` / ``range_validity`` / ``errors`` /
+            ``a2l_*``) — the single ``LoadedFile``-coupling site (D-1).
+
+        Args:
+            loaded (LoadedFile): The loaded-image snapshot to adapt.
+
+        Returns:
+            OperationInput: A neutral input over ``loaded.mem_map`` /
+            ``loaded.ranges`` with ``input_path`` = ``loaded.path``,
+            ``variant_id`` = ``loaded.variant_id``, ``file_type`` =
+            ``loaded.file_type``.
+
+        Data Flow:
+            - Called at ``operation_service.run_operation`` and the
+              ``OperationsScreen`` execute handler before ``execute``.
+
+        Dependencies:
+            Uses:
+                - LoadedFile
+            Used by:
+                - tui.services.operation_service.run_operation
+                - tui.screens.OperationsScreen (execute handler)
+                - tests/test_operations.py (TC-108 and adapted TCs)
+
+        Example:
+            >>> from pathlib import Path
+            >>> loaded = LoadedFile(
+            ...     path=Path("fw.s19"), file_type="s19", mem_map={0: 0xAA},
+            ...     row_bases=[0], ranges=[(0, 1)], range_validity=[True],
+            ...     errors=[], a2l_path=None, a2l_data=None,
+            ... )
+            >>> OperationInput.from_loaded(loaded).file_type
+            's19'
+        """
+        return cls(
+            mem_map=loaded.mem_map,
+            ranges=loaded.ranges,
+            input_path=loaded.path,
+            variant_id=loaded.variant_id,
+            file_type=loaded.file_type,
+        )
+
+
+@dataclass
+class CrcRegionResult:
+    """
+    Summary:
+        Per-region CRC payload entry (§6.2 D-2 / LLR-005.2) carried by
+        :attr:`OperationResult.crc_regions`. Defined now as part of the
+        widened result contract; populated by the CRC operation in a later
+        increment (the check path sets ``computed_crc`` / ``stored_value`` /
+        ``matched``; the inject path sets ``written``).
+
+    Args:
+        output_address (int): The memory address at which this region's CRC
+            is stored (check) or written (inject).
+        computed_crc (int): The CRC computed over the region's bytes.
+        stored_value (Optional[int]): The 4-byte little-endian value read at
+            ``output_address``; ``None`` when no stored value is present.
+        matched (Optional[bool]): Whether ``stored_value`` equals
+            ``computed_crc``; ``None`` when there is no stored value to
+            compare.
+        written (bool): Whether the inject path wrote this CRC to
+            ``output_address`` (``False`` on the non-mutating check path).
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Produced by the CRC operation; carried on
+          ``OperationResult.crc_regions``; serialized by
+          ``OperationResult.to_dict`` and rendered by the result/report
+          surfaces.
+
+    Dependencies:
+        Used by:
+            - OperationResult (crc_regions field)
+            - tests/test_operations.py (TC-109)
+
+    Example:
+        >>> CrcRegionResult(
+        ...     output_address=0x100, computed_crc=0xDEADBEEF,
+        ...     stored_value=0xDEADBEEF, matched=True, written=False,
+        ... ).matched
+        True
+    """
+
+    output_address: int
+    computed_crc: int
+    stored_value: Optional[int]
+    matched: Optional[bool]
+    written: bool
+
+
+@dataclass
 class OperationResult:
     """
     Summary:
@@ -52,6 +207,10 @@ class OperationResult:
         timestamp_utc (str): ISO-8601 UTC timestamp of the execution, taken
             from the producer's injectable ``now_fn`` clock (the
             ``changes.apply`` clock-seam precedent).
+        crc_regions (Optional[list[CrcRegionResult]]): Per-region CRC
+            payload (§6.2 D-2 / LLR-005.2); ``None`` for every current
+            producer (the three placeholders) so they construct unchanged,
+            populated only by the CRC operation in a later increment.
 
     Returns:
         None: Dataclass container.
@@ -98,6 +257,7 @@ class OperationResult:
     output: LoadedFile
     notes: list[str]
     timestamp_utc: str
+    crc_regions: Optional[list[CrcRegionResult]] = None
 
     def __post_init__(self) -> None:
         """
@@ -129,9 +289,10 @@ class OperationResult:
 
         Returns:
             dict[str, object]: JSON-compatible mapping of the 7 canonical
-            fields; paths as strings (or ``None``), ``notes`` as a fresh
-            list, ``output`` as exactly
-            ``{"path", "file_type", "byte_count"}``.
+            fields plus ``crc_regions``; paths as strings (or ``None``),
+            ``notes`` as a fresh list, ``output`` as exactly
+            ``{"path", "file_type", "byte_count"}``, ``crc_regions`` as a
+            list of per-region dicts when present or ``None`` when absent.
 
         Data Flow:
             - Rebuilt from the dataclass fields on every call — no caching,
@@ -171,6 +332,20 @@ class OperationResult:
             },
             "notes": list(self.notes),
             "timestamp_utc": self.timestamp_utc,
+            "crc_regions": (
+                [
+                    {
+                        "output_address": region.output_address,
+                        "computed_crc": region.computed_crc,
+                        "stored_value": region.stored_value,
+                        "matched": region.matched,
+                        "written": region.written,
+                    }
+                    for region in self.crc_regions
+                ]
+                if self.crc_regions is not None
+                else None
+            ),
         }
 
 
@@ -227,35 +402,40 @@ class Operation(ABC):
     @abstractmethod
     def execute(
         self,
-        loaded: LoadedFile,
+        op_input: OperationInput,
         *,
         now_fn: Optional[Callable[[], datetime]] = None,
     ) -> OperationResult:
         """
         Summary:
-            Execute this operation against one loaded-image snapshot and
-            return the structured :class:`OperationResult` (LLR-001.1).
+            Execute this operation against one neutral operation input
+            (LLR-005.1) and return the structured :class:`OperationResult`
+            (LLR-001.1). The input is the ``LoadedFile``-decoupled
+            :class:`OperationInput`, not a ``LoadedFile``.
 
         Args:
-            loaded (LoadedFile): The loaded-image snapshot to operate on.
+            op_input (OperationInput): The neutral input carrying
+                ``mem_map`` / ``ranges`` / metadata to operate on.
             now_fn (Optional[Callable[[], datetime]]): Injectable UTC clock
                 (the ``changes.apply.apply_change_document`` ``now_fn``
                 seam); ``None`` defaults to ``datetime.now(timezone.utc)``.
                 The result records ``now_fn().isoformat()``.
 
         Returns:
-            OperationResult: The 7-field result envelope; a placeholder
-            returns ``output is loaded`` with ``status="placeholder"``
-            (LLR-001.3).
+            OperationResult: The result envelope; a placeholder returns the
+            echoed input with ``status="placeholder"`` (LLR-001.3).
 
         Data Flow:
-            - Invoked by the ``run_operation`` service seam (LLR-003.1,
-              increment I2), which forwards ``now_fn`` unchanged.
+            - Invoked by the ``run_operation`` service seam and the
+              ``OperationsScreen`` execute handler, both of which build the
+              :class:`OperationInput` via :meth:`OperationInput.from_loaded`
+              and forward ``now_fn`` unchanged.
 
         Dependencies:
             Uses:
                 - OperationResult
+                - OperationInput
             Used by:
                 - tui.services.operation_service.run_operation
-                  (increment I2)
+                - tui.screens.OperationsScreen (execute handler)
         """

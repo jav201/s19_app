@@ -9,11 +9,12 @@ Coverage map (TC-010..TC-012):
   no-file guard (LLR-004.2) bails with one status line and pushes no
   screen and invokes no service.
 - LLR-004.2 — ``test_operations_view_executes_via_service`` (TC-011):
-  executing the selected operation presents ``status: placeholder`` plus
-  the exact LLR-002.1 placeholder note; the service seam is observed — a
-  stub injected through the LLR-003.1 ``operation_resolver`` seam is what
-  executes (a view bypassing ``run_operation`` would never reach the
-  stub), with the same loaded snapshot the app passed to the screen.
+  executing the selected ``crc`` operation through the generic (no-config)
+  service path presents ``status: ok`` plus the nothing-to-check note; the
+  service seam is observed — a stub injected through the LLR-003.1
+  ``operation_resolver`` seam is what executes (a view bypassing
+  ``run_operation`` would never reach the stub), with the same loaded
+  snapshot the app passed to the screen.
 - LLR-004.3 — ``test_operations_view_result_hex_render_matches_baseline``
   (TC-012): the live ``#operation_result_hex`` widget text (``.plain``)
   equals a baseline computed INDEPENDENTLY in the test by calling
@@ -41,6 +42,7 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.hexview import MAX_HEX_ROWS, render_hex_view_text
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.operations import OperationResult
+from s19_app.tui.operations.model import OperationInput
 from s19_app.tui.screens import OperationsScreen
 
 # Minimal valid S19 image (checksum verified against s19_app.core.S19File):
@@ -141,16 +143,21 @@ def test_operations_view_lists_registry_ids(tmp_path: Path) -> None:
 def test_operations_view_executes_via_service(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Execute shows the placeholder result; the service seam is observed.
+    """Execute shows the result; the service seam is observed.
 
-    Intent: LLR-004.2 — phase A executes the real ``crc`` placeholder and
-    the presented text carries ``status: placeholder`` plus the exact
-    LLR-002.1 note. Phase B injects a stub through the LLR-003.1
-    ``operation_resolver`` seam: the stub is what executes (with the same
-    snapshot the app handed to the screen), proving the view routes through
-    ``run_operation`` and never bypasses the service — a direct
-    ``registry.get_operation(...).execute(...)`` call in the view would
-    leave the stub unreached and fail here.
+    Intent: LLR-004.2 — phase A executes the real ``extract`` placeholder
+    through the generic synchronous service path and the presented text
+    carries ``status: placeholder`` plus its placeholder note. Phase B injects
+    a stub through the LLR-003.1 ``operation_resolver`` seam: the stub is what
+    executes (with the same snapshot the app handed to the screen), proving
+    the view routes through the resolver seam and never bypasses it — a direct
+    ``registry.get_operation(...).execute(...)`` call in the view would leave
+    the stub unreached and fail here.
+
+    Note (batch-12 I3b): the synchronous-path contracts are exercised through
+    a NON-CRC row (``extract``, index 1) — the ``crc`` row migrated to a
+    config-fed ``@work(thread=True)`` worker (LLR-002.3/004.2), covered by
+    ``tests/test_tui_crc_surface.py``.
     """
     s19_path = _write_s19(tmp_path)
 
@@ -163,7 +170,7 @@ def test_operations_view_executes_via_service(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             screen.query_one("#operations_execute", Button).press()
             await pilot.pause()
@@ -173,25 +180,37 @@ def test_operations_view_executes_via_service(
 
     status_text = asyncio.run(_drive_real())
     assert "status: placeholder" in status_text, status_text
-    assert "placeholder: crc not yet implemented" in status_text, status_text
+    assert "placeholder: extract not yet implemented" in status_text, status_text
 
-    calls: list[LoadedFile] = []
+    calls: list[OperationInput] = []
 
     class _StubOperation:
-        operation_id = "crc"
-        title = "CRC"
+        operation_id = "extract"
+        title = "Extract"
 
         def describe(self) -> str:
             return "stub"
 
-        def execute(self, loaded: LoadedFile, *, now_fn=None) -> OperationResult:
-            calls.append(loaded)
+        def execute(self, op_input: OperationInput, *, now_fn=None) -> OperationResult:
+            calls.append(op_input)
+            output = LoadedFile(
+                path=op_input.input_path,
+                file_type=op_input.file_type,
+                mem_map=op_input.mem_map,
+                row_bases=[],
+                ranges=op_input.ranges,
+                range_validity=[],
+                errors=[],
+                a2l_path=None,
+                a2l_data=None,
+                variant_id=op_input.variant_id,
+            )
             return OperationResult(
-                operation_id="crc",
+                operation_id="extract",
                 status="placeholder",
-                input_path=loaded.path,
-                variant_id=loaded.variant_id,
-                output=loaded,
+                input_path=op_input.input_path,
+                variant_id=op_input.variant_id,
+                output=output,
                 notes=["stub note: seam substitution observed"],
                 timestamp_utc="2026-06-11T00:00:00+00:00",
             )
@@ -211,14 +230,18 @@ def test_operations_view_executes_via_service(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             screen.query_one("#operations_execute", Button).press()
             await pilot.pause()
             stub_text = str(
                 screen.query_one("#operation_result_status", Static).content
             )
-            same_snapshot = bool(calls) and calls[0] is app.current_file
+            same_snapshot = (
+                bool(calls)
+                and app.current_file is not None
+                and calls[0].mem_map is app.current_file.mem_map
+            )
             return stub_text, same_snapshot
 
     stub_text, same_snapshot = asyncio.run(_drive_stub())
@@ -240,10 +263,15 @@ def test_operations_view_result_hex_render_matches_baseline(
     Intent: LLR-004.3 — the baseline is computed INDEPENDENTLY here, on the
     INPUT snapshot's ``mem_map`` (captured before execution), with the
     pinned argument tuple; the compared text is read from the LIVE
-    ``#operation_result_hex`` widget after the modal executed the ``crc``
-    placeholder. For an identity-passthrough result the two must be equal
-    (the end-to-end unchanged-image acceptance demo). Status and note
-    visibility ride along per the TC-012 threshold.
+    ``#operation_result_hex`` widget after the modal executed the real
+    ``extract`` placeholder. The placeholder echoes ``mem_map`` unchanged,
+    so the two hex texts must be equal (the end-to-end unchanged-image
+    acceptance demo). Status and note visibility ride along per the TC-012
+    threshold.
+
+    Note (batch-12 I3b): exercised through the NON-CRC ``extract`` row (the
+    ``crc`` row migrated to a config-fed worker; its pinned hex render is
+    covered by ``tests/test_tui_crc_surface.py``).
     """
     s19_path = _write_s19(tmp_path)
 
@@ -266,7 +294,7 @@ def test_operations_view_result_hex_render_matches_baseline(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             screen.query_one("#operations_execute", Button).press()
             await pilot.pause()
@@ -285,7 +313,7 @@ def test_operations_view_result_hex_render_matches_baseline(
     )
     assert "0x00001000" in widget_plain, widget_plain[:80]
     assert "status: placeholder" in status_text, status_text
-    assert "placeholder: crc not yet implemented" in status_text, status_text
+    assert "placeholder: extract not yet implemented" in status_text, status_text
 
 
 # ---------------------------------------------------------------------------
@@ -337,14 +365,18 @@ def test_execute_internal_keyerror_not_masked_as_unknown_operation(
     assert any("unknown operation" in line for line in miss_log), miss_log
 
     # Phase B — resolve succeeds, .execute raises KeyError: NOT masked.
+    # Exercised through the NON-CRC ``extract`` row (index 1): the synchronous
+    # in-handler execute is reserved for non-CRC ops (the CRC row dispatches to
+    # a thread-worker, batch-12 I3b), and that synchronous call is where the
+    # M-3 resolve/execute KeyError split must hold.
     class _ExecKeyErrorOperation:
-        operation_id = "crc"
-        title = "CRC"
+        operation_id = "extract"
+        title = "Extract"
 
         def describe(self) -> str:
             return "stub"
 
-        def execute(self, loaded: LoadedFile, *, now_fn=None) -> OperationResult:
+        def execute(self, op_input: OperationInput, *, now_fn=None) -> OperationResult:
             raise KeyError("internal lookup miss inside execute")
 
     monkeypatch.setattr(
@@ -362,7 +394,7 @@ def test_execute_internal_keyerror_not_masked_as_unknown_operation(
             await pilot.pause()
             screen = app.screen
             assert isinstance(screen, OperationsScreen)
-            screen.query_one("#operations_list", ListView).index = 0
+            screen.query_one("#operations_list", ListView).index = 1
             await pilot.pause()
             raised = False
             try:

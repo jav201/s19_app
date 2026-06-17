@@ -9,9 +9,9 @@ operations (``placeholders.py``), and the deterministic registry
 detail. Headless by contract — no Textual imports anywhere (LLR-003.2).
 """
 
+from .crc import CrcOperation
 from .model import Operation, OperationResult, STATUS_DOMAIN
 from .placeholders import (
-    CrcOperation,
     ExtractOperation,
     SplitBySegmentOperation,
 )

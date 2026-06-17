@@ -39,6 +39,7 @@ Functional subsystems:
 15. Hex Compare Mode (batch-09)
 16. HEX Emitter + Verify-on-Save (batch-10)
 17. Project Manifest Writer (batch-11)
+18. CRC Operation (CRC_F2) (batch-12)
 
 ---
 
@@ -2084,3 +2085,193 @@ write-failure surfaces an error notice without crashing the save flow
   `active_variant` (it calls `write_project_manifest` with empty `batch`/
   `assignments`). Persisting `batch`/`assignments` from the loaded project
   state via the save UI is a batch-12 candidate; this row does not claim it.
+
+---
+
+# 18. CRC Operation (CRC_F2)
+
+The CRC operation batch (`2026-06-16-batch-12`, US-011 / US-012) is the first
+concrete *operation* fill-in of the batch-08 operations framework: a
+parameterized CRC32 over one or more configured memory ranges of a loaded S19
+(incl. S3/32-bit), with a non-mutating **check** (compute + compare against the
+stored value) and an operator-confirmed **inject** (write + re-emit modified
+S19 + verify). It resolves the two batch-08 deferred framework risks — the
+neutral input contract (R-2) and the `OperationResult` widening (R-3) — and
+reuses `emit_s19_from_mem_map` / `verify_written_image` / `range_index`
+import-only, touching ZERO frozen engine path.
+
+> **Per-operation HLR/LLR detail:**
+> `s19_app/tui/operations/requirements/REQ-crc.md` (co-located with the module,
+> per the batch-08 C-7 operations-module convention). The rows below are the
+> repo-wide `R-CRC-*` traceability that REFERENCE that doc; the operation's own
+> HLR/LLR statements, EARS form, engine decisions (D-4 default param set, D-5
+> 4-byte LE codec), and open risks live there and are NOT inlined here. The
+> normative source of truth for the full statements is
+> `.dev-flow/2026-06-16-batch-12/01-requirements.md` §3 (HLR) / §4 (LLR); the
+> per-node validation verdicts are in
+> `.dev-flow/2026-06-16-batch-12/04-validation.md` (PASS-WITH-NOTES; 5/5 HLR +
+> 12/12 in-scope LLR PASS, 1 LLR WITHDRAWN, 0 FAIL; CRC subset 53 passed; full
+> suite 847 passed / 0 failed / 29 skipped / 3 xfailed).
+
+> **Scope boundaries (honest).** This batch is **TUI-only** — no CLI `ops`
+> subcommand (deferred at batch-08). CRC inputs are **S19 only** — no A2L, no
+> HEX/MAC as CRC inputs. There is **no `report_service` integration** (J-3
+> re-scope, `01-requirements.md` §6.4 / `04-validation.md` §5): `report_service`
+> is project/variant-scoped while CRC is a per-file operation, so the CRC's
+> persistent record is the emitted modified S19 (FR9) plus the `OperationResult`
+> result summary — not a report-service section. `report_service.py` is
+> untouched this batch.
+
+**R-CRC-ENGINE-001**: The CRC operation must provide a parameterized, headless
+CRC32 compute engine that, for each configured region, selects only in-region
+`mem_map` bytes, orders them ascending, reconstructs contiguous segments
+(splitting on any gap, contiguity rule `current == previous + 1`, inserting no
+bytes for gaps), digests the concatenated segments through one non-resetting
+CRC32 state, applies the configured final XOR, and returns one computed CRC per
+region — with no I/O, no parsing, and no mutation of the input. With the default
+params (zlib/PKZIP convention: poly `0x04C11DB7`, init `0xFFFFFFFF`, reverse
+`true`, xorout `0xFFFFFFFF`) the result equals `zlib.crc32` over the same bytes
+(HLR-001 / LLR-001.1–001.3; engine surface detail in `REQ-crc.md`).
+
+- Code: `s19_app/tui/operations/crc.py` (`crc32_stream`, `region_segments`,
+  `compute_region_crc`, `compute_region_crcs`, `encode_le32`/`decode_le32`),
+  reusing `s19_app/range_index.py` (`build_sorted_range_index`,
+  `address_in_sorted_ranges`) import-only
+- Validation: `Automated` via `tests/test_crc_engine.py`
+  (`test_known_answer_vector` — the gating KAT `crc32(b"123456789") ==
+  0xCBF43926`, `test_segment_chaining_does_not_reset_state`,
+  `test_gap_splits_segments_no_inserted_bytes`,
+  `test_ascending_address_ordering`,
+  `test_region_filter_excludes_out_of_range`,
+  `test_entry_point_does_not_mutate_mem_map`, `test_config_params_change_result`,
+  `test_le_codec_roundtrip`)
+- Status: Added in batch `2026-06-16-batch-12` (US-011 / HLR-001 /
+  LLR-001.1–001.3)
+
+**R-CRC-ENGINE-002**: With non-default CRC parameters the engine uses a bitwise
+reflected loop rather than the `zlib.crc32` fast path; the default (zlib) path
+is fully verified by the known-answer vector, and the bitwise path is
+corroborated against published CRC-32 variant KATs, but a real device's
+*non-zlib* convention still requires an operator-sourced reference vector before
+its computed CRC can be trusted (RK-3; the params are proven *wired*, not a
+non-default result proven *correct*).
+
+- Code: `s19_app/tui/operations/crc.py` (`crc32_stream` bitwise reflected branch)
+- Validation: `Partial` — the default zlib path is `Automated` via
+  `tests/test_crc_engine.py` (`test_known_answer_vector`,
+  `test_config_params_change_result`) and the bitwise path is corroborated by
+  `test_bitwise_path_reproduces_published_variant_kats`; a non-default *device*
+  convention reference vector is `Manual` (operator-sourced fixture pending —
+  RK-3, see `REQ-crc.md` Open risks and `04-validation.md` §5)
+- Status: Added in batch `2026-06-16-batch-12` (US-011 / HLR-001 / LLR-001.1,
+  RK-3 residual)
+
+**R-CRC-CHECK-001**: When the CRC operation runs in its default (check) mode
+over a loaded S19, the system must, for each configured region, read the 4-byte
+little-endian value stored at that region's output address, compare it to the
+computed CRC, and report per output address whether the stored value matches —
+without modifying the loaded `mem_map` or writing any file. A missing output
+address yields no stored value (no exception) (HLR-002 / LLR-002.1–002.4; detail
+in `REQ-crc.md`).
+
+- Code: `s19_app/tui/operations/crc.py` (check/compare + read-stored 4-byte LE
+  via `decode_le32`), `s19_app/tui/screens.py` (`OperationsScreen` CRC result
+  rows + `@work(thread=True)` execute path)
+- Validation: `Automated` via `tests/test_crc_operation.py`
+  (`test_check_reports_match_nonmutating`, `test_check_reports_mismatch`,
+  `test_read_stored_missing_returns_none`, `test_check_multi_region_order`,
+  `test_execute_with_config_populates_crc_regions`) and
+  `tests/test_tui_crc_surface.py`
+  (`test_crc_check_reaches_result_surface_via_handler`,
+  `test_crc_execute_path_uses_thread_worker`,
+  `test_stale_crc_worker_result_does_not_overwrite_error`)
+- Status: Added in batch `2026-06-16-batch-12` (US-011 / HLR-002 /
+  LLR-002.1–002.4). **Note (J-3):** LLR-002.5 (persistent project-report
+  render) is **WITHDRAWN** — the check has no separate persistent artifact; its
+  surface is the op-result view (LLR-002.4).
+
+**R-CRC-WRITE-001**: When the operator confirms the write stage after a check,
+the system must write each computed CRC as a 4-byte little-endian value at its
+output address — extending `mem_map` and `ranges` to include the 4 bytes when
+the output address falls in a gap — emit a structurally valid modified S19 from
+the resulting memory map into the contained work area, re-read that S19 with the
+production parser and confirm it equals the intended (injected) memory map, and
+record the emitted path + verify verdict in the `OperationResult`; and if the
+operator does not confirm, then the system must write no file. The original
+`mem_map` is left byte-for-byte unchanged (inject works on a working copy)
+(HLR-003 / LLR-003.1–003.5; detail in `REQ-crc.md`).
+
+- Code: `s19_app/tui/operations/crc.py` (inject 4-byte LE via `encode_le32` +
+  extend-on-gap + emit via `emit_s19_from_mem_map` + verify via
+  `verify_written_image` + assemble the write `OperationResult`),
+  `s19_app/tui/screens.py` (`ConfirmWriteScreen` two-stage confirm +
+  `confirm_write_ok`/`confirm_write_cancel` + write-outcome rows)
+- Validation: `Automated` via `tests/test_crc_operation.py`
+  (`test_inject_writes_le_at_output_address`,
+  `test_inject_into_gap_extends_ranges`,
+  `test_modified_s19_reread_matches_intent` — clean → verified + empty diff,
+  corrupted → mismatch (non-tautological), `test_write_only_when_invoked`,
+  `test_write_outside_workarea_collects_finding_and_writes_no_file`,
+  `test_write_result_records_emitted_path_and_verdict`) and
+  `tests/test_tui_crc_surface.py` (`test_no_write_without_confirmation` —
+  pilot-driven `ConfirmWriteScreen` decline → 0 files / confirm → 1 file,
+  `test_crc_inject_reaches_surface_via_handler`)
+- Status: Added in batch `2026-06-16-batch-12` (US-012 / HLR-003 /
+  LLR-003.1–003.4 + re-scoped LLR-003.5). **Note (J-3):** LLR-003.5 is
+  **RE-SCOPED** — the persistent record is the operation's own output (emitted
+  S19 + `OperationResult`), NOT a `report_service` binding.
+
+**R-CRC-CONFIG-001**: When the operator supplies a CRC config file path, the
+system must resolve it via `resolve_input_path` under the `READ_SIZE_CAP_BYTES`
+size cap, parse the JSON into a typed config (regions with `(start, end)` +
+output address, polynomial, init, reverse flag, final-XOR), and present the
+config in the TUI as editable text pre-filled with dummy values for format
+guidance; and if the path is unresolvable or the JSON is structurally invalid,
+then the system must report the failure as exactly one collected error and run
+no CRC computation (collect-don't-abort, never raises). Real per-firmware config
+values are never committed — the repo carries only the dummy template
+`examples/crc_config.example.json` (HLR-004 / LLR-004.1–004.2; detail in
+`REQ-crc.md`).
+
+- Code: `s19_app/tui/operations/crc_config.py` (`read_crc_config`,
+  `parse_crc_config`, `CrcConfig`, `CrcRegion`, `DUMMY_CONFIG_TEXT`),
+  `s19_app/tui/screens.py` (CRC config text editor surface)
+- Validation: `Automated` via `tests/test_crc_config.py`
+  (`test_params_loaded_from_synthetic_json`,
+  `test_unresolvable_path_collects_one_error`,
+  `test_malformed_json_collects_one_error`,
+  `test_over_size_cap_collects_one_error_without_reading`,
+  `test_missing_field_collects_one_error`,
+  `test_parse_crc_config_valid_text_populates_config`,
+  `test_parse_crc_config_dummy_prefill_is_valid`,
+  `test_parse_crc_config_malformed_text_collects_one_error`,
+  `test_parse_crc_config_non_object_top_level_collects_one_error`,
+  `test_parse_crc_config_missing_field_collects_one_error`,
+  `test_no_real_config_required`) and `tests/test_tui_crc_surface.py`
+  (`test_crc_config_error_surfaces_error_and_no_match`)
+- Status: Added in batch `2026-06-16-batch-12` (US-011/US-012 / HLR-004 /
+  LLR-004.1–004.2)
+
+**R-CRC-CONTRACT-001**: The operations framework must provide a neutral
+operation input (`OperationInput`) carrying `mem_map`, `ranges`, and identifying
+metadata — replacing the `execute(loaded: LoadedFile, …)` binding so an
+operation does not depend on the Textual-side `LoadedFile` (a
+`OperationInput.from_loaded` adapter keeps existing callers working) — and
+`OperationResult` must be widened with one optional structured per-region CRC
+payload field (`crc_regions`) while preserving its 7 canonical fields and the
+closed `STATUS_DOMAIN` `{"placeholder","ok","error"}` for all current callers
+(resolves batch-08 R-2 / R-3; HLR-005 / LLR-005.1–005.3).
+
+- Code: `s19_app/tui/operations/model.py` (`OperationInput` :27 +
+  `from_loaded` :82, `OperationResult.crc_regions` :260, `CrcRegionResult` :131,
+  `STATUS_DOMAIN` :23 unchanged), `s19_app/tui/services/operation_service.py`
+  (`run_operation` builds the neutral input), `s19_app/tui/operations/
+  placeholders.py` (3 placeholder `execute` signatures adapted)
+- Validation: `Automated` via `tests/test_operations.py`
+  (`test_operation_input_exposes_mem_map_ranges_metadata`,
+  `test_operation_result_widened_field_count_and_status_domain`,
+  `test_run_operation_service`, `test_operation_interface`,
+  `test_identity_passthrough_s19`, `test_identity_passthrough_hex`,
+  `test_placeholders_registered` — 10 nodes, 0 regressions post-widening)
+- Status: Added in batch `2026-06-16-batch-12` (US-011/US-012 / HLR-005 /
+  LLR-005.1–005.3, resolves batch-08 deferred R-2 / R-3)

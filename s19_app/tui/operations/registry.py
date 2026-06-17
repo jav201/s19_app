@@ -6,8 +6,9 @@ model involvement in dispatch (engineering rule 5).
 
 from __future__ import annotations
 
+from .crc import CrcOperation
 from .model import Operation
-from .placeholders import CrcOperation, ExtractOperation, SplitBySegmentOperation
+from .placeholders import ExtractOperation, SplitBySegmentOperation
 
 #: The static registry — insertion order IS the deterministic enumeration
 #: order of :func:`list_operation_ids` (LLR-002.2).
