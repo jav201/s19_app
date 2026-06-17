@@ -18,11 +18,14 @@ Region membership reuses the frozen :mod:`s19_app.range_index` primitives
 from __future__ import annotations
 
 import zlib
-from typing import Iterable, Optional
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Callable, Iterable, Optional
 
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
+from ..models import LoadedFile
 from .crc_config import CrcConfig
-from .model import CrcRegionResult, OperationInput
+from .model import CrcRegionResult, Operation, OperationInput, OperationResult
 
 #: zlib/PKZIP CRC-32 default convention (§6.2 D-4). With these params the
 #: engine reproduces ``zlib.crc32`` exactly (the LLR-001.1 oracle).
@@ -513,3 +516,178 @@ def check_regions(
             )
         )
     return results
+
+
+def _summarize_check(crc_regions: list[CrcRegionResult]) -> str:
+    """
+    Summary:
+        Build the one-line CRC check note from a list of per-region results,
+        counting matched (``matched is True``), mismatched (``matched is
+        False``), and no-stored-value (``matched is None``) regions.
+
+    Args:
+        crc_regions (list[CrcRegionResult]): The per-region check results, in
+            config order.
+
+    Returns:
+        str: The note ``"CRC: N region(s): M matched, K mismatched, J
+        no-stored-value"``.
+
+    Data Flow:
+        - Partition ``crc_regions`` by their ``matched`` tri-state into the
+          three counts; format the single summary line.
+
+    Dependencies:
+        Used by:
+            - :meth:`CrcOperation.execute` (config-supplied check path)
+    """
+    matched = sum(1 for region in crc_regions if region.matched is True)
+    mismatched = sum(1 for region in crc_regions if region.matched is False)
+    no_stored = sum(1 for region in crc_regions if region.matched is None)
+    return (
+        f"CRC: {len(crc_regions)} region(s): {matched} matched, "
+        f"{mismatched} mismatched, {no_stored} no-stored-value"
+    )
+
+
+class CrcOperation(Operation):
+    """
+    Summary:
+        The real CRC check operation over a loaded image (CRC_F2, HLR/LLR
+        check path). On the non-mutating check path (F-Q-02) it computes a
+        CRC per configured region and compares it against the stored 4-byte
+        little-endian value at each region's output address, reporting the
+        per-region verdicts on ``OperationResult.crc_regions``. The input
+        snapshot is never mutated; ``output`` is a fresh ``LoadedFile`` over
+        the same ``mem_map`` / ``ranges``. With no config supplied there is
+        nothing to check, so the result carries no regions and one explaining
+        note.
+
+    Data Flow:
+        - Registered under id ``"crc"`` in ``operations.registry``; executed
+          through the ``run_operation`` service seam (no config) or with a
+          ``CrcConfig`` passed directly to :meth:`execute`.
+
+    Dependencies:
+        Uses:
+            - Operation
+            - check_regions
+            - OperationResult / LoadedFile
+        Used by:
+            - operations.registry
+            - tui.services.operation_service.run_operation
+    """
+
+    operation_id: str = "crc"
+    title: str = "CRC"
+
+    def describe(self) -> str:
+        """
+        Summary:
+            Describe the CRC check operation (LLR-001.1).
+
+        Returns:
+            str: Non-empty description text.
+
+        Data Flow:
+            - Read by presentation surfaces and TC-009.
+
+        Dependencies:
+            Used by:
+                - tests/test_operations.py (TC-009)
+        """
+        return (
+            "Compute a CRC32 over each configured region of the loaded image "
+            "and compare it against the stored value."
+        )
+
+    def execute(
+        self,
+        op_input: OperationInput,
+        *,
+        now_fn: Optional[Callable[[], datetime]] = None,
+        config: Optional[CrcConfig] = None,
+    ) -> OperationResult:
+        """
+        Summary:
+            Run the non-mutating CRC check over ``op_input`` (F-Q-02). When
+            ``config`` is supplied, compute one CRC per region and compare it
+            against the stored 4-byte LE value via :func:`check_regions`,
+            carrying the per-region verdicts on ``crc_regions`` and a summary
+            note. When ``config`` is ``None`` there is nothing to check, so
+            ``crc_regions`` is ``None`` and a single explaining note is
+            returned. Either way ``status`` is ``"ok"`` and the input snapshot
+            is never mutated; ``output`` is a fresh ``LoadedFile`` over the
+            input's ``mem_map`` / ``ranges``.
+
+        Args:
+            op_input (OperationInput): The neutral input; only ``mem_map`` is
+                read, never mutated.
+            now_fn (Optional[Callable[[], datetime]]): Injectable UTC clock;
+                ``None`` defaults to ``datetime.now(timezone.utc)`` (the
+                ``changes.apply`` clock-seam idiom). The result records
+                ``now_fn().isoformat()``.
+            config (Optional[CrcConfig]): The parsed CRC config supplying the
+                regions and algorithm params. ``None`` (the default, used by
+                the generic ``run_operation`` seam) means there is nothing to
+                check.
+
+        Returns:
+            OperationResult: ``status="ok"``; ``crc_regions`` is the list of
+            per-region results when ``config`` is supplied, else ``None``;
+            ``notes`` carries one summary (config path) or one
+            nothing-to-check note (no-config path).
+
+        Raises:
+            None: The check path collects per-region verdicts (including
+                no-stored-value) without raising.
+
+        Data Flow:
+            - Rebuild ``output`` as a ``LoadedFile`` over ``op_input`` (no
+              mutation). ``config is None`` → one note, ``crc_regions=None``.
+              Else :func:`check_regions` → :func:`_summarize_check` note.
+
+        Dependencies:
+            Uses:
+                - check_regions
+                - _summarize_check
+                - OperationResult / LoadedFile
+            Used by:
+                - tui.services.operation_service.run_operation
+                - tests/test_crc_operation.py (execute tests)
+        """
+        clock: Callable[[], datetime] = (
+            now_fn if now_fn is not None else (lambda: datetime.now(timezone.utc))
+        )
+        output = LoadedFile(
+            path=(
+                op_input.input_path
+                if op_input.input_path is not None
+                else Path("")
+            ),
+            file_type=op_input.file_type,
+            mem_map=op_input.mem_map,
+            row_bases=[],
+            ranges=op_input.ranges,
+            range_validity=[],
+            errors=[],
+            a2l_path=None,
+            a2l_data=None,
+            variant_id=op_input.variant_id,
+        )
+        if config is None:
+            crc_regions: Optional[list[CrcRegionResult]] = None
+            notes = ["CRC: no config supplied — nothing to check"]
+        else:
+            crc_regions = check_regions(op_input, config)
+            notes = [_summarize_check(crc_regions)]
+        return OperationResult(
+            operation_id=self.operation_id,
+            status="ok",
+            input_path=op_input.input_path,
+            variant_id=op_input.variant_id,
+            output=output,
+            notes=notes,
+            timestamp_utc=clock().isoformat(),
+            crc_regions=crc_regions,
+        )

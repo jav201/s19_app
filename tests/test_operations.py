@@ -10,10 +10,11 @@ anywhere:
   disclosure guard (``output`` serialized as exactly
   ``{path, file_type, byte_count}``, never ``mem_map``).
 - **TC-002** — ``test_identity_passthrough_s19`` (LLR-001.3): for each of
-  the 3 placeholders over a real parsed S19 snapshot
+  the 3 registered operations over a real parsed S19 snapshot
   (``examples/case_00_public/prg.s19`` via ``S19File`` +
-  ``build_loaded_s19``): ``output is loaded``, ``status="placeholder"``,
-  and ``mem_map``/``ranges``/``errors`` unmutated — 15 assertions.
+  ``build_loaded_s19``): the ``output`` echoes ``mem_map``/``ranges``,
+  status is ``"placeholder"`` for the two placeholders and ``"ok"`` for the
+  real no-config ``crc``, and ``mem_map``/``ranges``/``errors`` unmutated.
 - **TC-003** — ``test_identity_passthrough_hex`` (LLR-001.4): the same
   15-assertion set over a HEX snapshot built from inline Intel HEX records
   written to ``tmp_path`` (the ``tests/test_hexfile.py`` idiom) via
@@ -124,6 +125,10 @@ def _assert_identity_passthrough(loaded: LoadedFile) -> None:
     ``OperationInput`` (not the ``LoadedFile``), so the echo is value-equality
     on ``mem_map`` / ``ranges`` — not object identity — while the input
     snapshot must still be byte-for-byte unchanged (the no-mutation contract).
+
+    After I3a ``crc`` is the real CRC operation: with no config it returns
+    ``status="ok"`` (nothing to check) but is still a non-mutating value-echo,
+    so it shares every assertion here except the status token.
     """
     for operation_cls in ALL_PLACEHOLDERS:
         mem_map_before = copy.deepcopy(loaded.mem_map)
@@ -134,7 +139,8 @@ def _assert_identity_passthrough(loaded: LoadedFile) -> None:
 
         assert result.output.mem_map == loaded.mem_map
         assert result.output.ranges == loaded.ranges
-        assert result.status == "placeholder"
+        expected_status = "ok" if operation_cls is CrcOperation else "placeholder"
+        assert result.status == expected_status
         assert loaded.mem_map == mem_map_before
         assert loaded.ranges == ranges_before
         assert loaded.errors == errors_before
@@ -198,9 +204,15 @@ def test_placeholders_registered(tmp_path):
     for operation_id, operation_cls in expected.items():
         assert type(get_operation(operation_id)) is operation_cls
         result = get_operation(operation_id).execute(op_input)
-        assert result.notes == [
-            f"placeholder: {operation_id} not yet implemented"
-        ]
+        if operation_id == "crc":
+            # crc is real after I3a: with no config it reports nothing-to-check.
+            assert result.notes == [
+                "CRC: no config supplied — nothing to check"
+            ]
+        else:
+            assert result.notes == [
+                f"placeholder: {operation_id} not yet implemented"
+            ]
 
 
 def test_registry_deterministic_order():

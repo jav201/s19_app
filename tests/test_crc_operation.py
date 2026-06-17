@@ -17,6 +17,7 @@ from s19_app.tui.operations.crc import (
     DEFAULT_INIT,
     DEFAULT_POLYNOMIAL,
     DEFAULT_REVERSE,
+    CrcOperation,
     check_regions,
     compute_region_crc,
     encode_le32,
@@ -151,3 +152,68 @@ def test_check_multi_region_order() -> None:
     assert [r.output_address for r in results] == [0x100, 0x200]
     assert results[0].computed_crc == compute_region_crc(mem, 0, 3)
     assert results[1].computed_crc == compute_region_crc(mem, 3, 6)
+
+
+def test_execute_no_config_returns_ok_no_regions() -> None:
+    """``CrcOperation.execute`` with ``config=None`` (the generic
+    ``run_operation`` path) reports ``status="ok"`` with nothing to check:
+    ``crc_regions is None``, one explaining note, and ``mem_map`` byte-for-byte
+    unchanged.
+
+    Intent: the no-config branch must not invent a check — a regression that
+    ran ``check_regions`` against an empty/implicit config would populate
+    ``crc_regions`` and fail the ``is None`` assertion."""
+    mem = _mem_from_bytes(0x500, b"\x01\x02\x03\x04")
+    op_input = _op_input(mem)
+    snapshot = dict(mem)
+
+    result = CrcOperation().execute(op_input)
+
+    assert result.status == "ok"
+    assert result.operation_id == "crc"
+    assert result.crc_regions is None
+    assert result.notes == ["CRC: no config supplied — nothing to check"]
+    assert result.output.mem_map == mem
+    assert op_input.mem_map == snapshot  # zero mutation
+
+
+def test_execute_with_config_populates_crc_regions() -> None:
+    """``CrcOperation.execute(config=...)`` runs the check: a matching region
+    and a mismatching region yield ``status="ok"`` with the per-region
+    ``matched`` flags correct and ``mem_map`` unchanged.
+
+    Intent: the matched/mismatched verdicts are proven non-vacuous — the
+    matching region's stored value is ``encode_le32`` of an INDEPENDENT
+    ``compute_region_crc`` recompute, and the mismatching region's stored value
+    is its bitwise complement (guaranteed ``!=``). The summary note must count
+    1 matched + 1 mismatched + 0 no-stored-value."""
+    mem = _mem_from_bytes(0, b"\x11\x22\x33\x44\x55\x66")
+    region_match = CrcRegion(start=0, end=3, output_address=0x100)
+    region_mismatch = CrcRegion(start=3, end=6, output_address=0x200)
+
+    crc_match = compute_region_crc(mem, region_match.start, region_match.end)
+    crc_mismatch = compute_region_crc(
+        mem, region_mismatch.start, region_mismatch.end
+    )
+    wrong = (crc_mismatch ^ 0xFFFFFFFF) & 0xFFFFFFFF
+    assert wrong != crc_mismatch
+    mem.update(_mem_from_bytes(region_match.output_address, encode_le32(crc_match)))
+    mem.update(_mem_from_bytes(region_mismatch.output_address, encode_le32(wrong)))
+
+    op_input = _op_input(mem)
+    snapshot = dict(mem)
+    config = _default_config([region_match, region_mismatch])
+
+    result = CrcOperation().execute(op_input, config=config)
+
+    assert result.status == "ok"
+    assert result.crc_regions is not None
+    assert len(result.crc_regions) == 2
+    assert result.crc_regions[0].matched is True
+    assert result.crc_regions[0].computed_crc == crc_match  # independent oracle
+    assert result.crc_regions[1].matched is False
+    assert result.crc_regions[1].computed_crc == crc_mismatch
+    assert result.notes == [
+        "CRC: 2 region(s): 1 matched, 1 mismatched, 0 no-stored-value"
+    ]
+    assert op_input.mem_map == snapshot  # zero mutation

@@ -1,7 +1,7 @@
 """
-The three placeholder operations (batch-08, HLR-002 / LLR-002.1).
+The remaining placeholder operations (batch-08, HLR-002 / LLR-002.1).
 
-``CrcOperation``, ``ExtractOperation``, and ``SplitBySegmentOperation`` are
+``ExtractOperation`` and ``SplitBySegmentOperation`` are
 identity passthroughs: ``execute`` echoes the neutral :class:`OperationInput`
 it received back out as ``output`` (a ``LoadedFile`` over the same
 ``mem_map`` / ``ranges``), with ``status="placeholder"`` and exactly one
@@ -58,7 +58,6 @@ def _placeholder_result(
             - OperationResult
             - LoadedFile
         Used by:
-            - CrcOperation.execute
             - ExtractOperation.execute
             - SplitBySegmentOperation.execute
     """
@@ -86,79 +85,6 @@ def _placeholder_result(
         notes=[f"placeholder: {operation.operation_id} not yet implemented"],
         timestamp_utc=clock().isoformat(),
     )
-
-
-class CrcOperation(Operation):
-    """
-    Summary:
-        Placeholder for the future CRC computation over a loaded image
-        (LLR-002.1). Identity passthrough — no CRC is computed yet.
-
-    Data Flow:
-        - Registered under id ``"crc"`` in ``operations.registry``;
-          executed through the ``run_operation`` service seam.
-
-    Dependencies:
-        Uses:
-            - Operation
-            - _placeholder_result
-        Used by:
-            - operations.registry
-    """
-
-    operation_id: str = "crc"
-    title: str = "CRC"
-
-    def describe(self) -> str:
-        """
-        Summary:
-            Describe the future CRC operation (LLR-001.1).
-
-        Returns:
-            str: Non-empty description text.
-
-        Data Flow:
-            - Read by presentation surfaces and TC-009.
-
-        Dependencies:
-            Used by:
-                - tests/test_operations.py (TC-009)
-        """
-        return (
-            "Compute a CRC over the loaded image (placeholder — not yet "
-            "implemented)."
-        )
-
-    def execute(
-        self,
-        op_input: OperationInput,
-        *,
-        now_fn: Optional[Callable[[], datetime]] = None,
-    ) -> OperationResult:
-        """
-        Summary:
-            Identity passthrough (LLR-001.3): echo the neutral input back
-            as ``output`` with ``status="placeholder"``.
-
-        Args:
-            op_input (OperationInput): The neutral input; not mutated.
-            now_fn (Optional[Callable[[], datetime]]): Injectable UTC
-                clock; ``None`` defaults to the system UTC clock.
-
-        Returns:
-            OperationResult: ``output`` echoes ``op_input``, one placeholder
-            note.
-
-        Data Flow:
-            - Delegates to :func:`_placeholder_result`; no I/O, no parsing.
-
-        Dependencies:
-            Uses:
-                - _placeholder_result
-            Used by:
-                - tui.services.operation_service.run_operation
-        """
-        return _placeholder_result(self, op_input, now_fn)
 
 
 class ExtractOperation(Operation):

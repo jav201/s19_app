@@ -9,11 +9,12 @@ Coverage map (TC-010..TC-012):
   no-file guard (LLR-004.2) bails with one status line and pushes no
   screen and invokes no service.
 - LLR-004.2 — ``test_operations_view_executes_via_service`` (TC-011):
-  executing the selected operation presents ``status: placeholder`` plus
-  the exact LLR-002.1 placeholder note; the service seam is observed — a
-  stub injected through the LLR-003.1 ``operation_resolver`` seam is what
-  executes (a view bypassing ``run_operation`` would never reach the
-  stub), with the same loaded snapshot the app passed to the screen.
+  executing the selected ``crc`` operation through the generic (no-config)
+  service path presents ``status: ok`` plus the nothing-to-check note; the
+  service seam is observed — a stub injected through the LLR-003.1
+  ``operation_resolver`` seam is what executes (a view bypassing
+  ``run_operation`` would never reach the stub), with the same loaded
+  snapshot the app passed to the screen.
 - LLR-004.3 — ``test_operations_view_result_hex_render_matches_baseline``
   (TC-012): the live ``#operation_result_hex`` widget text (``.plain``)
   equals a baseline computed INDEPENDENTLY in the test by calling
@@ -142,11 +143,12 @@ def test_operations_view_lists_registry_ids(tmp_path: Path) -> None:
 def test_operations_view_executes_via_service(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Execute shows the placeholder result; the service seam is observed.
+    """Execute shows the crc result; the service seam is observed.
 
-    Intent: LLR-004.2 — phase A executes the real ``crc`` placeholder and
-    the presented text carries ``status: placeholder`` plus the exact
-    LLR-002.1 note. Phase B injects a stub through the LLR-003.1
+    Intent: LLR-004.2 — phase A executes the real ``crc`` operation through
+    the generic no-config service path and the presented text carries
+    ``status: ok`` plus the nothing-to-check note. Phase B injects a stub
+    through the LLR-003.1
     ``operation_resolver`` seam: the stub is what executes (with the same
     snapshot the app handed to the screen), proving the view routes through
     ``run_operation`` and never bypasses the service — a direct
@@ -173,8 +175,8 @@ def test_operations_view_executes_via_service(
             )
 
     status_text = asyncio.run(_drive_real())
-    assert "status: placeholder" in status_text, status_text
-    assert "placeholder: crc not yet implemented" in status_text, status_text
+    assert "status: ok" in status_text, status_text
+    assert "CRC: no config supplied — nothing to check" in status_text, status_text
 
     calls: list[OperationInput] = []
 
@@ -257,10 +259,11 @@ def test_operations_view_result_hex_render_matches_baseline(
     Intent: LLR-004.3 — the baseline is computed INDEPENDENTLY here, on the
     INPUT snapshot's ``mem_map`` (captured before execution), with the
     pinned argument tuple; the compared text is read from the LIVE
-    ``#operation_result_hex`` widget after the modal executed the ``crc``
-    placeholder. For an identity-passthrough result the two must be equal
-    (the end-to-end unchanged-image acceptance demo). Status and note
-    visibility ride along per the TC-012 threshold.
+    ``#operation_result_hex`` widget after the modal executed the real
+    ``crc`` operation with no config. The check path never mutates
+    ``mem_map``, so the two hex texts must be equal (the end-to-end
+    unchanged-image acceptance demo). Status and note visibility ride along
+    per the TC-012 threshold.
     """
     s19_path = _write_s19(tmp_path)
 
@@ -301,8 +304,8 @@ def test_operations_view_result_hex_render_matches_baseline(
         "pinned-args baseline"
     )
     assert "0x00001000" in widget_plain, widget_plain[:80]
-    assert "status: placeholder" in status_text, status_text
-    assert "placeholder: crc not yet implemented" in status_text, status_text
+    assert "status: ok" in status_text, status_text
+    assert "CRC: no config supplied — nothing to check" in status_text, status_text
 
 
 # ---------------------------------------------------------------------------
