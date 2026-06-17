@@ -18,6 +18,14 @@ Coverage map:
   ``test_crc_config_error_surfaces_error_and_no_match``: a parse-error config
   surfaces the error notice and renders NO per-region row and NO "MATCH" — a
   no-config / error run must never read like a passed check.
+- TC-124 / I5b two-stage confirmation —
+  ``test_no_write_without_confirmation``: declining ``ConfirmWriteScreen``
+  writes zero files and shows no emitted path; confirming emits exactly one
+  ``*-crc.s19`` under the work area. Driven through the real button + modal.
+- TC-125 / I5b through-handler (A-5) —
+  ``test_crc_inject_reaches_surface_via_handler``: a confirmed write's emitted
+  path + verify verdict reach the result surface via the handler; non-vacuous
+  (asserts the verdict AND a real file on disk).
 
 Harness: the ``App.run_test()`` pilot idiom of ``tests/test_tui_operations_view.py``
 — ``async def _drive()`` wrapped by ``asyncio.run``, the ``_flush`` pump,
@@ -321,3 +329,136 @@ def test_stale_crc_worker_result_does_not_overwrite_error(tmp_path: Path) -> Non
     assert "MATCH" not in status, status
     assert "region @" not in status, status
     assert hex_text == "", repr(hex_text)
+
+
+# ---------------------------------------------------------------------------
+# I5b write-surface helpers
+# ---------------------------------------------------------------------------
+
+
+def _emitted_s19_files(base_dir: Path) -> list[Path]:
+    """Count surviving emitted ``*-crc.s19`` files under the work area.
+
+    The write path stages a copy under ``.s19tool/workarea/temp/`` and unlinks
+    it in a ``finally``, placing the survivor under ``.s19tool/workarea/crc/``;
+    a declined write writes nothing. This globs the whole work area so a stray
+    staged file would also be caught.
+    """
+    workarea = base_dir / ".s19tool" / "workarea"
+    if not workarea.exists():
+        return []
+    return sorted(workarea.rglob("*-crc.s19"))
+
+
+async def _press_write_and_handle_modal(app, pilot, screen, *, confirm: bool) -> None:
+    """Press Write CRC, then drive the ConfirmWriteScreen confirm/cancel button."""
+    screen.query_one("#operations_write", Button).press()
+    await _flush(pilot)
+    confirm_screen = app.screen
+    button_id = "confirm_write_ok" if confirm else "confirm_write_cancel"
+    confirm_screen.query_one(f"#{button_id}", Button).press()
+    await _flush(pilot)
+    await app.workers.wait_for_complete()
+    await _flush(pilot)
+
+
+# ---------------------------------------------------------------------------
+# TC-124 — no write without confirmation; a confirmed write emits a file
+# ---------------------------------------------------------------------------
+
+
+def test_no_write_without_confirmation(tmp_path: Path) -> None:
+    """Declining the confirm modal writes nothing; confirming emits a file.
+
+    Intent (I5b two-stage confirmation): after a real check enables the
+    ``Write CRC`` button, pressing it opens ``ConfirmWriteScreen``. DECLINING
+    leaves ZERO emitted files under the work area and the surface shows no
+    emitted path / "wrote" line. CONFIRMING (a fresh run) emits exactly one
+    file under the work area and renders the write outcome. Driven through the
+    real button + modal, never a direct ``write_crc_image`` call.
+    """
+
+    async def _drive(*, confirm: bool) -> tuple[int, str]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=False)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+
+            # A real check first — this is what enables the Write CRC button.
+            screen.query_one("#operation_config", TextArea).text = _config_text()
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            assert not screen.query_one("#operations_write", Button).disabled
+
+            await _press_write_and_handle_modal(app, pilot, screen, confirm=confirm)
+            status = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            return len(_emitted_s19_files(app.base_dir)), status
+
+    # DECLINE: nothing written, surface carries no emitted-path / "wrote" line.
+    declined_count, declined_status = asyncio.run(_drive(confirm=False))
+    assert declined_count == 0, declined_status
+    assert "wrote " not in declined_status, declined_status
+    assert "-crc.s19" not in declined_status, declined_status
+
+    # CONFIRM: exactly one file emitted, the write outcome renders.
+    confirmed_count, confirmed_status = asyncio.run(_drive(confirm=True))
+    assert confirmed_count == 1, confirmed_status
+    assert "-crc.s19" in confirmed_status, confirmed_status
+
+
+# ---------------------------------------------------------------------------
+# TC-125 — the confirmed write outcome reaches the surface VIA the handler
+# ---------------------------------------------------------------------------
+
+
+def test_crc_inject_reaches_surface_via_handler(tmp_path: Path) -> None:
+    """A confirmed write's emitted path + verify verdict reach the surface.
+
+    Intent (A-5, through-handler): a real check then a CONFIRMED write routes
+    THROUGH the shipped Write button + ConfirmWriteScreen + worker (not a direct
+    ``write_crc_image`` call); the emitted modified-S19 outcome — the path AND
+    the verify verdict — reaches ``#operation_result_status``. Non-vacuous: the
+    verdict text is asserted AND the emitted file is confirmed on disk.
+    """
+
+    async def _drive() -> tuple[str, list[Path]]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=False)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+
+            screen.query_one("#operation_config", TextArea).text = _config_text()
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+
+            await _press_write_and_handle_modal(app, pilot, screen, confirm=True)
+            status = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            return status, _emitted_s19_files(app.base_dir)
+
+    status, emitted = asyncio.run(_drive())
+    # The emitted path + the verified verdict reached the surface.
+    assert "wrote " in status, status
+    assert "verified" in status, status
+    assert OperationsScreen.WRITE_FAILED_TEXT not in status, status
+    assert OperationsScreen.VERIFY_MISMATCH_TEXT not in status, status
+    # F1 (review): the fixture's stored value MISMATCHED before the write, so a
+    # check-oriented per-region row would print a stale "MISMATCH" beside the
+    # "(verified)" write. The write surface must instead describe what was
+    # WRITTEN — a "(4 LE bytes)" row — and carry no stale MISMATCH.
+    assert "(4 LE bytes)" in status, status
+    assert "MISMATCH" not in status, status
+    # Non-vacuous: a real file exists on disk under the work area.
+    assert len(emitted) == 1, emitted
+    assert emitted[0].read_text(encoding="utf-8").strip(), "emitted S19 is empty"

@@ -21,8 +21,10 @@ from textual.widgets import (
     TextArea,
 )
 
+from .changes.verify import STATUS_VERIFIED
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .models import LoadedFile
+from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
 from .operations.crc_config import DUMMY_CONFIG_TEXT, parse_crc_config
 from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
@@ -497,6 +499,65 @@ class ReportViewerScreen(ModalScreen[None]):
             self.dismiss(None)
 
 
+class ConfirmWriteScreen(ModalScreen[bool]):
+    """Two-stage write confirmation modal for the CRC inject path (I5b).
+
+    Summary:
+        A minimal Confirm / Cancel modal shown before the CRC write actually
+        emits a modified S19 into the work area (the second stage of the
+        two-stage confirmation — the first stage is the operator pressing the
+        ``Write CRC`` button, which only becomes enabled after a real check
+        ran). It dismisses with ``True`` only when ``Confirm`` is pressed;
+        ``Cancel`` (or any other dismissal) yields ``False`` so the caller
+        performs NO write. Styling reuses the shared Calm Dark
+        ``.modal-dialog`` token classes from ``styles.tcss``.
+
+    Args:
+        None: the message text is a fixed class constant.
+
+    Returns:
+        bool: ``True`` on confirm, ``False`` on cancel.
+
+    Data Flow:
+        - Pushed by :meth:`OperationsScreen._on_write_pressed` with a callback;
+          the callback dispatches the write worker only on ``True``.
+
+    Dependencies:
+        Used by:
+            - s19_app.tui.screens.OperationsScreen._on_write_pressed
+            - tests/test_tui_crc_surface.py (TC-124, TC-125)
+
+    Example:
+        >>> screen = ConfirmWriteScreen()  # doctest: +SKIP
+    """
+
+    CONFIRM_TEXT = (
+        "Write the computed CRC(s) into a new modified S19 under the work area?"
+    )
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label(self.CONFIRM_TEXT, classes="modal-title"),
+            Container(
+                Button("Confirm", id="confirm_write_ok", classes="modal-confirm"),
+                Button("Cancel", id="confirm_write_cancel"),
+                id="confirm_write_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "confirm_write_ok":
+            logger.info("ConfirmWriteScreen confirmed.")
+            self.dismiss(True)
+            return
+        if event.button.id == "confirm_write_cancel":
+            logger.info("ConfirmWriteScreen cancelled.")
+            self.dismiss(False)
+
+
 class OperationsScreen(ModalScreen[None]):
     """Operations modal: select a registered operation, execute, view result.
 
@@ -562,6 +623,14 @@ class OperationsScreen(ModalScreen[None]):
     #: or empty editor must NOT read like a passed check.
     NO_CONFIG_TEXT = "CRC config error - no check was run:"
 
+    #: Status prefix for the write path when the re-read image drifts from the
+    #: injected one (F-L1): a mismatch must NOT read like a clean write.
+    VERIFY_MISMATCH_TEXT = "VERIFY MISMATCH - the written image did not verify:"
+
+    #: Status prefix when no file was written (containment / emit / write
+    #: fault, F-L1): a failure must NOT read like a clean write.
+    WRITE_FAILED_TEXT = "WRITE FAILED - no file was written:"
+
     def __init__(self, options: List[Tuple[str, str]], loaded: LoadedFile) -> None:
         super().__init__()
         self.options = options
@@ -574,6 +643,16 @@ class OperationsScreen(ModalScreen[None]):
         #: overwrite the current surface — cancellation alone cannot, since the
         #: running thread still reaches ``call_from_thread``.
         self._crc_dispatch_token = 0
+        #: Independent dispatch token for the CRC WRITE path (I5b), mirroring
+        #: ``_crc_dispatch_token``. Bumped on every write dispatch AND on the
+        #: decline / config-error write paths so a stale write worker (one a
+        #: later decline or re-check superseded) cannot repaint the surface
+        #: after it lands via ``call_from_thread``.
+        self._crc_write_token = 0
+        #: The last check result's per-region payload, captured by
+        #: :meth:`_present_result`. Non-``None`` only after a real check ran
+        #: (config-supplied, no parse error); gates the ``Write CRC`` button.
+        self._last_crc_regions: Optional[List[CrcRegionResult]] = None
 
     def compose(self) -> ComposeResult:
         yield Container(
@@ -594,6 +673,7 @@ class OperationsScreen(ModalScreen[None]):
             ),
             Container(
                 Button("Execute", id="operations_execute", classes="modal-confirm"),
+                Button("Write CRC", id="operations_write", disabled=True),
                 Button("Close", id="operations_close"),
                 id="operations_buttons",
                 classes="modal-buttons",
@@ -683,6 +763,13 @@ class OperationsScreen(ModalScreen[None]):
         is_crc = self._selected_operation_id() == self.CRC_OPERATION_ID
         self.query_one("#operation_config_label", Label).display = is_crc
         self.query_one("#operation_config", TextArea).display = is_crc
+        # The Write CRC button is meaningful only for the CRC op, and only
+        # after a real check landed regions. Hide it entirely off the CRC row;
+        # on the CRC row it stays disabled until a check enables it.
+        write_button = self.query_one("#operations_write", Button)
+        write_button.display = is_crc
+        if not is_crc:
+            write_button.disabled = True
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "operations_close":
@@ -691,6 +778,9 @@ class OperationsScreen(ModalScreen[None]):
             return
         if event.button.id == "operations_execute":
             self._execute_selected()
+            return
+        if event.button.id == "operations_write":
+            self._on_write_pressed()
 
     def _execute_selected(self) -> None:
         """
@@ -762,7 +852,11 @@ class OperationsScreen(ModalScreen[None]):
                 # run could complete after the error paint and overwrite it with
                 # a stale "status: ok" + MATCH surface.
                 self._crc_dispatch_token += 1
+                self._crc_write_token += 1
                 self.workers.cancel_group(self, "crc_operation")
+                self.workers.cancel_group(self, "crc_write")
+                self._last_crc_regions = None
+                self.query_one("#operations_write", Button).disabled = True
                 logger.info("OperationsScreen CRC config error: %s", issues)
                 self.query_one("#operation_result_status", Static).update(
                     "\n".join([self.NO_CONFIG_TEXT, *issues])
@@ -901,6 +995,17 @@ class OperationsScreen(ModalScreen[None]):
             max_rows=MAX_HEX_ROWS,
         )
         self.query_one("#operation_result_hex", Static).update(rendered)
+        # Enable the Write CRC button ONLY after a real check landed regions
+        # (config supplied, no parse error). A non-CRC op or no-config run
+        # carries ``crc_regions is None`` and leaves the button disabled, so
+        # the write path is unreachable without a prior check (F-L1 / two-stage
+        # confirmation stage 1).
+        if result.crc_regions is not None:
+            self._last_crc_regions = result.crc_regions
+            self.query_one("#operations_write", Button).disabled = False
+        else:
+            self._last_crc_regions = None
+            self.query_one("#operations_write", Button).disabled = True
 
     @staticmethod
     def _crc_region_lines(
@@ -952,3 +1057,237 @@ class OperationsScreen(ModalScreen[None]):
                 f"stored {stored} -> {verdict}"
             )
         return lines
+
+    def _on_write_pressed(self) -> None:
+        """
+        Summary:
+            Begin the two-stage CRC write (I5b): push :class:`ConfirmWriteScreen`
+            with a callback. The button is only enabled after a real check ran
+            (stage 1), so reaching here implies a prior check; the modal is
+            stage 2. The callback performs the write ONLY on an explicit
+            ``True`` confirmation — ``False`` / ``None`` make no
+            :func:`write_crc_image` call and leave the surface unchanged.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``push_screen(ConfirmWriteScreen(), self._on_confirm_write)`` (the
+              app's ``push_screen(Screen, callback)`` idiom, never
+              ``push_screen_wait``); the callback re-parses the config and
+              dispatches the write worker on confirm.
+
+        Dependencies:
+            Uses:
+                - ConfirmWriteScreen / _on_confirm_write
+            Used by:
+                - on_button_pressed (Write CRC button)
+        """
+        logger.info("OperationsScreen Write CRC pressed - confirming.")
+        self.app.push_screen(ConfirmWriteScreen(), self._on_confirm_write)
+
+    def _on_confirm_write(self, confirmed: Optional[bool]) -> None:
+        """
+        Summary:
+            Handle the :class:`ConfirmWriteScreen` outcome (I5b stage 2). On a
+            declined / dismissed modal (``False`` / ``None``) NOTHING is written
+            and the surface is unchanged. On ``True`` the config ``TextArea`` is
+            RE-PARSED (honoring any edits made between check and write); a parse
+            error surfaces the config error and writes nothing (F-L1), while a
+            clean parse dispatches the off-thread write worker under a fresh
+            write token.
+
+        Args:
+            confirmed (Optional[bool]): The modal result — ``True`` confirm,
+                ``False`` cancel, ``None`` dismissed.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``confirmed is not True`` → no write, return.
+            - Else :func:`parse_crc_config` on the editor text; issues →
+              bump tokens, cancel groups, paint the config error, disable Write,
+              no write. Clean parse → bump :attr:`_crc_write_token` and dispatch
+              :meth:`_run_crc_write_worker`.
+
+        Dependencies:
+            Uses:
+                - parse_crc_config / _run_crc_write_worker / OperationInput
+            Used by:
+                - _on_write_pressed (modal callback)
+        """
+        if confirmed is not True:
+            logger.info("OperationsScreen write declined - no file written.")
+            return
+        config, issues = parse_crc_config(
+            self.query_one("#operation_config", TextArea).text
+        )
+        if issues or config is None:
+            # F-L1: an edit between check and write that broke the config must
+            # not silently write a stale CRC — surface the error and write
+            # nothing, mirroring the check-path config-error branch.
+            self._crc_dispatch_token += 1
+            self._crc_write_token += 1
+            self.workers.cancel_group(self, "crc_operation")
+            self.workers.cancel_group(self, "crc_write")
+            self._last_crc_regions = None
+            self.query_one("#operations_write", Button).disabled = True
+            logger.info("OperationsScreen write config error: %s", issues)
+            self.query_one("#operation_result_status", Static).update(
+                "\n".join([self.NO_CONFIG_TEXT, *issues])
+            )
+            self.query_one("#operation_result_hex", Static).update("")
+            return
+        op_input = OperationInput.from_loaded(self.loaded)
+        self._crc_write_token += 1
+        self._run_crc_write_worker(op_input, config, self._crc_write_token)
+
+    @work(thread=True, exclusive=True, group="crc_write")
+    def _run_crc_write_worker(
+        self,
+        op_input: OperationInput,
+        config: "CrcConfig",
+        token: int,
+    ) -> None:
+        """
+        Summary:
+            Off-thread CRC write worker (I5b): run :func:`write_crc_image`
+            against the work area on a Textual thread-worker — never the UI
+            thread — and marshal the :class:`CrcWriteResult` back to the UI
+            thread via ``call_from_thread`` so the write outcome renders on the
+            main thread (the ``_run_crc_worker`` precedent).
+
+        Args:
+            op_input (OperationInput): The neutral input built from
+                ``self.loaded``; only ``mem_map`` / ``ranges`` are read.
+            config (CrcConfig): The parsed config re-validated at confirm time.
+            token (int): The write dispatch token captured at confirm.
+                :meth:`_present_write_result` lands this result only if the
+                token still matches ``self._crc_write_token`` — a superseded
+                run (a later decline / config error) carries a stale token and
+                is dropped.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``write_crc_image(op_input, config, workarea_base=self.app.base_dir)``
+              runs on the worker thread; the :class:`CrcWriteResult` is handed
+              to :meth:`_present_write_result` on the UI thread via
+              ``call_from_thread`` with ``token``. A worker-side crash surfaces
+              as one status line, never an unhandled worker exception.
+
+        Dependencies:
+            Uses:
+                - write_crc_image / call_from_thread / _present_write_result
+            Used by:
+                - _on_confirm_write (confirmed write path)
+        """
+        try:
+            result = write_crc_image(
+                op_input, config, workarea_base=self.app.base_dir
+            )
+        except Exception as exc:  # noqa: BLE001 - surfaced, never swallowed
+            logger.exception("CRC write worker failed: %s", exc)
+            self.app.call_from_thread(
+                self.app.set_status,
+                f"CRC write failed: {type(exc).__name__}: {exc}",
+            )
+            return
+        self.app.call_from_thread(self._present_write_result, result, token)
+
+    def _present_write_result(
+        self, result: CrcWriteResult, token: int
+    ) -> None:
+        """
+        Summary:
+            Render a :class:`CrcWriteResult` into the result surface (I5b),
+            distinguishing the three outcomes so none of them reads as a clean
+            pass (F-L1): a clean ``verified`` write shows the emitted path +
+            verdict and the written regions; a ``mismatch`` prepends a clear
+            ``VERIFY MISMATCH`` line; a no-file write (``written_path is None``
+            or findings present) prepends ``WRITE FAILED`` and the finding.
+            Runs on the UI thread; a stale-token result is dropped first.
+
+        Args:
+            result (CrcWriteResult): The headless write outcome.
+            token (int): The worker's captured write token; the result is
+                dropped unless it still matches ``self._crc_write_token`` so a
+                superseded write worker cannot repaint the surface.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Token-stale results are dropped before any widget write.
+            - Build the status prefix from the outcome (failed / mismatch /
+              verified), append a path note and the written per-region rows,
+              and render the injected ``mem_map`` hex via the pinned
+              ``render_hex_view_text`` tuple.
+
+        Dependencies:
+            Uses:
+                - _crc_region_lines / render_hex_view_text / MAX_HEX_ROWS
+            Used by:
+                - _run_crc_write_worker (via call_from_thread)
+        """
+        if token != self._crc_write_token:
+            logger.info(
+                "OperationsScreen dropping stale CRC write result "
+                "(token %s != %s)",
+                token,
+                self._crc_write_token,
+            )
+            return
+
+        status_lines: List[str] = ["status: ok"]
+        write_failed = result.written_path is None or bool(result.findings)
+        if write_failed:
+            status_lines = [self.WRITE_FAILED_TEXT, *result.findings]
+        elif result.verify_status != STATUS_VERIFIED:
+            status_lines = [
+                self.VERIFY_MISMATCH_TEXT,
+                f"wrote {result.written_path} but it did not verify "
+                f"(verify status: {result.verify_status})",
+            ]
+        else:
+            status_lines.append(f"wrote {result.written_path} (verified)")
+        # F1: on a WRITE FAILED the pre-write CHECK verdict (MATCH/MISMATCH) is
+        # the last meaningful per-region state. On a written result the per-region
+        # `matched`/`stored_value` are the now-STALE pre-write check values
+        # (`inject_crcs` only flips `written=True`), so rendering them as
+        # MATCH/MISMATCH would print a stale "MISMATCH" beside a "(verified)"
+        # write — instead describe what was WRITTEN.
+        if write_failed:
+            status_lines.extend(self._crc_region_lines(result.crc_regions))
+        else:
+            status_lines.extend(
+                f"region @ 0x{region.output_address:08X}: wrote "
+                f"0x{region.computed_crc:08X} (4 LE bytes)"
+                for region in result.crc_regions
+            )
+        self.query_one("#operation_result_status", Static).update(
+            "\n".join(status_lines)
+        )
+
+        if result.written_path is None:
+            # No file written: leave the prior check's hex render in place
+            # rather than rendering a misleading "written" image.
+            return
+        # Render the injected image (the bytes actually written) so the hex
+        # surface reflects the write outcome, not the pre-inject check image.
+        op_input = OperationInput.from_loaded(self.loaded)
+        injected_mem, _ranges, _written = inject_crcs(op_input, result.crc_regions)
+        rendered = render_hex_view_text(
+            injected_mem,
+            focus_address=None,
+            row_bases=None,
+            highlight=None,
+            mac_highlight_addresses=None,
+            max_rows=MAX_HEX_ROWS,
+        )
+        self.query_one("#operation_result_hex", Static).update(rendered)

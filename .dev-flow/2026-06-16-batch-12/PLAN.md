@@ -6,9 +6,9 @@
 
 ## 0. Where we are RIGHT NOW
 
-**Phase 3 (Implementation), increment I5a (inject + emit + verify, headless) — AWAITING YOUR GATE.** I5 split into I5a (headless write mechanics) + I5b (TUI confirm) — the headless-then-TUI pattern.
-- ✅ I1a · I1b · I2 · I3a · I3b committed. **I4 WITHDRAWN** (§6.4 J-3). ✅ I5a implemented + reviewed by **code-reviewer (OK, 0 HIGH) AND security-reviewer (CLEAN — the mandatory write-path sign-off)**; the 1 LOW security finding (F-S-06) folded. ⏳ I5a needs your `approve` to commit and move to I5b.
-- Suite: **877 collected / 824 lean-pass / 0 failures**. KAT green. The CRC **write** mechanics (inject 4-LE + emit modified S19 into the contained work area + reader-as-oracle verify) work headlessly; I5b adds the two-stage operator confirmation + TUI render.
+**Phase 3 (Implementation) — COMPLETE pending the I5b gate.** I5b (the last increment) implemented + reviewed.
+- ✅ I1a · I1b · I2 · I3a · I3b · I5a committed. **I4 WITHDRAWN** (§6.4 J-3). ✅ I5b (TUI two-stage confirm + write surface) implemented + reviewed (code-reviewer OK, 0 HIGH; 1 MEDIUM F1 fixed — no stale MISMATCH on a verified write). ⏳ I5b needs your `approve` to commit; then **Phase 3 closes → Phase 4 (validation)**.
+- Suite: **879 collected / 826 lean-pass / 0 failures**. KAT green. **The full CRC feature now works end-to-end in the TUI:** edit config → check (per-region MATCH/MISMATCH) → "Write CRC" → confirm → inject + emit modified S19 (contained) + verify → write-outcome rows. No write without confirmation (mutation-tested).
 
 ---
 
@@ -35,7 +35,7 @@ Add a **CRC32 operation** to s19tool: compute a CRC32 over configured memory reg
 | **I3b** | TUI surface | config TextArea (dummy pre-fill) + per-region rows + worker-thread (R-6); F-L1 honored; stale-worker race fixed | LLR-004.2, LLR-002.3/.4 | ✅ **committed** (4312dcd) |
 | ~~**I4**~~ | ~~Persistent report~~ | **WITHDRAWN (§6.4 J-3):** `report_service` is project/variant-scoped; CRC is per-file. The CRC persistent record = the operation's emitted S19 + `OperationResult` (folded into I5). | ~~LLR-002.5/003.5~~ | ❌ **withdrawn** |
 | **I5a** | Inject + emit + verify (headless) | 4-byte LE inject (extend on gap, sorted/merged) + `emit_s19_from_mem_map` into the contained work area (`copy_into_workarea` seam) + reader-as-oracle verify + `CrcWriteResult` carrier | LLR-003.1/.2/.3 + re-scoped LLR-003.5 (record) | ✅ **reviewed (code OK + security CLEAN), awaiting gate** |
-| **I5b** | TUI confirm + write surface | two-stage operator confirmation (R-6) + worker + assemble `OperationResult` + render write outcome | LLR-003.4 + LLR-003.5 (surface) | ▶️ **next (LAST)** |
+| **I5b** | TUI confirm + write surface | two-stage operator confirmation (R-6) + write worker (token-guarded) + assemble `OperationResult` + render write outcome (F-L1: verified/mismatch/failed) | LLR-003.4 + LLR-003.5 (surface) | ✅ **reviewed (1 MEDIUM fixed), awaiting gate — LAST** |
 
 **Dependency order:** I1a → I1b → I2 → I3a → I3b → I5a → I5b (I4 withdrawn). **7 increments.** No increment depends on a later one. (I5 split into I5a/I5b at the I5 kickoff — headless write mechanics then the confirm surface.)
 
@@ -90,6 +90,7 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | After I3a | 862 | 809 | +2 (execute no-config / with-config); review CLEAN |
 | After I3b | 871 | 818 | +9 (5 parse + 3 pilot + 1 race regression); 1 MEDIUM fixed |
 | After I5a | 877 | 824 | +6 (inject/emit/verify/no-write/result/containment); security CLEAN, F-S-06 folded |
+| After I5b | 879 | 826 | +2 (TC-124 confirm-gate / TC-125 through-handler); 1 MEDIUM F1 fixed. **Phase 3 done.** |
 
 - Frozen-engine guards: **green** at every step (CRC lives in new files; `range_index`/`core` reuse import-only). A-4 census stress-test: **CLEAR**.
 - KAT TC-101: **green**.
@@ -110,7 +111,8 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | 2026-06-16 | 3 / I3a | CrcOperation real (Path A, 7 files), reviewed CLEAN, **approved + committed** (7658d4e) |
 | 2026-06-16 | 3 / I3b | TUI surface (config editor + worker + rows), reviewed (1 MEDIUM race fixed, 0 HIGH), **approved + committed** (4312dcd) |
 | 2026-06-16 | 3 / J-3 | **Re-scope: I4 withdrawn** — CRC persistent record = operation's emitted S19 + `OperationResult` (not the project/variant report). Folded into I5. |
-| 2026-06-16 | 3 / I5a | inject + emit + verify (headless write mechanics); **code-reviewer OK + security-reviewer CLEAN** (mandatory write-path sign-off), F-S-06 folded, **awaiting gate** |
+| 2026-06-16 | 3 / I5a | inject + emit + verify (headless write mechanics); **code-reviewer OK + security-reviewer CLEAN** (mandatory write-path sign-off), F-S-06 folded, **approved + committed** (d67ff48) |
+| 2026-06-16 | 3 / I5b | TUI two-stage confirm + write surface; code-reviewer OK (1 MEDIUM F1 fixed); no-write-without-confirm mutation-tested; **awaiting gate — Phase 3 closes on approval** |
 
 Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
@@ -118,4 +120,4 @@ Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
 ## 8. What's next
 
-You approve I5a → I commit it → **I5b (the last increment):** the TUI two-stage confirmation (after a check, the operator confirms → the write runs on a worker) + assemble `CrcWriteResult` into the `OperationResult` + render the write outcome rows. (The write mechanics + their security sign-off are already done in I5a.) After I5b: **Phase 4 (validation) → Phase 5 (post-mortem) → Phase 6 (docs)**, then close commit + PR + review + CI + merge + `/dev-flow-sync`.
+You approve I5b → I commit it → **Phase 3 is COMPLETE** (7 increments). Then **Phase 4 — Validation:** qa-reviewer runs the per-requirement pass/fail matrix, reconciles the Phase-3 TC ids into §5.2 (V-5), fills the surface-reachability matrix, and the full suite (incl. slow) is measured once. Then **Phase 5 (post-mortem) → Phase 6 (docs/traceability/exec-summary) → close** (commit + PR + review + CI + merge + `/dev-flow-sync`).
