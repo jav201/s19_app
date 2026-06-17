@@ -6,11 +6,11 @@
 
 ## 0. Where we are RIGHT NOW
 
-**Phase 4 (Validation) — COMPLETE, AWAITING YOUR GATE.** Verdict **PASS-WITH-NOTES** (0 FAIL / 0 blockers).
-- ✅ Phase 3 done & committed (7 increments through 43a2b0f). ✅ Phase 4: qa-reviewer wrote [`04-validation.md`](04-validation.md); orchestrator ran the full suite once.
-- **Full suite: 847 passed / 0 failed / 29 skipped / 3 xfailed (exit 0).** Lean 826. Signed-balance **879 = 839 + 40** (EXACT). KAT gating green; frozen-set CLEAR.
-- 5/5 HLR + 12/12 in-scope LLR PASS; LLR-002.5 WITHDRAWN (J-3). TC reconciliation clean (0 orphans). Surface-reachability CLEAR (all 8 US dimensions through the shipped handler — SCOPE-1 does not recur).
-- ⏳ Phase 4 needs your `approve` → Phase 5 (post-mortem).
+**Phase 5 (Post-mortem) — COMPLETE, AWAITING YOUR GATE.**
+- ✅ Phases 0-4 done & committed (Phase 4 = 272b4a7). ✅ Phase 5: [`05-postmortem.md`](05-postmortem.md) co-authored (architect process + qa-reviewer test-strategy retrospective).
+- **Headline:** closed clean with one in-flight re-scope (J-3); the A-4 census stress-test HELD under a real adversary, the KAT anchor caught a real bug, and the A-5 surface-reachability control prevented a SCOPE-1 recurrence. 0 code defects.
+- **2 new controls proposed:** (a) extend the symbol-citation rule to **consumer input contracts** (would have caught J-3 at Phase 1); (b) Phase-1 **facade/test blast-radius** budgeting. **7 next-batch items** (A-3 save-flow carry, RK-3 device vector, CLI `ops`, CI trigger gap, codify reader-as-oracle, …).
+- ⏳ Phase 5 needs your `approve` → **Phase 6 (documentation)** — the last phase before close.
 
 ---
 
@@ -116,7 +116,8 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | 2026-06-16 | 3 / J-3 | **Re-scope: I4 withdrawn** — CRC persistent record = operation's emitted S19 + `OperationResult` (not the project/variant report). Folded into I5. |
 | 2026-06-16 | 3 / I5a | inject + emit + verify (headless write mechanics); **code-reviewer OK + security-reviewer CLEAN** (mandatory write-path sign-off), F-S-06 folded, **approved + committed** (d67ff48) |
 | 2026-06-16 | 3 / I5b | TUI two-stage confirm + write surface; code-reviewer OK (1 MEDIUM F1 fixed); no-write-without-confirm mutation-tested; **approved + committed** (43a2b0f) — **Phase 3 complete** |
-| 2026-06-17 | 4 | Validation **PASS-WITH-NOTES** (0 FAIL): 5 HLR/12 LLR PASS, full suite 847/0, surface-reachability CLEAR, 10/10 inspections; **awaiting gate** |
+| 2026-06-17 | 4 | Validation **PASS-WITH-NOTES** (0 FAIL): 5 HLR/12 LLR PASS, full suite 847/0, surface-reachability CLEAR; **approved + committed** (272b4a7) |
+| 2026-06-17 | 5 | Post-mortem (architect + qa): A-4/A-5/KAT controls HELD; J-3 root cause = "named-but-not-read"; 2 new controls + 7 next-batch items; **awaiting gate** |
 
 Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
@@ -124,4 +125,4 @@ Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
 ## 8. What's next
 
-You approve I5b → I commit it → **Phase 3 is COMPLETE** (7 increments). Then **Phase 4 — Validation:** qa-reviewer runs the per-requirement pass/fail matrix, reconciles the Phase-3 TC ids into §5.2 (V-5), fills the surface-reachability matrix, and the full suite (incl. slow) is measured once. Then **Phase 5 (post-mortem) → Phase 6 (docs/traceability/exec-summary) → close** (commit + PR + review + CI + merge + `/dev-flow-sync`).
+You approve Phase 5 → **Phase 6 (Documentation)** — the last phase: docs-writer updates `REQUIREMENTS.md` (new `R-CRC-*` rows + the `REQ-crc.md` back-reference that was deferred), writes the `06-docs/` traceability matrix + functionality walkthrough + a Mermaid flow diagram, and presentation-builder writes the executive summary. Then **close**: commit + push + PR + review + CI + merge + `/dev-flow-sync` to the Obsidian vault.
