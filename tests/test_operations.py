@@ -37,6 +37,14 @@ anywhere:
   ``operation_id``, non-empty ``title`` and ``describe()`` per placeholder;
   a subclass omitting ``execute`` is rejected by the ABC machinery
   (``TypeError`` on instantiation).
+- **TC-108** — ``test_operation_input_exposes_mem_map_ranges_metadata``
+  (LLR-005.1): ``OperationInput.from_loaded(loaded)`` exposes ``mem_map``,
+  ``ranges``, and the three metadata fields mapped cleanly from the
+  ``LoadedFile``.
+- **TC-109** — ``test_operation_result_widened_field_count_and_status_domain``
+  (LLR-005.2): ``OperationResult`` is the 7 original fields + ``crc_regions``;
+  ``STATUS_DOMAIN`` is unchanged; ``to_dict`` round-trips deterministically
+  and serializes ``crc_regions`` when set.
 
 Every fixture is public (``examples/case_00_public/``) or synthetic
 in-test.
@@ -45,6 +53,7 @@ in-test.
 from __future__ import annotations
 
 import copy
+import dataclasses
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -61,6 +70,11 @@ from s19_app.tui.operations import (
     SplitBySegmentOperation,
     get_operation,
     list_operation_ids,
+)
+from s19_app.tui.operations.model import (
+    STATUS_DOMAIN,
+    CrcRegionResult,
+    OperationInput,
 )
 from s19_app.tui.services import operation_service
 from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
@@ -104,15 +118,22 @@ def _load_hex_snapshot(tmp_path: Path) -> LoadedFile:
 
 
 def _assert_identity_passthrough(loaded: LoadedFile) -> None:
-    """The shared TC-002/TC-003 assertion set: 15 assertions, 0 mutations."""
+    """The shared TC-002/TC-003 assertion set: echo + 0 mutations.
+
+    After the I1a neutral-input migration ``execute`` receives an
+    ``OperationInput`` (not the ``LoadedFile``), so the echo is value-equality
+    on ``mem_map`` / ``ranges`` — not object identity — while the input
+    snapshot must still be byte-for-byte unchanged (the no-mutation contract).
+    """
     for operation_cls in ALL_PLACEHOLDERS:
         mem_map_before = copy.deepcopy(loaded.mem_map)
         ranges_before = copy.deepcopy(loaded.ranges)
         errors_before = copy.deepcopy(loaded.errors)
 
-        result = operation_cls().execute(loaded)
+        result = operation_cls().execute(OperationInput.from_loaded(loaded))
 
-        assert result.output is loaded
+        assert result.output.mem_map == loaded.mem_map
+        assert result.output.ranges == loaded.ranges
         assert result.status == "placeholder"
         assert loaded.mem_map == mem_map_before
         assert loaded.ranges == ranges_before
@@ -122,8 +143,9 @@ def _assert_identity_passthrough(loaded: LoadedFile) -> None:
 def test_operation_result_schema(tmp_path):
     """TC-001 / LLR-001.2 — canonical schema, determinism, domain, disclosure."""
     loaded = _load_hex_snapshot(tmp_path)
+    op_input = OperationInput.from_loaded(loaded)
 
-    serialized = CrcOperation().execute(loaded, now_fn=_fixed_clock).to_dict()
+    serialized = CrcOperation().execute(op_input, now_fn=_fixed_clock).to_dict()
     assert "operation_id" in serialized
     assert "status" in serialized
     assert "input_path" in serialized
@@ -132,7 +154,7 @@ def test_operation_result_schema(tmp_path):
     assert "notes" in serialized
     assert "timestamp_utc" in serialized
 
-    second = CrcOperation().execute(loaded, now_fn=_fixed_clock).to_dict()
+    second = CrcOperation().execute(op_input, now_fn=_fixed_clock).to_dict()
     assert serialized == second
 
     with pytest.raises(ValueError):
@@ -172,9 +194,10 @@ def test_placeholders_registered(tmp_path):
         "extract": ExtractOperation,
         "split_by_segment": SplitBySegmentOperation,
     }
+    op_input = OperationInput.from_loaded(loaded)
     for operation_id, operation_cls in expected.items():
         assert type(get_operation(operation_id)) is operation_cls
-        result = get_operation(operation_id).execute(loaded)
+        result = get_operation(operation_id).execute(op_input)
         assert result.notes == [
             f"placeholder: {operation_id} not yet implemented"
         ]
@@ -219,13 +242,13 @@ def test_run_operation_service(tmp_path, monkeypatch):
         def describe(self) -> str:
             return "seam-substitution stub"
 
-        def execute(self, loaded, *, now_fn=None):
+        def execute(self, op_input, *, now_fn=None):
             self.seen_now_fn = now_fn
             return OperationResult(
                 operation_id=self.operation_id,
                 status="ok",
-                input_path=loaded.path,
-                variant_id=loaded.variant_id,
+                input_path=op_input.input_path,
+                variant_id=op_input.variant_id,
                 output=loaded,
                 notes=["stub executed"],
                 timestamp_utc=_fixed_clock().isoformat(),
@@ -262,3 +285,85 @@ def test_operation_interface():
 
     with pytest.raises(TypeError):
         _MissingExecute()
+
+
+def test_operation_input_exposes_mem_map_ranges_metadata():
+    """TC-108 / LLR-005.1 — neutral ``OperationInput.from_loaded`` exposes
+    ``mem_map`` + ``ranges`` + the 3 metadata fields, mapped from the
+    ``LoadedFile``."""
+    loaded = _load_s19_snapshot()
+    op_input = OperationInput.from_loaded(loaded)
+
+    assert op_input.mem_map == loaded.mem_map
+    assert op_input.ranges == loaded.ranges
+    assert op_input.input_path == loaded.path
+    assert op_input.variant_id == loaded.variant_id
+    assert op_input.file_type == loaded.file_type
+
+
+def test_operation_result_widened_field_count_and_status_domain(tmp_path):
+    """TC-109 / LLR-005.2 — ``OperationResult`` = 7 original fields +
+    ``crc_regions``; ``STATUS_DOMAIN`` unchanged; ``to_dict`` round-trips
+    deterministically and serializes ``crc_regions`` when set."""
+    field_names = {f.name for f in dataclasses.fields(OperationResult)}
+    assert field_names == {
+        "operation_id",
+        "status",
+        "input_path",
+        "variant_id",
+        "output",
+        "notes",
+        "timestamp_utc",
+        "crc_regions",
+    }
+    assert len(field_names) == 8
+
+    assert STATUS_DOMAIN == frozenset({"placeholder", "ok", "error"})
+
+    loaded = _load_hex_snapshot(tmp_path)
+    regions = [
+        CrcRegionResult(
+            output_address=0x100,
+            computed_crc=0xDEADBEEF,
+            stored_value=0xDEADBEEF,
+            matched=True,
+            written=False,
+        )
+    ]
+    result = OperationResult(
+        operation_id="crc",
+        status="ok",
+        input_path=loaded.path,
+        variant_id=None,
+        output=loaded,
+        notes=[],
+        timestamp_utc=_fixed_clock().isoformat(),
+        crc_regions=regions,
+    )
+
+    serialized = result.to_dict()
+    assert serialized == result.to_dict()
+    assert serialized["crc_regions"] == [
+        {
+            "output_address": 0x100,
+            "computed_crc": 0xDEADBEEF,
+            "stored_value": 0xDEADBEEF,
+            "matched": True,
+            "written": False,
+        }
+    ]
+
+    no_regions = OperationResult(
+        operation_id="crc",
+        status="placeholder",
+        input_path=loaded.path,
+        variant_id=None,
+        output=loaded,
+        notes=[],
+        timestamp_utc=_fixed_clock().isoformat(),
+    )
+    assert no_regions.crc_regions is None
+    assert no_regions.to_dict()["crc_regions"] is None
+    # F2: the None branch must serialize deterministically too (symmetry with
+    # the populated branch above).
+    assert no_regions.to_dict() == no_regions.to_dict()

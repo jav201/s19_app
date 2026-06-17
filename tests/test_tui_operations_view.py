@@ -41,6 +41,7 @@ from s19_app.tui.app import S19TuiApp
 from s19_app.tui.hexview import MAX_HEX_ROWS, render_hex_view_text
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.operations import OperationResult
+from s19_app.tui.operations.model import OperationInput
 from s19_app.tui.screens import OperationsScreen
 
 # Minimal valid S19 image (checksum verified against s19_app.core.S19File):
@@ -175,7 +176,7 @@ def test_operations_view_executes_via_service(
     assert "status: placeholder" in status_text, status_text
     assert "placeholder: crc not yet implemented" in status_text, status_text
 
-    calls: list[LoadedFile] = []
+    calls: list[OperationInput] = []
 
     class _StubOperation:
         operation_id = "crc"
@@ -184,14 +185,26 @@ def test_operations_view_executes_via_service(
         def describe(self) -> str:
             return "stub"
 
-        def execute(self, loaded: LoadedFile, *, now_fn=None) -> OperationResult:
-            calls.append(loaded)
+        def execute(self, op_input: OperationInput, *, now_fn=None) -> OperationResult:
+            calls.append(op_input)
+            output = LoadedFile(
+                path=op_input.input_path,
+                file_type=op_input.file_type,
+                mem_map=op_input.mem_map,
+                row_bases=[],
+                ranges=op_input.ranges,
+                range_validity=[],
+                errors=[],
+                a2l_path=None,
+                a2l_data=None,
+                variant_id=op_input.variant_id,
+            )
             return OperationResult(
                 operation_id="crc",
                 status="placeholder",
-                input_path=loaded.path,
-                variant_id=loaded.variant_id,
-                output=loaded,
+                input_path=op_input.input_path,
+                variant_id=op_input.variant_id,
+                output=output,
                 notes=["stub note: seam substitution observed"],
                 timestamp_utc="2026-06-11T00:00:00+00:00",
             )
@@ -218,7 +231,11 @@ def test_operations_view_executes_via_service(
             stub_text = str(
                 screen.query_one("#operation_result_status", Static).content
             )
-            same_snapshot = bool(calls) and calls[0] is app.current_file
+            same_snapshot = (
+                bool(calls)
+                and app.current_file is not None
+                and calls[0].mem_map is app.current_file.mem_map
+            )
             return stub_text, same_snapshot
 
     stub_text, same_snapshot = asyncio.run(_drive_stub())
@@ -344,7 +361,7 @@ def test_execute_internal_keyerror_not_masked_as_unknown_operation(
         def describe(self) -> str:
             return "stub"
 
-        def execute(self, loaded: LoadedFile, *, now_fn=None) -> OperationResult:
+        def execute(self, op_input: OperationInput, *, now_fn=None) -> OperationResult:
             raise KeyError("internal lookup miss inside execute")
 
     monkeypatch.setattr(

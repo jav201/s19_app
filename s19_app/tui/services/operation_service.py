@@ -25,6 +25,7 @@ from typing import Callable, Optional
 
 from ..models import LoadedFile
 from ..operations import Operation, OperationResult
+from ..operations.model import OperationInput
 from ..operations.registry import get_operation
 
 #: The registry-lookup seam (LLR-003.1): a callable
@@ -68,9 +69,11 @@ def run_operation(
 
     Data Flow:
         - ``operation_id`` → :data:`operation_resolver` → operation
-          instance → ``execute(loaded, now_fn=now_fn)`` → result returned
-          unmodified. No I/O, no disk writes, no parsing anywhere on the
-          path (probe P11).
+          instance → ``execute(OperationInput.from_loaded(loaded),
+          now_fn=now_fn)`` → result returned unmodified. The neutral input
+          is built here (LLR-005.1 / D-1), so ``loaded`` (a ``LoadedFile``)
+          never crosses the operation boundary. No I/O, no disk writes, no
+          parsing anywhere on the path (probe P11).
 
     Dependencies:
         Uses:
@@ -88,4 +91,4 @@ def run_operation(
         'placeholder'
     """
     operation = operation_resolver(operation_id)
-    return operation.execute(loaded, now_fn=now_fn)
+    return operation.execute(OperationInput.from_loaded(loaded), now_fn=now_fn)

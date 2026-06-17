@@ -13,6 +13,7 @@ from textual.widgets import Button, Input, Label, ListItem, ListView, Markdown, 
 
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .models import LoadedFile
+from .operations.model import OperationInput
 from .services import operation_service
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -516,8 +517,8 @@ class OperationsScreen(ModalScreen[None]):
     Data Flow:
         - Execute resolves the row index into ``self.options`` →
           ``operation_service.operation_resolver(operation_id)`` (in a narrow
-          ``try``) → resolved op ``.execute(self.loaded, now_fn=None)`` (out
-          of the ``try``) → status/notes text into
+          ``try``) → resolved op ``.execute(OperationInput.from_loaded(self.loaded), now_fn=None)``
+          (out of the ``try``) → status/notes text into
           ``#operation_result_status`` and the pinned hex render into
           ``#operation_result_hex``.
         - A registry ``KeyError`` (LLR-002.3) surfaces as an app status-line
@@ -599,7 +600,7 @@ class OperationsScreen(ModalScreen[None]):
             - Resolve the id through ``operation_service.operation_resolver``
               inside a narrow ``try``/``except KeyError`` (a registry miss
               becomes a status line); call the resolved operation's
-              ``.execute(self.loaded, now_fn=None)`` OUTSIDE that ``try`` so
+              ``.execute(OperationInput.from_loaded(self.loaded), now_fn=None)`` OUTSIDE that ``try`` so
               an execute-internal ``KeyError`` is NOT masked (M-3, LLR-005.2).
             - ``status`` + ``notes`` → ``#operation_result_status``; the
               LLR-004.3 PINNED render call
@@ -633,7 +634,7 @@ class OperationsScreen(ModalScreen[None]):
             logger.warning("OperationsScreen unknown operation id: %s", exc)
             self.app.set_status(f"Operations error: unknown operation {operation_id}")
             return
-        result = operation.execute(self.loaded, now_fn=None)
+        result = operation.execute(OperationInput.from_loaded(self.loaded), now_fn=None)
         status_lines = [f"status: {result.status}"]
         status_lines.extend(result.notes)
         self.query_one("#operation_result_status", Static).update(
