@@ -12,19 +12,29 @@ cannot pass; the no-mutation assertions snapshot ``mem_map`` pre/post.
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from s19_app.core import S19File
+from s19_app.tui.changes.io import emit_s19_from_mem_map
+from s19_app.tui.changes.verify import STATUS_VERIFIED, verify_written_image
 from s19_app.tui.operations.crc import (
     DEFAULT_FINAL_XOR,
     DEFAULT_INIT,
     DEFAULT_POLYNOMIAL,
     DEFAULT_REVERSE,
+    LE32_WIDTH,
     CrcOperation,
     check_regions,
     compute_region_crc,
+    decode_le32,
     encode_le32,
+    inject_crcs,
     read_stored_crc_le,
+    write_crc_image,
 )
 from s19_app.tui.operations.crc_config import CrcConfig, CrcRegion
 from s19_app.tui.operations.model import OperationInput
+from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, ensure_workarea
 
 
 def _op_input(mem_map: dict[int, int]) -> OperationInput:
@@ -217,3 +227,221 @@ def test_execute_with_config_populates_crc_regions() -> None:
         "CRC: 2 region(s): 1 matched, 1 mismatched, 0 no-stored-value"
     ]
     assert op_input.mem_map == snapshot  # zero mutation
+
+
+# ---------------------------------------------------------------------------
+# Write path (I5a, headless): inject + emit + verify mechanics (LLR-003.1/.2/
+# .3, re-scoped LLR-003.5). The original mem_map is never mutated; the write
+# only happens when ``write_crc_image`` is invoked; the verify intent is the
+# INJECTED working copy (F-Q-05); a containment-failing target collects a
+# finding and writes nothing (collect-don't-abort).
+# ---------------------------------------------------------------------------
+
+
+def _contiguous_op_input(base: int, payload: bytes) -> OperationInput:
+    """A neutral input over ONE contiguous range ``[base, base+len)``.
+
+    Unlike ``_op_input`` (per-byte ranges), this gives a single clean range so
+    an output address placed beyond it is a genuine gap and the emitted S19 has
+    well-formed contiguous records."""
+    mem = _mem_from_bytes(base, payload)
+    return OperationInput(
+        mem_map=mem,
+        ranges=[(base, base + len(payload))],
+        input_path=Path("firmware.s19"),
+        variant_id=None,
+        file_type="s19",
+    )
+
+
+def test_inject_writes_le_at_output_address() -> None:
+    """TC-121 — inject writes the computed CRC as 4 LE bytes at the output
+    address in the WORKING copy, while the ORIGINAL ``mem_map`` is left
+    byte-for-byte unchanged (LLR-003.1).
+
+    The output address sits INSIDE the loaded range (region 0x40..0x60 covers
+    the 0x50 output), so this exercises the in-range branch (no extension).
+    Non-vacuous: the injected bytes are decoded back and must equal an
+    INDEPENDENT ``compute_region_crc`` of the same region."""
+    payload = bytes(range(0x20, 0x40))  # 32 contiguous bytes at 0x40..0x60
+    op_input = _contiguous_op_input(0x40, payload)
+    snapshot = dict(op_input.mem_map)
+    region = CrcRegion(start=0x40, end=0x48, output_address=0x50)
+    config = _default_config([region])
+
+    check_results = check_regions(op_input, config)
+    working_mem, working_ranges, written = inject_crcs(op_input, check_results)
+
+    expected = compute_region_crc(op_input.mem_map, 0x40, 0x48)
+    stored_in_working = decode_le32(
+        working_mem[0x50 + i] for i in range(LE32_WIDTH)
+    )
+    assert stored_in_working == expected  # independent oracle
+    assert [working_mem[0x50 + i] for i in range(LE32_WIDTH)] == list(
+        encode_le32(expected)
+    )
+    assert written[0].written is True
+    assert written[0].computed_crc == expected
+    # In-range output: no new keys, ranges unchanged.
+    assert working_ranges == op_input.ranges
+    # ORIGINAL never mutated.
+    assert op_input.mem_map == snapshot
+
+
+def test_inject_into_gap_extends_ranges() -> None:
+    """TC-122 — an output address in a GAP → the working ``mem_map`` gains
+    exactly 4 keys AND the working ``ranges`` gains/merges a covering range,
+    kept sorted + non-overlapping; the original snapshot is unchanged
+    (LLR-003.1 / D-6 / F-A-06)."""
+    payload = bytes(range(0, 16))  # 0x100..0x110
+    op_input = _contiguous_op_input(0x100, payload)
+    snapshot = dict(op_input.mem_map)
+    snapshot_ranges = list(op_input.ranges)
+    # 0x200 is far outside the only loaded range [0x100, 0x110).
+    region = CrcRegion(start=0x100, end=0x108, output_address=0x200)
+    config = _default_config([region])
+
+    check_results = check_regions(op_input, config)
+    working_mem, working_ranges, _ = inject_crcs(op_input, check_results)
+
+    # Exactly 4 new keys, all at the output address.
+    new_keys = set(working_mem) - set(op_input.mem_map)
+    assert new_keys == {0x200, 0x201, 0x202, 0x203}
+    # Ranges gained a covering range, kept sorted + non-overlapping.
+    assert (0x200, 0x204) in working_ranges
+    assert working_ranges == sorted(working_ranges)
+    for (a_start, a_end), (b_start, _) in zip(
+        working_ranges, working_ranges[1:]
+    ):
+        assert a_end < b_start  # strictly non-overlapping (and non-touching)
+    # ORIGINAL never mutated.
+    assert op_input.mem_map == snapshot
+    assert op_input.ranges == snapshot_ranges
+
+
+def test_modified_s19_reread_matches_intent(tmp_path: Path) -> None:
+    """TC-123 — inject → emit (into a tmp work area) → ``verify_written_image``
+    yields ``STATUS_VERIFIED`` with empty runs; AND a deliberately corrupted
+    written file yields ``"mismatch"`` with non-empty runs (the negative case
+    guards against a tautological self-compare). Verify intent is the INJECTED
+    working copy (F-Q-05)."""
+    payload = bytes(range(0x10, 0x30))  # 32 bytes at 0x80..0xA0
+    op_input = _contiguous_op_input(0x80, payload)
+    region = CrcRegion(start=0x80, end=0x90, output_address=0x88)
+    config = _default_config([region])
+
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+
+    assert result.written_path is not None
+    assert result.written_path.exists()
+    assert result.verify_status == STATUS_VERIFIED
+    assert result.verify_runs == []
+    assert result.findings == []
+    assert all(r.written is True for r in result.crc_regions)
+
+    # Negative control (guards a tautological self-compare): write a CORRUPTED
+    # S19 to disk, then verify it against the SAME intended map that just
+    # verified clean. The verdict must flip to mismatch with a non-empty run.
+    intended = S19File(str(result.written_path)).get_memory_map()
+    bad_mem = dict(intended)
+    bad_mem[min(bad_mem)] ^= 0xFF  # flip one byte
+    bad_ranges = [(min(bad_mem), max(bad_mem) + 1)]
+    bad_path = tmp_path / "bad.s19"
+    bad_path.write_text(
+        emit_s19_from_mem_map(bad_mem, bad_ranges), encoding="utf-8"
+    )
+    bad_result = verify_written_image(bad_path, intended, "s19")
+    assert bad_result.status == "mismatch"
+    assert bad_result.runs != []
+
+
+def test_write_only_when_invoked(tmp_path: Path) -> None:
+    """TC-124 (headless half) — the inject/emit mechanics write a file ONLY when
+    ``write_crc_image`` is invoked; the check path (``check_regions`` /
+    ``inject_crcs``) writes ZERO files. The two-stage CONFIRMATION gating is
+    I5b; here we pin that the mechanics have no implicit write."""
+    payload = bytes(range(0, 16))
+    op_input = _contiguous_op_input(0x300, payload)
+    region = CrcRegion(start=0x300, end=0x308, output_address=0x304)
+    config = _default_config([region])
+
+    workarea = ensure_workarea(tmp_path)
+
+    def _files_under(root: Path) -> list[Path]:
+        return [p for p in root.rglob("*") if p.is_file()]
+
+    before = _files_under(workarea)
+
+    # check + inject are pure: no file appears.
+    check_results = check_regions(op_input, config)
+    inject_crcs(op_input, check_results)
+    assert _files_under(workarea) == before  # 0 files written by check/inject
+
+    # Only invoking the write path produces a file.
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+    after = _files_under(workarea)
+    assert result.written_path is not None
+    assert result.written_path in after
+    assert len(after) == len(before) + 1  # exactly one new file
+
+
+def test_write_result_records_emitted_path_and_verdict(tmp_path: Path) -> None:
+    """TC-126 — the returned ``CrcWriteResult`` carries the emitted path +
+    ``written=True`` per region + the verify verdict (re-scoped LLR-003.5),
+    so the I5b layer can assemble the ``OperationResult``."""
+    payload = bytes(range(0x40, 0x60))
+    op_input = _contiguous_op_input(0x1000, payload)
+    region_a = CrcRegion(start=0x1000, end=0x1008, output_address=0x1010)
+    region_b = CrcRegion(start=0x1008, end=0x1010, output_address=0x1014)
+    config = _default_config([region_a, region_b])
+
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+
+    assert result.written_path is not None
+    assert result.written_path.name == "firmware-crc.s19"  # derived name
+    assert result.verify_status == STATUS_VERIFIED
+    assert len(result.crc_regions) == 2
+    assert [r.output_address for r in result.crc_regions] == [0x1010, 0x1014]
+    assert all(r.written is True for r in result.crc_regions)
+    # The written CRC values are the engine's computed values (non-vacuous).
+    assert result.crc_regions[0].computed_crc == compute_region_crc(
+        op_input.mem_map, 0x1000, 0x1008
+    )
+
+
+def test_write_outside_workarea_collects_finding_and_writes_no_file(
+    tmp_path: Path,
+) -> None:
+    """Containment — a forced target OUTSIDE the contained work area fails the
+    real ``copy_into_workarea`` seam (``is_relative_to(workarea_root)`` +
+    reparse-point checks); the result collects exactly 1 finding and NO file is
+    written, with no exception raised (collect-don't-abort, LLR-003.2 / D-8)."""
+    payload = bytes(range(0, 16))
+    op_input = _contiguous_op_input(0x500, payload)
+    region = CrcRegion(start=0x500, end=0x508, output_address=0x504)
+    config = _default_config([region])
+
+    # A directory OUTSIDE any .s19tool/workarea/ root.
+    escape_dir = tmp_path / "outside"
+    escape_dir.mkdir()
+
+    result = write_crc_image(
+        op_input, config, workarea_base=tmp_path, dest_dir=escape_dir
+    )
+
+    assert result.written_path is None
+    assert result.verify_status is None
+    assert len(result.findings) == 1
+    # The finding names the real seam's exception (F-S-04 plain-text disclosure);
+    # WorkareaContainmentError is what copy_into_workarea raised on the escape.
+    assert "WorkareaContainmentError" in result.findings[0]
+    # No file landed in the escape directory.
+    assert list(escape_dir.iterdir()) == []
+    # And nothing leaked into the work area beyond the cleaned-up temp.
+    workarea_root = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR
+    emitted = [
+        p
+        for p in workarea_root.rglob("firmware-crc*.s19")
+        if p.is_file()
+    ]
+    assert emitted == []

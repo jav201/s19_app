@@ -18,12 +18,21 @@ Region membership reuses the frozen :mod:`s19_app.range_index` primitives
 from __future__ import annotations
 
 import zlib
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Iterable, Optional
+from typing import Callable, Iterable, List, Optional
 
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
+from ..changes.io import emit_s19_from_mem_map
+from ..changes.verify import VerifyResult, verify_written_image
 from ..models import LoadedFile
+from ..workspace import (
+    WORKAREA_TEMP,
+    WorkareaContainmentError,
+    copy_into_workarea,
+    ensure_workarea,
+)
 from .crc_config import CrcConfig
 from .model import CrcRegionResult, Operation, OperationInput, OperationResult
 
@@ -516,6 +525,388 @@ def check_regions(
             )
         )
     return results
+
+
+#: Suffix appended to the input file stem for the auto-generated emitted-S19
+#: name (LLR-003.2): ``<stem>-crc.s19``. NO operator-arbitrary path is ever
+#: honored — the emit name is derived, never supplied.
+EMITTED_NAME_SUFFIX: str = "-crc"
+
+#: The default emitted-S19 output subdirectory under
+#: ``.s19tool/workarea/`` — kept SEPARATE from ``temp/`` (the staging dir) so a
+#: first write lands as ``<stem>-crc.s19`` rather than self-colliding with its
+#: own staged copy; ``copy_into_workarea`` still name-dedups a genuine re-write
+#: (F-S-03 no-overwrite).
+CRC_OUTPUT_SUBDIR: str = "crc"
+
+#: Fallback stem when the input snapshot has no source path
+#: (``OperationInput.input_path is None``) — the emitted file is still named
+#: deterministically rather than failing.
+DEFAULT_EMITTED_STEM: str = "image"
+
+
+def _emitted_file_name(input_path: Optional[Path]) -> str:
+    """
+    Summary:
+        Derive the auto-generated emitted-S19 file name from the input path
+        (LLR-003.2): ``<input stem>-crc.s19``, falling back to
+        ``image-crc.s19`` when the input snapshot has no source path. The name
+        is always derived — never operator-supplied — so the write target is
+        a fixed stem under the contained work area, not an arbitrary path
+        (F-S-01 posture).
+
+    Args:
+        input_path (Optional[Path]): The input snapshot's source path
+            (``OperationInput.input_path``); ``None`` outside a file-backed
+            load.
+
+    Returns:
+        str: The bare file name (no directory) ``"<stem>-crc.s19"``.
+
+    Data Flow:
+        - Take ``input_path.stem`` (or :data:`DEFAULT_EMITTED_STEM`), append
+          :data:`EMITTED_NAME_SUFFIX` and the ``.s19`` suffix.
+
+    Dependencies:
+        Used by:
+            - :func:`write_crc_image`
+
+    Example:
+        >>> _emitted_file_name(Path("/tmp/firmware.s19"))
+        'firmware-crc.s19'
+        >>> _emitted_file_name(None)
+        'image-crc.s19'
+    """
+    stem = input_path.stem if input_path is not None and input_path.stem else DEFAULT_EMITTED_STEM
+    return f"{stem}{EMITTED_NAME_SUFFIX}.s19"
+
+
+def _extend_ranges(
+    ranges: list[tuple[int, int]], new_start: int, new_end: int
+) -> list[tuple[int, int]]:
+    """
+    Summary:
+        Insert the half-open range ``[new_start, new_end)`` into ``ranges`` and
+        return a NEW list that is SORTED by start and non-overlapping
+        (D-6 / F-A-06): any range that touches or overlaps the new one
+        (``a_start <= b_end`` and ``b_start <= a_end``) is merged into a single
+        covering range. The input list is not mutated.
+
+    Args:
+        ranges (list[tuple[int, int]]): The existing half-open ``(start, end)``
+            ranges; assumed already sorted + non-overlapping (the
+            ``LoadedFile.ranges`` invariant), but the merge is correct for any
+            input order.
+        new_start (int): Inclusive start of the range to insert.
+        new_end (int): Exclusive end of the range to insert.
+
+    Returns:
+        list[tuple[int, int]]: A fresh sorted, non-overlapping range list that
+        covers every address of ``ranges`` plus ``[new_start, new_end)``.
+
+    Data Flow:
+        - Append the new range, sort by start, then sweep once merging any
+          range whose start is ``<=`` the running merged end (touching ranges
+          merge, so two adjacent extension writes never leave a seam).
+
+    Dependencies:
+        Used by:
+            - :func:`inject_crcs`
+            - tests/test_crc_operation.py (TC-122)
+
+    Example:
+        >>> _extend_ranges([(0, 4), (8, 12)], 4, 8)
+        [(0, 12)]
+    """
+    combined = sorted([*ranges, (new_start, new_end)])
+    merged: list[tuple[int, int]] = []
+    for start, end in combined:
+        if merged and start <= merged[-1][1]:
+            prev_start, prev_end = merged[-1]
+            merged[-1] = (prev_start, max(prev_end, end))
+        else:
+            merged.append((start, end))
+    return merged
+
+
+def inject_crcs(
+    op_input: OperationInput,
+    crc_regions: list[CrcRegionResult],
+) -> tuple[dict[int, int], list[tuple[int, int]], list[CrcRegionResult]]:
+    """
+    Summary:
+        Build a WORKING COPY of ``op_input``'s ``mem_map`` / ``ranges`` with
+        each region's computed CRC written as 4 little-endian bytes at its
+        output address (LLR-003.1, §6.2 D-5/D-6). The originally loaded
+        ``mem_map`` / ``ranges`` are NEVER mutated — a fresh ``dict`` / ``list``
+        is built. When an output address falls outside every loaded range, the
+        working ``mem_map`` gains exactly the 4 missing keys AND the working
+        ``ranges`` gains/merges a covering ``[output_address, output_address+4)``
+        range, kept SORTED + non-overlapping via :func:`_extend_ranges`
+        (guarding ``emit_s19_from_mem_map``'s ``KeyError`` on a range claiming an
+        absent address). Each input :class:`CrcRegionResult` is re-emitted with
+        ``written=True``.
+
+    Args:
+        op_input (OperationInput): The neutral input; its ``mem_map`` / ``ranges``
+            are READ to seed the working copy, never mutated.
+        crc_regions (list[CrcRegionResult]): The per-region check results from
+            :func:`check_regions`, in config order; each supplies the
+            ``output_address`` and the ``computed_crc`` to inject.
+
+    Returns:
+        tuple[dict[int, int], list[tuple[int, int]], list[CrcRegionResult]]:
+        ``(working_mem_map, working_ranges, written_regions)`` — the injected
+        memory map, its sorted non-overlapping ranges, and one
+        ``CrcRegionResult`` per region carrying the same address/value with
+        ``written=True``.
+
+    Raises:
+        None: A gapped output address is handled by extension, not an error;
+            this is a pure in-memory transform.
+
+    Data Flow:
+        - Copy ``mem_map`` / ``ranges``. For each region: encode the computed
+          CRC LE (:func:`encode_le32`), set the 4 addresses in the working map;
+          if any of the 4 was absent from every loaded range, extend ``ranges``
+          via :func:`_extend_ranges`. Re-emit each region with ``written=True``.
+
+    Dependencies:
+        Uses:
+            - :func:`encode_le32`
+            - :func:`_extend_ranges`
+            - ``s19_app.range_index`` membership primitives (import-only)
+        Used by:
+            - :func:`write_crc_image`
+            - tests/test_crc_operation.py (TC-121, TC-122)
+
+    Example:
+        >>> op_input = OperationInput(
+        ...     mem_map={0: 0x31}, ranges=[(0, 1)], input_path=None,
+        ...     variant_id=None, file_type="s19",
+        ... )
+        >>> region = CrcRegionResult(
+        ...     output_address=0x10, computed_crc=0x04030201,
+        ...     stored_value=None, matched=None, written=False,
+        ... )
+        >>> mem, ranges, written = inject_crcs(op_input, [region])
+        >>> [mem[0x10 + i] for i in range(4)]
+        [1, 2, 3, 4]
+        >>> written[0].written
+        True
+    """
+    working_mem: dict[int, int] = dict(op_input.mem_map)
+    working_ranges: list[tuple[int, int]] = list(op_input.ranges)
+    written_regions: list[CrcRegionResult] = []
+
+    for region in crc_regions:
+        payload = encode_le32(region.computed_crc)
+        addresses = range(
+            region.output_address, region.output_address + LE32_WIDTH
+        )
+        range_index = build_sorted_range_index(working_ranges)
+        in_a_range = all(
+            address_in_sorted_ranges(addr, range_index) for addr in addresses
+        )
+        for offset, value in enumerate(payload):
+            working_mem[region.output_address + offset] = value
+        if not in_a_range:
+            working_ranges = _extend_ranges(
+                working_ranges,
+                region.output_address,
+                region.output_address + LE32_WIDTH,
+            )
+        written_regions.append(
+            CrcRegionResult(
+                output_address=region.output_address,
+                computed_crc=region.computed_crc,
+                stored_value=region.stored_value,
+                matched=region.matched,
+                written=True,
+            )
+        )
+
+    return working_mem, working_ranges, written_regions
+
+
+@dataclass
+class CrcWriteResult:
+    """
+    Summary:
+        The headless outcome of the CRC write path (re-scoped LLR-003.5): the
+        per-region results (``written=True`` on success), the emitted-S19 path,
+        the verify verdict, and any collected findings. Returned by
+        :func:`write_crc_image` so the I5b TUI layer can assemble the
+        ``OperationResult`` (status / notes / ``crc_regions``) WITHOUT this
+        headless module importing Textual. A containment / path / data fault
+        is a collected ``findings`` string, never an exception.
+
+    Args:
+        crc_regions (list[CrcRegionResult]): Per-region results. On a written
+            image each carries ``written=True``; when the write was refused
+            (containment finding) the regions are the injected-but-unwritten
+            results and the caller treats ``written_path is None`` as "no file".
+        written_path (Optional[Path]): The emitted-S19 path inside the contained
+            work area, or ``None`` when no file was written (containment /
+            emit / verify-stage fault).
+        verify_status (Optional[str]): ``verify.STATUS_VERIFIED`` /
+            ``"mismatch"`` from :func:`verify_written_image`, or ``None`` when no
+            file was written (so verify never ran).
+        verify_runs (list): The :class:`VerifyResult.runs` diff runs; empty on a
+            verified write, non-empty on a mismatch, empty when no file was
+            written.
+        findings (list[str]): Collected plain-text faults (containment refusal,
+            emit / write OSError); empty on a clean verified write. Paths are
+            interpolated as PLAIN text (F-S-04).
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - Produced by :func:`write_crc_image`; consumed by the I5b confirm
+          handler to build the ``OperationResult`` and render the op-result
+          rows.
+
+    Dependencies:
+        Used by:
+            - :func:`write_crc_image`
+            - tests/test_crc_operation.py (TC-123, TC-124, TC-126, containment)
+
+    Example:
+        >>> CrcWriteResult(
+        ...     crc_regions=[], written_path=None, verify_status=None,
+        ...     verify_runs=[], findings=["refused"],
+        ... ).written_path is None
+        True
+    """
+
+    crc_regions: list[CrcRegionResult]
+    written_path: Optional[Path]
+    verify_status: Optional[str]
+    verify_runs: List[object] = field(default_factory=list)
+    findings: List[str] = field(default_factory=list)
+
+
+def write_crc_image(
+    op_input: OperationInput,
+    config: CrcConfig,
+    *,
+    workarea_base: Path,
+    dest_dir: Optional[Path] = None,
+) -> CrcWriteResult:
+    """
+    Summary:
+        The side-effectful CRC write path, headless and only-writes-when-called
+        (LLR-003.1/.2/.3, re-scoped LLR-003.5; §6.2 D-6/D-8). It computes the
+        per-region CRCs (:func:`check_regions`), injects them into a working
+        copy (:func:`inject_crcs`, original never mutated), serializes the
+        injected map via ``emit_s19_from_mem_map``, stages the text under
+        ``<workarea_base>/.s19tool/workarea/temp/`` and places it into the
+        contained work area via ``copy_into_workarea`` — which enforces the
+        REAL containment seam (``_find_workarea_root`` +
+        ``is_relative_to(workarea_root)`` + ``_path_traverses_reparse_point``)
+        AND name-dedups on collision (no overwrite, F-S-03) — then verifies the
+        written file against the INJECTED map (F-Q-05) via
+        ``verify_written_image``. A containment / path / write fault is a single
+        collected finding with NO file written (collect-don't-abort; never
+        raises on a data/path fault).
+
+    Args:
+        op_input (OperationInput): The neutral input; only ``mem_map`` / ``ranges``
+            are read, never mutated.
+        config (CrcConfig): The parsed CRC config supplying the regions and
+            algorithm params.
+        workarea_base (Path): The base directory whose ``.s19tool/workarea/`` is
+            the staging + containment root (the caller / TUI supplies the app
+            base dir; a test passes a ``tmp_path``). Kept injectable so the path
+            is headless / testable.
+        dest_dir (Optional[Path]): The directory the emitted S19 is placed into.
+            ``None`` (the default) targets the contained
+            ``.s19tool/workarea/crc/`` output dir (distinct from the ``temp/``
+            staging dir, so a first write is not dedup-suffixed by its own
+            staged copy). A ``dest_dir`` OUTSIDE the work area fails
+            ``copy_into_workarea``'s containment check → one finding, no file
+            (the security-relevant escape case).
+
+    Returns:
+        CrcWriteResult: On a clean write — ``written_path`` set, ``verify_status``
+        ``"verified"`` (or ``"mismatch"`` if the re-read drifts), ``crc_regions``
+        with ``written=True``, empty ``findings``. On a containment / write
+        fault — ``written_path is None``, ``verify_status is None``, one
+        ``findings`` entry.
+
+    Raises:
+        None: Every containment / path / OS fault is a collected ``findings``
+            string (collect-don't-abort, D-8). The staged temp file is always
+            cleaned up.
+
+    Data Flow:
+        - :func:`check_regions` → :func:`inject_crcs` (working copy) →
+          ``emit_s19_from_mem_map(working_mem, working_ranges)`` →
+          stage under ``temp/`` → ``copy_into_workarea(staged, dest_dir)``
+          (containment + dedup) → ``verify_written_image(placed, working_mem,
+          "s19")`` → assemble :class:`CrcWriteResult`.
+
+    Dependencies:
+        Uses:
+            - :func:`check_regions`
+            - :func:`inject_crcs`
+            - ``changes.io.emit_s19_from_mem_map`` (import-only)
+            - ``workspace.ensure_workarea`` / ``copy_into_workarea`` (import-only)
+            - ``changes.verify.verify_written_image`` (import-only)
+        Used by:
+            - the I5b TUI confirm handler (assembles the OperationResult)
+            - tests/test_crc_operation.py (TC-123, TC-124, TC-126, containment)
+    """
+    check_results = check_regions(op_input, config)
+    working_mem, working_ranges, written_regions = inject_crcs(
+        op_input, check_results
+    )
+
+    workarea = ensure_workarea(workarea_base)
+    temp_dir = workarea / WORKAREA_TEMP
+    target_dir = (workarea / CRC_OUTPUT_SUBDIR) if dest_dir is None else dest_dir
+    file_name = _emitted_file_name(op_input.input_path)
+    staged = temp_dir / file_name
+
+    placed: Optional[Path] = None
+    try:
+        # F-S-06 defense-in-depth: emit is inside the try so a hypothetical
+        # KeyError (an injected range claiming an address absent from the
+        # working map — unreachable by construction since inject_crcs extends
+        # the map, but guarded anyway on this side-effectful path) becomes a
+        # collected finding, never an unhandled raise.
+        s19_text = emit_s19_from_mem_map(working_mem, working_ranges)
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        staged.write_text(s19_text, encoding="utf-8")
+        placed = copy_into_workarea(staged, target_dir)
+    except (WorkareaContainmentError, OSError, KeyError) as exc:
+        return CrcWriteResult(
+            crc_regions=written_regions,
+            written_path=None,
+            verify_status=None,
+            verify_runs=[],
+            findings=[
+                "CRC write failed — no file was written: "
+                f"{type(exc).__name__}: {exc}"
+            ],
+        )
+    finally:
+        try:
+            staged.unlink()
+        except OSError:
+            pass
+
+    verify_result: VerifyResult = verify_written_image(
+        placed, working_mem, "s19"
+    )
+    return CrcWriteResult(
+        crc_regions=written_regions,
+        written_path=placed,
+        verify_status=verify_result.status,
+        verify_runs=verify_result.runs,
+        findings=[],
+    )
 
 
 def _summarize_check(crc_regions: list[CrcRegionResult]) -> str:
