@@ -6,9 +6,10 @@
 
 ## 0. Where we are RIGHT NOW
 
-**Phase 3 (Implementation), increment I3b (TUI surface) — AWAITING YOUR GATE.**
-- ✅ I1a · I1b · I2 · I3a committed. ✅ I3b (CRC check runs from the TUI) implemented + reviewed (1 MEDIUM race fixed; 0 HIGH). ⏳ I3b needs your `approve` to commit and move to I4.
-- Suite: **871 collected / 818 lean-pass / 0 failures**. KAT green. **You can now run a CRC check on screen:** open the operations view, edit the dummy-prefilled config, Execute → per-region MATCH/MISMATCH rows (on a worker thread; config-error shows the error, never a fake pass).
+**Phase 3 (Implementation), increment I5 (inject + emit + verify + confirm) — STARTING.** This is the LAST implementation increment.
+- ✅ I1a · I1b · I2 · I3a · I3b committed. **I4 WITHDRAWN** (operator re-scope §6.4 J-3 — the CRC persistent record is the operation's own output, not the project/variant report). ▶️ I5 next.
+- Suite: **871 collected / 818 lean-pass / 0 failures**. KAT green. The CRC **check** runs from the TUI today; I5 adds the operator-confirmed **write** (inject + emit modified S19 + verify).
+- I5 is the side-effectful half → **security-reviewer sign-off is mandatory** before its gate.
 
 ---
 
@@ -32,11 +33,11 @@ Add a **CRC32 operation** to s19tool: compute a CRC32 over configured memory reg
 | **I1b** | CRC engine (headless) | Parameterized CRC32 + region assembly + 4-byte LE codec; `REQ-crc.md`; engine tests | LLR-001.1/.2/.3, LLR-005.3 | ✅ **committed** |
 | **I2** | Config + check (headless) | dummy JSON template, config reader (resolve+size-cap+collect), read-stored-4LE + compare → `CrcRegionResult[]` | LLR-004.1, LLR-002.1/.2 | ✅ **reviewed CLEAN, awaiting gate** |
 | **I3a** | Operation wiring | `CrcOperation` REAL in `crc.py` (consume `check_regions` → `OperationResult{status=ok, crc_regions}`); `config` via execute kwarg; placeholder removed + facade rewired | LLR-002.2 (assembly) | ✅ **reviewed CLEAN, awaiting gate** (7 files, ≤5 exception) |
-| **I3b** | TUI surface | config TextArea (dummy pre-fill) + per-region rows + worker-thread (R-6); F-L1 honored (error path never reads as a pass; stale-worker race fixed via dispatch-token guard) | LLR-004.2, LLR-002.3/.4 | ✅ **reviewed (1 MEDIUM fixed), awaiting gate** |
-| **I4** | Persistent report | CRC section in `report_service.py` (check + write outcomes) | LLR-002.5, LLR-003.5 | ⬜ pending |
-| **I5** | Inject + emit + verify + confirm | 4-byte LE inject (extend on gap) + `emit_s19_from_mem_map` + reader-as-oracle verify + two-stage confirm (R-6 + security sign-off) | LLR-003.1/.2/.3/.4 | ⬜ pending |
+| **I3b** | TUI surface | config TextArea (dummy pre-fill) + per-region rows + worker-thread (R-6); F-L1 honored; stale-worker race fixed | LLR-004.2, LLR-002.3/.4 | ✅ **committed** (4312dcd) |
+| ~~**I4**~~ | ~~Persistent report~~ | **WITHDRAWN (§6.4 J-3):** `report_service` is project/variant-scoped; CRC is per-file. The CRC persistent record = the operation's emitted S19 + `OperationResult` (folded into I5). | ~~LLR-002.5/003.5~~ | ❌ **withdrawn** |
+| **I5** | Inject + emit + verify + confirm + result record | 4-byte LE inject (extend on gap) + `emit_s19_from_mem_map` + reader-as-oracle verify + two-stage confirm (R-6) + write `OperationResult` (emitted path + verdict) | LLR-003.1/.2/.3/.4 + re-scoped LLR-003.5 | ▶️ **next (LAST)** |
 
-**Dependency order is linear:** I1a → I1b → I2 → I3a → I3b → I4 → I5. No increment depends on a later one. (I3 split into I3a/I3b at the I2 gate: making `CrcOperation` real + replacing the placeholder + the TUI surface together exceed ≤5 files.)
+**Dependency order:** I1a → I1b → I2 → I3a → I3b → I5 (I4 withdrawn). **6 increments.** No increment depends on a later one.
 
 ---
 
@@ -106,7 +107,8 @@ Full text: [`01-requirements.md`](01-requirements.md).
 | 2026-06-16 | 3 / I1b | implemented, reviewed (1 HIGH fixed), **approved + committed** (d7e862e) |
 | 2026-06-16 | 3 / I2 | config + check (headless), reviewed CLEAN, **approved + committed** (ae73288) |
 | 2026-06-16 | 3 / I3a | CrcOperation real (Path A, 7 files), reviewed CLEAN, **approved + committed** (7658d4e) |
-| 2026-06-16 | 3 / I3b | TUI surface (config editor + worker + rows), reviewed (1 MEDIUM race **fixed**, 0 HIGH), **awaiting gate** |
+| 2026-06-16 | 3 / I3b | TUI surface (config editor + worker + rows), reviewed (1 MEDIUM race fixed, 0 HIGH), **approved + committed** (4312dcd) |
+| 2026-06-16 | 3 / J-3 | **Re-scope: I4 withdrawn** — CRC persistent record = operation's emitted S19 + `OperationResult` (not the project/variant report). Folded into I5. |
 
 Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
@@ -114,4 +116,4 @@ Full machine log: [`../state.json`](../state.json) `decisions_log`.
 
 ## 8. What's next
 
-You approve I3b → I commit it → I start **I4 (persistent report)**: a CRC section in `report_service.py::generate_project_report` consuming `crc_regions` (check + later write outcomes) + `tests/test_report_crc.py`. Then **I5** — the side-effectful half: inject the CRC (4-byte LE, extend on gap) + emit a modified S19 + reader-as-oracle verify + two-stage operator confirmation (R-6; **security-reviewer sign-off mandatory at I5**).
+**I5 — the last implementation increment** (the side-effectful write): inject the CRC (4-byte LE, extend image on gap) → emit a modified S19 via `emit_s19_from_mem_map` into the contained work area → re-read & verify via `verify_written_image` (reader-as-oracle, 4th use) → two-stage operator confirmation (R-6); the write `OperationResult` carries the emitted path + verify verdict (the re-scoped LLR-003.5 record). **security-reviewer sign-off is mandatory** at this gate (operator-supplied config path + emitted output path + the write itself). After I5: Phase 4 (validation) → 5 (post-mortem) → 6 (docs).

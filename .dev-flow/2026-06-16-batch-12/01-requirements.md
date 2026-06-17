@@ -266,8 +266,8 @@ This document specifies, at HLR (IEEE 830 + EARS) and LLR level, the requirement
 > - **I1b — CRC engine + co-located doc, headless (3 files):** `operations/crc.py` (NEW, compute core), `operations/requirements/REQ-crc.md` (NEW co-located doc — C-7; lands here, where the operation first becomes real, rather than in I1a to keep I1a's atomic call-site migration at 5), `tests/test_crc_engine.py` (NEW). → LLR-001.1/.2/.3, LLR-005.3.
 > - **I2 — config sourcing + check, headless (5 files):** `operations/crc_config.py` (NEW reader) or config in `crc.py`, `examples/crc_config.example.json` (NEW dummy), `crc.py` (check/compare + read-stored), `tests/test_crc_config.py` (NEW), `tests/test_crc_operation.py` (NEW). → LLR-004.1, LLR-002.1/.2.
 > - **I3 — TUI surface: config text + op-result view + worker-thread (3 files):** `screens.py` (config text widget + per-region result rows), `app.py` (`@work(thread=True)` migration), `tests/test_tui_crc_surface.py` (NEW pilot). → LLR-004.2, LLR-002.3, LLR-002.4(view).
-> - **I4 — persistent report integration (≤3 files):** `report_service.py` (NEW CRC report section consuming `crc_regions`), `tests/test_report_crc.py` (NEW), `app.py` (wire op result → report, if needed). → LLR-002.5(report), LLR-003.5(report).
-> - **I5 — inject + emit + verify + two-stage confirm (5 files):** `crc.py` (inject), `screens.py` (confirm modal), `app.py` (confirm + emit wiring), `tests/test_crc_operation.py` (inject/emit/verify), `tests/test_tui_crc_surface.py` (confirm pilot). → LLR-003.1/.2/.3/.4.
+> - ~~**I4 — persistent report integration**~~ **WITHDRAWN at Phase 3 (operator re-scope, §6.4 J-3).** `report_service.generate_project_report` is project/variant-scoped; CRC is a per-file operation, so binding it there was an awkward, unreachable coupling (the SCOPE-1/A-5 risk). The CRC's persistent record is instead the operation's OWN output — the emitted modified S19 (FR9) + the `OperationResult` result summary — folded into I5. The check (US-011) has NO separate persistent artifact; its surface is the op-result view (LLR-002.4). `report_service.py` is no longer touched by this batch.
+> - **I5 — inject + emit + verify + two-stage confirm + result record (≤5 files):** `crc.py` (inject 4-byte LE + extend-on-gap + emit via `emit_s19_from_mem_map` + verify via `verify_written_image` + assemble the write `OperationResult` with the emitted path + verify verdict), `screens.py` (confirm modal + render the write outcome rows), `app.py` (confirm wiring if needed), `tests/test_crc_operation.py` (inject/emit/verify/no-confirm + the result record), `tests/test_tui_crc_surface.py` (confirm pilot). → LLR-003.1/.2/.3/.4 + the re-scoped LLR-003.5 (write outcome in the OperationResult, NOT report_service). **security-reviewer sign-off mandatory (R-6 write path).**
 >
 > Every test FILE path / `-k` selector / node id named below is **provisional-until-Phase-3** (V-5); implemented names are reconciled from the real tree at Phase 4. Symbols flagged `NEW — created in Phase 3` do not yet exist; symbols with a `file:line` citation were grep-verified at draft time (2026-06-16, re-verified at iter-2).
 
@@ -381,7 +381,7 @@ This document specifies, at HLR (IEEE 830 + EARS) and LLR level, the requirement
 - **Executed verification:** `pytest -q tests/test_crc_operation.py` (`NEW`): matching fixture → `matched=True`; mismatching fixture → `matched=False`; pre/post `mem_map` equality → 0 mutation; result rendered in the `OperationsScreen` surface (`screens.py:637-650` consumer).
 - **Numeric pass threshold:** `matched` flag == (`stored == computed`) for every region; input `mem_map` unchanged (0 changed addresses); `status == "ok"`; 100% pass.
 - **Acceptance criteria (informative):**
-  - The populated `crc_regions` payload feeds BOTH surfaces (F-A-01): the operations-result view (LLR-002.4) AND the persistent project report (LLR-002.5). This LLR only PRODUCES the payload (headless); rendering is those two LLRs.
+  - The populated `crc_regions` payload feeds the operations-result view (LLR-002.4). This LLR only PRODUCES the payload (headless); rendering is LLR-002.4. (Phase-3 re-scope §6.4 J-3: the check has no separate persistent-report surface — `report_service` binding WITHDRAWN; the write's persistent record is its emitted S19 + result, I5/LLR-003.5.)
   - **Plain-text messaging (F-S-04):** any per-region or config-error line interpolating a resolved path / reader-issue string is emitted as PLAIN text (no Rich markup), mirroring `app.py:3606`.
 
 ### LLR-002.3 — Check execution migrates to worker-thread (R-6, no UI-thread compute)
@@ -402,15 +402,9 @@ This document specifies, at HLR (IEEE 830 + EARS) and LLR level, the requirement
 - **Acceptance criteria (informative):**
   - View rendering only (UI state); the payload comes from LLR-002.2. `screens.py` row-rendering shape is **gate-confirm at increment** (A-2). Increment I3.
 
-### LLR-002.5 — Render per-region CRC results in the persistent project report (surface 2 of 2)
-- **Traceability:** HLR-002 (F-A-01 surface b)
-- **Statement:** The project report generated by `report_service.py` (`generate_project_report`, `report_service.py:913`) shall include a CRC section rendering each `crc_regions` entry (output address, computed CRC, stored value, match/mismatch), so the check outcome is captured in the persistent report.
-- **Validation:** `test (integration)`
-- **Executed verification:** `pytest -q tests/test_report_crc.py` (`NEW`): a report generated with a CRC result containing match + mismatch regions contains the CRC section with the correct per-region verdicts.
-- **Numeric pass threshold:** report text contains one CRC line per region with the correct verdict; absent a CRC result the section is omitted (no empty section); 100% pass.
-- **Acceptance criteria (informative):**
-  - **NEW integration (F-A-01):** `report_service.py` does NOT consume `OperationResult` today (it renders `VariantExecutionResult`-based project reports, grep-confirmed `report_service.py:913/577/619`); wiring a CRC section fed by `crc_regions` is net-new. The exact seam (a new `_crc_section_lines(...)` helper + a call site in `generate_project_report`, and how the CRC `OperationResult` reaches the report generator) is **gate-confirm at increment I4**. `report_service.py` is NOT in either frozen set.
-  - Plain-text path interpolation (F-S-04) applies here too.
+### LLR-002.5 — ~~Render per-region CRC results in the persistent project report~~ **WITHDRAWN (Phase-3 re-scope, §6.4 J-3)**
+- **Traceability:** HLR-002 (was F-A-01 surface b)
+- **Status:** WITHDRAWN. `report_service.generate_project_report` is project/variant-scoped (grep-confirmed it consumes `VariantExecutionResult`, not `OperationResult`); CRC is a per-file operation, so a project-report CRC section is an awkward, operator-unreachable coupling (the SCOPE-1/A-5 half-delivery risk). Operator decision (2026-06-16): the CHECK (US-011) has NO separate persistent artifact — its surface is the op-result view (LLR-002.4). `report_service.py`, `tests/test_report_crc.py`, and TC-117 are removed from this batch's scope.
 
 ---
 
@@ -458,14 +452,14 @@ This document specifies, at HLR (IEEE 830 + EARS) and LLR level, the requirement
   - Confirmation + worker-thread + sanitized path are the R-6 mandatory inheritances; security-reviewer sign-off required before merge (write path + operator-supplied config path + emitted output path).
   - The confirmation modal shape in `screens.py`/`app.py` is **gate-confirm at increment** (A-2).
 
-### LLR-003.5 — Render the inject/emit/verify outcome in the persistent project report (surface 2 of 2)
-- **Traceability:** HLR-003 (F-A-01 surface b)
-- **Statement:** The project report generated by `report_service.py` shall include, for a confirmed write, the emitted modified-S19 path, the per-region written CRC values, and the verify verdict (`verified`/`mismatch`), so the write outcome is captured in the persistent report; and if no write was confirmed, then the report shall record the check-only outcome without a write section.
+### LLR-003.5 — Persistent record of the write outcome via the operation output (RE-SCOPED, §6.4 J-3)
+- **Traceability:** HLR-003 (FR9 — the write's persistent record)
+- **Statement:** For a confirmed write, the operation shall produce the persistent record as its OWN output — the emitted modified S19 file (LLR-003.2, the FR9 artifact) plus an `OperationResult` whose `notes`/`crc_regions` carry the emitted-S19 path, the per-region written CRC values (`written=True`), and the verify verdict (`verified`/`mismatch`); the op-result view (LLR-002.4) renders this. There is NO `report_service.generate_project_report` integration (WITHDRAWN — that report is project/variant-scoped, not per-operation).
 - **Validation:** `test (integration)`
-- **Executed verification:** `pytest -q tests/test_report_crc.py` (`NEW`): a report from a confirmed-write CRC result contains the emitted path + verify verdict; a check-only result contains no write section.
-- **Numeric pass threshold:** confirmed-write report contains the path + `verified`/`mismatch` verdict; check-only report has 0 write-section lines; 100% pass.
+- **Executed verification:** `pytest -q tests/test_crc_operation.py` (folded into I5): a confirmed-write `OperationResult` carries the emitted path + `written=True` per region + the verify verdict; a no-confirm result carries no emitted path and `written=False`.
+- **Numeric pass threshold:** confirmed-write result exposes the emitted path + `verified`/`mismatch` verdict + `written=True`; no-confirm result has 0 files written + `written=False`; 100% pass.
 - **Acceptance criteria (informative):**
-  - Same NEW `report_service.py` integration as LLR-002.5 (increment I4); paths interpolated as PLAIN text (F-S-04).
+  - The emitted modified S19 (LLR-003.2) IS the durable artifact (FR9); the `OperationResult` is the in-session record rendered in the op-result view. Paths interpolated as PLAIN text (F-S-04). Implemented in I5.
 
 ---
 
@@ -508,8 +502,8 @@ This document specifies, at HLR (IEEE 830 + EARS) and LLR level, the requirement
 | **TC-108** | LLR-005.1 | I1a | Neutral `OperationInput` exposes `mem_map`+`ranges`+metadata; `from_loaded` adapter maps `LoadedFile` cleanly. | `tests/test_operations.py::test_operation_input_exposes_mem_map_ranges_metadata` (NEW) |
 | **TC-109** | LLR-005.2 | I1a | `OperationResult` widened: field count == 7+1 optional; `STATUS_DOMAIN` unchanged; `to_dict` deterministic + represents the new field when present. | `tests/test_operations.py::test_operation_result_widened_field_count_and_status_domain` (NEW) |
 | **TC-116** | LLR-002.3 | I3 | `inspection` — CRC execute path carries `@work(thread=True)`; 0 synchronous `operation.execute` in the CRC path. | `tests/test_tui_crc_surface.py` / inspection (NEW) |
-| **TC-117** | LLR-002.5 (report, F-A-01) | I4 | Persistent report contains a CRC section with per-region match/mismatch verdicts; omitted when no CRC result. | `tests/test_report_crc.py::test_report_contains_crc_check_section` (NEW) |
-| **TC-126** | LLR-003.5 (report, F-A-01) | I4 | Confirmed-write report contains emitted path + verify verdict; check-only report has no write section. | `tests/test_report_crc.py::test_report_contains_crc_write_section` (NEW) |
+| ~~TC-117~~ | ~~LLR-002.5~~ | — | **WITHDRAWN** (Phase-3 re-scope §6.4 J-3) — report_service check-section removed; the check surface is the op-result view (TC-115). | — |
+| **TC-126** | LLR-003.5 (re-scoped) | I5 | Confirmed-write `OperationResult` carries the emitted-S19 path + `written=True` per region + verify verdict; no-confirm carries none. | `tests/test_crc_operation.py::test_write_result_records_emitted_path_and_verdict` (NEW) |
 | **TC-111** | US-011 AC (match) | I2 | Compare MATCH — stored 4-byte LE == computed → match, file untouched (assert input unchanged). | `tests/test_crc_operation.py::test_check_reports_match_nonmutating` (impl) |
 | TC-112 | US-011 AC (mismatch) | I2 | Compare MISMATCH per output address; file untouched. | `tests/test_crc_operation.py::test_check_reports_mismatch` (impl) |
 | TC-113 | config sourcing | I2 | Params loaded from **synthetic** JSON via `resolve_input_path`. | `tests/test_crc_config.py::test_params_loaded_from_synthetic_json` (NEW) |
@@ -548,7 +542,7 @@ One row per input dimension named in US-011/US-012, confirming ≥1 TC exercises
 | Inject + modified-S19 emit | TC-121/TC-123 | TC-125 | covered |
 | Operator confirmation (two-stage) | TC-124 | TC-125 | covered |
 | Result in operations-result view (F-A-01 surface a) | — | TC-115 / LLR-002.4 | covered |
-| Result in persistent project report (F-A-01 surface b) | TC-117/TC-126 | (report is non-interactive; integration TC) | covered |
+| Persistent record of the WRITE (re-scoped §6.4 J-3) = emitted modified S19 + `OperationResult` | TC-126 (write result record) | TC-125 (inject reaches the surface via handler) | covered (I5) |
 
 > **TC-125 confirm must be pilot-driven (F-Q-06):** TC-125's confirmation interaction shall be driven through the Textual pilot (`pilot.press`/widget interaction), NOT by calling the write service with a `confirm=True` kwarg — otherwise it collapses into the headless TC-124 and the through-handler row is mislabeled. TC-124 (headless boolean) stays the no-confirm assertion.
 >
@@ -595,11 +589,11 @@ See §1.3 for the primary glossary. Additional draft-time-verified anchor symbol
 
 **D-2 — `OperationResult` widening + producer/consumer identity table (R-3, C-9-style).** Add `crc_regions: Optional[list[CrcRegionResult]] = None` (default `None`). `CrcRegionResult` (`NEW`): `output_address: int`, `computed_crc: int`, `stored_value: Optional[int]`, `matched: Optional[bool]`, `written: bool`. Canonical field set of `OperationResult` after this batch = `{operation_id, status, input_path, variant_id, output, notes, timestamp_utc, crc_regions}` (7 original + 1 new optional).
 
-| Field | CRC op producer | Placeholder producers | Consumer: `OperationsScreen` (`screens.py:637-650`) | Consumer: `report_service` (NEW wiring) | Consumer: `to_dict` (`model.py:122`) |
-|-------|-----------------|----------------------|-----------------------------------------|--------------------------|-----------------------|
-| 7 original fields | sets all | sets all (status=`placeholder`) | reads `status`,`notes`,`output.mem_map` | reads all (NEW) | serializes all |
-| `crc_regions` | populated (check & inject) | `None` | renders per-region lines (LLR-002.4) | renders CRC section (LLR-002.5/003.5, **NEW** — does not consume `OperationResult` today) | serialized when present |
-| `output` (`LoadedFile`, non-optional) | check → input snapshot unchanged; inject → `LoadedFile` over injected map (F-Q-02) | echoes input | `render_hex_view_text(output.mem_map)` | — | n/a |
+| Field | CRC op producer | Placeholder producers | Consumer: `OperationsScreen` (`screens.py:637-650`) | Consumer: `to_dict` (`model.py:122`) |
+|-------|-----------------|----------------------|-----------------------------------------|-----------------------|
+| 7 original fields | sets all | sets all (status=`placeholder`) | reads `status`,`notes`,`output.mem_map` | serializes all |
+| `crc_regions` | populated (check & inject) | `None` | renders per-region lines (LLR-002.4) | serialized when present |
+| `output` (`LoadedFile`, non-optional) | check → input snapshot unchanged; inject → `LoadedFile` over injected map (F-Q-02) | echoes input | `render_hex_view_text(output.mem_map)` | n/a |
 
 **Contract-touch rule (batch-07 B-1/B-2):** this table is the canonical set; any later edit adding a result field re-opens it for a field-set-equality re-run recorded in that edit's §6.4 audit row.
 
@@ -661,6 +655,14 @@ Hex strings parsed to int (`int(s, 16)`); `end` is the half-open upper bound (ma
 
 All 19 findings CLOSED. 0 remain open. (F-Q-03/RK-3's non-default-vector residual stays a deliberate, flagged "assumed — verify in Phase 3/4" data dependency, not an open finding.)
 
+**Phase-3 reconciliation event J-3 (2026-06-16) — operator re-scope of the "persistent report" surface.**
+
+| Finding(s) | What changed | Parent HLR re-read? | Body edit landed (section) |
+|---|---|---|---|
+| J-3 (Phase-3 scope-change) | Discovered at I4 prep: `report_service.generate_project_report` (`report_service.py:913`) is project/variant-scoped and consumes `VariantExecutionResult`, NOT `OperationResult`. Binding a CRC section there is an awkward, operator-unreachable coupling — the batch-11 SCOPE-1 / A-5 half-delivery risk. **Operator decision (2026-06-16):** the CRC persistent record is the operation's OWN output (the FR9 emitted modified S19 + the `OperationResult`), rendered in the op-result view; `report_service` is NOT touched. **I4 WITHDRAWN** (folded into I5). **LLR-002.5 WITHDRAWN** (check has no separate persistent artifact). **LLR-003.5 RE-SCOPED** (write outcome via OperationResult, not report_service). TC-117 withdrawn; TC-126 re-pointed to `test_crc_operation.py`. `report_service.py` + `test_report_crc.py` removed from the §6.5 census. NO new external-write surface added (the I5 write path was already in scope with mandatory security sign-off) → no security re-route. | HLR-002 ✓ (check surface = op-result view only), HLR-003 ✓ (write record = emitted S19 + OperationResult, I5) | §4 increment plan (I4 withdrawn, I5 absorbs); §4 LLR-002.2/.5, LLR-003.5; §5.2 TC-117/126; §5.4 matrix; §6.5 census |
+
+Increment count after J-3: **6** (I1a, I1b, I2, I3a, I3b, I5). Net new TCs unaffected by the withdrawal (TC-117 never implemented; TC-126 re-homed).
+
 ---
 
 ### 6.5 Change-first census (A-1 / A-2 / A-4) — best-effort + gate-confirmed
@@ -678,11 +680,11 @@ Run change-first: each planned new/edited file checked against EVERY guard famil
 | `s19_app/tui/operations/registry.py` | E (maybe) | No | If `CrcOperation` body moves out of `placeholders.py`, registry import line updates. Not frozen. |
 | `s19_app/tui/operations/placeholders.py` | E (maybe) | No | `CrcOperation` becomes real (or moves to `crc.py`). Not frozen. `tests/test_operations.py` regression net. |
 | `s19_app/tui/services/operation_service.py` | **E (definite, F-A-02)** | No | `run_operation` migrates to build/forward the neutral `OperationInput`. Not frozen. |
-| `s19_app/tui/services/report_service.py` | **E (F-A-01)** | No | NEW CRC report section consuming `crc_regions` (does not consume `OperationResult` today; `generate_project_report` `:913` is `VariantExecutionResult`-based). Not in either frozen list. Section shape gate-confirm at I4. |
+| ~~`s19_app/tui/services/report_service.py`~~ | — | — | **NOT TOUCHED — WITHDRAWN (Phase-3 re-scope §6.4 J-3).** The CRC persistent record is the operation's emitted S19 + `OperationResult`, not a project-report section. |
 | `s19_app/tui/screens.py` | E | No | Call-site adapter + config text surface + confirm modal. **Structural — gate-confirm at increment** (A-2). Not frozen. |
 | `s19_app/tui/app.py` | E | No | Worker-thread wiring (R-6). **Structural — gate-confirm at increment** (A-2). Not frozen. |
 | `examples/crc_config.example.json` | N | No | Dummy template. AC-artifact (LLR-004.1); probe 2026-06-16 → 0 existing. |
-| `tests/test_crc_engine.py`, `tests/test_crc_operation.py`, `tests/test_crc_config.py`, `tests/test_tui_crc_surface.py`, `tests/test_report_crc.py` | N | No | New tests (engine, operation, config, TUI-surface pilot, report). |
+| `tests/test_crc_engine.py`, `tests/test_crc_operation.py`, `tests/test_crc_config.py`, `tests/test_tui_crc_surface.py` | N | No | New tests (engine, operation, config, TUI-surface pilot). (`tests/test_report_crc.py` WITHDRAWN — §6.4 J-3.) |
 | `REQUIREMENTS.md` | E | No | Add `REQ-crc.md` reference + R-* status. Not frozen. |
 
 **Guard-family pass (change-first):**
