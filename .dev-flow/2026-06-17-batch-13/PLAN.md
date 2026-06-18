@@ -3,9 +3,9 @@
 > Living doc. Updated at every gate + significant checkpoint. BLUF: where we are, what's next, why.
 
 ## Where we are
-- **Phase 5 (Post-mortem) — awaiting gate.** Closed clean, PASS, 0 defects. Top lessons: Phase-0 premise correction (highest leverage), stale-main-ref discovery, reader-as-oracle reuse + b12 controls held. 6 carries (3 new, 3 standing). New §6.5 amendment convention assessed keep.
-- (done) Phase 4 PASS committed (c6d1440); Phase 3 (9ab8d3e/a8c7080/e42181c/5197169); Phase 0-2; batch-12 sync; conventions in /dev-flow command.
-- **NOTE:** local `main` ref stale (`ec453a2`); true base = `febd843` (§6.5 Amendment A-1).
+- **Phase 6 (Documentation) — awaiting gate (FINAL).** REQUIREMENTS.md §19 (3 R-*, Automated) + 06-docs (traceability/functionality/2 Mermaid diagrams/exec-summary). Verified: node ids real, 0 mojibake. On approval → awaiting-sync.
+- (done) Phase 5 close-batch (2ad5126); Phase 4 PASS (c6d1440); Phase 3 (…/5197169); Phase 0-2; batch-12 sync.
+- **On close:** push branch → PR to main → review/CI → merge → `/dev-flow-sync`. (CI trigger gap RESOLVED since b06 — do not re-flag.)
 
 ## Objective
 Surface two existing-substrate TUI capabilities (no new engine math):

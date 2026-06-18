@@ -40,6 +40,7 @@ Functional subsystems:
 16. HEX Emitter + Verify-on-Save (batch-10)
 17. Project Manifest Writer (batch-11)
 18. CRC Operation (CRC_F2) (batch-12)
+19. CRC Config-from-File + Patch-Editor Paste (batch-13)
 
 ---
 
@@ -2275,3 +2276,145 @@ closed `STATUS_DOMAIN` `{"placeholder","ok","error"}` for all current callers
   `test_placeholders_registered` — 10 nodes, 0 regressions post-widening)
 - Status: Added in batch `2026-06-16-batch-12` (US-011/US-012 / HLR-005 /
   LLR-005.1–005.3, resolves batch-08 deferred R-2 / R-3)
+
+---
+
+# 19. CRC Config-from-File + Patch-Editor Paste (CRC_F2 / Patch Editor)
+
+The batch (`2026-06-17-batch-13`, US-013 / US-014) adds **two existing-substrate
+TUI surfaces** — no new engine math. US-013 lets the operator load the CRC config
+JSON from a file path into the editable `#operation_config` `TextArea` (rather
+than only pasting it), reusing the shipped resolve + size-cap read contract.
+US-014 lets the operator paste a whole `s19app-changeset` (kind=change) document
+into the Patch Editor — pre-loaded with a dummy reference — and parse it into the
+owned `ChangeService` document, which then feeds the **already-shipped**
+apply / containment / contained-emit / verify / save-back path **with zero new
+write surface**. Both surfaces preserve the collect-don't-abort reader contract
+and touch ZERO frozen engine path (the CRC reader lands in non-frozen
+`tui/operations/crc_config.py`; the change-document parse seam lands in
+non-frozen `tui/changes/io.py`).
+
+> **Per-story HLR/LLR detail:** the normative source of truth for the full EARS
+> statements is `.dev-flow/2026-06-17-batch-13/01-requirements.md` §3 (HLR-013 /
+> HLR-014) / §4 (LLR-013.1–.3 / LLR-014.1–.3); the per-node validation verdicts
+> are in `.dev-flow/2026-06-17-batch-13/04-validation.md` (verdict **PASS**:
+> 2/2 HLR + 6/6 LLR PASS, 0 FAIL; full suite **861 passed / 0 failed / 29
+> skipped / 3 xfailed**, 893 collected; TC-201..211 each map to exactly one real
+> passing node, 0 orphans). The rows below are the repo-wide `R-*`
+> traceability that REFERENCE those docs; the EARS statements, consumer-input
+> contracts, and the change-first census are NOT inlined here.
+
+> **Scope boundaries (honest).** This batch is **TUI-only** — no CLI (`s19tool`)
+> config-load or paste. US-014 is a **Phase-0 re-scope** to the one genuinely
+> missing ergonomic (paste-full-changeset + dummy pre-load, at CRC parity): the
+> shipped Patch Editor load-from-file, apply, INSIDE/PARTIAL/OUTSIDE containment,
+> contained emit (`emit_s19_from_mem_map` via `copy_into_workarea`), and
+> `verify_written_image` reader-as-oracle are reused **unchanged** and were NOT
+> re-specified. The two-stage write modal and a write worker-thread remain
+> operator-DEFERRED. The stale `app.py:938` "inert shell" docstring was corrected
+> as a surgical truth-fix (not a requirement).
+
+**R-CRC-CONFIGLOAD-001**: Where the CRC operation is the selected operation on
+the `OperationsScreen`, when the operator supplies a config file path and
+triggers a load, the system must ingest the file's RAW text into the editable
+`#operation_config` `TextArea` under the existing resolve + size-cap read
+contract (`resolve_input_path` + `READ_SIZE_CAP_BYTES`, size-cap enforced BEFORE
+read); and if the path is empty, unresolvable, over the size cap, or unreadable,
+then the system must surface exactly one collected error on the operations status
+surface, leave the `#operation_config` text unchanged, and run no CRC check
+(collect-don't-abort, never raises). The CRC run path is unchanged — Execute
+still parses the editor text via `parse_crc_config(TextArea.text)`, and while no
+file has been loaded the editor keeps `DUMMY_CONFIG_TEXT` as the pre-loaded
+reference (HLR-013 / LLR-013.1–013.3; detail in `01-requirements.md` §3/§4).
+
+- Code: `s19_app/tui/operations/crc_config.py` (`read_crc_config_text` :221 — the
+  NEW raw-text reader: resolve + size-cap + `read_text`, returns
+  `tuple[Optional[str], list[str]]` WITHOUT parsing; `read_crc_config` /
+  `parse_crc_config` / `DUMMY_CONFIG_TEXT` reused import-only),
+  `s19_app/tui/screens.py` (`OperationsScreen` config-path `Input`
+  `#operation_config_path` + "Load config" `Button` `#operation_config_load` in
+  `compose`, toggled with `#operation_config` by `_sync_config_visibility`;
+  `on_button_pressed` → `_load_config_from_path` handler at screens.py:795/801/841)
+- Validation: `Automated` via `tests/test_crc_config.py`
+  (`test_read_crc_config_text_returns_raw_text_without_parsing`,
+  `test_read_crc_config_text_over_cap_collects_one_error_without_reading`,
+  `test_read_crc_config_text_returns_unparsed_invalid_json`,
+  `test_read_crc_config_text_unresolvable_path_collects_one_error`) and
+  `tests/test_tui_crc_surface.py`
+  (`test_crc_config_load_widgets_present_and_toggle` — TC-201,
+  `test_crc_config_load_ok_populates_editor_via_handler` — TC-203,
+  `test_crc_config_load_fault_surfaces_error_and_no_check` — TC-204,
+  `test_crc_config_error_surfaces_error_and_no_match`)
+- Status: Added in batch `2026-06-17-batch-13` (US-013 / HLR-013 /
+  LLR-013.1–013.3). A-5 surface-reachability: the load reaches `#operation_config`
+  THROUGH the `on_button_pressed` handler call-site (not a direct reader call).
+
+**R-PATCH-PASTE-001**: While the Patch Editor is mounted, the system must present
+an editable paste `TextArea` pre-loaded with `DUMMY_CHANGESET_TEXT` (a
+syntactically valid `s19app-changeset`, kind=change, FAKE values only) as a
+format reference; when the operator triggers the `parse_paste` action, the panel
+must post a `PatchEditorPanel.ActionRequested` carrying the paste text, `app.py`
+must route it to `ChangeService.load_text`, and the service must parse the text
+into a `ChangeDocument` via a string-input parse seam under collect-don't-abort,
+replacing the owned document; a malformed paste must yield a document carrying
+the collected findings (including `MF-JSON-PARSE` on a JSON-decode failure) and
+must not raise. The string seam is a delegation refactor of the file reader —
+`read_change_document(path)` delegates to `parse_change_document(text)` exactly
+once — and a string-parsed document equals the equivalent file read on `entries`
+and issue-code set (the string seam sets `source_path=None`, the only intended
+divergence) (HLR-014 / LLR-014.1–014.2; detail in `01-requirements.md` §3/§4).
+
+- Code: `s19_app/tui/changes/io.py` (`parse_change_document` :431 — NEW string
+  seam factored out of the post-`json.load` interpretation, re-homing the
+  `MF-JSON-PARSE` three-exception catch onto `json.loads(text)`;
+  `read_change_document` refactored to delegate after resolve + size-cap + read;
+  `DUMMY_CHANGESET_TEXT` :134; both added to `__all__`),
+  `s19_app/tui/services/change_service.py` (`load_text` :633 — NEW sibling of
+  `load` that calls `parse_change_document(text)` and does the same
+  `self.document = …` / `last_summary = None` / `ChangeActionResult` shaping),
+  `s19_app/tui/screens_directionb.py` (paste `TextArea` `#patch_paste_text` on
+  `PatchEditorPanel` + `parse_paste` action + `paste_text` field on
+  `ActionRequested`), `s19_app/tui/app.py` (`parse_paste` route to `load_text`
+  at app.py:1336-1338; `PATCH_ACTIONS_V2` extended 9→10)
+- Validation: `Automated` via `tests/test_changes_schema.py`
+  (`test_dummy_changeset_parses` — TC-206,
+  `test_parse_from_string_matches_file_read` — TC-207 (narrowed `entries` +
+  `{issue.code}` parity oracle, `source_path=None` divergence asserted),
+  `test_parse_malformed_json_emits_mf_json_parse` — TC-209,
+  `test_read_change_document_delegates_to_parse` — TC-210 (`call_count == 1`),
+  `test_no_changeset_under_examples` — TC-211 tripwire) and
+  `tests/test_tui_patch_editor_v2.py`
+  (`test_paste_textarea_preloads_dummy_changeset` — TC-205,
+  `test_paste_parse_then_apply_matches_file_loaded` — TC-208 (route half),
+  `test_action_routing_pins_exactly_ten_v2_actions` — the `PATCH_ACTIONS_V2`
+  9→10 REUSE-extend)
+- Status: Added in batch `2026-06-17-batch-13` (US-014 / HLR-014 /
+  LLR-014.1–014.2). A-5 surface-reachability: parse reaches the service THROUGH
+  the panel → `ActionRequested(paste_text)` → router call-site, not a direct
+  `load_text` kwarg.
+
+**R-PATCH-WRITE-REUSE-001**: After a paste is parsed into the owned document, the
+system must make that document drive the EXISTING apply / INSIDE-PARTIAL-OUTSIDE /
+contained-emit / verify / save-back path unchanged, introducing **no new write
+surface** — a paste-parsed document and an equivalent file-loaded document must
+produce identical apply outcomes (entries applied + save-back prompt state,
+including the pre-filled save name) (HLR-014 / LLR-014.3; the standing F-S-03
+write-surface gate).
+
+- Code: no new write code — reuse-only. The shipped write path
+  (`s19_app/tui/changes/apply.py`, `s19_app/tui/changes/verify.py`,
+  `s19_app/tui/workspace.py`, plus `emit_s19_from_mem_map` and `save_patched`)
+  is consumed unchanged; the parse seam (`R-PATCH-PASTE-001`) is the only delta
+  feeding it
+- Validation: `Automated (inspection)` — the standing write-surface gate is a
+  HARD Phase-4 row, verified against the batch-13 branch point `febd843` (the
+  PR #17 merge = real `origin/main` tip, NOT the stale local `main` ref):
+  `git diff febd843 -- s19_app/tui/changes/apply.py s19_app/tui/changes/verify.py
+  s19_app/tui/workspace.py` = **0 changed lines**, and the `emit_s19_from_mem_map`
+  / `save_patched` symbol bodies are unchanged vs `febd843` (0 new write paths).
+  The reuse itself is exercised by `tests/test_tui_patch_editor_v2.py`
+  (`test_paste_parse_then_apply_matches_file_loaded` — TC-208, apply + save-back
+  prompt-name identity vs a file-loaded document)
+- Status: Added in batch `2026-06-17-batch-13` (US-014 / HLR-014 / LLR-014.3).
+  Standing gate — re-run on any future batch that touches the Patch Editor write
+  surface; PASS at batch-13 close vs `febd843`.

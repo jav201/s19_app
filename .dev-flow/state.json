@@ -4,7 +4,7 @@
     "batch_id": "2026-06-17-batch-13",
     "batch_objective": "Surface two existing-substrate TUI capabilities (no new engine math). US-013: load the CRC config JSON from a file in the CRC surface (OperationsScreen) via the existing crc_config.read_crc_config(path) (resolve_input_path + READ_SIZE_CAP_BYTES + collect-don't-abort) and populate the editable TextArea; DUMMY_CONFIG_TEXT stays pre-loaded as editable reference; load errors surface and DO NOT run the check. US-014: wire the inert Patch Editor (rail key 6, PatchEditorPanel, #screen_patch) to load a change-document (kind=change) from FILE and/or PASTE with a pre-loaded dummy change-document reference, apply via changes/apply.apply_change_document, show before/after + per-entry INSIDE/PARTIAL/OUTSIDE containment, then WRITE under R-6 (worker-thread + two-stage confirm + contained emit via copy_into_workarea seam + verify_written_image reader-as-oracle + MANDATORY security-reviewer sign-off).",
     "current_phase": 6,
-    "phase_status": "in-progress",
+    "phase_status": "awaiting-sync",
     "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
     "artifacts": {
         "1": ".dev-flow/2026-06-17-batch-13/01-requirements.md",
@@ -196,6 +196,18 @@
             "date": "2026-06-18",
             "decision": "started",
             "notes": "Phase 6 docs. 3 parallel agents, disjoint files. (A) docs-writer -> REQUIREMENTS.md NEW section for batch-13 (US-013 CRC config-from-file + US-014 paste-changeset; living-doc, references-not-inlines, matches the s18 CRC format from b12) + back-ref to operations/requirements REQ if applicable. (B) docs-writer -> 06-docs/traceability-matrix.md (2 HLR/6 LLR rows w/ real node ids from 04-validation: TC-201..211 reconciled; mark the LLR-014.3 standing write-surface gate row), functionality.md (operator walkthrough: load CRC config from file; paste change-doc -> parse -> apply -> confirm -> contained write), diagrams/ (Mermaid: CRC config-load flow + paste-changeset parse->apply->existing-write flow). (C) presentation-builder -> executive-summary.md (~1.5pp, real numbers 861/0, +14 tests, PASS, 0 defects, the premise-correction story). Orchestrator INDEPENDENTLY re-verify after (b09 lesson): REQUIREMENTS.md section landed, 06-docs files present, Mermaid blocks present, 0 mojibake, UTF-8 no-BOM. On approval state -> awaiting-sync."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-18",
+            "decision": "awaiting-gate",
+            "notes": "PRE-DECISION. Phase 6 docs complete. (A) docs-writer -> REQUIREMENTS.md NEW §19 'CRC Config-from-File + Patch-Editor Paste' (R-CRC-CONFIGLOAD-001 / R-PATCH-PASTE-001 / R-PATCH-WRITE-REUSE-001, all Automated; mirrors §18 format, references-not-inlines; +TOC line; 143 insertions/0 deletions surgical). (B) docs-writer -> 06-docs/traceability-matrix.md (US->HLR->LLR->TC->status->evidence; 13 chain rows + 3 write-surface gate rows; all PASS; real node ids), functionality.md (operator walkthrough both features + FAKE/dummy callouts + 4 safety properties), diagrams/batch-13-flows.md (2 Mermaid: CRC config-load + paste-changeset, NEW-green vs REUSED-blue nodes). (C) presentation-builder -> executive-summary.md (~1.5pp/56 lines, real numbers 861/0 +14 PASS 0-defects, premise-correction framed as strength). ORCHESTRATOR independently re-verified (b09 lesson): REQUIREMENTS.md §19 + 3 R-* landed (grep), 4 06-docs files present, 2 Mermaid blocks, the 3 cited patch-editor test nodes EXIST on disk (not fabricated), 0 mojibake, UTF-8 no-BOM. Note: REQUIREMENTS.md R-* use 'must' (the living-doc R-* convention matching §18), NOT the dev-flow HLR/LLR 'shall' rule - correct. On approval state -> awaiting-sync (close commit + push + PR + review + CI + merge + /dev-flow-sync). NOTE: tui-ci fires on main since b06 (CI trigger gap RESOLVED - do not re-flag); worktree branch off febd843. Awaiting Phase 6 gate."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-18",
+            "decision": "approved-batch-content-closed-awaiting-sync",
+            "notes": "Phase 6 APPROVED (operator: 'document the batch properly'). Batch-13 CONTENT CLOSED. Docs committed locally (REQUIREMENTS.md §19 + 06-docs + PLAN + state). state -> awaiting-sync. Operator requested /dev-flow-sync NOW + going to sleep. SEQUENCING SURFACED to operator: per dev-flow-sync convention sync runs AFTER merge; batch-13 is committed locally on branch claude/agitated-boyd-ea0e9e but NOT pushed/PR/merged. Push/PR/merge are outward-facing + need review -> NOT done unsupervised while operator sleeps. Proceeding with sync per explicit request, README frontmatter will mark merge PENDING. REMAINING on operator return: push branch -> PR to main -> review/CI (tui-ci fires on main since b06) -> merge -> re-confirm sync flag. Full batch-13: 6 phases, 3 increments, 879->893 (+14), 861/0 full suite, PASS, 0 defects, commits 9ab8d3e..2ad5126 + pending Phase-6 docs close commit."
         }
     ],
     "obsidian_synced": false,
