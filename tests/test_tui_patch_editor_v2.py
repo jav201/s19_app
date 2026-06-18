@@ -51,7 +51,10 @@ from s19_app.tui.changes import (
     VerifyResult,
     emit_s19_from_mem_map,
 )
-from s19_app.tui.changes.io import emit_intel_hex_from_mem_map
+from s19_app.tui.changes.io import (
+    DUMMY_CHANGESET_TEXT,
+    emit_intel_hex_from_mem_map,
+)
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.load_service import build_loaded_hex, build_loaded_s19
 
@@ -172,14 +175,14 @@ def test_panel_composition(tmp_path: Path) -> None:
 # ===========================================================================
 
 
-def test_action_routing_pins_exactly_nine_v2_actions() -> None:
-    """The routable action set is exactly nine actions at E6.
+def test_action_routing_pins_exactly_ten_v2_actions() -> None:
+    """The routable action set is exactly ten actions at batch-13.
 
-    Intent: LLR-003.2 + LLR-006.6 (F-A-15) — the E3a eight {add_entry,
-    edit_entry, remove_entry, load_doc, validate_doc, apply_doc, save_doc,
-    run_checks} extended by exactly ONE further action at increment E6,
-    ``execute_scope`` (the stated F-A-15 extension clause — the E3a
-    eight-action pin re-asserted as nine here).
+    Intent: LLR-003.2 + LLR-006.6 (F-A-15) + LLR-014.2 — the E3a eight
+    {add_entry, edit_entry, remove_entry, load_doc, validate_doc, apply_doc,
+    save_doc, run_checks} extended by ``execute_scope`` at increment E6 (the
+    stated F-A-15 extension clause) and by ``parse_paste`` at batch-13 (the
+    paste-changeset surface) — the action pin re-asserted as ten here.
     """
     assert PATCH_ACTIONS_V2 == frozenset(
         {
@@ -192,8 +195,122 @@ def test_action_routing_pins_exactly_nine_v2_actions() -> None:
             "save_doc",
             "run_checks",
             "execute_scope",
+            "parse_paste",
         }
     )
+
+
+# ===========================================================================
+# TC-205 — paste TextArea dummy pre-load (LLR-014.1)
+# ===========================================================================
+
+
+def test_paste_textarea_preloads_dummy_changeset(tmp_path: Path) -> None:
+    """The paste ``TextArea`` exists on mount, pre-loaded with the dummy.
+
+    Intent: LLR-014.1 (HLR-014) — the Patch Editor presents an editable
+    paste field pre-loaded with ``DUMMY_CHANGESET_TEXT`` as a format
+    reference, at CRC-surface parity. Compared with ``.rstrip("\\n")``
+    tolerance because Textual's ``TextArea`` may normalise a trailing
+    newline on init (F-Q-07).
+    """
+    from textual.widgets import TextArea
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return app.query_one("#patch_paste_text", TextArea).text
+
+    text = asyncio.run(_drive())
+    assert text.rstrip("\n") == DUMMY_CHANGESET_TEXT.rstrip("\n")
+
+
+# ===========================================================================
+# TC-208 — paste parses then drives the EXISTING apply path (LLR-014.2/.3)
+# ===========================================================================
+
+
+def test_paste_parse_then_apply_matches_file_loaded(tmp_path: Path) -> None:
+    """A parsed paste replaces the document and drives the existing apply
+    path with the SAME save-back prompt name as a file-loaded document.
+
+    Intent: LLR-014.2 — the ``parse_paste`` action routes the paste text
+    through ``ChangeService.load_text``, replacing the owned document
+    (entries present). LLR-014.3 (F-A-06) — the parsed document then drives
+    the EXISTING ``apply_doc`` path, and the post-apply save-back prompt's
+    pre-filled name is IDENTICAL to a file-loaded document's, since the
+    name is ``<variant_id>-patched.s19`` (driven by the loaded image's stem,
+    NOT by ``source_path``). No new write surface — the same apply path.
+    """
+    from textual.containers import Container
+    from textual.widgets import Button, Input, TextArea
+
+    image_path = _make_s19_image(tmp_path)
+    # One entry inside the loaded image's [0x100, 0x110) range so apply
+    # writes ≥1 entry and the save-back prompt opens (S19).
+    entries = [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+    paste_text = json.dumps(
+        {
+            "format": "s19app-changeset",
+            "version": "2.0",
+            "kind": "change",
+            "encoding": "utf-8",
+            "value_mode": "text",
+            "entries": entries,
+        }
+    )
+    doc_path = _write_v2_document(tmp_path / "patch.json", entries)
+
+    async def _apply_via(source: str) -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            if source == "paste":
+                app.query_one(
+                    "#patch_paste_text", TextArea
+                ).text = paste_text
+                app.query_one(
+                    "#patch_paste_parse_button", Button
+                ).press()
+            else:
+                _set_entry_inputs(app, path_text=str(doc_path))
+                panel.request_action("load_doc")
+            await pilot.pause()
+
+            outcomes["entries"] = len(
+                app._change_service.document.entries
+            )
+
+            panel.request_action("apply_doc")
+            await pilot.pause()
+
+            prompt = app.query_one("#patch_saveback_row", Container)
+            name_input = app.query_one("#patch_saveback_name_input", Input)
+            outcomes["prompt_shown"] = not prompt.has_class("hidden")
+            outcomes["saveback_name"] = name_input.value
+        return outcomes
+
+    pasted = asyncio.run(_apply_via("paste"))
+    loaded = asyncio.run(_apply_via("file"))
+
+    # parse_paste replaced the document with the parsed entries.
+    assert pasted["entries"] == 1
+    # The existing apply path opened the S19 save-back prompt.
+    assert pasted["prompt_shown"] is True
+    assert loaded["prompt_shown"] is True
+    # F-A-06: paste-parsed and file-loaded produce the SAME save-back name
+    # (source_path does not drive it).
+    assert pasted["saveback_name"] == loaded["saveback_name"]
+    assert pasted["saveback_name"] == f"{image_path.stem}-patched.s19"
 
 
 def test_action_routing_observable_effects(tmp_path: Path) -> None:

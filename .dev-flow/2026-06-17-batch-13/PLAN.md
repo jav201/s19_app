@@ -3,9 +3,9 @@
 > Living doc. Updated at every gate + significant checkpoint. BLUF: where we are, what's next, why.
 
 ## Where we are
-- **Phase 3 (Implementation) — Inc 2 awaiting gate.** US-014 data layer (3 files, +5 tests); F-A-01 major resolved (MF-JSON-PARSE re-homed, delegation pinned). code-reviewer APPROVE-WITH-NITS (0 HIGH; 1 pre-existing F401 left). Ledger 886→891. Write path UNTOUCHED vs febd843.
-- (done) Inc 1 US-013 APPROVED + committed (9ab8d3e, a8c7080); Phase 0-2; batch-12 sync; comms-rules in /dev-flow command.
-- **NOTE:** local `main` ref is stale (`ec453a2`); batch-13 true base = `febd843`. F-S-03 gate baseline pinned to `febd843` in LLR-014.3.
+- **Phase 3 (Implementation) — Inc 3 awaiting gate (COMPLETES Phase 3).** US-014 UI wiring (3 files, +2 tests); paste TextArea + parse_paste route + stale :938 docstring fixed. code-reviewer APPROVE (0 HIGH; F1 folded). Ledger 891→893. Write path UNTOUCHED vs febd843; PATCH_ACTIONS_V2 = 10.
+- (done) Inc 1 (9ab8d3e/a8c7080) + Inc 2 (e42181c) committed; Phase 0-2; batch-12 sync; comms-rules + amendment-record convention in /dev-flow command.
+- **NOTE:** local `main` ref is stale (`ec453a2`); batch-13 true base = `febd843`. F-S-03 gate baseline pinned to `febd843` (§6.5 Amendment A-1).
 
 ## Objective
 Surface two existing-substrate TUI capabilities (no new engine math):
@@ -65,6 +65,8 @@ A-3 save-flow composition (b11 LEAD), RK-3 non-zlib device vector, CLI 'ops', CO
 - Baseline CONFIRMED (V-7): **879 collected** (matches b12 close).
 - Inc 1 (US-013): +7 (TC-202 ×4 unit + TC-201/203/204 ×3 surface) → **886 collected**. Signed: post = 879 − 0 + 7 = 886 EXACT.
 - Inc 2 (US-014 data): +5 (TC-206/207/209/210/211) → **891 collected**. Signed: post = 886 − 0 + 5 = 891 EXACT.
+- Inc 3 (US-014 UI): +2 (TC-205/208; action-pin renamed = REUSE, net 0) → **893 collected**. Signed: post = 891 − 0 + 2 = 893 EXACT.
+- **Phase-3 total: 879 → 893 (+14: I1 +7, I2 +5, I3 +2).**
 
 ## Decision log (mirror of state.json, human-readable)
 - 2026-06-17 — Phase 0 init: batch-13 scaffolded; batch-12 close snapshot written.
