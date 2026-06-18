@@ -47,7 +47,17 @@ from typing import List, Optional, Sequence, Tuple
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
-from textual.widgets import Button, DataTable, Input, Label, Select, Static
+from textual.widgets import (
+    Button,
+    DataTable,
+    Input,
+    Label,
+    Select,
+    Static,
+    TextArea,
+)
+
+from .changes.io import DUMMY_CHANGESET_TEXT
 
 
 class EmptyStatePanel(Static):
@@ -436,6 +446,9 @@ class PatchEditorPanel(ScrollableContainer):
                 shows (one of ``EXECUTE_SCOPES``) — used by the E6
                 ``"execute_scope"`` action; empty default keeps the E3a
                 constructions unchanged.
+            paste_text (str): The paste ``TextArea``'s current text — used
+                by the batch-13 ``"parse_paste"`` action (LLR-014.2); empty
+                default keeps the prior constructions unchanged.
 
         Dependencies:
             Used by:
@@ -450,6 +463,7 @@ class PatchEditorPanel(ScrollableContainer):
             bytes_text: str = "",
             path_text: str = "",
             scope_text: str = "",
+            paste_text: str = "",
         ) -> None:
             super().__init__()
             self.action = action
@@ -458,6 +472,7 @@ class PatchEditorPanel(ScrollableContainer):
             self.bytes_text = bytes_text
             self.path_text = path_text
             self.scope_text = scope_text
+            self.paste_text = paste_text
 
     class SaveBackDecision(Message):
         """The operator answered the post-apply save prompt (LLR-002.7).
@@ -561,6 +576,17 @@ class PatchEditorPanel(ScrollableContainer):
             ),
             id="patch_doc_file_row",
         )
+        yield Container(
+            Label(
+                "Paste change-set (v2 JSON)", classes="patch-field-label"
+            ),
+            TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
+            Horizontal(
+                Button("Parse pasted", id="patch_paste_parse_button"),
+                id="patch_paste_controls",
+            ),
+            id="patch_paste_row",
+        )
         yield Label("", id="patch_doc_issue_count", classes="patch-field-label")
         yield Static("", id="patch_doc_issues", markup=False, classes="hidden")
         yield Container(
@@ -650,8 +676,10 @@ class PatchEditorPanel(ScrollableContainer):
         """Translate any Patch Editor button press into a message.
 
         Summary:
-            Map the pressed button id to one of the eight v2 actions and
-            forward it via :meth:`request_action`; the save-back confirm /
+            Map the pressed button id to one of the v2 actions and forward
+            it via :meth:`request_action`; the "Parse pasted" button posts
+            its own :class:`ActionRequested` carrying the paste ``TextArea``
+            body (``parse_paste``, LLR-014.2), and the save-back confirm /
             decline buttons post a :class:`SaveBackDecision` instead. Stops
             the event so it does not also reach the app-level
             ``on_button_pressed``.
@@ -678,9 +706,23 @@ class PatchEditorPanel(ScrollableContainer):
             event.stop()
             self.post_message(self.SaveBackDecision(None))
             return
+        if button_id == "patch_paste_parse_button":
+            # The paste action carries the TextArea body (not an Input), so
+            # it posts its own ActionRequested with ``paste_text`` rather
+            # than going through request_action (LLR-014.2).
+            event.stop()
+            self.post_message(
+                self.ActionRequested(
+                    action="parse_paste",
+                    paste_text=self.query_one(
+                        "#patch_paste_text", TextArea
+                    ).text,
+                )
+            )
+            return
         if button_id == "patch_execute_scope_button":
             # Selector state only — cycle the scope and relabel; no message
-            # is posted, so the routed action set stays exactly nine.
+            # is posted, so this adds no routed action.
             event.stop()
             index = self.EXECUTE_SCOPES.index(self._execute_scope)
             self._execute_scope = self.EXECUTE_SCOPES[

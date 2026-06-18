@@ -120,8 +120,9 @@ from .workspace import (
 )
 
 #: The Patch Editor's routable action set (LLR-003.2) — the eight v2
-#: actions of increment E3a extended by exactly one further action at E6,
-#: ``execute_scope`` (the stated F-A-15 extension, LLR-006.6 — nine total).
+#: actions of increment E3a extended by ``execute_scope`` at E6 (the stated
+#: F-A-15 extension, LLR-006.6) and by ``parse_paste`` at batch-13
+#: (LLR-014.2 — the paste-changeset surface; ten total).
 #: A non-member action is reported as a status error, never a crash.
 PATCH_ACTIONS_V2: frozenset[str] = frozenset(
     {
@@ -134,6 +135,7 @@ PATCH_ACTIONS_V2: frozenset[str] = frozenset(
         "save_doc",
         "run_checks",
         "execute_scope",
+        "parse_paste",
     }
 )
 
@@ -935,9 +937,13 @@ class S19TuiApp(App):
             - Screen 4 (Memory Map) renders a read-only coverage map of the
               loaded image, and screen 8 (Bookmarks) shows a neutral
               "coming soon" placeholder (increment 9).
-            - Screen 6 (Patch Editor) is an inert before/after view shell
-              and screen 7 (A2B Diff) is a static three-column placeholder
-              (increment 10); neither wires patch or diff logic.
+            - Screen 6 (Patch Editor) is the fully-wired v2 change flow —
+              the ``PatchEditorPanel`` posts ``ActionRequested`` messages
+              that ``app.py`` routes to ``ChangeService`` for
+              load / validate / apply / save / run-checks (and batch-13 adds
+              the ``parse_paste`` paste-changeset surface); screen 7
+              (A2B Diff) is a static three-column placeholder (increment 10)
+              that wires no diff logic.
             - The persistent ``#workspace_status_bar`` (above the footer)
               hosts the re-homed status text, progress bar and log-tail
               labels — the renderer targets the old Status tile carried.
@@ -1250,10 +1256,11 @@ class S19TuiApp(App):
         """
         Summary:
             Route a Patch Editor control action to the change service and
-            feed the shaped rows back to the screen — exactly the nine
+            feed the shaped rows back to the screen — exactly the ten
             ``PATCH_ACTIONS_V2`` actions (the LLR-003.2 eight plus the E6
-            ``execute_scope`` extension, LLR-006.6); a retired or unknown
-            action is one status error, never a crash.
+            ``execute_scope`` extension, LLR-006.6, plus the batch-13
+            ``parse_paste`` paste-changeset action, LLR-014.2); a retired or
+            unknown action is one status error, never a crash.
 
         Args:
             event (PatchEditorPanel.ActionRequested): The message a Patch
@@ -1267,7 +1274,10 @@ class S19TuiApp(App):
             - ``add_entry`` / ``edit_entry`` / ``remove_entry`` mutate the
               service's v2 document (both entry kinds).
             - ``load_doc`` / ``validate_doc`` / ``save_doc`` round-trip and
-              re-validate the document; ``apply_doc`` runs the E2 engine
+              re-validate the document; ``parse_paste`` replaces the owned
+              document from the paste ``TextArea`` body via
+              ``ChangeService.load_text`` (LLR-014.2), then the same apply
+              path takes over; ``apply_doc`` runs the E2 engine
               and, with ≥1 applied entry, opens the save-back prompt (S19)
               or states HEX save-back is unsupported (LLR-002.7).
             - ``run_checks`` rides the E4 service seam and renders the
@@ -1323,6 +1333,9 @@ class S19TuiApp(App):
                 else:
                     result = service.load(event.path_text, self.base_dir)
                     self._report_change_result(result)
+            elif event.action == "parse_paste":
+                result = service.load_text(event.paste_text)
+                self._report_change_result(result)
             elif event.action == "validate_doc":
                 self._report_change_result(service.validate(loaded_ranges))
             elif event.action == "apply_doc":

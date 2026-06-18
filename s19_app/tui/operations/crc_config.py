@@ -190,19 +190,16 @@ def read_crc_config(
             errors outside this contract.
 
     Data Flow:
-        - Resolve ``raw_path`` via ``resolve_input_path``; unresolvable → one
-          error, ``None`` config.
-        - Probe the on-disk size; over :data:`READ_SIZE_CAP_BYTES` → one
-          error, ``None`` config — the file is never read.
-        - Parse with stdlib ``json`` catching parse/decode errors → one error.
-        - Build the typed :class:`CrcConfig`; any missing/invalid field
-          (wrong type, un-parseable hex, malformed region) → one error.
+        - Read the raw text via :func:`read_crc_config_text` (resolve +
+          size-cap + ``read_text``); any read fault is returned verbatim as
+          ``(None, [one error])`` — the file is never parsed.
+        - On a clean read, delegate to :func:`parse_crc_config`; any
+          parse/structure fault becomes one collected error.
 
     Dependencies:
         Uses:
-            - workspace.resolve_input_path (path resolution)
-            - changes.io.READ_SIZE_CAP_BYTES (shared 256 MB read cap)
-            - json (stdlib parse)
+            - read_crc_config_text (resolve + size-cap + raw read)
+            - parse_crc_config (typed-build from the raw text)
         Used by:
             - the CRC operation config-sourcing path (HLR-004) and its TUI
               surface (LLR-004.2)
@@ -213,6 +210,78 @@ def read_crc_config(
         []
         >>> config.polynomial
         79764919
+    """
+    raw_text, errors = read_crc_config_text(raw_path, base_dir, size_probe)
+    if errors:
+        return None, errors
+    assert raw_text is not None  # no errors ⇒ raw text present (read succeeded)
+    return parse_crc_config(raw_text)
+
+
+def read_crc_config_text(
+    raw_path: str,
+    base_dir: Optional[Path] = None,
+    size_probe: Optional[SizeProbe] = None,
+) -> tuple[Optional[str], list[str]]:
+    """
+    Summary:
+        Read an operator-supplied CRC config file's RAW TEXT into memory —
+        resolve + size-cap + ``read_text`` — WITHOUT parsing it, collecting any
+        data-quality fault as a single error string and NEVER raising (the
+        ``read_change_document`` collect-don't-abort contract, ``io.py:266``).
+        This is the load seam the TUI "Load config" button (LLR-013.2) routes
+        through to populate the editable ``#operation_config`` ``TextArea``:
+        the editor stays the single source of truth, and the CRC run still
+        parses that text on Execute via :func:`parse_crc_config`. It is the
+        body of :func:`read_crc_config` minus the final parse delegation.
+
+    Args:
+        raw_path (str): The user-supplied config file path, resolved through
+            ``workspace.resolve_input_path`` before the file is opened — an
+            unresolvable path is one collected error and no file is opened.
+        base_dir (Optional[Path]): The base directory ``resolve_input_path``
+            resolves a RELATIVE path against. ``None`` (the default) uses the
+            current working directory.
+        size_probe (Optional[SizeProbe]): The on-disk byte-size measurement
+            seam. ``None`` (the default) resolves to a real
+            ``Path.stat().st_size`` at call time; injectable so a test can
+            report an over-cap size without a real 256 MB file.
+
+    Returns:
+        tuple[Optional[str], list[str]]: ``(raw_text, [])`` on success;
+        ``(None, [one error string])`` on ANY data-quality fault (unresolvable
+        path, over-cap, unreadable). The list carries exactly one error on
+        failure and is empty on success. Never raises on a data fault. NB: the
+        raw text is NOT parsed here, so a syntactically-invalid-but-readable
+        file still returns ``(raw_text, [])`` — the JSON fault surfaces later
+        at parse-on-run.
+
+    Raises:
+        None: Every failure mode is a collected error string
+            (collect-don't-abort), matching :func:`read_crc_config`'s fault
+            shape and messages.
+
+    Data Flow:
+        - Resolve ``raw_path`` via ``resolve_input_path``; unresolvable → one
+          error, ``None`` text.
+        - Probe the on-disk size; over :data:`READ_SIZE_CAP_BYTES` → one
+          error, ``None`` text — the file is never read.
+        - ``read_text`` the file; an ``OSError`` → one error, ``None`` text.
+
+    Dependencies:
+        Uses:
+            - workspace.resolve_input_path (path resolution)
+            - changes.io.READ_SIZE_CAP_BYTES (shared 256 MB read cap)
+        Used by:
+            - read_crc_config (delegates here, then parses)
+            - the CRC TUI "Load config" surface (LLR-013.2)
+
+    Example:
+        >>> text, errors = read_crc_config_text("examples/crc_config.example.json")
+        >>> errors
+        []
+        >>> text.startswith("{")
+        True
     """
     resolve_base = Path.cwd() if base_dir is None else base_dir
     resolved = resolve_input_path(Path(raw_path), resolve_base)
@@ -236,7 +305,7 @@ def read_crc_config(
     except OSError as exc:
         return None, [f"CRC config file could not be read: {exc}"]
 
-    return parse_crc_config(raw_text)
+    return raw_text, []
 
 
 def parse_crc_config(text: str) -> tuple[Optional[CrcConfig], list[str]]:

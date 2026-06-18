@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
@@ -45,6 +46,8 @@ from s19_app.tui.changes import (
     read_change_document,
     write_change_document,
 )
+from s19_app.tui.changes.io import DUMMY_CHANGESET_TEXT, parse_change_document
+from s19_app.validation.model import ValidationSeverity
 
 
 def _v2_payload(**overrides: object) -> dict:
@@ -504,3 +507,152 @@ def test_v1_rejected(tmp_path: Path) -> None:
     assert [issue.code for issue in shaped.issues] == [CHG_V1_FORMAT]
     assert shaped.entries == []
     assert CHG_FORMAT not in [issue.code for issue in shaped.issues]
+
+
+# ---------------------------------------------------------------------------
+# Batch-13 Inc 2 — US-014 data layer: the string-input parse seam
+# (LLR-014.1 dummy + LLR-014.2 parse_change_document / read delegation).
+# ---------------------------------------------------------------------------
+
+
+def _repo_root() -> Path:
+    """Walk up from this test file to the repo root (carries pyproject.toml)."""
+    current = Path(__file__).resolve().parent
+    for _ in range(6):
+        if (current / "pyproject.toml").exists() or (
+            current / "project.toml"
+        ).exists():
+            return current
+        if current.parent == current:
+            break
+        current = current.parent
+    raise AssertionError("repo root (pyproject.toml/project.toml) not found")
+
+
+def test_dummy_changeset_parses(tmp_path: Path) -> None:
+    """TC-206 (LLR-014.1): the pre-loaded ``DUMMY_CHANGESET_TEXT`` parses
+    cleanly through the string seam.
+
+    Encodes WHY: the dummy is the operator's editable format reference — it
+    must be a *valid* kind=change document so a paste-and-parse round trip
+    starts from a clean slate, never a faulted envelope. The instant the
+    dummy drifts to an invalid shape (a bad address, a non-text codec) this
+    fails with a non-zero ERROR count.
+    """
+    document = parse_change_document(DUMMY_CHANGESET_TEXT)
+
+    assert document.kind == "change"
+    assert len(document.entries) >= 1
+    error_count = sum(
+        1
+        for issue in document.issues
+        if issue.severity is ValidationSeverity.ERROR
+    )
+    assert error_count == 0
+    # The string seam has no on-disk path (F-A-06).
+    assert document.source_path is None
+
+
+def test_parse_from_string_matches_file_read(tmp_path: Path) -> None:
+    """TC-207 (LLR-014.2 parity, narrowed oracle — F-Q-04): for the SAME JSON,
+    ``parse_change_document(text)`` and ``read_change_document(path)`` agree on
+    ``entries`` and the issue-code set.
+
+    Encodes WHY: the paste seam must be the SAME parser as the file seam, not a
+    look-alike that can silently diverge. The oracle is narrowed to entries +
+    issue codes (NOT whole-document ``==``) because the documents legitimately
+    differ on ``source_path`` — the string seam carries ``None``, the file
+    read carries the resolved path. A drift in entry interpretation OR in which
+    findings are collected fails this; a benign ``source_path`` difference does
+    not.
+    """
+    payload = _v2_payload(
+        kind="change",
+        entries=[
+            {"type": "bytes", "address": "0x00000000", "bytes": "DE AD BE EF"},
+            {"type": "string", "address": "0x00000010", "value": "ABC"},
+        ],
+    )
+    text = json.dumps(payload)
+    path_text = _write_json(tmp_path, payload)
+
+    from_string = parse_change_document(text)
+    from_file = read_change_document(path_text, tmp_path)
+
+    assert from_string.entries == from_file.entries
+    assert {issue.code for issue in from_string.issues} == {
+        issue.code for issue in from_file.issues
+    }
+    # The path-coupled field is the documented divergence: string seam → None,
+    # file seam → the resolved path.
+    assert from_string.source_path is None
+    assert from_file.source_path is not None
+
+
+def test_parse_malformed_json_emits_mf_json_parse() -> None:
+    """TC-209 (LLR-014.2, F-A-01): a malformed JSON string yields a document
+    carrying ``MF-JSON-PARSE`` and does NOT raise.
+
+    Encodes WHY: the ``MF-JSON-PARSE`` guarantee previously lived in the
+    ``try/except`` wrapping ``json.load(handle)``; re-homing the seam to
+    ``json.loads(text)`` must preserve that exact three-exception catch so a
+    malformed *paste* still surfaces the finding under collect-don't-abort. The
+    valid-parity TC alone cannot detect a dropped catch — this TC pins it.
+    """
+    document = parse_change_document("{ this is not valid json ]")
+
+    assert MF_JSON_PARSE in [issue.code for issue in document.issues]
+    assert document.entries == []
+    assert document.has_errors
+
+
+def test_read_change_document_delegates_to_parse(tmp_path: Path) -> None:
+    """TC-210 (LLR-014.2 delegation guard — F-Q-01): ``read_change_document``
+    invokes ``parse_change_document`` exactly once with the file payload.
+
+    Encodes WHY: behavioral parity (TC-207) can pass while a parallel copy of
+    the interpretation block drifts inside ``read_change_document``. Patching
+    ``parse_change_document`` and asserting ``call_count == 1`` pins the
+    refactor as *delegation*, not duplication — the failure mode that would
+    let the two seams silently diverge over time.
+    """
+    payload = _v2_payload(
+        kind="change",
+        entries=[
+            {"type": "bytes", "address": "0x00000000", "bytes": "DE AD BE EF"},
+        ],
+    )
+    file_bytes = json.dumps(payload).encode("utf-8")
+    path = tmp_path / "doc.json"
+    path.write_bytes(file_bytes)
+
+    sentinel = ChangeDocument(
+        format=FORMAT_ID,
+        version=FORMAT_VERSION,
+        kind="change",
+        encoding="utf-8",
+        value_mode="text",
+    )
+    with mock.patch.object(
+        changes_io, "parse_change_document", return_value=sentinel
+    ) as parse_spy:
+        result = read_change_document(str(path), tmp_path)
+
+    assert parse_spy.call_count == 1
+    (called_payload,) = parse_spy.call_args.args
+    assert called_payload == file_bytes
+    # read_change_document re-stamps source_path on the delegated document.
+    assert result.source_path is not None
+
+
+def test_no_changeset_under_examples() -> None:
+    """TC-211 (LLR-014.1 tripwire — F-S-04): no ``*changeset*.json`` is ever
+    committed under ``examples/``.
+
+    Encodes WHY: ``DUMMY_CHANGESET_TEXT`` is a FAKE-valued module constant, not
+    a committed file — this fails the instant any real-looking changeset JSON
+    leaks into ``examples/`` (mirrors the CRC tripwire TC-114). It keeps the
+    JSON-never-in-repo rule mechanically enforced for the changeset family.
+    """
+    examples = _repo_root() / "examples"
+    assert list(examples.glob("**/*changeset*.json")) == []

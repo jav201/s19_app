@@ -58,6 +58,7 @@ from ..changes import (
     write_change_document,
 )
 from ..changes.check import run_check_document
+from ..changes.io import parse_change_document
 from ..changes.model import CheckRunResult
 from ..color_policy import css_class_for_severity
 from ..mac import parse_mac_file
@@ -612,6 +613,58 @@ class ChangeService:
                 - app.py ``load_doc`` action routing
         """
         document = read_change_document(path_text.strip(), base_dir)
+        self.document = document
+        self.last_summary = None
+        error_count = sum(
+            1
+            for issue in document.issues
+            if issue.severity is ValidationSeverity.ERROR
+        )
+        return ChangeActionResult(
+            message=(
+                f"Loaded {document.kind}: {len(document.entries)} entr"
+                f"{'y' if len(document.entries) == 1 else 'ies'}, "
+                f"{error_count} error(s)"
+            ),
+            issues=list(document.issues),
+            ok=not document.has_errors,
+        )
+
+    def load_text(self, text: str) -> ChangeActionResult:
+        """
+        Summary:
+            Parse a pasted v2 change/check document (raw JSON text) into the
+            owned document, replacing it (LLR-014.2 paste seam) — the
+            string-input sibling of :meth:`load`, feeding the SAME existing
+            apply / containment / verify / save-back path with NO new write
+            surface. A malformed paste comes back as a document carrying the
+            collected findings (``MF-JSON-PARSE`` on a JSON-decode failure);
+            the parser never raises.
+
+        Args:
+            text (str): The raw change-document text pasted into the Patch
+                Editor paste field — parsed through
+                ``changes.io.parse_change_document`` (collect-don't-abort).
+
+        Returns:
+            ChangeActionResult: ``ok`` is ``True`` when the document parsed
+            with no ERROR finding; ``message`` reports the kind / entry /
+            error counts; ``issues`` carries every collected finding.
+
+        Data Flow:
+            - Delegate to ``parse_change_document`` (collect-don't-abort) and
+              **replace** the owned document so the table and the
+              declaration-fault rendering reflect the paste.
+            - Reset ``last_summary`` — a fresh document has no apply yet
+              (parity with :meth:`load`).
+
+        Dependencies:
+            Uses:
+                - parse_change_document
+            Used by:
+                - app.py ``parse_paste`` action routing (LLR-014.2)
+        """
+        document = parse_change_document(text)
         self.document = document
         self.last_summary = None
         error_count = sum(

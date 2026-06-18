@@ -13,12 +13,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from unittest import mock
+
 from s19_app.tui.operations.crc_config import (
     DUMMY_CONFIG_TEXT,
     CrcConfig,
     CrcRegion,
     parse_crc_config,
     read_crc_config,
+    read_crc_config_text,
 )
 
 
@@ -268,6 +271,99 @@ def test_parse_crc_config_non_object_top_level_collects_one_error() -> None:
 
     assert config is None
     assert len(errors) == 1
+
+
+# ---------------------------------------------------------------------------
+# TC-202 — read_crc_config_text: raw-text reader seam (LLR-013.2 / LLR-013.3)
+# returns the file's RAW text WITHOUT parsing, collect-don't-abort on fault.
+# ---------------------------------------------------------------------------
+
+
+def test_read_crc_config_text_returns_raw_text_without_parsing(
+    tmp_path: Path,
+) -> None:
+    """TC-202: read_crc_config_text returns (raw_text, []) and never parses.
+
+    Encodes WHY (LLR-013.2): the CRC "Load config" surface populates the
+    editable TextArea with the file's RAW text — the editor stays the single
+    source of truth and the run parses on Execute. So the load seam must return
+    the byte-equal file text and MUST NOT invoke parse_crc_config. We patch
+    parse_crc_config to a sentinel that fails the test if it is ever called on
+    the load path; the returned text must equal the file content verbatim.
+    """
+    config_path = tmp_path / "synthetic_crc.json"
+    file_text = (
+        '{"polynomial":"0x04C11DB7","init":"0xFFFFFFFF","reverse":true,'
+        '"final_xor":"0xFFFFFFFF",'
+        '"regions":[{"start":"0x1000","end":"0x2000","output_address":"0x1FFC"}]}'
+    )
+    config_path.write_text(file_text, encoding="utf-8")
+
+    with mock.patch(
+        "s19_app.tui.operations.crc_config.parse_crc_config"
+    ) as parse_spy:
+        raw_text, errors = read_crc_config_text(str(config_path))
+
+    assert errors == []
+    assert raw_text == file_text
+    parse_spy.assert_not_called()
+
+
+def test_read_crc_config_text_unresolvable_path_collects_one_error(
+    tmp_path: Path,
+) -> None:
+    """TC-202 fault: an unresolvable path → (None, [1 error]); no raise.
+
+    Encodes WHY (LLR-013.3): a bad load path must surface exactly one collected
+    error and leave the caller free to keep the editor unchanged — never a
+    raise that would abort the surface (collect-don't-abort).
+    """
+    missing = tmp_path / "does_not_exist.json"
+
+    raw_text, errors = read_crc_config_text(str(missing))
+
+    assert raw_text is None
+    assert len(errors) == 1
+
+
+def test_read_crc_config_text_over_cap_collects_one_error_without_reading(
+    tmp_path: Path,
+) -> None:
+    """TC-202 fault: over-cap via the size probe → (None, [1 error]); not read.
+
+    Encodes WHY (LLR-013.2): the READ_SIZE_CAP_BYTES cap is enforced BEFORE the
+    read on the raw-text seam exactly as on read_crc_config — an oversized
+    declaration cannot force an unbounded read. The file content is well-formed
+    so only the pre-read cap can produce the error here.
+    """
+    config_path = tmp_path / "synthetic_crc.json"
+    config_path.write_text("{}", encoding="utf-8")
+
+    oversized_probe = lambda _candidate: 1 << 40  # noqa: E731 — 1 TiB stub
+
+    raw_text, errors = read_crc_config_text(
+        str(config_path), size_probe=oversized_probe
+    )
+
+    assert raw_text is None
+    assert len(errors) == 1
+
+
+def test_read_crc_config_text_returns_unparsed_invalid_json(tmp_path: Path) -> None:
+    """TC-202: a readable-but-invalid-JSON file still returns (raw_text, []).
+
+    Encodes WHY (LLR-013.2): the load seam does NOT parse — a syntactically
+    invalid file is loaded into the editor verbatim and the JSON fault surfaces
+    only later at parse-on-run. This pins that the reader is read-only, not a
+    validator, so a regression that re-added a parse on load would fail here.
+    """
+    bad = tmp_path / "broken.json"
+    bad.write_text("{ not valid json", encoding="utf-8")
+
+    raw_text, errors = read_crc_config_text(str(bad))
+
+    assert errors == []
+    assert raw_text == "{ not valid json"
 
 
 def test_parse_crc_config_missing_field_collects_one_error() -> None:
