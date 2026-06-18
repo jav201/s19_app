@@ -3,8 +3,9 @@
 > Living doc. Updated at every gate + significant checkpoint. BLUF: where we are, what's next, why.
 
 ## Where we are
-- **Phase 3 (Implementation) — Inc 1 awaiting gate.** US-013 implemented (4 files, +7 tests). code-reviewer APPROVE (0 HIGH/0 MED/2 LOW; F1 folded, F2 left). Ledger 879→886 (+7 EXACT). Toolchain gate PASS.
-- (done) Phase 2 re-confirmed (17 findings folded); Phase 1 APPROVED; Phase 0 APPROVED; batch-12 sync; comms-rules in /dev-flow command.
+- **Phase 3 (Implementation) — Inc 2 awaiting gate.** US-014 data layer (3 files, +5 tests); F-A-01 major resolved (MF-JSON-PARSE re-homed, delegation pinned). code-reviewer APPROVE-WITH-NITS (0 HIGH; 1 pre-existing F401 left). Ledger 886→891. Write path UNTOUCHED vs febd843.
+- (done) Inc 1 US-013 APPROVED + committed (9ab8d3e, a8c7080); Phase 0-2; batch-12 sync; comms-rules in /dev-flow command.
+- **NOTE:** local `main` ref is stale (`ec453a2`); batch-13 true base = `febd843`. F-S-03 gate baseline pinned to `febd843` in LLR-014.3.
 
 ## Objective
 Surface two existing-substrate TUI capabilities (no new engine math):
@@ -52,6 +53,7 @@ The brief's premise that the Patch Editor is "un SHELL INERTE" is **false** — 
 - reader-as-oracle for any write (already present in the shipped path; US-014 adds no new write).
 - config/patch JSON NEVER in repo — dummy templates (FAKE values) + synthetic fixtures only; tripwire `examples/**/crc*.json` (TC-114) respected; US-014 dummy is FAKE-valued.
 - Living PLAN.md + 7-section review packets in-conversation at each gate + mid-increment checkpoints.
+- **Requirement amendments during an increment are recorded with explicit Before → After + Deleted / New** (01-requirements.md §6.5), never silently edited (operator convention, batch-13).
 
 ## Out of scope (separate carries — do NOT pull in)
 A-3 save-flow composition (b11 LEAD), RK-3 non-zlib device vector, CLI 'ops', CODIFY reader-as-oracle in PROJECT_RULES, ADR report_service-CRC. RESOLVED — do NOT re-flag: CI trigger gap (fires on main since b06).
@@ -62,6 +64,7 @@ A-3 save-flow composition (b11 LEAD), RK-3 non-zlib device vector, CLI 'ops', CO
 ## Test ledger
 - Baseline CONFIRMED (V-7): **879 collected** (matches b12 close).
 - Inc 1 (US-013): +7 (TC-202 ×4 unit + TC-201/203/204 ×3 surface) → **886 collected**. Signed: post = 879 − 0 + 7 = 886 EXACT.
+- Inc 2 (US-014 data): +5 (TC-206/207/209/210/211) → **891 collected**. Signed: post = 886 − 0 + 5 = 891 EXACT.
 
 ## Decision log (mirror of state.json, human-readable)
 - 2026-06-17 — Phase 0 init: batch-13 scaffolded; batch-12 close snapshot written.

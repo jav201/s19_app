@@ -70,6 +70,7 @@ __all__ = [
     "DOCUMENT_KINDS",
     "VALUE_MODES",
     "DEFAULT_CHANGE_FILE_NAME",
+    "DUMMY_CHANGESET_TEXT",
     "READ_SIZE_CAP_BYTES",
     "MF_ENTRY_COUNT_CEILING",
     "MF_RUN_LENGTH_CEILING",
@@ -89,6 +90,7 @@ __all__ = [
     "CHG_ENCODE_FAIL",
     "CHG_V1_FORMAT",
     "CHG_COLLISION",
+    "parse_change_document",
     "read_change_document",
     "serialize_change_document",
     "write_change_document",
@@ -123,6 +125,25 @@ VALUE_MODES = frozenset({"text", "codes"})
 
 #: The default change-file name a save uses when the caller passes none.
 DEFAULT_CHANGE_FILE_NAME = "changes.json"
+
+#: A syntactically valid ``s19app-changeset`` (kind=change) carrying FAKE
+#: values only, pre-loaded into the Patch Editor paste field as a format
+#: reference (LLR-014.1). Authored WITHOUT a trailing newline so a Textual
+#: ``TextArea`` round-trips it on mount (F-Q-07). Never under ``examples/`` —
+#: it is a module constant, not a committed file (JSON-never-in-repo, F-S-04).
+DUMMY_CHANGESET_TEXT = (
+    '{\n'
+    f'  "format": "{FORMAT_ID}",\n'
+    f'  "version": "{FORMAT_VERSION}",\n'
+    '  "kind": "change",\n'
+    '  "encoding": "utf-8",\n'
+    '  "value_mode": "text",\n'
+    '  "entries": [\n'
+    '    {"type": "bytes", "address": "0x00000000", "bytes": "DE AD BE EF"},\n'
+    '    {"type": "string", "address": "0x00000010", "value": "ABC"}\n'
+    '  ]\n'
+    '}'
+)
 
 # ---------------------------------------------------------------------------
 # MF-* structural rule codes — spellings preserved from the v1
@@ -342,21 +363,6 @@ def read_change_document(
     """
     issues: list[ValidationIssue] = []
 
-    resolved: Optional[Path] = None
-
-    def _empty(found: Optional[dict] = None) -> ChangeDocument:
-        fmt, version, kind, encoding, value_mode = _document_metadata(found)
-        return ChangeDocument(
-            format=fmt,
-            version=version,
-            kind=kind,
-            encoding=encoding,
-            value_mode=value_mode,
-            entries=[],
-            issues=issues,
-            source_path=resolved,
-        )
-
     # --- Path resolution (LLR-001.7) ----------------------------------------
     resolved = resolve_input_path(Path(path_text), base_dir)
     if resolved is None:
@@ -367,9 +373,14 @@ def read_change_document(
                 f"opened: {path_text!r}",
             )
         )
-        return _empty()
+        return ChangeDocument(
+            *_document_metadata(None),
+            entries=[],
+            issues=issues,
+            source_path=None,
+        )
 
-    # --- Pre-parse size cap (LLR-001.7) — precedes json.load ----------------
+    # --- Pre-parse size cap (LLR-001.7) — precedes the read -----------------
     probe: SizeProbe = (
         (lambda candidate: candidate.stat().st_size)
         if size_probe is None
@@ -385,27 +396,125 @@ def read_change_document(
                 f"loaded into memory",
             )
         )
-        return _empty()
+        return ChangeDocument(
+            *_document_metadata(None),
+            entries=[],
+            issues=issues,
+            source_path=resolved,
+        )
 
-    # --- Parse — catch JSONDecodeError AND RecursionError -------------------
+    # --- Read the file (LLR-001.7) — OSError is the only path-side fault ----
     try:
         with resolved.open("rb") as handle:
-            document = json.load(handle)
-    except (json.JSONDecodeError, RecursionError, UnicodeDecodeError) as exc:
-        issues.append(
-            _issue(
-                MF_JSON_PARSE,
-                f"the change file is not well-formed JSON — the load "
-                f"produced an empty document: {type(exc).__name__}",
-            )
-        )
-        return _empty()
+            payload = handle.read()
     except OSError as exc:
         issues.append(
             _issue(
                 MF_PATH_UNRESOLVED,
                 f"the change file could not be opened — no document was "
                 f"loaded: {type(exc).__name__}",
+            )
+        )
+        return ChangeDocument(
+            *_document_metadata(None),
+            entries=[],
+            issues=issues,
+            source_path=resolved,
+        )
+
+    # --- Delegate the json-decode + interpretation to the shared seam -------
+    document = parse_change_document(payload)
+    document.source_path = resolved
+    return document
+
+
+def parse_change_document(text: str) -> ChangeDocument:
+    """
+    Summary:
+        Parse an in-memory change/check document (the raw JSON text of an
+        ``s19app-changeset``) into a :class:`ChangeDocument`, collecting every
+        structural, metadata, per-entry, collision, and resource-ceiling
+        finding as a ``ValidationIssue`` without ever raising. This is the
+        string seam shared by the file reader (``read_change_document``
+        delegates here after resolve + size-cap + read) and the Patch Editor
+        paste field (LLR-014.2).
+
+    Args:
+        text (str): The raw JSON document text. ``bytes`` is also accepted
+            (``json.loads`` decodes it) so the file reader can hand its
+            on-disk payload straight through; an invalid UTF-8 byte payload is
+            one ``MF-JSON-PARSE`` finding (collect-don't-abort).
+
+    Returns:
+        ChangeDocument: The parsed document with ``source_path=None`` (a string
+        seam has no on-disk path — F-A-06; ``read_change_document`` re-stamps
+        the resolved path on its returned document). ``entries`` is **always
+        empty** when the text is not well-formed JSON, when its top level is
+        not an object, when it is a v1 document (``CHG-V1-FORMAT`` hard break),
+        or when any metadata-level ERROR was recorded; it is **populated,
+        possibly partially** when only per-entry rules or ceilings dropped
+        entries. ``issues`` carries every collected finding.
+
+    Raises:
+        None: Every failure mode is a collected ``ValidationIssue``
+            (collect-don't-abort). A malformed string yields a document
+            carrying ``MF-JSON-PARSE``, not an exception.
+
+    Data Flow:
+        - Decode with stdlib ``json.loads`` catching ``JSONDecodeError`` AND
+          ``RecursionError`` AND ``UnicodeDecodeError`` → ``MF-JSON-PARSE``
+          (the same three-exception catch that previously wrapped
+          ``json.load(handle)`` — F-A-01).
+        - Non-object top level → ``MF-BAD-STRUCTURE``, empty document.
+        - **v1 detection BEFORE generic format validation** (F-A-03): the v1
+          format token or the v1 ``parameters``/``memory`` shape → exactly
+          one ``CHG-V1-FORMAT``, zero entries, ``CHG-FORMAT`` suppressed.
+        - Metadata validation (LLR-001.3): any metadata ERROR → zero entries
+          (faulted envelope).
+        - Entry parsing (LLR-001.2/.4/.7) then the collision check
+          (LLR-001.5); findings appended.
+
+    Dependencies:
+        Uses:
+            - json.loads
+            - _is_v1_document / _document_metadata / _metadata_issues
+            - _parse_entries
+            - collision_issues
+            - _issue
+        Used by:
+            - read_change_document (file seam, delegates here)
+            - ChangeService.load_text (paste seam, LLR-014.2)
+            - tests/test_changes_schema.py
+
+    Example:
+        >>> doc = parse_change_document(DUMMY_CHANGESET_TEXT)
+        >>> doc.kind
+        'change'
+    """
+    issues: list[ValidationIssue] = []
+
+    def _empty(found: Optional[dict] = None) -> ChangeDocument:
+        fmt, version, kind, encoding, value_mode = _document_metadata(found)
+        return ChangeDocument(
+            format=fmt,
+            version=version,
+            kind=kind,
+            encoding=encoding,
+            value_mode=value_mode,
+            entries=[],
+            issues=issues,
+            source_path=None,
+        )
+
+    # --- Parse — catch JSONDecodeError AND RecursionError AND UnicodeDecode -
+    try:
+        document = json.loads(text)
+    except (json.JSONDecodeError, RecursionError, UnicodeDecodeError) as exc:
+        issues.append(
+            _issue(
+                MF_JSON_PARSE,
+                f"the change file is not well-formed JSON — the load "
+                f"produced an empty document: {type(exc).__name__}",
             )
         )
         return _empty()
@@ -454,7 +563,7 @@ def read_change_document(
         value_mode=value_mode,
         entries=entries,
         issues=issues,
-        source_path=resolved,
+        source_path=None,
     )
 
 
