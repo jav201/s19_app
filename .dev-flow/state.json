@@ -3,9 +3,9 @@
     "language": "en",
     "batch_id": "2026-06-17-batch-13",
     "batch_objective": "Surface two existing-substrate TUI capabilities (no new engine math). US-013: load the CRC config JSON from a file in the CRC surface (OperationsScreen) via the existing crc_config.read_crc_config(path) (resolve_input_path + READ_SIZE_CAP_BYTES + collect-don't-abort) and populate the editable TextArea; DUMMY_CONFIG_TEXT stays pre-loaded as editable reference; load errors surface and DO NOT run the check. US-014: wire the inert Patch Editor (rail key 6, PatchEditorPanel, #screen_patch) to load a change-document (kind=change) from FILE and/or PASTE with a pre-loaded dummy change-document reference, apply via changes/apply.apply_change_document, show before/after + per-entry INSIDE/PARTIAL/OUTSIDE containment, then WRITE under R-6 (worker-thread + two-stage confirm + contained emit via copy_into_workarea seam + verify_written_image reader-as-oracle + MANDATORY security-reviewer sign-off).",
-    "current_phase": 3,
-    "phase_status": "awaiting-gate",
-    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 0, "5": 0, "6": 0},
+    "current_phase": 5,
+    "phase_status": "in-progress",
+    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 1, "6": 0},
     "artifacts": {
         "1": ".dev-flow/2026-06-17-batch-13/01-requirements.md",
         "2": ".dev-flow/2026-06-17-batch-13/02-review.md",
@@ -148,6 +148,36 @@
             "date": "2026-06-17",
             "decision": "I3-implemented-awaiting-gate-PHASE-3-COMPLETE-on-approval",
             "notes": "Inc3 (US-014 UI, LAST impl increment) implemented by software-dev: 3 files. screens_directionb.py paste TextArea #patch_paste_text pre-loaded DUMMY_CHANGESET_TEXT + #patch_paste_parse_button + ActionRequested.paste_text additive field + docstring Args. app.py parse_paste in PATCH_ACTIONS_V2 (9->10) + router elif -> ChangeService.load_text(event.paste_text) -> _report_change_result (reads ONLY paste_text, no write code) + stale :938 docstring truth-fixed. test_tui_patch_editor_v2.py TC-205 (mount preload, rstrip tolerance) + TC-208 (parse_paste THROUGH router -> doc replaced, then EXISTING apply_doc -> save-back prompt NAME identity paste-vs-file = F-A-06 oracle) + action-set assertion REUSE-extend 9->10 (renamed ..._ten_...). code-reviewer APPROVE 0 HIGH/0 MED/2 LOW; all 8 rule-ons PASS (additive contract all constructions valid, router paste_text-only collect-don't-abort, PATCH_ACTIONS_V2 exact 10, NO new write surface diff-vs-febd843=0, TC-208 genuine F-A-06 oracle save-back name from variant_id not source_path, docstring prose-only, frozen untouched); security CONCURS advisory (R-D). F1 LOW folded (stale 'nine'->'adds no routed action' comment screens_directionb.py:725); F2 LOW left (pre-existing app.py F40x, code-reviewer corrected count 12->6, surgical). ORCHESTRATOR re-ran: patch-editor 13 passed post-fold, ledger 891->893 (+2 EXACT: TC-205/208; action-pin renamed=REUSE net 0), write-surface vs febd843 EMPTY, frozen guards test_engine_unchanged 1 passed + tc031 3 passed, ruff clean changed files. 0 frozen edits. PHASE 3 COMPLETE on Inc3 approval: 3 increments I1/I2/I3, ledger 879->893 (+14: I1+7/I2+5/I3+2). NOT autonomous - awaiting Inc3 gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "I3-approved-committed-PHASE-3-COMPLETE",
+            "notes": "Inc3 APPROVED ('approve') + committed 5197169. PHASE 3 COMPLETE: 3 increments I1/I2/I3 (no withdrawals). Branch commits: 9ab8d3e (Phase 0-2) / a8c7080 (I1 CRC config-from-file) / e42181c (I2 data layer + §6.5 amendment) / 5197169 (I3 paste UI). Full feature end-to-end: US-013 load CRC config from file (path Input + Load button -> #operation_config); US-014 paste a change-document (dummy pre-loaded) -> parse_paste -> ChangeService.load_text -> EXISTING apply/contained-emit/verify/save-back. Ledger 879->893 (+14). 0 new write surface. Advancing to Phase 4 validation."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-17",
+            "decision": "started",
+            "notes": "Phase 4 validation. qa-reviewer executes the strategy -> 04-validation.md: per-LLR pass/fail table w/ evidence (TC node ids), TC reconciliation (every in-scope spec TC TC-201..211 -> a real collect-verified passing node; reconcile provisional V-5 ids), A-5 surface-reachability matrix (all 7 US dimensions through the SHIPPED handler), the LLR-014.3 STANDING write-surface gate row (git diff febd843 -- apply.py/verify.py/workspace.py = 0 + emit/save_patched bodies unchanged), refactor-fidelity invariants (MF-JSON-PARSE on malformed, delegation call_count==1, parity entries+{code}, source_path=None), changeset tripwire (examples/**/*changeset*.json EMPTY). Run full suite once for authoritative pass/fail + ledger reconcile (signed-balance 893=879+14). Baseline 879."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-18",
+            "decision": "awaiting-gate-PASS",
+            "notes": "PRE-DECISION. Phase 4 -> 04-validation.md. VERDICT PASS, 0 FAIL/0 blockers. qa-reviewer ran full suite ONCE: 861 passed / 29 skipped / 3 xfailed / 0 failed exit 0 (765s); collection 893. 6/6 LLR + 2/2 HLR PASS on real verified-present nodes; 0 orphan TCs. TC reconciliation CLEAN (TC-201..211 -> real passing nodes; provisional V-5 ids reconciled: TC-205=test_paste_textarea_preloads_dummy_changeset, TC-208=test_paste_parse_then_apply_matches_file_loaded, action-set=..._exactly_ten_v2_actions). A-5 surface-reachability 7/7 through-handler (SCOPE-1 does NOT recur; handlers screens.py:795/801/841 + app.py:1336-1338). Refactor-fidelity invariants HOLD: MF-JSON-PARSE TC-209, delegation call_count==1 TC-210, narrowed parity oracle entries+{code} + source_path=None TC-207. WRITE-SURFACE GATE (LLR-014.3/F-S-03) PASS vs febd843 (NOT stale local main): git diff apply/verify/workspace = 0 lines; emit_s19_from_mem_map/save_patched bodies unchanged. Changeset tripwire EMPTY. Frozen guards pass (engine-unchanged + tc031). LEDGER EXACT: 893=879+14 (I1+7/I2+5/I3+2). NON-BLOCKING notes: pre-existing F401 app.py/change_service.py (untouched vs febd843, not introduced); bytes-vs-str annotation documented/accepted; 2 provisional-id line-drifts + 1 node-merge reconciled (no coverage loss); 29 skips=slow marker + 3 standing xfails (not regressions). ORCHESTRATOR independently spot-verified (b09 lesson): collection 893, write-surface empty vs febd843, batch-13 4 test files 75 passed, 04-validation.md present 0 mojibake. 0 code defects. Awaiting Phase 4 gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-18",
+            "decision": "approved-committed",
+            "notes": "Phase 4 APPROVED ('approve'). Committed (04-validation.md + PLAN + state). Advancing to Phase 5 post-mortem (architect + qa-reviewer co-author)."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-18",
+            "decision": "started",
+            "notes": "Phase 5 post-mortem. architect + qa-reviewer co-author 05-postmortem.md: what worked / what didn't / scope drift / metrics (iters per phase, findings open-vs-closed) / root causes / next-batch items. KEY THEMES to cover: (1) Phase-0 PREMISE CORRECTION caught a false brief premise (Patch Editor 'inert shell' was a stale app.py:938 docstring; substrate fully wired) -> US-014 re-scoped to the real gap (paste+dummy) BEFORE deriving requirements = the draft-time-verification control working at story intake; (2) STALE-MAIN-REF discovery in Phase-3 Inc-2 (local main=ec453a2 pre-batch-09; true base febd843) -> the F-S-03 write-surface gate would have spuriously failed; spec Amendment A-1 pinned the baseline; (3) the consumer-input-contract citation control (b12) applied throughout; (4) facade/test blast-radius budgeted (PATCH_ACTIONS_V2 9->10 stayed in budget); (5) reader-as-oracle REUSED (0 new write surface, verified vs febd843); (6) NEW b13 operator convention: requirement-amendment Before/After+Deleted/New record (§6.5), now encoded in /dev-flow command. METRICS: iters {0:1,1:2,2:1,3:1,4:1,5:1}; Phase-2 0 blocker/1 major/16 minor all folded (iter-2); per-increment code-review 3/3 (I1 2 LOW/I2 1 LOW pre-existing/I3 2 LOW); ledger 879->893 (+14 D0/A14); full suite 861/0; cap-trips 0. Recommend ADR/carry: codify reader-as-oracle in PROJECT_RULES (now 5th use); fix stale local main ref hygiene; pre-existing app.py F401 cleanup."
         }
     ],
     "obsidian_synced": false,

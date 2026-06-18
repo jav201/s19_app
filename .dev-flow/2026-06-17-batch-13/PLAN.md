@@ -3,9 +3,9 @@
 > Living doc. Updated at every gate + significant checkpoint. BLUF: where we are, what's next, why.
 
 ## Where we are
-- **Phase 3 (Implementation) — Inc 3 awaiting gate (COMPLETES Phase 3).** US-014 UI wiring (3 files, +2 tests); paste TextArea + parse_paste route + stale :938 docstring fixed. code-reviewer APPROVE (0 HIGH; F1 folded). Ledger 891→893. Write path UNTOUCHED vs febd843; PATCH_ACTIONS_V2 = 10.
-- (done) Inc 1 (9ab8d3e/a8c7080) + Inc 2 (e42181c) committed; Phase 0-2; batch-12 sync; comms-rules + amendment-record convention in /dev-flow command.
-- **NOTE:** local `main` ref is stale (`ec453a2`); batch-13 true base = `febd843`. F-S-03 gate baseline pinned to `febd843` (§6.5 Amendment A-1).
+- **Phase 4 (Validation) — awaiting gate. VERDICT: PASS.** Full suite 861 passed / 29 skipped / 3 xfailed / 0 failed (exit 0); collection 893; ledger reconciled exact (879+14). 6/6 LLR + 2/2 HLR PASS; A-5 7/7; write-surface gate empty vs febd843; refactor-fidelity invariants hold; 0 defects.
+- (done) Phase 3 COMPLETE (I1/I2/I3 committed 9ab8d3e/a8c7080/e42181c/5197169); Phase 0-2; batch-12 sync; comms + amendment-record conventions in /dev-flow command.
+- **NOTE:** local `main` ref stale (`ec453a2`); true base = `febd843` (§6.5 Amendment A-1).
 
 ## Objective
 Surface two existing-substrate TUI capabilities (no new engine math):
