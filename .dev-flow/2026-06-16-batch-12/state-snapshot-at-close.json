@@ -1,0 +1,222 @@
+{
+    "project": "s19_app",
+    "language": "en",
+    "batch_id": "2026-06-16-batch-12",
+    "batch_objective": "CRC_F2 operation (custom name, adjustable) — CRC32 IEEE region calculator/checker for Motorola S19/S3 firmware. Operator FR1-FR9 draft: accept S19 (incl. S3/32-bit), one+ hex memory ranges to CRC + per-range output address, polynomial/init/reverse-flag/final-XOR params, ascending-address sort, region filtering, gap-split contiguous-segment reconstruction (no gap byte insertion), segment-chained CRC (no reset between segments), final XOR, and a TWO-STAGE finalization: compare computed CRC vs value already in the specified memory region (check-only, default non-mutating), then on operator confirmation write the CRC into the output address and emit a modified S19 — surfaced in the s19_app report. Also the named A-4 census STRESS-TEST: CRC computation must NOT land in frozen core.py.",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
+    "artifacts": {
+        "1": ".dev-flow/2026-06-16-batch-12/01-requirements.md",
+        "2": ".dev-flow/2026-06-16-batch-12/02-review.md",
+        "3": ".dev-flow/2026-06-16-batch-12/03-increments/",
+        "4": ".dev-flow/2026-06-16-batch-12/04-validation.md",
+        "5": ".dev-flow/2026-06-16-batch-12/05-postmortem.md",
+        "6": ".dev-flow/2026-06-16-batch-12/06-docs/"
+    },
+    "branch": "claude/determined-curran-a4b557 (worktree off main; main already includes batch-11 PR #16)",
+    "previous_batches": [
+        "2026-05-05-batch-01",
+        "2026-05-20-batch-02",
+        "2026-05-21-batch-03",
+        "2026-05-21-batch-04",
+        "2026-05-26-batch-05",
+        "2026-06-09-batch-06",
+        "2026-06-10-batch-07",
+        "2026-06-11-batch-08",
+        "2026-06-11-batch-09",
+        "2026-06-13-batch-10",
+        "2026-06-14-batch-11"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. Living docs (REQUIREMENTS.md, tests/, docs/diagrams/) kept current. On batch advance, the closing batch's state.json is snapshotted into its folder as state-snapshot-at-close.json before the shared state.json is trimmed to the new batch.",
+    "living_documentation": {
+        "requirements": "REQUIREMENTS.md (repo root)",
+        "tests": "tests/",
+        "diagrams": "docs/diagrams/"
+    },
+    "carried_from_batch_11": {
+        "closure": "batch-11 (US-010 project.json manifest writer) fully closed: 6 phases, 4 increments, PR #16 merged 2026-06-15, synced to G: vault 2026-06-16 (obsidian_synced flipped + Dashboard.md created during batch-12 intake). Full batch-11 history: .dev-flow/2026-06-14-batch-11/state-snapshot-at-close.json. Suite baseline at batch-11 close: 839 collected / full 807 passed / lean 786. Re-measure at batch-12 Phase-1 per V-7 (do not assume).",
+        "postmortem_actions_into_batch12": "A-3 save-flow composition (batch-11 LEAD carryover — wire batch/assignments through the TUI save flow; SEPARATE story from CRC, operator to confirm whether it rides batch-12 or waits). A-4 census STRESS-TEST: CRC is the named candidate that genuinely abuts frozen core.py — Phase-1 change-first census MUST catch CRC placement near the frozen set BEFORE the I-gate (b11 ran the census clean but never load-tested it). A-5 story-dimension coverage control: add the Phase-4 surface-reachability matrix row + Phase-1 composition-LLR rule so a writer-API-complete-but-surface-incomplete half-delivery (the b11 SCOPE-1 class) is caught.",
+        "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py (git-frozen by _ENGINE_PATHS guards: test_engine_unchanged.py, test_tui_directionb.py::test_tc031_*). CRITICAL for CRC: core.py/hexfile.py are READERS/oracles and FROZEN — CRC computation + S19 re-emission must live elsewhere (precedent: batch-10 Intel HEX emission went to tui/changes/io.py next to emit_s19_from_mem_map, NOT into hexfile.py). emit_s19_from_mem_map (tui/changes/io.py) is the existing S19 emitter to reuse for FR9 modified-S19 output.",
+        "reader_as_oracle_idiom": "Now a 3rd-use NAMED idiom (b09 compare, b10 IntelHexFile, b11 read_project_manifest) flagged to CODIFY. CRC verify-on-write (FR9 stage-1 compare computed-vs-stored) is the natural 4th consumer: re-read the written S19 via the frozen S19File reader and diff against intent, reusing the batch-10 verify_written_image substrate (s19_app/tui/changes/verify.py).",
+        "other_queued": "CI trigger gap (tui-ci.yml fires only on main-tui, never on main -> the 3.11 gate never runs; operator-flagged 1-line fix, 'cuando quieras' — NOT yet scoped into a batch). Optional E2E pilot / perf-knee test still queued."
+    },
+    "decisions_log": [
+        {
+            "phase": 0,
+            "date": "2026-06-16",
+            "decision": "batch-12-initialized",
+            "notes": "Operator: 'Opcion 1, empezar con /dev-flow-init.' Batch-11 confirmed fully closed FIRST: re-synced to G: vault (obsidian_synced flipped true, README regenerated with metrics frontmatter, Dashboard.md created), state snapshotted to .dev-flow/2026-06-14-batch-11/state-snapshot-at-close.json. batch-12 scaffolded per PROJECT convention (subfolder .dev-flow/2026-06-16-batch-12/, NOT the generic flat layout) from ~/.claude/templates/dev-flow/ (verified yesterday's 8-gen version): 7 artifact skeletons, UTF-8 no-BOM, 0 mojibake, 0 residual <PROJECT>/<BATCH_ID>. Objective = CRC_F2 CRC32-IEEE region calculator/checker (operator FR1-FR9 draft). CRITICAL framing carried: CRC is the A-4 census stress-test (core.py is FROZEN -> CRC compute/emit must live elsewhere); reader-as-oracle 4th-consumer candidate for FR9 stage-1 compare. Next: Phase 0 story intake — convert FR1-FR9 into user story(ies), INVEST + Definition of Ready, classify READY/REFINE/SPIKE/OUT. FR1-9 draft to be seeded into 01-requirements.md s2.6."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-16",
+            "decision": "awaiting-gate",
+            "notes": "Phase 0 story intake complete. FR1-9 seeded into 01-requirements.md s2.6 as US-011 (check, non-mutating) + US-012 (inject + modified-S19 emit). architect dispatched for a READ-ONLY feasibility judgment (agentId a65f9487d5b109451): both feasible, CRC math trivial (zlib.crc32 / parameterized bit-loop); the real risk is the cross-cutting C-7/R-2 neutral-input-contract decoupling (CRC = the first operations fill-in, must resolve it) + config externalization. Verified vs code: operations module + Operation.execute(loaded: LoadedFile) placeholder, run_operation, OperationsScreen call-site; frozen set confirmed (test_engine_unchanged.py:120-127) — CRC compute/emit clears it; reuse points emit_s19_from_mem_map (io.py:1300), verify_written_image/VerifyResult (verify.py:119), range_index, resolve_input_path (workspace.py:469); R-6 worker-thread+confirm precedent _write_and_verify_manifest (app.py:3539). Operator Phase-0 Q&A LOCKED: reverse=refin/refout zlib; params OPEN via external config NOT in repo; CRC stored value = 4-byte LITTLE-ENDIAN fixed; surface TUI-only (cli.py out); config = JSON via resolve_input_path + TUI text view/edit pre-filled with DUMMY values for format guidance (repo carries only dummy template + synthetic fixtures, never real config); write-into-gap = EXTEND mem_map+ranges. BOTH US READY (0 REFINE/SPIKE/OUT). Decomposition (3 increments): I1 neutral input contract + config sourcing + CRC compute core (headless) + CREATE operations/requirements/REQ-crc.md (C-7); I2 US-011 check+report+config TUI surface + execute_scope worker (R-6); I3 US-012 inject+emit+verify + two-stage confirm (R-6 + security-reviewer). Flagged risk+fallback: if contract decoupling deeper than expected at I1, split to SPIKE and ship CRC vs LoadedFile as-is. A-4 named census stress-test applies at Phase 1 (all planned files clear frozen set; reuse import-only — certify at gate). Awaiting Phase 0 gate."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-16",
+            "decision": "approved",
+            "notes": "Operator: 'apruebo'. Both US-011 + US-012 READY. Decomposition + cross-cutting decisions locked (see prior entry). Advancing to Phase 1 requirements engineering — architect (HLR via IEEE 830 + EARS) + qa-reviewer (validation method per requirement) in parallel."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-16",
+            "decision": "started",
+            "notes": "Phase 1 wave 1: architect + qa-reviewer in parallel -> 01-requirements.md. architect derives HLR/LLR (EARS) from US-011/US-012 honoring the 3-increment decomposition + C-7 (REQ-crc.md) + R-2 neutral contract + R-3 OperationResult widening + R-6; runs the A-1/A-2 change-first census against the planned file list incl. engine-frozen family; draft-time verifies every code-symbol claim (file:line) or flags 'assumed - verify in Phase N'. qa-reviewer defines validation method (test/demo/inspection/analysis) per requirement + provisional TC ids. Normative: shall only in HLR/LLR; flag any should-in-statement."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-16",
+            "decision": "awaiting-gate",
+            "notes": "PRE-APPROVAL DRAFT NOTE. Phase 1 draft complete. architect wrote s1/s3/s4/s6; qa-reviewer returned s5 (orchestrator merged). Result: 5 HLR / 15 LLR (architect summary said 16 but its own list enumerates 15; artifact + grep confirm 15 — CORRECTED) / TC-101..132. HLR-001 compute engine, HLR-002 check+compare+report, HLR-003 inject+emit+verify, HLR-004 config sourcing+TUI text surface, HLR-005 neutral input contract + OperationResult widening. Decisions D-1..D-8: D-1 OperationInput(mem_map+ranges+metadata) neutral contract; D-2 OperationResult +crc_regions optional (CrcRegionResult{output_address,computed_crc,stored_value,matched,written}), STATUS_DOMAIN UNCHANGED + producer/consumer identity table (C-9 style); D-3 CrcConfig/CrcRegion + dummy examples/crc_config.example.json (NEW); D-4 zlib default param set; D-5 4-byte LE codec FIXED; D-6 write-into-gap copy+extend (guards emit KeyError io.py:1331); D-7 REQ-crc.md plan; D-8 R-6 (worker @work(thread=True) app.py:1599 + two-stage confirm + sanitized path). KAT anchor TC-101 crc32(b'123456789')==0xCBF43926 = load-bearing acceptance. Surface-reachability matrix (A-5) present. Census A-1/A-2/A-4: best-effort + gate-confirmed (NOT stamped complete); A-4 STRESS-TEST CLEAR — every planned file outside BOTH frozen sets (test_engine_unchanged.py:120-127 [6 paths, no color_policy] + test_tui_directionb.py:3738-3745 [7 incl color_policy] — discrepancy noted), reuse import-only. 6 qa testability flags reconciled in s6.7: 5 RESOLVED in draft, flag-4 (non-default/reverse=false variant vector) PARTIAL -> RK-3 honest 'assumed - verify Phase 3/4'. RK-1 contract-decoupling SPIKE fallback retained. 16-item evidence checklist all green. Baseline RE-MEASURED (V-7, not assumed): 839 collected (matches batch-11 close; worktree off main incl. batch-11). 0 mojibake. 0 should-in-statement. Awaiting Phase 1 gate."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-16",
+            "decision": "approved",
+            "notes": "Operator: 'approve'. 5 HLR / 15 LLR / TC-101..132 / D-1..D-8 / RK-1..6 / KAT anchor / A-5 matrix / census A-4 CLEAR. Advancing to Phase 2 cross-review (architect + qa-reviewer + security-reviewer in parallel)."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-16",
+            "decision": "started",
+            "notes": "Phase 2. architect (completeness/contradictions/US->HLR->LLR derivation/manifest-contract identity D-2/anchors/8-gen-rule compliance incl. change-first census A-1/A-2/A-4 reframe) + qa-reviewer (testability/KAT soundness/reader-as-oracle viability/per-region fault models/surface-reachability A-5/threshold soundness) + security-reviewer (REAL surface: NEW operator-supplied config path via resolve_input_path containment, NEW emitted S19 output path work-area containment, side-effectful write R-6 worker+confirm+sanitized, no-byte-leak in report, config path/values, collect-don't-abort tolerance vs verify) dispatched in parallel; each RETURNS findings (blocker/major/minor + F-X-NN ids), orchestrator assembles 02-review.md. shall/should misuse = blocker. Scope-change re-routing armed."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-16",
+            "decision": "awaiting-gate-0-blockers-8-majors",
+            "notes": "PRE-DECISION. Phase 2 -> 02-review.md. NOTE: architect + qa-reviewer 500'd on first dispatch (transient API), re-run clean; security completed first pass. Aggregate 0 BLOCKER / 8 major / 11 minor; security OK-with-mitigations. shall/should CLEAN (0 in statements, dual-confirmed). Census A-4 stress-test CLEAR + honestly not-stamped (both frozen lists independently re-verified: test_engine_unchanged.py:120-127 [6] + test_tui_directionb.py:3738-3745 [7 incl color_policy]). 8 majors cluster on 3 seams: (1) REPORT/RESULT surface — F-A-01 FR9 'report' has no LLR/consumer/file (report_service.py does not consume OperationResult, not in budget; D-2 names a nonexistent consumer) + F-Q-01 (3 LLRs 005.1/005.2/002.3 missing TC ids vs 100% bar) + F-Q-02 (OperationResult.output: LoadedFile non-optional, unreconciled w/ neutral input, TC-115 oracle under-specified); (2) NEUTRAL-CONTRACT half-specified — F-A-02 (run_operation operation_service.py:38 LoadedFile binding unresolved; promote to definite E); (3) BUDGET — F-A-03 (I1 >=7 files VIOLATES CLAUDE.md <=5/increment hard rule; split I1->I1a contract / I1b engine; re-aim RK-1 SPIKE trigger). Plus F-Q-03 (TC-106 variant KAT vacuous, RK-3 'assumed' CONFIRMED honest by qa+architect) + F-S-01 (emit-write containment not bound to copy_into_workarea seam workspace.py:215/278-291) + F-S-02 (resolve_input_path returns abs paths verbatim, no containment — correct wording to uncontained-by-design + size cap). 11 minors: F-A-04..07 (D-5/FR1 scope, model.py:227->:228, range-merge ordering, s5.4 RK-3 caveat), F-Q-04..07 (VERIFIED->STATUS_VERIFIED, intended-mem_map identity, TC-125 pilot-driven confirm, TC-114 concrete assertion), F-S-03..05 (overwrite dedup, plain-text-no-markup app.py:3606, RK-5 mitigation update). Orchestrator recommends ITERATE (no blocker but I1 hard-rule violation + FR9 untraceable). ONE operator decision embedded: F-A-01 report-surface depth (screens.py op-result view vs report_service.py vs both). Rest orchestrator-lockable under delegated latitude. GATE NOTE: a spurious 'approve' arrived via a post-disconnect retry-replay (operator clarified it was an app error, NOT a decision); integrity re-verified (state valid JSON, 5HLR/15LLR, artifacts intact, 0 mojibake). Awaiting REAL Phase 2 gate decision."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-16",
+            "decision": "iterate-to-phase-1",
+            "notes": "REAL gate decision (post-integrity-recheck). Operator: 'Iterate y arreglar majors' + F-A-01='Ambas superficies'. Iterating Phase 1 (iter 2). architect to apply the FULL register: 8 majors + 11 minors. KEY DISPOSITIONS: F-A-01 = BOTH surfaces -> crc_regions wires into screens.py op-result view (immediate) AND report_service.py (persistent report); add report_service.py to file budget + guard disposition; D-2 consumer table now lists report_service as a REAL consumer + add LLRs + TCs for both. F-A-02 = promote operation_service.py to definite E, migrate run_operation off LoadedFile, pin test_operations.py reconciliation. F-A-03 = split I1 -> I1a (contract) / I1b (engine); RE-PLAN all increments each <=5 files (likely 5 increments now: I1a contract, I1b engine, I2 config+check+op-result-view, I3 report_service integration, I4 inject+emit+verify+confirm — architect to finalize within budget). F-Q-01 add TC-108/109/116. F-Q-02 state OperationResult.output semantics for CRC op (check=input snapshot; inject=LoadedFile over injected map). F-Q-03 reword TC-106 (params-change-digest, RK-3-deferred correctness). F-S-01 bind emit-write to copy_into_workarea seam (workspace.py:215/278-291), resolved-path containment assertion. F-S-02 correct resolve_input_path wording (uncontained-by-design + READ_SIZE_CAP_BYTES + collect-don't-abort). Minors F-A-04..07/F-Q-04..07/F-S-03..05. Add s6.4 reconciliation audit table (J-rows, parent-HLR re-read per change). shall/should discipline preserved. Re-run change-first census incl. report_service.py (new file) against frozen families."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-16",
+            "decision": "iteration-2-completed",
+            "notes": "INLINE application (architect subagent blocked by sustained API 529 x3 — orchestrator applied the register directly; deterministic edits, dispositions pre-decided). All 19 findings CLOSED (8 majors + 11 minors), audit in 01-requirements s6.4 (11 cluster rows). 5 HLR / 18 LLR (was 15; +LLR-002.4 op-result-view, +LLR-002.5 + LLR-003.5 report_service = F-A-01 BOTH surfaces). report_service.py added to file budget + s6.5 census (outside both frozen lists; consumes crc_regions import-only; generate_project_report:913 is VariantExecutionResult-based today, CRC section NEW gate-confirm I4) + s6.1 anchor. F-A-02 operation_service.py DEFINITE E, run_operation migrates via from_loaded adapter. F-A-03 I1 split I1a(5f)/I1b(2f); 6-increment plan I1a/I1b/I2(5f)/I3(3f)/I4(<=3f)/I5(5f) each <=5 files (evidence item 18). F-Q-02 OperationResult.output contract stated (check=input snapshot; inject=injected map). F-Q-03 TC-106 reworded params-wired-only, RK-3 deferral, out of s5.3 gating. F-S-01 LLR-003.2 bound to copy_into_workarea/is_relative_to containment. F-S-02 resolve_input_path uncontained-by-design + READ_SIZE_CAP_BYTES(io.py:192). New TCs 108/109/116/117/126. Orchestrator re-verified: 5 HLR/18 LLR (grep), 0 should-in-statement, 0 mojibake, census A-4 CLEAR incl report_service, increment budgets <=5. Awaiting Phase-2 re-confirmation gate."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-16",
+            "decision": "approved-iteration-2",
+            "notes": "Phase-2 re-confirmation gate APPROVED (operator: 'apruebo' x2, intentional). All 19 findings closed; 5 HLR / 18 LLR. NOT autonomous mode (batch-11 only) — each Phase-3 increment needs operator approval + independent code-reviewer before the gate. Advancing to Phase 3."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "started-toolchain-gate-pass-I1a-replanned",
+            "notes": "Phase 3 entry. TOOLCHAIN GATE PASS: python 3.14.4 (local; CI=3.11 noted), pytest 9.0.3, ruff 0.8.4 present; mypy ABSENT but NOT declared in pyproject.toml (only pytest + dev snapshot extra) -> not a blocker. I1a RE-PLANNED at Phase-3 prep (verified only 2 real execute call-sites: operation_service.py:91 + screens.py:636, rest docstrings): I1a (5, ATOMIC execute->OperationInput migration across BOTH call-sites + OperationResult widen + tests) = model.py/operation_service.py/screens.py/placeholders.py/test_operations.py; REQ-crc.md (LLR-005.3) MOVED to I1b (3 files: crc.py/REQ-crc.md/test_crc_engine.py) to keep I1a atomic at 5 without a transitional LoadedFile shim. Spec ordering note + evidence item 18 updated. Implementing I1a next (software-dev if server load permits, else inline)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I1a-implemented-awaiting-increment-gate",
+            "notes": "I1a implemented by software-dev (server recovered). Neutral contract: OperationInput + from_loaded (model.py:27/:82), CrcRegionResult (:131), OperationResult +crc_regions trailing-optional (:260) + to_dict (:335), Operation.execute retyped to OperationInput; BOTH real call-sites migrated atomically (operation_service.py:91 run_operation builds from_loaded internally w/ unchanged signature; screens.py:636 one line). placeholders.py 3 execute retyped + _placeholder_result rebuilds LoadedFile output. NO CRC compute (I1b). FILE COUNT: 5 named + 1 FORCED test reconciliation (tests/test_tui_operations_view.py — execute stubs broke on the contract change; dev kept tree green, flagged it). code-reviewer ruled the 6th-file JUSTIFIED (pure mechanical, intent preserved) + the identity->value-equality change SOUND (no consumer reads dropped LoadedFile fields off operation output; only path/file_type/mem_map read). code-reviewer verdict APPROVE-WITH-NITS, 0 HIGH. 2 LOW folded by orchestrator: F1 stale screens.py docstrings :520/:603 -> updated to from_loaded; F2 TC-109 None-branch determinism assert added. Tests: test_operations.py 10 passed (+2 TC-108/109); orchestrator re-ran post-nit green; ruff clean. LEDGER: lean 786->788, full 807->809, collection 839->841 (+2, EXACT). 0 frozen-file edits (operations/model.py etc outside both _ENGINE_PATHS lists). NOT autonomous — awaiting operator increment gate. Not yet committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I1a-approved-committed-I1b-implemented-awaiting-gate",
+            "notes": "I1a APPROVED (operator 'Apruebo') + committed in 2 clean commits: 71cef36 (batch-12 Phase 0-2 artifacts + batch-11 close snapshot) + dd665b0 (I1a code+tests+packet+state). Working tree clean. I1b implemented by software-dev: NEW crc.py (headless parameterized CRC32 engine; default->zlib.crc32, non-default->bitwise reflected loop; region assembly sort/gap-split/no-gap-bytes/non-reset-via-concatenation; per-region no-mutation entry; 4-byte LE codec D-5) + NEW REQ-crc.md (C-7 co-located) + NEW test_crc_engine.py. Dev caught+fixed a real seed bug (zlib.crc32(data,0xFFFFFFFF) wrong). code-reviewer: OK-WITH-FIXES, 1 HIGH (F1: bitwise non-default path had ZERO correctness coverage — only TC-106 inequality-only; mutation-tested wrong-final-reflection passes TC-106). HIGH FIXED test-only: added TC-106b pinning bitwise path vs 2 published catalog KATs (CRC-32/BZIP2 reverse=False=0xFC891918, CRC-32C poly=0x1EDC6F41=0xE3069283); orchestrator independently confirmed engine reproduces both before pinning; engine code unchanged (already correct). F2 LOW docstring drift fixed. Tests: test_crc_engine.py 9 passed, KAT TC-101 green. LEDGER: lean 788->797 (+9, EXACT, orchestrator re-ran 175s), collection 841->850. ruff clean. 0 frozen edits (crc.py NEW, range_index import-only). RK-3 residual honest (bespoke device convention still assumed). TC-106b -> Phase-4 s5.2 reconcile (V-5). Awaiting I1b increment gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I1b-approved-committed-comms-recalibrated",
+            "notes": "I1b APPROVED (operator 'Aprobar I1b'). COMMS FEEDBACK mid-batch: operator flagged communication 'almost disappeared' during long execution stretches + wanted a plan/compendium. CORRECTIVE: created living PLAN.md (batch-12 index: where-we-are/roadmap/reqs/decisions/risks/ledger/log/next), saved feedback memory devflow-living-compendium, and recalibrated to (a) full 7-section review packet IN-CONVERSATION at each gate, (b) MID-implementation checkpoints during each increment (operator chose 'more/more often'), not just end-gate. Increment GATE stays the approval point; mid-step checkpoints are visibility. Committing I1b now. Next: I2 (config + check) implemented in visible narrated sub-steps with checkpoints."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I2-implemented-awaiting-gate",
+            "notes": "I2 (config + check, headless) implemented in 2 narrated sub-steps via software-dev. Step A: crc_config.py (CrcRegion/CrcConfig + read_crc_config: resolve_input_path + READ_SIZE_CAP_BYTES before read + collect-don't-abort, never raises; bool-as-int guard; SizeProbe seam) + examples/crc_config.example.json dummy + test_crc_config.py (TC-113/114 + 4 fault modes). Step B: crc.py +read_stored_crc_le (4-byte LE, missing->None KeyError-safe) +check_regions (compute via I1b engine w/ config params + compare -> CrcRegionResult[], matched True/False/None tri-state, non-mutating) + test_crc_operation.py (TC-111 match/TC-112 mismatch/missing/multi-region). 5 files total (3+2, <=5). NO OperationResult assembly/CrcOperation-real/TUI (deferred to I3). code-reviewer: CLEAN, 0 findings — all 3 rule-ons passed (collect-don't-abort no escape incl OSError-on-read catch; read_stored_crc_le KeyError-safe full-span guard; TC-111 non-vacuous independent oracle). LEDGER orchestrator re-ran lean=807 (797+10 EXACT: A+6/B+4), collection 850->860. ruff clean, 0 frozen edits, F-S-02 read-only/size-capped no write path. s5.2 TC-111/112 path reconciled test_crc_check->test_crc_operation (V-5 provisional). RE-PLAN: I3 -> I3a (op wiring: CrcOperation real + OperationResult assembly + replace placeholder, touches registry/placeholders/test_operations) + I3b (TUI surface: config widget + per-region rows + worker R-6); PLAN.md updated. NOT autonomous — awaiting I2 increment gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I2-approved-committed-I3a-implemented-awaiting-gate",
+            "notes": "I2 APPROVED ('Aprueba') + committed ae73288. I3a: design fork surfaced + operator chose Option 1 (config as execute kwarg). software-dev STOPPED correctly on 2 scope conflicts (operations/__init__.py re-exports CrcOperation from .placeholders; test_tui_operations_view.py TC-011/012 hardcode the placeholder contract) -> operator chose Path A (clean home in crc.py, 7 files, <=5 EXCEPTION granted). Re-dispatched: CrcOperation moved to crc.py REAL (execute(...,config=None): no-config->status=ok+note+crc_regions=None; config->check_regions+summary note+status=ok; output=input snapshot unchanged; STATUS_DOMAIN intact; match/mismatch only in crc_regions[].matched), placeholders.py removed it, registry/__init__ re-export from .crc, 3 tests updated (+2 execute TCs). code-reviewer: CLEAN 0 HIGH/MEDIUM — 3 rule-ons passed (no-config ok sound; TC-002/011/012 preserved intent branched-not-weakened, TC-012 hex baseline legit unchanged; facade rewire no dangling import). 2 LOW: F-L1 (no-config status=ok -> I3b surface must distinguish no-config from all-matched; carried) + F-L2 (ABC config-seam undocumented, optional). LEDGER orchestrator re-ran lean=809 (807+2 EXACT), collection 862. ruff clean, 0 frozen edits. RE-PLAN held: I3b = TUI surface next. NOT autonomous — awaiting I3a gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I3a-approved-committed-I3b-implemented-awaiting-gate",
+            "notes": "I3a APPROVED ('Apruebo') + committed 7658d4e. I3b (TUI surface) implemented via software-dev: crc_config.py +parse_crc_config (text parse, collect-don't-abort; read_crc_config delegates) +DUMMY_CONFIG_TEXT; screens.py OperationsScreen config TextArea (dummy pre-fill, crc-row only) + parse->run flow + @work(thread=True,exclusive,group=crc_operation) worker w/ call_from_thread + per-region rows + F-L1 (parse-error/no-config surfaces error, clears hex, no MATCH/no status:ok); test_crc_config.py +5 parse tests; test_tui_crc_surface.py NEW (TC-115 through-handler 2-fixture non-vacuous, TC-116 worker inspection, F-L1 case); test_tui_operations_view.py 5th-file reconciliation (TC-011/012/013 re-pointed crc-row->extract placeholder since crc row now always parses editor; crc-no-config-via-TUI unreachable by construction per LLR-004.2, config=None stays covered headlessly). code-reviewer: APPROVE-WITH-NITS 0 HIGH; all 3 rule-ons passed. 1 MEDIUM F1 (stale in-flight CRC worker could overwrite config-error surface w/ stale status:ok+MATCH -> defeats F-L1 via race) FIXED: dispatch-token guard (_crc_dispatch_token bumped every Execute incl error branch; _present_result drops stale-token results) + cancel_group; token guard load-bearing (thread worker can't be interrupted mid-run); verified Textual 8.2.5; regression test_stale_crc_worker_result_does_not_overwrite_error fail-before/pass-after. LOW F2 (typed config Optional[CrcConfig]/operation via TYPE_CHECKING) + F4 (unused test param) FIXED; F3 (source-level TC-116) left per spec inspection threshold. LEDGER orchestrator re-ran lean=818 (809+9: 5 parse+3 pilot+1 race; collection 862->871). ruff clean, 0 frozen edits, OperationsScreen not SVG-snapshotted (no baseline drift). NOT autonomous — awaiting I3b gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I3b-approved-committed-J3-rescope-I4-withdrawn",
+            "notes": "I3b APPROVED ('apruebo') + committed 4312dcd (Bash safety-classifier had a transient outage; commit succeeded on retry). THEN at I4 prep, SCOPE-CHANGE surfaced + operator-decided (J-3): report_service.generate_project_report (report_service.py:913) is project/variant-scoped (consumes VariantExecutionResult, not OperationResult); binding a CRC section there = awkward operator-unreachable coupling = the batch-11 SCOPE-1/A-5 half-delivery risk. Operator chose 'Re-scope: persist via the CRC operation output'. CONSEQUENCES: I4 WITHDRAWN (folded into I5); LLR-002.5 WITHDRAWN (check has no separate persistent artifact — surface is op-result view LLR-002.4); LLR-003.5 RE-SCOPED (write outcome = emitted modified S19 [FR9] + OperationResult{emitted path, written=True, verdict}, NOT report_service); TC-117 withdrawn, TC-126 re-homed to test_crc_operation.py; report_service.py + test_report_crc.py removed from s6.5 census; D-2 contract table report_service consumer removed; s6.4 J-3 audit row added; PLAN.md roadmap I4 struck. NO new external-write surface (I5 write path already in scope w/ mandatory security sign-off) -> no security re-route. Spec amendment committed separately before I5. Increment count now 6 (I1a/I1b/I2/I3a/I3b/I5). NEXT: I5 (inject+emit+verify+two-stage confirm + write result record) — LAST impl increment; security-reviewer sign-off MANDATORY at its gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I5a-implemented-awaiting-gate",
+            "notes": "I5 SPLIT into I5a (headless write mechanics) + I5b (TUI confirm) at kickoff. Operator security-default confirmed: emitted S19 -> contained work area, auto-named <stem>-crc.s19, no operator-arbitrary path. I5a via software-dev: crc.py +inject_crcs (4-LE into a COPY, _extend_ranges sorted/merged on gap, original immutable) +write_crc_image (check->inject->emit_s19_from_mem_map->stage temp/->copy_into_workarea containment seam->verify_written_image vs INJECTED map; collect-don't-abort, staged temp unlinked in finally; default dir .s19tool/workarea/crc/) +CrcWriteResult carrier; test_crc_operation.py +6 (TC-121/122/123-incl-corrupted-negative/124-headless/126 + containment-escape). 2 files. MANDATORY security-reviewer: CLEAN OK-to-ship — 4 gate-Qs pass (contained via real resolved-path seam; no escape via abs/.. /symlink/junction; original immutable; collect-don't-abort no temp leak); 1 LOW F-S-06 (emit outside try, hypothetical KeyError unreachable-by-construction) FOLDED by orchestrator (emit moved inside try + KeyError caught + message generalized; containment test assertion updated containment->WorkareaContainmentError class name). code-reviewer: OK 0 HIGH/MEDIUM — 4 rule-ons pass (inject LE-correct+immutable; _extend_ranges sorted-merge correct-by-construction edge-cases verified RK-6; verify uses injected map genuine reread; tests non-vacuous). 2 LOW: F1 verify_runs:List[object] LEFT (DiffRun not simple public export, reviewer ok), F2 in-loop index rebuild LEFT (required for correctness). LEDGER orchestrator re-ran lean=824 (818+6 EXACT incl F-S-06 fold which net-0 tests; collection 871->877). ruff clean, 0 frozen edits. NOTE: security-reviewer spawned an F-S-06 task chip; now moot (folded) but its id not returned to orchestrator -> noted to operator. NOT autonomous — awaiting I5a gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I5a-approved-committed-I5b-implemented-awaiting-gate",
+            "notes": "I5a APPROVED ('approve') + committed d67ff48. I5b (LAST impl increment) implemented via software-dev (it paused for plan-approval; orchestrator re-dispatched with the pre-approved 2-file plan since SendMessage unavailable). screens.py: ConfirmWriteScreen(ModalScreen[bool]) + Write CRC button (disabled until a check lands crc_regions, hidden non-crc) -> confirm modal (FR9 stage-2) -> decline/None=no write/0 files; confirm -> re-parse TextArea -> @work(thread=True,exclusive,group=crc_write) worker (2nd token _crc_write_token guard) -> write_crc_image(workarea_base=self.app.base_dir) -> assemble OperationResult -> render. F-L1 verified/mismatch/write-failed. test_tui_crc_surface.py +TC-124/125. 2 files. code-reviewer: OK 0 HIGH; NO-write-without-confirm AIRTIGHT (mutation-tested: removing decline guard makes TC-124 emit a file -> fails); write-token guard SOUND; F-L1 distinct. 1 MEDIUM F1 (verified corrective write rendered STALE pre-write MISMATCH row since inject_crcs carries forward matched) FIXED by orchestrator: write path now renders write-oriented rows ('region @ 0x..: wrote 0x.. (4 LE bytes)'), check verdict kept only for WRITE FAILED; TC-125 strengthened (mismatching-stored fixture asserts '(4 LE bytes)' present + 'MISMATCH' absent). F2 (hex re-derivation) LOW left. INTEGRITY INCIDENT HANDLED: code-reviewer ran a git checkout that discarded uncommitted screens.py, reconstructed from diff; orchestrator verified git status = only screens.py+test modified, committed crc.py/crc_config.py intact, all I5b symbols+TC-124/125 present, lean 826 green -> reconstruction clean. LEDGER orchestrator re-ran lean=826 (824+2 EXACT; collection 877->879). ruff clean, 0 frozen edits. PHASE 3 COMPLETE on I5b approval (7 increments: I1a/I1b/I2/I3a/I3b/I5a/I5b; I4 withdrawn). NOT autonomous — awaiting I5b gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-16",
+            "decision": "I5b-approved-committed-PHASE-3-COMPLETE",
+            "notes": "I5b APPROVED ('apruebo') + committed 43a2b0f. PHASE 3 COMPLETE: 7 increments (I1a/I1b/I2/I3a/I3b/I5a/I5b; I4 withdrawn J-3). Full CRC feature end-to-end in the TUI: config editor -> check (per-region MATCH/MISMATCH) -> Write CRC -> confirm modal -> inject+emit contained S19+verify -> write-outcome rows; no write without confirmation (mutation-tested). Branch commits: 71cef36 (Phase 0-2) / dd665b0 (I1a) / d7e862e (I1b) / ae73288 (I2) / 7658d4e (I3a) / 4312dcd (I3b) / 8c02f52 (J-3) / d67ff48 (I5a) / 43a2b0f (I5b). Advancing to Phase 4."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate-PASS-WITH-NOTES",
+            "notes": "Phase 4 validation. qa-reviewer wrote 04-validation.md: VERDICT PASS-WITH-NOTES, 0 FAIL/0 blockers. 5/5 HLR + 12/12 in-scope LLR PASS; LLR-002.5 WITHDRAWN (J-3, not a gap). TC reconciliation CLEAN (every in-scope spec TC -> a real collect-verified passing node; TC-117 correctly absent; 0 orphans — extra nodes trace to named LLRs). Surface-reachability A-5/SCOPE-1 CLEAR (all 8 US dimensions through the shipped TUI handler; write dims pilot-driven via ConfirmWriteScreen #confirm_write_ok/cancel — SCOPE-1 does NOT recur). 10/10 inspections PASS (KAT gating 0xCBF43926; reader-as-oracle injected-map non-tautological; config collect-don't-abort; write containment workarea seam + no arbitrary path; no-write-without-confirm; F-L1; original immutable; frozen-set CLEAR test_engine_unchanged 1 passed; REQ-crc.md co-located; output=input-snapshot). ORCHESTRATOR ran full suite ONCE: 847 passed / 0 failed / 29 skipped / 3 xfailed exit 0 (822s); lean 826; signed-balance 879=839+40 (D0/A40 EXACT: I1a2/I1b9/I2 10/I3a2/I3b9/I5a6/I5b2). NOTES (non-blocking): RK-3 non-default *device* vector still 'assumed' (partial-closed by TC-106b published-KATs); REQUIREMENTS.md->REQ-crc.md back-ref is a Phase-6 task; A2L/CLI/report_service(J-3) out-of-scope. 0 code defects. Awaiting Phase 4 gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-17",
+            "decision": "approved-committed",
+            "notes": "Phase 4 APPROVED ('aprobado') + committed 272b4a7 (04-validation.md + PLAN + state). Advancing to Phase 5 post-mortem."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate",
+            "notes": "Phase 5 post-mortem. architect wrote 05-postmortem.md (process/architecture) + qa-reviewer retrospective merged. HEADLINE: closed clean w/ 1 in-flight re-scope (J-3); A-4 census stress-test HELD under a real adversary (CRC abuts frozen core.py/hexfile.py, stayed out); KAT anchor caught a real seed bug; A-5 surface-reachability HELD (SCOPE-1 did NOT recur — write dims pilot-driven). TOP LESSONS: (1) J-3 root cause = 'named-but-not-read' (report_service bound as CRC consumer without reading its VariantExecutionResult input contract) — same class as the Phase-1 majors; (2) increment budgeting under-counted facade/test blast-radius (both <=5 exceptions were re-export churn + test recon, not feature code); (3) comms collapsed mid-batch (operator-flagged, corrected w/ living PLAN.md + saved feedback control). METRICS: iters sum 6 {0:1,1:2,2:1,3:1,4:1,5:1}; Phase-2 19/19 findings closed (0 blocker/8 major/11 minor); per-increment review 5/5 closed (I1b HIGH, I3b MED, I5b MED, I5a sec-LOW, I1a 2 LOW); ledger 839->879 D0/A40; full 847/0; cap-trips 0. 2 NEW CONTROLS PROPOSED: (a) extend symbol-citation rule to CONSUMER input contracts (would have caught J-3 at Phase 1); (b) Phase-1 facade/test blast-radius budgeting. 7 next-batch items incl. A-3 save-flow (b11 carry), RK-3 device vector, CLI ops, CI trigger gap, CODIFY reader-as-oracle (4th use). Recommended ADR: report_service should NOT carry a CRC section (per-operation vs per-variant scope). 0 code defects. Awaiting Phase 5 gate."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-17",
+            "decision": "approved-committed",
+            "notes": "Phase 5 APPROVED ('apruebo') + committed b012e30. Advancing to Phase 6 documentation."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate",
+            "notes": "Phase 6 docs. 3 parallel agents, disjoint files. (A) docs-writer -> REQUIREMENTS.md NEW section 18 'CRC Operation (CRC_F2)': R-CRC-ENGINE-001/002 (002=RK-3 carve-out: default zlib Automated via KAT, non-default device convention Partial/Manual pending operator vector), R-CRC-CHECK-001 (notes LLR-002.5 WITHDRAWN), R-CRC-WRITE-001 (notes LLR-003.5 RE-SCOPED), R-CRC-CONFIG-001, R-CRC-CONTRACT-001 + back-reference line to s19_app/tui/operations/requirements/REQ-crc.md (C-7) — closes the Phase-5-flagged gap; matches the s17 R-MAN format; references-not-inlines. (B) docs-writer -> 06-docs/traceability-matrix.md (18 LLR rows, real node ids from 04-validation, LLR-002.5 WITHDRAWN/003.5 RE-SCOPED marked not-gaps), functionality.md (operator walkthrough), diagrams/crc-check-write-flow.md (Mermaid check+confirmed-write + guard-rail callouts). (C) presentation-builder -> executive-summary.md (~1.5pp, real numbers 847/0, 40 new, PASS-WITH-NOTES). Orchestrator INDEPENDENTLY re-verified (batch-09 silent-fail lesson): REQUIREMENTS.md s18 landed (14 R-CRC/REQ-crc matches), 4 06-docs files present, Mermaid block present, 0 mojibake. Encoding UTF-8 no-BOM. Awaiting Phase 6 gate; on approval state -> awaiting-sync (close commit + push + PR + review + CI + merge + /dev-flow-sync)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-17",
+            "decision": "approved-batch-content-closed-awaiting-sync",
+            "notes": "Phase 6 APPROVED ('apruebo'). Batch-12 CONTENT CLOSED. Docs committed locally (REQUIREMENTS.md s18 + 06-docs + PLAN + state). state -> awaiting-sync. REMAINING (outward-facing, operator-confirm BEFORE remote per hard rules): push branch claude/determined-curran-a4b557 -> open PR to main -> /code-review or review -> CI (NOTE: tui-ci.yml fires on main-tui only, NOT main/PRs-to-main -> the 3.11 gate will NOT auto-run on this PR; the CI-trigger-gap carry is directly relevant here) -> merge -> /dev-flow-sync to G: vault (06-docs + 01/02/04/05 + README; NOT 03-increments). Branch is a worktree off main incl. batch-11. Full batch-12: 7 increments, 839->879 collected, 847/0 full suite, PASS-WITH-NOTES, 0 defects, 9 commits 71cef36..b012e30 + the pending docs close commit."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-17",
+            "decision": "synced-to-obsidian",
+            "notes": "Confirmed during batch-13 init. PR #17 merged to main (merge febd843). Vault sync VERIFIED already complete + current at G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-16-batch-12\\ — all 8 artifacts (01/02/04/05 + 06-docs: exec-summary/functionality/traceability/diagrams/crc-check-write-flow) + 2026-06-16-batch-12-README.md present; EOL-normalized diff vs merged-to-main local copies = IDENTICAL content (vault CRLF vs local LF only), so NO re-copy needed. README frontmatter complete + accurate (verdict pass, 847/0, 839->879 D0/A40, 18 LLR 100%, pct_caught_p2 79.2, 2 new controls). Dashboard.md present (not touched). The only gap was this flag never flipped in a prior session; flipped now. 03-increments correctly NOT synced (vault convention). Operator requested this sync explicitly before advancing batch-13 to Phase 1."
+        }
+    ],
+    "obsidian_synced": true,
+    "created_at": "2026-06-16T12:00:00-06:00"
+}
