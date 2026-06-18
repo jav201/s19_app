@@ -3,8 +3,8 @@
 > Living doc. Updated at every gate + significant checkpoint. BLUF: where we are, what's next, why.
 
 ## Where we are
-- **Phase 4 (Validation) — awaiting gate. VERDICT: PASS.** Full suite 861 passed / 29 skipped / 3 xfailed / 0 failed (exit 0); collection 893; ledger reconciled exact (879+14). 6/6 LLR + 2/2 HLR PASS; A-5 7/7; write-surface gate empty vs febd843; refactor-fidelity invariants hold; 0 defects.
-- (done) Phase 3 COMPLETE (I1/I2/I3 committed 9ab8d3e/a8c7080/e42181c/5197169); Phase 0-2; batch-12 sync; comms + amendment-record conventions in /dev-flow command.
+- **Phase 5 (Post-mortem) — awaiting gate.** Closed clean, PASS, 0 defects. Top lessons: Phase-0 premise correction (highest leverage), stale-main-ref discovery, reader-as-oracle reuse + b12 controls held. 6 carries (3 new, 3 standing). New §6.5 amendment convention assessed keep.
+- (done) Phase 4 PASS committed (c6d1440); Phase 3 (9ab8d3e/a8c7080/e42181c/5197169); Phase 0-2; batch-12 sync; conventions in /dev-flow command.
 - **NOTE:** local `main` ref stale (`ec453a2`); true base = `febd843` (§6.5 Amendment A-1).
 
 ## Objective
