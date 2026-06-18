@@ -37,13 +37,14 @@ from __future__ import annotations
 import asyncio
 import inspect
 from pathlib import Path
+from unittest import mock
 
-from textual.widgets import Button, ListView, Static, TextArea
+from textual.widgets import Button, Input, ListView, Static, TextArea
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import emit_s19_from_mem_map
 from s19_app.tui.operations.crc import compute_region_crc, encode_le32
-from s19_app.tui.operations.crc_config import DUMMY_CONFIG_TEXT
+from s19_app.tui.operations.crc_config import DUMMY_CONFIG_TEXT, read_crc_config_text
 from s19_app.tui.operations.model import CrcRegionResult, OperationResult
 from s19_app.tui.screens import OperationsScreen
 
@@ -329,6 +330,240 @@ def test_stale_crc_worker_result_does_not_overwrite_error(tmp_path: Path) -> Non
     assert "MATCH" not in status, status
     assert "region @" not in status, status
     assert hex_text == "", repr(hex_text)
+
+
+# ---------------------------------------------------------------------------
+# US-013 CRC config-load helpers + fixtures (HLR-013, all 3 LLR)
+# ---------------------------------------------------------------------------
+
+
+def _write_config_fixture(tmp_path: Path) -> tuple[Path, str]:
+    """Write a SYNTHETIC CRC config JSON; return (path, its exact file text).
+
+    All values FAKE; NOT under examples/ (respects the examples/**/crc*.json
+    tripwire, TC-114). The text is the load oracle: TC-203 asserts the editor
+    text byte-equals it after a load.
+    """
+    text = _config_text()
+    path = tmp_path / "loadable_crc.json"
+    path.write_text(text, encoding="utf-8")
+    return path, text
+
+
+# ---------------------------------------------------------------------------
+# TC-201 / LLR-013.1 — config-path Input + Load button present + display toggle
+# ---------------------------------------------------------------------------
+
+
+def test_crc_config_load_widgets_present_and_toggle(tmp_path: Path) -> None:
+    """TC-201: the path Input + Load button show on the CRC row, hide off it.
+
+    Intent (LLR-013.1): the new ``#operation_config_path`` Input and
+    ``#operation_config_load`` Button extend the CRC compose branch and share
+    the CRC row's visibility — they are ``.display==True`` while the CRC op is
+    highlighted (index 0) and ``.display==False`` while a non-CRC op is
+    highlighted (index 1, ``extract``), at parity with the existing
+    ``#operation_config`` editor. A regression that forgot to toggle them in
+    ``_sync_config_visibility`` would leave them visible off the CRC row.
+    """
+
+    async def _drive() -> tuple[bool, bool, bool, bool, bool, bool]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=True)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+
+            path_input = screen.query_one("#operation_config_path", Input)
+            load_button = screen.query_one("#operation_config_load", Button)
+            editor = screen.query_one("#operation_config", TextArea)
+            on_crc = (path_input.display, load_button.display, editor.display)
+
+            # Highlight a non-CRC operation (index 1 = "extract").
+            screen.query_one("#operations_list", ListView).index = 1
+            await _flush(pilot)
+            off_crc = (path_input.display, load_button.display, editor.display)
+            return (*on_crc, *off_crc)
+
+    (
+        path_on,
+        load_on,
+        editor_on,
+        path_off,
+        load_off,
+        editor_off,
+    ) = asyncio.run(_drive())
+    # On the CRC row: both new widgets displayed, at parity with the editor.
+    assert path_on is True
+    assert load_on is True
+    assert editor_on is True
+    # Off the CRC row: both new widgets hidden, at parity with the editor.
+    assert path_off is False
+    assert load_off is False
+    assert editor_off is False
+
+
+# ---------------------------------------------------------------------------
+# TC-203 / LLR-013.2 — Load config through the handler populates the editor
+# ---------------------------------------------------------------------------
+
+
+def test_crc_config_load_ok_populates_editor_via_handler(tmp_path: Path) -> None:
+    """TC-203: pressing Load config loads the file's raw text, runs no check.
+
+    Intent (LLR-013.2, A-5 through-handler): the pilot types a valid synthetic
+    config path into ``#operation_config_path`` and presses Load config — the
+    press routes THROUGH ``OperationsScreen.on_button_pressed`` (the shipped
+    handler, not a direct call). After the load, ``#operation_config.text``
+    byte-equals the file text, and NO CRC check ran (no per-region row, no
+    ``status: ok`` on the result surface). A regression that parsed-on-load or
+    auto-ran the check would fail here.
+    """
+
+    async def _drive() -> tuple[str, str, str]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=True)
+        config_path, config_text = _write_config_fixture(tmp_path)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+
+            # The editor pre-fills with the dummy; the load must replace it.
+            assert (
+                screen.query_one("#operation_config", TextArea).text
+                == DUMMY_CONFIG_TEXT
+            )
+
+            screen.query_one("#operation_config_path", Input).value = str(
+                config_path
+            )
+            screen.query_one("#operation_config_load", Button).press()
+            await _flush(pilot)
+
+            editor_text = screen.query_one("#operation_config", TextArea).text
+            status = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            return editor_text, config_text, status
+
+    editor_text, config_text, status = asyncio.run(_drive())
+    # The editor now byte-equals the loaded file text (raw, unparsed).
+    assert editor_text == config_text
+    # No CRC check ran on load: no per-region row, no green-pass status.
+    assert "region @" not in status, status
+    assert "status: ok" not in status, status
+    assert "MATCH" not in status, status
+
+
+# ---------------------------------------------------------------------------
+# TC-204 / LLR-013.3 — load fault surfaces 1 error + no check; dummy on mount
+# ---------------------------------------------------------------------------
+
+
+def test_crc_config_load_fault_surfaces_error_and_no_check(tmp_path: Path) -> None:
+    """TC-204: an unresolvable path AND an over-cap probe each surface 1 error.
+
+    Intent (LLR-013.3): a load fault surfaces exactly one error on
+    ``#operation_result_status``, leaves ``#operation_config.text`` UNCHANGED,
+    and runs zero CRC checks (no per-region row, no ``status: ok``). Two fault
+    modes are exercised through the handler: (a) an unresolvable path, and
+    (b) an over-cap file via an injected oversized ``size_probe`` on
+    ``read_crc_config_text``. The mount case asserts the editor pre-fills with
+    ``DUMMY_CONFIG_TEXT`` and that an empty-path press leaves it untouched.
+    """
+
+    async def _drive_unresolvable() -> tuple[str, str]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=True)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            before = screen.query_one("#operation_config", TextArea).text
+
+            screen.query_one("#operation_config_path", Input).value = str(
+                tmp_path / "does_not_exist.json"
+            )
+            screen.query_one("#operation_config_load", Button).press()
+            await _flush(pilot)
+
+            after = screen.query_one("#operation_config", TextArea).text
+            status = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            assert before == after, "editor changed on a load fault"
+            return status, after
+
+    async def _drive_over_cap() -> tuple[str, str]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=True)
+        config_path, _ = _write_config_fixture(tmp_path)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            before = screen.query_one("#operation_config", TextArea).text
+
+            # Force an over-cap read via the injected size probe on the seam.
+            oversized = lambda _candidate: 1 << 40  # noqa: E731 — 1 TiB stub
+            with mock.patch(
+                "s19_app.tui.screens.read_crc_config_text",
+                side_effect=lambda path, base, _probe=oversized: read_crc_config_text(
+                    path, base, _probe
+                ),
+            ):
+                screen.query_one("#operation_config_path", Input).value = str(
+                    config_path
+                )
+                screen.query_one("#operation_config_load", Button).press()
+                await _flush(pilot)
+
+            after = screen.query_one("#operation_config", TextArea).text
+            status = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            assert before == after, "editor changed on an over-cap load fault"
+            return status, after
+
+    async def _drive_mount_and_empty() -> tuple[str, str, str]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=True)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            mounted = screen.query_one("#operation_config", TextArea).text
+
+            # Empty path: surface a message, leave the editor untouched.
+            screen.query_one("#operation_config_path", Input).value = ""
+            screen.query_one("#operation_config_load", Button).press()
+            await _flush(pilot)
+            after_empty = screen.query_one("#operation_config", TextArea).text
+            status_empty = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            return mounted, after_empty, status_empty
+
+    # (a) Unresolvable path → exactly one surfaced error, no check.
+    status_unres, _ = asyncio.run(_drive_unresolvable())
+    assert "CRC config load error:" in status_unres, status_unres
+    assert "region @" not in status_unres, status_unres
+    assert "status: ok" not in status_unres, status_unres
+
+    # (b) Over-cap → exactly one surfaced error, no check, editor unchanged.
+    status_cap, _ = asyncio.run(_drive_over_cap())
+    assert "CRC config load error:" in status_cap, status_cap
+    assert "region @" not in status_cap, status_cap
+    assert "status: ok" not in status_cap, status_cap
+
+    # Mount case: dummy pre-load; empty-path press surfaces a message and
+    # leaves the editor untouched (LLR-013.3: empty is a fault that surfaces).
+    mounted, after_empty, status_empty = asyncio.run(_drive_mount_and_empty())
+    assert mounted == DUMMY_CONFIG_TEXT, mounted
+    assert after_empty == DUMMY_CONFIG_TEXT, after_empty
+    assert "enter a config file path" in status_empty, status_empty
 
 
 # ---------------------------------------------------------------------------

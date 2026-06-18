@@ -25,7 +25,11 @@ from .changes.verify import STATUS_VERIFIED
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .models import LoadedFile
 from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
-from .operations.crc_config import DUMMY_CONFIG_TEXT, parse_crc_config
+from .operations.crc_config import (
+    DUMMY_CONFIG_TEXT,
+    parse_crc_config,
+    read_crc_config_text,
+)
 from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
 from .services.report_service import (
@@ -665,6 +669,11 @@ class OperationsScreen(ModalScreen[None]):
                 id="operations_list",
             ),
             Label("CRC config (editable JSON):", id="operation_config_label"),
+            Input(
+                placeholder="config file path (.json)",
+                id="operation_config_path",
+            ),
+            Button("Load config", id="operation_config_load"),
             TextArea(DUMMY_CONFIG_TEXT, id="operation_config"),
             Static("", id="operation_result_status", markup=False),
             ScrollableContainer(
@@ -753,8 +762,10 @@ class OperationsScreen(ModalScreen[None]):
 
         Data Flow:
             - ``_selected_operation_id() == CRC_OPERATION_ID`` toggles the
-              ``display`` style of ``#operation_config_label`` and
-              ``#operation_config``.
+              ``display`` style of ``#operation_config_label``,
+              ``#operation_config_path``, ``#operation_config_load`` and
+              ``#operation_config`` (the config-load controls share the CRC
+              row's visibility, LLR-013.1).
 
         Dependencies:
             Used by:
@@ -762,6 +773,8 @@ class OperationsScreen(ModalScreen[None]):
         """
         is_crc = self._selected_operation_id() == self.CRC_OPERATION_ID
         self.query_one("#operation_config_label", Label).display = is_crc
+        self.query_one("#operation_config_path", Input).display = is_crc
+        self.query_one("#operation_config_load", Button).display = is_crc
         self.query_one("#operation_config", TextArea).display = is_crc
         # The Write CRC button is meaningful only for the CRC op, and only
         # after a real check landed regions. Hide it entirely off the CRC row;
@@ -779,8 +792,61 @@ class OperationsScreen(ModalScreen[None]):
         if event.button.id == "operations_execute":
             self._execute_selected()
             return
+        if event.button.id == "operation_config_load":
+            self._load_config_from_path()
+            return
         if event.button.id == "operations_write":
             self._on_write_pressed()
+
+    def _load_config_from_path(self) -> None:
+        """
+        Summary:
+            Load the CRC config file named in ``#operation_config_path`` into
+            the editable ``#operation_config`` ``TextArea`` as RAW TEXT
+            (LLR-013.2 / LLR-013.3). On success the editor is the single source
+            of truth: the load NEVER parses, validates, or runs the CRC check —
+            the run still parses the editor text on Execute. On any fault
+            (empty / unresolvable / over-cap / unreadable) the collected error
+            is surfaced on ``#operation_result_status`` and the editor is left
+            unchanged (collect-don't-abort).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read ``#operation_config_path`` ``.value``; an empty path surfaces
+              a message and returns without touching the editor.
+            - Resolve + size-cap + read via
+              ``crc_config.read_crc_config_text(path, self.app.base_dir)``.
+            - On ``(None, [error])`` surface the error on
+              ``#operation_result_status`` and leave the editor unchanged.
+            - On ``(raw_text, [])`` replace ``#operation_config`` ``.text`` with
+              the raw text and run no check.
+
+        Dependencies:
+            Uses:
+                - crc_config.read_crc_config_text (resolve + size-cap + read)
+            Used by:
+                - on_button_pressed (Load config button)
+        """
+        path_text = self.query_one("#operation_config_path", Input).value.strip()
+        status = self.query_one("#operation_result_status", Static)
+        if not path_text:
+            status.update("CRC config load: enter a config file path first.")
+            return
+
+        raw_text, errors = read_crc_config_text(path_text, self.app.base_dir)
+        if errors:
+            logger.info("OperationsScreen CRC config load error: %s", errors)
+            status.update("\n".join(["CRC config load error:", *errors]))
+            return
+
+        assert raw_text is not None  # no errors ⇒ raw text present
+        self.query_one("#operation_config", TextArea).text = raw_text
+        status.update(f"Loaded CRC config from {path_text}")
 
     def _execute_selected(self) -> None:
         """
