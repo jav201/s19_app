@@ -4216,6 +4216,41 @@ def test_tc030_footer_updates_and_reflects_active_screen(tmp_path: Path) -> None
         )
 
 
+def test_tc030_operations_binding_shown_in_footer(tmp_path: Path) -> None:
+    """The Operations view's ``x`` binding is footer-discoverable.
+
+    Intent: fast-dev-flow AC "x/Operations is footer-discoverable" — the
+    Operations view (host of the CRC operation) was reachable only by the
+    undocumented ``x`` key. Flipping that binding to ``show=True`` surfaces it
+    in the footer. AC-1: ``x`` is in the footer's visible set on every rail
+    screen. AC-2: the chip's description reads ``Operations``.
+    """
+
+    async def _drive() -> tuple[dict[str, set[str]], str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        footers: dict[str, set[str]] = {}
+        description = ""
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            for screen_key in SCREEN_KEYS:
+                app.action_show_screen(screen_key)
+                await pilot.pause()
+                footers[screen_key] = _shown_footer_keys(app)
+            description = app.active_bindings["x"].binding.description
+        return footers, description
+
+    footers, description = asyncio.run(_drive())
+    for screen_key, shown in footers.items():
+        assert "x" in shown, (
+            f"screen '{screen_key}' footer is missing the Operations key "
+            f"'x' — footer shows {sorted(shown)}"
+        )
+    assert description == "Operations", (
+        f"the 'x' binding footer description must read 'Operations', "
+        f"got {description!r}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # TC-031 — the engine / data-processing modules are behaviorally unchanged
 #          vs the batch start (git diff classification — LLR-014.1)
