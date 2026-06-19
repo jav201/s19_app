@@ -519,7 +519,7 @@ class S19TuiApp(App):
         Binding("v", "select_variant", "Select variant", show=False),
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
         Binding("t", "view_reports", "View reports", show=False),
-        Binding("x", "operations_view", "Operations", show=False),
+        Binding("x", "operations_view", "Operations", show=True),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
         Binding("3", "show_screen('mac')", "MAC View", show=False),
