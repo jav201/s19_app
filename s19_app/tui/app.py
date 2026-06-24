@@ -2130,7 +2130,7 @@ class S19TuiApp(App):
                 "sev-error",
             )
             return
-        mem_map_a, mem_map_b = self._diff_load_maps(result)
+        mem_map_a, mem_map_b, failed_sides = self._diff_load_maps(result)
         runs = [(run.start, run.end, run.kind) for run in result.runs]
         usage_a = result.notes.get("image_a")
         usage_b = result.notes.get("image_b")
@@ -2141,28 +2141,52 @@ class S19TuiApp(App):
             usage_a.summary if usage_a is not None else "none",
             usage_b.summary if usage_b is not None else "none",
         )
-        panel.set_status(
-            f"Compared {result.image_a.label} vs {result.image_b.label}: "
-            f"{len(result.runs)} runs.",
-            "sev-ok",
-        )
+        if failed_sides:
+            panel.set_status(
+                f"Compare failed: {', '.join(failed_sides)} loaded no image "
+                "(file has content but no valid records).",
+                "sev-error",
+            )
+        else:
+            panel.set_status(
+                f"Compared {result.image_a.label} vs {result.image_b.label}: "
+                f"{len(result.runs)} runs.",
+                "sev-ok",
+            )
         self._diff_last_result = result
 
-    def _diff_load_maps(self, result) -> tuple[dict, dict]:
+    def _diff_load_maps(self, result) -> tuple[dict, dict, list[str]]:
         """
         Summary:
             Re-load the two compared images' memory maps for the on-screen hex
-            windows and the report (LLR-005.2 / LLR-005.4). The comparison
-            service returns runs but not the maps; the panel and the report
-            generator both need the raw bytes, so this re-parses by path
+            windows and the report (LLR-005.2 / LLR-005.4), and detect a
+            per-side load failure so the caller can surface an honest
+            diagnostic instead of a silent clean compare (LLR-016.1). The
+            comparison service returns runs but not the maps; the panel and the
+            report generator both need the raw bytes, so this re-parses by path
             through the existing headless loaders.
+
+            A side is a load failure when its source file has content on disk
+            yet re-parses to an empty memory map (every record rejected, the
+            collect-don't-abort degenerate case the service does not refuse),
+            or the re-parse raises for a non-empty source. A legitimately small
+            but valid image maps ≥1 byte and is NOT a failure.
 
         Args:
             result (ComparisonResult): The completed comparison.
 
         Returns:
-            tuple[dict, dict]: ``(mem_map_a, mem_map_b)``; an unreadable image
-            yields an empty map (the hex window then shows nothing — non-fatal).
+            tuple[dict, dict, list[str]]: ``(mem_map_a, mem_map_b,
+            failed_sides)`` where the two maps feed the hex windows unchanged
+            (an unreadable image still yields an empty map — non-fatal) and
+            ``failed_sides`` carries the human label of each side that loaded no
+            image, out-of-band from the maps tuple the report path consumes.
+
+        Data Flow:
+            - Re-parse each side's path through ``build_loaded_s19`` /
+              ``build_loaded_hex``; a raised parse becomes an empty map.
+            - A non-empty source path whose map is empty is appended to
+              ``failed_sides`` by its ``image.label``.
 
         Dependencies:
             Uses:
@@ -2181,7 +2205,21 @@ class S19TuiApp(App):
             except Exception:  # noqa: BLE001 — display-side, non-fatal
                 return {}
 
-        return _load(result.image_a), _load(result.image_b)
+        def _source_has_content(image) -> bool:
+            if not image.path:
+                return False
+            try:
+                return Path(image.path).stat().st_size > 0
+            except OSError:
+                return False
+
+        mem_map_a = _load(result.image_a)
+        mem_map_b = _load(result.image_b)
+        failed_sides: list[str] = []
+        for image, mem_map in ((result.image_a, mem_map_a), (result.image_b, mem_map_b)):
+            if not mem_map and _source_has_content(image):
+                failed_sides.append(image.label or str(image.path))
+        return mem_map_a, mem_map_b, failed_sides
 
     def on_ab_diff_panel_report_requested(
         self, event: AbDiffPanel.ReportRequested

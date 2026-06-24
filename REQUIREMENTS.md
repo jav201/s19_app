@@ -41,6 +41,7 @@ Functional subsystems:
 17. Project Manifest Writer (batch-11)
 18. CRC Operation (CRC_F2) (batch-12)
 19. CRC Config-from-File + Patch-Editor Paste (batch-13)
+20. A↔B Compare Load-Failure Honesty (batch-15)
 
 ---
 
@@ -2418,3 +2419,67 @@ write-surface gate).
 - Status: Added in batch `2026-06-17-batch-13` (US-014 / HLR-014 / LLR-014.3).
   Standing gate — re-run on any future batch that touches the Patch Editor write
   surface; PASS at batch-13 close vs `febd843`.
+
+---
+
+# 20. A↔B Compare Load-Failure Honesty (batch-15)
+
+The batch (`2026-06-24-batch-15`, US-016) is a **retroactive black-box acceptance
+closure** of an escaped bug in the A↔B Diff compare: when one of the two compared
+images was a non-empty file that parsed to an **empty** memory map (every S-record
+malformed — the collect-don't-abort degenerate case the comparison service does
+NOT refuse), the panel rendered a green `sev-ok` verdict with bogus `only_a`/`only_b`
+runs, silently presenting a load failure as a clean compare. The fix is a
+display-side verdict-honesty change in `tui/app.py` (outside the engine-frozen
+set); the comparison engine and `compare_service` are unchanged. The escape was
+possible because **every prior diff handler test monkeypatched `compare_images`**,
+so the real on-disk parse path was never driven through the shipped button.
+
+> **Per-story HLR/LLR detail:** the normative source of truth for the full EARS
+> statements is `.dev-flow/2026-06-24-batch-15/01-requirements.md` §3 (HLR-016) /
+> §4 (LLR-016.1–.3); the black-box acceptance design (AT-016.1/.2/.3/.4, the
+> pre-fix-RED oracle, the R-2 reachability gate) and the per-node validation
+> verdicts are in that batch folder (`02-review.md`, `04-validation.md`). The row
+> below is the repo-wide `R-*` traceability that REFERENCES those docs.
+
+> **Scope boundaries (honest).** US-015 (16/32 S19 record width + populated S0)
+> was carried in the batch-14 backlog alongside this story but is **net-new
+> feature work, not an escaped bug**; it was **deferred** at the batch-15 Phase-0
+> gate to its own forward-feature batch (its spec is preserved in
+> `.dev-flow/2026-06-23-batch-14/01-requirements.md`). batch-15 ships US-016 only.
+
+**R-DIFF-LOADFAIL-001**: When the operator runs an A↔B compare of two images
+selected by absolute path through the `#diff_compare_button` surface, and one side
+is a non-empty source file that re-parses to an empty memory map (or whose
+re-parse raises), then the system must surface a `sev-error` diagnostic on
+`#diff_status` naming the failed side — rather than a `sev-ok` status (whether "0
+runs" or runs derived from a partially-loaded pair); and when both images load to
+usable maps the genuine differing runs and `sev-ok` are reported as before. A
+legitimately small but valid image (maps ≥1 byte) must NOT be flagged. The failed
+side is detected display-side (`_diff_load_maps`: source file has content on disk
+yet maps empty) and carried out-of-band of the `(mem_map_a, mem_map_b)` tuple the
+report path consumes; the diagnostic text is surfaced as plain text
+(`#diff_status` stays `markup=False`) (HLR-016 / LLR-016.1–.3; detail in
+`01-requirements.md` §3/§4).
+
+- Code: `s19_app/tui/app.py` (`_diff_load_maps` :2151 — return widened to
+  `tuple[dict, dict, list[str]]` with the NEW `failed_sides` out-of-band signal +
+  inner `_source_has_content` predicate; `on_ab_diff_panel_compare_requested`
+  :2083 — conditional `sev-error`-naming-the-side vs the prior unconditional
+  `sev-ok` at :2144). No engine / `compare_service` / widget change; report path
+  (`on_ab_diff_panel_report_requested`, reads `panel.mem_map_a/b`) untouched.
+- Validation: `Automated` via `tests/test_tui_diff_compare_realpath.py` — four
+  black-box `App.run_test()` pilots driving the real `#diff_compare_button` with
+  NO `compare_images` monkeypatch:
+  `test_at_016_1_two_wellformed_images_show_changed_runs` (AT-016.1, regression
+  lock), `test_at_016_2_degenerate_image_is_flagged_not_silent` (AT-016.2, the
+  escaped-bug regression — RED on the pre-fix tree, GREEN post-fix),
+  `test_at_016_3_unresolvable_path_refuses_without_crash` (AT-016.3),
+  `test_at_016_4_legit_small_valid_image_is_not_flagged` (AT-016.4,
+  over-correction guard). Pre-fix-RED vs post-fix-GREEN evidence captured in
+  `04-validation.md`.
+- Status: Added in batch `2026-06-24-batch-15` (US-016 / HLR-016 /
+  LLR-016.1–.3). A-5 surface-reachability: the diagnostic reaches `#diff_status`
+  THROUGH the `#diff_compare_button` → `on_ab_diff_panel_compare_requested`
+  handler (not a direct service call). Closes the 2026-06-23 black-box
+  acceptance-gap audit item for batch-14 US-016.
