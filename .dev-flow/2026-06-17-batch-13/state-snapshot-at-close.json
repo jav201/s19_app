@@ -1,0 +1,215 @@
+{
+    "project": "s19_app",
+    "language": "en",
+    "batch_id": "2026-06-17-batch-13",
+    "batch_objective": "Surface two existing-substrate TUI capabilities (no new engine math). US-013: load the CRC config JSON from a file in the CRC surface (OperationsScreen) via the existing crc_config.read_crc_config(path) (resolve_input_path + READ_SIZE_CAP_BYTES + collect-don't-abort) and populate the editable TextArea; DUMMY_CONFIG_TEXT stays pre-loaded as editable reference; load errors surface and DO NOT run the check. US-014: wire the inert Patch Editor (rail key 6, PatchEditorPanel, #screen_patch) to load a change-document (kind=change) from FILE and/or PASTE with a pre-loaded dummy change-document reference, apply via changes/apply.apply_change_document, show before/after + per-entry INSIDE/PARTIAL/OUTSIDE containment, then WRITE under R-6 (worker-thread + two-stage confirm + contained emit via copy_into_workarea seam + verify_written_image reader-as-oracle + MANDATORY security-reviewer sign-off).",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {"0": 1, "1": 2, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
+    "artifacts": {
+        "1": ".dev-flow/2026-06-17-batch-13/01-requirements.md",
+        "2": ".dev-flow/2026-06-17-batch-13/02-review.md",
+        "3": ".dev-flow/2026-06-17-batch-13/03-increments/",
+        "4": ".dev-flow/2026-06-17-batch-13/04-validation.md",
+        "5": ".dev-flow/2026-06-17-batch-13/05-postmortem.md",
+        "6": ".dev-flow/2026-06-17-batch-13/06-docs/"
+    },
+    "branch": "claude/agitated-boyd-ea0e9e (worktree off main; main already includes batch-12 PR #17 merge febd843)",
+    "previous_batches": [
+        "2026-05-05-batch-01",
+        "2026-05-20-batch-02",
+        "2026-05-21-batch-03",
+        "2026-05-21-batch-04",
+        "2026-05-26-batch-05",
+        "2026-06-09-batch-06",
+        "2026-06-10-batch-07",
+        "2026-06-11-batch-08",
+        "2026-06-11-batch-09",
+        "2026-06-13-batch-10",
+        "2026-06-14-batch-11",
+        "2026-06-16-batch-12"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. Living docs (REQUIREMENTS.md, tests/, docs/diagrams/) kept current. On batch advance, the closing batch's state.json is snapshotted into its folder as state-snapshot-at-close.json before the shared state.json is trimmed to the new batch. Batch-12 snapshot written to .dev-flow/2026-06-16-batch-12/state-snapshot-at-close.json at batch-13 init.",
+    "living_documentation": {
+        "requirements": "REQUIREMENTS.md (repo root)",
+        "tests": "tests/",
+        "diagrams": "docs/diagrams/",
+        "plan": ".dev-flow/2026-06-17-batch-13/PLAN.md (living compendium — created in Phase 0)"
+    },
+    "carried_from_batch_12": {
+        "closure": "batch-12 (CRC_F2 / US-011 check + US-012 inject+emit) fully closed: 6 phases, 7 increments (I1a/I1b/I2/I3a/I3b/I5a/I5b; I4 withdrawn J-3), PASS-WITH-NOTES, 0 defects, full suite 847/0, collection 839->879 (D0/A40). PR #17 merged to main 2026-06-17 (merge febd843). Full batch-12 history: .dev-flow/2026-06-16-batch-12/state-snapshot-at-close.json. VAULT SYNC RESOLVED 2026-06-17: /dev-flow-sync run at batch-13 init confirmed batch-12 already fully synced to G: vault (8 artifacts + README + Dashboard; EOL-only diff vs main, content identical) — only the obsidian_synced flag was unflipped from a prior session; now flipped true in the batch-12 close snapshot. Loose end CLEARED.",
+        "suite_baseline": "Batch-12 close: 879 collected / full 847 passed / lean 826. RE-MEASURE at batch-13 Phase-1 per V-7 (do not assume) — this worktree is off main which now includes batch-12.",
+        "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py (git-frozen by _ENGINE_PATHS guards: test_engine_unchanged.py:120-127 [6 paths, no color_policy] + test_tui_directionb.py:3738-3745 [7 incl color_policy] — known discrepancy, re-verify both at Phase-1 census). CRITICAL for batch-13: both US surface EXISTING substrate; new UI code goes OUTSIDE the frozen set. CRC config reader (crc_config.py) + changes/ family (io/apply/check/verify/model) are already outside frozen. Patch write must reuse emit_s19_from_mem_map + verify_written_image + copy_into_workarea seam (precedent: batch-10/12).",
+        "reader_as_oracle_idiom": "Named idiom, now 4+ uses (b09 compare, b10 IntelHexFile, b11 manifest, b12 CRC verify-on-write). US-014 patch write is the next consumer: re-read the emitted S19 via frozen S19File reader and diff against the INTENDED patched map (verify_written_image / changes/verify.py), ALWAYS with a negative control (corrupted-write proves the oracle can fail). CODIFY-in-PROJECT_RULES is a SEPARATE carry — OUT of batch-13 scope.",
+        "two_new_controls_from_b12_postmortem": "APPLY BOTH in batch-13: (a) CONSUMER-INPUT-CONTRACT citation — extend the LLR symbol-citation rule: any LLR wiring a producer to an existing consumer MUST cite the consumer's REAL input type (file:line) in draft (would have caught J-3: report_service consumes VariantExecutionResult, not OperationResult). For batch-13 this binds: PatchEditorPanel / #screen_patch real widget contract (app.py ~:938), apply_change_document's real signature, OperationsScreen TextArea #operation_config. (b) FACADE/TEST BLAST-RADIUS budgeting in Phase 1 — count __init__/facade re-exports + tests that hardcode contracts WITHIN the <=5-files-per-increment limit (b12 I1a/I3a blew budget on re-export churn + test recon).",
+        "never_in_repo_json_rule": "config/patch JSON NEVER committed: only dummy templates (FAKE values) + synthetic fixtures. Respect the tripwire examples/**/crc*.json (TC-114). The US-014 change-document dummy goes in as an analogous example with FAKE values only.",
+        "anchors_to_verify_phase1": "DO NOT ASSUME — verify each vs disk at Phase 1. CRC: s19_app/tui/operations/crc_config.py (read_crc_config, parse_crc_config, CrcConfig/CrcRegion, DUMMY_CONFIG_TEXT); surface s19_app/tui/screens.py OperationsScreen (TextArea #operation_config, parse-on-run, @work worker, ConfirmWriteScreen). PATCH: s19_app/tui/changes/io.py (read_change_document, FORMAT_ID, DOCUMENT_KINDS, VALUE_MODES, emit_s19_from_mem_map), changes/apply.py (apply_change_document), changes/check.py, changes/model.py (ChangeDocument/ChangeEntry, EntryPlacement INSIDE/PARTIAL/OUTSIDE), changes/verify.py (verify_written_image/VerifyResult); PatchEditorPanel + #screen_patch (app.py ~:938, inert shell); cli.py patch-hex/patch-str. SHARED: copy_into_workarea + _find_workarea_root/is_relative_to/_path_traverses_reparse_point + resolve_input_path (workspace.py); OperationInput neutral contract (operations/model.py).",
+        "out_of_scope_carries": "DO NOT pull into batch-13 (separate carries): A-3 save-flow composition (b11 LEAD), RK-3 non-zlib device vector, CLI 'ops' subcommand, CODIFY reader-as-oracle in PROJECT_RULES, ADR report_service-CRC. RESOLVED — do NOT re-flag: CI trigger gap (tui-ci fires on main since batch-06, bd2c2ad)."
+    },
+    "decisions_log": [
+        {
+            "phase": 0,
+            "date": "2026-06-17",
+            "decision": "batch-13-initialized",
+            "notes": "Operator: 'Arranca batch-13 (abre batch nuevo con /dev-flow-init, language=en)'. Batch-12 confirmed closed + merged to main (PR #17, merge febd843) BEFORE scaffolding; its closing state snapshotted to .dev-flow/2026-06-16-batch-12/state-snapshot-at-close.json. batch-13 scaffolded per PROJECT convention (subfolder .dev-flow/2026-06-17-batch-13/, NOT generic flat layout) from ~/.claude/templates/dev-flow/: 7 artifact skeletons, byte-preserving sed copy (UTF-8 no-BOM), 0 mojibake, 0 residual <PROJECT>/<BATCH_ID>. Objective = surface US-013 (CRC config-from-file) + US-014 (patch values via TUI Patch Editor, R-6 write path). Both surface EXISTING substrate; new UI outside frozen set. Two new b12 controls armed (consumer-input-contract citation + facade/test blast-radius budgeting). LOOSE END flagged: batch-12 obsidian_synced still false. Next: Phase 0 story intake — refine US-013/US-014 (INVEST + Definition of Ready), classify READY/REFINE/SPIKE/OUT; seed into 01-requirements.md s2.6."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate",
+            "notes": "PHASE-0-DRAFT. Phase 0 story intake complete. Draft-time disk verification surfaced a LOAD-BEARING premise conflict on US-014: the brief framed the Patch Editor as 'SHELL INERTE (app.py ~:938)', but that is a STALE DOCSTRING (app.py:938 'inert before/after view shell ... neither wires patch or diff logic') contradicted by live code. PatchEditorPanel (screens_directionb.py:325) + ChangeService (services/change_service.py:284) + app.py handlers (on_patch_editor_panel_action_requested:1247) already SHIP: load-from-file (service.load->read_change_document, resolve_input_path, collect-don't-abort, change_service.py:580), apply (apply_doc->service.apply, INSIDE/PARTIAL/OUTSIDE via classify_containment), emit (emit_s19_from_mem_map), CONTAINED write via copy_into_workarea seam (no arbitrary path, no clobber, changes/apply.py:586-635 save_patched_image), and verify_written_image reader-as-oracle (change_service.py:867). I.e. the entire R-6 write substrate the brief called 'genuinely new' is already wired with the EXACT containment+verify the brief prescribes. STOPPED at gate + surfaced via AskUserQuestion. Operator decision: 'Trim to the real gap' -> US-014 re-scoped to the ONE genuine ergonomic gap: a paste-full-changeset TextArea + DUMMY_CHANGESET_TEXT pre-load (CRC parity); shipped load/apply/verify/save-back LEFT INTACT; two-stage modal + worker-thread DEFERRED (operator). US-013 confirmed GENUINE (read_crc_config wired only into tests/test_crc_config.py, NOT to any TUI control; CRC surface screens.py:667-677 has TextArea+Execute/Write/Close but no path Input / Load button). BOTH stories classified READY (0 REFINE/SPIKE/OUT) post-rescope. 01-requirements.md s2.6 written: 2 US table + per-story INVEST/DoR/AC blocks + premise-correction note + consumer-input-contract citations (b12 control: parse_crc_config(text:str) crc_config.py:242 / read_crc_config(path,base_dir)->(Optional[CrcConfig],list[str]) crc_config.py:156 / ChangeService.load->read_change_document) + facade/test blast-radius flag (PATCH_ACTIONS_V2 fixed 9-action set asserted in tests). Phase-1 verify items flagged 'assumed': US-013 raw-text-vs-parsed reconciliation; US-014 changes/io.py parse-from-string seam existence. Living PLAN.md created. SURGICAL truth-fix queued: correct stale app.py:938 docstring. Awaiting Phase 0 DoR gate."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-17",
+            "decision": "approved",
+            "notes": "Operator: 'proceed with the approval to advance to phase 1' (after requesting batch-12 /dev-flow-sync first — DONE, batch-12 obsidian_synced flipped true). Both US-013 + US-014 (trimmed) READY, 0 REFINE/SPIKE/OUT. Advancing to Phase 1 requirements engineering."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-17",
+            "decision": "started",
+            "notes": "Phase 1 wave 1: architect + qa-reviewer dispatched in parallel -> 01-requirements.md. Baseline RE-MEASURED (V-7): 879 collected (matches batch-12 close; worktree off main incl batch-12). architect derives HLR/LLR (IEEE 830 + EARS) from US-013 + US-014(trimmed) + runs change-first census A-1/A-2 incl engine-frozen family + draft-time verifies every code-symbol claim (file:line) or flags 'assumed - verify in Phase N' + APPLIES BOTH new b12 controls (consumer-input-contract citation: cite real input types of read_crc_config/parse_crc_config + read_change_document + PatchEditorPanel.ActionRequested; facade/test blast-radius budget: PATCH_ACTIONS_V2 fixed 9-action set asserted in tests) + decomposes into <=5-file increments. qa-reviewer defines validation method (test/demo/inspection/analysis) per requirement + Executed-verification + Numeric-pass-threshold for test/analysis + provisional TC ids. Normative: shall only in HLR/LLR statements; flag any should-in-statement. KEY SCOPE BOUNDARY: US-014 is the TRIM (paste TextArea + DUMMY_CHANGESET_TEXT + text->document parse seam) — shipped load/apply/verify/save-back NOT re-specified; two-stage modal + worker DEFERRED."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate-SUPERSEDED",
+            "notes": "PRE-APPROVAL DRAFT. Phase 1 complete. architect wrote s1/s3/s4/s6; qa-reviewer returned s5 (orchestrator merged + aligned CRC Executed-verification refs test_tui_app->test_tui_crc_surface for internal consistency, V-5 provisional, no s6.4 row owed). RESULT: 2 HLR / 6 LLR / TC-201..208. HLR-013 CRC config file-load (LLR-013.1 path Input+Load button, .2 NEW read_crc_config_text raw-text reader, .3 fault surfaces+no-check+dummy-stays); HLR-014 Patch paste-changeset (LLR-014.1 NEW DUMMY_CHANGESET_TEXT preload, .2 NEW parse_change_document(text) in changes/io.py + ChangeService.load_text, .3 parsed doc feeds EXISTING apply path - 0 new write code paths). TWO SEAMS SETTLED (were 'assumed'): US-013 RAW-TEXT (read_crc_config returns parsed, wrong type for editor -> add read_crc_config_text); US-014 changes/io has NO parse-from-string -> ADD parse_change_document (factor io.py:414-458, json.load->json.loads, read_change_document delegates). CENSUS: 6 prod files EDIT (crc_config.py/screens.py/changes/io.py/change_service.py/screens_directionb.py/app.py) + 3 test files, ALL outside both frozen lists (test_engine_unchanged.py:120 _ENGINE_PATHS has no crc_config/changes/io entries; re-verified); NO new files. DECOMP: 3 increments x 3 files (Inc1 US-013 crc_config+screens+test_tui_crc_surface; Inc2 US-014 data io+change_service+test_changes_schema; Inc3 US-014 UI screens_directionb+app+test_tui_patch_editor_v2). FACADE/TEST BLAST-RADIUS (b12 control) budgeted: PATCH_ACTIONS_V2 (app.py:126) fixed set asserted at test_tui_patch_editor_v2.py:184 -> 4 edit points (def + router app.py:1301 + ActionRequested field + test assertion) all inside Inc3's 3-file budget, no __init__ facade re-exports. CONSUMER-INPUT-CONTRACT citations present (parse_crc_config(text:str) crc_config.py:242 / read_crc_config->(Optional[CrcConfig],list[str]) :156 / read_change_document path-based io.py:266 / ActionRequested fields). A-5 surface-reachability matrix: 7/7 dimensions through-handler (CRC on_button_pressed screens.py:774; Patch router app.py:1301; apply_doc app.py:1328) - SCOPE-1 structurally excluded. ORCHESTRATOR re-verified (b09 lesson): 2 HLR/6 LLR (grep), all 4 NEW symbols genuinely absent from s19_app/ (correctly NEW), test_tui_crc_surface.py exists, PATCH_ACTIONS_V2 anchors confirmed, 0 should-in-statement, 0 mojibake. 2 honest carries: (a) Phase-2 security mandatory-vs-advisory for US-014 (input-parse, no NEW write surface - shipped write reused); (b) Phase-4 reconcile provisional TC node ids (V-5) + the 'read_change_document delegates to parse_change_document' structural guard + '0 new write paths' diff-vs-main standing row. Awaiting Phase 1 gate."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-17",
+            "decision": "approved",
+            "notes": "Operator: 'approve'. 2 HLR / 6 LLR / TC-201..208 / D1/D2 seams settled / A-5 7/7 / census clean / 0 should-in-statement. ALSO this turn: operator asked to present full PLAN in-conversation + make comms rules durable -> /dev-flow command (~/.claude/commands/dev-flow.md) extended with 'Living plan & in-conversation reporting' subsection (living PLAN at each gate + 7-section in-conversation packets + mid-increment checkpoints + no-silent-bursts). Advancing to Phase 2 cross-review (architect + qa-reviewer + security-reviewer in parallel)."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-17",
+            "decision": "started",
+            "notes": "Phase 2 cross-review. 3 agents in parallel, each RETURNS classified findings (blocker/major/minor + F-{A,Q,S}-NN ids); orchestrator assembles 02-review.md. architect: completeness/ambiguity/contradictions/US->HLR->LLR derivation + change-first census incl frozen family + soundness of D1 (read_crc_config_text) & D2 (parse_change_document refactor of io.py:414-458) seam-adds + consumer-input-contract citation adequacy + facade/test blast-radius (PATCH_ACTIONS_V2) + increment decomposition <=5 files. qa-reviewer: testability per req + validation-method viability + parse-parity invariant soundness (parse_change_document==read_change_document) + the 'read_change_document delegates' structural guard + A-5 matrix completeness + threshold objectivity + provisional-id discipline (V-5). security-reviewer: REAL surface + RESOLVE R-D — (1) US-013 operator config path via resolve_input_path uncontained-by-design + READ_SIZE_CAP_BYTES size-cap-before-read + collect-don't-abort; (2) US-014 operator-pasted JSON parse safety (json.loads not eval, collect-don't-abort, TextArea size considerations) + CONFIRM US-014 introduces 0 NEW write surface (existing copy_into_workarea+verify reused, untouched) => sign-off mandatory(write) vs advisory(input-parse); (3) no-secret-leak in dummies (FAKE values). shall/should misuse = blocker (pre-verified 0). Scope-change re-routing armed. Baseline 879."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-17",
+            "decision": "awaiting-gate-0-blockers-1-major",
+            "notes": "PRE-DECISION. Phase 2 -> 02-review.md. Aggregate 0 BLOCKER / 1 major / 16 minor. shall/should CLEAN (triple-confirmed 0 in statements). Census CLEAN (both frozen lists re-verified independently by architect: test_engine_unchanged.py:120-127 + test_tui_directionb.py:3738-3746; all 6 prod + 3 test files outside). Traceability complete; s6.4 audit correctly empty-by-exception (seams resolved into ACs, not threshold/statement changes). R-D RESOLVED by security: ADVISORY sign-off (US-014 = 2 input-parse surfaces + 0 NEW write surface; shipped save_patched/save_patched_image/copy_into_workarea/emit/verify reused unmodified; pasted changeset as contained as file-loaded via classify_containment). THE 1 MAJOR + high-teeth minors cluster on 4 themes: (C1) D2 refactor fidelity = F-A-01 major (parse_change_document must re-home the MF-JSON-PARSE 3-exc catch around json.loads or malformed paste loses the code LLR-014.2 names) + F-Q-01 (delegation-guard not mechanical -> add mock.patch call_count==1 TC) + F-Q-04 (whole-dataclass == parity oracle may compare path-coupled fields -> narrow to entries+{issue.code}) + F-A-06 (source_path=None for string seam + save-back parity); (C2) action token unnamed = F-A-04+F-Q-02 (pin literal, proposed parse_paste); (C3) diff-vs-main 0-new-write executable+gated = F-Q-03+F-S-03 (exact git diff command + path span -> hard Phase-4 row, elevated bc Inc2 edits io.py/change_service.py near emit/save_patched); (C4) changeset tripwire = F-S-04 (sibling examples/**/*changeset*.json EMPTY mirror of TC-114). Cluster 5 draft-tidy: F-A-02/03/05, F-Q-05/06/07, io.py:393->416 line-drift. ALL 3 reviewers recommend proceed-after-light-tightening; findings are cheap LLR-AC edits, no re-derivation/no design change. ORCHESTRATOR RECOMMENDS ITERATE-LIGHT (fold C1-C5 into LLR ACs deterministically, then re-confirm + proceed). NOT autonomous - awaiting operator Phase-2 gate decision."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-17",
+            "decision": "iterate-to-phase-1",
+            "notes": "Operator: 'iterate'. Iterating Phase 1 (iter 2) to fold the Phase-2 register (0 blocker / 1 major / 16 minor, Clusters C1-C5) into the LLR ACs. Dispositions pre-decided (reviewers' own prescriptions), applied INLINE by orchestrator (deterministic AC edits, no re-derivation, no design change) - same pattern as batch-12 iter-2."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-17",
+            "decision": "iteration-2-completed",
+            "notes": "INLINE fold of all Phase-2 findings into 01-requirements.md. Body-first satisfied (s4/s5 edits FIRST, then s6.4 audit rows J-1/J-2/J-3). CHANGES: C1 (F-A-01 major+F-Q-01+F-Q-04+F-A-06) -> LLR-014.2 Statement (names parse_paste token + MF-JSON-PARSE clause) + threshold (narrowed parity oracle to entries+{issue.code} since parse_change_document sets source_path=None; MF-JSON-PARSE on malformed; delegation call_count==1) + ACs (re-home the 3-exception catch JSONDecodeError/RecursionError/UnicodeDecodeError around json.loads; mock.patch delegation guard; source_path=None) + TC-209 (malformed->MF-JSON-PARSE) + TC-210 (delegation). LLR-014.3 threshold made executable: git diff main -- apply.py/verify.py/workspace.py = 0 lines + emit/save_patched symbol bodies 0-changed + save-back prompt-name parity (F-A-06). C2 (F-A-04/F-Q-02): action token literal = parse_paste (PATCH_ACTIONS_V2 9->10). C3 (F-Q-03/F-S-03): standing Phase-4 diff gate row. C4 (F-S-04): TC-211 changeset tripwire examples/**/*changeset*.json EMPTY (in test_changes_schema.py, Inc2, no new file). C5 tidy: F-A-02 __all__ adds DUMMY_CHANGESET_TEXT; F-A-03 ActionRequested docstring-Args note; F-Q-05 PATCH_ACTIONS_V2 assertion marked REUSE-extend; F-Q-06 HLR-013 +test_crc_config.py; F-Q-07 rstrip mount tolerance; line-drift io.py:393->416. s6.4 now has audit rows J-1/J-2/J-3 (parent HLR-014 re-read = no change required each, refinements are LLR-level). ORCHESTRATOR re-verified: 2 HLR/6 LLR (unchanged), TC-201..211, 0 should-in-statement, J-1/J-2/J-3 present, all 4 NEW symbols (incl parse_paste) genuinely absent from s19_app/, 0 mojibake. Increment file lists UNCHANGED (TC-209/210/211 in test_changes_schema.py=Inc2; no new files; still <=5/inc). Awaiting Phase-2 re-confirmation gate."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-17",
+            "decision": "approved-iteration-2",
+            "notes": "Operator: 'approve'. Phase-2 re-confirmation APPROVED. All 17 findings closed (1 major + 16 minor); 2 HLR / 6 LLR / TC-201..211; R-D ADVISORY. NOT autonomous mode - each Phase-3 increment needs operator approval + independent code-reviewer before its gate (security-reviewer NOT mandatory per R-D advisory, but available). Advancing to Phase 3."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "started",
+            "notes": "Phase 3 entry. 3 increments planned: Inc1 US-013 (crc_config.py +read_crc_config_text / screens.py CRC path Input+Load button / test_tui_crc_surface.py); Inc2 US-014 data (changes/io.py +parse_change_document+DUMMY_CHANGESET_TEXT+refactor reader-delegates+__all__ / change_service.py +load_text / test_changes_schema.py +TC-207/209/210/211); Inc3 US-014 UI (screens_directionb.py paste TextArea+paste_text field / app.py parse_paste in PATCH_ACTIONS_V2+router+fix :938 docstring / test_tui_patch_editor_v2.py). Toolchain gate next, then Inc1 via software-dev with mid-increment checkpoints, then code-reviewer before the Inc1 gate. Baseline 879."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "toolchain-gate-pass-I1-implemented-awaiting-gate",
+            "notes": "TOOLCHAIN GATE PASS: python 3.14.4 (CI=3.11), pytest 9.0.3, ruff 0.8.4 (standalone /c/Users/jjgh8/anaconda3/Scripts/ruff - invoke 'ruff' NOT 'python -m ruff'); mypy not declared (not blocker). Inc1 (US-013) implemented by software-dev: 4 files (<=5). crc_config.py +read_crc_config_text(raw_path,base_dir,size_probe=None)->tuple[Optional[str],list[str]] (resolve+size-cap-before-read+read_text minus parse; collect-don't-abort never raises); read_crc_config REFACTORED to delegate (extract-method, behavior+fault-messages preserved). screens.py CRC branch +#operation_config_path Input +#operation_config_load Button + _sync_config_visibility toggle + _load_config_from_path handler (success->replace #operation_config text; fault->surface on #operation_result_status + editor unchanged; empty->message; NEVER auto-runs check). test_crc_config.py +TC-202 (4 unit: raw text + parse_crc_config NOT called via mock; unresolvable; over-cap via injected probe; invalid-JSON unparsed). test_tui_crc_surface.py +TC-201/203/204 (widgets+display toggle; through-handler byte-equal load; faults+dummy-stays). code-reviewer: APPROVE 0 HIGH/0 MED/2 LOW; all 7 rule-ons PASS (refactor fidelity preserved, cap-before-read confirmed crc_config.py:296 vs :303, collect-don't-abort 3 exits+OSError, no auto-run, tests non-vacuous incl over-cap mock ruled SOUND, conventions clean, frozen untouched). F1 LOW folded by orchestrator (empty-path test now asserts the 'enter a config file path' message - LLR-013.3 surface compliance); F2 LOW left (assert-under-O, convention parity). ORCHESTRATOR re-ran: HLR-013 bundle 24 passed post-fold, ruff clean, frozen guard 1 passed. LEDGER: collection 879->886 (+7 EXACT: TC-202 x4 + TC-201/203/204 x3). 0 frozen edits. NOT autonomous - awaiting Inc1 increment gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "I1-approved-committed-I2-started",
+            "notes": "Inc1 APPROVED ('approve') + committed in 2 clean commits: 9ab8d3e (Phase 0-2 artifacts + batch-12 close snapshot) + a8c7080 (Inc1 code+tests+packet+state). Working tree clean. NOTE: ~/.claude/commands/dev-flow.md comms-rules edit is OUTSIDE the repo (global config) - not in these commits, flagged to operator. Inc2 (US-014 data layer) started via software-dev: changes/io.py +parse_change_document(text)->ChangeDocument (factor io.py:414-458 + re-home the MF-JSON-PARSE 3-exception catch JSONDecodeError/RecursionError/UnicodeDecodeError around json.loads; source_path=None) + DUMMY_CHANGESET_TEXT (FAKE, kind=change, no trailing newline) + read_change_document delegates + both in __all__; change_service.py +load_text(text) mirrors load; test_changes_schema.py +TC-206/207(narrowed oracle entries+{code})/209(malformed->MF-JSON-PARSE)/210(delegation call_count==1)/211(tripwire examples/**/*changeset*.json EMPTY). 3 files. Then code-reviewer before Inc2 gate. Ledger base 886."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "I2-implemented-awaiting-gate",
+            "notes": "Inc2 (US-014 data) implemented by software-dev: 3 files. changes/io.py +parse_change_document(text)->ChangeDocument (re-homes the SAME 3-exc catch JSONDecodeError/RecursionError/UnicodeDecodeError around json.loads -> MF-JSON-PARSE [F-A-01 major]; source_path=None; never raises) + read_change_document REFACTORED to delegate (resolve+cap+read stay, decode+interp move to seam, re-stamps source_path=resolved) + DUMMY_CHANGESET_TEXT (FAKE kind=change no-trailing-newline) + both in __all__. change_service.py +load_text(text) mirrors load (direct-module import). test_changes_schema.py +TC-206/207(narrowed oracle entries+{code}+source_path divergence)/209(malformed->MF-JSON-PARSE)/210(delegation call_count==1)/211(tripwire). code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/1 LOW; all 9 rule-ons PASS (F-A-01 catch re-homed verbatim, delegation-not-duplication TC-210, source_path correct, parity narrowed, NO new write surface, bytes-vs-str acceptable+documented, F401 pre-existing, frozen untouched). LOW=pre-existing F401 typing.List change_service.py:38 (identical on febd843, left surgical). ORCHESTRATOR re-ran: test_changes_schema 38 passed, ledger 886->891 (+5 EXACT), frozen guard 1 passed. KEY DISCOVERY: local 'main' ref is STALE (ec453a2 pre-batch-09); batch-13 TRUE base = febd843 (PR#17 merge, parent of 9ab8d3e). Verified batch-13 footprint vs febd843 = exactly 4 prod files (io/crc_config/screens/change_service) + tests; write path apply.py/verify.py/workspace.py UNTOUCHED vs febd843; io.py emit_s19_from_mem_map body untouched. SPEC FIX: LLR-014.3 F-S-03 gate baseline pinned to <BASE>=febd843 (NOT stale local main) so Phase-4 won't spuriously fail. 0 frozen edits. NOT autonomous - awaiting Inc2 gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "I2-approved-committed-amendment-convention-I3-started",
+            "notes": "Inc2 APPROVED ('I approve') + committed e42181c (incl spec amendment §6.5). OPERATOR PROCESS REQUEST: requirement edits during an increment must be written Before/After + Deleted/New, not silently edited. APPLIED: added 01-requirements.md §6.5 'Phase-3 spec amendments' with the LLR-014.3 baseline change (Before/After/Deleted/New + parent-HLR-re-read); ENCODED durably in ~/.claude/commands/dev-flow.md Phase 3; saved feedback memory feedback-requirement-amendment-before-after + PLAN convention. Inc3 (US-014 UI wiring, LAST impl increment) started via software-dev: screens_directionb.py (paste TextArea pre-loaded DUMMY_CHANGESET_TEXT + ActionRequested.paste_text additive field + docstring Args + parse control posting parse_paste) + app.py (parse_paste in PATCH_ACTIONS_V2 9->10 + router elif -> ChangeService.load_text + fix stale :938 'inert shell' docstring) + test_tui_patch_editor_v2.py (TC-205 mount preload + TC-208 route+apply+save-back parity + PATCH_ACTIONS_V2 assertion REUSE-extend). 3 files. R-D ADVISORY (no security-reviewer mandatory; route to it only if code-reviewer flags). Then code-reviewer before Inc3 gate. Ledger base 891."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "I3-implemented-awaiting-gate-PHASE-3-COMPLETE-on-approval",
+            "notes": "Inc3 (US-014 UI, LAST impl increment) implemented by software-dev: 3 files. screens_directionb.py paste TextArea #patch_paste_text pre-loaded DUMMY_CHANGESET_TEXT + #patch_paste_parse_button + ActionRequested.paste_text additive field + docstring Args. app.py parse_paste in PATCH_ACTIONS_V2 (9->10) + router elif -> ChangeService.load_text(event.paste_text) -> _report_change_result (reads ONLY paste_text, no write code) + stale :938 docstring truth-fixed. test_tui_patch_editor_v2.py TC-205 (mount preload, rstrip tolerance) + TC-208 (parse_paste THROUGH router -> doc replaced, then EXISTING apply_doc -> save-back prompt NAME identity paste-vs-file = F-A-06 oracle) + action-set assertion REUSE-extend 9->10 (renamed ..._ten_...). code-reviewer APPROVE 0 HIGH/0 MED/2 LOW; all 8 rule-ons PASS (additive contract all constructions valid, router paste_text-only collect-don't-abort, PATCH_ACTIONS_V2 exact 10, NO new write surface diff-vs-febd843=0, TC-208 genuine F-A-06 oracle save-back name from variant_id not source_path, docstring prose-only, frozen untouched); security CONCURS advisory (R-D). F1 LOW folded (stale 'nine'->'adds no routed action' comment screens_directionb.py:725); F2 LOW left (pre-existing app.py F40x, code-reviewer corrected count 12->6, surgical). ORCHESTRATOR re-ran: patch-editor 13 passed post-fold, ledger 891->893 (+2 EXACT: TC-205/208; action-pin renamed=REUSE net 0), write-surface vs febd843 EMPTY, frozen guards test_engine_unchanged 1 passed + tc031 3 passed, ruff clean changed files. 0 frozen edits. PHASE 3 COMPLETE on Inc3 approval: 3 increments I1/I2/I3, ledger 879->893 (+14: I1+7/I2+5/I3+2). NOT autonomous - awaiting Inc3 gate. Not committed."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-17",
+            "decision": "I3-approved-committed-PHASE-3-COMPLETE",
+            "notes": "Inc3 APPROVED ('approve') + committed 5197169. PHASE 3 COMPLETE: 3 increments I1/I2/I3 (no withdrawals). Branch commits: 9ab8d3e (Phase 0-2) / a8c7080 (I1 CRC config-from-file) / e42181c (I2 data layer + §6.5 amendment) / 5197169 (I3 paste UI). Full feature end-to-end: US-013 load CRC config from file (path Input + Load button -> #operation_config); US-014 paste a change-document (dummy pre-loaded) -> parse_paste -> ChangeService.load_text -> EXISTING apply/contained-emit/verify/save-back. Ledger 879->893 (+14). 0 new write surface. Advancing to Phase 4 validation."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-17",
+            "decision": "started",
+            "notes": "Phase 4 validation. qa-reviewer executes the strategy -> 04-validation.md: per-LLR pass/fail table w/ evidence (TC node ids), TC reconciliation (every in-scope spec TC TC-201..211 -> a real collect-verified passing node; reconcile provisional V-5 ids), A-5 surface-reachability matrix (all 7 US dimensions through the SHIPPED handler), the LLR-014.3 STANDING write-surface gate row (git diff febd843 -- apply.py/verify.py/workspace.py = 0 + emit/save_patched bodies unchanged), refactor-fidelity invariants (MF-JSON-PARSE on malformed, delegation call_count==1, parity entries+{code}, source_path=None), changeset tripwire (examples/**/*changeset*.json EMPTY). Run full suite once for authoritative pass/fail + ledger reconcile (signed-balance 893=879+14). Baseline 879."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-18",
+            "decision": "awaiting-gate-PASS",
+            "notes": "PRE-DECISION. Phase 4 -> 04-validation.md. VERDICT PASS, 0 FAIL/0 blockers. qa-reviewer ran full suite ONCE: 861 passed / 29 skipped / 3 xfailed / 0 failed exit 0 (765s); collection 893. 6/6 LLR + 2/2 HLR PASS on real verified-present nodes; 0 orphan TCs. TC reconciliation CLEAN (TC-201..211 -> real passing nodes; provisional V-5 ids reconciled: TC-205=test_paste_textarea_preloads_dummy_changeset, TC-208=test_paste_parse_then_apply_matches_file_loaded, action-set=..._exactly_ten_v2_actions). A-5 surface-reachability 7/7 through-handler (SCOPE-1 does NOT recur; handlers screens.py:795/801/841 + app.py:1336-1338). Refactor-fidelity invariants HOLD: MF-JSON-PARSE TC-209, delegation call_count==1 TC-210, narrowed parity oracle entries+{code} + source_path=None TC-207. WRITE-SURFACE GATE (LLR-014.3/F-S-03) PASS vs febd843 (NOT stale local main): git diff apply/verify/workspace = 0 lines; emit_s19_from_mem_map/save_patched bodies unchanged. Changeset tripwire EMPTY. Frozen guards pass (engine-unchanged + tc031). LEDGER EXACT: 893=879+14 (I1+7/I2+5/I3+2). NON-BLOCKING notes: pre-existing F401 app.py/change_service.py (untouched vs febd843, not introduced); bytes-vs-str annotation documented/accepted; 2 provisional-id line-drifts + 1 node-merge reconciled (no coverage loss); 29 skips=slow marker + 3 standing xfails (not regressions). ORCHESTRATOR independently spot-verified (b09 lesson): collection 893, write-surface empty vs febd843, batch-13 4 test files 75 passed, 04-validation.md present 0 mojibake. 0 code defects. Awaiting Phase 4 gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-18",
+            "decision": "approved-committed",
+            "notes": "Phase 4 APPROVED ('approve'). Committed (04-validation.md + PLAN + state). Advancing to Phase 5 post-mortem (architect + qa-reviewer co-author)."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-18",
+            "decision": "started",
+            "notes": "Phase 5 post-mortem. architect + qa-reviewer co-author 05-postmortem.md: what worked / what didn't / scope drift / metrics (iters per phase, findings open-vs-closed) / root causes / next-batch items. KEY THEMES to cover: (1) Phase-0 PREMISE CORRECTION caught a false brief premise (Patch Editor 'inert shell' was a stale app.py:938 docstring; substrate fully wired) -> US-014 re-scoped to the real gap (paste+dummy) BEFORE deriving requirements = the draft-time-verification control working at story intake; (2) STALE-MAIN-REF discovery in Phase-3 Inc-2 (local main=ec453a2 pre-batch-09; true base febd843) -> the F-S-03 write-surface gate would have spuriously failed; spec Amendment A-1 pinned the baseline; (3) the consumer-input-contract citation control (b12) applied throughout; (4) facade/test blast-radius budgeted (PATCH_ACTIONS_V2 9->10 stayed in budget); (5) reader-as-oracle REUSED (0 new write surface, verified vs febd843); (6) NEW b13 operator convention: requirement-amendment Before/After+Deleted/New record (§6.5), now encoded in /dev-flow command. METRICS: iters {0:1,1:2,2:1,3:1,4:1,5:1}; Phase-2 0 blocker/1 major/16 minor all folded (iter-2); per-increment code-review 3/3 (I1 2 LOW/I2 1 LOW pre-existing/I3 2 LOW); ledger 879->893 (+14 D0/A14); full suite 861/0; cap-trips 0. Recommend ADR/carry: codify reader-as-oracle in PROJECT_RULES (now 5th use); fix stale local main ref hygiene; pre-existing app.py F401 cleanup."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-18",
+            "decision": "awaiting-gate",
+            "notes": "PRE-DECISION. Phase 5 -> 05-postmortem.md (architect wrote process/architecture/metrics; qa retrospective merged into the placeholder; 0 mojibake, 140 lines). HEADLINE: closed clean, PASS, 0 defects, 3 increments, ledger 879->893. TOP 3 LESSONS: (1) Phase-0 premise correction = highest-leverage event - draft-time disk verification caught the false 'inert shell' brief premise at STORY INTAKE before any HLR derived; US-014 re-scoped to the real gap (the R-6 write substrate was already shipped+wired, write-surface gate 0-lines counterfactually confirms); (2) stale local main ref (ec453a2 pre-b09) nearly tripped the write-surface gate spuriously - root-caused (worktree main never updated to real tip febd843), Amendment A-1 pinned baseline, general lesson = diff-vs-main gates must pin the real merge-base; (3) reader-as-oracle reuse (5th use) + b12 controls held (consumer-input-contract citation forced D1/D2; facade/test blast-radius kept PATCH_ACTIONS_V2 9->10 in budget; F-A-01 MF-JSON-PARSE major was a real catch now pinned by TC-209/210). METRICS: iters {0:1,1:2,2:1,3:1,4:1,5:1}; 17/17 findings closed (0 blocker/1 major/16 minor); code-review 3/3 (I1 2LOW/I2 1LOW pre-existing/I3 2LOW); ledger 879->893 D0/A14 EXACT; full 861/0; A-5 7/7; cap-trips 0. NEW CONVENTION: §6.5 requirement-amendment Before/After+Deleted/New (encoded in /dev-flow Phase 3) - assessed keep. CARRIES: NEW (1) codify reader-as-oracle in PROJECT_RULES (5th use), (2) stale-main hygiene + generalize gate-baseline rule, (3) pre-existing app.py F401 cleanup; STANDING not-pulled (4) A-3 save-flow, (5) RK-3 non-zlib device vector, (6) CLI 'ops'; do-NOT-re-flag CI trigger gap (resolved b06). 0 code defects. Awaiting Phase 5 gate."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-18",
+            "decision": "close-batch-approved-committed",
+            "notes": "Operator: 'close batch'. Phase 5 APPROVED. Committed (05-postmortem.md + PLAN + state). Advancing to Phase 6 documentation (FINAL phase)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-18",
+            "decision": "started",
+            "notes": "Phase 6 docs. 3 parallel agents, disjoint files. (A) docs-writer -> REQUIREMENTS.md NEW section for batch-13 (US-013 CRC config-from-file + US-014 paste-changeset; living-doc, references-not-inlines, matches the s18 CRC format from b12) + back-ref to operations/requirements REQ if applicable. (B) docs-writer -> 06-docs/traceability-matrix.md (2 HLR/6 LLR rows w/ real node ids from 04-validation: TC-201..211 reconciled; mark the LLR-014.3 standing write-surface gate row), functionality.md (operator walkthrough: load CRC config from file; paste change-doc -> parse -> apply -> confirm -> contained write), diagrams/ (Mermaid: CRC config-load flow + paste-changeset parse->apply->existing-write flow). (C) presentation-builder -> executive-summary.md (~1.5pp, real numbers 861/0, +14 tests, PASS, 0 defects, the premise-correction story). Orchestrator INDEPENDENTLY re-verify after (b09 lesson): REQUIREMENTS.md section landed, 06-docs files present, Mermaid blocks present, 0 mojibake, UTF-8 no-BOM. On approval state -> awaiting-sync."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-18",
+            "decision": "awaiting-gate",
+            "notes": "PRE-DECISION. Phase 6 docs complete. (A) docs-writer -> REQUIREMENTS.md NEW §19 'CRC Config-from-File + Patch-Editor Paste' (R-CRC-CONFIGLOAD-001 / R-PATCH-PASTE-001 / R-PATCH-WRITE-REUSE-001, all Automated; mirrors §18 format, references-not-inlines; +TOC line; 143 insertions/0 deletions surgical). (B) docs-writer -> 06-docs/traceability-matrix.md (US->HLR->LLR->TC->status->evidence; 13 chain rows + 3 write-surface gate rows; all PASS; real node ids), functionality.md (operator walkthrough both features + FAKE/dummy callouts + 4 safety properties), diagrams/batch-13-flows.md (2 Mermaid: CRC config-load + paste-changeset, NEW-green vs REUSED-blue nodes). (C) presentation-builder -> executive-summary.md (~1.5pp/56 lines, real numbers 861/0 +14 PASS 0-defects, premise-correction framed as strength). ORCHESTRATOR independently re-verified (b09 lesson): REQUIREMENTS.md §19 + 3 R-* landed (grep), 4 06-docs files present, 2 Mermaid blocks, the 3 cited patch-editor test nodes EXIST on disk (not fabricated), 0 mojibake, UTF-8 no-BOM. Note: REQUIREMENTS.md R-* use 'must' (the living-doc R-* convention matching §18), NOT the dev-flow HLR/LLR 'shall' rule - correct. On approval state -> awaiting-sync (close commit + push + PR + review + CI + merge + /dev-flow-sync). NOTE: tui-ci fires on main since b06 (CI trigger gap RESOLVED - do not re-flag); worktree branch off febd843. Awaiting Phase 6 gate."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-18",
+            "decision": "approved-batch-content-closed-awaiting-sync",
+            "notes": "Phase 6 APPROVED (operator: 'document the batch properly'). Batch-13 CONTENT CLOSED. Docs committed locally (REQUIREMENTS.md §19 + 06-docs + PLAN + state). state -> awaiting-sync. Operator requested /dev-flow-sync NOW + going to sleep. SEQUENCING SURFACED to operator: per dev-flow-sync convention sync runs AFTER merge; batch-13 is committed locally on branch claude/agitated-boyd-ea0e9e but NOT pushed/PR/merged. Push/PR/merge are outward-facing + need review -> NOT done unsupervised while operator sleeps. Proceeding with sync per explicit request, README frontmatter will mark merge PENDING. REMAINING on operator return: push branch -> PR to main -> review/CI (tui-ci fires on main since b06) -> merge -> re-confirm sync flag. Full batch-13: 6 phases, 3 increments, 879->893 (+14), 861/0 full suite, PASS, 0 defects, commits 9ab8d3e..2ad5126 + pending Phase-6 docs close commit."
+        }
+    ],
+    "obsidian_synced": true,
+    "created_at": "2026-06-17T09:00:00-06:00"
+}
