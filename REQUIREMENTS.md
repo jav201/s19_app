@@ -292,7 +292,9 @@ summary, show parse errors if present, and indicate tag validation status.
 keyboard binding.
 
 - Code: `s19_app/tui/app.py` (`action_dump_a2l_json`)
-- Validation: `Manual` (trigger the export action in the TUI)
+- Validation: `Automated` via `tests/test_tui_evidence_packs.py`
+  (`test_dump_a2l_json_writes_file_on_disk` — drives the `j` binding through
+  Pilot and asserts the `<name>.a2l.json` exists, is non-empty, and re-parses)
 
 **R-A2L-004**: The tool must allow loading an A2L file and show its parsed
 content in the A2L view.
@@ -752,11 +754,14 @@ workarea subfolder named by a sanitized project name.
 
 - Code: `s19_app/tui/workspace.py` (`sanitize_project_name`, `copy_into_workarea`),
   `s19_app/tui/app.py` (`action_save_project`, `_handle_save_dialog`)
-- Validation: `Partial` via `tests/test_tui_helpers.py`
+- Validation: `Automated` via `tests/test_tui_helpers.py`
   (`test_sanitize_project_name_allows_safe_chars`,
   `test_sanitize_project_name_strips_invalid_chars`,
-  `test_sanitize_project_name_rejects_empty`); still verify the save flow
-  manually
+  `test_sanitize_project_name_rejects_empty`) and
+  `tests/test_tui_evidence_packs.py`
+  (`test_save_project_creates_project_folder_on_disk` — drives the real save
+  handler through Pilot and asserts the sanitized `<project>/` folder appears
+  on disk under `.s19tool/workarea/` with the copied primary)
 
 **R-TUI-013**: Loading a project must list all project folders in the
 workarea except for the temp folder and load the selected project file.
@@ -790,7 +795,10 @@ at most one A2L file.
 and the loaded A2L file into the project folder when available.
 
 - Code: `s19_app/tui/app.py` (`_handle_save_dialog`)
-- Validation: `Manual` (save a project with data and A2L loaded)
+- Validation: `Automated` via `tests/test_tui_evidence_packs.py`
+  (`test_save_project_creates_project_folder_on_disk` — asserts the loaded
+  primary is persisted into the project folder on disk; the A2L-also-present
+  leg remains exercised by `tests/test_tui_manifest_save.py`)
 
 **R-PROJ-002**: If a project is active, loading a data or A2L file later
 must copy it into the corresponding project folder (respecting limits).
@@ -1511,7 +1519,11 @@ to the rotating log.
   `test_context_bytes_out_of_domain_rejected`,
   `test_region_cap_marker_exact_omitted_count`,
   `test_total_bytes_cap_marker`, `test_inspection_no_forbidden_symbols`,
-  `test_execution_capture_feeds_report_end_to_end`)
+  `test_execution_capture_feeds_report_end_to_end`) plus the black-box e2e
+  seam in `tests/test_tui_report_seam.py`
+  (`test_report_seam_writes_real_file_on_disk` — triggers generation through
+  the shipped Reports surface and asserts the real `<timestamp>-report.md`
+  exists and is non-empty on disk, no faked service)
 - Status: Added in batch `2026-06-10-batch-07` (US-004 / HLR-007)
 
 **R-RPT-002**: The TUI must list the active project's reports newest-first by
@@ -1533,7 +1545,12 @@ Textual `App`.
   `test_select_renders_markdown_open_links_false`,
   `test_oversized_report_refused`, `test_empty_reports_dir_empty_state`,
   `test_generate_trigger_calls_service_and_drops_results`) and
-  `tests/test_report_service.py` (`test_generation_is_headless_no_app`)
+  `tests/test_report_service.py` (`test_generation_is_headless_no_app`) plus
+  the black-box e2e seam in `tests/test_tui_report_seam.py`
+  (`test_report_seam_surfaces_written_path_in_status`,
+  `test_report_seam_renders_generated_report_in_viewer` — drive the real
+  generation trigger and observe the surfaced path + the just-generated
+  report rendered through `ReportViewerScreen`)
 - Status: Added in batch `2026-06-10-batch-07` (US-004 / HLR-008)
 
 ---

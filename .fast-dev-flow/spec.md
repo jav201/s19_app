@@ -1,102 +1,46 @@
-# Quick Spec — s19_app
+# Quick Spec — s19_app — audit-gaps follow-up (gaps #3/#4; #2 premise-corrected)
 
-> Minimal spec for `/fast-dev-flow`. Goal: capture what's needed in 5-10 minutes without IEEE 830 overhead.
-> **Hard rule:** acceptance criteria must be **observable** (input → verifiable output).
-
----
+> `/fast-dev-flow` batch on branch `claude/audit-gaps-followup` (off merged main `d3c9cfe`). Follow-up to batch-15 (gap #1/US-016, merged PR #20). Retroactive black-box acceptance closure for the remaining 2026-06-23 audit gaps. English.
 
 ## 1. Objective (1 line)
+Close the remaining audit black-box-acceptance gaps by adding Pilot e2e + artifact-on-disk tests that observe each user-facing deliverable through the shipped surface — gap #3 (report-generation seam) and gap #4 (demo evidence packs); **gap #2 is premise-corrected and pulled out (see §5).**
 
-Make the Operations view (which hosts the CRC operation) discoverable by surfacing its `x` keybinding in the TUI footer instead of leaving it hidden.
+## 2. User stories
+- **US-A (gap #3, batch-07):** As an operator, when I trigger report generation from the Reports screen on a project, I want a real timestamped report file written under the project's `reports/` dir, its path shown in the status line, and the just-generated report rendered in the viewer — so I can trust the in-app report trigger end-to-end.
+- **US-B (gap #4, batch-01):** As an operator, when I save a project / dump A2L JSON, I want the on-disk artifact to actually appear (a project folder under `.s19tool/workarea/<project>/`; an `<name>.a2l.json` file) — so the demo-evidence claims are observed, not assumed.
 
----
+## 3. Acceptance criteria (observable)
+**US-A — report-generation seam (gap #3):**
+- **AC-A1:** When the operator opens Reports (`t` → `action_view_reports`) on a saved project and triggers generation (`ReportViewerScreen.GenerateRequested` → `_trigger_generate_report`), the system shall write a real `<timestamp>-*.md` (or the actual naming) file under `.s19tool/workarea/<project>/reports/` — asserted to exist + be non-empty on disk via Pilot.
+- **AC-A2:** After generation, the status line (or the screen's surfaced path) shall show the written report path.
+- **AC-A3:** The just-generated report shall be rendered in `ReportViewerScreen` (observed through the screen, not a hand-built fixture).
+- *(If the seam already works pre-existing → these lock it as a regression; the AT still demonstrates the deliverable is observed through the surface. If any leg is broken → minimal fix + the failing leg shown red pre-fix.)*
 
-## 2. User stories (1-3, Connextra format)
-
-- As a **TUI user who doesn't know the keymap**, I want **the Operations (CRC) action to be visibly listed in the footer**, so that **I can discover the operation exists without having to already know to press `x`**.
-
----
-
-## 3. Acceptance criteria (3-7 bullets, observable)
-
-- [ ] **AC-1 — `x` is footer-shown.** When the app is running on any rail screen, the footer's visible binding set (`app.active_bindings` filtered to `binding.show and enabled`) shall include the `x` key. (Today it does not, because the binding is `show=False`.)
-- [ ] **AC-2 — the chip is labelled "Operations".** When `x` is shown in the footer, its rendered description shall be `Operations` (the existing binding description, unchanged).
-- [ ] **AC-3 — the action still works.** When the user presses `x`, the system shall still open the Operations view (`action_operations_view` reachability is unchanged — only `show` flips).
-- [ ] **AC-4 — no regression to the existing footer contract.** When the footer is rendered, the keymap §2 global set (`ctrl+k · ctrl+d · ctrl+l · ctrl+s · / · g · q`) and the per-screen paging keys shall still be present (TC-030 family stays green).
-- [ ] **AC-5 — engine-frozen set untouched.** The change shall live only in `s19_app/tui/app.py`; no file in the engine-frozen set is modified (TC-031 family stays green).
-
----
+**US-B — evidence packs (gap #4):**
+- **AC-B1:** When the operator saves a project (`action_save_project` flow), a project folder shall appear under `.s19tool/workarea/<project>/` containing the saved primary — asserted on disk via Pilot.
+- **AC-B2:** When the operator dumps A2L JSON (`j` → `action_dump_a2l_json`), an `<name>.a2l.json` file shall be written and exist non-empty on disk — asserted via Pilot.
 
 ## 4. Validation strategy (1 paragraph)
-
-One new unit/integration test in `tests/test_tui_directionb.py` (the home of the existing TC-030 footer tests), reusing the established `_shown_footer_keys(app)` helper to assert `"x"` is in the shown footer set on every rail screen and that its `active_bindings` description is `"Operations"` (AC-1, AC-2). AC-3 is covered by the existing `_PRE_BATCH_BINDINGS` keyboard-reachability test (`x`/`operations_view` already asserted reachable) plus a focused press-`x` smoke if needed. AC-4/AC-5 are covered by the existing TC-030 (subset-based footer assertions) and TC-031 (engine-frozen diff) families — run the full suite to confirm zero regressions. Evidence to close: new test passes by name on disk + full suite green + `git diff` shows only `app.py` (one line) + the new test.
-
----
+Textual Pilot `App.run_test()` drives each real action/binding on a synthetic project (reuse `tests/conftest.py` generators + `tmp_path` as `base_dir`); each test asserts the deliverable on disk (file exists + non-empty) and/or through the rendered screen — never via a faked service. Run `pytest -q` for the suite; confirm engine-frozen guards still pass. Where a leg is already green, the test is a locked regression (state so explicitly); where a leg is red, capture the failing run before the fix. Promote the corresponding `REQUIREMENTS.md` R-* rows from Manual/Partial → Automated for the legs that become covered.
 
 ## 5. Non-goals (what is OUT)
-
-- **No tier-policy redesign.** We are NOT deciding the footer/rail policy for the *other* hidden bindings (`1`–`8` screen switches, `l`, `s`, `p`, `t`, `r`, `o`, `v`, `j`). Only `x`/Operations flips to shown, per the operator's explicit scope choice. (The keymap-proposal.md §2 "uncrowded footer" rationale predates the Operations view; this is a deliberate, scoped exception for Operations discoverability, not a reversal of that rationale.)
-- **No command-palette / help-screen / on-screen-hint work** (the other discoverability options the operator did not pick).
-- **No change to the CRC operation itself or the Operations screen contents.**
-- **No batch-13 sync work** — its `state.json` still reads `awaiting-sync` / `obsidian_synced:false` after the PR #18 merge; closing that is a separate `/dev-flow-sync` task.
-
----
+- **GAP #2 (batch-11 manifest composition) — PULLED OUT, premise-corrected.** Disk verification (this Phase A) shows the TUI save path holds **no** `batch`/`assignments` state and there is **no operator surface** to assign per-variant files; `assignments` semantics = *additional* per-variant files (not the primary image), so deriving them from the variant set is semantically wrong. The execution service *does* consume `manifest.batch`/`assignments` (variant_execution_service.py:586-602), but a TUI save legitimately has none to record today. Making a save persist non-empty batch/assignments is **net-new feature work** (a per-variant file-assignment surface + persistence), not a wiring fix — so the audit's "drive save with non-empty batch/assignments → assert round-trip" cannot be honestly grounded. **Recommend deferring gap #2 to its own forward-feature `/dev-flow` batch** (parallels the US-015 deferral in batch-15). Operator decision requested at the Phase-A gate.
+- C-1 (automated `dev-flow-sync` unfilled-template reject-check) — global `~/.claude` config, separate task.
+- US-015 (16/32 S19 record width + S0) — its own forward-feature batch.
+- No engine-frozen edits (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`).
+- No new report/export *behavior* — only tests that observe the existing shipped writes (+ minimal fix only if a leg is genuinely broken).
 
 ## 6. Detected security flags
-
-- [ ] Auth / identity (login, sessions, tokens, permissions)
-- [ ] Secrets / config (.env, API keys, credentials)
-- [ ] External integrations (webhooks, MCP, Composio, n8n, third-party)
-- [ ] Sensitive data (PII, payments, health, encryption)
-- [ ] Destructive DB (drop, delete, truncate, migrations)
-- [ ] Input / attack surface (uploads, forms, sanitization, CORS)
-- [ ] Network / exposure (new public endpoints, webhook receivers)
-
-**`security_required`:** `false`
-
-**Risk summary (if security_required = true):**
-N/A — this is a single-attribute UI visibility flip (`show=False` → `show=True`) on an existing, already-wired keybinding. No new action, input surface, data path, or external interaction.
-
----
+- Scanned objective + criteria + description for the sensitive-pattern list. Matches: "export" / file-write (A2L JSON, report.md) — but these are **existing shipped writes into the contained `.s19tool/workarea/`** being *observed by tests*, not new write/exec/network/auth/secret/PII surfaces. No new external surface, no auth, no secrets, no destructive DB.
+- **`security_required: false`.** (Tests write only synthetic fixtures into a `tmp_path` work area.)
 
 ## 7. Batch status
-
 | Field | Value |
 |-------|-------|
-| Current phase | closed |
-| Started | 2026-06-19 |
-| Closed | 2026-06-19 |
-| Promoted to /dev-flow | no |
-| Notes | Routed here from `/dev-flow` (operator picked fast-dev-flow); design = footer-show `x`. Closed PASS, 0 defects. |
-
----
-
-## 8. Close (filled in phase C)
-
-### What changed
-The Operations view — which hosts the CRC operation — was reachable only by the undocumented `x` key, with no on-screen affordance telling users it existed. Flipped the `x` binding from `show=False` to `show=True` in `s19_app/tui/app.py`, so it now renders as an `x Operations` chip in the TUI footer on every rail screen. Key, action (`operations_view`), and description are unchanged; only visibility flipped. Added one regression test pinning the new footer behavior.
-
-### How it was tested
-- New test `tests/test_tui_directionb.py::test_tc030_operations_binding_shown_in_footer` — asserts `"x"` is in the footer's shown set on every rail screen (AC-1) and that its description reads `"Operations"` (AC-2). Passes by node id.
-- Existing TC-030 footer family + TC-031 engine-frozen guards — green (AC-3 reachability via `_PRE_BATCH_BINDINGS`; AC-4 footer contract; AC-5 frozen set untouched).
-- Full suite: **862 passed, 29 skipped, 3 xfailed, 0 failed** (674s) — +1 vs the batch-13 baseline of 861 (the new test), no regressions.
-- ruff: changed test file clean; `app.py` has 6 pre-existing F401/F402 errors (identical at HEAD — not introduced here).
-- `git diff --stat`: only `app.py` (1 line) + `test_tui_directionb.py` (+35) changed.
-
-### Open risks / pending
-- Cosmetic only: one extra footer chip per screen.
-- Out of scope (flag only): the 6 pre-existing ruff F401/F402 in `app.py`; tier-policy for the other hidden bindings (`1`–`8`, `l`, `s`, `p`, `t`…) was deliberately not addressed.
-- Unrelated: batch-13 `state.json` still reads `awaiting-sync` / `obsidian_synced:false` after PR #18 merge — needs `/dev-flow-sync`.
-
-### Security flags — handling
-N/A — security_required was false (single-attribute visibility flip on an already-wired binding).
-
-### Suggested commit message
-```
-feat(tui): surface Operations (CRC) binding in the footer
-
-Flip the `x`/operations_view binding to show=True so the Operations
-view (host of the CRC operation) is discoverable in the footer instead
-of requiring users to already know the keybinding. Add a TC-030 footer
-test pinning the visibility and the "Operations" chip label.
-```
+| Current phase | **closed** |
+| Scope | gaps #3 + #4 (2 increments, both locked-regression); gap #2 DEFERRED to its own /dev-flow batch (operator decision, premise-corrected) |
+| Started | 2026-06-24 |
+| Closed | 2026-06-24 |
+| security_required | false |
+| Branch | claude/audit-gaps-followup (off main d3c9cfe) |
+| Outcome | PASS — 5 black-box ATs (3 report-seam + 2 evidence), all already-working/locked-regression; 0 source edits; REQUIREMENTS.md: R-A2L-003/R-TUI-012/R-PROJ-001 → Automated, R-RPT-001/002 augmented; suite sweep 18 passed; engine-frozen guards green |
