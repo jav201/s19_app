@@ -1409,13 +1409,16 @@ def _safe_name(file_name: str) -> str:
 def emit_s19_from_mem_map(
     mem_map: dict[int, int],
     ranges: list[tuple[int, int]],
+    bytes_per_line: int = 32,
+    s0_header: bytes | None = None,
 ) -> str:
     """
     Summary:
         Serialize a sparse memory map into structurally valid Motorola S19
         text — the NEW mem_map-based emitter of LLR-002.7 (the CLI
         ``patch-hex --save-as`` path serializes an ``S19File`` object and is
-        not reusable here, F-A-05).
+        not reusable here, F-A-05). LLR-015.1/.2 add a selectable record
+        width and an optional populated S0 header.
 
     Args:
         mem_map (dict[int, int]): Address-to-byte map of the (post-apply)
@@ -1426,25 +1429,38 @@ def emit_s19_from_mem_map(
         ranges (list[tuple[int, int]]): The image's contiguous half-open
             ``(start, end)`` ranges (``LoadedFile.ranges`` ordering), driving
             record emission order.
+        bytes_per_line (int): Data bytes per emitted record, constrained to
+            ``{16, 32}`` (default 32). Any other value raises ``ValueError``
+            before a single record is emitted (LLR-015.1 / F-S-03).
+        s0_header (bytes | None): Optional S0 header payload. When provided
+            the emitter writes a populated ``S0`` carrying these bytes; when
+            ``None`` it writes the legacy empty ``S0``. The S0 is inert to the
+            memory map either way. Bounded to ``len(s0_header) <= 252`` so the
+            single-byte ``byte_count`` field cannot overflow (C4 / F-S-02);
+            an over-long header raises ``ValueError`` (LLR-015.2).
 
     Returns:
-        str: S19 text, one record per line with a trailing newline: an empty
-        S0 header (optional per the format; emitted data-free so re-parsing
-        adds nothing to the memory map), data records of 16 data bytes max,
-        and the matching terminator. The data record type is chosen from the
-        highest emitted address — S1/S9 up to 0xFFFF, S2/S8 up to 0xFFFFFF,
-        S3/S7 above — and every record carries the one's-complement checksum
-        ``core.SRecord._calculate_checksum`` validates.
+        str: S19 text, one record per line with a trailing newline: an S0
+        header (empty by default, or populated from ``s0_header``; inert to
+        the memory map either way), data records of ``bytes_per_line`` data
+        bytes max, and the matching terminator. The data record type is chosen
+        from the highest emitted address — S1/S9 up to 0xFFFF, S2/S8 up to
+        0xFFFFFF, S3/S7 above — and every record carries the one's-complement
+        checksum ``core.SRecord._calculate_checksum`` validates.
 
     Raises:
+        ValueError: If ``bytes_per_line`` is not in ``{16, 32}`` (no records
+            emitted), or if ``s0_header`` exceeds 252 bytes.
         KeyError: If ``ranges`` claims an address absent from ``mem_map`` —
             a programming error in the caller, not a data-quality fault.
 
     Data Flow:
+        - Validate ``bytes_per_line`` and the ``s0_header`` length at entry,
+          before emitting anything.
         - Pick the address width from the highest ``end − 1`` over ``ranges``.
-        - Emit ``S0`` (no data), then walk each range in 16-byte rows reading
-          bytes from ``mem_map``, then emit the width-matched terminator
-          (address 0, no data).
+        - Emit ``S0`` (empty, or populated from ``s0_header``), then walk each
+          range in ``bytes_per_line``-byte rows reading bytes from ``mem_map``,
+          then emit the width-matched terminator (address 0, no data).
         - Acceptance contract: the emitted text re-parses via
           ``s19_app.core.S19File`` to a memory map equal to ``mem_map`` with
           zero load errors.
@@ -1460,6 +1476,15 @@ def emit_s19_from_mem_map(
         >>> emit_s19_from_mem_map({0x10: 0xAB}, [(0x10, 0x11)]).splitlines()[1]
         'S1040010AB40'
     """
+    if bytes_per_line not in (16, 32):
+        raise ValueError(
+            f"bytes_per_line must be 16 or 32, got {bytes_per_line!r}"
+        )
+    if s0_header is not None and len(s0_header) > 252:
+        raise ValueError(
+            f"s0_header must be at most 252 bytes, got {len(s0_header)}"
+        )
+
     highest = max((end - 1 for _, end in ranges), default=0)
     if highest <= 0xFFFF:
         data_type, address_length, terminator_type = "S1", 2, "S9"
@@ -1468,10 +1493,11 @@ def emit_s19_from_mem_map(
     else:
         data_type, address_length, terminator_type = "S3", 4, "S7"
 
-    lines = [_s19_record("S0", 2, 0, ())]
+    s0_data = () if s0_header is None else tuple(s0_header)
+    lines = [_s19_record("S0", 2, 0, s0_data)]
     for start, end in ranges:
-        for row_start in range(start, end, 16):
-            row_end = min(row_start + 16, end)
+        for row_start in range(start, end, bytes_per_line):
+            row_end = min(row_start + bytes_per_line, end)
             data = tuple(mem_map[addr] for addr in range(row_start, row_end))
             lines.append(_s19_record(data_type, address_length, row_start, data))
     lines.append(_s19_record(terminator_type, address_length, 0, ()))

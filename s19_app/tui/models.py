@@ -28,6 +28,10 @@ class LoadedFile:
         variant_id (Optional[str]): Project variant this snapshot belongs to
             (filename stem); ``None`` for non-project or single-file loads
             (multi-variant model, LLR-005.2).
+        source_s0_header (Optional[bytes]): Raw S0 header bytes captured from
+            the source S19 image (first ``S0`` record's data), or ``None`` when
+            the source carries no S0. Preserved so a save flow can re-emit a
+            populated S0 in 32-byte mode (LLR-015.2).
 
     Data Flow:
         - Produced by ``S19TuiApp._parse_loaded_file``.
@@ -50,6 +54,7 @@ class LoadedFile:
     range_index: Optional[Any] = field(default=None, repr=False, compare=False)
     bases_set: Optional[Any] = field(default=None, repr=False, compare=False)
     variant_id: Optional[str] = None
+    source_s0_header: Optional[bytes] = None
 
 
 @dataclass(frozen=True)

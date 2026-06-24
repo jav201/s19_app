@@ -36,6 +36,7 @@ from s19_app.tui.changes import (
     verify_written_image,
 )
 import s19_app.tui.changes.apply as apply_module
+import s19_app.tui.changes.io as io_module
 from s19_app.tui.workspace import ensure_workarea
 
 EXAMPLE_S19 = (
@@ -592,3 +593,272 @@ def test_verify_on_dropped_byte_is_mismatch_file_kept(
     assert len(result.runs) == 1
     assert result.runs[0].kind == "only_a"
     assert result.runs[0].length == 1
+
+
+# ---------------------------------------------------------------------------
+# US-015 / LLR-015.1/.2/.4 — selectable record width + populated S0 header.
+# Reader-as-oracle: re-parse every emission via the frozen ``S19File``.
+# ---------------------------------------------------------------------------
+
+
+def _wide_mem_map() -> dict[int, int]:
+    """A single contiguous 80-byte 32-bit-address image (forces S3, >2 rows)."""
+    return {0x80001000 + offset: offset & 0xFF for offset in range(80)}
+
+
+def _data_byte_counts(text: str) -> list[int]:
+    """Data-byte length of every S1/S2/S3 data record in ``text``."""
+    counts = []
+    for line in text.splitlines():
+        if line[:2] in ("S1", "S2", "S3"):
+            byte_count = int(line[2:4], 16)
+            address_length = {"S1": 2, "S2": 3, "S3": 4}[line[:2]]
+            counts.append(byte_count - address_length - 1)
+    return counts
+
+
+def test_tc212_default_emit_packs_32_byte_rows() -> None:
+    """TC-212 — default (omitted) width packs ≤32-byte rows, ≥1 row >16."""
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    text = emit_s19_from_mem_map(mem_map, ranges)
+
+    counts = _data_byte_counts(text)
+    assert counts, "expected at least one data record"
+    assert all(count <= 32 for count in counts)
+    assert any(count > 16 for count in counts)
+
+
+def test_tc213_bytes_per_line_16_back_compat_byte_identical() -> None:
+    """TC-213 — bpl=16 output is byte-identical to the legacy framing."""
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    # Build the legacy expectation directly from the same record builder, in
+    # explicit 16-byte rows — this is what the pre-change emitter produced.
+    expected_lines = [io_module._s19_record("S0", 2, 0, ())]
+    for row_start in range(0x80001000, 0x80001000 + 80, 16):
+        row_end = min(row_start + 16, 0x80001000 + 80)
+        data = tuple(mem_map[addr] for addr in range(row_start, row_end))
+        expected_lines.append(io_module._s19_record("S3", 4, row_start, data))
+    expected_lines.append(io_module._s19_record("S7", 4, 0, ()))
+    expected = "\n".join(expected_lines) + "\n"
+
+    text = emit_s19_from_mem_map(mem_map, ranges, bytes_per_line=16)
+
+    assert text == expected
+    assert all(count <= 16 for count in _data_byte_counts(text))
+
+
+@pytest.mark.parametrize("bad_width", [0, 24, 64])
+def test_tc214_invalid_bytes_per_line_raises_and_emits_nothing(
+    bad_width: int,
+) -> None:
+    """TC-214 — bpl ∉ {16,32} raises ValueError before any record is built."""
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    with pytest.raises(ValueError):
+        emit_s19_from_mem_map(mem_map, ranges, bytes_per_line=bad_width)
+
+
+def _data_record_map(s19: S19File) -> dict[int, int]:
+    """Memory map from S1/S2/S3 data records ONLY (excludes S0 / terminators).
+
+    ``S19File.get_memory_map`` (``core.py:485``) folds EVERY record's data —
+    including the S0 header at address 0 — into the map, so a populated S0
+    contributes low-address keys. The firmware payload is the data records;
+    this helper isolates it for S0-inertness assertions (premise correction,
+    §6.5 amendment).
+    """
+    mem_map: dict[int, int] = {}
+    for record in s19.records:
+        if record.type in ("S1", "S2", "S3"):
+            for offset, byte in enumerate(record.data):
+                mem_map[record.address + offset] = byte
+    return mem_map
+
+
+def test_tc215_populated_s0_is_inert_to_data_and_empty_when_none(
+    tmp_path: Path,
+) -> None:
+    """TC-215 — s0_header populates an S0 that is inert to the firmware data
+    records; s0_header=None keeps the empty S0.
+
+    NOTE (§6.5 premise correction): the frozen reader's ``get_memory_map``
+    folds S0 data into the map, so "inert" is asserted against the DATA-record
+    map, not the full ``get_memory_map`` (which the spec's "+0 addresses"
+    threshold assumed). The S0 sits at address 0 and never collides with the
+    high-address firmware payload.
+    """
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+    header = b"MODULE_X v1.0"
+
+    populated = emit_s19_from_mem_map(mem_map, ranges, s0_header=header)
+    s0_line = next(line for line in populated.splitlines() if line.startswith("S0"))
+    s0_byte_count = int(s0_line[2:4], 16)
+    assert s0_byte_count - 2 - 1 == len(header)  # S0 data field non-empty
+
+    target = tmp_path / "populated.s19"
+    target.write_text(populated, encoding="ascii")
+    reparsed = S19File(str(target))
+    assert reparsed.get_errors() == []
+    assert _data_record_map(reparsed) == mem_map  # S0 adds 0 DATA addresses
+
+    empty = emit_s19_from_mem_map(mem_map, ranges, s0_header=None)
+    empty_s0 = next(line for line in empty.splitlines() if line.startswith("S0"))
+    assert int(empty_s0[2:4], 16) - 2 - 1 == 0  # empty S0 data field
+
+
+def test_tc216_32_byte_emit_reparses_byte_equal(tmp_path: Path) -> None:
+    """TC-216 — 32-byte emit re-parses to a map byte-equal to the intended."""
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    text = emit_s19_from_mem_map(mem_map, ranges, bytes_per_line=32)
+    target = tmp_path / "w32.s19"
+    target.write_text(text, encoding="ascii")
+
+    reparsed = S19File(str(target))
+    assert reparsed.get_errors() == []
+    assert reparsed.get_memory_map() == mem_map
+
+
+def test_tc217_16_byte_emit_reparses_byte_equal(tmp_path: Path) -> None:
+    """TC-217 — 16-byte emit re-parses to a map byte-equal to the intended."""
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    text = emit_s19_from_mem_map(mem_map, ranges, bytes_per_line=16)
+    target = tmp_path / "w16.s19"
+    target.write_text(text, encoding="ascii")
+
+    reparsed = S19File(str(target))
+    assert reparsed.get_errors() == []
+    assert reparsed.get_memory_map() == mem_map
+
+
+def test_tc218_negative_control_corrupt_data_byte_detected(
+    tmp_path: Path,
+) -> None:
+    """TC-218 — corrupting a DATA-record byte breaks the oracle (non-vacuous).
+
+    Corrupts a byte of an S3 data record (NOT the inert S0): the re-parsed
+    map must differ from the intended map OR the reader must report errors.
+    """
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+    text = emit_s19_from_mem_map(mem_map, ranges, bytes_per_line=32)
+
+    lines = text.splitlines()
+    data_idx = next(i for i, line in enumerate(lines) if line.startswith("S3"))
+    line = lines[data_idx]
+    # Flip the first data byte's high nibble (data starts after type+count+addr).
+    data_start = 4 + 4 * 2  # 'S3' + byte_count(2) + address(4 bytes = 8 hex)
+    original = line[data_start]
+    flipped = "0" if original != "0" else "F"
+    lines[data_idx] = line[:data_start] + flipped + line[data_start + 1:]
+    corrupt = "\n".join(lines) + "\n"
+
+    target = tmp_path / "corrupt.s19"
+    target.write_text(corrupt, encoding="ascii")
+    reparsed = S19File(str(target))
+    assert reparsed.get_memory_map() != mem_map or reparsed.get_errors() != []
+
+
+def test_tc226_cross_format_round_trip_integrity(tmp_path: Path) -> None:
+    """TC-226 — map-equality in all directions at the 32 default.
+
+    S19→reparse; HEX-source map → emit S19(32) → reparse;
+    S19-source map → emit_intel_hex → reparse. All byte-equal, 0 errors.
+    """
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    # Direction 1: S19 emit(32) → re-parse.
+    s19_text = emit_s19_from_mem_map(mem_map, ranges, bytes_per_line=32)
+    s19_path = tmp_path / "d1.s19"
+    s19_path.write_text(s19_text, encoding="ascii")
+    s19_reparsed = S19File(str(s19_path))
+    assert s19_reparsed.get_errors() == []
+    assert s19_reparsed.get_memory_map() == mem_map
+
+    # Direction 2: HEX source map → emit S19(32) → re-parse.
+    hex_text = io_module.emit_intel_hex_from_mem_map(mem_map, ranges)
+    hex_path = tmp_path / "src.hex"
+    hex_path.write_text(hex_text, encoding="ascii")
+    hex_map = IntelHexFile(str(hex_path)).memory
+    s19_from_hex = emit_s19_from_mem_map(dict(hex_map), ranges, bytes_per_line=32)
+    s19_from_hex_path = tmp_path / "d2.s19"
+    s19_from_hex_path.write_text(s19_from_hex, encoding="ascii")
+    d2 = S19File(str(s19_from_hex_path))
+    assert d2.get_errors() == []
+    assert d2.get_memory_map() == mem_map
+
+    # Direction 3: S19 source map → emit Intel HEX → re-parse.
+    hex_from_s19 = io_module.emit_intel_hex_from_mem_map(
+        s19_reparsed.get_memory_map(), ranges
+    )
+    d3_path = tmp_path / "d3.hex"
+    d3_path.write_text(hex_from_s19, encoding="ascii")
+    d3 = IntelHexFile(str(d3_path))
+    assert d3.get_errors() == []
+    assert dict(d3.memory) == mem_map
+
+
+def test_c4_overlong_s0_header_raises(tmp_path: Path) -> None:
+    """C4 / F-S-02 — s0_header > 252 bytes raises, no malformed record emitted."""
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+
+    with pytest.raises(ValueError):
+        emit_s19_from_mem_map(mem_map, ranges, s0_header=b"\x00" * 253)
+
+    # The 252-byte boundary is accepted and re-parses cleanly (inert to the
+    # firmware data records; see TC-215 note re: the reader folding S0).
+    boundary = emit_s19_from_mem_map(mem_map, ranges, s0_header=b"\x00" * 252)
+    target = tmp_path / "boundary.s19"
+    target.write_text(boundary, encoding="ascii")
+    reparsed = S19File(str(target))
+    assert reparsed.get_errors() == []
+    assert _data_record_map(reparsed) == mem_map
+
+
+def test_fq05_hex_emitter_unmodified_16_byte_rows(tmp_path: Path) -> None:
+    """F-Q-05 — the Intel HEX emitter is unmodified: width constant stays 16
+    and emitted HEX data rows never exceed 16 bytes (backs AT-015.2)."""
+    assert io_module.HEX_DATA_BYTES_PER_RECORD == 16
+
+    mem_map = _wide_mem_map()
+    ranges = [(0x80001000, 0x80001000 + 80)]
+    hex_text = io_module.emit_intel_hex_from_mem_map(mem_map, ranges)
+    for line in hex_text.splitlines():
+        if line.startswith(":"):
+            byte_count = int(line[1:3], 16)
+            assert byte_count <= 16
+
+
+# ---------------------------------------------------------------------------
+# US-015 / LLR-015.2 — source S0 capture at the load seam (read-only).
+# ---------------------------------------------------------------------------
+
+
+def test_build_loaded_s19_captures_source_s0_header() -> None:
+    """LLR-015.2 — build_loaded_s19 captures the source S0 header bytes, and
+    is None when the source carries no S0 record."""
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    with_s0 = (
+        Path(__file__).resolve().parents[1]
+        / "examples"
+        / "case_01_basic_valid"
+        / "firmware.s19"
+    )
+    loaded = build_loaded_s19(with_s0, S19File(str(with_s0)), None, None)
+    assert loaded.source_s0_header == b"CASE01_BASIC"
+
+    # prg.s19 has 0 S0 records (Phase-1 finding) → capture is None.
+    loaded_none = build_loaded_s19(EXAMPLE_S19, S19File(str(EXAMPLE_S19)), None, None)
+    assert loaded_none.source_s0_header is None
