@@ -51,6 +51,18 @@
         {
             "phase": 3,
             "date": "2026-06-24",
+            "decision": "Inc2-implemented-awaiting-gate",
+            "notes": "Inc2 (US-015 backend save-flow threading) implemented by software-dev: 4 files. apply.py save_patched_image +bytes_per_line/s0_header passed to emit() ONLY under source_kind=='s19' (C1, apply.py:701); change_service.save_patched +params forwarded (two-hop F-A-05); variant_execution_service:711 passes bytes_per_line=32; tests TC-219 (S19 thread) + TC-220 (through change_service) + TC-220b (HEX unaffected — real TypeError guard outside try/except). code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/2 LOW (F1 app.py:1428 caller silent-default-32 = expected Inc3 carry; F2 explicit-32 redundant leave). C1 CLOSED = YES (HEX save-back provably works). ORCHESTRATOR spot-check: diff=4 files (0 frozen), C1 branch at apply.py:701, TC-219/220/220b on disk, 41 collected. LEDGER 916->919 (+3). Pre-existing ruff F401 typing.List change_service.py:38 (batch-15 carry C-7, NOT introduced — git-stash confirmed). NOT committed. Awaiting Inc2 gate. Inc3 = selector UI + preserve/synthesize S0 + C3 pilot AT (FINAL increment)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc1-approved-committed-Inc2-started",
+            "notes": "Inc1 APPROVED ('approve') + Amendment B RATIFIED. Committed in 2: 12e91a7 (code: io.py/models.py/load_service.py/test_changes_apply.py) + ca0e042 (docs: batch-14 artifacts + batch-15 close snapshot w/ obsidian_synced ride-along flipped true per operator carry + batch-13 pattern). On branch claude/batch-14-us015 atop 9169130; NOT pushed. SCOPE REFINEMENT (≤5-file discipline): original Inc2 (4 source + 2 test files = 6) SPLIT -> Inc2 backend save-flow threading (apply.py save_patched_image +bytes_per_line/s0_header S19-BRANCH-ONLY per C1 + change_service.save_patched two-hop F-A-05 + variant_execution_service:711 + test_changes_apply TC-219/220 + C1 HEX-unaffected; 4 files) and Inc3 selector UI + preserve/synthesize S0 policy + C3 pilot AT-015.1 (screens_directionb selector + app.py wire + change_service synth helper + test_tui_patch_editor_v2 pilot; ≤5). C2 (CRC->32) needs NO code edit — crc.py:879 inherits the new 32 default; document in A-5 only. Inc2 dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
             "decision": "Inc1-implemented-awaiting-gate",
             "notes": "Inc1 (US-015 emitter+S0 data layer) implemented by software-dev: 4 source/test files + §6.5 spec amendments (≤5). emit_s19_from_mem_map +bytes_per_line{16,32} default 32 (validate-at-entry F-S-03) + s0_header bytes|None populated≤252 else ValueError (C4) else empty; docstring fixed (F-A-04). LoadedFile +source_s0_header (additive). build_loaded_s19 captures first S0 (read-only). Tests TC-212..218/226 + C4 overflow + F-Q-05 HEX-unmodified + S0-capture (TC-218 corrupts a DATA byte per F-Q-06). code-reviewer APPROVE 0 HIGH/0 MED/2 LOW; Amendment B verified correct + safe = YES. ORCHESTRATOR spot-check: diff = 4 Inc1 files only (0 frozen), all 14 TC functions exist on disk, get_memory_map (core.py:485) confirmed folds all records (Amendment B true), 38 collected, ruff clean. LEDGER 903->916 (+13). Full non-slow suite 863/0. AMENDMENT B (RATIFY): 'S0 adds 0 addresses' was FALSE; oracle uses data-record-only map; integrity (data records byte-equal) preserved; binds Inc2 AT oracles. Amendment A: C4 S0≤252 new threshold on LLR-015.2. NOT committed. Awaiting Inc1 gate + Amendment-B ratification."
         },
