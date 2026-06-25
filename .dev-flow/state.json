@@ -3,9 +3,9 @@
     "language": "en",
     "batch_id": "2026-06-25-batch-16",
     "batch_objective": "GAP #2 (batch-11 SCOPE-1, premise-corrected NET-NEW feature): give the project save an operator surface to assign per-variant change/check files (and optionally project-wide batch files), persist them into the manifest (write_project_manifest batch/assignments kwargs, manifest_writer.py:370), and prove the round-trip through the SHIPPED save handler (assign -> save -> reload project.json -> manifest.assignments non-empty + consumed by plan_variant_executions, variant_execution_service.py:526). Today app.py:3687 calls write_project_manifest with NO batch/assignments and there is no assignment UI; the writer's batch/assignments were tested only via direct kwargs (the SCOPE-1 gap).",
-    "current_phase": 3,
-    "phase_status": "in-progress",
-    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 0, "4": 0, "5": 0, "6": 0},
+    "current_phase": 4,
+    "phase_status": "awaiting-gate",
+    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 0, "4": 1, "5": 0, "6": 0},
     "artifacts": {
         "1": ".dev-flow/2026-06-25-batch-16/01-requirements.md",
         "2": ".dev-flow/2026-06-25-batch-16/02-review.md",
@@ -26,6 +26,20 @@
         "open_scoping_questions": "Phase-0 decisions owed (operator): (Q1) surface = extend SaveProjectScreen with per-variant assignment rows, vs a dedicated 'assign variant files' screen decoupled from save; (Q2) persist assignments-only vs assignments + project-wide batch; (Q3) assignable file source = restrict to files already in the project workarea (project-relative, satisfies _reject_unsafe_entry), vs allow external files copied-in. These gate READY."
     },
     "decisions_log": [
+        {
+            "phase": 4,
+            "date": "2026-06-25",
+            "decision": "iteration-PASS-G3-closed-awaiting-gate",
+            "notes": "Operator: 'iterate'. Phase-4 hardening (test + docstring, NO prod behavior change): G-3 CLOSED — new e2e AT test_at017_2_e2e_consumer_pickup_through_handler (test_tui_manifest_save.py:410) drives the SHIPPED save handler via _save_through_handler, re-reads the HANDLER-WRITTEN project.json (read_project_manifest, NOT direct write), feeds plan_variant_executions(scope=ALL), asserts files_by_id['b'] EXACTLY == (doc.json,extra.json).resolve() + unassigned batch-only. Orchestrator READ the body to confirm handler-driven (not direct write). Original consumer-contract guard kept. G-2 CLOSED (screens.py _collect_composition docstring -> PROJECT_RULES order). 2 files, ruff clean, 26 affected passed, 0 frozen/substrate edits. LEDGER 932->933. 04-validation.md updated (Phase-4 iteration section). Verdict stands PASS. Awaiting Phase-4 re-confirmation gate.",
+            "_prev": "awaiting-gate-PASS"
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-25",
+            "decision": "awaiting-gate-PASS-SUPERSEDED",
+            "notes": "PRE-DECISION. Phase 3 Inc2 APPROVED + committed 2fc948b (code) + 043c3a2 (docs) -> PHASE 3 COMPLETE. Phase 4 (qa-reviewer) -> 04-validation.md (153 lines). VERDICT PASS, 0 FAIL/0 blockers. Full suite 900 passed/29 skip/3 xfail/0 fail (932 collected); not-slow 879/0. Ledger 922+7(Inc1)+3(Inc2)=932 EXACT. COUNTERFACTUAL: reverted prod (app.py/screens.py) to origin/main, tests at HEAD -> AT-017.1/.4/.5 + TC-302/303 RED pre-fix (TypeError: SaveProjectPayload no 'batch' kwarg = payload path absent pre-feature), restored clean. 0 engine-frozen edits; manifest_writer + variant_execution_service EDIT-FREE vs b734c19. Per-LLR + per-AT PASS on real reconciled nodes (V-5; no rename chore). A-5 matrix through shipped handler+UI. HONEST NOTE G-3: spec §5.3#2 listed AT-017.2 among RED-pre-fix but it is correctly GREEN pre-fix — it writes project.json directly + tests only the unchanged consumer plan_variant_executions (a consumer-contract guard, NOT a handler counterfactual); SCOPE-1 closure proven by the 4 handler REDs. The consumer-half-through-handler is a two-step proof (AT-017.1 handler->disk + AT-017.2 disk->consumer), logically sound; could be chained to one e2e pilot if full rigor wanted. G-1 pre-existing app.py C-7; G-2 screens.py docstring nit. ORCHESTRATOR spot-check: 932 collected, substrate+frozen edit-free, 04-validation UTF-8. Awaiting Phase 4 gate.",
+            "_prev": "Inc2-complete"
+        },
         {
             "phase": 3,
             "date": "2026-06-25",
