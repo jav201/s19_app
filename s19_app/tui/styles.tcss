@@ -730,6 +730,17 @@ ModalScreen {
     height: 10;
 }
 
+/* --- Save-project per-variant assignment lists (batch-16 LLR-017.3) --------
+ * One SelectionList per variant + a project-wide batch list, each height-
+ * capped so a long candidate set scrolls inside the modal rather than
+ * overflowing it. Colors resolve through the shared Calm Dark tokens. */
+.assign-list {
+    border: round $rule;
+    background: $bg-base;
+    height: 6;
+    margin-bottom: 1;
+}
+
 /* --- Report viewer modal (batch-07 E8, LLR-008.1/008.5) --------------------
  * Listing strip on top, scrollable Markdown render area filling the rest,
  * generation row (context-bytes input + buttons) docked at the bottom via

@@ -17,6 +17,7 @@ from textual.widgets import (
     ListItem,
     ListView,
     Markdown,
+    SelectionList,
     Static,
     TextArea,
 )
@@ -151,20 +152,71 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
 
 
 class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
-    """Modal dialog for destination folder, optional browse, and project name.
+    """Modal dialog for destination folder, project name, and per-variant assignments.
 
-    Re-skinned to the Calm Dark theme in batch-02 increment 8 (LLR-015.1):
-    the dialog carries the shared ``.modal-dialog`` class. Behavior — the
-    browse fallback, ``SaveProjectPayload`` construction and the
-    ``.s19tool/`` workarea destination — is unchanged (LLR-015.2 / A-5).
+    Summary:
+        Collects the save destination (parent folder + project name) and,
+        when re-saving an existing multi-variant project, the per-variant
+        change/check assignments plus a project-wide batch list (HLR-017 /
+        LLR-017.3). The assignment rows offer ONLY project-relative ``.json``
+        documents enumerated from the project dir (workarea-restricted,
+        D-SCOPING); each per-variant key is sourced from the caller-supplied
+        ``variant_id`` (never recomputed as ``Path.stem`` — D-KEY), and every
+        selection resolves by the row's stored VALUE, never by parsing label
+        text. Re-skinned to the Calm Dark theme in batch-02 increment 8
+        (LLR-015.1): the dialog carries the shared ``.modal-dialog`` class.
+
+    Args:
+        default_parent (Path): Prefilled destination parent directory.
+        variants (Optional[List[Tuple[str, str]]]): ``(variant_id,
+            display_label)`` pairs for the existing project's variants, in
+            set order (the ``_variant_display_options`` contract). ``None`` /
+            empty ⇒ no assignment rows (D-NEWPROJ: a brand-new project save
+            has no variant set, so it writes empty ``batch`` / ``assignments``).
+        candidate_files (Optional[List[str]]): Project-relative ``.json``
+            change/check document names enumerated from the project dir
+            (``project.json`` excluded by the caller — D-SCOPING). ``None`` /
+            empty ⇒ no assignment rows offered.
+
+    Data Flow:
+        - ``compose`` renders a ``SelectionList`` per variant (id
+          ``#assign_<index>``) plus one for the project-wide batch
+          (``#assign_batch``) only when both ``variants`` and
+          ``candidate_files`` are non-empty.
+        - ``save_ok`` reads each ``SelectionList.selected`` (a list of the
+          candidate-filename VALUES) and builds ``batch`` (tuple) +
+          ``assignments`` (``{variant_id: tuple}``) keyed by INDEX into
+          ``self.variants`` — the writer's ``_reject_unsafe_entry`` remains
+          the sole path-safety authority (D-SEC).
+
+    Dependencies:
+        Used by:
+            - s19_app.tui.app.S19TuiApp.action_save_project
     """
 
-    def __init__(self, default_parent: Path) -> None:
+    def __init__(
+        self,
+        default_parent: Path,
+        variants: Optional[List[Tuple[str, str]]] = None,
+        candidate_files: Optional[List[str]] = None,
+    ) -> None:
         super().__init__()
         self.default_parent = default_parent
+        self.variants: List[Tuple[str, str]] = list(variants or [])
+        self.candidate_files: List[str] = list(candidate_files or [])
+
+    @property
+    def _assignment_rows_enabled(self) -> bool:
+        """Whether the per-variant assignment section is rendered (D-NEWPROJ).
+
+        Only a re-save of an existing multi-variant project (variants known)
+        with ≥1 enumerated candidate file offers assignment rows; otherwise
+        the screen collects no composition and the payload stays empty.
+        """
+        return bool(self.variants) and bool(self.candidate_files)
 
     def compose(self) -> ComposeResult:
-        yield Container(
+        children: list = [
             Label("Save project folder under:", classes="modal-title"),
             Input(
                 placeholder="C:\\path\\to\\parent\\folder",
@@ -176,18 +228,80 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
             ),
             Label("Project name (new folder name):", classes="modal-title"),
             Input(placeholder="letters, numbers, - _", id="project_name"),
+        ]
+        if self._assignment_rows_enabled:
+            children.append(
+                Label("Project-wide batch files (.json):", classes="modal-title")
+            )
+            children.append(
+                SelectionList[str](
+                    *[(name, name) for name in self.candidate_files],
+                    id="assign_batch",
+                    classes="assign-list",
+                )
+            )
+            for index, (_variant_id, display) in enumerate(self.variants):
+                children.append(
+                    Label(
+                        f"Assign files to '{display}':",
+                        classes="modal-title",
+                    )
+                )
+                children.append(
+                    SelectionList[str](
+                        *[(name, name) for name in self.candidate_files],
+                        id=f"assign_{index}",
+                        classes="assign-list",
+                    )
+                )
+        children.append(
             Container(
                 Button("Save", id="save_ok", classes="modal-confirm"),
                 Button("Cancel", id="save_cancel"),
                 id="saveproject_buttons",
                 classes="modal-buttons",
-            ),
+            )
+        )
+        yield Container(
+            *children,
             id="load_dialog",
             classes="modal-dialog",
         )
 
     def on_mount(self) -> None:
         self.query_one("#project_parent_path", Input).value = str(self.default_parent)
+
+    def _collect_composition(
+        self,
+    ) -> Tuple[Tuple[str, ...], dict]:
+        """Read the assignment SelectionLists into ``(batch, assignments)``.
+
+        Summary:
+            Collect the project-wide batch selection and each per-variant
+            selection into a payload composition (LLR-017.3). Returns empty
+            structures when the assignment section was not rendered
+            (D-NEWPROJ). Each assignment key is the caller-supplied
+            ``variant_id`` resolved by row INDEX into ``self.variants`` —
+            never recomputed (D-KEY). Selection values are the candidate
+            filenames (project-relative strings, no pre-resolution — D-SEC);
+            a variant with no selection is omitted entirely.
+
+        Returns:
+            Tuple[Tuple[str, ...], dict]: ``(batch, assignments)`` where
+            ``batch`` is project-relative filename strings and ``assignments``
+            maps ``variant_id`` → tuple of filename strings.
+        """
+        if not self._assignment_rows_enabled:
+            return (), {}
+        batch = tuple(self.query_one("#assign_batch", SelectionList).selected)
+        assignments: dict[str, Tuple[str, ...]] = {}
+        for index, (variant_id, _display) in enumerate(self.variants):
+            selected = tuple(
+                self.query_one(f"#assign_{index}", SelectionList).selected
+            )
+            if selected:
+                assignments[variant_id] = selected
+        return batch, assignments
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "save_cancel":
@@ -213,7 +327,15 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
             name = self.query_one("#project_name", Input).value.strip()
             if not parent or not name:
                 return
-            self.dismiss(SaveProjectPayload(parent_folder=parent, project_name=name))
+            batch, assignments = self._collect_composition()
+            self.dismiss(
+                SaveProjectPayload(
+                    parent_folder=parent,
+                    project_name=name,
+                    batch=batch,
+                    assignments=assignments,
+                )
+            )
 
 
 class LoadProjectScreen(ModalScreen[Optional[str]]):

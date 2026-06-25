@@ -40,8 +40,11 @@ import asyncio
 import json
 from pathlib import Path
 
+from textual.widgets import Button, Input, SelectionList
+
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
+from s19_app.tui.screens import SaveProjectScreen
 from s19_app.tui.services.variant_execution_service import (
     PROJECT_MANIFEST_NAME,
     read_project_manifest,
@@ -607,3 +610,192 @@ def test_tc302_303_handler_threads_batch_assignments_to_write_and_verify(
     # R1: identical intent threaded to verify.
     assert verify_calls[-1].get("batch") == write_calls[-1].get("batch")
     assert verify_calls[-1].get("assignments") == write_calls[-1].get("assignments")
+
+
+# --------------------------------------------------------------------------- #
+# Inc-2 / LLR-017.3 — the SaveProjectScreen assignment UI (screen-collect).
+# These pilots set up a multi-variant `_variant_set` + on-disk project dir
+# BEFORE `action_save_project` (F-Q-06 precondition / D-NEWPROJ timing), then
+# drive the screen's SelectionLists and capture the dismissed payload.
+# --------------------------------------------------------------------------- #
+
+
+def _make_project(app: S19TuiApp, name: str, files: dict[str, str]) -> Path:
+    """Create ``.s19tool/workarea/<name>/`` with the given text files."""
+    project_dir = app.workarea / name
+    project_dir.mkdir(parents=True, exist_ok=True)
+    for filename, content in files.items():
+        (project_dir / filename).write_text(content, encoding="utf-8")
+    return project_dir
+
+
+def _capture_save_payload(app: S19TuiApp) -> list:
+    """Spy on ``_handle_save_dialog`` so a screen-collect dismiss is captured.
+
+    Returns a list the patched handler appends the dismissed
+    ``SaveProjectPayload`` to (so a screen-driven Save can be asserted on
+    without re-running the file-copy write path).
+    """
+    captured: list = []
+    app._handle_save_dialog = lambda payload: captured.append(payload)  # type: ignore[method-assign]
+    return captured
+
+
+def test_tc304_screen_collects_per_variant_and_batch_assignment(
+    tmp_path: Path,
+) -> None:
+    """TC-304 / LLR-017.3 — golden: the screen collects a keyed assignment + batch.
+
+    Intent (HLR-017 / D-KEY): a re-save of an existing multi-variant project
+    renders per-variant assignment rows offering the project-relative ``.json``
+    docs. Selecting a per-variant file + a project-wide batch file and pressing
+    Save dismisses a ``SaveProjectPayload`` whose ``assignments`` is keyed by
+    the variant's ``variant_id`` (sourced from the variant set, NOT recomputed)
+    with the selected file, and whose ``batch`` carries the batch file.
+    """
+    external = tmp_path / "seed.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app,
+            "proj",
+            {
+                "a.s19": S19_A,
+                "b.s19": S19_B,
+                "doc.json": "{}",
+                "extra.json": "{}",
+                "project.json": "{}",
+            },
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            captured = _capture_save_payload(app)
+            app.action_save_project()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SaveProjectScreen)
+            screen.query_one("#project_name", Input).value = "proj"
+            # Variant ids the screen was wired with (sourced from the set).
+            variant_ids = [vid for vid, _display in screen.variants]
+            # Drive: batch picks doc.json; variant 'b' picks extra.json.
+            screen.query_one("#assign_batch", SelectionList).select("doc.json")
+            b_index = variant_ids.index("b")
+            screen.query_one(
+                f"#assign_{b_index}", SelectionList
+            ).select("extra.json")
+            await pilot.pause()
+            screen.query_one("#save_ok", Button).press()
+            await _flush(pilot)
+            return captured, variant_ids
+
+    captured, variant_ids = asyncio.run(_drive())
+    assert captured, "pressing Save must dismiss a payload"
+    payload = captured[-1]
+    assert variant_ids == ["a", "b"], f"variant ids from set, got {variant_ids}"
+    assert payload.batch == ("doc.json",), f"batch must carry the file; got {payload.batch}"
+    assert payload.assignments == {"b": ("extra.json",)}, (
+        f"assignment must be keyed by variant_id with the file; got {payload.assignments}"
+    )
+
+
+def test_tc305_screen_offers_only_in_project_candidate_files(
+    tmp_path: Path,
+) -> None:
+    """TC-305 / LLR-017.3 (escape) — the screen offers ONLY in-project files.
+
+    Intent (D-SCOPING): the assignment rows enumerate ONLY project-relative
+    ``.json`` documents from the project dir, never out-of-project paths — so a
+    selection that would escape is simply not offerable through the UI
+    (end-to-end refusal is AT-017.4). We seed a ``.json`` OUTSIDE the project
+    and assert it is absent from every SelectionList's candidate values, while
+    ``project.json`` is excluded too.
+    """
+    external = tmp_path / "seed.s19"
+    external.write_text(S19_A, encoding="utf-8")
+    # An out-of-project .json that must NOT be offered.
+    (tmp_path / "outside.json").write_text("{}", encoding="utf-8")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app,
+            "proj",
+            {
+                "a.s19": S19_A,
+                "b.s19": S19_B,
+                "doc.json": "{}",
+                "project.json": "{}",
+            },
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            app.action_save_project()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SaveProjectScreen)
+            candidates = list(screen.candidate_files)
+            # Values offered by the batch list (representative of every list).
+            batch_values = [
+                option.value
+                for option in screen.query_one(
+                    "#assign_batch", SelectionList
+                ).options
+            ]
+            return candidates, batch_values
+
+    candidates, batch_values = asyncio.run(_drive())
+    assert candidates == ["doc.json"], (
+        f"only the in-project .json is offered (project.json excluded); got {candidates}"
+    )
+    assert "outside.json" not in candidates, "out-of-project file must not be offered"
+    assert "../outside.json" not in batch_values
+    assert "project.json" not in batch_values
+    assert batch_values == ["doc.json"], f"offered values match candidates; got {batch_values}"
+
+
+def test_tc306_screen_no_selection_yields_empty_composition(
+    tmp_path: Path,
+) -> None:
+    """TC-306 / LLR-017.3 (empty) — no selection ⇒ empty batch/assignments.
+
+    Intent (HLR-017 zero-selection): pressing Save with no assignment selected
+    dismisses a payload with ``batch == ()`` / ``assignments == {}`` (the screen
+    collects nothing), and the dialog does not crash.
+    """
+    external = tmp_path / "seed.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app,
+            "proj",
+            {"a.s19": S19_A, "b.s19": S19_B, "doc.json": "{}"},
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            captured = _capture_save_payload(app)
+            app.action_save_project()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SaveProjectScreen)
+            screen.query_one("#project_name", Input).value = "proj"
+            screen.query_one("#save_ok", Button).press()
+            await _flush(pilot)
+            return captured
+
+    captured = asyncio.run(_drive())
+    assert captured, "pressing Save must dismiss a payload"
+    payload = captured[-1]
+    assert payload.batch == (), f"no selection ⇒ empty batch; got {payload.batch}"
+    assert payload.assignments == {}, (
+        f"no selection ⇒ empty assignments; got {payload.assignments}"
+    )
