@@ -466,6 +466,64 @@ def test_duplicate_stem_ids_become_filenames(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# AT-017.2 (batch-16, HLR-017) — consumer pickup of saved batch+assignments
+# ---------------------------------------------------------------------------
+
+
+def test_at017_2_consumer_pickup_of_saved_composition(tmp_path: Path) -> None:
+    """``plan_variant_executions`` applies saved ``batch + assignments[vid]``.
+
+    Intent (AT-017.2 / LLR-017.4, batch-16): the SCOPE-1 closure is only real
+    if the persisted composition is picked up by the consumer. We write a
+    ``project.json`` carrying a project-wide ``batch`` and a per-variant
+    ``assignments`` entry, read it back through the SAME reader the save path
+    uses (``read_project_manifest``), and assert the planned file tuple for the
+    assigned variant EXACTLY equals ``tuple(batch) + tuple(assignments[vid])``
+    in the LLR-006.2 inner order — exact, not "non-empty". A wrong key or a
+    dropped list would change the tuple, so this test fails if the assignment
+    silently drops.
+    """
+    project_dir = _make_project(tmp_path, {"a.s19": S19_A, "b.s19": S19_B})
+    _write_v2_document(
+        project_dir / "doc.json",
+        [{"type": "bytes", "address": "0x1000", "bytes": "AA"}],
+    )
+    _write_v2_document(
+        project_dir / "extra.json",
+        [{"type": "bytes", "address": "0x2000", "bytes": "BB"}],
+    )
+    (project_dir / "project.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "active_variant": "b",
+                "batch": ["doc.json"],
+                "assignments": {"b": ["extra.json"]},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    vset = _variant_set(project_dir)
+
+    plan = plan_variant_executions(vset, manifest, scope=SCOPE_ALL)
+    files_by_id = {variant.variant_id: files for variant, files in plan}
+
+    expected_b = (
+        (project_dir / "doc.json").resolve(),
+        (project_dir / "extra.json").resolve(),
+    )
+    assert files_by_id["b"] == expected_b, (
+        "the assigned variant's plan must be exactly batch + assignments[vid] "
+        f"in order; got {files_by_id['b']}"
+    )
+    # The unassigned variant gets only the project-wide batch (no assignment).
+    assert files_by_id["a"] == ((project_dir / "doc.json").resolve(),)
+
+
+# ---------------------------------------------------------------------------
 # LLR-002.7 headless — save-back files land under the project directory
 # ---------------------------------------------------------------------------
 

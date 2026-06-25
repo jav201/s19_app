@@ -40,8 +40,11 @@ import asyncio
 import json
 from pathlib import Path
 
+from textual.widgets import Button, Input, SelectionList
+
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
+from s19_app.tui.screens import SaveProjectScreen
 from s19_app.tui.services.variant_execution_service import (
     PROJECT_MANIFEST_NAME,
     read_project_manifest,
@@ -49,6 +52,7 @@ from s19_app.tui.services.variant_execution_service import (
 
 # Minimal valid S19 image (checksum verified against s19_app.core.S19File).
 S19_A = "S107100001020304DE\nS9030000FC\n"
+S19_B = "S10720000A0B0C0DAA\nS9030000FC\n"  # 4 bytes at 0x2000
 
 
 async def _flush(pilot, count: int = 12) -> None:
@@ -303,3 +307,567 @@ def test_manifest_writer_module_is_headless() -> None:
         assert not stripped.startswith("import logging"), line
         assert not stripped.startswith("from logging"), line
         assert "getLogger" not in stripped, line
+
+
+# --------------------------------------------------------------------------- #
+# batch-16 / HLR-017 — per-variant assignments + project-wide batch persist
+# through the SHIPPED save handler (the SCOPE-1 closure).
+# --------------------------------------------------------------------------- #
+
+
+def _save_through_handler(
+    app: S19TuiApp,
+    *,
+    primary: Path,
+    batch: tuple[str, ...] = (),
+    assignments: dict | None = None,
+):
+    """Drive ``_handle_save_dialog`` with a composed payload; return the pilot fn.
+
+    Builds an ``async`` driver that loads ``primary`` as the active variant and
+    invokes the real save handler with ``batch`` / ``assignments`` populated
+    programmatically (Inc-1: no UI). The caller wraps it in ``asyncio.run`` and
+    reads ``project.json`` off disk — exercising the WHAT through the shipped
+    surface, not the writer's direct kwargs (the SCOPE-1 hole).
+    """
+
+    async def _drive():
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.load_selected_file(primary)
+            await _flush(pilot)
+            payload = app_module.SaveProjectPayload(
+                parent_folder=str(app.workarea),
+                project_name="proj",
+                batch=batch,
+                assignments=assignments or {},
+            )
+            app._handle_save_dialog(payload)
+            await _flush(pilot)
+            return app.workarea / "proj"
+
+    return _drive
+
+
+def test_at017_1_save_persists_and_round_trips_composition(tmp_path: Path) -> None:
+    """AT-017.1 — a save through the handler persists batch+assignments, 0-drift.
+
+    Intent (HLR-017 / LLR-017.4): when the payload carries a project-wide
+    ``batch`` and a per-variant ``assignments`` entry, the SHIPPED save handler
+    writes them into ``project.json`` so that ``read_project_manifest`` re-reads
+    them EXACTLY (resolved against the project dir), the verify reports 0 drift
+    (clean "manifest verified" status, no mismatch notice), and
+    ``active_variant`` is preserved. RED pre-fix: the handler passed no kwargs,
+    so the on-disk ``batch`` / ``assignments`` were empty.
+    """
+    external = tmp_path / "a.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    statuses: list[str] = []
+    notices: list[tuple[str, str]] = []
+
+    app = S19TuiApp(base_dir=tmp_path)
+    # Pre-seed the project dir with a second variant + the assignable docs so
+    # the post-copy variant rebuild yields a >1 variant set and the entries
+    # resolve inside the work area.
+    project_dir = app.workarea / "proj"
+    project_dir.mkdir(parents=True, exist_ok=True)
+    (project_dir / "b.s19").write_text(S19_B, encoding="utf-8")
+    (project_dir / "doc.json").write_text("{}", encoding="utf-8")
+    (project_dir / "extra.json").write_text("{}", encoding="utf-8")
+
+    statuses = _statuses(app)
+    notices = _notices(app)
+    asyncio.run(
+        _save_through_handler(
+            app,
+            primary=external,
+            batch=("doc.json",),
+            assignments={"b": ("extra.json",)},
+        )()
+    )
+
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.issues == [], f"re-read must be clean; got {manifest.issues}"
+    assert manifest.batch == [(project_dir / "doc.json").resolve()], (
+        f"on-disk batch must equal the assigned file; got {manifest.batch}"
+    )
+    assert manifest.assignments == {
+        "b": [(project_dir / "extra.json").resolve()]
+    }, f"on-disk assignments[vid] must equal the assigned file; got {manifest.assignments}"
+    assert manifest.active_variant == (
+        app._variant_set.active_id if app._variant_set else None
+    ), "active_variant must be preserved across the composition save"
+    assert any("manifest verified" in m.lower() for m in statuses), (
+        f"a faithful composition save must verify 0-drift; got {statuses}"
+    )
+    assert not any("mismatch" in title.lower() for title, _ in notices), (
+        f"a faithful save must NOT raise a mismatch notice; got {notices}"
+    )
+
+
+def test_at017_2_e2e_consumer_pickup_through_handler(tmp_path: Path) -> None:
+    """AT-017.2 (e2e) — consumer applies a composition the HANDLER wrote.
+
+    Intent (HLR-017 / LLR-017.4, batch-16 G-3): close the consumer-pickup loop
+    end-to-end through the SHIPPED save handler — not the two-step
+    handler→disk + disk→consumer split (AT-017.1 + the consumer-contract guard
+    ``test_variant_execution.py::test_at017_2_consumer_pickup_of_saved_composition``).
+    The handler is driven with ``batch=("doc.json",)`` and
+    ``assignments={"b": ("extra.json",)}``; we re-read the HANDLER-WRITTEN
+    ``project.json`` via ``read_project_manifest`` (NOT a direct
+    ``write_project_manifest``) and feed it plus the post-save
+    ``ProjectVariantSet`` into ``plan_variant_executions(..., scope="all")``.
+    The assigned variant ``b``'s file tuple must EXACTLY equal
+    ``(doc.json, extra.json)`` (batch + assignment, LLR-006.2 inner order) and
+    the unassigned active variant must get batch only — so a wrong key or a
+    dropped list would change the tuple and fail. Handler-driven: pre-fix the
+    handler passed no kwargs (the SCOPE-1 hole) and the ATs TypeError; this
+    asserts GREEN over the shipped surface.
+    """
+    from s19_app.tui.services.variant_execution_service import (
+        SCOPE_ALL,
+        plan_variant_executions,
+    )
+
+    external = tmp_path / "a.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    app = S19TuiApp(base_dir=tmp_path)
+    # Pre-seed a second variant + the assignable docs so the post-copy variant
+    # rebuild yields a >1 variant set ('b' is real) and the entries resolve
+    # inside the work area.
+    project_dir = app.workarea / "proj"
+    project_dir.mkdir(parents=True, exist_ok=True)
+    (project_dir / "b.s19").write_text(S19_B, encoding="utf-8")
+    (project_dir / "doc.json").write_text("{}", encoding="utf-8")
+    (project_dir / "extra.json").write_text("{}", encoding="utf-8")
+
+    asyncio.run(
+        _save_through_handler(
+            app,
+            primary=external,
+            batch=("doc.json",),
+            assignments={"b": ("extra.json",)},
+        )()
+    )
+
+    # Re-read the manifest the HANDLER wrote (not a direct write_project_manifest).
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.issues == [], f"handler-written manifest must re-read clean; got {manifest.issues}"
+
+    # The post-save live variant set is the consumer's variant inventory.
+    vset = app._variant_set
+    assert vset is not None
+    plan = plan_variant_executions(vset, manifest, scope=SCOPE_ALL)
+    files_by_id = {variant.variant_id: files for variant, files in plan}
+
+    assert "b" in files_by_id, f"variant 'b' must be planned; got {list(files_by_id)}"
+    assert files_by_id["b"] == (
+        (project_dir / "doc.json").resolve(),
+        (project_dir / "extra.json").resolve(),
+    ), (
+        "the assigned variant's plan must be exactly batch + assignments[vid] "
+        f"in LLR-006.2 order; got {files_by_id['b']}"
+    )
+    # An unassigned variant (the active 'a') gets the project-wide batch only.
+    assert files_by_id[vset.active_id] == ((project_dir / "doc.json").resolve(),), (
+        "an unassigned variant must get batch only; got "
+        f"{files_by_id[vset.active_id]}"
+    )
+
+
+def test_at017_3_zero_selection_save_no_regression(tmp_path: Path) -> None:
+    """AT-017.3 — an empty payload writes empty batch/assignments, preserved.
+
+    Intent (HLR-017 zero-selection / LLR-017.1): a save that selects nothing
+    (default empty ``batch`` / ``assignments``) still succeeds, writes
+    ``batch == []`` / ``assignments == {}`` on disk, and preserves
+    ``active_variant`` — identical to the prior active-variant-only save. This
+    is a NO-REGRESSION guard, not a counterfactual.
+    """
+    external = tmp_path / "a.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    app = S19TuiApp(base_dir=tmp_path)
+    statuses = _statuses(app)
+    project_dir = asyncio.run(_save_through_handler(app, primary=external)())
+
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.issues == []
+    assert manifest.batch == []
+    assert manifest.assignments == {}
+    assert manifest.active_variant == (
+        app._variant_set.active_id if app._variant_set else None
+    )
+    assert any("manifest verified" in m.lower() for m in statuses), statuses
+
+
+def test_at017_4_escaping_assignment_refused_no_file_written(
+    tmp_path: Path,
+) -> None:
+    """AT-017.4 — an escaping assignment is refused: notice surfaced, no file.
+
+    Intent (HLR-017 security / LLR-017.4, D-SEC): an assignment entry that is
+    absolute or ``../``-escaping must drive the writer's ``_reject_unsafe_entry``
+    through the SHIPPED handler — surfacing a POSITIVE refusal observable (the
+    "Manifest write failed" error notice) AND leaving NO ``project.json`` behind
+    (not merely "no escaping entry in the file"). RED pre-fix: the handler
+    ignored assignments, so the refusal path never fired and no notice appeared.
+    """
+    external = tmp_path / "a.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    app = S19TuiApp(base_dir=tmp_path)
+    statuses = _statuses(app)
+    notices = _notices(app)
+    project_dir = asyncio.run(
+        _save_through_handler(
+            app,
+            primary=external,
+            assignments={"a": ("../../escape.json",)},
+        )()
+    )
+
+    assert not (project_dir / PROJECT_MANIFEST_NAME).exists(), (
+        "an escaping assignment must refuse the write — no project.json"
+    )
+    refusal_notices = [
+        (title, message)
+        for title, message in notices
+        if "manifest write failed" in title.lower()
+    ]
+    assert refusal_notices, (
+        f"an escaping assignment must surface a refusal notice; got {notices}"
+    )
+    assert any("mismatch" not in s.lower() for s in statuses)
+
+
+def test_at017_5_stem_collision_assignment_keyed_by_full_filename(
+    tmp_path: Path,
+) -> None:
+    """AT-017.5 — a stem-collision assignment round-trips under the full filename.
+
+    Intent (HLR-017 / D-KEY): a project with ``fw.s19`` + ``fw.hex`` collides on
+    the stem ``fw``, so each ``variant_id`` is the FULL FILENAME
+    (``workspace.build_variant_set``). Assigning to the full-filename id must
+    round-trip on disk AND be picked up by ``plan_variant_executions`` under
+    that full-filename key — proving the key is sourced from ``variant_id`` and
+    never recomputed as ``Path.stem`` (a stem key would silently drop). RED
+    pre-fix: empty manifest.
+    """
+    from s19_app.tui.services.variant_execution_service import (
+        SCOPE_ALL,
+        plan_variant_executions,
+    )
+    from s19_app.tui.workspace import build_variant_set, validate_project_files
+
+    external = tmp_path / "fw.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    app = S19TuiApp(base_dir=tmp_path)
+    project_dir = app.workarea / "proj"
+    project_dir.mkdir(parents=True, exist_ok=True)
+    # The colliding sibling + the assignable doc, pre-seeded in the work area.
+    (project_dir / "fw.hex").write_text(":00000001FF\n", encoding="utf-8")
+    (project_dir / "extra.json").write_text("{}", encoding="utf-8")
+
+    asyncio.run(
+        _save_through_handler(
+            app,
+            primary=external,
+            assignments={"fw.hex": ("extra.json",)},
+        )()
+    )
+
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.issues == []
+    assert manifest.assignments == {
+        "fw.hex": [(project_dir / "extra.json").resolve()]
+    }, f"the assignment must be keyed by the FULL filename id; got {manifest.assignments}"
+
+    data_files, _a2l, error = validate_project_files(project_dir)
+    assert error is None
+    vset = build_variant_set("proj", data_files)
+    assert "fw.hex" in {v.variant_id for v in vset.variants}
+    plan = plan_variant_executions(vset, manifest, scope=SCOPE_ALL)
+    files_by_id = {v.variant_id: files for v, files in plan}
+    assert files_by_id["fw.hex"] == ((project_dir / "extra.json").resolve(),), (
+        "consumer must pick up the collision-keyed assignment under the full id"
+    )
+
+
+# --------------------------------------------------------------------------- #
+# White-box TC-301/302/303 — payload carries fields; handler threads them.
+# --------------------------------------------------------------------------- #
+
+
+def test_tc301_payload_carries_batch_and_assignments() -> None:
+    """TC-301 / LLR-017.1 — the payload deep-equals constructed composition.
+
+    Intent: ``SaveProjectPayload`` carries ``batch`` / ``assignments``; omitted
+    ⇒ empty defaults (zero-selection identity).
+    """
+    payload = app_module.SaveProjectPayload(
+        parent_folder="p",
+        project_name="proj",
+        batch=("doc.json",),
+        assignments={"b": ("extra.json",)},
+    )
+    assert payload.batch == ("doc.json",)
+    assert payload.assignments == {"b": ("extra.json",)}
+
+    bare = app_module.SaveProjectPayload(parent_folder="p", project_name="proj")
+    assert bare.batch == ()
+    assert bare.assignments == {}
+
+
+def test_tc302_303_handler_threads_batch_assignments_to_write_and_verify(
+    tmp_path: Path,
+) -> None:
+    """TC-302/303 / LLR-017.2 — handler passes batch+assignments to write+verify.
+
+    Intent (R1): the save handler threads the SAME ``batch`` / ``assignments``
+    into BOTH ``write_project_manifest`` (TC-302) AND ``verify_written_manifest``
+    (TC-303) — mismatched intent would make verify report spurious drift. We
+    spy on both substrate functions through ``app_module`` and assert each
+    received the payload values.
+    """
+    external = tmp_path / "a.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    app = S19TuiApp(base_dir=tmp_path)
+    project_dir = app.workarea / "proj"
+    project_dir.mkdir(parents=True, exist_ok=True)
+    (project_dir / "b.s19").write_text(S19_B, encoding="utf-8")
+    (project_dir / "doc.json").write_text("{}", encoding="utf-8")
+    (project_dir / "extra.json").write_text("{}", encoding="utf-8")
+
+    write_calls: list[dict] = []
+    verify_calls: list[dict] = []
+    real_write = app_module.write_project_manifest
+    real_verify = app_module.verify_written_manifest
+
+    def _spy_write(variant_set, project_root, base_dir, **kwargs):
+        write_calls.append(kwargs)
+        return real_write(variant_set, project_root, base_dir, **kwargs)
+
+    def _spy_verify(project_dir_, variant_set, project_root, **kwargs):
+        verify_calls.append(kwargs)
+        return real_verify(project_dir_, variant_set, project_root, **kwargs)
+
+    app_module.write_project_manifest = _spy_write
+    app_module.verify_written_manifest = _spy_verify
+    try:
+        asyncio.run(
+            _save_through_handler(
+                app,
+                primary=external,
+                batch=("doc.json",),
+                assignments={"b": ("extra.json",)},
+            )()
+        )
+    finally:
+        app_module.write_project_manifest = real_write
+        app_module.verify_written_manifest = real_verify
+
+    assert write_calls, "write_project_manifest must be called"
+    assert verify_calls, "verify_written_manifest must be called"
+    assert write_calls[-1].get("batch") == ("doc.json",)
+    assert write_calls[-1].get("assignments") == {"b": ("extra.json",)}
+    # R1: identical intent threaded to verify.
+    assert verify_calls[-1].get("batch") == write_calls[-1].get("batch")
+    assert verify_calls[-1].get("assignments") == write_calls[-1].get("assignments")
+
+
+# --------------------------------------------------------------------------- #
+# Inc-2 / LLR-017.3 — the SaveProjectScreen assignment UI (screen-collect).
+# These pilots set up a multi-variant `_variant_set` + on-disk project dir
+# BEFORE `action_save_project` (F-Q-06 precondition / D-NEWPROJ timing), then
+# drive the screen's SelectionLists and capture the dismissed payload.
+# --------------------------------------------------------------------------- #
+
+
+def _make_project(app: S19TuiApp, name: str, files: dict[str, str]) -> Path:
+    """Create ``.s19tool/workarea/<name>/`` with the given text files."""
+    project_dir = app.workarea / name
+    project_dir.mkdir(parents=True, exist_ok=True)
+    for filename, content in files.items():
+        (project_dir / filename).write_text(content, encoding="utf-8")
+    return project_dir
+
+
+def _capture_save_payload(app: S19TuiApp) -> list:
+    """Spy on ``_handle_save_dialog`` so a screen-collect dismiss is captured.
+
+    Returns a list the patched handler appends the dismissed
+    ``SaveProjectPayload`` to (so a screen-driven Save can be asserted on
+    without re-running the file-copy write path).
+    """
+    captured: list = []
+    app._handle_save_dialog = lambda payload: captured.append(payload)  # type: ignore[method-assign]
+    return captured
+
+
+def test_tc304_screen_collects_per_variant_and_batch_assignment(
+    tmp_path: Path,
+) -> None:
+    """TC-304 / LLR-017.3 — golden: the screen collects a keyed assignment + batch.
+
+    Intent (HLR-017 / D-KEY): a re-save of an existing multi-variant project
+    renders per-variant assignment rows offering the project-relative ``.json``
+    docs. Selecting a per-variant file + a project-wide batch file and pressing
+    Save dismisses a ``SaveProjectPayload`` whose ``assignments`` is keyed by
+    the variant's ``variant_id`` (sourced from the variant set, NOT recomputed)
+    with the selected file, and whose ``batch`` carries the batch file.
+    """
+    external = tmp_path / "seed.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app,
+            "proj",
+            {
+                "a.s19": S19_A,
+                "b.s19": S19_B,
+                "doc.json": "{}",
+                "extra.json": "{}",
+                "project.json": "{}",
+            },
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            captured = _capture_save_payload(app)
+            app.action_save_project()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SaveProjectScreen)
+            screen.query_one("#project_name", Input).value = "proj"
+            # Variant ids the screen was wired with (sourced from the set).
+            variant_ids = [vid for vid, _display in screen.variants]
+            # Drive: batch picks doc.json; variant 'b' picks extra.json.
+            screen.query_one("#assign_batch", SelectionList).select("doc.json")
+            b_index = variant_ids.index("b")
+            screen.query_one(
+                f"#assign_{b_index}", SelectionList
+            ).select("extra.json")
+            await pilot.pause()
+            screen.query_one("#save_ok", Button).press()
+            await _flush(pilot)
+            return captured, variant_ids
+
+    captured, variant_ids = asyncio.run(_drive())
+    assert captured, "pressing Save must dismiss a payload"
+    payload = captured[-1]
+    assert variant_ids == ["a", "b"], f"variant ids from set, got {variant_ids}"
+    assert payload.batch == ("doc.json",), f"batch must carry the file; got {payload.batch}"
+    assert payload.assignments == {"b": ("extra.json",)}, (
+        f"assignment must be keyed by variant_id with the file; got {payload.assignments}"
+    )
+
+
+def test_tc305_screen_offers_only_in_project_candidate_files(
+    tmp_path: Path,
+) -> None:
+    """TC-305 / LLR-017.3 (escape) — the screen offers ONLY in-project files.
+
+    Intent (D-SCOPING): the assignment rows enumerate ONLY project-relative
+    ``.json`` documents from the project dir, never out-of-project paths — so a
+    selection that would escape is simply not offerable through the UI
+    (end-to-end refusal is AT-017.4). We seed a ``.json`` OUTSIDE the project
+    and assert it is absent from every SelectionList's candidate values, while
+    ``project.json`` is excluded too.
+    """
+    external = tmp_path / "seed.s19"
+    external.write_text(S19_A, encoding="utf-8")
+    # An out-of-project .json that must NOT be offered.
+    (tmp_path / "outside.json").write_text("{}", encoding="utf-8")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app,
+            "proj",
+            {
+                "a.s19": S19_A,
+                "b.s19": S19_B,
+                "doc.json": "{}",
+                "project.json": "{}",
+            },
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            app.action_save_project()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SaveProjectScreen)
+            candidates = list(screen.candidate_files)
+            # Values offered by the batch list (representative of every list).
+            batch_values = [
+                option.value
+                for option in screen.query_one(
+                    "#assign_batch", SelectionList
+                ).options
+            ]
+            return candidates, batch_values
+
+    candidates, batch_values = asyncio.run(_drive())
+    assert candidates == ["doc.json"], (
+        f"only the in-project .json is offered (project.json excluded); got {candidates}"
+    )
+    assert "outside.json" not in candidates, "out-of-project file must not be offered"
+    assert "../outside.json" not in batch_values
+    assert "project.json" not in batch_values
+    assert batch_values == ["doc.json"], f"offered values match candidates; got {batch_values}"
+
+
+def test_tc306_screen_no_selection_yields_empty_composition(
+    tmp_path: Path,
+) -> None:
+    """TC-306 / LLR-017.3 (empty) — no selection ⇒ empty batch/assignments.
+
+    Intent (HLR-017 zero-selection): pressing Save with no assignment selected
+    dismisses a payload with ``batch == ()`` / ``assignments == {}`` (the screen
+    collects nothing), and the dialog does not crash.
+    """
+    external = tmp_path / "seed.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app,
+            "proj",
+            {"a.s19": S19_A, "b.s19": S19_B, "doc.json": "{}"},
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            captured = _capture_save_payload(app)
+            app.action_save_project()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SaveProjectScreen)
+            screen.query_one("#project_name", Input).value = "proj"
+            screen.query_one("#save_ok", Button).press()
+            await _flush(pilot)
+            return captured
+
+    captured = asyncio.run(_drive())
+    assert captured, "pressing Save must dismiss a payload"
+    payload = captured[-1]
+    assert payload.batch == (), f"no selection ⇒ empty batch; got {payload.batch}"
+    assert payload.assignments == {}, (
+        f"no selection ⇒ empty assignments; got {payload.assignments}"
+    )

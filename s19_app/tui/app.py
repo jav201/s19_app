@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import time
-from typing import Any, List, Optional
+from typing import Any, List, Mapping, Optional, Sequence
 
 from textual import events, work
 from textual.app import App, ComposeResult
@@ -95,6 +95,7 @@ from .services.manifest_writer import (
 from .services.validation_service import build_validation_report
 from .services.variant_execution_service import (
     EXECUTION_SCOPES,
+    PROJECT_MANIFEST_NAME,
     SCOPE_ACTIVE,
     VariantExecutionResult,
     execute_project_variants,
@@ -2634,14 +2635,88 @@ class S19TuiApp(App):
             self.logger.exception("Failed to open workarea.")
 
     def action_save_project(self) -> None:
-        """Prompt to save current selection as a project."""
+        """
+        Summary:
+            Open the save dialog (HLR-017 / LLR-017.3). When re-saving an
+            existing multi-variant project (variant set known + a project dir
+            on disk), pass the variant ``(variant_id, display)`` pairs and the
+            enumerated project-relative ``.json`` candidate files so the screen
+            renders per-variant assignment rows; a brand-new project save (no
+            variant set) gets the bare dialog and writes empty composition
+            (D-NEWPROJ).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Build ``variants`` via ``_variant_display_options`` and
+              ``candidate_files`` via ``_assignment_candidate_files`` only when
+              ``_variant_set``/``current_project_dir`` are present.
+            - Push ``SaveProjectScreen`` with ``_handle_save_dialog`` as the
+              dismiss callback.
+
+        Dependencies:
+            Uses:
+                - ``_variant_display_options`` / ``_assignment_candidate_files``
+                - ``SaveProjectScreen`` / ``push_screen``
+            Used by:
+                - save-project keybinding / command palette entry
+        """
         if not self.current_file and not self.current_a2l_path:
             self.logger.info("Save project action triggered with no loaded files.")
         elif self.current_file:
             self.logger.info("Save project action triggered for %s", self.current_file.path)
         else:
             self.logger.info("Save project action triggered with A2L only.")
-        self.push_screen(SaveProjectScreen(self.workarea), self._handle_save_dialog)
+        variants: list[tuple[str, str]] = []
+        candidate_files: list[str] = []
+        variant_set = self._variant_set
+        if variant_set is not None and variant_set.variants:
+            variants = self._variant_display_options(variant_set)
+            candidate_files = self._assignment_candidate_files()
+        self.push_screen(
+            SaveProjectScreen(self.workarea, variants, candidate_files),
+            self._handle_save_dialog,
+        )
+
+    def _assignment_candidate_files(self) -> list[str]:
+        """
+        Summary:
+            Enumerate the project-relative ``.json`` change/check documents
+            assignable at save time (D-SCOPING), restricted to the current
+            project directory's work area and excluding ``project.json``
+            itself (LLR-017.3).
+
+        Args:
+            None
+
+        Returns:
+            list[str]: Sorted project-relative ``.json`` filenames in the
+            project dir, ``project.json`` excluded. Empty when no project dir
+            is known (a brand-new save) — the screen then renders no
+            assignment rows (D-NEWPROJ).
+
+        Data Flow:
+            - Glob ``current_project_dir`` for ``*.json``, drop
+              ``PROJECT_MANIFEST_NAME``, return the bare filenames (the
+              writer's ``_reject_unsafe_entry`` is the path-safety authority).
+
+        Dependencies:
+            Used by:
+                - ``action_save_project``
+        """
+        project_dir = self.current_project_dir
+        if project_dir is None or not project_dir.is_dir():
+            return []
+        names = [
+            item.name
+            for item in project_dir.glob("*.json")
+            if item.is_file() and item.name != PROJECT_MANIFEST_NAME
+        ]
+        return sorted(names)
 
     def action_load_project(self) -> None:
         """Prompt to load an existing project."""
@@ -3641,11 +3716,21 @@ class S19TuiApp(App):
             )
         else:
             self.set_status(f"Saved project to {project_dir}")
-        self._write_and_verify_manifest(project_dir)
+        self._write_and_verify_manifest(
+            project_dir,
+            batch=payload.batch,
+            assignments=payload.assignments,
+        )
         self.update_project_labels()
         self.refresh_files()
 
-    def _write_and_verify_manifest(self, project_dir: Path) -> None:
+    def _write_and_verify_manifest(
+        self,
+        project_dir: Path,
+        *,
+        batch: Sequence[str] = (),
+        assignments: Optional[Mapping[str, Sequence[str]]] = None,
+    ) -> None:
         """
         Summary:
             Persist the active project's ``project.json`` and verify-check the
@@ -3661,6 +3746,15 @@ class S19TuiApp(App):
         Args:
             project_dir (Path): The just-saved project directory the manifest is
                 written into (``project.json`` lands directly here).
+            batch (Sequence[str]): Project-wide change/check files as
+                project-relative path strings (HLR-017 / LLR-017.2). Threaded
+                IDENTICALLY into the write and the verify so the verify intent
+                matches the write intent (R1); defaults empty (zero-selection
+                save, unchanged active-variant-only behavior).
+            assignments (Optional[Mapping[str, Sequence[str]]]): Per-variant
+                change/check files keyed by ``variant_id``; same project-relative
+                strings, same identical threading into write + verify (R1).
+                ``None`` ⇒ empty assignments.
 
         Returns:
             None
@@ -3685,7 +3779,11 @@ class S19TuiApp(App):
         if variant_set is None:
             return
         written, issues = write_project_manifest(
-            variant_set, project_dir, self.base_dir
+            variant_set,
+            project_dir,
+            self.base_dir,
+            batch=batch,
+            assignments=assignments,
         )
         if written is None:
             detail = "; ".join(issue.message for issue in issues) or "unknown error"
@@ -3698,7 +3796,13 @@ class S19TuiApp(App):
             )
             self.logger.warning("Manifest write refused: %s", detail)
             return
-        result = verify_written_manifest(project_dir, variant_set, project_dir)
+        result = verify_written_manifest(
+            project_dir,
+            variant_set,
+            project_dir,
+            batch=batch,
+            assignments=assignments,
+        )
         self._surface_manifest_verify_result(result)
 
     def _surface_manifest_verify_result(

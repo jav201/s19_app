@@ -22,8 +22,9 @@
 
 ## P1 — High (process backstop + key feature)
 
-### C-1 — dev-flow-sync unfilled-template reject-check
-- **Flow:** direct(global ~/.claude). **Why P1:** the RC-1 backstop — batch-14 escaped via a blank Phase-4 artifact; this is the highest-value process fix and should land before the big feature batches so they run hardened. **Care:** match unfilled *structure* (placeholder tokens in required rows, empty required sections, 04-validation with no executed results), NOT token substrings — legit prose quotes `<P>`/`TC-NNN`.
+### C-1 — dev-flow-sync unfilled-template reject-check ✅ DONE (2026-06-25)
+- **Flow:** direct(global ~/.claude). **DONE:** `~/.claude/commands/dev-flow-sync.md` step 3 prose replaced with a concrete structural DETECT (empty required tables/sections, live placeholder tokens as field values, `04-validation.md` with no verdict+results) + anti-false-positive verify-before-block (quoted-guidance/code-fence/frontmatter-example hits are NOT blockers). Global config — not committed to this repo.
+- **Why P1 (was):** the RC-1 backstop — batch-14 escaped via a blank Phase-4 artifact; match unfilled *structure*, NOT token substrings (legit prose quotes `<P>`/`TC-NNN`).
 
 ### GAP #2 — per-variant file-assignment surface + manifest persistence
 - **Flow:** /dev-flow (own batch, scope-first). **Why P1 (after US-015):** net-new feature, larger. PREMISE-CORRECTED — not a wiring fix: TUI save holds no batch/assignments state and there's no per-variant assign surface; `assignments` = *additional* per-variant files (change/check docs), not the primary image. Live: `_write_and_verify_manifest` (`app.py:3548/3591`) writes no batch/assignments; execution service consumes them (`variant_execution_service.py:586-602`).
@@ -48,8 +49,12 @@
 ### C-6 — retire provisional TC-230/231 ids in REQUIREMENTS.md / dev-flow docs
 - **Flow:** direct. Doc cleanup.
 
-### C-10 — formalize the "AT-subsumes-TC" criterion in the dev-flow
-- **Flow:** direct(global ~/.claude). An AT subsumes a planned white-box TC iff it drives the exact mechanism with no mock AND exercises every named LLR boundary.
+### C-10 — AT-authoring discipline ✅ DONE (2026-06-25, reframed) + C-11 ✅ DONE
+- **DONE:** encoded in `~/.claude/commands/dev-flow.md` two-layer section — (a) no default-value-reliant pilots (drive a non-default value / cycle off-and-back); (b) one AT per policy branch, asserting *content*. **C-11 ownership** also DONE (qa authors at Phase 1/3; Phase-2 + code-review treat violations as findings).
+- **NOTE — original framing superseded:** the first C-10 ("formalize AT-*subsumes*-TC: an AT may replace a TC iff it drives the exact mechanism") was deliberately NOT implemented — the batch-14 post-mortem found AT and TC catch *different* failure classes (the AT caught C3 the TCs structurally couldn't; the AT layer carried the first-cut defects the TCs didn't). Layers kept INDEPENDENT, not consolidated. Documented decision, not an omission.
+
+### RC-1 — Phase-0 base-currency gate ✅ DONE (2026-06-25)
+- **DONE:** `~/.claude/commands/dev-flow.md` Phase 0 — `git fetch` + assert merge-base == origin/main tip (rebase if stale) + per-story already-shipped grep → drop SATISFIED-EXTERNALLY at Phase 0. Global config. The headline batch-14 lesson.
 
 ---
 

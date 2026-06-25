@@ -1,0 +1,144 @@
+{
+    "project": "s19_app",
+    "language": "en",
+    "batch_id": "2026-06-23-batch-14",
+    "batch_objective": "Cluster 1 data fidelity — US-015: S19 emitter gains a 16/32 data-bytes-per-record selector (DEFAULT 32, 16 opt-in) + a populated S0 header in 32-byte mode (preserve captured source S0 via load_service seam, else synthesize), parametrizing emit_s19_from_mem_map (tui/changes/io.py:1409, outside engine-frozen set) and threading the choice through the TUI save flows (patch-editor save-back + project save); reader-as-oracle byte-equality + negative control + cross-format integrity (S19<->HEX round-trip, TC-226). US-016 (A2B compare load-failure) is SATISFIED externally by batch-15 (main 9169130, REQUIREMENTS §20 R-DIFF-LOADFAIL-001) — kept for traceability, no duplicate work; its hex-window-content AT coverage gap is backlog C-9.",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 1, "4": 0, "5": 0, "6": 0},
+    "artifacts": {
+        "1": ".dev-flow/2026-06-23-batch-14/01-requirements.md",
+        "2": ".dev-flow/2026-06-23-batch-14/02-review.md",
+        "backlog": ".dev-flow/BACKLOG.md"
+    },
+    "branch": "claude/batch-14-us015 (cut fresh off origin/main 9169130 = batch-15 PR#20 + audit-gaps PR#21; batch-14 spec carried over and rebased atop the shipped US-016 — continuity per operator, NOT a restart)",
+    "previous_batches": [
+        "2026-05-05-batch-01",
+        "2026-05-20-batch-02",
+        "2026-05-21-batch-03",
+        "2026-05-21-batch-04",
+        "2026-05-26-batch-05",
+        "2026-06-09-batch-06",
+        "2026-06-10-batch-07",
+        "2026-06-11-batch-08",
+        "2026-06-11-batch-09",
+        "2026-06-13-batch-10",
+        "2026-06-14-batch-11",
+        "2026-06-16-batch-12",
+        "2026-06-17-batch-13",
+        "2026-06-24-batch-15"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. NOTE chronology: batch-14 (2026-06-23) was scaffolded before batch-15 (2026-06-24) but never committed; batch-15 merged first (PRs #20/#21). batch-14 now RESUMES atop main-incl-batch-15. batch-15 closing state snapshotted to .dev-flow/2026-06-24-batch-15/state-snapshot-at-close.json (was absent on origin/main) before the shared state.json was reset to batch-14.",
+    "living_documentation": {
+        "requirements": "REQUIREMENTS.md (repo root)",
+        "tests": "tests/",
+        "diagrams": "docs/diagrams/",
+        "plan": ".dev-flow/2026-06-23-batch-14/PLAN.md",
+        "backlog": ".dev-flow/BACKLOG.md (cross-batch prioritized queue)"
+    },
+    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py (git-frozen by _ENGINE_PATHS: test_engine_unchanged.py + test_tui_directionb.py::test_tc031_*). US-015 emission stays in tui/changes/io.py (outside). S0 capture READS core.py::S19File.records only (no write to frozen reader).",
+    "carried_context": {
+        "us016_satisfied": "A2B compare load-failure fix shipped in batch-15 (main 9169130, REQUIREMENTS §20 R-DIFF-LOADFAIL-001, PR #20, app.py _diff_load_maps). batch-14 does NOT re-implement it. Coverage gap (hex-window content AT) tracked as backlog C-9.",
+        "us015_unbuilt_confirmed": "Re-verified on current main 9169130: emit_s19_from_mem_map io.py:1409 has NO bytes_per_line param; 16-byte hardcode range(start,end,16) io.py:1473; empty S0 _s19_record('S0',2,0,()) io.py:1471. Net-new feature, never built (matches memory project_blackbox_gap_audit premise correction).",
+        "suite_baseline": "RE-MEASURED on current main 9169130: 903 collected (was 894 on stale aeb8da0; +9 from batch-15 + PR#21 ATs: test_tui_diff_screen / test_tui_report_seam / test_tui_evidence_packs). batch-14 ledger baseline = 903.",
+        "blast_radius_recheck": "D2 HOLDS on current main: 0 tests assert a 16-byte S19 ROW WIDTH (every S19 test checks record TYPE or re-parses for mem_map equality, invariant under the 16->32 default flip). The new batch-15/PR#21 test files do not touch S19 emission width. The only 16-byte-max assertion is the Intel-HEX emitter (out of scope).",
+        "phase1_status": "Phase 1 COMPLETE (iter-2, two-layer-model fold). 2 HLR / 7 LLR / TC-212..226 + black-box AT-015.1/.2/.3 + AT-016.1/.2. D1 header preserve-or-synthesize (no frozen edit), D2 flip safe, D3 US-016 display-side. Operator D1 cosmetic CONFIRMED + D2 cross-format integrity TC-226 added (§6.6 J-1/J-2/J-3). Anchors re-verified on current main (io.py:1409/1471/1473 exact; emit_intel_hex_from_mem_map io.py:1533).",
+        "process_carry_partB": "A2B test-escape lesson (diff engine tested, shipped load path not) is now embodied in main via batch-15's retro AT + the updated two-layer dev-flow model. The /dev-flow-sync reject-check (backlog C-1, global config) remains owed.",
+        "obsidian_synced_b15_pending": "batch-15 state.json obsidian_synced=false; operator carry = flip true + commit (ride into batch-14's first commit, batch-13 pattern). Will confirm batch-15 vault-sync status at commit time before asserting true — not silently flipped.",
+        "backlog_priority": "P0 US-015 (this batch) -> P1 C-1 + GAP#2 -> P2 C-9 + 4a ruff + obsidian flip -> P3 C-6 + C-10. See .dev-flow/BACKLOG.md."
+    },
+    "decisions_log": [
+        {
+            "phase": 6,
+            "date": "2026-06-25",
+            "decision": "synced-to-obsidian",
+            "notes": "Batch-14 MERGED to main (PR #22, merge commit b734c19) after tui-ci PASS (7m29s) + integrated PR review APPROVE-MERGE. /dev-flow-sync run: copied 01-requirements/02-review/04-validation/05-postmortem + 06-docs/ (NO 03-increments) to G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-23-batch-14\\; generated 2026-06-23-batch-14-README.md (metrics frontmatter + body); Dashboard.md already existed (untouched); 0 mojibake, UTF-8. obsidian_synced flipped true (this local flip is uncommitted — rides into the next batch's first commit per the batch-13 pattern). BATCH-14 FULLY CLOSED + SYNCED."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-25",
+            "decision": "close-batch-phase6-complete-content-closed-pushing-PR",
+            "notes": "Operator: 'proceed with close batch. Make sure changes are reviewed and merged (PR review and merge) and finally /dev-flow-sync.' Phase 5 APPROVED (close batch) + post-mortem committed 25421cd. Phase 6 docs (docs-writer + presentation-builder): REQUIREMENTS.md §21 (R-S19-WIDTH-001 / R-S19-S0HEADER-001 / R-S19-SAVE-REUSE-001, Automated, living-doc 'must' format matching §19/§20) + 06-docs/ (traceability-matrix dual-chain, functionality operator walkthrough, diagrams/batch-14-flows Mermaid, executive-summary ~1.5pp). LEAK FIXED: presentation-builder wrote executive-summary to the MAIN checkout path; moved into the worktree + removed the stray untracked subtree from main checkout. ORCHESTRATOR verified: §21+3 R-* present, 4 06-docs files in worktree, Mermaid present, all 8 cited test nodes EXIST on disk (anti-fabrication), UTF-8 no-BOM, git diff = REQUIREMENTS.md + .dev-flow only (0 prod/frozen edits). N-2 spec node-name reconciled to live names in docs. Batch-14 CONTENT CLOSED. Next: commit Phase 6 -> push claude/batch-14-us015 -> PR to main -> review + CI (tui-ci) -> merge -> /dev-flow-sync (flips obsidian_synced). Full batch: 6 phases, 3 increments, 903->922 (+19), 890/0, PASS, 0 defects, 0 frozen edits."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-24",
+            "decision": "awaiting-gate",
+            "notes": "PRE-DECISION. Phase 4 APPROVED + committed 416c8f5 (test hardening + app.py docstring) + 9f45a6d (04-validation). Phase 5 (architect + qa co-author) -> 05-postmortem.md. HEADLINE: closed clean, PASS-WITH-NOTES, 0 defects, 3 increments, ledger 903->922, 0 frozen edits. TOP 3 LESSONS: (1) RC-1 STALE-BASE scaffolding — batch-14 scaffolded off stale main aeb8da0 while origin/main advanced to 9169130 (US-016 shipped batch-15, audit closed); required mid-flight rebase + US-016 drop (a full Phase-1 spec written for an already-shipped story); recovery clean but detection late -> NEW Phase-0 base-currency gate (git fetch + merge-base assert + per-story already-shipped grep). (2) Two-layer model earned its keep (AT caught C3 selector-blind class TCs structurally can't) BUT its first cut had F1 (default-value reliance) + F2 (preserve leg unobserved) holes — caught by CODE-REVIEW not QA -> C-10 AT-authoring anti-patterns + C-11 ownership. (3) b12 controls pre-code: consumer-input-contract -> C1 (TypeError-on-HEX averted); A-5 -> C2 (CRC third surface); Amendment B draft-time premise correction via §6.5. METRICS iters {0:1,1:2,2:1,3:1,4:1}; 0 blocker/4 major/9 minor all closed; code-review 3/3 no HIGH/MED; ledger 903->922; full 890/0; 0 frozen. CARRIES: NEW RC-1 base-currency gate (global), C-10/C-11 AT-authoring (global), CRC-width AT (latent LOW), N-2 spec node-name align (Phase 6); existing C-1/GAP#2/C-9/C-7/C-6 unchanged; keep AT+TC independent (do NOT consolidate). Awaiting Phase 5 gate (close batch / open new batch / iterate)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-24",
+            "decision": "awaiting-gate-PASS-WITH-NOTES",
+            "notes": "PRE-DECISION. Phase 3 Inc3 APPROVED + committed ff3ad12 (code) + 3ee26cd (docs) -> PHASE 3 COMPLETE. Phase 4 (qa-reviewer) -> 04-validation.md. VERDICT PASS-WITH-NOTES, 0 FAIL/0 blockers. STEP1 closed 3 binding hardening: F1 (AT-015.1 now cycles selector 32->16->32, dead button fails it), F2 (NEW preserve-leg AT test_saveback_width_32_preserves_source_s0_header:1198 — content-bearing source S0 round-trips to disk, asserts emitted S0==source not synth-filename; + app.py docstring note empty-S0->synth), F3 (trimmed comment). STEP2 full suite: pytest -q 890 passed/29 skip/3 xfail/0 fail (922 collected); -m 'not slow' 869/0. Ledger 903+18+1(F2)=922 EXACT. STEP3 04-validation.md (162 lines): HLR-015 + LLR-015.1-.5 all PASS on real reconciled nodes (provisional TC-212..226 -> actual test_tc* names; V-5 incl engine-guard name fix test_tc031->live names); Layer B 4/4 AT PASS (015.1/.2-cross-format/.3 + preserve-leg); A-5 matrix incl C2 CRC inheritance row (crc.py:879 inherits 32, safe per test_crc_operation.py:345 + 21 CRC tests green); reverse-edge 0; invariants hold (reader-as-oracle data-record-map, TC-218 neg control, TC-226 cross-format, C4 ≤252, C1 HEX-unaffected); 0 engine-frozen edits vs origin/main. NON-BLOCKING: N-1 pre-existing app.py/change_service F401 (batch-15 C-7, not introduced); N-2 provisional engine-guard node name reconciled. ORCHESTRATOR spot-check: preserve-leg AT on disk, 922 collected, 0 frozen diff, 04-validation valid UTF-8. Phase-4 working tree (test+app.py-docstring+04-validation+state) NOT committed. Awaiting Phase 4 gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc3-implemented-awaiting-gate-PHASE-3-COMPLETE-on-approval",
+            "notes": "Inc3 (US-015 selector UI + S0 policy + C3 pilot, FINAL) implemented by software-dev: 3 files. screens_directionb.py SAVEBACK_WIDTHS=(32,16) cycling Width button (default 32, reset-on-show) + bytes_per_line additive on SaveBackDecision; app.py _synth_s0_header_from_filename (<=252 ascii) + save-back handler reads event.bytes_per_line, preserve(source_s0_header)/synthesize/empty S0 policy, threads both params (closes F1); test_tui_patch_editor_v2.py AT-015.1 (32) + AT-015.3 (16) pilots reading written .s19 off disk via frozen S19File. code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/3 LOW; C3 pilot genuine black-box = YES (AT pair, no stub). 3 LOW carried to Phase 4 as BINDING hardening: F1 (AT-015.1 asserts on default value -> tighten to cycle selector off+back), F2 (preserve leg unit-tested at load seam but not black-box -> add preserve-leg AT + document empty-S0->synth semantics), F3 (trim comment). ORCHESTRATOR spot-check: diff=3 files (0 frozen), pilots on disk, selector wired, app.py ruff=6 pre-existing C-7 (0 introduced), 15 collected. LEDGER 919->921 (+2). Full regression 868/0. PHASE 3 COMPLETE on approval: Inc1+Inc2+Inc3, ledger 903->921 (+18), 0 frozen edits. NOT committed. Awaiting Inc3 gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc2-approved-committed-Inc3-started",
+            "notes": "Inc2 APPROVED ('approve') + committed d464464 (code) + 9520453 (docs). Tree clean atop 9169130, not pushed. Inc3 (FINAL increment) dispatched: {16,32} selector UI in screens_directionb.py (default 32) + wire choice from app.py save-back handler (closes code-reviewer F1 silent-default-32) + preserve/synthesize S0 policy (32-mode: source_s0_header from current LoadedFile if present, else synthesize minimal from dest filename bounded<=252; 16-mode: None=empty S0) + C3 black-box pilot AT-015.1 via run_test driving the selector. C2 (CRC->32) no code (inherits default). Ledger base 919."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc2-implemented-awaiting-gate",
+            "notes": "Inc2 (US-015 backend save-flow threading) implemented by software-dev: 4 files. apply.py save_patched_image +bytes_per_line/s0_header passed to emit() ONLY under source_kind=='s19' (C1, apply.py:701); change_service.save_patched +params forwarded (two-hop F-A-05); variant_execution_service:711 passes bytes_per_line=32; tests TC-219 (S19 thread) + TC-220 (through change_service) + TC-220b (HEX unaffected — real TypeError guard outside try/except). code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/2 LOW (F1 app.py:1428 caller silent-default-32 = expected Inc3 carry; F2 explicit-32 redundant leave). C1 CLOSED = YES (HEX save-back provably works). ORCHESTRATOR spot-check: diff=4 files (0 frozen), C1 branch at apply.py:701, TC-219/220/220b on disk, 41 collected. LEDGER 916->919 (+3). Pre-existing ruff F401 typing.List change_service.py:38 (batch-15 carry C-7, NOT introduced — git-stash confirmed). NOT committed. Awaiting Inc2 gate. Inc3 = selector UI + preserve/synthesize S0 + C3 pilot AT (FINAL increment)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc1-approved-committed-Inc2-started",
+            "notes": "Inc1 APPROVED ('approve') + Amendment B RATIFIED. Committed in 2: 12e91a7 (code: io.py/models.py/load_service.py/test_changes_apply.py) + ca0e042 (docs: batch-14 artifacts + batch-15 close snapshot w/ obsidian_synced ride-along flipped true per operator carry + batch-13 pattern). On branch claude/batch-14-us015 atop 9169130; NOT pushed. SCOPE REFINEMENT (≤5-file discipline): original Inc2 (4 source + 2 test files = 6) SPLIT -> Inc2 backend save-flow threading (apply.py save_patched_image +bytes_per_line/s0_header S19-BRANCH-ONLY per C1 + change_service.save_patched two-hop F-A-05 + variant_execution_service:711 + test_changes_apply TC-219/220 + C1 HEX-unaffected; 4 files) and Inc3 selector UI + preserve/synthesize S0 policy + C3 pilot AT-015.1 (screens_directionb selector + app.py wire + change_service synth helper + test_tui_patch_editor_v2 pilot; ≤5). C2 (CRC->32) needs NO code edit — crc.py:879 inherits the new 32 default; document in A-5 only. Inc2 dispatched."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc1-implemented-awaiting-gate",
+            "notes": "Inc1 (US-015 emitter+S0 data layer) implemented by software-dev: 4 source/test files + §6.5 spec amendments (≤5). emit_s19_from_mem_map +bytes_per_line{16,32} default 32 (validate-at-entry F-S-03) + s0_header bytes|None populated≤252 else ValueError (C4) else empty; docstring fixed (F-A-04). LoadedFile +source_s0_header (additive). build_loaded_s19 captures first S0 (read-only). Tests TC-212..218/226 + C4 overflow + F-Q-05 HEX-unmodified + S0-capture (TC-218 corrupts a DATA byte per F-Q-06). code-reviewer APPROVE 0 HIGH/0 MED/2 LOW; Amendment B verified correct + safe = YES. ORCHESTRATOR spot-check: diff = 4 Inc1 files only (0 frozen), all 14 TC functions exist on disk, get_memory_map (core.py:485) confirmed folds all records (Amendment B true), 38 collected, ruff clean. LEDGER 903->916 (+13). Full non-slow suite 863/0. AMENDMENT B (RATIFY): 'S0 adds 0 addresses' was FALSE; oracle uses data-record-only map; integrity (data records byte-equal) preserved; binds Inc2 AT oracles. Amendment A: C4 S0≤252 new threshold on LLR-015.2. NOT committed. Awaiting Inc1 gate + Amendment-B ratification."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "phase2-approved-phase3-started-Inc1",
+            "notes": "Operator: 'approve' at Phase-2 gate. 0 blockers -> advance. The 4 majors + 9 minors are BINDING implementation constraints (recorded in 02-review.md), carried into the increments they touch (Inc1: C4 S0<=252 bound, F-S-03 validate-before-emit, F-Q-06 TC-218 corrupt-data-byte, F-Q-05 HEX-unmodified guard, F-A-04 docstring; Inc2: C1 S19-branch-only dispatch, C2 CRC accept->32 + A-5 row, C3 selector-widget pilot AT, F-A-05 two-hop threading). The one LLR-threshold change (C4) recorded via §6.5 Before/After amendment in Inc1. TOOLCHAIN GATE PASS: python 3.14.4, pytest 9.0.3, ruff 0.8.4. Baseline 903. Inc1 = emitter+S0 data layer (io.py emit_s19_from_mem_map +bytes_per_line{16,32} default 32 validate-at-entry + s0_header bytes|None populated<=252 else empty + docstring; models.py LoadedFile +source_s0_header; load_service.py capture S0 from S19File.records; tests TC-212..218/226 + C4 overflow + capture). <=5 files, outside frozen set, no commit. code-reviewer before Inc1 gate."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-24",
+            "decision": "awaiting-gate-0-blocker-4-major",
+            "notes": "PRE-DECISION. Phase 2 cross-review (architect ∥ qa ∥ security) on US-015 only (US-016 out-of-scope, banner in §3) -> 02-review.md. Aggregate 0 BLOCKER / 4 major / 9 minor / 3 security clearances. Security sign-off ADVISORY (apply.py:687-692 — content-only change through secured copy_into_workarea seam; no new write target). shall/should CLEAN. Census CLEAN (all 8 planned files outside both frozen guard lists; F-A-02 minor citation fix). 4 MAJORS, 2 raised by BOTH architect+qa (high signal): C1 (F-A-01#1+F-Q-01) polymorphic _SAVE_BACK_EMITTERS dispatch apply.py:687 shared S19+HEX -> new kwargs must be S19-branch-only + TC proving HEX save-back unaffected; C2 (F-A-01#2+F-Q-02) third S19 surface crc.py:879 inherits new 32 default silently -> ACCEPT CRC->32 (uniform, D2-safe, no CRC width test) + A-5 row; C3 (F-Q-03) AT-015.1/.3 realized by service-level TCs not a selector-widget Pilot -> add run_test pilot AT for AT-015.1 (two-layer through-shipped-surface); C4 (F-S-02) S0 payload unbounded vs single-byte byte_count {:02X} io.py:1511 -> bound len<=252 + TC. 9 minors: F-A-02 frozen-citation (6 vs 7 paths), F-A-03 SaveBackDecision :477 not :707, F-A-04 emitter docstring stale, F-A-05 D1 two-hop threading (change_service:860 + save_patched_image:574 + variant_execution:711; Inc2 = exactly 5 files), F-Q-04 LLR-015.x->LLR-015.5 + pin guard -k, F-Q-05 AT-015.2 HEX-unmodified needs guard/soften, F-Q-06 TC-218 corrupt a DATA byte not inert S0, F-Q-07 V-5 test-file reconciliation row, F-S-03 validate-before-emit. ALL 3 reviewers recommend proceed-after-light-fold; dispositions are reviewers' own prescriptions (LLR/AC edits, no re-derivation, no design change, increment plan unchanged). ORCHESTRATOR RECOMMENDS iterate-light. Awaiting operator Phase-2 gate decision."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-24",
+            "decision": "rebased-onto-main-awaiting-phase1-gate",
+            "notes": "Operator: 'all confirmed, continue' (priority order + US-015 continuation mechanics approved). EXECUTED the mechanics: backed up batch-14 artifacts, cut fresh branch claude/batch-14-us015 off origin/main 9169130, carried .dev-flow/2026-06-23-batch-14/ + BACKLOG.md over, snapshotted batch-15 state into its folder, reset shared state.json to batch-14. RE-CONFIRMED vs current main (the operator-required re-verify): US-015 unbuilt (io.py:1409 no bytes_per_line, 16-hardcode :1473, empty S0 :1471); baseline 894->903; blast radius still nil (0 16-byte-row-width tests); spec anchors hold (incl emit_intel_hex_from_mem_map io.py:1533 for TC-226). US-016 confirmed satisfied in main §20 — no duplicate. NO code/commits. Resuming at the Phase-1 gate (iter-2 spec) for approve->Phase 2."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-24",
+            "decision": "continue-not-pivot-unified-backlog",
+            "notes": "Operator: 'don't pivot, continue + add the last changes to the backlog, prioritize the whole set; the first batch has critical items.' Created .dev-flow/BACKLOG.md unifying batch-14 + all audit carries (P0 US-015; P1 C-1 + GAP#2; P2 C-9 + 4a + obsidian flip; P3 C-6 + C-10). US-016 marked SATISFIED (main §20). US-015 = the critical live batch-14 item == backlog P0. Operator approved the priority order + continuation mechanics ('all confirmed, continue')."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-23",
+            "decision": "iteration-2-completed-two-layer-fold",
+            "notes": "Phase 1 iter-2: /dev-flow process updated mid-batch (mandatory black-box AT-NNN layer). Added §3 Acceptance blocks AT-015.1/.2/.3 + AT-016.1/.2; TC-226 cross-format integrity (operator D2); D1 cosmetic confirmation (operator). §5.2 dual-traceability, §5.3 +items 10/11, §6.6 audit J-1/J-2/J-3. 2 HLR/7 LLR unchanged. Verified: AT blocks present, NEW symbols absent, anchors exist, 0 should-in-statement, valid UTF-8."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-23",
+            "decision": "batch-14-opened-stories-ready",
+            "notes": "Operator invoked /dev-flow with functional-testing observations + questions. 5 Explore agents grounded all + answered Q1-Q4. Operator picked Cluster 1; legend Q1/Q2 -> batch-15+ backlog; BPL default 32; selector surface = TUI save flows. US-015 + US-016 classified READY. Phase 0 DoR approved. Phase 1 (architect + qa-reviewer) -> 2 HLR/7 LLR/TC-212..225, baseline (then) 894, both verify items resolved favorably (D1 no frozen edit, D2 flip safe)."
+        }
+    ],
+    "obsidian_synced": true,
+    "created_at": "2026-06-23T15:00:00-06:00"
+}
