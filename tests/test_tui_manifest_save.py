@@ -407,6 +407,78 @@ def test_at017_1_save_persists_and_round_trips_composition(tmp_path: Path) -> No
     )
 
 
+def test_at017_2_e2e_consumer_pickup_through_handler(tmp_path: Path) -> None:
+    """AT-017.2 (e2e) — consumer applies a composition the HANDLER wrote.
+
+    Intent (HLR-017 / LLR-017.4, batch-16 G-3): close the consumer-pickup loop
+    end-to-end through the SHIPPED save handler — not the two-step
+    handler→disk + disk→consumer split (AT-017.1 + the consumer-contract guard
+    ``test_variant_execution.py::test_at017_2_consumer_pickup_of_saved_composition``).
+    The handler is driven with ``batch=("doc.json",)`` and
+    ``assignments={"b": ("extra.json",)}``; we re-read the HANDLER-WRITTEN
+    ``project.json`` via ``read_project_manifest`` (NOT a direct
+    ``write_project_manifest``) and feed it plus the post-save
+    ``ProjectVariantSet`` into ``plan_variant_executions(..., scope="all")``.
+    The assigned variant ``b``'s file tuple must EXACTLY equal
+    ``(doc.json, extra.json)`` (batch + assignment, LLR-006.2 inner order) and
+    the unassigned active variant must get batch only — so a wrong key or a
+    dropped list would change the tuple and fail. Handler-driven: pre-fix the
+    handler passed no kwargs (the SCOPE-1 hole) and the ATs TypeError; this
+    asserts GREEN over the shipped surface.
+    """
+    from s19_app.tui.services.variant_execution_service import (
+        SCOPE_ALL,
+        plan_variant_executions,
+    )
+
+    external = tmp_path / "a.s19"
+    external.write_text(S19_A, encoding="utf-8")
+
+    app = S19TuiApp(base_dir=tmp_path)
+    # Pre-seed a second variant + the assignable docs so the post-copy variant
+    # rebuild yields a >1 variant set ('b' is real) and the entries resolve
+    # inside the work area.
+    project_dir = app.workarea / "proj"
+    project_dir.mkdir(parents=True, exist_ok=True)
+    (project_dir / "b.s19").write_text(S19_B, encoding="utf-8")
+    (project_dir / "doc.json").write_text("{}", encoding="utf-8")
+    (project_dir / "extra.json").write_text("{}", encoding="utf-8")
+
+    asyncio.run(
+        _save_through_handler(
+            app,
+            primary=external,
+            batch=("doc.json",),
+            assignments={"b": ("extra.json",)},
+        )()
+    )
+
+    # Re-read the manifest the HANDLER wrote (not a direct write_project_manifest).
+    manifest = read_project_manifest(project_dir)
+    assert manifest is not None
+    assert manifest.issues == [], f"handler-written manifest must re-read clean; got {manifest.issues}"
+
+    # The post-save live variant set is the consumer's variant inventory.
+    vset = app._variant_set
+    assert vset is not None
+    plan = plan_variant_executions(vset, manifest, scope=SCOPE_ALL)
+    files_by_id = {variant.variant_id: files for variant, files in plan}
+
+    assert "b" in files_by_id, f"variant 'b' must be planned; got {list(files_by_id)}"
+    assert files_by_id["b"] == (
+        (project_dir / "doc.json").resolve(),
+        (project_dir / "extra.json").resolve(),
+    ), (
+        "the assigned variant's plan must be exactly batch + assignments[vid] "
+        f"in LLR-006.2 order; got {files_by_id['b']}"
+    )
+    # An unassigned variant (the active 'a') gets the project-wide batch only.
+    assert files_by_id[vset.active_id] == ((project_dir / "doc.json").resolve(),), (
+        "an unassigned variant must get batch only; got "
+        f"{files_by_id[vset.active_id]}"
+    )
+
+
 def test_at017_3_zero_selection_save_no_regression(tmp_path: Path) -> None:
     """AT-017.3 — an empty payload writes empty batch/assignments, preserved.
 

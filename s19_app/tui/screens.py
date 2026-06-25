@@ -274,8 +274,7 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
     def _collect_composition(
         self,
     ) -> Tuple[Tuple[str, ...], dict]:
-        """Read the assignment SelectionLists into ``(batch, assignments)``.
-
+        """
         Summary:
             Collect the project-wide batch selection and each per-variant
             selection into a payload composition (LLR-017.3). Returns empty
@@ -290,6 +289,22 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
             Tuple[Tuple[str, ...], dict]: ``(batch, assignments)`` where
             ``batch`` is project-relative filename strings and ``assignments``
             maps ``variant_id`` → tuple of filename strings.
+
+        Data Flow:
+            - Short-circuit to ``((), {})`` when ``_assignment_rows_enabled``
+              is false (the assignment section was not rendered, D-NEWPROJ).
+            - Read the ``#assign_batch`` SelectionList's ``selected`` into the
+              project-wide ``batch`` tuple.
+            - For each ``(variant_id, _display)`` in ``self.variants``, read the
+              row-indexed ``#assign_<index>`` SelectionList; key non-empty
+              selections under ``variant_id`` (D-KEY), omit empty ones.
+
+        Dependencies:
+            Uses:
+                - self.variants (variant_id source, D-KEY)
+                - textual.widgets.SelectionList (queried by id)
+            Used by:
+                - SaveProjectScreen.on_button_pressed (Save dismiss path)
         """
         if not self._assignment_rows_enabled:
             return (), {}
