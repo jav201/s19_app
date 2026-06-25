@@ -2626,3 +2626,135 @@ gate).
   paths is empty, confirmed by the `test_tc027_*` / `test_tc031_*` / `test_tc032_*`
   guards. A-5 surface-reachability: the C1 isolation is exercised through the HEX
   save branch, confirming the S19-only kwarg does not leak into the HEX writer.
+
+---
+
+# 22. Per-variant File-Assignment at Project Save (batch-16)
+
+The batch (`2026-06-25-batch-16`, US-017) **closes batch-11 SCOPE-1**: the project
+save now persists a project-wide `batch` list and a per-variant `assignments` map
+(keyed by `variant_id`) into `project.json`, alongside the pre-existing
+`active_variant`. Pre-batch-16 the save handler passed neither dimension and there
+was no assignment UI, so the manifest writer / verifier / consumer — which already
+accepted `batch`/`assignments` — were reachable only by direct service kwargs in
+tests (`test_manifest_verify.py`), never through the shipped save surface; the
+saved artifact therefore carried only `active_variant`. The fix threads the
+composition from a NEW per-variant assignment UI on `SaveProjectScreen` through the
+`SaveProjectPayload` into both `write_project_manifest` and `verify_written_manifest`,
+and the persisted entries are consumed unchanged by `plan_variant_executions`.
+**0 engine-frozen edits; the writer (`manifest_writer.py`) and consumer
+(`variant_execution_service.py`) substrate is edit-free** — all new code lives in
+`tui/screens.py` + `tui/app.py` (+ `tui/styles.tcss`), outside the `_ENGINE_PATHS`
+set.
+
+> **Per-story HLR/LLR detail:** the normative source of truth for the full EARS
+> statements is `.dev-flow/2026-06-25-batch-16/01-requirements.md` §3 (HLR-017) /
+> §4 (LLR-017.1–.4), including the load-bearing D-KEY contract (assignment keys are
+> the variant's `variant_id` — the filename **stem**, or the **full filename** on
+> stem-collision — never a recomputed `Path.stem`) and the D-NEWPROJ scope decision
+> (the assignment UI targets re-saving an EXISTING multi-variant project). The
+> black-box acceptance design (AT-017.1/.2/.3/.4/.5 + the e2e through-handler AT,
+> the four pre-fix-RED handler counterfactuals, the A-5 surface-reachability matrix)
+> and the per-node validation verdicts are in that batch folder (`02-review.md`,
+> `04-validation.md`, `06-docs/traceability-matrix.md`). The rows below are the
+> repo-wide `R-*` traceability that REFERENCES those docs.
+
+**R-PROJ-ASSIGN-001**: When the operator saves a multi-variant project through the
+save dialog, the system must persist into `project.json` a project-wide `batch`
+list and a per-variant `assignments` map keyed by `variant_id` (alongside
+`active_variant`), threading the payload's composition into BOTH
+`write_project_manifest` and `verify_written_manifest` with identical values; the
+re-read manifest must reproduce `active_variant`/`batch`/`assignments` with zero
+drift, and the persisted entries must be consumable by `plan_variant_executions`
+such that an assigned variant's execution plan tuple **exactly equals**
+`tuple(batch) + tuple(assignments[variant_id])` (resolved). Where the operator
+makes no selection the system must write empty `batch`/`assignments`, preserving
+the prior active-variant-only save (HLR-017 / LLR-017.1, .2, .4; detail in
+`01-requirements.md` §3/§4).
+
+- Code: `s19_app/tui/screens.py` (`SaveProjectPayload` — NEW `batch` +
+  `assignments` fields defaulting empty via `field(default_factory=...)`),
+  `s19_app/tui/app.py` (`_handle_save_dialog` threads the payload into
+  `_write_and_verify_manifest`, which gains a NEW `*, batch, assignments` keyword
+  pair; write call `app.py:3785/3786` and verify call `app.py:3803/3804` both carry
+  the kwargs). The writer `s19_app/tui/services/manifest_writer.py` and the
+  consumer `s19_app/tui/services/variant_execution_service.py` are consumed
+  unchanged (read-only substrate)
+- Validation: `Automated` via `tests/test_tui_manifest_save.py`
+  (`test_at017_1_save_persists_and_round_trips_composition` — AT-017.1, on-disk
+  round-trip 0-drift through the shipped handler;
+  `test_at017_3_zero_selection_save_no_regression` — AT-017.3, zero-selection
+  no-regression guard;
+  `test_tc302_303_handler_threads_batch_assignments_to_write_and_verify` — TC-302/303,
+  spies assert write & verify each receive `batch`/`assignments` with write-intent
+  == verify-intent; `test_tc301_payload_carries_batch_and_assignments` — TC-301,
+  payload unit guard) and `tests/test_variant_execution.py`
+  (`test_at017_2_consumer_pickup_of_saved_composition` — AT-017.2, exact-tuple
+  consumer pickup contract guard). The two pre-fix-RED handler counterfactuals
+  AT-017.1 and TC-302/303 fail on the pre-feature tree
+  (`TypeError: SaveProjectPayload.__init__() got an unexpected keyword argument
+  'batch'`) and pass post-fix; AT-017.3 is green both sides by design (no-regression
+  guard). Pre-fix-RED vs post-fix-GREEN evidence captured in `04-validation.md`
+- Status: Added in batch `2026-06-25-batch-16` (US-017 / HLR-017 / LLR-017.1, .2,
+  .4). Closes batch-11 SCOPE-1. A-5 surface-reachability: every dimension (`batch`,
+  `assignments`) reaches `project.json` THROUGH the save dialog →
+  `_handle_save_dialog` → `_write_and_verify_manifest` handler, not via the writer's
+  direct kwargs (the SCOPE-1 hole). G-3 (Phase-4 iteration): the consumer pickup is
+  also observed end-to-end through the handler by
+  `tests/test_tui_manifest_save.py::test_at017_2_e2e_consumer_pickup_through_handler`,
+  which re-reads the handler-written `project.json` and feeds it to
+  `plan_variant_executions`.
+
+**R-PROJ-ASSIGN-UI-001**: While re-saving an existing multi-variant project, the
+`SaveProjectScreen` must collect per-variant assignment files and a project-wide
+batch list, offering ONLY project-relative `.json` change/check documents
+enumerated from the project directory (excluding `project.json` and any file
+outside the work-area), and must source each assignment key from the variant's
+`ProjectVariantSet.variants[*].variant_id` — never a recomputed `Path.stem` — so a
+stem-colliding variant (`fw.s19`+`fw.hex`) is keyed by its full filename (D-KEY);
+empty fields must collect `batch==[]`/`assignments=={}` without crashing (HLR-017 /
+LLR-017.3; detail in `01-requirements.md` §3/§4).
+
+- Code: `s19_app/tui/screens.py` (`SaveProjectScreen._collect_composition` — NEW
+  helper that keys per-variant rows from `variant_id` by index, with no `Path.stem`
+  recomputation; `screens.py:298-303`), `s19_app/tui/app.py`
+  (`action_save_project` `app.py:2637` passes the variant ids + candidate
+  workarea-relative files into the screen), `s19_app/tui/styles.tcss` (assignment
+  rows, as needed)
+- Validation: `Automated` via `tests/test_tui_manifest_save.py`
+  (`test_tc304_...` — TC-304, keys `{"b": ("extra.json",)}` from the variant set;
+  `test_tc305_...` — TC-305, offers only `["doc.json"]`, excluding `outside.json`
+  and `project.json`; `test_tc306_...` — TC-306, empty fields collect `()`/`{}`
+  without crash). The stem-collision key contract is exercised by
+  `tests/test_tui_manifest_save.py::test_at017_5_stem_collision_assignment_keyed_by_full_filename`
+  (AT-017.5)
+- Status: Added in batch `2026-06-25-batch-16` (US-017 / HLR-017 / LLR-017.3).
+  D-NEWPROJ scope: a brand-new project save (variant set not yet built) writes the
+  HLR-017 zero-selection empty composition; the assignment UI is for re-saving a
+  project whose variants are already known. A-5 surface-reachability: the
+  assignment reaches the payload THROUGH `action_save_project` →
+  `SaveProjectScreen._collect_composition`, not a direct payload construction.
+
+**R-PROJ-ASSIGN-SEC-001**: Every `batch`/`assignments` entry collected at save time
+must be a project-relative path inside the work-area; an absolute or escaping
+entry driven through the save handler must be refused — surfacing a POSITIVE
+"Manifest write failed" notice AND leaving `project.json` un-written — rather than
+crashing or persisting the escaping entry. The writer's `_reject_unsafe_entry`
+remains the sole path-safety authority (the UI's workarea restriction is
+convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
+`01-requirements.md` §3/§4).
+
+- Code: no new security code — the payload carries project-relative strings
+  (no pre-resolution to absolute) and the existing writer gate
+  `s19_app/tui/services/manifest_writer.py::_reject_unsafe_entry` (`:178`) is the
+  enforcement point, now reached end-to-end through the handler. The handler
+  surfaces the writer's refusal as a status notice rather than swallowing it
+- Validation: `Automated` via `tests/test_tui_manifest_save.py`
+  (`test_at017_4_escaping_assignment_refused_no_file_written` — AT-017.4: asserts
+  the refusal notice is present AND `not (project_dir / PROJECT_MANIFEST_NAME).exists()`).
+  AT-017.4 is RED on the pre-feature tree (the refusal path is unreachable — the
+  handler ignores assignments pre-fix, same `TypeError`) and GREEN post-fix
+- Status: Added in batch `2026-06-25-batch-16` (US-017 / HLR-017 / LLR-017.3, .4).
+  New output surface → Phase-2 security-reviewer mandatory (per D-SEC). A-5
+  surface-reachability: the refusal is driven through the save handler
+  end-to-end, not by a direct `_reject_unsafe_entry` unit call.
