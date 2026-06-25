@@ -42,6 +42,7 @@ Functional subsystems:
 18. CRC Operation (CRC_F2) (batch-12)
 19. CRC Config-from-File + Patch-Editor Paste (batch-13)
 20. A↔B Compare Load-Failure Honesty (batch-15)
+21. Selectable S19 Record Width + Populated S0 Header (batch-14)
 
 ---
 
@@ -2500,3 +2501,128 @@ report path consumes; the diagnostic text is surfaced as plain text
   THROUGH the `#diff_compare_button` → `on_ab_diff_panel_compare_requested`
   handler (not a direct service call). Closes the 2026-06-23 black-box
   acceptance-gap audit item for batch-14 US-016.
+
+---
+
+# 21. Selectable S19 Record Width + Populated S0 Header (batch-14)
+
+The batch (`2026-06-23-batch-14`, US-015) is a **net-new data-fidelity feature**:
+the S19 emitter gains a 16-or-32 data-bytes-per-record selector (default 32),
+and in 32-byte mode the emitted file carries a **populated S0 header** — the
+preserved source S0 when the loaded image had one, else a minimal ASCII header
+synthesized from the output filename — while 16-byte mode keeps the legacy empty
+S0. The operator chooses the width through a cycling Width selector on the Patch
+Editor save-back surface; the choice and the S0 policy are threaded through the
+existing contained-write save path into `emit_s19_from_mem_map`. The integrity
+guarantee is verified by re-reading every emitted image through the frozen
+`S19File` reader-as-oracle. **0 engine-frozen edits** (all new code lives outside
+the `_ENGINE_PATHS` set). US-016 was satisfied separately by batch-15 (§20) and
+is out of this batch's scope.
+
+> **Per-story HLR/LLR detail:** the normative source of truth for the full EARS
+> statements is `.dev-flow/2026-06-23-batch-14/01-requirements.md` §3 (HLR-015) /
+> §4 (LLR-015.1–.5), including the two Phase-3 spec amendments — Amendment A
+> (S0 length bound ≤252) and Amendment B (S0-inertness asserted against the
+> data-record map, not the full `get_memory_map`). The black-box acceptance design
+> (AT-015.1/.2/.3 + the preserve-leg AT) and per-node validation verdicts are in
+> that batch folder (`02-review.md`, `04-validation.md`,
+> `06-docs/traceability-matrix.md`). The rows below are the repo-wide `R-*`
+> traceability that REFERENCES those docs.
+
+**R-S19-WIDTH-001**: When the operator saves a patched image through the Patch
+Editor save-back surface, the system must emit the S19 at either 16 or 32 data
+bytes per record (default 32), selectable through a cycling Width control, such
+that every emitted data record carries no more than the chosen number of data
+bytes and the emitted file re-parses through the frozen `S19File` reader to a
+data-record memory map byte-equal to the in-app patched map; the 16-byte mode
+must remain byte-identical to the pre-change framing, and a `bytes_per_line`
+value other than 16 or 32 must raise `ValueError` before any record is emitted
+(HLR-015 / LLR-015.1, .3, .4; detail in `01-requirements.md` §3/§4).
+
+- Code: `s19_app/tui/changes/io.py` (`emit_s19_from_mem_map` — NEW keyword
+  `bytes_per_line: int = 32`, validate-before-emit `ValueError` on values ∉
+  {16,32}, replacing the hardcoded 16-byte row step), `s19_app/tui/screens_directionb.py`
+  (NEW cycling Width selector `#patch_saveback_width_button` on the save-back
+  surface, carried on `SaveBackDecision`), `s19_app/tui/app.py` (save-back handler
+  threads the selected width), `s19_app/tui/changes/apply.py`
+  (`save_patched_image` — CHANGED signature threading `bytes_per_line` to the
+  emitter), `s19_app/tui/services/change_service.py` (`save_patched` — forwards
+  the width two hops), `s19_app/tui/services/variant_execution_service.py`
+  (project-save threads `bytes_per_line=32`)
+- Validation: `Automated` via `tests/test_changes_apply.py`
+  (`test_tc212_default_emit_packs_32_byte_rows`,
+  `test_tc213_bytes_per_line_16_back_compat_byte_identical`,
+  `test_tc214_invalid_bytes_per_line_raises_and_emits_nothing`,
+  `test_tc216_32_byte_emit_reparses_byte_equal`,
+  `test_tc217_16_byte_emit_reparses_byte_equal`,
+  `test_tc218_negative_control_corrupt_data_byte_detected`,
+  `test_tc219_save_patched_image_threads_width_and_s0_header`,
+  `test_tc220_change_service_save_patched_threads_to_emitter`) and
+  `tests/test_tui_patch_editor_v2.py`
+  (`test_saveback_width_32_packs_wide_records_and_populates_s0` — AT-015.1,
+  `test_saveback_width_16_caps_records_and_empties_s0` — AT-015.3, both black-box
+  through the shipped save-back widget read off disk)
+- Status: Added in batch `2026-06-23-batch-14` (US-015 / HLR-015 /
+  LLR-015.1/.3/.4). A-5 surface-reachability: the 16/32 choice reaches the emitter
+  THROUGH `#patch_saveback_width_button` → `SaveBackDecision` → the save-back
+  handler → `save_patched` (not a direct emitter kwarg).
+
+**R-S19-S0HEADER-001**: While 32-byte mode is selected, the emitted S19 must carry
+a populated S0 header — the captured source S0 when the loaded image had a
+content-bearing S0, else a minimal ASCII header synthesized from the output
+filename — bounded to a data length of at most 252 bytes (an over-long header
+raises `ValueError` before any record is emitted); while 16-byte mode is selected
+the system must keep the legacy empty S0. The populated S0 must be inert to the
+firmware payload: the re-parsed data-record map (S1/S2/S3 records only) stays
+byte-equal to the input map (HLR-015 / LLR-015.2; detail in `01-requirements.md`
+§3/§4, including Amendment A and Amendment B).
+
+- Code: `s19_app/tui/changes/io.py` (`emit_s19_from_mem_map` — NEW optional
+  `s0_header: bytes | None = None`; when provided emits a populated S0 record,
+  with the `len(s0_header) <= 252` bound from Amendment A),
+  `s19_app/tui/app.py` (save-back handler S0 policy: `source_s0_header or synth`
+  — empty/`None` source S0 falls through to the filename-synthesized header,
+  documented in the handler docstring), `s19_app/tui/models.py`
+  (NEW `LoadedFile.source_s0_header` capture field),
+  `s19_app/tui/services/load_service.py` (`build_loaded_s19` — captures the
+  source S0 from `S19File.records`, read-only; no frozen-file edit)
+- Validation: `Automated` via `tests/test_changes_apply.py`
+  (`test_tc215_populated_s0_is_inert_to_data_and_empty_when_none`,
+  `test_c4_overlong_s0_header_raises` — Amendment A 252 bound,
+  `test_build_loaded_s19_captures_source_s0_header` — load-seam capture) and
+  `tests/test_tui_patch_editor_v2.py`
+  (`test_saveback_width_32_preserves_source_s0_header` — the preserve-leg
+  black-box AT: a source image with a content-bearing S0 emits that source S0,
+  not the synthesized filename, observed off disk)
+- Status: Added in batch `2026-06-23-batch-14` (US-015 / HLR-015 / LLR-015.2).
+  The S0 header is cosmetic for data integrity — it contributes 0 bytes to the
+  firmware payload (it sits at low addresses that never collide with the high-
+  address image); its only purpose is downstream tools that display or key on the
+  label. A-5 surface-reachability: both the preserve and synthesize legs are
+  observed end-to-end through the save-back widget → on-disk file, not via direct
+  emitter kwargs.
+
+**R-S19-SAVE-REUSE-001**: The new record-width and S0-header content must reach
+disk only through the EXISTING contained-write save path — the save-back handler
+threads the width/header into `save_patched` → `save_patched_image` →
+`emit_s19_from_mem_map`, which still writes via the established
+`copy_into_workarea` contained-write, introducing **no new write surface**; the
+dispatch must be S19-branch-only, so the Intel-HEX save path is unaffected by the
+S19-only `bytes_per_line` kwarg (HLR-015 / LLR-015.3; the standing C1 HEX-isolation
+gate).
+
+- Code: no new write code — reuse-only. The shipped write path
+  (`s19_app/tui/changes/apply.py`, the `_SAVE_BACK_EMITTERS` dispatch, the
+  workspace contained-write) is consumed unchanged; the `bytes_per_line` /
+  `s0_header` threading (`R-S19-WIDTH-001` / `R-S19-S0HEADER-001`) is the only
+  delta feeding it, and it is gated to the S19 emitter branch
+- Validation: `Automated` via `tests/test_changes_apply.py`
+  (`test_tc220b_hex_save_unaffected_by_s19_only_kwargs` — HEX save with
+  `bytes_per_line=32` writes a valid `.hex`, no `TypeError`, map-equal) and the
+  cross-format integrity guard `test_tc226_cross_format_round_trip_integrity`
+  (AT-015.2 — 0 byte delta + 0 errors across S19↔re-parse, HEX→S19(32), S19→HEX)
+- Status: Added in batch `2026-06-23-batch-14` (US-015 / HLR-015 / LLR-015.3).
+  0 engine-frozen edits — `git diff --name-only origin/main` over the 7 frozen
+  paths is empty, confirmed by the `test_tc027_*` / `test_tc031_*` / `test_tc032_*`
+  guards. A-5 surface-reachability: the C1 isolation is exercised through the HEX
+  save branch, confirming the S19-only kwarg does not leak into the HEX writer.
