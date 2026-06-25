@@ -3,7 +3,7 @@
     "language": "en",
     "batch_id": "2026-06-25-batch-16",
     "batch_objective": "GAP #2 (batch-11 SCOPE-1, premise-corrected NET-NEW feature): give the project save an operator surface to assign per-variant change/check files (and optionally project-wide batch files), persist them into the manifest (write_project_manifest batch/assignments kwargs, manifest_writer.py:370), and prove the round-trip through the SHIPPED save handler (assign -> save -> reload project.json -> manifest.assignments non-empty + consumed by plan_variant_executions, variant_execution_service.py:526). Today app.py:3687 calls write_project_manifest with NO batch/assignments and there is no assignment UI; the writer's batch/assignments were tested only via direct kwargs (the SCOPE-1 gap).",
-    "current_phase": 4,
+    "current_phase": 5,
     "phase_status": "awaiting-gate",
     "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 0, "4": 1, "5": 0, "6": 0},
     "artifacts": {
@@ -27,9 +27,15 @@
     },
     "decisions_log": [
         {
+            "phase": 5,
+            "date": "2026-06-25",
+            "decision": "awaiting-gate",
+            "notes": "PRE-DECISION. Phase 4 APPROVED ('approve') + committed 33c9fb9 (e2e AT + docstring) + 35f5b79 (04-validation). Phase 5 (architect + qa co-author) -> 05-postmortem.md. HEADLINE: closed clean PASS, 0 defects, 2 increments, ledger 922->933, 0 frozen AND 0 substrate edits (writer/verifier/consumer already had the kwargs since batch-11 -> pure surface-wiring, A-5/SCOPE-1 class, falsifiably proven). TOP LESSON G-3: the batch closing 'tested via direct-kwargs not the shipped surface' nearly shipped its OWN consumer-pickup AT via a direct write; Phase-4 flagged honestly, operator iterated, e2e through-handler AT added. NEW CONTROL proposed C-12/QC-1 (output-then-consume AT discipline: observe consumer over the HANDLER-PRODUCED artifact, not a same-values direct write; extends C-10) — GLOBAL config, propose post-gate. RC-1 first real use held (preventive, not battle-tested). D-KEY caught pre-code by both reviewers. QC-2 (TypeError-RED counterfactual weak -> confirm post-fix value-sensitivity), QC-3 (boundary-catalog pre-Phase-3), QC-4 (keep AT+TC independent). METRICS iters {0:1,1:1,2:1,3:1,4:1}; 0 blocker/4 major/9 minor folded; code-review 2/2; full 900/0. CARRIES: GAP#2 DONE; C-12 NEW; C-9, CRC-width AT, C-7, C-6, N-2 standing. Awaiting Phase 5 gate (close batch / open new batch / iterate)."
+        },
+        {
             "phase": 4,
             "date": "2026-06-25",
-            "decision": "iteration-PASS-G3-closed-awaiting-gate",
+            "decision": "iteration-PASS-G3-closed-committed",
             "notes": "Operator: 'iterate'. Phase-4 hardening (test + docstring, NO prod behavior change): G-3 CLOSED — new e2e AT test_at017_2_e2e_consumer_pickup_through_handler (test_tui_manifest_save.py:410) drives the SHIPPED save handler via _save_through_handler, re-reads the HANDLER-WRITTEN project.json (read_project_manifest, NOT direct write), feeds plan_variant_executions(scope=ALL), asserts files_by_id['b'] EXACTLY == (doc.json,extra.json).resolve() + unassigned batch-only. Orchestrator READ the body to confirm handler-driven (not direct write). Original consumer-contract guard kept. G-2 CLOSED (screens.py _collect_composition docstring -> PROJECT_RULES order). 2 files, ruff clean, 26 affected passed, 0 frozen/substrate edits. LEDGER 932->933. 04-validation.md updated (Phase-4 iteration section). Verdict stands PASS. Awaiting Phase-4 re-confirmation gate.",
             "_prev": "awaiting-gate-PASS"
         },
