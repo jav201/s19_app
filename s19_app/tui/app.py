@@ -140,6 +140,45 @@ PATCH_ACTIONS_V2: frozenset[str] = frozenset(
 )
 
 
+#: Upper bound on a synthesized S0 header payload (US-015 / LLR-015.2): the
+#: S19 ``byte_count`` field is one byte, so the S0 data plus its 2-byte
+#: address and 1-byte checksum cannot exceed 255 — leaving ≤252 data bytes.
+#: ``emit_s19_from_mem_map`` enforces the same cap; this trims the synthesized
+#: header before it ever reaches the emitter.
+_SAVEBACK_S0_MAX_BYTES = 252
+
+
+def _synth_s0_header_from_filename(filename: str) -> bytes:
+    """
+    Summary:
+        Synthesize a minimal populated S0 header from a save-back destination
+        filename (US-015 / LLR-015.2) — used in 32-byte mode when the loaded
+        image carried no source S0 to preserve. The result is plain ASCII,
+        bounded to ``_SAVEBACK_S0_MAX_BYTES`` so the emitter's one-byte
+        ``byte_count`` field cannot overflow.
+
+    Args:
+        filename (str): The (possibly edited) operator-confirmed target name.
+
+    Returns:
+        bytes: The ASCII bytes of ``filename`` with any non-ASCII character
+        dropped, truncated to ``_SAVEBACK_S0_MAX_BYTES``. May be empty when
+        ``filename`` holds no ASCII characters — an empty header is a valid,
+        inert S0 the emitter accepts.
+
+    Data Flow:
+        - Encode the name as ASCII dropping un-encodable characters, then
+          truncate to the 252-byte cap; the emitter writes it verbatim as the
+          S0 data field, inert to the memory map.
+
+    Dependencies:
+        Used by:
+            - S19TuiApp.on_patch_editor_panel_save_back_decision
+    """
+    ascii_bytes = filename.encode("ascii", errors="ignore")
+    return ascii_bytes[:_SAVEBACK_S0_MAX_BYTES]
+
+
 def _a2l_tag_in_memory_display(tag: dict) -> str:
     if not tag.get("memory_checked"):
         return "n/a"
@@ -1403,15 +1442,22 @@ class S19TuiApp(App):
         Data Flow:
             - Hide the prompt either way.
             - Decline → one status line, no write.
-            - Confirm → ``ChangeService.save_patched`` into the active
-              project directory (work-area root when no project is active);
-              the typed name passes the engine's F-S-01 sanitizer; the
-              result and its findings surface on the status path.
+            - Confirm → resolve the operator's selected record width and the
+              matching S0 policy (US-015 / LLR-015.3): at 32 bytes/line
+              PRESERVE the loaded image's ``source_s0_header`` when present,
+              else SYNTHESIZE a minimal ASCII S0 from the destination filename
+              (``_synth_s0_header_from_filename``); at 16 bytes/line write the
+              legacy empty S0 (``s0_header=None``). Then
+              ``ChangeService.save_patched`` into the active project directory
+              (work-area root when no project is active); the typed name
+              passes the engine's F-S-01 sanitizer; the result and its
+              findings surface on the status path.
 
         Dependencies:
             Uses:
                 - ``ChangeService.save_patched``
                 - ``_active_project_dir``
+                - ``_synth_s0_header_from_filename``
             Used by:
                 - Textual message dispatch for ``PatchEditorPanel``
         """
@@ -1425,12 +1471,21 @@ class S19TuiApp(App):
             self.set_status("Patch Editor: no image loaded - nothing saved")
             return
         dest_dir = self._active_project_dir() or self.workarea
+        bytes_per_line = event.bytes_per_line
+        if bytes_per_line == 32:
+            s0_header = loaded.source_s0_header or _synth_s0_header_from_filename(
+                event.filename
+            )
+        else:
+            s0_header = None
         result = self._change_service.save_patched(
             loaded.mem_map,
             loaded.ranges,
             dest_dir,
             event.filename,
             source_kind=loaded.file_type,
+            bytes_per_line=bytes_per_line,
+            s0_header=s0_header,
         )
         self._report_change_result(result)
         if result.ok:

@@ -986,3 +986,156 @@ def test_verify_loud_mismatch_notice(
     assert "changed 1 run / 1 byte" in notice, notice
     # collect-don't-abort: the file the real engine wrote is still on disk.
     assert written == ["img-patched.hex"], written
+
+
+# ===========================================================================
+# AT-015.1 / AT-015.3 — width selector → on-disk record width + S0 policy
+# (US-015 / LLR-015.3, C3 black-box pilot). These observe the user-facing
+# outcome through the SHIPPED save-back surface: the selector widget is set,
+# the confirm button is pressed, then the WRITTEN .s19 file is read off disk
+# and verified through the frozen ``S19File`` reader — never a service call.
+# ===========================================================================
+
+
+def _make_wide_s19_image(tmp_path: Path, name: str = "wide.s19") -> Path:
+    """Emit a 40-byte contiguous S19 image — wide enough that a 32-byte
+    record packs >16 data bytes (and a 16-byte record cannot)."""
+    mem_map = {0x80001000 + offset: 0x00 for offset in range(40)}
+    text = emit_s19_from_mem_map(mem_map, [(0x80001000, 0x80001000 + 40)])
+    path = tmp_path / name
+    path.write_text(text, encoding="ascii")
+    return path
+
+
+def _data_record_map(s19: S19File) -> dict[int, int]:
+    """Memory map from S1/S2/S3 data records ONLY (excludes the S0 header,
+    which the frozen reader folds into ``get_memory_map`` at address 0 —
+    §6.5 Amendment B)."""
+    mem_map: dict[int, int] = {}
+    for record in s19.records:
+        if record.type in ("S1", "S2", "S3"):
+            for offset, byte in enumerate(record.data):
+                mem_map[record.address + offset] = byte
+    return mem_map
+
+
+def _drive_saveback_width(
+    tmp_path: Path, image_path: Path, target_width: int
+) -> tuple[Path, dict[int, int]]:
+    """Drive the real Patch Editor save-back surface to ``target_width`` and
+    return ``(written_path, intended_data_map)``.
+
+    Adds one bytes entry inside the loaded image's range, applies it, cycles
+    the width selector to ``target_width``, then presses the real confirm
+    button. The intended DATA-record map is the post-apply ``mem_map`` the
+    written file is checked against.
+    """
+    from textual.widgets import Button
+
+    async def _drive() -> tuple[Path, dict[int, int]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # Patch a run inside the wide range (INSIDE → applied → prompt).
+            _set_entry_inputs(
+                app, address="0x80001008", bytes_text="DE AD BE EF"
+            )
+            panel.request_action("add_entry")
+            await pilot.pause()
+            panel.request_action("apply_doc")
+            await pilot.pause()
+
+            # Cycle the SHIPPED width selector to the target (default is 32).
+            width_button = app.query_one(
+                "#patch_saveback_width_button", Button
+            )
+            while panel._saveback_width != target_width:
+                width_button.press()
+                await pilot.pause()
+
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+
+            written = app._change_service.last_summary.saved_path
+            # The intended firmware map after the apply (the engine mutated
+            # loaded.mem_map in place; copy it before the app tears down).
+            intended = dict(app.current_file.mem_map)
+            return written, intended
+
+    return asyncio.run(_drive())
+
+
+def test_saveback_width_32_packs_wide_records_and_populates_s0(
+    tmp_path: Path,
+) -> None:
+    """AT-015.1 — selecting 32 bytes/line on the real save-back surface
+    writes a .s19 whose S3 data records pack >16 (and ≤32) data bytes, whose
+    S0 header is populated, and whose firmware DATA-record map re-parses
+    byte-equal to the patched image.
+
+    Intent (C3, two-layer): observe the user-facing US-015 outcome THROUGH the
+    shipped Patch Editor save-back widget — set the selector to 32, press the
+    real Write-file button, then read the written file off disk and verify it
+    with the frozen ``S19File`` reader. A service-level call would not prove
+    the operator's selector choice reaches the bytes on disk.
+    """
+    image_path = _make_wide_s19_image(tmp_path)
+    written, intended = _drive_saveback_width(tmp_path, image_path, 32)
+
+    assert written is not None, "the 32-byte confirm must write a file"
+    assert written.suffix == ".s19"
+
+    reparsed = S19File(str(written))
+    assert reparsed.get_errors() == []
+
+    data_records = [r for r in reparsed.records if r.type == "S3"]
+    assert data_records, "a >0xFFFFFF image emits S3 data records"
+    # (a) at least one record packs >16 and ≤32 data bytes — only 32-byte
+    #     mode can do this; 16-byte mode caps every record at 16.
+    assert any(16 < len(r.data) <= 32 for r in data_records), (
+        f"32-byte mode must pack a wide record, got widths "
+        f"{[len(r.data) for r in data_records]}"
+    )
+    assert all(len(r.data) <= 32 for r in data_records)
+
+    # (b) the S0 header is populated (non-empty data).
+    s0 = next(r for r in reparsed.records if r.type == "S0")
+    assert len(s0.data) > 0, "32-byte mode must populate the S0 header"
+
+    # (c) the DATA-record map re-parses byte-equal to the patched map.
+    assert _data_record_map(reparsed) == intended
+
+
+def test_saveback_width_16_caps_records_and_empties_s0(tmp_path: Path) -> None:
+    """AT-015.3 (reinforcement) — selecting 16 bytes/line on the real
+    save-back surface writes a .s19 whose data records each carry ≤16 data
+    bytes and whose S0 header is empty (legacy back-compat), still re-parsing
+    byte-equal to the patched map.
+
+    Intent: the 16-byte branch of the same shipped selector — confirms the
+    operator's choice flips both the record width AND the S0 policy
+    (``s0_header=None``) end-to-end, observed off disk.
+    """
+    image_path = _make_wide_s19_image(tmp_path)
+    written, intended = _drive_saveback_width(tmp_path, image_path, 16)
+
+    assert written is not None, "the 16-byte confirm must write a file"
+    reparsed = S19File(str(written))
+    assert reparsed.get_errors() == []
+
+    data_records = [r for r in reparsed.records if r.type == "S3"]
+    assert data_records
+    assert all(len(r.data) <= 16 for r in data_records), (
+        f"16-byte mode must cap every record at 16, got widths "
+        f"{[len(r.data) for r in data_records]}"
+    )
+
+    s0 = next(r for r in reparsed.records if r.type == "S0")
+    assert len(s0.data) == 0, "16-byte mode must write the legacy empty S0"
+
+    assert _data_record_map(reparsed) == intended
