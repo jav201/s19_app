@@ -3,9 +3,9 @@
     "language": "en",
     "batch_id": "2026-06-23-batch-14",
     "batch_objective": "Cluster 1 data fidelity — US-015: S19 emitter gains a 16/32 data-bytes-per-record selector (DEFAULT 32, 16 opt-in) + a populated S0 header in 32-byte mode (preserve captured source S0 via load_service seam, else synthesize), parametrizing emit_s19_from_mem_map (tui/changes/io.py:1409, outside engine-frozen set) and threading the choice through the TUI save flows (patch-editor save-back + project save); reader-as-oracle byte-equality + negative control + cross-format integrity (S19<->HEX round-trip, TC-226). US-016 (A2B compare load-failure) is SATISFIED externally by batch-15 (main 9169130, REQUIREMENTS §20 R-DIFF-LOADFAIL-001) — kept for traceability, no duplicate work; its hex-window-content AT coverage gap is backlog C-9.",
-    "current_phase": 3,
-    "phase_status": "in-progress",
-    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 0, "4": 0, "5": 0, "6": 0},
+    "current_phase": 4,
+    "phase_status": "awaiting-gate",
+    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 1, "4": 0, "5": 0, "6": 0},
     "artifacts": {
         "1": ".dev-flow/2026-06-23-batch-14/01-requirements.md",
         "2": ".dev-flow/2026-06-23-batch-14/02-review.md",
@@ -48,6 +48,12 @@
         "backlog_priority": "P0 US-015 (this batch) -> P1 C-1 + GAP#2 -> P2 C-9 + 4a ruff + obsidian flip -> P3 C-6 + C-10. See .dev-flow/BACKLOG.md."
     },
     "decisions_log": [
+        {
+            "phase": 4,
+            "date": "2026-06-24",
+            "decision": "awaiting-gate-PASS-WITH-NOTES",
+            "notes": "PRE-DECISION. Phase 3 Inc3 APPROVED + committed ff3ad12 (code) + 3ee26cd (docs) -> PHASE 3 COMPLETE. Phase 4 (qa-reviewer) -> 04-validation.md. VERDICT PASS-WITH-NOTES, 0 FAIL/0 blockers. STEP1 closed 3 binding hardening: F1 (AT-015.1 now cycles selector 32->16->32, dead button fails it), F2 (NEW preserve-leg AT test_saveback_width_32_preserves_source_s0_header:1198 — content-bearing source S0 round-trips to disk, asserts emitted S0==source not synth-filename; + app.py docstring note empty-S0->synth), F3 (trimmed comment). STEP2 full suite: pytest -q 890 passed/29 skip/3 xfail/0 fail (922 collected); -m 'not slow' 869/0. Ledger 903+18+1(F2)=922 EXACT. STEP3 04-validation.md (162 lines): HLR-015 + LLR-015.1-.5 all PASS on real reconciled nodes (provisional TC-212..226 -> actual test_tc* names; V-5 incl engine-guard name fix test_tc031->live names); Layer B 4/4 AT PASS (015.1/.2-cross-format/.3 + preserve-leg); A-5 matrix incl C2 CRC inheritance row (crc.py:879 inherits 32, safe per test_crc_operation.py:345 + 21 CRC tests green); reverse-edge 0; invariants hold (reader-as-oracle data-record-map, TC-218 neg control, TC-226 cross-format, C4 ≤252, C1 HEX-unaffected); 0 engine-frozen edits vs origin/main. NON-BLOCKING: N-1 pre-existing app.py/change_service F401 (batch-15 C-7, not introduced); N-2 provisional engine-guard node name reconciled. ORCHESTRATOR spot-check: preserve-leg AT on disk, 922 collected, 0 frozen diff, 04-validation valid UTF-8. Phase-4 working tree (test+app.py-docstring+04-validation+state) NOT committed. Awaiting Phase 4 gate."
+        },
         {
             "phase": 3,
             "date": "2026-06-24",
