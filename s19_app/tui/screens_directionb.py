@@ -417,6 +417,12 @@ class PatchEditorPanel(ScrollableContainer):
         "assignments": "per assignment",
     }
 
+    #: The save-back S19 record widths in selector cycle order (US-015 /
+    #: LLR-015.3). 32 is the default (the populated-S0 / 32-byte mode); 16 is
+    #: the legacy empty-S0 / 16-byte mode. Spelled locally so this view widget
+    #: imports nothing from the engine or service layer.
+    SAVEBACK_WIDTHS = (32, 16)
+
     # Layout rules for the v2 widget ids live in styles.tcss (folded there
     # at E3b when the retired batch-03/04 ids' rules were removed).
 
@@ -487,15 +493,22 @@ class PatchEditorPanel(ScrollableContainer):
                 when the operator confirmed; ``None`` when declined — the
                 app persists nothing and ``ChangeSummary.saved_path`` stays
                 ``None``.
+            bytes_per_line (int): The data-bytes-per-S19-record width the
+                operator selected (``{16, 32}``, default 32) — carried only on
+                a confirm so ``app.py`` can thread it (and the matching S0
+                policy) into ``ChangeService.save_patched`` (US-015 / LLR-015.3).
 
         Dependencies:
             Used by:
                 - ``S19TuiApp.on_patch_editor_panel_save_back_decision``
         """
 
-        def __init__(self, filename: Optional[str]) -> None:
+        def __init__(
+            self, filename: Optional[str], bytes_per_line: int = 32
+        ) -> None:
             super().__init__()
             self.filename = filename
+            self.bytes_per_line = bytes_per_line
 
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
@@ -503,6 +516,10 @@ class PatchEditorPanel(ScrollableContainer):
         #: cycled by ``#patch_execute_scope_button``; carried on the
         #: ``execute_scope`` ``ActionRequested``.
         self._execute_scope: str = self.EXECUTE_SCOPES[0]
+        #: The save-back S19 record width the selector currently shows
+        #: (US-015 / LLR-015.3) — cycled by ``#patch_saveback_width_button``;
+        #: carried on the ``SaveBackDecision``. Defaults to 32.
+        self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
 
     def compose(self) -> ComposeResult:
         """Lay out the consolidated v2 Patch Editor widget tree.
@@ -593,6 +610,10 @@ class PatchEditorPanel(ScrollableContainer):
             Label("Save patched image as:", classes="patch-field-label"),
             Input(id="patch_saveback_name_input"),
             Horizontal(
+                Button(
+                    f"Width: {self._saveback_width} bytes/line",
+                    id="patch_saveback_width_button",
+                ),
                 Button("Write file", id="patch_saveback_confirm_button"),
                 Button("Don't save", id="patch_saveback_decline_button"),
                 id="patch_saveback_buttons",
@@ -694,11 +715,26 @@ class PatchEditorPanel(ScrollableContainer):
                 - Textual button-press dispatch
         """
         button_id = event.button.id or ""
+        if button_id == "patch_saveback_width_button":
+            # Selector state only — cycle the save-back record width and
+            # relabel; no message is posted, so this adds no routed action
+            # (the same idiom as #patch_execute_scope_button). The chosen
+            # width rides the next SaveBackDecision (US-015 / LLR-015.3).
+            event.stop()
+            index = self.SAVEBACK_WIDTHS.index(self._saveback_width)
+            self._saveback_width = self.SAVEBACK_WIDTHS[
+                (index + 1) % len(self.SAVEBACK_WIDTHS)
+            ]
+            event.button.label = (
+                f"Width: {self._saveback_width} bytes/line"
+            )
+            return
         if button_id == "patch_saveback_confirm_button":
             event.stop()
             self.post_message(
                 self.SaveBackDecision(
-                    self.query_one("#patch_saveback_name_input", Input).value
+                    self.query_one("#patch_saveback_name_input", Input).value,
+                    bytes_per_line=self._saveback_width,
                 )
             )
             return
@@ -842,6 +878,12 @@ class PatchEditorPanel(ScrollableContainer):
                 - ``S19TuiApp`` apply-action handling
         """
         self.query_one("#patch_saveback_name_input", Input).value = suggestion
+        # Reset the width selector to its 32-byte default each time the prompt
+        # appears, so a per-apply width choice never leaks into the next apply.
+        self._saveback_width = self.SAVEBACK_WIDTHS[0]
+        self.query_one("#patch_saveback_width_button", Button).label = (
+            f"Width: {self._saveback_width} bytes/line"
+        )
         self.query_one("#patch_saveback_row", Container).remove_class("hidden")
 
     def hide_save_prompt(self) -> None:

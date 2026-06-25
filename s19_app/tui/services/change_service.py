@@ -865,6 +865,8 @@ class ChangeService:
         filename: str,
         *,
         source_kind: str,
+        bytes_per_line: int = 32,
+        s0_header: bytes | None = None,
     ) -> ChangeActionResult:
         """
         Summary:
@@ -888,6 +890,12 @@ class ChangeService:
             source_kind (str): ``LoadedFile.file_type``; ``"s19"`` and
                 ``"hex"`` are persisted (US-008), any other source (e.g.
                 ``"mac"``) is refused with ``CHG-HEX-SAVE-UNSUPPORTED``.
+            bytes_per_line (int): Data bytes per emitted S19 record,
+                ``{16, 32}`` (default 32); forwarded to ``save_patched_image``
+                and applied on the S19 branch only (LLR-015.3).
+            s0_header (bytes | None): Optional populated S0 header, forwarded
+                to ``save_patched_image`` and applied on the S19 branch only
+                (LLR-015.3).
 
         Returns:
             ChangeActionResult: ``ok`` ``True`` with the written file name
@@ -902,7 +910,13 @@ class ChangeService:
                 - app.py save-back confirm handling
         """
         path, issues = save_patched_image(
-            mem_map, ranges, dest_dir, filename, source_kind=source_kind
+            mem_map,
+            ranges,
+            dest_dir,
+            filename,
+            source_kind=source_kind,
+            bytes_per_line=bytes_per_line,
+            s0_header=s0_header,
         )
         if self.last_summary is not None:
             self.last_summary.saved_path = path

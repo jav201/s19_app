@@ -986,3 +986,249 @@ def test_verify_loud_mismatch_notice(
     assert "changed 1 run / 1 byte" in notice, notice
     # collect-don't-abort: the file the real engine wrote is still on disk.
     assert written == ["img-patched.hex"], written
+
+
+# ===========================================================================
+# AT-015.1 / AT-015.3 — width selector → on-disk record width + S0 policy
+# (US-015 / LLR-015.3, C3 black-box pilot). These observe the user-facing
+# outcome through the SHIPPED save-back surface: the selector widget is set,
+# the confirm button is pressed, then the WRITTEN .s19 file is read off disk
+# and verified through the frozen ``S19File`` reader — never a service call.
+# ===========================================================================
+
+
+def _make_wide_s19_image(tmp_path: Path, name: str = "wide.s19") -> Path:
+    """Emit a 40-byte contiguous S19 image — wide enough that a 32-byte
+    record packs >16 data bytes (and a 16-byte record cannot)."""
+    mem_map = {0x80001000 + offset: 0x00 for offset in range(40)}
+    text = emit_s19_from_mem_map(mem_map, [(0x80001000, 0x80001000 + 40)])
+    path = tmp_path / name
+    path.write_text(text, encoding="ascii")
+    return path
+
+
+def _data_record_map(s19: S19File) -> dict[int, int]:
+    """Memory map from S1/S2/S3 data records ONLY — the firmware-payload
+    oracle that excludes the inert S0 header (§6.5 Amendment B)."""
+    mem_map: dict[int, int] = {}
+    for record in s19.records:
+        if record.type in ("S1", "S2", "S3"):
+            for offset, byte in enumerate(record.data):
+                mem_map[record.address + offset] = byte
+    return mem_map
+
+
+def _drive_saveback_width(
+    tmp_path: Path,
+    image_path: Path,
+    target_width: int,
+    *,
+    exercise_toggle: bool = False,
+) -> tuple[Path, dict[int, int]]:
+    """Drive the real Patch Editor save-back surface to ``target_width`` and
+    return ``(written_path, intended_data_map)``.
+
+    Adds one bytes entry inside the loaded image's range, applies it, cycles
+    the width selector to ``target_width``, then presses the real confirm
+    button. The intended DATA-record map is the post-apply ``mem_map`` the
+    written file is checked against.
+
+    When ``exercise_toggle`` is set, the selector is first cycled the whole
+    way OFF its current value and back to ``target_width`` before confirming,
+    asserting the displayed value actually changed mid-cycle (F1). This makes
+    the test exercise the button's press path rather than relying on the
+    default-32 value, so a wired-but-dead selector button would fail it.
+    """
+    from textual.widgets import Button
+
+    async def _drive() -> tuple[Path, dict[int, int]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # Patch a run inside the wide range (INSIDE → applied → prompt).
+            _set_entry_inputs(
+                app, address="0x80001008", bytes_text="DE AD BE EF"
+            )
+            panel.request_action("add_entry")
+            await pilot.pause()
+            panel.request_action("apply_doc")
+            await pilot.pause()
+
+            # Cycle the SHIPPED width selector to the target (default is 32).
+            width_button = app.query_one(
+                "#patch_saveback_width_button", Button
+            )
+
+            if exercise_toggle:
+                # F1 — drive the button OFF its current value and back, so the
+                # press path is exercised even when target == the default. A
+                # dead button (no state change on press) would fail the
+                # mid-cycle assertion below.
+                start_width = panel._saveback_width
+                width_button.press()
+                await pilot.pause()
+                assert panel._saveback_width != start_width, (
+                    "pressing the width selector must change the displayed "
+                    f"value, stayed at {start_width}"
+                )
+
+            while panel._saveback_width != target_width:
+                width_button.press()
+                await pilot.pause()
+
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+
+            written = app._change_service.last_summary.saved_path
+            # The intended firmware map after the apply (the engine mutated
+            # loaded.mem_map in place; copy it before the app tears down).
+            intended = dict(app.current_file.mem_map)
+            return written, intended
+
+    return asyncio.run(_drive())
+
+
+def test_saveback_width_32_packs_wide_records_and_populates_s0(
+    tmp_path: Path,
+) -> None:
+    """AT-015.1 — selecting 32 bytes/line on the real save-back surface
+    writes a .s19 whose S3 data records pack >16 (and ≤32) data bytes, whose
+    S0 header is populated, and whose firmware DATA-record map re-parses
+    byte-equal to the patched image.
+
+    Intent (C3, two-layer): observe the user-facing US-015 outcome THROUGH the
+    shipped Patch Editor save-back widget — cycle the selector OFF 32 and back
+    (F1: exercise the button's press path, not the bare default), press the
+    real Write-file button, then read the written file off disk and verify it
+    with the frozen ``S19File`` reader. A service-level call would not prove
+    the operator's selector choice reaches the bytes on disk.
+    """
+    image_path = _make_wide_s19_image(tmp_path)
+    written, intended = _drive_saveback_width(
+        tmp_path, image_path, 32, exercise_toggle=True
+    )
+
+    assert written is not None, "the 32-byte confirm must write a file"
+    assert written.suffix == ".s19"
+
+    reparsed = S19File(str(written))
+    assert reparsed.get_errors() == []
+
+    data_records = [r for r in reparsed.records if r.type == "S3"]
+    assert data_records, "a >0xFFFFFF image emits S3 data records"
+    # (a) at least one record packs >16 and ≤32 data bytes — only 32-byte
+    #     mode can do this; 16-byte mode caps every record at 16.
+    assert any(16 < len(r.data) <= 32 for r in data_records), (
+        f"32-byte mode must pack a wide record, got widths "
+        f"{[len(r.data) for r in data_records]}"
+    )
+    assert all(len(r.data) <= 32 for r in data_records)
+
+    # (b) the S0 header is populated (non-empty data).
+    s0 = next(r for r in reparsed.records if r.type == "S0")
+    assert len(s0.data) > 0, "32-byte mode must populate the S0 header"
+
+    # (c) the DATA-record map re-parses byte-equal to the patched map.
+    assert _data_record_map(reparsed) == intended
+
+
+def test_saveback_width_16_caps_records_and_empties_s0(tmp_path: Path) -> None:
+    """AT-015.3 (reinforcement) — selecting 16 bytes/line on the real
+    save-back surface writes a .s19 whose data records each carry ≤16 data
+    bytes and whose S0 header is empty (legacy back-compat), still re-parsing
+    byte-equal to the patched map.
+
+    Intent: the 16-byte branch of the same shipped selector — confirms the
+    operator's choice flips both the record width AND the S0 policy
+    (``s0_header=None``) end-to-end, observed off disk.
+    """
+    image_path = _make_wide_s19_image(tmp_path)
+    written, intended = _drive_saveback_width(tmp_path, image_path, 16)
+
+    assert written is not None, "the 16-byte confirm must write a file"
+    reparsed = S19File(str(written))
+    assert reparsed.get_errors() == []
+
+    data_records = [r for r in reparsed.records if r.type == "S3"]
+    assert data_records
+    assert all(len(r.data) <= 16 for r in data_records), (
+        f"16-byte mode must cap every record at 16, got widths "
+        f"{[len(r.data) for r in data_records]}"
+    )
+
+    s0 = next(r for r in reparsed.records if r.type == "S0")
+    assert len(s0.data) == 0, "16-byte mode must write the legacy empty S0"
+
+    assert _data_record_map(reparsed) == intended
+
+
+# AT-015.1 PRESERVE-leg (F2) — a content-bearing source S0 must be carried
+# through to disk verbatim in 32-byte mode, NOT replaced by the synthesized
+# filename header. This is the genuine preserve branch of the save-back S0
+# policy (``loaded.source_s0_header or _synth_s0_header_from_filename(...)``),
+# observed black-box through the shipped surface rather than at the load seam.
+
+_SOURCE_S0_BYTES = b"SRCHDR_PRESERVE_ME"
+
+
+def _make_wide_s19_image_with_s0(
+    tmp_path: Path, name: str = "wide_s0.s19"
+) -> Path:
+    """Emit a 40-byte contiguous S19 image carrying a populated source S0
+    header (``_SOURCE_S0_BYTES``) — wide enough that a 32-byte record packs
+    >16 data bytes, and with a content-bearing S0 the load seam will capture
+    into ``LoadedFile.source_s0_header``."""
+    mem_map = {0x80001000 + offset: 0x00 for offset in range(40)}
+    text = emit_s19_from_mem_map(
+        mem_map,
+        [(0x80001000, 0x80001000 + 40)],
+        bytes_per_line=32,
+        s0_header=_SOURCE_S0_BYTES,
+    )
+    path = tmp_path / name
+    path.write_text(text, encoding="ascii")
+    return path
+
+
+def test_saveback_width_32_preserves_source_s0_header(tmp_path: Path) -> None:
+    """AT-015.1 (preserve leg, F2) — when the loaded image carries a
+    content-bearing S0, saving in 32-byte mode through the shipped selector
+    writes that SOURCE S0 verbatim, NOT a header synthesized from the
+    destination filename.
+
+    Intent: exercise the genuine preserve branch of the save-back S0 policy
+    end-to-end. The synthesize branch is covered by AT-015.1's wide image
+    (no source S0). Here the load seam captures ``source_s0_header`` and the
+    handler must prefer it over ``_synth_s0_header_from_filename`` — observed
+    black-box by reading the written S0 off disk. A regression that always
+    synthesized would write the filename bytes and fail this assertion.
+    """
+    image_path = _make_wide_s19_image_with_s0(tmp_path)
+
+    # Sanity: the load seam actually captured the source S0 (guards against a
+    # vacuous pass where source_s0_header is None and the synth path is taken).
+    captured = S19File(str(image_path))
+    captured_loaded = build_loaded_s19(image_path, captured, None, None)
+    assert captured_loaded.source_s0_header == _SOURCE_S0_BYTES
+
+    written, intended = _drive_saveback_width(tmp_path, image_path, 32)
+
+    assert written is not None, "the 32-byte confirm must write a file"
+    reparsed = S19File(str(written))
+    assert reparsed.get_errors() == []
+
+    s0 = next(r for r in reparsed.records if r.type == "S0")
+    # The written S0 is the SOURCE header, byte-for-byte — not the filename.
+    assert bytes(s0.data) == _SOURCE_S0_BYTES, (
+        f"32-byte save must preserve the source S0, got {bytes(s0.data)!r}"
+    )
+    # And it is NOT the synthesized-from-filename header (distinct content).
+    assert bytes(s0.data) != written.name.encode("ascii", "ignore")
+
+    # The firmware data-record map still round-trips byte-equal.
+    assert _data_record_map(reparsed) == intended
