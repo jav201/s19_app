@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Mapping, Optional, Tuple
 
 from textual import work
 from textual.app import ComposeResult
@@ -76,10 +76,38 @@ VIEWER_SIZE_CAP_BYTES = 2 * REPORT_MAX_TOTAL_BYTES
 
 @dataclass(frozen=True)
 class SaveProjectPayload:
-    """Parent directory (as entered or browsed) and project folder name for save."""
+    """Save-dialog result: destination + the project composition to persist.
+
+    Summary:
+        Carries the parent directory and project folder name plus the optional
+        per-variant / project-wide change-check composition to persist into
+        ``project.json`` (HLR-017 / LLR-017.1). ``batch`` is the project-wide
+        file list; ``assignments`` maps a ``variant_id`` to its per-variant file
+        list. Both default empty, so a save that selects nothing re-reads
+        identically to the prior active-variant-only save (LLR-017.1, F-Q-05).
+
+    Args:
+        parent_folder (str): Destination parent directory, as entered or browsed.
+        project_name (str): New project folder name (sanitized downstream).
+        batch (tuple[str, ...]): Project-wide change/check files as
+            project-relative path strings. Empty ⇒ no project-wide files.
+        assignments (Mapping[str, tuple[str, ...]]): Per-variant files keyed by
+            ``variant_id`` (the workspace stem, or full filename on a stem
+            collision — D-KEY); each value is project-relative path strings.
+            Empty ⇒ no per-variant assignments.
+
+    Data Flow:
+        - Produced by ``SaveProjectScreen`` / a pilot and consumed by
+          ``S19TuiApp._handle_save_dialog``, which threads ``batch`` /
+          ``assignments`` into the manifest write + verify (LLR-017.2).
+        - All values are project-relative strings; the writer's
+          ``_reject_unsafe_entry`` is the sole path-safety authority (D-SEC).
+    """
 
     parent_folder: str
     project_name: str
+    batch: tuple[str, ...] = ()
+    assignments: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
 
 
 class LoadFileScreen(ModalScreen[Optional[Path]]):

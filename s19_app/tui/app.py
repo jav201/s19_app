@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import time
-from typing import Any, List, Optional
+from typing import Any, List, Mapping, Optional, Sequence
 
 from textual import events, work
 from textual.app import App, ComposeResult
@@ -3641,11 +3641,21 @@ class S19TuiApp(App):
             )
         else:
             self.set_status(f"Saved project to {project_dir}")
-        self._write_and_verify_manifest(project_dir)
+        self._write_and_verify_manifest(
+            project_dir,
+            batch=payload.batch,
+            assignments=payload.assignments,
+        )
         self.update_project_labels()
         self.refresh_files()
 
-    def _write_and_verify_manifest(self, project_dir: Path) -> None:
+    def _write_and_verify_manifest(
+        self,
+        project_dir: Path,
+        *,
+        batch: Sequence[str] = (),
+        assignments: Optional[Mapping[str, Sequence[str]]] = None,
+    ) -> None:
         """
         Summary:
             Persist the active project's ``project.json`` and verify-check the
@@ -3661,6 +3671,15 @@ class S19TuiApp(App):
         Args:
             project_dir (Path): The just-saved project directory the manifest is
                 written into (``project.json`` lands directly here).
+            batch (Sequence[str]): Project-wide change/check files as
+                project-relative path strings (HLR-017 / LLR-017.2). Threaded
+                IDENTICALLY into the write and the verify so the verify intent
+                matches the write intent (R1); defaults empty (zero-selection
+                save, unchanged active-variant-only behavior).
+            assignments (Optional[Mapping[str, Sequence[str]]]): Per-variant
+                change/check files keyed by ``variant_id``; same project-relative
+                strings, same identical threading into write + verify (R1).
+                ``None`` ⇒ empty assignments.
 
         Returns:
             None
@@ -3685,7 +3704,11 @@ class S19TuiApp(App):
         if variant_set is None:
             return
         written, issues = write_project_manifest(
-            variant_set, project_dir, self.base_dir
+            variant_set,
+            project_dir,
+            self.base_dir,
+            batch=batch,
+            assignments=assignments,
         )
         if written is None:
             detail = "; ".join(issue.message for issue in issues) or "unknown error"
@@ -3698,7 +3721,13 @@ class S19TuiApp(App):
             )
             self.logger.warning("Manifest write refused: %s", detail)
             return
-        result = verify_written_manifest(project_dir, variant_set, project_dir)
+        result = verify_written_manifest(
+            project_dir,
+            variant_set,
+            project_dir,
+            batch=batch,
+            assignments=assignments,
+        )
         self._surface_manifest_verify_result(result)
 
     def _surface_manifest_verify_result(
