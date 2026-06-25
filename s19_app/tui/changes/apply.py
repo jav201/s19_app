@@ -578,6 +578,8 @@ def save_patched_image(
     filename: str,
     *,
     source_kind: str,
+    bytes_per_line: int = 32,
+    s0_header: bytes | None = None,
 ) -> Tuple[Optional[Path], List[ValidationIssue]]:
     """
     Summary:
@@ -612,6 +614,15 @@ def save_patched_image(
             ``"hex"`` emits Intel HEX (LLR-002.1). Any other value (e.g.
             ``"mac"``) is refused with one ``CHG-HEX-SAVE-UNSUPPORTED`` issue
             and nothing is written (LLR-002.2).
+        bytes_per_line (int): Data bytes per emitted S19 record, ``{16, 32}``
+            (default 32). Threaded to ``emit_s19_from_mem_map`` for an
+            ``"s19"`` source ONLY (LLR-015.3); the HEX emitter takes no width
+            argument, so the HEX branch is dispatched unchanged.
+        s0_header (bytes | None): Optional populated S0 header payload, passed
+            to ``emit_s19_from_mem_map`` for an ``"s19"`` source ONLY
+            (LLR-015.3). When ``None`` the emitter writes the legacy empty S0.
+            This increment only forwards a caller-supplied header; the
+            preserve/synthesize policy is a later increment.
 
     Returns:
         Tuple[Optional[Path], List[ValidationIssue]]: The absolute path of
@@ -684,7 +695,18 @@ def save_patched_image(
         )
         return None, issues
 
-    text = emit(dict(mem_map), list(ranges))
+    # C1: the S19 emitter takes the LLR-015.3 width + header kwargs; the HEX
+    # emitter (emit_intel_hex_from_mem_map) does NOT — pass them only on the
+    # S19 branch, or the HEX branch would TypeError.
+    if source_kind == "s19":
+        text = emit(
+            dict(mem_map),
+            list(ranges),
+            bytes_per_line=bytes_per_line,
+            s0_header=s0_header,
+        )
+    else:
+        text = emit(dict(mem_map), list(ranges))
     staged = workarea_root / WORKAREA_TEMP / safe_name
     try:
         staged.parent.mkdir(parents=True, exist_ok=True)

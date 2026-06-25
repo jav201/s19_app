@@ -862,3 +862,129 @@ def test_build_loaded_s19_captures_source_s0_header() -> None:
     # prg.s19 has 0 S0 records (Phase-1 finding) → capture is None.
     loaded_none = build_loaded_s19(EXAMPLE_S19, S19File(str(EXAMPLE_S19)), None, None)
     assert loaded_none.source_s0_header is None
+
+
+# ---------------------------------------------------------------------------
+# US-015 / LLR-015.3 — width + S0 header threaded through the save call-sites.
+# Reader-as-oracle on the DATA-record map (a populated S0 sits at address 0
+# and the frozen reader folds it into get_memory_map; the firmware payload is
+# the data records — see _data_record_map / TC-215, §6.5 Amendment B).
+# ---------------------------------------------------------------------------
+
+_WIDE_RANGES = [(0x80001000, 0x80001000 + 80)]
+
+
+def test_tc219_save_patched_image_threads_width_and_s0_header(
+    tmp_path: Path,
+) -> None:
+    """TC-219 — save_patched_image forwards bytes_per_line + s0_header to the
+    S19 emitter; the written file packs >16/≤32-byte data rows AND carries a
+    populated S0, re-parsing byte-equal on the DATA-record map. Omitting the
+    width ⇒ 32.
+
+    Intent: LLR-015.3 — the engine save call-site honors the selector and the
+    captured header, not only the bare emitter; a default (omitted) width
+    still emits 32-byte rows.
+    """
+    mem_map = _wide_mem_map()
+    dest_dir = _project_dir(tmp_path)
+
+    saved_path, issues = save_patched_image(
+        mem_map,
+        _WIDE_RANGES,
+        dest_dir,
+        "patched.s19",
+        source_kind="s19",
+        bytes_per_line=32,
+        s0_header=b"HDR",
+    )
+
+    assert issues == []
+    assert saved_path is not None and saved_path.is_file()
+    written = saved_path.read_text(encoding="ascii")
+    counts = _data_byte_counts(written)
+    assert counts, "expected at least one data record"
+    assert all(count <= 32 for count in counts)
+    assert any(count > 16 for count in counts)  # 32-byte packing reached
+    s0_line = next(line for line in written.splitlines() if line.startswith("S0"))
+    assert int(s0_line[2:4], 16) - 2 - 1 == len(b"HDR")  # populated S0
+
+    reparsed = S19File(str(saved_path))
+    assert reparsed.get_errors() == []
+    assert _data_record_map(reparsed) == mem_map  # inert S0, payload intact
+
+    # Default (omitted) ⇒ 32: the same >16-byte packing without passing width.
+    default_path, default_issues = save_patched_image(
+        mem_map, _WIDE_RANGES, dest_dir, "default.s19", source_kind="s19"
+    )
+    assert default_issues == []
+    assert default_path is not None
+    default_counts = _data_byte_counts(default_path.read_text(encoding="ascii"))
+    assert any(count > 16 for count in default_counts)
+
+
+def test_tc220_change_service_save_patched_threads_to_emitter(
+    tmp_path: Path,
+) -> None:
+    """TC-220 — ChangeService.save_patched (the project/service save path)
+    threads bytes_per_line + s0_header two hops to the emitter: the written
+    .s19 packs >16/≤32-byte rows, carries the populated S0, and re-parses
+    byte-equal on the DATA-record map.
+
+    Intent: LLR-015.3 AC — partial threading (emitter-only, not the service
+    call-site) fails here; the service signature must forward both params.
+    """
+    from s19_app.tui.services.change_service import ChangeService
+
+    service = ChangeService()
+    mem_map = _wide_mem_map()
+    dest_dir = _project_dir(tmp_path)
+
+    result = service.save_patched(
+        mem_map,
+        _WIDE_RANGES,
+        dest_dir,
+        "service-patched.s19",
+        source_kind="s19",
+        bytes_per_line=32,
+        s0_header=b"HDR",
+    )
+
+    assert result.ok, result.message
+    saved = next(dest_dir.glob("service-patched*.s19"))
+    written = saved.read_text(encoding="ascii")
+    assert any(count > 16 for count in _data_byte_counts(written))  # 32 reached
+    s0_line = next(line for line in written.splitlines() if line.startswith("S0"))
+    assert int(s0_line[2:4], 16) - 2 - 1 == len(b"HDR")  # populated S0
+
+    reparsed = S19File(str(saved))
+    assert reparsed.get_errors() == []
+    assert _data_record_map(reparsed) == mem_map
+
+
+def test_tc220b_hex_save_unaffected_by_s19_only_kwargs(tmp_path: Path) -> None:
+    """C1 — the HEX branch ignores the S19-only width/header kwargs: a HEX
+    save with bytes_per_line set still writes a valid Intel-HEX file and does
+    NOT raise (the HEX emitter takes no such kwargs).
+
+    Intent: LLR-015.3 C1 — the new params are dispatched on the S19 branch
+    only; passing them to a HEX save must not TypeError, and the re-parsed
+    .hex carries 0 errors with the intended map.
+    """
+    mem_map = _wide_mem_map()
+    dest_dir = _project_dir(tmp_path)
+
+    saved_path, issues = save_patched_image(
+        mem_map,
+        _WIDE_RANGES,
+        dest_dir,
+        "patched.hex",
+        source_kind="hex",
+        bytes_per_line=32,
+    )
+
+    assert issues == []
+    assert saved_path is not None and saved_path.suffix == ".hex"
+    reparsed = IntelHexFile(str(saved_path))
+    assert reparsed.get_errors() == []
+    assert reparsed.memory == mem_map

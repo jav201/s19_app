@@ -714,6 +714,7 @@ def _execute_one_variant(
                         project_dir,
                         f"{variant.variant_id}-patched.s19",
                         source_kind="s19",
+                        bytes_per_line=32,
                     )
                     summary.saved_path = saved_path
                     if saved_path is None:
