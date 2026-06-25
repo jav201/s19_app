@@ -51,6 +51,18 @@
         {
             "phase": 3,
             "date": "2026-06-24",
+            "decision": "Inc3-implemented-awaiting-gate-PHASE-3-COMPLETE-on-approval",
+            "notes": "Inc3 (US-015 selector UI + S0 policy + C3 pilot, FINAL) implemented by software-dev: 3 files. screens_directionb.py SAVEBACK_WIDTHS=(32,16) cycling Width button (default 32, reset-on-show) + bytes_per_line additive on SaveBackDecision; app.py _synth_s0_header_from_filename (<=252 ascii) + save-back handler reads event.bytes_per_line, preserve(source_s0_header)/synthesize/empty S0 policy, threads both params (closes F1); test_tui_patch_editor_v2.py AT-015.1 (32) + AT-015.3 (16) pilots reading written .s19 off disk via frozen S19File. code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/3 LOW; C3 pilot genuine black-box = YES (AT pair, no stub). 3 LOW carried to Phase 4 as BINDING hardening: F1 (AT-015.1 asserts on default value -> tighten to cycle selector off+back), F2 (preserve leg unit-tested at load seam but not black-box -> add preserve-leg AT + document empty-S0->synth semantics), F3 (trim comment). ORCHESTRATOR spot-check: diff=3 files (0 frozen), pilots on disk, selector wired, app.py ruff=6 pre-existing C-7 (0 introduced), 15 collected. LEDGER 919->921 (+2). Full regression 868/0. PHASE 3 COMPLETE on approval: Inc1+Inc2+Inc3, ledger 903->921 (+18), 0 frozen edits. NOT committed. Awaiting Inc3 gate."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
+            "decision": "Inc2-approved-committed-Inc3-started",
+            "notes": "Inc2 APPROVED ('approve') + committed d464464 (code) + 9520453 (docs). Tree clean atop 9169130, not pushed. Inc3 (FINAL increment) dispatched: {16,32} selector UI in screens_directionb.py (default 32) + wire choice from app.py save-back handler (closes code-reviewer F1 silent-default-32) + preserve/synthesize S0 policy (32-mode: source_s0_header from current LoadedFile if present, else synthesize minimal from dest filename bounded<=252; 16-mode: None=empty S0) + C3 black-box pilot AT-015.1 via run_test driving the selector. C2 (CRC->32) no code (inherits default). Ledger base 919."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-24",
             "decision": "Inc2-implemented-awaiting-gate",
             "notes": "Inc2 (US-015 backend save-flow threading) implemented by software-dev: 4 files. apply.py save_patched_image +bytes_per_line/s0_header passed to emit() ONLY under source_kind=='s19' (C1, apply.py:701); change_service.save_patched +params forwarded (two-hop F-A-05); variant_execution_service:711 passes bytes_per_line=32; tests TC-219 (S19 thread) + TC-220 (through change_service) + TC-220b (HEX unaffected — real TypeError guard outside try/except). code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/2 LOW (F1 app.py:1428 caller silent-default-32 = expected Inc3 carry; F2 explicit-32 redundant leave). C1 CLOSED = YES (HEX save-back provably works). ORCHESTRATOR spot-check: diff=4 files (0 frozen), C1 branch at apply.py:701, TC-219/220/220b on disk, 41 collected. LEDGER 916->919 (+3). Pre-existing ruff F401 typing.List change_service.py:38 (batch-15 carry C-7, NOT introduced — git-stash confirmed). NOT committed. Awaiting Inc2 gate. Inc3 = selector UI + preserve/synthesize S0 + C3 pilot AT (FINAL increment)."
         },
