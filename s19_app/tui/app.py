@@ -1446,7 +1446,10 @@ class S19TuiApp(App):
               matching S0 policy (US-015 / LLR-015.3): at 32 bytes/line
               PRESERVE the loaded image's ``source_s0_header`` when present,
               else SYNTHESIZE a minimal ASCII S0 from the destination filename
-              (``_synth_s0_header_from_filename``); at 16 bytes/line write the
+              (``_synth_s0_header_from_filename``). Note: an EMPTY source S0
+              (zero-length ``bytes``) is falsy and so is treated as absent →
+              synthesized, same as ``None`` (the ``source_s0_header or synth``
+              semantics). At 16 bytes/line write the
               legacy empty S0 (``s0_header=None``). Then
               ``ChangeService.save_patched`` into the active project directory
               (work-area root when no project is active); the typed name
