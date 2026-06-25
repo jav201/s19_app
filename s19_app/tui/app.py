@@ -24,7 +24,6 @@ from textual.widgets import (
     ProgressBar,
     Static,
 )
-from textual.widgets.data_table import RowDoesNotExist
 from rich.text import Text
 
 from ..compare import DIFF_KIND_DOMAIN
@@ -34,9 +33,7 @@ from .a2l_parse import parse_a2l_file
 from .changes import STATUS_VERIFIED, VerifyResult
 from .hexview import (
     address_in_sorted_ranges,
-    build_mem_map_s19,
-    build_range_validity_hex,
-    build_range_validity_s19,
+    build_range_validity_hex,  # noqa: F401  (kept as test monkeypatch seam: test_tui_app.py patches app.build_range_validity_hex)
     build_row_bases,
     build_sorted_range_index,
     find_string_in_mem,
@@ -105,7 +102,6 @@ from .workspace import (
     A2L_EXTENSIONS,
     HEX_EXTENSIONS,
     MAC_EXTENSIONS,
-    PROJECT_DATA_EXTENSIONS,
     PROJECT_PRIMARY_DATA_EXTENSIONS,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,

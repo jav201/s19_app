@@ -29,7 +29,14 @@
         {
             "phase": 6,
             "date": "2026-06-25",
-            "decision": "awaiting-gate",
+            "decision": "synced-to-obsidian",
+            "notes": "Batch-16 MERGED to main (PR #23, merge dd46113) after tui-ci PASS (7m57s) + integrated PR review APPROVE-MERGE (6 seams clean). /dev-flow-sync run: C-1 reject-check (FIRST real use) PASSED — no live placeholders (§2.6 Connextra tokens correctly recorded as backtick-quoted false positives, anti-false-positive rule worked), 04-validation has PASS verdict + filled tables. Copied 01/02/04/05 + 06-docs/ (NO 03-increments) to G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-25-batch-16\\; generated 2026-06-25-batch-16-README.md (metrics frontmatter + body); Dashboard.md existed (untouched); 0 mojibake. obsidian_synced flipped true (uncommitted local flip rides into next batch's first commit, batch-13 pattern). BATCH-16 / GAP#2 FULLY CLOSED + SYNCED. NEW carry C-12 (output-then-consume AT discipline) proposed for global ~/.claude (needs operator auth like C-1/RC-1/C-10).",
+            "_prev": "phase6-awaiting"
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-25",
+            "decision": "phase6-content-closed",
             "notes": "Phase 5 'close batch' APPROVED + post-mortem committed 27c6590. Phase 6 docs (docs-writer + presentation-builder, written to WORKTREE paths — no main-repo leak this time): REQUIREMENTS.md §22 (R-PROJ-ASSIGN-001 / -UI-001 / -SEC-001, Automated, living-doc format matching §20/§21) + 06-docs/ (traceability-matrix dual-chain w/ real nodes + G-3 consumer-guard-vs-e2e distinction, functionality operator walkthrough, diagrams/batch-16-flows 4 Mermaid, executive-summary ~1.5pp). ORCHESTRATOR verified: §22+3 R-* present, 4 06-docs files in worktree, NO leak to main checkout, all 4 cited test nodes EXIST on disk (anti-fabrication), Mermaid present, UTF-8, git diff = REQUIREMENTS.md+state only (0 prod/frozen). Batch-16 CONTENT CLOSED. Next: commit Phase 6 -> push claude/batch-16-gap2 -> PR to main -> review + CI (tui-ci) -> merge -> /dev-flow-sync (uses the C-1 reject-check + flips obsidian_synced; carries batch-14 obsidian flip from batch-14 snapshot). Awaiting Phase 6 gate.",
             "_prev": "phase5-close"
         },
@@ -115,6 +122,6 @@
             "notes": "PHASE-0-AWAITING-GATE. 3 scoping decisions RESOLVED (operator AskUserQuestion): (1) surface = extend SaveProjectScreen with per-variant assignment rows (at-save-time); (2) persist BOTH assignments + project-wide batch; (3) assignable files restricted to project-workarea (project-relative, satisfies _reject_unsafe_entry). US-017 -> READY (0 REFINE/SPIKE/OUT). §2.6 written. Likely 2 increments: I1 SaveProjectPayload + save-handler threading (app.py:3687/3701 + verify) + through-save round-trip AT; I2 the per-variant assignment UI in SaveProjectScreen. Awaiting Phase-0 DoR gate. ORIGINAL: Operator: 'Perform GAP 2.' RC-1 base-currency gate APPLIED (the new control's first use): git fetch -> origin/main=b734c19 (batch-14 merged); confirmed GAP#2 LIVE/unbuilt (REQUIREMENTS §17 documents the manifest WRITER's batch/assignments support, but save path app.py:3687 passes none + no assignment UI). Cut fresh branch claude/batch-16-gap2 off b734c19; batch-14 snapshotted; BACKLOG done-markers carried. Explore agent mapped the substrate (model/writer/verifier/save-gap/consumer/variant-model/test-gap, all outside frozen). batch-16 scaffolded (.dev-flow/2026-06-25-batch-16/, 0 residual placeholders). Phase 0 = scope GAP#2 into US-017 (per-variant file-assignment surface + manifest persistence + through-save round-trip AT). 3 open scoping questions (surface placement / assignments-only-vs-batch / file source) owed before READY. Awaiting Phase-0 DoR gate."
         }
     ],
-    "obsidian_synced": false,
+    "obsidian_synced": true,
     "created_at": "2026-06-25T16:00:00-06:00"
 }
