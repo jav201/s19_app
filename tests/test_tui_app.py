@@ -662,13 +662,17 @@ def test_parse_loaded_file_primary_after_mac_keeps_mac_payload(tmp_path: Path, m
         mac_diagnostics=["ok"],
     )
 
+    # Sentinel range_validity: a value the real build_range_validity_hex would
+    # never return, so the assertion below can only pass if the monkeypatch
+    # (not the real helper) is the source — proving the seam is live.
+    sentinel_range_validity = ["PATCHED"]
     primary_loaded = LoadedFile(
         path=tmp_path / "new.hex",
         file_type="hex",
         mem_map={0x3000: 0x11},
         row_bases=[0x3000],
         ranges=[(0x3000, 0x3001)],
-        range_validity=[True],
+        range_validity=sentinel_range_validity,
         errors=[],
         a2l_path=None,
         a2l_data=None,
@@ -686,8 +690,12 @@ def test_parse_loaded_file_primary_after_mac_keeps_mac_payload(tmp_path: Path, m
             },
         )(),
     )
+    # The production hex path resolves this helper through load_service's
+    # globals (build_loaded_hex -> load_service.build_range_validity_hex), not
+    # the app module namespace, so the patch must target load_service to take
+    # effect.
     monkeypatch.setattr(
-        "s19_app.tui.app.build_range_validity_hex",
+        "s19_app.tui.services.load_service.build_range_validity_hex",
         lambda _f, _r: primary_loaded.range_validity,
     )
 
@@ -697,6 +705,7 @@ def test_parse_loaded_file_primary_after_mac_keeps_mac_payload(tmp_path: Path, m
     assert merged.file_type == "hex"
     assert merged.mem_map == {0x3000: 0x11}
     assert merged.ranges == [(0x3000, 0x3001)]
+    assert merged.range_validity == sentinel_range_validity
     assert merged.mac_path == (tmp_path / "tags.mac")
     assert len(merged.mac_records) == 1
     assert merged.mac_diagnostics == ["ok"]
