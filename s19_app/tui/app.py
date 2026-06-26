@@ -7260,10 +7260,10 @@ class S19TuiApp(App):
     def _update_a2l_filter_menu(self) -> None:
         menu_list = self.query_one("#a2l_filter_menu_list", ListView)
         menu_list.clear()
-        for field in self.a2l_tags_filter_fields:
-            label = f"(*) {field}" if field == self.a2l_tags_filter_field else f"( ) {field}"
+        for field_name in self.a2l_tags_filter_fields:
+            label = f"(*) {field_name}" if field_name == self.a2l_tags_filter_field else f"( ) {field_name}"
             item = ListItem(Label(label))
-            item.data = field
+            item.data = field_name
             menu_list.append(item)
 
     def _set_a2l_filter_field(self, field: str) -> None:
