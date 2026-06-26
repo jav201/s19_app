@@ -33,8 +33,14 @@
 
 ## P2 — Medium (coverage + cleanups to ride soon)
 
-### C-9 — hex-window-content AT for HLR-016
-- **Flow:** /fast-dev-flow. **Why:** HLR-016 says "render the differing bytes in the hex windows" but no AT observes pane content — a blanked-pane defect passes today's 4 ATs. Test-centric, on shipped compare.
+### C-9 — hex-window-content AT for HLR-016 ✅ DONE (2026-06-25, /fast-dev-flow batch claude/fdf-at-gaps)
+- **DONE:** 2 black-box ATs added to `tests/test_tui_diff_compare_realpath.py` observing `#diff_hex_a`/`#diff_hex_b` CONTENT through the shipped Compare surface — `test_compare_hex_windows_render_the_differing_bytes` (asserts the exact differing bytes per pane; counterfactual blank-pane RED captured) + `test_compare_hex_windows_report_no_runs_for_identical_images` (the no-run branch, C-10 (b)). 0 source/engine edits.
+
+### CRC-width lock-AT ✅ DONE (2026-06-25, same batch)
+- **DONE:** `tests/test_crc_operation.py::test_crc_write_emits_32_byte_records` reads the `write_crc_image`-written `.s19` back as TEXT and locks the fixed 32-byte record width (crc.py:879 emits at the default; the `S19File` map oracle is width-agnostic). Counterfactual 16-byte emit → value-discriminating RED (QC-2). 0 source edits.
+
+### CRC save honours operator-selected record width — DEFERRED feature
+- **Flow:** /dev-flow or /fast-dev-flow (own batch). **Why deferred:** `write_crc_image` (crc.py:790) has NO width parameter and hardcodes the default 32 via `emit_s19_from_mem_map(working_mem, working_ranges)` (crc.py:879); US-015's width selector reaches only the Patch Editor save-back, never the CRC operation. Threading a selection through `write_crc_image` + the I5b confirm handler (+ a width source/UI) is net-new feature work. The fixed-32 contract is now LOCKED (above); this item makes it selectable. Parallels the US-015 deferral pattern.
 
 ### 4a — app.py ruff F401 cleanup
 - **Flow:** direct micro-PR. 5–6 unused imports (`app.py:27/37/38/39/107`), predate recent work. Own PR so it doesn't ride a behavioral change.

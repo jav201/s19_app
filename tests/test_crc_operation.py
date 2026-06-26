@@ -445,3 +445,68 @@ def test_write_outside_workarea_collects_finding_and_writes_no_file(
         if p.is_file()
     ]
     assert emitted == []
+
+
+def _s19_data_record_widths(s19_text: str) -> list[int]:
+    """Per-record DATA-byte count for every S1/S2/S3 data record in ``s19_text``.
+
+    Each S-record line is ``S<type><count><address><data><checksum>``; the
+    one-byte ``count`` field covers address + data + checksum bytes, so the
+    data-byte width is ``count - address_bytes - 1`` (address bytes: S1=2, S2=3,
+    S3=4). S0/S5/S7/S8/S9 framing records carry no data and are skipped.
+
+    Args:
+        s19_text (str): The full text of an emitted S19 file.
+
+    Returns:
+        list[int]: The data-byte width of each S1/S2/S3 data record, in file order.
+    """
+    addr_bytes_by_type = {"S1": 2, "S2": 3, "S3": 4}
+    widths: list[int] = []
+    for line in s19_text.splitlines():
+        tag = line[:2]
+        if tag in addr_bytes_by_type:
+            count = int(line[2:4], 16)
+            widths.append(count - addr_bytes_by_type[tag] - 1)
+    return widths
+
+
+def test_crc_write_emits_32_byte_records(tmp_path: Path) -> None:
+    """#7 lock-AT — the CRC save path emits the fixed 32-byte S19 record width.
+
+    Intent: ``write_crc_image`` serialises via
+    ``emit_s19_from_mem_map(working_mem, working_ranges)`` (crc.py:879) with NO
+    ``bytes_per_line`` argument, so it rides the emitter's default 32-byte width.
+    The map oracle the other CRC tests re-read through
+    (``S19File.get_memory_map``) flattens records and is WIDTH-AGNOSTIC, so today
+    nothing observes the emitted record width on this path. This locks the actual
+    contract: read the written ``.s19`` back as TEXT and assert its data records
+    carry 32 data bytes — a value-discriminating lock (a regression emitting
+    16-byte records makes ``max == 32`` fail with 16 != 32, QC-2). Making the path
+    honour an operator-SELECTED width is deferred feature work (spec §5); this
+    only pins the current default.
+    """
+    # 64 contiguous bytes -> two full 32-byte data records on the S1 path
+    # (addresses <= 0xFFFF); a 4-byte CRC record is injected into the 0x200 gap.
+    payload = bytes((0x10 + i) & 0xFF for i in range(0x40))
+    op_input = _contiguous_op_input(0x100, payload)
+    region = CrcRegion(start=0x100, end=0x120, output_address=0x200)
+    config = _default_config([region])
+
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+
+    assert result.written_path is not None and result.written_path.exists(), (
+        f"the CRC write must land a file; findings={result.findings!r}"
+    )
+    widths = _s19_data_record_widths(
+        result.written_path.read_text(encoding="utf-8")
+    )
+    assert widths, "the written .s19 must contain at least one data record"
+    # The fixed contract: full data records are 32 bytes wide, none exceed it.
+    assert 32 in widths, (
+        f"the CRC save must emit a full 32-byte record; widths={widths}"
+    )
+    assert max(widths) == 32, (
+        f"the CRC save's record width must be the fixed 32, not {max(widths)}; "
+        f"widths={widths}"
+    )

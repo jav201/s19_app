@@ -221,3 +221,112 @@ def test_at_016_4_legit_small_valid_image_is_not_flagged(tmp_path: Path) -> None
     assert is_ok is True, (
         f"a valid small-vs-full compare must proceed to sev-ok; status was {status_text!r}"
     )
+
+
+def _drive_compare_hex(tmp_path: Path, path_a: Path, path_b: Path) -> tuple[str, str, str]:
+    """Drive the real Compare button and read back the two hex-window panes.
+
+    Summary:
+        Same shipped path as :func:`_drive_compare` (activate the diff screen with
+        no project loaded, type the two external paths, press the REAL
+        ``#diff_compare_button``), but read back the rendered text of the two hex
+        windows ``#diff_hex_a`` / ``#diff_hex_b`` — auto-populated with the FIRST
+        run's window by ``AbDiffPanel.render_comparison`` — plus the run list. This
+        observes the hex-pane CONTENT the four AT-016 status/run-list tests never
+        read: a blanked or stale hex pane passes those but fails a byte-content
+        assertion here (C-9).
+
+    Args:
+        tmp_path (Path): The app ``base_dir`` (external-path resolution root).
+        path_a (Path): Absolute path typed into ``#diff_path_a``.
+        path_b (Path): Absolute path typed into ``#diff_path_b``.
+
+    Returns:
+        tuple[str, str, str]: ``(hex_a_text, hex_b_text, range_text)`` — the
+        rendered text of ``#diff_hex_a``, ``#diff_hex_b`` and ``#diff_range_list``.
+
+    Dependencies:
+        Uses:
+            - S19TuiApp.run_test / action_show_screen
+        Used by:
+            - the compare hex-window ATs (#6 / C-9)
+    """
+
+    async def _run() -> tuple[str, str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            app.query_one("#diff_path_a", Input).value = str(path_a)
+            app.query_one("#diff_path_b", Input).value = str(path_b)
+            app.query_one("#diff_compare_button").press()
+            await pilot.pause()
+            return (
+                str(app.query_one("#diff_hex_a", Static).render()),
+                str(app.query_one("#diff_hex_b", Static).render()),
+                str(app.query_one("#diff_range_list", Static).render()),
+            )
+
+    return asyncio.run(_run())
+
+
+def test_compare_hex_windows_render_the_differing_bytes(tmp_path: Path) -> None:
+    """AT-COMPARE-HEX (#6 / C-9) — the compare hex panes show the run's real bytes.
+
+    Intent: the four AT-016 tests assert the status severity and the run LIST but
+    never read the hex windows, so a blanked / content-swapped ``#diff_hex_a`` /
+    ``#diff_hex_b`` pane would pass them all. This drives the real Compare on two
+    on-disk S19 images that differ at four known bytes and asserts those EXACT bytes
+    are rendered in the correct pane — image A shows ``00 01 02 03`` where image B
+    shows ``F0 F1 F2 F3`` — so a blank or swapped pane fails. (C-10: a non-default
+    differing pair, asserting byte CONTENT, not merely non-emptiness.)
+    """
+    a = tmp_path / "hex_a.s19"
+    b = tmp_path / "hex_b.s19"
+    ranges = [(0x500, 0x508)]
+    _write_s19(a, {0x500 + i: i & 0xFF for i in range(8)}, ranges)
+    # Same range, first four bytes flipped to 0xF0..0xF3 -> a contiguous changed run.
+    flipped = {0x500 + i: i & 0xFF for i in range(8)}
+    for i in range(4):
+        flipped[0x500 + i] = (0xF0 + i) & 0xFF
+    _write_s19(b, flipped, ranges)
+
+    hex_a, hex_b, range_text = _drive_compare_hex(tmp_path, a, b)
+
+    # The differing bytes render in their own pane...
+    assert "00 01 02 03" in hex_a, f"image A pane must show A's original bytes; pane={hex_a!r}"
+    assert "F0 F1 F2 F3" in hex_b, f"image B pane must show B's flipped bytes; pane={hex_b!r}"
+    # ...and B's bytes are NOT in A's pane (content-discriminating: a swapped/blank pane fails).
+    assert "F0 F1 F2 F3" not in hex_a, f"image A pane must not carry B's bytes; pane={hex_a!r}"
+    # The shared context bytes render as real bytes on BOTH sides (fails on a blank pane).
+    assert "04 05 06 07" in hex_a and "04 05 06 07" in hex_b, (
+        f"the shared tail bytes must render on both panes; a={hex_a!r} b={hex_b!r}"
+    )
+    # Sanity: a changed run is in fact driving the windows.
+    assert "changed" in range_text, (
+        f"the differing bytes must classify as a changed run; runs={range_text!r}"
+    )
+
+
+def test_compare_hex_windows_report_no_runs_for_identical_images(tmp_path: Path) -> None:
+    """AT-COMPARE-HEX-EQUAL (#6 boundary) — identical images hit the no-run branch.
+
+    Intent: the boundary / negative control for the hex panes and the SECOND branch
+    of ``render_comparison`` (C-10 (b): one AT per branch). Two byte-identical on-disk
+    images produce zero differing runs, so the panel takes the no-run branch and the
+    hex windows must SAY so ("no differing runs") rather than going blank or showing
+    a stale window — distinguishing a real no-run message from a blanked pane.
+    """
+    same_map = {0x500 + i: i & 0xFF for i in range(8)}
+    ranges = [(0x500, 0x508)]
+    a = tmp_path / "same_a.s19"
+    b = tmp_path / "same_b.s19"
+    _write_s19(a, same_map, ranges)
+    _write_s19(b, dict(same_map), ranges)
+
+    hex_a, hex_b, range_text = _drive_compare_hex(tmp_path, a, b)
+
+    assert "no differing runs" in hex_a, f"identical images -> A pane must state no runs; pane={hex_a!r}"
+    assert "no differing runs" in hex_b, f"identical images -> B pane must state no runs; pane={hex_b!r}"
+    assert "Runs: 0" in range_text, f"identical images must classify as zero runs; runs={range_text!r}"

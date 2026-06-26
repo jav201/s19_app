@@ -1,46 +1,97 @@
-# Quick Spec — s19_app — audit-gaps follow-up (gaps #3/#4; #2 premise-corrected)
+# Quick Spec — s19_app · AT-gap closure (compare hex-window + CRC width)
 
-> `/fast-dev-flow` batch on branch `claude/audit-gaps-followup` (off merged main `d3c9cfe`). Follow-up to batch-15 (gap #1/US-016, merged PR #20). Retroactive black-box acceptance closure for the remaining 2026-06-23 audit gaps. English.
+> `/fast-dev-flow` batch. Two latent **black-box AT gaps** from prior batches, both **test-only** on already-shipped code. Cut fresh off `origin/main` `16ab9aab` (RC-1 PASS). English. Branch `claude/fdf-at-gaps`.
+
+---
 
 ## 1. Objective (1 line)
-Close the remaining audit black-box-acceptance gaps by adding Pilot e2e + artifact-on-disk tests that observe each user-facing deliverable through the shipped surface — gap #3 (report-generation seam) and gap #4 (demo evidence packs); **gap #2 is premise-corrected and pulled out (see §5).**
 
-## 2. User stories
-- **US-A (gap #3, batch-07):** As an operator, when I trigger report generation from the Reports screen on a project, I want a real timestamped report file written under the project's `reports/` dir, its path shown in the status line, and the just-generated report rendered in the viewer — so I can trust the in-app report trigger end-to-end.
-- **US-B (gap #4, batch-01):** As an operator, when I save a project / dump A2L JSON, I want the on-disk artifact to actually appear (a project folder under `.s19tool/workarea/<project>/`; an `<name>.a2l.json` file) — so the demo-evidence claims are observed, not assumed.
+Close two latent acceptance-test gaps with black-box ATs that observe *content* a blanked/regressed surface would otherwise pass silently: the A↔B compare **hex-window** panes (#6 / C-9), and the CRC save path's **S19 record width** (#7, reframed to a fixed-32 lock-AT).
+
+---
+
+## 2. User stories (Connextra)
+
+- As an operator comparing two firmware images, I want the compare view's hex windows to actually show the selected run's bytes, so that I can trust the on-screen A/B hex is real and not a blank/stale pane.
+- As an operator saving a CRC-injected image, I want the written `.s19` to keep its documented record width, so that a downstream tool reading the file gets the byte layout it expects.
+
+---
 
 ## 3. Acceptance criteria (observable)
-**US-A — report-generation seam (gap #3):**
-- **AC-A1:** When the operator opens Reports (`t` → `action_view_reports`) on a saved project and triggers generation (`ReportViewerScreen.GenerateRequested` → `_trigger_generate_report`), the system shall write a real `<timestamp>-*.md` (or the actual naming) file under `.s19tool/workarea/<project>/reports/` — asserted to exist + be non-empty on disk via Pilot.
-- **AC-A2:** After generation, the status line (or the screen's surfaced path) shall show the written report path.
-- **AC-A3:** The just-generated report shall be rendered in `ReportViewerScreen` (observed through the screen, not a hand-built fixture).
-- *(If the seam already works pre-existing → these lock it as a regression; the AT still demonstrates the deliverable is observed through the surface. If any leg is broken → minimal fix + the failing leg shown red pre-fix.)*
 
-**US-B — evidence packs (gap #4):**
-- **AC-B1:** When the operator saves a project (`action_save_project` flow), a project folder shall appear under `.s19tool/workarea/<project>/` containing the saved primary — asserted on disk via Pilot.
-- **AC-B2:** When the operator dumps A2L JSON (`j` → `action_dump_a2l_json`), an `<name>.a2l.json` file shall be written and exist non-empty on disk — asserted via Pilot.
+- [ ] **AT-COMPARE-HEX (#6 / C-9):** When the operator compares two on-disk S19 images that differ at known bytes and selects the changed run, the system shall render those exact differing bytes in `#diff_hex_a` AND `#diff_hex_b` — the AT asserts the specific hex byte values appear (not merely that the panes are non-empty / not the placeholder), and FAILS if either pane is blank. (C-10: non-default differing pair; assert content.)
+- [ ] **AT-COMPARE-HEX-EQUAL (#6 boundary):** When the two compared images are byte-identical over the shared range and a run is selected, `#diff_hex_a` / `#diff_hex_b` shall render the same real bytes on both sides — a content assertion that still FAILS on a blanked pane (the boundary control distinguishing "real equal content" from "blank").
+- [ ] **AT-CRC-WIDTH-32 (#7 lock):** When `write_crc_image` saves a CRC-injected image into the work area, the written `.s19`'s data records shall each carry ≤ 32 data bytes with at least one full 32-byte record (the current fixed contract) — read back off disk and asserted on actual per-record data-byte counts; a regression that changed the emitted width (e.g. to 16) FAILS this lock.
+
+---
 
 ## 4. Validation strategy (1 paragraph)
-Textual Pilot `App.run_test()` drives each real action/binding on a synthetic project (reuse `tests/conftest.py` generators + `tmp_path` as `base_dir`); each test asserts the deliverable on disk (file exists + non-empty) and/or through the rendered screen — never via a faked service. Run `pytest -q` for the suite; confirm engine-frozen guards still pass. Where a leg is already green, the test is a locked regression (state so explicitly); where a leg is red, capture the failing run before the fix. Promote the corresponding `REQUIREMENTS.md` R-* rows from Manual/Partial → Automated for the legs that become covered.
+
+Three black-box ATs, all driving the **shipped surface** and observing real artifacts; **no engine/source edits expected**. #6 extends `tests/test_tui_diff_compare_realpath.py`'s Pilot harness (`_drive_compare`): after `#diff_compare_button`, drive the run-selection that populates the hex windows, then read `#diff_hex_a` / `#diff_hex_b` `.render()` and assert the known differing bytes (fixtures via `emit_s19_from_mem_map`, existing pattern). The one Phase-B unknown to confirm: the run-selection mechanism is Pilot-drivable (the panes populate on run pick per screens_directionb.py:965). #7 adds a test near `tests/test_crc_operation.py` calling `write_crc_image` with a `tmp_path` workarea, reads the written `.s19` back (line inspection / `S19File`), and asserts per-record data-byte width — locking the default-32 contract. **Close evidence:** all 3 ATs GREEN; each shown to FAIL under its counterfactual per C-10 (blank-pane / placeholder for #6; width-flipped emit for #7); full `pytest -q -m "not slow"` stays green; 0 engine-frozen edits; `code-reviewer` pass.
+
+---
 
 ## 5. Non-goals (what is OUT)
-- **GAP #2 (batch-11 manifest composition) — PULLED OUT, premise-corrected.** Disk verification (this Phase A) shows the TUI save path holds **no** `batch`/`assignments` state and there is **no operator surface** to assign per-variant files; `assignments` semantics = *additional* per-variant files (not the primary image), so deriving them from the variant set is semantically wrong. The execution service *does* consume `manifest.batch`/`assignments` (variant_execution_service.py:586-602), but a TUI save legitimately has none to record today. Making a save persist non-empty batch/assignments is **net-new feature work** (a per-variant file-assignment surface + persistence), not a wiring fix — so the audit's "drive save with non-empty batch/assignments → assert round-trip" cannot be honestly grounded. **Recommend deferring gap #2 to its own forward-feature `/dev-flow` batch** (parallels the US-015 deferral in batch-15). Operator decision requested at the Phase-A gate.
-- C-1 (automated `dev-flow-sync` unfilled-template reject-check) — global `~/.claude` config, separate task.
-- US-015 (16/32 S19 record width + S0) — its own forward-feature batch.
-- No engine-frozen edits (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`).
-- No new report/export *behavior* — only tests that observe the existing shipped writes (+ minimal fix only if a leg is genuinely broken).
+
+- **Making the CRC save honor an operator-selected width** — `write_crc_image` (crc.py:790) has no width parameter; threading a selection through it + the I5b confirm handler is a production **feature**, deferred to its own batch (logging to BACKLOG). This batch only LOCKS the current fixed-32 contract.
+- No changes to diff/compare classification, the CRC algorithm, or any engine-frozen module (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`).
+- No new UI, no new save/export surface.
+
+---
 
 ## 6. Detected security flags
-- Scanned objective + criteria + description for the sensitive-pattern list. Matches: "export" / file-write (A2L JSON, report.md) — but these are **existing shipped writes into the contained `.s19tool/workarea/`** being *observed by tests*, not new write/exec/network/auth/secret/PII surfaces. No new external surface, no auth, no secrets, no destructive DB.
-- **`security_required: false`.** (Tests write only synthetic fixtures into a `tmp_path` work area.)
+
+- [ ] Auth / identity
+- [ ] Secrets / config
+- [ ] External integrations
+- [ ] Sensitive data
+- [ ] Destructive DB
+- [ ] Input / attack surface
+- [ ] Network / exposure
+
+**`security_required`:** `false`
+
+Rationale: both items are read-only **observation** ATs on existing behavior. #6 reads rendered widgets; #7 reads a `.s19` the existing CRC path already writes into its contained work area. No new write/external surface, no auth/secrets/PII/network. (The CRC path's existing containment seam is unchanged and out of scope.)
+
+---
 
 ## 7. Batch status
+
 | Field | Value |
 |-------|-------|
 | Current phase | **closed** |
-| Scope | gaps #3 + #4 (2 increments, both locked-regression); gap #2 DEFERRED to its own /dev-flow batch (operator decision, premise-corrected) |
-| Started | 2026-06-24 |
-| Closed | 2026-06-24 |
-| security_required | false |
-| Branch | claude/audit-gaps-followup (off main d3c9cfe) |
-| Outcome | PASS — 5 black-box ATs (3 report-seam + 2 evidence), all already-working/locked-regression; 0 source edits; REQUIREMENTS.md: R-A2L-003/R-TUI-012/R-PROJ-001 → Automated, R-RPT-001/002 augmented; suite sweep 18 passed; engine-frozen guards green |
+| Started | 2026-06-25 |
+| Closed | 2026-06-25 |
+| Promoted to /dev-flow | no |
+| Notes | RC-1 PASS off origin/main 16ab9aab; branch claude/fdf-at-gaps. #7 reframed to fixed-32 lock-AT per operator (CRC save has no width param — feature deferred to BACKLOG). PASS: 3 ATs, 0 source/engine edits, suite 883/0. |
+
+---
+
+## 8. Close (phase C)
+
+### What changed
+Added 3 black-box acceptance tests closing two latent AT gaps, **test-only, 0 source/engine edits**. (#6/C-9) two ATs in `tests/test_tui_diff_compare_realpath.py` observe the compare hex-pane CONTENT (`#diff_hex_a`/`#diff_hex_b`) through the shipped Compare surface — one asserts the exact differing bytes per pane, one covers the no-run branch (C-10 (b)). (#7) one AT in `tests/test_crc_operation.py` reads the `write_crc_image`-written `.s19` back as text and locks the fixed 32-byte record width (the `S19File` map oracle is width-agnostic). BACKLOG updated: C-9 + CRC-lock marked done; the "CRC honours operator-selected width" feature logged as deferred.
+
+### How it was tested
+- `tests/test_tui_diff_compare_realpath.py` — 6 passed (4 existing + 2 new).
+- `tests/test_crc_operation.py` — 13 passed (12 existing + 1 new).
+- Full `pytest -q -m "not slow"` — **883 passed, 29 skipped, 3 xfailed, 0 failed**.
+- **Counterfactuals (non-vacuity, C-10/QC-2):** blank-pane → compare-hex AT RED (`pane='Image A'`); 16-byte CRC emit → width lock RED (`widths=[16,16,16,16,4]`, value-discriminating). Independently re-verified by `code-reviewer` (blank + swapped + 16-byte, all RED).
+- `code-reviewer`: APPROVE (1 LOW docstring nit, fixed). 3 new functions confirmed on disk.
+
+### Open risks / pending
+- None for this batch. Deferred (tracked in BACKLOG): making the CRC save honour an operator-**selected** width is net-new feature work (`write_crc_image` has no width param).
+
+### Security flags — handling
+`security_required: false` — no flags fired (read-only observation ATs; no new write/external/auth/secret surface). No security pass needed.
+
+### Suggested commit message
+```
+test(tui): black-box ATs for compare hex-window content + CRC record width
+
+Close two latent AT gaps (test-only, 0 source edits): observe the A↔B compare
+hex panes (#diff_hex_a/b) through the shipped Compare surface (C-9), and lock the
+CRC save path's fixed 32-byte S19 record width (the S19File map oracle is
+width-agnostic). Both counterfactually shown RED. CRC selectable-width logged as
+a deferred feature in BACKLOG.
+```
