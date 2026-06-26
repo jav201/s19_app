@@ -46,8 +46,9 @@
 
 ## P3 — Low (doc/process tidy)
 
-### C-6 — retire provisional TC-230/231 ids in REQUIREMENTS.md / dev-flow docs
-- **Flow:** direct. Doc cleanup.
+### C-6 — retire provisional TC-230/231 ids ✅ DONE (2026-06-25)
+- **DONE — substantively already satisfied; closed with finding.** REQUIREMENTS.md never contained `TC-230`/`TC-231` — §20 (`R-DIFF-LOADFAIL-001`) cites the real node names (`test_at_016_*`), so there was nothing to retire there. The batch-15 archives (`.dev-flow/2026-06-24-batch-15/`) already document every `TC-230`/`TC-231` mention as RETIRED / subsumed-by-AT (V-5); left untouched as a closed + Obsidian-synced historical record (no retroactive rewrite). No live dangling identifier exists anywhere — the only remaining mentions are carry-tracking entries (this item + the batch-14/16 post-mortem carry lists).
+- **Flow:** direct. Doc closure (no archive rewrite); rode the F402 `app.py` micro-PR.
 
 ### C-10 — AT-authoring discipline ✅ DONE (2026-06-25, reframed) + C-11 ✅ DONE
 - **DONE:** encoded in `~/.claude/commands/dev-flow.md` two-layer section — (a) no default-value-reliant pilots (drive a non-default value / cycle off-and-back); (b) one AT per policy branch, asserting *content*. **C-11 ownership** also DONE (qa authors at Phase 1/3; Phase-2 + code-review treat violations as findings).
