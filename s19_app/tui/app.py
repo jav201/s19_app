@@ -33,7 +33,6 @@ from .a2l_parse import parse_a2l_file
 from .changes import STATUS_VERIFIED, VerifyResult
 from .hexview import (
     address_in_sorted_ranges,
-    build_range_validity_hex,  # noqa: F401  (kept as test monkeypatch seam: test_tui_app.py patches app.build_range_validity_hex)
     build_row_bases,
     build_sorted_range_index,
     find_string_in_mem,
