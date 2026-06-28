@@ -1,0 +1,127 @@
+{
+    "project": "s19_app",
+    "language": "en",
+    "batch_id": "2026-06-25-batch-16",
+    "batch_objective": "GAP #2 (batch-11 SCOPE-1, premise-corrected NET-NEW feature): give the project save an operator surface to assign per-variant change/check files (and optionally project-wide batch files), persist them into the manifest (write_project_manifest batch/assignments kwargs, manifest_writer.py:370), and prove the round-trip through the SHIPPED save handler (assign -> save -> reload project.json -> manifest.assignments non-empty + consumed by plan_variant_executions, variant_execution_service.py:526). Today app.py:3687 calls write_project_manifest with NO batch/assignments and there is no assignment UI; the writer's batch/assignments were tested only via direct kwargs (the SCOPE-1 gap).",
+    "current_phase": 6,
+    "phase_status": "awaiting-sync",
+    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 0, "4": 1, "5": 0, "6": 0},
+    "artifacts": {
+        "1": ".dev-flow/2026-06-25-batch-16/01-requirements.md",
+        "2": ".dev-flow/2026-06-25-batch-16/02-review.md",
+        "backlog": ".dev-flow/BACKLOG.md"
+    },
+    "branch": "claude/batch-16-gap2 (cut fresh off origin/main b734c19 per RC-1 base-currency gate; batch-14 + batch-15 already merged)",
+    "previous_batches": [
+        "2026-05-05-batch-01","2026-05-20-batch-02","2026-05-21-batch-03","2026-05-21-batch-04",
+        "2026-05-26-batch-05","2026-06-09-batch-06","2026-06-10-batch-07","2026-06-11-batch-08",
+        "2026-06-11-batch-09","2026-06-13-batch-10","2026-06-14-batch-11","2026-06-16-batch-12",
+        "2026-06-17-batch-13","2026-06-23-batch-14","2026-06-24-batch-15"
+    ],
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. batch-14 closing state snapshotted to .dev-flow/2026-06-23-batch-14/state-snapshot-at-close.json at batch-16 init (obsidian_synced true). Uncommitted ride-alongs carried onto this branch (BACKLOG done-markers for C-1/RC-1/C-10/C-11; batch-14 obsidian flip lives in the batch-14 snapshot) -> fold into batch-16's first commit.",
+    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. GAP #2 surfaces are ALL outside: manifest_writer.py, variant_execution_service.py, app.py save handler, screens.py SaveProjectScreen/SaveProjectPayload, models.py — confirmed by Phase-0 substrate map.",
+    "carried_context": {
+        "gap2_substrate_map": "ProjectManifest (variant_execution_service.py:159): active_variant + batch:list[Path] + assignments:dict[str,list[Path]] (variant_id -> per-variant change/check file paths). Writer write_project_manifest (manifest_writer.py:370) + serialize_manifest (:224) accept batch:Sequence[str]=() + assignments:Mapping[str,Sequence[str]]=None (PROJECT-RELATIVE strings; _reject_unsafe_entry :178 refuses absolute/escaping). verify_written_manifest (:580) re-reads canonical project.json + compares in resolved-Path form, returns drift. SAVE GAP: app.py:3687 write_project_manifest(variant_set, project_dir, self.base_dir) + verify :3701 pass NO batch/assignments. SaveProjectPayload (screens.py:78) = parent_folder+project_name only; SaveProjectScreen (:125) no per-variant field; SelectVariantScreen (:233) is the reusable variant-list pattern. Consumer plan_variant_executions (variant_execution_service.py:526, reads :586-605): scope SCOPE_ASSIGNMENTS -> assignments[variant_id] only; else batch + assignments[variant_id]. Variant model VariantDescriptor (models.py:61) variant_id=filename stem; ProjectVariantSet (models.py:86). TEST GAP: test_tui_manifest_save.py:90 tests active_variant only (no through-save batch/assignments); test_manifest_verify.py has the direct-kwargs round-trip (TC-003a) = the SCOPE-1 coverage.",
+        "scope1_lineage": "batch-11 US-010 manifest writer SUPPORTS batch/assignments but tested only via direct kwargs; the save handler passes empty -> shipped artifact carried only active_variant. This is the A-5 surface-reachability class. GAP #2 closes it: an operator surface + save-path threading + a THROUGH-THE-SAVE-HANDLER round-trip AT (the black-box deliverable observed on disk in project.json).",
+        "open_scoping_questions": "Phase-0 decisions owed (operator): (Q1) surface = extend SaveProjectScreen with per-variant assignment rows, vs a dedicated 'assign variant files' screen decoupled from save; (Q2) persist assignments-only vs assignments + project-wide batch; (Q3) assignable file source = restrict to files already in the project workarea (project-relative, satisfies _reject_unsafe_entry), vs allow external files copied-in. These gate READY."
+    },
+    "decisions_log": [
+        {
+            "phase": 6,
+            "date": "2026-06-25",
+            "decision": "synced-to-obsidian",
+            "notes": "Batch-16 MERGED to main (PR #23, merge dd46113) after tui-ci PASS (7m57s) + integrated PR review APPROVE-MERGE (6 seams clean). /dev-flow-sync run: C-1 reject-check (FIRST real use) PASSED — no live placeholders (§2.6 Connextra tokens correctly recorded as backtick-quoted false positives, anti-false-positive rule worked), 04-validation has PASS verdict + filled tables. Copied 01/02/04/05 + 06-docs/ (NO 03-increments) to G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-06-25-batch-16\\; generated 2026-06-25-batch-16-README.md (metrics frontmatter + body); Dashboard.md existed (untouched); 0 mojibake. obsidian_synced flipped true (uncommitted local flip rides into next batch's first commit, batch-13 pattern). BATCH-16 / GAP#2 FULLY CLOSED + SYNCED. NEW carry C-12 (output-then-consume AT discipline) proposed for global ~/.claude (needs operator auth like C-1/RC-1/C-10).",
+            "_prev": "phase6-awaiting"
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-25",
+            "decision": "phase6-content-closed",
+            "notes": "Phase 5 'close batch' APPROVED + post-mortem committed 27c6590. Phase 6 docs (docs-writer + presentation-builder, written to WORKTREE paths — no main-repo leak this time): REQUIREMENTS.md §22 (R-PROJ-ASSIGN-001 / -UI-001 / -SEC-001, Automated, living-doc format matching §20/§21) + 06-docs/ (traceability-matrix dual-chain w/ real nodes + G-3 consumer-guard-vs-e2e distinction, functionality operator walkthrough, diagrams/batch-16-flows 4 Mermaid, executive-summary ~1.5pp). ORCHESTRATOR verified: §22+3 R-* present, 4 06-docs files in worktree, NO leak to main checkout, all 4 cited test nodes EXIST on disk (anti-fabrication), Mermaid present, UTF-8, git diff = REQUIREMENTS.md+state only (0 prod/frozen). Batch-16 CONTENT CLOSED. Next: commit Phase 6 -> push claude/batch-16-gap2 -> PR to main -> review + CI (tui-ci) -> merge -> /dev-flow-sync (uses the C-1 reject-check + flips obsidian_synced; carries batch-14 obsidian flip from batch-14 snapshot). Awaiting Phase 6 gate.",
+            "_prev": "phase5-close"
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-25",
+            "decision": "close-batch-committed",
+            "notes": "Phase 4 APPROVED ('approve') + committed 33c9fb9 (e2e AT + docstring) + 35f5b79 (04-validation). Phase 5 (architect + qa co-author) -> 05-postmortem.md. HEADLINE: closed clean PASS, 0 defects, 2 increments, ledger 922->933, 0 frozen AND 0 substrate edits (writer/verifier/consumer already had the kwargs since batch-11 -> pure surface-wiring, A-5/SCOPE-1 class, falsifiably proven). TOP LESSON G-3: the batch closing 'tested via direct-kwargs not the shipped surface' nearly shipped its OWN consumer-pickup AT via a direct write; Phase-4 flagged honestly, operator iterated, e2e through-handler AT added. NEW CONTROL proposed C-12/QC-1 (output-then-consume AT discipline: observe consumer over the HANDLER-PRODUCED artifact, not a same-values direct write; extends C-10) — GLOBAL config, propose post-gate. RC-1 first real use held (preventive, not battle-tested). D-KEY caught pre-code by both reviewers. QC-2 (TypeError-RED counterfactual weak -> confirm post-fix value-sensitivity), QC-3 (boundary-catalog pre-Phase-3), QC-4 (keep AT+TC independent). METRICS iters {0:1,1:1,2:1,3:1,4:1}; 0 blocker/4 major/9 minor folded; code-review 2/2; full 900/0. CARRIES: GAP#2 DONE; C-12 NEW; C-9, CRC-width AT, C-7, C-6, N-2 standing. Awaiting Phase 5 gate (close batch / open new batch / iterate)."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-25",
+            "decision": "iteration-PASS-G3-closed-committed",
+            "notes": "Operator: 'iterate'. Phase-4 hardening (test + docstring, NO prod behavior change): G-3 CLOSED — new e2e AT test_at017_2_e2e_consumer_pickup_through_handler (test_tui_manifest_save.py:410) drives the SHIPPED save handler via _save_through_handler, re-reads the HANDLER-WRITTEN project.json (read_project_manifest, NOT direct write), feeds plan_variant_executions(scope=ALL), asserts files_by_id['b'] EXACTLY == (doc.json,extra.json).resolve() + unassigned batch-only. Orchestrator READ the body to confirm handler-driven (not direct write). Original consumer-contract guard kept. G-2 CLOSED (screens.py _collect_composition docstring -> PROJECT_RULES order). 2 files, ruff clean, 26 affected passed, 0 frozen/substrate edits. LEDGER 932->933. 04-validation.md updated (Phase-4 iteration section). Verdict stands PASS. Awaiting Phase-4 re-confirmation gate.",
+            "_prev": "awaiting-gate-PASS"
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-25",
+            "decision": "awaiting-gate-PASS-SUPERSEDED",
+            "notes": "PRE-DECISION. Phase 3 Inc2 APPROVED + committed 2fc948b (code) + 043c3a2 (docs) -> PHASE 3 COMPLETE. Phase 4 (qa-reviewer) -> 04-validation.md (153 lines). VERDICT PASS, 0 FAIL/0 blockers. Full suite 900 passed/29 skip/3 xfail/0 fail (932 collected); not-slow 879/0. Ledger 922+7(Inc1)+3(Inc2)=932 EXACT. COUNTERFACTUAL: reverted prod (app.py/screens.py) to origin/main, tests at HEAD -> AT-017.1/.4/.5 + TC-302/303 RED pre-fix (TypeError: SaveProjectPayload no 'batch' kwarg = payload path absent pre-feature), restored clean. 0 engine-frozen edits; manifest_writer + variant_execution_service EDIT-FREE vs b734c19. Per-LLR + per-AT PASS on real reconciled nodes (V-5; no rename chore). A-5 matrix through shipped handler+UI. HONEST NOTE G-3: spec §5.3#2 listed AT-017.2 among RED-pre-fix but it is correctly GREEN pre-fix — it writes project.json directly + tests only the unchanged consumer plan_variant_executions (a consumer-contract guard, NOT a handler counterfactual); SCOPE-1 closure proven by the 4 handler REDs. The consumer-half-through-handler is a two-step proof (AT-017.1 handler->disk + AT-017.2 disk->consumer), logically sound; could be chained to one e2e pilot if full rigor wanted. G-1 pre-existing app.py C-7; G-2 screens.py docstring nit. ORCHESTRATOR spot-check: 932 collected, substrate+frozen edit-free, 04-validation UTF-8. Awaiting Phase 4 gate.",
+            "_prev": "Inc2-complete"
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-25",
+            "decision": "Inc2-implemented-awaiting-gate-PHASE-3-COMPLETE-on-approval",
+            "notes": "Inc2 (US-017 assignment UI, FINAL) implemented by software-dev: 4 files. screens.py SaveProjectScreen +variants/candidate_files params + assignment SelectionLists (D-NEWPROJ-gated) + _collect_composition (keys from variant_id by index, D-KEY) + save_ok dismisses composed payload; app.py action_save_project passes variant ids + _assignment_candidate_files (top-level in-project .json, excludes project.json); styles.tcss .assign-list; tests TC-304/305/306. code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/2 LOW; D-KEY=YES (variant.variant_id never Path.stem), D-NEWPROJ no-crash=YES (gated, empty for new project). F1 (collision lacks Inc-2 TC) MOOT — AT-017.5 already ships Inc1 (test_at017_5 on disk). ORCHESTRATOR spot-check: diff=4 files (0 frozen/substrate), TC-304/305/306 + Inc1 AT-017.5 + duplicate-stem on disk, 13 collected (full 932), screens.py ruff clean. LEDGER 929->932 (+3). Full non-slow 879/0. The design fork resolved cleanly (action_save_project has _variant_set+project dir in scope, no refactor). NOT committed. PHASE 3 COMPLETE on approval: Inc1+Inc2, ledger 922->932 (+10), 0 frozen/substrate edits. Awaiting Inc2 gate.",
+            "_prev": "Inc2-started"
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-25",
+            "decision": "Inc1-approved-committed-Inc2-started",
+            "notes": "Inc1 APPROVED ('approve') + committed a151d56 (code) + 60aebf0 (docs: batch-16 artifacts + batch-14 snapshot obsidian ride-along + BACKLOG C-1/RC-1/C-10/C-11 done). Tree clean atop b734c19; NOT pushed. Inc2 (FINAL, the assignment UI, LLR-017.3) dispatched: SaveProjectScreen per-variant assignment rows (workarea-restricted .json) + project-wide batch list -> SaveProjectPayload.batch/assignments; D-KEY keys from variant_id not Path.stem; D-NEWPROJ scoped to re-saving existing project (new-project = empty Inc1 default); action_save_project passes variant ids + candidate files; TC-304/305/306 screen-collect pilots (precondition: multi-variant set before action_save_project, F-Q-06). Ledger base 929.",
+            "_prev": "Inc1-awaiting"
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-25",
+            "decision": "Inc1-implemented-awaiting-gate",
+            "notes": "Phase 2 re-confirmation APPROVED ('approve'). Phase 3 entry: toolchain OK (this env). Inc1 (US-017 payload+handler threading+ATs, closes SCOPE-1 at the handler) implemented by software-dev: 4 files. screens.py SaveProjectPayload +batch/assignments (frozen field defaults); app.py _write_and_verify_manifest +*,batch,assignments threaded from payload into BOTH write_project_manifest:3687 AND verify_written_manifest:3701 (R1); tests AT-017.1/.3/.4/.5 + TC-301/302/303 (test_tui_manifest_save) + AT-017.2 + collision-id guard (test_variant_execution). code-reviewer APPROVE-WITH-NITS 0 HIGH/0 MED/2 LOW; R1 correct=YES, D-KEY collision non-vacuous=YES (AT-017.5 fw.s19+fw.hex keys by full filename, fails on Path.stem), counterfactual genuine=YES (reverted threading -> exactly 4 ATs RED). ORCHESTRATOR spot-check: diff=4 files (0 frozen/substrate; manifest_writer+variant_execution_service UNCHANGED), all nodes on disk, 22 collected (full 929), screens.py ruff clean. LEDGER 922->929 (+7). Full suite 897/0. 2 LOW nits non-blocking (F1 monkeypatch pre-existing, F2 redundant assertion line). NOT committed. Awaiting Inc1 gate.",
+            "_prev": "iter2-folded"
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-25",
+            "decision": "approved-iteration-2-reconfirm",
+            "notes": "Operator: 'approve'. Phase-2 re-confirmation APPROVED. All 13 findings folded (0 blocker/4 major/9 minor); 1 HLR/4 LLR/TC-301..312/AT-017.1..5; security MANDATORY granted. Advancing to Phase 3 (NOT autonomous; each increment needs operator approval + code-reviewer)."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-25",
+            "decision": "iteration-2-folded-awaiting-phase2-reconfirm",
+            "notes": "Operator: 'iterate'. Phase-1 iter-2 INLINE fold of all Phase-2 findings (0 blocker/4 major/9 minor, reviewers' own prescriptions; no HLR/LLR statement re-derivation). C1 D-KEY corrected for stem-collision (variant_id = stem OR full filename, tui/workspace.py:399-403; UI sources key from VariantDescriptor.variant_id never Path.stem) + NEW AT-017.5 stem-collision round-trip. C2 AT-017.4 -> POSITIVE refusal observable + no-file (not 'absence of bad entry') + per-AT pre-fix modes in §3. C3 AT-017.2 exact-tuple batch+assignments[vid]. C4 tui/services/ prefix on all 13 writer/consumer citations. Minors: F-A-03 (_handle_save_dialog def :3552) / F-A-04 (ctor :188) / F-A-06 (renumber amendments §6.7) / F-Q-04 (_write_and_verify_manifest NEW *,batch,assignments) / F-Q-05 ('re-reads identically' not byte-identical) / F-Q-06 (pilot multi-variant precondition) / F-S-02/04 (no-file-on-refusal + symlink TC folded into AT-017.4). §6.6 audit table J=C1..C4+minors. ORCHESTRATOR re-verified: AT-017.5 present, collision+exact-tuple folded, 0 bare service paths, dup §6.5 fixed (6.5/6.6/6.7), statements untouched, UTF-8. Now AT-017.1..5 (was .1..4); increment plan UNCHANGED (Inc1 payload+threading+ATs incl collision AT; Inc2 UI). Awaiting Phase-2 re-confirmation gate.",
+            "_prev": "phase2-awaiting"
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-25",
+            "decision": "iterate-to-phase1",
+            "notes": "Operator: 'iterate' (after interrupting an 'approve'). Iterating Phase 1 to fold the Phase-2 register. SUPERSEDES the awaiting-gate-0-blocker-4-major entry below.",
+            "_prev": "awaiting-gate-0-blocker-4-major"
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-25",
+            "decision": "awaiting-gate-0-blocker-4-major",
+            "notes": "PRE-DECISION. Phase 2 cross-review (architect ∥ qa ∥ security) -> 02-review.md. Aggregate 0 BLOCKER / 4 major / 9 minor. SECURITY MANDATORY sign-off GRANTED (0 HIGH/MED; new output surface reuses _reject_unsafe_entry over both batch+assignments dict-values, whole-write-refusal; AT-017.4 drives it through handler; 2 advisory test-strength items). shall/should CLEAN. Census CLEAN (planned files outside frozen; manifest_writer/variant_execution_service confirmed read-only). 4 MAJORS: C1 (F-A-01+F-Q-02, raised by BOTH) D-KEY INCOMPLETE — variant_id=stem EXCEPT stem-collision->full filename (workspace.py:399-403); UI must read VariantDescriptor.variant_id not recompute Path.stem + add collision AT; C2 (F-Q-01) AT-017.4 counterfactual vacuous pre-fix (negative AT) -> assert POSITIVE refusal observable + per-AT failure mode; C3 (F-Q-03) AT-017.2 must assert EXACT tuple batch+assignments[vid] not non-empty; C4 (F-A-02) prefix manifest_writer/variant_execution citations with tui/services/. 9 minors: F-A-03/04/05 anchor drift, F-A-06 dup §6.5, F-Q-04 helper NEW param flag, F-Q-05 byte-identical->re-reads-identically, F-Q-06 LLR-017.3 pilot precondition (multi-variant set before save), F-S-02/04 advisory test-strength. ALL 3 reviewers PASS-WITH-NOTES proceed-after-fold; increment plan unchanged. ORCHESTRATOR RECOMMENDS iterate-light. Awaiting operator Phase-2 gate.",
+            "_prev": "phase1-awaiting"
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-25",
+            "decision": "awaiting-gate",
+            "notes": "PRE-DECISION. Phase 1 (architect + qa parallel) -> 01-requirements.md s3/s4/s5/s6. RESULT: 1 HLR-017 / 4 LLR (017.1 SaveProjectPayload +batch/assignments NEW fields; 017.2 handler threads both into write_project_manifest+verify_written_manifest app.py:3687/3701; 017.3 SaveProjectScreen per-variant UI workarea-restricted; 017.4 reader-as-oracle round-trip + consumer pickup) / TC-301..312 + black-box AT-017.1..4. Baseline RE-MEASURED 922 (b734c19). 2 LOAD-BEARING findings folded: D-KEY (assignment keys MUST be variant_id stem not filename, else plan_variant_executions :599/602 silently drops) + D-NEWPROJ (architect rec: assignment UI scoped to RE-SAVING existing project; brand-new save opens dialog before variant set exists app.py:3617-3619 -> writes empty; keeps Inc1 payload+handler independent of UI). A-5 matrix: the AT MUST drive the SHIPPED save handler (pilot), NOT writer direct-kwargs (the existing insufficient test_manifest_verify.py:76 = the SCOPE-1 hole). Counterfactual: every AT-017.* RED on pre-feature tree (handler passes no kwargs -> on-disk empty). Security: operator paths flow into _reject_unsafe_entry (existing gate); payload stores RELATIVE strings; NEW output surface -> Phase-2 security mandatory. CENSUS: screens.py+app.py+tests outside frozen; manifest_writer/variant_execution_service READ-ONLY substrate. DECOMP: Inc1 payload+threading+round-trip AT (load-bearing, closes SCOPE-1 w/o UI); Inc2 the UI. ORCHESTRATOR re-verified: 1 HLR/4 LLR, 0 should-in-statement, SaveProjectPayload batch/assignments genuinely ABSENT (NEW), anchors exist (write_project_manifest:370, plan_variant_executions:526, SaveProjectPayload:78, SaveProjectScreen:125, models.py:61/86), UTF-8 0 mojibake. PLAN.md created. Awaiting Phase-1 gate (+ D-NEWPROJ confirmation).",
+            "_prev": "batch-16-opened"
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-25",
+            "decision": "batch-16-opened-gap2-intake",
+            "notes": "PHASE-0-AWAITING-GATE. 3 scoping decisions RESOLVED (operator AskUserQuestion): (1) surface = extend SaveProjectScreen with per-variant assignment rows (at-save-time); (2) persist BOTH assignments + project-wide batch; (3) assignable files restricted to project-workarea (project-relative, satisfies _reject_unsafe_entry). US-017 -> READY (0 REFINE/SPIKE/OUT). §2.6 written. Likely 2 increments: I1 SaveProjectPayload + save-handler threading (app.py:3687/3701 + verify) + through-save round-trip AT; I2 the per-variant assignment UI in SaveProjectScreen. Awaiting Phase-0 DoR gate. ORIGINAL: Operator: 'Perform GAP 2.' RC-1 base-currency gate APPLIED (the new control's first use): git fetch -> origin/main=b734c19 (batch-14 merged); confirmed GAP#2 LIVE/unbuilt (REQUIREMENTS §17 documents the manifest WRITER's batch/assignments support, but save path app.py:3687 passes none + no assignment UI). Cut fresh branch claude/batch-16-gap2 off b734c19; batch-14 snapshotted; BACKLOG done-markers carried. Explore agent mapped the substrate (model/writer/verifier/save-gap/consumer/variant-model/test-gap, all outside frozen). batch-16 scaffolded (.dev-flow/2026-06-25-batch-16/, 0 residual placeholders). Phase 0 = scope GAP#2 into US-017 (per-variant file-assignment surface + manifest persistence + through-save round-trip AT). 3 open scoping questions (surface placement / assignments-only-vs-batch / file source) owed before READY. Awaiting Phase-0 DoR gate."
+        }
+    ],
+    "obsidian_synced": true,
+    "created_at": "2026-06-25T16:00:00-06:00"
+}
