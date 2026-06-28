@@ -585,16 +585,47 @@ def _emitted_s19_files(base_dir: Path) -> list[Path]:
     return sorted(workarea.rglob("*-crc.s19"))
 
 
-async def _press_write_and_handle_modal(app, pilot, screen, *, confirm: bool) -> None:
-    """Press Write CRC, then drive the ConfirmWriteScreen confirm/cancel button."""
+async def _press_write_and_handle_modal(
+    app, pilot, screen, *, confirm: bool, select_width=None
+) -> None:
+    """Press Write CRC, then drive the ConfirmWriteScreen.
+
+    When ``select_width`` is given (e.g. 16), the width selector button is cycled
+    (black-box, by its label) until it shows that width before confirming, so the
+    chosen width rides the ``ConfirmWriteResult`` into the writer (US-019).
+    """
     screen.query_one("#operations_write", Button).press()
     await _flush(pilot)
     confirm_screen = app.screen
+    if select_width is not None:
+        width_button = confirm_screen.query_one("#confirm_write_width", Button)
+        guard = 0
+        while str(select_width) not in str(width_button.label) and guard < 5:
+            width_button.press()
+            await _flush(pilot)
+            guard += 1
     button_id = "confirm_write_ok" if confirm else "confirm_write_cancel"
     confirm_screen.query_one(f"#{button_id}", Button).press()
     await _flush(pilot)
     await app.workers.wait_for_complete()
     await _flush(pilot)
+
+
+def _crc_record_widths(s19_text: str) -> list[int]:
+    """Per-record DATA-byte width of each S1/S2/S3 data record in ``s19_text``.
+
+    Mirrors ``tests/test_crc_operation.py::_s19_data_record_widths`` — an S-record
+    line is ``S<type><count><address><data><checksum>``, so data bytes =
+    count - address_bytes - 1 (S1=2, S2=3, S3=4). Used to observe the written
+    record width through the handler-produced file (US-019 AT-019b, C-12).
+    """
+    addr_bytes = {"S1": 2, "S2": 3, "S3": 4}
+    out: list[int] = []
+    for line in s19_text.splitlines():
+        tag = line[:2]
+        if tag in addr_bytes:
+            out.append(int(line[2:4], 16) - addr_bytes[tag] - 1)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -697,3 +728,126 @@ def test_crc_inject_reaches_surface_via_handler(tmp_path: Path) -> None:
     # Non-vacuous: a real file exists on disk under the work area.
     assert len(emitted) == 1, emitted
     assert emitted[0].read_text(encoding="utf-8").strip(), "emitted S19 is empty"
+
+
+# ---------------------------------------------------------------------------
+# US-019 — operator-selected CRC save width (16/32) through ConfirmWriteScreen
+# ---------------------------------------------------------------------------
+
+#: A >=40-byte contiguous fixture so the emitted record WIDTH is observable: at
+#: width 32 the region emits a 32-byte record (max 32); at width 16 it splits
+#: into 16-byte records (max 16). The small shared fixture (_write_fixture_s19)
+#: has only 4-byte regions and cannot discriminate the width.
+_WIDTH_FIXTURE_START = 0x4000
+_WIDTH_FIXTURE_LEN = 40
+_WIDTH_FIXTURE_OUTPUT = 0x4100
+
+
+def _write_width_fixture_and_config(tmp_path: Path) -> tuple[Path, str]:
+    """A 40-byte contiguous fixture + a CRC config over it (for the width AT)."""
+    start = _WIDTH_FIXTURE_START
+    end = _WIDTH_FIXTURE_START + _WIDTH_FIXTURE_LEN
+    data = {start + i: (i * 3) & 0xFF for i in range(_WIDTH_FIXTURE_LEN)}
+    expected = compute_region_crc(data, start, end)
+    mem = dict(data)
+    for off, byte in enumerate(encode_le32(expected)):
+        mem[_WIDTH_FIXTURE_OUTPUT + off] = byte
+    ranges = [(start, end), (_WIDTH_FIXTURE_OUTPUT, _WIDTH_FIXTURE_OUTPUT + 4)]
+    path = tmp_path / "width_fixture.s19"
+    path.write_text(emit_s19_from_mem_map(mem, ranges), encoding="utf-8")
+    config = (
+        "{"
+        '"polynomial":"0x04C11DB7","init":"0xFFFFFFFF",'
+        '"reverse":true,"final_xor":"0xFFFFFFFF",'
+        f'"regions":[{{"start":"0x{start:X}","end":"0x{end:X}",'
+        f'"output_address":"0x{_WIDTH_FIXTURE_OUTPUT:X}"}}]'
+        "}"
+    )
+    return path, config
+
+
+def test_confirm_write_width_selector_cycles(tmp_path: Path) -> None:
+    """TC-019.2 — the ConfirmWriteScreen width selector cycles 32 -> 16 -> 32.
+
+    Intent (US-019 / LLR-019.1, white-box state machine): the new width button
+    defaults to 32 (the prior contract) and cycles through (32, 16). Driven on the
+    real modal; cancels out so no file is written.
+    """
+
+    async def _drive() -> list[str]:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=False)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            screen.query_one("#operation_config", TextArea).text = _config_text()
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+
+            screen.query_one("#operations_write", Button).press()
+            await _flush(pilot)
+            confirm_screen = app.screen
+            wbtn = confirm_screen.query_one("#confirm_write_width", Button)
+            labels = [str(wbtn.label)]
+            wbtn.press()
+            await _flush(pilot)
+            labels.append(str(wbtn.label))
+            wbtn.press()
+            await _flush(pilot)
+            labels.append(str(wbtn.label))
+            confirm_screen.query_one("#confirm_write_cancel", Button).press()
+            await _flush(pilot)
+            return labels
+
+    labels = asyncio.run(_drive())
+    assert "32" in labels[0], f"default width must be 32; labels={labels}"
+    assert "16" in labels[1], f"one cycle must select 16; labels={labels}"
+    assert "32" in labels[2], f"a second cycle must return to 32; labels={labels}"
+
+
+def test_crc_write_honours_selected_16_width_through_confirm(tmp_path: Path) -> None:
+    """AT-019b — selecting 16 at the confirm modal emits 16-byte records.
+
+    Intent (US-019, the load-bearing AT): drive the SHIPPED surface — Write CRC ->
+    ConfirmWriteScreen -> cycle the width selector to the NON-default 16 (C-10) ->
+    Confirm -> worker -> write_crc_image. Then read the HANDLER-PRODUCED .s19 back
+    off disk and assert its records are 16 bytes wide (C-12: observe the consumer
+    over the handler's artifact, never a direct write_crc_image(bytes_per_line=16)).
+    Value-discriminating: a regression that ignored the selector would leave
+    32-byte records and fail ``max == 16``.
+    """
+
+    async def _drive() -> list:
+        s19_path, config_text = _write_width_fixture_and_config(tmp_path)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            screen.query_one("#operation_config", TextArea).text = config_text
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+
+            await _press_write_and_handle_modal(
+                app, pilot, screen, confirm=True, select_width=16
+            )
+            return _emitted_s19_files(app.base_dir)
+
+    emitted = asyncio.run(_drive())
+    assert len(emitted) == 1, emitted
+    widths = _crc_record_widths(emitted[0].read_text(encoding="utf-8"))
+    assert widths, "the emitted .s19 must contain data records"
+    assert 16 in widths, f"the selected 16-byte width must reach the file; widths={widths}"
+    assert 32 not in widths, (
+        f"selecting 16 must leave NO 32-byte record (a regression that ignored "
+        f"the selector would emit 32); widths={widths}"
+    )
+    assert max(widths) == 16, (
+        f"selecting 16 must cap record width at 16 (selector honoured end-to-end); "
+        f"widths={widths}"
+    )

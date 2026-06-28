@@ -2758,3 +2758,29 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
   New output surface → Phase-2 security-reviewer mandatory (per D-SEC). A-5
   surface-reachability: the refusal is driven through the save handler
   end-to-end, not by a direct `_reject_unsafe_entry` unit call.
+
+# 23. Workspace / CRC / Issues usability (batch-17)
+
+> Three previously-deferred usability features + an issues-list field exposure, full `/dev-flow`. US-018 / US-019 / US-020a / US-020b shipped; US-020c/d (issues-report addendum) deferred to a follow-on batch. Statements: `.dev-flow/2026-06-26-batch-17/01-requirements.md` §3/§4.
+
+**R-WS-HEXROW-001**: When the Workspace renders the hex view, a full 16-byte + ASCII row shall lay out on one line — the hex view content-sizes and `#hex_scroll` scrolls horizontally when the pane is narrower — while all three Workspace panes stay visible.
+- Code: `s19_app/tui/styles.tcss` `#hex_view { width: auto }` (US-018). Supersedes a rejected `#ws_center { min-width: 82 }` floor that pushed the right context pane off-screen on a 3-pane layout at 120 cols (§6.5 amendment A2 — the likely cause of prior failed attempts).
+- Validation: `Automated` — `tests/test_tui_workspace_layout.py::test_ws_hex_row_on_one_line_and_scrollable` (AT-018; RED pre-fix: hex view wraps to ~28) + `::test_ws_all_three_panes_stay_visible` + `::test_ws_hex_one_line_holds_in_narrow_regime`.
+- Status: Added batch-17 (US-018 / HLR-018 / LLR-018.1).
+
+**R-CRC-WIDTH-001**: When the operator confirms a CRC-injected write after selecting a 16- or 32-byte record width, the written `.s19` shall use the selected width; absent a selection it shall default to 32.
+- Code: `s19_app/tui/screens.py` ConfirmWriteScreen width selector + `ConfirmWriteResult(confirmed, bytes_per_line)` threaded `_on_confirm_write` → `_run_crc_write_worker` → `s19_app/tui/operations/crc.py::write_crc_image(bytes_per_line=)` → `emit_s19_from_mem_map` (US-019; `io.py` unchanged — kwarg pre-existed).
+- Validation: `Automated` — `tests/test_tui_crc_surface.py::test_crc_write_honours_selected_16_width_through_confirm` (AT-019b; RED pre-fix: emits 32) + `::test_confirm_write_width_selector_cycles` + `tests/test_crc_operation.py::test_crc_write_emits_16_byte_records_when_selected` / `::test_crc_write_emits_32_byte_records` (default lock).
+- Status: Added batch-17 (US-019 / HLR-019 / LLR-019.1, .2). Builds on the batch-16 fixed-32 lock (re-pointed as the default branch).
+
+**R-ISSUES-HEXPANE-001**: When the operator selects a validation-issue row carrying an address, the bytes at that address shall render in the Issues screen's hex pane; an address-less issue shall show a placeholder, not stale bytes.
+- Code: `s19_app/tui/app.py` `_compose_screen_issues` `#issues_hex_pane` + `_update_issues_hex_pane` (via `render_hex_view_text`) wired into `_jump_to_validation_issue_object`; `s19_app/tui/styles.tcss` `#issues_columns` split (US-020a).
+- Validation: `Automated` — `tests/test_tui_issues_view.py::test_at020a_issue_hex_pane_shows_bytes_and_clears_on_no_address` (AT-020a; RED pre-fix: pane empty).
+- Status: Added batch-17 (US-020a / HLR-020 / LLR-020.1, .2).
+
+**R-ISSUES-RELATED-001**: Where a validation issue carries related artifacts, the issues list shall display them in a "Related" column (comma-joined, or `-` when none).
+- Code: `s19_app/tui/app.py` `precompute_issue_datatable_payload` Related cell + the issues `add_columns` "Related" header (cell tuple 7→8, kept in lockstep) (US-020b).
+- Validation: `Automated` — `tests/test_tui_issues_view.py::test_at021_issues_list_shows_related_artifacts` (AT-021; RED pre-fix: cell shows `-`) + `::test_tc021_precompute_payload_emits_related_cell` + `tests/test_tui_app.py::test_precompute_issue_datatable_payload_emits_eight_columns_and_styles`.
+- Status: Added batch-17 (US-020b / HLR-021 / LLR-021.1).
+
+> Deferred to a follow-on batch (`.dev-flow/BACKLOG.md`): US-020c (issues-report addendum input / declared memory locations) + US-020d (issues→report integration).

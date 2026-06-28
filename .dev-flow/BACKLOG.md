@@ -39,8 +39,11 @@
 ### CRC-width lock-AT ✅ DONE (2026-06-25, same batch)
 - **DONE:** `tests/test_crc_operation.py::test_crc_write_emits_32_byte_records` reads the `write_crc_image`-written `.s19` back as TEXT and locks the fixed 32-byte record width (crc.py:879 emits at the default; the `S19File` map oracle is width-agnostic). Counterfactual 16-byte emit → value-discriminating RED (QC-2). 0 source edits.
 
-### CRC save honours operator-selected record width — DEFERRED feature
-- **Flow:** /dev-flow or /fast-dev-flow (own batch). **Why deferred:** `write_crc_image` (crc.py:790) has NO width parameter and hardcodes the default 32 via `emit_s19_from_mem_map(working_mem, working_ranges)` (crc.py:879); US-015's width selector reaches only the Patch Editor save-back, never the CRC operation. Threading a selection through `write_crc_image` + the I5b confirm handler (+ a width source/UI) is net-new feature work. The fixed-32 contract is now LOCKED (above); this item makes it selectable. Parallels the US-015 deferral pattern.
+### CRC save honours operator-selected record width — IN PROGRESS (batch-17 US-019)
+- **Flow:** /dev-flow (batch-17, claude/batch-17). **Status (2026-06-26):** picked up as US-019. Path mapped: width-cycle selector on `ConfirmWriteScreen` (screens.py:671) mirroring the Patch Editor `#patch_saveback_width_button`; thread `bytes_per_line` through `_on_confirm_write`→`_run_crc_write_worker`→`write_crc_image` (crc.py:790/879). The fixed-32 lock-AT (PR #26) gets re-pointed to "default 32 + selectable 16", not deleted.
+
+### US-020c/d — issues-report addendum input + report integration — DEFERRED feature
+- **Flow:** /dev-flow (own batch + design spike). **Why deferred (batch-17 DoR, 2026-06-26):** the "report-addendum input (declared memory locations)" is net-new (no data model, no persistence) with unresolved semantics ("declared memory locations"); US-020d (issues→report integration) depends on it. batch-17 ships the READY parts (US-020a hex pane + US-020b enhanced list); these two carry design risk and need a spike first. Surfaces: report_service.py (addendum section), a new addendum data model + input form, ReportOptions field.
 
 ### 4a — app.py ruff F401 cleanup
 - **Flow:** direct micro-PR. 5–6 unused imports (`app.py:27/37/38/39/107`), predate recent work. Own PR so it doesn't ride a behavioral change.

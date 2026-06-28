@@ -482,9 +482,11 @@ def test_crc_write_emits_32_byte_records(tmp_path: Path) -> None:
     nothing observes the emitted record width on this path. This locks the actual
     contract: read the written ``.s19`` back as TEXT and assert its data records
     carry 32 data bytes — a value-discriminating lock (a regression emitting
-    16-byte records makes ``max == 32`` fail with 16 != 32, QC-2). Making the path
-    honour an operator-SELECTED width is deferred feature work (spec §5); this
-    only pins the current default.
+    16-byte records makes ``max == 32`` fail with 16 != 32, QC-2). US-019 makes
+    the width operator-selectable; this test now pins the DEFAULT branch (no width
+    passed -> 32, the prior contract). The selected-16 path is covered by
+    ``test_crc_write_emits_16_byte_records_when_selected`` (TC-019.1) and the
+    through-ConfirmWriteScreen ``AT-019b`` in test_tui_crc_surface.py.
     """
     # 64 contiguous bytes -> two full 32-byte data records on the S1 path
     # (addresses <= 0xFFFF); a 4-byte CRC record is injected into the 0x200 gap.
@@ -509,4 +511,39 @@ def test_crc_write_emits_32_byte_records(tmp_path: Path) -> None:
     assert max(widths) == 32, (
         f"the CRC save's record width must be the fixed 32, not {max(widths)}; "
         f"widths={widths}"
+    )
+
+
+def test_crc_write_emits_16_byte_records_when_selected(tmp_path: Path) -> None:
+    """TC-019.1 — write_crc_image honours a selected 16-byte record width.
+
+    Intent (US-019 white-box): with ``bytes_per_line=16`` the written .s19's data
+    records are 16 bytes wide, not the default 32 — and the default call (no
+    kwarg) still emits 32 (back-compat). Read the written file back as TEXT and
+    assert per-record data-byte width; value-discriminating (16 path must NOT
+    leave any 32-byte record).
+    """
+    # Same 64-byte payload as the default test -> at 16-wide it yields four full
+    # 16-byte records (plus the 4-byte injected CRC).
+    payload = bytes((0x10 + i) & 0xFF for i in range(0x40))
+    op_input = _contiguous_op_input(0x100, payload)
+    region = CrcRegion(start=0x100, end=0x120, output_address=0x200)
+    config = _default_config([region])
+
+    result = write_crc_image(
+        op_input, config, workarea_base=tmp_path, bytes_per_line=16
+    )
+
+    assert result.written_path is not None and result.written_path.exists(), (
+        f"the CRC write must land a file; findings={result.findings!r}"
+    )
+    widths = _s19_data_record_widths(
+        result.written_path.read_text(encoding="utf-8")
+    )
+    assert widths, "the written .s19 must contain at least one data record"
+    assert 16 in widths, (
+        f"a 16-byte selected width must emit a full 16-byte record; widths={widths}"
+    )
+    assert max(widths) == 16, (
+        f"with bytes_per_line=16 no record may exceed 16 data bytes; widths={widths}"
     )

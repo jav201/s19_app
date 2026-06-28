@@ -293,7 +293,7 @@ class PreparedLoad:
     #   in ``update_mac_view`` so the main thread never rescans full row vectors.
     # - ``mac_cell_rows``: list of 8-string tuples ready to hand to ``DataTable.add_rows``.
     # - ``mac_cell_styles``: parallel list of severity style strings per row.
-    # - ``issue_cell_rows``: list of 6-string tuples for the Issues DataTable.
+    # - ``issue_cell_rows``: list of 8-string tuples for the Issues DataTable.
     # - ``issue_cell_styles``: parallel severity style strings per issue row.
     mac_widths: Optional[tuple] = None
     mac_cell_rows: list = field(default_factory=list)
@@ -476,7 +476,7 @@ def precompute_issue_datatable_payload(
 ) -> tuple[list[tuple[str, ...]], list[str]]:
     """
     Summary:
-        Format validation issues into ready-to-render 7-tuple cell rows and per-row
+        Format validation issues into ready-to-render 8-tuple cell rows and per-row
         severity styles so the main thread only calls ``DataTable.add_rows``.
 
     Args:
@@ -484,7 +484,9 @@ def precompute_issue_datatable_payload(
 
     Returns:
         tuple[list[tuple[str, ...]], list[str]]: ``(cell_rows, styles)`` where each
-        cell row is ``(severity, code, artifact, symbol, address, line, message)``.
+        cell row is ``(severity, code, artifact, related, symbol, address, line,
+        message)`` — ``related`` is the comma-joined ``related_artifacts`` (or
+        ``-`` when empty; US-021).
 
     Data Flow:
         - Iterate issues once.
@@ -503,11 +505,13 @@ def precompute_issue_datatable_payload(
         symbol = issue.symbol or "-"
         addr = f"0x{issue.address:08X}" if isinstance(issue.address, int) else "-"
         line_no = str(issue.line_number) if isinstance(issue.line_number, int) else "-"
+        related = ", ".join(issue.related_artifacts) if issue.related_artifacts else "-"
         cell_rows.append(
             (
                 issue.severity.value.upper(),
                 str(issue.code or ""),
                 str(issue.artifact or ""),
+                related,
                 symbol,
                 addr,
                 line_no,
@@ -1133,9 +1137,11 @@ class S19TuiApp(App):
 
         Returns:
             Container: ``#screen_issues`` holding the filter row
-            (``#validation_issues_filters``), the Issues ``DataTable``
-            (``#validation_issues_list``), the ``#validation_issues_summary``
-            label and an ``EmptyStatePanel``. Hidden at startup.
+            (``#validation_issues_filters``), an ``#issues_columns`` horizontal
+            split of the Issues ``DataTable`` (``#validation_issues_list``) beside
+            a hex pane (``#issues_hex_pane``, US-020a), the
+            ``#validation_issues_summary`` label and an ``EmptyStatePanel``.
+            Hidden at startup.
 
         Data Flow:
             - Lifts the ``#validation_issues_filters`` / ``#validation_issues_list``
@@ -1162,8 +1168,14 @@ class S19TuiApp(App):
                 Button("Warnings", id="issues_filter_warning"),
                 id="validation_issues_filters",
             ),
-            DataTable(
-                id="validation_issues_list", zebra_stripes=True, cursor_type="row"
+            Container(
+                DataTable(
+                    id="validation_issues_list",
+                    zebra_stripes=True,
+                    cursor_type="row",
+                ),
+                Static("", id="issues_hex_pane", markup=False),
+                id="issues_columns",
             ),
             Label("", id="validation_issues_summary"),
             id="issues_content",
@@ -2568,6 +2580,7 @@ class S19TuiApp(App):
                     "Severity",
                     "Code",
                     "Artifact",
+                    "Related",
                     "Symbol",
                     "Address",
                     "Line",
@@ -4767,6 +4780,54 @@ class S19TuiApp(App):
         if 0 <= absolute_index < len(filtered):
             self._jump_to_validation_issue_object(filtered[absolute_index])
 
+    def _update_issues_hex_pane(self, address: Optional[int]) -> None:
+        """Render the selected issue's address bytes in ``#issues_hex_pane`` (US-020a).
+
+        Summary:
+            On an Issues-table row selection, show a focused hex+ASCII window
+            around the issue's ``address`` in the Issues screen's hex pane
+            (``#issues_hex_pane``, LLR-020.2). When the issue carries no address
+            (a cross-artifact issue) or no file is loaded, show a fixed
+            placeholder and clear any bytes from a prior selection — never a
+            stale render.
+
+        Args:
+            address (Optional[int]): The selected issue's address, or ``None``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - No pane present (Issues screen not composed) → no-op.
+            - ``address`` is ``None`` / no file → the placeholder string.
+            - Else render a ±``context``-row window via ``render_hex_view_text``
+              focused at ``address`` into the pane.
+
+        Dependencies:
+            Uses:
+                - ``render_hex_view_text``
+            Used by:
+                - ``_jump_to_validation_issue_object``
+        """
+        # No mounted screen (e.g. a headless unit-test call to the jump path) ->
+        # there is no DOM to query; skip the best-effort pane update.
+        if not self.screen_stack:
+            return
+        matches = self.query("#issues_hex_pane")
+        if not matches:
+            return
+        pane = matches.first(Static)
+        if not isinstance(address, int) or not self.current_file:
+            pane.update("(issue has no address — nothing to show)")
+            return
+        base = address - (address % 16)
+        context_rows = 6
+        low = max(0, base - 16 * context_rows)
+        row_bases = list(range(low, base + 16 * (context_rows + 1), 16))
+        pane.update(
+            render_hex_view_text(self.current_file.mem_map, address, row_bases, None)
+        )
+
     def _jump_to_validation_issue_object(self, issue: ValidationIssue) -> None:
         """
         Summary:
@@ -4792,6 +4853,9 @@ class S19TuiApp(App):
                 - ``_jump_to_validation_issue`` (legacy adapter)
         """
         address = issue.address
+        # US-020a: every issue selection refreshes the on-screen Issues hex pane
+        # (bytes at the address, or a placeholder when the issue carries none).
+        self._update_issues_hex_pane(address)
         if isinstance(address, int) and self.current_file:
             self.update_hex_view(address)
             self.update_alt_hex_view(address)
@@ -4953,7 +5017,7 @@ class S19TuiApp(App):
 
         Args:
             issue_table (DataTable): Target issues table.
-            visible_rows (list[tuple[str, ...]]): Pre-formatted 7-tuple cells.
+            visible_rows (list[tuple[str, ...]]): Pre-formatted 8-tuple cells.
             visible_styles (list[str]): Per-row Rich style strings.
             visible_issues (list[ValidationIssue]): Parallel issue objects (for jump).
             index_base (int): Absolute index of the first visible row for row_keys.

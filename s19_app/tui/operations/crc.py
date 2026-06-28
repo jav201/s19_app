@@ -793,6 +793,7 @@ def write_crc_image(
     *,
     workarea_base: Path,
     dest_dir: Optional[Path] = None,
+    bytes_per_line: int = 32,
 ) -> CrcWriteResult:
     """
     Summary:
@@ -827,6 +828,10 @@ def write_crc_image(
             staged copy). A ``dest_dir`` OUTSIDE the work area fails
             ``copy_into_workarea``'s containment check → one finding, no file
             (the security-relevant escape case).
+        bytes_per_line (int): The emitted S19 data-record width, 16 or 32
+            (US-019). Defaults to 32 (the prior fixed behaviour). Passed straight
+            to ``emit_s19_from_mem_map``; affects only record framing, never the
+            destination path, filename, or containment seam.
 
     Returns:
         CrcWriteResult: On a clean write — ``written_path`` set, ``verify_status``
@@ -876,7 +881,9 @@ def write_crc_image(
         # working map — unreachable by construction since inject_crcs extends
         # the map, but guarded anyway on this side-effectful path) becomes a
         # collected finding, never an unhandled raise.
-        s19_text = emit_s19_from_mem_map(working_mem, working_ranges)
+        s19_text = emit_s19_from_mem_map(
+            working_mem, working_ranges, bytes_per_line=bytes_per_line
+        )
         staged.parent.mkdir(parents=True, exist_ok=True)
         staged.write_text(s19_text, encoding="utf-8")
         placed = copy_into_workarea(staged, target_dir)
