@@ -668,33 +668,54 @@ class ReportViewerScreen(ModalScreen[None]):
             self.dismiss(None)
 
 
-class ConfirmWriteScreen(ModalScreen[bool]):
+@dataclass(frozen=True)
+class ConfirmWriteResult:
+    """Outcome of :class:`ConfirmWriteScreen` (US-019, Option C).
+
+    Carries the confirm/cancel decision AND the selected S19 record width, so the
+    width chosen on the modal reaches ``OperationsScreen._on_confirm_write`` — the
+    consumer runs after the modal is dismissed and cannot read the modal's own
+    state, so the width must ride the dismiss result.
+
+    Attributes:
+        confirmed (bool): ``True`` only when ``Confirm`` was pressed.
+        bytes_per_line (int): The chosen data-record width, 16 or 32 (default 32).
+    """
+
+    confirmed: bool
+    bytes_per_line: int = 32
+
+
+class ConfirmWriteScreen(ModalScreen[Optional[ConfirmWriteResult]]):
     """Two-stage write confirmation modal for the CRC inject path (I5b).
 
     Summary:
-        A minimal Confirm / Cancel modal shown before the CRC write actually
-        emits a modified S19 into the work area (the second stage of the
-        two-stage confirmation — the first stage is the operator pressing the
-        ``Write CRC`` button, which only becomes enabled after a real check
-        ran). It dismisses with ``True`` only when ``Confirm`` is pressed;
-        ``Cancel`` (or any other dismissal) yields ``False`` so the caller
-        performs NO write. Styling reuses the shared Calm Dark
-        ``.modal-dialog`` token classes from ``styles.tcss``.
+        A Confirm / Cancel modal shown before the CRC write emits a modified S19
+        into the work area (stage 2 of the two-stage confirmation — stage 1 is the
+        ``Write CRC`` button, enabled only after a real check). It also hosts a
+        record-width selector (US-019) the operator can cycle over ``(32, 16)``.
+        It dismisses with a :class:`ConfirmWriteResult` carrying ``confirmed``
+        (``True`` only on ``Confirm``) AND the selected ``bytes_per_line``; any
+        other dismissal yields ``None`` so the caller performs NO write. Styling
+        reuses the shared Calm Dark ``.modal-dialog`` token classes.
 
     Args:
-        None: the message text is a fixed class constant.
+        None: the message text is a fixed class constant; the width selector
+            defaults to 32 (the prior fixed behaviour).
 
     Returns:
-        bool: ``True`` on confirm, ``False`` on cancel.
+        Optional[ConfirmWriteResult]: the decision + chosen width on Confirm /
+        Cancel; ``None`` on an Escape/click-outside dismissal.
 
     Data Flow:
         - Pushed by :meth:`OperationsScreen._on_write_pressed` with a callback;
-          the callback dispatches the write worker only on ``True``.
+          the callback dispatches the write worker only when ``confirmed`` is
+          ``True``, threading ``bytes_per_line`` into the writer.
 
     Dependencies:
         Used by:
             - s19_app.tui.screens.OperationsScreen._on_write_pressed
-            - tests/test_tui_crc_surface.py (TC-124, TC-125)
+            - tests/test_tui_crc_surface.py (TC-124, TC-125, US-019 AT/TC)
 
     Example:
         >>> screen = ConfirmWriteScreen()  # doctest: +SKIP
@@ -703,11 +724,25 @@ class ConfirmWriteScreen(ModalScreen[bool]):
     CONFIRM_TEXT = (
         "Write the computed CRC(s) into a new modified S19 under the work area?"
     )
+    #: Operator-cyclable S19 record widths (US-019); the default (first) is 32,
+    #: preserving the prior fixed contract. Mirrors the Patch Editor's
+    #: ``SAVEBACK_WIDTHS`` (screens_directionb.py).
+    CRC_WIDTHS = (32, 16)
+
+    def __init__(self) -> None:
+        super().__init__()
+        #: The currently-selected save width; cycled by ``#confirm_write_width``
+        #: and carried on the ``ConfirmWriteResult`` (US-019 / LLR-019.1).
+        self._crc_saveback_width = self.CRC_WIDTHS[0]
 
     def compose(self) -> ComposeResult:
         yield Container(
             Label(self.CONFIRM_TEXT, classes="modal-title"),
             Container(
+                Button(
+                    f"Width: {self._crc_saveback_width} bytes/line",
+                    id="confirm_write_width",
+                ),
                 Button("Confirm", id="confirm_write_ok", classes="modal-confirm"),
                 Button("Cancel", id="confirm_write_cancel"),
                 id="confirm_write_buttons",
@@ -718,13 +753,25 @@ class ConfirmWriteScreen(ModalScreen[bool]):
         )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "confirm_write_width":
+            # Selector state only — cycle the record width and relabel; no
+            # dismiss (the Patch Editor #patch_saveback_width_button idiom).
+            index = self.CRC_WIDTHS.index(self._crc_saveback_width)
+            self._crc_saveback_width = self.CRC_WIDTHS[
+                (index + 1) % len(self.CRC_WIDTHS)
+            ]
+            event.button.label = f"Width: {self._crc_saveback_width} bytes/line"
+            return
         if event.button.id == "confirm_write_ok":
-            logger.info("ConfirmWriteScreen confirmed.")
-            self.dismiss(True)
+            logger.info(
+                "ConfirmWriteScreen confirmed (width=%d).",
+                self._crc_saveback_width,
+            )
+            self.dismiss(ConfirmWriteResult(True, self._crc_saveback_width))
             return
         if event.button.id == "confirm_write_cancel":
             logger.info("ConfirmWriteScreen cancelled.")
-            self.dismiss(False)
+            self.dismiss(ConfirmWriteResult(False, self._crc_saveback_width))
 
 
 class OperationsScreen(ModalScreen[None]):
@@ -1320,7 +1367,7 @@ class OperationsScreen(ModalScreen[None]):
         logger.info("OperationsScreen Write CRC pressed - confirming.")
         self.app.push_screen(ConfirmWriteScreen(), self._on_confirm_write)
 
-    def _on_confirm_write(self, confirmed: Optional[bool]) -> None:
+    def _on_confirm_write(self, result: Optional["ConfirmWriteResult"]) -> None:
         """
         Summary:
             Handle the :class:`ConfirmWriteScreen` outcome (I5b stage 2). On a
@@ -1332,8 +1379,10 @@ class OperationsScreen(ModalScreen[None]):
             write token.
 
         Args:
-            confirmed (Optional[bool]): The modal result — ``True`` confirm,
-                ``False`` cancel, ``None`` dismissed.
+            result (Optional[ConfirmWriteResult]): The modal result — its
+                ``confirmed`` flag (``True`` confirm, else cancel) and the
+                selected ``bytes_per_line`` (16/32) threaded into the writer;
+                ``None`` on an Escape/click-outside dismissal.
 
         Returns:
             None
@@ -1351,7 +1400,7 @@ class OperationsScreen(ModalScreen[None]):
             Used by:
                 - _on_write_pressed (modal callback)
         """
-        if confirmed is not True:
+        if result is None or not result.confirmed:
             logger.info("OperationsScreen write declined - no file written.")
             return
         config, issues = parse_crc_config(
@@ -1375,7 +1424,9 @@ class OperationsScreen(ModalScreen[None]):
             return
         op_input = OperationInput.from_loaded(self.loaded)
         self._crc_write_token += 1
-        self._run_crc_write_worker(op_input, config, self._crc_write_token)
+        self._run_crc_write_worker(
+            op_input, config, self._crc_write_token, result.bytes_per_line
+        )
 
     @work(thread=True, exclusive=True, group="crc_write")
     def _run_crc_write_worker(
@@ -1383,6 +1434,7 @@ class OperationsScreen(ModalScreen[None]):
         op_input: OperationInput,
         config: "CrcConfig",
         token: int,
+        bytes_per_line: int = 32,
     ) -> None:
         """
         Summary:
@@ -1420,7 +1472,10 @@ class OperationsScreen(ModalScreen[None]):
         """
         try:
             result = write_crc_image(
-                op_input, config, workarea_base=self.app.base_dir
+                op_input,
+                config,
+                workarea_base=self.app.base_dir,
+                bytes_per_line=bytes_per_line,
             )
         except Exception as exc:  # noqa: BLE001 - surfaced, never swallowed
             logger.exception("CRC write worker failed: %s", exc)

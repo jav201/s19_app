@@ -372,6 +372,16 @@ Screen {
     overflow: auto;
 }
 
+/* US-018: the hex view sizes to its content width (one full 16-byte + ASCII
+ * row, ~81 cells) instead of wrapping to the pane; `#hex_scroll`'s
+ * `overflow: auto` then provides a horizontal scrollbar when the pane is
+ * narrower than a row, so the row stays on ONE line and all three Workspace
+ * panes remain visible (a `min-width` floor on `#ws_center` would instead push
+ * the right context pane off-screen at <~168-col terminals). */
+#hex_view {
+    width: auto;
+}
+
 #hex_controls {
     layout: horizontal;
     height: auto;
@@ -580,6 +590,26 @@ Screen {
 #diff_columns {
     width: 100%;
     height: 1fr;
+}
+
+/* US-020a: Issues Report split — the issues list (left) beside a hex pane
+ * (right) that shows the bytes at the selected issue's address. Mirrors the
+ * #diff_columns horizontal split. */
+#issues_columns {
+    layout: horizontal;
+    width: 100%;
+    height: 1fr;
+}
+
+#issues_columns #validation_issues_list {
+    width: 2fr;
+    height: 100%;
+}
+
+#issues_hex_pane {
+    width: 1fr;
+    height: 100%;
+    border: round $rule;
 }
 
 /* Patch Editor — the batch-07 consolidated v2 panel: ONE change-flow section

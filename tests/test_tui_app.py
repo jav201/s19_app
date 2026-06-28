@@ -1474,7 +1474,7 @@ def test_precompute_mac_datatable_payload_clamps_wide_columns():
     assert widths[7] == 48  # A2LMatch clamp.
 
 
-def test_precompute_issue_datatable_payload_emits_seven_columns_and_styles():
+def test_precompute_issue_datatable_payload_emits_eight_columns_and_styles():
     issues = [
         ValidationIssue(
             code="E001",
@@ -1497,11 +1497,14 @@ def test_precompute_issue_datatable_payload_emits_seven_columns_and_styles():
     ]
     cell_rows, styles = precompute_issue_datatable_payload(issues)
     assert len(cell_rows) == 2
-    assert all(len(row) == 7 for row in cell_rows)
+    # 8-tuple after US-021 added the Related column at index 3:
+    # (severity, code, artifact, related, symbol, address, line, message).
+    assert all(len(row) == 8 for row in cell_rows)
     assert cell_rows[0][0] == "ERROR"
-    assert cell_rows[0][4] == "0x00001000"
-    assert cell_rows[1][3] == "-"  # missing symbol is rendered as dash
-    assert cell_rows[1][4] == "-"  # missing address is rendered as dash
+    assert cell_rows[0][3] == "-"  # no related_artifacts -> dash (US-021)
+    assert cell_rows[0][5] == "0x00001000"  # address shifted 4 -> 5
+    assert cell_rows[1][4] == "-"  # missing symbol is rendered as dash (now index 4)
+    assert cell_rows[1][5] == "-"  # missing address is rendered as dash (now index 5)
     assert styles == [_severity_style(ValidationSeverity.ERROR), _severity_style(ValidationSeverity.WARNING)]
 
 
