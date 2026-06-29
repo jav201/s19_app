@@ -59,6 +59,7 @@ from s19_app.tui.changes.model import (
     CheckRunEntry,
     CheckRunResult,
 )
+from s19_app.tui.legend import LEGEND_TABLE
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services import report_service
 from s19_app.tui.services.report_service import (
@@ -693,3 +694,76 @@ def test_measure_report_caps_on_large_s19(tmp_path: Path, large_s19: Path) -> No
         # the document never silently exceeds budget by more than marker text
         if fired == "no":
             assert size <= REPORT_MAX_TOTAL_BYTES
+
+
+# ---------------------------------------------------------------------------
+# US-022 (batch-18) — classification legend in the generated report
+# ---------------------------------------------------------------------------
+
+
+def _legend_report_text(tmp_path: Path, **opts: object) -> str:
+    """Generate a minimal one-variant report and return its text."""
+    results = [VariantExecutionResult(variant_id="a", status="ok")]
+    path = generate_project_report(
+        tmp_path,
+        results,
+        ReportOptions(**opts),  # type: ignore[arg-type]
+        variant_set=_variant_set("a"),
+    )
+    return path.read_text(encoding="utf-8")
+
+
+def test_report_includes_legend_with_documented_rows(tmp_path: Path) -> None:
+    """AT-022a — black-box: the produced report file carries the legend.
+
+    Intent: observe the US-022 outcome through the SHIPPED surface
+    (``generate_project_report`` → the report file on disk). Asserts the
+    colour→MEANING pairing per row (m2 fold) — the documented meaning text
+    of every ``LEGEND_TABLE`` row must appear, so a blank-meaning or
+    colour-token-only legend fails. Single-source coupling: the expectation
+    reads ``LEGEND_TABLE``, so the table and the report move together.
+    """
+    text = _legend_report_text(tmp_path)
+    assert "## Legend" in text
+    for artifact, rows in LEGEND_TABLE.items():
+        assert f"### {artifact}" in text, f"missing legend heading for {artifact}"
+        for classification, (_colour, meaning) in rows.items():
+            assert classification in text, f"missing {artifact} row {classification!r}"
+            assert meaning in text, f"missing meaning for {artifact}/{classification}"
+
+
+def test_report_omits_legend_when_disabled(tmp_path: Path) -> None:
+    """AT-022b — negative: ``include_legend=False`` removes the section.
+
+    Proves present/absent discrimination — the legend is gated, not an
+    always-on string. A representative documented meaning is absent too.
+    """
+    text = _legend_report_text(tmp_path, include_legend=False)
+    assert "## Legend" not in text
+    sample_meaning = LEGEND_TABLE["MAC"]["Orange"][1]
+    assert sample_meaning not in text
+
+
+def test_legend_lines_renders_shared_table() -> None:
+    """TC-022.1 — ``_legend_lines`` renders every ``LEGEND_TABLE`` row.
+
+    White-box: the helper reads the shared table (single source, not a
+    duplicated literal) and opens with the ``## Legend`` heading.
+    """
+    blob = "\n".join(report_service._legend_lines())
+    assert blob.startswith("## Legend")
+    for rows in LEGEND_TABLE.values():
+        for _classification, (_colour, meaning) in rows.items():
+            assert meaning in blob
+
+
+def test_include_legend_default_true_and_validated() -> None:
+    """TC-022.2 — ``include_legend`` defaults True and is domain-validated.
+
+    Matches the file's strict-validation contract (one explicit
+    ``ValueError`` per field, never a silent coercion).
+    """
+    assert ReportOptions().include_legend is True
+    assert ReportOptions(include_legend=False).include_legend is False
+    with pytest.raises(ValueError):
+        ReportOptions(include_legend="yes")  # type: ignore[arg-type]

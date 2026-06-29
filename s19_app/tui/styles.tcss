@@ -724,6 +724,24 @@ ModalScreen {
     margin-bottom: 1;
 }
 
+/* --- Legend modal (batch-18, LLR-023.1) ---------------------------------
+ * Reuses the shared `.modal-dialog` token styling; caps the dialog height
+ * and scrolls the body so the full A2L/MAC/Issues legend fits the 80- and
+ * 120-col regimes (C-13). The per-row `sev-*` classes colour the rows. */
+#legend_dialog {
+    height: 90%;
+}
+
+#legend_body {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+.legend-artifact {
+    text-style: bold;
+    margin-top: 1;
+}
+
 .modal-buttons {
     layout: horizontal;
     height: auto;

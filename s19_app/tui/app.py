@@ -44,6 +44,7 @@ from .models import LoadedFile, ProjectVariantSet
 from .operations import get_operation, list_operation_ids
 from .rail import Rail, RailItem
 from .screens import (
+    LegendScreen,
     LoadFileScreen,
     LoadProjectScreen,
     OperationsScreen,
@@ -559,6 +560,7 @@ class S19TuiApp(App):
         Binding("j", "dump_a2l_json", "Dump A2L JSON", show=False),
         Binding("t", "view_reports", "View reports", show=False),
         Binding("x", "operations_view", "Operations", show=True),
+        Binding("k", "show_legend", "Legend", show=True),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
         Binding("3", "show_screen('mac')", "MAC View", show=False),
@@ -1166,6 +1168,7 @@ class S19TuiApp(App):
                 Button("Issues: All", id="issues_filter_all"),
                 Button("Errors", id="issues_filter_error"),
                 Button("Warnings", id="issues_filter_warning"),
+                Button("Legend", id="issues_legend_button"),
                 id="validation_issues_filters",
             ),
             Container(
@@ -2471,6 +2474,7 @@ class S19TuiApp(App):
             Container(
                 Button("Page Prev", id="mac_page_prev_button"),
                 Button("Page Next", id="mac_page_next_button"),
+                Button("Legend", id="mac_legend_button"),
                 id="mac_page_controls",
             ),
             Container(
@@ -3051,6 +3055,31 @@ class S19TuiApp(App):
         self._apply_empty_state()
         if screen_key == "diff":
             self._prefill_diff_variants()
+
+    def action_show_legend(self) -> None:
+        """
+        Summary:
+            Open the read-only classification-legend modal (HLR-023). The
+            single Legend surface shared by every colour-coded view: the
+            ``k`` key binding (reachable from the A2L explorer, where the
+            dense filter row has no geometry budget for a button — C-13)
+            and the MAC / Issues "Legend" buttons all route here.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Pushes a fresh :class:`LegendScreen`, which renders
+              ``legend.LEGEND_TABLE`` and dismisses itself on Close.
+
+        Dependencies:
+            Uses:
+                - ``LegendScreen``
+            Used by:
+                - The ``k`` key binding
+                - ``on_button_pressed`` (the MAC / Issues Legend buttons)
+        """
+        self.push_screen(LegendScreen())
 
     # Screens that own both real content and an `EmptyStatePanel`; the panel
     # is shown only while no file is loaded (LLR-002.3). Each tuple is the
@@ -7479,6 +7508,11 @@ class S19TuiApp(App):
             self.validation_issue_filter_mode = "warning"
             self._validation_issues_window_start = 0
             self.update_validation_issues_view()
+        elif event.button.id in (
+            "mac_legend_button",
+            "issues_legend_button",
+        ):
+            self.action_show_legend()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id == "a2l_tags_filter_input":
