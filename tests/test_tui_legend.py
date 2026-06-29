@@ -17,6 +17,8 @@ import asyncio
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from textual.widgets import Button
 
 from s19_app.tui.app import S19TuiApp
@@ -83,11 +85,30 @@ def test_legend_table_has_documented_artifacts_and_rows() -> None:  # TC-S1 stru
             assert meaning.strip(), f"blank meaning: {artifact}/{classification}"
 
 
+def _frozen_base_ref() -> str | None:
+    """The batch-start baseline to diff the frozen module against. CI checks
+    out only the PR head, so the local ``main`` branch may be absent; prefer
+    ``origin/main``, fall back to ``main``, else ``None`` (caller skips)."""
+    for ref in ("origin/main", "main"):
+        probe = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", ref],
+            cwd=_REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if probe.returncode == 0:
+            return ref
+    return None
+
+
 def test_legend_data_not_in_frozen_color_policy() -> None:  # TC-frozen-diff
-    """``color_policy.py`` (engine-frozen) is unchanged vs ``main``; the shared
-    legend table lives in the new non-frozen ``legend`` module instead."""
+    """``color_policy.py`` (engine-frozen) is unchanged vs the batch baseline;
+    the shared legend table lives in the new non-frozen ``legend`` module."""
+    base = _frozen_base_ref()
+    if base is None:
+        pytest.skip("no main / origin/main ref available to diff against")
     diff = subprocess.run(
-        ["git", "diff", "--stat", "main", "--", "s19_app/tui/color_policy.py"],
+        ["git", "diff", "--stat", base, "--", "s19_app/tui/color_policy.py"],
         cwd=_REPO_ROOT,
         capture_output=True,
         text=True,
@@ -95,7 +116,7 @@ def test_legend_data_not_in_frozen_color_policy() -> None:  # TC-frozen-diff
     assert diff.returncode == 0, diff.stderr
     assert diff.stdout.strip() == "", (
         "color_policy.py is engine-frozen (LLR-022.1); legend data must live "
-        f"in legend.py — unexpected diff vs main:\n{diff.stdout}"
+        f"in legend.py — unexpected diff vs {base}:\n{diff.stdout}"
     )
     import s19_app.tui.legend as legend_mod
 
