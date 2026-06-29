@@ -2784,3 +2784,27 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Status: Added batch-17 (US-020b / HLR-021 / LLR-021.1).
 
 > Deferred to a follow-on batch (`.dev-flow/BACKLOG.md`): US-020c (issues-report addendum input / declared memory locations) + US-020d (issues→report integration).
+
+# 24. Classification legend — report + in-app (batch-18)
+
+> Feature #11: surface the existing classification/colour semantics (REQUIREMENTS.md §3) as a legend in the generated report (Q1) and via an in-app modal reachable from each colour-coded view (Q2). Content derived from ONE non-frozen source; never re-invented. Statements: `.dev-flow/2026-06-26-batch-18/01-requirements.md` §3/§4 (+ §6.5 amendment A1).
+
+**R-LEGEND-SOURCE-001**: The shared classification legend (artifact → classification → colour + meaning, mirroring §3 and `color_policy.SEVERITY_CLASS_MAP`) shall be defined in the non-frozen module `s19_app/tui/legend.py` and consumed by both the report and the in-app modal; it shall NOT be added to the engine-frozen `color_policy.py`.
+- Code: `s19_app/tui/legend.py::LEGEND_TABLE` (`:33`) + `COLOUR_SEVERITY` (`:103`) (US-022/US-023, LLR-022.1).
+- Validation: `Automated` — `tests/test_tui_legend.py::test_legend_table_covers_all_severities` (TC-S1; anti-drift — every `SEVERITY_CLASS_MAP` severity reachable) + `::test_legend_table_has_documented_artifacts_and_rows` + `::test_legend_data_not_in_frozen_color_policy` (`color_policy.py` diff vs `main` = 0). Frozen guard `tests/test_tui_directionb.py::_ENGINE_PATHS` green.
+- Status: Added batch-18.
+
+**R-LEGEND-REPORT-001**: When the operator generates a project report (`include_legend=True`, the default), the report shall include a `## Legend` section listing each artifact's colour→meaning rows read from `LEGEND_TABLE`; `include_legend=False` shall omit it.
+- Code: `s19_app/tui/services/report_service.py::_legend_lines` (`:923`) + `ReportOptions.include_legend` (`:192`, domain-validated in `__post_init__`) (US-022, LLR-022.2).
+- Validation: `Automated` — `tests/test_report_service.py::test_report_includes_legend_with_documented_rows` (AT-022a; RED pre-fix: no `## Legend`) + `::test_report_omits_legend_when_disabled` (AT-022b, negative) + `::test_legend_lines_renders_shared_table` + `::test_include_legend_default_true_and_validated`.
+- Status: Added batch-18 (US-022 / HLR-022).
+
+**R-LEGEND-MODAL-001**: When the operator invokes the legend on a colour-coded view (the `k` key on A2L; the "Legend" button on MAC and Issues), the system shall open a read-only `LegendScreen` modal rendering every `LEGEND_TABLE` row, colourized via `color_policy.css_class_for_severity`, dismissable by Close; the static legend shall show even with no file loaded.
+- Code: `s19_app/tui/screens.py::LegendScreen` (`:474`) + `app.py::action_show_legend` (`:3059`), `Binding("k","show_legend")` (`:563`), MAC/Issues buttons (`:2477`/`:1171`), dispatch (`:7511`); `s19_app/tui/styles.tcss` `#legend_dialog`/`#legend_body` (US-023, LLR-023.1/.2).
+- Validation: `Automated` — `tests/test_tui_legend.py::test_at023a_a2l_legend_opens_via_key` / `::test_at023b_mac_legend_button_opens` / `::test_at023c_issues_legend_button_opens` / `::test_at023d_close_dismisses_modal` / `::test_at023f_legend_shows_without_file_loaded` (AT-023a–d,f) + `::test_tc023_1_modal_renders_all_table_rows` + `::test_tc023_2_mac_issues_buttons_present_a2l_absent` + `::test_tc_s2_report_and_modal_render_same_rows` (TC-S2 Q1/Q2 anti-drift).
+- Status: Added batch-18 (US-023 / HLR-023). §6.5 A1: A2L uses the `k` key (not a button) — the A2L filter row overflows at 80 & 120 cols (C-13 measurement).
+
+**R-LEGEND-GEOMETRY-001**: The legend affordances shall fit the supported terminal regimes: the MAC/Issues "Legend" buttons render fully on-screen at 80 and 120 cols, the A2L view exposes no (clippable) legend button, and the opened modal fits within the terminal.
+- Code: `s19_app/tui/styles.tcss` `#legend_dialog { height: 90% }` + `#legend_body { height: 1fr; overflow-y: auto }` (US-023, LLR-023.3 / C-13).
+- Validation: `Automated` — `tests/test_tui_legend.py::test_at023e_c13_geometry_at_80_cols` (measured: MAC right=23, Issues=69 ≤80; A2L 0 buttons; modal within 80×30). `Manual` — SVG snapshot baselines for the 3 views + footer regenerate in canonical CI (G-1; never local).
+- Status: Added batch-18 (US-023 / HLR-023 / LLR-023.3).

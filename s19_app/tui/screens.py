@@ -23,7 +23,9 @@ from textual.widgets import (
 )
 
 from .changes.verify import STATUS_VERIFIED
+from .color_policy import css_class_for_severity
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
+from .legend import COLOUR_SEVERITY, LEGEND_TABLE
 from .models import LoadedFile
 from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
 from .operations.crc_config import (
@@ -467,6 +469,74 @@ class SelectVariantScreen(ModalScreen[Optional[str]]):
             variant_id = self.options[index][0]
             logger.info("SelectVariantScreen dismissing with variant_id=%s", variant_id)
             self.dismiss(variant_id)
+
+
+class LegendScreen(ModalScreen[None]):
+    """Read-only classification-legend modal (HLR-023 / LLR-023.1).
+
+    Summary:
+        Renders every :data:`s19_app.tui.legend.LEGEND_TABLE` row — one
+        bold sub-heading per artifact (A2L / MAC / Issues), one Label per
+        classification giving ``<classification> — <meaning>`` — and
+        colours each row through ``color_policy.css_class_for_severity``
+        (the ``sev-*`` classes) so the in-app legend shows the same colours
+        the views use. Shared single source with the report legend
+        (``report_service._legend_lines``); the modal copies no literal
+        text. The body scrolls so the full table fits the 80- and 120-col
+        regimes (C-13). Opened by the per-view Legend buttons and dismissed
+        by Close (self-handled, no app-side dispatch).
+
+    Data Flow:
+        - Reads ``LEGEND_TABLE`` + ``COLOUR_SEVERITY`` (s19_app.tui.legend)
+          and ``css_class_for_severity`` (color_policy, READ-only).
+        - Pushed by ``S19TuiApp.action_show_legend``, reached from the
+          ``k`` binding (A2L, which has no button — C-13) and the
+          ``#mac_legend_button`` / ``#issues_legend_button`` ids via
+          ``on_button_pressed``; dismissed with ``None``.
+
+    Dependencies:
+        Uses:
+            - s19_app.tui.legend.LEGEND_TABLE / COLOUR_SEVERITY
+            - s19_app.tui.color_policy.css_class_for_severity
+        Used by:
+            - S19TuiApp.on_button_pressed
+            - tests/test_tui_legend.py
+    """
+
+    def compose(self) -> ComposeResult:
+        rows: List[Label] = []
+        for artifact, table in LEGEND_TABLE.items():
+            rows.append(Label(artifact, classes="legend-artifact"))
+            for classification, (colour, meaning) in table.items():
+                severity = COLOUR_SEVERITY.get(colour)
+                sev_class = (
+                    css_class_for_severity(severity)
+                    if severity is not None
+                    else ""
+                )
+                classes = f"legend-row {sev_class}".strip()
+                rows.append(
+                    Label(f"{classification} — {meaning}", classes=classes)
+                )
+        yield Container(
+            Label("Classification legend", classes="modal-title"),
+            ScrollableContainer(*rows, id="legend_body"),
+            Container(
+                Button("Close", id="legend_close", classes="modal-confirm"),
+                id="legend_buttons",
+                classes="modal-buttons",
+            ),
+            id="legend_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        self.query_one("#legend_close", Button).focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "legend_close":
+            logger.info("LegendScreen dismissed by close.")
+            self.dismiss(None)
 
 
 class ReportViewerScreen(ModalScreen[None]):

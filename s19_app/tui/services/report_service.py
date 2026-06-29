@@ -47,6 +47,7 @@ from typing import Callable, Iterable, List, Optional, Sequence, Tuple
 from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+from ..legend import LEGEND_TABLE
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
     SCOPE_ACTIVE,
@@ -158,6 +159,9 @@ class ReportOptions:
             :data:`REPORT_ASSIGNMENT_SOURCES` — whether the variant→file
             mapping came from ``project.json`` or the manifest-absent
             default.
+        include_legend (bool): When ``True`` (default), the report emits the
+            classification-legend section (LLR-022.2) from
+            :data:`s19_app.tui.legend.LEGEND_TABLE`. ``False`` omits it.
 
     Returns:
         None: Frozen dataclass container.
@@ -185,6 +189,7 @@ class ReportOptions:
     context_bytes: int = REPORT_CONTEXT_BYTES_DEFAULT
     execution_mode: str = REPORT_MODE_BATCH
     assignment_source: str = REPORT_SOURCE_DEFAULT
+    include_legend: bool = True
 
     def __post_init__(self) -> None:
         """
@@ -216,6 +221,11 @@ class ReportOptions:
                 f"assignment_source must be one of "
                 f"{REPORT_ASSIGNMENT_SOURCES}, got "
                 f"{self.assignment_source!r}"
+            )
+        if not isinstance(self.include_legend, bool):
+            raise ValueError(
+                f"include_legend must be a bool, got "
+                f"{self.include_legend!r}"
             )
 
 
@@ -910,6 +920,43 @@ def _hexdump_section(
     return out, notes
 
 
+def _legend_lines() -> List[str]:
+    """
+    Summary:
+        Render :data:`s19_app.tui.legend.LEGEND_TABLE` as a Markdown legend
+        section (LLR-022.2) — one sub-heading per artifact, one bullet per
+        classification giving its colour and documented meaning. Static text
+        (no run data feeds it), so it is identical across every report.
+
+    Returns:
+        List[str]: Markdown lines beginning with the ``## Legend`` heading;
+        each row is ``- **<classification>**[ (<colour>)] — <meaning>`` with
+        the parenthetical colour shown only when it differs from the
+        classification label (i.e. the Issues categories).
+
+    Data Flow:
+        - Reads the shared ``LEGEND_TABLE`` (single source with the in-app
+          ``LegendScreen`` modal — no duplicated literal here).
+        - Emitted by :func:`generate_project_report` when
+          ``options.include_legend`` is ``True``.
+
+    Dependencies:
+        Uses:
+            - s19_app.tui.legend.LEGEND_TABLE
+        Used by:
+            - generate_project_report
+            - tests/test_report_service.py
+    """
+    lines: List[str] = ["## Legend", ""]
+    for artifact, rows in LEGEND_TABLE.items():
+        lines.append(f"### {artifact}")
+        for classification, (colour, meaning) in rows.items():
+            suffix = "" if classification == colour else f" ({colour})"
+            lines.append(f"- **{classification}**{suffix} — {meaning}")
+        lines.append("")
+    return lines
+
+
 def generate_project_report(
     project_dir: Path,
     variant_results: Sequence[VariantExecutionResult],
@@ -958,16 +1005,18 @@ def generate_project_report(
     Data Flow:
         - ``reports/`` is created on demand (LLR-007.7).
         - Sections emit in the LLR-007.4 order: (a) header, (b) variant
-          inventory, (c) consolidated overview, (d) one section per
-          variant (modified files → modifications table → declaration
-          errors → checklists → memory-region hexdumps), (e) the
-          truncation appendix when any cap fired.
+          inventory, (c) consolidated overview, (c2) the classification
+          legend when ``options.include_legend`` (LLR-022.2), (d) one
+          section per variant (modified files → modifications table →
+          declaration errors → checklists → memory-region hexdumps), (e)
+          the truncation appendix when any cap fired.
         - The whole document is budgeted against
           :data:`REPORT_MAX_TOTAL_BYTES` at hexdump-block granularity.
 
     Dependencies:
         Uses:
             - _header_lines / _inventory_lines / _overview_lines
+            - _legend_lines
             - _modified_files_lines / _modifications_lines
             - _declaration_error_lines / _checklist_lines
             - _hexdump_section / _report_filename
@@ -998,6 +1047,8 @@ def generate_project_report(
     emit(_header_lines(variant_set.project_name, generated_at, options))
     emit(_inventory_lines(variant_set))
     emit(_overview_lines(variant_results))
+    if options.include_legend:
+        emit(_legend_lines())
     for result in variant_results:
         emit([f"## Variant: {result.variant_id}", ""])
         emit(_modified_files_lines(result))
