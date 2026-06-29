@@ -48,6 +48,7 @@ from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
+from .report_addendum import DeclaredRegion
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
     SCOPE_ACTIVE,
@@ -162,6 +163,10 @@ class ReportOptions:
         include_legend (bool): When ``True`` (default), the report emits the
             classification-legend section (LLR-022.2) from
             :data:`s19_app.tui.legend.LEGEND_TABLE`. ``False`` omits it.
+        declared_regions (Tuple[DeclaredRegion, ...]): Operator-declared memory
+            regions (LLR-024.2). When non-empty, the report emits an addendum
+            listing each region and the modifications/issues whose address
+            falls inside it. Each entry must be a :class:`DeclaredRegion`.
 
     Returns:
         None: Frozen dataclass container.
@@ -190,6 +195,7 @@ class ReportOptions:
     execution_mode: str = REPORT_MODE_BATCH
     assignment_source: str = REPORT_SOURCE_DEFAULT
     include_legend: bool = True
+    declared_regions: Tuple[DeclaredRegion, ...] = ()
 
     def __post_init__(self) -> None:
         """
@@ -227,6 +233,12 @@ class ReportOptions:
                 f"include_legend must be a bool, got "
                 f"{self.include_legend!r}"
             )
+        for region in self.declared_regions:
+            if not isinstance(region, DeclaredRegion):
+                raise ValueError(
+                    f"declared_regions entries must be DeclaredRegion, got "
+                    f"{region!r}"
+                )
 
 
 def _align16(value: int) -> int:
@@ -710,9 +722,14 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
         lines.extend(["None.", ""])
         return lines
     for issue in issues:
-        lines.append(
-            f"- [{issue.code}] {issue.severity.value}: {issue.message}"
-        )
+        line = f"- [{issue.code}] {issue.severity.value}: {issue.message}"
+        if issue.address is not None:
+            line += f" @ 0x{issue.address:X}"
+        if issue.symbol:
+            line += f" symbol={issue.symbol}"
+        if issue.related_artifacts:
+            line += f" related={','.join(issue.related_artifacts)}"
+        lines.append(line)
     lines.append("")
     return lines
 
@@ -957,6 +974,75 @@ def _legend_lines() -> List[str]:
     return lines
 
 
+def _addendum_lines(
+    regions: Sequence[DeclaredRegion],
+    variant_results: Sequence[VariantExecutionResult],
+) -> List[str]:
+    """
+    Summary:
+        Render the declared-region addendum (LLR-024.2): one sub-section per
+        region listing the modifications and validation issues whose address
+        falls within the region's inclusive ``[start, end]`` range, aggregated
+        across all variants. A region with no hits renders an explicit "None.".
+
+    Args:
+        regions (Sequence[DeclaredRegion]): The operator-declared regions.
+        variant_results (Sequence[VariantExecutionResult]): Per-variant E6
+            outcomes — the same objects the per-variant report sections walk.
+
+    Returns:
+        List[str]: Markdown lines beginning with the
+        ``## Addendum: declared regions`` heading.
+
+    Data Flow:
+        - Reads each variant's change-summary entries (``address_start``) and
+          the issues on its change summaries + check results
+          (``ValidationIssue.address``) — the SAME address the issue renderer
+          (``_declaration_error_lines``) reads (single source, TC-S3).
+        - Aggregates across ALL variants regardless of ``result.status`` —
+          deliberately consistent with the per-variant report sections, which
+          also emit for every variant; each hit line is tagged
+          ``(variant <id>)`` for traceability.
+        - Emitted by :func:`generate_project_report` when
+          ``options.declared_regions`` is non-empty.
+
+    Dependencies:
+        Uses:
+            - DeclaredRegion.contains
+        Used by:
+            - generate_project_report
+            - tests/test_report_service.py
+    """
+    lines: List[str] = ["## Addendum: declared regions", ""]
+    for region in regions:
+        lines.append(f"### {region.name} (0x{region.start:X}-0x{region.end:X})")
+        hits: List[str] = []
+        for result in variant_results:
+            for summary in result.change_summaries:
+                for entry in summary.entries:
+                    if region.contains(entry.address_start):
+                        hits.append(
+                            f"- modification @ 0x{entry.address_start:X} "
+                            f"(variant {result.variant_id})"
+                        )
+                for issue in summary.issues:
+                    if issue.address is not None and region.contains(issue.address):
+                        hits.append(
+                            f"- issue [{issue.code}] @ 0x{issue.address:X} "
+                            f"(variant {result.variant_id})"
+                        )
+            for check in result.check_results:
+                for issue in check.issues:
+                    if issue.address is not None and region.contains(issue.address):
+                        hits.append(
+                            f"- issue [{issue.code}] @ 0x{issue.address:X} "
+                            f"(variant {result.variant_id})"
+                        )
+        lines.extend(hits if hits else ["None."])
+        lines.append("")
+    return lines
+
+
 def generate_project_report(
     project_dir: Path,
     variant_results: Sequence[VariantExecutionResult],
@@ -1008,15 +1094,16 @@ def generate_project_report(
           inventory, (c) consolidated overview, (c2) the classification
           legend when ``options.include_legend`` (LLR-022.2), (d) one
           section per variant (modified files → modifications table →
-          declaration errors → checklists → memory-region hexdumps), (e)
-          the truncation appendix when any cap fired.
+          declaration errors → checklists → memory-region hexdumps), (d2)
+          the declared-region addendum when ``options.declared_regions``
+          (LLR-024.2), (e) the truncation appendix when any cap fired.
         - The whole document is budgeted against
           :data:`REPORT_MAX_TOTAL_BYTES` at hexdump-block granularity.
 
     Dependencies:
         Uses:
             - _header_lines / _inventory_lines / _overview_lines
-            - _legend_lines
+            - _legend_lines / _addendum_lines
             - _modified_files_lines / _modifications_lines
             - _declaration_error_lines / _checklist_lines
             - _hexdump_section / _report_filename
@@ -1058,6 +1145,8 @@ def generate_project_report(
         dump_lines, dump_notes = _hexdump_section(result, options, budget)
         lines.extend(dump_lines)
         notes.extend(dump_notes)
+    if options.declared_regions:
+        emit(_addendum_lines(options.declared_regions, variant_results))
     if notes:
         emit(
             ["## Truncation appendix", ""]

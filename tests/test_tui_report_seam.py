@@ -46,10 +46,11 @@ import json
 from pathlib import Path
 from typing import Tuple
 
-from textual.widgets import Button, Markdown
+from textual.widgets import Button, Markdown, TextArea
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens import ReportViewerScreen
+from s19_app.tui.screens import ReportViewerScreen, _parse_declared_regions
+from s19_app.tui.services.report_addendum import DeclaredRegion
 from s19_app.tui.services.report_service import (
     REPORT_FILENAME_REGEX,
     list_project_reports,
@@ -294,3 +295,97 @@ def test_report_seam_renders_generated_report_in_viewer(tmp_path: Path) -> None:
         "AC-A3: the viewer must render the report's real on-disk bytes, "
         "not a hand-built fixture"
     )
+
+
+# ---------------------------------------------------------------------------
+# US-020c (batch-19) — declared-region input through the report dialog
+# ---------------------------------------------------------------------------
+
+
+def test_declared_region_in_dialog_reaches_report_addendum(tmp_path: Path) -> None:
+    """AT-024c — a region typed into the ReportViewerScreen input reaches the
+    PRODUCED report's addendum (C-12: observed over the handler-produced file,
+    not a direct ReportOptions write).
+
+    The change document modifies 0x1000, so the declared region
+    ``calzone,0x1000,0x10FF`` contains that modification and the addendum must
+    list it.
+    """
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            app.action_view_reports()
+            await _flush(pilot)
+            screen = app.screen_stack[-1]
+            assert isinstance(screen, ReportViewerScreen)
+            screen.query_one("#report_declared_regions", TextArea).text = (
+                "calzone,0x1000,0x10FF"
+            )
+            screen.query_one("#report_generate", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            project_dir = app._active_project_dir()
+            assert project_dir is not None
+            return project_dir
+
+    project_dir = asyncio.run(_drive())
+    report = list_project_reports(project_dir)[0]
+    text = report.read_text(encoding="utf-8")
+    assert "## Addendum: declared regions" in text
+    assert "calzone" in text
+    assert "modification @ 0x1000" in text
+
+
+def test_parse_declared_regions_handles_hex_dec_and_skips_malformed() -> None:
+    """TC-024.5 — the dialog parser accepts hex/decimal bounds and skips blank
+    or malformed/invalid lines (never aborts on a bad line)."""
+    regions = _parse_declared_regions(
+        "cal,0x1000,0x10FF\n"  # hex
+        "ram,4096,8191\n"  # decimal
+        "\n"  # blank → skipped
+        "bad line\n"  # wrong arity → skipped
+        "neg,-1,0x10\n"  # start < 0 → DeclaredRegion rejects → skipped
+        "rev,0x20,0x10\n"  # start > end → rejected → skipped
+    )
+    assert len(regions) == 2
+    assert regions[0] == DeclaredRegion("cal", 0x1000, 0x10FF)
+    assert regions[1].start == 4096 and regions[1].end == 8191
+
+
+def test_report_dialog_with_region_input_fits_80_and_120_cols(tmp_path: Path) -> None:
+    """TC-024.6 — C-13 geometry: with the declared-region input added, the
+    report dialog still fits within the terminal and the input is reachable at
+    the 80- and 120-col regimes."""
+
+    async def _measure(width: int) -> tuple[int, int, int, int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(width, 24)) as pilot:
+            await pilot.pause()
+            app.push_screen(ReportViewerScreen("proj", []))
+            await pilot.pause()
+            screen = app.screen
+            dlg = screen.query_one("#report_dialog")
+            ta = screen.query_one("#report_declared_regions", TextArea)
+            return (
+                dlg.region.bottom,
+                dlg.region.right,
+                ta.region.height,
+                app.size.width,
+                app.size.height,
+            )
+
+    for width in (80, 120):
+        bottom, right, ta_height, sw, sh = asyncio.run(_measure(width))
+        assert bottom <= sh and right <= sw, (
+            f"report dialog clipped at {width}x24: bottom={bottom}/{sh}, "
+            f"right={right}/{sw}"
+        )
+        assert ta_height > 0, "declared-region input not visible"

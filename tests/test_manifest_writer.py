@@ -46,6 +46,7 @@ from pathlib import Path
 import pytest
 
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
+from s19_app.tui.services.report_addendum import DeclaredRegion
 from s19_app.tui.services.manifest_writer import (
     MANIFEST_WRITE_CONTAINMENT,
     MANIFEST_WRITE_ESCAPE,
@@ -449,3 +450,77 @@ def test_refused_serialize_short_circuits_without_writing(tmp_path: Path) -> Non
     assert issues
     assert all(i.code == MANIFEST_WRITE_ESCAPE for i in issues)
     assert not (project_dir / PROJECT_MANIFEST_NAME).exists()
+
+
+# ---------------------------------------------------------------------------
+# US-020c (batch-19) — declared-region persistence in project.json (LLR-026.1)
+# ---------------------------------------------------------------------------
+
+
+def test_declared_regions_roundtrip_and_on_disk(tmp_path: Path) -> None:
+    """AT-026a — declare → serialize → write → read roundtrip; the on-disk
+    project.json carries the regions AND the read path returns them (qa-F4)."""
+    vset = _variant_set("a", "a")
+    regions = (
+        DeclaredRegion("cal", 0x1000, 0x10FF),
+        DeclaredRegion("ram", 0x2000, 0x2010),
+    )
+    text, issues = serialize_manifest(vset, tmp_path, declared_regions=regions)
+    assert issues == []
+    (tmp_path / PROJECT_MANIFEST_NAME).write_text(text, encoding="utf-8")
+
+    disk = (tmp_path / PROJECT_MANIFEST_NAME).read_text(encoding="utf-8")
+    assert '"declared_regions"' in disk and '"cal"' in disk and '"name"' in disk
+
+    manifest = read_project_manifest(tmp_path)
+    assert manifest is not None
+    assert manifest.declared_regions == regions
+    assert manifest.issues == []
+
+
+def test_serialize_omits_declared_regions_key_when_empty(tmp_path: Path) -> None:
+    """TC-026.1 — with no declared regions the key is omitted entirely, so an
+    existing project serializes byte-identically (back-compat, no schema bump)."""
+    text, issues = serialize_manifest(_variant_set("a", "a"), tmp_path)
+    assert issues == []
+    assert "declared_regions" not in text
+
+
+def test_read_absent_key_empty_and_malformed_collected(tmp_path: Path) -> None:
+    """TC-026.2 — an absent key reads back as zero regions with no finding
+    (back-compat); a malformed/invalid entry emits a ValidationIssue and the
+    read completes (collect-don't-abort)."""
+    base = {
+        "schema_version": 1,
+        "active_variant": "a",
+        "batch": [],
+        "assignments": {},
+    }
+    (tmp_path / PROJECT_MANIFEST_NAME).write_text(json.dumps(base), encoding="utf-8")
+    absent = read_project_manifest(tmp_path)
+    assert absent is not None
+    assert absent.declared_regions == ()
+    assert absent.issues == []
+
+    (tmp_path / PROJECT_MANIFEST_NAME).write_text(
+        json.dumps(
+            {
+                **base,
+                "declared_regions": [
+                    # valid, but with a control char in the name — the read
+                    # path must scrub it (injection defense, Phase-2 F1)
+                    {"name": "o\tk\x1b[31m", "start": 0x10, "end": 0x20},
+                    {"name": "no_end", "start": 0x30},  # malformed (missing end)
+                    {"name": "rev", "start": 0x50, "end": 0x40},  # invalid (start>end)
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    mixed = read_project_manifest(tmp_path)
+    assert mixed is not None
+    assert mixed.declared_regions == (DeclaredRegion("ok", 0x10, 0x20),)
+    # read-path scrub: the control char / ANSI never survives into the model
+    assert "\t" not in mixed.declared_regions[0].name
+    assert "\x1b" not in mixed.declared_regions[0].name
+    assert sum("declared_regions" in issue.message for issue in mixed.issues) == 2
