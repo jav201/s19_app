@@ -292,3 +292,18 @@
 
 ### 6.5 Requirement amendments (Before / After · Deleted / New)
 *(Used by `iterate-to-refine` (Phase 1 from a Phase-4 black-box failure) and by Phase-3 spec amendments. One block per amendment: **Before → After** text · **Deleted / New** tokens · parent-HLR re-read result · the re-derived HLR/LLR + their `TC`/`AT`. Never silently edit a locked requirement.)*
+
+#### A1 (Phase-3 Inc2, 2026-06-28) — A2L Legend affordance: button → key binding (C-13 measurement-driven)
+
+**Trigger:** C-13 draft-time MEASUREMENT (LLR-023.3) at Phase-3 implementation. `App.run_test(size=(80,30))` and `(120,30)` over `#screen_a2l` with `prg.s19` loaded showed the A2L Legend button rendered at x=147 (80 cols) / x=165 (120 cols) — **off-screen at BOTH regimes**, because `#a2l_tags_filters` (`layout: horizontal`, two `1fr` inputs + 7 buttons) already overflows its half-width left pane (region width ≈38 at 80, ≈50 at 120) before any addition. The pre-committed PRIMARY fallback (shorten the label to "Key", ~3 cols) cannot recover a ~67–85 col overflow, so the LAST-RESORT (key binding) is taken. MAC (`#mac_page_controls`, btn right=23/41) and Issues (`#validation_issues_filters`, btn right=69/87) measured fully on-screen at both regimes → keep their visible buttons. Operator ratified the key-binding resolution (AskUserQuestion, 2026-06-28).
+
+**LLR-023.2 — Before → After:**
+- Before: "`app.py` shall add a `Legend` `Button` to each of `#a2l_tags_filters` / `#mac_page_controls` / `#validation_issues_filters`, and `on_button_pressed` shall route each id to `push_screen(LegendScreen())`."
+- After: "`app.py` shall add a `Legend` `Button` to `#mac_page_controls` and `#validation_issues_filters`; for the A2L view (whose filter row has no geometry budget — C-13/A1) it shall instead bind key `k` (`Binding('k','show_legend','Legend',show=True)`). A new `action_show_legend()` shall `push_screen(LegendScreen())`; `on_button_pressed` routes the two button ids to it, and the `k` binding invokes it directly."
+- **Deleted token:** `#a2l_legend_button`. **New tokens:** `action_show_legend`, the `k` binding.
+
+**LLR-023.3 — Before → After (fallback realised):** the pre-decided fallback ladder fires at its LAST RESORT. After: "A2L exposes the legend via the `k` key (no button in the overflowing filter row); MAC/Issues retain the full 'Legend' button (measured on-screen at 80 & 120)."
+
+**Parent-HLR re-read (HLR-023):** statement unchanged — "When the operator presses the Legend button on a colour-coded view … the system shall open a modal …". A key binding is a press affordance on the A2L view; the user-observable outcome (open the modal from each of the three views) is preserved. **No HLR body change required.**
+
+**AT/TC re-derivation:** AT-023a now observes A2L via `pilot.press("k")` (black-box, the shipped affordance) instead of a button press; AT-023e additionally asserts A2L exposes **zero** `#a2l_legend_button` at 80 cols (the C-13 resolution is itself acceptance-checked); TC-023.2 asserts the MAC/Issues buttons present + A2L button absent. AT-023b/c/d/f and TC-023.1/TC-S2 unchanged in intent.

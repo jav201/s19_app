@@ -3,14 +3,15 @@
     "language": "en",
     "batch_id": "2026-06-26-batch-18",
     "batch_objective": "#11 Q1/Q2 legend feature: (Q1) a red-flag / classification legend in the generated report, and (Q2) an in-app per-view 'Legend' button surfacing the classification tables (A2L row colour, Status, Linkage). The classification semantics are already drafted (REQUIREMENTS.md 'Severity / colour conventions' + the batch-14 Phase-0 history) and are the single source of truth: Red=schema/structural failure; Green=memory-checked+present; White=valid record without image hit; Grey=not-yet-checked; MAC adds Orange=warning-level overlap/alias/symbol-only. Legend content MUST be derived from color_policy.py SEVERITY_CLASS_MAP / the documented conventions, not re-invented.",
-    "current_phase": 2,
-    "phase_status": "approved",
-    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 0, "4": 0, "5": 0, "6": 0},
+    "current_phase": 6,
+    "phase_status": "awaiting-gate-phase6-commit",
+    "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
     "artifacts": {
         "1": ".dev-flow/2026-06-26-batch-18/01-requirements.md",
         "2": ".dev-flow/2026-06-26-batch-18/02-review.md",
         "4": ".dev-flow/2026-06-26-batch-18/04-validation.md",
         "5": ".dev-flow/2026-06-26-batch-18/05-postmortem.md",
+        "6": ".dev-flow/2026-06-26-batch-18/06-docs/",
         "backlog": ".dev-flow/BACKLOG.md"
     },
     "branch": "claude/batch-18 (cut fresh off origin/main f3926b45 per RC-1; batch-17 merged PR #29)",
@@ -47,6 +48,24 @@
             "date": "2026-06-26",
             "decision": "approved-with-iterate-light-fold",
             "notes": "Phase-1 APPROVED. Phase 2 cross-review (architect ∥ qa; security N/A justified inline — no new external/write/auth/secret surface, legend is static text from frozen data, modal read-only) -> 02-review.md. 0 BLOCKER / 1 major / 4 minor; both PROCEED. MAJOR-1 (architect): frozen-guard mis-citation — color_policy.py is frozen by test_tui_directionb.py::_ENGINE_PATHS (~:3745) + TC-013a/round-trip, NOT test_engine_unchanged.py (which omits it); git diff=0 guard is right, authority corrected. FOLDED. Minors folded: m1 (on_button_pressed :7481->:7433), m4 (C-13 fallback DECIDED: primary=shorten A2L label, last-resort=keybinding). Phase-3 notes: m2 (operationalize 'every row'=colour->meaning pairing + '0 clipped' predicate), m3 (TC-S2 compare RENDERED rows not just same constant). Both confirmed C-13 A2L risk real (9 widgets app.py:2390-2401). shall/should clean; both chains complete; C-10/C-12 honored. Awaiting Phase-2 gate (proceed to Phase 3)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-28",
+            "decision": "phase-3-complete-2-increments-approved",
+            "notes": "DRIVEN MANUALLY (session physically rooted in pedantic-bose-55ed5c worktree, operating claude/batch-18 at gifted-ramanujan-6d30eb via absolute paths; /dev-flow Skill NOT used — it would read the wrong worktree's state.json; same gates enforced by hand). Inc1 (US-022): NEW s19_app/tui/legend.py (LEGEND_TABLE + COLOUR_SEVERITY anti-drift) + report_service _legend_lines + ReportOptions.include_legend; 4 files; code-reviewer APPROVE-WITH-NITS (F3 import-order applied); 892->899; counterfactual REDs AT-022a (emit off) + TC-S1 (severity drop). Inc2 (US-023): LegendScreen modal (screens.py) + MAC/Issues Legend buttons + action_show_legend + k binding (app.py) + styles.tcss; 4 files; code-reviewer APPROVE-WITH-NITS (F1 docstring applied); 899->908; counterfactual REDs (button-dispatch off, modal-drop-artifact). C-13 MATERIALISED: measured A2L Legend button off-screen at BOTH 80 (right=147) & 120 (right=165) cols (filter row already overflows half-width pane) -> pre-committed 'shorten label' fallback insufficient (~67-85 col deficit) -> operator-ratified (AskUserQuestion) k key for A2L; MAC/Issues keep buttons -> §6.5 amendment A1. color_policy.py diff=0, frozen guard green, ruff clean. Each increment ≤5 files + operator gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-28",
+            "decision": "phase-4-validation-PASS",
+            "notes": "04-validation.md -> PASS. 2 US / 2 HLR / 5 LLR covered BOTH layers, 0 blocker fails. All provisional AT/TC ids reconciled to real on-disk nodes (V-5): AT-022a/b + AT-023a-f + TC-S1 x2/TC-frozen-diff/TC-022.1/.2/TC-023.1/.2/TC-S2. Signed-balance ledger 892-0+16=908 reconciles; full non-slow 908 passed/0 failed. 4 counterfactual REDs captured, all value-discriminating (QC-2). Bidirectional surface-reachability complete. Engine-frozen untouched. Supersession N/A (net-new surfaces). ONE minor process gap G-1: SVG snapshot baselines for the 3 views + footer skip locally -> regen in canonical CI at PR. §6.5 A1 reflected in AT-023a/e + TC-023.2. Operator APPROVED."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-28",
+            "decision": "awaiting-gate-phase5-6-complete-then-commit",
+            "notes": "Phase 4 APPROVED (PASS). Phase 5 post-mortem -> 05-postmortem.md (headline: C-13 control WORKED — caught off-screen A2L button at draft-time measurement — but pre-committed fallback ladder was ordered by escalation cost not measured deficit; proposes C-13.1 deficit-matched fallback selection, candidate for global dev-flow.md encode at close). Phase 6 docs (written to WORKTREE paths, no main-checkout leak) -> 06-docs/traceability-matrix.md (dual chains, real reconciled nodes, 0 orphans), functionality.md (operator walkthrough + maintainer seams), executive-summary.md (~1pp), diagrams/batch-18-flows.md (3 Mermaid). REQUIREMENTS.md §24 added (R-LEGEND-SOURCE-001 / R-LEGEND-REPORT-001 / R-LEGEND-MODAL-001 / R-LEGEND-GEOMETRY-001, all Automated). Suite still 908 (docs-only since Phase 4). ALL WORK UNCOMMITTED on claude/batch-18 (commit/PR at operator approval; first commit absorbs the uncommitted batch-18 .dev-flow scaffold + the untracked batch-17 state-snapshot-at-close.json, batch-13 pattern). Next: operator approves -> commit + PR -> tui-ci (snapshot baselines G-1 regen in CI) -> review -> merge -> /dev-flow-sync. Awaiting Phase-6 gate + commit/PR approval."
         }
     ],
     "obsidian_synced": false,

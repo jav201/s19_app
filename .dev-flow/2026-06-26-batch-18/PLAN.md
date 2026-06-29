@@ -1,7 +1,14 @@
 # PLAN.md — batch-18 (living compendium)
 
 ## Where we are
-**▶ RESUME POINT: Phase 3 — implementation, Increment 1.** Phases 0/1/2 DONE + gated. `state.json` = `phase 2, approved`. Branch `claude/batch-18` off `origin/main f3926b45` (RC-1 PASS). Spec ([01-requirements.md](01-requirements.md)) complete + cross-reviewed ([02-review.md](02-review.md)) + folds applied. **A new session resumes by running `/dev-flow`** (reads state.json → advances to Phase 3) or "continue batch-18".
+**▶ RESUME POINT: Phase 4 — validation. Phase 3 (both increments) DONE + gated.** Phases 0/1/2 gated; **Inc1 (US-022, Q1 report legend) + Inc2 (US-023, in-app legend modal) DONE**, each operator-approved + independent code-reviewer APPROVE-WITH-NITS (nits applied). Full non-slow suite **892→899→908** (0 fail), 4 counterfactual REDs shown, `color_policy.py` diff=0, frozen guard green, ruff clean. `state.json` = `phase 2, approved` (advance to 3-done/4 on operator gate). Branch `claude/batch-18` off `origin/main f3926b4` (RC-1 PASS; HEAD 6a9c4e8 docs). Spec ([01-requirements.md](01-requirements.md)) + review ([02-review.md](02-review.md)) folds applied; **§6.5 amendment A1 recorded** (C-13: A2L button → `k` key).
+
+> **Note (worktree/session):** this batch is being driven from a session physically rooted in the `pedantic-bose-55ed5c` worktree but operating on the `claude/batch-18` worktree (`…/gifted-ramanujan-6d30eb`) via absolute paths — the `/dev-flow` Skill is NOT used (it would read the wrong state.json); Phase-3 is executed manually with the same gates. Inc1 work is UNCOMMITTED on `claude/batch-18` (commit at operator approval).
+
+### Inc1 delivered (US-022)
+- NEW `s19_app/tui/legend.py` — `LEGEND_TABLE` single source (artifact→{classification:(colour,meaning)}) + `COLOUR_SEVERITY` anti-drift map. NOT in frozen `color_policy.py`.
+- `report_service.py` — `_legend_lines()` + `ReportOptions.include_legend: bool = True` (strict `__post_init__` validation) + gated `emit` after overview.
+- Tests: AT-022a/AT-022b (`tests/test_report_service.py`), TC-022.1/.2, TC-S1 + TC-frozen-diff (`tests/test_tui_legend.py`). 4 files (≤5).
 
 ### Resume cheat-sheet (everything a fresh agent needs)
 - **Scope:** 2 stories — US-022 (Q1 report legend), US-023 (Q2 in-app Legend button + LegendScreen modal on A2L/MAC/Issues). One batch, **2 increments**: Inc1 = `s19_app/tui/legend.py` (NEW single source) + Q1 report legend + AT (≤5 files: legend.py, report_service.py, tests/test_tui_legend.py NEW, tests/test_report_service.py). Inc2 = Q2 LegendScreen + Legend button on 3 views + AT (screens.py, app.py, styles.tcss, test_tui_legend.py; + SVG snapshot regen in canonical CI only).
@@ -60,7 +67,9 @@ RC-1 (held), engine-frozen OFF-LIMITS (esp. color_policy.py — READ only), two-
 - Snapshot SVG cells for the 3 views + report will shift → CI regen (G-1 pattern).
 
 ## Test ledger
-Baseline (origin/main f3926b45): full non-slow 892 passed (carry forward; re-measure Phase 4).
+Baseline (origin/main f3926b4): full non-slow 892 passed. **After Inc1: 899** (+7: AT-022a/b, TC-022.1/.2, TC-S1 ×2, TC-frozen-diff). **After Inc2: 908** (+9: AT-023a–f, TC-023.1/.2, TC-S2). 0 fail. SVG snapshot cells for the 3 views skipped locally (CI-gated, G-1) → regen in canonical CI at PR.
 
 ## Decision log (mirror)
 - 2026-06-26 — batch-18 init; Phase-0 done; frozen-constraint finding (legend.py not color_policy.py); awaiting DoR gate (scope shape).
+- 2026-06-28 — Phase-3 Inc1 (US-022) implemented + gated. 4 files, code-reviewer APPROVE-WITH-NITS (F3 applied), 892→899, 2 counterfactual REDs, color_policy.py diff=0, frozen guard green.
+- 2026-06-28 — Phase-3 Inc2 (US-023) implemented + gated. 4 files (screens.py/app.py/styles.tcss/test_tui_legend.py), code-reviewer APPROVE-WITH-NITS (F1 docstring applied), 899→908, 2 counterfactual REDs (button-dispatch off, modal-drop-artifact). **C-13 materialised → §6.5 A1: A2L button off-screen at 80 & 120 (measured) → operator-ratified `k` key for A2L; MAC/Issues keep buttons.** color_policy.py diff=0, frozen guard green, ruff clean. Phase 3 COMPLETE. Awaiting operator gate → Phase 4 validation.
