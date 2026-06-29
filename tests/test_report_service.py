@@ -61,6 +61,7 @@ from s19_app.tui.changes.model import (
 )
 from s19_app.tui.legend import LEGEND_TABLE
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
+from s19_app.tui.services.report_addendum import DeclaredRegion
 from s19_app.tui.services import report_service
 from s19_app.tui.services.report_service import (
     REPORT_CONTEXT_BYTES_MAX,
@@ -767,3 +768,170 @@ def test_include_legend_default_true_and_validated() -> None:
     assert ReportOptions(include_legend=False).include_legend is False
     with pytest.raises(ValueError):
         ReportOptions(include_legend="yes")  # type: ignore[arg-type]
+
+
+# ---------------------------------------------------------------------------
+# US-020d (batch-19) — issue rendering enrichment (LLR-025.1 / HLR-025)
+# ---------------------------------------------------------------------------
+
+
+def _enriched_issue(
+    message: str,
+    *,
+    address: Optional[int] = None,
+    symbol: Optional[str] = None,
+    related: Sequence[str] = (),
+) -> ValidationIssue:
+    """A ValidationIssue carrying the optional address/symbol/related fields."""
+    return ValidationIssue(
+        code="X-ENRICH",
+        severity=ValidationSeverity.ERROR,
+        message=message,
+        artifact="changes",
+        symbol=symbol,
+        address=address,
+        related_artifacts=list(related),
+    )
+
+
+def _report_with_issue(tmp_path: Path, issue: ValidationIssue) -> str:
+    """Generate a one-variant report whose change-summary carries ``issue``."""
+    summary = _summary([], issues=[issue], variant_id="a")
+    results = [
+        VariantExecutionResult(
+            variant_id="a", status="ok", change_summaries=[summary]
+        )
+    ]
+    path = generate_project_report(
+        tmp_path, results, ReportOptions(), variant_set=_variant_set("a"),
+    )
+    return path.read_text(encoding="utf-8")
+
+
+def _issue_line(text: str, needle: str) -> str:
+    """The single report line carrying ``needle`` (the issue's message)."""
+    return next(line for line in text.splitlines() if needle in line)
+
+
+def test_report_issue_line_shows_address_symbol_related(tmp_path: Path) -> None:
+    """AT-025a — black-box: a rendered issue carrying address/symbol/related
+    shows all three through the produced report file (HLR-025).
+
+    Intent: the report's Declaration-errors line is enriched beyond
+    code/severity/message. Observed through `generate_project_report` → the
+    report file on disk; asserts the content, not mere presence.
+    """
+    issue = _enriched_issue(
+        "enriched issue", address=0x80040000, symbol="CAL_MAP", related=["a2l", "mac"]
+    )
+    line = _issue_line(_report_with_issue(tmp_path, issue), "enriched issue")
+    assert "@ 0x80040000" in line
+    assert "symbol=CAL_MAP" in line
+    assert "related=a2l,mac" in line
+
+
+def test_report_issue_without_address_has_no_hex(tmp_path: Path) -> None:
+    """AT-025b — negative: an issue with no address shows no `@0x` (nor empty
+    `symbol=`/`related=`), proving present/absent discrimination (C-10)."""
+    issue = _enriched_issue("bare issue")  # address/symbol None, related empty
+    line = _issue_line(_report_with_issue(tmp_path, issue), "bare issue")
+    assert "@ 0x" not in line
+    assert "symbol=" not in line
+    assert "related=" not in line
+
+
+def test_report_issue_address_zero_renders(tmp_path: Path) -> None:
+    """TC-025.1 — boundary: `address == 0` renders `@ 0x0` (not suppressed by
+    a truthiness test on the address)."""
+    line = _issue_line(
+        _report_with_issue(tmp_path, _enriched_issue("zero addr", address=0)),
+        "zero addr",
+    )
+    assert "@ 0x0" in line
+
+
+# ---------------------------------------------------------------------------
+# US-020c (batch-19) — declared-region report addendum (LLR-024.2 / HLR-024)
+# ---------------------------------------------------------------------------
+
+
+def _report_with_regions(
+    tmp_path: Path,
+    regions: Sequence[DeclaredRegion],
+    summary: ChangeSummary,
+) -> str:
+    """Generate a one-variant report carrying ``summary`` + declared regions."""
+    results = [
+        VariantExecutionResult(
+            variant_id="a", status="ok", change_summaries=[summary]
+        )
+    ]
+    path = generate_project_report(
+        tmp_path,
+        results,
+        ReportOptions(declared_regions=tuple(regions)),
+        variant_set=_variant_set("a"),
+    )
+    return path.read_text(encoding="utf-8")
+
+
+def test_addendum_lists_region_with_mods_and_issues(tmp_path: Path) -> None:
+    """AT-024a — black-box: the report addendum lists a declared region and the
+    modifications + issues whose address falls inside it (through the file)."""
+    region = DeclaredRegion("calzone", 0x1000, 0x10FF)
+    summary = _summary(
+        [_applied_entry(0x1000, (0x01,), (0xAA,))],
+        issues=[_enriched_issue("inside issue", address=0x1050)],
+        variant_id="a",
+    )
+    text = _report_with_regions(tmp_path, [region], summary)
+    assert "## Addendum: declared regions" in text
+    assert "calzone" in text
+    assert "modification @ 0x1000" in text
+    assert "issue [X-ENRICH] @ 0x1050" in text
+
+
+def test_addendum_region_with_no_hits_shows_none(tmp_path: Path) -> None:
+    """AT-024b — boundary: a declared region with nothing inside renders an
+    explicit 'None.' under its sub-heading."""
+    region = DeclaredRegion("empty_zone", 0x9000, 0x90FF)
+    summary = _summary([_applied_entry(0x1000, (0x01,), (0xAA,))], variant_id="a")
+    addendum = _report_with_regions(tmp_path, [region], summary).split(
+        "## Addendum: declared regions", 1
+    )[1]
+    assert "empty_zone" in addendum
+    assert "None." in addendum
+    assert "0x1000" not in addendum  # the out-of-region modification is not listed
+
+
+def test_addendum_membership_inclusive_at_bounds(tmp_path: Path) -> None:
+    """TC-024.4 — inclusive [start,end]: a modification at exactly start and at
+    exactly end is in-region; one past end is excluded (architect-M1)."""
+    region = DeclaredRegion("edge", 0x2000, 0x2010)
+    summary = _summary(
+        [
+            _applied_entry(0x2000, (0x01,), (0xAA,)),  # at start (inclusive)
+            _applied_entry(0x2010, (0x01,), (0xBB,)),  # at end (inclusive)
+            _applied_entry(0x2011, (0x01,), (0xCC,)),  # just past end (excluded)
+        ],
+        variant_id="a",
+    )
+    addendum = _report_with_regions(tmp_path, [region], summary).split(
+        "## Addendum", 1
+    )[1]
+    assert "modification @ 0x2000" in addendum
+    assert "modification @ 0x2010" in addendum
+    assert "0x2011" not in addendum
+
+
+def test_addendum_and_issue_render_use_same_address(tmp_path: Path) -> None:
+    """TC-S3 — single-source anti-drift: an issue's address appears in BOTH the
+    enriched Declaration-errors line (LLR-025.1) and the addendum membership
+    (LLR-024.2); both read the same ``ValidationIssue.address``."""
+    region = DeclaredRegion("zone", 0x3000, 0x30FF)
+    summary = _summary(
+        [], issues=[_enriched_issue("shared issue", address=0x3040)], variant_id="a"
+    )
+    text = _report_with_regions(tmp_path, [region], summary)
+    assert "shared issue @ 0x3040" in text  # enriched declaration-errors (LLR-025.1)
+    assert "issue [X-ENRICH] @ 0x3040" in text  # addendum membership (LLR-024.2)

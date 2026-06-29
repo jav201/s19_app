@@ -69,6 +69,7 @@ from ..changes.check import run_check_document
 from ..changes.model import CheckRunResult
 from ..mac import parse_mac_file
 from ..models import ProjectVariantSet, VariantDescriptor
+from .report_addendum import DeclaredRegion
 from ..workspace import (
     DEFAULT_COPY_SIZE_CAP_BYTES,
     MAC_EXTENSIONS,
@@ -197,6 +198,7 @@ class ProjectManifest:
     active_variant: Optional[str]
     batch: list[Path] = field(default_factory=list)
     assignments: dict[str, list[Path]] = field(default_factory=dict)
+    declared_regions: Tuple[DeclaredRegion, ...] = ()
     issues: list[ValidationIssue] = field(default_factory=list)
 
 
@@ -288,6 +290,75 @@ def _resolve_manifest_entry(
         )
         return None
     return resolved
+
+
+def _parse_manifest_declared_regions(
+    raw: object,
+    issues: list[ValidationIssue],
+) -> Tuple[DeclaredRegion, ...]:
+    """
+    Summary:
+        Parse the OPTIONAL ``declared_regions`` manifest key (LLR-026.1) into
+        :class:`DeclaredRegion` rows. Absent/empty → ``()`` with no finding
+        (back-compat). A non-array value, or a malformed/invalid entry (not an
+        object, missing/ill-typed ``name``/``start``/``end``, or rejected by
+        ``DeclaredRegion`` validation), emits one ``MANIFEST-BAD-STRUCTURE``
+        finding and is skipped — collect-don't-abort, matching ``batch`` /
+        ``assignments`` parsing.
+
+    Args:
+        raw (object): The value of the manifest ``declared_regions`` key
+            (``payload.get("declared_regions", [])``).
+        issues (list[ValidationIssue]): The accumulating finding list; mutated.
+
+    Returns:
+        Tuple[DeclaredRegion, ...]: The successfully parsed regions, in order.
+
+    Dependencies:
+        Uses:
+            - DeclaredRegion / _manifest_issue
+        Used by:
+            - read_project_manifest
+    """
+    if not isinstance(raw, list):
+        issues.append(
+            _manifest_issue(
+                MANIFEST_BAD_STRUCTURE,
+                "manifest declared_regions is not an array - ignored",
+            )
+        )
+        return ()
+    regions: list[DeclaredRegion] = []
+    for entry in raw:
+        if (
+            not isinstance(entry, dict)
+            or not isinstance(entry.get("name"), str)
+            or not isinstance(entry.get("start"), int)
+            or isinstance(entry.get("start"), bool)
+            or not isinstance(entry.get("end"), int)
+            or isinstance(entry.get("end"), bool)
+        ):
+            issues.append(
+                _manifest_issue(
+                    MANIFEST_BAD_STRUCTURE,
+                    f"manifest declared_regions entry is malformed - "
+                    f"ignored: {entry!r}",
+                )
+            )
+            continue
+        try:
+            regions.append(
+                DeclaredRegion(entry["name"], entry["start"], entry["end"])
+            )
+        except ValueError:
+            issues.append(
+                _manifest_issue(
+                    MANIFEST_BAD_STRUCTURE,
+                    f"manifest declared_regions entry is invalid - "
+                    f"ignored: {entry!r}",
+                )
+            )
+    return tuple(regions)
 
 
 def read_project_manifest(
@@ -465,6 +536,9 @@ def read_project_manifest(
         active_variant=active_variant,
         batch=batch,
         assignments=assignments,
+        declared_regions=_parse_manifest_declared_regions(
+            payload.get("declared_regions", []), issues
+        ),
         issues=issues,
     )
 

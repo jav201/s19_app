@@ -2808,3 +2808,29 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Code: `s19_app/tui/styles.tcss` `#legend_dialog { height: 90% }` + `#legend_body { height: 1fr; overflow-y: auto }` (US-023, LLR-023.3 / C-13).
 - Validation: `Automated` — `tests/test_tui_legend.py::test_at023e_c13_geometry_at_80_cols` (measured: MAC right=23, Issues=69 ≤80; A2L 0 buttons; modal within 80×30). `Manual` — SVG snapshot baselines for the 3 views + footer regenerate in canonical CI (G-1; never local).
 - Status: Added batch-18 (US-023 / HLR-023 / LLR-023.3).
+
+# 25. Issues-report addendum + issue enrichment (batch-19)
+
+> Feature #10 follow-on: enrich the report's validation issues with their address/symbol/related fields (Q1d), and add an operator-declared "expected-zone" addendum that cross-references modifications/issues per declared memory region (Q1c) + persists the regions. Stories: `.dev-flow/2026-06-29-batch-19/01-requirements.md` §3/§4. DoR: A Expected-zone + Both + persist. `ValidationIssue` (validation/, FROZEN) consumed read-only.
+
+**R-RPT-ISSUE-FIELDS-001**: When the report renders a validation issue, it shall append the issue's address (hex, when present), symbol (when set), and related artifacts (when non-empty) to the code/severity/message line; an issue lacking a field shall show no empty placeholder, and `address == 0` shall render `@ 0x0`.
+- Code: `s19_app/tui/services/report_service.py::_declaration_error_lines` (~:712) (US-020d, LLR-025.1; reads `ValidationIssue.address/.symbol/.related_artifacts`).
+- Validation: `Automated` — `tests/test_report_service.py::test_report_issue_line_shows_address_symbol_related` (AT-025a; RED pre-fix: fields absent) + `::test_report_issue_without_address_has_no_hex` (AT-025b, negative) + `::test_report_issue_address_zero_renders` (TC-025.1 boundary).
+- Status: Added batch-19 (US-020d / HLR-025).
+
+**R-RPT-ADDENDUM-001**: The `DeclaredRegion(name,start,end)` model shall scrub + length-cap `name` via `validation.model._scrub_issue_message` at construction and validate `name` non-empty / `start>=0` / `start<=end` (one `ValueError` each); membership is the INCLUSIVE `[start,end]` predicate.
+- Code: `s19_app/tui/services/report_addendum.py::DeclaredRegion` (:30) (US-020c, LLR-024.1).
+- Validation: `Automated` — `tests/test_report_addendum.py` (membership inclusive; bad bounds; empty/control-only name rejected; name scrubbed of control/ANSI; length-capped — RED pre-fix: scrub bypass lets a newline name survive).
+- Status: Added batch-19. **Security**: the region `name` is operator free text reaching the Markdown report + `project.json`; the construction-time scrub (reusing the existing `_scrub_issue_message`) is the injection defense (Phase-2 security-F1).
+
+**R-RPT-ADDENDUM-002**: When the operator declares memory regions for a report, the report shall emit an "Addendum: declared regions" section listing each region and, per region, the modifications and validation issues whose address falls within `[start,end]` (aggregated across variants); a zero-hit region renders "None.". Regions are entered in `ReportViewerScreen` and threaded to `ReportOptions.declared_regions`.
+- Code: `report_service.py::_addendum_lines` (:977) + `ReportOptions.declared_regions` (:198); `screens.py::_parse_declared_regions` (:543) + `ReportViewerScreen` TextArea + `GenerateRequested.declared_regions` (:652); `app.py` 4-hop thread → `ReportOptions` (US-020c, LLR-024.2/024.3).
+- Validation: `Automated` — `tests/test_report_service.py::test_addendum_lists_region_with_mods_and_issues` (AT-024a) + `::test_addendum_region_with_no_hits_shows_none` (AT-024b) + `::test_addendum_membership_inclusive_at_bounds` (TC-024.4) + `::test_addendum_and_issue_render_use_same_address` (TC-S3 single-source); `tests/test_tui_report_seam.py::test_declared_region_in_dialog_reaches_report_addendum` (AT-024c, true e2e dialog→report file, C-12; RED pre-fix: app threading dropped) + `::test_parse_declared_regions_handles_hex_dec_and_skips_malformed` (TC-024.5) + `::test_report_dialog_with_region_input_fits_80_and_120_cols` (TC-024.6 / C-13 MEASURED PASS).
+- Status: Added batch-19 (US-020c / HLR-024).
+
+**R-RPT-ADDENDUM-PERSIST-001**: Declared regions shall persist in `project.json` as an OPTIONAL `declared_regions` array, written only when non-empty (back-compat — no `schema_version` bump); the reader shall return them (absent key → empty), emitting one `MANIFEST-BAD-STRUCTURE` issue for a malformed/invalid entry without aborting, and re-scrubbing each name on read.
+- Code: `manifest_writer.py::serialize_manifest`/`write_project_manifest` (optional key); `variant_execution_service.py::_parse_manifest_declared_regions` (:295) + `ProjectManifest.declared_regions` (:201) (US-020c, LLR-026.1).
+- Validation: `Automated` — `tests/test_manifest_writer.py::test_declared_regions_roundtrip_and_on_disk` (AT-026a; on-disk project.json + read roundtrip, qa-F4; RED pre-fix: key not written) + `::test_serialize_omits_declared_regions_key_when_empty` (TC-026.1 back-compat) + `::test_read_absent_key_empty_and_malformed_collected` (TC-026.2; absent→empty, malformed→issue, read-path scrub).
+- Status: Added batch-19 (US-020c / HLR-026). Serialization layer only; UI auto-wire (save dialog regions / pre-fill on load) deferred to BACKLOG (operator option-1).
+
+> Deferred to BACKLOG: UI region save/load auto-wiring (HLR-026 follow-on); on-screen feedback when the dialog parser skips a malformed region line.

@@ -1,73 +1,54 @@
 # s19_app — dev-flow BACKLOG (cross-batch, prioritized)
 
-> Single prioritized queue for all open work: the in-flight batch-14 item + the 2026-06-23/24 audit carries. Continue (do not pivot). `origin/main` tip = `9169130` (batch-15 PR #20 + audit-gaps PR #21 merged). Engine-frozen set OFF-LIMITS: core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. All repo work on a fresh branch off `origin/main`; `pytest -q` to verify; ≤5 files/increment; every behavioral change ships a black-box AT shown failing pre-fix; commits/PRs only on operator approval.
+> Single prioritized queue for open feature work. `origin/main` tip = `8654df5` (batch-18 PR #30 merged). **RC-1 every batch open:** `git fetch`; assert merge-base == origin/main tip; cut a fresh branch off origin/main; per-story already-shipped grep before deriving. **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`). ≤5 files/increment; every behavioral change ships a black-box `AT-NNN` shown failing pre-fix; commits/PRs only on operator approval. **Last refresh: 2026-06-29 (batch-18 close).**
 
 ## Status legend
-`P0` critical/next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct, direct(global ~/.claude)}
+`P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct, direct(global ~/.claude)}
 
 ---
 
-## P0 — Critical (continue batch-14)
+## OPEN QUEUE
 
-### US-015 — Selectable 16/32 S19 record width + populated S0 header
-- **Flow:** /dev-flow (the batch-14 we are continuing). **Status:** Phase 1 complete (2 HLR / 7 LLR / TC-212..226 + AT-015.1-.3 / AT-016.* · spec at `.dev-flow/2026-06-23-batch-14/01-requirements.md`).
-- **Why P0:** data-fidelity/interop — downstream flashing/diff tools need 32-byte records + header; emitter is hardcoded 16-byte + empty S0 (`tui/changes/io.py:1409/1473/1471`). Confirmed net-new, never built.
-- **Critical watch:** the 16→32 default flip has back-compat blast radius (Phase-1 finding D2: 0 tests assert a 16-byte *row width*, but re-confirm on current main). Cross-format integrity guarded by TC-226 (S19↔HEX round-trip, `emit_intel_hex_from_mem_map io.py:1533` untouched).
-- **Build-on:** rebase batch-14 branch onto `origin/main 9169130` so US-015 sits atop the shipped US-016. Emission stays in `tui/changes/io.py` (outside frozen set).
+### D-1 — Declared-region UI save/load wiring (HLR-026 follow-on)
+- **Flow:** `/dev-flow` or `/fast-dev-flow` (small). **Priority: P2.** **Origin:** batch-19 (operator option-1 scoped the persistence to the serialization layer only).
+- **Scope:** wire the persistence shipped in batch-19 to the UI — save the report dialog's declared regions into `project.json` on project-save (via the existing `_write_and_verify_manifest` path, which now accepts `declared_regions`), and pre-fill the `ReportViewerScreen` region input from `ProjectManifest.declared_regions` on project load. Needs app-level declared-region state. The serialization layer (`serialize/write_project_manifest` + `read_project_manifest`) is already in place + tested (`R-RPT-ADDENDUM-PERSIST-001`).
 
-### US-016 — A↔B compare load-failure honesty  ✅ SATISFIED (batch-15, main §20)
-- Shipped in PR #20 (`R-DIFF-LOADFAIL-001`). No duplicate work. Kept here for traceability; its coverage gap is C-9 below.
+### D-2 — Report dialog: feedback on skipped malformed region lines
+- **Flow:** `direct` micro-PR or fold into D-1. **Priority: P3.** **Origin:** batch-19 Inc3 reviewer F1.
+- **Scope:** `_parse_declared_regions` (`screens.py:543`) silently skips blank/malformed/invalid lines (log only). Surface a count to the operator (e.g. `self.set_status`/`notify` before dismiss) so a mistyped region isn't silently dropped. Touches the dismiss/post path in `ReportViewerScreen.on_button_pressed`.
 
----
+### #8 — Patch-editor overhaul
+- **Flow:** `/dev-flow` (largest; **scope-first Phase 0 — likely splits into several stories**). **Priority: P1** (after US-020c/d).
+- **Scope:** 4-pane split + change-file default (`changes.json`) + change-file dropdown + dedicated workarea folder + variant dropdown + Checks-button fix.
+- **Baseline:** `PatchEditorPanel(ScrollableContainer)` (`screens_directionb.py:335`) is currently a SINGLE scrollable container — the 4-pane split is net-new structural work. **C-13 geometry-budget is a prime case:** verify each pane's budget at 80/120-col at draft time (don't assume); C-13.1 deficit-matched fallback applies to any overflow.
+- **High blast radius** — Phase-0 decomposition mandatory before any code.
 
-## P1 — High (process backstop + key feature)
-
-### C-1 — dev-flow-sync unfilled-template reject-check ✅ DONE (2026-06-25)
-- **Flow:** direct(global ~/.claude). **DONE:** `~/.claude/commands/dev-flow-sync.md` step 3 prose replaced with a concrete structural DETECT (empty required tables/sections, live placeholder tokens as field values, `04-validation.md` with no verdict+results) + anti-false-positive verify-before-block (quoted-guidance/code-fence/frontmatter-example hits are NOT blockers). Global config — not committed to this repo.
-- **Why P1 (was):** the RC-1 backstop — batch-14 escaped via a blank Phase-4 artifact; match unfilled *structure*, NOT token substrings (legit prose quotes `<P>`/`TC-NNN`).
-
-### GAP #2 — per-variant file-assignment surface + manifest persistence
-- **Flow:** /dev-flow (own batch, scope-first). **Why P1 (after US-015):** net-new feature, larger. PREMISE-CORRECTED — not a wiring fix: TUI save holds no batch/assignments state and there's no per-variant assign surface; `assignments` = *additional* per-variant files (change/check docs), not the primary image. Live: `_write_and_verify_manifest` (`app.py:3548/3591`) writes no batch/assignments; execution service consumes them (`variant_execution_service.py:586-602`).
-
----
-
-## P2 — Medium (coverage + cleanups to ride soon)
-
-### C-9 — hex-window-content AT for HLR-016 ✅ DONE (2026-06-25, /fast-dev-flow batch claude/fdf-at-gaps)
-- **DONE:** 2 black-box ATs added to `tests/test_tui_diff_compare_realpath.py` observing `#diff_hex_a`/`#diff_hex_b` CONTENT through the shipped Compare surface — `test_compare_hex_windows_render_the_differing_bytes` (asserts the exact differing bytes per pane; counterfactual blank-pane RED captured) + `test_compare_hex_windows_report_no_runs_for_identical_images` (the no-run branch, C-10 (b)). 0 source/engine edits.
-
-### CRC-width lock-AT ✅ DONE (2026-06-25, same batch)
-- **DONE:** `tests/test_crc_operation.py::test_crc_write_emits_32_byte_records` reads the `write_crc_image`-written `.s19` back as TEXT and locks the fixed 32-byte record width (crc.py:879 emits at the default; the `S19File` map oracle is width-agnostic). Counterfactual 16-byte emit → value-discriminating RED (QC-2). 0 source edits.
-
-### CRC save honours operator-selected record width — IN PROGRESS (batch-17 US-019)
-- **Flow:** /dev-flow (batch-17, claude/batch-17). **Status (2026-06-26):** picked up as US-019. Path mapped: width-cycle selector on `ConfirmWriteScreen` (screens.py:671) mirroring the Patch Editor `#patch_saveback_width_button`; thread `bytes_per_line` through `_on_confirm_write`→`_run_crc_write_worker`→`write_crc_image` (crc.py:790/879). The fixed-32 lock-AT (PR #26) gets re-pointed to "default 32 + selectable 16", not deleted.
-
-### US-020c/d — issues-report addendum input + report integration — DEFERRED feature
-- **Flow:** /dev-flow (own batch + design spike). **Why deferred (batch-17 DoR, 2026-06-26):** the "report-addendum input (declared memory locations)" is net-new (no data model, no persistence) with unresolved semantics ("declared memory locations"); US-020d (issues→report integration) depends on it. batch-17 ships the READY parts (US-020a hex pane + US-020b enhanced list); these two carry design risk and need a spike first. Surfaces: report_service.py (addendum section), a new addendum data model + input form, ReportOptions field.
-
-### 4a — app.py ruff F401 cleanup
-- **Flow:** direct micro-PR. 5–6 unused imports (`app.py:27/37/38/39/107`), predate recent work. Own PR so it doesn't ride a behavioral change.
-
-### (process) — commit batch-15 `obsidian_synced:true` flip
-- **Flow:** direct (ride-along into the first new-branch commit, batch-13 pattern).
+### #12 — Before/after report + entropy viewer + reconcile
+- **Flow:** `/dev-flow` (greenfield → **design proposal first**). **Priority: P2** — most design-heavy; last.
+- **Scope:** (a) before/after report generation (original vs patched file); (b) entropy / data-classification viewer (greenfield); (c) A2L-colour ↔ issues-report reconcile (red A2L rows that produce no issue).
+- Verified net-new: `report_service.py` has 0 `entropy`/`before-after` hits on main. (c) likely the smallest sub-item and could be split out early if value warrants.
 
 ---
 
-## P3 — Low (doc/process tidy)
+## DONE (batches 14–18, merged + synced) — do NOT redo, verify-shipped if in doubt
+- US-015 (16/32 S19 record width + S0 header) — batch-14, PR #22 (`b734c19`)
+- US-016 (A↔B compare load-failure honesty) — batch-15, PR #20 (`R-DIFF-LOADFAIL-001`)
+- US-017 / GAP #2 (manifest per-variant assignments) — batch-16, PR #23 (`dd46113`)
+- US-018 (#9 workspace one-line hex) — batch-17, PR #29
+- US-019 (CRC selectable record width) — batch-17, PR #29
+- US-020a/b (#10 issues hex pane + Related column) — batch-17, PR #29
+- US-022 / US-023 (#11 classification legend — report section + in-app modal) — batch-18, PR #30 (`8654df5`)
+- US-020c / US-020d (#10 issues-report addendum + issue enrichment + region persistence) — batch-19 (REQUIREMENTS §25; 908→926). Persistence = serialization layer only; UI auto-wire split to D-1.
+- Closed process/AT carries: C-9 (compare hex-pane AT), CRC-width lock-AT, ruff F401/F402, batch-07 report seam, batch-01 evidence packs, C-6 (TC-id retire), obsidian flips.
 
-### C-6 — retire provisional TC-230/231 ids ✅ DONE (2026-06-25)
-- **DONE — substantively already satisfied; closed with finding.** REQUIREMENTS.md never contained `TC-230`/`TC-231` — §20 (`R-DIFF-LOADFAIL-001`) cites the real node names (`test_at_016_*`), so there was nothing to retire there. The batch-15 archives (`.dev-flow/2026-06-24-batch-15/`) already document every `TC-230`/`TC-231` mention as RETIRED / subsumed-by-AT (V-5); left untouched as a closed + Obsidian-synced historical record (no retroactive rewrite). No live dangling identifier exists anywhere — the only remaining mentions are carry-tracking entries (this item + the batch-14/16 post-mortem carry lists).
-- **Flow:** direct. Doc closure (no archive rewrite); rode the F402 `app.py` micro-PR.
-
-### C-10 — AT-authoring discipline ✅ DONE (2026-06-25, reframed) + C-11 ✅ DONE
-- **DONE:** encoded in `~/.claude/commands/dev-flow.md` two-layer section — (a) no default-value-reliant pilots (drive a non-default value / cycle off-and-back); (b) one AT per policy branch, asserting *content*. **C-11 ownership** also DONE (qa authors at Phase 1/3; Phase-2 + code-review treat violations as findings).
-- **NOTE — original framing superseded:** the first C-10 ("formalize AT-*subsumes*-TC: an AT may replace a TC iff it drives the exact mechanism") was deliberately NOT implemented — the batch-14 post-mortem found AT and TC catch *different* failure classes (the AT caught C3 the TCs structurally couldn't; the AT layer carried the first-cut defects the TCs didn't). Layers kept INDEPENDENT, not consolidated. Documented decision, not an omission.
-
-### RC-1 — Phase-0 base-currency gate ✅ DONE (2026-06-25)
-- **DONE:** `~/.claude/commands/dev-flow.md` Phase 0 — `git fetch` + assert merge-base == origin/main tip (rebase if stale) + per-story already-shipped grep → drop SATISFIED-EXTERNALLY at Phase 0. Global config. The headline batch-14 lesson.
+## Controls encoded (global `~/.claude` / templates) — do NOT re-encode
+RC-1 (Phase-0 base-currency gate), C-1 (dev-flow-sync reject-check), C-10/C-11 (AT-authoring), C-12 (output-then-consume AT), **C-13 (geometry-budget)** + **C-13.1 (deficit-matched fallback, batch-18)**, QC-2 (value-discriminating RED), QC-3 (boundary-catalog pre-Phase-3). Two-layer AT/TC + dual traceability standing. dev-flow control-encode approval protocol (always ask before editing `~/.claude/commands/`).
 
 ---
 
-## Notes
-- Items C-1 / C-10 touch global `~/.claude` (outside the repo) — surfaced explicitly per edit, never committed to s19_app.
-- Proposed execution order: **US-015 (P0) → C-1 (P1, parallel-safe) → GAP #2 (P1) → C-9 / 4a / obsidian flip (P2) → C-6 / C-10 (P3)**, with P2 cleanups ride-able opportunistically. Operator confirms/reorders.
+## Proposed sequence (pending operator approval — do NOT derive yet)
+1. **US-020c/d** — `/dev-flow`, Phase-0 design spike on "declared memory locations" before deriving HLR. Smallest; extends the issues-report line.
+2. **#8 patch-editor overhaul** — `/dev-flow`, scope-first Phase 0 (decompose into stories); C-13 budget per pane.
+3. **#12** — `/dev-flow`, design proposal first (greenfield entropy viewer + before/after + reconcile).
+
+Operator confirms / reorders.

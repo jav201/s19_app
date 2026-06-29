@@ -75,6 +75,7 @@ from .services.diff_report_service import (
     generate_diff_report_html,
 )
 from .services.load_service import build_loaded_hex, build_loaded_s19
+from .services.report_addendum import DeclaredRegion
 from .services.report_service import (
     EXECUTION_SCOPE_TO_REPORT_MODE,
     REPORT_SOURCE_DEFAULT,
@@ -1879,9 +1880,15 @@ class S19TuiApp(App):
             Used by:
                 - ``ReportViewerScreen`` (bubbled message)
         """
-        self._trigger_generate_report(message.context_bytes)
+        self._trigger_generate_report(
+            message.context_bytes, message.declared_regions
+        )
 
-    def _trigger_generate_report(self, context_bytes: int) -> None:
+    def _trigger_generate_report(
+        self,
+        context_bytes: int,
+        declared_regions: Sequence[DeclaredRegion] = (),
+    ) -> None:
         """
         Summary:
             UI-thread gate for E8 report generation (LLR-008.5): reuse the
@@ -1939,7 +1946,12 @@ class S19TuiApp(App):
         else:
             self.set_status("Report: generating from last execution...")
         self._start_generate_report_worker(
-            project_dir, variant_set, context_bytes, last, fallback_batch
+            project_dir,
+            variant_set,
+            context_bytes,
+            last,
+            fallback_batch,
+            tuple(declared_regions),
         )
 
     @work(thread=True, exclusive=True, group="generate_report")
@@ -1950,6 +1962,7 @@ class S19TuiApp(App):
         context_bytes: int,
         last: Optional[tuple[Path, str, str, List[VariantExecutionResult]]],
         fallback_batch: list[Path],
+        declared_regions: Sequence[DeclaredRegion] = (),
     ) -> None:
         """
         Summary:
@@ -2015,6 +2028,7 @@ class S19TuiApp(App):
                 context_bytes=context_bytes,
                 execution_mode=EXECUTION_SCOPE_TO_REPORT_MODE[scope],
                 assignment_source=assignment_source,
+                declared_regions=tuple(declared_regions),
             )
             report_path = generate_project_report(
                 project_dir, results, options, variant_set=variant_set

@@ -48,6 +48,7 @@ from typing import Mapping, Optional, Sequence
 
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..models import ProjectVariantSet
+from .report_addendum import DeclaredRegion
 from ..workspace import (
     WORKAREA_TEMP,
     WorkareaContainmentError,
@@ -227,15 +228,18 @@ def serialize_manifest(
     *,
     batch: Sequence[str] = (),
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
+    declared_regions: Sequence[DeclaredRegion] = (),
     schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> tuple[Optional[str], list[ValidationIssue]]:
     """
     Summary:
         Serialize a project composition into the canonical ``project.json``
         envelope text the reader parses back without findings (HLR-001 /
-        LLR-001.1..001.5). The envelope carries exactly
-        ``{schema_version, active_variant, batch, assignments}``; emission is
-        via the stdlib ``json`` encoder, never string assembly (LLR-001.1).
+        LLR-001.1..001.5). The envelope carries
+        ``{schema_version, active_variant, batch, assignments}`` plus an
+        OPTIONAL ``declared_regions`` array, written only when regions are
+        declared (LLR-026.1); emission is via the stdlib ``json`` encoder,
+        never string assembly (LLR-001.1).
 
         Security input gate (LLR-001.5): if ANY ``batch`` / ``assignments``
         entry is absolute or resolves outside ``project_root``, the whole
@@ -255,6 +259,9 @@ def serialize_manifest(
         assignments (Optional[Mapping[str, Sequence[str]]]): Per-variant file
             entries keyed by ``variant_id``; each value is a sequence of
             project-relative path strings. ``None`` → empty object.
+        declared_regions (Sequence[DeclaredRegion]): Operator-declared memory
+            regions (LLR-026.1). Each is serialized as ``{name, start, end}``;
+            the key is omitted entirely when empty (back-compat).
         schema_version (int): The literal written for ``schema_version``;
             defaults to :data:`DEFAULT_SCHEMA_VERSION` (``1``).
 
@@ -316,6 +323,15 @@ def serialize_manifest(
             for variant_id, entries in assignments.items()
         },
     }
+    # Optional, additive key (LLR-026.1): written ONLY when regions are
+    # declared, so a project with none serializes byte-identically to before
+    # (back-compat — no schema_version bump). The reader treats an absent key
+    # as zero regions.
+    if declared_regions:
+        envelope["declared_regions"] = [
+            {"name": region.name, "start": region.start, "end": region.end}
+            for region in declared_regions
+        ]
     return json.dumps(envelope, indent=2), []
 
 
@@ -374,6 +390,7 @@ def write_project_manifest(
     *,
     batch: Sequence[str] = (),
     assignments: Optional[Mapping[str, Sequence[str]]] = None,
+    declared_regions: Sequence[DeclaredRegion] = (),
     schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> tuple[Optional[Path], list[ValidationIssue]]:
     """
@@ -447,6 +464,7 @@ def write_project_manifest(
         project_root,
         batch=batch,
         assignments=assignments,
+        declared_regions=declared_regions,
         schema_version=schema_version,
     )
     if text is None:

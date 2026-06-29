@@ -35,6 +35,7 @@ from .operations.crc_config import (
 )
 from .operations.model import CrcRegionResult, OperationInput, OperationResult
 from .services import operation_service
+from .services.report_addendum import DeclaredRegion
 from .services.report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
     REPORT_MAX_TOTAL_BYTES,
@@ -539,6 +540,44 @@ class LegendScreen(ModalScreen[None]):
             self.dismiss(None)
 
 
+def _parse_declared_regions(text: str) -> Tuple[DeclaredRegion, ...]:
+    """
+    Summary:
+        Parse the report dialog's declared-region input (LLR-024.3): one
+        ``name,start,end`` per line, where ``start``/``end`` accept ``0x`` hex
+        or decimal. Blank lines and malformed/invalid lines are skipped (the
+        ``DeclaredRegion`` constructor validates + scrubs each name) — a bad
+        line never aborts the parse.
+
+    Args:
+        text (str): The raw multi-line region input.
+
+    Returns:
+        Tuple[DeclaredRegion, ...]: The successfully parsed regions, in order.
+
+    Dependencies:
+        Uses:
+            - DeclaredRegion
+        Used by:
+            - ReportViewerScreen.on_button_pressed
+    """
+    regions: List[DeclaredRegion] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        parts = [part.strip() for part in line.split(",")]
+        if len(parts) != 3:
+            logger.info("ReportViewerScreen skipped malformed region line: %r", line)
+            continue
+        name, start_text, end_text = parts
+        try:
+            regions.append(DeclaredRegion(name, int(start_text, 0), int(end_text, 0)))
+        except ValueError:
+            logger.info("ReportViewerScreen skipped invalid region line: %r", line)
+    return tuple(regions)
+
+
 class ReportViewerScreen(ModalScreen[None]):
     """Read-only report viewer + generation trigger modal (LLR-008.1/008.5).
 
@@ -607,9 +646,14 @@ class ReportViewerScreen(ModalScreen[None]):
                 - s19_app.tui.app.S19TuiApp.on_report_viewer_screen_generate_requested
         """
 
-        def __init__(self, context_bytes: int) -> None:
+        def __init__(
+            self,
+            context_bytes: int,
+            declared_regions: Tuple[DeclaredRegion, ...] = (),
+        ) -> None:
             super().__init__()
             self.context_bytes = context_bytes
+            self.declared_regions = declared_regions
 
     def __init__(self, project_name: str, reports: List[Path]) -> None:
         super().__init__()
@@ -635,6 +679,8 @@ class ReportViewerScreen(ModalScreen[None]):
                 Markdown("", open_links=False, id="report_markdown"),
                 id="report_markdown_scroll",
             ),
+            Label("Declared regions (name,start,end per line):"),
+            TextArea(id="report_declared_regions"),
             Container(
                 Label("Context bytes:"),
                 Input(
@@ -732,9 +778,14 @@ class ReportViewerScreen(ModalScreen[None]):
                 "ReportViewerScreen requesting generation. context_bytes=%d",
                 context_bytes,
             )
+            regions = _parse_declared_regions(
+                self.query_one("#report_declared_regions", TextArea).text
+            )
             # Posted straight to the app's queue (not bubbled) so the
             # immediately following dismiss can never drop it.
-            self.app.post_message(self.GenerateRequested(context_bytes))
+            self.app.post_message(
+                self.GenerateRequested(context_bytes, regions)
+            )
             self.dismiss(None)
 
 
