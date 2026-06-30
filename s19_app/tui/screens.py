@@ -540,20 +540,26 @@ class LegendScreen(ModalScreen[None]):
             self.dismiss(None)
 
 
-def _parse_declared_regions(text: str) -> Tuple[DeclaredRegion, ...]:
+def _parse_declared_regions(text: str) -> Tuple[Tuple[DeclaredRegion, ...], int]:
     """
     Summary:
         Parse the report dialog's declared-region input (LLR-024.3): one
         ``name,start,end`` per line, where ``start``/``end`` accept ``0x`` hex
         or decimal. Blank lines and malformed/invalid lines are skipped (the
         ``DeclaredRegion`` constructor validates + scrubs each name) — a bad
-        line never aborts the parse.
+        line never aborts the parse. Malformed (wrong field count) and invalid
+        (failed ``int``/``DeclaredRegion`` parse) lines are counted so the
+        caller can surface a skip count (LLR-029.1); blank/whitespace-only
+        lines are intentional spacing and are NOT counted.
 
     Args:
         text (str): The raw multi-line region input.
 
     Returns:
-        Tuple[DeclaredRegion, ...]: The successfully parsed regions, in order.
+        Tuple[Tuple[DeclaredRegion, ...], int]: A pair of
+            ``(regions, skipped_count)`` — the successfully parsed regions in
+            order, and the number of non-blank lines skipped as malformed or
+            invalid (blank lines excluded from the count).
 
     Dependencies:
         Uses:
@@ -562,6 +568,7 @@ def _parse_declared_regions(text: str) -> Tuple[DeclaredRegion, ...]:
             - ReportViewerScreen.on_button_pressed
     """
     regions: List[DeclaredRegion] = []
+    skipped = 0
     for raw_line in text.splitlines():
         line = raw_line.strip()
         if not line:
@@ -569,13 +576,15 @@ def _parse_declared_regions(text: str) -> Tuple[DeclaredRegion, ...]:
         parts = [part.strip() for part in line.split(",")]
         if len(parts) != 3:
             logger.info("ReportViewerScreen skipped malformed region line: %r", line)
+            skipped += 1
             continue
         name, start_text, end_text = parts
         try:
             regions.append(DeclaredRegion(name, int(start_text, 0), int(end_text, 0)))
         except ValueError:
             logger.info("ReportViewerScreen skipped invalid region line: %r", line)
-    return tuple(regions)
+            skipped += 1
+    return tuple(regions), skipped
 
 
 class ReportViewerScreen(ModalScreen[None]):
@@ -598,6 +607,11 @@ class ReportViewerScreen(ModalScreen[None]):
         project_name (str): The active project's display name.
         reports (List[Path]): Report paths newest-first (LLR-008.3 order
             is the CALLER's contract; this screen preserves it verbatim).
+        declared_regions (Tuple[DeclaredRegion, ...]): Regions carried over
+            from the loaded project's manifest (LLR-028.3); seeded into the
+            ``#report_declared_regions`` TextArea by ``compose`` (LLR-028.4)
+            so the operator does not retype them. Defaults to ``()`` — the
+            2-arg constructions stay valid (no seed text).
 
     Returns:
         None: ``ModalScreen[None]`` — always dismisses with ``None``.
@@ -655,10 +669,16 @@ class ReportViewerScreen(ModalScreen[None]):
             self.context_bytes = context_bytes
             self.declared_regions = declared_regions
 
-    def __init__(self, project_name: str, reports: List[Path]) -> None:
+    def __init__(
+        self,
+        project_name: str,
+        reports: List[Path],
+        declared_regions: Tuple[DeclaredRegion, ...] = (),
+    ) -> None:
         super().__init__()
         self.project_name = project_name
         self.reports = reports
+        self.declared_regions = declared_regions
         self.selected_path: Optional[Path] = None
 
     def compose(self) -> ComposeResult:
@@ -680,7 +700,13 @@ class ReportViewerScreen(ModalScreen[None]):
                 id="report_markdown_scroll",
             ),
             Label("Declared regions (name,start,end per line):"),
-            TextArea(id="report_declared_regions"),
+            TextArea(
+                "\n".join(
+                    f"{region.name},{region.start},{region.end}"
+                    for region in self.declared_regions
+                ),
+                id="report_declared_regions",
+            ),
             Container(
                 Label("Context bytes:"),
                 Input(
@@ -778,9 +804,13 @@ class ReportViewerScreen(ModalScreen[None]):
                 "ReportViewerScreen requesting generation. context_bytes=%d",
                 context_bytes,
             )
-            regions = _parse_declared_regions(
+            regions, skipped = _parse_declared_regions(
                 self.query_one("#report_declared_regions", TextArea).text
             )
+            if skipped >= 1:
+                # Count-only (LLR-029.3 / carry C-P3b): never interpolate the
+                # offending line text — it renders pre-scrub in the toast.
+                self.notify(f"{skipped} region line(s) skipped")
             # Posted straight to the app's queue (not bubbled) so the
             # immediately following dismiss can never drop it.
             self.app.post_message(

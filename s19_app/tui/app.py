@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import time
-from typing import Any, List, Mapping, Optional, Sequence
+from typing import Any, List, Mapping, Optional, Sequence, Tuple
 
 from textual import events, work
 from textual.app import App, ComposeResult
@@ -704,6 +704,13 @@ class S19TuiApp(App):
         self._last_execution: Optional[
             tuple[Path, str, str, List[VariantExecutionResult]]
         ] = None
+        #: Declared memory regions captured from the Reports dialog when the
+        #: operator presses Generate (HLR-027 capture, Option A). The single
+        #: source of truth threaded into ``write_project_manifest`` on project
+        #: SAVE so regions persist to ``project.json``. Empty ⇒ the manifest
+        #: omits the ``declared_regions`` key (back-compat, byte-identical to
+        #: the pre-batch-20 output).
+        self._declared_regions: Tuple[DeclaredRegion, ...] = ()
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -1839,10 +1846,13 @@ class S19TuiApp(App):
             - ``list_project_reports`` supplies the newest-first listing
               (the F-Q-05 parsed sort key); the screen renders it verbatim
               and shows its own neutral empty state when it is empty.
+            - ``self._declared_regions`` (set on load, LLR-028.1) is threaded
+              into the screen so the region TextArea pre-fills (LLR-028.2).
 
         Dependencies:
             Uses:
                 - ``_active_project_dir`` / ``list_project_reports``
+                - ``_declared_regions`` (LLR-028.2 seed source)
                 - ``ReportViewerScreen`` / ``push_screen``
             Used by:
                 - ``t`` keybinding / command palette entry
@@ -1857,7 +1867,13 @@ class S19TuiApp(App):
         self.logger.info(
             "View reports action. project=%s count=%d", project_name, len(reports)
         )
-        self.push_screen(ReportViewerScreen(project_name, reports))
+        self.push_screen(
+            ReportViewerScreen(
+                project_name,
+                reports,
+                declared_regions=self._declared_regions,
+            )
+        )
 
     def on_report_viewer_screen_generate_requested(
         self, message: ReportViewerScreen.GenerateRequested
@@ -1865,14 +1881,23 @@ class S19TuiApp(App):
         """
         Summary:
             Route the viewer's Generate request to the generation flow
-            (LLR-008.5) — pure dispatch, no report logic here.
+            (LLR-008.5), capturing the declared regions into app state for
+            project SAVE persistence first (LLR-027.2) — pure dispatch
+            otherwise, no report logic here.
 
         Args:
             message (ReportViewerScreen.GenerateRequested): Carries the
-                collected ``context_bytes``.
+                collected ``context_bytes`` and ``declared_regions``.
 
         Returns:
             None
+
+        Data Flow:
+            - Store ``tuple(message.declared_regions)`` into
+              ``self._declared_regions`` (HLR-027 capture, Option A) so a
+              later project SAVE persists them — captured ON Generate, so a
+              region typed but never generated with is not persisted.
+            - Then dispatch ``context_bytes`` + regions to the generator.
 
         Dependencies:
             Uses:
@@ -1880,6 +1905,7 @@ class S19TuiApp(App):
             Used by:
                 - ``ReportViewerScreen`` (bubbled message)
         """
+        self._declared_regions = tuple(message.declared_regions)
         self._trigger_generate_report(
             message.context_bytes, message.declared_regions
         )
@@ -3771,6 +3797,7 @@ class S19TuiApp(App):
             project_dir,
             batch=payload.batch,
             assignments=payload.assignments,
+            declared_regions=self._declared_regions,
         )
         self.update_project_labels()
         self.refresh_files()
@@ -3781,6 +3808,7 @@ class S19TuiApp(App):
         *,
         batch: Sequence[str] = (),
         assignments: Optional[Mapping[str, Sequence[str]]] = None,
+        declared_regions: Sequence[DeclaredRegion] = (),
     ) -> None:
         """
         Summary:
@@ -3806,6 +3834,12 @@ class S19TuiApp(App):
                 change/check files keyed by ``variant_id``; same project-relative
                 strings, same identical threading into write + verify (R1).
                 ``None`` ⇒ empty assignments.
+            declared_regions (Sequence[DeclaredRegion]): Operator-declared
+                memory regions captured on Generate (HLR-027). Forwarded into
+                ``write_project_manifest`` ONLY — NOT into
+                ``verify_written_manifest``, which re-reads the written file as
+                the oracle (CARRY C-P3c). Empty ⇒ the serializer omits the key
+                (back-compat).
 
         Returns:
             None
@@ -3815,6 +3849,10 @@ class S19TuiApp(App):
             - ``write_project_manifest`` returns ``(None, issues)`` on a refused
               serialize or a containment / IO failure (collect-don't-abort);
               that is surfaced as an error notice, never raised.
+            - ``declared_regions`` is threaded into the write only; the verify
+              re-reads the written ``project.json`` as the oracle, so threading
+              regions into verify would be a tautology (it would compare the
+              file against an intent already derived from the same source).
             - On a successful write, ``verify_written_manifest`` re-reads the
               canonical ``project.json`` and the result is surfaced (quiet on
               verified, loud on mismatch).
@@ -3835,6 +3873,7 @@ class S19TuiApp(App):
             self.base_dir,
             batch=batch,
             assignments=assignments,
+            declared_regions=declared_regions,
         )
         if written is None:
             detail = "; ".join(issue.message for issue in issues) or "unknown error"
@@ -3932,6 +3971,12 @@ class S19TuiApp(App):
         # manifest names an unknown variant).
         variant_set = build_variant_set(name, data_files)
         manifest = read_project_manifest(project_dir)
+        # LLR-028.1 — adopt the manifest's declared regions as app state so the
+        # next Reports dialog seeds from them (HLR-028 capture); reset to empty
+        # for a legacy/no-key project so a prior project's regions do not leak.
+        self._declared_regions = (
+            tuple(manifest.declared_regions) if manifest is not None else ()
+        )
         if manifest is not None and manifest.active_variant is not None:
             known_ids = {variant.variant_id for variant in variant_set.variants}
             if manifest.active_variant in known_ids:

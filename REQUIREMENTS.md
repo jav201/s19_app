@@ -43,6 +43,7 @@ Functional subsystems:
 19. CRC Config-from-File + Patch-Editor Paste (batch-13)
 20. A↔B Compare Load-Failure Honesty (batch-15)
 21. Selectable S19 Record Width + Populated S0 Header (batch-14)
+22. Declared-region UI round-trip + skip notice (batch-20)
 
 ---
 
@@ -2834,3 +2835,26 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Status: Added batch-19 (US-020c / HLR-026). Serialization layer only; UI auto-wire (save dialog regions / pre-fill on load) deferred to BACKLOG (operator option-1).
 
 > Deferred to BACKLOG: UI region save/load auto-wiring (HLR-026 follow-on); on-screen feedback when the dialog parser skips a malformed region line.
+
+---
+
+# 26. Declared-region UI round-trip + skip notice (batch-20)
+
+> Feature #10 follow-on D-1/D-2: wire batch-19's declared-region **serialization layer** to the Reports dialog UI. D-1 — declared regions persist on project SAVE and pre-fill the dialog on project LOAD (round-trip). D-2 — malformed/invalid region lines surface a count-only skip notice. The batch-19 manifest reader/writer and `DeclaredRegion` model (shipped batch-19) are consumed read-only; frozen-engine diff = 0. Stories: `.dev-flow/2026-06-29-batch-20/01-requirements.md`. All AT/TC in `tests/test_tui_report_seam.py`.
+
+**R-RPT-REGION-PERSIST-001**: On project SAVE the operator's declared regions — captured into app state ON Generate (a region typed but never Generated is not saved) — shall be threaded into `write_project_manifest(declared_regions=...)` and written to `project.json` only when non-empty; a save with no regions remains byte-identical to the pre-batch-20 output (key omitted). The save's verify leg is deliberately not threaded from state (it re-reads from disk).
+- Code: `s19_app/tui/app.py::S19TuiApp` — `self._declared_regions` (:713), `GenerateRequested` capture (:1899), `_handle_save_dialog` (:3791) → `_write_and_verify_manifest` (:3802) → `write_project_manifest(declared_regions=)` (:3867) (US-024, HLR-027 / LLR-027.1–027.4). Reuses `manifest_writer.serialize_manifest` (key-omit-when-empty, batch-19).
+- Validation: `Automated` — `tests/test_tui_report_seam.py::test_save_persists_declared_regions` (AT-027a; on-disk `project.json`) + `::test_typed_but_not_generated_not_saved` (AT-027b, capture-on-Generate) + `::test_save_without_regions_byte_identical` (AT-027c, back-compat) + `::test_save_threads_declared_regions_to_writer` (TC-027.1) + `::test_write_and_verify_manifest_accepts_declared_regions_default` (TC-027.2) + `::test_empty_regions_omits_key` (TC-027.3).
+- Status: Added batch-20 (US-024 / HLR-027). Closes batch-19 BACKLOG D-1 (save leg).
+
+**R-RPT-REGION-PERSIST-002**: On project LOAD the manifest's declared regions shall be adopted into app state (legacy/no-key project → empty, `else ()`, so a prior project's regions never leak), and the next Reports dialog shall pre-fill its `#report_declared_regions` TextArea from that state in the exact inverse format of `_parse_declared_regions`.
+- Code: `s19_app/tui/app.py::_handle_load_project` (:3977, adopt + `else ()` reset), `action_view_reports` (:1874, passes seed), `s19_app/tui/screens.py::ReportViewerScreen.__init__` (:667) + `compose` TextArea seed (:691–698) (US-024, HLR-028 / LLR-028.1–028.4). Reuses `variant_execution_service.read_project_manifest` → `ProjectManifest.declared_regions` (read-path name re-scrub, batch-19).
+- Validation: `Automated` — `tests/test_tui_report_seam.py::test_load_prefills_declared_regions` (AT-028a, C-12 through-surface GATE — round-trip observed back through the dialog, not a same-values direct write) + `::test_load_seed_guard` (AT-028b, consumer guard — no-key load is empty, no cross-load leak) + `::test_load_sets_declared_regions_state` (TC-028.1) + `::test_seed_format_is_parser_inverse` (TC-028.2).
+- Status: Added batch-20 (US-024 / HLR-028). Closes batch-19 BACKLOG D-1 (load leg).
+
+**R-RPT-REGION-SKIP-001**: When the Reports dialog parses declared-region input, malformed (wrong field count) and invalid (failed `int`/`DeclaredRegion` parse) lines shall be skipped and counted (the two sites mutually exclusive per line), blank/whitespace-only lines excluded from the count; on Generate a count-only toast `"N region line(s) skipped"` is shown only when the count ≥ 1 (zero suppresses the notice), and the offending line text is never interpolated (no pre-scrub echo).
+- Code: `s19_app/tui/screens.py::_parse_declared_regions` (:543, returns `(regions, skipped)`), `on_button_pressed` notify (:804 / :807–813) (US-025, HLR-029 / LLR-029.1–029.3).
+- Validation: `Automated` — `tests/test_tui_report_seam.py::test_skipped_malformed_line_counted` (AT-029a) + `::test_skipped_invalid_line_counted` (AT-029b) + `::test_skipped_count_excludes_blank` (AT-029c) + `::test_all_valid_no_skip_message` (AT-029d) + `::test_parse_returns_skip_count` (TC-029.1) + `::test_zero_skip_suppresses_notify` (TC-029.2) + `::test_parse_declared_regions_handles_hex_dec_and_skips_malformed` (TC-024.5, batch-19 TC rewritten for the `(regions, skipped)` return shape).
+- Status: Added batch-20 (US-025 / HLR-029). Closes batch-19 BACKLOG D-2.
+
+> Scoped out (BACKLOG): a region name containing a comma is not representable in the comma-delimited `name,start,end` line format (skipped as malformed); the construction-time scrub neutralizes injection content regardless.

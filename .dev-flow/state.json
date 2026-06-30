@@ -1,65 +1,139 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-06-29-batch-19",
-    "batch_objective": "US-020c/d — issues-report addendum + report integration (deferred from batch-17 DoR). US-020c: a report-addendum input for operator-DECLARED MEMORY LOCATIONS (net-new data model + persistence + input form; 'declared memory locations' semantics UNRESOLVED -> Phase-0 design spike resolves them before HLR derivation). US-020d: integrate validation issues into the generated report (depends on US-020c). Surfaces (to confirm Phase-0): report_service.py (addendum section + a new ReportOptions field), a NEW addendum data model + input form. Engine-frozen set OFF-LIMITS. /dev-flow full rigor, operator-approved sequence US-020c/d -> #8 -> #12.",
+    "batch_id": "2026-06-29-batch-20",
+    "batch_objective": "D-1 + D-2 declared-region cleanup bundle (batch-19 follow-ons). D-1: wire the declared-region persistence (serialization layer shipped batch-19) to the UI — (a) on PROJECT-SAVE persist the report dialog's declared regions into project.json; (b) on PROJECT-LOAD pre-fill ReportViewerScreen region TextArea from ProjectManifest.declared_regions. Needs app-level declared-region state (does not exist yet). D-2: ReportViewerScreen silently skips blank/malformed/invalid region lines (logger.info only @screens.py:571/577) — surface a COUNT of skipped lines to the operator (notify/set_status) at parse/dismiss. Surfaces: app.py (save/load handlers + app state), screens.py (ReportViewerScreen seed + skipped-count), workspace/manifest (read/write already shipped). Engine-frozen set OFF-LIMITS. /dev-flow full rigor, operator-approved scope.",
     "current_phase": 6,
-    "phase_status": "awaiting-gate-phase5-6-complete",
+    "phase_status": "awaiting-sync",
     "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
     "artifacts": {
-        "1": ".dev-flow/2026-06-29-batch-19/01-requirements.md",
-        "2": ".dev-flow/2026-06-29-batch-19/02-review.md",
-        "4": ".dev-flow/2026-06-29-batch-19/04-validation.md",
-        "5": ".dev-flow/2026-06-29-batch-19/05-postmortem.md",
-        "6": ".dev-flow/2026-06-29-batch-19/06-docs/",
+        "1": ".dev-flow/2026-06-29-batch-20/01-requirements.md",
+        "2": ".dev-flow/2026-06-29-batch-20/02-review.md",
+        "3": ".dev-flow/2026-06-29-batch-20/03-increments/",
+        "4": ".dev-flow/2026-06-29-batch-20/04-validation.md",
+        "plan": ".dev-flow/2026-06-29-batch-20/PLAN.md",
         "backlog": ".dev-flow/BACKLOG.md"
     },
-    "branch": "claude/batch-19 (cut fresh off origin/main 8654df5 per RC-1; batch-18 merged PR #30). Driven MANUALLY from a session rooted in the pedantic-bose-55ed5c worktree, operating claude/batch-19 at gifted-ramanujan-6d30eb via absolute paths; /dev-flow Skill NOT used (would read the wrong worktree's state.json); same gates enforced by hand.",
+    "branch": "claude/naughty-rhodes-96200c (== origin/main 818a02b per RC-1; batch-19 PR #31 merged). This session is rooted in the naughty-rhodes-96200c worktree (auto-cut, HEAD==origin/main). Operator editor may not be rooted here -> paste reviewable artifacts inline at each gate (batch-19 friction mitigation).",
     "previous_batches": [
         "2026-05-05-batch-01","2026-05-20-batch-02","2026-05-21-batch-03","2026-05-21-batch-04",
         "2026-05-26-batch-05","2026-06-09-batch-06","2026-06-10-batch-07","2026-06-11-batch-08",
         "2026-06-11-batch-09","2026-06-13-batch-10","2026-06-14-batch-11","2026-06-16-batch-12",
         "2026-06-17-batch-13","2026-06-23-batch-14","2026-06-24-batch-15","2026-06-25-batch-16",
-        "2026-06-26-batch-17","2026-06-26-batch-18"
+        "2026-06-26-batch-17","2026-06-26-batch-18","2026-06-29-batch-19"
     ],
-    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. batch-18 closing state (obsidian_synced true) snapshotted to .dev-flow/2026-06-26-batch-18/state-snapshot-at-close.json at batch-19 init -> rides batch-19's first commit (batch-13 pattern), alongside the BACKLOG.md refresh.",
-    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. TUI-side write logic -> tui/changes/io.py (batch-10). report_service.py + screens.py + app.py are OUTSIDE the frozen set; validation/model.py (ValidationIssue) is FROZEN (read-only for the issues->report integration).",
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. batch-19 closed+synced+merged externally (PR #31, merge 818a02b) via the manual cross-worktree workflow; its true closing state.json lived in the manual worktree and was synced to Obsidian, so no in-tree close-snapshot is available here (the committed batch-19 state.json was the mid-flight copy, now replaced by this batch-20 state).",
+    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. TUI-side write logic -> tui/changes/io.py (batch-10). app.py + screens.py + services/manifest_writer.py + services/variant_execution_service.py are OUTSIDE the frozen set. validation/model.py is FROZEN.",
     "decisions_log": [
         {
             "phase": 0,
             "date": "2026-06-29",
-            "decision": "batch-19-initialized-US-020cd-spike",
-            "notes": "Operator approved the post-batch-18 sequence (US-020c/d -> #8 -> #12, all /dev-flow) + confirmed /dev-flow. RC-1: git fetch -> origin/main=8654df5 (matches; batch-18 PR #30 merged); cut fresh claude/batch-19 off it. Done-list verified shipped on main (legend.py, io.py bytes_per_line); open items confirmed net-new (report_service.py 0 addendum / 0 entropy hits; PatchEditorPanel still a single ScrollableContainer @screens_directionb.py:335). BACKLOG.md refreshed to reality (tip 8654df5, DONE section, clean open queue). batch-18 closing state snapshotted. batch-19 scaffolded from templates. Phase 0 = DESIGN SPIKE on US-020c/d (Explore agent mapped the issues-report surfaces, disk-verified). DoR gate RESOLVED (operator): semantics = A Expected-zone (declared region = name/start/end; addendum cross-refs mods+issue.address inside/outside); US-020d scope = Both (enrich existing issue rendering + region cross-ref); persistence = in-scope. Next: synthesize spike -> stories + interpretations -> DoR gate."
+            "decision": "batch-20-initialized-D1-D2",
+            "notes": "Operator picked the D-1 + D-2 cleanup bundle (closes batch-19's declared-region line) over #8/#12. RC-1 PASS: git fetch -> origin/main=818a02b (PR #31 batch-19 merged); branch HEAD==merge-base==818a02b (current, clean tree). Per-story already-shipped grep on origin/main: D-1 (project-save persistence + load pre-fill) and D-2 (skipped-line count) BOTH net-new — only the report-GENERATE path + serialization layer exist, not the save/load UI wiring. batch-20 scaffolded. Phase 0 = INVEST + DoR intake on D-1/D-2; Explore agent disk-mapped the surfaces. Base test ledger = 958 non-slow (979 total). DoR: US-024 (D-1) + US-025 (D-2) both READY; 0 SPIKE/OUT."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-29",
+            "decision": "awaiting-gate",
+            "notes": "DoR gate: both stories READY. Operator RESOLVED the D-1 capture-point open question = Option A (capture self._declared_regions when GenerateRequested fires; accepted edge: type-without-generate not saved -> becomes an AT boundary). §2.6 locked (US-024 READY, US-025 READY). Exit criteria: Evaluability+Feasibility met, 0 blockers."
+        },
+        {
+            "phase": 0,
+            "date": "2026-06-29",
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 0 -> advance to Phase 1. iterations_per_phase[0]=1. Dispatching architect ∥ qa-reviewer for HLR/LLR derivation + validation-method/AT authoring."
         },
         {
             "phase": 1,
             "date": "2026-06-29",
             "decision": "awaiting-gate",
-            "notes": "Phase 1 derivation DONE -> 01-requirements.md FULLY WRITTEN (operator asked for the detail before approving): §2.6 (US-020c/d both READY + INVEST refinement log), §3 HLR-024 (addendum)/HLR-025 (issue enrichment)/HLR-026 (persistence) EARS + executed-verification + numeric thresholds + black-box acceptance + QC-3 boundary catalogs, §4 LLR-025.1/024.1[NEW]/024.2/024.3/026.1 with disk-verified targets + NEW flags + contract-touch notes, §5.2 dual traceability (AT-024a/b/c, AT-025a/b, AT-026a + TC-024.*/025.1/026.* + TC-S3 anti-drift), §5.3 acceptance, §2.4 constraints/§2.5 assumptions (spike-verified)/§6.2-6.3 decisions+risks. PLAN.md enriched to mirror. 4 increments. Operator APPROVED Phase 1 (after asking the full spec be written + made reviewable inline, since the gifted-ramanujan worktree isn't browsable from their editor; artifacts left in place per prior-batch convention)."
+            "notes": "Phase 1 derivation DONE (architect ∥ qa, parallel) -> 01-requirements.md §3/§4/§5/§6 written. 2 US / 3 HLR (HLR-027 SAVE, HLR-028 LOAD, HLR-029 D-2) / 10 LLR / 9 AT (AT-027a/b/c, AT-028a-gate/b-guard, AT-029a/b/c/d) + 7 TC (TC-027.1/.2/.3, TC-028.1/.2, TC-029.1/.2). Dual traceability complete; QC-2 counterfactual table (9 rows, each value-discriminating). Conflicts reconciled (surface-don't-average): (1) AT/TC renumbered to HLR-027/028/029 to avoid batch-19 AT-024*/TC-024* collision; (2) batch-19 TC-024.5 is MODIFIED by Inc C (return-shape change), NOT carried unchanged (architect correct over qa); (3) D-2 surface = self.notify (architect); (4) back-compat = key-omitted-when-empty (shipped serializer); (5) SaveProjectPayload frozen (capture from app state). C-13 geometry N/A (no new widget). should-misuse PASS, engine-frozen PASS. 3 increments (A save 1f, B load 2f, C d-2 2f), all <=5. Caller-count for _parse_declared_regions re-verified = 2."
+        },
+        {
+            "phase": 1,
+            "date": "2026-06-29",
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 1 -> advance to Phase 2 cross-review. iterations_per_phase[1]=1. Dispatching architect ∥ qa-reviewer ∥ security-reviewer."
         },
         {
             "phase": 2,
             "date": "2026-06-29",
-            "decision": "awaiting-gate-proceed-after-fold",
-            "notes": "Phase 2 cross-review (architect ∥ qa ∥ security, parallel) -> 02-review.md. 0 BLOCKER / 1 major (architect-M1: DeclaredRegion inclusive [start,end] vs CrcRegion half-open) / 1 MED-security (F1: region NAME reaches the markdown report + project.json without the _scrub_issue_message control-char/ANSI/length scrub issue.message gets) / 7 minor. All verdicts PROCEED/GRANTED-after-fold. Security GRANTED. All folds APPLIED to 01-requirements.md (body-first) + §6.4 reconciliation log SEEDED (fold audit + contract-touch identity re-run). architect verified all 9 anchors + census (0 frozen edits) + cross-variant aggregation feasible. Phase-3 carry: update manifest serializer docstring at Inc4 (architect-F3, no schema bump). Operator APPROVED Phase 2."
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 2 -> advance to Phase 3. iterations_per_phase[2]=1. Toolchain entry gate PASS (ruff 0.15.17 + pytest 9.0.3; mypy not in declared CI toolchain). Dispatching software-dev for Increment A (HLR-027 SAVE, app.py)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-06-29",
+            "decision": "approved-awaiting-sync",
+            "notes": "Operator APPROVED Phase 6 + commit/PR. iterations_per_phase[6]=1. state -> awaiting-sync. Committing code+artifacts on claude/naughty-rhodes-96200c -> PR to main -> tui-ci -> merge -> /dev-flow-sync. Phase 6 docs (docs-writer ∥ presentation-builder, written to WORKTREE) -> 06-docs/traceability-matrix.md (dual chains, real reconciled nodes, 0 orphan/0 gap; AT-028a=C-12 gate, AT-028b=guard), functionality.md (walkthrough + maintainer seams + security note), diagrams/batch-20-flows.md (2 Mermaid: D-1 round-trip seq + D-2 skip-count), executive-summary.md (plain-language). REQUIREMENTS.md §26 ADDED (R-RPT-REGION-PERSIST-001 save, R-RPT-REGION-PERSIST-002 load incl C-12 gate, R-RPT-REGION-SKIP-001 D-2; all Automated) + index line 22. BACKLOG refreshed: D-1/D-2 -> DONE (§26, 958->974), tip 818a02b, D-3 logged (P3 per-line detail + comma-in-name), inline-paste control noted, sequence reordered (#8 next). No placeholders. Changed set = REQUIREMENTS.md + app.py + screens.py + test_tui_report_seam.py; frozen 0. ALL WORK UNCOMMITTED on claude/naughty-rhodes-96200c. Awaiting Phase-6 gate + commit/PR approval -> then /dev-flow-sync."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-29",
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 5. iterations_per_phase[5]=1. Inline-paste protocol formalized+encoded. Advancing to Phase 6 docs (docs-writer ∥ presentation-builder)."
+        },
+        {
+            "phase": 5,
+            "date": "2026-06-29",
+            "decision": "awaiting-gate-superseded",
+            "notes": "Phase 5 post-mortem (architect ∥ qa co-author) -> 05-postmortem.md. PASS clean run, 0 iterations/0 blockers all phases. Root-cause N/A; why-clean: ambiguity killed pre-Phase-1 + risky substrate (serialization) pre-shipped batch-19 + surfaces disk-mapped Phase-0. Metrics: 2US/3HLR/10LLR, 9AT+7TC+1 rewrite, 958->974, 0 fail, frozen 0. C-12 gate/guard held (batch-16 G-3 lineage). C-13 N/A-with-arithmetic. 2 test-quality folds prevented vacuous ATs. OPERATOR DECISION (worktree-not-editor-root friction, 2-for-2) = FORMALIZE inline-paste protocol -> ENCODED in ~/.claude/commands/dev-flow.md point 5 (operator-directed + permission-gated, control-encode-approval rule honored) + memory feedback_inline_paste_at_gates. Process carries: checkpoint-before-long-run (qa agent stalled Phase-4), label-ledger-units. Next-batch rec: #8 (P1, Phase-0 scope-split spike) -> #12 -> D-2 follow-ons. D-1 CLOSED. Awaiting operator Phase-5 gate."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-29",
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 4 (PASS). iterations_per_phase[4]=1. Advancing to Phase 5 post-mortem (architect ∥ qa co-author) then Phase 6 docs."
+        },
+        {
+            "phase": 4,
+            "date": "2026-06-29",
+            "decision": "awaiting-gate-superseded",
+            "notes": "Phase 4 validation -> 04-validation.md. VERDICT PASS. qa-reviewer agent stalled on its final summary (long pytest) -> orchestrator executed validation directly. All 17 provisional ids reconciled to real on-disk nodes (V-5): AT-027a=test_save_persists_declared_regions, AT-027b=test_typed_but_not_generated_not_saved, AT-027c=test_save_without_regions_byte_identical, AT-028a(GATE)=test_load_prefills_declared_regions, AT-028b=test_load_seed_guard, AT-029a/b/c/d=test_skipped_malformed_line_counted/test_skipped_invalid_line_counted/test_skipped_count_excludes_blank/test_all_valid_no_skip_message, TC-027.1/.2/.3=test_save_threads_declared_regions_to_writer/test_write_and_verify_manifest_accepts_declared_regions_default/test_empty_regions_omits_key, TC-028.1/.2=test_load_sets_declared_regions_state/test_seed_format_is_parser_inverse, TC-029.1/.2=test_parse_returns_skip_count/test_zero_skip_suppresses_notify, TC-024.5(rewritten)=test_parse_declared_regions_handles_hex_dec_and_skips_malformed. Seam file 22 passed. Full non-slow 942 passed/29 skip/3 xfail/0 FAIL (974 collected, 958+16). Both layers green, bidirectional matrix complete, 3 counterfactual REDs (one+ per increment), 0 blocker (both US have black-box deliverable obs). ruff clean, frozen diff 0, no SVG regen needed. NO §6.5 amendment. Gaps: comma-in-name scoped out (BACKLOG-if-recurs), LOW cosmetic line(s); D-1 BACKLOG item CLOSES with this batch. Awaiting operator Phase-4 gate."
         },
         {
             "phase": 3,
             "date": "2026-06-29",
-            "decision": "inc1-awaiting-gate",
-            "notes": "Phase-3 Increment 1 (US-020d / LLR-025.1) IMPLEMENTED + operator-APPROVED. Enriched report_service._declaration_error_lines: appends '@ 0x{address:X}' when address is not None (0 -> @ 0x0), 'symbol=', 'related=' when set. 2 files. AT-025a/b + TC-025.1, counterfactual RED shown, 908->911, frozen diff 0, code-reviewer APPROVE."
+            "decision": "phase3-approved",
+            "notes": "Operator APPROVED Increment C -> Phase 3 COMPLETE (3/3, ledger 958->974 +16, 0 frozen throughout). iterations_per_phase[3]=1. Advancing to Phase 4 validation -> qa-reviewer."
         },
         {
             "phase": 3,
             "date": "2026-06-29",
-            "decision": "inc2-awaiting-gate",
-            "_phase6": "Phase 4 APPROVED (PASS). Phase 5 post-mortem -> 05-postmortem.md (headline: the design spike + the security lens were highest-leverage; security caught the region-name injection on a 'just text' feature; C-13 MEASURED PASS this time so no fallback/amendment; worktree-not-operator-editor-root friction mitigated by inline artifact pastes). Phase 6 docs (written to WORKTREE paths) -> 06-docs/traceability-matrix.md (dual chains, real reconciled nodes, 0 orphans), functionality.md (walkthrough + maintainer seams), executive-summary.md, diagrams/batch-19-flows.md (3 Mermaid). REQUIREMENTS.md §25 added (R-RPT-ISSUE-FIELDS-001 / R-RPT-ADDENDUM-001 / R-RPT-ADDENDUM-002 / R-RPT-ADDENDUM-PERSIST-001, all Automated). BACKLOG: US-020c/d -> DONE; D-1 (UI region save/load wiring, HLR-026 follow-on) + D-2 (malformed-line feedback) logged. Suite still 926 (docs-only since Phase 4). ALL WORK UNCOMMITTED on claude/batch-19 (commit/PR at operator approval; first commit absorbs the carry: batch-18 obsidian flip + state-snapshot-at-close + batch-19 scaffold). Next: operator approves -> commit + PR -> tui-ci -> review -> merge -> /dev-flow-sync. Awaiting Phase-6 gate + commit/PR approval.",
-            "_phase4": "Phase 4 validation -> 04-validation.md. VERDICT PASS. 2 US / 3 HLR / 5 LLR covered BOTH layers, 0 blocker fails. All provisional AT/TC ids reconciled to real on-disk nodes (V-5): AT-025a/b (test_report_issue_*), AT-024a/b (test_addendum_*), AT-024c (test_declared_region_in_dialog_reaches_report_addendum), AT-026a (test_declared_regions_roundtrip_and_on_disk), TC-024.3 (5 model tests), TC-024.4/024.5/024.6/025.1/026.1/026.2/TC-S3. Signed-balance ledger 908-0+18=926 reconciles; full non-slow 926 passed/0 failed. 5 counterfactual REDs captured (one+ per increment), all value-discriminating QC-2. Bidirectional surface-reachability complete. Supersession N/A (net-new). Engine-frozen diff 0; ruff clean. NO SVG snapshot regen (report dialog not in the matrix, reviewer-confirmed). NO §6.5 amendment (C-13 MEASURED PASS, no fallback - unlike batch-18). Gaps: G-1 pre-existing unused pytest import (lint, not introduced); D-1 UI auto-wire deferred (HLR-026 follow-on, operator option-1); D-2 Inc3 malformed-line UI feedback deferred -> both to BACKLOG at close. Awaiting Phase-4 gate -> Phase 5 post-mortem + Phase 6 docs.",
-            "_inc4": "Phase-3 Increment 4 (US-020c persistence / LLR-026.1) IMPLEMENTED + operator option-1 (serialization layer; UI auto-wire deferred to BACKLOG). manifest_writer.serialize_manifest + write_project_manifest gain declared_regions param; envelope writes an OPTIONAL declared_regions [{name,start,end}] ONLY when non-empty (back-compat byte-identical, no schema bump) + docstring updated. variant_execution_service: ProjectManifest.declared_regions field + _parse_manifest_declared_regions (absent/empty->(); non-list or malformed/invalid entry -> 1 MANIFEST-BAD-STRUCTURE issue + skip, collect-don't-abort, mirrors batch idiom) wired into read_project_manifest. DeclaredRegion imported in both (no cycle: report_addendum->validation only). 3 files (manifest_writer.py/variant_execution_service.py/tests/test_manifest_writer.py). Tests: AT-026a (roundtrip + on-disk project.json carries regions, qa-F4), TC-026.1 (key omitted when empty), TC-026.2 (absent->empty no-issue; malformed/invalid->2 issues read completes; + F2 fold: control-char/ANSI name in a hand-edited project.json is SCRUBBED on read = injection defense). Counterfactual RED: key-write if-False'd -> AT-026a RED. Full suite 923->926 (0 fail). Frozen diff 0. Production+new-tests ruff clean (pre-existing unused `import pytest` in test_manifest_writer.py is on origin/main, NOT introduced; left per surgical rule, flagged to operator). code-reviewer APPROVE (no HIGH/MED; back-compat byte-identity confirmed, no cycle, collect-don't-abort verified, qa-F4 satisfied). PHASE 3 COMPLETE (4/4 increments, ledger 908->926 +18). Awaiting operator Inc4/Phase-3 gate -> Phase 4 validation.",
-            "_inc3": "Phase-3 Increment 3 (US-020c input / LLR-024.3) IMPLEMENTED + APPROVE-WITH-NITS. screens.py: ReportViewerScreen #report_declared_regions TextArea + _parse_declared_regions (name,start,end per line; int(x,0) hex/dec; blank/malformed/invalid skipped via ValueError catch) + GenerateRequested.declared_regions field + on_button_pressed parse/post. app.py: 4-hop thread GenerateRequested.declared_regions -> handler -> _trigger_generate_report -> _start_generate_report_worker -> ReportOptions(declared_regions=) at :2014 + DeclaredRegion import. styles.tcss: #report_declared_regions height:5 (1fr markdown scroll absorbs it). 4 files (screens.py/app.py/styles.tcss/tests/test_tui_report_seam.py). C-13 MEASURED PASS at 80 & 120 cols (dialog fits, region input reachable -> NO fallback). Tests in test_tui_report_seam.py (reuse the e2e harness): AT-024c TRUE e2e (load project -> open Reports -> type region in TextArea -> press Generate -> drain worker -> assert on-disk report addendum lists the region + modification @ 0x1000, C-12 output-then-consume), TC-024.5 (parse hex/dec + skip malformed), TC-024.6 (C-13 geometry). Counterfactual RED: app threading dropped (declared_regions=()) -> AT-024c RED. Full suite 920->923 (0 fail). Frozen diff 0. ruff clean. code-reviewer APPROVE-WITH-NITS: NO SVG regen needed (matrix covers Workspace/A2L/MAC/Issues, not the report dialog); 3 LOW recs (F1 silent malformed-line skip -> LOG TO BACKLOG at close; F2 dup-region unmerged; F3 int(0) octal/bin superset) none required. Awaiting operator Inc3 gate -> Inc4 (persistence: manifest_writer + variant_execution_service).",
-            "notes": "Phase-3 Increment 2 (US-020c core / LLR-024.1 + LLR-024.2) IMPLEMENTED. NEW s19_app/tui/services/report_addendum.py: DeclaredRegion(name,start,end) frozen+slots dataclass — __post_init__ SCRUBS+CAPS name via validation.model._scrub_issue_message (security-F1 fold, object.__setattr__ for the frozen field) + validates name-non-empty/start>=0/start<=end (one ValueError each, bool-isinstance guarded) + inclusive contains() [start,end] (distinct from CrcRegion half-open, architect-M1). report_service.py: _addendum_lines(regions, variant_results) (per-region table + modifications by address_start + issues by ValidationIssue.address inside, aggregated ALL variants) + ReportOptions.declared_regions: Tuple[DeclaredRegion,...]=() + __post_init__ element validation + gated emit after the per-variant loop. 4 files (report_addendum.py NEW, report_service.py, tests/test_report_addendum.py NEW TC-024.3, tests/test_report_service.py AT-024a/AT-024b/TC-024.4/TC-S3). TWO counterfactual REDs: addendum-emit if-False'd -> 4 addendum ATs RED; scrub bypassed -> the injection/cap model tests RED (proves the security fold is enforced). Full non-slow suite 911->920 (0 fail). Frozen diff over validation/ + color_policy.py = 0 (_scrub_issue_message + ValidationIssue imported read-only). ruff clean. Independent code-reviewer APPROVE-WITH-NITS (no HIGH/MED; security scrub genuinely applied+tested, inclusive bounds correct, single-read aggregation confirmed): F1 (status-gating) folded as a deliberate all-variants docstring note (consistent with per-variant sections); F2 (en-dash -> ASCII) folded. Awaiting operator Inc2 gate -> Inc3 (US-020c input: ReportViewerScreen region form + GenerateRequested thread, C-13)."
+            "decision": "inc-C-awaiting-gate-phase3-complete",
+            "notes": "Phase-3 Increment C (HLR-029 / D-2) IMPLEMENTED -> increment-C.md. 2 files (screens.py + tests/test_tui_report_seam.py). LLR-029.1 screens.py:543/587 (_parse_declared_regions -> (regions, skipped); counts wrong-arity + ValueError, blank EXCLUDED, 2 mutually-exclusive sites no double-count), LLR-029.2 screens.py:804 (caller unpack, GenerateRequested regions-only unchanged), LLR-029.3 screens.py:807-813 (count-only self.notify, zero-suppress if skipped>=1). LLR-029.4 rewrote batch-19 TC-024.5 (skipped==3). Return-shape ripple: ALL 8 _parse_declared_regions callers unpack 2-tuple (incl. Inc-B AT-028b/TC-028.2); AT-028a gate unaffected (asserts literal .text). 6 new tests AT-029a/b/c/d (standalone \\b1\\b/\\b2\\b tokens + blank-exclusion negative + absence) + TC-029.1/.2. C-P3a ported _notices (before press), C-P3b count-only. Counterfactual RED: guard>=0 -> spurious '0 ... skipped' -> AT-029d+TC-029.2 RED. Full non-slow 968->974 collected (+6, TC-024.5 net-0 rewrite), 0 fail. ruff clean. Frozen diff 0 (engine-guard 10 passed). code-reviewer APPROVE (0 HIGH/MED; 1 LOW cosmetic line(s)). PHASE 3 COMPLETE (3/3 increments, ledger 958->974 +16). Awaiting operator Inc-C/Phase-3 gate -> Phase 4 validation."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-29",
+            "decision": "inc-B-approved",
+            "notes": "Operator APPROVED Increment B (D-1 round-trip complete). Advancing to Increment C (HLR-029 D-2). screens.py lines drifted from Inc B -> Inc C must re-grep."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-29",
+            "decision": "inc-B-awaiting-gate",
+            "notes": "Phase-3 Increment B (HLR-028 / D-1 LOAD) IMPLEMENTED -> increment-B.md. 3 files (app.py + screens.py + tests/test_tui_report_seam.py). LLR-028.1 app.py:3977 (load->self._declared_regions, else () RESET on legacy/no-manifest -> no cross-load leak, placed after early-return guards), LLR-028.2 app.py:1874 (thread into ReportViewerScreen), LLR-028.3 screens.py:667 (defaulted ctor param), LLR-028.4 screens.py:691-698 (seed TextArea, exact parser inverse, decimal). 4 tests: AT-028a (C-12 GATE, full round-trip, LITERAL .text assert per qa minor-2), AT-028b (guard, hand-written project.json), TC-028.1, TC-028.2 (seed<->parse idempotence). Counterfactual RED: seed->TextArea('') -> AT-028a ''!=literal. Full non-slow 964->968 collected (+4), 0 fail. ruff clean. Frozen diff 0. code-reviewer APPROVE (no-stale-leak verified, AT-028a non-vacuous, 2 LOW notes-only). D-1 round-trip COMPLETE. Awaiting operator Inc-B gate -> Inc C (HLR-029 D-2)."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-29",
+            "decision": "inc-A-approved",
+            "notes": "Operator APPROVED Increment A. Advancing to Increment B (HLR-028 LOAD). Note: app.py line numbers drifted +~30 from Inc A additions -> Inc B must re-grep."
+        },
+        {
+            "phase": 3,
+            "date": "2026-06-29",
+            "decision": "inc-A-awaiting-gate",
+            "notes": "Phase-3 Increment A (HLR-027 / D-1 SAVE) IMPLEMENTED -> increment-A.md. self._declared_regions app state (app.py:713) + Option-A capture on GenerateRequested (app.py:1899, before dispatch) + thread through _handle_save_dialog (app.py:3791) -> _write_and_verify_manifest (new kwarg-only declared_regions=() app.py:3802) -> write_project_manifest ONLY (app.py:3867); verify_written_manifest NOT threaded (C-P3c honored). SaveProjectPayload frozen. 2 files (app.py + tests/test_tui_report_seam.py). 6 new tests: AT-027a (exact 2-tuple via real save->oracle), AT-027b (typed-not-generated->()), AT-027c (key absent + legacy load), TC-027.1/.2/.3. Counterfactual RED captured (forward dropped -> AT-027a oracle ()!=expected tuple). Full non-slow 958->964 collected (+6), 0 fail. ruff clean. Frozen diff 0. code-reviewer APPROVE-WITH-NITS (0 HIGH/MED; 1 LOW = pre-existing substrate docstring gap in manifest_writer, NOT touched). Security already covered (Phase-2 Q1 scrub). Awaiting operator Inc-A gate -> Inc B (HLR-028 LOAD)."
+        },
+        {
+            "phase": 2,
+            "date": "2026-06-29",
+            "decision": "approved",
+            "notes": "Phase 2 cross-review (architect ∥ qa ∥ security, parallel) -> 02-review.md. 0 BLOCKER. architect PROCEED (supersession census COMPLETE+ACCURATE on all 3 signature changes, 0 frozen edits; 2 minor: comma-edge-louder doc fold, :372 census addendum). qa PROCEED (CRITICAL notify-observability PASS: Widget.notify->app.notify, _notices() patch catches it -> AT-029a-d non-vacuous; C-12 gate/guard separation confirmed; 2 minor: AT-029a/b standalone-token \\b1\\b, AT-028a literal-not-reconstruction). security GRANTED (batch-19 catch fully defended: Q1 save scrubbed, Q2 load re-scrub, Q3 newline-impossible+raw-text TextArea, Q4 no new write surface, Q5 notify count-only; 2 LOW: comma round-trip no-sec-impact, keep-notify-count-only). All 6 folds APPLIED body-first + §6.4 reconciliation seeded. Phase-3 carries: C-P3a port _notices into test_tui_report_seam.py, C-P3b keep notify count-only, C-P3c thread regions to write_project_manifest only. Awaiting operator Phase-2 gate."
         }
     ],
     "obsidian_synced": false,
-    "created_at": "2026-06-29T12:00:00-06:00"
+    "created_at": "2026-06-29T15:00:00-06:00"
 }
