@@ -43,11 +43,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from pathlib import Path
 from typing import Tuple
 
 from textual.widgets import Button, Markdown, TextArea
 
+import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import ReportViewerScreen, _parse_declared_regions
 from s19_app.tui.services.report_addendum import DeclaredRegion
@@ -55,6 +57,7 @@ from s19_app.tui.services.report_service import (
     REPORT_FILENAME_REGEX,
     list_project_reports,
 )
+from s19_app.tui.services.variant_execution_service import read_project_manifest
 
 # Two minimal valid S19 images (checksums verified against
 # s19_app.core.S19File) — a 2-variant project per the spec, so the seam is
@@ -123,6 +126,27 @@ async def _flush(pilot, count: int = 12) -> None:
     """Pump the event loop so deferred screen/message/apply work runs."""
     for _ in range(count):
         await pilot.pause()
+
+
+def _notices(app: S19TuiApp) -> list[tuple[str, str]]:
+    """Capture ``(title, message)`` for every ``notify`` call on the app.
+
+    Ported from ``tests/test_tui_manifest_save.py`` (carry C-P3a). Returns the
+    mutable list the patched ``notify`` appends to so a test can assert on the
+    skip-count notice surface (LLR-029.3). ``ReportViewerScreen.notify`` (a
+    ``Widget.notify``) delegates to ``app.notify``, so patching the app's
+    method observes the screen's ``self.notify`` — install BEFORE the Generate
+    press.
+    """
+    captured: list[tuple[str, str]] = []
+    original = app.notify
+
+    def _patched(message: str, *, title: str = "", **kwargs):
+        captured.append((title, message))
+        return original(message, title=title, **kwargs)
+
+    app.notify = _patched  # type: ignore[method-assign]
+    return captured
 
 
 async def _generate_through_surface(app: S19TuiApp, pilot) -> None:
@@ -346,18 +370,25 @@ def test_declared_region_in_dialog_reaches_report_addendum(tmp_path: Path) -> No
 
 def test_parse_declared_regions_handles_hex_dec_and_skips_malformed() -> None:
     """TC-024.5 — the dialog parser accepts hex/decimal bounds and skips blank
-    or malformed/invalid lines (never aborts on a bad line)."""
-    regions = _parse_declared_regions(
+    or malformed/invalid lines (never aborts on a bad line).
+
+    Updated for batch-20 LLR-029.1: ``_parse_declared_regions`` now returns
+    ``(regions, skipped)`` — this unpacks the new shape (the return-shape change
+    is the fail-loud signal the contract moved). The three non-blank bad lines
+    (wrong-arity + two invalid) are counted; the blank line is not.
+    """
+    regions, skipped = _parse_declared_regions(
         "cal,0x1000,0x10FF\n"  # hex
         "ram,4096,8191\n"  # decimal
-        "\n"  # blank → skipped
-        "bad line\n"  # wrong arity → skipped
-        "neg,-1,0x10\n"  # start < 0 → DeclaredRegion rejects → skipped
-        "rev,0x20,0x10\n"  # start > end → rejected → skipped
+        "\n"  # blank → skipped, NOT counted
+        "bad line\n"  # wrong arity → skipped + counted
+        "neg,-1,0x10\n"  # start < 0 → DeclaredRegion rejects → counted
+        "rev,0x20,0x10\n"  # start > end → rejected → counted
     )
     assert len(regions) == 2
     assert regions[0] == DeclaredRegion("cal", 0x1000, 0x10FF)
     assert regions[1].start == 4096 and regions[1].end == 8191
+    assert skipped == 3, "three non-blank bad lines counted; blank excluded"
 
 
 def test_report_dialog_with_region_input_fits_80_and_120_cols(tmp_path: Path) -> None:
@@ -389,3 +420,728 @@ def test_report_dialog_with_region_input_fits_80_and_120_cols(tmp_path: Path) ->
             f"right={right}/{sw}"
         )
         assert ta_height > 0, "declared-region input not visible"
+
+
+# ---------------------------------------------------------------------------
+# batch-20 / HLR-027 (US-024 SAVE half) — declared regions persist to
+# project.json on project SAVE. Capture point = Option A (on Generate).
+# ---------------------------------------------------------------------------
+#
+# Coverage map (test -> AT/TC -> LLR):
+# - AT-027a (test_save_persists_declared_regions): Generate+Save ⇒ the on-disk
+#   project.json carries the EXACT declared-region tuple. THE on-disk gate.
+# - AT-027b (test_typed_but_not_generated_not_saved): type-without-Generate ⇒
+#   nothing captured ⇒ manifest declared_regions == () (Option-A boundary).
+# - AT-027c (test_save_without_regions_byte_identical): no regions ever ⇒ the
+#   raw project.json has NO declared_regions key + a legacy no-key project.json
+#   still loads (back-compat, byte-identical to pre-batch-20).
+# - TC-027.1 (test_save_threads_declared_regions_to_writer): white-box — the
+#   save path reaches write_project_manifest with the captured regions
+#   (on-disk oracle).
+# - TC-027.2 (test_write_and_verify_manifest_accepts_declared_regions_default):
+#   white-box — _write_and_verify_manifest callable with and without
+#   declared_regions (defaulted; existing callers stay valid).
+# - TC-027.3 (test_empty_regions_omits_key): white-box — empty
+#   self._declared_regions ⇒ serialized project.json omits the key (0-byte
+#   delta vs a no-regions baseline).
+
+
+async def _type_regions_and_generate(
+    app: S19TuiApp, pilot, region_text: str, *, generate: bool
+) -> None:
+    """Open Reports, type ``region_text`` into the region TextArea, optionally Generate.
+
+    Drives the operator path: ``action_view_reports`` pushes the real
+    ``ReportViewerScreen``; the region lines are typed into the
+    ``#report_declared_regions`` ``TextArea``; when ``generate`` is True the
+    real ``#report_generate`` button is pressed (which posts
+    ``GenerateRequested`` → the app captures into ``self._declared_regions``)
+    and the worker is drained. When ``generate`` is False the dialog is left as
+    typed-but-not-generated (the Option-A capture boundary).
+    """
+    app.action_view_reports()
+    await _flush(pilot)
+    screen = app.screen_stack[-1]
+    assert isinstance(screen, ReportViewerScreen)
+    screen.query_one("#report_declared_regions", TextArea).text = region_text
+    if generate:
+        screen.query_one("#report_generate", Button).press()
+        await _flush(pilot)
+        await app.workers.wait_for_complete()
+        await _flush(pilot)
+
+
+def _save_loaded_project(app: S19TuiApp, pilot_unused=None) -> Path:
+    """Save the currently-loaded project through the real save handler.
+
+    Invokes ``_handle_save_dialog`` with the same minimal
+    ``SaveProjectPayload`` shape ``tests/test_tui_manifest_save.py`` uses
+    (parent_folder = workarea, project_name = "proj"). Returns the project dir.
+    """
+    payload = app_module.SaveProjectPayload(
+        parent_folder=str(app.workarea), project_name="proj"
+    )
+    app._handle_save_dialog(payload)
+    return app.workarea / "proj"
+
+
+def test_save_persists_declared_regions(tmp_path: Path) -> None:
+    """AT-027a — Generate+Save persists the EXACT declared-region tuple to disk.
+
+    Intent (HLR-027): the operator declares two non-default named regions in
+    the Reports dialog, presses Generate (capture, Option A), then saves the
+    project through the real ``_handle_save_dialog``. The on-disk
+    ``project.json`` — re-read via the ``read_project_manifest`` oracle — must
+    carry EXACTLY those two regions, in order (C-10 exact content, not
+    ``len > 0``). RED pre-fix: the save handler did not thread
+    ``self._declared_regions``, so the oracle returned ``()``.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await _type_regions_and_generate(
+                app,
+                pilot,
+                "bootblk,0x1000,0x10FF\ncal,0x8000,0x80FF",
+                generate=True,
+            )
+            project_dir = _save_loaded_project(app)
+            await _flush(pilot)
+            return read_project_manifest(project_dir).declared_regions
+
+    declared = asyncio.run(_drive())
+    assert declared == (
+        DeclaredRegion("bootblk", 0x1000, 0x10FF),
+        DeclaredRegion("cal", 0x8000, 0x80FF),
+    ), (
+        "AT-027a: the saved project.json must carry the exact declared-region "
+        f"tuple in order; oracle returned {declared!r}"
+    )
+
+
+def test_typed_but_not_generated_not_saved(tmp_path: Path) -> None:
+    """AT-027b — a region typed but NOT generated with is not persisted.
+
+    Intent (HLR-027 capture boundary, Option A): capture happens ON Generate.
+    If the operator types a region into the dialog but never presses Generate,
+    then saves, the on-disk ``project.json`` carries NO regions. This locks the
+    accepted edge in the DoR decision (D1). RED if capture moved to
+    save/keystroke.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await _type_regions_and_generate(
+                app, pilot, "bootblk,0x1000,0x10FF", generate=False
+            )
+            project_dir = _save_loaded_project(app)
+            await _flush(pilot)
+            return read_project_manifest(project_dir).declared_regions
+
+    declared = asyncio.run(_drive())
+    assert declared == (), (
+        "AT-027b: a region typed but never generated with must NOT persist; "
+        f"oracle returned {declared!r}"
+    )
+
+
+def test_save_without_regions_byte_identical(tmp_path: Path) -> None:
+    """AT-027c — no regions ⇒ the project.json omits the key + legacy loads.
+
+    Intent (HLR-027 back-compat): when no regions are ever generated, the
+    save writes a ``project.json`` whose RAW JSON has NO ``declared_regions``
+    key (byte-identical to pre-batch-20 output), and a hand-written legacy
+    ``project.json`` with no key still re-reads with zero reader issues. RED if
+    the save wrote ``declared_regions: []`` when empty.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            # No Reports dialog opened, no Generate ⇒ no capture.
+            project_dir = _save_loaded_project(app)
+            await _flush(pilot)
+            raw = (project_dir / "project.json").read_text(encoding="utf-8")
+            manifest = read_project_manifest(project_dir)
+            return raw, json.loads(raw), manifest.declared_regions, manifest.issues
+
+    raw, payload, declared, issues = asyncio.run(_drive())
+    assert "declared_regions" not in payload, (
+        "AT-027c: an empty-regions save must OMIT the declared_regions key; "
+        f"raw project.json was {raw!r}"
+    )
+    assert declared == (), "AT-027c: the no-key manifest must re-read as no regions"
+    assert issues == [], (
+        f"AT-027c: a legacy no-key project.json must load without error; got {issues}"
+    )
+
+
+def test_save_threads_declared_regions_to_writer(tmp_path: Path) -> None:
+    """TC-027.1 — the save path reaches write_project_manifest with the regions.
+
+    Intent (white-box, LLR-027.2/.3/.4): after capture (regions set on
+    ``self._declared_regions`` via the GenerateRequested handler), the save
+    threads them through ``_handle_save_dialog`` → ``_write_and_verify_manifest``
+    → ``write_project_manifest``. Asserted via the on-disk oracle (preferred
+    over mocking the substrate): the regions reach the writer iff they appear in
+    the written manifest.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            # Capture directly via the handler's message contract (the same
+            # path the Generate button drives).
+            app.on_report_viewer_screen_generate_requested(
+                ReportViewerScreen.GenerateRequested(
+                    0, (DeclaredRegion("ram", 0x2000, 0x20FF),)
+                )
+            )
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            project_dir = _save_loaded_project(app)
+            await _flush(pilot)
+            return read_project_manifest(project_dir).declared_regions
+
+    declared = asyncio.run(_drive())
+    assert declared == (DeclaredRegion("ram", 0x2000, 0x20FF),), (
+        "TC-027.1: the captured region must reach write_project_manifest and "
+        f"land in the written manifest; oracle returned {declared!r}"
+    )
+
+
+def test_write_and_verify_manifest_accepts_declared_regions_default(
+    tmp_path: Path,
+) -> None:
+    """TC-027.2 — _write_and_verify_manifest is callable with AND without regions.
+
+    Intent (white-box, LLR-027.4): the new ``declared_regions`` param is
+    keyword-only and DEFAULTED — existing 2-kwarg callers (batch / assignments
+    only) stay valid, and the new caller can pass regions. We drive both call
+    shapes against a loaded project and assert each writes a project.json the
+    oracle can re-read.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            project_dir = app.workarea / "proj"
+            # Without declared_regions (existing-caller shape).
+            app._write_and_verify_manifest(project_dir)
+            await _flush(pilot)
+            without = read_project_manifest(project_dir).declared_regions
+            # With declared_regions (new-caller shape).
+            app._write_and_verify_manifest(
+                project_dir,
+                declared_regions=(DeclaredRegion("cal", 0x8000, 0x80FF),),
+            )
+            await _flush(pilot)
+            with_ = read_project_manifest(project_dir).declared_regions
+            return without, with_
+
+    without, with_ = asyncio.run(_drive())
+    assert without == (), "TC-027.2: the defaulted call must write no regions"
+    assert with_ == (DeclaredRegion("cal", 0x8000, 0x80FF),), (
+        "TC-027.2: the explicit call must thread regions to the writer; "
+        f"got {with_!r}"
+    )
+
+
+def test_empty_regions_omits_key(tmp_path: Path) -> None:
+    """TC-027.3 — empty self._declared_regions ⇒ serialized project.json omits the key.
+
+    Intent (white-box, LLR-027.1 back-compat): an empty capture must produce a
+    project.json byte-identical to the no-regions baseline (the
+    ``declared_regions`` key is omitted, not written as ``[]``). We compare the
+    raw bytes of a save with ``self._declared_regions = ()`` against a save with
+    a populated-then-cleared capture — the bytes must be identical (0-byte
+    delta) and neither must contain the key.
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            project_dir = app.workarea / "proj"
+            # Baseline: empty capture (the default).
+            assert app._declared_regions == ()
+            app._write_and_verify_manifest(project_dir)
+            await _flush(pilot)
+            baseline = (project_dir / "project.json").read_bytes()
+            # Populate then clear ⇒ empty again ⇒ must reproduce the baseline.
+            app._declared_regions = (DeclaredRegion("x", 0x10, 0x1F),)
+            app._declared_regions = ()
+            app._write_and_verify_manifest(project_dir)
+            await _flush(pilot)
+            after = (project_dir / "project.json").read_bytes()
+            return baseline, after
+
+    baseline, after = asyncio.run(_drive())
+    assert b"declared_regions" not in baseline, (
+        "TC-027.3: an empty-capture save must OMIT the declared_regions key"
+    )
+    assert after == baseline, (
+        "TC-027.3: clearing the capture back to empty must reproduce the "
+        "byte-identical no-regions project.json (0-byte delta)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-20 / HLR-028 (US-024 LOAD half) — declared regions pre-fill the
+# Reports dialog on project LOAD. Seed = inverse of _parse_declared_regions.
+# ---------------------------------------------------------------------------
+#
+# Coverage map (test -> AT/TC -> LLR):
+# - AT-028a (test_load_prefills_declared_regions): THE GATE (C-12). One
+#   through-surface chain: type+Generate+real-save ⇒ fresh app load ⇒ open
+#   Reports ⇒ the TextArea text equals a hand-computed LITERAL string. Reverts
+#   RED if EITHER the Inc-A save thread OR this increment's load-seed breaks.
+# - AT-028b (test_load_seed_guard): GUARD (never the gate) — a project.json
+#   written DIRECTLY on disk (bypassing the save handler) seeds the TextArea.
+#   Stays green under a reverted save handler ⇒ cannot be the gate.
+# - TC-028.1 (test_load_sets_declared_regions_state): white-box — load sets
+#   app._declared_regions to the manifest tuple.
+# - TC-028.2 (test_seed_format_is_parser_inverse): white-box idempotence — the
+#   production seed text re-parses to the identical tuple.
+
+
+async def _open_reports_text(app: S19TuiApp, pilot) -> str:
+    """Open the Reports dialog through the real surface; return the seed text.
+
+    Drives ``action_view_reports`` (which threads ``self._declared_regions``
+    into ``ReportViewerScreen``), then reads the ``#report_declared_regions``
+    TextArea ``.text`` — the LOAD-seed observable.
+    """
+    app.action_view_reports()
+    await _flush(pilot)
+    screen = app.screen_stack[-1]
+    assert isinstance(screen, ReportViewerScreen)
+    return screen.query_one("#report_declared_regions", TextArea).text
+
+
+def test_load_prefills_declared_regions(tmp_path: Path) -> None:
+    """AT-028a (THE GATE, C-12) — save then fresh-load pre-fills the dialog.
+
+    Intent (HLR-028 + HLR-027 fused): the operator declares two regions in the
+    Reports dialog, presses Generate (capture, Inc A), saves through the REAL
+    ``_handle_save_dialog``; then a FRESH ``S19TuiApp`` loads the SAME project
+    and re-opens Reports — the region TextArea shows EXACTLY those regions,
+    decimal-rendered, in order. The expected string is HAND-COMPUTED
+    (0x1000=4096, 0x10FF=4351, 0x8000=32768, 0x80FF=33023), NOT derived via the
+    production seed helper (anti-tautology, qa minor-2). RED if either the
+    save-thread (Inc A) or the load-seed (this increment) breaks.
+    """
+
+    async def _drive() -> str:
+        # Phase 1: save a project carrying two declared regions.
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await _type_regions_and_generate(
+                app,
+                pilot,
+                "bootblk,0x1000,0x10FF\ncal,0x8000,0x80FF",
+                generate=True,
+            )
+            _save_loaded_project(app)
+            await _flush(pilot)
+
+        # Phase 2: a FRESH app instance loads the SAME project off disk.
+        fresh = S19TuiApp(base_dir=tmp_path)
+        async with fresh.run_test() as pilot:
+            await pilot.pause()
+            fresh._handle_load_project("proj")
+            await _flush(pilot)
+            await fresh.workers.wait_for_complete()
+            await _flush(pilot)
+            return await _open_reports_text(fresh, pilot)
+
+    seed_text = asyncio.run(_drive())
+    assert seed_text == "bootblk,4096,4351\ncal,32768,33023", (
+        "AT-028a: a fresh load must pre-fill the region TextArea with the saved "
+        "regions, decimal-rendered in stored order; "
+        f"TextArea text was {seed_text!r}"
+    )
+
+
+def test_load_seed_guard(tmp_path: Path) -> None:
+    """AT-028b (GUARD, never the gate) — a hand-written manifest seeds the dialog.
+
+    Intent (HLR-028 load-seed in isolation): a ``project.json`` written
+    DIRECTLY on disk (bypassing the save handler) with a ``declared_regions``
+    entry, when loaded and re-opened, seeds the region TextArea so the text
+    round-trips to ``DeclaredRegion("ram", 8192, 12287)``. Because no save
+    handler runs, this stays GREEN even if the Inc-A save thread is reverted —
+    which is exactly why it is the guard, not the gate.
+    """
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = _make_report_project(app, "proj")
+        # Inject declared_regions directly into the on-disk manifest, bypassing
+        # the save handler entirely (this is what makes it a guard, not a gate).
+        manifest_path = project_dir / "project.json"
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["declared_regions"] = [
+            {"name": "ram", "start": 8192, "end": 12287}
+        ]
+        manifest_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return await _open_reports_text(app, pilot)
+
+    seed_text = asyncio.run(_drive())
+    assert seed_text == "ram,8192,12287", (
+        "AT-028b: a hand-written manifest's region must seed the TextArea; "
+        f"text was {seed_text!r}"
+    )
+    # The seed must round-trip back to the identical region (batch-20: the
+    # parser now returns ``(regions, skipped)`` — unpack regions, no skips).
+    reparsed, skipped = _parse_declared_regions(seed_text)
+    assert reparsed == (
+        DeclaredRegion("ram", 8192, 12287),
+    ), "AT-028b: the seeded text must re-parse to the same region"
+    assert skipped == 0, "AT-028b: a clean seed must not register any skips"
+
+
+def test_load_sets_declared_regions_state(tmp_path: Path) -> None:
+    """TC-028.1 — load sets app._declared_regions to the manifest tuple.
+
+    Intent (white-box, LLR-028.1): after ``_handle_load_project`` on a project
+    whose manifest carries regions, ``app._declared_regions`` equals the exact
+    expected tuple (the seed source for LLR-028.2/.4).
+    """
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = _make_report_project(app, "proj")
+        manifest_path = project_dir / "project.json"
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["declared_regions"] = [
+            {"name": "bootblk", "start": 4096, "end": 4351},
+            {"name": "cal", "start": 32768, "end": 33023},
+        ]
+        manifest_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return app._declared_regions
+
+    declared = asyncio.run(_drive())
+    assert declared == (
+        DeclaredRegion("bootblk", 4096, 4351),
+        DeclaredRegion("cal", 32768, 33023),
+    ), (
+        "TC-028.1: load must set app._declared_regions to the manifest's "
+        f"region tuple; got {declared!r}"
+    )
+
+
+def test_seed_format_is_parser_inverse() -> None:
+    """TC-028.2 — the seed format is the inverse of _parse_declared_regions.
+
+    Intent (white-box idempotence, LLR-028.4): render a tuple of regions with
+    the SAME format the production ``compose`` seed uses, then re-parse it with
+    ``_parse_declared_regions`` — the result must equal the original tuple. This
+    is the ONE place the seed format may appear on both sides: it is explicitly
+    a round-trip test, not AT-028a's deliverable.
+    """
+    regions = (
+        DeclaredRegion("bootblk", 0x1000, 0x10FF),
+        DeclaredRegion("cal", 0x8000, 0x80FF),
+    )
+    # Same expression as compose's TextArea seed (LLR-028.4).
+    seeded = "\n".join(
+        f"{region.name},{region.start},{region.end}" for region in regions
+    )
+    # batch-20: parser returns ``(regions, skipped)`` — unpack and check both.
+    reparsed, skipped = _parse_declared_regions(seeded)
+    assert reparsed == regions, (
+        "TC-028.2: the seed text must re-parse to the identical region tuple "
+        f"(idempotence); re-parse of {seeded!r} did not round-trip"
+    )
+    assert skipped == 0, "TC-028.2: a clean seed must not register any skips"
+
+
+# ---------------------------------------------------------------------------
+# batch-20 / HLR-029 (US-025 / D-2) — operator sees a COUNT of skipped region
+# lines. ``_parse_declared_regions`` returns ``(regions, skipped)``;
+# ``on_button_pressed`` surfaces the count via ``self.notify`` when skipped>=1
+# (count-only, carry C-P3b) and stays silent when skipped==0.
+# ---------------------------------------------------------------------------
+#
+# Coverage map (test -> AT/TC -> LLR):
+# - AT-029a (test_skipped_malformed_line_counted): wrong-arity line ⇒ notify
+#   carries the standalone token ``1``; the valid region still flows.
+# - AT-029b (test_skipped_invalid_line_counted): start>end line ⇒ notify ``1``.
+# - AT-029c (test_skipped_count_excludes_blank): valid+malformed+blank+invalid
+#   ⇒ notify count ``2`` (blank excluded), NOT 3.
+# - AT-029d (test_all_valid_no_skip_message): all-valid AND empty input ⇒ NO
+#   skip message (absence assertion).
+# - TC-029.1 (test_parse_returns_skip_count): white-box parser return values.
+# - TC-029.2 (test_zero_skip_suppresses_notify): white-box/seam zero-guard.
+
+
+async def _generate_capturing_notices(
+    app: S19TuiApp, pilot, region_text: str
+) -> list[tuple[str, str]]:
+    """Drive the operator path and return every ``notify`` raised by Generate.
+
+    Opens Reports (real ``action_view_reports``), types ``region_text`` into
+    the region TextArea, installs the ``_notices`` capture on ``app.notify``
+    BEFORE pressing ``#report_generate`` (carry C-P3a — the Screen's
+    ``self.notify`` delegates to ``app.notify``), then drains the worker.
+    Returns the captured ``(title, message)`` list.
+    """
+    app.action_view_reports()
+    await _flush(pilot)
+    screen = app.screen_stack[-1]
+    assert isinstance(screen, ReportViewerScreen)
+    screen.query_one("#report_declared_regions", TextArea).text = region_text
+    captured = _notices(app)  # install BEFORE the press (C-P3a)
+    screen.query_one("#report_generate", Button).press()
+    await _flush(pilot)
+    await app.workers.wait_for_complete()
+    await _flush(pilot)
+    return captured
+
+
+def _skip_messages(captured: list[tuple[str, str]]) -> list[str]:
+    """Return the messages mentioning a skip (case-insensitive)."""
+    return [msg for _title, msg in captured if "skip" in msg.lower()]
+
+
+def test_skipped_malformed_line_counted(tmp_path: Path) -> None:
+    """AT-029a — a wrong-arity line is surfaced as a count-of-1 notify.
+
+    Intent (HLR-029 surface, malformed branch): the operator types one valid
+    region plus one wrong-arity line, presses Generate; the notify channel
+    carries a message whose count token is the standalone ``1`` (regex
+    ``\\b1\\b``, qa minor-1 — guards against e.g. "0 of 1" passing). The valid
+    region still flows to capture.
+    """
+
+    async def _drive() -> tuple[list[tuple[str, str]], tuple]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            captured = await _generate_capturing_notices(
+                app, pilot, "good,0x1000,0x10FF\nbad line"
+            )
+            return captured, app._declared_regions
+
+    captured, declared = asyncio.run(_drive())
+    skips = _skip_messages(captured)
+    assert skips, "AT-029a: a malformed line must surface a skip notify"
+    assert any(re.search(r"\b1\b", msg) for msg in skips), (
+        "AT-029a: the skip notify must report the standalone count 1; "
+        f"messages were {skips!r}"
+    )
+    assert declared == (DeclaredRegion("good", 0x1000, 0x10FF),), (
+        "AT-029a: the valid region must still flow despite the skipped line"
+    )
+
+
+def test_skipped_invalid_line_counted(tmp_path: Path) -> None:
+    """AT-029b — a start>end line (invalid branch) is surfaced as count-of-1.
+
+    Intent (HLR-029 surface, invalid branch): ``rev,0x20,0x10`` has start>end
+    so ``DeclaredRegion`` raises ``ValueError`` → the invalid skip site fires.
+    The notify must carry the standalone ``1``.
+    """
+
+    async def _drive() -> list[tuple[str, str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return await _generate_capturing_notices(
+                app, pilot, "good,0x1000,0x10FF\nrev,0x20,0x10"
+            )
+
+    skips = _skip_messages(asyncio.run(_drive()))
+    assert skips, "AT-029b: an invalid line must surface a skip notify"
+    assert any(re.search(r"\b1\b", msg) for msg in skips), (
+        "AT-029b: the skip notify must report the standalone count 1; "
+        f"messages were {skips!r}"
+    )
+
+
+def test_skipped_count_excludes_blank(tmp_path: Path) -> None:
+    """AT-029c — blank lines are NOT counted; one malformed + one invalid ⇒ 2.
+
+    Intent (HLR-029 blank-exclusion boundary): input = valid + malformed +
+    blank + invalid. The blank is intentional spacing and must NOT count, so
+    the notify reports the standalone ``2`` (regex ``\\b2\\b``), NOT 3.
+    """
+
+    async def _drive() -> list[tuple[str, str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return await _generate_capturing_notices(
+                app, pilot, "good,0x1000,0x10FF\nbad line\n\nrev,0x20,0x10"
+            )
+
+    skips = _skip_messages(asyncio.run(_drive()))
+    assert skips, "AT-029c: malformed+invalid lines must surface a skip notify"
+    assert any(re.search(r"\b2\b", msg) for msg in skips), (
+        "AT-029c: the count must be 2 (blank excluded), not 3; "
+        f"messages were {skips!r}"
+    )
+    assert not any(re.search(r"\b3\b", msg) for msg in skips), (
+        "AT-029c: the blank line must NOT be counted (count 3 would be wrong); "
+        f"messages were {skips!r}"
+    )
+
+
+def test_all_valid_no_skip_message(tmp_path: Path) -> None:
+    """AT-029d (negative) — all-valid AND empty input emit NO skip message.
+
+    Intent (HLR-029 clean case): two valid regions ⇒ no skip notify; and an
+    empty TextArea ⇒ no skip notify. Asserts ABSENCE (no captured notice
+    mentions "skip"), not a "0 skipped" message.
+    """
+
+    async def _drive(region_text: str) -> list[tuple[str, str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return await _generate_capturing_notices(app, pilot, region_text)
+
+    all_valid = asyncio.run(_drive("a,0x1000,0x10FF\nb,0x2000,0x20FF"))
+    assert not _skip_messages(all_valid), (
+        "AT-029d: all-valid input must NOT surface any skip message; "
+        f"captured {all_valid!r}"
+    )
+
+    empty = asyncio.run(_drive(""))
+    assert not _skip_messages(empty), (
+        "AT-029d: empty input must NOT surface any skip message; "
+        f"captured {empty!r}"
+    )
+
+
+def test_parse_returns_skip_count() -> None:
+    """TC-029.1 — white-box: ``_parse_declared_regions`` returns (regions, skipped).
+
+    Intent (LLR-029.1): malformed (wrong-arity) and invalid (start>end) lines
+    each increment ``skipped``; blank lines do not; all-valid ⇒ 0. Asserts the
+    tuple values directly.
+    """
+    # Malformed only.
+    regions, skipped = _parse_declared_regions("good,0x1000,0x10FF\nbad line")
+    assert regions == (DeclaredRegion("good", 0x1000, 0x10FF),)
+    assert skipped == 1, "TC-029.1: a wrong-arity line must be counted"
+
+    # Invalid only (start>end).
+    regions, skipped = _parse_declared_regions("good,0x1000,0x10FF\nrev,0x20,0x10")
+    assert regions == (DeclaredRegion("good", 0x1000, 0x10FF),)
+    assert skipped == 1, "TC-029.1: an invalid (start>end) line must be counted"
+
+    # Blank lines are NOT counted.
+    regions, skipped = _parse_declared_regions("good,0x1000,0x10FF\n\n\n")
+    assert regions == (DeclaredRegion("good", 0x1000, 0x10FF),)
+    assert skipped == 0, "TC-029.1: blank lines must NOT be counted"
+
+    # All valid ⇒ 0.
+    regions, skipped = _parse_declared_regions("a,0x1000,0x10FF\nb,0x2000,0x20FF")
+    assert len(regions) == 2
+    assert skipped == 0, "TC-029.1: all-valid input must yield skipped == 0"
+
+
+def test_zero_skip_suppresses_notify(tmp_path: Path) -> None:
+    """TC-029.2 — white-box/seam: skipped==0 ⇒ ``self.notify`` is NOT called.
+
+    Intent (LLR-029.3 zero-suppression guard): pressing Generate on all-valid
+    input must raise ZERO notify calls (the guard suppresses the count message
+    when nothing was skipped) — asserts the capture list is empty.
+    """
+
+    async def _drive() -> list[tuple[str, str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return await _generate_capturing_notices(
+                app, pilot, "a,0x1000,0x10FF\nb,0x2000,0x20FF"
+            )
+
+    captured = asyncio.run(_drive())
+    assert captured == [], (
+        "TC-029.2: a clean (zero-skip) Generate must not call notify at all; "
+        f"captured {captured!r}"
+    )
