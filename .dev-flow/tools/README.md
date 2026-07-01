@@ -114,6 +114,11 @@ machine but is not shared with the team by default. The **script** under
 un-ignore `.claude/settings.json` (e.g. add `!.claude/settings.json` after the
 `.claude/` line in `.gitignore`) and commit it.
 
+The hook command in `.claude/settings.json` assumes **`python` is on PATH** and
+that Claude Code runs hooks from the project root (both true here). On a machine
+where the interpreter is only `py`/`python3`, edit the `command` accordingly — a
+launch failure disables the gate silently (it does not block commits).
+
 ---
 
 ## Assessment: can the "no hollow iterate at gates" rule be hook-enforced? — **No.**

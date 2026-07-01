@@ -133,44 +133,32 @@ def classify(text: str) -> list[Line]:
     Returns:
         List of Line, one per source line, in order.
     """
+    raw_lines = text.splitlines()
+
+    # Leading YAML frontmatter is recognised ONLY when the first non-blank line is
+    # exactly '---' AND a closing '---' exists later. Without the closing check, a
+    # document that merely opens with a horizontal rule (or an unterminated '---')
+    # would be marked frontmatter to EOF, silencing every detector (a false-open).
+    fm_start: int | None = None
+    fm_end: int | None = None
+    first_nonblank = next((k for k, r in enumerate(raw_lines) if r.strip()), None)
+    if first_nonblank is not None and raw_lines[first_nonblank].strip() == "---":
+        for k in range(first_nonblank + 1, len(raw_lines)):
+            if raw_lines[k].strip() == "---":
+                fm_start, fm_end = first_nonblank, k
+                break
+
     lines: list[Line] = []
     in_fence = False
-    in_frontmatter = False
-    seen_content = False
-    fm_open = False
-
-    raw_lines = text.splitlines()
-    # Detect leading YAML frontmatter: first non-blank line is exactly '---'.
     for idx, raw in enumerate(raw_lines):
-        stripped = raw.strip()
-
-        # Frontmatter open/close (only before any real content, delimiter == ---).
-        if not seen_content and stripped == "---":
-            if not fm_open:
-                fm_open = True
-                in_frontmatter = True
-                lines.append(Line(idx + 1, raw, in_fence=False, in_frontmatter=True))
-                continue
-            # closing delimiter
-            lines.append(Line(idx + 1, raw, in_fence=False, in_frontmatter=True))
-            in_frontmatter = False
-            fm_open = False
-            seen_content = True
-            continue
-
-        if in_frontmatter:
+        if fm_start is not None and fm_start <= idx <= fm_end:
             lines.append(Line(idx + 1, raw, in_fence=False, in_frontmatter=True))
             continue
-
-        if stripped:
-            seen_content = True
-
         if _FENCE_RE.match(raw):
             # The fence delimiter line itself belongs to the block boundary.
             lines.append(Line(idx + 1, raw, in_fence=True, in_frontmatter=False))
             in_fence = not in_fence
             continue
-
         lines.append(Line(idx + 1, raw, in_fence=in_fence, in_frontmatter=False))
 
     return lines
@@ -421,13 +409,36 @@ def render_report(blockers: list[Blocker], checked: list[Path], root: Path,
 
 # --- Command sniffing (hook mode) ------------------------------------------------
 
-_GIT_COMMIT_RE = re.compile(r"\bgit\b[^;&|]*\bcommit\b")
-_COMMIT_ALL_RE = re.compile(r"\bcommit\b[^;&|]*\s-\w*a")  # -a / -am / -a ...
+# git global options that consume a following argument (so we don't mistake the
+# argument for the subcommand, e.g. `git -C /path commit`).
+_GIT_ARG_FLAGS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--exec-path"}
+_COMMIT_ALL_RE = re.compile(r"\bcommit\b[^;&|]*\s(?:-\w*a|--all)\b")  # -a / -am / --all
 
 
 def is_git_commit(command: str) -> bool:
-    """True if the shell command invokes `git commit` (best-effort, per-segment)."""
-    return bool(_GIT_COMMIT_RE.search(command or ""))
+    """True if the command invokes `git commit` as a subcommand (best-effort).
+
+    Matches `commit` only as the git SUBCOMMAND -- after skipping git global
+    options (including arg-taking ones like `-C <path>`). This excludes commands
+    that merely contain the word 'commit' as a value, e.g. `git config
+    commit.gpgsign ...` (subcommand is `config`) or `git commit-tree`. Read-only
+    `git commit --dry-run` is treated as NOT a gated commit.
+    """
+    for segment in re.split(r"[;&|\n]+", command or ""):
+        toks = segment.split()
+        if "git" not in toks:
+            continue
+        i = toks.index("git") + 1
+        while i < len(toks) and toks[i].startswith("-"):
+            flag = toks[i]
+            i += 1
+            if flag in _GIT_ARG_FLAGS and i < len(toks):
+                i += 1  # consume this flag's argument
+        if i < len(toks) and toks[i] == "commit":
+            if "--dry-run" in toks[i + 1:]:
+                continue  # inspection only -> not a real commit to gate
+            return True
+    return False
 
 
 def _git_names(root: Path, *args: str) -> list[str] | None:
