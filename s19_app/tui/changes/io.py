@@ -54,6 +54,7 @@ from typing import Callable, Optional, Union
 from ...validation.model import ValidationIssue, ValidationSeverity
 from ..workspace import (
     DEFAULT_COPY_SIZE_CAP_BYTES,
+    WORKAREA_PATCHES,
     WORKAREA_TEMP,
     WorkareaContainmentError,
     copy_into_workarea,
@@ -1319,9 +1320,10 @@ def write_change_document(
         - Serialize ``document``; ensure the work-area structure; stage the
           bytes in ``.s19tool/workarea/temp/`` — itself inside the work area,
           so no bytes ever land outside it.
-        - Place the staged file via the copy helper (containment + reparse
-          point + dedup checks reused); remove the staged temp file either
-          way.
+        - Place the staged file into the dedicated patches folder
+          ``.s19tool/workarea/patches/`` via the copy helper (containment +
+          reparse point + dedup checks reused; the helper creates the patches
+          subdir on demand); remove the staged temp file either way.
 
     Dependencies:
         Uses:
@@ -1349,7 +1351,7 @@ def write_change_document(
     try:
         staged.parent.mkdir(parents=True, exist_ok=True)
         staged.write_bytes(data)
-        target = placement(staged, workarea)
+        target = placement(staged, workarea / WORKAREA_PATCHES)
         return target, issues
     except (WorkareaContainmentError, OSError) as exc:
         issues.append(

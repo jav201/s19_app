@@ -391,7 +391,12 @@ def test_action_routing_observable_effects(tmp_path: Path) -> None:
             panel.request_action("save_doc")
             await pilot.pause()
             workarea = tmp_path / ".s19tool" / "workarea"
-            outcomes["saved_files"] = len(list(workarea.glob("changes*.json")))
+            # HLR-031: change-file saves now land in the dedicated patches
+            # folder, not the workarea root — assert via recursive glob so the
+            # "one file saved" intent survives the placement move.
+            outcomes["saved_files"] = len(
+                list(workarea.rglob("changes*.json"))
+            )
 
             # run_checks (real E4 engine; kind="change" document with no
             # image -> not runnable, both entries uncheckable)
@@ -1232,3 +1237,574 @@ def test_saveback_width_32_preserves_source_s0_header(tmp_path: Path) -> None:
 
     # The firmware data-record map still round-trips byte-equal.
     assert _data_record_map(reparsed) == intended
+
+
+# ===========================================================================
+# AT-031 — dedicated patches folder (HLR-031 / US-027)
+# ===========================================================================
+
+
+def test_at031a_save_doc_lands_in_patches_folder(tmp_path: Path) -> None:
+    """AT-031a (golden gate) — a change-document save lands under patches/.
+
+    Intent: HLR-031 — the Patch Editor's change-document save (``save_doc``,
+    NOT the save-back image prompt) must write the ``*.json`` into the
+    dedicated ``…/.s19tool/workarea/patches/`` folder, created on demand. This
+    drives the save through the shipped ``request_action("save_doc")`` surface
+    with an in-memory doc holding one entry and asserts the on-disk file:
+    (a) no ``*.json`` exists under patches/ before the save, (b) a ``*.json``
+    exists there afterwards, and (c) it parses as an ``s19app-changeset`` v2
+    envelope. (The folder itself may pre-exist — ``ensure_workarea`` scaffolds
+    it at app startup per LLR-031.1 — so the pre-save witness is the absence of
+    a saved file, not the absence of the folder.) Counterfactual: leaving the
+    placement at the workarea root drops zero files under patches/ → this goes
+    RED.
+    """
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+            panel.request_action("add_entry")
+            await pilot.pause()
+
+            assert not (patches.exists() and list(patches.glob("*.json"))), (
+                "no change file may exist under patches/ before the save"
+            )
+
+            panel.request_action("save_doc")
+            await pilot.pause()
+
+    asyncio.run(_drive())
+
+    assert patches.is_dir(), "save_doc must create the patches folder"
+    saved = list(patches.glob("*.json"))
+    assert len(saved) == 1, f"expected one saved change file, found {saved}"
+
+    written = json.loads(saved[0].read_bytes())
+    assert written["format"] == "s19app-changeset"
+    assert written["version"] == "2.0"
+    assert isinstance(written["entries"], list) and written["entries"]
+
+
+def test_at031b_two_saves_are_distinct_no_clobber(tmp_path: Path) -> None:
+    """AT-031b (idempotent boundary) — two saves keep both, distinct names.
+
+    Intent: HLR-031 no-clobber — saving the same change document twice must
+    produce two on-disk files with DIFFERING names (dedup-suffixed by
+    ``copy_into_workarea``), never one clobbered file and never an error. This
+    pins the no-clobber contract by exact count + name distinctness rather than
+    merely "no exception raised". Counterfactual: dropping the dedup/exist_ok
+    guard makes the second save clobber or raise → this goes RED.
+    """
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+
+    async def _drive() -> None:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+            panel.request_action("add_entry")
+            await pilot.pause()
+
+            panel.request_action("save_doc")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+
+    asyncio.run(_drive())
+
+    saved = list(patches.glob("*.json"))
+    assert len(saved) == 2, f"two saves must keep two files, found {saved}"
+    names = {p.name for p in saved}
+    assert len(names) == 2, f"the two saved files must differ, got {names}"
+
+
+# ===========================================================================
+# Increment 2 — HLR-030 / US-026 — change-file dropdown
+# ===========================================================================
+
+
+def _select_option_values(select: object) -> list[str]:
+    """Return a ``Select``'s real option values, excluding the blank sentinel.
+
+    Textual prepends a ``('', Select.NULL)`` blank entry to the option list
+    when ``allow_blank=True``; the dropdown's *change-file* options are the rest
+    (each value equals the filename). This reads them through the public
+    ``_options`` list, filtering the blank so the assertions see only the
+    change files.
+    """
+    from textual.widgets import Select
+
+    return [
+        value
+        for _label, value in select._options
+        if value is not Select.NULL and value is not Select.BLANK
+    ]
+
+
+def _name_holding_address(patches: Path, address: int) -> str:
+    """Return the patches/ change-file whose sole entry declares ``address``.
+
+    The AT selects the SECOND file BY KNOWN FILENAME (not positional ``[1]``,
+    since glob order is FS-dependent — F-Q2): we read each on-disk file to
+    learn which name carries the distinguishing entry, then drive the dropdown
+    with that name.
+    """
+    for path in sorted(patches.glob("*.json")):
+        doc = json.loads(path.read_bytes())
+        addresses = {int(entry["address"], 16) for entry in doc["entries"]}
+        if addresses == {address}:
+            return path.name
+    raise AssertionError(f"no patches/ file holds only address {address:#x}")
+
+
+def test_at030a_dropdown_lists_and_loads_selected_change_file(
+    tmp_path: Path,
+) -> None:
+    """AT-030a (C-12 GATE) — two saved files listed; selecting #2 loads it.
+
+    Intent: HLR-030 end-to-end through the shipped surfaces. Produce TWO
+    distinct change files via the REAL change-document save
+    (``request_action("save_doc")`` — Inc1's path into ``patches/``, NOT the
+    save-back image writer), each with a DISTINCT distinguishing entry (file #1
+    holds only 0x100, file #2 holds only 0x200). Re-open the patch editor,
+    assert ``#patch_doc_file_select`` lists BOTH names, then select the SECOND
+    BY KNOWN FILENAME (read from disk — not positional index) and assert the
+    editor's active change document now holds file #2's distinguishing entry
+    (0x200), not file #1's (0x100), not a dummy. Sub-assertion (F-Q4/R2): a
+    save performed WHILE the patch screen is open appears in the dropdown
+    without re-activation.
+
+    Counterfactual (QC-2): if the app never populates the Select from the scan
+    (``set_change_files`` call dropped), the second file never lists / never
+    loads → this goes RED.
+    """
+    from textual.widgets import Select
+
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+
+    async def _drive() -> tuple[list[str], int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # File #1 — a single entry at 0x100.
+            _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+
+            # R2 (a save while open self-refreshes the dropdown) has its own
+            # dedicated test; here we focus on the two-file list + load.
+
+            # File #2 — swap the in-memory doc to a single entry at 0x200 so
+            # the two on-disk files carry DISTINCT distinguishing entries.
+            _set_entry_inputs(app, address="0x100")
+            panel.request_action("remove_entry")
+            await pilot.pause()
+            _set_entry_inputs(app, address="0x200", bytes_text="CC DD")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+
+            # Re-open the editor and read the fresh option set.
+            app.action_show_screen("patch")
+            await pilot.pause()
+            select = app.query_one("#patch_doc_file_select", Select)
+            options = _select_option_values(select)
+
+            # Select file #2 BY KNOWN FILENAME (the name holding only 0x200).
+            second_name = _name_holding_address(patches, 0x200)
+            select.value = second_name
+            await pilot.pause()
+
+            active_addresses = [
+                entry.address
+                for entry in app._change_service.document.entries
+            ]
+            return options, active_addresses[0] if active_addresses else -1
+
+    options, loaded_address = asyncio.run(_drive())
+    # Sanity: both saves landed as distinct on-disk files.
+    saved = sorted(p.name for p in patches.glob("*.json"))
+    assert len(saved) == 2, f"expected two saved change files, found {saved}"
+
+    # The dropdown lists BOTH files, sorted deterministically.
+    assert set(options) == set(saved), (
+        f"dropdown options {options} must list both saved files {saved}"
+    )
+    assert options == sorted(options), "dropdown options must be sorted"
+
+    # Selecting file #2 by known filename loads ITS distinguishing entry.
+    assert loaded_address == 0x200, (
+        f"selecting file #2 must load its 0x200 entry, got {loaded_address:#x}"
+    )
+
+
+def test_at030a_r2_save_while_open_appears_without_reactivation(
+    tmp_path: Path,
+) -> None:
+    """AT-030a sub-assertion (F-Q4 / R2) — a save while open self-refreshes.
+
+    Intent: a change-document save performed WHILE the patch editor is already
+    open must appear in ``#patch_doc_file_select`` without re-activating the
+    screen (the C-12 chain relies on the after-save re-scan, LLR-030.3).
+    Counterfactual: drop the ``_prefill_patch_change_files`` call in the
+    ``save_doc`` arm ⇒ the option set stays empty until re-activation → RED.
+    """
+    from textual.widgets import Select
+
+    async def _drive() -> list[str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            select = app.query_one("#patch_doc_file_select", Select)
+            assert _select_option_values(select) == [], (
+                "no options before any save"
+            )
+
+            _set_entry_inputs(app, address="0x100", bytes_text="AA BB")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            panel.request_action("save_doc")
+            await pilot.pause()
+
+            # NO action_show_screen("patch") here — the dropdown must self-fill.
+            return _select_option_values(select)
+
+    options = asyncio.run(_drive())
+    assert len(options) == 1, (
+        f"a save while open must appear without re-activation, got {options}"
+    )
+
+
+def test_at030b_empty_patches_folder_renders_placeholder_no_crash(
+    tmp_path: Path,
+) -> None:
+    """AT-030b (boundary) — an empty patches folder yields a blank dropdown.
+
+    Intent: HLR-030 empty case — with no change file present, the dropdown
+    renders an empty/placeholder state (``Select(allow_blank=True)``, W1), the
+    app stays responsive, and nothing raises. Counterfactual: indexing ``[0]``
+    on the empty scan would throw on open → RED.
+    """
+    from textual.widgets import Select
+
+    async def _drive() -> tuple[list[str], object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            select = app.query_one("#patch_doc_file_select", Select)
+            # App still responsive: a follow-up screen switch works.
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return _select_option_values(select), select.value
+
+    options, value = asyncio.run(_drive())
+    assert options == [], f"empty folder must yield no options, got {options}"
+    assert value in (Select.BLANK, Select.NULL), (
+        "empty dropdown must sit on a blank sentinel, not a concrete file"
+    )
+
+
+def test_at030c_directly_dropped_file_is_listed_and_loadable(
+    tmp_path: Path,
+) -> None:
+    """AT-030c (GUARD, not the gate) — a hand-dropped file lists + loads.
+
+    Intent: pins the SCAN contract independently of the save handler. A valid
+    v2 change file dropped DIRECTLY into ``patches/`` (bypassing ``save_doc``)
+    must be listed in the dropdown and loadable. This stays green even under a
+    reverted save handler, so it is structurally a guard, NOT the C-12 gate.
+    """
+    from textual.widgets import Select
+
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    patches.mkdir(parents=True, exist_ok=True)
+    _write_v2_document(
+        patches / "dropped.json",
+        [{"type": "bytes", "address": "0x300", "bytes": "EE FF"}],
+    )
+
+    async def _drive() -> tuple[list[str], int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            select = app.query_one("#patch_doc_file_select", Select)
+            options = _select_option_values(select)
+
+            select.value = "dropped.json"
+            await pilot.pause()
+            active = [
+                entry.address
+                for entry in app._change_service.document.entries
+            ]
+            return options, active[0] if active else -1
+
+    options, loaded_address = asyncio.run(_drive())
+    assert options == ["dropped.json"], (
+        f"a directly-dropped change file must be listed, got {options}"
+    )
+    assert loaded_address == 0x300, (
+        f"selecting the dropped file must load its 0x300 entry, "
+        f"got {loaded_address:#x}"
+    )
+
+
+def test_f1_symlink_entry_is_skipped_by_scan(tmp_path: Path) -> None:
+    """Security TC (F1) — a symlinked patches/ entry is skipped by the scan.
+
+    Intent: the read-path containment fold (LLR-030.3 / F-S1). The typed-path
+    load resolves through ``resolve_input_path`` which has only a size cap (no
+    containment/symlink guard); the dropdown closes that asymmetry by SKIPPING
+    symlink entries at scan time and re-asserting ``is_relative_to`` before
+    load. A symlinked ``patches/`` entry (pointing outside the folder) must not
+    appear in the dropdown. Portable fallback: when symlink creation is
+    unavailable on the host, assert the ``is_relative_to`` guard rejects a
+    crafted ``..``-containing name through the load handler instead.
+    """
+    from textual.widgets import Select
+
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    patches.mkdir(parents=True, exist_ok=True)
+
+    # An out-of-folder v2 file the symlink would point at.
+    outside = tmp_path / "outside.json"
+    _write_v2_document(
+        outside, [{"type": "bytes", "address": "0x400", "bytes": "11"}]
+    )
+
+    symlink_made = False
+    link = patches / "evil.json"
+    try:
+        link.symlink_to(outside)
+        symlink_made = True
+    except (OSError, NotImplementedError):
+        symlink_made = False
+
+    async def _drive() -> tuple[list[str], int, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            select = app.query_one("#patch_doc_file_select", Select)
+            options = _select_option_values(select)
+
+            # Portable branch: exercise the load-path is_relative_to guard with
+            # a crafted escaping name (works with or without symlink support).
+            app.on_patch_editor_panel_change_file_selected(
+                PatchEditorPanel.ChangeFileSelected("../outside.json")
+            )
+            await pilot.pause()
+            escaped_loaded = [
+                entry.address
+                for entry in app._change_service.document.entries
+            ]
+            return options, escaped_loaded[0] if escaped_loaded else -1, True
+
+    options, escaped_address, _ok = asyncio.run(_drive())
+
+    # The escaping ``..`` name must NOT have loaded the outside file's 0x400.
+    assert escaped_address != 0x400, (
+        "the is_relative_to guard must reject a ..-escaping change-file name"
+    )
+    if symlink_made:
+        assert "evil.json" not in options, (
+            "a symlinked patches/ entry must be skipped by the scan"
+        )
+
+
+def test_tc030_scan_returns_sorted_json_set_ignoring_non_change_files(
+    tmp_path: Path,
+) -> None:
+    """TC-030 (white-box) — file discovery + dropdown population.
+
+    Intent: the scan helper returns exactly the ``*.json`` set, sorted, and
+    ignores non-change files; population maps one option per file, and an empty
+    folder yields a placeholder (no options).
+    """
+    from textual.widgets import Select
+
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+
+    async def _drive() -> tuple[list[str], list[str], list[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+
+            # Empty folder → empty scan → placeholder dropdown.
+            select = app.query_one("#patch_doc_file_select", Select)
+            empty_options = _select_option_values(select)
+
+            # Drop two change files + one non-change file.
+            _write_v2_document(
+                patches / "beta.json",
+                [{"type": "bytes", "address": "0x10", "bytes": "01"}],
+            )
+            _write_v2_document(
+                patches / "alpha.json",
+                [{"type": "bytes", "address": "0x20", "bytes": "02"}],
+            )
+            (patches / "notes.txt").write_text("ignore me", encoding="utf-8")
+
+            scanned = app._scan_patch_change_files()
+            app._prefill_patch_change_files()
+            await pilot.pause()
+            populated = _select_option_values(select)
+            return empty_options, scanned, populated
+
+    empty_options, scanned, populated = asyncio.run(_drive())
+    assert empty_options == [], "empty folder must yield no options"
+    assert scanned == ["alpha.json", "beta.json"], (
+        f"scan must return the sorted .json set only, got {scanned}"
+    )
+    assert populated == ["alpha.json", "beta.json"], (
+        f"one option per change file, sorted, got {populated}"
+    )
+
+
+# ===========================================================================
+# AT-032 — Checks-button clarity (HLR-032 / US-029)
+# ===========================================================================
+
+# The key token span the Checks affordance must state — the WHAT (the loaded
+# change document's checks) + the WHICH artifact (the loaded image). Asserted
+# as a substring (W3), never the whole punctuated string nor "a Label exists".
+_CHECKS_HELP_TOKEN = (
+    "runs the loaded change document's checks against the loaded image"
+)
+
+
+def test_at032a_checks_help_states_what_and_which_artifact(
+    tmp_path: Path,
+) -> None:
+    """AT-032a (gate) — the Checks affordance states what it checks + on what.
+
+    Intent: HLR-032 / US-029 — with the Patch Editor open, the operator sees a
+    clarity element on the Checks affordance whose rendered text contains the
+    key token span naming WHAT is checked (the loaded change document's checks)
+    and WHICH artifact it acts on (the loaded image) — not a bare "Run checks".
+    Observed through the shipped surface via ``str(widget.render())``, matching
+    how the other label-text tests in this file read rendered content (W3:
+    assert the substring/token span, not the whole string, not merely
+    "a Label exists"). Counterfactual (QC-2): revert to the bare button with no
+    description ⇒ the token span is absent → RED.
+    """
+    from textual.widgets import Label
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return str(app.query_one("#patch_checks_help", Label).render())
+
+    help_text = asyncio.run(_drive())
+    assert _CHECKS_HELP_TOKEN in help_text, (
+        f"the Checks help must state what + which artifact, got {help_text!r}"
+    )
+
+
+def test_at032b_clarity_added_action_wiring_unchanged(tmp_path: Path) -> None:
+    """AT-032b (regression) — clarity added; the run_checks wiring unchanged.
+
+    Intent: HLR-032 — the clarity fix is label/description ONLY, behavior
+    unchanged. Assert two things through the composed tree: (a) the Checks
+    affordance is no longer JUST a bare unqualified "Run checks" — the enriched
+    ``#patch_checks_help`` element is present with the token span; AND (b) the
+    action wiring is intact — ``#patch_checks_run_button`` still exists with its
+    ``run_checks`` action, and driving that action still routes (the check-run
+    status line appears). This pins "clarity added, behavior unchanged".
+
+    Note: the action wiring lives in a local dict inside the panel's
+    ``on_button_pressed`` handler (not a queryable method), so (b) is pinned by
+    the observable effect (pressing the button posts the "Checks:" status line)
+    per the spec's "drive run_checks and confirm it still routes" option, plus
+    the button label staying short. Counterfactual: leaving the bare button with
+    no help makes (a) fail; renaming the id makes the button query / the routed
+    action fail.
+    """
+    from textual.widgets import Button, Label
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # (a) the enriched clarity element is present, with the token span.
+            help_labels = list(app.query("#patch_checks_help").results(Label))
+            outcomes["help_present"] = len(help_labels) == 1
+            outcomes["help_text"] = str(
+                app.query_one("#patch_checks_help", Label).render()
+            )
+
+            # (b) the Checks button id is unchanged and still a SHORT label
+            # (not made verbose); pressing it routes the run_checks action.
+            checks_button = app.query_one("#patch_checks_run_button", Button)
+            outcomes["button_present"] = True
+            outcomes["button_label"] = str(checks_button.label)
+
+            # Driving the action still routes (behavior unchanged): a
+            # kind=change doc with no image posts the "Checks:" status line.
+            _set_entry_inputs(app, address="0x100", bytes_text="AA")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            checks_button.press()
+            await pilot.pause()
+            outcomes["checks_line"] = any(
+                line.startswith("Checks:") for line in app.log_lines
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["button_present"] is True, "the Checks button must still exist"
+    assert outcomes["help_present"] is True, (
+        "the enriched Checks clarity element must be present (not bare)"
+    )
+    assert _CHECKS_HELP_TOKEN in outcomes["help_text"], (
+        f"the Checks affordance must be qualified, got {outcomes['help_text']!r}"
+    )
+    # The button stays a SHORT label (clarity went into its own row, not a
+    # verbose button that risks the 5-button controls row overflowing at 80).
+    assert outcomes["button_label"] == "Run checks", (
+        f"the Checks button label must stay short, got "
+        f"{outcomes['button_label']!r}"
+    )
+    assert outcomes["checks_line"] is True, (
+        "pressing the Checks button must still route run_checks (behavior "
+        "unchanged)"
+    )

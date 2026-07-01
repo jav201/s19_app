@@ -44,6 +44,7 @@ Functional subsystems:
 20. A↔B Compare Load-Failure Honesty (batch-15)
 21. Selectable S19 Record Width + Populated S0 Header (batch-14)
 22. Declared-region UI round-trip + skip notice (batch-20)
+23. Patch-editor change-file management + Checks clarity (batch-21)
 
 ---
 
@@ -2858,3 +2859,26 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Status: Added batch-20 (US-025 / HLR-029). Closes batch-19 BACKLOG D-2.
 
 > Scoped out (BACKLOG): a region name containing a comma is not representable in the comma-delimited `name,start,end` line format (skipped as malformed); the construction-time scrub neutralizes injection content regardless.
+
+---
+
+# 27. Patch-editor change-file management + Checks clarity (batch-21)
+
+> Feature #8 (patch-editor overhaul), **slice 1**: give the patch editor a durable home for saved change documents and a way to reopen them, plus a one-line explanation of the Checks action. US-027 — change-document saves land in a dedicated global `patches/` folder (was the workarea root; `temp/` is staging-only). US-026 — a `Select` dropdown lists those saved change files (sorted) and loads the selected one via `ChangeService.load`. US-029 — a description Label states what Checks does and which artifact it runs against (button id + `run_checks` action unchanged). Read-path containment guard (F1) hardens the scan/load. Frozen-engine diff = 0. Stories: `.dev-flow/2026-06-29-batch-21/01-requirements.md`. AT/TC in `tests/test_tui_patch_editor_v2.py` + `tests/test_unified_write.py`.
+
+**R-PATCH-SAVE-FOLDER-001**: Change-document saves shall be placed in a dedicated global `.s19tool/workarea/patches/` folder (named by the new `WORKAREA_PATCHES="patches"` constant and created by `ensure_workarea`), never the workarea root; `temp/` remains staging-only. Two distinct saves shall not clobber one another on disk.
+- Code: `s19_app/tui/workspace.py::WORKAREA_PATCHES` (:19) + `ensure_workarea` mkdir (:47-48); `s19_app/tui/changes/io.py::write_change_document` placement under `workarea/patches/` (:1354) (US-027, HLR-031 / LLR-031.1–031.2).
+- Validation: `Automated` — `tests/test_tui_patch_editor_v2.py::test_at031a_save_doc_lands_in_patches_folder` (AT-031a) + `::test_at031b_two_saves_are_distinct_no_clobber` (AT-031b) + `tests/test_unified_write.py::test_tc031_write_target_resolves_under_patches_folder` (TC-031).
+- Status: Added batch-21 (US-027 / HLR-031). Advances feature #8 (patch-editor) slice 1.
+
+**R-PATCH-DOC-DROPDOWN-001**: On patch-screen activation and after each save, a `Select#patch_doc_file_select` dropdown shall list the change files scanned from `patches/` (sorted `.json` set, non-change files ignored, symlink entries skipped); selecting an entry shall load it via `ChangeService.load` after an `is_relative_to(patches/)` read-path containment check. An empty `patches/` shall render a placeholder without crashing, and a change file dropped directly into `patches/` shall be listed and loadable.
+- Code: `s19_app/tui/app.py::_scan_patch_change_files` (:2217-2240, sorted + symlink-skip), `_prefill_patch_change_files` (:1428-1431, post-save), load handler + F1 containment (:2315-2322); `s19_app/tui/screens_directionb.py::set_change_files` (:549/:587) → `Select#patch_doc_file_select` (:649), `Select.Changed` handler (:889) (US-026, HLR-030 / LLR-030.1–030.3).
+- Validation: `Automated` — `tests/test_tui_patch_editor_v2.py::test_at030a_dropdown_lists_and_loads_selected_change_file` (AT-030a, C-12 through-surface GATE over the handler-produced change file) + `::test_at030a_r2_save_while_open_appears_without_reactivation` (AT-030a-R2) + `::test_at030b_empty_patches_folder_renders_placeholder_no_crash` (AT-030b) + `::test_at030c_directly_dropped_file_is_listed_and_loadable` (AT-030c, consumer guard) + `::test_f1_symlink_entry_is_skipped_by_scan` (F1, security-adversarial) + `tests/test_unified_write.py::test_tc030_scan_returns_sorted_json_set_ignoring_non_change_files` (TC-030).
+- Status: Added batch-21 (US-026 / HLR-030). Consumes R-PATCH-SAVE-FOLDER-001's producer output.
+
+**R-PATCH-CHECKS-CLARITY-001**: The patch editor shall render a description Label `#patch_checks_help` under the Checks button reading `"Checks: runs the loaded change document's checks against the loaded image."`, stating both what the action does and which artifact it runs against; the Checks button id (`patch_checks_run_button`) and its `run_checks` action shall be unchanged (text-only clarity, no behavior change).
+- Code: `s19_app/tui/screens_directionb.py::#patch_checks_help` Label (:665-670), Checks button `patch_checks_run_button` (:662) + `run_checks` action (:856, UNCHANGED); `s19_app/tui/styles.tcss` Label CSS (:680-685) (US-029, HLR-032 / LLR-032.1–032.2).
+- Validation: `Automated` — `tests/test_tui_patch_editor_v2.py::test_at032a_checks_help_states_what_and_which_artifact` (AT-032a) + `::test_at032b_clarity_added_action_wiring_unchanged` (AT-032b).
+- Status: Added batch-21 (US-029 / HLR-032).
+
+> Scoped out (BACKLOG, deferred to later patch-editor slices — not gaps): US-028 (inline variant dropdown), US-030 (4-pane split — geometry SPIKE, needs host-width measurement + C-13.1 fallback), US-031 (4-pane geometry snapshots).

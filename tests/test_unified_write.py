@@ -69,6 +69,7 @@ from s19_app.tui.changes.io import (
 from s19_app.tui.changes.model import ChangeDocument
 from s19_app.tui.workspace import (
     WORKAREA_DIRNAME,
+    WORKAREA_PATCHES,
     WORKAREA_SUBDIR,
     WorkareaContainmentError,
 )
@@ -296,6 +297,36 @@ def test_tc018_write_target_resolves_under_workarea(tmp_path: Path) -> None:
     workarea = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR
     assert path.resolve().is_relative_to(workarea.resolve()), (
         f"the change file was written outside the work area: {path}"
+    )
+    assert path.exists() and path.suffix == ".json"
+    assert MF_WRITE_CONTAINMENT not in [i.code for i in issues]
+
+
+def test_tc031_write_target_resolves_under_patches_folder(
+    tmp_path: Path,
+) -> None:
+    """TC-031 (NET-NEW) — a save lands in the dedicated ``patches/`` folder.
+
+    HLR-031 / LLR-031.2 routes the final placement into
+    ``.s19tool/workarea/patches/`` (was the workarea root). The generic
+    containment tests above assert only ``is_relative_to(workarea)`` — which
+    ``patches/`` already satisfies — so they cannot detect the move. This
+    net-new assertion pins the exact placement subfolder: revert the placement
+    to the workarea root and this goes RED (the file lands one level up). It
+    also covers LLR-031.1 folder-creation — ``write_change_document`` calls
+    ``ensure_workarea``, so the patches folder exists after the save.
+    """
+    document = change_document_factory()
+
+    patches = tmp_path / WORKAREA_DIRNAME / WORKAREA_SUBDIR / WORKAREA_PATCHES
+    assert not patches.exists(), "patches/ must not pre-exist this fixture"
+
+    path, issues = write_change_document(document, tmp_path, "cs.json")
+
+    assert path is not None, f"write was rejected: {[i.code for i in issues]}"
+    assert patches.is_dir(), "the save must create the patches folder"
+    assert path.resolve().is_relative_to(patches.resolve()), (
+        f"the change file was not placed in the patches folder: {path}"
     )
     assert path.exists() and path.suffix == ".json"
     assert MF_WRITE_CONTAINMENT not in [i.code for i in issues]

@@ -677,6 +677,15 @@ Screen {
     padding: 0 1;
 }
 
+/* US-029 (HLR-032): the Checks affordance's one-line clarity row states what
+ * `#patch_checks_run_button` runs and on which artifact. It is a vertical row
+ * inside the `overflow-y:auto` panel (no horizontal-budget hit; mirrors the
+ * diff-row `width:100%; height:auto` pattern). */
+#patch_checks_help {
+    width: 100%;
+    height: auto;
+}
+
 #diff_range_list,
 #diff_hex_a,
 #diff_hex_b {
