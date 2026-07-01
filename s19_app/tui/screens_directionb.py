@@ -587,102 +587,150 @@ class PatchEditorPanel(ScrollableContainer):
         self.query_one("#patch_doc_file_select", Select).set_options(options)
 
     def compose(self) -> ComposeResult:
-        """Lay out the consolidated v2 Patch Editor widget tree.
+        """Lay out the consolidated v2 Patch Editor widget tree as a 2x2 grid.
 
         Summary:
-            Yield the single change-flow section (LLR-003.1): the entries
-            ``DataTable`` and its empty-state line, the address / value /
-            bytes input row with add / edit / remove buttons, the
-            change-file path ``Input`` with the Load / Validate / Apply /
-            Save / Run-checks control row, the persistent declaration-fault
-            area (count line + listing, LLR-002.8), the hidden save-back
-            prompt row (LLR-002.7), and the check-results area
-            (LLR-004.5). The panel is a :class:`ScrollableContainer`, so the
-            stacked content scrolls vertically when it exceeds the terminal
-            height.
+            Reparent the single change-flow section (LLR-003.1) into four
+            area-pane :class:`Container` s laid out 2x2 (HLR-033.1) —
+            ``#patch_pane_entries`` (top-left: entries table, empty-state,
+            entry inputs), ``#patch_pane_changefile`` (top-right: the
+            change-file row + the paste row), ``#patch_pane_checks``
+            (bottom-left: the declaration-fault count + listing, the checks
+            status line + results), and ``#patch_pane_variant``
+            (bottom-right: the execute-over-variants row). Each inner
+            sub-tree is moved wholesale — no inner id is renamed or
+            reordered, so every ``patch_*`` id and its action wiring stay
+            queryable (HLR-033.2). The hidden save-back prompt row is yielded
+            as a direct grid child after the four panes with ``column-span:
+            2`` (LLR-033.4), landing in the grid's ``auto`` third row so it
+            spans full width when shown without squeezing a pane. The panel
+            itself is styled ``layout: grid`` (styles.tcss), so each pane
+            scrolls vertically and independently (HLR-033.3).
 
         Args:
             None
 
         Returns:
-            ComposeResult: The Patch Editor widget tree.
+            ComposeResult: The Patch Editor widget tree — four ``#patch_pane_*``
+            containers plus the spanning save-back row.
+
+        Data Flow:
+            - Each pane ``Container`` wraps its area's pre-existing widget
+              sub-tree intact; the panel's ``layout: grid; grid-size: 2 3``
+              CSS places the four panes in the top two ``1fr`` rows and the
+              save-back span in the ``auto`` third row.
 
         Dependencies:
             Used by:
                 - Textual ``ScrollableContainer`` compose lifecycle
         """
-        yield Label(
-            "Change document (v2 JSON)", classes="patch-section-title"
-        )
-        yield DataTable(
-            id="patch_doc_entries_table",
-            zebra_stripes=True,
-            cursor_type="row",
-        )
-        yield Static(
-            self.EMPTY_STATE_TEXT,
-            id="patch_doc_empty_state",
-            markup=False,
-        )
-        yield Container(
-            Label("Address", classes="patch-field-label"),
-            Input(placeholder="0x100", id="patch_entry_address_input"),
-            Label("String value", classes="patch-field-label"),
-            Input(
-                placeholder="text (document encoding)",
-                id="patch_entry_value_input",
-            ),
-            Label("Bytes", classes="patch-field-label"),
-            Input(placeholder="DE AD BE EF", id="patch_entry_bytes_input"),
-            Horizontal(
-                Button("Add", id="patch_entry_add_button"),
-                Button("Edit", id="patch_entry_edit_button"),
-                Button("Remove", id="patch_entry_remove_button"),
-                id="patch_doc_entry_buttons",
-            ),
-            id="patch_doc_entry_inputs",
-        )
-        yield Container(
-            Label("Change file", classes="patch-field-label"),
-            Select(
-                [],
-                id="patch_doc_file_select",
-                prompt="Change files in patches/",
-                allow_blank=True,
-            ),
-            Input(
-                placeholder="path to v2 change-set .json",
-                id="patch_doc_path_input",
-            ),
-            Horizontal(
-                Button("Load", id="patch_doc_load_button"),
-                Button("Validate", id="patch_doc_validate_button"),
-                Button("Apply", id="patch_doc_apply_button"),
-                Button("Save", id="patch_doc_save_button"),
-                Button("Run checks", id="patch_checks_run_button"),
-                id="patch_doc_controls",
-            ),
-            Label(
-                "Checks: runs the loaded change document's checks against "
-                "the loaded image.",
-                id="patch_checks_help",
-                classes="patch-field-label",
-            ),
-            id="patch_doc_file_row",
-        )
         yield Container(
             Label(
-                "Paste change-set (v2 JSON)", classes="patch-field-label"
+                "Change document (v2 JSON)", classes="patch-section-title"
             ),
-            TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
-            Horizontal(
-                Button("Parse pasted", id="patch_paste_parse_button"),
-                id="patch_paste_controls",
+            DataTable(
+                id="patch_doc_entries_table",
+                zebra_stripes=True,
+                cursor_type="row",
             ),
-            id="patch_paste_row",
+            Static(
+                self.EMPTY_STATE_TEXT,
+                id="patch_doc_empty_state",
+                markup=False,
+            ),
+            Container(
+                Label("Address", classes="patch-field-label"),
+                Input(placeholder="0x100", id="patch_entry_address_input"),
+                Label("String value", classes="patch-field-label"),
+                Input(
+                    placeholder="text (document encoding)",
+                    id="patch_entry_value_input",
+                ),
+                Label("Bytes", classes="patch-field-label"),
+                Input(
+                    placeholder="DE AD BE EF", id="patch_entry_bytes_input"
+                ),
+                Horizontal(
+                    Button("Add", id="patch_entry_add_button"),
+                    Button("Edit", id="patch_entry_edit_button"),
+                    Button("Remove", id="patch_entry_remove_button"),
+                    id="patch_doc_entry_buttons",
+                ),
+                id="patch_doc_entry_inputs",
+            ),
+            id="patch_pane_entries",
         )
-        yield Label("", id="patch_doc_issue_count", classes="patch-field-label")
-        yield Static("", id="patch_doc_issues", markup=False, classes="hidden")
+        yield Container(
+            Container(
+                Label("Change file", classes="patch-field-label"),
+                Select(
+                    [],
+                    id="patch_doc_file_select",
+                    prompt="Change files in patches/",
+                    allow_blank=True,
+                ),
+                Input(
+                    placeholder="path to v2 change-set .json",
+                    id="patch_doc_path_input",
+                ),
+                Horizontal(
+                    Button("Load", id="patch_doc_load_button"),
+                    Button("Validate", id="patch_doc_validate_button"),
+                    Button("Apply", id="patch_doc_apply_button"),
+                    Button("Save", id="patch_doc_save_button"),
+                    Button("Run checks", id="patch_checks_run_button"),
+                    id="patch_doc_controls",
+                ),
+                Label(
+                    "Checks: runs the loaded change document's checks "
+                    "against the loaded image.",
+                    id="patch_checks_help",
+                    classes="patch-field-label",
+                ),
+                id="patch_doc_file_row",
+            ),
+            Container(
+                Label(
+                    "Paste change-set (v2 JSON)",
+                    classes="patch-field-label",
+                ),
+                TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
+                Horizontal(
+                    Button("Parse pasted", id="patch_paste_parse_button"),
+                    id="patch_paste_controls",
+                ),
+                id="patch_paste_row",
+            ),
+            id="patch_pane_changefile",
+        )
+        yield Container(
+            Label(
+                "", id="patch_doc_issue_count", classes="patch-field-label"
+            ),
+            Static(
+                "", id="patch_doc_issues", markup=False, classes="hidden"
+            ),
+            Label("", id="patch_checks_status", classes="patch-field-label"),
+            Container(id="patch_checks_results"),
+            id="patch_pane_checks",
+        )
+        yield Container(
+            Container(
+                Label(
+                    "Execute over variants", classes="patch-field-label"
+                ),
+                Horizontal(
+                    Button(
+                        f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
+                        id="patch_execute_scope_button",
+                    ),
+                    Button("Execute scope", id="patch_execute_run_button"),
+                    id="patch_execute_buttons",
+                ),
+                id="patch_execute_row",
+            ),
+            id="patch_pane_variant",
+        )
         yield Container(
             Label("Save patched image as:", classes="patch-field-label"),
             Input(id="patch_saveback_name_input"),
@@ -698,20 +746,6 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_saveback_row",
             classes="hidden",
         )
-        yield Container(
-            Label("Execute over variants", classes="patch-field-label"),
-            Horizontal(
-                Button(
-                    f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
-                    id="patch_execute_scope_button",
-                ),
-                Button("Execute scope", id="patch_execute_run_button"),
-                id="patch_execute_buttons",
-            ),
-            id="patch_execute_row",
-        )
-        yield Label("", id="patch_checks_status", classes="patch-field-label")
-        yield Container(id="patch_checks_results")
 
     def on_mount(self) -> None:
         """Initialise the entries table columns and the empty state.

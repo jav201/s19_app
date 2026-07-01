@@ -9,12 +9,14 @@ Covers the increment-12 LLRs:
     firmware / A2L / MAC artifact is ever loaded.
 
 Test cases:
-  - TC-016-S — the 27-baseline ``pytest-textual-snapshot`` SVG matrix:
+  - TC-016-S — the 28-baseline ``pytest-textual-snapshot`` SVG matrix:
     the 4 restyled screens (Workspace, A2L Explorer, MAC View, Issues
     Report) x {compact, comfortable} x {80x24, 120x30, 160x40} = 24
-    baselines, plus the 3 additive scaffold screens (Memory Map, Patch
-    Editor, A2B Diff) at the 120x30 primary size only = 3 baselines.
-    27 baseline ``.svg`` files total (requirements section 5.5).
+    baselines, plus the additive scaffold screens: Memory Map + A2B Diff at
+    the 120x30 primary size (2), and the Patch Editor at both 80x24 and
+    120x30 to lock the batch-22 US-030 2x2 four-pane layout at the floor and
+    the primary width (2) = 4 scaffold baselines.
+    28 baseline ``.svg`` files total (batch-22 US-031 adds the patch 80x24 cell).
   - TC-016-S public-fixture sub-case — the snapshot setup loads no client
     artifact; every baseline traces to a ``conftest.py`` generator.
   - TC-016 / CV-04 — the 119/120-column breakpoint boundary check: the
@@ -360,7 +362,7 @@ def _snapshot_run_before(
 
 
 # ---------------------------------------------------------------------------
-# TC-016-S — the 27-baseline snapshot SVG matrix (LLR-007.1 / LLR-007.2)
+# TC-016-S — the 28-baseline snapshot SVG matrix (LLR-007.1 / LLR-007.2)
 # ---------------------------------------------------------------------------
 
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
@@ -371,20 +373,23 @@ _RESTYLED_CELLS = [
     for size_key in _SIZES
 ]
 
-# 3 cells: the additive scaffolds at the 120x30 primary size, comfortable.
-# The patch cell's baseline predates the batch-07 consolidated v2 Patch
-# Editor (§6.6: exactly this ONE baseline regenerates — in the canonical CI
-# env only, never locally); until that regen lands the cell is an expected
-# mismatch.
+# Additive scaffold cells at the 120x30 primary size, comfortable — PLUS the
+# patch screen additionally at the 80x24 floor, to lock the batch-22 US-030
+# 2x2 four-pane layout at both the tight floor and the primary width
+# (HLR-034.1 / US-031). Every patch baseline regenerates in the canonical CI
+# env only (§6.6 + snapshot-regen-env convention): the pre-batch baseline
+# predates the batch-07 v2 editor AND the batch-22 2x2 relayout changes it
+# again, so until the CI regen lands each patch cell is an expected mismatch
+# (xfail, non-strict). map/diff are unchanged (120x30 only).
 _SCAFFOLD_CELLS = [
     pytest.param(
         screen,
         "comfortable",
-        "120x30",
-        id=f"{screen}-comfortable-120x30",
+        size_key,
+        id=f"{screen}-comfortable-{size_key}",
         marks=(
             pytest.mark.xfail(
-                reason="baseline regen pending in CI env (batch-07 E3b)",
+                reason="baseline regen pending in CI env (batch-22 US-031 2x2 relayout)",
                 strict=False,
             ),
         )
@@ -392,9 +397,10 @@ _SCAFFOLD_CELLS = [
         else (),
     )
     for screen in _SCAFFOLD_SCREENS
+    for size_key in (("80x24", "120x30") if screen == "patch" else ("120x30",))
 ]
 
-# 24 + 3 = 27 baseline cells (requirements section 5.5).
+# 24 + 4 = 28 baseline cells (batch-22 US-031 adds the patch 80x24 floor cell).
 _ALL_SNAPSHOT_CELLS = _RESTYLED_CELLS + _SCAFFOLD_CELLS
 
 
@@ -422,10 +428,10 @@ def test_tc016s_density_layout_snapshot(
     app renders only the public synthetic ``conftest.py`` generators; no
     client artifact is opened.
 
-    The 27-cell matrix: the 4 restyled screens carry the full
-    {density x size} grid (24 cells); the 3 additive scaffolds, which have
-    no pre-batch behavior to regress, are pinned at 120x30 comfortable
-    (3 cells).
+    The 28-cell matrix: the 4 restyled screens carry the full
+    {density x size} grid (24 cells); map + diff scaffolds are pinned at
+    120x30 comfortable (2 cells); the patch scaffold carries 80x24 + 120x30
+    to lock the batch-22 2x2 four-pane layout at both regimes (2 cells).
     """
     width, height = _SIZES[size_key]
     app = S19TuiApp(base_dir=tmp_path)
