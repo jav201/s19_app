@@ -45,6 +45,7 @@ Functional subsystems:
 21. Selectable S19 Record Width + Populated S0 Header (batch-14)
 22. Declared-region UI round-trip + skip notice (batch-20)
 23. Patch-editor change-file management + Checks clarity (batch-21)
+24. Patch-editor 4-pane 2×2 layout (batch-22)
 
 ---
 
@@ -2882,3 +2883,19 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Status: Added batch-21 (US-029 / HLR-032).
 
 > Scoped out (BACKLOG, deferred to later patch-editor slices — not gaps): US-028 (inline variant dropdown), US-030 (4-pane split — geometry SPIKE, needs host-width measurement + C-13.1 fallback), US-031 (4-pane geometry snapshots).
+
+---
+
+# 28. Patch-editor 4-pane 2×2 layout (batch-22)
+
+> Feature #8 (patch-editor overhaul), **slice 2**: reorganize the Patch Editor from a single ~12-group vertical scroll into a 2×2 grid of four independently-scrolling area-panes (Entries · Change-file · Checks · Variant), all visible together, with the save-back prompt spanning full width below. View-layer only; frozen-engine diff = 0. Phase-0 measurement de-risked it: measured host content = 70 cols @80 / 92 @120 (batch-21's ~37/~58 estimate was wrong) → a 2×2 (~35/~46 per pane) rather than a cramped 4-across. Stories: `.dev-flow/2026-07-01-batch-22/01-requirements.md`. AT/TC in `tests/test_tui_patch_layout.py` + `tests/test_tui_snapshot.py`.
+
+**R-PATCH-2X2-LAYOUT-001**: The Patch Editor shall lay its four area-panes out as a 2×2 grid — `#patch_pane_entries` (top-left), `#patch_pane_changefile` (top-right), `#patch_pane_checks` (bottom-left), `#patch_pane_variant` (bottom-right) — all visible together, each pane scrolling vertically and independently (`overflow-y: auto; overflow-x: hidden`). `#patch_editor_panel` shall be `layout: grid; grid-size: 2 3` with `grid-rows: 1fr 1fr auto`; the hidden `#patch_saveback_row` shall be a `column-span: 2` grid child in the `auto` third row (full width when shown, zero-height while hidden, panes not squeezed). Each area's pre-existing widget sub-tree is reparented wholesale — every `patch_*` inner id and its action wiring stay queryable. The Change-file control row `#patch_doc_controls` shall be an explicit `layout: grid; grid-size: 3` (Textual `Horizontal` does not wrap → would clip its five buttons) so Load·Validate·Apply·Save·Run-checks flow to two rows within the pane budget. The 2×2 holds at both supported terminal sizes (80×24 floor, 120×30).
+- Code: `s19_app/tui/screens_directionb.py::PatchEditorPanel.compose` four-pane reparent + save-back span child; `s19_app/tui/styles.tcss` `#patch_editor_panel` grid, `#patch_pane_*` overflow, `#patch_saveback_row { column-span: 2 }`, `#patch_doc_controls { grid-size: 3 }` (US-030, HLR-033 / LLR-033.1–033.4).
+- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at_033a_two_by_two_at_80_floor` (AT-033a, 80-col floor boundary gate) + `::test_at_033b_two_by_two_at_120` (AT-033b) + `::test_at_033c_reparent_safety_at_80` + `::test_at_033c_reparent_safety_at_120` (AT-033c, reparent-safety) + `::test_tc_pane_styles_and_grid` (TC-033, white-box grid + `grid_size_columns == 3`).
+- Status: Added batch-22 (US-030 / HLR-033). Advances feature #8 (patch-editor) slice 2. Frozen-engine diff = 0.
+
+**R-PATCH-2X2-SNAPSHOT-001**: The Patch Editor 2×2 layout shall be pixel-locked by SVG snapshot cells at 80×24 and 120×30 (snapshot matrix 27→28). Because `pytest-textual-snapshot` baselines regenerate only in the canonical CI environment (local regen drifts unrelated baselines), both patch cells ride `xfail(strict=False)` until the CI baseline lands — neither failing the suite nor claiming a pass. The 2×2 is behaviorally proven by `R-PATCH-2X2-LAYOUT-001`'s AT set; this row locks the pixels once the baseline exists.
+- Code: `tests/test_tui_snapshot.py` `_SCAFFOLD_CELLS` patch cells (`xfail(strict=False)`), `patch` in `_SCAFFOLD_SCREENS`, `_SIZES` (US-031, HLR-034 / LLR-034.1–034.2).
+- Validation: `CI-locked` (xfail-until-baseline) — `tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]` (AT-034a) + `::...[patch-comfortable-120x30]` (AT-034b); SKIP-local / xfail-CI until the canonical-CI baseline is regenerated, then flip to `Automated`.
+- Status: Added batch-22 (US-031 / HLR-034). Follow-on: regenerate the two `patch-comfortable-*` baselines in CI, confirm green, promote to `Automated`.

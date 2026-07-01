@@ -1,127 +1,105 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-06-29-batch-21",
-    "batch_objective": "#8 Patch-editor overhaul (P1, largest open feature). SCOPE-FIRST Phase 0: decompose into stories before any code (high blast radius). Candidate sub-features (from BACKLOG): 4-pane split of PatchEditorPanel (currently a single ScrollableContainer @screens_directionb.py:335) + change-file default (changes.json) + change-file dropdown + dedicated workarea folder + variant dropdown + Checks-button fix. C-13 geometry-budget is a PRIME case — each pane's 80/120-col budget verified at draft time (don't assume); C-13.1 deficit-matched fallback for any overflow. Likely spans MULTIPLE batches -> operator picks the batch-21 in-scope slice at the DoR gate. Engine-frozen set OFF-LIMITS; TUI-side write logic -> tui/changes/io.py.",
+    "batch_id": "2026-07-01-batch-22",
+    "batch_objective": "#8 Patch-editor overhaul — SLICE 2: US-030 (4-pane split of PatchEditorPanel) + US-031 (4-pane geometry snapshots, rides with it). The headline geometry-heavy story deferred from batch-21. PatchEditorPanel is a single vertical ScrollableContainer @screens_directionb.py:335; the 4-pane split is net-new STRUCTURAL work. **C-13 / C-13.1 is the PRIME case** — Phase 0 is a MEASUREMENT SPIKE: measure the patch-editor host content width at 80 AND 120 cols at draft time (batch-21 est. ~37/~58, UNVERIFIED), compute each pane's budget (available − fixed siblings vs required footprint), and pre-commit a deficit-matched fallback ladder BEFORE any HLR/code. Engine-frozen set OFF-LIMITS; TUI-side write logic -> tui/changes/io.py. Full /dev-flow.",
     "current_phase": 6,
     "phase_status": "awaiting-sync",
     "iterations_per_phase": {"0": 1, "1": 1, "2": 1, "3": 1, "4": 1, "5": 1, "6": 1},
     "artifacts": {
         "backlog": ".dev-flow/BACKLOG.md"
     },
-    "branch": "claude/naughty-rhodes-96200c (ff'd to origin/main ec3a2a7 per RC-1 at batch-21 open; batch-20 PR #32 merged). Worktree reused (batch-20 ran + merged on it cleanly). Operator editor may not be rooted here -> inline-paste-at-gates protocol (formalized batch-20, dev-flow.md point 5).",
+    "branch": "claude/naughty-rhodes-96200c (== origin/main 13c06c4 per RC-1). During batch-22 Phase-2, origin/main advanced 74f19ac->13c06c4 via the CONCURRENT hooks task (task_2d3e38b5 I spawned batch-21): PR #33 (merge 13c06c4) shipped the shift-left artifact-completeness pre-commit hook (.claude/settings.json PreToolUse + .dev-flow/tools/validate_phase_artifacts.py) + F1/F2/F4/F5 PR-review fixes. Those 3 commits touch ONLY .claude/settings.json/.dev-flow/tools/.gitignore -> ZERO overlap with batch-22 targets (screens_directionb.py/styles.tcss/patch tests). Branch ff'd 74f19ac->13c06c4 (uncommitted batch-22 work preserved via stash). The new hook is now present and WILL validate batch-22 artifacts at its close-commit (phase>=4). Same worktree; inline-paste at gates.",
     "previous_batches": [
         "2026-05-05-batch-01","2026-05-20-batch-02","2026-05-21-batch-03","2026-05-21-batch-04",
         "2026-05-26-batch-05","2026-06-09-batch-06","2026-06-10-batch-07","2026-06-11-batch-08",
         "2026-06-11-batch-09","2026-06-13-batch-10","2026-06-14-batch-11","2026-06-16-batch-12",
         "2026-06-17-batch-13","2026-06-23-batch-14","2026-06-24-batch-15","2026-06-25-batch-16",
-        "2026-06-26-batch-17","2026-06-26-batch-18","2026-06-29-batch-19","2026-06-29-batch-20"
+        "2026-06-26-batch-17","2026-06-26-batch-18","2026-06-29-batch-19","2026-06-29-batch-20","2026-06-29-batch-21"
     ],
-    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. batch-20 closing state (obsidian_synced true) snapshotted to .dev-flow/2026-06-29-batch-20/state-snapshot-at-close.json at batch-21 init -> rides batch-21's first commit (batch-13/batch-20 pattern). batch-20 merged PR #32 (ec3a2a7).",
-    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. TUI-side write logic -> tui/changes/io.py (batch-10). app.py + screens.py + screens_directionb.py + services/ are OUTSIDE the frozen set.",
+    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. batch-21 closing state (obsidian_synced true) snapshotted to .dev-flow/2026-06-29-batch-21/state-snapshot-at-close.json at batch-22 init -> rides batch-22's first commit (batch-13/20/21 pattern). Also carried: the uncommitted BACKLOG.md UI-focus optional item (batch-21 post-close). batch-21 merged PR #34 (74f19ac).",
+    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. TUI-side write logic -> tui/changes/io.py. screens_directionb.py + app.py + styles.tcss are OUTSIDE the frozen set (the 4-pane split lives here).",
     "decisions_log": [
         {
             "phase": 0,
-            "date": "2026-06-29",
-            "decision": "batch-21-initialized-issue8-decomposition-spike",
-            "notes": "Operator: start next batch = #8 patch-editor overhaul (P1, top of queue per batch-20 postmortem + BACKLOG). RC-1 base-currency PASS: git fetch -> origin/main=ec3a2a7 (batch-20 PR #32 merged); branch ff'd 45be027->ec3a2a7 (HEAD==origin/main tip, derive against latest). batch-20 closing state snapshotted. batch-21 scaffolded. Phase 0 = SCOPE-FIRST DECOMPOSITION SPIKE (#8 is the largest/highest-blast-radius item, mandatory decompose-before-code): Explore agent mapping the PatchEditorPanel surface + the 6 candidate sub-features. Next: synthesize spike -> candidate stories + INVEST/DoR -> operator picks batch-21 in-scope slice (likely a subset; #8 spans multiple batches). NOTE: this Phase-0 scaffold was produced by a concurrent/earlier /dev-flow run on the shared worktree; the resuming session adopted it per the awaiting-gate don't-regenerate rule (artifact spike-verified against ec3a2a7, sound + current)."
-        },
-        {
-            "phase": 0,
-            "date": "2026-06-30",
-            "decision": "dor-gate-decisions-recorded",
-            "notes": "Operator DoR decisions: (1) batch-21 SLICE = US-026 (change-file dropdown) + US-027 (dedicated workarea folder) — coupled change-file-management; US-028 variant dropdown DEFERRED, US-030/031 4-pane split DEFERRED to own geometry batch. (2) US-029 REFINED -> READY: operator clarified the Checks button is a CLARITY/affordance defect (not functional — spike found no crash/dead-wiring/TODO/failing-test): label+position don't communicate WHAT it does or WHICH artifact it acts on. §2.6 updated (US-029 READY)."
-        },
-        {
-            "phase": 0,
-            "date": "2026-06-30",
-            "decision": "approved",
-            "notes": "Operator APPROVED Phase 0 -> advance to Phase 1 with scope = US-026 + US-027 + US-029 (US-029 included). iterations_per_phase[0]=1. RC-1 Phase-1-entry per-story already-shipped check PASS (vs ec3a2a7): US-026 set_change_files/dropdown ABSENT, US-027 patch-folder const ABSENT -> both net-new; seams confirmed (DEFAULT_CHANGE_FILE_NAME=changes.json io.py:127, Run-checks button screens_directionb.py:591, set_variants pattern :1139). Dispatching architect ∥ qa-reviewer."
-        },
-        {
-            "phase": 1,
-            "date": "2026-06-30",
-            "decision": "approved",
-            "notes": "Operator APPROVED Phase 1 -> advance to Phase 2 cross-review. iterations_per_phase[1]=1. Dispatching architect ∥ qa-reviewer ∥ security-reviewer. Carry: R1 (which test asserts temp/ path) to resolve in review."
-        },
-        {
-            "phase": 2,
-            "date": "2026-06-30",
-            "decision": "approved",
-            "notes": "Operator APPROVED Phase 2 -> advance to Phase 3. iterations_per_phase[2]=1. Toolchain PASS (ruff 0.15.17 + pytest 9.0.3, verified this session). Dispatching software-dev for Increment 1 (HLR-031 folder)."
+            "date": "2026-07-01",
+            "decision": "batch-22-initialized-US030-4pane-geometry-spike",
+            "notes": "Operator picked #8 US-030 (4-pane split) as batch-22 (next P1 in the sequence, over US-028/hooks/#12). RC-1 PASS: git fetch -> origin/main=74f19ac (batch-21 PR #34 merged); branch ff'd 590ac30->74f19ac (HEAD==origin/main, uncommitted BACKLOG/state edits preserved via stash). batch-21 closing state snapshotted. batch-22 scaffolded. Phase 0 = MEASUREMENT SPIKE (C-13/C-13.1 prime case)."
         },
         {
             "phase": 6,
-            "date": "2026-06-30",
-            "decision": "awaiting-gate",
-            "notes": "Phase 6 docs (docs-writer ∥ presentation-builder, written to WORKTREE) -> 06-docs/traceability-matrix.md (dual chains, 11 real reconciled nodes, 0 gaps; AT-030a=C-12 gate, AT-030c=guard, F1=security-adversarial), functionality.md (walkthrough + maintainer seams + security note), diagrams/batch-21-flows.md (2 Mermaid: save->patches->dropdown->load C-12 chain + change-file-row component), executive-summary.md (plain-language). REQUIREMENTS.md §27 ADDED (R-PATCH-SAVE-FOLDER-001 / R-PATCH-DOC-DROPDOWN-001 / R-PATCH-CHECKS-CLARITY-001, all Automated; no code collision) + index line 23. Fixed docs-writer's US-028 mislabel (variant dropdown, not delete/rename). BACKLOG refreshed: #8 slice-1 US-026/027/029 -> DONE (§27), remaining slices reordered (US-030 geometry batch NEXT, US-028, US-031), C-14 added, tip ec3a2a7. No placeholders. ALL WORK UNCOMMITTED on claude/naughty-rhodes-96200c. Awaiting Phase-6 gate + commit/PR approval -> /dev-flow-sync.",
-            "_note": "prior phase-5 approved entry retained below"
+            "date": "2026-07-01",
+            "decision": "approved-awaiting-sync",
+            "notes": "Operator APPROVED Phase 6 + commit/PR. iterations_per_phase[6]=1. state -> awaiting-sync. Committing code+artifacts on claude/naughty-rhodes-96200c (== 13c06c4) -> PR to main -> tui-ci -> merge -> /dev-flow-sync. The pre-commit validate_phase_artifacts hook fires on this commit (first real use). Phase 6 docs (docs-writer ∥ presentation-builder, written to WORKTREE) -> 06-docs/traceability-matrix.md (US-030 5 geometry nodes PASS; US-031 2 snapshot cells CI-locked, behaviorally covered by US-030 AT, not orphan), functionality.md, diagrams/batch-22-flows.md (2x2 layout + reparent mapping Mermaid), executive-summary.md (honest on snapshot-CI-baseline). REQUIREMENTS.md §28 ADDED (R-PATCH-2X2-LAYOUT-001 Automated + R-PATCH-2X2-SNAPSHOT-001 CI-LOCKED not Automated-passing; no collision) + index line 24. BACKLOG refreshed: #8 slice-2 US-030/031 -> DONE (§28), US-028 = last #8 story (NEXT), tip 13c06c4, sequence dedup'd. No placeholders. ALL WORK UNCOMMITTED on claude/naughty-rhodes-96200c (== 13c06c4). Awaiting Phase-6 gate + commit/PR approval -> /dev-flow-sync. NOTE: the new pre-commit hook (validate_phase_artifacts.py) WILL fire on the batch-22 commit (phase>=4) -> validates the batch-22 artifacts.",
+            "_superseded_phase5": "Operator APPROVED Phase 5 (don't-encode/watch)."
         },
         {
             "phase": 5,
-            "date": "2026-06-30",
-            "decision": "approved-superseded-by-phase6",
-            "notes": "Operator APPROVED Phase 5 + the C-14 control encoding. Advancing to Phase 6 docs (docs-writer ∥ presentation-builder)."
-        },
-        {
-            "phase": 5,
-            "date": "2026-06-30",
+            "date": "2026-07-01",
             "decision": "approved-superseded",
-            "notes": "Phase 5 post-mortem (architect ∥ qa co-author) -> 05-postmortem.md. PASS clean run, 0 iterations/0 blockers. HEADLINE: supersession-census SCOPE gap (keyed white-box placement tests, missed 2 e2e save-observers on a location-move; caught by dev at Inc1, fail-loud held, net-0 rewrite). 2 AT-authoring folds killed a flaky gate (sort+select-by-name) + a vacuous gate (save_doc producer). Agent stalls (Inc2 software-dev + Phase-4 qa) -> orchestrator direct verification, independent lens preserved (3x code-reviewer + Phase-2 qa). Operator callout on hollow iterate menu -> corrected+memory+hooks-task. C-13 by-structure (geometry SPIKE deferred). Deferred: US-030 (geometry batch next), US-028, US-031. N1 docstring LOW. OPERATOR DECISION at gate: ENCODE the census control -> C-14 (Location-move census sweep) ENCODED in ~/.claude/commands/dev-flow.md Phase-2 census guidance (permission-gated, control-encode-approval rule). iterations_per_phase[5]=1.",
-            "_note": "prior phase-4 approved entries retained below"
+            "notes": "OPERATOR DECISION at Phase-5 gate: DON'T ENCODE; WATCH — no control added this batch (both candidates leaned against; existing controls held). Overclaim pattern = watch for 3rd instance; framework-behavior = existing draft-time-verify rule working. No global edits. Phase 5 post-mortem (architect ∥ qa) -> 05-postmortem.md. PASS clean run, 0 iterations/0 blockers. HEADLINE: Phase-0 measurement spike de-risked the deferred story (measured host 70/92, batch-21's ~37/~58 WRONG; 4-across->2x2). R1 false-premise (Horizontal doesn't wrap) caught at cross-review, folded before code. Reparent census proved completeness (id-set diff, 39 ids preserved). Snapshot honesty (no fabricated local pass; geometry AT is behavioral verdict). 2 orchestrator self-folds (F1 overclaim, F1b stale labels) -> OVERCLAIM PATTERN flagged. Concurrent hooks-task-on-main (PR #33) benign. Agent-stall avoidance (Inc2+Phase4 direct). 2 CANDIDATE CONTROLS surfaced for operator (both leaned AGAINST encoding): (1) framework-behavior draft-time verify = existing rule working; (2) assertion<=evidence overclaim check = watch for 3rd instance. RECOMMENDATION: don't encode now. Deferred: US-028 next, #12. CI baseline regen post-merge (gated). Awaiting operator Phase-5 gate + control decision.",
+            "_superseded_phase4": "Operator APPROVED Phase 4 (PASS)."
         },
         {
             "phase": 4,
-            "date": "2026-06-30",
+            "date": "2026-07-01",
             "decision": "approved-superseded",
-            "notes": "Operator approved Inc3 -> Phase 3 COMPLETE. iterations_per_phase[3]=1. Phase 4 validation -> 04-validation.md. VERDICT PASS. Executed DIRECTLY by orchestrator (qa-agent stall pattern this session; full evidence held). 11 AT/TC ids reconciled to real nodes (V-5), all PASS: AT-031a/b + TC-031 (folder), AT-030a(C-12 gate)/030a-r2/030b/030c + F1 + TC-030 (dropdown), AT-032a/b (clarity). Both layers green, bidirectional matrix complete, 3 counterfactual REDs (Inc1 placement->root, Inc2 scan->[], Inc3 remove Label), 0 blocker (each US has black-box deliverable obs). Full non-slow 953 passed/29 skip/3 xfail/0 FAIL (985 collected, 974+11). ruff clean, frozen 0, no SVG regen. NO §6.5 amendment. Gaps: US-028/030/031 deferred; process carries (census-missed-e2e-globs + agent-stall/checkpoint-before-long-run) -> Phase 5; N1 docstring LOW. iterations_per_phase[4]=1. Awaiting operator Phase-4 gate -> Phase 5+6.",
-            "_note": "prior inc3 entry retained below"
+            "notes": "Operator confirmed Inc2 -> Phase 3 COMPLETE (985->991 +6, 0 fail, frozen 0). iterations_per_phase[3]=1. Phase 4 validation -> 04-validation.md. VERDICT PASS (executed directly, qa-agent stall pattern). V-5: 5 geometry nodes PASS (test_at_033a_two_by_two_at_80_floor, _033b_two_by_two_at_120, _033c_reparent_safety_at_80/_120, test_tc_pane_styles_and_grid); 2 snapshot cells (patch-80x24/120x30) SKIP-local/xfail-CI. US-030 fully validated behaviorally (geometry ATs green); US-031 snapshot cells authored + CI-locked (honest xfail-until-baseline; 2x2 proven by US-030 AT -> NOT a blocker; no fabricated pass). Bidirectional matrix complete. Counterfactual RED = AT-033a (Inc1). Full non-slow 958 passed/30 skip/3 xfail/0 FAIL. Frozen 0, ruff (1 pre-existing F401 left). iterations_per_phase[4]=1. Gaps: CI baseline regen post-merge, F2 save-back-span->BACKLOG, pre-existing F401. Awaiting operator Phase-4 gate.",
+            "_note": "prior inc entries below"
         },
         {
             "phase": 3,
-            "date": "2026-06-30",
-            "decision": "inc3-awaiting-gate-phase3-complete",
-            "notes": "Phase-3 Increment 3 (HLR-032 / US-029 Checks clarity) IMPLEMENTED -> increment-3.md. 3 files (screens_directionb.py + styles.tcss + test_tui_patch_editor_v2.py). Label id=patch_checks_help 'Checks: runs the loaded change document's checks against the loaded image.' own vertical row (:665-670) + CSS width:100%/height:auto (:680-685). Button id + run_checks action UNCHANGED (grep-confirmed no +/-). AT-032a (token substring via render()), AT-032b (genuine: button.press -> run_checks -> dynamic 'Checks:' status line, different path from static Label). Counterfactual RED: remove Label -> NoMatches on #patch_checks_help. Full non-slow 983->985 collected (+2), 953 passed/0 fail. ruff clean. Frozen 0. No SVG baseline. code-reviewer APPROVE (0 findings; agent delivered packet, no stall this time). PHASE 3 COMPLETE (3/3 increments, ledger 974->985 +11 net: Inc1 +3, Inc2 +6, Inc3 +2; 2 e2e globs rewritten-in-place Inc1). Awaiting operator Inc3/Phase-3 gate -> Phase 4 validation.",
-            "_note": "prior inc2-approved entry retained below"
+            "date": "2026-07-01",
+            "decision": "inc1-approved-inc2-awaiting-gate",
+            "notes": "Operator APPROVED Inc1 (2x2 reparent). Phase-3 Increment 2 (HLR-034 / US-031 snapshot lock) IMPLEMENTED DIRECTLY by orchestrator (small test-only edit; agent-stall avoidance) -> increment-2.md. 1 file (tests/test_tui_snapshot.py). _SCAFFOLD_CELLS restructured: patch scaffold -> 80x24 (NEW) + 120x30 cells, both xfail(strict=False, batch-22 US-031 relayout reason); map/diff unchanged. Matrix 27->28. R3 CONFIRMED: patch in _SCAFFOLD_SCREENS not _RESTYLED_SCREENS (only patch cells affected). Locally the 2 patch cells SKIP (pytest-textual-snapshot dev-only, absent) -> in CI they run+xfail-until-baseline-regen; NO fabricated local pass (behavioral verdict = Inc1 AT-033a/b). Pre-existing F401 (Optional unused :57) on origin/main -> left per surgical rule (flagged, like batch-21 N1). code-reviewer dispatched + full non-slow bg. PHASE 3 will be COMPLETE (2/2 inc). Awaiting code-review + suite -> Inc2 gate -> Phase 4.",
+            "_note": "prior inc1 entry below"
         },
         {
             "phase": 3,
-            "date": "2026-06-30",
-            "decision": "inc2-approved",
-            "notes": "Operator APPROVED Increment 2 (bar met all 3 axes, no gap; post-F1-fold 951 passed/0 fail confirmed). Advancing to Increment 3 (HLR-032 Checks clarity, final increment)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-06-30",
-            "decision": "inc2-awaiting-gate",
-            "notes": "Phase-3 Increment 2 (HLR-030 / US-026 dropdown) IMPLEMENTED -> increment-2.md. 3 files (screens_directionb.py + app.py + test_tui_patch_editor_v2.py). Select#patch_doc_file_select (allow_blank) + set_change_files + app scan (sorted) of patches/*.json on activation + after-save (R2) + Select.Changed -> service.load. F1 read-path guard: scan symlink-skip (app.py:2238) + load is_relative_to(patches) (app.py:2317). 6 tests: AT-030a (C-12 gate, select-by-known-filename, asserts 2nd file 0x200 content), AT-030a-r2 (save-while-open refresh), AT-030b (empty placeholder no-crash), AT-030c (direct-drop guard), TC-030 (sorted scan), F1 symlink-skip (portable). Full non-slow 977->983 collected (+6). ruff clean. Frozen diff 0 (vs origin/main ec3a2a7). IMPLEMENTING AGENT STALLED (no packet, 94 tool calls) -> orchestrator verified on disk + code-reviewer captured the counterfactual RED (neuter scan -> InvalidSelectValueError on select). code-reviewer APPROVE-WITH-NITS. F1 LOW FOLDED by orchestrator (dead is_symlink-on-resolved -> live is_symlink-on-raw, security guard now real; 6 tests + ruff re-green). Awaiting operator Inc2 gate -> Inc3 (HLR-032 Checks clarity). 'checkpoint-before-long-run' agent-stall carry reinforced -> Phase 5.",
-            "_superseded_prior_inc1": true
-        },
-        {
-            "phase": 3,
-            "date": "2026-06-30",
-            "decision": "inc1-approved",
-            "notes": "Operator APPROVED Increment 1 (bar met all 3 axes, no gap). PROCESS CORRECTION (operator callout): stop dangling 'approve or iterate?' at gates — present resolved axis assessment + call; iterate ONLY with a named gap. Saved as memory feedback_no_hollow_iterate_at_gates + corrected gate behavior from here. Hooks assessment delivered: iterate-prose rule NOT hook-enforceable (message prose, not a tool event; stays command+memory); artifact-completeness checklists ARE hook-enforceable -> spawned task_2d3e38b5 (shift-left the dev-flow-sync reject-check into a PreToolUse git-commit hook), separate session. Advancing to Inc2 (HLR-030 dropdown + F1 read-path guard)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-06-30",
+            "date": "2026-07-01",
             "decision": "inc1-awaiting-gate",
-            "notes": "Phase-3 Increment 1 (HLR-031 / US-027 patches folder) IMPLEMENTED -> increment-1.md. 5 files (workspace.py + changes/io.py + 3 test files). LLR-031.1 workspace.py:19/48 (WORKAREA_PATCHES const + ensure_workarea mkdir), LLR-031.2 io.py:57/1354 (placement -> workarea/patches/, internal default no param). Folder-creation + dedup INHERITED from copy_into_workarea (not re-coded). SPEC-DRIFT surfaced honestly: architect census MISSED 2 e2e placement globs (test_change_service.py:147, test_tui_patch_editor_v2.py:394) that pinned OLD root location non-recursively -> broke on move -> fixed glob->rglob (intent preserved, reported not silently patched); applied spec's ≤5 consolidation. 3 new tests: TC-031 (NET-NEW positive placement is_relative_to patches/, per architect F-A3), AT-031a (save_doc producer -> file under patches/ parses v2), AT-031b (len==2 + distinct names). Counterfactual RED captured (placement->root: TC-031+AT-031a RED). Full non-slow 974->977 collected (+3), 0 fail. ruff clean. Frozen diff 0 (vs origin/main ec3a2a7; NOTE local main stale at 818a02b). code-reviewer APPROVE (rglob double-count risk CLEARED: temp stager unlinked in finally before assertions; ATs use non-recursive .glob on patches/; 1 LOW nit N1 pre-existing docstring out-of-scope). Security unchanged (copy_into_workarea guards cover new dest). Census-scope lesson -> Phase 5. Awaiting operator Inc1 gate -> Inc2 (HLR-030 dropdown + F1 read guard)."
+            "notes": "Phase-3 Increment 1 (HLR-033 / US-030 2x2 reparent) IMPLEMENTED -> increment-1.md. 3 files (screens_directionb.py + styles.tcss + NEW test_tui_patch_layout.py). 4 panes #patch_pane_{entries,changefile,checks,variant}; grid-size 2 3 + grid-rows 1fr 1fr auto; per-pane overflow; save-back column-span:2 in auto row; R1 fix #patch_doc_controls grid-size:3 (Horizontal doesn't wrap). All 39 patch ids preserved (id-set diff), > Static intact (26/26 v2 green). AT-033a(80)/033b(120) 2x2 proof (2 distinct x+y, each band exactly 2 panes, runtime budget, no clip); AT-033c reparent-safety (action routing observable); TC per-pane overflow+grid. Counterfactual RED (revert grid -> panes share x=7). Full non-slow 985->990 (+5), 0 fail. ruff clean. Frozen 0 (vs 13c06c4). code-reviewer APPROVE-WITH-NITS: F1 LOW FOLDED by orchestrator (docstring+CSS comment overclaimed AT proves button-grid no-clip -> reworded: TC locks button-grid, AT proves pane-in-host; 5 tests+ruff re-green). F2 LOW DEFERRED->BACKLOG (save-back shown-span not asserted, structurally sound). Awaiting operator Inc1 gate -> Inc2 (HLR-034 snapshot).",
+            "_note": "prior phase-2 approved entry below"
         },
         {
             "phase": 2,
-            "date": "2026-06-30",
+            "date": "2026-07-01",
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 2 (via 'proceed with the next phase' after the git-state check). iterations_per_phase[2]=1. GIT-STATE SORTED: the 3 mystery main commits (74f19ac->13c06c4) = the concurrent hooks task (PR #33), benign, batch-22 targets untouched; branch ff'd current. Advancing to Phase 3 Inc1. Toolchain PASS. Dispatching software-dev for Inc1 (reparent + geometry AT)."
+        },
+        {
+            "phase": 2,
+            "date": "2026-07-01",
             "decision": "awaiting-gate-superseded",
-            "notes": "Phase 2 cross-review (architect ∥ qa ∥ security, parallel) -> 02-review.md. 0 BLOCKER. architect PROCEED, qa PROCEED, security GRANTED-after-fold. HEADLINE (architect MAJOR-1, factual): saves land in workarea ROOT not temp/ (temp=staging-only) -> corrected §2.5/HLR-031/LLR-031.2/D1/AT-031a; R1 RESOLVED (no test asserts temp/; test_unified_write tc018 assert generic workarea containment which patches/ satisfies -> suite stays green -> Inc1 MUST add NET-NEW positive placement TC else move silently unverified); R3 corrected (orphans in root not temp). qa: AT-031b distinct-names, AT-030a sort+select-by-name, AT-030a producer=save_doc explicit, on-screen-save refresh sub-assert. security F1 LOW (read-path no containment guard -> symlink in patches/ followed on load; net-neutral vs typed-path Load; fold in Inc2 LLR-030.3: match.name + is_relative_to(patches) + skip symlinks before load); F2/F3/F4 PASS. Census CLEAR (0 frozen, no caller breaks). All folds APPLIED body-first + §6.4 seeded (F-A1/A2/A3, F-Q1/Q2/Q3/Q4, F-S1) + 3 Phase-3 watch (W1 allow_blank, W2 empty-set invariant, W3 key-token). Awaiting operator Phase-2 gate."
+            "notes": "Phase 2 cross-review (architect ∥ qa; security inline N/A pure-layout) -> 02-review.md. 0 BLOCKER, PROCEED×2. HEADLINE architect MAJOR-R1: Textual Horizontal does NOT wrap (false premise in Phase-1) -> rung-2 corrected to explicit #patch_doc_controls layout:grid grid-size:3 button-grid (NEW LLR-033.3b); 2x2 design unchanged, AT-033a region.right<=host catches clip. Pane mapping COMPLETE (12 yields->4 panes/span). Census RE-VERIFIED (only #patch_checks_results>Static structural, survives). qa: MINOR-1 tighten 2x2 proof (each row/col band EXACTLY 2 panes, rejects L-shape), MINOR-2 divisor=content_region.width, MINOR-3 per-pane overflow_y TC. architect minors: grid-size 2 3 + grid-rows 1fr 1fr auto for saveback span; Phase-3 confirm patch not in _RESTYLED_CELLS. AT-033c routing genuine; no-fabricated-snapshot clean. All folds APPLIED body-first + §6.4 seeded. Phase-3 verify-at-render: button-grid pixel@80, span, snapshot-cell membership. Awaiting operator Phase-2 gate.",
+            "_superseded_phase1": "Operator APPROVED Phase 1 -> Phase 2. Security = inline N/A" (pure layout reparent + CSS + tests; no new data/IO/external-write/auth/path surface; ids preserved) per scope-change-re-routing rule; formal security pass offered to operator if wanted."
         },
         {
             "phase": 1,
-            "date": "2026-06-30",
+            "date": "2026-07-01",
             "decision": "awaiting-gate-superseded",
-            "notes": "Phase 1 derivation DONE (architect ∥ qa, parallel) -> 01-requirements.md §3/§4/§5/§6. 3 US / 3 HLR (030 dropdown, 031 folder, 032 clarity) / 7 LLR / 7 AT (AT-031a/b folder, AT-030a C-12 gate/030b/030c guard, AT-032a/b clarity) + 5 TC named. Dual traceability complete; QC-2 counterfactual table. KEY DECISIONS: D1 folder=GLOBAL .s19tool/workarea/patches/ (save path already global/temp-only; per-project deferred as larger/riskier); D2 route placement INSIDE write_change_document (zero call-site churn); D3 US-029=description Label row not verbose button label (kills the only horizontal-row geometry risk); exact anchor text fixed. C-13 PASS-by-structure (vertical scroll container; no width budget; 1 flagged measurement struck by D3). should-misuse PASS, engine-frozen PASS (TUI-side editable set only). 3 increments (Inc1 folder workspace.py+io.py -> Inc2 dropdown screens_directionb.py+app.py consumes Inc1 -> Inc3 clarity screens_directionb.py+styles.tcss), all <=3 files, output-then-consume ordered. Risks: R1 grep tests for temp/ path (Inc1 fail-loud), R2 re-scan after save (C-12), R3 temp/ files not in dropdown (stated, not regression), R4 security LOW (workarea-internal, Phase-2 confirm). Awaiting operator Phase-1 gate."
+            "notes": "Phase 1 derivation DONE (architect ∥ qa) -> 01-requirements §3/§4/§5/§6. 2 US / 2 HLR (HLR-033 2x2 split, HLR-034 snapshot lock) / 8 LLR / 5 AT (AT-033a 80-floor/033b 120/033c reparent-safety, AT-034a/b snapshot) + TCs. Pane ids #patch_pane_{entries,changefile,checks,variant}; reparent 10 flat compose yields WHOLESALE (all inner ids preserved); grid CSS grid-size 2 2 + per-pane overflow; save-back column-span:2. CENSUS = LOW risk (only structural query #patch_checks_results>Static survives via LLR-033.5; no .children/parent asserts). C-13: measured 70/92 -> 2x2 ~35/~46 per pane, deficit-free; Change-file 5-button row wraps (rung-2 free). US-031 = geometry AT (local gate-blocking verdict) + snapshot cells (reconcile existing xfail patch-comfortable-120x30, regen CI-only -> xfail-until-CI, NO fabricated local pass). 2 assumed items (button-wrap@80, column-span:2) -> Phase-3 render confirm via geometry AT. should-misuse PASS, frozen PASS. 2 increments (Inc1 reparent screens_directionb+styles.tcss; Inc2 geometry AT + snapshot tests). Awaiting operator Phase-1 gate.",
+            "_superseded_phase0_approved": true
+        },
+        {
+            "phase": 0,
+            "date": "2026-07-01",
+            "decision": "approved",
+            "notes": "Operator APPROVED Phase 0 -> advance to Phase 1. iterations_per_phase[0]=1. Scope = US-030 (2x2 grid) + US-031 (snapshots). Dispatching architect ∥ qa-reviewer."
+        },
+        {
+            "phase": 0,
+            "date": "2026-07-01",
+            "decision": "dor-layout-confirmed",
+            "notes": "Operator confirmed at DoR gate: 2x2 grid, grouping as proposed (entries/change-file/checks/variant). US-030 + US-031 both READY, no open item. §2.6 locked. Awaiting explicit approval to advance to Phase 1 (architect ∥ qa derive HLR/LLR for the 2x2 split + snapshot story)."
+        },
+        {
+            "phase": 0,
+            "date": "2026-07-01",
+            "decision": "awaiting-gate",
+            "notes": "SPIKE DONE (measured, not assumed): drove the real app under Pilot @80/120, queried #patch_editor_panel content_region. Host width = ~70 cols @80 / ~92 @120 (batch-21's ~37/~58 estimate was WRONG — patch screen is near-full-width minus rail, NOT sharing the workspace body). Per-pane budget: 2x2 grid = ~35 @80 / ~46 @120 (comfortable); 4-across = ~17 @80 (underflows the 5-button controls row -> STRUCK). C-13.1 ladder: PRIMARY 2x2 grid deficit-free at both; rung-2 wrap button row (free/vertical), rung-3 responsive stack (only if <80 supported). 4 areas mapped (entries / change-file / checks / variant + hidden saveback overlay). 01-requirements §2.5/2.5b/2.6 written. US-030 + US-031 both READY (layout=2x2 per measured budget). Measurement spike REMOVED the deferred geometry risk -> bounded structural refactor. Temp measurement test appended+run+reverted (tree clean). DoR gate: confirm 4-area grouping + 2x2 layout. Awaiting operator."
         }
     ],
     "obsidian_synced": false,
-    "created_at": "2026-06-29T22:00:00-06:00"
+    "created_at": "2026-07-01T09:00:00-06:00"
 }
