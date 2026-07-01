@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python .dev-flow/tools/validate_phase_artifacts.py --hook"
+            "command": "python \"$CLAUDE_PROJECT_DIR/.dev-flow/tools/validate_phase_artifacts.py\" --hook"
           }
         ]
       }
