@@ -16,6 +16,7 @@ from .models import ProjectVariantSet, VariantDescriptor
 WORKAREA_DIRNAME = ".s19tool"
 WORKAREA_SUBDIR = "workarea"
 WORKAREA_TEMP = "temp"
+WORKAREA_PATCHES = "patches"
 LOGS_SUBDIR = "logs"
 LOG_FILENAME = "s19tui.log"
 # Default size cap for ``copy_into_workarea``. Cap rationale (per security
@@ -44,6 +45,7 @@ def ensure_workarea(base_dir: Path) -> Path:
     workarea = workarea_root / WORKAREA_SUBDIR
     workarea.mkdir(parents=True, exist_ok=True)
     (workarea / WORKAREA_TEMP).mkdir(parents=True, exist_ok=True)
+    (workarea / WORKAREA_PATCHES).mkdir(parents=True, exist_ok=True)
     (workarea_root / LOGS_SUBDIR).mkdir(parents=True, exist_ok=True)
     return workarea
 

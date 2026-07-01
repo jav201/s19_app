@@ -144,7 +144,11 @@ def test_v2_save_load_round_trip(tmp_path: Path) -> None:
 
     result = service.save(tmp_path, file_name="roundtrip.json")
     assert result.ok, result.message
-    written = list((tmp_path / ".s19tool" / "workarea").glob("roundtrip*.json"))
+    # HLR-031: change-file saves now land in the dedicated patches folder, not
+    # the workarea root — discover recursively so the round-trip intent holds.
+    written = list(
+        (tmp_path / ".s19tool" / "workarea").rglob("roundtrip*.json")
+    )
     assert len(written) == 1
 
     fresh = ChangeService()

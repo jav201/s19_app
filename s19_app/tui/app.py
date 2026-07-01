@@ -106,6 +106,7 @@ from .workspace import (
     PROJECT_PRIMARY_DATA_EXTENSIONS,
     S19_EXTENSIONS,
     SUPPORTED_EXTENSIONS,
+    WORKAREA_PATCHES,
     WORKAREA_TEMP,
     WorkareaContainmentError,
     build_variant_set,
@@ -1425,6 +1426,9 @@ class S19TuiApp(App):
                         )
             elif event.action == "save_doc":
                 self._report_change_result(service.save(self.base_dir))
+                # R2 / LLR-030.3: a save while the patch screen is open must
+                # appear in the dropdown without re-activation.
+                self._prefill_patch_change_files()
             elif event.action == "run_checks":
                 result = service.run_checks(
                     mem_map, loaded_ranges, mac_records, a2l_tags
@@ -2164,6 +2168,167 @@ class S19TuiApp(App):
             else []
         )
         panel.set_variants(variants)
+
+    def _patches_dir(self) -> Path:
+        """Return the dedicated patches folder path (``workarea/patches/``).
+
+        Summary:
+            Resolve the change-file dropdown's scan/containment root — the
+            dedicated patches folder created by ``ensure_workarea`` (LLR-031.1).
+            The single source of truth for both the discovery scan (LLR-030.3)
+            and the read-path containment guard (F1), so the two never drift.
+
+        Args:
+            None
+
+        Returns:
+            Path: ``<base_dir>/.s19tool/workarea/patches``.
+
+        Dependencies:
+            Uses:
+                - ``self.workarea`` / ``WORKAREA_PATCHES``
+            Used by:
+                - ``_scan_patch_change_files``
+                - ``on_patch_editor_panel_change_file_selected``
+        """
+        return self.workarea / WORKAREA_PATCHES
+
+    def _scan_patch_change_files(self) -> List[str]:
+        """Discover the change files under the patches folder (LLR-030.3).
+
+        Summary:
+            Return the sorted bare names of every ``*.json`` change file in
+            ``workarea/patches/``, feeding the dropdown (US-026). The scan is
+            SORTED deterministically (F-Q2) so the AT can select by known
+            filename rather than by filesystem order, and it applies the
+            read-path security fold at discovery time (F1): a symlink entry is
+            SKIPPED (never listed), closing the write-guarded / read-unguarded
+            asymmetry of the typed-path load.
+
+        Args:
+            None
+
+        Returns:
+            List[str]: The sorted bare component names (``match.name``) of the
+            non-symlink ``*.json`` files under the patches folder; an empty
+            list when the folder is absent or holds no change file.
+
+        Data Flow:
+            - ``patches_dir.glob("*.json")`` → drop ``is_symlink`` matches →
+              collect ``match.name`` → ``sorted``.
+            - A missing folder yields no glob matches (empty list), never a
+              raise.
+
+        Dependencies:
+            Uses:
+                - ``_patches_dir``
+            Used by:
+                - ``_prefill_patch_change_files``
+
+        Example:
+            >>> app._scan_patch_change_files()
+            ['changes-1.json', 'changes.json']
+        """
+        patches_dir = self._patches_dir()
+        if not patches_dir.is_dir():
+            return []
+        names = [
+            match.name
+            for match in patches_dir.glob("*.json")
+            if not match.is_symlink()
+        ]
+        return sorted(names)
+
+    def _prefill_patch_change_files(self) -> None:
+        """Prefill the Patch Editor change-file dropdown from patches/ (US-026).
+
+        Summary:
+            Scan ``workarea/patches/`` and hand the sorted change-file names to
+            ``PatchEditorPanel.set_change_files`` (LLR-030.3). Called on
+            patch-screen activation AND after each ``save_doc`` (R2), so a file
+            saved while the screen is open appears without re-activation. An
+            empty folder yields an empty option set — the panel renders the
+            blank placeholder without crashing (AT-030b).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``_scan_patch_change_files`` → ``panel.set_change_files``.
+            - A not-yet-mounted panel (headless unit path) is tolerated as a
+              no-op, matching ``_apply_empty_state``.
+
+        Dependencies:
+            Uses:
+                - ``_scan_patch_change_files``
+                - ``PatchEditorPanel.set_change_files``
+            Used by:
+                - ``action_show_screen`` (patch activation)
+                - ``on_patch_editor_panel_action_requested`` (after save_doc)
+        """
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            return
+        panel.set_change_files(self._scan_patch_change_files())
+
+    def on_patch_editor_panel_change_file_selected(
+        self, event: PatchEditorPanel.ChangeFileSelected
+    ) -> None:
+        """Load a dropdown-chosen change file through the existing load path.
+
+        Summary:
+            Re-resolve the operator's chosen filename under the patches folder
+            and, once the F1 containment guard passes, route it through the
+            SAME ``ChangeService.load`` seam the typed-path Load action uses
+            (LLR-030.3) — so the picked file becomes the active change document
+            (its entries table reflects it). No new load/parse surface is
+            introduced; only the source of the path differs.
+
+        Args:
+            event (PatchEditorPanel.ChangeFileSelected): Carries the bare
+                filename the operator selected.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Build ``candidate = patches_dir / event.filename`` and re-resolve.
+            - **F1 guard:** SKIP (status line, no load) when the resolved path
+              is a symlink or does not lie inside ``patches_dir.resolve()`` —
+              closing the read-path asymmetry (``resolve_input_path`` has only a
+              size cap, no containment/symlink guard).
+            - Otherwise call ``ChangeService.load`` on the resolved absolute
+              path and surface the result (``_report_change_result``); refresh
+              the entries table from the new document.
+
+        Dependencies:
+            Uses:
+                - ``_patches_dir`` / ``ChangeService.load``
+                - ``_report_change_result`` / ``PatchEditorPanel.refresh_entries``
+            Used by:
+                - Textual message dispatch (the panel's ``ChangeFileSelected``)
+        """
+        patches_dir = self._patches_dir().resolve()
+        raw = self._patches_dir() / event.filename
+        candidate = raw.resolve()
+        if raw.is_symlink() or not candidate.is_relative_to(patches_dir):
+            self.set_status(
+                f"Patch Editor: change file {event.filename!r} is outside "
+                "the patches folder — not loaded."
+            )
+            return
+        service = self._change_service
+        result = service.load(str(candidate), self.base_dir)
+        self._report_change_result(result)
+        loaded = self.current_file
+        loaded_ranges = loaded.ranges if loaded is not None else None
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        panel.refresh_entries(service.rows(loaded_ranges))
+        panel.refresh_issues(service.issue_lines())
 
     def _diff_image_source(self, variant_id: Optional[str], raw_path: str) -> ImageSource:
         """
@@ -3095,6 +3260,8 @@ class S19TuiApp(App):
         self._apply_empty_state()
         if screen_key == "diff":
             self._prefill_diff_variants()
+        elif screen_key == "patch":
+            self._prefill_patch_change_files()
 
     def action_show_legend(self) -> None:
         """

@@ -510,6 +510,31 @@ class PatchEditorPanel(ScrollableContainer):
             self.filename = filename
             self.bytes_per_line = bytes_per_line
 
+    class ChangeFileSelected(Message):
+        """The operator picked a change file from the patches dropdown (US-026).
+
+        Summary:
+            Posted when ``#patch_doc_file_select`` fires ``Select.Changed`` with
+            a concrete filename (not the blank sentinel). Carries the bare
+            filename only — the panel owns no ``changes``-package logic and no
+            path resolution; ``app.py`` re-resolves the name under the patches
+            folder (with the LLR-030.3 containment guard) and routes it through
+            the existing ``ChangeService.load`` path. Blank / cleared selections
+            post nothing (a blank is not a load request).
+
+        Args:
+            filename (str): The chosen change-file's bare component
+                (``match.name``), e.g. ``"changes.json"``.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_change_file_selected``
+        """
+
+        def __init__(self, filename: str) -> None:
+            super().__init__()
+            self.filename = filename
+
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
         #: The execution scope the selector currently shows (LLR-006.6) —
@@ -520,6 +545,46 @@ class PatchEditorPanel(ScrollableContainer):
         #: (US-015 / LLR-015.3) — cycled by ``#patch_saveback_width_button``;
         #: carried on the ``SaveBackDecision``. Defaults to 32.
         self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
+
+    def set_change_files(self, names: Sequence[str]) -> None:
+        """Populate the change-file dropdown with the patches-folder files.
+
+        Summary:
+            Replace the ``#patch_doc_file_select`` options with one blank-prompt
+            entry per change-file name (LLR-030.2), so the operator can pick a
+            file instead of typing its path. Called by ``app.py`` on patch-screen
+            activation and after each save (LLR-030.3 / R2). This is the ONLY
+            populator of the dropdown; a panel never handed a scan keeps its
+            empty (blank-prompt) option set — the bare-construction invariant
+            (W2). An empty ``names`` clears every option, leaving the blank
+            state (``allow_blank=True``), so an empty patches folder renders a
+            valid placeholder dropdown without crashing (AT-030b / W1).
+
+        Args:
+            names (Sequence[str]): Bare change-file component names (``*.json``)
+                discovered under ``workarea/patches/``, already sorted
+                deterministically by the caller. The option value equals the
+                name, so the ``Select.Changed`` handler forwards it verbatim.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Map each name to a ``(name, name)`` option pair and hand them to
+              the ``Select`` via ``set_options``; an empty list clears the
+              options, and Textual falls back to the blank prompt.
+
+        Dependencies:
+            Uses:
+                - ``textual.widgets.Select.set_options``
+            Used by:
+                - ``S19TuiApp._prefill_patch_change_files``
+
+        Example:
+            >>> panel.set_change_files(["changes.json", "changes-1.json"])
+        """
+        options = [(name, name) for name in names]
+        self.query_one("#patch_doc_file_select", Select).set_options(options)
 
     def compose(self) -> ComposeResult:
         """Lay out the consolidated v2 Patch Editor widget tree.
@@ -579,6 +644,12 @@ class PatchEditorPanel(ScrollableContainer):
         )
         yield Container(
             Label("Change file", classes="patch-field-label"),
+            Select(
+                [],
+                id="patch_doc_file_select",
+                prompt="Change files in patches/",
+                allow_blank=True,
+            ),
             Input(
                 placeholder="path to v2 change-set .json",
                 id="patch_doc_path_input",
@@ -590,6 +661,12 @@ class PatchEditorPanel(ScrollableContainer):
                 Button("Save", id="patch_doc_save_button"),
                 Button("Run checks", id="patch_checks_run_button"),
                 id="patch_doc_controls",
+            ),
+            Label(
+                "Checks: runs the loaded change document's checks against "
+                "the loaded image.",
+                id="patch_checks_help",
+                classes="patch-field-label",
             ),
             id="patch_doc_file_row",
         )
@@ -783,6 +860,44 @@ class PatchEditorPanel(ScrollableContainer):
         if action is not None:
             event.stop()
             self.request_action(action)
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """Forward a change-file dropdown pick to ``app.py`` (US-026).
+
+        Summary:
+            When ``#patch_doc_file_select`` changes to a concrete filename,
+            post a :class:`ChangeFileSelected` carrying the bare name so the app
+            re-resolves it under the patches folder (with the LLR-030.3
+            containment guard) and loads it via the existing
+            ``ChangeService.load`` path. A blank selection (``Select.BLANK`` —
+            the placeholder state after ``set_change_files([])`` or a cleared
+            option set) is NOT a load request, so nothing is posted. Only this
+            panel's own ``#patch_doc_file_select`` is handled; other ``Select``
+            widgets are left for their own handlers.
+
+        Args:
+            event (Select.Changed): The Textual select-change event; its
+                ``select.id`` and ``value`` identify the widget and choice.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Ignore events from other selects and the blank sentinel, else
+              post ``ChangeFileSelected(str(value))``.
+
+        Dependencies:
+            Uses:
+                - ``ChangeFileSelected``
+            Used by:
+                - Textual select-change dispatch
+        """
+        if event.select.id != "patch_doc_file_select":
+            return
+        if event.value is Select.BLANK:
+            return
+        event.stop()
+        self.post_message(self.ChangeFileSelected(str(event.value)))
 
     def refresh_entries(self, rows: Sequence[object]) -> None:
         """Repopulate the entries table from shaped display rows.
