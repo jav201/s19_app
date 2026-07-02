@@ -1577,6 +1577,76 @@ def test_at030c_directly_dropped_file_is_listed_and_loadable(
     )
 
 
+def test_repopulate_blank_reset_posts_no_spurious_load(tmp_path: Path) -> None:
+    """Regression — a repopulate's blank reset is NOT a load request.
+
+    Intent: ``Select.set_options`` resets the selection to ``Select.NULL``
+    (the ``NoSelection`` sentinel) and emits ``Changed(NULL)``. The panel's
+    ``on_select_changed`` must swallow that sentinel. The regressed guard
+    compared against ``Select.BLANK`` — which in textual 8.x resolves to the
+    inherited ``Widget.BLANK`` bool, never a ``NoSelection`` — so every
+    repopulate while a file was selected (patch-screen re-activation, or the
+    after-save re-scan) leaked ``ChangeFileSelected("Select.NULL")`` and the
+    app issued a spurious ``ChangeService.load`` on ``patches/Select.NULL``
+    plus a load-error status.
+
+    Counterfactual (QC-2): restore the ``Select.BLANK`` comparison and the
+    re-activation below records a load call ending in ``Select.NULL`` → RED.
+    """
+    from textual.widgets import Select
+
+    patches = tmp_path / ".s19tool" / "workarea" / "patches"
+    patches.mkdir(parents=True, exist_ok=True)
+    _write_v2_document(
+        patches / "dropped.json",
+        [{"type": "bytes", "address": "0x300", "bytes": "EE FF"}],
+    )
+
+    async def _drive() -> tuple[list[str], object]:
+        app = S19TuiApp(base_dir=tmp_path)
+
+        # Spy on the ONLY load seam the dropdown handler uses — every call
+        # (legit pick and any spurious blank-reset leak) lands here.
+        load_paths: list[str] = []
+        real_load = app._change_service.load
+
+        def _spy_load(path: str, base_dir: Path) -> object:
+            load_paths.append(str(path))
+            return real_load(path, base_dir)
+
+        app._change_service.load = _spy_load  # type: ignore[method-assign]
+
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            select = app.query_one("#patch_doc_file_select", Select)
+
+            # Legit pick — exactly one load expected from this.
+            select.value = "dropped.json"
+            await pilot.pause()
+
+            # Re-activate the patch screen: _prefill_patch_change_files
+            # repopulates the Select, set_options resets the selection to
+            # Select.NULL, and Changed(NULL) is emitted.
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return load_paths, select.value
+
+    load_paths, final_value = asyncio.run(_drive())
+    spurious = [p for p in load_paths if "Select.NULL" in p]
+    assert spurious == [], (
+        f"the blank reset must not be forwarded as a load request, "
+        f"got spurious load(s) {spurious}"
+    )
+    assert len(load_paths) == 1 and load_paths[0].endswith("dropped.json"), (
+        f"exactly the operator's pick must load, got {load_paths}"
+    )
+    assert final_value is Select.NULL, (
+        "after the repopulate the dropdown must sit on the blank sentinel"
+    )
+
+
 def test_f1_symlink_entry_is_skipped_by_scan(tmp_path: Path) -> None:
     """Security TC (F1) — a symlinked patches/ entry is skipped by the scan.
 

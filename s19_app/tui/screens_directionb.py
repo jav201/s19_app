@@ -904,8 +904,9 @@ class PatchEditorPanel(ScrollableContainer):
             re-resolves it under the patches folder (with the LLR-030.3
             containment guard) and loads it via the existing
             ``ChangeService.load`` path. A blank selection (``Select.NULL`` —
-            the placeholder state after ``set_change_files([])`` or a cleared
-            option set) is NOT a load request, so nothing is posted. Only this
+            the ``NoSelection`` placeholder emitted after ``set_change_files``
+            repopulates or clears the option set) is NOT a load request, so
+            nothing is posted. Only this
             panel's own ``#patch_doc_file_select`` is handled; other ``Select``
             widgets are left for their own handlers.
 
