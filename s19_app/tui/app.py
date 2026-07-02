@@ -2275,6 +2275,143 @@ class S19TuiApp(App):
             return
         panel.set_change_files(self._scan_patch_change_files())
 
+    def _refresh_patch_variant_select(self) -> None:
+        """Re-evaluate the Patch Editor variant dropdown from app state (US-028).
+
+        Summary:
+            Populate ``Select#patch_variant_select`` from the active project's
+            ``ProjectVariantSet`` (LLR-035.3): with N >= 2 variants, one
+            ``(variant_id, variant_id)`` option per variant in model order
+            with the value pre-selected to ``active_id``; with N < 2 or no
+            project, ``set_variants([])`` leaves the blank placeholder with
+            the control disabled (LLR-035.5, DoR Q1). Called on patch-screen
+            activation and — via ``update_project_labels``, which every
+            variant-set mutation site already funnels through — whenever the
+            variant set or the active variant changes while the screen is
+            shown (the F-3 trigger set). The repopulate's
+            ``Changed(Select.NULL)`` + ``Changed(active_id)`` echo pair (F-4) is
+            absorbed by the handler chain's short-circuits (LLR-035.4).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``self._variant_set`` → ``(variant_id, variant_id)`` option
+              pairs (mirrors ``_prefill_diff_variants``) →
+              ``PatchEditorPanel.set_variants``.
+            - A not-yet-mounted panel (headless unit path) is tolerated as a
+              no-op, matching ``_prefill_patch_change_files``.
+
+        Dependencies:
+            Uses:
+                - ``PatchEditorPanel.set_variants``
+            Used by:
+                - ``action_show_screen`` (patch activation)
+                - ``update_project_labels`` (variant-set change trigger)
+        """
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            return
+        variant_set = self._variant_set
+        if variant_set is None or len(variant_set.variants) < 2:
+            panel.set_variants([])
+            return
+        options = [
+            (variant.variant_id, variant.variant_id)
+            for variant in variant_set.variants
+        ]
+        panel.set_variants(options, variant_set.active_id)
+
+    def _variant_load_in_flight(self) -> bool:
+        """Report whether a load is still in flight (LLR-035.7 race guard).
+
+        Summary:
+            True while a variant activation (or any load) has not finished
+            installing: either ``_pending_variant_id`` is stamped but not yet
+            consumed by ``_apply_prepared_load``, or a ``"load"``-group
+            worker is still unfinished. The variant-dropdown handler
+            suppresses new picks while this holds — the suppress-while-loading
+            mechanism chosen for LLR-035.7 (security F2): it touches the
+            shared load pipeline nowhere, so the modal path is demonstrably
+            unaffected.
+
+        Args:
+            None
+
+        Returns:
+            bool: ``True`` when a pick must be suppressed.
+
+        Data Flow:
+            - ``self._pending_variant_id`` (stamped at dispatch, consumed on
+              the main thread at apply) OR any unfinished worker in the
+              ``"load"`` group of ``self.workers``.
+
+        Dependencies:
+            Uses:
+                - ``self.workers`` (Textual ``WorkerManager``)
+            Used by:
+                - ``on_patch_editor_panel_variant_selected``
+        """
+        if self._pending_variant_id is not None:
+            return True
+        return any(
+            worker.group == "load" and not worker.is_finished
+            for worker in self.workers
+        )
+
+    def on_patch_editor_panel_variant_selected(
+        self, event: PatchEditorPanel.VariantSelected
+    ) -> None:
+        """Route a Variant-pane dropdown pick to the activation pipeline (US-028).
+
+        Summary:
+            Hand the picked id wholesale to ``_handle_select_variant``
+            (LLR-035.4) — reusing its guards (no set / unknown id / missing
+            file) and its ``_pending_variant_id`` → ``load_from_path`` →
+            ``_apply_prepared_load`` stamping without duplicating any of
+            them. Two short-circuits fire no activation: a pick equal to the
+            current ``active_id`` (absorbs the F-4 repopulate echo — no
+            redundant reload loop), and a pick arriving while a prior load is
+            still in flight (LLR-035.7 suppress-while-loading; the stale
+            display value self-heals when the in-flight activation completes
+            and LLR-035.3 re-syncs the dropdown).
+
+        Args:
+            event (PatchEditorPanel.VariantSelected): Carries the picked
+                variant id (the panel already filtered the blank sentinel
+                ``Select.NULL``).
+
+        Returns:
+            None
+
+        Data Flow:
+            - same-as-active → drop; ``_variant_load_in_flight`` → drop with
+              a status line; else ``_handle_select_variant(variant_id)``.
+
+        Dependencies:
+            Uses:
+                - ``_variant_load_in_flight`` / ``_handle_select_variant``
+            Used by:
+                - Textual message dispatch (the panel's ``VariantSelected``)
+        """
+        variant_set = self._variant_set
+        if variant_set is not None and event.variant_id == variant_set.active_id:
+            return
+        if self._variant_load_in_flight():
+            self.set_status(
+                "Variant switch ignored - a load is already in progress."
+            )
+            self.logger.info(
+                "Variant pick '%s' suppressed: load in flight (LLR-035.7).",
+                event.variant_id,
+            )
+            return
+        self._handle_select_variant(event.variant_id)
+
     def on_patch_editor_panel_change_file_selected(
         self, event: PatchEditorPanel.ChangeFileSelected
     ) -> None:
@@ -3262,6 +3399,7 @@ class S19TuiApp(App):
             self._prefill_diff_variants()
         elif screen_key == "patch":
             self._prefill_patch_change_files()
+            self._refresh_patch_variant_select()
 
     def action_show_legend(self) -> None:
         """
@@ -7651,11 +7789,17 @@ class S19TuiApp(App):
               ``«project»:«variant» (i/N)`` with ``i`` the 1-based index of
               the active variant; single-variant projects keep the plain
               project name (LLR-005.3 back-compat).
+            - Chains ``_refresh_patch_variant_select`` (US-028 / LLR-035.3):
+              every variant-set mutation site (project load/save, variant
+              append, activation apply) already funnels through this
+              refresh, so the Patch Editor's variant dropdown re-syncs on
+              the same trigger set with no extra call sites.
 
         Dependencies:
             Uses:
                 - ``CommandBar.set_context_labels``
                 - ``_variant_display_options``
+                - ``_refresh_patch_variant_select``
             Used by:
                 - Project / A2L load handlers
                 - ``_sync_loaded_file_to_project`` (variant append)
@@ -7684,6 +7828,7 @@ class S19TuiApp(App):
             )
         a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
         self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
+        self._refresh_patch_variant_select()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         # The Direction B restyle retires the `#view_bar` button bar

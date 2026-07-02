@@ -583,6 +583,18 @@ Screen {
     column-span: 2;
 }
 
+/* US-028 (HLR-035 / LLR-035.2) — the Variant pane stacks the variant-dropdown
+ * group ABOVE the execute group. Both rows need `height: auto`: a bare
+ * `Container` defaults to `height: 1fr`, which would split the 3-row pane
+ * (@80x24) between the two groups and clip the Select. The pane's
+ * `overflow-y: auto` (batch-22 C-13.1 rung) scrolls the execute group below
+ * the fold while the Select's first row stays visible at scroll 0. */
+#patch_variant_row,
+#patch_execute_row {
+    width: 100%;
+    height: auto;
+}
+
 /* A↔B Diff panel (batch-09 I4, HLR-005): the inline image-pair selection
  * rows, the action row, the panel status line and the three result columns.
  * The status line's colour comes from the `sev-*` classes (the single
