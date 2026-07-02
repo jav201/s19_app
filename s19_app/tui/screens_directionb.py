@@ -535,6 +535,31 @@ class PatchEditorPanel(ScrollableContainer):
             super().__init__()
             self.filename = filename
 
+    class VariantSelected(Message):
+        """The operator picked a variant from the Variant-pane dropdown (US-028).
+
+        Summary:
+            Posted when ``#patch_variant_select`` fires ``Select.Changed``
+            with a concrete variant id (not the blank sentinel). Carries the
+            bare id only — the panel owns no variant-set access and no
+            activation logic; ``app.py`` routes the id wholesale through the
+            existing ``_handle_select_variant`` pipeline (LLR-035.4). Blank /
+            cleared selections post nothing (a blank is not a switch
+            request), mirroring :class:`ChangeFileSelected`.
+
+        Args:
+            variant_id (str): The chosen variant's id, e.g. ``"b"`` (the
+                FULL FILENAME when stems collide — the E6 duplicate-id rule).
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_variant_selected``
+        """
+
+        def __init__(self, variant_id: str) -> None:
+            super().__init__()
+            self.variant_id = variant_id
+
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
         #: The execution scope the selector currently shows (LLR-006.6) —
@@ -586,6 +611,60 @@ class PatchEditorPanel(ScrollableContainer):
         options = [(name, name) for name in names]
         self.query_one("#patch_doc_file_select", Select).set_options(options)
 
+    def set_variants(
+        self,
+        options: Sequence[tuple[str, str]],
+        active_id: Optional[str] = None,
+    ) -> None:
+        """Populate the variant dropdown and mirror the active variant.
+
+        Summary:
+            Replace the ``#patch_variant_select`` options with the project's
+            variant ids and pre-select the active one (LLR-035.3), mirroring
+            :meth:`set_change_files`: the panel owns no ``_variant_set``
+            access — ``app.py`` is the ONLY populator (the US-026 ownership
+            split). ``set_options`` runs strictly BEFORE the value assignment
+            (F-4: assigning a value not in the options raises
+            ``InvalidSelectValueError``); the reset-to-blank-sentinel
+            (``Select.NULL``) ``Changed`` echo pair a repopulate emits is
+            absorbed by the ``Select.NULL`` / same-as-active
+            short-circuits in the handler chain (LLR-035.4). An empty
+            ``options`` clears the dropdown back to its blank placeholder
+            with NO preselection (F-2), and the control is disabled whenever
+            fewer than 2 options exist (LLR-035.5 — no false affordance for
+            the no-project / single-variant states, DoR Q1).
+
+        Args:
+            options (Sequence[tuple[str, str]]): ``(label, variant_id)``
+                pairs in model order (``ProjectVariantSet.variants``); empty
+                for the no-project / N<2 states.
+            active_id (Optional[str]): The ``variant_set.active_id`` to
+                display, or ``None`` to leave the blank prompt.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``Select.set_options`` (resets the selection to the blank
+              sentinel ``Select.NULL``), then
+              the value assignment when ``active_id`` is provided with N >= 2,
+              then the ``disabled`` invariant (``len(options) < 2``).
+
+        Dependencies:
+            Uses:
+                - ``textual.widgets.Select.set_options``
+            Used by:
+                - ``S19TuiApp._refresh_patch_variant_select``
+
+        Example:
+            >>> panel.set_variants([("a", "a"), ("b", "b")], "b")
+        """
+        select = self.query_one("#patch_variant_select", Select)
+        select.set_options(options)
+        if active_id is not None and len(options) >= 2:
+            select.value = active_id
+        select.disabled = len(options) < 2
+
     def compose(self) -> ComposeResult:
         """Lay out the consolidated v2 Patch Editor widget tree as a 2x2 grid.
 
@@ -597,7 +676,10 @@ class PatchEditorPanel(ScrollableContainer):
             change-file row + the paste row), ``#patch_pane_checks``
             (bottom-left: the declaration-fault count + listing, the checks
             status line + results), and ``#patch_pane_variant``
-            (bottom-right: the execute-over-variants row). Each inner
+            (bottom-right: the variant-dropdown row composed ABOVE the
+            execute-over-variants row, LLR-035.2 — the switch affordance
+            stays visible at scroll 0 while the execute group scrolls below
+            when the pane overflows at 80x24). Each inner
             sub-tree is moved wholesale — no inner id is renamed or
             reordered, so every ``patch_*`` id and its action wiring stay
             queryable (HLR-033.2). The hidden save-back prompt row is yielded
@@ -715,6 +797,17 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_pane_checks",
         )
         yield Container(
+            Container(
+                Label("Active variant", classes="patch-field-label"),
+                Select(
+                    [],
+                    id="patch_variant_select",
+                    prompt="Variants in project",
+                    allow_blank=True,
+                    disabled=True,
+                ),
+                id="patch_variant_row",
+            ),
             Container(
                 Label(
                     "Execute over variants", classes="patch-field-label"
@@ -896,19 +989,22 @@ class PatchEditorPanel(ScrollableContainer):
             self.request_action(action)
 
     def on_select_changed(self, event: Select.Changed) -> None:
-        """Forward a change-file dropdown pick to ``app.py`` (US-026).
+        """Forward a dropdown pick to ``app.py`` (US-026 / US-028).
 
         Summary:
             When ``#patch_doc_file_select`` changes to a concrete filename,
             post a :class:`ChangeFileSelected` carrying the bare name so the app
             re-resolves it under the patches folder (with the LLR-030.3
             containment guard) and loads it via the existing
-            ``ChangeService.load`` path. A blank selection (``Select.NULL`` —
-            the ``NoSelection`` placeholder emitted after ``set_change_files``
-            repopulates or clears the option set) is NOT a load request, so
-            nothing is posted. Only this
-            panel's own ``#patch_doc_file_select`` is handled; other ``Select``
-            widgets are left for their own handlers.
+            ``ChangeService.load`` path. When ``#patch_variant_select``
+            changes to a concrete variant id, post a :class:`VariantSelected`
+            so the app routes it through the existing activation pipeline
+            (LLR-035.4). A blank selection (``Select.NULL`` — the
+            ``NoSelection`` placeholder emitted when ``set_change_files`` /
+            ``set_variants`` repopulates or clears the option set) is NOT a
+            request, so nothing is posted. Only this panel's own two selects
+            are handled; other ``Select`` widgets are left for their own
+            handlers.
 
         Args:
             event (Select.Changed): The Textual select-change event; its
@@ -919,14 +1015,25 @@ class PatchEditorPanel(ScrollableContainer):
 
         Data Flow:
             - Ignore events from other selects and the blank sentinel, else
-              post ``ChangeFileSelected(str(value))``.
+              post ``VariantSelected(str(value))`` for the variant dropdown
+              or ``ChangeFileSelected(str(value))`` for the change-file one.
 
         Dependencies:
             Uses:
-                - ``ChangeFileSelected``
+                - ``ChangeFileSelected`` / ``VariantSelected``
             Used by:
                 - Textual select-change dispatch
         """
+        if event.select.id == "patch_variant_select":
+            # ``Select.NULL`` is the installed textual 8.2.5 blank sentinel
+            # (a ``NoSelection`` instance) — ``Select.BLANK`` resolves to an
+            # unrelated inherited ``Widget.BLANK`` bool in this version and
+            # never matches a blank value.
+            if event.value is Select.NULL:
+                return
+            event.stop()
+            self.post_message(self.VariantSelected(str(event.value)))
+            return
         if event.select.id != "patch_doc_file_select":
             return
         if event.value is Select.NULL:
