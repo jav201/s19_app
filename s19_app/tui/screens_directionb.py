@@ -903,7 +903,7 @@ class PatchEditorPanel(ScrollableContainer):
             post a :class:`ChangeFileSelected` carrying the bare name so the app
             re-resolves it under the patches folder (with the LLR-030.3
             containment guard) and loads it via the existing
-            ``ChangeService.load`` path. A blank selection (``Select.BLANK`` —
+            ``ChangeService.load`` path. A blank selection (``Select.NULL`` —
             the placeholder state after ``set_change_files([])`` or a cleared
             option set) is NOT a load request, so nothing is posted. Only this
             panel's own ``#patch_doc_file_select`` is handled; other ``Select``
@@ -928,7 +928,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         if event.select.id != "patch_doc_file_select":
             return
-        if event.value is Select.BLANK:
+        if event.value is Select.NULL:
             return
         event.stop()
         self.post_message(self.ChangeFileSelected(str(event.value)))
@@ -1334,9 +1334,10 @@ class AbDiffPanel(Container):
         status.update(message)
 
     def _selected_variant(self, select_id: str) -> Optional[str]:
-        """Return the chosen variant id, or ``None`` for the external option."""
+        """Return the chosen variant id, or ``None`` for the external option
+        or a blank select (``Select.NULL`` — the no-selection sentinel)."""
         value = self.query_one(select_id, Select).value
-        if value in (self._EXTERNAL_OPTION, Select.BLANK):
+        if value in (self._EXTERNAL_OPTION, Select.NULL):
             return None
         return str(value)
 
