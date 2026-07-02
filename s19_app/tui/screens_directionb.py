@@ -903,9 +903,10 @@ class PatchEditorPanel(ScrollableContainer):
             post a :class:`ChangeFileSelected` carrying the bare name so the app
             re-resolves it under the patches folder (with the LLR-030.3
             containment guard) and loads it via the existing
-            ``ChangeService.load`` path. A blank selection (``Select.BLANK`` —
-            the placeholder state after ``set_change_files([])`` or a cleared
-            option set) is NOT a load request, so nothing is posted. Only this
+            ``ChangeService.load`` path. A blank selection (``Select.NULL`` —
+            the ``NoSelection`` placeholder emitted after ``set_change_files``
+            repopulates or clears the option set) is NOT a load request, so
+            nothing is posted. Only this
             panel's own ``#patch_doc_file_select`` is handled; other ``Select``
             widgets are left for their own handlers.
 
@@ -928,7 +929,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         if event.select.id != "patch_doc_file_select":
             return
-        if event.value is Select.BLANK:
+        if event.value is Select.NULL:
             return
         event.stop()
         self.post_message(self.ChangeFileSelected(str(event.value)))
