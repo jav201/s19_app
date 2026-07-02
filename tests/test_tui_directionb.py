@@ -3514,6 +3514,44 @@ def test_tc027_ab_diff_panel_routes_through_service() -> None:
     )
 
 
+def test_ab_diff_blank_select_yields_none_variant(tmp_path: Path) -> None:
+    """A blank A/B variant ``Select`` resolves to ``None``, not "Select.NULL".
+
+    Intent: regression for the textual 8.2.5 blank sentinel. The
+    no-selection value is ``Select.NULL`` (a ``NoSelection`` instance);
+    ``Select.BLANK`` resolves to the inherited ``Widget.BLANK`` bool and
+    never matches a real value. Under the old ``Select.BLANK`` comparison,
+    ``AbDiffPanel._selected_variant`` stringified the sentinel and Compare
+    received the bogus variant id ``"Select.NULL"`` instead of ``None``.
+    The panel's selects are ``allow_blank=False``, so the blank state is
+    forced via ``set_reactive`` (the validated ``value`` setter refuses it).
+    """
+    from textual.widgets import Select
+
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    async def _drive() -> tuple[object, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            panel = app.query_one("#ab_diff_panel", AbDiffPanel)
+            default = panel._selected_variant("#diff_select_a")
+            select = app.query_one("#diff_select_a", Select)
+            select.set_reactive(Select.value, Select.NULL)
+            return default, panel._selected_variant("#diff_select_a")
+
+    default, blank = asyncio.run(_drive())
+    assert default is None, (
+        f"the default (external-option) selection must map to None, "
+        f"got {default!r}"
+    )
+    assert blank is None, (
+        f"a blank Select (Select.NULL) must map to None, got {blank!r}"
+    )
+
+
 # ---------------------------------------------------------------------------
 # TC-028 (completion) — deferred-logic guard for all scaffolds (LLR-012.4)
 # ---------------------------------------------------------------------------

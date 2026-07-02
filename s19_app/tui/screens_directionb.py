@@ -1335,9 +1335,10 @@ class AbDiffPanel(Container):
         status.update(message)
 
     def _selected_variant(self, select_id: str) -> Optional[str]:
-        """Return the chosen variant id, or ``None`` for the external option."""
+        """Return the chosen variant id, or ``None`` for the external option
+        or a blank select (``Select.NULL`` — the no-selection sentinel)."""
         value = self.query_one(select_id, Select).value
-        if value in (self._EXTERNAL_OPTION, Select.BLANK):
+        if value in (self._EXTERNAL_OPTION, Select.NULL):
             return None
         return str(value)
 
