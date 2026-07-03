@@ -63,6 +63,7 @@ from .screens_directionb import (
 from .color_policy import css_class_for_severity
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
+from .services.before_after_service import compose_before_after_report
 from .services.change_service import ChangeActionResult, ChangeService
 from .services.compare_service import (
     SOURCE_EXTERNAL,
@@ -220,7 +221,124 @@ def _a2l_tag_unit_display(tag: dict) -> str:
     return "" if compu_unit in (None, "") else str(compu_unit)
 
 
-def _a2l_tag_row_severity(tag: dict) -> ValidationSeverity:
+_A2L_ISSUE_SEVERITY_RANK: dict[ValidationSeverity, int] = {
+    ValidationSeverity.NEUTRAL: 0,
+    ValidationSeverity.OK: 1,
+    ValidationSeverity.INFO: 2,
+    ValidationSeverity.WARNING: 3,
+    ValidationSeverity.ERROR: 4,
+}
+"""Severity ordering for ``_a2l_issue_severity_map`` — ``ERROR`` ranks above all (LLR-037.1)."""
+
+
+def _a2l_issue_severity_map(
+    issues: list[ValidationIssue],
+) -> dict[str, ValidationSeverity]:
+    """
+    Summary:
+        Derive a casefolded symbol -> maximum-severity map from a validation
+        issue list, restricted to issues with ``artifact == "a2l"`` and a
+        non-empty symbol (LLR-037.1, US-033 issue-implies-red-row).
+
+    Args:
+        issues (list[ValidationIssue]): Current validation issue list
+            (``S19TuiApp._validation_issues`` at render time).
+
+    Returns:
+        dict[str, ValidationSeverity]: Casefolded issue symbol -> highest
+        severity observed for that symbol per ``_A2L_ISSUE_SEVERITY_RANK``
+        (``ERROR`` above all).
+
+    Raises:
+        None
+
+    Data Flow:
+        - Skip issues whose ``artifact`` is not ``"a2l"`` or whose ``symbol``
+          is empty/absent (symbol-less codes such as ``A2L_STRUCTURE_ERROR``
+          never map).
+        - Casefold each symbol so lookups match the engine's ``name.lower()``
+          duplicate grouping (``validation/rules.py``).
+        - Keep the maximum severity per symbol, order-independent.
+        - Pure function: O(issues) build, no widget access; consulted O(1)
+          per rendered row.
+
+    Dependencies:
+        Uses:
+            - ``_A2L_ISSUE_SEVERITY_RANK``
+        Used by:
+            - ``S19TuiApp.update_a2l_tags_view`` (built once per render)
+
+    Example:
+        >>> dup = ValidationIssue(
+        ...     code="A2L_DUPLICATE_SYMBOL",
+        ...     severity=ValidationSeverity.ERROR,
+        ...     message="dup",
+        ...     artifact="a2l",
+        ...     symbol="RPM",
+        ... )
+        >>> _a2l_issue_severity_map([dup])
+        {'rpm': <ValidationSeverity.ERROR: 'error'>}
+    """
+    severity_map: dict[str, ValidationSeverity] = {}
+    for issue in issues:
+        if issue.artifact != "a2l" or not issue.symbol:
+            continue
+        key = issue.symbol.casefold()
+        current = severity_map.get(key)
+        if current is None or (
+            _A2L_ISSUE_SEVERITY_RANK[issue.severity] > _A2L_ISSUE_SEVERITY_RANK[current]
+        ):
+            severity_map[key] = issue.severity
+    return severity_map
+
+
+def _a2l_tag_row_severity(
+    tag: dict,
+    issue_severity_map: Mapping[str, ValidationSeverity],
+) -> ValidationSeverity:
+    """
+    Summary:
+        Resolve the severity that colours one A2L table row: an ERROR-severity
+        issue mapped to the tag's casefolded name wins; every other case keeps
+        the pre-existing schema/memory ladder (LLR-037.2, US-033).
+
+    Args:
+        tag (dict): Enriched A2L tag dictionary.
+        issue_severity_map (Mapping[str, ValidationSeverity]): Casefolded
+            symbol -> max severity map from ``_a2l_issue_severity_map``; pass
+            ``{}`` for the ladder-only behavior.
+
+    Returns:
+        ValidationSeverity: Row severity consumed by ``_severity_style``.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Return ``ERROR`` when the tag's casefolded name maps to ``ERROR``.
+          Only ERROR recolours — a WARNING-mapped symbol falls through
+          unchanged, because the A2L palette is Red/Green/White/Grey only
+          (orange is a MAC-view convention; design decision D-2).
+        - Otherwise apply the unchanged ladder: ``schema_ok=False`` -> ERROR;
+          memory-checked present -> OK; memory-checked absent -> INFO;
+          virtual/formula -> INFO; else NEUTRAL.
+
+    Dependencies:
+        Uses:
+            - none
+        Used by:
+            - ``S19TuiApp.update_a2l_tags_view``
+
+    Example:
+        >>> _a2l_tag_row_severity(
+        ...     {"name": "RPM", "schema_ok": True},
+        ...     {"rpm": ValidationSeverity.ERROR},
+        ... )
+        <ValidationSeverity.ERROR: 'error'>
+    """
+    name = str(tag.get("name") or "").strip()
+    if name and issue_severity_map.get(name.casefold()) is ValidationSeverity.ERROR:
+        return ValidationSeverity.ERROR
     if not tag.get("schema_ok", True):
         return ValidationSeverity.ERROR
     if tag.get("memory_checked") and tag.get("in_memory") is True:
@@ -563,6 +681,7 @@ class S19TuiApp(App):
         Binding("t", "view_reports", "View reports", show=False),
         Binding("x", "operations_view", "Operations", show=True),
         Binding("k", "show_legend", "Legend", show=True),
+        Binding("b", "before_after_report", "Before/After report", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
         Binding("3", "show_screen('mac')", "MAC View", show=False),
@@ -1477,7 +1596,12 @@ class S19TuiApp(App):
               ``ChangeService.save_patched`` into the active project directory
               (work-area root when no project is active); the typed name
               passes the engine's F-S-01 sanitizer; the result and its
-              findings surface on the status path.
+              findings surface on the status path. ``loaded.path`` rides the
+              ``source_image_path`` kwarg — the LLR-038.2 B-2 provenance
+              stamp the before/after composer checks for staleness. On a
+              successful save, after the verify outcome surfaces, an
+              information notify offers the before/after report action
+              (key ``b`` — LLR-038.3).
 
         Dependencies:
             Uses:
@@ -1512,10 +1636,21 @@ class S19TuiApp(App):
             source_kind=loaded.file_type,
             bytes_per_line=bytes_per_line,
             s0_header=s0_header,
+            source_image_path=loaded.path,
         )
         self._report_change_result(result)
         if result.ok:
             self._surface_verify_result()
+            # LLR-038.3 offer — AFTER _surface_verify_result so a
+            # verify-mismatch error notice is never masked; a mismatch does
+            # NOT suppress the offer (A-m2: the report is an honest
+            # disk-to-disk comparison of what was actually written).
+            self.notify(
+                "Before/after report ready - press b to write it to the "
+                "project reports directory (action: before_after_report).",
+                title="Before/after report",
+                severity="information",
+            )
 
     def _surface_verify_result(self) -> None:
         """
@@ -1570,6 +1705,56 @@ class S19TuiApp(App):
             title="Verify mismatch - file may not match",
             severity="error",
             timeout=10.0,
+        )
+
+    def action_before_after_report(self) -> None:
+        """
+        Summary:
+            Write the before/after save-back report pair (LLR-038.3, key
+            ``b``): invoke the LLR-038.2 composer over the current
+            ``ChangeService.last_summary`` + loaded image and surface the
+            written paths — or the refusal diagnostic — on the status line.
+            Surfaced text carries paths and diagnostics ONLY, never entry
+            byte content (LLR-038.5 / S-F5).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Gather ``last_summary``, ``LoadedFile.path``, the active
+              project dir, and the workarea root; the composer validates the
+              five LLR-038.2 preconditions and every LLR-038.4 refusal class
+              itself — this handler never pre-duplicates them.
+            - ``written`` → one status line naming BOTH written paths.
+            - refusal → one status line carrying the composer's diagnostics;
+              no file was written, the app keeps running.
+
+        Dependencies:
+            Uses:
+                - ``compose_before_after_report``
+                - ``_active_project_dir`` / ``set_status``
+            Used by:
+                - key binding ``b`` (BINDINGS) after the save-back offer
+                  notify in ``on_patch_editor_panel_save_back_decision``
+        """
+        loaded = self.current_file
+        result = compose_before_after_report(
+            self._change_service.last_summary,
+            loaded.path if loaded is not None else None,
+            project_dir=self._active_project_dir(),
+            workarea=self.workarea,
+        )
+        if result.written:
+            self.set_status(
+                f"Before/after report written: {result.md_path} "
+                f"| {result.html_path}"
+            )
+            return
+        self.set_status(
+            "Before/after report refused: " + " ".join(result.diagnostics)
         )
 
     @staticmethod
@@ -5812,6 +5997,108 @@ class S19TuiApp(App):
         self._validation_issue_cell_rows = []
         self._validation_issue_cell_styles = []
 
+    def _mac_view_cache_key_for(
+        self,
+        records: list[dict],
+        loaded: LoadedFile,
+        a2l_data: Optional[dict],
+    ) -> tuple:
+        """
+        Summary:
+            Build the MAC-view cache key shared by the load worker
+            (``_prepare_load_payload``) and ``update_mac_view`` so both sides agree
+            on cache hits, including no-MAC sessions (LLR-037.4).
+
+        Args:
+            records (list[dict]): Normalized MAC record list (may be empty).
+            loaded (LoadedFile): File the key describes (``current_file`` at render time).
+            a2l_data (Optional[dict]): A2L payload identity component.
+
+        Returns:
+            tuple: ``(records_identity, len(records), id(a2l_data), file_type,
+            ranges_tuple, mem_map_len)``.
+
+        Raises:
+            None
+
+        Data Flow:
+            - With records present, the identity component stays ``id(records)``
+              (pre-LLR-037.4 behavior, unchanged).
+            - With records EMPTY, ``mac_records or []`` builds a fresh list per call,
+              so ``id(records)`` would churn and force a full payload recompute
+              (including an S19 re-parse for the overlap set) on every render. The
+              stable substitute chosen at Phase 3 is ``id(loaded)``: the ``LoadedFile``
+              identity is shared by the worker (``loaded``) and the renderer
+              (``self.current_file``), so worker-precomputed no-MAC reports register
+              as cache HITS and repeat renders never recompute.
+
+        Dependencies:
+            Uses:
+                - none
+            Used by:
+                - ``_prepare_load_payload``
+                - ``update_mac_view``
+                - ``_refresh_no_mac_validation``
+        """
+        records_identity = id(records) if records else id(loaded)
+        return (
+            records_identity,
+            len(records),
+            id(a2l_data),
+            loaded.file_type,
+            tuple(loaded.ranges),
+            len(loaded.mem_map),
+        )
+
+    def _refresh_no_mac_validation(self) -> None:
+        """
+        Summary:
+            Keep (or compute) the primary+A2L validation report when
+            ``update_mac_view`` takes a no-MAC branch, instead of wiping
+            ``_validation_report`` / ``_validation_issues`` (LLR-037.4, the B-1a
+            fix). Sessions with NO primary file keep the historical clear.
+
+        Args:
+            None (reads ``current_file`` / ``current_a2l_data``; writes the four
+            validation members on the clear path.)
+
+        Returns:
+            None
+
+        Raises:
+            None
+
+        Data Flow:
+            - No primary file: clear ``_validation_report`` / ``_validation_issues``
+              and the issue cell caches (unchanged pre-fix behavior).
+            - Primary present: build the empty-records cache key via
+              ``_mac_view_cache_key_for`` (stable ``id(current_file)`` substitute) and,
+              only on a key change, run ``_build_mac_view_cache`` — which routes
+              through ``_compute_mac_view_payload`` / ``build_validation_report`` for
+              the primary+A2L pair. On a key match (worker precompute or a repeat
+              render) every validation member is retained untouched — never
+              wipe-then-recompute.
+
+        Dependencies:
+            Uses:
+                - ``_mac_view_cache_key_for``
+                - ``_build_mac_view_cache``
+            Used by:
+                - ``update_mac_view`` (both no-MAC branches)
+        """
+        if not self.current_file:
+            self._validation_report = None
+            self._validation_issues = []
+            self._validation_issue_cell_rows = []
+            self._validation_issue_cell_styles = []
+            return
+        cache_key = self._mac_view_cache_key_for(
+            [], self.current_file, self.current_a2l_data
+        )
+        if self._mac_view_cache_key != cache_key:
+            self._mac_view_cache_key = cache_key
+            self._build_mac_view_cache()
+
     def _compute_mac_view_payload(
         self,
         loaded: Optional[LoadedFile],
@@ -6521,14 +6808,7 @@ class S19TuiApp(App):
         )
         self._flush_logger()
         records = loaded.mac_records or []
-        mac_cache_key = (
-            id(records),
-            len(records),
-            id(a2l_data),
-            loaded.file_type,
-            tuple(loaded.ranges),
-            len(loaded.mem_map),
-        )
+        mac_cache_key = self._mac_view_cache_key_for(records, loaded, a2l_data)
         mac_widths, mac_cell_rows, mac_cell_styles = precompute_mac_datatable_payload(
             mac_payload["rows"], mac_payload["meta"]
         )
@@ -7135,7 +7415,10 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Short-circuit when no MAC records are loaded (empty table + summary).
+            - Short-circuit when no MAC records are loaded (empty table + summary);
+              a session WITH a primary file still computes/retains the primary+A2L
+              validation report via ``_refresh_no_mac_validation`` (LLR-037.4) —
+              only no-primary sessions clear the validation members.
             - Ensure the DataTable's MAC cache matches the current loaded state.
             - Slice one page of precomputed cell rows using ``mac_records_page_size``.
             - Build ``rich.text.Text`` cells keyed by severity and insert them via
@@ -7147,6 +7430,7 @@ class S19TuiApp(App):
             Uses:
                 - ``_populate_mac_datatable``
                 - ``update_validation_issues_view``
+                - ``_refresh_no_mac_validation`` / ``_mac_view_cache_key_for``
             Used by:
                 - ``_apply_prepared_load`` post-load refresh
                 - ``update_a2l_view`` when A2L data changes
@@ -7159,10 +7443,7 @@ class S19TuiApp(App):
         mac_table.clear(columns=False)
         if not self.current_file or not self.current_file.mac_records:
             summary_label.update("No MAC loaded.")
-            self._validation_report = None
-            self._validation_issues = []
-            self._validation_issue_cell_rows = []
-            self._validation_issue_cell_styles = []
+            self._refresh_no_mac_validation()
             self.update_validation_issues_view()
             self.logger.info(
                 "Load phase boundary: populate_mac_table_done rows=0 elapsed=%.3f",
@@ -7173,10 +7454,7 @@ class S19TuiApp(App):
         records = self.current_file.mac_records or []
         if not records:
             summary_label.update("No MAC records parsed.")
-            self._validation_report = None
-            self._validation_issues = []
-            self._validation_issue_cell_rows = []
-            self._validation_issue_cell_styles = []
+            self._refresh_no_mac_validation()
             self.update_validation_issues_view()
             self.logger.info(
                 "Load phase boundary: populate_mac_table_done rows=0 elapsed=%.3f",
@@ -7184,13 +7462,8 @@ class S19TuiApp(App):
             )
             self._flush_logger()
             return
-        cache_key = (
-            id(records),
-            len(records),
-            id(self.current_a2l_data),
-            self.current_file.file_type,
-            tuple(self.current_file.ranges),
-            len(self.current_file.mem_map),
+        cache_key = self._mac_view_cache_key_for(
+            records, self.current_file, self.current_a2l_data
         )
         if self._mac_view_cache_key != cache_key:
             self._mac_view_cache_key = cache_key
@@ -7393,7 +7666,41 @@ class S19TuiApp(App):
         self.update_a2l_tags_view(self._a2l_filtered_tags)
 
     def update_a2l_view(self) -> None:
-        """Render buffered A2L summary and tags views."""
+        """
+        Summary:
+            Render buffered A2L summary and tag views, refreshing MAC/validation
+            state BEFORE the tag rows render so their severity map is fresh.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Raises:
+            None
+
+        Data Flow:
+            - A2L absent: clear enrichment/filter/find state, render empty views,
+              refresh the MAC view, and (with no primary file) clear the
+              validation members.
+            - A2L present: enrich tags first, then call ``update_mac_view()`` —
+              AFTER enrichment because ``_build_mac_view_cache`` consumes
+              ``self._a2l_enriched_tags``, and BEFORE ``_refresh_a2l_filtered_tags``
+              so the issue list read by the row-severity map reflects the current
+              file pair on the sync-fallback load path (LLR-037.3; the call is
+              idempotent over ``_mac_view_cache_key``, so the reorder adds no
+              recomputation).
+
+        Dependencies:
+            Uses:
+                - ``_compute_a2l_enriched_tags`` / ``update_mac_view``
+                - ``_refresh_a2l_filtered_tags`` / ``_update_a2l_summary_buffer``
+                - ``update_a2l_tags_view`` / ``update_validation_issues_view``
+            Used by:
+                - ``_apply_prepared_load`` (``_step_a2l``)
+                - A2L clear/reload handlers
+        """
         if not self.current_a2l_data:
             self._a2l_enriched_tags = []
             self._a2l_filtered_tags = []
@@ -7411,11 +7718,14 @@ class S19TuiApp(App):
                 self.update_validation_issues_view()
             return
         self._compute_a2l_enriched_tags()
+        # LLR-037.3: install the validation issue list after enrichment (the
+        # MAC-view cache consumes _a2l_enriched_tags) and before the tag rows
+        # render, so the first frame reads a fresh issue-severity map.
+        self.update_mac_view()
         filter_input = self.query_one("#a2l_tags_filter_input", Input)
         self.a2l_tags_filter_text = filter_input.value.strip()
         self._refresh_a2l_filtered_tags(preserve_anchor=False)
         self._update_a2l_summary_buffer()
-        self.update_mac_view()
 
     def update_a2l_tags_view(self, tags: list[dict]) -> None:
         """
@@ -7433,6 +7743,9 @@ class S19TuiApp(App):
             - Clear the DataTable (keep columns) and reset the row_key -> tag map.
             - Short-circuit when ``tags`` is empty (update summary text only).
             - Slice one page using ``_a2l_clamp_page_start`` and window bounds.
+            - Build the issue-severity map from ``self._validation_issues`` once
+              per render (LLR-037.2 map-build ownership) and pass it to
+              ``_a2l_tag_row_severity`` so ERROR-issue symbols red their rows.
             - Build 16-cell tuples with the same fields the prior renderer produced,
               wrap each cell in a severity-styled ``rich.text.Text``, and insert
               via per-row ``add_row`` with ``a2l:<absolute_index>`` keys.
@@ -7440,6 +7753,7 @@ class S19TuiApp(App):
         Dependencies:
             Uses:
                 - ``_a2l_clamp_page_start`` / ``_get_window_bounds``
+                - ``_a2l_issue_severity_map``
                 - ``_a2l_tag_row_severity`` / ``_severity_style``
                 - ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display``
             Used by:
@@ -7474,12 +7788,13 @@ class S19TuiApp(App):
         start, end = self._get_window_bounds(total_tags, self._a2l_window_start, page_size)
         self._a2l_window_start = start
         visible_tags = tags[start:end]
+        issue_severity_map = _a2l_issue_severity_map(self._validation_issues)
         for i, tag in enumerate(visible_tags):
             absolute_index = start + i
             row_key = f"a2l:{absolute_index}"
             self._a2l_row_key_to_tag[row_key] = tag
             cells = self._build_a2l_table_cells(tag)
-            severity = _a2l_tag_row_severity(tag)
+            severity = _a2l_tag_row_severity(tag, issue_severity_map)
             style = _severity_style(severity)
             rich_cells = tuple(Text(cell, style=style) if style else Text(cell) for cell in cells)
             try:

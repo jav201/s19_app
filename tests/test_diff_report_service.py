@@ -23,6 +23,14 @@ Test -> TC -> LLR map:
     test_html_escapes_embedded_payload                TC-028  LLR-004.7 (html.escape)
     test_html_filename_scheme_and_collision           TC-028  LLR-004.7 (M-5 / regex)
 
+Batch-24 (HLR-038 / LLR-038.1 — provenance + linkage kwargs):
+    test_default_kwargs_output_byte_identical_pre_change_golden
+                                                      TC-038.1 (byte-identical)
+    test_provenance_and_linkage_render_in_both_formats
+                                                      TC-038.1 (kwargs render)
+    test_zero_entries_linkage_states_no_entries       TC-038.2 (empty linkage)
+    test_pipe_bearing_symbol_md_escaped_html_intact   TC-038.6 (S-F2 _md_cell)
+
 Element-style thresholds are inline on each test.
 
 Confidentiality (F-S-07): every fixture is a synthetic in-memory byte run —
@@ -32,6 +40,7 @@ never operator firmware.
 from __future__ import annotations
 
 import inspect
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -48,16 +57,19 @@ from s19_app.compare import (
     DiffStats,
     ImageRef,
 )
+from s19_app.tui.changes import ChangeSummaryEntry
 from s19_app.tui.services import diff_report_service
 from s19_app.tui.services.compare_service import ArtifactNote, ArtifactUsage
 from s19_app.tui.services.diff_report_service import (
     DIFF_REPORT_FILENAME_REGEX,
     DIFF_REPORT_HTML_FILENAME_REGEX,
+    BeforeAfterProvenance,
     DiffReportResult,
     generate_diff_report,
     generate_diff_report_html,
     list_diff_reports,
 )
+from s19_app.version import __version__
 
 FIXED_NOW = datetime(2026, 6, 11, 12, 0, 0, tzinfo=timezone.utc)
 
@@ -645,3 +657,267 @@ def test_html_filename_scheme_and_collision(tmp_path: Path) -> None:
     assert DIFF_REPORT_HTML_FILENAME_REGEX.match(first.path.name)
     assert DIFF_REPORT_HTML_FILENAME_REGEX.match(second.path.name)
     assert not DIFF_REPORT_FILENAME_REGEX.match(first.path.name)
+
+
+# ---------------------------------------------------------------------------
+# TC-038.1 / TC-038.2 / TC-038.6 — LLR-038.1 (batch-24) — provenance/linkage
+# kwargs; omitted-kwargs output BYTE-IDENTICAL to pre-change behavior.
+# ---------------------------------------------------------------------------
+
+# PRE-CHANGE golden capture (TC-038.1 byte-identical regression): these two
+# templates are the EXACT bytes generate_diff_report / generate_diff_report_html
+# wrote for the fixture below BEFORE the LLR-038.1 kwargs landed (captured
+# 2026-07-02 against the unedited module, fixed clock FIXED_NOW, mem A=AA x4 /
+# B=BB x4 at 0x100). The live tool version is templated as @@VERSION@@ so the
+# golden survives version bumps while staying byte-exact otherwise.
+_PRE_CHANGE_MD_TEMPLATE = (
+    '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: @@VERSION@@\n- Image A: A.s19 [external] path=`/tmp/a.s19` parse-errors=0\n- Image B: B.s19 [external] path=`/tmp/b.s19` parse-errors=0\n'
+    '- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)\n- Image B artifacts: summary=both; a2l=used (1/2); mac=used (1/1)\n\n## Statistics\n\n| Classification | Runs | Bytes |\n'
+    '|---|---|---|\n| changed | 1 | 4 |\n| only in A | 0 | 0 |\n| only in B | 0 | 0 |\n\n## Runs\n'
+    '\n| Start | End | Length | Classification | Symbols |\n|---|---|---|---|---|\n| 0x00000100 | 0x00000104 | 4 | changed | - |\n\n## Hex windows\n'
+    '\n### Run 0x00000100-0x00000104 (changed)\n\n```diff\n-0x000000C0                                                   |................|\n-0x000000D0                                                   |................|\n'
+    '-0x000000E0                                                   |................|\n-0x000000F0                                                   |................|\n-0x00000100  AA AA AA AA                                      |................|\n+0x000000C0                                                   |................|\n+0x000000D0                                                   |................|\n+0x000000E0                                                   |................|\n'
+    '+0x000000F0                                                   |................|\n+0x00000100  BB BB BB BB                                      |................|\n```\n\nImage A window 0x000000C0-0x00000110:\n\n'
+    '```text\n0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n0x00000100  AA AA AA AA                                      |................|\n'
+    '```\n\nImage B window 0x000000C0-0x00000110:\n\n```text\n0x000000C0                                                   |................|\n'
+    '0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n0x00000100  BB BB BB BB                                      |................|\n```\n'
+)
+
+_PRE_CHANGE_HTML_TEMPLATE = (
+    '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Diff report</title>\n<style>body{font-family:monospace;background:#fdf6e3;color:#073642;}table{border-collapse:collapse;}th,td{border:1px solid #93a1a1;padding:2px 6px;text-align:left;}pre{border:1px solid #93a1a1;padding:6px;overflow:auto;}</style>\n'
+    '</head>\n<body>\n<h1>Diff report</h1>\n<ul>\n<li>Generated (UTC): 2026-06-11T12:00:00+00:00</li>\n<li>Tool version: @@VERSION@@</li>\n'
+    '<li>Image A: A.s19 [external] path=<code>/tmp/a.s19</code> parse-errors=0</li>\n<li>Image B: B.s19 [external] path=<code>/tmp/b.s19</code> parse-errors=0</li>\n<li>Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)</li>\n<li>Image B artifacts: summary=both; a2l=used (1/2); mac=used (1/1)</li>\n</ul>\n<h2>Statistics</h2>\n'
+    '<table>\n<tr><th>Classification</th><th>Runs</th><th>Bytes</th></tr>\n<tr><td style="color:#b58900">changed</td><td>1</td><td>4</td></tr>\n<tr><td style="color:#dc322f">only in A</td><td>0</td><td>0</td></tr>\n<tr><td style="color:#268bd2">only in B</td><td>0</td><td>0</td></tr>\n</table>\n'
+    '<h2>Runs</h2>\n<table>\n<tr><th>Start</th><th>End</th><th>Length</th><th>Classification</th><th>Symbols</th></tr>\n<tr><td>0x00000100</td><td>0x00000104</td><td>4</td><td style="color:#b58900">changed</td><td>-</td></tr>\n</table>\n<h2>Hex windows</h2>\n'
+    '<h3 style="color:#b58900">Run 0x00000100-0x00000104 (changed)</h3>\n<p>Image A window 0x000000C0-0x00000110:</p>\n<pre style="color:#b58900">0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n'
+    '0x00000100  AA AA AA AA                                      |................|</pre>\n<p>Image B window 0x000000C0-0x00000110:</p>\n<pre style="color:#b58900">0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n'
+    '0x00000100  BB BB BB BB                                      |................|</pre>\n</body>\n</html>'
+)
+
+
+def _entry(
+    *,
+    address_start: int = 0x100,
+    address_end: int = 0x102,
+    before_bytes: tuple = (0xAA, 0xAA),
+    after_bytes: tuple = (0x01, 0x02),
+    disposition: str = "applied",
+    linkage: str = "mac-linked",
+    linkage_symbol: str = "CAL_SYM",
+    entry_type: str = "bytes",
+) -> ChangeSummaryEntry:
+    """Build one linkage entry with overridable fields (TC-038.* fixture)."""
+    return ChangeSummaryEntry(
+        entry_type=entry_type,
+        address_start=address_start,
+        address_end=address_end,
+        before_bytes=before_bytes,
+        after_bytes=after_bytes,
+        disposition=disposition,
+        linkage=linkage,
+        linkage_symbol=linkage_symbol,
+    )
+
+
+def _provenance() -> BeforeAfterProvenance:
+    return BeforeAfterProvenance(
+        original_path=Path("/tmp/original.s19"),
+        saved_path=Path("/tmp/original-patched_1.s19"),
+        applied_at_utc="2026-07-02T09:00:00+00:00",
+        change_doc_path=Path("/tmp/change-doc.json"),
+    )
+
+
+def test_default_kwargs_output_byte_identical_pre_change_golden(
+    tmp_path: Path,
+) -> None:
+    """Omitted new kwargs → output byte-identical to the PRE-CHANGE capture.
+
+    Intent: LLR-038.1 — the default-off kwargs leave the diff-report path
+    untouched. Threshold: the written .md and .html BYTES equal the golden
+    captured against the unedited module (fixed clock; version templated);
+    neither new section heading appears anywhere in the default output.
+    """
+    md = generate_diff_report(
+        _comparison(),
+        mem_map_a=_mem(0x100, 0xAA, 4),
+        mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+    )
+    html_r = generate_diff_report_html(
+        _comparison(),
+        mem_map_a=_mem(0x100, 0xAA, 4),
+        mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+    )
+
+    # write_text translates "\n" to os.linesep — the pre-change writer did the
+    # same, so expanding the LF-normalized golden per platform preserves exact
+    # byte identity on Windows (CRLF) and CI Linux (LF) alike.
+    expected_md = _PRE_CHANGE_MD_TEMPLATE.replace("@@VERSION@@", __version__)
+    expected_html = _PRE_CHANGE_HTML_TEMPLATE.replace(
+        "@@VERSION@@", __version__
+    )
+    assert md.path.read_bytes() == expected_md.replace(
+        "\n", os.linesep
+    ).encode("utf-8")
+    assert html_r.path.read_bytes() == expected_html.replace(
+        "\n", os.linesep
+    ).encode("utf-8")
+    # explicit absence of the new sections in default output
+    for text in (expected_md, expected_html):
+        assert "Before/after provenance" not in text
+        assert "Change-entry linkage" not in text
+    # default filename scheme untouched
+    assert md.path.name == "20260611T120000Z-diff-report.md"
+    assert html_r.path.name == "20260611T120000Z-diff-report.html"
+
+
+def test_provenance_and_linkage_render_in_both_formats(tmp_path: Path) -> None:
+    """Provenance + linkage kwargs render the header section and the table.
+
+    Intent: LLR-038.1 — both formats carry the before/after header (original
+    path, saved post-dedup path, apply instant, change-doc origin), one
+    linkage row per entry (all dispositions), the before_bytes=None
+    create-into-hole marker (never fabricated bytes), and the filename-stem
+    override. Threshold: every named element present in BOTH written files;
+    the None-before cell carries the marker and no hex bytes.
+    """
+    entries = [
+        _entry(),
+        _entry(
+            address_start=0x9000,
+            address_end=0x9002,
+            before_bytes=None,
+            after_bytes=(0xCC, 0xDD),
+            disposition="applied",
+            linkage="standalone",
+            linkage_symbol=None,
+        ),
+        _entry(
+            address_start=0x200,
+            address_end=0x201,
+            before_bytes=None,
+            after_bytes=(0xEE,),
+            disposition="skipped",
+            linkage="a2l-linked",
+            linkage_symbol="A2L_SYM",
+        ),
+    ]
+    prov = _provenance()
+    kwargs = dict(
+        mem_map_a=_mem(0x100, 0xAA, 4),
+        mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+        provenance=prov,
+        linkage_entries=entries,
+        filename_stem="before-after-report",
+    )
+    md = generate_diff_report(_comparison(), **kwargs)
+    html_r = generate_diff_report_html(_comparison(), **kwargs)
+
+    # filename-stem override in both formats
+    assert md.path.name == "20260611T120000Z-before-after-report.md"
+    assert html_r.path.name == "20260611T120000Z-before-after-report.html"
+
+    md_text = md.path.read_text(encoding="utf-8")
+    html_text = html_r.path.read_text(encoding="utf-8")
+
+    for text in (md_text, html_text):
+        # provenance header content (str() — platform-native separators)
+        assert "Before/after provenance" in text
+        assert str(prov.original_path) in text
+        assert str(prov.saved_path) in text
+        assert "2026-07-02T09:00:00+00:00" in text
+        assert str(prov.change_doc_path) in text
+        # linkage table content — all three entries, all dispositions
+        assert "Change-entry linkage" in text
+        assert "CAL_SYM" in text
+        assert "A2L_SYM" in text
+        assert "skipped" in text
+        assert "0x00009000" in text
+        # create-into-hole marker, never fabricated bytes
+        assert "(none - created into hole)" in text
+        assert "CC DD" in text  # after side still real
+    # md linkage row shape: entry 1 fully tabular
+    assert (
+        "| 1 | bytes | 0x00000100 | 0x00000102 | applied | mac-linked "
+        "| CAL_SYM | AA AA | 01 02 |" in md_text
+    )
+    # the None-before md row carries the marker cell, not hex
+    assert (
+        "| 2 | bytes | 0x00009000 | 0x00009002 | applied | standalone "
+        "| - | (none - created into hole) | CC DD |" in md_text
+    )
+    # html stays self-contained and safe with the new sections
+    assert html_text.count("<script") == 0
+    assert _EXTERNAL_RESOURCE_RE.search(html_text) is None
+
+
+def test_zero_entries_linkage_states_no_entries(tmp_path: Path) -> None:
+    """An EMPTY linkage sequence renders a 'No entries.' linkage section.
+
+    Intent: LLR-038.1 / TC-038.2 — an apply with 0 applied entries still
+    reports, and the linkage section states there are no entries (the no-diff
+    report precedent). Threshold: section heading + 'No entries.' in both
+    formats; no linkage table header row.
+    """
+    kwargs = dict(
+        mem_map_a=_mem(0x100, 0xAA, 4),
+        mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+        linkage_entries=[],
+    )
+    md = generate_diff_report(_comparison(), **kwargs)
+    html_r = generate_diff_report_html(_comparison(), **kwargs)
+
+    md_text = md.path.read_text(encoding="utf-8")
+    html_text = html_r.path.read_text(encoding="utf-8")
+    for text in (md_text, html_text):
+        assert "Change-entry linkage" in text
+        assert "No entries." in text
+        assert "Disposition" not in text  # no table header for 0 entries
+
+
+def test_pipe_bearing_symbol_md_escaped_html_intact(tmp_path: Path) -> None:
+    """A pipe/control-char symbol is _md_cell-escaped in md, _esc-d in html.
+
+    Intent: LLR-038.1 / S-F2 (TC-038.6) — a parsed-artifact symbol carrying
+    ``|`` and a control char cannot break the Markdown table: the pipe renders
+    escaped (``\\|``), the control char is stripped, and the row still has the
+    9-column shape. The HTML side renders the symbol intact-escaped through
+    ``html.escape``. Threshold: escaped pipe present in md; raw control char
+    absent from both files; md row cell count == 9; html carries the
+    escaped-form symbol.
+    """
+    evil = "EVIL|SYM<b>\x01END"
+    entries = [_entry(linkage_symbol=evil)]
+    kwargs = dict(
+        mem_map_a=_mem(0x100, 0xAA, 4),
+        mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+        linkage_entries=entries,
+    )
+    md = generate_diff_report(_comparison(), **kwargs)
+    html_r = generate_diff_report_html(_comparison(), **kwargs)
+
+    md_text = md.path.read_text(encoding="utf-8")
+    html_text = html_r.path.read_text(encoding="utf-8")
+
+    # md: pipe escaped, control char stripped, table row intact (9 cells)
+    assert "EVIL\\|SYM<b>END" in md_text
+    assert "\x01" not in md_text
+    row = next(
+        ln for ln in md_text.splitlines() if ln.startswith("| 1 | bytes |")
+    )
+    unescaped_pipes = re.findall(r"(?<!\\)\|", row)
+    assert len(unescaped_pipes) == 10  # 9 cells -> 10 structural pipes
+    # html: symbol intact-escaped (pipe preserved, markup escaped via _esc;
+    # ctl-char stripping is the md-cell rule only — S-F2)
+    assert "EVIL|SYM&lt;b&gt;" in html_text
+    assert "<b>" not in html_text

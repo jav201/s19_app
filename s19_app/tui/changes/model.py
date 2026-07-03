@@ -411,6 +411,14 @@ class ChangeSummary:
             ``changes.verify.verify_written_image``; ``None`` when no save
             happened. Kept off :meth:`to_dict` (a runtime-only carrier the TUI
             reads, not part of the deterministic serialized summary).
+        source_image_path (Optional[Path]): The image file the summary was
+            saved FROM (LLR-038.2, B-2 provenance stamp, batch-24) — stamped
+            by ``ChangeService.save_patched`` beside ``saved_path`` so the
+            before/after report composer can detect a stale summary
+            (``LoadedFile.path`` no longer matching). ``None`` when no save
+            happened or the caller passed no source. Kept off
+            :meth:`to_dict`, mirroring ``verify_result``'s runtime-only
+            treatment, so the serialized summary stays byte-stable.
 
     Returns:
         None: Dataclass container.
@@ -453,13 +461,16 @@ class ChangeSummary:
     issues: list[ValidationIssue] = field(default_factory=list)
     saved_path: Optional[Path] = None
     verify_result: Optional["VerifyResult"] = None
+    source_image_path: Optional[Path] = None
 
     def to_dict(self) -> dict[str, object]:
         """
         Summary:
             Serialize this summary to a deterministic plain-data dict — same
             object, same dict, every call; entries in document order
-            (LLR-002.5).
+            (LLR-002.5). ``verify_result`` and ``source_image_path`` are
+            deliberately EXCLUDED — both are runtime-only carriers (LLR-038.2)
+            and serializing them would break the summary's byte-stability.
 
         Returns:
             dict[str, object]: JSON-compatible mapping: paths as strings (or

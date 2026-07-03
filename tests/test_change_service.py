@@ -318,6 +318,89 @@ def test_declined_or_refused_save_leaves_saved_path_none(
 
 
 # ===========================================================================
+# Batch-24 — LLR-038.2 (B-2 provenance stamp): save_patched stamps
+# source_image_path beside saved_path; the field never serializes.
+# ===========================================================================
+
+
+def test_save_patched_stamps_source_image_path(tmp_path: Path) -> None:
+    """save_patched(source_image_path=...) stamps the summary's provenance.
+
+    Intent: LLR-038.2 / B-2 — the image the patched map was loaded from is
+    recorded beside ``saved_path`` in the SAME service seam, so the
+    before/after composer (I4) can detect a stale summary. Threshold: the
+    stamped value equals the passed path; ``saved_path`` stamping unchanged.
+    """
+    service, mem_map, ranges = _service_with_image()
+    service.add_entry("0x100", "", "AA BB")
+    summary = service.apply(mem_map, ranges, None, None, variant_id="img")
+    assert summary.source_image_path is None  # nothing saved yet
+
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    project_dir.mkdir(parents=True)
+    original = tmp_path / "original.s19"
+    result = service.save_patched(
+        mem_map,
+        ranges,
+        project_dir,
+        "img-patched.s19",
+        source_kind="s19",
+        source_image_path=original,
+    )
+
+    assert result.ok, result.message
+    assert summary.saved_path is not None
+    assert summary.source_image_path == original
+
+
+def test_save_patched_without_kwarg_leaves_source_image_path_none(
+    tmp_path: Path,
+) -> None:
+    """Omitting the kwarg keeps ``source_image_path`` None after a save.
+
+    Intent: LLR-038.2 — the stamp is opt-in for the I4 handler; existing
+    callers that never pass a source are unchanged. Threshold: a successful
+    save with the kwarg omitted leaves the field ``None`` while ``saved_path``
+    is stamped.
+    """
+    service, mem_map, ranges = _service_with_image()
+    service.add_entry("0x100", "", "AA")
+    summary = service.apply(mem_map, ranges, None, None)
+
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    project_dir.mkdir(parents=True)
+    result = service.save_patched(
+        mem_map, ranges, project_dir, "img-patched.s19", source_kind="s19"
+    )
+
+    assert result.ok, result.message
+    assert summary.saved_path is not None
+    assert summary.source_image_path is None
+
+
+def test_to_dict_excludes_source_image_path_and_stays_byte_stable(
+    tmp_path: Path,
+) -> None:
+    """``source_image_path`` never serializes — to_dict output byte-unchanged.
+
+    Intent: LLR-038.2 — the field mirrors ``verify_result``'s runtime-only
+    treatment: stamping it must not perturb the deterministic serialized
+    summary. Threshold: the JSON dump of ``to_dict()`` before and after
+    setting the field is byte-equal; the key is absent from the dict.
+    """
+    service, mem_map, ranges = _service_with_image()
+    service.add_entry("0x100", "", "AA BB")
+    summary = service.apply(mem_map, ranges, None, None, variant_id="img")
+
+    baseline = json.dumps(summary.to_dict(), sort_keys=True)
+    summary.source_image_path = tmp_path / "original.s19"
+    stamped = json.dumps(summary.to_dict(), sort_keys=True)
+
+    assert stamped == baseline  # byte-stable serialization
+    assert "source_image_path" not in summary.to_dict()
+
+
+# ===========================================================================
 # F-Q-15 case 6 — legacy-path rejection passthrough
 # ===========================================================================
 
