@@ -76,7 +76,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, Sequence, Tuple
 
 from ...compare import (
     DIFF_KIND_DOMAIN,
@@ -86,6 +86,9 @@ from ...compare import (
     ComparisonResult,
     DiffRun,
 )
+
+if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
+    from ..changes.model import ChangeSummaryEntry
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
@@ -177,8 +180,221 @@ class DiffReportResult:
     diagnostics: List[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True, slots=True)
+class BeforeAfterProvenance:
+    """
+    Summary:
+        The before/after provenance block for a save-back report (LLR-038.1,
+        batch-24) — the identities the report header names so the written file
+        proves WHICH original image was compared against WHICH saved patched
+        image, when the change document was applied, and where that document
+        came from.
+
+    Args:
+        original_path (Path): The ORIGINAL loaded image on disk
+            (``LoadedFile.path``) — the report's "before" side.
+        saved_path (Path): The SAVED patched image — the actual post-dedup
+            written path (``ChangeSummary.saved_path``), the "after" side.
+        applied_at_utc (str): ISO-8601 UTC apply instant
+            (``ChangeSummary.timestamp_utc``).
+        change_doc_path (Optional[Path]): The change document the applied
+            entries came from (``ChangeSummary.source_path``); ``None`` for a
+            programmatically composed document.
+
+    Returns:
+        None: Frozen dataclass container.
+
+    Data Flow:
+        - Built by the before/after composer (LLR-038.2, increment I4) from
+          ``LoadedFile`` + ``ChangeService.last_summary``; consumed by
+          :func:`generate_diff_report` / :func:`generate_diff_report_html`
+          which render it into the written header section.
+
+    Dependencies:
+        Used by:
+            - generate_diff_report
+            - generate_diff_report_html
+            - s19_app.tui.services.before_after_service (increment I4)
+    """
+
+    original_path: Path
+    saved_path: Path
+    applied_at_utc: str
+    change_doc_path: Optional[Path] = None
+
+
+def _strip_ctl(value: object) -> str:
+    """
+    Summary:
+        Strip control characters (``ord < 0x20`` — which covers the
+        row-breaking ``\\n``/``\\r`` — plus ``0x7F``) from one parsed-artifact
+        value (S-F2, LLR-038.1). Shared by the Markdown cell pipeline and the
+        two before/after HTML helpers so a ctl-bearing symbol renders
+        identically in BOTH written formats (increment-3 review
+        recommendation); ``_esc`` escapes markup but does not strip.
+
+    Args:
+        value (object): The raw value (symbol, path, entry field); rendered
+            via ``str()``.
+
+    Returns:
+        str: The text with every control character removed.
+
+    Dependencies:
+        Used by:
+            - _md_cell
+            - _html_provenance
+            - _html_linkage
+    """
+    return "".join(
+        ch for ch in str(value) if ord(ch) >= 0x20 and ord(ch) != 0x7F
+    )
+
+
+def _md_cell(value: object) -> str:
+    """
+    Summary:
+        Sanitize one parsed-artifact value for embedding in a Markdown table
+        cell (S-F2, LLR-038.1): strip control characters via
+        :func:`_strip_ctl` and escape ``|`` so a pipe-bearing A2L/MAC symbol
+        cannot break the table structure.
+
+    Args:
+        value (object): The raw value (symbol, path, entry field); rendered
+            via ``str()``.
+
+    Returns:
+        str: The cell-safe text — no control characters, every ``|`` escaped
+        as ``\\|``.
+
+    Dependencies:
+        Uses:
+            - _strip_ctl
+        Used by:
+            - _provenance_lines
+            - _linkage_table_lines
+    """
+    return _strip_ctl(value).replace("|", "\\|")
+
+
+def _bytes_cell(values: Optional[Sequence[int]]) -> str:
+    """
+    Summary:
+        Render an entry's before/after byte run for a linkage-table cell.
+        ``None`` (a create-into-hole entry — no prior bytes were read) renders
+        the explicit marker, never fabricated bytes (LLR-038.1).
+
+    Args:
+        values (Optional[Sequence[int]]): ``ChangeSummaryEntry.before_bytes``
+            / ``after_bytes``; ``None`` only for the before side of a
+            non-``applied`` or hole-creating entry.
+
+    Returns:
+        str: Space-separated uppercase hex bytes, ``(none - created into
+        hole)`` for ``None``, or ``-`` for an empty run.
+
+    Dependencies:
+        Used by:
+            - _linkage_table_lines
+            - _html_linkage
+    """
+    if values is None:
+        return "(none - created into hole)"
+    return " ".join(f"{b:02X}" for b in values) or "-"
+
+
+def _provenance_lines(provenance: BeforeAfterProvenance) -> List[str]:
+    """
+    Summary:
+        Build the Markdown before/after provenance header section
+        (LLR-038.1): original path, saved (post-dedup) path, apply instant,
+        and change-document origin. Values pass :func:`_md_cell` (S-F2).
+
+    Args:
+        provenance (BeforeAfterProvenance): The composer-built identities.
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included.
+
+    Dependencies:
+        Uses:
+            - _md_cell
+        Used by:
+            - generate_diff_report
+    """
+    doc = (
+        f"`{_md_cell(provenance.change_doc_path)}`"
+        if provenance.change_doc_path is not None
+        else "(in-memory document)"
+    )
+    return [
+        "## Before/after provenance",
+        "",
+        f"- Original image (before): `{_md_cell(provenance.original_path)}`",
+        f"- Saved patched image (after): `{_md_cell(provenance.saved_path)}`",
+        f"- Applied (UTC): {_md_cell(provenance.applied_at_utc)}",
+        f"- Change document: {doc}",
+        "",
+    ]
+
+
+def _linkage_table_lines(
+    entries: Sequence["ChangeSummaryEntry"],
+) -> List[str]:
+    """
+    Summary:
+        Build the Markdown per-entry change-linkage table (LLR-038.1): one row
+        per summary entry — ALL dispositions, not only ``applied`` — with the
+        addressed range, disposition, linkage classification/symbol, and the
+        before/after byte runs. Every parsed-artifact value passes
+        :func:`_md_cell` (S-F2); a ``before_bytes=None`` entry renders the
+        explicit no-prior-bytes marker (never fabricated bytes).
+
+    Args:
+        entries (Sequence[ChangeSummaryEntry]): ``ChangeSummary.entries`` in
+            document order; may be empty.
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included; the empty case
+        states ``No entries.``
+
+    Dependencies:
+        Uses:
+            - _md_cell / _bytes_cell
+        Used by:
+            - generate_diff_report
+    """
+    lines = ["## Change-entry linkage", ""]
+    if not entries:
+        lines.extend(["No entries.", ""])
+        return lines
+    lines.extend(
+        [
+            "| # | Type | Start | End | Disposition | Linkage | Symbol "
+            "| Before | After |",
+            "|---|---|---|---|---|---|---|---|---|",
+        ]
+    )
+    for index, entry in enumerate(entries, start=1):
+        symbol = (
+            _md_cell(entry.linkage_symbol)
+            if entry.linkage_symbol is not None
+            else "-"
+        )
+        lines.append(
+            f"| {index} | {_md_cell(entry.entry_type)} "
+            f"| 0x{entry.address_start:08X} | 0x{entry.address_end:08X} "
+            f"| {_md_cell(entry.disposition)} | {_md_cell(entry.linkage)} "
+            f"| {symbol} "
+            f"| {_md_cell(_bytes_cell(entry.before_bytes))} "
+            f"| {_md_cell(_bytes_cell(entry.after_bytes))} |"
+        )
+    lines.append("")
+    return lines
+
+
 def _diff_report_filename(
-    dest_dir: Path, timestamp: datetime, suffix: str
+    dest_dir: Path, timestamp: datetime, suffix: str, stem: str = "diff-report"
 ) -> str:
     """
     Summary:
@@ -197,6 +413,9 @@ def _diff_report_filename(
             clock.
         suffix (str): The file extension including the dot — ``".md"`` for the
             Markdown report, ``".html"`` for the HTML report.
+        stem (str): The filename kind stem between the counter and the suffix
+            (LLR-038.1) — default ``"diff-report"`` (unchanged scheme); the
+            before/after composer (I4) passes its own stem.
 
     Returns:
         str: A filename matching :data:`DIFF_REPORT_FILENAME_REGEX` (``.md``)
@@ -217,11 +436,11 @@ def _diff_report_filename(
             - generate_diff_report_html
     """
     base = timestamp.strftime(REPORT_TIMESTAMP_FORMAT)
-    candidate = f"{base}-diff-report{suffix}"
+    candidate = f"{base}-{stem}{suffix}"
     if not (dest_dir / candidate).exists():
         return candidate
     for counter in range(1, 100):
-        candidate = f"{base}-{counter:02d}-diff-report{suffix}"
+        candidate = f"{base}-{counter:02d}-{stem}{suffix}"
         if not (dest_dir / candidate).exists():
             return candidate
     raise FileExistsError(
@@ -728,6 +947,9 @@ def generate_diff_report(
     mac_records: Optional[Sequence[dict]] = None,
     context_bytes: int = REPORT_CONTEXT_BYTES_DEFAULT,
     now_fn: Optional[NowFn] = None,
+    provenance: Optional[BeforeAfterProvenance] = None,
+    linkage_entries: Optional[Sequence["ChangeSummaryEntry"]] = None,
+    filename_stem: Optional[str] = None,
 ) -> DiffReportResult:
     """
     Summary:
@@ -761,6 +983,19 @@ def generate_diff_report(
         context_bytes (int): ± surrounding bytes per run hex window.
         now_fn (Optional[NowFn]): Injectable UTC clock; ``None`` resolves to
             ``datetime.now(timezone.utc)``.
+        provenance (Optional[BeforeAfterProvenance]): The before/after
+            save-back identities (LLR-038.1, batch-24); when given a
+            ``## Before/after provenance`` section renders after the header.
+            When omitted the written output is BYTE-IDENTICAL to the
+            pre-batch-24 behavior.
+        linkage_entries (Optional[Sequence[ChangeSummaryEntry]]): The applied
+            summary's per-entry records (LLR-038.1); when given (even empty)
+            a ``## Change-entry linkage`` table renders after the provenance
+            slot — cells ``_md_cell``-sanitized (S-F2), ``before_bytes=None``
+            as an explicit marker. Omitted -> no section, output unchanged.
+        filename_stem (Optional[str]): Filename kind-stem override
+            (LLR-038.1) for the before/after composer's own scheme (I4);
+            ``None`` keeps the ``diff-report`` scheme unchanged.
 
     Returns:
         DiffReportResult: ``written=True`` with the path on success, or
@@ -778,13 +1013,15 @@ def generate_diff_report(
           path (LLR-004.6).
         - Build the filename with the no-silent-overwrite collision counter
           (:func:`_diff_report_filename`, M-5) in the resolved directory.
-        - Emit header -> stats -> run table (best-effort annotation) -> per-run
-          hex windows + ```diff cue, then write once (COMPLETE — G-9).
+        - Emit header -> optional provenance/linkage sections (LLR-038.1) ->
+          stats -> run table (best-effort annotation) -> per-run hex windows +
+          ```diff cue, then write once (COMPLETE — G-9).
 
     Dependencies:
         Uses:
             - _resolve_destination / _diff_report_filename
-            - _header_lines / _stats_lines / _run_table_lines / _hex_windows_lines
+            - _header_lines / _provenance_lines / _linkage_table_lines
+            - _stats_lines / _run_table_lines / _hex_windows_lines
         Used by:
             - s19_app.tui.app.S19TuiApp (increment I4)
             - tests/test_diff_report_service.py
@@ -798,7 +1035,12 @@ def generate_diff_report(
 
     clock = now_fn if now_fn is not None else _default_now
     generated_at = clock()
-    filename = _diff_report_filename(dest_dir, generated_at, ".md")
+    filename = _diff_report_filename(
+        dest_dir,
+        generated_at,
+        ".md",
+        stem=filename_stem if filename_stem is not None else "diff-report",
+    )
 
     symbol_addresses = _artifact_addresses_with_names(
         a2l_records
@@ -806,6 +1048,10 @@ def generate_diff_report(
 
     lines: List[str] = []
     lines.extend(_header_lines(comparison, generated_at))
+    if provenance is not None:
+        lines.extend(_provenance_lines(provenance))
+    if linkage_entries is not None:
+        lines.extend(_linkage_table_lines(linkage_entries))
     lines.extend(_stats_lines(comparison))
     lines.extend(_run_table_lines(comparison, symbol_addresses))
     lines.extend(
@@ -883,6 +1129,98 @@ def _html_header(comparison: ComparisonResult, generated_at: datetime) -> List[s
         _usage("B", comparison.notes.get("image_b")),
         "</ul>",
     ]
+
+
+def _html_provenance(provenance: BeforeAfterProvenance) -> List[str]:
+    """
+    Summary:
+        Build the HTML before/after provenance section (LLR-038.1) — the
+        Markdown :func:`_provenance_lines` mirror, every embedded value
+        ctl-stripped via :func:`_strip_ctl` (md/html pair consistency) then
+        ``html.escape``-d via :func:`_esc`.
+
+    Args:
+        provenance (BeforeAfterProvenance): The composer-built identities.
+
+    Returns:
+        List[str]: HTML lines.
+
+    Dependencies:
+        Uses:
+            - _esc / _strip_ctl
+        Used by:
+            - generate_diff_report_html
+    """
+    doc = (
+        f"<code>{_esc(_strip_ctl(provenance.change_doc_path))}</code>"
+        if provenance.change_doc_path is not None
+        else "(in-memory document)"
+    )
+    return [
+        "<h2>Before/after provenance</h2>",
+        "<ul>",
+        f"<li>Original image (before): "
+        f"<code>{_esc(_strip_ctl(provenance.original_path))}</code></li>",
+        f"<li>Saved patched image (after): "
+        f"<code>{_esc(_strip_ctl(provenance.saved_path))}</code></li>",
+        f"<li>Applied (UTC): {_esc(_strip_ctl(provenance.applied_at_utc))}</li>",
+        f"<li>Change document: {doc}</li>",
+        "</ul>",
+    ]
+
+
+def _html_linkage(entries: Sequence["ChangeSummaryEntry"]) -> List[str]:
+    """
+    Summary:
+        Build the HTML per-entry change-linkage table (LLR-038.1) — the
+        Markdown :func:`_linkage_table_lines` mirror: one row per summary
+        entry (all dispositions), values ctl-stripped via :func:`_strip_ctl`
+        (md/html pair consistency) then ``html.escape``-d via :func:`_esc`,
+        ``before_bytes=None`` rendered as the explicit no-prior-bytes marker.
+
+    Args:
+        entries (Sequence[ChangeSummaryEntry]): ``ChangeSummary.entries`` in
+            document order; may be empty.
+
+    Returns:
+        List[str]: HTML lines; the empty case states ``No entries.``
+
+    Dependencies:
+        Uses:
+            - _esc / _strip_ctl / _bytes_cell
+        Used by:
+            - generate_diff_report_html
+    """
+    lines = ["<h2>Change-entry linkage</h2>"]
+    if not entries:
+        lines.append("<p>No entries.</p>")
+        return lines
+    lines.extend(
+        [
+            "<table>",
+            "<tr><th>#</th><th>Type</th><th>Start</th><th>End</th>"
+            "<th>Disposition</th><th>Linkage</th><th>Symbol</th>"
+            "<th>Before</th><th>After</th></tr>",
+        ]
+    )
+    for index, entry in enumerate(entries, start=1):
+        symbol = (
+            _esc(_strip_ctl(entry.linkage_symbol))
+            if entry.linkage_symbol is not None
+            else "-"
+        )
+        lines.append(
+            f"<tr><td>{index}</td><td>{_esc(_strip_ctl(entry.entry_type))}</td>"
+            f"<td>0x{entry.address_start:08X}</td>"
+            f"<td>0x{entry.address_end:08X}</td>"
+            f"<td>{_esc(_strip_ctl(entry.disposition))}</td>"
+            f"<td>{_esc(_strip_ctl(entry.linkage))}</td>"
+            f"<td>{symbol}</td>"
+            f"<td>{_esc(_bytes_cell(entry.before_bytes))}</td>"
+            f"<td>{_esc(_bytes_cell(entry.after_bytes))}</td></tr>"
+        )
+    lines.append("</table>")
+    return lines
 
 
 def _html_stats(comparison: ComparisonResult) -> List[str]:
@@ -1023,6 +1361,9 @@ def generate_diff_report_html(
     mac_records: Optional[Sequence[dict]] = None,
     context_bytes: int = REPORT_CONTEXT_BYTES_DEFAULT,
     now_fn: Optional[NowFn] = None,
+    provenance: Optional[BeforeAfterProvenance] = None,
+    linkage_entries: Optional[Sequence["ChangeSummaryEntry"]] = None,
+    filename_stem: Optional[str] = None,
 ) -> DiffReportResult:
     """
     Summary:
@@ -1054,6 +1395,18 @@ def generate_diff_report_html(
         context_bytes (int): ± surrounding bytes per run hex window.
         now_fn (Optional[NowFn]): Injectable UTC clock; ``None`` resolves to
             ``datetime.now(timezone.utc)``.
+        provenance (Optional[BeforeAfterProvenance]): The before/after
+            save-back identities (LLR-038.1, batch-24); when given a
+            ``Before/after provenance`` section renders after the header,
+            values ``_esc``-d. Omitted -> output BYTE-IDENTICAL to the
+            pre-batch-24 behavior.
+        linkage_entries (Optional[Sequence[ChangeSummaryEntry]]): The applied
+            summary's per-entry records (LLR-038.1); when given (even empty)
+            a ``Change-entry linkage`` table renders after the provenance
+            slot, values ``_esc``-d, ``before_bytes=None`` as an explicit
+            marker. Omitted -> no section, output unchanged.
+        filename_stem (Optional[str]): Filename kind-stem override
+            (LLR-038.1); ``None`` keeps the ``diff-report`` scheme unchanged.
 
     Returns:
         DiffReportResult: ``written=True`` with the ``.html`` path on success,
@@ -1075,7 +1428,8 @@ def generate_diff_report_html(
     Dependencies:
         Uses:
             - _resolve_destination / _diff_report_filename
-            - _html_header / _html_stats / _html_run_rows / _html_hex_windows
+            - _html_header / _html_provenance / _html_linkage
+            - _html_stats / _html_run_rows / _html_hex_windows
         Used by:
             - s19_app.tui.app.S19TuiApp (increment I4)
             - tests/test_diff_report_service.py
@@ -1089,7 +1443,12 @@ def generate_diff_report_html(
 
     clock = now_fn if now_fn is not None else _default_now
     generated_at = clock()
-    filename = _diff_report_filename(dest_dir, generated_at, ".html")
+    filename = _diff_report_filename(
+        dest_dir,
+        generated_at,
+        ".html",
+        stem=filename_stem if filename_stem is not None else "diff-report",
+    )
 
     symbol_addresses = _artifact_addresses_with_names(
         a2l_records
@@ -1113,6 +1472,10 @@ def generate_diff_report_html(
         "<body>",
     ]
     lines.extend(_html_header(comparison, generated_at))
+    if provenance is not None:
+        lines.extend(_html_provenance(provenance))
+    if linkage_entries is not None:
+        lines.extend(_html_linkage(linkage_entries))
     lines.extend(_html_stats(comparison))
     lines.extend(_html_run_rows(comparison, symbol_addresses))
     lines.extend(_html_hex_windows(comparison, mem_map_a, mem_map_b, context_bytes))

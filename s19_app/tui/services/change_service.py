@@ -867,12 +867,15 @@ class ChangeService:
         source_kind: str,
         bytes_per_line: int = 32,
         s0_header: bytes | None = None,
+        source_image_path: Optional[Path] = None,
     ) -> ChangeActionResult:
         """
         Summary:
             Persist the post-apply image under the operator-confirmed
             filename via ``save_patched_image``, stamp the written path onto
-            ``last_summary.saved_path``, then verify-on-save: re-read the
+            ``last_summary.saved_path`` (and the caller's source image onto
+            ``last_summary.source_image_path`` — the LLR-038.2 B-2 provenance
+            stamp), then verify-on-save: re-read the
             written file and diff it against the intended map, stamping the
             ``VerifyResult`` onto ``last_summary.verify_result`` (HLR-002
             service half + HLR-003 wiring, §6.2 C-10 back-compatible carrier).
@@ -896,6 +899,13 @@ class ChangeService:
             s0_header (bytes | None): Optional populated S0 header, forwarded
                 to ``save_patched_image`` and applied on the S19 branch only
                 (LLR-015.3).
+            source_image_path (Optional[Path]): The image file this patched
+                map was loaded from (``LoadedFile.path``; the app handler
+                passes it at I4) — stamped onto
+                ``last_summary.source_image_path`` beside ``saved_path`` so
+                the before/after composer can detect a stale summary
+                (LLR-038.2, B-2). Runtime-only: never serialized by
+                ``ChangeSummary.to_dict``.
 
         Returns:
             ChangeActionResult: ``ok`` ``True`` with the written file name
@@ -920,6 +930,7 @@ class ChangeService:
         )
         if self.last_summary is not None:
             self.last_summary.saved_path = path
+            self.last_summary.source_image_path = source_image_path
         if path is None:
             return ChangeActionResult(
                 message="Patched image not saved - see issues",

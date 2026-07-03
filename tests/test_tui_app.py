@@ -47,11 +47,13 @@ def test_mac_record_ui_state_a2l_verification_buckets():
 
 
 def test_a2l_tag_row_severity_matches_updated_policy():
-    assert _a2l_tag_row_severity({"schema_ok": False}) == ValidationSeverity.ERROR
-    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": True, "in_memory": True}) == ValidationSeverity.OK
-    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": True, "in_memory": False}) == ValidationSeverity.INFO
-    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False, "source": "formula"}) == ValidationSeverity.INFO
-    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False}) == ValidationSeverity.NEUTRAL
+    # Empty issue-severity map = ladder-only behavior (LLR-037.2; the
+    # ERROR-issue precedence matrix lives in tests/test_tui_a2l_issue_recolor.py).
+    assert _a2l_tag_row_severity({"schema_ok": False}, {}) == ValidationSeverity.ERROR
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": True, "in_memory": True}, {}) == ValidationSeverity.OK
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": True, "in_memory": False}, {}) == ValidationSeverity.INFO
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False, "source": "formula"}, {}) == ValidationSeverity.INFO
+    assert _a2l_tag_row_severity({"schema_ok": True, "memory_checked": False}, {}) == ValidationSeverity.NEUTRAL
 
 
 def test_save_project_writes_under_workarea(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
