@@ -1,6 +1,6 @@
 # s19_app — dev-flow BACKLOG (cross-batch, prioritized)
 
-> Single prioritized queue for open feature work. `origin/main` tip = `f5f8111` (batch-22 PR #35 + hook-fix PR #36 + Select.NULL sentinel fixes PRs #37/#38 merged); **batch-23 (#8 US-028, the FINAL #8 story) pending commit/PR.** **RC-1 every batch open:** `git fetch`; assert merge-base == origin/main tip; cut a fresh branch off origin/main; per-story already-shipped grep before deriving. **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`). ≤5 files/increment; every behavioral change ships a black-box `AT-NNN` shown failing pre-fix; commits/PRs only on operator approval. **Last refresh: 2026-07-02 (batch-23 close).**
+> Single prioritized queue for open feature work. `origin/main` tip = `9d2123c` (batch-23 PR #39 merged — feature #8 COMPLETE); **batch-24 (#12 (a)+(c): reconcile both directions + before/after report) pending commit/PR.** **RC-1 every batch open:** `git fetch`; assert merge-base == origin/main tip; cut a fresh branch off origin/main; per-story already-shipped grep before deriving. **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`). ≤5 files/increment; every behavioral change ships a black-box `AT-NNN` shown failing pre-fix; commits/PRs only on operator approval. **Last refresh: 2026-07-03 (batch-24 close).**
 
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct, direct(global ~/.claude)}
@@ -9,10 +9,10 @@
 
 ## OPEN QUEUE
 
-### #12 — Before/after report + entropy viewer + reconcile
-- **Flow:** `/dev-flow` (greenfield → **design proposal first**; likely a batch-21-style Phase-0 decomposition). **Priority: P1 — NEXT** (queue head now that #8 is closed).
-- **Scope:** (a) before/after report generation (original vs patched file); (b) entropy / data-classification viewer (greenfield); (c) A2L-colour ↔ issues-report reconcile (red A2L rows that produce no issue).
-- Verified net-new: `report_service.py` has 0 `entropy`/`before-after` hits on main. (c) likely the smallest sub-item and could be split out early if value warrants.
+### #12(b) — Entropy / data-classification viewer (the remaining #12 piece)
+- **Flow:** `/dev-flow` with a batch-22-style Phase-0 SPIKE (algorithm: window size / estimator / band thresholds; ambition: entropy bands vs semantic classification; surface: report-section-first US-037 vs viewer US-036 w/ C-13 measurement; `/prototype` candidate per the UI-focus note). **Priority: P1 — NEXT.**
+- Stories pre-drafted at batch-24 Phase 0 (01-requirements §2.6): US-035 (headless service — prerequisite), US-036 (viewer, HIGH geometry), US-037 (report section, cheap). Substrate verified: `LoadedFile.mem_map + ranges`; entropy computation TUI-side (engine-frozen constraint).
+- **#12(a)+(c) DONE (batch-24):** US-032/033 (A2L↔issues reconcile BOTH directions + the no-MAC wipe fix LLR-037.4) + US-034 (before/after report on save-back w/ B-2 provenance guards). REQUIREMENTS §30/§31. Pending PR.
 
 ---
 
@@ -22,6 +22,12 @@
 
 ### Snapshot-baseline batch (batch-22/23 carry)
 - **Flow:** own small batch or fold into the next batch touching CI. **Priority: P3.** The batch-22 patch snapshot cells (80×24/120×30) remain xfail-until-baseline; batch-23's variant row changed the pane tree, so baselines regenerate AFTER both merges, ONLY in the canonical CI env (memory: local regen drifts).
+
+### Batch-24 carries (small, fold opportunistically)
+- **I4-F1** (P3): orphan-md when the html half of the before/after pair refuses after the md wrote — theoretical branch; optional `unlink(missing_ok=True)` or diagnostic append. `before_after_service.py:346-351`.
+- **Pre-existing ruff F401s** (P3): test_tui_app.py:1599 + 2 in the I3 sweep — one-token deletions, own micro-PR.
+- **C1-range `_strip_ctl` extension** (P3): extend the predicate to U+0080–U+009F if the helper is touched again.
+- **Recorded AT limitations** (no action): AT-037b single-shot inertness (spec-accepted); AT-038d state-level switch — RE-DERIVE if a future batch adds last-summary invalidation to the real project-switch path.
 
 ### D-3 — Declared-region report dialog: per-line skip detail + comma-in-name support (D-2 follow-on)
 - **Flow:** `direct` micro-PR or fold into a batch already touching the report dialog. **Priority: P3.** **Origin:** batch-20 (D-2 shipped count-only; reviewer/postmortem deferrals).
@@ -48,7 +54,7 @@
 - Closed process/AT carries: C-9 (compare hex-pane AT), CRC-width lock-AT, ruff F401/F402, batch-07 report seam, batch-01 evidence packs, C-6 (TC-id retire), obsidian flips.
 
 ## Controls encoded (global `~/.claude` / templates) — do NOT re-encode
-RC-1 (Phase-0 base-currency gate), C-1 (dev-flow-sync reject-check), C-10/C-11 (AT-authoring), C-12 (output-then-consume AT), **C-13 (geometry-budget)** + **C-13.1 (deficit-matched fallback, batch-18)**, **C-14 (location-move census sweep — e2e/save-observers, batch-21)**, **C-15 (symbol-identity probe + post-fold sweep-back, batch-23)**, QC-2 (value-discriminating RED), QC-3 (boundary-catalog pre-Phase-3), **inline-paste-at-gates protocol (batch-20, dev-flow.md point 5)**, **repo-hygiene close-checklist line (batch-23, dev-flow-sync.md step 3)**. Two-layer AT/TC + dual traceability standing. dev-flow control-encode approval protocol (always ask before editing `~/.claude/commands/`).
+RC-1 (Phase-0 base-currency gate), C-1 (dev-flow-sync reject-check), C-10/C-11 (AT-authoring), C-12 (output-then-consume AT), **C-13 (geometry-budget)** + **C-13.1 (deficit-matched fallback, batch-18)**, **C-14 (location-move census sweep — e2e/save-observers, batch-21)**, **C-15 (symbol-identity probe + post-fold sweep-back, batch-23)** + **C-15.1 (writer-census probe, batch-24)**, **state-lifetime provenance rule (req-template, batch-24)**, **interruption protocol + golden double-proof (dev-flow.md, batch-24)**, QC-2 (value-discriminating RED), QC-3 (boundary-catalog pre-Phase-3), **inline-paste-at-gates protocol (batch-20, dev-flow.md point 5)**, **repo-hygiene close-checklist line (batch-23, dev-flow-sync.md step 3)**. Two-layer AT/TC + dual traceability standing. dev-flow control-encode approval protocol (always ask before editing `~/.claude/commands/`).
 
 ---
 
