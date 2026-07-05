@@ -14,6 +14,12 @@ on:
       - main
       - main-tui
 
+# Least-privilege (batch-25): every job needs only to read the checked-out
+# source. No job writes back to the repo (baseline regeneration is a manual,
+# artifact-upload-only workflow_dispatch in snapshot-regen.yml).
+permissions:
+  contents: read
+
 jobs:
   tui-ci:
     runs-on: ubuntu-latest
@@ -43,3 +49,31 @@ jobs:
       - name: Run full test suite (pushes)
         if: github.event_name == 'push'
         run: pytest -q
+
+  # Non-blocking layout-drift oracle (batch-25). Runs the pytest-textual-snapshot
+  # suite that the main tui-ci job cannot (it never installs the [dev] extra, so
+  # the 28 snapshot cells were silently SKIPPED on every PR/push). `continue-on-
+  # error: true` keeps this job advisory: drift surfaces in the run log but does
+  # NOT fail the workflow or block merges. Baselines are regenerated only in this
+  # same canonical env via snapshot-regen.yml (never locally — see the
+  # snapshot-regen-env convention).
+  snapshot:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies (with dev extra for pytest-textual-snapshot)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -e ".[dev]"
+
+      - name: Run TUI layout-snapshot suite (28 cells)
+        run: pytest tests/test_tui_snapshot.py -m snapshot -q
