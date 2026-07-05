@@ -1,207 +1,41 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-07-02-batch-24",
-    "batch_objective": "Feature #12: (a) before/after report generation (original vs patched), (b) entropy/data-classification viewer (greenfield), (c) A2L-colour <-> issues-report reconcile. Design-heavy queue head after #8 closed; Phase 0 = decomposition + design proposal (batch-21 precedent) -> operator picks the batch-24 slice at the DoR gate. Engine-frozen set OFF-LIMITS (entropy computation TUI-side). Full /dev-flow.",
-    "current_phase": 6,
-    "phase_status": "awaiting-sync",
-    "iterations_per_phase": {
-        "0": 1,
-        "1": 2,
-        "2": 1,
-        "3": 1,
-        "4": 1,
-        "5": 1,
-        "6": 1
-    },
+    "batch_id": "2026-07-03-batch-25",
+    "batch_objective": "P3 snapshot-baseline batch (addendum to the batch-25 command; entropy #12(b) DEFERRED to batch-26). Fix tui-ci.yml so the pytest-textual-snapshot suite actually RUNS (currently silently skipped every PR/push: CI installs requirements+pytest+pillow, never the [dev] extra). Regenerate the 28-cell baseline set IN THE CANONICAL CI ENV ONLY (local regen forbidden per snapshot-regen-env memory). Drop the 2 permanent patch xfail cells once real baselines land. Refresh vault assets/snapshots/ + visual-evidence.md, dated to this batch. Baselines-only; pilot GIF gallery OUT OF SCOPE (C-16). No engine-frozen module touched. REQUIREMENTS row R-TUI-029.",
+    "current_phase": 0,
+    "phase_status": "in-progress",
+    "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
     "artifacts": {
         "backlog": ".dev-flow/BACKLOG.md",
-        "plan": ".dev-flow/2026-07-02-batch-24/PLAN.md",
-        "1": ".dev-flow/2026-07-02-batch-24/01-requirements.md",
-        "2": ".dev-flow/2026-07-02-batch-24/02-review.md",
-        "4": ".dev-flow/2026-07-02-batch-24/04-validation.md"
+        "plan": ".dev-flow/2026-07-03-batch-25/PLAN.md"
     },
-    "branch": "claude/batch-24-feat12 cut at origin/main 9d2123c (batch-23 PR #39 merge; RC-1 PASS, merge-base == tip). Carried uncommitted -> ride batch-24 first commit: batch-23 close snapshot (.dev-flow/2026-07-01-batch-23/state-snapshot-at-close.json) + this state.json batch-24 rollover (includes batch-23 obsidian_synced=true flip). Same worktree (naughty-rhodes-96200c); inline-paste at gates.",
+    "branch": "claude/laughing-gauss-1ccc58 (auto-cut worktree branch) @ 0c06b48 = origin/main tip (batch-24 PR #40 merge). RC-1 PASS: merge-base == origin/main tip, clean tree, no rebase/new-cut needed. STANDING FLAG unresolved: operator's PRIMARY checkout still on merged branch fix/select-null-blank-sentinel -> switch to main.",
+    "route_note": "Snapshot-baseline is CI/infra work with a MANDATORY CI round-trip (baselines regen in canonical env only, cannot regen on this Windows local). Route (full /dev-flow vs /fast-dev-flow) + the 2 design forks (CI gating policy; baseline CI->repo round-trip mechanism) are the Phase-0 gate decisions.",
     "previous_batches": [
-        "2026-05-05-batch-01",
-        "2026-05-20-batch-02",
-        "2026-05-21-batch-03",
-        "2026-05-21-batch-04",
-        "2026-05-26-batch-05",
-        "2026-06-09-batch-06",
-        "2026-06-10-batch-07",
-        "2026-06-11-batch-08",
-        "2026-06-11-batch-09",
-        "2026-06-13-batch-10",
-        "2026-06-14-batch-11",
-        "2026-06-16-batch-12",
-        "2026-06-17-batch-13",
-        "2026-06-23-batch-14",
-        "2026-06-24-batch-15",
-        "2026-06-25-batch-16",
-        "2026-06-26-batch-17",
-        "2026-06-26-batch-18",
-        "2026-06-29-batch-19",
-        "2026-06-29-batch-20",
-        "2026-06-29-batch-21",
-        "2026-07-01-batch-22",
-        "2026-07-01-batch-23"
+        "2026-05-05-batch-01", "2026-05-20-batch-02", "2026-05-21-batch-03", "2026-05-21-batch-04",
+        "2026-05-26-batch-05", "2026-06-09-batch-06", "2026-06-10-batch-07", "2026-06-11-batch-08",
+        "2026-06-11-batch-09", "2026-06-13-batch-10", "2026-06-14-batch-11", "2026-06-16-batch-12",
+        "2026-06-17-batch-13", "2026-06-23-batch-14", "2026-06-24-batch-15", "2026-06-25-batch-16",
+        "2026-06-26-batch-17", "2026-06-26-batch-18", "2026-06-29-batch-19", "2026-06-29-batch-20",
+        "2026-06-29-batch-21", "2026-07-01-batch-22", "2026-07-01-batch-23", "2026-07-02-batch-24"
     ],
-    "batch_layout": "Each batch archived under .dev-flow/<YYYY-MM-DD>-batch-NN/. batch-23 closing state (obsidian_synced true) snapshotted to .dev-flow/2026-07-01-batch-23/state-snapshot-at-close.json at batch-24 init -> rides batch-24's first commit (standing pattern). batch-23 merged PR #39 (9d2123c) - FEATURE #8 COMPLETE.",
-    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. TUI-side write logic -> tui/changes/io.py. Services + screens_directionb.py + app.py + styles.tcss are OUTSIDE the frozen set. #12 note: entropy computation must live TUI-side (services/ or a new module); color_policy is READABLE for the (c) reconcile but not editable.",
+    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. This batch touches NONE of them (CI yaml + test-file xfail marks + committed SVG baselines + docs only).",
     "decisions_log": [
         {
             "phase": 6,
             "date": "2026-07-03",
-            "decision": "approved-awaiting-sync",
-            "notes": "Operator APPROVED Phase 6 + close sequence. state -> awaiting-sync. Close: commit 1 feat (6 code files + 5 test files + REQUIREMENTS §30/§31; artifact hook validates), commit 2 docs (.dev-flow batch-24 + BACKLOG + state + batch-23 snapshot carry), push claude/batch-24-feat12, PR to main, operator merge, /dev-flow-sync (incl. first live visual-evidence refresh - tui/ touched). Batch-24 ships #12(a)+(c): the reconcile both directions (2 live shipped bugs fixed w/ RED-first proof + the no-MAC wipe fix) + the before/after report (provenance-guarded). 4 controls encoded at P5."
-        },
-        {
-            "phase": 6,
-            "date": "2026-07-03",
-            "decision": "awaiting-gate",
-            "notes": "Phase 6 DONE (docs-writer PARALLEL presentation-builder) -> 06-docs/: traceability-matrix.md (zero gaps both chains, V-5 nodes, current-tree re-verified anchors w/ drift preamble, GUARD arithmetic reconciled 3 Layer-B + 1 Layer-A, RED-evidence pointers incl. 2 live-bug notes), functionality.md (reconcile mutual-guarantee + no-MAC operator framing + refusal-ladder table + 9 re-verified seams), diagrams/batch-24-flows.md (3 Mermaid: reconcile both-directions, before/after chain w/ 7 refusal branches, no-MAC before/after), executive-summary.md (honest figures; stale pending-decision wording corrected to adopted). Cross-read findings dispositioned: §6.6 stale §29 pointer FIXED; GUARD framing reconciled in-matrix; TOC drift pre-existing footnoted; I4 date 07-03 correct (gate ran post-midnight); anchor drift handled per precedent. BACKLOG refreshed (#12(a)+(c) DONE pending PR; #12(b) entropy = P1 NEXT w/ spike scope; batch-24 carries logged; 4 new controls in register + stale-lines swept). Awaiting Phase-6 gate -> close sequence: commit x2, push, PR, operator merge, /dev-flow-sync (incl. the NEW visual-evidence refresh - batch-24 touched tui/)."
-        },
-        {
-            "phase": 6,
-            "date": "2026-07-03",
-            "decision": "in-progress",
-            "notes": "Operator APPROVED Phase 5 + ALL FOUR control encodes (AskUserQuestion, encode-approval protocol satisfied): C-15.1 writer-census probe (dev-flow.md C-15 family, grep-form, B-1 origin), state-lifetime provenance rule (req-template.md, B-2 origin), interruption protocol (dev-flow.md new section post-Iteration-cap, I4 origin + qa's 4 conditions referenced), golden double-proof narrow (dev-flow.md Independent-review bullet, I3 origin). Overclaim watch stays 2. Phase 6 dispatched: docs-writer (matrix/functionality/diagrams) PARALLEL presentation-builder (exec summary)."
-        },
-        {
-            "phase": 5,
-            "date": "2026-07-03",
-            "decision": "awaiting-gate",
-            "notes": "Phase 5 co-authored (architect 05 PARALLEL qa 05b). HEADLINES: P2 paid twice (B-1 no-MAC wipe = C-15 blind spot one function deeper, fixed-in-product LLR-037.4; B-2 false-provenance via every-write-surface security routing); 2 of 3 REDs were LIVE SHIPPED BUGS (the flow's strongest evidence class to date); I4 interruption absorbed zero-rework (clean-RED checkpoint + verify-before-extend). SCORECARD: P2=18, P3=15 (10 LOW + 5 D-notes), P4=0; caught-P2 strict 54.5% BUT excluding execute-to-discover 85.7% (strongest P2 of the 3 batches severity-weighted; qa: trend BOTH, the excluded one is the shift-left signal - the strict metric punishes recorded transparency). qa condition-set for interruption-REDs (4 named conditions; equivalence was cheap only because I4's counterfactual was absent-deliverable class - do NOT generalize). CONTROL RECOMMENDATIONS: 1 C-15.1 writer-census ENCODE (grep form - mechanical, demonstrably would have fired); 2 state-lifetime provenance template line ENCODE; 3 interruption protocol ENCODE (3 lines); 4 golden double-proof ENCODE-NARROW or WATCH; 5 overclaim watch stays at 2 (no 3rd instance; twice the opposite). Existing-control saves: C-15 sweep-back, QC-2/C-10/C-12, two-layer (both live REDs its trophies), RC-1, security routing, census net-0 exact. Awaiting Phase-5 gate + control decisions."
-        },
-        {
-            "phase": 5,
-            "date": "2026-07-03",
-            "decision": "in-progress",
-            "notes": "Operator APPROVED Phase 4 (PASS). Phase 5 dispatched: architect (main postmortem + control-candidate analysis) PARALLEL qa (scorecard deep-dive -> 05b)."
-        },
-        {
-            "phase": 4,
-            "date": "2026-07-03",
-            "decision": "awaiting-gate",
-            "notes": "Phase 4 DONE (qa executed) -> 04-validation.md. VERDICT PASS, zero gaps/blockers. qa EXECUTED (not inherited): 3 new files 26/26 (15.65s), 2 extended 45/45, engine guard green, frozen 0-diff re-verified, issue-code greps clean, handler inspection (paths/diagnostics only). V-5: all 24 provisional ids bound to 33 real nodes (26+7=33 == ledger +33); 3 RED captures bound to reconciled nodes (AT-036a live-bug, AT-037a live-bug, AT-038a-d trigger-absent 5-fail). ALL 12 LLR thresholds read in-assert - none vacuous (list-equality counts, call-counter cache proofs, raw read_bytes golden, 0-files-per-class with positive needles, Q-M1 chain literal, Q-M2 honored). 1 soft cell honestly classified (project.json untouched = census+byte-stability by-construction, justified); 1 precision note (virtual-exempt sharpest assert in AT-036a not AT-036c - covered both, no gap). Carries to P5/P6: I4-F1 BACKLOG, 3 pre-existing F401s, C1-strip optional, AT-037b single-shot limitation, F3 re-derive trigger. Full-suite evidence = I4 gate run 1004/0 (current, no code since). Awaiting Phase-4 gate."
-        },
-        {
-            "phase": 4,
-            "date": "2026-07-03",
-            "decision": "in-progress",
-            "notes": "Operator APPROVED I5 -> PHASE 3 COMPLETE (5/5 inc, 1004->1037, iterations_per_phase[3]=1). Phase 4 dispatched (qa-reviewer): V-5 bind all provisional AT/TC ids to the 33 real nodes, Layer A/B results (re-run new files itself), bidirectional matrix vs the QC-3 catalogs, deviations record (D-notes I1-I4 + AM-1..4), verdict. Full-suite evidence = the I4 gate run (1004/0, current - no code changed since); orchestrator re-runs at gate only if anything changes."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-03",
-            "decision": "inc5-awaiting-gate-phase3-complete",
-            "notes": "Operator APPROVED I4. I5 (close, orchestrator-executed doc increment) DONE -> increment-5.md: AM-4 (F2 C-10 wording reconcile, discriminator unchanged), F3 traceability note (AT-038d state-level switch + re-derive trigger), F1 -> BACKLOG carry, V-5 census (33 batch nodes: 26 across 3 new files + 7 in 2 extended; ledger cross-checks 1004->1037). REQUIREMENTS §30/§31 coherent. PHASE 3 COMPLETE pending gate: 5/5 increments, 3 stories + 2 blocker-born requirements, 3 RED-first counterfactuals, frozen 0-diff throughout, code-review 0 HIGH/0 MED/10 LOW all dispositioned. Awaiting I5/Phase-3 gate -> Phase 4."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-03",
-            "decision": "inc4-awaiting-gate",
-            "notes": "I4 (US-034 composer + trigger) COMPLETE across the interruption split (Agent A: composer 354L + tests 694L + more wiring than credited; Agent B post-reset: action_before_after_report method + _strip_ctl factoring + REQUIREMENTS §31 + increment-4.md w/ split credit). RED CAPTURE: the interruption checkpoint's 5-fail state = the specced trigger-absent counterfactual (verbatim §0). Results: 55 passed (before_after+diff_report+change_service; GOLDEN INTACT), targeted 34/0, FULL suite 0 fail, ledger 1027->1037 (+10), ruff clean, frozen 0-diff. code-reviewer OK-TO-ADVANCE (0 HIGH/MED; 3 LOW -> I5: F1 orphan-md hygiene optional, F2 NON-DEFAULT wording reconcile, F3 AT-038d state-level note). Key b live, driven by pilot.press. US-034 DONE - all 3 batch stories implemented. Awaiting I4 gate -> I5 (V-5 reconcile + F2 wording amend + traceability + close)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc4-INTERRUPTED-session-limit",
-            "notes": "I4 agent hit the account session limit mid-run (resets 21:00 America/Mexico_City) after 44 tool calls. TREE STATE (coherent partial, verified): DONE = before_after_service.py (354 lines, composer), tests/test_before_after_report.py (693 lines, 5 pass / 5 fail = the expected RED of the missing trigger), B-2 handler wiring (source_image_path= 1 ref in app.py). NOT DONE = trigger (action_before_after_report 0 refs; key b binding + notify offer), _strip_ctl factoring (0 refs; ctl pair TC fails), REQUIREMENTS §31 (0 refs), increment-4.md. I1-I3 untouched + green (test_diff_report_service+test_change_service 45/45 re-verified). RESUME PLAN (phase_status stays in-progress per the interruption protocol): fresh software-dev agent post-reset completes the 4 missing pieces + captures the CURRENT 5-fail state as the AT-038a RED evidence (the trigger-absent failures ARE the story counterfactual - do not regenerate the done files, extend them), then the normal gate trio."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc3-approved-inc4-in-progress",
-            "notes": "Operator APPROVED I3 (994/0, byte-identical double-proven, 1020->1027). I4 dispatched (US-034 composer + trigger): before_after_service.py NEW (LLR-038.2 preconditions 1-5 incl. B-2 provenance match + containment + S-F4 symlink), app.py trigger (LLR-038.3 notify-after-verify + action_before_after_report key b + handler passes loaded.path into save_patched - the B-2 wiring half), NEW tests/test_before_after_report.py (AT-038a C-10+C-12 RED-first + AT-038b/c/d GUARDs + TC-038.3/.4/.5), diff_report_service.py _strip_ctl factoring (reviewer recommendation, html pair consistency), REQUIREMENTS.md. 5 files."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc3-awaiting-gate",
-            "notes": "I3 (US-034 service half) IMPLEMENTED -> increment-3.md. 5/5 files: diff_report_service.py +345/-10 (BeforeAfterProvenance frozen dataclass, provenance/linkage_entries/filename_stem kwargs default-off both generators, _md_cell S-F2 pipe+ctl escape, _bytes_cell none-marker, TYPE_CHECKING-only ChangeSummaryEntry import), model.py +12/-1 (source_image_path field OFF to_dict, positional back-compat last), change_service.py +12/-1 (kwarg stamp beside saved_path :933), test deltas +276/+83 (7 new nodes: TC-038.1x2 golden byte-identical, TC-038.2 empty, TC-038.6 pipe both formats, 3 stamp/serialization). GOLDEN CAPTURED PRE-EDIT + INDEPENDENTLY RE-DERIVED by reviewer from detached worktree @9d2123c (2437B/2386B MATCH). Results: 45 passed new files; targeted 46/0; FULL suite 0 fail; ledger 1020->1027 (+7) reconciled; ruff 0 new; frozen 0-diff. code-reviewer OK-TO-ADVANCE (2 LOW cosmetic; I4 recommendation: _strip_ctl in the 2 new html helpers for pair consistency). Awaiting I3 gate -> I4 (composer + trigger; AT-038a C-12 gate + AT-038d)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc2-approved-inc3-in-progress",
-            "notes": "Operator APPROVED I2 (987/0, 1015->1020, #12(c) closed both directions). I3 dispatched (US-034 service half): LLR-038.1 generator kwargs (provenance header + linkage table + filename stem, default-off BYTE-IDENTICAL regression gate) + TC-038.1/.2/.6 (_md_cell pipe-escape S-F2) + B-2 stamp half (ChangeSummary.source_image_path field OFF to_dict + save_patched kwarg). 5 files: diff_report_service.py, tests/test_diff_report_service.py, changes/model.py, change_service.py, tests/test_change_service.py. I3->I4 STRICT."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc2-awaiting-gate",
-            "notes": "I2 (US-033) IMPLEMENTED -> increment-2.md. 5/5 files: app.py +165/-12 (_a2l_issue_severity_map + rank table :223-291, _a2l_tag_row_severity REQUIRED-map re-signature :294-350 ERROR-overrides-all incl green / WARNING falls through byte-identical ladder, update_a2l_tags_view builds map per render :7723-7729, update_a2l_view reorder :7652-7660 after-enrichment pin), validation_service.py F1 1-token fold (:80 not :153 - D-note corrected), NEW tests/test_tui_a2l_issue_recolor.py 393 lines (AT-037a/b + TC-037.1-.3; sibling file per delegated latitude - test_tui_app.py module import would break pre-fix RED collection), test_tui_app.py net-0 rewrite (:49-56 ladder set +{}), REQUIREMENTS.md §30 R-A2L-ISSUE-RECONCILE-002 (closes #12(c) both directions). RED CAPTURE verbatim: duplicate rows rendered non-red pre-impl w/ divergence-naming assert message. Results: 6/6 new green; targeted 187/0; FULL suite 0 fail (tail in addendum); ledger 1015->1020 (+5); ruff clean (1 PRE-EXISTING F401 test_tui_app.py:1599@HEAD flagged, untouched); frozen 0-diff. code-reviewer OK-TO-ADVANCE (0 HIGH/MED, 2 LOW informational). Awaiting I2 gate -> I3 (US-034 generator kwargs, byte-identical regression gate)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc1-approved-inc2-in-progress",
-            "notes": "Operator APPROVED I1. I2 dispatched (US-033: LLR-037.1 map builder + LLR-037.2 precedence consult + LLR-037.3 reorder; AT-037a/b + TC-037.1-.3; F1 dead-or-[] ride-along fold). RED-first sequence again: AT-037a run pre-impl (duplicate rows non-red today)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc1-awaiting-gate",
-            "notes": "I1 (US-032 + LLR-037.4 wipe-fix) IMPLEMENTED -> increment-1.md. 4 files: validation_service.py +106/-2 (supplemental_a2l_row_issues: is-False keying, casefold x a2l x ERROR dedup, merged BOTH branches pre-dedupe), app.py +136/-26 (_refresh_no_mac_validation: no-primary keeps clear, primary+no-MAC computes/retains via _mac_view_cache_key_for w/ id(loaded) empty-records substitute; worker key routed through same helper - D-note-1, within LLR latitude), NEW tests/test_validation_service_supplemental.py 599 lines / 11 nodes, REQUIREMENTS.md §30. RED CAPTURE: AT-036a run pre-impl, observable 1 (red row) PASS + observable 2 FAIL 'Rendered issue rows: []' - the reported bug live. Results: 11/11 green post-impl; targeted regression 78/0; FULL suite (orchestrator) 982/0 fail; ledger 1004->1015 (+11) reconciled; ruff clean; frozen 0-diff. code-reviewer APPROVE (3 LOW: F1 dead or-[] -> I2, F2 note-only, F3 pre-existing). Awaiting I1 gate -> I2 (US-033, STRICT dependency)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-02",
-            "decision": "inc1-in-progress",
-            "notes": "Operator APPROVED Phase 2 (post-fold re-presentation). Phase 3 entry: toolchain gate + ledger base recorded below. I1 dispatched (US-032 + B-1a LLR-037.4): validation_service.py + app.py + NEW tests/test_validation_service_supplemental.py + REQUIREMENTS.md (4 files). CRITICAL SEQUENCE: AT-036a authored FIRST and run RED on the pre-fix tree (the counterfactual IS the reported bug) -> capture -> implement -> green. I1->I2 STRICT, I3->I4 STRICT."
-        },
-        {
-            "phase": 2,
-            "date": "2026-07-02",
-            "decision": "fold-complete-awaiting-gate",
-            "notes": "Phase-1 iteration (fold) COMPLETE: all 18 P2 findings body-first; §6.4 18-row table + §6.5 AM-1 (B-1a LLR-037.4 no-MAC fix, cache via _mac_view_cache_key w/ stable id substitute, ships in I1, I1->I2 STRICT), AM-2 (B-2 ChangeSummary.source_image_path service-side stamp OFF to_dict + preconditions 4-5 + refusal-4 + AT-038d; stamp I3, handler pass I4), AM-3 (A-M1 AT-037b split). qa MAJORs folded (surfaced-path C-12 + pinned literal img-patched_1.s19). All 10 minors folded incl. _md_cell TC-038.6 + S-F4 symlink refusal. C-15 sweep-back 0 stale (1 residual R-8 found+fixed). Counts: 3 HLR / 12 LLR / 9 AT / 14 TC; should-scan 0 (1 meta-mention); 15 shall on Statement lines only. I1 = US-032+B-1a 4 files; I3 = 5 files exactly. ORCHESTRATOR VERIFIED: 18 rows, LLR-037.4 x11 refs, AT-038d x10 refs, provenance mechanism bound at file:line. Re-presenting Phase-2 gate."
-        },
-        {
-            "phase": 2,
-            "date": "2026-07-02",
-            "decision": "iterate-to-refine",
-            "notes": "Operator: B-1 = OPTION (a) FIX THE WIPE (no-MAC branch computes/retains the validation report when a primary is loaded; ATs stay MAC-less, gate the real surface). iterate-to-refine approved -> ONE Phase-1 iteration folding ALL Phase-2 findings (B-1a, B-2 provenance stamp + refusal #4 + AT-038d, qa MAJORs AT-038a surfaced-path + pinned literal, architect MAJORs AT-037b split + census sweep-in, ~12 minors incl. _md_cell pipe-escape). iterations_per_phase[1]=2. architect dispatched for the fold; orchestrator verifies + re-presents Phase-2 gate."
-        },
-        {
-            "phase": 2,
-            "date": "2026-07-02",
-            "decision": "awaiting-gate-iterate-forced",
-            "notes": "Phase 2 cross-review DONE (architect ITERATE / qa APPROVE+2MAJOR / security BLOCK-pending-F1) -> 02-review.md. 2 BLOCKERS + 4 MAJOR + ~12 MINOR. B-1 (architect): update_mac_view WIPES _validation_issues + early-returns on no-MAC sessions (app.py:7160-7186) -> US-032/033 ATs unreachable on their MAC-less fixtures AND a product-scope hole (adding MAC to fixtures would mask); P-10 probed one function too shallow (C-15 blind-spot instance). OPERATOR CHOICE at gate: (a) fix the no-MAC branch (story intent) vs (b) rescope to MAC-present. B-2 (security): stale/cross-project last_summary -> false-provenance report (survives project switch, no source-image field, workarea-root fallback app.py:1499); fix fully specified (source_image_path stamp + refusal #4 + containment revalidate + NEW AT-038d). qa MAJORs: AT-038a path-from-surfaced-output + pinned-literal img-patched_1.s19 (internal operand demoted). architect MAJORs: AT-037b WARNING boundary unbuildable through shipped chain (split to Layer-A GUARD); R-1 census mis-anchor (executed sweep: exposure LOW, named). VERIFIED-TRUE: ~30 anchors exact, both fixture assumptions PROVEN (a2l.py:932/:1068 retention; both duplicate rows kept), all counterfactuals confirmed, census executed w/ named results. iterations_per_phase[2]=1. Awaiting gate: B-1 choice -> fold ALL findings (one Phase-1 iteration, §6.4/§6.5) -> re-present."
-        },
-        {
-            "phase": 2,
-            "date": "2026-07-02",
-            "decision": "in-progress",
-            "notes": "Operator APPROVED Phase 1. Phase 2 cross-review dispatched: architect (derivation/ambiguity/contradiction + citation re-verify + framework-behavior hunt per C-15) PARALLEL qa (testability + C-10/C-12 audits + counterfactual audit + fixture-plan check) PARALLEL security (REAL pass: US-034 new write surface - report file + trigger; US-032/033 read-only surfaces). Reviewing 01-requirements.md + 01b -> 02-review.md."
-        },
-        {
-            "phase": 1,
-            "date": "2026-07-02",
-            "decision": "awaiting-gate",
-            "notes": "Phase 1 derivation DONE (architect PARALLEL qa). 01-requirements §2.7 (13-probe C-15 ledger, runtime identities not hasattr) + §3-§6: 3 HLR (036 red-implies-issue / 037 issue-implies-red / 038 before-after report), 11 LLR, 8 AT (036a/b/c, 037a/b, 038a/b/c), TC LLR-aligned, QC-3 catalogs complete. KEY DECISIONS: D-1 composer = NEW before_after_service.py + default-off kwargs on diff_report generators (byte-identical regression TC-038.1); D-2 WARNING never recolours (REQUIREMENTS.md:362-367 palette, orange is MAC-only); D-3 no-project trigger refuses naming manual A-B path; D-4 dedup key = casefolded symbol x a2l x ERROR, new code A2L_TAG_SCHEMA_INCOMPLETE (P-4: 0 hits); D-5 map app-side. REAL FINDING P-10: sync-fallback update_a2l_view renders rows BEFORE validation computes -> LLR-037.3 reorder (worker path already ordered). qa 01b: AT plans w/ counterfactuals (AT-036a = the reported bug, RED capture pre-Inc1), fixture headline = BOTH A2L defect fixtures must be authored (missing-address non-virtual + duplicate-symbol exist only dict-shaped); R-1 red = Rich Text.style not sev-* class -> colour-policy round-trip anchor. ORCHESTRATOR RECONCILIATION note added to 01b (R-2 trigger id bound, R-3 issues surface = widget not file, WARNING policy, b/c variant mapping). should-scan 0 hits / 14 shall statements. Assumed->Phase 3: A-1 enriched-tags path, A-3 two-external-sources behavior, key b provisional. Roadmap: 5 increments (I1 US-032, I2 US-033, I3 generator kwargs, I4 composer+trigger, I5 close); I3->I4 strict. Awaiting Phase-1 gate."
-        },
-        {
-            "phase": 0,
-            "date": "2026-07-02",
-            "decision": "approved",
-            "notes": "Operator APPROVED DoR gate (AskUserQuestion x4): SLICE = US-032 (red-row-implies-issue) + US-033 (issue-implies-red-row) + US-034 (before/after report); US-035/036/037 (entropy) DEFERRED whole to own spike batch. US-034 flavor = diff-report + patch header/linkage table; trigger = offer-after-save-back (+ manual compare path). Architect consult: (c) divergence CONFIRMED live both directions (app.py:223-232 vs rules.py:460-480); (a) ~80% reuse (compare_service + diff_report_service + ChangeSummaryEntry before/after bytes already captured). MICRO-SPIKE RESOLVED at intake: save_patched_image dedup-suffixes collisions (apply.py:574) -> original cannot be clobbered; report 'after' side = last_summary.saved_path. iterations_per_phase[0]=1. Phase 1 dispatched: architect (HLR/LLR) PARALLEL qa (validation strategy)."
-        },
-        {
-            "phase": 0,
-            "date": "2026-07-02",
-            "decision": "batch-24-initialized-feat12-decomposition",
-            "notes": "Operator: continue with /dev-flow -> #12 (P1 queue head per BACKLOG). RC-1 PASS: origin/main=9d2123c; new branch claude/batch-24-feat12 at tip. Already-shipped checks: all three sub-items OPEN (entropy 0 code hits - one docstring LEAD change_service.py:825 per-entry before/after records; reconcile 0 hits; report_service reusable machinery). Architect decomposition consult dispatched (read-only): seam inventory + INVEST story drafts + feasibility/size + slice proposal + operator design questions. DoR gate will present decomposition + AskUserQuestion for slice selection."
-        },
-        {
-            "phase": 6,
-            "date": "2026-07-02",
-            "decision": "synced-to-obsidian",
-            "notes": "PR #39 merged to main (9d2123c, CI green). /dev-flow-sync: copied 01+01b/02/04/05+05b + 06-docs (03-increments excluded) to G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-07-01-batch-23\\ + generated 2026-07-01-batch-23-README.md (frontmatter: pass, 71.4% caught-P2, 100% LLR cov, 991->1002, new_control C-15+repo-hygiene, 5 open-next). DETECT clean (0 live placeholders), evidence checklists present, Dashboard.md pre-existing (untouched). REPO-HYGIENE LINE (first live use) FLAGGED: primary checkout still on stale merged branch fix/select-null-blank-sentinel @84efde8 + old detached .cursor worktrees - listed to operator, not switched. obsidian_synced=true. BATCH-23 CLOSED - FEATURE #8 COMPLETE (US-026..031, b21/b22/b23). Next queue head: #12 (P1, Phase-0 decomposition).",
+            "decision": "batch-24-closed-synced",
+            "notes": "batch-24 (#12 a+c) MERGED as PR #40 (0c06b48) and SYNCED to Obsidian (per memory index batch-24 CLOSED+SYNCED). origin/main tip = 0c06b48. Rolling state.json over to batch-25.",
             "_batch_closed": true
+        },
+        {
+            "phase": 0,
+            "date": "2026-07-03",
+            "decision": "batch-25-initialized-snapshot-baseline",
+            "notes": "Operator (AskUserQuestion) chose SNAPSHOT-BASELINE FIRST over entropy #12(b) (-> batch-26, logged BACKLOG). RC-1 PASS (0c06b48). VERIFIED premise: tui-ci.yml:29-37 installs requirements+pytest+pillow only (no [dev]) -> test_tui_snapshot.py:74 import fails -> importorskip skips whole 28-cell suite silently every PR/push. pyproject.toml:30 dev=[pytest-textual-snapshot==1.1.0]. Matrix = 28 cells (24 restyled + map/diff/patch@80x24/patch@120x30); 2 xfail = the 2 patch cells (test_tui_snapshot.py:384-401). CONSTRAINT: regen canonical-CI-env only (local forbidden, snapshot-regen-env memory: 2026-05-28 local regen drifted 13/27). Phase 0 to resolve route + 2 design forks, then DoR gate."
         }
     ],
     "obsidian_synced": false,
-    "created_at": "2026-07-02T18:00:00-06:00"
+    "created_at": "2026-07-03T00:00:00-06:00"
 }
