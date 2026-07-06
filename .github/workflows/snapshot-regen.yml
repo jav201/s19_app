@@ -1,0 +1,60 @@
+name: snapshot-regen
+
+# Manual, canonical-env baseline regeneration (batch-25, R-TUI-029).
+#
+# WHY MANUAL: pytest-textual-snapshot SVG baselines are tooling-version
+# sensitive — regenerating locally drifts unrelated baselines (see the
+# snapshot-regen-env convention: a 2026-05-28 local regen moved 13/27 cells
+# from tooling differences alone). This job regenerates in the SAME
+# Ubuntu / Python 3.11 canonical env as tui-ci, then uploads the result as a
+# downloadable artifact for a maintainer to review + commit. It deliberately
+# does NOT commit back: no write-scoped token, a human stays in the loop, and
+# only the genuinely-changed screens (patch 2x2, MAC 82-col) should move.
+on:
+  workflow_dispatch:
+
+# Read-only: the job reads the checked-out source and uploads an artifact.
+# It never writes to the repository.
+permissions:
+  contents: read
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies (with dev extra for pytest-textual-snapshot)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -e ".[dev]"
+
+      - name: Regenerate snapshot baselines (canonical env)
+        # --snapshot-update rewrites tests/__snapshots__/**/*.svg in place.
+        # `|| true` so the run always reaches the diff + upload steps even
+        # though pytest exits non-zero when it updates a snapshot.
+        run: pytest tests/test_tui_snapshot.py -m snapshot --snapshot-update -q || true
+
+      - name: Report which baselines changed
+        # Surfaces the AC-4 containment check in the run log: ONLY the patch
+        # (80x24 + 120x30) and MAC cells should appear here. Any other screen
+        # moving means the env is wrong — do NOT commit that artifact.
+        run: |
+          echo "=== changed baselines ==="
+          git status --porcelain tests/__snapshots__/
+          echo "=== diffstat ==="
+          git diff --stat tests/__snapshots__/
+
+      - name: Upload regenerated baselines
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-baselines
+          path: tests/__snapshots__/
+          if-no-files-found: error
