@@ -65,14 +65,36 @@ Layer A (mechanical): after the CI env fix, a **CI run log** is the primary evid
 
 | Field | Value |
 |-------|-------|
-| Current phase | B (Inc 1 landed, awaiting CI round-trip) |
+| Current phase | C — CODE CLOSED (PR #41 + #42 merged); US-D (vault) pending |
 | Started | 2026-07-03 |
-| Closed | — |
+| Closed | 2026-07-06 (code) — AC-6/US-D vault refresh remains |
 | Promoted to /dev-flow | no |
 | Notes | Route=/fast-dev-flow, non-blocking job, workflow_dispatch artifact (operator AskUserQuestion 2026-07-03). RC-1 PASS @ 0c06b48. Regen is CI-env-only. Prior closed spec archived → archive/2026-06-25-spec.md. **Inc 1 APPROVED 2026-07-03**: tui-ci.yml (perms + non-blocking snapshot job) + snapshot-regen.yml (new); security-reviewer OK-to-ship 0 blockers; local smoke 28-skip exit-0. Defaults adopted: update R-TUI-032 (not R-TUI-029); US-D vault → sync-time. PR #41 opened; CI: tui-ci PASS, snapshot FAIL-non-blocking (run conclusion=success → **AC-1 + AC-2 confirmed**). **AMENDMENT 2026-07-03 (operator AskUserQuestion):** canonical-env run drifted **23/28** (not just patch+MAC) — baselines (2026-05-22) predate CI textual 8.2.8; `textual>=8.0.2` unpinned → every release re-drifts. Chose **pin textual + full regen**: added `textual==8.2.8` to `[dev]` (pyproject.toml, ride PR #41 so the pin is on main before regen), AC-4 reframed, full-28 regen. **BLOCKED on merge of PR #41** → then dispatch snapshot-regen (pinned) → Inc 2 (28 baselines + xfail drop + R-TUI-032). |
 
 ---
 
-## 8. Close (filled in phase C)
+## 8. Close (phase C)
 
-_TBD_
+### What changed
+Fixed the silently-skipped TUI layout-snapshot drift oracle and re-baselined it to current `main`. Two PRs, both merged:
+- **#41** — `tui-ci.yml` gains least-privilege `contents:read` + a non-blocking `snapshot` job (installs `.[dev]`, `continue-on-error`) so the 28-cell suite runs on every PR/push without wedging merges; new `snapshot-regen.yml` (`workflow_dispatch`, artifact upload, no auto-commit) regenerates baselines in the canonical env; pinned `textual==8.2.8` in `[dev]` so baselines are reproducible (runtime `>=8.0.2` unchanged).
+- **#42** — 25 regenerated baselines (from the `snapshot-regen` artifact, canonical env only) + drop the 2 patch `xfail` marks → 28/28 green; `.gitattributes` `eol=lf` for cross-platform byte-stability; R-TUI-032 traceability note.
+
+### How it was tested
+- **AC-1** ✅ — the `snapshot` job executed the 28 cells in CI (was silently skipped); proven on PR #41's run (56s, real failures) and PR #42's run (green).
+- **AC-2** ✅ — snapshot job failure did not fail the overall run (PR #41 run `conclusion=success`).
+- **AC-3** ✅ — `snapshot-regen` run 28795179574 regenerated + uploaded the `snapshot-baselines` artifact (`24 updated, 1 generated`).
+- **AC-4** ✅ (amended) — all changes confined to the 28-cell snapshot set; spot-check of workspace/issues/a2l/map/diff confirmed the drift is legitimate current-UI content (Legend/Operations keys from batches 18-24) + textual render deltas, not a regression.
+- **AC-5** ✅ — `snapshot` job GREEN on PR #42 (28/28, zero xfail); `tui-ci` required check green; both merged.
+- Local: `py_compile` OK; suite collects 28 cells, 0 xfail.
+
+### Open risks / pending
+- **AC-6 / US-D (vault) — NOT DONE.** The vault gallery (`…/assets/snapshots/`) + `visual-evidence.md` (date lines + retire the stale "MAC predates batch-05" callout) still need refreshing. This is vault-side (outside fast-dev-flow) and post-baseline → handled at sync-time or by the operator. **The batch's DONE-WHEN is not fully met until this lands.**
+- The `snapshot` oracle is now stable *only while* `textual==8.2.8` holds; adopting a newer textual requires bumping the pin + re-running `snapshot-regen` (documented in `pyproject.toml` + R-TUI-032).
+
+### Security flags — handling
+`security_required: true` (CI/CD modification). `security-reviewer` reviewed the concrete YAML: **0 blockers / 0 majors** — `pull_request` (not `pull_request_target`), least-privilege `contents:read` on both workflows, no secrets, no `github.event.*` shell interpolation, artifact path-scoped, regen holds no write token. Optional follow-up (not blocking): SHA-pin the `actions/*` with a Dependabot entry.
+
+### Suggested commit message
+_(both increments already merged — #41, #42)_
+
