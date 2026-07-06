@@ -29,6 +29,13 @@ dependencies = [
 # Version: pinned for CI-reproducible snapshot baselines (S-5 resolved).
 dev = [
     "pytest-textual-snapshot==1.1.0",
+    # Pin the renderer exactly (batch-25): SVG snapshot baselines are
+    # textual-version sensitive. The runtime floor above (textual>=8.0.2) has
+    # no ceiling, so CI drifted to 8.2.8 and silently invalidated every
+    # 2026-05-22 baseline. Pinning here (dev / snapshot env only; runtime stays
+    # >=8.0.2) locks the baselines to a known-good render. To adopt a newer
+    # textual: bump this pin, then regenerate via snapshot-regen.yml.
+    "textual==8.2.8",
 ]
 
 [project.scripts]
