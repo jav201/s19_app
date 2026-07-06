@@ -3,8 +3,10 @@
     "language": "en",
     "batch_id": "2026-07-03-batch-25",
     "batch_objective": "P3 snapshot-baseline batch (addendum to the batch-25 command; entropy #12(b) DEFERRED to batch-26). Fix tui-ci.yml so the pytest-textual-snapshot suite actually RUNS (currently silently skipped every PR/push: CI installs requirements+pytest+pillow, never the [dev] extra). Regenerate the 28-cell baseline set IN THE CANONICAL CI ENV ONLY (local regen forbidden per snapshot-regen-env memory). Drop the 2 permanent patch xfail cells once real baselines land. Refresh vault assets/snapshots/ + visual-evidence.md, dated to this batch. Baselines-only; pilot GIF gallery OUT OF SCOPE (C-16). No engine-frozen module touched. REQUIREMENTS row R-TUI-029.",
-    "current_phase": 0,
-    "phase_status": "in-progress",
+    "current_phase": "C-closed",
+    "phase_status": "closed",
+    "route": "fast-dev-flow (operator AskUserQuestion 2026-07-03; this batch ran the 3-phase compressed flow, tracked in .fast-dev-flow/spec.md). state.json kept for batch lineage only.",
+    "outcome": "PASS. All 6 ACs met. PR #41 (b0140c4: CI runs snapshot suite non-blocking + snapshot-regen.yml workflow_dispatch + textual==8.2.8 [dev] pin) + PR #42 (35238ea: 25 regenerated baselines + drop 2 patch xfails -> 28/28 green + .gitattributes eol=lf + R-TUI-032). Snapshot job GREEN on #42. US-D done: 28 vault SVGs refreshed + visual-evidence.md re-dated 2026-07-06 (MAC callout retired). KEY FINDING: baselines drifted 23/28 not just patch+MAC (2026-05-22 baselines predated ~19 batches of UI + unpinned textual 8.0.x->8.2.8) -> AMENDMENT: pin textual + full regen (makes oracle stable). NEW LESSONS: (1) workflow_dispatch needs the workflow on the DEFAULT branch to be triggerable -> 2-PR sequence; (2) an unpinned renderer silently rots every snapshot baseline each release. security-reviewer OK 0-blockers on the CI YAML. entropy #12(b) remains P1 -> batch-26.",
     "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
     "artifacts": {
         "backlog": ".dev-flow/BACKLOG.md",
