@@ -610,6 +610,18 @@ note, not a runtime requirement — the runtime dependency set (`rich`,
 - Code: `pyproject.toml` (`[project.optional-dependencies]`)
 - Validation: `Automated` via `tests/test_tui_directionb.py` (`tc028` — no new
   runtime dependency) — recorded for traceability against constraints C-2 / C-8
+- Batch-25 update: the `[dev]` extra now pins `textual==8.2.8` exactly
+  (snapshot/test env only; the runtime floor `textual>=8.0.2` is unchanged) so
+  the 28-cell SVG layout baselines are reproducible, and CI now **executes**
+  the `tests/test_tui_snapshot.py` suite in a dedicated **non-blocking** job
+  (`.github/workflows/tui-ci.yml`, `continue-on-error`) — previously the whole
+  suite was silently skipped because CI never installed the extra. Baselines
+  regenerate in the canonical CI env only, via
+  `.github/workflows/snapshot-regen.yml` (`workflow_dispatch`, artifact upload,
+  no auto-commit — never locally, per the snapshot-regen-env convention). The
+  batch-22 patch `xfail` scaffold cells are retired now that real baselines
+  exist. `.gitattributes` pins the baselines to `eol=lf` for cross-platform
+  (Windows-dev / Linux-CI) byte-stability.
 
 **R-TUI-033**: The command-bar find and go-to inputs must route submitted text
 to the existing `find_string_in_mem` and `_handle_goto` handlers respectively,

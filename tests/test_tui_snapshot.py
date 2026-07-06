@@ -376,25 +376,16 @@ _RESTYLED_CELLS = [
 # Additive scaffold cells at the 120x30 primary size, comfortable — PLUS the
 # patch screen additionally at the 80x24 floor, to lock the batch-22 US-030
 # 2x2 four-pane layout at both the tight floor and the primary width
-# (HLR-034.1 / US-031). Every patch baseline regenerates in the canonical CI
-# env only (§6.6 + snapshot-regen-env convention): the pre-batch baseline
-# predates the batch-07 v2 editor AND the batch-22 2x2 relayout changes it
-# again, so until the CI regen lands each patch cell is an expected mismatch
-# (xfail, non-strict). map/diff are unchanged (120x30 only).
+# (HLR-034.1 / US-031). Real baselines for all four were regenerated in the
+# canonical CI env (batch-25, .github/workflows/snapshot-regen.yml, pinned
+# textual==8.2.8), so the two patch cells are now full green cells — the prior
+# xfail (baseline-regen-pending) is retired. map/diff are 120x30 only.
 _SCAFFOLD_CELLS = [
     pytest.param(
         screen,
         "comfortable",
         size_key,
         id=f"{screen}-comfortable-{size_key}",
-        marks=(
-            pytest.mark.xfail(
-                reason="baseline regen pending in CI env (batch-22 US-031 2x2 relayout)",
-                strict=False,
-            ),
-        )
-        if screen == "patch"
-        else (),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (("80x24", "120x30") if screen == "patch" else ("120x30",))
