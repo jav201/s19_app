@@ -1,0 +1,5 @@
+# pytest-textual-snapshot SVG layout baselines must stay LF-only so the
+# Linux-CI drift oracle compares byte-for-byte against Windows-dev checkouts
+# (batch-25). Without this, core.autocrlf=true would rewrite them to CRLF on a
+# Windows checkout and every CI snapshot comparison could spuriously fail.
+tests/__snapshots__/**/*.svg text eol=lf
