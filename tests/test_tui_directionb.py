@@ -5407,3 +5407,216 @@ def test_tc032_directionb_tests_do_not_monkeypatch_engine_functions() -> None:
         f"Direction B view-layer tests must not monkeypatch frozen engine "
         f"functions: {offenders}"
     )
+
+
+# ---------------------------------------------------------------------------
+# fast-dev-flow (sections-label) — Data Sections range label two-line wrap.
+#
+# The fixed 22-column ``#ws_left`` pane clipped the old single-line range
+# label ``0x{start:08X} - 0x{end-1:08X} ({size} bytes)`` (~33 chars), so the
+# end address + size fell off. ``update_sections`` (app.py) now emits a
+# two-line label — start on line 1, ``– <end>  <size>B`` on line 2 — and the
+# sibling MAC out-of-range label gets the same treatment. These tests pin the
+# rendered text through the mounted ``Label.content`` (the same accessor the
+# existing ``#hex_view`` tests read), which preserves the newline.
+#
+#   AC-1 -> test_sections_label_shows_end_address_not_clipped (gate)
+#   AC-2 -> test_sections_label_two_line_format
+#   AC-3 -> test_mac_out_of_range_label_full_address
+#   AC-4 -> test_sections_item_data_and_colour_preserved (regression)
+# ---------------------------------------------------------------------------
+
+# A range whose single-line label is far wider than the 22-col left pane —
+# start 0x80302040, end-exclusive 0x80302080 (so end token = 0x8030207F).
+_WIDE_RANGE_START = 0x80302040
+_WIDE_RANGE_END = 0x80302080  # exclusive; size = 64
+_WIDE_RANGE_END_TOKEN = f"0x{_WIDE_RANGE_END - 1:08X}"  # 0x8030207F
+_WIDE_RANGE_START_TOKEN = f"0x{_WIDE_RANGE_START:08X}"  # 0x80302040
+
+
+def _install_wide_range_loaded_file(app: "S19TuiApp", tmp_path: Path) -> LoadedFile:
+    """Seed a ``LoadedFile`` with one wide, valid range as ``current_file``.
+
+    The range is chosen so its single-line label exceeds the fixed 22-column
+    ``#ws_left`` pane — the pre-change format clipped the end address.
+    """
+    loaded = LoadedFile(
+        path=tmp_path / "wide.s19",
+        file_type="s19",
+        mem_map={_WIDE_RANGE_START: 0x11},
+        row_bases=[_WIDE_RANGE_START],
+        ranges=[(_WIDE_RANGE_START, _WIDE_RANGE_END)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+    app.current_file = loaded
+    return loaded
+
+
+def _first_section_label_text(app: "S19TuiApp") -> str:
+    """Return the rendered text of the first ``#sections_list`` item's Label."""
+    from textual.widgets import Label, ListView
+
+    sections = app.query_one("#sections_list", ListView)
+    label = sections.children[0].query_one(Label)
+    return str(label.content)
+
+
+def test_sections_label_shows_end_address_not_clipped(tmp_path: Path) -> None:
+    """AC-1 (gate): the end address is placed so it is NOT clipped by the pane.
+
+    Intent: a range wider than the 22-col ``#ws_left`` pane clipped its END
+    address under the old single-line ``0x<start> - 0x<end> (<size> bytes)``
+    format — the end trailed the start on one physical line past the pane edge.
+    The fix moves the end onto its own line. This test observes the discriminator
+    that actually stops the clipping: the end token ``0x8030207F`` must appear on
+    a rendered line AFTER the start token's line — never trailing it on the same
+    line. On the old single-line format everything is one line, so the end never
+    lands on a later line and this gate FAILS; on the two-line wrap it PASSES.
+    (Verified to genuinely gate: reverting to the single-line format fails this.)
+    """
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_wide_range_loaded_file(app, tmp_path)
+            app.update_sections()
+            await pilot.pause()
+            return _first_section_label_text(app)
+
+    text = asyncio.run(_drive())
+    lines = text.split("\n")
+    assert _WIDE_RANGE_END_TOKEN in text, (
+        f"the range label must contain the end address {_WIDE_RANGE_END_TOKEN!r}; "
+        f"rendered text was {text!r}"
+    )
+    start_line = next(
+        i for i, line in enumerate(lines) if _WIDE_RANGE_START_TOKEN in line
+    )
+    end_on_later_line = any(
+        _WIDE_RANGE_END_TOKEN in line
+        for i, line in enumerate(lines)
+        if i > start_line
+    )
+    assert end_on_later_line, (
+        f"the end address {_WIDE_RANGE_END_TOKEN!r} must render on a line AFTER "
+        f"the start line (so the narrow pane cannot clip it); the old single-line "
+        f"format trails it on the start line. Rendered lines were {lines!r}"
+    )
+
+
+def test_sections_label_two_line_format(tmp_path: Path) -> None:
+    """AC-2: the range item renders two lines with both start and end tokens.
+
+    Intent: the fix is Variant A (two-line wrap) — start address on line 1,
+    ``– <end>  <size>B`` on line 2. Assert the rendered label text contains a
+    newline AND both the start and end address tokens, so the whole range
+    stays readable in the narrow pane without a layout/width change.
+    """
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_wide_range_loaded_file(app, tmp_path)
+            app.update_sections()
+            await pilot.pause()
+            return _first_section_label_text(app)
+
+    text = asyncio.run(_drive())
+    assert "\n" in text, (
+        f"the range label must render two lines (contain a newline); "
+        f"rendered text was {text!r}"
+    )
+    assert _WIDE_RANGE_START_TOKEN in text, (
+        f"line 1 must carry the start token {_WIDE_RANGE_START_TOKEN!r}; "
+        f"rendered text was {text!r}"
+    )
+    assert _WIDE_RANGE_END_TOKEN in text, (
+        f"line 2 must carry the end token {_WIDE_RANGE_END_TOKEN!r}; "
+        f"rendered text was {text!r}"
+    )
+
+
+def test_mac_out_of_range_label_full_address(tmp_path: Path) -> None:
+    """AC-3: a MAC out-of-range item renders the full 0x{address:08X}.
+
+    Intent: the sibling ``MAC out-of-range @ 0x{address:08X}`` label (~29 chars)
+    also clipped in the 22-col pane. It gets the same two-line treatment. The
+    out-of-range address is fed through the exact seam ``update_sections``
+    consumes (its ``precomputed_out_of_range`` argument), so the assertion runs
+    over the real render path. The full address token must be present.
+    """
+    from textual.widgets import Label, ListView
+
+    oor_address = 0x80302040
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_wide_range_loaded_file(app, tmp_path)
+            app.update_sections(precomputed_out_of_range=[oor_address])
+            await pilot.pause()
+            sections = app.query_one("#sections_list", ListView)
+            # The MAC out-of-range item follows the range item(s); find the one
+            # carrying the MAC label by its content marker.
+            texts = [
+                str(item.query_one(Label).content)
+                for item in sections.children
+            ]
+            return next(t for t in texts if "MAC out-of-range" in t)
+
+    text = asyncio.run(_drive())
+    assert f"0x{oor_address:08X}" in text, (
+        f"the MAC out-of-range label must show the full address "
+        f"0x{oor_address:08X}; rendered text was {text!r}"
+    )
+    # The consistency fix wraps the MAC label too: address on its own line, so
+    # the ~29-char single line cannot clip it in the 22-col pane.
+    assert "\n" in text and f"0x{oor_address:08X}" in text.split("\n")[-1], (
+        f"the MAC out-of-range label must place the address on its own line "
+        f"(two-line wrap); rendered text was {text!r}"
+    )
+
+
+def test_sections_item_data_and_colour_preserved(tmp_path: Path) -> None:
+    """AC-4 (regression): the (start, end) payload and sev-* colour survive.
+
+    Intent: the relabel must not disturb the selection payload or the colour
+    class — ``ListItem.data`` must still be ``(start, end)`` (drives the hex
+    jump on select) and the Label must still carry the ``css_class_for_severity``
+    class (here ``sev-ok`` for a valid range). A Pilot select of the item must
+    still drive the hex view (focus moves onto the hex pane region).
+    """
+    from textual.widgets import Label, ListView
+
+    from s19_app.tui.color_policy import css_class_for_severity
+    from s19_app.validation.model import ValidationSeverity
+
+    ok_class = css_class_for_severity(ValidationSeverity.OK)
+
+    async def _drive() -> tuple[object, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_wide_range_loaded_file(app, tmp_path)
+            app.update_sections()
+            await pilot.pause()
+            sections = app.query_one("#sections_list", ListView)
+            item = sections.children[0]
+            label = item.query_one(Label)
+            has_class = label.has_class(ok_class)
+            return item.data, has_class
+
+    data, has_class = asyncio.run(_drive())
+    assert data == (_WIDE_RANGE_START, _WIDE_RANGE_END), (
+        f"the range item must still carry its (start, end) selection payload; "
+        f"got {data!r}"
+    )
+    assert has_class, (
+        f"the range Label must still carry the {ok_class!r} colour class"
+    )

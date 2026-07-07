@@ -7202,7 +7202,7 @@ class S19TuiApp(App):
         visible_ranges = list(zip(ranges[:range_cap], validity[:range_cap]))
         for (start, end), is_valid in visible_ranges:
             size = end - start
-            label = Label(f"0x{start:08X} - 0x{end - 1:08X} ({size} bytes)")
+            label = Label(f"0x{start:08X}\n– 0x{end - 1:08X}  {size}B")
             severity = ValidationSeverity.OK if is_valid else ValidationSeverity.ERROR
             label.add_class(css_class_for_severity(severity))
             item = ListItem(label)
@@ -7225,7 +7225,7 @@ class S19TuiApp(App):
         oor_cap = MAX_SECTIONS_OUT_OF_RANGE
         visible = out_of_range[:oor_cap]
         for address in visible:
-            label = Label(f"MAC out-of-range @ 0x{address:08X}")
+            label = Label(f"MAC out-of-range\n@ 0x{address:08X}")
             label.add_class("mac_out_of_range")
             item = ListItem(label)
             item.data = (address, address + 1)
