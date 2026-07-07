@@ -42,8 +42,11 @@ Memory Map and A2B Diff panels are unchanged.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from math import ceil
 from typing import List, Optional, Sequence, Tuple
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
@@ -58,6 +61,8 @@ from textual.widgets import (
 )
 
 from .changes.io import DUMMY_CHANGESET_TEXT
+from .color_policy import css_class_for_severity
+from ..validation import ValidationIssue, ValidationSeverity
 
 
 class EmptyStatePanel(Static):
@@ -142,17 +147,674 @@ class ScreenScaffold(Container):
         yield EmptyStatePanel()
 
 
-class MemoryMapPanel(Static):
-    """Read-only coverage visualization of the loaded image's memory ranges.
+#: Default grid geometry (columns, rows) used when the panel's live content
+#: region has not been measured yet (headless unit tests, pre-mount renders).
+#: Kept small and fixed so the cell count is a pure function of
+#: ``(span, geometry)`` and never drifts with runtime layout (LLR-041.2, R-4).
+DEFAULT_GRID_COLS = 16
+DEFAULT_GRID_ROWS = 8
+
+#: The VISUAL column count of ``#map_grid``. Must equal the ``grid-size`` of the
+#: ``#map_grid`` rule in ``styles.tcss`` — the two are the single source of
+#: truth for how the cells wrap on screen, so arrow-key Up/Down (``∓ cols``)
+#: lands on the cell the operator sees one row away (US-036). Kept equal to
+#: ``DEFAULT_GRID_COLS`` so headless and rendered geometries agree.
+MAP_GRID_COLS = DEFAULT_GRID_COLS
+
+#: A single kibibyte, used only for the "≈ N KiB/cell" header label arithmetic.
+_KIB = 1024
+
+#: Filled block glyph rendered inside each cell; its colour comes from the
+#: cell's ``sev-*`` CSS class (single source of truth = color_policy), never a
+#: hard-coded severity hex in this module (LLR-041.3).
+_CELL_GLYPH = "█"
+
+
+def derive_image_span(
+    ranges: Sequence[Tuple[int, int]],
+) -> Tuple[int, int]:
+    """Compute the image span ``[span_start, span_end)`` over all ranges.
 
     Summary:
-        Renders the firmware memory coverage of the loaded file as a textual
-        map: one labelled line per contiguous range with a proportional
-        coverage bar, plus the gap (uncovered) spans between consecutive
-        ranges. It is a pure presentational widget — it reads the already-
-        computed ``LoadedFile.ranges`` and ``LoadedFile.range_validity``
-        fields handed to ``render_ranges`` and performs NO coverage,
-        parsing or analysis of its own (LLR-012.1 / LLR-012.4).
+        Return the minimum start and maximum end across ``ranges`` — the same
+        ``span_start``/``span_end`` arithmetic the legacy text list used
+        (superseded ``render_ranges``). Pure arithmetic on already-parsed
+        addresses; no parse/coverage/analysis (LLR-041.7).
+
+    Args:
+        ranges (Sequence[Tuple[int, int]]): Contiguous ``(start, end)``
+            memory ranges (``end`` exclusive).
+
+    Returns:
+        Tuple[int, int]: ``(span_start, span_end)``. ``(0, 0)`` when
+        ``ranges`` is empty (zero-span → empty-state path, no ratio computed).
+
+    Data Flow:
+        - Reads only the supplied ``ranges``; feeds ``cell_count_for_geometry``
+          and ``bytes_per_cell``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> derive_image_span([(0x100, 0x200), (0x400, 0x440)])
+        (256, 1088)
+    """
+    if not ranges:
+        return (0, 0)
+    span_start = min(start for start, _end in ranges)
+    span_end = max(end for _start, end in ranges)
+    return (span_start, span_end)
+
+
+def cell_count_for_geometry(span: int, cols: int, rows: int) -> int:
+    """Choose the number of grid cells for a span and measured geometry.
+
+    Summary:
+        Return ``cols * rows`` capped so the whole ``span`` fits, i.e. never
+        more cells than there are bytes. The result is a pure function of
+        ``(span, cols, rows)`` — no live layout is read here, so the grid is
+        deterministic and snapshot-stable (LLR-041.2, R-4).
+
+    Args:
+        span (int): Image span in bytes (``span_end - span_start``).
+        cols (int): Grid columns available in the content region.
+        rows (int): Grid rows available in the content region.
+
+    Returns:
+        int: Number of cells to render; ``0`` when ``span <= 0`` (empty
+        state, no ratio computed → no divide-by-zero).
+
+    Data Flow:
+        - Called by ``render_ranges`` with ``derive_image_span`` output and
+          the measured (or default) geometry; feeds ``bytes_per_cell``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> cell_count_for_geometry(1000, 16, 8)
+        128
+        >>> cell_count_for_geometry(10, 16, 8)
+        10
+        >>> cell_count_for_geometry(0, 16, 8)
+        0
+    """
+    if span <= 0:
+        return 0
+    capacity = max(1, cols) * max(1, rows)
+    return min(capacity, span)
+
+
+def bytes_per_cell(span: int, cell_count: int) -> int:
+    """Compute the bytes-per-cell size for the grid.
+
+    Summary:
+        Return ``ceil(span / cell_count)`` — the address window each cell
+        covers so the whole span fits the grid (LLR-041.2). Guards against a
+        zero ``cell_count`` (empty state) so no division occurs.
+
+    Args:
+        span (int): Image span in bytes.
+        cell_count (int): Number of cells from ``cell_count_for_geometry``.
+
+    Returns:
+        int: Bytes covered by one cell; ``0`` when ``cell_count <= 0``.
+
+    Data Flow:
+        - Called by ``render_ranges``; drives per-cell window boundaries and
+          the "≈ N KiB/cell" header.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> bytes_per_cell(1000, 128)
+        8
+        >>> bytes_per_cell(0, 0)
+        0
+    """
+    if cell_count <= 0:
+        return 0
+    return ceil(span / cell_count)
+
+
+def cell_status(
+    cell_start: int,
+    cell_end: int,
+    ordered_ranges: Sequence[Tuple[int, int, bool]],
+) -> str:
+    """Derive a cell's status from the ranges overlapping its window.
+
+    Summary:
+        Classify the half-open window ``[cell_start, cell_end)`` as
+        ``"invalid"`` if it overlaps any invalid range, else ``"valid"`` if
+        it overlaps any (only valid) range, else ``"gap"`` (LLR-041.1). Pure
+        overlap arithmetic — no ``range_index`` call needed for a single
+        window, no parse/analysis (LLR-041.7).
+
+    Args:
+        cell_start (int): Inclusive window start.
+        cell_end (int): Exclusive window end.
+        ordered_ranges (Sequence[Tuple[int, int, bool]]): ``(start, end,
+            is_valid)`` triples (``end`` exclusive), start-sorted.
+
+    Returns:
+        str: One of ``"valid"``, ``"invalid"``, ``"gap"``.
+
+    Data Flow:
+        - Called once per cell by ``render_ranges``; its result routes
+          through ``status_to_css_class`` for colour.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> cell_status(0, 16, [(0, 8, True), (8, 16, False)])
+        'invalid'
+        >>> cell_status(0, 8, [(0, 8, True)])
+        'valid'
+        >>> cell_status(16, 32, [(0, 8, True)])
+        'gap'
+    """
+    overlaps_valid = False
+    for start, end, is_valid in ordered_ranges:
+        if start < cell_end and end > cell_start:
+            if not is_valid:
+                return "invalid"
+            overlaps_valid = True
+    return "valid" if overlaps_valid else "gap"
+
+
+def status_to_css_class(status: str) -> str:
+    """Map a cell status to its canonical ``sev-*`` CSS class.
+
+    Summary:
+        Route ``"invalid"``→``ERROR``, ``"valid"``→``OK``, ``"gap"``→
+        ``NEUTRAL`` through the frozen ``css_class_for_severity`` — the
+        single source of truth for severity colours. The panel hard-codes no
+        severity hex or inline style (LLR-041.3).
+
+    Args:
+        status (str): ``"valid"``, ``"invalid"`` or ``"gap"``.
+
+    Returns:
+        str: The matching CSS class (``"sev-ok"`` / ``"sev-error"`` /
+        ``"sev-neutral"``).
+
+    Data Flow:
+        - Applied by ``render_ranges`` as a cell widget class.
+
+    Dependencies:
+        Uses:
+            - ``css_class_for_severity`` (frozen, consumed read-only)
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> status_to_css_class("invalid")
+        'sev-error'
+    """
+    severity = {
+        "invalid": ValidationSeverity.ERROR,
+        "valid": ValidationSeverity.OK,
+        "gap": ValidationSeverity.NEUTRAL,
+    }.get(status, ValidationSeverity.NEUTRAL)
+    return css_class_for_severity(severity)
+
+
+def safe_text(value: str, style: str = "") -> Text:
+    """Build a markup-safe ``rich.text.Text`` from a possibly hostile string.
+
+    Summary:
+        Wrap ``value`` as a ``Text`` with an explicit ``style`` so the string
+        is treated as literal content, never as Rich markup (LLR-041.11).
+        This neutralises file-derived tokens such as ``sensor[red]`` or
+        ``x[link=file:///…]`` and raw ANSI bytes carried in the never-scrubbed
+        ``ValidationIssue.symbol`` — no ``MarkupError``, no style/ANSI leak,
+        no crash of the Memory Map screen on load (security B-1 / F2).
+
+    Args:
+        value (str): The (possibly untrusted, file-derived) text to render.
+        style (str): An optional Rich style applied to the whole span
+            (developer-supplied, never file-derived).
+
+    Returns:
+        Text: A ``Text`` instance whose content is exactly ``value``.
+
+    Data Flow:
+        - Used for every file-derived string reaching the grid or (in a later
+          increment) the detail pane; ``Text.from_markup`` is deliberately
+          NOT used.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> safe_text("sensor[red]").plain
+        'sensor[red]'
+    """
+    return Text(value, style=style)
+
+
+def issues_in_window(
+    issues: Sequence["ValidationIssue"],
+    window_start: int,
+    window_end: int,
+) -> List["ValidationIssue"]:
+    """Return the issues whose address falls in ``[window_start, window_end)``.
+
+    Summary:
+        Filter ``issues`` to those whose ``address`` is an ``int`` inside the
+        half-open window (LLR-041.5). Issues with ``address is None`` cannot be
+        spatially anchored and are excluded (locks the R-1 default). Pure
+        arithmetic on the already-computed issue list — no new analysis
+        (LLR-041.7). Used both for the cell-scoped issue list (window = the
+        cell) and for the "N issues in region" count (window = the covering
+        range).
+
+    Args:
+        issues (Sequence[ValidationIssue]): The pre-computed
+            ``S19TuiApp._validation_issues`` handed to the panel.
+        window_start (int): Inclusive window start.
+        window_end (int): Exclusive window end.
+
+    Returns:
+        List[ValidationIssue]: Issues whose ``address`` is in the window, in
+        input order; empty when none match.
+
+    Data Flow:
+        - Called by ``MemoryMapPanel._render_detail`` for both the cell window
+          and the covering-region window.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._render_detail``
+
+    Example:
+        >>> class _I:  # doctest-only stand-in
+        ...     def __init__(self, address):
+        ...         self.address = address
+        >>> [i.address for i in issues_in_window([_I(4), _I(None), _I(16)], 0, 16)]
+        [4]
+    """
+    hits: List["ValidationIssue"] = []
+    for issue in issues:
+        address = issue.address
+        if isinstance(address, int) and window_start <= address < window_end:
+            hits.append(issue)
+    return hits
+
+
+def covering_range(
+    cell_start: int,
+    cell_end: int,
+    ordered_ranges: Sequence[Tuple[int, int, bool]],
+) -> Optional[Tuple[int, int, bool]]:
+    """Return the range overlapping the cell window, or ``None`` for a gap.
+
+    Summary:
+        Find the first ``(start, end, is_valid)`` triple overlapping the
+        half-open cell window ``[cell_start, cell_end)`` — the covering region
+        surfaced in the detail pane (LLR-041.4). An invalid overlapping range
+        is preferred so the detail status matches the cell colour
+        (``cell_status`` invalid-wins, LLR-041.1). Returns ``None`` when the
+        cell overlaps no range (a gap → "gap — no region").
+
+    Args:
+        cell_start (int): Inclusive cell-window start.
+        cell_end (int): Exclusive cell-window end.
+        ordered_ranges (Sequence[Tuple[int, int, bool]]): ``(start, end,
+            is_valid)`` triples (``end`` exclusive), start-sorted.
+
+    Returns:
+        Optional[Tuple[int, int, bool]]: The covering range triple, or
+        ``None`` when the window is a gap.
+
+    Data Flow:
+        - Called by ``MemoryMapPanel._render_detail`` to name the region and
+          to bound the region-issue count window.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._render_detail``
+
+    Example:
+        >>> covering_range(0, 16, [(0, 8, True), (8, 16, False)])
+        (8, 16, False)
+        >>> covering_range(16, 24, [(0, 8, True)]) is None
+        True
+    """
+    first_valid: Optional[Tuple[int, int, bool]] = None
+    for start, end, is_valid in ordered_ranges:
+        if start < cell_end and end > cell_start:
+            if not is_valid:
+                return (start, end, is_valid)
+            if first_valid is None:
+                first_valid = (start, end, is_valid)
+    return first_valid
+
+
+@dataclass(frozen=True)
+class CoverageStats:
+    """The seven coverage-strip statistics for one rendered image (US-037).
+
+    Summary:
+        A pure value object holding the numbers the ``#map_stats`` strip
+        displays. Every field is derived by arithmetic on the already-parsed
+        ``ranges``/``range_validity`` and the pre-computed issue list — the
+        panel computes no new coverage/parse/analysis (LLR-041.7/.8).
+
+    Args:
+        image_span (int): ``span_end - span_start`` in bytes (``0`` when
+            there are no ranges → empty state, no ratio computed).
+        covered_bytes (int): ``Σ(end - start)`` over all ranges.
+        coverage_pct (float): ``covered_bytes / image_span * 100`` when
+            ``image_span > 0``, else ``0.0`` (the ``image_span > 0`` guard is
+            the single divide-by-zero guard).
+        valid_count (int): number of ranges flagged valid.
+        invalid_count (int): number of ranges flagged invalid.
+        gap_count (int): number of uncovered spans between consecutive ranges.
+        largest_gap (int): the widest inter-range gap in bytes (``0`` when
+            there are no gaps).
+        total_issues (int): ``len(issues)`` — the pre-computed issue count.
+    """
+
+    image_span: int
+    covered_bytes: int
+    coverage_pct: float
+    valid_count: int
+    invalid_count: int
+    gap_count: int
+    largest_gap: int
+    total_issues: int
+
+
+def coverage_stats(
+    ranges: Sequence[Tuple[int, int]],
+    range_validity: Sequence[bool],
+    issues: Sequence["ValidationIssue"],
+) -> CoverageStats:
+    """Compute the coverage-strip statistics from already-parsed inputs.
+
+    Summary:
+        Derive the seven US-037 statistics — coverage %, bytes covered,
+        valid/invalid range counts, gap count, largest-gap bytes and total
+        issues — by arithmetic on the ``ranges``/``range_validity`` handed in
+        by ``update_memory_map`` and ``len(issues)`` (LLR-041.8). Coverage %
+        divides only when ``image_span > 0`` (the sole divide-by-zero guard,
+        LLR-041.2/.9); an empty ``ranges`` yields an all-zero
+        :class:`CoverageStats` and the strip shows nothing (LLR-041.9). No
+        parsing, coverage or validation is performed here (LLR-041.7); the
+        gap arithmetic mirrors the legacy consecutive-range subtraction the
+        superseded text list used.
+
+    Args:
+        ranges (Sequence[Tuple[int, int]]): Contiguous ``(start, end)``
+            memory ranges (``end`` exclusive) from ``LoadedFile.ranges``.
+        range_validity (Sequence[bool]): Per-range validity flags,
+            positionally aligned with ``ranges``.
+        issues (Sequence[ValidationIssue]): The single canonical
+            ``_validation_issues`` list — only its length is read (LLR-041.8).
+
+    Returns:
+        CoverageStats: the seven metrics; all-zero when ``ranges`` is empty.
+
+    Data Flow:
+        - Called by ``MemoryMapPanel.render_ranges`` with the same inputs the
+          grid is built from; feeds ``build_stats_text``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges`` / ``build_stats_text``
+            - (test) TC-041.8 / TC-041.9
+
+    Example:
+        >>> s = coverage_stats([(0, 8), (16, 24)], [True, False], [])
+        >>> (s.covered_bytes, s.gap_count, s.largest_gap, s.image_span)
+        (16, 1, 8, 24)
+        >>> (s.valid_count, s.invalid_count, s.total_issues)
+        (1, 1, 0)
+        >>> coverage_stats([], [], []).image_span
+        0
+    """
+    if not ranges:
+        return CoverageStats(0, 0, 0.0, 0, 0, 0, 0, len(issues))
+
+    span_start, span_end = derive_image_span(ranges)
+    image_span = span_end - span_start
+    covered_bytes = sum(end - start for start, end in ranges)
+
+    valid_count = 0
+    invalid_count = 0
+    for index in range(len(ranges)):
+        is_valid = bool(range_validity[index]) if index < len(range_validity) else True
+        if is_valid:
+            valid_count += 1
+        else:
+            invalid_count += 1
+
+    ordered = sorted(ranges, key=lambda item: item[0])
+    largest_gap = 0
+    gap_count = 0
+    for index in range(1, len(ordered)):
+        gap = ordered[index][0] - ordered[index - 1][1]
+        if gap > 0:
+            gap_count += 1
+            if gap > largest_gap:
+                largest_gap = gap
+
+    coverage_pct = covered_bytes / image_span * 100 if image_span > 0 else 0.0
+
+    return CoverageStats(
+        image_span=image_span,
+        covered_bytes=covered_bytes,
+        coverage_pct=coverage_pct,
+        valid_count=valid_count,
+        invalid_count=invalid_count,
+        gap_count=gap_count,
+        largest_gap=largest_gap,
+        total_issues=len(issues),
+    )
+
+
+#: The four arrow keys and their (row, column) focus deltas on the minimap
+#: grid — Left/Right step one cell, Up/Down step one visual row. Consumed by
+#: ``adjacent_cell_index``; kept as data so the handler stays a table lookup.
+_ARROW_DELTAS = {
+    "left": (0, -1),
+    "right": (0, 1),
+    "up": (-1, 0),
+    "down": (1, 0),
+}
+
+
+def adjacent_cell_index(
+    current: int, key: str, count: int, cols: int
+) -> Optional[int]:
+    """Return the grid index one arrow-step from ``current``, clamped.
+
+    Summary:
+        Compute the focus target for an arrow key over a ``count``-cell grid
+        laid out ``cols`` columns wide (US-036 keyboard nav). Left/Right move
+        ``∓1`` in mount order; Up/Down move ``∓cols`` (one visual row). The
+        result is clamped to ``[0, count)`` — stepping off the first/last cell
+        or above the top / below the bottom row is a no-op (returns the same
+        index), so focus never wraps. Returns ``None`` for a non-arrow key or
+        an empty grid. Pure arithmetic — no widget access, no parsing.
+
+    Args:
+        current (int): The focused cell's index in mount order.
+        key (str): The pressed key (one of ``_ARROW_DELTAS`` or anything else).
+        count (int): Total number of cells in the grid.
+        cols (int): Visual column count (``MAP_GRID_COLS``).
+
+    Returns:
+        Optional[int]: The target index (possibly ``== current`` at an edge),
+        or ``None`` when ``key`` is not an arrow or the grid is empty.
+
+    Data Flow:
+        - Called by ``MemoryMapPanel.focus_adjacent_cell`` with the current
+          focus index; its result selects which cell receives ``.focus()``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.focus_adjacent_cell``
+
+    Example:
+        >>> adjacent_cell_index(0, "right", 32, 16)
+        1
+        >>> adjacent_cell_index(0, "left", 32, 16)  # clamp at first cell
+        0
+        >>> adjacent_cell_index(3, "down", 32, 16)
+        19
+        >>> adjacent_cell_index(3, "up", 32, 16)  # clamp above top row
+        3
+        >>> adjacent_cell_index(0, "enter", 32, 16) is None
+        True
+    """
+    delta = _ARROW_DELTAS.get(key)
+    if delta is None or count <= 0 or cols <= 0:
+        return None
+    row_delta, col_delta = delta
+    target = current + col_delta + row_delta * cols
+    if target < 0 or target >= count:
+        return current
+    return target
+
+
+class MapCell(Static):
+    """A single focusable, clickable cell of the Memory Map minimap grid.
+
+    Summary:
+        Carries the address window ``[cell_start, cell_end)`` and status of one
+        grid tile so both the pointer-click and the keyboard-focus/``Enter``
+        paths can resolve which cell was selected (LLR-041.4).
+
+        Navigation (US-036):
+            - ``Tab`` / ``Shift+Tab`` — Textual's default focus traversal steps
+              cell to cell (each cell is ``can_focus``).
+            - Arrow keys — Left/Right move focus to the previous/next cell in
+              mount order; Up/Down move one grid row (``∓ cols``); focus clamps
+              at the grid edges (no wrap). Handled by delegating to
+              ``MemoryMapPanel.focus_adjacent_cell`` (the panel owns the cell
+              list + column count — a single source of truth). Arrows only MOVE
+              focus; they do NOT select.
+            - Click / ``Enter`` — posts :class:`Selected`, which the panel
+              handles by rendering the detail pane (the select step).
+
+        Purely presentational — it stores windows, never parses.
+
+    Args:
+        cell_start (int): Inclusive window start of this cell.
+        cell_end (int): Exclusive window end of this cell.
+        status (str): The cell status (``"valid"`` / ``"invalid"`` / ``"gap"``).
+        classes (str): The space-joined CSS classes (``map-cell`` + the
+            ``sev-*`` status class).
+
+    Returns:
+        None
+
+    Data Flow:
+        - Mounted by ``MemoryMapPanel.render_ranges``; on click/``Enter`` posts
+          :class:`Selected` → ``MemoryMapPanel.on_map_cell_selected``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> cell = MapCell(0, 16, "valid", "map-cell sev-ok")
+        >>> (cell.cell_start, cell.cell_end, cell.status)
+        (0, 16, 'valid')
+    """
+
+    can_focus = True
+
+    class Selected(Message):
+        """A map cell was activated (click or ``Enter``).
+
+        Args:
+            cell (MapCell): The activated cell.
+        """
+
+        def __init__(self, cell: "MapCell") -> None:
+            super().__init__()
+            self.cell = cell
+
+    def __init__(
+        self, cell_start: int, cell_end: int, status: str, classes: str
+    ) -> None:
+        super().__init__(safe_text(_CELL_GLYPH), classes=classes)
+        self.cell_start = cell_start
+        self.cell_end = cell_end
+        self.status = status
+
+    def on_click(self) -> None:
+        """Post :class:`Selected` when the cell is clicked."""
+        self.focus()
+        self.post_message(self.Selected(self))
+
+    def on_key(self, event) -> None:  # type: ignore[no-untyped-def]
+        """Handle ``Enter`` (select) and the arrow keys (move focus).
+
+        Summary:
+            ``Enter`` posts :class:`Selected` (the select step). An arrow key
+            moves focus to the adjacent cell via the parent
+            :class:`MemoryMapPanel` and is CONSUMED (``event.stop()``) so it
+            does not also scroll the enclosing ``#map_content``
+            ``ScrollableContainer`` — the consumption is scoped to a focused
+            cell only, so arrows retain their normal scroll behaviour when
+            focus is elsewhere. Arrows never select.
+
+        Args:
+            event: The Textual key event (``event.key`` is the key name).
+
+        Dependencies:
+            Uses:
+                - ``MemoryMapPanel.focus_adjacent_cell``
+            Used by:
+                - Textual key-event dispatch (only while this cell is focused)
+        """
+        if event.key == "enter":
+            event.stop()
+            self.post_message(self.Selected(self))
+            return
+        if event.key in _ARROW_DELTAS:
+            panel = self._map_panel()
+            if panel is not None:
+                event.stop()
+                panel.focus_adjacent_cell(self, event.key)
+
+    def _map_panel(self) -> Optional["MemoryMapPanel"]:
+        """Return the enclosing ``MemoryMapPanel`` ancestor, or ``None``."""
+        node = self.parent
+        while node is not None:
+            if isinstance(node, MemoryMapPanel):
+                return node
+            node = node.parent
+        return None
+
+
+class MemoryMapPanel(Container):
+    """Colour-coded 2-D spatial minimap of the loaded image's memory ranges.
+
+    Summary:
+        Renders the firmware image span as a grid of address-window cells,
+        each coloured ``valid``/``invalid``/``gap`` from the already-computed
+        ``LoadedFile.ranges`` and ``LoadedFile.range_validity`` handed to
+        ``render_ranges``. Cell size auto-scales so the whole span fits the
+        visible grid, and a header shows the "≈ N KiB/cell" ratio. It is a
+        pure presentational widget — it performs NO coverage, parsing,
+        validation or file I/O of its own (LLR-041.7). Cell colours route
+        exclusively through ``css_class_for_severity`` (LLR-041.3); no
+        severity hex is hard-coded. With no ranges it preserves the neutral
+        no-file note (LLR-041.9).
 
     Args:
         None
@@ -162,45 +824,163 @@ class MemoryMapPanel(Static):
 
     Data Flow:
         - ``render_ranges`` receives the pre-computed ``ranges`` and
-          ``range_validity`` lists from ``S19TuiApp.update_memory_map`` and
-          formats them into static text; it derives gap spans by subtracting
-          consecutive range bounds — arithmetic on already-parsed addresses,
-          not a new coverage metric.
-        - With no ranges the widget shows a neutral "no file loaded" note.
+          ``range_validity`` from ``S19TuiApp.update_memory_map``, derives the
+          image span and per-cell status by arithmetic on those already-parsed
+          values, and mounts one ``.map-cell`` widget per cell into
+          ``#map_grid`` carrying its ``sev-*`` status class.
+        - Selecting a cell populates ``#map_detail`` (status chip, window,
+          covering region, cell-scoped issues, region count); the
+          ``#map_stats`` strip shows the seven coverage statistics derived by
+          ``coverage_stats`` (US-037 / LLR-041.8).
+        - With no ranges the header shows the neutral empty note, no cells are
+          mounted, and the stats strip is blanked (LLR-041.9).
+        - ``#map_grid`` and ``#map_detail`` sit in a ``#map_body`` sub-container
+          laid horizontally when wide and stacked under ``width-narrow`` — the
+          reflow rules live in ``styles.tcss`` (LLR-041.10).
 
     Dependencies:
+        Uses:
+            - ``derive_image_span`` / ``cell_count_for_geometry`` /
+              ``bytes_per_cell`` / ``cell_status`` / ``status_to_css_class`` /
+              ``safe_text``
         Used by:
             - ``S19TuiApp._compose_screen_map`` (mounts the widget)
             - ``S19TuiApp.update_memory_map`` (drives ``render_ranges``)
 
     Example:
         >>> panel = MemoryMapPanel()
-        >>> panel.render_ranges([(0x0, 0x100)], [True])
         >>> panel.id
         'memory_map_panel'
     """
 
-    _BAR_WIDTH = 40
     _EMPTY_TEXT = "No file loaded - press Ctrl+L (or 'l') to load a file."
+    _DETAIL_HINT = (
+        "Click a cell, or focus the grid and use arrows "
+        "(<-/->/up/down) then Enter to inspect."
+    )
+
+    class OpenInHexRequested(Message):
+        """The operator asked to jump to the hex view at a cell's start (US-036).
+
+        Summary:
+            Posted by the "Open in Hex View" affordance in the detail pane so
+            ``app.py`` drives the existing ``update_hex_view(focus_address=…)``
+            and switches to the Workspace/hex screen (LLR-041.6). The panel
+            renders no hex itself — it only carries the focus address.
+
+        Args:
+            focus_address (int): The selected cell's ``cell_start`` — the
+                address the hex view should focus.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_memory_map_panel_open_in_hex_requested``
+        """
+
+        def __init__(self, focus_address: int) -> None:
+            super().__init__()
+            self.focus_address = focus_address
 
     def __init__(self) -> None:
-        super().__init__(self._EMPTY_TEXT, id="memory_map_panel", markup=False)
-        #: Last text passed to ``update`` — exposed so tests and callers can
-        #: read the rendered coverage map without touching Textual internals.
+        super().__init__(id="memory_map_panel")
+        #: Last header/summary text rendered — exposed so tests and callers
+        #: can read the map's textual summary without touching Textual
+        #: internals. Mirrors the old ``rendered_text`` accessor.
         self.rendered_text: str = self._EMPTY_TEXT
+        #: The start-sorted ``(start, end, is_valid)`` triples of the last
+        #: render — the covering-region lookup and region-issue count read
+        #: these already-parsed ranges (never re-derived, LLR-041.7).
+        self._ordered_ranges: List[Tuple[int, int, bool]] = []
+        #: The pre-computed issue list handed in by ``update_memory_map`` — the
+        #: single canonical source for both the cell join and the region count
+        #: (LLR-041.5 / LLR-041.8, arch MINOR-3). Never re-derived here.
+        self._issues: List[ValidationIssue] = []
+        #: The currently-selected cell's start address, or ``None`` before any
+        #: selection — carried on the Open-in-Hex message (LLR-041.6).
+        self._selected_cell_start: Optional[int] = None
+        #: The visual column count the last grid was laid out with — used by
+        #: arrow-key Up/Down (``∓ cols``). Equals ``MAP_GRID_COLS`` (the CSS
+        #: ``grid-size``), the single source of truth for on-screen wrapping.
+        self._grid_cols: int = MAP_GRID_COLS
+
+    def compose(self) -> ComposeResult:
+        """Compose the header, the cell grid and the (empty) placeholders.
+
+        Summary:
+            Yield the full-width "≈ N KiB/cell" header, then a ``#map_body``
+            horizontal sub-container holding the ``#map_grid`` cell grid and
+            the ``#map_detail`` pane side by side (the wide-regime layout;
+            ``#map_body`` stacks them vertically under ``width-narrow`` — the
+            reflow lives in ``styles.tcss``, LLR-041.10), and finally the
+            full-width ``#map_stats`` coverage strip (US-037 / LLR-041.8).
+
+        Returns:
+            ComposeResult: the header, the grid+detail body, and the stats
+            strip.
+
+        Dependencies:
+            Used by:
+                - Textual mount pipeline
+        """
+        yield Label(self._EMPTY_TEXT, id="map_header", markup=False)
+        yield Horizontal(
+            Container(id="map_grid"),
+            Container(
+                Static(safe_text(self._DETAIL_HINT), id="map_detail_body"),
+                Button(
+                    "Open in Hex View",
+                    id="map_open_hex_button",
+                    classes="hidden",
+                ),
+                id="map_detail",
+            ),
+            id="map_body",
+        )
+        yield Container(Static("", id="map_stats_body"), id="map_stats")
+
+    def _grid_geometry(self) -> Tuple[int, int]:
+        """Return the (cols, rows) grid geometry to scale cells against.
+
+        Summary:
+            Read the live content-region size of ``#map_grid`` when the panel
+            is mounted and measured, else fall back to the fixed
+            ``DEFAULT_GRID_COLS``/``DEFAULT_GRID_ROWS``. Kept separate so tests
+            can reason about the cell count as a pure function of geometry
+            (LLR-041.2, R-4).
+
+        Returns:
+            Tuple[int, int]: ``(cols, rows)`` — always ``>= 1`` each.
+
+        Dependencies:
+            Used by:
+                - ``render_ranges``
+        """
+        try:
+            grid = self.query_one("#map_grid", Container)
+            size = grid.content_size
+            cols = size.width if size.width > 0 else DEFAULT_GRID_COLS
+            rows = size.height if size.height > 0 else DEFAULT_GRID_ROWS
+        except Exception:
+            cols, rows = DEFAULT_GRID_COLS, DEFAULT_GRID_ROWS
+        return (max(1, cols), max(1, rows))
 
     def render_ranges(
         self,
         ranges: Sequence[Tuple[int, int]],
         range_validity: Sequence[bool],
+        issues: Sequence[ValidationIssue] = (),
     ) -> None:
-        """Render the coverage map from already-computed range data.
+        """Render the colour-coded minimap grid from already-computed ranges.
 
         Summary:
-            Format the loaded file's contiguous memory ranges and the gaps
-            between them into a static coverage map and display it. The
-            input is consumed verbatim from the ``LoadedFile`` snapshot — no
-            range is re-derived and no coverage value is computed here.
+            Build the image span, auto-scale the cell size to the visible
+            grid, and mount one ``MapCell`` widget per cell coloured by its
+            overlap status. The input is consumed verbatim from the
+            ``LoadedFile`` snapshot and the pre-computed ``issues`` list — no
+            range is re-derived and no coverage/validation is computed here
+            (LLR-041.7). Cell content is built as markup-safe ``Text``
+            (LLR-041.11). The ordered ranges and the issue list are stored so
+            cell selection can assemble the detail pane (LLR-041.4/.5).
 
         Args:
             ranges (Sequence[Tuple[int, int]]): Contiguous ``(start, end)``
@@ -208,89 +988,372 @@ class MemoryMapPanel(Static):
             range_validity (Sequence[bool]): Per-range validity flags from
                 ``LoadedFile.range_validity``, positionally aligned with
                 ``ranges``.
+            issues (Sequence[ValidationIssue]): The already-computed
+                ``S19TuiApp._validation_issues`` — the single canonical source
+                for the cell-scoped issue list and the region-issue count
+                (LLR-041.5); defaults to empty for the no-issue / headless
+                path.
 
         Returns:
             None
 
         Data Flow:
-            - When ``ranges`` is empty, show the neutral empty-state note.
-            - Otherwise emit a summary line (range count, covered bytes),
-              one line per range with a proportional fill bar and an
-              OK/INVALID marker, and one line per inter-range gap.
-            - The rendered text is also stored on ``rendered_text``.
+            - When ``ranges`` is empty, show the neutral empty note, mount no
+              cells and reset the detail pane (LLR-041.9).
+            - Otherwise derive the span, cell count and bytes-per-cell, then
+              mount a ``MapCell`` widget per cell into ``#map_grid`` with its
+              ``sev-*`` status class and its ``[cell_start, cell_end)`` window;
+              the header shows the "≈ N KiB/cell" ratio. The summary text is
+              stored on ``rendered_text``.
 
         Dependencies:
+            Uses:
+                - ``derive_image_span`` / ``cell_count_for_geometry`` /
+                  ``bytes_per_cell`` / ``cell_status`` /
+                  ``status_to_css_class`` / ``MapCell``
             Used by:
                 - ``S19TuiApp.update_memory_map``
         """
-        if not ranges:
+        try:
+            header = self.query_one("#map_header", Label)
+            grid = self.query_one("#map_grid", Container)
+        except Exception:
+            # App not mounted yet (headless render before compose) — nothing
+            # to draw into; the compose default already shows the empty note.
+            return
+
+        grid.remove_children()
+        self._issues = list(issues)
+        self._reset_detail()
+
+        span_start, span_end = derive_image_span(ranges)
+        span = span_end - span_start
+        if not ranges or span <= 0:
+            self._ordered_ranges = []
             self.rendered_text = self._EMPTY_TEXT
-            self.update(self._EMPTY_TEXT)
+            header.update(self._EMPTY_TEXT)
+            self._render_stats([], [], self._issues, empty=True)
             return
 
         ordered: List[Tuple[int, int, bool]] = []
         for index, (start, end) in enumerate(ranges):
-            is_valid = bool(range_validity[index]) if index < len(range_validity) else True
+            is_valid = (
+                bool(range_validity[index]) if index < len(range_validity) else True
+            )
             ordered.append((start, end, is_valid))
         ordered.sort(key=lambda item: item[0])
+        self._ordered_ranges = ordered
 
-        span_start = ordered[0][0]
-        span_end = max(end for _start, end, _valid in ordered)
-        total_span = span_end - span_start
-        covered = sum(end - start for start, end, _valid in ordered)
+        cols, rows = self._grid_geometry()
+        count = cell_count_for_geometry(span, cols, rows)
+        per_cell = bytes_per_cell(span, count)
+        #: Record the VISUAL column count for arrow-key Up/Down; the on-screen
+        #: wrapping is fixed by the ``#map_grid`` CSS ``grid-size`` (MAP_GRID_COLS),
+        #: not the measured content geometry used only for the cell *count*.
+        self._grid_cols = MAP_GRID_COLS
 
-        lines: List[str] = [
-            f"Memory coverage - {len(ordered)} range(s), "
-            f"{covered} bytes across 0x{span_start:08X}-0x{span_end - 1:08X}",
-            "",
-        ]
-        previous_end: Optional[int] = None
-        for start, end, is_valid in ordered:
-            if previous_end is not None and start > previous_end:
-                gap = start - previous_end
-                lines.append(
-                    f"  gap                                       "
-                    f" 0x{previous_end:08X}-0x{start - 1:08X} ({gap} bytes)"
-                )
-            size = end - start
-            bar = self._coverage_bar(size, total_span)
-            marker = "OK" if is_valid else "INVALID"
-            lines.append(
-                f"  {bar} 0x{start:08X}-0x{end - 1:08X} "
-                f"({size} bytes) [{marker}]"
+        cells: List[MapCell] = []
+        for index in range(count):
+            cell_start = span_start + index * per_cell
+            cell_end = min(span_end, cell_start + per_cell)
+            status = cell_status(cell_start, cell_end, ordered)
+            sev_class = status_to_css_class(status)
+            cell = MapCell(
+                cell_start, cell_end, status, f"map-cell {sev_class}"
             )
-            previous_end = end
+            cells.append(cell)
+        if cells:
+            grid.mount(*cells)
 
-        self.rendered_text = "\n".join(lines)
-        self.update(self.rendered_text)
+        kib_per_cell = per_cell / _KIB
+        summary = f"≈ {kib_per_cell:.2f} KiB/cell ({count} cells, {per_cell} B/cell)"
+        self.rendered_text = summary
+        header.update(safe_text(summary))
 
-    def _coverage_bar(self, size: int, total_span: int) -> str:
-        """Build a fixed-width fill bar proportional to a range's size.
+        self._render_stats(ranges, range_validity, self._issues, empty=False)
+
+    def _render_stats(
+        self,
+        ranges: Sequence[Tuple[int, int]],
+        range_validity: Sequence[bool],
+        issues: Sequence[ValidationIssue],
+        empty: bool,
+    ) -> None:
+        """Populate (or clear) the ``#map_stats`` coverage strip (US-037).
 
         Summary:
-            Produce a ``_BAR_WIDTH``-character bar whose filled portion is
-            proportional to ``size`` over ``total_span``. This is display
-            formatting only — it scales an already-known byte count, it does
-            not measure or compute coverage.
+            Compute the seven coverage statistics from the already-parsed
+            ``ranges``/``range_validity`` and the pre-computed ``issues`` list
+            via ``coverage_stats`` and render them markup-safe into
+            ``#map_stats_body`` (LLR-041.8). When ``empty`` (no ranges), the
+            strip is blanked so the no-file state shows nothing / neutral, with
+            no divide-by-zero (LLR-041.9). Pure arithmetic on already-parsed
+            values — no new coverage/parse/analysis (LLR-041.7).
 
         Args:
-            size (int): Byte length of the range.
-            total_span (int): Total span (last range end minus first range
-                start) the bar is scaled against.
+            ranges (Sequence[Tuple[int, int]]): The image ranges (empty in the
+                no-file path).
+            range_validity (Sequence[bool]): Per-range validity flags.
+            issues (Sequence[ValidationIssue]): The single canonical
+                ``_validation_issues`` list (only its length is read).
+            empty (bool): ``True`` on the no-file / zero-span path → clear the
+                strip; ``False`` → render the seven metrics.
+
+        Data Flow:
+            - Reads the same inputs the grid is built from; writes the composed
+              ``Text`` into ``#map_stats_body``.
+
+        Dependencies:
+            Uses:
+                - ``coverage_stats`` / ``build_stats_text`` / ``safe_text``
+            Used by:
+                - ``render_ranges``
+        """
+        try:
+            body = self.query_one("#map_stats_body", Static)
+        except Exception:
+            return
+        if empty:
+            body.update(safe_text(""))
+            return
+        stats = coverage_stats(ranges, range_validity, issues)
+        body.update(self.build_stats_text(stats))
+
+    def build_stats_text(self, stats: CoverageStats) -> Text:
+        """Assemble the markup-safe coverage-strip text (US-037 / LLR-041.8).
+
+        Summary:
+            Compose the seven-statistic strip — coverage %, bytes covered,
+            valid/invalid range counts, gap count, largest-gap bytes and total
+            issues — as labelled ``Text`` segments so the strip is readable and
+            markup-safe (LLR-041.11 uniformity; the numbers are developer
+            formatting, not file-derived, but the panel stays uniformly
+            ``Text``-composed). Pure formatting of a :class:`CoverageStats` —
+            no analysis (LLR-041.7).
+
+        Args:
+            stats (CoverageStats): The metrics from ``coverage_stats``.
 
         Returns:
-            str: A bracketed bar string, e.g. ``[####------------------]``.
+            Text: The composed, markup-safe coverage strip.
+
+        Data Flow:
+            - Reads ``stats``; produces the ``Text`` rendered into
+              ``#map_stats_body``.
+
+        Dependencies:
+            Uses:
+                - ``safe_text``
+            Used by:
+                - ``_render_stats`` / (test) TC-041.8
+        """
+        text = Text()
+        text.append(f"Coverage: {stats.coverage_pct:.6f}%  ")
+        text.append(f"Bytes covered: {stats.covered_bytes}\n")
+        text.append(f"Valid ranges: {stats.valid_count}  ")
+        text.append(f"Invalid ranges: {stats.invalid_count}\n")
+        text.append(f"Gaps: {stats.gap_count}  ")
+        text.append(f"Largest gap: {stats.largest_gap} bytes\n")
+        text.append(f"Total issues: {stats.total_issues}")
+        return text
+
+    def _reset_detail(self) -> None:
+        """Clear the detail pane back to its neutral hint and hide the jump.
+
+        Summary:
+            Return the detail body to the "select a cell" hint and hide the
+            Open-in-Hex button — used on every fresh render so a stale
+            selection from a prior file never lingers.
 
         Dependencies:
             Used by:
                 - ``render_ranges``
         """
-        if total_span <= 0:
-            filled = self._BAR_WIDTH
+        try:
+            body = self.query_one("#map_detail_body", Static)
+            button = self.query_one("#map_open_hex_button", Button)
+        except Exception:
+            return
+        self._selected_cell_start = None
+        body.update(safe_text(self._DETAIL_HINT))
+        button.add_class("hidden")
+
+    def build_detail_text(
+        self,
+        cell_start: int,
+        cell_end: int,
+        status: str,
+    ) -> Text:
+        """Assemble the markup-safe detail text for a selected cell.
+
+        Summary:
+            Compose the detail pane's body for the cell ``[cell_start,
+            cell_end)`` (LLR-041.4): a status chip line, the cell window
+            ``0x{start:08X}-0x{end-1:08X}``, the covering region (bounds/size/
+            status, or "gap — no region"), the cell-scoped issue list
+            (LLR-041.5) and a "N issues in region" count. Every file-derived
+            string — issue ``code``/``message``/``symbol`` — is appended as a
+            ``Text`` segment (never markup-parsed), so hostile tokens like
+            ``sensor[red]`` render literally (LLR-041.11). Pure assembly over
+            the stored ``_ordered_ranges`` / ``_issues`` — no new analysis
+            (LLR-041.7).
+
+        Args:
+            cell_start (int): Inclusive cell-window start.
+            cell_end (int): Exclusive cell-window end.
+            status (str): The cell status (``"valid"`` / ``"invalid"`` /
+                ``"gap"``).
+
+        Returns:
+            Text: The composed, markup-safe detail body.
+
+        Data Flow:
+            - Reads ``self._ordered_ranges`` (covering region) and
+              ``self._issues`` (cell + region joins via ``issues_in_window``);
+              produces the ``Text`` rendered into ``#map_detail_body``.
+
+        Dependencies:
+            Uses:
+                - ``covering_range`` / ``issues_in_window`` / ``safe_text``
+            Used by:
+                - ``on_map_cell_selected`` / (test) TC-041.4
+        """
+        text = Text()
+        chip = {
+            "valid": "VALID",
+            "invalid": "INVALID",
+            "gap": "GAP (uncovered)",
+        }.get(status, "GAP (uncovered)")
+        text.append("Status: ")
+        text.append(f"{chip}\n")
+        text.append(f"Cell: 0x{cell_start:08X}-0x{cell_end - 1:08X}\n")
+
+        region = covering_range(cell_start, cell_end, self._ordered_ranges)
+        if region is None:
+            text.append("Region: gap - no region\n")
+            region_issue_count = 0
         else:
-            filled = round(self._BAR_WIDTH * size / total_span)
-            filled = max(1, min(self._BAR_WIDTH, filled))
-        return "[" + "#" * filled + "-" * (self._BAR_WIDTH - filled) + "]"
+            r_start, r_end, r_valid = region
+            r_status = "valid" if r_valid else "invalid"
+            r_size = r_end - r_start
+            text.append(
+                f"Region: 0x{r_start:08X}-0x{r_end - 1:08X} "
+                f"({r_size} bytes, {r_status})\n"
+            )
+            region_issue_count = len(
+                issues_in_window(self._issues, r_start, r_end)
+            )
+
+        cell_issues = issues_in_window(self._issues, cell_start, cell_end)
+        text.append(f"{len(cell_issues)} issue(s) in this cell\n")
+        for issue in cell_issues:
+            text.append("  [")
+            text.append(safe_text(issue.code))
+            text.append("] ")
+            if isinstance(issue.address, int):
+                text.append(f"0x{issue.address:08X} ")
+            if issue.symbol:
+                text.append(safe_text(issue.symbol))
+                text.append(" ")
+            text.append(safe_text(issue.message))
+            text.append("\n")
+        text.append(f"{region_issue_count} issue(s) in region")
+        return text
+
+    def on_map_cell_selected(self, event: "MapCell.Selected") -> None:
+        """Render the detail pane for the activated cell (LLR-041.4).
+
+        Summary:
+            Handle a :class:`MapCell.Selected` message by composing the
+            markup-safe detail body for that cell and revealing the
+            Open-in-Hex jump. Stores the cell start so the jump can carry it.
+
+        Args:
+            event (MapCell.Selected): The cell-activation message.
+
+        Dependencies:
+            Uses:
+                - ``build_detail_text``
+            Used by:
+                - Textual message dispatch (from ``MapCell``)
+        """
+        event.stop()
+        cell = event.cell
+        self._selected_cell_start = cell.cell_start
+        body = self.query_one("#map_detail_body", Static)
+        body.update(
+            self.build_detail_text(cell.cell_start, cell.cell_end, cell.status)
+        )
+        self.query_one("#map_open_hex_button", Button).remove_class("hidden")
+
+    def focus_adjacent_cell(self, current: "MapCell", key: str) -> None:
+        """Move focus to the cell one arrow-step from ``current`` (US-036).
+
+        Summary:
+            Resolve the target cell index from ``adjacent_cell_index`` over the
+            current ``#map_grid`` children (mount order) and the stored visual
+            column count, then ``.focus()`` it. Focus clamps at the grid edges
+            (no wrap). This only MOVES focus — selection stays on click/Enter,
+            matching AT-036a (press Right, then Enter). The panel owns the cell
+            list + column count, so ``MapCell`` needs no sibling access.
+
+        Args:
+            current (MapCell): The currently-focused cell.
+            key (str): The arrow key pressed (``left``/``right``/``up``/
+                ``down``).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads the ``#map_grid`` ``MapCell`` children; computes the target
+              via ``adjacent_cell_index``; calls ``.focus()`` on it (or on the
+              same cell at an edge — a harmless no-op move).
+
+        Dependencies:
+            Uses:
+                - ``adjacent_cell_index``
+            Used by:
+                - ``MapCell.on_key`` (arrow keys)
+        """
+        try:
+            grid = self.query_one("#map_grid", Container)
+        except Exception:
+            return
+        cells = list(grid.query(MapCell))
+        if not cells or current not in cells:
+            return
+        index = cells.index(current)
+        target = adjacent_cell_index(index, key, len(cells), self._grid_cols)
+        if target is None:
+            return
+        cells[target].focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Post :class:`OpenInHexRequested` for the Open-in-Hex button.
+
+        Summary:
+            Translate the detail pane's "Open in Hex View" press into an
+            :class:`OpenInHexRequested` carrying the selected cell's start so
+            ``app.py`` drives ``update_hex_view`` and switches screen — the
+            panel renders no hex itself (LLR-041.6).
+
+        Args:
+            event (Button.Pressed): The Textual button-press event.
+
+        Dependencies:
+            Uses:
+                - ``OpenInHexRequested``
+            Used by:
+                - Textual button-press dispatch
+        """
+        if event.button.id != "map_open_hex_button":
+            return
+        event.stop()
+        if self._selected_cell_start is not None:
+            self.post_message(
+                self.OpenInHexRequested(self._selected_cell_start)
+            )
 
 
 class BookmarksPlaceholder(Static):
