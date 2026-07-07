@@ -935,3 +935,282 @@ def test_addendum_and_issue_render_use_same_address(tmp_path: Path) -> None:
     text = _report_with_regions(tmp_path, [region], summary)
     assert "shared issue @ 0x3040" in text  # enriched declaration-errors (LLR-025.1)
     assert "issue [X-ENRICH] @ 0x3040" in text  # addendum membership (LLR-024.2)
+
+
+# ---------------------------------------------------------------------------
+# US-037 (batch-26) — per-variant entropy section in the project report
+# (HLR-037 / LLR-037.1..037.3). The known-profile image is the AT-035c mixed
+# image: a 256-byte constant ``0x00`` run (→ constant/padding, H=0.0) plus a
+# 256-byte 0..255 permutation run (→ high/random, H=8.0), separated by a gap.
+# ---------------------------------------------------------------------------
+
+# Mixed known-entropy image: constant run + max-entropy run + unmapped gap.
+_ENTROPY_CONST_BASE = 0x3000
+_ENTROPY_RANDOM_BASE = 0x4000
+_ENTROPY_MIXED_MEM_MAP = {
+    **{_ENTROPY_CONST_BASE + i: 0x00 for i in range(256)},
+    **{_ENTROPY_RANDOM_BASE + i: i for i in range(256)},
+}
+
+
+def _entropy_captured_result(
+    project_dir: Path,
+) -> "tuple[VariantExecutionResult, ProjectVariantSet]":
+    """Run the SHIPPED variant chain over the mixed image with capture on.
+
+    Builds the AT-035c mixed image on disk via ``emit_s19_from_mem_map``,
+    loads + executes it through the real variant-execution chain with
+    ``capture_mem_maps=True`` so the returned ``VariantExecutionResult.mem_map``
+    is populated by the shipped plumbing (QR-4) — NOT hand-set on the fixture.
+    The change is a no-op single byte re-write of an already-present value, so
+    the captured post-change ``mem_map`` equals the mixed image.
+    """
+    import json
+
+    from s19_app.tui.changes.io import emit_s19_from_mem_map
+
+    ranges = [
+        (_ENTROPY_CONST_BASE, _ENTROPY_CONST_BASE + 256),
+        (_ENTROPY_RANDOM_BASE, _ENTROPY_RANDOM_BASE + 256),
+    ]
+    project_dir.mkdir(parents=True, exist_ok=True)
+    (project_dir / "fw.s19").write_text(
+        emit_s19_from_mem_map(_ENTROPY_MIXED_MEM_MAP, ranges), encoding="utf-8"
+    )
+    change_path = project_dir / "chg.json"
+    change_path.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                # re-write an existing byte to its own value: no image change,
+                # so the captured post-change map == the mixed image.
+                "entries": [
+                    {"type": "bytes", "address": hex(_ENTROPY_CONST_BASE), "bytes": "00"}
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    data_files, _a2l, error = validate_project_files(project_dir)
+    assert error is None
+    vset = build_variant_set("proj", data_files)
+    plan = plan_variant_executions(
+        vset, None, scope=SCOPE_ALL, fallback_batch=[change_path]
+    )
+    captured = execute_variant_plan(plan, project_dir, capture_mem_maps=True)
+    return captured[0], vset
+
+
+def test_report_contains_entropy_section_on_disk(tmp_path: Path) -> None:
+    """AT-037a — GATE (C-12 output-then-consume): the WRITTEN report file
+    carries the per-variant entropy section with the expected band lines.
+
+    Intent (LLR-037.2 + LLR-037.3): drive the shipped report handler over a
+    variant whose ``mem_map`` was populated by the real execution chain with
+    ``capture_mem_maps=True`` (precondition-asserted non-empty BEFORE
+    generating — QR-4, proves the capture plumbing not just the formatter),
+    then RE-READ the file at the path the handler wrote (``report_service``
+    ``:1163``) and assert the ``### Entropy`` heading plus a ``constant/padding``
+    band line AND a ``high/random`` band line are present. Not a direct
+    ``_entropy_lines`` call, not a glob-reconstruct.
+    """
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    result, vset = _entropy_captured_result(project_dir)
+
+    # Precondition (QR-4): the shipped chain populated mem_map end-to-end.
+    assert result.mem_map, "capture_mem_maps=True must populate result.mem_map"
+    assert result.mem_map[_ENTROPY_CONST_BASE] == 0x00
+    assert result.mem_map[_ENTROPY_RANDOM_BASE + 255] == 255
+
+    path = generate_project_report(
+        project_dir,
+        [result],
+        ReportOptions(context_bytes=0),
+        variant_set=vset,
+        now_fn=_fixed_clock,
+    )
+    text = path.read_text(encoding="utf-8")
+
+    # Scope to this variant's block (single variant here).
+    assert "## Variant:" in text
+    variant_block = text.split("## Variant:", 1)[1]
+    assert "### Entropy" in variant_block
+    assert "**constant/padding**" in variant_block  # the 0x00 run
+    assert "**high/random**" in variant_block  # the 0..255 permutation run
+
+
+def test_report_omits_entropy_when_disabled_byte_identical(tmp_path: Path) -> None:
+    """AT-037b — branch-completeness (per-branch C-10): ``include_entropy=False``
+    removes the section and yields a report byte-for-byte identical to the
+    pre-feature baseline — i.e. the flag suppresses ONLY the entropy block and
+    adds zero incidental drift elsewhere.
+
+    The US-037 counterfactual is carried by AT-037a (absent-on-pre-fix-tree);
+    AT-037b proves the flag is a pure suppressor. The load-bearing assert takes
+    the ``include_entropy=True`` report, removes EXACTLY the entropy block the
+    shipped builder emits for the variant (``_entropy_lines(result)``, joined
+    verbatim), and asserts the remainder equals the ``include_entropy=False``
+    report BYTE-FOR-BYTE. That block is the only thing the flag adds, so
+    on-minus-block == off proves the off-branch reproduces the pre-feature
+    bytes with no drift in any surrounding section. Both reports use a fixed
+    clock + fixed filename so nothing else can differ.
+    """
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    result, vset = _entropy_captured_result(project_dir)
+    assert result.mem_map  # capture precondition
+
+    def _gen(dest: Path, *, include_entropy: bool) -> bytes:
+        path = generate_project_report(
+            dest,
+            [result],
+            ReportOptions(context_bytes=0, include_entropy=include_entropy),
+            variant_set=vset,
+            now_fn=_fixed_clock,
+        )
+        return path.read_bytes()
+
+    off_bytes = _gen(tmp_path / "off", include_entropy=False)
+    reference_bytes = _gen(tmp_path / "ref", include_entropy=False)
+    on_bytes = _gen(tmp_path / "on", include_entropy=True)
+    on_text = on_bytes.decode("utf-8")
+    off_text = off_bytes.decode("utf-8")
+
+    # Section absent when disabled.
+    assert "### Entropy" not in off_text
+    # Present when enabled (discriminates present/absent, not vacuous).
+    assert "### Entropy" in on_text
+
+    # The EXACT block the shipped builder emits for this variant. The report
+    # is written with the platform newline (CRLF on Windows), so join with the
+    # newline the written file actually uses — matched to the on-disk bytes.
+    newline = "\r\n" if b"\r\n" in on_bytes else "\n"
+    entropy_block = newline.join(report_service._entropy_lines(result))
+    assert entropy_block in on_text  # precise block, not a fuzzy heading match
+
+    # generate_project_report appends the block to the flat line list, so on
+    # disk it is preceded by one separator joining it to the prior line. Strip
+    # that leading separator with the block so removal leaves no doubled gap.
+    on_minus_block = on_text.replace(newline + entropy_block, "", 1)
+
+    # LOAD-BEARING: on-minus-entropy-block == off, byte-for-byte. Proves the
+    # flag adds ONLY the entropy block and zero incidental drift elsewhere.
+    assert on_minus_block == off_text
+
+    # Determinism guard (kept): two disabled generations are byte-identical.
+    assert off_bytes == reference_bytes
+
+
+def test_entropy_lines_shape_direct_call() -> None:
+    """TC-037.1 — GUARD (NOT the gate): ``_entropy_lines(result)`` returns the
+    documented markdown shape (``### Entropy`` heading + per-band count bullets)
+    for a variant with a known mixed mem_map. Consumer-contract only; the C-12
+    gate re-reads the written file (AT-037a).
+    """
+    result = VariantExecutionResult(
+        variant_id="v", status="ok", mem_map=dict(_ENTROPY_MIXED_MEM_MAP)
+    )
+    lines = report_service._entropy_lines(result)
+    assert lines[0] == "### Entropy"
+    blob = "\n".join(lines)
+    # Two full windows → one constant/padding + one high/random bullet.
+    assert "- **constant/padding**: 1 window(s)" in blob
+    assert "- **high/random**: 1 window(s)" in blob
+    # Band-summary only — no raw byte values dumped by this builder.
+    assert "0x00" not in blob.lower() or "0x" not in blob  # no address/byte dump
+
+
+def test_entropy_lines_empty_mem_map_no_crash() -> None:
+    """TC-037.1 (edge) / LLR-037.2 — a variant with no mapped bytes returns the
+    heading plus a 'no data' line, never a crash."""
+    for mem_map in (None, {}):
+        result = VariantExecutionResult(
+            variant_id="v", status="ok", mem_map=mem_map
+        )
+        lines = report_service._entropy_lines(result)
+        assert lines[0] == "### Entropy"
+        assert any("not computed" in line for line in lines)
+
+
+def test_include_entropy_default_true_and_validated() -> None:
+    """TC-037.2 — ``include_entropy`` defaults True and is domain-validated
+    (one explicit ``ValueError``, never coerced — mirrors ``include_legend``).
+    """
+    assert ReportOptions().include_entropy is True
+    assert ReportOptions(include_entropy=False).include_entropy is False
+    with pytest.raises(ValueError):
+        ReportOptions(include_entropy="x")  # type: ignore[arg-type]
+
+
+def test_include_entropy_false_not_emitted(tmp_path: Path) -> None:
+    """TC-037.2 — with ``include_entropy=False`` the entropy heading is not
+    emitted into the produced file (option gates emission)."""
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    result, vset = _entropy_captured_result(project_dir)
+    path = generate_project_report(
+        project_dir,
+        [result],
+        ReportOptions(context_bytes=0, include_entropy=False),
+        variant_set=vset,
+        now_fn=_fixed_clock,
+    )
+    assert "### Entropy" not in path.read_text(encoding="utf-8")
+
+
+def test_entropy_section_charged_against_budget(tmp_path: Path) -> None:
+    """TC-037.3 — the entropy section is routed through the budget-charged
+    ``emit`` helper: enabling it grows the produced file (the lines land in the
+    budgeted ``lines`` list like the header/legend/overview sections), i.e. no
+    unbudgeted side-channel. Observed as a strict size increase of the written
+    file when the only differing option is ``include_entropy``.
+    """
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    result, vset = _entropy_captured_result(project_dir)
+
+    def _size(dest: Path, *, include_entropy: bool) -> int:
+        path = generate_project_report(
+            dest,
+            [result],
+            ReportOptions(context_bytes=0, include_entropy=include_entropy),
+            variant_set=vset,
+            now_fn=_fixed_clock,
+        )
+        return path.stat().st_size
+
+    off = _size(tmp_path / "off", include_entropy=False)
+    on = _size(tmp_path / "on", include_entropy=True)
+    assert on > off  # section lands in the budgeted line list
+
+
+def test_entropy_section_confidentiality_no_raw_bytes_or_logging(
+    tmp_path: Path,
+) -> None:
+    """TC-037.4 — confidentiality: the entropy section reports bands/counts only
+    (no raw byte values beyond what the hexdump already emits); the report lands
+    ONLY under the gitignored ``reports/`` tree; the module adds no new logging.
+    """
+    project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+    result, vset = _entropy_captured_result(project_dir)
+    path = generate_project_report(
+        project_dir,
+        [result],
+        ReportOptions(context_bytes=0),
+        variant_set=vset,
+        now_fn=_fixed_clock,
+    )
+    # Report lands under the gitignored reports/ tree (F-S-07).
+    assert path.parent.name == report_service.REPORTS_DIR_NAME
+
+    # The entropy builder emits band summary lines only — no raw byte dump.
+    entropy_block = "\n".join(report_service._entropy_lines(result))
+    assert "constant/padding" in entropy_block
+    # No hex byte pairs / address rows in the band summary itself.
+    assert "0x" not in entropy_block
+
+    # The module performs no logging at all (F-S-07 confidentiality contract).
+    source = Path(report_service.__file__).read_text(encoding="utf-8")
+    assert "import logging" not in source
+    assert "getLogger" not in source

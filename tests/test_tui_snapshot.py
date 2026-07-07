@@ -17,6 +17,12 @@ Test cases:
     120x30 to lock the batch-22 US-030 2x2 four-pane layout at the floor and
     the primary width (2) = 4 scaffold baselines.
     28 baseline ``.svg`` files total (batch-22 US-031 adds the patch 80x24 cell).
+  - TC-036-S — 2 additive, NON-GATING entropy-viewer modal cells (US-036,
+    batch-26) at 80x24 + 120x30, marked xfail-until-baseline. They are a
+    layout-drift regression artifact only; the behavioral verdict for the
+    entropy modal is the Inc-3 Pilot ATs (AT-036a/b/c). The baselines are
+    generated later in the canonical CI env via snapshot-regen.yml, at which
+    point a follow-up drops their xfail (as batch-25 did for the patch cells).
   - TC-016-S public-fixture sub-case — the snapshot setup loads no client
     artifact; every baseline traces to a ``conftest.py`` generator.
   - TC-016 / CV-04 — the 119/120-column breakpoint boundary check: the
@@ -361,6 +367,52 @@ def _snapshot_run_before(
     return run_before
 
 
+def _entropy_run_before(triple: dict[str, Path]):
+    """Build the ``run_before`` coroutine for an entropy-modal snapshot cell.
+
+    Summary:
+        Return an ``async`` callable that ``pytest-textual-snapshot`` runs
+        inside the pilot before capturing the SVG: it installs the public
+        synthetic ``LoadedFile`` then presses the ``e`` key binding to push
+        :class:`s19_app.tui.screens.EntropyViewerScreen` over the loaded
+        image. The public triple's S19 is a random-filled multi-range image,
+        so ``compute_entropy`` yields several windows spanning ≥2 entropy
+        bands — the strip must therefore render ≥2 distinct band colours,
+        exercising the band→colour map (US-036 / batch-26). The modal is a
+        pushed ``ModalScreen`` (not a rail screen), so this drives the ``e``
+        binding rather than ``action_show_screen`` like the rail cells.
+
+    Args:
+        triple (dict[str, Path]): the ``public_triple`` fixture paths.
+
+    Returns:
+        Callable: an ``async`` ``run_before(pilot)`` callable.
+
+    Data Flow:
+        - ``_build_loaded_triple`` installs the public ``LoadedFile`` (with a
+          populated ``mem_map``).
+        - ``pilot.press("e")`` fires ``action_show_entropy`` →
+          ``push_screen(EntropyViewerScreen(loaded.mem_map))``.
+
+    Dependencies:
+        Uses:
+            - ``_build_loaded_triple``
+            - the ``e`` key binding (``S19TuiApp.BINDINGS``) →
+              ``action_show_entropy``
+        Used by:
+            - the parametrized ``test_tc036s_entropy_modal_snapshot`` cells
+    """
+
+    async def run_before(pilot) -> None:
+        app = pilot.app
+        _build_loaded_triple(app, triple)
+        await pilot.pause()
+        await pilot.press("e")
+        await pilot.pause()
+
+    return run_before
+
+
 # ---------------------------------------------------------------------------
 # TC-016-S — the 28-baseline snapshot SVG matrix (LLR-007.1 / LLR-007.2)
 # ---------------------------------------------------------------------------
@@ -430,6 +482,76 @@ def test_tc016s_density_layout_snapshot(
         app,
         terminal_size=(width, height),
         run_before=_snapshot_run_before(screen, density, public_triple),
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-036-S — entropy-viewer modal snapshot cells (US-036, batch-26)
+#            NON-GATING regression artifact; xfail-until-baseline.
+# ---------------------------------------------------------------------------
+
+# 2 cells: the entropy modal at the 80x24 floor and the 120x30 primary width
+# (spike-MEASURED fit: 48 cols content @80 / 76 @120 — no fallback rung). These
+# are added to the batch-25 pinned-textual snapshot suite as a layout-drift
+# REGRESSION ARTIFACT only — the behavioral proof of US-036 is the Inc-3 Pilot
+# ATs (AT-036a/b/c), NOT this snapshot. The baselines are generated later in the
+# canonical CI env via .github/workflows/snapshot-regen.yml (pinned
+# textual==8.2.8 — never locally, per the snapshot-regen-env convention), so
+# until that regen lands each cell is an expected mismatch. Both are therefore
+# marked xfail(strict=False) — mirroring the batch-22 patch cells, whose xfail
+# scaffold was dropped by batch-25 once real baselines existed. A follow-up
+# drops these two xfails the same way once the canonical-env baselines land.
+_ENTROPY_CELLS = [
+    pytest.param(
+        size_key,
+        id=f"entropy-comfortable-{size_key}",
+        marks=(
+            pytest.mark.xfail(
+                reason="baseline pending canonical-CI regen — batch-26 US-036",
+                strict=False,
+            ),
+        ),
+    )
+    for size_key in ("80x24", "120x30")
+]
+
+
+@pytest.mark.skipif(
+    not snapshot_plugin_available,
+    reason="pytest-textual-snapshot not installed (dev-only optional extra)",
+)
+@pytest.mark.snapshot
+@pytest.mark.parametrize("size_key", _ENTROPY_CELLS)
+def test_tc036s_entropy_modal_snapshot(
+    snap_compare,
+    public_triple: dict[str, Path],
+    tmp_path: Path,
+    size_key: str,
+) -> None:
+    """The entropy-viewer modal matches its approved layout baseline (TC-036-S).
+
+    Intent: US-036 (batch-26) — a NON-GATING layout-drift regression artifact
+    for :class:`s19_app.tui.screens.EntropyViewerScreen`. The cell installs
+    the public synthetic triple (LLR-007.2 — no client artifact), presses the
+    ``e`` key binding to open the entropy modal over the loaded image, and
+    snapshots it at the 80x24 floor and 120x30 primary width. The image is a
+    random-filled multi-range S19, so the band strip renders ≥2 distinct band
+    colours. The behavioral verdict for US-036 lives in the Inc-3 Pilot ATs
+    (AT-036a/b/c), not here; this cell only catches later layout/theme drift.
+
+    xfail-until-baseline: the SVG baselines are generated in the canonical CI
+    env via snapshot-regen.yml (pinned ``textual==8.2.8``), never locally
+    (snapshot-regen-env convention). Until that regen lands the cell has no
+    baseline to match, so it is marked ``xfail(strict=False)`` — an expected
+    fail, not a failure. A follow-up drops the xfail once the baseline exists,
+    exactly as batch-25 did for the batch-22 patch cells.
+    """
+    width, height = _SIZES[size_key]
+    app = S19TuiApp(base_dir=tmp_path)
+    assert snap_compare(
+        app,
+        terminal_size=(width, height),
+        run_before=_entropy_run_before(public_triple),
     )
 
 

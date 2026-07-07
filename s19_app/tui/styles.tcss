@@ -801,6 +801,34 @@ ModalScreen {
     margin-top: 1;
 }
 
+/* --- Entropy viewer modal (batch-26, LLR-036.2/036.3) -------------------
+ * Reuses the shared `.modal-dialog` token styling and box model (the same
+ * container measured at 48/76 cols, §2.6 C-13) so the strip + jump-list
+ * content-width budget holds by construction. Caps the dialog height and
+ * scrolls the body so both surfaces fit the 80- and 120-col regimes. The
+ * strip cells carry their band colours inline as Rich `Text` styles
+ * (`ENTROPY_BAND_COLOUR`, screens.py) — NOT the frozen `sev-*` classes — so
+ * no per-band CSS rule is needed here. The `#entropy_strip` Static wraps its
+ * cells into the content width (no horizontal overflow, LLR-036.3). */
+#entropy_dialog {
+    height: 90%;
+}
+
+#entropy_body {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+#entropy_strip {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#entropy_jump_list {
+    height: auto;
+    max-height: 60%;
+}
+
 .modal-buttons {
     layout: horizontal;
     height: auto;
