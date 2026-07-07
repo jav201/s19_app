@@ -526,6 +526,96 @@ Screen {
     color: $fg-base;
 }
 
+/*
+ * R-TUI-041 (batch-27): the Memory Map is a colour-coded 2-D minimap. The
+ * `#map_grid` lays its `.map-cell` widgets in a wrapping grid; each cell
+ * carries its `sev-*` status class (single source of truth = color_policy).
+ * The header and the `#map_stats` coverage strip span the full panel width;
+ * `#map_grid` + `#map_detail` share a `#map_body` sub-container laid out
+ * per the two-regime reflow below (LLR-041.10).
+ */
+#map_header {
+    width: 100%;
+    height: auto;
+    color: $fg-base;
+}
+
+/*
+ * Two-regime reflow (LLR-041.10) — reuses the existing `width-narrow` class
+ * toggled by `_apply_width_regime`/`on_resize`; NOT a new breakpoint.
+ *   Wide (>= 120): `#map_body` is horizontal — the grid takes the `1fr`
+ *   remainder beside a fixed 36-col `#map_detail` right column (C-13 budget
+ *   §6.2: 98-col body − 36 = 62-col elastic grid, positive).
+ *   Narrow (< 120): `#map_body` stacks vertically — grid full width, detail
+ *   below it; no horizontal fixed-sibling contention.
+ */
+#map_body {
+    width: 100%;
+    height: auto;
+    layout: horizontal;
+}
+
+#workspace_body.width-narrow #map_body {
+    layout: vertical;
+}
+
+#map_grid {
+    width: 1fr;
+    height: auto;
+    layout: grid;
+    grid-size: 16;
+    grid-gutter: 0;
+}
+
+.map-cell {
+    width: 100%;
+    height: 1;
+    min-width: 2;
+    text-align: center;
+}
+
+.map-cell:focus {
+    text-style: reverse;
+}
+
+#map_detail {
+    width: 36;
+    height: auto;
+    margin-left: 2;
+}
+
+#workspace_body.width-narrow #map_detail {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 1;
+}
+
+#map_detail_body {
+    width: 100%;
+    height: auto;
+    color: $fg-base;
+}
+
+#map_open_hex_button {
+    margin-top: 1;
+}
+
+#map_open_hex_button.hidden {
+    display: none;
+}
+
+#map_stats {
+    width: 100%;
+    height: auto;
+    margin-top: 1;
+}
+
+#map_stats_body {
+    width: 100%;
+    height: auto;
+    color: $fg-base;
+}
+
 #bookmarks_placeholder {
     width: 100%;
     height: auto;

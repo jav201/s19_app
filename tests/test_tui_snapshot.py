@@ -9,14 +9,16 @@ Covers the increment-12 LLRs:
     firmware / A2L / MAC artifact is ever loaded.
 
 Test cases:
-  - TC-016-S — the 28-baseline ``pytest-textual-snapshot`` SVG matrix:
+  - TC-016-S — the 29-baseline ``pytest-textual-snapshot`` SVG matrix:
     the 4 restyled screens (Workspace, A2L Explorer, MAC View, Issues
     Report) x {compact, comfortable} x {80x24, 120x30, 160x40} = 24
-    baselines, plus the additive scaffold screens: Memory Map + A2B Diff at
-    the 120x30 primary size (2), and the Patch Editor at both 80x24 and
-    120x30 to lock the batch-22 US-030 2x2 four-pane layout at the floor and
-    the primary width (2) = 4 scaffold baselines.
-    28 baseline ``.svg`` files total (batch-22 US-031 adds the patch 80x24 cell).
+    baselines, plus the additive scaffold screens: the A2B Diff at the 120x30
+    primary size (1), the Patch Editor at both 80x24 and 120x30 to lock the
+    batch-22 US-030 2x2 four-pane layout (2), and the Memory Map at both 80x24
+    and 120x30 to lock the batch-27 minimap redesign + narrow-regime reflow
+    (2) = 5 scaffold baselines.
+    29 baseline ``.svg`` files total (batch-27 US-037 adds the map 80x24 reflow
+    cell; batch-22 US-031 added the patch 80x24 cell).
   - TC-036-S — 2 additive, NON-GATING entropy-viewer modal cells (US-036,
     batch-26) at 80x24 + 120x30, marked xfail-until-baseline. They are a
     layout-drift regression artifact only; the behavioral verdict for the
@@ -414,7 +416,7 @@ def _entropy_run_before(triple: dict[str, Path]):
 
 
 # ---------------------------------------------------------------------------
-# TC-016-S — the 28-baseline snapshot SVG matrix (LLR-007.1 / LLR-007.2)
+# TC-016-S — the 29-baseline snapshot SVG matrix (LLR-007.1 / LLR-007.2)
 # ---------------------------------------------------------------------------
 
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
@@ -432,18 +434,57 @@ _RESTYLED_CELLS = [
 # canonical CI env (batch-25, .github/workflows/snapshot-regen.yml, pinned
 # textual==8.2.8), so the two patch cells are now full green cells — the prior
 # xfail (baseline-regen-pending) is retired. map/diff are 120x30 only.
+#
+# batch-27 (R-TUI-041, US-035/036/037): the map screen's read-only text list
+# becomes a colour-coded minimap grid + detail pane + coverage stats strip, and
+# the batch-27 Inc-3 two-regime reflow (LLR-041.10) lays the detail beside the
+# grid at 120x30 and stacked below it at 80x24 → BOTH the `map-comfortable-120x30`
+# baseline AND a NEW `map-comfortable-80x24` narrow-reflow cell must be locked.
+# Local regen is FORBIDDEN ([[reference_snapshot_regen_env]], batch-25); the real
+# baselines are regenerated in the canonical CI env post-merge. Until then both
+# map cells are xfail-until-baseline (strict=False), mirroring the retired
+# batch-22 patch pattern (which added the patch 80x24 floor the same way); the
+# other 27 cells stay green.
+_MAP_BASELINE_PENDING = pytest.mark.xfail(
+    reason="baseline-regen-pending: US-035/036/037 minimap redesign (batch-27)",
+    strict=False,
+)
+
+
+def _scaffold_cell_marks(screen: str, size_key: str) -> tuple:
+    """Return the pytest marks for a scaffold snapshot cell.
+
+    The batch-27 minimap redesign drifts the `map` baselines until they are
+    regenerated in the canonical CI env; both map cells (120x30 primary and the
+    new 80x24 narrow-reflow floor) are xfail-until-baseline.
+    """
+    if screen == "map":
+        return (_MAP_BASELINE_PENDING,)
+    return ()
+
+
+# The map scaffold, like patch, now carries BOTH the 80x24 floor and the 120x30
+# primary — the 80x24 cell locks the batch-27 narrow-regime reflow (LLR-041.10),
+# added exactly as batch-22 added the patch 80x24 floor cell (qa M-2).
+_TWO_SIZE_SCAFFOLDS = ("patch", "map")
+
+
 _SCAFFOLD_CELLS = [
     pytest.param(
         screen,
         "comfortable",
         size_key,
         id=f"{screen}-comfortable-{size_key}",
+        marks=_scaffold_cell_marks(screen, size_key),
     )
     for screen in _SCAFFOLD_SCREENS
-    for size_key in (("80x24", "120x30") if screen == "patch" else ("120x30",))
+    for size_key in (
+        ("80x24", "120x30") if screen in _TWO_SIZE_SCAFFOLDS else ("120x30",)
+    )
 ]
 
-# 24 + 4 = 28 baseline cells (batch-22 US-031 adds the patch 80x24 floor cell).
+# 24 + 5 = 29 baseline cells (batch-27 US-037 adds the map 80x24 reflow cell,
+# alongside the batch-22 patch 80x24 floor cell).
 _ALL_SNAPSHOT_CELLS = _RESTYLED_CELLS + _SCAFFOLD_CELLS
 
 
@@ -471,10 +512,11 @@ def test_tc016s_density_layout_snapshot(
     app renders only the public synthetic ``conftest.py`` generators; no
     client artifact is opened.
 
-    The 28-cell matrix: the 4 restyled screens carry the full
-    {density x size} grid (24 cells); map + diff scaffolds are pinned at
-    120x30 comfortable (2 cells); the patch scaffold carries 80x24 + 120x30
-    to lock the batch-22 2x2 four-pane layout at both regimes (2 cells).
+    The 29-cell matrix: the 4 restyled screens carry the full
+    {density x size} grid (24 cells); the diff scaffold is pinned at 120x30
+    comfortable (1 cell); the patch and map scaffolds each carry 80x24 + 120x30
+    to lock, respectively, the batch-22 2x2 four-pane layout and the batch-27
+    minimap redesign + narrow-regime reflow at both regimes (4 cells).
     """
     width, height = _SIZES[size_key]
     app = S19TuiApp(base_dir=tmp_path)

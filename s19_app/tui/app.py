@@ -7273,15 +7273,45 @@ class S19TuiApp(App):
         """
         panel = self.query_one("#memory_map_panel", MemoryMapPanel)
         if not self.current_file:
-            panel.render_ranges([], [])
+            panel.render_ranges([], [], [])
             return
         panel.render_ranges(
             self.current_file.ranges,
             self.current_file.range_validity,
+            self._validation_issues,
         )
         self.logger.info(
             "Memory Map updated. ranges=%d", len(self.current_file.ranges)
         )
+
+    def on_memory_map_panel_open_in_hex_requested(
+        self, message: "MemoryMapPanel.OpenInHexRequested"
+    ) -> None:
+        """Jump to the hex view focused on the selected cell (LLR-041.6).
+
+        Summary:
+            Handle the Memory Map's Open-in-Hex request by switching to the
+            Workspace/hex screen and driving the existing
+            ``update_hex_view(focus_address=…)`` with the cell's start address.
+            The panel renders no hex itself — this app-side handler is the
+            single owner of the focus path.
+
+        Args:
+            message (MemoryMapPanel.OpenInHexRequested): Carries the selected
+                cell's ``focus_address`` (its ``cell_start``).
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``action_show_screen`` / ``update_hex_view``
+            Used by:
+                - Textual message dispatch (from ``MemoryMapPanel``)
+        """
+        message.stop()
+        self.action_show_screen("workspace")
+        self.update_hex_view(focus_address=message.focus_address)
 
     def update_hex_view(self, focus_address: Optional[int] = None) -> None:
         """Render hex view around a focus address if provided."""

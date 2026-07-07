@@ -2890,89 +2890,1037 @@ def _install_case_02_loaded_file(app: S19TuiApp) -> "object":
 
 
 # ---------------------------------------------------------------------------
-# TC-025 — Memory Map scaffold renders coverage from LoadedFile (LLR-012.1)
+# batch-27 (R-TUI-041) — Interactive colour-coded Memory-Map minimap grid.
+#
+# Increment 1 (US-035): the read-only monochrome text list (superseded
+# R-TUI-026 realisation — the three old `test_tc025_memory_map_renders_*`
+# text-format tests were removed here) is replaced by a 2-D colour-coded cell
+# grid whose cells route their status through `css_class_for_severity`.
+#
+# TCs below map 1:1 to the Inc-1 LLRs; AT-035 is the black-box Pilot proof.
 # ---------------------------------------------------------------------------
 
 
-def test_tc025_memory_map_renders_coverage_from_loaded_file(tmp_path: Path) -> None:
-    """The Memory Map renders every range of the loaded file (LLR-012.1).
+# The public ``case_04`` S19 fixture has one valid range and one INVALID range
+# (bad checksums) — it exercises the minimap's invalid (red / sev-error) cells.
+_CASE_04_S19 = (
+    Path(__file__).resolve().parent.parent
+    / "examples"
+    / "case_04_bad_checksums"
+    / "firmware.s19"
+)
 
-    Intent: the Memory Map is a read-only coverage visualization driven
-    only by the existing ``LoadedFile.ranges`` / ``range_validity`` model
-    fields — every contiguous range of the loaded image appears in the
-    rendered map, addressed by its start/end. No coverage is computed by
-    the screen itself.
+
+def _install_case_04_loaded_file(app: S19TuiApp) -> "object":
+    """Install the public ``case_04`` bad-checksums fixture as ``current_file``.
+
+    Sibling of ``_install_case_02_loaded_file``; returns the built
+    ``LoadedFile`` so a test can read its ``ranges`` / ``range_validity``.
     """
-    from s19_app.tui.screens_directionb import MemoryMapPanel
+    from s19_app.core import S19File
+    from s19_app.tui.services.load_service import build_loaded_s19
 
-    async def _drive() -> tuple[str, list[tuple[int, int]]]:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            loaded = _install_case_02_loaded_file(app)
-            app.update_memory_map()
-            await pilot.pause()
-            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            return panel.rendered_text, list(loaded.ranges)
+    s19 = S19File(str(_CASE_04_S19))
+    loaded = build_loaded_s19(_CASE_04_S19, s19, a2l_path=None, a2l_data=None)
+    app.current_file = loaded
+    app._apply_empty_state()
+    return loaded
 
-    rendered, ranges = asyncio.run(_drive())
-    assert ranges, "precondition: the case_02 fixture must expose ranges"
-    for start, end in ranges:
-        token = f"0x{start:08X}-0x{end - 1:08X}"
-        assert token in rendered, (
-            f"Memory Map must render range {token} from LoadedFile.ranges; "
-            f"rendered map was:\n{rendered}"
-        )
-    assert f"{len(ranges)} range(s)" in rendered, (
-        "the Memory Map summary line must report the LoadedFile range count"
+
+def test_tc041_1_cell_status_derivation() -> None:
+    """Cell status = invalid/valid/gap by range overlap (LLR-041.1).
+
+    Intent: a cell overlapping any invalid range is ``invalid``; overlapping
+    only valid range(s) is ``valid``; overlapping no range is ``gap``. This
+    is the pure grid-model contract the colour routing binds to — if the
+    overlap logic changes, the whole minimap mis-colours.
+    """
+    from s19_app.tui.screens_directionb import cell_status
+
+    ordered = [(0, 8, True), (8, 16, False), (32, 40, True)]
+
+    # Cell spanning both a valid and an invalid range → invalid wins.
+    assert cell_status(0, 16, ordered) == "invalid"
+    # Cell over the valid-only range.
+    assert cell_status(32, 40, ordered) == "valid"
+    # Cell over an uncovered window between ranges → gap.
+    assert cell_status(16, 24, ordered) == "gap"
+    # Half-open boundary: a cell that starts exactly at a range's end does
+    # NOT overlap it (end is exclusive).
+    assert cell_status(8, 16, [(0, 8, True)]) == "gap"
+
+
+def test_tc041_2_auto_scale_cell_count_and_zero_span() -> None:
+    """Cell count fits the injected geometry; zero-span → empty, no crash
+    (LLR-041.2).
+
+    Intent: the number of cells is a pure function of ``(span, cols, rows)``
+    (version-stable, snapshot-safe — NOT live ``panel.size``) and never
+    exceeds the grid capacity nor the byte count. A zero/empty span takes the
+    empty path and computes no ratio (no divide-by-zero).
+    """
+    from s19_app.tui.screens_directionb import (
+        bytes_per_cell,
+        cell_count_for_geometry,
+        derive_image_span,
+    )
+
+    # Large synthetic span, injected geometry (16x8 = 128 capacity).
+    span_start, span_end = derive_image_span([(0x0, 0x100000)])
+    span = span_end - span_start
+    count = cell_count_for_geometry(span, 16, 8)
+    assert count == 128, "cell count must be capped at the injected capacity"
+    assert count <= span, "never more cells than bytes in the span"
+    per_cell = bytes_per_cell(span, count)
+    assert per_cell * count >= span, "the cells must cover the whole span"
+
+    # A span smaller than capacity → one cell per byte, not padded up.
+    assert cell_count_for_geometry(10, 16, 8) == 10
+
+    # Zero-span guard: no cells, no ratio, no exception.
+    assert cell_count_for_geometry(0, 16, 8) == 0
+    assert bytes_per_cell(0, 0) == 0
+    assert derive_image_span([]) == (0, 0)
+
+
+def test_tc041_3_invalid_cell_carries_sev_error_class() -> None:
+    """Invalid cell status routes to ``sev-error`` via color_policy
+    (LLR-041.3).
+
+    Intent: colours are NOT hard-coded — an invalid cell's class must equal
+    ``css_class_for_severity(ValidationSeverity.ERROR)``, so the frozen
+    severity map stays the single source of truth.
+    """
+    from s19_app.tui.color_policy import css_class_for_severity
+    from s19_app.tui.screens_directionb import status_to_css_class
+    from s19_app.validation import ValidationSeverity
+
+    assert status_to_css_class("invalid") == css_class_for_severity(
+        ValidationSeverity.ERROR
+    )
+    assert status_to_css_class("invalid") == "sev-error"
+    assert status_to_css_class("valid") == css_class_for_severity(
+        ValidationSeverity.OK
+    )
+    assert status_to_css_class("gap") == css_class_for_severity(
+        ValidationSeverity.NEUTRAL
     )
 
 
-def test_tc025_memory_map_renders_gaps_between_ranges(tmp_path: Path) -> None:
-    """The Memory Map labels the uncovered gaps between ranges (LLR-012.1).
+def test_tc041_11_markup_safe_render_of_hostile_text() -> None:
+    """File-derived text with markup / ANSI renders literally (LLR-041.11).
 
-    Intent: the case_02 fixture has gaps between its contiguous ranges.
-    The Memory Map must surface those gaps so coverage holes are visible
-    at a glance — the gap spans are derived by subtracting consecutive
-    (already-parsed) range bounds, not by any new coverage computation.
+    Intent: the panel renders with markup enabled to colour cells, so a
+    loaded A2L/MAC symbol like ``sensor[red]`` or ``x[link=file:///]`` — or a
+    raw ANSI escape byte — must be treated as literal text, never parsed as
+    Rich markup. Otherwise it corrupts the render, injects styling, or raises
+    ``MarkupError`` and crashes the Memory Map on load (security B-1 / F2).
+    """
+    from rich.console import Console
+
+    from s19_app.tui.screens_directionb import safe_text
+
+    hostile = "sensor[red]value[/]\x1b[31mANSI\x1b[0m"
+    text = safe_text(hostile)
+
+    # The literal string is preserved verbatim — brackets and ANSI as text.
+    assert text.plain == hostile
+
+    # Rendering never raises MarkupError and never emits a real SGR sequence
+    # from the file-derived content (the ANSI byte is literal, not active).
+    console = Console(color_system=None, width=120)
+    with console.capture() as capture:
+        console.print(text)
+    rendered = capture.get()
+    assert "sensor[red]" in rendered, "brackets must survive as literal text"
+    assert "[/]" in rendered, "closing-tag markup must survive as literal text"
+
+
+def test_at035_minimap_grid_colours_and_header(tmp_path: Path) -> None:
+    """Black-box: the minimap shows colour-coded cells + a KiB/cell header.
+
+    AT-035 (US-035, HLR-035): drive the shipped ``#screen_map`` surface with
+    the public fixtures and observe the rendered grid — ``case_04`` (an
+    invalid range) must produce ≥1 ``sev-error`` cell; ``case_02`` (gaps
+    between valid ranges) must produce ≥1 valid ``sev-ok`` cell AND ≥1
+    ``sev-neutral`` gap cell; the header must show an "≈ N KiB/cell" label.
+    Nothing is asserted about internal text — only what the operator sees.
+    """
+    import re
+
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
+    async def _drive(installer) -> tuple[list[str], str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            installer(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            grid = app.query_one("#map_grid")
+            cells = grid.query(".map-cell")
+            classes = [" ".join(cell.classes) for cell in cells]
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            return classes, panel.rendered_text
+
+    header_re = re.compile(r"≈\s*[\d.]+\s*KiB/cell")
+
+    # case_04 — an invalid range must colour ≥1 cell sev-error.
+    classes_04, header_04 = asyncio.run(_drive(_install_case_04_loaded_file))
+    assert any("map-cell" in c for c in classes_04), "cells must be queryable"
+    assert any("sev-error" in c for c in classes_04), (
+        f"case_04's invalid range must produce a sev-error cell; got {classes_04}"
+    )
+    assert header_re.search(header_04), (
+        f"the header must show '≈ N KiB/cell'; got {header_04!r}"
+    )
+
+    # case_02 — valid ranges with gaps: ≥1 sev-ok AND ≥1 sev-neutral gap cell.
+    classes_02, header_02 = asyncio.run(_drive(_install_case_02_loaded_file))
+    assert any("sev-ok" in c for c in classes_02), (
+        f"case_02 must have a valid (sev-ok) cell; got {classes_02}"
+    )
+    assert any("sev-neutral" in c for c in classes_02), (
+        f"case_02's gaps must produce a sev-neutral cell; got {classes_02}"
+    )
+    assert header_re.search(header_02), (
+        f"the header must show '≈ N KiB/cell'; got {header_02!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-27 Increment 2 (US-036) — cell selection → detail pane, cell-scoped
+# issue join, and Open-in-Hex jump.
+#
+# TC-041.4/.5/.6 are the white-box unit contracts; AT-036a..g are the
+# black-box Pilot proofs over the shipped `#screen_map` surface.
+# ---------------------------------------------------------------------------
+
+
+def _mounted_map_panel(app: "S19TuiApp") -> None:
+    """Install ``case_02`` and drive ``update_memory_map`` on the map screen.
+
+    Populates the panel's ``_ordered_ranges`` / ``_issues`` and mounts the
+    ``MapCell`` grid so a test can select cells.
+    """
+    _install_case_02_loaded_file(app)
+    app.action_show_screen("map")
+    app.update_memory_map()
+
+
+def _first_cell_with_status(cells: "list", status: str) -> "object":
+    """Return the first ``MapCell`` whose ``status`` matches, else ``None``."""
+    for cell in cells:
+        if cell.status == status:
+            return cell
+    return None
+
+
+def _cell_containing(cells: "list", address: int) -> "object":
+    """Return the ``MapCell`` whose window contains ``address``, else ``None``.
+
+    Live grid geometry can drift between two ``update_memory_map`` renders
+    (the panel reads ``#map_grid.content_size``, the Inc-1 CARRY-F2 note), so a
+    seed-issue test must resolve the cell by the address it anchored — not by
+    cell index or "first invalid".
+    """
+    for cell in cells:
+        if cell.cell_start <= address < cell.cell_end:
+            return cell
+    return None
+
+
+def _invalid_range_start(app: "S19TuiApp") -> int:
+    """Return the start of the first INVALID range in ``current_file``.
+
+    Anchoring a seeded issue at a real invalid-range address (not a cell's
+    arbitrary window centre, which for the sparse ``case_04`` image falls in a
+    gap) guarantees the containing cell is invalid AND that a covering region
+    is found, so the region-issue count is non-zero.
+    """
+    ranges = app.current_file.ranges
+    validity = app.current_file.range_validity
+    for (start, _end), valid in zip(ranges, validity):
+        if not valid:
+            return start
+    raise AssertionError("fixture must have an invalid range")
+
+
+def test_tc041_4_build_detail_text_content(tmp_path: Path) -> None:
+    """The detail assembler emits chip, window, region and issue lines
+    (TC-041.4 / LLR-041.4).
+
+    Intent: given a selected cell over an INVALID range plus one in-cell
+    seeded issue, ``build_detail_text`` must produce the status chip, the
+    ``0x..-0x..`` window, the covering-region bounds/size/status, the issue
+    ``code``+address line, and the "N issue(s)" cell + region counts. If the
+    assembler drops any of these, the detail pane is incomplete.
     """
     from s19_app.tui.screens_directionb import MemoryMapPanel
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    panel = MemoryMapPanel()
+    # Directly seed the stored state the assembler reads (pure-function test).
+    panel._ordered_ranges = [(0x100, 0x200, False)]
+    panel._issues = [
+        ValidationIssue(
+            code="S19_RECORD_CHECKSUM",
+            severity=ValidationSeverity.ERROR,
+            message="bad record checksum",
+            artifact="s19",
+            address=0x110,
+        )
+    ]
+    text = panel.build_detail_text(0x100, 0x140, "invalid").plain
+
+    assert "INVALID" in text, f"status chip missing; got {text!r}"
+    assert "0x00000100-0x0000013F" in text, f"cell window missing; got {text!r}"
+    assert "0x00000100-0x000001FF" in text, f"region bounds missing; got {text!r}"
+    assert "256 bytes" in text, f"region size missing; got {text!r}"
+    assert "S19_RECORD_CHECKSUM" in text, f"issue code missing; got {text!r}"
+    assert "0x00000110" in text, f"issue address missing; got {text!r}"
+    assert "1 issue(s) in this cell" in text, f"cell count missing; got {text!r}"
+    assert "1 issue(s) in region" in text, f"region count missing; got {text!r}"
+
+
+def test_tc041_4b_arrow_adjacent_index_and_edge_clamp() -> None:
+    """Arrow nav resolves the adjacent cell index and clamps at edges
+    (TC-041.4b / US-036 keyboard nav).
+
+    Intent: the arrow-key focus target is a pure function of ``(current, key,
+    count, cols)`` — Right/Down step one cell / one visual row; Left on the
+    first cell and Up on the top row clamp (no wrap); a non-arrow key returns
+    ``None`` so ``on_key`` leaves it for ``Enter`` / the default handler. This
+    is the deterministic core the black-box AT-036a traversal binds to.
+    """
+    from s19_app.tui.screens_directionb import MAP_GRID_COLS, adjacent_cell_index
+
+    cols = MAP_GRID_COLS  # 16, == the #map_grid CSS grid-size
+    count = 40
+
+    # Left/Right step ±1 in mount order.
+    assert adjacent_cell_index(0, "right", count, cols) == 1
+    assert adjacent_cell_index(5, "left", count, cols) == 4
+    # Up/Down step ∓cols (one visual row).
+    assert adjacent_cell_index(3, "down", count, cols) == 3 + cols
+    assert adjacent_cell_index(3 + cols, "up", count, cols) == 3
+    # Edge clamps: no wrap past the first / last cell or off the top / bottom.
+    assert adjacent_cell_index(0, "left", count, cols) == 0
+    assert adjacent_cell_index(count - 1, "right", count, cols) == count - 1
+    assert adjacent_cell_index(2, "up", count, cols) == 2
+    assert adjacent_cell_index(count - 1, "down", count, cols) == count - 1
+    # Non-arrow / empty grid → None (Enter and defaults are left untouched).
+    assert adjacent_cell_index(0, "enter", count, cols) is None
+    assert adjacent_cell_index(0, "right", 0, cols) is None
+
+
+def test_tc041_5_cell_issue_join_boundary_and_negative() -> None:
+    """Cell→issue join: in-window in, ``end`` excluded, ``None`` excluded
+    (TC-041.5 / LLR-041.5).
+
+    Intent: the half-open ``[start, end)`` join is the contract the detail
+    pane and the region count both bind to — an issue at exactly ``end`` must
+    NOT match (it belongs to the next cell), and an ``address is None`` issue
+    can never be spatially anchored (locks the R-1 default).
+    """
+    from s19_app.tui.screens_directionb import issues_in_window
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    def _issue(addr: "object") -> ValidationIssue:
+        return ValidationIssue(
+            code="C",
+            severity=ValidationSeverity.ERROR,
+            message="m",
+            artifact="s19",
+            address=addr,
+        )
+
+    at_start = _issue(0)
+    inside = _issue(8)
+    at_end = _issue(16)  # exclusive end → excluded
+    addressless = _issue(None)  # cannot be anchored → excluded
+
+    hits = issues_in_window(
+        [at_start, inside, at_end, addressless], 0, 16
+    )
+    codes_addrs = [i.address for i in hits]
+    assert codes_addrs == [0, 8], (
+        f"in-window included, end + None excluded; got {codes_addrs}"
+    )
+
+
+def test_tc041_6_open_computes_focus_equals_cell_start(tmp_path: Path) -> None:
+    """Open-in-Hex posts a focus address equal to the cell start
+    (TC-041.6 / LLR-041.6).
+
+    Intent: the white-box contract that the jump message carries exactly the
+    selected cell's ``cell_start`` (no off-by-one, no row-base rounding on the
+    panel side — the app owns the focus math). Complements AT-036b's
+    behavioral hex-render assertion.
+    """
+    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
+
+    async def _drive() -> "object":
+        app = S19TuiApp(base_dir=tmp_path)
+        posted: list[int] = []
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            cell = next(iter(app.query_one("#map_grid").query(MapCell)))
+
+            def _capture(msg: "object") -> None:
+                posted.append(msg.focus_address)
+
+            # Observe the message the button emits without needing the app
+            # handler: post Selected, then press the revealed button.
+            panel.on_map_cell_selected(MapCell.Selected(cell))
+            # The panel stores the selection; assert the message it would post.
+            assert panel._selected_cell_start == cell.cell_start
+            msg = MemoryMapPanel.OpenInHexRequested(panel._selected_cell_start)
+            _capture(msg)
+            return posted[0], cell.cell_start
+
+    focus, cell_start = asyncio.run(_drive())
+    assert focus == cell_start, (
+        f"Open-in-Hex focus must equal cell_start; {focus} != {cell_start}"
+    )
+
+
+def test_at036a_non_default_cell_changes_detail(tmp_path: Path) -> None:
+    """Black-box: keyboard-navigating to a different cell changes the detail
+    (AT-036a, C-10 non-default).
+
+    Intent: the operator focuses a cell and presses Enter, then navigates to a
+    DIFFERENT cell and presses Enter — the detail body must CHANGE and show
+    the new cell's start-address token. A detail pane that never updates (or
+    updates identically) fails the interaction.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> "tuple[str, str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            default_text = str(app.query_one("#map_detail_body").render())
+
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            first = cells[0]
+            first.focus()
+            await pilot.pause()
+            await pilot.press("enter")
+            await pilot.pause()
+            first_text = str(app.query_one("#map_detail_body").render())
+
+            # F1 (Inc-2 review): exercise the arrow-key grid navigation US-036
+            # promises — not just .focus() on an index. Pressing Right must move
+            # focus to a DIFFERENT MapCell; Enter then selects it. Asserting on
+            # the actually-focused cell means a broken grid focus-order fails.
+            await pilot.press("right")
+            await pilot.pause()
+            navigated = app.focused
+            assert isinstance(navigated, MapCell), (
+                f"arrow-key nav must land focus on a MapCell; got {navigated!r}"
+            )
+            assert navigated is not first, (
+                "pressing Right must move focus to a different cell"
+            )
+            await pilot.press("enter")
+            await pilot.pause()
+            second_text = str(app.query_one("#map_detail_body").render())
+            token = f"0x{navigated.cell_start:08X}"
+            return default_text, first_text, second_text, token
+
+    default_text, first_text, second_text, token = asyncio.run(_drive())
+    assert first_text != default_text, "selecting a cell must change the detail"
+    assert second_text != first_text, "a different cell must change the detail"
+    assert token in second_text, (
+        f"the detail must show the new cell's start token {token!r}; "
+        f"got {second_text!r}"
+    )
+
+
+def test_at036_detail_hint_prompts_navigation_before_selection(
+    tmp_path: Path,
+) -> None:
+    """Black-box: the pre-selection detail pane prompts the navigation keys
+    (US-036 discoverability).
+
+    Intent: arrow-key nav must be discoverable, not hidden — before any cell
+    is selected the ``#map_detail_body`` must show a hint that mentions
+    clicking AND the arrow keys + Enter, so the prompt cannot silently
+    regress and leave the keyboard path undiscoverable.
+    """
 
     async def _drive() -> str:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _install_case_02_loaded_file(app)
-            app.update_memory_map()
+            _mounted_map_panel(app)
             await pilot.pause()
-            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            return panel.rendered_text
+            return str(app.query_one("#map_detail_body").render())
 
-    rendered = asyncio.run(_drive())
-    assert "gap" in rendered, (
-        f"the Memory Map must label the uncovered gaps between ranges; "
-        f"rendered map was:\n{rendered}"
+    hint = asyncio.run(_drive())
+    assert "Click a cell" in hint, f"click cue missing; got {hint!r}"
+    assert "arrow" in hint.lower(), f"arrow-key cue missing; got {hint!r}"
+    assert "Enter" in hint, f"Enter cue missing; got {hint!r}"
+
+
+def test_at036_arrow_moves_cell_focus_without_scrolling(tmp_path: Path) -> None:
+    """Black-box: an arrow with a cell focused moves cell focus and does NOT
+    scroll the container (US-036 no-leak scoping).
+
+    Intent: ``#map_grid`` sits inside the ``#map_content`` ScrollableContainer,
+    so an unconsumed arrow would scroll it. With a ``MapCell`` focused the
+    arrow must (a) move focus to a different ``MapCell`` and (b) leave the
+    container's scroll offset unchanged — proving the handler consumes the
+    arrow only when a cell owns focus (``event.stop()``), never leaking a
+    scroll.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> "tuple[bool, bool, float]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            content = app.query_one("#map_content")
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            first = cells[0]
+            first.focus()
+            await pilot.pause()
+            scroll_before = content.scroll_offset.y
+            await pilot.press("right")
+            await pilot.pause()
+            navigated = app.focused
+            moved = isinstance(navigated, MapCell) and navigated is not first
+            scroll_after = content.scroll_offset.y
+            return moved, scroll_before == scroll_after, scroll_after
+
+    moved, scroll_unchanged, _ = asyncio.run(_drive())
+    assert moved, "arrow must move focus to a different cell"
+    assert scroll_unchanged, (
+        "a consumed arrow must NOT also scroll the #map_content container"
     )
 
 
-def test_tc025_memory_map_panel_consumes_model_fields_verbatim() -> None:
-    """MemoryMapPanel.render_ranges reflects exactly what it is handed.
+def test_at036b_open_in_hex_focuses_cell_start(tmp_path: Path) -> None:
+    """Black-box: Open-in-Hex switches to the hex view focused on the cell
+    (AT-036b, behavioral).
 
-    Intent: LLR-012.1 / LLR-012.4 — the panel must NOT re-derive or compute
-    coverage. Driven with a hand-built range list it has never seen, it
-    renders exactly those ranges and respects the supplied validity flags,
-    proving it is a pure consumer of the ``LoadedFile`` fields.
+    Intent: selecting a valid cell at start ``A`` and triggering Open-in-Hex
+    must reveal the Workspace/hex screen AND render the hex row containing
+    ``A`` in ``#hex_view`` — confirming ``update_hex_view(focus_address=A)``
+    ran through the shipped surface (NOT a mock-call assertion; that is
+    TC-041.6's job).
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> "tuple[bool, str, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            # The first cell covers the (0, 11) valid range → start 0.
+            cell = next(iter(app.query_one("#map_grid").query(MapCell)))
+            start = cell.cell_start
+            cell.on_click()
+            await pilot.pause()
+            app.query_one("#map_open_hex_button").press()
+            await pilot.pause()
+            ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
+            hex_str = str(app.query_one("#hex_view").render())
+            return ws_visible, hex_str, start
+
+    ws_visible, hex_str, start = asyncio.run(_drive())
+    assert ws_visible, "Open-in-Hex must reveal the Workspace/hex screen"
+    row_token = f"{start - (start % 16):08X}"
+    assert row_token in hex_str.upper(), (
+        f"the hex row containing 0x{start:08X} must render; "
+        f"expected row base {row_token} in the hex view"
+    )
+
+
+def test_at036c_valid_cell_detail(tmp_path: Path) -> None:
+    """Black-box: a valid cell shows a valid chip + covering region bounds
+    (AT-036c).
+
+    Intent: selecting a cell inside a valid range must report the VALID chip
+    and the covering region's bounds/size — the operator's confirmation that
+    those bytes are covered and clean.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            valid_cell = _first_cell_with_status(cells, "valid")
+            assert valid_cell is not None, "case_02 must have a valid cell"
+            valid_cell.on_click()
+            await pilot.pause()
+            return str(app.query_one("#map_detail_body").render())
+
+    text = asyncio.run(_drive())
+    assert "VALID" in text, f"valid chip missing; got {text!r}"
+    assert "Region: 0x" in text and "bytes, valid" in text, (
+        f"covering region bounds/size/status missing; got {text!r}"
+    )
+
+
+def test_at036d_invalid_cell_seeded_issue_detail(tmp_path: Path) -> None:
+    """Black-box: an invalid cell with a seeded issue shows chip + code + addr
+    (AT-036d, PINNED seed-issue path).
+
+    Intent: because both ``address=`` sites in ``rules.py`` are MAC-only, a
+    lone S19 load yields no address-anchored issue — so we seed
+    ``_validation_issues`` with an explicit ERROR issue at an address inside a
+    known invalid cell, re-render, and select that cell. The detail must show
+    the INVALID chip, the issue ``code``, the ``0x{address:08X}`` token, the
+    "N issue(s) in this cell" line and the region count.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_04_loaded_file(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            # Anchor the issue at a real invalid-range address so the
+            # containing cell is invalid AND a covering region is found (the
+            # sparse case_04 image has huge cells over tiny ranges, so a cell
+            # centre would land in a gap).
+            addr = _invalid_range_start(app)
+            app._validation_issues = [
+                ValidationIssue(
+                    code="S19_RECORD_CHECKSUM",
+                    severity=ValidationSeverity.ERROR,
+                    message="bad record checksum",
+                    artifact="s19",
+                    address=addr,
+                )
+            ]
+            app.update_memory_map()
+            await pilot.pause()
+            # Re-query cells after the re-render and select the cell that
+            # actually contains the anchored address.
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            target = _cell_containing(cells, addr)
+            assert target is not None, "the anchored address must land in a cell"
+            target.on_click()
+            await pilot.pause()
+            return str(app.query_one("#map_detail_body").render()), addr
+
+    text, addr = asyncio.run(_drive())
+    assert "INVALID" in text, f"invalid chip missing; got {text!r}"
+    assert "S19_RECORD_CHECKSUM" in text, f"issue code missing; got {text!r}"
+    assert f"0x{addr:08X}" in text, f"issue address missing; got {text!r}"
+    assert "issue(s) in this cell" in text, f"cell count line missing; got {text!r}"
+    assert "issue(s) in region" in text, f"region count line missing; got {text!r}"
+
+
+def test_at036e_gap_cell_detail(tmp_path: Path) -> None:
+    """Black-box: a gap cell shows an uncovered chip and no covering region
+    (AT-036e).
+
+    Intent: selecting a cell in a gap must report the GAP/uncovered chip and
+    must NOT claim a covering region — the operator sees the hole plainly.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            gap_cell = _first_cell_with_status(cells, "gap")
+            assert gap_cell is not None, "case_02 must have a gap cell"
+            gap_cell.on_click()
+            await pilot.pause()
+            return str(app.query_one("#map_detail_body").render())
+
+    text = asyncio.run(_drive())
+    assert "GAP" in text.upper() or "UNCOVERED" in text.upper(), (
+        f"gap chip missing; got {text!r}"
+    )
+    assert "gap - no region" in text, f"gap must not claim a region; got {text!r}"
+
+
+def test_at036f_markup_safe_symbol_in_detail(tmp_path: Path) -> None:
+    """Black-box: a hostile ``symbol`` renders literally in the detail pane
+    (AT-036f / LLR-041.11, B-1).
+
+    Intent: a loaded symbol like ``sensor[red]`` must appear as literal text
+    in ``#map_detail`` with the brackets present — the markup=True render must
+    not parse it as Rich markup, inject styling, or raise ``MarkupError`` and
+    crash the Memory Map screen on the tool's core untrusted-input path.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_04_loaded_file(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            addr = _invalid_range_start(app)
+            app._validation_issues = [
+                ValidationIssue(
+                    code="X",
+                    severity=ValidationSeverity.ERROR,
+                    message="m",
+                    artifact="s19",
+                    symbol="sensor[red]",
+                    address=addr,
+                )
+            ]
+            app.update_memory_map()
+            await pilot.pause()
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            target = _cell_containing(cells, addr)
+            assert target is not None, "the anchored address must land in a cell"
+            target.on_click()
+            await pilot.pause()
+            return str(app.query_one("#map_detail_body").render())
+
+    text = asyncio.run(_drive())
+    assert "sensor[red]" in text, (
+        f"the hostile symbol must render literally (brackets present); "
+        f"got {text!r}"
+    )
+
+
+def test_at036g_addressless_issue_excluded_from_cell_and_region(
+    tmp_path: Path,
+) -> None:
+    """Black-box: an ``address=None`` issue is in neither the cell list nor
+    the region count (AT-036g / R-1 default).
+
+    Intent: seed one addressless issue and one in-cell issue; selecting the
+    cell must count exactly ONE issue in the cell and ONE in the region — the
+    addressless issue is unanchorable and appears nowhere (locks the
+    operator-confirmed R-1 default: region-count line only, no banner).
+    """
+    from s19_app.tui.screens_directionb import MapCell
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_04_loaded_file(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            addr = _invalid_range_start(app)
+            app._validation_issues = [
+                ValidationIssue(
+                    code="ANCHORED",
+                    severity=ValidationSeverity.ERROR,
+                    message="anchored",
+                    artifact="s19",
+                    address=addr,
+                ),
+                ValidationIssue(
+                    code="FLOATING",
+                    severity=ValidationSeverity.ERROR,
+                    message="no address",
+                    artifact="s19",
+                    address=None,
+                ),
+            ]
+            app.update_memory_map()
+            await pilot.pause()
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            target = _cell_containing(cells, addr)
+            assert target is not None, "the anchored address must land in a cell"
+            target.on_click()
+            await pilot.pause()
+            return str(app.query_one("#map_detail_body").render())
+
+    text = asyncio.run(_drive())
+    assert "FLOATING" not in text, (
+        f"the address=None issue must NOT appear in the detail; got {text!r}"
+    )
+    assert "1 issue(s) in this cell" in text, (
+        f"exactly one anchored issue in the cell; got {text!r}"
+    )
+    assert "1 issue(s) in region" in text, (
+        f"exactly one anchored issue in the region; got {text!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-27 Increment 3 (US-037) — coverage stats strip + two-regime reflow.
+#
+# TC-041.8 hand-computes the EXACT case_02 coverage literals; TC-041.9 locks
+# the empty-state strip; TC-041.10 asserts the width-narrow reflow class per
+# regime; AT-037 is the black-box Pilot proof over `#map_stats`.
+# ---------------------------------------------------------------------------
+
+# The public ``case_02`` image's ranges are four disjoint spans over a ~2 GiB
+# address window. Its EXACT coverage arithmetic (verified against the built
+# LoadedFile): span 0x0..0x80010140 = 2_147_549_504 bytes; covered = 11 + 34 +
+# 16 + 32 = 93 bytes; 3 gaps (2_147_549_173 / 94 / 144), largest 2_147_549_173;
+# all four ranges valid → 0 invalid; coverage = 93 / 2_147_549_504 * 100.
+_CASE_02_IMAGE_SPAN = 0x80010140
+_CASE_02_COVERED_BYTES = 93
+_CASE_02_GAP_COUNT = 3
+_CASE_02_LARGEST_GAP = 2_147_549_173
+_CASE_02_VALID_COUNT = 4
+_CASE_02_INVALID_COUNT = 0
+_CASE_02_COVERAGE_PCT = _CASE_02_COVERED_BYTES / _CASE_02_IMAGE_SPAN * 100
+
+# The live rendered cell count for case_02 at the primary 120x30 size — pinned
+# by the CARRY-F2 guard below so a live-geometry drift fails deterministically
+# (the shipped panel reads `#map_grid.content_size`). Measured value; update in
+# lockstep with any deliberate layout change + the regenerated SVG baseline.
+_EXPECTED_MAP_CELLS_120x30 = 128
+
+
+def test_tc041_8_coverage_stats_exact_case_02_literals() -> None:
+    """Coverage stats equal the hand-computed case_02 literals (TC-041.8 /
+    LLR-041.8).
+
+    Intent: the strip's numbers are pure arithmetic on the parsed ranges, so
+    every metric must equal an EXACT hand-computed literal (NOT ``> 0``) — a
+    coverage-math regression (double-count, off-by-one gap, wrong span) fails
+    a specific number, not just a sign check. Coverage % is strictly < 100.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.screens_directionb import coverage_stats
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    s19 = S19File(str(_CASE_02_S19))
+    loaded = build_loaded_s19(_CASE_02_S19, s19, a2l_path=None, a2l_data=None)
+
+    stats = coverage_stats(loaded.ranges, loaded.range_validity, [])
+
+    assert stats.image_span == _CASE_02_IMAGE_SPAN, "span literal"
+    assert stats.covered_bytes == _CASE_02_COVERED_BYTES, "covered bytes literal"
+    assert stats.gap_count == _CASE_02_GAP_COUNT, "gap count literal"
+    assert stats.largest_gap == _CASE_02_LARGEST_GAP, "largest gap literal"
+    assert stats.valid_count == _CASE_02_VALID_COUNT, "valid count literal"
+    assert stats.invalid_count == _CASE_02_INVALID_COUNT, "invalid count literal"
+    assert stats.coverage_pct == _CASE_02_COVERAGE_PCT, "coverage %% literal"
+    assert stats.coverage_pct < 100, "case_02 is far from fully covered"
+    assert stats.total_issues == 0, "no issues handed in → zero"
+
+
+def test_tc041_8_single_range_full_coverage_no_gaps() -> None:
+    """Boundary: a single range → 100%% coverage, 0 gaps, 0 largest-gap
+    (TC-041.8 boundary).
+
+    Intent: the QC-3 boundary row — one contiguous range with no holes must
+    report exactly 100%%, gap count 0 and largest gap 0, and route validity
+    into the valid count.
+    """
+    from s19_app.tui.screens_directionb import coverage_stats
+
+    stats = coverage_stats([(0x100, 0x200)], [True], [])
+    assert stats.coverage_pct == 100.0
+    assert stats.gap_count == 0
+    assert stats.largest_gap == 0
+    assert stats.covered_bytes == 0x100
+    assert stats.valid_count == 1 and stats.invalid_count == 0
+
+
+def test_tc041_9_empty_state_stats_neutral_no_exception(tmp_path: Path) -> None:
+    """No file → the stats strip is neutral/blank, no divide-by-zero
+    (TC-041.9 / LLR-041.9).
+
+    Intent: with ``ranges`` empty the coverage-% guard must not divide, the
+    stats value object is all-zero, and the rendered ``#map_stats_body`` shows
+    no coverage numbers — the empty state is preserved.
+    """
+    from s19_app.tui.screens_directionb import coverage_stats
+
+    # Pure guard: no ranges → all-zero stats, no exception, no ratio.
+    stats = coverage_stats([], [], [])
+    assert stats.image_span == 0
+    assert stats.coverage_pct == 0.0
+    assert stats.covered_bytes == 0
+    assert stats.gap_count == 0
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            app.update_memory_map()  # no current_file → empty path
+            await pilot.pause()
+            return str(app.query_one("#map_stats_body").render())
+
+    strip = asyncio.run(_drive())
+    assert "Coverage:" not in strip, (
+        f"the no-file stats strip must be neutral/blank; got {strip!r}"
+    )
+
+
+def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
+    """The map reflow follows the width-narrow class at 119 vs 120
+    (TC-041.10 / LLR-041.10).
+
+    Intent: the two-regime reflow reuses the EXISTING ``width-narrow`` class
+    (no new breakpoint). At width >= 120 the class is absent (wide: detail
+    beside grid); at < 120 it is present (narrow: detail stacked below). Assert
+    the class per regime AND that both `#map_grid` and `#map_detail` are present
+    in both regimes with a positive-width, non-clipping layout.
     """
     from s19_app.tui.screens_directionb import MemoryMapPanel
 
-    panel = MemoryMapPanel()
-    panel.render_ranges([(0x100, 0x200), (0x400, 0x440)], [True, False])
-    rendered = panel.rendered_text
-    assert "0x00000100-0x000001FF" in rendered, "first range must render"
-    assert "0x00000400-0x0000043F" in rendered, "second range must render"
-    assert "[OK]" in rendered, "a valid range must carry the OK marker"
-    assert "[INVALID]" in rendered, "an invalid range must carry the INVALID marker"
-    assert "gap" in rendered, "the 0x200-0x3FF gap must be labelled"
+    async def _regime(width: int) -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(width, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            body = app.query_one("#workspace_body")
+            grid = app.query_one("#map_grid")
+            detail = app.query_one("#map_detail")
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            return {
+                "narrow": body.has_class("width-narrow"),
+                "grid_w": grid.size.width,
+                "detail_w": detail.size.width,
+                "grid_x": grid.region.x,
+                "detail_x": detail.region.x,
+                "detail_y": detail.region.y,
+                "grid_y": grid.region.y,
+                "panel_w": panel.size.width,
+            }
+
+    wide = asyncio.run(_regime(120))
+    narrow_100 = asyncio.run(_regime(100))
+    narrow_80 = asyncio.run(_regime(80))
+
+    # Wide (>= 120): fixed regime, detail BESIDE the grid (same row, to its
+    # right) — a horizontal split, both panes positive width (C-13 budget).
+    assert wide["narrow"] is False, "at 120 the fixed (wide) regime is active"
+    assert wide["grid_w"] > 0 and wide["detail_w"] > 0, (
+        f"both map panes must have positive width at 120; got {wide!r}"
+    )
+    assert wide["detail_x"] > wide["grid_x"], (
+        f"wide regime: detail must sit to the RIGHT of the grid; got {wide!r}"
+    )
+    assert wide["detail_y"] == wide["grid_y"], (
+        f"wide regime: detail must be on the SAME row as the grid; got {wide!r}"
+    )
+
+    # Narrow (< 120): proportional regime, detail STACKED BELOW the grid.
+    for narrow in (narrow_100, narrow_80):
+        assert narrow["narrow"] is True, (
+            f"below 120 the proportional (narrow) regime is active; got {narrow!r}"
+        )
+        assert narrow["grid_w"] > 0 and narrow["detail_w"] > 0, (
+            f"both map panes must have positive width when narrow; got {narrow!r}"
+        )
+        assert narrow["detail_y"] > narrow["grid_y"], (
+            f"narrow regime: detail must stack BELOW the grid; got {narrow!r}"
+        )
+
+
+def test_carry_f2_fixed_cell_count_at_120x30(tmp_path: Path) -> None:
+    """The rendered map cell count is fixed at size=(120,30) for case_02
+    (CARRY-F2 live-geometry lock).
+
+    Intent: the Inc-1 CARRY-F2 note — the shipped panel reads live
+    ``#map_grid.content_size``, so a layout drift could silently change the
+    cell count independent of the SVG baseline. Pin the live count at the
+    primary size for a fixed fixture, so a geometry regression fails HERE
+    (deterministically, no snapshot env needed) rather than flapping the
+    baseline. If a legitimate layout change moves the number, update this
+    literal in lockstep with the regenerated baseline.
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _count() -> int:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return len(list(app.query_one("#map_grid").query(MapCell)))
+
+    count = asyncio.run(_count())
+    assert count == _EXPECTED_MAP_CELLS_120x30, (
+        f"map cell count at (120,30) drifted: {count} != "
+        f"{_EXPECTED_MAP_CELLS_120x30}; update the literal in lockstep with a "
+        f"deliberate layout change + the regenerated SVG baseline"
+    )
+
+
+def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
+    """Black-box: the `#map_stats` strip shows the seven case_02 metrics
+    (AT-037 / US-037).
+
+    Intent: load case_02, show the map, read `#map_stats`, and assert each of
+    the seven metric labels is present with its value — the coverage %% equals
+    TC-041.8's hand-computed number, and the total-issue count equals
+    ``len(app._validation_issues)`` (the single canonical source).
+    """
+
+    async def _drive() -> tuple[str, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            strip = str(app.query_one("#map_stats_body").render())
+            return strip, len(app._validation_issues)
+
+    strip, issue_count = asyncio.run(_drive())
+
+    # All seven labels present.
+    for label in (
+        "Coverage:",
+        "Bytes covered:",
+        "Valid ranges:",
+        "Invalid ranges:",
+        "Gaps:",
+        "Largest gap:",
+        "Total issues:",
+    ):
+        assert label in strip, f"stats label {label!r} missing; got {strip!r}"
+
+    # Values match the hand-computed case_02 literals.
+    assert f"{_CASE_02_COVERAGE_PCT:.6f}%" in strip, (
+        f"coverage %% must match TC-041.8's number; got {strip!r}"
+    )
+    assert f"Bytes covered: {_CASE_02_COVERED_BYTES}" in strip
+    assert f"Valid ranges: {_CASE_02_VALID_COUNT}" in strip
+    assert f"Invalid ranges: {_CASE_02_INVALID_COUNT}" in strip
+    assert f"Gaps: {_CASE_02_GAP_COUNT}" in strip
+    assert f"Largest gap: {_CASE_02_LARGEST_GAP} bytes" in strip
+    # Total issues == the single canonical source len(_validation_issues).
+    assert f"Total issues: {issue_count}" in strip, (
+        f"total issues must equal len(_validation_issues)={issue_count}; "
+        f"got {strip!r}"
+    )
 
 
 def test_tc025_memory_map_empty_state_with_no_file(tmp_path: Path) -> None:

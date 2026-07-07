@@ -1,19 +1,31 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-07-06-batch-26",
-    "batch_objective": "Feature #12(b) — Entropy / data-classification viewer. Pre-drafted stories (batch-24 Phase 0): US-035 headless entropy service (SPIKE — window/estimator/band thresholds + bands-vs-semantic ambition), US-036 entropy viewer surface (SPIKE — HIGH geometry, C-13 mandatory, surface choice modal/rail/prototype), US-037 entropy report section (cheap, depends on US-035). Substrate verified batch-24: LoadedFile.mem_map+ranges; computation TUI-side (engine-frozen). Full /dev-flow with a batch-22-style Phase-0 measurement/algorithm spike. Closes feature #12.",
+    "batch_id": "2026-07-06-batch-27",
+    "batch_objective": "Redesign the TUI Memory Map screen from a read-only monochrome per-range text list (MemoryMapPanel.render_ranges, markup=False) into an INTERACTIVE color-coded spatial minimap (Variant B v2, operator-approved via prototype scratchpad/memory_map_B_interactive.html): clickable coverage grid (US-035) + per-cell detail pane surfacing covering region + ValidationReport issues + Open-in-Hex jump (US-036) + coverage stats strip (US-037). TUI-side only; no engine-frozen module touched. Supersedes/extends read-only R-TUI-026 via new R-TUI-041. Snapshot baselines regen canonical-CI-env only (xfail-until-baseline).",
     "current_phase": 6,
     "phase_status": "awaiting-sync",
-    "phase_3_increment": "PHASE 3 COMPLETE (all 17 LLRs covered, 3 increments approved+folded). Inc-1 US-035 service 14/14. Inc-2 US-037 report 33 pass (AT-037a C-12 RED->GREEN; F1+F2 folded). Inc-3 US-036 modal 13 pass (F1 max->min either-cap truncation mutation-verified; F3 List[Widget]); geometry 48/76 real; e-binding registered+white-box-pinned TC-036.4; cost-cap; snapshot-at-push; 0 frozen diff; code-review no HIGH. Inc-3b +2 xfail snapshot cells. Behavioral total base+35 (14+8+13). SNAPSHOT-DRIFT CARRY (expected, non-gating continue-on-error): new e/Entropy footer binding drifts 19/28 baselines -> resolved post-merge by batch-25 snapshot-regen.yml canonical-CI regen (re-baseline 19+2, drop 2 xfails). Env: local 3.14.4, canonical/CI gate 3.11 (Phase-4 records pass there). Awaiting operator approval to advance Phase 3 -> Phase 4.",
-    "route": "/dev-flow (full V-model) — operator AskUserQuestion 2026-07-06 chose #12(b) full over service+report-only / P3-cleanup / UI-UX pass.",
-    "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
+    "route": "full /dev-flow (operator-directed 2026-07-06). Parallel to batch-26 (origin/claude/batch-26-entropy); this batch took id 27 to avoid collision.",
+    "iterations_per_phase": {"0": 0, "1": 1, "2": 1, "3": 0, "4": 0, "5": 0, "6": 0},
     "artifacts": {
-        "backlog": ".dev-flow/BACKLOG.md",
-        "plan": ".dev-flow/2026-07-06-batch-26/PLAN.md"
+        "plan": ".dev-flow/2026-07-06-batch-27/PLAN.md",
+        "1": ".dev-flow/2026-07-06-batch-27/01-requirements.md",
+        "2": ".dev-flow/2026-07-06-batch-27/02-review.md",
+        "3-inc1": ".dev-flow/2026-07-06-batch-27/03-increments/increment-001.md",
+        "3-inc2": ".dev-flow/2026-07-06-batch-27/03-increments/increment-002.md",
+        "3-inc3": ".dev-flow/2026-07-06-batch-27/03-increments/increment-003.md",
+        "4": ".dev-flow/2026-07-06-batch-27/04-validation.md",
+        "5": ".dev-flow/2026-07-06-batch-27/05-postmortem.md",
+        "6-traceability": ".dev-flow/2026-07-06-batch-27/06-docs/traceability-matrix.md",
+        "6-functionality": ".dev-flow/2026-07-06-batch-27/06-docs/functionality.md",
+        "6-diagrams": ".dev-flow/2026-07-06-batch-27/06-docs/diagrams/diagrams.md",
+        "6-exec": ".dev-flow/2026-07-06-batch-27/06-docs/executive-summary.md"
     },
-    "branch": "claude/hungry-burnell-b75534 (auto-cut worktree) @ 6341fd7 = origin/main tip (batch-25 PR #43 close). RC-1 PASS: HEAD == merge-base == origin/main tip, clean tree, no rebase/re-cut. Per-story already-shipped check PASS: no entropy code in s19_app/ (entropy_service.py absent, 0 shannon/entropy refs). STANDING FLAG unresolved: operator primary checkout still on merged fix/select-null-blank-sentinel -> switch to main.",
-    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. This batch touches NONE: new tui/services/entropy_service.py + viewer surface + report section only.",
+    "controls_encoded": "C-16 (prototype-fidelity: cross-tech prototype interactions UNVERIFIED for target framework -> AT drives real mechanism) + C-17 (untrusted-render-mode markup-safety: render-mode flip over file-derived text owes Phase-1 markup-safety LLR + hostile-input AT) ENCODED into ~/.claude/commands/dev-flow.md Phase-1 draft-time cluster (after C-13.1), operator-directed at Phase-5 gate 2026-07-07. Watch-item: overclaim-docstring 3rd occurrence (not encoded).",
+    "test_ledger": "base 1037 -> Inc1 1039 (-3 TC-025, +5) -> Inc2 1049 (+10 AT-036a-g + TC-041.4/.5/.6) -> Inc2 arrow-nav follow-on 1052 (+3 TC-041.4b + hint-prompt + arrow-no-scroll).",
+    "parallel_merge_note": "batch-26 (entropy #12b) MERGED to origin/main as PR #44 (tip now 4452f31, was our base 6341fd7). Overlap on app.py/styles.tcss/test_tui_snapshot.py is NON-OVERLAPPING regions (entropy modal at app.py~44/682/3613 + styles~801 + new test_tc036s cells vs our map edits at app.py~7206 + styles~526 + map cell in test_tc016s). screens_directionb.py NOT touched by batch-26. Clean/trivial rebase expected at PR time; .dev-flow/state.json conflicts (metadata, ours wins). batch-26 added same xfail-until-baseline snapshot pattern (match, don't duplicate) + 'e' keybinding (no clash, we add none).",
+    "branch": "claude/heuristic-wu-1c7c49 (auto-cut worktree branch) @ 6341fd7 = origin/main tip (batch-25 close PR #43). RC-1 PASS: HEAD == merge-base == origin/main tip, clean tree, no rebase needed.",
+    "rc1": "PASS @ 6341fd7 (2026-07-06). Already-shipped check: R-TUI-026 covers ONLY the read-only Memory Map scaffold; interactive minimap is net-new -> new R-TUI-041 supersedes/extends R-TUI-026. Highest existing R-TUI = R-TUI-040; highest US = US-034 (batch-24) -> this batch opens US-035.",
     "previous_batches": [
         "2026-05-05-batch-01", "2026-05-20-batch-02", "2026-05-21-batch-03", "2026-05-21-batch-04",
         "2026-05-26-batch-05", "2026-06-09-batch-06", "2026-06-10-batch-07", "2026-06-11-batch-08",
@@ -21,69 +33,93 @@
         "2026-06-17-batch-13", "2026-06-23-batch-14", "2026-06-24-batch-15", "2026-06-25-batch-16",
         "2026-06-26-batch-17", "2026-06-26-batch-18", "2026-06-29-batch-19", "2026-06-29-batch-20",
         "2026-06-29-batch-21", "2026-07-01-batch-22", "2026-07-01-batch-23", "2026-07-02-batch-24",
-        "2026-07-03-batch-25"
+        "2026-07-03-batch-25", "2026-07-06-batch-26"
     ],
+    "engine_frozen_set": "core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py. This batch touches NONE of them (TUI-side: screens_directionb.py, app.py, styles.tcss, REQUIREMENTS.md, tests).",
+    "stories": {
+        "US-035": "Color-coded spatial minimap grid (replaces the text list) - READY pending decision 1 (cell auto-scale).",
+        "US-036": "Cell selection -> detail pane (region + issues + Open-in-Hex) - READY pending decisions 2 (narrow-regime reflow) + 3 (issue anchoring).",
+        "US-037": "Coverage stats strip - READY."
+    },
     "decisions_log": [
         {
             "phase": 6,
             "date": "2026-07-06",
-            "decision": "batch-25-closed-synced",
-            "notes": "batch-25 (P3 snapshot-baseline) MERGED as PRs #41/#42/#43 (origin/main tip = 6341fd7) and synced. Rolling state.json over to batch-26.",
+            "decision": "batch-25-closed",
+            "notes": "batch-25 (snapshot-baseline) closed+merged (PRs #41/#42/#43, origin/main tip 6341fd7). Rolling state.json over to batch-27 (batch-26 is the parallel entropy batch).",
             "_batch_closed": true
         },
         {
             "phase": 0,
             "date": "2026-07-06",
-            "decision": "batch-26-initialized-entropy-viewer",
-            "notes": "Operator (AskUserQuestion) chose #12(b) Entropy viewer FULL (US-035+US-036+US-037) over service+report-only / P3-cleanup / UI-UX pass. RC-1 PASS (6341fd7). Per-story already-shipped PASS (no entropy code). Phase 0 = batch-22-style measurement/algorithm SPIKE: architect consult on algorithm (window/estimator/thresholds) + bands-vs-semantic ambition + surface geometry (C-13). Then DoR gate resolves scope + slice."
+            "decision": "batch-27-initialized-interactive-memory-map",
+            "notes": "Operator approved the Variant B v2 interactive-minimap prototype and directed full /dev-flow, parallel to batch-26. RC-1 PASS @ 6341fd7 (HEAD==merge-base==origin/main tip, clean). batch-26 claimed (origin/claude/batch-26-entropy) -> took batch-27. Already-shipped: R-TUI-026 read-only only -> new R-TUI-041. 3 stories US-035/036/037. 3 open design decisions (cell auto-scale; narrow-regime detail reflow w/ C-13; issue->cell anchoring) surfaced at gate with recommendations. Awaiting DoR gate."
         },
         {
             "phase": 0,
             "date": "2026-07-06",
             "decision": "approved",
-            "notes": "DoR gate PASS. Architect spike (read-only, cited) resolved substrate (mem_map sparse Dict[int,int] models.py:44; ranges half-open core.py:503-514), algorithm (256B windows/range, Shannon bits/byte 0-8, 4 bands <1.0/1.0-5.0/5.0-7.2/>=7.2), report reuse (result.mem_map already flows; _entropy_lines mirrors include_legend). Operator resolved 2 gate decisions (AskUserQuestion): R1 = BANDS-ONLY (defer semantic); US-036 = MODAL + in-batch /prototype measurement pre-step. Story status: US-035 READY, US-037 READY (seq after US-035), US-036 SPIKE (geometry assumed-measure -> /prototype before its Phase-1 LLR derivation). Adopted defaults: range.start anchoring, low-sample(<64B) tagged not dropped, per-variant report section, own band colour map (grey/green/yellow/red, not sev-*). Next: run US-036 /prototype measurement to complete its DoR, then Phase 1 derives all three."
-        },
-        {
-            "phase": 0,
-            "date": "2026-07-06",
-            "decision": "us036-geometry-measured",
-            "notes": "US-036 modal geometry MEASURED under Pilot (real LegendScreen .modal-dialog, textual 8.2.8): usable content width = 48 cols @80x24 / 76 cols @120x30 (70%*W - border 2 - padding 4; scrollbar overlays). C-13 verdict: FITS both regimes (30-col jump row -> 18-col margin @80), no column-span/fallback rung. US-036 flipped SPIKE->READY; no separate /prototype step needed. Incidental: editable install .pth resolves s19_app to a DIFFERENT worktree (lucid-margulis) -> Phase-3 standalone scripts need sys.path.insert; in-repo pytest from this worktree root is fine."
+            "notes": "DoR gate PASSED. All 3 stories READY. Operator confirmed all 3 design decisions via recommendations: (1) cell size AUTO-SCALE to fit pane (header '~N KiB/cell'); (2) detail pane REFLOW to bottom region in <120 narrow regime (C-13 budget check required); (3) issue anchoring = CELL-SCOPED primary list + region-issue count. Advancing to Phase 1."
         },
         {
             "phase": 1,
             "date": "2026-07-06",
             "decision": "approved",
-            "notes": "Phase 1 requirements APPROVED (operator AskUserQuestion). architect + qa-reviewer parallel. 3 US -> 3 HLR (035/037/036) -> 16 LLR (035.1-.5/037.1-.3/036.1-.5) in 01-requirements.md; 10 AT + 13 TC + 14-row QC-3 boundary catalog in 01b-validation-strategy.md. shall-only self-grepped 0 flags; C-12 output-then-consume on US-037 (AT-037a re-reads written report file); C-13 measured 48/76; C-15 e-key clean (plain key string, git grep '\"e\"' app.py = 0). Axes: Coverage/Certainty/Evidence all met, no iterate gap. Tracked-to-Phase-2 (not gaps): TC<->LLR numeric binding (V-5), QR-2 exact-7.2-boundary pair-pin, QR-4 capture_mem_map=True in US-037/036 drives. Next: Phase 2 cross-review (architect+qa+security)."
+            "notes": "Phase 1 PASSED. architect + qa-reviewer (parallel) derived R-TUI-041: 3 HLR (035/036/037), 10 LLR (041.1-.10) incl. explicit render-only LLR-041.7 + color-routing LLR-041.3. Full dual traceability (AT-035/036a-e/037 + TC-041.1-.10). C-13 geometry budget COMPUTED: map screen has ONE fixed sibling (detail col) in a 1fr body -> 120col: 62-col elastic grid beside 36-col detail in 98-col body (no Workspace-style overflow); narrow stacks. Post-chrome widths flagged assumed->measure Phase 3. R-2 (issue-address density, HIGH testability) handled in AT-036d install path. R-1 OPEN DECISION resolved by operator: address-less issues surface via region-count line only (no banner). All 3 exit axes met. 12-row probe ledger. Advancing to Phase 2."
+        },
+        {
+            "phase": 2,
+            "date": "2026-07-06",
+            "decision": "iterate-to-refine",
+            "notes": "Phase 2 cross-review (architect + qa-reviewer + security-reviewer, parallel). 1 BLOCKER (B-1/security-F1 HIGH: markup injection - coloring flips markup=False->True; panel renders file-derived ValidationIssue.message/.symbol/.code + region names; _scrub_issue_message doesn't escape Rich brackets + never touches .symbol + is engine-frozen). architect independently flagged same as MAJOR-1. +4 majors: MAJOR-2 stray 'may' in LLR-041.4; qa M-1 pin AT-036d to seed-issue path; qa M-2 add map-comfortable-80x24 snapshot cell; security F2 .symbol unsanitized (folds into B-1 via Text approach). Other axes PASS (C-15 severity identity, C-13 geometry, draft-time citations, render-only, R-2 seed-issue black-box-valid). Operator approved iterate-to-refine w/ Text-with-explicit-styles. AMENDED 01-requirements.md (S6.5): +LLR-041.11 markup-safe render +TC-041.11 +AT-036f; reword may; pin AT-036d; +80x24 snapshot; +AT-036g address-less negative; minors. Blocker CLOSED. Re-gate for Phase 3."
         },
         {
             "phase": 2,
             "date": "2026-07-06",
             "decision": "approved",
-            "notes": "Phase 2 cross-review (architect+qa+security parallel, read-only) APPROVED by operator. 02-review.md: 0 BLOCKERS from all 3. 5 major + 6 minor, all additive spec-tightening. Convergence: architect M1 == security F5 (strip cost-cap -> normative shall). qa LLR->TC coverage audit PASSED all 16. All 11 findings FOLDED pre-lock: NEW LLR-036.6 (cost cap + TC-036.5), snapshot-at-push (M2), .modal-dialog reuse (m3), TC-036.4 e-binding white-box guard (M3, C-15 silent-unbind class), AT-037a capture-chain precondition (M4), TC-035.2 literal-7.2 (M5), TC-035.7 purity (m4), AT-037b byte-identical (m5), emit()/budget (m2), 8.000001 sentinel (m1), colour-map inspection->test (m6). No new control encoded."
+            "notes": "Phase 2 re-gate: blocker B-1 + all 4 majors closed in amended 01-requirements.md; Certainty axis met. Operator approved -> Phase 3."
         },
         {
             "phase": 3,
             "date": "2026-07-06",
-            "decision": "approved",
-            "notes": "Phase 3 implementation COMPLETE, 3 increments + Inc-3b, all approved+folded (operator per-increment gates). Inc-1 US-035 service 14/14 (0 HIGH; 3 LOW backlog). Inc-2 US-037 report 33 pass, AT-037a C-12 LIVE RED->GREEN (0 HIGH; F1 doc + F2 byte-identical folded; F3/F4 LOW backlog). Inc-3 US-036 modal 13 pass, geometry 48/76 real, e-binding registered+TC-036.4-pinned, cost-cap, snapshot-at-push, 0 frozen diff (0 HIGH; F1 either-cap max->min mutation-verified + F3 List[Widget] folded; F2 LOW no-action). Inc-3b +2 xfail snapshot cells. +35 behavioral tests. code-reviewer independent per increment."
+            "decision": "increment-1-approved",
+            "notes": "Inc 1 (US-035 colored minimap grid) DONE + gated. software-dev: MemoryMapPanel Static->Container hosting #map_header + #map_grid (.map-cell widgets) + empty #map_detail/#map_stats placeholders; 6 pure helpers (derive_image_span, cell_count_for_geometry, bytes_per_cell [zero-span guard], cell_status [half-open overlap], status_to_css_class [routes frozen css_class_for_severity], safe_text [Text explicit-style = LLR-041.11 pattern]). render_ranges(ranges,range_validity) signature KEPT -> app.py untouched Inc1. 4 files. Ledger 1037->1039. code-reviewer 0 HIGH. CARRIES: F2 (MEDIUM, shipped panel reads live #map_grid.content_size -> lock len(.map-cell)@120x30 when retiring xfail); F3 (LOW cosmetic trailing gap cells). Operator approved -> Inc 2."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-06",
+            "decision": "increment-2-approved",
+            "notes": "Inc 2 (US-036 cell selection -> detail pane) DONE + gated, INCL. arrow-key nav follow-on. Body: MapCell(Static) focusable/clickable + issues_in_window (half-open, address None excluded) + covering_range + build_detail_text (markup-safe) + on_map_cell_selected + OpenInHexRequested -> app handler (update_hex_view(focus=cell_start) + workspace switch). app.py ONE call-site change render_ranges(...,_validation_issues) + handler. code-reviewer #1: 0 HIGH; F1 MEDIUM = AT-036a used .focus() not arrow-nav. F1 exposed REAL gap: arrow keys were NEVER wired (MapCell.on_key handled only Enter; Textual no spatial arrow-focus by default) despite docstring overclaim + prototype demo. Operator chose IMPLEMENT arrow-nav + 2 directives (no key conflict; discoverable). Follow-on: adjacent_cell_index (pure, clamp, no-wrap, partial-row guarded) + focus_adjacent_cell + MAP_GRID_COLS=16 tied to CSS grid-size:16; event.stop scoped to focused cell (no scroll leak, proven); _DETAIL_HINT surfaces arrow keys (tested pre-selection); docstring fixed. arrow-nav review: 0 HIGH/MEDIUM (MAP_GRID_COLS==CSS verified); F1(compose hint via safe_text) FOLDED. Ledger 1049->1052. 4 files, 0 engine-frozen diffs. batch-26 PR#44 merged (tip 4452f31) - overlap BENIGN; R-TUI-041 free. Operator approved -> Inc 3."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-07",
+            "decision": "increment-3-approved-phase-3-complete",
+            "notes": "Inc 3 (US-037 stats strip + reflow) DONE + gated -> PHASE 3 COMPLETE (all 3 stories US-035/036/037 shipped, R-TUI-041 closed). CoverageStats + coverage_stats (7 metrics, span>0 guard) + build_stats_text markup-safe -> #map_stats_body; #map_body reflow; map-comfortable-80x24 snapshot cell (xfail); REQUIREMENTS.md R-TUI-041 + R-TUI-026 superseded. 5 files. Ledger 1052->1058. C-13 measured live. code-reviewer 0 HIGH; F2 (.6f) -> operator KEEP. 0 engine-frozen diffs. Full batch ledger 1037->1058. Advancing to Phase 4."
         },
         {
             "phase": 4,
-            "date": "2026-07-06",
+            "date": "2026-07-07",
             "decision": "approved",
-            "notes": "Phase 4 validation GATE PASS (operator). 04-validation.md real results (local py3.14.4/textual8.2.8): batch modules 60 pass, frozen guards 101 pass, full suite not-slow 1048 pass / 19 fail (ALL snapshot-drift non-gating) / 5 xfail, slow 21 pass. 0 non-snapshot failures (2 runs). Both layers observed through shipped surfaces; AT/TC->real-node reconciliation complete (0 orphans); bidirectional surface-reachability matrix complete; counterfactual ledger complete (AT-037a LIVE RED). 0 engine-frozen diff. No blocker. Authoritative gate = CI py3.11 (local confirmatory)."
+            "notes": "Phase 4 validation PASS, no blockers. Layer A 14/14 TC, Layer B 11/11 AT each through #screen_map. Bidirectional matrix + 9 boundary/negative. 122 passed; snapshot 30/2 xfailed. 0 frozen diffs. Operator approved -> Phase 5."
         },
         {
             "phase": 5,
-            "date": "2026-07-06",
+            "date": "2026-07-07",
             "decision": "approved",
-            "notes": "Phase 5 post-mortem APPROVED (operator). Co-authored 05-postmortem.md + 05b-postmortem-qa.md. Single-pass batch (0 iterations/phase 0-4). Scope-drift NONE. Control-encode NONE (all candidates = existing C-13/C-12/C-15 firing correctly). Headline: Phase-0 measurement spike (48/76) turned HIGH-geometry US-036 SPIKE into first-pass READY (no fallback, no /prototype). Weakest = US-036 by-construction counterfactual (QA carry: Pilot-safe binding-absent harness). Feature #12 COMPLETE (a+b+c)."
+            "notes": "Phase 5 post-mortem (architect process + qa metrics, co-authored 05-postmortem.md). BLUF: clean run, ledger 1037->1058, 1 blocker + majors all closed, no 3-cap. META-ROOT-CAUSE: controlled-data cross-tech HTML prototype created false confidence on 2 axes (untrusted-input safety -> B-1 markup blocker; real framework interaction -> arrow-nav gap). No scope creep (arrow-nav = in-scope story-promise recovery). Operator APPROVED -> Phase 6 AND directed ENCODE BOTH candidate controls C-16 + C-17 into global ~/.claude (done). Watch-item overclaim-docstring 3rd-occ NOT encoded. Proposed next: baseline regen+xfail retire; Bookmarks dead-screen; coverage-% polish; A2L region naming."
         },
         {
             "phase": 6,
-            "date": "2026-07-06",
-            "decision": "approved",
-            "notes": "Phase 6 documentation APPROVED (operator). 06-docs/: traceability-matrix.md (0 gaps, all node ids reconciled), functionality.md, diagrams/diagrams.md (3 Mermaid: architecture+US-036 sequence+US-037 data-flow), executive-summary.md. State -> awaiting-sync. NEXT: operator commits/pushes/opens PR (not done without approval); after merge run /dev-flow-sync; post-merge canonical-CI snapshot-regen.yml re-baselines 19 drifted + 2 new entropy cells + drops 2 xfails. Deferred LOW nits + SEC-F1 + D-3 + Pilot-binding-absent-harness -> BACKLOG."
+            "date": "2026-07-07",
+            "decision": "awaiting-gate",
+            "notes": "Phase 6 docs written (docs-writer: traceability-matrix.md [real node ids, no gaps, R-TUI-041<->026 supersession, 2 xfail cells flagged pending-baseline] + functionality.md + diagrams/diagrams.md [3 Mermaid]; presentation-builder: executive-summary.md). C-16+C-17 encoded to ~/.claude/commands/dev-flow.md. Awaiting Phase-6 gate -> awaiting-sync. FLAG: MEMORY.md index still shows batch-25 latest; batch-26+27 not yet indexed (add at sync)."
+        },
+        {
+            "phase": 6,
+            "date": "2026-07-07",
+            "decision": "approved-awaiting-sync",
+            "notes": "Phase 6 gate APPROVED. All 4 docs accepted; C-16+C-17 encoded. Batch-27 FUNCTIONALLY COMPLETE -> phase_status=awaiting-sync. Operator to: (1) commit (nothing committed yet - all changes are working-tree); (2) open PR from claude/heuristic-wu-1c7c49; (3) rebase onto origin/main 4452f31 (batch-26, benign overlap on app.py/styles.tcss/test_tui_snapshot.py - non-overlapping regions); (4) merge; (5) canonical-CI baseline regen (snapshot-regen.yml, pinned textual 8.2.8) for map-comfortable-120x30 + 80x24 -> retire 2 xfails; (6) run /dev-flow-sync (vault + MEMORY.md index add batch-26 + batch-27). NOT DONE by orchestrator: commit/push/merge/regen/sync (operator-gated actions). Full batch: US-035/036/037 shipped, R-TUI-041 closed, ledger 1037->1058, 0 engine-frozen diffs, 1 security blocker caught+fixed pre-code, arrow-nav gap caught by hardened AT."
         }
     ],
     "obsidian_synced": false,

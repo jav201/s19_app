@@ -554,6 +554,40 @@ coverage (ranges, gaps, validity) from the existing `LoadedFile.ranges` and
   `s19_app/tui/app.py` (`#screen_map` wiring)
 - Validation: `Automated` via `tests/test_tui_directionb.py`
   (`tc025`) — covers LLR-012.1
+- Status: **Superseded by R-TUI-041** (batch-27, US-035/036/037). The read-only
+  monochrome per-range text list is replaced by the interactive colour-coded
+  minimap; the render-only "without computing new coverage data" constraint is
+  retained and strengthened (LLR-041.7). Statement preserved here as historical
+  record.
+
+**R-TUI-041**: The TUI Memory Map screen must present the loaded image as an
+interactive, colour-coded spatial minimap driven entirely from the
+already-computed `LoadedFile.ranges` / `range_validity` and the pre-computed
+`ValidationReport.issues` — it computes no new coverage, parsing, or validation
+(render-only). The screen shows: a 2-D grid of address-window cells coloured
+valid / invalid / gap through the frozen `css_class_for_severity` severity map,
+with an "≈ N KiB/cell" header (HLR-035); a cell-selection detail pane (status
+chip, address window, covering region, cell-scoped issues, region-issue count,
+and an "Open in Hex View" jump that reuses `update_hex_view(focus_address=…)`)
+(HLR-036); and a coverage stats strip (coverage %, bytes covered,
+valid/invalid range counts, gap count, largest-gap bytes, total issues)
+(HLR-037). All file-derived text is rendered markup-safe (LLR-041.11), and the
+grid + detail reflow via the existing `width-narrow` breakpoint — detail beside
+the grid at ≥ 120 columns, stacked below it at < 120 (LLR-041.10). This
+supersedes/extends R-TUI-026.
+
+- Code: `s19_app/tui/screens_directionb.py` (`MemoryMapPanel`, `MapCell`,
+  `coverage_stats` + the grid/detail/stats helpers), `s19_app/tui/app.py`
+  (`#screen_map` wiring, `update_memory_map`, `on_memory_map_panel_open_in_hex_requested`),
+  `s19_app/tui/styles.tcss` (`#map_grid` / `#map_body` two-regime reflow / `.map-cell`
+  / `#map_detail` / `#map_stats`)
+- Validation: `Automated` via `tests/test_tui_directionb.py`
+  (`tc041_1`..`tc041_11`, `at035`, `at036a`..`at036g`, `at037`, the CARRY-F2
+  cell-count lock) and `tests/test_tui_snapshot.py` (the map 120x30 + 80x24
+  reflow cells, xfail-until-canonical-baseline) — covers HLR-035/036/037 /
+  LLR-041.1–.11
+- Status: Added in batch `2026-07-06-batch-27` (US-035/036/037 / HLR-035/036/037
+  / LLR-041.1–.11)
 
 **R-TUI-028**: The TUI must present an A↔B Firmware Diff view shell — a static
 three-column layout (range list, hex A, hex B) populated with constant,
