@@ -62,7 +62,6 @@ from __future__ import annotations
 import asyncio
 import inspect
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
