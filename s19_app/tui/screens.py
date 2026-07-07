@@ -3,13 +3,15 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, List, Mapping, Optional, Tuple
 
+from rich.text import Text
 from textual import work
 from textual.app import ComposeResult
 from textual.containers import Container, ScrollableContainer
 from textual.message import Message
 from textual.screen import ModalScreen
+from textual.widget import Widget
 from textual.widgets import (
     Button,
     Input,
@@ -28,6 +30,7 @@ from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .legend import COLOUR_SEVERITY, LEGEND_TABLE
 from .models import LoadedFile
 from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
+from .services.entropy_service import EntropyWindow, compute_entropy
 from .operations.crc_config import (
     DUMMY_CONFIG_TEXT,
     parse_crc_config,
@@ -537,6 +540,181 @@ class LegendScreen(ModalScreen[None]):
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "legend_close":
             logger.info("LegendScreen dismissed by close.")
+            self.dismiss(None)
+
+
+#: Band → Rich colour-style map for the entropy strip cells (LLR-036.1,
+#: §2.6 D-d): ``constant/padding`` → grey · ``low`` → green · ``medium`` →
+#: yellow · ``high/random`` → red. These are the viewer's OWN band colours,
+#: applied inline as Rich ``Text`` styles (the ``hexview`` per-cell style
+#: precedent, ``FOCUS_HIGHLIGHT_STYLE`` = ``"bold yellow"``). The severity
+#: ``sev-*`` classes (``color_policy.py``, frozen + severity-semantic) are
+#: deliberately NOT referenced here. Low-confidence windows are additionally
+#: dimmed via :data:`ENTROPY_LOW_CONFIDENCE_STYLE`, never dropped.
+ENTROPY_BAND_COLOUR: Dict[str, str] = {
+    "constant/padding": "grey50",
+    "low": "green",
+    "medium": "yellow",
+    "high/random": "red",
+}
+
+#: Rich style modifier appended to a low-confidence window's cell so it is
+#: visually distinguished from a full-sample window of the same band
+#: (LLR-036.1 / HLR-036 low-sample boundary), without changing its band hue.
+ENTROPY_LOW_CONFIDENCE_STYLE = "dim"
+
+#: Cost caps mirroring the ``hexview`` ``MAX_HEX_ROWS`` / ``MAX_HEX_BYTES``
+#: precedent (LLR-036.6): the strip renders at most this many cells and the
+#: jump list at most this many rows regardless of image size; beyond the cap
+#: the excess is truncated and an on-screen indicator is shown (never silent).
+ENTROPY_STRIP_MAX_CELLS = 512
+ENTROPY_MAX_ROWS = 512
+
+
+class EntropyViewerScreen(ModalScreen[Optional[int]]):
+    """Entropy-viewer modal — band strip + jump-to-address list (HLR-036).
+
+    Summary:
+        Renders a snapshot of the loaded image's per-window Shannon entropy
+        (``entropy_service.compute_entropy`` over the ``mem_map`` passed at
+        construction, LLR-036.2 snapshot-at-push) as two surfaces inside a
+        shared ``.modal-dialog`` box (box-model reuse — the 48/76-col budget
+        measured at §2.6 C-13 holds by construction):
+
+        - a **band-coloured strip** (``#entropy_strip``): one Rich ``Text``
+          cell per window, styled by :data:`ENTROPY_BAND_COLOUR` for the
+          window's band (never the severity ``sev-*`` classes, LLR-036.1),
+          low-confidence windows dimmed; the strip wraps into the modal
+          content width with no horizontal overflow (LLR-036.3);
+        - a **jump-to-address list** (``#entropy_jump_list``): one
+          ``ListItem`` per window reading ``0xXXXXXXXX  <band>  H=<h>``.
+
+        The strip is capped at :data:`ENTROPY_STRIP_MAX_CELLS` cells and the
+        jump list at :data:`ENTROPY_MAX_ROWS` rows (LLR-036.6); when the
+        window count exceeds either cap the excess is dropped and a
+        truncation indicator is rendered. Activating a jump row dismisses the
+        modal with that window's ``start`` address so the host can move its
+        hex focus there (LLR-036.5, dismiss-with-target); Close / no
+        selection dismisses with ``None``.
+
+    Args:
+        mem_map (Dict[int, int]): The loaded image's sparse address→byte map,
+            snapshotted at construction. Empty (or a ``None``-image no-op) is
+            handled: the modal shows an explicit empty-state affordance
+            (LLR-036.4 / HLR-036 boundary) instead of crashing.
+
+    Returns:
+        Optional[int]: The chosen jump target address, or ``None`` on Close /
+        empty selection (``ModalScreen[Optional[int]]``). *(Deviation from the
+        LLR-036.2 ``ModalScreen[None]`` note: LLR-036.5 explicitly authorises
+        "dismissing with the target for the host to focus — implementer's
+        choice"; the dismiss-with-target design requires the address payload,
+        so the screen is typed ``Optional[int]``.)*
+
+    Data Flow:
+        - ``__init__`` computes ``self._windows = compute_entropy(mem_map)``
+          ONCE (push-time snapshot; the modal never re-reads ``mem_map``).
+        - ``compose`` renders the capped strip cells + jump rows from
+          ``self._windows``; ``on_list_view_selected`` dismisses with the
+          selected window's ``start``.
+
+    Dependencies:
+        Uses:
+            - ``entropy_service.compute_entropy`` / ``EntropyWindow``
+            - ``ENTROPY_BAND_COLOUR`` / ``ENTROPY_STRIP_MAX_CELLS`` /
+              ``ENTROPY_MAX_ROWS``
+        Used by:
+            - ``S19TuiApp.action_show_entropy`` (the ``e`` binding)
+            - tests/test_tui_entropy_viewer.py
+
+    Example:
+        >>> screen = EntropyViewerScreen({0x1000 + i: 0xFF for i in range(256)})
+        ...  # doctest: +SKIP
+    """
+
+    EMPTY_TEXT = "No image loaded — nothing to classify."
+    TRUNCATED_TEXT = "... (truncated — image exceeds the viewer render cap)"
+
+    def __init__(self, mem_map: Dict[int, int]) -> None:
+        super().__init__()
+        self._windows: List[EntropyWindow] = compute_entropy(mem_map)
+
+    def _strip_text(self) -> Text:
+        """Build the wrapped band-coloured strip as a single Rich ``Text``.
+
+        Summary:
+            One ``█`` cell per window (up to :data:`ENTROPY_STRIP_MAX_CELLS`),
+            each appended with its band's :data:`ENTROPY_BAND_COLOUR` Rich
+            style; low-confidence windows also get the
+            :data:`ENTROPY_LOW_CONFIDENCE_STYLE` (dim) modifier. The containing
+            ``Static`` wraps the cells into the modal content width, so no
+            explicit per-line column count is emitted (LLR-036.3 — wrap, not
+            clip).
+
+        Returns:
+            Text: the styled strip; the ``EMPTY_TEXT`` sentinel when no window
+            exists.
+        """
+        if not self._windows:
+            return Text(self.EMPTY_TEXT)
+        text = Text()
+        for window in self._windows[:ENTROPY_STRIP_MAX_CELLS]:
+            style = ENTROPY_BAND_COLOUR.get(window.band, "")
+            if window.low_confidence:
+                style = f"{style} {ENTROPY_LOW_CONFIDENCE_STYLE}".strip()
+            text.append("█", style=style)
+        return text
+
+    def compose(self) -> ComposeResult:
+        strip = Static(self._strip_text(), id="entropy_strip")
+        jump_items: List[ListItem] = []
+        for window in self._windows[:ENTROPY_MAX_ROWS]:
+            conf = " (low-confidence)" if window.low_confidence else ""
+            jump_items.append(
+                ListItem(
+                    Label(
+                        f"0x{window.start:08X}  {window.band}  "
+                        f"H={window.entropy:.2f}{conf}"
+                    )
+                )
+            )
+        body_children: List[Widget] = [strip]
+        if self._windows:
+            body_children.append(ListView(*jump_items, id="entropy_jump_list"))
+        else:
+            body_children.append(Label(self.EMPTY_TEXT, id="entropy_empty"))
+        # LLR-036.6: indicator fires when EITHER surface truncates — use min()
+        # so neither the strip nor the jump list truncates silently.
+        if len(self._windows) > min(ENTROPY_STRIP_MAX_CELLS, ENTROPY_MAX_ROWS):
+            body_children.append(
+                Label(self.TRUNCATED_TEXT, id="entropy_truncated")
+            )
+        yield Container(
+            Label("Entropy classification", classes="modal-title"),
+            ScrollableContainer(*body_children, id="entropy_body"),
+            Container(
+                Button("Close", id="entropy_close", classes="modal-confirm"),
+                id="entropy_buttons",
+                classes="modal-buttons",
+            ),
+            id="entropy_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        self.query_one("#entropy_close", Button).focus()
+
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        index = event.list_view.index
+        if index is None or not (0 <= index < len(self._windows)):
+            return
+        target = self._windows[index].start
+        logger.info("EntropyViewerScreen jump to 0x%08X", target)
+        self.dismiss(target)
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "entropy_close":
+            logger.info("EntropyViewerScreen dismissed by close.")
             self.dismiss(None)
 
 

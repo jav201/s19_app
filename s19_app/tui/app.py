@@ -44,6 +44,7 @@ from .models import LoadedFile, ProjectVariantSet
 from .operations import get_operation, list_operation_ids
 from .rail import Rail, RailItem
 from .screens import (
+    EntropyViewerScreen,
     LegendScreen,
     LoadFileScreen,
     LoadProjectScreen,
@@ -681,6 +682,7 @@ class S19TuiApp(App):
         Binding("t", "view_reports", "View reports", show=False),
         Binding("x", "operations_view", "Operations", show=True),
         Binding("k", "show_legend", "Legend", show=True),
+        Binding("e", "show_entropy", "Entropy", show=True),
         Binding("b", "before_after_report", "Before/After report", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
@@ -3610,6 +3612,71 @@ class S19TuiApp(App):
                 - ``on_button_pressed`` (the MAC / Issues Legend buttons)
         """
         self.push_screen(LegendScreen())
+
+    def action_show_entropy(self) -> None:
+        """
+        Summary:
+            Open the entropy-viewer modal over the loaded image (HLR-036, key
+            ``e``). Snapshots the current image's ``mem_map`` into a fresh
+            :class:`EntropyViewerScreen` (push-time snapshot, LLR-036.2) and
+            pushes it; when the operator activates a jump row the screen
+            dismisses with that window's start address, and the
+            :func:`_focus_entropy_target` callback moves the main hex view's
+            focus there (LLR-036.5, dismiss-with-target). With NO image loaded
+            the action is a safe no-op notify — never a crash (LLR-036.4 /
+            HLR-036 empty boundary).
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``self.current_file`` is ``None`` → ``notify`` + return (no-op).
+            - else → ``push_screen(EntropyViewerScreen(mem_map), callback)``;
+              the callback validates + focuses the returned address via the
+              existing ``_apply_goto`` / ``update_hex_view`` path.
+
+        Dependencies:
+            Uses:
+                - ``EntropyViewerScreen`` / ``current_file``
+                - ``_focus_entropy_target``
+            Used by:
+                - The ``e`` key binding (BINDINGS)
+        """
+        loaded = self.current_file
+        if loaded is None:
+            self.notify("No image loaded — nothing to classify.")
+            return
+        self.push_screen(
+            EntropyViewerScreen(loaded.mem_map), self._focus_entropy_target
+        )
+
+    def _focus_entropy_target(self, target: Optional[int]) -> None:
+        """
+        Summary:
+            Callback for :meth:`action_show_entropy`'s pushed modal — move the
+            main hex view's focus to the jump target the operator picked
+            (LLR-036.5). ``None`` (Close / empty selection) is a no-op. The
+            address is routed through the existing ``_apply_goto`` guard (it
+            rejects out-of-range addresses on the status line) and
+            ``update_hex_view``, so no new focus plumbing is introduced.
+
+        Args:
+            target (Optional[int]): The dismissed window's start address, or
+                ``None`` when the modal was closed without a jump.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_apply_goto`` / ``update_hex_view``
+            Used by:
+                - ``action_show_entropy`` (push_screen callback)
+        """
+        if target is None or self.current_file is None:
+            return
+        if self._apply_goto("main", target):
+            self.update_hex_view(target)
 
     # Screens that own both real content and an `EmptyStatePanel`; the panel
     # is shown only while no file is loaded (LLR-002.3). Each tuple is the

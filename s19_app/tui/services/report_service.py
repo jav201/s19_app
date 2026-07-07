@@ -48,6 +48,7 @@ from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
+from .entropy_service import ENTROPY_BANDS, compute_entropy
 from .report_addendum import DeclaredRegion
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
@@ -195,6 +196,7 @@ class ReportOptions:
     execution_mode: str = REPORT_MODE_BATCH
     assignment_source: str = REPORT_SOURCE_DEFAULT
     include_legend: bool = True
+    include_entropy: bool = True
     declared_regions: Tuple[DeclaredRegion, ...] = ()
 
     def __post_init__(self) -> None:
@@ -232,6 +234,12 @@ class ReportOptions:
             raise ValueError(
                 f"include_legend must be a bool, got "
                 f"{self.include_legend!r}"
+            )
+        if not isinstance(self.include_entropy, bool):
+            raise ValueError(
+                f"include_entropy must be a bool, got "
+                f"{self.include_entropy!r} - the value is rejected, not "
+                f"coerced"
             )
         for region in self.declared_regions:
             if not isinstance(region, DeclaredRegion):
@@ -974,6 +982,72 @@ def _legend_lines() -> List[str]:
     return lines
 
 
+def _entropy_lines(result: VariantExecutionResult) -> List[str]:
+    """
+    Summary:
+        Render a per-variant entropy/classification section (LLR-037.2) — a
+        band SUMMARY (count per band, low-confidence windows flagged) computed
+        from :func:`entropy_service.compute_entropy` over the variant's
+        post-change ``result.mem_map``. Band-summary only (O(bands), not
+        O(windows)) — no raw byte dump — so the section stays bounded against
+        the report byte budget (R-2) and adds no memory-value confidentiality
+        surface beyond what the hexdump already emits.
+
+    Args:
+        result (VariantExecutionResult): The variant whose ``mem_map`` (the
+            same source :func:`_hexdump_section` reads, populated when the E6
+            execution layer runs with ``capture_mem_maps=True``) is classified.
+            An empty or ``None`` ``mem_map`` yields a heading plus a single
+            "no data" line rather than crashing.
+
+    Returns:
+        List[str]: Markdown lines beginning with the ``### Entropy`` heading;
+        for a populated map, one bullet per :data:`entropy_service.ENTROPY_BANDS`
+        band that has ≥1 window (``- **<band>**: <n> window(s)``, with a
+        ``(<k> low-confidence)`` suffix when any of that band's windows are
+        low-confidence). A map with no mapped bytes returns the heading plus
+        ``No mapped bytes - entropy not computed.``.
+
+    Data Flow:
+        - ``result.mem_map`` → :func:`entropy_service.compute_entropy` →
+          count windows per band label (in ``ENTROPY_BANDS`` order) →
+          Markdown bullets.
+        - Emitted by :func:`generate_project_report` through the budget-charged
+          ``emit`` helper when ``options.include_entropy`` is ``True``, inside
+          the per-variant loop immediately after the hexdump section.
+
+    Dependencies:
+        Uses:
+            - entropy_service.compute_entropy / entropy_service.ENTROPY_BANDS
+        Used by:
+            - generate_project_report
+            - tests/test_report_service.py
+    """
+    lines: List[str] = ["### Entropy", ""]
+    mem_map = result.mem_map
+    if not mem_map:
+        lines.append("No mapped bytes - entropy not computed.")
+        lines.append("")
+        return lines
+    windows = compute_entropy(mem_map)
+    counts: dict[str, int] = {label: 0 for label, _lo, _hi in ENTROPY_BANDS}
+    low_conf: dict[str, int] = {label: 0 for label, _lo, _hi in ENTROPY_BANDS}
+    for window in windows:
+        counts[window.band] += 1
+        if window.low_confidence:
+            low_conf[window.band] += 1
+    for label, _lo, _hi in ENTROPY_BANDS:
+        count = counts[label]
+        if not count:
+            continue
+        suffix = (
+            f" ({low_conf[label]} low-confidence)" if low_conf[label] else ""
+        )
+        lines.append(f"- **{label}**: {count} window(s){suffix}")
+    lines.append("")
+    return lines
+
+
 def _addendum_lines(
     regions: Sequence[DeclaredRegion],
     variant_results: Sequence[VariantExecutionResult],
@@ -1145,6 +1219,8 @@ def generate_project_report(
         dump_lines, dump_notes = _hexdump_section(result, options, budget)
         lines.extend(dump_lines)
         notes.extend(dump_notes)
+        if options.include_entropy:
+            emit(_entropy_lines(result))
     if options.declared_regions:
         emit(_addendum_lines(options.declared_regions, variant_results))
     if notes:
