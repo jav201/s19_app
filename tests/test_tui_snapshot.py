@@ -440,26 +440,11 @@ _RESTYLED_CELLS = [
 # the batch-27 Inc-3 two-regime reflow (LLR-041.10) lays the detail beside the
 # grid at 120x30 and stacked below it at 80x24 → BOTH the `map-comfortable-120x30`
 # baseline AND a NEW `map-comfortable-80x24` narrow-reflow cell must be locked.
-# Local regen is FORBIDDEN ([[reference_snapshot_regen_env]], batch-25); the real
-# baselines are regenerated in the canonical CI env post-merge. Until then both
-# map cells are xfail-until-baseline (strict=False), mirroring the retired
-# batch-22 patch pattern (which added the patch 80x24 floor the same way); the
-# other 27 cells stay green.
-_MAP_BASELINE_PENDING = pytest.mark.xfail(
-    reason="baseline-regen-pending: US-035/036/037 minimap redesign (batch-27)",
-    strict=False,
-)
-
-
+# The map baselines (120x30 primary + the 80x24 narrow-reflow floor) were
+# regenerated in the canonical CI env (snapshot-regen.yml) and committed, so the
+# batch-27 xfail-until-baseline marks are retired — all scaffold cells are green.
 def _scaffold_cell_marks(screen: str, size_key: str) -> tuple:
-    """Return the pytest marks for a scaffold snapshot cell.
-
-    The batch-27 minimap redesign drifts the `map` baselines until they are
-    regenerated in the canonical CI env; both map cells (120x30 primary and the
-    new 80x24 narrow-reflow floor) are xfail-until-baseline.
-    """
-    if screen == "map":
-        return (_MAP_BASELINE_PENDING,)
+    """Return the pytest marks for a scaffold snapshot cell (none — baselines exist)."""
     return ()
 
 
@@ -547,12 +532,8 @@ _ENTROPY_CELLS = [
     pytest.param(
         size_key,
         id=f"entropy-comfortable-{size_key}",
-        marks=(
-            pytest.mark.xfail(
-                reason="baseline pending canonical-CI regen — batch-26 US-036",
-                strict=False,
-            ),
-        ),
+        # baselines regenerated in the canonical CI env (snapshot-regen.yml) and
+        # committed — the batch-26 xfail-until-baseline marks are retired.
     )
     for size_key in ("80x24", "120x30")
 ]
