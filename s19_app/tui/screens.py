@@ -126,6 +126,12 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
     ``styles.tcss``. Behavior is unchanged (LLR-015.2).
     """
 
+    #: Route initial focus to the path Input so Ctrl+V and typing land
+    #: there instead of on the Load button. Without this, Textual's default
+    #: auto-focus picks the first focusable descendant of the dialog — often
+    #: the primary button — and the user's paste is silently dropped.
+    AUTO_FOCUS = "#load_path"
+
     def compose(self) -> ComposeResult:
         yield Container(
             Label("Load file (S19/HEX/MAC/A2L):", classes="modal-title"),
