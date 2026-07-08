@@ -309,7 +309,8 @@ content in the A2L view.
 - Code: `s19_app/tui/screens.py` (`LoadFileScreen`),
   `s19_app/tui/app.py` (`_load_path_from_user_input`, `load_a2l_from_path`,
   `update_a2l_view`)
-- Validation: `Manual` (load a `.a2l` file in the TUI)
+- Validation: `Automated` via `tests/test_loadfilescreen_input.py` (initial
+  focus, keyboard input integrity, OS-clipboard paste; see R-TUI-043)
 
 **R-A2L-005**: The tool must extract tag address/length metadata for
 MEASUREMENT and CHARACTERISTIC sections.
@@ -629,6 +630,37 @@ state (LLR-042.11); the batch diffs no engine-frozen path (LLR-042.12).
   / LLR-042.1–.12). Frozen-engine diff = 0. Prototype directions re-selected by
   the operator at the Phase-1 gate (A2L→Baseline+, MAC dropped, Issues→Dense,
   Workspace→Dense). Follow-on: canonical-CI snapshot regen retires the xfails.
+
+**R-TUI-043**: The Load-file modal (`LoadFileScreen`) must (a) land initial
+keyboard focus on its path `Input` (`#load_path`) — never on the primary
+`Load` button — so single-key `S19TuiApp.BINDINGS` (`s`, `e`, `r`, `l`, `p`,
+`j`, `g`, `q`, `b`, `t`, `x`, `k`, `v`, `o`, `1..8`, `slash`, `comma`,
+`period`, `plus`, `minus`) never steal characters from a user typing a
+path, and (b) route `Ctrl+V` through the OS clipboard (not only Textual's
+in-process `App._clipboard`), because in a Windows Terminal that has
+negotiated the Kitty keyboard protocol (enabled by Textual's Windows
+driver before bracketed paste) Ctrl+V is forwarded as a plain key event
+rather than converted to bracketed paste, so the stock `Input.action_paste`
+would silently read an empty internal buffer. The Load `Input` must remain
+a subclass of `textual.widgets.Input` so widget queries filtered by
+`Input` continue to find it.
+
+- Code: `s19_app/tui/screens.py` (`LoadFileScreen.AUTO_FOCUS`, use of
+  `OsClipboardInput` for `#load_path`), `s19_app/tui/os_clipboard_input.py`
+  (`OsClipboardInput`, `read_os_clipboard`)
+- Validation: `Automated` via `tests/test_loadfilescreen_input.py`
+  (`test_loadfilescreen_auto_focus_lands_on_input`,
+  `test_loadfilescreen_typing_a_realistic_path_is_not_truncated`,
+  `test_loadfilescreen_typing_after_focus_stolen_by_button_reproduces_bug`,
+  `test_loadfilescreen_uses_os_clipboard_widget`,
+  `test_loadfilescreen_ctrl_v_reads_from_os_clipboard`,
+  `test_loadfilescreen_ctrl_v_falls_back_to_internal_clipboard`,
+  `test_os_clipboard_input_is_input_subclass`)
+- Status: Added post-incident after two consecutive fixes (PR #50 focus
+  routing, PR #51 OS-clipboard paste) shipped without automated
+  regression guards. The prior `R-A2L-004` line treated the Load dialog as
+  `Manual` — that gap is now closed by lifting `R-A2L-004` to `Automated`
+  through the same test file.
 
 **R-TUI-028**: The TUI must present an A↔B Firmware Diff view shell — a static
 three-column layout (range list, hex A, hex B) populated with constant,
