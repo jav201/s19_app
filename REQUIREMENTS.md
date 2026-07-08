@@ -589,6 +589,47 @@ supersedes/extends R-TUI-026.
 - Status: Added in batch `2026-07-06-batch-27` (US-035/036/037 / HLR-035/036/037
   / LLR-041.1–.11)
 
+**R-TUI-042**: Three prototype-approved (throwaway-prototype design intent,
+implemented + verified in Textual) view enhancements, all render-only over the
+already-computed model (no new parse / coverage / validation) and colour-routed
+exclusively through the frozen `css_class_for_severity`: (a) **A2L Explorer**
+renders the symbol table at a compact, queryable density (`density-compact`)
+while the Textual `DataTable` keeps its column header fixed on scroll and the
+existing per-row severity colouring + paging are preserved (US-038 / HLR-038 /
+LLR-042.1–.2); (b) **Issues Report** presents the validation issues grouped by
+severity (errors → warnings → info) with a per-group whole-(filtered)-list count
+header and a per-issue code "chip", beside the retained `#issues_hex_pane` live
+peek (selection repaints it via `_update_issues_hex_pane`); the grouped view
+preserves the existing paging window + severity filter and mounts at most a
+bounded display window (`_GROUP_DISPLAY_MAX`) so a hostile large-N issue list
+cannot flood the widget tree, and every file-derived string (`.code` / `.symbol`
+/ `.message`) is rendered markup-safe (US-039 / HLR-039.a/.b / LLR-042.3–.6/.10);
+(c) **Workspace** shows inline coverage signal without opening the Memory Map —
+a per-range range-magnitude micro-bar (validity colour + width ∝ range size, NOT
+a covered-fraction), a Workspace-only whole-image memory strip (bounded, reusing
+the batch-27 `cell_status` path), and a stat pane (coverage %, range / error /
+warning counts; no entropy) (US-040 / HLR-040.a/.b/.c / LLR-042.7–.9). Each new
+surface renders legibly at the 80- and 120-column regimes with a neutral no-data
+state (LLR-042.11); the batch diffs no engine-frozen path (LLR-042.12).
+
+- Code: `s19_app/tui/issues_view.py` (`GroupedIssuesPanel`, `IssueGroupHeader`,
+  `IssueRow`, `_GROUP_DISPLAY_MAX`), `s19_app/tui/app.py` (`_compose_screen_a2l`
+  density, `update_validation_issues_view` / `_render_validation_issues_groups`
+  / `on_issue_row_selected`, `update_sections` micro-bar, `update_workspace_stats`,
+  `update_memory_strip`, `coverage_bar_cells`), `s19_app/tui/styles.tcss`
+  (`#a2l_tags_pane.density-compact`, `#validation_issues_groups` / `.issue-*`,
+  `#ws_stats`, `#ws_memstrip` / `.strip-cell`)
+- Validation: `Automated` via `tests/test_tui_directionb.py`
+  (`at_038a`..`at_038d`, `at_039a`..`at_039g`, `at040a`..`at040e` + the memory-strip
+  cells, `tc_042_1`..`tc_042_12`) and `tests/test_tui_app.py`
+  (`test_update_sections_caps_*`, `TestCrossFileCompatibilityPanelRender` as the
+  perf-regression guard); the restyled A2L / Issues / Workspace snapshot cells +
+  the entropy-modal backdrop cells are xfail-until-canonical-baseline
+- Status: Added in batch `2026-07-07-batch-28` (US-038/039/040 / HLR-038/039/040
+  / LLR-042.1–.12). Frozen-engine diff = 0. Prototype directions re-selected by
+  the operator at the Phase-1 gate (A2L→Baseline+, MAC dropped, Issues→Dense,
+  Workspace→Dense). Follow-on: canonical-CI snapshot regen retires the xfails.
+
 **R-TUI-028**: The TUI must present an A↔B Firmware Diff view shell — a static
 three-column layout (range list, hex A, hex B) populated with constant,
 clearly-labelled placeholder hex rows — with no second-file load path and no

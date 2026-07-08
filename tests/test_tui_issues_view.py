@@ -5,10 +5,11 @@ selecting an issue row that carries an address renders the bytes at that address
 selecting an issue with NO address shows a placeholder and clears any bytes from a
 prior selection (no stale render).
 
-AT-020a drives the SHIPPED surface — `action_show_screen("issues")` then a real
-`DataTable` row selection (cursor + Enter -> `on_data_table_row_selected` ->
-`_jump_to_validation_issue_by_index` -> `_jump_to_validation_issue_object` ->
-`_update_issues_hex_pane`) — and asserts the pane CONTENT (the address row + a
+AT-020a drives the SHIPPED VISIBLE surface — `action_show_screen("issues")` then
+a real grouped-panel `IssueRow` selection (focus + Enter -> `IssueRow.on_key` ->
+`IssueRow.Selected` -> `on_issue_row_selected` -> `_update_issues_hex_pane`; the
+legacy DataTable is now `display: none`) — and asserts the pane CONTENT (the
+address row + a
 known byte for the addressed issue; the exact placeholder for the address-less
 one, with the prior bytes gone). It is value-discriminating: a blank/stale pane
 or a dropped address fails.
@@ -28,6 +29,7 @@ from textual.widgets import DataTable, Static
 from s19_app.core import S19File
 from s19_app.tui.app import S19TuiApp, precompute_issue_datatable_payload
 from s19_app.tui.changes.io import emit_s19_from_mem_map
+from s19_app.tui.issues_view import IssueRow
 from s19_app.tui.services.load_service import build_loaded_s19
 from s19_app.validation import ValidationIssue, ValidationSeverity
 
@@ -91,11 +93,21 @@ def _seed_issues(app: S19TuiApp, tmp_path: Path) -> None:
 
 
 async def _select_issue_row(app: S19TuiApp, pilot, row: int) -> str:
-    """Select issue ``row`` through the real DataTable + return the hex pane text."""
-    table = app.query_one("#validation_issues_list", DataTable)
-    table.focus()
+    """Select issue ``row`` through the real grouped-panel ``IssueRow`` and
+    return the hex pane text.
+
+    Drives the shipped VISIBLE surface (batch-28 HIGH-fix): the legacy
+    ``#validation_issues_list`` DataTable is now ``display: none``, so
+    ``.focus()`` on it is a no-op. Selection instead goes through the
+    grouped ``GroupedIssuesPanel`` — focus the real ``IssueRow`` and press
+    Enter (the C-16 real-mechanism path shared with AT-039c). Grouped render
+    order is error→warning→info, so for the AT-020a seed the addressed error
+    is row 0 and the address-less warning is row 1 — same indices the old
+    DataTable path used.
+    """
+    rows = list(app.query(IssueRow))
+    rows[row].focus()
     await pilot.pause()
-    table.move_cursor(row=row)
     await pilot.press("enter")
     await pilot.pause()
     return str(app.query_one("#issues_hex_pane", Static).render())

@@ -5620,3 +5620,1404 @@ def test_sections_item_data_and_colour_preserved(tmp_path: Path) -> None:
     assert has_class, (
         f"the range Label must still carry the {ok_class!r} colour class"
     )
+
+
+# ===========================================================================
+# batch-28 (R-TUI-042) — Increment 1: US-038 A2L Explorer table polish
+# ===========================================================================
+#
+# LLR-042.1 (verify-not-build): A2L rows scroll INSIDE the `#a2l_tags_list`
+# DataTable so its column header stays fixed — the Textual DataTable default;
+# AT-038a / TC-042.1 drive a REAL `pagedown` and assert the table (not an outer
+# container) actually scrolled.  LLR-042.2 (build): the tags pane carries the
+# queryable `density-compact` class + the DataTable renders `cell_padding=0`;
+# the per-row `_severity_style` colouring and paging path stay unchanged and
+# cells stay `rich.text.Text` (no markup flip — batch-27 B-1 guard).
+#
+# NOTE (surface fact, verified against app.py:687-691): the A2L Explorer rail
+# screen is bound to key "2" (`show_screen('a2l')`); "3" is MAC View. The
+# requirement draft's `press("3")` names the wrong surface, so these ATs drive
+# the real A2L key, "2".
+#
+# case_01 carries only 3 A2L tags — too few to overflow the pane — so AT-038a /
+# TC-042.1 render a windowful of the case_01 enriched tag repeated through the
+# real `update_a2l_tags_view` renderer (all 180 < the default page_size 200, so
+# one page mounts) purely to give the table something to scroll; the scroll
+# itself is the real mechanism under test (C-16).
+
+
+def _a2l_enriched_case_01(app: S19TuiApp) -> list[dict]:
+    """Return the case_01 enriched A2L tag dicts through the real pipeline.
+
+    Runs `_compute_a2l_enriched_tags` + `_refresh_a2l_filtered_tags` so the
+    dicts carry every field `_build_a2l_table_cells` / `_a2l_tag_row_severity`
+    read — no hand-built tag shapes.
+    """
+    app.a2l_tags_filter_mode = "all"
+    app.a2l_tags_filter_field = "name"
+    app.a2l_tags_filter_text = ""
+    app._compute_a2l_enriched_tags()
+    app._refresh_a2l_filtered_tags(preserve_anchor=False)
+    return list(app._a2l_filtered_tags)
+
+
+def test_at_038a_a2l_table_owns_scroll_header_fixed(tmp_path: Path) -> None:
+    """AT-038a / TC-042.1 / LLR-042.1: a REAL pagedown scrolls the A2L
+    DataTable while its header stays fixed.
+
+    Intent: LLR-042.1 is verify-not-build — the fixed column header is the
+    Textual DataTable default *because the DataTable itself owns row scrolling*.
+    This must be observed, not assumed: navigate to A2L via the real "2" key,
+    fill the table past the pane height, focus it, drive a REAL `pagedown`, and
+    assert the DataTable's `scroll_offset.y` actually advanced (> 0) while
+    `show_header` stays True with a rendered column label. A tautology (columns
+    always present) could not fail; a table whose whole body scrolled away —
+    losing the header — would fail the scroll-owner check in TC-042.1.
+    """
+    from textual.widgets import DataTable
+
+    async def _drive() -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _load_case_01(app)
+            base_tags = _a2l_enriched_case_01(app)
+            assert base_tags, "case_01 must enrich at least one A2L tag"
+            big = (base_tags * 60)[:180]  # < page_size 200 → one mounted page
+            await pilot.press("2")  # real A2L rail key (NOT "3" = MAC)
+            await pilot.pause()
+            app.update_a2l_tags_view(big)
+            await pilot.pause()
+            table = app.query_one("#a2l_tags_list", DataTable)
+            table.focus()
+            await pilot.pause()
+            before = table.scroll_offset.y
+            await pilot.press("pagedown")
+            await pilot.pause()
+            return {
+                "before": before,
+                "after": table.scroll_offset.y,
+                "show_header": table.show_header,
+                "column_labels": [c.label.plain for c in table.columns.values()],
+                # scroll owner: outer containers must NOT scroll (header fixed).
+                "pane_scroll_y": app.query_one("#a2l_tags_pane").scroll_offset.y,
+                "screen_scroll_y": app.query_one("#screen_a2l").scroll_offset.y,
+                "row_count": table.row_count,
+            }
+
+    r = asyncio.run(_drive())
+    assert r["row_count"] == 180, (
+        f"expected a full mounted page of 180 rows, got {r['row_count']}"
+    )
+    assert r["after"] > r["before"], (
+        "a real pagedown must scroll the A2L DataTable rows: "
+        f"scroll_offset.y went {r['before']} -> {r['after']}"
+    )
+    assert r["show_header"] is True, "the A2L column header must stay shown on scroll"
+    assert any(label.strip() for label in r["column_labels"]), (
+        f"the fixed header must render at least one column label; "
+        f"got {r['column_labels']!r}"
+    )
+    # TC-042.1: the DataTable — not an outer container — owns row scrolling, so
+    # the header cannot scroll away with the body.
+    assert r["pane_scroll_y"] == 0 and r["screen_scroll_y"] == 0, (
+        "row scrolling must be owned by the #a2l_tags_list DataTable, not an "
+        f"outer container (pane_y={r['pane_scroll_y']}, "
+        f"screen_y={r['screen_scroll_y']})"
+    )
+
+
+def test_at_038b_a2l_pane_carries_density_compact_class(tmp_path: Path) -> None:
+    """AT-038b / LLR-042.2: the A2L tags pane carries the queryable
+    `density-compact` class after load.
+
+    Intent: the compact-density polish is observable as a queryable class on the
+    A2L container (mirroring the `#workspace_body.density-compact` precedent), so
+    a test — and any future density-aware CSS — can bind to it. A polish applied
+    only via a hard-coded padding literal, with no queryable marker, would leave
+    this assertion unable to distinguish compact from comfortable.
+    """
+
+    async def _drive() -> bool:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _load_case_01(app)
+            app.update_a2l_view()
+            await pilot.press("2")
+            await pilot.pause()
+            return app.query_one("#a2l_tags_pane").has_class("density-compact")
+
+    assert asyncio.run(_drive()), (
+        "#a2l_tags_pane must carry the 'density-compact' class (US-038 polish)"
+    )
+
+
+def test_at_038c_a2l_error_row_keeps_severity_style(tmp_path: Path) -> None:
+    """AT-038c (regression) / LLR-042.2: an error-severity A2L row still
+    carries its severity style after the density polish.
+
+    Intent: the density polish must not disturb the per-row `_severity_style`
+    colouring. An ERROR issue mapped to a real case_01 symbol (`CAL_BLOCK_A`)
+    must still red that row — i.e. its DataTable cells must be `rich.text.Text`
+    styled "red" (the frozen `_SEVERITY_TO_RICH_STYLE[ERROR]`). A polish that
+    dropped the styled `Text` cells (or flipped to markup) would fail this.
+    """
+    from rich.text import Text
+    from textual.widgets import DataTable
+
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    async def _drive() -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _load_case_01(app)
+            app._validation_issues = [
+                ValidationIssue(
+                    code="A2L_DUPLICATE_SYMBOL",
+                    severity=ValidationSeverity.ERROR,
+                    message="seeded error for CAL_BLOCK_A",
+                    artifact="a2l",
+                    symbol="CAL_BLOCK_A",
+                )
+            ]
+            app.update_a2l_view()
+            await pilot.press("2")
+            await pilot.pause()
+            table = app.query_one("#a2l_tags_list", DataTable)
+            # Find the row key whose enriched tag is CAL_BLOCK_A via the render
+            # map, then read its cells straight off the DataTable.
+            key = next(
+                k
+                for k, tag in app._a2l_row_key_to_tag.items()
+                if str(tag.get("name")) == "CAL_BLOCK_A"
+            )
+            cells = table.get_row(key)
+            return {
+                "all_text": all(isinstance(c, Text) for c in cells),
+                "styles": [str(c.style) for c in cells],
+            }
+
+    r = asyncio.run(_drive())
+    assert r["all_text"], "every A2L cell must stay a rich.text.Text instance"
+    assert all("red" in style for style in r["styles"]), (
+        "the ERROR-severity CAL_BLOCK_A row must keep its red severity style; "
+        f"got {r['styles']!r}"
+    )
+
+
+def test_at_038d_a2l_empty_state_no_file(tmp_path: Path) -> None:
+    """AT-038d: with no file loaded the A2L Explorer shows its empty table
+    and does not crash.
+
+    Intent: the negative/boundary case — navigating to A2L on a fresh app (no
+    `current_file`) must leave the `#a2l_tags_list` table mounted and empty
+    (0 rows) with no exception, so the polish never assumes a loaded image.
+    """
+    from textual.widgets import DataTable
+
+    async def _drive() -> int:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("2")
+            await pilot.pause()
+            return app.query_one("#a2l_tags_list", DataTable).row_count
+
+    assert asyncio.run(_drive()) == 0, (
+        "with no file loaded the A2L table must render empty (0 rows), no crash"
+    )
+
+
+def test_tc_042_2_density_class_text_cells_and_paging(tmp_path: Path) -> None:
+    """TC-042.2 / LLR-042.2: density class applied, cells stay `rich.text.Text`
+    (markup NOT enabled), and the paging path is unchanged.
+
+    Intent: the white-box companion to AT-038b/c. After the polish the A2L pane
+    carries `density-compact`; every rendered cell is a `rich.text.Text`
+    instance (batch-27 B-1 guard — the renderer never flips to markup parsing);
+    and the existing `_a2l_window_start` paging still advances/retreats by one
+    page through `action_a2l_tags_page_next/prev`. Using page_size 2 over the 3
+    case_01 tags exercises a real second page without synthetic data.
+    """
+    from rich.text import Text
+    from textual.widgets import DataTable
+
+    async def _drive() -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _load_case_01(app)
+            tags = _a2l_enriched_case_01(app)
+            await pilot.press("2")
+            await pilot.pause()
+            has_class = app.query_one("#a2l_tags_pane").has_class("density-compact")
+            # Cells stay Text — render the first page and inspect a row.
+            app.a2l_tags_page_size = 200
+            app._a2l_window_start = 0
+            app.update_a2l_tags_view(tags)
+            table = app.query_one("#a2l_tags_list", DataTable)
+            first_key = next(iter(app._a2l_row_key_to_tag))
+            cells_are_text = all(
+                isinstance(c, Text) for c in table.get_row(first_key)
+            )
+            # Paging unchanged: page_size 2 over 3 tags → start 0 -> 2 -> 0.
+            app.a2l_tags_page_size = 2
+            app._a2l_window_start = 0
+            app.update_a2l_tags_view(tags)
+            start0 = app._a2l_window_start
+            app.action_a2l_tags_page_next()
+            start1 = app._a2l_window_start
+            app.action_a2l_tags_page_prev()
+            start2 = app._a2l_window_start
+            return {
+                "has_class": has_class,
+                "cells_are_text": cells_are_text,
+                "paging": (start0, start1, start2),
+            }
+
+    r = asyncio.run(_drive())
+    assert r["has_class"], "#a2l_tags_pane must carry 'density-compact'"
+    assert r["cells_are_text"], (
+        "A2L cells must remain rich.text.Text (markup must NOT be enabled)"
+    )
+    assert r["paging"] == (0, 2, 0), (
+        f"A2L paging must still advance/retreat one page; got {r['paging']!r}"
+    )
+
+
+# ===========================================================================
+# batch-28 Increment 2 — US-039 Issues Report grouped-by-severity dense view
+# (LLR-042.3 grouping / .4 code chips / .5 selection->peek / .6 paging+filter
+#  +DoS+observables / .10 C-17 markup-safety). Rail key for Issues is "5".
+# ===========================================================================
+
+
+def _seed_issue_objects(app: S19TuiApp, issues: list) -> None:
+    """Install ``case_04`` as ``current_file`` + render ``issues`` grouped.
+
+    Sibling of ``_seed_issues_screen`` but takes an explicit issue list (so a
+    test can seed a specific severity mix — including INFO — or a hostile
+    record). Flips the empty state, clears the worker precompute caches, resets
+    filter=all + window 0, then renders both the DataTable and the grouped
+    panel via ``update_validation_issues_view``.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    s19 = S19File(str(_CASE_04_S19))
+    loaded = build_loaded_s19(_CASE_04_S19, s19, a2l_path=None, a2l_data=None)
+    app.current_file = loaded
+    app._apply_empty_state()
+    app._validation_issues = list(issues)
+    app._validation_issue_cell_rows = []
+    app._validation_issue_cell_styles = []
+    app.validation_issue_filter_mode = "all"
+    app._validation_issues_window_start = 0
+    app.update_validation_issues_view()
+
+
+def _mixed_issues_with_info() -> list:
+    """Build a 2-error / 1-warning / 1-info issue mix (extends ``_make_issues``,
+    which emits only ERROR+WARNING — AT-039b requires a seeded INFO branch)."""
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    return [
+        ValidationIssue(
+            code="ERR_0", severity=ValidationSeverity.ERROR, artifact="s19",
+            message="e0", symbol="symE0", address=0x80000000, line_number=1,
+        ),
+        ValidationIssue(
+            code="ERR_1", severity=ValidationSeverity.ERROR, artifact="s19",
+            message="e1", symbol="symE1", address=0x80000010, line_number=2,
+        ),
+        ValidationIssue(
+            code="WARN_0", severity=ValidationSeverity.WARNING, artifact="mac",
+            message="w0", symbol="symW0", address=0x80000100, line_number=3,
+        ),
+        ValidationIssue(
+            code="INFO_0", severity=ValidationSeverity.INFO, artifact="a2l",
+            message="i0", symbol="symI0", address=None, line_number=4,
+        ),
+    ]
+
+
+def test_at_039a_group_headers_carry_whole_filtered_counts_and_chips(
+    tmp_path: Path,
+) -> None:
+    """AT-039a / LLR-042.3/.4/.6: one group header per present severity whose
+    count == the filtered-whole-list count for that severity, and >=1 code chip
+    carrying the issue code.
+
+    Intent: seed a 2-error / 1-warning / 1-info mix and open the Issues screen.
+    The grouped view must mount exactly three ``.issue-group-header`` nodes
+    whose reported counts are (errors=2, warnings=1, info=1) — the WHOLE
+    filtered counts, not a windowed subset — and at least one
+    ``.issue-code-chip`` whose text is a seeded code. A header that miscounts
+    or a dropped chip fails.
+    """
+    from s19_app.tui.issues_view import IssueGroupHeader
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            headers = list(app.query(IssueGroupHeader))
+            counts = {h.severity_label: h.issue_count for h in headers}
+            chip_texts = [
+                str(chip.render()) for chip in app.query(".issue-code-chip")
+            ]
+            return {"counts": counts, "chips": chip_texts}
+
+    r = asyncio.run(_drive())
+    assert r["counts"] == {"ERRORS": 2, "WARNINGS": 1, "INFO": 1}, (
+        f"one header per severity with whole-filtered counts; got {r['counts']!r}"
+    )
+    assert any("ERR_0" in text for text in r["chips"]), (
+        f"a code chip must carry the issue code; chips={r['chips']!r}"
+    )
+
+
+def test_at_039b_groups_render_in_error_warning_info_order(tmp_path: Path) -> None:
+    """AT-039b / LLR-042.3: with >=1 error, >=1 warning and >=1 info seeded, the
+    three group headers render in error -> warning -> info order (observed, C-10b).
+
+    Intent: the INFO branch is seeded (not assumed), and the observed mount
+    order of the ``.issue-group-header`` labels must be exactly
+    ['ERRORS', 'WARNINGS', 'INFO']. A view that groups but mis-orders fails.
+    """
+    from s19_app.tui.issues_view import IssueGroupHeader
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            return [h.severity_label for h in app.query(IssueGroupHeader)]
+
+    order = asyncio.run(_drive())
+    assert order == ["ERRORS", "WARNINGS", "INFO"], (
+        f"groups must render error -> warning -> info; got {order!r}"
+    )
+
+
+def test_at_039c_real_click_repaints_hex_peek_and_none_is_neutral(
+    tmp_path: Path,
+) -> None:
+    """AT-039c / LLR-042.5 (C-16 real mechanism): a real ``Enter`` keypress on a
+    focused NON-DEFAULT issue row repaints ``#issues_hex_pane`` at that issue's
+    address; an ``address is None`` row yields the neutral peek with no crash.
+
+    Intent: focus the third row (a warning at 0x80000100, NOT the first error)
+    and press ``Enter`` — the real ``IssueRow.on_key`` -> ``Selected`` ->
+    ``on_issue_row_selected`` path must repaint the hex pane and show the
+    0x80000100 row label (the pane must CHANGE). Then the address-less row ->
+    placeholder, no stale bytes. ``.focus()`` only positions focus; the real
+    ``Enter`` keypress drives the selection, so an unwired ``on_key`` fails
+    (batch-27 AT-036a C-16 precedent — Enter, not a direct setter).
+    """
+    from textual.widgets import Static
+    from s19_app.tui.issues_view import IssueRow
+
+    async def _select(app, pilot, row) -> str:
+        row.focus()
+        await pilot.pause()
+        await pilot.press("enter")
+        await pilot.pause()
+        return str(app.query_one("#issues_hex_pane", Static).render())
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            before = str(app.query_one("#issues_hex_pane", Static).render())
+            rows = list(app.query(IssueRow))
+            # Order is [ERR_0, ERR_1, WARN_0(0x80000100), INFO_0(None)].
+            addressed = await _select(app, pilot, rows[2])
+            no_address = await _select(app, pilot, rows[3])
+            return before, addressed, no_address
+
+    before, addressed, no_address = asyncio.run(_drive())
+    assert "80000100" in addressed, (
+        f"clicking the warning row must peek at 0x80000100; pane={addressed!r}"
+    )
+    assert addressed != before, "the hex peek must change on selection"
+    assert "no address" in no_address.lower(), (
+        f"an address-less issue must show the neutral placeholder; "
+        f"pane={no_address!r}"
+    )
+    assert "80000100" not in no_address, (
+        f"the prior selection's bytes must be cleared; pane={no_address!r}"
+    )
+
+
+def test_at_039d_zero_issues_empty_state_and_neutral_peek(tmp_path: Path) -> None:
+    """AT-039d / LLR-042.3: with a file loaded but 0 issues, the grouped view
+    shows a neutral 'no issues' empty state and no rows, with a neutral peek.
+
+    Intent: seed zero issues -> the grouped panel mounts an ``.issues-empty-note``
+    (and no ``.issue-code-chip``), and the hex pane stays neutral (no crash).
+    """
+    from s19_app.tui.issues_view import GroupedIssuesPanel
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, [])
+            await pilot.pause()
+            panel = app.query_one("#validation_issues_groups", GroupedIssuesPanel)
+            return {
+                "empty_notes": len(panel.query(".issues-empty-note")),
+                "chips": len(panel.query(".issue-code-chip")),
+            }
+
+    r = asyncio.run(_drive())
+    assert r["empty_notes"] == 1, "0 issues must show one empty-state note"
+    assert r["chips"] == 0, "0 issues must mount no code chips"
+
+
+def test_at_039e_c17_hostile_code_symbol_message_render_literal(
+    tmp_path: Path,
+) -> None:
+    """AT-039e (C-17 MANDATORY) / LLR-042.10: a hostile issue whose code/symbol
+    carry Rich markup + a raw ANSI byte and whose message carries markup +
+    ``[link=...]`` renders LITERAL — no MarkupError, no style/ANSI leak, no
+    OSC-8 hyperlink, no crash.
+
+    Intent: seed ``code='MAP_Model[bold]'``, ``symbol='MAP_Model[bold]\\x1b[31m'``
+    and ``message='open[red]sensor[/] [link=file:///etc]'``. The run must NOT
+    raise ``rich.errors.MarkupError``; the code chip's plain text must contain
+    the literal ``MAP_Model[bold]`` (brackets intact), and the detail's plain
+    text must contain the literal ``[link=file:///etc]`` — if markup had been
+    parsed, that token would have been consumed (proving no link/OSC-8 escape).
+    """
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    hostile = ValidationIssue(
+        code="MAP_Model[bold]",
+        severity=ValidationSeverity.ERROR,
+        artifact="s19",
+        message="open[red]sensor[/] [link=file:///etc]",
+        symbol="MAP_Model[bold]\x1b[31m",
+        address=0x80000000,
+        line_number=1,
+    )
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, [hostile])
+            await pilot.pause()
+            chip = app.query(".issue-code-chip").first()
+            detail = app.query(".issue-detail").first()
+            chip_plain = chip.render().plain  # Content.plain -> literal text
+            detail_plain = detail.render().plain
+            return chip_plain, detail_plain
+
+    chip_plain, detail_plain = asyncio.run(_drive())
+    assert "MAP_Model[bold]" in chip_plain, (
+        f"the code chip must render brackets literally; chip={chip_plain!r}"
+    )
+    assert "[link=file:///etc]" in detail_plain, (
+        f"the [link=...] token must survive as literal text (no OSC-8 parse); "
+        f"detail={detail_plain!r}"
+    )
+
+
+def test_at_039f_dos_bound_large_issue_list_mounts_one_window(
+    tmp_path: Path,
+) -> None:
+    """AT-039f (DoS bound) / LLR-042.6: ~5000 issues mount at most one bounded
+    paging window of rows (mounted ``.issue-code-chip`` <= page_size), not O(N).
+
+    Intent: a hostile large-N issue list must not mount thousands of widgets.
+    With page_size 200 and 5000 issues the mounted chip count must be <= 200
+    (and > 0) — the grouped view reuses the same paging window as the table.
+    """
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    big = [
+        ValidationIssue(
+            code=f"C_{i}",
+            severity=ValidationSeverity.ERROR if i % 2 == 0 else ValidationSeverity.WARNING,
+            artifact="mac",
+            message=f"m{i}",
+            symbol=f"s{i}",
+            address=0x80000000 + i,
+            line_number=i + 1,
+        )
+        for i in range(5000)
+    ]
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            app.validation_issues_page_size = 200
+            _seed_issue_objects(app, big)
+            await pilot.pause()
+            return len(app.query(".issue-code-chip")), app.validation_issues_page_size
+
+    mounted, page_size = asyncio.run(_drive())
+    assert 0 < mounted <= page_size, (
+        f"mounted chips ({mounted}) must be bounded by page_size ({page_size}), "
+        f"never O(N)=5000"
+    )
+
+
+def test_tc_042_3_group_order_and_header_counts(tmp_path: Path) -> None:
+    """TC-042.3 / LLR-042.3 (white-box): the grouped renderer emits headers in
+    error->warning->info order carrying whole-filtered counts as attributes.
+
+    Intent: the ``IssueGroupHeader.issue_count`` attribute (read directly, not
+    parsed from the string) equals the filtered-list count per severity, and
+    the header sequence is fixed-order. Complements AT-039a/b.
+    """
+    from s19_app.tui.issues_view import IssueGroupHeader
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            return [(h.severity_label, h.issue_count) for h in app.query(IssueGroupHeader)]
+
+    seq = asyncio.run(_drive())
+    assert seq == [("ERRORS", 2), ("WARNINGS", 1), ("INFO", 1)], (
+        f"headers must be ordered with whole-filtered counts; got {seq!r}"
+    )
+
+
+def test_tc_042_4_chip_colour_via_policy_no_hardcoded_hex(tmp_path: Path) -> None:
+    """TC-042.4 / LLR-042.4 (white-box): each code chip carries the frozen
+    ``css_class_for_severity`` sev-* class (colour via policy, no hardcoded hex),
+    and there is one chip per windowed issue.
+
+    Intent: an error chip carries ``sev-error`` and a warning chip ``sev-warning``
+    — the same frozen classes ``color_policy`` maps — so the chip colour routes
+    through the single source of truth. A hardcoded colour would not attach
+    these classes.
+    """
+    from s19_app.tui.issues_view import IssueRow
+    from s19_app.tui.color_policy import css_class_for_severity
+    from s19_app.validation.model import ValidationSeverity
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            rows = list(app.query(IssueRow))
+            chip_classes = []
+            for row in rows:
+                chip = row.query(".issue-code-chip").first()
+                chip_classes.append(set(chip.classes))
+            return {
+                "n_rows": len(rows),
+                "n_chips": len(app.query(".issue-code-chip")),
+                "err_class": css_class_for_severity(ValidationSeverity.ERROR),
+                "warn_class": css_class_for_severity(ValidationSeverity.WARNING),
+                "chip0": chip_classes[0],
+                "chip2": chip_classes[2],
+            }
+
+    r = asyncio.run(_drive())
+    assert r["n_chips"] == r["n_rows"] == 4, "one chip per windowed issue"
+    assert r["err_class"] in r["chip0"], (
+        f"error chip must carry {r['err_class']}; got {r['chip0']!r}"
+    )
+    assert r["warn_class"] in r["chip2"], (
+        f"warning chip must carry {r['warn_class']}; got {r['chip2']!r}"
+    )
+
+
+def test_tc_042_5_selection_handler_drives_peek(tmp_path: Path) -> None:
+    """TC-042.5 / LLR-042.5 (white-box): ``on_issue_row_selected`` repaints the
+    hex peek at the message address; a None address gives the neutral peek.
+
+    Intent: posting an ``IssueRow.Selected`` with an address reuses
+    ``_update_issues_hex_pane`` to show that address; a None-address message
+    shows the placeholder and clears prior bytes — no crash on either.
+    """
+    from textual.widgets import Static
+    from s19_app.tui.issues_view import IssueRow
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            app.on_issue_row_selected(IssueRow.Selected(0x80000100))
+            await pilot.pause()
+            addressed = str(app.query_one("#issues_hex_pane", Static).render())
+            app.on_issue_row_selected(IssueRow.Selected(None))
+            await pilot.pause()
+            none_peek = str(app.query_one("#issues_hex_pane", Static).render())
+            return addressed, none_peek
+
+    addressed, none_peek = asyncio.run(_drive())
+    assert "80000100" in addressed, f"addressed peek must show target; {addressed!r}"
+    assert "no address" in none_peek.lower() and "80000100" not in none_peek, (
+        f"None address must show neutral peek + clear bytes; {none_peek!r}"
+    )
+
+
+def test_tc_042_6_paging_window_preserved_and_filter_scopes(tmp_path: Path) -> None:
+    """TC-042.6 / LLR-042.6 (white-box): the grouped view preserves the paging
+    window (bounded mount) AND the severity filter scopes which issues render,
+    while the header count stays the whole-filtered count.
+
+    Intent: with 5000 mixed issues + page_size 200 -> mounted rows <= 200 but
+    the ERROR header reports the full filtered error count. Switching the filter
+    to 'error' drops the WARNING group entirely (scoped render). Paging next
+    advances the mounted window (different first code).
+    """
+    from s19_app.tui.issues_view import IssueGroupHeader, IssueRow
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    big = [
+        ValidationIssue(
+            code=f"C_{i}",
+            severity=ValidationSeverity.ERROR if i % 2 == 0 else ValidationSeverity.WARNING,
+            artifact="mac",
+            message=f"m{i}",
+            symbol=f"s{i}",
+            address=0x80000000 + i,
+            line_number=i + 1,
+        )
+        for i in range(5000)
+    ]
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            app.validation_issues_page_size = 200
+            _seed_issue_objects(app, big)
+            await pilot.pause()
+            mounted = len(app.query(IssueRow))
+            err_header = next(
+                h for h in app.query(IssueGroupHeader) if h.severity_label == "ERRORS"
+            )
+            first_code_p0 = str(list(app.query(".issue-code-chip"))[0].render())
+            # Paging next must move the mounted window.
+            app.action_validation_issues_page_next()
+            await pilot.pause()
+            first_code_p1 = str(list(app.query(".issue-code-chip"))[0].render())
+            # Filter to errors only -> no WARNINGS group renders.
+            app.validation_issue_filter_mode = "error"
+            app._validation_issues_window_start = 0
+            app.update_validation_issues_view()
+            await pilot.pause()
+            labels = [h.severity_label for h in app.query(IssueGroupHeader)]
+            return {
+                "mounted": mounted,
+                "err_count": err_header.issue_count,
+                "p0": first_code_p0,
+                "p1": first_code_p1,
+                "labels_error_filter": labels,
+            }
+
+    r = asyncio.run(_drive())
+    assert r["mounted"] <= 200, f"mounted rows must be bounded; got {r['mounted']}"
+    assert r["err_count"] == 2500, (
+        f"ERROR header must report the whole-filtered count 2500; got {r['err_count']}"
+    )
+    assert r["p0"] != r["p1"], "paging next must advance the mounted window"
+    assert r["labels_error_filter"] == ["ERRORS"], (
+        f"the error filter must scope out the WARNINGS group; got "
+        f"{r['labels_error_filter']!r}"
+    )
+
+
+def test_at_039g_tc_042_6b_full_page_render_is_row_capped_and_settles(
+    tmp_path: Path,
+) -> None:
+    """AT-039g / TC-042.6b / LLR-042.6: a full ``page_size`` (200) issue page
+    mounts at most ``_GROUP_DISPLAY_MAX`` rows and the render SETTLES.
+
+    Intent — direct guard for the batch-28 Inc-2 perf regression: the grouped
+    panel mounted one ``IssueRow`` (a ``Horizontal`` of two ``Static``s) per
+    issue in the whole 200-row paging window → ~600 non-virtualized widgets
+    remounted per ``update_validation_issues_view``, which flooded Textual's
+    message pump and made the Issues screen take ~35s to settle (``pilot.pause``
+    raised ``WaitForScreenTimeout``). This test seeds a FULL page of 200 issues
+    through the real Issues surface and asserts the mount is row-capped (not
+    ~200) and that ``pilot.pause`` returns — so a future uncapped render is
+    caught HERE directly, not incidentally via the ``tc_065`` panel-render
+    timeout. The mounted ``IssueRow`` count must equal the queryable chip count
+    and be ``<= _GROUP_DISPLAY_MAX``, and a truncation note must be present
+    (200 window > cap). Reaching the asserts at all proves no timeout.
+    """
+    from s19_app.tui.issues_view import (
+        GroupedIssuesPanel,
+        IssueRow,
+        _GROUP_DISPLAY_MAX,
+    )
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            # Default page_size is 200; seed a full page so the window == 200.
+            _seed_issues_screen(app, 200)
+            await pilot.pause()  # must SETTLE — no WaitForScreenTimeout
+            panel = app.query_one(
+                "#validation_issues_groups", GroupedIssuesPanel
+            )
+            return {
+                "rows": len(app.query(IssueRow)),
+                "chips": len(app.query(".issue-code-chip")),
+                "notes": len(panel.query(".issues-truncation-note")),
+                "cap": _GROUP_DISPLAY_MAX,
+                "page_size": app.validation_issues_page_size,
+            }
+
+    r = asyncio.run(_drive())
+    assert r["page_size"] == 200, (
+        f"precondition: a full page_size window; got {r['page_size']}"
+    )
+    assert 0 < r["rows"] <= r["cap"], (
+        f"a 200-issue page must mount at most {r['cap']} rows (not ~200); "
+        f"got {r['rows']}"
+    )
+    assert r["rows"] == r["chips"], (
+        f"one code chip per mounted row; rows={r['rows']} chips={r['chips']}"
+    )
+    assert r["notes"] == 1, (
+        "a full page beyond the display cap must show a truncation note; "
+        f"got {r['notes']}"
+    )
+
+
+def test_tc_042_10_markup_safe_renderables_and_no_from_markup(tmp_path: Path) -> None:
+    """TC-042.10 / LLR-042.10 (white-box + source): file-derived cells render
+    their markup literally (composed as ``Text``, not an interpolated markup
+    string), and the render module never calls ``Text.from_markup`` /
+    ``markup=True`` on file text.
+
+    Intent: complements AT-039e. For a hostile issue the chip/detail rendered
+    plain text preserves the literal brackets (so the value was treated as a
+    ``Text``, never markup-parsed), and a source scan of ``issues_view.py``
+    finds no ``from_markup`` and no ``markup=True`` — the render surface has
+    zero raw file-text-in-a-markup-string path.
+    """
+    from pathlib import Path as _P
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    hostile = ValidationIssue(
+        code="X[bold]", severity=ValidationSeverity.WARNING, artifact="mac",
+        message="m[red]", symbol="s[/]", address=None, line_number=1,
+    )
+
+    async def _drive() -> tuple:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, [hostile])
+            await pilot.pause()
+            chip = app.query(".issue-code-chip").first()
+            detail = app.query(".issue-detail").first()
+            return chip.render().plain, detail.render().plain
+
+    chip_plain, detail_plain = asyncio.run(_drive())
+    assert "X[bold]" in chip_plain, (
+        f"the chip must render the code literally (Text, not markup); {chip_plain!r}"
+    )
+    assert "m[red]" in detail_plain and "s[/]" in detail_plain, (
+        f"detail message/symbol markup must be literal; {detail_plain!r}"
+    )
+    import s19_app.tui.issues_view as _iv
+
+    source = _P(_iv.__file__).read_text(encoding="utf-8")
+    assert "from_markup" not in source, "issues_view must not call Text.from_markup"
+    assert "markup=True" not in source, "issues_view must not enable markup on file text"
+
+
+# ===========================================================================
+# batch-28 (R-TUI-042) — Increment 3: US-040 Workspace dense-cockpit signal
+# ===========================================================================
+#
+# LLR-042.7 (per-range coverage micro-bar): each `#ws_left` range row gains an
+# ADDED third line — a fixed-8-cell magnitude spark whose FILL WIDTH ∝ the
+# range byte-size relative to the largest rendered range (NOT a covered-
+# fraction; a contiguous range is 100% covered by definition) and whose COLOUR
+# is the row's validity `sev-*` class (valid→sev-ok, invalid→sev-error). The
+# bar is composed markup-safe (`rich.text.Text`, no markup parse) and adds no
+# horizontal width to the fixed 22-col pane (C-13).
+#
+# LLR-042.9 (stat pane): `#ws_right` gains a `#ws_stats` block above the
+# Context — coverage % + range count (from `coverage_stats`) + error/warning
+# counts (severity tally over `_validation_issues`, counting not re-validation);
+# NO entropy figure (D3 descoped).
+#
+# ATs drive the real render path (`update_sections` → the shipped
+# `#sections_list` / `#ws_stats` widgets); the pure arithmetic is pinned by
+# TC-042.7 / TC-042.9.
+
+
+def _section_bar_lines(app: "S19TuiApp") -> list[tuple[tuple[int, int], str, "frozenset"]]:
+    """Return ``(item.data, bar_line, label.classes)`` for each range row.
+
+    Reads the shipped ``#sections_list`` render: the range Label content is
+    three lines (start / end+size / micro-bar); this returns the bar line (the
+    third) plus the row's ``(start, end)`` payload and CSS classes so an AT can
+    assert on the rendered bar element itself (not a proxy).
+    """
+    from textual.widgets import Label, ListView
+
+    rows: list[tuple[tuple[int, int], str, "frozenset"]] = []
+    sections = app.query_one("#sections_list", ListView)
+    for item in sections.children:
+        if not isinstance(getattr(item, "data", None), tuple):
+            continue
+        label = item.query_one(Label)
+        lines = str(label.content).split("\n")
+        bar_line = lines[2] if len(lines) >= 3 else ""
+        rows.append((item.data, bar_line, label.classes))
+    return rows
+
+
+def _ws_stats_text(app: "S19TuiApp") -> str:
+    """Return the rendered plain text of the Workspace ``#ws_stats`` pane.
+
+    Mirrors the ``#map_stats_body`` read (``str(widget.render())``) — the
+    canonical way to observe a ``Static(markup=False)`` body's text.
+    """
+    return str(app.query_one("#ws_stats").render())
+
+
+def test_tc_042_7_coverage_bar_arithmetic_pure() -> None:
+    """TC-042.7 / LLR-042.7 (white-box): the micro-bar is a pure range-magnitude
+    spark — largest range → full bar, non-empty range → ≥1 cell, empty/zero-max
+    → no cells, monotonic non-decreasing in size — and its colour is the
+    validity ``sev-*`` class.
+
+    Intent: pins the bar semantics (R4) that AT-040a observes through the render
+    surface. If the fill ever became a covered-fraction (always full) or lost
+    monotonicity, or the colour stopped tracking validity, this fails.
+    """
+    from s19_app.tui.app import (
+        SECTIONS_COVERAGE_BAR_WIDTH,
+        build_coverage_bar_text,
+        coverage_bar_cells,
+    )
+    from s19_app.tui.color_policy import css_class_for_severity
+    from s19_app.validation.model import ValidationSeverity
+
+    width = SECTIONS_COVERAGE_BAR_WIDTH
+
+    # Largest range fills the whole bar; a smaller non-empty range shows ≥1 cell.
+    assert coverage_bar_cells(34, 34, width) == width, "largest range → full bar"
+    assert coverage_bar_cells(11, 34, width) >= 1, "non-empty range → at least 1 cell"
+    # Empty range and zero-max guards → no cells, no divide-by-zero.
+    assert coverage_bar_cells(0, 34, width) == 0
+    assert coverage_bar_cells(5, 0, width) == 0
+    # Monotonic non-decreasing in size (a larger range never yields a narrower bar).
+    assert coverage_bar_cells(16, 34, width) >= coverage_bar_cells(11, 34, width)
+    assert coverage_bar_cells(34, 34, width) >= coverage_bar_cells(16, 34, width)
+
+    # The rendered bar is a fixed-width Text whose filled-glyph count == cells.
+    bar = build_coverage_bar_text(11, 34, width)
+    assert bar.plain.count("█") == coverage_bar_cells(11, 34, width)
+    assert len(bar.plain) == width, "bar is a fixed-width track (no row widening)"
+
+    # Colour = validity class (the row's sev-* class the label carries).
+    assert css_class_for_severity(ValidationSeverity.OK) == "sev-ok"
+    assert css_class_for_severity(ValidationSeverity.ERROR) == "sev-error"
+
+
+def test_tc_042_9_stat_pane_values_pure() -> None:
+    """TC-042.9 / LLR-042.9 (white-box): the stat-pane text is exactly coverage %
+    + range count from ``coverage_stats`` and the passed error/warning tallies;
+    an empty image shows a neutral ``—`` coverage.
+
+    Intent: pins the stat-pane formatting AT-040c/d observe. No entropy line is
+    emitted (D3 scope-negative).
+    """
+    from s19_app.tui.app import build_workspace_stats_text
+    from s19_app.tui.screens_directionb import CoverageStats
+
+    stats = CoverageStats(
+        image_span=100, covered_bytes=42, coverage_pct=42.0,
+        valid_count=2, invalid_count=1, gap_count=1, largest_gap=8, total_issues=5,
+    )
+    plain = build_workspace_stats_text(stats, error_count=3, warning_count=1).plain
+    assert "Coverage: 42.00%" in plain
+    assert "Ranges: 3" in plain, "range count = valid + invalid"
+    assert "Errors: 3" in plain
+    assert "Warnings: 1" in plain
+    assert "entropy" not in plain.lower(), "no entropy figure (D3 descoped)"
+
+    empty = build_workspace_stats_text(
+        CoverageStats(0, 0, 0.0, 0, 0, 0, 0, 0), 0, 0
+    ).plain
+    assert "Coverage: —" in empty, "no-range image shows a neutral em-dash coverage"
+    assert "Ranges: 0" in empty
+
+
+def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
+    """AT-040a / LLR-042.7 (black-box, C-10b): each range row renders a micro-bar;
+    its width ∝ range size (largest → widest, per-branch), and its colour class
+    tracks validity (valid → sev-ok ≠ invalid → sev-error).
+
+    Intent: observe the shipped `#sections_list` render, not a proxy. Width is
+    proven over case_02 (four all-valid ranges of differing sizes); the colour
+    branch is proven over case_04 (one valid + one INVALID range) so the
+    valid≠invalid discriminator is actually exercised.
+    """
+
+    async def _drive_width() -> list[tuple[tuple[int, int], str, object]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.update_sections()
+            await pilot.pause()
+            return _section_bar_lines(app)
+
+    async def _drive_colour() -> list[tuple[tuple[int, int], str, object]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_04_loaded_file(app)
+            app.update_sections()
+            await pilot.pause()
+            return _section_bar_lines(app)
+
+    # --- width branch (case_02, all valid) ---
+    width_rows = asyncio.run(_drive_width())
+    assert len(width_rows) == 4, "case_02 has four ranges"
+    for data, bar_line, _classes in width_rows:
+        assert "█" in bar_line, (
+            f"each range row must render a micro-bar (filled glyphs); "
+            f"row {data!r} bar was {bar_line!r}"
+        )
+    # The largest range renders a wider-or-equal bar than the smallest — and the
+    # widths are NOT all identical (proves fill ∝ magnitude, not covered-fraction).
+    filled = {data: bar_line.count("█") for data, bar_line, _ in width_rows}
+    largest = max(filled, key=lambda d: d[1] - d[0])
+    smallest = min(filled, key=lambda d: d[1] - d[0])
+    assert filled[largest] >= filled[smallest]
+    assert filled[largest] > filled[smallest], (
+        f"the largest range's bar must be strictly wider than the smallest's "
+        f"(magnitude spark); filled cells were {filled!r}"
+    )
+
+    # --- colour branch (case_04, valid + invalid) ---
+    colour_rows = asyncio.run(_drive_colour())
+    assert len(colour_rows) == 2, "case_04 has a valid and an invalid range"
+    valid_classes = [c for (st, en), _bar, c in colour_rows if (en - st) == 13]
+    invalid_classes = [c for (st, en), _bar, c in colour_rows if (en - st) == 48]
+    assert valid_classes and valid_classes[0].__contains__("sev-ok"), (
+        f"the valid range row's bar must carry sev-ok; got {valid_classes!r}"
+    )
+    assert invalid_classes and invalid_classes[0].__contains__("sev-error"), (
+        f"the invalid range row's bar must carry sev-error; got {invalid_classes!r}"
+    )
+    assert "sev-ok" not in invalid_classes[0], (
+        "valid and invalid bars must carry DIFFERENT colour classes"
+    )
+
+
+def test_at040c_stat_pane_values_match_image(tmp_path: Path) -> None:
+    """AT-040c / LLR-042.9 (black-box, C-10b): the stat pane shows coverage %,
+    range count and error/warning tallies matching the loaded image; a case_04
+    image seeded with errors shows a higher error count than a clean image.
+
+    Intent: coverage %/range count come from `coverage_stats` over the parsed
+    ranges; error/warning counts are a tally of `_validation_issues` (the app
+    state the real load pipeline populates) — asserted against the exact
+    computed numbers, not a proxy.
+    """
+    from s19_app.tui.screens_directionb import coverage_stats
+
+    seeded = _mixed_issues_with_info()  # 2 ERROR + 1 WARNING + 1 INFO
+
+    async def _drive_case04() -> tuple[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            loaded = _install_case_04_loaded_file(app)
+            app._validation_issues = list(seeded)
+            app.update_sections()
+            await pilot.pause()
+            return _ws_stats_text(app), loaded
+
+    async def _drive_clean() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app._validation_issues = []
+            app.update_sections()
+            await pilot.pause()
+            return _ws_stats_text(app)
+
+    text_04, loaded_04 = asyncio.run(_drive_case04())
+    stats_04 = coverage_stats(loaded_04.ranges, loaded_04.range_validity, seeded)
+    assert f"Coverage: {stats_04.coverage_pct:.2f}%" in text_04, (
+        f"coverage % must match coverage_stats; pane was {text_04!r}"
+    )
+    assert f"Ranges: {len(loaded_04.ranges)}" in text_04
+    assert "Errors: 2" in text_04, f"error tally must be 2; pane was {text_04!r}"
+    assert "Warnings: 1" in text_04, f"warning tally must be 1; pane was {text_04!r}"
+
+    text_clean = asyncio.run(_drive_clean())
+    assert "Errors: 0" in text_clean, f"clean image error tally is 0; {text_clean!r}"
+    # The discriminating assertion: case_04 (seeded errors) > clean (no errors).
+    assert "Errors: 2" in text_04 and "Errors: 0" in text_clean, (
+        "case_04's error count must exceed the clean image's"
+    )
+
+
+def test_at040d_stat_pane_neutral_when_no_file(tmp_path: Path) -> None:
+    """AT-040d / LLR-042.9 (black-box, negative): with no file loaded the stat
+    pane shows a neutral empty state (0 ranges, coverage ``—``) and no micro-bars
+    render; no crash.
+
+    Intent: the no-file path takes the neutral branch and never touches a parsed
+    model — the panel is safe before any load.
+    """
+
+    async def _drive() -> tuple[str, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = None
+            app.update_sections()
+            await pilot.pause()
+            return _ws_stats_text(app), len(_section_bar_lines(app))
+
+    text, bar_rows = asyncio.run(_drive())
+    assert "Ranges: 0" in text, f"no file → 0 ranges; pane was {text!r}"
+    assert "Coverage: —" in text, f"no file → neutral coverage; pane was {text!r}"
+    assert bar_rows == 0, "no file → no range rows (no micro-bars)"
+
+
+def test_at040e_stat_pane_has_no_entropy_element(tmp_path: Path) -> None:
+    """AT-040e / LLR-042.9 (black-box, scope-negative D3): with a file loaded the
+    Workspace stat pane carries NO entropy sparkline / figure.
+
+    Intent: a positive guard that the descoped entropy signal (D3) did not leak
+    into the stat pane — neither as text nor as a widget under `#ws_right`.
+    """
+
+    async def _drive() -> tuple[str, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.update_sections()
+            await pilot.pause()
+            entropy_widgets = len(app.query("#ws_right #ws_entropy"))
+            return _ws_stats_text(app).lower(), entropy_widgets
+
+    text, entropy_widgets = asyncio.run(_drive())
+    assert "entropy" not in text, f"stat pane must show no entropy figure; {text!r}"
+    assert entropy_widgets == 0, "no entropy widget may exist under #ws_right"
+
+
+def test_at040_workspace_geometry_no_clip_80_and_120(tmp_path: Path) -> None:
+    """TC-042.11 / C-13 geometry gate: the batch-28 Workspace surfaces — the
+    per-range micro-bar line, the stat pane AND the whole-image memory-strip band
+    (LLR-042.8) — must not push any Workspace pane off-screen. All three panes
+    plus the hex-scroll, sections list, stat pane, the Context scroll
+    (``#a2l_scroll``, Inc-3 LOW F1) and the memory strip (``#ws_memstrip``)
+    render with positive area at both the 80x24 floor and the 120x40 wide regime;
+    the strip's 1-row band must leave ``#hex_scroll`` a positive height at 80x24.
+
+    Intent: the batch-17 failure mode (a 22-col-pane change that widened or
+    clipped a pane) must not recur, and the new vertical strip band must not push
+    the hex view off-screen. Observing every pane's live region area is the
+    discriminator: a clipped/zero-area pane (including the Context scroll a
+    stat-band regression would silently shrink, or the hex the strip could crowd)
+    fails.
+    """
+
+    async def _drive(size: tuple[int, int]) -> dict[str, tuple[int, int]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.update_sections()
+            app.update_hex_view()
+            await pilot.pause()
+            # #hex_scroll (the hex pane's scroll container filling #ws_center) is
+            # checked rather than #hex_view, whose width is `auto` and tracks
+            # content — the pane-clip gate is about the laid-out panes/containers.
+            ids = (
+                "#ws_left", "#ws_center", "#ws_right",
+                "#hex_scroll", "#sections_list", "#ws_stats",
+                "#a2l_scroll", "#ws_memstrip",
+            )
+            regions: dict[str, tuple[int, int]] = {}
+            for wid in ids:
+                region = app.query_one(wid).region
+                regions[wid] = (region.width, region.height)
+            return regions
+
+    for size in ((80, 24), (120, 40)):
+        regions = asyncio.run(_drive(size))
+        for wid, (width, height) in regions.items():
+            assert width > 0 and height > 0, (
+                f"at size {size}, {wid} must render with positive area "
+                f"(no clip); got width={width} height={height}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# batch-28 Increment 4 (US-040b, LLR-042.8) — Workspace whole-image memory strip.
+#
+# A single-row `#ws_memstrip` band above `#workspace_panes` whose cells are
+# coloured valid/invalid/gap over `current_file.ranges` / `range_validity`,
+# reusing the batch-27 `cell_status` / `status_to_css_class` / `cell_count_for_
+# geometry` path in a rows=1 variant. The mounted cell count is BOUNDED to the
+# band width so a hostile huge image never mounts unbounded cells. Workspace-only.
+# ---------------------------------------------------------------------------
+
+
+def _strip_cell_classes(app: "S19TuiApp") -> list[str]:
+    """Return the space-joined class string of each ``#ws_memstrip`` cell.
+
+    Reads the shipped memory-strip band render — one ``.strip-cell`` widget per
+    minimap cell — so an AT can assert on the coloured cells the operator sees
+    (not a proxy).
+    """
+    band = app.query_one("#ws_memstrip")
+    return [" ".join(cell.classes) for cell in band.query(".strip-cell")]
+
+
+def test_at040b_memory_strip_valid_and_gap_cells(tmp_path: Path) -> None:
+    """AT-040b / LLR-042.8 (black-box, C-10b): a gapped image renders a memory
+    strip with ≥1 valid-class (``sev-ok``) cell AND ≥1 gap-class (``sev-neutral``)
+    cell, colour routed via ``css_class_for_severity`` (the ``status_to_css_class``
+    single source of truth).
+
+    Intent: observe the shipped ``#ws_memstrip`` cells over case_02 (valid ranges
+    separated by real gaps) — the strip must show BOTH covered and gap regions.
+    A strip that painted every cell one colour (lost the gap discriminator) fails.
+    """
+    from s19_app.tui.color_policy import css_class_for_severity
+    from s19_app.validation.model import ValidationSeverity
+
+    async def _drive() -> list[str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.update_sections()
+            await pilot.pause()
+            return _strip_cell_classes(app)
+
+    classes = asyncio.run(_drive())
+    assert classes, "case_02 must mount memory-strip cells"
+    # Colour classes are exactly what css_class_for_severity emits — no hard-code.
+    ok_class = css_class_for_severity(ValidationSeverity.OK)
+    gap_class = css_class_for_severity(ValidationSeverity.NEUTRAL)
+    assert any(ok_class in c for c in classes), (
+        f"case_02's covered ranges must produce a {ok_class} cell; got {classes}"
+    )
+    assert any(gap_class in c for c in classes), (
+        f"case_02's gaps must produce a {gap_class} cell; got {classes}"
+    )
+
+
+def test_at040b_memory_strip_is_workspace_only(tmp_path: Path) -> None:
+    """AT-040b (scope): the memory strip is present on ``#screen_workspace`` and
+    ABSENT on another rail screen (A2L, key ``2``) — it is composed only inside
+    the Workspace screen, so no other screen carries a ``#ws_memstrip`` node.
+
+    Intent: a positive Workspace-only guard (D2) — the strip must not leak into
+    the A2L/MAC/Issues/Map surfaces.
+    """
+
+    async def _drive() -> tuple[int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.update_sections()
+            await pilot.press("2")  # real A2L rail key
+            await pilot.pause()
+            in_workspace = len(app.query("#screen_workspace #ws_memstrip"))
+            in_a2l = len(app.query("#screen_a2l #ws_memstrip"))
+            return in_workspace, in_a2l
+
+    in_workspace, in_a2l = asyncio.run(_drive())
+    assert in_workspace == 1, "the memory strip must live on #screen_workspace"
+    assert in_a2l == 0, "no #ws_memstrip may exist under #screen_a2l"
+
+
+def test_at040b_memory_strip_empty_when_no_file(tmp_path: Path) -> None:
+    """AT-040b (negative): with no file loaded the memory strip is a neutral empty
+    band — zero cells mounted — and rendering does not crash.
+
+    Intent: the no-file path takes the neutral branch and never touches a parsed
+    model; the band is safe before any load.
+    """
+
+    async def _drive() -> int:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = None
+            app.update_sections()
+            await pilot.pause()
+            return len(_strip_cell_classes(app))
+
+    assert asyncio.run(_drive()) == 0, "no file → neutral empty band (no cells)"
+
+
+def test_at040b_memory_strip_cell_count_is_bounded(tmp_path: Path) -> None:
+    """AT-040b / LLR-042.8 (DoS bound): a huge image mounts a BOUNDED number of
+    strip cells — capped at the band's geometry-derived cell count
+    (``cell_count_for_geometry(span, band_width, 1)``), never O(image size).
+
+    Intent: the strip auto-scales like the batch-27 minimap; a hostile
+    100-MB-span image must not mount ~10^8 widgets. The mounted count equals the
+    pure geometry cap and stays ≤ the band width (rows=1) and far below the span.
+    """
+    from s19_app.tui.screens_directionb import cell_count_for_geometry
+
+    huge_span = 100_000_000
+
+    async def _drive() -> tuple[int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = LoadedFile(
+                path=tmp_path / "huge.s19",
+                file_type="s19",
+                mem_map={0: 0x11},
+                row_bases=[0],
+                ranges=[(0, huge_span)],
+                range_validity=[True],
+                errors=[],
+                a2l_path=None,
+                a2l_data=None,
+            )
+            app.update_sections()
+            await pilot.pause()
+            band = app.query_one("#ws_memstrip")
+            band_width = band.content_size.width
+            return len(_strip_cell_classes(app)), band_width
+
+    mounted, band_width = asyncio.run(_drive())
+    expected_cap = cell_count_for_geometry(huge_span, band_width, 1)
+    assert mounted == expected_cap, (
+        f"mounted strip cells must equal the geometry cap {expected_cap}; got {mounted}"
+    )
+    assert mounted <= band_width, "rows=1 strip mounts at most band-width cells"
+    assert mounted < 10_000, (
+        f"a {huge_span}-byte span must not mount O(span) cells; got {mounted}"
+    )
+
+
+def test_tc_042_8_strip_colour_is_pure_reuse_of_batch27_helpers() -> None:
+    """TC-042.8 / LLR-042.8 (white-box): the strip's per-cell colouring and
+    auto-scale are a pure function of ``ranges`` / ``range_validity`` computed via
+    the reused batch-27 helpers — ``cell_status`` → ``status_to_css_class`` maps
+    valid→sev-ok / invalid→sev-error / gap→sev-neutral, and
+    ``cell_count_for_geometry`` bounds the cell count.
+
+    Intent: pins that the strip reuses the frozen-safe minimap colour path (no new
+    colour logic, no hard-coded hex) and that ``update_memory_strip`` reads only
+    the parsed model — no new parse / coverage / validation call.
+    """
+    import ast
+    import inspect
+
+    from s19_app.tui.screens_directionb import (
+        cell_count_for_geometry,
+        cell_status,
+        status_to_css_class,
+    )
+
+    # Pure colour reuse: the three statuses map to the canonical sev-* classes.
+    valid = [(0, 8, True), (8, 16, False)]
+    assert status_to_css_class(cell_status(0, 8, valid)) == "sev-ok"
+    assert status_to_css_class(cell_status(8, 16, valid)) == "sev-error"
+    assert status_to_css_class(cell_status(32, 48, valid)) == "sev-neutral"
+    # Auto-scale bounds the count (rows=1): never more cells than band cols.
+    assert cell_count_for_geometry(100_000_000, 40, 1) == 40
+    assert cell_count_for_geometry(10, 40, 1) == 10
+    assert cell_count_for_geometry(0, 40, 1) == 0
+
+    # update_memory_strip reads LoadedFile.ranges/range_validity and calls only
+    # the reused presentational helpers — no parse/validate/coverage helper.
+    source = inspect.getsource(S19TuiApp.update_memory_strip)
+    tree = ast.parse(source.lstrip())
+    attrs = {n.attr for n in ast.walk(tree) if isinstance(n, ast.Attribute)}
+    assert "ranges" in attrs and "range_validity" in attrs, (
+        "update_memory_strip must read LoadedFile.ranges / range_validity"
+    )
+    calls = {
+        n.func.id
+        for n in ast.walk(tree)
+        if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+    }
+    assert {"cell_status", "status_to_css_class", "cell_count_for_geometry"} <= calls, (
+        f"update_memory_strip must reuse the batch-27 helpers; called {sorted(calls)}"
+    )
+    forbidden = {
+        "validate_artifact_consistency",
+        "build_sorted_range_index",
+        "build_range_validity_s19",
+        "build_range_validity_hex",
+        "parse_a2l_file",
+        "parse_mac_file",
+    }
+    assert forbidden.isdisjoint(calls), (
+        f"update_memory_strip must not invoke parse/validate helpers; called {sorted(calls)}"
+    )
+
+
+def test_tc_042_12_memory_strip_touches_no_frozen_path() -> None:
+    """TC-042.12 / LLR-042.12: the memory strip is render-side only — its render
+    code lives in ``s19_app/tui/app.py`` and reuses the batch-27 public helpers
+    from ``screens_directionb`` (NOT in the engine-frozen set), so it adds 0 diff
+    to any engine-frozen path.
+
+    Intent: a directionb-side pointer that the engine-frozen invariant holds; the
+    authoritative 0-diff proof is the standing guard
+    ``test_tc031_engine_modules_have_no_diff_vs_main`` (+ ``test_engine_unchanged``),
+    which fails if any frozen path (core.py / hexfile.py / range_index.py /
+    validation/ / tui/a2l.py / tui/mac.py / tui/color_policy.py) changed.
+    """
+    import inspect
+
+    import s19_app.tui.app as app_module
+    import s19_app.tui.screens_directionb as sdb
+
+    # The strip renderer is defined in the non-frozen app module.
+    assert inspect.getsourcefile(S19TuiApp.update_memory_strip).endswith("app.py")
+    # The reused colour/geometry helpers live in the non-frozen screens module.
+    for name in ("cell_status", "status_to_css_class", "cell_count_for_geometry"):
+        assert hasattr(sdb, name), f"batch-27 helper {name} must be a public reuse"
+    # No frozen engine module is imported into the strip's home module namespace
+    # under a colour/parse alias (the strip colours only via status_to_css_class).
+    assert app_module.status_to_css_class is sdb.status_to_css_class
