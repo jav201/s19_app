@@ -27,6 +27,7 @@ from textual.widgets import (
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
+from .os_clipboard_input import OsClipboardInput
 from .legend import COLOUR_SEVERITY, LEGEND_TABLE
 from .models import LoadedFile
 from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
@@ -135,7 +136,7 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
     def compose(self) -> ComposeResult:
         yield Container(
             Label("Load file (S19/HEX/MAC/A2L):", classes="modal-title"),
-            Input(
+            OsClipboardInput(
                 placeholder="C:\\path\\to\\file.s19, .hex, .mac, or .a2l",
                 id="load_path",
             ),
