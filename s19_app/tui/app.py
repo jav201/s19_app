@@ -57,11 +57,20 @@ from .screens import (
 from .screens_directionb import (
     AbDiffPanel,
     BookmarksPlaceholder,
+    CoverageStats,
     EmptyStatePanel,
     MemoryMapPanel,
     PatchEditorPanel,
+    bytes_per_cell,
+    cell_count_for_geometry,
+    cell_status,
+    coverage_stats,
+    derive_image_span,
+    safe_text,
+    status_to_css_class,
 )
 from .color_policy import css_class_for_severity
+from .issues_view import GroupedIssuesPanel, IssueRow
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
 from .services.before_after_service import compose_before_after_report
@@ -529,6 +538,153 @@ def _severity_style(severity: ValidationSeverity) -> str:
             - ``precompute_issue_datatable_payload``
     """
     return _SEVERITY_TO_RICH_STYLE.get(severity, "")
+
+
+#: Fixed cell budget for the Workspace per-range coverage micro-bar (LLR-042.7).
+#: Small enough (<= the ~18 usable cols of the 22-wide ``#ws_left`` pane) that the
+#: bar renders as an ADDED third line inside the range row without widening it.
+SECTIONS_COVERAGE_BAR_WIDTH = 8
+
+#: Fallback column count for the Workspace whole-image memory strip (LLR-042.8)
+#: used only before the ``#ws_memstrip`` band has a measured content width (e.g.
+#: a headless render before layout). It caps the mounted cell count so a hostile
+#: huge image never mounts unbounded cells even pre-layout.
+WORKSPACE_MEMSTRIP_DEFAULT_COLS = 76
+
+#: Glyph painted in each memory-strip cell. A full block so the ``sev-*`` colour
+#: fills the cell; composed via ``safe_text`` so the band stays markup-safe.
+_STRIP_CELL_GLYPH = "█"
+
+#: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
+#: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
+#: a markup-parsed string) so the render surface stays markup-safe by construction.
+_BAR_FILLED_GLYPH = "█"
+_BAR_EMPTY_GLYPH = "░"
+
+
+def coverage_bar_cells(
+    size: int, max_size: int, width: int = SECTIONS_COVERAGE_BAR_WIDTH
+) -> int:
+    """
+    Summary:
+        Compute the filled-cell count for a range-magnitude coverage micro-bar
+        (LLR-042.7 / R4). The bar's fill width is proportional to this range's
+        byte-size **relative to the largest rendered range** — a relative-
+        magnitude spark, NOT a covered-fraction (a contiguous range is 100%
+        covered by definition). Pure arithmetic; no widget or file access.
+
+    Args:
+        size (int): This range's byte-size (``end - start``).
+        max_size (int): The largest range byte-size among the rendered rows.
+        width (int): Total bar cell budget (defaults to
+            ``SECTIONS_COVERAGE_BAR_WIDTH``).
+
+    Returns:
+        int: Filled-cell count in ``[0, width]``. ``0`` for a non-positive
+        ``size`` / ``max_size`` / ``width``; otherwise at least ``1`` so any
+        non-empty range shows a bar, and exactly ``width`` for the largest
+        range. Monotonic non-decreasing in ``size`` (a larger range never
+        yields a narrower bar).
+
+    Data Flow:
+        - Called per range row by ``build_coverage_bar_text`` /
+          ``S19TuiApp.update_sections``.
+
+    Dependencies:
+        Used by:
+            - ``build_coverage_bar_text``
+            - (test) TC-042.7
+
+    Example:
+        >>> coverage_bar_cells(100, 100, 8)
+        8
+        >>> coverage_bar_cells(1, 100, 8)
+        1
+        >>> coverage_bar_cells(0, 100, 8)
+        0
+    """
+    if width <= 0 or max_size <= 0 or size <= 0:
+        return 0
+    filled = round(size / max_size * width)
+    return max(1, min(width, filled))
+
+
+def build_coverage_bar_text(
+    size: int, max_size: int, width: int = SECTIONS_COVERAGE_BAR_WIDTH
+) -> Text:
+    """
+    Summary:
+        Compose the markup-safe range-magnitude micro-bar as a ``rich.text.Text``
+        of ``filled`` block glyphs followed by an empty-track remainder
+        (LLR-042.7). Colour is NOT encoded here — the range row's ``sev-*`` CSS
+        class (added by ``update_sections``) colours the whole label, so the bar
+        inherits validity colour.
+
+    Args:
+        size (int): This range's byte-size.
+        max_size (int): The largest rendered range byte-size.
+        width (int): Total bar cell budget.
+
+    Returns:
+        Text: A fixed-``width`` bar (``filled`` block glyphs + empty track),
+        composed markup-safe (``Text.append`` never parses markup).
+
+    Data Flow:
+        - Called by ``update_sections``; appended as the range row's third line.
+
+    Dependencies:
+        Uses:
+            - ``coverage_bar_cells``
+        Used by:
+            - ``S19TuiApp.update_sections``
+            - (test) TC-042.7
+    """
+    filled = coverage_bar_cells(size, max_size, width)
+    bar = Text()
+    bar.append(_BAR_FILLED_GLYPH * filled)
+    bar.append(_BAR_EMPTY_GLYPH * max(0, width - filled))
+    return bar
+
+
+def build_workspace_stats_text(
+    stats: CoverageStats, error_count: int, warning_count: int
+) -> Text:
+    """
+    Summary:
+        Assemble the markup-safe Workspace stat pane body (LLR-042.9): coverage
+        percent + range count (from ``coverage_stats``) and error / warning
+        counts (severity tallies over ``_validation_issues``). No entropy figure
+        (D3 descoped). Pure formatting of already-computed values.
+
+    Args:
+        stats (CoverageStats): Metrics from ``coverage_stats`` over the parsed
+            ranges / validity and the pre-computed issue list.
+        error_count (int): Count of ``ERROR``-severity validation issues.
+        warning_count (int): Count of ``WARNING``-severity validation issues.
+
+    Returns:
+        Text: Four labelled lines. When there are no ranges the coverage line
+        shows a neutral ``—`` (em dash) instead of ``0.00%``.
+
+    Data Flow:
+        - Called by ``S19TuiApp.update_workspace_stats``; rendered into
+          ``#ws_stats``.
+
+    Dependencies:
+        Used by:
+            - ``S19TuiApp.update_workspace_stats``
+            - (test) TC-042.9
+    """
+    range_count = stats.valid_count + stats.invalid_count
+    text = Text()
+    if range_count == 0:
+        text.append("Coverage: —\n")
+    else:
+        text.append(f"Coverage: {stats.coverage_pct:.2f}%\n")
+    text.append(f"Ranges: {range_count}\n")
+    text.append(f"Errors: {error_count}\n")
+    text.append(f"Warnings: {warning_count}")
+    return text
 
 
 def precompute_mac_datatable_payload(
@@ -1184,9 +1340,10 @@ class S19TuiApp(App):
             None
 
         Returns:
-            Container: ``#screen_workspace`` holding ``#workspace_panes``
-            (the three-pane ``Horizontal``) and an ``EmptyStatePanel``.
-            Visible at startup (no ``.hidden`` class).
+            Container: ``#screen_workspace`` holding the ``#ws_memstrip``
+            whole-image memory-strip band, ``#workspace_panes`` (the three-pane
+            ``Horizontal``) and an ``EmptyStatePanel``. Visible at startup (no
+            ``.hidden`` class).
 
         Data Flow:
             - Center pane reuses the pre-batch hex subtree verbatim
@@ -1198,8 +1355,13 @@ class S19TuiApp(App):
             - Left pane hosts ``#files_list`` (Workarea Files) and
               ``#sections_list`` — the latter is the ``update_sections``
               render target, unchanged.
-            - Right context pane hosts ``#a2l_view`` (the A2L summary that
-              ``update_a2l_view`` writes to), unchanged.
+            - Right context pane hosts the Workspace stat pane ``#ws_stats``
+              (coverage %/range/error/warning counts, LLR-042.9) above
+              ``#a2l_view`` (the A2L summary that ``update_a2l_view`` writes to).
+            - The ``#ws_memstrip`` band above the panes is the render target of
+              ``update_memory_strip`` — a single-row whole-image minimap
+              (LLR-042.8); it spans the workspace body width so it does not
+              steal the fixed ``#ws_left`` horizontal budget.
             - An ``EmptyStatePanel`` is composed alongside the panes;
               ``_apply_empty_state`` shows it (and hides ``#workspace_panes``)
               while no ``LoadedFile`` is present (LLR-002.3).
@@ -1235,6 +1397,8 @@ class S19TuiApp(App):
             classes="db-pane",
         )
         _right_pane = Container(
+            Label("Coverage Stats", id="ws_stats_title"),
+            Static("", id="ws_stats", markup=False),
             Label("Context", id="a2l_title"),
             ScrollableContainer(
                 Static("", id="a2l_view", markup=False),
@@ -1249,7 +1413,9 @@ class S19TuiApp(App):
             _right_pane,
             id="workspace_panes",
         )
+        _memstrip = Container(id="ws_memstrip")
         return Container(
+            _memstrip,
             _panes,
             EmptyStatePanel(),
             id="screen_workspace",
@@ -1270,10 +1436,12 @@ class S19TuiApp(App):
         Returns:
             Container: ``#screen_issues`` holding the filter row
             (``#validation_issues_filters``), an ``#issues_columns`` horizontal
-            split of the Issues ``DataTable`` (``#validation_issues_list``) beside
-            a hex pane (``#issues_hex_pane``, US-020a), the
-            ``#validation_issues_summary`` label and an ``EmptyStatePanel``.
-            Hidden at startup.
+            split whose left ``#issues_list_stack`` stacks the grouped-dense
+            ``GroupedIssuesPanel`` (``#validation_issues_groups``, the US-039
+            primary view) above the retained Issues ``DataTable``
+            (``#validation_issues_list``), beside a hex pane
+            (``#issues_hex_pane``, US-020a), the ``#validation_issues_summary``
+            label and an ``EmptyStatePanel``. Hidden at startup.
 
         Data Flow:
             - Lifts the ``#validation_issues_filters`` / ``#validation_issues_list``
@@ -1302,10 +1470,21 @@ class S19TuiApp(App):
                 id="validation_issues_filters",
             ),
             Container(
-                DataTable(
-                    id="validation_issues_list",
-                    zebra_stripes=True,
-                    cursor_type="row",
+                Container(
+                    GroupedIssuesPanel(id="validation_issues_groups"),
+                    # Hidden compatibility surface (batch-28 HIGH-fix): the
+                    # GroupedIssuesPanel above is the sole VISIBLE Issues view.
+                    # This DataTable stays mounted + populated by
+                    # ``update_validation_issues_view`` (its monkeypatched unit
+                    # tests + ``get_row_at`` reads depend on it) but is
+                    # ``display: none`` in styles.tcss so issues aren't rendered
+                    # twice. Full retirement of the table is a backlog item.
+                    DataTable(
+                        id="validation_issues_list",
+                        zebra_stripes=True,
+                        cursor_type="row",
+                    ),
+                    id="issues_list_stack",
                 ),
                 Static("", id="issues_hex_pane", markup=False),
                 id="issues_columns",
@@ -2916,6 +3095,13 @@ class S19TuiApp(App):
         Dependencies:
             Used by:
                 - ``compose``
+
+        US-038 polish (LLR-042.2): the tags pane carries the queryable
+        ``density-compact`` class (tightened pane padding, mirroring the
+        ``#workspace_body.density-compact`` precedent) and the DataTable renders
+        with ``cell_padding=0`` for compact rows. The fixed column header is the
+        Textual ``DataTable`` default (LLR-042.1, verify-not-build); no change to
+        the tag enrichment / paging / per-row severity colouring.
         """
         _tags_pane = Container(
             Label("A2L Tags", id="a2l_tags_title"),
@@ -2936,10 +3122,15 @@ class S19TuiApp(App):
                 id="a2l_filter_menu",
                 classes="hidden",
             ),
-            DataTable(id="a2l_tags_list", zebra_stripes=True, cursor_type="row"),
+            DataTable(
+                id="a2l_tags_list",
+                zebra_stripes=True,
+                cursor_type="row",
+                cell_padding=0,
+            ),
             Label("", id="a2l_tags_summary"),
             id="a2l_tags_pane",
-            classes="db-pane",
+            classes="db-pane density-compact",
         )
         _hex_pane = Container(
             Label("Hex Viewer", id="alt_hex_title"),
@@ -5592,6 +5783,7 @@ class S19TuiApp(App):
         filtered = self._filtered_validation_issues()
         if not filtered:
             summary_label.update("No validation issues.")
+            self._render_validation_issues_groups()
             self.logger.info(
                 "Load phase boundary: populate_issues_table_done rows=0 elapsed=%.3f",
                 time.perf_counter() - populate_started,
@@ -5638,6 +5830,7 @@ class S19TuiApp(App):
         self._populate_issues_datatable(
             issue_table, visible_rows, visible_styles, visible_issues, index_base
         )
+        self._render_validation_issues_groups()
         self.logger.info(
             "Load phase boundary: populate_issues_table_done rows=%d total=%d elapsed=%.3f",
             len(visible_rows),
@@ -5645,6 +5838,92 @@ class S19TuiApp(App):
             time.perf_counter() - populate_started,
         )
         self._flush_logger()
+
+    def _render_validation_issues_groups(self) -> None:
+        """
+        Summary:
+            Render the grouped-by-severity dense Issues view
+            (``#validation_issues_groups``) from the same filtered list +
+            paging window the ``DataTable`` uses, so the two surfaces stay in
+            lock-step (US-039 / LLR-042.3/.4/.6). Groups render in error →
+            warning → info order; each group-header count is the whole
+            (filtered) list count for that severity, while only the current
+            bounded paging window of rows is mounted — a hostile large-N issue
+            list therefore cannot mount O(N) row widgets.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - No mounted screen (headless / monkeypatched unit call) or no
+              grouped panel present → no-op (keeps the ``DataTable``-only unit
+              tests unaffected).
+            - Else resolve the filtered list, reuse ``_get_window_bounds`` /
+              ``page_size`` for the window, tally per-severity whole-filtered
+              counts, and hand them to ``GroupedIssuesPanel.render_groups``.
+
+        Dependencies:
+            Uses:
+                - ``_filtered_validation_issues`` / ``_clamp_viewer_page_size``
+                  / ``_get_window_bounds``
+                - ``GroupedIssuesPanel.render_groups``
+            Used by:
+                - ``update_validation_issues_view``
+        """
+        if not self.screen_stack:
+            return
+        panels = self.query("#validation_issues_groups")
+        if not panels:
+            return
+        panel = panels.first(GroupedIssuesPanel)
+        filtered = self._filtered_validation_issues()
+        if not filtered:
+            panel.render_groups([], {}, truncated=False)
+            return
+        total = len(filtered)
+        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        start, end = self._get_window_bounds(
+            total, self._validation_issues_window_start, page_size
+        )
+        window = filtered[start:end]
+        group_counts = {
+            ValidationSeverity.ERROR: sum(
+                1 for item in filtered if item.severity == ValidationSeverity.ERROR
+            ),
+            ValidationSeverity.WARNING: sum(
+                1 for item in filtered if item.severity == ValidationSeverity.WARNING
+            ),
+            ValidationSeverity.INFO: sum(
+                1 for item in filtered if item.severity == ValidationSeverity.INFO
+            ),
+        }
+        panel.render_groups(window, group_counts, truncated=(end - start) < total)
+
+    def on_issue_row_selected(self, event: "IssueRow.Selected") -> None:
+        """
+        Summary:
+            Repaint the retained ``#issues_hex_pane`` when an issue row in the
+            grouped view is activated by a real click or ``Enter`` (LLR-042.5,
+            C-16 real mechanism). An ``address is None`` issue yields the
+            neutral peek placeholder, never a crash.
+
+        Args:
+            event (IssueRow.Selected): The row-activation message carrying the
+                selected issue's integer address (or ``None``).
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_update_issues_hex_pane``
+            Used by:
+                - Textual message dispatch (from ``IssueRow``)
+        """
+        self._update_issues_hex_pane(event.address)
 
     def _populate_issues_datatable(
         self,
@@ -7178,9 +7457,11 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Clear widget and short-circuit when no file is loaded.
+            - Clear widget, refresh the Workspace stat pane and the whole-image
+              memory strip, and short-circuit when no file is loaded.
             - Append at most ``MAX_SECTIONS_PRIMARY_RANGES`` memory-range rows with
-              OK/ERROR coloring, then a truncation row when more exist.
+              OK/ERROR coloring plus a range-magnitude coverage micro-bar as an
+              added third line (LLR-042.7), then a truncation row when more exist.
             - Append at most ``MAX_SECTIONS_OUT_OF_RANGE`` MAC out-of-range rows; when
               truncated, add a single summary row pointing users at the Issues panel.
 
@@ -7188,11 +7469,16 @@ class S19TuiApp(App):
             Uses:
                 - ``_collect_mac_out_of_range_addresses``
                 - ``css_class_for_severity``
+                - ``build_coverage_bar_text``
+                - ``update_workspace_stats``
+                - ``update_memory_strip``
             Used by:
                 - ``_apply_prepared_load``
         """
         sections = self.query_one("#sections_list", ListView)
         sections.clear()
+        self.update_workspace_stats()
+        self.update_memory_strip()
         if not self.current_file:
             return
         ranges = self.current_file.ranges
@@ -7200,9 +7486,14 @@ class S19TuiApp(App):
         total_ranges = len(ranges)
         range_cap = MAX_SECTIONS_PRIMARY_RANGES
         visible_ranges = list(zip(ranges[:range_cap], validity[:range_cap]))
+        max_size = max((end - start for (start, end), _ in visible_ranges), default=0)
         for (start, end), is_valid in visible_ranges:
             size = end - start
-            label = Label(f"0x{start:08X}\n– 0x{end - 1:08X}  {size}B")
+            content = Text()
+            content.append(f"0x{start:08X}\n")
+            content.append(f"– 0x{end - 1:08X}  {size}B\n")
+            content.append_text(build_coverage_bar_text(size, max_size))
+            label = Label(content)
             severity = ValidationSeverity.OK if is_valid else ValidationSeverity.ERROR
             label.add_class(css_class_for_severity(severity))
             item = ListItem(label)
@@ -7243,6 +7534,143 @@ class S19TuiApp(App):
             total_oor,
             min(total_oor, oor_cap),
         )
+
+    def update_workspace_stats(self) -> None:
+        """
+        Summary:
+            Refresh the Workspace stat pane (``#ws_right`` → ``#ws_stats``) with
+            coverage percent + range count and error / warning tallies
+            (LLR-042.9 / US-040c). Display arithmetic only — it reuses
+            ``coverage_stats`` and counts ``_validation_issues`` by severity;
+            it performs no new parse / coverage / validation. No entropy figure
+            (D3 descoped).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - With no file loaded, render the neutral empty pane (0 ranges,
+              coverage ``—``).
+            - Otherwise compute ``coverage_stats`` over the already-parsed
+              ``ranges`` / ``range_validity`` and the pre-computed
+              ``_validation_issues``, tally ERROR / WARNING counts, and render
+              the markup-safe stat text into ``#ws_stats``.
+
+        Dependencies:
+            Uses:
+                - ``coverage_stats``
+                - ``build_workspace_stats_text``
+            Used by:
+                - ``update_sections``
+        """
+        # Render-defensive: ``update_sections`` also runs in unit tests that drive
+        # a non-mounted app with a fake ``query_one`` (returns None for widgets they
+        # don't stub) and pre-mount, where ``#ws_stats`` is absent. Either case is a
+        # no-op, not a crash (mirrors ``update_memory_strip``).
+        try:
+            body = self.query_one("#ws_stats", Static)
+        except Exception:  # noqa: BLE001 — display-side, non-fatal
+            return
+        if body is None:
+            return
+        if not self.current_file:
+            body.update(build_workspace_stats_text(coverage_stats([], [], []), 0, 0))
+            return
+        stats = coverage_stats(
+            self.current_file.ranges,
+            self.current_file.range_validity,
+            self._validation_issues,
+        )
+        error_count = sum(
+            1 for issue in self._validation_issues
+            if issue.severity is ValidationSeverity.ERROR
+        )
+        warning_count = sum(
+            1 for issue in self._validation_issues
+            if issue.severity is ValidationSeverity.WARNING
+        )
+        body.update(build_workspace_stats_text(stats, error_count, warning_count))
+
+    def update_memory_strip(self) -> None:
+        """
+        Summary:
+            Refresh the Workspace whole-image memory strip (``#ws_memstrip``): a
+            single-row band whose cells are coloured valid / invalid / gap over
+            the already-computed ``current_file.ranges`` / ``range_validity``,
+            reusing the batch-27 ``cell_status`` / ``status_to_css_class`` path
+            in a rows=1 variant (LLR-042.8 / US-040b). The mounted cell count is
+            BOUNDED to the band's measured content width via
+            ``cell_count_for_geometry`` (rows=1), so a hostile huge image never
+            mounts unbounded cells. Display arithmetic only — no new parse /
+            coverage / validation. No entropy (D3 descoped).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - Clear the band; with no file loaded or no positive image span,
+              leave a neutral empty band (no cells, no crash).
+            - Otherwise build the ``(start, end, is_valid)`` triples from the
+              parsed model, derive the image span, cap the cell count to the
+              measured band width (fallback ``WORKSPACE_MEMSTRIP_DEFAULT_COLS``),
+              and mount one ``Static`` cell per window coloured by ``cell_status``
+              → ``status_to_css_class``.
+
+        Dependencies:
+            Uses:
+                - ``derive_image_span`` / ``cell_count_for_geometry`` /
+                  ``bytes_per_cell`` / ``cell_status`` / ``status_to_css_class``
+                  / ``safe_text``
+            Used by:
+                - ``update_sections``
+        """
+        try:
+            band = self.query_one("#ws_memstrip", Container)
+        except Exception:  # noqa: BLE001 — display-side, non-fatal
+            # App not mounted yet (headless render before compose).
+            return
+        if band is None:
+            # Unit tests drive ``update_sections`` with a fake ``query_one`` that
+            # returns None for widgets they don't stub — no-op, not a crash.
+            return
+        band.remove_children()
+        if not self.current_file:
+            return
+        ranges = self.current_file.ranges
+        validity = self.current_file.range_validity
+        span_start, span_end = derive_image_span(ranges)
+        span = span_end - span_start
+        if not ranges or span <= 0:
+            return
+        ordered: list[tuple[int, int, bool]] = []
+        for index, (start, end) in enumerate(ranges):
+            is_valid = bool(validity[index]) if index < len(validity) else True
+            ordered.append((start, end, is_valid))
+        ordered.sort(key=lambda item: item[0])
+        size = band.content_size
+        cols = size.width if size.width > 0 else WORKSPACE_MEMSTRIP_DEFAULT_COLS
+        count = cell_count_for_geometry(span, cols, 1)
+        per_cell = bytes_per_cell(span, count)
+        cells: list[Static] = []
+        for index in range(count):
+            cell_start = span_start + index * per_cell
+            cell_end = min(span_end, cell_start + per_cell)
+            status = cell_status(cell_start, cell_end, ordered)
+            sev_class = status_to_css_class(status)
+            cells.append(
+                Static(
+                    safe_text(_STRIP_CELL_GLYPH),
+                    classes=f"strip-cell {sev_class}",
+                )
+            )
+        if cells:
+            band.mount(*cells)
 
     def update_memory_map(self) -> None:
         """

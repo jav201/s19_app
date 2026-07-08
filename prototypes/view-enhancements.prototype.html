@@ -1,0 +1,664 @@
+<!--
+  THROWAWAY PROTOTYPE — s19tui view enhancements (batch: prototype-view-enhancements)
+  Question it answers: "How far can we push the EXISTING views (not entropy)?"
+  Scope: LAYOUT / INFORMATION-HIERARCHY / VISUAL-TREATMENT ONLY.
+  It does NOT prove interactions or untrusted-input safety — those stay dev-flow AT
+  concerns (this repo's C-16 / C-17). Delete or fold the winning bits into real code.
+-->
+<style>
+  :root {
+    /* Calm Dark tokens — carried 1:1 from s19_app/tui/styles.tcss */
+    --bg-base:   #11141a;
+    --bg-panel:  #171b23;
+    --fg-base:   #c8ccd4;
+    --fg-dim:    #8a90a0;
+    --rule:      #2a2f3a;
+    --accent:    #4ec9d4;
+    --sev-ok:    #5fb98a;
+    --sev-error: #e06c75;
+    --sev-warn:  #d9a35b;
+    --sev-info:  #4ec9d4;
+    --sev-neutral:#6b7280;
+    /* prototype chrome (deliberately NOT terminal — this frame is the meta-layer) */
+    --chrome-bg: #0b0d11;
+    --chrome-fg: #e7eaf0;
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--chrome-bg);
+    color: var(--chrome-fg);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    padding: 0 0 96px;
+  }
+
+  /* ---- prototype meta header (sans — clearly not the design under test) ---- */
+  .proto-head {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 26px 24px 8px;
+  }
+  .proto-head h1 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+  }
+  .proto-head p {
+    margin: 0;
+    color: #9aa2b2;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 74ch;
+  }
+  .proto-head .warn {
+    color: var(--sev-warn);
+  }
+  .proto-tabs {
+    max-width: 1180px;
+    margin: 14px auto 0;
+    padding: 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .proto-tab {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    color: #aab2c2;
+    background: #141821;
+    border: 1px solid #232838;
+    border-radius: 7px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .proto-tab[aria-selected="true"] {
+    color: var(--bg-base);
+    background: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .proto-tab .k { opacity: 0.5; font-size: 11px; margin-right: 5px; }
+  .proto-tab.disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ---- terminal canvas (monospace — a terminal has ONE font, on purpose) ---- */
+  .term-wrap {
+    max-width: 1180px;
+    margin: 14px auto 0;
+    padding: 0 24px;
+  }
+  .term {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.48;
+    background: var(--bg-base);
+    color: var(--fg-base);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px -20px #000;
+  }
+  .term-titlebar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px;
+    background: #0d1016;
+    border-bottom: 1px solid var(--rule);
+    color: var(--fg-dim);
+    font-size: 11.5px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.r{background:#e0605f;} .dot.y{background:#d9a35b;} .dot.g{background:#5fb98a;}
+  .term-titlebar .tt { margin-left: 6px; }
+
+  /* command bar */
+  .cmdbar {
+    display: flex; align-items: center; gap: 0;
+    padding: 6px 8px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+  .cmdbar .prompt { color: var(--accent); font-weight: 700; padding: 0 8px; }
+  .cmdbar .ctx { color: var(--fg-base); padding: 0 14px; }
+  .cmdbar .ctx b { color: var(--accent); font-weight: 600; }
+  .cmdbar .field {
+    border: 1px solid var(--rule); border-radius: 5px;
+    padding: 2px 9px; margin-left: 8px; color: var(--fg-dim);
+  }
+  .cmdbar .sevbadges { margin-left: auto; display: flex; gap: 10px; padding: 0 8px; }
+  .badge { font-weight: 700; }
+  .badge.e{color:var(--sev-error);} .badge.w{color:var(--sev-warn);} .badge.i{color:var(--sev-info);}
+
+  /* body shell = rail + main */
+  .shell { display: flex; min-height: 452px; }
+  .rail {
+    width: 168px; flex: 0 0 168px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--rule);
+    padding: 8px 0;
+  }
+  .rail-item {
+    display: flex; gap: 10px; align-items: baseline;
+    padding: 2px 12px; color: var(--fg-base);
+    border-left: 2px solid transparent; cursor: pointer;
+  }
+  .rail-item .g { width: 1.1em; text-align: center; color: var(--fg-dim); }
+  .rail-item:hover { background: var(--bg-base); }
+  .rail-item.active {
+    color: var(--accent); background: var(--bg-base);
+    border-left-color: var(--accent); font-weight: 700;
+  }
+  .rail-item.active .g { color: var(--accent); }
+  .rail-item.soon { color: var(--fg-dim); }
+  .rail-item .tag { margin-left: auto; font-size: 10px; color: var(--sev-neutral); }
+
+  .main { flex: 1 1 auto; min-width: 0; padding: 12px; overflow: hidden; }
+  .screen-title {
+    text-align: center; background: var(--accent); color: var(--bg-base);
+    font-weight: 700; padding: 1px 8px; border-radius: 3px; margin-bottom: 10px;
+  }
+
+  /* focus card (direction C) + strip (direction B) */
+  .focuscard {
+    border: 1px solid var(--sev-error); border-left-width: 3px;
+    background: #1b1418; border-radius: 6px;
+    padding: 8px 12px; margin-bottom: 10px; color: var(--fg-base);
+  }
+  .focuscard .lead { color: var(--sev-error); font-weight: 700; }
+  .focuscard .act { color: var(--accent); }
+  .strip { display: flex; gap: 1px; margin-bottom: 10px; height: 12px; border-radius: 3px; overflow: hidden; }
+  .strip i { flex: 1 1 auto; }
+
+  /* generic panes */
+  .panes { display: flex; gap: 10px; }
+  .pane {
+    border: 1px solid var(--rule); border-radius: 6px;
+    background: var(--bg-panel); padding: 8px; min-width: 0;
+  }
+  .pane-title { color: var(--accent); font-weight: 700; margin-bottom: 6px; font-size: 12px; }
+  .muted { color: var(--fg-dim); }
+
+  .ok{color:var(--sev-ok);} .err{color:var(--sev-error);} .warn{color:var(--sev-warn);}
+  .info{color:var(--sev-info);} .neu{color:var(--sev-neutral);} .acc{color:var(--accent);}
+  .oor{color:var(--sev-warn);}
+
+  /* tables */
+  table.dt { border-collapse: collapse; width: 100%; font-size: 12px; }
+  table.dt th {
+    text-align: left; color: var(--fg-dim); font-weight: 600;
+    border-bottom: 1px solid var(--rule); padding: 2px 8px 3px; position: sticky; top: 0;
+    background: var(--bg-panel); white-space: nowrap;
+  }
+  table.dt td { padding: 1px 8px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.dt tr.row-sel td { background: #12232a; }
+  .scrollx { overflow-x: auto; }
+
+  /* ranges list */
+  .ranges .r { padding: 3px 4px; border-bottom: 1px solid #1d222c; }
+  .ranges .r .addr { display: block; }
+  .ranges .r .meta { color: var(--fg-dim); font-size: 11px; }
+  .covbar { height: 4px; border-radius: 2px; background: #222736; margin-top: 3px; overflow: hidden; }
+  .covbar i { display: block; height: 100%; }
+
+  /* hex */
+  .hex { white-space: pre; font-size: 12.5px; }
+  .hex .a { color: var(--fg-dim); }
+  .hex .hl { background: #35401f; color: #f0e6c8; }
+  .hex .macbyte { color: var(--sev-warn); }
+  .hex .gut { color: var(--accent); }
+
+  /* stat stack (direction B right pane) */
+  .stat { display: flex; justify-content: space-between; padding: 2px 0; }
+  .stat .lbl { color: var(--fg-dim); }
+  .stat .val { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .spark { display: flex; align-items: flex-end; gap: 1px; height: 22px; margin-top: 4px; }
+  .spark i { flex: 1; background: var(--accent); opacity: 0.85; }
+
+  /* master-detail card (direction C for A2L / MAC) */
+  .kv { display: grid; grid-template-columns: 84px 1fr; gap: 2px 10px; font-size: 12px; }
+  .kv dt { color: var(--fg-dim); }
+  .kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .list-narrow .li {
+    padding: 2px 6px; border-left: 2px solid transparent; cursor: default;
+  }
+  .list-narrow .li.sel { background: #12232a; border-left-color: var(--accent); }
+  .glyph { width: 1em; display: inline-block; text-align: center; }
+
+  /* issue worklist (direction C) */
+  .worklist { display: flex; flex-direction: column; gap: 7px; }
+  .wcard {
+    border: 1px solid var(--rule); border-left-width: 3px; border-radius: 6px;
+    padding: 6px 10px; background: var(--bg-panel);
+  }
+  .wcard.e{border-left-color:var(--sev-error);}
+  .wcard.w{border-left-color:var(--sev-warn);}
+  .wcard.i{border-left-color:var(--sev-info);}
+  .wcard .top { display: flex; gap: 8px; align-items: baseline; }
+  .wcard .code { color: var(--fg-dim); font-size: 11px; }
+  .wcard .msg { margin: 2px 0 4px; }
+  .wcard .acts a { color: var(--accent); margin-right: 14px; font-size: 11.5px; text-decoration: none; }
+  .chip { font-size: 10.5px; border: 1px solid var(--rule); border-radius: 10px; padding: 0 7px; color: var(--fg-dim); }
+
+  /* group headers (direction B issues) */
+  .grouphdr { color: var(--fg-dim); border-bottom: 1px solid var(--rule); margin: 8px 0 3px; padding-bottom: 2px; font-size: 11px; }
+  .countpill { border-radius: 10px; padding: 0 7px; margin-left: 6px; }
+
+  /* status bar */
+  .statusbar {
+    border-top: 1px solid var(--rule); background: var(--bg-panel);
+    padding: 4px 12px; color: var(--fg-dim); font-size: 11.5px;
+  }
+  .statusbar .live { color: var(--sev-ok); }
+
+  .noteline { color: var(--fg-dim); font-size: 11px; margin-top: 8px; }
+
+  /* ---- floating variant switcher ---- */
+  .switcher {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: stretch; gap: 0;
+    background: #05070a; border: 1px solid #2b3143; border-radius: 999px;
+    box-shadow: 0 12px 40px -12px #000, 0 0 0 1px #0009;
+    font-family: var(--sans); z-index: 50; overflow: hidden;
+  }
+  .switcher button {
+    background: none; border: none; color: var(--chrome-fg);
+    font-size: 18px; width: 44px; cursor: pointer;
+  }
+  .switcher button:hover { background: #141826; }
+  .switcher .cur {
+    padding: 9px 16px; min-width: 260px; text-align: center;
+    border-left: 1px solid #1e2333; border-right: 1px solid #1e2333;
+  }
+  .switcher .cur .vk { color: var(--accent); font-weight: 700; }
+  .switcher .cur .vn { font-weight: 600; }
+  .switcher .cur .vd { display: block; font-size: 11px; color: #8b93a6; margin-top: 1px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="proto-head">
+  <h1>s19tui — view enhancement directions</h1>
+  <p>
+    Three structurally different directions applied to the four highest-value views. Pick a view with the
+    tabs (or keys <b>1–4</b>); flip the direction with the bar below (or <b>←/→</b>).
+    <span class="warn">Layout &amp; hierarchy only — not an interaction or input-safety proof.</span>
+    Patch Editor, A2B Diff (still a placeholder) and Bookmarks (dead placeholder) are out of this pass.
+  </p>
+</div>
+
+<div class="proto-tabs" id="tabs"></div>
+<div class="term-wrap">
+  <div class="term">
+    <div class="term-titlebar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="tt">s19tui — examples/case_00_public/prg.s19</span>
+    </div>
+    <div id="cmdbar" class="cmdbar"></div>
+    <div class="shell">
+      <div class="rail" id="rail"></div>
+      <div class="main" id="main"></div>
+    </div>
+    <div class="statusbar" id="statusbar"></div>
+  </div>
+  <div class="noteline" id="noteline"></div>
+</div>
+
+<div class="switcher" role="group" aria-label="Enhancement direction">
+  <button id="prev" aria-label="Previous direction">‹</button>
+  <div class="cur" id="cur"></div>
+  <button id="next" aria-label="Next direction">›</button>
+</div>
+
+<script>
+(() => {
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  // ---------- sample data (realistic; includes hostile-looking A2L symbol) ----------
+  const RANGES = [
+    { s:0x80040000, e:0x8004FFFF, sev:'ok',   size:'64 KiB', cov:100 },
+    { s:0x80050000, e:0x80057FFF, sev:'ok',   size:'32 KiB', cov:100 },
+    { s:0x80060000, e:0x800603FF, sev:'err',  size:'1 KiB',  cov:62  },
+    { s:0x8FFF0000, e:0x8FFF0000, sev:'oor',  size:'MAC out-of-range', cov:0 },
+  ];
+  const A2L = [
+    { tag:'InjTiming_Adv', addr:0x80040100, len:4, src:'CHARACTERISTIC', raw:'0x1F40', phys:'8000.0', mem:'ok', region:'CAL', lim:'0..16000', unit:'deg', bits:16, end:'LE', virt:'no', func:'F_Inj', acc:'RW', dt:'SWORD', sev:'ok' },
+    { tag:'Ign_Dwell',     addr:0x80040180, len:2, src:'CHARACTERISTIC', raw:'0x00C8', phys:'2.00',   mem:'ok', region:'CAL', lim:'0..8',     unit:'ms',  bits:16, end:'LE', virt:'no', func:'F_Ign', acc:'RW', dt:'UWORD', sev:'ok' },
+    { tag:'Boost_Tgt',     addr:0x80050040, len:4, src:'CHARACTERISTIC', raw:'0x0BB8', phys:'1.80',   mem:'ok', region:'CAL', lim:'0..3',     unit:'bar', bits:16, end:'LE', virt:'no', func:'F_Air', acc:'RW', dt:'UWORD', sev:'ok' },
+    { tag:'Lambda_Set',    addr:0x80050200, len:2, src:'CHARACTERISTIC', raw:'—',      phys:'—',       mem:'no', region:'—',   lim:'0.7..1.3', unit:'λ',   bits:16, end:'LE', virt:'no', func:'F_Fuel',acc:'RW', dt:'UWORD', sev:'neu' },
+    { tag:'MAP_Model[bold]', addr:0x80060010, len:8, src:'CHARACTERISTIC', raw:'0x2A', phys:'—',     mem:'ok', region:'ERR', lim:'0..300',   unit:'kPa', bits:16, end:'BE', virt:'yes',func:'F_Air', acc:'RW', dt:'SWORD', sev:'err' },
+    { tag:'VVT_Phase',     addr:0x800603F0, len:4, src:'CHARACTERISTIC', raw:'?',      phys:'?',       mem:'—',  region:'CAL', lim:'-30..30',  unit:'deg', bits:16, end:'LE', virt:'no', func:'F_Cam', acc:'RW', dt:'SWORD', sev:'info' },
+  ];
+  const MAC = [
+    { tag:'INJ_TIMING', addr:0x80040100, ina2l:'yes', inmem:'yes', status:'OK',           line:12, err:'—', match:'InjTiming_Adv', sev:'ok' },
+    { tag:'IGN_DWELL',  addr:0x80040180, ina2l:'yes', inmem:'yes', status:'OK',           line:13, err:'—', match:'Ign_Dwell',     sev:'ok' },
+    { tag:'BOOST',      addr:0x80050040, ina2l:'yes', inmem:'yes', status:'OK',           line:14, err:'—', match:'Boost_Tgt',     sev:'ok' },
+    { tag:'LAMBDA',     addr:0x80050200, ina2l:'yes', inmem:'no',  status:'SYMBOL_ONLY',  line:15, err:'—', match:'Lambda_Set',    sev:'warn' },
+    { tag:'CHKSUM',     addr:0x8FFF0000, ina2l:'no',  inmem:'no',  status:'OUT_OF_RANGE', line:16, err:'—', match:'—',             sev:'oor' },
+    { tag:'BAD=LINE',   addr:null,       ina2l:'no',  inmem:'no',  status:'PARSE_ERR',    line:17, err:'bad hex "GxZ0"', match:'—', sev:'err' },
+  ];
+  const ISSUES = [
+    { sev:'err',  code:'CROSS_MAC_S19_OUT_OF_RANGE',   art:'MAC', rel:'S19', sym:'CHKSUM',        addr:0x8FFF0000, line:16, msg:'MAC record maps to an address outside every S19 range.', to:'MAC' },
+    { sev:'err',  code:'S19_RECORD_CHECKSUM',          art:'S19', rel:'—',   sym:'—',             addr:0x80060000, line:44, msg:'S3 record checksum mismatch — data may be corrupt.', to:'Hex' },
+    { sev:'warn', code:'TRIPLE_NAME_ADDRESS_MISMATCH', art:'A2L', rel:'MAC', sym:'MAP_Model[bold]',addr:0x80060010, line:'—', msg:'A2L name/address disagree with the MAC record.', to:'A2L' },
+    { sev:'warn', code:'MAC_SYMBOL_ONLY_IN_MEM',       art:'MAC', rel:'A2L', sym:'LAMBDA',        addr:0x80050200, line:15, msg:'Present in the image but not declared in A2L.', to:'MAC' },
+    { sev:'info', code:'A2L_UNCHECKED',                art:'A2L', rel:'—',   sym:'VVT_Phase',     addr:0x800603F0, line:'—', msg:'Tag not yet memory-checked.', to:'A2L' },
+  ];
+  const hx = (n, w=8) => '0x' + n.toString(16).toUpperCase().padStart(w, '0');
+  const sevClass = s => ({ok:'ok', err:'err', warn:'warn', info:'info', neu:'neu', oor:'oor'}[s] || 'neu');
+  const sevGlyph = s => ({ok:'✓', err:'✗', warn:'⚠', info:'·', neu:'○', oor:'⚠'}[s] || '·');
+  const covColor = s => `var(--sev-${s==='err'?'error':s==='oor'?'warn':s==='neu'?'neutral':s})`;
+
+  // deterministic hex rows around a base
+  function hexRows(base, n, macAt) {
+    const rows = [];
+    for (let r = 0; r < n; r++) {
+      const addr = base + r*16;
+      let cells = [];
+      for (let b = 0; b < 16; b++) {
+        const v = ((addr>>>4) + b*13 + r*7) & 0xFF;
+        const isMac = macAt != null && addr <= macAt && macAt < addr+16 && ((macAt - addr) === b);
+        cells.push(`<span class="${isMac?'macbyte':''}">${v.toString(16).toUpperCase().padStart(2,'0')}</span>`);
+      }
+      const ascii = Array.from({length:16}, (_,b) => { const v=((addr>>>4)+b*13+r*7)&0xFF; return (v>=32&&v<127)?String.fromCharCode(v):'.'; })
+        .map(c=>esc(c)).join('');
+      rows.push({ addr, hex: cells.slice(0,8).join(' ') + '  ' + cells.slice(8).join(' '), ascii });
+    }
+    return rows;
+  }
+
+  // ---------- directions ----------
+  const DIRECTIONS = [
+    { k:'A', name:'Baseline+', desc:'Refine what ships now — same bones, tighter.' },
+    { k:'B', name:'Dense Cockpit', desc:'Max signal per cell: inline data-viz + a memory strip.' },
+    { k:'C', name:'Guided Focus', desc:'Fewer things, worst-first, one object at a time.' },
+  ];
+  const VIEWS = [
+    { k:'workspace', g:'◫', label:'Workspace' },
+    { k:'a2l',       g:'≡', label:'A2L Explorer' },
+    { k:'mac',       g:'◉', label:'MAC View' },
+    { k:'issues',    g:'!', label:'Issues Report' },
+  ];
+  const RAIL_FULL = [
+    ['workspace','◫','Workspace'],['a2l','≡','A2L Explorer'],['mac','◉','MAC View'],
+    ['map','▤','Memory Map'],['issues','!','Issues Report'],['patch','✎','Patch Editor'],
+    ['diff','⏚','A2B Diff'],['bookmarks','✶','Bookmarks'],
+  ];
+
+  let view = 'workspace', dir = 0;
+
+  // ---------- shell chrome ----------
+  function cmdbar() {
+    const d = DIRECTIONS[dir].k;
+    const badges = (d === 'A') ? '' :
+      `<span class="sevbadges"><span class="badge e">✗ 2</span><span class="badge w">⚠ 2</span><span class="badge i">· 1</span></span>`;
+    return `<span class="prompt">›</span>`
+      + `<span class="ctx">project <b>case_00_public</b></span>`
+      + `<span class="ctx">a2l <b>ecu_public.a2l</b></span>`
+      + `<span class="field">find…</span><span class="field">goto 0x…</span>`
+      + badges;
+  }
+  function rail() {
+    return RAIL_FULL.map(([k,g,label]) => {
+      const active = k === view ? ' active' : '';
+      const inScope = VIEWS.some(v => v.k === k);
+      const tag = inScope ? '' : `<span class="tag">soon</span>`;
+      const cls = inScope ? '' : ' soon';
+      return `<div class="rail-item${active}${cls}" data-view="${k}" ${inScope?'role="button" tabindex="0"':''}>`
+        + `<span class="g">${esc(g)}</span><span>${esc(label)}</span>${tag}</div>`;
+    }).join('');
+  }
+  function memoryStrip() {
+    // 48-cell coverage strip: mostly ok, a red patch, a gap, a lone oor marker
+    const cells = [];
+    for (let i=0;i<48;i++){
+      let s='ok';
+      if (i>=30 && i<34) s='err';
+      else if (i>=34 && i<38) s='neu';       // gap
+      else if (i===46) s='oor';
+      cells.push(`<i style="background:${covColor(s)}"></i>`);
+    }
+    return `<div class="strip" title="whole-image coverage minimap">${cells.join('')}</div>`;
+  }
+  function focusCard() {
+    return `<div class="focuscard">`
+      + `<span class="lead">2 errors, 2 warnings.</span> `
+      + `Top: MAC record <b>CHKSUM</b> @ ${hx(0x8FFF0000)} falls outside every S19 range. `
+      + `<span class="act">→ Open in Issues</span></div>`;
+  }
+
+  // ---------- views ----------
+  function vWorkspace(d) {
+    const rangesRows = RANGES.map(r => {
+      const cls = sevClass(r.sev);
+      const cov = d==='B' ? `<div class="covbar"><i style="width:${r.cov}%;background:${covColor(r.sev)}"></i></div>` : '';
+      const glyph = d==='B' ? `<span class="${cls}">${sevGlyph(r.sev)}</span> ` : '';
+      const label = r.sev==='oor'
+        ? `<span class="oor">MAC out-of-range</span><span class="meta">@ ${hx(r.s)}</span>`
+        : `<span class="addr ${cls}">${glyph}${hx(r.s)} – ${hx(r.e)}</span><span class="meta">${r.size}</span>`;
+      return `<div class="r">${label}${cov}</div>`;
+    }).join('');
+
+    const rows = hexRows(0x80040000, d==='C' ? 12 : 8, 0x80040100);
+    const hexText = rows.map(row => {
+      const gut = d==='B' ? `<span class="gut">${row.addr===0x80040100? '▸':' '}</span> ` : '';
+      return `${gut}<span class="a">${hx(row.addr)}</span>  ${row.hex}  |${row.ascii}|`;
+    }).join('\n');
+
+    if (d === 'C') {
+      // guided: slim ranges, big hex, single selection card (no dense right stack)
+      return `<div class="panes">`
+        + `<div class="pane" style="flex:0 0 150px"><div class="pane-title">Ranges</div><div class="ranges">${rangesRows}</div></div>`
+        + `<div class="pane" style="flex:1 1 auto"><div class="pane-title">Hex — 0x80040100</div><div class="hex scrollx">${hexText}</div></div>`
+        + `<div class="pane" style="flex:0 0 210px"><div class="pane-title">Selection</div>`
+          + `<dl class="kv"><dt>Symbol</dt><dd class="acc">InjTiming_Adv</dd><dt>Address</dt><dd>${hx(0x80040100)}</dd>`
+          + `<dt>In range</dt><dd class="ok">✓ 0x80040000–…</dd><dt>Status</dt><dd class="ok">memory-checked</dd></dl>`
+          + `<div class="noteline">Next: nothing to fix here.</div></div>`
+        + `</div>`;
+    }
+
+    const right = (d === 'B')
+      ? `<div class="pane" style="flex:0 0 200px"><div class="pane-title">At a glance</div>`
+        + `<div class="stat"><span class="lbl">Coverage</span><span class="val ok">86.4%</span></div>`
+        + `<div class="stat"><span class="lbl">Ranges</span><span class="val">4</span></div>`
+        + `<div class="stat"><span class="lbl">Errors</span><span class="val err">2</span></div>`
+        + `<div class="stat"><span class="lbl">Warnings</span><span class="val warn">2</span></div>`
+        + `<div class="stat"><span class="lbl">Bytes</span><span class="val">98 304</span></div>`
+        + `<div class="noteline">Entropy</div>`
+        + `<div class="spark">${Array.from({length:22},(_,i)=>`<i style="height:${20+18*Math.sin(i/2)+i}%"></i>`).join('')}</div></div>`
+      : `<div class="pane" style="flex:0 0 200px"><div class="pane-title">File</div>`
+        + `<dl class="kv"><dt>Format</dt><dd>S19 (S3)</dd><dt>Records</dt><dd>3 072</dd><dt>Ranges</dt><dd>4</dd><dt>MAC</dt><dd>6</dd><dt>A2L</dt><dd>6</dd></dl></div>`;
+
+    return `<div class="panes">`
+      + `<div class="pane" style="flex:0 0 210px"><div class="pane-title">Data sections</div><div class="ranges">${rangesRows}</div></div>`
+      + `<div class="pane" style="flex:1 1 auto"><div class="pane-title">Hex view</div><div class="hex scrollx">${hexText}</div></div>`
+      + right
+      + `</div>`;
+  }
+
+  function vA2L(d) {
+    if (d === 'C') {
+      // master-detail: narrow list + readable record card (kills the 16-col crush)
+      const list = A2L.map((t,i) => `<div class="li ${i===4?'sel':''}">`
+        + `<span class="glyph ${sevClass(t.sev)}">${sevGlyph(t.sev)}</span> ${esc(t.tag)}</div>`).join('');
+      const t = A2L[4];
+      const card = `<dl class="kv">`
+        + `<dt>Tag</dt><dd class="acc">${esc(t.tag)}</dd>`
+        + `<dt>Address</dt><dd>${hx(t.addr)}</dd><dt>Length</dt><dd>${t.len} B</dd>`
+        + `<dt>Source</dt><dd>${esc(t.src)}</dd><dt>Region</dt><dd class="err">${esc(t.region)} — name/addr mismatch</dd>`
+        + `<dt>Raw</dt><dd>${esc(t.raw)}</dd><dt>Physical</dt><dd>${esc(t.phys)} ${esc(t.unit)}</dd>`
+        + `<dt>Limits</dt><dd>${esc(t.lim)}</dd><dt>In memory</dt><dd class="ok">✓</dd>`
+        + `<dt>Bits / Endian</dt><dd>${t.bits} / ${esc(t.end)}</dd>`
+        + `<dt>Func</dt><dd>${esc(t.func)}</dd><dt>Access</dt><dd>${esc(t.acc)}</dd><dt>Dtype</dt><dd>${esc(t.dt)}</dd></dl>`;
+      return `<div class="panes">`
+        + `<div class="pane list-narrow" style="flex:0 0 210px"><div class="pane-title">Tags · 6</div>${list}</div>`
+        + `<div class="pane" style="flex:1 1 auto"><div class="pane-title">Record — ${esc(t.tag)}</div>${card}`
+          + `<div class="focuscard" style="margin-top:10px"><span class="lead">Mismatch.</span> A2L address disagrees with MAC. <span class="act">→ Open in Hex · Open in MAC</span></div></div>`
+        + `</div>`;
+    }
+
+    // A + B: table. B freezes Tag/Address and adds status glyphs + filter chips w/ counts.
+    const cols = ['Tag','Address','Len','Raw','Phys','InMem','Region','Unit','Bits','End','Func','Acc','Dtype'];
+    const chipRow = d==='B'
+      ? `<div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap">`
+        + `<span class="chip acc">all 6</span><span class="chip ok">✓ in-mem 4</span>`
+        + `<span class="chip neu">○ unchecked 1</span><span class="chip err">✗ error 1</span></div>`
+      : '';
+    const head = cols.map(c => `<th>${c}</th>`).join('');
+    const body = A2L.map((t,i) => {
+      const cls = sevClass(t.sev);
+      const g = d==='B' ? `<span class="${cls}">${sevGlyph(t.sev)}</span> ` : '';
+      const mem = d==='B' ? `<span class="${t.mem==='ok'?'ok':t.mem==='no'?'neu':'muted'}">${t.mem==='ok'?'✓':t.mem==='no'?'✗':'—'}</span>` : esc(t.mem);
+      return `<tr class="${cls} ${i===4?'row-sel':''}">`
+        + `<td>${g}${esc(t.tag)}</td><td>${hx(t.addr)}</td><td>${t.len}</td><td>${esc(t.raw)}</td><td>${esc(t.phys)}</td>`
+        + `<td>${mem}</td><td>${esc(t.region)}</td><td>${esc(t.unit)}</td><td>${t.bits}</td><td>${esc(t.end)}</td>`
+        + `<td>${esc(t.func)}</td><td>${esc(t.acc)}</td><td>${esc(t.dt)}</td></tr>`;
+    }).join('');
+    const note = d==='B' ? `<div class="noteline">Tag + Address freeze on horizontal scroll; 16 fields reachable →</div>` : '';
+    return `<div class="pane">${chipRow}<div class="scrollx"><table class="dt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>${note}</div>`;
+  }
+
+  function vMAC(d) {
+    if (d === 'C') {
+      const list = MAC.map((m,i) => `<div class="li ${i===4?'sel':''}">`
+        + `<span class="glyph ${sevClass(m.sev)}">${sevGlyph(m.sev)}</span> ${esc(m.tag)}</div>`).join('');
+      const m = MAC[4];
+      const card = `<dl class="kv">`
+        + `<dt>Tag</dt><dd class="acc">${esc(m.tag)}</dd><dt>Address</dt><dd>${hx(m.addr)}</dd>`
+        + `<dt>In A2L</dt><dd class="neu">${esc(m.ina2l)}</dd><dt>In memory</dt><dd class="neu">${esc(m.inmem)}</dd>`
+        + `<dt>Status</dt><dd class="oor">${esc(m.status)}</dd><dt>Source line</dt><dd>${m.line}</dd>`
+        + `<dt>A2L match</dt><dd>${esc(m.match)}</dd></dl>`;
+      return `<div class="panes">`
+        + `<div class="pane list-narrow" style="flex:0 0 190px"><div class="pane-title">Records · 6</div>${list}</div>`
+        + `<div class="pane" style="flex:1 1 auto"><div class="pane-title">Record — ${esc(m.tag)}</div>${card}`
+          + `<div class="focuscard" style="margin-top:10px;border-left-color:var(--sev-warn)">`
+          + `<span class="lead" style="color:var(--sev-warn)">Out of range.</span> `
+          + `${hx(m.addr)} is above the top S19 range (0x80057FFF). <span class="act">→ Open in Issues</span></div></div>`
+        + `</div>`;
+    }
+    const cols = ['Tag','Address','InA2L','InMem','Status','Line','ParseErr','A2LMatch'];
+    const head = cols.map(c=>`<th>${c}</th>`).join('');
+    const body = MAC.map(m => {
+      const cls = sevClass(m.sev);
+      const g = d==='B' ? `<span class="${cls}">${sevGlyph(m.sev)}</span> ` : '';
+      return `<tr class="${cls}"><td>${g}${esc(m.tag)}</td><td>${m.addr==null?'<span class="err">—</span>':hx(m.addr)}</td>`
+        + `<td>${esc(m.ina2l)}</td><td>${esc(m.inmem)}</td><td>${esc(m.status)}</td><td>${m.line}</td>`
+        + `<td>${esc(m.err)}</td><td>${esc(m.match)}</td></tr>`;
+    }).join('');
+    return `<div class="pane"><div class="scrollx"><table class="dt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`;
+  }
+
+  function vIssues(d) {
+    if (d === 'C') {
+      const order = ['err','warn','info'];
+      const sorted = [...ISSUES].sort((a,b)=>order.indexOf(a.sev)-order.indexOf(b.sev));
+      const cards = sorted.map(is => `<div class="wcard ${sevClass(is.sev)}">`
+        + `<div class="top"><span class="${sevClass(is.sev)}">${sevGlyph(is.sev)} ${is.sev.toUpperCase()}</span>`
+        + `<span class="code">${esc(is.code)}</span><span class="chip">${esc(is.art)}${is.rel!=='—'?' ↔ '+esc(is.rel):''}</span></div>`
+        + `<div class="msg">${esc(is.msg)}</div>`
+        + `<div class="acts"><a href="#">→ Open in ${esc(is.to)}</a>`
+        + `${is.sym!=='—'?`<a href="#">${esc(is.sym)}</a>`:''}<span class="muted">${is.addr!=null?hx(is.addr):''}</span></div></div>`).join('');
+      return `<div class="worklist">${cards}</div>`;
+    }
+    if (d === 'B') {
+      // grouped by severity with counts + hex peek pane
+      const groups = [['err','Errors','2'],['warn','Warnings','2'],['info','Info','1']];
+      const groupHtml = groups.map(([s,label,n]) => {
+        const rows = ISSUES.filter(i=>i.sev===s).map(is =>
+          `<tr class="${sevClass(s)}"><td>${esc(is.code)}</td><td>${esc(is.art)}</td><td>${esc(is.rel)}</td>`
+          + `<td>${esc(is.sym)}</td><td>${is.addr!=null?hx(is.addr):'—'}</td><td>${is.line}</td></tr>`).join('');
+        return `<div class="grouphdr">${sevGlyph(s)} ${label}<span class="countpill ${sevClass(s)}" style="border:1px solid var(--rule)">${n}</span></div>`
+          + `<table class="dt"><thead><tr><th>Code</th><th>Art</th><th>Rel</th><th>Symbol</th><th>Address</th><th>Line</th></tr></thead><tbody>${rows}</tbody></table>`;
+      }).join('');
+      const rows = hexRows(0x8FFF0000, 6, 0x8FFF0000).map(row=>`<span class="a">${hx(row.addr)}</span>  ${row.hex}`).join('\n');
+      return `<div class="panes"><div class="pane" style="flex:2 1 0">${groupHtml}</div>`
+        + `<div class="pane" style="flex:1 1 0"><div class="pane-title">Hex @ selected</div><div class="hex scrollx">${rows}</div></div></div>`;
+    }
+    // A: current 8-col table + hex pane
+    const cols = ['Sev','Code','Art','Rel','Symbol','Address','Line','Message'];
+    const head = cols.map(c=>`<th>${c}</th>`).join('');
+    const body = ISSUES.map(is => `<tr class="${sevClass(is.sev)}"><td>${sevGlyph(is.sev)}</td><td>${esc(is.code)}</td>`
+      + `<td>${esc(is.art)}</td><td>${esc(is.rel)}</td><td>${esc(is.sym)}</td><td>${is.addr!=null?hx(is.addr):'—'}</td>`
+      + `<td>${is.line}</td><td>${esc(is.msg)}</td></tr>`).join('');
+    const rows = hexRows(0x8FFF0000, 6, 0x8FFF0000).map(row=>`<span class="a">${hx(row.addr)}</span>  ${row.hex}`).join('\n');
+    return `<div class="panes"><div class="pane" style="flex:2 1 0"><div class="scrollx"><table class="dt"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></div>`
+      + `<div class="pane" style="flex:1 1 0"><div class="pane-title">Hex @ issue</div><div class="hex scrollx">${rows}</div></div></div>`;
+  }
+
+  const RENDER = { workspace:vWorkspace, a2l:vA2L, mac:vMAC, issues:vIssues };
+  const NOTES = {
+    workspace: {
+      A:'A — sev glyphs stay implicit (colour only), right pane is plain file facts. Lowest-risk polish.',
+      B:'B — coverage micro-bars per range, memory strip on top, right pane becomes a live stat + entropy sparkline.',
+      C:'C — hex gets the room; ranges shrink; right pane is one “what am I looking at / anything to fix” card.',
+    },
+    a2l: {
+      A:'A — the 16-col table, tightened, sev-coloured rows, sticky header. Familiar but still a horizontal crush.',
+      B:'B — freeze Tag+Address, glyph badges for in-mem/status, filter chips carry live counts.',
+      C:'C — master–detail: a scannable tag list + a readable record card. Kills the 16-column squeeze entirely.',
+    },
+    mac: {
+      A:'A — 8-col table, out-of-range in orange (as today).',
+      B:'B — status glyphs up front so OK/warn/oor read at a glance in a long list.',
+      C:'C — record card + an explicit callout for the out-of-range finding.',
+    },
+    issues: {
+      A:'A — the current flat 8-col table beside a hex peek pane.',
+      B:'B — grouped by severity with counts; table stays but scans by tier.',
+      C:'C — a worst-first worklist of cards: plain-language message + one-click “Open in …”. The “what’s wrong & what next” view.',
+    },
+  };
+
+  // ---------- render ----------
+  function render() {
+    const d = DIRECTIONS[dir].k;
+    document.getElementById('cmdbar').innerHTML = cmdbar();
+    document.getElementById('rail').innerHTML = rail();
+    let body = '';
+    if (d === 'B') body += memoryStrip();
+    if (d === 'C' && (view==='workspace' || view==='issues')) body += focusCard();
+    body += RENDER[view](d);
+    const vlabel = VIEWS.find(v=>v.k===view).label;
+    document.getElementById('main').innerHTML = `<div class="screen-title">${esc(vlabel)}</div>${body}`;
+    document.getElementById('statusbar').innerHTML =
+      `<span class="live">●</span> loaded prg.s19 · 3 072 records · 4 ranges &nbsp;|&nbsp; last: validate_artifact_consistency → 2 errors, 2 warnings`;
+    document.getElementById('noteline').textContent = NOTES[view][d];
+
+    // tabs
+    document.querySelectorAll('.proto-tab').forEach(t =>
+      t.setAttribute('aria-selected', String(t.dataset.view === view)));
+    // switcher
+    const cur = DIRECTIONS[dir];
+    document.getElementById('cur').innerHTML =
+      `<span class="vk">${cur.k}</span> — <span class="vn">${cur.name}</span><span class="vd">${esc(cur.desc)}</span>`;
+  }
+
+  // tabs
+  document.getElementById('tabs').innerHTML = VIEWS.map((v,i) =>
+    `<button class="proto-tab" data-view="${v.k}"><span class="k">${i+1}</span>${esc(v.label)}</button>`).join('');
+  document.getElementById('tabs').addEventListener('click', e => {
+    const b = e.target.closest('.proto-tab'); if (!b) return; view = b.dataset.view; render();
+  });
+  document.getElementById('rail').addEventListener('click', e => {
+    const it = e.target.closest('.rail-item[data-view]'); if (!it) return;
+    if (VIEWS.some(v=>v.k===it.dataset.view)) { view = it.dataset.view; render(); }
+  });
+  const cycle = n => { dir = (dir + n + DIRECTIONS.length) % DIRECTIONS.length; render(); };
+  document.getElementById('prev').addEventListener('click', () => cycle(-1));
+  document.getElementById('next').addEventListener('click', () => cycle(1));
+  document.addEventListener('keydown', e => {
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (e.key === 'ArrowLeft') cycle(-1);
+    else if (e.key === 'ArrowRight') cycle(1);
+    else if (['1','2','3','4'].includes(e.key)) { view = VIEWS[+e.key-1].k; render(); }
+  });
+
+  render();
+})();
+</script>

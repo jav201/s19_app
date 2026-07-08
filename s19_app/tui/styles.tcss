@@ -181,7 +181,25 @@ Screen {
  */
 #workspace_panes {
     layout: horizontal;
-    height: 100%;
+    height: 1fr;
+}
+
+/* batch-28 (R-TUI-042, US-040 / LLR-042.8): Workspace whole-image memory strip.
+ * A single-row band ABOVE `#workspace_panes` (which now takes the `1fr`
+ * remainder) spanning the workspace body width — it does NOT touch the fixed
+ * 22-col `#ws_left` budget. Bounded to one content row so `#ws_center`'s hex
+ * view still renders >= 1 row at 80x24 (C-13 geometry, batch-17 mode). Cells lay
+ * out horizontally; their `sev-*` class supplies the valid/invalid/gap colour. */
+#ws_memstrip {
+    height: 1;
+    width: 100%;
+    layout: horizontal;
+    margin-bottom: 1;
+}
+
+.strip-cell {
+    width: 1;
+    height: 1;
 }
 
 /* >= 120-column fixed-width regime (LLR-008.1). */
@@ -409,6 +427,19 @@ Screen {
     overflow: auto;
 }
 
+/* batch-28 (R-TUI-042, US-040 / LLR-042.9): Workspace stat pane. The stats
+ * block sits above the Context scroll in `#ws_right` as a content-height band;
+ * the Context ScrollableContainer takes the remaining height (`1fr`) so the
+ * stat pane never pushes the hex/context off-screen (C-13 geometry). */
+#ws_right #ws_stats {
+    height: auto;
+    padding-bottom: 1;
+}
+
+#ws_right #a2l_scroll {
+    height: 1fr;
+}
+
 #mac_scroll {
     height: 100%;
     overflow: auto;
@@ -416,6 +447,14 @@ Screen {
 
 #a2l_tags_list {
     height: 1fr;
+}
+
+/* A2L Explorer compact density (US-038, LLR-042.2). Mirrors the
+ * `#workspace_body.density-compact` precedent (base `.db-pane` padding: 1 ->
+ * 0 1). The class is a queryable density marker (AT-038b); the compact rows
+ * themselves come from the DataTable `cell_padding=0` set in `_compose_screen_a2l`. */
+#a2l_tags_pane.density-compact {
+    padding: 0 1;
 }
 
 #a2l_tags_summary {
@@ -726,9 +765,71 @@ Screen {
     height: 1fr;
 }
 
-#issues_columns #validation_issues_list {
+/* US-039: left slot holds the grouped-dense view (the SOLE visible Issues
+ * surface). The legacy DataTable is a stacked-but-hidden compatibility
+ * surface (see below), so the grouped panel fills the whole stack. */
+#issues_list_stack {
+    layout: vertical;
     width: 2fr;
     height: 100%;
+}
+
+#validation_issues_groups {
+    width: 100%;
+    height: 100%;
+    border: round $rule;
+}
+
+/* Hidden compatibility surface (batch-28 HIGH-fix). The legacy Issues
+ * DataTable stays MOUNTED + populated by ``update_validation_issues_view``
+ * (its monkeypatched unit tests + ``get_row_at`` model reads depend on it),
+ * but is removed from the visible layout so it is NOT rendered twice next to
+ * the GroupedIssuesPanel. The grouped panel is the sole visible Issues surface;
+ * full retirement of this DataTable is a backlog item. */
+#issues_columns #validation_issues_list {
+    display: none;
+}
+
+/* US-039 grouped-dense rows: a bold per-severity group header, then compact
+ * issue rows each carrying a fixed-width code chip beside the detail span.
+ * Severity colour comes from the frozen `sev-*` classes (color_policy) applied
+ * on the header / chip / row — no hex is set here. */
+.issue-group-header {
+    width: 100%;
+    height: auto;
+    text-style: bold;
+    padding: 1 1 0 1;
+}
+
+.issue-row {
+    layout: horizontal;
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
+.issue-row:focus {
+    text-style: reverse;
+}
+
+.issue-code-chip {
+    width: auto;
+    min-width: 16;
+    height: auto;
+    text-style: bold;
+    margin-right: 1;
+}
+
+.issue-detail {
+    width: 1fr;
+    height: auto;
+}
+
+.issues-empty-note,
+.issues-truncation-note {
+    width: 100%;
+    height: auto;
+    padding: 1;
 }
 
 #issues_hex_pane {
@@ -1038,7 +1139,7 @@ ModalScreen {
     height: 1fr;
 }
 
-#files_title, #sections_title, #hex_title, #a2l_title, #a2l_tags_title, #alt_hex_title, #alt_actions_title {
+#files_title, #sections_title, #hex_title, #a2l_title, #ws_stats_title, #a2l_tags_title, #alt_hex_title, #alt_actions_title {
     text-align: center;
     width: 100%;
     background: $accent-calm;
