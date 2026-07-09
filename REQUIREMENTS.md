@@ -645,6 +645,23 @@ would silently read an empty internal buffer. The Load `Input` must remain
 a subclass of `textual.widgets.Input` so widget queries filtered by
 `Input` continue to find it.
 
+The OS-clipboard read must degrade gracefully through a **layered
+cascade**: (1) `tkinter.Tk().clipboard_get()` — Python stdlib default;
+(2) `ctypes` against the Win32 clipboard API (`OpenClipboard(NULL)` /
+`GetClipboardData(CF_UNICODETEXT)`) — bypasses the Tcl interpreter and
+its window-manager expectations; (3) `subprocess` shelling out to
+`powershell.exe Get-Clipboard -Raw` — a fresh process, immune to any
+in-process clipboard grab state, present on every Windows install (does
+not require `wt` / Windows Terminal / `pwsh`). The cascade must stop at
+the first layer that returns non-`None`; the happy path pays no
+fallback cost. Total wall-clock budget across the cascade stays under
+one second (150 ms tk + 100 ms ctypes + 500 ms powershell). On total
+cascade failure, `action_paste` falls back to `App.clipboard` (the
+Textual in-process buffer) and, if that is also empty, surfaces
+`app.notify(..., severity="warning")` telling the user to use
+Ctrl+Shift+V or type the path manually — the paste must never be a
+silent no-op and must never corrupt the `Input` value.
+
 - Code: `s19_app/tui/screens.py` (`LoadFileScreen.AUTO_FOCUS`, use of
   `OsClipboardInput` for `#load_path`), `s19_app/tui/os_clipboard_input.py`
   (`OsClipboardInput`, `read_os_clipboard`)

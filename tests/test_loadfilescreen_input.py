@@ -292,3 +292,247 @@ def test_os_clipboard_input_is_input_subclass() -> None:
         "OsClipboardInput must subclass Input so widget queries "
         "targeting Input still find it."
     )
+
+
+# ---------------------------------------------------------------------------
+# R-TUI-043-g/h/i/j — Layered clipboard cascade (tkinter → ctypes → PowerShell).
+#
+# The cascade guarantees that a single layer's failure mode (Tcl grab race,
+# antivirus lock, PowerShell missing) does not silently break Ctrl+V. Each
+# test below exercises the cascade at the ``read_os_clipboard`` level with
+# fake strategy callables so nothing depends on the real OS clipboard.
+# ---------------------------------------------------------------------------
+
+
+def test_read_os_clipboard_happy_path_uses_only_first_strategy() -> None:
+    """R-TUI-043-g: on happy path, ONLY the first strategy is invoked.
+
+    Perf sanity: we do not pay the cost of the fallback layers when the
+    primary layer returns text. Guards against a refactor that
+    accidentally invokes every layer every time.
+    """
+    from s19_app.tui.os_clipboard_input import read_os_clipboard
+
+    calls: list[str] = []
+
+    def tk_ok() -> str:
+        calls.append("tk")
+        return "TK_TEXT"
+
+    def ctypes_boom() -> str:
+        calls.append("ctypes")
+        raise RuntimeError("must-not-be-called on happy path")
+
+    def ps_boom() -> str:
+        calls.append("ps")
+        raise RuntimeError("must-not-be-called on happy path")
+
+    result = read_os_clipboard(
+        strategies=(("tkinter", tk_ok), ("ctypes-win32", ctypes_boom), ("powershell", ps_boom))
+    )
+    assert result == "TK_TEXT"
+    assert calls == ["tk"], f"Only the first strategy should run; got {calls}"
+
+
+def test_read_os_clipboard_cascades_tk_fail_to_ctypes() -> None:
+    """R-TUI-043-h: when tkinter returns None, the cascade tries ctypes next."""
+    from s19_app.tui.os_clipboard_input import read_os_clipboard
+
+    calls: list[str] = []
+    result = read_os_clipboard(
+        strategies=(
+            ("tkinter", lambda: (calls.append("tk") or None)),
+            ("ctypes-win32", lambda: (calls.append("ct") or "CTYPES_TEXT")),
+            ("powershell", lambda: (calls.append("ps") or "PS_TEXT")),
+        )
+    )
+    assert result == "CTYPES_TEXT"
+    assert calls == ["tk", "ct"], (
+        f"Cascade should stop at the first non-None; got calls={calls}"
+    )
+
+
+def test_read_os_clipboard_cascades_tk_and_ctypes_fail_to_powershell() -> None:
+    """R-TUI-043-i: when tk AND ctypes fail, PowerShell is the last resort."""
+    from s19_app.tui.os_clipboard_input import read_os_clipboard
+
+    calls: list[str] = []
+    result = read_os_clipboard(
+        strategies=(
+            ("tkinter", lambda: (calls.append("tk") or None)),
+            ("ctypes-win32", lambda: (calls.append("ct") or None)),
+            ("powershell", lambda: (calls.append("ps") or "PS_RESCUE")),
+        )
+    )
+    assert result == "PS_RESCUE"
+    assert calls == ["tk", "ct", "ps"], (
+        f"All three layers must be tried in order; got calls={calls}"
+    )
+
+
+def test_read_os_clipboard_returns_none_when_all_layers_fail() -> None:
+    """R-TUI-043-j: total cascade failure yields ``None`` (never raises)."""
+    from s19_app.tui.os_clipboard_input import read_os_clipboard
+
+    result = read_os_clipboard(
+        strategies=(
+            ("tkinter", lambda: None),
+            ("ctypes-win32", lambda: None),
+            ("powershell", lambda: None),
+        )
+    )
+    assert result is None
+
+
+def test_read_os_clipboard_swallows_strategy_exceptions() -> None:
+    """R-TUI-043-k: a strategy that raises must NOT propagate; cascade continues."""
+    from s19_app.tui.os_clipboard_input import read_os_clipboard
+
+    def boom() -> str:
+        raise TimeoutError("subprocess timeout")
+
+    result = read_os_clipboard(
+        strategies=(
+            ("tkinter", lambda: None),
+            ("ctypes-win32", boom),
+            ("powershell", lambda: "PS_AFTER_BOOM"),
+        )
+    )
+    assert result == "PS_AFTER_BOOM"
+
+
+def test_ctrl_v_notifies_user_when_every_clipboard_source_is_empty(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-TUI-043-l: on total clipboard failure, the user gets a warning notification.
+
+    Without this the paste is a silent no-op and the user has no idea why
+    Ctrl+V did nothing.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    # Force the OS clipboard cascade to return None so we hit the empty
+    # internal-fallback branch.
+    monkeypatch.setattr(os_clip_mod, "read_os_clipboard", lambda: None)
+
+    notifications: list[tuple[str, str]] = []
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        app._clipboard = ""  # internal clipboard also empty
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.push_screen(LoadFileScreen())
+            for _ in range(6):
+                await pilot.pause()
+            # Patch notify to record the call instead of routing to the
+            # real notification widget (which does not exist in this
+            # headless test context in some Textual builds).
+            original_notify = app.notify
+
+            def _capture(msg: str, *, severity: str = "information", **kwargs) -> None:  # type: ignore[no-redef]
+                notifications.append((severity, msg))
+                # Also drive the real notify to catch any exceptions.
+                try:
+                    original_notify(msg, severity=severity, **kwargs)
+                except Exception:
+                    pass
+
+            app.notify = _capture  # type: ignore[method-assign]
+
+            input_widget = app.screen.query_one("#load_path", Input)
+            input_widget.value = "initial"  # sanity: paste must not corrupt
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            return input_widget.value
+
+    value_after = asyncio.run(_drive())
+    assert value_after == "initial", (
+        f"Failed paste must not corrupt the Input value; got {value_after!r}"
+    )
+    assert any(sev == "warning" and "clipboard" in msg.lower() for sev, msg in notifications), (
+        f"Expected a warning notification about clipboard; got {notifications!r}"
+    )
+
+
+def test_powershell_layer_does_not_require_wt_or_windows_terminal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """R-TUI-043-m: the PowerShell fallback must invoke ``powershell.exe`` only.
+
+    On a machine without Windows Terminal (``wt``) or the more modern
+    ``pwsh``, the fallback must still work because ``powershell.exe``
+    ships with every Windows install. We inspect the argv the layer
+    would use rather than actually executing.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    captured: dict[str, list[str]] = {}
+
+    class _FakeResult:
+        returncode = 0
+        stdout = "PS_CLIPBOARD_TEXT\r\n"
+        stderr = ""
+
+    def _fake_run(argv, **kwargs) -> _FakeResult:  # type: ignore[no-untyped-def]
+        captured["argv"] = list(argv)
+        captured["kwargs"] = list(kwargs.keys())
+        return _FakeResult()
+
+    monkeypatch.setattr(os_clip_mod.subprocess, "run", _fake_run)
+    monkeypatch.setattr(os_clip_mod.sys, "platform", "win32")
+
+    text = os_clip_mod._read_via_powershell()
+    assert text == "PS_CLIPBOARD_TEXT"
+    assert captured["argv"][0] == "powershell", (
+        f"PowerShell layer must invoke `powershell` (not `wt` or `pwsh`); "
+        f"got {captured['argv']!r}"
+    )
+    assert "timeout" in captured["kwargs"], (
+        "PowerShell layer must set a timeout to prevent hangs"
+    )
+
+
+def test_powershell_layer_returns_none_on_non_windows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """R-TUI-043-n: the PowerShell layer is a no-op on non-Windows platforms."""
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    monkeypatch.setattr(os_clip_mod.sys, "platform", "linux")
+
+    called: list[bool] = []
+
+    def _should_not_run(*args, **kwargs):  # type: ignore[no-untyped-def]
+        called.append(True)
+        raise RuntimeError("must not spawn powershell on non-Windows")
+
+    monkeypatch.setattr(os_clip_mod.subprocess, "run", _should_not_run)
+    assert os_clip_mod._read_via_powershell() is None
+    assert called == []
+
+
+def test_ctypes_layer_returns_none_on_non_windows(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """R-TUI-043-o: the ctypes-Win32 layer is a no-op on non-Windows platforms."""
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    monkeypatch.setattr(os_clip_mod.sys, "platform", "linux")
+    assert os_clip_mod._read_via_ctypes() is None
+
+
+def test_notification_message_mentions_ctrl_shift_v_workaround(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-TUI-043-p: the failure notification points the user at Ctrl+Shift+V.
+
+    The whole point of the notification is to route the user to the
+    OS-level workaround. If the message stops mentioning it, the fix is
+    half-useless.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    assert "Ctrl+Shift+V" in os_clip_mod._PASTE_FAIL_NOTIFICATION, (
+        "Failure notification must document the WT-level paste shortcut"
+    )
