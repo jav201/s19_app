@@ -3,8 +3,9 @@ LLR-037.4 no-MAC validation-report retention fix (B-1a).
 
 Layer B gates (AT-036a/b/c) drive the SHIPPED load chain under Textual Pilot —
 sync ``asyncio.run`` wrappers because pytest-asyncio is not installed (idiom:
-``tests/test_tui_patch_layout.py``) — and observe only the rendered
-``#a2l_tags_list`` / ``#validation_issues_list`` DataTables. Row styles are
+``tests/test_tui_patch_layout.py``) — and observe the rendered ``#a2l_tags_list``
+DataTable (colour oracle, untouched) plus the grouped ``IssueRow`` issue
+read-back (C-14 migration: the retired ``#validation_issues_list``). Row styles are
 asserted against ``_severity_style(ValidationSeverity.ERROR)`` (semantic
 colour-policy anchor; no raw ``"red"`` literal, QR-1). Fixtures are
 deliberately MAC-LESS: pre-fix ``update_mac_view`` wiped ``_validation_issues``
@@ -38,10 +39,9 @@ from s19_app.validation import ValidationIssue, ValidationSeverity
 
 SUPPLEMENTAL_CODE = "A2L_TAG_SCHEMA_INCOMPLETE"
 
-# Issue-row cell layout per ``precompute_issue_datatable_payload`` /
-# ``update_validation_issues_view`` fallback:
-# (severity, code, artifact, related, symbol, address, line, message)
-_SEV, _CODE, _SYMBOL, _MESSAGE = 0, 1, 4, 7
+# Grouped ``IssueRow.issue`` read-back layout (C-14 migration):
+# (severity, code, artifact, symbol, message)
+_SEV, _CODE, _SYMBOL, _MESSAGE = 0, 1, 3, 4
 
 
 # ---------------------------------------------------------------------------
@@ -171,14 +171,38 @@ def _a2l_row_list(app: S19TuiApp) -> list[tuple[str, tuple]]:
     return rows
 
 
-def _issue_rows(app: S19TuiApp) -> list[tuple[str, ...]]:
-    """Rendered ``#validation_issues_list`` rows as plain-string cell tuples
-    (read-back idiom: tests/test_tui_app.py::_query_issues_panel_codes)."""
-    table = app.query_one("#validation_issues_list", DataTable)
+def _issue_rows(app: S19TuiApp) -> list[tuple]:
+    """Grouped-panel issue read-back (C-14 migration): the ``ValidationIssue``
+    each mounted ``IssueRow`` carries, as ``(severity, code, artifact, symbol,
+    message)`` tuples. Replaces the retired ``#validation_issues_list``
+    DataTable read; reading the issue object (not rendered cells) keeps the
+    ``_SEV`` comparison on the ``ValidationSeverity`` enum (stronger typing)."""
+    from s19_app.tui.issues_view import IssueRow
+
     return [
-        tuple(str(cell) for cell in table.get_row_at(index))
-        for index in range(table.row_count)
+        (
+            row.issue.severity,
+            row.issue.code,
+            row.issue.artifact,
+            row.issue.symbol,
+            row.issue.message,
+        )
+        for row in app.query(IssueRow)
     ]
+
+
+def _assert_within_cap(app: S19TuiApp) -> None:
+    """C-14 count-guard (v2): ``GroupedIssuesPanel`` caps mounted rows at
+    ``_GROUP_DISPLAY_MAX`` regardless of ``page_size``, so a whole-list count
+    or absence claim over ``query(IssueRow)`` is faithful only when the whole
+    filtered list fits under the cap. These fixtures emit small issue sets;
+    this pins that so a future larger fixture cannot satisfy a claim vacuously."""
+    from s19_app.tui.issues_view import _GROUP_DISPLAY_MAX
+
+    assert len(app._filtered_validation_issues()) <= _GROUP_DISPLAY_MAX, (
+        "fixture exceeds the grouped-panel row cap; the capped IssueRow read "
+        "would no longer equal the whole filtered list"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -214,6 +238,10 @@ def test_at_036a_missing_schema_red_row_has_matching_error_issue(tmp_path: Path)
         # Observable 2 — Issues surface (rail screen 5) carries the matching ERRORs.
         app.action_show_screen("issues")
         await pilot.pause()
+        # C-14 count-guard: whole filtered list fits under the row cap, so the
+        # capped IssueRow read equals the whole list (existence + absence claims
+        # below are then faithful).
+        _assert_within_cap(app)
         issue_rows = _issue_rows(app)
         supplemental = [row for row in issue_rows if row[_CODE] == SUPPLEMENTAL_CODE]
         broken = [row for row in supplemental if row[_SYMBOL] == "BROKEN_CHAR"]
@@ -223,7 +251,7 @@ def test_at_036a_missing_schema_red_row_has_matching_error_issue(tmp_path: Path)
             f"(red row without an issue — the HLR-036 divergence). "
             f"Rendered issue rows: {issue_rows!r}"
         )
-        assert broken[0][_SEV] == ValidationSeverity.ERROR.value.upper()
+        assert broken[0][_SEV] == ValidationSeverity.ERROR
         assert "missing address/length" in broken[0][_MESSAGE]
         assert nolen, (
             f"missing-length arm produced no {SUPPLEMENTAL_CODE} issue; "
@@ -256,12 +284,15 @@ def test_at_036b_already_covered_symbol_gains_no_second_error(tmp_path: Path) ->
             )
         app.action_show_screen("issues")
         await pilot.pause()
+        # C-14 count-guard: whole filtered list fits under the row cap, so the
+        # "exactly one ERROR" and dedup-absence claims below are faithful.
+        _assert_within_cap(app)
         issue_rows = _issue_rows(app)
         dup_errors = [
             row
             for row in issue_rows
             if row[_SYMBOL].casefold() == "dup_rpm"
-            and row[_SEV] == ValidationSeverity.ERROR.value.upper()
+            and row[_SEV] == ValidationSeverity.ERROR
         ]
         assert len(dup_errors) == 1, (
             f"expected exactly ONE ERROR for DUP_RPM (dedup, LLR-036.2); "
@@ -296,6 +327,9 @@ def test_at_036c_clean_a2l_yields_zero_supplemental_issues(tmp_path: Path) -> No
             )
         app.action_show_screen("issues")
         await pilot.pause()
+        # C-14 count-guard: whole filtered list fits under the row cap, so the
+        # absence claim below is faithful (not vacuous under the row cap).
+        _assert_within_cap(app)
         issue_rows = _issue_rows(app)
         assert not any(row[_CODE] == SUPPLEMENTAL_CODE for row in issue_rows), (
             f"clean A2L produced supplemental issues: {issue_rows!r}"
@@ -313,6 +347,9 @@ def test_at_036c_empty_tag_set_yields_zero_supplemental_issues(tmp_path: Path) -
         assert a2l_table.row_count == 0, "zero-tag A2L must render no tag rows"
         app.action_show_screen("issues")
         await pilot.pause()
+        # C-14 count-guard (test_at_036c: absence claim, no "exactly one" — the
+        # guard is still required so the row cap cannot make it vacuous).
+        _assert_within_cap(app)
         issue_rows = _issue_rows(app)
         assert not any(row[_CODE] == SUPPLEMENTAL_CODE for row in issue_rows), (
             f"zero-tag A2L produced supplemental issues: {issue_rows!r}"

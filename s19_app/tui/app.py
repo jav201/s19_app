@@ -936,7 +936,6 @@ class S19TuiApp(App):
         # Per-DataTable maps from visible row_key back to the underlying record so
         # the shared ``on_data_table_row_selected`` handler can jump correctly.
         self._mac_row_key_to_address: dict[str, int] = {}
-        self._issue_row_key_to_index: dict[str, int] = {}
         self._a2l_row_key_to_tag: dict[str, dict[str, Any]] = {}
         self._hex_window_start: int = 0
         # First-visible row-base address caches for the alt / mac hex panes,
@@ -1426,8 +1425,8 @@ class S19TuiApp(App):
         """
         Summary:
             Build the Direction B Issues Report rail screen (``#screen_issues``)
-            as a dedicated full screen carrying the validation Issues
-            ``DataTable``, its severity filter row and the summary line —
+            as a dedicated full screen carrying the grouped validation Issues
+            panel, its severity filter row and the summary line —
             promoted out of the old Workspace Status tile (LLR-011.1).
 
         Args:
@@ -1436,16 +1435,15 @@ class S19TuiApp(App):
         Returns:
             Container: ``#screen_issues`` holding the filter row
             (``#validation_issues_filters``), an ``#issues_columns`` horizontal
-            split whose left ``#issues_list_stack`` stacks the grouped-dense
-            ``GroupedIssuesPanel`` (``#validation_issues_groups``, the US-039
-            primary view) above the retained Issues ``DataTable``
-            (``#validation_issues_list``), beside a hex pane
+            split whose left ``#issues_list_stack`` holds the grouped-dense
+            ``GroupedIssuesPanel`` (``#validation_issues_groups``, the sole
+            Issues surface since batch-29), beside a hex pane
             (``#issues_hex_pane``, US-020a), the ``#validation_issues_summary``
             label and an ``EmptyStatePanel``. Hidden at startup.
 
         Data Flow:
-            - Lifts the ``#validation_issues_filters`` / ``#validation_issues_list``
-              / ``#validation_issues_summary`` subtree intact out of the
+            - Lifts the ``#validation_issues_filters`` /
+              ``#validation_issues_summary`` subtree intact out of the
               former hidden ``#workspace_carryover`` container; every id
               ``update_validation_issues_view``, the ``issues_filter_*``
               button handlers and ``action_validation_issues_page_*`` query
@@ -1472,18 +1470,6 @@ class S19TuiApp(App):
             Container(
                 Container(
                     GroupedIssuesPanel(id="validation_issues_groups"),
-                    # Hidden compatibility surface (batch-28 HIGH-fix): the
-                    # GroupedIssuesPanel above is the sole VISIBLE Issues view.
-                    # This DataTable stays mounted + populated by
-                    # ``update_validation_issues_view`` (its monkeypatched unit
-                    # tests + ``get_row_at`` reads depend on it) but is
-                    # ``display: none`` in styles.tcss so issues aren't rendered
-                    # twice. Full retirement of the table is a backlog item.
-                    DataTable(
-                        id="validation_issues_list",
-                        zebra_stripes=True,
-                        cursor_type="row",
-                    ),
                     id="issues_list_stack",
                 ),
                 Static("", id="issues_hex_pane", markup=False),
@@ -3297,21 +3283,6 @@ class S19TuiApp(App):
                 )
         except Exception:
             self.logger.debug("MAC DataTable columns already initialized or missing.")
-        try:
-            issues_table = self.query_one("#validation_issues_list", DataTable)
-            if not issues_table.columns:
-                issues_table.add_columns(
-                    "Severity",
-                    "Code",
-                    "Artifact",
-                    "Related",
-                    "Symbol",
-                    "Address",
-                    "Line",
-                    "Message",
-                )
-        except Exception:
-            self.logger.debug("Issues DataTable columns already initialized or missing.")
         try:
             a2l_table = self.query_one("#a2l_tags_list", DataTable)
             if not a2l_table.columns:
@@ -5236,9 +5207,9 @@ class S19TuiApp(App):
             ):
                 self._apply_viewer_setting(payload[0], payload[1])
             return
-        # ``mac_records_list``, ``validation_issues_list``, and ``a2l_tags_list`` are
-        # now ``DataTable`` widgets; selection for those IDs arrives via
-        # ``on_data_table_row_selected`` instead of this ListView handler.
+        # ``mac_records_list`` and ``a2l_tags_list`` are ``DataTable`` widgets;
+        # selection for those IDs arrives via ``on_data_table_row_selected``
+        # instead of this ListView handler.
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         """
@@ -5256,13 +5227,14 @@ class S19TuiApp(App):
         Data Flow:
             - Pull the table id from ``event.data_table`` and the row_key value.
             - MAC rows -> ``_jump_to_mac_address`` via the ``_mac_row_key_to_address`` map.
-            - Issue rows -> ``_jump_to_validation_issue_by_index`` via the filtered list.
             - A2L rows -> ``_jump_to_tag_by_data`` via the ``_a2l_row_key_to_tag`` map.
+            - Issues rows are NOT dispatched here: since batch-29 the Issues
+              surface is the ``GroupedIssuesPanel`` whose ``IssueRow.Selected``
+              message is handled by ``on_issue_row_selected`` (no DataTable).
 
         Dependencies:
             Uses:
                 - ``_jump_to_mac_address``
-                - ``_jump_to_validation_issue_by_index``
                 - ``_jump_to_tag_by_data``
             Used by:
                 - Textual event dispatch for ``DataTable.RowSelected``
@@ -5277,11 +5249,6 @@ class S19TuiApp(App):
             address = self._mac_row_key_to_address.get(key_value)
             if isinstance(address, int):
                 self._jump_to_mac_address(address)
-            return
-        if table_id == "validation_issues_list":
-            absolute_index = self._issue_row_key_to_index.get(key_value)
-            if isinstance(absolute_index, int):
-                self._jump_to_validation_issue_by_index(absolute_index)
             return
         if table_id == "a2l_tags_list":
             tag = self._a2l_row_key_to_tag.get(key_value)
@@ -5593,29 +5560,6 @@ class S19TuiApp(App):
         )
         self._jump_to_validation_issue_object(issue_stub)
 
-    def _jump_to_validation_issue_by_index(self, absolute_index: int) -> None:
-        """
-        Summary:
-            Look up a validation issue by its absolute index in the current filtered
-            list and jump to its hex/tag context.
-
-        Args:
-            absolute_index (int): Index into ``_filtered_validation_issues()`` result.
-
-        Returns:
-            None
-
-        Dependencies:
-            Uses:
-                - ``_filtered_validation_issues``
-                - ``_jump_to_validation_issue_object``
-            Used by:
-                - ``on_data_table_row_selected`` for the Issues DataTable
-        """
-        filtered = self._filtered_validation_issues()
-        if 0 <= absolute_index < len(filtered):
-            self._jump_to_validation_issue_object(filtered[absolute_index])
-
     def _update_issues_hex_pane(self, address: Optional[int]) -> None:
         """Render the selected issue's address bytes in ``#issues_hex_pane`` (US-020a).
 
@@ -5685,8 +5629,7 @@ class S19TuiApp(App):
                 - ``_focus_a2l_tag_absolute_index``
                 - ``set_status``
             Used by:
-                - ``_jump_to_validation_issue_by_index``
-                - ``_jump_to_validation_issue`` (legacy adapter)
+                - ``_jump_to_validation_issue`` (legacy ListView adapter)
         """
         address = issue.address
         # US-020a: every issue selection refreshes the on-screen Issues hex pane
@@ -5747,8 +5690,9 @@ class S19TuiApp(App):
     def update_validation_issues_view(self) -> None:
         """
         Summary:
-            Render a paged window of validation issues into the Issues ``DataTable``
-            and push aggregate totals into the adjacent summary ``Label``.
+            Compute the aggregate validation-issue counts + paging summary line,
+            push them into the ``#validation_issues_summary`` ``Label``, and
+            render the grouped Issues view via ``_render_validation_issues_groups``.
 
         Args:
             None
@@ -5758,28 +5702,25 @@ class S19TuiApp(App):
 
         Data Flow:
             - Resolve the filtered list via ``_filtered_validation_issues``.
-            - Short-circuit with a summary-only message when there are no issues.
+            - Short-circuit with a summary-only message when there are no issues
+              (still re-rendering the grouped panel so it clears).
             - Compute aggregate counts (errors/warnings/info) and a page-number line.
-            - Use worker-precomputed cell rows/styles when the filter is ``all``, else
-              format the filtered subset on the fly (cheap, already filtered down).
-            - Insert the page rows via ``DataTable.add_row`` with row_keys of the form
-              ``issue:<absolute_index>`` so ``on_data_table_row_selected`` can jump.
+            - Render the current paging window through
+              ``_render_validation_issues_groups`` — the sole Issues surface
+              since batch-29 retired the legacy Issues DataTable.
 
         Dependencies:
             Uses:
                 - ``_filtered_validation_issues``
                 - ``_clamp_viewer_page_size`` / ``_get_window_bounds``
-                - ``precompute_issue_datatable_payload`` (fallback)
+                - ``_render_validation_issues_groups``
             Used by:
                 - ``_apply_prepared_load`` (post-load refresh)
                 - ``update_mac_view`` (when MAC/validation input changes)
                 - issue filter buttons and paging actions
         """
         populate_started = time.perf_counter()
-        issue_table = self.query_one("#validation_issues_list", DataTable)
         summary_label = self.query_one("#validation_issues_summary", Label)
-        self._issue_row_key_to_index = {}
-        issue_table.clear(columns=False)
         filtered = self._filtered_validation_issues()
         if not filtered:
             summary_label.update("No validation issues.")
@@ -5812,28 +5753,10 @@ class S19TuiApp(App):
             ]
         )
         summary_label.update(summary_text)
-        use_precomputed = (
-            self.validation_issue_filter_mode == "all"
-            and len(self._validation_issue_cell_rows) == len(self._validation_issues)
-        )
-        if use_precomputed:
-            cell_rows = self._validation_issue_cell_rows
-            styles = self._validation_issue_cell_styles
-            index_base = start
-            visible_rows = cell_rows[start:end]
-            visible_styles = styles[start:end]
-            visible_issues = filtered[start:end]
-        else:
-            visible_issues = filtered[start:end]
-            visible_rows, visible_styles = precompute_issue_datatable_payload(visible_issues)
-            index_base = start
-        self._populate_issues_datatable(
-            issue_table, visible_rows, visible_styles, visible_issues, index_base
-        )
         self._render_validation_issues_groups()
         self.logger.info(
             "Load phase boundary: populate_issues_table_done rows=%d total=%d elapsed=%.3f",
-            len(visible_rows),
+            end - start,
             total,
             time.perf_counter() - populate_started,
         )
@@ -5843,9 +5766,9 @@ class S19TuiApp(App):
         """
         Summary:
             Render the grouped-by-severity dense Issues view
-            (``#validation_issues_groups``) from the same filtered list +
-            paging window the ``DataTable`` uses, so the two surfaces stay in
-            lock-step (US-039 / LLR-042.3/.4/.6). Groups render in error →
+            (``#validation_issues_groups``) — the sole Issues surface since
+            batch-29 — from the current filtered list + paging window
+            (US-039 / LLR-042.3/.4/.6). Groups render in error →
             warning → info order; each group-header count is the whole
             (filtered) list count for that severity, while only the current
             bounded paging window of rows is mounted — a hostile large-N issue
@@ -5859,8 +5782,7 @@ class S19TuiApp(App):
 
         Data Flow:
             - No mounted screen (headless / monkeypatched unit call) or no
-              grouped panel present → no-op (keeps the ``DataTable``-only unit
-              tests unaffected).
+              grouped panel present → no-op.
             - Else resolve the filtered list, reuse ``_get_window_bounds`` /
               ``page_size`` for the window, tally per-severity whole-filtered
               counts, and hand them to ``GroupedIssuesPanel.render_groups``.
@@ -5924,52 +5846,6 @@ class S19TuiApp(App):
                 - Textual message dispatch (from ``IssueRow``)
         """
         self._update_issues_hex_pane(event.address)
-
-    def _populate_issues_datatable(
-        self,
-        issue_table: "DataTable",
-        visible_rows: list[tuple[str, ...]],
-        visible_styles: list[str],
-        visible_issues: list[ValidationIssue],
-        index_base: int,
-    ) -> None:
-        """
-        Summary:
-            Insert a page of issue rows into the Issues ``DataTable`` using Rich
-            ``Text`` cells styled by severity, and record the row_key -> filtered
-            index map that ``on_data_table_row_selected`` consumes.
-
-        Args:
-            issue_table (DataTable): Target issues table.
-            visible_rows (list[tuple[str, ...]]): Pre-formatted 8-tuple cells.
-            visible_styles (list[str]): Per-row Rich style strings.
-            visible_issues (list[ValidationIssue]): Parallel issue objects (for jump).
-            index_base (int): Absolute index of the first visible row for row_keys.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Build styled ``Text`` cells so severity color applies to every column.
-            - Emit a unique row_key per row (``issue:<index>``).
-            - Call ``DataTable.add_row`` per row; O(1) dict insert per row (no mount).
-            - Remember the filtered-list index on ``_issue_row_key_to_index``.
-
-        Dependencies:
-            Used by:
-                - ``update_validation_issues_view``
-        """
-        for i, row in enumerate(visible_rows):
-            style = visible_styles[i] if i < len(visible_styles) else ""
-            rich_cells = tuple(Text(str(cell), style=style) if style else Text(str(cell)) for cell in row)
-            absolute_index = index_base + i
-            row_key = f"issue:{absolute_index}"
-            if i < len(visible_issues):
-                self._issue_row_key_to_index[row_key] = absolute_index
-            try:
-                issue_table.add_row(*rich_cells, key=row_key)
-            except Exception:
-                issue_table.add_row(*rich_cells)
 
     def action_validation_issues_page_next(self) -> None:
         """Advance the validation-issues viewer window by one configured page."""

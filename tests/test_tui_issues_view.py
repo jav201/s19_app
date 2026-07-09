@@ -8,7 +8,7 @@ prior selection (no stale render).
 AT-020a drives the SHIPPED VISIBLE surface — `action_show_screen("issues")` then
 a real grouped-panel `IssueRow` selection (focus + Enter -> `IssueRow.on_key` ->
 `IssueRow.Selected` -> `on_issue_row_selected` -> `_update_issues_hex_pane`; the
-legacy DataTable is now `display: none`) — and asserts the pane CONTENT (the
+legacy DataTable is retired since batch-29) — and asserts the pane CONTENT (the
 address row + a
 known byte for the addressed issue; the exact placeholder for the address-less
 one, with the prior bytes gone). It is value-discriminating: a blank/stale pane
@@ -24,7 +24,8 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from textual.widgets import DataTable, Static
+from rich.text import Text
+from textual.widgets import Static
 
 from s19_app.core import S19File
 from s19_app.tui.app import S19TuiApp, precompute_issue_datatable_payload
@@ -96,14 +97,12 @@ async def _select_issue_row(app: S19TuiApp, pilot, row: int) -> str:
     """Select issue ``row`` through the real grouped-panel ``IssueRow`` and
     return the hex pane text.
 
-    Drives the shipped VISIBLE surface (batch-28 HIGH-fix): the legacy
-    ``#validation_issues_list`` DataTable is now ``display: none``, so
-    ``.focus()`` on it is a no-op. Selection instead goes through the
-    grouped ``GroupedIssuesPanel`` — focus the real ``IssueRow`` and press
-    Enter (the C-16 real-mechanism path shared with AT-039c). Grouped render
-    order is error→warning→info, so for the AT-020a seed the addressed error
-    is row 0 and the address-less warning is row 1 — same indices the old
-    DataTable path used.
+    Drives the shipped VISIBLE surface: the legacy Issues DataTable is retired
+    (batch-29), so selection goes through the grouped ``GroupedIssuesPanel`` —
+    focus the real ``IssueRow`` and press Enter (the C-16 real-mechanism path
+    shared with AT-039c). Grouped render order is error→warning→info, so for the
+    AT-020a seed the addressed error is row 0 and the address-less warning is
+    row 1.
     """
     rows = list(app.query(IssueRow))
     rows[row].focus()
@@ -120,7 +119,7 @@ def test_at020a_issue_hex_pane_shows_bytes_and_clears_on_no_address(tmp_path: Pa
     in `#issues_hex_pane`; then selecting the address-less issue (row 1) replaces
     that with the placeholder and leaves NO stale bytes. Both halves are asserted
     in one run so a stale-render regression (carrying row 0's bytes into row 1)
-    fails. Driven through the real Issues screen + DataTable selection.
+    fails. Driven through the real Issues screen + grouped-panel IssueRow selection.
     """
 
     async def _drive() -> tuple[str, str]:
@@ -155,14 +154,33 @@ def test_at020a_issue_hex_pane_shows_bytes_and_clears_on_no_address(tmp_path: Pa
     )
 
 
-def test_at021_issues_list_shows_related_artifacts(tmp_path: Path) -> None:
-    """AT-021 / LLR-021.1 — the issues list surfaces an issue's related artifacts.
+def _static_content(node: Static) -> object:
+    """Return the renderable a ``Static`` was built with, via its public API.
 
-    Intent: an issue carrying ``related_artifacts`` shows them in its row's Related
-    cell; one without shows the ``-`` empty marker. Read through the rendered
-    DataTable cells (column index 3 = Related). Content-discriminating: a dropped
-    or mis-indexed Related cell fails, and the no-related row must NOT borrow the
-    other row's artifacts.
+    ``Static.content`` returns the source renderable the widget was constructed
+    with (the exact ``safe_text`` ``Text`` here) and is app-independent — no
+    active-app console needed — so a white-box test can inspect the literal,
+    un-rendered value without reaching into name-mangled internals.
+    """
+    return node.content
+
+
+def _related_plain(node: Static) -> str:
+    """Return the plain text of an ``.issue-related`` Static (literal, no markup)."""
+    content = _static_content(node)
+    return content.plain if isinstance(content, Text) else str(content)
+
+
+def test_at021_issues_list_shows_related_artifacts(tmp_path: Path) -> None:
+    """AT-021 (RESTORED) / LLR-043.R8 — the grouped row surfaces related artifacts.
+
+    Intent: an issue carrying ``related_artifacts`` shows them on its row's restored
+    ``.issue-related`` node; one without shows the ``-`` empty marker. Read through
+    the SHIPPED grouped surface — the ``.issue-related`` node of each mounted
+    ``IssueRow`` (batch-29 Inc2; the batch-28-hidden DataTable no longer read).
+    Rows are ordered by ``SEVERITY_ORDER`` (error→warning), so the multi-artifact
+    ERROR is row 0 and the bare WARNING is row 1. Content-discriminating: a dropped
+    node fails, and the no-related row must NOT borrow the other row's artifacts.
     """
 
     async def _drive() -> tuple[str, str]:
@@ -191,16 +209,75 @@ def test_at021_issues_list_shows_related_artifacts(tmp_path: Path) -> None:
                 ],
             )
             await pilot.pause()
-            table = app.query_one("#validation_issues_list", DataTable)
-            # Column index 3 = "Related" (Severity, Code, Artifact, Related, ...).
-            return str(table.get_row_at(0)[3]), str(table.get_row_at(1)[3])
+            rows = list(app.query(IssueRow))
+            return (
+                _related_plain(rows[0].query_one(".issue-related", Static)),
+                _related_plain(rows[1].query_one(".issue-related", Static)),
+            )
 
     with_rel, without_rel = asyncio.run(_drive())
     assert with_rel == "a2l, mac", (
-        f"the Related cell must list both artifacts; got {with_rel!r}"
+        f"the .issue-related node must list both artifacts; got {with_rel!r}"
     )
     assert without_rel == "-", (
         f"an issue with no related artifacts shows '-'; got {without_rel!r}"
+    )
+
+
+def test_tc043_restore1_related_node_is_markup_safe() -> None:
+    """TC-043-restore.1 / LLR-043.R8 — the ``.issue-related`` node is safe_text.
+
+    White-box on ``IssueRow.compose``: it yields a dedicated ``.issue-related``
+    node whose plain text is ``", ".join(related_artifacts) or "-"``; and a hostile
+    payload injected into ``related_artifacts`` renders LITERAL — no
+    ``rich.errors.MarkupError``, the brackets survive in ``.plain``, and the
+    ``[link=...]`` token is NOT consumed (built via ``safe_text``, never
+    markup-parsed). Pins the C-17 invariant on the restored node so a future
+    file-derived ``related_artifacts`` value cannot become a silent injection sink.
+    """
+
+    def _related_node(issue: ValidationIssue) -> Static:
+        row = IssueRow(issue)
+        related = [
+            w
+            for w in row.compose()
+            if isinstance(w, Static) and w.has_class("issue-related")
+        ]
+        assert len(related) == 1, (
+            f"compose must yield exactly one .issue-related node; got {len(related)}"
+        )
+        return related[0]
+
+    # Plain-text contract: comma-joined artifacts, and "-" when none.
+    assert _related_plain(_related_node(
+        ValidationIssue(
+            code="C", severity=ValidationSeverity.ERROR, message="m",
+            artifact="s19", related_artifacts=["a2l", "mac"],
+        )
+    )) == "a2l, mac"
+    assert _related_plain(_related_node(
+        ValidationIssue(
+            code="C", severity=ValidationSeverity.INFO, message="m",
+            artifact="s19", related_artifacts=[],
+        )
+    )) == "-"
+
+    # Hostile payload — the whole thing must render LITERAL (no MarkupError,
+    # brackets intact, [link=...] token not consumed).
+    hostile = _related_node(
+        ValidationIssue(
+            code="C", severity=ValidationSeverity.ERROR, message="m",
+            artifact="s19", related_artifacts=["a2l[bold]", "x[link=file:///etc]"],
+        )
+    )
+    assert isinstance(_static_content(hostile), Text), (
+        "the related node must carry a literal safe_text Text, never a "
+        "markup-parsed string"
+    )
+    plain = _related_plain(hostile)
+    assert plain == "a2l[bold], x[link=file:///etc]", plain
+    assert "a2l[bold]" in plain and "[link=file:///etc]" in plain, (
+        f"hostile markup must survive literal (no token consumption); got {plain!r}"
     )
 
 

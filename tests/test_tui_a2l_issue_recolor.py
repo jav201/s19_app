@@ -4,8 +4,9 @@ Layer B gates (AT-037a/b) drive the SHIPPED load chain under Textual Pilot —
 sync ``asyncio.run`` wrappers (idiom: ``tests/test_tui_patch_layout.py``;
 helpers mirror ``tests/test_validation_service_supplemental.py`` — tests/ is
 not a package, so the small drive/read-back helpers are duplicated rather than
-cross-imported) — and observe only the rendered ``#a2l_tags_list`` /
-``#validation_issues_list`` DataTables. Row styles are asserted against
+cross-imported) — and observe the rendered ``#a2l_tags_list`` DataTable (colour
+oracle, untouched) plus the grouped ``IssueRow`` issue read-back (C-14
+migration: the retired ``#validation_issues_list`` DataTable). Row styles are asserted against
 ``_severity_style(ValidationSeverity.ERROR)`` (semantic colour-policy anchor;
 no raw ``"red"`` literal). Fixtures are deliberately MAC-LESS: AT-037a's map
 source (``_validation_issues``) exists in no-MAC sessions only thanks to the
@@ -39,9 +40,9 @@ DUPLICATE_CODE = "A2L_DUPLICATE_SYMBOL"
 BROKEN_REF_CODE = "A2L_BROKEN_REFERENCE"
 SUPPLEMENTAL_CODE = "A2L_TAG_SCHEMA_INCOMPLETE"
 
-# Issue-row cell layout per ``precompute_issue_datatable_payload``:
-# (severity, code, artifact, related, symbol, address, line, message)
-_SEV, _CODE, _SYMBOL = 0, 1, 4
+# Grouped ``IssueRow.issue`` read-back layout (C-14 migration):
+# (severity, code, artifact, symbol, message)
+_SEV, _CODE, _SYMBOL = 0, 1, 3
 
 
 # ---------------------------------------------------------------------------
@@ -85,6 +86,32 @@ _BROKEN_REF_A2L = (
     "    /end MEASUREMENT\n"
     "    /begin GROUP PANEL\n"
     "      REF_MEASUREMENT GHOST_TAG\n"
+    "    /end GROUP\n"
+    "  /end MODULE\n"
+    "/end PROJECT\n"
+)
+
+# AT-043-c17 (C-17, file-derived): the SAME broken-reference shape, but each
+# GROUP REF names a HOSTILE ghost symbol carrying Rich-markup metacharacters.
+# Per qa M-1 a single whitespace-delimited REF token cannot carry spaces, so the
+# two hostile tokens are TWO separate no-whitespace REF entries. Both round-trip
+# VERBATIM through the frozen ``a2l.py`` lexer + ``validate_a2l_internal_issues``
+# (rules.py:497 ``raw.strip().split()`` — whitespace split preserves brackets)
+# into ``issue.symbol`` AND ``issue.message`` (probe-confirmed in Phase 3), so a
+# genuine file-derived hostile symbol reaches the grouped panel's ``.issue-detail``
+# node — no constructed ``ValidationIssue``.
+_HOSTILE_MARKUP_REF = "MAP_Model[bold]"  # Rich style tag -> MarkupError if parsed
+_HOSTILE_LINK_REF = "x[link=file:///etc]"  # OSC-8 link token -> consumed if parsed
+_HOSTILE_REF_A2L = (
+    "/begin PROJECT Demo\n"
+    "  /begin MODULE Engine\n"
+    "    /begin MEASUREMENT RPM\n"
+    "      ECU_ADDRESS 0x1000\n"
+    "      DATA_SIZE 2\n"
+    "    /end MEASUREMENT\n"
+    "    /begin GROUP PANEL\n"
+    f"      REF_MEASUREMENT {_HOSTILE_MARKUP_REF}\n"
+    f"      REF_MEASUREMENT {_HOSTILE_LINK_REF}\n"
     "    /end GROUP\n"
     "  /end MODULE\n"
     "/end PROJECT\n"
@@ -150,13 +177,38 @@ def _a2l_row_list(app: S19TuiApp) -> list[tuple[str, tuple]]:
     return rows
 
 
-def _issue_rows(app: S19TuiApp) -> list[tuple[str, ...]]:
-    """Rendered ``#validation_issues_list`` rows as plain-string cell tuples."""
-    table = app.query_one("#validation_issues_list", DataTable)
+def _issue_rows(app: S19TuiApp) -> list[tuple]:
+    """Grouped-panel issue read-back (C-14 migration): the ``ValidationIssue``
+    each mounted ``IssueRow`` carries, as ``(severity, code, artifact, symbol,
+    message)`` tuples. Replaces the retired ``#validation_issues_list``
+    DataTable read; reading the issue object (not rendered cells) keeps the
+    ``_SEV`` comparison on the ``ValidationSeverity`` enum (stronger typing)."""
+    from s19_app.tui.issues_view import IssueRow
+
     return [
-        tuple(str(cell) for cell in table.get_row_at(index))
-        for index in range(table.row_count)
+        (
+            row.issue.severity,
+            row.issue.code,
+            row.issue.artifact,
+            row.issue.symbol,
+            row.issue.message,
+        )
+        for row in app.query(IssueRow)
     ]
+
+
+def _assert_within_cap(app: S19TuiApp) -> None:
+    """C-14 count-guard (v2): ``GroupedIssuesPanel`` caps mounted rows at
+    ``_GROUP_DISPLAY_MAX`` regardless of ``page_size``, so a whole-list count
+    or absence claim over ``query(IssueRow)`` is faithful only when the whole
+    filtered list fits under the cap. These fixtures emit <=4 issues; this pins
+    that so a future larger fixture cannot satisfy a claim vacuously."""
+    from s19_app.tui.issues_view import _GROUP_DISPLAY_MAX
+
+    assert len(app._filtered_validation_issues()) <= _GROUP_DISPLAY_MAX, (
+        "fixture exceeds the grouped-panel row cap; the capped IssueRow read "
+        "would no longer equal the whole filtered list"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -198,12 +250,16 @@ def test_at_037a_duplicate_symbol_error_issue_reds_both_rows(tmp_path: Path) -> 
         # only): exactly one A2L_DUPLICATE_SYMBOL ERROR, no supplemental code.
         app.action_show_screen("issues")
         await pilot.pause()
+        # C-14 count-guard: the whole filtered list fits under the row cap, so
+        # the capped IssueRow read below equals the whole list (both the
+        # "exactly one" and the "not any" claims are then faithful).
+        _assert_within_cap(app)
         issue_rows = _issue_rows(app)
         dup_issues = [row for row in issue_rows if row[_CODE] == DUPLICATE_CODE]
         assert len(dup_issues) == 1, (
             f"expected exactly ONE {DUPLICATE_CODE} issue; rows: {issue_rows!r}"
         )
-        assert dup_issues[0][_SEV] == ValidationSeverity.ERROR.value.upper()
+        assert dup_issues[0][_SEV] == ValidationSeverity.ERROR
         assert dup_issues[0][_SYMBOL].casefold() == "rpm"
         assert not any(row[_CODE] == SUPPLEMENTAL_CODE for row in issue_rows), (
             "schema-complete duplicate tags must gain no supplemental issue"
@@ -236,6 +292,9 @@ def test_at_037b_absent_from_table_issue_symbol_is_inert(tmp_path: Path) -> None
         # absent-symbol issue (otherwise this boundary passes vacuously).
         app.action_show_screen("issues")
         await pilot.pause()
+        # C-14 count-guard: whole filtered list fits under the row cap, so the
+        # ghost issue (if produced) is guaranteed present in the capped read.
+        _assert_within_cap(app)
         issue_rows = _issue_rows(app)
         ghost = [
             row
@@ -245,6 +304,97 @@ def test_at_037b_absent_from_table_issue_symbol_is_inert(tmp_path: Path) -> None
         assert ghost, (
             f"fixture failed to produce the natural {BROKEN_REF_CODE} issue "
             f"for GHOST_TAG; rows: {issue_rows!r}"
+        )
+
+    _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+
+# ---------------------------------------------------------------------------
+# Layer B — AT-043-c17 (C-17 MANDATORY, FILE-DERIVED) / LLR-043.R6 + LLR-043.R8
+# (US-043). Realizes the spec's file-derived C-17 AT (01-requirements.md §3):
+# a hostile symbol must reach the grouped panel's rendered ``.issue-detail`` node
+# by flowing through the REAL load chain (file -> frozen a2l.py lexer ->
+# issue.symbol -> GroupedIssuesPanel), NOT a constructed ``ValidationIssue``.
+# This is the file-derived counterpart to the retained SEEDED companion
+# ``test_at_039e_c17_...`` (tests/test_tui_directionb.py), which proves the same
+# literal-render invariant over a constructed hostile issue (+ ANSI byte + code
+# field). Both are kept: C-17 discipline requires the hostile input be
+# file-derived here, so the token survives the parser it will meet in production.
+# ---------------------------------------------------------------------------
+
+
+def test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal(
+    tmp_path: Path,
+) -> None:
+    """AT-043-c17 (C-17) / LLR-043.R6 + LLR-043.R8 (US-043) — a FILE-DERIVED
+    hostile GROUP-REF symbol renders LITERAL in the grouped ``.issue-detail`` node.
+
+    Intent: load an A2L whose GROUP names two hostile no-whitespace ghost symbols
+    (``MAP_Model[bold]`` and ``x[link=file:///etc]``) through the SHIPPED load
+    chain (``_parse_loaded_file`` -> ``_prepare_load_payload`` ->
+    ``_apply_prepared_load`` -> ``update_validation_issues_view`` ->
+    ``GroupedIssuesPanel``). The frozen ``a2l.py`` lexer +
+    ``validate_a2l_internal_issues`` split the GROUP lines on whitespace
+    (rules.py:497), so each bracket-bearing token round-trips VERBATIM into an
+    ``A2L_BROKEN_REFERENCE`` issue's ``.symbol`` (and its ``.message``) — a
+    genuine untrusted-file value, not a constructed ``ValidationIssue``. The
+    ``IssueRow`` composes that value into its ``.issue-detail`` span
+    (``symbol · address · message``) via ``safe_text`` (issues_view.py:186).
+
+    Assert: the run raises NO ``rich.errors.MarkupError``, and the combined
+    ``.issue-detail`` plain text contains the LITERAL ``MAP_Model[bold]``
+    (brackets intact) and the LITERAL ``x[link=file:///etc]`` / ``[link=...]``
+    token (NOT consumed -> no OSC-8 hyperlink, no style leak).
+
+    Counterfactual (discriminates the fix): if ``.issue-detail`` parsed Rich
+    markup instead of using ``safe_text``, mounting would either raise
+    ``MarkupError`` on ``[bold]`` or SILENTLY CONSUME the ``[link=file:///etc]``
+    token into an OSC-8 hyperlink — the literal-bracket assertions below would
+    then fail. Asserting the brackets survive verbatim is exactly what makes this
+    non-vacuous.
+
+    Frozen-lexer note: Phase-3 probe confirmed the frozen ``a2l.py`` chain
+    preserves BOTH hostile tokens verbatim (``issue.symbol ==
+    'MAP_Model[bold]'`` and ``'x[link=file:///etc]'``), so no fallback token was
+    needed — the strongest hostile tokens the spec names are the ones exercised.
+    """
+    s19_path = _write_s19(tmp_path)
+    a2l_path = _write_a2l(tmp_path, _HOSTILE_REF_A2L)
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        from s19_app.tui.issues_view import IssueRow
+
+        # Load-bearing positive assert: the shipped chain really produced the
+        # two file-derived hostile-symbol issues (otherwise the literal checks
+        # below could pass vacuously over an empty detail set).
+        app.action_show_screen("issues")
+        await pilot.pause()
+        _assert_within_cap(app)
+        issue_rows = _issue_rows(app)
+        ghost_symbols = {
+            row[_SYMBOL]
+            for row in issue_rows
+            if row[_CODE] == BROKEN_REF_CODE
+        }
+        assert {_HOSTILE_MARKUP_REF, _HOSTILE_LINK_REF} <= ghost_symbols, (
+            f"fixture failed to carry the hostile REF tokens verbatim into "
+            f"issue.symbol via the frozen lexer; issues: {issue_rows!r}"
+        )
+
+        # Observe through the SHIPPED grouped surface: the rendered plain text of
+        # every mounted ``.issue-detail`` node. ``render().plain`` yields the
+        # literal, un-parsed text (the idiom used by the seeded companion
+        # test_at_039e_c17_...); reaching this line at all proves compose/mount
+        # raised no MarkupError over the hostile file-derived symbols.
+        details = [row.query_one(".issue-detail").render().plain for row in app.query(IssueRow)]
+        combined = "\n".join(details)
+        assert _HOSTILE_MARKUP_REF in combined, (
+            f"file-derived symbol must render brackets literally in "
+            f".issue-detail; details={details!r}"
+        )
+        assert "[link=file:///etc]" in combined, (
+            f"the [link=...] token must survive as literal text (no OSC-8 "
+            f"parse); details={details!r}"
         )
 
     _drive_load(tmp_path, s19_path, a2l_path, _observe)

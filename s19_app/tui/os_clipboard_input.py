@@ -67,6 +67,10 @@ _CTYPES_RETRIES = 5
 _CTYPES_RETRY_DELAY_S = 0.02
 _POWERSHELL_TIMEOUT_S = 0.5
 
+# Bound the clipboard value we hand downstream. 64 Ki chars ≈ 2× the
+# largest legal Windows extended path, so a real path never truncates.
+_CLIPBOARD_READ_CAP_CHARS = 65536
+
 _PASTE_FAIL_NOTIFICATION = (
     "Clipboard read failed — try Ctrl+Shift+V or type the path manually."
 )
@@ -216,6 +220,39 @@ _STRATEGIES: tuple[tuple[str, Callable[[], Optional[str]]], ...] = (
 )
 
 
+def _bound_clipboard_text(text: Optional[str]) -> Optional[str]:
+    """
+    Summary:
+        Truncate a clipboard string to ``_CLIPBOARD_READ_CAP_CHARS`` so an
+        oversized clipboard cannot flow unbounded into ``splitlines``, the
+        Input widget, or the logs. Passes ``None`` and short strings
+        through unchanged and never raises.
+
+    Args:
+        text (Optional[str]): Raw value returned by a clipboard strategy,
+            possibly ``None`` or arbitrarily long.
+
+    Returns:
+        Optional[str]: ``None`` unchanged; otherwise ``text`` when its
+        length is ``<= _CLIPBOARD_READ_CAP_CHARS``, else the ``CAP``-char
+        prefix.
+
+    Data Flow:
+        - Called by :func:`read_os_clipboard` at the single non-``None``
+          funnel before the success log + return, so every layer and any
+          injected ``strategies`` cascade is bounded at one place.
+
+    Dependencies:
+        Uses:
+            - ``_CLIPBOARD_READ_CAP_CHARS``
+        Used by:
+            - :func:`read_os_clipboard`
+    """
+    if text is None:
+        return None
+    return text[:_CLIPBOARD_READ_CAP_CHARS]
+
+
 def read_os_clipboard(
     strategies: Optional[tuple[tuple[str, Callable[[], Optional[str]]], ...]] = None,
 ) -> Optional[str]:
@@ -233,12 +270,14 @@ def read_os_clipboard(
 
     Returns:
         Optional[str]: Clipboard text from the first strategy that
-        returns a non-``None`` value, else ``None`` when every strategy
-        fails.
+        returns a non-``None`` value, bounded to
+        ``_CLIPBOARD_READ_CAP_CHARS``; ``None`` when every strategy fails.
 
     Data Flow:
         - Iterates ``strategies`` in order, calling each callable and
-          returning its result the first time it is not ``None``.
+          returning its result the first time it is not ``None``, after
+          bounding it through :func:`_bound_clipboard_text` so an
+          oversized clipboard cannot flow unbounded downstream.
         - The default cascade prioritises the cheapest / most reliable
           layer first (``tkinter``); each fallback layer costs more
           latency but is impervious to the failure mode that could kill
@@ -252,6 +291,7 @@ def read_os_clipboard(
             - :func:`_read_via_tk`
             - :func:`_read_via_ctypes`
             - :func:`_read_via_powershell`
+            - :func:`_bound_clipboard_text`
         Used by:
             - :meth:`OsClipboardInput.action_paste`
     """
@@ -263,6 +303,7 @@ def read_os_clipboard(
             logger.debug("read_os_clipboard: %s raised %s", name, exc)
             continue
         if text is not None:
+            text = _bound_clipboard_text(text)
             logger.debug(
                 "read_os_clipboard succeeded via %s (len=%d)", name, len(text)
             )

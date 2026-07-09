@@ -837,25 +837,13 @@ def test_update_validation_issues_view_empty_state(tmp_path: Path, monkeypatch: 
     app = S19TuiApp(base_dir=tmp_path)
     summary_text: list[str] = []
 
-    class FakeTable:
-        columns = ["Severity"]
-
-        def clear(self, columns: bool = True) -> None:
-            return
-
-        def add_row(self, *_cells: object, key: object = None) -> None:
-            summary_text.append("row")
-
     class FakeLabel:
         def update(self, text: str) -> None:
             summary_text.append(text)
 
-    fake_table = FakeTable()
     fake_label = FakeLabel()
 
     def _query(selector: str, *_a, **_k):
-        if selector == "#validation_issues_list":
-            return fake_table
         if selector == "#validation_issues_summary":
             return fake_label
         return None
@@ -886,30 +874,24 @@ def _make_validation_issues(n: int) -> list[ValidationIssue]:
 
 
 def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """With thousands of issues, the panel must render at most one page-sized slice into the DataTable."""
+    """With thousands of issues, the summary reports a single page-sized window.
+
+    Post-retirement (batch-29) the Issues surface is the grouped panel (capped
+    at ``_GROUP_DISPLAY_MAX``), so the DataTable ``add_row`` / ``issue:`` row-key
+    windowing assertion retires; the windowing invariant is re-observed through
+    the summary line and ``_get_window_bounds`` — the same window math the
+    grouped panel pages on.
+    """
     app = S19TuiApp(base_dir=tmp_path)
-    row_keys: list[object] = []
     summary_captured: list[str] = []
-
-    class FakeTable:
-        columns = ["Severity"]
-
-        def clear(self, columns: bool = True) -> None:
-            row_keys.clear()
-
-        def add_row(self, *_cells: object, key: object = None) -> None:
-            row_keys.append(key)
 
     class FakeLabel:
         def update(self, text: str) -> None:
             summary_captured.append(text)
 
-    fake_table = FakeTable()
     fake_label = FakeLabel()
 
     def _query(selector: str, *_a, **_k):
-        if selector == "#validation_issues_list":
-            return fake_table
         if selector == "#validation_issues_summary":
             return fake_label
         return None
@@ -922,35 +904,25 @@ def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, mo
 
     app.update_validation_issues_view()
 
-    # One add_row call per visible issue; no summary rows bleed into the table.
-    assert len(row_keys) == 150
-    assert all(isinstance(key, str) and key.startswith("issue:") for key in row_keys)
+    # Window math: page 1 covers rows 1-150 of 5000 (the grouped panel pages on
+    # the same bounds; only the summary is asserted since no DataTable remains).
+    assert app._get_window_bounds(total, 0, 150) == (0, 150)
+    assert app._validation_issues_window_start == 0
     assert summary_captured and "page 1/" in summary_captured[-1]
+    assert "rows 1-150/5000" in summary_captured[-1]
 
 
 def test_validation_issues_paging_actions_advance_window(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     app = S19TuiApp(base_dir=tmp_path)
     renders: list[int] = []
 
-    class FakeTable:
-        columns = ["Severity"]
-
-        def clear(self, columns: bool = True) -> None:
-            return
-
-        def add_row(self, *_cells: object, key: object = None) -> None:
-            return
-
     class FakeLabel:
         def update(self, _text: str) -> None:
             return
 
-    fake_table = FakeTable()
     fake_label = FakeLabel()
 
     def _query(selector: str, *_a, **_k):
-        if selector == "#validation_issues_list":
-            return fake_table
         if selector == "#validation_issues_summary":
             return fake_label
         return None
@@ -1567,52 +1539,14 @@ def test_populate_mac_datatable_emits_row_keys_and_records_addresses(
     assert app._mac_row_key_to_address == {"mac:10": 0x1000, "mac:11": 0x1004}
 
 
-def test_populate_issues_datatable_records_filtered_index(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-):
-    app = S19TuiApp(base_dir=tmp_path)
-    issues = [
-        ValidationIssue(
-            code=f"C{i}",
-            severity=ValidationSeverity.ERROR if i % 2 == 0 else ValidationSeverity.WARNING,
-            message="m",
-            artifact="mac",
-            symbol=f"s{i}",
-            address=0x1000 + i,
-            line_number=i,
-        )
-        for i in range(3)
-    ]
-    cell_rows, styles = precompute_issue_datatable_payload(issues)
-
-    captured_keys: list[object] = []
-
-    class _FakeTable:
-        def add_row(self, *_cells: object, key: object = None) -> None:
-            captured_keys.append(key)
-
-    app._issue_row_key_to_index = {}
-    app._populate_issues_datatable(_FakeTable(), cell_rows, styles, issues, index_base=5)
-    assert captured_keys == ["issue:5", "issue:6", "issue:7"]
-    assert app._issue_row_key_to_index == {"issue:5": 5, "issue:6": 6, "issue:7": 7}
-
-
 def test_on_data_table_row_selected_dispatches_by_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    from s19_app.tui import app as app_module
-
     app = S19TuiApp(base_dir=tmp_path)
     jumps: dict[str, object] = {}
 
     monkeypatch.setattr(app, "_jump_to_mac_address", lambda addr: jumps.setdefault("mac", addr))
-    monkeypatch.setattr(
-        app,
-        "_jump_to_validation_issue_by_index",
-        lambda idx: jumps.setdefault("issue", idx),
-    )
     monkeypatch.setattr(app, "_jump_to_tag_by_data", lambda tag: jumps.setdefault("a2l", tag))
 
     app._mac_row_key_to_address = {"mac:3": 0xABCD}
-    app._issue_row_key_to_index = {"issue:2": 2}
     tag_dict = {"name": "RPM", "address": 0x2000}
     app._a2l_row_key_to_tag = {"a2l:0": tag_dict}
 
@@ -1628,10 +1562,9 @@ def test_on_data_table_row_selected_dispatches_by_id(tmp_path: Path, monkeypatch
             self.row_key = _K()
 
     app.on_data_table_row_selected(_Evt("mac_records_list", "mac:3"))
-    app.on_data_table_row_selected(_Evt("validation_issues_list", "issue:2"))
     app.on_data_table_row_selected(_Evt("a2l_tags_list", "a2l:0"))
 
-    assert jumps == {"mac": 0xABCD, "issue": 2, "a2l": tag_dict}
+    assert jumps == {"mac": 0xABCD, "a2l": tag_dict}
 
 
 def test_on_button_pressed_routes_new_page_buttons(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
@@ -1684,85 +1617,45 @@ def test_jump_actions_request_near_top_focus_and_scroll_reset(tmp_path: Path, mo
     assert mac_calls == [(0x2000, True, True)]
 
 
-def test_update_validation_issues_view_uses_worker_precomputed_cells(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-):
-    app = S19TuiApp(base_dir=tmp_path)
-    issues = _make_validation_issues(20)
-    precomputed_rows, precomputed_styles = precompute_issue_datatable_payload(issues)
-    app._validation_issues = issues
-    app._validation_issue_cell_rows = precomputed_rows
-    app._validation_issue_cell_styles = precomputed_styles
-    app.validation_issues_page_size = 10
-    app.validation_issue_filter_mode = "all"
-
-    recorded: list[tuple[str, ...]] = []
-
-    class FakeTable:
-        columns = ["Severity"]
-
-        def clear(self, columns: bool = True) -> None:
-            recorded.clear()
-
-        def add_row(self, *cells: object, key: object = None) -> None:
-            recorded.append(tuple(str(cell) for cell in cells))
-
-    class FakeLabel:
-        def update(self, _text: str) -> None:
-            return
-
-    fake_table = FakeTable()
-    fake_label = FakeLabel()
-
-    def _query(selector: str, *_a, **_k):
-        if selector == "#validation_issues_list":
-            return fake_table
-        if selector == "#validation_issues_summary":
-            return fake_label
-        return None
-
-    monkeypatch.setattr(app, "query_one", _query)
-
-    app.update_validation_issues_view()
-    assert len(recorded) == 10
-    assert recorded[0][0] == precomputed_rows[0][0]  # severity cell reused verbatim
+# NOTE (batch-29 / LLR-043.R4): the former
+# ``test_update_validation_issues_view_uses_worker_precomputed_cells`` retired
+# with the Issues ``DataTable``. The precompute cache-reuse path
+# (``_populate_issues_datatable`` reading ``_validation_issue_cell_rows``) no
+# longer exists — the grouped panel is the sole surface, so there is no
+# ``add_row`` consumer to observe. ``precompute_issue_datatable_payload`` itself
+# is still invoked by the load worker (dead-written cache, R-043-3) and is
+# covered by ``test_tc021_precompute_payload_emits_related_cell`` as a formatter.
 
 
 # ---------------------------------------------------------------------------
 # Snapshot-harness skeleton (LLR-007.4 / R-7).
 #
 # The harness drives ``S19TuiApp`` headlessly via ``App.run_test()`` and reads
-# back the codes rendered into the Issues panel ``DataTable``. The full
-# parametric per-class snapshot tests (TC-064 / TC-065) land in a later
-# increment; this is just a smoke test proving the harness skeleton works.
+# back the codes rendered into the grouped Issues panel. The full parametric
+# per-class snapshot tests (TC-064 / TC-065) land in a later increment; this is
+# just a smoke test proving the harness skeleton works.
 # ---------------------------------------------------------------------------
 
 
 def _query_issues_panel_codes(app: S19TuiApp) -> list[str]:
     """
     Summary:
-        Read the ``Code`` cell of every row currently rendered in the Issues
-        panel ``DataTable`` (``#validation_issues_list``). Used by snapshot
-        tests to assert which ``ValidationIssue.code`` strings made it past
-        the engine-emit boundary all the way into the panel widget tree.
+        Read the rendered code of every ``.issue-code-chip`` in the grouped
+        Issues panel (``#validation_issues_groups``). Since batch-29 the grouped
+        panel is the sole Issues surface (the legacy ``DataTable`` is retired);
+        each mounted ``IssueRow`` carries one code chip whose rendered text is
+        the issue ``.code``. Used by snapshot tests to assert which
+        ``ValidationIssue.code`` strings reached the panel widget tree.
 
     Args:
         app (S19TuiApp): A running app instance under ``App.run_test()``.
 
     Returns:
-        list[str]: Code cell values, one per visible row, in render order.
+        list[str]: Chip code values, one per visible row, in render order. The
+        grouped panel mounts at most ``_GROUP_DISPLAY_MAX`` rows of the current
+        page, so this reflects the visible window, not the whole filtered list.
     """
-    from textual.widgets import DataTable
-
-    table = app.query_one("#validation_issues_list", DataTable)
-    codes: list[str] = []
-    for row_index in range(table.row_count):
-        row = table.get_row_at(row_index)
-        # Row layout per ``precompute_issue_datatable_payload``:
-        # (severity, code, artifact, symbol, address, line, message)
-        if len(row) >= 2:
-            codes.append(str(row[1]))
-    return codes
+    return [str(chip.render()) for chip in app.query(".issue-code-chip")]
 
 
 # Stands in for TC-064 (single-class smoke; parametric per-class tests are TC-065.a..h).
@@ -1885,28 +1778,44 @@ class TestCrossFileCompatibilityPanelRender:
     @staticmethod
     def _drive_panel(tmp_path: Path, issues) -> list[str]:
         """Spin up ``S19TuiApp`` headlessly, populate ``_validation_issues``,
-        render the panel, and return the codes read back from the DataTable.
-        Same sync-wrapper pattern as ``test_snapshot_harness_renders_issues_panel``.
+        render the grouped Issues panel, and return the codes read back from its
+        ``.issue-code-chip`` nodes. Same sync-wrapper pattern as
+        ``test_snapshot_harness_renders_issues_panel``.
 
-        The Issues panel pages at ``validation_issues_page_size`` (default 200,
-        clamped to ``viewer_page_size_max=200``). For per-class assertions to
-        hold against the multi-thousand-issue ``large_project`` report we widen
-        both ceilings on the test instance so the entire issues list renders in
-        a single page. This is test-side configuration only; no product change.
+        Batch-29 cap note: since the legacy ``DataTable`` retired, the sole
+        Issues surface is the grouped panel, which mounts at most
+        ``_GROUP_DISPLAY_MAX`` (40) rows of the current page regardless of
+        page size. A multi-thousand-issue ``large_project`` report floods the
+        error group (e.g. ~all ``MAC_PARSE_ERROR``) and would push the sparse
+        cross-file codes past the cap. To keep observing "engine code X
+        co-renders in the panel" through the *shipped* surface, we seed one
+        representative real issue per distinct code (dedup, order preserved) so
+        every emitted code fits under the cap and renders as a real
+        ``IssueRow``. This is test-side seeding only; no product change.
         """
         import asyncio
 
         from s19_app.tui.app import S19TuiApp
 
+        # One representative real ValidationIssue per distinct code (the grouped
+        # panel caps mounted rows at _GROUP_DISPLAY_MAX; dedup keeps every code
+        # observable without exceeding it).
+        seen: set[str] = set()
+        seed: list = []
+        for issue in issues:
+            if issue.code not in seen:
+                seen.add(issue.code)
+                seed.append(issue)
+
         async def _drive() -> list[str]:
             app = S19TuiApp(base_dir=tmp_path)
-            # Widen page-size ceiling so all issues land on the first page.
-            app.viewer_page_size_max = max(app.viewer_page_size_max, len(issues) + 1)
+            # Widen page-size ceiling so the deduped set lands on the first page.
+            app.viewer_page_size_max = max(app.viewer_page_size_max, len(seed) + 1)
             app.validation_issues_page_size = max(
-                app.validation_issues_page_size, len(issues) + 1
+                app.validation_issues_page_size, len(seed) + 1
             )
             async with app.run_test() as pilot:
-                app._validation_issues = list(issues)
+                app._validation_issues = list(seed)
                 app._validation_issues_window_start = 0
                 app.update_validation_issues_view()
                 await pilot.pause()
