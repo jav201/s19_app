@@ -171,7 +171,6 @@ def test_loadfilescreen_typing_after_focus_stolen_by_button_reproduces_bug(
                     # symptom of the bug. Count remaining as lost.
                     lost += len(_COLLIDING_PATH) - _COLLIDING_PATH.index(ch)
                     break
-                before = input_widget.value
                 try:
                     await pilot.press(_key_for(ch))
                     await pilot.pause()
@@ -624,3 +623,208 @@ def test_notification_message_mentions_ctrl_shift_v_workaround(
     assert "Ctrl+Shift+V" in os_clip_mod._PASTE_FAIL_NOTIFICATION, (
         "Failure notification must document the WT-level paste shortcut"
     )
+
+
+# ---------------------------------------------------------------------------
+# US-042 (R-TUI-044) — bound the OS-clipboard read to _CLIPBOARD_READ_CAP_CHARS.
+#
+# An oversized OS clipboard must not spike memory / stall Ctrl+V in the Load
+# dialog. The read is capped at a single funnel in read_os_clipboard, so every
+# layer AND any injected _STRATEGIES cascade is bounded. Tests inject fake
+# strategies (or override _STRATEGIES) so nothing depends on the real OS
+# clipboard.
+# ---------------------------------------------------------------------------
+
+
+def test_at042a_read_os_clipboard_caps_huge_single_line_blob() -> None:
+    """AT-042a (LLR-044.2): a multi-MB single-line blob is capped to CAP.
+
+    read_os_clipboard(strategies=...) with a fake layer returning a blob
+    far larger than the cap must return exactly the CAP-char prefix.
+    """
+    from s19_app.tui.os_clipboard_input import (
+        _CLIPBOARD_READ_CAP_CHARS as CAP,
+        read_os_clipboard,
+    )
+
+    blob = "A" * (CAP + 5_000_000)
+    result = read_os_clipboard(strategies=(("fake", lambda: blob),))
+    assert result is not None
+    assert len(result) == CAP
+    assert result == blob[:CAP]
+
+
+def test_at042b_ctrl_v_inserts_capped_value_via_real_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-042b (B-1 fix, LLR-044.2/.3/.4): Ctrl+V inserts the capped value.
+
+    Injection is at ``_STRATEGIES`` (BELOW read_os_clipboard) so the real
+    capped ``read_os_clipboard`` runs inside ``action_paste``. A wholesale
+    ``read_os_clipboard`` monkeypatch would bypass the cap and let the full
+    blob reach ``splitlines()[0]`` — this test would then falsely red or
+    force a second, spec-forbidden cap in ``action_paste``.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+    from s19_app.tui.os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS as CAP
+
+    blob = "A" * (CAP + 5_000_000)
+    monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: blob),))
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.push_screen(LoadFileScreen())
+            for _ in range(6):
+                await pilot.pause()
+            input_widget = app.screen.query_one("#load_path", Input)
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            return input_widget.value
+
+    value = asyncio.run(_drive())
+    assert len(value) <= CAP
+    assert value == blob[:CAP]
+
+
+def test_at042c_boundary_at_cap_is_unchanged() -> None:
+    """AT-042c (LLR-044.2): a value exactly CAP chars long is untouched."""
+    from s19_app.tui.os_clipboard_input import (
+        _CLIPBOARD_READ_CAP_CHARS as CAP,
+        read_os_clipboard,
+    )
+
+    blob = "p" * CAP
+    result = read_os_clipboard(strategies=(("fake", lambda: blob),))
+    assert result == blob
+    assert len(result) == CAP
+
+
+def test_at042d_boundary_over_cap_by_one_drops_last_char() -> None:
+    """AT-042d (LLR-044.2): CAP+1 chars truncates; the trailing X is dropped."""
+    from s19_app.tui.os_clipboard_input import (
+        _CLIPBOARD_READ_CAP_CHARS as CAP,
+        read_os_clipboard,
+    )
+
+    blob = "p" * CAP + "X"
+    result = read_os_clipboard(strategies=(("fake", lambda: blob),))
+    assert result is not None
+    assert len(result) == CAP
+    assert result[-1] == "p"
+
+
+def test_at042e_real_path_passes_through_untouched(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-042e (LLR-044.3, negative): a real ~120-char path is not altered.
+
+    Guards against an over-aggressive cap — a legitimate path (well under
+    CAP) must round-trip through Ctrl+V verbatim.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    path = _COLLIDING_PATH
+    monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: path),))
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.push_screen(LoadFileScreen())
+            for _ in range(6):
+                await pilot.pause()
+            input_widget = app.screen.query_one("#load_path", Input)
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            return input_widget.value
+
+    value = asyncio.run(_drive())
+    assert value == path
+
+
+def test_at042f_multiline_clipboard_inserts_only_first_line(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-042f (LLR-044.4): splitlines()[0] policy survives the cap.
+
+    A multi-line clipboard (under CAP) inserts only its first line.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    blob = "first\nsecond\nthird"
+    monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: blob),))
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.push_screen(LoadFileScreen())
+            for _ in range(6):
+                await pilot.pause()
+            input_widget = app.screen.query_one("#load_path", Input)
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            return input_widget.value
+
+    value = asyncio.run(_drive())
+    assert value == "first"
+
+
+def test_tc042_1_cap_constant_is_positive_int_at_least_4096() -> None:
+    """TC-042.1 (LLR-044.1): the cap constant exists, positive int, >= 4096."""
+    from s19_app.tui.os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS as CAP
+
+    assert isinstance(CAP, int)
+    assert not isinstance(CAP, bool)
+    assert CAP > 0
+    assert CAP >= 4096
+
+
+def test_tc042_2_bound_helper_behavior() -> None:
+    """TC-042.2 (LLR-044.2): the bound helper caps long, passes short/None/empty.
+
+    <= CAP unchanged; longer -> [:CAP]; "" and None pass through without
+    raising.
+    """
+    from s19_app.tui.os_clipboard_input import (
+        _CLIPBOARD_READ_CAP_CHARS as CAP,
+        _bound_clipboard_text,
+    )
+
+    assert _bound_clipboard_text(None) is None
+    assert _bound_clipboard_text("") == ""
+    short = "p" * (CAP - 1)
+    assert _bound_clipboard_text(short) == short
+    at_cap = "p" * CAP
+    assert _bound_clipboard_text(at_cap) == at_cap
+    longer = "p" * (CAP + 10)
+    bounded = _bound_clipboard_text(longer)
+    assert bounded is not None
+    assert len(bounded) == CAP
+    assert bounded == longer[:CAP]
+
+
+def test_tc042_3_read_os_clipboard_bounds_selected_strategy_result() -> None:
+    """TC-042.3 (LLR-044.2/.3): the bound applies to the selected strategy.
+
+    Caller-independent: an injected huge-return strategy is capped by
+    read_os_clipboard regardless of which layer produced it.
+    """
+    from s19_app.tui.os_clipboard_input import (
+        _CLIPBOARD_READ_CAP_CHARS as CAP,
+        read_os_clipboard,
+    )
+
+    huge = "z" * (CAP + 1000)
+    result = read_os_clipboard(
+        strategies=(
+            ("tkinter", lambda: None),
+            ("ctypes-win32", lambda: huge),
+            ("powershell", lambda: "unreached"),
+        )
+    )
+    assert result is not None
+    assert len(result) == CAP
+    assert result == huge[:CAP]

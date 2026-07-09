@@ -630,6 +630,35 @@ state (LLR-042.11); the batch diffs no engine-frozen path (LLR-042.12).
   / LLR-042.1–.12). Frozen-engine diff = 0. Prototype directions re-selected by
   the operator at the Phase-1 gate (A2L→Baseline+, MAC dropped, Issues→Dense,
   Workspace→Dense). Follow-on: canonical-CI snapshot regen retires the xfails.
+- Updated in batch `2026-07-08-batch-29` (US-043, HLR-043.R1-retire): the
+  transitional legacy `#validation_issues_list` DataTable — kept mounted with
+  `display:none` since batch-28 as a shim beside the grouped panel — is **fully
+  retired**, so `GroupedIssuesPanel` (`#validation_issues_groups`) is now the
+  sole mounted Issues surface (grep of `s19_app/` for `#validation_issues_list`
+  = 0 source hits; its compose yield, CSS rules, column-init, population,
+  `_issue_row_key_to_index` row-key map, and `on_data_table_row_selected` issues
+  branch + the unreachable `_jump_to_validation_issue_by_index` are removed).
+  Each issue's related artifacts are **restored** onto a dedicated markup-safe
+  `.issue-related` node on `IssueRow` (`", ".join(related_artifacts) or "-"` via
+  `safe_text`; invisible since batch-28 — LLR-043.R8). The
+  `#validation_issues_summary`, the paging window, the `#issues_hex_pane`
+  selection peek (`on_issue_row_selected` → `_update_issues_hex_pane`), and the
+  `_GROUP_DISPLAY_MAX` bound are preserved (summary + paging never depended on
+  the DataTable). C-17 markup-safety holds on all three `IssueRow` nodes,
+  including file-derived hostile symbols through the frozen `a2l.py` lexer
+  (AT-043-c17). Frozen-engine diff = 0. Validation additions (all `Automated`):
+  `tests/test_tui_directionb.py`
+  (`test_at043a_datatable_retired_grouped_panel_populated`,
+  `test_at043b_selection_preserved_after_retirement`,
+  `test_at043c_no_datatable_orphan_on_any_screen`,
+  `test_tc023_grouped_panel_is_primary_content_of_screen_issues`),
+  `tests/test_tui_issues_view.py`
+  (`test_at021_issues_list_shows_related_artifacts` migrated to `.issue-related`,
+  `test_tc043_restore1_related_node_is_markup_safe`),
+  `tests/test_tui_a2l_issue_recolor.py`
+  (`test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal`).
+  Follow-up (R-043-3): the worker `precompute_issue_datatable_payload` + its now
+  dead-written caches await a separate batch.
 
 **R-TUI-043**: The Load-file modal (`LoadFileScreen`) must (a) land initial
 keyboard focus on its path `Input` (`#load_path`) — never on the primary
@@ -692,7 +721,52 @@ default log levels catch the event.
   routing, PR #51 OS-clipboard paste) shipped without automated
   regression guards. The prior `R-A2L-004` line treated the Load dialog as
   `Manual` — that gap is now closed by lifting `R-A2L-004` to `Automated`
-  through the same test file.
+  through the same test file. The OS-clipboard read defined here
+  (`read_os_clipboard`) is length-bounded as of batch
+  `2026-07-08-batch-29` — see **R-TUI-044**.
+
+**R-TUI-044**: The system must bound the length of any OS-clipboard value it
+reads for the Load-dialog paste (`read_os_clipboard`, R-TUI-043) to a fixed
+maximum of `_CLIPBOARD_READ_CAP_CHARS = 65536` characters (64 Ki chars ≈ 2× the
+largest legal Windows extended path, so a real path is never truncated) before
+the value is used downstream. Truncation is applied at a **single funnel** — the
+module-private `_bound_clipboard_text` helper is called on the first non-`None`
+strategy result inside `read_os_clipboard`, *before* the value is logged or
+returned — so the cap covers every cascade layer (`tkinter` → `ctypes` Win32 →
+`powershell.exe Get-Clipboard`) and any injected `strategies=` with no per-layer
+duplication. The cap therefore prevents an oversized clipboard from causing an
+unbounded `splitlines` cost, an oversized value flowing into the `Input` widget
+or the logs, or a hang. Truncation returns the capped prefix (never `None`) and
+never raises, so `action_paste` still inserts the bounded first line
+(`splitlines()[0]` of the already-capped string) and does not fall through to the
+internal-buffer fallback or the failure notification; the success debug-log
+`len=` reports the post-cap length. This is a **functional bound on downstream
+use, not a true source memory bound**: each reader (tk/ctypes/PS) still
+transiently materializes the full clipboard string before the cap applies
+(residual R-044-1); a true source bound via a bounded
+`subprocess.Popen(...).stdout.read(CAP+1)` + terminate is the deferred,
+named-not-built LLR-044.6, not implemented this batch.
+
+- Code: `s19_app/tui/os_clipboard_input.py` (`_CLIPBOARD_READ_CAP_CHARS`,
+  `_bound_clipboard_text`, the single-funnel bound in `read_os_clipboard`)
+- Validation: `Automated` via `tests/test_loadfilescreen_input.py`
+  (`test_tc042_1_cap_constant_is_positive_int_at_least_4096`,
+  `test_tc042_2_bound_helper_behavior`,
+  `test_tc042_3_read_os_clipboard_bounds_selected_strategy_result`,
+  `test_at042a_read_os_clipboard_caps_huge_single_line_blob`,
+  `test_at042b_ctrl_v_inserts_capped_value_via_real_read`,
+  `test_at042c_boundary_at_cap_is_unchanged`,
+  `test_at042d_boundary_over_cap_by_one_drops_last_char`,
+  `test_at042e_real_path_passes_through_untouched`,
+  `test_at042f_multiline_clipboard_inserts_only_first_line`) — covers
+  HLR-044.1-clip / LLR-044.1–.5 (LLR-044.6 deferred)
+- Status: Added in batch `2026-07-08-batch-29` (US-042 / HLR-044.1-clip /
+  LLR-044.1–.5). Frozen-engine diff = 0. AT-042b injects at the module-level
+  `_STRATEGIES` (below the capped `read_os_clipboard`), not a wholesale
+  `read_os_clipboard` monkeypatch, so the real cap runs through `action_paste`
+  (Phase-2 B-1 blocker fix). Deferred: LLR-044.6 true source bound (R-044-1);
+  the un-capped internal-buffer fallback `self.app.clipboard` (R-044-3, short +
+  app-populated).
 
 **R-TUI-028**: The TUI must present an A↔B Firmware Diff view shell — a static
 three-column layout (range list, hex A, hex B) populated with constant,
@@ -2938,7 +3012,15 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 **R-ISSUES-RELATED-001**: Where a validation issue carries related artifacts, the issues list shall display them in a "Related" column (comma-joined, or `-` when none).
 - Code: `s19_app/tui/app.py` `precompute_issue_datatable_payload` Related cell + the issues `add_columns` "Related" header (cell tuple 7→8, kept in lockstep) (US-020b).
 - Validation: `Automated` — `tests/test_tui_issues_view.py::test_at021_issues_list_shows_related_artifacts` (AT-021; RED pre-fix: cell shows `-`) + `::test_tc021_precompute_payload_emits_related_cell` + `tests/test_tui_app.py::test_precompute_issue_datatable_payload_emits_eight_columns_and_styles`.
-- Status: Added batch-17 (US-020b / HLR-021 / LLR-021.1).
+- Status: Added batch-17 (US-020b / HLR-021 / LLR-021.1). Display surface
+  migrated in batch `2026-07-08-batch-29` (US-043 / LLR-043.R8): with the
+  `#validation_issues_list` DataTable retired, the related artifacts now render
+  on the grouped `IssueRow`'s markup-safe `.issue-related` node instead of the
+  DataTable "Related" column, and `test_at021_issues_list_shows_related_artifacts`
+  is re-pointed to observe that node (`.issue-related`) black-box; see
+  **R-TUI-042**. The `precompute_issue_datatable_payload` Related cell +
+  `test_tc021_precompute_payload_emits_related_cell` are retained (dead-written,
+  R-043-3 follow-up).
 
 > Deferred to a follow-on batch (`.dev-flow/BACKLOG.md`): US-020c (issues-report addendum input / declared memory locations) + US-020d (issues→report integration).
 

@@ -529,11 +529,6 @@ Screen {
     padding-top: 1;
 }
 
-#validation_issues_list {
-    height: 1fr;
-    border: round $rule;
-}
-
 #validation_issues_summary {
     height: auto;
     padding: 0 1;
@@ -780,16 +775,6 @@ Screen {
     border: round $rule;
 }
 
-/* Hidden compatibility surface (batch-28 HIGH-fix). The legacy Issues
- * DataTable stays MOUNTED + populated by ``update_validation_issues_view``
- * (its monkeypatched unit tests + ``get_row_at`` model reads depend on it),
- * but is removed from the visible layout so it is NOT rendered twice next to
- * the GroupedIssuesPanel. The grouped panel is the sole visible Issues surface;
- * full retirement of this DataTable is a backlog item. */
-#issues_columns #validation_issues_list {
-    display: none;
-}
-
 /* US-039 grouped-dense rows: a bold per-severity group header, then compact
  * issue rows each carrying a fixed-width code chip beside the detail span.
  * Severity colour comes from the frozen `sev-*` classes (color_policy) applied
@@ -823,6 +808,15 @@ Screen {
 .issue-detail {
     width: 1fr;
     height: auto;
+}
+
+/* Related artifacts, restored to the grouped row (LLR-043.R8). Muted + width:auto
+ * so it trails the 1fr detail span without forcing horizontal overflow. */
+.issue-related {
+    width: auto;
+    height: auto;
+    color: #6b7280;
+    margin-left: 1;
 }
 
 .issues-empty-note,

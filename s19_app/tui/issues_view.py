@@ -4,8 +4,9 @@ Batch-28 · R-TUI-042 · US-039 (Direction B). These presentational widgets
 render the already-computed ``S19TuiApp._validation_issues`` list grouped by
 severity (errors → warnings → info) with a per-group count header and a
 compact per-issue code "chip", replacing the old flat single-table read of the
-Issues Report while the ``#validation_issues_list`` ``DataTable`` and the
-``#issues_hex_pane`` peek are retained beside them (LLR-042.3/.4/.5/.6).
+Issues Report. Since batch-29 (US-043) the legacy Issues ``DataTable`` is fully
+retired and this grouped panel is the sole Issues surface beside the
+``#issues_hex_pane`` peek (LLR-042.3/.4/.5/.6, LLR-043.R1).
 
 C-17 markup-safety (LLR-042.10): every file-derived string reaching this view
 (an issue ``.code``, ``.symbol`` or ``.message``) is composed through the
@@ -111,18 +112,21 @@ class IssueGroupHeader(Static):
 
 
 class IssueRow(Horizontal):
-    """A focusable, clickable single-issue row: a code chip + issue detail.
+    """A focusable, clickable single-issue row: a code chip + issue detail + related.
 
     Summary:
         Renders one ``ValidationIssue`` as a horizontal row holding a compact
         ``.issue-code-chip`` (the issue ``.code``) beside a ``.issue-detail``
-        span (symbol · address · message). Both cells are markup-safe
-        ``rich.text.Text`` built via ``safe_text`` (LLR-042.10), so hostile
-        file-derived tokens render literal. The row is ``can_focus`` and on a
-        real click or ``Enter`` posts :class:`Selected` carrying the issue's
-        integer address (or ``None``), which ``app.py`` consumes to repaint the
-        retained ``#issues_hex_pane`` (LLR-042.5). Purely presentational — it
-        never parses or validates.
+        span (symbol · address · message) and a trailing ``.issue-related``
+        node listing the issue's ``related_artifacts`` (``", ".join(...)`` or
+        ``"-"`` when none) — the info the retired Related column showed,
+        restored to the grouped view (LLR-043.R8). All three cells are
+        markup-safe ``rich.text.Text`` built via ``safe_text`` (LLR-042.10 /
+        LLR-043.R8), so hostile file-derived tokens render literal. The row is
+        ``can_focus`` and on a real click or ``Enter`` posts :class:`Selected`
+        carrying the issue's integer address (or ``None``), which ``app.py``
+        consumes to repaint the retained ``#issues_hex_pane`` (LLR-042.5).
+        Purely presentational — it never parses or validates.
 
     Args:
         issue (ValidationIssue): The already-computed issue to display.
@@ -131,8 +135,10 @@ class IssueRow(Horizontal):
         None
 
     Data Flow:
-        - Mounted by ``GroupedIssuesPanel.render_groups``; on click/``Enter``
-          posts :class:`Selected` → ``S19TuiApp.on_issue_row_selected``.
+        - Mounted by ``GroupedIssuesPanel.render_groups``; :meth:`compose`
+          yields the code chip, the detail span and the ``.issue-related``
+          node (all ``safe_text``). On click/``Enter`` posts :class:`Selected`
+          → ``S19TuiApp.on_issue_row_selected``.
 
     Dependencies:
         Uses:
@@ -172,12 +178,16 @@ class IssueRow(Horizontal):
         super().__init__(classes=f"issue-row {self._sev_class}")
 
     def compose(self) -> ComposeResult:
-        """Yield the markup-safe code chip and the issue-detail span."""
+        """Yield the markup-safe code chip, detail span and related node."""
         yield Static(
             safe_text(self.issue.code or "-"),
             classes=f"issue-code-chip {self._sev_class}",
         )
         yield Static(safe_text(self._detail_text()), classes="issue-detail")
+        yield Static(
+            safe_text(", ".join(self.issue.related_artifacts) or "-"),
+            classes="issue-related",
+        )
 
     def _detail_text(self) -> str:
         """Build the ``symbol · address · message`` detail string (literal)."""

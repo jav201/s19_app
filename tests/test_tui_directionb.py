@@ -1838,17 +1838,19 @@ def _seed_issues_screen(app: S19TuiApp, count: int) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_tc023_issues_table_is_primary_content_of_screen_issues(
+def test_tc023_grouped_panel_is_primary_content_of_screen_issues(
     tmp_path: Path,
 ) -> None:
-    """The Issues DataTable is the primary content of the #screen_issues rail.
+    """The grouped panel is the sole primary content of the #screen_issues rail.
 
-    Intent: LLR-011.1 — the validation Issues ``DataTable`` is promoted out
-    of the old Workspace Status tile into its own dedicated rail screen.
-    The table must be a descendant of ``#screen_issues`` (the rail item-5
-    container), together with its filter row and summary line.
+    Intent (batch-29, AT-043a home / LLR-043.R1): the legacy Issues
+    ``#validation_issues_list`` ``DataTable`` is fully retired, so it must be
+    absent from ``#screen_issues`` and the ``GroupedIssuesPanel``
+    (``#validation_issues_groups``) is the sole primary descendant — together
+    with the filter row and the summary line. Inverts the pre-retirement
+    assertion (the DataTable used to be required present).
     """
-    from textual.widgets import DataTable
+    from s19_app.tui.issues_view import GroupedIssuesPanel
 
     async def _drive() -> dict[str, int]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -1857,25 +1859,33 @@ def test_tc023_issues_table_is_primary_content_of_screen_issues(
             screen_issues = app.query_one("#screen_issues")
             return {
                 "table": len(screen_issues.query("#validation_issues_list")),
+                "groups": len(screen_issues.query("#validation_issues_groups")),
                 "filters": len(screen_issues.query("#validation_issues_filters")),
                 "summary": len(screen_issues.query("#validation_issues_summary")),
-                "is_datatable": int(
+                "is_grouped_panel": int(
                     isinstance(
-                        app.query_one("#validation_issues_list"), DataTable
+                        app.query_one("#validation_issues_groups"),
+                        GroupedIssuesPanel,
                     )
                 ),
             }
 
     dims = asyncio.run(_drive())
-    assert dims["table"] == 1, (
-        "the Issues DataTable must be a descendant of #screen_issues "
+    assert dims["table"] == 0, (
+        "the legacy Issues DataTable must be GONE from #screen_issues "
         f"(found {dims['table']})"
+    )
+    assert dims["groups"] == 1, (
+        "the GroupedIssuesPanel must be the primary descendant of #screen_issues "
+        f"(found {dims['groups']})"
     )
     assert dims["filters"] == 1 and dims["summary"] == 1, (
         "the Issues filter row and summary line must live in #screen_issues "
         f"(filters={dims['filters']}, summary={dims['summary']})"
     )
-    assert dims["is_datatable"] == 1, "#validation_issues_list must be a DataTable"
+    assert dims["is_grouped_panel"] == 1, (
+        "#validation_issues_groups must be a GroupedIssuesPanel"
+    )
 
 
 def test_tc023_issues_not_nested_in_workspace_and_carryover_gone(
@@ -1930,6 +1940,117 @@ def test_tc023_issues_not_nested_in_workspace_and_carryover_gone(
     )
 
 
+def test_at043a_datatable_retired_grouped_panel_populated(tmp_path: Path) -> None:
+    """AT-043a (retirement): with issues seeded, the legacy DataTable is gone and
+    the grouped panel is the populated Issues surface.
+
+    Real mechanism: Pilot render of ``#screen_issues`` after seeding a mixed
+    error/warning/info issue set. Observed: ``query("#validation_issues_list")``
+    is empty tree-wide (DataTable retired) AND ``#validation_issues_groups`` is
+    present with ``>= 1`` mounted ``IssueRow``. Counterfactual: pre-retirement
+    the ``display:none`` DataTable was still mounted (query == 1) -> FAIL.
+    """
+    from s19_app.tui.issues_view import IssueRow
+
+    async def _drive() -> tuple[int, int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            return (
+                len(app.query("#validation_issues_list")),
+                len(app.query("#validation_issues_groups")),
+                len(app.query(IssueRow)),
+            )
+
+    tables, groups, rows = asyncio.run(_drive())
+    assert tables == 0, (
+        f"the legacy Issues DataTable must be retired tree-wide (found {tables})"
+    )
+    assert groups == 1, (
+        f"the grouped panel must be the Issues surface (found {groups})"
+    )
+    assert rows >= 1, (
+        f"the grouped panel must mount >= 1 IssueRow for a seeded mix (found {rows})"
+    )
+
+
+def test_at043b_selection_preserved_after_retirement(tmp_path: Path) -> None:
+    """AT-043b (selection preserved): a real ``IssueRow`` focus + ``Enter`` still
+    repaints ``#issues_hex_pane`` for an addressed issue after retirement.
+
+    Real mechanism: ``IssueRow.on_key`` -> ``IssueRow.Selected`` ->
+    ``on_issue_row_selected`` -> ``#issues_hex_pane`` (no DataTable path). An
+    addressed row peeks at its ``0x…`` bytes and CHANGES the pane; an
+    ``address is None`` row yields the neutral placeholder with no stale bytes.
+    """
+    from textual.widgets import Static
+    from s19_app.tui.issues_view import IssueRow
+
+    async def _select(app, pilot, row) -> str:
+        row.focus()
+        await pilot.pause()
+        await pilot.press("enter")
+        await pilot.pause()
+        return str(app.query_one("#issues_hex_pane", Static).render())
+
+    async def _drive() -> tuple[str, str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
+            await pilot.pause()
+            before = str(app.query_one("#issues_hex_pane", Static).render())
+            rows = list(app.query(IssueRow))
+            # Order is [ERR_0, ERR_1, WARN_0(0x80000100), INFO_0(None)].
+            addressed = await _select(app, pilot, rows[2])
+            no_address = await _select(app, pilot, rows[3])
+            return before, addressed, no_address
+
+    before, addressed, no_address = asyncio.run(_drive())
+    assert "80000100" in addressed, (
+        f"selecting the addressed row must peek at 0x80000100; pane={addressed!r}"
+    )
+    assert addressed != before, "the hex peek must change on selection"
+    assert "80000100" not in no_address, (
+        f"an address-less row must clear the prior selection's bytes; "
+        f"pane={no_address!r}"
+    )
+
+
+def test_at043c_no_datatable_orphan_on_any_screen(tmp_path: Path) -> None:
+    """AT-043c (retirement total): the legacy DataTable exists on NO rail screen.
+
+    Real mechanism: boot the app, open Issues, and query the retired id on both
+    ``#screen_issues`` and ``#screen_workspace`` — both must be 0, proving no
+    second mount survived the retirement.
+    """
+
+    async def _drive() -> tuple[int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("issues")
+            await pilot.pause()
+            return (
+                len(app.query_one("#screen_issues").query("#validation_issues_list")),
+                len(
+                    app.query_one("#screen_workspace").query("#validation_issues_list")
+                ),
+            )
+
+    on_issues, on_workspace = asyncio.run(_drive())
+    assert on_issues == 0, (
+        f"no DataTable may survive on #screen_issues (found {on_issues})"
+    )
+    assert on_workspace == 0, (
+        f"no DataTable may survive on #screen_workspace (found {on_workspace})"
+    )
+
+
 def test_tc023_status_widgets_persist_across_screens(tmp_path: Path) -> None:
     """The re-homed status bar widgets are reachable from every rail screen.
 
@@ -1981,7 +2102,11 @@ def test_tc024_issues_severity_filters_narrow_through_dedicated_screen(
     select distinct, non-empty subsets: Errors and Warnings each smaller
     than All, and their row counts summing to the All count.
     """
-    from textual.widgets import DataTable
+    from s19_app.tui.issues_view import (
+        IssueGroupHeader,
+        IssueRow,
+        _GROUP_DISPLAY_MAX,
+    )
 
     async def _drive() -> tuple[int, int, int]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -1990,15 +2115,26 @@ def test_tc024_issues_severity_filters_narrow_through_dedicated_screen(
             _seed_issues_screen(app, 30)
             app.action_show_screen("issues")
             await pilot.pause()
-            table = app.query_one("#validation_issues_list", DataTable)
 
-            def _count(mode: str) -> int:
+            async def _count(mode: str) -> int:
+                # Whole-filtered partition via the group headers (each reports
+                # the whole-filtered count for its severity), not the windowed
+                # rows. The pause flushes the prior render's remove_children so
+                # only the current render's headers/rows are counted. Count-guard:
+                # the capped IssueRow read must equal the whole list
+                # (30 < _GROUP_DISPLAY_MAX), else the count is vacuous.
                 app.validation_issue_filter_mode = mode
                 app._validation_issues_window_start = 0
                 app.update_validation_issues_view()
-                return table.row_count
+                await pilot.pause()
+                assert len(app.query(IssueRow)) <= _GROUP_DISPLAY_MAX
+                return sum(h.issue_count for h in app.query(IssueGroupHeader))
 
-            return _count("all"), _count("error"), _count("warning")
+            return (
+                await _count("all"),
+                await _count("error"),
+                await _count("warning"),
+            )
 
     all_n, err_n, warn_n = asyncio.run(_drive())
     assert all_n == 30, f"All filter must show every issue, got {all_n}"
@@ -2019,7 +2155,14 @@ def test_tc024_issues_filter_buttons_route_through_dedicated_screen(
     Pressing it via the real button widget inside ``#screen_issues``
     exercises the wiring end-to-end, not just the renderer.
     """
-    from textual.widgets import Button, DataTable
+    from textual.widgets import Button
+    from s19_app.tui.issues_view import IssueGroupHeader, IssueRow, _GROUP_DISPLAY_MAX
+
+    def _filtered_total(app: S19TuiApp) -> int:
+        # Whole-filtered count via the group headers; count-guard the capped
+        # IssueRow read cannot make the count vacuous (30 < _GROUP_DISPLAY_MAX).
+        assert len(app.query(IssueRow)) <= _GROUP_DISPLAY_MAX
+        return sum(h.issue_count for h in app.query(IssueGroupHeader))
 
     async def _drive() -> tuple[int, int]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -2028,12 +2171,11 @@ def test_tc024_issues_filter_buttons_route_through_dedicated_screen(
             _seed_issues_screen(app, 30)
             app.action_show_screen("issues")
             await pilot.pause()
-            table = app.query_one("#validation_issues_list", DataTable)
-            before = table.row_count
+            before = _filtered_total(app)
             button = app.query_one("#issues_filter_error", Button)
             app.on_button_pressed(Button.Pressed(button))
             await pilot.pause()
-            return before, table.row_count
+            return before, _filtered_total(app)
 
     before, after = asyncio.run(_drive())
     assert before == 30, f"unfiltered Issues table must show 30, got {before}"
@@ -2135,62 +2277,80 @@ def test_tc024_issues_severity_color_round_trips(tmp_path: Path) -> None:
         f"(error={err_styles}, warning={warn_styles})"
     )
 
-    async def _drive() -> int:
+    from s19_app.tui.issues_view import IssueRow, _GROUP_DISPLAY_MAX
+
+    async def _drive() -> list:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             _seed_issues_screen(app, 12)
             app.action_show_screen("issues")
             await pilot.pause()
-            # The dedicated Issues screen renders without raising and keeps
-            # the styled rows in the DataTable.
-            return app.query_one("#validation_issues_list").row_count
+            # The grouped Issues panel mounts a row per issue (12 < the cap)
+            # and colours each through the same css_class_for_severity path —
+            # the grouped panel's colour source of truth (IssueRow._sev_class).
+            rows = list(app.query(IssueRow))
+            assert len(rows) <= _GROUP_DISPLAY_MAX
+            return [(r.issue.severity, r._sev_class) for r in rows]
 
     rendered = asyncio.run(_drive())
-    assert rendered == 12, (
-        f"the dedicated Issues screen must render all 12 styled rows, "
-        f"got {rendered}"
+    assert len(rendered) == 12, (
+        f"the grouped Issues panel must mount all 12 rows, got {len(rendered)}"
     )
+    for severity, sev_class in rendered:
+        assert sev_class == css_class_for_severity(severity), (
+            f"IssueRow colour must round-trip through css_class_for_severity: "
+            f"{severity} -> {sev_class}"
+        )
 
 
 def test_tc024_issues_row_select_jumps_to_source(tmp_path: Path) -> None:
     """Selecting an Issues row still jumps to its source (LLR-011.2).
 
-    Intent: row-level jump-to-source is preserved after the move — the
-    ``on_data_table_row_selected`` handler routes an ``issue:<index>`` row
-    key through ``_jump_to_validation_issue_by_index``. Selecting a row on
-    the dedicated screen must not raise and must resolve the issue index.
+    Intent: row-level jump-to-source is preserved after the legacy DataTable
+    retirement — the surviving path is a real ``IssueRow`` focus + ``Enter``
+    keypress that posts ``IssueRow.Selected`` and drives
+    ``on_issue_row_selected`` -> ``#issues_hex_pane`` (C-16 real mechanism; the
+    retired ``issue:<index>`` row-key path via ``on_data_table_row_selected`` is
+    gone). An addressed row must repaint the peek at its address; an
+    address-less row yields the neutral placeholder with no stale bytes.
     """
-    from textual.widgets import DataTable
+    from textual.widgets import Static
+    from s19_app.tui.issues_view import IssueRow
 
-    class _Evt:
-        def __init__(self, table: object, key: str) -> None:
-            self.data_table = table
-            self.row_key = key
+    async def _select(app, pilot, row) -> str:
+        row.focus()
+        await pilot.pause()
+        await pilot.press("enter")
+        await pilot.pause()
+        return str(app.query_one("#issues_hex_pane", Static).render())
 
-    async def _drive() -> tuple[bool, int]:
+    async def _drive() -> tuple[str, str, str]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _seed_issues_screen(app, 20)
             app.action_show_screen("issues")
+            _seed_issue_objects(app, _mixed_issues_with_info())
             await pilot.pause()
-            table = app.query_one("#validation_issues_list", DataTable)
-            # The renderer recorded issue:<index> row keys for the page.
-            row_keys = [
-                k for k in app._issue_row_key_to_index if k.startswith("issue:")
-            ]
-            raised = False
-            try:
-                app.on_data_table_row_selected(_Evt(table, row_keys[0]))
-            except Exception:
-                raised = True
-            return raised, len(row_keys)
+            before = str(app.query_one("#issues_hex_pane", Static).render())
+            rows = list(app.query(IssueRow))
+            # Order is [ERR_0, ERR_1, WARN_0(0x80000100), INFO_0(None)].
+            addressed = await _select(app, pilot, rows[2])
+            no_address = await _select(app, pilot, rows[3])
+            return before, addressed, no_address
 
-    raised, key_count = asyncio.run(_drive())
-    assert key_count > 0, "the Issues renderer must record issue:<index> row keys"
-    assert not raised, (
-        "selecting an Issues row must route to jump-to-source without error"
+    before, addressed, no_address = asyncio.run(_drive())
+    assert "80000100" in addressed, (
+        f"selecting the addressed row must peek at 0x80000100; pane={addressed!r}"
+    )
+    assert addressed != before, "the hex peek must change on selection"
+    assert "no address" in no_address.lower(), (
+        f"an address-less issue must show the neutral placeholder; "
+        f"pane={no_address!r}"
+    )
+    assert "80000100" not in no_address, (
+        f"the prior selection's bytes must clear on an address-less row; "
+        f"pane={no_address!r}"
     )
 
 
@@ -5900,8 +6060,8 @@ def _seed_issue_objects(app: S19TuiApp, issues: list) -> None:
     Sibling of ``_seed_issues_screen`` but takes an explicit issue list (so a
     test can seed a specific severity mix — including INFO — or a hostile
     record). Flips the empty state, clears the worker precompute caches, resets
-    filter=all + window 0, then renders both the DataTable and the grouped
-    panel via ``update_validation_issues_view``.
+    filter=all + window 0, then renders the grouped panel (the sole Issues
+    surface since batch-29) via ``update_validation_issues_view``.
     """
     from s19_app.core import S19File
     from s19_app.tui.services.load_service import build_loaded_s19
