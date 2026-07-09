@@ -45,6 +45,7 @@ guessing why the paste did nothing.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import subprocess
 import sys
@@ -161,18 +162,38 @@ def _read_via_powershell() -> Optional[str]:
     A fresh process reads the clipboard, isolating us from any in-process
     lock state. Ships with every Windows install (does not depend on
     Windows Terminal). Returns ``None`` on any non-Windows platform.
+
+    Encoding: ``utf-8`` explicit with ``errors='replace'`` so unicode
+    paths (``Ñoño``, cyrillic, CJK, emoji) survive the round-trip
+    instead of being corrupted by ``locale.getpreferredencoding()``
+    (typically ``cp1252`` on Windows). We ask PowerShell itself to emit
+    UTF-8 via ``[Console]::OutputEncoding``.
     """
     if sys.platform != "win32":
         return None
     try:
         result = subprocess.run(
-            ["powershell", "-NoProfile", "-Command", "Get-Clipboard -Raw"],
+            [
+                "powershell",
+                "-NoProfile",
+                "-Command",
+                "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
+                "Get-Clipboard -Raw",
+            ],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=_POWERSHELL_TIMEOUT_S,
         )
-    except Exception as exc:
-        logger.debug("_read_via_powershell subprocess failed: %s", exc)
+    except subprocess.TimeoutExpired as exc:
+        logger.debug("_read_via_powershell timed out after %ss", exc.timeout)
+        return None
+    except FileNotFoundError as exc:
+        logger.debug("_read_via_powershell: powershell.exe not on PATH: %s", exc)
+        return None
+    except OSError as exc:
+        logger.debug("_read_via_powershell subprocess OSError: %s", exc)
         return None
     if result.returncode != 0:
         logger.debug(
@@ -246,9 +267,9 @@ def read_os_clipboard(
                 "read_os_clipboard succeeded via %s (len=%d)", name, len(text)
             )
             return text
-    logger.info(
-        "read_os_clipboard: every strategy failed "
-        "(cascade=%s)", [name for name, _ in cascade]
+    logger.warning(
+        "read_os_clipboard: every strategy failed (cascade=%s)",
+        [name for name, _ in cascade],
     )
     return None
 
@@ -265,11 +286,15 @@ class OsClipboardInput(Input):
         the OS-level workaround (Ctrl+Shift+V on Windows Terminal).
 
     Data Flow:
-        - ``action_paste`` (bound to Ctrl+V by ``Input.BINDINGS``) calls
-          :func:`read_os_clipboard`; on ``None`` it falls back to
-          ``self.app.clipboard``. On non-empty text, only the first line
-          of the payload is inserted, matching Textual's stock
-          ``Input._on_paste`` policy for single-line ``Input`` widgets.
+        - ``action_paste`` (bound to Ctrl+V by ``Input.BINDINGS``) is
+          async so the cascade runs off the UI event loop via
+          ``loop.run_in_executor`` — otherwise the worst-case PowerShell
+          subprocess (up to 500 ms) would freeze the terminal.
+        - The executor call yields to :func:`read_os_clipboard`; on
+          ``None`` we fall back to ``self.app.clipboard``. On non-empty
+          text, only the first line of the payload is inserted, matching
+          Textual's stock ``Input._on_paste`` policy for single-line
+          ``Input`` widgets.
         - The insertion goes through ``self.replace(text, start, end)``
           against the current selection, identical to stock behaviour.
         - On total clipboard failure (no OS layer succeeded AND the
@@ -287,8 +312,13 @@ class OsClipboardInput(Input):
             - :class:`s19_app.tui.screens.LoadFileScreen`
     """
 
-    def action_paste(self) -> None:
-        text = read_os_clipboard()
+    async def action_paste(self) -> None:
+        # Run the cascade off the UI event loop. Even the fast tk layer
+        # blocks synchronously (~89 ms measured), and the PowerShell
+        # rescue can spend up to 500 ms in a blocking subprocess. Both
+        # would freeze the UI if invoked directly from the loop.
+        loop = asyncio.get_event_loop()
+        text = await loop.run_in_executor(None, read_os_clipboard)
         source = "os"
         if text is None:
             text = self.app.clipboard
@@ -304,7 +334,7 @@ class OsClipboardInput(Input):
                 )
             except Exception:  # pragma: no cover — notify is best-effort.
                 pass
-            logger.info(
+            logger.warning(
                 "action_paste: no clipboard text available (source=%s)", source
             )
             return

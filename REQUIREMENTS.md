@@ -662,6 +662,21 @@ Textual in-process buffer) and, if that is also empty, surfaces
 Ctrl+Shift+V or type the path manually — the paste must never be a
 silent no-op and must never corrupt the `Input` value.
 
+The cascade must run **off the UI event loop** (via
+`loop.run_in_executor`) so a worst-case PowerShell subprocess
+(up to 500 ms) never freezes the terminal — `action_paste` is
+therefore an `async` coroutine. The PowerShell layer must invoke
+`subprocess.run` with `encoding='utf-8'` + `errors='replace'` and ask
+PowerShell itself to emit UTF-8 via
+`[Console]::OutputEncoding=[System.Text.Encoding]::UTF8` so unicode
+paths (`Ñoño`, cyrillic, CJK, emoji) survive the round-trip on non-UTF
+Windows locales (typically `cp1252` in Latin America / Europe). Each
+layer must swallow its own expected failure classes cleanly:
+`subprocess.TimeoutExpired`, `FileNotFoundError`, `OSError` on the
+PowerShell layer; `TclError` on tk; Win32 handle-null returns on
+ctypes. Total-failure logging is `logger.warning` (not `.info`) so
+default log levels catch the event.
+
 - Code: `s19_app/tui/screens.py` (`LoadFileScreen.AUTO_FOCUS`, use of
   `OsClipboardInput` for `#load_path`), `s19_app/tui/os_clipboard_input.py`
   (`OsClipboardInput`, `read_os_clipboard`)

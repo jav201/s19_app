@@ -33,6 +33,7 @@ and lifts R-A2L-004 to `Automated`.
 from __future__ import annotations
 
 import asyncio
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -467,7 +468,7 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
     """
     from s19_app.tui import os_clipboard_input as os_clip_mod
 
-    captured: dict[str, list[str]] = {}
+    captured: dict[str, object] = {}
 
     class _FakeResult:
         returncode = 0
@@ -476,7 +477,7 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
 
     def _fake_run(argv, **kwargs) -> _FakeResult:  # type: ignore[no-untyped-def]
         captured["argv"] = list(argv)
-        captured["kwargs"] = list(kwargs.keys())
+        captured["kwargs"] = dict(kwargs)
         return _FakeResult()
 
     monkeypatch.setattr(os_clip_mod.subprocess, "run", _fake_run)
@@ -484,12 +485,99 @@ def test_powershell_layer_does_not_require_wt_or_windows_terminal(
 
     text = os_clip_mod._read_via_powershell()
     assert text == "PS_CLIPBOARD_TEXT"
-    assert captured["argv"][0] == "powershell", (
+    assert captured["argv"][0] == "powershell", (  # type: ignore[index]
         f"PowerShell layer must invoke `powershell` (not `wt` or `pwsh`); "
         f"got {captured['argv']!r}"
     )
-    assert "timeout" in captured["kwargs"], (
-        "PowerShell layer must set a timeout to prevent hangs"
+    kwargs = captured["kwargs"]
+    assert isinstance(kwargs, dict)
+    assert "timeout" in kwargs, "PowerShell layer must set a timeout to prevent hangs"
+    # F1 (audit): encoding must be UTF-8 explicit so unicode paths
+    # survive the round-trip on non-UTF-8 locales (cp1252, cp850, etc.).
+    assert kwargs.get("encoding") == "utf-8", (
+        f"PowerShell layer must set encoding='utf-8'; got {kwargs.get('encoding')!r}"
+    )
+    assert kwargs.get("errors") == "replace", (
+        "PowerShell layer must set errors='replace' so a stray decode "
+        "issue does not raise"
+    )
+
+
+def test_powershell_layer_swallows_timeout_expired(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """R-TUI-043-q: subprocess timeout must degrade to ``None``, never raise.
+
+    Without this guard, a hung ``powershell.exe`` would surface a bare
+    ``TimeoutExpired`` inside ``action_paste`` and take down the paste
+    action (and possibly the UI). We assert the layer returns ``None``
+    cleanly and the cascade caller can continue / fall back.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    def _timeout_run(*args, **kwargs) -> object:  # type: ignore[no-untyped-def]
+        raise subprocess.TimeoutExpired(cmd=args[0], timeout=kwargs.get("timeout"))
+
+    monkeypatch.setattr(os_clip_mod.subprocess, "run", _timeout_run)
+    monkeypatch.setattr(os_clip_mod.sys, "platform", "win32")
+
+    assert os_clip_mod._read_via_powershell() is None
+
+
+def test_powershell_layer_swallows_file_not_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """R-TUI-043-r: absent ``powershell.exe`` must degrade to ``None``.
+
+    On a stripped-down Windows install (or any machine where PowerShell
+    was removed / renamed) the ``FileNotFoundError`` from the subprocess
+    launcher must not propagate.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    def _missing_run(*args, **kwargs) -> object:  # type: ignore[no-untyped-def]
+        raise FileNotFoundError(2, "The system cannot find the file specified.")
+
+    monkeypatch.setattr(os_clip_mod.subprocess, "run", _missing_run)
+    monkeypatch.setattr(os_clip_mod.sys, "platform", "win32")
+
+    assert os_clip_mod._read_via_powershell() is None
+
+
+def test_ctrl_v_preserves_unicode_from_clipboard(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """R-TUI-043-s: unicode paths survive Ctrl+V end-to-end.
+
+    A Windows path can legitimately contain ``Ñ``, ``ö``, cyrillic, CJK
+    or emoji. If the PowerShell fallback used the wrong subprocess
+    encoding these would be corrupted. This test drives Ctrl+V through
+    ``action_paste`` with the module-level ``read_os_clipboard`` mocked
+    to return unicode, then asserts the exact string round-trips into
+    the Input value.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    unicode_path = "C:\\Ñoño\\firmware.s19"
+    monkeypatch.setattr(os_clip_mod, "read_os_clipboard", lambda: unicode_path)
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.push_screen(LoadFileScreen())
+            for _ in range(6):
+                await pilot.pause()
+            input_widget = app.screen.query_one("#load_path", Input)
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            await pilot.pause()
+            return input_widget.value
+
+    value = asyncio.run(_drive())
+    assert value == unicode_path, (
+        f"Ctrl+V must preserve unicode payload exactly; "
+        f"expected {unicode_path!r}, got {value!r}"
     )
 
 
