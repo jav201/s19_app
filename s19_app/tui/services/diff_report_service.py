@@ -91,6 +91,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
     from ..changes.model import ChangeSummaryEntry
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
+from ..changes.display import format_memory_value
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -277,12 +278,45 @@ def _md_cell(value: object) -> str:
     return _strip_ctl(value).replace("|", "\\|")
 
 
+def _md_table_cell(value: object) -> str:
+    """
+    Summary:
+        Sanitize a FILE-BYTE-derived value for a Markdown table cell
+        (batch-34 B-10, security F1): like :func:`_md_cell` but escaping
+        the backslash FIRST — adjacent ``\\|`` bytes under plain
+        :func:`_md_cell` become ``\\\\|`` where Markdown reads a literal
+        backslash followed by a LIVE cell delimiter, silently shifting the
+        row's columns. Scoped to the Before/After byte cells only:
+        :func:`_provenance_lines` keeps :func:`_md_cell` because its output
+        is backtick-wrapped, where doubled backslashes would corrupt
+        Windows paths.
+
+    Args:
+        value (object): The raw cell text (hex + ASCII rendering).
+
+    Returns:
+        str: Cell-safe text — control characters stripped, ``\\`` doubled,
+        every ``|`` escaped.
+
+    Dependencies:
+        Uses:
+            - _strip_ctl
+        Used by:
+            - _linkage_table_lines (Before/After cells)
+    """
+    return (
+        _strip_ctl(value).replace("\\", "\\\\").replace("|", "\\|")
+    )
+
+
 def _bytes_cell(values: Optional[Sequence[int]]) -> str:
     """
     Summary:
-        Render an entry's before/after byte run for a linkage-table cell.
-        ``None`` (a create-into-hole entry — no prior bytes were read) renders
-        the explicit marker, never fabricated bytes (LLR-038.1).
+        Render an entry's before/after byte run for a linkage-table cell —
+        hex tokens PLUS the ASCII companion (batch-34 B-10, operator ask:
+        text-valued patches readable at a glance). ``None`` (a
+        create-into-hole entry — no prior bytes were read) renders the
+        explicit marker, never fabricated bytes (LLR-038.1).
 
     Args:
         values (Optional[Sequence[int]]): ``ChangeSummaryEntry.before_bytes``
@@ -290,17 +324,26 @@ def _bytes_cell(values: Optional[Sequence[int]]) -> str:
             non-``applied`` or hole-creating entry.
 
     Returns:
-        str: Space-separated uppercase hex bytes, ``(none - created into
-        hole)`` for ``None``, or ``-`` for an empty run.
+        str: ``"41 42 43 |ABC|"`` — space-separated uppercase hex bytes
+        followed by the pipe-delimited ASCII rendering
+        (``changes.display.format_memory_value``; non-printables as ``.``);
+        ``(none - created into hole)`` for ``None``; ``-`` for an empty
+        run. RAW text — the Markdown caller escapes via
+        :func:`_md_table_cell`, the HTML caller via :func:`_esc`.
 
     Dependencies:
+        Uses:
+            - changes.display.format_memory_value
         Used by:
             - _linkage_table_lines
             - _html_linkage
     """
     if values is None:
         return "(none - created into hole)"
-    return " ".join(f"{b:02X}" for b in values) or "-"
+    if not values:
+        return "-"
+    rendering = format_memory_value(values)
+    return f"{rendering.hex} |{rendering.ascii}|"
 
 
 def _provenance_lines(provenance: BeforeAfterProvenance) -> List[str]:
@@ -386,8 +429,8 @@ def _linkage_table_lines(
             f"| 0x{entry.address_start:08X} | 0x{entry.address_end:08X} "
             f"| {_md_cell(entry.disposition)} | {_md_cell(entry.linkage)} "
             f"| {symbol} "
-            f"| {_md_cell(_bytes_cell(entry.before_bytes))} "
-            f"| {_md_cell(_bytes_cell(entry.after_bytes))} |"
+            f"| {_md_table_cell(_bytes_cell(entry.before_bytes))} "
+            f"| {_md_table_cell(_bytes_cell(entry.after_bytes))} |"
         )
     lines.append("")
     return lines
@@ -814,26 +857,60 @@ def _window_rows(mem_map: Dict[int, int], low: int, high: int) -> List[str]:
     return rendered.splitlines()
 
 
+#: batch-34 (B-08, operator spec): run windows in the diff/before-after
+#: reports merge when separated by at most this many hex rows — the
+#: "current window plus 5 lines" limit, realized as a 5-row merge bridge so
+#: contiguous changes share ONE window instead of near-identical repeats.
+MERGE_GAP_ROWS: int = 5
+
+
+def _clamp_window(low: int, high: int, image_top: int) -> Tuple[int, int]:
+    """
+    Summary:
+        Clamp a merged window's exclusive upper bound at an image's aligned
+        top (batch-34 B-08) — the per-image half of the old per-run
+        ``compute_hexdump_windows(..., image_top)`` clamp, applied at
+        emission time now that windows are computed once over BOTH images.
+
+    Args:
+        low (int): Inclusive row-aligned window start.
+        high (int): Exclusive row-aligned window end (pre-clamp).
+        image_top (int): One-past-the-last mapped address of the image.
+
+    Returns:
+        Tuple[int, int]: ``(low, min(high, align16_up(image_top)))``; the
+        caller skips emission when the clamped range is empty.
+
+    Dependencies:
+        Used by:
+            - _diff_block_lines / _hex_windows_lines / _html_hex_windows
+    """
+    top_aligned = image_top + (-image_top % HEX_WIDTH)
+    return low, min(high, top_aligned)
+
+
 def _diff_block_lines(
-    run: DiffRun,
+    low: int,
+    high: int,
     mem_map_a: Dict[int, int],
     mem_map_b: Dict[int, int],
-    context_bytes: int,
     top_a: int,
     top_b: int,
 ) -> List[str]:
     """
     Summary:
-        Build the fenced ```diff block for one ``changed`` run (LLR-004.3):
-        image A's window rows as ``-``-prefixed lines, image B's window rows as
-        ``+``-prefixed lines, so the block renders red/green on
-        GitHub/VS Code/Obsidian and degrades to plain text elsewhere.
+        Build the fenced ```diff block for one (possibly merged) changed
+        window (LLR-004.3, batch-34 B-08): image A's window rows as
+        ``-``-prefixed lines, image B's window rows as ``+``-prefixed lines,
+        so the block renders red/green on GitHub/VS Code/Obsidian and
+        degrades to plain text elsewhere. One block per MERGED window —
+        contiguous changed runs no longer repeat their shared context rows.
 
     Args:
-        run (DiffRun): The ``changed`` run.
+        low (int): Inclusive row-aligned window start (merged over runs).
+        high (int): Exclusive row-aligned window end.
         mem_map_a (Dict[int, int]): Image A's memory map.
         mem_map_b (Dict[int, int]): Image B's memory map.
-        context_bytes (int): ± surrounding bytes per run window.
         top_a (int): One-past-the-last mapped address of A (window clamp).
         top_b (int): One-past-the-last mapped address of B (window clamp).
 
@@ -843,16 +920,18 @@ def _diff_block_lines(
 
     Dependencies:
         Uses:
-            - compute_hexdump_windows / _window_rows
+            - _clamp_window / _window_rows
         Used by:
             - _hex_windows_lines
     """
     out: List[str] = ["```diff"]
-    for low, high in compute_hexdump_windows([(run.start, run.end)], context_bytes, top_a):
-        for row in _window_rows(mem_map_a, low, high):
+    low_a, high_a = _clamp_window(low, high, top_a)
+    if high_a > low_a:
+        for row in _window_rows(mem_map_a, low_a, high_a):
             out.append(f"-{row}")
-    for low, high in compute_hexdump_windows([(run.start, run.end)], context_bytes, top_b):
-        for row in _window_rows(mem_map_b, low, high):
+    low_b, high_b = _clamp_window(low, high, top_b)
+    if high_b > low_b:
+        for row in _window_rows(mem_map_b, low_b, high_b):
             out.append(f"+{row}")
     out.extend(["```", ""])
     return out
@@ -883,13 +962,18 @@ def _hex_windows_lines(
         List[str]: Markdown lines, trailing blank included.
 
     Data Flow:
-        - Per run: a ```text window per image (clamped at each image's top);
-          a ``changed`` run additionally emits a ```diff block via
-          :func:`_diff_block_lines`. No omission, no marker (G-9).
+        - Windows are computed ONCE over ALL runs with the
+          :data:`MERGE_GAP_ROWS` bridge (batch-34 B-08) — contiguous runs
+          share one merged window instead of repeating context rows. Per
+          merged window: one grouped heading naming every member run, one
+          ```diff block when any member is ``changed``, then the A and B
+          ```text windows (each clamped at its image's top). No omission,
+          no marker (G-9).
 
     Dependencies:
         Uses:
-            - compute_hexdump_windows / _window_rows / _diff_block_lines
+            - compute_hexdump_windows (merge_gap_bytes) / _clamp_window /
+              _window_rows / _diff_block_lines
         Used by:
             - generate_diff_report
     """
@@ -916,22 +1000,29 @@ def _hex_windows_lines(
             "",
         ]
 
-    for run in runs:
-        out.append(
-            f"### Run 0x{run.start:08X}-0x{run.end:08X} ({_kind_label(run.kind)})"
+    merged_windows = compute_hexdump_windows(
+        [(run.start, run.end) for run in runs],
+        context_bytes,
+        max(top_a, top_b),
+        merge_gap_bytes=MERGE_GAP_ROWS * HEX_WIDTH,
+    )
+    for low, high in merged_windows:
+        members = [run for run in runs if run.start < high and low < run.end]
+        labels = ", ".join(
+            f"0x{run.start:08X}-0x{run.end:08X} ({_kind_label(run.kind)})"
+            for run in members
         )
+        noun = "Run" if len(members) == 1 else "Runs"
+        out.append(f"### {noun} {labels}")
         out.append("")
-        if run.kind == KIND_CHANGED:
+        if any(run.kind == KIND_CHANGED for run in members):
             out.extend(
-                _diff_block_lines(
-                    run, mem_map_a, mem_map_b, context_bytes, top_a, top_b
-                )
+                _diff_block_lines(low, high, mem_map_a, mem_map_b, top_a, top_b)
             )
         for who, mem_map, top in (("A", mem_map_a, top_a), ("B", mem_map_b, top_b)):
-            for low, high in compute_hexdump_windows(
-                [(run.start, run.end)], context_bytes, top
-            ):
-                out.extend(_block(mem_map, low, high, who))
+            low_x, high_x = _clamp_window(low, high, top)
+            if high_x > low_x:
+                out.extend(_block(mem_map, low_x, high_x, who))
 
     return out
 
@@ -1329,25 +1420,154 @@ def _html_hex_windows(
     top_a = max(mem_map_a) + 1 if mem_map_a else 0
     top_b = max(mem_map_b) + 1 if mem_map_b else 0
 
-    for run in runs:
-        colour = _HTML_KIND_COLOUR.get(run.kind, "#000000")
-        lines.append(
-            f'<h3 style="color:{colour}">'
-            f"Run 0x{run.start:08X}-0x{run.end:08X} "
-            f"({_esc(_kind_label(run.kind))})</h3>"
+    merged_windows = compute_hexdump_windows(
+        [(run.start, run.end) for run in runs],
+        context_bytes,
+        max(top_a, top_b),
+        merge_gap_bytes=MERGE_GAP_ROWS * HEX_WIDTH,
+    )
+    for low, high in merged_windows:
+        members = [run for run in runs if run.start < high and low < run.end]
+        colour = _HTML_KIND_COLOUR.get(members[0].kind, "#000000")
+        labels = ", ".join(
+            f"0x{run.start:08X}-0x{run.end:08X} ({_esc(_kind_label(run.kind))})"
+            for run in members
         )
+        noun = "Run" if len(members) == 1 else "Runs"
+        lines.append(f'<h3 style="color:{colour}">{noun} {labels}</h3>')
+        if any(run.kind == KIND_CHANGED for run in members):
+            lines.extend(
+                _html_side_by_side_pane(
+                    mem_map_a, mem_map_b, low, high, top_a, top_b
+                )
+            )
+            continue
         for who, mem_map, top in (("A", mem_map_a, top_a), ("B", mem_map_b, top_b)):
-            for low, high in compute_hexdump_windows(
-                [(run.start, run.end)], context_bytes, top
-            ):
-                body = "\n".join(_window_rows(mem_map, low, high))
-                lines.append(
-                    f"<p>Image {who} window 0x{low:08X}-0x{high:08X}:</p>"
-                )
-                lines.append(
-                    f'<pre style="color:{colour}">{_esc(body)}</pre>'
-                )
+            low_x, high_x = _clamp_window(low, high, top)
+            if high_x <= low_x:
+                continue
+            body = "\n".join(_window_rows(mem_map, low_x, high_x))
+            lines.append(
+                f"<p>Image {who} window 0x{low_x:08X}-0x{high_x:08X}:</p>"
+            )
+            lines.append(f'<pre style="color:{colour}">{_esc(body)}</pre>')
     return lines
+
+
+#: batch-34 (B-09, security F3): the CONSTANT inline style for a changed-byte
+#: highlight span — file-derived data never lands in an attribute value.
+_HTML_CHANGED_BYTE_STYLE: str = "background:#ffd54d;color:#000;font-weight:bold"
+
+
+def _html_hex_row(
+    mem_map: Dict[int, int], other_map: Dict[int, int], base: int
+) -> str:
+    """
+    Summary:
+        Build ONE highlighted hex row as HTML (batch-34 B-09) from
+        structured tokens — each fragment is ``_esc``-escaped FIRST and
+        span-wrapped AFTER (security F2: never index-patch an escaped
+        string), so entity expansion can never shift a highlight into the
+        file-derived ASCII gutter.
+
+    Args:
+        mem_map (Dict[int, int]): The image this row renders.
+        other_map (Dict[int, int]): The counterpart image; a byte whose
+            value differs (or exists on exactly one side) is highlighted.
+        base (int): The row's 16-aligned base address.
+
+    Returns:
+        str: The row HTML: address label, 16 hex tokens (changed ones
+        wrapped in the constant-style span), and the escaped ASCII gutter
+        with changed characters wrapped identically.
+
+    Dependencies:
+        Uses:
+            - _esc / _HTML_CHANGED_BYTE_STYLE
+        Used by:
+            - _html_side_by_side_pane
+    """
+    hex_parts: List[str] = []
+    ascii_parts: List[str] = []
+    for offset in range(HEX_WIDTH):
+        addr = base + offset
+        present = addr in mem_map
+        changed = mem_map.get(addr) != other_map.get(addr)
+        token = f"{mem_map[addr]:02X}" if present else "  "
+        char = "  "
+        if present:
+            value = mem_map[addr]
+            char = chr(value) if 0x20 <= value <= 0x7E else "."
+        token_html = _esc(token)
+        char_html = _esc(char)
+        if changed and present:
+            token_html = (
+                f'<span style="{_HTML_CHANGED_BYTE_STYLE}">{token_html}</span>'
+            )
+            char_html = (
+                f'<span style="{_HTML_CHANGED_BYTE_STYLE}">{char_html}</span>'
+            )
+        hex_parts.append(token_html)
+        ascii_parts.append(char_html if present else _esc(" "))
+    return (
+        f"0x{base:08X}  " + " ".join(hex_parts) + "  |" + "".join(ascii_parts) + "|"
+    )
+
+
+def _html_side_by_side_pane(
+    mem_map_a: Dict[int, int],
+    mem_map_b: Dict[int, int],
+    low: int,
+    high: int,
+    top_a: int,
+    top_b: int,
+) -> List[str]:
+    """
+    Summary:
+        Build the side-by-side Before/After pane for one (possibly merged)
+        changed window (batch-34 B-09): a two-column inline-CSS table whose
+        left cell renders image A's rows and right cell image B's, each
+        through :func:`_html_hex_row` so exactly the differing bytes carry
+        the highlight span. Self-contained inline CSS only; every fragment
+        escaped at construction (security F2/F3).
+
+    Args:
+        mem_map_a (Dict[int, int]): Image A's memory map.
+        mem_map_b (Dict[int, int]): Image B's memory map.
+        low (int): Inclusive row-aligned window start.
+        high (int): Exclusive row-aligned window end.
+        top_a (int): One-past-the-last mapped address of A.
+        top_b (int): One-past-the-last mapped address of B.
+
+    Returns:
+        List[str]: HTML lines for the pane.
+
+    Dependencies:
+        Uses:
+            - _html_hex_row / _clamp_window
+        Used by:
+            - _html_hex_windows
+    """
+
+    def _pane(mem_map: Dict[int, int], other: Dict[int, int], top: int) -> str:
+        low_x, high_x = _clamp_window(low, high, top)
+        if high_x <= low_x:
+            return "<em>(window beyond this image)</em>"
+        rows = [
+            _html_hex_row(mem_map, other, base)
+            for base in range(low_x, high_x, HEX_WIDTH)
+        ]
+        return "<pre>" + "\n".join(rows) + "</pre>"
+
+    return [
+        f"<p>Window 0x{low:08X}-0x{high:08X} (changed bytes highlighted):</p>",
+        '<table style="width:100%;border-collapse:collapse"><tr>',
+        '<td style="vertical-align:top;width:50%;padding-right:8px">'
+        "<strong>Before (A)</strong>" + _pane(mem_map_a, mem_map_b, top_a) + "</td>",
+        '<td style="vertical-align:top;width:50%">'
+        "<strong>After (B)</strong>" + _pane(mem_map_b, mem_map_a, top_b) + "</td>",
+        "</tr></table>",
+    ]
 
 
 def generate_diff_report_html(

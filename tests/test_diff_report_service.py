@@ -670,29 +670,12 @@ def test_html_filename_scheme_and_collision(tmp_path: Path) -> None:
 # 2026-07-02 against the unedited module, fixed clock FIXED_NOW, mem A=AA x4 /
 # B=BB x4 at 0x100). The live tool version is templated as @@VERSION@@ so the
 # golden survives version bumps while staying byte-exact otherwise.
-_PRE_CHANGE_MD_TEMPLATE = (
-    '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: @@VERSION@@\n- Image A: A.s19 [external] path=`/tmp/a.s19` parse-errors=0\n- Image B: B.s19 [external] path=`/tmp/b.s19` parse-errors=0\n'
-    '- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)\n- Image B artifacts: summary=both; a2l=used (1/2); mac=used (1/1)\n\n## Statistics\n\n| Classification | Runs | Bytes |\n'
-    '|---|---|---|\n| changed | 1 | 4 |\n| only in A | 0 | 0 |\n| only in B | 0 | 0 |\n\n## Runs\n'
-    '\n| Start | End | Length | Classification | Symbols |\n|---|---|---|---|---|\n| 0x00000100 | 0x00000104 | 4 | changed | - |\n\n## Hex windows\n'
-    '\n### Run 0x00000100-0x00000104 (changed)\n\n```diff\n-0x000000C0                                                   |................|\n-0x000000D0                                                   |................|\n'
-    '-0x000000E0                                                   |................|\n-0x000000F0                                                   |................|\n-0x00000100  AA AA AA AA                                      |................|\n+0x000000C0                                                   |................|\n+0x000000D0                                                   |................|\n+0x000000E0                                                   |................|\n'
-    '+0x000000F0                                                   |................|\n+0x00000100  BB BB BB BB                                      |................|\n```\n\nImage A window 0x000000C0-0x00000110:\n\n'
-    '```text\n0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n0x00000100  AA AA AA AA                                      |................|\n'
-    '```\n\nImage B window 0x000000C0-0x00000110:\n\n```text\n0x000000C0                                                   |................|\n'
-    '0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n0x00000100  BB BB BB BB                                      |................|\n```\n'
-)
+# batch-34 NOTE: goldens re-captured at batch-34 (the side-by-side HTML
+# pane + grouped headings deliberately changed the changed-run output);
+# the test's INTENT (omitted kwargs add nothing) is unchanged.
+_PRE_CHANGE_MD_TEMPLATE = '# Diff report\n\n- Generated (UTC): 2026-06-11T12:00:00+00:00\n- Tool version: @@VERSION@@\n- Image A: A.s19 [external] path=`/tmp/a.s19` parse-errors=0\n- Image B: B.s19 [external] path=`/tmp/b.s19` parse-errors=0\n- Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)\n- Image B artifacts: summary=both; a2l=used (1/2); mac=used (1/1)\n\n## Statistics\n\n| Classification | Runs | Bytes |\n|---|---|---|\n| changed | 1 | 4 |\n| only in A | 0 | 0 |\n| only in B | 0 | 0 |\n\n## Runs\n\n| Start | End | Length | Classification | Symbols |\n|---|---|---|---|---|\n| 0x00000100 | 0x00000104 | 4 | changed | - |\n\n## Hex windows\n\n### Run 0x00000100-0x00000104 (changed)\n\n```diff\n-0x000000C0                                                   |................|\n-0x000000D0                                                   |................|\n-0x000000E0                                                   |................|\n-0x000000F0                                                   |................|\n-0x00000100  AA AA AA AA                                      |................|\n+0x000000C0                                                   |................|\n+0x000000D0                                                   |................|\n+0x000000E0                                                   |................|\n+0x000000F0                                                   |................|\n+0x00000100  BB BB BB BB                                      |................|\n```\n\nImage A window 0x000000C0-0x00000110:\n\n```text\n0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n0x00000100  AA AA AA AA                                      |................|\n```\n\nImage B window 0x000000C0-0x00000110:\n\n```text\n0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n0x00000100  BB BB BB BB                                      |................|\n```\n'
 
-_PRE_CHANGE_HTML_TEMPLATE = (
-    '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Diff report</title>\n<style>body{font-family:monospace;background:#fdf6e3;color:#073642;}table{border-collapse:collapse;}th,td{border:1px solid #93a1a1;padding:2px 6px;text-align:left;}pre{border:1px solid #93a1a1;padding:6px;overflow:auto;}</style>\n'
-    '</head>\n<body>\n<h1>Diff report</h1>\n<ul>\n<li>Generated (UTC): 2026-06-11T12:00:00+00:00</li>\n<li>Tool version: @@VERSION@@</li>\n'
-    '<li>Image A: A.s19 [external] path=<code>/tmp/a.s19</code> parse-errors=0</li>\n<li>Image B: B.s19 [external] path=<code>/tmp/b.s19</code> parse-errors=0</li>\n<li>Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)</li>\n<li>Image B artifacts: summary=both; a2l=used (1/2); mac=used (1/1)</li>\n</ul>\n<h2>Statistics</h2>\n'
-    '<table>\n<tr><th>Classification</th><th>Runs</th><th>Bytes</th></tr>\n<tr><td style="color:#b58900">changed</td><td>1</td><td>4</td></tr>\n<tr><td style="color:#dc322f">only in A</td><td>0</td><td>0</td></tr>\n<tr><td style="color:#268bd2">only in B</td><td>0</td><td>0</td></tr>\n</table>\n'
-    '<h2>Runs</h2>\n<table>\n<tr><th>Start</th><th>End</th><th>Length</th><th>Classification</th><th>Symbols</th></tr>\n<tr><td>0x00000100</td><td>0x00000104</td><td>4</td><td style="color:#b58900">changed</td><td>-</td></tr>\n</table>\n<h2>Hex windows</h2>\n'
-    '<h3 style="color:#b58900">Run 0x00000100-0x00000104 (changed)</h3>\n<p>Image A window 0x000000C0-0x00000110:</p>\n<pre style="color:#b58900">0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n'
-    '0x00000100  AA AA AA AA                                      |................|</pre>\n<p>Image B window 0x000000C0-0x00000110:</p>\n<pre style="color:#b58900">0x000000C0                                                   |................|\n0x000000D0                                                   |................|\n0x000000E0                                                   |................|\n0x000000F0                                                   |................|\n'
-    '0x00000100  BB BB BB BB                                      |................|</pre>\n</body>\n</html>'
-)
+_PRE_CHANGE_HTML_TEMPLATE = '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<title>Diff report</title>\n<style>body{font-family:monospace;background:#fdf6e3;color:#073642;}table{border-collapse:collapse;}th,td{border:1px solid #93a1a1;padding:2px 6px;text-align:left;}pre{border:1px solid #93a1a1;padding:6px;overflow:auto;}</style>\n</head>\n<body>\n<h1>Diff report</h1>\n<ul>\n<li>Generated (UTC): 2026-06-11T12:00:00+00:00</li>\n<li>Tool version: @@VERSION@@</li>\n<li>Image A: A.s19 [external] path=<code>/tmp/a.s19</code> parse-errors=0</li>\n<li>Image B: B.s19 [external] path=<code>/tmp/b.s19</code> parse-errors=0</li>\n<li>Image A artifacts: summary=both; a2l=used (1/2); mac=used (1/1)</li>\n<li>Image B artifacts: summary=both; a2l=used (1/2); mac=used (1/1)</li>\n</ul>\n<h2>Statistics</h2>\n<table>\n<tr><th>Classification</th><th>Runs</th><th>Bytes</th></tr>\n<tr><td style="color:#b58900">changed</td><td>1</td><td>4</td></tr>\n<tr><td style="color:#dc322f">only in A</td><td>0</td><td>0</td></tr>\n<tr><td style="color:#268bd2">only in B</td><td>0</td><td>0</td></tr>\n</table>\n<h2>Runs</h2>\n<table>\n<tr><th>Start</th><th>End</th><th>Length</th><th>Classification</th><th>Symbols</th></tr>\n<tr><td>0x00000100</td><td>0x00000104</td><td>4</td><td style="color:#b58900">changed</td><td>-</td></tr>\n</table>\n<h2>Hex windows</h2>\n<h3 style="color:#b58900">Run 0x00000100-0x00000104 (changed)</h3>\n<p>Window 0x000000C0-0x00000110 (changed bytes highlighted):</p>\n<table style="width:100%;border-collapse:collapse"><tr>\n<td style="vertical-align:top;width:50%;padding-right:8px"><strong>Before (A)</strong><pre>0x000000C0                                                   |                |\n0x000000D0                                                   |                |\n0x000000E0                                                   |                |\n0x000000F0                                                   |                |\n0x00000100  <span style="background:#ffd54d;color:#000;font-weight:bold">AA</span> <span style="background:#ffd54d;color:#000;font-weight:bold">AA</span> <span style="background:#ffd54d;color:#000;font-weight:bold">AA</span> <span style="background:#ffd54d;color:#000;font-weight:bold">AA</span>                                      |<span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span>            |</pre></td>\n<td style="vertical-align:top;width:50%"><strong>After (B)</strong><pre>0x000000C0                                                   |                |\n0x000000D0                                                   |                |\n0x000000E0                                                   |                |\n0x000000F0                                                   |                |\n0x00000100  <span style="background:#ffd54d;color:#000;font-weight:bold">BB</span> <span style="background:#ffd54d;color:#000;font-weight:bold">BB</span> <span style="background:#ffd54d;color:#000;font-weight:bold">BB</span> <span style="background:#ffd54d;color:#000;font-weight:bold">BB</span>                                      |<span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span><span style="background:#ffd54d;color:#000;font-weight:bold">.</span>            |</pre></td>\n</tr></table>\n</body>\n</html>'
 
 
 def _entry(
@@ -842,15 +825,18 @@ def test_provenance_and_linkage_render_in_both_formats(tmp_path: Path) -> None:
         # create-into-hole marker, never fabricated bytes
         assert "(none - created into hole)" in text
         assert "CC DD" in text  # after side still real
-    # md linkage row shape: entry 1 fully tabular
+    # md linkage row shape: entry 1 fully tabular — batch-34 (AC-5,
+    # supersedes the hex-only pin): cells carry the ASCII companion with
+    # its gutter pipes escaped via _md_table_cell.
     assert (
         "| 1 | bytes | 0x00000100 | 0x00000102 | applied | mac-linked "
-        "| CAL_SYM | AA AA | 01 02 |" in md_text
+        "| CAL_SYM | AA AA \\|..\\| | 01 02 \\|..\\| |" in md_text
     )
-    # the None-before md row carries the marker cell, not hex
+    # the None-before md row carries the marker cell, not hex (marker
+    # unchanged — no fabricated ASCII).
     assert (
         "| 2 | bytes | 0x00009000 | 0x00009002 | applied | standalone "
-        "| - | (none - created into hole) | CC DD |" in md_text
+        "| - | (none - created into hole) | CC DD \\|..\\| |" in md_text
     )
     # html stays self-contained and safe with the new sections
     assert html_text.count("<script") == 0
@@ -921,3 +907,247 @@ def test_pipe_bearing_symbol_md_escaped_html_intact(tmp_path: Path) -> None:
     # ctl-char stripping is the md-cell rule only — S-F2)
     assert "EVIL|SYM&lt;b&gt;" in html_text
     assert "<b>" not in html_text
+
+
+# ---------------------------------------------------------------------------
+# batch-34 Inc-1 (B-08) — merged context windows for contiguous runs.
+# ---------------------------------------------------------------------------
+
+
+def test_ac1_contiguous_runs_share_one_merged_window(tmp_path: Path) -> None:
+    """AC-1: two changed runs two rows apart yield ONE grouped heading and
+    ONE Image-A/Image-B window pair (RED-first: pre-batch-34 each run
+    emitted its own overlapping pair, duplicating the shared context)."""
+    # Runs at 0x1000 and 0x1020 (two rows apart); context 0 keeps the
+    # window math exact: rows 0x1000 and 0x1020 bridge (gap 1 row <= 5).
+    runs = [
+        DiffRun(0x1000, 0x1004, KIND_CHANGED),
+        DiffRun(0x1020, 0x1024, KIND_CHANGED),
+    ]
+    mem_a = {addr: 0xAA for addr in range(0x1000, 0x1030)}
+    mem_b = {addr: 0xBB for addr in range(0x1000, 0x1030)}
+    comparison = _comparison(runs=runs, stats=_stats(2, 8))
+
+    result = generate_diff_report(
+        comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert text.count("### Run") == 1, "one grouped heading, not one per run"
+    assert "### Runs 0x00001000-0x00001004 (changed), 0x00001020-0x00001024 (changed)" in text
+    assert text.count("Image A window") == 1
+    assert text.count("Image B window") == 1
+    assert "Image A window 0x00001000-0x00001030:" in text
+    assert text.count("```diff") == 1, "one merged diff block"
+
+
+def test_ac1_boundary_five_rows_merges_six_does_not(tmp_path: Path) -> None:
+    """AC-1 boundary: a 5-row gap between run windows merges; a 6-row gap
+    keeps two separate windows (the operator's +5-lines limit)."""
+
+    def _report(second_start: int) -> str:
+        runs = [
+            DiffRun(0x1000, 0x1004, KIND_CHANGED),
+            DiffRun(second_start, second_start + 4, KIND_CHANGED),
+        ]
+        top = second_start + 0x10
+        mem_a = {addr: 0xAA for addr in range(0x1000, top)}
+        mem_b = {addr: 0xBB for addr in range(0x1000, top)}
+        result = generate_diff_report(
+            _comparison(runs=runs, stats=_stats(2, 8)),
+            mem_map_a=mem_a, mem_map_b=mem_b,
+            project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+        )
+        return result.path.read_text(encoding="utf-8")
+
+    # Window 1 covers [0x1000, 0x1010); a run starting at 0x1060 opens its
+    # window exactly 5 rows (0x50 bytes) past that end -> merges.
+    merged = _report(0x1060)
+    assert merged.count("Image A window") == 1
+    assert "### Runs" in merged
+
+    # 6 rows past (0x1070) -> stays separate.
+    separate = _report(0x1070)
+    assert separate.count("Image A window") == 2
+    assert separate.count("### Run 0x") == 2  # two singular headings
+
+
+def test_ac2_compute_hexdump_windows_gap_parameter() -> None:
+    """AC-2: the default (gap 0) is byte-identical to the old fold; a
+    positive merge_gap_bytes bridges windows separated by <= gap."""
+    from s19_app.tui.services.report_service import compute_hexdump_windows
+    regions = [(0x100, 0x104), (0x160, 0x164)]  # windows 0x100-0x110, 0x160-0x170
+    # Default: overlap-or-touch only -> two windows (gap is 0x50).
+    assert compute_hexdump_windows(regions, 0, 0x200) == [
+        (0x100, 0x110),
+        (0x160, 0x170),
+    ]
+    # Gap 5 rows (0x50): exactly bridges -> one window.
+    assert compute_hexdump_windows(regions, 0, 0x200, merge_gap_bytes=0x50) == [
+        (0x100, 0x170),
+    ]
+    # Gap one row short (0x40): still two windows.
+    assert compute_hexdump_windows(regions, 0, 0x200, merge_gap_bytes=0x40) == [
+        (0x100, 0x110),
+        (0x160, 0x170),
+    ]
+
+
+# ---------------------------------------------------------------------------
+# batch-34 Inc-2 (B-09) — HTML side-by-side panes with per-changed-byte
+# highlights (escape-then-wrap construction, security F2/F3).
+# ---------------------------------------------------------------------------
+
+
+def test_ac3_html_side_by_side_highlights_changed_bytes(tmp_path: Path) -> None:
+    """AC-3: the changed window renders Before(A)/After(B) side by side and
+    wraps EXACTLY the differing bytes' hex tokens in the highlight span —
+    an unchanged byte's token stays span-free."""
+    # One changed run 0x100-0x102 (two bytes differ); byte at 0x102 equal.
+    runs = [DiffRun(0x100, 0x102, KIND_CHANGED)]
+    mem_a = {0x100: 0xAA, 0x101: 0xAB, 0x102: 0x55}
+    mem_b = {0x100: 0xBB, 0x101: 0xBC, 0x102: 0x55}
+    result = generate_diff_report_html(
+        _comparison(runs=runs, stats=_stats(1, 2)),
+        mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert "Before (A)" in text and "After (B)" in text
+    assert "(changed bytes highlighted)" in text
+    span = '<span style="background:#ffd54d;color:#000;font-weight:bold">'
+    assert f"{span}AA</span>" in text
+    assert f"{span}BB</span>" in text
+    assert f"{span}AB</span>" in text
+    assert f"{span}BC</span>" in text
+    # The unchanged 0x55 byte is NOT highlighted on either pane.
+    assert f"{span}55</span>" not in text
+    assert "55" in text  # ...but it renders
+
+
+def test_ac3_hostile_gutter_bytes_escaped_in_html(tmp_path: Path) -> None:
+    """AC-3 hostile case (security fixture 5): a run whose bytes decode to
+    '<b>&' renders the gutter ESCAPED (no raw '<b>' anywhere; the ampersand
+    beside a highlighted byte yields exactly one '&amp;', never a split or
+    doubled entity)."""
+    payload = [0x3C, 0x62, 0x3E, 0x26]  # "<b>&"
+    runs = [DiffRun(0x100, 0x104, KIND_CHANGED)]
+    mem_a = {0x100 + i: b for i, b in enumerate(payload)}
+    mem_b = {0x100 + i: (b ^ 0xFF) for i, b in enumerate(payload)}
+    result = generate_diff_report_html(
+        _comparison(runs=runs, stats=_stats(1, 4)),
+        mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert "<b>" not in text, "raw file-derived tag must never reach the HTML"
+    # Gutter chars are escaped per-fragment (escape-then-wrap), so '<' and
+    # '>' appear as individual escaped entities, never as a raw tag.
+    assert "&lt;" in text and "&gt;" in text
+    assert "&amp;amp;" not in text, "no double-escaped entity"
+    assert "&amp;" in text
+    # The escaped gutter chars themselves carry the highlight (escape-then-wrap).
+    span = '<span style="background:#ffd54d;color:#000;font-weight:bold">'
+    assert f"{span}&lt;</span>" in text
+
+
+def test_ac4_markdown_diff_block_format_unchanged(tmp_path: Path) -> None:
+    """AC-4 (regression pin): the Markdown report's ```diff block keeps its
+    -A/+B row format for a changed run."""
+    result = generate_diff_report(
+        _comparison(), mem_map_a=_mem(0x100, 0xAA, 4), mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+    assert "```diff" in text
+    assert "-0x00000100  AA AA AA AA" in text
+    assert "+0x00000100  BB BB BB BB" in text
+
+
+# ---------------------------------------------------------------------------
+# batch-34 Inc-3 (B-10) — linkage-table ASCII companions + hostile bytes.
+# ---------------------------------------------------------------------------
+
+
+def _linkage_report_pair(tmp_path: Path, entry) -> "tuple[str, str]":
+    """Generate MD + HTML with one linkage entry; return both texts."""
+    md = generate_diff_report(
+        _comparison(), mem_map_a=_mem(0x100, 0xAA, 4), mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path, now_fn=_fixed_clock, linkage_entries=[entry],
+    )
+    html_r = generate_diff_report_html(
+        _comparison(), mem_map_a=_mem(0x100, 0xAA, 4), mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path, now_fn=_fixed_clock, linkage_entries=[entry],
+    )
+    return (
+        md.path.read_text(encoding="utf-8"),
+        html_r.path.read_text(encoding="utf-8"),
+    )
+
+
+def test_ac5_linkage_cells_carry_ascii_companion(tmp_path: Path) -> None:
+    """AC-5: a text-valued patch renders readable — the Before/After cells
+    carry the ASCII rendering beside the hex in BOTH formats (RED-first:
+    cells were hex-only)."""
+    entry = _entry(
+        address_start=0x100,
+        address_end=0x105,
+        before_bytes=(0x52, 0x45, 0x56, 0x5F, 0x42),  # "REV_B"
+        after_bytes=(0x52, 0x45, 0x56, 0x5F, 0x43),  # "REV_C"
+    )
+    md_text, html_text = _linkage_report_pair(tmp_path, entry)
+
+    # MD: gutter pipes escaped by _md_table_cell; ASCII visible.
+    assert "52 45 56 5F 42 \\|REV_B\\|" in md_text
+    assert "52 45 56 5F 43 \\|REV_C\\|" in md_text
+    # HTML: plain pipes (inert), html-escaped path.
+    assert "52 45 56 5F 42 |REV_B|" in html_text
+    assert "52 45 56 5F 43 |REV_C|" in html_text
+
+
+def test_ac5_hostile_bytes_keep_md_table_and_html_safe(tmp_path: Path) -> None:
+    """AC-5 hostile set (security F1 counterfactual + fixtures 1/2/4/6):
+    pipe and backslash-pipe bytes keep the MD row at exactly its 9 cells
+    (plain _md_cell would leak a live delimiter on the adjacent \\| pair);
+    '<b>'-shaped bytes are escaped in HTML; non-printables render '.'."""
+    hostile = (0x5C, 0x7C, 0x3C, 0x62, 0x3E, 0x0A, 0x60)  # \ | < b > LF `
+    entry = _entry(
+        address_start=0x200,
+        address_end=0x207,
+        before_bytes=hostile,
+        after_bytes=(0x41,) * 7,
+    )
+    md_text, html_text = _linkage_report_pair(tmp_path, entry)
+
+    # The MD row still splits into exactly 9 cells: split on pipes that are
+    # NOT backslash-escaped.
+    row = next(
+        line for line in md_text.splitlines() if line.startswith("| 1 | ")
+    )
+    cells = re.split(r"(?<!\\)\|", row)
+    assert len([c for c in cells if c != ""]) == 9, (
+        f"hostile bytes must not add/remove MD columns; row: {row!r}"
+    )
+    # ASCII shows the literal printables (escaped) and '.' for LF.
+    assert "\\\\" in row  # the 0x5C byte, backslash-doubled
+    assert "." in row  # the LF placeholder
+    # HTML: tag-shaped bytes escaped, never raw.
+    assert "<b>" not in html_text
+    assert "&lt;b&gt;" in html_text
+
+
+def test_ac5_markers_unchanged(tmp_path: Path) -> None:
+    """AC-5 boundary: the None-before marker and empty-run dash render
+    exactly as before (no fabricated ASCII)."""
+    entry = _entry(
+        address_start=0x300,
+        address_end=0x302,
+        before_bytes=None,
+        after_bytes=(0x01, 0x02),
+    )
+    md_text, html_text = _linkage_report_pair(tmp_path, entry)
+    assert "(none - created into hole)" in md_text
+    assert "(none - created into hole)" in html_text

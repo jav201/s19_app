@@ -275,7 +275,7 @@ def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
     # Linkage table row for the applied entry.
     assert (
         "| 1 | bytes | 0x00000100 | 0x00000102 | applied | standalone | - "
-        "| 00 00 | AA BB |" in text
+        "| 00 00 \\|..\\| | AA BB \\|..\\| |" in text
     ), "AT-038a: linkage row for the applied entry missing"
 
     # Diff fence: pre-patch bytes as '-' lines, after_bytes as '+' lines.
@@ -494,7 +494,7 @@ def test_tc_038_3_composer_happy_path_and_regex_ownership(tmp_path: Path) -> Non
     assert str(original) in text and str(patched) in text
     assert (
         "| 1 | bytes | 0x00000100 | 0x00000102 | applied | standalone | - "
-        "| 00 00 | AA BB |" in text
+        "| 00 00 \\|..\\| | AA BB \\|..\\| |" in text
     )
     assert "```diff" in text
 
