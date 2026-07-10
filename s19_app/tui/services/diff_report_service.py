@@ -814,26 +814,60 @@ def _window_rows(mem_map: Dict[int, int], low: int, high: int) -> List[str]:
     return rendered.splitlines()
 
 
+#: batch-34 (B-08, operator spec): run windows in the diff/before-after
+#: reports merge when separated by at most this many hex rows — the
+#: "current window plus 5 lines" limit, realized as a 5-row merge bridge so
+#: contiguous changes share ONE window instead of near-identical repeats.
+MERGE_GAP_ROWS: int = 5
+
+
+def _clamp_window(low: int, high: int, image_top: int) -> Tuple[int, int]:
+    """
+    Summary:
+        Clamp a merged window's exclusive upper bound at an image's aligned
+        top (batch-34 B-08) — the per-image half of the old per-run
+        ``compute_hexdump_windows(..., image_top)`` clamp, applied at
+        emission time now that windows are computed once over BOTH images.
+
+    Args:
+        low (int): Inclusive row-aligned window start.
+        high (int): Exclusive row-aligned window end (pre-clamp).
+        image_top (int): One-past-the-last mapped address of the image.
+
+    Returns:
+        Tuple[int, int]: ``(low, min(high, align16_up(image_top)))``; the
+        caller skips emission when the clamped range is empty.
+
+    Dependencies:
+        Used by:
+            - _diff_block_lines / _hex_windows_lines / _html_hex_windows
+    """
+    top_aligned = image_top + (-image_top % HEX_WIDTH)
+    return low, min(high, top_aligned)
+
+
 def _diff_block_lines(
-    run: DiffRun,
+    low: int,
+    high: int,
     mem_map_a: Dict[int, int],
     mem_map_b: Dict[int, int],
-    context_bytes: int,
     top_a: int,
     top_b: int,
 ) -> List[str]:
     """
     Summary:
-        Build the fenced ```diff block for one ``changed`` run (LLR-004.3):
-        image A's window rows as ``-``-prefixed lines, image B's window rows as
-        ``+``-prefixed lines, so the block renders red/green on
-        GitHub/VS Code/Obsidian and degrades to plain text elsewhere.
+        Build the fenced ```diff block for one (possibly merged) changed
+        window (LLR-004.3, batch-34 B-08): image A's window rows as
+        ``-``-prefixed lines, image B's window rows as ``+``-prefixed lines,
+        so the block renders red/green on GitHub/VS Code/Obsidian and
+        degrades to plain text elsewhere. One block per MERGED window —
+        contiguous changed runs no longer repeat their shared context rows.
 
     Args:
-        run (DiffRun): The ``changed`` run.
+        low (int): Inclusive row-aligned window start (merged over runs).
+        high (int): Exclusive row-aligned window end.
         mem_map_a (Dict[int, int]): Image A's memory map.
         mem_map_b (Dict[int, int]): Image B's memory map.
-        context_bytes (int): ± surrounding bytes per run window.
         top_a (int): One-past-the-last mapped address of A (window clamp).
         top_b (int): One-past-the-last mapped address of B (window clamp).
 
@@ -843,16 +877,18 @@ def _diff_block_lines(
 
     Dependencies:
         Uses:
-            - compute_hexdump_windows / _window_rows
+            - _clamp_window / _window_rows
         Used by:
             - _hex_windows_lines
     """
     out: List[str] = ["```diff"]
-    for low, high in compute_hexdump_windows([(run.start, run.end)], context_bytes, top_a):
-        for row in _window_rows(mem_map_a, low, high):
+    low_a, high_a = _clamp_window(low, high, top_a)
+    if high_a > low_a:
+        for row in _window_rows(mem_map_a, low_a, high_a):
             out.append(f"-{row}")
-    for low, high in compute_hexdump_windows([(run.start, run.end)], context_bytes, top_b):
-        for row in _window_rows(mem_map_b, low, high):
+    low_b, high_b = _clamp_window(low, high, top_b)
+    if high_b > low_b:
+        for row in _window_rows(mem_map_b, low_b, high_b):
             out.append(f"+{row}")
     out.extend(["```", ""])
     return out
@@ -883,13 +919,18 @@ def _hex_windows_lines(
         List[str]: Markdown lines, trailing blank included.
 
     Data Flow:
-        - Per run: a ```text window per image (clamped at each image's top);
-          a ``changed`` run additionally emits a ```diff block via
-          :func:`_diff_block_lines`. No omission, no marker (G-9).
+        - Windows are computed ONCE over ALL runs with the
+          :data:`MERGE_GAP_ROWS` bridge (batch-34 B-08) — contiguous runs
+          share one merged window instead of repeating context rows. Per
+          merged window: one grouped heading naming every member run, one
+          ```diff block when any member is ``changed``, then the A and B
+          ```text windows (each clamped at its image's top). No omission,
+          no marker (G-9).
 
     Dependencies:
         Uses:
-            - compute_hexdump_windows / _window_rows / _diff_block_lines
+            - compute_hexdump_windows (merge_gap_bytes) / _clamp_window /
+              _window_rows / _diff_block_lines
         Used by:
             - generate_diff_report
     """
@@ -916,22 +957,29 @@ def _hex_windows_lines(
             "",
         ]
 
-    for run in runs:
-        out.append(
-            f"### Run 0x{run.start:08X}-0x{run.end:08X} ({_kind_label(run.kind)})"
+    merged_windows = compute_hexdump_windows(
+        [(run.start, run.end) for run in runs],
+        context_bytes,
+        max(top_a, top_b),
+        merge_gap_bytes=MERGE_GAP_ROWS * HEX_WIDTH,
+    )
+    for low, high in merged_windows:
+        members = [run for run in runs if run.start < high and low < run.end]
+        labels = ", ".join(
+            f"0x{run.start:08X}-0x{run.end:08X} ({_kind_label(run.kind)})"
+            for run in members
         )
+        noun = "Run" if len(members) == 1 else "Runs"
+        out.append(f"### {noun} {labels}")
         out.append("")
-        if run.kind == KIND_CHANGED:
+        if any(run.kind == KIND_CHANGED for run in members):
             out.extend(
-                _diff_block_lines(
-                    run, mem_map_a, mem_map_b, context_bytes, top_a, top_b
-                )
+                _diff_block_lines(low, high, mem_map_a, mem_map_b, top_a, top_b)
             )
         for who, mem_map, top in (("A", mem_map_a, top_a), ("B", mem_map_b, top_b)):
-            for low, high in compute_hexdump_windows(
-                [(run.start, run.end)], context_bytes, top
-            ):
-                out.extend(_block(mem_map, low, high, who))
+            low_x, high_x = _clamp_window(low, high, top)
+            if high_x > low_x:
+                out.extend(_block(mem_map, low_x, high_x, who))
 
     return out
 

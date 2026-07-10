@@ -921,3 +921,88 @@ def test_pipe_bearing_symbol_md_escaped_html_intact(tmp_path: Path) -> None:
     # ctl-char stripping is the md-cell rule only — S-F2)
     assert "EVIL|SYM&lt;b&gt;" in html_text
     assert "<b>" not in html_text
+
+
+# ---------------------------------------------------------------------------
+# batch-34 Inc-1 (B-08) — merged context windows for contiguous runs.
+# ---------------------------------------------------------------------------
+
+
+def test_ac1_contiguous_runs_share_one_merged_window(tmp_path: Path) -> None:
+    """AC-1: two changed runs two rows apart yield ONE grouped heading and
+    ONE Image-A/Image-B window pair (RED-first: pre-batch-34 each run
+    emitted its own overlapping pair, duplicating the shared context)."""
+    # Runs at 0x1000 and 0x1020 (two rows apart); context 0 keeps the
+    # window math exact: rows 0x1000 and 0x1020 bridge (gap 1 row <= 5).
+    runs = [
+        DiffRun(0x1000, 0x1004, KIND_CHANGED),
+        DiffRun(0x1020, 0x1024, KIND_CHANGED),
+    ]
+    mem_a = {addr: 0xAA for addr in range(0x1000, 0x1030)}
+    mem_b = {addr: 0xBB for addr in range(0x1000, 0x1030)}
+    comparison = _comparison(runs=runs, stats=_stats(2, 8))
+
+    result = generate_diff_report(
+        comparison, mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+    )
+    text = result.path.read_text(encoding="utf-8")
+
+    assert text.count("### Run") == 1, "one grouped heading, not one per run"
+    assert "### Runs 0x00001000-0x00001004 (changed), 0x00001020-0x00001024 (changed)" in text
+    assert text.count("Image A window") == 1
+    assert text.count("Image B window") == 1
+    assert "Image A window 0x00001000-0x00001030:" in text
+    assert text.count("```diff") == 1, "one merged diff block"
+
+
+def test_ac1_boundary_five_rows_merges_six_does_not(tmp_path: Path) -> None:
+    """AC-1 boundary: a 5-row gap between run windows merges; a 6-row gap
+    keeps two separate windows (the operator's +5-lines limit)."""
+
+    def _report(second_start: int) -> str:
+        runs = [
+            DiffRun(0x1000, 0x1004, KIND_CHANGED),
+            DiffRun(second_start, second_start + 4, KIND_CHANGED),
+        ]
+        top = second_start + 0x10
+        mem_a = {addr: 0xAA for addr in range(0x1000, top)}
+        mem_b = {addr: 0xBB for addr in range(0x1000, top)}
+        result = generate_diff_report(
+            _comparison(runs=runs, stats=_stats(2, 8)),
+            mem_map_a=mem_a, mem_map_b=mem_b,
+            project_dir=tmp_path, context_bytes=0, now_fn=_fixed_clock,
+        )
+        return result.path.read_text(encoding="utf-8")
+
+    # Window 1 covers [0x1000, 0x1010); a run starting at 0x1060 opens its
+    # window exactly 5 rows (0x50 bytes) past that end -> merges.
+    merged = _report(0x1060)
+    assert merged.count("Image A window") == 1
+    assert "### Runs" in merged
+
+    # 6 rows past (0x1070) -> stays separate.
+    separate = _report(0x1070)
+    assert separate.count("Image A window") == 2
+    assert separate.count("### Run 0x") == 2  # two singular headings
+
+
+def test_ac2_compute_hexdump_windows_gap_parameter() -> None:
+    """AC-2: the default (gap 0) is byte-identical to the old fold; a
+    positive merge_gap_bytes bridges windows separated by <= gap."""
+    from s19_app.tui.services.report_service import compute_hexdump_windows
+    regions = [(0x100, 0x104), (0x160, 0x164)]  # windows 0x100-0x110, 0x160-0x170
+    # Default: overlap-or-touch only -> two windows (gap is 0x50).
+    assert compute_hexdump_windows(regions, 0, 0x200) == [
+        (0x100, 0x110),
+        (0x160, 0x170),
+    ]
+    # Gap 5 rows (0x50): exactly bridges -> one window.
+    assert compute_hexdump_windows(regions, 0, 0x200, merge_gap_bytes=0x50) == [
+        (0x100, 0x170),
+    ]
+    # Gap one row short (0x40): still two windows.
+    assert compute_hexdump_windows(regions, 0, 0x200, merge_gap_bytes=0x40) == [
+        (0x100, 0x110),
+        (0x160, 0x170),
+    ]

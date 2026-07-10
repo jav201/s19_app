@@ -263,6 +263,7 @@ def compute_hexdump_windows(
     regions: Sequence[Tuple[int, int]],
     context_bytes: int,
     image_top: int,
+    merge_gap_bytes: int = 0,
 ) -> List[Tuple[int, int]]:
     """
     Summary:
@@ -279,6 +280,13 @@ def compute_hexdump_windows(
         image_top (int): EXCLUSIVE top of the mapped image — highest
             mapped address + 1 — so a top byte sitting exactly on a row
             boundary still gets its full row.
+        merge_gap_bytes (int): Additional bridge for the merge fold
+            (batch-34 B-08): windows separated by at most this many bytes
+            merge into one. ``0`` (the default) preserves the original
+            overlap-or-touch behavior byte-identically for every existing
+            caller; the diff report passes ``5 * HEX_WIDTH`` so changes
+            within five hex rows share one window (the operator's
+            "+5 lines" limit).
 
     Returns:
         List[Tuple[int, int]]: Merged half-open windows, ascending, each
@@ -316,7 +324,7 @@ def compute_hexdump_windows(
     windows.sort()
     merged: List[List[int]] = []
     for low, high in windows:
-        if merged and low <= merged[-1][1]:
+        if merged and low <= merged[-1][1] + merge_gap_bytes:
             merged[-1][1] = max(merged[-1][1], high)
         else:
             merged.append([low, high])
