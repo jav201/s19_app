@@ -828,3 +828,146 @@ def test_tc042_3_read_os_clipboard_bounds_selected_strategy_result() -> None:
     assert result is not None
     assert len(result) == CAP
     assert result == huge[:CAP]
+
+
+# ---------------------------------------------------------------------------
+# batch-31 AC-2 (B-03) — OS-clipboard paste works in EVERY swapped text box,
+# not just the Load dialog's #load_path (the sole batch-29 consumer).
+#
+# Same seam discipline as AT-042b: inject at _STRATEGIES (below
+# read_os_clipboard) so the real bounded funnel runs inside action_paste;
+# never monkeypatch the funnel itself.
+# ---------------------------------------------------------------------------
+
+
+def test_ac2_paste_reaches_all_swapped_inputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-2 / B-03: Ctrl+V inserts OS-clipboard text in all swapped inputs.
+
+    Intent: the operator could paste only into the Load dialog; the A/B diff
+    paths, the change-set path, the save-back name, and the patch-entry
+    inputs were stock ``Input`` widgets that silently no-op on Ctrl+V. Each
+    swapped input must now receive the (first-line, funnel-bounded) OS
+    clipboard text through the REAL key path: focus + Ctrl+V.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+
+    pasted = "C:/firmware/team drop/case_31.json"
+    monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: pasted),))
+
+    targets_by_screen = {
+        "patch": (
+            "#patch_entry_address_input",
+            "#patch_entry_value_input",
+            "#patch_entry_bytes_input",
+            "#patch_doc_path_input",
+        ),
+        "diff": ("#diff_path_a", "#diff_path_b", "#diff_report_dest"),
+    }
+
+    async def _drive() -> "dict[str, str]":
+        values: dict[str, str] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            for screen_key, selectors in targets_by_screen.items():
+                app.action_show_screen(screen_key)
+                await pilot.pause()
+                for selector in selectors:
+                    widget = app.query_one(selector, Input)
+                    widget.value = ""
+                    widget.focus()
+                    await pilot.pause()
+                    await pilot.press("ctrl+v")
+                    await pilot.pause()
+                    values[selector] = widget.value
+        return values
+
+    values = asyncio.run(_drive())
+    for selector, value in values.items():
+        assert value == pasted, (
+            f"Ctrl+V must insert the OS clipboard text into {selector}; got {value!r}"
+        )
+
+
+def test_ac2_paste_reaches_project_name_input(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-2 / B-03: the Save-project name input accepts Ctrl+V too.
+
+    The sibling `project_parent_path` input deliberately stays a stock Input
+    (security mini-review scope condition), so only `#project_name` is
+    asserted here.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+    from s19_app.tui.screens import SaveProjectScreen
+
+    pasted = "proyecto-ignis-31"
+    monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: pasted),))
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.push_screen(SaveProjectScreen(default_parent=tmp_path))
+            for _ in range(6):
+                await pilot.pause()
+            widget = app.screen.query_one("#project_name", Input)
+            widget.focus()
+            await pilot.pause()
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            return widget.value
+
+    assert asyncio.run(_drive()) == pasted
+
+
+@pytest.mark.parametrize(
+    "hostile",
+    ["[red]x[/red] payload", "[unbalanced bracket path"],
+    ids=["balanced-markup", "unbalanced-bracket"],
+)
+def test_ac2h_hostile_paste_renders_literal_and_never_crashes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, hostile: str
+) -> None:
+    """AC-2 hostile-paste AT (security mini-review F1, C-16/C-17 lens).
+
+    Intent: clipboard text is semi-untrusted (a webpage can plant a "copy
+    this" payload). A Rich-markup-shaped payload pasted through the REAL
+    Ctrl+V path and then driven through a real downstream echo (the Load
+    action over the pasted change-set path, whose failure surfaces the text
+    in `#patch_doc_issues` / the status line) must render LITERALLY and must
+    not raise ``MarkupError`` or crash the app. run_test re-raises any app
+    exception at context exit, so survival of this drive IS the no-crash
+    verdict.
+    """
+    from s19_app.tui import os_clipboard_input as os_clip_mod
+    from s19_app.tui.screens_directionb import PatchEditorPanel
+
+    monkeypatch.setattr(os_clip_mod, "_STRATEGIES", (("fake", lambda: hostile),))
+
+    async def _drive() -> "tuple[str, bool]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 48)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            path_input = app.query_one("#patch_doc_path_input", Input)
+            path_input.focus()
+            await pilot.pause()
+            await pilot.press("ctrl+v")
+            await pilot.pause()
+            inserted = path_input.value
+            # Real downstream echo: Load over the hostile path (fails, and
+            # the failure text lands in the markup=False issues Static).
+            app.query_one("#patch_doc_load_button", Button).press()
+            for _ in range(4):
+                await pilot.pause()
+            panel = app.query_one(PatchEditorPanel)
+            alive = panel.is_mounted
+            return inserted, alive
+
+    inserted, alive = asyncio.run(_drive())
+    assert inserted == hostile, "the hostile payload must insert literally"
+    assert alive, "the app must stay alive after echoing the hostile path"
