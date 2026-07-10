@@ -2517,7 +2517,63 @@ values are never committed — the repo carries only the dummy template
   `test_no_real_config_required`) and `tests/test_tui_crc_surface.py`
   (`test_crc_config_error_surfaces_error_and_no_match`)
 - Status: Added in batch `2026-06-16-batch-12` (US-011/US-012 / HLR-004 /
-  LLR-004.1–004.2)
+  LLR-004.1–004.2). **Amended in batch `2026-07-09-batch-32` (§6.5 #1)**:
+  the parse rule *"field 'regions' must contain at least one region"* →
+  *"at least one of 'regions' / 'groups' must be present and non-empty"*;
+  the total declared span count is ceilinged (`CRC_SPAN_COUNT_CEILING`,
+  applies to the combined count — a pathological >4096-region legacy-only
+  config is now also rejected, deliberately); group fields carry strict
+  numeric-domain bounds (non-negative, 32-bit space incl. the output
+  window) while legacy `regions` keep the tolerant parse.
+
+**R-CRC-GROUP-001**: The CRC operation must accept, alongside the legacy
+per-region form, operator-declared region GROUPS (`groups` config key) — each
+an ordered list of `{start, end}` spans plus one `output_address` and one
+optional `output_bytes` — and must compute for each group a single CRC over
+the spans' present bytes concatenated in DECLARED order (never address-sorted,
+never deduplicated) through one non-resetting CRC state, checking/injecting
+that single value at the group's output address. Legacy-only configs parse and
+behave byte-identically to the pre-batch-32 system; all faults follow the
+one-collected-error / never-raise contracts; gap-coverage (per-group aggregate
+note; legacy regions stay silent) and group-involved overlap conditions
+surface as diagnostic notes, never aborts (legacy-only pairs stay silent —
+the committed dummy config's legacy regions self-overlap by design).
+
+- Code: `s19_app/tui/operations/crc_config.py` (`CrcGroup`, `_build_group`,
+  presence rule, `CRC_SPAN_COUNT_CEILING`, domain bounds, N5/N6 rejects),
+  `s19_app/tui/operations/crc.py` (`CrcTarget`, `normalized_targets`,
+  `compute_group_crc`, `crc_diagnostics`, group-aware `check_regions` /
+  `inject_crcs`), `s19_app/tui/operations/model.py`
+  (`CrcRegionResult.output_bytes` + `to_dict`), `s19_app/tui/screens.py`
+  (parameterized write rows), `DUMMY_CONFIG_TEXT` +
+  `examples/crc_config.example.json` (demo group)
+- Validation: `Automated` via `tests/test_crc_config.py` (AT-044b/d/e
+  families), `tests/test_crc_engine.py` (AT-045a/b/e/f, B5, TC-202),
+  `tests/test_crc_operation.py` (AT-044a golden compat [frozen literal
+  `0x156424B4`, double-proven vs the pre-change engine at `551fc77`],
+  AT-045c/d, AT-047a/b/c/d/f/g, TC-203/205), `tests/test_tui_crc_surface.py`
+  (AT-047e handler AT + C-17 hostile-input, AT-047h confirm-write flow)
+- Status: Added in batch `2026-07-09-batch-32` (US-044/US-045/US-047 /
+  R-CRC-GROUP-001 / LLR-GRP-001.1–.15). Frozen-engine diff = 0.
+
+**R-CRC-WIDTH-001**: The stored/written CRC field width must be configurable
+per GROUP as 1, 2, 4, or 8 little-endian bytes (default 4): widths above 4
+zero-extend (high bytes 0x00), widths below 4 truncate to the low bytes and
+fire a truncation warning; the check path reads exactly the configured width
+(any absent byte → no-stored-value / `matched=None`) and compares under
+`stored == computed & ((1 << 8N) − 1)`; legacy regions remain fixed at 4.
+**This amends §6.2 D-5** (*"Fixed storage codec width … NOT parameterized"*) →
+parameterized per group; `encode_le32`/`decode_le32` remain as fixed-4
+wrappers over the new `encode_le`/`decode_le`.
+
+- Code: `s19_app/tui/operations/crc.py` (`encode_le`, `decode_le`,
+  width-parameterized `read_stored_crc_le`, width-driven `inject_crcs`)
+- Validation: `Automated` via `tests/test_crc_engine.py` (TC-202.9/.10/.11),
+  `tests/test_crc_operation.py` (AT-046a [through the shipped write path],
+  AT-046b [truncated-compare MATCH + warning], AT-046d, TC-205),
+  `tests/test_crc_config.py` (AT-046c parse default, AT-044d(c) width set)
+- Status: Added in batch `2026-07-09-batch-32` (US-046 / R-CRC-WIDTH-001 /
+  LLR-WID-001.1–.6)
 
 **R-CRC-CONTRACT-001**: The operations framework must provide a neutral
 operation input (`OperationInput`) carrying `mem_map`, `ranges`, and identifying
