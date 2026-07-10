@@ -460,10 +460,39 @@ def test_at044b_output_bytes_defaults_to_4_when_omitted() -> None:
 
 
 def test_legacy_only_config_still_parses_with_empty_groups() -> None:
-    """Compat sanity (feeds AT-044a): legacy-only text parses; groups == []."""
-    config, errors = parse_crc_config(DUMMY_CONFIG_TEXT)
+    """Compat sanity (feeds AT-044a): legacy-only text parses; groups == [].
+
+    Uses a legacy-only literal — since Inc-4 the DUMMY pre-fill deliberately
+    demonstrates BOTH forms (AT-044e), so it is no longer legacy-only.
+    """
+    legacy_only = _json.dumps(
+        {
+            "polynomial": "0x04C11DB7",
+            "init": "0xFFFFFFFF",
+            "reverse": True,
+            "final_xor": "0xFFFFFFFF",
+            "regions": [
+                {"start": "0x100", "end": "0x200", "output_address": "0x1FC"}
+            ],
+        }
+    )
+    config, errors = parse_crc_config(legacy_only)
     assert errors == []
     assert config is not None and config.groups == []
+
+
+def test_at044e_dummy_prefill_demonstrates_both_forms() -> None:
+    """AT-044e: the updated DUMMY pre-fill parses cleanly AND demonstrates
+    both a legacy region and a group (format guidance self-validating;
+    extends — never replaces — the existing dummy-prefill mirror test)."""
+    config, errors = parse_crc_config(DUMMY_CONFIG_TEXT)
+    assert errors == []
+    assert config is not None
+    assert len(config.regions) >= 1, "the pre-fill must keep a legacy region"
+    assert len(config.groups) >= 1, "the pre-fill must demonstrate a group"
+    assert len(config.groups[0].spans) >= 2, (
+        "the demo group should show the multi-span shape"
+    )
 
 
 @pytest.mark.parametrize(

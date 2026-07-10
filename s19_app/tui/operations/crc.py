@@ -563,7 +563,7 @@ def encode_le32(crc: int) -> bytes:
         >>> encode_le32(0x04030201)
         b'\\x01\\x02\\x03\\x04'
     """
-    return (crc & _MASK32).to_bytes(LE32_WIDTH, "little")
+    return encode_le(crc, LE32_WIDTH)
 
 
 def decode_le32(data: Iterable[int]) -> int:
@@ -665,45 +665,52 @@ def check_regions(
 ) -> list[CrcRegionResult]:
     """
     Summary:
-        Run the non-mutating CRC check over every configured region (LLR-002.2):
-        for each :class:`CrcRegion` compute the CRC over ``(start, end)`` with
-        ``config``'s algorithm params, read the stored 4-byte LE value at the
-        region's output address via :func:`read_stored_crc_le`, and build one
-        :class:`CrcRegionResult` per region in config order. ``matched`` is
-        ``True`` when a stored value is present and equals the computed CRC,
-        ``False`` when present and differing, and ``None`` when there is no
-        stored value to compare. ``written`` is always ``False`` (the check path
-        never mutates). ``op_input.mem_map`` is only read.
+        Run the non-mutating CRC check over every configured TARGET
+        (LLR-002.2, group-aware since batch-32 LLR-GRP-001.7): iterate
+        :func:`normalized_targets` (legacy regions first in file order, then
+        groups), compute each target's single CRC via
+        :func:`compute_group_crc` with ``config``'s algorithm params, read
+        the stored ``output_bytes``-wide LE value via
+        :func:`read_stored_crc_le`, and compare under the LLR-WID-001.5
+        rule (``stored == computed & ((1 << 8N) − 1)``; a width-8 stored
+        value with nonzero high bytes mismatches). ``matched`` is the usual
+        tri-state; ``written`` is always ``False``; ``op_input.mem_map`` is
+        only read. A legacy region (single span, width 4) is byte-identical
+        to the pre-batch-32 behavior (AT-044a).
 
     Args:
         op_input (OperationInput): The neutral operation input; its ``mem_map``
             is read for both the CRC compute and the stored-value read, never
             mutated.
-        config (CrcConfig): The parsed CRC config supplying the regions and the
-            algorithm params (polynomial / init / reverse / final_xor).
+        config (CrcConfig): The parsed CRC config supplying the regions,
+            groups, and algorithm params (polynomial / init / reverse /
+            final_xor).
 
     Returns:
-        list[CrcRegionResult]: One result per region, in ``config.regions``
-        order, each carrying ``output_address`` / ``computed_crc`` /
-        ``stored_value`` / ``matched`` / ``written=False``.
+        list[CrcRegionResult]: One result per target, in normalized order
+        (legacy regions then groups, each file-ordered), carrying
+        ``output_address`` / ``computed_crc`` / ``stored_value`` /
+        ``matched`` / ``written=False`` / ``output_bytes``.
 
     Raises:
         None: Missing stored bytes yield ``stored_value=None`` /
             ``matched=None`` (collect-don't-abort), not an exception.
 
     Data Flow:
-        - For each region: :func:`compute_region_crc` over ``(start, end)`` with
-          ``config``'s params → :func:`read_stored_crc_le` at
-          ``region.output_address`` → assemble one :class:`CrcRegionResult`.
+        - :func:`normalized_targets` fixes order/widening → per target:
+          :func:`compute_group_crc` over its spans →
+          :func:`read_stored_crc_le` at ``output_address`` with
+          ``output_bytes`` → masked compare → one :class:`CrcRegionResult`.
 
     Dependencies:
         Uses:
-            - :func:`compute_region_crc`
+            - :func:`normalized_targets`
+            - :func:`compute_group_crc`
             - :func:`read_stored_crc_le`
             - :class:`s19_app.tui.operations.model.CrcRegionResult`
         Used by:
             - the CRC operation check path (CrcOperation.execute, increment I3)
-            - tests/test_crc_operation.py (TC-111, TC-112, multi-region order)
+            - tests/test_crc_operation.py (TC-111, TC-112, TC-203 family)
 
     Example:
         >>> from pathlib import Path
@@ -984,16 +991,19 @@ def inject_crcs(
     """
     Summary:
         Build a WORKING COPY of ``op_input``'s ``mem_map`` / ``ranges`` with
-        each region's computed CRC written as 4 little-endian bytes at its
-        output address (LLR-003.1, §6.2 D-5/D-6). The originally loaded
-        ``mem_map`` / ``ranges`` are NEVER mutated — a fresh ``dict`` / ``list``
-        is built. When an output address falls outside every loaded range, the
-        working ``mem_map`` gains exactly the 4 missing keys AND the working
-        ``ranges`` gains/merges a covering ``[output_address, output_address+4)``
-        range, kept SORTED + non-overlapping via :func:`_extend_ranges`
-        (guarding ``emit_s19_from_mem_map``'s ``KeyError`` on a range claiming an
-        absent address). Each input :class:`CrcRegionResult` is re-emitted with
-        ``written=True``.
+        each target's computed CRC written as ``output_bytes`` little-endian
+        bytes at its output address (LLR-003.1; width-driven since batch-32
+        LLR-GRP-001.9/.10 — the width comes from the RESULT field, never
+        re-parsed config text, so the screens re-inject renders identical
+        bytes). The originally loaded ``mem_map`` / ``ranges`` are NEVER
+        mutated — a fresh ``dict`` / ``list`` is built. When an output window
+        falls outside every loaded range, the working ``mem_map`` gains
+        exactly the ``output_bytes`` missing keys AND the working ``ranges``
+        gains/merges a covering ``[output_address, output_address+N)`` range,
+        kept SORTED + non-overlapping via :func:`_extend_ranges` (guarding
+        ``emit_s19_from_mem_map``'s ``KeyError`` on a range claiming an
+        absent address). Each input :class:`CrcRegionResult` is re-emitted
+        with ``written=True``.
 
     Args:
         op_input (OperationInput): The neutral input; its ``mem_map`` / ``ranges``
@@ -1014,14 +1024,15 @@ def inject_crcs(
             this is a pure in-memory transform.
 
     Data Flow:
-        - Copy ``mem_map`` / ``ranges``. For each region: encode the computed
-          CRC LE (:func:`encode_le32`), set the 4 addresses in the working map;
-          if any of the 4 was absent from every loaded range, extend ``ranges``
-          via :func:`_extend_ranges`. Re-emit each region with ``written=True``.
+        - Copy ``mem_map`` / ``ranges``. For each target: encode the computed
+          CRC LE at ``output_bytes`` width (:func:`encode_le`), set the N
+          addresses in the working map; if any was absent from every loaded
+          range, extend ``ranges`` via :func:`_extend_ranges`. Re-emit each
+          entry with ``written=True``.
 
     Dependencies:
         Uses:
-            - :func:`encode_le32`
+            - :func:`encode_le`
             - :func:`_extend_ranges`
             - ``s19_app.range_index`` membership primitives (import-only)
         Used by:

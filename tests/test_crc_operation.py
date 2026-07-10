@@ -752,6 +752,8 @@ def test_at047f_all_computes_precede_all_writes(tmp_path: Path) -> None:
     )
     pristine_g2 = zlib.crc32(payload[0x20:0x30])
     results = check_regions(op_input, config)
+    # m-5 precondition named: g1 (overlapping output) evaluates before g2.
+    assert [r.output_address for r in results] == [0x1020, 0x5000]
     assert results[1].computed_crc == pristine_g2
     working_mem, _ranges, written = inject_crcs(op_input, results)
     injected_g2 = bytes(working_mem[0x5000 + i] for i in range(4))
@@ -870,9 +872,11 @@ def test_at044a_legacy_gapped_golden_compat(tmp_path: Path) -> None:
     config = _default_config(
         [CrcRegion(start=0x1000, end=0x1020, output_address=0x1038)]
     )
-    # FROZEN golden: zlib.crc32 over the 31 present bytes of [0x1000,0x1020)
-    # (the gap at 0x1015 is payload offset 0x15).
-    golden = zlib.crc32(payload[0x00:0x15] + payload[0x16:0x20])
+    # FROZEN golden (m-4): literal captured at authoring and DOUBLE-PROVEN by
+    # the increment reviewer against the pre-change engine at origin/main
+    # 551fc77 (zlib oracle == pre-change compute_region_crc == HEAD).
+    golden = 0x156424B4
+    assert golden == zlib.crc32(payload[0x00:0x15] + payload[0x16:0x20])
 
     result = CrcOperation().execute(op_input, config=config)
     assert result.notes == [

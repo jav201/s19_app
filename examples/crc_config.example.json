@@ -6,5 +6,15 @@
   "regions": [
     { "start": "0x00010000", "end": "0x00020000", "output_address": "0x0001FFFC" },
     { "start": "0x00020000", "end": "0x00030000", "output_address": "0x0002FFFC" }
+  ],
+  "groups": [
+    {
+      "regions": [
+        { "start": "0x00030000", "end": "0x00034000" },
+        { "start": "0x00040000", "end": "0x00042000" }
+      ],
+      "output_address": "0x00042000",
+      "output_bytes": 4
+    }
   ]
 }

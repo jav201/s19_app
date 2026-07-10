@@ -52,6 +52,16 @@ DUMMY_CONFIG_TEXT: str = """{
   "regions": [
     { "start": "0x00010000", "end": "0x00020000", "output_address": "0x0001FFFC" },
     { "start": "0x00020000", "end": "0x00030000", "output_address": "0x0002FFFC" }
+  ],
+  "groups": [
+    {
+      "regions": [
+        { "start": "0x00030000", "end": "0x00034000" },
+        { "start": "0x00040000", "end": "0x00042000" }
+      ],
+      "output_address": "0x00042000",
+      "output_bytes": 4
+    }
   ]
 }
 """
@@ -536,8 +546,9 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
         do NOT pass through these bounds (strict AT-044a compat).
 
     Args:
-        index (int): The group's position in the ``groups`` list (used in
-            error strings so the operator can find the offending entry).
+        index (int): The group's 0-based position in the ``groups`` list;
+            error strings render it 1-BASED (matching the 1-based "CRC group
+            N" diagnostic notes so operators cross-reference one numbering).
         raw_group (Any): The raw JSON value for this ``groups`` entry.
 
     Returns:
@@ -563,25 +574,25 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
             - _build_config
     """
     if not isinstance(raw_group, dict):
-        raise TypeError(f"group {index} must be a JSON object")
+        raise TypeError(f"group {index + 1} must be a JSON object")
 
     raw_spans = raw_group["regions"]
     if not isinstance(raw_spans, list):
-        raise TypeError(f"group {index}: field 'regions' must be a list")
+        raise TypeError(f"group {index + 1}: field 'regions' must be a list")
     if not raw_spans:
-        raise ValueError(f"group {index}: field 'regions' must not be empty")
+        raise ValueError(f"group {index + 1}: field 'regions' must not be empty")
 
     spans: list[tuple[int, int]] = []
     for span_index, raw_span in enumerate(raw_spans):
         if not isinstance(raw_span, dict):
-            raise TypeError(f"group {index} span {span_index} must be a JSON object")
+            raise TypeError(f"group {index + 1} span {span_index + 1} must be a JSON object")
         if "output_address" in raw_span:
             # N6 tripwire: this key's presence is the signature of a legacy
             # region pasted into a group (its author expects per-span CRCs).
             # Targeted rejection on this ONE key only — general unknown-key
             # tolerance is unchanged.
             raise ValueError(
-                f"group {index} span {span_index}: 'output_address' is not "
+                f"group {index + 1} span {span_index + 1}: 'output_address' is not "
                 "allowed inside a group span (a group has exactly one "
                 "output_address)"
             )
@@ -589,11 +600,11 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
         end = _parse_int(raw_span["end"])
         if start < 0:
             raise ValueError(
-                f"group {index} span {span_index}: 'start' must be non-negative"
+                f"group {index + 1} span {span_index + 1}: 'start' must be non-negative"
             )
         if end > _ADDRESS_SPACE_END:
             raise ValueError(
-                f"group {index} span {span_index}: 'end' (0x{end:X}) exceeds "
+                f"group {index + 1} span {span_index + 1}: 'end' (0x{end:X}) exceeds "
                 "the 32-bit address space"
             )
         if end <= start:
@@ -601,7 +612,7 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
             # would contribute zero bytes AND zero absent-count, so no
             # coverage note could ever fire (a fully silent divergence).
             raise ValueError(
-                f"group {index} span {span_index}: 'end' (0x{end:X}) must be "
+                f"group {index + 1} span {span_index + 1}: 'end' (0x{end:X}) must be "
                 f"greater than 'start' (0x{start:X})"
             )
         spans.append((start, end))
@@ -613,21 +624,21 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
         # Re-raise with the field named — _parse_int's raw message ("invalid
         # literal ...") gives the operator no field/group to look at.
         raise ValueError(
-            f"group {index}: 'output_bytes' must be one of "
+            f"group {index + 1}: 'output_bytes' must be one of "
             f"{list(ALLOWED_OUTPUT_BYTES)}, got {output_bytes_raw!r}"
         ) from None
     if output_bytes not in ALLOWED_OUTPUT_BYTES:
         raise ValueError(
-            f"group {index}: 'output_bytes' must be one of "
+            f"group {index + 1}: 'output_bytes' must be one of "
             f"{list(ALLOWED_OUTPUT_BYTES)}, got {output_bytes_raw!r}"
         )
 
     output_address = _parse_int(raw_group["output_address"])
     if output_address < 0:
-        raise ValueError(f"group {index}: 'output_address' must be non-negative")
+        raise ValueError(f"group {index + 1}: 'output_address' must be non-negative")
     if output_address + output_bytes > _ADDRESS_SPACE_END:
         raise ValueError(
-            f"group {index}: output window [0x{output_address:X}, "
+            f"group {index + 1}: output window [0x{output_address:X}, "
             f"0x{output_address:X}+{output_bytes}) exceeds the 32-bit "
             "address space"
         )

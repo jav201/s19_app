@@ -1893,9 +1893,11 @@ class OperationsScreen(ModalScreen[None]):
         if write_failed:
             status_lines.extend(self._crc_region_lines(result.crc_regions))
         else:
+            # batch-32 (LLR-GRP-001.12): the write width comes from the
+            # result field — legacy rows keep rendering "(4 LE bytes)".
             status_lines.extend(
                 f"region @ 0x{region.output_address:08X}: wrote "
-                f"0x{region.computed_crc:08X} (4 LE bytes)"
+                f"0x{region.computed_crc:08X} ({region.output_bytes} LE bytes)"
                 for region in result.crc_regions
             )
         self.query_one("#operation_result_status", Static).update(
