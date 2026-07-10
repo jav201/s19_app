@@ -801,3 +801,33 @@ def test_llr051_3_reason_template_caps() -> None:
     assert "+2 more" in result2.run_blocked_reason
     assert result2.run_blocked_reason.count("XX-BLOCK-A") == 1  # deduped
     assert "XX-BLOCK-F" not in result2.run_blocked_reason  # capped at 5
+
+
+def test_at051f_to_dict_additive_through_real_runs(tmp_path: Path) -> None:
+    """AT-051f: to_dict over REAL runs — a blocked run serializes the
+    run-level reason pair; a runnable run serializes None pair and the
+    per-entry reason pair rides each entry dict. (Stated: to_dict has zero
+    production consumers this batch — the report generator reads dataclass
+    attributes directly; the Q2 report column is deferred.)"""
+    entries = [{"type": "bytes", "address": "0x100", "bytes": "00 01"}]
+    blocked_doc = read_change_document(
+        str(_write_document(tmp_path / "wrong.json", entries, "change")),
+        tmp_path,
+    )
+    mem_map, ranges = _image()
+    blocked = run_check_document(blocked_doc, mem_map, ranges, None, None)
+    payload = blocked.to_dict()
+    assert payload["run_blocked_reason_code"] == "doc-kind"
+    assert "not a check-set" in payload["run_blocked_reason"]
+    assert payload["entries"][0]["reason_code"] == "doc-kind"
+    assert payload["entries"][0]["reason"] == "run blocked [doc-kind]"
+
+    runnable_doc = read_change_document(
+        str(_write_document(tmp_path / "ok.json", entries, "check")),
+        tmp_path,
+    )
+    runnable = run_check_document(runnable_doc, mem_map, ranges, None, None)
+    payload2 = runnable.to_dict()
+    assert payload2["run_blocked_reason_code"] is None
+    assert payload2["run_blocked_reason"] is None
+    assert payload2["entries"][0]["reason_code"] is None

@@ -1651,7 +1651,53 @@ colours plus the three aggregate counts.
   `test_result_shape_deterministic`, `test_headless_project_run`,
   `test_no_textual_in_static_import_graph`) and
   `tests/test_tui_patch_editor_v2.py` (`test_check_run_display`)
-- Status: Added in batch `2026-06-10-batch-07` (US-003 / HLR-004)
+- Status: Added in batch `2026-06-10-batch-07` (US-003 / HLR-004).
+  **Amended in batch `2026-07-09-batch-33` (§6.5, operator-decided
+  behavior change 2026-07-09):** the apply-gate MIRROR is retired for
+  checks — *Before:* any ERROR-severity issue or `kind != "check"` made the
+  whole document not-runnable (every entry a bare `uncheckable`). *After:*
+  `kind != "check"` blocks the run with one loud run-level `doc-kind`
+  reason; ERROR codes OUTSIDE the entry-scoped non-blocking set block with
+  a `doc-fault` reason (fail-safe for envelope/unknown codes); a runnable
+  document checks its HEALTHY entries normally, tainting only entries
+  attributed by a taint-attribution code (`CHG-COLLISION`, start-address
+  equality — skip-site codes never taint, closing the same-address
+  false-taint mode). Every `uncheckable` carries `reason_code` + display
+  `reason` (6-token domain); templates are bounded ({kind!r} 64-char cap;
+  codes list deduped/capped at 5). The apply gate itself is UNTOUCHED
+  (`test_at050d_apply_gate_untouched`). New issue code
+  `CHG-DECL-STRUCTURE` splits per-declaration junk out of the envelope
+  `MF-BAD-STRUCTURE`.
+
+**R-CHK-002**: Every `uncheckable` check outcome must explain itself: the
+engine stamps a stable `reason_code` (one of `doc-kind` / `doc-fault` /
+`entry-fault` / `partial` / `outside` / `no-image`) plus a bounded human
+`reason` on each entry, and a blocked run carries the loud run-level reason
+pair; the TUI renders the untruncated run reason on the check status label,
+the per-row reasons on the result rows, and only the capped prefix on the
+status log; all three render surfaces are markup-safe (`markup=False` at
+construction — the log-label scrub also closes the pre-existing
+five-message file-derived-text exposure class), and the checks help
+affordance states the kind requirement, the reason taxonomy, and the
+healthy-entries-still-checked rule.
+
+- Code: `s19_app/tui/changes/model.py` (reason vocabulary + carriage),
+  `s19_app/tui/changes/check.py` (gate + reason assignment + template caps),
+  `s19_app/tui/changes/io.py` (`CHG_DECL_STRUCTURE`),
+  `s19_app/tui/services/change_service.py` (loud status + row suffixes),
+  `s19_app/tui/app.py` (log-label `markup=False`),
+  `s19_app/tui/screens_directionb.py` (`#patch_checks_status`
+  `markup=False`; extended `#patch_checks_help`)
+- Validation: `Automated` via `tests/test_checks_engine.py` (TC-051.1,
+  AT-050a/b/c/d engine layer, TC-050.1/.2, AT-051b engine half,
+  LLR-051.3 caps, AT-051f), `tests/test_change_service.py` (AT-051c
+  composed path), `tests/test_tui_patch_editor_v2.py` (AT-050a-pilot,
+  AT-051a, AT-051b, AT-051e three-surface hostile incl. the
+  bisected-token case, TC-051.4 hostile-encoding sibling, AT-052a/b),
+  `tests/test_report_service.py` (TC-051.5 blocked-run render + zero-entry
+  boundary)
+- Status: Added in batch `2026-07-09-batch-33` (US-050/US-051/US-052 /
+  LLR-050.1-.4, LLR-051.1-.8, LLR-052.1-.2). Frozen-engine diff = 0.
 
 ---
 

@@ -2137,3 +2137,104 @@ def test_at051e_hostile_kind_renders_literal_on_all_surfaces(
     # hostile text never reaches them by construction.
     assert all("run blocked [doc-kind]" in text for text in outcomes["row_texts"])
     assert all("[red]" not in text for text in outcomes["row_texts"])
+
+
+# ---------------------------------------------------------------------------
+# batch-33 Inc-4 — help affordance (AT-052a/b) + the hostile-encoding
+# sibling through the load path's log funnel (TC-051.4).
+# ---------------------------------------------------------------------------
+
+
+def test_at052a_checks_help_states_semantics(tmp_path: Path) -> None:
+    """AT-052a: the checks help names (i) the AT-032a what/which token
+    (locked pin, unchanged), (ii) the kind requirement, (iii) the
+    per-entry-reasons + healthy-entries-still-checked rule — three DISTINCT
+    token spans on the shipped surface."""
+    from textual.widgets import Label
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return str(app.query_one("#patch_checks_help", Label).render())
+
+    text = asyncio.run(_drive())
+    assert _CHECKS_HELP_TOKEN in text  # (i) the locked AT-032a span
+    assert "Needs kind 'check'" in text  # (ii)
+    assert "Uncheckable rows name their reason" in text  # (iii)
+    assert "healthy entries are still checked" in text
+
+
+def test_at052b_checks_help_survives_screen_cycle(tmp_path: Path) -> None:
+    """AT-052b (wiring regression): the extended help renders identically
+    after cycling away from and back to the Patch Editor screen."""
+    from textual.widgets import Label
+
+    async def _drive() -> "tuple[str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            first = str(app.query_one("#patch_checks_help", Label).render())
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            second = str(app.query_one("#patch_checks_help", Label).render())
+            return first, second
+
+    first, second = asyncio.run(_drive())
+    assert first == second
+    assert "Needs kind 'check'" in second
+
+
+def test_tc051_4_hostile_encoding_sibling_through_load_funnel(
+    tmp_path: Path,
+) -> None:
+    """TC-051.4 (Phase-2 F3): a hostile Rich-markup token in the document
+    ENCODING flows through the load path's per-issue log lines
+    (_report_change_result -> set_status -> #log_line_*) and renders
+    LITERALLY — the LLR-051.8 construction-time scrub closes the whole
+    five-message class, not just the kind message."""
+    from textual.widgets import Label
+
+    hostile_doc = tmp_path / "hostile_enc.json"
+    hostile_doc.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "check",
+                "encoding": "bad[bold]codec[/bold]",
+                "value_mode": "text",
+                "entries": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> "list[str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(hostile_doc))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            # Rendering the four log labels IS the no-MarkupError verdict.
+            return [
+                str(app.query_one(f"#log_line_{i}", Label).render())
+                for i in range(1, 5)
+            ]
+
+    renders = asyncio.run(_drive())
+    assert any("CHG-ENCODING-UNKNOWN" in text for text in renders), (
+        f"the encoding fault must reach the log surface; got {renders}"
+    )
