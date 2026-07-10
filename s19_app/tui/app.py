@@ -1268,10 +1268,18 @@ class S19TuiApp(App):
         yield Container(
             Label("Ready.", id="status_text"),
             ProgressBar(total=100, id="progress_bar"),
-            Label("", id="log_line_1"),
-            Label("", id="log_line_2"),
-            Label("", id="log_line_3"),
-            Label("", id="log_line_4"),
+            # batch-33 (LLR-051.8, C-17): the log lines render FILE-DERIVED
+            # text (issue messages embedding verbatim {kind!r}/{fmt!r}/... ,
+            # check reasons) — markup=False at CONSTRUCTION is the single
+            # funnel scrub, applied AFTER the 50-char cap in
+            # `_append_log_line` (never pre-escape: the cap would bisect
+            # escape sequences). Closes the pre-existing CHG-KIND-UNKNOWN
+            # class (five sibling messages). No caller uses intended markup
+            # (repo-wide grep: zero Rich tags reach set_status).
+            Label("", id="log_line_1", markup=False),
+            Label("", id="log_line_2", markup=False),
+            Label("", id="log_line_3", markup=False),
+            Label("", id="log_line_4", markup=False),
             id="workspace_status_bar",
         )
         yield Footer()

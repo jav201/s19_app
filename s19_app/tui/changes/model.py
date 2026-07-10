@@ -571,6 +571,52 @@ CHECK_RESULT_DOMAIN: tuple[str, ...] = (
 CHECK_AGGREGATE_KEYS: tuple[str, ...] = ("passed", "failed", "uncheckable")
 
 
+# ---------------------------------------------------------------------------
+# batch-33 uncheckable-reason vocabulary (R-B02, LLR-051.1/.2).
+#
+# Every ``uncheckable`` outcome carries a stable ``reason_code`` token plus a
+# human display ``reason``; ``pass``/``fail`` carry ``None`` for both
+# (AT-051d). Run-blocking reasons additionally travel at run level on
+# :class:`CheckRunResult` so a blocked run explains itself ONCE, loudly.
+# ---------------------------------------------------------------------------
+
+#: Run-blocking — the loaded document is not a check-set (``kind`` is not
+#: ``"check"``); checks cannot run at all (operator decision 2026-07-09:
+#: wrong kind stays a whole-run block with one loud run-level reason).
+CHECK_REASON_DOC_KIND = "doc-kind"
+
+#: Run-blocking — the document carries one or more ERROR-severity faults
+#: whose codes are OUTSIDE the entry-scoped non-blocking set (envelope /
+#: unknown codes; fail-safe default).
+CHECK_REASON_DOC_FAULT = "doc-fault"
+
+#: Per-entry — the entry itself carries an attributable ERROR-severity
+#: declaration fault (today: a collision partner).
+CHECK_REASON_ENTRY_FAULT = "entry-fault"
+
+#: Per-entry — the entry's addressed range is partially outside the loaded
+#: image (``MemoryStatus.PARTIAL``).
+CHECK_REASON_PARTIAL = "partial"
+
+#: Per-entry — the entry's addressed range is entirely outside the loaded
+#: image (``MemoryStatus.OUTSIDE``).
+CHECK_REASON_OUTSIDE = "outside"
+
+#: Per-entry — no image is loaded (``MemoryStatus.UNVALIDATED_NO_IMAGE``).
+CHECK_REASON_NO_IMAGE = "no-image"
+
+#: The full uncheckable-reason domain in its canonical order (run-blocking
+#: codes first, then per-entry containment codes).
+CHECK_UNCHECKABLE_REASON_DOMAIN: tuple[str, ...] = (
+    CHECK_REASON_DOC_KIND,
+    CHECK_REASON_DOC_FAULT,
+    CHECK_REASON_ENTRY_FAULT,
+    CHECK_REASON_PARTIAL,
+    CHECK_REASON_OUTSIDE,
+    CHECK_REASON_NO_IMAGE,
+)
+
+
 @dataclass(slots=True)
 class CheckRunEntry:
     """
@@ -599,6 +645,13 @@ class CheckRunEntry:
             ``result``.
         linkage_symbol (Optional[str]): The matching MAC/A2L symbol name
             when linked; ``None`` when standalone or unnamed.
+        reason_code (Optional[str]): One token of
+            :data:`CHECK_UNCHECKABLE_REASON_DOMAIN` when ``result`` is
+            ``uncheckable``; ``None`` on ``pass``/``fail`` (batch-33
+            LLR-051.1, AT-051d).
+        reason (Optional[str]): The human display string for
+            ``reason_code`` (ints/codes/capped interpolations only —
+            LLR-051.3 bounds); ``None`` on ``pass``/``fail``.
 
     Returns:
         None: Dataclass container.
@@ -623,6 +676,8 @@ class CheckRunEntry:
     result: str
     linkage: str
     linkage_symbol: Optional[str]
+    reason_code: Optional[str] = None
+    reason: Optional[str] = None
 
 
 @dataclass(slots=True)
@@ -689,6 +744,11 @@ class CheckRunResult:
     aggregates: dict[str, int]
     entries: list[CheckRunEntry] = field(default_factory=list)
     issues: list[ValidationIssue] = field(default_factory=list)
+    # batch-33 (LLR-051.2): a BLOCKED run explains itself once at run level;
+    # None on a runnable document. reason_code is CHECK_REASON_DOC_KIND or
+    # CHECK_REASON_DOC_FAULT.
+    run_blocked_reason_code: Optional[str] = None
+    run_blocked_reason: Optional[str] = None
 
     def to_dict(self) -> dict[str, object]:
         """
@@ -703,7 +763,10 @@ class CheckRunResult:
             :data:`CHECK_AGGREGATE_KEYS` in canonical order, ``issues`` as
             ``{code, severity, message, artifact, symbol, address}`` dicts,
             and ``entries`` as per-entry dicts (byte tuples as lists,
-            ``actual_bytes`` ``None`` when uncheckable) in document order.
+            ``actual_bytes`` ``None`` when uncheckable, plus the batch-33
+            ``reason_code``/``reason`` pair) in document order; also carries
+            the run-level ``run_blocked_reason_code``/``run_blocked_reason``
+            pair (``None`` on a runnable document — batch-33 LLR-051.2).
 
         Data Flow:
             - Rebuilt from the dataclass fields on every call — no caching,
@@ -724,6 +787,11 @@ class CheckRunResult:
             ),
             "timestamp_utc": self.timestamp_utc,
             "variant_id": self.variant_id,
+            # batch-33 (AT-051f): additive keys. NOTE: to_dict currently has
+            # zero production consumers (the report generator reads the
+            # dataclass attributes directly) — stated per the Q2 deferral.
+            "run_blocked_reason_code": self.run_blocked_reason_code,
+            "run_blocked_reason": self.run_blocked_reason,
             "aggregates": {
                 key: self.aggregates.get(key, 0)
                 for key in CHECK_AGGREGATE_KEYS
@@ -753,6 +821,8 @@ class CheckRunResult:
                     "result": entry.result,
                     "linkage": entry.linkage,
                     "linkage_symbol": entry.linkage_symbol,
+                    "reason_code": entry.reason_code,
+                    "reason": entry.reason,
                 }
                 for entry in self.entries
             ],

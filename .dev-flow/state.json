@@ -1,67 +1,80 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-07-09-batch-32",
-    "batch_objective": "B-21 (P1, baseline backlog 2026-07-09): CRC multi-region single-CRC groups. New top-level `groups` config key beside the legacy `regions` key: each group = ordered {start,end} spans concatenated in DECLARED order -> ONE CRC (single non-resetting crc32_stream state) -> ONE output_address with configurable output_bytes {1,2,4,8} little-endian (default 4). Legacy-only configs parse and behave byte-identically. All work in tui/operations/ + screens.py surface + tests; 0 engine-frozen modules.",
+    "batch_id": "2026-07-09-batch-33",
+    "batch_objective": "B-02 (P1, baseline backlog 2026-07-09): patch-editor check results explain themselves. (1) OPERATOR-DECIDED behavior change (round-3, 2026-07-09): drop the collective has_errors taint -- only entries carrying an attributable error become uncheckable (each with reason_code + display reason); healthy entries still checked; wrong document kind stays a whole-run block with ONE loud run-level reason; genuinely document-global faults still block with a reason. (2) Reason taxonomy on CheckRunEntry/CheckRunResult (doc-kind, doc-fault, entry-fault, partial, outside, no-image), rendered in check rows + status. (3) Checks help affordance extension. (4) In-batch: scrub the markup-enabled log-label funnel (pre-existing CHG-KIND-UNKNOWN C-17 exposure). Section 6.5 before/after for the taint change; apply gate explicitly untouched.",
     "current_phase": 6,
     "phase_status": "awaiting-sync",
-    "standing_authorization": "Session 2026-07-09 (operator: 'Punch it' for the 3-lane dispatch incl. this Lane-B full /dev-flow; 'Merged, continue!' after batch-31 close). Same model as the recorded batch-29 auth: run phases autonomously -- each gate = do work, present packet in-conversation, self-approve under this auth, advance; report ALL decisions to the operator. The 4 architect open questions are DEFAULTED (gaps=present-bytes+warn; widths {1,2,4,8} with <4 truncate+warn; mixed order=legacy-first; legacy regions stay silent) and stay overridable -- an operator message changing any of them triggers a section 6.5 amendment. GUARDRAILS: full suite + engine-frozen guards + independent code-review GREEN before PR; NO self-merge (operator merges -- enforced by auto-mode classifier); snapshot regen canonical-CI-only; 0 engine-frozen diffs; propose-not-encode any new dev-flow control.",
-    "route": "full /dev-flow (operator-approved Lane B of the 2026-07-09 3-lane dispatch). Successor to batch-31 (fast-dev-flow P1 quick strike, PRs #58/#59 merged).",
+    "standing_authorization": "Same session model as batches 29/31/32 (operator: 'Punch it' 3-lane dispatch; 'Merged, continue!'; round-3 taint decision message; '/dev-flow-sync and continue'): run phases autonomously -- each gate = do work, present packet in-conversation, self-approve under this auth, advance; report ALL decisions. GUARDRAILS: full suite + engine-frozen guards + independent code-review GREEN before PR; NO self-merge (operator merges); snapshot regen canonical-CI-only; 0 engine-frozen diffs; propose-not-encode controls. Draft defaults adopted pending override: Q1 collision entries stay uncheckable-with-reason; Q2 report Reason column deferred (to_dict keys land, no-consumer state named).",
+    "route": "full /dev-flow (behavior change to shipped semantics + C-17 surfaces). Successor to batch-32 (CRC groups, PR #60 merged dd91941, synced).",
     "iterations_per_phase": {
         "0": 1,
-        "1": 1,
+        "1": 2,
         "2": 1,
-        "3": 5,
+        "3": 4,
         "4": 1,
         "5": 1,
         "6": 1
     },
     "artifacts": {
-        "plan": ".dev-flow/2026-07-09-batch-32/PLAN.md",
-        "1": ".dev-flow/2026-07-09-batch-32/01-requirements.md",
-        "2": ".dev-flow/2026-07-09-batch-32/02-review.md",
-        "3": ".dev-flow/2026-07-09-batch-32/03-increments/",
-        "4": ".dev-flow/2026-07-09-batch-32/04-validation.md",
-        "5": ".dev-flow/2026-07-09-batch-32/05-postmortem.md",
-        "6": ".dev-flow/2026-07-09-batch-32/06-docs/"
+        "plan": ".dev-flow/2026-07-09-batch-33/PLAN.md",
+        "1": ".dev-flow/2026-07-09-batch-33/01-requirements.md",
+        "1b": ".dev-flow/2026-07-09-batch-33/01b-qa-strategy-and-verification.md",
+        "2": ".dev-flow/2026-07-09-batch-33/02-review.md",
+        "3": ".dev-flow/2026-07-09-batch-33/03-increments/",
+        "4": ".dev-flow/2026-07-09-batch-33/04-validation.md",
+        "5": ".dev-flow/2026-07-09-batch-33/05-postmortem.md",
+        "6": ".dev-flow/2026-07-09-batch-33/06-docs/"
     },
-    "rc1": "PASS @ 551fc77 (2026-07-09). git fetch origin; feat/batch-32-crc-groups cut from origin/main tip 551fc77 (post PR #58 batch-31 squash 91d884a + PR #59 snapshot baselines). Clean tree. Already-shipped check: origin/main crc_config.py CrcConfig has NO groups concept -- one CRC per region, per-region output_address, fixed LE32_WIDTH=4 (crc.py:48); REQUIREMENTS.md has no R-CRC-GROUP/WIDTH rows; operator round-2 baseline review confirmed the need. All 4 stories net-new.",
+    "rc1": "PASS @ dd91941 (2026-07-09). feat/batch-33-check-reasons cut from origin/main tip dd91941 (batch-32 squash) + 1 docs commit (batch-32 vault-sync state flag riding this branch). Already-shipped check: check.py:166 still carries the collective not_runnable gate; CheckRunEntry (changes/model.py:574-625) has NO reason field; R-CHK-001 (REQUIREMENTS.md:1631-1654) still specifies the apply-gate-mirror behavior -> nothing shipped. All 36 draft citations re-verified at this tip (01b Task A: 33 exact, 3 line-drift-only).",
     "decisions_log": [
         {
             "phase": 6,
             "date": "2026-07-09",
             "decision": "approved",
-            "notes": "Under standing auth. 06-docs complete (traceability-matrix with grep-verified node names + both chains zero-gap; functionality.md; executive-summary.md). Phase-5 post-mortem approved same gate (1 candidate control C-CAND-D lint-gate-per-increment PROPOSED not encoded). Full-suite gate evidence: 1215 passed / 0 failed / 31 snapshots / engine-frozen green. State -> awaiting-sync; /dev-flow-sync after operator merges the PR."
+            "notes": "Under standing auth. 06-docs complete: traceability-matrix (both chains + C-18 table, 21 node names grep-verified with file:line), functionality.md (taxonomy, two-set gate + B-1 rationale, three-surface census, mermaid flow), executive-summary.md. State -> awaiting-sync; /dev-flow-sync after the operator merges the PR."
+        },
+        {
+            "phase": 5,
+            "date": "2026-07-09",
+            "decision": "approved",
+            "notes": "Under standing auth. 05-postmortem.md: 3 non-overlapping Phase-2 pre-code catches; QA killed an unimplementable AT; review-F1 census-execution lesson; agent-stall recovery lesson. 2 candidate controls PROPOSED not encoded (C-CAND-E checklist-only verification prompts; C-CAND-F packets quote owed census rows). P-1/P-2 carried; P-3 filename-markup hygiene new."
         },
         {
             "phase": 4,
             "date": "2026-07-09",
             "decision": "approved",
-            "notes": "Under standing auth. 04-validation.md: Layer A TC-201..205 all GREEN; Layer B C-18 reconciliation TABLE - all 23 ATs -> exactly one on-disk node (5 gaps caught by the reconciliation itself, closed Inc-5); bidirectional matrix complete; golden double-proof recorded; full-suite gate run launched (result appended on completion)."
+            "notes": "Under standing auth. Full suite 1234 passed / 1 failed = the anticipated patch-120x30 help-label snapshot drift -> xfail(strict=False) pending canonical regen (post-mark 33+1). C-18: all 12 ATs -> exactly one node (2 designation notes: engine twins are TC partners). Census fully dispositioned (3 supersessions). 0 frozen diffs. 04-validation.md complete."
         },
         {
             "phase": 3,
             "date": "2026-07-09",
             "decision": "approved",
-            "notes": "Under standing auth, 5 increments each code-reviewed: Inc-1 schema+strict validation (review FIX-FIRST F1 HIGH named-field error -> fixed); Inc-2 compute/normalizer/codec; Inc-3 check/inject/notes/report wiring (combined Inc-2/3 review FIX-FIRST F1-F3 + F4-F6 -> all folded incl. golden frozen 0x156424B4 DOUBLE-PROVEN vs pre-change origin/main engine by the reviewer); Inc-4 TUI surface + dummy/example group + Layer-B ATs (AT-047e + hostile C-17 + AT-047h); Inc-5 C-18 reconciliation (5 in-parts ATs -> single nodes). RED evidence per increment (trigger-absent stash). CRC suites 49 -> 110. REQUIREMENTS.md: R-CRC-GROUP-001 + R-CRC-WIDTH-001 rows + R-CRC-CONFIG-001 amendment note (section 6.5 #1) + D-5 amendment (#2). 0 engine-frozen diffs."
+            "notes": "Under standing auth, 4 increments each with RED evidence + 2 fold commits: Inc-1 model vocabulary/carriage; Inc-2 gate rewrite (two-set split, capped templates, CHG-DECL-STRUCTURE) with the apply-gate-mirror docstrings rewritten; Inc-3 loud status + row reasons + markup funnel scrub (5 Layer-B ATs through the real button incl. bisected-hostile-token); Inc-4 help affordance + AT-051f/TC-051.4/TC-051.5 + REQUIREMENTS rows (R-CHK-001 section-6.5 amendment + NEW R-CHK-002). Combined Inc-2/3 code review: APPROVE, 2 medium folded (census rows 1-2 EXECUTED -- the old gate test superseded in place after surviving with a false docstring; service docstrings refreshed) + F3 realization note + F4 comment. One vacuous draft assertion self-caught (TC-051.5)."
         },
         {
             "phase": 2,
             "date": "2026-07-09",
             "decision": "approved",
-            "notes": "Under standing auth. 3 parallel reviews: architect PASS-with-minors, qa PASS-with-minors, security PASS-with-conditions; 0 blockers, 4 major + 9 minor ALL FOLDED at gate (01-requirements.md section 12 fold record): phantom to_json_dict->to_dict sweep; S-7 overlap scoped to group-involved pairs (unscoped contradicted AT-044a via the self-overlapping dummy config); AT-047h group confirm-write Layer-B AT added (23 ATs total); counterfactual block completed; span-count ceiling LLR-GRP-001.14 + groups-only numeric bounds .15 (security F1/F2, sect-10 cost claim corrected); N5+N6 both REJECT; C-17 markup clause + hostile-input in AT-047e fixture; golden double-proof + ordering-precondition TC obligations. LLR decomposition locked: LLR-GRP-001.1-.15, LLR-WID-001.1-.6. Exit axes met; no unmet gap named."
+            "notes": "Under standing auth, after the one iterate-to-refine round. All 10 folds applied (section 12 record); independent FAST verification of the amended lock: CLEAN 13/13 (two-set LLR-050.1 + fail-safe intact; same-address regression pin distinct; template caps; scrub mechanics + five-sibling closure; AT surfaces/counts/anchors/shall-discipline all verified with quoted evidence). 02-review.md consolidates the three lenses (architect BLOCKERS(1)->folded; security PASS-with-conditions->folded; QA fold-verify stalled->mandate absorbed by the verification pass). Exit axes met -> approve. Phase 3 begins: Inc-1 model reason fields."
+        },
+        {
+            "phase": 2,
+            "date": "2026-07-09",
+            "decision": "iterate-to-refine",
+            "notes": "Architect: 1 BLOCKER B-1 -- locked attribution rule (allowlist x address-equality) wrongly taints a healthy constructed entry sharing an address with a SKIPPED declaration (all skip sites emit address=; realistic duplicated-then-edited file); fix = split into non-blocking set (6 skip codes + new decl-level code) and taint-attribution set ({CHG-COLLISION} only -- sole code emitted against constructed entries); entry-index attribution rejected (ValidationIssue is engine-frozen). + minors m-1 (AT-051c bytes-entry fixture), m-3 (ok observed on ChangeActionResult), R-B02-2 correction. Security: PASS-with-conditions -- F1 MAJOR MF-BAD-STRUCTURE dual-use (envelope-blocking vs per-declaration; mint CHG-DECL-STRUCTURE non-blocking) which would have re-introduced the collective-taint behavior on one junk element; F2 MAJOR unbounded reason interpolations (dedupe+cap {codes} at 5; cap {kind!r} at 64 chars) -- local-DoS class; F4 scrub post-cap constraint; F3 five-sibling-exposure closure + hostile-encoding assert. QA fold-verify agent STALLED (watchdog kill, no output) -- its narrow mandate folded into the post-amendment verification pass. Amendment agent dispatched; re-gate after."
         },
         {
             "phase": 1,
             "date": "2026-07-09",
             "decision": "approved",
-            "notes": "Under standing auth. 01-requirements.md locked: 4 US, 2 HLR (R-CRC-GROUP-001, R-CRC-WIDTH-001), 20 ATs after the Phase-1 QA fold (added AT-045f S-2 owner, AT-047e Layer-B handler AT, AT-047f S-6 pristine-compute owner, AT-047g cross-overlap split; AT-044b value round-trip; AT-044d + AT-046b parametrized; AT-045d counterfactual corrected RED-first; AT-044a gapped-legacy fixture condition). Validation strategy section 11 (methods, C-12 binding spec, N1-N6/B1-B14, ledger base 49 CRC/1191 total, output-bytes naming guard). Exit axes: Coverage = every US->AT chain present, HLR->LLR/TC decomposition assigned to Phase 2 (skeleton requested from architect); Certainty = counterfactual direction stated per AT, C-12 node bound to shipped write path; Evidence = draft claims file:line-cited, LE32_WIDTH anchor re-verified at 551fc77, qa collect-only executed. No unmet-axis gap named -> approve. Q1-Q4 defaults recorded in section 9, overridable via section 6.5."
+            "notes": "Under standing auth. 01-requirements.md LOCKED: 3 US, 12 ATs, 15 LLRs (new LLR-051.8 in-batch log-funnel scrub), 9 TCs (new TC-051.5 blocked-run aggregates owner). All QA folds applied + 3 anchor refreshes; R-B02-1 CLOSED; new low risk R-B02-6 (composed-path harness smoke owed Phase-2). Exit axes: Coverage = every US->AT chain + reason-code ownership complete; Certainty = counterfactual directions audited (2 CONDITIONAL resolved by the folds), C-12 chains bound to the real Run-checks button; Evidence = 36 citations re-verified at dd91941, ledger collect-only executed. No unmet-axis gap -> approve."
         },
         {
             "phase": 0,
             "date": "2026-07-09",
             "decision": "approved",
-            "notes": "Story intake: US-044 (schema + backward compat), US-045 (single-CRC group semantics), US-046 (configurable output width), US-047 (check/inject/report surface) -- all READY per INVEST/DoR analysis in the architect draft section 4 (each names user, outcome, observable surface, out-of-scope in section 7). No REFINE/SPIKE/OUT. Approved under standing auth; the 4 semantic open questions carried into Phase 1 as documented defaults, overridable at any gate."
+            "notes": "Story intake: US-050 per-entry taint (operator-decided behavior change), US-051 reasons on every uncheckable + loud run-block, US-052 checks help affordance -- READY (draft section 4 DoR). RC-1 PASS @ dd91941. Operator round-3 decision recorded verbatim in batch_objective; draft Q1/Q2 defaults adopted, overridable."
         }
     ],
     "obsidian_synced": false,

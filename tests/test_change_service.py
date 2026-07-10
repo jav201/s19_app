@@ -601,3 +601,49 @@ def test_parse_helpers_follow_tui_input_grammar() -> None:
     assert parse_new_bytes("0x01, 2") == [1, 2]
     with pytest.raises(ValueError):
         parse_new_bytes("ZZ")
+
+
+# ---------------------------------------------------------------------------
+# batch-33 Inc-3 — AT-051c: the COMPOSED path (pasted faulted envelope +
+# editor-added entries) blocks with the doc-fault reason (R-B02-6 smoke).
+# ---------------------------------------------------------------------------
+
+
+def test_at051c_composed_faulted_envelope_blocks_with_doc_fault() -> None:
+    """AT-051c: paste a check document whose envelope carries a blocking
+    fault (CHG-VALUE-MODE-UNKNOWN — orthogonal to encoding per the m-1
+    fixture note), compose BYTES entries onto it via the editor seam, run
+    checks: the run blocks with the doc-fault reason naming the code, and
+    the composed entries enumerate as uncheckable with the short pointer.
+    """
+    service = ChangeService()
+    faulted = json.dumps(
+        {
+            "format": "s19app-changeset",
+            "version": "2.0",
+            "kind": "check",
+            "encoding": "utf-8",
+            "value_mode": "banana",
+            "entries": [],
+        }
+    )
+    load_result = service.load_text(faulted)
+    assert load_result.ok is False
+    assert service.document is not None
+    assert service.document.entries == []  # F-A-16 envelope fault
+
+    service.add_entry("0x100", "", "00 01")  # BYTES entry (m-1)
+    service.add_entry("0x104", "", "02")
+    assert len(service.document.entries) == 2
+
+    mem_map = {0x100 + offset: offset for offset in range(16)}
+    action = service.run_checks(mem_map, [(0x100, 0x110)])
+    assert action.ok is False
+    assert "Checks: not run" in action.message
+    assert "CHG-VALUE-MODE-UNKNOWN" in action.message
+    assert "fix the document" in action.message
+    assert "(0 passed, 0 failed, 2 uncheckable)" in action.message
+
+    rows = service.check_rows()
+    assert len(rows) == 2
+    assert all("run blocked [doc-fault]" in row.text for row in rows)

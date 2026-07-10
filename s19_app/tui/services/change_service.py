@@ -996,6 +996,12 @@ class ChangeService:
                 - self.check_runner (run_check_document by default)
             Used by:
                 - app.py ``run_checks`` action routing
+
+        Note (batch-33 LLR-051.4): on a BLOCKED run
+            (``run_blocked_reason`` set on the engine result) the
+            message is ``Checks: not run — {reason} ({counts})`` and
+            ``ok`` is ``False``; on a runnable run the message stays
+            the three-count line and ``ok`` is ``failed == 0``.
         """
         result = self.check_runner(
             self.document, mem_map, ranges, mac_records, a2l_tags
@@ -1005,6 +1011,22 @@ class ChangeService:
         passed = int(aggregates.get("passed", 0))
         failed = int(aggregates.get("failed", 0))
         uncheckable = int(aggregates.get("uncheckable", 0))
+        # batch-33 (LLR-051.4 / AT-051b): a BLOCKED run explains itself
+        # loudly in the status message (the untruncated `result.message`
+        # reaches `#patch_checks_status`; the app log shows only the
+        # capped prefix) and reports ok=False on the returned result — the
+        # counts still follow so report consumers keep their anchors.
+        blocked_reason = getattr(result, "run_blocked_reason", None)
+        if blocked_reason:
+            return ChangeActionResult(
+                message=(
+                    f"Checks: not run — {blocked_reason} "
+                    f"({passed} passed, {failed} failed, "
+                    f"{uncheckable} uncheckable)"
+                ),
+                issues=list(getattr(result, "issues", []) or []),
+                ok=False,
+            )
         return ChangeActionResult(
             message=(
                 f"Checks: {passed} passed, {failed} failed, "
@@ -1030,7 +1052,9 @@ class ChangeService:
             - Read the duck-shaped ``entries`` records of
               ``last_check_result`` (the LLR-004.3 per-entry field set);
               render address range, expected / actual hex, and the result
-              token; map the token to a severity class.
+              token; map the token to a severity class. Uncheckable rows
+              append the entry's ``reason`` in parentheses (batch-33
+              LLR-051.5); pass/fail rows are unchanged.
 
         Dependencies:
             Uses:
@@ -1059,11 +1083,15 @@ class ChangeService:
                 if actual_bytes is not None
                 else "-"
             )
+            # batch-33 (LLR-051.5 / AT-051a): every uncheckable row names
+            # its reason; pass/fail rows are unchanged (reason is None).
+            reason = getattr(record, "reason", None)
+            suffix = f" ({reason})" if reason else ""
             rows.append(
                 CheckResultRow(
                     text=(
                         f"0x{start:X}-0x{end - 1:X} expected [{expected}] "
-                        f"actual [{actual}] -> {token}"
+                        f"actual [{actual}] -> {token}{suffix}"
                     ),
                     css_class=css_class_for_severity(severity),
                 )

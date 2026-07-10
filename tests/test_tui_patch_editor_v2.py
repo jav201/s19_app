@@ -398,13 +398,16 @@ def test_action_routing_observable_effects(tmp_path: Path) -> None:
                 list(workarea.rglob("changes*.json"))
             )
 
-            # run_checks (real E4 engine; kind="change" document with no
-            # image -> not runnable, both entries uncheckable)
+            # run_checks (real E4 engine; kind="change" document -> the
+            # batch-33 loud doc-kind run block; the 50-char-capped log line
+            # carries the "Checks: not run" prefix — the FULL reason is
+            # asserted on #patch_checks_status by AT-051b, not here).
+            # Supersedes the pre-batch-33 "0 passed, 0 failed, 2
+            # uncheckable" literal (rewrite-in-place, censused).
             panel.request_action("run_checks")
             await pilot.pause()
             outcomes["checks_line"] = any(
-                "Checks: 0 passed, 0 failed, 2 uncheckable" in line
-                for line in app.log_lines
+                "Checks: not run" in line for line in app.log_lines
             )
 
             # retired action -> status error, not a crash
@@ -1906,4 +1909,332 @@ def test_ac4_patch_paste_textarea_min_height(tmp_path: Path) -> None:
     height = asyncio.run(_drive())
     assert height >= 6, (
         f"#patch_paste_text must render >= 6 lines (fixed height 8); got {height}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-33 Inc-3 — Layer-B Pilot ATs through the REAL Run-checks button:
+# AT-050a (US-050 through the shipped surface), AT-051a (containment reasons
+# in rows), AT-051b (loud doc-kind status + capped log prefix + ok=False),
+# AT-051e (hostile kind, three markup surfaces, bisected-token case).
+# ---------------------------------------------------------------------------
+
+
+def test_at050a_pilot_mixed_results_via_real_button(tmp_path: Path) -> None:
+    """AT-050a (Layer B, real button): a runnable check doc with a collision
+    PAIR yields mixed rows — healthy entries checked, only the pair
+    uncheckable with the entry-fault reason visible in its rows (RED-first:
+    the pre-change gate rendered all four uncheckable)."""
+    from textual.widgets import Label, Static
+
+    check_path = _write_v2_document(
+        tmp_path / "coll.json",
+        [
+            {"type": "bytes", "address": "0x100", "bytes": "00 00"},  # pass
+            {"type": "bytes", "address": "0x106", "bytes": "02"},  # fail
+            {"type": "bytes", "address": "0x200", "bytes": "DE AD BE EF"},
+            {"type": "bytes", "address": "0x202", "bytes": "01 02"},  # collide
+        ],
+        kind="check",
+    )
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(check_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            panel.request_action("run_checks")
+            await pilot.pause()
+            rows = list(
+                app.query("#patch_checks_results > Static").results(Static)
+            )
+            outcomes["row_texts"] = [str(row.render()) for row in rows]
+            outcomes["status_line"] = str(
+                app.query_one("#patch_checks_status", Label).render()
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    texts = outcomes["row_texts"]
+    assert len(texts) == 4
+    assert "-> pass" in texts[0] and "(" not in texts[0].split("->")[1], (
+        "pass rows carry no reason suffix (AT-051d display half)"
+    )
+    assert "-> fail" in texts[1]
+    for tainted_text, addr in ((texts[2], 0x200), (texts[3], 0x202)):
+        assert "-> uncheckable" in tainted_text
+        assert f"entry at 0x{addr:X} carries" in tainted_text
+        assert "CHG-COLLISION" in tainted_text
+    assert outcomes["status_line"] == "Checks: 1 passed, 1 failed, 2 uncheckable"
+
+
+def test_at051a_containment_reasons_visible_in_rows(tmp_path: Path) -> None:
+    """AT-051a (Layer B): the PARTIAL and OUTSIDE rows name their specific
+    containment reasons through the shipped surface (RED-first: rows ended
+    at the bare token pre-change)."""
+    from textual.widgets import Static
+
+    check_path = _write_v2_document(
+        tmp_path / "contain.json",
+        [
+            {"type": "bytes", "address": "0x10E", "bytes": "01 02 03 04"},
+            {"type": "bytes", "address": "0x500", "bytes": "05 06"},
+        ],
+        kind="check",
+    )
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> list[str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(check_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            panel.request_action("run_checks")
+            await pilot.pause()
+            return [
+                str(row.render())
+                for row in app.query(
+                    "#patch_checks_results > Static"
+                ).results(Static)
+            ]
+
+    texts = asyncio.run(_drive())
+    assert "range partially outside the loaded image [partial]" in texts[0]
+    assert "range outside the loaded image [outside]" in texts[1]
+
+
+def test_at051b_doc_kind_loud_status_capped_log_and_not_ok(
+    tmp_path: Path,
+) -> None:
+    """AT-051b (Layer B): running checks on a kind='change' document renders
+    the FULL loud reason on #patch_checks_status (untruncated), only the
+    'Checks: not run' prefix on the 50-char-capped log lines, and the
+    service return (the m-3 observation point) reports ok=False."""
+    from textual.widgets import Label
+
+    change_path = _write_v2_document(
+        tmp_path / "wrongkind.json",
+        [
+            {"type": "bytes", "address": "0x100", "bytes": "00 00"},
+            {"type": "bytes", "address": "0x104", "bytes": "00"},
+        ],
+        kind="change",
+    )
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(change_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            panel.request_action("run_checks")
+            await pilot.pause()
+            outcomes["status_line"] = str(
+                app.query_one("#patch_checks_status", Label).render()
+            )
+            outcomes["log_lines"] = list(app.log_lines)
+            # m-3: ok is observable on the ChangeActionResult return.
+            action = app._change_service.run_checks(
+                app.current_file.mem_map, app.current_file.ranges
+            )
+            outcomes["ok"] = action.ok
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    status = outcomes["status_line"]
+    assert "Checks: not run" in status
+    assert "not a check-set" in status
+    assert "needs kind 'check'" in status
+    assert "'change'" in status
+    assert "(0 passed, 0 failed, 2 uncheckable)" in status
+    assert any("Checks: not run" in line for line in outcomes["log_lines"])
+    assert all(len(line) <= 50 for line in outcomes["log_lines"])
+    assert outcomes["ok"] is False
+
+
+def test_at051e_hostile_kind_renders_literal_on_all_surfaces(
+    tmp_path: Path,
+) -> None:
+    """AT-051e (C-17, Phase-2 P2): a Rich-markup kind token — sized so the
+    50-char log cap BISECTS a markup token — renders literally on all three
+    surfaces (rows / status / log labels), no MarkupError, app alive."""
+    from textual.widgets import Label, Static
+
+    # 'Checks: not run — this is a change-set (kind ' is ~46 chars; the
+    # hostile token lands across the 50-char log boundary (bisected case).
+    hostile_kind = "zz[red]boom[/red]"
+    payload = {
+        "format": "s19app-changeset",
+        "version": "2.0",
+        "kind": hostile_kind,
+        "encoding": "utf-8",
+        "value_mode": "text",
+        "entries": [{"type": "bytes", "address": "0x100", "bytes": "00"}],
+    }
+    hostile_path = tmp_path / "hostile.json"
+    hostile_path.write_text(json.dumps(payload), encoding="utf-8")
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(hostile_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            panel.request_action("run_checks")
+            await pilot.pause()
+            outcomes["status_line"] = str(
+                app.query_one("#patch_checks_status", Label).render()
+            )
+            outcomes["log_lines"] = list(app.log_lines)
+            outcomes["row_texts"] = [
+                str(row.render())
+                for row in app.query(
+                    "#patch_checks_results > Static"
+                ).results(Static)
+            ]
+            outcomes["log_renders"] = [
+                str(app.query_one(f"#log_line_{i}", Label).render())
+                for i in range(1, 5)
+            ]
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    # Surface 2 (#patch_checks_status): hostile token VERBATIM, untruncated.
+    assert "[red]boom[/red]" in outcomes["status_line"]
+    # Surface 3 (log labels): capped lines rendered without MarkupError —
+    # the render() calls above completing IS the no-crash verdict; the
+    # blocked prefix is present.
+    assert any("Checks: not run" in text for text in outcomes["log_renders"])
+    # Surface 1 (rows): blocked rows carry only the short pointer — the
+    # hostile text never reaches them by construction.
+    assert all("run blocked [doc-kind]" in text for text in outcomes["row_texts"])
+    assert all("[red]" not in text for text in outcomes["row_texts"])
+
+
+# ---------------------------------------------------------------------------
+# batch-33 Inc-4 — help affordance (AT-052a/b) + the hostile-encoding
+# sibling through the load path's log funnel (TC-051.4).
+# ---------------------------------------------------------------------------
+
+
+def test_at052a_checks_help_states_semantics(tmp_path: Path) -> None:
+    """AT-052a: the checks help names (i) the AT-032a what/which token
+    (locked pin, unchanged), (ii) the kind requirement, (iii) the
+    per-entry-reasons + healthy-entries-still-checked rule — three DISTINCT
+    token spans on the shipped surface."""
+    from textual.widgets import Label
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return str(app.query_one("#patch_checks_help", Label).render())
+
+    text = asyncio.run(_drive())
+    assert _CHECKS_HELP_TOKEN in text  # (i) the locked AT-032a span
+    assert "Needs kind 'check'" in text  # (ii)
+    assert "Uncheckable rows name their reason" in text  # (iii)
+    assert "healthy entries are still checked" in text
+
+
+def test_at052b_checks_help_survives_screen_cycle(tmp_path: Path) -> None:
+    """AT-052b (wiring regression): the extended help renders identically
+    after cycling away from and back to the Patch Editor screen."""
+    from textual.widgets import Label
+
+    async def _drive() -> "tuple[str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            first = str(app.query_one("#patch_checks_help", Label).render())
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            second = str(app.query_one("#patch_checks_help", Label).render())
+            return first, second
+
+    first, second = asyncio.run(_drive())
+    assert first == second
+    assert "Needs kind 'check'" in second
+
+
+def test_tc051_4_hostile_encoding_sibling_through_load_funnel(
+    tmp_path: Path,
+) -> None:
+    """TC-051.4 (Phase-2 F3): a hostile Rich-markup token in the document
+    ENCODING flows through the load path's per-issue log lines
+    (_report_change_result -> set_status -> #log_line_*) and renders
+    LITERALLY — the LLR-051.8 construction-time scrub closes the whole
+    five-message class, not just the kind message."""
+    from textual.widgets import Label
+
+    hostile_doc = tmp_path / "hostile_enc.json"
+    hostile_doc.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "check",
+                "encoding": "bad[bold]codec[/bold]",
+                "value_mode": "text",
+                "entries": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> "list[str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            _set_entry_inputs(app, path_text=str(hostile_doc))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            # Rendering the four log labels IS the no-MarkupError verdict.
+            return [
+                str(app.query_one(f"#log_line_{i}", Label).render())
+                for i in range(1, 5)
+            ]
+
+    renders = asyncio.run(_drive())
+    assert any("CHG-ENCODING-UNKNOWN" in text for text in renders), (
+        f"the encoding fault must reach the log surface; got {renders}"
     )

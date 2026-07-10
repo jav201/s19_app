@@ -77,6 +77,7 @@ __all__ = [
     "MF_RUN_LENGTH_CEILING",
     "MF_JSON_PARSE",
     "MF_BAD_STRUCTURE",
+    "CHG_DECL_STRUCTURE",
     "MF_SIZE_CAP",
     "MF_PATH_UNRESOLVED",
     "MF_ENTRY_LIMIT",
@@ -187,6 +188,13 @@ CHG_VALUE_MODE_UNKNOWN = "CHG-VALUE-MODE-UNKNOWN"
 #: success alone is NOT sufficient (F-S-02: ``zlib_codec`` resolves but is
 #: not a text codec).
 CHG_ENCODING_UNKNOWN = "CHG-ENCODING-UNKNOWN"
+#: Entry: the DECLARATION itself is structurally junk — not a JSON object,
+#: or an unknown ``type`` — and was skipped (skip-and-continue). Split out
+#: of the envelope-level :data:`MF_BAD_STRUCTURE` in batch-33 (R-B02,
+#: Phase-2 F1) so the check engine classifies it entry-scoped/non-blocking:
+#: one junk declaration must not block checking the document's healthy
+#: entries (the envelope variant stays run-blocking).
+CHG_DECL_STRUCTURE = "CHG-DECL-STRUCTURE"
 #: Entry: ``address`` is not a ``^0x[0-9A-Fa-f]+$`` string nor a non-negative
 #: integer (the strict wire grammar, LLR-001.2).
 CHG_ADDRESS_SYNTAX = "CHG-ADDRESS-SYNTAX"
@@ -879,7 +887,7 @@ def _parse_entry(
     if not isinstance(element, dict):
         issues.append(
             _issue(
-                MF_BAD_STRUCTURE,
+                CHG_DECL_STRUCTURE,
                 f"entry {index} is not a JSON object — the entry was skipped",
             )
         )
@@ -889,7 +897,7 @@ def _parse_entry(
     if entry_type not in ("string", "bytes"):
         issues.append(
             _issue(
-                MF_BAD_STRUCTURE,
+                CHG_DECL_STRUCTURE,
                 f"entry {index} declares type {entry_type!r}, not one of "
                 f"'string' / 'bytes' — the entry was skipped",
             )

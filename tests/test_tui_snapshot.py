@@ -453,6 +453,26 @@ def _batch31_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-33 (R-B02): the extended `#patch_checks_help` label reflows the patch
+# screen at 120x30 (the 80x24 cell still matches — the longer text renders
+# below the fold there). One cell xfail(strict=False) until the canonical-CI
+# regen (snapshot-regen.yml, textual 8.2.8, at CURRENT main post-merge)
+# recommits it — the standing batch-25/27/28/31 pattern.
+_BATCH33_HELP_DRIFT = {("patch", "comfortable", "120x30")}
+
+
+def _batch33_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the xfail mark for the batch-33 help-label drift cell, else ()."""
+    if (screen, density, size_key) in _BATCH33_HELP_DRIFT:
+        return (
+            pytest.mark.xfail(
+                strict=False,
+                reason="pending canonical-CI baseline regen (batch-33 checks-help text)",
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -501,7 +521,8 @@ _SCAFFOLD_CELLS = [
         size_key,
         id=f"{screen}-comfortable-{size_key}",
         marks=_scaffold_cell_marks(screen, size_key)
-        + _batch31_drift_marks(screen, "comfortable", size_key),
+        + _batch31_drift_marks(screen, "comfortable", size_key)
+        + _batch33_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

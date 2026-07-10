@@ -11,8 +11,8 @@ anywhere:
 - **TC-021** — comparison semantics (LLR-004.2): the loaded-image 2-1-2 run
   (2 pass, 1 fail, 2 uncheckable — one PARTIAL, one OUTSIDE) with exact
   actual tuples and ``mem_map`` immutability; the no-image all-uncheckable
-  run; the not-runnable gate (ERROR-faulted document / wrong ``kind`` —
-  the apply-gate mirror).
+  run; the batch-33 gate (entry-scoped faults taint per entry; wrong
+  ``kind`` / envelope faults block the run with a loud reason).
 - **TC-022** — result shape (LLR-004.3): the C-6 ``CheckRunResult`` field
   set plus fixed-clock double-run ``to_dict()`` equality (B-4).
 - **TC-023** — headless project run (LLR-004.4):
@@ -199,14 +199,19 @@ def test_results_no_image_all_uncheckable() -> None:
     assert all(entry.actual_bytes is None for entry in result.entries)
 
 
-def test_faulted_or_wrong_kind_document_not_runnable(tmp_path: Path) -> None:
-    """An ERROR-faulted or non-check document performs no comparison.
+def test_collision_pair_uncheckable_and_wrong_kind_blocked(
+    tmp_path: Path,
+) -> None:
+    """Collision pair → per-entry taint; wrong kind → doc-kind run block.
 
-    Intent: LLR-004.1/004.2, apply-gate mirror of LLR-002.1 — a check
-    document with an ERROR issue is not runnable: every entry uncheckable
-    with actual ``None`` even where the range is fully readable, the memory
-    map untouched, and the declaration faults carried in ``result.issues``
-    (B-2). Same gate for ``kind="change"`` fed to the check engine.
+    Intent (SUPERSEDES the pre-batch-33 apply-gate-mirror test — census
+    rows 1-2 executed): under the batch-33 gate a collision pair is
+    ENTRY-tainted (the run itself is NOT blocked), each partner carrying
+    the entry-fault reason with ``actual_bytes`` ``None``, the memory map
+    untouched, and the declaration faults carried in ``result.issues``
+    (B-2). A ``kind="change"`` document fed to the check engine is a
+    doc-kind RUN block. Same fixtures as the retired test, so the old
+    behavior's regression surface stays covered under the new semantics.
     """
     mem_map, ranges = _image()
     snapshot = dict(mem_map)
@@ -226,7 +231,11 @@ def test_faulted_or_wrong_kind_document_not_runnable(tmp_path: Path) -> None:
     )
     assert faulted.has_errors
     result = run_check_document(faulted, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code is None  # per-entry, NOT a block
     assert [entry.result for entry in result.entries] == ["uncheckable"] * 2
+    assert all(
+        entry.reason_code == "entry-fault" for entry in result.entries
+    )
     assert all(entry.actual_bytes is None for entry in result.entries)
     assert [issue.code for issue in result.issues] == [
         CHG_COLLISION,
@@ -243,6 +252,7 @@ def test_faulted_or_wrong_kind_document_not_runnable(tmp_path: Path) -> None:
         entries=[ChangeEntry("bytes", 0x100, (0x00,))],
     )
     result = run_check_document(wrong_kind, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code == "doc-kind"
     assert [entry.result for entry in result.entries] == ["uncheckable"]
     assert result.entries[0].actual_bytes is None
     assert mem_map == snapshot
@@ -439,3 +449,395 @@ def test_no_textual_in_static_import_graph() -> None:
     assert offenders == [], (
         f"textual reached the headless check path: {offenders}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-33 (R-B02) Inc-1 — reason vocabulary + model carriage (TC-051.1).
+# ---------------------------------------------------------------------------
+
+
+def test_tc051_1_reason_vocabulary_and_model_defaults() -> None:
+    """TC-051.1: the reason domain is the canonical 6-token set; entry and
+    run reason fields default to None (pass/fail entries carry no reason,
+    AT-051d's model half); to_dict is ADDITIVE — the four new keys are
+    present and None-safe while every pre-batch-33 key survives unchanged.
+    """
+    from s19_app.tui.changes.model import (
+        CHECK_REASON_DOC_FAULT,
+        CHECK_REASON_DOC_KIND,
+        CHECK_REASON_ENTRY_FAULT,
+        CHECK_REASON_NO_IMAGE,
+        CHECK_REASON_OUTSIDE,
+        CHECK_REASON_PARTIAL,
+        CHECK_UNCHECKABLE_REASON_DOMAIN,
+        CheckRunEntry,
+        CheckRunResult,
+    )
+
+    assert CHECK_UNCHECKABLE_REASON_DOMAIN == (
+        CHECK_REASON_DOC_KIND,
+        CHECK_REASON_DOC_FAULT,
+        CHECK_REASON_ENTRY_FAULT,
+        CHECK_REASON_PARTIAL,
+        CHECK_REASON_OUTSIDE,
+        CHECK_REASON_NO_IMAGE,
+    )
+    assert len(set(CHECK_UNCHECKABLE_REASON_DOMAIN)) == 6
+
+    entry = CheckRunEntry(
+        entry_type="bytes",
+        address_start=0x100,
+        address_end=0x104,
+        expected_bytes=(1, 2, 3, 4),
+        actual_bytes=(1, 2, 3, 4),
+        result="pass",
+        linkage="standalone",
+        linkage_symbol=None,
+    )
+    assert entry.reason_code is None and entry.reason is None
+
+    result = CheckRunResult(
+        source_path=None,
+        timestamp_utc="2026-07-09T00:00:00+00:00",
+        variant_id=None,
+        aggregates={"passed": 1, "failed": 0, "uncheckable": 0},
+        entries=[entry],
+    )
+    assert result.run_blocked_reason_code is None
+    assert result.run_blocked_reason is None
+
+    payload = result.to_dict()
+    # Additive run-level keys.
+    assert payload["run_blocked_reason_code"] is None
+    assert payload["run_blocked_reason"] is None
+    # Additive per-entry keys beside the intact pre-batch-33 key set.
+    entry_payload = payload["entries"][0]
+    assert entry_payload["reason_code"] is None
+    assert entry_payload["reason"] is None
+    assert set(entry_payload) == {
+        "entry_type", "address_start", "address_end", "expected_bytes",
+        "actual_bytes", "result", "linkage", "linkage_symbol",
+        "reason_code", "reason",
+    }
+    assert payload["aggregates"] == {"passed": 1, "failed": 0, "uncheckable": 0}
+
+
+# ===========================================================================
+# batch-33 Inc-2 — gate rewrite + reasons (AT-050a-d engine layer, TC-050.1/.2,
+# AT-051b/d engine halves, LLR-051.3 template caps).
+# ===========================================================================
+
+
+def test_at050a_collision_pair_tainted_healthy_entries_checked(
+    tmp_path: Path,
+) -> None:
+    """AT-050a: a runnable doc with a collision PAIR checks its healthy
+    entries and taints ONLY the pair — aggregates exactly {1,1,2}
+    (RED-first: the pre-change gate made all four uncheckable).
+
+    Fixture per the Phase-2 amendment: BOTH collision partners taint (two
+    findings, two addresses); the healthy pass/fail entries sit at
+    non-colliding addresses.
+    """
+    entries = [
+        {"type": "bytes", "address": "0x100", "bytes": "00 01"},  # pass
+        {"type": "bytes", "address": "0x106", "bytes": "FF"},  # fail
+        {"type": "bytes", "address": "0x200", "bytes": "DE AD BE EF"},
+        {"type": "bytes", "address": "0x202", "bytes": "01 02"},  # collides
+    ]
+    document = read_change_document(
+        str(_write_document(tmp_path / "coll.json", entries, "check")),
+        tmp_path,
+    )
+    assert document.has_errors  # the collision pair is ERROR severity
+    mem_map, ranges = _image()
+    result = run_check_document(document, mem_map, ranges, None, None)
+
+    assert result.run_blocked_reason_code is None
+    assert result.run_blocked_reason is None
+    assert result.aggregates == {"passed": 1, "failed": 1, "uncheckable": 2}
+    by_addr = {entry.address_start: entry for entry in result.entries}
+    # AT-051d engine half: pass/fail entries carry NO reason.
+    assert by_addr[0x100].result == "pass"
+    assert by_addr[0x100].reason_code is None and by_addr[0x100].reason is None
+    assert by_addr[0x106].result == "fail"
+    assert by_addr[0x106].reason_code is None and by_addr[0x106].reason is None
+    # Both collision partners carry the entry-fault reason naming themselves.
+    for addr in (0x200, 0x202):
+        tainted = by_addr[addr]
+        assert tainted.result == "uncheckable"
+        assert tainted.reason_code == "entry-fault"
+        assert f"0x{addr:X}" in tainted.reason
+        assert "CHG-COLLISION" in tainted.reason
+        assert tainted.actual_bytes is None
+
+
+def test_at050b_skipped_declarations_taint_nothing(tmp_path: Path) -> None:
+    """AT-050b + the Phase-2 B-1 pin: skip-site faults (incl. one at the
+    SAME address as a healthy constructed entry, and a non-object junk
+    declaration -> CHG-DECL-STRUCTURE) leave the run runnable and taint NO
+    constructed entry (RED-first: the pre-change gate blocked everything).
+    """
+    entries = [
+        {"type": "bytes", "address": "0x100", "bytes": "00 01"},  # healthy
+        # SAME address 0x100, bad bytes -> skipped CHG-BYTES-SYNTAX with
+        # address=0x100 — the B-1 false-taint fixture.
+        {"type": "bytes", "address": "0x100", "bytes": "ZZ"},
+        ["junk-not-an-object"],  # skipped CHG-DECL-STRUCTURE (Phase-2 F1)
+    ]
+    document = read_change_document(
+        str(_write_document(tmp_path / "skips.json", entries, "check")),
+        tmp_path,
+    )
+    codes = [issue.code for issue in document.issues]
+    assert "CHG-BYTES-SYNTAX" in codes
+    assert "CHG-DECL-STRUCTURE" in codes
+    assert document.has_errors
+    assert len(document.entries) == 1  # only the healthy entry constructed
+
+    mem_map, ranges = _image()
+    result = run_check_document(document, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code is None
+    assert result.aggregates == {"passed": 1, "failed": 0, "uncheckable": 0}
+    healthy = result.entries[0]
+    assert healthy.result == "pass"
+    assert healthy.reason_code is None, (
+        "a skipped declaration at the same address must NOT taint the "
+        "healthy constructed entry (Phase-2 B-1)"
+    )
+
+
+def test_at050c_clean_document_negative_control() -> None:
+    """AT-050c (declared negative — passes pre- AND post-change): a clean
+    runnable document is checked exactly as before ({2,1,2} on the 2-1-2
+    fixture) with containment reasons on the uncheckable rows (AT-051a
+    engine half) and None reasons on pass/fail."""
+    document = _check_document(_two_one_two_entries())
+    mem_map, ranges = _image()
+    result = run_check_document(document, mem_map, ranges, None, None)
+
+    assert result.run_blocked_reason_code is None
+    assert result.aggregates == {"passed": 2, "failed": 1, "uncheckable": 2}
+    by_addr = {entry.address_start: entry for entry in result.entries}
+    partial = by_addr[0x10E]
+    assert partial.reason_code == "partial"
+    assert partial.reason == "range partially outside the loaded image [partial]"
+    outside = by_addr[0x500]
+    assert outside.reason_code == "outside"
+    assert outside.reason == "range outside the loaded image [outside]"
+    for addr in (0x100, 0x104, 0x106):
+        assert by_addr[addr].reason_code is None
+
+
+def test_at050c_no_image_reason() -> None:
+    """AT-051a engine half (no-image branch): every entry uncheckable with
+    the no-image reason when no image is loaded."""
+    document = _check_document([ChangeEntry("bytes", 0x100, (0x00,))])
+    result = run_check_document(document, None, None, None, None)
+    entry = result.entries[0]
+    assert entry.result == "uncheckable"
+    assert entry.reason_code == "no-image"
+    assert entry.reason == "no image loaded"
+
+
+def test_at050d_apply_gate_untouched(tmp_path: Path) -> None:
+    """AT-050d (regression guard): the APPLY gate still blocks the whole
+    document on any ERROR — the batch-33 taint relaxation applies to checks
+    only."""
+    from s19_app.tui.changes.apply import apply_change_document
+    from s19_app.tui.changes.model import DISPOSITION_BLOCKED
+
+    entries = [
+        {"type": "bytes", "address": "0x100", "bytes": "00 01"},
+        {"type": "bytes", "address": "0x100", "bytes": "02 03"},  # collides
+        {"type": "bytes", "address": "0x104", "bytes": "04"},  # healthy
+    ]
+    document = read_change_document(
+        str(_write_document(tmp_path / "chg.json", entries, "change")),
+        tmp_path,
+    )
+    assert document.has_errors
+    mem_map, ranges = _image()
+    snapshot = dict(mem_map)
+    summary = apply_change_document(document, mem_map, ranges, None, None)
+    assert all(
+        entry.disposition == DISPOSITION_BLOCKED for entry in summary.entries
+    ), "apply must still block EVERY entry on an ERROR-faulted document"
+    assert mem_map == snapshot
+
+
+def test_tc050_1_envelope_and_unknown_codes_block(tmp_path: Path) -> None:
+    """TC-050.1: the fail-safe — envelope faults and unknown/future ERROR
+    codes block the run with the doc-fault reason; a zero-entry blocked run
+    aggregates {0,0,0} (the TC-051.5 boundary, engine half)."""
+    # (a) Envelope fault: entries not an array -> MF-BAD-STRUCTURE, zero
+    # entries (F-A-16).
+    path = tmp_path / "env.json"
+    path.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "check",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": "not-an-array",
+            }
+        ),
+        encoding="utf-8",
+    )
+    document = read_change_document(str(path), tmp_path)
+    assert document.entries == []
+    mem_map, ranges = _image()
+    result = run_check_document(document, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code == "doc-fault"
+    assert "MF-BAD-STRUCTURE" in result.run_blocked_reason
+    assert "fix the document" in result.run_blocked_reason
+    assert result.aggregates == {"passed": 0, "failed": 0, "uncheckable": 0}
+
+    # (b) Unknown future ERROR code -> blocks (fail-safe default).
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    document2 = _check_document([ChangeEntry("bytes", 0x100, (0x00,))])
+    document2.issues.append(
+        ValidationIssue(
+            code="XX-FUTURE-CODE",
+            severity=ValidationSeverity.ERROR,
+            message="synthetic future fault",
+            artifact="changes",
+            address=None,
+        )
+    )
+    result2 = run_check_document(document2, mem_map, ranges, None, None)
+    assert result2.run_blocked_reason_code == "doc-fault"
+    assert "XX-FUTURE-CODE" in result2.run_blocked_reason
+    assert result2.aggregates == {"passed": 0, "failed": 0, "uncheckable": 1}
+    assert result2.entries[0].reason == "run blocked [doc-fault]"
+
+
+def test_tc050_2_taint_boundaries() -> None:
+    """TC-050.2: address-less non-blocking issues taint nothing; a
+    taint-attribution issue at address 0x0 taints the entry at 0x0 (falsy-
+    int membership)."""
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    def _issue(code: str, address) -> ValidationIssue:
+        return ValidationIssue(
+            code=code,
+            severity=ValidationSeverity.ERROR,
+            message="synthetic",
+            artifact="changes",
+            address=address,
+        )
+
+    mem_map = {0x0: 0x00, 0x1: 0x01}
+    ranges = [(0x0, 0x2)]
+    document = _check_document([ChangeEntry("bytes", 0x0, (0x00,))])
+    document.issues.append(_issue("MF-ENTRY-LIMIT", None))  # address-less
+    result = run_check_document(document, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code is None
+    assert result.entries[0].result == "pass"  # no taint from MF-ENTRY-LIMIT
+
+    document2 = _check_document([ChangeEntry("bytes", 0x0, (0x00,))])
+    document2.issues.append(_issue("CHG-COLLISION", 0x0))
+    result2 = run_check_document(document2, mem_map, ranges, None, None)
+    assert result2.entries[0].result == "uncheckable"
+    assert result2.entries[0].reason_code == "entry-fault"
+    assert "0x0" in result2.entries[0].reason
+
+
+def test_at051b_engine_half_doc_kind_run_block(tmp_path: Path) -> None:
+    """AT-051b (engine half): a kind='change' document blocks the run with
+    the loud doc-kind reason; every enumerated row carries the SHORT
+    pointer (LLR-051.5 — the run reason is never multiplied by row count)."""
+    entries = [
+        {"type": "bytes", "address": "0x100", "bytes": "00 01"},
+        {"type": "bytes", "address": "0x104", "bytes": "04"},
+    ]
+    document = read_change_document(
+        str(_write_document(tmp_path / "wrongkind.json", entries, "change")),
+        tmp_path,
+    )
+    mem_map, ranges = _image()
+    result = run_check_document(document, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code == "doc-kind"
+    assert "not a check-set" in result.run_blocked_reason
+    assert "needs kind 'check'" in result.run_blocked_reason
+    assert "'change'" in result.run_blocked_reason
+    assert result.aggregates == {"passed": 0, "failed": 0, "uncheckable": 2}
+    for entry in result.entries:
+        assert entry.result == "uncheckable"
+        assert entry.reason_code == "doc-kind"
+        assert entry.reason == "run blocked [doc-kind]"
+        assert entry.actual_bytes is None
+
+
+def test_llr051_3_reason_template_caps() -> None:
+    """LLR-051.3 (Phase-2 F2): the doc-kind {kind!r} interpolation is
+    display-capped at 64 chars + marker; the doc-fault {codes} list is
+    deduplicated, sorted, and capped at 5 with '+N more'."""
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    # Pathological kind string: reason stays bounded.
+    document = ChangeDocument(
+        format=FORMAT_ID,
+        version=FORMAT_VERSION,
+        kind="x" * 500,
+        encoding="utf-8",
+        value_mode="text",
+        entries=[],
+    )
+    result = run_check_document(document, {}, [], None, None)
+    assert result.run_blocked_reason_code == "doc-kind"
+    assert "…(capped)" in result.run_blocked_reason
+    assert len(result.run_blocked_reason) < 250
+
+    # 7 unique blocking codes, each duplicated: 5 shown + '+2 more', deduped.
+    document2 = _check_document([])
+    for suffix in "ABCDEFG":
+        for _ in range(2):
+            document2.issues.append(
+                ValidationIssue(
+                    code=f"XX-BLOCK-{suffix}",
+                    severity=ValidationSeverity.ERROR,
+                    message="synthetic",
+                    artifact="changes",
+                    address=None,
+                )
+            )
+    result2 = run_check_document(document2, {}, [], None, None)
+    assert result2.run_blocked_reason_code == "doc-fault"
+    assert "14 error-severity" in result2.run_blocked_reason
+    assert "+2 more" in result2.run_blocked_reason
+    assert result2.run_blocked_reason.count("XX-BLOCK-A") == 1  # deduped
+    assert "XX-BLOCK-F" not in result2.run_blocked_reason  # capped at 5
+
+
+def test_at051f_to_dict_additive_through_real_runs(tmp_path: Path) -> None:
+    """AT-051f: to_dict over REAL runs — a blocked run serializes the
+    run-level reason pair; a runnable run serializes None pair and the
+    per-entry reason pair rides each entry dict. (Stated: to_dict has zero
+    production consumers this batch — the report generator reads dataclass
+    attributes directly; the Q2 report column is deferred.)"""
+    entries = [{"type": "bytes", "address": "0x100", "bytes": "00 01"}]
+    blocked_doc = read_change_document(
+        str(_write_document(tmp_path / "wrong.json", entries, "change")),
+        tmp_path,
+    )
+    mem_map, ranges = _image()
+    blocked = run_check_document(blocked_doc, mem_map, ranges, None, None)
+    payload = blocked.to_dict()
+    assert payload["run_blocked_reason_code"] == "doc-kind"
+    assert "not a check-set" in payload["run_blocked_reason"]
+    assert payload["entries"][0]["reason_code"] == "doc-kind"
+    assert payload["entries"][0]["reason"] == "run blocked [doc-kind]"
+
+    runnable_doc = read_change_document(
+        str(_write_document(tmp_path / "ok.json", entries, "check")),
+        tmp_path,
+    )
+    runnable = run_check_document(runnable_doc, mem_map, ranges, None, None)
+    payload2 = runnable.to_dict()
+    assert payload2["run_blocked_reason_code"] is None
+    assert payload2["run_blocked_reason"] is None
+    assert payload2["entries"][0]["reason_code"] is None

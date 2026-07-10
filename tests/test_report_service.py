@@ -1214,3 +1214,67 @@ def test_entropy_section_confidentiality_no_raw_bytes_or_logging(
     source = Path(report_service.__file__).read_text(encoding="utf-8")
     assert "import logging" not in source
     assert "getLogger" not in source
+
+
+# ---------------------------------------------------------------------------
+# batch-33 TC-051.5 (report half) — blocked runs keep the Checklists table
+# rendering: {0,0,N} with enumerated rows, and the zero-entry {0,0,0}
+# envelope-fault boundary renders an empty table without fault.
+# ---------------------------------------------------------------------------
+
+
+def test_tc051_5_blocked_runs_render_checklists(tmp_path: Path) -> None:
+    blocked_with_rows = CheckRunResult(
+        source_path=Path("blocked.json"),
+        timestamp_utc="2026-07-09T00:00:00+00:00",
+        variant_id=None,
+        aggregates=_aggregates(0, 0, 2),
+        entries=[
+            CheckRunEntry(
+                "bytes", 0x100, 0x102, (0xAA, 0xBB), None, "uncheckable",
+                "standalone", None, reason_code="doc-kind",
+                reason="run blocked [doc-kind]",
+            ),
+            CheckRunEntry(
+                "bytes", 0x104, 0x105, (0xCC,), None, "uncheckable",
+                "standalone", None, reason_code="doc-kind",
+                reason="run blocked [doc-kind]",
+            ),
+        ],
+        run_blocked_reason_code="doc-kind",
+        run_blocked_reason="this is a change-set (kind 'change'), not a "
+        "check-set — Run checks needs kind 'check'",
+    )
+    zero_entry_blocked = CheckRunResult(
+        source_path=Path("envelope.json"),
+        timestamp_utc="2026-07-09T00:00:00+00:00",
+        variant_id=None,
+        aggregates=_aggregates(0, 0, 0),
+        run_blocked_reason_code="doc-fault",
+        run_blocked_reason="document carries 1 error-severity declaration "
+        "fault(s) [MF-BAD-STRUCTURE] — fix the document before running "
+        "checks",
+    )
+    results = [
+        VariantExecutionResult(
+            variant_id="a",
+            status="ok",
+            check_results=[blocked_with_rows, zero_entry_blocked],
+        ),
+    ]
+    path = generate_project_report(
+        tmp_path,
+        results,
+        ReportOptions(),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    text = path.read_text(encoding="utf-8")
+    assert "Checklists" in text
+    # {0,0,N}: the blocked run's aggregates line + both enumerated rows.
+    assert "Passed: 0 - Failed: 0 - Uncheckable: 2" in text
+    assert text.count("| uncheckable |") == 2
+    # The zero-entry {0,0,0} envelope-fault boundary renders its header +
+    # aggregates line with an empty table, without fault.
+    assert "#### Checklist: envelope.json" in text
+    assert "Passed: 0 - Failed: 0 - Uncheckable: 0" in text

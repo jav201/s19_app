@@ -1866,9 +1866,18 @@ class PatchEditorPanel(ScrollableContainer):
                     Button("Run checks", id="patch_checks_run_button"),
                     id="patch_doc_controls",
                 ),
+                # batch-33 (US-052 / LLR-052.1): the help text extends the
+                # AT-032a sentence (its token span is a locked pin) with
+                # check-semantics guidance so "uncheckable" explains itself
+                # before it ever appears: kind requirement + per-entry
+                # reasons + the healthy-entries-still-checked rule.
                 Label(
                     "Checks: runs the loaded change document's checks "
-                    "against the loaded image.",
+                    "against the loaded image. Needs kind 'check' (a "
+                    "change-set cannot be checked). Uncheckable rows name "
+                    "their reason (declaration fault, partial/outside "
+                    "range, or no image); healthy entries are still "
+                    "checked.",
                     id="patch_checks_help",
                     classes="patch-field-label",
                 ),
@@ -1895,7 +1904,15 @@ class PatchEditorPanel(ScrollableContainer):
             Static(
                 "", id="patch_doc_issues", markup=False, classes="hidden"
             ),
-            Label("", id="patch_checks_status", classes="patch-field-label"),
+            # batch-33 (LLR-051.6, C-17): the check status renders the
+            # UNTRUNCATED run-block reason, which embeds file-derived
+            # {kind!r} text — markup must never be interpreted here.
+            Label(
+                "",
+                id="patch_checks_status",
+                classes="patch-field-label",
+                markup=False,
+            ),
             Container(id="patch_checks_results"),
             id="patch_pane_checks",
         )

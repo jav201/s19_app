@@ -10,14 +10,17 @@ as change documents, LLR-004.1) plus read-only snapshots of the loaded image
 against the image without writing anything (LLR-004.2: execution mutates
 nothing in the memory map).
 
-Gate semantics (the apply-gate mirror, chosen per LLR-004.1's one-reader /
-one-rule decision D-3): a document carrying any ERROR-severity issue, or
-whose ``kind`` is not ``"check"``, is **not runnable** — no comparison is
-performed, every entry's result is ``uncheckable`` with ``actual_bytes``
-``None``, and the result object carries the document's collected issues so
-the declaration faults reach the report (B-2). This mirrors
-``apply_change_document``'s LLR-002.1 gate (ERROR or wrong kind → every
-disposition ``blocked``).
+Gate semantics (batch-33 R-B02, §6.5 amendment — the apply-gate MIRROR is
+RETIRED for checks per the operator decision 2026-07-09; the apply gate
+itself is untouched): ``kind`` != ``"check"`` blocks the whole run with one
+loud run-level reason (``doc-kind``); ERROR issues whose codes fall OUTSIDE
+the entry-scoped non-blocking set block the run with a ``doc-fault`` reason
+(fail-safe for envelope/unknown codes). A runnable document with
+entry-scoped faults checks its HEALTHY entries normally — only entries
+tainted by a taint-attribution code (today: a collision partner, matched by
+start address) become ``uncheckable`` (``entry-fault``). Every
+``uncheckable`` outcome carries a ``reason_code`` + display ``reason``;
+the result still carries the document's collected issues (B-2).
 
 The containment and linkage machinery is **reused** from ``changes/apply.py``
 (``classify_containment`` plus the module-private linkage helpers) — one
@@ -36,6 +39,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
+from ...validation.model import ValidationSeverity
 from .apply import (
     _a2l_linkage_source,
     _classify_linkage,
@@ -43,16 +47,31 @@ from .apply import (
     _mac_linkage_source,
     classify_containment,
 )
+from .io import (
+    CHG_ADDRESS_SYNTAX,
+    CHG_BYTES_SYNTAX,
+    CHG_DECL_STRUCTURE,
+    CHG_ENCODE_FAIL,
+    CHG_VALUE_EMPTY,
+    MF_ENTRY_LIMIT,
+)
 from .model import (
     CHECK_AGGREGATE_KEYS,
     CHECK_FAIL,
     CHECK_PASS,
+    CHECK_REASON_DOC_FAULT,
+    CHECK_REASON_DOC_KIND,
+    CHECK_REASON_ENTRY_FAULT,
+    CHECK_REASON_NO_IMAGE,
+    CHECK_REASON_OUTSIDE,
+    CHECK_REASON_PARTIAL,
     CHECK_UNCHECKABLE,
     ChangeDocument,
     CheckRunEntry,
     CheckRunResult,
     MemoryStatus,
 )
+from .validate import CHG_COLLISION
 
 __all__ = ["run_check_document"]
 
@@ -63,6 +82,113 @@ _RESULT_TO_AGGREGATE = {
     CHECK_FAIL: "failed",
     CHECK_UNCHECKABLE: "uncheckable",
 }
+
+#: batch-33 (LLR-050.1 set (a)) — ERROR codes that are ENTRY-SCOPED, so a
+#: document carrying only these stays RUNNABLE (checks are read-only; the
+#: apply-gate mirror is retired for checks per the operator decision
+#: 2026-07-09). Any ERROR code OUTSIDE this set is document-blocking — the
+#: fail-safe default for envelope faults and unknown/future codes.
+_CHECK_NON_BLOCKING_CODES: frozenset[str] = frozenset(
+    {
+        CHG_ADDRESS_SYNTAX,
+        CHG_BYTES_SYNTAX,
+        CHG_VALUE_EMPTY,
+        CHG_ENCODE_FAIL,
+        MF_ENTRY_LIMIT,
+        CHG_COLLISION,
+        CHG_DECL_STRUCTURE,
+    }
+)
+
+#: batch-33 (LLR-050.1 set (b), Phase-2 B-1) — the codes whose issues taint a
+#: CONSTRUCTED entry by address equality. ONLY codes emitted AGAINST
+#: constructed entries belong here (today exactly the collision fault,
+#: ``validate.py`` — one finding per partner, ``address=entry.address``).
+#: Reader skip-site codes are non-blocking AND non-tainting: a skipped
+#: declaration must never taint a healthy constructed entry that happens to
+#: share its address (the B-1 false-taint mode).
+_CHECK_TAINT_ATTRIBUTION_CODES: frozenset[str] = frozenset({CHG_COLLISION})
+
+#: batch-33 (LLR-051.3, Phase-2 F2): display bounds — ``{kind!r}`` is capped
+#: to this many characters (with an ellipsis marker) and the doc-fault
+#: ``{codes}`` list is deduplicated and capped to this many codes.
+_REASON_KIND_DISPLAY_CAP = 64
+_REASON_CODES_DISPLAY_CAP = 5
+
+#: Containment verdict → (reason_code, display reason) for the per-entry
+#: uncheckable outcomes (LLR-051.1; §1.3 taxonomy).
+_CONTAINMENT_REASONS = {
+    MemoryStatus.PARTIAL: (
+        CHECK_REASON_PARTIAL,
+        "range partially outside the loaded image [partial]",
+    ),
+    MemoryStatus.OUTSIDE: (
+        CHECK_REASON_OUTSIDE,
+        "range outside the loaded image [outside]",
+    ),
+    MemoryStatus.UNVALIDATED_NO_IMAGE: (
+        CHECK_REASON_NO_IMAGE,
+        "no image loaded",
+    ),
+}
+
+
+def _display_kind(kind: str) -> str:
+    """
+    Summary:
+        Render the document's ``kind`` for a reason string: ``repr`` (keeps
+        control-character escaping) display-capped at
+        :data:`_REASON_KIND_DISPLAY_CAP` characters with an ellipsis marker
+        (LLR-051.3, Phase-2 F2 — a pathological kind string must not hang
+        the render surfaces).
+
+    Args:
+        kind (str): The document's verbatim ``kind`` value (file-derived).
+
+    Returns:
+        str: The capped ``repr`` text.
+
+    Data Flow:
+        - Used only inside the ``doc-kind`` run-block reason template.
+
+    Dependencies:
+        Used by:
+            - run_check_document
+    """
+    rendered = repr(kind)
+    if len(rendered) <= _REASON_KIND_DISPLAY_CAP:
+        return rendered
+    return rendered[: _REASON_KIND_DISPLAY_CAP] + "…(capped)"
+
+
+def _blocking_codes_display(codes: list[str]) -> str:
+    """
+    Summary:
+        Render the blocking issue-code list for the ``doc-fault`` reason:
+        sorted, DEDUPLICATED, capped at :data:`_REASON_CODES_DISPLAY_CAP`
+        codes with a ``+N more`` marker (LLR-051.3, Phase-2 F2 — one
+        pathological file must not produce a multi-MB reason).
+
+    Args:
+        codes (list[str]): The blocking ERROR codes, possibly duplicated.
+
+    Returns:
+        str: e.g. ``"MF-BAD-STRUCTURE, MF-JSON-PARSE"`` or
+        ``"A, B, C, D, E +3 more"``.
+
+    Data Flow:
+        - Used only inside the ``doc-fault`` run-block reason template.
+
+    Dependencies:
+        Used by:
+            - run_check_document
+    """
+    unique = sorted(set(codes))
+    shown = unique[:_REASON_CODES_DISPLAY_CAP]
+    suffix = (
+        f" +{len(unique) - len(shown)} more" if len(unique) > len(shown) else ""
+    )
+    return ", ".join(shown) + suffix
 
 
 def run_check_document(
@@ -84,12 +210,13 @@ def run_check_document(
         (LLR-004.2).
 
     Args:
-        document (ChangeDocument): The check document to run. Any
-            ERROR-severity issue, or ``kind`` != ``"check"``, makes the
-            document not runnable: no comparisons, every entry
-            ``uncheckable`` with ``actual_bytes`` ``None`` — the
-            apply-gate mirror of LLR-002.1, with the collected issues
-            carried in the result (B-2).
+        document (ChangeDocument): The check document to run. ``kind`` !=
+            ``"check"`` or a blocking (non-entry-scoped) ERROR fault makes
+            the RUN blocked: no comparisons, every entry ``uncheckable``
+            with the run-level reason pair set (batch-33 LLR-050.1);
+            entry-scoped faults leave the document runnable and taint only
+            attributable entries. Collected issues always ride the result
+            (B-2).
         mem_map (Optional[Dict[int, int]]): The loaded image's address-to-
             byte map (``LoadedFile.mem_map``) — **read-only**: actual bytes
             are read from it for fully-``INSIDE`` entries, nothing is ever
@@ -127,13 +254,17 @@ def run_check_document(
         - Stamp containment via :func:`classify_containment` (LLR-001.6;
           the only state touched is each entry's ``status`` stamp — the
           established validation side effect, identical to apply/validate).
-        - Gate: ``document.has_errors or kind != "check"`` → every entry
-          ``uncheckable``, no read, no comparison.
+        - Gate (batch-33 LLR-050.1): wrong kind → ``doc-kind`` run block;
+          blocking ERROR codes (outside the non-blocking set) →
+          ``doc-fault`` run block; else runnable.
+        - Taint attribution (LLR-050.2): taint-attribution-code issues
+          (``CHG-COLLISION``) taint constructed entries by start-address
+          equality → ``entry-fault``; skip-site codes never taint.
         - Otherwise per entry: ``INSIDE`` → read ``actual_bytes`` from
           ``mem_map`` and compare against ``encoded_bytes`` (equal →
           ``pass``, unequal → ``fail``); ``PARTIAL`` / ``OUTSIDE`` /
-          ``UNVALIDATED_NO_IMAGE`` → ``uncheckable``, ``actual_bytes``
-          ``None`` (LLR-004.2 — the three uncheckable provocations).
+          ``UNVALIDATED_NO_IMAGE`` → ``uncheckable`` with its containment
+          reason pair (LLR-051.1).
         - Linkage is classified for every entry regardless of result —
           informative only (LLR-004.3).
 
@@ -163,7 +294,50 @@ def run_check_document(
     a2l_index, a2l_symbols = _linkage_index(_a2l_linkage_source(a2l_tags))
 
     classify_containment(document, ranges)
-    not_runnable = document.has_errors or document.kind != "check"
+
+    # batch-33 gate (LLR-050.1, operator decision 2026-07-09): the collective
+    # apply-gate mirror is retired for checks. Kind is evaluated FIRST; then
+    # only ERROR codes OUTSIDE the entry-scoped non-blocking set block the
+    # run (fail-safe for envelope/unknown codes). A runnable document with
+    # entry-scoped faults checks its healthy entries normally.
+    run_blocked_code: Optional[str] = None
+    run_blocked_reason: Optional[str] = None
+    if document.kind != "check":
+        run_blocked_code = CHECK_REASON_DOC_KIND
+        run_blocked_reason = (
+            f"this is a change-set (kind {_display_kind(document.kind)}), "
+            "not a check-set — Run checks needs kind 'check'"
+        )
+    else:
+        blocking_codes = [
+            issue.code
+            for issue in document.issues
+            if issue.severity is ValidationSeverity.ERROR
+            and issue.code not in _CHECK_NON_BLOCKING_CODES
+        ]
+        if blocking_codes:
+            run_blocked_code = CHECK_REASON_DOC_FAULT
+            run_blocked_reason = (
+                f"document carries {len(blocking_codes)} error-severity "
+                f"declaration fault(s) [{_blocking_codes_display(blocking_codes)}]"
+                " — fix the document before running checks"
+            )
+
+    # Taint attribution (LLR-050.2, Phase-2 B-1): ONLY taint-attribution
+    # codes (emitted against constructed entries) taint, by start-address
+    # equality. Skip-site issues share the address space but never taint.
+    tainting_by_address: Dict[int, str] = {}
+    if run_blocked_code is None:
+        for issue in document.issues:
+            if (
+                issue.severity is ValidationSeverity.ERROR
+                and issue.code in _CHECK_TAINT_ATTRIBUTION_CODES
+                and isinstance(issue.address, int)
+            ):
+                # First attributable code wins the DISPLAY at a shared
+                # address (unreachable while the set is a singleton);
+                # the taint outcome is identical either way.
+                tainting_by_address.setdefault(issue.address, issue.code)
 
     aggregates: Dict[str, int] = {key: 0 for key in CHECK_AGGREGATE_KEYS}
     result_entries: List[CheckRunEntry] = []
@@ -173,8 +347,22 @@ def run_check_document(
             start, end, mac_index, mac_symbols, a2l_index, a2l_symbols
         )
         actual_bytes: Optional[Tuple[int, ...]] = None
-        if not_runnable:
+        reason_code: Optional[str] = None
+        reason: Optional[str] = None
+        if run_blocked_code is not None:
+            # A blocked run explains itself ONCE at run level; each row
+            # carries only the short pointer (LLR-051.5 — bounded, so the
+            # run reason is never multiplied by the row count, F2).
             result = CHECK_UNCHECKABLE
+            reason_code = run_blocked_code
+            reason = f"run blocked [{run_blocked_code}]"
+        elif start in tainting_by_address:
+            result = CHECK_UNCHECKABLE
+            reason_code = CHECK_REASON_ENTRY_FAULT
+            reason = (
+                f"entry at 0x{start:X} carries "
+                f"[{tainting_by_address[start]}] — see declaration faults"
+            )
         elif entry.status is MemoryStatus.INSIDE:
             assert mem_map is not None  # INSIDE implies a loaded image
             actual_bytes = tuple(mem_map[addr] for addr in range(start, end))
@@ -185,6 +373,7 @@ def run_check_document(
             )
         else:
             result = CHECK_UNCHECKABLE
+            reason_code, reason = _CONTAINMENT_REASONS[entry.status]
         aggregates[_RESULT_TO_AGGREGATE[result]] += 1
         result_entries.append(
             CheckRunEntry(
@@ -196,6 +385,8 @@ def run_check_document(
                 result=result,
                 linkage=linkage,
                 linkage_symbol=linkage_symbol,
+                reason_code=reason_code,
+                reason=reason,
             )
         )
 
@@ -206,4 +397,6 @@ def run_check_document(
         aggregates=aggregates,
         entries=result_entries,
         issues=list(document.issues),
+        run_blocked_reason_code=run_blocked_code,
+        run_blocked_reason=run_blocked_reason,
     )
