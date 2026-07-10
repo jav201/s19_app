@@ -7329,3 +7329,85 @@ def test_ac7_workspace_load_project_button(tmp_path: Path) -> None:
     visible, pushed = asyncio.run(_drive())
     assert visible, "#ws_load_project_button must be visible on the Workspace"
     assert pushed, "pressing the button must push LoadProjectScreen (same as key 'p')"
+
+
+# ---------------------------------------------------------------------------
+# batch-31 Inc-4 — AC-1 (B-01): Memory Map "Open in Hex View" must move the
+# hex window to the selected cell's region even when the coarse cell start is
+# not itself a present 16-aligned row base (the live bug: the exact-membership
+# guard in `update_hex_view` silently skipped the reposition).
+# ---------------------------------------------------------------------------
+
+
+def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "object":
+    """Install a synthetic two-range image whose ranges sit ~1 MiB apart.
+
+    Each range is exactly one 200-row hex page (3200 bytes), so range B's
+    rows live on page 2 — a window that stays on page 1 provably does NOT
+    render them. Built through the real emit → S19File → build_loaded_s19
+    pipeline (no hand-mocked LoadedFile).
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    ranges = [(0x1000, 0x1000 + 3200), (0x100000, 0x100000 + 3200)]
+    mem_map = {
+        addr: (addr & 0xFF) for start, end in ranges for addr in range(start, end)
+    }
+    path = tmp_path / "two_far_ranges.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    loaded = build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+    app.current_file = loaded
+    app._apply_empty_state()
+    return loaded
+
+
+def test_ac1_open_in_hex_snaps_to_nearest_present_row(tmp_path: Path) -> None:
+    """AC-1 / B-01: Open-in-Hex repositions to the nearest present row
+    (RED-first: the old `focus_base in row_bases` guard left the window on
+    page 1, so the selected far region never appeared).
+
+    Intent: the operator clicks a Memory Map cell over/near the second range
+    (whose coarse `cell_start` falls in the inter-range gap — an absent
+    address) and presses "Open in Hex View". The Workspace hex view must
+    render the row of the nearest present address at-or-after the cell start
+    (range B's first row, `0x00100000`), not silently stay on range A's page.
+    """
+    from textual.widgets import Button as _Button
+    from textual.widgets import Static as _Static
+
+    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
+
+    async def _drive() -> "tuple[bool, int, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_two_far_ranges_loaded_file(app, tmp_path)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            cell = _cell_containing(cells, 0x100000)
+            assert cell is not None, "a cell must cover range B's start"
+            assert cell.cell_start not in (app.current_file.row_bases or []), (
+                "precondition: the coarse cell start must NOT be a present row "
+                f"base (got 0x{cell.cell_start:08X}) — otherwise this test "
+                "cannot observe the snap"
+            )
+            panel.on_map_cell_selected(MapCell.Selected(cell))
+            await pilot.pause()
+            panel.query_one("#map_open_hex_button", _Button).press()
+            for _ in range(4):
+                await pilot.pause()
+            hex_text = str(app.query_one("#hex_view", _Static).render())
+            workspace_visible = app._is_layout_visible("#screen_workspace")
+            return workspace_visible, app._hex_window_start, hex_text
+
+    workspace_visible, window_start, hex_text = asyncio.run(_drive())
+    assert workspace_visible, "Open-in-Hex must switch to the Workspace screen"
+    assert "0x00100000" in hex_text, (
+        "the hex view must render range B's first row (nearest present row "
+        f"at-or-after the gap cell start); window_start={window_start}"
+    )

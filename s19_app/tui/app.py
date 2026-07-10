@@ -7614,6 +7614,45 @@ class S19TuiApp(App):
         self.action_show_screen("workspace")
         self.update_hex_view(focus_address=message.focus_address)
 
+    def _snapped_focus_row_index(
+        self, focus_address: int, row_bases: list[int]
+    ) -> Optional[int]:
+        """
+        Summary:
+            Resolve a focus address to the index of the nearest present
+            16-aligned row base — exact when present, else the first row
+            at-or-after the focus, else the last row before it (batch-31
+            AC-1 / B-01).
+
+        Args:
+            focus_address (int): The requested focus address (need not be
+                present in the image — e.g. a coarse Memory-Map cell start).
+            row_bases (list[int]): The image's ascending present row bases.
+
+        Returns:
+            Optional[int]: Index into ``row_bases``, or ``None`` when the
+            list is empty.
+
+        Data Flow:
+            - Align the focus down to its 16-byte row, then bisect the
+              sorted ``row_bases`` for the exact/at-or-after/before match.
+
+        Dependencies:
+            Uses:
+                - ``bisect.bisect_left``
+            Used by:
+                - ``update_hex_view`` (window reposition on focus)
+        """
+        if not row_bases:
+            return None
+        from bisect import bisect_left
+
+        focus_base = focus_address - (focus_address % 16)
+        index = bisect_left(row_bases, focus_base)
+        if index < len(row_bases):
+            return index
+        return len(row_bases) - 1
+
     def update_hex_view(self, focus_address: Optional[int] = None) -> None:
         """Render hex view around a focus address if provided."""
         hex_view = self.query_one("#hex_view", Static)
@@ -7625,9 +7664,12 @@ class S19TuiApp(App):
         page_size = self._clamp_viewer_page_size(self.hex_rows_page_size)
         if row_bases:
             if isinstance(focus_address, int):
-                focus_base = focus_address - (focus_address % 16)
-                if focus_base in row_bases:
-                    focus_index = row_bases.index(focus_base)
+                # batch-31 AC-1 (B-01): snap to the nearest present row
+                # instead of requiring exact row-base membership — a coarse
+                # Memory-Map cell start rarely coincides with a present row,
+                # and the old exact guard silently left the window in place.
+                focus_index = self._snapped_focus_row_index(focus_address, row_bases)
+                if focus_index is not None:
                     self._hex_window_start = (focus_index // page_size) * page_size
             max_start = max(0, ((len(row_bases) - 1) // page_size) * page_size)
             self._hex_window_start = max(0, min(self._hex_window_start, max_start))
