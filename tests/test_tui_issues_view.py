@@ -28,7 +28,7 @@ from rich.text import Text
 from textual.widgets import Static
 
 from s19_app.core import S19File
-from s19_app.tui.app import S19TuiApp, precompute_issue_datatable_payload
+from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes.io import emit_s19_from_mem_map
 from s19_app.tui.issues_view import IssueRow
 from s19_app.tui.services.load_service import build_loaded_s19
@@ -47,8 +47,7 @@ def _render_issue_list(
     """Load a fixture (bytes at ``_ADDR``) and render ``issues`` into the table.
 
     Mirrors the directionb ``_seed_issues_screen`` setup: install ``current_file``
-    so the empty state flips, set ``_validation_issues``, clear the precompute
-    caches (format on the fly), filter=all, render.
+    so the empty state flips, set ``_validation_issues``, filter=all, render.
     """
     path = tmp_path / "issues_fixture.s19"
     path.write_text(
@@ -58,8 +57,6 @@ def _render_issue_list(
     app.current_file = build_loaded_s19(path, s19, a2l_path=None, a2l_data=None)
     app._apply_empty_state()
     app._validation_issues = issues
-    app._validation_issue_cell_rows = []
-    app._validation_issue_cell_styles = []
     app.validation_issue_filter_mode = "all"
     app._validation_issues_window_start = 0
     app.update_validation_issues_view()
@@ -279,37 +276,3 @@ def test_tc043_restore1_related_node_is_markup_safe() -> None:
     assert "a2l[bold]" in plain and "[link=file:///etc]" in plain, (
         f"hostile markup must survive literal (no token consumption); got {plain!r}"
     )
-
-
-def test_tc021_precompute_payload_emits_related_cell() -> None:
-    """TC-021.1 / LLR-021.1 — the payload formatter emits an 8-tuple with Related.
-
-    White-box: ``precompute_issue_datatable_payload`` returns 8-column rows; the
-    Related cell (index 3) is the comma-joined ``related_artifacts`` (or ``-``);
-    rows + styles stay parallel and index-aligned (a no-related issue must not
-    borrow another's artifacts).
-    """
-    issues = [
-        ValidationIssue(
-            code="A",
-            severity=ValidationSeverity.ERROR,
-            message="m",
-            artifact="s19",
-            related_artifacts=["a2l", "mac"],
-        ),
-        ValidationIssue(
-            code="B",
-            severity=ValidationSeverity.WARNING,
-            message="m2",
-            artifact="mac",
-            related_artifacts=[],
-        ),
-    ]
-    rows, styles = precompute_issue_datatable_payload(issues)
-
-    assert len(rows) == 2 and len(styles) == 2
-    assert all(len(r) == 8 for r in rows), (
-        f"each cell row must be an 8-tuple (Related added); got {[len(r) for r in rows]}"
-    )
-    assert rows[0][3] == "a2l, mac", rows[0]
-    assert rows[1][3] == "-", rows[1]

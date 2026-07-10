@@ -1826,8 +1826,6 @@ def _seed_issues_screen(app: S19TuiApp, count: int) -> None:
     app.current_file = loaded
     app._apply_empty_state()
     app._validation_issues = _make_issues(count)
-    app._validation_issue_cell_rows = []
-    app._validation_issue_cell_styles = []
     app.validation_issue_filter_mode = "all"
     app._validation_issues_window_start = 0
     app.update_validation_issues_view()
@@ -2234,12 +2232,8 @@ def test_tc024_issues_severity_color_round_trips(tmp_path: Path) -> None:
 
     Intent: LLR-011.2 / LLR-005.2 — severity coloring on the dedicated
     Issues screen uses the same ``color_policy`` source of truth. Each
-    severity value must map to its fixed ``sev-*`` class, and the Issues
-    DataTable renderer (``precompute_issue_datatable_payload``) — unchanged
-    by the screen move — must emit a distinct per-row Rich style for each
-    severity so the coloring survives the promotion to ``#screen_issues``.
+    severity value must map to its fixed ``sev-*`` class.
     """
-    from s19_app.tui.app import precompute_issue_datatable_payload
     from s19_app.tui.color_policy import css_class_for_severity
     from s19_app.validation.model import ValidationSeverity
 
@@ -2253,29 +2247,6 @@ def test_tc024_issues_severity_color_round_trips(tmp_path: Path) -> None:
         assert css_class_for_severity(severity) == css_class, (
             f"{severity} must map to {css_class}"
         )
-
-    # The unchanged Issues renderer must still produce one severity style
-    # per row, and error vs. warning rows must be styled differently.
-    issues = _make_issues(12)
-    cell_rows, styles = precompute_issue_datatable_payload(issues)
-    assert len(styles) == len(cell_rows) == 12, (
-        "the Issues renderer must emit one severity style per issue row"
-    )
-    err_styles = {
-        styles[i]
-        for i, it in enumerate(issues)
-        if it.severity == ValidationSeverity.ERROR
-    }
-    warn_styles = {
-        styles[i]
-        for i, it in enumerate(issues)
-        if it.severity == ValidationSeverity.WARNING
-    }
-    assert err_styles and warn_styles, "both severities must appear in the fixture"
-    assert err_styles.isdisjoint(warn_styles), (
-        f"error and warning rows must carry distinct severity styles "
-        f"(error={err_styles}, warning={warn_styles})"
-    )
 
     from s19_app.tui.issues_view import IssueRow, _GROUP_DISPLAY_MAX
 
@@ -6071,8 +6042,6 @@ def _seed_issue_objects(app: S19TuiApp, issues: list) -> None:
     app.current_file = loaded
     app._apply_empty_state()
     app._validation_issues = list(issues)
-    app._validation_issue_cell_rows = []
-    app._validation_issue_cell_styles = []
     app.validation_issue_filter_mode = "all"
     app._validation_issues_window_start = 0
     app.update_validation_issues_view()

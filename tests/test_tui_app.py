@@ -8,7 +8,6 @@ from s19_app.tui.app import (
     _a2l_tag_unit_display,
     _mac_record_ui_state,
     _severity_style,
-    precompute_issue_datatable_payload,
     precompute_mac_datatable_payload,
 )
 from s19_app.tui.models import LoadedFile
@@ -1190,7 +1189,6 @@ def test_stress_load_s19_then_a2l_then_mac(
     assert prepared.precomputed is True
     assert len(prepared.mac_rows) == len(final_loaded.mac_records)
     assert len(prepared.mac_cell_rows) == len(final_loaded.mac_records)
-    assert len(prepared.issue_cell_rows) == len(prepared.validation_issues)
     assert prepared.mac_widths is not None and len(prepared.mac_widths) == 8
 
     # Perf budget: default 20s on CI, overridable for slower hardware via env var.
@@ -1448,40 +1446,6 @@ def test_precompute_mac_datatable_payload_clamps_wide_columns():
     assert widths[7] == 48  # A2LMatch clamp.
 
 
-def test_precompute_issue_datatable_payload_emits_eight_columns_and_styles():
-    issues = [
-        ValidationIssue(
-            code="E001",
-            severity=ValidationSeverity.ERROR,
-            message="addr missing",
-            artifact="mac",
-            symbol="RPM",
-            address=0x1000,
-            line_number=7,
-        ),
-        ValidationIssue(
-            code="W002",
-            severity=ValidationSeverity.WARNING,
-            message="not in a2l",
-            artifact="mac",
-            symbol=None,
-            address=None,
-            line_number=None,
-        ),
-    ]
-    cell_rows, styles = precompute_issue_datatable_payload(issues)
-    assert len(cell_rows) == 2
-    # 8-tuple after US-021 added the Related column at index 3:
-    # (severity, code, artifact, related, symbol, address, line, message).
-    assert all(len(row) == 8 for row in cell_rows)
-    assert cell_rows[0][0] == "ERROR"
-    assert cell_rows[0][3] == "-"  # no related_artifacts -> dash (US-021)
-    assert cell_rows[0][5] == "0x00001000"  # address shifted 4 -> 5
-    assert cell_rows[1][4] == "-"  # missing symbol is rendered as dash (now index 4)
-    assert cell_rows[1][5] == "-"  # missing address is rendered as dash (now index 5)
-    assert styles == [_severity_style(ValidationSeverity.ERROR), _severity_style(ValidationSeverity.WARNING)]
-
-
 def test_prepare_load_payload_precomputes_datatable_fields(tmp_path: Path):
     app = S19TuiApp(base_dir=tmp_path)
     mac_records = [
@@ -1505,9 +1469,6 @@ def test_prepare_load_payload_precomputes_datatable_fields(tmp_path: Path):
     assert len(prepared.mac_cell_rows) == 25
     assert all(isinstance(row, tuple) for row in prepared.mac_cell_rows)
     assert len(prepared.mac_cell_styles) == 25
-    # issue_cell_rows parallels validation_issues.
-    assert len(prepared.issue_cell_rows) == len(prepared.validation_issues)
-    assert len(prepared.issue_cell_styles) == len(prepared.validation_issues)
 
 
 def test_populate_mac_datatable_emits_row_keys_and_records_addresses(
@@ -1617,14 +1578,10 @@ def test_jump_actions_request_near_top_focus_and_scroll_reset(tmp_path: Path, mo
     assert mac_calls == [(0x2000, True, True)]
 
 
-# NOTE (batch-29 / LLR-043.R4): the former
-# ``test_update_validation_issues_view_uses_worker_precomputed_cells`` retired
-# with the Issues ``DataTable``. The precompute cache-reuse path
-# (``_populate_issues_datatable`` reading ``_validation_issue_cell_rows``) no
-# longer exists — the grouped panel is the sole surface, so there is no
-# ``add_row`` consumer to observe. ``precompute_issue_datatable_payload`` itself
-# is still invoked by the load worker (dead-written cache, R-043-3) and is
-# covered by ``test_tc021_precompute_payload_emits_related_cell`` as a formatter.
+# NOTE (batch-30 / R-043-3): the Issues ``DataTable`` and its worker-precompute
+# formatter were fully retired. The grouped panel (``GroupedIssuesPanel`` via
+# ``_render_validation_issues_groups``) is the sole Issues surface; there is no
+# ``add_row`` consumer and no per-load issue-cell cache to observe here anymore.
 
 
 # ---------------------------------------------------------------------------
