@@ -1895,7 +1895,15 @@ class PatchEditorPanel(ScrollableContainer):
             Static(
                 "", id="patch_doc_issues", markup=False, classes="hidden"
             ),
-            Label("", id="patch_checks_status", classes="patch-field-label"),
+            # batch-33 (LLR-051.6, C-17): the check status renders the
+            # UNTRUNCATED run-block reason, which embeds file-derived
+            # {kind!r} text — markup must never be interpreted here.
+            Label(
+                "",
+                id="patch_checks_status",
+                classes="patch-field-label",
+                markup=False,
+            ),
             Container(id="patch_checks_results"),
             id="patch_pane_checks",
         )
