@@ -30,6 +30,12 @@
         {
             "phase": 6,
             "date": "2026-07-09",
+            "decision": "synced-to-obsidian",
+            "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches\u00826-07-09-batch-32\\ (01/02/04/05 + 06-docs + README index; 03-increments repo-side per convention). Detect CLEAN (2 false-positive subsection hints verified). Visual evidence: pilot suite 15/15 regenerated post-merge, gifs re-copied, 0 stale assets, stamp -> batch-32 close. Dashboard.md pre-existing, untouched. Hygiene: primary checkout ON main but at 7dcaa22 (needs git pull); cursor worktrees detached (pre-existing); 2 claude agent worktrees removable."
+        },
+        {
+            "phase": 6,
+            "date": "2026-07-09",
             "decision": "approved",
             "notes": "Under standing auth. 06-docs complete (traceability-matrix with grep-verified node names + both chains zero-gap; functionality.md; executive-summary.md). Phase-5 post-mortem approved same gate (1 candidate control C-CAND-D lint-gate-per-increment PROPOSED not encoded). Full-suite gate evidence: 1215 passed / 0 failed / 31 snapshots / engine-frozen green. State -> awaiting-sync; /dev-flow-sync after operator merges the PR."
         },
@@ -64,6 +70,6 @@
             "notes": "Story intake: US-044 (schema + backward compat), US-045 (single-CRC group semantics), US-046 (configurable output width), US-047 (check/inject/report surface) -- all READY per INVEST/DoR analysis in the architect draft section 4 (each names user, outcome, observable surface, out-of-scope in section 7). No REFINE/SPIKE/OUT. Approved under standing auth; the 4 semantic open questions carried into Phase 1 as documented defaults, overridable at any gate."
         }
     ],
-    "obsidian_synced": false,
+    "obsidian_synced": true,
     "created_at": "2026-07-09T00:00:00Z"
 }
