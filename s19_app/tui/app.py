@@ -424,13 +424,9 @@ class PreparedLoad:
     #   in ``update_mac_view`` so the main thread never rescans full row vectors.
     # - ``mac_cell_rows``: list of 8-string tuples ready to hand to ``DataTable.add_rows``.
     # - ``mac_cell_styles``: parallel list of severity style strings per row.
-    # - ``issue_cell_rows``: list of 8-string tuples for the Issues DataTable.
-    # - ``issue_cell_styles``: parallel severity style strings per issue row.
     mac_widths: Optional[tuple] = None
     mac_cell_rows: list = field(default_factory=list)
     mac_cell_styles: list = field(default_factory=list)
-    issue_cell_rows: list = field(default_factory=list)
-    issue_cell_styles: list = field(default_factory=list)
 
 
 def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
@@ -535,7 +531,6 @@ def _severity_style(severity: ValidationSeverity) -> str:
     Dependencies:
         Used by:
             - ``precompute_mac_datatable_payload``
-            - ``precompute_issue_datatable_payload``
     """
     return _SEVERITY_TO_RICH_STYLE.get(severity, "")
 
@@ -749,57 +744,6 @@ def precompute_mac_datatable_payload(
     return tuple(widths_list), cell_rows, styles
 
 
-def precompute_issue_datatable_payload(
-    issues: list[ValidationIssue],
-) -> tuple[list[tuple[str, ...]], list[str]]:
-    """
-    Summary:
-        Format validation issues into ready-to-render 8-tuple cell rows and per-row
-        severity styles so the main thread only calls ``DataTable.add_rows``.
-
-    Args:
-        issues (list[ValidationIssue]): Validation issues from the worker.
-
-    Returns:
-        tuple[list[tuple[str, ...]], list[str]]: ``(cell_rows, styles)`` where each
-        cell row is ``(severity, code, artifact, related, symbol, address, line,
-        message)`` — ``related`` is the comma-joined ``related_artifacts`` (or
-        ``-`` when empty; US-021).
-
-    Data Flow:
-        - Iterate issues once.
-        - Format address as ``0x%08X`` and line number as str when available.
-        - Map severity enum to a Rich style string for the first cell.
-
-    Dependencies:
-        Uses:
-            - ``_severity_style``
-        Used by:
-            - ``S19TuiApp._prepare_load_payload``
-    """
-    cell_rows: list[tuple[str, ...]] = []
-    styles: list[str] = []
-    for issue in issues or []:
-        symbol = issue.symbol or "-"
-        addr = f"0x{issue.address:08X}" if isinstance(issue.address, int) else "-"
-        line_no = str(issue.line_number) if isinstance(issue.line_number, int) else "-"
-        related = ", ".join(issue.related_artifacts) if issue.related_artifacts else "-"
-        cell_rows.append(
-            (
-                issue.severity.value.upper(),
-                str(issue.code or ""),
-                str(issue.artifact or ""),
-                related,
-                symbol,
-                addr,
-                line_no,
-                str(issue.message or ""),
-            )
-        )
-        styles.append(_severity_style(issue.severity))
-    return cell_rows, styles
-
-
 class S19TuiApp(App):
     """Main TUI app with workarea, project management, and views."""
 
@@ -931,8 +875,6 @@ class S19TuiApp(App):
         self._mac_view_cache_widths: Optional[tuple[int, ...]] = None
         self._mac_view_cache_cell_rows: list[tuple[str, ...]] = []
         self._mac_view_cache_cell_styles: list[str] = []
-        self._validation_issue_cell_rows: list[tuple[str, ...]] = []
-        self._validation_issue_cell_styles: list[str] = []
         # Per-DataTable maps from visible row_key back to the underlying record so
         # the shared ``on_data_table_row_selected`` handler can jump correctly.
         self._mac_row_key_to_address: dict[str, int] = {}
@@ -6216,8 +6158,6 @@ class S19TuiApp(App):
         self._mac_view_cache_widths = None
         self._mac_view_cache_cell_rows = []
         self._mac_view_cache_cell_styles = []
-        self._validation_issue_cell_rows = []
-        self._validation_issue_cell_styles = []
 
     def _mac_view_cache_key_for(
         self,
@@ -6311,8 +6251,6 @@ class S19TuiApp(App):
         if not self.current_file:
             self._validation_report = None
             self._validation_issues = []
-            self._validation_issue_cell_rows = []
-            self._validation_issue_cell_styles = []
             return
         cache_key = self._mac_view_cache_key_for(
             [], self.current_file, self.current_a2l_data
@@ -6522,9 +6460,6 @@ class S19TuiApp(App):
         self._mac_view_cache_widths = widths
         self._mac_view_cache_cell_rows = cell_rows
         self._mac_view_cache_cell_styles = cell_styles
-        issue_cells, issue_styles = precompute_issue_datatable_payload(list(payload["issues"]))
-        self._validation_issue_cell_rows = issue_cells
-        self._validation_issue_cell_styles = issue_styles
         self.logger.info(
             "MAC row cache built: records=%d elapsed_seconds=%.3f",
             len(self.current_file.mac_records) if self.current_file else 0,
@@ -6828,8 +6763,6 @@ class S19TuiApp(App):
             self._mac_view_cache_widths = prepared.mac_widths
             self._mac_view_cache_cell_rows = list(prepared.mac_cell_rows)
             self._mac_view_cache_cell_styles = list(prepared.mac_cell_styles)
-            self._validation_issue_cell_rows = list(prepared.issue_cell_rows)
-            self._validation_issue_cell_styles = list(prepared.issue_cell_styles)
             if prepared.a2l_enriched_key is not None:
                 self._a2l_enriched_tags = prepared.a2l_enriched_tags
                 self._a2l_enriched_key = prepared.a2l_enriched_key
@@ -7034,13 +6967,9 @@ class S19TuiApp(App):
         mac_widths, mac_cell_rows, mac_cell_styles = precompute_mac_datatable_payload(
             mac_payload["rows"], mac_payload["meta"]
         )
-        issue_cell_rows, issue_cell_styles = precompute_issue_datatable_payload(
-            list(mac_payload["issues"])
-        )
         self.logger.info(
-            "Load phase boundary: prepare_datatable_done mac_rows=%d issues=%d widths=%s",
+            "Load phase boundary: prepare_datatable_done mac_rows=%d widths=%s",
             len(mac_cell_rows),
-            len(issue_cell_rows),
             mac_widths,
         )
         self._flush_logger()
@@ -7065,8 +6994,6 @@ class S19TuiApp(App):
             mac_widths=mac_widths,
             mac_cell_rows=mac_cell_rows,
             mac_cell_styles=mac_cell_styles,
-            issue_cell_rows=issue_cell_rows,
-            issue_cell_styles=issue_cell_styles,
         )
 
     @work(thread=True, exclusive=True, group="load")

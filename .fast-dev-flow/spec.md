@@ -1,43 +1,37 @@
-# fast-dev-flow spec — Data Sections label readability (two-line wrap)
+# fast-dev-flow spec — R-043-3: retire the dead-written issue-precompute path (batch-30)
 
-- **Status:** closed 2026-07-07 (code complete; AC-1..4 green; awaiting operator commit/PR)
-- **Created:** 2026-07-07
-- **Branch:** `claude/sections-label` @ `d0b47fd` (origin/main, incl. batch-26 entropy + batch-27 memory map)
-- **Route:** /fast-dev-flow (small non-trivial UI fix; operator-approved solution via /prototype)
+- **Status:** draft 2026-07-09
+- **Created:** 2026-07-09
+- **Branch:** `claude/batch-30-retire-precompute` @ `7dcaa22` (origin/main = batch-29 merge)
+- **Route:** /fast-dev-flow (dead-code cleanup follow-up; operator chose fast over full V-model — no new user behavior)
 - **security_required:** false (see §6)
 
 ## 1. Objective
-Stop the Workspace "Data Sections" range labels from clipping in the fixed 22-column `#ws_left` pane. Today `update_sections` (`app.py:7205`) builds `0x{start:08X} - 0x{end-1:08X} ({size} bytes)` (~33 chars) but the pane shows ~17, so the end address + size are cut (`0x80302040 - 0x8...`). Fix = **Variant A (two-line wrap)**, operator-approved from `scratchpad/sections_prototype.html`.
+Retire the issue-DataTable precompute path that batch-29 orphaned. When batch-29 removed the `#validation_issues_list` DataTable and its `_populate_issues_datatable` consumer, `precompute_issue_datatable_payload` was deliberately KEPT as a tracked-orphan (follow-up **R-043-3**). It is now confirmed dead work: the load worker still calls it (`app.py:6525`, `:7037`) and writes `_validation_issue_cell_rows` / `_validation_issue_cell_styles` (`:6526`, `:6831`) + the prepared-payload dataclass fields `issue_cell_rows` / `issue_cell_styles` (`:432-433`), but a grep finds **no reader** — the grouped panel builds its own cells via `safe_text` + `css_class_for_severity`. Remove the whole dead chain.
 
-## 2. Loose user stories
-- As an operator inspecting an image, I want each Data Sections entry to show the **full range** (start, end, size) without clipping in the narrow left pane, so I can read where each section is without resizing.
+## 2. Loose user story
+As a maintainer, I want the orphaned issue-precompute + its caches + dataclass fields gone, so the load worker stops doing per-load formatting work whose output is never read and the codebase carries no dead path masquerading as live.
 
 ## 3. Scope
-**In:** the range label at `app.py:7205` → two-line format (start on line 1; `– 0x{end-1:08X}  {size}B` on line 2). **The sibling MAC out-of-range label at `app.py:7228`** (`MAC out-of-range @ 0x{address:08X}`, ~29 chars, also clips) → same two-line treatment for consistency (Phase-0 decision: **IN scope**).
-**Out:** widening `#ws_left` (would steal from the hex view — the C-13 tradeoff); any other pane; the Memory Map (shipped batch-27); Search/Goto; the truncation "... N more ranges ..." line (short, doesn't clip).
+**IN (all verified dead on `7dcaa22`):**
+- `precompute_issue_datatable_payload` — def `app.py:752`; calls `:6525`, `:7037`; docstring ref `:538`.
+- prepared-payload dataclass fields `issue_cell_rows` / `issue_cell_styles` — `app.py:432-433` + population `:7068-69`.
+- self attrs `_validation_issue_cell_rows` / `_validation_issue_cell_styles` — init `:934-935`; resets `:6219-20`, `:6314-15`; assigns `:6526-27`, `:6831-32`.
+- orphaned formatter TCs — `test_tc021_precompute_payload_emits_related_cell` + the eight-columns-and-styles TC (across `test_tui_app.py` / `test_tui_directionb.py` / `test_tui_issues_view.py`; software-dev locates and retires only tests that exclusively exercise the removed symbols).
+
+**OUT:** any behavior change to the Issues screen; the canonical-CI snapshot regen (separate track); R-044-6 (deferred); any engine-frozen module.
 
 ## 4. Acceptance criteria (observable)
-- **AC-1 (the gate, black-box):** When a file whose ranges produce a label wider than the pane is loaded and the Workspace `#sections_list` renders, each range ListItem's rendered text **shall contain the end-address token `0x{end-1:08X}`** (currently absent/clipped). Verified by Textual Pilot over a fixture (e.g. `case_02` or a seeded `0x80302040`-style range): assert the end token appears in the ListItem/Label text.
-- **AC-2:** A range ListItem **shall render two lines** — start address on line 1, `– <end>  <size>B` on line 2 (assert the label text contains a newline and both the start and end tokens).
-- **AC-3:** MAC out-of-range ListItems **shall render the full `0x{address:08X}`** without clipping (two-line if needed), asserted through the rendered text.
-- **AC-4 (regression):** The `sev-*` colour class (`css_class_for_severity`) and the `ListItem.data = (start, end)` selection payload **shall be unchanged** — selecting a section still carries its `(start, end)` and jumps the hex view (assert `item.data` intact + a Pilot select still focuses hex).
+- **AC-1 (behavior unchanged, black-box):** When an S19+A2L carrying validation issues is loaded and the Issues screen opened under Pilot, `#validation_issues_groups` renders the same `IssueRow` set (same codes + severities) as before the change. A pilot AT observes the shipped grouped surface.
+- **AC-2 (dead code gone):** `grep -rn "precompute_issue_datatable_payload\|_validation_issue_cell_rows\|_validation_issue_cell_styles\|issue_cell_rows\|issue_cell_styles" s19_app/` returns **0 hits**.
+- **AC-3 (frozen clean):** `git diff origin/main -- s19_app/core.py s19_app/hexfile.py s19_app/range_index.py s19_app/validation s19_app/tui/a2l.py s19_app/tui/mac.py s19_app/tui/color_policy.py` is **EMPTY**.
+- **AC-4 (suite green):** full suite passes (0 failed); the orphaned formatter TCs are removed; no remaining test references the deleted symbols (`grep` clean in `tests/`).
 
-## 5. Design decision
-Obvious — no architect delegation. Pure relabel in `update_sections`; no new widget, no layout/geometry change, no new breakpoint. Label uses `\n` → Textual renders two lines and the ListItem auto-grows. Colour + `.data` untouched.
+## 5. Design
+Pure deletion, no new abstraction. Remove the dead chain: the two worker call-sites → the function → the dataclass fields + their population → the self-attrs (init/reset/assign) → the orphan tests. Confirm the live grouped path (`_render_validation_issues_groups` → `GroupedIssuesPanel`) is untouched. Likely 1–2 increments (`app.py` + up to 3 test files); watch `≤5 files`.
 
-## 6. Security-flag scan
-Scanned objective + criteria + description against the sensitive-pattern list: **no match.** No auth/identity, secrets, external integration, PII/payment, destructive-DB, input-surface (the labels render already-parsed address/size **ints**, not file-derived strings — no markup/injection surface; **C-17 does NOT apply**), or network/exposure. → **security_required: false.**
+## 6. Security
+**security_required: FALSE.** Sensitive-pattern scan (auth / secrets / external-integration / PII / destructive-DB / input-surface / network): **no match**. This is a pure internal deletion — it removes code and adds no surface. No security gate needed.
 
-## 7. Test plan (map each to an AC)
-- `test_sections_label_shows_end_address_not_clipped` → AC-1 (Pilot, black-box).
-- `test_sections_label_two_line_format` → AC-2 (white-box on the label text).
-- `test_mac_out_of_range_label_full_address` → AC-3.
-- `test_sections_item_data_and_colour_preserved` → AC-4 (regression).
-Match `tests/test_tui_directionb.py` Pilot idiom + `_install_case_*` helpers. Engine-frozen guard (`test_engine_unchanged`) must stay green (app.py is not frozen; 0 frozen diffs expected).
-
-## 8. Batch status
-| Field | Value |
-|---|---|
-| Current phase | A — spec (awaiting gate) |
-| Files (est.) | `s19_app/tui/app.py` + `tests/test_tui_directionb.py` (≤5) |
-| Closed | — |
+## 7. Route + authorization
+Operator chose /fast-dev-flow (dead-code cleanup, no derivable new behavior — full V-model would be over-ceremony). Standing authorization for batch-30: run autonomously through commit → PR → independent code-review → MERGE to main, same guardrails as batch-29 (full suite + engine guards + code-review all GREEN before merge; 0 frozen diffs); report decisions at the end.

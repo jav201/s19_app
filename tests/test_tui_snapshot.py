@@ -304,8 +304,6 @@ def _seed_issues(app: S19TuiApp) -> None:
             )
         )
     app._validation_issues = issues
-    app._validation_issue_cell_rows = []
-    app._validation_issue_cell_styles = []
     app.validation_issue_filter_mode = "all"
     app._validation_issues_window_start = 0
     app.update_validation_issues_view()
