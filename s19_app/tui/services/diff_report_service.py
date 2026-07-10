@@ -1377,25 +1377,154 @@ def _html_hex_windows(
     top_a = max(mem_map_a) + 1 if mem_map_a else 0
     top_b = max(mem_map_b) + 1 if mem_map_b else 0
 
-    for run in runs:
-        colour = _HTML_KIND_COLOUR.get(run.kind, "#000000")
-        lines.append(
-            f'<h3 style="color:{colour}">'
-            f"Run 0x{run.start:08X}-0x{run.end:08X} "
-            f"({_esc(_kind_label(run.kind))})</h3>"
+    merged_windows = compute_hexdump_windows(
+        [(run.start, run.end) for run in runs],
+        context_bytes,
+        max(top_a, top_b),
+        merge_gap_bytes=MERGE_GAP_ROWS * HEX_WIDTH,
+    )
+    for low, high in merged_windows:
+        members = [run for run in runs if run.start < high and low < run.end]
+        colour = _HTML_KIND_COLOUR.get(members[0].kind, "#000000")
+        labels = ", ".join(
+            f"0x{run.start:08X}-0x{run.end:08X} ({_esc(_kind_label(run.kind))})"
+            for run in members
         )
+        noun = "Run" if len(members) == 1 else "Runs"
+        lines.append(f'<h3 style="color:{colour}">{noun} {labels}</h3>')
+        if any(run.kind == KIND_CHANGED for run in members):
+            lines.extend(
+                _html_side_by_side_pane(
+                    mem_map_a, mem_map_b, low, high, top_a, top_b
+                )
+            )
+            continue
         for who, mem_map, top in (("A", mem_map_a, top_a), ("B", mem_map_b, top_b)):
-            for low, high in compute_hexdump_windows(
-                [(run.start, run.end)], context_bytes, top
-            ):
-                body = "\n".join(_window_rows(mem_map, low, high))
-                lines.append(
-                    f"<p>Image {who} window 0x{low:08X}-0x{high:08X}:</p>"
-                )
-                lines.append(
-                    f'<pre style="color:{colour}">{_esc(body)}</pre>'
-                )
+            low_x, high_x = _clamp_window(low, high, top)
+            if high_x <= low_x:
+                continue
+            body = "\n".join(_window_rows(mem_map, low_x, high_x))
+            lines.append(
+                f"<p>Image {who} window 0x{low_x:08X}-0x{high_x:08X}:</p>"
+            )
+            lines.append(f'<pre style="color:{colour}">{_esc(body)}</pre>')
     return lines
+
+
+#: batch-34 (B-09, security F3): the CONSTANT inline style for a changed-byte
+#: highlight span — file-derived data never lands in an attribute value.
+_HTML_CHANGED_BYTE_STYLE: str = "background:#ffd54d;color:#000;font-weight:bold"
+
+
+def _html_hex_row(
+    mem_map: Dict[int, int], other_map: Dict[int, int], base: int
+) -> str:
+    """
+    Summary:
+        Build ONE highlighted hex row as HTML (batch-34 B-09) from
+        structured tokens — each fragment is ``_esc``-escaped FIRST and
+        span-wrapped AFTER (security F2: never index-patch an escaped
+        string), so entity expansion can never shift a highlight into the
+        file-derived ASCII gutter.
+
+    Args:
+        mem_map (Dict[int, int]): The image this row renders.
+        other_map (Dict[int, int]): The counterpart image; a byte whose
+            value differs (or exists on exactly one side) is highlighted.
+        base (int): The row's 16-aligned base address.
+
+    Returns:
+        str: The row HTML: address label, 16 hex tokens (changed ones
+        wrapped in the constant-style span), and the escaped ASCII gutter
+        with changed characters wrapped identically.
+
+    Dependencies:
+        Uses:
+            - _esc / _HTML_CHANGED_BYTE_STYLE
+        Used by:
+            - _html_side_by_side_pane
+    """
+    hex_parts: List[str] = []
+    ascii_parts: List[str] = []
+    for offset in range(HEX_WIDTH):
+        addr = base + offset
+        present = addr in mem_map
+        changed = mem_map.get(addr) != other_map.get(addr)
+        token = f"{mem_map[addr]:02X}" if present else "  "
+        char = "  "
+        if present:
+            value = mem_map[addr]
+            char = chr(value) if 0x20 <= value <= 0x7E else "."
+        token_html = _esc(token)
+        char_html = _esc(char)
+        if changed and present:
+            token_html = (
+                f'<span style="{_HTML_CHANGED_BYTE_STYLE}">{token_html}</span>'
+            )
+            char_html = (
+                f'<span style="{_HTML_CHANGED_BYTE_STYLE}">{char_html}</span>'
+            )
+        hex_parts.append(token_html)
+        ascii_parts.append(char_html if present else _esc(" "))
+    return (
+        f"0x{base:08X}  " + " ".join(hex_parts) + "  |" + "".join(ascii_parts) + "|"
+    )
+
+
+def _html_side_by_side_pane(
+    mem_map_a: Dict[int, int],
+    mem_map_b: Dict[int, int],
+    low: int,
+    high: int,
+    top_a: int,
+    top_b: int,
+) -> List[str]:
+    """
+    Summary:
+        Build the side-by-side Before/After pane for one (possibly merged)
+        changed window (batch-34 B-09): a two-column inline-CSS table whose
+        left cell renders image A's rows and right cell image B's, each
+        through :func:`_html_hex_row` so exactly the differing bytes carry
+        the highlight span. Self-contained inline CSS only; every fragment
+        escaped at construction (security F2/F3).
+
+    Args:
+        mem_map_a (Dict[int, int]): Image A's memory map.
+        mem_map_b (Dict[int, int]): Image B's memory map.
+        low (int): Inclusive row-aligned window start.
+        high (int): Exclusive row-aligned window end.
+        top_a (int): One-past-the-last mapped address of A.
+        top_b (int): One-past-the-last mapped address of B.
+
+    Returns:
+        List[str]: HTML lines for the pane.
+
+    Dependencies:
+        Uses:
+            - _html_hex_row / _clamp_window
+        Used by:
+            - _html_hex_windows
+    """
+
+    def _pane(mem_map: Dict[int, int], other: Dict[int, int], top: int) -> str:
+        low_x, high_x = _clamp_window(low, high, top)
+        if high_x <= low_x:
+            return "<em>(window beyond this image)</em>"
+        rows = [
+            _html_hex_row(mem_map, other, base)
+            for base in range(low_x, high_x, HEX_WIDTH)
+        ]
+        return "<pre>" + "\n".join(rows) + "</pre>"
+
+    return [
+        f"<p>Window 0x{low:08X}-0x{high:08X} (changed bytes highlighted):</p>",
+        '<table style="width:100%;border-collapse:collapse"><tr>',
+        '<td style="vertical-align:top;width:50%;padding-right:8px">'
+        "<strong>Before (A)</strong>" + _pane(mem_map_a, mem_map_b, top_a) + "</td>",
+        '<td style="vertical-align:top;width:50%">'
+        "<strong>After (B)</strong>" + _pane(mem_map_b, mem_map_a, top_b) + "</td>",
+        "</tr></table>",
+    ]
 
 
 def generate_diff_report_html(
