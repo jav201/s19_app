@@ -1,0 +1,9 @@
+# Increment 002 — engine gate rewrite + reasons (LLR-050.1-.4, LLR-051.1/.3/.5 engine halves; F1 code split)
+
+1. **What changed** — `check.py`: apply-gate mirror RETIRED for checks (section 6.5 amendment; module + function docstrings rewritten). Kind evaluated FIRST -> doc-kind run block (loud reason, {kind!r} capped 64 + ellipsis); then blocking-fault check (ERROR codes outside `_CHECK_NON_BLOCKING_CODES` -> doc-fault reason with sorted/deduped/cap-5 codes list, F2); runnable docs check healthy entries; taint attribution restricted to `_CHECK_TAINT_ATTRIBUTION_CODES` = {CHG-COLLISION} by start-address equality (B-1 two-set split); containment reasons per taxonomy; blocked-run rows carry the SHORT pointer `run blocked [code]` (LLR-051.5, F2 no-multiplication). `io.py`: NEW `CHG_DECL_STRUCTURE` code — the two per-declaration junk sites split out of envelope MF-BAD-STRUCTURE (F1); envelope sites unchanged (schema-suite pins verified green).
+2. **Files** — check.py, io.py, tests/test_checks_engine.py (3 of <=5).
+3. **How to test** — `pytest tests/test_checks_engine.py -q`.
+4. **Results** — engine 17 passed (9 new: AT-050a {1,1,2} collision-pair + AT-051d None-reasons; AT-050b B-1 same-address pin + CHG-DECL-STRUCTURE; AT-050c negative + containment reasons + no-image; AT-050d apply-gate regression; TC-050.1 envelope/unknown fail-safe + {0,0,0} boundary; TC-050.2 address-less + 0x0 falsy; AT-051b engine half loud doc-kind; LLR-051.3 caps). Consumers green UNMODIFIED: 184 across 7 suites (incl. the :406 UI literal — status wording changes at Inc-3, where its supersession lands). **RED captured**: stash check.py+io.py -> 8 failed (new gate absent, specced reason) -> pop -> 17 green. Ruff clean.
+5. **Risks** — the :406 literal + `startswith("Checks:")` pins supersede at Inc-3 (censused).
+6. **Pending** — Inc-3 service/UI (status line, rows, funnel scrub, Pilot ATs); Inc-2/3 combined code review after Inc-3.
+7. **Next** — Inc-3.
