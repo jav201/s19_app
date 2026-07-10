@@ -324,6 +324,221 @@ def compute_region_crcs(
     ]
 
 
+@dataclass(frozen=True)
+class CrcTarget:
+    """
+    Summary:
+        One normalized CRC evaluation target (batch-32, LLR-GRP-001.4):
+        either a legacy region widened to a single-span target with the
+        fixed 4-byte codec, or an operator-declared group. The normalizer
+        is the ONLY place ordering and widening are decided, so the
+        check/inject/result paths run one uniform loop.
+
+    Args:
+        spans (tuple[tuple[int, int], ...]): Half-open spans in declared
+            order (exactly one for a legacy region).
+        output_address (int): The single address the target's CRC occupies.
+        output_bytes (int): Stored-field width in LE bytes (4 for legacy).
+        is_group (bool): Provenance flag — ``False`` for a legacy region.
+            Group-only diagnostics (coverage, overlap) key on this
+            (LLR-GRP-001.6/.8, Q4 legacy-silent).
+
+    Data Flow:
+        - Built by :func:`normalized_targets`; consumed by the group-aware
+          check/inject paths (increment 3).
+
+    Dependencies:
+        Used by:
+            - normalized_targets
+            - the check/inject paths (batch-32 increment 3)
+    """
+
+    spans: tuple[tuple[int, int], ...]
+    output_address: int
+    output_bytes: int
+    is_group: bool
+
+
+def normalized_targets(config: CrcConfig) -> list[CrcTarget]:
+    """
+    Summary:
+        Yield the unified evaluation sequence for a config (LLR-GRP-001.4,
+        Q3 ordering): legacy regions first (file order, each as a
+        single-span target with ``output_bytes=4`` and legacy provenance),
+        then groups (file order). Pure function — no compute, no I/O.
+
+    Args:
+        config (CrcConfig): The parsed CRC config.
+
+    Returns:
+        list[CrcTarget]: The targets in evaluation/report order. Legacy
+        entries keep the first positions so existing reports stay stable.
+
+    Data Flow:
+        - Maps ``config.regions`` then ``config.groups`` onto
+          :class:`CrcTarget`; consumed by check/inject (increment 3) and by
+          tests as the ordering oracle (AT-044c).
+
+    Dependencies:
+        Uses:
+            - CrcConfig / CrcGroup (crc_config)
+        Used by:
+            - the group-aware check/inject paths (increment 3)
+            - tests/test_crc_engine.py (ordering TC)
+
+    Example:
+        >>> from .crc_config import CrcConfig, CrcRegion
+        >>> cfg = CrcConfig(
+        ...     regions=[CrcRegion(0, 4, 0x10)], polynomial=0x04C11DB7,
+        ...     init=0xFFFFFFFF, reverse=True, final_xor=0xFFFFFFFF,
+        ... )
+        >>> normalized_targets(cfg)[0].spans
+        ((0, 4),)
+    """
+    targets: list[CrcTarget] = [
+        CrcTarget(
+            spans=((region.start, region.end),),
+            output_address=region.output_address,
+            output_bytes=LE32_WIDTH,
+            is_group=False,
+        )
+        for region in config.regions
+    ]
+    targets.extend(
+        CrcTarget(
+            spans=group.spans,
+            output_address=group.output_address,
+            output_bytes=group.output_bytes,
+            is_group=True,
+        )
+        for group in config.groups
+    )
+    return targets
+
+
+def compute_group_crc(
+    mem_map: dict[int, int],
+    spans: Iterable[tuple[int, int]],
+    *,
+    polynomial: int = DEFAULT_POLYNOMIAL,
+    init: int = DEFAULT_INIT,
+    reverse: bool = DEFAULT_REVERSE,
+    final_xor: int = DEFAULT_FINAL_XOR,
+) -> int:
+    """
+    Summary:
+        Compute ONE CRC over multiple spans (batch-32, LLR-GRP-001.5, S-1):
+        each span's present bytes are assembled by :func:`region_segments`
+        (ascending within the span, gaps contribute nothing — FR2/FR7
+        parity), the span streams are concatenated IN DECLARED ORDER —
+        never address-sorted, never deduplicated (S-2) — and the whole
+        stream is digested by a single :func:`crc32_stream` call, which is
+        exactly one non-resetting CRC state across the spans (the FR8
+        argument of :func:`compute_region_crc` extended across spans).
+
+    Args:
+        mem_map (dict[int, int]): Address-to-byte map (read only; never
+            mutated).
+        spans (Iterable[tuple[int, int]]): Half-open ``(start, end)`` spans
+            in declared order.
+        polynomial (int): CRC generator polynomial.
+        init (int): Initial register value.
+        reverse (bool): Reflected-in/out flag (zlib convention when True).
+        final_xor (int): Final-XOR value.
+
+    Returns:
+        int: The 32-bit CRC over the concatenated present-byte stream.
+
+    Data Flow:
+        - Per span: :func:`region_segments` → joined bytes; all span
+          streams joined in declared order → one :func:`crc32_stream`.
+
+    Dependencies:
+        Uses:
+            - :func:`region_segments`
+            - :func:`crc32_stream`
+        Used by:
+            - the group-aware check/inject paths (increment 3)
+            - tests/test_crc_engine.py (AT-045a/b/e/f oracles)
+
+    Example:
+        >>> hex(compute_group_crc({0: 0x31, 1: 0x32, 2: 0x33}, [(0, 2), (2, 3)]))
+        '0x884863d2'
+    """
+    stream = b"".join(
+        b"".join(region_segments(mem_map, start, end)) for start, end in spans
+    )
+    return crc32_stream(
+        stream,
+        polynomial=polynomial,
+        init=init,
+        reverse=reverse,
+        final_xor=final_xor,
+    )
+
+
+def encode_le(value: int, width: int) -> bytes:
+    """
+    Summary:
+        Encode a CRC into ``width`` little-endian bytes (batch-32,
+        LLR-WID-001.1, R-CRC-WIDTH-001): the low ``8 * width`` bits of the
+        value. Width 4 is byte-identical to :func:`encode_le32`; width 8
+        zero-extends (high 4 bytes = 0x00 for any 32-bit CRC); widths 1/2
+        truncate to the low bytes (the caller owes the truncation warning,
+        LLR-WID-001.3).
+
+    Args:
+        value (int): The CRC value; only its low ``8 * width`` bits encode.
+        width (int): The stored-field width — one of {1, 2, 4, 8}.
+
+    Returns:
+        bytes: Exactly ``width`` bytes, little-endian.
+
+    Data Flow:
+        - Mask to ``8 * width`` bits, emit little-endian.
+
+    Dependencies:
+        Used by:
+            - encode_le32 (fixed-4 wrapper)
+            - the group-aware inject path (increment 3)
+            - tests/test_crc_engine.py (width codec table)
+
+    Example:
+        >>> encode_le(0x04030201, 2)
+        b'\\x01\\x02'
+    """
+    mask = (1 << (8 * width)) - 1
+    return (value & mask).to_bytes(width, "little")
+
+
+def decode_le(data: Iterable[int]) -> int:
+    """
+    Summary:
+        Decode little-endian bytes of ANY length into an int (batch-32,
+        LLR-WID-001.2) — the length-driven inverse of :func:`encode_le`.
+        :func:`decode_le32` remains the fixed-4 wrapper.
+
+    Args:
+        data (Iterable[int]): The stored bytes, low byte first.
+
+    Returns:
+        int: The decoded value.
+
+    Data Flow:
+        - Materialize the bytes; combine little-endian.
+
+    Dependencies:
+        Used by:
+            - the group-aware check path (increment 3)
+            - tests/test_crc_engine.py (width codec table)
+
+    Example:
+        >>> hex(decode_le(b'\\x01\\x02'))
+        '0x201'
+    """
+    return int.from_bytes(bytes(data), "little")
+
+
 def encode_le32(crc: int) -> bytes:
     """
     Summary:
@@ -389,7 +604,7 @@ def decode_le32(data: Iterable[int]) -> int:
 
 
 def read_stored_crc_le(
-    op_input: OperationInput, output_address: int
+    op_input: OperationInput, output_address: int, width: int = LE32_WIDTH
 ) -> Optional[int]:
     """
     Summary:
@@ -404,26 +619,29 @@ def read_stored_crc_le(
         op_input (OperationInput): The neutral operation input; only its
             ``mem_map`` is read (never mutated).
         output_address (int): The address at which the region's CRC is stored;
-            the four consecutive addresses are read low-byte-first.
+            the ``width`` consecutive addresses are read low-byte-first.
+        width (int): The stored-field width in bytes (batch-32,
+            LLR-WID-001.4). Defaults to :data:`LE32_WIDTH` so every legacy
+            caller is unchanged.
 
     Returns:
-        Optional[int]: The decoded 32-bit stored value, or ``None`` when any of
-        the four addresses is not present in ``mem_map``.
+        Optional[int]: The decoded stored value, or ``None`` when ANY of the
+        ``width`` addresses is not present in ``mem_map``.
 
     Raises:
-        None: A missing address yields ``None``; the codec ``decode_le32`` is
-            only ever handed exactly four present bytes, so it never raises.
+        None: A missing address yields ``None``; the codec :func:`decode_le`
+            is only ever handed exactly ``width`` present bytes.
 
     Data Flow:
-        - Probe the four addresses ``output_address + i`` in ``mem_map``; if any
-          is absent return ``None``; else decode the four bytes via
-          :func:`decode_le32`.
+        - Probe the ``width`` addresses ``output_address + i`` in ``mem_map``;
+          if any is absent return ``None``; else decode via :func:`decode_le`.
 
     Dependencies:
         Uses:
-            - :func:`decode_le32`
+            - :func:`decode_le`
         Used by:
             - :func:`check_regions`
+            - the group-aware check path (batch-32 increment 3)
             - tests/test_crc_operation.py (TC-111, TC-112, missing-bytes case)
 
     Example:
@@ -436,10 +654,10 @@ def read_stored_crc_le(
         >>> hex(read_stored_crc_le(op_input, 0x100))
         '0xcbf43926'
     """
-    addresses = range(output_address, output_address + LE32_WIDTH)
+    addresses = range(output_address, output_address + width)
     if any(addr not in op_input.mem_map for addr in addresses):
         return None
-    return decode_le32(op_input.mem_map[addr] for addr in addresses)
+    return decode_le(op_input.mem_map[addr] for addr in addresses)
 
 
 def check_regions(
