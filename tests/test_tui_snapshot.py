@@ -439,41 +439,17 @@ def _restyled_cell_marks(screen: str) -> tuple:
     return ()
 
 
-# batch-31 (fast-dev-flow P1 quick strike) geometry drift: AC-5 (B-06,
-# `#files_list` fixed 8 → `1fr`) reshapes the Workspace left pane, and AC-6
-# (B-15, `MapCell.render` width-fill) repaints the map grid band. Exactly the
-# six cells below mismatch their canonical baselines; they carry
-# xfail(strict=False) until the canonical-CI regen (snapshot-regen.yml,
-# pinned textual==8.2.8, at CURRENT main post-merge) recommits them — the
-# same batch-25/27/28 xfail-until-baseline pattern. strict=False because a
-# cell may already match at some sizes and must not turn XPASS-red.
-_BATCH31_GEOMETRY_DRIFT = {
-    ("workspace", "compact", "80x24"),
-    ("workspace", "compact", "120x30"),
-    ("workspace", "compact", "160x40"),
-    ("workspace", "comfortable", "80x24"),
-    ("workspace", "comfortable", "120x30"),
-    ("workspace", "comfortable", "160x40"),
-    ("map", "comfortable", "80x24"),
-    ("map", "comfortable", "120x30"),
-}
-
-
+# batch-31 (fast-dev-flow P1 quick strike) geometry drift: AC-5/AC-7 (B-06
+# `#files_list` 1fr + B-20 Load-project button) reshaped the Workspace left
+# pane and AC-6 (B-15 `MapCell.render` width-fill) repainted the map grid
+# band — 8 grid cells (6 workspace + 2 map) plus the entropy-80x24 backdrop
+# cell were xfail-until-baseline. The canonical-CI regen (snapshot-regen.yml,
+# pinned textual==8.2.8, run at current main `91d884a` post-#58) recommitted
+# exactly those 9 baselines (containment verified in the run log: no other
+# screen moved), so the `_BATCH31_GEOMETRY_DRIFT` marks are retired — all
+# cells are full green oracles again.
 def _batch31_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the xfail mark for a batch-31 geometry-drifted cell, else ().
-
-    Summary:
-        Membership gate over ``_BATCH31_GEOMETRY_DRIFT`` so only the six
-        measured-drift cells are expected mismatches while every other cell
-        stays a hard oracle.
-    """
-    if (screen, density, size_key) in _BATCH31_GEOMETRY_DRIFT:
-        return (
-            pytest.mark.xfail(
-                strict=False,
-                reason="pending canonical-CI baseline regen (batch-31 AC-5/AC-6 geometry)",
-            ),
-        )
+    """Return the pytest marks for a batch-31 drift cell (none — baselines regenerated)."""
     return ()
 
 
@@ -598,28 +574,13 @@ _ENTROPY_CELLS = [
         size_key,
         id=f"entropy-comfortable-{size_key}",
         # The entropy modal opens over the loaded Workspace and its translucent
-        # `ModalScreen { background: $bg-base 70% }` backdrop shows the US-040
-        # Workspace restyle through — so these two cells were xfail-until-baseline.
-        # Their baselines were regenerated in the canonical CI env
-        # (snapshot-regen.yml, textual==8.2.8) at origin/main 117f6b4 and committed
-        # here, so the xfail was retired. batch-31's Workspace geometry (AC-5
-        # files-list 1fr, AC-7 Load-project button) shows through the same
-        # translucent backdrop at 80x24, so that cell is xfail again until the
-        # batch-31 canonical-CI regen recommits it (120x30 still matches — the
-        # modal fully covers the drifted pane region there).
-        marks=(
-            (
-                pytest.mark.xfail(
-                    strict=False,
-                    reason=(
-                        "pending canonical-CI baseline regen "
-                        "(batch-31 AC-5/AC-7 workspace drift via translucent backdrop)"
-                    ),
-                ),
-            )
-            if size_key == "80x24"
-            else ()
-        ),
+        # `ModalScreen { background: $bg-base 70% }` backdrop shows the
+        # Workspace through — so these cells drift whenever the Workspace
+        # does (batch-28 US-040 restyle; batch-31 AC-5/AC-7 left-pane
+        # geometry at 80x24). Each drift round is closed by the canonical-CI
+        # regen (snapshot-regen.yml, textual==8.2.8): most recently at main
+        # `91d884a` (post-#58), which recommitted the 80x24 baseline — the
+        # batch-31 xfail is retired and both cells are full green oracles.
     )
     for size_key in ("80x24", "120x30")
 ]
