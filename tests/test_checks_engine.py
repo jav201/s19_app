@@ -439,3 +439,74 @@ def test_no_textual_in_static_import_graph() -> None:
     assert offenders == [], (
         f"textual reached the headless check path: {offenders}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-33 (R-B02) Inc-1 — reason vocabulary + model carriage (TC-051.1).
+# ---------------------------------------------------------------------------
+
+
+def test_tc051_1_reason_vocabulary_and_model_defaults() -> None:
+    """TC-051.1: the reason domain is the canonical 6-token set; entry and
+    run reason fields default to None (pass/fail entries carry no reason,
+    AT-051d's model half); to_dict is ADDITIVE — the four new keys are
+    present and None-safe while every pre-batch-33 key survives unchanged.
+    """
+    from s19_app.tui.changes.model import (
+        CHECK_REASON_DOC_FAULT,
+        CHECK_REASON_DOC_KIND,
+        CHECK_REASON_ENTRY_FAULT,
+        CHECK_REASON_NO_IMAGE,
+        CHECK_REASON_OUTSIDE,
+        CHECK_REASON_PARTIAL,
+        CHECK_UNCHECKABLE_REASON_DOMAIN,
+        CheckRunEntry,
+        CheckRunResult,
+    )
+
+    assert CHECK_UNCHECKABLE_REASON_DOMAIN == (
+        CHECK_REASON_DOC_KIND,
+        CHECK_REASON_DOC_FAULT,
+        CHECK_REASON_ENTRY_FAULT,
+        CHECK_REASON_PARTIAL,
+        CHECK_REASON_OUTSIDE,
+        CHECK_REASON_NO_IMAGE,
+    )
+    assert len(set(CHECK_UNCHECKABLE_REASON_DOMAIN)) == 6
+
+    entry = CheckRunEntry(
+        entry_type="bytes",
+        address_start=0x100,
+        address_end=0x104,
+        expected_bytes=(1, 2, 3, 4),
+        actual_bytes=(1, 2, 3, 4),
+        result="pass",
+        linkage="standalone",
+        linkage_symbol=None,
+    )
+    assert entry.reason_code is None and entry.reason is None
+
+    result = CheckRunResult(
+        source_path=None,
+        timestamp_utc="2026-07-09T00:00:00+00:00",
+        variant_id=None,
+        aggregates={"passed": 1, "failed": 0, "uncheckable": 0},
+        entries=[entry],
+    )
+    assert result.run_blocked_reason_code is None
+    assert result.run_blocked_reason is None
+
+    payload = result.to_dict()
+    # Additive run-level keys.
+    assert payload["run_blocked_reason_code"] is None
+    assert payload["run_blocked_reason"] is None
+    # Additive per-entry keys beside the intact pre-batch-33 key set.
+    entry_payload = payload["entries"][0]
+    assert entry_payload["reason_code"] is None
+    assert entry_payload["reason"] is None
+    assert set(entry_payload) == {
+        "entry_type", "address_start", "address_end", "expected_bytes",
+        "actual_bytes", "result", "linkage", "linkage_symbol",
+        "reason_code", "reason",
+    }
+    assert payload["aggregates"] == {"passed": 1, "failed": 0, "uncheckable": 0}
