@@ -426,40 +426,16 @@ def _entropy_run_before(triple: dict[str, Path]):
 # xfail(strict=False) — the same batch-25/27 xfail-until-baseline pattern; a
 # follow-up drops these once the canonical-env baselines are committed.
 def _restyled_cell_marks(screen: str) -> tuple:
-    """Return the pytest marks for a restyled snapshot cell.
+    """Return the pytest marks for a restyled snapshot cell (none — baselines exist).
 
-    The A2L cells (batch-28 US-038 compact density), the Issues cells
-    (batch-28 US-039 grouped-by-severity dense view — the grouped panel above
-    the retained DataTable shifts the SVG) and the Workspace cells (batch-28
-    US-040 per-range coverage micro-bar in `#ws_left` + stat pane in `#ws_right`
-    shift the SVG) are xfail-until-baseline; local regen is FORBIDDEN — canonical
-    CI only. Every other restyled screen keeps its committed baseline (no marks).
+    The A2L (batch-28 US-038 compact density), Issues (batch-28 US-039 grouped
+    dense view + the batch-29 DataTable retirement / restored `.issue-related`
+    node) and Workspace (batch-28 US-040 coverage micro-bar + stat pane + memory
+    strip) cells were xfail-until-baseline. Their baselines were regenerated in
+    the canonical CI env (snapshot-regen.yml, pinned textual==8.2.8) at
+    origin/main `117f6b4` (post batch-29/30) and committed here, so the xfail
+    marks are retired — all restyled cells are now full green cells.
     """
-    if screen == "a2l":
-        return (
-            pytest.mark.xfail(
-                reason="batch-28 US-038 A2L compact density; baseline "
-                "regenerated in canonical CI (snapshot-regen.yml, textual==8.2.8)",
-                strict=False,
-            ),
-        )
-    if screen == "issues":
-        return (
-            pytest.mark.xfail(
-                reason="batch-28 US-039 Issues grouped-dense view; baseline "
-                "regenerated in canonical CI (snapshot-regen.yml, textual==8.2.8)",
-                strict=False,
-            ),
-        )
-    if screen == "workspace":
-        return (
-            pytest.mark.xfail(
-                reason="batch-28 US-040 Workspace coverage micro-bar + stat pane "
-                "+ whole-image memory strip (#ws_memstrip); baseline regenerated "
-                "in canonical CI (snapshot-regen.yml, textual==8.2.8)",
-                strict=False,
-            ),
-        )
     return ()
 
 
@@ -582,18 +558,12 @@ _ENTROPY_CELLS = [
     pytest.param(
         size_key,
         id=f"entropy-comfortable-{size_key}",
-        # batch-28 re-marks these xfail-until-baseline: the entropy modal opens
-        # over the loaded Workspace, and `ModalScreen { background: $bg-base 70% }`
-        # is translucent, so the US-040 Workspace restyle (memory strip / stat pane
-        # / per-range coverage micro-bars) shows through the dimmed backdrop and
-        # shifts the SVG. Regenerated in the canonical CI env (snapshot-regen.yml,
-        # textual==8.2.8); a follow-up drops the xfail once the baseline lands.
-        marks=pytest.mark.xfail(
-            reason="batch-28 US-040 Workspace restyle shows through the "
-            "translucent entropy-modal backdrop; baseline regenerated in "
-            "canonical CI (snapshot-regen.yml, textual==8.2.8)",
-            strict=False,
-        ),
+        # The entropy modal opens over the loaded Workspace and its translucent
+        # `ModalScreen { background: $bg-base 70% }` backdrop shows the US-040
+        # Workspace restyle through — so these two cells were xfail-until-baseline.
+        # Their baselines were regenerated in the canonical CI env
+        # (snapshot-regen.yml, textual==8.2.8) at origin/main 117f6b4 and committed
+        # here, so the xfail is retired — both cells are now full green cells.
     )
     for size_key in ("80x24", "120x30")
 ]
