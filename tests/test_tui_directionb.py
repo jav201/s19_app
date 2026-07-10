@@ -7246,3 +7246,86 @@ def test_ac6_map_cells_render_contiguous_band(tmp_path: Path) -> None:
         assert right.x == left.x + left.width, (
             f"same-row cells must be contiguous; {left} then {right}"
         )
+
+
+# ---------------------------------------------------------------------------
+# batch-31 Inc-2 — AC-3 (B-04) Issues PgUp/PgDn actually page, and AC-7
+# (B-20) a visible Workspace "Load project" button wired to the existing
+# `action_load_project` flow.
+# ---------------------------------------------------------------------------
+
+
+def test_ac3_issues_pgdn_pgup_page_the_grouped_panel(tmp_path: Path) -> None:
+    """AC-3 / B-04: PgDn / PgUp page the Issues window (RED-first: the keys
+    named by `GroupedIssuesPanel.TRUNCATION_NOTE` had no binding at all).
+
+    Intent: with more filtered issues than one page (page size 200), pressing
+    PgDn on the Issues screen must advance `_validation_issues_window_start`
+    by one page (and re-render), and PgUp must rewind it — through the real
+    key dispatch, not by calling the action directly.
+    """
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    async def _drive() -> "tuple[int, int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app._validation_issues = [
+                ValidationIssue(
+                    code="SEEDED_ISSUE",
+                    severity=ValidationSeverity.WARNING,
+                    message=f"seeded issue {i}",
+                    artifact="s19",
+                    address=i,
+                )
+                for i in range(app.validation_issues_page_size * 2 + 5)
+            ]
+            app.action_show_screen("issues")
+            app.update_validation_issues_view()
+            await pilot.pause()
+            start_before = app._validation_issues_window_start
+            await pilot.press("pagedown")
+            await pilot.pause()
+            start_after_down = app._validation_issues_window_start
+            await pilot.press("pageup")
+            await pilot.pause()
+            start_after_up = app._validation_issues_window_start
+            return start_before, start_after_down, start_after_up
+
+    before, after_down, after_up = asyncio.run(_drive())
+    assert before == 0
+    assert after_down == S19TuiApp.validation_issues_page_size, (
+        f"PgDn must advance the issues window by one page; got {after_down}"
+    )
+    assert after_up == 0, f"PgUp must rewind the issues window; got {after_up}"
+
+
+def test_ac7_workspace_load_project_button(tmp_path: Path) -> None:
+    """AC-7 / B-20: the Workspace shows a "Load project" button that opens
+    the same `LoadProjectScreen` as key `p` (RED-first: no such button).
+
+    Intent: the load-project flow existed only behind the undiscoverable `p`
+    key. A visible button in the Workspace left pane must push the modal
+    project list when at least one saved project exists.
+    """
+    from s19_app.tui.screens import LoadProjectScreen
+
+    async def _drive() -> "tuple[bool, bool]":
+        app = S19TuiApp(base_dir=tmp_path)
+        (app.workarea / "demo_project").mkdir(parents=True, exist_ok=True)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            button = app.query_one("#ws_load_project_button")
+            visible = button.display and not button.has_class("hidden")
+            button.press()
+            await pilot.pause()
+            pushed = isinstance(app.screen, LoadProjectScreen)
+            return bool(visible), pushed
+
+    visible, pushed = asyncio.run(_drive())
+    assert visible, "#ws_load_project_button must be visible on the Workspace"
+    assert pushed, "pressing the button must push LoadProjectScreen (same as key 'p')"

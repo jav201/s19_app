@@ -450,6 +450,8 @@ def _restyled_cell_marks(screen: str) -> tuple:
 _BATCH31_GEOMETRY_DRIFT = {
     ("workspace", "compact", "80x24"),
     ("workspace", "compact", "120x30"),
+    ("workspace", "compact", "160x40"),
+    ("workspace", "comfortable", "80x24"),
     ("workspace", "comfortable", "120x30"),
     ("workspace", "comfortable", "160x40"),
     ("map", "comfortable", "80x24"),
@@ -600,7 +602,24 @@ _ENTROPY_CELLS = [
         # Workspace restyle through — so these two cells were xfail-until-baseline.
         # Their baselines were regenerated in the canonical CI env
         # (snapshot-regen.yml, textual==8.2.8) at origin/main 117f6b4 and committed
-        # here, so the xfail is retired — both cells are now full green cells.
+        # here, so the xfail was retired. batch-31's Workspace geometry (AC-5
+        # files-list 1fr, AC-7 Load-project button) shows through the same
+        # translucent backdrop at 80x24, so that cell is xfail again until the
+        # batch-31 canonical-CI regen recommits it (120x30 still matches — the
+        # modal fully covers the drifted pane region there).
+        marks=(
+            (
+                pytest.mark.xfail(
+                    strict=False,
+                    reason=(
+                        "pending canonical-CI baseline regen "
+                        "(batch-31 AC-5/AC-7 workspace drift via translucent backdrop)"
+                    ),
+                ),
+            )
+            if size_key == "80x24"
+            else ()
+        ),
     )
     for size_key in ("80x24", "120x30")
 ]

@@ -94,7 +94,10 @@ class EmptyStatePanel(Static):
         'empty_state_panel'
     """
 
-    PROMPT_TEXT = "No file loaded - press Ctrl+L (or 'l') to load a file."
+    PROMPT_TEXT = (
+        "No file loaded - press Ctrl+L (or 'l') to load a file, "
+        "or 'p' to load a saved project."
+    )
 
     def __init__(self) -> None:
         super().__init__(self.PROMPT_TEXT, id="empty_state_panel", markup=False)

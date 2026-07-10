@@ -29,6 +29,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Sequence
 
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, ScrollableContainer
 from textual.message import Message
 from textual.widgets import Static
@@ -256,6 +257,17 @@ class GroupedIssuesPanel(ScrollableContainer):
 
     EMPTY_TEXT = "No validation issues to group."
     TRUNCATION_NOTE = "More issues on other pages — use PgUp/PgDn to page."
+
+    # batch-31 AC-3 (B-04): when this ScrollableContainer holds focus its
+    # inherited pageup/pagedown bindings would scroll (a no-op — the mounted
+    # window is display-capped) and consume the keys before the app-level
+    # `page_up/down_context` bindings could fire. Rebind them to the app's
+    # issues paging actions so PgUp/PgDn page the window from inside the
+    # panel too, matching TRUNCATION_NOTE's promise.
+    BINDINGS = [
+        Binding("pageup", "app.validation_issues_page_prev", "Page-", show=False),
+        Binding("pagedown", "app.validation_issues_page_next", "Page+", show=False),
+    ]
 
     def render_groups(
         self,

@@ -796,6 +796,12 @@ class S19TuiApp(App):
         ("minus", "page_prev_context", "Page-"),
         ("comma", "hex_page_prev", "Hex-"),
         ("period", "hex_page_next", "Hex+"),
+        # batch-31 AC-3 (B-04): PgUp/PgDn were advertised by the Issues
+        # panel's truncation note but had no binding anywhere. They route
+        # through the issues-aware context actions (Issues screen pages the
+        # grouped panel; A2L/MAC keep their +/- paging parity).
+        Binding("pagedown", "page_down_context", "Page+", show=False),
+        Binding("pageup", "page_up_context", "Page-", show=False),
     ]
 
     workarea: Path
@@ -1314,6 +1320,7 @@ class S19TuiApp(App):
                 - ``compose``
         """
         _left_pane = Container(
+            Button("Load project (p)", id="ws_load_project_button"),
             Label("Workarea Files", id="files_title"),
             ListView(id="files_list"),
             Label("Data Sections", id="sections_title"),
@@ -4179,6 +4186,69 @@ class S19TuiApp(App):
             self.action_a2l_tags_page_prev()
         elif active == "mac":
             self.action_mac_records_page_prev()
+
+    def action_page_down_context(self) -> None:
+        """
+        Summary:
+            Route PgDn to the visible pageable surface — the Issues grouped
+            panel when the Issues screen is active, else the ``+`` context
+            paging (A2L / MAC tables) (batch-31 AC-3 / B-04).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - When ``#screen_issues`` is visible, forward to
+              ``action_validation_issues_page_next``.
+            - Otherwise forward to ``action_page_next_context`` so PgDn is a
+              synonym of ``+`` on the A2L/MAC screens.
+
+        Dependencies:
+            Uses:
+                - ``_is_layout_visible``
+                - ``action_validation_issues_page_next``
+                - ``action_page_next_context``
+            Used by:
+                - the ``pagedown`` key binding
+        """
+        if self._is_layout_visible("#screen_issues"):
+            self.action_validation_issues_page_next()
+        else:
+            self.action_page_next_context()
+
+    def action_page_up_context(self) -> None:
+        """
+        Summary:
+            Route PgUp to the visible pageable surface — the Issues grouped
+            panel when the Issues screen is active, else the ``-`` context
+            paging (A2L / MAC tables) (batch-31 AC-3 / B-04).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - When ``#screen_issues`` is visible, forward to
+              ``action_validation_issues_page_prev``.
+            - Otherwise forward to ``action_page_prev_context``.
+
+        Dependencies:
+            Uses:
+                - ``_is_layout_visible``
+                - ``action_validation_issues_page_prev``
+                - ``action_page_prev_context``
+            Used by:
+                - the ``pageup`` key binding
+        """
+        if self._is_layout_visible("#screen_issues"):
+            self.action_validation_issues_page_prev()
+        else:
+            self.action_page_prev_context()
 
     def action_hex_page_next(self) -> None:
         """
@@ -8479,6 +8549,10 @@ class S19TuiApp(App):
         # supersede the view-toggle buttons (LLR-004.4 / A-07).
         if event.button.id == "search_button":
             self._handle_search()
+        elif event.button.id == "ws_load_project_button":
+            # batch-31 AC-7 (B-20): visible Workspace entry point to the
+            # existing key-`p` load-project flow.
+            self.action_load_project()
         elif event.button.id == "goto_button":
             self._handle_goto()
         elif event.button.id == "alt_search_button":

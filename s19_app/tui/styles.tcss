@@ -240,6 +240,15 @@ Screen {
     height: 100%;
 }
 
+/* batch-31 AC-7 (B-20): compact one-row Load-project button — borderless so
+ * it costs a single row of the tight 22-col left pane (C-13 budget). */
+#ws_load_project_button {
+    width: 100%;
+    height: 1;
+    min-width: 0;
+    border: none;
+}
+
 #ws_left #sections_list {
     height: 1fr;
 }
