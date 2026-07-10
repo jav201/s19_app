@@ -629,6 +629,12 @@ def test_at045c_gap_note_names_group_and_count_legacy_stays_silent() -> None:
         regions=[CrcRegion(start=0x1000, end=0x1010, output_address=0x5000)],
     )
     result = CrcOperation().execute(op_input, config=config)
+    # C-18: the SAME node owns the AT's compute clause — the group CRC covers
+    # present bytes only (offsets 0x05/0x06 absent).
+    group_entry = result.crc_regions[1]  # legacy first, then the group
+    assert group_entry.computed_crc == zlib.crc32(
+        payload[0x00:0x05] + payload[0x07:0x10]
+    )
     coverage_notes = [n for n in result.notes if "absent byte(s)" in n]
     assert len(coverage_notes) == 1, (
         f"exactly ONE coverage note (group only, never legacy); got {result.notes}"
@@ -895,3 +901,113 @@ def test_at044a_legacy_gapped_golden_compat(tmp_path: Path) -> None:
     assert write_result.verify_status == STATUS_VERIFIED
     reread = S19File(str(write_result.written_path)).get_memory_map()
     assert bytes(reread[0x1038 + i] for i in range(4)) == encode_le(golden, 4)
+
+
+# ---------------------------------------------------------------------------
+# batch-32 Phase-4 C-18 reconciliation — single-node realizations for the ATs
+# whose clauses previously lived in parts (TC-205 family).
+# ---------------------------------------------------------------------------
+
+
+def test_at045d_single_span_group_equals_legacy_end_to_end(tmp_path: Path) -> None:
+    """AT-045d — the equivalence bridge as ONE node (TC-205.1): a 1-span
+    group with output_bytes 4 yields the SAME computed CRC, check verdict,
+    and injected bytes as the legacy region over the identical
+    (start, end, output_address)."""
+    payload = bytes(range(0x30, 0x70))
+    mem = _mem_from_bytes(0x1000, payload)
+    mem.update(_mem_from_bytes(0x2000, bytes([0x11, 0x22, 0x33, 0x44])))
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1040), (0x2000, 0x2004)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    legacy_cfg = _default_config(
+        [CrcRegion(start=0x1000, end=0x1020, output_address=0x2000)]
+    )
+    group_cfg = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1020),), output_address=0x2000,
+                         output_bytes=4)]
+    )
+    legacy_res = check_regions(op_input, legacy_cfg)[0]
+    group_res = check_regions(op_input, group_cfg)[0]
+    assert group_res.computed_crc == legacy_res.computed_crc
+    assert group_res.stored_value == legacy_res.stored_value
+    assert group_res.matched == legacy_res.matched
+
+    legacy_mem, _r1, _w1 = inject_crcs(op_input, [legacy_res])
+    group_mem, _r2, _w2 = inject_crcs(op_input, [group_res])
+    assert legacy_mem == group_mem, "injected bytes must be identical"
+
+
+def test_at046a_width8_through_the_shipped_write_path(tmp_path: Path) -> None:
+    """AT-046a as ONE node (TC-205.2): confirm-write (the shipped
+    write_crc_image path) with output_bytes 8 lands exactly 8 LE bytes on
+    disk (low 4 = CRC, high 4 = 0x00) and the emitted records cover the
+    full [out, out+8) window (the range-extension observable)."""
+    payload = bytes(range(0x10, 0x30))
+    op_input = _contiguous_op_input(0x1000, payload)
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1020),), output_address=0x3000,
+                         output_bytes=8)]
+    )
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+    assert result.verify_status == STATUS_VERIFIED
+    reread = S19File(str(result.written_path)).get_memory_map()
+    crc = zlib.crc32(payload)
+    stored = bytes(reread[0x3000 + i] for i in range(8))
+    assert stored == encode_le(crc, 8)
+    assert stored[4:] == bytes(4)
+    assert not any((0x3000 + 8 + i) in reread for i in range(4)), (
+        "exactly 8 bytes, not more, at the output window"
+    )
+
+
+def test_at046b_truncated_compare_matches_low_bytes() -> None:
+    """AT-046b compare clause in the note node's chain (TC-205.3): a stored
+    field holding exactly the low-N CRC bytes MATCHES at width N (the
+    compared value is the truncated CRC), and the truncation note fires."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    crc = zlib.crc32(payload[:0x10])
+    mem.update(_mem_from_bytes(0x4000, encode_le(crc, 2)))
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020), (0x4000, 0x4002)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1010),), output_address=0x4000,
+                         output_bytes=2)]
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    entry = result.crc_regions[0]
+    assert entry.matched is True, (
+        "a stored low-2-byte CRC must MATCH at width 2 (truncated compare)"
+    )
+    assert any("truncates the 32-bit CRC" in n for n in result.notes)
+
+
+def test_at047d_to_dict_through_a_real_mixed_run() -> None:
+    """AT-047d as ONE node (TC-205.4): serialize a REAL mixed-run result —
+    each target entry includes output_bytes; the legacy entry keeps the
+    five pre-batch-32 keys with unchanged values plus output_bytes == 4."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1010),), output_address=0x5000,
+                         output_bytes=8)],
+        regions=[CrcRegion(start=0x1000, end=0x1020, output_address=0x6000)],
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    entries = result.to_dict()["crc_regions"]
+    assert [e["output_bytes"] for e in entries] == [4, 8]
+    legacy = entries[0]
+    assert set(legacy) == {
+        "output_address", "computed_crc", "stored_value", "matched",
+        "written", "output_bytes",
+    }
+    assert legacy["output_address"] == 0x6000
+    assert legacy["written"] is False and legacy["matched"] is None
