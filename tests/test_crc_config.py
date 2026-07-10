@@ -491,8 +491,13 @@ def test_legacy_only_config_still_parses_with_empty_groups() -> None:
         ),
         pytest.param(
             "output_bytes_nonint",
-            "structurally invalid",
+            "output_bytes",
             id="at044d-c-bytes-nonint",
+        ),
+        pytest.param(
+            "output_bytes_bool",
+            "output_bytes",
+            id="at044d-c-bytes-bool",
         ),
         pytest.param(
             "span_inverted",
@@ -566,6 +571,8 @@ def test_at044d_parse_rejections_one_named_error(
         group["output_bytes"] = -1
     elif mutate == "output_bytes_nonint":
         group["output_bytes"] = "four"
+    elif mutate == "output_bytes_bool":
+        group["output_bytes"] = True
     elif mutate == "span_inverted":
         group["regions"][0] = {"start": "0x200", "end": "0x100"}
     elif mutate == "span_zero_length":

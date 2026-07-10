@@ -439,8 +439,11 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
     """
     Summary:
         Build a typed :class:`CrcConfig` from a parsed JSON object, parsing
-        each int field from hex-string-or-int and each region's three address
-        fields the same way.
+        each int field from hex-string-or-int: the legacy ``regions`` (each
+        region's three address fields, tolerant pre-batch-32 rules) and the
+        batch-32 ``groups`` (strict rules via :func:`_build_group`), under
+        the at-least-one-of presence rule and the total-span-count ceiling
+        (:data:`CRC_SPAN_COUNT_CEILING`).
 
     Args:
         data (dict[str, Any]): The parsed top-level JSON object.
@@ -451,18 +454,25 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
     Raises:
         KeyError: A required field is missing.
         TypeError: A field has the wrong JSON type (e.g. ``reverse`` not a
-            bool, ``regions`` not a list, a region not an object).
-        ValueError: An int field is not a base-16-parseable string/int.
+            bool, ``regions``/``groups`` not a list, an entry not an object).
+        ValueError: An int field is not a base-16-parseable string/int;
+            neither ``regions`` nor ``groups`` is present and non-empty; a
+            group rule violation (see :func:`_build_group`); or the total
+            declared span count exceeds the ceiling — the ceiling applies to
+            the COMBINED count, so a pathological >4096-region legacy-only
+            config is now also rejected (recorded as part of the batch-32
+            §6.5 amendment #1).
 
     Data Flow:
-        - Called by :func:`read_crc_config` inside its fault-collecting guard;
-          any exception here becomes a single collected error string.
+        - Called by :func:`parse_crc_config` inside its fault-collecting
+          guard; any exception here becomes a single collected error string.
 
     Dependencies:
         Uses:
             - _parse_int
+            - _build_group
         Used by:
-            - read_crc_config
+            - parse_crc_config
     """
     reverse = data["reverse"]
     if not isinstance(reverse, bool):
@@ -587,7 +597,7 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
                 "the 32-bit address space"
             )
         if end <= start:
-            # N5: an inverted/empty span is always a typo — accepted, it
+            # N5: an inverted/empty span is always a typo — if accepted, it
             # would contribute zero bytes AND zero absent-count, so no
             # coverage note could ever fire (a fully silent divergence).
             raise ValueError(
@@ -597,7 +607,15 @@ def _build_group(index: int, raw_group: Any) -> CrcGroup:
         spans.append((start, end))
 
     output_bytes_raw = raw_group.get("output_bytes", 4)
-    output_bytes = _parse_int(output_bytes_raw)
+    try:
+        output_bytes = _parse_int(output_bytes_raw)
+    except ValueError:
+        # Re-raise with the field named — _parse_int's raw message ("invalid
+        # literal ...") gives the operator no field/group to look at.
+        raise ValueError(
+            f"group {index}: 'output_bytes' must be one of "
+            f"{list(ALLOWED_OUTPUT_BYTES)}, got {output_bytes_raw!r}"
+        ) from None
     if output_bytes not in ALLOWED_OUTPUT_BYTES:
         raise ValueError(
             f"group {index}: 'output_bytes' must be one of "
