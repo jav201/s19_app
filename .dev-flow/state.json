@@ -4,7 +4,7 @@
     "batch_id": "2026-07-09-batch-33",
     "batch_objective": "B-02 (P1, baseline backlog 2026-07-09): patch-editor check results explain themselves. (1) OPERATOR-DECIDED behavior change (round-3, 2026-07-09): drop the collective has_errors taint -- only entries carrying an attributable error become uncheckable (each with reason_code + display reason); healthy entries still checked; wrong document kind stays a whole-run block with ONE loud run-level reason; genuinely document-global faults still block with a reason. (2) Reason taxonomy on CheckRunEntry/CheckRunResult (doc-kind, doc-fault, entry-fault, partial, outside, no-image), rendered in check rows + status. (3) Checks help affordance extension. (4) In-batch: scrub the markup-enabled log-label funnel (pre-existing CHG-KIND-UNKNOWN C-17 exposure). Section 6.5 before/after for the taint change; apply gate explicitly untouched.",
     "current_phase": 6,
-    "phase_status": "in-progress",
+    "phase_status": "awaiting-sync",
     "standing_authorization": "Same session model as batches 29/31/32 (operator: 'Punch it' 3-lane dispatch; 'Merged, continue!'; round-3 taint decision message; '/dev-flow-sync and continue'): run phases autonomously -- each gate = do work, present packet in-conversation, self-approve under this auth, advance; report ALL decisions. GUARDRAILS: full suite + engine-frozen guards + independent code-review GREEN before PR; NO self-merge (operator merges); snapshot regen canonical-CI-only; 0 engine-frozen diffs; propose-not-encode controls. Draft defaults adopted pending override: Q1 collision entries stay uncheckable-with-reason; Q2 report Reason column deferred (to_dict keys land, no-consumer state named).",
     "route": "full /dev-flow (behavior change to shipped semantics + C-17 surfaces). Successor to batch-32 (CRC groups, PR #60 merged dd91941, synced).",
     "iterations_per_phase": {
@@ -28,6 +28,12 @@
     },
     "rc1": "PASS @ dd91941 (2026-07-09). feat/batch-33-check-reasons cut from origin/main tip dd91941 (batch-32 squash) + 1 docs commit (batch-32 vault-sync state flag riding this branch). Already-shipped check: check.py:166 still carries the collective not_runnable gate; CheckRunEntry (changes/model.py:574-625) has NO reason field; R-CHK-001 (REQUIREMENTS.md:1631-1654) still specifies the apply-gate-mirror behavior -> nothing shipped. All 36 draft citations re-verified at this tip (01b Task A: 33 exact, 3 line-drift-only).",
     "decisions_log": [
+        {
+            "phase": 6,
+            "date": "2026-07-09",
+            "decision": "approved",
+            "notes": "Under standing auth. 06-docs complete: traceability-matrix (both chains + C-18 table, 21 node names grep-verified with file:line), functionality.md (taxonomy, two-set gate + B-1 rationale, three-surface census, mermaid flow), executive-summary.md. State -> awaiting-sync; /dev-flow-sync after the operator merges the PR."
+        },
         {
             "phase": 5,
             "date": "2026-07-09",
