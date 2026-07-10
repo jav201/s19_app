@@ -244,8 +244,12 @@ Screen {
     height: 1fr;
 }
 
+/* batch-31 AC-5 (B-06): the work-area file list shares the left pane
+ * elastically instead of the former fixed 8-row cap, so taller terminals
+ * show more files. Sections and files split the remainder 1:1; at 80x24
+ * both stay scrollable, preserving the C-13 geometry budget. */
 #ws_left #files_list {
-    height: 8;
+    height: 1fr;
 }
 
 /* --- A2L Explorer 2-pane re-layout (batch-02 increment 6 / 13, LLR-009.1) -
@@ -910,6 +914,15 @@ Screen {
     width: 100%;
     height: auto;
     padding: 0 1;
+}
+
+/* batch-31 AC-4 (B-05): the paste-a-change-set TextArea previously had no
+ * height rule and collapsed to 1-2 visible lines inside its grid cell.
+ * A fixed 8-line editor keeps multi-line JSON readable; the enclosing
+ * pane scrolls (`overflow-y: auto`), so the fixed height cannot clip
+ * siblings out of the pane budget. */
+#patch_paste_text {
+    height: 8;
 }
 
 /* US-029 (HLR-032): the Checks affordance's one-line clarity row states what

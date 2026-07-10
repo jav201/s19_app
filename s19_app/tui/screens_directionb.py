@@ -755,6 +755,36 @@ class MapCell(Static):
         self.cell_end = cell_end
         self.status = status
 
+    def render(self) -> Text:
+        """
+        Summary:
+            Render the cell as a run of ``█`` glyphs filling the cell's
+            current content width, so adjacent cells form a contiguous band
+            instead of lone centered glyphs separated by blank grid-track
+            columns (batch-31 AC-6 / B-15).
+
+        Returns:
+            Text: A markup-safe run of ``_CELL_GLYPH`` sized to the content
+            width (minimum one glyph before layout has assigned a size).
+
+        Data Flow:
+            - Called by Textual on every (re)render, including after resize,
+              so the fill tracks the live grid-track width; colour still comes
+              solely from the ``sev-*`` CSS class on the widget.
+
+        Dependencies:
+            Uses:
+                - ``safe_text`` (markup-safe constant glyph, C-17-consistent)
+            Used by:
+                - Textual render dispatch
+
+        Example:
+            >>> MapCell(0, 16, "valid", "map-cell sev-ok").render().plain
+            '█'
+        """
+        width = max(1, self.content_size.width)
+        return safe_text(_CELL_GLYPH * width)
+
     def on_click(self) -> None:
         """Post :class:`Selected` when the cell is clicked."""
         self.focus()

@@ -7150,3 +7150,99 @@ def test_tc_042_12_memory_strip_touches_no_frozen_path() -> None:
     # No frozen engine module is imported into the strip's home module namespace
     # under a colour/parse alias (the strip colours only via status_to_css_class).
     assert app_module.status_to_css_class is sdb.status_to_css_class
+
+
+# ---------------------------------------------------------------------------
+# batch-31 (fast-dev-flow P1 quick strike) — Inc-1 geometry.
+#
+# AC-5 (B-06): the Workspace work-area file list is elastic (was a fixed
+# 8-row cap), so taller terminals show more files.
+# AC-6 (B-15): Memory Map cells render as a contiguous band — each cell
+# fills its grid track with glyphs instead of one centered glyph flanked
+# by blank columns.
+# ---------------------------------------------------------------------------
+
+
+def test_ac5_files_list_grows_beyond_legacy_cap(tmp_path: Path) -> None:
+    """AC-5 / B-06: `#files_list` is elastic, not capped at 8 rows.
+
+    Intent: the operator reported the work-area file window was too small to
+    show the available files. The fix replaces the fixed `height: 8` with a
+    `1fr` share of `#ws_left` (AC-5 as amended after geometry measurement):
+    at 80x50 the list must exceed the old 8-row cap, and at 80x24 — where the
+    pane has only ~3 content rows and the old fixed 8 OVERFLOWED it, starving
+    the sections list — both lists must keep >= 1 visible row. A loaded file
+    is installed first because the Workspace shows its empty-state panel
+    (content hidden, heights 0) until `current_file` is set (LLR-002.3).
+    """
+
+    async def _drive(size: "tuple[int, int]") -> "tuple[int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            files_h = app.query_one("#files_list").outer_size.height
+            sections_h = app.query_one("#sections_list").outer_size.height
+            return files_h, sections_h
+
+    files_h, sections_h = asyncio.run(_drive((80, 50)))
+    assert files_h > 8, (
+        f"#files_list must exceed the legacy 8-row cap at 80x50; got {files_h}"
+    )
+    assert sections_h > 8, (
+        f"#sections_list must share the pane elastically at 80x50; got {sections_h}"
+    )
+    files_h_24, sections_h_24 = asyncio.run(_drive((80, 24)))
+    assert files_h_24 >= 1 and sections_h_24 >= 1, (
+        "at 80x24 both lists must remain visible (the old fixed 8 overflowed "
+        f"the 3-row pane); got files={files_h_24}, sections={sections_h_24}"
+    )
+
+
+def test_ac6_map_cells_render_contiguous_band(tmp_path: Path) -> None:
+    """AC-6 / B-15: adjacent map cells form a contiguous glyph band.
+
+    Intent: the operator reported the minimap stripes looked uncomfortably
+    separated. Root cause: each `MapCell` rendered a single centered `█`
+    inside a multi-column grid track, leaving blank gutter columns. The fix
+    fills each cell's content width with glyphs, so (a) every cell's render
+    equals `█ * content_width`, (b) at least one track is >= 2 columns wide
+    (the artifact zone), and (c) same-row neighbours are horizontally
+    contiguous (`right.x == left.x + left.width` with the glyph run filling
+    the width, no blank gutter remains).
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> "list[tuple[str, int, object]]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            return [
+                (cell.render().plain, cell.content_size.width, cell.region)
+                for cell in cells[:32]
+            ]
+
+    data = asyncio.run(_drive())
+    assert data, "the mounted map grid must contain cells"
+    for plain, width, _region in data:
+        assert width >= 1, "a mounted cell must have layout width"
+        assert plain == "█" * width, (
+            f"cell render must fill its content width; got {plain!r} for width {width}"
+        )
+    assert any(width >= 2 for _p, width, _r in data), (
+        "at least one grid track must be wider than 1 column at 120x30 "
+        "(otherwise this test cannot observe the old gutter artifact)"
+    )
+    regions = [r for _p, _w, r in data]
+    row_y = regions[0].y
+    same_row = sorted((r for r in regions if r.y == row_y), key=lambda r: r.x)
+    assert len(same_row) >= 2, "need >= 2 same-row cells to check contiguity"
+    for left, right in zip(same_row, same_row[1:]):
+        assert right.x == left.x + left.width, (
+            f"same-row cells must be contiguous; {left} then {right}"
+        )

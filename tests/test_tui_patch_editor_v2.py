@@ -1878,3 +1878,32 @@ def test_at032b_clarity_added_action_wiring_unchanged(tmp_path: Path) -> None:
         "pressing the Checks button must still route run_checks (behavior "
         "unchanged)"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-31 (fast-dev-flow P1 quick strike) — Inc-1 geometry, AC-4 (B-05).
+# ---------------------------------------------------------------------------
+
+
+def test_ac4_patch_paste_textarea_min_height(tmp_path: Path) -> None:
+    """AC-4 / B-05: the paste-change-set TextArea renders >= 6 lines tall.
+
+    Intent: the operator reported the JSON paste box showed only 1-2 lines
+    because `#patch_paste_text` had no CSS height rule and collapsed inside
+    its grid cell. The fix pins it to 8 lines; this AT gates the observable
+    minimum (>= 6) so a future style tweak cannot silently collapse it again.
+    """
+    from textual.widgets import TextArea
+
+    async def _drive() -> int:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            return app.query_one("#patch_paste_text", TextArea).outer_size.height
+
+    height = asyncio.run(_drive())
+    assert height >= 6, (
+        f"#patch_paste_text must render >= 6 lines (fixed height 8); got {height}"
+    )
