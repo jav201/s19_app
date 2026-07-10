@@ -17,6 +17,10 @@ from pathlib import Path
 from s19_app.core import S19File
 from s19_app.tui.changes.io import emit_s19_from_mem_map
 from s19_app.tui.changes.verify import STATUS_VERIFIED, verify_written_image
+import zlib
+
+import pytest
+
 from s19_app.tui.operations.crc import (
     DEFAULT_FINAL_XOR,
     DEFAULT_INIT,
@@ -27,12 +31,13 @@ from s19_app.tui.operations.crc import (
     check_regions,
     compute_region_crc,
     decode_le32,
+    encode_le,
     encode_le32,
     inject_crcs,
     read_stored_crc_le,
     write_crc_image,
 )
-from s19_app.tui.operations.crc_config import CrcConfig, CrcRegion
+from s19_app.tui.operations.crc_config import CrcConfig, CrcGroup, CrcRegion
 from s19_app.tui.operations.model import OperationInput
 from s19_app.tui.workspace import WORKAREA_DIRNAME, WORKAREA_SUBDIR, ensure_workarea
 
@@ -547,3 +552,462 @@ def test_crc_write_emits_16_byte_records_when_selected(tmp_path: Path) -> None:
     assert max(widths) == 16, (
         f"with bytes_per_line=16 no record may exceed 16 data bytes; widths={widths}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-32 (R-CRC-GROUP-001 / R-CRC-WIDTH-001) - group check/inject/notes/
+# report wiring (TC-203 family): AT-047a/b/c/f/g, AT-046a/b/d (operation
+# halves), AT-045c note half, AT-044a golden compat, AT-044c shipped-path
+# ordering, S-7 scope pin, AT-047d serializer.
+# ---------------------------------------------------------------------------
+
+
+def _groups_config(groups, regions=None) -> CrcConfig:
+    """A :class:`CrcConfig` with groups (and optional legacy regions), zlib defaults."""
+    return CrcConfig(
+        regions=list(regions or []),
+        polynomial=DEFAULT_POLYNOMIAL,
+        init=DEFAULT_INIT,
+        reverse=DEFAULT_REVERSE,
+        final_xor=DEFAULT_FINAL_XOR,
+        groups=list(groups),
+    )
+
+
+def test_at047a_mixed_check_per_target_verdicts_and_order(tmp_path: Path) -> None:
+    """AT-047a + AT-044c (shipped check path): a mixed config reports one
+    result per target - legacy region FIRST, then groups (file order) - with
+    per-target matched True/False and each result carrying its
+    output_address and output_bytes (TC-203.1)."""
+    payload_a = bytes(range(0x40, 0x60))  # 32B @ 0x1000
+    payload_b = bytes(range(0x80, 0x90))  # 16B @ 0x2000
+    mem = _mem_from_bytes(0x1000, payload_a)
+    mem.update(_mem_from_bytes(0x2000, payload_b))
+    group_match_crc = zlib.crc32(payload_a[:8] + payload_b[:8])
+    # Stored value for the MATCHING group (width 2 -> low 2 bytes) @ 0x3000.
+    mem.update(_mem_from_bytes(0x3000, encode_le(group_match_crc, 2)))
+    # Stored value for the MISMATCHING group @ 0x3010 (wrong bytes).
+    mem.update(_mem_from_bytes(0x3010, b"\xde\xad\xbe\xef"))
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020), (0x2000, 0x2010), (0x3000, 0x3014)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[
+            CrcGroup(spans=((0x1000, 0x1008), (0x2000, 0x2008)),
+                     output_address=0x3000, output_bytes=2),
+            CrcGroup(spans=((0x2008, 0x2010),), output_address=0x3010,
+                     output_bytes=4),
+        ],
+        regions=[CrcRegion(start=0x1000, end=0x1010, output_address=0x5000)],
+    )
+    results = check_regions(op_input, config)
+    assert [r.output_address for r in results] == [0x5000, 0x3000, 0x3010]
+    assert [r.output_bytes for r in results] == [4, 2, 4]
+    legacy, grp_match, grp_mismatch = results
+    assert legacy.matched is None  # nothing stored at 0x5000
+    assert grp_match.matched is True
+    assert grp_match.computed_crc == group_match_crc
+    assert grp_mismatch.matched is False
+
+
+def test_at045c_gap_note_names_group_and_count_legacy_stays_silent() -> None:
+    """AT-045c (note half) + Q4/AT-044a branch: a gapped GROUP span emits ONE
+    aggregate coverage note naming the group and absent count; a gapped
+    LEGACY region in the same run emits nothing (TC-203.2)."""
+    payload = bytes(range(0x20, 0x40))  # 32B @ 0x1000
+    mem = _mem_from_bytes(0x1000, payload)
+    del mem[0x1005]
+    del mem[0x1006]
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1010),), output_address=0x4000,
+                         output_bytes=4)],
+        regions=[CrcRegion(start=0x1000, end=0x1010, output_address=0x5000)],
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    # C-18: the SAME node owns the AT's compute clause — the group CRC covers
+    # present bytes only (offsets 0x05/0x06 absent).
+    group_entry = result.crc_regions[1]  # legacy first, then the group
+    assert group_entry.computed_crc == zlib.crc32(
+        payload[0x00:0x05] + payload[0x07:0x10]
+    )
+    coverage_notes = [n for n in result.notes if "absent byte(s)" in n]
+    assert len(coverage_notes) == 1, (
+        f"exactly ONE coverage note (group only, never legacy); got {result.notes}"
+    )
+    assert "CRC group 1" in coverage_notes[0]
+    assert "2 absent byte(s)" in coverage_notes[0]
+    assert "present bytes only" in coverage_notes[0]
+
+
+@pytest.mark.parametrize("width", [1, 2])
+def test_at046b_truncation_note_per_narrow_width(width: int) -> None:
+    """AT-046b (note half): width < 4 fires one truncation warning naming the
+    target; widths 4/8 fire none (TC-203.3, parametrized per width)."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[
+            CrcGroup(spans=((0x1000, 0x1010),), output_address=0x4000,
+                     output_bytes=width),
+            CrcGroup(spans=((0x1010, 0x1020),), output_address=0x4010,
+                     output_bytes=8),
+        ]
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    trunc = [n for n in result.notes if "truncates the 32-bit CRC" in n]
+    assert len(trunc) == 1
+    assert "0x00004000" in trunc[0]
+    assert f"output bytes {width}" in trunc[0]
+
+
+def test_at047c_group_self_overlap_warns_and_completes() -> None:
+    """AT-047c: a GROUP whose output window overlaps its own input span (by
+    exactly 1 byte at span end, B10) warns with the self-overlap wording and
+    the run still yields results for every target (TC-203.4)."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1010),), output_address=0x100F,
+                         output_bytes=4)]
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    own = [n for n in result.notes if "its own input span" in n]
+    assert len(own) == 1 and "0x0000100F" in own[0]
+    assert result.crc_regions is not None and len(result.crc_regions) == 1
+
+
+def test_at047g_cross_target_overlap_distinct_warning() -> None:
+    """AT-047g: a group's output window inside ANOTHER target's input span
+    warns with the cross-target wording (distinct from self-overlap) and the
+    run completes with all results (TC-203.5)."""
+    payload = bytes(range(0x10, 0x50))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1040)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[
+            CrcGroup(spans=((0x1000, 0x1010),), output_address=0x1020,
+                     output_bytes=4),
+            CrcGroup(spans=((0x1020, 0x1030),), output_address=0x5000,
+                     output_bytes=4),
+        ]
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    cross = [n for n in result.notes if "another target's input span" in n]
+    assert len(cross) == 1 and "0x00001020" in cross[0]
+    assert not any("its own input span" in n for n in result.notes)
+    assert len(result.crc_regions) == 2
+
+
+def test_s7_scope_pin_legacy_self_overlap_stays_silent() -> None:
+    """S-7 scope pin (Phase-2 F-2) / AT-044a notes half: a LEGACY-only config
+    whose output sits inside its own region (the committed dummy-config
+    pattern) emits ZERO overlap/coverage/truncation notes - the notes list
+    is exactly the legacy summary (TC-203.6)."""
+    payload = bytes(range(0x10, 0x50))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1040)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _default_config(
+        [CrcRegion(start=0x1000, end=0x1040, output_address=0x103C)]
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    assert result.notes == [
+        "CRC: 1 region(s): 0 matched, 1 mismatched, 0 no-stored-value"
+    ]
+
+
+def test_at047f_all_computes_precede_all_writes(tmp_path: Path) -> None:
+    """AT-047f / S-6: when target 1's output window lies INSIDE target 2's
+    input span (and target 1 is evaluated first per the Q3 order - the m-5
+    precondition), target 2's computed CRC and injected bytes reflect the
+    ORIGINAL pristine bytes, not target 1's write (TC-203.7). A naive
+    compute-inject-compute loop fails this."""
+    payload = bytes(range(0x10, 0x50))  # 64B @ 0x1000
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1040)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    # Group 1 (evaluated first) writes INTO [0x1020, 0x1024) - inside
+    # group 2's span [0x1020, 0x1030).
+    config = _groups_config(
+        groups=[
+            CrcGroup(spans=((0x1000, 0x1010),), output_address=0x1020,
+                     output_bytes=4),
+            CrcGroup(spans=((0x1020, 0x1030),), output_address=0x5000,
+                     output_bytes=4),
+        ]
+    )
+    pristine_g2 = zlib.crc32(payload[0x20:0x30])
+    results = check_regions(op_input, config)
+    # m-5 precondition named: g1 (overlapping output) evaluates before g2.
+    assert [r.output_address for r in results] == [0x1020, 0x5000]
+    assert results[1].computed_crc == pristine_g2
+    working_mem, _ranges, written = inject_crcs(op_input, results)
+    injected_g2 = bytes(working_mem[0x5000 + i] for i in range(4))
+    assert injected_g2 == encode_le(pristine_g2, 4), (
+        "target 2's injected value must be the pristine-input CRC"
+    )
+
+
+def test_at046a_inject_width8_zero_extends_and_extends_ranges() -> None:
+    """AT-046a: width 8 writes exactly 8 LE bytes (low 4 = CRC, high 4 =
+    0x00) at a gapped output and the working ranges gain [out, out+8)
+    (TC-203.8; B7/B9 in-gap extension at width != 4)."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1020),), output_address=0x2000,
+                         output_bytes=8)]
+    )
+    results = check_regions(op_input, config)
+    working_mem, working_ranges, written = inject_crcs(op_input, results)
+    new_keys = set(working_mem) - set(op_input.mem_map)
+    assert new_keys == set(range(0x2000, 0x2008))
+    crc = zlib.crc32(payload)
+    assert bytes(working_mem[0x2000 + i] for i in range(8)) == encode_le(crc, 8)
+    assert bytes(working_mem[0x2004 + i] for i in range(4)) == b"\x00" * 4
+    assert (0x2000, 0x2008) in working_ranges
+    assert written[0].written is True and written[0].output_bytes == 8
+
+
+def test_at046d_check_absent_stored_byte_tri_state_operation_half() -> None:
+    """AT-046d (operation half): one absent byte of the N stored bytes on
+    check yields stored_value None / matched None without raising
+    (TC-203.9)."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    mem.update(_mem_from_bytes(0x2000, b"\x01\x02\x03\x04\x05\x06\x07"))  # 7 of 8
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020), (0x2000, 0x2007)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1020),), output_address=0x2000,
+                         output_bytes=8)]
+    )
+    result = check_regions(op_input, config)[0]
+    assert result.stored_value is None and result.matched is None
+
+
+def test_at047b_write_reread_groups_c12(tmp_path: Path) -> None:
+    """AT-047b - the C-12 output-then-consume joined node (TC-203.10):
+    drive the SHIPPED write_crc_image path with a MIXED legacy+groups config
+    (one group width 8, one width 2 - the m-6 non-default-width pin), take
+    the emitted path FROM THE RESULT, re-read with a fresh S19File parse,
+    and decode exactly output_bytes LE bytes at each target's output
+    address, asserting equality against BOTH the run's computed_crc AND an
+    independent zlib oracle; verify_status is verified on the same result.
+    """
+    payload = bytes(range(0x10, 0x50))  # 64B @ 0x1000
+    op_input = _contiguous_op_input(0x1000, payload)
+    config = _groups_config(
+        groups=[
+            CrcGroup(spans=((0x1000, 0x1010), (0x1020, 0x1030)),
+                     output_address=0x2000, output_bytes=8),
+            CrcGroup(spans=((0x1030, 0x1040),), output_address=0x2010,
+                     output_bytes=2),
+        ],
+        regions=[CrcRegion(start=0x1000, end=0x1020, output_address=0x2020)],
+    )
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+    assert result.written_path is not None and result.written_path.exists()
+    assert result.verify_status == STATUS_VERIFIED
+
+    reread = S19File(str(result.written_path)).get_memory_map()
+
+    oracle_g1 = zlib.crc32(payload[0x00:0x10] + payload[0x20:0x30])
+    oracle_g2 = zlib.crc32(payload[0x30:0x40]) & 0xFFFF
+    oracle_legacy = zlib.crc32(payload[0x00:0x20])
+    expectations = [
+        (0x2020, 4, oracle_legacy),   # legacy first (result order)
+        (0x2000, 8, oracle_g1),
+        (0x2010, 2, oracle_g2),
+    ]
+    by_addr = {r.output_address: r for r in result.crc_regions}
+    for addr, width, oracle in expectations:
+        stored = bytes(reread[addr + i] for i in range(width))
+        assert stored == encode_le(oracle, width), (
+            f"on-disk bytes at 0x{addr:X} must decode to the oracle CRC"
+        )
+        run_result = by_addr[addr]
+        mask = (1 << (8 * width)) - 1
+        assert (run_result.computed_crc & mask) == oracle
+        assert run_result.output_bytes == width
+
+
+def test_at044a_legacy_gapped_golden_compat(tmp_path: Path) -> None:
+    """AT-044a - the compat pin (must PASS pre- and post-change): a
+    legacy-only config over a GAPPED region produces the FROZEN golden
+    results (literal values derived from the independent zlib oracle at
+    authoring time, never recomputed through the pipeline under test),
+    exactly the one summary note (zero new notes - the Q4 branch), the
+    unchanged serializer keys, and a verified on-disk write whose stored
+    bytes decode to the golden (TC-203.11)."""
+    payload = bytes(range(0x10, 0x50))  # 64B @ 0x1000
+    mem = _mem_from_bytes(0x1000, payload)
+    del mem[0x1015]  # the gap: legacy path must stay SILENT about it
+    # Ranges reflect the gap (the parse layer derives ranges from present
+    # keys; emit_s19_from_mem_map requires every in-range address present).
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1015), (0x1016, 0x1040)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    config = _default_config(
+        [CrcRegion(start=0x1000, end=0x1020, output_address=0x1038)]
+    )
+    # FROZEN golden (m-4): literal captured at authoring and DOUBLE-PROVEN by
+    # the increment reviewer against the pre-change engine at origin/main
+    # 551fc77 (zlib oracle == pre-change compute_region_crc == HEAD).
+    golden = 0x156424B4
+    assert golden == zlib.crc32(payload[0x00:0x15] + payload[0x16:0x20])
+
+    result = CrcOperation().execute(op_input, config=config)
+    assert result.notes == [
+        "CRC: 1 region(s): 0 matched, 1 mismatched, 0 no-stored-value"
+    ]
+    entry = result.crc_regions[0]
+    assert entry.computed_crc == golden
+    assert entry.output_bytes == 4  # legacy default
+    serialized = result.to_dict()["crc_regions"][0]
+    assert set(serialized) == {
+        "output_address", "computed_crc", "stored_value", "matched",
+        "written", "output_bytes",
+    }
+
+    write_result = write_crc_image(op_input, config, workarea_base=tmp_path)
+    assert write_result.verify_status == STATUS_VERIFIED
+    reread = S19File(str(write_result.written_path)).get_memory_map()
+    assert bytes(reread[0x1038 + i] for i in range(4)) == encode_le(golden, 4)
+
+
+# ---------------------------------------------------------------------------
+# batch-32 Phase-4 C-18 reconciliation — single-node realizations for the ATs
+# whose clauses previously lived in parts (TC-205 family).
+# ---------------------------------------------------------------------------
+
+
+def test_at045d_single_span_group_equals_legacy_end_to_end(tmp_path: Path) -> None:
+    """AT-045d — the equivalence bridge as ONE node (TC-205.1): a 1-span
+    group with output_bytes 4 yields the SAME computed CRC, check verdict,
+    and injected bytes as the legacy region over the identical
+    (start, end, output_address)."""
+    payload = bytes(range(0x30, 0x70))
+    mem = _mem_from_bytes(0x1000, payload)
+    mem.update(_mem_from_bytes(0x2000, bytes([0x11, 0x22, 0x33, 0x44])))
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1040), (0x2000, 0x2004)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    legacy_cfg = _default_config(
+        [CrcRegion(start=0x1000, end=0x1020, output_address=0x2000)]
+    )
+    group_cfg = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1020),), output_address=0x2000,
+                         output_bytes=4)]
+    )
+    legacy_res = check_regions(op_input, legacy_cfg)[0]
+    group_res = check_regions(op_input, group_cfg)[0]
+    assert group_res.computed_crc == legacy_res.computed_crc
+    assert group_res.stored_value == legacy_res.stored_value
+    assert group_res.matched == legacy_res.matched
+
+    legacy_mem, _r1, _w1 = inject_crcs(op_input, [legacy_res])
+    group_mem, _r2, _w2 = inject_crcs(op_input, [group_res])
+    assert legacy_mem == group_mem, "injected bytes must be identical"
+
+
+def test_at046a_width8_through_the_shipped_write_path(tmp_path: Path) -> None:
+    """AT-046a as ONE node (TC-205.2): confirm-write (the shipped
+    write_crc_image path) with output_bytes 8 lands exactly 8 LE bytes on
+    disk (low 4 = CRC, high 4 = 0x00) and the emitted records cover the
+    full [out, out+8) window (the range-extension observable)."""
+    payload = bytes(range(0x10, 0x30))
+    op_input = _contiguous_op_input(0x1000, payload)
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1020),), output_address=0x3000,
+                         output_bytes=8)]
+    )
+    result = write_crc_image(op_input, config, workarea_base=tmp_path)
+    assert result.verify_status == STATUS_VERIFIED
+    reread = S19File(str(result.written_path)).get_memory_map()
+    crc = zlib.crc32(payload)
+    stored = bytes(reread[0x3000 + i] for i in range(8))
+    assert stored == encode_le(crc, 8)
+    assert stored[4:] == bytes(4)
+    assert not any((0x3000 + 8 + i) in reread for i in range(4)), (
+        "exactly 8 bytes, not more, at the output window"
+    )
+
+
+def test_at046b_truncated_compare_matches_low_bytes() -> None:
+    """AT-046b compare clause in the note node's chain (TC-205.3): a stored
+    field holding exactly the low-N CRC bytes MATCHES at width N (the
+    compared value is the truncated CRC), and the truncation note fires."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    crc = zlib.crc32(payload[:0x10])
+    mem.update(_mem_from_bytes(0x4000, encode_le(crc, 2)))
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020), (0x4000, 0x4002)],
+        input_path=None, variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1010),), output_address=0x4000,
+                         output_bytes=2)]
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    entry = result.crc_regions[0]
+    assert entry.matched is True, (
+        "a stored low-2-byte CRC must MATCH at width 2 (truncated compare)"
+    )
+    assert any("truncates the 32-bit CRC" in n for n in result.notes)
+
+
+def test_at047d_to_dict_through_a_real_mixed_run() -> None:
+    """AT-047d as ONE node (TC-205.4): serialize a REAL mixed-run result —
+    each target entry includes output_bytes; the legacy entry keeps the
+    five pre-batch-32 keys with unchanged values plus output_bytes == 4."""
+    payload = bytes(range(0x10, 0x30))
+    mem = _mem_from_bytes(0x1000, payload)
+    op_input = OperationInput(
+        mem_map=mem, ranges=[(0x1000, 0x1020)], input_path=None,
+        variant_id=None, file_type="s19",
+    )
+    config = _groups_config(
+        groups=[CrcGroup(spans=((0x1000, 0x1010),), output_address=0x5000,
+                         output_bytes=8)],
+        regions=[CrcRegion(start=0x1000, end=0x1020, output_address=0x6000)],
+    )
+    result = CrcOperation().execute(op_input, config=config)
+    entries = result.to_dict()["crc_regions"]
+    assert [e["output_bytes"] for e in entries] == [4, 8]
+    legacy = entries[0]
+    assert set(legacy) == {
+        "output_address", "computed_crc", "stored_value", "matched",
+        "written", "output_bytes",
+    }
+    assert legacy["output_address"] == 0x6000
+    assert legacy["written"] is False and legacy["matched"] is None

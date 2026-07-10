@@ -851,3 +851,190 @@ def test_crc_write_honours_selected_16_width_through_confirm(tmp_path: Path) -> 
         f"selecting 16 must cap record width at 16 (selector honoured end-to-end); "
         f"widths={widths}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-32 (R-CRC-GROUP-001 / R-CRC-WIDTH-001) - Layer-B group ATs through
+# the shipped TUI handler (TC-204 family): AT-047e (check + hostile input),
+# AT-047h (confirm-write flow, non-default width).
+# ---------------------------------------------------------------------------
+
+_GROUP_SPAN_1 = (0x1000, 0x1002)
+_GROUP_SPAN_2 = (0x1002, 0x1004)
+_GROUP_OUTPUT = 0x2000
+
+
+def _group_config_text(*, output_bytes: int, stored_matches: bool = True) -> str:
+    """A mixed legacy+group config over the fixture image (group width var)."""
+    return (
+        "{"
+        '"polynomial":"0x04C11DB7","init":"0xFFFFFFFF",'
+        '"reverse":true,"final_xor":"0xFFFFFFFF",'
+        f'"regions":[{{"start":"0x{_REGION_START:X}","end":"0x{_REGION_END:X}",'
+        f'"output_address":"0x{_OUTPUT_ADDRESS:X}"}}],'
+        f'"groups":[{{"regions":[{{"start":"0x{_GROUP_SPAN_1[0]:X}","end":"0x{_GROUP_SPAN_1[1]:X}"}},'
+        f'{{"start":"0x{_GROUP_SPAN_2[0]:X}","end":"0x{_GROUP_SPAN_2[1]:X}"}}],'
+        f'"output_address":"0x{_GROUP_OUTPUT:X}","output_bytes":{output_bytes}}}]'
+        "}"
+    )
+
+
+def _write_group_fixture_s19(
+    tmp_path: Path, *, output_bytes: int, stored_matches: bool
+) -> Path:
+    """Fixture with stored bytes for BOTH the legacy region and the group."""
+    import zlib as _zlib
+
+    legacy_crc = compute_region_crc(_DATA, _REGION_START, _REGION_END)
+    group_stream = bytes(
+        _DATA[a] for a in range(*_GROUP_SPAN_1)
+    ) + bytes(_DATA[a] for a in range(*_GROUP_SPAN_2))
+    group_crc = _zlib.crc32(group_stream)
+    if not stored_matches:
+        group_crc ^= 0xFFFFFFFF
+
+    mem_map = dict(_DATA)
+    for offset, byte in enumerate(encode_le32(legacy_crc)):
+        mem_map[_OUTPUT_ADDRESS + offset] = byte
+    mask = (1 << (8 * output_bytes)) - 1
+    stored_group = (group_crc & mask).to_bytes(output_bytes, "little")
+    for offset, byte in enumerate(stored_group):
+        mem_map[_GROUP_OUTPUT + offset] = byte
+    ranges = [
+        (_REGION_START, _REGION_END),
+        (_OUTPUT_ADDRESS, _OUTPUT_ADDRESS + 4),
+        (_GROUP_OUTPUT, _GROUP_OUTPUT + output_bytes),
+    ]
+    path = tmp_path / "group_fixture.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="utf-8")
+    return path
+
+
+def test_at047e_group_check_reaches_surface_via_handler(tmp_path: Path) -> None:
+    """AT-047e (TC-204.1): a GROUPS config entered into the shipped
+    `#operation_config` TextArea and driven through the real Execute handler
+    surfaces the per-group verdict row AND the group notes (here the width-2
+    truncation warning) on `#operation_result_status`. Non-vacuous: the
+    mismatch fixture flips the group row to MISMATCH.
+    """
+
+    async def _drive(stored_matches: bool) -> str:
+        s19_path = _write_group_fixture_s19(
+            tmp_path, output_bytes=2, stored_matches=stored_matches
+        )
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            screen.query_one("#operation_config", TextArea).text = (
+                _group_config_text(output_bytes=2)
+            )
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+
+    status = asyncio.run(_drive(True))
+    assert f"region @ 0x{_GROUP_OUTPUT:08X}" in status, status
+    assert "truncates the 32-bit CRC" in status, (
+        f"the group truncation note must reach the surface; got {status}"
+    )
+    # Both targets (legacy + group) matched on the matching fixture.
+    assert "MISMATCH" not in status, status
+
+    status_mismatch = asyncio.run(_drive(False))
+    assert "MISMATCH" in status_mismatch, status_mismatch
+
+
+def test_at047e_hostile_config_value_renders_literal(tmp_path: Path) -> None:
+    """AT-047e hostile-input case (LLR-GRP-001.12 / security F4, C-17): a
+    config whose invalid field value is a Rich-markup payload surfaces the
+    named-field parse error VERBATIM (brackets intact, no style leak, no
+    MarkupError crash) on the markup=False result surface."""
+    hostile = "[red]x[/red]"
+
+    async def _drive() -> str:
+        s19_path = _write_fixture_s19(tmp_path, stored_matches=True)
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            config_text = (
+                "{"
+                '"polynomial":"0x04C11DB7","init":"0xFFFFFFFF",'
+                '"reverse":true,"final_xor":"0xFFFFFFFF",'
+                '"groups":[{"regions":[{"start":"0x1000","end":"0x1004"}],'
+                f'"output_address":"0x2000","output_bytes":"{hostile}"}}]'
+                "}"
+            )
+            screen.query_one("#operation_config", TextArea).text = config_text
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+
+    status = asyncio.run(_drive())
+    assert hostile in status, (
+        f"the hostile payload must render literally in the error; got {status}"
+    )
+    assert "output_bytes" in status, "the error must still name the field"
+    assert "MATCH" not in status, "a config error must never read as a check"
+
+
+def test_at047h_group_confirm_write_flow_and_row_text(tmp_path: Path) -> None:
+    """AT-047h (TC-204.2): a mixed config with a non-default group width (2)
+    driven through the REAL Write button + ConfirmWriteScreen confirm emits
+    the file on disk with the group CRC in exactly 2 LE bytes at the group
+    output, and the result surface renders the parameterized
+    "(2 LE bytes)" write row beside the legacy "(4 LE bytes)" row."""
+    import zlib as _zlib
+
+    async def _drive() -> "tuple[str, Path]":
+        s19_path = _write_group_fixture_s19(
+            tmp_path, output_bytes=2, stored_matches=True
+        )
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await _load_file(app, pilot, s19_path)
+            screen = await _open_crc_screen(app, pilot)
+            screen.query_one("#operation_config", TextArea).text = (
+                _group_config_text(output_bytes=2)
+            )
+            screen.query_one("#operations_execute", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await _press_write_and_handle_modal(app, pilot, screen, confirm=True)
+            await _flush(pilot)
+            status = str(
+                screen.query_one("#operation_result_status", Static).content
+            )
+            emitted = _emitted_s19_files(app.base_dir)
+            assert len(emitted) == 1, f"exactly one emitted file; got {emitted}"
+            return status, emitted[0]
+
+    status, emitted_path = asyncio.run(_drive())
+    assert "(2 LE bytes)" in status, status
+    assert "(4 LE bytes)" in status, status
+    assert "wrote" in status and "(verified)" in status, status
+
+    from s19_app.core import S19File as _S19File
+
+    reread = _S19File(str(emitted_path)).get_memory_map()
+    group_stream = bytes(
+        _DATA[a] for a in range(*_GROUP_SPAN_1)
+    ) + bytes(_DATA[a] for a in range(*_GROUP_SPAN_2))
+    oracle = _zlib.crc32(group_stream) & 0xFFFF
+    stored = bytes(reread[_GROUP_OUTPUT + i] for i in range(2))
+    assert stored == oracle.to_bytes(2, "little"), (
+        "the on-disk group bytes must decode to the oracle CRC low bytes"
+    )

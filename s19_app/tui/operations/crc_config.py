@@ -25,7 +25,7 @@ and uncontained-by-design (F-S-02), at parity with ``read_change_document``.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Optional
 
@@ -52,9 +52,43 @@ DUMMY_CONFIG_TEXT: str = """{
   "regions": [
     { "start": "0x00010000", "end": "0x00020000", "output_address": "0x0001FFFC" },
     { "start": "0x00020000", "end": "0x00030000", "output_address": "0x0002FFFC" }
+  ],
+  "groups": [
+    {
+      "regions": [
+        { "start": "0x00030000", "end": "0x00034000" },
+        { "start": "0x00040000", "end": "0x00042000" }
+      ],
+      "output_address": "0x00042000",
+      "output_bytes": 4
+    }
   ]
 }
 """
+
+
+#: Allowed values for a group's ``output_bytes`` field (batch-32
+#: LLR-GRP-001.3 / R-CRC-WIDTH-001): the stored CRC field is 1, 2, 4, or 8
+#: little-endian bytes; 4 is the default and matches the legacy fixed codec.
+ALLOWED_OUTPUT_BYTES: tuple[int, ...] = (1, 2, 4, 8)
+
+#: Parse-time ceiling on the TOTAL declared span count —
+#: ``len(regions) + sum(len(group spans))`` (batch-32 LLR-GRP-001.14,
+#: security F1). Each declared span costs a full ``mem_map`` scan in
+#: ``region_segments`` (O(spans x image bytes) overall), so this ceiling is
+#: deliberately TIGHTER than the change-document ``MF_ENTRY_COUNT_CEILING``
+#: (whose entries are O(1) each): generous for any real firmware layout,
+#: while bounding the compute a pathological config can demand.
+CRC_SPAN_COUNT_CEILING: int = 4096
+
+#: Exclusive upper bound of the 32-bit S19 address space (batch-32
+#: LLR-GRP-001.15, security F2): group span/output ints must be
+#: non-negative and fit the space, including the output WINDOW
+#: (``output_address + output_bytes``), or the S19 emitter would produce a
+#: structurally corrupt record that only surfaces as a baffling
+#: verify-mismatch. Legacy ``regions`` keep their tolerant parse (strict
+#: AT-044a compat) — the bound applies to groups only.
+_ADDRESS_SPACE_END: int = 0x1_0000_0000
 
 
 @dataclass(frozen=True)
@@ -88,29 +122,68 @@ class CrcRegion:
 
 
 @dataclass(frozen=True)
+class CrcGroup:
+    """
+    Summary:
+        One configured CRC GROUP (batch-32, R-CRC-GROUP-001): an ordered
+        list of half-open ``(start, end)`` spans whose present bytes are
+        concatenated IN DECLARED ORDER and fed through ONE CRC computation,
+        paired with the single output address and LE byte width at which
+        that one CRC is read (check) or written (inject).
+
+    Args:
+        spans (tuple[tuple[int, int], ...]): The declared spans, in file
+            order. Each is inclusive-start / exclusive-end, matching the
+            ``CrcRegion`` convention. Declared order is authoritative —
+            spans are never address-sorted or deduplicated (S-1/S-2).
+        output_address (int): The single address the group's CRC occupies.
+        output_bytes (int): The stored field width in little-endian bytes —
+            one of :data:`ALLOWED_OUTPUT_BYTES`; defaults to 4 at parse.
+
+    Data Flow:
+        - Built by :func:`_build_group` from one JSON ``groups`` entry.
+
+    Dependencies:
+        Used by:
+            - _build_config (constructs the list)
+            - the CRC engine group compute / check / inject paths
+    """
+
+    spans: tuple[tuple[int, int], ...]
+    output_address: int
+    output_bytes: int
+
+
+@dataclass(frozen=True)
 class CrcConfig:
     """
     Summary:
         The typed CRC operation config parsed from the operator-supplied JSON:
         the algorithm parameter set (polynomial, init, reverse flag, final
-        XOR) and the list of CRC regions (§6.2 D-3).
+        XOR), the list of legacy per-region CRC targets (§6.2 D-3), and the
+        list of multi-span single-CRC groups (batch-32, R-CRC-GROUP-001).
 
     Args:
-        regions (list[CrcRegion]): The configured CRC regions, in file order.
+        regions (list[CrcRegion]): The configured legacy CRC regions, in file
+            order. Optional in the JSON since batch-32 — but at least one of
+            ``regions`` / ``groups`` must be present and non-empty.
         polynomial (int): The CRC32 polynomial.
         init (int): The CRC register initial value.
         reverse (bool): ``True`` selects standard reflected-input/output
             (refin/refout) semantics — the zlib/PKZIP convention.
         final_xor (int): The value XOR'd into the final register (xorout).
+        groups (list[CrcGroup]): The configured multi-span groups, in file
+            order; empty for a legacy-only config (byte-identical behavior
+            to the pre-batch-32 system).
 
     Data Flow:
         - Returned by :func:`read_crc_config` on a successful parse; consumed
-          by the CRC engine to compute one CRC per region.
+          by the CRC engine to compute one CRC per region and one per group.
 
     Dependencies:
         Used by:
             - read_crc_config (constructs it)
-            - the CRC engine entry point (consumes params + regions)
+            - the CRC engine entry point (consumes params + regions + groups)
     """
 
     regions: list[CrcRegion]
@@ -118,6 +191,7 @@ class CrcConfig:
     init: int
     reverse: bool
     final_xor: int
+    groups: list[CrcGroup] = field(default_factory=list)
 
 
 def _parse_int(value: Any) -> int:
@@ -375,8 +449,11 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
     """
     Summary:
         Build a typed :class:`CrcConfig` from a parsed JSON object, parsing
-        each int field from hex-string-or-int and each region's three address
-        fields the same way.
+        each int field from hex-string-or-int: the legacy ``regions`` (each
+        region's three address fields, tolerant pre-batch-32 rules) and the
+        batch-32 ``groups`` (strict rules via :func:`_build_group`), under
+        the at-least-one-of presence rule and the total-span-count ceiling
+        (:data:`CRC_SPAN_COUNT_CEILING`).
 
     Args:
         data (dict[str, Any]): The parsed top-level JSON object.
@@ -387,28 +464,42 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
     Raises:
         KeyError: A required field is missing.
         TypeError: A field has the wrong JSON type (e.g. ``reverse`` not a
-            bool, ``regions`` not a list, a region not an object).
-        ValueError: An int field is not a base-16-parseable string/int.
+            bool, ``regions``/``groups`` not a list, an entry not an object).
+        ValueError: An int field is not a base-16-parseable string/int;
+            neither ``regions`` nor ``groups`` is present and non-empty; a
+            group rule violation (see :func:`_build_group`); or the total
+            declared span count exceeds the ceiling — the ceiling applies to
+            the COMBINED count, so a pathological >4096-region legacy-only
+            config is now also rejected (recorded as part of the batch-32
+            §6.5 amendment #1).
 
     Data Flow:
-        - Called by :func:`read_crc_config` inside its fault-collecting guard;
-          any exception here becomes a single collected error string.
+        - Called by :func:`parse_crc_config` inside its fault-collecting
+          guard; any exception here becomes a single collected error string.
 
     Dependencies:
         Uses:
             - _parse_int
+            - _build_group
         Used by:
-            - read_crc_config
+            - parse_crc_config
     """
     reverse = data["reverse"]
     if not isinstance(reverse, bool):
         raise TypeError("field 'reverse' must be a boolean")
 
-    raw_regions = data["regions"]
+    raw_regions = data.get("regions", [])
     if not isinstance(raw_regions, list):
         raise TypeError("field 'regions' must be a list")
-    if not raw_regions:
-        raise ValueError("field 'regions' must contain at least one region")
+    raw_groups = data.get("groups", [])
+    if not isinstance(raw_groups, list):
+        raise TypeError("field 'groups' must be a list")
+    # §6.5 amendment #1 (batch-32): the pre-batch-32 rule "field 'regions'
+    # must contain at least one region" widens to at-least-one-of.
+    if not raw_regions and not raw_groups:
+        raise ValueError(
+            "at least one of 'regions' / 'groups' must be present and non-empty"
+        )
 
     regions: list[CrcRegion] = []
     for index, raw_region in enumerate(raw_regions):
@@ -422,10 +513,138 @@ def _build_config(data: dict[str, Any]) -> CrcConfig:
             )
         )
 
+    groups: list[CrcGroup] = []
+    for index, raw_group in enumerate(raw_groups):
+        groups.append(_build_group(index, raw_group))
+
+    total_spans = len(regions) + sum(len(group.spans) for group in groups)
+    if total_spans > CRC_SPAN_COUNT_CEILING:
+        raise ValueError(
+            f"config declares {total_spans} spans, over the "
+            f"{CRC_SPAN_COUNT_CEILING}-span ceiling"
+        )
+
     return CrcConfig(
         regions=regions,
         polynomial=_parse_int(data["polynomial"]),
         init=_parse_int(data["init"]),
         reverse=reverse,
         final_xor=_parse_int(data["final_xor"]),
+        groups=groups,
+    )
+
+
+def _build_group(index: int, raw_group: Any) -> CrcGroup:
+    """
+    Summary:
+        Build one typed :class:`CrcGroup` from a JSON ``groups`` entry,
+        enforcing the batch-32 group-strict validation rules (LLR-GRP-001.3
+        / .15): span shape, N5 inverted-span rejection, N6 stray
+        ``output_address`` rejection, the :data:`ALLOWED_OUTPUT_BYTES` set,
+        and the 32-bit address-space bounds (including the output WINDOW
+        ``output_address + output_bytes``). Legacy ``regions`` deliberately
+        do NOT pass through these bounds (strict AT-044a compat).
+
+    Args:
+        index (int): The group's 0-based position in the ``groups`` list;
+            error strings render it 1-BASED (matching the 1-based "CRC group
+            N" diagnostic notes so operators cross-reference one numbering).
+        raw_group (Any): The raw JSON value for this ``groups`` entry.
+
+    Returns:
+        CrcGroup: The fully-validated group.
+
+    Raises:
+        KeyError: A required field (``regions``, ``output_address``, a span's
+            ``start``/``end``) is missing.
+        TypeError: A field has the wrong JSON type.
+        ValueError: A rule violation — empty span list, inverted span (N5),
+            stray ``output_address`` in a span (N6), ``output_bytes`` outside
+            the allowed set, or an out-of-address-space value. Callers catch
+            all three and convert to one collected error string.
+
+    Data Flow:
+        - Called per ``groups`` entry by :func:`_build_config` inside the
+          fault-collecting guard of :func:`parse_crc_config`.
+
+    Dependencies:
+        Uses:
+            - _parse_int
+        Used by:
+            - _build_config
+    """
+    if not isinstance(raw_group, dict):
+        raise TypeError(f"group {index + 1} must be a JSON object")
+
+    raw_spans = raw_group["regions"]
+    if not isinstance(raw_spans, list):
+        raise TypeError(f"group {index + 1}: field 'regions' must be a list")
+    if not raw_spans:
+        raise ValueError(f"group {index + 1}: field 'regions' must not be empty")
+
+    spans: list[tuple[int, int]] = []
+    for span_index, raw_span in enumerate(raw_spans):
+        if not isinstance(raw_span, dict):
+            raise TypeError(f"group {index + 1} span {span_index + 1} must be a JSON object")
+        if "output_address" in raw_span:
+            # N6 tripwire: this key's presence is the signature of a legacy
+            # region pasted into a group (its author expects per-span CRCs).
+            # Targeted rejection on this ONE key only — general unknown-key
+            # tolerance is unchanged.
+            raise ValueError(
+                f"group {index + 1} span {span_index + 1}: 'output_address' is not "
+                "allowed inside a group span (a group has exactly one "
+                "output_address)"
+            )
+        start = _parse_int(raw_span["start"])
+        end = _parse_int(raw_span["end"])
+        if start < 0:
+            raise ValueError(
+                f"group {index + 1} span {span_index + 1}: 'start' must be non-negative"
+            )
+        if end > _ADDRESS_SPACE_END:
+            raise ValueError(
+                f"group {index + 1} span {span_index + 1}: 'end' (0x{end:X}) exceeds "
+                "the 32-bit address space"
+            )
+        if end <= start:
+            # N5: an inverted/empty span is always a typo — if accepted, it
+            # would contribute zero bytes AND zero absent-count, so no
+            # coverage note could ever fire (a fully silent divergence).
+            raise ValueError(
+                f"group {index + 1} span {span_index + 1}: 'end' (0x{end:X}) must be "
+                f"greater than 'start' (0x{start:X})"
+            )
+        spans.append((start, end))
+
+    output_bytes_raw = raw_group.get("output_bytes", 4)
+    try:
+        output_bytes = _parse_int(output_bytes_raw)
+    except ValueError:
+        # Re-raise with the field named — _parse_int's raw message ("invalid
+        # literal ...") gives the operator no field/group to look at.
+        raise ValueError(
+            f"group {index + 1}: 'output_bytes' must be one of "
+            f"{list(ALLOWED_OUTPUT_BYTES)}, got {output_bytes_raw!r}"
+        ) from None
+    if output_bytes not in ALLOWED_OUTPUT_BYTES:
+        raise ValueError(
+            f"group {index + 1}: 'output_bytes' must be one of "
+            f"{list(ALLOWED_OUTPUT_BYTES)}, got {output_bytes_raw!r}"
+        )
+
+    output_address = _parse_int(raw_group["output_address"])
+    if output_address < 0:
+        raise ValueError(f"group {index + 1}: 'output_address' must be non-negative")
+    if output_address + output_bytes > _ADDRESS_SPACE_END:
+        raise ValueError(
+            f"group {index + 1}: output window [0x{output_address:X}, "
+            f"0x{output_address:X}+{output_bytes}) exceeds the 32-bit "
+            "address space"
+        )
+
+    return CrcGroup(
+        spans=tuple(spans),
+        output_address=output_address,
+        output_bytes=output_bytes,
     )

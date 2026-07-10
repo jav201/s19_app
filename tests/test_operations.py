@@ -355,6 +355,10 @@ def test_operation_result_widened_field_count_and_status_domain(tmp_path):
 
     serialized = result.to_dict()
     assert serialized == result.to_dict()
+    # batch-32 (AT-047d / LLR-GRP-001.11): entries GAIN "output_bytes"
+    # (defaulted 4 for legacy constructions); the pre-existing five keys and
+    # their values are unchanged — this pin was rewritten-in-place for the
+    # widened contract (counted in the batch-32 ledger).
     assert serialized["crc_regions"] == [
         {
             "output_address": 0x100,
@@ -362,6 +366,7 @@ def test_operation_result_widened_field_count_and_status_domain(tmp_path):
             "stored_value": 0xDEADBEEF,
             "matched": True,
             "written": False,
+            "output_bytes": 4,
         }
     ]
 

@@ -11,13 +11,19 @@ no real firmware config is ever referenced.
 
 from __future__ import annotations
 
+import json as _json
 from pathlib import Path
 
 from unittest import mock
 
+import pytest
+
 from s19_app.tui.operations.crc_config import (
+    ALLOWED_OUTPUT_BYTES,
+    CRC_SPAN_COUNT_CEILING,
     DUMMY_CONFIG_TEXT,
     CrcConfig,
+    CrcGroup,
     CrcRegion,
     parse_crc_config,
     read_crc_config,
@@ -381,3 +387,266 @@ def test_parse_crc_config_missing_field_collects_one_error() -> None:
 
     assert config is None
     assert len(errors) == 1
+
+
+# ---------------------------------------------------------------------------
+# batch-32 (R-CRC-GROUP-001 / R-CRC-WIDTH-001) - `groups` schema parsing.
+#
+# TC-201-family: AT-044b value round-trip; AT-044d parametrized parse
+# rejections (LLR-GRP-001.2/.3/.14/.15 incl. the N5/N6 REJECT decisions, the
+# span-count ceiling and the 32-bit bounds). All values SYNTHETIC.
+# ---------------------------------------------------------------------------
+
+def _groups_config_text(groups, regions=None):
+    """Build synthetic config JSON text with the standard dummy params."""
+    payload = {
+        "polynomial": "0x04C11DB7",
+        "init": "0xFFFFFFFF",
+        "reverse": True,
+        "final_xor": "0xFFFFFFFF",
+        "groups": groups,
+    }
+    if regions is not None:
+        payload["regions"] = regions
+    return _json.dumps(payload)
+
+
+def test_at044b_group_values_round_trip_hex_and_int() -> None:
+    """AT-044b: a parsed group round-trips its declared values (TC-201.1).
+
+    Intent: "populated + no errors" alone cannot fail against a
+    field-dropping parser - the span list (declared order preserved),
+    output_address and output_bytes must all round-trip, with numeric
+    fields accepted BOTH as hex strings and as native ints.
+    """
+    text = _groups_config_text(
+        [
+            {
+                "regions": [
+                    {"start": "0x00030000", "end": "0x00034000"},
+                    {"start": 0x00040000, "end": 0x00042000},
+                ],
+                "output_address": "0x00042000",
+                "output_bytes": 8,
+            }
+        ]
+    )
+    config, errors = parse_crc_config(text)
+    assert errors == []
+    assert config is not None
+    assert config.groups == [
+        CrcGroup(
+            spans=((0x30000, 0x34000), (0x40000, 0x42000)),
+            output_address=0x42000,
+            output_bytes=8,
+        )
+    ]
+    assert config.regions == []
+
+
+def test_at044b_output_bytes_defaults_to_4_when_omitted() -> None:
+    """AT-046c (parse half): an omitted output_bytes parses as 4 (TC-201.2)."""
+    text = _groups_config_text(
+        [
+            {
+                "regions": [{"start": "0x100", "end": "0x200"}],
+                "output_address": "0x1FC",
+            }
+        ]
+    )
+    config, errors = parse_crc_config(text)
+    assert errors == []
+    assert config is not None and config.groups[0].output_bytes == 4
+
+
+def test_legacy_only_config_still_parses_with_empty_groups() -> None:
+    """Compat sanity (feeds AT-044a): legacy-only text parses; groups == [].
+
+    Uses a legacy-only literal — since Inc-4 the DUMMY pre-fill deliberately
+    demonstrates BOTH forms (AT-044e), so it is no longer legacy-only.
+    """
+    legacy_only = _json.dumps(
+        {
+            "polynomial": "0x04C11DB7",
+            "init": "0xFFFFFFFF",
+            "reverse": True,
+            "final_xor": "0xFFFFFFFF",
+            "regions": [
+                {"start": "0x100", "end": "0x200", "output_address": "0x1FC"}
+            ],
+        }
+    )
+    config, errors = parse_crc_config(legacy_only)
+    assert errors == []
+    assert config is not None and config.groups == []
+
+
+def test_at044e_dummy_prefill_demonstrates_both_forms() -> None:
+    """AT-044e: the updated DUMMY pre-fill parses cleanly AND demonstrates
+    both a legacy region and a group (format guidance self-validating;
+    extends — never replaces — the existing dummy-prefill mirror test)."""
+    config, errors = parse_crc_config(DUMMY_CONFIG_TEXT)
+    assert errors == []
+    assert config is not None
+    assert len(config.regions) >= 1, "the pre-fill must keep a legacy region"
+    assert len(config.groups) >= 1, "the pre-fill must demonstrate a group"
+    assert len(config.groups[0].spans) >= 2, (
+        "the demo group should show the multi-span shape"
+    )
+
+
+@pytest.mark.parametrize(
+    "mutate, expect_fragment",
+    [
+        pytest.param(
+            "drop_both_keys",
+            "at least one of",
+            id="at044d-a-neither-key",
+        ),
+        pytest.param(
+            "both_keys_empty",
+            "at least one of",
+            id="at044d-a-both-empty",
+        ),
+        pytest.param(
+            "empty_group_regions",
+            "must not be empty",
+            id="at044d-b-empty-group-spans",
+        ),
+        pytest.param("output_bytes_0", "output_bytes", id="at044d-c-bytes-0"),
+        pytest.param("output_bytes_3", "output_bytes", id="at044d-c-bytes-3"),
+        pytest.param(
+            "output_bytes_negative", "output_bytes", id="at044d-c-bytes-neg"
+        ),
+        pytest.param(
+            "output_bytes_nonint",
+            "output_bytes",
+            id="at044d-c-bytes-nonint",
+        ),
+        pytest.param(
+            "output_bytes_bool",
+            "output_bytes",
+            id="at044d-c-bytes-bool",
+        ),
+        pytest.param(
+            "span_inverted",
+            "must be greater than",
+            id="at044d-n5-inverted-span",
+        ),
+        pytest.param(
+            "span_zero_length",
+            "must be greater than",
+            id="at044d-n5-zero-length-span",
+        ),
+        pytest.param(
+            "span_stray_output_address",
+            "not allowed inside a group span",
+            id="at044d-n6-stray-output-address",
+        ),
+        pytest.param(
+            "span_count_over_ceiling",
+            "span ceiling",
+            id="at044d-d-span-ceiling",
+        ),
+        pytest.param(
+            "start_negative", "must be non-negative", id="at044d-e-neg-start"
+        ),
+        pytest.param(
+            "end_over_32bit",
+            "exceeds the 32-bit address space",
+            id="at044d-e-end-over-space",
+        ),
+        pytest.param(
+            "output_window_over_32bit",
+            "exceeds the 32-bit",
+            id="at044d-e-window-over-space",
+        ),
+    ],
+)
+def test_at044d_parse_rejections_one_named_error(
+    mutate: str, expect_fragment: str
+) -> None:
+    """AT-044d: each faulty shape yields (None, [exactly one error naming the
+    offending rule]) without raising (TC-201.3, parametrized per branch so
+    one passing case cannot mask another; LLR-GRP-001.2/.3/.14/.15).
+    """
+    base_span = {"start": "0x100", "end": "0x200"}
+    payload = {
+        "polynomial": "0x04C11DB7",
+        "init": "0xFFFFFFFF",
+        "reverse": True,
+        "final_xor": "0xFFFFFFFF",
+        "groups": [
+            {
+                "regions": [dict(base_span)],
+                "output_address": "0x1FC",
+                "output_bytes": 4,
+            }
+        ],
+    }
+    group = payload["groups"][0]
+    if mutate == "drop_both_keys":
+        payload.pop("groups")
+    elif mutate == "both_keys_empty":
+        payload["groups"] = []
+        payload["regions"] = []
+    elif mutate == "empty_group_regions":
+        group["regions"] = []
+    elif mutate == "output_bytes_0":
+        group["output_bytes"] = 0
+    elif mutate == "output_bytes_3":
+        group["output_bytes"] = 3
+    elif mutate == "output_bytes_negative":
+        group["output_bytes"] = -1
+    elif mutate == "output_bytes_nonint":
+        group["output_bytes"] = "four"
+    elif mutate == "output_bytes_bool":
+        group["output_bytes"] = True
+    elif mutate == "span_inverted":
+        group["regions"][0] = {"start": "0x200", "end": "0x100"}
+    elif mutate == "span_zero_length":
+        group["regions"][0] = {"start": "0x100", "end": "0x100"}
+    elif mutate == "span_stray_output_address":
+        group["regions"][0] = {
+            "start": "0x100",
+            "end": "0x200",
+            "output_address": "0x1FC",
+        }
+    elif mutate == "span_count_over_ceiling":
+        group["regions"] = [
+            {"start": hex(0x1000 + 16 * i), "end": hex(0x1000 + 16 * i + 8)}
+            for i in range(CRC_SPAN_COUNT_CEILING + 1)
+        ]
+    elif mutate == "start_negative":
+        group["regions"][0] = {"start": -1, "end": "0x200"}
+    elif mutate == "end_over_32bit":
+        group["regions"][0] = {"start": "0x100", "end": "0x100000001"}
+    elif mutate == "output_window_over_32bit":
+        group["output_address"] = "0xFFFFFFFD"
+        group["output_bytes"] = 8
+    else:  # pragma: no cover - guard against a typo'd param
+        raise AssertionError(f"unknown mutation {mutate}")
+
+    config, errors = parse_crc_config(_json.dumps(payload))
+    assert config is None
+    assert len(errors) == 1, f"exactly one collected error; got {errors}"
+    assert expect_fragment in errors[0], (
+        f"error must name the offending rule; got {errors[0]!r}"
+    )
+
+
+def test_at044b_allowed_output_bytes_all_parse() -> None:
+    """N3 boundary: every allowed width in {1,2,4,8} parses cleanly (TC-201.4)."""
+    for width in ALLOWED_OUTPUT_BYTES:
+        text = _groups_config_text(
+            [
+                {
+                    "regions": [{"start": "0x100", "end": "0x200"}],
+                    "output_address": "0x300",
+                    "output_bytes": width,
+                }
+            ]
+        )
+        config, errors = parse_crc_config(text)
+        assert errors == [], f"width {width} must parse; got {errors}"
+        assert config is not None and config.groups[0].output_bytes == width
