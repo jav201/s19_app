@@ -148,6 +148,12 @@ class CrcRegionResult:
             compare.
         written (bool): Whether the inject path wrote this CRC to
             ``output_address`` (``False`` on the non-mutating check path).
+        output_bytes (int): The stored-field width in little-endian bytes
+            (batch-32, LLR-GRP-001.10) — 4 for every legacy region (the
+            default, so all pre-batch-32 constructions stay valid), 1/2/4/8
+            for a group target. The inject path (and the screens re-inject,
+            which holds only the result, never the config) derives the
+            write width from THIS field.
 
     Returns:
         None: Dataclass container.
@@ -176,6 +182,7 @@ class CrcRegionResult:
     stored_value: Optional[int]
     matched: Optional[bool]
     written: bool
+    output_bytes: int = 4
 
 
 @dataclass
@@ -340,6 +347,7 @@ class OperationResult:
                         "stored_value": region.stored_value,
                         "matched": region.matched,
                         "written": region.written,
+                        "output_bytes": region.output_bytes,
                     }
                     for region in self.crc_regions
                 ]

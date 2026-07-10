@@ -721,28 +721,158 @@ def check_regions(
         True
     """
     results: list[CrcRegionResult] = []
-    for region in config.regions:
-        computed = compute_region_crc(
+    for target in normalized_targets(config):
+        # batch-32 (LLR-GRP-001.7): one uniform loop over the normalized
+        # targets. A legacy region is a single-span width-4 target, for
+        # which compute_group_crc == compute_region_crc (the AT-045d
+        # equivalence bridge) and the mask is a 32-bit no-op — the legacy
+        # results are byte-identical to the pre-batch-32 path (AT-044a).
+        computed = compute_group_crc(
             op_input.mem_map,
-            region.start,
-            region.end,
+            target.spans,
             polynomial=config.polynomial,
             init=config.init,
             reverse=config.reverse,
             final_xor=config.final_xor,
         )
-        stored = read_stored_crc_le(op_input, region.output_address)
-        matched = None if stored is None else (stored == computed)
+        stored = read_stored_crc_le(
+            op_input, target.output_address, target.output_bytes
+        )
+        # LLR-WID-001.5 compare rule: the stored field holds the low
+        # 8*N bits (N <= 4); at N = 8 the decoded 64-bit value must equal
+        # the zero-extended 32-bit CRC (high bytes != 0 => mismatch, which
+        # the direct equality below gives for free).
+        mask = (1 << (8 * target.output_bytes)) - 1
+        matched = None if stored is None else (stored == (computed & mask))
         results.append(
             CrcRegionResult(
-                output_address=region.output_address,
+                output_address=target.output_address,
                 computed_crc=computed,
                 stored_value=stored,
                 matched=matched,
                 written=False,
+                output_bytes=target.output_bytes,
             )
         )
     return results
+
+
+def crc_diagnostics(op_input: OperationInput, config: CrcConfig) -> list[str]:
+    """
+    Summary:
+        Build the batch-32 group diagnostic notes (LLR-GRP-001.6/.8,
+        LLR-WID-001.3) for one config over one input: per-group gap
+        coverage, per-target truncation warnings, and group-involved
+        overlap warnings. A legacy-only config yields ``[]`` — legacy
+        regions NEVER emit any of these notes (Q4 / S-7 scope pin, AT-044a
+        strict compat).
+
+    Args:
+        op_input (OperationInput): The neutral input; ``mem_map`` is read
+            only to count present bytes per declared span.
+        config (CrcConfig): The parsed config (regions + groups).
+
+    Returns:
+        list[str]: Zero or more plain-text notes, in stable order: coverage
+        notes (group file order), truncation notes (target order), overlap
+        notes (pair order). All interpolated values are ints — no
+        file-derived text reaches these strings (C-17 posture; the notes
+        surface renders ``markup=False``).
+
+    Data Flow:
+        - Per GROUP target: absent count = Σ(span length − present bytes)
+          via :func:`region_segments`; > 0 → ONE aggregate note naming the
+          group, its gapped spans and the total (never one note per span).
+        - Per target with ``output_bytes`` < 4 → one truncation warning
+          (only groups can carry a non-4 width).
+        - Per target pair where ≥1 member is a GROUP: self-overlap
+          (output window vs own spans) and cross-target overlap (window vs
+          the other target's spans) get distinct wordings. Legacy-only
+          pairs stay silent — the committed dummy config's legacy regions
+          self-overlap by design.
+
+    Dependencies:
+        Uses:
+            - normalized_targets
+            - region_segments
+        Used by:
+            - CrcOperation.execute (notes assembly)
+            - write_crc_image (via the execute check path)
+            - tests/test_crc_operation.py (AT-045c/046b/047c/047g notes)
+
+    Example:
+        >>> from .crc_config import CrcConfig, CrcRegion
+        >>> op_input = OperationInput(
+        ...     mem_map={0: 1}, ranges=[(0, 1)], input_path=None,
+        ...     variant_id=None, file_type="s19",
+        ... )
+        >>> cfg = CrcConfig(
+        ...     regions=[CrcRegion(0, 1, 0x10)], polynomial=0x04C11DB7,
+        ...     init=0xFFFFFFFF, reverse=True, final_xor=0xFFFFFFFF,
+        ... )
+        >>> crc_diagnostics(op_input, cfg)
+        []
+    """
+    targets = normalized_targets(config)
+    notes: list[str] = []
+
+    group_number = 0
+    for target in targets:
+        if not target.is_group:
+            continue
+        group_number += 1
+        total_absent = 0
+        gapped_spans: list[str] = []
+        for start, end in target.spans:
+            present = sum(
+                len(segment)
+                for segment in region_segments(op_input.mem_map, start, end)
+            )
+            absent = (end - start) - present
+            if absent > 0:
+                total_absent += absent
+                gapped_spans.append(f"[0x{start:X}, 0x{end:X})")
+        if total_absent > 0:
+            notes.append(
+                f"CRC group {group_number}: {total_absent} absent byte(s) in "
+                f"declared span(s) {', '.join(gapped_spans)} — the CRC "
+                "covers present bytes only"
+            )
+
+    for target in targets:
+        if target.output_bytes < LE32_WIDTH:
+            notes.append(
+                f"CRC target at 0x{target.output_address:08X}: output bytes "
+                f"{target.output_bytes} truncates the 32-bit CRC to the low "
+                "byte(s) — weakened error detection"
+            )
+
+    def _window_overlaps(window: tuple[int, int], spans: tuple) -> bool:
+        w_start, w_end = window
+        return any(w_start < end and start < w_end for start, end in spans)
+
+    for i, target in enumerate(targets):
+        window = (
+            target.output_address,
+            target.output_address + target.output_bytes,
+        )
+        if target.is_group and _window_overlaps(window, target.spans):
+            notes.append(
+                f"CRC target at 0x{target.output_address:08X}: output window "
+                "overlaps one of its own input spans — a write invalidates "
+                "the just-computed CRC"
+            )
+        for j, other in enumerate(targets):
+            if j == i or not (target.is_group or other.is_group):
+                continue
+            if _window_overlaps(window, other.spans):
+                notes.append(
+                    f"CRC target at 0x{target.output_address:08X}: output "
+                    f"window overlaps another target's input span — that "
+                    "target's stored-vs-computed comparison becomes "
+                    "flash-order-dependent"
+                )
+    return notes
 
 
 #: Suffix appended to the input file stem for the auto-generated emitted-S19
@@ -918,9 +1048,14 @@ def inject_crcs(
     written_regions: list[CrcRegionResult] = []
 
     for region in crc_regions:
-        payload = encode_le32(region.computed_crc)
+        # batch-32 (LLR-GRP-001.9/.10): the write width comes from the
+        # RESULT field — never re-parsed config/editor text — so the
+        # screens re-inject path (which holds only results) writes the
+        # same bytes. Legacy results default to 4 (byte-identical path).
+        width = region.output_bytes
+        payload = encode_le(region.computed_crc, width)
         addresses = range(
-            region.output_address, region.output_address + LE32_WIDTH
+            region.output_address, region.output_address + width
         )
         range_index = build_sorted_range_index(working_ranges)
         in_a_range = all(
@@ -932,7 +1067,7 @@ def inject_crcs(
             working_ranges = _extend_ranges(
                 working_ranges,
                 region.output_address,
-                region.output_address + LE32_WIDTH,
+                region.output_address + width,
             )
         written_regions.append(
             CrcRegionResult(
@@ -941,6 +1076,7 @@ def inject_crcs(
                 stored_value=region.stored_value,
                 matched=region.matched,
                 written=True,
+                output_bytes=width,
             )
         )
 
@@ -1296,7 +1432,11 @@ class CrcOperation(Operation):
             notes = ["CRC: no config supplied — nothing to check"]
         else:
             crc_regions = check_regions(op_input, config)
+            # batch-32: the summary keeps its exact legacy wording (a
+            # legacy-only config's notes stay byte-identical, AT-044a);
+            # group diagnostics append AFTER it and are [] for legacy-only.
             notes = [_summarize_check(crc_regions)]
+            notes.extend(crc_diagnostics(op_input, config))
         return OperationResult(
             operation_id=self.operation_id,
             status="ok",
