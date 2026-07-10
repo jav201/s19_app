@@ -91,6 +91,7 @@ if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
     from ..changes.model import ChangeSummaryEntry
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
+from ..changes.display import format_memory_value
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from .report_service import (
     REPORT_CONTEXT_BYTES_DEFAULT,
@@ -277,12 +278,45 @@ def _md_cell(value: object) -> str:
     return _strip_ctl(value).replace("|", "\\|")
 
 
+def _md_table_cell(value: object) -> str:
+    """
+    Summary:
+        Sanitize a FILE-BYTE-derived value for a Markdown table cell
+        (batch-34 B-10, security F1): like :func:`_md_cell` but escaping
+        the backslash FIRST — adjacent ``\\|`` bytes under plain
+        :func:`_md_cell` become ``\\\\|`` where Markdown reads a literal
+        backslash followed by a LIVE cell delimiter, silently shifting the
+        row's columns. Scoped to the Before/After byte cells only:
+        :func:`_provenance_lines` keeps :func:`_md_cell` because its output
+        is backtick-wrapped, where doubled backslashes would corrupt
+        Windows paths.
+
+    Args:
+        value (object): The raw cell text (hex + ASCII rendering).
+
+    Returns:
+        str: Cell-safe text — control characters stripped, ``\\`` doubled,
+        every ``|`` escaped.
+
+    Dependencies:
+        Uses:
+            - _strip_ctl
+        Used by:
+            - _linkage_table_lines (Before/After cells)
+    """
+    return (
+        _strip_ctl(value).replace("\\", "\\\\").replace("|", "\\|")
+    )
+
+
 def _bytes_cell(values: Optional[Sequence[int]]) -> str:
     """
     Summary:
-        Render an entry's before/after byte run for a linkage-table cell.
-        ``None`` (a create-into-hole entry — no prior bytes were read) renders
-        the explicit marker, never fabricated bytes (LLR-038.1).
+        Render an entry's before/after byte run for a linkage-table cell —
+        hex tokens PLUS the ASCII companion (batch-34 B-10, operator ask:
+        text-valued patches readable at a glance). ``None`` (a
+        create-into-hole entry — no prior bytes were read) renders the
+        explicit marker, never fabricated bytes (LLR-038.1).
 
     Args:
         values (Optional[Sequence[int]]): ``ChangeSummaryEntry.before_bytes``
@@ -290,17 +324,26 @@ def _bytes_cell(values: Optional[Sequence[int]]) -> str:
             non-``applied`` or hole-creating entry.
 
     Returns:
-        str: Space-separated uppercase hex bytes, ``(none - created into
-        hole)`` for ``None``, or ``-`` for an empty run.
+        str: ``"41 42 43 |ABC|"`` — space-separated uppercase hex bytes
+        followed by the pipe-delimited ASCII rendering
+        (``changes.display.format_memory_value``; non-printables as ``.``);
+        ``(none - created into hole)`` for ``None``; ``-`` for an empty
+        run. RAW text — the Markdown caller escapes via
+        :func:`_md_table_cell`, the HTML caller via :func:`_esc`.
 
     Dependencies:
+        Uses:
+            - changes.display.format_memory_value
         Used by:
             - _linkage_table_lines
             - _html_linkage
     """
     if values is None:
         return "(none - created into hole)"
-    return " ".join(f"{b:02X}" for b in values) or "-"
+    if not values:
+        return "-"
+    rendering = format_memory_value(values)
+    return f"{rendering.hex} |{rendering.ascii}|"
 
 
 def _provenance_lines(provenance: BeforeAfterProvenance) -> List[str]:
@@ -386,8 +429,8 @@ def _linkage_table_lines(
             f"| 0x{entry.address_start:08X} | 0x{entry.address_end:08X} "
             f"| {_md_cell(entry.disposition)} | {_md_cell(entry.linkage)} "
             f"| {symbol} "
-            f"| {_md_cell(_bytes_cell(entry.before_bytes))} "
-            f"| {_md_cell(_bytes_cell(entry.after_bytes))} |"
+            f"| {_md_table_cell(_bytes_cell(entry.before_bytes))} "
+            f"| {_md_table_cell(_bytes_cell(entry.after_bytes))} |"
         )
     lines.append("")
     return lines

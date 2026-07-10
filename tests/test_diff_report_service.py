@@ -825,15 +825,18 @@ def test_provenance_and_linkage_render_in_both_formats(tmp_path: Path) -> None:
         # create-into-hole marker, never fabricated bytes
         assert "(none - created into hole)" in text
         assert "CC DD" in text  # after side still real
-    # md linkage row shape: entry 1 fully tabular
+    # md linkage row shape: entry 1 fully tabular — batch-34 (AC-5,
+    # supersedes the hex-only pin): cells carry the ASCII companion with
+    # its gutter pipes escaped via _md_table_cell.
     assert (
         "| 1 | bytes | 0x00000100 | 0x00000102 | applied | mac-linked "
-        "| CAL_SYM | AA AA | 01 02 |" in md_text
+        "| CAL_SYM | AA AA \\|..\\| | 01 02 \\|..\\| |" in md_text
     )
-    # the None-before md row carries the marker cell, not hex
+    # the None-before md row carries the marker cell, not hex (marker
+    # unchanged — no fabricated ASCII).
     assert (
         "| 2 | bytes | 0x00009000 | 0x00009002 | applied | standalone "
-        "| - | (none - created into hole) | CC DD |" in md_text
+        "| - | (none - created into hole) | CC DD \\|..\\| |" in md_text
     )
     # html stays self-contained and safe with the new sections
     assert html_text.count("<script") == 0
@@ -1062,3 +1065,89 @@ def test_ac4_markdown_diff_block_format_unchanged(tmp_path: Path) -> None:
     assert "```diff" in text
     assert "-0x00000100  AA AA AA AA" in text
     assert "+0x00000100  BB BB BB BB" in text
+
+
+# ---------------------------------------------------------------------------
+# batch-34 Inc-3 (B-10) — linkage-table ASCII companions + hostile bytes.
+# ---------------------------------------------------------------------------
+
+
+def _linkage_report_pair(tmp_path: Path, entry) -> "tuple[str, str]":
+    """Generate MD + HTML with one linkage entry; return both texts."""
+    md = generate_diff_report(
+        _comparison(), mem_map_a=_mem(0x100, 0xAA, 4), mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path, now_fn=_fixed_clock, linkage_entries=[entry],
+    )
+    html_r = generate_diff_report_html(
+        _comparison(), mem_map_a=_mem(0x100, 0xAA, 4), mem_map_b=_mem(0x100, 0xBB, 4),
+        project_dir=tmp_path, now_fn=_fixed_clock, linkage_entries=[entry],
+    )
+    return (
+        md.path.read_text(encoding="utf-8"),
+        html_r.path.read_text(encoding="utf-8"),
+    )
+
+
+def test_ac5_linkage_cells_carry_ascii_companion(tmp_path: Path) -> None:
+    """AC-5: a text-valued patch renders readable — the Before/After cells
+    carry the ASCII rendering beside the hex in BOTH formats (RED-first:
+    cells were hex-only)."""
+    entry = _entry(
+        address_start=0x100,
+        address_end=0x105,
+        before_bytes=(0x52, 0x45, 0x56, 0x5F, 0x42),  # "REV_B"
+        after_bytes=(0x52, 0x45, 0x56, 0x5F, 0x43),  # "REV_C"
+    )
+    md_text, html_text = _linkage_report_pair(tmp_path, entry)
+
+    # MD: gutter pipes escaped by _md_table_cell; ASCII visible.
+    assert "52 45 56 5F 42 \\|REV_B\\|" in md_text
+    assert "52 45 56 5F 43 \\|REV_C\\|" in md_text
+    # HTML: plain pipes (inert), html-escaped path.
+    assert "52 45 56 5F 42 |REV_B|" in html_text
+    assert "52 45 56 5F 43 |REV_C|" in html_text
+
+
+def test_ac5_hostile_bytes_keep_md_table_and_html_safe(tmp_path: Path) -> None:
+    """AC-5 hostile set (security F1 counterfactual + fixtures 1/2/4/6):
+    pipe and backslash-pipe bytes keep the MD row at exactly its 9 cells
+    (plain _md_cell would leak a live delimiter on the adjacent \\| pair);
+    '<b>'-shaped bytes are escaped in HTML; non-printables render '.'."""
+    hostile = (0x5C, 0x7C, 0x3C, 0x62, 0x3E, 0x0A, 0x60)  # \ | < b > LF `
+    entry = _entry(
+        address_start=0x200,
+        address_end=0x207,
+        before_bytes=hostile,
+        after_bytes=(0x41,) * 7,
+    )
+    md_text, html_text = _linkage_report_pair(tmp_path, entry)
+
+    # The MD row still splits into exactly 9 cells: split on pipes that are
+    # NOT backslash-escaped.
+    row = next(
+        line for line in md_text.splitlines() if line.startswith("| 1 | ")
+    )
+    cells = re.split(r"(?<!\\)\|", row)
+    assert len([c for c in cells if c != ""]) == 9, (
+        f"hostile bytes must not add/remove MD columns; row: {row!r}"
+    )
+    # ASCII shows the literal printables (escaped) and '.' for LF.
+    assert "\\\\" in row  # the 0x5C byte, backslash-doubled
+    assert "." in row  # the LF placeholder
+    # HTML: tag-shaped bytes escaped, never raw.
+    assert "<b>" not in html_text
+    assert "&lt;b&gt;" in html_text
+
+
+def test_ac5_markers_unchanged(tmp_path: Path) -> None:
+    """AC-5 boundary: the None-before marker and empty-run dash render
+    exactly as before (no fabricated ASCII)."""
+    entry = _entry(
+        address_start=0x300,
+        address_end=0x302,
+        before_bytes=None,
+        after_bytes=(0x01, 0x02),
+    )
+    md_text, html_text = _linkage_report_pair(tmp_path, entry)
+    assert "(none - created into hole)" in md_text
+    assert "(none - created into hole)" in html_text
