@@ -1041,7 +1041,9 @@ def test_ac3_hostile_gutter_bytes_escaped_in_html(tmp_path: Path) -> None:
     text = result.path.read_text(encoding="utf-8")
 
     assert "<b>" not in text, "raw file-derived tag must never reach the HTML"
-    assert "&lt;b&gt;" in text
+    # Gutter chars are escaped per-fragment (escape-then-wrap), so '<' and
+    # '>' appear as individual escaped entities, never as a raw tag.
+    assert "&lt;" in text and "&gt;" in text
     assert "&amp;amp;" not in text, "no double-escaped entity"
     assert "&amp;" in text
     # The escaped gutter chars themselves carry the highlight (escape-then-wrap).
