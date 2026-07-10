@@ -240,7 +240,13 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
                 id="save_browse_row",
             ),
             Label("Project name (new folder name):", classes="modal-title"),
-            Input(placeholder="letters, numbers, - _", id="project_name"),
+            # batch-31 AC-2 (B-03): OS-clipboard paste via the bounded
+            # batch-29 funnel; the name still passes sanitize_project_name.
+            # `project_parent_path` above deliberately stays a stock Input
+            # (security mini-review scope condition — write-surface input).
+            OsClipboardInput(
+                placeholder="letters, numbers, - _", id="project_name"
+            ),
         ]
         if self._assignment_rows_enabled:
             children.append(

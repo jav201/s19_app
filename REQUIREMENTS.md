@@ -588,7 +588,14 @@ supersedes/extends R-TUI-026.
   reflow cells, xfail-until-canonical-baseline) — covers HLR-035/036/037 /
   LLR-041.1–.11
 - Status: Added in batch `2026-07-06-batch-27` (US-035/036/037 / HLR-035/036/037
-  / LLR-041.1–.11)
+  / LLR-041.1–.11). Amended in batch `2026-07-09-batch-31` (fast-dev-flow):
+  (a) AC-1/B-01 — the Open-in-Hex jump now *works for coarse cell starts*:
+  `update_hex_view` snaps the focus to the nearest present row base via
+  `_snapped_focus_row_index` (bisect; exact → at-or-after → before) instead of
+  the old exact-membership guard that silently left the window unmoved
+  (`test_ac1_open_in_hex_snaps_to_nearest_present_row`, RED-first); (b) AC-6/B-15
+  — `MapCell.render` fills the cell's content width with glyphs so the grid
+  reads as a contiguous band (`test_ac6_map_cells_render_contiguous_band`).
 
 **R-TUI-042**: Three prototype-approved (throwaway-prototype design intent,
 implemented + verified in Textual) view enhancements, all render-only over the
@@ -764,7 +771,16 @@ named-not-built LLR-044.6, not implemented this batch.
   LLR-044.1–.5). Frozen-engine diff = 0. AT-042b injects at the module-level
   `_STRATEGIES` (below the capped `read_os_clipboard`), not a wholesale
   `read_os_clipboard` monkeypatch, so the real cap runs through `action_paste`
-  (Phase-2 B-1 blocker fix). Deferred: LLR-044.6 true source bound (R-044-1);
+  (Phase-2 B-1 blocker fix). Consumers widened in batch `2026-07-09-batch-31`
+  (AC-2/B-03, security-mini-review-gated): `OsClipboardInput` now also backs the
+  patch-entry address/value/bytes inputs, the change-set path, the save-back
+  name, the A/B diff paths + report destination, and the Save-project name
+  (`project_parent_path` deliberately excluded); the funnel/cap/first-line
+  semantics are unchanged and the widened surface is covered by
+  `test_ac2_paste_reaches_all_swapped_inputs`,
+  `test_ac2_paste_reaches_project_name_input` and the hostile-paste AT
+  `test_ac2h_hostile_paste_renders_literal_and_never_crashes`.
+  Deferred: LLR-044.6 true source bound (R-044-1);
   the un-capped internal-buffer fallback `self.app.clipboard` (R-044-3, short +
   app-populated).
 

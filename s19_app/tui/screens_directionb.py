@@ -62,6 +62,7 @@ from textual.widgets import (
 
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
+from .os_clipboard_input import OsClipboardInput
 from ..validation import ValidationIssue, ValidationSeverity
 
 
@@ -94,7 +95,10 @@ class EmptyStatePanel(Static):
         'empty_state_panel'
     """
 
-    PROMPT_TEXT = "No file loaded - press Ctrl+L (or 'l') to load a file."
+    PROMPT_TEXT = (
+        "No file loaded - press Ctrl+L (or 'l') to load a file, "
+        "or 'p' to load a saved project."
+    )
 
     def __init__(self) -> None:
         super().__init__(self.PROMPT_TEXT, id="empty_state_panel", markup=False)
@@ -754,6 +758,36 @@ class MapCell(Static):
         self.cell_start = cell_start
         self.cell_end = cell_end
         self.status = status
+
+    def render(self) -> Text:
+        """
+        Summary:
+            Render the cell as a run of ``█`` glyphs filling the cell's
+            current content width, so adjacent cells form a contiguous band
+            instead of lone centered glyphs separated by blank grid-track
+            columns (batch-31 AC-6 / B-15).
+
+        Returns:
+            Text: A markup-safe run of ``_CELL_GLYPH`` sized to the content
+            width (minimum one glyph before layout has assigned a size).
+
+        Data Flow:
+            - Called by Textual on every (re)render, including after resize,
+              so the fill tracks the live grid-track width; colour still comes
+              solely from the ``sev-*`` CSS class on the widget.
+
+        Dependencies:
+            Uses:
+                - ``safe_text`` (markup-safe constant glyph, C-17-consistent)
+            Used by:
+                - Textual render dispatch
+
+        Example:
+            >>> MapCell(0, 16, "valid", "map-cell sev-ok").render().plain
+            '█'
+        """
+        width = max(1, self.content_size.width)
+        return safe_text(_CELL_GLYPH * width)
 
     def on_click(self) -> None:
         """Post :class:`Selected` when the cell is clicked."""
@@ -1785,14 +1819,20 @@ class PatchEditorPanel(ScrollableContainer):
             ),
             Container(
                 Label("Address", classes="patch-field-label"),
-                Input(placeholder="0x100", id="patch_entry_address_input"),
+                # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in Input
+                # subclass) so Ctrl+V pastes from the OS clipboard through
+                # the single bounded batch-29 funnel — here and on every
+                # swapped input below.
+                OsClipboardInput(
+                    placeholder="0x100", id="patch_entry_address_input"
+                ),
                 Label("String value", classes="patch-field-label"),
-                Input(
+                OsClipboardInput(
                     placeholder="text (document encoding)",
                     id="patch_entry_value_input",
                 ),
                 Label("Bytes", classes="patch-field-label"),
-                Input(
+                OsClipboardInput(
                     placeholder="DE AD BE EF", id="patch_entry_bytes_input"
                 ),
                 Horizontal(
@@ -1814,7 +1854,7 @@ class PatchEditorPanel(ScrollableContainer):
                     prompt="Change files in patches/",
                     allow_blank=True,
                 ),
-                Input(
+                OsClipboardInput(
                     placeholder="path to v2 change-set .json",
                     id="patch_doc_path_input",
                 ),
@@ -1889,7 +1929,7 @@ class PatchEditorPanel(ScrollableContainer):
         )
         yield Container(
             Label("Save patched image as:", classes="patch-field-label"),
-            Input(id="patch_saveback_name_input"),
+            OsClipboardInput(id="patch_saveback_name_input"),
             Horizontal(
                 Button(
                     f"Width: {self._saveback_width} bytes/line",
@@ -2425,19 +2465,19 @@ class AbDiffPanel(Container):
         yield Horizontal(
             Label("A:", classes="diff-field-label"),
             Select(empty, id="diff_select_a", allow_blank=False),
-            Input(placeholder="external path A", id="diff_path_a"),
+            OsClipboardInput(placeholder="external path A", id="diff_path_a"),
             id="diff_select_row_a",
         )
         yield Horizontal(
             Label("B:", classes="diff-field-label"),
             Select(empty, id="diff_select_b", allow_blank=False),
-            Input(placeholder="external path B", id="diff_path_b"),
+            OsClipboardInput(placeholder="external path B", id="diff_path_b"),
             id="diff_select_row_b",
         )
         yield Horizontal(
             Button("Compare", id="diff_compare_button"),
             Button("Report", id="diff_report_button"),
-            Input(
+            OsClipboardInput(
                 placeholder="report destination dir (no-project only)",
                 id="diff_report_dest",
             ),

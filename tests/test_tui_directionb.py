@@ -7150,3 +7150,264 @@ def test_tc_042_12_memory_strip_touches_no_frozen_path() -> None:
     # No frozen engine module is imported into the strip's home module namespace
     # under a colour/parse alias (the strip colours only via status_to_css_class).
     assert app_module.status_to_css_class is sdb.status_to_css_class
+
+
+# ---------------------------------------------------------------------------
+# batch-31 (fast-dev-flow P1 quick strike) — Inc-1 geometry.
+#
+# AC-5 (B-06): the Workspace work-area file list is elastic (was a fixed
+# 8-row cap), so taller terminals show more files.
+# AC-6 (B-15): Memory Map cells render as a contiguous band — each cell
+# fills its grid track with glyphs instead of one centered glyph flanked
+# by blank columns.
+# ---------------------------------------------------------------------------
+
+
+def test_ac5_files_list_grows_beyond_legacy_cap(tmp_path: Path) -> None:
+    """AC-5 / B-06: `#files_list` is elastic, not capped at 8 rows.
+
+    Intent: the operator reported the work-area file window was too small to
+    show the available files. The fix replaces the fixed `height: 8` with a
+    `1fr` share of `#ws_left` (AC-5 as amended after geometry measurement):
+    at 80x50 the list must exceed the old 8-row cap, and at 80x24 — where the
+    pane has only ~3 content rows and the old fixed 8 OVERFLOWED it, starving
+    the sections list — both lists must keep >= 1 visible row. A loaded file
+    is installed first because the Workspace shows its empty-state panel
+    (content hidden, heights 0) until `current_file` is set (LLR-002.3).
+    """
+
+    async def _drive(size: "tuple[int, int]") -> "tuple[int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            files_h = app.query_one("#files_list").outer_size.height
+            sections_h = app.query_one("#sections_list").outer_size.height
+            return files_h, sections_h
+
+    files_h, sections_h = asyncio.run(_drive((80, 50)))
+    assert files_h > 8, (
+        f"#files_list must exceed the legacy 8-row cap at 80x50; got {files_h}"
+    )
+    assert sections_h > 8, (
+        f"#sections_list must share the pane elastically at 80x50; got {sections_h}"
+    )
+    files_h_24, sections_h_24 = asyncio.run(_drive((80, 24)))
+    assert files_h_24 >= 1 and sections_h_24 >= 1, (
+        "at 80x24 both lists must remain visible (the old fixed 8 overflowed "
+        f"the 3-row pane); got files={files_h_24}, sections={sections_h_24}"
+    )
+
+
+def test_ac6_map_cells_render_contiguous_band(tmp_path: Path) -> None:
+    """AC-6 / B-15: adjacent map cells form a contiguous glyph band.
+
+    Intent: the operator reported the minimap stripes looked uncomfortably
+    separated. Root cause: each `MapCell` rendered a single centered `█`
+    inside a multi-column grid track, leaving blank gutter columns. The fix
+    fills each cell's content width with glyphs, so (a) every cell's render
+    equals `█ * content_width`, (b) at least one track is >= 2 columns wide
+    (the artifact zone), and (c) same-row neighbours are horizontally
+    contiguous (`right.x == left.x + left.width` with the glyph run filling
+    the width, no blank gutter remains).
+    """
+    from s19_app.tui.screens_directionb import MapCell
+
+    async def _drive() -> "list[tuple[str, int, object]]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _mounted_map_panel(app)
+            await pilot.pause()
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            return [
+                (cell.render().plain, cell.content_size.width, cell.region)
+                for cell in cells[:32]
+            ]
+
+    data = asyncio.run(_drive())
+    assert data, "the mounted map grid must contain cells"
+    for plain, width, _region in data:
+        assert width >= 1, "a mounted cell must have layout width"
+        assert plain == "█" * width, (
+            f"cell render must fill its content width; got {plain!r} for width {width}"
+        )
+    assert any(width >= 2 for _p, width, _r in data), (
+        "at least one grid track must be wider than 1 column at 120x30 "
+        "(otherwise this test cannot observe the old gutter artifact)"
+    )
+    regions = [r for _p, _w, r in data]
+    row_y = regions[0].y
+    same_row = sorted((r for r in regions if r.y == row_y), key=lambda r: r.x)
+    assert len(same_row) >= 2, "need >= 2 same-row cells to check contiguity"
+    for left, right in zip(same_row, same_row[1:]):
+        assert right.x == left.x + left.width, (
+            f"same-row cells must be contiguous; {left} then {right}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# batch-31 Inc-2 — AC-3 (B-04) Issues PgUp/PgDn actually page, and AC-7
+# (B-20) a visible Workspace "Load project" button wired to the existing
+# `action_load_project` flow.
+# ---------------------------------------------------------------------------
+
+
+def test_ac3_issues_pgdn_pgup_page_the_grouped_panel(tmp_path: Path) -> None:
+    """AC-3 / B-04: PgDn / PgUp page the Issues window (RED-first: the keys
+    named by `GroupedIssuesPanel.TRUNCATION_NOTE` had no binding at all).
+
+    Intent: with more filtered issues than one page (page size 200), pressing
+    PgDn on the Issues screen must advance `_validation_issues_window_start`
+    by one page (and re-render), and PgUp must rewind it — through the real
+    key dispatch, not by calling the action directly.
+    """
+    from s19_app.validation.model import ValidationIssue, ValidationSeverity
+
+    async def _drive() -> "tuple[int, int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app._validation_issues = [
+                ValidationIssue(
+                    code="SEEDED_ISSUE",
+                    severity=ValidationSeverity.WARNING,
+                    message=f"seeded issue {i}",
+                    artifact="s19",
+                    address=i,
+                )
+                for i in range(app.validation_issues_page_size * 2 + 5)
+            ]
+            app.action_show_screen("issues")
+            app.update_validation_issues_view()
+            await pilot.pause()
+            start_before = app._validation_issues_window_start
+            await pilot.press("pagedown")
+            await pilot.pause()
+            start_after_down = app._validation_issues_window_start
+            await pilot.press("pageup")
+            await pilot.pause()
+            start_after_up = app._validation_issues_window_start
+            return start_before, start_after_down, start_after_up
+
+    before, after_down, after_up = asyncio.run(_drive())
+    assert before == 0
+    assert after_down == S19TuiApp.validation_issues_page_size, (
+        f"PgDn must advance the issues window by one page; got {after_down}"
+    )
+    assert after_up == 0, f"PgUp must rewind the issues window; got {after_up}"
+
+
+def test_ac7_workspace_load_project_button(tmp_path: Path) -> None:
+    """AC-7 / B-20: the Workspace shows a "Load project" button that opens
+    the same `LoadProjectScreen` as key `p` (RED-first: no such button).
+
+    Intent: the load-project flow existed only behind the undiscoverable `p`
+    key. A visible button in the Workspace left pane must push the modal
+    project list when at least one saved project exists.
+    """
+    from s19_app.tui.screens import LoadProjectScreen
+
+    async def _drive() -> "tuple[bool, bool]":
+        app = S19TuiApp(base_dir=tmp_path)
+        (app.workarea / "demo_project").mkdir(parents=True, exist_ok=True)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            button = app.query_one("#ws_load_project_button")
+            visible = button.display and not button.has_class("hidden")
+            button.press()
+            await pilot.pause()
+            pushed = isinstance(app.screen, LoadProjectScreen)
+            return bool(visible), pushed
+
+    visible, pushed = asyncio.run(_drive())
+    assert visible, "#ws_load_project_button must be visible on the Workspace"
+    assert pushed, "pressing the button must push LoadProjectScreen (same as key 'p')"
+
+
+# ---------------------------------------------------------------------------
+# batch-31 Inc-4 — AC-1 (B-01): Memory Map "Open in Hex View" must move the
+# hex window to the selected cell's region even when the coarse cell start is
+# not itself a present 16-aligned row base (the live bug: the exact-membership
+# guard in `update_hex_view` silently skipped the reposition).
+# ---------------------------------------------------------------------------
+
+
+def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "object":
+    """Install a synthetic two-range image whose ranges sit ~1 MiB apart.
+
+    Each range is exactly one 200-row hex page (3200 bytes), so range B's
+    rows live on page 2 — a window that stays on page 1 provably does NOT
+    render them. Built through the real emit → S19File → build_loaded_s19
+    pipeline (no hand-mocked LoadedFile).
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    ranges = [(0x1000, 0x1000 + 3200), (0x100000, 0x100000 + 3200)]
+    mem_map = {
+        addr: (addr & 0xFF) for start, end in ranges for addr in range(start, end)
+    }
+    path = tmp_path / "two_far_ranges.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    loaded = build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+    app.current_file = loaded
+    app._apply_empty_state()
+    return loaded
+
+
+def test_ac1_open_in_hex_snaps_to_nearest_present_row(tmp_path: Path) -> None:
+    """AC-1 / B-01: Open-in-Hex repositions to the nearest present row
+    (RED-first: the old `focus_base in row_bases` guard left the window on
+    page 1, so the selected far region never appeared).
+
+    Intent: the operator clicks a Memory Map cell over/near the second range
+    (whose coarse `cell_start` falls in the inter-range gap — an absent
+    address) and presses "Open in Hex View". The Workspace hex view must
+    render the row of the nearest present address at-or-after the cell start
+    (range B's first row, `0x00100000`), not silently stay on range A's page.
+    """
+    from textual.widgets import Button as _Button
+    from textual.widgets import Static as _Static
+
+    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
+
+    async def _drive() -> "tuple[bool, int, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_two_far_ranges_loaded_file(app, tmp_path)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            cells = list(app.query_one("#map_grid").query(MapCell))
+            cell = _cell_containing(cells, 0x100000)
+            assert cell is not None, "a cell must cover range B's start"
+            assert cell.cell_start not in (app.current_file.row_bases or []), (
+                "precondition: the coarse cell start must NOT be a present row "
+                f"base (got 0x{cell.cell_start:08X}) — otherwise this test "
+                "cannot observe the snap"
+            )
+            panel.on_map_cell_selected(MapCell.Selected(cell))
+            await pilot.pause()
+            panel.query_one("#map_open_hex_button", _Button).press()
+            for _ in range(4):
+                await pilot.pause()
+            hex_text = str(app.query_one("#hex_view", _Static).render())
+            workspace_visible = app._is_layout_visible("#screen_workspace")
+            return workspace_visible, app._hex_window_start, hex_text
+
+    workspace_visible, window_start, hex_text = asyncio.run(_drive())
+    assert workspace_visible, "Open-in-Hex must switch to the Workspace screen"
+    assert "0x00100000" in hex_text, (
+        "the hex view must render range B's first row (nearest present row "
+        f"at-or-after the gap cell start); window_start={window_start}"
+    )
