@@ -11,13 +11,19 @@ no real firmware config is ever referenced.
 
 from __future__ import annotations
 
+import json as _json
 from pathlib import Path
 
 from unittest import mock
 
+import pytest
+
 from s19_app.tui.operations.crc_config import (
+    ALLOWED_OUTPUT_BYTES,
+    CRC_SPAN_COUNT_CEILING,
     DUMMY_CONFIG_TEXT,
     CrcConfig,
+    CrcGroup,
     CrcRegion,
     parse_crc_config,
     read_crc_config,
@@ -390,17 +396,6 @@ def test_parse_crc_config_missing_field_collects_one_error() -> None:
 # rejections (LLR-GRP-001.2/.3/.14/.15 incl. the N5/N6 REJECT decisions, the
 # span-count ceiling and the 32-bit bounds). All values SYNTHETIC.
 # ---------------------------------------------------------------------------
-
-import json as _json
-
-import pytest
-
-from s19_app.tui.operations.crc_config import (
-    ALLOWED_OUTPUT_BYTES,
-    CRC_SPAN_COUNT_CEILING,
-    CrcGroup,
-)
-
 
 def _groups_config_text(groups, regions=None):
     """Build synthetic config JSON text with the standard dummy params."""
