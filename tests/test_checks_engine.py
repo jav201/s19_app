@@ -11,8 +11,8 @@ anywhere:
 - **TC-021** — comparison semantics (LLR-004.2): the loaded-image 2-1-2 run
   (2 pass, 1 fail, 2 uncheckable — one PARTIAL, one OUTSIDE) with exact
   actual tuples and ``mem_map`` immutability; the no-image all-uncheckable
-  run; the not-runnable gate (ERROR-faulted document / wrong ``kind`` —
-  the apply-gate mirror).
+  run; the batch-33 gate (entry-scoped faults taint per entry; wrong
+  ``kind`` / envelope faults block the run with a loud reason).
 - **TC-022** — result shape (LLR-004.3): the C-6 ``CheckRunResult`` field
   set plus fixed-clock double-run ``to_dict()`` equality (B-4).
 - **TC-023** — headless project run (LLR-004.4):
@@ -199,14 +199,19 @@ def test_results_no_image_all_uncheckable() -> None:
     assert all(entry.actual_bytes is None for entry in result.entries)
 
 
-def test_faulted_or_wrong_kind_document_not_runnable(tmp_path: Path) -> None:
-    """An ERROR-faulted or non-check document performs no comparison.
+def test_collision_pair_uncheckable_and_wrong_kind_blocked(
+    tmp_path: Path,
+) -> None:
+    """Collision pair → per-entry taint; wrong kind → doc-kind run block.
 
-    Intent: LLR-004.1/004.2, apply-gate mirror of LLR-002.1 — a check
-    document with an ERROR issue is not runnable: every entry uncheckable
-    with actual ``None`` even where the range is fully readable, the memory
-    map untouched, and the declaration faults carried in ``result.issues``
-    (B-2). Same gate for ``kind="change"`` fed to the check engine.
+    Intent (SUPERSEDES the pre-batch-33 apply-gate-mirror test — census
+    rows 1-2 executed): under the batch-33 gate a collision pair is
+    ENTRY-tainted (the run itself is NOT blocked), each partner carrying
+    the entry-fault reason with ``actual_bytes`` ``None``, the memory map
+    untouched, and the declaration faults carried in ``result.issues``
+    (B-2). A ``kind="change"`` document fed to the check engine is a
+    doc-kind RUN block. Same fixtures as the retired test, so the old
+    behavior's regression surface stays covered under the new semantics.
     """
     mem_map, ranges = _image()
     snapshot = dict(mem_map)
@@ -226,7 +231,11 @@ def test_faulted_or_wrong_kind_document_not_runnable(tmp_path: Path) -> None:
     )
     assert faulted.has_errors
     result = run_check_document(faulted, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code is None  # per-entry, NOT a block
     assert [entry.result for entry in result.entries] == ["uncheckable"] * 2
+    assert all(
+        entry.reason_code == "entry-fault" for entry in result.entries
+    )
     assert all(entry.actual_bytes is None for entry in result.entries)
     assert [issue.code for issue in result.issues] == [
         CHG_COLLISION,
@@ -243,6 +252,7 @@ def test_faulted_or_wrong_kind_document_not_runnable(tmp_path: Path) -> None:
         entries=[ChangeEntry("bytes", 0x100, (0x00,))],
     )
     result = run_check_document(wrong_kind, mem_map, ranges, None, None)
+    assert result.run_blocked_reason_code == "doc-kind"
     assert [entry.result for entry in result.entries] == ["uncheckable"]
     assert result.entries[0].actual_bytes is None
     assert mem_map == snapshot

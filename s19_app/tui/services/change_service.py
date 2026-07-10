@@ -996,6 +996,12 @@ class ChangeService:
                 - self.check_runner (run_check_document by default)
             Used by:
                 - app.py ``run_checks`` action routing
+
+        Note (batch-33 LLR-051.4): on a BLOCKED run
+            (``run_blocked_reason`` set on the engine result) the
+            message is ``Checks: not run — {reason} ({counts})`` and
+            ``ok`` is ``False``; on a runnable run the message stays
+            the three-count line and ``ok`` is ``failed == 0``.
         """
         result = self.check_runner(
             self.document, mem_map, ranges, mac_records, a2l_tags
@@ -1046,7 +1052,9 @@ class ChangeService:
             - Read the duck-shaped ``entries`` records of
               ``last_check_result`` (the LLR-004.3 per-entry field set);
               render address range, expected / actual hex, and the result
-              token; map the token to a severity class.
+              token; map the token to a severity class. Uncheckable rows
+              append the entry's ``reason`` in parentheses (batch-33
+              LLR-051.5); pass/fail rows are unchanged.
 
         Dependencies:
             Uses:

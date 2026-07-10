@@ -472,3 +472,12 @@ the standing snapshot policy; local regen FORBIDDEN).
 Totals after fold: **12 ATs · 15 LLRs · 9 TCs** — unchanged from lock (every amendment edits an
 existing numbered item in place; `CHG-DECL-STRUCTURE` is a new issue *code*, not a new LLR/TC; the
 LLR-050.1 split is one LLR with two sets, not two LLRs).
+
+
+### Phase-3 fold addendum (Inc-2/3 code review F3)
+- LLR-051.5 realized as the ` ({reason})` row suffix (not the drafted ` — {reason}`), and
+  blocked-run rows carry the BOUNDED short pointer `run blocked [{code}]` — the full run-level
+  reason lives on `CheckRunResult`/the status label only (F2 no-multiplication). Recorded as a
+  realization note, not a semantic change.
+- Review F1 executed: census rows 1-2 (the pre-batch-33 apply-gate-mirror engine test)
+  superseded in place -> `test_collision_pair_uncheckable_and_wrong_kind_blocked`.

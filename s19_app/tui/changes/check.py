@@ -334,6 +334,9 @@ def run_check_document(
                 and issue.code in _CHECK_TAINT_ATTRIBUTION_CODES
                 and isinstance(issue.address, int)
             ):
+                # First attributable code wins the DISPLAY at a shared
+                # address (unreachable while the set is a singleton);
+                # the taint outcome is identical either way.
                 tainting_by_address.setdefault(issue.address, issue.code)
 
     aggregates: Dict[str, int] = {key: 0 for key in CHECK_AGGREGATE_KEYS}
