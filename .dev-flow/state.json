@@ -3,14 +3,14 @@
     "language": "en",
     "batch_id": "2026-07-09-batch-33",
     "batch_objective": "B-02 (P1, baseline backlog 2026-07-09): patch-editor check results explain themselves. (1) OPERATOR-DECIDED behavior change (round-3, 2026-07-09): drop the collective has_errors taint -- only entries carrying an attributable error become uncheckable (each with reason_code + display reason); healthy entries still checked; wrong document kind stays a whole-run block with ONE loud run-level reason; genuinely document-global faults still block with a reason. (2) Reason taxonomy on CheckRunEntry/CheckRunResult (doc-kind, doc-fault, entry-fault, partial, outside, no-image), rendered in check rows + status. (3) Checks help affordance extension. (4) In-batch: scrub the markup-enabled log-label funnel (pre-existing CHG-KIND-UNKNOWN C-17 exposure). Section 6.5 before/after for the taint change; apply gate explicitly untouched.",
-    "current_phase": 2,
+    "current_phase": 3,
     "phase_status": "in-progress",
     "standing_authorization": "Same session model as batches 29/31/32 (operator: 'Punch it' 3-lane dispatch; 'Merged, continue!'; round-3 taint decision message; '/dev-flow-sync and continue'): run phases autonomously -- each gate = do work, present packet in-conversation, self-approve under this auth, advance; report ALL decisions. GUARDRAILS: full suite + engine-frozen guards + independent code-review GREEN before PR; NO self-merge (operator merges); snapshot regen canonical-CI-only; 0 engine-frozen diffs; propose-not-encode controls. Draft defaults adopted pending override: Q1 collision entries stay uncheckable-with-reason; Q2 report Reason column deferred (to_dict keys land, no-consumer state named).",
     "route": "full /dev-flow (behavior change to shipped semantics + C-17 surfaces). Successor to batch-32 (CRC groups, PR #60 merged dd91941, synced).",
     "iterations_per_phase": {
         "0": 1,
-        "1": 1,
-        "2": 0,
+        "1": 2,
+        "2": 1,
         "3": 0,
         "4": 0,
         "5": 0,
@@ -19,10 +19,23 @@
     "artifacts": {
         "plan": ".dev-flow/2026-07-09-batch-33/PLAN.md",
         "1": ".dev-flow/2026-07-09-batch-33/01-requirements.md",
-        "1b": ".dev-flow/2026-07-09-batch-33/01b-qa-strategy-and-verification.md"
+        "1b": ".dev-flow/2026-07-09-batch-33/01b-qa-strategy-and-verification.md",
+        "2": ".dev-flow/2026-07-09-batch-33/02-review.md"
     },
     "rc1": "PASS @ dd91941 (2026-07-09). feat/batch-33-check-reasons cut from origin/main tip dd91941 (batch-32 squash) + 1 docs commit (batch-32 vault-sync state flag riding this branch). Already-shipped check: check.py:166 still carries the collective not_runnable gate; CheckRunEntry (changes/model.py:574-625) has NO reason field; R-CHK-001 (REQUIREMENTS.md:1631-1654) still specifies the apply-gate-mirror behavior -> nothing shipped. All 36 draft citations re-verified at this tip (01b Task A: 33 exact, 3 line-drift-only).",
     "decisions_log": [
+        {
+            "phase": 2,
+            "date": "2026-07-09",
+            "decision": "approved",
+            "notes": "Under standing auth, after the one iterate-to-refine round. All 10 folds applied (section 12 record); independent FAST verification of the amended lock: CLEAN 13/13 (two-set LLR-050.1 + fail-safe intact; same-address regression pin distinct; template caps; scrub mechanics + five-sibling closure; AT surfaces/counts/anchors/shall-discipline all verified with quoted evidence). 02-review.md consolidates the three lenses (architect BLOCKERS(1)->folded; security PASS-with-conditions->folded; QA fold-verify stalled->mandate absorbed by the verification pass). Exit axes met -> approve. Phase 3 begins: Inc-1 model reason fields."
+        },
+        {
+            "phase": 2,
+            "date": "2026-07-09",
+            "decision": "iterate-to-refine",
+            "notes": "Architect: 1 BLOCKER B-1 -- locked attribution rule (allowlist x address-equality) wrongly taints a healthy constructed entry sharing an address with a SKIPPED declaration (all skip sites emit address=; realistic duplicated-then-edited file); fix = split into non-blocking set (6 skip codes + new decl-level code) and taint-attribution set ({CHG-COLLISION} only -- sole code emitted against constructed entries); entry-index attribution rejected (ValidationIssue is engine-frozen). + minors m-1 (AT-051c bytes-entry fixture), m-3 (ok observed on ChangeActionResult), R-B02-2 correction. Security: PASS-with-conditions -- F1 MAJOR MF-BAD-STRUCTURE dual-use (envelope-blocking vs per-declaration; mint CHG-DECL-STRUCTURE non-blocking) which would have re-introduced the collective-taint behavior on one junk element; F2 MAJOR unbounded reason interpolations (dedupe+cap {codes} at 5; cap {kind!r} at 64 chars) -- local-DoS class; F4 scrub post-cap constraint; F3 five-sibling-exposure closure + hostile-encoding assert. QA fold-verify agent STALLED (watchdog kill, no output) -- its narrow mandate folded into the post-amendment verification pass. Amendment agent dispatched; re-gate after."
+        },
         {
             "phase": 1,
             "date": "2026-07-09",

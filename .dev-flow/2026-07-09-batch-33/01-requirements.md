@@ -1,6 +1,6 @@
 # 01 — Requirements · batch-33 · B-02: self-explaining check results + per-entry taint
 
-**Status: Phase-1 LOCKED (QA verification + strategy folded; Phase-2 cross-review next).**
+**Status: Phase-1 LOCKED; Phase-2 cross-review findings FOLDED (architect B-1 blocker + m-1/m-3, security F1/F2/F3/F4 — see §12 fold record).**
 **R-B02-1 CLOSED** — all citations re-verified on merged main at `dd91941` (batch-30/31/32 touched none
 of `tui/changes/*`, `change_service.py`, `report_service.py`; US/HLR/AT numbering stands). 3 line-drift
 refreshes applied (content identical): R-PATCH-CHECKS-CLARITY-001 → REQUIREMENTS.md:3188-3193;
@@ -63,7 +63,7 @@ Language: English. Route: full /dev-flow.
 | C14 | Entry-count ceiling drops the overflow with ONE address-less `MF-ENTRY-LIMIT` issue; the in-ceiling prefix IS parsed | `io.py:813-823` |
 | C15 | `CHG-COLLISION` is the only ERROR that names a *constructed* entry's address (one finding per collision, `address=entry.address`) | `s19_app/tui/changes/validate.py:40-42,112-121` |
 | C16 | Precedent for entry-attribution already ships: `ChangeService.rows` builds `fault_addresses` from ERROR issues with non-None address and suffixes `" / fault"` on matching entries | `change_service.py:1110-1115,1137-1138` |
-| C17 | Issue codes: document-envelope family `MF-JSON-PARSE, MF-BAD-STRUCTURE, MF-SIZE-CAP, MF-PATH-UNRESOLVED, CHG-V1-FORMAT, CHG-FORMAT, CHG-KIND-UNKNOWN, CHG-VALUE-MODE-UNKNOWN, CHG-ENCODING-UNKNOWN`; entry-scoped family `CHG-ADDRESS-SYNTAX, CHG-BYTES-SYNTAX, CHG-VALUE-EMPTY, CHG-ENCODE-FAIL, MF-ENTRY-LIMIT, CHG-COLLISION` | `io.py:158-203`, `validate.py:42` |
+| C17 | Issue codes: document-envelope family `MF-JSON-PARSE, MF-BAD-STRUCTURE, MF-SIZE-CAP, MF-PATH-UNRESOLVED, CHG-V1-FORMAT, CHG-FORMAT, CHG-KIND-UNKNOWN, CHG-VALUE-MODE-UNKNOWN, CHG-ENCODING-UNKNOWN`; entry-scoped family `CHG-ADDRESS-SYNTAX, CHG-BYTES-SYNTAX, CHG-VALUE-EMPTY, CHG-ENCODE-FAIL, MF-ENTRY-LIMIT, CHG-COLLISION`. **Phase-2 F1 (dual-use found):** `MF-BAD-STRUCTURE` is minted BOTH for envelope faults (`io.py:526, 728-736`) AND per skipped junk (non-object) declaration (`io.py:879-897`); this batch mints a NEW distinct code `CHG-DECL-STRUCTURE` (additive) for the declaration-level case — non-blocking + non-tainting, joins the entry-scoped family; envelope `MF-BAD-STRUCTURE` stays run-blocking | `io.py:158-203`, `validate.py:42`; F1: `io.py:526,728-736,879-897` |
 | C18 | Aggregate consumers: status line (`change_service.py:1004-1012`), report totals + per-checklist line + per-entry table (`s19_app/tui/services/report_service.py:590-596,778-793`), tests (`tests/test_report_service.py:97-99,152-157`, `tests/test_variant_execution.py:439`) | cited inline |
 | C19 | Tests pinning the CURRENT collective-taint / bare-token behavior (supersession census input): `tests/test_checks_engine.py:203-246` (error-doc + wrong-kind → all-uncheckable), `tests/test_tui_patch_editor_v2.py:401-408` (kind=change run pinned as `"Checks: 0 passed, 0 failed, 2 uncheckable"`), row-text pins `tests/test_change_service.py:492-544`, TC-024 display test `tests/test_tui_patch_editor_v2.py:749-816`, help-label ATs `:1770-1874` | cited inline |
 | C20 (QA P1) | `_append_log_line` caps every log line at 50 chars (`line = trimmed[:50]`) — the ~100-char `doc-kind` reason can never be observed complete on `app.log_lines`; the untruncated `result.message` reaches `#patch_checks_status` via `refresh_check_results` | `app.py:8884` (cap); `screens_directionb.py:2258` (untruncated path) |
@@ -82,7 +82,12 @@ Document errors map to entries as follows (all grounded in C12–C17):
 2. **Entry-scoped ERRORs on *skipped* declarations** (`CHG-BYTES-SYNTAX` etc. — the declaration never
    became an entry, C12). They taint nothing: the run proceeds over the constructed entries; the fault
    already surfaces in the declaration-faults panel (`refresh_issues`, `screens_directionb.py:2191-2224`).
-   Same for the address-less count-ceiling `MF-ENTRY-LIMIT` (C14) — the kept prefix is healthy.
+   Same for the address-less count-ceiling `MF-ENTRY-LIMIT` (C14) — the kept prefix is healthy — and for
+   the NEW declaration-level `CHG-DECL-STRUCTURE` (Phase-2 F1: junk non-object declarations,
+   `io.py:879-897`). **Phase-2 B-1:** skip-site codes are non-blocking AND non-tainting (in the
+   LLR-050.1(a) non-blocking set, NOT in the LLR-050.1(b) taint-attribution set) — this rule is
+   literally implementable even when a skipped declaration shares an address with a healthy
+   constructed entry (regression pin: TC-050.2).
 3. **Document-envelope ERRORs** (the C17 envelope family) **block the whole run** with a run-level
    reason naming the code(s). Via the reader this case always has `entries == []` (C13), so per-entry
    taint is vacuous there; the blocking rule exists for documents *composed after load* through the
@@ -107,6 +112,10 @@ All display strings are C-9-compliant (addresses, codes, counts — never byte/v
 | `partial` | per-entry | `range partially outside the loaded image [partial]` | No |
 | `outside` | per-entry | `range outside the loaded image [outside]` | No |
 | `no-image` | per-entry | `no image loaded` | No |
+
+**Template bounds (Phase-2 F2, owner: TC-051.2's full-domain fixture):** `{codes}` in `doc-fault`
+renders sorted, DEDUPLICATED, and capped at 5 codes with a `+N more` marker; `{kind!r}` in `doc-kind`
+is display-capped at 64 chars with an ellipsis marker — the `!r` is KEPT (it escapes control chars).
 
 `reason_code` is the stable token (tests/serialization assert on it); the display string is the
 human sentence. Both ride `CheckRunEntry` (`None` on `pass`/`fail`); run-level blocks additionally
@@ -161,7 +170,7 @@ add one TC (TC-051.5); they add no new AT.
 | AT | EARS statement (WHEN/WHILE … the system shall …) | Counterfactual direction |
 |----|---------------------------------------------------|--------------------------|
 | **AT-050a** (gate) | WHEN checks run on a `kind="check"` document whose issues include a `CHG-COLLISION` **pair** — colliding entries E1 and E2 (two findings, two addresses: BOTH partners tainted) — alongside healthy entries H1 (matching image bytes) and H2 (mismatching) at **non-colliding** addresses, the system shall report H1 `pass`, H2 `fail`, and exactly E1 and E2 `uncheckable` with reason_code `entry-fault`; aggregates `{passed:1, failed:1, uncheckable:2}`. **Realization (QA fold):** this AT is driven through the REAL Run-checks button idiom (`test_tui_patch_editor_v2.py:749-816` pattern), not engine-direct — the Pilot observation is US-050's Layer B | Pre-change RED: all four entries are `uncheckable`, aggregates `{0,0,4}` (`check.py:166,176-177`) |
-| **AT-050b** (skipped-declaration) | WHEN a check file contains one syntactically faulty entry declaration (dropped by the reader with `CHG-BYTES-SYNTAX`) plus two healthy entries, the system shall check both constructed entries normally (pass/fail per image) and surface the declaration fault only in the declaration-faults area | Pre-change RED: `has_errors` taints both constructed entries |
+| **AT-050b** (skipped-declaration) | WHEN a check file contains one syntactically faulty entry declaration (dropped by the reader with `CHG-BYTES-SYNTAX`) plus one non-object junk declaration (dropped with the NEW declaration-level `CHG-DECL-STRUCTURE` — Phase-2 F1; non-blocking, non-tainting) plus two healthy entries, the system shall check both constructed entries normally (pass/fail per image) and surface both declaration faults only in the declaration-faults area | Pre-change RED: `has_errors` taints both constructed entries |
 | **AT-050c** (negative — clean doc unchanged) | WHEN checks run on a clean `kind="check"` document over a loaded image, the system shall produce exactly the pre-change results (pass/fail/containment-uncheckable per entry, same aggregates) | Passes pre-change too — guards against over-aggressive gating |
 | **AT-050d** (apply unchanged) | WHEN a change document with any ERROR is applied, the system shall still block every entry (`disposition="blocked"`) — the apply gate is NOT relaxed | Passes pre-change; RED if the taint relaxation leaks into `apply.py` |
 
@@ -170,8 +179,8 @@ add one TC (TC-051.5); they add no new AT.
 | AT | EARS statement | Counterfactual direction |
 |----|----------------|--------------------------|
 | **AT-051a** (containment reasons) | WHEN checks run with entries in `PARTIAL`, `OUTSIDE`, and no-image states, each uncheckable row rendered in `#patch_checks_results` shall contain its reason text (`partially outside the loaded image` / `outside the loaded image` / `no image loaded`) after the `uncheckable` token | Pre-change RED: rows end at the bare token (`change_service.py:1064-1067`) |
-| **AT-051b** (wrong-kind loud block — **rewritten per QA P1**) | WHEN Run checks is pressed with a `kind="change"` document loaded, the system shall render the FULL `doc-kind` reason on `#patch_checks_status` — which receives the untruncated `result.message` via `refresh_check_results` (`screens_directionb.py:2258`) — asserted as text starting `Checks:` and containing `not a check-set` + `needs kind 'check'`; shall mark the run result not-ok; and every enumerated row shall carry the `doc-kind` reason. On `app.log_lines` the AT shall assert ONLY the `Checks:` prefix — `_append_log_line` caps lines at 50 chars (`line = trimmed[:50]`, `app.py:8884`), so the ~100-char reason is structurally unassertable there (C20) | Pre-change RED: silent `Checks: 0 passed, 0 failed, N uncheckable` with `ok=True` (`change_service.py:1008-1014`; pinned at `test_tui_patch_editor_v2.py:406`) |
-| **AT-051c** (doc-fault block, composed path) | WHEN a document carrying an envelope-family ERROR (e.g. `CHG-ENCODING-UNKNOWN` via paste) has entries composed onto it through the entry editor and checks run, the system shall block the run with a status reason naming the fault count and code(s) | Pre-change RED: bare all-uncheckable, no reason |
+| **AT-051b** (wrong-kind loud block — **rewritten per QA P1**) | WHEN Run checks is pressed with a `kind="change"` document loaded, the system shall render the FULL `doc-kind` reason on `#patch_checks_status` — which receives the untruncated `result.message` via `refresh_check_results` (`screens_directionb.py:2258`) — asserted as text starting `Checks:` and containing `not a check-set` + `needs kind 'check'`; shall mark the run result not-ok — observed at the `ChangeActionResult` return (Phase-2 m-3: the app discards `ok` on this path, so the return value is the observation point for `ok=False`); and every enumerated row shall carry the `doc-kind` reason. On `app.log_lines` the AT shall assert ONLY the `Checks:` prefix — `_append_log_line` caps lines at 50 chars (`line = trimmed[:50]`, `app.py:8884`), so the ~100-char reason is structurally unassertable there (C20) | Pre-change RED: silent `Checks: 0 passed, 0 failed, N uncheckable` with `ok=True` (`change_service.py:1008-1014`; pinned at `test_tui_patch_editor_v2.py:406`) |
+| **AT-051c** (doc-fault block, composed path) | WHEN a document carrying an envelope-family ERROR (e.g. `CHG-ENCODING-UNKNOWN` via paste) has entries composed onto it through the entry editor and checks run, the system shall block the run with a status reason naming the fault count and code(s). **Fixture note (Phase-2 m-1):** with `CHG-ENCODING-UNKNOWN` as the envelope fault the composed entries MUST be BYTES entries — string composition raises at `change_service.py:443-453` and never reaches the document; alternatively use `CHG-VALUE-MODE-UNKNOWN` as the fault | Pre-change RED: bare all-uncheckable, no reason |
 | **AT-051d** (boundary — reason absent on pass/fail) | WHEN an entry results `pass` or `fail`, its row shall NOT carry any reason suffix and `CheckRunEntry.reason`/`reason_code` shall be `None` | Guards reason-spam; passes pre-change (vacuously), RED if reasons over-attach |
 | **AT-051e** (C-17 hostile, file-derived — **extended per QA P2**) | WHEN a pasted document declares a hostile markup kind token (e.g. `kind: "x[bold][link=file:///etc]y"` — metadata-faulted, then entries composed, then Run checks), ALL THREE render surfaces shall show the literal brackets with no `MarkupError`, no style leak, no link token consumed: (1) `#patch_checks_results` rows, (2) `#patch_checks_status`, (3) the `#log_line_1..4` log labels — INCLUDING the truncation-bisected-token case on the log surface (the 50-char cap of `app.py:8884` bisecting a markup token, e.g. `…[bol`, must not raise) | RED if the status label or the log labels render file text through Textual markup (`Label.update` markup-on default, `screens_directionb.py:2286`; `app.py:1932 → 8892-8895`). *Precedence note: kind is evaluated first (§1.2 rule 4) so the hostile kind reaches the `doc-kind` template verbatim.* |
 | **AT-051f** (serialization additive) | WHEN `CheckRunResult.to_dict()` is called, each entry dict shall carry `reason` and `reason_code` keys (`None` on pass/fail) and the result dict shall carry the run-block fields; all pre-existing keys and the three aggregate keys unchanged. **No-consumer statement (QA fold, C-12):** `to_dict` has ZERO production consumers — `report_service` reads dataclass attributes directly; this AT is produce-without-consume by design, stated not faked (the serialized reason is groundwork for Q2's deferred report surface) | Pre-change RED: keys absent (`model.py:742-758`) |
@@ -192,14 +201,27 @@ entry-scoped ERROR finding names the entry's address, or (c) the entry's contain
 INSIDE — and shall compare every other entry against the image normally. The apply engine's
 whole-document gate shall be unchanged.*
 
-- **LLR-050.1** — define the entry-scoped code allowlist beside the reader codes it classifies
-  (`CHG-ADDRESS-SYNTAX`, `CHG-BYTES-SYNTAX`, `CHG-VALUE-EMPTY`, `CHG-ENCODE-FAIL`, `MF-ENTRY-LIMIT`,
-  `CHG-COLLISION`); any ERROR whose code is outside the allowlist is document-blocking (fail-safe
-  default for future codes).
+- **LLR-050.1 (SPLIT — Phase-2 B-1)** — define TWO distinct code sets beside the reader codes they
+  classify:
+  **(a) Non-blocking set** (run proceeds; these codes are entry-scoped so the document is still
+  runnable): `CHG-ADDRESS-SYNTAX`, `CHG-BYTES-SYNTAX`, `CHG-VALUE-EMPTY`, `CHG-ENCODE-FAIL`,
+  `MF-ENTRY-LIMIT`, `CHG-COLLISION`, plus the NEW declaration-level `CHG-DECL-STRUCTURE` (security F1,
+  §1.1 C17); any ERROR whose code is outside this set is document-blocking (fail-safe default for
+  unknown/future codes — unchanged).
+  **(b) Taint-attribution set** (an address-matching issue taints a constructed entry): ONLY codes
+  emitted against *constructed* entries — today exactly `{CHG-COLLISION}` (`validate.py:110-122` emits
+  one finding per partner with `address=entry.address`, so start-address equality is exact for this
+  producer). Reader skip-site codes are non-blocking AND non-tainting — §1.2 rule 2 ("skipped
+  declarations taint nothing") becomes literally implementable.
+  **Q1 interplay:** flipping Q1 (collision never taints) EMPTIES the attribution set — `entry-fault`
+  loses its only producer and AT-050a needs a constructed-document fixture (redesign consequence
+  already flagged at §8 Q1).
 - **LLR-050.2** — in `run_check_document`, replace the single `not_runnable` boolean (`check.py:166`)
   with: (i) run-block evaluation (kind first, then blocking ERRORs); (ii) a per-entry taint set built
-  from entry-scoped ERROR addresses matching constructed entries (the `fault_addresses` idiom,
-  `change_service.py:1110-1115`); (iii) the existing INSIDE compare path unchanged for untainted entries.
+  ONLY from ERROR issues whose code is in the taint-attribution set (LLR-050.1(b)) with addresses
+  matching constructed entries (the `fault_addresses` idiom, `change_service.py:1110-1115`) —
+  address-equality applies to the taint-attribution set only, never to skip-site codes (Phase-2 B-1);
+  (iii) the existing INSIDE compare path unchanged for untainted entries.
 - **LLR-050.3** — purity preserved: no Textual import, no mem_map mutation, injectable clock —
   the existing LLR-004.2/004.4 contract carries over verbatim.
 - **LLR-050.4** — engine-frozen diff stays 0 (`git diff main -- <frozen set>` empty).
@@ -218,7 +240,10 @@ and run-level reasons in the status line, markup-safe end to end.*
 - **LLR-051.2** — `to_dict` emits the new fields additively; every pre-existing key, key order
   intent, and the three `CHECK_AGGREGATE_KEYS` are unchanged (C18 consumers keep working unmodified).
 - **LLR-051.3** — reason strings follow C-9 (addresses/codes/counts only, never byte or value
-  content) and use exactly the §1.3 templates.
+  content) and use exactly the §1.3 templates. **Bounds (Phase-2 F2):** `{codes}` in `doc-fault`
+  renders sorted, DEDUPLICATED, and capped at 5 codes with a `+N more` marker; `{kind!r}` in
+  `doc-kind` is display-capped at 64 chars with an ellipsis marker — the `!r` is KEPT (it escapes
+  control characters). Owner: TC-051.2's full-domain fixture.
 - **LLR-051.4** — `ChangeService.run_checks` message: unchanged
   `Checks: P passed, F failed, U uncheckable` on a runnable document; on a blocked run
   `Checks: not run — {run_blocked_reason}` (keeps the `Checks:` prefix contract pinned at
@@ -250,6 +275,12 @@ and run-level reasons in the status line, markup-safe end to end.*
   before this batch adds any code. One-line fix at a single funnel, on-theme (the same funnel AT-051e's
   surface-(3) assertion exercises). **Operator-visible decision:** fix in-batch vs spawn a separate
   task — **in-batch chosen** (same seam, same hostile AT, one line; operator may override at the gate).
+  **Mechanics (Phase-2 F4):** scrub at/after the 50-char cap, never pre-escape (the cap would bisect
+  escape sequences); preferred mechanism: `markup=False` at Label construction (`app.py:1271-1274`).
+  **Sibling closure (Phase-2 F3):** the scrub closes FIVE sibling exposures — `CHG-KIND-UNKNOWN`
+  `{kind!r}`, `CHG-FORMAT` `{fmt!r}`, `CHG-ENCODING-UNKNOWN` `{encoding!r}`, `CHG-VALUE-MODE-UNKNOWN`
+  `{value_mode!r}`, `MF-BAD-STRUCTURE` `{entry_type!r}`; TC-051.4/AT-051e pushes ONE sibling token
+  (hostile `encoding`) through `_report_change_result`.
 
 ### HLR-052 — checks info affordance (traces US-052; amends R-PATCH-CHECKS-CLARITY-001 via §6.5)
 *The system shall extend the checks help element to state, in at most three short lines: what Run
@@ -284,12 +315,12 @@ the standing snapshot policy; local regen FORBIDDEN).
 | TC | LLR | Mechanism (HOW) |
 |----|-----|-----------------|
 | TC-050.1 | LLR-050.1 | allowlist constant exists; every §1.1-C17 entry-scoped code present; an unknown code classifies as blocking |
-| TC-050.2 | LLR-050.2 | taint-set builder: ERROR+entry-scoped+address-match → tainted; skipped-declaration address (no constructed entry) and address-`None` entries → no taint; boundary cases per 01b B4: same-address multi-fault, address `0x0` falsy-membership, address-less `MF-ENTRY-LIMIT` no-taint |
+| TC-050.2 | LLR-050.2 | taint-set builder: ERROR+taint-attribution-set (LLR-050.1(b))+address-match → tainted; skipped-declaration address (no constructed entry) and address-`None` entries → no taint; boundary cases per 01b B4: same-address multi-fault, address `0x0` falsy-membership, address-less `MF-ENTRY-LIMIT` no-taint; **regression pin (Phase-2 B-1/m-2, DISTINCT from the skipped-address bullet):** a SKIPPED declaration (e.g. `CHG-BYTES-SYNTAX`) at address X + a HEALTHY constructed entry at the SAME X → the healthy entry is NOT tainted (checked normally) — non-tainting code membership, not address absence, protects it |
 | TC-050.3 | LLR-050.3/.4 | purity probe (no Textual import on the check path — reuse the F-Q-07 subprocess idiom of `tests/test_checks_engine.py`); frozen diff 0 |
 | TC-051.1 | LLR-051.1/.2 | model fields default `None`; `to_dict` additive keys; determinism (two calls compare equal) |
-| TC-051.2 | LLR-051.3 | each §1.3 template renders with addresses/codes/counts only — no `expected_bytes`/`value` content in any reason string (C-9 grep-style assert over a full-domain fixture) |
+| TC-051.2 | LLR-051.3 | each §1.3 template renders with addresses/codes/counts only — no `expected_bytes`/`value` content in any reason string (C-9 grep-style assert over a full-domain fixture); **bounds (Phase-2 F2):** the full-domain fixture also asserts `{codes}` sorted + deduplicated + capped at 5 with `+N more`, and `{kind!r}` 64-char display cap with ellipsis marker |
 | TC-051.3 | LLR-051.4/.7 | blocked run → `ok=False` + `Checks: not run — …` message; runnable run message byte-identical to today |
-| TC-051.4 | LLR-051.5/.6/.8 | `check_rows` suffixes reasons on uncheckable only; status surface AND log-label funnel render a bracket payload literally (unit-level companion to AT-051e) |
+| TC-051.4 | LLR-051.5/.6/.8 | `check_rows` suffixes reasons on uncheckable only; status surface AND log-label funnel render a bracket payload literally (unit-level companion to AT-051e); **sibling push (Phase-2 F3/F4):** pushes ONE sibling token (hostile `encoding`) through `_report_change_result` to prove the scrub covers the sibling-exposure family |
 | TC-051.5 (**NEW — QA fold, owner of R-B02-4**) | LLR-051.2/.4 | blocked run over N enumerated entries → aggregates exactly `{passed:0, failed:0, uncheckable:N}` AND the report `### Checklists` table (`report_service.py:782-793`) still renders over the blocked-run result; boundary: a zero-entry envelope-fault blocked run yields `{0,0,0}` and the report table renders empty without fault |
 | TC-052.1 | LLR-052.1/.2 | rendered help text contains all three token spans; widget id/classes unchanged |
 
@@ -328,8 +359,13 @@ the standing snapshot policy; local regen FORBIDDEN).
   `aggregates`/`check_rows`/`to_dict` consumer grep on merged main `dd91941`: 36 claims re-verified
   (33 exact, 3 line-only drifts refreshed in this document, 0 content changes); no new consumers;
   US/HLR/AT numbering stands (BLUF note resolved).
-- **R-B02-2 (low):** address-match taint keys on `entry.address` equality (the shipped C16 idiom).
-  Two entries at the same address are a `CHG-COLLISION` pair anyway; no silent mismatch mode identified.
+- **R-B02-2 (low) — CORRECTED (Phase-2 B-1):** address-match taint keys on `entry.address` equality
+  (the shipped C16 idiom). The draft's "no silent mismatch mode identified" claim was WRONG — the
+  identified mode is a SKIPPED declaration and a HEALTHY constructed entry at the same address (an
+  undifferentiated address rule would false-taint the healthy entry). The LLR-050.1 split closes it
+  (skip-site codes are outside the taint-attribution set) and TC-050.2's regression pin holds it
+  closed. For the sole attribution-set producer (`CHG-COLLISION`) start-address equality is exact
+  (`validate.py:110-122`, one finding per partner with `address=entry.address`).
 - **R-B02-3 (low):** `entry-fault` currently has exactly one producer (`CHG-COLLISION`). The allowlist
   + address-match rule generalizes to future entry-scoped ERROR codes without further engine change.
 - **R-B02-4 (low, intentional):** on a blocked run the enumerated entries still count under
@@ -353,7 +389,9 @@ the standing snapshot policy; local regen FORBIDDEN).
    conservative, consistent with the entries-table `" / fault"` marker at `change_service.py:1137-1138`).
    Flip to "collision never taints checks"? (Removes the only current `entry-fault` producer; AT-050a
    would need a constructed-document fixture instead.) **Adopted default at lock: taint the pair
-   (conservative) — operator-overridable at the Phase-2 gate.**
+   (conservative) — operator-overridable at the Phase-2 gate.** **Phase-2 B-1 interplay note:**
+   flipping Q1 EMPTIES the LLR-050.1(b) taint-attribution set — `entry-fault` loses its only producer
+   and the AT-050a redesign consequence above applies.
 2. **Report surface:** should the project report's per-entry Checklists table
    (`report_service.py:782-793`) gain a Reason column this batch (report-shape change, golden updates),
    or defer to a report-focused batch with reasons already carried in `to_dict`? Draft defers.
@@ -415,3 +453,22 @@ the standing snapshot policy; local regen FORBIDDEN).
 | 8 | **Anchor refreshes (3, line-only):** R-PATCH-CHECKS-CLARITY-001 → REQUIREMENTS.md:3188-3193; R-CHK-001 → :1631-1654; `refresh_check_results` → screens_directionb.py:2258 | Header, §1, §1.1 C10/C11, §6.5 |
 | 9 | **R-B02-1 CLOSED** + numbering note resolved (verified at `dd91941`); new low risk R-B02-6 recorded (composed-path harness smoke owed in Phase-2) | Header, BLUF note, §7 |
 | 10 | **In-batch log-funnel scrub decision** recorded as operator-visible (in-batch chosen over spawn; overridable at gate) | §4 LLR-051.8, §11 row 2 |
+
+## 12. Phase-2 fold record (cross-review → requirements, applied at iteration)
+
+| # | Finding | Amendment | Where applied |
+|---|---------|-----------|---------------|
+| 1 | **ARCH B-1 (BLOCKER)** | LLR-050.1 SPLIT into two sets: (a) non-blocking (entry-scoped codes + NEW `CHG-DECL-STRUCTURE`; unknown codes still block — fail-safe unchanged); (b) taint-attribution = ONLY codes emitted against constructed entries, today exactly `{CHG-COLLISION}` (`validate.py:110-122`, one finding per partner, start-address equality exact) | §4 LLR-050.1 |
+| 2 | ARCH B-1 | LLR-050.2: address-equality taint restricted to the LLR-050.1(b) attribution set; skip-site codes non-blocking AND non-tainting — §1.2 rule 2 literally implementable | §4 LLR-050.2, §1.2 rule 2 |
+| 3 | ARCH B-1 + m-2 | TC-050.2 regression pin (DISTINCT from the existing skipped-address bullet): SKIPPED `CHG-BYTES-SYNTAX` at address X + HEALTHY constructed entry at same X → healthy entry NOT tainted (checked normally) | §6 TC-050.2 |
+| 4 | ARCH B-1 | R-B02-2 corrected: "no silent mismatch mode identified" was wrong — skipped+constructed same-address mode recorded; the split rule + TC-050.2 pin close it | §7 R-B02-2 |
+| 5 | ARCH B-1 | Q1 interplay recorded: flipping Q1 empties the attribution set (`entry-fault` loses its only producer; AT-050a constructed-fixture redesign consequence) | §4 LLR-050.1, §8 Q1 |
+| 6 | **SEC F1 (MAJOR)** | `MF-BAD-STRUCTURE` dual-use recorded (envelope `io.py:526, 728-736` vs per-skipped-junk-declaration `io.py:879-897`); NEW distinct code `CHG-DECL-STRUCTURE` minted (additive) for the declaration-level case — non-blocking + non-tainting; envelope `MF-BAD-STRUCTURE` stays run-blocking; AT-050b extended with a non-object-declaration fixture | §1.1 C17, §1.2 rule 2, §3 AT-050b, §4 LLR-050.1(a) |
+| 7 | **SEC F2 (MAJOR)** | Template bounds: `{codes}` sorted + DEDUPLICATED + capped at 5 with `+N more`; `{kind!r}` display-capped at 64 chars with ellipsis marker, `!r` KEPT (control-char escaping); owner TC-051.2's full-domain fixture | §1.3 bounds note, §4 LLR-051.3, §6 TC-051.2 |
+| 8 | SEC F4 + F3 (MINOR) | LLR-051.8 mechanics: scrub at/after the 50-char cap, never pre-escape (cap would bisect escape sequences); preferred `markup=False` at Label construction (`app.py:1271-1274`); scrub closes FIVE sibling exposures (`CHG-KIND-UNKNOWN` `{kind!r}`, `CHG-FORMAT` `{fmt!r}`, `CHG-ENCODING-UNKNOWN` `{encoding!r}`, `CHG-VALUE-MODE-UNKNOWN` `{value_mode!r}`, `MF-BAD-STRUCTURE` `{entry_type!r}`); TC-051.4/AT-051e pushes ONE sibling token (hostile `encoding`) through `_report_change_result` | §4 LLR-051.8, §6 TC-051.4 |
+| 9 | ARCH m-1 | AT-051c fixture note: composed entries MUST be BYTES entries when the envelope fault is `CHG-ENCODING-UNKNOWN` (string composition raises at `change_service.py:443-453`, never reaches the document); alternative: use `CHG-VALUE-MODE-UNKNOWN` as the fault | §3 AT-051c |
+| 10 | ARCH m-3 | AT-051b: the `ChangeActionResult` return named as the observation point for `ok=False` (the app discards `ok` on this path) | §3 AT-051b |
+
+Totals after fold: **12 ATs · 15 LLRs · 9 TCs** — unchanged from lock (every amendment edits an
+existing numbered item in place; `CHG-DECL-STRUCTURE` is a new issue *code*, not a new LLR/TC; the
+LLR-050.1 split is one LLR with two sets, not two LLRs).
