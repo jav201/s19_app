@@ -3,8 +3,16 @@
 > Living compendium. Updated at every gate + significant checkpoint.
 
 ## Where we are
-- **Phase 3 — Inc-0 in flight** (guard goldens AT-054b/AT-055b through the shipped surfaces with
-  the `_default_now` environment pin + double-proof). Phase 2 APPROVED 2026-07-10 after one
+- **Phase 3 — Inc-3 in flight** (project-report filtering + UI-thread trigger resolution;
+  Inc-2 review running in parallel). DONE: **Inc-0** `92df3f4` goldens (canonical-form ratified
+  §6.5 #19/#20; double-proven ×3; reviewer re-derived byte-identical; APPROVE) → **Inc-1**
+  `2f237d1` filter engine (56 TCs; reviewer oracle-checked 18k probes, 0 divergences; APPROVE;
+  gate folds `d9a73c2`: D-10a + LLR-053.4 reword) → **Inc-2** `58d7c7e` before/after filtering
+  (audit header first-block, filter-then-merge, zero-match notice; goldens HELD; suite 1311).
+  Process incidents logged for Phase 5: stash-RED trap on untracked files (batch-29 leftover
+  stash popped → state.json conflict, resolved; move-aside is the net-new-module RED idiom);
+  agents backgrounding pytest (3 stalls, Inc-0).
+- Superseded Inc-0 status: Phase 2 APPROVED 2026-07-10 after one
   amendment round: triple review found 3 blockers (F-01 record-forwarding byte-drift, F-02
   project-report branch-(c)/linkage_symbol, Q-1 unreachable clock seam) + 10 majors → ALL 25
   findings folded under the **D-9 resolved-matcher** architecture (UI-thread parse+resolve at
