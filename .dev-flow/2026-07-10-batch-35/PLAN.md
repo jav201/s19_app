@@ -3,8 +3,15 @@
 > Living compendium. Updated at every gate + significant checkpoint.
 
 ## Where we are
-- **Phase 3 — Inc-3 in flight** (project-report filtering + UI-thread trigger resolution;
-  Inc-2 review running in parallel). DONE: **Inc-0** `92df3f4` goldens (canonical-form ratified
+- **Phase 5 — post-mortem in flight.** Phase 3 CLOSED (7 increments, Inc-0..6, commits
+  92df3f4..428470a + folds; ALL reviews APPROVE, 0 HIGH across the batch; suite 1244→1335
+  not-slow, goldens green throughout, frozen 0 diffs every increment). Phase 4 PASS
+  (04-validation.md: 25/25 LLRs, 17/17 ATs C-18-single-noded, goldens double-proven thrice,
+  census 14/14, perf measured, ledger 1363 collected = 1270+93 exact). Owed Phase 6:
+  REQUIREMENTS.md rows R-RPT-FILTER-001/R-TUI-045 + operator format docs (+ ceiling-perf
+  note). Post-merge: canonical snapshot regen (retire both batch-35 marks; 120x30 = real
+  drift, 80x24 defensive) + ubuntu CI as the cross-platform canonicalization proof.
+- Phase-3-era status (superseded): DONE: **Inc-0** `92df3f4` goldens (canonical-form ratified
   §6.5 #19/#20; double-proven ×3; reviewer re-derived byte-identical; APPROVE) → **Inc-1**
   `2f237d1` filter engine (56 TCs; reviewer oracle-checked 18k probes, 0 divergences; APPROVE;
   gate folds `d9a73c2`: D-10a + LLR-053.4 reword) → **Inc-2** `58d7c7e` before/after filtering
