@@ -366,9 +366,15 @@ def test_at_056a2_selector_row_and_generate_visible_at_both_regimes(
 
     Intent: the new selector row AND the Generate button are fully inside
     the ``#report_dialog`` region at BOTH size regimes (80x24 floor and
-    120x30) — the ``1fr`` markdown scroll absorbs the added height
-    (rung 1 of the C-13.1 ladder). The TC-024.6 per-width idiom: both
-    widths asserted in this single node.
+    120x30) — realized via RUNG 3 of the C-13.1 ladder (a second
+    docked-bottom line stacked above the buttons row; rung 1's ``1fr``
+    absorber was already exhausted pre-batch, styles.tcss record), so
+    this node ALSO guards the dock-offset contract: the selector row and
+    the buttons row must stay vertically disjoint (Inc-4 review F1 — the
+    ``margin-bottom`` offset is hand-measured from the buttons row's
+    realized height and would silently overlap if that height changes).
+    The TC-024.6 per-width idiom: both widths asserted in this single
+    node.
     """
 
     async def _regions(size: Tuple[int, int]) -> dict:
@@ -381,10 +387,12 @@ def test_at_056a2_selector_row_and_generate_visible_at_both_regimes(
             dialog = screen.query_one("#report_dialog")
             row = screen.query_one("#report_filter_row")
             generate = screen.query_one("#report_generate", Button)
+            buttons = screen.query_one(".modal-buttons")
             return {
                 "dialog": dialog.region,
                 "row": row.region,
                 "generate": generate.region,
+                "buttons": buttons.region,
             }
 
     for size in ((80, 24), (120, 30)):
@@ -403,6 +411,15 @@ def test_at_056a2_selector_row_and_generate_visible_at_both_regimes(
                 f"AT-056a2 @{size}: {label} exceeds the dialog vertically "
                 f"({region} vs {dialog})"
             )
+        # Inc-4 review F1: the rung-3 dock offset is a magic constant —
+        # guard the contract it encodes: no vertical overlap between the
+        # selector row and the buttons row.
+        assert regions["row"].bottom <= regions["buttons"].y, (
+            f"AT-056a2 @{size}: the selector row overlaps the buttons row "
+            f"(row {regions['row']} vs buttons {regions['buttons']}) — the "
+            "styles.tcss dock offset no longer matches the buttons row's "
+            "realized height"
+        )
 
 
 # ===========================================================================

@@ -1261,5 +1261,14 @@ statements live in §3/§4. Each record: requirement · Before (superseded claus
     ratified at the Inc-0 gate.
 20. **LLR-055.3 (Amended, Inc-0 gate 2026-07-10).** Same canonical-form definition by
     reference to LLR-054.4. — Inc-0 deviation flag.
+21. **LLR-057.4 (Amended, Inc-5 gate 2026-07-10).** Before: predicted drift set = both
+    patch scaffold cells (2 xfailed). After: OBSERVED drift at the canonical
+    textual==8.2.8 pin = `{patch-comfortable-120x30}` only — the 80x24 cell renders the
+    regroup below the pane fold (batch-33 precedent) and XPASSES under its mandated
+    `strict=False` mark. Both cells KEEP their marks until canonical regen (the 80x24
+    mark is defensive; xpass accepted); expected suite tail = 29 green + 1 xfailed +
+    1 xpassed + 0 unexpected; the post-merge canonical regen applies whatever the CI
+    renderer actually drifts and retires both marks. — Inc-5 deviation flag, ratified
+    at the Inc-5 gate.
 
-Record count: 19 amended + 1 new; no requirement deleted.
+Record count: 20 amended + 1 new; no requirement deleted.

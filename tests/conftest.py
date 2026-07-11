@@ -14,6 +14,7 @@ Dependencies:
 from __future__ import annotations
 
 import random
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
@@ -963,7 +964,7 @@ RUN_ROOT_TOKEN = b"<RUN-ROOT>"
 #: delimiters the reports place around paths (whitespace, backtick, quote,
 #: pipe, closing paren/bracket) — separator normalization applies ONLY
 #: inside these spans, never to report content.
-_RUN_ROOT_SPAN_RE = None  # compiled lazily so ``re`` stays a local import
+_RUN_ROOT_SPAN_RE = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
 
 
 def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes:
@@ -1004,11 +1005,6 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
         >>> canonical_report_bytes(b"a\r\nb") == b"a\nb"
         True
     """
-    import re
-
-    global _RUN_ROOT_SPAN_RE
-    if _RUN_ROOT_SPAN_RE is None:
-        _RUN_ROOT_SPAN_RE = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
     data = raw.replace(b"\r\n", b"\n")
     if run_root is not None:
         forms = {str(run_root), str(run_root.resolve())}
