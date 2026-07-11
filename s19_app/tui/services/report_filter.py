@@ -166,6 +166,12 @@ class ReportFilterMatcher:
             required because ``range_index`` membership checks assume
             non-overlapping ranges, while explicit ranges and record
             extents may overlap.
+        source_name (Optional[str]): The display name of the filter FILE
+            this matcher was resolved from — rendered by the audit header
+            (LLR-054.3). ``None`` (the default) makes the header writers
+            fall back to ``(unnamed filter)``. Declared-field promotion of
+            the Inc-2 duck-typed attribute (Inc-3); the display readers
+            keep their defensive fallback.
 
     Data Flow:
         - Built by :func:`resolve_report_filter`.
@@ -184,6 +190,7 @@ class ReportFilterMatcher:
 
     patterns: tuple[str, ...]
     matched_index: RangeIndex
+    source_name: Optional[str] = None
 
     def matches_symbol(self, symbol: Any) -> bool:
         """
@@ -623,6 +630,7 @@ def resolve_report_filter(
     report_filter: ReportFilter,
     a2l_records: Any,
     mac_records: Any,
+    source_name: Optional[str] = None,
 ) -> ReportFilterMatcher:
     """
     Summary:
@@ -646,10 +654,14 @@ def resolve_report_filter(
             shapes consumed by ``_artifact_addresses_with_names``).
         mac_records (Any): The loaded MAC records — dicts with
             ``'address'`` / ``'name'``.
+        source_name (Optional[str]): The filter FILE's display name,
+            stamped onto :attr:`ReportFilterMatcher.source_name` for the
+            audit header (LLR-054.3). ``None`` (the default) leaves the
+            header writers on their ``(unnamed filter)`` fallback.
 
     Returns:
         ReportFilterMatcher: Patterns plus the merged, sorted
-        matched-address index. Never raises.
+        matched-address index and the display name. Never raises.
 
     Raises:
         None: Hostile shapes are skipped (never-raise, S-F4).
@@ -723,4 +735,8 @@ def resolve_report_filter(
             continue
 
     matched_index = build_sorted_range_index(_merge_ranges(ranges))
-    return ReportFilterMatcher(patterns=patterns, matched_index=matched_index)
+    return ReportFilterMatcher(
+        patterns=patterns,
+        matched_index=matched_index,
+        source_name=source_name if isinstance(source_name, str) else None,
+    )

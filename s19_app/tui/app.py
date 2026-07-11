@@ -87,6 +87,12 @@ from .services.diff_report_service import (
 )
 from .services.load_service import build_loaded_hex, build_loaded_s19
 from .services.report_addendum import DeclaredRegion
+from .services.report_filter import (
+    ReportFilterMatcher,
+    parse_report_filter,
+    read_report_filter_text,
+    resolve_report_filter,
+)
 from .services.report_service import (
     EXECUTION_SCOPE_TO_REPORT_MODE,
     REPORT_SOURCE_DEFAULT,
@@ -936,6 +942,16 @@ class S19TuiApp(App):
         #: omits the ``declared_regions`` key (back-compat, byte-identical to
         #: the pre-batch-20 output).
         self._declared_regions: Tuple[DeclaredRegion, ...] = ()
+        #: The sticky per-run report-filter selection (batch-35 B-07,
+        #: LLR-056.3): the PATH of the operator-selected filter file, or
+        #: ``None`` = full report. Stores only the path — never a parsed
+        #: snapshot: the file is re-read, re-parsed, and re-resolved on the
+        #: UI thread at every report trigger (D-9), so an edited file takes
+        #: effect on the next run and a deleted/invalid file refuses
+        #: (LLR-053.5). Consumed by ``_trigger_generate_report`` (Inc-3);
+        #: the Inc-4 selector row writes it and ``action_before_after_report``
+        #: joins as the second consumer.
+        self._report_filter_path: Optional[Path] = None
         self.logger.info("App initialized. base_dir=%s workarea=%s", self.base_dir, self.workarea)
 
     def _debug_log(self, run_id: str, hypothesis_id: str, location: str, message: str, data: dict[str, Any]) -> None:
@@ -2246,6 +2262,17 @@ class S19TuiApp(App):
         Data Flow:
             - Refuse with one neutral status line when no project /
               variant set is active.
+            - When ``self._report_filter_path`` is set (LLR-055.1, D-9),
+              read + parse + resolve the filter HERE on the UI thread —
+              BEFORE the worker starts: any read/parse fault refuses with
+              the kind-prefixed diagnostic through the markup-inert
+              ``set_status`` funnel (LLR-053.5/053.6 — never ``notify()``
+              or ``set_file_status``), no worker is dispatched, and
+              ``<project>/reports/`` stays unchanged (F-04: refusal
+              precedes any variant execution). Resolution consumes
+              ``loaded.mac_records`` + ``_compute_a2l_enriched_tags()``
+              (the LLR-053.4 (c) record extents) and stamps the file's
+              name as the matcher's ``source_name``.
             - A retained snapshot from a DIFFERENT project directory is
               stale and treated as absent.
             - Without a usable snapshot, the same manifest-or-loaded-file
@@ -2256,6 +2283,8 @@ class S19TuiApp(App):
         Dependencies:
             Uses:
                 - ``_active_project_dir`` / ``read_project_manifest``
+                - ``read_report_filter_text`` / ``parse_report_filter``
+                - ``resolve_report_filter`` / ``_compute_a2l_enriched_tags``
                 - ``_start_generate_report_worker``
             Used by:
                 - ``on_report_viewer_screen_generate_requested``
@@ -2265,6 +2294,29 @@ class S19TuiApp(App):
         if project_dir is None or variant_set is None or not variant_set.variants:
             self.set_status("Report: no project variants - load a project first.")
             return
+        report_filter: Optional[ReportFilterMatcher] = None
+        filter_path = self._report_filter_path
+        if filter_path is not None:
+            text, errors = read_report_filter_text(
+                str(filter_path), self.base_dir
+            )
+            parsed = None
+            if not errors and text is not None:
+                parsed, errors = parse_report_filter(text)
+            if errors or parsed is None:
+                self.set_status(
+                    "Project report refused: " + "; ".join(errors)
+                )
+                return
+            loaded = self.current_file
+            mac_records = loaded.mac_records if loaded is not None else None
+            a2l_tags = self._compute_a2l_enriched_tags() or None
+            report_filter = resolve_report_filter(
+                parsed,
+                a2l_tags,
+                mac_records,
+                source_name=filter_path.name,
+            )
         last = self._last_execution
         if last is not None and last[0] != project_dir:
             self.logger.info(
@@ -2291,6 +2343,7 @@ class S19TuiApp(App):
             last,
             fallback_batch,
             tuple(declared_regions),
+            report_filter,
         )
 
     @work(thread=True, exclusive=True, group="generate_report")
@@ -2302,6 +2355,7 @@ class S19TuiApp(App):
         last: Optional[tuple[Path, str, str, List[VariantExecutionResult]]],
         fallback_batch: list[Path],
         declared_regions: Sequence[DeclaredRegion] = (),
+        report_filter: Optional[ReportFilterMatcher] = None,
     ) -> None:
         """
         Summary:
@@ -2321,6 +2375,12 @@ class S19TuiApp(App):
                 ``None`` to execute the active scope first.
             fallback_batch (list[Path]): The manifest-absent default file
                 list for the fresh-run path.
+            report_filter (Optional[ReportFilterMatcher]): The RESOLVED
+                report filter (LLR-055.1), captured and resolved on the UI
+                thread by ``_trigger_generate_report`` and handed over as
+                an immutable explicit argument — the worker reads NO
+                app-level selection state (F-04 thread contract: no
+                stale/torn read). ``None`` = full report.
 
         Returns:
             None
@@ -2368,6 +2428,7 @@ class S19TuiApp(App):
                 execution_mode=EXECUTION_SCOPE_TO_REPORT_MODE[scope],
                 assignment_source=assignment_source,
                 declared_regions=tuple(declared_regions),
+                report_filter=report_filter,
             )
             report_path = generate_project_report(
                 project_dir, results, options, variant_set=variant_set

@@ -1330,3 +1330,233 @@ def test_at_055b_no_filter_generate_report_byte_identical_to_golden(
         f"AT-055b: unfiltered project-report bytes drifted from golden "
         f"{_AT055B_GOLDEN.name} (LLR-055.3 byte-identity, canonical form)"
     )
+
+
+# ---------------------------------------------------------------------------
+# Batch-35 Inc-3 — AT-055a (surface arm) / AT-055c / AT-053a Generate half
+# (LLR-055.1 / LLR-055.2 / LLR-054.3 / LLR-053.5 / LLR-053.6)
+# ---------------------------------------------------------------------------
+
+
+def _write_report_filter(path: Path, body: str) -> Path:
+    """Write a report-filter fixture file and return its path."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(body, encoding="utf-8")
+    return path
+
+
+def _write_two_entry_change_document(path: Path) -> None:
+    """Overwrite ``chg.json`` with TWO applicable entries (0x1000, 0x1002).
+
+    Local to the filtered-report tests ONLY — ``_write_change_document``
+    (one entry) stays untouched because the AT-055b golden was captured
+    over it; this variant gives the filter something to hide.
+    """
+    path.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": [
+                    {"type": "bytes", "address": "0x1000", "bytes": "AA"},
+                    {"type": "bytes", "address": "0x1002", "bytes": "BB"},
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def _report_dir_names(project_dir: Path) -> list[str]:
+    """List ``<project>/reports/`` filenames; ``[]`` when the dir is absent."""
+    reports_dir = project_dir / "reports"
+    if not reports_dir.is_dir():
+        return []
+    return sorted(p.name for p in reports_dir.iterdir() if p.is_file())
+
+
+def _drive_generate_with_filter(
+    tmp_path: Path,
+    filter_body: str,
+    filter_name: str,
+    *,
+    two_entries: bool = False,
+) -> Tuple[list[str], list[str], dict[str, str]]:
+    """Drive the shipped Generate flow with ``_report_filter_path`` set.
+
+    Fixture setup ONLY sets the sticky app field (the selection UI —
+    dropdown + free path — arrives in Inc-4 / AT-056a); the DRIVE is the
+    real ``#report_generate`` button per the established AT-055b idiom.
+
+    Returns:
+        ``(log_lines, report_names, report_texts)`` — the status funnel
+        contents, the post-drive ``reports/`` listing, and each written
+        report's text keyed by filename.
+    """
+
+    async def _drive() -> Tuple[list[str], list[str], dict[str, str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = _make_report_project(app, "proj")
+        if two_entries:
+            _write_two_entry_change_document(project_dir / "chg.json")
+        filter_path = _write_report_filter(
+            project_dir / "filters" / filter_name, filter_body
+        )
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            app._report_filter_path = filter_path
+            await _generate_through_surface(app, pilot)
+            active_dir = app._active_project_dir()
+            assert active_dir is not None
+            names = _report_dir_names(active_dir)
+            texts = {
+                name: (active_dir / "reports" / name).read_text(
+                    encoding="utf-8"
+                )
+                for name in names
+            }
+            return list(app.log_lines), names, texts
+
+    return asyncio.run(_drive())
+
+
+def test_at_055a_generate_surface_filtered_report_with_audit_header(
+    tmp_path: Path,
+) -> None:
+    """AT-055a (Generate-surface arm) — LLR-055.1/055.2/054.3 (HLR-055).
+
+    Intent: with a valid filter designated, the SHIPPED Generate flow
+    (real ``#report_generate`` button → UI-thread resolution →
+    worker → real ``generate_project_report``) writes a report whose
+    Modifications rows and hexdump regions are restricted to matching
+    items, under an audit header naming the REAL filter file. Setting
+    ``app._report_filter_path`` is fixture setup — the selection-surface
+    arm (dropdown/free-path UI) belongs to AT-056a and lands in Inc-4.
+
+    F1 condition (Inc-2 review): the header must carry the fixture's
+    ACTUAL filename — the ``(unnamed filter)`` fallback appearing here
+    would mean the production wiring forgot to attach ``source_name``.
+    """
+    filter_body = json.dumps(
+        {
+            "format": "s19app-report-filter",
+            "version": "1.0",
+            "include": {
+                "symbols": [],
+                "addresses": [{"start": "0x1000", "end": "0x1001"}],
+            },
+        }
+    )
+    log_lines, names, texts = _drive_generate_with_filter(
+        tmp_path, filter_body, "only-first.json", two_entries=True
+    )
+    assert len(names) == 1, (
+        f"AT-055a: exactly one report expected, got {names}"
+    )
+    text = texts[names[0]]
+    lines = text.splitlines()
+    assert lines[2] == "## Report filter applied", (
+        "AT-055a: the audit header must be the first block after the title"
+    )
+    assert "- Filter file: only-first.json" in text, (
+        "AT-055a/F1: the audit header must carry the real filter filename"
+    )
+    assert "(unnamed filter)" not in text, (
+        "AT-055a/F1: the display-name fallback must never appear when a "
+        "real file was selected — production forgot source_name"
+    )
+    assert "- Modifications rows: shown 1 of 2 (hidden 1)" in text
+    assert "- Applied regions: shown 1 of 2 (hidden 1)" in text
+    # Matched entry row present, unmatched absent.
+    assert "| 0x00001000 | 1 |" in text
+    assert "| 0x00001002" not in text, (
+        "AT-055a: the unmatched modification row must be hidden"
+    )
+    assert not any("refused" in line for line in log_lines), (
+        f"AT-055a: a valid filter must not refuse; status was {log_lines!r}"
+    )
+
+
+def test_at_055c_generate_surface_zero_match_notice(tmp_path: Path) -> None:
+    """AT-055c — LLR-054.3 zero-match through the Generate surface.
+
+    Intent: a valid filter matching NOTHING still writes the report
+    (D-3), replacing the filtered section bodies with the loud
+    ``filter matched 0 of N items`` notice — wording disjoint from the
+    refusal wording (Q-12: no shared prefix token).
+    """
+    filter_body = json.dumps(
+        {
+            "format": "s19app-report-filter",
+            "version": "1.0",
+            "include": {
+                "symbols": [],
+                "addresses": [{"start": "0x9000", "end": "0x9010"}],
+            },
+        }
+    )
+    log_lines, names, texts = _drive_generate_with_filter(
+        tmp_path, filter_body, "matches-nothing.json"
+    )
+    assert len(names) == 1, (
+        f"AT-055c: the zero-match report must still be written, got {names}"
+    )
+    text = texts[names[0]]
+    assert "- Filter file: matches-nothing.json" in text
+    assert "- Modifications rows: shown 0 of 1 (hidden 1)" in text
+    assert "filter matched 0 of 1 items" in text, (
+        "AT-055c: the zero-match notice must replace the section bodies"
+    )
+    assert not any("refused" in line for line in log_lines), (
+        "AT-055c: zero-match is NOT a refusal (Q-12 disjoint wording); "
+        f"status was {log_lines!r}"
+    )
+
+
+def test_tc_generate_refusal_half_invalid_filter_refuses_before_worker(
+    tmp_path: Path,
+) -> None:
+    """AT-053a Generate-half guard (TC level) — LLR-053.5/053.6.
+
+    Intent: an INVALID designated filter refuses project-report
+    generation ON THE UI THREAD — the status line leads with the
+    report-kind-prefixed fault (``Project report refused: ...``), the
+    worker never starts (no progress status, no variant execution), and
+    ``<project>/reports/`` is unchanged (0 files).
+
+    C-18 note: this is deliberately the GENERATE HALF only — the joined
+    AT-053a node (ONE node driving BOTH surfaces, per §5.2) lands in
+    Inc-4 when the ``b``-key side exists; Inc-4 either extends this into
+    that node or supersedes it.
+    """
+    log_lines, names, _texts = _drive_generate_with_filter(
+        tmp_path,
+        '{"format": "wrong-format", "version": "1.0", "include": {}}',
+        "bad-envelope.json",
+    )
+    assert names == [], (
+        f"AT-053a(Generate): a refused run must write ZERO report files, "
+        f"got {names}"
+    )
+    assert any(
+        line.startswith("Project report refused:") for line in log_lines
+    ), (
+        "AT-053a(Generate): the refusal must lead with the kind-prefixed "
+        f"fault; status was {log_lines!r}"
+    )
+    assert any(
+        "'format'" in line for line in log_lines
+    ), (
+        "AT-053a(Generate): the refusal must carry the parser's named "
+        f"fault token; status was {log_lines!r}"
+    )
+    # The worker was never dispatched: neither progress status appears.
+    assert not any("running active scope" in line for line in log_lines)
+    assert not any("generating from last execution" in line for line in log_lines)
