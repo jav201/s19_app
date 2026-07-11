@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import random
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Optional
 
 import pytest
 
@@ -949,3 +949,71 @@ def make_deeply_nested_unified_file(path: Path, *, depth: int = 120_000) -> Path
     """
     path.write_bytes(b"[" * depth + b"]" * depth)
     return path
+
+
+# ---------------------------------------------------------------------------
+# Batch-35 canonical report bytes (shared on third use — reviewer carry)
+# ---------------------------------------------------------------------------
+
+#: Placeholder replacing every spelling of the per-run pytest tmp root
+#: inside canonical report bytes (LLR-054.4/055.3 canonical form).
+RUN_ROOT_TOKEN = b"<RUN-ROOT>"
+
+#: A run-root path span: the token plus its path remainder, stopping at the
+#: delimiters the reports place around paths (whitespace, backtick, quote,
+#: pipe, closing paren/bracket) — separator normalization applies ONLY
+#: inside these spans, never to report content.
+_RUN_ROOT_SPAN_RE = None  # compiled lazily so ``re`` stays a local import
+
+
+def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes:
+    """
+    Summary:
+        Map report bytes to the canonical form of the LLR-054.4/055.3
+        byte-identity pin: platform newline translation undone (CRLF -> LF),
+        every spelling of the per-run pytest tmp root replaced by
+        ``<RUN-ROOT>``, and path separators normalized to ``/`` ONLY inside
+        run-root path spans — content bytes are never rewritten. Shared
+        home for the helper duplicated as ``_canonical_report_bytes`` in
+        ``tests/test_before_after_report.py`` and
+        ``tests/test_tui_report_seam.py`` (factored here on its THIRD use,
+        per the Inc-2 reviewer recommendation; the two originals stay
+        untouched to keep those increments' diffs closed).
+
+    Args:
+        raw (bytes): Report bytes as read from disk (a freshly written
+            report, or a stored golden).
+        run_root (Optional[Path]): The per-run root whose spellings are
+            tokenized; ``None`` for stored goldens (already tokenized at
+            capture time — only the CRLF undo applies).
+
+    Returns:
+        bytes: The canonical byte form compared by the byte-identity ATs.
+
+    Data Flow:
+        - written report bytes + per-run root -> canonical bytes; equality
+          of two canonical forms IS the byte-identity gate.
+
+    Dependencies:
+        Uses:
+            - RUN_ROOT_TOKEN
+        Used by:
+            - tests/test_tui_report_filter_surface.py (AT-056c/AT-056e)
+
+    Example:
+        >>> canonical_report_bytes(b"a\r\nb") == b"a\nb"
+        True
+    """
+    import re
+
+    global _RUN_ROOT_SPAN_RE
+    if _RUN_ROOT_SPAN_RE is None:
+        _RUN_ROOT_SPAN_RE = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
+    data = raw.replace(b"\r\n", b"\n")
+    if run_root is not None:
+        forms = {str(run_root), str(run_root.resolve())}
+        for form in sorted(forms, key=len, reverse=True):
+            data = data.replace(form.encode("utf-8"), RUN_ROOT_TOKEN)
+    return _RUN_ROOT_SPAN_RE.sub(
+        lambda match: match.group(0).replace(b"\\", b"/"), data
+    )

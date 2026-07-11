@@ -1126,6 +1126,38 @@ ModalScreen {
     margin-bottom: 1;
 }
 
+/* Report-filter selector row (batch-35 US-056, LLR-056.2/056.5).
+ * C-13.1 ladder record: rung 1 (1fr absorber) FAILED at the 80x24 floor —
+ * the dialog's in-flow content already ends exactly at the dialog bottom
+ * pre-batch (measured deficit 4 rows), so rung 2 (-2 rows) cannot cover
+ * it. Rung 3 applied: the selector joins the DOCKED bottom control region
+ * (0 added flow rows), as a second docked line above `.modal-buttons`
+ * because a single-line fold is horizontally infeasible at 80 cols (five
+ * widgets exceed the 48-cell dialog interior). */
+#report_filter_row {
+    width: 100%;
+    height: 3;
+    dock: bottom;
+    /* Same-edge docks OVERLAY in textual 8.2.8 (measured) — offset by the
+     * buttons row's realized height (4: padding-top 1 + button chrome 3)
+     * so the selector stacks as the docked region's second line. */
+    margin-bottom: 4;
+}
+
+#report_filter_label {
+    width: 8;
+    padding: 1 1 0 0;
+    color: $fg-base;
+}
+
+#report_filter_select {
+    width: 40%;
+}
+
+#report_filter_path {
+    width: 1fr;
+}
+
 /* --- Operations modal (batch-08 I3, LLR-004.1/004.3) -----------------------
  * Operation list on top, one-line status/notes strip, scrollable hex render
  * of the result image filling the rest, Execute/Close docked at the bottom

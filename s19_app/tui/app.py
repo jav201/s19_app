@@ -370,6 +370,12 @@ MAX_SECTIONS_OUT_OF_RANGE = 50
 """Max MAC out-of-range rows the Sections panel renders before adding a truncation marker."""
 
 
+REPORT_FILTERS_DIR_NAME = "filters"
+"""Project subdirectory scanned for report-filter files (batch-35 US-056,
+LLR-056.1): ``<project_dir>/filters/*.json`` feeds the report-viewer
+dropdown. Net-new name — no prior production use (probe 2026-07-10)."""
+
+
 MAX_SECTIONS_PRIMARY_RANGES = 200
 """Max primary memory-range rows the Sections panel mounts before adding a truncation marker.
 
@@ -1864,6 +1870,16 @@ class S19TuiApp(App):
             None
 
         Data Flow:
+            - When ``self._report_filter_path`` is set (LLR-053.5/054.1,
+              D-9), read + parse + resolve the filter HERE on the UI
+              thread, at trigger time — any read/parse fault refuses with
+              the kind-prefixed diagnostic through the markup-inert
+              ``set_status`` funnel (LLR-053.6), the composer is NOT
+              invoked, and ``<project>/reports/`` stays unchanged.
+              Resolution consumes ``loaded.mac_records`` +
+              ``_compute_a2l_enriched_tags()`` (the LLR-053.4 (c) record
+              extents) and stamps the file's name as the matcher's
+              ``source_name`` (mirrors ``_trigger_generate_report``).
             - Gather ``last_summary``, ``LoadedFile.path``, the active
               project dir, and the workarea root; the composer validates the
               five LLR-038.2 preconditions and every LLR-038.4 refusal class
@@ -1875,17 +1891,42 @@ class S19TuiApp(App):
         Dependencies:
             Uses:
                 - ``compose_before_after_report``
+                - ``read_report_filter_text`` / ``parse_report_filter``
+                - ``resolve_report_filter`` / ``_compute_a2l_enriched_tags``
                 - ``_active_project_dir`` / ``set_status``
             Used by:
                 - key binding ``b`` (BINDINGS) after the save-back offer
                   notify in ``on_patch_editor_panel_save_back_decision``
         """
         loaded = self.current_file
+        report_filter: Optional[ReportFilterMatcher] = None
+        filter_path = self._report_filter_path
+        if filter_path is not None:
+            text, errors = read_report_filter_text(
+                str(filter_path), self.base_dir
+            )
+            parsed = None
+            if not errors and text is not None:
+                parsed, errors = parse_report_filter(text)
+            if errors or parsed is None:
+                self.set_status(
+                    "Before/after report refused: " + "; ".join(errors)
+                )
+                return
+            mac_records = loaded.mac_records if loaded is not None else None
+            a2l_tags = self._compute_a2l_enriched_tags() or None
+            report_filter = resolve_report_filter(
+                parsed,
+                a2l_tags,
+                mac_records,
+                source_name=filter_path.name,
+            )
         result = compose_before_after_report(
             self._change_service.last_summary,
             loaded.path if loaded is not None else None,
             project_dir=self._active_project_dir(),
             workarea=self.workarea,
+            report_filter=report_filter,
         )
         if result.written:
             self.set_status(
@@ -2196,13 +2237,160 @@ class S19TuiApp(App):
         self.logger.info(
             "View reports action. project=%s count=%d", project_name, len(reports)
         )
+        # Report-filter selector inputs (batch-35 US-056): scan the
+        # dropdown options and seed the reopen state from the sticky
+        # selection (LLR-056.2 F-05(i)) — a filters/-resident selection
+        # seeds the Select, a free-path selection seeds the path input.
+        filter_names = tuple(self._scan_report_filter_files())
+        filters_dir = self._report_filters_dir()
+        selected = self._report_filter_path
+        filter_select_value: Optional[str] = None
+        filter_path_text = ""
+        if selected is not None:
+            if (
+                filters_dir is not None
+                and selected.parent == filters_dir
+                and selected.name in filter_names
+            ):
+                filter_select_value = selected.name
+            else:
+                filter_path_text = str(selected)
         self.push_screen(
             ReportViewerScreen(
                 project_name,
                 reports,
                 declared_regions=self._declared_regions,
+                filter_names=filter_names,
+                filter_select_value=filter_select_value,
+                filter_path_text=filter_path_text,
             )
         )
+
+    def on_report_viewer_screen_filter_selected(
+        self, message: ReportViewerScreen.FilterSelected
+    ) -> None:
+        """
+        Summary:
+            Install a dropdown filter pick into the sticky app-level
+            selection (LLR-056.3): store the PATH only (never a parsed
+            snapshot — the file is re-read per report run) and confirm on
+            the status line through the markup-inert ``set_status`` funnel
+            (LLR-053.6, never ``notify()``/``set_file_status``).
+
+        Args:
+            message (ReportViewerScreen.FilterSelected): The picked bare
+                name, or ``None`` for the blank (full-report) selection.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``None`` pick → reset to ``None`` + "none" confirmation;
+              already-``None`` is a silent no-op (absorbs the mount echo
+              of the reopen seeding).
+            - Name pick → ``filters_dir / name``; an unchanged path is a
+              silent no-op (the reopen-seed echo), otherwise store +
+              confirm carrying the FILENAME within the Q-7 budget.
+
+        Dependencies:
+            Uses:
+                - ``_report_filters_dir`` / ``_confirm_filter_selection``
+            Used by:
+                - ``ReportViewerScreen.on_select_changed`` (posted message)
+        """
+        if message.name is None:
+            if self._report_filter_path is None:
+                return
+            self._report_filter_path = None
+            self.set_status("Report filter: none (full report)")
+            self.logger.info("Report filter cleared.")
+            return
+        filters_dir = self._report_filters_dir()
+        if filters_dir is None:
+            return
+        candidate = filters_dir / message.name
+        if self._report_filter_path == candidate:
+            return
+        self._report_filter_path = candidate
+        self.logger.info("Report filter selected: %s", candidate)
+        self._confirm_filter_selection(message.name)
+
+    def on_report_viewer_screen_filter_path_typed(
+        self, message: ReportViewerScreen.FilterPathTyped
+    ) -> None:
+        """
+        Summary:
+            Resolve a typed free filter path (LLR-056.4): route through
+            ``resolve_input_path`` against the app base dir, refuse a
+            missing / symlinked / non-file target with a named diagnostic
+            (the ``_scan_patch_change_files`` read-path security fold), and
+            install the resolved path into the sticky selection. An
+            out-of-project path is ALLOWED (read-only input, S-F5).
+
+        Args:
+            message (ReportViewerScreen.FilterPathTyped): The raw typed
+                path text (stripped, non-empty).
+
+        Returns:
+            None
+
+        Data Flow:
+            - unresolvable → "Filter path not found: ..." (fault token
+              leads within the 50-char funnel, Q-7); symlink / non-file →
+              their named refusals; the sticky selection is UNCHANGED on
+              every refusal.
+            - resolved file → store + confirmation carrying the filename.
+
+        Dependencies:
+            Uses:
+                - ``resolve_input_path`` / ``_confirm_filter_selection``
+            Used by:
+                - ``ReportViewerScreen.on_input_submitted`` (posted message)
+        """
+        raw = message.raw
+        resolved = resolve_input_path(Path(raw), self.base_dir)
+        if resolved is None:
+            self.set_status(f"Filter path not found: {raw}")
+            self.logger.info("Report filter path not found: %s", raw)
+            return
+        if resolved.is_symlink():
+            self.set_status(f"Filter path is a symlink - refused: {raw}")
+            self.logger.warning("Report filter symlink refused: %s", raw)
+            return
+        if not resolved.is_file():
+            self.set_status(f"Filter path is not a file: {raw}")
+            self.logger.info("Report filter non-file refused: %s", raw)
+            return
+        self._report_filter_path = resolved
+        self.logger.info("Report filter selected by path: %s", resolved)
+        self._confirm_filter_selection(resolved.name)
+
+    def _confirm_filter_selection(self, display: str) -> None:
+        """
+        Summary:
+            Surface the selection confirmation carrying the filter
+            FILENAME within the Q-7 status budget (LLR-053.6): the message
+            fits the 50-char funnel, or leads with its token — the bare
+            filename — when the framed form would trim it away. Flows
+            exclusively through the markup-inert ``set_status`` funnel.
+
+        Args:
+            display (str): The selected filter file's display name.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``set_status``
+            Used by:
+                - ``on_report_viewer_screen_filter_selected``
+                - ``on_report_viewer_screen_filter_path_typed``
+        """
+        message = f"Report filter: {display}"
+        if len(message) > 50:
+            message = display
+        self.set_status(message)
 
     def on_report_viewer_screen_generate_requested(
         self, message: ReportViewerScreen.GenerateRequested
@@ -2605,6 +2793,82 @@ class S19TuiApp(App):
         names = [
             match.name
             for match in patches_dir.glob("*.json")
+            if not match.is_symlink()
+        ]
+        return sorted(names)
+
+    def _report_filters_dir(self) -> Optional[Path]:
+        """Resolve the active project's report-filters directory (US-056).
+
+        Summary:
+            ``<project_dir>/filters`` for the active project, or ``None``
+            when no project is active — the report-filter dropdown then
+            simply has no options (LLR-056.1).
+
+        Args:
+            None
+
+        Returns:
+            Optional[Path]: The filters directory path (existence NOT
+            checked — the scanner tolerates absence), or ``None`` without
+            an active project.
+
+        Data Flow:
+            - ``_active_project_dir()`` → append ``REPORT_FILTERS_DIR_NAME``.
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / REPORT_FILTERS_DIR_NAME
+            Used by:
+                - ``_scan_report_filter_files``
+                - ``action_view_reports`` (reopen seeding)
+                - ``on_report_viewer_screen_filter_selected``
+        """
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            return None
+        return project_dir / REPORT_FILTERS_DIR_NAME
+
+    def _scan_report_filter_files(self) -> List[str]:
+        """Discover the report-filter files under filters/ (LLR-056.1).
+
+        Summary:
+            Return the sorted bare names of every ``*.json`` file in the
+            active project's ``filters/`` directory, feeding the
+            report-viewer dropdown (US-056). Mirrors
+            ``_scan_patch_change_files``: SORTED deterministically, and a
+            symlink entry is SKIPPED (never listed) — the read-path
+            security fold at discovery time.
+
+        Args:
+            None
+
+        Returns:
+            List[str]: The sorted bare component names of the non-symlink
+            ``*.json`` files; an empty list when no project is active or
+            the directory is absent/empty.
+
+        Data Flow:
+            - ``filters_dir.glob("*.json")`` → drop ``is_symlink`` matches
+              → collect ``match.name`` → ``sorted``.
+            - A missing directory yields no glob matches, never a raise.
+
+        Dependencies:
+            Uses:
+                - ``_report_filters_dir``
+            Used by:
+                - ``action_view_reports``
+
+        Example:
+            >>> app._scan_report_filter_files()
+            ['cal-only.json', 'crc-regions.json']
+        """
+        filters_dir = self._report_filters_dir()
+        if filters_dir is None or not filters_dir.is_dir():
+            return []
+        names = [
+            match.name
+            for match in filters_dir.glob("*.json")
             if not match.is_symlink()
         ]
         return sorted(names)
@@ -4562,6 +4826,10 @@ class S19TuiApp(App):
             return
         self.current_project = cleaned
         self.current_project_dir = project_dir
+        # F-09 (LLR-056.3): project CREATE/SAVE swaps the active project
+        # without reloading a file (no ``_apply_prepared_load`` pass), so
+        # the sticky report-filter selection resets here.
+        self._report_filter_path = None
         # Rebuild the variant inventory from the on-disk project so the saved
         # image becomes the active variant (multi-variant model, E5b). The id
         # is resolved AFTER the build by filename match because a stem
@@ -6866,6 +7134,13 @@ class S19TuiApp(App):
             ):
                 self._variant_set.active_id = pending_variant
         self.current_file = loaded
+        # F-09 (LLR-056.3): every load path — project load, loose-file
+        # load, variant activation — funnels through this install point,
+        # so the sticky report-filter selection dies with the previous
+        # loaded-file set here (the batch-24 cross-project survivor
+        # class). The project-CREATE swap, which installs no file, resets
+        # in ``_handle_save_dialog``.
+        self._report_filter_path = None
         # A file is now present — reveal the real content of the
         # content-bearing rail screens and hide their empty-state panels
         # (LLR-002.3).
