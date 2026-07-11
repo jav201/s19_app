@@ -890,19 +890,35 @@ Screen {
 }
 
 /* LLR-033.3b (C-13.1 rung-2) — the Change-file pane is the tightest (~35 cols
- * @80). Textual `Horizontal` does NOT wrap: it lays its five Load / Validate /
- * Apply / Save / Run-checks buttons on one line and CLIPS the overflow. Make
- * `#patch_doc_controls` an explicit 3-column button-grid so the five buttons
- * flow deterministically to two rows within the pane budget (version-stable,
- * CSS-only). Locked by the white-box TC (`grid_size_columns == 3`); AT-033a's
- * `region.right <= host` only proves the containing pane stays within the host
- * (a within-pane clip would be masked by `overflow-x: hidden`). */
+ * @80). Textual `Horizontal` does NOT wrap: it lays its buttons on one line
+ * and CLIPS the overflow. Make `#patch_doc_controls` an explicit 3-column
+ * button-grid so the buttons flow deterministically within the pane budget
+ * (version-stable, CSS-only). Since batch-35 (US-057) the grid holds the four
+ * Load / Validate / Apply / Save patch-script buttons (3 + 1 across two
+ * rows); Run-checks moved to `#patch_checks_controls` below. Locked by the
+ * white-box TC (`grid_size_columns == 3`); AT-033a's `region.right <= host`
+ * only proves the containing pane stays within the host (a within-pane clip
+ * would be masked by `overflow-x: hidden`). */
 #patch_doc_controls {
     width: 100%;
     height: auto;
     layout: grid;
     grid-size: 3;
     grid-gutter: 0 1;
+}
+
+/* batch-35 (US-057 / R-TUI-045) — the checks section container groups the
+ * Run-checks button with its clarity label under the "Checks" section title.
+ * Explicit `height: auto` is required: a bare `Container` defaults to
+ * `height: 1fr` and would grab the scrollable pane's whole viewport height
+ * (the #patch_variant_row precedent above). Geometry: the regroup only ADDS
+ * vertical rows (two section titles + the container) inside
+ * `#patch_pane_changefile`, which scrolls (`overflow-y: auto`, batch-22
+ * C-13.1) — no horizontal-budget change, the widest row is still the
+ * 3-column button grid. */
+#patch_checks_controls {
+    width: 100%;
+    height: auto;
 }
 
 .patch-field-label {

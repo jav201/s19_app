@@ -1858,28 +1858,52 @@ class PatchEditorPanel(ScrollableContainer):
                     placeholder="path to v2 change-set .json",
                     id="patch_doc_path_input",
                 ),
+                # batch-35 (US-057 / LLR-057.1): the mixed five-button row
+                # splits into two labeled sections — patch-script controls
+                # (Load/Validate/Apply/Save stay in #patch_doc_controls)
+                # vs check controls (Run checks + its help move into the
+                # new #patch_checks_controls) — so the operator never runs
+                # checks when a patch action was intended. Compose + CSS
+                # only: every pre-batch id and the on_button_pressed
+                # wiring are unchanged (LLR-057.3).
+                Label(
+                    "Patch script",
+                    id="patch_script_section_label",
+                    classes="patch-section-title",
+                ),
                 Horizontal(
                     Button("Load", id="patch_doc_load_button"),
                     Button("Validate", id="patch_doc_validate_button"),
                     Button("Apply", id="patch_doc_apply_button"),
                     Button("Save", id="patch_doc_save_button"),
-                    Button("Run checks", id="patch_checks_run_button"),
                     id="patch_doc_controls",
                 ),
-                # batch-33 (US-052 / LLR-052.1): the help text extends the
-                # AT-032a sentence (its token span is a locked pin) with
-                # check-semantics guidance so "uncheckable" explains itself
-                # before it ever appears: kind requirement + per-entry
-                # reasons + the healthy-entries-still-checked rule.
                 Label(
-                    "Checks: runs the loaded change document's checks "
-                    "against the loaded image. Needs kind 'check' (a "
-                    "change-set cannot be checked). Uncheckable rows name "
-                    "their reason (declaration fault, partial/outside "
-                    "range, or no image); healthy entries are still "
-                    "checked.",
-                    id="patch_checks_help",
-                    classes="patch-field-label",
+                    "Checks",
+                    id="patch_checks_section_label",
+                    classes="patch-section-title",
+                ),
+                Container(
+                    Button("Run checks", id="patch_checks_run_button"),
+                    # batch-33 (US-052 / LLR-052.1): the help text extends
+                    # the AT-032a sentence (its token span is a locked pin)
+                    # with check-semantics guidance so "uncheckable"
+                    # explains itself before it ever appears: kind
+                    # requirement + per-entry reasons + the
+                    # healthy-entries-still-checked rule. batch-35 moves
+                    # the label's CONTAINER only — the text is unchanged
+                    # (LLR-057.2).
+                    Label(
+                        "Checks: runs the loaded change document's checks "
+                        "against the loaded image. Needs kind 'check' (a "
+                        "change-set cannot be checked). Uncheckable rows "
+                        "name their reason (declaration fault, "
+                        "partial/outside range, or no image); healthy "
+                        "entries are still checked.",
+                        id="patch_checks_help",
+                        classes="patch-field-label",
+                    ),
+                    id="patch_checks_controls",
                 ),
                 id="patch_doc_file_row",
             ),

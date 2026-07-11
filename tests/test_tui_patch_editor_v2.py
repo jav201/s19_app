@@ -2238,3 +2238,194 @@ def test_tc051_4_hostile_encoding_sibling_through_load_funnel(
     assert any("CHG-ENCODING-UNKNOWN" in text for text in renders), (
         f"the encoding fault must reach the log surface; got {renders}"
     )
+
+
+# ===========================================================================
+# AT-057 — patch-editor control regroup (HLR-057 / US-057, batch-35)
+# ===========================================================================
+
+# LLR-057.1 — every pre-batch widget id in the change-file pane
+# (screens_directionb.py `#patch_pane_changefile` sub-tree) must survive the
+# regroup. This is the LLR's 15-id census, asserted verbatim.
+_PRESERVED_REGROUP_IDS = (
+    "patch_doc_file_select",
+    "patch_doc_path_input",
+    "patch_doc_load_button",
+    "patch_doc_validate_button",
+    "patch_doc_apply_button",
+    "patch_doc_save_button",
+    "patch_checks_run_button",
+    "patch_doc_controls",
+    "patch_checks_help",
+    "patch_doc_file_row",
+    "patch_paste_text",
+    "patch_paste_parse_button",
+    "patch_paste_controls",
+    "patch_paste_row",
+    "patch_pane_changefile",
+)
+
+
+def test_at057a_two_labeled_sections_ids_and_parentage(
+    tmp_path: Path,
+) -> None:
+    """AT-057a (gate) — two labeled sections; ids + AT-032a span survive.
+
+    Intent: HLR-057 / LLR-057.1/057.2 — with the Patch Editor open, the
+    operator sees a patch-script section label above ``#patch_doc_controls``
+    (now holding exactly the Load/Validate/Apply/Save buttons) and a checks
+    section label above the new ``#patch_checks_controls`` container holding
+    the Run-checks button and its help text. All 15 pre-batch widget ids
+    remain queryable and the locked AT-032a token span still renders in
+    ``#patch_checks_help`` (the regroup moves the label's container, never
+    its text). Counterfactual (QC-2): revert to the batch-22 mixed five-button
+    row ⇒ the section labels and ``#patch_checks_controls`` resolve to no
+    widget → RED (recorded at increment Inc-5 as the live RED).
+    """
+    from textual.widgets import Button, Label
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            outcomes["script_label"] = str(
+                app.query_one("#patch_script_section_label", Label).render()
+            )
+            outcomes["checks_label"] = str(
+                app.query_one("#patch_checks_section_label", Label).render()
+            )
+            outcomes["present_ids"] = [
+                wid
+                for wid in _PRESERVED_REGROUP_IDS
+                if len(app.query(f"#{wid}")) == 1
+            ]
+            run_button = app.query_one("#patch_checks_run_button", Button)
+            outcomes["run_parent"] = getattr(run_button.parent, "id", None)
+            help_label = app.query_one("#patch_checks_help", Label)
+            outcomes["help_parent"] = getattr(help_label.parent, "id", None)
+            outcomes["help_text"] = str(help_label.render())
+            controls = app.query_one("#patch_doc_controls")
+            outcomes["controls_button_ids"] = [
+                button.id for button in controls.query(Button)
+            ]
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["script_label"] == "Patch script", (
+        f"patch-script section label wrong: {outcomes['script_label']!r}"
+    )
+    assert outcomes["checks_label"] == "Checks", (
+        f"checks section label wrong: {outcomes['checks_label']!r}"
+    )
+    assert outcomes["present_ids"] == list(_PRESERVED_REGROUP_IDS), (
+        "missing preserved ids: "
+        f"{set(_PRESERVED_REGROUP_IDS) - set(outcomes['present_ids'])}"
+    )
+    assert outcomes["run_parent"] == "patch_checks_controls", (
+        f"Run checks must live under #patch_checks_controls, got "
+        f"{outcomes['run_parent']!r}"
+    )
+    assert outcomes["help_parent"] == "patch_checks_controls", (
+        f"the checks help must live under #patch_checks_controls, got "
+        f"{outcomes['help_parent']!r}"
+    )
+    assert _CHECKS_HELP_TOKEN in outcomes["help_text"], (
+        "the locked AT-032a token span must survive the regroup, got "
+        f"{outcomes['help_text']!r}"
+    )
+    assert outcomes["controls_button_ids"] == [
+        "patch_doc_load_button",
+        "patch_doc_validate_button",
+        "patch_doc_apply_button",
+        "patch_doc_save_button",
+    ], (
+        "#patch_doc_controls must retain exactly Load/Validate/Apply/Save, "
+        f"got {outcomes['controls_button_ids']}"
+    )
+
+
+def test_at057b_regroup_wiring_and_binding_regression(
+    tmp_path: Path,
+) -> None:
+    """AT-057b (regression) — every button and the `b` binding behave as
+    pre-batch after the regroup.
+
+    Intent: HLR-057 / LLR-057.3 — the regroup is compose + CSS only. Press
+    each of the five buttons through the shipped widget (``button.press()``,
+    the AT-032b idiom) and assert its pre-batch observable per button: Load
+    populates the entries table from the typed path, Validate posts the
+    ``Validate:`` status line, Apply posts ``Apply:``, Save writes exactly
+    one ``changes*.json`` under the work area, and Run checks on a
+    kind=change document posts the batch-33 ``Checks: not run`` loud block.
+    The app-level ``b`` binding stays bound to ``before_after_report``
+    (app.py BINDINGS). Counterfactual: dropping a button id from the
+    ``on_button_pressed`` dict or re-keying `b` makes its arm RED.
+    """
+    from textual.binding import Binding
+    from textual.widgets import Button, DataTable
+
+    doc_path = _write_v2_document(
+        tmp_path / "changes-at057b.json",
+        [
+            {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+            {"type": "string", "address": "0x200", "value": "REV"},
+        ],
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            table = app.query_one("#patch_doc_entries_table", DataTable)
+
+            _set_entry_inputs(app, path_text=str(doc_path))
+            app.query_one("#patch_doc_load_button", Button).press()
+            await pilot.pause()
+            outcomes["loaded_rows"] = table.row_count
+
+            app.query_one("#patch_doc_validate_button", Button).press()
+            await pilot.pause()
+            outcomes["validate_line"] = any(
+                line.startswith("Validate:") for line in app.log_lines
+            )
+
+            app.query_one("#patch_doc_apply_button", Button).press()
+            await pilot.pause()
+            outcomes["apply_line"] = any(
+                line.startswith("Apply:") for line in app.log_lines
+            )
+
+            app.query_one("#patch_doc_save_button", Button).press()
+            await pilot.pause()
+            workarea = tmp_path / ".s19tool" / "workarea"
+            outcomes["saved_files"] = len(
+                list(workarea.rglob("changes*.json"))
+            )
+
+            app.query_one("#patch_checks_run_button", Button).press()
+            await pilot.pause()
+            outcomes["checks_line"] = any(
+                "Checks: not run" in line for line in app.log_lines
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["loaded_rows"] == 2, "Load must populate the table"
+    assert outcomes["validate_line"] is True, "Validate: line must post"
+    assert outcomes["apply_line"] is True, "Apply: line must post"
+    assert outcomes["saved_files"] == 1, "Save must write one change file"
+    assert outcomes["checks_line"] is True, (
+        "Run checks must post the batch-33 loud doc-kind block"
+    )
+    assert any(
+        isinstance(binding, Binding)
+        and binding.key == "b"
+        and binding.action == "before_after_report"
+        for binding in S19TuiApp.BINDINGS
+    ), "the `b` binding must stay bound to before_after_report"

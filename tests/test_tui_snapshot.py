@@ -463,6 +463,35 @@ def _batch33_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-35 (US-057 / R-TUI-045): the patch-editor regroup — two labeled
+# sections in `#patch_pane_changefile` (patch-script buttons vs the new
+# `#patch_checks_controls`) — reflows the patch screen. Per LLR-057.4 BOTH
+# patch scaffold cells (the 80x24 floor + the 120x30 primary) are
+# xfail(strict=False) until the canonical-CI regen (snapshot-regen.yml,
+# textual 8.2.8, at CURRENT main post-merge) recommits them — the standing
+# batch-25/27/28/31/33 pattern. Observed at Inc-5 (local textual==8.2.8 ==
+# the canonical pin): only the 120x30 cell actually drifts — the 80x24
+# regroup rows render below the pane fold, exactly the batch-33 help-text
+# precedent — so the 80x24 cell XPASSes (strict=False keeps it non-gating)
+# until the regen retires both marks.
+_BATCH35_REGROUP_DRIFT = {
+    ("patch", "comfortable", "80x24"),
+    ("patch", "comfortable", "120x30"),
+}
+
+
+def _batch35_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the xfail mark for a batch-35 regroup drift cell, else ()."""
+    if (screen, density, size_key) in _BATCH35_REGROUP_DRIFT:
+        return (
+            pytest.mark.xfail(
+                strict=False,
+                reason="batch-35 US-057 regroup — pending canonical-CI regen",
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -512,7 +541,8 @@ _SCAFFOLD_CELLS = [
         id=f"{screen}-comfortable-{size_key}",
         marks=_scaffold_cell_marks(screen, size_key)
         + _batch31_drift_marks(screen, "comfortable", size_key)
-        + _batch33_drift_marks(screen, "comfortable", size_key),
+        + _batch33_drift_marks(screen, "comfortable", size_key)
+        + _batch35_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
@@ -784,3 +814,34 @@ def test_cv04_breakpoint_boundary_on_live_resize(tmp_path: Path) -> None:
     assert not back_at_120, (
         "resizing back up to width 120 must restore the fixed regime"
     )
+
+
+# ---------------------------------------------------------------------------
+# TC-320 — the batch-35 xfail set is exactly the two patch cells
+#          (LLR-057.4 — needs no snapshot library)
+# ---------------------------------------------------------------------------
+
+
+def test_tc320_batch35_xfail_set_is_exactly_the_two_patch_cells() -> None:
+    """The batch-35 regroup xfail set covers exactly the two patch cells.
+
+    Intent: LLR-057.4 — the US-057 regroup may drift ONLY the two
+    patch-screen scaffold cells (80x24 floor + 120x30 primary); no other
+    snapshot cell may carry the batch-35 xfail mark. Asserted against both
+    the declared drift set and the marks actually attached to the
+    parametrized cells, so an over-broad mark (masking an out-of-scope
+    drift) and an under-marked cell each make this RED.
+    """
+    assert _BATCH35_REGROUP_DRIFT == {
+        ("patch", "comfortable", "80x24"),
+        ("patch", "comfortable", "120x30"),
+    }, f"the drift set must be the two patch cells, got {_BATCH35_REGROUP_DRIFT}"
+    marked_cell_ids = sorted(
+        param.id
+        for param in _ALL_SNAPSHOT_CELLS + _ENTROPY_CELLS
+        if any(mark.name == "xfail" for mark in param.marks)
+    )
+    assert marked_cell_ids == [
+        "patch-comfortable-120x30",
+        "patch-comfortable-80x24",
+    ], f"exactly the two patch cells may be xfailed, got {marked_cell_ids}"
