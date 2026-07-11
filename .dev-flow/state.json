@@ -4,7 +4,7 @@
     "batch_id": "2026-07-10-batch-35",
     "batch_objective": "B-07 (P1, baseline backlog 2026-07-09; operator: 'one of the most important changes'): (1) report filter file -- operator-authored JSON whitelist (format s19app-report-filter v1.0) matching A2L/MAC symbol names (fnmatchcase globs) OR address ranges; restricts the before/after report and the project report (A/B diff stays always-complete); per-run dropdown of project filters/*.json + free path input, none = full report byte-identical; audit header names the applied filter + hidden counts; invalid filter refuses generation with named errors. (2) Patch-editor regroup -- patch-script controls vs check controls into two labeled sections (today one mixed Horizontal, screens_directionb.py:1861). Operator spec locked 2026-07-10 via 4-question AskUserQuestion gate; design defaults D-1..D-5 in PLAN.md adopted pending override.",
     "current_phase": 6,
-    "phase_status": "in-progress",
+    "phase_status": "awaiting-sync",
     "standing_authorization": "BATCH-35-SPECIFIC GRANT, operator AskUserQuestion 2026-07-10 mid-Phase-3 ('Grant batch-35 autonomy'): run the remaining gates (Inc-4/Inc-5, Phases 4-6) autonomously; present full packets in-conversation; report ALL decisions. GUARDRAILS unchanged: full suite + engine-frozen guards + independent code-review GREEN before PR; NO self-merge (operator merges); snapshot regen canonical-CI-only (LOCAL REGEN FORBIDDEN); 0 engine-frozen diffs; propose-not-encode new dev-flow controls. PER-BATCH RULE (operator correction 2026-07-10, feedback_standing_auth_per_batch): authorization is NEVER carried to a subsequent batch; ask the approval model at each batch kickoff. NOTE: phases 0-3 up to Inc-3 ran under the earlier carried auth before the correction surfaced; the operator's explicit grant now covers the remainder. Design defaults D-1..D-5 (PLAN.md) adopted pending operator override.",
     "route": "full /dev-flow (new operator-JSON input surface + C-17 file-derived text on status/report surfaces + report-semantics change to two shipped surfaces). Successor to batch-34 (reports lane, PR #63 merged 79699a5). Prior batch-33 fully synced; its awaiting-sync flag retired with this rollover.",
     "iterations_per_phase": {
@@ -14,7 +14,7 @@
         "3": 7,
         "4": 1,
         "5": 1,
-        "6": 0
+        "6": 1
     },
     "artifacts": {
         "plan": ".dev-flow/2026-07-10-batch-35/PLAN.md",
@@ -28,6 +28,12 @@
     },
     "rc1": "PASS @ 79699a5 (2026-07-10). feat/batch-35-report-filter cut from origin/main tip 79699a5 (batch-34 squash #63, operator-merged). Already-shipped check: 0 hits for any filter concept in s19_app/tui/services (case-insensitive), 0 hits repo-wide for R-RPT-FILTER/report-filter/filters-dir, no patch/checks section grouping in the TUI -- nothing shipped; all 5 stories proceed. Regroup grounding: #patch_doc_controls one mixed Horizontal (Load/Validate/Apply/Save + Run checks) at screens_directionb.py:1861-1868.",
     "decisions_log": [
+        {
+            "phase": 6,
+            "date": "2026-07-11",
+            "decision": "approved",
+            "notes": "Under the batch-35 grant. 06-docs complete: traceability-matrix (both chains, 25/25 LLR + 17/17 AT rows, 5-node grep sample re-verified, 0 gaps), functionality.md (doubles as the Phase-4-owed operator format docs; concrete example JSON VALIDATED through the real parser at the gate after the docs agent's honest untested flag; mermaid data-flow), REQUIREMENTS.md section 32 rows R-RPT-FILTER-001 + R-TUI-045 (house format, additive-only, engine guard green), executive-summary.md. Full-suite evidence: the Phase-4 gate run at 428470a (1335/2/4/1 exit 0) — every commit since is prose-only (dev-flow docs + REQUIREMENTS.md); CI on the PR is the tip-level re-proof. Review guardrail: 7/7 increment reviews APPROVE 0 HIGH + the reviewer's Phase-4 entry sweep. State -> awaiting-sync; /dev-flow-sync after the operator merges."
+        },
         {
             "phase": 5,
             "date": "2026-07-11",

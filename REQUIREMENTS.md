@@ -3291,3 +3291,93 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Code: `s19_app/tui/services/before_after_service.py::compose_before_after_report` + `BeforeAfterReportResult` + owned filename regexes (LLR-038.2/.4/.5); `s19_app/tui/services/diff_report_service.py::BeforeAfterProvenance` + `provenance`/`linkage_entries`/`filename_stem` kwargs + `_strip_ctl`/`_md_cell`/`_bytes_cell` + `_provenance_lines`/`_linkage_table_lines`/`_html_provenance`/`_html_linkage` (LLR-038.1); `s19_app/tui/changes/model.py::ChangeSummary.source_image_path` + `s19_app/tui/services/change_service.py::save_patched` stamp (B-2); `s19_app/tui/app.py::action_before_after_report` + `Binding("b", ...)` + the save-back offer notify in `on_patch_editor_panel_save_back_decision` (LLR-038.3) (US-034, HLR-038 / LLR-038.1–038.5).
 - Validation: `Automated` — `tests/test_before_after_report.py::test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path` (AT-038a GATE, C-10 collision-dedup drive + C-12 surfaced-path → dir-diff → re-read; RED pre-fix: key `b` unbound → no file, dir-diff assert failed) + `::test_at_038b_declined_saveback_trigger_refuses_and_writes_nothing` (AT-038b) + `::test_at_038c_missing_original_trigger_refuses_and_writes_nothing` (AT-038c) + `::test_at_038d_stale_summary_cross_project_refusal_writes_nothing` (AT-038d, B-2) + `::test_tc_038_3_composer_happy_path_and_regex_ownership` / `::test_tc_038_3_symlink_reports_destination_refused` / `::test_tc_038_3_ctl_symbol_renders_identically_in_md_and_html_pair` (TC-038.3) + `::test_tc_038_4_all_refusal_classes_write_no_files` / `::test_tc_038_4_no_project_refusal_names_manual_ab_path` (TC-038.4) + `::test_tc_038_5_module_imports_no_textual_and_no_logging` (TC-038.5) + `tests/test_diff_report_service.py::test_provenance_and_linkage_render_in_both_formats` / `::test_default_kwargs_output_byte_identical_pre_change_golden` / `::test_zero_entries_linkage_states_no_entries` (TC-038.2) / `::test_pipe_bearing_symbol_md_escaped_html_intact` (TC-038.1/.6) + `tests/test_change_service.py::test_save_patched_stamps_source_image_path` / `::test_save_patched_without_kwarg_leaves_source_image_path_none` / `::test_to_dict_excludes_source_image_path_and_stays_byte_stable` (B-2 stamp).
 - Status: Added batch-24 (US-034 / HLR-038). Closes feature #12(a). Frozen-engine diff = 0.
+
+---
+
+# 32. Report Filter Whitelist + Patch-editor Regroup (batch-35)
+
+> Backlog item B-07 (last P1): an operator-authored JSON whitelist restricts the
+> before/after report and the project report to selected symbols/address ranges under a
+> mandatory audit header; the A↔B diff report is exempt (always complete — a filtered
+> diff could hide unexpected deltas). Second half: the patch editor's mixed button row is
+> split into labeled patch-script vs checks sections. Stories:
+> `.dev-flow/2026-07-10-batch-35/01-requirements.md`.
+
+**R-RPT-FILTER-001**: The system must accept an operator-authored JSON report filter
+(envelope `format: "s19app-report-filter"`, `version: "1.0"`, whitelist-only
+`include.symbols` patterns + `include.addresses` ranges) selected per run on the Reports
+screen — a dropdown of the active project's `filters/*.json` (sorted, symlinks skipped)
+plus a free path input, defaulting to none, sticky across both report triggers, and
+reset on every project/loaded-file switch — and apply it to the before/after report pair
+and the project report: symbols match by exact equality OR case-sensitive
+`fnmatchcase` glob, name-matched A2L records cover their real `byte_size` extent (MAC
+records stay 1-byte points), address ranges are end-EXCLUSIVE over the pinned domain
+`0 <= start < end <= 2^32`, and an item matches on symbol, explicit-range intersection,
+or named-record-extent intersection, the matched address set resolved ONCE per run on
+the UI thread into a `ReportFilterMatcher` — the only filter object generators see.
+Filtered reports carry a mandatory first-block audit header naming the filter file and
+per-section shown/hidden counts (shown+hidden == pre-filter count); a zero-match filter
+still writes the report with the loud `filter matched 0 of N items` notice; an invalid,
+missing, oversized (4 MiB cap, probed pre-read), symlinked, or over-ceiling
+(4096 patterns / 4096 ranges) filter refuses generation on BOTH triggers with one named
+diagnostic per fault and writes zero files (missing `include` keys are accepted as empty
+lists — the loud zero-match path, never a silent full report); with no filter selected
+both reports remain byte-identical to the pre-batch output (golden-pinned under the
+declared fixed-clock environment pin); the A↔B diff report ignores the selection
+entirely; and all filter-derived text is markup-safe on the status funnel and
+ctl-stripped/cell-escaped/HTML-escaped in written files.
+
+- Code: `s19_app/tui/services/report_filter.py` (`REPORT_FILTER_FORMAT_ID`,
+  `REPORT_FILTER_SIZE_CAP_BYTES`, `SYMBOL_PATTERN_CEILING`, `ADDRESS_RANGE_CEILING`,
+  `ReportFilter`, `ReportFilterMatcher`, `read_report_filter_text`,
+  `parse_report_filter`, `resolve_report_filter`),
+  `s19_app/tui/services/report_service.py` (`ReportOptions.report_filter`, filtered
+  Modifications/Checklists/hexdump surfaces, `_audit_header_lines`,
+  `_zero_match_notice`),
+  `s19_app/tui/services/diff_report_service.py` (filtered linkage rows / run sections /
+  hex windows in MD+HTML, `_audit_header_lines`/`_html_audit_header`,
+  `_zero_match_notice`),
+  `s19_app/tui/services/before_after_service.py` (`report_filter` kwarg on
+  `compose_before_after_report`),
+  `s19_app/tui/app.py` (filter scan, sticky `_report_filter_path`, UI-thread resolve +
+  refusal-before-worker on both triggers, project-switch reset, markup-safe status),
+  `s19_app/tui/screens.py` (`ReportViewerScreen` `#report_filter_row` selector:
+  `#report_filter_select` + `#report_filter_path`, seeded on open, escaped option
+  labels)
+- Validation: `Automated` via `tests/test_report_filter.py` (TC-307 valid round-trip,
+  TC-308 rejection matrix, TC-309 read path + ceilings, TC-310 truth table + extent /
+  metacharacter / never-raise pins), `tests/test_tui_report_filter_surface.py` (AT-053a
+  both-surface refusal zero-files, AT-053b hostile-valid-filter sanitation, AT-054a
+  filtered b-key pair, AT-054c zero-match notice, AT-056a/a2/a3/b/c/d/e selector UX +
+  geometry + reset + hostile filename + typed path + A2B exemption, TC-316 scan, TC-317
+  free-path/swap refusals), `tests/test_before_after_report.py` (TC-311 composer
+  plumbing, AT-054b no-filter byte-identity golden), `tests/test_diff_report_service.py`
+  (TC-312 filtered surfaces + audit header position, TC-313 A2B completeness, TC-318
+  diff-half sanitation), `tests/test_report_service.py` (TC-314 filtered project
+  surfaces + end-exclusive boundary, TC-315 `ReportOptions` validation, TC-318
+  report-half sanitation), `tests/test_tui_report_seam.py` (AT-055a filtered Generate
+  report, AT-055b no-filter golden, AT-055c zero-match) with goldens under
+  `tests/goldens/batch35/` (double-proof executed ×3)
+- Status: Added in batch `2026-07-10-batch-35` (US-053/US-054/US-055/US-056 /
+  HLR-053..HLR-056, LLR-053.1–.7, LLR-054.1–.5, LLR-055.1–.4, LLR-056.1–.5).
+  Frozen-engine diff = 0.
+
+**R-TUI-045**: The Patch Editor's change-file pane must render its controls as two
+labeled sections — a patch-script section retaining exactly the
+Load/Validate/Apply/Save buttons in `#patch_doc_controls`, and a checks section
+(`#patch_checks_controls`) holding `#patch_checks_run_button` with its
+`#patch_checks_help` text — while preserving every pre-batch widget id (15-id census),
+the locked AT-032a help-token span, and the behavior of every existing handler, action,
+and key binding (compose + CSS only; the `b` binding stays bound to
+`before_after_report`); snapshot drift is confined to the patch-screen cells until the
+standing post-merge canonical regen.
+
+- Code: `s19_app/tui/screens_directionb.py` (change-file pane compose regroup, section
+  labels, `#patch_checks_controls`), `s19_app/tui/styles.tcss` (section styling)
+- Validation: `Automated` via `tests/test_tui_patch_editor_v2.py` (AT-057a section
+  labels + 15-id census + parentage, AT-057b per-button wiring + binding regression;
+  existing AT-032a/AT-052a green unmodified), `tests/test_tui_patch_layout.py` (TC-319
+  compose census; existing grid-3 pin green unmodified), `tests/test_tui_snapshot.py`
+  (TC-320 drift-set assertion: patch cells only)
+- Status: Added in batch `2026-07-10-batch-35` (US-057 / HLR-057, LLR-057.1–.4).
+  Frozen-engine diff = 0.
