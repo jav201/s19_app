@@ -691,3 +691,241 @@ def test_tc_038_5_module_imports_no_textual_and_no_logging() -> None:
         "S-F3: the reports destination must be constructed from the shared "
         "REPORTS_DIR_NAME constant under the active project dir"
     )
+
+
+# ===========================================================================
+# AT-054b — batch-35 Inc-0 byte-identity guard golden (LLR-054.4 / HLR-054)
+# ===========================================================================
+
+#: Golden fixtures for the batch-35 byte-identity guards, captured at the
+#: batch base revision ``79699a5`` by driving the shipped ``b``-key flow
+#: under the environment pin declared in :func:`_drive_bkey_report_pair`
+#: (golden home: ``tests/goldens/batch35/`` — canonical form, see
+#: :func:`_canonical_report_bytes`).
+_GOLDEN_DIR = Path(__file__).parent / "goldens" / "batch35"
+_AT054B_MD_GOLDEN = _GOLDEN_DIR / "at054b-before-after-report.md"
+_AT054B_HTML_GOLDEN = _GOLDEN_DIR / "at054b-before-after-report.html"
+
+#: The LLR-054.4 fixed-clock environment-pin instant (UTC).
+_FIXED_REPORT_INSTANT = datetime(2026, 7, 10, 12, 0, 0, tzinfo=timezone.utc)
+
+#: Placeholder replacing every spelling of the per-run pytest tmp root
+#: inside canonical report bytes.
+_RUN_ROOT_TOKEN = b"<RUN-ROOT>"
+
+#: A run-root path span: the token plus its path remainder, stopping at the
+#: delimiters the reports place around paths (whitespace, backtick, quote,
+#: pipe, closing paren/bracket) — separator normalization applies ONLY
+#: inside these spans, never to report content.
+_RUN_ROOT_SPAN = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
+
+
+class _FixedApplyDatetime(datetime):
+    """
+    Summary:
+        ``datetime`` stand-in pinning the ``changes.apply`` stamp clock —
+        ``apply_change_document`` defaults to an inline
+        ``datetime.now(timezone.utc)`` lambda (``changes/apply.py:313-314``)
+        with no module-level ``_default_now`` seam, so the environment pin
+        monkeypatches the module's ``datetime`` attribute with this subclass
+        (instances stay real ``datetime`` objects, so ``isoformat`` and any
+        isinstance check behave identically).
+
+    Args:
+        None (classmethod override only).
+
+    Returns:
+        None: Class definition.
+
+    Data Flow:
+        - ``apply.py:359`` ``timestamp_utc=clock().isoformat()`` ->
+          ``ChangeSummary.timestamp_utc`` -> ``BeforeAfterProvenance.
+          applied_at_utc`` -> the ``Applied (UTC)`` line in both report
+          formats (``diff_report_service.py:378`` / ``:1257``).
+
+    Dependencies:
+        Used by:
+            - _drive_bkey_report_pair
+    """
+
+    @classmethod
+    def now(cls, tz=None):  # noqa: ANN001 - datetime.now signature
+        """Return the pinned instant (tz-aware when ``tz`` is given)."""
+        if tz is None:
+            return cls(2026, 7, 10, 12, 0, 0)
+        return cls(2026, 7, 10, 12, 0, 0, tzinfo=tz)
+
+
+def _canonical_report_bytes(raw: bytes, run_root: Path | None = None) -> bytes:
+    """
+    Summary:
+        Map report bytes to the canonical golden form of the LLR-054.4/055.3
+        byte-identity pin: platform newline translation undone (CRLF -> LF,
+        the ``Path.write_text`` seam — generators join with ``"\\n"`` and let
+        the platform translate), every spelling of the per-run pytest tmp
+        root replaced by ``<RUN-ROOT>``, and path separators normalized to
+        ``/`` ONLY inside run-root path spans — content bytes (including the
+        batch-34 ``\\|`` linkage-cell escapes) are never rewritten.
+
+    Args:
+        raw (bytes): Report bytes as read from disk (a freshly written
+            report, or a stored golden).
+        run_root (Path | None): The per-run root whose spellings are
+            tokenized; ``None`` for stored goldens (already tokenized at
+            capture time — only the CRLF undo applies, shielding the golden
+            from git working-tree newline translation).
+
+    Returns:
+        bytes: The canonical byte form compared by AT-054b / AT-055b.
+
+    Data Flow:
+        - written report bytes + ``tmp_path`` -> canonical bytes;
+        - golden bytes (``run_root=None``) -> canonical bytes;
+        - equality of the two IS the LLR-054.4/055.3 byte-identity gate
+          (raw bytes cannot be run/platform-stable: the reports embed the
+          absolute run root in their provenance/inventory path lines).
+
+    Dependencies:
+        Uses:
+            - _RUN_ROOT_TOKEN / _RUN_ROOT_SPAN
+        Used by:
+            - test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+            - the batch-35 golden-capture procedure (increment-000)
+    """
+    data = raw.replace(b"\r\n", b"\n")
+    if run_root is not None:
+        forms = {str(run_root), str(run_root.resolve())}
+        for form in sorted(forms, key=len, reverse=True):
+            data = data.replace(form.encode("utf-8"), _RUN_ROOT_TOKEN)
+    return _RUN_ROOT_SPAN.sub(
+        lambda match: match.group(0).replace(b"\\", b"/"), data
+    )
+
+
+def _drive_bkey_report_pair(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> dict[str, bytes]:
+    """
+    Summary:
+        Drive the SHIPPED before/after surface (the AT-038a chain: load
+        image, apply one entry through the patch panel, confirm the
+        save-back, press key ``b``) under the LLR-054.4 environment pin and
+        return the written report files' raw bytes keyed by filename.
+
+    Args:
+        tmp_path (Path): Per-test root (app ``base_dir``); the project lives
+            at ``.s19tool/workarea/proj`` beneath it.
+        monkeypatch (pytest.MonkeyPatch): Applies the environment pin on
+            SERVICE module attributes (auto-undone per test):
+            ``diff_report_service._default_now`` (the default-clock seam
+            BOTH generators resolve when the handler passes no ``now_fn`` —
+            ``generate_diff_report``/``generate_diff_report_html``) and
+            ``changes.apply.datetime`` (:class:`_FixedApplyDatetime`, the
+            apply-stamp clock).
+
+    Returns:
+        dict[str, bytes]: ``{filename: raw bytes}`` for every file under
+        ``<project>/reports/`` after the ``b`` press.
+
+    Data Flow:
+        - pin clocks -> pilot drive (patch apply -> save-back confirm ->
+          key ``b``) -> handler writes MD+HTML pair -> raw bytes read back
+          from disk for the golden comparison.
+
+    Dependencies:
+        Uses:
+            - _make_s19_image / _load_image / _drive_apply
+            - _FixedApplyDatetime / _FIXED_REPORT_INSTANT
+        Used by:
+            - test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
+            - the batch-35 golden-capture procedure (increment-000)
+    """
+    import s19_app.tui.changes.apply as apply_module
+    from s19_app.tui.services import diff_report_service
+
+    monkeypatch.setattr(
+        diff_report_service, "_default_now", lambda: _FIXED_REPORT_INSTANT
+    )
+    monkeypatch.setattr(apply_module, "datetime", _FixedApplyDatetime)
+
+    from textual.widgets import Button
+
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict[str, bytes]:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+        reports_dir = project_dir / "reports"
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            project_dir.mkdir(parents=True, exist_ok=True)
+            app.current_project = "proj"
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            await _drive_apply(app, pilot)
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+            app.set_focus(None)
+            await pilot.press("b")
+            await pilot.pause()
+            return {
+                p.name: p.read_bytes()
+                for p in reports_dir.iterdir()
+                if p.is_file()
+            }
+
+    return asyncio.run(_drive())
+
+
+def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-054b / LLR-054.4 (HLR-054): with NO filter selected, the shipped
+    ``b``-key flow writes an MD+HTML pair byte-identical to the goldens
+    captured at the batch base revision ``79699a5`` under the declared
+    environment pin.
+
+    Intent: the batch-35 guard golden — every later increment must keep the
+    unfiltered before/after output byte-for-byte untouched; any generator
+    byte drift flips this equality RED.
+
+    Environment pin (test-side monkeypatch on SERVICE module attributes,
+    never a shipped-path change):
+    - ``s19_app.tui.services.diff_report_service._default_now`` -> fixed
+      2026-07-10T12:00:00Z — the default-clock seam BOTH generators resolve
+      when the handler passes no ``now_fn`` (``app.py`` passes none;
+      ``before_after_service`` forwards ``now_fn=None`` untouched).
+    - ``s19_app.tui.changes.apply.datetime`` -> :class:`_FixedApplyDatetime`
+      — the apply-stamp clock (inline default at ``apply.py:313-314``, no
+      ``_default_now`` symbol exists there) whose stamp is printed as the
+      ``Applied (UTC)`` report line.
+    Comparison runs on :func:`_canonical_report_bytes` (CRLF undo +
+    per-run tmp-root tokenization); all other bytes are compared exact.
+    Goldens: ``tests/goldens/batch35/at054b-before-after-report.{md,html}``.
+    Double-proof (batch-24 control): a one-byte golden perturbation makes
+    this AT RED — captured in increment-000.md.
+    """
+    written = _drive_bkey_report_pair(tmp_path, monkeypatch)
+
+    md_name = "20260710T120000Z-before-after-report.md"
+    html_name = "20260710T120000Z-before-after-report.html"
+    assert sorted(written) == [html_name, md_name], (
+        f"AT-054b: expected exactly the pinned-clock MD+HTML pair, "
+        f"got {sorted(written)}"
+    )
+
+    for label, name, golden_path in (
+        ("md", md_name, _AT054B_MD_GOLDEN),
+        ("html", html_name, _AT054B_HTML_GOLDEN),
+    ):
+        assert golden_path.is_file(), (
+            f"AT-054b: golden fixture missing: {golden_path} (captured in "
+            f"batch-35 increment-000 at base revision 79699a5)"
+        )
+        observed = _canonical_report_bytes(written[name], tmp_path)
+        golden = _canonical_report_bytes(golden_path.read_bytes())
+        assert observed == golden, (
+            f"AT-054b: unfiltered {label} report bytes drifted from golden "
+            f"{golden_path.name} (LLR-054.4 byte-identity, canonical form)"
+        )

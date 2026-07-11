@@ -44,9 +44,11 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Tuple
 
+import pytest
 from textual.widgets import Button, Markdown, TextArea
 
 import s19_app.tui.app as app_module
@@ -1144,4 +1146,187 @@ def test_zero_skip_suppresses_notify(tmp_path: Path) -> None:
     assert captured == [], (
         "TC-029.2: a clean (zero-skip) Generate must not call notify at all; "
         f"captured {captured!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-055b — batch-35 Inc-0 byte-identity guard golden (LLR-055.3 / HLR-055)
+# ---------------------------------------------------------------------------
+
+#: Golden fixture for the batch-35 project-report byte-identity guard,
+#: captured at the batch base revision ``79699a5`` by driving the shipped
+#: Generate flow under the environment pin declared in
+#: :func:`_drive_generate_report_bytes` (golden home:
+#: ``tests/goldens/batch35/`` — canonical form, see
+#: :func:`_canonical_report_bytes`).
+_GOLDEN_DIR = Path(__file__).parent / "goldens" / "batch35"
+_AT055B_GOLDEN = _GOLDEN_DIR / "at055b-project-report.md"
+
+#: The LLR-055.3 fixed-clock environment-pin instant (UTC).
+_FIXED_REPORT_INSTANT = datetime(2026, 7, 10, 12, 0, 0, tzinfo=timezone.utc)
+
+#: Placeholder replacing every spelling of the per-run pytest tmp root
+#: inside canonical report bytes.
+_RUN_ROOT_TOKEN = b"<RUN-ROOT>"
+
+#: A run-root path span: the token plus its path remainder, stopping at the
+#: delimiters the report places around paths — separator normalization
+#: applies ONLY inside these spans, never to report content.
+_RUN_ROOT_SPAN = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
+
+
+def _canonical_report_bytes(raw: bytes, run_root: Path | None = None) -> bytes:
+    """
+    Summary:
+        Map report bytes to the canonical golden form of the LLR-055.3
+        byte-identity pin: platform newline translation undone (CRLF -> LF,
+        the ``Path.write_text`` seam — ``generate_project_report`` joins
+        with ``"\\n"`` and lets the platform translate), every spelling of
+        the per-run pytest tmp root replaced by ``<RUN-ROOT>``, and path
+        separators normalized to ``/`` ONLY inside run-root path spans —
+        content bytes are never rewritten. Twin of the AT-054b helper in
+        ``tests/test_before_after_report.py`` (duplicated per file to keep
+        the increment additive; no shared test util module exists).
+
+    Args:
+        raw (bytes): Report bytes as read from disk (a freshly written
+            report, or a stored golden).
+        run_root (Path | None): The per-run root whose spellings are
+            tokenized; ``None`` for stored goldens (already tokenized at
+            capture time — only the CRLF undo applies, shielding the golden
+            from git working-tree newline translation).
+
+    Returns:
+        bytes: The canonical byte form compared by AT-055b.
+
+    Data Flow:
+        - written report bytes + ``tmp_path`` -> canonical bytes;
+        - golden bytes (``run_root=None``) -> canonical bytes;
+        - equality of the two IS the LLR-055.3 byte-identity gate (raw
+          bytes cannot be run/platform-stable: the Modifications section
+          embeds the absolute run root in its change-doc/saved-as line).
+
+    Dependencies:
+        Uses:
+            - _RUN_ROOT_TOKEN / _RUN_ROOT_SPAN
+        Used by:
+            - test_at_055b_no_filter_generate_report_byte_identical_to_golden
+            - the batch-35 golden-capture procedure (increment-000)
+    """
+    data = raw.replace(b"\r\n", b"\n")
+    if run_root is not None:
+        forms = {str(run_root), str(run_root.resolve())}
+        for form in sorted(forms, key=len, reverse=True):
+            data = data.replace(form.encode("utf-8"), _RUN_ROOT_TOKEN)
+    return _RUN_ROOT_SPAN.sub(
+        lambda match: match.group(0).replace(b"\\", b"/"), data
+    )
+
+
+def _drive_generate_report_bytes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> dict[str, bytes]:
+    """
+    Summary:
+        Drive the SHIPPED project-report Generate flow (the AC-A1 seam:
+        load the 2-variant project, open Reports, press the real
+        ``#report_generate`` button, drain the worker) under the LLR-055.3
+        environment pin and return the written report files' raw bytes
+        keyed by filename.
+
+    Args:
+        tmp_path (Path): Per-test root (app ``base_dir``); the project lives
+            at ``.s19tool/workarea/proj`` beneath it.
+        monkeypatch (pytest.MonkeyPatch): Applies the environment pin on the
+            SERVICE module attribute (auto-undone per test):
+            ``report_service._default_now`` — the default-clock seam
+            ``generate_project_report`` resolves when the worker passes no
+            ``now_fn`` (the shipped worker passes none).
+
+    Returns:
+        dict[str, bytes]: ``{filename: raw bytes}`` for every file under
+        ``<project>/reports/`` after the Generate press.
+
+    Data Flow:
+        - pin clock -> pilot drive (project load -> Generate through the
+          real screen control -> worker completes) -> the real
+          ``generate_project_report`` writes the report -> raw bytes read
+          back from disk for the golden comparison.
+
+    Dependencies:
+        Uses:
+            - _make_report_project / _generate_through_surface / _flush
+            - _FIXED_REPORT_INSTANT
+        Used by:
+            - test_at_055b_no_filter_generate_report_byte_identical_to_golden
+            - the batch-35 golden-capture procedure (increment-000)
+    """
+    import s19_app.tui.services.report_service as report_service_module
+
+    monkeypatch.setattr(
+        report_service_module, "_default_now", lambda: _FIXED_REPORT_INSTANT
+    )
+
+    async def _drive() -> dict[str, bytes]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await _generate_through_surface(app, pilot)
+            project_dir = app._active_project_dir()
+            assert project_dir is not None
+            reports_dir = project_dir / "reports"
+            return {
+                p.name: p.read_bytes()
+                for p in reports_dir.iterdir()
+                if p.is_file()
+            }
+
+    return asyncio.run(_drive())
+
+
+def test_at_055b_no_filter_generate_report_byte_identical_to_golden(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-055b / LLR-055.3 (HLR-055): with NO filter selected, the shipped
+    Generate flow writes a project report byte-identical to the golden
+    captured at the batch base revision ``79699a5`` under the declared
+    environment pin.
+
+    Intent: the batch-35 guard golden — every later increment must keep the
+    unfiltered project-report output byte-for-byte untouched; any generator
+    byte drift flips this equality RED.
+
+    Environment pin (test-side monkeypatch on the SERVICE module attribute,
+    never a shipped-path change):
+    - ``s19_app.tui.services.report_service._default_now`` -> fixed
+      2026-07-10T12:00:00Z — the ``NowFn`` default-clock seam
+      (``report_service.py:125-140``) ``generate_project_report`` resolves
+      when no ``now_fn`` is passed (the shipped worker passes none).
+    Comparison runs on :func:`_canonical_report_bytes` (CRLF undo +
+    per-run tmp-root tokenization); all other bytes are compared exact.
+    Golden: ``tests/goldens/batch35/at055b-project-report.md``.
+    Double-proof (batch-24 control): a one-byte golden perturbation makes
+    this AT RED — captured in increment-000.md.
+    """
+    written = _drive_generate_report_bytes(tmp_path, monkeypatch)
+
+    report_name = "20260710T120000Z-report.md"
+    assert sorted(written) == [report_name], (
+        f"AT-055b: expected exactly the pinned-clock report file, "
+        f"got {sorted(written)}"
+    )
+    assert _AT055B_GOLDEN.is_file(), (
+        f"AT-055b: golden fixture missing: {_AT055B_GOLDEN} (captured in "
+        f"batch-35 increment-000 at base revision 79699a5)"
+    )
+    observed = _canonical_report_bytes(written[report_name], tmp_path)
+    golden = _canonical_report_bytes(_AT055B_GOLDEN.read_bytes())
+    assert observed == golden, (
+        f"AT-055b: unfiltered project-report bytes drifted from golden "
+        f"{_AT055B_GOLDEN.name} (LLR-055.3 byte-identity, canonical form)"
     )
