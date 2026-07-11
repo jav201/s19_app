@@ -26,6 +26,10 @@ Report button), one on-disk node per AT (C-18):
 - **AT-053a** — JOINED node: an invalid selected filter refuses BOTH
   report triggers with the kind-prefixed named fault; ``reports/`` stays
   unchanged on both (LLR-053.5/053.6).
+- **AT-053b** — hostile-but-VALID filter (markup filename, pipe /
+  ``<b>`` / ctl / header-forging patterns): generation PROCEEDS on both
+  kinds, the confirmation renders the name literally, and every written
+  file is re-read asserting sanitation (LLR-053.6/055.4, Q-3; Inc-6).
 - **AT-054a** — ``b``-key with a filter: the written MD+HTML pair keeps
   the matching linkage row, omits the unmatched one, and carries the
   audit header (LLR-054.2/054.3).
@@ -56,6 +60,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Optional, Sequence, Tuple
@@ -277,6 +282,27 @@ def _symlink_or_skip(target: Path, link: Path) -> None:
         os.symlink(str(target), str(link))
     except OSError:
         pytest.skip("symlink creation not permitted on this platform")
+
+
+def _assert_md_table_rows_intact(md_text: str, label: str) -> None:
+    """Every contiguous MD table block keeps ONE unescaped-pipe count
+    across all its rows (the batch-34 split-on-unescaped-pipes idiom): a
+    hostile ``|`` surviving ``_md_table_cell`` unescaped would change one
+    row's structural cell count and fail here (LLR-055.4)."""
+    block: list = []
+    for line in md_text.splitlines() + [""]:
+        if line.startswith("|"):
+            block.append(line)
+            continue
+        if block:
+            counts = {
+                row: len(re.findall(r"(?<!\\)\|", row)) for row in block
+            }
+            assert len(set(counts.values())) == 1, (
+                f"AT-053b: {label} MD table structurally broken — "
+                f"unescaped-pipe counts differ across rows: {counts}"
+            )
+            block = []
 
 
 # ===========================================================================
@@ -824,6 +850,142 @@ def test_at_053a_invalid_filter_refuses_both_surfaces_zero_files(
         "running active scope" in line
         for line in outcomes["generate_lines"]
     ), "AT-053a: the worker must never start on the refused Generate run"
+
+
+# ===========================================================================
+# AT-053b — hostile-but-VALID filter proceeds; every written file sanitized
+# ===========================================================================
+
+
+def test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AT-053b / LLR-053.6 + LLR-055.4 (HLR-053, C-17 status + file sides).
+
+    Q-3 redefinition rationale: the draft's AT-053b observed a
+    hostile-content REFUSAL, which AT-053a already covers — the redefined
+    node proves the complementary half of HLR-053's acceptance:
+    hostility is NOT invalidity. A VALID filter whose FILENAME carries
+    markup brackets + backticks (Windows-legal; NTFS forbids ``|``/``<``/
+    ``>`` in names, so the pipe, ``<b>``, ctl-byte, and header-forging
+    classes ride in the PATTERNS) must PROCEED on BOTH report kinds
+    through the shipped surfaces (key ``b`` + Generate); the selection
+    confirmation renders the filename literally through the markup-inert
+    funnel with no ``MarkupError`` (LLR-053.6, Q-7 budget: the
+    confirmation carries the filename); and EVERY written file —
+    before/after MD + HTML and the project report — is re-read asserting
+    the LLR-055.4 sanitation discipline: literal filter name in each
+    audit header, no raw ``<b>`` in the HTML (the format carries no
+    legitimate one — the TC-038.6 precedent), MD table cell counts
+    intact (batch-34 unescaped-pipe idiom), the audit heading exactly
+    ONCE at its pinned first-block-after-title position (S-F6 — no
+    header forgery), and control bytes absent.
+    """
+    _pin_report_clocks(monkeypatch)
+    hostile_name = "[boom]`b`.json"
+    hostile_patterns = (
+        "a|b",
+        "`tick`",
+        "<b>bold</b>",
+        "\x01ctl",
+        "x\n## Report filter applied",
+    )
+    body = _valid_filter_body(
+        addresses=(("0x1000", "0x1001"),), symbols=hostile_patterns
+    )
+
+    async def _drive() -> dict:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = _make_project(
+            tmp_path, "proj", filters={hostile_name: body}, two_entries=True
+        )
+        outcomes: dict = {}
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            await _load_project(app, pilot, "proj")
+            await _select_filter_via_dropdown(app, pilot, hostile_name)
+            outcomes["log_renders"] = [
+                str(app.query_one(f"#log_line_{i}", Label).render())
+                for i in range(1, 5)
+            ]
+            await _apply_and_saveback(
+                app, pilot, entries=(("0x1000", "AA"), ("0x1002", "BB"))
+            )
+            await _press_bkey(app, pilot)
+            await _press_generate(app, pilot)
+            outcomes["written"] = _reports(project_dir)
+            outcomes["log_lines"] = list(app.log_lines)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    written = outcomes["written"]
+
+    # (a) generation PROCEEDED on both report kinds (hostility != invalidity).
+    assert set(written) == {_BA_MD_NAME, _BA_HTML_NAME, _PR_NAME}, (
+        "AT-053b: a hostile-but-VALID filter must not refuse either "
+        f"surface; wrote {sorted(written)}; status was "
+        f"{outcomes['log_lines']!r}"
+    )
+    assert not any("refused" in line for line in outcomes["log_lines"]), (
+        "AT-053b: no refusal may surface on the proceed path; status was "
+        f"{outcomes['log_lines']!r}"
+    )
+
+    # (b) the confirmation rendered the filename literally (LLR-053.6).
+    assert any(hostile_name in text for text in outcomes["log_renders"]), (
+        "AT-053b: the selection confirmation must render the hostile "
+        f"filename literally; rendered {outcomes['log_renders']!r}"
+    )
+
+    md_text = written[_BA_MD_NAME].decode("utf-8")
+    html_text = written[_BA_HTML_NAME].decode("utf-8")
+    pr_text = written[_PR_NAME].decode("utf-8")
+
+    # (c) every written file re-read: LLR-055.4 sanitation.
+    for label, text in (
+        ("ba-md", md_text), ("ba-html", html_text), ("project", pr_text)
+    ):
+        assert f"Filter file: {hostile_name}" in text, (
+            f"AT-053b: the {label} audit header must carry the literal "
+            "hostile filename"
+        )
+        assert "\x01" not in text, (
+            f"AT-053b: no control byte may reach the {label} file"
+        )
+
+    # Anti-forgery: the audit heading exactly ONCE, at its pinned
+    # first-block-after-title position (S-F6), in each format — the
+    # header-forging pattern must mint no second heading line.
+    md_lines = md_text.splitlines()
+    assert md_lines[0] == "# Diff report" and md_lines[2] == (
+        "## Report filter applied"
+    ), f"AT-053b: ba-md header block displaced: {md_lines[:4]}"
+    assert sum(
+        1 for ln in md_lines if ln == "## Report filter applied"
+    ) == 1, "AT-053b: the ba-md audit heading must appear exactly once"
+    pr_lines = pr_text.splitlines()
+    assert pr_lines[0] == "# Project report: proj" and pr_lines[2] == (
+        "## Report filter applied"
+    ), f"AT-053b: project-report header block displaced: {pr_lines[:4]}"
+    assert sum(
+        1 for ln in pr_lines if ln == "## Report filter applied"
+    ) == 1, "AT-053b: the project audit heading must appear exactly once"
+    html_lines = html_text.splitlines()
+    title_index = html_lines.index("<h1>Diff report</h1>")
+    assert html_lines[title_index + 1] == (
+        "<h2>Report filter applied</h2>"
+    ), "AT-053b: the HTML audit heading must follow the title"
+    assert html_text.count("Report filter applied") == 1, (
+        "AT-053b: the HTML audit heading must appear exactly once"
+    )
+
+    # No raw file-derived tag in the HTML; MD tables structurally intact.
+    assert "<b>" not in html_text, (
+        "AT-053b: raw '<b>' must never reach the HTML (escaped form only, "
+        "if echoed at all)"
+    )
+    _assert_md_table_rows_intact(md_text, "ba-md")
+    _assert_md_table_rows_intact(pr_text, "project")
 
 
 # ===========================================================================

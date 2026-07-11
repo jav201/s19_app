@@ -44,6 +44,7 @@ firmware.
 
 from __future__ import annotations
 
+import json
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -1510,3 +1511,113 @@ def test_tc315_report_filter_option_type_validation(tmp_path: Path) -> None:
     assert ReportOptions(report_filter=None).report_filter is None
     matcher = _resolved_matcher(_TC314_FILTER_JSON)
     assert ReportOptions(report_filter=matcher).report_filter is matcher
+
+
+_TC318_HOSTILE_PATTERNS = [
+    "a|b",
+    "`tick`",
+    "<b>bold</b>",
+    "\x01ctl",
+    "x\n## Forged heading",
+]
+
+
+def _tc318_filter_json(start: str, end: str) -> str:
+    """A VALID filter whose symbol patterns are hostile (TC-318 corpus):
+    pipe, backticks, raw HTML tag, control byte, and a would-be
+    header-forging line — all legal pattern strings per LLR-053.1."""
+    return json.dumps(
+        {
+            "format": "s19app-report-filter",
+            "version": "1.0",
+            "include": {
+                "symbols": _TC318_HOSTILE_PATTERNS,
+                "addresses": [{"start": start, "end": end}],
+            },
+        }
+    )
+
+
+def test_tc318_hostile_filter_name_and_patterns_sanitized(
+    tmp_path: Path,
+) -> None:
+    """TC-318 (report_service half) / LLR-055.4 (C-17 file side).
+
+    Intent: ``report_service`` performs no escaping on its existing lines,
+    so the NEW filter-derived audit-header text must sanitize LOCALLY
+    (``_strip_ctl_local`` — the S-F5 non-cell minimum: ctl-strip removes
+    newlines, so a hostile name cannot forge header lines). A matcher
+    whose ``source_name`` carries pipe / glob / bracket / control bytes
+    and whose patterns carry the full hostile corpus is driven through
+    ``generate_project_report`` twice — a MATCHING run (the audit header
+    renders) and a ZERO-MATCH run (the notice renders): the header line
+    carries the ctl-stripped literal name in both, no raw control byte
+    reaches either file, the hostile patterns mint no ``## `` heading,
+    and the existing section structure stays intact. The diff-module
+    half lives in ``test_diff_report_service.py::
+    test_tc318_hostile_filter_name_sanitized_md_html`` — this node
+    covers what it does not: the ``report_service`` audit header and
+    zero-match notice.
+    """
+    hostile_name = "a|b*[x]\x01\x1b.json"
+
+    # Matching run: the audit header renders with real shown counts.
+    matcher = _resolved_matcher(
+        _tc318_filter_json("0x1000", "0x1002"), name=hostile_name
+    )
+    hit_path = generate_project_report(
+        tmp_path / "hit",
+        _tc314_results(),
+        ReportOptions(context_bytes=0, report_filter=matcher),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    hit_text = hit_path.read_text(encoding="utf-8")
+    hit_lines = hit_text.splitlines()
+    assert hit_lines[2] == "## Report filter applied", (
+        "TC-318: the audit header must stay the first block after the "
+        f"title, got {hit_lines[:4]}"
+    )
+    assert "- Filter file: a|b*[x].json" in hit_text, (
+        "TC-318: the header must carry the ctl-stripped literal name"
+    )
+    assert "- Modifications rows: shown 1 of 2 (hidden 1)" in hit_text, (
+        "TC-318: the matching run must genuinely match (header renders "
+        "over a non-zero shown count)"
+    )
+
+    # Zero-match run: the notice renders under the same sanitized header.
+    zero_matcher = _resolved_matcher(
+        _tc318_filter_json("0x9000", "0x9010"), name=hostile_name
+    )
+    zero_path = generate_project_report(
+        tmp_path / "zero",
+        _tc314_results(),
+        ReportOptions(context_bytes=0, report_filter=zero_matcher),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    zero_text = zero_path.read_text(encoding="utf-8")
+    assert "- Filter file: a|b*[x].json" in zero_text
+    assert zero_text.count("filter matched 0 of 2 items") == 2, (
+        "TC-318: the zero-match notice must render (mods + regions)"
+    )
+    assert zero_text.count("filter matched 0 of 3 items") == 1
+
+    for label, text in (("matching", hit_text), ("zero-match", zero_text)):
+        assert "\x01" not in text and "\x1b" not in text, (
+            f"TC-318: no raw control byte may reach the {label} file"
+        )
+        lines = text.splitlines()
+        assert sum(
+            1 for ln in lines if ln == "## Report filter applied"
+        ) == 1, (
+            f"TC-318: the audit heading must appear exactly once "
+            f"({label})"
+        )
+        assert not any("Forged" in ln for ln in lines), (
+            f"TC-318: hostile patterns must never be echoed or mint a "
+            f"heading ({label})"
+        )
+        assert "## Variant inventory" in text
+        assert "## Consolidated overview" in text
