@@ -929,3 +929,172 @@ def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
             f"AT-054b: unfiltered {label} report bytes drifted from golden "
             f"{golden_path.name} (LLR-054.4 byte-identity, canonical form)"
         )
+
+
+# ===========================================================================
+# TC-311 — batch-35 Inc-2 composer plumbing (LLR-054.1)
+# ===========================================================================
+
+
+def _resolved_matcher(symbols=(), addresses=(), name="cal-filter.json"):
+    """Resolved ``ReportFilterMatcher`` via the public parse+resolve API.
+
+    ``name`` rides as the duck-typed ``source_name`` display attribute the
+    audit header reads (in-cap Inc-2 decision — see increment-002.md).
+    """
+    import json
+
+    from s19_app.tui.services.report_filter import (
+        parse_report_filter,
+        resolve_report_filter,
+    )
+
+    doc = json.dumps(
+        {
+            "format": "s19app-report-filter",
+            "version": "1.0",
+            "include": {
+                "symbols": list(symbols),
+                "addresses": [
+                    {"start": start, "end": end} for start, end in addresses
+                ],
+            },
+        }
+    )
+    flt, errors = parse_report_filter(doc)
+    assert errors == []
+    matcher = resolve_report_filter(flt, [], [])
+    if name is not None:
+        object.__setattr__(matcher, "source_name", name)
+    return matcher
+
+
+def test_tc311_composer_forwards_matcher_filtered_output_both_formats(
+    tmp_path: Path,
+) -> None:
+    """TC-311 / LLR-054.1: ``compose_before_after_report`` forwards the
+    resolved matcher into BOTH generators — the written MD and HTML each
+    carry the audit header, keep the matching linkage row, and drop the
+    non-matching one.
+
+    Threshold: audit header + filter name + matching symbol present in both
+    formats; the non-matching symbol absent from both.
+    """
+    bas = _bas()
+    project_dir = tmp_path / "proj"
+    project_dir.mkdir()
+    original = _make_s19_image(tmp_path)
+    patched = _make_s19_image(project_dir, name="img-patched_1.s19", patched=True)
+    summary = _summary(
+        saved_path=patched,
+        source_image_path=original,
+        entries=[
+            _summary_entry(symbol="CAL_KEEP"),
+            ChangeSummaryEntry(
+                entry_type="bytes",
+                address_start=0x900,
+                address_end=0x902,
+                before_bytes=(0x00, 0x00),
+                after_bytes=(0xCC, 0xDD),
+                disposition="applied",
+                linkage="standalone",
+                linkage_symbol="OTHER_DROP",
+            ),
+        ],
+    )
+    matcher = _resolved_matcher(
+        symbols=["CAL_KEEP"], addresses=[(0x100, 0x102)]
+    )
+
+    result = bas.compose_before_after_report(
+        summary,
+        original,
+        project_dir=project_dir,
+        workarea=tmp_path / "wa",
+        now_fn=_fixed_clock,
+        report_filter=matcher,
+    )
+
+    assert result.written, result.diagnostics
+    md_text = result.md_path.read_text(encoding="utf-8")
+    html_text = result.html_path.read_text(encoding="utf-8")
+    for text in (md_text, html_text):
+        assert "Report filter applied" in text
+        assert "cal-filter.json" in text
+        assert "CAL_KEEP" in text
+        assert "OTHER_DROP" not in text
+
+
+def test_tc311_no_filter_generator_kwargs_shape_is_todays(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """TC-311 / LLR-054.1 (F-01 kwargs pin): without the kwarg the composer
+    calls both generators with EXACTLY today's kwargs shape — no
+    ``report_filter`` key, no ``a2l_records``/``mac_records`` ever; with a
+    matcher, ``report_filter`` is the ONLY added key on both calls.
+
+    Byte-level no-filter arm: AT-054b (the Inc-0 golden) IS the byte pin —
+    this node pins the call shape at the composer seam.
+    """
+    from s19_app.tui.services.diff_report_service import DiffReportResult
+
+    bas = _bas()
+    project_dir = tmp_path / "proj"
+    project_dir.mkdir()
+    original = _make_s19_image(tmp_path)
+    patched = _make_s19_image(project_dir, name="p.s19", patched=True)
+    summary = _summary(saved_path=patched, source_image_path=original)
+
+    captured: list[tuple[str, dict]] = []
+
+    def _fake(fmt: str):
+        def _generator(comparison, **kwargs):
+            captured.append((fmt, kwargs))
+            return DiffReportResult(
+                path=project_dir / "reports" / f"fake.{fmt}",
+                written=True,
+                diagnostics=[],
+            )
+
+        return _generator
+
+    monkeypatch.setattr(bas, "generate_diff_report", _fake("md"))
+    monkeypatch.setattr(bas, "generate_diff_report_html", _fake("html"))
+
+    todays_keys = {
+        "mem_map_a",
+        "mem_map_b",
+        "project_dir",
+        "provenance",
+        "linkage_entries",
+        "filename_stem",
+        "now_fn",
+    }
+
+    result = bas.compose_before_after_report(
+        summary,
+        original,
+        project_dir=project_dir,
+        workarea=tmp_path / "wa",
+    )
+    assert result.written
+    assert [fmt for fmt, _ in captured] == ["md", "html"]
+    for fmt, kwargs in captured:
+        assert set(kwargs) == todays_keys, (
+            f"no-filter {fmt} kwargs drifted from today's shape: {set(kwargs)}"
+        )
+        assert kwargs["filename_stem"] == "before-after-report"
+
+    captured.clear()
+    matcher = _resolved_matcher(addresses=[(0x100, 0x102)])
+    result = bas.compose_before_after_report(
+        summary,
+        original,
+        project_dir=project_dir,
+        workarea=tmp_path / "wa",
+        report_filter=matcher,
+    )
+    assert result.written
+    for fmt, kwargs in captured:
+        assert set(kwargs) == todays_keys | {"report_filter"}, fmt
+        assert kwargs["report_filter"] is matcher

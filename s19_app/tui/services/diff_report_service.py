@@ -89,6 +89,7 @@ from ...compare import (
 
 if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
     from ..changes.model import ChangeSummaryEntry
+    from .report_filter import ReportFilterMatcher
 from ...range_index import address_in_sorted_ranges, build_sorted_range_index
 from ...version import __version__
 from ..changes.display import format_memory_value
@@ -344,6 +345,174 @@ def _bytes_cell(values: Optional[Sequence[int]]) -> str:
         return "-"
     rendering = format_memory_value(values)
     return f"{rendering.hex} |{rendering.ascii}|"
+
+
+def _filter_display_name(report_filter: "ReportFilterMatcher") -> str:
+    """
+    Summary:
+        The filter file name the audit header renders (LLR-054.3). Read as
+        the duck-typed ``source_name`` attribute on the matcher — the Inc-2
+        in-cap carrier for the display name (a later increment promotes it
+        to a declared ``ReportFilterMatcher`` field; this reader then needs
+        no change). RAW text — callers sanitize (``_strip_ctl`` / ``_esc``).
+
+    Args:
+        report_filter (ReportFilterMatcher): The resolved matcher.
+
+    Returns:
+        str: The attached display name, or ``(unnamed filter)`` when the
+        attribute is absent or not a non-empty string.
+
+    Dependencies:
+        Used by:
+            - generate_diff_report
+            - generate_diff_report_html
+    """
+    name = getattr(report_filter, "source_name", None)
+    return name if isinstance(name, str) and name else "(unnamed filter)"
+
+
+def _zero_match_notice(total: int) -> str:
+    """
+    Summary:
+        The LLR-054.3 zero-match notice replacing a filtered section's body.
+        Wording deliberately shares no prefix token with the LLR-053.5
+        refusal wordings (``report filter ...``) so "valid filter, matched
+        nothing" is never confusable with "filter invalid" (Q-12).
+
+    Args:
+        total (int): The section's PRE-FILTER item count.
+
+    Returns:
+        str: ``filter matched 0 of {total} items``.
+
+    Dependencies:
+        Used by:
+            - generate_diff_report
+            - generate_diff_report_html
+    """
+    return f"filter matched 0 of {total} items"
+
+
+def _apply_report_filter(
+    comparison: ComparisonResult,
+    linkage_entries: Optional[Sequence["ChangeSummaryEntry"]],
+    report_filter: Optional["ReportFilterMatcher"],
+) -> Tuple[
+    Optional[List[DiffRun]],
+    Optional[Sequence["ChangeSummaryEntry"]],
+    bool,
+    bool,
+]:
+    """
+    Summary:
+        Classify the report items against the resolved filter (LLR-054.2,
+        shared by both output formats): linkage entries match per LLR-053.4
+        (symbol OR range), runs match when ``[start, end)`` intersects the
+        matched address set. ``report_filter=None`` is the identity — the
+        unfiltered inputs pass through untouched (byte-identity,
+        LLR-054.4).
+
+    Args:
+        comparison (ComparisonResult): The completed comparison whose runs
+            are classified.
+        linkage_entries (Optional[Sequence[ChangeSummaryEntry]]): The
+            summary entries, or ``None`` when no linkage section renders.
+        report_filter (Optional[ReportFilterMatcher]): The resolved matcher
+            (LLR-053.7); ``None`` = no filtering.
+
+    Returns:
+        Tuple[Optional[List[DiffRun]], Optional[Sequence[ChangeSummaryEntry]],
+        bool, bool]: ``(filtered_runs, filtered_entries, zero_runs,
+        zero_entries)`` — ``filtered_runs`` is ``None`` when unfiltered;
+        the two flags mark a non-empty pre-filter set whose filtered form
+        is empty (the D-3 loud zero-match path).
+
+    Data Flow:
+        - Runs: ``matcher.matches_range(run.start, run.end)`` BEFORE any
+          window computation (D-5 filter-then-merge).
+        - Entries: ``matcher.matches_item(linkage_symbol, address_start,
+          address_end)``.
+
+    Dependencies:
+        Uses:
+            - ReportFilterMatcher.matches_range / matches_item (never-raise)
+        Used by:
+            - generate_diff_report
+            - generate_diff_report_html
+    """
+    if report_filter is None:
+        return None, linkage_entries, False, False
+    filtered_runs = [
+        run
+        for run in comparison.runs
+        if report_filter.matches_range(run.start, run.end)
+    ]
+    filtered_entries = linkage_entries
+    if linkage_entries is not None:
+        filtered_entries = [
+            entry
+            for entry in linkage_entries
+            if report_filter.matches_item(
+                entry.linkage_symbol, entry.address_start, entry.address_end
+            )
+        ]
+    zero_runs = bool(comparison.runs) and not filtered_runs
+    zero_entries = bool(linkage_entries) and not filtered_entries
+    return filtered_runs, filtered_entries, zero_runs, zero_entries
+
+
+def _audit_header_lines(
+    filter_name: str,
+    linkage_counts: Optional[Tuple[int, int]],
+    run_counts: Tuple[int, int],
+) -> List[str]:
+    """
+    Summary:
+        Build the Markdown audit header block (LLR-054.3) — the FIRST block
+        after the report title in every FILTERED report (S-F6): the applied
+        filter file name, the per-section shown/hidden counts (F-07:
+        before/after counts linkage entries and runs), and the F-03
+        informative merged-context note. The name passes ``_strip_ctl``
+        (LLR-055.4 non-cell minimum — newline stripping means a hostile
+        name cannot forge header lines).
+
+    Args:
+        filter_name (str): The filter display name (raw; ctl-stripped here).
+        linkage_counts (Optional[Tuple[int, int]]): ``(shown, total)`` for
+            the linkage table, or ``None`` when no linkage section renders.
+        run_counts (Tuple[int, int]): ``(shown, total)`` for the run
+            sections.
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included; shown + hidden
+        equals the pre-filter count per section.
+
+    Dependencies:
+        Uses:
+            - _strip_ctl
+        Used by:
+            - generate_diff_report
+    """
+    lines = [
+        "## Report filter applied",
+        "",
+        f"- Filter file: {_strip_ctl(filter_name)}",
+    ]
+    if linkage_counts is not None:
+        shown, total = linkage_counts
+        lines.append(
+            f"- Linkage entries: shown {shown} of {total} "
+            f"(hidden {total - shown})"
+        )
+    shown, total = run_counts
+    lines.append(f"- Runs: shown {shown} of {total} (hidden {total - shown})")
+    lines.append(
+        "- Note: windows seeded by matched runs may include excluded "
+        "addresses as merged context."
+    )
+    lines.append("")
+    return lines
 
 
 def _provenance_lines(provenance: BeforeAfterProvenance) -> List[str]:
@@ -786,18 +955,25 @@ def _stats_lines(comparison: ComparisonResult) -> List[str]:
 
 
 def _run_table_lines(
-    comparison: ComparisonResult, symbol_addresses: Sequence[Tuple[int, str]]
+    comparison: ComparisonResult,
+    symbol_addresses: Sequence[Tuple[int, str]],
+    runs: Optional[Sequence[DiffRun]] = None,
 ) -> List[str]:
     """
     Summary:
         Build the run table (LLR-004.3 / LLR-004.4): one row per run with
         start, end, length, classification, and best-effort symbol annotation.
-        Every run is listed.
+        Every run in scope is listed — the whole comparison by default, or
+        the filter-matched subset when the caller passes ``runs``
+        (LLR-054.2 (b)).
 
     Args:
         comparison (ComparisonResult): The completed comparison.
         symbol_addresses (Sequence[Tuple[int, str]]): Shared artifact
             ``(address, name)`` pairs; empty when no context (annotation ``-``).
+        runs (Optional[Sequence[DiffRun]]): The run subset to list;
+            ``None`` (the default) lists ``comparison.runs`` unchanged
+            (byte-identity, LLR-054.4).
 
     Returns:
         List[str]: Markdown lines, trailing blank included.
@@ -808,8 +984,9 @@ def _run_table_lines(
         Used by:
             - generate_diff_report
     """
+    runs = comparison.runs if runs is None else runs
     lines = ["## Runs", ""]
-    if not comparison.runs:
+    if not runs:
         lines.extend(["No differing runs - the images are identical.", ""])
         return lines
     lines.extend(
@@ -818,7 +995,7 @@ def _run_table_lines(
             "|---|---|---|---|---|",
         ]
     )
-    for run in comparison.runs:
+    for run in runs:
         lines.append(
             f"| 0x{run.start:08X} | 0x{run.end:08X} | {run.length} "
             f"| {_kind_label(run.kind)} "
@@ -942,27 +1119,36 @@ def _hex_windows_lines(
     mem_map_a: Dict[int, int],
     mem_map_b: Dict[int, int],
     context_bytes: int,
+    runs: Optional[Sequence[DiffRun]] = None,
 ) -> List[str]:
     """
     Summary:
         Build per-run bounded hex windows for image A and image B (LLR-004.3),
         rendered through the plain ``render_hex_view`` over windows from
         ``compute_hexdump_windows``. The written file is COMPLETE (G-9): every
-        run is dumped, there is no run cap, no byte budget, and no ``TRUNCATED``
-        marker. Each ``changed`` run additionally carries a fenced ```diff
-        block (A bytes as ``-`` lines, B bytes as ``+`` lines).
+        run in scope is dumped, there is no run cap, no byte budget, and no
+        ``TRUNCATED`` marker. Each ``changed`` run additionally carries a
+        fenced ```diff block (A bytes as ``-`` lines, B bytes as ``+`` lines).
 
     Args:
         comparison (ComparisonResult): The completed comparison.
         mem_map_a (Dict[int, int]): Image A's memory map.
         mem_map_b (Dict[int, int]): Image B's memory map.
         context_bytes (int): ± surrounding bytes per run window.
+        runs (Optional[Sequence[DiffRun]]): The run subset to dump;
+            ``None`` (the default) dumps ``comparison.runs`` unchanged.
+            A filtered subset (LLR-054.2 (c)) is applied BEFORE
+            ``compute_hexdump_windows`` — merged windows and grouped
+            headings are computed over the filtered list ONLY (D-5), so an
+            excluded run seeds no window and no heading member; its bytes
+            may still appear as merged context of matched-seeded windows
+            (F-03/Q-2, disclosed by the audit-header note).
 
     Returns:
         List[str]: Markdown lines, trailing blank included.
 
     Data Flow:
-        - Windows are computed ONCE over ALL runs with the
+        - Windows are computed ONCE over the in-scope runs with the
           :data:`MERGE_GAP_ROWS` bridge (batch-34 B-08) — contiguous runs
           share one merged window instead of repeating context rows. Per
           merged window: one grouped heading naming every member run, one
@@ -979,7 +1165,7 @@ def _hex_windows_lines(
     """
     out: List[str] = ["## Hex windows", ""]
 
-    runs = comparison.runs
+    runs = comparison.runs if runs is None else runs
     if not runs:
         out.extend(["No differing runs to dump.", ""])
         return out
@@ -1041,6 +1227,7 @@ def generate_diff_report(
     provenance: Optional[BeforeAfterProvenance] = None,
     linkage_entries: Optional[Sequence["ChangeSummaryEntry"]] = None,
     filename_stem: Optional[str] = None,
+    report_filter: Optional["ReportFilterMatcher"] = None,
 ) -> DiffReportResult:
     """
     Summary:
@@ -1049,7 +1236,8 @@ def generate_diff_report(
         the written path, or a diagnostic-bearing refusal when the no-project
         destination fails validation (LLR-004.6). The written file is complete
         — every run present, no cap, no byte truncation, no ``TRUNCATED`` marker
-        (G-9). Headless; performs no logging (LLR-004.5).
+        (G-9) — unless a ``report_filter`` restricts the item scope under the
+        LLR-054.3 audit header. Headless; performs no logging (LLR-004.5).
 
     Args:
         comparison (ComparisonResult): The §6.2 C-9 result from
@@ -1087,6 +1275,14 @@ def generate_diff_report(
         filename_stem (Optional[str]): Filename kind-stem override
             (LLR-038.1) for the before/after composer's own scheme (I4);
             ``None`` keeps the ``diff-report`` scheme unchanged.
+        report_filter (Optional[ReportFilterMatcher]): The resolved report
+            filter (LLR-053.7 / LLR-054.1, batch-35) — the ONLY filter
+            object crossing this boundary. When given: linkage rows and run
+            sections restrict to matching items (LLR-054.2, D-5
+            filter-then-merge), the LLR-054.3 audit header renders as the
+            first block after the title (S-F6), and a zero-match section
+            body becomes the loud notice. ``None`` (the default) leaves the
+            output BYTE-IDENTICAL to the pre-batch-35 behavior (LLR-054.4).
 
     Returns:
         DiffReportResult: ``written=True`` with the path on success, or
@@ -1104,17 +1300,23 @@ def generate_diff_report(
           path (LLR-004.6).
         - Build the filename with the no-silent-overwrite collision counter
           (:func:`_diff_report_filename`, M-5) in the resolved directory.
-        - Emit header -> optional provenance/linkage sections (LLR-038.1) ->
-          stats -> run table (best-effort annotation) -> per-run hex windows +
-          ```diff cue, then write once (COMPLETE — G-9).
+        - Classify items once (:func:`_apply_report_filter`, LLR-054.2) —
+          the identity when ``report_filter`` is ``None``.
+        - Emit header (+ audit header when filtered, S-F6) -> optional
+          provenance/linkage sections (LLR-038.1) -> stats (always COMPLETE,
+          D-2) -> run table -> hex windows over the in-scope runs +
+          ```diff cue, then write once.
 
     Dependencies:
         Uses:
             - _resolve_destination / _diff_report_filename
             - _header_lines / _provenance_lines / _linkage_table_lines
             - _stats_lines / _run_table_lines / _hex_windows_lines
+            - _apply_report_filter / _audit_header_lines /
+              _filter_display_name / _zero_match_notice (batch-35)
         Used by:
             - s19_app.tui.app.S19TuiApp (increment I4)
+            - s19_app.tui.services.before_after_service
             - tests/test_diff_report_service.py
 
     Example:
@@ -1137,17 +1339,55 @@ def generate_diff_report(
         a2l_records
     ) + _artifact_addresses_with_names(mac_records)
 
+    filtered_runs, filtered_entries, zero_runs, zero_entries = (
+        _apply_report_filter(comparison, linkage_entries, report_filter)
+    )
+
     lines: List[str] = []
-    lines.extend(_header_lines(comparison, generated_at))
+    header = _header_lines(comparison, generated_at)
+    if report_filter is None:
+        lines.extend(header)
+    else:
+        lines.extend(header[:2])  # title + blank — audit header follows (S-F6)
+        lines.extend(
+            _audit_header_lines(
+                _filter_display_name(report_filter),
+                (len(filtered_entries), len(linkage_entries))
+                if linkage_entries is not None
+                else None,
+                (len(filtered_runs), len(comparison.runs)),
+            )
+        )
+        lines.extend(header[2:])
     if provenance is not None:
         lines.extend(_provenance_lines(provenance))
     if linkage_entries is not None:
-        lines.extend(_linkage_table_lines(linkage_entries))
+        if zero_entries:
+            lines.extend(
+                [
+                    "## Change-entry linkage",
+                    "",
+                    _zero_match_notice(len(linkage_entries)),
+                    "",
+                ]
+            )
+        else:
+            lines.extend(_linkage_table_lines(filtered_entries))
     lines.extend(_stats_lines(comparison))
-    lines.extend(_run_table_lines(comparison, symbol_addresses))
-    lines.extend(
-        _hex_windows_lines(comparison, mem_map_a, mem_map_b, context_bytes)
-    )
+    if zero_runs:
+        notice = _zero_match_notice(len(comparison.runs))
+        lines.extend(["## Runs", "", notice, ""])
+        lines.extend(["## Hex windows", "", notice, ""])
+    else:
+        lines.extend(
+            _run_table_lines(comparison, symbol_addresses, runs=filtered_runs)
+        )
+        lines.extend(
+            _hex_windows_lines(
+                comparison, mem_map_a, mem_map_b, context_bytes,
+                runs=filtered_runs,
+            )
+        )
 
     target = dest_dir / filename
     target.write_text("\n".join(lines), encoding="utf-8")
@@ -1220,6 +1460,59 @@ def _html_header(comparison: ComparisonResult, generated_at: datetime) -> List[s
         _usage("B", comparison.notes.get("image_b")),
         "</ul>",
     ]
+
+
+def _html_audit_header(
+    filter_name: str,
+    linkage_counts: Optional[Tuple[int, int]],
+    run_counts: Tuple[int, int],
+) -> List[str]:
+    """
+    Summary:
+        Build the HTML audit header block (LLR-054.3) — the Markdown
+        :func:`_audit_header_lines` mirror, rendered directly after the
+        report title (S-F6). The filter name is ctl-stripped then
+        ``html.escape``-d (LLR-055.4 HTML side).
+
+    Args:
+        filter_name (str): The filter display name (raw; sanitized here).
+        linkage_counts (Optional[Tuple[int, int]]): ``(shown, total)`` for
+            the linkage table, or ``None`` when no linkage section renders.
+        run_counts (Tuple[int, int]): ``(shown, total)`` for the run
+            sections.
+
+    Returns:
+        List[str]: HTML lines.
+
+    Dependencies:
+        Uses:
+            - _esc / _strip_ctl
+        Used by:
+            - generate_diff_report_html
+    """
+    lines = [
+        "<h2>Report filter applied</h2>",
+        "<ul>",
+        f"<li>Filter file: {_esc(_strip_ctl(filter_name))}</li>",
+    ]
+    if linkage_counts is not None:
+        shown, total = linkage_counts
+        lines.append(
+            f"<li>Linkage entries: shown {shown} of {total} "
+            f"(hidden {total - shown})</li>"
+        )
+    shown, total = run_counts
+    lines.append(
+        f"<li>Runs: shown {shown} of {total} (hidden {total - shown})</li>"
+    )
+    lines.extend(
+        [
+            "<li>Note: windows seeded by matched runs may include excluded "
+            "addresses as merged context.</li>",
+            "</ul>",
+        ]
+    )
+    return lines
 
 
 def _html_provenance(provenance: BeforeAfterProvenance) -> List[str]:
@@ -1334,19 +1627,25 @@ def _html_stats(comparison: ComparisonResult) -> List[str]:
 
 
 def _html_run_rows(
-    comparison: ComparisonResult, symbol_addresses: Sequence[Tuple[int, str]]
+    comparison: ComparisonResult,
+    symbol_addresses: Sequence[Tuple[int, str]],
+    runs: Optional[Sequence[DiffRun]] = None,
 ) -> List[str]:
     """
     Summary:
         Build the HTML run table (LLR-004.7 / LLR-004.4): one row per run with
         start, end, length, classification (coloured by inline CSS per kind),
-        and best-effort symbol annotation. Every run is listed; all values
+        and best-effort symbol annotation. Every run in scope is listed —
+        the whole comparison by default, or the filter-matched subset when
+        the caller passes ``runs`` (LLR-054.2 (b)); all values
         ``html.escape``-d.
 
     Args:
         comparison (ComparisonResult): The completed comparison.
         symbol_addresses (Sequence[Tuple[int, str]]): Shared artifact
             ``(address, name)`` pairs; empty when no context (annotation ``-``).
+        runs (Optional[Sequence[DiffRun]]): The run subset to list;
+            ``None`` (the default) lists ``comparison.runs`` unchanged.
 
     Returns:
         List[str]: HTML lines.
@@ -1357,8 +1656,9 @@ def _html_run_rows(
         Used by:
             - generate_diff_report_html
     """
+    runs = comparison.runs if runs is None else runs
     lines = ["<h2>Runs</h2>"]
-    if not comparison.runs:
+    if not runs:
         lines.append("<p>No differing runs - the images are identical.</p>")
         return lines
     lines.extend(
@@ -1368,7 +1668,7 @@ def _html_run_rows(
             "<th>Classification</th><th>Symbols</th></tr>",
         ]
     )
-    for run in comparison.runs:
+    for run in runs:
         colour = _HTML_KIND_COLOUR.get(run.kind, "#000000")
         lines.append(
             f"<tr><td>0x{run.start:08X}</td><td>0x{run.end:08X}</td>"
@@ -1385,19 +1685,25 @@ def _html_hex_windows(
     mem_map_a: Dict[int, int],
     mem_map_b: Dict[int, int],
     context_bytes: int,
+    runs: Optional[Sequence[DiffRun]] = None,
 ) -> List[str]:
     """
     Summary:
         Build the HTML per-run hex windows for image A and image B (LLR-004.7).
-        COMPLETE (G-9): every run dumped, no cap / byte budget / ``TRUNCATED``
-        marker. Each window is an escaped ``<pre>`` block coloured by the run
-        kind via inline CSS.
+        COMPLETE (G-9): every run in scope dumped, no cap / byte budget /
+        ``TRUNCATED`` marker. Each window is an escaped ``<pre>`` block
+        coloured by the run kind via inline CSS.
 
     Args:
         comparison (ComparisonResult): The completed comparison.
         mem_map_a (Dict[int, int]): Image A's memory map.
         mem_map_b (Dict[int, int]): Image B's memory map.
         context_bytes (int): ± surrounding bytes per run window.
+        runs (Optional[Sequence[DiffRun]]): The run subset to dump;
+            ``None`` (the default) dumps ``comparison.runs`` unchanged. A
+            filtered subset (LLR-054.2 (c)) is applied BEFORE
+            ``compute_hexdump_windows`` — the D-5 filter-then-merge rule,
+            as :func:`_hex_windows_lines`.
 
     Returns:
         List[str]: HTML lines.
@@ -1409,7 +1715,7 @@ def _html_hex_windows(
             - generate_diff_report_html
     """
     lines = ["<h2>Hex windows</h2>"]
-    runs = comparison.runs
+    runs = comparison.runs if runs is None else runs
     if not runs:
         lines.append("<p>No differing runs to dump.</p>")
         return lines
@@ -1584,6 +1890,7 @@ def generate_diff_report_html(
     provenance: Optional[BeforeAfterProvenance] = None,
     linkage_entries: Optional[Sequence["ChangeSummaryEntry"]] = None,
     filename_stem: Optional[str] = None,
+    report_filter: Optional["ReportFilterMatcher"] = None,
 ) -> DiffReportResult:
     """
     Summary:
@@ -1627,6 +1934,13 @@ def generate_diff_report_html(
             marker. Omitted -> no section, output unchanged.
         filename_stem (Optional[str]): Filename kind-stem override
             (LLR-038.1); ``None`` keeps the ``diff-report`` scheme unchanged.
+        report_filter (Optional[ReportFilterMatcher]): The resolved report
+            filter (LLR-053.7 / LLR-054.1, batch-35) — same semantics as
+            :func:`generate_diff_report`: filtered linkage rows and run
+            sections (D-5 filter-then-merge), audit header first after the
+            title (S-F6), loud zero-match notice, filter name ``_esc``-d
+            (LLR-055.4). ``None`` (the default) leaves the output
+            BYTE-IDENTICAL to the pre-batch-35 behavior (LLR-054.4).
 
     Returns:
         DiffReportResult: ``written=True`` with the ``.html`` path on success,
@@ -1641,17 +1955,23 @@ def generate_diff_report_html(
         - Same destination resolution (:func:`_resolve_destination`) and
           collision counter (:func:`_diff_report_filename`, ``.html`` suffix)
           as the Markdown report.
+        - Classify items once (:func:`_apply_report_filter`, LLR-054.2) —
+          the identity when ``report_filter`` is ``None``.
         - Emit a self-contained ``<html>`` document: inline ``<style>`` ->
-          escaped header / stats / run table / hex windows, then write once
-          (COMPLETE — G-9).
+          escaped header (+ audit header when filtered) / stats / run table /
+          hex windows over the in-scope runs, then write once (COMPLETE —
+          G-9 — within the filtered item scope).
 
     Dependencies:
         Uses:
             - _resolve_destination / _diff_report_filename
             - _html_header / _html_provenance / _html_linkage
             - _html_stats / _html_run_rows / _html_hex_windows
+            - _apply_report_filter / _html_audit_header /
+              _filter_display_name / _zero_match_notice (batch-35)
         Used by:
             - s19_app.tui.app.S19TuiApp (increment I4)
+            - s19_app.tui.services.before_after_service
             - tests/test_diff_report_service.py
 
     Example:
@@ -1674,6 +1994,10 @@ def generate_diff_report_html(
         a2l_records
     ) + _artifact_addresses_with_names(mac_records)
 
+    filtered_runs, filtered_entries, zero_runs, zero_entries = (
+        _apply_report_filter(comparison, linkage_entries, report_filter)
+    )
+
     style = (
         "body{font-family:monospace;background:#fdf6e3;color:#073642;}"
         "table{border-collapse:collapse;}"
@@ -1691,14 +2015,48 @@ def generate_diff_report_html(
         "</head>",
         "<body>",
     ]
-    lines.extend(_html_header(comparison, generated_at))
+    header = _html_header(comparison, generated_at)
+    if report_filter is None:
+        lines.extend(header)
+    else:
+        lines.append(header[0])  # <h1> title — audit header follows (S-F6)
+        lines.extend(
+            _html_audit_header(
+                _filter_display_name(report_filter),
+                (len(filtered_entries), len(linkage_entries))
+                if linkage_entries is not None
+                else None,
+                (len(filtered_runs), len(comparison.runs)),
+            )
+        )
+        lines.extend(header[1:])
     if provenance is not None:
         lines.extend(_html_provenance(provenance))
     if linkage_entries is not None:
-        lines.extend(_html_linkage(linkage_entries))
+        if zero_entries:
+            lines.extend(
+                [
+                    "<h2>Change-entry linkage</h2>",
+                    f"<p>{_esc(_zero_match_notice(len(linkage_entries)))}</p>",
+                ]
+            )
+        else:
+            lines.extend(_html_linkage(filtered_entries))
     lines.extend(_html_stats(comparison))
-    lines.extend(_html_run_rows(comparison, symbol_addresses))
-    lines.extend(_html_hex_windows(comparison, mem_map_a, mem_map_b, context_bytes))
+    if zero_runs:
+        notice = _esc(_zero_match_notice(len(comparison.runs)))
+        lines.extend(["<h2>Runs</h2>", f"<p>{notice}</p>"])
+        lines.extend(["<h2>Hex windows</h2>", f"<p>{notice}</p>"])
+    else:
+        lines.extend(
+            _html_run_rows(comparison, symbol_addresses, runs=filtered_runs)
+        )
+        lines.extend(
+            _html_hex_windows(
+                comparison, mem_map_a, mem_map_b, context_bytes,
+                runs=filtered_runs,
+            )
+        )
     lines.extend(["</body>", "</html>"])
 
     target = dest_dir / filename

@@ -550,3 +550,49 @@ class TestTc310NeverRaise:
         matcher = resolve_report_filter(flt, None, None)
         assert matcher.matches_range(0, 1) is True
         assert matcher.matches_range(4, 5) is False
+
+
+# ---------------------------------------------------------------------------
+# D-10a — missing-key pin (batch-35 Inc-1 gate ratification, rides Inc-2)
+# ---------------------------------------------------------------------------
+
+
+def test_d10a_missing_include_keys_parse_ok_and_match_only_present() -> None:
+    """D-10a / LLR-053.1: a missing ``include`` key — or a missing
+    ``symbols``/``addresses`` sub-key — is accepted as the empty list (same
+    semantics as explicitly empty, D-10 loud zero-match): parse OK with zero
+    diagnostics; matching happens ONLY via the present list.
+    """
+    a2l = [{"name": "CAL_X", "address": 0x10, "byte_size": 4}]
+
+    # format + version only: valid, matches nothing.
+    envelope_only = json.dumps(
+        {
+            "format": REPORT_FILTER_FORMAT_ID,
+            "version": REPORT_FILTER_FORMAT_VERSION,
+        }
+    )
+    flt, errors = parse_report_filter(envelope_only)
+    assert errors == []
+    assert flt is not None
+    assert flt.symbols == () and flt.addresses == ()
+    matcher = resolve_report_filter(flt, a2l, [])
+    assert matcher.matches_item("CAL_X", 0x10, 0x14) is False
+
+    # include.symbols only: valid, matches via symbols (and their extents),
+    # never via the absent addresses list.
+    symbols_only = json.dumps(
+        {
+            "format": REPORT_FILTER_FORMAT_ID,
+            "version": REPORT_FILTER_FORMAT_VERSION,
+            "include": {"symbols": ["CAL_*"]},
+        }
+    )
+    flt2, errors2 = parse_report_filter(symbols_only)
+    assert errors2 == []
+    assert flt2 is not None
+    assert flt2.addresses == ()
+    matcher2 = resolve_report_filter(flt2, a2l, [])
+    assert matcher2.matches_symbol("CAL_X") is True
+    assert matcher2.matches_range(0x10, 0x14) is True  # CAL_X extent
+    assert matcher2.matches_range(0x100, 0x104) is False  # no explicit ranges
