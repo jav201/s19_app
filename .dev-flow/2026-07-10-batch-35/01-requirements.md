@@ -461,9 +461,11 @@ both extension buckets (`:363-369`) → loose JSON in the project dir is also in
   range, OR (c) `[a, b)` intersects the address EXTENT of any loaded A2L/MAC record whose NAME
   satisfies (a), where a record's extent is `[addr, addr + size)` with `size` = the record's
   `byte_size` value when it is a positive integer, else 1; the matched address set shall
-  be built once per report run, and membership checks shall consume
-  `build_sorted_range_index` / `address_in_sorted_ranges` / `range_in_sorted_ranges` from
-  `range_index.py` without modifying that module.
+  be built once per report run, and membership checks shall consume the APPLICABLE
+  `range_index.py` primitives (`build_sorted_range_index` + `address_in_sorted_ranges`;
+  `range_in_sorted_ranges` tests CONTAINMENT, not intersection, and is deliberately not
+  used — the intersection complement is a documented `bisect_right` arm over ranges merged
+  to disjoint before indexing) without modifying that module.
 - **Validation:** test (unit)
 - **Executed verification:** `pytest tests/test_report_filter.py -k tc310` (each of (a)/(b)/(c)
   isolated + a `fnmatchcase` case-sensitivity pin: pattern `CAL_*` must NOT match `cal_x`;
@@ -1089,6 +1091,11 @@ Covered in §1.3.
 - **D-10 (Phase-2 fold, F-11) — empty include lists are VALID** → the zero-match loud path
   (AT-054c/AT-055c). Supersedes 01b's P6 reject-preference, allowed by its own fallback
   clause.
+- **D-10a (Inc-1 gate ratification, 2026-07-10):** a MISSING `include` key, or a missing
+  `symbols`/`addresses` sub-key, is accepted as the empty list — same semantics as explicitly
+  empty (D-10 loud zero-match; the realistic typo `"includes"` is already rejected as an
+  unknown top-level key). Ratified from Inc-1's implemented-literally ambiguity flag; the
+  missing-key pin test rides Inc-2 (`tests/test_report_filter.py`, its 5th cap file).
 - **Requirement ledger sites:** filter → **R-RPT-FILTER-001**; regroup → **R-TUI-045**
   (both verified free, §1.4).
 
@@ -1152,6 +1159,8 @@ Covered in §1.3.
 | S-F4 (Phase-2 amendment, via LLR-053.7) | Never-raise extended to resolution + classification for any record shape; all per-run filter computation completes before the first file write. | HLR-053 re-read — unaffected | Yes |
 | S-F5 (Phase-2 amendment) | LLR-055.4: non-cell header lines pass ctl-strip at minimum (structurally sufficient); LLR-056.4: out-of-project free paths ALLOWED (read-only input, change-set precedent), no write ever outside `reports/`. | HLR-055/056 re-read — unaffected | Yes |
 | S-F6 (Phase-2 amendment) | LLR-054.3 informative pin: audit header = FIRST block after the title, fixed line format; TC-312/TC-314 assert its position. | HLR-054/055 re-read — unaffected | Yes |
+| D-10a (Inc-1 gate, 2026-07-10) | Missing `include` key / sub-keys accepted as empty lists (§6.2 D-10a); implementation probe-verified compliant by the Inc-1 reviewer; docstring sentence added (reviewer F1); pin test rides Inc-2. | HLR-053 re-read — unaffected | Yes |
+| Inc-1 review F2 (2026-07-10) | LLR-053.4 verification clause reworded: consume the APPLICABLE `range_index` primitives — `range_in_sorted_ranges` tests containment, not intersection, and is deliberately unused; the intersection complement is a documented `bisect_right` arm over merge-to-disjoint ranges (reviewer verified vs a brute-force oracle, 18k randomized probes, 0 divergences). | HLR-053 re-read — unaffected | Yes |
 
 #### 01b→01 AT registry reconciliation (F-06 / Q-11) — 01 is CANONICAL
 

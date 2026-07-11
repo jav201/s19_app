@@ -439,7 +439,11 @@ def parse_report_filter(text: str) -> tuple[Optional[ReportFilter], list[str]]:
         NAMED DIAGNOSTIC PER FAULT — a file with N distinct faults yields
         >= N diagnostics, each naming the offending key/index — and NEVER
         raising. Empty ``include`` lists are VALID and match nothing
-        (D-10). An unbalanced-bracket pattern such as ``CAL_[`` is VALID
+        (D-10). A MISSING ``include`` key, or a missing ``symbols`` /
+        ``addresses`` sub-key, is likewise accepted as the empty list
+        (D-10a — same zero-match semantics; the realistic ``"includes"``
+        typo is rejected as an unknown top-level key). An
+        unbalanced-bracket pattern such as ``CAL_[`` is VALID
         (Q-10): ``fnmatchcase`` treats the lone ``[`` literally and the F-2
         equality branch keeps it inert-safe — never a parse rejection.
 
