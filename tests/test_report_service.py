@@ -44,6 +44,7 @@ firmware.
 
 from __future__ import annotations
 
+import json
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -62,6 +63,10 @@ from s19_app.tui.changes.model import (
 from s19_app.tui.legend import LEGEND_TABLE
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services.report_addendum import DeclaredRegion
+from s19_app.tui.services.report_filter import (
+    parse_report_filter,
+    resolve_report_filter,
+)
 from s19_app.tui.services import report_service
 from s19_app.tui.services.report_service import (
     REPORT_CONTEXT_BYTES_MAX,
@@ -1278,3 +1283,341 @@ def test_tc051_5_blocked_runs_render_checklists(tmp_path: Path) -> None:
     # aggregates line with an empty table, without fault.
     assert "#### Checklist: envelope.json" in text
     assert "Passed: 0 - Failed: 0 - Uncheckable: 0" in text
+
+
+# ---------------------------------------------------------------------------
+# Batch-35 Inc-3 — TC-314 / TC-315: filtered project-report surfaces
+# (LLR-055.1 / LLR-055.2 / LLR-054.3)
+# ---------------------------------------------------------------------------
+
+
+def _resolved_matcher(filter_json: str, name: str = "tc314-filter.json"):
+    """Parse ``filter_json`` and resolve it into a named matcher.
+
+    Resolution runs with EMPTY artifact record lists — TC-314 exercises the
+    branch (a)/(b) item semantics through the report surfaces; branch (c)
+    record extents are TC-310 territory (test_report_filter.py). The
+    ``source_name`` kwarg is the Inc-3 declared-field promotion (Inc-2
+    review handoff): the audit header must render this exact name.
+    """
+    parsed, errors = parse_report_filter(filter_json)
+    assert not errors, f"fixture filter must parse cleanly, got {errors}"
+    return resolve_report_filter(parsed, [], [], source_name=name)
+
+
+_TC314_FILTER_JSON = (
+    '{"format": "s19app-report-filter", "version": "1.0",'
+    ' "include": {"symbols": ["CAL_*"],'
+    ' "addresses": [{"start": "0x1000", "end": "0x1002"}]}}'
+)
+
+_TC314_ZERO_MATCH_JSON = (
+    '{"format": "s19app-report-filter", "version": "1.0",'
+    ' "include": {"symbols": [],'
+    ' "addresses": [{"start": "0x9000", "end": "0x9010"}]}}'
+)
+
+
+def _tc314_results() -> list[VariantExecutionResult]:
+    """The TC-314 two-entry / three-check fixture (LLR-055.2 boundaries).
+
+    Modifications: E1 at [0x1000,0x1002) matches the filter RANGE; E2 at
+    [0x2000,0x2002) matches nothing. Checklist rows: C1 at [0x1000,0x1002)
+    matches by range; C2 at [0x0FFE,0x1000) ends EXACTLY at the filter
+    range start — end-exclusive semantics say NO match; C3 carries
+    ``linkage_symbol="CAL_TEMP"`` with its range outside every filter
+    range — the F-02 symbol branch must still match it.
+    """
+    mem_map = {addr: 0x55 for addr in range(0x1000, 0x1010)}
+    mem_map.update({addr: 0x66 for addr in range(0x2000, 0x2010)})
+    summary = _summary(
+        [
+            _applied_entry(0x1000, (0x01, 0x02), (0xAA, 0xBB), "mac-linked", "SYM_A"),
+            _applied_entry(0x2000, (0x03, 0x04), (0xCC, 0xDD)),
+        ],
+        variant_id="a",
+    )
+    check = _check(
+        [
+            CheckRunEntry(
+                "bytes", 0x1000, 0x1002, (0xAA, 0xBB), (0xAA, 0xBB),
+                "pass", "standalone", None,
+            ),
+            CheckRunEntry(
+                "bytes", 0x0FFE, 0x1000, (0x11, 0x22), (0x33, 0x44),
+                "fail", "standalone", None,
+            ),
+            CheckRunEntry(
+                "bytes", 0x3000, 0x3002, (0x01, 0x02), (0x01, 0x02),
+                "pass", "a2l-linked", "CAL_TEMP",
+            ),
+        ]
+    )
+    return [
+        VariantExecutionResult(
+            variant_id="a",
+            status="ok",
+            change_summaries=[summary],
+            check_results=[check],
+            mem_map=mem_map,
+        )
+    ]
+
+
+def test_tc314_filtered_sections_and_audit_header(tmp_path: Path) -> None:
+    """TC-314 — LLR-055.2 (a)/(b)/(c) + LLR-054.3 header position/counts.
+
+    Intent: a filter matching one of two modification entries restricts
+    ALL THREE filtered surfaces (Modifications rows, Checklists rows,
+    Memory-regions hexdump windows) to matching items only, under an
+    audit header that (S-F6) is the FIRST block after the report title
+    and whose per-section shown+hidden equals the pre-filter count.
+    Boundary pins: a check row whose range ENDS exactly at a filter
+    range start does NOT match (end-exclusive); a check row matched ONLY
+    by its ``linkage_symbol`` glob (range outside every filter range)
+    DOES match (F-02 branch).
+    """
+    matcher = _resolved_matcher(_TC314_FILTER_JSON)
+    path = generate_project_report(
+        tmp_path,
+        _tc314_results(),
+        ReportOptions(context_bytes=0, report_filter=matcher),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    text = path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+
+    # Audit header: FIRST block after the title (S-F6), fixed format.
+    assert lines[0] == "# Project report: proj"
+    assert lines[1] == ""
+    assert lines[2] == "## Report filter applied", (
+        "TC-314: the audit header must be the first block after the title"
+    )
+    assert "- Filter file: tc314-filter.json" in text
+    assert "- Modifications rows: shown 1 of 2 (hidden 1)" in text
+    assert "- Checklist rows: shown 2 of 3 (hidden 1)" in text
+    assert "- Applied regions: shown 1 of 2 (hidden 1)" in text
+
+    # Modifications: matched row present, unmatched absent.
+    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM_A |" in text
+    assert "| 0x00002000" not in text, (
+        "TC-314: the unmatched modification row must be absent"
+    )
+
+    # Checklists: range-matched row present; end-exclusive boundary row
+    # absent; symbol-matched (F-02) row present despite its range.
+    assert "| 0x00001000 | 2 | AA BB | AA BB | pass |" in text
+    assert "| 0x00000FFE" not in text, (
+        "TC-314: a check row ending exactly at a filter range start must "
+        "NOT match (end-exclusive semantics)"
+    )
+    assert "| 0x00003000 | 2 | 01 02 | 01 02 | pass |" in text, (
+        "TC-314: a check row matched only by linkage_symbol glob must "
+        "still render (F-02 branch)"
+    )
+
+    # Memory regions: only the matched region seeds a window (D-5
+    # filter-before-window); the unmatched region's window is absent.
+    assert "Window 0x00001000-0x00001010:" in text
+    assert "Window 0x00002000" not in text
+    assert text.count("Window 0x") == 1
+
+    # Whole sections stay complete (D-2): inventory + overview untouched.
+    assert "## Variant inventory" in text
+    assert "## Consolidated overview" in text
+
+
+def test_tc314_zero_match_notice_report_still_written(tmp_path: Path) -> None:
+    """TC-314 — LLR-054.3 zero-match: notice bodies, report on disk.
+
+    Intent: a VALID filter matching zero items still writes the report
+    (D-3 — never a silently empty/missing file); each filtered section's
+    body is replaced by the loud ``filter matched 0 of N items`` notice
+    with N = that section's pre-filter count; the audit header shows
+    ``shown 0``.
+    """
+    matcher = _resolved_matcher(_TC314_ZERO_MATCH_JSON, "zero.json")
+    path = generate_project_report(
+        tmp_path,
+        _tc314_results(),
+        ReportOptions(context_bytes=0, report_filter=matcher),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    assert path.is_file() and path.stat().st_size > 0, (
+        "TC-314: a zero-match filter must still write a non-empty report"
+    )
+    text = path.read_text(encoding="utf-8")
+    assert "- Filter file: zero.json" in text
+    assert "- Modifications rows: shown 0 of 2 (hidden 2)" in text
+    assert "- Checklist rows: shown 0 of 3 (hidden 3)" in text
+    assert "- Applied regions: shown 0 of 2 (hidden 2)" in text
+    # Section bodies replaced by the notice (mods + regions share N=2).
+    assert text.count("filter matched 0 of 2 items") == 2
+    assert text.count("filter matched 0 of 3 items") == 1
+    # No filtered row or window leaks through.
+    assert "| 0x00001000" not in text
+    assert "| 0x00002000" not in text
+    assert "Window 0x" not in text
+
+
+def test_tc314_unfiltered_output_identical_with_and_without_kwarg(
+    tmp_path: Path,
+) -> None:
+    """TC-314 — LLR-055.3 direct arm: no-kwarg == report_filter=None bytes.
+
+    Intent: the unfiltered path takes NO new code path — options built
+    without the ``report_filter`` kwarg and with an explicit ``None``
+    produce byte-identical reports (the golden AT-055b guards the
+    base-revision identity; this is the cheap in-tree equality arm).
+    """
+    dir_a = tmp_path / "a"
+    dir_b = tmp_path / "b"
+    results = _tc314_results()
+    vset = _variant_set("a")
+    path_a = generate_project_report(
+        dir_a, results, ReportOptions(context_bytes=0),
+        variant_set=vset, now_fn=_fixed_clock,
+    )
+    path_b = generate_project_report(
+        dir_b, results, ReportOptions(context_bytes=0, report_filter=None),
+        variant_set=vset, now_fn=_fixed_clock,
+    )
+    text_a = path_a.read_bytes()
+    assert text_a == path_b.read_bytes(), (
+        "TC-314: report_filter=None must be byte-identical to the "
+        "kwarg-absent construction"
+    )
+    assert b"Report filter applied" not in text_a, (
+        "TC-314: an UNFILTERED report must carry no audit header"
+    )
+
+
+def test_tc315_report_filter_option_type_validation(tmp_path: Path) -> None:
+    """TC-315 — LLR-055.1: wrong-type report_filter → exactly one ValueError.
+
+    Intent: the frozen-dataclass one-fault pattern extends to the new
+    field — a non-matcher value is REJECTED at construction (never
+    coerced), ``None`` (the default) and a real resolved matcher are
+    both accepted.
+    """
+    with pytest.raises(ValueError, match="report_filter"):
+        ReportOptions(report_filter="bogus")
+    with pytest.raises(ValueError, match="report_filter"):
+        ReportOptions(report_filter=42)
+    # None default + explicit None + a real matcher are all valid.
+    assert ReportOptions().report_filter is None
+    assert ReportOptions(report_filter=None).report_filter is None
+    matcher = _resolved_matcher(_TC314_FILTER_JSON)
+    assert ReportOptions(report_filter=matcher).report_filter is matcher
+
+
+_TC318_HOSTILE_PATTERNS = [
+    "a|b",
+    "`tick`",
+    "<b>bold</b>",
+    "\x01ctl",
+    "x\n## Forged heading",
+]
+
+
+def _tc318_filter_json(start: str, end: str) -> str:
+    """A VALID filter whose symbol patterns are hostile (TC-318 corpus):
+    pipe, backticks, raw HTML tag, control byte, and a would-be
+    header-forging line — all legal pattern strings per LLR-053.1."""
+    return json.dumps(
+        {
+            "format": "s19app-report-filter",
+            "version": "1.0",
+            "include": {
+                "symbols": _TC318_HOSTILE_PATTERNS,
+                "addresses": [{"start": start, "end": end}],
+            },
+        }
+    )
+
+
+def test_tc318_hostile_filter_name_and_patterns_sanitized(
+    tmp_path: Path,
+) -> None:
+    """TC-318 (report_service half) / LLR-055.4 (C-17 file side).
+
+    Intent: ``report_service`` performs no escaping on its existing lines,
+    so the NEW filter-derived audit-header text must sanitize LOCALLY
+    (``_strip_ctl_local`` — the S-F5 non-cell minimum: ctl-strip removes
+    newlines, so a hostile name cannot forge header lines). A matcher
+    whose ``source_name`` carries pipe / glob / bracket / control bytes
+    and whose patterns carry the full hostile corpus is driven through
+    ``generate_project_report`` twice — a MATCHING run (the audit header
+    renders) and a ZERO-MATCH run (the notice renders): the header line
+    carries the ctl-stripped literal name in both, no raw control byte
+    reaches either file, the hostile patterns mint no ``## `` heading,
+    and the existing section structure stays intact. The diff-module
+    half lives in ``test_diff_report_service.py::
+    test_tc318_hostile_filter_name_sanitized_md_html`` — this node
+    covers what it does not: the ``report_service`` audit header and
+    zero-match notice.
+    """
+    hostile_name = "a|b*[x]\x01\x1b.json"
+
+    # Matching run: the audit header renders with real shown counts.
+    matcher = _resolved_matcher(
+        _tc318_filter_json("0x1000", "0x1002"), name=hostile_name
+    )
+    hit_path = generate_project_report(
+        tmp_path / "hit",
+        _tc314_results(),
+        ReportOptions(context_bytes=0, report_filter=matcher),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    hit_text = hit_path.read_text(encoding="utf-8")
+    hit_lines = hit_text.splitlines()
+    assert hit_lines[2] == "## Report filter applied", (
+        "TC-318: the audit header must stay the first block after the "
+        f"title, got {hit_lines[:4]}"
+    )
+    assert "- Filter file: a|b*[x].json" in hit_text, (
+        "TC-318: the header must carry the ctl-stripped literal name"
+    )
+    assert "- Modifications rows: shown 1 of 2 (hidden 1)" in hit_text, (
+        "TC-318: the matching run must genuinely match (header renders "
+        "over a non-zero shown count)"
+    )
+
+    # Zero-match run: the notice renders under the same sanitized header.
+    zero_matcher = _resolved_matcher(
+        _tc318_filter_json("0x9000", "0x9010"), name=hostile_name
+    )
+    zero_path = generate_project_report(
+        tmp_path / "zero",
+        _tc314_results(),
+        ReportOptions(context_bytes=0, report_filter=zero_matcher),
+        variant_set=_variant_set("a"),
+        now_fn=_fixed_clock,
+    )
+    zero_text = zero_path.read_text(encoding="utf-8")
+    assert "- Filter file: a|b*[x].json" in zero_text
+    assert zero_text.count("filter matched 0 of 2 items") == 2, (
+        "TC-318: the zero-match notice must render (mods + regions)"
+    )
+    assert zero_text.count("filter matched 0 of 3 items") == 1
+
+    for label, text in (("matching", hit_text), ("zero-match", zero_text)):
+        assert "\x01" not in text and "\x1b" not in text, (
+            f"TC-318: no raw control byte may reach the {label} file"
+        )
+        lines = text.splitlines()
+        assert sum(
+            1 for ln in lines if ln == "## Report filter applied"
+        ) == 1, (
+            f"TC-318: the audit heading must appear exactly once "
+            f"({label})"
+        )
+        assert not any("Forged" in ln for ln in lines), (
+            f"TC-318: hostile patterns must never be echoed or mint a "
+            f"heading ({label})"
+        )
+        assert "## Variant inventory" in text
+        assert "## Consolidated overview" in text

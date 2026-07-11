@@ -325,3 +325,114 @@ def test_tc_pane_styles_and_grid(tmp_path: Path) -> None:
         f"#patch_doc_controls must be grid-size 3 columns, got "
         f"{result['controls_grid_cols']}"
     )
+
+
+# batch-35 (US-057 / LLR-057.1): the 15 pre-batch change-file-pane widget ids
+# that must survive the two-section regroup — the LLR's census, verbatim.
+_REGROUP_PRESERVED_IDS = (
+    "patch_doc_file_select",
+    "patch_doc_path_input",
+    "patch_doc_load_button",
+    "patch_doc_validate_button",
+    "patch_doc_apply_button",
+    "patch_doc_save_button",
+    "patch_checks_run_button",
+    "patch_doc_controls",
+    "patch_checks_help",
+    "patch_doc_file_row",
+    "patch_paste_text",
+    "patch_paste_parse_button",
+    "patch_paste_controls",
+    "patch_paste_row",
+    "patch_pane_changefile",
+)
+
+
+def test_tc319_regroup_section_structure_census(tmp_path: Path) -> None:
+    """TC-319 (white-box) — the regrouped change-file pane's compose census.
+
+    Intent: LLR-057.1 — against the composed widget tree: both section
+    labels render (`#patch_script_section_label` above `#patch_doc_controls`,
+    `#patch_checks_section_label` above `#patch_checks_controls`),
+    `#patch_doc_controls` holds exactly the four Load/Validate/Apply/Save
+    buttons, `#patch_checks_controls` holds the Run-checks button + the
+    checks help, and all 15 pre-batch widget ids survive. The sibling
+    grid-3 pin above (`test_tc_pane_styles_and_grid`) stays unmodified and
+    must remain GREEN with four buttons — this census only ADDS the
+    section-structure queries.
+    """
+    from textual.widgets import Button, Label
+
+    async def _run() -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            file_row = app.query_one("#patch_doc_file_row")
+            child_ids = [
+                child.id for child in file_row.children if child.id
+            ]
+            return {
+                "id_counts": {
+                    wid: len(app.query(f"#{wid}"))
+                    for wid in _REGROUP_PRESERVED_IDS
+                },
+                "script_label": str(
+                    app.query_one(
+                        "#patch_script_section_label", Label
+                    ).render()
+                ),
+                "checks_label": str(
+                    app.query_one(
+                        "#patch_checks_section_label", Label
+                    ).render()
+                ),
+                "file_row_child_ids": child_ids,
+                "controls_buttons": [
+                    button.id
+                    for button in app.query_one("#patch_doc_controls").query(
+                        Button
+                    )
+                ],
+                "checks_children": [
+                    child.id
+                    for child in app.query_one(
+                        "#patch_checks_controls"
+                    ).children
+                ],
+            }
+
+    result = asyncio.run(_run())
+    missing = [
+        wid for wid, count in result["id_counts"].items() if count != 1
+    ]
+    assert not missing, f"preserved ids missing after the regroup: {missing}"
+    assert result["script_label"] == "Patch script"
+    assert result["checks_label"] == "Checks"
+    # Section ORDER inside the file row: the patch-script label immediately
+    # precedes #patch_doc_controls, the checks label immediately precedes
+    # #patch_checks_controls.
+    ids = result["file_row_child_ids"]
+    assert ids.index("patch_script_section_label") + 1 == ids.index(
+        "patch_doc_controls"
+    ), f"the patch-script label must sit above the buttons, got {ids}"
+    assert ids.index("patch_checks_section_label") + 1 == ids.index(
+        "patch_checks_controls"
+    ), f"the checks label must sit above the checks container, got {ids}"
+    assert result["controls_buttons"] == [
+        "patch_doc_load_button",
+        "patch_doc_validate_button",
+        "patch_doc_apply_button",
+        "patch_doc_save_button",
+    ], (
+        "#patch_doc_controls must hold exactly Load/Validate/Apply/Save, "
+        f"got {result['controls_buttons']}"
+    )
+    assert result["checks_children"] == [
+        "patch_checks_run_button",
+        "patch_checks_help",
+    ], (
+        "#patch_checks_controls must hold the Run-checks button + help, "
+        f"got {result['checks_children']}"
+    )

@@ -50,6 +50,7 @@ from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
 from .report_addendum import DeclaredRegion
+from .report_filter import ReportFilterMatcher
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
     SCOPE_ACTIVE,
@@ -168,14 +169,23 @@ class ReportOptions:
             regions (LLR-024.2). When non-empty, the report emits an addendum
             listing each region and the modifications/issues whose address
             falls inside it. Each entry must be a :class:`DeclaredRegion`.
+        report_filter (Optional[ReportFilterMatcher]): The RESOLVED report
+            filter (LLR-055.1, batch-35 B-07) restricting the Modifications
+            rows, Checklists rows, and Memory-regions hexdump windows to
+            matching items (LLR-055.2) under an audit header. ``None`` (the
+            default) means no filtering — the output stays byte-identical
+            to the pre-batch report (LLR-055.3). Must already be resolved
+            on the UI thread (D-9); a non-matcher value raises ONE explicit
+            ``ValueError`` at construction.
 
     Returns:
         None: Frozen dataclass container.
 
     Raises:
         ValueError: When ``context_bytes`` is not an ``int`` inside the
-            F-S-05 domain, or ``execution_mode`` /
-            ``assignment_source`` is not a domain token.
+            F-S-05 domain, ``execution_mode`` / ``assignment_source`` is
+            not a domain token, or ``report_filter`` is neither ``None``
+            nor a :class:`ReportFilterMatcher`.
 
     Data Flow:
         - Built by the TUI report dialog (E8) or a headless caller.
@@ -198,6 +208,7 @@ class ReportOptions:
     include_legend: bool = True
     include_entropy: bool = True
     declared_regions: Tuple[DeclaredRegion, ...] = ()
+    report_filter: Optional[ReportFilterMatcher] = None
 
     def __post_init__(self) -> None:
         """
@@ -247,6 +258,14 @@ class ReportOptions:
                     f"declared_regions entries must be DeclaredRegion, got "
                     f"{region!r}"
                 )
+        if self.report_filter is not None and not isinstance(
+            self.report_filter, ReportFilterMatcher
+        ):
+            raise ValueError(
+                f"report_filter must be a ReportFilterMatcher or None, got "
+                f"{self.report_filter!r} - the value is rejected, not "
+                f"coerced"
+            )
 
 
 def _align16(value: int) -> int:
@@ -490,6 +509,241 @@ def list_project_reports(project_dir: Path) -> List[Path]:
     return [path for _key, path in keyed] + foreign
 
 
+def _strip_ctl_local(value: object) -> str:
+    """
+    Summary:
+        Strip control characters (``ord < 0x20`` plus ``0x7F``) from one
+        filter-derived value (LLR-055.4). Local twin of the diff report's
+        ``_strip_ctl`` — this module performs no escaping on its existing
+        lines and none is added; ONLY the new filter-derived audit-header
+        text passes through here (ctl-strip removes newlines, so a hostile
+        filter filename cannot forge header lines — S-F5 minimum).
+
+    Args:
+        value (object): The raw filter-derived value (the filter file
+            name); rendered via ``str()``.
+
+    Returns:
+        str: The text with every control character removed.
+
+    Data Flow:
+        - Character filter over ``str(value)``; no other transformation.
+
+    Dependencies:
+        Used by:
+            - _audit_header_lines
+    """
+    return "".join(
+        ch for ch in str(value) if ord(ch) >= 0x20 and ord(ch) != 0x7F
+    )
+
+
+def _filter_display_name(report_filter: ReportFilterMatcher) -> str:
+    """
+    Summary:
+        The filter file name the audit header renders (LLR-054.3), read
+        from the declared ``ReportFilterMatcher.source_name`` field (the
+        Inc-3 promotion of the Inc-2 duck-typed attribute). RAW text —
+        the caller sanitizes (``_strip_ctl_local``).
+
+    Args:
+        report_filter (ReportFilterMatcher): The resolved matcher.
+
+    Returns:
+        str: The attached display name, or ``(unnamed filter)`` when the
+        field is ``None`` or not a non-empty string.
+
+    Data Flow:
+        - Field read + type/emptiness guard; no I/O.
+
+    Dependencies:
+        Used by:
+            - generate_project_report
+    """
+    name = report_filter.source_name
+    return name if isinstance(name, str) and name else "(unnamed filter)"
+
+
+def _zero_match_notice(total: int) -> str:
+    """
+    Summary:
+        The LLR-054.3 zero-match notice replacing a filtered section's
+        body. Wording identical to the diff report's notice and
+        deliberately sharing no prefix token with the LLR-053.5 refusal
+        wordings (Q-12): "valid filter, matched nothing" is never
+        confusable with "filter invalid".
+
+    Args:
+        total (int): The section's PRE-FILTER item count.
+
+    Returns:
+        str: ``filter matched 0 of {total} items``.
+
+    Data Flow:
+        - Pure formatting; no I/O.
+
+    Dependencies:
+        Used by:
+            - _modifications_lines
+            - _checklist_lines
+            - _hexdump_section
+    """
+    return f"filter matched 0 of {total} items"
+
+
+def _matches_entry(matcher: ReportFilterMatcher, entry: object) -> bool:
+    """
+    Summary:
+        Classify one report row object against the resolved filter — the
+        LLR-053.4 item semantics via ``matches_item`` on the row's
+        ``linkage_symbol`` and half-open ``[address_start, address_end)``
+        range. Shared by the Modifications, Checklists (F-02: check
+        entries CARRY ``linkage_symbol``), and applied-regions surfaces so
+        all three sections obey ONE match rule (LLR-055.2).
+
+    Args:
+        matcher (ReportFilterMatcher): The resolved filter.
+        entry (object): A ``ChangeSummaryEntry`` or ``CheckRunEntry`` —
+            any object with ``linkage_symbol`` / ``address_start`` /
+            ``address_end`` attributes.
+
+    Returns:
+        bool: True when the row matches the filter. Never raises
+        (``matches_item`` honours the S-F4 never-raise contract).
+
+    Data Flow:
+        - Attribute reads → ``ReportFilterMatcher.matches_item``.
+
+    Dependencies:
+        Uses:
+            - ReportFilterMatcher.matches_item
+        Used by:
+            - _modifications_lines / _checklist_lines / _applied_regions
+            - _filter_section_counts
+    """
+    return matcher.matches_item(
+        getattr(entry, "linkage_symbol", None),
+        getattr(entry, "address_start", None),
+        getattr(entry, "address_end", None),
+    )
+
+
+def _filter_section_counts(
+    variant_results: Sequence[VariantExecutionResult],
+    matcher: ReportFilterMatcher,
+) -> Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:
+    """
+    Summary:
+        Aggregate the audit header's per-section ``(shown, total)`` pairs
+        (LLR-054.3 / F-07: the project report counts PER SECTION) across
+        every variant: Modifications rows, Checklists rows, and applied
+        regions — the same populations the section renderers filter, so
+        shown + hidden always equals the pre-filter count.
+
+    Args:
+        variant_results (Sequence[VariantExecutionResult]): Per-variant E6
+            execution outcomes, the report's row sources.
+        matcher (ReportFilterMatcher): The resolved filter.
+
+    Returns:
+        Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int]]:
+        ``((mods_shown, mods_total), (checks_shown, checks_total),
+        (regions_shown, regions_total))``.
+
+    Data Flow:
+        - Walk the same entry populations ``_modifications_lines`` /
+          ``_checklist_lines`` / ``_applied_regions`` render; classify via
+          :func:`_matches_entry`.
+
+    Dependencies:
+        Uses:
+            - _matches_entry / _applied_regions
+        Used by:
+            - generate_project_report
+    """
+    mods_shown = mods_total = checks_shown = checks_total = 0
+    regions_shown = regions_total = 0
+    for result in variant_results:
+        for summary in result.change_summaries:
+            for entry in summary.entries:
+                mods_total += 1
+                if _matches_entry(matcher, entry):
+                    mods_shown += 1
+        for check in result.check_results:
+            for entry in check.entries:
+                checks_total += 1
+                if _matches_entry(matcher, entry):
+                    checks_shown += 1
+        regions_total += len(_applied_regions(result))
+        regions_shown += len(_applied_regions(result, matcher))
+    return (
+        (mods_shown, mods_total),
+        (checks_shown, checks_total),
+        (regions_shown, regions_total),
+    )
+
+
+def _audit_header_lines(
+    filter_name: str,
+    modification_counts: Tuple[int, int],
+    checklist_counts: Tuple[int, int],
+    region_counts: Tuple[int, int],
+) -> List[str]:
+    """
+    Summary:
+        Build the Markdown audit header block (LLR-054.3) — the FIRST
+        block after the report title in every FILTERED report (S-F6),
+        same fixed format family as the diff report's audit header: the
+        applied filter file name plus the per-section shown/hidden counts
+        (F-07: the project report counts Modifications rows, Checklists
+        rows, and applied regions), closed by the F-03 informative
+        merged-context note. The name passes :func:`_strip_ctl_local`
+        (LLR-055.4 non-cell minimum).
+
+    Args:
+        filter_name (str): The filter display name (raw; ctl-stripped
+            here).
+        modification_counts (Tuple[int, int]): ``(shown, total)`` for the
+            Modifications rows.
+        checklist_counts (Tuple[int, int]): ``(shown, total)`` for the
+            Checklists rows.
+        region_counts (Tuple[int, int]): ``(shown, total)`` for the
+            applied regions feeding the hexdump windows.
+
+    Returns:
+        List[str]: Markdown lines, trailing blank included; shown +
+        hidden equals the pre-filter count per section.
+
+    Data Flow:
+        - Pure formatting of the pre-computed counts; no re-scan.
+
+    Dependencies:
+        Uses:
+            - _strip_ctl_local
+        Used by:
+            - generate_project_report
+    """
+    lines = [
+        "## Report filter applied",
+        "",
+        f"- Filter file: {_strip_ctl_local(filter_name)}",
+    ]
+    for label, (shown, total) in (
+        ("Modifications rows", modification_counts),
+        ("Checklist rows", checklist_counts),
+        ("Applied regions", region_counts),
+    ):
+        lines.append(
+            f"- {label}: shown {shown} of {total} (hidden {total - shown})"
+        )
+    lines.append(
+        "- Note: windows seeded by matched regions may include excluded "
+        "addresses as merged context."
+    )
+    lines.append("")
+    return lines
+
+
 def _header_lines(
     project_name: str, generated_at: datetime, options: ReportOptions
 ) -> List[str]:
@@ -654,15 +908,25 @@ def _modified_files_lines(result: VariantExecutionResult) -> List[str]:
     return lines
 
 
-def _modifications_lines(result: VariantExecutionResult) -> List[str]:
+def _modifications_lines(
+    result: VariantExecutionResult,
+    report_filter: Optional[ReportFilterMatcher] = None,
+) -> List[str]:
     """
     Summary:
         Build the per-variant per-modification table — address, length,
         before, after, linkage, symbol per entry (LLR-007.4 (d)), entries
-        in document order across the variant's change summaries.
+        in document order across the variant's change summaries. With a
+        ``report_filter`` (LLR-055.2 (a)), only rows matching the
+        LLR-053.4 item semantics render; a non-empty section whose rows
+        ALL filter out renders the loud zero-match notice instead
+        (LLR-054.3 / D-3).
 
     Args:
         result (VariantExecutionResult): One variant's execution outcome.
+        report_filter (Optional[ReportFilterMatcher]): The resolved
+            filter; ``None`` (the default) renders every row —
+            byte-identical to the pre-batch output (LLR-055.3).
 
     Returns:
         List[str]: Markdown lines, trailing blank included.
@@ -671,10 +935,12 @@ def _modifications_lines(result: VariantExecutionResult) -> List[str]:
         - ``before_bytes`` is ``None`` for every non-applied disposition
           (LLR-002.5) and renders as ``-`` — values come from the summary
           objects only, never from re-reading memory (LLR-007.8).
+        - Filtered rows are classified via :func:`_matches_entry`
+          (``matches_item`` on ``linkage_symbol`` + range).
 
     Dependencies:
         Uses:
-            - _format_bytes
+            - _format_bytes / _matches_entry / _zero_match_notice
         Used by:
             - generate_project_report
     """
@@ -687,6 +953,14 @@ def _modifications_lines(result: VariantExecutionResult) -> List[str]:
     if not entries:
         lines.extend(["No change entries were executed for this variant.", ""])
         return lines
+    if report_filter is not None:
+        kept = [
+            entry for entry in entries if _matches_entry(report_filter, entry)
+        ]
+        if not kept:
+            lines.extend([_zero_match_notice(len(entries)), ""])
+            return lines
+        entries = kept
     lines.extend(
         [
             "| Address | Length | Before | After | Linkage | Symbol |",
@@ -750,22 +1024,39 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
     return lines
 
 
-def _checklist_lines(result: VariantExecutionResult) -> List[str]:
+def _checklist_lines(
+    result: VariantExecutionResult,
+    report_filter: Optional[ReportFilterMatcher] = None,
+) -> List[str]:
     """
     Summary:
         Build the per-variant checklist tables — one table per executed
         check file with expected/actual/result per entry plus the
-        aggregate counts line (LLR-007.4 (d)).
+        aggregate counts line (LLR-007.4 (d)). With a ``report_filter``
+        (LLR-055.2 (b)), rows match via the FULL LLR-053.4 branch set —
+        ``CheckRunEntry.linkage_symbol`` OR range intersection (F-02:
+        check entries CARRY ``linkage_symbol``) — and a section whose
+        rows ALL filter out renders the zero-match notice; the per-file
+        aggregates line keeps the PRE-FILTER counts (the audit header
+        discloses the hidden row count).
 
     Args:
         result (VariantExecutionResult): One variant's execution outcome.
+        report_filter (Optional[ReportFilterMatcher]): The resolved
+            filter; ``None`` (the default) renders every row —
+            byte-identical to the pre-batch output (LLR-055.3).
 
     Returns:
         List[str]: Markdown lines, trailing blank included.
 
+    Data Flow:
+        - Filtered rows are classified via :func:`_matches_entry`; the
+          zero-match test spans the variant's WHOLE checklist row
+          population (all check files).
+
     Dependencies:
         Uses:
-            - _format_bytes
+            - _format_bytes / _matches_entry / _zero_match_notice
         Used by:
             - generate_project_report
     """
@@ -773,6 +1064,17 @@ def _checklist_lines(result: VariantExecutionResult) -> List[str]:
     if not result.check_results:
         lines.extend(["No checklists were executed for this variant.", ""])
         return lines
+    if report_filter is not None:
+        total = sum(len(check.entries) for check in result.check_results)
+        kept = sum(
+            1
+            for check in result.check_results
+            for entry in check.entries
+            if _matches_entry(report_filter, entry)
+        )
+        if total and not kept:
+            lines.extend([_zero_match_notice(total), ""])
+            return lines
     for check in result.check_results:
         source = (
             str(check.source_path)
@@ -792,6 +1094,10 @@ def _checklist_lines(result: VariantExecutionResult) -> List[str]:
             ]
         )
         for entry in check.entries:
+            if report_filter is not None and not _matches_entry(
+                report_filter, entry
+            ):
+                continue
             lines.append(
                 f"| 0x{entry.address_start:08X} "
                 f"| {entry.address_end - entry.address_start} "
@@ -805,29 +1111,45 @@ def _checklist_lines(result: VariantExecutionResult) -> List[str]:
 
 def _applied_regions(
     result: VariantExecutionResult,
+    report_filter: Optional[ReportFilterMatcher] = None,
 ) -> List[Tuple[int, int]]:
     """
     Summary:
         Collect the variant's modified regions — the half-open ranges of
         every ``applied`` summary entry, in document order across change
-        summaries.
+        summaries. With a ``report_filter`` (LLR-055.2 (c)), only entries
+        matching the LLR-053.4 item semantics contribute — the filter
+        applies to the ENTRY (symbol OR range), BEFORE any window math.
 
     Args:
         result (VariantExecutionResult): One variant's execution outcome.
+        report_filter (Optional[ReportFilterMatcher]): The resolved
+            filter; ``None`` (the default) keeps every applied entry —
+            byte-identical to the pre-batch output (LLR-055.3).
 
     Returns:
         List[Tuple[int, int]]: ``(address_start, address_end)`` per
-        applied entry.
+        (matching) applied entry.
+
+    Data Flow:
+        - Disposition gate first (unchanged), then the optional
+          :func:`_matches_entry` classification (D-5 filter-then-window).
 
     Dependencies:
+        Uses:
+            - _matches_entry
         Used by:
             - _hexdump_section
+            - _filter_section_counts
     """
     return [
         (entry.address_start, entry.address_end)
         for summary in result.change_summaries
         for entry in summary.entries
         if entry.disposition == DISPOSITION_APPLIED
+        and (
+            report_filter is None or _matches_entry(report_filter, entry)
+        )
     ]
 
 
@@ -885,7 +1207,8 @@ def _hexdump_section(
             ``result.mem_map`` is the post-change hexdump source
             (LLR-007.8) — when it was not captured the section states so
             and dumps nothing.
-        options (ReportOptions): Supplies ``context_bytes``.
+        options (ReportOptions): Supplies ``context_bytes`` and the
+            optional ``report_filter`` (LLR-055.2 (c)).
         budget (_ByteBudget): The running whole-document byte budget —
             consumed for every line this section emits; a block that no
             longer fits is omitted and counted.
@@ -895,6 +1218,10 @@ def _hexdump_section(
         truncation-appendix notes it produced (empty when no cap fired).
 
     Data Flow:
+        - With ``options.report_filter`` set (LLR-055.2 (c)), the applied
+          regions are filtered to matching entries BEFORE any window math
+          (D-5 filter-then-window); a non-empty region set whose entries
+          ALL filter out renders the zero-match notice (LLR-054.3).
         - Regions over :data:`REPORT_MAX_REGIONS_PER_VARIANT` → keep the
           first cap-many in document order, emit the region marker.
         - ``compute_hexdump_windows`` merges the kept regions' windows
@@ -905,6 +1232,7 @@ def _hexdump_section(
     Dependencies:
         Uses:
             - _applied_regions / compute_hexdump_windows / _hexdump_block
+            - _zero_match_notice
         Used by:
             - generate_project_report
     """
@@ -920,6 +1248,12 @@ def _hexdump_section(
     if not regions:
         put(["No modified regions.", ""])
         return out, notes
+    if options.report_filter is not None:
+        kept = _applied_regions(result, options.report_filter)
+        if not kept:
+            put([_zero_match_notice(len(regions)), ""])
+            return out, notes
+        regions = kept
     if not result.mem_map:
         put(["Post-change memory map unavailable - hexdumps omitted.", ""])
         return out, notes
@@ -1179,6 +1513,14 @@ def generate_project_report(
           declaration errors → checklists → memory-region hexdumps), (d2)
           the declared-region addendum when ``options.declared_regions``
           (LLR-024.2), (e) the truncation appendix when any cap fired.
+        - With ``options.report_filter`` set (LLR-055.2, batch-35 B-07)
+          the audit header block (:func:`_audit_header_lines`) is spliced
+          in as the FIRST block after the title (S-F6) and the
+          Modifications / Checklists / Memory-regions surfaces render
+          matching items only; header, inventory, overview, legend,
+          modified-files, declaration-errors, entropy, and addendum
+          sections stay complete (D-2). ``report_filter=None`` takes the
+          pre-batch code path unchanged (LLR-055.3 byte-identity).
         - The whole document is budgeted against
           :data:`REPORT_MAX_TOTAL_BYTES` at hexdump-block granularity.
 
@@ -1189,6 +1531,8 @@ def generate_project_report(
             - _modified_files_lines / _modifications_lines
             - _declaration_error_lines / _checklist_lines
             - _hexdump_section / _report_filename
+            - _audit_header_lines / _filter_section_counts
+            - _filter_display_name
         Used by:
             - The E8 report TUI action (later increment)
             - tests/test_report_service.py
@@ -1213,7 +1557,23 @@ def generate_project_report(
         lines.extend(batch)
         budget.consume(_line_bytes(batch))
 
-    emit(_header_lines(variant_set.project_name, generated_at, options))
+    header = _header_lines(variant_set.project_name, generated_at, options)
+    if options.report_filter is None:
+        emit(header)
+    else:
+        mod_counts, check_counts, region_counts = _filter_section_counts(
+            variant_results, options.report_filter
+        )
+        emit(header[:2])  # title + blank — audit header follows (S-F6)
+        emit(
+            _audit_header_lines(
+                _filter_display_name(options.report_filter),
+                mod_counts,
+                check_counts,
+                region_counts,
+            )
+        )
+        emit(header[2:])
     emit(_inventory_lines(variant_set))
     emit(_overview_lines(variant_results))
     if options.include_legend:
@@ -1221,9 +1581,9 @@ def generate_project_report(
     for result in variant_results:
         emit([f"## Variant: {result.variant_id}", ""])
         emit(_modified_files_lines(result))
-        emit(_modifications_lines(result))
+        emit(_modifications_lines(result, options.report_filter))
         emit(_declaration_error_lines(result))
-        emit(_checklist_lines(result))
+        emit(_checklist_lines(result, options.report_filter))
         dump_lines, dump_notes = _hexdump_section(result, options, budget)
         lines.extend(dump_lines)
         notes.extend(dump_notes)

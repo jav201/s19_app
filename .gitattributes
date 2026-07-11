@@ -3,3 +3,7 @@
 # (batch-25). Without this, core.autocrlf=true would rewrite them to CRLF on a
 # Windows checkout and every CI snapshot comparison could spuriously fail.
 tests/__snapshots__/**/*.svg text eol=lf
+# Report byte-identity goldens (batch-35 AT-054b/AT-055b) stay LF-only for the
+# same reason: the ATs undo CRLF on read, but LF-on-disk keeps the fixtures
+# byte-stable across Windows/Linux checkouts.
+tests/goldens/** text eol=lf

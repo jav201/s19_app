@@ -890,19 +890,35 @@ Screen {
 }
 
 /* LLR-033.3b (C-13.1 rung-2) — the Change-file pane is the tightest (~35 cols
- * @80). Textual `Horizontal` does NOT wrap: it lays its five Load / Validate /
- * Apply / Save / Run-checks buttons on one line and CLIPS the overflow. Make
- * `#patch_doc_controls` an explicit 3-column button-grid so the five buttons
- * flow deterministically to two rows within the pane budget (version-stable,
- * CSS-only). Locked by the white-box TC (`grid_size_columns == 3`); AT-033a's
- * `region.right <= host` only proves the containing pane stays within the host
- * (a within-pane clip would be masked by `overflow-x: hidden`). */
+ * @80). Textual `Horizontal` does NOT wrap: it lays its buttons on one line
+ * and CLIPS the overflow. Make `#patch_doc_controls` an explicit 3-column
+ * button-grid so the buttons flow deterministically within the pane budget
+ * (version-stable, CSS-only). Since batch-35 (US-057) the grid holds the four
+ * Load / Validate / Apply / Save patch-script buttons (3 + 1 across two
+ * rows); Run-checks moved to `#patch_checks_controls` below. Locked by the
+ * white-box TC (`grid_size_columns == 3`); AT-033a's `region.right <= host`
+ * only proves the containing pane stays within the host (a within-pane clip
+ * would be masked by `overflow-x: hidden`). */
 #patch_doc_controls {
     width: 100%;
     height: auto;
     layout: grid;
     grid-size: 3;
     grid-gutter: 0 1;
+}
+
+/* batch-35 (US-057 / R-TUI-045) — the checks section container groups the
+ * Run-checks button with its clarity label under the "Checks" section title.
+ * Explicit `height: auto` is required: a bare `Container` defaults to
+ * `height: 1fr` and would grab the scrollable pane's whole viewport height
+ * (the #patch_variant_row precedent above). Geometry: the regroup only ADDS
+ * vertical rows (two section titles + the container) inside
+ * `#patch_pane_changefile`, which scrolls (`overflow-y: auto`, batch-22
+ * C-13.1) — no horizontal-budget change, the widest row is still the
+ * 3-column button grid. */
+#patch_checks_controls {
+    width: 100%;
+    height: auto;
 }
 
 .patch-field-label {
@@ -1124,6 +1140,38 @@ ModalScreen {
     background: $bg-base;
     height: 5;
     margin-bottom: 1;
+}
+
+/* Report-filter selector row (batch-35 US-056, LLR-056.2/056.5).
+ * C-13.1 ladder record: rung 1 (1fr absorber) FAILED at the 80x24 floor —
+ * the dialog's in-flow content already ends exactly at the dialog bottom
+ * pre-batch (measured deficit 4 rows), so rung 2 (-2 rows) cannot cover
+ * it. Rung 3 applied: the selector joins the DOCKED bottom control region
+ * (0 added flow rows), as a second docked line above `.modal-buttons`
+ * because a single-line fold is horizontally infeasible at 80 cols (five
+ * widgets exceed the 48-cell dialog interior). */
+#report_filter_row {
+    width: 100%;
+    height: 3;
+    dock: bottom;
+    /* Same-edge docks OVERLAY in textual 8.2.8 (measured) — offset by the
+     * buttons row's realized height (4: padding-top 1 + button chrome 3)
+     * so the selector stacks as the docked region's second line. */
+    margin-bottom: 4;
+}
+
+#report_filter_label {
+    width: 8;
+    padding: 1 1 0 0;
+    color: $fg-base;
+}
+
+#report_filter_select {
+    width: 40%;
+}
+
+#report_filter_path {
+    width: 1fr;
 }
 
 /* --- Operations modal (batch-08 I3, LLR-004.1/004.3) -----------------------

@@ -5,10 +5,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Mapping, Optional, Tuple
 
+from rich.markup import escape as escape_markup
 from rich.text import Text
 from textual import work
 from textual.app import ComposeResult
-from textual.containers import Container, ScrollableContainer
+from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.widget import Widget
@@ -19,6 +20,7 @@ from textual.widgets import (
     ListItem,
     ListView,
     Markdown,
+    Select,
     SelectionList,
     Static,
     TextArea,
@@ -803,6 +805,17 @@ class ReportViewerScreen(ModalScreen[None]):
             ``#report_declared_regions`` TextArea by ``compose`` (LLR-028.4)
             so the operator does not retype them. Defaults to ``()`` — the
             2-arg constructions stay valid (no seed text).
+        filter_names (Tuple[str, ...]): The scanned ``filters/*.json`` bare
+            names for the ``#report_filter_select`` dropdown (batch-35
+            US-056, LLR-056.2). Option labels are markup-escaped at
+            construction (C-15 probe: textual 8.2.8 parses raw labels as
+            markup).
+        filter_select_value (Optional[str]): Reopen-seed for the dropdown
+            (F-05(i)) — the sticky selection's bare name when it lives in
+            the project's ``filters/`` dir, else ``None`` (blank).
+        filter_path_text (str): Reopen-seed for the free-path input — the
+            sticky selection's path string when it was a typed path, else
+            ``""``.
 
     Returns:
         None: ``ModalScreen[None]`` — always dismisses with ``None``.
@@ -860,16 +873,75 @@ class ReportViewerScreen(ModalScreen[None]):
             self.context_bytes = context_bytes
             self.declared_regions = declared_regions
 
+    class FilterSelected(Message):
+        """Operator picked a report filter on the dropdown (US-056).
+
+        Summary:
+            Posted straight to the app's queue when the
+            ``#report_filter_select`` value changes; carries the picked
+            filter's BARE FILENAME (the dropdown option value), or ``None``
+            when the blank option was chosen (= full report, LLR-056.2).
+            Path resolution and the sticky-state update are the APP's job
+            (LLR-056.3) — the screen holds no config (batch-32 precedent).
+
+        Args:
+            name (Optional[str]): The picked ``filters/*.json`` bare name,
+                or ``None`` for the blank (no-filter) selection.
+
+        Dependencies:
+            Used by:
+                - s19_app.tui.app.S19TuiApp.on_report_viewer_screen_filter_selected
+        """
+
+        def __init__(self, name: Optional[str]) -> None:
+            super().__init__()
+            self.name = name
+
+    class FilterPathTyped(Message):
+        """Operator submitted a free filter path (US-056, LLR-056.4).
+
+        Summary:
+            Posted straight to the app's queue when Enter is pressed in
+            ``#report_filter_path`` with non-blank text; carries the RAW
+            typed string — resolution (``resolve_input_path``), the
+            symlink/non-file refusal, and the sticky-state update are the
+            APP's job (LLR-056.4).
+
+        Args:
+            raw (str): The typed path text, stripped, non-empty.
+
+        Dependencies:
+            Used by:
+                - s19_app.tui.app.S19TuiApp.on_report_viewer_screen_filter_path_typed
+        """
+
+        def __init__(self, raw: str) -> None:
+            super().__init__()
+            self.raw = raw
+
     def __init__(
         self,
         project_name: str,
         reports: List[Path],
         declared_regions: Tuple[DeclaredRegion, ...] = (),
+        filter_names: Tuple[str, ...] = (),
+        filter_select_value: Optional[str] = None,
+        filter_path_text: str = "",
     ) -> None:
         super().__init__()
         self.project_name = project_name
         self.reports = reports
         self.declared_regions = declared_regions
+        #: Report-filter selector inputs (batch-35 US-056, LLR-056.2): the
+        #: scanned ``filters/*.json`` bare names (dropdown options), plus the
+        #: reopen-seeding state derived from the app's sticky
+        #: ``_report_filter_path`` (F-05(i)) — a dropdown-file selection
+        #: seeds the Select value, a free-path selection seeds the path
+        #: input text. Defaults keep every existing 2/3-arg construction
+        #: valid (no options, blank seed).
+        self.filter_names = filter_names
+        self.filter_select_value = filter_select_value
+        self.filter_path_text = filter_path_text
         self.selected_path: Optional[Path] = None
 
     def compose(self) -> ComposeResult:
@@ -897,6 +969,33 @@ class ReportViewerScreen(ModalScreen[None]):
                     for region in self.declared_regions
                 ),
                 id="report_declared_regions",
+            ),
+            Horizontal(
+                Label("Filter:", id="report_filter_label"),
+                Select(
+                    # C-15 probe (2026-07-10, textual 8.2.8): raw str option
+                    # labels are PARSED AS MARKUP — an unescaped hostile
+                    # filename renders styled/corrupted. Escape at option
+                    # construction so the literal name renders (LLR-056.2
+                    # F-05(ii)); the VALUE stays the raw bare name.
+                    [
+                        (escape_markup(name), name)
+                        for name in self.filter_names
+                    ],
+                    id="report_filter_select",
+                    allow_blank=True,
+                    value=(
+                        self.filter_select_value
+                        if self.filter_select_value in self.filter_names
+                        else Select.NULL
+                    ),
+                ),
+                OsClipboardInput(
+                    value=self.filter_path_text,
+                    placeholder="filter path (blank = full report)",
+                    id="report_filter_path",
+                ),
+                id="report_filter_row",
             ),
             Container(
                 Label("Context bytes:"),
@@ -978,6 +1077,68 @@ class ReportViewerScreen(ModalScreen[None]):
             return
         self.selected_path = path
         await markdown.update(text)
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        """
+        Summary:
+            Forward a report-filter dropdown change to the app as a
+            :class:`FilterSelected` message (LLR-056.2) — blank maps to
+            ``None`` via the ``Select.NULL`` runtime sentinel (C-15:
+            ``Select.BLANK`` resolves to an unrelated inherited bool on
+            the installed textual and never matches; batch-23 precedent).
+
+        Args:
+            event (Select.Changed): The dropdown change event.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``#report_filter_select`` only; posted straight to the app's
+              queue (the ``GenerateRequested`` idiom) so the message
+              survives any screen dismissal ordering.
+
+        Dependencies:
+            Used by:
+                - Textual select-change dispatch
+        """
+        if event.select.id != "report_filter_select":
+            return
+        event.stop()
+        if event.value is Select.NULL:
+            self.app.post_message(self.FilterSelected(None))
+            return
+        self.app.post_message(self.FilterSelected(str(event.value)))
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        """
+        Summary:
+            Forward a submitted free filter path to the app as a
+            :class:`FilterPathTyped` message (LLR-056.4). An empty submit
+            is ignored (the LoadFileScreen empty-input pattern).
+
+        Args:
+            event (Input.Submitted): The Enter-key submission event.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``#report_filter_path`` only (``#report_context_bytes`` keeps
+              its Generate-button-only flow); stripped, non-empty text is
+              posted raw — resolution and refusal are the app's job.
+
+        Dependencies:
+            Used by:
+                - Textual input-submit dispatch
+        """
+        if event.input.id != "report_filter_path":
+            return
+        event.stop()
+        raw = event.value.strip()
+        if not raw:
+            return
+        self.app.post_message(self.FilterPathTyped(raw))
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "report_close":

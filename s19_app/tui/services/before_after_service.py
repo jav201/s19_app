@@ -64,6 +64,7 @@ from .report_service import REPORTS_DIR_NAME
 
 if TYPE_CHECKING:  # pragma: no cover - typing-only, keeps runtime imports flat
     from ..changes.model import ChangeSummary
+    from .report_filter import ReportFilterMatcher
 
 #: Markdown before/after report filename regex (LLR-038.2) — owned HERE so
 #: the shared ``report_service.REPORT_FILENAME_REGEX`` and the diff-report
@@ -186,6 +187,7 @@ def compose_before_after_report(
     project_dir: Optional[Path],
     workarea: Path,
     now_fn: Optional[NowFn] = None,
+    report_filter: Optional["ReportFilterMatcher"] = None,
 ) -> BeforeAfterReportResult:
     """
     Summary:
@@ -214,6 +216,15 @@ def compose_before_after_report(
             ``dest_dir`` fallback).
         now_fn (Optional[NowFn]): Injectable UTC clock forwarded to both
             generators; ``None`` resolves to ``datetime.now(timezone.utc)``.
+        report_filter (Optional[ReportFilterMatcher]): The resolved report
+            filter (LLR-053.7 / LLR-054.1, batch-35) — the ONLY new
+            generator input; resolved by the caller on the UI thread at
+            trigger time (D-9). Forwarded into BOTH generators via the
+            shared kwargs dict when set; ``None`` (the default) adds no
+            kwarg, keeping the unfiltered generator call shape — and output
+            — byte-for-byte today's (F-01 / LLR-054.4, TC-311 pin). The
+            LLR-038.2 precondition order is untouched — the filter is
+            additive, never a reordering (LLR-053.5).
 
     Returns:
         BeforeAfterReportResult: ``written=True`` with both paths, or a
@@ -231,8 +242,9 @@ def compose_before_after_report(
           comparison forwards the engine's per-source diagnostics.
         - Re-load both maps (:func:`_load_map`), build the
           :class:`BeforeAfterProvenance`, then ``generate_diff_report`` +
-          ``generate_diff_report_html`` with ``linkage_entries`` and the
-          owned filename stem.
+          ``generate_diff_report_html`` with ``linkage_entries``, the owned
+          filename stem, and — only when set — the resolved
+          ``report_filter`` (LLR-054.1).
 
     Dependencies:
         Uses:
@@ -343,6 +355,11 @@ def compose_before_after_report(
         filename_stem=_BEFORE_AFTER_REPORT_STEM,
         now_fn=now_fn,
     )
+    if report_filter is not None:
+        # LLR-054.1: the matcher is the ONLY new generator input; added
+        # conditionally so the no-filter kwargs shape stays byte-for-byte
+        # today's (F-01, TC-311 pin).
+        kwargs["report_filter"] = report_filter
     md = generate_diff_report(comparison, **kwargs)
     if not md.written:
         return _refused(*md.diagnostics)

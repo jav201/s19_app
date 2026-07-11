@@ -31,6 +31,15 @@ Batch-24 (HLR-038 / LLR-038.1 — provenance + linkage kwargs):
     test_zero_entries_linkage_states_no_entries       TC-038.2 (empty linkage)
     test_pipe_bearing_symbol_md_escaped_html_intact   TC-038.6 (S-F2 _md_cell)
 
+Batch-35 Inc-2 (B-07 / HLR-054 — report_filter on the diff generators):
+    test_tc312_filter_restricts_linkage_and_run_sections_both_formats
+                                                      TC-312  LLR-054.2 (D-2/D-5)
+    test_tc312_a9_merged_window_spans_excluded_run    TC-312  LLR-054.2 (F-03/Q-2 A9)
+    test_tc312_zero_match_notice_and_refusal_disjoint TC-312  LLR-054.3 (D-3/Q-12)
+    test_tc312_audit_header_first_block_fixed_format  TC-312  LLR-054.3 (S-F6/F-07)
+    test_tc318_hostile_filter_name_sanitized_md_html  TC-318  LLR-055.4 (diff half)
+    test_tc313_no_filter_output_byte_identical_todays TC-313  LLR-054.5
+
 Element-style thresholds are inline on each test.
 
 Confidentiality (F-S-07): every fixture is a synthetic in-memory byte run —
@@ -40,6 +49,7 @@ never operator firmware.
 from __future__ import annotations
 
 import inspect
+import json
 import os
 import re
 from datetime import datetime, timezone
@@ -64,10 +74,14 @@ from s19_app.tui.services.diff_report_service import (
     DIFF_REPORT_FILENAME_REGEX,
     DIFF_REPORT_HTML_FILENAME_REGEX,
     BeforeAfterProvenance,
-    DiffReportResult,
     generate_diff_report,
     generate_diff_report_html,
     list_diff_reports,
+)
+from s19_app.tui.services.report_filter import (
+    parse_report_filter,
+    read_report_filter_text,
+    resolve_report_filter,
 )
 from s19_app.version import __version__
 
@@ -1151,3 +1165,303 @@ def test_ac5_markers_unchanged(tmp_path: Path) -> None:
     md_text, html_text = _linkage_report_pair(tmp_path, entry)
     assert "(none - created into hole)" in md_text
     assert "(none - created into hole)" in html_text
+
+
+# ---------------------------------------------------------------------------
+# batch-35 Inc-2 (B-07) — report_filter kwarg on both generators: filtered
+# linkage rows + run sections (LLR-054.2, D-5 filter-then-merge, F-03/Q-2),
+# audit header + zero-match notice (LLR-054.3, S-F6, Q-12), filter-name
+# sanitation (LLR-055.4 diff-module half), and the TC-313 no-filter guard
+# (LLR-054.5 white-box half).
+# ---------------------------------------------------------------------------
+
+
+def _report_matcher(symbols=(), addresses=(), name="cal-filter.json"):
+    """Resolved matcher via the public parse+resolve API (LLR-053.7).
+
+    ``name`` is attached as the duck-typed ``source_name`` display attribute
+    the audit header reads (in-cap Inc-2 decision: the frozen dataclass has
+    no slots, so ``object.__setattr__`` carries the display name until a
+    later increment promotes it to a declared field on the matcher).
+    """
+    doc = json.dumps(
+        {
+            "format": "s19app-report-filter",
+            "version": "1.0",
+            "include": {
+                "symbols": list(symbols),
+                "addresses": [
+                    {"start": start, "end": end} for start, end in addresses
+                ],
+            },
+        }
+    )
+    flt, errors = parse_report_filter(doc)
+    assert errors == []
+    matcher = resolve_report_filter(flt, [], [])
+    if name is not None:
+        object.__setattr__(matcher, "source_name", name)
+    return matcher
+
+
+def _two_disjoint_run_fixture() -> tuple:
+    """Two far-apart changed runs + one linkage entry per run.
+
+    Run/entry 1 at 0x100 (symbol CAL_KEEP) is inside the filter window
+    [0x100, 0x110); run/entry 2 at 0x900 (symbol OTHER_DROP) is not.
+    Returns ``(comparison, mem_a, mem_b, entries)``.
+    """
+    runs = [
+        DiffRun(0x100, 0x104, KIND_CHANGED),
+        DiffRun(0x900, 0x904, KIND_CHANGED),
+    ]
+    comparison = _comparison(runs=runs, stats=_stats(2, 8))
+    mem_a = _mem(0x100, 0xAA, 4) | _mem(0x900, 0xAA, 4)
+    mem_b = _mem(0x100, 0xBB, 4) | _mem(0x900, 0xBB, 4)
+    entries = [
+        _entry(linkage_symbol="CAL_KEEP"),
+        _entry(
+            address_start=0x900, address_end=0x902, linkage_symbol="OTHER_DROP"
+        ),
+    ]
+    return comparison, mem_a, mem_b, entries
+
+
+def _filtered_pair(tmp_path: Path, matcher, comparison, mem_a, mem_b, entries):
+    """Generate the MD + HTML pair with ``report_filter``; return both texts."""
+    kwargs = dict(
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=tmp_path,
+        now_fn=_fixed_clock,
+        linkage_entries=entries,
+        report_filter=matcher,
+    )
+    md = generate_diff_report(comparison, **kwargs)
+    html_r = generate_diff_report_html(comparison, **kwargs)
+    assert md.written and html_r.written
+    return (
+        md.path.read_text(encoding="utf-8"),
+        html_r.path.read_text(encoding="utf-8"),
+    )
+
+
+def test_tc312_filter_restricts_linkage_and_run_sections_both_formats(
+    tmp_path: Path,
+) -> None:
+    """TC-312 / LLR-054.2 (a)/(b): the matched run keeps its linkage row,
+    run-table row, and window heading; the unmatched run seeds none of the
+    three — in BOTH formats — while the statistics section stays complete.
+
+    Threshold (Q-2 scope): unmatched run → 0 linkage rows, 0 window
+    headings; matched run → all present; stats row still counts BOTH runs.
+    """
+    comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
+    matcher = _report_matcher(addresses=[(0x100, 0x110)])
+
+    md_text, html_text = _filtered_pair(
+        tmp_path, matcher, comparison, mem_a, mem_b, entries
+    )
+
+    # MD: matched linkage row + run row + window heading present.
+    assert "CAL_KEEP" in md_text
+    assert "| 0x00000100 | 0x00000104 | 4 | changed | - |" in md_text
+    assert "### Run 0x00000100-0x00000104 (changed)" in md_text
+    # MD: unmatched run seeds no linkage row, no run row, no window heading.
+    assert "OTHER_DROP" not in md_text
+    assert "| 0x00000900 | 0x00000904 | 4 | changed | - |" not in md_text
+    assert "0x00000900-0x00000904 (changed)" not in md_text
+    # Statistics stay COMPLETE (D-2): both runs still counted.
+    assert "| changed | 2 | 8 |" in md_text
+    # HTML twin.
+    assert "CAL_KEEP" in html_text
+    assert "Run 0x00000100-0x00000104 (changed)" in html_text
+    assert "OTHER_DROP" not in html_text
+    assert "0x00000900-0x00000904 (changed)" not in html_text
+
+
+def test_tc312_a9_merged_window_spans_excluded_run(tmp_path: Path) -> None:
+    """TC-312 / LLR-054.2 (F-03/Q-2, A9): two matched runs whose <=5-row gap
+    spans an excluded run merge into ONE window; the excluded run seeds no
+    heading and no linkage row, but its bytes MAY appear inside the merged
+    window (assert heading/linkage absence, NOT byte absence).
+    """
+    runs = [
+        DiffRun(0x1000, 0x1004, KIND_CHANGED),
+        DiffRun(0x1020, 0x1024, KIND_CHANGED),  # excluded
+        DiffRun(0x1040, 0x1044, KIND_CHANGED),
+    ]
+    comparison = _comparison(runs=runs, stats=_stats(3, 12))
+    mem_a = {addr: 0xAA for addr in range(0x1000, 0x1050)}
+    mem_b = {addr: 0xBB for addr in range(0x1000, 0x1050)}
+    entries = [
+        _entry(address_start=0x1000, address_end=0x1002, linkage_symbol="EDGE_A"),
+        _entry(address_start=0x1020, address_end=0x1022, linkage_symbol="MID_DROP"),
+        _entry(address_start=0x1040, address_end=0x1042, linkage_symbol="EDGE_B"),
+    ]
+    matcher = _report_matcher(addresses=[(0x1000, 0x1004), (0x1040, 0x1044)])
+
+    kwargs = dict(
+        mem_map_a=mem_a,
+        mem_map_b=mem_b,
+        project_dir=tmp_path,
+        context_bytes=0,
+        now_fn=_fixed_clock,
+        linkage_entries=entries,
+        report_filter=matcher,
+    )
+    md_text = generate_diff_report(comparison, **kwargs).path.read_text(
+        encoding="utf-8"
+    )
+
+    # ONE merged window over the two matched runs (D-5 filter-then-merge:
+    # window rows [0x1000,0x1010) and [0x1040,0x1050) bridge across 3 rows).
+    assert md_text.count("Image A window") == 1
+    assert (
+        "### Runs 0x00001000-0x00001004 (changed), "
+        "0x00001040-0x00001044 (changed)" in md_text
+    )
+    # The excluded run seeds NO heading member and NO linkage row...
+    assert "0x00001020-0x00001024 (changed)" not in md_text
+    assert "MID_DROP" not in md_text
+    assert "EDGE_A" in md_text and "EDGE_B" in md_text
+    # ...but its bytes legitimately appear inside the merged window (F-03).
+    assert "0x00001020  AA AA AA AA" in md_text
+
+
+def test_tc312_zero_match_notice_and_refusal_disjoint(tmp_path: Path) -> None:
+    """TC-312 / LLR-054.3 (D-3, Q-12): a valid filter matching zero items
+    still writes both non-empty files; each filtered section's body is the
+    ``filter matched 0 of N items`` notice; the notice wording shares no
+    prefix token with the refusal wording (LLR-053.5 = the read/parse
+    diagnostics, report-kind-prefixed).
+    """
+    comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
+    matcher = _report_matcher(addresses=[(0xF000, 0xF010)], name=None)
+
+    md_text, html_text = _filtered_pair(
+        tmp_path, matcher, comparison, mem_a, mem_b, entries
+    )
+
+    notice = "filter matched 0 of 2 items"
+    # Written, non-empty, notice replaces all three filtered section bodies.
+    assert md_text.count(notice) == 3  # linkage + runs + hex windows
+    assert notice in html_text
+    assert "CAL_KEEP" not in md_text and "OTHER_DROP" not in md_text
+    assert "Disposition" not in md_text  # no linkage table header row
+    assert "Image A window" not in md_text  # no hex window emitted
+    # Counts: shown 0, hidden == pre-filter count, per section (F-07).
+    assert "- Linkage entries: shown 0 of 2 (hidden 2)" in md_text
+    assert "- Runs: shown 0 of 2 (hidden 2)" in md_text
+    # A matcher without a display name renders the explicit fallback.
+    assert "- Filter file: (unnamed filter)" in md_text
+    # Q-12: no shared prefix token with the refusal wordings.
+    _, parse_refusals = parse_report_filter("{not json")
+    _, read_refusals = read_report_filter_text(
+        str(tmp_path / "missing-filter.json")
+    )
+    refusals = parse_refusals + read_refusals
+    assert refusals, "refusal wordings must exist for the disjointness pin"
+    for refusal in refusals:
+        assert refusal.split()[0] != notice.split()[0], (
+            f"zero-match notice shares its prefix token with refusal {refusal!r}"
+        )
+
+
+def test_tc312_audit_header_first_block_fixed_format(tmp_path: Path) -> None:
+    """TC-312 / LLR-054.3 (S-F6, F-07): the audit header is the FIRST block
+    after the report title, with the fixed line format — filter file name,
+    per-section shown/hidden counts (shown+hidden == pre-filter count), and
+    the F-03 informative note — in BOTH formats.
+    """
+    comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
+    matcher = _report_matcher(addresses=[(0x100, 0x110)])
+
+    md_text, html_text = _filtered_pair(
+        tmp_path, matcher, comparison, mem_a, mem_b, entries
+    )
+
+    md_lines = md_text.splitlines()
+    assert md_lines[0] == "# Diff report"
+    assert md_lines[1] == ""
+    assert md_lines[2] == "## Report filter applied"
+    assert md_lines[3] == ""
+    assert md_lines[4] == "- Filter file: cal-filter.json"
+    assert md_lines[5] == "- Linkage entries: shown 1 of 2 (hidden 1)"
+    assert md_lines[6] == "- Runs: shown 1 of 2 (hidden 1)"
+    assert md_lines[7] == (
+        "- Note: windows seeded by matched runs may include excluded "
+        "addresses as merged context."
+    )
+    assert md_lines[8] == ""
+    assert md_lines[9].startswith("- Generated (UTC): ")
+
+    html_lines = html_text.splitlines()
+    title_index = html_lines.index("<h1>Diff report</h1>")
+    assert html_lines[title_index + 1] == "<h2>Report filter applied</h2>"
+    assert "<li>Filter file: cal-filter.json</li>" in html_text
+    assert "<li>Linkage entries: shown 1 of 2 (hidden 1)</li>" in html_text
+    assert "<li>Runs: shown 1 of 2 (hidden 1)</li>" in html_text
+
+
+def test_tc318_hostile_filter_name_sanitized_md_html(tmp_path: Path) -> None:
+    """TC-318 (diff-module half) / LLR-055.4: a hostile filter display name
+    (pipe, backtick, ``<b>``, control bytes) renders ctl-stripped on the
+    non-cell MD audit line and html-escaped in the HTML — never raw.
+    """
+    comparison, mem_a, mem_b, entries = _two_disjoint_run_fixture()
+    hostile = "a|b`c<b>\x01\x0dd.json"
+    matcher = _report_matcher(addresses=[(0x100, 0x110)], name=hostile)
+
+    md_text, html_text = _filtered_pair(
+        tmp_path, matcher, comparison, mem_a, mem_b, entries
+    )
+
+    # MD non-cell line: control chars stripped, printables literal
+    # (LLR-055.4 S-F5 — ctl-strip removes the line-forging class).
+    assert "- Filter file: a|b`c<b>d.json" in md_text
+    assert "\x01" not in md_text
+    # HTML: escaped, never a raw file-derived tag; ctl bytes stripped.
+    assert "<li>Filter file: a|b`c&lt;b&gt;d.json</li>" in html_text
+    assert "<b>" not in html_text
+    assert "\x01" not in html_text
+    assert _EXTERNAL_RESOURCE_RE.search(html_text) is None
+
+
+def test_tc313_no_filter_output_byte_identical_todays(tmp_path: Path) -> None:
+    """TC-313 / LLR-054.5 (white-box half): ``report_filter`` omitted AND
+    ``report_filter=None`` explicit both produce output byte-identical to
+    today's capture (the batch-34 golden templates) — no audit header, no
+    code-path drift on the unfiltered branch.
+    """
+    mem_a = _mem(0x100, 0xAA, 4)
+    mem_b = _mem(0x100, 0xBB, 4)
+    omitted = generate_diff_report(
+        _comparison(), mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, now_fn=_fixed_clock,
+    )
+    explicit_none = generate_diff_report(
+        _comparison(), mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, now_fn=_fixed_clock, report_filter=None,
+    )
+    html_none = generate_diff_report_html(
+        _comparison(), mem_map_a=mem_a, mem_map_b=mem_b,
+        project_dir=tmp_path, now_fn=_fixed_clock, report_filter=None,
+    )
+
+    expected_md = (
+        _PRE_CHANGE_MD_TEMPLATE.replace("@@VERSION@@", __version__)
+        .replace("\n", os.linesep)
+        .encode("utf-8")
+    )
+    expected_html = (
+        _PRE_CHANGE_HTML_TEMPLATE.replace("@@VERSION@@", __version__)
+        .replace("\n", os.linesep)
+        .encode("utf-8")
+    )
+    assert omitted.path.read_bytes() == expected_md
+    assert explicit_none.path.read_bytes() == expected_md
+    assert html_none.path.read_bytes() == expected_html
+    assert "Report filter applied" not in omitted.path.read_text(
+        encoding="utf-8"
+    )
