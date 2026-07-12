@@ -1607,6 +1607,48 @@ class PatchEditorPanel(ScrollableContainer):
             self.filename = filename
             self.bytes_per_line = bytes_per_line
 
+    class BeforeAfterReportRequested(Message):
+        """The operator activated the persistent before/after control (US-061).
+
+        Summary:
+            Posted by the ``#patch_before_after_button`` in the persistent
+            report row revealed after a successful save-back (LLR-061.1).
+            Carries no payload — it is a pure trigger: ``app.py`` routes it to
+            the single existing ``action_before_after_report`` writer
+            (LLR-061.2), so the control adds no new report-writing code and the
+            ``b`` accelerator stays bound to the same handler.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_before_after_report_requested``
+        """
+
+    class EditJsonRequested(Message):
+        """The operator activated the "Edit JSON" control (US-064b).
+
+        Summary:
+            Posted by ``#patch_edit_json_button`` to open the full-size JSON
+            popup (``ChangeSetJsonScreen``) over the current paste buffer
+            (LLR-064b.1). Carries the ``#patch_paste_text`` contents so the app
+            can seed the popup without a second query. The button is DISABLED
+            whenever a file-backed document is loaded (LLR-064b.4 A-01
+            data-loss guard), so this message is only posted for a
+            paste-authored / empty document; the app re-checks the guard
+            predicate defensively before pushing the popup.
+
+        Args:
+            paste_text (str): The current ``#patch_paste_text`` buffer — the
+                paste-authored change-set JSON to seed the popup editor with.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_edit_json_requested``
+        """
+
+        def __init__(self, paste_text: str = "") -> None:
+            super().__init__()
+            self.paste_text = paste_text
+
     class ChangeFileSelected(Message):
         """The operator picked a change file from the patches dropdown (US-026).
 
@@ -1877,6 +1919,12 @@ class PatchEditorPanel(ScrollableContainer):
                 ),
                 Horizontal(
                     Button("Load", id="patch_doc_load_button"),
+                    # batch-37 (US-064a / LLR-064a.1): Refresh re-reads the
+                    # currently-loaded change file from disk (its own
+                    # source_path, A-03 — not the path input) so external edits
+                    # appear without re-typing the path. Additive: every
+                    # existing patch id + wiring is preserved (LLR-064a.2).
+                    Button("Refresh", id="patch_doc_refresh_button"),
                     Button("Validate", id="patch_doc_validate_button"),
                     Button("Apply", id="patch_doc_apply_button"),
                     Button("Save", id="patch_doc_save_button"),
@@ -1977,6 +2025,12 @@ class PatchEditorPanel(ScrollableContainer):
             TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
             Horizontal(
                 Button("Parse pasted", id="patch_paste_parse_button"),
+                # US-064b / LLR-064b.1: opens the full-size JSON popup over the
+                # paste buffer. Enabled by default (a fresh document is
+                # paste-authored, source_path None); the app DISABLES it
+                # whenever a file-backed document is loaded (LLR-064b.4 A-01
+                # data-loss guard) via ``set_edit_json_enabled``.
+                Button("Edit JSON", id="patch_edit_json_button"),
                 id="patch_paste_controls",
             ),
             id="patch_paste_row",
@@ -1994,6 +2048,26 @@ class PatchEditorPanel(ScrollableContainer):
                 id="patch_saveback_buttons",
             ),
             id="patch_saveback_row",
+            classes="hidden",
+        )
+        # US-061 / LLR-061.1: a PERSISTENT before/after-report control (not the
+        # transient LLR-038.3 notify). Hidden by default; revealed by the app's
+        # save-back handler on a successful save (result.ok) and re-hidden when
+        # the editing context clears (a new load). Mirrors the
+        # #patch_saveback_row ``.hidden``-reveal idiom exactly.
+        yield Container(
+            Label(
+                "Before/after report available:",
+                classes="patch-field-label",
+            ),
+            Horizontal(
+                Button(
+                    "Write before/after report",
+                    id="patch_before_after_button",
+                ),
+                id="patch_before_after_buttons",
+            ),
+            id="patch_before_after_row",
             classes="hidden",
         )
 
@@ -2103,6 +2177,13 @@ class PatchEditorPanel(ScrollableContainer):
             event.stop()
             self.post_message(self.SaveBackDecision(None))
             return
+        if button_id == "patch_before_after_button":
+            # US-061 / LLR-061.2: the persistent control is a second trigger
+            # onto the ONE report writer — post a payload-free request; the app
+            # routes it to action_before_after_report (no duplicated code).
+            event.stop()
+            self.post_message(self.BeforeAfterReportRequested())
+            return
         if button_id == "patch_paste_parse_button":
             # The paste action carries the TextArea body (not an Input), so
             # it posts its own ActionRequested with ``paste_text`` rather
@@ -2114,6 +2195,21 @@ class PatchEditorPanel(ScrollableContainer):
                     paste_text=self.query_one(
                         "#patch_paste_text", TextArea
                     ).text,
+                )
+            )
+            return
+        if button_id == "patch_edit_json_button":
+            # US-064b / LLR-064b.1: open the full-size JSON popup over the paste
+            # buffer. Carries the current buffer as the seed; the app pushes
+            # ``ChangeSetJsonScreen`` and applies the edit through the existing
+            # ``parse_paste`` → ``load_text`` seam. Disabled for a file-backed
+            # document (LLR-064b.4), so a press here is paste-authored only.
+            event.stop()
+            self.post_message(
+                self.EditJsonRequested(
+                    paste_text=self.query_one(
+                        "#patch_paste_text", TextArea
+                    ).text
                 )
             )
             return
@@ -2134,6 +2230,7 @@ class PatchEditorPanel(ScrollableContainer):
             "patch_entry_edit_button": "edit_entry",
             "patch_entry_remove_button": "remove_entry",
             "patch_doc_load_button": "load_doc",
+            "patch_doc_refresh_button": "refresh_doc",
             "patch_doc_validate_button": "validate_doc",
             "patch_doc_apply_button": "apply_doc",
             "patch_doc_save_button": "save_doc",
@@ -2308,6 +2405,61 @@ class PatchEditorPanel(ScrollableContainer):
                 - ``S19TuiApp.on_patch_editor_panel_save_back_decision``
         """
         self.query_one("#patch_saveback_row", Container).add_class("hidden")
+
+    def show_before_after_prompt(self) -> None:
+        """Reveal the persistent before/after-report control (US-061).
+
+        Summary:
+            Un-hide the ``#patch_before_after_row`` so the report control is
+            discoverable and actionable after a successful save-back —
+            persistent widget state, NOT a transient ``notify`` (LLR-061.1).
+            Mirrors :meth:`show_save_prompt`'s ``.hidden``-reveal idiom.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_save_back_decision``
+        """
+        self.query_one("#patch_before_after_row", Container).remove_class(
+            "hidden"
+        )
+
+    def hide_before_after_prompt(self) -> None:
+        """Re-hide the persistent before/after-report control (US-061).
+
+        Summary:
+            Add the ``.hidden`` class back to ``#patch_before_after_row`` when
+            the editing context clears (a new document load resets
+            ``ChangeService.last_summary`` to ``None``, so a stale "report
+            ready" offer must not persist — LLR-061.1 clear-on-context).
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_action_requested``
+                  (load_doc / parse_paste / refresh_doc arms)
+        """
+        self.query_one("#patch_before_after_row", Container).add_class("hidden")
+
+    def set_edit_json_enabled(self, enabled: bool) -> None:
+        """Toggle the "Edit JSON" control's enabled state (US-064b, A-01 guard).
+
+        Summary:
+            Enable or disable ``#patch_edit_json_button`` so the JSON popup
+            opens ONLY for a paste-authored / empty document — the LLR-064b.4
+            data-loss guard. The app calls this after every action with
+            ``enabled = document.source_path is None``: a file-backed document
+            (``source_path is not None``) disables the control so its stale
+            ``DUMMY_CHANGESET_TEXT`` buffer can never be Confirmed to
+            ``load_text``-REPLACE the loaded document.
+
+        Args:
+            enabled (bool): ``True`` to enable the control (paste-authored /
+                empty document); ``False`` to disable it (file-backed).
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp`` Patch Editor action / change-file handlers
+        """
+        self.query_one("#patch_edit_json_button", Button).disabled = not enabled
 
     def refresh_check_results(
         self, rows: Sequence[object], status_line: str

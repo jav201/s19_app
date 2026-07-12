@@ -23,6 +23,7 @@ from textual.widgets import (
     ListView,
     ProgressBar,
     Static,
+    TextArea,
 )
 from rich.text import Text
 
@@ -44,6 +45,7 @@ from .models import LoadedFile, ProjectVariantSet
 from .operations import get_operation, list_operation_ids
 from .rail import Rail, RailItem
 from .screens import (
+    ChangeSetJsonScreen,
     EntropyViewerScreen,
     LegendScreen,
     LoadFileScreen,
@@ -152,6 +154,7 @@ PATCH_ACTIONS_V2: frozenset[str] = frozenset(
         "run_checks",
         "execute_scope",
         "parse_paste",
+        "refresh_doc",
     }
 )
 
@@ -1580,10 +1583,11 @@ class S19TuiApp(App):
         """
         Summary:
             Route a Patch Editor control action to the change service and
-            feed the shaped rows back to the screen — exactly the ten
+            feed the shaped rows back to the screen — exactly the eleven
             ``PATCH_ACTIONS_V2`` actions (the LLR-003.2 eight plus the E6
-            ``execute_scope`` extension, LLR-006.6, plus the batch-13
-            ``parse_paste`` paste-changeset action, LLR-014.2); a retired or
+            ``execute_scope`` extension, LLR-006.6, the batch-13
+            ``parse_paste`` paste-changeset action, LLR-014.2, and the
+            batch-37 ``refresh_doc`` re-read action, LLR-064a.1); a retired or
             unknown action is one status error, never a crash.
 
         Args:
@@ -1650,6 +1654,10 @@ class S19TuiApp(App):
                 service.remove_entry(event.address_text)
                 self.set_status("Patch Editor: entry removed.")
             elif event.action == "load_doc":
+                # US-061 / LLR-061.1 clear-on-context: a new load resets
+                # ChangeService.last_summary to None, so the persistent
+                # before/after control's report input is gone — re-hide it.
+                panel.hide_before_after_prompt()
                 if not event.path_text.strip():
                     self.set_status(
                         "Patch Editor: enter a change-file path to load."
@@ -1658,8 +1666,27 @@ class S19TuiApp(App):
                     result = service.load(event.path_text, self.base_dir)
                     self._report_change_result(result)
             elif event.action == "parse_paste":
+                panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
                 result = service.load_text(event.paste_text)
                 self._report_change_result(result)
+            elif event.action == "refresh_doc":
+                panel.hide_before_after_prompt()  # LLR-061.1 clear-on-context
+                # US-064a / LLR-064a.1: re-read the CURRENTLY-LOADED document
+                # from disk to reflect external edits. Source is the document's
+                # own ``source_path`` (the file it was loaded from), NOT the
+                # live ``#patch_doc_path_input`` value (A-03) — a post-load path
+                # edit is "load", not "refresh". Reuses the validated
+                # ``ChangeService.load`` seam (size-cap + resolve_input_path +
+                # collect-don't-abort). A paste-authored / empty document has no
+                # ``source_path`` → the existing load guard, not a crash.
+                source_path = service.document.source_path
+                if source_path is None:
+                    self.set_status(
+                        "Patch Editor: enter a change-file path to load."
+                    )
+                else:
+                    result = service.load(str(source_path), self.base_dir)
+                    self._report_change_result(result)
             elif event.action == "validate_doc":
                 self._report_change_result(service.validate(loaded_ranges))
             elif event.action == "apply_doc":
@@ -1709,6 +1736,11 @@ class S19TuiApp(App):
 
         panel.refresh_entries(service.rows(loaded_ranges))
         panel.refresh_issues(service.issue_lines())
+        # US-064b / LLR-064b.4 A-01 guard: the JSON popup opens ONLY for a
+        # paste-authored / empty document — disable Edit-JSON whenever the
+        # document is file-backed (``source_path is not None``) so a stale
+        # buffer can never Confirm-clobber a loaded document.
+        panel.set_edit_json_enabled(service.document.source_path is None)
 
     def on_patch_editor_panel_save_back_decision(
         self, event: PatchEditorPanel.SaveBackDecision
@@ -1787,6 +1819,11 @@ class S19TuiApp(App):
         self._report_change_result(result)
         if result.ok:
             self._surface_verify_result()
+            # US-061 / LLR-061.1: reveal the PERSISTENT before/after-report
+            # control (a durable widget, not a Toast) so the report stays
+            # discoverable after the notify below would have timed out. It is
+            # re-hidden on the next document load (clear-on-context).
+            panel.show_before_after_prompt()
             # LLR-038.3 offer — AFTER _surface_verify_result so a
             # verify-mismatch error notice is never masked; a mismatch does
             # NOT suppress the offer (A-m2: the report is an honest
@@ -1797,6 +1834,128 @@ class S19TuiApp(App):
                 title="Before/after report",
                 severity="information",
             )
+
+    def on_patch_editor_panel_before_after_report_requested(
+        self, event: PatchEditorPanel.BeforeAfterReportRequested
+    ) -> None:
+        """
+        Summary:
+            Route the persistent report control's activation (US-061 /
+            LLR-061.2) to the single existing before/after report writer.
+            The control is a SECOND trigger onto ``action_before_after_report``
+            — the same handler the ``b`` accelerator binds to — so both paths
+            write the identical ``reports/*.md`` + ``*.html`` pair for the same
+            ``last_summary`` + loaded image, and no report-writing code is
+            duplicated.
+
+        Args:
+            event (PatchEditorPanel.BeforeAfterReportRequested): The
+                payload-free activation message from the persistent control.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Delegate wholesale to ``action_before_after_report`` (which owns
+              precondition validation, filter resolution, and every refusal
+              class); a stale click after a context change is safe-by-refusal
+              there (no ``last_summary`` → diagnostic on the status line, 0
+              files written).
+
+        Dependencies:
+            Uses:
+                - ``action_before_after_report``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        self.action_before_after_report()
+
+    def on_patch_editor_panel_edit_json_requested(
+        self, event: PatchEditorPanel.EditJsonRequested
+    ) -> None:
+        """
+        Summary:
+            Open the full-size JSON popup (:class:`ChangeSetJsonScreen`) over
+            the paste buffer (US-064b / LLR-064b.1), seeded from the message's
+            ``paste_text``. Re-checks the LLR-064b.4 A-01 disable-guard
+            defensively — even though ``#patch_edit_json_button`` is disabled
+            for a file-backed document, this handler refuses to push the popup
+            whenever ``ChangeService.document.source_path is not None`` so a
+            stale-buffer Confirm can never ``load_text``-REPLACE (clobber) the
+            loaded document. The popup's Confirm result is applied by
+            :meth:`_apply_changeset_json_edit`.
+
+        Args:
+            event (PatchEditorPanel.EditJsonRequested): Carries the current
+                ``#patch_paste_text`` buffer to seed the popup editor.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``source_path is not None`` → status-line refusal, no push
+              (A-01 guard, LLR-064b.4).
+            - else → ``push_screen(ChangeSetJsonScreen(seed),
+              _apply_changeset_json_edit)``.
+
+        Dependencies:
+            Uses:
+                - ``ChangeSetJsonScreen`` / ``_apply_changeset_json_edit``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        if self._change_service.document.source_path is not None:
+            self.set_status(
+                "Patch Editor: Edit JSON is available only for a pasted "
+                "change-set, not a file-loaded document."
+            )
+            return
+        self.push_screen(
+            ChangeSetJsonScreen(event.paste_text),
+            self._apply_changeset_json_edit,
+        )
+
+    def _apply_changeset_json_edit(self, edited: Optional[str]) -> None:
+        """
+        Summary:
+            Apply the JSON popup's Confirm result (US-064b / LLR-064b.2): write
+            the edited text back to ``#patch_paste_text`` and route it through
+            the EXISTING ``parse_paste`` → ``ChangeService.load_text`` seam by
+            posting the panel's ``ActionRequested(parse_paste)`` — the SAME
+            message the inline "Parse pasted" button posts — so no new
+            parse/apply path is introduced and the collect-don't-abort
+            re-render (entries table / issue lines / Edit-JSON enable-sync)
+            happens through the one action handler. Cancel (``None``) is a
+            no-op: the document and buffer are left unchanged.
+
+        Args:
+            edited (Optional[str]): The edited JSON on Confirm, or ``None`` on
+                Cancel / Escape.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``None`` → return (Cancel; document unchanged).
+            - else → set ``#patch_paste_text`` to ``edited`` and post
+              ``PatchEditorPanel.ActionRequested(action="parse_paste",
+              paste_text=edited)`` to re-use the existing paste apply arm.
+
+        Dependencies:
+            Uses:
+                - ``PatchEditorPanel.ActionRequested`` / ``load_text`` seam
+            Used by:
+                - ``on_patch_editor_panel_edit_json_requested`` (push callback)
+        """
+        if edited is None:
+            return
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        self.query_one("#patch_paste_text", TextArea).text = edited
+        panel.post_message(
+            PatchEditorPanel.ActionRequested(
+                action="parse_paste", paste_text=edited
+            )
+        )
 
     def _surface_verify_result(self) -> None:
         """
@@ -3100,6 +3259,9 @@ class S19TuiApp(App):
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
         panel.refresh_entries(service.rows(loaded_ranges))
         panel.refresh_issues(service.issue_lines())
+        # US-064b / LLR-064b.4 A-01 guard: a dropdown-picked file is file-backed
+        # (``source_path is not None``) → disable Edit-JSON (no clobber path).
+        panel.set_edit_json_enabled(service.document.source_path is None)
 
     def _diff_image_source(self, variant_id: Optional[str], raw_path: str) -> ImageSource:
         """

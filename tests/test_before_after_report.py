@@ -1098,3 +1098,221 @@ def test_tc311_no_filter_generator_kwargs_shape_is_todays(
     for fmt, kwargs in captured:
         assert set(kwargs) == todays_keys | {"report_filter"}, fmt
         assert kwargs["report_filter"] is matcher
+
+
+# ===========================================================================
+# AT-061a — persistent before/after-report control (US-061, HLR-061)
+# ===========================================================================
+
+
+def test_at_061a_persistent_control_survives_then_writes_pair_and_clears(
+    tmp_path: Path,
+) -> None:
+    """Save-back reveals a persistent report control that survives an unrelated
+    action, writes the same report pair on activation, and hides on a new load.
+
+    Intent: HLR-061 / LLR-061.1-.3 acceptance through the shipped Patch Editor
+    surface. After a successful save-back (the path that today fires only the
+    transient ``notify``), a persistent, queryable control
+    (``#patch_before_after_button`` inside the revealed ``#patch_before_after_row``)
+    is shown. Activating it routes to the EXISTING ``action_before_after_report``
+    writer — the same ``reports/*.md`` + ``*.html`` pair the ``b`` accelerator
+    produces — and the reread ``*.md`` carries real before/after CONTENT (a Run
+    diff heading + the provenance header), not merely "a file was written" (C-10).
+
+    Persistence proxy (Q-06): persistence is proven STRUCTURALLY — the control is
+    a durable ``.hidden``-reveal widget that stays queryable and un-hidden across
+    an unrelated action + re-render, distinguishing it from a ``notify`` Toast.
+    This proxy asserts widget durability, NOT the notify wall-clock TTL.
+
+    Activation mechanism: the control is activated through the real button-press
+    dispatch (``Button.press`` → ``on_button_pressed`` → ``BeforeAfterReportRequested``
+    → ``action_before_after_report``) — the codebase-wide button idiom (there is no
+    ``pilot.click`` precedent in the suite). It is NOT a direct proxy call to
+    ``action_before_after_report``; the message routing is exercised end-to-end.
+
+    Boundary arm (LLR-061.3 / A-04): after a subsequent document load the control
+    is re-hidden — a stale "report ready" offer must not persist once the editing
+    context (``last_summary``) has cleared.
+
+    Counterfactual (RED, C-20): pre-implementation there is no
+    ``#patch_before_after_row`` widget — the queryable-present assert fails, so
+    the transient-only notify cannot satisfy this node.
+    """
+    from textual.css.query import NoMatches
+    from textual.widgets import Button, Input
+
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = tmp_path / ".s19tool" / "workarea" / "proj"
+        reports_dir = project_dir / "reports"
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            project_dir.mkdir(parents=True, exist_ok=True)
+            app.current_project = "proj"
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            await _drive_apply(app, pilot)
+
+            # Before the save-back the persistent control must be hidden.
+            row = panel.query_one("#patch_before_after_row")
+            outcomes["hidden_before_saveback"] = row.has_class("hidden")
+
+            app.query_one("#patch_saveback_confirm_button", Button).press()
+            await pilot.pause()
+            outcomes["revealed_after_saveback"] = not panel.query_one(
+                "#patch_before_after_row"
+            ).has_class("hidden")
+
+            # Persistence proxy: an unrelated action + re-render must NOT drop
+            # the control (a notify Toast would be gone).
+            _set_entry_inputs(app, address="0x108", bytes_text="CC DD")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            button = panel.query_one("#patch_before_after_button", Button)
+            outcomes["queryable_after_unrelated_action"] = not panel.query_one(
+                "#patch_before_after_row"
+            ).has_class("hidden")
+
+            # Activate through the real button-press dispatch (not a proxy call).
+            statuses = _statuses(app)
+            before = _report_names(reports_dir)
+            button.press()
+            await pilot.pause()
+            outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
+            outcomes["statuses"] = list(statuses)
+
+            # Clear-on-context boundary: a new load re-hides the control.
+            (tmp_path / "changes.json").write_text(
+                '{"version": 2, "changes": []}', encoding="utf-8"
+            )
+            app.query_one("#patch_doc_path_input", Input).value = str(
+                tmp_path / "changes.json"
+            )
+            panel.request_action("load_doc")
+            await pilot.pause()
+            try:
+                outcomes["hidden_after_new_load"] = panel.query_one(
+                    "#patch_before_after_row"
+                ).has_class("hidden")
+            except NoMatches:  # pragma: no cover - row must persist as a widget
+                outcomes["hidden_after_new_load"] = True
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+
+    assert outcomes["hidden_before_saveback"], (
+        "AT-061a: the report control must be hidden before any save-back"
+    )
+    assert outcomes["revealed_after_saveback"], (
+        "AT-061a: a successful save-back must reveal the persistent control"
+    )
+    assert outcomes["queryable_after_unrelated_action"], (
+        "AT-061a: the control must survive an unrelated action (persistence "
+        "proxy) — a transient notify would be gone"
+    )
+
+    new_files = outcomes["new_files"]
+    md_new = [n for n in new_files if n.endswith(".md")]
+    html_new = [n for n in new_files if n.endswith(".html")]
+    assert len(new_files) == 2 and len(md_new) == 1 and len(html_new) == 1, (
+        f"AT-061a: activating the control must write one md + one html pair, "
+        f"got {new_files}; statuses: {outcomes['statuses']}"
+    )
+    assert _MD_NAME.match(md_new[0]) and _HTML_NAME.match(html_new[0])
+
+    written = [
+        s for s in outcomes["statuses"] if "Before/after report written" in s
+    ]
+    assert len(written) == 1, (
+        f"AT-061a: exactly one surfaced written-status line expected, "
+        f"got {outcomes['statuses']}"
+    )
+    surfaced_md = written[0].split("Before/after report written:", 1)[1].split(
+        "|", 1
+    )[0].strip()
+
+    # C-12: re-read the HANDLER-PRODUCED md off disk and assert real content.
+    text = Path(surfaced_md).read_text(encoding="utf-8")
+    assert _PROVENANCE_BEFORE.search(text) is not None, text[:800]
+    assert "### Run 0x00000100-0x00000102 (changed)" in text, (
+        "AT-061a: the reread report must carry the before/after Run diff heading"
+    )
+
+    assert outcomes["hidden_after_new_load"], (
+        "AT-061a: a subsequent document load must re-hide the control "
+        "(clear-on-context, LLR-061.3)"
+    )
+
+
+# ===========================================================================
+# TC-330 — reveal/hide state machine for the persistent control (LLR-061.1)
+# ===========================================================================
+
+
+def test_tc330_before_after_row_reveal_hide_state_machine(
+    tmp_path: Path,
+) -> None:
+    """White-box: the ``#patch_before_after_row`` starts hidden, reveals via
+    ``show_before_after_prompt`` and re-hides via ``hide_before_after_prompt``,
+    and its button posts a routed ``BeforeAfterReportRequested`` message.
+
+    Intent: LLR-061.1 state machine — the control is a persistent
+    ``.hidden``-reveal widget (mirroring ``show_save_prompt`` /
+    ``hide_save_prompt``), and pressing its button routes to
+    ``action_before_after_report`` (asserted by capturing the invocation).
+    """
+    from textual.widgets import Button
+
+    image_path = _make_s19_image(tmp_path)
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        (tmp_path / ".s19tool" / "workarea" / "proj").mkdir(
+            parents=True, exist_ok=True
+        )
+        app.current_project = "proj"
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _load_image(app, image_path)
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            row = panel.query_one("#patch_before_after_row")
+            outcomes["hidden_default"] = row.has_class("hidden")
+
+            panel.show_before_after_prompt()
+            await pilot.pause()
+            outcomes["revealed"] = not row.has_class("hidden")
+
+            panel.hide_before_after_prompt()
+            await pilot.pause()
+            outcomes["hidden_again"] = row.has_class("hidden")
+
+            # Button press routes to the single report writer (not duplicated).
+            calls: list[int] = []
+            original = app.action_before_after_report
+            app.action_before_after_report = lambda: (  # type: ignore[method-assign]
+                calls.append(1),
+                original(),
+            )[1]
+            panel.show_before_after_prompt()
+            await pilot.pause()
+            panel.query_one("#patch_before_after_button", Button).press()
+            await pilot.pause()
+            outcomes["routed_calls"] = len(calls)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["hidden_default"], "TC-330: row must be hidden by default"
+    assert outcomes["revealed"], "TC-330: show_before_after_prompt must reveal"
+    assert outcomes["hidden_again"], "TC-330: hide_before_after_prompt must hide"
+    assert outcomes["routed_calls"] == 1, (
+        "TC-330: pressing the button must invoke action_before_after_report once"
+    )

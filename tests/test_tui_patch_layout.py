@@ -354,12 +354,12 @@ def test_tc319_regroup_section_structure_census(tmp_path: Path) -> None:
     Intent: LLR-057.1 — against the composed widget tree: both section
     labels render (`#patch_script_section_label` above `#patch_doc_controls`,
     `#patch_checks_section_label` above `#patch_checks_controls`),
-    `#patch_doc_controls` holds exactly the four Load/Validate/Apply/Save
-    buttons, `#patch_checks_controls` holds the Run-checks button + the
-    checks help, and all 15 pre-batch widget ids survive. The sibling
-    grid-3 pin above (`test_tc_pane_styles_and_grid`) stays unmodified and
-    must remain GREEN with four buttons — this census only ADDS the
-    section-structure queries.
+    `#patch_doc_controls` holds exactly the five Load/Refresh/Validate/Apply/
+    Save buttons (Refresh added batch-37 US-064a), `#patch_checks_controls`
+    holds the Run-checks button + the checks help, and all 15 pre-batch widget
+    ids survive. The sibling grid-3 pin above (`test_tc_pane_styles_and_grid`)
+    stays unmodified and must remain GREEN (grid-size 3 columns is independent
+    of button count) — this census only ADDS the section-structure queries.
     """
     from textual.widgets import Button, Label
 
@@ -422,11 +422,13 @@ def test_tc319_regroup_section_structure_census(tmp_path: Path) -> None:
     ), f"the checks label must sit above the checks container, got {ids}"
     assert result["controls_buttons"] == [
         "patch_doc_load_button",
+        "patch_doc_refresh_button",
         "patch_doc_validate_button",
         "patch_doc_apply_button",
         "patch_doc_save_button",
     ], (
-        "#patch_doc_controls must hold exactly Load/Validate/Apply/Save, "
+        "#patch_doc_controls must hold exactly "
+        "Load/Refresh/Validate/Apply/Save (Refresh added batch-37 US-064a), "
         f"got {result['controls_buttons']}"
     )
     assert result["checks_children"] == [

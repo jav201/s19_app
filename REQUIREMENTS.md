@@ -3478,3 +3478,163 @@ identical `/begin` kinds — a pure scale duplicate) recorded BEFORE the irrever
   discovery preserved. I-060-1 gate evidence recorded in `increment-002.md` §I-060-1 before delete.
 - Status: Added in batch `2026-07-11-batch-36` (US-060 / HLR-060, LLR-060.1–.4). Frozen-engine
   diff = 0.
+
+# 34. Entropy paging/sort/legend · patch refresh · JSON popup (batch-37)
+
+> The P2 backlog (B-11..B-14) as five stories across two TUI surfaces, none crossing the
+> engine-frozen boundary (frozen diff = 0): B-11/US-061 makes the transient before/after-report
+> offer a persistent Patch Editor control; B-12/US-062 pages the entropy viewer past its 512-window
+> cap and sorts it; B-13/US-063 adds a band-colour legend + click-navigable strip cells; B-14
+> splits into US-064a (patch-editor Refresh) and US-064b (full-size JSON popup editor with a
+> file-loaded disable-guard). Stories: `.dev-flow/2026-07-11-batch-37/01-requirements.md`;
+> functional description: `.dev-flow/2026-07-11-batch-37/06-docs/functionality.md`;
+> traceability: `.../06-docs/traceability-matrix.md`.
+
+**R-TUI-049**: After a successful patch save-back the Patch Editor shall reveal a **persistent,
+operator-activatable before/after-report control** (`#patch_before_after_row` /
+`#patch_before_after_button`) — replacing the transient `notify` offer as the discoverable surface —
+that remains queryable across re-render (it is a durable widget, not a Toast) and, when activated,
+posts a `PatchEditorPanel.BeforeAfterReportRequested` message routed to the **existing**
+`action_before_after_report` handler, writing the same `reports/*.md` + `reports/*.html` pair the
+`b` key binding produces (byte-identical — no new report-writing code; the `b` accelerator is
+retained). The row shall be hidden by default, revealed only on a successful save-back
+(`result.ok`) via the `.hidden`-reveal idiom, and re-hidden when the editing context changes (a new
+`load_doc` / `parse_paste`, which resets `last_summary`), so no stale "report ready" offer persists.
+The report CONTENT (`compose_before_after_report`) and the before/after goldens are unchanged
+(C-24 census: SURVIVE). Geometry (persistence + queryability + activation, not above-the-fold
+placement) is pilot-measured at 80x24 and 120x30 (C-23).
+- Code: `s19_app/tui/screens_directionb.py` (`PatchEditorPanel.BeforeAfterReportRequested` message;
+  `#patch_before_after_row` compose + `show`/`hide` reveal handlers), `s19_app/tui/app.py`
+  (`on_patch_editor_panel_save_back_decision` reveal-on-`result.ok`;
+  `on_patch_editor_panel_before_after_report_requested` → `action_before_after_report`),
+  `s19_app/tui/styles.tcss`
+- Validation: `Automated` via
+  `tests/test_before_after_report.py::test_at_061a_persistent_control_survives_then_writes_pair_and_clears`
+  (AT-061a — persistence past an unrelated re-render + report reread off disk asserts content +
+  clear-on-context; both widths), `::test_tc330_before_after_row_reveal_hide_state_machine` (TC-330 —
+  default-hidden / show-on-ok / hide-when-declined / re-hidden-on-new-load / button→message routing).
+- Status: Added in batch `2026-07-11-batch-37` (US-061 / HLR-061, LLR-061.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-050**: The entropy viewer (`EntropyViewerScreen`) shall let the operator (a) **page** through
+every computed window and (b) **sort** the strip + jump list by address or entropy, WITHOUT changing
+the entropy computation (`entropy_service.compute_entropy` is still called exactly once at
+construction and `self._windows` is never mutated). The former `ENTROPY_STRIP_MAX_CELLS` /
+`ENTROPY_MAX_ROWS` = 512 truncation becomes a **FIXED per-page window budget**: `Prev`/`Next`
+controls (`#entropy_page_prev` / `#entropy_page_next`) and `action_page_prev/next` move the page
+index within `[0, ceil(N/512)-1]` so every window is reachable, and the former truncation indicator
+is replaced by a `page P/Q` position indicator (`#entropy_page_indicator`). The strip cells and the
+jump-list rows on a page shall be drawn from the SAME 512-window slice (indices agree). A sort
+control (`#entropy_sort_button` / `action_toggle_sort`) shall toggle `address` (ascending `start`,
+default) and `entropy` (descending `entropy` with a stable ascending-address tie-break), rendering
+both surfaces from a **display copy** and resetting the page index to 0 on a sort change so the
+extremal window is on the visible page. Selection under sort+paging shall resolve through a single
+shared `(sort, page, row) → window` helper (`_window_for_row`) preserving the
+`0 <= index < len(page slice)` bound. Page size is FIXED-512 (NOT pilot-measured); only the
+page/sort control row + legend placement are pilot-measured at 80x24 and 120x30 (C-23).
+- Code: `s19_app/tui/screens.py` (`EntropyViewerScreen`: `#entropy_sort_button`,
+  `#entropy_page_prev/next`, `#entropy_page_indicator`; `action_toggle_sort`, `action_page_prev/next`;
+  `_window_for_row`; display-copy sort + fixed-512 page slice), `s19_app/tui/styles.tcss`
+- Validation: `Automated` via
+  `tests/test_tui_entropy_viewer.py::test_at062a_page_past_cap_reaches_later_window` (AT-062a — a
+  window index ≥ 512 reachable + dismisses with its address; both widths),
+  `::test_at062b_sort_entropy_top_row_is_max` (AT-062b — entropy-desc row 0 is max + strip follows +
+  page reset), `::test_tc324_page_slice_math` (TC-324 — page clamp / union-reachable / strip==jump
+  slice / `page P/Q`), `::test_tc325_sort_key_no_mutation_and_remap` (TC-325 — entropy desc +
+  address tie-break; `_windows` unmutated; page reset; remap helper),
+  `::test_at036b_jump_second_row_moves_focus` (AT-036b — the pre-existing dismiss-contract regression
+  guard, green under the new remap). The 2 entropy snapshot cells
+  (`test_tui_snapshot.py::test_tc036s_entropy_modal_snapshot[entropy-comfortable-80x24 / -120x30]`)
+  `xfail` pending canonical-CI regen post-merge.
+- Status: Added in batch `2026-07-11-batch-37` (US-062 / HLR-062, LLR-062.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-051**: The entropy viewer shall (a) render a **band-colour legend** (`#entropy_legend`)
+mapping **each** `ENTROPY_BAND_COLOUR` band to its entropy meaning (grey→constant/padding,
+green→low, yellow→medium, red→high/random) plus the low-confidence dim cue, with the legend rows
+DERIVED by iterating `ENTROPY_BAND_COLOUR` (single source — adding a band without a legend row fails
+the census) and meanings authored markup-free (no `[`/`]`) and decoupled from the frozen `sev-*`
+classes and from `legend.py::LEGEND_TABLE` (a separate in-modal colour domain, reusing only the
+row-rendering pattern); and (b) make **each strip cell click-navigable** — each visible cell is an
+individual clickable widget with a stable id (`#entropy_cell_<row>`) posting `EntropyCell.Selected`
+→ `action_jump`, which resolves the window under the current sort+page through the SAME
+`_window_for_row` helper (R-TUI-050) and dismisses the modal with that window's `start` address (the
+same dismiss-with-target the jump-list row performs). `action_jump` shall mirror the jump-list index
+bound so a click on padding beyond the last cell is a no-op, not a crash or wrong-window dismiss. The
+per-cell clickable widget is the baseline mechanism (deterministic, no offset arithmetic; the Rich
+`@click`-meta offset approach was demoted, having zero in-repo precedent).
+- Code: `s19_app/tui/screens.py` (`EntropyViewerScreen`: `_legend_widget` / `#entropy_legend`
+  derived from `ENTROPY_BAND_COLOUR`; per-cell `#entropy_cell_<row>` clickable widgets;
+  `EntropyCell.Selected` → `on_entropy_cell_selected` → `action_jump` → `_window_for_row`)
+- Validation: `Automated` via
+  `tests/test_tui_entropy_viewer.py::test_at063a_band_legend_present_with_meanings` (AT-063a — all
+  four band meanings + dim cue present; both widths),
+  `::test_at063b_click_strip_cell_dismisses_with_address` (AT-063b — a REAL `pilot.click` on
+  `#entropy_cell_k` dismisses with the exact clicked cell's address under a non-default sort, C-16),
+  `::test_tc326_legend_derived_from_band_colour` (TC-326 —
+  `set(legend) == set(ENTROPY_BAND_COLOUR)`; non-blank; no `[`/`]`; derived not hardcoded),
+  `::test_tc327_action_jump_remap_and_bound` (TC-327 — `_window_for_row` remap under sort/page;
+  S-03 out-of-range no-op).
+- Status: Added in batch `2026-07-11-batch-37` (US-063 / HLR-063, LLR-063.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-052**: The Patch Editor shall add a **Refresh** control (`#patch_doc_refresh_button`) that
+re-reads the currently-loaded change/check file from disk into the editor — reflecting external
+edits without re-typing the path or reloading the app. The button shall map to an
+`ActionRequested("refresh_doc")` seam that re-invokes `ChangeService.load` over
+**`ChangeService.document.source_path`** (the loaded document's own path, NOT the widget path-input,
+so a refresh always re-reads what is actually loaded); when no file-backed document is loaded
+(`source_path is None`) Refresh shall surface the existing "enter a change-file path to load" guard
+(no crash), and malformed JSON on re-read shall surface an `MF-JSON-PARSE` finding via the existing
+collect-don't-abort path. The change is additive — every pre-existing patch-editor widget id and
+handler behaviour is preserved, and the added `#patch_doc_refresh_button` shall be reflected in
+BOTH layout censuses that pin the `#patch_doc_controls` child order (home-file AND the sibling
+`test_tui_patch_layout.py` census — the cross-file census sweep, C-CAND-A origin).
+- Code: `s19_app/tui/screens_directionb.py` (`#patch_doc_refresh_button` in `#patch_doc_controls`;
+  `refresh_doc` action mapping), `s19_app/tui/app.py` (`ActionRequested(refresh_doc)` →
+  `ChangeService.load` over `document.source_path`)
+- Validation: `Automated` via
+  `tests/test_tui_patch_editor_v2.py::test_at064a_refresh_rereads_edited_file_into_editor` (AT-064a —
+  external on-disk edit + Refresh → entries table shows the NEW on-disk entry, C-12),
+  `::test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded` (TC-328 — refresh over
+  `source_path` not the widget; None-guard), and the updated sibling census
+  `tests/test_tui_patch_layout.py::test_tc319_regroup_section_structure_census` (TC-319 — the
+  `#patch_doc_controls` child list updated to the shipped Load/Refresh/… order; Phase-4 cross-file
+  census fix).
+- Status: Added in batch `2026-07-11-batch-37` (US-064a / HLR-064a, LLR-064a.1–.2). Frozen-engine
+  diff = 0.
+
+**R-TUI-053**: The Patch Editor shall add an **"Edit JSON"** control (`#patch_edit_json_button`)
+that opens a full-size modal (`ChangeSetJsonScreen`) whose large editable `TextArea`
+(`#changeset_json_text`) shows the current change-set JSON (seeded from the `#patch_paste_text`
+buffer); on **Confirm** the edited text is applied back to the change document through the existing
+`parse_paste` → `ChangeService.load_text` seam, and **Cancel** leaves the document unchanged. The
+popup shall provide the readable multi-line editing the height-starved in-panel box could not
+(pilot-measured N_80 ≥ 7 / N_120 ≥ 13 editable lines, discharging the batch-36 F-01 deferral).
+**The "Edit JSON" control shall be DISABLED whenever a change *file* is loaded**
+(`ChangeService.document.source_path is not None`), so the stale paste buffer can never be Confirmed
+to `load_text`-REPLACE the loaded document — closing the A-01 data-loss footgun **at the trigger**
+(with a defense-in-depth handler re-check that refuses to push the popup even if the disabled button
+is bypassed); for a paste-authored / empty document (`source_path is None`) the control is enabled
+and the popup opens. Scope is the paste-buffer MVP; file-loaded JSON round-trip is OUT pending a
+separate `document→JSON` serializer story.
+- Code: `s19_app/tui/screens_directionb.py` (`PatchEditorPanel.EditJsonRequested` message;
+  `#patch_edit_json_button` + `set_edit_json_enabled` disable-guard tracking `source_path`),
+  `s19_app/tui/screens.py` (`ChangeSetJsonScreen` modal + `#changeset_json_text`),
+  `s19_app/tui/app.py` (`on_patch_editor_panel_edit_json_requested` push + defensive re-check →
+  `parse_paste`/`load_text`), `s19_app/tui/styles.tcss`
+- Validation: `Automated` via
+  `tests/test_tui_patch_editor_v2.py::test_at064b_json_popup_edit_confirm_cancel_and_geometry`
+  (AT-064b — paste-seed → popup edit → Confirm → entries table shows the new entry; Cancel no-op;
+  geometry N_80 ≥ 7 / N_120 ≥ 13, C-12/C-23),
+  `::test_at064c_edit_json_disabled_for_file_backed_document` (AT-064c — file-loaded → button
+  disabled + popup does not push + 0 mutation; paste-authored → enabled + popup opens; both states
+  in one node),
+  `::test_tc329_popup_seed_and_load_text_apply_seam` (TC-329 — seed == buffer; Confirm → `load_text`
+  ×1; Cancel → 0),
+  `::test_tc331_disable_guard_predicate_tracks_source_path` (TC-331 — disabled state tracks
+  `source_path` live). Pre-existing (NOT batch-37): neither `#patch_paste_text` nor
+  `#changeset_json_text` caps Textual's native bracketed paste at 64 KiB — a separate backlog item;
+  US-064b adds no new uncapped ingress.
+- Status: Added in batch `2026-07-11-batch-37` (US-064b / HLR-064b, LLR-064b.1–.4). Frozen-engine
+  diff = 0.

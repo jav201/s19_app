@@ -1028,6 +1028,21 @@ ModalScreen {
     margin-bottom: 1;
 }
 
+/* --- Change-set JSON popup (batch-37, US-064b / LLR-064b.1/.3) ----------
+ * Reuses the shared `.modal-dialog` box model. Caps the dialog height and
+ * lets the editor `TextArea` fill the remaining budget (`height: 1fr`) so the
+ * operator gets a readable multi-line JSON editor — the affordance the
+ * height-starved in-panel `#patch_paste_text` box cannot give at 80x24
+ * (batch-36 F-01). N_w visible editable lines are pilot-measured at 80x24 and
+ * 120x30 (LLR-064b.3, C-23). */
+#changeset_json_dialog {
+    height: 90%;
+}
+
+#changeset_json_text {
+    height: 1fr;
+}
+
 /* --- Legend modal (batch-18, LLR-023.1) ---------------------------------
  * Reuses the shared `.modal-dialog` token styling; caps the dialog height
  * and scrolls the body so the full A2L/MAC/Issues legend fits the 80- and
@@ -1064,14 +1079,56 @@ ModalScreen {
     overflow-y: auto;
 }
 
+/* The strip is a `Horizontal` of per-cell clickable `EntropyCell` widgets
+ * (US-063, LLR-063.2). `width: 100%` keeps the container within the modal
+ * content budget (no horizontal overflow, LLR-036.3/063.3) and `overflow-x:
+ * auto` scroll-reaches the tail cells on a full 512-window page; the empty-image
+ * case renders a plain `Static` under the same id. */
 #entropy_strip {
     height: auto;
+    width: 100%;
+    overflow-x: auto;
     margin-bottom: 1;
+}
+
+.entropy-cell {
+    width: 1;
+    height: 1;
+}
+
+/* In-modal band-colour legend (US-063, LLR-063.1): one auto-height row per
+ * `ENTROPY_BAND_COLOUR` band + the low-confidence dim cue. `height: auto` keeps
+ * it out of the `1fr` scroll body's flex; it scroll-reaches at 80x24. */
+#entropy_legend {
+    height: auto;
+    margin-bottom: 1;
+    padding: 0 1;
 }
 
 #entropy_jump_list {
     height: auto;
     max-height: 60%;
+}
+
+/* --- Entropy paging + sort controls (US-062, LLR-062.1/.2/.3) --------------
+ * A single auto-height control row above the strip: sort toggle + Prev/Next
+ * page buttons + a `page P/Q` position indicator. `height: auto` keeps the row
+ * from consuming the `1fr` scroll body; the buttons are compact so the row
+ * fits (or scroll-reaches) both the 80- and 120-col regimes — the page size
+ * itself is a FIXED 512-window budget, not a geometry-measured value. */
+#entropy_controls {
+    height: auto;
+    margin-bottom: 1;
+}
+
+#entropy_controls Button {
+    min-width: 6;
+    margin-right: 1;
+}
+
+.entropy-page-indicator {
+    height: auto;
+    padding: 1 1 0 1;
 }
 
 .modal-buttons {

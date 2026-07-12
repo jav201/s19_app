@@ -9,6 +9,8 @@ from rich.markup import escape as escape_markup
 from rich.text import Text
 from textual import work
 from textual.app import ComposeResult
+from textual.binding import Binding
+from textual.events import Click
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
 from textual.screen import ModalScreen
@@ -164,6 +166,90 @@ class LoadFileScreen(ModalScreen[Optional[Path]]):
                 return
             logger.info("LoadFileScreen dismissing with path=%s", value)
             self.dismiss(Path(value))
+
+
+class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
+    """Full-size modal JSON editor for a paste-authored change-set (US-064b).
+
+    Summary:
+        A large editable ``TextArea`` over the current change-set JSON, opened
+        from the Patch Editor's "Edit JSON" control (LLR-064b.1). It gives the
+        readable multi-line editing surface the height-starved in-panel
+        ``#patch_paste_text`` box cannot provide at 80x24 (batch-36 F-01): a
+        modal gets the full ``.modal-dialog`` budget, so the ``TextArea``
+        (``height: 1fr``, ``styles.tcss``) fills the dialog. The editor is
+        SEEDED with the ``#patch_paste_text`` buffer passed at construction —
+        the editable source of truth for a paste-authored document
+        (``source_path is None``, the only case the app opens the popup for,
+        per the LLR-064b.4 disable-guard). On **Confirm** the screen dismisses
+        with the edited text; the host writes it back to ``#patch_paste_text``
+        and routes it through the EXISTING ``parse_paste`` →
+        ``ChangeService.load_text`` apply seam (LLR-064b.2) — no new parse/apply
+        path. On **Cancel** the screen dismisses with ``None`` and the document
+        is left unchanged.
+
+        The editor is a plain ``TextArea`` — the IDENTICAL widget class to
+        ``#patch_paste_text`` — so it inherits exactly the same paste mechanism
+        and introduces NO new / second clipboard ingress (S-01: no uncapped
+        path is added).
+
+    Args:
+        seed_text (str): The current ``#patch_paste_text`` buffer contents to
+            pre-fill the editor with (the paste-authored change-set JSON).
+
+    Returns:
+        Optional[str]: The edited JSON text on Confirm, or ``None`` on
+        Cancel / Escape (``ModalScreen[Optional[str]]``).
+
+    Data Flow:
+        - ``compose`` builds a ``.modal-dialog`` with a title, the seeded
+          ``#changeset_json_text`` ``TextArea``, and Confirm / Cancel buttons.
+        - ``on_button_pressed`` dismisses with the ``TextArea`` text (Confirm)
+          or ``None`` (Cancel).
+
+    Dependencies:
+        Uses:
+            - ``TextArea`` / ``Button`` / the shared ``.modal-dialog`` classes
+        Used by:
+            - ``S19TuiApp.on_patch_editor_panel_edit_json_requested``
+            - tests/test_tui_patch_editor_v2.py
+
+    Example:
+        >>> screen = ChangeSetJsonScreen("{}")  # doctest: +SKIP
+    """
+
+    #: Route initial focus to the editor so typing / paste land there rather
+    #: than on the Confirm button (mirrors :class:`LoadFileScreen`).
+    AUTO_FOCUS = "#changeset_json_text"
+
+    def __init__(self, seed_text: str) -> None:
+        super().__init__()
+        self._seed_text = seed_text
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Edit change-set JSON:", classes="modal-title"),
+            TextArea(self._seed_text, id="changeset_json_text"),
+            Container(
+                Button(
+                    "Confirm", id="changeset_json_confirm", classes="modal-confirm"
+                ),
+                Button("Cancel", id="changeset_json_cancel"),
+                id="changeset_json_buttons",
+                classes="modal-buttons",
+            ),
+            id="changeset_json_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "changeset_json_cancel":
+            self.dismiss(None)
+            return
+        if event.button.id == "changeset_json_confirm":
+            self.dismiss(
+                self.query_one("#changeset_json_text", TextArea).text
+            )
 
 
 class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
@@ -578,6 +664,86 @@ ENTROPY_BAND_COLOUR: Dict[str, str] = {
 #: (LLR-036.1 / HLR-036 low-sample boundary), without changing its band hue.
 ENTROPY_LOW_CONFIDENCE_STYLE = "dim"
 
+#: Band → plain-language meaning for the in-modal entropy legend (LLR-063.1).
+#: Keyed by the SAME band labels as :data:`ENTROPY_BAND_COLOUR` (the single
+#: source): the legend iterates ``ENTROPY_BAND_COLOUR`` and looks each band's
+#: meaning up here, so a band added to the colour map without a meaning here
+#: trips the anti-drift unit test (TC-326). The entropy thresholds quoted are
+#: the ``entropy_service.ENTROPY_BANDS`` half-open cutoffs (bits/byte). Meanings
+#: are authored free of Textual/console-markup metacharacters (``[`` / ``]``, S-03)
+#: because the legend rows may render through a markup-enabled ``Label``.
+ENTROPY_BAND_MEANING: Dict[str, str] = {
+    "constant/padding": (
+        "constant or padding bytes, entropy below 1.0 bits/byte "
+        "(fills, erased flash, alignment padding)"
+    ),
+    "low": "low-variety structured data, entropy 1.0 to 5.0 bits/byte",
+    "medium": "moderately varied data, entropy 5.0 to 7.2 bits/byte",
+    "high/random": (
+        "compressed, encrypted or random-looking bytes, "
+        "entropy 7.2 bits/byte and above"
+    ),
+}
+
+
+class EntropyCell(Static):
+    """A single click-navigable band cell in the entropy strip (LLR-063.2).
+
+    Summary:
+        The BASELINE (Q-03/A-05) mechanism that makes each strip cell
+        individually clickable: one ``Static`` rendering a single band-coloured
+        ``█`` glyph, carrying a stable ``#entropy_cell_<row>`` id (deterministic,
+        so a test drives ``pilot.click("#entropy_cell_k")`` with no offset
+        arithmetic — C-16 real-interaction fidelity). A real pointer click posts
+        :class:`EntropyCell.Selected` with the cell's page-row index; the parent
+        :class:`EntropyViewerScreen` resolves that row to a window through the
+        shared ``(sort, page, row) → window`` helper and dismisses with the
+        window's address. The Rich ``@click``-meta offset alternative on a single
+        wrapped ``Static`` (former rung-1) is a demoted optional spike, not used
+        here.
+
+    Args:
+        row (int): the cell's index within the current page slice
+            (:meth:`EntropyViewerScreen._page_slice`), 0-based; used both as the
+            widget id suffix and as the row the click resolves through.
+        renderable (Text): the pre-styled single-glyph strip cell (band colour,
+            plus the low-confidence dim modifier when applicable).
+
+    Data Flow:
+        - ``compose`` / ``_refresh_view`` build one ``EntropyCell`` per window on
+          the current page; a click posts ``Selected(row)`` up to the screen.
+
+    Dependencies:
+        Used by:
+            - ``EntropyViewerScreen._strip_cells`` / ``compose`` / ``_refresh_view``
+            - ``EntropyViewerScreen.on_entropy_cell_selected``
+
+    Example:
+        >>> cell = EntropyCell(0, Text("█", style="red"))  # doctest: +SKIP
+    """
+
+    class Selected(Message):
+        """Posted when a strip cell is clicked (carries its page-row index).
+
+        Args:
+            row (int): the clicked cell's index within the current page slice.
+        """
+
+        def __init__(self, row: int) -> None:
+            super().__init__()
+            self.row = row
+
+    def __init__(self, row: int, renderable: Text) -> None:
+        super().__init__(
+            renderable, id=f"entropy_cell_{row}", classes="entropy-cell"
+        )
+        self._row = row
+
+    def on_click(self, event: Click) -> None:
+        """Post :class:`Selected` for this cell's row (LLR-063.2)."""
+        event.stop()
+        self.post_message(self.Selected(self._row))
+
 #: Cost caps mirroring the ``hexview`` ``MAX_HEX_ROWS`` / ``MAX_HEX_BYTES``
 #: precedent (LLR-036.6): the strip renders at most this many cells and the
 #: jump list at most this many rows regardless of image size; beyond the cap
@@ -604,13 +770,20 @@ class EntropyViewerScreen(ModalScreen[Optional[int]]):
         - a **jump-to-address list** (``#entropy_jump_list``): one
           ``ListItem`` per window reading ``0xXXXXXXXX  <band>  H=<h>``.
 
-        The strip is capped at :data:`ENTROPY_STRIP_MAX_CELLS` cells and the
-        jump list at :data:`ENTROPY_MAX_ROWS` rows (LLR-036.6); when the
-        window count exceeds either cap the excess is dropped and a
-        truncation indicator is rendered. Activating a jump row dismisses the
-        modal with that window's ``start`` address so the host can move its
-        hex focus there (LLR-036.5, dismiss-with-target); Close / no
-        selection dismisses with ``None``.
+        The strip and jump list render ONE PAGE at a time over a FIXED
+        :data:`ENTROPY_MAX_ROWS` (= 512) window budget (LLR-062.1): the
+        Prev/Next controls (or ``PgUp``/``PgDn``) move the page index within
+        ``[0, page_count-1]`` so every window beyond the first 512 is reachable
+        (no silent truncation), and a ``page P/Q`` indicator shows the
+        position. A sort control (or ``s``) reorders a DISPLAY COPY of the
+        windows by ``address`` (ascending ``start``) or ``entropy``
+        (descending, ``start`` tie-break) and resets to page 0 (LLR-062.2);
+        ``self._windows`` (the computation snapshot) is never mutated.
+        Activating a jump row dismisses the modal with that window's ``start``
+        address — resolved through the shared ``(sort, page, row) → window``
+        helper (:meth:`_window_for_row`) so the dismiss target is correct under
+        any sort + page — so the host can move its hex focus there (LLR-036.5,
+        dismiss-with-target); Close / no selection dismisses with ``None``.
 
     Args:
         mem_map (Dict[int, int]): The loaded image's sparse address→byte map,
@@ -648,23 +821,127 @@ class EntropyViewerScreen(ModalScreen[Optional[int]]):
     """
 
     EMPTY_TEXT = "No image loaded — nothing to classify."
-    TRUNCATED_TEXT = "... (truncated — image exceeds the viewer render cap)"
+
+    #: The low-confidence (dim) legend cue meaning (LLR-063.1) — documents the
+    #: :data:`ENTROPY_LOW_CONFIDENCE_STYLE` dim modifier so the operator can read
+    #: the strip. Authored free of ``[`` / ``]`` (S-03).
+    LOW_CONFIDENCE_MEANING = (
+        "low-confidence window (fewer than the minimum sampled bytes) — "
+        "shown dimmed, never dropped"
+    )
+
+    #: Sort keys the operator can toggle between (LLR-062.2): ``address``
+    #: (ascending ``start``, the computation/default order) and ``entropy``
+    #: (descending ``entropy`` with an ascending-``start`` tie-break).
+    SORT_KEYS = ("address", "entropy")
+
+    BINDINGS = [
+        Binding("pagedown", "page_next", "Next page", show=False),
+        Binding("pageup", "page_prev", "Prev page", show=False),
+        Binding("s", "toggle_sort", "Sort", show=False),
+    ]
 
     def __init__(self, mem_map: Dict[int, int]) -> None:
         super().__init__()
         self._windows: List[EntropyWindow] = compute_entropy(mem_map)
+        self._sort_key: str = "address"
+        self._page: int = 0
 
-    def _strip_text(self) -> Text:
-        """Build the wrapped band-coloured strip as a single Rich ``Text``.
+    def _page_size(self) -> int:
+        """Return the FIXED per-page window budget (LLR-062.1).
 
         Summary:
-            One ``█`` cell per window (up to :data:`ENTROPY_STRIP_MAX_CELLS`),
-            each appended with its band's :data:`ENTROPY_BAND_COLOUR` Rich
-            style; low-confidence windows also get the
+            The page size is FIXED at :data:`ENTROPY_MAX_ROWS` (= 512). The
+            module global is read at call time (never captured) so a test may
+            ``monkeypatch`` it to force multiple pages over a smaller image
+            without editing the production value.
+
+        Returns:
+            int: the number of windows rendered per page (>= 1).
+        """
+        return max(1, ENTROPY_MAX_ROWS)
+
+    def _page_count(self) -> int:
+        """Return the total number of pages over the current window set.
+
+        Returns:
+            int: ``ceil(len(windows) / page_size)``; 1 when there are no
+            windows (an empty image still shows a single ``page 1/1``).
+        """
+        size = self._page_size()
+        return max(1, (len(self._windows) + size - 1) // size)
+
+    def _display_windows(self) -> List[EntropyWindow]:
+        """Return a sorted DISPLAY COPY of ``self._windows`` (LLR-062.2).
+
+        Summary:
+            Sorts a COPY of the computed windows by the current sort key —
+            ``address`` → ascending ``start``; ``entropy`` → descending
+            ``entropy`` with a stable ascending-``start`` tie-break — WITHOUT
+            mutating ``self._windows`` (the computation snapshot is preserved,
+            HLR-062: presentation-only).
+
+        Returns:
+            List[EntropyWindow]: the windows in display order (a new list; the
+            ``EntropyWindow`` elements themselves are shared, so a resolved
+            window's ``start`` is the real computed address).
+        """
+        if self._sort_key == "entropy":
+            return sorted(self._windows, key=lambda w: (-w.entropy, w.start))
+        return sorted(self._windows, key=lambda w: w.start)
+
+    def _page_slice(self) -> List[EntropyWindow]:
+        """Return the display windows on the CURRENT page (LLR-062.1).
+
+        Returns:
+            List[EntropyWindow]: ``display_windows[page*size : (page+1)*size]``
+            — the SAME slice the strip cells and the jump rows are both drawn
+            from, so their row indices agree.
+        """
+        size = self._page_size()
+        start = self._page * size
+        return self._display_windows()[start : start + size]
+
+    def _window_for_row(self, row: Optional[int]) -> Optional[EntropyWindow]:
+        """Resolve a jump-list / strip row to its window (LLR-062.2, Q-04).
+
+        Summary:
+            The SINGLE shared ``(sort, page, row) → window`` mapping used by
+            both ``on_list_view_selected`` (jump list) and — in a later
+            increment (LLR-063.2) — the click-navigable strip cells. Resolving
+            through one helper keeps the two navigation paths from drifting
+            into divergent index schemes.
+
+        Args:
+            row (Optional[int]): the selected row index within the current
+                page slice (``ListView.index`` may be ``None``).
+
+        Returns:
+            Optional[EntropyWindow]: the window under the current sort + page
+            at ``row``, or ``None`` when ``row`` is out of the
+            ``0 <= row < len(page slice)`` bound (S-03) — a click on padding
+            beyond the last cell is a safe no-op, never an ``IndexError``.
+        """
+        if row is None:
+            return None
+        page = self._page_slice()
+        if not (0 <= row < len(page)):
+            return None
+        return page[row]
+
+    def _strip_text(self) -> Text:
+        """Build the current page's band-coloured strip as a Rich ``Text``.
+
+        Summary:
+            One ``█`` cell per window on the CURRENT page slice
+            (:meth:`_page_slice`, at most one :meth:`_page_size` block), each
+            appended with its band's :data:`ENTROPY_BAND_COLOUR` Rich style;
+            low-confidence windows also get the
             :data:`ENTROPY_LOW_CONFIDENCE_STYLE` (dim) modifier. The containing
             ``Static`` wraps the cells into the modal content width, so no
             explicit per-line column count is emitted (LLR-036.3 — wrap, not
-            clip).
+            clip). The cell order follows the current sort permutation
+            (LLR-062.2).
 
         Returns:
             Text: the styled strip; the ``EMPTY_TEXT`` sentinel when no window
@@ -673,37 +950,132 @@ class EntropyViewerScreen(ModalScreen[Optional[int]]):
         if not self._windows:
             return Text(self.EMPTY_TEXT)
         text = Text()
-        for window in self._windows[:ENTROPY_STRIP_MAX_CELLS]:
+        for window in self._page_slice():
             style = ENTROPY_BAND_COLOUR.get(window.band, "")
             if window.low_confidence:
                 style = f"{style} {ENTROPY_LOW_CONFIDENCE_STYLE}".strip()
             text.append("█", style=style)
         return text
 
+    def _strip_cells(self) -> List[Widget]:
+        """Build the current page's strip as per-cell clickable widgets (LLR-063.2).
+
+        Summary:
+            One :class:`EntropyCell` per window on the CURRENT page slice
+            (:meth:`_page_slice`), each rendering a single ``█`` glyph styled by
+            the window's :data:`ENTROPY_BAND_COLOUR` band (plus the
+            :data:`ENTROPY_LOW_CONFIDENCE_STYLE` dim modifier when low-confidence)
+            and carrying a stable ``#entropy_cell_<row>`` id so a real pointer
+            click is deterministic (C-16). The cell order follows the current
+            sort permutation (LLR-062.2); the visual banding matches
+            :meth:`_strip_text` (the same per-window style), only split into
+            clickable widgets.
+
+        Returns:
+            List[Widget]: one :class:`EntropyCell` per window on the page, in
+            display order (empty when there are no windows).
+        """
+        cells: List[Widget] = []
+        for row, window in enumerate(self._page_slice()):
+            style = ENTROPY_BAND_COLOUR.get(window.band, "")
+            if window.low_confidence:
+                style = f"{style} {ENTROPY_LOW_CONFIDENCE_STYLE}".strip()
+            cells.append(EntropyCell(row, Text("█", style=style)))
+        return cells
+
+    def _legend_lines(self) -> List[Text]:
+        """Build the band-colour legend rows, derived from ``ENTROPY_BAND_COLOUR``.
+
+        Summary:
+            One row per :data:`ENTROPY_BAND_COLOUR` band — a coloured ``█``
+            swatch followed by the band label and its
+            :data:`ENTROPY_BAND_MEANING` meaning — plus one row documenting the
+            :data:`ENTROPY_LOW_CONFIDENCE_STYLE` (dim) cue
+            (:data:`LOW_CONFIDENCE_MEANING`). The rows are DERIVED by iterating
+            ``ENTROPY_BAND_COLOUR`` (the single source, LLR-063.1), NOT hardcoded
+            and NOT drawn from the severity ``legend.py::LEGEND_TABLE`` (a
+            different colour domain, D-063); each is a Rich ``Text`` (never a
+            markup string) and the meanings are authored free of ``[`` / ``]``
+            (S-03). Window-independent — the legend documents the colour
+            vocabulary and renders even for an empty image.
+
+        Returns:
+            List[Text]: the legend rows, band rows first then the dim cue.
+        """
+        lines: List[Text] = []
+        for band, colour in ENTROPY_BAND_COLOUR.items():
+            meaning = ENTROPY_BAND_MEANING.get(band, "")
+            line = Text()
+            line.append("█ ", style=colour)
+            line.append(f"{band}: {meaning}")
+            lines.append(line)
+        dim_line = Text()
+        dim_line.append("█ ", style=ENTROPY_LOW_CONFIDENCE_STYLE)
+        dim_line.append(f"dim: {self.LOW_CONFIDENCE_MEANING}")
+        lines.append(dim_line)
+        return lines
+
+    def _legend_widget(self) -> Container:
+        """Build the ``#entropy_legend`` container (one ``Label`` per row)."""
+        return Container(
+            *[Label(line) for line in self._legend_lines()],
+            id="entropy_legend",
+        )
+
+    def _jump_item(self, window: EntropyWindow) -> ListItem:
+        """Build one jump-list row in the ``0xADDR  band  H=`` shape."""
+        conf = " (low-confidence)" if window.low_confidence else ""
+        return ListItem(
+            Label(
+                f"0x{window.start:08X}  {window.band}  "
+                f"H={window.entropy:.2f}{conf}"
+            )
+        )
+
+    def _page_indicator_text(self) -> str:
+        """Return the ``page P/Q`` position indicator text (LLR-062.1)."""
+        return f"page {self._page + 1}/{self._page_count()}"
+
+    def _sort_button_label(self) -> str:
+        """Return the sort-toggle button label reflecting the current key."""
+        return f"Sort: {self._sort_key}"
+
     def compose(self) -> ComposeResult:
-        strip = Static(self._strip_text(), id="entropy_strip")
-        jump_items: List[ListItem] = []
-        for window in self._windows[:ENTROPY_MAX_ROWS]:
-            conf = " (low-confidence)" if window.low_confidence else ""
-            jump_items.append(
-                ListItem(
+        body_children: List[Widget] = []
+        if self._windows:
+            body_children.append(
+                Horizontal(
+                    Button(
+                        self._sort_button_label(),
+                        id="entropy_sort_button",
+                        classes="entropy-control",
+                    ),
+                    Button("Prev", id="entropy_page_prev", classes="entropy-control"),
+                    Button("Next", id="entropy_page_next", classes="entropy-control"),
                     Label(
-                        f"0x{window.start:08X}  {window.band}  "
-                        f"H={window.entropy:.2f}{conf}"
-                    )
+                        self._page_indicator_text(),
+                        id="entropy_page_indicator",
+                        classes="entropy-page-indicator",
+                    ),
+                    id="entropy_controls",
                 )
             )
-        body_children: List[Widget] = [strip]
         if self._windows:
-            body_children.append(ListView(*jump_items, id="entropy_jump_list"))
+            body_children.append(
+                Horizontal(*self._strip_cells(), id="entropy_strip")
+            )
+        else:
+            body_children.append(Static(self._strip_text(), id="entropy_strip"))
+        body_children.append(self._legend_widget())
+        if self._windows:
+            body_children.append(
+                ListView(
+                    *[self._jump_item(w) for w in self._page_slice()],
+                    id="entropy_jump_list",
+                )
+            )
         else:
             body_children.append(Label(self.EMPTY_TEXT, id="entropy_empty"))
-        # LLR-036.6: indicator fires when EITHER surface truncates — use min()
-        # so neither the strip nor the jump list truncates silently.
-        if len(self._windows) > min(ENTROPY_STRIP_MAX_CELLS, ENTROPY_MAX_ROWS):
-            body_children.append(
-                Label(self.TRUNCATED_TEXT, id="entropy_truncated")
-            )
         yield Container(
             Label("Entropy classification", classes="modal-title"),
             ScrollableContainer(*body_children, id="entropy_body"),
@@ -718,19 +1090,115 @@ class EntropyViewerScreen(ModalScreen[Optional[int]]):
 
     def on_mount(self) -> None:
         self.query_one("#entropy_close", Button).focus()
+        if self._windows:
+            self._sync_page_buttons()
+
+    def _sync_page_buttons(self) -> None:
+        """Disable the Prev/Next buttons at the first/last page edges."""
+        last = self._page_count() - 1
+        self.query_one("#entropy_page_prev", Button).disabled = self._page <= 0
+        self.query_one("#entropy_page_next", Button).disabled = self._page >= last
+
+    def _refresh_view(self) -> None:
+        """Re-render the strip, jump list, indicator, and controls in place.
+
+        Summary:
+            Called after a page move or a sort toggle. Rebuilds the strip and
+            the jump list from the (new) :meth:`_page_slice`, updates the
+            ``page P/Q`` indicator + the sort-button label, and re-syncs the
+            Prev/Next disabled states. ``compute_entropy`` is never re-invoked
+            (presentation-only, HLR-062).
+
+            The strip's per-cell widgets (LLR-063.2) reuse row-based ids
+            (``#entropy_cell_<row>``) across pages, so the outgoing cells are
+            pruned first and the new cells mounted via ``call_after_refresh`` —
+            the prune is processed before the mount, avoiding a transient
+            duplicate-id collision on the shared ids.
+        """
+        strip = self.query_one("#entropy_strip", Horizontal)
+        strip.remove_children()
+        self.call_after_refresh(strip.mount, *self._strip_cells())
+        jump = self.query_one("#entropy_jump_list", ListView)
+        jump.clear()
+        for window in self._page_slice():
+            jump.append(self._jump_item(window))
+        self.query_one("#entropy_page_indicator", Label).update(
+            self._page_indicator_text()
+        )
+        self.query_one("#entropy_sort_button", Button).label = (
+            self._sort_button_label()
+        )
+        self._sync_page_buttons()
+
+    def _clamp_page(self, page: int) -> int:
+        """Clamp ``page`` into the valid ``[0, page_count-1]`` range (S-03)."""
+        return max(0, min(page, self._page_count() - 1))
+
+    def _set_page(self, page: int) -> None:
+        """Clamp ``page`` to ``[0, last]`` and re-render if it changed."""
+        new_page = self._clamp_page(page)
+        if new_page != self._page:
+            self._page = new_page
+            self._refresh_view()
+
+    def action_page_next(self) -> None:
+        if self._windows:
+            self._set_page(self._page + 1)
+
+    def action_page_prev(self) -> None:
+        if self._windows:
+            self._set_page(self._page - 1)
+
+    def action_toggle_sort(self) -> None:
+        """Toggle the sort key and reset to page 0 (LLR-062.2)."""
+        if not self._windows:
+            return
+        idx = self.SORT_KEYS.index(self._sort_key)
+        self._sort_key = self.SORT_KEYS[(idx + 1) % len(self.SORT_KEYS)]
+        self._page = 0
+        self._refresh_view()
+
+    def action_jump(self, row: Optional[int]) -> None:
+        """Dismiss with the window at ``row`` under the current sort + page.
+
+        Summary:
+            The single navigation sink shared by the jump list
+            (:meth:`on_list_view_selected`) and the click-navigable strip cells
+            (:meth:`on_entropy_cell_selected`, LLR-063.2): resolves ``row``
+            through the shared ``(sort, page, row) → window`` helper
+            (:meth:`_window_for_row`) and dismisses the modal with that window's
+            ``start`` address. An out-of-range or ``None`` ``row`` (S-03 bound) is
+            a safe no-op — a click on padding beyond the last cell dismisses
+            nothing, rather than raising or dismissing with the wrong window.
+
+        Args:
+            row (Optional[int]): the selected row index within the current page
+                slice; ``None`` or out of ``[0, len(page))`` → no-op.
+        """
+        window = self._window_for_row(row)
+        if window is None:
+            return
+        logger.info("EntropyViewerScreen jump to 0x%08X", window.start)
+        self.dismiss(window.start)
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
-        index = event.list_view.index
-        if index is None or not (0 <= index < len(self._windows)):
-            return
-        target = self._windows[index].start
-        logger.info("EntropyViewerScreen jump to 0x%08X", target)
-        self.dismiss(target)
+        self.action_jump(event.list_view.index)
+
+    def on_entropy_cell_selected(self, event: EntropyCell.Selected) -> None:
+        """Route a strip-cell click to the shared jump sink (LLR-063.2)."""
+        self.action_jump(event.row)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "entropy_close":
+        button_id = event.button.id
+        if button_id == "entropy_close":
             logger.info("EntropyViewerScreen dismissed by close.")
             self.dismiss(None)
+        elif button_id == "entropy_sort_button":
+            self.action_toggle_sort()
+        elif button_id == "entropy_page_prev":
+            self.action_page_prev()
+        elif button_id == "entropy_page_next":
+            self.action_page_next()
 
 
 def _parse_declared_regions(text: str) -> Tuple[Tuple[DeclaredRegion, ...], int]:
