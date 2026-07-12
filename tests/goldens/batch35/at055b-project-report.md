@@ -40,6 +40,10 @@
 - **Warnings** (Orange) — address/range out of S19 range, overlap ambiguity, symbol-only-in-MAC, symbol-only-in-A2L, or warning-policy alias
 - **Optional info** (Cyan) — valid-but-not-image-backed, not-checked-without-primary-image, or virtual/dependent non-memory-backed objects
 
+### Hex
+- **Yellow** — search / goto-focus highlight: the byte span matched by the last in-memory search or goto-address jump in the hex view
+- **Orange3** — MAC address overlay: a hex byte at an address referenced by a loaded MAC record
+
 ## Variant: a
 
 ### Modified files

@@ -3381,3 +3381,100 @@ standing post-merge canonical regen.
   (TC-320 drift-set assertion: patch cells only)
 - Status: Added in batch `2026-07-10-batch-35` (US-057 / HLR-057, LLR-057.1–.4).
   Frozen-engine diff = 0.
+
+---
+
+# 33. Patch-editor paste box · hex-view legend · fixture housekeeping (batch-36)
+
+> Three quality-of-life stories, none crossing the engine-frozen boundary (frozen diff = 0):
+> B-22/US-058 gives the Patch Editor's change-set paste box its own readable cell; B-24/US-059
+> documents the hex view's two overlay colours in both the in-app legend modal and the project
+> report; B-23/US-060 relocates ad-hoc test inputs into `examples/` and prunes a 54 MB duplicate
+> A2L. Stories: `.dev-flow/2026-07-11-batch-36/01-requirements.md`.
+
+**R-TUI-046**: The Patch Editor shall render the change-set paste editor
+(`#patch_paste_text`, wrapped by `#patch_paste_row`) in its own top-level panel cell — reparented
+out of the crowded `#patch_pane_changefile` pane and column-spanning both grid columns — so that at
+both an 80x24 and a 120x30 terminal the paste editor's first line lies inside its scroll pane's
+visible content-region at `scroll_y == 0` (no longer below the fold) with at least a per-width
+measured minimum of visible byte-editable lines (measured N_80 = 1 at the height-starved 80-col
+floor — an operator-accepted "first option" over the previous 0 in-viewport lines; N_120 = 4), its
+region sibling-disjoint (zero intersection area) from the change-file / patch-script / checks control
+cluster and not exceeding the panel host width (no right-edge clip) at either width. The change shall
+be **compose + CSS only** — no change to patch/check behaviour or button wiring — preserving every
+pre-batch patch-editor widget id (15-id census), the locked AT-032a `_CHECKS_HELP_TOKEN` span, and
+the behaviour of every existing handler, action, and key binding; the variant `Select` group stays
+above the execute row (the `1fr 2fr 2fr auto` row-weight deviation was chosen to keep that
+invariant). Snapshot drift is confined to the two patch-screen cells
+(`patch-comfortable-80x24`, `patch-comfortable-120x30`) until the standing post-merge canonical
+regen.
+- Code: `s19_app/tui/screens_directionb.py` (`compose`: reparent `#patch_paste_row` to a top-level
+  grid cell; `grid-size: 2 4` / `grid-rows: 1fr 2fr 2fr auto`), `s19_app/tui/styles.tcss`
+  (`#patch_editor_panel` grid + new `#patch_paste_row` rule: `column-span: 2; height: 100%;
+  overflow-y: auto; overflow-x: hidden`)
+- Validation: `Automated` via `tests/test_tui_patch_layout.py`
+  (`test_at058a_paste_editor_in_viewport_and_separated` — AT-058a, both widths in one node;
+  `test_tc319_regroup_section_structure_census` — TC-319 census survives),
+  `tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent` (AT-058b —
+  15-id census + wiring regression), `tests/test_tui_patch_variant.py::test_tc_035_2_variant_group_above_execute_row`
+  (survives), `tests/test_tui_snapshot.py::test_tc321_batch36_patch_xfail_set` (TC-321 — patch xfail
+  set is exactly the two patch cells). Residual F-01 (N_80 = 1) accepted; the 2 patch snapshot cells
+  `xfail` pending canonical-CI regen.
+- Status: Added in batch `2026-07-11-batch-36` (US-058 / HLR-058, LLR-058.1–.4). Frozen-engine
+  diff = 0.
+
+**R-TUI-047**: The system shall document the Workspace hex view's byte-cell overlay colours by
+adding a `"Hex"` block to the shared `LEGEND_TABLE` with exactly two classification rows — Yellow
+(`bold yellow`, `FOCUS_HIGHLIGHT_STYLE`) meaning the search / goto-focus span, and Orange3
+(`bold orange3`, `MAC_ADDRESS_OVERLAY_STYLE`) meaning the MAC address overlay — with each row's
+colour name derived at runtime from the shipped `color_policy.py` overlay-style constants (not
+hardcoded), so that the one added block reaches BOTH legend surfaces (the in-app `LegendScreen` modal
+via the `k` binding and the generated project report's `## Legend` section as a `### Hex`
+sub-section) and renders identical rows in both. The Hex block shall be decoupled from
+`COLOUR_SEVERITY` (these are interaction highlights, not `sev-*` validation severities — absent from
+`SEVERITY_CLASS_MAP`) and its meanings shall be non-blank and markup-free. The engine-frozen
+`color_policy.py` is READ only, never modified.
+- Code: `s19_app/tui/legend.py` (`LEGEND_TABLE["Hex"]`, `_RICH_MODIFIERS`,
+  `_colour_name_from_style()` — imports `FOCUS_HIGHLIGHT_STYLE` / `MAC_ADDRESS_OVERLAY_STYLE` from
+  `tui/color_policy.py`). Consumers unchanged (both already iterate the table):
+  `s19_app/tui/screens.py` (`LegendScreen` modal), `s19_app/tui/services/report_service.py`
+  (report legend section)
+- Validation: `Automated` via `tests/test_tui_legend.py`
+  (`test_at059a_hex_legend_present_in_modal` — AT-059a, exact meaning strings in the modal;
+  `test_tc322_hex_block_coupled_to_overlay_styles` — TC-322, runtime coupling to the overlay
+  constants + Hex colours absent from `COLOUR_SEVERITY`; `test_tc_s2_report_and_modal_render_same_rows`
+  — single-source parity; `test_legend_data_not_in_frozen_color_policy` green),
+  `tests/test_tui_report_seam.py::test_at059b_hex_legend_present_in_report` (AT-059b — handler writes
+  the report, test re-reads `reports/*.md` off disk for `### Hex` + both meanings),
+  `tests/test_report_service.py` (report legend-row coverage). The batch-35 report byte-identity
+  golden `tests/goldens/batch35/at055b-project-report.md` was rebaselined in-batch to include the
+  new `### Hex` section (writer-census carry, R-1).
+- Status: Added in batch `2026-07-11-batch-36` (US-059 / HLR-059, LLR-059.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-048**: The example-fixture tree shall relocate the git-tracked `tmp/stress_smoke/` inputs
+into `examples/` as a discoverable case (`examples/case_07_stress_smoke/firmware.{a2l,mac,s19}`, via
+`git mv`, with a convention `README.txt` and a `case_00_public/MANIFEST.md` entry), remove the
+redundant 54 MB slow-only large-A2L duplicate
+(`examples/professional_validation/case_06_large_nested_a2l/`, the `pv__case_06_large_nested_a2l`
+~490 s case) while retaining the 36 MB top-level `examples/case_06_large_nested_a2l/` large-A2L
+fixture (operator constraint D-1), and do so with no reduction in the functional coverage of the
+example smoke and pilot tests — such that the relocated case loads to a non-empty
+`LoadedFile.mem_map` through the real service layer, `SLOW_CASE_IDS` is empty, `tmp/stress_smoke/` is
+absent on disk and in the git index, and the large-A2L discovery pipeline is preserved. Working-tree
+`examples/` shall drop from 96 MB to ~42 MB (working-tree only; git-history rewrite is out of scope).
+The 54 MB delete is gated by an I-060-1 construct-kind census (`kinds(54 MB) ⊆ kinds(36 MB)`, 13
+identical `/begin` kinds — a pure scale duplicate) recorded BEFORE the irreversible `git rm`.
+- Code: fixture tree (`git mv` `tmp/stress_smoke/*` → `examples/case_07_stress_smoke/`; `git rm -r`
+  `examples/professional_validation/case_06_large_nested_a2l/`; `examples/case_07_stress_smoke/README.txt`
+  NEW; `examples/case_00_public/MANIFEST.md` case_07 entry), `tests/test_examples_smoke.py`
+  (`REPO_ROOT`, `import subprocess`, docstring counts, `SLOW_CASE_IDS = set()`)
+- Validation: `Automated` via
+  `tests/test_examples_smoke.py::test_at060a_fixtures_relocated_heavy_duplicate_pruned` (AT-060a —
+  four fused facts: `tmp/stress_smoke/` gone disk+index, relocated case non-empty `mem_map` via real
+  `build_loaded_s19/hex`, 54 MB absent, 36 MB present) +
+  `::test_tc323_discovery_and_coverage_map` (TC-323 — `case_07` discovered, `pv__case_06` not,
+  large-A2L pipeline retained, `SLOW_CASE_IDS == set()`); `tests/test_examples_pilot_gifs.py`
+  discovery preserved. I-060-1 gate evidence recorded in `increment-002.md` §I-060-1 before delete.
+- Status: Added in batch `2026-07-11-batch-36` (US-060 / HLR-060, LLR-060.1–.4). Frozen-engine
+  diff = 0.

@@ -21,6 +21,10 @@ This suite was generated to stress-test S19Tool and related parsers.
 6. **case_06_large_nested_a2l**  
    Large nested A2L (~35 MB). Designed to stress parsing, indexing, and memory use.
 
+7. **case_07_stress_smoke**  
+   Small S19/A2L/MAC stress-smoke triple (relocated from `tmp/stress_smoke/` in
+   batch-36). Quick parser-and-service smoke case.
+
 ## Notes
 - Files are synthetic and not tied to any OEM, ECU, or vendor.
 - `.mac` files are simple symbol listings intended to mimic symbol-address mapping.

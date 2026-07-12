@@ -688,26 +688,48 @@ Screen {
 /* HLR-033 (US-030) — the Patch Editor lays its four area-panes out as a 2x2
  * grid (Entries top-left, Change-file top-right, Checks bottom-left, Variant
  * bottom-right) so all four are visible together without scrolling one long
- * stack. `grid-size: 2 3` is two columns by three rows: the two `1fr` rows
- * host the four panes; the `auto` third row is the declared home for the
- * `column-span: 2` save-back child, zero-height while that child is hidden
+ * stack. `grid-size: 2 4` is two columns by four rows: the `1fr` + `2fr` top
+ * rows host the four panes; the weighted `2fr` third row is the reparented
+ * change-set paste cell (`#patch_paste_row`, `column-span: 2`, batch-36
+ * US-058 / LLR-058.1) — a WEIGHTED `grid-rows: 1fr 2fr 2fr auto` (not an equal
+ * split, which the MEASURED 5-row-@80x24 budget shows starves the paste cell)
+ * so the paste editor AND the middle (checks/variant) row each win 2 of the 5
+ * rows @80x24 — the paste editor's first line clears the fold at scroll 0 and
+ * the variant Select stays visible (TC-035.2); the entries/change-file top row
+ * takes the remaining 1 row and scrolls. The `auto` fourth row is the home for
+ * the `column-span: 2` save-back child, zero-height while that child is hidden
  * so the panes are not squeezed. Vertical scroll now lives per-pane
- * (`#patch_pane_*`), not on the panel. Measured host content = 70 cols @80 /
- * 92 @120 → ~35/pane @80 (C-13 budget clears). */
+ * (`#patch_pane_*` + `#patch_paste_row`), not on the panel. Measured host
+ * content = 70 cols @80 / 92 @120 → ~35/pane @80 (C-13 budget clears). */
 #patch_editor_panel {
     width: 100%;
     height: 1fr;
     padding: 1 2;
     layout: grid;
-    grid-size: 2 3;
+    grid-size: 2 4;
     grid-columns: 1fr 1fr;
-    grid-rows: 1fr 1fr auto;
+    grid-rows: 1fr 2fr 2fr auto;
 }
 
 #patch_pane_entries,
 #patch_pane_changefile,
 #patch_pane_checks,
 #patch_pane_variant {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* batch-36 (US-058 / LLR-058.1/.2) — the reparented change-set paste group is
+ * its own full-width panel cell in the weighted `2fr` third grid row. Like the
+ * four `#patch_pane_*` cells it scrolls vertically so the fixed 8-line
+ * `#patch_paste_text` editor (styles.tcss below) places its first line inside
+ * the visible content-region at scroll 0 rather than being pushed below the
+ * fold inside the crowded top-right pane. `column-span: 2` claims both columns;
+ * `overflow-x: hidden` matches the pane convention (JSON scrolls horizontally
+ * inside the `TextArea`). */
+#patch_paste_row {
+    column-span: 2;
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;

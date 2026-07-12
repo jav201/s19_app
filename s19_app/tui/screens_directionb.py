@@ -1770,7 +1770,9 @@ class PatchEditorPanel(ScrollableContainer):
             area-pane :class:`Container` s laid out 2x2 (HLR-033.1) —
             ``#patch_pane_entries`` (top-left: entries table, empty-state,
             entry inputs), ``#patch_pane_changefile`` (top-right: the
-            change-file row + the paste row), ``#patch_pane_checks``
+            change-file row — the paste group is reparented into its own
+            full-width cell below the four panes, batch-36 US-058),
+            ``#patch_pane_checks``
             (bottom-left: the declaration-fault count + listing, the checks
             status line + results), and ``#patch_pane_variant``
             (bottom-right: the variant-dropdown row composed ABOVE the
@@ -1791,13 +1793,15 @@ class PatchEditorPanel(ScrollableContainer):
 
         Returns:
             ComposeResult: The Patch Editor widget tree — four ``#patch_pane_*``
-            containers plus the spanning save-back row.
+            containers, the spanning paste cell, plus the spanning save-back row.
 
         Data Flow:
             - Each pane ``Container`` wraps its area's pre-existing widget
-              sub-tree intact; the panel's ``layout: grid; grid-size: 2 3``
-              CSS places the four panes in the top two ``1fr`` rows and the
-              save-back span in the ``auto`` third row.
+              sub-tree intact; the panel's ``layout: grid; grid-size: 2 4``
+              CSS (``grid-rows: 1fr 2fr 2fr auto``) places the four panes in
+              the top two rows, the reparented ``#patch_paste_row`` in the
+              weighted ``2fr`` third row (``column-span: 2``), and the
+              save-back span in the ``auto`` fourth row.
 
         Dependencies:
             Used by:
@@ -1907,18 +1911,6 @@ class PatchEditorPanel(ScrollableContainer):
                 ),
                 id="patch_doc_file_row",
             ),
-            Container(
-                Label(
-                    "Paste change-set (v2 JSON)",
-                    classes="patch-field-label",
-                ),
-                TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
-                Horizontal(
-                    Button("Parse pasted", id="patch_paste_parse_button"),
-                    id="patch_paste_controls",
-                ),
-                id="patch_paste_row",
-            ),
             id="patch_pane_changefile",
         )
         yield Container(
@@ -1967,6 +1959,27 @@ class PatchEditorPanel(ScrollableContainer):
                 id="patch_execute_row",
             ),
             id="patch_pane_variant",
+        )
+        # batch-36 (US-058 / LLR-058.1): the change-set paste group is
+        # reparented OUT of the crowded top-right #patch_pane_changefile cell
+        # (where it stacked below the change-file + patch-script + checks
+        # groups and was pushed fully below the fold — 0 in-viewport editor
+        # lines at scroll 0) into its own dedicated full-width panel cell in a
+        # weighted grid row (styles.tcss `grid-rows: 1fr 2fr 2fr auto`), so the
+        # editor's first line sits inside the visible content-region. Compose +
+        # CSS only: every patch_* id and the on_button_pressed wiring are
+        # unchanged (LLR-058.3).
+        yield Container(
+            Label(
+                "Paste change-set (v2 JSON)",
+                classes="patch-field-label",
+            ),
+            TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
+            Horizontal(
+                Button("Parse pasted", id="patch_paste_parse_button"),
+                id="patch_paste_controls",
+            ),
+            id="patch_paste_row",
         )
         yield Container(
             Label("Save patched image as:", classes="patch-field-label"),

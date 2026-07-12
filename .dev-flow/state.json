@@ -1,88 +1,94 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-07-10-batch-35",
-    "batch_objective": "B-07 (P1, baseline backlog 2026-07-09; operator: 'one of the most important changes'): (1) report filter file -- operator-authored JSON whitelist (format s19app-report-filter v1.0) matching A2L/MAC symbol names (fnmatchcase globs) OR address ranges; restricts the before/after report and the project report (A/B diff stays always-complete); per-run dropdown of project filters/*.json + free path input, none = full report byte-identical; audit header names the applied filter + hidden counts; invalid filter refuses generation with named errors. (2) Patch-editor regroup -- patch-script controls vs check controls into two labeled sections (today one mixed Horizontal, screens_directionb.py:1861). Operator spec locked 2026-07-10 via 4-question AskUserQuestion gate; design defaults D-1..D-5 in PLAN.md adopted pending override.",
+    "batch_id": "2026-07-11-batch-36",
+    "batch_objective": "Three operator-requested UI/hygiene stories + backlog refresh. US-058 (B-22): Patch Editor readable paste box + uncluttered controls (compose+CSS; 3-col vs taller-paste-pane open, C-13 geometry). US-059 (B-24): Workspace hex-view color legend rows added to legend.py + LegendScreen + report legend. US-060 (B-23): relocate tmp/stress_smoke -> examples/ + prune heavy real-vendor A2Ls, keeping a bare-minimum real-vendor large-A2L fixture with no stress-test coverage regression (operator constraint D-1). Plus refresh the 8-batch-stale .dev-flow/BACKLOG.md.",
     "current_phase": 6,
-    "phase_status": "awaiting-sync",
-    "standing_authorization": "BATCH-35-SPECIFIC GRANT, operator AskUserQuestion 2026-07-10 mid-Phase-3 ('Grant batch-35 autonomy'): run the remaining gates (Inc-4/Inc-5, Phases 4-6) autonomously; present full packets in-conversation; report ALL decisions. GUARDRAILS unchanged: full suite + engine-frozen guards + independent code-review GREEN before PR; NO self-merge (operator merges); snapshot regen canonical-CI-only (LOCAL REGEN FORBIDDEN); 0 engine-frozen diffs; propose-not-encode new dev-flow controls. PER-BATCH RULE (operator correction 2026-07-10, feedback_standing_auth_per_batch): authorization is NEVER carried to a subsequent batch; ask the approval model at each batch kickoff. NOTE: phases 0-3 up to Inc-3 ran under the earlier carried auth before the correction surfaced; the operator's explicit grant now covers the remainder. Design defaults D-1..D-5 (PLAN.md) adopted pending operator override.",
-    "route": "full /dev-flow (new operator-JSON input surface + C-17 file-derived text on status/report surfaces + report-semantics change to two shipped surfaces). Successor to batch-34 (reports lane, PR #63 merged 79699a5). Prior batch-33 fully synced; its awaiting-sync flag retired with this rollover.",
+    "phase_status": "awaiting-gate",
+    "standing_authorization": "BATCH-36-SPECIFIC, operator AskUserQuestion 2026-07-11 at kickoff: RUN MODE = 'Approve every gate' (FULLY SUPERVISED) -- the agent stops at every phase gate AND every Phase-3 increment for explicit operator approval; NO autonomy. MERGE = operator merges (no self-merge); agent stops at 'PR opened, CI green'. Decision-recording: every agent-taken decision recorded in PLAN.md decision log + this decisions_log + 05-postmortem + carried to vault at sync. PER-BATCH RULE (feedback_standing_auth_per_batch): batch-36-only; NEVER carried to batch-37; re-ask at next kickoff.",
+    "route": "full /dev-flow (operator explicitly invoked /dev-flow). 3 stories: UI redesign (US-058, geometry/C-13 risk) + legend feature (US-059, report-output surface) + fixture hygiene with destructive deletes (US-060, C-14 census). Successor to batch-35 (merged PRs #64/#65 on main 2a647d1/7df60dd, vault-synced 2026-07-11).",
     "iterations_per_phase": {
         "0": 1,
         "1": 1,
         "2": 2,
-        "3": 7,
+        "3": 3,
         "4": 1,
         "5": 1,
         "6": 1
     },
     "artifacts": {
-        "plan": ".dev-flow/2026-07-10-batch-35/PLAN.md",
-        "1": ".dev-flow/2026-07-10-batch-35/01-requirements.md",
-        "1b": ".dev-flow/2026-07-10-batch-35/01b-qa-strategy-and-verification.md",
-        "2": ".dev-flow/2026-07-10-batch-35/02-review.md",
-        "3": ".dev-flow/2026-07-10-batch-35/03-increments/",
-        "4": ".dev-flow/2026-07-10-batch-35/04-validation.md",
-        "5": ".dev-flow/2026-07-10-batch-35/05-postmortem.md",
-        "6": ".dev-flow/2026-07-10-batch-35/06-docs/"
+        "plan": ".dev-flow/2026-07-11-batch-36/PLAN.md",
+        "1": ".dev-flow/2026-07-11-batch-36/01-requirements.md",
+        "1b": ".dev-flow/2026-07-11-batch-36/01b-qa-strategy-and-verification.md",
+        "2": ".dev-flow/2026-07-11-batch-36/02-review.md",
+        "3": ".dev-flow/2026-07-11-batch-36/03-increments/",
+        "4": ".dev-flow/2026-07-11-batch-36/04-validation.md",
+        "5": ".dev-flow/2026-07-11-batch-36/05-postmortem.md",
+        "6": ".dev-flow/2026-07-11-batch-36/06-docs/"
     },
-    "rc1": "PASS @ 79699a5 (2026-07-10). feat/batch-35-report-filter cut from origin/main tip 79699a5 (batch-34 squash #63, operator-merged). Already-shipped check: 0 hits for any filter concept in s19_app/tui/services (case-insensitive), 0 hits repo-wide for R-RPT-FILTER/report-filter/filters-dir, no patch/checks section grouping in the TUI -- nothing shipped; all 5 stories proceed. Regroup grounding: #patch_doc_controls one mixed Horizontal (Load/Validate/Apply/Save + Run checks) at screens_directionb.py:1861-1868.",
+    "rc1": "PASS @ 7df60dd (2026-07-11). HEAD = origin/main tip = merge-base = 7df60dd (batch-35 snapshot PR #65). Already-shipped grep: 0 hits for a Patch Editor 3-col/paste-height redesign beyond B-07's 2-section regroup; 0 hits for a Hex row in legend.py LEGEND_TABLE (A2L/MAC/Issues only); tmp/stress_smoke tracked with 0 code references; examples/ = 96M (90M in two firmware.a2l). Nothing shipped; all 3 stories proceed.",
     "decisions_log": [
-        {
-            "phase": 6,
-            "date": "2026-07-11",
-            "decision": "approved",
-            "notes": "Under the batch-35 grant. 06-docs complete: traceability-matrix (both chains, 25/25 LLR + 17/17 AT rows, 5-node grep sample re-verified, 0 gaps), functionality.md (doubles as the Phase-4-owed operator format docs; concrete example JSON VALIDATED through the real parser at the gate after the docs agent's honest untested flag; mermaid data-flow), REQUIREMENTS.md section 32 rows R-RPT-FILTER-001 + R-TUI-045 (house format, additive-only, engine guard green), executive-summary.md. Full-suite evidence: the Phase-4 gate run at 428470a (1335/2/4/1 exit 0) — every commit since is prose-only (dev-flow docs + REQUIREMENTS.md); CI on the PR is the tip-level re-proof. Review guardrail: 7/7 increment reviews APPROVE 0 HIGH + the reviewer's Phase-4 entry sweep. State -> awaiting-sync; /dev-flow-sync after the operator merges."
-        },
         {
             "phase": 5,
             "date": "2026-07-11",
-            "decision": "approved (close phase, proceed to Phase 6)",
-            "notes": "Under the batch-35 grant. 05-postmortem.md complete: 32/32 in-batch findings closed; dominant success = D-9 resolved-matcher (killed 3 blockers + 1 major in one design move); dominant failure class = test-run discipline vs the harness (7 backgrounding events; Phase-4 blocking mandate physically unsatisfiable at the 10-min tool cap -> real invariant named: one complete run, evidence from that run's own output). Inc-6 = plan drift (increment cut adopted at the same gate that amended the registry). 4 candidate controls PROPOSED not encoded: C-CAND-D reformulated (run-evidence rule), C-CAND-G (move-aside RED for net-new files, never stash), C-CAND-H (AT-amending gates force registry re-reconciliation + cut re-derivation), C-CAND-I (per-cell snapshot-drift reasoning). C-15 lineage now 5 occurrences. Operator hindsight: B-07 = last P1; the 2026-07-09 P1 set fully closed pending merge. New batch NOT opened inside this one (per-batch auth rule)."
+            "decision": "approved (proceed to Phase 6)",
+            "notes": "05-postmortem.md complete. Metrics: iters 0:1/1:1/2:2/3:3/4:1/5:1; 11 Phase-2 findings all folded + F-01 escalated; 0 HIGH across batch (Inc-1 1 LOW hardened, Inc-2 0, Inc-3 1 MEDIUM fixed); ledger 1362->1370; examples 96M->42M; gate 1343 passed/0 failed. Scope drift NONE. 3 root causes: F-01 fr-math geometry 4.5x off (measured not estimated); writer-census missed report byte-identity golden; Phase-4 harness-backgrounding recurrence (recovered zero-rework). 4 control candidates PROPOSED not encoded (C-CAND-A pilot-measure geometry/C-13; C-CAND-B goldens in census/writer-census; C-CAND-C validation-run binding/C-19; C-CAND-D mark illustrative spec values/C-13) -- operator asked for pros/cons before deciding; ENCODING HELD pending operator choice (feedback_devflow_control_encode_approval). Operator gate = 'Proceed to Phase 6'. Phase 6 dispatched: docs-writer (traceability + functionality + REQUIREMENTS.md R-TUI-046/047/048 + BACKLOG.md refresh) + presentation-builder (executive summary)."
         },
         {
             "phase": 4,
             "date": "2026-07-11",
             "decision": "approved",
-            "notes": "Under the batch-35 grant. 04-validation.md PASS, all three axes: 25/25 LLRs node-verified on disk (file:line), 17/17 ATs single-noded (C-18) with per-AT counterfactual citations (13 live-RED, 2 goldens double-proven THRICE incl. the Phase-4 re-derivation, 2 declared-weaker classes with strongest-constructible CFs recorded), bidirectional surface matrix complete, census 14/14 rows resolved (grid-3 survived; D-9 made the TC-038-3 extend unnecessary; C-14 observer sweep re-run clean), executed inspections (A2B 0 hits, S-F1 0 call sites, frozen 0 diffs vs main AND base), perf measured (parse 3ms; ceiling worst ~9.3s accepted residual -> operator-docs note), ledger closes exactly (1363 collected = 1270+93, D=0), gate suite tail reproduced (1335/2/4/1 exit 0). Owed to Phase 6: REQUIREMENTS.md rows + operator format docs (+ceiling-perf note). Post-merge: canonical regen + mark retirement; ubuntu CI = cross-platform proof. Phase 5 post-mortem dispatched."
+            "notes": "Phase-4 validation PASS all 3 axes (Coverage/Certainty/Evidence), 0 blockers. Gate run (C-19 one complete run) pytest -q -m 'not slow' = 1343 passed / 2 skipped / 20 deselected / 5 xfailed / exit 0 / 0 failures / 14:25; reconciles to 1370 ledger. 5 xfails = 2 batch-36 patch cells + 3 pre-existing entropy. Both layers verified: 5 ATs each reconciled to exactly ONE on-disk node (C-18) with real counterfactual + observed deliverable (AT-058a patch_layout:532, AT-058b patch_editor_v2:2461, AT-059a legend:368, AT-059b report_seam:1570, AT-060a examples_smoke:170); Layer A TC-321/322/323 + TC-319/TC-035.2 survive PASS; engine-frozen 0 diffs. PROCESS: qa agent backgrounded the 14-min full suite and ended pre-completion (C-19 harness-backgrounding recurrence, 2nd batch running); orchestrator caught the completed run + resumed the agent with context intact -> 04-validation.md written, no rework. Residuals (accepted): F-01 N_80=1 (op-accepted, N_120=4); at055b golden rebaseline writer-census carry; 2 snapshot xfails canonical-regen; owed Phase 6 = R-TUI-046/047/048 + BACKLOG refresh + docs. Phase 5 dispatched."
         },
         {
             "phase": 3,
             "date": "2026-07-11",
-            "decision": "approved",
-            "notes": "PHASE-3 CLOSE under the batch-35 grant. Seven increments: Inc-0 92df3f4 goldens / Inc-1 2f237d1 engine (+folds d9a73c2) / Inc-2 58d7c7e before-after / Inc-3 49ec95b project report (+docs 4495ad4) / Inc-4 acfd0a5 selector UX + surface ATs / Inc-5 c8dc2fa regroup (+close-out folds e15b744: Inc-4 F1 dock-overlap guard, F2 docstring, F4 conftest; 6.5 #21 drift amendment) / Inc-6 428470a AT-053b + TC-318 report half (the C-18 sweep caught the unrealized pair). ALL increment reviews APPROVE, 0 HIGH across the batch. Suite 1335 passed / 2 skipped / 4 xfailed / 1 xpassed (declared Inc-5 snapshot state), goldens green throughout, engine-frozen 0 diffs every increment. Key catches: C-15 probe proved textual Select parses option labels as markup (escape applied, counterfactual-proven); geometry rung 3 (4-row measured deficit); refusal-gate + escape mutations both RED. Honest limitation recorded (Inc-6): NTFS filename arm can't carry ctl/<b> bytes; CF-2 neutered-sanitizer counterfactual is the discriminating proof. Phase 4 dispatched (qa-reviewer validation) + light Inc-6 review in parallel."
+            "decision": "Inc-3 (US-058) approved -- PHASE 3 CLOSED",
+            "notes": "Inc-3 Patch Editor reparent GREEN (compose+CSS only). Measured: paste box moved from below-fold (0 in-viewport lines @both widths, region.y=38/36) to in-viewport (N_80=1 @80x24, N_120=4 @120x30 -- exceeds provisional 3; first line inside content-region at both widths). 5 files (screens_directionb.py reparent, styles.tcss grid-size:2 4 grid-rows:1fr 2fr 2fr auto + #patch_paste_row, test_tui_patch_layout AT-058a, test_tui_patch_editor_v2 AT-058b, test_tui_snapshot TC-321+drift-marks). All 15 patch ids preserved; 0 handler/binding changes; TC-319 SURVIVES; Validate no-clip. RED->GREEN proven (file-revert not stash, C-20). 56 passed + snapshot 33 passed/2 xfailed/0 unexpected (patch-comfortable-80x24 + -120x30, canonical-CI regen only); ledger 1370; ruff clean; 0 frozen diffs. Deviations (sound): weight vector 1fr 2fr 2fr auto not spec's illustrative 1fr 1fr 2fr auto (that starved variant Select, broke TC-035.2 -- dev caught it); AT-058a sibling-disjoint reformulated (file_row region overflows pane). Code-review APPROVE 0 HIGH; 1 MEDIUM (comments cited rejected weight vector) FIXED by orchestrator (2 comment edits, screens_directionb.py:1968 + test_tui_snapshot.py:468). PHASE 3 CLOSED: 3/3 increments APPROVE 0 HIGH. Phase 4 (qa-reviewer full validation) dispatched."
         },
         {
             "phase": 3,
-            "date": "2026-07-10",
-            "decision": "approved (superseded row - see the phase-3 close row above)",
-            "notes": "Inc-0 92df3f4 guard goldens (canonical-form ratified 6.5 #19/#20; double-proof x3; reviewer re-derivation byte-identical; APPROVE). Inc-1 2f237d1 filter engine, 56 TCs (reviewer: RED re-derived, D-10a probe-verified, 18k-probe oracle 0 divergences; APPROVE; gate folds d9a73c2 D-10a spec+docstring, LLR-053.4 primitive reword). Inc-2 58d7c7e before/after filtering + audit header (goldens HELD; reviewer counterfactual-mutated the matcher seam both directions, tests discriminate; APPROVE; F1 handoff -> Inc-3 condition). Inc-3 49ec95b project-report filtering + UI-thread trigger resolution (F1 satisfied: real filename asserted, fallback rejected; refusal-half RED proved the pre-change silent-degrade; suite 1318 = 1311+7; review in flight). Process incidents for Phase 5: Inc-0 agent stalled 3x backgrounding pytest (orchestrator finished evidence+commit); Inc-1 stash-RED on untracked file popped the leftover batch-29 stash -> state.json conflict (resolved; move-aside is the net-new RED idiom; stash@{0} parked, prunable). Inc-4 (selector UX + surface ATs, C-15 Select-markup probe at entry) dispatched; Inc-5 regroup sequential after (styles.tcss overlap)."
+            "date": "2026-07-11",
+            "decision": "Inc-2 (US-060) approved",
+            "notes": "Inc-2 relocate+prune GREEN. I-060-1 delete-gate PASS recorded BEFORE git rm (kinds(54M)==kinds(36M)==13 identical A2L construct kinds; pure scale duplicate; reviewer independently re-ran census on retained file, superset confirmed). git mv tmp/stress_smoke -> examples/case_07_stress_smoke/firmware.{a2l,mac,s19} (true 100% renames, content-lossless); git rm -r professional_validation/case_06_large_nested_a2l (reversible via history; deleted README = 1-line desc, nothing sensitive). Edits: test_examples_smoke.py (SLOW_CASE_IDS->set(), docstring 7->8/8->7, +AT-060a +TC-323), docs/architecture.md, MANIFEST.md, new case_07 README (4 code/doc files). RED->GREEN proven; 17 passed exit 0 (reviewer re-ran 9.8s; retained 36M case normal-suite 9.5s, never slow-marked); examples 96M->42M; ledger 1367; ruff clean; 0 frozen diffs; Inc-1's 4 files untouched. Code-review APPROVE 0 HIGH/MEDIUM/LOW. No functional assertion removed; case_07 discovered + loads non-empty mem_map (C-10). Inc-3 (US-058) starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-11",
+            "decision": "Inc-1 (US-059) approved + hardened",
+            "notes": "Inc-1 hex-view colour legend GREEN. 4 files (legend.py + test_tui_legend.py + test_tui_report_seam.py + goldens/batch35/at055b-project-report.md). Hex block = 2 rows (Yellow=search/goto-focus overlay, Orange3=MAC overlay) DERIVED from color_policy FOCUS_HIGHLIGHT_STYLE/MAC_ADDRESS_OVERLAY_STYLE via _colour_name_from_style (digit kept -> no COLOUR_SEVERITY['Orange']->WARNING collision). Anti-drift orphan check SCOPED to _SEVERITY_ARTIFACTS (covers both non-severity overlay colours). RED->GREEN proven (report had no ### Hex pre-change). 41 passed exit 0; ledger 1365=1362+3; ruff clean; 0 engine-frozen diffs. Independent code-review APPROVE 0 HIGH/0 MEDIUM; golden delta independently verified = EXACTLY the Hex block (+4/-0), AT-055b byte-identity still green. Operator: approve + harden -> TC-322 hardened (feed live constants not literals through _colour_name_from_style so a bare RE-VALUE fails, not only a rename); re-run 1 passed, ruff clean. CARRY to post-mortem: Phase-1 writer-census must include report byte-identity goldens whenever LEGEND_TABLE changes (this at055b golden dep was missed in census; caught+handled in Inc-1). C-18: AT-059a + AT-059b each exactly one on-disk node. Inc-2 (US-060) starting."
         },
         {
             "phase": 2,
-            "date": "2026-07-10",
-            "decision": "approved",
-            "notes": "Under standing auth after the amendment round. All 25 Phase-2 findings folded (29 reconciliation rows + AT registry sub-table; 18 section-6.5 records incl. NEW LLR-053.7 resolved-matcher); independent checklist verification CLEAN 12/12 with quoted evidence. Final census 17 ATs / 14 TCs. Phase 3 opens with the architect cut: Inc-0 goldens-first (AT-054b/AT-055b guard goldens at base revision, double-proof), Inc-1 report_filter.py engine, Inc-2 before/after path, Inc-3 project report, Inc-4 selector UX, Inc-5 regroup (independent). S-F7 (pre-existing raw linkage_symbol interpolation in report_service) queued as backlog follow-up, not this batch."
+            "date": "2026-07-11",
+            "decision": "approved (re-gate after amendment fold)",
+            "notes": "11/11 Phase-2 findings folded into 01-requirements.md with 6.5 Before->After records + re-verified (orchestrator independently confirmed AT-058a redesign, LLR-058.1 measured budget, LLR-060.2 hard I-060-1 gate). US-058 acceptance rebuilt (paste-group non-nesting + content-region placement idiom, measured RED today region.y=38 vs fold [8,10)); TC-319 SURVIVES (verified); AT registry reconciled to 5 (AT-058a/b, 059a modal, 059b report C-12, 060a); I-060-1 hard delete-gate with draft preview showing identical 13 A2L construct kinds (pure scale duplicate). Deviation R-A04 accepted: colour name stays 'Orange3' not 'Orange' (avoids COLOUR_SEVERITY 'Orange'->WARNING collision). Security PASS. NEW finding F-01 (re-measurement: 80x24 panel only ~5 rows, compose+CSS cannot show multi-line paste @80) escalated to operator -> operator chose 'In-place fix, accept 80-col limit' (matches LLR-058.1's existing choice; no expand-view, no B-25 queued; full multi-line readability is a >=120-col affordance). Phase 3 increment cut proposed."
         },
         {
             "phase": 2,
-            "date": "2026-07-10",
+            "date": "2026-07-11",
             "decision": "iterate-to-refine",
-            "notes": "Triple review complete (02-review.md). Architect ITERATE: F-01 BLOCKER unconditional a2l/mac record forwarding would change UNFILTERED run-annotation bytes (byte-identity break); F-02 BLOCKER CheckRunEntry.linkage_symbol claim false (model.py:678) + branch-(c) inputs never reach generate_project_report; F-03..F-06 majors. QA ITERATE: Q-1 BLOCKER golden clock seam unreachable from handlers (neither passes now_fn); Q-2..Q-7 majors. Security PASS-with-conditions: S-F1 notify()+Select-option-label markup surfaces; S-F2 read-time symlink TOCTOU. UNIFYING FIX D-9 resolved-matcher: parse+resolve on UI thread at trigger -> ReportFilterMatcher (patterns + prebuilt sorted ranges) is the ONLY thing forwarded (composer kwarg / ReportOptions field / worker arg); no record kwargs added; golden mechanism (a) _default_now monkeypatch environment pin. Amendment agent dispatched with the full fold list; checklist verification pass follows; then re-gate."
+            "notes": "Phase-2 triple review complete (02-review.md + 3 sub-reviews). Security PASS (0 HIGH/MEDIUM). 3 blockers, all corrections/gates not story-kills: A-01 (US-058 five-region disjoint predicate unsatisfiable -- doc_controls/checks_controls are CHILDREN of file_row; contradicts surviving TC-319), Q-01 (US-058 paste metric region.height>=N CSS-invariant, box already height:8 -> no counterfactual; use content-region PLACEMENT idiom), Q-04/A-08 (US-060 I-060-1 construct-equivalence delete-gate ABSENT; LLR-060.2 deletes on size alone). Majors: Q-02/A-05 (re-derive N from chosen rung's measured cell height), A-02 (adding Hex breaks 2 legend assertions not 3; :322 dynamic survives), A-03 (TC-319 missing from census). Minors: A-04/Q-07 (derive colour name from constant), A-06/Q-08 (split AT-059a modal + AT-059b report; C-21 re-reconcile), A-07/Q-06 (snapshot id patch-comfortable-80x24), S-01 (Hex strings markup-free), S-02 (git mv/rm). Operator approved 'approve iterate'. Amendment agent dispatched to fold all findings into 01-requirements.md (6.5 Before/After) + reconcile AT registry; orchestrator verifies; then re-gate Phase 2."
         },
         {
             "phase": 1,
-            "date": "2026-07-10",
+            "date": "2026-07-11",
             "decision": "approved",
-            "notes": "Under standing auth after one orchestrator fold round. Draft: 5 US / 5 HLR / 24 LLR / 13 AT / 14 TC (TC-307..320), probe ledger executed, D-6 selector home = ReportViewerScreen row + sticky path-only app state (both triggers consult at generation). Architect draft-time corrections: C-17 status-funnel claim stale (batch-33 made log labels markup=False; residual = #status_text + NEW widgets); D-1(c) plumbing cheaper (generate_diff_report already accepts a2l/mac records). Orchestrator folds at gate: F-1 point->EXTENT semantics for name-matched A2L records (byte_size verified on enriched tags a2l.py:1200; point semantics could hide mid-parameter patches); F-2 exact-equality short-circuit closes QA G6 (PAR[0] metacharacter hazard). QA cross-check: QA-2 covered by LLR-055.4, QA-3 by LLR-054.2(c). Phase 2 triple review dispatched (architect/qa/security in parallel)."
+            "notes": "Phase-1 gate approved by operator. 3 US / 3 HLR / 11 LLR / 4 AT (AT-058a/b, 059a, 060a) / 3 TC (321/322/323); 23-row probe ledger, all file:line verified @7df60dd. Two premise-overturning findings surfaced + accepted by operator: DF-1/D-058 the operator's 3-column idea REJECTED by the measured 80-col budget (3-col button cell 7<8 clips 'Validate') -> dedicated vertical paste region instead (root cause: paste box already height:8, cramping is below-the-fold); DF-2 the 'real-vendor' premise inaccurate (both large A2Ls documented synthetic, MANIFEST.md:25) -> keep representative 36M, delete 54M slow duplicate, examples 96M->~42M. US-059 hex colours = bold yellow (search/focus) + bold orange3 (MAC overlay); anti-drift TC-S1 SPLIT not widened. One flagged assumption: patch snapshot cell ids (LLR-058.4) verify-in-Phase-3. Watch-item I-060-1 carried: verify 54M is a pure scale-duplicate before delete. Phase 2 dispatched: architect + qa-reviewer + security-reviewer in parallel."
         },
         {
             "phase": 0,
-            "date": "2026-07-10",
+            "date": "2026-07-11",
             "decision": "approved",
-            "notes": "Under standing auth. Spec locked by operator (4-question gate). Recon mapped all seams (PLAN.md). RC-1 PASS @ 79699a5 (0 already-shipped hits). 5 stories READY (US-053..057), each with observable black-box AC; one design item flagged to Phase 1 (selector UI home, C-13 budget owed). Phase 1 dispatched: architect (01-requirements draft) + qa-reviewer (01b strategy) in parallel."
+            "notes": "Definition-of-Ready gate approved by operator ('approved'). 3 stories READY (US-058/059/060), 0 REFINE/SPIKE/OUT. All 3 axes met (Coverage/Certainty/Evidence). Phase 1 dispatched: architect (extend 01-requirements.md with 3 Acceptance blocks + 4 HLR/LLR + traceability) + qa-reviewer (01b validation strategy) in parallel. Mechanisms deferred to Phase 1 by design: US-058 3-col vs taller-paste (C-13 measure), US-059 hex colour-class enumeration, US-060 retained-file selection + coverage-preservation proof."
+        },
+        {
+            "phase": 0,
+            "date": "2026-07-11",
+            "decision": "kickoff-authorization recorded (gate NOT yet approved)",
+            "notes": "Batch-36 opened by rollover from batch-35 (merged PRs #64/#65 on main + vault-synced 2026-07-11; prior worktree awaiting-sync flag was a stale local snapshot, retired). Operator AskUserQuestion answers: run mode = 'Approve every gate' (fully supervised, no autonomy); merge = operator merges (no self-merge); scope = all 3 session asks (US-058/059/060) + BACKLOG.md refresh; prune = delete unnecessary heavy files BUT keep a bare-minimum real-vendor large-A2L fixture with NO stress-test coverage regression (D-1). RC-1 PASS @ 7df60dd. Phase-0 story intake written (01-requirements.md 2.6 + PLAN.md); 3 stories classified READY. AWAITING operator approval at the Definition-of-Ready gate before dispatching Phase 1."
         }
     ],
     "obsidian_synced": false,
-    "created_at": "2026-07-10T00:00:00Z"
+    "created_at": "2026-07-11T00:00:00Z"
 }

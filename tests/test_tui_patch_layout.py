@@ -28,7 +28,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from textual.widgets import DataTable
+from textual.widgets import DataTable, TextArea
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens_directionb import PatchEditorPanel
@@ -436,3 +436,176 @@ def test_tc319_regroup_section_structure_census(tmp_path: Path) -> None:
         "#patch_checks_controls must hold the Run-checks button + help, "
         f"got {result['checks_children']}"
     )
+
+
+# ---------------------------------------------------------------------------
+# AT-058a / LLR-058.1/.2 — the reparented paste editor is in-viewport at
+# scroll 0, and its cell is separated from the change-file control cluster
+# (US-058, batch-36). C-18: one on-disk node asserting both widths.
+# ---------------------------------------------------------------------------
+
+# Per-width MEASURED in-viewport line pins (LLR-058.1), taken from the
+# post-fix Pilot capture at scroll 0 — each strictly greater than today's 0
+# in-viewport lines (the RED counterfactual: the paste editor sat fully below
+# the fold inside `#patch_pane_changefile`, region.y=38 vs pane content [8,10)
+# @80x24). The always-satisfiable acceptance is the content-region PLACEMENT
+# (first line in-viewport); `region.height` alone equals the CSS `height: 8`
+# whether visible or below the fold, so it is deliberately NOT the metric.
+_PASTE_INVIEW_MIN = {"80x24": 1, "120x30": 4}
+
+
+def _drive_paste_geometry(
+    tmp_path: Path, size: tuple[int, int]
+) -> dict[str, object]:
+    """Capture the reparented paste-cell geometry at ``size``.
+
+    Summary:
+        Drive the real app under Pilot, show the patch screen, and read the
+        paste editor's ``region``, its scroll pane's (``#patch_paste_row``)
+        ``content_region`` / descendant set, and the change-file cluster's
+        (``#patch_doc_file_row``) ``region`` so the caller can assert the
+        content-region placement (C-10 discriminator) plus the structural
+        non-descendant + sibling-disjoint guards.
+
+    Args:
+        tmp_path (Path): pytest tmp base for the app's ``.s19tool`` workarea.
+        size (tuple[int, int]): the ``(width, height)`` terminal size.
+
+    Returns:
+        dict[str, object]: the captured regions, the paste pane scroll offset,
+        and whether ``#patch_paste_row`` is a descendant of
+        ``#patch_pane_changefile``.
+
+    Data Flow:
+        - ``action_show_screen("patch")`` -> pilot pause -> region reads.
+
+    Dependencies:
+        Uses:
+            - :class:`s19_app.tui.app.S19TuiApp` Pilot harness.
+        Used by:
+            - :func:`test_at058a_paste_editor_in_viewport_and_separated`.
+    """
+
+    async def _run() -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            await pilot.pause()
+            paste = app.query_one("#patch_paste_text", TextArea)
+            pane = app.query_one("#patch_paste_row")
+            changefile = app.query_one("#patch_pane_changefile")
+            file_row = app.query_one("#patch_doc_file_row")
+            paste_is_changefile_descendant = paste in changefile.walk_children(
+                with_self=False
+            ) or pane in changefile.walk_children(with_self=False)
+            # The change-file/patch-script/checks CLUSTER (#patch_doc_file_row)
+            # is contained inside the #patch_pane_changefile grid cell — assert
+            # that containment holds, then use the pane cell as the visible
+            # cluster rectangle for the sibling-disjointness guard. (file_row's
+            # own .region overflows its scroll pane — h=29 vs the 1-2 visible
+            # rows @80x24 — so its RAW rectangle is not the on-screen cluster;
+            # the pane clips it, F-01.)
+            file_row_in_changefile = file_row in changefile.walk_children(
+                with_self=False
+            )
+            pr = paste.region
+            cf = changefile.region
+            return {
+                "scroll_y": pane.scroll_offset.y,
+                "content_y": pane.content_region.y,
+                "content_bottom": pane.content_region.bottom,
+                "paste_region": (pr.x, pr.y, pr.width, pr.height),
+                "changefile_region": (cf.x, cf.y, cf.width, cf.height),
+                "pane_right": pane.region.right,
+                "paste_right": pr.right,
+                "paste_is_changefile_descendant": (
+                    paste_is_changefile_descendant
+                ),
+                "file_row_in_changefile": file_row_in_changefile,
+            }
+
+    return asyncio.run(_run())
+
+
+def test_at058a_paste_editor_in_viewport_and_separated(tmp_path: Path) -> None:
+    """AT-058a — the paste editor clears the fold + its cell is separated.
+
+    Intent: LLR-058.1/.2 (US-058) — the change-set paste group is reparented
+    OUT of the crowded top-right ``#patch_pane_changefile`` cell into its own
+    weighted full-width panel cell, so at ``scroll_y == 0`` the paste editor's
+    FIRST line lies inside its scroll pane's visible ``content_region`` (no
+    longer below the fold), showing at least the per-width MEASURED minimum of
+    in-viewport editor lines. The C-10 discriminator is that content-region
+    PLACEMENT (mirrors ``test_tui_patch_variant.py``'s TC-035.2 idiom), guarded
+    by ``if paste.region.width and paste.region.height`` because a fully
+    scrolled-out widget reports a NULL (0,0) region. Structural cheap guards
+    (NOT the discriminator): ``#patch_paste_row`` is no longer a descendant of
+    ``#patch_pane_changefile``, and its region is disjoint from the change-file
+    control cluster ``#patch_doc_file_row``. Asserted at BOTH the 80x24 floor
+    and the 120x30 comfortable size.
+
+    Counterfactual (RED before the batch-36 reparent): the paste editor sat at
+    region.y=38 while ``#patch_pane_changefile``'s content-region was rows
+    [8,10) @80x24 (and y=36 vs [8,13) @120x30) -> 0 in-viewport lines, and
+    ``#patch_paste_row`` WAS a descendant of ``#patch_pane_changefile`` -> both
+    the placement predicate and the non-descendant guard flip RED.
+    """
+    for size_label, size in (("80x24", (80, 24)), ("120x30", (120, 30))):
+        dims = _drive_paste_geometry(tmp_path / size_label, size)
+        n_w = _PASTE_INVIEW_MIN[size_label]
+        px, py, pw, ph = dims["paste_region"]
+
+        # Structural guard 1 (cheap): the paste group is reparented OUT of the
+        # crowded change-file pane.
+        assert dims["paste_is_changefile_descendant"] is False, (
+            f"@{size_label}: #patch_paste_row / #patch_paste_text must not be "
+            "a descendant of #patch_pane_changefile after the reparent"
+        )
+
+        assert dims["scroll_y"] == 0, (
+            f"@{size_label}: the paste pane must start unscrolled"
+        )
+
+        # C-10 discriminator: the paste editor's first line is inside the
+        # pane's visible content-region at scroll 0, with >= N_w lines fitting.
+        if pw and ph:  # mapped (not a NULL fully-scrolled-out region)
+            assert dims["content_y"] <= py, (
+                f"@{size_label}: paste first line y={py} must be at/below the "
+                f"pane content top {dims['content_y']} (not above the fold)"
+            )
+            assert py + n_w <= dims["content_bottom"], (
+                f"@{size_label}: the paste editor must show >= {n_w} lines in "
+                f"the visible pane rows [{dims['content_y']}, "
+                f"{dims['content_bottom']}) at scroll 0; first line y={py}"
+            )
+        else:  # pragma: no cover - guards against a compositor NULL region
+            raise AssertionError(
+                f"@{size_label}: the paste editor reports a NULL region — it "
+                "is fully below the fold (the RED counterfactual)"
+            )
+
+        # Structural guard 2 (cheap): the change-file cluster is contained in
+        # the #patch_pane_changefile grid cell, and the paste cell's rectangle
+        # is disjoint from that (sibling) pane — so the paste group is
+        # visually separated from the change-file/patch-script/checks cluster.
+        # (The readability discriminator is the placement predicate above, not
+        # this cheap guard.)
+        assert dims["file_row_in_changefile"] is True, (
+            f"@{size_label}: #patch_doc_file_row must stay inside "
+            "#patch_pane_changefile (child containment)"
+        )
+        cx, cy, cw, ch = dims["changefile_region"]
+        if cw and ch and pw and ph:
+            overlap = px < cx + cw and cx < px + pw and py < cy + ch and cy < py + ph
+            assert not overlap, (
+                f"@{size_label}: the paste cell {dims['paste_region']} must "
+                f"not overlap the change-file pane {dims['changefile_region']}"
+            )
+
+        # No right-edge clip past the host pane.
+        assert dims["paste_right"] <= dims["pane_right"], (
+            f"@{size_label}: the paste editor must not clip past its pane "
+            f"right edge ({dims['paste_right']} > {dims['pane_right']})"
+        )

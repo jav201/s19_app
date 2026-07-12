@@ -2429,3 +2429,94 @@ def test_at057b_regroup_wiring_and_binding_regression(
         and binding.action == "before_after_report"
         for binding in S19TuiApp.BINDINGS
     ), "the `b` binding must stay bound to before_after_report"
+
+
+# ---------------------------------------------------------------------------
+# AT-058b / LLR-058.3 — zero behaviour change: the 15-id census + the
+# check-run wiring survive the batch-36 paste-group reparent (US-058).
+# ---------------------------------------------------------------------------
+
+# The 15 patch-editor widget ids that the compose+CSS-only reparent must
+# preserve (LLR-058.3). #patch_paste_text / #patch_paste_parse_button move to
+# a new parent cell but stay globally queryable by the same id.
+_PATCH_PRESERVED_IDS = (
+    "patch_doc_entries_table",
+    "patch_doc_path_input",
+    "patch_doc_file_select",
+    "patch_doc_load_button",
+    "patch_doc_validate_button",
+    "patch_doc_apply_button",
+    "patch_doc_save_button",
+    "patch_checks_run_button",
+    "patch_checks_help",
+    "patch_paste_text",
+    "patch_paste_parse_button",
+    "patch_variant_select",
+    "patch_execute_run_button",
+    "patch_saveback_name_input",
+    "patch_saveback_confirm_button",
+)
+
+
+def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
+    """AT-058b — every patch_* id + the run_checks wiring survive the reparent.
+
+    Intent: LLR-058.3 (US-058) — the batch-36 change is compose-tree + CSS
+    only; moving ``#patch_paste_row`` out of ``#patch_pane_changefile`` into its
+    own panel cell must not drop any widget id or alter any handler / binding.
+    Assert (a) all 15 preserved ids resolve to exactly one widget after the
+    reparent (the save-back ids are queried once its hidden row is composed —
+    it is composed, just ``.hidden``), (b) the AT-032a locked ``#patch_checks_help``
+    token span is unchanged, and (c) the AT-032b run_checks idiom still routes
+    (pressing ``#patch_checks_run_button`` posts the "Checks:" status line —
+    C-12: the status line is produced by the real handler, not injected).
+
+    Counterfactual: dropping/renaming any id fails (a); a handler regression
+    fails (c).
+    """
+    from textual.widgets import Button, Label
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # (a) 15-id census — each id resolves to exactly one widget.
+            outcomes["id_counts"] = {
+                wid: len(app.query(f"#{wid}")) for wid in _PATCH_PRESERVED_IDS
+            }
+
+            # (b) the AT-032a locked help token span survives.
+            outcomes["help_text"] = str(
+                app.query_one("#patch_checks_help", Label).render()
+            )
+
+            # (c) the run_checks wiring still routes (real handler produces the
+            # status line — C-12).
+            _set_entry_inputs(app, address="0x100", bytes_text="AA")
+            panel.request_action("add_entry")
+            await pilot.pause()
+            app.query_one("#patch_checks_run_button", Button).press()
+            await pilot.pause()
+            outcomes["checks_line"] = any(
+                line.startswith("Checks:") for line in app.log_lines
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    missing = [
+        wid for wid, count in outcomes["id_counts"].items() if count != 1
+    ]
+    assert not missing, f"patch ids missing after the reparent: {missing}"
+    assert _CHECKS_HELP_TOKEN in outcomes["help_text"], (
+        f"the AT-032a locked Checks-help token span must survive the reparent, "
+        f"got {outcomes['help_text']!r}"
+    )
+    assert outcomes["checks_line"] is True, (
+        "pressing Run checks must still route run_checks after the reparent "
+        "(wiring unchanged)"
+    )

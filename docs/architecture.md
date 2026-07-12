@@ -149,7 +149,7 @@ Roughly **763 tests** under `tests/` at the close of batch-04 (762 pass + 1 boun
 
 Markers (registered in `pyproject.toml`):
 
-- **`slow`** — stress / perf smoke tests. `pytest -q -m "not slow"` skips them. The large-A2L stress case (`pv__case_06_large_nested_a2l`) is pinned `@pytest.mark.slow`.
+- **`slow`** — stress / perf smoke tests. `pytest -q -m "not slow"` skips them. No example smoke case is currently pinned `@pytest.mark.slow`: the former ~490s `pv__case_06_large_nested_a2l` duplicate was pruned in batch-36 (US-060), and the large-A2L pipeline is now covered by the retained 36 MB top-level `case_06_large_nested_a2l` in the normal suite.
 - **`snapshot`** — `pytest-textual-snapshot` baselines.
 
 Visual regression: 27 SVG baselines under `tests/__snapshots__/`, generated only against the public synthetic fixtures (`examples/case_00_public/` and the `tests/conftest.py` generators) — **never against client firmware, A2L or MAC artefacts** (`R-TUI-034`, the TC-031 no-leak inspection).
