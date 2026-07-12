@@ -175,14 +175,18 @@ def test_panel_composition(tmp_path: Path) -> None:
 # ===========================================================================
 
 
-def test_action_routing_pins_exactly_ten_v2_actions() -> None:
-    """The routable action set is exactly ten actions at batch-13.
+def test_action_routing_pins_exactly_eleven_v2_actions() -> None:
+    """The routable action set is exactly eleven actions at batch-37.
 
-    Intent: LLR-003.2 + LLR-006.6 (F-A-15) + LLR-014.2 — the E3a eight
-    {add_entry, edit_entry, remove_entry, load_doc, validate_doc, apply_doc,
-    save_doc, run_checks} extended by ``execute_scope`` at increment E6 (the
-    stated F-A-15 extension clause) and by ``parse_paste`` at batch-13 (the
-    paste-changeset surface) — the action pin re-asserted as ten here.
+    Intent: LLR-003.2 + LLR-006.6 (F-A-15) + LLR-014.2 + LLR-064a.1 — the
+    E3a eight {add_entry, edit_entry, remove_entry, load_doc, validate_doc,
+    apply_doc, save_doc, run_checks} extended by ``execute_scope`` at
+    increment E6 (the stated F-A-15 extension clause), by ``parse_paste`` at
+    batch-13 (the paste-changeset surface), and by ``refresh_doc`` at
+    batch-37 (US-064a re-read of the loaded file's own ``source_path``) — the
+    action pin re-asserted as eleven here. Supersedes the batch-13 ten-action
+    pin (rewrite-in-place, censused: the additive ``refresh_doc`` is the one
+    behavior addition US-064a allows, LLR-064a.2).
     """
     assert PATCH_ACTIONS_V2 == frozenset(
         {
@@ -196,6 +200,7 @@ def test_action_routing_pins_exactly_ten_v2_actions() -> None:
             "run_checks",
             "execute_scope",
             "parse_paste",
+            "refresh_doc",
         }
     )
 
@@ -2338,11 +2343,15 @@ def test_at057a_two_labeled_sections_ids_and_parentage(
     )
     assert outcomes["controls_button_ids"] == [
         "patch_doc_load_button",
+        "patch_doc_refresh_button",
         "patch_doc_validate_button",
         "patch_doc_apply_button",
         "patch_doc_save_button",
     ], (
-        "#patch_doc_controls must retain exactly Load/Validate/Apply/Save, "
+        # batch-37 (US-064a / LLR-064a.1): Refresh is added to the patch-script
+        # controls row after Load (additive; Load/Validate/Apply/Save order and
+        # ids preserved, LLR-064a.2). Supersedes the batch-35 four-button pin.
+        "#patch_doc_controls must retain Load/Refresh/Validate/Apply/Save, "
         f"got {outcomes['controls_button_ids']}"
     )
 
@@ -2519,4 +2528,565 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
     assert outcomes["checks_line"] is True, (
         "pressing Run checks must still route run_checks after the reparent "
         "(wiring unchanged)"
+    )
+
+
+# ===========================================================================
+# US-064a (batch-37) — Patch-editor refresh (AT-064a + TC-328, LLR-064a.1/.2)
+# ===========================================================================
+
+
+def _entry_addresses(app: S19TuiApp) -> list[str]:
+    """Read the address column of the rendered entries table.
+
+    The address is column index 1 of ``#patch_doc_entries_table`` (kind,
+    address, value, status, linkage — see ``refresh_entries``). This reads
+    the CONSUMER surface the real handler produced, not the service model.
+    """
+    from textual.coordinate import Coordinate
+    from textual.widgets import DataTable
+
+    table = app.query_one("#patch_doc_entries_table", DataTable)
+    return [
+        str(table.get_cell_at(Coordinate(row, 1)))
+        for row in range(table.row_count)
+    ]
+
+
+def test_at064a_refresh_rereads_edited_file_into_editor(
+    tmp_path: Path,
+) -> None:
+    """Refresh re-reads the loaded change file from disk into the editor.
+
+    Intent (AT-064a, US-064a / LLR-064a.1, C-12 output-then-consume): the
+    operator loads a change file, the file is then edited EXTERNALLY (a new
+    entry at a NEW address), the operator presses Refresh, and the entries
+    table reflects the NEW on-disk content — asserting the SPECIFIC new
+    address (content, C-10), not merely that the table re-rendered. The AT
+    drives the REAL ``#patch_doc_refresh_button`` press through
+    ``on_button_pressed`` and reads the table the real ``ChangeService.load``
+    handler produced — never a value the test injected into the table.
+    """
+    from textual.widgets import Button, Input
+
+    doc_path = _write_v2_document(
+        tmp_path / "editable.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            _set_entry_inputs(app, path_text=str(doc_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["before"] = _entry_addresses(app)
+
+            # External edit: the SAME file now declares a NEW entry at a NEW
+            # address that did not exist in the first on-disk version.
+            _write_v2_document(
+                doc_path,
+                [
+                    {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+                    {"type": "string", "address": "0x555", "value": "NEW"},
+                ],
+            )
+            # The path input is irrelevant to refresh (A-03) — blank it to
+            # prove refresh does not read the widget value.
+            app.query_one("#patch_doc_path_input", Input).value = ""
+
+            app.query_one("#patch_doc_refresh_button", Button).press()
+            await pilot.pause()
+            outcomes["after"] = _entry_addresses(app)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert "0x555" not in outcomes["before"], (
+        "the new entry must not exist before the external edit + refresh"
+    )
+    assert "0x555" in outcomes["after"], (
+        "after Refresh the entries table must show the NEW on-disk entry "
+        f"(0x555); got {outcomes['after']!r}"
+    )
+    assert "0x100" in outcomes["after"], (
+        "the pre-existing entry must survive the refresh re-read"
+    )
+
+
+def test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded(
+    tmp_path: Path,
+) -> None:
+    """Refresh re-reads ``document.source_path``, never the widget value.
+
+    Intent (TC-328, LLR-064a.1, A-03): (a) after a load, editing
+    ``#patch_doc_path_input`` to point at a DIFFERENT file must NOT redirect
+    refresh — refresh re-reads the file the document was loaded from
+    (``ChangeService.document.source_path``), so the OTHER file's entry never
+    appears; (b) with no document loaded (``source_path is None``), Refresh
+    is a safe no-op that surfaces the existing load guard and does not crash.
+    """
+    from textual.widgets import Button, Input
+
+    loaded_doc = _write_v2_document(
+        tmp_path / "loaded.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+    other_doc = _write_v2_document(
+        tmp_path / "other.json",
+        [{"type": "string", "address": "0xABC", "value": "OTHER"}],
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # (b) No document loaded yet -> source_path is None -> refresh
+            # is a no-op guard, not a crash.
+            outcomes["source_before"] = (
+                app._change_service.document.source_path
+            )
+            app.query_one("#patch_doc_refresh_button", Button).press()
+            await pilot.pause()
+            outcomes["guard_line"] = any(
+                "enter a change-file path to load" in line
+                for line in app.log_lines
+            )
+            outcomes["rows_after_noop"] = _entry_addresses(app)
+
+            # (a) Load a file, then point the widget at a DIFFERENT file.
+            _set_entry_inputs(app, path_text=str(loaded_doc))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["source_after_load"] = (
+                app._change_service.document.source_path is not None
+            )
+            app.query_one(
+                "#patch_doc_path_input", Input
+            ).value = str(other_doc)
+
+            app.query_one("#patch_doc_refresh_button", Button).press()
+            await pilot.pause()
+            outcomes["addresses"] = _entry_addresses(app)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    # (b) no-op guard when unloaded.
+    assert outcomes["source_before"] is None
+    assert outcomes["guard_line"] is True, (
+        "Refresh with no document loaded must surface the load guard"
+    )
+    assert outcomes["rows_after_noop"] == [], (
+        "Refresh with no document must not populate the table"
+    )
+    # (a) refresh re-read the source_path file, NOT the widget's other file.
+    assert outcomes["source_after_load"] is True
+    assert "0x100" in outcomes["addresses"], (
+        "refresh must re-read the loaded document's source_path file"
+    )
+    assert "0xABC" not in outcomes["addresses"], (
+        "refresh must NOT redirect to the widget path-input value (A-03); "
+        f"got {outcomes['addresses']!r}"
+    )
+
+
+# ===========================================================================
+# US-064b — JSON popup change-set editor + A-01 disable-guard
+# (AT-064b, AT-064c, TC-329, TC-331 / LLR-064b.1/.2/.3/.4)
+# ===========================================================================
+
+
+def _changeset_text(entries: list[dict]) -> str:
+    """Return a v2 ``s19app-changeset`` JSON document as raw text (paste seed)."""
+    return json.dumps(
+        {
+            "format": "s19app-changeset",
+            "version": "2.0",
+            "kind": "change",
+            "encoding": "utf-8",
+            "value_mode": "text",
+            "entries": entries,
+        }
+    )
+
+
+def _seed_via_paste(app: S19TuiApp, text: str) -> None:
+    """Seed the change document via the PASTE path (source_path stays None).
+
+    Sets ``#patch_paste_text`` and presses the real Parse pasted button so
+    ``ChangeService.load_text`` replaces the document — exactly the Q-07
+    fixture path (paste-authored, so the LLR-064b.4 guard leaves Edit-JSON
+    enabled).
+    """
+    from textual.widgets import Button, TextArea
+
+    app.query_one("#patch_paste_text", TextArea).text = text
+    app.query_one("#patch_paste_parse_button", Button).press()
+
+
+def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
+    tmp_path: Path,
+) -> None:
+    """JSON popup: Confirm applies the edited change-set; Cancel is a no-op.
+
+    Intent (AT-064b, US-064b / LLR-064b.1/.2/.3, C-12 output-then-consume,
+    Q-07 paste-seed): for a PASTE-authored document (``source_path is None``)
+    the operator opens the JSON popup, edits the JSON to add a NEW entry, and
+    Confirms — the change document (the CONSUMER the real ``load_text``
+    handler produced, read via the entries table) reflects the edited entry
+    (specific NEW address, C-10), never merely the TextArea the test typed.
+    A Cancel arm asserts the document is unchanged. A geometry arm measures
+    the popup TextArea's visible editable lines at 80x24 AND 120x30
+    (LLR-064b.3, C-23 pilot-measured) — the readable surface the height-
+    starved in-panel box cannot give at 80x24.
+    """
+    from textual.widgets import Button, TextArea
+
+    from s19_app.tui.screens import ChangeSetJsonScreen
+
+    seed = _changeset_text(
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+    )
+    edited = _changeset_text(
+        [
+            {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+            {"type": "string", "address": "0x777", "value": "VIAPOPUP"},
+        ]
+    )
+
+    async def _confirm() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _seed_via_paste(app, seed)
+            await pilot.pause()
+            outcomes["before"] = _entry_addresses(app)
+
+            app.query_one("#patch_edit_json_button", Button).press()
+            await pilot.pause()
+            # The popup is a ModalScreen seeded from the paste buffer.
+            outcomes["is_popup"] = isinstance(app.screen, ChangeSetJsonScreen)
+            outcomes["seed_matches"] = (
+                app.screen.query_one("#changeset_json_text", TextArea).text
+                == seed
+            )
+            # Edit the JSON in the popup and Confirm.
+            app.screen.query_one(
+                "#changeset_json_text", TextArea
+            ).text = edited
+            app.screen.query_one("#changeset_json_confirm", Button).press()
+            await pilot.pause()
+            await pilot.pause()
+            outcomes["after"] = _entry_addresses(app)
+        return outcomes
+
+    async def _cancel() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _seed_via_paste(app, seed)
+            await pilot.pause()
+
+            app.query_one("#patch_edit_json_button", Button).press()
+            await pilot.pause()
+            app.screen.query_one(
+                "#changeset_json_text", TextArea
+            ).text = edited
+            app.screen.query_one("#changeset_json_cancel", Button).press()
+            await pilot.pause()
+            await pilot.pause()
+            outcomes["after"] = _entry_addresses(app)
+        return outcomes
+
+    async def _geometry(width: int, height: int) -> int:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(width, height)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _seed_via_paste(app, seed)
+            await pilot.pause()
+            app.query_one("#patch_edit_json_button", Button).press()
+            await pilot.pause()
+            from textual.widgets import TextArea as _TA
+
+            return app.screen.query_one("#changeset_json_text", _TA).size.height
+
+    confirm = asyncio.run(_confirm())
+    cancel = asyncio.run(_cancel())
+    lines_80 = asyncio.run(_geometry(80, 24))
+    lines_120 = asyncio.run(_geometry(120, 30))
+
+    assert confirm["is_popup"] is True, "Edit JSON must push the popup modal"
+    assert confirm["seed_matches"] is True, (
+        "the popup TextArea must be seeded from the #patch_paste_text buffer"
+    )
+    assert "0x777" not in confirm["before"]
+    assert "0x777" in confirm["after"], (
+        "after Confirm the change document must reflect the edited JSON "
+        f"(new entry 0x777); got {confirm['after']!r}"
+    )
+    assert "0x100" in confirm["after"], "the original entry must survive"
+
+    # Cancel leaves the document unchanged (no 0x777).
+    assert cancel["after"] == ["0x100"], (
+        f"Cancel must not mutate the document; got {cancel['after']!r}"
+    )
+
+    # C-23 geometry (LLR-064b.3), PILOT-MEASURED N_w (not fr-estimated): the
+    # full-screen modal gives a readable multi-line editor at BOTH widths —
+    # N_80 = 7 and N_120 = 13 visible editable lines — each far above the ~0-1
+    # in-viewport lines the height-starved in-panel box gives at 80x24 (F-01).
+    assert lines_80 >= 7, (
+        f"popup editor must show >= 7 lines at 80x24 (N_80); measured {lines_80}"
+    )
+    assert lines_120 >= 13, (
+        f"popup editor must show >= 13 lines at 120x30 (N_120); "
+        f"measured {lines_120}"
+    )
+
+
+def test_at064c_edit_json_disabled_for_file_backed_document(
+    tmp_path: Path,
+) -> None:
+    """Edit JSON is DISABLED for a file-backed doc → no popup, no clobber.
+
+    Intent (AT-064c, US-064b / LLR-064b.4, A-01 data-loss guard): after a
+    FILE load (``source_path is not None``) the Edit-JSON control is disabled
+    and the popup cannot open — so the stale ``DUMMY_CHANGESET_TEXT`` buffer
+    can never be Confirmed to ``load_text``-REPLACE the loaded document. The
+    test also drives the mechanism directly (posting ``EditJsonRequested``) to
+    prove the handler's guard refuses to push the modal and mutates nothing.
+    For a paste-authored doc (``source_path is None``) the same control is
+    ENABLED and the popup opens — the two states asserted in ONE node so the
+    guard is a real discriminator (C-10), not a constant.
+    """
+    from textual.widgets import Button
+
+    from s19_app.tui.screens import ChangeSetJsonScreen
+
+    doc_path = _write_v2_document(
+        tmp_path / "loaded.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+    paste = _changeset_text(
+        [{"type": "string", "address": "0x222", "value": "PASTED"}]
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # (a) FILE-backed document → source_path not None → disabled.
+            _set_entry_inputs(app, path_text=str(doc_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["file_source"] = (
+                app._change_service.document.source_path is not None
+            )
+            outcomes["disabled_when_file"] = app.query_one(
+                "#patch_edit_json_button", Button
+            ).disabled
+            outcomes["entries_before"] = _entry_addresses(app)
+
+            # Drive the mechanism directly — the guard must refuse to push.
+            panel.post_message(
+                PatchEditorPanel.EditJsonRequested(paste_text="{}")
+            )
+            await pilot.pause()
+            outcomes["popup_after_guarded_open"] = isinstance(
+                app.screen, ChangeSetJsonScreen
+            )
+            outcomes["entries_after_guarded_open"] = _entry_addresses(app)
+
+            # (b) PASTE-authored document → source_path None → enabled + opens.
+            _seed_via_paste(app, paste)
+            await pilot.pause()
+            outcomes["paste_source_none"] = (
+                app._change_service.document.source_path is None
+            )
+            outcomes["enabled_when_paste"] = not app.query_one(
+                "#patch_edit_json_button", Button
+            ).disabled
+            app.query_one("#patch_edit_json_button", Button).press()
+            await pilot.pause()
+            outcomes["popup_opens_for_paste"] = isinstance(
+                app.screen, ChangeSetJsonScreen
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    # (a) file-backed → disabled, guarded open is a no-op, 0 clobber.
+    assert outcomes["file_source"] is True
+    assert outcomes["disabled_when_file"] is True, (
+        "Edit JSON must be DISABLED when a file-backed document is loaded"
+    )
+    assert outcomes["popup_after_guarded_open"] is False, (
+        "the guard must refuse to push the popup over a file-backed document"
+    )
+    assert outcomes["entries_after_guarded_open"] == outcomes[
+        "entries_before"
+    ], "a guarded open must not mutate the loaded document (no clobber)"
+    # (b) paste-authored → enabled, popup opens.
+    assert outcomes["paste_source_none"] is True
+    assert outcomes["enabled_when_paste"] is True, (
+        "Edit JSON must be ENABLED for a paste-authored document"
+    )
+    assert outcomes["popup_opens_for_paste"] is True, (
+        "the popup must open for a paste-authored document"
+    )
+
+
+def test_tc329_popup_seed_and_load_text_apply_seam(tmp_path: Path) -> None:
+    """Popup seed == buffer; Confirm routes through ``load_text``; Cancel none.
+
+    Intent (TC-329, LLR-064b.1/.2 white-box): the popup ``#changeset_json_text``
+    initial text equals the ``#patch_paste_text`` buffer at open; Confirm
+    writes the edited text back to the buffer and routes it through the
+    EXISTING ``parse_paste`` → ``ChangeService.load_text`` seam (asserted by a
+    spy on ``load_text`` counting exactly one call carrying the edited text);
+    Cancel calls ``load_text`` zero times and leaves the buffer unchanged.
+    """
+    from textual.widgets import Button, TextArea
+
+    seed = _changeset_text(
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+    )
+    edited = _changeset_text(
+        [{"type": "bytes", "address": "0x100", "bytes": "CC DD"}]
+    )
+
+    async def _drive(confirm: bool) -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _seed_via_paste(app, seed)
+            await pilot.pause()
+
+            calls: list[str] = []
+            real_load_text = app._change_service.load_text
+
+            def _spy(text: str):
+                calls.append(text)
+                return real_load_text(text)
+
+            app._change_service.load_text = _spy  # type: ignore[assignment]
+
+            app.query_one("#patch_edit_json_button", Button).press()
+            await pilot.pause()
+            outcomes["seed"] = app.screen.query_one(
+                "#changeset_json_text", TextArea
+            ).text
+            app.screen.query_one(
+                "#changeset_json_text", TextArea
+            ).text = edited
+            button_id = (
+                "#changeset_json_confirm" if confirm else "#changeset_json_cancel"
+            )
+            app.screen.query_one(button_id, Button).press()
+            await pilot.pause()
+            await pilot.pause()
+            outcomes["calls"] = list(calls)
+            outcomes["buffer"] = app.query_one(
+                "#patch_paste_text", TextArea
+            ).text
+        return outcomes
+
+    confirmed = asyncio.run(_drive(confirm=True))
+    cancelled = asyncio.run(_drive(confirm=False))
+
+    assert confirmed["seed"] == seed, (
+        "the popup must be seeded from the #patch_paste_text buffer"
+    )
+    assert confirmed["calls"] == [edited], (
+        "Confirm must route the edited text through load_text exactly once; "
+        f"got {confirmed['calls']!r}"
+    )
+    assert confirmed["buffer"] == edited, (
+        "Confirm must write the edited text back to the paste buffer"
+    )
+    # Cancel: zero load_text calls, buffer unchanged.
+    assert cancelled["calls"] == [], (
+        f"Cancel must not call load_text; got {cancelled['calls']!r}"
+    )
+    assert cancelled["buffer"] == seed, (
+        "Cancel must leave the paste buffer unchanged"
+    )
+
+
+def test_tc331_disable_guard_predicate_tracks_source_path(
+    tmp_path: Path,
+) -> None:
+    """The disable-guard predicate tracks ``source_path`` live (TC-331).
+
+    Intent (TC-331, LLR-064b.4): the Edit-JSON control's disabled state tracks
+    ``ChangeService.document.source_path`` across the file→paste transition —
+    fresh (None) → enabled; after a file load (not None) → disabled; after a
+    subsequent paste (None) → enabled again.
+    """
+    from textual.widgets import Button
+
+    doc_path = _write_v2_document(
+        tmp_path / "f.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+    paste = _changeset_text(
+        [{"type": "string", "address": "0x9", "value": "P"}]
+    )
+
+    async def _drive() -> dict[str, bool]:
+        outcomes: dict[str, bool] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            button = app.query_one("#patch_edit_json_button", Button)
+
+            outcomes["fresh_enabled"] = not button.disabled
+
+            _set_entry_inputs(app, path_text=str(doc_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["file_disabled"] = button.disabled
+
+            _seed_via_paste(app, paste)
+            await pilot.pause()
+            outcomes["paste_enabled"] = not button.disabled
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["fresh_enabled"] is True, (
+        "a fresh (paste-authored/empty) document → Edit JSON enabled"
+    )
+    assert outcomes["file_disabled"] is True, (
+        "a file-backed document (source_path not None) → Edit JSON disabled"
+    )
+    assert outcomes["paste_enabled"] is True, (
+        "a subsequent paste (source_path None) → Edit JSON re-enabled"
     )

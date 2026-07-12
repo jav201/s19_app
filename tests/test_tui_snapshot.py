@@ -600,18 +600,47 @@ def test_tc016s_density_layout_snapshot(
 # marked xfail(strict=False) — mirroring the batch-22 patch cells, whose xfail
 # scaffold was dropped by batch-25 once real baselines existed. A follow-up
 # drops these two xfails the same way once the canonical-env baselines land.
+# batch-37 (US-062, LLR-062.1/.2/.3): the entropy modal interior gains a
+# sort/page CONTROL row (`#entropy_controls`: Sort toggle + Prev/Next + the
+# `page P/Q` `#entropy_page_indicator`) that REPLACES the former
+# `#entropy_truncated` label, and the strip/jump list now render one 512-window
+# page at a time — so BOTH entropy cells re-render. The SVG baselines are
+# regenerated in the canonical CI env (snapshot-regen.yml, pinned
+# textual==8.2.8 — never locally, per the snapshot-regen-env convention);
+# until that regen lands each cell is an expected mismatch, so both carry
+# xfail(strict=False), mirroring the retired `_batch36_drift_marks` pattern.
+# A follow-up drops these two xfails once the canonical-env baselines land.
+def _batch37_entropy_drift_marks(size_key: str) -> tuple:
+    """Return the batch-37 entropy-cell drift marks — xfail(strict=False) for
+    both cells (`80x24` + `120x30`) until the canonical-CI baselines regen."""
+    return (
+        pytest.mark.xfail(
+            reason=(
+                "batch-37 US-062: entropy modal gains the #entropy_controls "
+                "sort/page row + page P/Q indicator (replaces #entropy_truncated); "
+                "US-063 adds the #entropy_legend band-colour rows + per-cell "
+                "#entropy_cell_k clickable strip widgets (was a plain Static) "
+                "— SVG drifts until the canonical-CI baseline regen"
+            ),
+            strict=False,
+        ),
+    )
+
+
 _ENTROPY_CELLS = [
     pytest.param(
         size_key,
         id=f"entropy-comfortable-{size_key}",
+        marks=_batch37_entropy_drift_marks(size_key),
         # The entropy modal opens over the loaded Workspace and its translucent
         # `ModalScreen { background: $bg-base 70% }` backdrop shows the
         # Workspace through — so these cells drift whenever the Workspace
         # does (batch-28 US-040 restyle; batch-31 AC-5/AC-7 left-pane
         # geometry at 80x24). Each drift round is closed by the canonical-CI
         # regen (snapshot-regen.yml, textual==8.2.8): most recently at main
-        # `91d884a` (post-#58), which recommitted the 80x24 baseline — the
-        # batch-31 xfail is retired and both cells are full green oracles.
+        # `91d884a` (post-#58), which recommitted the 80x24 baseline. batch-37
+        # US-062 re-drifts both cells (the #entropy_controls row + page
+        # indicator) → xfail(strict=False) via `_batch37_entropy_drift_marks`.
     )
     for size_key in ("80x24", "120x30")
 ]
