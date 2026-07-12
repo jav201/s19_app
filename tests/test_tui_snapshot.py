@@ -611,20 +611,18 @@ def test_tc016s_density_layout_snapshot(
 # xfail(strict=False), mirroring the retired `_batch36_drift_marks` pattern.
 # A follow-up drops these two xfails once the canonical-env baselines land.
 def _batch37_entropy_drift_marks(size_key: str) -> tuple:
-    """Return the batch-37 entropy-cell drift marks — xfail(strict=False) for
-    both cells (`80x24` + `120x30`) until the canonical-CI baselines regen."""
-    return (
-        pytest.mark.xfail(
-            reason=(
-                "batch-37 US-062: entropy modal gains the #entropy_controls "
-                "sort/page row + page P/Q indicator (replaces #entropy_truncated); "
-                "US-063 adds the #entropy_legend band-colour rows + per-cell "
-                "#entropy_cell_k clickable strip widgets (was a plain Static) "
-                "— SVG drifts until the canonical-CI baseline regen"
-            ),
-            strict=False,
-        ),
-    )
+    """Return the batch-37 entropy-cell drift marks (none — baselines regenerated).
+
+    The batch-37 US-062/063 entropy-modal redesign (the `#entropy_controls`
+    sort/page row + `page P/Q` indicator that replaced `#entropy_truncated`, plus
+    the `#entropy_legend` band-colour rows and the per-cell `#entropy_cell_k`
+    clickable strip that replaced the plain `Static`) re-drifted both cells; the
+    SVG baselines were regenerated in the canonical CI env (snapshot-regen.yml,
+    run 29209048040, pinned textual==8.2.8 — the run moved EXACTLY these two
+    cells) and committed HERE, so both are now full green oracles and the xfail
+    is RETIRED. This also finally lands the entropy-modal baselines that had been
+    xfail-until-baseline since batch-26 (US-036)."""
+    return ()
 
 
 _ENTROPY_CELLS = [
