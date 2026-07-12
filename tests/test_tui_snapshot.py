@@ -463,6 +463,38 @@ def _batch33_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-36 (US-058 / LLR-058.4): the change-set paste group is reparented OUT
+# of the top-right `#patch_pane_changefile` cell into its own weighted
+# full-width panel cell (`grid-size: 2 4`, `grid-rows: 1fr 2fr 2fr auto`), so
+# BOTH patch cells re-render — the paste box no longer stacks below the
+# change-file controls inside the TR pane but sits full-width below the four
+# panes, and the four panes shrink one row to make room. The SVG baselines are
+# regenerated in the canonical CI env (snapshot-regen.yml, pinned
+# textual==8.2.8 — never locally, per the snapshot-regen-env convention), so
+# until that regen lands each patch cell is an expected mismatch and carries
+# xfail(strict=False). This SUPERSEDES any batch-35 parked patch mark (already
+# retired at 7df60dd via #65). A follow-up drops these once the canonical-env
+# baselines are committed.
+_BATCH36_PATCH_DRIFT_REASON = (
+    "batch-36 US-058: paste-group reparent re-renders the patch screen; "
+    "baseline regenerated in canonical CI (snapshot-regen.yml, textual==8.2.8)"
+)
+
+
+def _batch36_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-36 xfail mark for the two drifted patch cells.
+
+    LLR-058.4: the US-058 paste-group reparent drifts both
+    ``patch-comfortable-80x24`` and ``patch-comfortable-120x30``. Each is
+    marked ``xfail(strict=False)`` until the canonical-CI regen recommits the
+    baselines (local regen is forbidden — it drifts unrelated cells). Any other
+    cell is untouched (empty tuple).
+    """
+    if screen == "patch":
+        return (pytest.mark.xfail(strict=False, reason=_BATCH36_PATCH_DRIFT_REASON),)
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -512,7 +544,8 @@ _SCAFFOLD_CELLS = [
         id=f"{screen}-comfortable-{size_key}",
         marks=_scaffold_cell_marks(screen, size_key)
         + _batch31_drift_marks(screen, "comfortable", size_key)
-        + _batch33_drift_marks(screen, "comfortable", size_key),
+        + _batch33_drift_marks(screen, "comfortable", size_key)
+        + _batch36_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
@@ -561,6 +594,42 @@ def test_tc016s_density_layout_snapshot(
         app,
         terminal_size=(width, height),
         run_before=_snapshot_run_before(screen, density, public_triple),
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-321 — the batch-36 xfail-until-baseline set is EXACTLY the two patch cells
+#          (US-058 / LLR-058.4). C-22: named per-cell drift disposition.
+# ---------------------------------------------------------------------------
+
+
+def test_tc321_batch36_patch_xfail_set() -> None:
+    """TC-321 — only the two patch snapshot cells carry the batch-36 xfail.
+
+    Intent: LLR-058.4 — the US-058 paste-group reparent re-renders the patch
+    screen at both snapshot widths, so ``patch-comfortable-80x24`` and
+    ``patch-comfortable-120x30`` (VERIFIED cell ids on disk) drift and are
+    marked ``xfail(strict=False)`` until the canonical-CI regen recommits the
+    baselines. No other cell may carry a batch-36 xfail (local regen is
+    forbidden — it would drift unrelated cells). This asserts the declared
+    xfail set matches the intended drift and supersedes any batch-35 parked
+    patch mark (already retired at 7df60dd). ``strict=False`` means a cell that
+    happens NOT to drift below the fold still passes — but both are expected to
+    drift, since the paste box relocates from inside the TR pane to a full-width
+    row and the four panes lose a row.
+    """
+    xfailed = set()
+    for param in _ALL_SNAPSHOT_CELLS:
+        if any(
+            getattr(mark, "name", None) == "xfail" for mark in param.marks
+        ):
+            xfailed.add(param.id)
+    assert xfailed == {
+        "patch-comfortable-80x24",
+        "patch-comfortable-120x30",
+    }, (
+        "the batch-36 xfail set must be exactly the two drifted patch cells, "
+        f"got {sorted(xfailed)}"
     )
 
 

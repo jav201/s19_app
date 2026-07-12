@@ -24,11 +24,90 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 from ..validation import ValidationSeverity
+from .color_policy import FOCUS_HIGHLIGHT_STYLE, MAC_ADDRESS_OVERLAY_STYLE
 
 # artifact -> classification -> (colour-name, meaning).
 # For A2L/MAC the classification IS the colour; for Issues the tile category
 # (Errors/Warnings/Optional info) carries its own colour in the tuple.
 LegendRows = Dict[str, Tuple[str, str]]
+
+# Rich style modifier tokens to discard when deriving a colour name from a
+# style string (they carry weight/decoration, not colour).
+_RICH_MODIFIERS = frozenset(
+    {"bold", "italic", "dim", "underline", "reverse", "blink", "strike"}
+)
+
+
+def _colour_name_from_style(style: str) -> str:
+    """
+    Summary:
+        Derive a display colour NAME from a Rich style string by dropping the
+        modifier tokens and title-casing the remaining colour token AS-IS
+        (LLR-059.3). The shade digit is deliberately RETAINED
+        (``"bold orange3" -> "Orange3"``), because the digit-stripped
+        ``"Orange"`` collides with the ``COLOUR_SEVERITY`` WARNING key and
+        would wrongly paint the Hex overlay row ``sev-warning``.
+
+    Args:
+        style (str): a Rich style string, e.g. ``"bold yellow"`` /
+            ``"bold orange3"``.
+
+    Returns:
+        str: the title-cased colour token (``"Yellow"`` / ``"Orange3"``), or
+        ``""`` if the style carries no non-modifier token.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - Fed the two engine-frozen ``color_policy`` overlay-style constants
+          (READ-only) to build the Hex legend rows + ``HEX_LEGEND_STYLES``.
+
+    Dependencies:
+        Uses:
+            - _RICH_MODIFIERS
+        Used by:
+            - HEX_LEGEND_STYLES / the ``"Hex"`` LEGEND_TABLE block
+            - tests/test_tui_legend.py (TC-322)
+
+    Example:
+        >>> _colour_name_from_style("bold yellow")
+        'Yellow'
+    """
+    tokens = [tok for tok in style.split() if tok not in _RICH_MODIFIERS]
+    return tokens[0].title() if tokens else ""
+
+
+# The two byte-cell overlay styles the hex view actually paints
+# (``hexview.render_hex_view_text``) mapped to their documented meaning. These
+# are interaction highlights, NOT ``sev-*`` validation severities, so their
+# colours are absent from COLOUR_SEVERITY (LLR-059.1). Meanings are markup-free
+# (no ``[`` / ``]``) since the modal renders each row markup-enabled (S-01).
+_HEX_STYLE_MEANINGS: Dict[str, str] = {
+    FOCUS_HIGHLIGHT_STYLE: (
+        "search / goto-focus highlight: the byte span matched by the last "
+        "in-memory search or goto-address jump in the hex view"
+    ),
+    MAC_ADDRESS_OVERLAY_STYLE: (
+        "MAC address overlay: a hex byte at an address referenced by a "
+        "loaded MAC record"
+    ),
+}
+
+# Hex colour NAME -> source overlay-style constant (the anti-drift coupling:
+# TC-322 asserts the value set is exactly the two color_policy constants, so
+# the legend cannot silently diverge from the hex render).
+HEX_LEGEND_STYLES: Dict[str, str] = {
+    _colour_name_from_style(style): style for style in _HEX_STYLE_MEANINGS
+}
+
+# The "Hex" legend rows, DERIVED (not hardcoded) from the overlay-style
+# constants so the colour names track color_policy. For Hex the classification
+# IS the colour, mirroring A2L/MAC.
+_HEX_ROWS: LegendRows = {
+    _colour_name_from_style(style): (_colour_name_from_style(style), meaning)
+    for style, meaning in _HEX_STYLE_MEANINGS.items()
+}
 
 LEGEND_TABLE: Dict[str, LegendRows] = {
     "A2L": {
@@ -94,6 +173,9 @@ LEGEND_TABLE: Dict[str, LegendRows] = {
             "virtual/dependent non-memory-backed objects",
         ),
     },
+    # Hex byte-cell overlay highlights (interaction styles, not severities).
+    # DERIVED from the color_policy overlay-style constants — see _HEX_ROWS.
+    "Hex": _HEX_ROWS,
 }
 
 # Anti-drift coupling to SEVERITY_CLASS_MAP: each legend colour maps to the

@@ -1560,3 +1560,47 @@ def test_tc_generate_refusal_half_invalid_filter_refuses_before_worker(
     # The worker was never dispatched: neither progress status appears.
     assert not any("running active scope" in line for line in log_lines)
     assert not any("generating from last execution" in line for line in log_lines)
+
+
+# ---------------------------------------------------------------------------
+# US-059 (batch-36) — hex-view colour legend reaches the generated report
+# ---------------------------------------------------------------------------
+
+
+def test_at059b_hex_legend_present_in_report(tmp_path: Path) -> None:
+    """AT-059b (C-12) — a report generated through the shipped seam writes a
+    Hex legend section carrying the two hex overlay-colour meanings.
+
+    Output-then-consume: drive the REAL ``generate_project_report`` through
+    the surface, let the handler WRITE the file, RE-READ the produced
+    ``reports/*.md`` off disk, and assert the two SPECIFIC Hex meaning strings
+    (yellow search/goto-focus, orange3 MAC-overlay) are in the bytes the
+    handler wrote — the test never writes the legend itself (C-10 exact
+    strings, not "a Hex heading exists").
+    """
+    from s19_app.tui.legend import LEGEND_TABLE  # read the expected meanings
+
+    async def _drive() -> Path:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_report_project(app, "proj")
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            await _generate_through_surface(app, pilot)
+            project_dir = app._active_project_dir()
+            assert project_dir is not None
+            return project_dir
+
+    project_dir = asyncio.run(_drive())
+    reports = list_project_reports(project_dir)
+    assert reports, "AT-059b: the seam must write a report file to reread"
+    text = reports[0].read_text(encoding="utf-8")
+    assert "### Hex" in text, (
+        "AT-059b: the report legend must contain a Hex section; "
+        f"legend region was {text[text.find('## Legend'):][:400]!r}"
+    )
+    assert LEGEND_TABLE["Hex"]["Yellow"][1] in text
+    assert LEGEND_TABLE["Hex"]["Orange3"][1] in text

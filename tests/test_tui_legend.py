@@ -32,6 +32,11 @@ _PRG_S19 = _REPO_ROOT / "examples" / "case_00_public" / "prg.s19"
 
 _TOTAL_ROWS = sum(len(rows) for rows in LEGEND_TABLE.values())
 
+# The severity-driven artifacts (A2L/MAC/Issues). The "Hex" block holds
+# interaction overlay colours, not validation severities, so the TC-S1
+# orphan-colour guard is scoped to these three (LLR-059.3).
+_SEVERITY_ARTIFACTS = ("A2L", "MAC", "Issues")
+
 
 def _install_prg(app: S19TuiApp) -> None:
     """Install the public ``prg.s19`` fixture as ``current_file`` so the rail
@@ -62,10 +67,13 @@ def test_legend_table_covers_all_severities() -> None:  # TC-S1
         "a ValidationSeverity in SEVERITY_CLASS_MAP has no legend colour "
         "(anti-drift): add it to legend.COLOUR_SEVERITY + LEGEND_TABLE"
     )
+    # Scoped to the severity-driven artifacts (LLR-059.3): the "Hex" block's
+    # colours are interaction overlay styles, not validation severities, so
+    # they are exempt from the severity-orphan guard without loosening it.
     used_colours = {
         colour
-        for rows in LEGEND_TABLE.values()
-        for (colour, _meaning) in rows.values()
+        for artifact in _SEVERITY_ARTIFACTS
+        for (colour, _meaning) in LEGEND_TABLE[artifact].values()
     }
     assert used_colours <= set(COLOUR_SEVERITY) | {"White"}, (
         f"orphan legend colour(s): {used_colours - set(COLOUR_SEVERITY) - {'White'}}"
@@ -75,10 +83,11 @@ def test_legend_table_covers_all_severities() -> None:  # TC-S1
 def test_legend_table_has_documented_artifacts_and_rows() -> None:  # TC-S1 structure
     """The three artifacts and their REQUIREMENTS.md §3 classifications, each
     with a non-blank colour and meaning (a blank-meaning legend must fail)."""
-    assert set(LEGEND_TABLE) == {"A2L", "MAC", "Issues"}
+    assert set(LEGEND_TABLE) == {"A2L", "MAC", "Issues", "Hex"}
     assert set(LEGEND_TABLE["A2L"]) == {"Red", "Green", "White", "Grey"}
     assert set(LEGEND_TABLE["MAC"]) == {"Red", "Orange", "Green", "White", "Grey"}
     assert set(LEGEND_TABLE["Issues"]) == {"Errors", "Warnings", "Optional info"}
+    assert set(LEGEND_TABLE["Hex"]) == {"Yellow", "Orange3"}
     for artifact, rows in LEGEND_TABLE.items():
         for classification, (colour, meaning) in rows.items():
             assert colour.strip(), f"blank colour: {artifact}/{classification}"
@@ -348,6 +357,98 @@ def test_tc023_2_mac_issues_buttons_present_a2l_absent(tmp_path: Path) -> None:
     assert counts["mac_legend_button"] == 1
     assert counts["issues_legend_button"] == 1
     assert counts["a2l_legend_button"] == 0
+
+
+# ---------------------------------------------------------------------------
+# US-059 (batch-36) — hex-view colour legend. AT-059a (modal) + TC-322
+# (anti-drift coupling to the shipped hex-render overlay styles, LLR-059.1/.3).
+# ---------------------------------------------------------------------------
+
+
+def test_at059a_hex_legend_present_in_modal(tmp_path: Path) -> None:
+    """AT-059a — the LegendScreen modal carries a Hex section with both
+    shipped hex-cell overlay-colour meanings.
+
+    The hex view paints exactly two byte-cell overlay styles — the yellow
+    search/goto-focus highlight and the orange3 MAC-address overlay. This AT
+    drives the real ``k`` binding (no file loaded — the legend is static) and
+    asserts the two SPECIFIC meaning strings appear in the modal body (C-10),
+    not merely that a "Hex" heading exists.
+    """
+
+    async def _drive() -> tuple[bool, list[str], list[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.set_focus(None)  # user not typing in a filter field
+            await pilot.press("k")
+            await pilot.pause()
+            on_legend = isinstance(app.screen, LegendScreen)
+            headers = (
+                [
+                    str(label.render())
+                    for label in app.screen.query("#legend_body Label")
+                    if "legend-artifact" in label.classes
+                ]
+                if on_legend
+                else []
+            )
+            meanings = _modal_meanings(app.screen) if on_legend else []
+            return on_legend, headers, meanings
+
+    on_legend, headers, meanings = asyncio.run(_drive())
+    assert on_legend, "pressing 'k' did not open LegendScreen"
+    assert "Hex" in headers, "the modal has no Hex artifact section"
+    assert LEGEND_TABLE["Hex"]["Yellow"][1] in meanings
+    assert LEGEND_TABLE["Hex"]["Orange3"][1] in meanings
+
+
+def test_tc322_hex_block_coupled_to_overlay_styles() -> None:  # TC-322
+    """TC-322 — anti-drift: the Hex legend block is DERIVED from the two
+    shipped hex-render overlay-style constants, so the legend cannot silently
+    diverge from the hex view.
+
+    Fails if either ``FOCUS_HIGHLIGHT_STYLE`` / ``MAC_ADDRESS_OVERLAY_STYLE``
+    is renamed/re-valued or the ``_colour_name_from_style`` canonicalization
+    drifts. The overlay colours are interaction styles, NOT severities, so
+    they are deliberately absent from ``COLOUR_SEVERITY`` (the digit is
+    retained: a stripped ``"Orange"`` would collide with the WARNING key and
+    wrongly paint the row ``sev-warning``). The meanings are markup-free
+    (S-01: the modal renders each row through a markup-enabled ``Label``).
+    """
+    from s19_app.tui.color_policy import (
+        FOCUS_HIGHLIGHT_STYLE,
+        MAC_ADDRESS_OVERLAY_STYLE,
+    )
+    from s19_app.tui.legend import HEX_LEGEND_STYLES, _colour_name_from_style
+
+    # canonicalization transform pinned (Rich modifier dropped, shade digit kept).
+    # F1 hardening (batch-36 Inc-1 review): feed the LIVE constants — not string
+    # literals — through the transform, with the expected names as independent
+    # literal anchors. So a bare RE-VALUE of either overlay style (e.g. "bold
+    # yellow" -> "bold gold") fails here (derived name != pinned expectation),
+    # not only a rename (which fails at import). Self-sufficient anti-drift.
+    assert _colour_name_from_style(FOCUS_HIGHLIGHT_STYLE) == "Yellow"
+    assert _colour_name_from_style(MAC_ADDRESS_OVERLAY_STYLE) == "Orange3"
+
+    # the Hex colour set is exactly the two shipped overlay-style constants
+    assert set(HEX_LEGEND_STYLES.values()) == {
+        FOCUS_HIGHLIGHT_STYLE,
+        MAC_ADDRESS_OVERLAY_STYLE,
+    }
+
+    hex_block = LEGEND_TABLE["Hex"]
+    # the block's colour names are exactly the derived names (no divergence)
+    assert set(hex_block) == set(HEX_LEGEND_STYLES)
+    # overlay colours are not severities -> modal severity column stays empty
+    assert "Yellow" not in COLOUR_SEVERITY
+    assert "Orange3" not in COLOUR_SEVERITY
+    for classification, (colour, meaning) in hex_block.items():
+        assert classification == colour  # classification IS the colour for Hex
+        assert meaning.strip(), f"blank Hex meaning: {classification}"
+        assert "[" not in meaning and "]" not in meaning, (
+            f"Hex meaning must be markup-free (S-01): {classification}"
+        )
 
 
 def test_tc_s2_report_and_modal_render_same_rows(tmp_path: Path) -> None:
