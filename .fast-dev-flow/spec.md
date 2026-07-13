@@ -1,133 +1,70 @@
-# fast-dev-flow spec — batch-34 reports lane (B-08 / B-09 / B-10)
+# fast-dev-flow spec — batch 39 — Untrusted-text hardening
 
-- **Status:** closed 2026-07-10 (AC-1..AC-6 green; full suite 1244 passed / 0 failed; PR pending merge)
-- **Created:** 2026-07-10
-- **Branch:** `fix/batch-34-reports` @ `cc58397` (= origin/main after PRs #61/#62)
-- **Route:** /fast-dev-flow (isolated module `services/diff_report_service.py` + one shared primitive; root causes pre-verified in the 2026-07-09 baseline review)
+- **Status:** closed 2026-07-13 (AC-1.1..3.2 green; gate 1390 passed / 0 failed / 3 xfailed pre-existing; security PASS-with-carries; 0 frozen diffs)
+- **Created:** 2026-07-13
+- **Branch:** `claude/batch-39-untrusted-text-hardening` @ `be62c97` (= origin/main; RC-1 clean)
+- **Route:** /fast-dev-flow (3 small, isolated robustness/markup-safety fixes; each an independent AC)
+- **Run mode:** autonomous + self-merge (operator-stated); decisions recorded in this spec + the closing artifact.
 - **security_required:** true (see §6)
 
 ## 1. Objective
 
-Make the diff / before-after reports human-inspectable: merge the repeated context windows that
-contiguous changes currently produce (B-08), give the HTML report side-by-side before/after panes
-with per-changed-byte highlights (B-09), and add ASCII companions to the linkage table's hex-only
-Before/After cells (B-10).
+Close the standing untrusted-text carries from batches 34–38: cap the three uncapped paste surfaces and escape two file-derived-text sinks. No new features — three small, independently-testable robustness/markup-safety fixes. Engine-frozen set untouched.
 
 ## 2. User stories
 
-- As an operator reading a before/after report of contiguous patches, I want ONE merged context
-  window instead of near-identical windows repeated per change, so inspection doesn't require
-  visually deduplicating pages of hex (B-08; my window limit: the current window size plus 5 lines).
-- As an operator comparing before vs after in the HTML report, I want the A and B windows side by
-  side with the changed bytes highlighted, so I can spot the exact deltas without line-by-line
-  reading (B-09; the Markdown report keeps its ```diff blocks).
-- As an operator reading the Change-entry linkage table, I want each Before/After byte run shown
-  with its ASCII/UTF rendering beside the hex, so text-valued patches (version strings etc.) are
-  recognizable at a glance (B-10).
+- **S1 — Paste cap.** As a user pasting a large blob into a patch/JSON editor, I want the editor to cap the paste at 64 KiB so a huge accidental/malicious paste can't bloat memory or freeze the UI — matching the cap the Ctrl+V clipboard path already enforces.
+- **S2 — Report symbol sanitize (S-F7).** As a user generating a report over a change-set whose linkage symbol carries markup/table-breaking characters, I want that symbol rendered safely in the report so a file-derived symbol can't inject markup or corrupt the output.
+- **S3 — Filename markup hygiene (P-3).** As a user loading a file whose name contains markup metacharacters, I want the status line and notifications to show the name literally so a hostile filename can't leak styling or crash the render.
 
-## 3. Acceptance criteria (observable)
+## 3. Out of scope
 
-- [x] **AC-1 (B-08, MD):** When two changed runs sit within 5 hex rows (5×16 bytes) of each other,
-  the generated Markdown report shall contain ONE merged `Image A/B window 0x…-0x…` block pair
-  covering both runs (plus one grouped run heading naming both run ranges), where today it provably
-  emits two overlapping window pairs — RED first. Runs farther apart than the 5-row bridge shall
-  keep separate windows (boundary case at exactly 5 rows merges; 5 rows + 1 byte does not).
-- [x] **AC-2 (B-08, primitive):** `compute_hexdump_windows` shall gain an optional
-  `merge_gap_bytes=0` parameter — default behavior byte-identical (the project report's existing
-  call sites and tests pass unmodified); with a positive gap, windows separated by ≤ gap bytes
-  merge.
-- [x] **AC-3 (B-09, HTML):** When the HTML report renders a merged/changed window, it shall emit
-  the A and B panes side by side (a two-column flex/table row, headers "Before (A)" / "After (B)")
-  and shall wrap exactly the hex tokens whose byte value differs between A and B in a highlight
-  `<span>` (assert: a changed byte's token appears inside the span markup; an unchanged byte's
-  token does not; the ASCII gutter stays `html.escape`-d).
-- [x] **AC-4 (B-09, MD):** The Markdown report's ```diff blocks shall be unchanged in format
-  (regression pin over a changed run).
-- [x] **AC-5 (B-10):** When the linkage table renders a Before/After byte run, each cell shall
-  carry the ASCII rendering beside the hex (format: `41 42 43 |ABC|` — reusing
-  `changes/display.format_memory_value`'s ascii form), with the `(none - created into hole)` and
-  `-` markers unchanged; in Markdown the ASCII part shall pass `_md_cell` (a byte run decoding to
-  `|` must not break the table — RED-able via a pipe byte), and in HTML through `_esc`.
-- [x] **AC-6 (regression):** The project report (`report_service`) output shall be byte-identical
-  for its existing fixtures (its `compute_hexdump_windows` calls keep the default gap).
+- The OsClipboardInput Ctrl+V path (already capped at `_CLIPBOARD_READ_CAP_CHARS = 65536`).
+- What a report contains (S2 only changes how the symbol is *escaped*, not which rows appear).
+- Any engine-frozen module (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`) and the frozen TEST files (`_ENGINE_TEST_FILES`) — C-27 dual-guard every increment.
+- Batch-40/41 items (UX fixes, repo/test hygiene) and the Flow Builder.
 
-## 4. Validation strategy
+## 4. Acceptance criteria (observable)
 
-Pytest in the same increment as each change; existing suites `tests/test_diff_report_service.py`
-(+ `test_report_service.py` for AC-2/AC-6). RED-first where the AC captures live behavior (AC-1
-duplicate windows; AC-5 pipe-byte MD breakage). Full suite `-m "not slow"` at close; no snapshot
-surface is touched (reports are files on disk, not TUI screens). Manual smoke: generate one HTML
-report from the example fixtures and eyeball the side-by-side pane.
+**S1 — Paste cap (64 KiB = 65,536 chars, mirroring `_CLIPBOARD_READ_CAP_CHARS`):**
+- **AC-1.1:** When a native bracketed `Paste` of > 65,536 chars is delivered to any of the FIVE stock-`TextArea` paste surfaces — `#patch_paste_text`, `#changeset_json_text`, `#entry_json_text`, `#report_declared_regions`, `#operation_config` (F4: cap all 5, not 3) — the widget inserts at most 65,536 chars (excess dropped) — asserted via a Pilot `Paste` event whose payload exceeds the cap, reading the widget's resulting `.text` length.
+- **AC-1.2:** When a `Paste` of ≤ 65,536 chars is delivered, the widget inserts the full text unchanged (no truncation regression) — boundary at exactly 65,536.
+- **AC-1.3 (F3, second ingress):** the ctrl+v path `TextArea.action_paste()` (reads `app.clipboard`) is ALSO capped to 65,536 on these widgets — a shared `CappedTextArea(TextArea)` overrides BOTH `_on_paste` and `action_paste`.
 
-## 5. Non-goals (OUT)
+**S2 — Report symbol sanitize (S-F7):**
+- **AC-2.1:** When a report is generated over an entry whose `linkage_symbol` contains **table-breaking / markup metacharacters** (a pipe `|`, a newline, a backslash) at the render sink `report_service.py:977` (`f"| {entry.linkage_symbol or '-'} |"`), the rendered `.md` report bytes contain the symbol escaped (no raw `|` breaking the markdown table); a benign symbol is unchanged. *(F2: report is `.md`, not Textual markup — the load-bearing threat is table-break via `|`/newline, which `_md_table_cell` neutralizes; backtick/`[](url)` residual is accepted, identical to batch-34's Before/After byte cells.)*
+- **AC-2.2 (golden double-proof, C-24):** the byte-identity report goldens capturing this Modifications-table line are re-derived from the base ref and drift ONLY for hostile-symbol fixtures; benign-symbol goldens stay byte-identical.
 
-- The report window content/row format itself (`render_hex_view` reuse stays).
-- PDF or other export formats; report_service (project report) visual changes beyond AC-2's
-  parameter.
-- B-07 (filter file) — awaiting operator spec; separate batch.
-- Any TUI screen change.
+**S3 — Filename markup hygiene (P-3):**
+- **AC-3.1:** When a file whose name contains markup metacharacters (`[red]evil[/]`, brackets) drives `set_file_status` → `#status_text` (the `Label` built markup-ENABLED at `app.py:1296`; source `_format_coexistence_status` `app.py:7643` embeds raw `path.name`), the status renders the filename literally (brackets verbatim, no `MarkupError`, no style leak) — asserted via a Pilot load with a hostile filename, reading rendered `#status_text`. Fix: `markup=False` on the `#status_text` `Label` (batch-33 log-line precedent).
+- **AC-3.2 (F6, enumerated sinks):** the `notify()` sites embedding file-derived text — `app.py:2228` (save name), `app.py:5337` (manifest issue messages), `app.py:5397` (drift keys/messages) — render it literally under hostile input (pass `markup=False`; `notify` supports it in textual 8.2.8, default is `markup=True`). The false-premise docstring at `app.py:5364-5366` (claims plain interpolation is markup-safe — it is NOT) is corrected.
 
-## 6. Detected security flags
+## 5. Design notes / seams (verified @ be62c97; `assumed` flags noted)
 
-- [ ] Auth / identity
-- [ ] Secrets / config
-- [ ] External integrations
-- [ ] Sensitive data
-- [ ] Destructive DB
-- [x] Input / attack surface (**escape/sanitize**: file-derived BYTE VALUES rendered as ASCII into
-  Markdown tables and HTML — printable bytes include `|`, `` ` ``, `<`, `>`, `&`)
-- [ ] Network / exposure
+- **S1 (hook CONFIRMED by security pre-pass):** `os_clipboard_input.py:72` `_CLIPBOARD_READ_CAP_CHARS = 65536` = the cap to mirror (import it, don't redefine). Native bracketed paste → `TextArea._on_paste(self, event: events.Paste)` (`textual/widgets/_text_area.py:1982`, calls `_replace_via_keyboard(event.text, …)`); ctrl+v → `TextArea.action_paste()` (`:2661`, reads `app.clipboard`) is a SECOND ingress. Shared `CappedTextArea(TextArea)` overrides BOTH, truncating to the cap. 5 construction sites: `#changeset_json_text` (`screens.py:232`), `#entry_json_text`, `#patch_paste_text` (`screens_directionb.py`), `#report_declared_regions` (`screens.py:1599`), `#operation_config` (`screens.py:2025`). *Private `_replace_via_keyboard` dependency OK only because textual==8.2.8 is pinned.*
+- **S2 (line CORRECTED, F1):** render sink = `report_service.py:977` `f"| {entry.linkage_symbol or '-'} |"` in `_modifications_lines` (NOT `:625`, which is the filter matcher `_matches_entry` — escaping there breaks filtering). `linkage_symbol` is the ONLY unescaped file-derived field on the row (`entry.linkage` = controlled constants; `_format_bytes` = hex). Reuse `diff_report_service.py:282 _md_table_cell` (strips ctl chars, doubles `\`, escapes `|`) — do NOT invent a new sanitizer. Flows into report goldens → C-24 census + double-proof. (Out-of-S2-scope note: `report_service.py:1086` interpolates raw `check.source_path` into a `####` heading — separate carry, not this batch.)
+- **S3 (sinks ENUMERATED, F5/F6):** `#status_text` `Label` built markup-ENABLED at `app.py:1296` → `markup=False`; fed by `set_file_status` (`app.py:9607`) ← `_format_coexistence_status` (`app.py:7643`, raw `path.name`). `notify` sites `app.py:2228/5337/5397` embed file-derived text (markup default True) → `markup=False`; correct the false-premise docstring `app.py:5364-5366`. `set_status`/log-lines already markup=False (batch-33) — no change.
+- **C-26:** touched symbols to reverse-grep across `tests/`: `#patch_paste_text`, `#changeset_json_text`, `#entry_json_text`, `#status_text`, `set_file_status`, `linkage_symbol`.
 
-**`security_required`:** true
+## 6. Security flags (auto-detection)
 
-**Risk summary:** B-10 decodes loaded-image bytes to ASCII and embeds them in an MD table cell and
-an HTML cell; B-09 builds new HTML around byte tokens and the ASCII gutter. A crafted image whose
-patched bytes decode to `|`/backticks breaks the MD table; `<script>`-shaped bytes must never reach
-HTML unescaped. Mitigations already in the module: `_md_cell` (S-F2) and `_esc` (html.escape) —
-the batch's rule is that EVERY new interpolation passes one of them; hostile-byte ATs are mandatory
-(pipe-byte MD case; `<b>`-shaped HTML case). A focused security mini-review gates Inc-2/3.
+**security_required: TRUE.** Fired patterns: `sanitize` / `escape` (S2, S3 — file-derived text into report + status); `user input` / paste ingress (S1 — uncapped paste, DoS-adjacent memory/UI); markup-injection surface (S2, S3 — C-17 family).
 
-## 7. Increment plan (3 increments, ≤5 files each)
+**Handling:** this batch IS the hardening. Phase-B pre-code: a `security-reviewer` mini-pass on the 3 patterns (cap correctness + no-bypass; escape covers the real metacharacters; no existing sanitizer weakened). Phase-C: final security pass confirms each mitigation + the hostile-input AT per story.
 
-| Inc | Items | Files (est.) |
-|---|---|---|
-| 1 | AC-1/AC-2/AC-6 window grouping | report_service.py, diff_report_service.py, 2 test files |
-| 2 | AC-3/AC-4 HTML side-by-side + highlights | diff_report_service.py, test file |
-| 3 | AC-5 linkage ASCII cells | diff_report_service.py, test file |
+## 7. Increment plan (≤5 files each)
 
-**Interpretation note (operator-amendable):** the "+5 lines" limit is realized as a merge bridge —
-run windows merge when the gap between them is ≤ 5 hex rows (80 bytes); this keeps merged windows
-tight instead of bridging arbitrarily distant changes.
+1. **Inc-1 (S1):** shared `CappedTextArea(TextArea)` (caps `_on_paste` + `action_paste`) applied to all 5 sites + AC-1.1/1.2/1.3 tests.
+2. **Inc-2 (S2):** escape `linkage_symbol` at `report_service.py:977` via `_md_table_cell` + AC-2.1 test + golden double-proof (C-24).
+3. **Inc-3 (S3):** `markup=False` on `#status_text` + the 3 notify sites + docstring fix + AC-3.1/3.2 tests.
 
-## 8. Batch status
+(3 increments = the fast-flow soft ceiling; a 4th → reassess vs promotion to /dev-flow.)
 
-| Field | Value |
-|-------|-------|
-| Current phase | closed |
-| Started | 2026-07-10 |
-| Closed | 2026-07-10 |
-| Promoted to /dev-flow | no |
-| Notes | Reports lane of the 2026-07-09 baseline dispatch; follows batches 31–33 |
+## 8. Amendment record (Phase-B pre-code security fold, 2026-07-13)
 
-## 9. Close (filled in phase C)
-
-### What changed
-Three report improvements in 3 increments (+2 fold commits): (Inc-1/B-08) contiguous change runs share ONE merged context window — `compute_hexdump_windows` gained `merge_gap_bytes=0` (default byte-identical; project report untouched) and the diff report bridges up to 5 hex rows (`MERGE_GAP_ROWS`), emitting one grouped heading + one diff block + one A/B window pair per merged window. (Inc-2/B-09) HTML changed windows render side-by-side Before(A)/After(B) panes with exactly the differing bytes highlighted (hex tokens + ASCII gutter chars), built escape-then-wrap from structured tokens with a constant inline style (security F2/F3); MD ```diff blocks unchanged. (Inc-3/B-10) linkage Before/After cells render `HH HH |ascii|` via `format_memory_value`, with the new `_md_table_cell` backslash-first escape (security F1) scoped to byte cells; markers unchanged.
-
-### How it was tested
-- 10 new AC-mapped tests (AC-1 merge + 5-row boundary, AC-2 primitive incl. default identity, AC-3 highlight exactness + hostile `<b>&` gutter, AC-4 MD diff pin, AC-5 ASCII cells + hostile pipe/backslash-pipe/tag/LF byte set + markers); RED captured per increment via source-stash (3/2/2 failures respectively).
-- Full suite: **1244 passed, 2 skipped, 3 xfailed (pre-existing), 0 failed; 31/31 snapshots** (no snapshot surface touched).
-- Censused supersessions: the batch-24 default-kwargs MD+HTML goldens re-captured under the new renderer (kwarg-neutrality intent unchanged); the hex-only linkage pins in test_diff_report_service.py AND test_before_after_report.py rewritten to the AC-5 format — the second file was a census miss caught by the full-suite run (C-14 lesson class: sweep the e2e OBSERVERS).
-- Manual smoke: deferred to operator eyeball of the first real HTML report (the AC-3 assertions cover the pane structure).
-
-### Open risks / pending
-- F4 (security review): a merged window larger than MAX_HEX_ROWS renders hexview's row-limit note — a display bound, not report truncation (pre-existing class for giant single runs; merging raises likelihood marginally). Recorded, not chunked.
-- Process notes for the next post-mortem: (1) Inc-2 was briefly committed with a red test (pipe chain masked the exit code — second occurrence of the C-CAND-D lint/test-gate lesson); (2) the B-10 census missed the e2e observer file (C-14 class); (3) harness heredoc escape-collapsing corrupted test literals twice — Write-tool file transfer is the reliable path.
-
-### Security flags — handling
-`security_required: true` (input surface — file bytes rendered as ASCII into MD/HTML). Pre-code mini-review: OK-with-mitigations, all applied: F1 `_md_table_cell` backslash-first escape (+ the backslash-pipe counterfactual AT); F2 escape-then-wrap token construction (+ the `<b>&` AT incl. single-entity assert); F3 constant inline style, no file-derived attribute values; F4 bound confirmed (MAX_HEX_ROWS), wording note recorded. No backtick wrapping of cells.
-
-### Suggested commit message
-```
-feat(reports): batch-34 — merged windows, side-by-side highlighted HTML, linkage ASCII (B-08/09/10)
-```
+Security-reviewer pre-pass (0 HIGH) drove these spec corrections BEFORE Inc-1:
+- **F1 (S2 sink):** `report_service.py:625` → **`:977`** (`:625` is the filter matcher; escaping it would break filtering).
+- **F4 (S1 scope):** 3 → **5** TextAreas (`#report_declared_regions`, `#operation_config` added) — shared subclass makes it ~free; autonomous decision, operator may object.
+- **F3 (S1 second ingress):** cap `action_paste` (ctrl+v internal clipboard) in addition to `_on_paste`; import `_CLIPBOARD_READ_CAP_CHARS`.
+- **F5/F6 (S3 sinks):** confirmed `#status_text` (`app.py:1296`) markup-enabled gap + enumerated notify sites `2228/5337/5397` + a false-premise docstring at `5364-5366` to correct.
+- **F2 (S2 wording):** threat reframed to markdown table-break (`|`/newline), not Textual `[red]` markup; backtick/link residual accepted (batch-34 precedent).

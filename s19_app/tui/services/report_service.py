@@ -941,6 +941,7 @@ def _modifications_lines(
     Dependencies:
         Uses:
             - _format_bytes / _matches_entry / _zero_match_notice
+            - diff_report_service._md_table_cell (symbol cell escape, S-F7)
         Used by:
             - generate_project_report
     """
@@ -961,6 +962,11 @@ def _modifications_lines(
             lines.extend([_zero_match_notice(len(entries)), ""])
             return lines
         entries = kept
+    # Deferred import: ``diff_report_service`` imports from this module at load
+    # time, so a top-level import of ``_md_table_cell`` would be a circular
+    # import — resolve it lazily here, where both modules are fully loaded.
+    from .diff_report_service import _md_table_cell
+
     lines.extend(
         [
             "| Address | Length | Before | After | Linkage | Symbol |",
@@ -968,13 +974,18 @@ def _modifications_lines(
         ]
     )
     for entry in entries:
+        symbol_cell = (
+            _md_table_cell(entry.linkage_symbol)
+            if entry.linkage_symbol
+            else "-"
+        )
         lines.append(
             f"| 0x{entry.address_start:08X} "
             f"| {entry.address_end - entry.address_start} "
             f"| {_format_bytes(entry.before_bytes)} "
             f"| {_format_bytes(entry.after_bytes)} "
             f"| {entry.linkage} "
-            f"| {entry.linkage_symbol or '-'} |"
+            f"| {symbol_cell} |"
         )
     lines.append("")
     return lines
