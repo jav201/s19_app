@@ -476,35 +476,14 @@ def _batch36_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
-# batch-38 (US-065 / R-TUI-054, LLR-065.1/.2): the change-set free-path relabel
-# drops the "v2" token from the entries-pane section title ("Change document
-# (v2 JSON)" -> "Change document (JSON)") and rewrites the
-# `#patch_doc_path_input` placeholder ("path to v2 change-set .json" -> "or type
-# a path to the same change-set JSON (alternative to the patches/ dropdown)").
-# Both strings render on the Patch Editor screen — the title always, the
-# placeholder while the path input is empty (its state at initial render) — so
-# BOTH patch cells (80x24 + 120x30) re-render. This is COPY drift, not a layout
-# regression. The SVG baselines must be regenerated in the canonical CI env
-# (snapshot-regen.yml, pinned textual==8.2.8 — never locally, per the
-# snapshot-regen-env convention); until that regen lands both cells are expected
-# mismatches marked xfail(strict=False). A follow-up drops these once the
-# canonical-env baselines are committed.
+# batch-38 (US-065 change-doc relabel — title "Change document (JSON)" + rewritten
+# `#patch_doc_path_input` placeholder — AND US-067 variant info "?" button): both
+# patch cells (80x24 + 120x30) re-rendered. The SVG baselines were regenerated in
+# the canonical CI env (snapshot-regen.yml, pinned textual==8.2.8; containment
+# check confirmed ONLY the two patch cells moved) and committed, so the batch-38
+# xfail-until-baseline marks are retired.
 def _batch38_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-38 patch-copy drift marks (xfail until canonical regen)."""
-    if screen == "patch":
-        return (
-            pytest.mark.xfail(
-                reason=(
-                    "batch-38 re-renders both patch cells: US-065 change-doc "
-                    "relabel (title 'Change document (JSON)' + rewritten "
-                    "#patch_doc_path_input placeholder) AND US-067 variant "
-                    "info button ('?' beside #patch_variant_select); baseline "
-                    "regen pending in canonical CI (snapshot-regen.yml, "
-                    "textual==8.2.8)"
-                ),
-                strict=False,
-            ),
-        )
+    """Return the batch-38 patch drift marks (none — baselines regenerated)."""
     return ()
 
 
