@@ -819,6 +819,12 @@ class S19TuiApp(App):
         # grouped panel; A2L/MAC keep their +/- paging parity).
         Binding("pagedown", "page_down_context", "Page+", show=False),
         Binding("pageup", "page_up_context", "Page-", show=False),
+        # batch-40 S2 (US-068a discoverability): ctrl+z / ctrl+y reach the
+        # patch-editor change-set undo/redo without scrolling to the buttons.
+        # The actions self-guard (patch screen active + A-01 source_path None),
+        # so a press on any other screen / file-backed doc is a safe no-op.
+        Binding("ctrl+z", "patch_undo", "Undo", show=False),
+        Binding("ctrl+y", "patch_redo", "Redo", show=False),
     ]
 
     workarea: Path
@@ -1928,15 +1934,19 @@ class S19TuiApp(App):
 
         Data Flow:
             - Read the loaded image's ranges (``None`` when no image), then
-              ``refresh_entries`` / ``refresh_issues`` and re-sync the
-              Edit-JSON + Undo/Redo enable state from the restored document's
-              ``source_path`` (LLR-068a.4).
+              ``refresh_entries`` / ``refresh_issues``, clear the stale Checks
+              panel from the restored (now check-less) document
+              (``refresh_check_results`` — ``undo``/``redo`` reset
+              ``last_check_result`` so ``check_rows`` returns the cleared state,
+              batch-40 S1), and re-sync the Edit-JSON + Undo/Redo enable state
+              from the restored document's ``source_path`` (LLR-068a.4).
 
         Dependencies:
             Uses:
-                - ``ChangeService.rows`` / ``issue_lines``
+                - ``ChangeService.rows`` / ``issue_lines`` / ``check_rows``
                 - ``PatchEditorPanel.refresh_entries`` / ``refresh_issues``
-                  / ``set_edit_json_enabled`` / ``set_undo_redo_enabled``
+                  / ``refresh_check_results`` / ``set_edit_json_enabled``
+                  / ``set_undo_redo_enabled``
             Used by:
                 - ``on_patch_editor_panel_undo_requested`` / ``..._redo_requested``
         """
@@ -1946,6 +1956,11 @@ class S19TuiApp(App):
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
         panel.refresh_entries(service.rows(loaded_ranges))
         panel.refresh_issues(service.issue_lines())
+        # batch-40 S1: a history move (undo/redo) restores a change-set whose
+        # entries no longer match the pre-move check run, so the stale Checks
+        # panel must not persist. ``undo``/``redo`` reset ``last_check_result``
+        # → ``check_rows`` returns the cleared state; render it here.
+        panel.refresh_check_results(service.check_rows(), "")
         panel.set_edit_json_enabled(service.document.source_path is None)
         panel.set_undo_redo_enabled(service.document.source_path is None)
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
@@ -1956,11 +1971,13 @@ class S19TuiApp(App):
         """
         Summary:
             Restore the immediately-prior change-set (US-068a / LLR-068a.2/.3):
-            call ``ChangeService.undo()`` and re-render the entries table. An
-            empty undo history is a no-op inside the service, so this handler is
-            crash-free even with no history. The Undo control is disabled for a
-            file-backed document (LLR-068a.4), so this message is only posted
-            for a paste-authored / empty document.
+            route the payload-free Undo button trigger through the shared
+            :meth:`action_patch_undo` path (the same one the ``ctrl+z`` key
+            binding drives). An empty undo history is a no-op inside the
+            service, so this handler is crash-free even with no history. The
+            Undo control is disabled for a file-backed document (LLR-068a.4),
+            so this message is only posted for a paste-authored / empty
+            document.
 
         Args:
             event (PatchEditorPanel.UndoRequested): The payload-free trigger.
@@ -1970,12 +1987,11 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``ChangeService.undo`` / ``_refresh_patch_history_view``
+                - ``action_patch_undo`` (the shared guarded undo path)
             Used by:
                 - Textual message dispatch for ``PatchEditorPanel``
         """
-        self._change_service.undo()
-        self._refresh_patch_history_view()
+        self.action_patch_undo()
 
     def on_patch_editor_panel_redo_requested(
         self, event: PatchEditorPanel.RedoRequested
@@ -1983,8 +1999,10 @@ class S19TuiApp(App):
         """
         Summary:
             Re-apply the most-recently-undone change-set (US-068a /
-            LLR-068a.2/.3): call ``ChangeService.redo()`` and re-render the
-            entries table. An empty redo stack is a service-level no-op.
+            LLR-068a.2/.3): route the payload-free Redo button trigger through
+            the shared :meth:`action_patch_redo` path (the same one the
+            ``ctrl+y`` key binding drives). An empty redo stack is a
+            service-level no-op.
 
         Args:
             event (PatchEditorPanel.RedoRequested): The payload-free trigger.
@@ -1994,10 +2012,91 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``ChangeService.redo`` / ``_refresh_patch_history_view``
+                - ``action_patch_redo`` (the shared guarded redo path)
             Used by:
                 - Textual message dispatch for ``PatchEditorPanel``
         """
+        self.action_patch_redo()
+
+    def _patch_history_action_allowed(self) -> bool:
+        """
+        Summary:
+            The A-01 guard shared by the ``ctrl+z`` / ``ctrl+y`` history key
+            bindings (batch-40 S2): change-set undo/redo is reachable ONLY
+            while the Patch Editor screen is active AND the owned document is
+            paste-authored (``source_path is None``) — the exact enable-state
+            :meth:`PatchEditorPanel.set_undo_redo_enabled` gives the Undo/Redo
+            buttons. A key press on any other screen, or against a file-backed
+            document, is a safe no-op so the binding can never bypass the
+            LLR-068a.4 data-loss guard.
+
+        Returns:
+            bool: ``True`` when a history action may run (patch screen active
+            and paste-authored document); ``False`` otherwise.
+
+        Data Flow:
+            - Read the ``#screen_patch`` container's ``hidden`` class (active
+              iff not hidden), then the owned document's ``source_path``.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.document``
+            Used by:
+                - ``action_patch_undo`` / ``action_patch_redo``
+        """
+        if self.query_one("#screen_patch").has_class("hidden"):
+            return False
+        return self._change_service.document.source_path is None
+
+    def action_patch_undo(self) -> None:
+        """
+        Summary:
+            Restore the immediately-prior change-set (US-068a / LLR-068a.2/.3),
+            the shared body behind both the ``ctrl+z`` key binding and the
+            ``#patch_undo_button`` trigger. Guarded by
+            :meth:`_patch_history_action_allowed`, so it is a no-op unless the
+            Patch Editor is active and the document is paste-authored (the
+            A-01 guard); an empty undo history is itself a service-level no-op.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_patch_history_action_allowed``
+                - ``ChangeService.undo`` / ``_refresh_patch_history_view``
+            Used by:
+                - The ``ctrl+z`` key binding
+                - ``on_patch_editor_panel_undo_requested`` (the button path)
+        """
+        if not self._patch_history_action_allowed():
+            return
+        self._change_service.undo()
+        self._refresh_patch_history_view()
+
+    def action_patch_redo(self) -> None:
+        """
+        Summary:
+            Re-apply the most-recently-undone change-set (US-068a /
+            LLR-068a.2/.3), the shared body behind both the ``ctrl+y`` key
+            binding and the ``#patch_redo_button`` trigger. Guarded by
+            :meth:`_patch_history_action_allowed` (patch screen active +
+            paste-authored A-01 guard); an empty redo stack is a service-level
+            no-op.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_patch_history_action_allowed``
+                - ``ChangeService.redo`` / ``_refresh_patch_history_view``
+            Used by:
+                - The ``ctrl+y`` key binding
+                - ``on_patch_editor_panel_redo_requested`` (the button path)
+        """
+        if not self._patch_history_action_allowed():
+            return
         self._change_service.redo()
         self._refresh_patch_history_view()
 

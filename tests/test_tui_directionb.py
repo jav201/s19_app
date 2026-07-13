@@ -4038,9 +4038,14 @@ def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
     ):
         assert label in strip, f"stats label {label!r} missing; got {strip!r}"
 
-    # Values match the hand-computed case_02 literals.
-    assert f"{_CASE_02_COVERAGE_PCT:.6f}%" in strip, (
-        f"coverage %% must match TC-041.8's number; got {strip!r}"
+    # Values match the hand-computed case_02 literals. batch-40 S3: the strip
+    # renders coverage to a clean 2 decimals (was an ugly .6f), matching the
+    # A-view (app.build_workspace_stats_text). AC-3.1: .2f present, no 6-dec tail.
+    assert f"Coverage: {_CASE_02_COVERAGE_PCT:.2f}%" in strip, (
+        f"coverage %% must render at .2f (TC-041.8's number); got {strip!r}"
+    )
+    assert f"{_CASE_02_COVERAGE_PCT:.6f}%" not in strip, (
+        f"coverage %% must NOT render the 6-decimal form; got {strip!r}"
     )
     assert f"Bytes covered: {_CASE_02_COVERED_BYTES}" in strip
     assert f"Valid ranges: {_CASE_02_VALID_COUNT}" in strip

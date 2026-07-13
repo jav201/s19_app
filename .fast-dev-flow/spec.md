@@ -1,70 +1,55 @@
-# fast-dev-flow spec — batch 39 — Untrusted-text hardening
+# fast-dev-flow spec — batch 40 — Small UX fixes
 
-- **Status:** closed 2026-07-13 (AC-1.1..3.2 green; gate 1390 passed / 0 failed / 3 xfailed pre-existing; security PASS-with-carries; 0 frozen diffs)
+- **Status:** closed 2026-07-13 (AC-1.1..3.1 green; gate 1393 passed / 0 failed / 3 xfailed pre-existing; 0 frozen diffs; no security flags)
 - **Created:** 2026-07-13
-- **Branch:** `claude/batch-39-untrusted-text-hardening` @ `be62c97` (= origin/main; RC-1 clean)
-- **Route:** /fast-dev-flow (3 small, isolated robustness/markup-safety fixes; each an independent AC)
-- **Run mode:** autonomous + self-merge (operator-stated); decisions recorded in this spec + the closing artifact.
-- **security_required:** true (see §6)
+- **Branch:** `claude/batch-40-small-ux-fixes` @ `fbd8aaa` (= origin/main; RC-1 clean)
+- **Route:** /fast-dev-flow (3 small UX polish fixes; each an independent AC)
+- **Run mode:** autonomous + self-merge (operator-stated, batch-40 kickoff); decisions recorded in this spec + the closing artifact.
+- **security_required:** FALSE — no sensitive patterns fire (state reset, key bindings, display-format only; no untrusted input / auth / secrets / external surface).
 
 ## 1. Objective
 
-Close the standing untrusted-text carries from batches 34–38: cap the three uncapped paste surfaces and escape two file-derived-text sinks. No new features — three small, independently-testable robustness/markup-safety fixes. Engine-frozen set untouched.
+Close 3 small UX carries from the batch-38 review + the deferred-polish backlog. No new features, no untrusted-text surface. Engine-frozen set untouched.
 
 ## 2. User stories
 
-- **S1 — Paste cap.** As a user pasting a large blob into a patch/JSON editor, I want the editor to cap the paste at 64 KiB so a huge accidental/malicious paste can't bloat memory or freeze the UI — matching the cap the Ctrl+V clipboard path already enforces.
-- **S2 — Report symbol sanitize (S-F7).** As a user generating a report over a change-set whose linkage symbol carries markup/table-breaking characters, I want that symbol rendered safely in the report so a file-derived symbol can't inject markup or corrupt the output.
-- **S3 — Filename markup hygiene (P-3).** As a user loading a file whose name contains markup metacharacters, I want the status line and notifications to show the name literally so a hostile filename can't leak styling or crash the render.
+- **S1 — Checks panel refreshes after undo/redo.** As a patch-editor user, after I run Checks and then Undo (or Redo) an edit, I want the Checks results to reflect the restored change-set rather than showing stale results for the pre-undo entries. (batch-38 Inc-4 F1.)
+- **S2 — Undo/redo key bindings.** As a patch-editor user, I want `ctrl+z`/`ctrl+y` to undo/redo change-set edits (not only the on-screen buttons, which sit below the entries-pane fold), so the feature is discoverable and reachable without scrolling. (batch-38 Inc-4 F2.)
+- **S3 — Clean coverage %.** As a user reading the Memory-Map stats strip, I want the coverage percentage shown to a clean precision (2 decimals, matching the A-view) instead of six noisy decimals. (deferred polish.)
 
 ## 3. Out of scope
 
-- The OsClipboardInput Ctrl+V path (already capped at `_CLIPBOARD_READ_CAP_CHARS = 65536`).
-- What a report contains (S2 only changes how the symbol is *escaped*, not which rows appear).
-- Any engine-frozen module (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`) and the frozen TEST files (`_ENGINE_TEST_FILES`) — C-27 dual-guard every increment.
-- Batch-40/41 items (UX fixes, repo/test hygiene) and the Flow Builder.
+- The A-01 data-loss guard semantics (undo/redo stay DISABLED for file-loaded docs, `source_path is not None`) — unchanged; the new key bindings MUST respect it.
+- Item 6 (A2L-symbol region names + per-cell tooltips, R-TUI-041 R-3) — its own batch (operator, 2026-07-13).
+- Any engine-frozen module (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`) + frozen TEST files (`_ENGINE_TEST_FILES`) — C-27 dual-guard every increment.
 
 ## 4. Acceptance criteria (observable)
 
-**S1 — Paste cap (64 KiB = 65,536 chars, mirroring `_CLIPBOARD_READ_CAP_CHARS`):**
-- **AC-1.1:** When a native bracketed `Paste` of > 65,536 chars is delivered to any of the FIVE stock-`TextArea` paste surfaces — `#patch_paste_text`, `#changeset_json_text`, `#entry_json_text`, `#report_declared_regions`, `#operation_config` (F4: cap all 5, not 3) — the widget inserts at most 65,536 chars (excess dropped) — asserted via a Pilot `Paste` event whose payload exceeds the cap, reading the widget's resulting `.text` length.
-- **AC-1.2:** When a `Paste` of ≤ 65,536 chars is delivered, the widget inserts the full text unchanged (no truncation regression) — boundary at exactly 65,536.
-- **AC-1.3 (F3, second ingress):** the ctrl+v path `TextArea.action_paste()` (reads `app.clipboard`) is ALSO capped to 65,536 on these widgets — a shared `CappedTextArea(TextArea)` overrides BOTH `_on_paste` and `action_paste`.
+**S1 — Checks panel refresh after undo/redo:**
+- **AC-1.1:** When a user runs Checks (populating the Checks panel), then edits an entry, then Undo — the Checks panel no longer shows the pre-undo result: either it clears (`last_check_result` reset) or it reflects the restored change-set. Asserted via Pilot: run checks → edit → undo → read the rendered Checks panel and assert it is NOT the stale pre-undo content. RED counterfactual: pre-fix the panel keeps the stale result.
+- **AC-1.2:** Same for Redo (redo restores, Checks panel is not stale from the pre-redo state).
 
-**S2 — Report symbol sanitize (S-F7):**
-- **AC-2.1:** When a report is generated over an entry whose `linkage_symbol` contains **table-breaking / markup metacharacters** (a pipe `|`, a newline, a backslash) at the render sink `report_service.py:977` (`f"| {entry.linkage_symbol or '-'} |"`), the rendered `.md` report bytes contain the symbol escaped (no raw `|` breaking the markdown table); a benign symbol is unchanged. *(F2: report is `.md`, not Textual markup — the load-bearing threat is table-break via `|`/newline, which `_md_table_cell` neutralizes; backtick/`[](url)` residual is accepted, identical to batch-34's Before/After byte cells.)*
-- **AC-2.2 (golden double-proof, C-24):** the byte-identity report goldens capturing this Modifications-table line are re-derived from the base ref and drift ONLY for hostile-symbol fixtures; benign-symbol goldens stay byte-identical.
+**S2 — Undo/redo key bindings:**
+- **AC-2.1:** With a paste-authored change-set (`source_path is None`), pressing `ctrl+z` undoes the last edit (restores the prior change-set) and `ctrl+y` redoes it — asserted via real `await pilot.press("ctrl+z")` / `press("ctrl+y")` (C-16 real key), reading the entries table before/after, driving the SAME path as the `#patch_undo_button`/`#patch_redo_button`.
+- **AC-2.2 (A-01 guard respected):** with a FILE-loaded change-set (`source_path is not None`), `ctrl+z`/`ctrl+y` are a safe no-op (no mutation, no clobber) — mirrors the button-disabled state. RED/negative: the binding must NOT bypass the A-01 guard.
 
-**S3 — Filename markup hygiene (P-3):**
-- **AC-3.1:** When a file whose name contains markup metacharacters (`[red]evil[/]`, brackets) drives `set_file_status` → `#status_text` (the `Label` built markup-ENABLED at `app.py:1296`; source `_format_coexistence_status` `app.py:7643` embeds raw `path.name`), the status renders the filename literally (brackets verbatim, no `MarkupError`, no style leak) — asserted via a Pilot load with a hostile filename, reading rendered `#status_text`. Fix: `markup=False` on the `#status_text` `Label` (batch-33 log-line precedent).
-- **AC-3.2 (F6, enumerated sinks):** the `notify()` sites embedding file-derived text — `app.py:2228` (save name), `app.py:5337` (manifest issue messages), `app.py:5397` (drift keys/messages) — render it literally under hostile input (pass `markup=False`; `notify` supports it in textual 8.2.8, default is `markup=True`). The false-premise docstring at `app.py:5364-5366` (claims plain interpolation is markup-safe — it is NOT) is corrected.
+**S3 — Clean coverage %:**
+- **AC-3.1:** The Memory-Map stats strip (`screens_directionb.py:1186`) renders `Coverage: {pct:.2f}%` (2 decimals), not `.6f` — asserted by reading the rendered stats text for a known coverage value (e.g. exactly 2 decimals, no 6-decimal tail). RED counterfactual: pre-fix shows the 6-decimal form.
 
-## 5. Design notes / seams (verified @ be62c97; `assumed` flags noted)
+## 5. Design notes / seams (verified @ fbd8aaa)
 
-- **S1 (hook CONFIRMED by security pre-pass):** `os_clipboard_input.py:72` `_CLIPBOARD_READ_CAP_CHARS = 65536` = the cap to mirror (import it, don't redefine). Native bracketed paste → `TextArea._on_paste(self, event: events.Paste)` (`textual/widgets/_text_area.py:1982`, calls `_replace_via_keyboard(event.text, …)`); ctrl+v → `TextArea.action_paste()` (`:2661`, reads `app.clipboard`) is a SECOND ingress. Shared `CappedTextArea(TextArea)` overrides BOTH, truncating to the cap. 5 construction sites: `#changeset_json_text` (`screens.py:232`), `#entry_json_text`, `#patch_paste_text` (`screens_directionb.py`), `#report_declared_regions` (`screens.py:1599`), `#operation_config` (`screens.py:2025`). *Private `_replace_via_keyboard` dependency OK only because textual==8.2.8 is pinned.*
-- **S2 (line CORRECTED, F1):** render sink = `report_service.py:977` `f"| {entry.linkage_symbol or '-'} |"` in `_modifications_lines` (NOT `:625`, which is the filter matcher `_matches_entry` — escaping there breaks filtering). `linkage_symbol` is the ONLY unescaped file-derived field on the row (`entry.linkage` = controlled constants; `_format_bytes` = hex). Reuse `diff_report_service.py:282 _md_table_cell` (strips ctl chars, doubles `\`, escapes `|`) — do NOT invent a new sanitizer. Flows into report goldens → C-24 census + double-proof. (Out-of-S2-scope note: `report_service.py:1086` interpolates raw `check.source_path` into a `####` heading — separate carry, not this batch.)
-- **S3 (sinks ENUMERATED, F5/F6):** `#status_text` `Label` built markup-ENABLED at `app.py:1296` → `markup=False`; fed by `set_file_status` (`app.py:9607`) ← `_format_coexistence_status` (`app.py:7643`, raw `path.name`). `notify` sites `app.py:2228/5337/5397` embed file-derived text (markup default True) → `markup=False`; correct the false-premise docstring `app.py:5364-5366`. `set_status`/log-lines already markup=False (batch-33) — no change.
-- **C-26:** touched symbols to reverse-grep across `tests/`: `#patch_paste_text`, `#changeset_json_text`, `#entry_json_text`, `#status_text`, `set_file_status`, `linkage_symbol`.
+- **S1:** `change_service.py` `undo` (:445) / `redo` (:474) reset `last_summary` but NOT `last_check_result` (:357, set at :1255); `app.py:_refresh_patch_history_view` (:1919) refreshes entries + issues + enable-guards but does NOT call `panel.refresh_check_results`. Fix: reset `last_check_result = None` in `undo`/`redo` AND call `refresh_check_results(service.check_rows(), "")` in `_refresh_patch_history_view` (the `refresh_check_results` seam already exists, app.py:1737). Keep the primary entries refresh intact.
+- **S2:** app `BINDINGS` (app.py:784). Add `Binding("ctrl+z", "patch_undo", ...)` + `Binding("ctrl+y", "patch_redo", ...)` (show=False or shown). New `action_patch_undo`/`action_patch_redo` on the app that route to the SAME logic the `UndoRequested`/`RedoRequested` handlers use, guarded: no-op unless the patch editor is active AND undo/redo is enabled (`source_path is None` + non-empty stack). Must NOT double-fire or bypass the A-01 guard. *Exact guard/active-screen check — confirm at implementation.*
+- **S3:** `screens_directionb.py:1186` `f"Coverage: {stats.coverage_pct:.6f}%  "` → `:.2f` (match `app.py:695`). `coverage_pct` is a float 0-100 (`screens_directionb.py:617`).
+- **C-26:** touched symbols to reverse-grep across `tests/`: `last_check_result`, `_refresh_patch_history_view`, `refresh_check_results`, `action_patch_undo`/`action_patch_redo`, the `ctrl+z`/`ctrl+y` bindings, `coverage_pct` `.6f`.
 
 ## 6. Security flags (auto-detection)
 
-**security_required: TRUE.** Fired patterns: `sanitize` / `escape` (S2, S3 — file-derived text into report + status); `user input` / paste ingress (S1 — uncapped paste, DoS-adjacent memory/UI); markup-injection surface (S2, S3 — C-17 family).
-
-**Handling:** this batch IS the hardening. Phase-B pre-code: a `security-reviewer` mini-pass on the 3 patterns (cap correctness + no-bypass; escape covers the real metacharacters; no existing sanitizer weakened). Phase-C: final security pass confirms each mitigation + the hostile-input AT per story.
+**security_required: FALSE.** No pattern fires — S1 is in-process state reset, S2 is key bindings over an already-guarded action, S3 is a display-format change. No untrusted input, auth, secrets, external surface, or markup sink. (The A-01 data-loss guard is PRESERVED, not weakened — S2's AC-2.2 asserts it.)
 
 ## 7. Increment plan (≤5 files each)
 
-1. **Inc-1 (S1):** shared `CappedTextArea(TextArea)` (caps `_on_paste` + `action_paste`) applied to all 5 sites + AC-1.1/1.2/1.3 tests.
-2. **Inc-2 (S2):** escape `linkage_symbol` at `report_service.py:977` via `_md_table_cell` + AC-2.1 test + golden double-proof (C-24).
-3. **Inc-3 (S3):** `markup=False` on `#status_text` + the 3 notify sites + docstring fix + AC-3.1/3.2 tests.
+1. **Inc-1 (S1 + S2 — undo/redo polish):** reset `last_check_result` + refresh checks in `_refresh_patch_history_view` (S1); add `ctrl+z`/`ctrl+y` bindings + actions routing to the existing undo/redo path with the A-01 guard (S2). Files: `change_service.py`, `app.py`, + test(s). AC-1.1/1.2 + AC-2.1/2.2.
+2. **Inc-2 (S3 — coverage format):** `.6f`→`.2f` at `screens_directionb.py:1186` + AC-3.1 test.
 
-(3 increments = the fast-flow soft ceiling; a 4th → reassess vs promotion to /dev-flow.)
-
-## 8. Amendment record (Phase-B pre-code security fold, 2026-07-13)
-
-Security-reviewer pre-pass (0 HIGH) drove these spec corrections BEFORE Inc-1:
-- **F1 (S2 sink):** `report_service.py:625` → **`:977`** (`:625` is the filter matcher; escaping it would break filtering).
-- **F4 (S1 scope):** 3 → **5** TextAreas (`#report_declared_regions`, `#operation_config` added) — shared subclass makes it ~free; autonomous decision, operator may object.
-- **F3 (S1 second ingress):** cap `action_paste` (ctrl+v internal clipboard) in addition to `_on_paste`; import `_CLIPBOARD_READ_CAP_CHARS`.
-- **F5/F6 (S3 sinks):** confirmed `#status_text` (`app.py:1296`) markup-enabled gap + enumerated notify sites `2228/5337/5397` + a false-premise docstring at `5364-5366` to correct.
-- **F2 (S2 wording):** threat reframed to markdown table-break (`|`/newline), not Textual `[red]` markup; backtick/link residual accepted (batch-34 precedent).
+(2 increments; well under the fast-flow ceiling.)

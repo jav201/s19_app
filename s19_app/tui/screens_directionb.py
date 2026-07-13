@@ -1183,7 +1183,7 @@ class MemoryMapPanel(Container):
                 - ``_render_stats`` / (test) TC-041.8
         """
         text = Text()
-        text.append(f"Coverage: {stats.coverage_pct:.6f}%  ")
+        text.append(f"Coverage: {stats.coverage_pct:.2f}%  ")
         text.append(f"Bytes covered: {stats.covered_bytes}\n")
         text.append(f"Valid ranges: {stats.valid_count}  ")
         text.append(f"Invalid ranges: {stats.invalid_count}\n")
