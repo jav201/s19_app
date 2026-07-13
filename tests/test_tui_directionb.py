@@ -7411,3 +7411,131 @@ def test_ac1_open_in_hex_snaps_to_nearest_present_row(tmp_path: Path) -> None:
         "the hex view must render range B's first row (nearest present row "
         f"at-or-after the gap cell start); window_start={window_start}"
     )
+
+
+# ===========================================================================
+# batch-38 US-065 (B-16) / R-TUI-054 — change-set free-path label clarity
+#
+# The Patch Editor's change-document section title and the free-path
+# ``#patch_doc_path_input`` placeholder must read as an alternative way to
+# point at the SAME primary change-set (not a second / "v2" file). Per
+# LLR-065.1/LLR-065.2 (01-requirements §3.1, M3): the :1854 entries-pane
+# title drops the "v2" token, and the placeholder carries the
+# alternative-to-dropdown framing.
+# ===========================================================================
+
+# Pinned copy — 01-requirements §3.1 / LLR-065.1 / LLR-065.2 (verbatim).
+PATCH_DOC_SECTION_TITLE = "Change document (JSON)"
+PATCH_DOC_PATH_PLACEHOLDER = (
+    "or type a path to the same change-set JSON "
+    "(alternative to the patches/ dropdown)"
+)
+
+
+def _patch_label_and_placeholder(tmp_path: Path) -> tuple[str, str]:
+    """Open the Patch Editor and return its change-doc title + path placeholder.
+
+    Summary:
+        Drive ``S19TuiApp`` headlessly, activate the Patch Editor rail screen,
+        and read the two rendered strings that US-065 relabels: the
+        entries-pane change-document section-title ``Label`` (``:1854``, the
+        only ``patch-section-title`` inside ``#patch_pane_entries``) and the
+        ``#patch_doc_path_input`` free-path placeholder (``:1904``).
+
+    Args:
+        tmp_path: Per-test temp dir used as the app ``base_dir``.
+
+    Returns:
+        A ``(title_text, placeholder_text)`` tuple of the rendered plain-text
+        strings, for verbatim assertion by AT-065a / TC-332.
+
+    Raises:
+        textual.css.query.NoMatches: If either widget is absent (compose drift).
+
+    Data Flow:
+        run_test → action_show_screen("patch") → query_one the title Label and
+        the path Input → extract plain text.
+
+    Dependencies:
+        Uses:
+            - S19TuiApp.action_show_screen
+            - textual.widgets.Label / Input
+        Used by:
+            - test_at065a_change_doc_label_reads_as_dropdown_alternative
+            - test_tc332_change_doc_copy_pins_verbatim
+
+    Example:
+        >>> title, placeholder = _patch_label_and_placeholder(tmp_path)
+        >>> title
+        'Change document (JSON)'
+    """
+    from textual.widgets import Label
+
+    async def _drive() -> tuple[str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            label = app.query_one(
+                "#patch_pane_entries .patch-section-title", Label
+            )
+            title = str(label.render())
+            placeholder = app.query_one(
+                "#patch_doc_path_input", Input
+            ).placeholder
+            return title, placeholder
+
+    return asyncio.run(_drive())
+
+
+def test_at065a_change_doc_label_reads_as_dropdown_alternative(
+    tmp_path: Path,
+) -> None:
+    """AT-065a: the change-doc title + free-path placeholder drop "v2" framing.
+
+    Intent: US-065 (R-TUI-054) — a Patch Editor user reads the free-path field
+    as an alternative way to point at the SAME primary change-set (not a second
+    / "v2" file). Black-box through the shipped ``PatchEditorPanel`` surface:
+    the entries-pane section-title ``Label`` renderable and the
+    ``#patch_doc_path_input`` placeholder are asserted verbatim, the
+    alternative-to-dropdown tokens are present, and the substring ``v2`` is
+    absent from BOTH (C-10 content assertion, not merely non-empty).
+
+    RED counterfactual: at ``main`` the title is ``"Change document (v2 JSON)"``
+    and the placeholder ``"path to v2 change-set .json"`` — the verbatim-equality
+    and "no v2" assertions fail.
+    """
+    title, placeholder = _patch_label_and_placeholder(tmp_path)
+
+    assert title == PATCH_DOC_SECTION_TITLE, (
+        f"section title must read {PATCH_DOC_SECTION_TITLE!r}, got {title!r}"
+    )
+    assert placeholder == PATCH_DOC_PATH_PLACEHOLDER, (
+        f"placeholder must read {PATCH_DOC_PATH_PLACEHOLDER!r}, "
+        f"got {placeholder!r}"
+    )
+    for token in ("alternative to", "same change-set", "patches/ dropdown"):
+        assert token in placeholder, (
+            f"placeholder must state it is an {token!r}; got {placeholder!r}"
+        )
+    assert "v2" not in title, f"title must not mention 'v2'; got {title!r}"
+    assert "v2" not in placeholder, (
+        f"placeholder must not mention 'v2'; got {placeholder!r}"
+    )
+
+
+def test_tc332_change_doc_copy_pins_verbatim(tmp_path: Path) -> None:
+    """TC-332: the two rendered strings equal the pinned copy verbatim.
+
+    Intent: LLR-065.1 / LLR-065.2 — white-box pin of the exact composed copy.
+    The rendered ``#patch_pane_entries`` section-title ``Label`` and the
+    ``#patch_doc_path_input`` placeholder must equal the module-level pinned
+    constants byte-for-byte (the single source of truth the wording is locked
+    to), with ``v2`` absent from both.
+    """
+    title, placeholder = _patch_label_and_placeholder(tmp_path)
+
+    assert title == PATCH_DOC_SECTION_TITLE
+    assert placeholder == PATCH_DOC_PATH_PLACEHOLDER
+    assert "v2" not in title and "v2" not in placeholder

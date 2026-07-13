@@ -252,6 +252,171 @@ class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
             )
 
 
+class EntryJsonScreen(ModalScreen[Optional[str]]):
+    """Modal JSON editor scoped to a SINGLE change-set entry (US-068b).
+
+    Summary:
+        A per-entry sibling of :class:`ChangeSetJsonScreen` (LLR-068b.2):
+        the editable ``TextArea`` is seeded with ONE entry's canonical
+        wire-form JSON (``{"type", "address", "value"|"bytes"}``) rather than
+        the whole document, so the operator edits a single entry in isolation.
+        This single-entry seed is what distinguishes the popup from batch-37's
+        whole-set editor — it carries no document header / ``entries`` array.
+        Opened from the Patch Editor's per-entry ``#patch_entry_edit_json_
+        button`` (distinct from the whole-set ``#patch_edit_json_button`` and
+        the field-populate ``#patch_entry_edit_button``) for the row selected
+        in ``#patch_doc_entries_table``, and only for a paste-authored
+        document (``source_path is None``) per the LLR-068b.4 disable-guard.
+
+        On **Confirm** the screen dismisses with the edited text; the host
+        routes it through ``ChangeService.edit_entry_json`` — which validates
+        it via the EXISTING ``parse_change_document`` seam (no new parse/apply
+        path) and replaces ONLY the selected entry. On **Cancel** the screen
+        dismisses with ``None`` and the document is left unchanged. The editor
+        is a plain ``TextArea`` (the same widget class as ``#patch_paste_text``
+        / ``#changeset_json_text``), so it adds NO new clipboard ingress.
+
+    Args:
+        seed_text (str): The selected entry's canonical wire-form JSON to
+            pre-fill the editor with (a single entry object).
+
+    Returns:
+        Optional[str]: The edited entry JSON on Confirm, or ``None`` on
+        Cancel / Escape (``ModalScreen[Optional[str]]``).
+
+    Data Flow:
+        - ``compose`` builds a ``.modal-dialog`` with a title, the seeded
+          ``#entry_json_text`` ``TextArea``, and Confirm / Cancel buttons.
+        - ``on_button_pressed`` dismisses with the ``TextArea`` text (Confirm)
+          or ``None`` (Cancel).
+
+    Dependencies:
+        Uses:
+            - ``TextArea`` / ``Button`` / the shared ``.modal-dialog`` classes
+        Used by:
+            - ``S19TuiApp.on_patch_editor_panel_entry_edit_json_requested``
+            - tests/test_tui_patch_editor_v2.py
+
+    Example:
+        >>> screen = EntryJsonScreen('{"type": "bytes"}')  # doctest: +SKIP
+    """
+
+    #: Route initial focus to the editor so typing / paste land there rather
+    #: than on the Confirm button (mirrors :class:`ChangeSetJsonScreen`).
+    AUTO_FOCUS = "#entry_json_text"
+
+    def __init__(self, seed_text: str) -> None:
+        super().__init__()
+        self._seed_text = seed_text
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Edit entry JSON:", classes="modal-title"),
+            TextArea(self._seed_text, id="entry_json_text"),
+            Container(
+                Button("Confirm", id="entry_json_confirm", classes="modal-confirm"),
+                Button("Cancel", id="entry_json_cancel"),
+                id="entry_json_buttons",
+                classes="modal-buttons",
+            ),
+            id="entry_json_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "entry_json_cancel":
+            self.dismiss(None)
+            return
+        if event.button.id == "entry_json_confirm":
+            self.dismiss(self.query_one("#entry_json_text", TextArea).text)
+
+
+#: Static help copy for the variant-selector info modal (US-067 / LLR-067.3).
+#: One paragraph per idea, joined with blank lines. Authored free of Rich /
+#: console-markup metacharacters (``[`` / ``]`` / ``link=``) and rendered
+#: through a ``markup=False`` ``Static`` — the text is a fixed constant with NO
+#: untrusted interpolation, so it can never carry a markup or style leak
+#: (C-17). The required content tokens (``picks which firmware image loads`` /
+#: ``at least two firmware images`` / ``project directory``) are asserted by
+#: AT-067a + TC-337, so a copy edit that drops the explanation trips the tests.
+VARIANT_HELP_TEXT: str = "\n\n".join(
+    (
+        "The variant selector picks which firmware image loads.",
+        "Each option is one firmware image found in the current project "
+        "directory. Choosing an option reloads that image, so you can inspect "
+        "or patch a different build without leaving the project.",
+        "The selector appears only when the project directory holds at least "
+        "two firmware images. With a single image there is nothing to switch "
+        "between, so the control stays empty and disabled.",
+    )
+)
+
+
+class VariantHelpScreen(ModalScreen[None]):
+    """Read-only help modal explaining the variant selector (HLR-067).
+
+    Summary:
+        Static discovery help for the Patch Editor's ``#patch_variant_select``
+        dropdown (LLR-067.3), opened by the always-rendered
+        ``#patch_variant_info_button`` beside it. The body renders the fixed
+        :data:`VARIANT_HELP_TEXT` — what the selector does (picks which
+        firmware image loads) and when it appears (>=2 images in the project
+        directory) — through a ``markup=False`` ``Static`` so a stray
+        metacharacter could never be interpreted (C-17); the copy is a constant
+        with no interpolation. Reuses the shared ``.modal-dialog`` box model
+        (``height: auto`` fits the short help text at both 80x24 and 120x30 —
+        pilot-measured, C-23), so no new CSS rule is added. Dismissed by Close
+        (self-handled, no app-side dispatch) — the same idiom as
+        :class:`LegendScreen`.
+
+    Data Flow:
+        - ``compose`` builds a ``.modal-dialog`` with a title, the
+          ``#variant_help_body`` ``Static`` seeded from ``VARIANT_HELP_TEXT``,
+          and a Close button.
+        - ``on_button_pressed`` dismisses with ``None`` on Close.
+
+    Dependencies:
+        Uses:
+            - ``Static`` / ``Button`` / the shared ``.modal-dialog`` classes
+            - :data:`VARIANT_HELP_TEXT`
+        Used by:
+            - ``S19TuiApp.on_patch_editor_panel_variant_help_requested``
+            - tests/test_tui_variants.py
+
+    Example:
+        >>> screen = VariantHelpScreen()  # doctest: +SKIP
+    """
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("About the variant selector", classes="modal-title"),
+            Static(
+                VARIANT_HELP_TEXT,
+                id="variant_help_body",
+                markup=False,
+            ),
+            Container(
+                Button(
+                    "Close",
+                    id="variant_help_close",
+                    classes="modal-confirm",
+                ),
+                id="variant_help_buttons",
+                classes="modal-buttons",
+            ),
+            id="variant_help_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        self.query_one("#variant_help_close", Button).focus()
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "variant_help_close":
+            logger.info("VariantHelpScreen dismissed by close.")
+            self.dismiss(None)
+
+
 class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
     """Modal dialog for destination folder, project name, and per-variant assignments.
 

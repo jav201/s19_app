@@ -108,6 +108,85 @@ def supplemental_a2l_row_issues(
     return supplemental
 
 
+def supplemental_a2l_oversized_address_issues(
+    tags_for_validation: list[dict],
+) -> list[ValidationIssue]:
+    """
+    Summary:
+        Emit one WARNING ``ValidationIssue`` (code ``A2L_ADDRESS_EXCEEDS_32BIT``)
+        per A2L tag whose parsed ``address`` is an ``int`` strictly greater than
+        ``0xFFFFFFFF`` — the 32-bit address ceiling (US-066 / LLR-066.1). A tag
+        whose address is ``<= 0xFFFFFFFF``, ``None``, or non-``int`` yields no
+        issue. This is a TUI-side supplemental producer (sibling of
+        ``supplemental_a2l_row_issues``) so the engine-frozen ``validation/``
+        package is not edited.
+
+    Args:
+        tags_for_validation (list[dict]): Effective A2L tag list resolved by
+            ``build_validation_report`` (enriched tags when available, raw
+            otherwise). Each tag's ``address`` is a parsed ``int`` or ``None``
+            (``tui/a2l.py`` reads ``ECU_ADDRESS`` via ``int(token, 0)``).
+
+    Returns:
+        list[ValidationIssue]: Supplemental WARNING issues, one per oversized
+        tag, in tag order. The ``message`` embeds the file-derived tag name as
+        a plain literal (no Rich markup) so the markup-safe issues render
+        (``IssueRow`` via ``safe_text``) displays a hostile name literally
+        (LLR-066.3, C-17).
+
+    Raises:
+        None
+
+    Data Flow:
+        - Key each tag on ``isinstance(address, int) and address > 0xFFFFFFFF``;
+          any other address (``None``/string/absent) is skipped (A-1 guard).
+        - Build a plain message naming the tag (or its address when nameless)
+          and the offending hex address; the ``ValidationIssue`` constructor
+          scrubs control/ANSI chars from the message (``validation/model.py`` —
+          consumed, not edited).
+
+    Dependencies:
+        Uses:
+            - ``ValidationIssue`` / ``ValidationSeverity``
+        Used by:
+            - ``build_validation_report`` (both report branches, LLR-066.2)
+
+    Example:
+        >>> issues = supplemental_a2l_oversized_address_issues(
+        ...     [{"name": "BIG", "address": 0x1_0000_0000}]
+        ... )
+        >>> issues[0].code
+        'A2L_ADDRESS_EXCEEDS_32BIT'
+    """
+    supplemental: list[ValidationIssue] = []
+    for tag in tags_for_validation:
+        address = tag.get("address")
+        if not isinstance(address, int) or address <= 0xFFFFFFFF:
+            continue
+        name = str(tag.get("name") or "").strip()
+        if name:
+            message = (
+                f"A2L tag '{name}' address 0x{address:X} exceeds the 32-bit "
+                f"address range (> 0xFFFFFFFF)."
+            )
+        else:
+            message = (
+                f"Unnamed A2L tag address 0x{address:X} exceeds the 32-bit "
+                f"address range (> 0xFFFFFFFF)."
+            )
+        supplemental.append(
+            ValidationIssue(
+                code="A2L_ADDRESS_EXCEEDS_32BIT",
+                severity=ValidationSeverity.WARNING,
+                message=message,
+                artifact="a2l",
+                symbol=name or None,
+                address=address,
+            )
+        )
+    return supplemental
+
+
 def build_validation_report(
     records: list[dict],
     primary_file: Optional[LoadedFile],
@@ -138,8 +217,10 @@ def build_validation_report(
         - For MAC-only sessions, run MAC validator directly and skip coverage.
         - For primary-backed sessions, run full cross-artifact validator and optional A2L internals.
         - In BOTH branches, when the effective tag list is non-empty, merge the
-          ``supplemental_a2l_row_issues`` output (US-032 red-row reconcile) into the
-          collected issues before the ``dedupe_issues`` call (LLR-036.3).
+          ``supplemental_a2l_row_issues`` output (US-032 red-row reconcile) and the
+          ``supplemental_a2l_oversized_address_issues`` output (US-066 >32-bit
+          WARNING) into the collected issues before the ``dedupe_issues`` call
+          (LLR-036.3 / LLR-066.2).
         - De-duplicate and return the finalized issue list with optional coverage text.
 
     Dependencies:
@@ -148,6 +229,7 @@ def build_validation_report(
             - ``validate_artifact_consistency``
             - ``validate_a2l_internal_issues``
             - ``supplemental_a2l_row_issues``
+            - ``supplemental_a2l_oversized_address_issues``
         Used by:
             - ``S19TuiApp._compute_mac_view_payload``
             - TUI service tests
@@ -166,6 +248,9 @@ def build_validation_report(
         if tags_for_validation:
             mac_only_issues = mac_only_issues + supplemental_a2l_row_issues(
                 tags_for_validation, mac_only_issues
+            )
+            mac_only_issues = mac_only_issues + supplemental_a2l_oversized_address_issues(
+                tags_for_validation
             )
         report = ValidationReport(
             issues=dedupe_issues(mac_only_issues),
@@ -191,6 +276,9 @@ def build_validation_report(
     if tags_for_validation:
         merged_issues = merged_issues + supplemental_a2l_row_issues(
             tags_for_validation, merged_issues
+        )
+        merged_issues = merged_issues + supplemental_a2l_oversized_address_issues(
+            tags_for_validation
         )
     report.issues = dedupe_issues(merged_issues)
     issues = list(report.issues)

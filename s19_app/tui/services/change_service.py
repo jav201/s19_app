@@ -33,6 +33,8 @@ constraint C-7; verified by the subprocess-isolated probe in
 
 from __future__ import annotations
 
+import copy
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Sequence, Tuple
@@ -54,6 +56,7 @@ from ..changes import (
     collision_issues,
     read_change_document,
     save_patched_image,
+    serialize_change_document,
     verify_written_image,
     write_change_document,
 )
@@ -80,6 +83,13 @@ _CHECK_RESULT_SEVERITY: Dict[str, ValidationSeverity] = {
 
 #: How many byte tokens an entries-table value cell shows before eliding.
 _ROW_BYTES_PREVIEW = 8
+
+#: Maximum depth of the change-set undo history (US-068a / LLR-068a.1). Each
+#: document-mutating operation pushes ONE deep-copy snapshot; the stack evicts
+#: its oldest entry past this bound so a long editing session cannot grow the
+#: history without limit (risk R-B). Value assumed (Phase-3 flag): 20 change-
+#: set-level (not keystroke-level) snapshots is ample for interactive editing.
+_HISTORY_MAX = 20
 
 
 def parse_address(address_text: str) -> int:
@@ -345,6 +355,15 @@ class ChangeService:
         #: The result object of the most recent check run (``None`` before
         #: any run or when the seam is unfilled).
         self.last_check_result: Optional[object] = None
+        #: The change-set undo history (US-068a / LLR-068a.1): a bounded stack
+        #: of DEEP-COPY :class:`ChangeDocument` snapshots, each captured
+        #: immediately before a document-mutating operation. :meth:`undo` pops
+        #: from here; :meth:`_push_history` bounds it at :data:`_HISTORY_MAX`.
+        self._undo_stack: List[ChangeDocument] = []
+        #: The change-set redo stack — documents popped by :meth:`undo`,
+        #: replayable by :meth:`redo`; cleared by :meth:`_push_history` on any
+        #: fresh mutation (a new edit invalidates the redo future).
+        self._redo_stack: List[ChangeDocument] = []
 
     @staticmethod
     def _empty_document() -> ChangeDocument:
@@ -395,6 +414,91 @@ class ChangeService:
                 - PatchEditorPanel.refresh_entries
         """
         return not self.document.entries
+
+    # ------------------------------------------------------------------
+    # Change-set history — bounded deep-copy undo/redo (US-068a, LLR-068a.1/.2)
+    # ------------------------------------------------------------------
+
+    def _push_history(self) -> None:
+        """
+        Summary:
+            Capture a deep-copy snapshot of the current document onto the undo
+            stack immediately before a mutation, evicting the oldest snapshot
+            past :data:`_HISTORY_MAX` and clearing the redo stack (a fresh
+            mutation invalidates any redo future) — LLR-068a.1.
+
+        Data Flow:
+            - ``copy.deepcopy(self.document)`` → append to ``_undo_stack``;
+              trim the head past the bound; empty ``_redo_stack``.
+
+        Dependencies:
+            Uses:
+                - copy.deepcopy
+            Used by:
+                - add_entry / edit_entry / remove_entry / load / load_text
+        """
+        self._undo_stack.append(copy.deepcopy(self.document))
+        if len(self._undo_stack) > _HISTORY_MAX:
+            del self._undo_stack[0]
+        self._redo_stack.clear()
+
+    def undo(self) -> ChangeDocument:
+        """
+        Summary:
+            Restore the immediately-prior change-set (LLR-068a.2): replace the
+            live document with the top undo snapshot, pushing the current
+            document onto the redo stack. An empty undo stack is a no-op that
+            returns the unchanged document.
+
+        Returns:
+            ChangeDocument: The now-current document (the restored prior
+            change-set, or the unchanged document when the undo stack is empty).
+
+        Data Flow:
+            - Empty stack → return ``self.document`` unchanged.
+            - Else → push the live document onto ``_redo_stack``, pop the top
+              undo snapshot as the new live document, and reset
+              ``last_summary`` (a restored change-set has no matching apply).
+
+        Dependencies:
+            Used by:
+                - app.py ``on_patch_editor_panel_undo_requested``
+        """
+        if not self._undo_stack:
+            return self.document
+        self._redo_stack.append(self.document)
+        self.document = self._undo_stack.pop()
+        self.last_summary = None
+        return self.document
+
+    def redo(self) -> ChangeDocument:
+        """
+        Summary:
+            Re-apply the most-recently-undone change-set (LLR-068a.2): replace
+            the live document with the top redo snapshot, pushing the current
+            document onto the undo stack. An empty redo stack is a no-op that
+            returns the unchanged document.
+
+        Returns:
+            ChangeDocument: The now-current document (the re-applied change-set,
+            or the unchanged document when the redo stack is empty).
+
+        Data Flow:
+            - Empty stack → return ``self.document`` unchanged.
+            - Else → push the live document onto ``_undo_stack``, pop the top
+              redo snapshot as the new live document, and reset
+              ``last_summary``.
+
+        Dependencies:
+            Used by:
+                - app.py ``on_patch_editor_panel_redo_requested``
+        """
+        if not self._redo_stack:
+            return self.document
+        self._undo_stack.append(self.document)
+        self.document = self._redo_stack.pop()
+        self.last_summary = None
+        return self.document
 
     # ------------------------------------------------------------------
     # Entry mutation — both kinds (LLR-003.4)
@@ -514,6 +618,9 @@ class ChangeService:
             self._entry_index(address)
         except KeyError:
             entry = self._build_entry(address, value_text, bytes_text)
+            # US-068a / LLR-068a.1: snapshot the pre-mutation document (after
+            # validation, so a rejected input pushes no no-op snapshot).
+            self._push_history()
             self.document.entries.append(entry)
             return entry
         raise ValueError(
@@ -549,6 +656,9 @@ class ChangeService:
         address = parse_address(address_text)
         index = self._entry_index(address)
         entry = self._build_entry(address, value_text, bytes_text)
+        # US-068a / LLR-068a.1: snapshot the pre-mutation document (after the
+        # index lookup + build, so a KeyError / invalid input pushes nothing).
+        self._push_history()
         self.document.entries[index] = entry
         return entry
 
@@ -572,7 +682,137 @@ class ChangeService:
                 - app.py ``remove_entry`` action routing
         """
         address = parse_address(address_text)
-        del self.document.entries[self._entry_index(address)]
+        index = self._entry_index(address)
+        # US-068a / LLR-068a.1: snapshot the pre-mutation document (after the
+        # index lookup, so a KeyError on an absent address pushes nothing).
+        self._push_history()
+        del self.document.entries[index]
+
+    def entry_seed_json(self, index: int) -> str:
+        """
+        Summary:
+            Serialize the entry at ``index`` to its canonical wire-form JSON
+            as a SINGLE entry object (US-068b / LLR-068b.2) — the seed the
+            per-entry JSON popup (``EntryJsonScreen``) opens with. Distinct
+            from the whole-set popup seed (the full document): this returns
+            just ``{"type", "address", "value"|"bytes"}`` for one entry, so
+            the operator edits one entry in isolation.
+
+        Args:
+            index (int): The zero-based entry index — the selected row of
+                ``#patch_doc_entries_table`` (document order).
+
+        Returns:
+            str: The one entry's canonical wire-form JSON, ``indent=2``.
+
+        Raises:
+            IndexError: When ``index`` is out of range (the caller
+                bounds-checks against ``document.entries`` first).
+
+        Data Flow:
+            - Wrap the single entry in a one-entry :class:`ChangeDocument`
+              carrying the live document's header, run it through the
+              canonical :func:`serialize_change_document` writer, then extract
+              the sole ``entries[0]`` object — so the seed uses the SAME wire
+              form the per-entry parse route (:meth:`edit_entry_json`) accepts
+              and no entry-encoding logic is duplicated here.
+
+        Dependencies:
+            Uses:
+                - serialize_change_document
+            Used by:
+                - app.py ``on_patch_editor_panel_entry_edit_json_requested``
+        """
+        entry = self.document.entries[index]
+        probe = ChangeDocument(
+            format=self.document.format,
+            version=self.document.version,
+            kind=self.document.kind,
+            encoding=self.document.encoding,
+            value_mode=self.document.value_mode,
+            entries=[entry],
+        )
+        payload = json.loads(serialize_change_document(probe))
+        return json.dumps(payload["entries"][0], indent=2)
+
+    def edit_entry_json(self, index: int, text: str) -> ChangeActionResult:
+        """
+        Summary:
+            Replace ONLY the entry at ``index`` with an entry parsed from the
+            per-entry JSON popup's edited text (US-068b / LLR-068b.3), leaving
+            every other entry byte-identical. The edited single-entry text is
+            routed through the EXISTING validated document parser
+            (:func:`parse_change_document`) by splicing it into a one-entry
+            envelope built from the live document's header — the SAME
+            collect-don't-abort seam :meth:`load_text` uses — so per-entry
+            byte-validity / address-grammar rules and markup-safety apply and
+            NO new parse/apply path is introduced. Malformed JSON, or an entry
+            the parser rejects, leaves the document untouched and comes back as
+            a non-``ok`` result carrying the collected findings (never an
+            exception). A successful edit is a history-eligible mutation: it
+            snapshots the prior document (LLR-068a.1) before the in-place
+            replace.
+
+        Args:
+            index (int): The zero-based index of the entry to replace.
+            text (str): The edited single-entry JSON from the popup — one wire
+                entry object (``{"type", "address", "value"|"bytes"}``).
+
+        Returns:
+            ChangeActionResult: ``ok`` is ``True`` and ``message`` reports the
+            edit when the text parsed to exactly one valid entry; otherwise
+            ``ok`` is ``False``, the document is unchanged, and ``issues``
+            carries every collected finding.
+
+        Raises:
+            KeyError: When ``index`` is out of range for the current document.
+
+        Data Flow:
+            - Bounds-check ``index``; build a one-entry envelope from the live
+              header + the raw edited entry text; parse it through
+              :func:`parse_change_document` (collect-don't-abort).
+            - Reject (no mutation) when the parse produced an ERROR or did not
+              yield exactly one entry; otherwise snapshot the document and
+              replace ``entries[index]`` with the parsed entry.
+
+        Dependencies:
+            Uses:
+                - parse_change_document / _push_history
+            Used by:
+                - app.py ``_apply_entry_json_edit`` (per-entry popup Confirm)
+        """
+        if index < 0 or index >= len(self.document.entries):
+            raise KeyError(f"no change entry at index {index}")
+        # Route the edited entry through the validated document parser by
+        # splicing the raw text into a one-entry envelope built from the live
+        # document's (already-canonical) header. Malformed text makes the whole
+        # envelope invalid JSON, so parse_change_document reports MF-JSON-PARSE
+        # — identical to the whole-set popup route; the untrusted text is
+        # parsed, never eval'd.
+        header = json.dumps(
+            {
+                "format": self.document.format,
+                "version": self.document.version,
+                "kind": self.document.kind,
+                "encoding": self.document.encoding,
+                "value_mode": self.document.value_mode,
+            }
+        )
+        envelope_text = f'{header[:-1]}, "entries": [{text}]}}'
+        probe = parse_change_document(envelope_text)
+        if probe.has_errors or len(probe.entries) != 1:
+            return ChangeActionResult(
+                message="Patch Editor: entry edit rejected - see findings.",
+                issues=list(probe.issues),
+                ok=False,
+            )
+        self._push_history()
+        self.document.entries[index] = probe.entries[0]
+        return ChangeActionResult(
+            message=f"Patch Editor: entry {index} updated.",
+            issues=[],
+            ok=True,
+        )
 
     # ------------------------------------------------------------------
     # Document lifecycle — load / validate / save (LLR-003.4)
@@ -613,6 +853,9 @@ class ChangeService:
                 - app.py ``load_doc`` action routing
         """
         document = read_change_document(path_text.strip(), base_dir)
+        # US-068a / LLR-068a.1: snapshot the outgoing document before the
+        # replace, so an undo can restore the pre-load change-set.
+        self._push_history()
         self.document = document
         self.last_summary = None
         error_count = sum(
@@ -665,6 +908,9 @@ class ChangeService:
                 - app.py ``parse_paste`` action routing (LLR-014.2)
         """
         document = parse_change_document(text)
+        # US-068a / LLR-068a.1: snapshot the outgoing document before the
+        # replace, so an undo can restore the pre-paste change-set.
+        self._push_history()
         self.document = document
         self.last_summary = None
         error_count = sum(

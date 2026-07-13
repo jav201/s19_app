@@ -1699,6 +1699,83 @@ class PatchEditorPanel(ScrollableContainer):
             super().__init__()
             self.variant_id = variant_id
 
+    class VariantHelpRequested(Message):
+        """The operator activated the variant-selector info button (US-067).
+
+        Summary:
+            Posted by ``#patch_variant_info_button`` — the always-rendered
+            info affordance beside ``#patch_variant_select`` (LLR-067.1) — to
+            open the ``VariantHelpScreen`` discovery-help modal (LLR-067.3).
+            Carries no payload: it is a pure trigger, so ``app.py`` routes it
+            straight to ``push_screen(VariantHelpScreen())`` (LLR-067.2). The
+            button is unconditionally enabled (help is always available), so
+            this message may be posted in any project state.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_variant_help_requested``
+        """
+
+    class UndoRequested(Message):
+        """The operator activated the change-set Undo control (US-068a).
+
+        Summary:
+            Posted by ``#patch_undo_button`` — routed to
+            ``ChangeService.undo()`` (LLR-068a.2/.3). Carries no payload: it is
+            a pure trigger, so ``app.py`` restores the prior change-set and
+            re-renders the entries table. The button is DISABLED whenever a
+            file-backed document is loaded (LLR-068a.4 A-01 data-loss guard),
+            so this message is only posted for a paste-authored / empty
+            document.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_undo_requested``
+        """
+
+    class RedoRequested(Message):
+        """The operator activated the change-set Redo control (US-068a).
+
+        Summary:
+            Posted by ``#patch_redo_button`` — routed to
+            ``ChangeService.redo()`` (LLR-068a.2/.3). Carries no payload: it is
+            a pure trigger, so ``app.py`` re-applies the undone change-set and
+            re-renders the entries table. DISABLED for a file-backed document
+            (LLR-068a.4 A-01 guard), mirroring :class:`UndoRequested`.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_redo_requested``
+        """
+
+    class EntryEditJsonRequested(Message):
+        """The operator activated the per-entry Edit-JSON control (US-068b).
+
+        Summary:
+            Posted by ``#patch_entry_edit_json_button`` — the per-entry JSON
+            control (LLR-068b.1), DISTINCT from the whole-set
+            ``#patch_edit_json_button`` and the field-populate
+            ``#patch_entry_edit_button``. Carries the SELECTED row index of
+            ``#patch_doc_entries_table`` so ``app.py`` seeds ``EntryJsonScreen``
+            with that one entry's JSON and routes Confirm through the validated
+            per-entry apply (``ChangeService.edit_entry_json``). The button is
+            DISABLED whenever a file-backed document is loaded (LLR-068b.4 A-01
+            data-loss guard), so this message is only posted for a
+            paste-authored / empty document; with no rows the panel posts
+            nothing (no selection is a no-op).
+
+        Args:
+            index (int): The zero-based index of the selected entry row.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp.on_patch_editor_panel_entry_edit_json_requested``
+        """
+
+        def __init__(self, index: int) -> None:
+            super().__init__()
+            self.index = index
+
     def __init__(self) -> None:
         super().__init__(id="patch_editor_panel")
         #: The execution scope the selector currently shows (LLR-006.6) —
@@ -1851,7 +1928,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         yield Container(
             Label(
-                "Change document (v2 JSON)", classes="patch-section-title"
+                "Change document (JSON)", classes="patch-section-title"
             ),
             DataTable(
                 id="patch_doc_entries_table",
@@ -1885,7 +1962,25 @@ class PatchEditorPanel(ScrollableContainer):
                     Button("Add", id="patch_entry_add_button"),
                     Button("Edit", id="patch_entry_edit_button"),
                     Button("Remove", id="patch_entry_remove_button"),
+                    # US-068b / LLR-068b.1: the per-entry JSON editor for the
+                    # SELECTED entries-table row — distinct from the whole-set
+                    # #patch_edit_json_button and the field-populate
+                    # #patch_entry_edit_button. DISABLED for a file-backed
+                    # document via ``set_entry_edit_json_enabled`` (LLR-068b.4
+                    # A-01 data-loss guard).
+                    Button("Edit JSON", id="patch_entry_edit_json_button"),
                     id="patch_doc_entry_buttons",
+                ),
+                # US-068a / LLR-068a.3: change-set Undo / Redo in their OWN
+                # dedicated row (NOT #patch_doc_controls, whose 5-button census
+                # is pinned by test_tui_patch_layout / test_tui_patch_editor_v2)
+                # so no sibling census churns (C-26). Both are DISABLED for a
+                # file-backed document via ``set_undo_redo_enabled`` (LLR-068a.4
+                # A-01 data-loss guard), mirroring the Edit-JSON guard idiom.
+                Horizontal(
+                    Button("Undo", id="patch_undo_button"),
+                    Button("Redo", id="patch_redo_button"),
+                    id="patch_history_controls",
                 ),
                 id="patch_doc_entry_inputs",
             ),
@@ -1901,7 +1996,10 @@ class PatchEditorPanel(ScrollableContainer):
                     allow_blank=True,
                 ),
                 OsClipboardInput(
-                    placeholder="path to v2 change-set .json",
+                    placeholder=(
+                        "or type a path to the same change-set JSON "
+                        "(alternative to the patches/ dropdown)"
+                    ),
                     id="patch_doc_path_input",
                 ),
                 # batch-35 (US-057 / LLR-057.1): the mixed five-button row
@@ -1983,12 +2081,22 @@ class PatchEditorPanel(ScrollableContainer):
         yield Container(
             Container(
                 Label("Active variant", classes="patch-field-label"),
-                Select(
-                    [],
-                    id="patch_variant_select",
-                    prompt="Variants in project",
-                    allow_blank=True,
-                    disabled=True,
+                # US-067 / LLR-067.1: the info button is ALWAYS rendered beside
+                # the selector (the Select is 1fr, the "?" button auto-width, so
+                # both share the row) so its click target always exists — the
+                # help modal is discovery help, unconditionally enabled. The
+                # Select keeps its id; set_variants / on_select_changed still
+                # find it (query_one walks descendants).
+                Horizontal(
+                    Select(
+                        [],
+                        id="patch_variant_select",
+                        prompt="Variants in project",
+                        allow_blank=True,
+                        disabled=True,
+                    ),
+                    Button("?", id="patch_variant_info_button"),
+                    id="patch_variant_select_row",
                 ),
                 id="patch_variant_row",
             ),
@@ -2212,6 +2320,37 @@ class PatchEditorPanel(ScrollableContainer):
                     ).text
                 )
             )
+            return
+        if button_id == "patch_variant_info_button":
+            # US-067 / LLR-067.1/.2: open the variant-selector help modal. A
+            # pure trigger — post a payload-free request; the app pushes
+            # ``VariantHelpScreen`` (no variant-set access, no routed action).
+            event.stop()
+            self.post_message(self.VariantHelpRequested())
+            return
+        if button_id == "patch_undo_button":
+            # US-068a / LLR-068a.3: pure trigger — the app calls
+            # ``ChangeService.undo()`` and re-renders. Disabled for a
+            # file-backed document (LLR-068a.4), so a press is history-safe.
+            event.stop()
+            self.post_message(self.UndoRequested())
+            return
+        if button_id == "patch_redo_button":
+            event.stop()
+            self.post_message(self.RedoRequested())
+            return
+        if button_id == "patch_entry_edit_json_button":
+            # US-068b / LLR-068b.1: open the per-entry JSON popup for the
+            # SELECTED entries-table row. Carry the selected row index; the app
+            # seeds ``EntryJsonScreen`` with that one entry's JSON and routes
+            # Confirm through the validated per-entry apply. With no rows there
+            # is no selection → no-op. Disabled for a file-backed document
+            # (LLR-068b.4), so a press here is paste-authored only.
+            event.stop()
+            table = self.query_one("#patch_doc_entries_table", DataTable)
+            if table.row_count == 0:
+                return
+            self.post_message(self.EntryEditJsonRequested(table.cursor_row))
             return
         if button_id == "patch_execute_scope_button":
             # Selector state only — cycle the scope and relabel; no message
@@ -2460,6 +2599,57 @@ class PatchEditorPanel(ScrollableContainer):
                 - ``S19TuiApp`` Patch Editor action / change-file handlers
         """
         self.query_one("#patch_edit_json_button", Button).disabled = not enabled
+
+    def set_undo_redo_enabled(self, enabled: bool) -> None:
+        """Toggle the Undo/Redo controls' enabled state (US-068a, A-01 guard).
+
+        Summary:
+            Enable or disable ``#patch_undo_button`` and ``#patch_redo_button``
+            together so change-set undo/redo is available ONLY for a
+            paste-authored / empty document — the LLR-068a.4 data-loss guard.
+            The app calls this after every action with
+            ``enabled = document.source_path is None``: a file-backed document
+            (``source_path is not None``) disables both controls so a
+            file-backed change document can never be silently mutated or
+            replaced through the history path (batch-37 ``set_edit_json_enabled``
+            precedent).
+
+        Args:
+            enabled (bool): ``True`` to enable both controls (paste-authored /
+                empty document); ``False`` to disable them (file-backed).
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp`` Patch Editor action / change-file / history
+                  handlers
+        """
+        self.query_one("#patch_undo_button", Button).disabled = not enabled
+        self.query_one("#patch_redo_button", Button).disabled = not enabled
+
+    def set_entry_edit_json_enabled(self, enabled: bool) -> None:
+        """Toggle the per-entry Edit-JSON control's enabled state (US-068b).
+
+        Summary:
+            Enable or disable ``#patch_entry_edit_json_button`` so the
+            per-entry JSON popup opens ONLY for a paste-authored / empty
+            document — the LLR-068b.4 A-01 data-loss guard. The app calls this
+            after every action with ``enabled = document.source_path is None``:
+            a file-backed document (``source_path is not None``) disables the
+            control so a per-entry edit can never silently mutate the loaded
+            document (batch-37 ``set_edit_json_enabled`` precedent).
+
+        Args:
+            enabled (bool): ``True`` to enable the control (paste-authored /
+                empty document); ``False`` to disable it (file-backed).
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp`` Patch Editor action / change-file / history
+                  handlers
+        """
+        self.query_one(
+            "#patch_entry_edit_json_button", Button
+        ).disabled = not enabled
 
     def refresh_check_results(
         self, rows: Sequence[object], status_line: str

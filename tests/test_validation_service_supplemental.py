@@ -633,3 +633,114 @@ def test_tc_037_4_no_primary_session_keeps_the_clear(tmp_path: Path) -> None:
             assert app._validation_report is None
 
     asyncio.run(_run())
+
+
+# ---------------------------------------------------------------------------
+# Layer A — US-066 (B-17) oversized-address WARNING producer (batch-38).
+# TC-333 (LLR-066.1): producer emits one WARNING per >32-bit tag naming it.
+# TC-334 (LLR-066.2): the WARNING merges into build_validation_report in BOTH
+#   branches and its severity round-trips css_class_for_severity -> sev-warning.
+# TC-335 (LLR-066.3 boundary): 0xFFFFFFFF is inclusive-safe (no warn), the next
+#   int warns, and None / non-int addresses never warn.
+# The producer is imported lazily so this module still collected (and the TCs
+# ran RED) on the pre-implementation tree, where the symbol did not yet exist.
+# ---------------------------------------------------------------------------
+
+OVERSIZED_CODE = "A2L_ADDRESS_EXCEEDS_32BIT"
+
+
+def test_tc_333_oversized_address_producer_emits_named_warning() -> None:
+    from s19_app.tui.services.validation_service import (
+        supplemental_a2l_oversized_address_issues,
+    )
+
+    issues = supplemental_a2l_oversized_address_issues(
+        [{"name": "BIG_TAG", "address": 0x1_0000_0000, "length": 2}]
+    )
+
+    assert len(issues) == 1
+    issue = issues[0]
+    assert issue.code == OVERSIZED_CODE
+    assert issue.severity == ValidationSeverity.WARNING
+    assert issue.artifact == "a2l"
+    assert issue.symbol == "BIG_TAG"
+    assert issue.address == 0x1_0000_0000
+    # C-10 content: the WARNING names the offending tag, not merely "an issue".
+    assert "BIG_TAG" in issue.message
+
+
+def test_tc_334_oversized_warning_merges_in_both_branches_and_colours() -> None:
+    from s19_app.tui.color_policy import css_class_for_severity
+
+    big_tags = [{"name": "BIG_TAG", "address": 0x1_0000_0000, "length": 2}]
+    empty_a2l = {"sections": [], "errors": [], "tags": []}
+
+    def identity(issues: list[ValidationIssue]) -> list[ValidationIssue]:
+        return issues
+
+    # MAC-only branch (primary_file=None).
+    _, mac_only_issues, coverage = build_validation_report(
+        records=[],
+        primary_file=None,
+        a2l_data=empty_a2l,
+        a2l_enriched_tags=big_tags,
+        dedupe_issues=identity,
+    )
+    assert coverage is None
+    mac_only = [i for i in mac_only_issues if i.code == OVERSIZED_CODE]
+    assert len(mac_only) == 1 and mac_only[0].symbol == "BIG_TAG"
+
+    # Primary-backed branch.
+    loaded = LoadedFile(
+        path=Path("img.s19"),
+        file_type="s19",
+        mem_map={0x1000: 0x00},
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1001)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+    _, primary_issues, _ = build_validation_report(
+        records=[],
+        primary_file=loaded,
+        a2l_data=empty_a2l,
+        a2l_enriched_tags=big_tags,
+        dedupe_issues=identity,
+    )
+    primary = [i for i in primary_issues if i.code == OVERSIZED_CODE]
+    assert len(primary) == 1 and primary[0].symbol == "BIG_TAG"
+
+    # Colour contract: WARNING round-trips through the frozen policy map.
+    assert css_class_for_severity(primary[0].severity) == "sev-warning"
+
+
+def test_tc_335_oversized_address_boundary_and_non_int() -> None:
+    from s19_app.tui.services.validation_service import (
+        supplemental_a2l_oversized_address_issues,
+    )
+
+    # C-10 boundary: 0xFFFFFFFF (32-bit max) is NOT oversized; the next int is.
+    assert (
+        supplemental_a2l_oversized_address_issues(
+            [{"name": "EDGE", "address": 0xFFFFFFFF, "length": 2}]
+        )
+        == []
+    )
+    over = supplemental_a2l_oversized_address_issues(
+        [{"name": "OVER", "address": 0x1_0000_0000, "length": 2}]
+    )
+    assert len(over) == 1 and over[0].symbol == "OVER"
+
+    # Non-int / None / string addresses never warn (A-1: guards isinstance int).
+    assert (
+        supplemental_a2l_oversized_address_issues(
+            [
+                {"name": "NONE_ADDR", "address": None},
+                {"name": "STR_ADDR", "address": "0x100000000"},
+                {"name": "NO_ADDR_KEY"},
+            ]
+        )
+        == []
+    )

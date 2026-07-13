@@ -1,16 +1,17 @@
 # s19_app — dev-flow BACKLOG (cross-batch, prioritized)
 
-> Single prioritized queue for open feature work. `origin/main` tip = `978a900` (batch-36 snapshot
-> baselines, PR #67 merged); **batch-37 (US-061 persistent report control · US-062 entropy
-> paging+sort · US-063 entropy legend+clickable strip · US-064a patch refresh · US-064b JSON popup)
-> pending commit/PR.** **RC-1 every batch open:** `git fetch`; assert merge-base == origin/main tip;
-> cut a fresh branch off origin/main; per-story already-shipped grep before deriving.
-> **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/, tui/a2l.py,
-> tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`). ≤5 files/increment;
-> every behavioral change ships a black-box `AT-NNN` shown failing pre-fix; commits/PRs only on
-> operator approval; **ask the approval model at every batch kickoff — a standing authorization is
-> never carried across batches** (feedback_standing_auth_per_batch). **Last refresh: 2026-07-12
-> (batch-37 close).**
+> Single prioritized queue for open feature work. `origin/main` tip = `5a6c45b` (batch-37 merged —
+> PRs #68 `18f1d30` + snapshot #69 `5a6c45b`); **batch-38 (US-065 label · US-066 A2L >32-bit WARNING ·
+> US-067 variant info modal · US-068a undo/redo · US-068b per-entry JSON popup — the entire P3 pool
+> B-16/B-17/B-18/B-19) pending commit/PR.** **RC-1 every batch open:** `git fetch`; assert merge-base
+> == origin/main tip; cut a fresh branch off origin/main; per-story already-shipped grep before
+> deriving. **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/,
+> tui/a2l.py, tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`) — AND the
+> frozen TEST files (`_ENGINE_TEST_FILES`: test_tui_a2l.py, test_tui_mac.py, test_validation_*, …;
+> batch-38 F-1 lesson). ≤5 files/increment; every behavioral change ships a black-box `AT-NNN` shown
+> failing pre-fix; commits/PRs only on operator approval; **ask the approval model at every batch
+> kickoff — a standing authorization is never carried across batches**
+> (feedback_standing_auth_per_batch). **Last refresh: 2026-07-12 (batch-38 close).**
 
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct, direct(global ~/.claude)}
@@ -25,15 +26,9 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 ## OPEN QUEUE
 
 ### P3 — low
-- **B-16 — v2-path relabel.** Relabel the v2 change-set path for operator clarity. **Flow:**
-  `direct` micro-PR or fold.
-- **B-17 — A2L >32-bit defensive warning.** Emit a defensive warning when an A2L address/extent
-  exceeds 32 bits. **Flow:** `/dev-flow` (touches parse-adjacent surfaces — keep off the frozen
-  engine; TUI-side warning only).
-- **B-18 — info buttons.** Add per-section info buttons across the TUI. **Flow:** `/dev-flow` or
-  `/prototype` first.
-- **B-19 — patch undo/redo.** Undo/redo for patch-editor edits (US-058 explicitly excluded it;
-  batch-37 US-064b explicitly left undo/redo out of scope). **Flow:** `/dev-flow`.
+- **B-16/B-17/B-18/B-19 — SHIPPED batch-38 (US-065/066/067/068a/068b).** The entire P3 pool is
+  CLOSED (pending commit/PR). See DONE below. What remains open is the Bookmarks scaffold + hygiene
+  carries.
 
 ### Dead scaffold (own future batch)
 - **Bookmarks screen** — rail item 8 is a dead "coming soon" placeholder; the one clear TUI gap.
@@ -49,11 +44,23 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
   (coverage-% `.6f` display; A2L-symbol region names + per-cell tooltips R-TUI-041 R-3;
   pre-existing full-suite TUI global-state flake). See baseline backlog for detail.
 - **Native bracketed-paste 64 KiB cap gap (P3, NEW — batch-37 surfaced, US-064-adjacent,
-  PRE-EXISTING).** Neither `#patch_paste_text` nor the new `#changeset_json_text` popup caps
-  Textual's native bracketed paste at 64 KiB; the 65 KiB `os_clipboard_input` funnel guards a
-  *different* ingress. Surfaced by the S-01 spec-premise correction
-  (`.dev-flow/2026-07-11-batch-37/05-postmortem.md` §2 F-2 / §6). US-064b added no new uncapped
-  ingress, so this is a separate item, not a batch-37 regression. **Flow:** `/dev-flow` or `direct`.
+  PRE-EXISTING; batch-38 EXTENDS).** Neither `#patch_paste_text`, the batch-37 `#changeset_json_text`
+  popup, NOR batch-38's new `#entry_json_text` per-entry popup caps Textual's native bracketed paste
+  at 64 KiB; the 65 KiB `os_clipboard_input` funnel guards a *different* ingress. Include
+  `#entry_json_text` when this carry lands. **Flow:** `/dev-flow` or `direct`.
+- **batch-38 LOW review carries (P3, NEW).** All reviewer-accepted non-blocking. Inc-4 F1: the Checks
+  results panel goes stale after undo/redo (`last_check_result` not reset in `undo`/`redo`;
+  `_refresh_patch_history_view` refreshes entries+issues but not check-results) — secondary
+  user-invoked surface. Inc-4 F2: undo/redo discoverability is below the entries-pane fold →
+  proposed `ctrl+z`/`ctrl+y` key bindings routed to the same `UndoRequested`/`RedoRequested`
+  messages. Inc-5 F1: a per-entry edit that changes an address to collide with a sibling passes the
+  per-entry parse but is re-detected + blocked at the document Validate/Apply/Save gate (by-design,
+  LLR-068b.3). Detail: `.dev-flow/2026-07-12-batch-38/05-postmortem.md` §6.
+- **batch-38 patch snapshot regen (P3, NEW).** The 2 `patch` density cells
+  (`test_tc016s_density_layout_snapshot[patch-comfortable-80x24 / -120x30]`) are `xfail(strict=False)`
+  from US-065's copy change + US-067's info button (`_batch38_drift_marks`, `test_tui_snapshot.py`).
+  Regenerate ONLY in canonical CI **post-merge** (local regen drifts unrelated baselines), then
+  retire the xfails + the helper. A follow-up snapshot-baselines PR, as in #67/#69.
 - **~9 LOW review carries (P3, NEW — batch-37 increment reviews).** All reviewer-accepted as
   non-blocking; groom only if they recur. Inc-1: TC-328 uses a status-line proxy for the None-guard.
   Inc-2: AT-061a activation via `.press()` not `pilot.click` (zero suite precedent; still routes
@@ -97,16 +104,27 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 
 ---
 
-## DONE (batches 31–37, shipped) — do NOT redo, verify-shipped if in doubt
-- **batch-37 (US-061/062/063/064a/064b — the entire P2 set B-11/B-12/B-13/B-14) — pending
-  commit/PR.** US-061 (B-11) persistent before/after-report control replacing the transient notify
+## DONE (batches 31–38, shipped) — do NOT redo, verify-shipped if in doubt
+- **batch-38 (US-065/066/067/068a/068b — the entire P3 pool B-16/B-17/B-18/B-19) — pending
+  commit/PR.** US-065 (B-16) change-set free-path label clarity — title `"Change document (JSON)"` +
+  placeholder framed as an alternative to the `patches/` dropdown (R-TUI-054); US-066 (B-17) defensive
+  `A2L_ADDRESS_EXCEEDS_32BIT` WARNING for tag addresses > 0xFFFFFFFF, produced TUI-side in
+  `services/validation_service.py` (engine frozen), C-17 markup-safe (R-TUI-055); US-067 (B-18)
+  variant-selector info button → `VariantHelpScreen` modal (R-TUI-056); US-068a (B-19) patch-editor
+  undo/redo, bounded deep-copy history `_HISTORY_MAX=20` in ChangeService + A-01 file-loaded guard
+  (R-TUI-057); US-068b (B-19) per-entry JSON popup `EntryJsonScreen` (single-entry seed, validated
+  `parse_change_document`) + A-01 guard (R-TUI-058). REQUIREMENTS §35. Gate green
+  (`1377 passed, 2 skipped, 5 xfailed, 0 failed`; ledger 1358→1377, +19); 6/6 black-box ATs C-18
+  single-node; frozen 0 (source + test). Autonomous + self-merge (operator grant, batch-38-only).
+  Root causes: F-1 frozen-TEST-file guard gap (AT-066a briefly in frozen test_tui_a2l.py, fixed
+  test-only); F-2 Phase-1 multi-author contract drift (Phase-2 caught). No scope drift.
+- **batch-37 (US-061/062/063/064a/064b — the entire P2 set B-11/B-12/B-13/B-14) — MERGED PRs #68
+  `18f1d30` + snapshot #69 `5a6c45b`.** US-061 (B-11) persistent before/after-report control
   (R-TUI-049); US-062 (B-12) entropy viewer paging past the 512 cap + entropy/address sort
   (R-TUI-050); US-063 (B-13) entropy band-colour legend + clickable strip cells that navigate
   (R-TUI-051); US-064a (B-14) patch-editor Refresh re-reads the file over `document.source_path`
   (R-TUI-052); US-064b (B-14) full-size JSON popup editor with the file-loaded disable-guard
-  closing the A-01 data-loss footgun (R-TUI-053). REQUIREMENTS §34. Gate green
-  (`1358 passed, 2 skipped, 5 xfailed, 0 failed`; ledger 1369→1385, +16); 8/8 black-box ATs; frozen
-  0. Autonomous + self-merge (operator grant, batch-37-only).
+  (R-TUI-053). REQUIREMENTS §34.
 - **batch-36 (US-058/059/060) — snapshot PR #67 merged (`978a900` tip line).** US-058 (B-22)
   patch-editor readable paste box reparented (R-TUI-046); US-059 (B-24) hex-view colour legend in
   modal + report (R-TUI-047); US-060 (B-23) fixtures relocated to `examples/` + 54 MB duplicate A2L
@@ -131,22 +149,27 @@ before/after report (#12(a)+(c)) + entropy viewer (#12(b), b26) + variant dropdo
 Full detail: `.dev-flow/project_baseline_backlog_2026-07-09.md` and the vault batch log.
 
 ## Controls encoded (global `~/.claude` / templates) — do NOT re-encode
-RC-1, C-1..C-25 (canonical record: `project_devflow_control_lineage.md`). Headliners since the last
-refresh: **C-23 (geometry pilot-measured, not fr-math)**, **C-24 (report byte-identity goldens in the
-supersession census)**, **C-25 (orchestrator owns the Phase-4 gate run)** — all encoded 2026-07-11
-(batch-36). **batch-37 proposes C-26 (census cross-file sweep, extends C-14 — TC-319 origin)** —
-awaiting per-control operator approval before it enters the lineage. Standing: two-layer AT/TC + dual
-traceability; inline-paste-at-gates; writer-census sweeps (C-14 / C-15.1); dev-flow control-encode
-approval (always ask before editing `~/.claude/commands/`).
+RC-1, C-1..C-26 (canonical record: `project_devflow_control_lineage.md`). **C-26 (touched-symbol
+reverse census — generalizes C-14 + C-24) ENCODED 2026-07-12 (batch-37).** **batch-38 proposes
+C-CAND-A (primary): the per-increment frozen-file guard must run BOTH `test_engine_unchanged` (SOURCE
+freeze) AND `test_tc032`/`test_tc031` (engine TEST-file freeze) — origin batch-38 F-1, a stray AT in
+frozen `test_tui_a2l.py` passed the increment gate because only the source-freeze guard ran; and
+C-CAND-B (secondary): a Phase-1 shared-contract convergence step (issue codes / producer sink / AT
+targets reconciled across §4/intake/PLAN/01b before the Phase-2 gate) — origin F-2.** Both await
+per-control operator approval before entering the lineage. Standing: two-layer AT/TC + dual
+traceability; inline-paste-at-gates; writer-census sweeps (C-14 / C-15.1 / C-26); dev-flow
+control-encode approval (always ask before editing `~/.claude/commands/`).
 
 ---
 
 ## Proposed sequence (pending operator approval — do NOT derive yet)
-1. **Bookmarks screen** — dead scaffold; own batch, spec first. P2–P3.
-2. **B-16..B-19** — the P3 pool (v2-path relabel, A2L >32-bit warning, info buttons, patch
-   undo/redo). Fold or small batches.
+1. **batch-38 patch snapshot regen** — post-merge canonical-CI regen of the 2 `patch` xfail cells +
+   retire `_batch38_drift_marks`. Follow-up PR like #67/#69. (Do FIRST after batch-38 merge.)
+2. **Bookmarks screen** — dead scaffold; own batch, spec first. P2–P3.
 3. **Hygiene carries** — S-F7, canonicalizer consolidation, `__setattr__` retire, P-1/P-2/P-3,
-   native bracketed-paste 64 KiB cap gap, batch-37 entropy snapshot regen (post-merge), ~9 LOW
-   review carries. Fold opportunistically.
+   native bracketed-paste 64 KiB cap gap (incl. `#entry_json_text`), batch-38 LOW carries (Inc-4
+   checks-panel-stale, ctrl+z/y binding; Inc-5 cross-entry collision note). Fold opportunistically.
+4. **C-CAND-A/B encode decision** — operator per-control approval before editing `~/.claude/commands/`.
 
-Operator confirms / reorders.
+The entire B-01..B-24 backlog is now shipped (P1 batches 31–35, P2 batch-37, P3 batch-38); what
+remains is the Bookmarks scaffold + hygiene. Operator confirms / reorders.
