@@ -32,7 +32,6 @@ from s19_app.tui.changes.io import emit_s19_from_mem_map
 from s19_app.tui.screens import (
     ENTROPY_BAND_COLOUR,
     ENTROPY_MAX_ROWS,
-    ENTROPY_STRIP_MAX_CELLS,
     EntropyViewerScreen,
 )
 from s19_app.tui.services.load_service import build_loaded_s19
@@ -348,8 +347,8 @@ def test_tc036_4_e_binding_registered() -> None:
 
 def test_tc036_5_cost_cap_and_truncation(large_s19: Path) -> None:
     """On the 200x4KB ``large_s19`` image (>>512 windows), page 0 renders at
-    most ``ENTROPY_STRIP_MAX_CELLS`` strip cells and ``ENTROPY_MAX_ROWS`` jump
-    rows (the per-page budget still bounds cost) AND a ``page P/Q`` position
+    most ``ENTROPY_MAX_ROWS`` strip cells and jump rows (the per-page budget
+    still bounds cost) AND a ``page P/Q`` position
     indicator is present with Q > 1 (the tail is reachable by paging, not
     silently dropped — the batch-37 US-062 redefinition of the batch-26
     truncation node, Q-02)."""
@@ -360,11 +359,10 @@ def test_tc036_5_cost_cap_and_truncation(large_s19: Path) -> None:
     screen = EntropyViewerScreen(loaded.mem_map)
     # Precondition: the image genuinely exceeds one page (else the test is
     # vacuous — it would pass for a tiny image too).
-    assert len(screen._windows) > ENTROPY_STRIP_MAX_CELLS
     assert len(screen._windows) > ENTROPY_MAX_ROWS
 
     strip = screen._strip_text()
-    assert len(strip.plain) <= ENTROPY_STRIP_MAX_CELLS
+    assert len(strip.plain) <= ENTROPY_MAX_ROWS
 
     async def _drive() -> tuple[int, int, bool, str]:
         from s19_app.tui.app import S19TuiApp
@@ -385,7 +383,7 @@ def test_tc036_5_cost_cap_and_truncation(large_s19: Path) -> None:
             return n_cells, n_rows, present, text
 
     n_cells, n_rows, present, text = asyncio.run(_drive())
-    assert n_cells <= ENTROPY_STRIP_MAX_CELLS
+    assert n_cells <= ENTROPY_MAX_ROWS
     assert n_rows <= ENTROPY_MAX_ROWS
     assert present, "no page indicator shown when window count exceeds one page"
     # `page 1/Q` with Q > 1 — the tail is reachable by paging, not truncated.
@@ -414,7 +412,6 @@ def test_tc036_5_truncation_fires_on_either_cap(
     small_budget = n_windows // 4  # force ~4 pages
     assert small_budget >= 1
     monkeypatch.setattr(screens_module, "ENTROPY_MAX_ROWS", small_budget)
-    monkeypatch.setattr(screens_module, "ENTROPY_STRIP_MAX_CELLS", small_budget)
     expected_pages = (n_windows + small_budget - 1) // small_budget
 
     async def _drive() -> tuple[int, str]:
@@ -772,7 +769,6 @@ def test_at063b_click_strip_cell_dismisses_with_address(
     # Force two pages over the 3-window image so the click path is exercised
     # under a non-trivial page slice (never edits the production value).
     monkeypatch.setattr(screens_module, "ENTROPY_MAX_ROWS", 2)
-    monkeypatch.setattr(screens_module, "ENTROPY_STRIP_MAX_CELLS", 2)
 
     def _drive_click(cell_id: str) -> object:
         async def _run() -> object:

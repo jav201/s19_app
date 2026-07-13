@@ -47,6 +47,8 @@ from s19_app.tui.changes.model import ChangeSummary, ChangeSummaryEntry
 from s19_app.tui.screens_directionb import PatchEditorPanel
 from s19_app.tui.services.load_service import build_loaded_s19
 
+from conftest import canonical_report_bytes
+
 #: Black-box pin of the LLR-038.2 filename scheme (module-independent so the
 #: AT never imports the composer; ownership is asserted in TC-038.3).
 _MD_NAME = re.compile(r"^\d{8}T\d{6}Z(-\d{2})?-before-after-report\.md$")
@@ -701,23 +703,13 @@ def test_tc_038_5_module_imports_no_textual_and_no_logging() -> None:
 #: batch base revision ``79699a5`` by driving the shipped ``b``-key flow
 #: under the environment pin declared in :func:`_drive_bkey_report_pair`
 #: (golden home: ``tests/goldens/batch35/`` — canonical form, see
-#: :func:`_canonical_report_bytes`).
+#: :func:`canonical_report_bytes`).
 _GOLDEN_DIR = Path(__file__).parent / "goldens" / "batch35"
 _AT054B_MD_GOLDEN = _GOLDEN_DIR / "at054b-before-after-report.md"
 _AT054B_HTML_GOLDEN = _GOLDEN_DIR / "at054b-before-after-report.html"
 
 #: The LLR-054.4 fixed-clock environment-pin instant (UTC).
 _FIXED_REPORT_INSTANT = datetime(2026, 7, 10, 12, 0, 0, tzinfo=timezone.utc)
-
-#: Placeholder replacing every spelling of the per-run pytest tmp root
-#: inside canonical report bytes.
-_RUN_ROOT_TOKEN = b"<RUN-ROOT>"
-
-#: A run-root path span: the token plus its path remainder, stopping at the
-#: delimiters the reports place around paths (whitespace, backtick, quote,
-#: pipe, closing paren/bracket) — separator normalization applies ONLY
-#: inside these spans, never to report content.
-_RUN_ROOT_SPAN = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
 
 
 class _FixedApplyDatetime(datetime):
@@ -754,52 +746,6 @@ class _FixedApplyDatetime(datetime):
         if tz is None:
             return cls(2026, 7, 10, 12, 0, 0)
         return cls(2026, 7, 10, 12, 0, 0, tzinfo=tz)
-
-
-def _canonical_report_bytes(raw: bytes, run_root: Path | None = None) -> bytes:
-    """
-    Summary:
-        Map report bytes to the canonical golden form of the LLR-054.4/055.3
-        byte-identity pin: platform newline translation undone (CRLF -> LF,
-        the ``Path.write_text`` seam — generators join with ``"\\n"`` and let
-        the platform translate), every spelling of the per-run pytest tmp
-        root replaced by ``<RUN-ROOT>``, and path separators normalized to
-        ``/`` ONLY inside run-root path spans — content bytes (including the
-        batch-34 ``\\|`` linkage-cell escapes) are never rewritten.
-
-    Args:
-        raw (bytes): Report bytes as read from disk (a freshly written
-            report, or a stored golden).
-        run_root (Path | None): The per-run root whose spellings are
-            tokenized; ``None`` for stored goldens (already tokenized at
-            capture time — only the CRLF undo applies, shielding the golden
-            from git working-tree newline translation).
-
-    Returns:
-        bytes: The canonical byte form compared by AT-054b / AT-055b.
-
-    Data Flow:
-        - written report bytes + ``tmp_path`` -> canonical bytes;
-        - golden bytes (``run_root=None``) -> canonical bytes;
-        - equality of the two IS the LLR-054.4/055.3 byte-identity gate
-          (raw bytes cannot be run/platform-stable: the reports embed the
-          absolute run root in their provenance/inventory path lines).
-
-    Dependencies:
-        Uses:
-            - _RUN_ROOT_TOKEN / _RUN_ROOT_SPAN
-        Used by:
-            - test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden
-            - the batch-35 golden-capture procedure (increment-000)
-    """
-    data = raw.replace(b"\r\n", b"\n")
-    if run_root is not None:
-        forms = {str(run_root), str(run_root.resolve())}
-        for form in sorted(forms, key=len, reverse=True):
-            data = data.replace(form.encode("utf-8"), _RUN_ROOT_TOKEN)
-    return _RUN_ROOT_SPAN.sub(
-        lambda match: match.group(0).replace(b"\\", b"/"), data
-    )
 
 
 def _drive_bkey_report_pair(
@@ -900,7 +846,7 @@ def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
       — the apply-stamp clock (inline default at ``apply.py:313-314``, no
       ``_default_now`` symbol exists there) whose stamp is printed as the
       ``Applied (UTC)`` report line.
-    Comparison runs on :func:`_canonical_report_bytes` (CRLF undo +
+    Comparison runs on :func:`canonical_report_bytes` (CRLF undo +
     per-run tmp-root tokenization); all other bytes are compared exact.
     Goldens: ``tests/goldens/batch35/at054b-before-after-report.{md,html}``.
     Double-proof (batch-24 control): a one-byte golden perturbation makes
@@ -923,8 +869,8 @@ def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
             f"AT-054b: golden fixture missing: {golden_path} (captured in "
             f"batch-35 increment-000 at base revision 79699a5)"
         )
-        observed = _canonical_report_bytes(written[name], tmp_path)
-        golden = _canonical_report_bytes(golden_path.read_bytes())
+        observed = canonical_report_bytes(written[name], tmp_path)
+        golden = canonical_report_bytes(golden_path.read_bytes())
         assert observed == golden, (
             f"AT-054b: unfiltered {label} report bytes drifted from golden "
             f"{golden_path.name} (LLR-054.4 byte-identity, canonical form)"
@@ -939,8 +885,10 @@ def test_at_054b_no_filter_bkey_report_pair_byte_identical_to_golden(
 def _resolved_matcher(symbols=(), addresses=(), name="cal-filter.json"):
     """Resolved ``ReportFilterMatcher`` via the public parse+resolve API.
 
-    ``name`` rides as the duck-typed ``source_name`` display attribute the
-    audit header reads (in-cap Inc-2 decision — see increment-002.md).
+    ``name`` is passed to ``resolve_report_filter(..., source_name=name)``,
+    which stamps the declared ``ReportFilterMatcher.source_name`` field the
+    audit header reads (batch-41 retired the earlier frozen-dataclass
+    attribute bypass now that the field and the resolver param exist).
     """
     import json
 
@@ -963,10 +911,7 @@ def _resolved_matcher(symbols=(), addresses=(), name="cal-filter.json"):
     )
     flt, errors = parse_report_filter(doc)
     assert errors == []
-    matcher = resolve_report_filter(flt, [], [])
-    if name is not None:
-        object.__setattr__(matcher, "source_name", name)
-    return matcher
+    return resolve_report_filter(flt, [], [], source_name=name)
 
 
 def test_tc311_composer_forwards_matcher_filtered_output_both_formats(

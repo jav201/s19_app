@@ -22,7 +22,6 @@ from __future__ import annotations
 import dataclasses
 import shutil
 from pathlib import Path
-from typing import Optional
 
 import pytest
 

@@ -1179,10 +1179,10 @@ def test_ac5_markers_unchanged(tmp_path: Path) -> None:
 def _report_matcher(symbols=(), addresses=(), name="cal-filter.json"):
     """Resolved matcher via the public parse+resolve API (LLR-053.7).
 
-    ``name`` is attached as the duck-typed ``source_name`` display attribute
-    the audit header reads (in-cap Inc-2 decision: the frozen dataclass has
-    no slots, so ``object.__setattr__`` carries the display name until a
-    later increment promotes it to a declared field on the matcher).
+    ``name`` is passed to ``resolve_report_filter(..., source_name=name)``,
+    which stamps the declared ``ReportFilterMatcher.source_name`` field the
+    audit header reads (batch-41 retired the earlier frozen-dataclass
+    attribute bypass now that the field and the resolver param exist).
     """
     doc = json.dumps(
         {
@@ -1198,10 +1198,7 @@ def _report_matcher(symbols=(), addresses=(), name="cal-filter.json"):
     )
     flt, errors = parse_report_filter(doc)
     assert errors == []
-    matcher = resolve_report_filter(flt, [], [])
-    if name is not None:
-        object.__setattr__(matcher, "source_name", name)
-    return matcher
+    return resolve_report_filter(flt, [], [], source_name=name)
 
 
 def _two_disjoint_run_fixture() -> tuple:
