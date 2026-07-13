@@ -1293,7 +1293,13 @@ class S19TuiApp(App):
         # above the footer so `set_status` / `set_file_status` / `set_progress`
         # / the log tail keep a stable target on every screen (increment 7).
         yield Container(
-            Label("Ready.", id="status_text"),
+            # batch-39 (S3, C-17): #status_text renders FILE-DERIVED text — the
+            # coexistence status embeds a verbatim `path.name`/`mac_path.name`
+            # (`_format_coexistence_status`), so a hostile filename like
+            # `[red]evil[/].s19` would leak styling or raise MarkupError.
+            # markup=False at CONSTRUCTION persists across `.update()` (mirrors
+            # the #log_line_* scrub below).
+            Label("Ready.", id="status_text", markup=False),
             ProgressBar(total=100, id="progress_bar"),
             # batch-33 (LLR-051.8, C-17): the log lines render FILE-DERIVED
             # text (issue messages embedding verbatim {kind!r}/{fmt!r}/... ,
@@ -2230,6 +2236,7 @@ class S19TuiApp(App):
             title="Verify mismatch - file may not match",
             severity="error",
             timeout=10.0,
+            markup=False,
         )
 
     def action_before_after_report(self) -> None:
@@ -5339,6 +5346,7 @@ class S19TuiApp(App):
                 title="Manifest write failed - project.json not written",
                 severity="error",
                 timeout=10.0,
+                markup=False,
             )
             self.logger.warning("Manifest write refused: %s", detail)
             return
@@ -5361,9 +5369,9 @@ class S19TuiApp(App):
             "manifest verified" status line on success, and on mismatch a status
             line plus a prominent error notice naming the drifting key(s) and
             the re-read reader issue messages. Reader-issue messages are
-            attacker-influenceable, so they are passed as PLAIN text to
-            ``notify`` (no Rich-markup interpolation) — a crafted path cannot
-            inject markup.
+            attacker-influenceable and ``notify`` parses Rich markup by default,
+            so the notice is emitted with ``markup=False`` — the message renders
+            literally and a crafted path cannot inject markup (C-17).
 
         Args:
             result (ManifestVerifyResult): The already-computed verify outcome
@@ -5399,6 +5407,7 @@ class S19TuiApp(App):
             title="Manifest verify mismatch - project.json may be wrong",
             severity="error",
             timeout=10.0,
+            markup=False,
         )
         self.logger.warning("Manifest verify mismatch: %s", detail)
 

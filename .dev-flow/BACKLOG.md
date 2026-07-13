@@ -1,9 +1,10 @@
 # s19_app — dev-flow BACKLOG (cross-batch, prioritized)
 
-> Single prioritized queue for open feature work. `origin/main` tip = `5a6c45b` (batch-37 merged —
-> PRs #68 `18f1d30` + snapshot #69 `5a6c45b`); **batch-38 (US-065 label · US-066 A2L >32-bit WARNING ·
-> US-067 variant info modal · US-068a undo/redo · US-068b per-entry JSON popup — the entire P3 pool
-> B-16/B-17/B-18/B-19) pending commit/PR.** **RC-1 every batch open:** `git fetch`; assert merge-base
+> Single prioritized queue for open feature work. `origin/main` tip = `be62c97` (batch-38 merged —
+> PRs #70 `4c3b821` + snapshot #71 `be62c97`; vault-synced 2026-07-13). **The entire B-01..B-24
+> backlog is SHIPPED** (P1 batches 31–35, P2 batch-37, P3 batch-38). What remains = hygiene + small
+> polish + one flaky-test spike, then the NEW Flow Builder (multi-batch, deferred — see CLOSURE PLAN
+> below). **RC-1 every batch open:** `git fetch`; assert merge-base
 > == origin/main tip; cut a fresh branch off origin/main; per-story already-shipped grep before
 > deriving. **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/,
 > tui/a2l.py, tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`) — AND the
@@ -30,9 +31,17 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
   CLOSED (pending commit/PR). See DONE below. What remains open is the Bookmarks scaffold + hygiene
   carries.
 
-### Dead scaffold (own future batch)
-- **Bookmarks screen** — rail item 8 is a dead "coming soon" placeholder; the one clear TUI gap.
-  Its own future batch (spec first). **Priority: P2–P3.**
+### Rail-8 "Bookmarks" → Flow Builder (NEW multi-batch feature, DEFERRED after hygiene)
+- **Operator decision 2026-07-13:** Bookmarks is DROPPED (reports already track memory-address
+  values, so bookmarks are redundant). Rail item 8 is instead repurposed into a **functional-block
+  Flow Builder** — compose already-coded operations (patch → check → CRC → write-out) as an ordered
+  pipeline of typed blocks, run across the project's S19 image(s), emit output file(s). Dropdown-to-add
+  (no drag-drop). Architect grounding: most of the execution engine ALREADY exists
+  (`variant_execution_service` runs ordered, state-threading, multi-op {patch,check} plans); NEW work
+  = a typed-block vocabulary + a thin `flow_execution_service` + the rail-8 UI + persistence. All named
+  ops are in NON-frozen modules. **Multi-batch roadmap:** b-N tracer (`source→patch→write-out`, run,
+  observable output) → +check/crc blocks (CRC-into-loop = the real seam) → flow persistence → multi-image
+  scope + report fusion → polish. **Deferred: operator finishes the open hygiene/polish backlog FIRST.**
 
 ### Hygiene carries (fold opportunistically)
 - **S-F7** (P3): `report_service` surfaces raw `linkage_symbol` — sanitize/relabel. batch-35 carry.
@@ -162,14 +171,35 @@ control-encode approval (always ask before editing `~/.claude/commands/`).
 
 ---
 
-## Proposed sequence (pending operator approval — do NOT derive yet)
-1. **batch-38 patch snapshot regen** — post-merge canonical-CI regen of the 2 `patch` xfail cells +
-   retire `_batch38_drift_marks`. Follow-up PR like #67/#69. (Do FIRST after batch-38 merge.)
-2. **Bookmarks screen** — dead scaffold; own batch, spec first. P2–P3.
-3. **Hygiene carries** — S-F7, canonicalizer consolidation, `__setattr__` retire, P-1/P-2/P-3,
-   native bracketed-paste 64 KiB cap gap (incl. `#entry_json_text`), batch-38 LOW carries (Inc-4
-   checks-panel-stale, ctrl+z/y binding; Inc-5 cross-entry collision note). Fold opportunistically.
-4. **C-CAND-A/B encode decision** — operator per-control approval before editing `~/.claude/commands/`.
+## CLOSURE PLAN — operator-approved 2026-07-13 (finish open work BEFORE the Flow Builder)
 
-The entire B-01..B-24 backlog is now shipped (P1 batches 31–35, P2 batch-37, P3 batch-38); what
-remains is the Bookmarks scaffold + hygiene. Operator confirms / reorders.
+Everything B-01..B-24 shipped; batch-38 snapshot regen DONE (PR #71). Remaining = hygiene + small
+polish + one spike, grouped into 3 small themed batches, then the Flow Builder (multi-batch).
+
+- **Batch 39 — "Untrusted-text hardening" (`/fast-dev-flow`, IN PROGRESS):** ① native bracketed-paste
+  **64 KiB cap** on the 3 plain TextAreas `#patch_paste_text` / `#changeset_json_text` /
+  `#entry_json_text` (they bypass the OsClipboardInput funnel); ② **S-F7** sanitize raw
+  `linkage_symbol` in `report_service.py:625` (golden-regen discipline C-24); ③ **P-3** filename-markup
+  hygiene on `#status_text` / `set_file_status` + `notify`. One security/robustness theme; each ships a
+  black-box AT. *(Started first — clears the batch-37/38 security carries.)*
+- **Batch 40 — "Small UX fixes" (`/fast-dev-flow`):** ④ batch-38 Inc-4 F1 Checks-panel goes stale after
+  undo/redo (`last_check_result` not reset); ⑤ Inc-4 F2 undo/redo `ctrl+z`/`ctrl+y` key bindings; ⑦
+  coverage-% `.6f` display. (⑥ A2L-symbol region names + per-cell tooltips R-TUI-041 R-3 — fold here or
+  its own batch, operator's call.)
+- **Batch 41 — "Repo & test hygiene" (`/fast-dev-flow` — NOT direct):** ⑧ `canonical_report_bytes`
+  consolidation (4 copies → one conftest helper); ⑨ `object.__setattr__` test-helper retire (2 files);
+  ⑩ **P-2** repo ruff debt (8 errors, 5 auto-fixable); ⑪ **P-1** 1-based index convention; + 2 trivial
+  batch-37 folds (`Escape` on `ChangeSetJsonScreen`, vestigial `ENTROPY_STRIP_MAX_CELLS`). No
+  product-behavior change. **OPERATOR RULE 2026-07-13: bundle these as a tracked fast-dev-flow batch —
+  NO loose direct edits; every change is tracked (spec + branch + PR).**
+- **Spike (any time):** ⑫ full-suite TUI global-state flake → `/diagnose` root-cause before it bites a gate.
+
+> **Tracking rule (operator, 2026-07-13):** ALL code changes go through **at least `/fast-dev-flow`**
+> (tracked: spec + branch + PR + tests). Do NOT do trivial/hygiene items as untracked `direct` edits —
+> consolidate them into a fast-dev-flow batch. This supersedes the earlier "mostly direct" framing for
+> batch 41 and any "fold opportunistically / direct" note elsewhere in this backlog.
+- **Then → Flow Builder** (batches 42+, roadmap above).
+
+**Accepted, no action:** batch-38 Inc-5 F1 (cross-entry collision caught at doc gate, by-design);
+batch-37 ~9 LOW carries (groom only if they recur). **C-CAND-B** (Phase-1 contract convergence) left
+proposed-only (operator chose C-CAND-A/C-27 only, 2026-07-13).

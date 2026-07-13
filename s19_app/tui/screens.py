@@ -28,6 +28,7 @@ from textual.widgets import (
     TextArea,
 )
 
+from .capped_text_area import CappedTextArea
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
@@ -229,7 +230,7 @@ class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
     def compose(self) -> ComposeResult:
         yield Container(
             Label("Edit change-set JSON:", classes="modal-title"),
-            TextArea(self._seed_text, id="changeset_json_text"),
+            CappedTextArea(self._seed_text, id="changeset_json_text"),
             Container(
                 Button(
                     "Confirm", id="changeset_json_confirm", classes="modal-confirm"
@@ -312,7 +313,7 @@ class EntryJsonScreen(ModalScreen[Optional[str]]):
     def compose(self) -> ComposeResult:
         yield Container(
             Label("Edit entry JSON:", classes="modal-title"),
-            TextArea(self._seed_text, id="entry_json_text"),
+            CappedTextArea(self._seed_text, id="entry_json_text"),
             Container(
                 Button("Confirm", id="entry_json_confirm", classes="modal-confirm"),
                 Button("Cancel", id="entry_json_cancel"),
@@ -1596,7 +1597,7 @@ class ReportViewerScreen(ModalScreen[None]):
                 id="report_markdown_scroll",
             ),
             Label("Declared regions (name,start,end per line):"),
-            TextArea(
+            CappedTextArea(
                 "\n".join(
                     f"{region.name},{region.start},{region.end}"
                     for region in self.declared_regions
@@ -2022,7 +2023,7 @@ class OperationsScreen(ModalScreen[None]):
                 id="operation_config_path",
             ),
             Button("Load config", id="operation_config_load"),
-            TextArea(DUMMY_CONFIG_TEXT, id="operation_config"),
+            CappedTextArea(DUMMY_CONFIG_TEXT, id="operation_config"),
             Static("", id="operation_result_status", markup=False),
             ScrollableContainer(
                 Static("", id="operation_result_hex"),

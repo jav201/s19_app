@@ -60,6 +60,7 @@ from textual.widgets import (
     TextArea,
 )
 
+from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .os_clipboard_input import OsClipboardInput
@@ -2130,7 +2131,7 @@ class PatchEditorPanel(ScrollableContainer):
                 "Paste change-set (v2 JSON)",
                 classes="patch-field-label",
             ),
-            TextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
+            CappedTextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
             Horizontal(
                 Button("Parse pasted", id="patch_paste_parse_button"),
                 # US-064b / LLR-064b.1: opens the full-size JSON popup over the
