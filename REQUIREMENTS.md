@@ -3638,3 +3638,171 @@ separate `document→JSON` serializer story.
   US-064b adds no new uncapped ingress.
 - Status: Added in batch `2026-07-11-batch-37` (US-064b / HLR-064b, LLR-064b.1–.4). Frozen-engine
   diff = 0.
+
+# 35. Change-doc label clarity · A2L >32-bit WARNING · variant help · patch undo/redo + per-entry JSON (batch-38)
+
+> The last four P3 backlog items (B-16..B-19) as five stories, none crossing the engine-frozen
+> boundary (0 frozen SOURCE + 0 frozen TEST diffs vs `main`): B-16/US-065 clarifies the change-doc
+> free-path copy; B-17/US-066 emits a defensive WARNING for A2L tag addresses > 0xFFFFFFFF, built
+> TUI-side in `validation_service` so the frozen `validation/` package is untouched; B-18/US-067 adds
+> a variant-selector "?" help modal; B-19 splits into US-068a (change-set undo/redo) + US-068b
+> (per-entry JSON popup), both with an A-01 file-backed disable-guard. Stories:
+> `.dev-flow/2026-07-12-batch-38/01-requirements.md`; functional description:
+> `.dev-flow/2026-07-12-batch-38/06-docs/functionality.md`; traceability:
+> `.../06-docs/traceability-matrix.md`.
+
+**R-TUI-054**: When the Patch Editor is rendered, the change-document section title and the free-path
+placeholder shall read as an **alternative way to point at the same primary change-set** (not a
+second or "v2" file). The entries-pane section-title `Label` (`screens_directionb.py:1854`) shall be
+**`"Change document (JSON)"`** (was `"Change document (v2 JSON)"` — drops the `v2` token only), and
+the `#patch_doc_path_input` placeholder (`:1904`, sitting directly under the `patches/` dropdown
+`#patch_doc_file_select`) shall be **`"or type a path to the same change-set JSON (alternative to the
+patches/ dropdown)"`** (was `"path to v2 change-set .json"`). The change is copy-only: the edit is
+scoped to the `:1854` `patch-section-title` instance (the `:1918`/`:1936` instances and the
+`#patch_doc_path_input` id are unchanged — C-26), and `v2` shall be absent from both rendered strings.
+- Code: `s19_app/tui/screens_directionb.py` (section-title `Label` copy; `#patch_doc_path_input`
+  placeholder copy)
+- Validation: `Automated` via
+  `tests/test_tui_directionb.py::test_at065a_change_doc_label_reads_as_dropdown_alternative` (AT-065a —
+  reads the rendered section-title `Label.renderable` + `#patch_doc_path_input.placeholder` on the
+  live panel; asserts both verbatim + positive tokens present + `v2` absent from both),
+  `::test_tc332_change_doc_copy_pins_verbatim` (TC-332 — verbatim copy pin for LLR-065.1/.2; id
+  preserved). The 2 `patch` snapshot cells
+  (`test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24 / -120x30]`)
+  `xfail(strict=False)` pending canonical-CI regen post-merge (C-22).
+- Status: Added in batch `2026-07-12-batch-38` (US-065 / HLR-065, LLR-065.1–.2). Frozen-engine
+  diff = 0.
+
+**R-TUI-055**: When an A2L tag's parsed **integer** address exceeds `0xFFFFFFFF`, the system shall
+emit a WARNING-severity `ValidationIssue` (code **`A2L_ADDRESS_EXCEEDS_32BIT`**, `artifact="a2l"`,
+`symbol=<tag name>`, `address=<addr>`) naming that tag onto the validation issues surface, and a tag
+whose name carries markup metacharacters shall render **literally** without a `MarkupError` or style
+leak. The WARNING is produced **TUI-side** by a new supplemental producer
+`supplemental_a2l_oversized_address_issues` (`validation_service.py:111`, sibling of
+`supplemental_a2l_row_issues`) — so the engine-frozen `validation/` package is not edited — and is
+merged into the collected issue list in **BOTH** branches of `build_validation_report` (MAC-only +
+primary-backed) before `dedupe_issues`, reaching `ValidationReport.issues` regardless of session
+kind. The boundary is exclusive: `0xFFFFFFFF` → 0 issues; `0x100000000` and above → 1 issue per
+oversized tag; `None`/non-int address → 0 issues. The file-derived tag name is carried only via the
+`ValidationIssue.symbol` field (no pre-formatted Rich markup), so the existing markup-safe
+`issues_view.py` `safe_text` render path (`GroupedIssuesPanel`) displays a hostile name verbatim;
+colour round-trips the existing `css_class_for_severity` → `sev-warning` (C-17).
+- Code: `s19_app/tui/services/validation_service.py` (`supplemental_a2l_oversized_address_issues`
+  producer + merge into both branches of `build_validation_report`). Render surface
+  `s19_app/tui/issues_view.py` (`safe_text` / `IssueRow`) reused unchanged.
+- Validation: `Automated` via
+  `tests/test_validation_service_supplemental.py::test_tc_333_oversized_address_producer_emits_named_warning`
+  (TC-333 — producer emits one WARNING naming the tag),
+  `::test_tc_334_oversized_warning_merges_in_both_branches_and_colours` (TC-334 — merge into both
+  report branches; colour round-trip),
+  `::test_tc_335_oversized_address_boundary_and_non_int` (TC-335 — boundary `0xFFFFFFFF`/`0x100000000`
+  + `None`/str),
+  `tests/test_tui_a2l_issue_recolor.py::test_at_066a_oversized_a2l_address_warns_naming_tag` (AT-066a —
+  loads a tag @ `0x100000000`, one WARNING `IssueRow` naming it; sibling `0xFFFFFFFF` negative
+  control),
+  `::test_at_066b_oversized_hostile_tag_name_renders_safely` (AT-066b — hostile tag name: brackets
+  verbatim, ANSI neutralized, 0 `MarkupError`, C-17). AT-066a/b were authored in the non-frozen
+  `test_tui_a2l_issue_recolor.py` (relocated out of the frozen `test_tui_a2l.py` at Inc-5;
+  `test_tui_a2l.py` byte-identical to `main`).
+- Status: Added in batch `2026-07-12-batch-38` (US-066 / HLR-066, LLR-066.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-056**: The Patch Editor shall add an **info** `Button` (`#patch_variant_info_button`) beside
+the variant selector `Select#patch_variant_select` that, when pressed, opens a help modal
+(`VariantHelpScreen`) explaining that the selector **picks which firmware image loads** and that it
+**appears when ≥2 images exist in the project directory**. The button is always rendered whenever the
+variant selector renders (the selector itself requires ≥2 images), and is nested in a new
+`Horizontal(#patch_variant_select_row)` inside `#patch_variant_row` so the `#patch_pane_variant`
+child-order census is unperturbed (C-26). Pressing it posts `PatchEditorPanel.VariantHelpRequested`,
+which `S19TuiApp.on_patch_editor_panel_variant_help_requested` handles by
+`push_screen(VariantHelpScreen())`; the modal renders static markup-free help text plus a close
+control and reuses the shared `.modal-dialog` CSS. Modal geometry is pilot-measured to fit 80x24 and
+120x30 (C-23), not fr-derived.
+- Code: `s19_app/tui/screens_directionb.py` (`#patch_variant_info_button` +
+  `PatchEditorPanel.VariantHelpRequested` message), `s19_app/tui/app.py`
+  (`on_patch_editor_panel_variant_help_requested` → push), `s19_app/tui/screens.py`
+  (`VariantHelpScreen` modal + help-text content), `s19_app/tui/styles.tcss`
+- Validation: `Automated` via
+  `tests/test_tui_variants.py::test_at067a_variant_info_button_opens_help_modal` (AT-067a — real
+  `pilot.click` → `app.screen` is `VariantHelpScreen`; body carries the 3 explanation tokens; dismiss
+  returns to prior screen, C-16),
+  `::test_tc336_tc337_help_message_pushes_modal_with_content` (TC-336/TC-337 — info button present +
+  real-click routing → push + help-text tokens), and the additive non-gating geometry inspection
+  `::test_variant_help_modal_fits_at_both_sizes` (C-23 pilot-measure). The 2 `patch` snapshot cells
+  `xfail(strict=False)` pending canonical-CI regen (C-22).
+- Status: Added in batch `2026-07-12-batch-38` (US-067 / HLR-067, LLR-067.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-057**: The Patch Editor shall add **Undo** (`#patch_undo_button`) and **Redo**
+(`#patch_redo_button`) controls — in a new `#patch_history_controls` row (kept OUT of the
+census-pinned `#patch_doc_controls` row, C-26) — so that after a change-set edit, undo restores the
+immediately-prior change-set and redo re-applies it, up to a bounded history depth. `ChangeService`
+shall capture a **deep-copy** snapshot of its `document` immediately before each document-mutating
+operation (`add_entry`, `edit_entry`, `remove_entry`, `load`, `load_text`, `edit_entry_json`) via
+`_push_history`, pushing onto an undo stack bounded to `_HISTORY_MAX = 20` (`change_service.py:92`;
+oldest evicted past the bound), and clearing the redo stack on a fresh mutation; each snapshot is a
+true `ChangeDocument` deep copy (mutating the live document never aliases a stored snapshot).
+`ChangeService.undo()` (`:445`) shall replace `document` with the top undo snapshot (pushing the
+current onto the redo stack) and `redo()` (`:474`) the reverse; each is a **no-op** returning an
+unchanged document when its source stack is empty. Buttons post `PatchEditorPanel.UndoRequested` /
+`RedoRequested`, handled by `S19TuiApp.on_patch_editor_panel_undo_requested` / `…_redo_requested`
+which call `undo`/`redo` and re-render via the existing `refresh_entries`. **A-01 data-loss guard:**
+when `document.source_path is not None` (a file-loaded change document) the Undo/Redo controls shall
+be **DISABLED** (`set_undo_redo_enabled`, `screens_directionb.py:2603`) so a file-backed document is
+never clobbered; when `source_path is None` (paste-authored) they are enabled — mirroring the
+batch-37 A-01 precedent.
+- Code: `s19_app/tui/services/change_service.py` (`_HISTORY_MAX`, `_push_history`, `undo`, `redo`),
+  `s19_app/tui/screens_directionb.py` (`#patch_undo_button`/`#patch_redo_button` in
+  `#patch_history_controls`; `UndoRequested`/`RedoRequested` messages; `set_undo_redo_enabled`
+  A-01 guard), `s19_app/tui/app.py` (`on_patch_editor_panel_undo_requested`/`…_redo_requested` →
+  `ChangeService.undo`/`redo` → `refresh_entries`), `s19_app/tui/styles.tcss`
+- Validation: `Automated` via
+  `tests/test_change_service.py::test_tc338_history_bounded_and_deep_copy_no_alias` (TC-338 — bounded
+  deep-copy snapshotting, no-alias),
+  `::test_tc339_undo_redo_restore_semantics_and_empty_noop` (TC-339 — restore semantics + empty-stack
+  no-op),
+  `tests/test_tui_patch_editor_v2.py::test_at068a_undo_redo_roundtrip_through_surface` (AT-068a — real
+  Undo/Redo clicks restore then re-apply entries byte/field-for-field; empty-history no-op, C-16),
+  `::test_tc344_undo_redo_disabled_for_file_backed_document` (TC-344 — A-01: disabled iff
+  `source_path is not None`; both states in one node). The 2 `patch` snapshot cells
+  `xfail(strict=False)` pending canonical-CI regen (C-22).
+- Status: Added in batch `2026-07-12-batch-38` (US-068a / HLR-068a, LLR-068a.1–.4). Frozen-engine
+  diff = 0.
+
+**R-TUI-058**: The Patch Editor shall add a **per-entry JSON edit** control
+(`#patch_entry_edit_json_button`) targeting the row selected in `#patch_doc_entries_table`
+(`cursor_type="row"`) — distinct from the whole-set `#patch_edit_json_button` and the field-based
+`#patch_entry_edit_button` — that opens a modal (`EntryJsonScreen`, `screens.py:255`) seeded with
+**only that one entry's** JSON. On Confirm the edited text is routed through the EXISTING validated
+`parse_change_document` seam by `ChangeService.edit_entry_json(index, text)` (`change_service.py:738`),
+which splices the entry into a one-entry envelope built from the live document's header (the same
+collect-don't-abort path `load_text` uses) and replaces **only** `entries[index]`, leaving every
+other entry byte-identical; malformed JSON leaves the document unchanged and comes back as a
+non-`ok` result carrying an `MF-JSON-PARSE` finding (never an exception). A successful per-entry edit
+is a history-eligible mutation (snapshots first, R-TUI-057). With no selected entry the control is a
+no-op. **A-01 data-loss guard:** the control shall be **DISABLED** when
+`document.source_path is not None` (`set_entry_edit_json_enabled`, `screens_directionb.py:2629`) so a
+file-backed document is never silently mutated; for a paste-authored document (`source_path is None`)
+it is enabled — mirroring the batch-37 whole-set Edit-JSON A-01 guard.
+- Code: `s19_app/tui/screens_directionb.py` (`#patch_entry_edit_json_button` +
+  `PatchEditorPanel.EntryEditJsonRequested` message; `set_entry_edit_json_enabled` A-01 guard),
+  `s19_app/tui/screens.py` (`EntryJsonScreen` modal + `#entry_json_text` TextArea),
+  `s19_app/tui/app.py` (`on_patch_editor_panel_entry_edit_json_requested` push +
+  `_apply_entry_json_edit` → `ChangeService.edit_entry_json`),
+  `s19_app/tui/services/change_service.py` (`edit_entry_json` + `entry_seed_json`)
+- Validation: `Automated` via
+  `tests/test_tui_patch_editor_v2.py::test_at068b_per_entry_json_popup_edits_only_selected_entry`
+  (AT-068b — real click on the new `#patch_entry_edit_json_button` → single-entry-seed popup; Confirm
+  edits only entry *i*, siblings byte-identical, C-16),
+  `::test_tc341_entry_seed_json_is_single_entry_scoped_to_index` (TC-341 — control distinct +
+  selection-scoped, single-entry seed),
+  `::test_tc342_edit_entry_json_mutates_only_the_selected_index` (TC-342 — only the selected index
+  changes),
+  `::test_tc343_edit_entry_json_rejects_malformed_without_mutation` (TC-343 — malformed JSON →
+  `MF-JSON-PARSE`, no mutation, no crash, via the validated route),
+  `::test_tc345_entry_edit_json_disabled_for_file_backed_document` (TC-345 — A-01: disabled iff
+  `source_path is not None`; both states in one node). Pre-existing (NOT batch-38): the new
+  `#entry_json_text` TextArea inherits Textual's uncapped native paste (the 64 KiB cap is
+  `OsClipboardInput`-only) — a batch-39 hygiene carry, no new external-write surface.
+- Status: Added in batch `2026-07-12-batch-38` (US-068b / HLR-068b, LLR-068b.1–.4). Frozen-engine
+  diff = 0.

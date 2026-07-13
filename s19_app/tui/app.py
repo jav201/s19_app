@@ -47,6 +47,7 @@ from .rail import Rail, RailItem
 from .screens import (
     ChangeSetJsonScreen,
     EntropyViewerScreen,
+    EntryJsonScreen,
     LegendScreen,
     LoadFileScreen,
     LoadProjectScreen,
@@ -55,6 +56,7 @@ from .screens import (
     SaveProjectPayload,
     SaveProjectScreen,
     SelectVariantScreen,
+    VariantHelpScreen,
 )
 from .screens_directionb import (
     AbDiffPanel,
@@ -1741,6 +1743,14 @@ class S19TuiApp(App):
         # document is file-backed (``source_path is not None``) so a stale
         # buffer can never Confirm-clobber a loaded document.
         panel.set_edit_json_enabled(service.document.source_path is None)
+        # US-068a / LLR-068a.4 A-01 guard: undo/redo is available ONLY for a
+        # paste-authored / empty document — disable both controls whenever the
+        # document is file-backed so the history path cannot clobber it.
+        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # US-068b / LLR-068b.4 A-01 guard: the per-entry JSON edit is available
+        # ONLY for a paste-authored / empty document — disable it whenever the
+        # document is file-backed so a per-entry edit cannot clobber it.
+        panel.set_entry_edit_json_enabled(service.document.source_path is None)
 
     def on_patch_editor_panel_save_back_decision(
         self, event: PatchEditorPanel.SaveBackDecision
@@ -1870,6 +1880,121 @@ class S19TuiApp(App):
         """
         self.action_before_after_report()
 
+    def on_patch_editor_panel_variant_help_requested(
+        self, event: PatchEditorPanel.VariantHelpRequested
+    ) -> None:
+        """
+        Summary:
+            Open the variant-selector help modal (:class:`VariantHelpScreen`)
+            when the operator presses ``#patch_variant_info_button``
+            (US-067 / LLR-067.2). A pure trigger: the message carries no
+            payload and the modal is static discovery help, so this handler
+            just pushes the screen — no variant-set access, no state read.
+
+        Args:
+            event (PatchEditorPanel.VariantHelpRequested): The payload-free
+                info-button trigger.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``push_screen(VariantHelpScreen())``; the modal dismisses itself
+              via its Close button (no result callback needed).
+
+        Dependencies:
+            Uses:
+                - ``VariantHelpScreen``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        self.push_screen(VariantHelpScreen())
+
+    def _refresh_patch_history_view(self) -> None:
+        """
+        Summary:
+            Re-render the Patch Editor after a change-set history restore
+            (US-068a) — the shared tail of :meth:`on_patch_editor_panel_undo_
+            requested` / :meth:`on_patch_editor_panel_redo_requested`. Mirrors
+            the entries/issues/enable-sync tail of the action handler so the
+            entries table, declaration-fault area, and both A-01 disable guards
+            reflect the restored document.
+
+        Data Flow:
+            - Read the loaded image's ranges (``None`` when no image), then
+              ``refresh_entries`` / ``refresh_issues`` and re-sync the
+              Edit-JSON + Undo/Redo enable state from the restored document's
+              ``source_path`` (LLR-068a.4).
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.rows`` / ``issue_lines``
+                - ``PatchEditorPanel.refresh_entries`` / ``refresh_issues``
+                  / ``set_edit_json_enabled`` / ``set_undo_redo_enabled``
+            Used by:
+                - ``on_patch_editor_panel_undo_requested`` / ``..._redo_requested``
+        """
+        service = self._change_service
+        loaded = self.current_file
+        loaded_ranges = loaded.ranges if loaded is not None else None
+        panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        panel.refresh_entries(service.rows(loaded_ranges))
+        panel.refresh_issues(service.issue_lines())
+        panel.set_edit_json_enabled(service.document.source_path is None)
+        panel.set_undo_redo_enabled(service.document.source_path is None)
+        panel.set_entry_edit_json_enabled(service.document.source_path is None)
+
+    def on_patch_editor_panel_undo_requested(
+        self, event: PatchEditorPanel.UndoRequested
+    ) -> None:
+        """
+        Summary:
+            Restore the immediately-prior change-set (US-068a / LLR-068a.2/.3):
+            call ``ChangeService.undo()`` and re-render the entries table. An
+            empty undo history is a no-op inside the service, so this handler is
+            crash-free even with no history. The Undo control is disabled for a
+            file-backed document (LLR-068a.4), so this message is only posted
+            for a paste-authored / empty document.
+
+        Args:
+            event (PatchEditorPanel.UndoRequested): The payload-free trigger.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.undo`` / ``_refresh_patch_history_view``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        self._change_service.undo()
+        self._refresh_patch_history_view()
+
+    def on_patch_editor_panel_redo_requested(
+        self, event: PatchEditorPanel.RedoRequested
+    ) -> None:
+        """
+        Summary:
+            Re-apply the most-recently-undone change-set (US-068a /
+            LLR-068a.2/.3): call ``ChangeService.redo()`` and re-render the
+            entries table. An empty redo stack is a service-level no-op.
+
+        Args:
+            event (PatchEditorPanel.RedoRequested): The payload-free trigger.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.redo`` / ``_refresh_patch_history_view``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        self._change_service.redo()
+        self._refresh_patch_history_view()
+
     def on_patch_editor_panel_edit_json_requested(
         self, event: PatchEditorPanel.EditJsonRequested
     ) -> None:
@@ -1956,6 +2081,101 @@ class S19TuiApp(App):
                 action="parse_paste", paste_text=edited
             )
         )
+
+    def on_patch_editor_panel_entry_edit_json_requested(
+        self, event: PatchEditorPanel.EntryEditJsonRequested
+    ) -> None:
+        """
+        Summary:
+            Open the per-entry JSON popup (:class:`EntryJsonScreen`) for the
+            selected entry (US-068b / LLR-068b.1/.2), seeded with ONLY that
+            entry's JSON via ``ChangeService.entry_seed_json`` — a single
+            entry, distinct from the whole-set :class:`ChangeSetJsonScreen`.
+            Re-checks the LLR-068b.4 A-01 disable-guard defensively — even
+            though ``#patch_entry_edit_json_button`` is disabled for a
+            file-backed document, this handler refuses to push the popup
+            whenever ``source_path is not None`` so a stale index can never
+            mutate a loaded document. Bounds-checks the index (a stale message
+            after a shrink is a no-op). The popup's Confirm result is applied
+            by :meth:`_apply_entry_json_edit` for the same index.
+
+        Args:
+            event (PatchEditorPanel.EntryEditJsonRequested): Carries the
+                selected entries-table row index.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``source_path is not None`` → status-line refusal, no push
+              (A-01 guard, LLR-068b.4).
+            - index out of range → no-op.
+            - else → ``push_screen(EntryJsonScreen(seed), callback)`` where the
+              callback binds the index for :meth:`_apply_entry_json_edit`.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.entry_seed_json`` / ``EntryJsonScreen``
+                - ``_apply_entry_json_edit``
+            Used by:
+                - Textual message dispatch for ``PatchEditorPanel``
+        """
+        service = self._change_service
+        if service.document.source_path is not None:
+            self.set_status(
+                "Patch Editor: per-entry Edit JSON is available only for a "
+                "pasted change-set, not a file-loaded document."
+            )
+            return
+        if event.index < 0 or event.index >= len(service.document.entries):
+            return
+        seed = service.entry_seed_json(event.index)
+        self.push_screen(
+            EntryJsonScreen(seed),
+            lambda edited, index=event.index: self._apply_entry_json_edit(
+                index, edited
+            ),
+        )
+
+    def _apply_entry_json_edit(
+        self, index: int, edited: Optional[str]
+    ) -> None:
+        """
+        Summary:
+            Apply the per-entry JSON popup's Confirm result (US-068b /
+            LLR-068b.3): route the edited single-entry text through
+            ``ChangeService.edit_entry_json`` — which validates it via the
+            EXISTING ``parse_change_document`` seam and replaces ONLY the
+            selected entry (malformed input is collected, not applied) — then
+            surface the result and re-render the entries table / issue lines /
+            enable guards through the shared :meth:`_refresh_patch_history_view`
+            tail. Cancel (``None``) is a no-op: the document is left unchanged.
+
+        Args:
+            index (int): The entry index the popup was opened for.
+            edited (Optional[str]): The edited JSON on Confirm, or ``None`` on
+                Cancel / Escape.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``None`` → return (Cancel; document unchanged).
+            - else → ``edit_entry_json(index, edited)`` →
+              ``_report_change_result`` → ``_refresh_patch_history_view``.
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.edit_entry_json`` / ``_report_change_result``
+                - ``_refresh_patch_history_view``
+            Used by:
+                - ``on_patch_editor_panel_entry_edit_json_requested`` (callback)
+        """
+        if edited is None:
+            return
+        result = self._change_service.edit_entry_json(index, edited)
+        self._report_change_result(result)
+        self._refresh_patch_history_view()
 
     def _surface_verify_result(self) -> None:
         """
@@ -3262,6 +3482,12 @@ class S19TuiApp(App):
         # US-064b / LLR-064b.4 A-01 guard: a dropdown-picked file is file-backed
         # (``source_path is not None``) → disable Edit-JSON (no clobber path).
         panel.set_edit_json_enabled(service.document.source_path is None)
+        # US-068a / LLR-068a.4 A-01 guard: same file-backed doc → disable
+        # Undo/Redo so the history path cannot clobber it either.
+        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # US-068b / LLR-068b.4 A-01 guard: same file-backed doc → disable the
+        # per-entry JSON edit so it cannot clobber the loaded document either.
+        panel.set_entry_edit_json_enabled(service.document.source_path is None)
 
     def _diff_image_source(self, variant_id: Optional[str], raw_path: str) -> ImageSource:
         """

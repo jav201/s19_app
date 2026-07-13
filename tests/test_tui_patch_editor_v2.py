@@ -3090,3 +3090,471 @@ def test_tc331_disable_guard_predicate_tracks_source_path(
     assert outcomes["paste_enabled"] is True, (
         "a subsequent paste (source_path None) → Edit JSON re-enabled"
     )
+
+
+# ===========================================================================
+# US-068a (B-19a) — patch-editor change-set undo/redo through the surface
+# (AT-068a, TC-344 / LLR-068a.3/.4)
+# ===========================================================================
+
+
+def _entry_addr_values(app: S19TuiApp) -> list[tuple[str, str]]:
+    """Read the (address, value) columns of the rendered entries table.
+
+    Columns 1 and 2 of ``#patch_doc_entries_table`` (kind, address, value,
+    status, linkage). Reads the CONSUMER surface the real handler produced —
+    so a restore assertion is byte/field-level (C-10), not "object changed".
+    """
+    from textual.coordinate import Coordinate
+    from textual.widgets import DataTable
+
+    table = app.query_one("#patch_doc_entries_table", DataTable)
+    return [
+        (
+            str(table.get_cell_at(Coordinate(row, 1))),
+            str(table.get_cell_at(Coordinate(row, 2))),
+        )
+        for row in range(table.row_count)
+    ]
+
+
+def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
+    """Undo restores the prior change-set; Redo re-applies it (AT-068a).
+
+    Intent (AT-068a, US-068a / LLR-068a.2/.3, C-16 real click, C-10 content):
+    with a paste-authored change-set (``source_path`` None → controls enabled)
+    the operator adds an entry through the REAL Add button, then a REAL Undo
+    click restores the pre-add change-set byte/field-for-field (the SPECIFIC
+    prior entry — address AND value — not merely "the table re-rendered"), and
+    a REAL Redo click re-applies the add. An empty-history Undo click on a
+    fresh document is a no-op (boundary). Every mutation and Undo/Redo is driven
+    by ``pilot.click`` on the shipped surface (no ``.focus()``, no direct
+    service call).
+    """
+    paste = _changeset_text(
+        [{"type": "string", "address": "0x200", "value": "REV_A"}]
+    )
+
+    async def _click(pilot: object, app: S19TuiApp, selector: str) -> None:
+        """Drive a REAL pointer click on an entries-pane control (C-16).
+
+        The entries pane is the grid's 1fr (smallest) cell; its inputs +
+        control rows overflow the cell, so the Undo/Redo/Add row sits below the
+        cell's clipped viewport. Scroll the pane to its end so the control row
+        is on-screen, then ``pilot.click`` delivers a genuine mouse event to the
+        button (no ``.focus()``, no direct handler / service call).
+        """
+        app.query_one("#patch_pane_entries").scroll_end(animate=False)
+        await pilot.pause()
+        await pilot.click(selector)
+        await pilot.pause()
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+
+            # Boundary: empty-history Undo on a fresh (empty) document is a
+            # no-op — the real click must not crash and the table stays empty.
+            await _click(pilot, app, "#patch_undo_button")
+            outcomes["empty_undo_rows"] = _entry_addresses(app)
+
+            # Paste-author a one-entry change-set (source_path None → enabled).
+            _seed_via_paste(app, paste)
+            await pilot.pause()
+            outcomes["after_paste"] = _entry_addr_values(app)
+
+            # Add a second entry through the REAL Add button (surface mutation).
+            _set_entry_inputs(app, address="0x300", bytes_text="DE AD")
+            await _click(pilot, app, "#patch_entry_add_button")
+            outcomes["after_add"] = _entry_addresses(app)
+
+            # UNDO via the REAL button (C-16).
+            await _click(pilot, app, "#patch_undo_button")
+            outcomes["after_undo"] = _entry_addr_values(app)
+
+            # REDO via the REAL button (C-16).
+            await _click(pilot, app, "#patch_redo_button")
+            outcomes["after_redo"] = _entry_addresses(app)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["empty_undo_rows"] == [], (
+        "an empty-history Undo must be a no-op (table stays empty)"
+    )
+    assert outcomes["after_paste"] == [("0x200", "REV_A")]
+    assert outcomes["after_add"] == ["0x200", "0x300"], (
+        f"the real Add must append 0x300, got {outcomes['after_add']!r}"
+    )
+    assert outcomes["after_undo"] == [("0x200", "REV_A")], (
+        "Undo must restore the pre-add change-set byte/field-for-field "
+        f"(0x200='REV_A' only), got {outcomes['after_undo']!r}"
+    )
+    assert outcomes["after_redo"] == ["0x200", "0x300"], (
+        f"Redo must re-apply the add (0x300 back), got {outcomes['after_redo']!r}"
+    )
+
+
+def test_tc344_undo_redo_disabled_for_file_backed_document(
+    tmp_path: Path,
+) -> None:
+    """Undo/Redo are DISABLED for a file-backed doc → no clobber (TC-344).
+
+    Intent (TC-344, US-068a / LLR-068a.4, A-01 data-loss guard, batch-37
+    AT-064c precedent): after a FILE load (``source_path is not None``) the
+    Undo and Redo controls are DISABLED so a file-backed document can never be
+    silently mutated/replaced through the history path; for a paste-authored
+    document (``source_path is None``) both controls are ENABLED. The two states
+    are asserted in ONE node so the guard is a real discriminator (C-10), not a
+    constant.
+    """
+    from textual.widgets import Button
+
+    doc_path = _write_v2_document(
+        tmp_path / "loaded.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+    paste = _changeset_text(
+        [{"type": "string", "address": "0x222", "value": "PASTED"}]
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # (a) FILE-backed document → source_path not None → disabled.
+            _set_entry_inputs(app, path_text=str(doc_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["file_source"] = (
+                app._change_service.document.source_path is not None
+            )
+            outcomes["undo_disabled_when_file"] = app.query_one(
+                "#patch_undo_button", Button
+            ).disabled
+            outcomes["redo_disabled_when_file"] = app.query_one(
+                "#patch_redo_button", Button
+            ).disabled
+
+            # (b) PASTE-authored document → source_path None → enabled.
+            _seed_via_paste(app, paste)
+            await pilot.pause()
+            outcomes["paste_source_none"] = (
+                app._change_service.document.source_path is None
+            )
+            outcomes["undo_enabled_when_paste"] = not app.query_one(
+                "#patch_undo_button", Button
+            ).disabled
+            outcomes["redo_enabled_when_paste"] = not app.query_one(
+                "#patch_redo_button", Button
+            ).disabled
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["file_source"] is True
+    assert outcomes["undo_disabled_when_file"] is True, (
+        "Undo must be DISABLED when a file-backed document is loaded"
+    )
+    assert outcomes["redo_disabled_when_file"] is True, (
+        "Redo must be DISABLED when a file-backed document is loaded"
+    )
+    assert outcomes["paste_source_none"] is True
+    assert outcomes["undo_enabled_when_paste"] is True, (
+        "Undo must be ENABLED for a paste-authored document"
+    )
+    assert outcomes["redo_enabled_when_paste"] is True, (
+        "Redo must be ENABLED for a paste-authored document"
+    )
+
+
+# ===========================================================================
+# US-068b (B-19b) — per-entry JSON edit popup (AT-068b + TC-341/342/343/345)
+# ===========================================================================
+
+
+def _make_paste_service(entries: list[dict]) -> "object":
+    """Return a paste-authored ``ChangeService`` seeded with ``entries``.
+
+    Loads the entries through the real ``load_text`` paste seam so
+    ``source_path`` stays ``None`` (paste-authored) — the per-entry-JSON edit
+    is enabled only for such documents (LLR-068b.4).
+    """
+    service = change_service_module.ChangeService()
+    result = service.load_text(_changeset_text(entries))
+    assert result.ok, f"fixture paste failed to parse: {result.issues!r}"
+    return service
+
+
+def test_tc341_entry_seed_json_is_single_entry_scoped_to_index(
+    tmp_path: Path,
+) -> None:
+    """The per-entry seed is entry i's JSON only, scoped to the index (TC-341).
+
+    Intent (TC-341, US-068b / LLR-068b.1/.2, white-box): ``entry_seed_json``
+    returns a SINGLE wire entry object (no ``entries`` array — distinct from
+    batch-37's whole-set seed) for the selected index; first / middle / last
+    indices each seed their own entry's address, so the control is
+    selection-scoped, not fixed to entry 0.
+    """
+    service = _make_paste_service(
+        [
+            {"type": "string", "address": "0x200", "value": "REV_A"},
+            {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+            {"type": "string", "address": "0x400", "value": "REV_C"},
+        ]
+    )
+    seeds = [json.loads(service.entry_seed_json(i)) for i in range(3)]
+    # Each seed is one entry OBJECT, not a whole-set document (no "entries").
+    assert all(
+        isinstance(seed, dict) and "entries" not in seed for seed in seeds
+    ), f"each seed must be a single entry object, got {seeds!r}"
+    assert [seed["address"] for seed in seeds] == ["0x200", "0x300", "0x400"], (
+        f"the seed must be scoped to the selected index, got {seeds!r}"
+    )
+    assert seeds[1] == {"type": "bytes", "address": "0x300", "bytes": "DE AD"}
+
+
+def test_tc342_edit_entry_json_mutates_only_the_selected_index(
+    tmp_path: Path,
+) -> None:
+    """Confirming an edited entry i mutates only entry i (TC-342).
+
+    Intent (TC-342, US-068b / LLR-068b.3, white-box): ``edit_entry_json`` on
+    index 1 of a 3-entry document replaces ONLY that entry — entries 0 and 2
+    remain the SAME objects (byte-identical), entry 1 reflects the edit.
+    """
+    service = _make_paste_service(
+        [
+            {"type": "string", "address": "0x200", "value": "REV_A"},
+            {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+            {"type": "string", "address": "0x400", "value": "REV_C"},
+        ]
+    )
+    before = list(service.document.entries)
+    result = service.edit_entry_json(
+        1, json.dumps({"type": "bytes", "address": "0x300", "bytes": "BE EF"})
+    )
+    assert result.ok, f"a valid per-entry edit must succeed: {result.issues!r}"
+    after = service.document.entries
+    # Siblings are the IDENTICAL objects — not merely equal (no rebuild).
+    assert after[0] is before[0], "entry 0 must be untouched (same object)"
+    assert after[2] is before[2], "entry 2 must be untouched (same object)"
+    assert after[1] is not before[1], "entry 1 must be replaced"
+    assert after[1].encoded_bytes == (0xBE, 0xEF), (
+        f"entry 1 must reflect the edited bytes, got {after[1].encoded_bytes!r}"
+    )
+
+
+def test_tc343_edit_entry_json_rejects_malformed_without_mutation(
+    tmp_path: Path,
+) -> None:
+    """Malformed JSON is rejected through the validated route, no mutation (TC-343).
+
+    Intent (TC-343, US-068b / LLR-068b.3, white-box, C-17): a malformed
+    Confirm is routed through the validated ``parse_change_document`` seam
+    (mirrors batch-37 — no direct-bypass write), so it comes back non-``ok``
+    with a collected ``MF-JSON-PARSE`` finding and leaves every entry
+    untouched. A markup-bearing string value edits successfully and is stored
+    literally (no crash, no markup interpretation).
+    """
+    service = _make_paste_service(
+        [
+            {"type": "string", "address": "0x200", "value": "REV_A"},
+            {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+        ]
+    )
+    before = list(service.document.entries)
+    # (a) Malformed JSON -> rejected, no mutation.
+    bad = service.edit_entry_json(0, '{"type": "bytes", "address": ')
+    assert bad.ok is False, "malformed JSON must be rejected"
+    assert any(issue.code == "MF-JSON-PARSE" for issue in bad.issues), (
+        f"a malformed edit must surface MF-JSON-PARSE, got {bad.issues!r}"
+    )
+    assert service.document.entries[0] is before[0], "entry 0 must be untouched"
+    assert service.document.entries[1] is before[1], "entry 1 must be untouched"
+    # (b) A markup-bearing string value is stored literally (C-17, no crash).
+    ok = service.edit_entry_json(
+        0,
+        json.dumps(
+            {"type": "string", "address": "0x200", "value": "[red]x[/red]"}
+        ),
+    )
+    assert ok.ok, f"a markup-bearing value must edit safely: {ok.issues!r}"
+    assert service.document.entries[0].value == "[red]x[/red]", (
+        "the hostile value must be stored verbatim, not interpreted"
+    )
+
+
+def test_at068b_per_entry_json_popup_edits_only_selected_entry(
+    tmp_path: Path,
+) -> None:
+    """Per-entry JSON popup opens for the selected entry; confirm edits it only (AT-068b).
+
+    Intent (AT-068b, US-068b / LLR-068b.1/.2/.3, C-16 real click, C-10
+    content): with a paste-authored 3-entry change-set the operator selects the
+    MIDDLE entry (index 1, i != 0 to prove scoping), a REAL ``pilot.click`` on
+    the NEW ``#patch_entry_edit_json_button`` (distinct from the whole-set
+    ``#patch_edit_json_button`` and the field-populate
+    ``#patch_entry_edit_button``) opens the per-entry popup SEEDED WITH A
+    SINGLE ENTRY (entry 1's JSON only — no ``entries`` array, distinguishing it
+    from batch-37's whole-set popup), the operator edits + Confirms, and the
+    entries table (the CONSUMER the real handler produced) shows ONLY entry 1
+    changed while entries 0 and 2 are byte-identical.
+    """
+    from textual.widgets import Button, DataTable, TextArea
+
+    from s19_app.tui.screens import EntryJsonScreen
+
+    paste = _changeset_text(
+        [
+            {"type": "string", "address": "0x200", "value": "REV_A"},
+            {"type": "bytes", "address": "0x300", "bytes": "DE AD"},
+            {"type": "string", "address": "0x400", "value": "REV_C"},
+        ]
+    )
+
+    async def _click_entry_json(pilot: object, app: S19TuiApp) -> None:
+        """Drive a REAL pointer click on the per-entry Edit-JSON button (C-16).
+
+        The entries pane is the grid's 1fr (smallest) cell; its inputs +
+        button rows overflow, so the per-entry buttons row can sit below the
+        clipped viewport. Scroll the pane to its end, then ``pilot.click``
+        delivers a genuine mouse event (no ``.focus()`` / no direct call).
+        """
+        app.query_one("#patch_pane_entries").scroll_end(animate=False)
+        await pilot.pause()
+        await pilot.click("#patch_entry_edit_json_button")
+        await pilot.pause()
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 50)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _seed_via_paste(app, paste)
+            await pilot.pause()
+            outcomes["before"] = _entry_addr_values(app)
+
+            # Select the MIDDLE entry (index 1 -> 0x300); i != 0 proves scoping.
+            table = app.query_one("#patch_doc_entries_table", DataTable)
+            table.move_cursor(row=1)
+            await pilot.pause()
+
+            # REAL click -> the per-entry popup (C-16).
+            await _click_entry_json(pilot, app)
+            outcomes["is_entry_popup"] = isinstance(app.screen, EntryJsonScreen)
+            seed = app.screen.query_one("#entry_json_text", TextArea).text
+            parsed = json.loads(seed)
+            outcomes["seed_is_single_entry"] = (
+                isinstance(parsed, dict) and "entries" not in parsed
+            )
+            outcomes["seed_address"] = parsed.get("address")
+
+            # Edit entry 1's JSON (DE AD -> BE EF) and Confirm.
+            app.screen.query_one(
+                "#entry_json_text", TextArea
+            ).text = json.dumps(
+                {"type": "bytes", "address": "0x300", "bytes": "BE EF"}
+            )
+            app.screen.query_one("#entry_json_confirm", Button).press()
+            await pilot.pause()
+            outcomes["after"] = _entry_addr_values(app)
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["is_entry_popup"], (
+        "the per-entry control must open EntryJsonScreen (not the whole-set popup)"
+    )
+    assert outcomes["seed_is_single_entry"], (
+        "the popup must be seeded with a SINGLE entry (no 'entries' array), "
+        "distinct from batch-37's whole-set ChangeSetJsonScreen"
+    )
+    assert outcomes["seed_address"] == "0x300", (
+        f"the seed must be the SELECTED entry (0x300), got {outcomes['seed_address']!r}"
+    )
+    before = outcomes["before"]
+    after = outcomes["after"]
+    assert after[0] == before[0], (
+        f"entry 0 (0x200) must be byte-identical, got {after[0]!r}"
+    )
+    assert after[2] == before[2], (
+        f"entry 2 (0x400) must be byte-identical, got {after[2]!r}"
+    )
+    assert after[1] == ("0x300", "BE EF"), (
+        f"only entry 1 (0x300) must change to BE EF, got {after[1]!r}"
+    )
+    assert before[1] == ("0x300", "DE AD")
+
+
+def test_tc345_entry_edit_json_disabled_for_file_backed_document(
+    tmp_path: Path,
+) -> None:
+    """The per-entry JSON control is DISABLED for a file-backed doc (TC-345).
+
+    Intent (TC-345, US-068b / LLR-068b.4, A-01 data-loss guard, batch-37
+    AT-064c precedent): after a FILE load (``source_path is not None``) the
+    ``#patch_entry_edit_json_button`` is DISABLED so a per-entry edit can never
+    silently mutate a file-backed document; for a paste-authored document
+    (``source_path is None``) it is ENABLED. Both states are asserted in ONE
+    node so the guard is a real discriminator (C-10), not a constant.
+    """
+    from textual.widgets import Button
+
+    doc_path = _write_v2_document(
+        tmp_path / "loaded.json",
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}],
+    )
+    paste = _changeset_text(
+        [{"type": "string", "address": "0x222", "value": "PASTED"}]
+    )
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+
+            # (a) FILE-backed document -> source_path not None -> disabled.
+            _set_entry_inputs(app, path_text=str(doc_path))
+            panel.request_action("load_doc")
+            await pilot.pause()
+            outcomes["file_source"] = (
+                app._change_service.document.source_path is not None
+            )
+            outcomes["disabled_when_file"] = app.query_one(
+                "#patch_entry_edit_json_button", Button
+            ).disabled
+
+            # (b) PASTE-authored document -> source_path None -> enabled.
+            _seed_via_paste(app, paste)
+            await pilot.pause()
+            outcomes["paste_source_none"] = (
+                app._change_service.document.source_path is None
+            )
+            outcomes["enabled_when_paste"] = not app.query_one(
+                "#patch_entry_edit_json_button", Button
+            ).disabled
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["file_source"] is True
+    assert outcomes["disabled_when_file"] is True, (
+        "the per-entry JSON control must be DISABLED for a file-backed document"
+    )
+    assert outcomes["paste_source_none"] is True
+    assert outcomes["enabled_when_paste"] is True, (
+        "the per-entry JSON control must be ENABLED for a paste-authored document"
+    )

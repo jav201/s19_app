@@ -43,7 +43,7 @@ import ast
 import asyncio
 from pathlib import Path
 
-from textual.widgets import Button, ListView
+from textual.widgets import Button, ListView, Select, Static
 
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
@@ -397,3 +397,198 @@ def test_duplicate_stem_ids_are_filenames(tmp_path: Path) -> None:
     # Deterministic order: fw.hex < fw.s19; ids AND displays are filenames.
     assert options == [("fw.hex", "fw.hex"), ("fw.s19", "fw.s19")]
     assert "proj:fw.hex (1/2)" in label, f"duplicate-stem label must show the filename, got {label!r}"
+
+
+# ---------------------------------------------------------------------------
+# US-067 (B-18) — variant-selector info/help popup
+# ---------------------------------------------------------------------------
+#
+# AT-067a (black-box, C-16 real pointer): a REAL ``pilot.click`` on the new
+# ``#patch_variant_info_button`` opens the ``VariantHelpScreen`` modal, whose
+# rendered body names what the selector does. TC-336/337 (white-box) drive the
+# message/handler route and assert the same content; a Phase-3 geometry
+# inspection pilot-measures the modal fits at 80x24 AND 120x30 (C-23).
+
+# Content tokens the help modal must render (C-10: assert content, not
+# "a modal exists"). Sourced from the shipped ``VARIANT_HELP_TEXT`` copy.
+_VARIANT_HELP_TOKENS = (
+    "picks which firmware image loads",
+    "at least two firmware images",
+    "project directory",
+)
+
+
+async def _open_patch_with_two_variants(pilot, app: S19TuiApp) -> None:
+    """Load a >=2-image project and show the Patch Editor (F-m3 fixture).
+
+    The variant selector renders only for a >=2-image project; the info
+    button is always rendered beside it, so a >=2-image project makes the
+    selector + info button live click targets for the AT.
+    """
+    await pilot.pause()
+    app._handle_load_project("proj")
+    await _flush(pilot)
+    app.action_show_screen("patch")
+    await pilot.pause()
+
+
+def test_at067a_variant_info_button_opens_help_modal(tmp_path: Path) -> None:
+    """AT-067a — a real click on the variant info button opens the help modal.
+
+    Intent (US-067 / HLR-067, C-16 real pointer): with a >=2-image project the
+    variant selector is live and the always-rendered info button beside it is a
+    real click target. A REAL ``pilot.click`` (not ``.focus()`` / not a direct
+    ``push_screen`` proxy) on ``#patch_variant_info_button`` makes the
+    ``VariantHelpScreen`` the active screen, and its body names what the
+    selector does (picks which firmware image loads; appears with >=2 images in
+    the project dir) — a content assertion, not merely "a screen was pushed".
+    Pressing Close dismisses it back to the prior screen.
+
+    RED counterfactual: at ``main`` no info button is wired to the selector, so
+    ``pilot.click("#patch_variant_info_button")`` raises ``NoMatches`` (the
+    click target does not exist) and no modal appears.
+    """
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await _open_patch_with_two_variants(pilot, app)
+            select = app.query_one("#patch_variant_select", Select)
+            outcomes["select_enabled"] = not select.disabled
+            # C-16: REAL pointer click on the info button.
+            await pilot.click("#patch_variant_info_button")
+            await pilot.pause()
+            from s19_app.tui.screens import VariantHelpScreen
+
+            outcomes["is_help_modal"] = isinstance(
+                app.screen, VariantHelpScreen
+            )
+            outcomes["body"] = str(
+                app.screen.query_one("#variant_help_body", Static).render()
+            )
+            # Dismiss returns to the prior (Patch Editor) screen.
+            app.screen.query_one("#variant_help_close", Button).press()
+            await pilot.pause()
+            outcomes["dismissed"] = not isinstance(
+                app.screen, VariantHelpScreen
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["select_enabled"] is True, (
+        "a >=2-image project must render the variant selector as live so the "
+        "info button is a real click target (F-m3)"
+    )
+    assert outcomes["is_help_modal"] is True, (
+        "a real click on the info button must push VariantHelpScreen"
+    )
+    body = str(outcomes["body"])
+    for token in _VARIANT_HELP_TOKENS:
+        assert token in body, (
+            f"help modal must explain the selector; missing token {token!r} "
+            f"in body: {body!r}"
+        )
+    assert outcomes["dismissed"] is True, (
+        "Close must dismiss the help modal back to the prior screen"
+    )
+
+
+def test_tc336_tc337_help_message_pushes_modal_with_content(
+    tmp_path: Path,
+) -> None:
+    """TC-336/337 — the info-button message routes to a modal that shows help.
+
+    Intent (LLR-067.1/.2/.3 white-box): the always-rendered
+    ``#patch_variant_info_button`` is present and enabled beside the selector
+    (TC-336); posting ``PatchEditorPanel.VariantHelpRequested`` — the same
+    message the button posts — routes to the app handler which pushes
+    ``VariantHelpScreen`` (TC-337 routing); the modal body carries the required
+    help tokens (TC-337 content). White-box counterpart to AT-067a: it drives
+    the message path directly rather than the real pointer.
+    """
+    from s19_app.tui.screens import VariantHelpScreen
+    from s19_app.tui.screens_directionb import PatchEditorPanel
+
+    async def _drive() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await _open_patch_with_two_variants(pilot, app)
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            btn = panel.query_one("#patch_variant_info_button", Button)
+            outcomes["button_enabled"] = not btn.disabled
+            panel.post_message(PatchEditorPanel.VariantHelpRequested())
+            await pilot.pause()
+            outcomes["pushed"] = isinstance(app.screen, VariantHelpScreen)
+            outcomes["body"] = str(
+                app.screen.query_one("#variant_help_body", Static).render()
+            )
+        return outcomes
+
+    outcomes = asyncio.run(_drive())
+    assert outcomes["button_enabled"] is True, (
+        "the info button is always rendered and enabled beside the selector"
+    )
+    assert outcomes["pushed"] is True, (
+        "VariantHelpRequested must route to the handler that pushes the modal"
+    )
+    body = str(outcomes["body"])
+    for token in _VARIANT_HELP_TOKENS:
+        assert token in body, f"missing help token {token!r} in body: {body!r}"
+
+
+def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
+    """Geometry inspection (C-23) — the help modal fits at 80x24 AND 120x30.
+
+    Intent (US-067 geometry, additive to AT-067a): PILOT-MEASURE the modal on
+    the running app at the tight floor (80x24) and the comfortable size
+    (120x30) — NOT fr-math. Assert the dialog region sits fully on-screen (no
+    clip past the width/height, no negative origin) and that both the help body
+    and the Close control are visible (non-zero region) at both sizes.
+    """
+
+    async def _measure(width: int, height: int) -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
+        async with app.run_test(size=(width, height)) as pilot:
+            await _open_patch_with_two_variants(pilot, app)
+            await pilot.click("#patch_variant_info_button")
+            await pilot.pause()
+            dialog = app.screen.query_one("#variant_help_dialog")
+            body = app.screen.query_one("#variant_help_body", Static)
+            close = app.screen.query_one("#variant_help_close", Button)
+            region = dialog.region
+            return {
+                "region": (
+                    region.x,
+                    region.y,
+                    region.right,
+                    region.bottom,
+                ),
+                "body_visible": body.region.height > 0
+                and body.region.width > 0,
+                "close_visible": close.region.height > 0
+                and close.region.width > 0,
+            }
+
+    for width, height in ((80, 24), (120, 30)):
+        m = asyncio.run(_measure(width, height))
+        x, y, right, bottom = m["region"]  # type: ignore[misc]
+        assert x >= 0 and y >= 0, (
+            f"dialog origin off-screen at {width}x{height}: ({x},{y})"
+        )
+        assert right <= width, (
+            f"dialog overflows width at {width}x{height}: right={right}"
+        )
+        assert bottom <= height, (
+            f"dialog overflows height at {width}x{height}: bottom={bottom}"
+        )
+        assert m["body_visible"] is True, (
+            f"help body not visible at {width}x{height}"
+        )
+        assert m["close_visible"] is True, (
+            f"Close control not visible at {width}x{height}"
+        )

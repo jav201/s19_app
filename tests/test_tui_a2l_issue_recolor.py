@@ -401,6 +401,161 @@ def test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal(
 
 
 # ---------------------------------------------------------------------------
+# Layer B — AT-066b (C-17 hostile-input, US-066/B-17, batch-38): a FILE-DERIVED
+# hostile tag NAME on a >32-bit-address tag flows through the real load chain
+# into the oversize WARNING (message + symbol) and renders LITERAL/neutralized
+# in the grouped ``.issue-detail`` node. Bracket + [link=...] tokens survive
+# VERBATIM (whitespace-split name parser a2l.py:218; safe_text render); the ANSI
+# CSI is NEUTRALIZED, not verbatim (ValidationIssue.__post_init__ strips CSI from
+# message, model.py:71; safe_text neutralizes any reaching symbol). No crash,
+# no MarkupError, no style leak.
+#
+# Counterfactual: if the tag name were interpolated into a markup-parsed string
+# the ``[red]`` would be consumed as styling (bracket chars absent) or raise
+# MarkupError, and the raw ESC byte would leak — the assertions below fail RED.
+# ---------------------------------------------------------------------------
+
+OVERSIZED_CODE = "A2L_ADDRESS_EXCEEDS_32BIT"
+
+# Three oversized (>0xFFFFFFFF) tags, each with a hostile no-whitespace NAME:
+# brackets, an OSC-8-style [link=...] token, and a raw ANSI CSI escape. All
+# survive the whitespace-split name parser; the addresses parse via int(_, 0).
+_HOSTILE_BRACKET_NAME = "MARK_[red]evil[/red]"
+_HOSTILE_LINK_NAME = "LINK_x[link=file:///etc]"
+_HOSTILE_ANSI_NAME = "ANSI_\x1b[31mHACK"
+_HOSTILE_OVERSIZED_A2L = (
+    "/begin PROJECT Demo\n"
+    "  /begin MODULE Engine\n"
+    f"    /begin CHARACTERISTIC {_HOSTILE_BRACKET_NAME}\n"
+    "      ECU_ADDRESS 0x100000000\n"
+    "      LENGTH 2\n"
+    "    /end CHARACTERISTIC\n"
+    f"    /begin CHARACTERISTIC {_HOSTILE_LINK_NAME}\n"
+    "      ECU_ADDRESS 0x100000001\n"
+    "      LENGTH 2\n"
+    "    /end CHARACTERISTIC\n"
+    f"    /begin CHARACTERISTIC {_HOSTILE_ANSI_NAME}\n"
+    "      ECU_ADDRESS 0x100000002\n"
+    "      LENGTH 2\n"
+    "    /end CHARACTERISTIC\n"
+    "  /end MODULE\n"
+    "/end PROJECT\n"
+)
+
+
+def test_at_066b_oversized_hostile_tag_name_renders_safely(tmp_path: Path) -> None:
+    s19_path = _write_s19(tmp_path)
+    a2l_path = _write_a2l(tmp_path, _HOSTILE_OVERSIZED_A2L)
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        from s19_app.tui.issues_view import IssueRow
+
+        # Load-bearing positive assert: the shipped chain produced the three
+        # file-derived oversize WARNINGs (otherwise the checks below could pass
+        # vacuously over an empty set).
+        app.action_show_screen("issues")
+        await pilot.pause()
+        _assert_within_cap(app)
+        oversize_widgets = [
+            row for row in app.query(IssueRow) if row.issue.code == OVERSIZED_CODE
+        ]
+        assert len(oversize_widgets) == 3, (
+            f"expected three {OVERSIZED_CODE} WARNINGs for the hostile oversized "
+            f"tags; got codes: {[r.issue.code for r in app.query(IssueRow)]!r}"
+        )
+        by_symbol = {row.issue.symbol: row for row in oversize_widgets}
+
+        # (i) Bracket + link payloads survive VERBATIM in the constructed
+        # WARNING message (no markup pre-formatting) — model.py scrub keeps
+        # ``[...]`` (only control/ANSI are stripped).
+        bracket_msg = by_symbol[_HOSTILE_BRACKET_NAME].issue.message
+        link_msg = by_symbol[_HOSTILE_LINK_NAME].issue.message
+        assert "[red]evil[/red]" in bracket_msg, bracket_msg
+        assert "[link=file:///etc]" in link_msg, link_msg
+
+        # (ii) ANSI CSI is NEUTRALIZED (NOT verbatim): __post_init__ strips the
+        # CSI from ``message`` (model.py:71), so neither the raw ESC nor the
+        # ``[31m`` remnant survives; the readable name text still appears.
+        ansi_msg = by_symbol[_HOSTILE_ANSI_NAME].issue.message
+        assert "\x1b" not in ansi_msg, repr(ansi_msg)
+        assert "[31m" not in ansi_msg, repr(ansi_msg)
+        assert "ANSI_" in ansi_msg and "HACK" in ansi_msg, repr(ansi_msg)
+
+        # Render safety (C-17): reaching a rendered ``.issue-detail`` at all
+        # proves compose/mount raised no MarkupError over the hostile names, and
+        # the brackets appear LITERAL in the rendered plain text (no style leak,
+        # no OSC-8 parse) — the same literal-render oracle as AT-043-c17.
+        bracket_detail = (
+            by_symbol[_HOSTILE_BRACKET_NAME].query_one(".issue-detail").render().plain
+        )
+        link_detail = (
+            by_symbol[_HOSTILE_LINK_NAME].query_one(".issue-detail").render().plain
+        )
+        assert "[red]evil[/red]" in bracket_detail, repr(bracket_detail)
+        assert "[link=file:///etc]" in link_detail, repr(link_detail)
+
+    _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+
+# ---------------------------------------------------------------------------
+# Layer B — AT-066a (US-066/B-17, batch-38): a >32-bit A2L tag address surfaces
+# a WARNING naming the tag on the shipped issues surface; a sibling tag at the
+# 32-bit max (0xFFFFFFFF) produces no such WARNING (boundary/negative control).
+# Driven through the real app load handler (reuses the module-level ``_write_s19``
+# / ``_drive_load`` / ``_issue_rows`` helpers — same shipped worker path).
+# Relocated here from tests/test_tui_a2l.py (git-frozen engine test file); net
+# test count unchanged, behavior byte-identical.
+# RED counterfactual: at main there is 0 >32-bit handling in the service, so no
+# A2L_ADDRESS_EXCEEDS_32BIT WARNING is produced and the assertion fails RED.
+# ---------------------------------------------------------------------------
+
+# Two schema-complete CHARACTERISTIC tags: BIG_TAG one past the 32-bit max
+# (must warn), EDGE_TAG exactly at the 32-bit max (must NOT warn). The parser
+# reads ECU_ADDRESS via int(token, 0) (a2l.py:984) so the addresses are genuine
+# ints, not strings — the A-1 positive-branch guard (isinstance int) fires.
+_OVERSIZED_A2L = (
+    "/begin PROJECT Demo\n"
+    "  /begin MODULE Engine\n"
+    "    /begin CHARACTERISTIC BIG_TAG\n"
+    "      ECU_ADDRESS 0x100000000\n"
+    "      LENGTH 2\n"
+    "    /end CHARACTERISTIC\n"
+    "    /begin CHARACTERISTIC EDGE_TAG\n"
+    "      ECU_ADDRESS 0xFFFFFFFF\n"
+    "      LENGTH 2\n"
+    "    /end CHARACTERISTIC\n"
+    "  /end MODULE\n"
+    "/end PROJECT\n"
+)
+
+
+def test_at_066a_oversized_a2l_address_warns_naming_tag(tmp_path: Path) -> None:
+    s19_path = _write_s19(tmp_path)
+    a2l_path = _write_a2l(tmp_path, _OVERSIZED_A2L, name="oversized.a2l")
+
+    async def _observe(app: S19TuiApp, pilot: object) -> None:
+        app.action_show_screen("issues")
+        await pilot.pause()
+        rows = _issue_rows(app)
+        oversized = [row for row in rows if row[_CODE] == OVERSIZED_CODE]
+        # Exactly one WARNING, naming BIG_TAG; EDGE_TAG at the 32-bit max does
+        # not warn (boundary/negative control on the same load).
+        assert len(oversized) == 1, (
+            f"expected exactly one {OVERSIZED_CODE} WARNING; issue rows: {rows!r}"
+        )
+        row = oversized[0]
+        assert row[_SEV] == ValidationSeverity.WARNING
+        assert row[_SYMBOL] == "BIG_TAG"
+        assert "BIG_TAG" in row[4]
+        assert "EDGE_TAG" not in row[4]
+        assert not any(
+            row[_SYMBOL] == "EDGE_TAG" and row[_CODE] == OVERSIZED_CODE for row in rows
+        ), "the 0xFFFFFFFF boundary tag must not produce an oversize WARNING"
+
+    _drive_load(tmp_path, s19_path, a2l_path, _observe)
+
+
+# ---------------------------------------------------------------------------
 # Layer A — TC-037.1 (LLR-037.1): map build/filter semantics — a2l-only,
 # non-empty symbol only, casefolded keys, max severity order-independent.
 # ---------------------------------------------------------------------------

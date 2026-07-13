@@ -647,3 +647,84 @@ def test_at051c_composed_faulted_envelope_blocks_with_doc_fault() -> None:
     rows = service.check_rows()
     assert len(rows) == 2
     assert all("run blocked [doc-fault]" in row.text for row in rows)
+
+
+# ===========================================================================
+# US-068a (B-19a) — bounded deep-copy change-set history (LLR-068a.1/.2)
+# ===========================================================================
+
+
+def test_tc338_history_bounded_and_deep_copy_no_alias() -> None:
+    """Snapshotting is deep-copy and the undo stack is bounded (TC-338).
+
+    Intent: LLR-068a.1 — each entry mutation pushes exactly one snapshot; the
+    undo stack never grows past ``_HISTORY_MAX`` (oldest evicted); and every
+    stored snapshot is a TRUE deep copy — mutating ``document.entries`` after a
+    push must NOT alter any stored snapshot (risk R-B, the graded no-alias
+    point). Verified at the service level (no Textual).
+    """
+    from s19_app.tui.services.change_service import _HISTORY_MAX
+
+    service = ChangeService()
+    # One snapshot per mutation, more than the bound so eviction is exercised.
+    for offset in range(_HISTORY_MAX + 5):
+        service.add_entry(hex(0x100 + offset), "", "AA")
+    assert len(service.document.entries) == _HISTORY_MAX + 5
+    assert len(service._undo_stack) == _HISTORY_MAX, (
+        "the undo history must be bounded at _HISTORY_MAX, got "
+        f"{len(service._undo_stack)}"
+    )
+
+    # No-alias: the top snapshot is a deep copy. Mutating the LIVE document's
+    # entries must leave the stored snapshot byte/field-for-field unchanged.
+    snapshot = service._undo_stack[-1]
+    assert snapshot.entries is not service.document.entries
+    snapshot_len = len(snapshot.entries)
+    snapshot_first_addr = snapshot.entries[0].address
+    service.document.entries.clear()
+    service.document.entries.append(ChangeEntry("bytes", 0x999, (0x01,)))
+    assert len(snapshot.entries) == snapshot_len, (
+        "mutating the live document must not alias a stored snapshot"
+    )
+    assert snapshot.entries[0].address == snapshot_first_addr
+
+
+def test_tc339_undo_redo_restore_semantics_and_empty_noop() -> None:
+    """undo/redo round-trip the document; empty stacks are no-ops (TC-339).
+
+    Intent: LLR-068a.2 — ``undo`` restores the immediately-prior change-set and
+    ``redo`` re-applies it (content-level, not "object changed"); an empty
+    source stack makes undo/redo a no-op that leaves ``document`` identical; a
+    fresh mutation after an undo clears the redo stack.
+    """
+    service = ChangeService()
+
+    # Empty-stack no-op: undo/redo on a fresh service change nothing.
+    doc0 = service.document
+    assert service.undo() is doc0
+    assert service.redo() is doc0
+    assert service.document is doc0
+
+    service.add_entry("0x200", "REV_A", "")
+    assert [entry.address for entry in service.document.entries] == [0x200]
+
+    # undo restores the pre-mutation (empty) change-set.
+    service.undo()
+    assert [entry.address for entry in service.document.entries] == [], (
+        "undo must restore the pre-mutation (empty) document"
+    )
+
+    # redo re-applies the entry — byte/field-for-field.
+    service.redo()
+    assert [entry.address for entry in service.document.entries] == [0x200]
+    restored = service.document.entries[0]
+    assert restored.entry_type == "string"
+    assert restored.value == "REV_A"
+
+    # A fresh mutation after an undo clears the redo stack.
+    service.undo()  # back to empty; redo stack now holds the 0x200 state
+    assert service._redo_stack, "undo must populate the redo stack"
+    service.add_entry("0x300", "", "DE AD")
+    assert service._redo_stack == [], (
+        "a fresh mutation must clear the redo stack"
+    )
