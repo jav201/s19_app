@@ -458,7 +458,9 @@ class ChangeService:
             - Empty stack → return ``self.document`` unchanged.
             - Else → push the live document onto ``_redo_stack``, pop the top
               undo snapshot as the new live document, and reset
-              ``last_summary`` (a restored change-set has no matching apply).
+              ``last_summary`` / ``last_check_result`` (a restored change-set
+              has no matching apply or check run, so a stale check result must
+              not survive the history move).
 
         Dependencies:
             Used by:
@@ -469,6 +471,7 @@ class ChangeService:
         self._redo_stack.append(self.document)
         self.document = self._undo_stack.pop()
         self.last_summary = None
+        self.last_check_result = None
         return self.document
 
     def redo(self) -> ChangeDocument:
@@ -487,7 +490,9 @@ class ChangeService:
             - Empty stack → return ``self.document`` unchanged.
             - Else → push the live document onto ``_undo_stack``, pop the top
               redo snapshot as the new live document, and reset
-              ``last_summary``.
+              ``last_summary`` / ``last_check_result`` (a re-applied change-set
+              has no matching apply or check run, so a stale check result must
+              not survive the history move).
 
         Dependencies:
             Used by:
@@ -498,6 +503,7 @@ class ChangeService:
         self._undo_stack.append(self.document)
         self.document = self._redo_stack.pop()
         self.last_summary = None
+        self.last_check_result = None
         return self.document
 
     # ------------------------------------------------------------------
