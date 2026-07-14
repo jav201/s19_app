@@ -3315,6 +3315,152 @@ def test_tc041_4_build_detail_text_content(tmp_path: Path) -> None:
     assert "1 issue(s) in region" in text, f"region count missing; got {text!r}"
 
 
+def test_symbols_in_window_matching_point_and_hostile_shapes() -> None:
+    """``symbols_in_window`` joins A2L tags to a window by extent overlap,
+    address-then-name sorted, and is hostile-shape-safe (R-TUI-041 R-3).
+
+    Intent: the join is the pure core both the detail-pane naming and the
+    per-cell tooltip bind to — a tag overlaps ``[start, end)`` iff
+    ``addr < end and addr + size > start`` (``size = byte_size>0 else 1``),
+    and any malformed tag (non-dict, None/str/bool address, empty name) is
+    skipped, never raised (S-F4).
+    """
+    from s19_app.tui.screens_directionb import symbols_in_window
+
+    tags = [
+        {"name": "B", "address": 0x120, "byte_size": 4},   # inside
+        {"name": "A", "address": 0x100, "byte_size": 4},   # inside, earlier addr
+        {"name": "POINT", "address": 0x130},               # no byte_size -> point
+        {"name": "OUT", "address": 0x200, "byte_size": 4}, # outside [0x100,0x140)
+        {"name": "EDGE", "address": 0x13F, "byte_size": 1},# last byte inside
+        "not-a-dict",                                      # skipped
+        {"name": "NOADDR", "address": None},               # None addr skipped
+        {"name": "STRADDR", "address": "0x110"},           # non-int addr skipped
+        {"name": "", "address": 0x105},                    # empty name skipped
+        {"name": "BOOLADDR", "address": True},             # bool addr skipped
+    ]
+    # address-then-name sorted, overlap-only
+    assert symbols_in_window(tags, 0x100, 0x140) == ["A", "B", "POINT", "EDGE"]
+    # a window entirely before the first extent matches nothing
+    assert symbols_in_window(tags, 0x00, 0x100) == []
+
+
+def test_at_r3_detail_region_named_by_a2l_symbols() -> None:
+    """R-TUI-041 R-3 (AC-1): the detail-pane region line names the covering
+    region by the overlapping A2L symbol(s), address-sorted, capped at 3 with a
+    ``+N more`` tail, alongside the bounds.
+
+    RED pre-fix: the region line is bounds-only and never contains a symbol
+    name (``symbols_in_window`` / the region-naming append do not exist).
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
+    panel = MemoryMapPanel()
+    panel._ordered_ranges = [(0x8000, 0x9000, True)]
+    panel._issues = []
+    panel._a2l_tags = [
+        {"name": "CAL_KI", "address": 0x8100, "byte_size": 4},
+        {"name": "CAL_KP", "address": 0x8010, "byte_size": 4},
+        {"name": "CAL_KD", "address": 0x8080, "byte_size": 4},
+        {"name": "CAL_X4", "address": 0x8200, "byte_size": 4},  # 4th -> "+1 more"
+        {"name": "OTHER", "address": 0x9500, "byte_size": 4},   # outside region
+    ]
+    text = panel.build_detail_text(0x8000, 0x8100, "valid").plain
+
+    assert "CAL_KP" in text and "CAL_KD" in text and "CAL_KI" in text
+    assert "+1 more" in text, f"cap/overflow missing; got {text!r}"
+    assert "CAL_X4" not in text, "the 4th symbol must be behind '+N more'"
+    assert "OTHER" not in text, "an out-of-region symbol must not appear"
+    assert "0x00008000-0x00008FFF" in text, "region bounds must still show"
+
+
+def test_at_r3_detail_hostile_symbol_name_rendered_literally() -> None:
+    """R-TUI-041 R-3 (AC-3, detail): a hostile A2L symbol name renders LITERALLY
+    in the region line — no Rich-markup injection, no ``MarkupError`` (the
+    batch-27 Phase-2 BLOCKER class; markup-safe via ``safe_text`` / ``Text``).
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
+    panel = MemoryMapPanel()
+    panel._ordered_ranges = [(0x8000, 0x9000, True)]
+    panel._issues = []
+    for hostile in ("evil[red]", "x[/]", "y[bold", "z[link=file:///etc/passwd]"):
+        panel._a2l_tags = [{"name": hostile, "address": 0x8010, "byte_size": 4}]
+        text = panel.build_detail_text(0x8000, 0x8100, "valid").plain
+        assert hostile in text, f"hostile name not rendered literally; got {text!r}"
+
+
+def test_at_r3_detail_no_a2l_region_bounds_only() -> None:
+    """R-TUI-041 R-3 (AC-4): with no A2L tags the region line is the unchanged
+    bounds-only form — no symbol suffix, no regression to the R-TUI-041 detail.
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
+    panel = MemoryMapPanel()
+    panel._ordered_ranges = [(0x8000, 0x9000, True)]
+    panel._issues = []
+    panel._a2l_tags = []
+    text = panel.build_detail_text(0x8000, 0x8100, "valid").plain
+    region_line = next(
+        ln for ln in text.splitlines() if ln.startswith("Region:")
+    )
+    assert region_line == "Region: 0x00008000-0x00008FFF (4096 bytes, valid)", (
+        f"region line should be bounds-only; got {region_line!r}"
+    )
+
+
+def test_at_r3_cell_tooltip_names_symbols_and_renders_literally(
+    tmp_path: Path,
+) -> None:
+    """R-TUI-041 R-3 (AC-2 + AC-3 tooltip): ``render_ranges`` gives each MapCell
+    a markup-safe ``Text`` tooltip; a cell over an A2L symbol names it, and a
+    hostile name renders LITERALLY through Textual's tooltip render path.
+
+    The tooltip MUST be a Rich ``Text``: Textual 8.2.8 renders a bare ``str``
+    tooltip via ``Content.from_markup`` (markup-parsed — ``evil[red]`` loses
+    ``[red]`` and a malformed token can raise ``MarkupError`` on hover), while a
+    ``Text`` renders via ``Content.from_rich_text`` literally. Asserting
+    ``isinstance(Text)`` + driving ``Content.from_rich_text`` is the hover-crash
+    regression guard (security review F1). RED pre-fix: no tooltip is set, so
+    ``cell.tooltip`` is not a ``Text`` carrying the symbol name.
+    """
+    from rich.text import Text
+    from textual.content import Content
+
+    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
+
+    async def _drive() -> "object":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            _install_case_02_loaded_file(app)
+            target = app.current_file.ranges[0][0]  # a present (mapped) address
+            app._a2l_enriched_tags = [
+                {"name": "CAL_TARGET", "address": target, "byte_size": 4},
+                {"name": "evil[red]", "address": target, "byte_size": 4},
+            ]
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            cells = list(panel.query(MapCell))
+            return _cell_containing(cells, target)
+
+    cell = asyncio.run(_drive())
+    assert cell is not None, "a cell must cover the seeded symbol address"
+    tooltip = cell.tooltip
+    # AC-3 tooltip: Text (not str) — else Textual markup-parses it on hover.
+    assert isinstance(tooltip, Text), f"tooltip must be Text, got {type(tooltip)!r}"
+    assert "CAL_TARGET" in tooltip.plain
+    assert "evil[red]" in tooltip.plain
+    # Drive the actual Text tooltip render path — it must stay literal.
+    rendered = Content.from_rich_text(tooltip).plain
+    assert "evil[red]" in rendered, f"tooltip not literal through render; {rendered!r}"
+    # Counterfactual proving the Text type matters: a str tooltip would
+    # markup-parse and drop the ``[red]`` token.
+    assert "evil[red]" not in Content.from_markup("evil[red]").plain
+
+
 def test_tc041_4b_arrow_adjacent_index_and_edge_clamp() -> None:
     """Arrow nav resolves the adjacent cell index and clamps at edges
     (TC-041.4b / US-036 keyboard nav).

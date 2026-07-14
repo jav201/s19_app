@@ -44,7 +44,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import ceil
-from typing import List, Optional, Sequence, Tuple
+from typing import Any, List, Mapping, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -505,6 +505,111 @@ def covering_range(
     return first_valid
 
 
+def symbols_in_window(
+    tags: Sequence[Mapping[str, Any]],
+    start: int,
+    end: int,
+) -> List[str]:
+    """Names of A2L symbols whose extent overlaps ``[start, end)`` (R-TUI-041 R-3).
+
+    Summary:
+        Join the already-computed enriched A2L tags to a memory window: a tag
+        overlaps ``[start, end)`` iff ``addr < end and addr + size > start``,
+        where ``size`` is the tag's positive-int ``byte_size`` else ``1`` (a
+        point) — the same extent convention ``resolve_report_filter`` uses. The
+        result is the overlapping tags' ``name`` strings, address-then-name
+        sorted, for markup-safe display in the detail pane and cell tooltips.
+        Read-only over the load snapshot; computes no coverage/parse/validation
+        (LLR-041.7). Hostile-shape-safe (S-F4): a non-dict tag, a non-int / None
+        ``address``, a non-str / empty ``name`` is skipped, never raised.
+
+    Args:
+        tags (Sequence[Mapping[str, Any]]): The enriched A2L tags
+            (``S19TuiApp._a2l_enriched_tags``) — dicts with ``name`` /
+            ``address`` (int, or ``None`` when absent) and optional
+            ``byte_size``.
+        start (int): Inclusive window start.
+        end (int): Exclusive window end.
+
+    Returns:
+        List[str]: Overlapping tags' names, address-then-name sorted.
+
+    Data Flow:
+        - Called by ``MemoryMapPanel.build_detail_text`` (region window) and
+          ``MemoryMapPanel.render_ranges`` (per-cell tooltip window).
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.build_detail_text``
+            - ``MemoryMapPanel.render_ranges``
+
+    Example:
+        >>> symbols_in_window(
+        ...     [{"name": "CAL", "address": 0x10, "byte_size": 4}], 0x10, 0x20
+        ... )
+        ['CAL']
+    """
+    matched: List[Tuple[int, str]] = []
+    for tag in tags:
+        if not isinstance(tag, dict):
+            continue
+        addr = tag.get("address")
+        if not isinstance(addr, int) or isinstance(addr, bool):
+            continue
+        size = tag.get("byte_size")
+        extent = (
+            size
+            if isinstance(size, int) and not isinstance(size, bool) and size > 0
+            else 1
+        )
+        if addr < end and addr + extent > start:
+            name = tag.get("name")
+            if isinstance(name, str) and name:
+                matched.append((addr, name))
+    matched.sort(key=lambda item: (item[0], item[1]))
+    return [name for _addr, name in matched]
+
+
+def symbol_list_text(names: Sequence[str], cap: int = 3) -> Text:
+    """Markup-safe ``Text`` of up to ``cap`` symbol names + a ``"+N more"`` tail.
+
+    Summary:
+        Compose a comma-joined run of the first ``cap`` names as markup-safe
+        ``Text`` segments (each via ``safe_text``, so a hostile name like
+        ``evil[red]`` renders literally — LLR-041.11 / the batch-27 markup
+        BLOCKER class), followed by ``" +N more"`` when more names overlap. The
+        whole aggregate is ``Text``; no name is ever formatted into an f-string
+        (the sink that would re-introduce Rich-markup parsing, incl. the tooltip
+        path where Textual markup-parses a bare ``str``).
+
+    Args:
+        names (Sequence[str]): The overlapping symbol names (from
+            ``symbols_in_window``), already ordered.
+        cap (int): Maximum names shown before the ``"+N more"`` tail.
+
+    Returns:
+        Text: The composed markup-safe label (empty ``Text`` when ``names`` is
+        empty).
+
+    Dependencies:
+        Uses:
+            - ``safe_text``
+        Used by:
+            - ``MemoryMapPanel.build_detail_text``
+            - ``MemoryMapPanel.render_ranges``
+    """
+    text = Text()
+    shown = list(names[:cap])
+    for index, name in enumerate(shown):
+        if index:
+            text.append(", ")
+        text.append(safe_text(name))
+    remaining = len(names) - len(shown)
+    if remaining > 0:
+        text.append(f" +{remaining} more")
+    return text
+
+
 @dataclass(frozen=True)
 class CoverageStats:
     """The seven coverage-strip statistics for one rendered image (US-037).
@@ -930,6 +1035,11 @@ class MemoryMapPanel(Container):
         #: single canonical source for both the cell join and the region count
         #: (LLR-041.5 / LLR-041.8, arch MINOR-3). Never re-derived here.
         self._issues: List[ValidationIssue] = []
+        #: The enriched A2L tags handed in by ``update_memory_map`` (R-TUI-041
+        #: R-3) — the read-only source for naming a region/cell by the A2L
+        #: symbol(s) overlapping it (detail pane + per-cell tooltip). Never
+        #: re-parsed; joined via ``symbols_in_window``.
+        self._a2l_tags: List[Mapping[str, Any]] = []
         #: The currently-selected cell's start address, or ``None`` before any
         #: selection — carried on the Open-in-Hex message (LLR-041.6).
         self._selected_cell_start: Optional[int] = None
@@ -1004,6 +1114,7 @@ class MemoryMapPanel(Container):
         ranges: Sequence[Tuple[int, int]],
         range_validity: Sequence[bool],
         issues: Sequence[ValidationIssue] = (),
+        a2l_tags: Sequence[Mapping[str, Any]] = (),
     ) -> None:
         """Render the colour-coded minimap grid from already-computed ranges.
 
@@ -1059,6 +1170,7 @@ class MemoryMapPanel(Container):
 
         grid.remove_children()
         self._issues = list(issues)
+        self._a2l_tags = list(a2l_tags)
         self._reset_detail()
 
         span_start, span_end = derive_image_span(ranges)
@@ -1096,6 +1208,10 @@ class MemoryMapPanel(Container):
             cell = MapCell(
                 cell_start, cell_end, status, f"map-cell {sev_class}"
             )
+            # R-TUI-041 R-3: hover tooltip naming the A2L symbol(s) in the cell.
+            # MUST be a Rich ``Text`` — Textual markup-parses a bare ``str``
+            # tooltip, so a Text keeps a hostile A2L name literal (security F1).
+            cell.tooltip = self._cell_tooltip(cell_start, cell_end, status)
             cells.append(cell)
         if cells:
             grid.mount(*cells)
@@ -1106,6 +1222,45 @@ class MemoryMapPanel(Container):
         header.update(safe_text(summary))
 
         self._render_stats(ranges, range_validity, self._issues, empty=False)
+
+    def _cell_tooltip(
+        self, cell_start: int, cell_end: int, status: str
+    ) -> Text:
+        """Markup-safe hover tooltip for one ``MapCell`` (R-TUI-041 R-3).
+
+        Summary:
+            Compose the cell's address window + status and, when A2L symbol(s)
+            overlap the cell window, their name(s) (capped) — as a Rich
+            ``Text``. The return MUST be ``Text`` (never a ``str``): Textual
+            8.2.8 renders a bare ``str`` tooltip through ``markup=True``
+            (``Content.from_markup``), so a hostile A2L name like ``evil[red]``
+            would inject markup or raise ``MarkupError`` on hover; a ``Text`` is
+            rendered via ``Content.from_rich_text`` literally (security review
+            F1 / the batch-27 markup BLOCKER class). The window + status are
+            developer-formatted ints/literals; only the symbol names are
+            file-derived, and they flow through ``symbol_list_text`` (safe).
+
+        Args:
+            cell_start (int): Inclusive cell-window start.
+            cell_end (int): Exclusive cell-window end.
+            status (str): The cell status literal (``valid``/``invalid``/``gap``).
+
+        Returns:
+            Text: The markup-safe tooltip content.
+
+        Dependencies:
+            Uses:
+                - ``symbols_in_window`` / ``symbol_list_text``
+            Used by:
+                - ``render_ranges`` (per-cell ``MapCell.tooltip``)
+        """
+        text = Text()
+        text.append(f"0x{cell_start:08X}-0x{cell_end - 1:08X} ({status})")
+        names = symbols_in_window(self._a2l_tags, cell_start, cell_end)
+        if names:
+            text.append("\n")
+            text.append(symbol_list_text(names))
+        return text
 
     def _render_stats(
         self,
@@ -1273,8 +1428,16 @@ class MemoryMapPanel(Container):
             r_size = r_end - r_start
             text.append(
                 f"Region: 0x{r_start:08X}-0x{r_end - 1:08X} "
-                f"({r_size} bytes, {r_status})\n"
+                f"({r_size} bytes, {r_status})"
             )
+            # R-TUI-041 R-3: name the region by the A2L symbol(s) overlapping
+            # it. Untrusted A2L names go through ``symbol_list_text`` (markup-
+            # safe ``Text``), never an f-string (LLR-041.11).
+            region_names = symbols_in_window(self._a2l_tags, r_start, r_end)
+            if region_names:
+                text.append(" - ")
+                text.append(symbol_list_text(region_names))
+            text.append("\n")
             region_issue_count = len(
                 issues_in_window(self._issues, r_start, r_end)
             )
