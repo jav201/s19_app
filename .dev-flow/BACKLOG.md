@@ -193,6 +193,16 @@ polish + one spike, grouped into 3 small themed batches, then the Flow Builder (
   intermittent `pilot`/`WaitForScreenTimeout` failures ("different unrelated test fails each run; passes in
   isolation"). Fix bounds the handler set to 1 per process (batch-42 fast-flow, self-merged). **Retires the
   standing per-batch control-run tax (C-CANDIDATE-C).**
+- **Item ⑥ — DONE (batch-43, 2026-07-13):** A2L-symbol region names + Memory-Map per-cell tooltips
+  (**R-TUI-041 R-3**, deferred at batch-27). Render-only over `_a2l_enriched_tags`: the detail-pane
+  covering region is named by overlapping A2L symbol(s) (capped 3 + "+N more"), and each `MapCell` gets a
+  hover tooltip listing the symbols in the cell + its window/status. New `symbols_in_window` /
+  `symbol_list_text` / `_cell_tooltip`; `update_memory_map` passes tags as `render_ranges`'s 4th arg.
+  `a2l.py` only READ (frozen, untouched). `security_required: TRUE` — security-reviewer pre-code pass
+  (F1): a `str` tooltip is markup-parsed by Textual 8.2.8 (would inject/crash on hover) → mitigation =
+  tooltip is a Rich `Text` (never f-string); detail pane via `Text.append(safe_text)`. Gate **1400
+  passed / 0 failed / 3 xfailed** (+5 tests), 0 frozen diffs, C-27 dual-guard ×2, C-26 census clean,
+  RED-first for AC-1 + AC-2. fast-dev-flow, autonomous + self-merge. REQUIREMENTS R-TUI-041 amended.
 
 > **Tracking rule (operator, 2026-07-13):** ALL code changes go through **at least `/fast-dev-flow`**
 > (tracked: spec + branch + PR + tests). Do NOT do trivial/hygiene items as untracked `direct` edits —

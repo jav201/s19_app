@@ -596,6 +596,23 @@ supersedes/extends R-TUI-026.
   (`test_ac1_open_in_hex_snaps_to_nearest_present_row`, RED-first); (b) AC-6/B-15
   — `MapCell.render` fills the cell's content width with glyphs so the grid
   reads as a contiguous band (`test_ac6_map_cells_render_contiguous_band`).
+  Amended in batch `2026-07-13-batch-43` (fast-dev-flow) — **R-3 shipped**
+  (A2L-symbol region naming, deferred at batch-27): the detail-pane covering
+  region is now named by the A2L symbol(s) overlapping it, and each `MapCell`
+  carries a hover tooltip listing the symbols intersecting the cell + its
+  window/status. Both surfaces render `_a2l_enriched_tags` names markup-safe —
+  the detail pane via `Text.append(safe_text(...))`, the tooltip as a Rich
+  `Text` (never a `str`, which Textual would markup-parse — the batch-27
+  BLOCKER class, security review F1). New module helpers `symbols_in_window`
+  (extent-overlap join, `[addr, addr+byte_size)`, hostile-shape-safe) +
+  `symbol_list_text` (capped, markup-safe) + `MemoryMapPanel._cell_tooltip`;
+  `update_memory_map` passes `_a2l_enriched_tags` as the 4th `render_ranges`
+  arg. Tests (`tests/test_tui_directionb.py`): `test_symbols_in_window_*`,
+  `test_at_r3_detail_region_named_by_a2l_symbols` (RED-first),
+  `test_at_r3_detail_hostile_symbol_name_rendered_literally`,
+  `test_at_r3_detail_no_a2l_region_bounds_only`,
+  `test_at_r3_cell_tooltip_names_symbols_and_renders_literally` (RED-first,
+  drives `Content.from_rich_text` to prove literal render).
 
 **R-TUI-042**: Three prototype-approved (throwaway-prototype design intent,
 implemented + verified in Textual) view enhancements, all render-only over the
