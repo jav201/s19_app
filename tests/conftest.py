@@ -974,12 +974,11 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
         byte-identity pin: platform newline translation undone (CRLF -> LF),
         every spelling of the per-run pytest tmp root replaced by
         ``<RUN-ROOT>``, and path separators normalized to ``/`` ONLY inside
-        run-root path spans — content bytes are never rewritten. Shared
-        home for the helper duplicated as ``_canonical_report_bytes`` in
+        run-root path spans — content bytes are never rewritten. The single
+        shared home for the report byte-identity canonical form (batch-41
+        consolidated the two former ``_canonical_report_bytes`` copies in
         ``tests/test_before_after_report.py`` and
-        ``tests/test_tui_report_seam.py`` (factored here on its THIRD use,
-        per the Inc-2 reviewer recommendation; the two originals stay
-        untouched to keep those increments' diffs closed).
+        ``tests/test_tui_report_seam.py`` onto this helper).
 
     Args:
         raw (bytes): Report bytes as read from disk (a freshly written
@@ -999,6 +998,8 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
         Uses:
             - RUN_ROOT_TOKEN
         Used by:
+            - tests/test_before_after_report.py (AT-054b)
+            - tests/test_tui_report_seam.py (AT-055b)
             - tests/test_tui_report_filter_surface.py (AT-056c/AT-056e)
 
     Example:

@@ -43,8 +43,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services.report_addendum import DeclaredRegion
 from s19_app.tui.services.manifest_writer import (

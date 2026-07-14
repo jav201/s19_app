@@ -61,6 +61,8 @@ from s19_app.tui.services.report_service import (
 )
 from s19_app.tui.services.variant_execution_service import read_project_manifest
 
+from conftest import canonical_report_bytes
+
 # Two minimal valid S19 images (checksums verified against
 # s19_app.core.S19File) — a 2-variant project per the spec, so the seam is
 # exercised on a real multi-variant inventory.
@@ -1158,69 +1160,12 @@ def test_zero_skip_suppresses_notify(tmp_path: Path) -> None:
 #: Generate flow under the environment pin declared in
 #: :func:`_drive_generate_report_bytes` (golden home:
 #: ``tests/goldens/batch35/`` — canonical form, see
-#: :func:`_canonical_report_bytes`).
+#: :func:`canonical_report_bytes`).
 _GOLDEN_DIR = Path(__file__).parent / "goldens" / "batch35"
 _AT055B_GOLDEN = _GOLDEN_DIR / "at055b-project-report.md"
 
 #: The LLR-055.3 fixed-clock environment-pin instant (UTC).
 _FIXED_REPORT_INSTANT = datetime(2026, 7, 10, 12, 0, 0, tzinfo=timezone.utc)
-
-#: Placeholder replacing every spelling of the per-run pytest tmp root
-#: inside canonical report bytes.
-_RUN_ROOT_TOKEN = b"<RUN-ROOT>"
-
-#: A run-root path span: the token plus its path remainder, stopping at the
-#: delimiters the report places around paths — separator normalization
-#: applies ONLY inside these spans, never to report content.
-_RUN_ROOT_SPAN = re.compile(rb"<RUN-ROOT>[^\s`\"'|)\]]*")
-
-
-def _canonical_report_bytes(raw: bytes, run_root: Path | None = None) -> bytes:
-    """
-    Summary:
-        Map report bytes to the canonical golden form of the LLR-055.3
-        byte-identity pin: platform newline translation undone (CRLF -> LF,
-        the ``Path.write_text`` seam — ``generate_project_report`` joins
-        with ``"\\n"`` and lets the platform translate), every spelling of
-        the per-run pytest tmp root replaced by ``<RUN-ROOT>``, and path
-        separators normalized to ``/`` ONLY inside run-root path spans —
-        content bytes are never rewritten. Twin of the AT-054b helper in
-        ``tests/test_before_after_report.py`` (duplicated per file to keep
-        the increment additive; no shared test util module exists).
-
-    Args:
-        raw (bytes): Report bytes as read from disk (a freshly written
-            report, or a stored golden).
-        run_root (Path | None): The per-run root whose spellings are
-            tokenized; ``None`` for stored goldens (already tokenized at
-            capture time — only the CRLF undo applies, shielding the golden
-            from git working-tree newline translation).
-
-    Returns:
-        bytes: The canonical byte form compared by AT-055b.
-
-    Data Flow:
-        - written report bytes + ``tmp_path`` -> canonical bytes;
-        - golden bytes (``run_root=None``) -> canonical bytes;
-        - equality of the two IS the LLR-055.3 byte-identity gate (raw
-          bytes cannot be run/platform-stable: the Modifications section
-          embeds the absolute run root in its change-doc/saved-as line).
-
-    Dependencies:
-        Uses:
-            - _RUN_ROOT_TOKEN / _RUN_ROOT_SPAN
-        Used by:
-            - test_at_055b_no_filter_generate_report_byte_identical_to_golden
-            - the batch-35 golden-capture procedure (increment-000)
-    """
-    data = raw.replace(b"\r\n", b"\n")
-    if run_root is not None:
-        forms = {str(run_root), str(run_root.resolve())}
-        for form in sorted(forms, key=len, reverse=True):
-            data = data.replace(form.encode("utf-8"), _RUN_ROOT_TOKEN)
-    return _RUN_ROOT_SPAN.sub(
-        lambda match: match.group(0).replace(b"\\", b"/"), data
-    )
 
 
 def _drive_generate_report_bytes(
@@ -1307,7 +1252,7 @@ def test_at_055b_no_filter_generate_report_byte_identical_to_golden(
       2026-07-10T12:00:00Z — the ``NowFn`` default-clock seam
       (``report_service.py:125-140``) ``generate_project_report`` resolves
       when no ``now_fn`` is passed (the shipped worker passes none).
-    Comparison runs on :func:`_canonical_report_bytes` (CRLF undo +
+    Comparison runs on :func:`canonical_report_bytes` (CRLF undo +
     per-run tmp-root tokenization); all other bytes are compared exact.
     Golden: ``tests/goldens/batch35/at055b-project-report.md``.
     Double-proof (batch-24 control): a one-byte golden perturbation makes
@@ -1324,8 +1269,8 @@ def test_at_055b_no_filter_generate_report_byte_identical_to_golden(
         f"AT-055b: golden fixture missing: {_AT055B_GOLDEN} (captured in "
         f"batch-35 increment-000 at base revision 79699a5)"
     )
-    observed = _canonical_report_bytes(written[report_name], tmp_path)
-    golden = _canonical_report_bytes(_AT055B_GOLDEN.read_bytes())
+    observed = canonical_report_bytes(written[report_name], tmp_path)
+    golden = canonical_report_bytes(_AT055B_GOLDEN.read_bytes())
     assert observed == golden, (
         f"AT-055b: unfiltered project-report bytes drifted from golden "
         f"{_AT055B_GOLDEN.name} (LLR-055.3 byte-identity, canonical form)"

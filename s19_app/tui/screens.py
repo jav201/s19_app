@@ -223,6 +223,11 @@ class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
     #: than on the Confirm button (mirrors :class:`LoadFileScreen`).
     AUTO_FOCUS = "#changeset_json_text"
 
+    #: ``Escape`` cancels the modal, mirroring the Cancel button (batch-41
+    #: fold: every sibling modal dismisses on Escape; this one previously
+    #: exposed only the Cancel button).
+    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+
     def __init__(self, seed_text: str) -> None:
         super().__init__()
         self._seed_text = seed_text
@@ -251,6 +256,10 @@ class ChangeSetJsonScreen(ModalScreen[Optional[str]]):
             self.dismiss(
                 self.query_one("#changeset_json_text", TextArea).text
             )
+
+    def action_cancel(self) -> None:
+        """Dismiss with ``None`` — ``Escape`` mirrors the Cancel button."""
+        self.dismiss(None)
 
 
 class EntryJsonScreen(ModalScreen[Optional[str]]):
@@ -910,11 +919,12 @@ class EntropyCell(Static):
         event.stop()
         self.post_message(self.Selected(self._row))
 
-#: Cost caps mirroring the ``hexview`` ``MAX_HEX_ROWS`` / ``MAX_HEX_BYTES``
-#: precedent (LLR-036.6): the strip renders at most this many cells and the
-#: jump list at most this many rows regardless of image size; beyond the cap
-#: the excess is truncated and an on-screen indicator is shown (never silent).
-ENTROPY_STRIP_MAX_CELLS = 512
+#: Per-page render budget mirroring the ``hexview`` ``MAX_HEX_ROWS`` /
+#: ``MAX_HEX_BYTES`` precedent (LLR-036.6 / LLR-062.1): the entropy viewer
+#: renders at most this many strip cells and jump rows PER PAGE regardless of
+#: image size; the tail is reachable by paging (batch-37 US-062), never
+#: silently dropped. (batch-41 retired the redundant per-cell strip-cap alias
+#: — this single budget now governs both the strip and the jump list.)
 ENTROPY_MAX_ROWS = 512
 
 
@@ -975,8 +985,7 @@ class EntropyViewerScreen(ModalScreen[Optional[int]]):
     Dependencies:
         Uses:
             - ``entropy_service.compute_entropy`` / ``EntropyWindow``
-            - ``ENTROPY_BAND_COLOUR`` / ``ENTROPY_STRIP_MAX_CELLS`` /
-              ``ENTROPY_MAX_ROWS``
+            - ``ENTROPY_BAND_COLOUR`` / ``ENTROPY_MAX_ROWS``
         Used by:
             - ``S19TuiApp.action_show_entropy`` (the ``e`` binding)
             - tests/test_tui_entropy_viewer.py

@@ -112,7 +112,7 @@ def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
         console.print(f"[bold cyan]File:[/bold cyan] {args.file}")
         console.print(f"[bold cyan]Endian:[/bold cyan] {s19.endian}")
         console.print(f"[bold cyan]Valid records:[/bold cyan] {sum(r.valid for r in s19.records)}")
-        console.print(f"[bold cyan]Header:[/bold cyan] (see below)")
+        console.print("[bold cyan]Header:[/bold cyan] (see below)")
         s19.print_header()
 
     elif args.command == "layout":
@@ -184,7 +184,7 @@ def dispatch(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     elif args.command == "update-checksums":
         for record in s19.records:
             record.checksum = record._calculate_checksum()
-        console.print(f"[cyan]🔄 All checksums updated based on current data.[/cyan]")
+        console.print("[cyan]🔄 All checksums updated based on current data.[/cyan]")
     elif args.command == "dump-by-range":
         if args.output:
             with open(args.output, "w", encoding='utf-8') as f:

@@ -2862,6 +2862,73 @@ def test_at064b_json_popup_edit_confirm_cancel_and_geometry(
     )
 
 
+def test_at_batch41_escape_cancels_changeset_json_popup(tmp_path: Path) -> None:
+    """Escape dismisses the ChangeSetJsonScreen popup as a Cancel (batch-41).
+
+    Intent (AC-5.1, batch-37 fold): the full-size JSON popup previously
+    exposed only a Cancel BUTTON — ``Escape`` was unbound, so it could not
+    close the modal the way every sibling modal does. With the new
+    ``BINDINGS = [Binding("escape", "cancel", ...)]`` on
+    :class:`ChangeSetJsonScreen`, pressing ``Escape`` after editing the
+    TextArea pops the modal and leaves the change document UNCHANGED (a
+    Cancel, never an apply). Pre-fix RED: ``Escape`` is unbound → the modal
+    stays on screen (still a ``ChangeSetJsonScreen``).
+    """
+    from textual.widgets import Button, TextArea
+
+    from s19_app.tui.screens import ChangeSetJsonScreen
+
+    seed = _changeset_text(
+        [{"type": "bytes", "address": "0x100", "bytes": "AA BB"}]
+    )
+    edited = _changeset_text(
+        [
+            {"type": "bytes", "address": "0x100", "bytes": "AA BB"},
+            {"type": "string", "address": "0x777", "value": "VIAPOPUP"},
+        ]
+    )
+
+    async def _escape() -> dict[str, object]:
+        outcomes: dict[str, object] = {}
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            _seed_via_paste(app, seed)
+            await pilot.pause()
+
+            app.query_one("#patch_edit_json_button", Button).press()
+            await pilot.pause()
+            outcomes["popup_open_before_escape"] = isinstance(
+                app.screen, ChangeSetJsonScreen
+            )
+            # Edit the JSON, then press Escape instead of clicking Cancel.
+            app.screen.query_one("#changeset_json_text", TextArea).text = edited
+            await pilot.press("escape")
+            await pilot.pause()
+            await pilot.pause()
+            outcomes["popup_still_open"] = isinstance(
+                app.screen, ChangeSetJsonScreen
+            )
+            outcomes["after"] = _entry_addresses(app)
+        return outcomes
+
+    result = asyncio.run(_escape())
+
+    assert result["popup_open_before_escape"] is True, (
+        "Edit JSON must push the ChangeSetJsonScreen modal"
+    )
+    # AC-5.1: Escape dismisses the modal (RED pre-fix: Escape unbound → still open).
+    assert result["popup_still_open"] is False, (
+        "Escape must dismiss the ChangeSetJsonScreen popup (batch-41 binding)"
+    )
+    # Escape is a Cancel: the edited-but-unconfirmed entry must NOT be applied.
+    assert result["after"] == ["0x100"], (
+        f"Escape must not mutate the document; got {result['after']!r}"
+    )
+
+
 def test_at064c_edit_json_disabled_for_file_backed_document(
     tmp_path: Path,
 ) -> None:

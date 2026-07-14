@@ -176,22 +176,16 @@ control-encode approval (always ask before editing `~/.claude/commands/`).
 Everything B-01..B-24 shipped; batch-38 snapshot regen DONE (PR #71). Remaining = hygiene + small
 polish + one spike, grouped into 3 small themed batches, then the Flow Builder (multi-batch).
 
-- **Batch 39 — "Untrusted-text hardening" (`/fast-dev-flow`, IN PROGRESS):** ① native bracketed-paste
-  **64 KiB cap** on the 3 plain TextAreas `#patch_paste_text` / `#changeset_json_text` /
-  `#entry_json_text` (they bypass the OsClipboardInput funnel); ② **S-F7** sanitize raw
-  `linkage_symbol` in `report_service.py:625` (golden-regen discipline C-24); ③ **P-3** filename-markup
-  hygiene on `#status_text` / `set_file_status` + `notify`. One security/robustness theme; each ships a
-  black-box AT. *(Started first — clears the batch-37/38 security carries.)*
-- **Batch 40 — "Small UX fixes" (`/fast-dev-flow`):** ④ batch-38 Inc-4 F1 Checks-panel goes stale after
-  undo/redo (`last_check_result` not reset); ⑤ Inc-4 F2 undo/redo `ctrl+z`/`ctrl+y` key bindings; ⑦
-  coverage-% `.6f` display. (⑥ A2L-symbol region names + per-cell tooltips R-TUI-041 R-3 — fold here or
-  its own batch, operator's call.)
-- **Batch 41 — "Repo & test hygiene" (`/fast-dev-flow` — NOT direct):** ⑧ `canonical_report_bytes`
-  consolidation (4 copies → one conftest helper); ⑨ `object.__setattr__` test-helper retire (2 files);
-  ⑩ **P-2** repo ruff debt (8 errors, 5 auto-fixable); ⑪ **P-1** 1-based index convention; + 2 trivial
-  batch-37 folds (`Escape` on `ChangeSetJsonScreen`, vestigial `ENTROPY_STRIP_MAX_CELLS`). No
-  product-behavior change. **OPERATOR RULE 2026-07-13: bundle these as a tracked fast-dev-flow batch —
-  NO loose direct edits; every change is tracked (spec + branch + PR).**
+- **Batch 39 — "Untrusted-text hardening" (`/fast-dev-flow`) — DONE** ([PR #72](https://github.com/jav201/s19_app/pull/72) `fbd8aaa`): ① native paste **64 KiB cap** on all **5** stock TextAreas (pre-pass expanded 3→5) via `CappedTextArea`; ② **S-F7** escape `linkage_symbol` at report render sink `report_service:977` (was mis-specced :625); ③ **P-3** `markup=False` on `#status_text` + 3 notify sites + docstring fix. Pre-code+final security PASS.
+- **Batch 40 — "Small UX fixes" (`/fast-dev-flow`) — DONE** ([PR #73](https://github.com/jav201/s19_app/pull/73) `0954826`): ④ undo/redo reset `last_check_result` + refresh Checks panel; ⑤ `ctrl+z`/`ctrl+y` bindings (A-01 guard preserved); ⑦ coverage `.6f`→`.2f`. (⑥ A2L-symbol region names + per-cell tooltips R-TUI-041 R-3 → **its own future batch**, operator 2026-07-13.)
+- **Batch 41 — "Repo & test hygiene" (`/fast-dev-flow`) — DONE 2026-07-13:** ⑧ `_canonical_report_bytes`
+  consolidated onto `conftest.canonical_report_bytes` (2 local copies deleted; 3 importers); ⑨
+  `object.__setattr__` bypass retired in 2 files (`source_name=` kwarg — field already declared, zero
+  production change); ⑩ **P-2** 7 of 8 ruff hits cleared (frozen `a2l.py:926` F841 = documented carry);
+  ⑤ `Escape`→cancel binding on `ChangeSetJsonScreen` (RED-first AT); ⑥ vestigial `ENTROPY_STRIP_MAX_CELLS`
+  removed (live `ENTROPY_MAX_ROWS` preserved). Gate **1394 passed / 0 failed / 3 xfailed** (+1 test), 0
+  frozen diffs, C-27 dual-guard ×2, C-26 census clean, `security_required: false`. **⑪ P-1 DEFERRED**
+  (no concrete defect — re-logged below). 12 code files, net −44 lines.
 - **Spike (any time):** ⑫ full-suite TUI global-state flake → `/diagnose` root-cause before it bites a gate.
 
 > **Tracking rule (operator, 2026-07-13):** ALL code changes go through **at least `/fast-dev-flow`**

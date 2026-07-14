@@ -299,12 +299,12 @@ def test_double_run_orderings_identical(tmp_path: Path) -> None:
     runs compare equal.
     """
     project_dir = _make_project(tmp_path, {"b.s19": S19_B, "a.s19": S19_A})
-    chk_batch = _write_v2_document(
+    _write_v2_document(
         project_dir / "chk1.json",
         [{"type": "bytes", "address": "0x1000", "bytes": "01"}],
         kind="check",
     )
-    chk_extra = _write_v2_document(
+    _write_v2_document(
         project_dir / "chk2.json",
         [{"type": "bytes", "address": "0x2000", "bytes": "0A"}],
         kind="check",

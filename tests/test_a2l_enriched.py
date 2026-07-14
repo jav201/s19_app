@@ -6,7 +6,6 @@ import pytest
 
 from s19_app.tui.a2l import (
     build_section_tree,
-    extract_a2l_tags,
     parse_a2l_file,
     parse_begin_meta,
     parse_measurement_header,
