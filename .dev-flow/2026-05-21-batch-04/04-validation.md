@@ -137,7 +137,7 @@ TC-027 is the one `inspection`-method TC. The §5.6 checklist was applied in Pha
 
 ## 5. Per-TC pass/fail table
 
-Verdict legend: `pass` = an asserting test is green in this Phase 4 run / the inspection checklist is fully satisfied. Every TC verdict below is backed by the §1.2 (151-pass) and §1.1 (762-pass) Phase 4 evidence runs. Each TC was confirmed to have ≥1 referencing asserting test in the 11 batch-04 test files (every TC-NNN ID TC-001…TC-037 was grep-confirmed present); the "Evidence" column names the test file(s) and the LLR coverage. Method abbreviations match §5.7: U = test (unit), I = test (integration), RT = test (round-trip), INSP = inspection, A = analysis (corroborating only).
+Verdict legend: `pass` = an asserting test is green in this Phase 4 run / the inspection checklist is fully satisfied. Every TC verdict below is backed by the §1.2 (151-pass) and §1.1 (762-pass) Phase 4 evidence runs. Each TC was confirmed to have ≥1 referencing asserting test in the 11 batch-04 test files (every TC-<n> ID TC-001…TC-037 was grep-confirmed present); the "Evidence" column names the test file(s) and the LLR coverage. Method abbreviations match §5.7: U = test (unit), I = test (integration), RT = test (round-trip), INSP = inspection, A = analysis (corroborating only).
 
 | TC | Title | Covers LLR | Method | Verdict | Evidence (Phase 4) |
 |----|-------|------------|--------|---------|--------------------|
@@ -237,7 +237,7 @@ Verdict legend: `pass` = an asserting test is green in this Phase 4 run / the in
 
 | # | Criterion (abridged) | Verdict | Evidence |
 |---|----------------------|---------|----------|
-| 1 | **Coverage** — 100% of the 9 HLR + 37 LLR map to ≥1 TC with a recorded `pass`; the §5.7 catalogue of 37 active TCs over 37 IDs (TC-001…TC-037) is the record. | **met** | §5 + §6 — 9 HLR + 37 LLR all map to TCs; 37/37 TCs pass. All 37 TC-NNN IDs were grep-confirmed present in the 11 batch-04 test files. |
+| 1 | **Coverage** — 100% of the 9 HLR + 37 LLR map to ≥1 TC with a recorded `pass`; the §5.7 catalogue of 37 active TCs over 37 IDs (TC-001…TC-037) is the record. | **met** | §5 + §6 — 9 HLR + 37 LLR all map to TCs; 37/37 TCs pass. All 37 TC-<n> IDs were grep-confirmed present in the 11 batch-04 test files. |
 | 2 | **Method assigned** — no HLR or LLR left without a validation method. | **met** | §5.2 / §5.3 of the requirements are complete; every TC in §5 carries its method (U / I / RT / INSP / A). |
 | 3 | **No blocker fails** — zero failing TCs at error/blocker severity. | **met** | §1 — 0 failed in the full 762-pass run and the 151-pass subset; §5 — 0 TC fails of any severity. No warning-level finding to justify. |
 | 4 | **Round-trip pass** — TC-025 passes: a scalar + 1-D array + ASCII + three adversarial IEEE floats parameter half plus an `inside`+`partial`+`outside`+multi-byte memory half survives write→read structurally equal, exact float `==`, exact ordered byte sequence. | **met** | TC-025 — `test_unified_roundtrip.py`, 9 tests green; exact `==` on every parameter value, adversarial floats survive full binary64 precision, every memory byte run recovered exactly, order preserved, status re-derived and asserted separately (Q-06 predicate). |

@@ -404,7 +404,7 @@ unconfused.
 
 ## 12. LLR decomposition (Phase-2, architect) + fold record
 
-Normative statements use *shall*. Each LLR names its owning AT(s); white-box TC-NNN ids are minted in
+Normative statements use *shall*. Each LLR names its owning AT(s); white-box TC-<n> ids are minted in
 Phase 3 and reconciled per V-5.
 
 ### R-CRC-GROUP-001 → LLR-GRP-001.x
@@ -438,7 +438,7 @@ Phase 3 and reconciled per V-5.
 | .5 | Compare rule (F-6): `matched = decoded_stored == (computed & ((1<<8N)−1))` for N ≤ 4; N = 8 shall require the high 4 stored bytes ≡ 0 | AT-047a |
 | .6 | Range extension `[out, out+N)` at every width; merge/adjacency via `_extend_ranges` unchanged | AT-046a, B7/B9 |
 
-### Phase-2 TC obligations (minted as TC-NNN in Phase 3)
+### Phase-2 TC obligations (minted as TC-<n> in Phase 3)
 - AT-044a shall be realized with **literal frozen expectations** (golden double-proof, batch-24 control): expected values/bytes captured at authoring, never recomputed through the pipeline under test (QA m-4).
 - AT-047f's TC shall pin that the overlapped-output target is evaluated BEFORE the containing-span target under the Q3 order, or the counterfactual is vacuous (QA m-5).
 - AT-046a's ranges clause is realized at the TC layer (repo Layer-A idiom); the AT's observable is the emitted file carrying the 8-byte window (QA m-7).

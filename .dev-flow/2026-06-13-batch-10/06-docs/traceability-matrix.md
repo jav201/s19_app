@@ -8,7 +8,7 @@
 
 ## 1. Master table
 
-Legend — TC col carries the spec id (TC-NNN); the implemented node id is in the File:line cell. `File:line` cites BOTH the implementation site and the verifying test site.
+Legend — TC col carries the spec id (TC-<n>); the implemented node id is in the File:line cell. `File:line` cites BOTH the implementation site and the verifying test site.
 
 | US | HLR | LLR | TC | File:line (impl → test) | Status | Notes |
 |----|-----|-----|----|--------------------------|--------|-------|

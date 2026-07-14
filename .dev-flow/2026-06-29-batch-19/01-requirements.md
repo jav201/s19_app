@@ -1,4 +1,4 @@
-# Requirements Document — <PROJECT> — Batch <BATCH_ID>
+# Requirements Document — s19_app — Batch 2026-06-29-batch-19
 
 > **Artifact language**
 > This template is the canonical **English scaffold**. Generate the artifact in the batch's development language (`state.json` `language`). For Spanish batches, translate the section headers and guidance and use `deberá` as the normative keyword (≡ `shall`). The normative RULES in this preamble are **language-independent** and enforced regardless of artifact language.
