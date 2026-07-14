@@ -26,6 +26,65 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 
 ## OPEN QUEUE
 
+### FIELD AUDIT — post-batch-44 (2026-07-14) — operator issue sweep, code-grounded
+
+> Operator ran the shipped tool on a real client file and filed ~25 issues + questions. Audited every
+> one against the code (3 parallel read-only agents). **Headline: most are already SHIPPED-WORKS
+> (batches 29–44); the real work is ~4 bugs + ~4 new features + a big discoverability gap.** Several
+> complaints describe **pre-batch-31/36/37 behavior** → FIRST confirm the operator is on the current
+> build (the Flow-Builder rail in the screenshot says yes, but "entropy truncated / can't paste paths
+> / tiny JSON box / no load-project" all read as stale). Answered questions: A2L undeclared-length IS
+> inferred from `DATATYPE_SIZES` (a2l.py:13-28), independent of `A2L_ADDRESS_EXCEEDS_32BIT`; CRC
+> multi-region IS shipped (batch-32 groups); "v2 change-set" = schema-v2 not variant-2; uncheckable
+> reason exists but sits on the status line.
+
+**P0 — real bugs (small fix, high value)**
+- **B1 — Issues PgUp/PgDn are no-ops.** SHIPPED-BUGGY. Bindings wired but page **stride=200** while
+  panel mounts only **40** rows (`_GROUP_DISPLAY_MAX`) → no-op for 41–200 issues. Fix: page by the
+  40-row cap. `issues_view.py:52,267`, `app.py:6741`.
+- **B2 — Patch buttons unreachable / 3 scrollbars.** SHIPPED-BUGGY. Change-file pane holds the most
+  widgets but gets the smallest grid row (`1fr` of `1fr 2fr 2fr auto`); buttons overflow its fold,
+  scroll fragmented across ~5 regions. Fix: weight the row / hoist the button row. **← operator's
+  item-1; pairs with U8 3-window redesign; /prototype FIRST (operator, 2026-07-14).** `styles.tcss:704-721`.
+- **B3 — A2L address shows "two extra chars" (clicks correct).** SHIPPED-BUGGY, NEEDS-REPRO. Likely a
+  >32-bit address (`f"0x{addr:08X}"` non-truncating) + hex-view clamp; but "at the end" implies a
+  low-order discrepancy that display/click (same `tag["address"]` int) can't produce in audited code.
+  Needs live repro w/ the real symbol+value. `app.py:9180,6265`, `a2l.py:984`.
+
+**P1 — genuinely-new features**
+- **N1 — Entropy/density-shaded memory map** (operator item-2: histogram / "at a glance", grid,
+  textures). NOT-IMPLEMENTED. Map colour = validation-range overlap ONLY; `mem_map`/entropy is never
+  plumbed into `render_ranges` → real files mostly grey. New data path: per-cell entropy → colour
+  ramp + grid + texture glyphs. **/prototype.** `screens_directionb.py:302-347,1124`; entropy in
+  `entropy_service.py` (separate).
+- **N2 — Issues filter (name + type) + sort.** PARTIAL. Only 3-way severity filter today; data
+  (`symbol`/`code`/`severity`) already on each row. `app.py:6564`, `issues_view.py:173`.
+- **N3 — Single-click map→hex nav.** PARTIAL. Cell click only paints detail + reveals an "Open in Hex"
+  button (2nd click jumps). Bind nav to select. `screens_directionb.py:1473,1542`.
+- **N4 — Paste into ALL text boxes.** PARTIAL. A2B-diff paths + file-load already paste-enabled
+  (`OsClipboardInput`); search/goto/filter/name/save are stock `Input`. Extend the widget.
+  `os_clipboard_input.py`, `command_bar.py:142`.
+
+**P2 — UX / presentation polish**
+- **U1** surface uncheckable-entry reason inline on the row (exists on status line, `check.py:350`).
+- **U2** relabel "v2 change-set" box (schema-v2 ≠ variant-2) — trivial.
+- **U3** denser map cells / grid lines / textures (`grid-gutter` already 0; needs denser glyph) — ties N1.
+- **U4** load-project as inline dropdown vs modal list (functionality shipped, `screens.py:638`).
+- **U5** bigger workspace files allocation at 80×24 (elastic already, splits left col 1:1).
+- **U6** ASCII in the hex-only "### Modifications" table (`report_service.py:970`) — "Change-entry
+  linkage" already has before+after ASCII.
+- **U7** entropy strip: description-first landing (jumps straight to hex today).
+- **U8** 3 distinct windows for patch/checks (gestalt) — stronger than today's labeled sections;
+  pairs with B2. **/prototype (operator FIRST pick, 2026-07-14).**
+
+**P3 — discoverability (biggest lever, mostly NOT code)** — SHIPPED but operator couldn't find:
+report-filter (R-RPT-FILTER-001, "most important" — exists), CRC multi-region (batch-32 groups),
+Refresh + JSON popup (R-TUI-052/053), persistent "Write before/after report" button (US-061), entropy
+paging/sort/legend (R-TUI-050/051), load-project (`p`). → in-app hints / onboarding pass.
+
+**Won't-fix (format-inherent — explain):** Markdown per-byte colour + MD side-by-side — Markdown can't
+express either; HTML report already does BOTH (`diff_report_service.py:1765,1868`).
+
 ### P3 — low
 - **B-16/B-17/B-18/B-19 — SHIPPED batch-38 (US-065/066/067/068a/068b).** The entire P3 pool is
   CLOSED (pending commit/PR). See DONE below. What remains open is the Bookmarks scaffold + hygiene
