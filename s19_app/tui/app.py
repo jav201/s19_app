@@ -60,7 +60,7 @@ from .screens import (
 )
 from .screens_directionb import (
     AbDiffPanel,
-    BookmarksPlaceholder,
+    FlowBuilderPanel,
     CoverageStats,
     EmptyStatePanel,
     MemoryMapPanel,
@@ -808,7 +808,7 @@ class S19TuiApp(App):
         Binding("5", "show_screen('issues')", "Issues Report", show=False),
         Binding("6", "show_screen('patch')", "Patch Editor", show=False),
         Binding("7", "show_screen('diff')", "A2B Diff", show=False),
-        Binding("8", "show_screen('bookmarks')", "Bookmarks", show=False),
+        Binding("8", "show_screen('flow')", "Flow Builder", show=False),
         ("plus", "page_next_context", "Page+"),
         ("minus", "page_prev_context", "Page-"),
         ("comma", "hex_page_prev", "Hex-"),
@@ -1242,8 +1242,8 @@ class S19TuiApp(App):
               (increment 7) holding the Issues ``DataTable`` + filters +
               summary promoted out of the old Workspace Status tile.
             - Screen 4 (Memory Map) renders a read-only coverage map of the
-              loaded image, and screen 8 (Bookmarks) shows a neutral
-              "coming soon" placeholder (increment 9).
+              loaded image, and screen 8 (Flow Builder) composes + runs an
+              ordered typed-block pipeline (R-TUI-059 tracer).
             - Screen 6 (Patch Editor) is the fully-wired v2 change flow —
               the ``PatchEditorPanel`` posts ``ActionRequested`` messages
               that ``app.py`` routes to ``ChangeService`` for
@@ -1289,7 +1289,7 @@ class S19TuiApp(App):
                 self._compose_screen_issues(),
                 self._compose_screen_patch(),
                 self._compose_screen_diff(),
-                self._compose_screen_bookmarks(),
+                self._compose_screen_flow(),
                 id="workspace_body",
             ),
             id="workspace_shell",
@@ -1524,36 +1524,82 @@ class S19TuiApp(App):
             classes="db-screen hidden",
         )
 
-    def _compose_screen_bookmarks(self) -> Container:
+    def _compose_screen_flow(self) -> Container:
         """
         Summary:
-            Build the Direction B Bookmarks rail screen (``#screen_bookmarks``)
-            as a neutral "coming soon" placeholder — no persistence logic is
-            wired (LLR-002.2 / LLR-012.4).
+            Build the rail-8 Flow Builder screen (``#screen_flow``, R-TUI-059)
+            — the tracer surface hosting a :class:`FlowBuilderPanel`. Run is
+            handled by ``on_flow_builder_panel_run_requested``.
 
         Args:
             None
 
         Returns:
-            Container: ``#screen_bookmarks`` holding a title label and a
-            ``BookmarksPlaceholder`` static notice. Hidden at startup.
+            Container: ``#screen_flow`` holding a title label and the
+            ``FlowBuilderPanel``. Hidden at startup.
 
         Data Flow:
-            - Static composition only. Activating the Bookmarks rail item
-              shows this container; no bookmark state is read or written.
+            - Static composition. Activating the Flow rail item shows this
+              container; Run posts ``FlowBuilderPanel.RunRequested``.
 
         Dependencies:
             Uses:
-                - ``BookmarksPlaceholder``
+                - ``FlowBuilderPanel``
             Used by:
                 - ``compose``
         """
         return Container(
-            Label("Bookmarks", classes="db-screen-title"),
-            BookmarksPlaceholder(),
-            id="screen_bookmarks",
+            Label("Flow Builder", classes="db-screen-title"),
+            FlowBuilderPanel(),
+            id="screen_flow",
             classes="db-screen hidden",
         )
+
+    def on_flow_builder_panel_run_requested(
+        self, event: "FlowBuilderPanel.RunRequested"
+    ) -> None:
+        """Run the composed flow over the active project and paint the result.
+
+        Summary:
+            Handle the rail-8 Run (R-TUI-059): resolve the active project
+            directory and execute the flow via the Textual-free
+            ``flow_execution_service.run_flow`` (reads bounded to the project,
+            writes to the work area — batch-44 security F1/F2), then hand the
+            ``FlowRunResult`` back to the panel. A no-project state renders an
+            error result instead of running. Runs synchronously — acceptable
+            for the tracer's small images; a worker is deferred to polish.
+
+        Args:
+            event (FlowBuilderPanel.RunRequested): Carries the composed flow.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_active_project_dir`` / ``flow_execution_service.run_flow``
+            Used by:
+                - ``FlowBuilderPanel`` Run button (message dispatch)
+        """
+        from .services.flow_execution_service import run_flow
+        from .services.flow_model import (
+            FLOW_STATUS_ERROR,
+            FlowContext,
+            FlowRunResult,
+        )
+
+        panel = self.query_one("#flow_panel", FlowBuilderPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            panel.render_result(
+                FlowRunResult(
+                    status=FLOW_STATUS_ERROR,
+                    diagnostics=["no project loaded - load a project first"],
+                )
+            )
+            return
+        result = run_flow(event.flow, FlowContext(project_dir=project_dir))
+        panel.render_result(result)
 
     def _compose_screen_patch(self) -> Container:
         """
@@ -4409,7 +4455,7 @@ class S19TuiApp(App):
         self.logger.info("A2L JSON exported: %s", output)
 
     #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
-    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Bookmarks —
+    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow —
     #: the rail order of the keymap proposal (keys 1-8).
     SCREEN_CONTAINER_IDS = {
         "workspace": "screen_workspace",
@@ -4419,7 +4465,7 @@ class S19TuiApp(App):
         "issues": "screen_issues",
         "patch": "screen_patch",
         "diff": "screen_diff",
-        "bookmarks": "screen_bookmarks",
+        "flow": "screen_flow",
     }
 
     #: One extra command-palette command outside ``BINDINGS``: the viewer
@@ -4479,7 +4525,7 @@ class S19TuiApp(App):
         Args:
             screen_key (str): One of the keys of ``SCREEN_CONTAINER_IDS``
                 (``workspace`` / ``a2l`` / ``mac`` / ``map`` / ``issues`` /
-                ``patch`` / ``diff`` / ``bookmarks``).
+                ``patch`` / ``diff`` / ``flow``).
 
         Returns:
             None

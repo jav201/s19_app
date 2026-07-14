@@ -154,7 +154,7 @@ def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
                 "issues",
                 "patch",
                 "diff",
-                "bookmarks",
+                "flow",
             ):
                 app.action_show_screen(key)
                 app.set_focus(None)
