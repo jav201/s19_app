@@ -13,8 +13,9 @@ Increment 9 adds the first two real scaffold contents:
   - ``MemoryMapPanel`` — a read-only coverage visualization of the loaded
     image, rendered from the existing ``LoadedFile.ranges`` and
     ``range_validity`` fields (LLR-012.1); it computes no coverage itself;
-  - ``BookmarksPlaceholder`` — the neutral "coming soon" placeholder for
-    the Bookmarks rail item (LLR-002.2); no persistence logic.
+  - ``FlowBuilderPanel`` — the rail-8 Flow Builder (R-TUI-059 tracer): a
+    dropdown-add block list + Run that composes a typed-block pipeline and
+    emits ``RunRequested`` for the app to execute via ``run_flow``.
 
 Increment 10 (batch-02) added the last two scaffold contents:
   - ``PatchEditorPanel`` — *(superseded by batch-03 increment 9 — see below)*;
@@ -64,6 +65,17 @@ from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .os_clipboard_input import OsClipboardInput
+from .services.flow_model import (
+    BLOCK_PATCH,
+    BLOCK_SOURCE,
+    BLOCK_WRITE_OUT,
+    Flow,
+    FlowBlock,
+    FlowRunResult,
+    PatchBlock,
+    SourceBlock,
+    WriteOutBlock,
+)
 from ..validation import ValidationIssue, ValidationSeverity
 
 
@@ -1554,43 +1566,163 @@ class MemoryMapPanel(Container):
             )
 
 
-class BookmarksPlaceholder(Static):
-    """Neutral "coming soon" placeholder for the Bookmarks rail screen.
+def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:
+    """Build a typed :class:`FlowBlock` from the panel's (kind, ref) selection.
+
+    Returns ``None`` for an unknown kind or an empty ref (the panel no-ops).
+    """
+    ref = ref.strip()
+    if not ref:
+        return None
+    if kind == BLOCK_SOURCE:
+        return SourceBlock(ref)
+    if kind == BLOCK_PATCH:
+        return PatchBlock(ref)
+    if kind == BLOCK_WRITE_OUT:
+        return WriteOutBlock(ref)
+    return None
+
+
+def _flow_block_label(block: FlowBlock) -> str:
+    """One-line display label for a block (plain text — rendered markup-safe)."""
+    if isinstance(block, SourceBlock):
+        return f"SOURCE  {block.image_ref}  ({block.file_type})"
+    if isinstance(block, PatchBlock):
+        return f"PATCH   {block.change_doc_ref}"
+    if isinstance(block, WriteOutBlock):
+        return f"WRITE-OUT  {block.output_name}  ({block.fmt})"
+    return "?"
+
+
+class FlowBuilderPanel(ScrollableContainer):
+    """Rail-8 Flow Builder — compose + run an ordered typed-block pipeline.
 
     Summary:
-        Renders a static notice that the Bookmarks feature is not yet
-        available (LLR-002.2). It holds no bookmark state and reads or
-        writes no persistence — activating the Bookmarks rail item simply
-        mounts this widget. Bookmark persistence is deferred to a follow-up
-        batch (C-5).
-
-    Args:
-        None
-
-    Returns:
-        None
+        The tracer surface (R-TUI-059, batch-44): a ``Select`` (block kind) +
+        an ``Input`` (the block's project-relative ref) + **Add** appends a
+        block; the ordered list shows the composed flow; **Run** posts
+        :class:`RunRequested` with the built :class:`Flow`, and the app calls
+        ``flow_execution_service.run_flow`` and hands the
+        :class:`FlowRunResult` back to :meth:`render_result`. Presentational —
+        it imports the ``flow_model`` data types only (no engine), and EVERY
+        dynamic string (block refs, run diagnostics, written paths) is rendered
+        markup-safe via ``safe_text`` (security F4 / the batch-27/43 class).
 
     Data Flow:
-        - Static text only; reads no engine state and no ``LoadedFile``.
+        - Add → ``_make_flow_block(kind, ref)`` → append to ``self._blocks`` →
+          repaint ``#flow_blocks``.
+        - Run → ``RunRequested(Flow(blocks=self._blocks))`` → app → ``run_flow``
+          → :meth:`render_result` paints ``#flow_result``.
 
     Dependencies:
+        Uses:
+            - ``flow_model`` (SourceBlock / PatchBlock / WriteOutBlock / Flow)
+            - ``safe_text`` (markup-safe render)
         Used by:
-            - ``S19TuiApp._compose_screen_bookmarks``
-
-    Example:
-        >>> placeholder = BookmarksPlaceholder()
-        >>> placeholder.id
-        'bookmarks_placeholder'
+            - ``S19TuiApp._compose_screen_flow`` /
+              ``S19TuiApp.on_flow_builder_panel_run_requested``
     """
 
-    PLACEHOLDER_TEXT = (
-        "Bookmarks - coming soon.\n\n"
-        "Saving and recalling memory bookmarks is not yet available. "
-        "This feature is deferred to a future release."
-    )
+    #: The dropdown block-kind options (label, ``kind`` value).
+    _KIND_OPTIONS = [
+        ("Source (image)", BLOCK_SOURCE),
+        ("Patch (change doc)", BLOCK_PATCH),
+        ("Write-out (file)", BLOCK_WRITE_OUT),
+    ]
+
+    class RunRequested(Message):
+        """The operator pressed Run — carries the composed flow to the app.
+
+        Args:
+            flow (Flow): The ordered typed-block flow to execute.
+        """
+
+        def __init__(self, flow: Flow) -> None:
+            super().__init__()
+            self.flow = flow
 
     def __init__(self) -> None:
-        super().__init__(self.PLACEHOLDER_TEXT, id="bookmarks_placeholder", markup=False)
+        super().__init__(id="flow_panel")
+        self._blocks: List[FlowBlock] = []
+
+    def compose(self) -> ComposeResult:
+        yield Label(
+            "Flow Builder (tracer): pick a block kind, enter its "
+            "project-relative ref, Add; then Run.",
+            id="flow_help",
+            markup=False,
+        )
+        yield Horizontal(
+            Select(
+                self._KIND_OPTIONS,
+                value=BLOCK_SOURCE,
+                allow_blank=False,
+                id="flow_kind",
+            ),
+            Input(
+                placeholder="ref (image / change-doc / output name)",
+                id="flow_ref",
+            ),
+            Button("Add", id="flow_add"),
+            id="flow_add_row",
+        )
+        yield Static(self._blocks_text(), id="flow_blocks", markup=False)
+        yield Horizontal(
+            Button("Run", id="flow_run", variant="primary"),
+            Button("Clear", id="flow_clear"),
+            id="flow_run_row",
+        )
+        yield Static("", id="flow_result", markup=False)
+
+    def _blocks_text(self) -> Text:
+        if not self._blocks:
+            return safe_text("(no blocks yet)")
+        text = Text()
+        for position, block in enumerate(self._blocks, start=1):
+            text.append(f"{position}. ")
+            text.append(safe_text(_flow_block_label(block)))
+            text.append("\n")
+        return text
+
+    def _refresh_blocks(self) -> None:
+        self.query_one("#flow_blocks", Static).update(self._blocks_text())
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "flow_add":
+            kind = str(self.query_one("#flow_kind", Select).value)
+            ref = self.query_one("#flow_ref", Input).value
+            block = _make_flow_block(kind, ref)
+            if block is None:
+                return
+            self._blocks.append(block)
+            self.query_one("#flow_ref", Input).value = ""
+            self._refresh_blocks()
+        elif event.button.id == "flow_run":
+            self.post_message(
+                self.RunRequested(Flow(name="flow", blocks=list(self._blocks)))
+            )
+        elif event.button.id == "flow_clear":
+            self._blocks.clear()
+            self._refresh_blocks()
+            self.query_one("#flow_result", Static).update(safe_text(""))
+
+    def render_result(self, result: FlowRunResult) -> None:
+        """Paint the ``#flow_result`` pane from a run outcome (markup-safe)."""
+        text = Text()
+        text.append(f"Run: {result.status}\n")
+        for block_result in result.block_results:
+            text.append(f"  [{block_result.status}] ")
+            text.append(safe_text(f"{block_result.kind}: {block_result.summary}"))
+            text.append("\n")
+            for diagnostic in block_result.diagnostics:
+                text.append("      ")
+                text.append(safe_text(diagnostic))
+                text.append("\n")
+        for path in result.written_paths:
+            text.append("wrote: ")
+            text.append(safe_text(str(path)))
+            text.append("\n")
+        self.query_one("#flow_result", Static).update(text)
 
 
 class PatchEditorPanel(ScrollableContainer):

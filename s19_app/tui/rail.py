@@ -74,7 +74,7 @@ class RailEntry:
 #: The eight ordered Direction B rail items on keys ``1``-``8`` (LLR-001.1).
 #: The glyph / ascii_glyph columns are the normative LLR-001.3 mapping table:
 #: Workspace=(U+25EB,#), A2L=(U+2261,=), MAC=(U+25C9,@), Map=(U+25A4,M),
-#: Issues=(!,!), Patch=(U+270E,P), Diff=(U+23DA,D), Bookmarks=(U+2736,*).
+#: Issues=(!,!), Patch=(U+270E,P), Diff=(U+23DA,D), Flow=(U+2726,F).
 RAIL_ENTRIES: tuple[RailEntry, ...] = (
     RailEntry("workspace", "◫", "#", "Workspace"),
     RailEntry("a2l", "≡", "=", "A2L Explorer"),
@@ -83,7 +83,7 @@ RAIL_ENTRIES: tuple[RailEntry, ...] = (
     RailEntry("issues", "!", "!", "Issues Report"),
     RailEntry("patch", "✎", "P", "Patch Editor"),
     RailEntry("diff", "⏚", "D", "A2B Diff"),
-    RailEntry("bookmarks", "✶", "*", "Bookmarks"),
+    RailEntry("flow", "✦", "F", "Flow Builder"),
 )
 
 

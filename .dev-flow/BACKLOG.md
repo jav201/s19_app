@@ -208,7 +208,13 @@ polish + one spike, grouped into 3 small themed batches, then the Flow Builder (
 > (tracked: spec + branch + PR + tests). Do NOT do trivial/hygiene items as untracked `direct` edits —
 > consolidate them into a fast-dev-flow batch. This supersedes the earlier "mostly direct" framing for
 > batch 41 and any "fold opportunistically / direct" note elsewhere in this backlog.
-- **Then → Flow Builder** (batches 42+, roadmap above).
+- **Flow Builder** (batches 44+, roadmap above). **Design DONE** (`.fast-dev-flow/ADR-flow-builder-tracer.md`,
+  system-design pass 2026-07-14). **batch-44 tracer DONE** (R-TUI-059): rail-8 Flow Builder runs
+  SOURCE→PATCH→WRITE-OUT via new `flow_model` + `flow_execution_service.run_flow` (reuses the ops +
+  `_execute_one_variant` state model) + `FlowBuilderPanel`. Gate 1373 pass / 0 fail; snapshot regen
+  follow-up pending (rail-8 relabel drift, `_batch44_drift_marks` xfail). **NEXT: b-45 flow persistence
+  (`flow.json` untrusted loader — security-focused); b-46 CHECK + CRC blocks (the CRC-into-loop seam,
+  ADR §7 — split `write_crc_image` into a pure inject stage + shared write); b-47 multi-image scope.**
 
 **Accepted, no action:** batch-38 Inc-5 F1 (cross-entry collision caught at doc gate, by-design);
 batch-37 ~9 LOW carries (groom only if they recur). **C-CAND-B** (Phase-1 contract convergence) left

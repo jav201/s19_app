@@ -139,7 +139,7 @@ SCREEN_IDS = [
     "screen_issues",
     "screen_patch",
     "screen_diff",
-    "screen_bookmarks",
+    "screen_flow",
 ]
 
 # Rail screen-key -> container id, matching S19TuiApp.SCREEN_CONTAINER_IDS.
@@ -151,7 +151,7 @@ SCREEN_KEYS = [
     "issues",
     "patch",
     "diff",
-    "bookmarks",
+    "flow",
 ]
 
 
@@ -454,7 +454,7 @@ EXPECTED_RAIL = [
     ("issues", "!", "!"),
     ("patch", "✎", "P"),
     ("diff", "⏚", "D"),
-    ("bookmarks", "✶", "*"),
+    ("flow", "✦", "F"),
 ]
 
 
@@ -4280,46 +4280,87 @@ def test_tc025_memory_map_empty_state_clears_when_file_loads(
 # ---------------------------------------------------------------------------
 
 
-def test_tc004_bookmarks_activation_shows_placeholder(tmp_path: Path) -> None:
-    """Activating the Bookmarks rail item shows a "coming soon" placeholder.
+#: 4 bytes (01 02 03 04) at 0x1000 — the Flow Builder AT source image.
+_FLOW_S19 = "S107100001020304DE\nS9030000FC\n"
+#: A change document patching 0x1000 -> 0xAA (byte-addressed, no linkage).
+_FLOW_PATCH = (
+    '{"format": "s19app-changeset", "version": "2.0", "kind": "change", '
+    '"encoding": "utf-8", "value_mode": "text", '
+    '"entries": [{"type": "bytes", "address": "0x1000", "bytes": "AA"}]}'
+)
 
-    Intent: LLR-002.2 — the Bookmarks slot is a neutral placeholder screen.
-    Activating it raises no error and shows text stating the feature is not
-    yet available / coming soon.
+
+def _flow_project(app: "S19TuiApp") -> None:
+    """Seed a workarea project (``prg.s19`` + ``patch.json``) and select it."""
+    project = app.workarea / "proj"
+    project.mkdir(parents=True, exist_ok=True)
+    (project / "prg.s19").write_text(_FLOW_S19, encoding="utf-8")
+    (project / "patch.json").write_text(_FLOW_PATCH, encoding="utf-8")
+    app.current_project = "proj"
+
+
+def _add_flow_block(app: "S19TuiApp", kind: str, ref: str) -> None:
+    """Drive the Flow Builder add row: set kind + ref, press Add."""
+    from textual.widgets import Button, Input, Select
+
+    app.query_one("#flow_kind", Select).value = kind
+    app.query_one("#flow_ref", Input).value = ref
+    app.query_one("#flow_add", Button).press()
+
+
+def _static_plain(app: "S19TuiApp", selector: str) -> str:
+    """Return the plain text of a ``Static``'s current rendered content."""
+    from textual.widgets import Static
+
+    return str(app.query_one(selector, Static).render())
+
+
+def test_at_flow_add_blocks_and_run_renders_result(tmp_path: Path) -> None:
+    """AC-4: rail-8 is the Flow Builder; adding Source/Patch/WriteOut blocks and
+    pressing Run executes the flow and renders the result (with the written
+    path).
+
+    RED pre-code: rail-8 is the Bookmarks placeholder; ``#screen_flow`` and the
+    panel are absent.
     """
-    from s19_app.tui.screens_directionb import BookmarksPlaceholder
+    from textual.widgets import Button
 
-    async def _drive() -> tuple[bool, list[str], str]:
+    async def _drive() -> tuple[list[str], str, str]:
         app = S19TuiApp(base_dir=tmp_path)
-        raised = False
-        text = ""
-        async with app.run_test(size=(120, 30)) as pilot:
+        _flow_project(app)
+        async with app.run_test(size=(120, 40)) as pilot:
             await pilot.pause()
-            try:
-                app.action_show_screen("bookmarks")
-                await pilot.pause()
-            except Exception:  # pragma: no cover - failure path
-                raised = True
-            placeholder = app.query_one("#bookmarks_placeholder", BookmarksPlaceholder)
-            text = placeholder.PLACEHOLDER_TEXT.lower()
-            return raised, _visible_screens(app), text
+            app.action_show_screen("flow")
+            await pilot.pause()
+            visible = _visible_screens(app)
+            _add_flow_block(app, "source", "prg.s19")
+            await pilot.pause()
+            _add_flow_block(app, "patch", "patch.json")
+            await pilot.pause()
+            _add_flow_block(app, "write_out", "out.s19")
+            await pilot.pause()
+            blocks_text = _static_plain(app, "#flow_blocks")
+            app.query_one("#flow_run", Button).press()
+            await pilot.pause()
+            await pilot.pause()
+            return visible, blocks_text, _static_plain(app, "#flow_result")
 
-    raised, visible, text = asyncio.run(_drive())
-    assert not raised, "activating Bookmarks must not raise an exception"
-    assert visible == ["screen_bookmarks"], (
-        f"only the Bookmarks screen must be visible after activation, "
-        f"got {visible}"
-    )
-    assert "coming soon" in text or "not yet available" in text, (
-        f"the placeholder must state the feature is deferred; text was {text!r}"
-    )
+    visible, blocks_text, result_text = asyncio.run(_drive())
+
+    assert visible == ["screen_flow"], f"rail-8 must show #screen_flow; {visible}"
+    # The composed flow lists all three blocks in order.
+    assert "SOURCE" in blocks_text and "prg.s19" in blocks_text
+    assert "PATCH" in blocks_text and "patch.json" in blocks_text
+    assert "WRITE-OUT" in blocks_text and "out.s19" in blocks_text
+    # Run succeeded and the result names the written file.
+    assert "Run: ok" in result_text, f"run should succeed; got {result_text!r}"
+    assert "out.s19" in result_text, f"result must name the output; {result_text!r}"
 
 
-def test_tc004_bookmarks_rail_key_8_reaches_placeholder(tmp_path: Path) -> None:
-    """Pressing the rail key ``8`` opens the Bookmarks placeholder screen.
+def test_at_flow_rail_key_8_reaches_panel(tmp_path: Path) -> None:
+    """AC-4: pressing the rail key ``8`` opens the Flow Builder screen.
 
-    Intent: LLR-002.2 / LLR-013.1 — the Bookmarks placeholder is reachable
-    by keyboard via its rail key, and the keyboard path raises no error.
+    RED pre-code: rail key 8 showed ``#screen_bookmarks``.
     """
 
     async def _drive() -> list[str]:
@@ -4331,40 +4372,29 @@ def test_tc004_bookmarks_rail_key_8_reaches_placeholder(tmp_path: Path) -> None:
             return _visible_screens(app)
 
     visible = asyncio.run(_drive())
-    assert visible == ["screen_bookmarks"], (
-        f"rail key 8 must show only the Bookmarks screen, got {visible}"
+    assert visible == ["screen_flow"], (
+        f"rail key 8 must show only the Flow Builder screen, got {visible}"
     )
 
 
-def test_tc004_bookmarks_placeholder_has_no_persistence_methods() -> None:
-    """The Bookmarks placeholder widget exposes no persistence surface.
-
-    Intent: LLR-002.2 / C-5 — no bookmark persistence is read or written
-    this batch. The placeholder widget is a static notice; it must not
-    carry save/load/store/persist methods that would imply wired logic.
+def test_at_flow_block_label_markup_safe(tmp_path: Path) -> None:
+    """AC-5: a block ref carrying hostile markup renders LITERALLY in the block
+    list — no Rich markup injection / MarkupError (the batch-27/43 class).
     """
-    from s19_app.tui.screens_directionb import BookmarksPlaceholder
 
-    placeholder = BookmarksPlaceholder()
-    # Bookmark-persistence verbs only — generic substrings like "load" are
-    # avoided since Textual's own `Static` carries `set_loading` / `loading`.
-    forbidden = (
-        "bookmark",
-        "save_bookmark",
-        "store_bookmark",
-        "persist",
-        "add_bookmark",
-        "remove_bookmark",
-    )
-    surface = [name for name in dir(placeholder) if not name.startswith("_")]
-    leaked = [
-        name
-        for name in surface
-        if any(token in name.lower() for token in forbidden)
-    ]
-    assert leaked == [], (
-        f"the Bookmarks placeholder must expose no persistence methods, "
-        f"found {leaked}"
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("flow")
+            await pilot.pause()
+            _add_flow_block(app, "source", "evil[red].s19")
+            await pilot.pause()
+            return _static_plain(app, "#flow_blocks")
+
+    blocks_text = asyncio.run(_drive())
+    assert "evil[red].s19" in blocks_text, (
+        f"hostile ref must render literally; got {blocks_text!r}"
     )
 
 

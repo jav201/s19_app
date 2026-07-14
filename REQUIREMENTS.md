@@ -3823,3 +3823,33 @@ it is enabled — mirroring the batch-37 whole-set Edit-JSON A-01 guard.
   `OsClipboardInput`-only) — a batch-39 hygiene carry, no new external-write surface.
 - Status: Added in batch `2026-07-12-batch-38` (US-068b / HLR-068b, LLR-068b.1–.4). Frozen-engine
   diff = 0.
+
+**R-TUI-059**: Rail item 8 (formerly the dropped "Bookmarks" placeholder) hosts a **Flow Builder** —
+the tracer slice composes and runs an ordered pipeline of typed functional blocks over a project
+image. Batch-44 ships the minimal vertical **SOURCE → PATCH → WRITE-OUT**: a Textual-free
+`flow_execution_service.run_flow(flow, ctx)` threads a working `(mem_map, ranges)` pair — SOURCE seeds
+it via `build_loaded_s19/hex`, PATCH mutates it via `apply_change_document`, WRITE-OUT emits it via
+`save_patched_image` (both `s19` and `hex`) — mirroring `variant_execution_service._execute_one_variant`
+(collect-don't-abort, per-block isolation, `len(block_results) == len(flow.blocks)`, never raises). The
+rail-8 `FlowBuilderPanel` (`#screen_flow`) is a dropdown-add block list + Run that posts
+`RunRequested`; the app runs the flow over `_active_project_dir()` and renders the `FlowRunResult`.
+**Security:** every block file-ref (`SourceBlock.image_ref` / `PatchBlock.change_doc_ref`) is
+containment-checked through the manifest guard `_resolve_manifest_entry` (absolute / escape-project /
+reparse-point triad) BEFORE any open (the reused readers apply no containment — pre-code review F1);
+WRITE-OUT goes only through `save_patched_image` (F-S-01 sanitiser + `copy_into_workarea`); every panel
+sink renders markup-safe via `safe_text` (F4). **OUT (deferred):** flow persistence (`flow.json`,
+batch-45), CHECK/CRC blocks (the CRC-into-loop seam, batch-46), multi-image scope (batch-47).
+- Code: `s19_app/tui/services/flow_model.py` (typed blocks + run-result containers),
+  `s19_app/tui/services/flow_execution_service.py` (`run_flow`),
+  `s19_app/tui/screens_directionb.py` (`FlowBuilderPanel` + `_make_flow_block` / `_flow_block_label`),
+  `s19_app/tui/rail.py` (rail-8 `RailEntry("flow", …, "Flow Builder")`),
+  `s19_app/tui/app.py` (`_compose_screen_flow`, `SCREEN_CONTAINER_IDS["flow"]`, digit-8 binding,
+  `on_flow_builder_panel_run_requested`)
+- Validation: `Automated` via `tests/test_flow_execution.py` (engine: happy path, isolation,
+  path-escape F1, hex+s19 formats) and `tests/test_tui_directionb.py`
+  (`test_at_flow_add_blocks_and_run_renders_result`, `test_at_flow_rail_key_8_reaches_panel`,
+  `test_at_flow_block_label_markup_safe`). Rail snapshot drift (rail-8 relabel) is
+  `xfail(strict=False)`-until-canonical-baseline (`_batch44_drift_marks`, `tests/test_tui_snapshot.py`);
+  a follow-up snapshot-regen PR retires the marks.
+- Status: Added in batch `2026-07-14-batch-44` (Flow Builder tracer; fast-dev-flow). Frozen-engine
+  diff = 0 (the `changes/`/`load_service` ops are REUSED, never modified; `a2l.py` unread here).
