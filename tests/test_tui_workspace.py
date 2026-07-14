@@ -49,6 +49,46 @@ def test_setup_logging_reuses_handler_for_same_path(tmp_path: Path):
     assert matching_handlers[0].maxBytes == 5 * 1024 * 1024
 
 
+def test_setup_logging_does_not_accumulate_handlers_across_distinct_base_dirs(
+    tmp_path: Path,
+):
+    """Distinct base_dirs must NOT accumulate handlers on the global s19tui logger.
+
+    batch-42 (flake root cause): ``setup_logging`` attaches a RotatingFileHandler
+    to the process-global ``logging.getLogger("s19tui")`` on every
+    ``S19TuiApp.__init__``; the per-path dedup guard never matches across tests
+    (each uses a fresh ``tmp_path``), so PRE-FIX handlers grew 1:1 with app
+    constructions and were never closed -- thousands by suite-end, O(N) log
+    fan-out, intermittent pilot timeouts ("different unrelated test fails each
+    run; passes in isolation"). The fix bounds the handler set to one per process.
+    """
+    logger = logging.getLogger("s19tui")
+    # Start from a clean slate so the assertion is about THIS test's calls only.
+    for handler in list(logger.handlers):
+        logger.removeHandler(handler)
+        handler.close()
+
+    for i in range(10):
+        setup_logging(tmp_path / f"run{i}")
+
+    rotating = [
+        handler
+        for handler in logger.handlers
+        if isinstance(handler, RotatingFileHandler)
+    ]
+    assert len(rotating) == 1, (
+        "setup_logging leaked handlers across distinct base_dirs: "
+        f"expected 1, got {len(rotating)}"
+    )
+    # The single surviving handler points at the LAST base_dir's log file.
+    last_log = tmp_path / "run9" / WORKAREA_DIRNAME / LOGS_SUBDIR / LOG_FILENAME
+    assert Path(rotating[0].baseFilename) == last_log
+
+    for handler in rotating:
+        logger.removeHandler(handler)
+        handler.close()
+
+
 class TestCopyIntoWorkareaContainment:
     """Phase 3 increment 1 -- LLR-005.3 write-path guards.
 

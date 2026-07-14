@@ -186,7 +186,13 @@ polish + one spike, grouped into 3 small themed batches, then the Flow Builder (
   removed (live `ENTROPY_MAX_ROWS` preserved). Gate **1394 passed / 0 failed / 3 xfailed** (+1 test), 0
   frozen diffs, C-27 dual-guard ×2, C-26 census clean, `security_required: false`. **⑪ P-1 DEFERRED**
   (no concrete defect — re-logged below). 12 code files, net −44 lines.
-- **Spike (any time):** ⑫ full-suite TUI global-state flake → `/diagnose` root-cause before it bites a gate.
+- **Spike ⑫ — DONE (batch-42, 2026-07-13):** full-suite TUI global-state flake root-caused via `/diagnose` +
+  FIXED. Root cause: `workspace.py::setup_logging` attached a `RotatingFileHandler` to the process-global
+  `s19tui` logger on every `S19TuiApp.__init__`; the per-path dedup guard never matched across tests (fresh
+  `tmp_path` each) → handlers accumulated 1:1 with app constructions, never closed → O(N) log fan-out →
+  intermittent `pilot`/`WaitForScreenTimeout` failures ("different unrelated test fails each run; passes in
+  isolation"). Fix bounds the handler set to 1 per process (batch-42 fast-flow, self-merged). **Retires the
+  standing per-batch control-run tax (C-CANDIDATE-C).**
 
 > **Tracking rule (operator, 2026-07-13):** ALL code changes go through **at least `/fast-dev-flow`**
 > (tracked: spec + branch + PR + tests). Do NOT do trivial/hygiene items as untracked `direct` edits —

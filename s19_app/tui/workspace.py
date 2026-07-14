@@ -63,12 +63,24 @@ def setup_logging(base_dir: Path) -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.propagate = False
 
+    # Bound the handler set to a SINGLE RotatingFileHandler for this ``log_path``.
+    # ``getLogger("s19tui")`` is process-global, so without pruning, every call
+    # with a new ``base_dir`` would append another handler that is never closed.
+    # Under the test suite (one ``setup_logging`` per ``S19TuiApp.__init__``,
+    # thousands of app constructions across ~1000 TUI tests, each with a fresh
+    # ``tmp_path``) the handlers grow unbounded: each log record then fans out
+    # O(N) file writes, the suite slows progressively, and the accumulated open
+    # handles block ``tmp_path`` cleanup on Windows -- the intermittent full-suite
+    # global-state flake. Keep the handler already bound to this path (idempotent
+    # re-init); remove + close any bound to a different path.
     handler_exists = False
-    for handler in logger.handlers:
+    for handler in list(logger.handlers):
         if isinstance(handler, RotatingFileHandler):
             if getattr(handler, "baseFilename", None) == str(log_path):
                 handler_exists = True
-                break
+            else:
+                logger.removeHandler(handler)
+                handler.close()
 
     if not handler_exists:
         handler = RotatingFileHandler(
