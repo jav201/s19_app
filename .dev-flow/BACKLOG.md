@@ -87,6 +87,15 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
   canonical CI env **post-merge** (local regen drifts unrelated baselines —
   `reference_snapshot_regen_env`), then retire the xfails + the batch-37 `_batch37_entropy_drift_marks`.
   A follow-up snapshot-baselines PR, as in batches 35/36.
+- **Snapshot-baseline regen (batch-44 carry) — DONE (PR pending):** the batch-44 rail-8 relabel
+  (`"Bookmarks"`/U+2736 → `"Flow Builder"`/U+2726, R-TUI-059) redrew the activity rail in every
+  snapshot cell. Regenerated in the canonical CI env (`snapshot-regen.yml` `workflow_dispatch`,
+  `textual==8.2.8`, **run 29346071860 at main `1fcdca3`**); containment confirmed **exactly 20 cells
+  moved** (all `test_tc016s_density_layout_snapshot` + the `entropy-comfortable-120x30`
+  `test_tc036s_entropy_modal_snapshot` cell — 40 insertions / 40 deletions, no other screen). Delta
+  verified as the pure rail relabel (`✦  Flow Builder` ← `✶  Bookmarks`). Baselines committed +
+  `_batch44_drift_marks` neutered to `return ()` (`test_tui_snapshot.py`). Follow-up
+  snapshot-baselines PR (the #67/#69/#71 lane); tui-ci on the PR is the authoritative green gate.
 
 ---
 
