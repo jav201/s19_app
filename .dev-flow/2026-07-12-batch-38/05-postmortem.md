@@ -150,7 +150,7 @@ Only **Phase 2** took ≥2 iterations (iterate-to-refine → re-approve). Two ro
 - [✓] Cost/latency — n/a for UI stories; history bounded `_HISTORY_MAX=20` (memory ceiling) recorded.
 - [✓] Diagram — flow is small; reachability matrix (04-validation §3) substitutes.
 - [✓] What would change the recommendation — if `validation/` freeze lifted, US-066 could move to `rules.py` (stated PLAN Feasibility).
-- [✓] Two-layer requirements — every US has AT-NNN (black-box) + both traceability chains (US→AT→outcome behavioral; US→HLR→LLR→TC functional); reconciled 04-validation §1/§2.
+- [✓] Two-layer requirements — every US has an AT-<n> id (black-box) + both traceability chains (US→AT→outcome behavioral; US→HLR→LLR→TC functional); reconciled 04-validation §1/§2.
 
 **QA-reviewer lens:**
 - [✓] Acceptance criteria observable-outcome form — 04-validation §1 (each AT states outcome + shipped surface + deliverable).

@@ -490,19 +490,15 @@ def _batch38_drift_marks(screen: str, density: str, size_key: str) -> tuple:
 # batch-44 (rail item 8 relabel: "Bookmarks"/U+2736 -> "Flow Builder"/U+2726,
 # R-TUI-059 Flow Builder tracer): the activity rail is rendered in EVERY snapshot
 # cell, so every tc016s cell (and the tc036s entropy modal, which shows the rail
-# behind it) drifts by exactly the rail-8 glyph+label. xfail(strict=False) until
-# the canonical-CI baselines are regenerated (snapshot-regen.yml, pinned
-# textual==8.2.8) and committed in a follow-up snapshot PR — the batch-36/37/38
-# pattern (reference_snapshot_regen_env: local regen drifts unrelated baselines).
+# behind it) drifted by exactly the rail-8 glyph+label. The SVG baselines were
+# regenerated in the canonical CI env (snapshot-regen.yml, pinned textual==8.2.8;
+# run 29346071860 at main 1fcdca3 — containment confirmed EXACTLY the 20 rail
+# cells moved, 40 insertions / 40 deletions, no other screen) and committed HERE,
+# so the batch-44 xfail-until-baseline marks are retired — all cells are full
+# green oracles again.
 def _batch44_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-44 rail-relabel drift mark — EVERY cell drifts."""
-    return (
-        pytest.mark.xfail(
-            reason="batch-44 rail-8 relabel (Bookmarks -> Flow Builder); "
-            "canonical-CI baseline regen pending",
-            strict=False,
-        ),
-    )
+    """Return the batch-44 rail-relabel drift marks (none — baselines regenerated)."""
+    return ()
 
 
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
