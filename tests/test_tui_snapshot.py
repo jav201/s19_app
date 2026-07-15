@@ -459,16 +459,15 @@ def _batch44_drift_marks(screen: str, density: str, size_key: str) -> tuple:
 # green mid-batch; a post-merge follow-up regen retires these marks (mirrors the
 # retired ``_batch44_drift_marks`` pattern).
 def _batch45_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-45 map entropy-view drift mark for the ``map`` cells."""
-    if screen != "map":
-        return ()
-    return (
-        pytest.mark.xfail(
-            reason="batch-45 R-TUI-060 Memory-Map entropy view (validity grid -> "
-            "band bar + region list + legend); canonical-CI baseline regen pending",
-            strict=False,
-        ),
-    )
+    """Return the batch-45 map entropy-view drift marks (none — baselines regenerated).
+
+    The 2 ``map`` cells drifted when R-TUI-060 replaced the validity grid with the
+    entropy band bar + region list + legend. The SVG baselines were regenerated in
+    the canonical CI env (snapshot-regen.yml, pinned textual==8.2.8; run 29397319797
+    at main 4608953 — containment confirmed exactly the 20 batch-45 cells moved) and
+    committed, so the xfail is retired — the map cells are full green oracles again.
+    """
+    return ()
 
 
 # batch-45 Inc-5 FOOTER drift: retiring the entropy modal removed the
@@ -484,21 +483,15 @@ _WIDE_FOOTER_SIZES = frozenset({"120x30", "160x40"})
 
 
 def _batch45_footer_drift_marks(screen: str, density: str, size_key: str) -> tuple:
-    """Return the batch-45 footer-drift mark for a WIDE tc016s cell.
+    """Return the batch-45 footer-drift marks (none — baselines regenerated).
 
-    The removed footer-visible ``e``/Entropy binding drifts the footer only at
-    the widths that showed it (120x30, 160x40) — not the 80x24 floor. ``map`` is
-    already covered by ``_batch45_map_drift_marks``.
+    Retiring the entropy modal removed the footer-visible ``e``/Entropy binding,
+    drifting the footer of every wide (120x30 / 160x40) tc016s cell. The 18 SVG
+    baselines were regenerated in the canonical CI env (snapshot-regen.yml, run
+    29397319797 at main 4608953 — containment confirmed exactly the 20 batch-45
+    cells) and committed, so the xfail is retired — all cells are full green oracles.
     """
-    if screen == "map" or size_key not in _WIDE_FOOTER_SIZES:
-        return ()
-    return (
-        pytest.mark.xfail(
-            reason="batch-45: removed footer-visible `e`/Entropy binding drifts "
-            "the footer on wide cells; canonical-CI regen pending",
-            strict=False,
-        ),
-    )
+    return ()
 
 
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
