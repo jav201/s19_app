@@ -782,73 +782,127 @@ Screen {
     padding: 1 2;
 }
 
-/* HLR-033 (US-030) — the Patch Editor lays its four area-panes out as a 2x2
- * grid (Entries top-left, Change-file top-right, Checks bottom-left, Variant
- * bottom-right) so all four are visible together without scrolling one long
- * stack. `grid-size: 2 4` is two columns by four rows: the `1fr` + `2fr` top
- * rows host the four panes; the weighted `2fr` third row is the reparented
- * change-set paste cell (`#patch_paste_row`, `column-span: 2`, batch-36
- * US-058 / LLR-058.1) — a WEIGHTED `grid-rows: 1fr 2fr 2fr auto` (not an equal
- * split, which the MEASURED 5-row-@80x24 budget shows starves the paste cell)
- * so the paste editor AND the middle (checks/variant) row each win 2 of the 5
- * rows @80x24 — the paste editor's first line clears the fold at scroll 0 and
- * the variant Select stays visible (TC-035.2); the entries/change-file top row
- * takes the remaining 1 row and scrolls. The `auto` fourth row is the home for
- * the `column-span: 2` save-back child, zero-height while that child is hidden
- * so the panes are not squeezed. Vertical scroll now lives per-pane
- * (`#patch_pane_*` + `#patch_paste_row`), not on the panel. Measured host
- * content = 70 cols @80 / 92 @120 → ~35/pane @80 (C-13 budget clears). */
+/* HLR-063/064 (US-U8/US-B2, batch-46) — the Patch Editor renders THREE
+ * bordered windows (PATCH SCRIPT / CHECKS / JSON EDIT), each a constant title
+ * + a scrollable `.patch-window-body` + docked button-row siblings of that
+ * body (so a button is never trapped below the body's inner fold — the B2
+ * fix). Two regimes, pure CSS reusing the existing `width-narrow` toggle
+ * (mirrors the batch-45 map reflow, styles.tcss:626):
+ *   Wide (>= 120): `layout: horizontal`, windows side by side. PATCH SCRIPT is
+ *   the widest (`#patch_win_script { width: 2fr }`) — the ratio is a
+ *   pilot-measured design call (not fr-guessed; FOLD-2), the other two `1fr`.
+ *   Each window is full panel height; its body scrolls internally.
+ *   Narrow (< 120, incl. the 80x24 floor): `layout: vertical` + the panel
+ *   itself scrolls; windows grow to content (`height: auto`) and stack, so a
+ *   docked button is reachable by scrolling its window into the viewport
+ *   (FOLD-8 reachable-under-scroll — the MEASURED ~5-row @80x24 panel budget
+ *   cannot show all buttons at once). */
 #patch_editor_panel {
     width: 100%;
     height: 1fr;
     padding: 1 2;
+    layout: horizontal;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#workspace_body.width-narrow #patch_editor_panel {
+    layout: vertical;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* A window: a bordered vertical stack (title / body / docked rows). Wide =
+ * full panel height, equal `1fr` columns (PATCH SCRIPT overridden to `2fr`);
+ * narrow = full width, content height, stacked. `overflow-y: auto` makes the
+ * WINDOW itself scroll when its content exceeds its slot (wide), so every
+ * docked button is reachable by scrolling the window into view (FOLD-8); at
+ * narrow the window is `height: auto` (never overflows — the PANEL scrolls). */
+.patch-window {
+    width: 1fr;
+    height: 100%;
+    layout: vertical;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: round $rule;
+    margin-right: 1;
+}
+
+#patch_win_script {
+    width: 2fr;
+}
+
+#workspace_body.width-narrow .patch-window {
+    width: 100%;
+    height: auto;
+    margin-right: 0;
+    margin-bottom: 1;
+}
+
+/* Constant window title (never file-derived — C-17 / F3). */
+.patch-window-title {
+    width: 100%;
+    height: 1;
+    text-style: bold;
+    color: $fg-base;
+    background: $bg-panel;
+    padding: 0 1;
+}
+
+/* The body is a `VerticalScroll` sized to its content (`height: auto`) so it
+ * never holds an inner fold that could trap the docked rows below it; the
+ * WINDOW (wide) or the PANEL (narrow) provides the scroll that reaches
+ * everything. Docked rows stay siblings of this body (HLR-064 structural). */
+.patch-window-body {
+    width: 100%;
+    height: auto;
+    overflow-x: hidden;
+    padding: 0 1;
+}
+
+/* Docked button rows / groups — siblings of the body, so they sit outside its
+ * scroll and are reachable by scrolling the window into view (HLR-064). */
+.patch-docked-row,
+.patch-docked-group {
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
+/* Docked button rows WRAP (grid, not Horizontal) so each button's region is
+ * bounded to a cell and never clips past the (narrow @wide) window edge — a
+ * horizontally-clipped button is unreachable by vertical scroll alone. Two
+ * per row; #patch_doc_controls keeps its own grid-3 rule below. */
+#patch_doc_entry_buttons,
+#patch_history_controls,
+#patch_execute_buttons,
+#patch_paste_controls,
+#patch_saveback_buttons,
+#patch_before_after_buttons {
+    width: 100%;
+    height: auto;
     layout: grid;
-    grid-size: 2 4;
-    grid-columns: 1fr 1fr;
-    grid-rows: 1fr 2fr 2fr auto;
+    grid-size: 2;
+    grid-gutter: 0 1;
 }
 
-#patch_pane_entries,
-#patch_pane_changefile,
-#patch_pane_checks,
-#patch_pane_variant {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* batch-36 (US-058 / LLR-058.1/.2) — the reparented change-set paste group is
- * its own full-width panel cell in the weighted `2fr` third grid row. Like the
- * four `#patch_pane_*` cells it scrolls vertically so the fixed 8-line
- * `#patch_paste_text` editor (styles.tcss below) places its first line inside
- * the visible content-region at scroll 0 rather than being pushed below the
- * fold inside the crowded top-right pane. `column-span: 2` claims both columns;
- * `overflow-x: hidden` matches the pane convention (JSON scrolls horizontally
- * inside the `TextArea`). */
-#patch_paste_row {
-    column-span: 2;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* HLR-033.4 — the hidden save-back prompt is not a pane: it spans both grid
- * columns in the `auto` bottom row (full width when shown, zero-height while
- * hidden). */
-#patch_saveback_row {
-    column-span: 2;
-}
-
-/* US-028 (HLR-035 / LLR-035.2) — the Variant pane stacks the variant-dropdown
- * group ABOVE the execute group. Both rows need `height: auto`: a bare
- * `Container` defaults to `height: 1fr`, which would split the 3-row pane
- * (@80x24) between the two groups and clip the Select. The pane's
- * `overflow-y: auto` (batch-22 C-13.1 rung) scrolls the execute group below
- * the fold while the Select's first row stays visible at scroll 0. */
+/* US-028 (LLR-035.2) — the variant group composes ABOVE the execute group;
+ * both rows are `height: auto` so neither is clipped (TC-035.2). */
 #patch_variant_row,
 #patch_execute_row {
     width: 100%;
     height: auto;
+}
+
+/* batch-46 — bound the variant Select row to the collapsed Select height (3).
+ * The Textual `Select` reserves its 12-line dropdown overlay in the auto-height
+ * of an enclosing container; unbounded it inflated `#patch_variant_row` to ~14
+ * rows, under-measuring the PATCH SCRIPT window's virtual height so the docked
+ * execute buttons fell 1 row past the scrollable content (unreachable). The
+ * dropdown is an overlay layer, so a fixed row height does not clip it. */
+#patch_variant_select_row {
+    width: 100%;
+    height: 3;
 }
 
 /* A↔B Diff panel (batch-09 I4, HLR-005): the inline image-pair selection
@@ -1002,22 +1056,22 @@ Screen {
     padding-top: 1;
 }
 
-#patch_doc_entry_buttons,
-#patch_saveback_buttons {
+/* FOLD-1: the preserved in-body pane sub-containers are NON-scrolling grouping
+ * containers (the scroll lives on the window body). Pin `height: auto` so the
+ * Textual `Container` default (`height: 1fr`) cannot grab the body's virtual
+ * height. (`#patch_doc_file_row` + `#patch_pane_variant` get auto above.) */
+#patch_pane_entries,
+#patch_pane_changefile {
     width: 100%;
     height: auto;
 }
 
-/* LLR-033.3b (C-13.1 rung-2) — the Change-file pane is the tightest (~35 cols
- * @80). Textual `Horizontal` does NOT wrap: it lays its buttons on one line
- * and CLIPS the overflow. Make `#patch_doc_controls` an explicit 3-column
- * button-grid so the buttons flow deterministically within the pane budget
- * (version-stable, CSS-only). Since batch-35 (US-057) the grid holds the four
- * Load / Validate / Apply / Save patch-script buttons (3 + 1 across two
- * rows); Run-checks moved to `#patch_checks_controls` below. Locked by the
- * white-box TC (`grid_size_columns == 3`); AT-033a's `region.right <= host`
- * only proves the containing pane stays within the host (a within-pane clip
- * would be masked by `overflow-x: hidden`). */
+/* batch-46 — `#patch_doc_controls` is a docked row in the PATCH SCRIPT window.
+ * Textual `Horizontal` does NOT wrap (it lays buttons on one line and CLIPS the
+ * overflow), so keep it an explicit 3-column button-grid: its five buttons
+ * (Load / Refresh / Validate / Apply / Save — Refresh added batch-37 US-064a)
+ * flow deterministically as 3 + 2 across two rows within the window's column
+ * budget (version-stable, CSS-only), reachable-under-scroll (FOLD-8). */
 #patch_doc_controls {
     width: 100%;
     height: auto;
@@ -1026,15 +1080,11 @@ Screen {
     grid-gutter: 0 1;
 }
 
-/* batch-35 (US-057 / R-TUI-045) — the checks section container groups the
- * Run-checks button with its clarity label under the "Checks" section title.
- * Explicit `height: auto` is required: a bare `Container` defaults to
- * `height: 1fr` and would grab the scrollable pane's whole viewport height
- * (the #patch_variant_row precedent above). Geometry: the regroup only ADDS
- * vertical rows (two section titles + the container) inside
- * `#patch_pane_changefile`, which scrolls (`overflow-y: auto`, batch-22
- * C-13.1) — no horizontal-budget change, the widest row is still the
- * 3-column button grid. */
+/* `#patch_checks_controls` groups the Run-checks button with its clarity label;
+ * batch-46 relocates it into the CHECKS window (`#patch_win_checks`). Explicit
+ * `height: auto` is required — a bare `Container` defaults to `height: 1fr` and
+ * would grab the window body's whole height (the #patch_variant_row precedent
+ * above). */
 #patch_checks_controls {
     width: 100%;
     height: auto;

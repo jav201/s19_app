@@ -2483,7 +2483,9 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
     Counterfactual: dropping/renaming any id fails (a); a handler regression
     fails (c).
     """
-    from textual.widgets import Button, Label
+    from textual.widgets import Button, Label, Static
+
+    from s19_app.tui.capped_text_area import CappedTextArea
 
     async def _drive() -> dict[str, object]:
         outcomes: dict[str, object] = {}
@@ -2514,6 +2516,20 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
             outcomes["checks_line"] = any(
                 line.startswith("Checks:") for line in app.log_lines
             )
+
+            # batch-46 FOLD-6 (C-17 / security F1/F4): the three-window
+            # reparent must NOT downgrade the markup-safety of the two
+            # file-derived-text sinks, nor swap the paste editor's 64 KiB
+            # CappedTextArea for a stock TextArea.
+            outcomes["checks_status_markup"] = app.query_one(
+                "#patch_checks_status", Label
+            )._render_markup
+            outcomes["doc_issues_markup"] = app.query_one(
+                "#patch_doc_issues", Static
+            )._render_markup
+            outcomes["paste_is_capped"] = isinstance(
+                app.query_one("#patch_paste_text"), CappedTextArea
+            )
         return outcomes
 
     outcomes = asyncio.run(_drive())
@@ -2528,6 +2544,17 @@ def test_at058b_id_census_and_wiring_survive_reparent(tmp_path: Path) -> None:
     assert outcomes["checks_line"] is True, (
         "pressing Run checks must still route run_checks after the reparent "
         "(wiring unchanged)"
+    )
+    assert outcomes["checks_status_markup"] is False, (
+        "#patch_checks_status must keep markup disabled after the reparent "
+        "(C-17 — it renders file-derived {kind!r} text)"
+    )
+    assert outcomes["doc_issues_markup"] is False, (
+        "#patch_doc_issues must keep markup disabled after the reparent (C-17)"
+    )
+    assert outcomes["paste_is_capped"] is True, (
+        "#patch_paste_text must stay a CappedTextArea (64 KiB paste cap) after "
+        "the reparent (F4)"
     )
 
 
@@ -3203,15 +3230,16 @@ def test_at068a_undo_redo_roundtrip_through_surface(tmp_path: Path) -> None:
     )
 
     async def _click(pilot: object, app: S19TuiApp, selector: str) -> None:
-        """Drive a REAL pointer click on an entries-pane control (C-16).
+        """Drive a REAL pointer click on a PATCH SCRIPT docked control (C-16).
 
-        The entries pane is the grid's 1fr (smallest) cell; its inputs +
-        control rows overflow the cell, so the Undo/Redo/Add row sits below the
-        cell's clipped viewport. Scroll the pane to its end so the control row
-        is on-screen, then ``pilot.click`` delivers a genuine mouse event to the
-        button (no ``.focus()``, no direct handler / service call).
+        batch-46: the Add / Undo / Redo / entry buttons are docked siblings of
+        the PATCH SCRIPT window body, below it. Scroll the WINDOW
+        (``#patch_win_script`` — the scroll container that reveals the docked
+        rows, not the body) to its end so the control row is on-screen, then
+        ``pilot.click`` delivers a genuine mouse event to the button (no
+        ``.focus()``, no direct handler / service call).
         """
-        app.query_one("#patch_pane_entries").scroll_end(animate=False)
+        app.query_one("#patch_win_script").scroll_end(animate=False)
         await pilot.pause()
         await pilot.click(selector)
         await pilot.pause()
@@ -3491,12 +3519,12 @@ def test_at068b_per_entry_json_popup_edits_only_selected_entry(
     async def _click_entry_json(pilot: object, app: S19TuiApp) -> None:
         """Drive a REAL pointer click on the per-entry Edit-JSON button (C-16).
 
-        The entries pane is the grid's 1fr (smallest) cell; its inputs +
-        button rows overflow, so the per-entry buttons row can sit below the
-        clipped viewport. Scroll the pane to its end, then ``pilot.click``
+        batch-46: the per-entry buttons row is docked below the PATCH SCRIPT
+        window body. Scroll the WINDOW (``#patch_win_script`` — the scroll
+        container that reveals the docked rows) to its end, then ``pilot.click``
         delivers a genuine mouse event (no ``.focus()`` / no direct call).
         """
-        app.query_one("#patch_pane_entries").scroll_end(animate=False)
+        app.query_one("#patch_win_script").scroll_end(animate=False)
         await pilot.pause()
         await pilot.click("#patch_entry_edit_json_button")
         await pilot.pause()

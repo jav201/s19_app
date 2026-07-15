@@ -494,6 +494,37 @@ def _batch45_footer_drift_marks(screen: str, density: str, size_key: str) -> tup
     return ()
 
 
+# batch-46 (R-TUI-063/064, US-U8/US-B2): the Patch Editor 2x2 four-pane grid is
+# REPLACED by three responsive bordered windows (PATCH SCRIPT / CHECKS / JSON
+# EDIT) laid out 3-across @>=120 and stacked @<120 (the width-narrow reflow).
+# Only the two ``patch`` scaffold cells (80x24 + 120x30) drift; no other screen
+# renders the patch panel. The SVG baselines must be regenerated in the
+# canonical CI env (snapshot-regen.yml, pinned textual==8.2.8) — NOT locally
+# (local regen drifts unrelated baselines, per reference_snapshot_regen_env).
+# Until then the two patch cells ride ``xfail(strict=False)`` (C-22 upper bound)
+# so the suite stays green mid-batch; a post-merge follow-up regen retires these
+# marks (mirrors the retired ``_batch44`` / ``_batch45_*`` drift-mark pattern).
+def _batch46_patch_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-46 three-window patch-layout drift marks.
+
+    The two ``patch`` cells (80x24 + 120x30) drift when the 2x2 grid becomes the
+    three-window responsive layout. Marked ``xfail(strict=False)`` until the
+    canonical-CI baseline regen lands, then retired.
+    """
+    if screen == "patch" and size_key in ("80x24", "120x30"):
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-46 R-TUI-063/064: patch 2x2 grid -> three-window "
+                    "responsive layout; SVG baseline regen pending in "
+                    "canonical CI (snapshot-regen.yml)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -551,7 +582,8 @@ _SCAFFOLD_CELLS = [
         + _batch38_drift_marks(screen, "comfortable", size_key)
         + _batch44_drift_marks(screen, "comfortable", size_key)
         + _batch45_map_drift_marks(screen, "comfortable", size_key)
-        + _batch45_footer_drift_marks(screen, "comfortable", size_key),
+        + _batch45_footer_drift_marks(screen, "comfortable", size_key)
+        + _batch46_patch_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
