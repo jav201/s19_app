@@ -38,6 +38,14 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 > multi-region IS shipped (batch-32 groups); "v2 change-set" = schema-v2 not variant-2; uncheckable
 > reason exists but sits on the status line.
 
+> **UPDATE 2026-07-15 — batch-45 SHIPPED N1 + N3 + U3 + U7** (Memory-Map entropy "Band-Bands" view +
+> retire the entropy pop-up; PRs [#81](https://github.com/jav201/s19_app/pull/81) `4608953` +
+> snapshot [#82](https://github.com/jav201/s19_app/pull/82) `dc4879f`; R-TUI-060/061/062, R-TUI-041
+> amended, R-TUI-050/051 retired). **NEXT (operator-approved): B2 + U8 — patch-editor responsive
+> 3-column** (prototype DONE, `prototypes/patch_editor_layout.prototype.py`, responsive 3-col +
+> docked buttons chosen). Remaining field-audit work: P0 B1 (Issues paging) + B3 (A2L two-chars,
+> needs repro); P1 N2 (Issues filter/sort) + N4 (paste everywhere); P2 polish + P3 discoverability.
+
 **P0 — real bugs (small fix, high value)**
 - **B1 — Issues PgUp/PgDn are no-ops.** SHIPPED-BUGGY. Bindings wired but page **stride=200** while
   panel mounts only **40** rows (`_GROUP_DISPLAY_MAX`) → no-op for 41–200 issues. Fix: page by the
@@ -45,7 +53,9 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 - **B2 — Patch buttons unreachable / 3 scrollbars.** SHIPPED-BUGGY. Change-file pane holds the most
   widgets but gets the smallest grid row (`1fr` of `1fr 2fr 2fr auto`); buttons overflow its fold,
   scroll fragmented across ~5 regions. Fix: weight the row / hoist the button row. **← operator's
-  item-1; pairs with U8 3-window redesign; /prototype FIRST (operator, 2026-07-14).** `styles.tcss:704-721`.
+  item-1; pairs with U8 3-window redesign. PROTOTYPE DONE + operator-chose responsive 3-column
+  (`prototypes/patch_editor_layout.prototype.py`: docked button rows + 3-col-when-wide/tabbed-at-floor;
+  start-geometry+font-scale DEFERRED). ← THE OPERATOR-APPROVED NEXT BATCH.** `styles.tcss:704-721`.
 - **B3 — A2L address shows "two extra chars" (clicks correct).** SHIPPED-BUGGY, NEEDS-REPRO. Likely a
   >32-bit address (`f"0x{addr:08X}"` non-truncating) + hex-view clamp; but "at the end" implies a
   low-order discrepancy that display/click (same `tag["address"]` int) can't produce in audited code.
@@ -53,14 +63,15 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 
 **P1 — genuinely-new features**
 - **N1 — Entropy/density-shaded memory map** (operator item-2: histogram / "at a glance", grid,
-  textures). NOT-IMPLEMENTED. Map colour = validation-range overlap ONLY; `mem_map`/entropy is never
-  plumbed into `render_ranges` → real files mostly grey. New data path: per-cell entropy → colour
-  ramp + grid + texture glyphs. **/prototype.** `screens_directionb.py:302-347,1124`; entropy in
-  `entropy_service.py` (separate).
+  textures). **✅ SHIPPED batch-45 (R-TUI-060/061 `4608953`)** — the map now renders entropy as a
+  proportional band bar + textured region list + docked "At a glance" histogram/sparkline (prototype
+  Variant 3 · BAND BANDS). Entropy plumbed on the worker-thread load path (`LoadedFile.entropy_windows`)
+  via the NEW non-frozen `entropy_style.py`.
 - **N2 — Issues filter (name + type) + sort.** PARTIAL. Only 3-way severity filter today; data
   (`symbol`/`code`/`severity`) already on each row. `app.py:6564`, `issues_view.py:173`.
-- **N3 — Single-click map→hex nav.** PARTIAL. Cell click only paints detail + reveals an "Open in Hex"
-  button (2nd click jumps). Bind nav to select. `screens_directionb.py:1473,1542`.
+- **N3 — Single-click map→hex nav.** **✅ SHIPPED batch-45 (R-TUI-062)** — a single click on a region
+  row now repositions the hex view (RegionRow.on_click → OpenInHexRequested; the 2-step reveal-button
+  path was deleted with the grid).
 - **N4 — Paste into ALL text boxes.** PARTIAL. A2B-diff paths + file-load already paste-enabled
   (`OsClipboardInput`); search/goto/filter/name/save are stock `Input`. Extend the widget.
   `os_clipboard_input.py`, `command_bar.py:142`.
@@ -68,19 +79,23 @@ closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — 
 **P2 — UX / presentation polish**
 - **U1** surface uncheckable-entry reason inline on the row (exists on status line, `check.py:350`).
 - **U2** relabel "v2 change-set" box (schema-v2 ≠ variant-2) — trivial.
-- **U3** denser map cells / grid lines / textures (`grid-gutter` already 0; needs denser glyph) — ties N1.
+- **U3** denser map cells / grid lines / textures — **✅ SHIPPED batch-45** (folded into N1: band segments + texture glyphs `·░▒▓` + `band-*` classes).
 - **U4** load-project as inline dropdown vs modal list (functionality shipped, `screens.py:638`).
 - **U5** bigger workspace files allocation at 80×24 (elastic already, splits left col 1:1).
 - **U6** ASCII in the hex-only "### Modifications" table (`report_service.py:970`) — "Change-entry
   linkage" already has before+after ASCII.
-- **U7** entropy strip: description-first landing (jumps straight to hex today).
+- **U7** entropy strip: description-first landing — **SUPERSEDED batch-45**: the standalone entropy
+  strip/modal is retired; region-row selection now populates the map detail pane (description) *and*
+  navigates to hex (single click).
 - **U8** 3 distinct windows for patch/checks (gestalt) — stronger than today's labeled sections;
-  pairs with B2. **/prototype (operator FIRST pick, 2026-07-14).**
+  pairs with B2. **PROTOTYPE DONE → operator-chose responsive 3-column (docked buttons); THE
+  OPERATOR-APPROVED NEXT BATCH** (see B2).
 
 **P3 — discoverability (biggest lever, mostly NOT code)** — SHIPPED but operator couldn't find:
 report-filter (R-RPT-FILTER-001, "most important" — exists), CRC multi-region (batch-32 groups),
-Refresh + JSON popup (R-TUI-052/053), persistent "Write before/after report" button (US-061), entropy
-paging/sort/legend (R-TUI-050/051), load-project (`p`). → in-app hints / onboarding pass.
+Refresh + JSON popup (R-TUI-052/053), persistent "Write before/after report" button (US-061),
+load-project (`p`). → in-app hints / onboarding pass. (Entropy paging/sort/legend R-TUI-050/051
+RETIRED batch-45 — superseded by the always-visible Band-Bands map.)
 
 **Won't-fix (format-inherent — explain):** Markdown per-byte colour + MD side-by-side — Markdown can't
 express either; HTML report already does BOTH (`diff_report_service.py:1765,1868`).
@@ -225,8 +240,13 @@ Features #1–#12 + #17 and the #8 patch-editor line (US-026..031, b21/b22/b23) 
 before/after report (#12(a)+(c)) + entropy viewer (#12(b), b26) + variant dropdown (#8 CLOSED, b23).
 Full detail: `.dev-flow/project_baseline_backlog_2026-07-09.md` and the vault batch log.
 
-## Controls encoded (global `~/.claude` / templates) — do NOT re-encode
-RC-1, C-1..C-26 (canonical record: `project_devflow_control_lineage.md`). **C-26 (touched-symbol
+## Controls encoded — do NOT re-encode
+RC-1, C-1..C-28 (canonical record: `project_devflow_control_lineage.md`). **PLACEMENT SPLIT (batch-45,
+operator-directed 2026-07-15):** the global `/dev-flow` command stays PROJECT-AGNOSTIC — stack-specific
+controls **C-13/C-13.1/C-22/C-23 relocated to this repo's `docs/engineering-rules.md`** ([PR #83](https://github.com/jav201/s19_app/pull/83) `299d04e`); **NEW C-28** (shared-chrome/footer binding-drift snapshot
+census) encoded there; only project-agnostic **C-16/C-17/C-27** stay global + a standing
+"classify-before-encode: stack-specific→project doc" policy. Rule: keep general flows general
+(`feedback_devflow_general_flows_project_agnostic`). **C-26 (touched-symbol
 reverse census — generalizes C-14 + C-24) ENCODED 2026-07-12 (batch-37).** **batch-38 proposes
 C-CAND-A (primary): the per-increment frozen-file guard must run BOTH `test_engine_unchanged` (SOURCE
 freeze) AND `test_tc032`/`test_tc031` (engine TEST-file freeze) — origin batch-38 F-1, a stray AT in
