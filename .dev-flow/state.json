@@ -12,7 +12,7 @@
         "0": 1,
         "1": 1,
         "2": 1,
-        "3": 1,
+        "3": 2,
         "4": 0,
         "5": 0,
         "6": 0
@@ -60,6 +60,12 @@
             "date": "2026-07-14",
             "decision": "Inc-1 APPROVE (autonomous)",
             "notes": "entropy_style.py + .band-* + test_entropy_style.py. ruff clean, 8 passed (F1 non-empty-glyph guard added per code-review MEDIUM), C-27 dual-guard 0 frozen diffs. Code-review APPROVE-WITH-NITS 0 HIGH; F2/F3 LOW -> Inc-5 heads-ups (delete screens.py ENTROPY_BAND_MEANING + TC-326; confirm dropping modal threshold text). Ledger +8. Inc-2 starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-2 (2a+2b) APPROVE (autonomous)",
+            "notes": "Core view swap. compute-on-load (LoadedFile.entropy_windows via build_loaded_s19/hex) + band bar/region list/legend replacing the sev-* grid. RED captured (AT-069/070/071). 163 passed/2 skipped; consumers 77 passed; C-27 0 frozen; 2 map cells xfail (_batch45_map_drift_marks). Superseded-test disposition (Option A ruling): rework at035/at036e\u2192pure/at036f\u2192pure-hostile; retire cell-grid/arrow-nav/tooltip/count/fill; defer at036b/tc041_6\u2192Inc-3. C-17 GUARDRAIL preserved (build_detail_text + hostile test live). Code-review APPROVE-WITH-NITS 0 HIGH: F1 (real cross-gap same-band merge defect) FIXED + gap test test_at071b (RED-if-revert confirmed 1x512B->2x256B); F2 AST bare-name guard FIXED; F4 docstring id/class FIXED; F3 B-01 snap -> Inc-3. DuplicateIds re-render bug found+fixed (id->class)+guarded. Inc-3 starting."
         }
     ],
     "obsidian_synced": false,

@@ -627,12 +627,47 @@ Screen {
     layout: vertical;
 }
 
+/* batch-45 (R-TUI-060): the map body is the entropy band view (band bar +
+ * region list + legend stacked vertically), not the retired 16-col validity
+ * cell grid. The `.map-cell` rules below are kept for the dead MapCell class
+ * (deleted in Inc-5). */
 #map_grid {
     width: 1fr;
     height: auto;
-    layout: grid;
-    grid-size: 16;
-    grid-gutter: 0;
+    layout: vertical;
+}
+
+/* Entropy band bar: one proportional segment per merged run, laid left→right;
+ * each segment sizes to its glyph-run content width. Re-mounted per render, so
+ * addressed by CLASS (not id) to avoid DuplicateIds on re-render. */
+.map-band-bar {
+    width: 100%;
+    height: 1;
+    layout: horizontal;
+}
+
+.map-band-seg {
+    width: auto;
+    height: 1;
+}
+
+/* Per-region list + band legend: one full-width row each. */
+.map-region-list {
+    width: 100%;
+    height: auto;
+    margin-top: 1;
+}
+
+.map-band-legend {
+    width: 100%;
+    height: auto;
+    margin-top: 1;
+}
+
+.map-region-row,
+.map-legend-row {
+    width: 100%;
+    height: 1;
 }
 
 .map-cell {

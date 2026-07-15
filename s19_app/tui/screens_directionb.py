@@ -49,7 +49,12 @@ from typing import Any, List, Mapping, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual.app import ComposeResult
-from textual.containers import Container, Horizontal, ScrollableContainer
+from textual.containers import (
+    Container,
+    Horizontal,
+    ScrollableContainer,
+    Vertical,
+)
 from textual.message import Message
 from textual.widgets import (
     Button,
@@ -64,7 +69,9 @@ from textual.widgets import (
 from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
+from .entropy_style import ENTROPY_BAND_LABELS, band_style
 from .os_clipboard_input import OsClipboardInput
+from .services.entropy_service import EntropyWindow
 from .services.flow_model import (
     BLOCK_PATCH,
     BLOCK_SOURCE,
@@ -185,6 +192,68 @@ _KIB = 1024
 #: cell's ``sev-*`` CSS class (single source of truth = color_policy), never a
 #: hard-coded severity hex in this module (LLR-041.3).
 _CELL_GLYPH = "█"
+
+#: Total character width the entropy band bar is drawn across (batch-45,
+#: R-TUI-060). Fixed so each run's segment width is a deterministic function of
+#: ``round(_BAND_BAR_WIDTH * run_bytes / total_bytes)`` — independent of live
+#: layout geometry, exactly as the cell count was kept geometry-pure (LLR-041.2).
+_BAND_BAR_WIDTH = 60
+
+
+def _merge_band_runs(
+    windows: Sequence[EntropyWindow],
+) -> List[Tuple[str, int, int]]:
+    """Merge contiguous same-band entropy windows into region runs.
+
+    Summary:
+        Collapse an ascending-address ``EntropyWindow`` sequence into one run
+        per maximal stretch of ADDRESS-CONTIGUOUS same-band windows, summing
+        their byte counts (batch-45, R-TUI-060 / LLR-045A.4). A run extends
+        onto the next window only when the band matches AND the window is
+        physically adjacent (``run_start + run_total == window.start``); a band
+        change OR an address discontinuity starts a new run. The contiguity
+        break matters because ``compute_entropy`` walks per-contiguous-range,
+        so two physically separate same-band regions (e.g. two padding blocks
+        across an address gap) sit back-to-back in the window list and must NOT
+        collapse into one span (review F1). Pure arithmetic over already-
+        computed windows — no re-parse, no entropy recomputation.
+
+    Args:
+        windows (Sequence[EntropyWindow]): The loader-computed
+            ``LoadedFile.entropy_windows`` in ascending address order.
+
+    Returns:
+        List[Tuple[str, int, int]]: One ``(band_label, summed_bytes,
+        start_addr)`` per run, in window order; ``[]`` for empty input.
+
+    Data Flow:
+        - Reads each window's ``band`` / ``sample_count`` / ``start``; produces
+          the run list the band bar + region list render from.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges`` (band bar + region list)
+
+    Example:
+        >>> from s19_app.tui.services.entropy_service import EntropyWindow
+        >>> w = lambda s, band: EntropyWindow(s, s + 256, 256, 0.0, band, False)
+        >>> _merge_band_runs([w(0, "low"), w(256, "low"), w(512, "high/random")])
+        [('low', 512, 0), ('high/random', 256, 512)]
+        >>> _merge_band_runs([w(0, "low"), w(4096, "low")])  # gap → 2 runs
+        [('low', 256, 0), ('low', 256, 4096)]
+    """
+    runs: List[Tuple[str, int, int]] = []
+    for window in windows:
+        if (
+            runs
+            and runs[-1][0] == window.band
+            and runs[-1][2] + runs[-1][1] == window.start
+        ):
+            band, total, start = runs[-1]
+            runs[-1] = (band, total + window.sample_count, start)
+        else:
+            runs.append((window.band, window.sample_count, window.start))
+    return runs
 
 
 def derive_image_span(
@@ -954,19 +1023,21 @@ class MapCell(Static):
 
 
 class MemoryMapPanel(Container):
-    """Colour-coded 2-D spatial minimap of the loaded image's memory ranges.
+    """Entropy band view of the loaded image's mapped memory.
 
     Summary:
-        Renders the firmware image span as a grid of address-window cells,
-        each coloured ``valid``/``invalid``/``gap`` from the already-computed
-        ``LoadedFile.ranges`` and ``LoadedFile.range_validity`` handed to
-        ``render_ranges``. Cell size auto-scales so the whole span fits the
-        visible grid, and a header shows the "≈ N KiB/cell" ratio. It is a
-        pure presentational widget — it performs NO coverage, parsing,
-        validation or file I/O of its own (LLR-041.7). Cell colours route
-        exclusively through ``css_class_for_severity`` (LLR-041.3); no
-        severity hex is hard-coded. With no ranges it preserves the neutral
-        no-file note (LLR-041.9).
+        Renders the image as an ENTROPY band view (batch-45, R-TUI-060): a
+        proportional band bar + a per-region list (address · size · band) + a
+        band legend, merged by ``_merge_band_runs`` from the loader-computed
+        ``LoadedFile.entropy_windows`` handed to ``render_ranges``. This
+        replaced the batch-27 ``sev-*`` validity cell grid (the ``MapCell`` +
+        arrow-nav machinery below is retained as dead code pending its Inc-5
+        deletion). It is a pure presentational widget — it performs NO entropy,
+        coverage, parsing or validation of its own (LLR-045A.2 / LLR-041.7).
+        Band colours route through the ``band-*`` CSS classes owned by
+        ``entropy_style`` + ``styles.tcss`` (LLR-045A.3); no colour hex is
+        hard-coded. The coverage stats strip is retained unchanged. With no
+        image / no entropy it preserves the neutral no-data note (LLR-045A.5).
 
     Args:
         None
@@ -1127,48 +1198,65 @@ class MemoryMapPanel(Container):
         range_validity: Sequence[bool],
         issues: Sequence[ValidationIssue] = (),
         a2l_tags: Sequence[Mapping[str, Any]] = (),
+        entropy_windows: Sequence[EntropyWindow] = (),
     ) -> None:
-        """Render the colour-coded minimap grid from already-computed ranges.
+        """Render the entropy band view from already-computed windows.
 
         Summary:
-            Build the image span, auto-scale the cell size to the visible
-            grid, and mount one ``MapCell`` widget per cell coloured by its
-            overlap status. The input is consumed verbatim from the
-            ``LoadedFile`` snapshot and the pre-computed ``issues`` list — no
-            range is re-derived and no coverage/validation is computed here
-            (LLR-041.7). Cell content is built as markup-safe ``Text``
-            (LLR-041.11). The ordered ranges and the issue list are stored so
-            cell selection can assemble the detail pane (LLR-041.4/.5).
+            Merge the loader-computed ``entropy_windows`` into contiguous
+            same-band runs and render the Memory-Map body as a proportional
+            band bar + a per-region list + a band legend (batch-45, R-TUI-060 /
+            LLR-045A.2..045A.6). This REPLACES the batch-27 ``sev-*`` validity
+            cell grid — no ``MapCell`` is mounted. All input is consumed
+            verbatim from the ``LoadedFile`` snapshot; no range is re-derived
+            and no entropy/coverage/validation is computed here (LLR-045A.2 M4,
+            LLR-041.7). Every segment/row is a widget carrying its
+            ``band-*`` CSS class (colour owned by ``styles.tcss``) with
+            markup-safe ``Text`` content (LLR-041.11). The coverage stats strip
+            is retained unchanged (validity signal). The ordered ranges + issue
+            list are still stored so the retained ``build_detail_text`` (re-wired
+            to region-row selection in a later increment) stays usable.
 
         Args:
             ranges (Sequence[Tuple[int, int]]): Contiguous ``(start, end)``
-                memory ranges from ``LoadedFile.ranges`` (``end`` exclusive).
+                memory ranges from ``LoadedFile.ranges`` (``end`` exclusive) —
+                used only for the retained coverage stats strip.
             range_validity (Sequence[bool]): Per-range validity flags from
                 ``LoadedFile.range_validity``, positionally aligned with
-                ``ranges``.
+                ``ranges`` — used only for the coverage stats strip.
             issues (Sequence[ValidationIssue]): The already-computed
-                ``S19TuiApp._validation_issues`` — the single canonical source
-                for the cell-scoped issue list and the region-issue count
-                (LLR-041.5); defaults to empty for the no-issue / headless
-                path.
+                ``S19TuiApp._validation_issues`` — the canonical source for the
+                stats strip issue count and the retained detail-pane join
+                (LLR-041.5); defaults to empty for the headless path.
+            a2l_tags (Sequence[Mapping[str, Any]]): The enriched A2L tags for
+                the retained detail-pane region naming (R-TUI-041 R-3);
+                deliberately NOT used by the new region-list rows, which are
+                addr/size/band-only (security B3).
+            entropy_windows (Sequence[EntropyWindow]): The loader-computed
+                per-window entropy over the image (``LoadedFile.entropy_windows``);
+                empty on the no-file path. The trailing default keeps every
+                pre-batch-45 caller working (C-26 safe, mirrors the batch-43
+                ``a2l_tags`` 4th-arg pattern).
 
         Returns:
             None
 
         Data Flow:
-            - When ``ranges`` is empty, show the neutral empty note, mount no
-              cells and reset the detail pane (LLR-041.9).
-            - Otherwise derive the span, cell count and bytes-per-cell, then
-              mount a ``MapCell`` widget per cell into ``#map_grid`` with its
-              ``sev-*`` status class and its ``[cell_start, cell_end)`` window;
-              the header shows the "≈ N KiB/cell" ratio. The summary text is
-              stored on ``rendered_text``.
+            - When there is no image or no entropy (``ranges`` empty, zero
+              span, or ``entropy_windows`` empty), show the neutral no-data
+              note, mount no segments/rows and blank the stats strip — never
+              raise (LLR-045A.5 / LLR-041.9).
+            - Otherwise merge windows via ``_merge_band_runs`` and mount the
+              band bar (``.map-band-bar``), region list (``.map-region-list``)
+              and legend (``.map-band-legend``) into ``#map_grid``; the header
+              shows a band summary. The summary is stored on ``rendered_text``.
+              These three are addressed by CLASS (not id) because they are
+              re-mounted every render (an id would trip ``DuplicateIds``).
 
         Dependencies:
             Uses:
-                - ``derive_image_span`` / ``cell_count_for_geometry`` /
-                  ``bytes_per_cell`` / ``cell_status`` /
-                  ``status_to_css_class`` / ``MapCell``
+                - ``_merge_band_runs`` / ``band_style`` / ``ENTROPY_BAND_LABELS``
+                  / ``safe_text`` / ``derive_image_span``
             Used by:
                 - ``S19TuiApp.update_memory_map``
         """
@@ -1187,7 +1275,7 @@ class MemoryMapPanel(Container):
 
         span_start, span_end = derive_image_span(ranges)
         span = span_end - span_start
-        if not ranges or span <= 0:
+        if not ranges or span <= 0 or not entropy_windows:
             self._ordered_ranges = []
             self.rendered_text = self._EMPTY_TEXT
             header.update(self._EMPTY_TEXT)
@@ -1203,37 +1291,88 @@ class MemoryMapPanel(Container):
         ordered.sort(key=lambda item: item[0])
         self._ordered_ranges = ordered
 
-        cols, rows = self._grid_geometry()
-        count = cell_count_for_geometry(span, cols, rows)
-        per_cell = bytes_per_cell(span, count)
-        #: Record the VISUAL column count for arrow-key Up/Down; the on-screen
-        #: wrapping is fixed by the ``#map_grid`` CSS ``grid-size`` (MAP_GRID_COLS),
-        #: not the measured content geometry used only for the cell *count*.
-        self._grid_cols = MAP_GRID_COLS
+        runs = _merge_band_runs(entropy_windows)
+        grid.mount(*self._build_band_widgets(runs))
 
-        cells: List[MapCell] = []
-        for index in range(count):
-            cell_start = span_start + index * per_cell
-            cell_end = min(span_end, cell_start + per_cell)
-            status = cell_status(cell_start, cell_end, ordered)
-            sev_class = status_to_css_class(status)
-            cell = MapCell(
-                cell_start, cell_end, status, f"map-cell {sev_class}"
-            )
-            # R-TUI-041 R-3: hover tooltip naming the A2L symbol(s) in the cell.
-            # MUST be a Rich ``Text`` — Textual markup-parses a bare ``str``
-            # tooltip, so a Text keeps a hostile A2L name literal (security F1).
-            cell.tooltip = self._cell_tooltip(cell_start, cell_end, status)
-            cells.append(cell)
-        if cells:
-            grid.mount(*cells)
-
-        kib_per_cell = per_cell / _KIB
-        summary = f"≈ {kib_per_cell:.2f} KiB/cell ({count} cells, {per_cell} B/cell)"
+        total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
+        summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
         self.rendered_text = summary
         header.update(safe_text(summary))
 
         self._render_stats(ranges, range_validity, self._issues, empty=False)
+
+    def _build_band_widgets(
+        self, runs: Sequence[Tuple[str, int, int]]
+    ) -> List[Container]:
+        """Build the band bar, region list and legend widgets for ``runs``.
+
+        Summary:
+            Assemble the three entropy band-view sub-containers (batch-45,
+            R-TUI-060 / LLR-045A.3/.4/.6): a proportional ``.map-band-bar``
+            (one segment per run, width ∝ byte share), a ``.map-region-list``
+            (one addr/size/band row per run), and a ``.map-band-legend`` (one
+            row per band label) — each addressed by CLASS (not id) because they
+            are re-mounted every render. Every segment/row is a widget carrying its
+            ``band-*`` CSS class (``styles.tcss`` owns the colour) with
+            markup-safe ``Text`` content via ``safe_text`` — never an f-string
+            into a markup sink (LLR-041.11). Region rows are addr/size/band
+            ONLY — no file-derived (A2L) text (security B3).
+
+        Args:
+            runs (Sequence[Tuple[str, int, int]]): The merged
+                ``(band_label, summed_bytes, start_addr)`` runs from
+                ``_merge_band_runs`` (non-empty).
+
+        Returns:
+            List[Container]: ``[band_bar, region_list, legend]`` ready to mount
+            into ``#map_grid``.
+
+        Data Flow:
+            - Reads ``runs`` + the ``entropy_style`` band maps; produces the
+              widgets ``render_ranges`` mounts.
+
+        Dependencies:
+            Uses:
+                - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text``
+            Used by:
+                - ``render_ranges``
+        """
+        total_bytes = sum(run_bytes for _band, run_bytes, _start in runs) or 1
+
+        segments: List[Static] = []
+        region_rows: List[Static] = []
+        for band, run_bytes, start in runs:
+            token, glyph, _meaning = band_style(band)
+            width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_bytes))
+            segments.append(
+                Static(safe_text(glyph * width), classes=f"map-band-seg {token}")
+            )
+            region_rows.append(
+                Static(
+                    safe_text(f"{glyph} 0x{start:08X} · {run_bytes} B · {band}"),
+                    classes=f"map-region-row {token}",
+                )
+            )
+
+        legend_rows: List[Static] = []
+        for band in ENTROPY_BAND_LABELS:
+            token, glyph, meaning = band_style(band)
+            legend_rows.append(
+                Static(
+                    safe_text(f"{glyph} {band} — {meaning}"),
+                    classes=f"map-legend-row {token}",
+                )
+            )
+
+        # Re-mounted every render after ``grid.remove_children()`` (whose removal
+        # is deferred), so these carry CLASSES, not unique IDs — an ID would trip
+        # ``DuplicateIds`` when the old container is still registered at re-render
+        # (the same reason the retired cell grid used ``.map-cell``, not an id).
+        return [
+            Horizontal(*segments, classes="map-band-bar"),
+            Vertical(*region_rows, classes="map-region-list"),
+            Vertical(*legend_rows, classes="map-band-legend"),
+        ]
 
     def _cell_tooltip(
         self, cell_start: int, cell_end: int, status: str

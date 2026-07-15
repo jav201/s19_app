@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from .services.entropy_service import EntropyWindow
+
 
 @dataclass
 class LoadedFile:
@@ -32,6 +34,11 @@ class LoadedFile:
             the source S19 image (first ``S0`` record's data), or ``None`` when
             the source carries no S0. Preserved so a save flow can re-emit a
             populated S0 in 32-byte mode (LLR-015.2).
+        entropy_windows (List[EntropyWindow]): Per-window Shannon-entropy
+            records over ``mem_map``, computed once on the worker-thread load
+            path (``load_service.build_loaded_*``) and cached here so the
+            Memory-Map band view reads them without recomputing on the UI
+            thread (batch-45, R-TUI-060 / LLR-045A.2). Empty for an empty map.
 
     Data Flow:
         - Produced by ``S19TuiApp._parse_loaded_file``.
@@ -55,6 +62,7 @@ class LoadedFile:
     bases_set: Optional[Any] = field(default=None, repr=False, compare=False)
     variant_id: Optional[str] = None
     source_s0_header: Optional[bytes] = None
+    entropy_windows: List[EntropyWindow] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

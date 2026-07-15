@@ -501,6 +501,28 @@ def _batch44_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-45 (R-TUI-060, Memory-Map entropy view swap): the map screen's read-only
+# ``sev-*`` validity cell grid is REPLACED by the entropy band view (proportional
+# band bar + per-region list + band legend). Only the two ``map`` scaffold cells
+# (80x24 + 120x30) drift; no other screen renders the map body. The SVG baselines
+# must be regenerated in the canonical CI env (snapshot-regen.yml, pinned
+# textual==8.2.8) — NOT locally (local regen drifts unrelated baselines). Until
+# then the two map cells are marked ``xfail(strict=False)`` so the suite stays
+# green mid-batch; a post-merge follow-up regen retires these marks (mirrors the
+# retired ``_batch44_drift_marks`` pattern).
+def _batch45_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-45 map entropy-view drift mark for the ``map`` cells."""
+    if screen != "map":
+        return ()
+    return (
+        pytest.mark.xfail(
+            reason="batch-45 R-TUI-060 Memory-Map entropy view (validity grid -> "
+            "band bar + region list + legend); canonical-CI baseline regen pending",
+            strict=False,
+        ),
+    )
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -555,7 +577,8 @@ _SCAFFOLD_CELLS = [
         + _batch33_drift_marks(screen, "comfortable", size_key)
         + _batch36_drift_marks(screen, "comfortable", size_key)
         + _batch38_drift_marks(screen, "comfortable", size_key)
-        + _batch44_drift_marks(screen, "comfortable", size_key),
+        + _batch44_drift_marks(screen, "comfortable", size_key)
+        + _batch45_map_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

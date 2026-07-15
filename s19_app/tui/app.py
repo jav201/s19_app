@@ -8448,11 +8448,13 @@ class S19TuiApp(App):
               so it shows its neutral no-file note.
             - Otherwise pass ``current_file.ranges``,
               ``current_file.range_validity``, the pre-computed
-              ``_validation_issues`` and the enriched ``_a2l_enriched_tags``
-              (R-TUI-041 R-3 region/cell symbol naming) straight through to
-              ``MemoryMapPanel.render_ranges``. The renderer reads these
-              already-computed model fields verbatim — it adds no coverage
-              computation, parsing or analysis (LLR-012.1 / LLR-012.4).
+              ``_validation_issues``, the enriched ``_a2l_enriched_tags``
+              (R-TUI-041 R-3 region/cell symbol naming) and the loader-computed
+              ``current_file.entropy_windows`` (batch-45 R-TUI-060 band view)
+              straight through to ``MemoryMapPanel.render_ranges``. The renderer
+              reads these already-computed model fields verbatim — it adds no
+              coverage computation, entropy computation, parsing or analysis
+              (LLR-012.1 / LLR-012.4 / LLR-045A.2 M4).
 
         Dependencies:
             Uses:
@@ -8462,13 +8464,14 @@ class S19TuiApp(App):
         """
         panel = self.query_one("#memory_map_panel", MemoryMapPanel)
         if not self.current_file:
-            panel.render_ranges([], [], [], [])
+            panel.render_ranges([], [], [], [], [])
             return
         panel.render_ranges(
             self.current_file.ranges,
             self.current_file.range_validity,
             self._validation_issues,
             self._a2l_enriched_tags,
+            self.current_file.entropy_windows,
         )
         self.logger.info(
             "Memory Map updated. ranges=%d", len(self.current_file.ranges)

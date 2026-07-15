@@ -12,6 +12,7 @@ from ..hexview import (
     build_row_bases,
 )
 from ..models import LoadedFile
+from .entropy_service import compute_entropy
 
 
 def build_loaded_s19(
@@ -39,11 +40,15 @@ def build_loaded_s19(
         - Reads ``S19File.records`` (``core.py:226``) and each record's
           ``.type`` / ``.data`` (``core.py:98``/``core.py:145``), read-only —
           no write to the frozen reader.
+        - Computes per-window entropy over ``mem_map`` once here (worker
+          thread) and caches it on ``LoadedFile.entropy_windows`` for the
+          Memory-Map band view (batch-45, R-TUI-060 / LLR-045A.2).
         - Hands the snapshot to ``S19TuiApp._apply_loaded_file``.
 
     Dependencies:
         Uses:
-            - build_mem_map_s19, build_row_bases, build_range_validity_s19
+            - build_mem_map_s19, build_row_bases, build_range_validity_s19,
+              compute_entropy
         Used by:
             - S19TuiApp._parse_loaded_file
     """
@@ -67,6 +72,7 @@ def build_loaded_s19(
         mac_records=[],
         mac_diagnostics=[],
         source_s0_header=source_s0_header,
+        entropy_windows=compute_entropy(mem_map),
     )
 
 
@@ -78,6 +84,10 @@ def build_loaded_hex(
 ) -> LoadedFile:
     """
     Build a ``LoadedFile`` snapshot for an Intel HEX image.
+
+    Mirrors ``build_loaded_s19``: caches per-window entropy over ``mem_map``
+    on ``LoadedFile.entropy_windows`` for the Memory-Map band view (batch-45,
+    R-TUI-060 / LLR-045A.2).
     """
     mem_map = dict(hex_file.memory)
     ranges = hex_file.get_ranges()
@@ -94,4 +104,5 @@ def build_loaded_hex(
         mac_path=None,
         mac_records=[],
         mac_diagnostics=[],
+        entropy_windows=compute_entropy(mem_map),
     )
