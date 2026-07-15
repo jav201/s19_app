@@ -1022,6 +1022,69 @@ class MapCell(Static):
         return None
 
 
+class RegionRow(Static):
+    """A single clickable entropy region-list row (batch-45, R-TUI-062).
+
+    Summary:
+        One row of the ``.map-region-list`` — an address · size · band summary
+        of one merged entropy run. A SINGLE real click posts
+        :class:`Activated` carrying the run's ``[region_start, region_end)``
+        window; the enclosing :class:`MemoryMapPanel` handles it by populating
+        the detail pane (``build_detail_text``, keeping the R-TUI-041 R-3 A2L
+        naming + its C-17 markup-safety guard alive on a live path) and posting
+        :class:`MemoryMapPanel.OpenInHexRequested` for direct region→hex nav
+        (LLR-045C.1 — no reveal-button, no two-step). The row itself shows
+        addr/size/band ONLY — no file-derived A2L text (security B3). A click on
+        padding/legend/empty area hits no ``RegionRow`` and is an inert no-op
+        (LLR-045C.3).
+
+    Args:
+        content (Text): The markup-safe ``{glyph} 0x.. · N B · band`` row text.
+        region_start (int): Inclusive start address of the run.
+        region_end (int): Exclusive end address of the run
+            (``region_start + run_bytes``).
+        classes (str): Space-joined CSS classes (``map-region-row`` + the
+            run's ``band-*`` token).
+
+    Data Flow:
+        - Mounted by ``MemoryMapPanel._build_band_widgets``; on click posts
+          :class:`Activated` → ``MemoryMapPanel.on_region_row_activated``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets``
+    """
+
+    class Activated(Message):
+        """A region row was clicked (single-click region→hex + detail).
+
+        Args:
+            region_start (int): The run's inclusive start address (the hex
+                focus address).
+            region_end (int): The run's exclusive end address.
+        """
+
+        def __init__(self, region_start: int, region_end: int) -> None:
+            super().__init__()
+            self.region_start = region_start
+            self.region_end = region_end
+
+    def __init__(
+        self,
+        content: Text,
+        region_start: int,
+        region_end: int,
+        classes: str,
+    ) -> None:
+        super().__init__(content, classes=classes)
+        self.region_start = region_start
+        self.region_end = region_end
+
+    def on_click(self) -> None:
+        """Post :class:`Activated` for this region on a single click."""
+        self.post_message(self.Activated(self.region_start, self.region_end))
+
+
 class MemoryMapPanel(Container):
     """Entropy band view of the loaded image's mapped memory.
 
@@ -1340,7 +1403,7 @@ class MemoryMapPanel(Container):
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs) or 1
 
         segments: List[Static] = []
-        region_rows: List[Static] = []
+        region_rows: List[RegionRow] = []
         for band, run_bytes, start in runs:
             token, glyph, _meaning = band_style(band)
             width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_bytes))
@@ -1348,8 +1411,10 @@ class MemoryMapPanel(Container):
                 Static(safe_text(glyph * width), classes=f"map-band-seg {token}")
             )
             region_rows.append(
-                Static(
+                RegionRow(
                     safe_text(f"{glyph} 0x{start:08X} · {run_bytes} B · {band}"),
+                    region_start=start,
+                    region_end=start + run_bytes,
                     classes=f"map-region-row {token}",
                 )
             )
@@ -1634,6 +1699,39 @@ class MemoryMapPanel(Container):
             self.build_detail_text(cell.cell_start, cell.cell_end, cell.status)
         )
         self.query_one("#map_open_hex_button", Button).remove_class("hidden")
+
+    def on_region_row_activated(self, event: "RegionRow.Activated") -> None:
+        """Handle a region-row click: populate detail + jump to hex (R-TUI-062).
+
+        Summary:
+            On a single :class:`RegionRow.Activated` (one click), populate the
+            retained ``#map_detail`` pane for the clicked run's
+            ``[region_start, region_end)`` window via ``build_detail_text``
+            (LLR-045C — this keeps the R-TUI-041 R-3 A2L-symbol region naming
+            and its C-17 markup-safety guard alive on a LIVE path), then post
+            :class:`OpenInHexRequested` so the reused app handler switches to
+            the Workspace/hex screen and repositions the hex window to the
+            run's start (LLR-045C.1). The detail is populated BEFORE the nav
+            message so the pane reflects the selection when the operator returns
+            to the map. The window status is derived from the already-stored
+            ``_ordered_ranges`` via ``cell_status`` — no re-parse (LLR-041.7).
+
+        Args:
+            event (RegionRow.Activated): The clicked run's window.
+
+        Dependencies:
+            Uses:
+                - ``cell_status`` / ``build_detail_text`` / ``OpenInHexRequested``
+            Used by:
+                - Textual message dispatch (from ``RegionRow``)
+        """
+        event.stop()
+        start, end = event.region_start, event.region_end
+        self._selected_cell_start = start
+        status = cell_status(start, end, self._ordered_ranges)
+        body = self.query_one("#map_detail_body", Static)
+        body.update(self.build_detail_text(start, end, status))
+        self.post_message(self.OpenInHexRequested(start))
 
     def focus_adjacent_cell(self, current: "MapCell", key: str) -> None:
         """Move focus to the cell one arrow-step from ``current`` (US-036).

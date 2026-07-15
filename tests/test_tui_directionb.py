@@ -120,7 +120,6 @@ import asyncio
 import subprocess
 from pathlib import Path
 
-import pytest
 from textual.binding import Binding
 from textual.widgets import Input
 
@@ -3473,48 +3472,54 @@ def test_tc041_5_cell_issue_join_boundary_and_negative() -> None:
     )
 
 
-@pytest.mark.skip(
-    reason="batch-45 R-TUI-060: DEFERRED to Inc-3. The Open-in-Hex focus "
-    "contract is re-established through region-row (single-click region→hex) "
-    "selection in Inc-3; the cell surface this drives is gone in Inc-2. Kept "
-    "(not deleted) so Inc-3 reworks rather than reinvents it."
-)
-def test_tc041_6_open_computes_focus_equals_cell_start(tmp_path: Path) -> None:
-    """Open-in-Hex posts a focus address equal to the cell start
-    (TC-041.6 / LLR-041.6).
+def test_tc041_6_region_activation_focus_equals_region_start(
+    tmp_path: Path,
+) -> None:
+    """A region activation posts a focus address equal to the region start
+    (TC-041.6, REWORKED batch-45 R-TUI-062 — was cell_start, now region_start).
 
-    Intent: the white-box contract that the jump message carries exactly the
-    selected cell's ``cell_start`` (no off-by-one, no row-base rounding on the
-    panel side — the app owns the focus math). Complements AT-036b's
-    behavioral hex-render assertion.
+    Intent (white-box): the ``OpenInHexRequested`` the panel posts on a region
+    click carries EXACTLY the run's ``region_start`` — no off-by-one, no
+    row-base rounding on the panel side (the app handler owns the focus math /
+    the nearest-present-row snap). Complements AT-074's behavioral hex-render.
     """
-    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
+    from s19_app.tui.screens_directionb import (
+        MemoryMapPanel,
+        RegionRow,
+    )
 
-    async def _drive() -> "object":
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[list, int]":
         app = S19TuiApp(base_dir=tmp_path)
         posted: list[int] = []
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _mounted_map_panel(app)
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
             await pilot.pause()
             panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            cell = next(iter(app.query_one("#map_grid").query(MapCell)))
+            row = next(
+                r for r in app.query(RegionRow) if "high/random" in _widget_plain(r)
+            )
+            orig_post = panel.post_message
 
-            def _capture(msg: "object") -> None:
-                posted.append(msg.focus_address)
+            def _cap(msg: "object") -> bool:
+                if isinstance(msg, MemoryMapPanel.OpenInHexRequested):
+                    posted.append(msg.focus_address)
+                return orig_post(msg)
 
-            # Observe the message the button emits without needing the app
-            # handler: post Selected, then press the revealed button.
-            panel.on_map_cell_selected(MapCell.Selected(cell))
-            # The panel stores the selection; assert the message it would post.
-            assert panel._selected_cell_start == cell.cell_start
-            msg = MemoryMapPanel.OpenInHexRequested(panel._selected_cell_start)
-            _capture(msg)
-            return posted[0], cell.cell_start
+            panel.post_message = _cap  # type: ignore[method-assign]
+            panel.on_region_row_activated(
+                RegionRow.Activated(row.region_start, row.region_end)
+            )
+            return posted, row.region_start
 
-    focus, cell_start = asyncio.run(_drive())
-    assert focus == cell_start, (
-        f"Open-in-Hex focus must equal cell_start; {focus} != {cell_start}"
+    posted, region_start = asyncio.run(_drive())
+    assert posted == [region_start], (
+        f"region activation must post exactly OpenInHexRequested(region_start); "
+        f"posted={posted} region_start={region_start}"
     )
 
 
@@ -3533,42 +3538,36 @@ def test_tc041_6_open_computes_focus_equals_cell_start(tmp_path: Path) -> None:
 #     focus scoping — the grid is gone.
 
 
-@pytest.mark.skip(
-    reason="batch-45 R-TUI-060: DEFERRED to Inc-3. Open-in-Hex from the map is "
-    "re-established through region-row (single-click region→hex) selection in "
-    "Inc-3; the MapCell surface this drives is gone in Inc-2."
-)
-def test_at036b_open_in_hex_focuses_cell_start(tmp_path: Path) -> None:
-    """Black-box: Open-in-Hex switches to the hex view focused on the cell
-    (AT-036b, behavioral).
+def test_at036b_region_click_reveals_hex_at_region_start(tmp_path: Path) -> None:
+    """Black-box: a region click switches to the hex view focused on the region
+    (AT-036b, REWORKED batch-45 R-TUI-062 — was cell, now region).
 
-    Intent: selecting a valid cell at start ``A`` and triggering Open-in-Hex
-    must reveal the Workspace/hex screen AND render the hex row containing
-    ``A`` in ``#hex_view`` — confirming ``update_hex_view(focus_address=A)``
-    ran through the shipped surface (NOT a mock-call assertion; that is
-    TC-041.6's job).
+    Intent: a single REAL ``pilot.click`` on the CONSTANT region row (start
+    ``0x80000000``) must reveal the Workspace/hex screen AND render the hex row
+    containing that start in ``#hex_view`` — the C-10 non-default counterpart to
+    AT-074 (which clicks the HIGH region), proving the clicked region's start
+    (not a fixed address) drives the focus. Confirms ``update_hex_view`` ran
+    through the shipped surface (NOT a mock assertion — TC-041.6's job).
     """
-    from s19_app.tui.screens_directionb import MapCell
+    loaded = _two_band_loaded(tmp_path)
 
     async def _drive() -> "tuple[bool, str, int]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _mounted_map_panel(app)
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
             await pilot.pause()
-            # The first cell covers the (0, 11) valid range → start 0.
-            cell = next(iter(app.query_one("#map_grid").query(MapCell)))
-            start = cell.cell_start
-            cell.on_click()
-            await pilot.pause()
-            app.query_one("#map_open_hex_button").press()
-            await pilot.pause()
+            row = await _click_region_row(
+                pilot, app, lambda r: "constant/padding" in _widget_plain(r)
+            )
             ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
             hex_str = str(app.query_one("#hex_view").render())
-            return ws_visible, hex_str, start
+            return ws_visible, hex_str, row.region_start
 
     ws_visible, hex_str, start = asyncio.run(_drive())
-    assert ws_visible, "Open-in-Hex must reveal the Workspace/hex screen"
+    assert ws_visible, "a region click must reveal the Workspace/hex screen"
     row_token = f"{start - (start % 16):08X}"
     assert row_token in hex_str.upper(), (
         f"the hex row containing 0x{start:08X} must render; "
@@ -3940,6 +3939,25 @@ def _region_rows(app: "S19TuiApp") -> "list":
     return list(app.query(".map-region-row"))
 
 
+async def _click_region_row(pilot: "object", app: "S19TuiApp", match) -> "object":
+    """Scroll the first ``RegionRow`` matching ``match`` into view and REAL-click it.
+
+    A single genuine ``pilot.click`` on the widget instance (C-16 real pointer,
+    precedent: ``test_tui_patch_editor_v2.py`` scroll-then-``pilot.click`` and
+    ``test_tui_variants.py::test_at067a`` — NOT the retired cell path). Returns
+    the clicked row so the caller can read its ``region_start``.
+    """
+    from s19_app.tui.screens_directionb import RegionRow
+
+    target = next(r for r in app.query(RegionRow) if match(r))
+    target.scroll_visible(animate=False)
+    await pilot.pause()
+    await pilot.click(target)
+    await pilot.pause()
+    await pilot.pause()
+    return target
+
+
 def _expected_band_runs(loaded: "LoadedFile") -> "list":
     """Merge address-contiguous same-band windows into ``(band, bytes, start)``.
 
@@ -4143,6 +4161,203 @@ def test_map_band_view_survives_rerender(tmp_path: Path) -> None:
     assert asyncio.run(_drive()) == len(runs), (
         "a re-render must leave exactly one region row per run (no doubling, "
         "no DuplicateIds)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-45 Inc-3 (R-TUI-062, LLR-045C) — single-click region→hex nav + the
+# detail-pane re-wire (keeps R-TUI-041 R-3 A2L naming + its C-17 guard on a
+# LIVE path) + re-cover of the retired test_ac1 B-01 nearest-present-row snap.
+# ---------------------------------------------------------------------------
+
+
+def _install_two_far_ranges(app: "S19TuiApp", tmp_path: Path) -> "object":
+    """Load a two-range image whose ranges sit ~1 MiB apart (B-01 fixture).
+
+    Range B's rows live far past range A's first page, so a hex window that
+    fails to reposition provably does NOT render them. Built through the real
+    emit → S19File → build_loaded_s19 pipeline.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    ranges = [(0x1000, 0x1000 + 3200), (0x100000, 0x100000 + 3200)]
+    mem_map = {
+        addr: (addr & 0xFF) for start, end in ranges for addr in range(start, end)
+    }
+    path = tmp_path / "two_far.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    loaded = build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+    app.current_file = loaded
+    app._apply_empty_state()
+    return loaded
+
+
+def test_at074_single_click_repositions_hex(tmp_path: Path) -> None:
+    """Black-box: ONE real click on a region row repositions the hex view
+    (AT-074 / R-TUI-062, LLR-045C.1, C-16 real pointer).
+
+    A single ``pilot.click`` on the HIGH region row (start ``0x80010000``) must
+    reveal the Workspace/hex screen AND render that region's 16-aligned row
+    token in ``#hex_view`` — with EXACTLY ONE click (no reveal-button, no
+    two-step). RED pre-Inc-3: Inc-2 mounted region rows but wired NO click nav,
+    so the click posts nothing and the hex view never repositions.
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[bool, str, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            row = await _click_region_row(
+                pilot, app, lambda r: "high/random" in _widget_plain(r)
+            )
+            ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
+            hex_str = str(app.query_one("#hex_view").render())
+            return ws_visible, hex_str, row.region_start
+
+    ws_visible, hex_str, start = asyncio.run(_drive())
+    assert ws_visible, "a single region click must reveal the Workspace/hex screen"
+    row_token = f"{start - (start % 16):08X}"
+    assert row_token in hex_str.upper(), (
+        f"the hex row for the clicked region 0x{start:08X} must render; "
+        f"expected row base {row_token}"
+    )
+
+
+def test_tc062_1_region_activation_posts_single_open_in_hex(tmp_path: Path) -> None:
+    """A region activation posts EXACTLY ONE OpenInHexRequested; no activation
+    posts none (TC-062.1 / R-TUI-062, white-box message contract).
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow
+
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        posted: list[int] = []
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            orig_post = panel.post_message
+
+            def _cap(msg: "object") -> bool:
+                if isinstance(msg, MemoryMapPanel.OpenInHexRequested):
+                    posted.append(msg.focus_address)
+                return orig_post(msg)
+
+            panel.post_message = _cap  # type: ignore[method-assign]
+            # No activation yet → no message.
+            none_yet = len(posted)
+            row = next(iter(app.query(RegionRow)))
+            panel.on_region_row_activated(
+                RegionRow.Activated(row.region_start, row.region_end)
+            )
+            return none_yet, len(posted)
+
+    none_yet, after_one = asyncio.run(_drive())
+    assert none_yet == 0, "no region activation must post no OpenInHexRequested"
+    assert after_one == 1, (
+        f"one activation must post exactly one OpenInHexRequested; got {after_one}"
+    )
+
+
+def test_b01_region_click_snaps_hex_to_far_range(tmp_path: Path) -> None:
+    """Re-cover of the retired test_ac1 (B-01): navigating to a FAR region lands
+    the hex window on the nearest present row (R-TUI-062 + batch-31 AC-1).
+
+    Two facets: (1) a REAL region click over the far range B repositions the
+    hex window to range B's first row (0x00100000) — the map→far-region nav
+    test_ac1 covered; (2) the underlying nearest-present-row snap for an
+    ABSENT-in-gap focus address (test_ac1's precondition — a region click uses a
+    PRESENT start, so the absent-address branch is driven directly through
+    ``update_hex_view``) still lands on the nearest present row.
+    """
+
+    async def _drive() -> "tuple[str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_two_far_ranges(app, tmp_path)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            # (1) Real click on the far range-B region (start 0x00100000).
+            await _click_region_row(pilot, app, lambda r: r.region_start == 0x100000)
+            for _ in range(3):
+                await pilot.pause()
+            click_hex = str(app.query_one("#hex_view").render())
+            # (2) Absent-in-gap focus address snaps to the nearest present row.
+            app.update_hex_view(focus_address=0x0FFFF0)  # in the gap, not present
+            await pilot.pause()
+            snap_hex = str(app.query_one("#hex_view").render())
+            return click_hex, snap_hex
+
+    click_hex, snap_hex = asyncio.run(_drive())
+    assert "00100000" in click_hex.upper(), (
+        "a click on range B's region must render range B's first row "
+        "(0x00100000)"
+    )
+    assert "00100000" in snap_hex.upper(), (
+        "an absent-in-gap focus must snap to the nearest present row "
+        "(range B's first row 0x00100000)"
+    )
+
+
+def test_at_r3_region_click_detail_names_a2l_symbol_literally(
+    tmp_path: Path,
+) -> None:
+    """The region-triggered detail pane keeps R-TUI-041 R-3 A2L naming alive and
+    renders a hostile symbol literally (LLR-045C detail re-wire, C-17 F1).
+
+    A single region click populates ``#map_detail`` via ``build_detail_text`` for
+    the clicked run's window; the covering region is named by the overlapping
+    A2L symbol(s) through the retained ``safe_text``/``symbol_list_text`` path.
+    A hostile symbol name (``evil[red]``) must render LITERALLY — proving the
+    C-17 markup-safety guard now runs on a LIVE (region-triggered), not merely a
+    pure-function, path. Region-LIST rows themselves stay addr/size/band-only.
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            # Seed an A2L symbol overlapping the CONSTANT region's covering range.
+            app._a2l_enriched_tags = [
+                {"name": "evil[red]", "address": 0x80000010, "byte_size": 4},
+            ]
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            row = await _click_region_row(
+                pilot, app, lambda r: r.region_start == 0x80000000
+            )
+            detail = str(app.query_one("#map_detail_body").render())
+            row_text = _widget_plain(row)
+            return detail, row_text
+
+    detail, row_text = asyncio.run(_drive())
+    assert "evil[red]" in detail, (
+        f"the region-triggered detail must name the A2L symbol literally; "
+        f"got {detail!r}"
+    )
+    assert "0x80000000" in detail, (
+        f"the detail must show the clicked region's bounds; got {detail!r}"
+    )
+    # B3: the region-LIST row itself must NOT carry the A2L symbol name.
+    assert "evil[red]" not in row_text, (
+        f"region rows are addr/size/band-only (B3); got {row_text!r}"
     )
 
 
@@ -7459,12 +7674,10 @@ def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "ob
 
 # RETIRED batch-45 (R-TUI-060): ``test_ac1_open_in_hex_snaps_to_nearest_present_
 # row`` (B-01) drove the Open-in-Hex nearest-present-row snap through the removed
-# ``MapCell`` + ``on_map_cell_selected`` surface. The Open-in-Hex path from the
-# map is re-established via region-row (single-click region→hex) selection in
-# Inc-3, which must RE-COVER this B-01 snap assertion.
-# COVERAGE FLAG (see review packet): retiring this removes the only integration
-# test of the ``update_hex_view`` nearest-present-row snap through the map
-# trigger — Inc-3 owns re-establishing it on the region-row surface.
+# ``MapCell`` + ``on_map_cell_selected`` surface. RE-COVERED in Inc-3 (R-TUI-062)
+# by ``test_b01_region_click_snaps_hex_to_far_range`` — a real region click over
+# a far range plus the direct absent-in-gap ``update_hex_view`` snap assertion.
+# (Coverage flag closed.)
 
 
 # ===========================================================================

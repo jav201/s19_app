@@ -12,7 +12,7 @@
         "0": 1,
         "1": 1,
         "2": 1,
-        "3": 2,
+        "3": 3,
         "4": 0,
         "5": 0,
         "6": 0
@@ -66,6 +66,12 @@
             "date": "2026-07-14",
             "decision": "Inc-2 (2a+2b) APPROVE (autonomous)",
             "notes": "Core view swap. compute-on-load (LoadedFile.entropy_windows via build_loaded_s19/hex) + band bar/region list/legend replacing the sev-* grid. RED captured (AT-069/070/071). 163 passed/2 skipped; consumers 77 passed; C-27 0 frozen; 2 map cells xfail (_batch45_map_drift_marks). Superseded-test disposition (Option A ruling): rework at035/at036e\u2192pure/at036f\u2192pure-hostile; retire cell-grid/arrow-nav/tooltip/count/fill; defer at036b/tc041_6\u2192Inc-3. C-17 GUARDRAIL preserved (build_detail_text + hostile test live). Code-review APPROVE-WITH-NITS 0 HIGH: F1 (real cross-gap same-band merge defect) FIXED + gap test test_at071b (RED-if-revert confirmed 1x512B->2x256B); F2 AST bare-name guard FIXED; F4 docstring id/class FIXED; F3 B-01 snap -> Inc-3. DuplicateIds re-render bug found+fixed (id->class)+guarded. Inc-3 starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-3 APPROVE (autonomous, orchestrator review)",
+            "notes": "R-TUI-062 single-click region->hex nav + detail re-wire. New RegionRow(Static) on_click->Activated->on_region_row_activated: cell_status (no re-parse) -> #map_detail via retained build_detail_text (A2L R-3 + C-17 on LIVE path) -> OpenInHexRequested. App handler REUSED unchanged (no app.py edit). 169 passed/0 skipped (+6, 2 deferrals unskipped/reworked); C-27 0 frozen; 2 map xfail; ruff clean. AT-074 RED captured. B-01 re-covered. 2 files. Orchestrator diff-review (low-risk); independent agent review reserved for Inc-5 deletion. Inc-4 starting."
         }
     ],
     "obsidian_synced": false,
