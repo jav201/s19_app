@@ -1,29 +1,24 @@
-# Executive summary — s19_app — Batch 2026-07-14-batch-45
+# Executive Summary — batch-45 — Memory-Map entropy view
 
-> **Artifact language:** canonical English scaffold. Generate in the batch's development language (`state.json` `language`).
-> Phase 6 artifact. Owner: `presentation-builder`. Audience: non-technical stakeholder. 1-2 pages.
+**Context.** During a field test on a real client firmware image, the Memory Map read as "mostly grey"
+— it coloured cells only by validation status, telling the operator nothing about what each region
+*contains*. A throwaway prototype explored three visualizations; the operator chose the "Band-Bands"
+design.
 
-## 🔑 Bottom line (read first)
+**Problem.** The map's most valuable signal for a firmware engineer — entropy (is this region code,
+calibration data, tables, or padding?) — was computed by the tool but never surfaced on the map. A
+separate entropy pop-up existed but was easy to miss and showed one page at a time.
 
-- **What we delivered:** `<one sentence>`
-- **Business outcome:** `<result that matters to the stakeholder>`
-- **Next step:** `<concrete, time-boxed>`
+**Solution.** The map now visualizes entropy directly: a proportional band bar + a per-region list
+(address · size · band), each colour- and texture-coded, plus a docked "at a glance" histogram and
+sparkline. Clicking a region jumps straight to it in the hex view. The redundant entropy pop-up was
+retired — its function now lives, always visible, in the map itself.
 
----
+**Outcome.** Shipped as 6 supervised increments with zero high-severity findings, zero scope drift,
+and zero changes to the frozen parsing/validation engine. The full test suite is green (1374 passed,
+0 failed); nine black-box acceptance tests exercise the feature end-to-end through the real UI. Net
+≈ −2100 lines of code (the retirement removed more than the feature added).
 
-## Context (reference)
-
-### Context
-`<where this fits in the larger picture>`
-
-### Problem
-`<what hurt / why this mattered>`
-
-### Solution
-`<what we built, in business terms — not technical jargon>`
-
-### Outcomes / results
-`<measurable outcomes; label any estimate as "estimated">`
-
-### Next steps
-`<phased, concrete, time-boxed>`
+**Next steps.** A routine post-merge step regenerates ~20 visual snapshot baselines in the canonical
+CI environment. The related field-audit items (a responsive patch-editor layout, Issues-panel paging
+and filters) are queued as separate batches.

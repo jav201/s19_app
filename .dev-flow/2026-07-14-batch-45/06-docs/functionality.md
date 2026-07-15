@@ -1,33 +1,42 @@
 # Functionality — s19_app — Batch 2026-07-14-batch-45
 
-> **Artifact language:** canonical English scaffold. Generate in the batch's development language (`state.json` `language`).
-> Phase 6 artifact. Owner: `docs-writer`. Audience: technical stakeholder.
+## What it does
+The **Memory Map** screen now visualizes the loaded firmware image's **entropy** instead of only
+its validation status. Previously a real image showed a mostly-grey cell grid (only valid/invalid/gap
+colouring); now it shows, at a glance, which regions are code, calibration data, lookup tables, or
+padding.
 
-## 🔑 At a glance (read first)
+### The band view (R-TUI-060)
+- A **proportional segmented band bar**: contiguous memory windows of the same entropy band are merged
+  into one segment whose width is proportional to its byte size. Same-band regions separated by an
+  address gap stay **separate** (they are not falsely merged into one contiguous span).
+- A **per-region list**: one row per merged region showing `{glyph} 0x{start} · {N} B · {band}`.
+- Each segment/row is **colour-coded AND texture-coded** by band (`· constant/padding`, `░ low`,
+  `▒ medium`, `▓ high/random`) — the texture glyph means the bands read even without colour.
+- Bands come from the existing `entropy_service.compute_entropy` (constant/padding · low · medium ·
+  high/random); colours from a new non-frozen `entropy_style` map (kept separate from the frozen
+  severity colours).
 
-- **What this batch added:** `<1-2 lines>`
-- **Capabilities:** `<bullet>` · `<bullet>`
-- **How to use it:** `<entry point / command / API in one line>`
+### At a glance (R-TUI-061)
+A docked panel showing a **per-band histogram** (count + %) and an **entropy profile sparkline** across
+the address space. It docks beside the band bar on wide terminals and stacks below it at the 80×24 floor.
 
-> Enough to know what shipped and how to reach it. Detail below for how it works.
+### Single-click navigation (R-TUI-062)
+Clicking a region row **once** repositions the hex view to that region's start address and switches to
+the workspace — replacing the old two-step (select a cell, then press an "Open in Hex" button). The
+region's detail (including any overlapping A2L symbol names) is shown in the detail pane on selection.
 
----
+### Retirement
+The standalone entropy pop-up (the `e` key) is **removed** — the always-visible map band view provides
+its function (all regions shown at once, a band legend, per-region navigation), so paging and sort are
+no longer needed.
 
-## Detail (reference)
+## How entropy is computed
+Entropy is computed once on the **worker thread** during file load (`build_loaded_s19/hex`) and cached
+on `LoadedFile.entropy_windows`; the renderer only reads it (never recomputes), keeping the UI thread
+responsive on large images.
 
-### How it works (flow)
-`<…>`
-
-### Components / modules touched
-| Module | Role in this batch |
-|--------|--------------------|
-| `<module>` | `<role>` |
-
-### Usage / examples
-`<commands, snippets>`
-
-### Diagrams
-`<links to 06-docs/diagrams/>`
-
-### Evidence checklist — docs-writer
-> Attach `docs-writer`'s completed evidence checklist (items in `~/.claude/agents/docs-writer.md`), ✓/✗ + one-line evidence.
+## Non-goals / notes
+- The band bar's width is fixed (60 glyphs) and clips cosmetically at narrow-shared layouts — a
+  responsive width is a future polish.
+- Markdown/HTML reports are unaffected. The engine (parsers/validation) is unchanged.
