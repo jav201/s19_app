@@ -637,16 +637,69 @@ Screen {
     layout: vertical;
 }
 
-/* Entropy band bar: one proportional segment per merged run, laid left→right;
- * each segment sizes to its glyph-run content width. Re-mounted per render, so
- * addressed by CLASS (not id) to avoid DuplicateIds on re-render. */
+/* batch-45 R-TUI-061: the band bar docks BESIDE the At-a-glance panel in a
+ * band row; at width-narrow (< 120) the row reflows to vertical (bar over
+ * glance) so both fit the 80x24 floor (LLR-045B.3). Re-mounted per render →
+ * addressed by CLASS (not id) to avoid DuplicateIds. */
+.map-band-row {
+    width: 100%;
+    height: auto;
+    layout: horizontal;
+}
+
+#workspace_body.width-narrow .map-band-row {
+    layout: vertical;
+}
+
+/* Entropy band bar: takes the remaining row width beside the glance panel;
+ * one proportional segment per merged run, each sized to its glyph content. */
 .map-band-bar {
+    width: 1fr;
+    height: 1;
+    layout: horizontal;
+}
+
+#workspace_body.width-narrow .map-band-bar {
+    width: 100%;
+}
+
+.map-band-seg {
+    width: auto;
+    height: 1;
+}
+
+/* "At a glance": docked beside the band bar at >=120, full-width below it when
+ * narrow. Title + per-band histogram rows + a band-coloured profile sparkline. */
+.at-a-glance {
+    width: 28;
+    height: auto;
+    margin-left: 1;
+}
+
+#workspace_body.width-narrow .at-a-glance {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 1;
+}
+
+.glance-title {
+    width: 100%;
+    height: 1;
+    text-style: bold;
+}
+
+.map-glance-row {
+    width: 100%;
+    height: 1;
+}
+
+.map-sparkline {
     width: 100%;
     height: 1;
     layout: horizontal;
 }
 
-.map-band-seg {
+.map-sparkline-seg {
     width: auto;
     height: 1;
 }

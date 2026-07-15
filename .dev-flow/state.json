@@ -12,7 +12,7 @@
         "0": 1,
         "1": 1,
         "2": 1,
-        "3": 3,
+        "3": 4,
         "4": 0,
         "5": 0,
         "6": 0
@@ -72,6 +72,12 @@
             "date": "2026-07-14",
             "decision": "Inc-3 APPROVE (autonomous, orchestrator review)",
             "notes": "R-TUI-062 single-click region->hex nav + detail re-wire. New RegionRow(Static) on_click->Activated->on_region_row_activated: cell_status (no re-parse) -> #map_detail via retained build_detail_text (A2L R-3 + C-17 on LIVE path) -> OpenInHexRequested. App handler REUSED unchanged (no app.py edit). 169 passed/0 skipped (+6, 2 deferrals unskipped/reworked); C-27 0 frozen; 2 map xfail; ruff clean. AT-074 RED captured. B-01 re-covered. 2 files. Orchestrator diff-review (low-risk); independent agent review reserved for Inc-5 deletion. Inc-4 starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-4 APPROVE (autonomous, orchestrator review)",
+            "notes": "R-TUI-061 docked At-a-glance histogram+sparkline. Pure band_histogram/sparkline_glyphs/entropy_ramp_glyph; _build_glance_widgets, safe_text over CONSTANT labels (B3, no file text). Docked .map-band-row (horizontal->vertical narrow). 174 passed/0 skipped (+5); C-27 0 frozen; 2 map xfail; ruff clean. AT-072/073+geometry RED captured; pilot-measured 120x30 side-by-side / 80x24 stacked. 3 files (no app/model/frozen). Cosmetic: band bar 60-glyph clips to ~21 cols @120x30 (already clipped ~50 Inc-2/3; responsive width = out-of-scope, needs snapshot regen; postmortem note). Inc-5 (deletion) starting \u2014 FULL independent review."
         }
     ],
     "obsidian_synced": false,

@@ -199,6 +199,186 @@ _CELL_GLYPH = "█"
 #: layout geometry, exactly as the cell count was kept geometry-pure (LLR-041.2).
 _BAND_BAR_WIDTH = 60
 
+#: 9-glyph entropy ramp (0.0 → 8.0 bits/byte) for the At-a-glance sparkline
+#: (batch-45, R-TUI-061 / LLR-045B.2). Index 0 = a space (near-zero entropy),
+#: index 8 = a full block (maximal entropy). Mirrors the prototype ``BARS``.
+_ENTROPY_BAR_RAMP = " ▁▂▃▄▅▆▇█"
+
+#: Fixed histogram bar width for the At-a-glance per-band rows (LLR-045B.1) —
+#: geometry-pure like ``_BAND_BAR_WIDTH``.
+_GLANCE_BAR_WIDTH = 6
+
+#: Fixed number of sparkline columns the profile is sampled to (LLR-045B.2).
+_SPARKLINE_WIDTH = 24
+
+
+def entropy_ramp_glyph(entropy: float) -> str:
+    """Map a Shannon entropy value (0.0–8.0) to its :data:`_ENTROPY_BAR_RAMP` glyph.
+
+    Summary:
+        Round ``entropy`` to the nearest integer band index and clamp it into
+        ``[0, 8]`` to pick one of the nine ramp glyphs (batch-45, R-TUI-061 /
+        LLR-045B.2). A constant-fill window (``0.0``) maps to the leading space;
+        a maximal-entropy window (``8.0``) to the full block.
+
+    Args:
+        entropy (float): Entropy in bits/byte, normally ``0.0 ≤ H ≤ 8.0``.
+
+    Returns:
+        str: The single ramp glyph for ``entropy``.
+
+    Data Flow:
+        - Called once per sampled window by :func:`sparkline_glyphs` /
+          :func:`_sparkline_segments`.
+
+    Dependencies:
+        Uses:
+            - _ENTROPY_BAR_RAMP
+        Used by:
+            - sparkline_glyphs / _sparkline_segments / tests
+
+    Example:
+        >>> entropy_ramp_glyph(0.0), entropy_ramp_glyph(8.0)
+        (' ', '█')
+    """
+    index = int(round(entropy))
+    index = max(0, min(len(_ENTROPY_BAR_RAMP) - 1, index))
+    return _ENTROPY_BAR_RAMP[index]
+
+
+def band_histogram(
+    runs: Sequence[Tuple[str, int, int]],
+) -> List[Tuple[str, int, float]]:
+    """Tally merged region runs per band into ``(band, count, pct)`` rows.
+
+    Summary:
+        Count how many merged region runs fall in each band and compute each
+        band's share of the total region count (batch-45, R-TUI-061 /
+        LLR-045B.1). Rows are returned for OCCUPIED bands only (count > 0), in
+        the canonical :data:`ENTROPY_BAND_LABELS` order. The count is a REGION
+        (merged-run) count — consistent with the region list — not a raw
+        window count. A pure tally over the already-merged runs; no re-parse.
+
+    Args:
+        runs (Sequence[Tuple[str, int, int]]): The merged
+            ``(band, bytes, start)`` runs from :func:`_merge_band_runs`.
+
+    Returns:
+        List[Tuple[str, int, float]]: One ``(band_label, region_count,
+        percentage)`` per occupied band, in band order; ``[]`` when ``runs`` is
+        empty. Percentages are ``100 * count / total`` and sum to ~100.
+
+    Data Flow:
+        - Reads each run's band; produces the histogram rows the At-a-glance
+          panel renders.
+
+    Dependencies:
+        Uses:
+            - ENTROPY_BAND_LABELS
+        Used by:
+            - MemoryMapPanel._build_glance_widgets / tests
+
+    Example:
+        >>> band_histogram([("low", 256, 0), ("low", 256, 4096),
+        ...                 ("high/random", 256, 8192)])
+        [('low', 2, 66.66666666666667), ('high/random', 1, 33.33333333333333)]
+    """
+    total = len(runs)
+    if total == 0:
+        return []
+    counts = {label: 0 for label in ENTROPY_BAND_LABELS}
+    for band, _bytes, _start in runs:
+        if band in counts:
+            counts[band] += 1
+    return [
+        (label, counts[label], 100.0 * counts[label] / total)
+        for label in ENTROPY_BAND_LABELS
+        if counts[label] > 0
+    ]
+
+
+def sparkline_glyphs(windows: Sequence[EntropyWindow], width: int) -> str:
+    """Sample the entropy profile to a fixed-width ramp-glyph string.
+
+    Summary:
+        Sub-sample ``windows`` with step ``max(1, N // width)`` and map each
+        sampled window's entropy to its :func:`entropy_ramp_glyph` (batch-45,
+        R-TUI-061 / LLR-045B.2). The plain (uncoloured) glyph string; the
+        rendered sparkline colours it per band via :func:`_sparkline_segments`.
+
+    Args:
+        windows (Sequence[EntropyWindow]): The loader-computed entropy windows.
+        width (int): Target column budget the profile is sampled down to.
+
+    Returns:
+        str: One ramp glyph per sampled window; ``""`` for empty input.
+
+    Data Flow:
+        - Reads each sampled window's ``entropy``; used by the pure unit test
+          and any plain-text sparkline read.
+
+    Dependencies:
+        Uses:
+            - entropy_ramp_glyph
+        Used by:
+            - tests (TC-061.2)
+
+    Example:
+        >>> from s19_app.tui.services.entropy_service import EntropyWindow
+        >>> w = lambda e: EntropyWindow(0, 256, 256, e, "x", False)
+        >>> sparkline_glyphs([w(0.0), w(8.0)], 24)
+        ' █'
+    """
+    if not windows:
+        return ""
+    step = max(1, len(windows) // max(1, width))
+    return "".join(entropy_ramp_glyph(w.entropy) for w in windows[::step])
+
+
+def _sparkline_segments(
+    windows: Sequence[EntropyWindow], width: int
+) -> List[Tuple[str, str]]:
+    """Sample the profile and group it into ``(band, glyphs)`` colour segments.
+
+    Summary:
+        Sub-sample ``windows`` (step ``max(1, N // width)``) and group
+        consecutive sampled windows of the SAME band into runs, each carrying
+        that band's concatenated ramp glyphs (batch-45, LLR-045B.2). One
+        band-styled ``Static`` per segment lets the sparkline be band-coloured
+        through the ``band-*`` CSS classes (single colour source) rather than
+        per-glyph widgets or hard-coded Rich colours.
+
+    Args:
+        windows (Sequence[EntropyWindow]): The loader-computed entropy windows.
+        width (int): Target column budget for sampling.
+
+    Returns:
+        List[Tuple[str, str]]: ``(band, glyphs)`` colour segments in profile
+        order; ``[]`` for empty input.
+
+    Data Flow:
+        - Reads each sampled window's ``band`` + ``entropy``; produces the
+          per-band sparkline segments the panel mounts.
+
+    Dependencies:
+        Uses:
+            - entropy_ramp_glyph
+        Used by:
+            - MemoryMapPanel._build_glance_widgets
+    """
+    if not windows:
+        return []
+    step = max(1, len(windows) // max(1, width))
+    segments: List[Tuple[str, str]] = []
+    for window in windows[::step]:
+        glyph = entropy_ramp_glyph(window.entropy)
+        if segments and segments[-1][0] == window.band:
+            band, glyphs = segments[-1]
+            segments[-1] = (band, glyphs + glyph)
+        else:
+            segments.append((window.band, glyph))
+    return segments
+
 
 def _merge_band_runs(
     windows: Sequence[EntropyWindow],
@@ -1355,7 +1535,7 @@ class MemoryMapPanel(Container):
         self._ordered_ranges = ordered
 
         runs = _merge_band_runs(entropy_windows)
-        grid.mount(*self._build_band_widgets(runs))
+        grid.mount(*self._build_band_widgets(runs, entropy_windows))
 
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
         summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
@@ -1365,38 +1545,48 @@ class MemoryMapPanel(Container):
         self._render_stats(ranges, range_validity, self._issues, empty=False)
 
     def _build_band_widgets(
-        self, runs: Sequence[Tuple[str, int, int]]
+        self,
+        runs: Sequence[Tuple[str, int, int]],
+        windows: Sequence[EntropyWindow],
     ) -> List[Container]:
-        """Build the band bar, region list and legend widgets for ``runs``.
+        """Build the band row (bar + At-a-glance), region list and legend.
 
         Summary:
-            Assemble the three entropy band-view sub-containers (batch-45,
-            R-TUI-060 / LLR-045A.3/.4/.6): a proportional ``.map-band-bar``
-            (one segment per run, width ∝ byte share), a ``.map-region-list``
-            (one addr/size/band row per run), and a ``.map-band-legend`` (one
-            row per band label) — each addressed by CLASS (not id) because they
-            are re-mounted every render. Every segment/row is a widget carrying its
-            ``band-*`` CSS class (``styles.tcss`` owns the colour) with
-            markup-safe ``Text`` content via ``safe_text`` — never an f-string
-            into a markup sink (LLR-041.11). Region rows are addr/size/band
-            ONLY — no file-derived (A2L) text (security B3).
+            Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
+            R-TUI-061): a ``.map-band-row`` docking the proportional
+            ``.map-band-bar`` (one segment per run, width ∝ byte share) beside
+            the ``.at-a-glance`` panel (per-band histogram + profile sparkline,
+            LLR-045B), then the ``.map-region-list`` (one addr/size/band row per
+            run) and the ``.map-band-legend`` (one row per band label). Each is
+            addressed by CLASS (not id) because they are re-mounted every render
+            (an id would trip ``DuplicateIds``). Every segment/row is a widget
+            carrying its ``band-*`` CSS class (``styles.tcss`` owns the colour)
+            with markup-safe ``Text`` via ``safe_text`` (LLR-041.11). Region
+            rows + the At-a-glance panel carry no file-derived text — region
+            rows are addr/size/band only; the histogram/sparkline use constant
+            band labels (security B3). At ``width-narrow`` the band row reflows
+            to vertical (band bar over glance) so both fit the 80×24 floor
+            (LLR-045B.3).
 
         Args:
             runs (Sequence[Tuple[str, int, int]]): The merged
                 ``(band_label, summed_bytes, start_addr)`` runs from
                 ``_merge_band_runs`` (non-empty).
+            windows (Sequence[EntropyWindow]): The loader-computed entropy
+                windows the sparkline profile is sampled from.
 
         Returns:
-            List[Container]: ``[band_bar, region_list, legend]`` ready to mount
+            List[Container]: ``[band_row, region_list, legend]`` ready to mount
             into ``#map_grid``.
 
         Data Flow:
-            - Reads ``runs`` + the ``entropy_style`` band maps; produces the
-              widgets ``render_ranges`` mounts.
+            - Reads ``runs`` + ``windows`` + the ``entropy_style`` band maps;
+              produces the widgets ``render_ranges`` mounts.
 
         Dependencies:
             Uses:
-                - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text``
+                - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text`` /
+                  ``_build_glance_widgets``
             Used by:
                 - ``render_ranges``
         """
@@ -1433,11 +1623,75 @@ class MemoryMapPanel(Container):
         # is deferred), so these carry CLASSES, not unique IDs — an ID would trip
         # ``DuplicateIds`` when the old container is still registered at re-render
         # (the same reason the retired cell grid used ``.map-cell``, not an id).
+        band_bar = Horizontal(*segments, classes="map-band-bar")
+        glance = self._build_glance_widgets(runs, windows)
         return [
-            Horizontal(*segments, classes="map-band-bar"),
+            Horizontal(band_bar, glance, classes="map-band-row"),
             Vertical(*region_rows, classes="map-region-list"),
             Vertical(*legend_rows, classes="map-band-legend"),
         ]
+
+    def _build_glance_widgets(
+        self,
+        runs: Sequence[Tuple[str, int, int]],
+        windows: Sequence[EntropyWindow],
+    ) -> Container:
+        """Build the docked "At a glance" panel (histogram + sparkline).
+
+        Summary:
+            Assemble the ``.at-a-glance`` panel (batch-45, R-TUI-061): a title,
+            one band-styled histogram row per OCCUPIED band (``{glyph} {label}
+            {count} {bar} {pct}%`` — region counts via :func:`band_histogram`,
+            LLR-045B.1), and a band-coloured profile ``.map-sparkline`` of the
+            entropy windows (one band-styled segment per contiguous same-band
+            run of sampled ramp glyphs, :func:`_sparkline_segments`,
+            LLR-045B.2). Colour flows solely through the ``band-*`` CSS classes;
+            every text sink is a markup-safe ``safe_text`` over CONSTANT band
+            labels — no file-derived text (security B3).
+
+        Args:
+            runs (Sequence[Tuple[str, int, int]]): The merged region runs (the
+                histogram's region tally).
+            windows (Sequence[EntropyWindow]): The entropy windows the
+                sparkline profile is sampled from.
+
+        Returns:
+            Container: The ``.at-a-glance`` panel to dock beside the band bar.
+
+        Data Flow:
+            - Reads ``runs`` (histogram) + ``windows`` (sparkline); produces the
+              docked panel.
+
+        Dependencies:
+            Uses:
+                - ``band_histogram`` / ``_sparkline_segments`` / ``band_style``
+                  / ``safe_text``
+            Used by:
+                - ``_build_band_widgets``
+        """
+        children: List[Static] = [
+            Static(safe_text("At a glance"), classes="glance-title")
+        ]
+        for band, count, pct in band_histogram(runs):
+            token, glyph, _meaning = band_style(band)
+            bar = "█" * max(1, round(_GLANCE_BAR_WIDTH * pct / 100.0))
+            children.append(
+                Static(
+                    safe_text(f"{glyph} {band} {count} {bar} {pct:.0f}%"),
+                    classes=f"map-glance-row {token}",
+                )
+            )
+
+        spark_segments: List[Static] = [
+            Static(safe_text(glyphs), classes=f"map-sparkline-seg {band_style(band)[0]}")
+            for band, glyphs in _sparkline_segments(windows, _SPARKLINE_WIDTH)
+        ]
+        children.append(
+            Horizontal(*spark_segments, classes="map-sparkline")
+            if spark_segments
+            else Static(safe_text(""), classes="map-sparkline")
+        )
+        return Vertical(*children, classes="at-a-glance")
 
     def _cell_tooltip(
         self, cell_start: int, cell_end: int, status: str

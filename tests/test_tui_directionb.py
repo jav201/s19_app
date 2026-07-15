@@ -4361,6 +4361,225 @@ def test_at_r3_region_click_detail_names_a2l_symbol_literally(
     )
 
 
+# ---------------------------------------------------------------------------
+# batch-45 Inc-4 (R-TUI-061, LLR-045B) — docked "At a glance" panel: a per-band
+# histogram (region counts + %) + a band-coloured profile sparkline, docked
+# beside the band bar at >=120 cols and stacked below it at the 80x24 floor.
+# ---------------------------------------------------------------------------
+
+
+def _constant_only_loaded(tmp_path: Path) -> "LoadedFile":
+    """A single 0xFF-fill block (one constant/padding window) → uniform profile."""
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.entropy_service import compute_entropy
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    base = 0x80000000
+    mem_map = {base + i: 0xFF for i in range(256)}
+    ranges = [(base, base + 256)]
+    bands = {w.band for w in compute_entropy(mem_map)}
+    assert bands == {"constant/padding"}, bands
+    path = tmp_path / "const.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    return build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+
+def _glance_rows(app: "S19TuiApp") -> "list":
+    """Return the At-a-glance histogram rows on the map screen."""
+    return list(app.query(".map-glance-row"))
+
+
+def _sparkline_text(app: "S19TuiApp") -> str:
+    """Concatenated plain text of the At-a-glance sparkline segments."""
+    return "".join(_widget_plain(s) for s in app.query(".map-sparkline-seg"))
+
+
+def test_tc061_1_band_histogram_counts() -> None:
+    """band_histogram tallies REGION counts per occupied band + percentages
+    (TC-061.1 / LLR-045B.1, pure).
+    """
+    from s19_app.tui.screens_directionb import band_histogram
+
+    runs = [
+        ("constant/padding", 256, 0x0),
+        ("high/random", 256, 0x1000),
+        ("high/random", 256, 0x2000),
+    ]
+    rows = band_histogram(runs)
+    # Occupied bands only, in canonical band order.
+    assert [(b, c) for b, c, _p in rows] == [
+        ("constant/padding", 1),
+        ("high/random", 2),
+    ]
+    pcts = [p for _b, _c, p in rows]
+    assert abs(sum(pcts) - 100.0) < 1e-9, f"percentages must sum to 100; {pcts}"
+    assert band_histogram([]) == [], "empty runs → empty histogram"
+
+
+def test_tc061_2_sparkline_ramp_mapping() -> None:
+    """entropy_ramp_glyph maps 0→space, 8→full block, mid→ramp; sparkline_glyphs
+    sub-samples with step max(1, N//width) (TC-061.2 / LLR-045B.2, pure).
+    """
+    from s19_app.tui.screens_directionb import (
+        _ENTROPY_BAR_RAMP,
+        entropy_ramp_glyph,
+        sparkline_glyphs,
+    )
+    from s19_app.tui.services.entropy_service import EntropyWindow
+
+    assert entropy_ramp_glyph(0.0) == _ENTROPY_BAR_RAMP[0] == " "
+    assert entropy_ramp_glyph(8.0) == _ENTROPY_BAR_RAMP[8] == "█"
+    assert entropy_ramp_glyph(4.0) == _ENTROPY_BAR_RAMP[4]
+    # Clamp out-of-range without raising.
+    assert entropy_ramp_glyph(99.0) == _ENTROPY_BAR_RAMP[8]
+
+    def _w(e: float) -> EntropyWindow:
+        return EntropyWindow(0, 256, 256, e, "x", False)
+
+    # width >= N → step 1 → one glyph per window.
+    assert sparkline_glyphs([_w(0.0), _w(8.0)], 24) == " █"
+    # width < N → step N//width samples down.
+    windows = [_w(0.0) for _ in range(48)]
+    assert len(sparkline_glyphs(windows, 24)) == 24  # step 48//24 = 2 → 24 samples
+    assert sparkline_glyphs([], 24) == ""
+
+
+def test_at072_histogram_per_band_counts(tmp_path: Path) -> None:
+    """Black-box: the At-a-glance histogram lists each occupied band with a
+    count equal to its region tally, %s ~summing to 100 (AT-072 / LLR-045B.1).
+
+    RED pre-impl: no ``.at-a-glance`` / ``.map-glance-row`` surface exists.
+    """
+    from s19_app.tui.screens_directionb import band_histogram
+
+    loaded = _two_band_loaded(tmp_path)
+    expected = {b: c for b, c, _p in band_histogram(_expected_band_runs(loaded))}
+
+    async def _drive() -> "dict":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            out: dict = {}
+            for row in _glance_rows(app):
+                text = _widget_plain(row)
+                classes = tuple(row.classes)
+                out[classes] = text
+            return out
+
+    rows = asyncio.run(_drive())
+    # Both bands present as histogram rows (by band class), non-vacuous counts.
+    const_row = next(t for c, t in rows.items() if "band-constant" in c)
+    high_row = next(t for c, t in rows.items() if "band-high" in c)
+    const_count = expected["constant/padding"]
+    high_count = expected["high/random"]
+    assert const_count >= 1 and high_count >= 1, expected
+    assert f"constant/padding {const_count} " in const_row, (
+        f"constant row must show its region count {const_count}; got {const_row!r}"
+    )
+    assert f"high/random {high_count} " in high_row, (
+        f"high row must show its region count {high_count}; got {high_row!r}"
+    )
+    # Percentages present and ~sum to 100 across the two rows.
+    import re
+
+    pcts = [
+        int(re.search(r"(\d+)%", t).group(1))
+        for t in (const_row, high_row)
+    ]
+    assert abs(sum(pcts) - 100) <= 1, f"histogram %s must ~sum to 100; got {pcts}"
+
+
+def test_at073_sparkline_tracks_profile(tmp_path: Path) -> None:
+    """Black-box: a mixed image's sparkline has >=2 distinct ramp glyphs, and a
+    constant-only image's sparkline is uniform (AT-073 / LLR-045B.2, two-branch).
+
+    RED pre-impl: no ``.map-sparkline`` surface exists.
+    """
+    mixed = _two_band_loaded(tmp_path)
+    flat = _constant_only_loaded(tmp_path)
+
+    async def _spark(loaded) -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return _sparkline_text(app)
+
+    async def _both() -> "tuple[str, str]":
+        return await _spark(mixed), await _spark(flat)
+
+    mixed_spark, flat_spark = asyncio.run(_both())
+    assert len(set(mixed_spark)) >= 2, (
+        f"a mixed-entropy image's sparkline must vary (>=2 distinct glyphs); "
+        f"got {mixed_spark!r}"
+    )
+    assert flat_spark and len(set(flat_spark)) == 1, (
+        f"a constant-only image's sparkline must be uniform (1 glyph); "
+        f"got {flat_spark!r}"
+    )
+
+
+def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
+    """Pilot-geometry: the band bar + At-a-glance fit the viewport at 120x30 AND
+    80x24, docked side-by-side when wide and stacked when narrow (LLR-045B.3,
+    C-23 — measured regions, not fr-math).
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _measure(size) -> "dict":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            body = app.query_one("#workspace_body")
+            bar = app.query_one(".map-band-bar")
+            glance = app.query_one(".at-a-glance")
+            return {
+                "narrow": body.has_class("width-narrow"),
+                "body_right": body.region.right,
+                "bar": (bar.region.x, bar.region.y, bar.region.width, bar.region.right),
+                "glance": (
+                    glance.region.x,
+                    glance.region.y,
+                    glance.region.width,
+                    glance.region.right,
+                ),
+            }
+
+    wide = asyncio.run(_measure((120, 30)))
+    narrow = asyncio.run(_measure((80, 24)))
+
+    for tag, m in (("120x30", wide), ("80x24", narrow)):
+        bx, by, bw, bright = m["bar"]
+        gx, gy, gw, gright = m["glance"]
+        assert bw > 0 and gw > 0, f"{tag}: both widgets must have width; {m}"
+        # No horizontal overflow past the body's right edge (no clip off-screen).
+        assert bright <= m["body_right"], f"{tag}: band bar overflows body; {m}"
+        assert gright <= m["body_right"], f"{tag}: glance overflows body; {m}"
+
+    # Wide (>=120): NOT narrow → glance docked to the RIGHT of the bar (same row).
+    assert not wide["narrow"], f"120x30 must be the wide regime; {wide}"
+    assert wide["glance"][0] > wide["bar"][0], (
+        f"at 120x30 the glance must dock beside (right of) the band bar; {wide}"
+    )
+    # Narrow (<120): width-narrow → glance STACKS below the band bar.
+    assert narrow["narrow"], f"80x24 must be the narrow regime; {narrow}"
+    assert narrow["glance"][1] > narrow["bar"][1], (
+        f"at 80x24 the glance must stack below the band bar; {narrow}"
+    )
+
+
 def test_tc025_memory_map_empty_state_with_no_file(tmp_path: Path) -> None:
     """Activating Memory Map with no file shows the empty-state panel.
 
