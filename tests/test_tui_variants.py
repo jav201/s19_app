@@ -457,6 +457,11 @@ def test_at067a_variant_info_button_opens_help_modal(tmp_path: Path) -> None:
             await _open_patch_with_two_variants(pilot, app)
             select = app.query_one("#patch_variant_select", Select)
             outcomes["select_enabled"] = not select.disabled
+            # batch-46 (FOLD-8, reachable-under-scroll): the info button now
+            # lives in the PATCH SCRIPT window body, below the 120x30 fold —
+            # scroll its window into view so the real pointer click lands.
+            app.query_one("#patch_win_script").scroll_end(animate=False)
+            await pilot.pause()
             # C-16: REAL pointer click on the info button.
             await pilot.click("#patch_variant_info_button")
             await pilot.pause()
@@ -555,7 +560,16 @@ def test_variant_help_modal_fits_at_both_sizes(tmp_path: Path) -> None:
         _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
         async with app.run_test(size=(width, height)) as pilot:
             await _open_patch_with_two_variants(pilot, app)
-            await pilot.click("#patch_variant_info_button")
+            # batch-46 (FOLD-8): this is the MODAL-geometry check (C-23) at both
+            # sizes; the real-pointer click is owned by AT-067a (@120x30). At the
+            # 80x24 floor the info button is doubly-nested (below the panel fold
+            # AND its window body fold under the reachable-under-scroll layout),
+            # so open the modal via the same message the button posts — keeping
+            # this test focused on the modal's geometry, not the click mechanism.
+            from s19_app.tui.screens_directionb import PatchEditorPanel
+
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.post_message(PatchEditorPanel.VariantHelpRequested())
             await pilot.pause()
             dialog = app.screen.query_one("#variant_help_dialog")
             body = app.screen.query_one("#variant_help_body", Static)

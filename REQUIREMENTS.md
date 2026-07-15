@@ -3291,11 +3291,13 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Code: `s19_app/tui/screens_directionb.py::PatchEditorPanel.compose` four-pane reparent + save-back span child; `s19_app/tui/styles.tcss` `#patch_editor_panel` grid, `#patch_pane_*` overflow, `#patch_saveback_row { column-span: 2 }`, `#patch_doc_controls { grid-size: 3 }` (US-030, HLR-033 / LLR-033.1–033.4).
 - Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at_033a_two_by_two_at_80_floor` (AT-033a, 80-col floor boundary gate) + `::test_at_033b_two_by_two_at_120` (AT-033b) + `::test_at_033c_reparent_safety_at_80` + `::test_at_033c_reparent_safety_at_120` (AT-033c, reparent-safety) + `::test_tc_pane_styles_and_grid` (TC-033, white-box grid + `grid_size_columns == 3`).
 - Status: Added batch-22 (US-030 / HLR-033). Advances feature #8 (patch-editor) slice 2. Frozen-engine diff = 0.
+- **SUPERSEDED batch-46** (§36, R-TUI-063 / R-TUI-064): the 2×2 four-pane grid is replaced by the responsive three-window layout (`#patch_win_script` / `#patch_win_checks` / `#patch_win_json`, 3-across ≥120 / stacked <120). The four `#patch_pane_*` container ids are PRESERVED as non-scrolling grouping sub-containers (reparent-safety carried forward verbatim in LLR-063.4); `grid-size: 2 4`, `#patch_saveback_row { column-span: 2 }`, and AT-033a/b/c + TC-033 are retired → AT-063a/b/c + AT-064a/b/c. See `.dev-flow/2026-07-15-batch-46/01-requirements.md` §6.5 A-1.
 
 **R-PATCH-2X2-SNAPSHOT-001**: The Patch Editor 2×2 layout shall be pixel-locked by SVG snapshot cells at 80×24 and 120×30 (snapshot matrix 27→28). Because `pytest-textual-snapshot` baselines regenerate only in the canonical CI environment (local regen drifts unrelated baselines), both patch cells ride `xfail(strict=False)` until the CI baseline lands — neither failing the suite nor claiming a pass. The 2×2 is behaviorally proven by `R-PATCH-2X2-LAYOUT-001`'s AT set; this row locks the pixels once the baseline exists.
 - Code: `tests/test_tui_snapshot.py` `_SCAFFOLD_CELLS` patch cells (`xfail(strict=False)`), `patch` in `_SCAFFOLD_SCREENS`, `_SIZES` (US-031, HLR-034 / LLR-034.1–034.2).
 - Validation: `CI-locked` (xfail-until-baseline) — `tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[patch-comfortable-80x24]` (AT-034a) + `::...[patch-comfortable-120x30]` (AT-034b); SKIP-local / xfail-CI until the canonical-CI baseline is regenerated, then flip to `Automated`.
 - Status: Added batch-22 (US-031 / HLR-034). Follow-on: regenerate the two `patch-comfortable-*` baselines in CI, confirm green, promote to `Automated`.
+- **SUPERSEDED batch-46** (R-TUI-063): the two `patch-comfortable-{80x24,120x30}` cells now pixel-lock the three-window layout (not the 2×2); they ride `_batch46_patch_drift_marks` (`xfail(strict=False)`) until the post-merge canonical-CI regen, then flip to `Automated`. The behavioural proof carries to AT-063a/b/c + AT-064a/b/c. See §6.5 A-2.
 
 ---
 
@@ -3307,6 +3309,7 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Code: `s19_app/tui/screens_directionb.py::PatchEditorPanel.VariantSelected` (:538), `set_variants` (:614), compose `#patch_variant_row` + `Select#patch_variant_select` (:797-807), `on_select_changed` variant branch (:1025); `s19_app/tui/app.py::_refresh_patch_variant_select` (:2278), `_variant_load_in_flight` (:2329), `on_patch_editor_panel_variant_selected` (:2366), `action_show_screen` patch-activation hook (:3401), `update_project_labels` variant-set-change hook (:7830); `s19_app/tui/styles.tcss` `#patch_variant_row, #patch_execute_row { height: auto }` (:592) (US-028, HLR-035 / LLR-035.1–035.7).
 - Validation: `Automated` — `tests/test_tui_patch_variant.py::test_at035a_dropdown_switch_updates_label_and_image` (AT-035a, C-10 switch-through-surface GATE: rendered label + hex content) + `::test_at035b_switch_persists_on_save_and_load_consumes` (AT-035b, C-12 output-then-consume GATE over the handler-written `project.json`; the direct-write consumer guard stays `tests/test_variant_execution.py::test_load_project_honors_manifest_active_variant`) + `::test_at035c_no_project_disabled_placeholder` / `::test_at035c_single_variant_disabled_placeholder` (AT-035c) + `::test_tc_035_1_compose_presence` (TC-035.1) + `::test_tc_035_2_variant_group_above_execute_row` (TC-035.2, 80×24 + 120×30) + `::test_tc_035_3_options_order_preselection_and_triggers` (TC-035.3) + `::test_tc_035_4_routing_guards` (TC-035.4) + `::test_tc_035_5_disabled_state_table` (TC-035.5) + `::test_tc_035_6_switch_writes_nothing_to_disk` (TC-035.6) + `::test_tc_035_7_rapid_double_pick_stays_consistent` (TC-035.7, security F2).
 - Status: Added batch-23 (US-028 / HLR-035). Closes feature #8 (patch-editor overhaul) — last open story. Frozen-engine diff = 0.
+- **NOTE batch-46** (R-TUI-063): the variant `Select`+info (`#patch_variant_row`) and execute (`#patch_execute_row`) rows move from `#patch_pane_variant` into the PATCH SCRIPT window (`#patch_win_script`). The normative content — present/disabled behaviour, `_handle_select_variant` activation, persist-on-save, variant-**above**-execute order — is UNCHANGED and preserved (`test_tui_patch_variant.py` 12/12 green unchanged); `#patch_pane_variant` is retained as a non-scrolling sub-container. See §6.5 A-4.
 
 ---
 
@@ -3465,6 +3468,11 @@ regen.
   `xfail` pending canonical-CI regen.
 - Status: Added in batch `2026-07-11-batch-36` (US-058 / HLR-058, LLR-058.1–.4). Frozen-engine
   diff = 0.
+- **AMENDED batch-46** (R-TUI-063): the paste editor (`#patch_paste_text`, still a `CappedTextArea`)
+  moves from the retired `#patch_paste_row` full-width grid cell into the **JSON EDIT window**
+  (`#patch_win_json`) body; the readability outcome (first line in-viewport at `scroll_y == 0`, separated
+  from the change-file cluster) is preserved and re-observed by the JSON-window acceptance. `column-span: 2`
+  is retired. See §6.5 A-3.
 
 **R-TUI-047**: The system shall document the Workspace hex view's byte-cell overlay colours by
 adding a `"Hex"` block to the shared `LEGEND_TABLE` with exactly two classification rows — Yellow
@@ -3977,4 +3985,66 @@ activation posts none.
   `test_b01_region_click_snaps_hex_to_far_range` (re-covers the retired `test_ac1` B-01 snap),
   `test_at_r3_region_click_detail_names_a2l_symbol_literally` (detail re-wire + hostile-name literal))
 - Status: Added in batch `2026-07-14-batch-45` (US-045c / R-TUI-062, LLR-045C.1–.3). Frozen-engine
+  diff = 0.
+
+---
+
+# 36. Patch Editor responsive three-window layout (batch-46)
+
+> Field-audit **B2** (action buttons overflow a starved `1fr` grid cell and become unreachable;
+> ~5 fragmented scroll regions) + **U8** (weak gestalt — labeled sections read as one crowded surface).
+> Restructure `PatchEditorPanel` from the batch-22 2×2 four-pane grid into three bordered windows —
+> **PATCH SCRIPT · CHECKS · JSON EDIT** — each with its action buttons **docked outside the scrollable
+> body**, laid out **3-across when wide (≥120)** and **stacked at the 80×24 floor**. **Layout-only**
+> (compose + CSS; `app.py` diff = 0; every leaf id + message contract preserved). D1 (operator-locked):
+> the responsive switch is **pure CSS reusing the existing `width-narrow` 120-col regime** — no new
+> Python, no `TabbedContent`. Supersedes R-PATCH-2X2-LAYOUT-001 / R-PATCH-2X2-SNAPSHOT-001; amends
+> R-TUI-046; notes R-PATCH-VARIANT-SELECT-001. Stories: `.dev-flow/2026-07-15-batch-46/01-requirements.md`.
+
+**R-TUI-063**: When the Patch Editor screen is shown, the TUI shall render its content as three bordered
+windows — `#patch_win_script` (PATCH SCRIPT: entries table + inputs + change-file + variant + execute),
+`#patch_win_checks` (CHECKS: issue count + issues + status + results + help), `#patch_win_json` (JSON EDIT:
+paste `CappedTextArea` + revealed save-back + before/after) — each a constant-title `Label` + a scrollable
+`VerticalScroll` body + docked button-row sibling(s) of that body. It shall lay the three windows out
+horizontally (3 columns, asymmetric `grid-columns: 2fr 1fr 1fr`) while the terminal is ≥120 columns and
+vertically stacked while it is <120 columns, via the existing `#workspace_body.width-narrow` CSS regime
+(no new Python breakpoint, resize handler, or `TabbedContent`). The four batch-22 `#patch_pane_*`
+containers + `#patch_doc_file_row` are PRESERVED as non-scrolling grouping sub-containers; every leaf
+widget id, the `.hidden`-toggled `#patch_saveback_row`/`#patch_before_after_row`, the `#patch_doc_controls`
+five-button census, `#patch_checks_controls`, and the variant-above-execute order are preserved (message-
+based app wiring unchanged). C-17: the moved file-derived sinks (`#patch_checks_status`, `#patch_doc_issues`)
+retain `markup=False`; window titles are constant strings.
+- Code: `s19_app/tui/screens_directionb.py::PatchEditorPanel.compose` (three-window reparent);
+  `s19_app/tui/styles.tcss` (`#patch_editor_panel { layout: horizontal }` + `#workspace_body.width-narrow
+  #patch_editor_panel { layout: vertical }`, `.patch-window` / `.patch-window-body` / `.patch-docked-row`,
+  `#patch_win_script { width: 2fr }`, duplicate `#patch_saveback_row` reconciled). `app.py` diff = 0.
+- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at063a_three_across_at_120` (3-across
+  @120×30: 3 distinct `region.x` + `MIN_USABLE_W/H` floors + non-overlap + no clip) +
+  `::test_at063b_stacked_at_80` (stacked @80×24: 1 distinct x + 3 ascending y) +
+  `::test_at063c_reparent_safety_at_80` + `::test_at063c_reparent_safety_at_120` (reparent-safety + one
+  observable action per window, both sizes) + the layout-agnostic white-box
+  `::test_tc46_1_window_structure_layout_agnostic` + `::test_tc46_2_paste_in_viewport_at_body_scroll0`; `tests/test_tui_patch_editor_v2.py` FOLD-6
+  markup/`CappedTextArea` census; `tests/test_tui_patch_variant.py` + `tests/test_tui_directionb.py` pass
+  UNCHANGED (FOLD-1). Snapshot: the two `patch-comfortable-*` cells ride `_batch46_patch_drift_marks`
+  (`xfail(strict=False)`) until the canonical-CI regen.
+- Status: Added batch-46 (US-U8 / HLR-063, LLR-063.1–.4). Frozen-engine diff = 0.
+
+**R-TUI-064**: Where the Patch Editor renders its three windows, each window's action-button row(s) shall
+be composed as sibling(s) of — not descendants of — that window's scrollable body, so no button is trapped
+below an inner-body scroll fold. At 120×30 every named action button shall be simultaneously reachable
+(target: all `_fully_visible` at scroll 0). At the 80×24 floor — where the MEASURED ~5-row panel budget
+(the operator-deferred app-start-geometry starvation; `app.py` frozen) cannot show all 17 buttons at once —
+every named action button shall be **reachable-under-scroll**: it becomes `_fully_visible` once its window
+is scrolled into the panel viewport, and none is trapped below an inner-body fold (FOLD-8, operator-approved
+amendment of the original all-visible acceptance).
+- Code: `s19_app/tui/screens_directionb.py` (docked button-row `Horizontal`s as window-body siblings);
+  `s19_app/tui/styles.tcss` (`.patch-docked-row` / `.patch-docked-group` outside `.patch-window-body`;
+  wrapping button-grids so no button clips horizontally). `app.py` diff = 0.
+- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at064a_reachable_under_scroll_at_80`
+  (reachable-under-scroll @80×24, 17 named buttons) + `::test_at064b_reachable_under_scroll_at_120`
+  (all-visible @120×30) + `::test_at064c_revealed_rows_reachable_at_80` (revealed save-back +
+  before/after reachable @80×24); the `_fully_visible` oracle (region ⊆ screen ∧ every scrollable ancestor's
+  `content_region`) + the structural "no `VerticalScroll` ancestor" docked-sibling check. RED-proven on the
+  batch-22 2×2 tree (buttons below the starved `1fr` fold).
+- Status: Added batch-46 (US-B2 / HLR-064, LLR-064.1–.3; FOLD-8 reachable-under-scroll floor). Frozen-engine
   diff = 0.

@@ -54,6 +54,7 @@ from textual.containers import (
     Horizontal,
     ScrollableContainer,
     Vertical,
+    VerticalScroll,
 )
 from textual.message import Message
 from textual.widgets import (
@@ -2269,301 +2270,321 @@ class PatchEditorPanel(ScrollableContainer):
         select.disabled = len(options) < 2
 
     def compose(self) -> ComposeResult:
-        """Lay out the consolidated v2 Patch Editor widget tree as a 2x2 grid.
+        """Lay out the Patch Editor as three responsive bordered windows.
 
         Summary:
-            Reparent the single change-flow section (LLR-003.1) into four
-            area-pane :class:`Container` s laid out 2x2 (HLR-033.1) —
-            ``#patch_pane_entries`` (top-left: entries table, empty-state,
-            entry inputs), ``#patch_pane_changefile`` (top-right: the
-            change-file row — the paste group is reparented into its own
-            full-width cell below the four panes, batch-36 US-058),
-            ``#patch_pane_checks``
-            (bottom-left: the declaration-fault count + listing, the checks
-            status line + results), and ``#patch_pane_variant``
-            (bottom-right: the variant-dropdown row composed ABOVE the
-            execute-over-variants row, LLR-035.2 — the switch affordance
-            stays visible at scroll 0 while the execute group scrolls below
-            when the pane overflows at 80x24). Each inner
-            sub-tree is moved wholesale — no inner id is renamed or
-            reordered, so every ``patch_*`` id and its action wiring stay
-            queryable (HLR-033.2). The hidden save-back prompt row is yielded
-            as a direct grid child after the four panes with ``column-span:
-            2`` (LLR-033.4), landing in the grid's ``auto`` third row so it
-            spans full width when shown without squeezing a pane. The panel
-            itself is styled ``layout: grid`` (styles.tcss), so each pane
-            scrolls vertically and independently (HLR-033.3).
+            Render the change-flow editor as three bordered windows
+            (HLR-063) — ``#patch_win_script`` (PATCH SCRIPT),
+            ``#patch_win_checks`` (CHECKS) and ``#patch_win_json``
+            (JSON EDIT). Each window is a constant title ``Label`` + a
+            scrollable ``VerticalScroll`` body + one or more **docked
+            button-row siblings of the body** (not descendants of it), so an
+            action button is never trapped below the body's inner scroll fold
+            (HLR-064 / the field-audit B2 fix). The pre-existing grouping
+            sub-containers ``#patch_pane_entries``, ``#patch_pane_changefile``,
+            ``#patch_pane_variant`` and ``#patch_doc_file_row`` are preserved
+            intact as **non-scrolling** groups (FOLD-1) so every leaf id and
+            the two variant-order tests stay green unchanged; only their
+            button rows move out to the docked region. The wide↔narrow switch
+            is pure CSS reusing the existing ``width-narrow`` regime
+            (styles.tcss): three columns when ≥120 cols, stacked with a
+            panel-level scroll below it (FOLD-8 reachable-under-scroll, since
+            the measured 5-row @80×24 viewport cannot show all buttons at
+            once). Window titles are CONSTANT strings — never file-derived
+            (C-17 / F3). No leaf id is renamed; the variant group stays ABOVE
+            the execute group (R-PATCH-VARIANT-SELECT-001).
 
         Args:
             None
 
         Returns:
-            ComposeResult: The Patch Editor widget tree — four ``#patch_pane_*``
-            containers, the spanning paste cell, plus the spanning save-back row.
+            ComposeResult: The Patch Editor widget tree — three
+            ``#patch_win_*`` window containers, each holding a title, a
+            scrollable body and its docked button-row sibling(s).
 
         Data Flow:
-            - Each pane ``Container`` wraps its area's pre-existing widget
-              sub-tree intact; the panel's ``layout: grid; grid-size: 2 4``
-              CSS (``grid-rows: 1fr 2fr 2fr auto``) places the four panes in
-              the top two rows, the reparented ``#patch_paste_row`` in the
-              weighted ``2fr`` third row (``column-span: 2``), and the
-              save-back span in the ``auto`` fourth row.
+            - Each window ``Container`` lays its children out vertically
+              (title / body / docked rows); ``#patch_editor_panel`` lays the
+              three windows out horizontally when wide and vertically (with a
+              panel scroll) when ``width-narrow`` is set (styles.tcss).
 
         Dependencies:
             Used by:
                 - Textual ``ScrollableContainer`` compose lifecycle
         """
+        # ================= PATCH SCRIPT window =================
         yield Container(
-            Label(
-                "Change document (JSON)", classes="patch-section-title"
-            ),
-            DataTable(
-                id="patch_doc_entries_table",
-                zebra_stripes=True,
-                cursor_type="row",
-            ),
-            Static(
-                self.EMPTY_STATE_TEXT,
-                id="patch_doc_empty_state",
-                markup=False,
-            ),
-            Container(
-                Label("Address", classes="patch-field-label"),
-                # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in Input
-                # subclass) so Ctrl+V pastes from the OS clipboard through
-                # the single bounded batch-29 funnel — here and on every
-                # swapped input below.
-                OsClipboardInput(
-                    placeholder="0x100", id="patch_entry_address_input"
-                ),
-                Label("String value", classes="patch-field-label"),
-                OsClipboardInput(
-                    placeholder="text (document encoding)",
-                    id="patch_entry_value_input",
-                ),
-                Label("Bytes", classes="patch-field-label"),
-                OsClipboardInput(
-                    placeholder="DE AD BE EF", id="patch_entry_bytes_input"
-                ),
-                Horizontal(
-                    Button("Add", id="patch_entry_add_button"),
-                    Button("Edit", id="patch_entry_edit_button"),
-                    Button("Remove", id="patch_entry_remove_button"),
-                    # US-068b / LLR-068b.1: the per-entry JSON editor for the
-                    # SELECTED entries-table row — distinct from the whole-set
-                    # #patch_edit_json_button and the field-populate
-                    # #patch_entry_edit_button. DISABLED for a file-backed
-                    # document via ``set_entry_edit_json_enabled`` (LLR-068b.4
-                    # A-01 data-loss guard).
-                    Button("Edit JSON", id="patch_entry_edit_json_button"),
-                    id="patch_doc_entry_buttons",
-                ),
-                # US-068a / LLR-068a.3: change-set Undo / Redo in their OWN
-                # dedicated row (NOT #patch_doc_controls, whose 5-button census
-                # is pinned by test_tui_patch_layout / test_tui_patch_editor_v2)
-                # so no sibling census churns (C-26). Both are DISABLED for a
-                # file-backed document via ``set_undo_redo_enabled`` (LLR-068a.4
-                # A-01 data-loss guard), mirroring the Edit-JSON guard idiom.
-                Horizontal(
-                    Button("Undo", id="patch_undo_button"),
-                    Button("Redo", id="patch_redo_button"),
-                    id="patch_history_controls",
-                ),
-                id="patch_doc_entry_inputs",
-            ),
-            id="patch_pane_entries",
-        )
-        yield Container(
-            Container(
-                Label("Change file", classes="patch-field-label"),
-                Select(
-                    [],
-                    id="patch_doc_file_select",
-                    prompt="Change files in patches/",
-                    allow_blank=True,
-                ),
-                OsClipboardInput(
-                    placeholder=(
-                        "or type a path to the same change-set JSON "
-                        "(alternative to the patches/ dropdown)"
+            Label("PATCH SCRIPT", classes="patch-window-title"),
+            VerticalScroll(
+                Container(
+                    Label(
+                        "Change document (JSON)",
+                        classes="patch-section-title",
                     ),
-                    id="patch_doc_path_input",
-                ),
-                # batch-35 (US-057 / LLR-057.1): the mixed five-button row
-                # splits into two labeled sections — patch-script controls
-                # (Load/Validate/Apply/Save stay in #patch_doc_controls)
-                # vs check controls (Run checks + its help move into the
-                # new #patch_checks_controls) — so the operator never runs
-                # checks when a patch action was intended. Compose + CSS
-                # only: every pre-batch id and the on_button_pressed
-                # wiring are unchanged (LLR-057.3).
-                Label(
-                    "Patch script",
-                    id="patch_script_section_label",
-                    classes="patch-section-title",
-                ),
-                Horizontal(
-                    Button("Load", id="patch_doc_load_button"),
-                    # batch-37 (US-064a / LLR-064a.1): Refresh re-reads the
-                    # currently-loaded change file from disk (its own
-                    # source_path, A-03 — not the path input) so external edits
-                    # appear without re-typing the path. Additive: every
-                    # existing patch id + wiring is preserved (LLR-064a.2).
-                    Button("Refresh", id="patch_doc_refresh_button"),
-                    Button("Validate", id="patch_doc_validate_button"),
-                    Button("Apply", id="patch_doc_apply_button"),
-                    Button("Save", id="patch_doc_save_button"),
-                    id="patch_doc_controls",
-                ),
-                Label(
-                    "Checks",
-                    id="patch_checks_section_label",
-                    classes="patch-section-title",
+                    DataTable(
+                        id="patch_doc_entries_table",
+                        zebra_stripes=True,
+                        cursor_type="row",
+                    ),
+                    Static(
+                        self.EMPTY_STATE_TEXT,
+                        id="patch_doc_empty_state",
+                        markup=False,
+                    ),
+                    Container(
+                        Label("Address", classes="patch-field-label"),
+                        # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in
+                        # Input subclass) so Ctrl+V pastes from the OS
+                        # clipboard through the single bounded batch-29 funnel.
+                        OsClipboardInput(
+                            placeholder="0x100",
+                            id="patch_entry_address_input",
+                        ),
+                        Label("String value", classes="patch-field-label"),
+                        OsClipboardInput(
+                            placeholder="text (document encoding)",
+                            id="patch_entry_value_input",
+                        ),
+                        Label("Bytes", classes="patch-field-label"),
+                        OsClipboardInput(
+                            placeholder="DE AD BE EF",
+                            id="patch_entry_bytes_input",
+                        ),
+                        id="patch_doc_entry_inputs",
+                    ),
+                    id="patch_pane_entries",
                 ),
                 Container(
-                    Button("Run checks", id="patch_checks_run_button"),
-                    # batch-33 (US-052 / LLR-052.1): the help text extends
-                    # the AT-032a sentence (its token span is a locked pin)
-                    # with check-semantics guidance so "uncheckable"
-                    # explains itself before it ever appears: kind
-                    # requirement + per-entry reasons + the
-                    # healthy-entries-still-checked rule. batch-35 moves
-                    # the label's CONTAINER only — the text is unchanged
-                    # (LLR-057.2).
+                    Container(
+                        Label("Change file", classes="patch-field-label"),
+                        Select(
+                            [],
+                            id="patch_doc_file_select",
+                            prompt="Change files in patches/",
+                            allow_blank=True,
+                        ),
+                        OsClipboardInput(
+                            placeholder=(
+                                "or type a path to the same change-set JSON "
+                                "(alternative to the patches/ dropdown)"
+                            ),
+                            id="patch_doc_path_input",
+                        ),
+                        # batch-35 (US-057 / LLR-057.1): the patch-script
+                        # section label. Its button row (#patch_doc_controls)
+                        # is docked below (batch-46 HLR-064), out of this
+                        # scrollable body.
+                        Label(
+                            "Patch script",
+                            id="patch_script_section_label",
+                            classes="patch-section-title",
+                        ),
+                        id="patch_doc_file_row",
+                    ),
+                    id="patch_pane_changefile",
+                ),
+                id="patch_win_script_body",
+                classes="patch-window-body",
+            ),
+            # Docked button rows — siblings of the body (the B2 fix): never
+            # trapped below the body's inner scroll fold.
+            Horizontal(
+                Button("Add", id="patch_entry_add_button"),
+                Button("Edit", id="patch_entry_edit_button"),
+                Button("Remove", id="patch_entry_remove_button"),
+                # US-068b: the per-entry JSON editor for the SELECTED
+                # entries-table row — disabled for a file-backed document.
+                Button("Edit JSON", id="patch_entry_edit_json_button"),
+                id="patch_doc_entry_buttons",
+                classes="patch-docked-row",
+            ),
+            # US-068a: change-set Undo / Redo in their own dedicated row —
+            # disabled for a file-backed document (A-01 data-loss guard).
+            Horizontal(
+                Button("Undo", id="patch_undo_button"),
+                Button("Redo", id="patch_redo_button"),
+                id="patch_history_controls",
+                classes="patch-docked-row",
+            ),
+            # batch-37 (US-064a): Refresh re-reads the loaded change file from
+            # its own source_path. The 5-button census is pinned by
+            # test_tui_patch_editor_v2 / the layout TC.
+            Horizontal(
+                Button("Load", id="patch_doc_load_button"),
+                Button("Refresh", id="patch_doc_refresh_button"),
+                Button("Validate", id="patch_doc_validate_button"),
+                Button("Apply", id="patch_doc_apply_button"),
+                Button("Save", id="patch_doc_save_button"),
+                id="patch_doc_controls",
+                classes="patch-docked-row",
+            ),
+            # US-028 (LLR-035.2): the variant group composes ABOVE the execute
+            # group (R-PATCH-VARIANT-SELECT-001 / TC-035.2). Kept intact as a
+            # docked, non-scrolling group so the Select + "?" + execute buttons
+            # are reachable by scrolling the window into view (FOLD-8), never
+            # trapped below the body fold.
+            Container(
+                Container(
+                    Label("Active variant", classes="patch-field-label"),
+                    # US-067: the "?" info button is ALWAYS rendered beside the
+                    # selector so its click target always exists.
+                    Horizontal(
+                        Select(
+                            [],
+                            id="patch_variant_select",
+                            prompt="Variants in project",
+                            allow_blank=True,
+                            disabled=True,
+                        ),
+                        Button("?", id="patch_variant_info_button"),
+                        id="patch_variant_select_row",
+                    ),
+                    id="patch_variant_row",
+                ),
+                Container(
                     Label(
-                        "Checks: runs the loaded change document's checks "
-                        "against the loaded image. Needs kind 'check' (a "
-                        "change-set cannot be checked). Uncheckable rows "
-                        "name their reason (declaration fault, "
-                        "partial/outside range, or no image); healthy "
-                        "entries are still checked.",
-                        id="patch_checks_help",
+                        "Execute over variants", classes="patch-field-label"
+                    ),
+                    Horizontal(
+                        Button(
+                            f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
+                            id="patch_execute_scope_button",
+                        ),
+                        Button(
+                            "Execute scope", id="patch_execute_run_button"
+                        ),
+                        id="patch_execute_buttons",
+                    ),
+                    id="patch_execute_row",
+                ),
+                id="patch_pane_variant",
+                classes="patch-docked-group",
+            ),
+            id="patch_win_script",
+            classes="patch-window",
+        )
+        # ================= CHECKS window =================
+        yield Container(
+            Label("CHECKS", classes="patch-window-title"),
+            VerticalScroll(
+                Label(
+                    "",
+                    id="patch_doc_issue_count",
+                    classes="patch-field-label",
+                ),
+                Static(
+                    "", id="patch_doc_issues", markup=False, classes="hidden"
+                ),
+                # batch-33 (LLR-051.6, C-17): the check status renders the
+                # UNTRUNCATED run-block reason (embeds file-derived {kind!r}
+                # text) — markup must never be interpreted here.
+                Label(
+                    "",
+                    id="patch_checks_status",
+                    classes="patch-field-label",
+                    markup=False,
+                ),
+                Container(id="patch_checks_results"),
+                id="patch_win_checks_body",
+                classes="patch-window-body",
+            ),
+            # batch-35 (US-057): the "Checks" section label (its parentage is
+            # not pinned, but its presence + text are — test_at057a); it labels
+            # the docked Run-checks control below.
+            Label(
+                "Checks",
+                id="patch_checks_section_label",
+                classes="patch-section-title",
+            ),
+            # batch-35 (US-052 / LLR-057.2): the Run-checks button + its
+            # clarity help stay together in #patch_checks_controls (their
+            # parentage is pinned by test_at057a); docked here so the button is
+            # reachable by scrolling the CHECKS window into view.
+            Container(
+                Button("Run checks", id="patch_checks_run_button"),
+                Label(
+                    "Checks: runs the loaded change document's checks "
+                    "against the loaded image. Needs kind 'check' (a "
+                    "change-set cannot be checked). Uncheckable rows "
+                    "name their reason (declaration fault, "
+                    "partial/outside range, or no image); healthy "
+                    "entries are still checked.",
+                    id="patch_checks_help",
+                    classes="patch-field-label",
+                ),
+                id="patch_checks_controls",
+                classes="patch-docked-group",
+            ),
+            id="patch_win_checks",
+            classes="patch-window",
+        )
+        # ================= JSON EDIT window =================
+        yield Container(
+            Label("JSON EDIT", classes="patch-window-title"),
+            VerticalScroll(
+                # batch-36 (US-058): the change-set paste group in a scrollable
+                # body so the editor's first line sits inside the visible
+                # content-region at scroll 0 (FOLD-4). #patch_paste_row is kept
+                # for the AT-057a id census; its button row is docked below.
+                Container(
+                    Label(
+                        "Paste change-set (v2 JSON)",
                         classes="patch-field-label",
                     ),
-                    id="patch_checks_controls",
-                ),
-                id="patch_doc_file_row",
-            ),
-            id="patch_pane_changefile",
-        )
-        yield Container(
-            Label(
-                "", id="patch_doc_issue_count", classes="patch-field-label"
-            ),
-            Static(
-                "", id="patch_doc_issues", markup=False, classes="hidden"
-            ),
-            # batch-33 (LLR-051.6, C-17): the check status renders the
-            # UNTRUNCATED run-block reason, which embeds file-derived
-            # {kind!r} text — markup must never be interpreted here.
-            Label(
-                "",
-                id="patch_checks_status",
-                classes="patch-field-label",
-                markup=False,
-            ),
-            Container(id="patch_checks_results"),
-            id="patch_pane_checks",
-        )
-        yield Container(
-            Container(
-                Label("Active variant", classes="patch-field-label"),
-                # US-067 / LLR-067.1: the info button is ALWAYS rendered beside
-                # the selector (the Select is 1fr, the "?" button auto-width, so
-                # both share the row) so its click target always exists — the
-                # help modal is discovery help, unconditionally enabled. The
-                # Select keeps its id; set_variants / on_select_changed still
-                # find it (query_one walks descendants).
-                Horizontal(
-                    Select(
-                        [],
-                        id="patch_variant_select",
-                        prompt="Variants in project",
-                        allow_blank=True,
-                        disabled=True,
+                    CappedTextArea(
+                        DUMMY_CHANGESET_TEXT, id="patch_paste_text"
                     ),
-                    Button("?", id="patch_variant_info_button"),
-                    id="patch_variant_select_row",
+                    id="patch_paste_row",
                 ),
-                id="patch_variant_row",
+                id="patch_win_json_body",
+                classes="patch-window-body",
             ),
+            Horizontal(
+                Button("Parse pasted", id="patch_paste_parse_button"),
+                # US-064b: opens the full-size JSON popup over the paste buffer;
+                # disabled by the app for a file-backed document (A-01 guard).
+                Button("Edit JSON", id="patch_edit_json_button"),
+                id="patch_paste_controls",
+                classes="patch-docked-row",
+            ),
+            # The hidden save-back prompt is a docked group revealed by the
+            # app's save-back handler on a successful save; docked so its
+            # buttons are reachable when shown (AT-064c).
+            Container(
+                Label("Save patched image as:", classes="patch-field-label"),
+                OsClipboardInput(id="patch_saveback_name_input"),
+                Horizontal(
+                    Button(
+                        f"Width: {self._saveback_width} bytes/line",
+                        id="patch_saveback_width_button",
+                    ),
+                    Button("Write file", id="patch_saveback_confirm_button"),
+                    Button("Don't save", id="patch_saveback_decline_button"),
+                    id="patch_saveback_buttons",
+                ),
+                id="patch_saveback_row",
+                classes="hidden patch-docked-group",
+            ),
+            # US-061: a PERSISTENT before/after-report control, hidden by
+            # default and revealed on a successful save. Mirrors the
+            # #patch_saveback_row reveal idiom.
             Container(
                 Label(
-                    "Execute over variants", classes="patch-field-label"
+                    "Before/after report available:",
+                    classes="patch-field-label",
                 ),
                 Horizontal(
                     Button(
-                        f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
-                        id="patch_execute_scope_button",
+                        "Write before/after report",
+                        id="patch_before_after_button",
                     ),
-                    Button("Execute scope", id="patch_execute_run_button"),
-                    id="patch_execute_buttons",
+                    id="patch_before_after_buttons",
                 ),
-                id="patch_execute_row",
+                id="patch_before_after_row",
+                classes="hidden patch-docked-group",
             ),
-            id="patch_pane_variant",
-        )
-        # batch-36 (US-058 / LLR-058.1): the change-set paste group is
-        # reparented OUT of the crowded top-right #patch_pane_changefile cell
-        # (where it stacked below the change-file + patch-script + checks
-        # groups and was pushed fully below the fold — 0 in-viewport editor
-        # lines at scroll 0) into its own dedicated full-width panel cell in a
-        # weighted grid row (styles.tcss `grid-rows: 1fr 2fr 2fr auto`), so the
-        # editor's first line sits inside the visible content-region. Compose +
-        # CSS only: every patch_* id and the on_button_pressed wiring are
-        # unchanged (LLR-058.3).
-        yield Container(
-            Label(
-                "Paste change-set (v2 JSON)",
-                classes="patch-field-label",
-            ),
-            CappedTextArea(DUMMY_CHANGESET_TEXT, id="patch_paste_text"),
-            Horizontal(
-                Button("Parse pasted", id="patch_paste_parse_button"),
-                # US-064b / LLR-064b.1: opens the full-size JSON popup over the
-                # paste buffer. Enabled by default (a fresh document is
-                # paste-authored, source_path None); the app DISABLES it
-                # whenever a file-backed document is loaded (LLR-064b.4 A-01
-                # data-loss guard) via ``set_edit_json_enabled``.
-                Button("Edit JSON", id="patch_edit_json_button"),
-                id="patch_paste_controls",
-            ),
-            id="patch_paste_row",
-        )
-        yield Container(
-            Label("Save patched image as:", classes="patch-field-label"),
-            OsClipboardInput(id="patch_saveback_name_input"),
-            Horizontal(
-                Button(
-                    f"Width: {self._saveback_width} bytes/line",
-                    id="patch_saveback_width_button",
-                ),
-                Button("Write file", id="patch_saveback_confirm_button"),
-                Button("Don't save", id="patch_saveback_decline_button"),
-                id="patch_saveback_buttons",
-            ),
-            id="patch_saveback_row",
-            classes="hidden",
-        )
-        # US-061 / LLR-061.1: a PERSISTENT before/after-report control (not the
-        # transient LLR-038.3 notify). Hidden by default; revealed by the app's
-        # save-back handler on a successful save (result.ok) and re-hidden when
-        # the editing context clears (a new load). Mirrors the
-        # #patch_saveback_row ``.hidden``-reveal idiom exactly.
-        yield Container(
-            Label(
-                "Before/after report available:",
-                classes="patch-field-label",
-            ),
-            Horizontal(
-                Button(
-                    "Write before/after report",
-                    id="patch_before_after_button",
-                ),
-                id="patch_before_after_buttons",
-            ),
-            id="patch_before_after_row",
-            classes="hidden",
+            id="patch_win_json",
+            classes="patch-window",
         )
 
     def on_mount(self) -> None:
