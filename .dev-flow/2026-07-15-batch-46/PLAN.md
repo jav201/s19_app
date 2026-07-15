@@ -1,7 +1,12 @@
 # PLAN — batch-46 · Patch Editor responsive 3-column redesign (field-audit B2 + U8)
 
 > Living compendium. Created Phase 0 (2026-07-15). Updated at every gate.
-> **STATUS: Phase 3 Inc-1 IN PROGRESS (resumed after an operator-approved iterate-to-refine). D1=STACKED; run-mode=AUTONOMOUS-THROUGH-SELF-MERGE. Branch `feat/batch-46-patch-3col` @ `1bf3b19`.**
+> **STATUS: Phase 3 Inc-1 GATED + COMMITTED (`e05ffec`) → Inc-2 (docs) next. D1=STACKED; run-mode=AUTONOMOUS-THROUGH-SELF-MERGE. Branch `feat/batch-46-patch-3col`.**
+>
+> **Inc-1 result:** 3-window layout shipped (app.py diff = 0, pure-CSS). Gate 1394 passed / 0 failed / 5 xfailed
+> (2 batch-46 patch-drift + 3 pre-existing), C-27 clean, ruff clean, code-review APPROVE-WITH-NITS (all applied).
+> 6 files (census-miss +1: `test_tui_variants.py`). Reachable-under-scroll oracle RED-proven + independently
+> verified valid. Committed to protect against a concurrent session's branch-switching.
 >
 > **Inc-1 measured blocker → FOLD-8 (operator Option A):** pilot showed the patch panel gets only **5 rows @80×24**
 > (deferred app-geometry starvation; frozen `app.py`), so all 17 buttons can't be simultaneously visible at the floor.
