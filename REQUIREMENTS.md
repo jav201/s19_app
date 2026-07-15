@@ -613,6 +613,32 @@ supersedes/extends R-TUI-026.
   `test_at_r3_detail_no_a2l_region_bounds_only`,
   `test_at_r3_cell_tooltip_names_symbols_and_renders_literally` (RED-first,
   drives `Content.from_rich_text` to prove literal render).
+  **Amended in batch `2026-07-14-batch-45`** (US-045a/b/c / R-TUI-060/061/062;
+  §6.5 Before → After — the batch-27/31/43 text above is the *Before*):
+  - **Cell-colour dimension — Before:** a 2-D grid of address-window `MapCell`s
+    coloured **valid/invalid/gap** through the frozen `css_class_for_severity`
+    (`sev-*`), with an "≈ N KiB/cell" header. **After:** the grid is REMOVED;
+    the body is an **entropy band view** — a proportional segmented band bar +
+    a textured per-region list + a band legend, coloured per **entropy band**
+    via the non-frozen `entropy_style` map (see **R-TUI-060**). Reason:
+    field-audit N1 (real images rendered grey); operator-approved prototype
+    Variant 3.
+  - **Detail / nav (HLR-036) — Before:** cell selection → detail pane +
+    keyboard arrow-nav + a two-step "Open in Hex View" **button**. **After:** a
+    **single click** on a region row populates the detail pane AND jumps to hex
+    (see **R-TUI-062**); the `MapCell` grid, arrow-nav, and `#map_open_hex_button`
+    are deleted (Inc-5).
+  - **Coverage stats strip (HLR-037) — RETAINED (no signal loss):** the
+    validity/coverage strip stays in `#map_stats`, unchanged, now independent of
+    the cell-colour dimension.
+  - **Preserved:** the render-only contract, the `width-narrow` two-regime
+    reflow, and the batch-43 R-3 A2L-symbol region naming with its `safe_text`
+    markup-safety (re-wired onto region-row selection, still guarded by
+    `test_at_r3_detail_hostile_symbol_name_rendered_literally`). The per-CELL
+    tooltip and the `at036*` / CARRY-F2 / `test_at_r3_cell_tooltip*` grid tests
+    are retired with the grid (Inc-5); the `#map_stats` / `tc041_8` / detail
+    `build_detail_text` tests remain green. New/reworked coverage lives on
+    R-TUI-060/061/062.
 
 **R-TUI-042**: Three prototype-approved (throwaway-prototype design intent,
 implemented + verified in Textual) view enhancements, all render-only over the
@@ -3564,7 +3590,16 @@ page/sort control row + legend placement are pilot-measured at 80x24 and 120x30 
   (`test_tui_snapshot.py::test_tc036s_entropy_modal_snapshot[entropy-comfortable-80x24 / -120x30]`)
   `xfail` pending canonical-CI regen post-merge.
 - Status: Added in batch `2026-07-11-batch-37` (US-062 / HLR-062, LLR-062.1–.3). Frozen-engine
-  diff = 0.
+  diff = 0. **RETIRED / Superseded in batch `2026-07-14-batch-45`** (US-045a/c; §6.5 Before → After):
+  the standalone `EntropyViewerScreen` — and thus its paging + sort — is **DELETED** (Inc-5), its
+  function moved into the **always-visible** Memory-Map band view (R-TUI-060). **Before:** a modal
+  showing one FIXED-512 window page at a time, with `Prev`/`Next` paging and an address/entropy sort
+  toggle. **After:** the map band view renders **all** region runs at once (no page budget → no paging)
+  as an **address-ordered** region list (no sort control needed). `EntropyViewerScreen`,
+  `action_page_prev/next`, `action_toggle_sort`, `_window_for_row`, `#entropy_*` are removed;
+  `tests/test_tui_entropy_viewer.py` (AT-062a/b, TC-324/325) is deleted. `compute_entropy` is retained
+  (now cached on `LoadedFile.entropy_windows`, R-TUI-060). Statement + Code/Validation retained above
+  as historical record.
 
 **R-TUI-051**: The entropy viewer shall (a) render a **band-colour legend** (`#entropy_legend`)
 mapping **each** `ENTROPY_BAND_COLOUR` band to its entropy meaning (grey→constant/padding,
@@ -3593,7 +3628,17 @@ per-cell clickable widget is the baseline mechanism (deterministic, no offset ar
   `::test_tc327_action_jump_remap_and_bound` (TC-327 — `_window_for_row` remap under sort/page;
   S-03 out-of-range no-op).
 - Status: Added in batch `2026-07-11-batch-37` (US-063 / HLR-063, LLR-063.1–.3). Frozen-engine
-  diff = 0.
+  diff = 0. **RETIRED / Superseded in batch `2026-07-14-batch-45`** (US-045a/c; §6.5 Before → After):
+  the entropy modal's legend + clickable strip are **DELETED** with `EntropyViewerScreen` (Inc-5),
+  superseded by the always-visible map. **Before:** an in-modal `#entropy_legend` derived from
+  `ENTROPY_BAND_COLOUR`, plus per-cell `#entropy_cell_<row>` clickable widgets that dismissed the modal
+  with the clicked window's address. **After:** the Memory-Map band view carries its OWN **band legend**
+  (`.map-band-legend`, one row per `entropy_style` band label — R-TUI-060 / LLR-045D.3), and
+  navigation is **single-click region → hex** on the region list (R-TUI-062) — no modal, no strip.
+  `EntropyCell`, `_legend_widget`, `on_entropy_cell_selected`, `ENTROPY_BAND_COLOUR`,
+  `ENTROPY_LOW_CONFIDENCE_STYLE`, and the screens.py modal `ENTROPY_BAND_MEANING` are removed;
+  `tests/test_tui_entropy_viewer.py` (AT-063a/b, TC-326/327) is deleted. Statement + Code/Validation
+  retained above as historical record.
 
 **R-TUI-052**: The Patch Editor shall add a **Refresh** control (`#patch_doc_refresh_button`) that
 re-reads the currently-loaded change/check file from disk into the editor — reflecting external
@@ -3853,3 +3898,83 @@ batch-45), CHECK/CRC blocks (the CRC-into-loop seam, batch-46), multi-image scop
   a follow-up snapshot-regen PR retires the marks.
 - Status: Added in batch `2026-07-14-batch-44` (Flow Builder tracer; fast-dev-flow). Frozen-engine
   diff = 0 (the `changes/`/`load_service` ops are REUSED, never modified; `a2l.py` unread here).
+
+**R-TUI-060**: The TUI Memory Map presents the loaded image as an **entropy band visualization** —
+a **proportional segmented band bar** (one segment per merged same-band region run, width ∝ that
+run's byte share) above a **textured per-region list** (one row per run: `{glyph} 0x{start} · {N} B ·
+{band}`), plus a **band legend** (one row per band label). Colour + texture come per entropy band from
+the NON-frozen `entropy_style` map (`band-{token}` CSS classes owned by `styles.tcss` + a distinct
+texture glyph per band — a colour-blind cue, C-10), a colour domain deliberately separate from the
+frozen `sev-*` severity classes. This REPLACES the batch-27 validity (`sev-*`) cell grid (field-audit
+N1: real firmware rendered mostly grey). Entropy is computed **once on the worker-thread load path**
+(`load_service.build_loaded_*` → `compute_entropy` → cached on `LoadedFile.entropy_windows`); the
+render is read-only over that cache and merges it via `_merge_band_runs` (band change OR address
+discontinuity starts a new run) — `update_memory_map` never recomputes entropy inline (M4, guarded by
+the `test_tc028` AST purity check). Region-list rows carry addr/size/band ONLY — no file-derived (A2L)
+text (security B3). Every text sink is markup-safe `safe_text`. With no image / no entropy the panel
+shows the neutral no-data note and never raises (LLR-045A.5). The coverage stats strip (R-TUI-041 /
+HLR-037) is retained unchanged in `#map_stats`. This supersedes/extends R-TUI-041's cell-colour
+dimension.
+- Code: `s19_app/tui/entropy_style.py` (NEW — band→`(class, glyph, meaning)` map, non-frozen),
+  `s19_app/tui/screens_directionb.py` (`_merge_band_runs`, `RegionRow`, `MemoryMapPanel._build_band_widgets`,
+  the band-bar/region-list/legend render), `s19_app/tui/services/load_service.py` (compute-on-load in
+  `build_loaded_s19`/`build_loaded_hex`), `s19_app/tui/models.py` (`LoadedFile.entropy_windows`),
+  `s19_app/tui/app.py` (`update_memory_map` passes `entropy_windows` as the 5th `render_ranges` arg),
+  `s19_app/tui/styles.tcss` (`.map-band-bar` / `.map-region-list` / `.map-region-row` / `.map-band-legend`
+  + the `.band-*` colours)
+- Validation: `Automated` via `tests/test_tui_directionb.py`
+  (`test_at069_high_region_renders_high_band`, `test_at070_constant_vs_high_bands_differ` (C-10
+  two-branch), `test_at071_region_list_rows_addr_size_band`,
+  `test_at071b_disjoint_same_band_regions_stay_separate` (contiguity break),
+  `test_at035_map_shows_band_bar_and_summary_header`, `test_map_band_view_survives_rerender`, the
+  `_merge_band_runs` / `test_tc028` guards) and `tests/test_entropy_style.py` (TC-060.x — band-map
+  census + `band_style` fallback). The 2 `map` snapshot cells are `xfail(strict=False)`
+  until canonical-CI regen (`_batch45_map_drift_marks`, `tests/test_tui_snapshot.py`).
+- Status: Added in batch `2026-07-14-batch-45` (US-045a / R-TUI-060, LLR-045A / LLR-045D). Frozen-engine
+  diff = 0.
+
+**R-TUI-061**: The Memory Map docks an **"At a glance"** panel beside the band bar: (a) a per-band
+**histogram** — one band-styled row per OCCUPIED band showing its REGION count (merged-run tally,
+consistent with the region list) + a proportional bar + percentage (`band_histogram`, LLR-045B.1); and
+(b) a band-coloured entropy **profile sparkline** — each sampled window's entropy (0–8) mapped to a
+fixed 9-glyph ramp (`_ENTROPY_BAR_RAMP`), sub-sampled at step `max(1, N // width)` and grouped into
+per-band segments for CSS-class colouring (`sparkline_glyphs` / `_sparkline_segments`, LLR-045B.2).
+Colour flows solely through the `band-*` classes; every text sink is `safe_text` over CONSTANT band
+labels (no file-derived text — B3). The panel docks to the RIGHT of the band bar at ≥ 120 columns and
+**stacks below it** at < 120 via the existing `width-narrow` breakpoint so both fit the 80×24 floor;
+the layout is pilot-measured (real regions, not fr-math), never overflowing `#workspace_body`
+(LLR-045B.3, C-23). Empty/no-file → nothing / neutral, no crash.
+- Code: `s19_app/tui/screens_directionb.py` (`entropy_ramp_glyph`, `band_histogram`, `sparkline_glyphs`,
+  `_sparkline_segments`, `MemoryMapPanel._build_glance_widgets`; the `.map-band-row` dock),
+  `s19_app/tui/styles.tcss` (`.map-band-row` + `width-narrow` reflow, `.at-a-glance`, `.glance-title`,
+  `.map-glance-row`, `.map-sparkline` / `.map-sparkline-seg`)
+- Validation: `Automated` via `tests/test_tui_directionb.py`
+  (`test_at072_histogram_per_band_counts` (non-vacuous per-band region counts + %≈100),
+  `test_at073_sparkline_tracks_profile` (two-branch: mixed ≥2 distinct glyphs / constant-only uniform),
+  `test_tc061_1_band_histogram_counts`, `test_tc061_2_sparkline_ramp_mapping`,
+  `test_at073b_glance_geometry_fits_and_reflows` (pilot-measured 120×30 side-by-side + 80×24 stacked))
+- Status: Added in batch `2026-07-14-batch-45` (US-045b / R-TUI-061, LLR-045B.1–.3). Frozen-engine
+  diff = 0.
+
+**R-TUI-062**: The Memory Map region rows are **single-click → hex** navigation targets. A single real
+click on a region row (`RegionRow`) posts `MemoryMapPanel.OpenInHexRequested(region.start)` — REUSING
+the existing message class and the app handler `on_memory_map_panel_open_in_hex_requested` unchanged —
+which switches to the Workspace/hex screen focused on the region's start, repositioning the hex window
+to the nearest present row via `_snapped_focus_row_index` (the batch-31 B-01 snap). The same click also
+populates the RETAINED `#map_detail` pane via `build_detail_text` for the clicked run's window, keeping
+the batch-43 R-TUI-041 R-3 A2L-symbol region naming — and its C-17 `safe_text` markup-safety guard —
+alive on a LIVE (region-triggered) path. This REPLACES the retired two-step (cell-select → reveal
+`#map_open_hex_button` → press). A click on padding / the legend / empty area hits no `RegionRow` and
+is an inert no-op (LLR-045C.3). Exactly one `OpenInHexRequested` is posted per activation; no
+activation posts none.
+- Code: `s19_app/tui/screens_directionb.py` (`RegionRow` + its `Activated` message,
+  `MemoryMapPanel.on_region_row_activated`)
+- Validation: `Automated` via `tests/test_tui_directionb.py`
+  (`test_at074_single_click_repositions_hex` (C-16 real click),
+  `test_at036b_region_click_reveals_hex_at_region_start` (reworked, C-10 non-default region),
+  `test_tc041_6_region_activation_focus_equals_region_start` (reworked, focus == region_start),
+  `test_tc062_1_region_activation_posts_single_open_in_hex`,
+  `test_b01_region_click_snaps_hex_to_far_range` (re-covers the retired `test_ac1` B-01 snap),
+  `test_at_r3_region_click_detail_names_a2l_symbol_literally` (detail re-wire + hostile-name literal))
+- Status: Added in batch `2026-07-14-batch-45` (US-045c / R-TUI-062, LLR-045C.1–.3). Frozen-engine
+  diff = 0.

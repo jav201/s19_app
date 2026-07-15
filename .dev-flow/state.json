@@ -12,7 +12,7 @@
         "0": 1,
         "1": 1,
         "2": 1,
-        "3": 5,
+        "3": 6,
         "4": 0,
         "5": 0,
         "6": 0
@@ -84,6 +84,12 @@
             "date": "2026-07-15",
             "decision": "Inc-5 (5a+5b) APPROVE (autonomous, full independent review) \u2014 PHASE 3 CLOSED",
             "notes": "Retire entropy modal + delete dead grid machinery. Net -2192 lines. C-26 per-symbol reverse-census run BEFORE deletion -> 0 live refs (grep-gate + ruff F821 clean). Deleted EntropyViewerScreen/EntropyCell/MapCell/arrow-nav/#map_open_hex_button/#entropy_*/.map-cell + test_tui_entropy_viewer.py (918L) + tc036s snapshot cells. AT-075/076 (deletion black-box) RED captured via git-stash. Collection 1419 no error; 250 passed/0 failed; C-27 0 frozen; 2 map xfail. Code-review APPROVE-WITH-NITS 0 HIGH; F1 (stale Data-Flow docstring) FIXED. KEEP-list verified live (cell_status/build_detail_text/coverage_stats/OpenInHexRequested/entropy_style.ENTROPY_BAND_MEANING). e freed no collision. coverage preserved (compute_entropy via test_entropy_service.py). PHASE 3 CLOSED: 5 increments (Inc-2 split 2a/2b, Inc-5 split 5a/5b), 0 HIGH batch-wide. Inc-6 (REQUIREMENTS amendments) next, then Phase 4."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-15",
+            "decision": "Inc-6 APPROVE \u2014 PHASE 3 CLOSED (autonomous)",
+            "notes": "REQUIREMENTS.md amendments: add R-TUI-060/061/062; amend R-TUI-041 (\u00a76.5 before/after: cell colour validity->entropy band, two-step->single-click, stats strip RETAINED, render-only+width-narrow+R-3 A2L preserved); retire R-TUI-050/051 (superseded, historical record kept). Doc-only 1 file. EntropyViewerScreen only in retired rows. Sanity 4 passed. PHASE 3 CLOSED: 6 increments, 0 HIGH batch-wide, 0 frozen diffs, C-17 on live path. Phase 4 (orchestrator-owned gate suite, C-25) next."
         }
     ],
     "obsidian_synced": false,
