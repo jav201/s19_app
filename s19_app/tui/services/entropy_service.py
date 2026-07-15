@@ -244,8 +244,9 @@ def compute_entropy(mem_map: Dict[int, int]) -> List[EntropyWindow]:
             - _derive_ranges / _window_entropy / classify_band
             - EntropyWindow / ENTROPY_WINDOW_BYTES / ENTROPY_MIN_SAMPLES
         Used by:
-            - s19_app.tui.services.report_service (US-037, later increment)
-            - s19_app.tui.screens.EntropyViewerScreen (US-036, later increment)
+            - s19_app.tui.services.report_service (US-037)
+            - s19_app.tui.services.load_service (batch-45: cached on
+              ``LoadedFile.entropy_windows`` for the Memory-Map band view)
             - tests/test_entropy_service.py
 
     Example:

@@ -628,9 +628,8 @@ Screen {
 }
 
 /* batch-45 (R-TUI-060): the map body is the entropy band view (band bar +
- * region list + legend stacked vertically), not the retired 16-col validity
- * cell grid. The `.map-cell` rules below are kept for the dead MapCell class
- * (deleted in Inc-5). */
+ * region list + legend stacked vertically); the batch-27 validity cell grid
+ * (and its `.map-cell` rules + MapCell class) was removed in Inc-5. */
 #map_grid {
     width: 1fr;
     height: auto;
@@ -721,17 +720,6 @@ Screen {
 .map-legend-row {
     width: 100%;
     height: 1;
-}
-
-.map-cell {
-    width: 100%;
-    height: 1;
-    min-width: 2;
-    text-align: center;
-}
-
-.map-cell:focus {
-    text-style: reverse;
 }
 
 #map_detail {
@@ -1170,75 +1158,9 @@ ModalScreen {
     margin-top: 1;
 }
 
-/* --- Entropy viewer modal (batch-26, LLR-036.2/036.3) -------------------
- * Reuses the shared `.modal-dialog` token styling and box model (the same
- * container measured at 48/76 cols, §2.6 C-13) so the strip + jump-list
- * content-width budget holds by construction. Caps the dialog height and
- * scrolls the body so both surfaces fit the 80- and 120-col regimes. The
- * strip cells carry their band colours inline as Rich `Text` styles
- * (`ENTROPY_BAND_COLOUR`, screens.py) — NOT the frozen `sev-*` classes — so
- * no per-band CSS rule is needed here. The `#entropy_strip` Static wraps its
- * cells into the content width (no horizontal overflow, LLR-036.3). */
-#entropy_dialog {
-    height: 90%;
-}
-
-#entropy_body {
-    height: 1fr;
-    overflow-y: auto;
-}
-
-/* The strip is a `Horizontal` of per-cell clickable `EntropyCell` widgets
- * (US-063, LLR-063.2). `width: 100%` keeps the container within the modal
- * content budget (no horizontal overflow, LLR-036.3/063.3) and `overflow-x:
- * auto` scroll-reaches the tail cells on a full 512-window page; the empty-image
- * case renders a plain `Static` under the same id. */
-#entropy_strip {
-    height: auto;
-    width: 100%;
-    overflow-x: auto;
-    margin-bottom: 1;
-}
-
-.entropy-cell {
-    width: 1;
-    height: 1;
-}
-
-/* In-modal band-colour legend (US-063, LLR-063.1): one auto-height row per
- * `ENTROPY_BAND_COLOUR` band + the low-confidence dim cue. `height: auto` keeps
- * it out of the `1fr` scroll body's flex; it scroll-reaches at 80x24. */
-#entropy_legend {
-    height: auto;
-    margin-bottom: 1;
-    padding: 0 1;
-}
-
-#entropy_jump_list {
-    height: auto;
-    max-height: 60%;
-}
-
-/* --- Entropy paging + sort controls (US-062, LLR-062.1/.2/.3) --------------
- * A single auto-height control row above the strip: sort toggle + Prev/Next
- * page buttons + a `page P/Q` position indicator. `height: auto` keeps the row
- * from consuming the `1fr` scroll body; the buttons are compact so the row
- * fits (or scroll-reaches) both the 80- and 120-col regimes — the page size
- * itself is a FIXED 512-window budget, not a geometry-measured value. */
-#entropy_controls {
-    height: auto;
-    margin-bottom: 1;
-}
-
-#entropy_controls Button {
-    min-width: 6;
-    margin-right: 1;
-}
-
-.entropy-page-indicator {
-    height: auto;
-    padding: 1 1 0 1;
-}
+/* The entropy-viewer modal (batch-26 `#entropy_*` / `.entropy-*` rules) was
+ * removed in batch-45 Inc-5 — its function moved into the always-visible
+ * Memory-Map band view (R-TUI-060/061/062). */
 
 .modal-buttons {
     layout: horizontal;

@@ -12,7 +12,7 @@
         "0": 1,
         "1": 1,
         "2": 1,
-        "3": 4,
+        "3": 5,
         "4": 0,
         "5": 0,
         "6": 0
@@ -78,6 +78,12 @@
             "date": "2026-07-14",
             "decision": "Inc-4 APPROVE (autonomous, orchestrator review)",
             "notes": "R-TUI-061 docked At-a-glance histogram+sparkline. Pure band_histogram/sparkline_glyphs/entropy_ramp_glyph; _build_glance_widgets, safe_text over CONSTANT labels (B3, no file text). Docked .map-band-row (horizontal->vertical narrow). 174 passed/0 skipped (+5); C-27 0 frozen; 2 map xfail; ruff clean. AT-072/073+geometry RED captured; pilot-measured 120x30 side-by-side / 80x24 stacked. 3 files (no app/model/frozen). Cosmetic: band bar 60-glyph clips to ~21 cols @120x30 (already clipped ~50 Inc-2/3; responsive width = out-of-scope, needs snapshot regen; postmortem note). Inc-5 (deletion) starting \u2014 FULL independent review."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-15",
+            "decision": "Inc-5 (5a+5b) APPROVE (autonomous, full independent review) \u2014 PHASE 3 CLOSED",
+            "notes": "Retire entropy modal + delete dead grid machinery. Net -2192 lines. C-26 per-symbol reverse-census run BEFORE deletion -> 0 live refs (grep-gate + ruff F821 clean). Deleted EntropyViewerScreen/EntropyCell/MapCell/arrow-nav/#map_open_hex_button/#entropy_*/.map-cell + test_tui_entropy_viewer.py (918L) + tc036s snapshot cells. AT-075/076 (deletion black-box) RED captured via git-stash. Collection 1419 no error; 250 passed/0 failed; C-27 0 frozen; 2 map xfail. Code-review APPROVE-WITH-NITS 0 HIGH; F1 (stale Data-Flow docstring) FIXED. KEEP-list verified live (cell_status/build_detail_text/coverage_stats/OpenInHexRequested/entropy_style.ENTROPY_BAND_MEANING). e freed no collision. coverage preserved (compute_entropy via test_entropy_service.py). PHASE 3 CLOSED: 5 increments (Inc-2 split 2a/2b, Inc-5 split 5a/5b), 0 HIGH batch-wide. Inc-6 (REQUIREMENTS amendments) next, then Phase 4."
         }
     ],
     "obsidian_synced": false,

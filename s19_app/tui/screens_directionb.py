@@ -171,28 +171,6 @@ class ScreenScaffold(Container):
         yield EmptyStatePanel()
 
 
-#: Default grid geometry (columns, rows) used when the panel's live content
-#: region has not been measured yet (headless unit tests, pre-mount renders).
-#: Kept small and fixed so the cell count is a pure function of
-#: ``(span, geometry)`` and never drifts with runtime layout (LLR-041.2, R-4).
-DEFAULT_GRID_COLS = 16
-DEFAULT_GRID_ROWS = 8
-
-#: The VISUAL column count of ``#map_grid``. Must equal the ``grid-size`` of the
-#: ``#map_grid`` rule in ``styles.tcss`` — the two are the single source of
-#: truth for how the cells wrap on screen, so arrow-key Up/Down (``∓ cols``)
-#: lands on the cell the operator sees one row away (US-036). Kept equal to
-#: ``DEFAULT_GRID_COLS`` so headless and rendered geometries agree.
-MAP_GRID_COLS = DEFAULT_GRID_COLS
-
-#: A single kibibyte, used only for the "≈ N KiB/cell" header label arithmetic.
-_KIB = 1024
-
-#: Filled block glyph rendered inside each cell; its colour comes from the
-#: cell's ``sev-*`` CSS class (single source of truth = color_policy), never a
-#: hard-coded severity hex in this module (LLR-041.3).
-_CELL_GLYPH = "█"
-
 #: Total character width the entropy band bar is drawn across (batch-45,
 #: R-TUI-060). Fixed so each run's segment width is a deterministic function of
 #: ``round(_BAND_BAR_WIDTH * run_bytes / total_bytes)`` — independent of live
@@ -994,214 +972,6 @@ def coverage_stats(
     )
 
 
-#: The four arrow keys and their (row, column) focus deltas on the minimap
-#: grid — Left/Right step one cell, Up/Down step one visual row. Consumed by
-#: ``adjacent_cell_index``; kept as data so the handler stays a table lookup.
-_ARROW_DELTAS = {
-    "left": (0, -1),
-    "right": (0, 1),
-    "up": (-1, 0),
-    "down": (1, 0),
-}
-
-
-def adjacent_cell_index(
-    current: int, key: str, count: int, cols: int
-) -> Optional[int]:
-    """Return the grid index one arrow-step from ``current``, clamped.
-
-    Summary:
-        Compute the focus target for an arrow key over a ``count``-cell grid
-        laid out ``cols`` columns wide (US-036 keyboard nav). Left/Right move
-        ``∓1`` in mount order; Up/Down move ``∓cols`` (one visual row). The
-        result is clamped to ``[0, count)`` — stepping off the first/last cell
-        or above the top / below the bottom row is a no-op (returns the same
-        index), so focus never wraps. Returns ``None`` for a non-arrow key or
-        an empty grid. Pure arithmetic — no widget access, no parsing.
-
-    Args:
-        current (int): The focused cell's index in mount order.
-        key (str): The pressed key (one of ``_ARROW_DELTAS`` or anything else).
-        count (int): Total number of cells in the grid.
-        cols (int): Visual column count (``MAP_GRID_COLS``).
-
-    Returns:
-        Optional[int]: The target index (possibly ``== current`` at an edge),
-        or ``None`` when ``key`` is not an arrow or the grid is empty.
-
-    Data Flow:
-        - Called by ``MemoryMapPanel.focus_adjacent_cell`` with the current
-          focus index; its result selects which cell receives ``.focus()``.
-
-    Dependencies:
-        Used by:
-            - ``MemoryMapPanel.focus_adjacent_cell``
-
-    Example:
-        >>> adjacent_cell_index(0, "right", 32, 16)
-        1
-        >>> adjacent_cell_index(0, "left", 32, 16)  # clamp at first cell
-        0
-        >>> adjacent_cell_index(3, "down", 32, 16)
-        19
-        >>> adjacent_cell_index(3, "up", 32, 16)  # clamp above top row
-        3
-        >>> adjacent_cell_index(0, "enter", 32, 16) is None
-        True
-    """
-    delta = _ARROW_DELTAS.get(key)
-    if delta is None or count <= 0 or cols <= 0:
-        return None
-    row_delta, col_delta = delta
-    target = current + col_delta + row_delta * cols
-    if target < 0 or target >= count:
-        return current
-    return target
-
-
-class MapCell(Static):
-    """A single focusable, clickable cell of the Memory Map minimap grid.
-
-    Summary:
-        Carries the address window ``[cell_start, cell_end)`` and status of one
-        grid tile so both the pointer-click and the keyboard-focus/``Enter``
-        paths can resolve which cell was selected (LLR-041.4).
-
-        Navigation (US-036):
-            - ``Tab`` / ``Shift+Tab`` — Textual's default focus traversal steps
-              cell to cell (each cell is ``can_focus``).
-            - Arrow keys — Left/Right move focus to the previous/next cell in
-              mount order; Up/Down move one grid row (``∓ cols``); focus clamps
-              at the grid edges (no wrap). Handled by delegating to
-              ``MemoryMapPanel.focus_adjacent_cell`` (the panel owns the cell
-              list + column count — a single source of truth). Arrows only MOVE
-              focus; they do NOT select.
-            - Click / ``Enter`` — posts :class:`Selected`, which the panel
-              handles by rendering the detail pane (the select step).
-
-        Purely presentational — it stores windows, never parses.
-
-    Args:
-        cell_start (int): Inclusive window start of this cell.
-        cell_end (int): Exclusive window end of this cell.
-        status (str): The cell status (``"valid"`` / ``"invalid"`` / ``"gap"``).
-        classes (str): The space-joined CSS classes (``map-cell`` + the
-            ``sev-*`` status class).
-
-    Returns:
-        None
-
-    Data Flow:
-        - Mounted by ``MemoryMapPanel.render_ranges``; on click/``Enter`` posts
-          :class:`Selected` → ``MemoryMapPanel.on_map_cell_selected``.
-
-    Dependencies:
-        Used by:
-            - ``MemoryMapPanel.render_ranges``
-
-    Example:
-        >>> cell = MapCell(0, 16, "valid", "map-cell sev-ok")
-        >>> (cell.cell_start, cell.cell_end, cell.status)
-        (0, 16, 'valid')
-    """
-
-    can_focus = True
-
-    class Selected(Message):
-        """A map cell was activated (click or ``Enter``).
-
-        Args:
-            cell (MapCell): The activated cell.
-        """
-
-        def __init__(self, cell: "MapCell") -> None:
-            super().__init__()
-            self.cell = cell
-
-    def __init__(
-        self, cell_start: int, cell_end: int, status: str, classes: str
-    ) -> None:
-        super().__init__(safe_text(_CELL_GLYPH), classes=classes)
-        self.cell_start = cell_start
-        self.cell_end = cell_end
-        self.status = status
-
-    def render(self) -> Text:
-        """
-        Summary:
-            Render the cell as a run of ``█`` glyphs filling the cell's
-            current content width, so adjacent cells form a contiguous band
-            instead of lone centered glyphs separated by blank grid-track
-            columns (batch-31 AC-6 / B-15).
-
-        Returns:
-            Text: A markup-safe run of ``_CELL_GLYPH`` sized to the content
-            width (minimum one glyph before layout has assigned a size).
-
-        Data Flow:
-            - Called by Textual on every (re)render, including after resize,
-              so the fill tracks the live grid-track width; colour still comes
-              solely from the ``sev-*`` CSS class on the widget.
-
-        Dependencies:
-            Uses:
-                - ``safe_text`` (markup-safe constant glyph, C-17-consistent)
-            Used by:
-                - Textual render dispatch
-
-        Example:
-            >>> MapCell(0, 16, "valid", "map-cell sev-ok").render().plain
-            '█'
-        """
-        width = max(1, self.content_size.width)
-        return safe_text(_CELL_GLYPH * width)
-
-    def on_click(self) -> None:
-        """Post :class:`Selected` when the cell is clicked."""
-        self.focus()
-        self.post_message(self.Selected(self))
-
-    def on_key(self, event) -> None:  # type: ignore[no-untyped-def]
-        """Handle ``Enter`` (select) and the arrow keys (move focus).
-
-        Summary:
-            ``Enter`` posts :class:`Selected` (the select step). An arrow key
-            moves focus to the adjacent cell via the parent
-            :class:`MemoryMapPanel` and is CONSUMED (``event.stop()``) so it
-            does not also scroll the enclosing ``#map_content``
-            ``ScrollableContainer`` — the consumption is scoped to a focused
-            cell only, so arrows retain their normal scroll behaviour when
-            focus is elsewhere. Arrows never select.
-
-        Args:
-            event: The Textual key event (``event.key`` is the key name).
-
-        Dependencies:
-            Uses:
-                - ``MemoryMapPanel.focus_adjacent_cell``
-            Used by:
-                - Textual key-event dispatch (only while this cell is focused)
-        """
-        if event.key == "enter":
-            event.stop()
-            self.post_message(self.Selected(self))
-            return
-        if event.key in _ARROW_DELTAS:
-            panel = self._map_panel()
-            if panel is not None:
-                event.stop()
-                panel.focus_adjacent_cell(self, event.key)
-
-    def _map_panel(self) -> Optional["MemoryMapPanel"]:
-        """Return the enclosing ``MemoryMapPanel`` ancestor, or ``None``."""
-        node = self.parent
-        while node is not None:
-            if isinstance(node, MemoryMapPanel):
-                return node
-            node = node.parent
-        return None
-
-
 class RegionRow(Static):
     """A single clickable entropy region-list row (batch-45, R-TUI-062).
 
@@ -1274,9 +1044,10 @@ class MemoryMapPanel(Container):
         band legend, merged by ``_merge_band_runs`` from the loader-computed
         ``LoadedFile.entropy_windows`` handed to ``render_ranges``. This
         replaced the batch-27 ``sev-*`` validity cell grid (the ``MapCell`` +
-        arrow-nav machinery below is retained as dead code pending its Inc-5
-        deletion). It is a pure presentational widget — it performs NO entropy,
-        coverage, parsing or validation of its own (LLR-045A.2 / LLR-041.7).
+        arrow-nav machinery was removed in batch-45 Inc-5; a single click on a
+        region row drives detail + hex nav via ``on_region_row_activated``). It
+        is a pure presentational widget — it performs NO entropy, coverage,
+        parsing or validation of its own (LLR-045A.2 / LLR-041.7).
         Band colours route through the ``band-*`` CSS classes owned by
         ``entropy_style`` + ``styles.tcss`` (LLR-045A.3); no colour hex is
         hard-coded. The coverage stats strip is retained unchanged. With no
@@ -1289,17 +1060,20 @@ class MemoryMapPanel(Container):
         None
 
     Data Flow:
-        - ``render_ranges`` receives the pre-computed ``ranges`` and
-          ``range_validity`` from ``S19TuiApp.update_memory_map``, derives the
-          image span and per-cell status by arithmetic on those already-parsed
-          values, and mounts one ``.map-cell`` widget per cell into
-          ``#map_grid`` carrying its ``sev-*`` status class.
-        - Selecting a cell populates ``#map_detail`` (status chip, window,
-          covering region, cell-scoped issues, region count); the
-          ``#map_stats`` strip shows the seven coverage statistics derived by
-          ``coverage_stats`` (US-037 / LLR-041.8).
-        - With no ranges the header shows the neutral empty note, no cells are
-          mounted, and the stats strip is blanked (LLR-041.9).
+        - ``render_ranges`` receives the pre-computed ``ranges`` +
+          ``range_validity`` + ``entropy_windows`` from
+          ``S19TuiApp.update_memory_map``, merges contiguous same-band windows
+          via ``_merge_band_runs``, and mounts ``.map-band-seg`` segments (the
+          band bar) plus the ``.map-region-row`` region list, the band legend,
+          and the docked ``.at-a-glance`` histogram/sparkline into
+          ``#map_grid`` — no per-cell ``.map-cell`` widgets are mounted.
+        - Clicking a region row drives ``on_region_row_activated`` → populates
+          ``#map_detail`` (via ``build_detail_text``: status chip, covering
+          region, A2L symbols, issues) and posts ``OpenInHexRequested`` for
+          single-click hex nav; the ``#map_stats`` strip shows the seven
+          coverage statistics derived by ``coverage_stats`` (US-037 / LLR-041.8).
+        - With no ranges / no entropy the header shows the neutral empty note,
+          no segments/rows are mounted, and the stats strip is blanked (LLR-041.9).
         - ``#map_grid`` and ``#map_detail`` sit in a ``#map_body`` sub-container
           laid horizontally when wide and stacked under ``width-narrow`` — the
           reflow rules live in ``styles.tcss`` (LLR-041.10).
@@ -1320,10 +1094,7 @@ class MemoryMapPanel(Container):
     """
 
     _EMPTY_TEXT = "No file loaded - press Ctrl+L (or 'l') to load a file."
-    _DETAIL_HINT = (
-        "Click a cell, or focus the grid and use arrows "
-        "(<-/->/up/down) then Enter to inspect."
-    )
+    _DETAIL_HINT = "Click a region row to inspect it and jump to the hex view."
 
     class OpenInHexRequested(Message):
         """The operator asked to jump to the hex view at a cell's start (US-036).
@@ -1362,32 +1133,28 @@ class MemoryMapPanel(Container):
         #: (LLR-041.5 / LLR-041.8, arch MINOR-3). Never re-derived here.
         self._issues: List[ValidationIssue] = []
         #: The enriched A2L tags handed in by ``update_memory_map`` (R-TUI-041
-        #: R-3) — the read-only source for naming a region/cell by the A2L
-        #: symbol(s) overlapping it (detail pane + per-cell tooltip). Never
-        #: re-parsed; joined via ``symbols_in_window``.
+        #: R-3) — the read-only source for naming a region by the A2L symbol(s)
+        #: overlapping it (region-triggered detail pane). Never re-parsed;
+        #: joined via ``symbols_in_window``.
         self._a2l_tags: List[Mapping[str, Any]] = []
-        #: The currently-selected cell's start address, or ``None`` before any
-        #: selection — carried on the Open-in-Hex message (LLR-041.6).
+        #: The currently-selected region's start address, or ``None`` before any
+        #: selection — carried on the Open-in-Hex message (LLR-041.6 / R-TUI-062).
         self._selected_cell_start: Optional[int] = None
-        #: The visual column count the last grid was laid out with — used by
-        #: arrow-key Up/Down (``∓ cols``). Equals ``MAP_GRID_COLS`` (the CSS
-        #: ``grid-size``), the single source of truth for on-screen wrapping.
-        self._grid_cols: int = MAP_GRID_COLS
 
     def compose(self) -> ComposeResult:
-        """Compose the header, the cell grid and the (empty) placeholders.
+        """Compose the header, the band-view body and the (empty) placeholders.
 
         Summary:
-            Yield the full-width "≈ N KiB/cell" header, then a ``#map_body``
-            horizontal sub-container holding the ``#map_grid`` cell grid and
-            the ``#map_detail`` pane side by side (the wide-regime layout;
+            Yield the full-width header, then a ``#map_body`` horizontal
+            sub-container holding the ``#map_grid`` band-view container and the
+            ``#map_detail`` pane side by side (the wide-regime layout;
             ``#map_body`` stacks them vertically under ``width-narrow`` — the
-            reflow lives in ``styles.tcss``, LLR-041.10), and finally the
-            full-width ``#map_stats`` coverage strip (US-037 / LLR-041.8).
+            reflow lives in ``styles.tcss``), and finally the full-width
+            ``#map_stats`` coverage strip (US-037 / LLR-041.8).
 
         Returns:
-            ComposeResult: the header, the grid+detail body, and the stats
-            strip.
+            ComposeResult: the header, the band-view + detail body, and the
+            stats strip.
 
         Dependencies:
             Used by:
@@ -1398,42 +1165,11 @@ class MemoryMapPanel(Container):
             Container(id="map_grid"),
             Container(
                 Static(safe_text(self._DETAIL_HINT), id="map_detail_body"),
-                Button(
-                    "Open in Hex View",
-                    id="map_open_hex_button",
-                    classes="hidden",
-                ),
                 id="map_detail",
             ),
             id="map_body",
         )
         yield Container(Static("", id="map_stats_body"), id="map_stats")
-
-    def _grid_geometry(self) -> Tuple[int, int]:
-        """Return the (cols, rows) grid geometry to scale cells against.
-
-        Summary:
-            Read the live content-region size of ``#map_grid`` when the panel
-            is mounted and measured, else fall back to the fixed
-            ``DEFAULT_GRID_COLS``/``DEFAULT_GRID_ROWS``. Kept separate so tests
-            can reason about the cell count as a pure function of geometry
-            (LLR-041.2, R-4).
-
-        Returns:
-            Tuple[int, int]: ``(cols, rows)`` — always ``>= 1`` each.
-
-        Dependencies:
-            Used by:
-                - ``render_ranges``
-        """
-        try:
-            grid = self.query_one("#map_grid", Container)
-            size = grid.content_size
-            cols = size.width if size.width > 0 else DEFAULT_GRID_COLS
-            rows = size.height if size.height > 0 else DEFAULT_GRID_ROWS
-        except Exception:
-            cols, rows = DEFAULT_GRID_COLS, DEFAULT_GRID_ROWS
-        return (max(1, cols), max(1, rows))
 
     def render_ranges(
         self,
@@ -1693,45 +1429,6 @@ class MemoryMapPanel(Container):
         )
         return Vertical(*children, classes="at-a-glance")
 
-    def _cell_tooltip(
-        self, cell_start: int, cell_end: int, status: str
-    ) -> Text:
-        """Markup-safe hover tooltip for one ``MapCell`` (R-TUI-041 R-3).
-
-        Summary:
-            Compose the cell's address window + status and, when A2L symbol(s)
-            overlap the cell window, their name(s) (capped) — as a Rich
-            ``Text``. The return MUST be ``Text`` (never a ``str``): Textual
-            8.2.8 renders a bare ``str`` tooltip through ``markup=True``
-            (``Content.from_markup``), so a hostile A2L name like ``evil[red]``
-            would inject markup or raise ``MarkupError`` on hover; a ``Text`` is
-            rendered via ``Content.from_rich_text`` literally (security review
-            F1 / the batch-27 markup BLOCKER class). The window + status are
-            developer-formatted ints/literals; only the symbol names are
-            file-derived, and they flow through ``symbol_list_text`` (safe).
-
-        Args:
-            cell_start (int): Inclusive cell-window start.
-            cell_end (int): Exclusive cell-window end.
-            status (str): The cell status literal (``valid``/``invalid``/``gap``).
-
-        Returns:
-            Text: The markup-safe tooltip content.
-
-        Dependencies:
-            Uses:
-                - ``symbols_in_window`` / ``symbol_list_text``
-            Used by:
-                - ``render_ranges`` (per-cell ``MapCell.tooltip``)
-        """
-        text = Text()
-        text.append(f"0x{cell_start:08X}-0x{cell_end - 1:08X} ({status})")
-        names = symbols_in_window(self._a2l_tags, cell_start, cell_end)
-        if names:
-            text.append("\n")
-            text.append(symbol_list_text(names))
-        return text
-
     def _render_stats(
         self,
         ranges: Sequence[Tuple[int, int]],
@@ -1818,12 +1515,12 @@ class MemoryMapPanel(Container):
         return text
 
     def _reset_detail(self) -> None:
-        """Clear the detail pane back to its neutral hint and hide the jump.
+        """Clear the detail pane back to its neutral hint.
 
         Summary:
-            Return the detail body to the "select a cell" hint and hide the
-            Open-in-Hex button — used on every fresh render so a stale
-            selection from a prior file never lingers.
+            Return the detail body to the "click a region row" hint — used on
+            every fresh render so a stale selection from a prior file never
+            lingers.
 
         Dependencies:
             Used by:
@@ -1831,12 +1528,10 @@ class MemoryMapPanel(Container):
         """
         try:
             body = self.query_one("#map_detail_body", Static)
-            button = self.query_one("#map_open_hex_button", Button)
         except Exception:
             return
         self._selected_cell_start = None
         body.update(safe_text(self._DETAIL_HINT))
-        button.add_class("hidden")
 
     def build_detail_text(
         self,
@@ -1928,32 +1623,6 @@ class MemoryMapPanel(Container):
         text.append(f"{region_issue_count} issue(s) in region")
         return text
 
-    def on_map_cell_selected(self, event: "MapCell.Selected") -> None:
-        """Render the detail pane for the activated cell (LLR-041.4).
-
-        Summary:
-            Handle a :class:`MapCell.Selected` message by composing the
-            markup-safe detail body for that cell and revealing the
-            Open-in-Hex jump. Stores the cell start so the jump can carry it.
-
-        Args:
-            event (MapCell.Selected): The cell-activation message.
-
-        Dependencies:
-            Uses:
-                - ``build_detail_text``
-            Used by:
-                - Textual message dispatch (from ``MapCell``)
-        """
-        event.stop()
-        cell = event.cell
-        self._selected_cell_start = cell.cell_start
-        body = self.query_one("#map_detail_body", Static)
-        body.update(
-            self.build_detail_text(cell.cell_start, cell.cell_end, cell.status)
-        )
-        self.query_one("#map_open_hex_button", Button).remove_class("hidden")
-
     def on_region_row_activated(self, event: "RegionRow.Activated") -> None:
         """Handle a region-row click: populate detail + jump to hex (R-TUI-062).
 
@@ -1986,75 +1655,6 @@ class MemoryMapPanel(Container):
         body = self.query_one("#map_detail_body", Static)
         body.update(self.build_detail_text(start, end, status))
         self.post_message(self.OpenInHexRequested(start))
-
-    def focus_adjacent_cell(self, current: "MapCell", key: str) -> None:
-        """Move focus to the cell one arrow-step from ``current`` (US-036).
-
-        Summary:
-            Resolve the target cell index from ``adjacent_cell_index`` over the
-            current ``#map_grid`` children (mount order) and the stored visual
-            column count, then ``.focus()`` it. Focus clamps at the grid edges
-            (no wrap). This only MOVES focus — selection stays on click/Enter,
-            matching AT-036a (press Right, then Enter). The panel owns the cell
-            list + column count, so ``MapCell`` needs no sibling access.
-
-        Args:
-            current (MapCell): The currently-focused cell.
-            key (str): The arrow key pressed (``left``/``right``/``up``/
-                ``down``).
-
-        Returns:
-            None
-
-        Data Flow:
-            - Reads the ``#map_grid`` ``MapCell`` children; computes the target
-              via ``adjacent_cell_index``; calls ``.focus()`` on it (or on the
-              same cell at an edge — a harmless no-op move).
-
-        Dependencies:
-            Uses:
-                - ``adjacent_cell_index``
-            Used by:
-                - ``MapCell.on_key`` (arrow keys)
-        """
-        try:
-            grid = self.query_one("#map_grid", Container)
-        except Exception:
-            return
-        cells = list(grid.query(MapCell))
-        if not cells or current not in cells:
-            return
-        index = cells.index(current)
-        target = adjacent_cell_index(index, key, len(cells), self._grid_cols)
-        if target is None:
-            return
-        cells[target].focus()
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Post :class:`OpenInHexRequested` for the Open-in-Hex button.
-
-        Summary:
-            Translate the detail pane's "Open in Hex View" press into an
-            :class:`OpenInHexRequested` carrying the selected cell's start so
-            ``app.py`` drives ``update_hex_view`` and switches screen — the
-            panel renders no hex itself (LLR-041.6).
-
-        Args:
-            event (Button.Pressed): The Textual button-press event.
-
-        Dependencies:
-            Uses:
-                - ``OpenInHexRequested``
-            Used by:
-                - Textual button-press dispatch
-        """
-        if event.button.id != "map_open_hex_button":
-            return
-        event.stop()
-        if self._selected_cell_start is not None:
-            self.post_message(
-                self.OpenInHexRequested(self._selected_cell_start)
-            )
 
 
 def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:

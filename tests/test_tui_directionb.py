@@ -3217,53 +3217,9 @@ def test_at035_map_shows_band_bar_and_summary_header(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _mounted_map_panel(app: "S19TuiApp") -> None:
-    """Install ``case_02`` and drive ``update_memory_map`` on the map screen.
-
-    Populates the panel's ``_ordered_ranges`` / ``_issues`` and mounts the
-    ``MapCell`` grid so a test can select cells.
-    """
-    _install_case_02_loaded_file(app)
-    app.action_show_screen("map")
-    app.update_memory_map()
-
-
-def _first_cell_with_status(cells: "list", status: str) -> "object":
-    """Return the first ``MapCell`` whose ``status`` matches, else ``None``."""
-    for cell in cells:
-        if cell.status == status:
-            return cell
-    return None
-
-
-def _cell_containing(cells: "list", address: int) -> "object":
-    """Return the ``MapCell`` whose window contains ``address``, else ``None``.
-
-    Live grid geometry can drift between two ``update_memory_map`` renders
-    (the panel reads ``#map_grid.content_size``, the Inc-1 CARRY-F2 note), so a
-    seed-issue test must resolve the cell by the address it anchored — not by
-    cell index or "first invalid".
-    """
-    for cell in cells:
-        if cell.cell_start <= address < cell.cell_end:
-            return cell
-    return None
-
-
-def _invalid_range_start(app: "S19TuiApp") -> int:
-    """Return the start of the first INVALID range in ``current_file``.
-
-    Anchoring a seeded issue at a real invalid-range address (not a cell's
-    arbitrary window centre, which for the sparse ``case_04`` image falls in a
-    gap) guarantees the containing cell is invalid AND that a covering region
-    is found, so the region-issue count is non-zero.
-    """
-    ranges = app.current_file.ranges
-    validity = app.current_file.range_validity
-    for (start, _end), valid in zip(ranges, validity):
-        if not valid:
-            return start
-    raise AssertionError("fixture must have an invalid range")
+# RETIRED batch-45 Inc-5: the ``_mounted_map_panel`` / ``_first_cell_with_status``
+# / ``_cell_containing`` / ``_invalid_range_start`` helpers served only the
+# retired MapCell grid tests (removed Inc-2..5); deleted with the MapCell class.
 
 
 def test_tc041_4_build_detail_text_content(tmp_path: Path) -> None:
@@ -3406,35 +3362,9 @@ def test_at_r3_detail_no_a2l_region_bounds_only() -> None:
 # literally`` (build_detail_text, re-wired to region-row selection in Inc-3).
 
 
-def test_tc041_4b_arrow_adjacent_index_and_edge_clamp() -> None:
-    """Arrow nav resolves the adjacent cell index and clamps at edges
-    (TC-041.4b / US-036 keyboard nav).
-
-    Intent: the arrow-key focus target is a pure function of ``(current, key,
-    count, cols)`` — Right/Down step one cell / one visual row; Left on the
-    first cell and Up on the top row clamp (no wrap); a non-arrow key returns
-    ``None`` so ``on_key`` leaves it for ``Enter`` / the default handler. This
-    is the deterministic core the black-box AT-036a traversal binds to.
-    """
-    from s19_app.tui.screens_directionb import MAP_GRID_COLS, adjacent_cell_index
-
-    cols = MAP_GRID_COLS  # 16, == the #map_grid CSS grid-size
-    count = 40
-
-    # Left/Right step ±1 in mount order.
-    assert adjacent_cell_index(0, "right", count, cols) == 1
-    assert adjacent_cell_index(5, "left", count, cols) == 4
-    # Up/Down step ∓cols (one visual row).
-    assert adjacent_cell_index(3, "down", count, cols) == 3 + cols
-    assert adjacent_cell_index(3 + cols, "up", count, cols) == 3
-    # Edge clamps: no wrap past the first / last cell or off the top / bottom.
-    assert adjacent_cell_index(0, "left", count, cols) == 0
-    assert adjacent_cell_index(count - 1, "right", count, cols) == count - 1
-    assert adjacent_cell_index(2, "up", count, cols) == 2
-    assert adjacent_cell_index(count - 1, "down", count, cols) == count - 1
-    # Non-arrow / empty grid → None (Enter and defaults are left untouched).
-    assert adjacent_cell_index(0, "enter", count, cols) is None
-    assert adjacent_cell_index(0, "right", 0, cols) is None
+# RETIRED batch-45 Inc-5: ``test_tc041_4b_arrow_adjacent_index_and_edge_clamp``
+# tested ``adjacent_cell_index`` (the MapCell arrow-nav math), removed with the
+# grid. Region→hex nav is single-click (AT-074); no keyboard grid traversal.
 
 
 def test_tc041_5_cell_issue_join_boundary_and_negative() -> None:
@@ -3665,12 +3595,6 @@ _CASE_02_LARGEST_GAP = 2_147_549_173
 _CASE_02_VALID_COUNT = 4
 _CASE_02_INVALID_COUNT = 0
 _CASE_02_COVERAGE_PCT = _CASE_02_COVERED_BYTES / _CASE_02_IMAGE_SPAN * 100
-
-# The live rendered cell count for case_02 at the primary 120x30 size — pinned
-# by the CARRY-F2 guard below so a live-geometry drift fails deterministically
-# (the shipped panel reads `#map_grid.content_size`). Measured value; update in
-# lockstep with any deliberate layout change + the regenerated SVG baseline.
-_EXPECTED_MAP_CELLS_120x30 = 128
 
 
 def test_tc041_8_coverage_stats_exact_case_02_literals() -> None:
@@ -4577,6 +4501,70 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
     assert narrow["narrow"], f"80x24 must be the narrow regime; {narrow}"
     assert narrow["glance"][1] > narrow["bar"][1], (
         f"at 80x24 the glance must stack below the band bar; {narrow}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-45 Inc-5 (R-TUI-050/051 retire) — the standalone entropy pop-up is
+# removed; its function lives in the always-visible Memory-Map band view. A
+# deletion still owes an observation (AT-075/076).
+# ---------------------------------------------------------------------------
+
+
+def test_at075_e_key_opens_no_modal_map_has_legend(tmp_path: Path) -> None:
+    """Black-box: pressing ``e`` opens no modal, and the map's band legend is
+    present (AT-075 / R-TUI-050/051 retire).
+
+    RED pre-delete: ``e`` was bound to ``show_entropy`` and pushed the
+    ``EntropyViewerScreen`` modal (the screen stack grew).
+    """
+    from textual.screen import ModalScreen
+
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[int, int, bool, list]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            before = len(app.screen_stack)
+            await pilot.press("e")
+            await pilot.pause()
+            after = len(app.screen_stack)
+            is_modal = isinstance(app.screen, ModalScreen)
+            legend = [_widget_plain(r) for r in app.query(".map-legend-row")]
+            return before, after, is_modal, legend
+
+    before, after, is_modal, legend = asyncio.run(_drive())
+    assert after == before, (
+        f"pressing 'e' must push no modal (stack {before} -> {after})"
+    )
+    assert not is_modal, "no ModalScreen may be active after pressing 'e'"
+    joined = " ".join(legend)
+    for band in ("constant/padding", "low", "medium", "high/random"):
+        assert band in joined, f"the map band legend must list {band!r}; got {legend}"
+
+
+def test_at076_entropy_screen_and_action_removed() -> None:
+    """Black-box: ``EntropyViewerScreen`` is gone from ``screens``, and
+    ``S19TuiApp`` has no ``show_entropy`` action or ``e`` binding (AT-076).
+
+    RED pre-delete: all three existed.
+    """
+    import s19_app.tui.screens as screens_module
+
+    assert not hasattr(screens_module, "EntropyViewerScreen"), (
+        "EntropyViewerScreen must be removed from s19_app.tui.screens"
+    )
+    assert not hasattr(S19TuiApp, "action_show_entropy"), (
+        "S19TuiApp.action_show_entropy must be removed"
+    )
+    bound = {b.key: b.action for b in S19TuiApp.BINDINGS if hasattr(b, "key")}
+    assert bound.get("e") != "show_entropy", (
+        f"the 'e' -> show_entropy binding must be removed; got {bound.get('e')!r}"
     )
 
 
