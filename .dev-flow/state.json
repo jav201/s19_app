@@ -1,106 +1,124 @@
 {
     "project": "s19_app",
     "language": "en",
-    "batch_id": "2026-07-12-batch-38",
-    "batch_objective": "P3 backlog set B-16..B-19 (4 stories, US-065..068). US-065 (B-16): relabel the '#patch_doc_path_input' placeholder + section copy so the free-path field reads as an alternative to the patches/ dropdown for the SAME primary change-set, not a second file (screens_directionb.py:1854/1904). US-066 (B-17): defensive WARNING-severity validation issue for A2L addresses > 0xFFFFFFFF, built TUI-side in services/a2l_service.enrich_tags_and_render (validation/ stays engine-frozen) + hostile-input AT. US-067 (B-18): info/help popup for the variant selector (Select#patch_variant_select, app.py:3071) via a new info button + help modal. US-068 (B-19): patch-editor undo/redo + per-entry JSON edit popup (distinct from batch-37's whole-set ChangeSetJsonScreen); heaviest story, may SPLIT at Phase 2. ~4-6 increments.",
+    "batch_id": "2026-07-14-batch-45",
+    "batch_objective": "Memory-map ENTROPY 'Band-Bands' view (field-audit N1/U3/N3): replace the Memory Map's validation-only cell colouring with an entropy visualization \u2014 a proportional segmented region bar (contiguous same-band runs, width proportional to size) + per-region list (address/size/band) + docked 'At a glance' histogram; band model mirrors entropy_service.ENTROPY_BANDS; textures + grid (U3); region rows drive click-to-hex (N3). AND retire the entropy pop-up (EntropyViewerScreen/US-036 + batch-37 paging/sort/legend R-TUI-050/051) \u2014 its function moves into and is superseded by the Memory Map view. Requirement amendments on R-TUI-035/036/050/051 (\u00a76.5 before/after).",
     "current_phase": 6,
-    "phase_status": "in-progress",
-    "standing_authorization": "BATCH-38-SPECIFIC, operator AskUserQuestion 2026-07-12 at kickoff. RUN MODE = 'Autonomous + self-merge' WITH ONE OPERATOR REFINEMENT (verbatim): 'Yes, record all autonomous decisions as your first response states. But only ask me to approve the plan.' INTERPRETATION: the agent runs ALL phase gates + increment gates autonomously (full review packets in-conversation at each, self-approving with a named exit-criteria axis check), NO stop-for-approval at gates EXCEPT the single Phase-0 PLAN APPROVAL gate (operator explicitly wants to approve the plan before execution). MERGE AUTHORITY GRANTED (self-merge): after PR opened + CI green, a FINAL independent PR-level qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression via C-26 reverse census, every gate carry discharged) MUST come back clean; only then may the agent merge, then proceed to /dev-flow-sync. A HIGH finding BLOCKS the merge and returns to the operator. DECISION-RECORDING: every autonomous decision recorded in PLAN.md decision log + this decisions_log + 05-postmortem + carried to vault at sync. GUARDRAILS: full suite + engine-frozen guards + independent code-review GREEN before PR; snapshot regen canonical-CI-only (LOCAL REGEN FORBIDDEN); propose-not-encode new dev-flow controls (AskUserQuestion before encoding). PER-BATCH RULE (feedback_standing_auth_per_batch): batch-38-only; NEVER carried to batch-39; re-ask at next kickoff. Return to operator on: plan approval (the one gate), a HIGH final-QA finding, a genuine operator-only decision, or completion.",
-    "route": "full /dev-flow, autonomous+self-merge (plan-approval gate only). 4 stories (B-16..B-19 P3). Successor to batch-37 (merged PRs #68/#69 on main, 18f1d30/5a6c45b, vault-synced 2026-07-12). Fresh worktree memory-tool-baseline-backlog-30f7df off origin/main 5a6c45b. NOTE: .dev-flow is gitignored + per-worktree; batch history lives in the main checkout, batch-38 scaffolded fresh here.",
-    "rc1": "PASS @ 5a6c45b (2026-07-12). merge-base == origin/main tip == HEAD == 5a6c45b confirmed (git fetch clean, no rebase needed). Already-shipped grep: 0 source hits for the B-16..B-19 outcomes -- B-16 placeholder still 'path to v2 change-set .json' (screens_directionb.py:1904); B-17 no >0xFFFFFFFF handling in a2l.py or validation/; B-18 variant Select exists but no info/help popup; B-19 no undo/redo, per-entry Add/Edit/Remove buttons exist (1885-87) but no per-entry JSON popup (batch-37 shipped whole-SET popup only). All 4 stories proceed. Feasibility flag: B-17 -- validation/ (engine.py/model.py/rules.py) is engine-frozen, so the WARNING issue is constructed TUI-side in services/a2l_service (NOT frozen); ValidationSeverity.WARNING confirmed present (model.py:13).",
+    "phase_status": "approved",
+    "standing_authorization": "BATCH-45-SPECIFIC, operator AskUserQuestion 2026-07-14 at kickoff. RUN MODE = 'Plan-approval gate' (verbatim option label + description: 'I present the spec/plan and stop for your approval before implementing; then drive to PR, stopping before merge'). INTERPRETATION: a SINGLE operator gate at the Phase-1 plan/spec \u2014 the agent runs Phase 0->1, PRESENTS the spec, and STOPS for operator approval before Phase 2/3. AFTER approval the agent runs Phases 2->6 AUTONOMOUSLY (review packets in-conversation at each gate, self-approving with a named exit-criteria axis check), through to 'PR opened + CI green'. MERGE = NOT GRANTED: stop there; the OPERATOR merges. Never self-merge. DECISION-RECORDING: every autonomous decision -> PLAN.md log + decisions_log + 05-postmortem + vault at sync. GUARDRAILS: engine-frozen set OFF-LIMITS (core.py/hexfile.py/range_index.py/validation/ /tui/a2l.py/tui/mac.py/tui/color_policy.py); entropy colours via a NEW band class map (do NOT edit color_policy.py) or frozen css_class_for_severity read-only; snapshot regen canonical-CI ONLY (LOCAL REGEN FORBIDDEN); C-27 frozen dual-guard each increment; requirement amendments on locked R-TUI-035/036/050/051 via \u00a76.5 before/after (never silent edit). PER-BATCH RULE: batch-45-only; NEVER carried. Return to operator on: the Phase-1 plan-approval gate, PR-opened+CI-green (for merge), or a genuine operator-only decision. >>> UPDATE 2026-07-14 (operator: 'Approved, take it all the way to merge.'): PLAN APPROVED (Phase-1 gate) + MERGE AUTHORITY NOW GRANTED. Agent runs Phases 2->6 autonomously (review packets in-conversation at each gate, self-approving with a named axis check) through PR opened + CI green; then a FINAL independent PR-level qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression via C-26, every gate carry discharged) MUST come back clean; only then merge, then /dev-flow-sync. A HIGH final-QA finding BLOCKS the merge and returns to operator. Snapshot regen = canonical-CI follow-up PR post-merge.",
+    "route": "full /dev-flow, plan-approval gate (operator approves gates; no self-merge). Feature batch off origin/main a015e28 (post #78 snapshot regen, #79 placeholder sweep, #80 field-audit backlog). Origin = operator-approved prototype pick: prototypes/memory_map_entropy.prototype.py Variant 3 BAND BANDS. Branch feat/batch-45-map-entropy.",
+    "rc1": "PASS @ a015e28 (2026-07-14). git fetch clean; branch cut off origin/main tip a015e28 (#80 merged). Already-shipped check: the ENTROPY MAP (N1) is NOT-IMPLEMENTED (field audit: map colours by validation-overlap only; entropy never plumbed into render_ranges); EntropyViewerScreen EXISTS (to be retired). Stories proceed.",
     "iterations_per_phase": {
         "0": 1,
         "1": 1,
-        "2": 2,
-        "3": 1,
+        "2": 1,
+        "3": 6,
         "4": 1,
         "5": 1,
         "6": 1
     },
     "artifacts": {
-        "plan": ".dev-flow/2026-07-12-batch-38/PLAN.md",
-        "1": ".dev-flow/2026-07-12-batch-38/01-requirements.md",
-        "1b": ".dev-flow/2026-07-12-batch-38/01b-qa-strategy-and-verification.md",
-        "2": ".dev-flow/2026-07-12-batch-38/02-review.md",
-        "3": ".dev-flow/2026-07-12-batch-38/03-increments/",
-        "4": ".dev-flow/2026-07-12-batch-38/04-validation.md",
-        "5": ".dev-flow/2026-07-12-batch-38/05-postmortem.md",
-        "6": ".dev-flow/2026-07-12-batch-38/06-docs/"
+        "plan": ".dev-flow/2026-07-14-batch-45/PLAN.md",
+        "1": ".dev-flow/2026-07-14-batch-45/01-requirements.md",
+        "1b": ".dev-flow/2026-07-14-batch-45/01b-qa-strategy-and-verification.md",
+        "2": ".dev-flow/2026-07-14-batch-45/02-review.md",
+        "3": ".dev-flow/2026-07-14-batch-45/03-increments/",
+        "4": ".dev-flow/2026-07-14-batch-45/04-validation.md",
+        "5": ".dev-flow/2026-07-14-batch-45/05-postmortem.md",
+        "6": ".dev-flow/2026-07-14-batch-45/06-docs/"
     },
     "decisions_log": [
         {
-            "phase": 5,
-            "date": "2026-07-12",
-            "decision": "approved (autonomous, proceed to Phase 6)",
-            "notes": "05-postmortem.md complete (architect+qa lenses). Metrics: 5 stories US-065..068b, iters 0:1/1:1/2:2/3:1/4:1/5:1; 12/12 findings closed (2 blocker+4 major+6 minor/low), 0 story-kill, security PASS; 5/5 increment reviews 0 HIGH; Phase-4 gate 1377 passed/0 fail/exit 0; 6 ATs C-18 single-node; ledger 1358->1377 (+19); 0 frozen diffs. SCOPE DRIFT NONE (US-068 split pre-flagged Phase 0, every AT amendment folded into an existing increment C-21). Root causes: F-1 Inc-2 freeze-TEST-file miss (per-increment guard ran test_engine_unchanged SOURCE-freeze but not test_tc032 TEST-file-freeze -> AT-066a in frozen test_tui_a2l.py passed Inc-2, caught Inc-5, test-only fix 0 shipped impact); F-2 Phase-1 multi-author contract drift (intake/PLAN/01b vs correct §4 on producer sink/issue-code/AT target -- Phase-2 reconciliation caught as designed). CONTROL CANDIDATES (PROPOSE-not-encode, AskUserQuestion at completion per authorization guardrail): C-CAND-A (primary) per-increment frozen guard runs BOTH test_engine_unchanged + test_tc032/tc031 -- extends engine-freeze discipline, origin F-1; C-CAND-B (secondary) Phase-1 shared-contract convergence step, origin F-2, left-shift efficiency not correctness gap. Batch-39 backlog: 2 patch snapshot cells canonical regen (PR like #67/#69); Bookmarks screen; hygiene carries (S-F7, native-paste 64KiB cap incl #entry_json_text, canonicalizer consolidation, setattr helper, P-1/P-2/P-3); batch-38 LOW carries (Inc-4 F1 checks-panel-stale, F2 ctrl+z/y binding, Inc-5 cross-entry collision note); C-CAND-A/B encode decision. Phase 6 dispatched (docs-writer + presentation-builder)."
-        },
-        {
-            "phase": 4,
-            "date": "2026-07-12",
-            "decision": "approved (autonomous) -- PASS all axes",
-            "notes": "Phase-4 validation PASS. Gate run C-25 orchestrator-owned (first background run orphaned at 52% by a session teardown -- NOT a test failure; re-launched, completed CLEAN). Result: 1377 passed / 2 skipped / 20 deselected / 5 xfailed / 0 failed / exit 0 / 12:12. Passed delta 1358->1377 = +19 reconciles increment ledger EXACTLY (Inc1 +2, Inc2 +5, Inc3 +3, Inc4 +4, Inc5 +5; AT-066a relocation net 0). NO cross-increment regression (contrast batch-37 TC-319 first-run fail). 6 ATs each reconciled to EXACTLY ONE on-disk node (C-18) with real counterfactuals: AT-065a test_tui_directionb.py:7492 (RED v2 copy); AT-066a test_tui_a2l_issue_recolor.py:532 (RELOCATED from frozen test_tui_a2l.py, RED 0 warnings); AT-066b :446 (RED MarkupError/consumed brackets); AT-067a test_tui_variants.py:435 (RED NoMatches real pilot.click); AT-068a test_tui_patch_editor_v2.py:3121 + A-01 branch tc344:3201 (RED NoMatches); AT-068b :3396 + A-01 branch tc345:3499 (RED ImportError). Layer A TC-332..345 all GREEN mapped to R-TUI-054..058. xfail 5 = 3 pre-existing (test_tui_app:1784, test_tui_public_api:162, test_validation_engine:211) + 2 batch-38 patch-cell snapshot drift (patch-comfortable-80x24/120x30, US-065+US-067 copy/button, xfail strict=False) -- NO xfail masks a regression. Engine-frozen: git diff --name-only main = 0 frozen SOURCE + 0 frozen TEST files; test_tui_a2l.py byte-identical to main; tc031/tc032/engine_unchanged 6 passed. No blocker. Residuals to Phase 6: REQUIREMENTS.md R-TUI-054..058 + BACKLOG refresh + docs; canonical snapshot regen for the 2 patch xfail cells (like #67/#69). Carries: Inc-2 F1 (test-helper dup, RESOLVED by relocation), Inc-4 F1/F2 LOW (checks-panel-stale, discoverability ctrl+z/y), Inc-5 F1 LOW (cross-entry collision at doc gate). Phase 5 dispatched (architect + qa)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-12",
-            "decision": "Inc-5 (US-068b) approved + freeze fix -- PHASE 3 CLOSED (autonomous)",
-            "notes": "Per-entry JSON popup + A-01 guard GREEN. 5 files (screens.py EntryJsonScreen ModalScreen single-entry seed mirrors ChangeSetJsonScreen; change_service.py entry_seed_json + edit_entry_json + json import; screens_directionb.py EntryEditJsonRequested + NEW #patch_entry_edit_json_button in #patch_doc_entry_buttons + on_button_pressed reads cursor_row + set_entry_edit_json_enabled; app.py import + handler + _apply_entry_json_edit + 3 enable-sync sites 1753/1945/3490; test_tui_patch_editor_v2.py AT-068b+TC-341/342/343/345). DISTINCTNESS PROVEN (vs batch-37 US-064b whole-set): AT-068b selects MIDDLE entry i=1 (i!=0), seed parses to dict with NO entries key + address 0x300 (single entry), confirm -> after[1]=('0x300','BE EF') + after[0]==before[0] + after[2]==before[2] byte-identical. NEW distinct id (not #patch_edit_json_button whole-set, not #patch_entry_edit_button field-edit). Parse route = parse_change_document (json.loads, NO eval/pickle/exec), malformed->MF-JSON-PARSE non-ok no-mutation, markup verbatim (C-17). A-01 3/3 sync + defensive handler re-check (TC-345 both states). C-16 real pilot.click (scroll_end first). C-26 CENSUS CLEAN: grep patch_doc_entry_buttons -> 0 census refs (tc319 pins #patch_doc_controls, different row); adding 4th button breaks nothing (verified by reviewer). RED->GREEN (ImportError pre-wire). Snapshot 2 patch cells already-marked, NO new drift, NO local regen. Ledger 1379->1384 (+5). ruff clean; 0 frozen source. Code-review APPROVE 0 HIGH/0 MEDIUM; 1 LOW informational (F1 per-entry edit cross-entry address collision surfaces at document Validate/Apply/Save gate not per-entry parse -- by-design, LLR-068b.3 scopes per-entry to byte-validity; re-detected at gate never silently written). FREEZE FIX (batch-level, Inc-2 miss caught at Inc-5): Inc-2 put AT-066a in FROZEN tests/test_tui_a2l.py (_ENGINE_TEST_FILES) -> tripped test_tc032. FIXED: reverted test_tui_a2l.py to main (0 diff), relocated AT-066a to non-frozen test_tui_a2l_issue_recolor.py (reuse helpers, resolves Inc-2 F1 dup); 3 freeze guards green; net test count unchanged. PROCESS LESSON -> CONTROL CANDIDATE (C-CAND): the per-increment frozen-file check ran only test_engine_unchanged (SOURCE freeze) not test_tc032 (engine TEST-file freeze); every increment's frozen guard must run BOTH -> AskUserQuestion at Phase 5. PHASE 3 CLOSED: 5/5 increments APPROVE, 0 HIGH batch-wide; ledger ~1358->1384 (+~26 nodes). Phase 4: orchestrator owns the gate run (C-25)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-12",
-            "decision": "Inc-4 (US-068a) approved (autonomous)",
-            "notes": "Undo/redo + A-01 guard GREEN. 5 files (change_service.py _HISTORY_MAX=20 + _undo_stack/_redo_stack + _push_history + undo/redo + 5 mutator/loader call-sites; screens_directionb.py UndoRequested/RedoRequested + NEW #patch_history_controls row inside #patch_doc_entry_inputs + button branches + set_undo_redo_enabled; app.py 2 handlers + _refresh_patch_history_view + enable-sync @1748/1939/3386; test_change_service.py TC-338/339; test_tui_patch_editor_v2.py AT-068a+TC-344). REACHABILITY (flagged risk) RULED REACHABLE by reviewer: #patch_pane_entries has overflow-y:auto real scrollbar; primary Add/Edit/Remove reached same way -> NOT batch-18 C-13.1 non-scrolling-clip class. C-26 SIBLING SWEEP: placed in NEW #patch_history_controls (NOT #patch_doc_controls) so 5-btn census untouched; test_tui_patch_layout.py tc319 + tc_pane_styles_and_grid + at057a explicitly swept, all pass; new id referenced 0 tests. A-01 sync COMPLETE 3/3 sites (paired with set_edit_json_enabled everywhere, no lone site) -> TC-344 file-loaded disabled / paste enabled. Deep-copy copy.deepcopy TC-338 non-vacuous no-alias; bound MAX+5->cap 20 evict oldest + redo-clear-on-mutation; push-after-validate (rejected input pushes no snapshot). C-16 real pilot.click (scroll_end first = genuine pointer path, target reachable); AT-068a asserts specific (addr,value) [('0x200','REV_A')] not object-changed. RED->GREEN (NoMatches pre-wire). Snapshot 2 patch cells drift, already covered _batch38_drift_marks, NO local regen, held 5-file cap. Ledger 1375->1379 (+4, D=0). ruff clean; 0 frozen. Code-review APPROVE 0 HIGH/0 MEDIUM; 2 LOW CARRIED to batch-39 (F1 Checks panel stale after undo/redo -- secondary user-invoked surface, last_check_result not reset; F2 undo/redo discoverability below-fold -> suggest ctrl+z/y keybinding). Inc-5 (US-068b per-entry JSON popup + A-01 guard) starting -- C-26: new per-entry button -> sweep #patch_doc_entry_buttons census."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-12",
-            "decision": "Inc-3 (US-067) approved (autonomous)",
-            "notes": "Variant info modal GREEN. 5 files (screens.py VARIANT_HELP_TEXT + VariantHelpScreen ModalScreen markup=False static self-dismiss; screens_directionb.py VariantHelpRequested msg + Button('?', #patch_variant_info_button) in NEW Horizontal(#patch_variant_select_row) wrapping the Select + on_button_pressed branch; app.py import + on_patch_editor_panel_variant_help_requested -> push_screen; test_tui_variants.py AT-067a+TC-336/337+geometry; test_tui_snapshot.py reason extend). C-16 REAL click verified (await pilot.click('#patch_variant_info_button'), not .focus()/direct push; RED=NoMatches pre-wire; GREEN app.screen is VariantHelpScreen + 3 help tokens asserted). C-23 pilot-measured FITS both: 80x24 dialog right=65<=80 bottom=24<=24 (inclusive edge, test guards future lines); 120x30 right=101<=120 bottom=24<=30. C-26 SIBLING SWEEP (batch-37 TC-319 lesson) independently verified by reviewer: new Horizontal nests INSIDE #patch_variant_row so #patch_pane_variant direct-child census (test_tui_patch_variant.py:429 ['patch_variant_row','patch_execute_row']) UNCHANGED; no census on #patch_variant_row's own children exists; TC-035.1/035.2 query-descendant + width still hold; 0 sibling breaks. Snapshot: patch-comfortable-80x24/120x30 drift from new button ON TOP of Inc-1 copy; ALREADY covered by _batch38_drift_marks (screen=='patch'), reason extended, no new cell, NO local regen. RED->GREEN; ledger 1372->1375 (+3, D=0); ruff clean; 0 frozen. Code-review APPROVE 0 HIGH/0 MEDIUM/0 LOW. Inc-4 (US-068a undo/redo + A-01 guard) starting -- HIGH C-26 ATTENTION: undo/redo buttons likely join a controls row -> MUST sweep #patch_doc_controls sibling census test_tui_patch_layout.py TC-319 (the exact batch-37 miss)."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-12",
-            "decision": "Inc-2 (US-066) approved (autonomous)",
-            "notes": "A2L >32-bit WARNING GREEN. 4 files (validation_service.py new producer supplemental_a2l_oversized_address_issues + merge into BOTH build_validation_report branches @252-254 MAC-only + 280-282 primary-backed; test_validation_service_supplemental.py TC-333/334/335; test_tui_a2l.py AT-066a; test_tui_a2l_issue_recolor.py AT-066b C-17). M1 sink VERIFIED by reviewer: both return paths carry the new issues (dedupe before return, guarded by same if tags_for_validation as sibling supplemental_a2l_row_issues) -- the exact single-branch-merge class Phase-2 flagged is sound. A-1 CONFIRMED: address is int in both branches (parser int(token,0) a2l.py:984/333; producer isinstance(int) guard -> AT-066a non-vacuous). Code A2L_ADDRESS_EXCEEDS_32BIT sev WARNING -> css_class_for_severity sev-warning (TC-334). Boundary 0xFFFFFFFF no-warn / 0x100000000 warns (TC-335 + AT-066a EDGE_TAG). C-17: message plain f-string, safe_text/IssueRow escapes; AT-066b brackets+[link=] VERBATIM, ANSI NEUTRALIZED (model.py _scrub keeps [] strips CSI), no crash. C-26: only >32-bit addrs in tests are new fixtures (large_a2l is 32-bit-bounded 0x{:08X}); dedupe key (code,sev,message,artifact,symbol,address,line) -> AT-066b 3 tags survive. RED->GREEN (pre 0 warnings/4 failed; post 1 named WARNING). Ledger 1367->1372 (+5, D=0). No snapshot drift owed (WARNING only on oversized loads, no snapshot fixture does). ruff clean; 0 frozen (test_engine_unchanged + tc031 pass); model.py/color_policy imported only. Code-review APPROVE 0 HIGH; 1 LOW F1 (test-helper dup across modules, justified 'tests/ not a package', accept as-is) CARRIED. Inc-3 (US-067 variant info modal, first geometry increment) starting."
-        },
-        {
-            "phase": 3,
-            "date": "2026-07-12",
-            "decision": "Inc-1 (US-065) approved (autonomous)",
-            "notes": "Relabel GREEN. 3 files (screens_directionb.py two pinned copy edits at :1854 title 'Change document (JSON)' + :1904 placeholder 'or type a path to the same change-set JSON (alternative to the patches/ dropdown)'; test_tui_directionb.py AT-065a + TC-332 + helper; test_tui_snapshot.py _batch38_drift_marks). RED->GREEN captured (pre-edit 2 failed against v2 copy at test_tui_directionb.py:7511/7539; post-edit 2 passed, target file 165 passed). C-26 reverse census 0 (re-run by reviewer: every #patch_doc_path_input ref is .value or id-frozenset, none pin .placeholder/patch-section-title/old strings). Exactly 2 snapshot cells xfail(strict=False) (patch-comfortable-80x24 + 120x30; copy drift not layout; NO local regen). Edit scoped to :1854 only (:1918/:1936 untouched, C-10 uniqueness via #patch_pane_entries .patch-section-title query). Ledger base 1365 -> 1367 (+2, deterministic collect count). ruff clean; 0 frozen files. Code-review APPROVE 0 HIGH/0 MEDIUM/0 LOW (TC-332/AT-065a overlap = required dual-traceability convention, non-finding). Axis check clean. Inc-2 (US-066) starting."
-        },
-        {
             "phase": 0,
-            "date": "2026-07-12",
-            "decision": "kickoff-authorization recorded + Phase-0 intake drafted (awaiting operator PLAN approval)",
-            "notes": "Batch-38 opened by rollover from batch-37 (merged PRs #68/#69, on main 5a6c45b, vault-synced 2026-07-12). Operator AskUserQuestion: scope = ALL 4 P3 (B-16..B-19); run mode = 'Autonomous + self-merge' with refinement 'only ask me to approve the plan'. RC-1 PASS @ 5a6c45b. 4 stories drafted (US-065..068). US-068 (B-19 undo/redo + per-entry JSON popup) flagged as likely SPLIT at Phase 2 (precedent: US-064). B-17 feasibility: engine-frozen validation/ -> WARNING built TUI-side in a2l_service. Cross-cutting: C-26 reverse-census on any touched shared id/class/path; C-23 pilot-measure geometry (info modal + per-entry popup); snapshot drift -> xfail canonical-regen; engine-frozen untouched. AWAITING operator plan approval before Phase 1."
-        },
-        {
-            "phase": 0,
-            "date": "2026-07-12",
-            "decision": "PLAN APPROVED by operator ('approved.') -> the single operator gate; Phases 1-6 now autonomous + self-merge",
-            "notes": "Operator approved the batch-38 plan (full P3 set B-16..B-19, autonomous+self-merge, plan-approval-only gate). Phase 0 CLOSED. Advancing to Phase 1: architect (HLR/LLR IEEE 830 + EARS into 01-requirements.md) + qa-reviewer (validation method + AT discipline into 01b) dispatched in parallel."
+            "date": "2026-07-14",
+            "decision": "Phase-0 intake + RC-1 (autonomous)",
+            "notes": "RC-1 PASS @ a015e28 (post #78 snapshot regen, #79 placeholder sweep, #80 field-audit backlog). 4 stories US-045a..d derived from operator-approved prototype V3. N1 verified NOT-IMPLEMENTED (map colours by validation overlap only); EntropyViewerScreen verified present to retire. All READY. Plan-approval-gate authorization recorded."
         },
         {
             "phase": 1,
-            "date": "2026-07-12",
-            "decision": "approved (autonomous, axis check clean)",
-            "notes": "Phase-1 complete: 5 US (US-068 SPLIT -> 068a undo/redo + 068b per-entry popup), 5 HLR (R-TUI-054..058), 14 LLR, 6 AT (065a,066a,066b,067a,068a,068b). Ledger base ~1358. All seams verified file:line @ 5a6c45b; 0 should-as-modal; every LLR targets a NON-frozen file (validation/ imported not edited -- US-066 WARNING in services/validation_service.py). Axis check: Coverage OK (US->AT + LLR->TC complete), Certainty OK (every AT names RED counterfactual + drives shipped surface), Evidence OK (seams cited on disk). 4 feasibility flags carried to Phase 2: F-a US-066 WARNING must reach GroupedIssuesPanel not #patch_doc_issues + markup already satisfied by IssueRow/safe_text; F-b US-068b needs NEW distinct control id (not hijack #patch_entry_edit_button); F-c issue-code naming reconcile (EXCEEDS_32BIT vs OVER_32BIT); F-d TC-id reconcile (architect TC-001..019 vs qa TC-332..343 -- qa base correct, batch-37 ended TC-331). Autonomous approve. Phase 2 triple review (architect + qa + security) dispatched."
+            "date": "2026-07-14",
+            "decision": "Phase-1 complete, awaiting operator PLAN-APPROVAL gate",
+            "notes": "architect + qa-reviewer dispatched in parallel. New reqs R-TUI-060/061/062; amend R-TUI-041; retire R-TUI-050/051. C-15 CATCH: brief said amend R-TUI-035/036 but those are unrelated (command-bar clipboard / issues rail); the entropy modal is owned by R-TUI-041 (internal HLR-035/036) + R-TUI-050/051 -> corrected. 4 HLR (045A-D), 19 LLR, 8 AT (069-076), 6 TC (045.1-.6). NEW non-frozen entropy_style.py for band colours (color_policy.py untouched). QA hard constraint: band via glyph+class not colour-alone (headless assertability C-10). Snapshot: 2 map cells drift+regen, 2 entropy cells deleted. 6-increment cut. All LLR target NON-frozen files. Axis check: Coverage OK (US->AT + LLR->TC complete), Certainty OK (every AT names RED counterfactual + drives shipped surface), Evidence OK (seams file:line cited). AWAITING operator plan approval before Phase 2/3."
+        },
+        {
+            "phase": 1,
+            "date": "2026-07-14",
+            "decision": "PLAN APPROVED by operator + MERGE GRANTED ('Approved, take it all the way to merge.')",
+            "notes": "Phase-1 gate approved; merge authority granted (was plan-approval-only). Phases 2-6 now autonomous through PR + self-merge after clean final PR-QA pass. Advancing to Phase 2 triple review (architect + qa + security)."
         },
         {
             "phase": 2,
-            "date": "2026-07-12",
-            "decision": "iterate-to-refine (autonomous)",
-            "notes": "Triple review (02-review.md + 3 sub). Security PASS 0 HIGH/MEDIUM. 2 BLOCKERS: B1 issue-code divergence (public contract) -> ratify A2L_ADDRESS_EXCEEDS_32BIT; B2 AT-068b clicked existing #patch_entry_edit_button (unsound counterfactual) -> re-point to NEW #patch_entry_edit_json_button + single-entry seed + siblings byte-identical. 4 MAJORS: M1 US-066 wrong sink (a2l_service.enrich returns tag rows not issues) -> reconcile intake/PLAN/01b to validation_service.build_validation_report (sink -> update_validation_issues_view app.py:3670 -> GroupedIssuesPanel); M2 TC ids TC-001..019 collide batch-01 -> adopt TC-332..345; M3 AT-065a pin copy (title 'Change document (JSON)'; placeholder 'or type a path to the same change-set JSON (alternative to the patches/ dropdown)'); M4 (security) A-01 file-loaded data-loss guard -> DISABLE undo/redo + per-entry-edit when source_path is not None (batch-37 precedent) + boundary AT + LLR-068a.4/068b.4 + TC-344/345. 6 minors/lows folded (AT-066b ANSI-scrubbed-not-verbatim; AT-067a always-render+>=2-image fixture; _HISTORY_MAX=20 assumed + deep-copy assertion; US-066 int-address confirm P3; patch-section-title 3-site scope to :1854; L1 native-paste-cap batch-39 carry; L2 no-preformat-markup code confirm). All corrections/gates, 0 story-kill, no HIGH security -> autonomous fold (no operator stop). Amendment fold dispatched."
+            "date": "2026-07-14",
+            "decision": "iterate-to-refine -> fold -> re-gate APPROVE (autonomous)",
+            "notes": "Triple review: 3 blockers + 4 majors + minors; security OK-to-ship low-surface. B1 set-site -> LoadedFile.entropy_windows computed in build_loaded_s19/hex (load_service.py) [the only site the AT fixture reaches]. B2 fixture -> NEW seeded _two_band_loaded (0xFF const + PRNG high, >=256B each, non-adjacent). B3 A2L contradiction -> new region rows are addr/size/band only (no file text); retained batch-43 detail keeps safe_text (regression guard at036f); security_required TRUE (regression only). M1 at036 per-AT disposition (retire a/b, migrate c/d/e/g, KEEP f as C-17 guard). M2 Inc-2=5 files. M3 delete MapCell+arrow-nav (Inc-5). M4 add compute_entropy to AST-purity guard. TC renumber ->060.x/061.x/062.x. All LLR non-frozen. 0 story-kill, autonomous fold (C-21 cut re-derived). Axis check clean. Phase 3 Inc-1 dispatched."
         },
         {
-            "phase": 2,
-            "date": "2026-07-12",
-            "decision": "approved (autonomous re-gate after amendment fold)",
-            "notes": "All Phase-2 findings folded + re-verified by orchestrator spot-check (grep: 0 A2L_ADDRESS_OVER_32BIT except [Deleted] record; EXCEEDS present; #patch_entry_edit_json_button targeted; 0 should-as-modal; US-065 strings pinned verbatim; TC-332..345 consistent both files; 0 frozen-file LLR targets). Reconciled: US 5 / HLR 5 (R-TUI-054..058) / LLR 16 / AT 6 / TC 14 (TC-332..345). A-01 stance = DISABLE controls when source_path is not None. Increment cut STANDS (C-21): Inc-1 US-065 -> Inc-2 US-066 -> Inc-3 US-067 -> Inc-4 US-068a (+A-01 guard) -> Inc-5 US-068b (+A-01 guard). Security PASS. Certainty axis (B1/B2) closed. Autonomous approve. Phase 3 Inc-1 dispatched. Ledger base to confirm at Inc-1 (~1358)."
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Phase 3 Inc-1 dispatched",
+            "notes": "Inc-1: entropy_style.py + styles.tcss .band-* + test_entropy_style.py (band census). software-dev then code-reviewer."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-1 APPROVE (autonomous)",
+            "notes": "entropy_style.py + .band-* + test_entropy_style.py. ruff clean, 8 passed (F1 non-empty-glyph guard added per code-review MEDIUM), C-27 dual-guard 0 frozen diffs. Code-review APPROVE-WITH-NITS 0 HIGH; F2/F3 LOW -> Inc-5 heads-ups (delete screens.py ENTROPY_BAND_MEANING + TC-326; confirm dropping modal threshold text). Ledger +8. Inc-2 starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-2 (2a+2b) APPROVE (autonomous)",
+            "notes": "Core view swap. compute-on-load (LoadedFile.entropy_windows via build_loaded_s19/hex) + band bar/region list/legend replacing the sev-* grid. RED captured (AT-069/070/071). 163 passed/2 skipped; consumers 77 passed; C-27 0 frozen; 2 map cells xfail (_batch45_map_drift_marks). Superseded-test disposition (Option A ruling): rework at035/at036e\u2192pure/at036f\u2192pure-hostile; retire cell-grid/arrow-nav/tooltip/count/fill; defer at036b/tc041_6\u2192Inc-3. C-17 GUARDRAIL preserved (build_detail_text + hostile test live). Code-review APPROVE-WITH-NITS 0 HIGH: F1 (real cross-gap same-band merge defect) FIXED + gap test test_at071b (RED-if-revert confirmed 1x512B->2x256B); F2 AST bare-name guard FIXED; F4 docstring id/class FIXED; F3 B-01 snap -> Inc-3. DuplicateIds re-render bug found+fixed (id->class)+guarded. Inc-3 starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-3 APPROVE (autonomous, orchestrator review)",
+            "notes": "R-TUI-062 single-click region->hex nav + detail re-wire. New RegionRow(Static) on_click->Activated->on_region_row_activated: cell_status (no re-parse) -> #map_detail via retained build_detail_text (A2L R-3 + C-17 on LIVE path) -> OpenInHexRequested. App handler REUSED unchanged (no app.py edit). 169 passed/0 skipped (+6, 2 deferrals unskipped/reworked); C-27 0 frozen; 2 map xfail; ruff clean. AT-074 RED captured. B-01 re-covered. 2 files. Orchestrator diff-review (low-risk); independent agent review reserved for Inc-5 deletion. Inc-4 starting."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-14",
+            "decision": "Inc-4 APPROVE (autonomous, orchestrator review)",
+            "notes": "R-TUI-061 docked At-a-glance histogram+sparkline. Pure band_histogram/sparkline_glyphs/entropy_ramp_glyph; _build_glance_widgets, safe_text over CONSTANT labels (B3, no file text). Docked .map-band-row (horizontal->vertical narrow). 174 passed/0 skipped (+5); C-27 0 frozen; 2 map xfail; ruff clean. AT-072/073+geometry RED captured; pilot-measured 120x30 side-by-side / 80x24 stacked. 3 files (no app/model/frozen). Cosmetic: band bar 60-glyph clips to ~21 cols @120x30 (already clipped ~50 Inc-2/3; responsive width = out-of-scope, needs snapshot regen; postmortem note). Inc-5 (deletion) starting \u2014 FULL independent review."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-15",
+            "decision": "Inc-5 (5a+5b) APPROVE (autonomous, full independent review) \u2014 PHASE 3 CLOSED",
+            "notes": "Retire entropy modal + delete dead grid machinery. Net -2192 lines. C-26 per-symbol reverse-census run BEFORE deletion -> 0 live refs (grep-gate + ruff F821 clean). Deleted EntropyViewerScreen/EntropyCell/MapCell/arrow-nav/#map_open_hex_button/#entropy_*/.map-cell + test_tui_entropy_viewer.py (918L) + tc036s snapshot cells. AT-075/076 (deletion black-box) RED captured via git-stash. Collection 1419 no error; 250 passed/0 failed; C-27 0 frozen; 2 map xfail. Code-review APPROVE-WITH-NITS 0 HIGH; F1 (stale Data-Flow docstring) FIXED. KEEP-list verified live (cell_status/build_detail_text/coverage_stats/OpenInHexRequested/entropy_style.ENTROPY_BAND_MEANING). e freed no collision. coverage preserved (compute_entropy via test_entropy_service.py). PHASE 3 CLOSED: 5 increments (Inc-2 split 2a/2b, Inc-5 split 5a/5b), 0 HIGH batch-wide. Inc-6 (REQUIREMENTS amendments) next, then Phase 4."
+        },
+        {
+            "phase": 3,
+            "date": "2026-07-15",
+            "decision": "Inc-6 APPROVE \u2014 PHASE 3 CLOSED (autonomous)",
+            "notes": "REQUIREMENTS.md amendments: add R-TUI-060/061/062; amend R-TUI-041 (\u00a76.5 before/after: cell colour validity->entropy band, two-step->single-click, stats strip RETAINED, render-only+width-narrow+R-3 A2L preserved); retire R-TUI-050/051 (superseded, historical record kept). Doc-only 1 file. EntropyViewerScreen only in retired rows. Sanity 4 passed. PHASE 3 CLOSED: 6 increments, 0 HIGH batch-wide, 0 frozen diffs, C-17 on live path. Phase 4 (orchestrator-owned gate suite, C-25) next."
+        },
+        {
+            "phase": 4,
+            "date": "2026-07-15",
+            "decision": "Phase-4 iterate-to-fix: snapshot footer-drift containment (autonomous)",
+            "notes": "First full gate run (C-25, orchestrator-owned, 12:27): 1374 passed / 0 NON-snapshot failures / 5 xfail / 2 skip, but 18 tc016s snapshot cells FAILED. ROOT CAUSE (verified): Inc-5 removed Binding('e','show_entropy','Entropy',show=True) which was FOOTER-VISIBLE (workspace baseline SVG contains 'Entropy' label) -> retiring the modal drifts the footer on every wide-width cell. Inc-2 _batch45_map_drift_marks only covered the 2 map cells -> containment miss. FIX (test-only): added _batch45_footer_drift_marks -> xfail(strict=False) the 18 footer-drifted cells (restyled x both densities x {120x30,160x40} + diff/patch 120x30); 80x24 NOT marked (footer truncates). Snapshot subset now 12 passed/20 xfailed/0 FAILED/0 xpassed (tight, C-22 per-cell). No product code touched (binding removal correct). Re-running full suite for clean gate artifact."
+        },
+        {
+            "phase": 4,
+            "date": "2026-07-15",
+            "decision": "Phase-4 gate APPROVE \u2014 PASS (autonomous)",
+            "notes": "Clean gate re-run (C-19/C-25 single complete): 1374 passed / 0 failed / 2 skipped / 23 xfailed / exit 0 in 12:48. qa-reviewer reconciled: C-18 9/9 AT (069-076) = one on-disk node each w/ RED counterfactual + shipped-surface obs; Layer A TC-060.x/061.x/062.x + census + AST-purity guard (compute_entropy+_merge_band_runs, attr+bare-name) green; bidirectional matrix complete; 23 xfail accounted (20 batch-45 drift [18 footer + 2 map] + 3 pre-existing, 0 mask regression, 0 xpassed on batch-45); C-27 0 frozen diffs (entropy_service.py non-frozen, docstring only). Coverage/Certainty/Evidence all PASS. Phase 5 (postmortem) dispatched."
+        },
+        {
+            "phase": 5,
+            "date": "2026-07-15",
+            "decision": "Phase-5 postmortem APPROVE \u2014 close batch (autonomous)",
+            "notes": "Clean batch: 6 increments, 0 HIGH, 0 story-kill, 0 scope drift, PASS. Root causes: F-1 footer-binding snapshot containment miss (removed footer-visible e/Entropy binding drifts every screen's Footer -> 18 cells; Phase-4 caught; test-only fix); F-2 set-site under-specified Phase-1 (assumed->Phase-2, C-15.1 writers-grep would've pinned earlier). CONTROL CANDIDATE (PROPOSE-not-encode, operator AskUserQuestion at close): C-CAND footer/shared-chrome binding-drift snapshot census (generalizes C-22 to Footer/Header/rail chrome). Metrics: iters 0:1/1:1/2:1/3:6/4:1; net ~-2100 lines; reqs +3 amend1 retire2. Phase 6 (docs + PR) next."
+        },
+        {
+            "phase": 6,
+            "date": "2026-07-15",
+            "decision": "Phase-6 docs APPROVE (autonomous)",
+            "notes": "traceability-matrix + functionality + executive-summary authored (R-TUI-060/061/062 + 041 amend + 050/051 retire -> LLR/TC/AT/files/status). Docs complete. Push + PR next; merge granted -> final PR-QA pass over whole diff before merge; then snapshot-regen follow-up + /dev-flow-sync."
         }
     ],
     "obsidian_synced": false,
-    "created_at": "2026-07-12T00:00:00Z"
+    "created_at": "2026-07-14T00:00:00Z"
 }

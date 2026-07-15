@@ -3167,56 +3167,44 @@ def test_tc041_11_markup_safe_render_of_hostile_text() -> None:
     assert "[/]" in rendered, "closing-tag markup must survive as literal text"
 
 
-def test_at035_minimap_grid_colours_and_header(tmp_path: Path) -> None:
-    """Black-box: the minimap shows colour-coded cells + a KiB/cell header.
+def test_at035_map_shows_band_bar_and_summary_header(tmp_path: Path) -> None:
+    """Black-box: the map shows an entropy band bar with ≥2 distinct band
+    colours + a band-summary header (AT-035, REWORKED batch-45 R-TUI-060).
 
-    AT-035 (US-035, HLR-035): drive the shipped ``#screen_map`` surface with
-    the public fixtures and observe the rendered grid — ``case_04`` (an
-    invalid range) must produce ≥1 ``sev-error`` cell; ``case_02`` (gaps
-    between valid ranges) must produce ≥1 valid ``sev-ok`` cell AND ≥1
-    ``sev-neutral`` gap cell; the header must show an "≈ N KiB/cell" label.
-    Nothing is asserted about internal text — only what the operator sees.
+    Superseded form: batch-27 asserted a ``sev-*`` cell grid + "≈ KiB/cell"
+    header. Batch-45 replaces the grid RENDER with the entropy band view, so
+    this proof now observes the band bar (``#map_band_bar`` with ≥2 distinct
+    ``band-*`` segment classes over a two-band image) and the band-summary
+    header (no longer the neutral no-file note). Region-row band/glyph/label
+    coverage is AT-069/070/071's job; this proves the bar + header surface.
     """
-    import re
-
     from s19_app.tui.screens_directionb import MemoryMapPanel
 
-    async def _drive(installer) -> tuple[list[str], str]:
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[list, str]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            installer(app)
+            app.current_file = loaded
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
-            grid = app.query_one("#map_grid")
-            cells = grid.query(".map-cell")
-            classes = [" ".join(cell.classes) for cell in cells]
+            bar = app.query_one(".map-band-bar")
+            seg_classes = [tuple(seg.classes) for seg in bar.query(".map-band-seg")]
             panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            return classes, panel.rendered_text
+            return seg_classes, panel.rendered_text
 
-    header_re = re.compile(r"≈\s*[\d.]+\s*KiB/cell")
-
-    # case_04 — an invalid range must colour ≥1 cell sev-error.
-    classes_04, header_04 = asyncio.run(_drive(_install_case_04_loaded_file))
-    assert any("map-cell" in c for c in classes_04), "cells must be queryable"
-    assert any("sev-error" in c for c in classes_04), (
-        f"case_04's invalid range must produce a sev-error cell; got {classes_04}"
+    seg_classes, header = asyncio.run(_drive())
+    assert seg_classes, "the band bar must mount ≥1 segment for a loaded image"
+    band_tokens = {
+        cls for classes in seg_classes for cls in classes if cls.startswith("band-")
+    }
+    assert len(band_tokens) >= 2, (
+        f"a two-band image must colour ≥2 distinct band segments; got {band_tokens}"
     )
-    assert header_re.search(header_04), (
-        f"the header must show '≈ N KiB/cell'; got {header_04!r}"
-    )
-
-    # case_02 — valid ranges with gaps: ≥1 sev-ok AND ≥1 sev-neutral gap cell.
-    classes_02, header_02 = asyncio.run(_drive(_install_case_02_loaded_file))
-    assert any("sev-ok" in c for c in classes_02), (
-        f"case_02 must have a valid (sev-ok) cell; got {classes_02}"
-    )
-    assert any("sev-neutral" in c for c in classes_02), (
-        f"case_02's gaps must produce a sev-neutral cell; got {classes_02}"
-    )
-    assert header_re.search(header_02), (
-        f"the header must show '≈ N KiB/cell'; got {header_02!r}"
+    assert header != MemoryMapPanel._EMPTY_TEXT and header.strip(), (
+        f"the header must show a band summary, not the empty note; got {header!r}"
     )
 
 
@@ -3229,53 +3217,9 @@ def test_at035_minimap_grid_colours_and_header(tmp_path: Path) -> None:
 # ---------------------------------------------------------------------------
 
 
-def _mounted_map_panel(app: "S19TuiApp") -> None:
-    """Install ``case_02`` and drive ``update_memory_map`` on the map screen.
-
-    Populates the panel's ``_ordered_ranges`` / ``_issues`` and mounts the
-    ``MapCell`` grid so a test can select cells.
-    """
-    _install_case_02_loaded_file(app)
-    app.action_show_screen("map")
-    app.update_memory_map()
-
-
-def _first_cell_with_status(cells: "list", status: str) -> "object":
-    """Return the first ``MapCell`` whose ``status`` matches, else ``None``."""
-    for cell in cells:
-        if cell.status == status:
-            return cell
-    return None
-
-
-def _cell_containing(cells: "list", address: int) -> "object":
-    """Return the ``MapCell`` whose window contains ``address``, else ``None``.
-
-    Live grid geometry can drift between two ``update_memory_map`` renders
-    (the panel reads ``#map_grid.content_size``, the Inc-1 CARRY-F2 note), so a
-    seed-issue test must resolve the cell by the address it anchored — not by
-    cell index or "first invalid".
-    """
-    for cell in cells:
-        if cell.cell_start <= address < cell.cell_end:
-            return cell
-    return None
-
-
-def _invalid_range_start(app: "S19TuiApp") -> int:
-    """Return the start of the first INVALID range in ``current_file``.
-
-    Anchoring a seeded issue at a real invalid-range address (not a cell's
-    arbitrary window centre, which for the sparse ``case_04`` image falls in a
-    gap) guarantees the containing cell is invalid AND that a covering region
-    is found, so the region-issue count is non-zero.
-    """
-    ranges = app.current_file.ranges
-    validity = app.current_file.range_validity
-    for (start, _end), valid in zip(ranges, validity):
-        if not valid:
-            return start
-    raise AssertionError("fixture must have an invalid range")
+# RETIRED batch-45 Inc-5: the ``_mounted_map_panel`` / ``_first_cell_with_status``
+# / ``_cell_containing`` / ``_invalid_range_start`` helpers served only the
+# retired MapCell grid tests (removed Inc-2..5); deleted with the MapCell class.
 
 
 def test_tc041_4_build_detail_text_content(tmp_path: Path) -> None:
@@ -3409,87 +3353,18 @@ def test_at_r3_detail_no_a2l_region_bounds_only() -> None:
     )
 
 
-def test_at_r3_cell_tooltip_names_symbols_and_renders_literally(
-    tmp_path: Path,
-) -> None:
-    """R-TUI-041 R-3 (AC-2 + AC-3 tooltip): ``render_ranges`` gives each MapCell
-    a markup-safe ``Text`` tooltip; a cell over an A2L symbol names it, and a
-    hostile name renders LITERALLY through Textual's tooltip render path.
-
-    The tooltip MUST be a Rich ``Text``: Textual 8.2.8 renders a bare ``str``
-    tooltip via ``Content.from_markup`` (markup-parsed — ``evil[red]`` loses
-    ``[red]`` and a malformed token can raise ``MarkupError`` on hover), while a
-    ``Text`` renders via ``Content.from_rich_text`` literally. Asserting
-    ``isinstance(Text)`` + driving ``Content.from_rich_text`` is the hover-crash
-    regression guard (security review F1). RED pre-fix: no tooltip is set, so
-    ``cell.tooltip`` is not a ``Text`` carrying the symbol name.
-    """
-    from rich.text import Text
-    from textual.content import Content
-
-    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
-
-    async def _drive() -> "object":
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 40)) as pilot:
-            await pilot.pause()
-            _install_case_02_loaded_file(app)
-            target = app.current_file.ranges[0][0]  # a present (mapped) address
-            app._a2l_enriched_tags = [
-                {"name": "CAL_TARGET", "address": target, "byte_size": 4},
-                {"name": "evil[red]", "address": target, "byte_size": 4},
-            ]
-            app.action_show_screen("map")
-            app.update_memory_map()
-            await pilot.pause()
-            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            cells = list(panel.query(MapCell))
-            return _cell_containing(cells, target)
-
-    cell = asyncio.run(_drive())
-    assert cell is not None, "a cell must cover the seeded symbol address"
-    tooltip = cell.tooltip
-    # AC-3 tooltip: Text (not str) — else Textual markup-parses it on hover.
-    assert isinstance(tooltip, Text), f"tooltip must be Text, got {type(tooltip)!r}"
-    assert "CAL_TARGET" in tooltip.plain
-    assert "evil[red]" in tooltip.plain
-    # Drive the actual Text tooltip render path — it must stay literal.
-    rendered = Content.from_rich_text(tooltip).plain
-    assert "evil[red]" in rendered, f"tooltip not literal through render; {rendered!r}"
-    # Counterfactual proving the Text type matters: a str tooltip would
-    # markup-parse and drop the ``[red]`` token.
-    assert "evil[red]" not in Content.from_markup("evil[red]").plain
+# RETIRED batch-45 (R-TUI-060): ``test_at_r3_cell_tooltip_names_symbols_and_
+# renders_literally`` tested the per-CELL A2L hover tooltip. The entropy band
+# view removes the cell surface (region-list rows are addr/size/band-only, no
+# A2L text — security B3), so the tooltip sink no longer exists. The security
+# F1 markup-safety guard on the RETAINED ``safe_text`` path stays covered by the
+# surviving pure-function test ``test_at_r3_detail_hostile_symbol_name_rendered_
+# literally`` (build_detail_text, re-wired to region-row selection in Inc-3).
 
 
-def test_tc041_4b_arrow_adjacent_index_and_edge_clamp() -> None:
-    """Arrow nav resolves the adjacent cell index and clamps at edges
-    (TC-041.4b / US-036 keyboard nav).
-
-    Intent: the arrow-key focus target is a pure function of ``(current, key,
-    count, cols)`` — Right/Down step one cell / one visual row; Left on the
-    first cell and Up on the top row clamp (no wrap); a non-arrow key returns
-    ``None`` so ``on_key`` leaves it for ``Enter`` / the default handler. This
-    is the deterministic core the black-box AT-036a traversal binds to.
-    """
-    from s19_app.tui.screens_directionb import MAP_GRID_COLS, adjacent_cell_index
-
-    cols = MAP_GRID_COLS  # 16, == the #map_grid CSS grid-size
-    count = 40
-
-    # Left/Right step ±1 in mount order.
-    assert adjacent_cell_index(0, "right", count, cols) == 1
-    assert adjacent_cell_index(5, "left", count, cols) == 4
-    # Up/Down step ∓cols (one visual row).
-    assert adjacent_cell_index(3, "down", count, cols) == 3 + cols
-    assert adjacent_cell_index(3 + cols, "up", count, cols) == 3
-    # Edge clamps: no wrap past the first / last cell or off the top / bottom.
-    assert adjacent_cell_index(0, "left", count, cols) == 0
-    assert adjacent_cell_index(count - 1, "right", count, cols) == count - 1
-    assert adjacent_cell_index(2, "up", count, cols) == 2
-    assert adjacent_cell_index(count - 1, "down", count, cols) == count - 1
-    # Non-arrow / empty grid → None (Enter and defaults are left untouched).
-    assert adjacent_cell_index(0, "enter", count, cols) is None
-    assert adjacent_cell_index(0, "right", 0, cols) is None
+# RETIRED batch-45 Inc-5: ``test_tc041_4b_arrow_adjacent_index_and_edge_clamp``
+# tested ``adjacent_cell_index`` (the MapCell arrow-nav math), removed with the
+# grid. Region→hex nav is single-click (AT-074); no keyboard grid traversal.
 
 
 def test_tc041_5_cell_issue_join_boundary_and_negative() -> None:
@@ -3527,196 +3402,102 @@ def test_tc041_5_cell_issue_join_boundary_and_negative() -> None:
     )
 
 
-def test_tc041_6_open_computes_focus_equals_cell_start(tmp_path: Path) -> None:
-    """Open-in-Hex posts a focus address equal to the cell start
-    (TC-041.6 / LLR-041.6).
+def test_tc041_6_region_activation_focus_equals_region_start(
+    tmp_path: Path,
+) -> None:
+    """A region activation posts a focus address equal to the region start
+    (TC-041.6, REWORKED batch-45 R-TUI-062 — was cell_start, now region_start).
 
-    Intent: the white-box contract that the jump message carries exactly the
-    selected cell's ``cell_start`` (no off-by-one, no row-base rounding on the
-    panel side — the app owns the focus math). Complements AT-036b's
-    behavioral hex-render assertion.
+    Intent (white-box): the ``OpenInHexRequested`` the panel posts on a region
+    click carries EXACTLY the run's ``region_start`` — no off-by-one, no
+    row-base rounding on the panel side (the app handler owns the focus math /
+    the nearest-present-row snap). Complements AT-074's behavioral hex-render.
     """
-    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
+    from s19_app.tui.screens_directionb import (
+        MemoryMapPanel,
+        RegionRow,
+    )
 
-    async def _drive() -> "object":
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[list, int]":
         app = S19TuiApp(base_dir=tmp_path)
         posted: list[int] = []
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _mounted_map_panel(app)
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
             await pilot.pause()
             panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            cell = next(iter(app.query_one("#map_grid").query(MapCell)))
-
-            def _capture(msg: "object") -> None:
-                posted.append(msg.focus_address)
-
-            # Observe the message the button emits without needing the app
-            # handler: post Selected, then press the revealed button.
-            panel.on_map_cell_selected(MapCell.Selected(cell))
-            # The panel stores the selection; assert the message it would post.
-            assert panel._selected_cell_start == cell.cell_start
-            msg = MemoryMapPanel.OpenInHexRequested(panel._selected_cell_start)
-            _capture(msg)
-            return posted[0], cell.cell_start
-
-    focus, cell_start = asyncio.run(_drive())
-    assert focus == cell_start, (
-        f"Open-in-Hex focus must equal cell_start; {focus} != {cell_start}"
-    )
-
-
-def test_at036a_non_default_cell_changes_detail(tmp_path: Path) -> None:
-    """Black-box: keyboard-navigating to a different cell changes the detail
-    (AT-036a, C-10 non-default).
-
-    Intent: the operator focuses a cell and presses Enter, then navigates to a
-    DIFFERENT cell and presses Enter — the detail body must CHANGE and show
-    the new cell's start-address token. A detail pane that never updates (or
-    updates identically) fails the interaction.
-    """
-    from s19_app.tui.screens_directionb import MapCell
-
-    async def _drive() -> "tuple[str, str, str]":
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _mounted_map_panel(app)
-            await pilot.pause()
-            default_text = str(app.query_one("#map_detail_body").render())
-
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            first = cells[0]
-            first.focus()
-            await pilot.pause()
-            await pilot.press("enter")
-            await pilot.pause()
-            first_text = str(app.query_one("#map_detail_body").render())
-
-            # F1 (Inc-2 review): exercise the arrow-key grid navigation US-036
-            # promises — not just .focus() on an index. Pressing Right must move
-            # focus to a DIFFERENT MapCell; Enter then selects it. Asserting on
-            # the actually-focused cell means a broken grid focus-order fails.
-            await pilot.press("right")
-            await pilot.pause()
-            navigated = app.focused
-            assert isinstance(navigated, MapCell), (
-                f"arrow-key nav must land focus on a MapCell; got {navigated!r}"
+            row = next(
+                r for r in app.query(RegionRow) if "high/random" in _widget_plain(r)
             )
-            assert navigated is not first, (
-                "pressing Right must move focus to a different cell"
+            orig_post = panel.post_message
+
+            def _cap(msg: "object") -> bool:
+                if isinstance(msg, MemoryMapPanel.OpenInHexRequested):
+                    posted.append(msg.focus_address)
+                return orig_post(msg)
+
+            panel.post_message = _cap  # type: ignore[method-assign]
+            panel.on_region_row_activated(
+                RegionRow.Activated(row.region_start, row.region_end)
             )
-            await pilot.press("enter")
-            await pilot.pause()
-            second_text = str(app.query_one("#map_detail_body").render())
-            token = f"0x{navigated.cell_start:08X}"
-            return default_text, first_text, second_text, token
+            return posted, row.region_start
 
-    default_text, first_text, second_text, token = asyncio.run(_drive())
-    assert first_text != default_text, "selecting a cell must change the detail"
-    assert second_text != first_text, "a different cell must change the detail"
-    assert token in second_text, (
-        f"the detail must show the new cell's start token {token!r}; "
-        f"got {second_text!r}"
+    posted, region_start = asyncio.run(_drive())
+    assert posted == [region_start], (
+        f"region activation must post exactly OpenInHexRequested(region_start); "
+        f"posted={posted} region_start={region_start}"
     )
 
 
-def test_at036_detail_hint_prompts_navigation_before_selection(
-    tmp_path: Path,
-) -> None:
-    """Black-box: the pre-selection detail pane prompts the navigation keys
-    (US-036 discoverability).
+# RETIRED batch-45 (R-TUI-060, PLAN R2 "arrow-nav ATs superseded"): the entropy
+# band view removes the ``MapCell`` grid + its keyboard focus-order, so the
+# following three cell-surface ATs no longer have a surface to drive and are
+# retired (MapCell + arrow-nav helpers stay DEFINED as dead code until Inc-5):
+#   - ``test_at036a_non_default_cell_changes_detail`` (arrow-nav + select→detail):
+#     the detail-changes-on-selection behavior is covered by the surviving pure
+#     ``build_detail_text`` tests (test_tc041_4 / test_at_r3_detail_no_a2l), and
+#     region-row→detail selection is Inc-3's single-click nav.
+#   - ``test_at036_detail_hint_prompts_navigation_before_selection``: the hint
+#     prompted arrow-key nav, which is removed; Inc-3 owns region-row selection
+#     discoverability.
+#   - ``test_at036_arrow_moves_cell_focus_without_scrolling``: arrow-key grid
+#     focus scoping — the grid is gone.
 
-    Intent: arrow-key nav must be discoverable, not hidden — before any cell
-    is selected the ``#map_detail_body`` must show a hint that mentions
-    clicking AND the arrow keys + Enter, so the prompt cannot silently
-    regress and leave the keyboard path undiscoverable.
+
+def test_at036b_region_click_reveals_hex_at_region_start(tmp_path: Path) -> None:
+    """Black-box: a region click switches to the hex view focused on the region
+    (AT-036b, REWORKED batch-45 R-TUI-062 — was cell, now region).
+
+    Intent: a single REAL ``pilot.click`` on the CONSTANT region row (start
+    ``0x80000000``) must reveal the Workspace/hex screen AND render the hex row
+    containing that start in ``#hex_view`` — the C-10 non-default counterpart to
+    AT-074 (which clicks the HIGH region), proving the clicked region's start
+    (not a fixed address) drives the focus. Confirms ``update_hex_view`` ran
+    through the shipped surface (NOT a mock assertion — TC-041.6's job).
     """
-
-    async def _drive() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _mounted_map_panel(app)
-            await pilot.pause()
-            return str(app.query_one("#map_detail_body").render())
-
-    hint = asyncio.run(_drive())
-    assert "Click a cell" in hint, f"click cue missing; got {hint!r}"
-    assert "arrow" in hint.lower(), f"arrow-key cue missing; got {hint!r}"
-    assert "Enter" in hint, f"Enter cue missing; got {hint!r}"
-
-
-def test_at036_arrow_moves_cell_focus_without_scrolling(tmp_path: Path) -> None:
-    """Black-box: an arrow with a cell focused moves cell focus and does NOT
-    scroll the container (US-036 no-leak scoping).
-
-    Intent: ``#map_grid`` sits inside the ``#map_content`` ScrollableContainer,
-    so an unconsumed arrow would scroll it. With a ``MapCell`` focused the
-    arrow must (a) move focus to a different ``MapCell`` and (b) leave the
-    container's scroll offset unchanged — proving the handler consumes the
-    arrow only when a cell owns focus (``event.stop()``), never leaking a
-    scroll.
-    """
-    from s19_app.tui.screens_directionb import MapCell
-
-    async def _drive() -> "tuple[bool, bool, float]":
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _mounted_map_panel(app)
-            await pilot.pause()
-            content = app.query_one("#map_content")
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            first = cells[0]
-            first.focus()
-            await pilot.pause()
-            scroll_before = content.scroll_offset.y
-            await pilot.press("right")
-            await pilot.pause()
-            navigated = app.focused
-            moved = isinstance(navigated, MapCell) and navigated is not first
-            scroll_after = content.scroll_offset.y
-            return moved, scroll_before == scroll_after, scroll_after
-
-    moved, scroll_unchanged, _ = asyncio.run(_drive())
-    assert moved, "arrow must move focus to a different cell"
-    assert scroll_unchanged, (
-        "a consumed arrow must NOT also scroll the #map_content container"
-    )
-
-
-def test_at036b_open_in_hex_focuses_cell_start(tmp_path: Path) -> None:
-    """Black-box: Open-in-Hex switches to the hex view focused on the cell
-    (AT-036b, behavioral).
-
-    Intent: selecting a valid cell at start ``A`` and triggering Open-in-Hex
-    must reveal the Workspace/hex screen AND render the hex row containing
-    ``A`` in ``#hex_view`` — confirming ``update_hex_view(focus_address=A)``
-    ran through the shipped surface (NOT a mock-call assertion; that is
-    TC-041.6's job).
-    """
-    from s19_app.tui.screens_directionb import MapCell
+    loaded = _two_band_loaded(tmp_path)
 
     async def _drive() -> "tuple[bool, str, int]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
-            _mounted_map_panel(app)
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
             await pilot.pause()
-            # The first cell covers the (0, 11) valid range → start 0.
-            cell = next(iter(app.query_one("#map_grid").query(MapCell)))
-            start = cell.cell_start
-            cell.on_click()
-            await pilot.pause()
-            app.query_one("#map_open_hex_button").press()
-            await pilot.pause()
+            row = await _click_region_row(
+                pilot, app, lambda r: "constant/padding" in _widget_plain(r)
+            )
             ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
             hex_str = str(app.query_one("#hex_view").render())
-            return ws_visible, hex_str, start
+            return ws_visible, hex_str, row.region_start
 
     ws_visible, hex_str, start = asyncio.run(_drive())
-    assert ws_visible, "Open-in-Hex must reveal the Workspace/hex screen"
+    assert ws_visible, "a region click must reveal the Workspace/hex screen"
     row_token = f"{start - (start % 16):08X}"
     assert row_token in hex_str.upper(), (
         f"the hex row containing 0x{start:08X} must render; "
@@ -3724,224 +3505,73 @@ def test_at036b_open_in_hex_focuses_cell_start(tmp_path: Path) -> None:
     )
 
 
-def test_at036c_valid_cell_detail(tmp_path: Path) -> None:
-    """Black-box: a valid cell shows a valid chip + covering region bounds
-    (AT-036c).
+# RETIRED batch-45 (R-TUI-060): the cell-selection→detail black-box variants
+# ``test_at036c`` (valid chip + region) and ``test_at036d`` (invalid chip +
+# code + addr + counts) drove the removed ``MapCell`` surface. Their detail
+# ASSEMBLY behavior is retained and still covered by the SURVIVING pure-function
+# tests over ``build_detail_text`` (kept live, C-17): ``test_at_r3_detail_no_a2l_
+# region_bounds_only`` (VALID chip + region bounds/size) and ``test_tc041_4_
+# build_detail_text_content`` (INVALID chip + issue code + address + cell/region
+# counts). ``test_at036g`` (addressless issue excluded) is covered by
+# ``test_tc041_5_cell_issue_join_boundary_and_negative`` (the ``address is None``
+# exclusion) plus ``test_tc041_4`` (the count lines). AT-036e/f are NOT covered
+# by a survivor and so are REWORKED below into pure ``build_detail_text`` tests
+# rather than retired.
 
-    Intent: selecting a cell inside a valid range must report the VALID chip
-    and the covering region's bounds/size — the operator's confirmation that
-    those bytes are covered and clean.
+
+def test_tc041_4c_gap_cell_detail_no_region(tmp_path: Path) -> None:
+    """The detail assembler reports an uncovered gap with no region
+    (REWORKED from AT-036e → pure ``build_detail_text``, LLR-041.4).
+
+    Intent: for a cell that lies outside every stored range, the detail must
+    show the GAP/uncovered chip and must NOT claim a covering region — the
+    region-None branch of ``build_detail_text``, which no surviving test
+    exercises. Reworked (not retired) because the entropy band view removes the
+    gap-cell surface but the assembler branch stays reachable via Inc-3
+    region-row selection.
     """
-    from s19_app.tui.screens_directionb import MapCell
+    from s19_app.tui.screens_directionb import MemoryMapPanel
 
-    async def _drive() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _mounted_map_panel(app)
-            await pilot.pause()
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            valid_cell = _first_cell_with_status(cells, "valid")
-            assert valid_cell is not None, "case_02 must have a valid cell"
-            valid_cell.on_click()
-            await pilot.pause()
-            return str(app.query_one("#map_detail_body").render())
+    panel = MemoryMapPanel()
+    panel._ordered_ranges = [(0x8000, 0x9000, True)]  # a gap cell sits outside
+    panel._issues = []
+    text = panel.build_detail_text(0x100, 0x140, "gap").plain
 
-    text = asyncio.run(_drive())
-    assert "VALID" in text, f"valid chip missing; got {text!r}"
-    assert "Region: 0x" in text and "bytes, valid" in text, (
-        f"covering region bounds/size/status missing; got {text!r}"
-    )
-
-
-def test_at036d_invalid_cell_seeded_issue_detail(tmp_path: Path) -> None:
-    """Black-box: an invalid cell with a seeded issue shows chip + code + addr
-    (AT-036d, PINNED seed-issue path).
-
-    Intent: because both ``address=`` sites in ``rules.py`` are MAC-only, a
-    lone S19 load yields no address-anchored issue — so we seed
-    ``_validation_issues`` with an explicit ERROR issue at an address inside a
-    known invalid cell, re-render, and select that cell. The detail must show
-    the INVALID chip, the issue ``code``, the ``0x{address:08X}`` token, the
-    "N issue(s) in this cell" line and the region count.
-    """
-    from s19_app.tui.screens_directionb import MapCell
-    from s19_app.validation.model import ValidationIssue, ValidationSeverity
-
-    async def _drive() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _install_case_04_loaded_file(app)
-            app.action_show_screen("map")
-            app.update_memory_map()
-            await pilot.pause()
-            # Anchor the issue at a real invalid-range address so the
-            # containing cell is invalid AND a covering region is found (the
-            # sparse case_04 image has huge cells over tiny ranges, so a cell
-            # centre would land in a gap).
-            addr = _invalid_range_start(app)
-            app._validation_issues = [
-                ValidationIssue(
-                    code="S19_RECORD_CHECKSUM",
-                    severity=ValidationSeverity.ERROR,
-                    message="bad record checksum",
-                    artifact="s19",
-                    address=addr,
-                )
-            ]
-            app.update_memory_map()
-            await pilot.pause()
-            # Re-query cells after the re-render and select the cell that
-            # actually contains the anchored address.
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            target = _cell_containing(cells, addr)
-            assert target is not None, "the anchored address must land in a cell"
-            target.on_click()
-            await pilot.pause()
-            return str(app.query_one("#map_detail_body").render()), addr
-
-    text, addr = asyncio.run(_drive())
-    assert "INVALID" in text, f"invalid chip missing; got {text!r}"
-    assert "S19_RECORD_CHECKSUM" in text, f"issue code missing; got {text!r}"
-    assert f"0x{addr:08X}" in text, f"issue address missing; got {text!r}"
-    assert "issue(s) in this cell" in text, f"cell count line missing; got {text!r}"
-    assert "issue(s) in region" in text, f"region count line missing; got {text!r}"
-
-
-def test_at036e_gap_cell_detail(tmp_path: Path) -> None:
-    """Black-box: a gap cell shows an uncovered chip and no covering region
-    (AT-036e).
-
-    Intent: selecting a cell in a gap must report the GAP/uncovered chip and
-    must NOT claim a covering region — the operator sees the hole plainly.
-    """
-    from s19_app.tui.screens_directionb import MapCell
-
-    async def _drive() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _mounted_map_panel(app)
-            await pilot.pause()
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            gap_cell = _first_cell_with_status(cells, "gap")
-            assert gap_cell is not None, "case_02 must have a gap cell"
-            gap_cell.on_click()
-            await pilot.pause()
-            return str(app.query_one("#map_detail_body").render())
-
-    text = asyncio.run(_drive())
     assert "GAP" in text.upper() or "UNCOVERED" in text.upper(), (
         f"gap chip missing; got {text!r}"
     )
     assert "gap - no region" in text, f"gap must not claim a region; got {text!r}"
 
 
-def test_at036f_markup_safe_symbol_in_detail(tmp_path: Path) -> None:
-    """Black-box: a hostile ``symbol`` renders literally in the detail pane
-    (AT-036f / LLR-041.11, B-1).
+def test_tc041_4d_hostile_issue_symbol_rendered_literally(tmp_path: Path) -> None:
+    """A hostile issue ``symbol`` renders literally in the detail
+    (REWORKED from AT-036f → pure ``build_detail_text``, LLR-041.11 / B-1).
 
-    Intent: a loaded symbol like ``sensor[red]`` must appear as literal text
-    in ``#map_detail`` with the brackets present — the markup=True render must
-    not parse it as Rich markup, inject styling, or raise ``MarkupError`` and
-    crash the Memory Map screen on the tool's core untrusted-input path.
+    Intent: a loaded ``ValidationIssue.symbol`` like ``sensor[red]`` reaches
+    the detail pane through ``safe_text`` and must render with its brackets
+    literal — never parsed as Rich markup (no injection, no ``MarkupError``).
+    Reworked (not retired) so the issue-``symbol`` markup-safety sink stays
+    guarded; complements ``test_at_r3_detail_hostile...`` (the A2L-name sink).
     """
-    from s19_app.tui.screens_directionb import MapCell
+    from s19_app.tui.screens_directionb import MemoryMapPanel
     from s19_app.validation.model import ValidationIssue, ValidationSeverity
 
-    async def _drive() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _install_case_04_loaded_file(app)
-            app.action_show_screen("map")
-            app.update_memory_map()
-            await pilot.pause()
-            addr = _invalid_range_start(app)
-            app._validation_issues = [
-                ValidationIssue(
-                    code="X",
-                    severity=ValidationSeverity.ERROR,
-                    message="m",
-                    artifact="s19",
-                    symbol="sensor[red]",
-                    address=addr,
-                )
-            ]
-            app.update_memory_map()
-            await pilot.pause()
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            target = _cell_containing(cells, addr)
-            assert target is not None, "the anchored address must land in a cell"
-            target.on_click()
-            await pilot.pause()
-            return str(app.query_one("#map_detail_body").render())
-
-    text = asyncio.run(_drive())
+    panel = MemoryMapPanel()
+    panel._ordered_ranges = [(0x100, 0x200, False)]
+    panel._issues = [
+        ValidationIssue(
+            code="X",
+            severity=ValidationSeverity.ERROR,
+            message="m",
+            artifact="s19",
+            symbol="sensor[red]",
+            address=0x110,
+        )
+    ]
+    text = panel.build_detail_text(0x100, 0x140, "invalid").plain
     assert "sensor[red]" in text, (
         f"the hostile symbol must render literally (brackets present); "
         f"got {text!r}"
-    )
-
-
-def test_at036g_addressless_issue_excluded_from_cell_and_region(
-    tmp_path: Path,
-) -> None:
-    """Black-box: an ``address=None`` issue is in neither the cell list nor
-    the region count (AT-036g / R-1 default).
-
-    Intent: seed one addressless issue and one in-cell issue; selecting the
-    cell must count exactly ONE issue in the cell and ONE in the region — the
-    addressless issue is unanchorable and appears nowhere (locks the
-    operator-confirmed R-1 default: region-count line only, no banner).
-    """
-    from s19_app.tui.screens_directionb import MapCell
-    from s19_app.validation.model import ValidationIssue, ValidationSeverity
-
-    async def _drive() -> str:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _install_case_04_loaded_file(app)
-            app.action_show_screen("map")
-            app.update_memory_map()
-            await pilot.pause()
-            addr = _invalid_range_start(app)
-            app._validation_issues = [
-                ValidationIssue(
-                    code="ANCHORED",
-                    severity=ValidationSeverity.ERROR,
-                    message="anchored",
-                    artifact="s19",
-                    address=addr,
-                ),
-                ValidationIssue(
-                    code="FLOATING",
-                    severity=ValidationSeverity.ERROR,
-                    message="no address",
-                    artifact="s19",
-                    address=None,
-                ),
-            ]
-            app.update_memory_map()
-            await pilot.pause()
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            target = _cell_containing(cells, addr)
-            assert target is not None, "the anchored address must land in a cell"
-            target.on_click()
-            await pilot.pause()
-            return str(app.query_one("#map_detail_body").render())
-
-    text = asyncio.run(_drive())
-    assert "FLOATING" not in text, (
-        f"the address=None issue must NOT appear in the detail; got {text!r}"
-    )
-    assert "1 issue(s) in this cell" in text, (
-        f"exactly one anchored issue in the cell; got {text!r}"
-    )
-    assert "1 issue(s) in region" in text, (
-        f"exactly one anchored issue in the region; got {text!r}"
     )
 
 
@@ -3965,12 +3595,6 @@ _CASE_02_LARGEST_GAP = 2_147_549_173
 _CASE_02_VALID_COUNT = 4
 _CASE_02_INVALID_COUNT = 0
 _CASE_02_COVERAGE_PCT = _CASE_02_COVERED_BYTES / _CASE_02_IMAGE_SPAN * 100
-
-# The live rendered cell count for case_02 at the primary 120x30 size — pinned
-# by the CARRY-F2 guard below so a live-geometry drift fails deterministically
-# (the shipped panel reads `#map_grid.content_size`). Measured value; update in
-# lockstep with any deliberate layout change + the regenerated SVG baseline.
-_EXPECTED_MAP_CELLS_120x30 = 128
 
 
 def test_tc041_8_coverage_stats_exact_case_02_literals() -> None:
@@ -4117,36 +3741,12 @@ def test_tc041_10_reflow_class_toggles_at_119_vs_120(tmp_path: Path) -> None:
         )
 
 
-def test_carry_f2_fixed_cell_count_at_120x30(tmp_path: Path) -> None:
-    """The rendered map cell count is fixed at size=(120,30) for case_02
-    (CARRY-F2 live-geometry lock).
-
-    Intent: the Inc-1 CARRY-F2 note — the shipped panel reads live
-    ``#map_grid.content_size``, so a layout drift could silently change the
-    cell count independent of the SVG baseline. Pin the live count at the
-    primary size for a fixed fixture, so a geometry regression fails HERE
-    (deterministically, no snapshot env needed) rather than flapping the
-    baseline. If a legitimate layout change moves the number, update this
-    literal in lockstep with the regenerated baseline.
-    """
-    from s19_app.tui.screens_directionb import MapCell
-
-    async def _count() -> int:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _install_case_02_loaded_file(app)
-            app.action_show_screen("map")
-            app.update_memory_map()
-            await pilot.pause()
-            return len(list(app.query_one("#map_grid").query(MapCell)))
-
-    count = asyncio.run(_count())
-    assert count == _EXPECTED_MAP_CELLS_120x30, (
-        f"map cell count at (120,30) drifted: {count} != "
-        f"{_EXPECTED_MAP_CELLS_120x30}; update the literal in lockstep with a "
-        f"deliberate layout change + the regenerated SVG baseline"
-    )
+# RETIRED batch-45 (R-TUI-060): ``test_carry_f2_fixed_cell_count_at_120x30``
+# pinned the live ``MapCell`` count against grid geometry. The entropy band view
+# renders no cell grid (region rows are proportional to merged runs, not to a
+# geometry-derived cell count), so the invariant no longer exists. Snapshot
+# drift of the two map cells is covered by ``_batch45_map_drift_marks`` in
+# ``tests/test_tui_snapshot.py`` (xfail-until canonical-CI regen).
 
 
 def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
@@ -4202,6 +3802,769 @@ def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
     assert f"Total issues: {issue_count}" in strip, (
         f"total issues must equal len(_validation_issues)={issue_count}; "
         f"got {strip!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-45 Inc-2 (R-TUI-060, US-045a / LLR-045A.2..045A.6) — the Memory Map's
+# validation cell-grid RENDER is REPLACED by an ENTROPY band view: a
+# proportional band bar + a per-region list (address · size · band) + a band
+# legend, driven by loader-computed ``LoadedFile.entropy_windows``. AT-069/070/
+# 071 are the black-box proofs over the shipped ``#screen_map`` surface.
+# ---------------------------------------------------------------------------
+
+
+def _two_band_loaded(tmp_path: Path) -> "LoadedFile":
+    """Build a two-band ``LoadedFile`` through the real load pipeline.
+
+    Two NON-ADJACENT 256-byte blocks (an address gap keeps them separate
+    derived ranges): a ``0xFF``-fill block (Shannon ``H == 0.0`` →
+    ``constant/padding``) and a seeded-shuffle permutation of ``0..255`` (each
+    byte value once → ``H == 8.0`` → ``high/random``). Emitted to S19, parsed,
+    and built via ``build_loaded_s19`` so entropy is LOADER-computed exactly as
+    the app sees it. Asserts IN-TEST (via ``compute_entropy``) that BOTH bands
+    are present before any render assertion depends on them.
+    """
+    import random
+
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.entropy_service import compute_entropy
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    const_base = 0x80000000
+    high_base = 0x80010000  # 0x10000 gap → a distinct second range (no merge)
+    mem_map: dict[int, int] = {const_base + i: 0xFF for i in range(256)}
+    values = list(range(256))
+    random.Random(20260714).shuffle(values)
+    for i, value in enumerate(values):
+        mem_map[high_base + i] = value
+    ranges = [(const_base, const_base + 256), (high_base, high_base + 256)]
+
+    bands = {w.band for w in compute_entropy(mem_map)}
+    assert {"constant/padding", "high/random"} <= bands, (
+        f"fixture must expose both a constant and a high band; got {bands}"
+    )
+
+    path = tmp_path / "two_band.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    return build_loaded_s19(
+        path, S19File(str(path)), a2l_path=None, a2l_data=None
+    )
+
+
+def _widget_plain(widget: "object") -> str:
+    """Return the plain text of a ``Static``-like widget's rendered content."""
+    return str(widget.render())
+
+
+def _region_rows(app: "S19TuiApp") -> "list":
+    """Return the mounted band-view region-list rows on the map screen."""
+    return list(app.query(".map-region-row"))
+
+
+async def _click_region_row(pilot: "object", app: "S19TuiApp", match) -> "object":
+    """Scroll the first ``RegionRow`` matching ``match`` into view and REAL-click it.
+
+    A single genuine ``pilot.click`` on the widget instance (C-16 real pointer,
+    precedent: ``test_tui_patch_editor_v2.py`` scroll-then-``pilot.click`` and
+    ``test_tui_variants.py::test_at067a`` — NOT the retired cell path). Returns
+    the clicked row so the caller can read its ``region_start``.
+    """
+    from s19_app.tui.screens_directionb import RegionRow
+
+    target = next(r for r in app.query(RegionRow) if match(r))
+    target.scroll_visible(animate=False)
+    await pilot.pause()
+    await pilot.click(target)
+    await pilot.pause()
+    await pilot.pause()
+    return target
+
+
+def _expected_band_runs(loaded: "LoadedFile") -> "list":
+    """Merge address-contiguous same-band windows into ``(band, bytes, start)``.
+
+    The test's own oracle — computed inline from ``compute_entropy``, using an
+    INDEPENDENT contiguity formulation from the production ``_merge_band_runs``:
+    it tracks each open run's expected next address explicitly and breaks the
+    run when the band changes OR the next window is not adjacent to it (review
+    F1). Returns ``(band, summed_bytes, start)`` triples.
+    """
+    from s19_app.tui.services.entropy_service import compute_entropy
+
+    runs: "list" = []
+    open_band: "object" = None
+    open_next_addr: "object" = None
+    for window in compute_entropy(loaded.mem_map):
+        adjacent = window.start == open_next_addr
+        if runs and window.band == open_band and adjacent:
+            band, total, start = runs[-1]
+            runs[-1] = (band, total + window.sample_count, start)
+        else:
+            runs.append((window.band, window.sample_count, window.start))
+            open_band = window.band
+        open_next_addr = window.end
+    return runs
+
+
+def test_at069_high_region_renders_high_band(tmp_path: Path) -> None:
+    """Black-box: the region row over the high-entropy block carries the
+    high band's glyph, class and label (AT-069 / LLR-045A.2/.3/.4).
+
+    RED pre-impl: the map renders a uniform ``sev-*`` cell grid — there is no
+    ``.map-region-row`` widget, so no ``band-high``/``▓``/``high/random`` row
+    exists.
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[bool, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            for row in _region_rows(app):
+                text = _widget_plain(row)
+                if "high/random" in text:
+                    return "band-high" in row.classes, text
+            return False, ""
+
+    has_class, text = asyncio.run(_drive())
+    assert has_class, "the high region row must carry the band-high class"
+    assert "▓" in text, f"the high region row must carry the ▓ glyph; got {text!r}"
+    assert "high/random" in text, f"high band label missing; got {text!r}"
+
+
+def test_at070_constant_vs_high_bands_differ(tmp_path: Path) -> None:
+    """Black-box: the constant and high region rows differ in BOTH glyph and
+    band class (AT-070 / LLR-045A.3, C-10 two-branch — reads both rows).
+
+    RED pre-impl: no ``.map-region-row`` widgets exist, so neither branch is
+    readable.
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[str, tuple, str, tuple]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            const_text = const_classes = high_text = high_classes = None
+            for row in _region_rows(app):
+                text = _widget_plain(row)
+                if "constant/padding" in text:
+                    const_text, const_classes = text, tuple(row.classes)
+                elif "high/random" in text:
+                    high_text, high_classes = text, tuple(row.classes)
+            return const_text, const_classes, high_text, high_classes
+
+    const_text, const_classes, high_text, high_classes = asyncio.run(_drive())
+    assert const_text is not None, "a constant-band region row must render"
+    assert high_text is not None, "a high-band region row must render"
+    # Glyph differs: ▓ marks high only; · marks the constant row's glyph.
+    assert "▓" in high_text and "▓" not in const_text, (
+        f"the high/constant glyphs must differ; const={const_text!r} "
+        f"high={high_text!r}"
+    )
+    # Class differs: band-high vs band-constant.
+    assert "band-high" in high_classes and "band-constant" in const_classes, (
+        f"the band classes must differ; const={const_classes} high={high_classes}"
+    )
+    assert set(high_classes) != set(const_classes), "band classes must differ"
+
+
+def test_at071_region_list_rows_addr_size_band(tmp_path: Path) -> None:
+    """Black-box: one region row per merged run, each showing its address,
+    size and band (AT-071 / LLR-045A.4).
+
+    RED pre-impl: the grid mounts ``.map-cell`` widgets, not ``.map-region-row``
+    rows, so the row count is 0 (not the merged-run count).
+    """
+    loaded = _two_band_loaded(tmp_path)
+    runs = _expected_band_runs(loaded)
+
+    async def _drive() -> "list":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return [_widget_plain(row) for row in _region_rows(app)]
+
+    texts = asyncio.run(_drive())
+    assert len(texts) == len(runs), (
+        f"one region row per merged run expected {len(runs)}; got {len(texts)}"
+    )
+    # A specific run's row must carry its address, size (bytes) and band.
+    band, run_bytes, start = next(r for r in runs if r[0] == "high/random")
+    row_text = next(t for t in texts if "high/random" in t)
+    assert f"0x{start:08X}" in row_text, f"row start address missing; got {row_text!r}"
+    assert f"{run_bytes} B" in row_text, f"row size missing; got {row_text!r}"
+    assert band in row_text, f"row band label missing; got {row_text!r}"
+
+
+def test_at071b_disjoint_same_band_regions_stay_separate(tmp_path: Path) -> None:
+    """Two physically separate SAME-band blocks render as TWO region rows, not
+    one merged span (AT-071b / LLR-045A.4, review F1).
+
+    ``compute_entropy`` walks per-contiguous-range, so two 0xFF-fill padding
+    blocks across an address gap sit back-to-back in the window list with the
+    SAME band. A band-only merge would collapse them into one row showing a
+    single contiguous span + summed size that crosses the gap. The merge must
+    also break on an address discontinuity, so each block keeps its own row.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.entropy_service import compute_entropy
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    block_a = 0x80000000
+    block_b = 0x80020000  # gap → a distinct second range, same 0xFF band
+    mem_map = {block_a + i: 0xFF for i in range(256)}
+    mem_map.update({block_b + i: 0xFF for i in range(256)})
+    ranges = [(block_a, block_a + 256), (block_b, block_b + 256)]
+    # Precondition: both blocks are the SAME band (so only contiguity separates).
+    bands = [w.band for w in compute_entropy(mem_map)]
+    assert bands == ["constant/padding", "constant/padding"], bands
+
+    path = tmp_path / "two_pad.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    loaded = build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+    async def _drive() -> "list":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return [_widget_plain(row) for row in _region_rows(app)]
+
+    texts = asyncio.run(_drive())
+    assert len(texts) == 2, (
+        f"two disjoint same-band blocks must render as 2 region rows; got {texts}"
+    )
+    # Each row is its own block: 256 B (never the merged 512 B), at its own start.
+    assert any(f"0x{block_a:08X}" in t and "256 B" in t for t in texts), texts
+    assert any(f"0x{block_b:08X}" in t and "256 B" in t for t in texts), texts
+    assert not any("512 B" in t for t in texts), (
+        f"the two blocks must NOT merge into a 512 B span; got {texts}"
+    )
+
+
+def test_map_band_view_survives_rerender(tmp_path: Path) -> None:
+    """A second ``update_memory_map`` re-renders the band view without a
+    DuplicateIds crash or doubled region rows (regression: the re-mounted band
+    containers must use CLASSES, not unique IDs — ``grid.remove_children`` is
+    deferred, so an id collides at re-render, LLR-045A.2).
+    """
+    loaded = _two_band_loaded(tmp_path)
+    runs = _expected_band_runs(loaded)
+
+    async def _drive() -> int:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            app.update_memory_map()  # re-render: must not raise / must not double
+            await pilot.pause()
+            return len(_region_rows(app))
+
+    assert asyncio.run(_drive()) == len(runs), (
+        "a re-render must leave exactly one region row per run (no doubling, "
+        "no DuplicateIds)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-45 Inc-3 (R-TUI-062, LLR-045C) — single-click region→hex nav + the
+# detail-pane re-wire (keeps R-TUI-041 R-3 A2L naming + its C-17 guard on a
+# LIVE path) + re-cover of the retired test_ac1 B-01 nearest-present-row snap.
+# ---------------------------------------------------------------------------
+
+
+def _install_two_far_ranges(app: "S19TuiApp", tmp_path: Path) -> "object":
+    """Load a two-range image whose ranges sit ~1 MiB apart (B-01 fixture).
+
+    Range B's rows live far past range A's first page, so a hex window that
+    fails to reposition provably does NOT render them. Built through the real
+    emit → S19File → build_loaded_s19 pipeline.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    ranges = [(0x1000, 0x1000 + 3200), (0x100000, 0x100000 + 3200)]
+    mem_map = {
+        addr: (addr & 0xFF) for start, end in ranges for addr in range(start, end)
+    }
+    path = tmp_path / "two_far.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    loaded = build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+    app.current_file = loaded
+    app._apply_empty_state()
+    return loaded
+
+
+def test_at074_single_click_repositions_hex(tmp_path: Path) -> None:
+    """Black-box: ONE real click on a region row repositions the hex view
+    (AT-074 / R-TUI-062, LLR-045C.1, C-16 real pointer).
+
+    A single ``pilot.click`` on the HIGH region row (start ``0x80010000``) must
+    reveal the Workspace/hex screen AND render that region's 16-aligned row
+    token in ``#hex_view`` — with EXACTLY ONE click (no reveal-button, no
+    two-step). RED pre-Inc-3: Inc-2 mounted region rows but wired NO click nav,
+    so the click posts nothing and the hex view never repositions.
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[bool, str, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            row = await _click_region_row(
+                pilot, app, lambda r: "high/random" in _widget_plain(r)
+            )
+            ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
+            hex_str = str(app.query_one("#hex_view").render())
+            return ws_visible, hex_str, row.region_start
+
+    ws_visible, hex_str, start = asyncio.run(_drive())
+    assert ws_visible, "a single region click must reveal the Workspace/hex screen"
+    row_token = f"{start - (start % 16):08X}"
+    assert row_token in hex_str.upper(), (
+        f"the hex row for the clicked region 0x{start:08X} must render; "
+        f"expected row base {row_token}"
+    )
+
+
+def test_tc062_1_region_activation_posts_single_open_in_hex(tmp_path: Path) -> None:
+    """A region activation posts EXACTLY ONE OpenInHexRequested; no activation
+    posts none (TC-062.1 / R-TUI-062, white-box message contract).
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow
+
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        posted: list[int] = []
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            orig_post = panel.post_message
+
+            def _cap(msg: "object") -> bool:
+                if isinstance(msg, MemoryMapPanel.OpenInHexRequested):
+                    posted.append(msg.focus_address)
+                return orig_post(msg)
+
+            panel.post_message = _cap  # type: ignore[method-assign]
+            # No activation yet → no message.
+            none_yet = len(posted)
+            row = next(iter(app.query(RegionRow)))
+            panel.on_region_row_activated(
+                RegionRow.Activated(row.region_start, row.region_end)
+            )
+            return none_yet, len(posted)
+
+    none_yet, after_one = asyncio.run(_drive())
+    assert none_yet == 0, "no region activation must post no OpenInHexRequested"
+    assert after_one == 1, (
+        f"one activation must post exactly one OpenInHexRequested; got {after_one}"
+    )
+
+
+def test_b01_region_click_snaps_hex_to_far_range(tmp_path: Path) -> None:
+    """Re-cover of the retired test_ac1 (B-01): navigating to a FAR region lands
+    the hex window on the nearest present row (R-TUI-062 + batch-31 AC-1).
+
+    Two facets: (1) a REAL region click over the far range B repositions the
+    hex window to range B's first row (0x00100000) — the map→far-region nav
+    test_ac1 covered; (2) the underlying nearest-present-row snap for an
+    ABSENT-in-gap focus address (test_ac1's precondition — a region click uses a
+    PRESENT start, so the absent-address branch is driven directly through
+    ``update_hex_view``) still lands on the nearest present row.
+    """
+
+    async def _drive() -> "tuple[str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            _install_two_far_ranges(app, tmp_path)
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            # (1) Real click on the far range-B region (start 0x00100000).
+            await _click_region_row(pilot, app, lambda r: r.region_start == 0x100000)
+            for _ in range(3):
+                await pilot.pause()
+            click_hex = str(app.query_one("#hex_view").render())
+            # (2) Absent-in-gap focus address snaps to the nearest present row.
+            app.update_hex_view(focus_address=0x0FFFF0)  # in the gap, not present
+            await pilot.pause()
+            snap_hex = str(app.query_one("#hex_view").render())
+            return click_hex, snap_hex
+
+    click_hex, snap_hex = asyncio.run(_drive())
+    assert "00100000" in click_hex.upper(), (
+        "a click on range B's region must render range B's first row "
+        "(0x00100000)"
+    )
+    assert "00100000" in snap_hex.upper(), (
+        "an absent-in-gap focus must snap to the nearest present row "
+        "(range B's first row 0x00100000)"
+    )
+
+
+def test_at_r3_region_click_detail_names_a2l_symbol_literally(
+    tmp_path: Path,
+) -> None:
+    """The region-triggered detail pane keeps R-TUI-041 R-3 A2L naming alive and
+    renders a hostile symbol literally (LLR-045C detail re-wire, C-17 F1).
+
+    A single region click populates ``#map_detail`` via ``build_detail_text`` for
+    the clicked run's window; the covering region is named by the overlapping
+    A2L symbol(s) through the retained ``safe_text``/``symbol_list_text`` path.
+    A hostile symbol name (``evil[red]``) must render LITERALLY — proving the
+    C-17 markup-safety guard now runs on a LIVE (region-triggered), not merely a
+    pure-function, path. Region-LIST rows themselves stay addr/size/band-only.
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[str, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            # Seed an A2L symbol overlapping the CONSTANT region's covering range.
+            app._a2l_enriched_tags = [
+                {"name": "evil[red]", "address": 0x80000010, "byte_size": 4},
+            ]
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            row = await _click_region_row(
+                pilot, app, lambda r: r.region_start == 0x80000000
+            )
+            detail = str(app.query_one("#map_detail_body").render())
+            row_text = _widget_plain(row)
+            return detail, row_text
+
+    detail, row_text = asyncio.run(_drive())
+    assert "evil[red]" in detail, (
+        f"the region-triggered detail must name the A2L symbol literally; "
+        f"got {detail!r}"
+    )
+    assert "0x80000000" in detail, (
+        f"the detail must show the clicked region's bounds; got {detail!r}"
+    )
+    # B3: the region-LIST row itself must NOT carry the A2L symbol name.
+    assert "evil[red]" not in row_text, (
+        f"region rows are addr/size/band-only (B3); got {row_text!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-45 Inc-4 (R-TUI-061, LLR-045B) — docked "At a glance" panel: a per-band
+# histogram (region counts + %) + a band-coloured profile sparkline, docked
+# beside the band bar at >=120 cols and stacked below it at the 80x24 floor.
+# ---------------------------------------------------------------------------
+
+
+def _constant_only_loaded(tmp_path: Path) -> "LoadedFile":
+    """A single 0xFF-fill block (one constant/padding window) → uniform profile."""
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.entropy_service import compute_entropy
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    base = 0x80000000
+    mem_map = {base + i: 0xFF for i in range(256)}
+    ranges = [(base, base + 256)]
+    bands = {w.band for w in compute_entropy(mem_map)}
+    assert bands == {"constant/padding"}, bands
+    path = tmp_path / "const.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    return build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+
+def _glance_rows(app: "S19TuiApp") -> "list":
+    """Return the At-a-glance histogram rows on the map screen."""
+    return list(app.query(".map-glance-row"))
+
+
+def _sparkline_text(app: "S19TuiApp") -> str:
+    """Concatenated plain text of the At-a-glance sparkline segments."""
+    return "".join(_widget_plain(s) for s in app.query(".map-sparkline-seg"))
+
+
+def test_tc061_1_band_histogram_counts() -> None:
+    """band_histogram tallies REGION counts per occupied band + percentages
+    (TC-061.1 / LLR-045B.1, pure).
+    """
+    from s19_app.tui.screens_directionb import band_histogram
+
+    runs = [
+        ("constant/padding", 256, 0x0),
+        ("high/random", 256, 0x1000),
+        ("high/random", 256, 0x2000),
+    ]
+    rows = band_histogram(runs)
+    # Occupied bands only, in canonical band order.
+    assert [(b, c) for b, c, _p in rows] == [
+        ("constant/padding", 1),
+        ("high/random", 2),
+    ]
+    pcts = [p for _b, _c, p in rows]
+    assert abs(sum(pcts) - 100.0) < 1e-9, f"percentages must sum to 100; {pcts}"
+    assert band_histogram([]) == [], "empty runs → empty histogram"
+
+
+def test_tc061_2_sparkline_ramp_mapping() -> None:
+    """entropy_ramp_glyph maps 0→space, 8→full block, mid→ramp; sparkline_glyphs
+    sub-samples with step max(1, N//width) (TC-061.2 / LLR-045B.2, pure).
+    """
+    from s19_app.tui.screens_directionb import (
+        _ENTROPY_BAR_RAMP,
+        entropy_ramp_glyph,
+        sparkline_glyphs,
+    )
+    from s19_app.tui.services.entropy_service import EntropyWindow
+
+    assert entropy_ramp_glyph(0.0) == _ENTROPY_BAR_RAMP[0] == " "
+    assert entropy_ramp_glyph(8.0) == _ENTROPY_BAR_RAMP[8] == "█"
+    assert entropy_ramp_glyph(4.0) == _ENTROPY_BAR_RAMP[4]
+    # Clamp out-of-range without raising.
+    assert entropy_ramp_glyph(99.0) == _ENTROPY_BAR_RAMP[8]
+
+    def _w(e: float) -> EntropyWindow:
+        return EntropyWindow(0, 256, 256, e, "x", False)
+
+    # width >= N → step 1 → one glyph per window.
+    assert sparkline_glyphs([_w(0.0), _w(8.0)], 24) == " █"
+    # width < N → step N//width samples down.
+    windows = [_w(0.0) for _ in range(48)]
+    assert len(sparkline_glyphs(windows, 24)) == 24  # step 48//24 = 2 → 24 samples
+    assert sparkline_glyphs([], 24) == ""
+
+
+def test_at072_histogram_per_band_counts(tmp_path: Path) -> None:
+    """Black-box: the At-a-glance histogram lists each occupied band with a
+    count equal to its region tally, %s ~summing to 100 (AT-072 / LLR-045B.1).
+
+    RED pre-impl: no ``.at-a-glance`` / ``.map-glance-row`` surface exists.
+    """
+    from s19_app.tui.screens_directionb import band_histogram
+
+    loaded = _two_band_loaded(tmp_path)
+    expected = {b: c for b, c, _p in band_histogram(_expected_band_runs(loaded))}
+
+    async def _drive() -> "dict":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            out: dict = {}
+            for row in _glance_rows(app):
+                text = _widget_plain(row)
+                classes = tuple(row.classes)
+                out[classes] = text
+            return out
+
+    rows = asyncio.run(_drive())
+    # Both bands present as histogram rows (by band class), non-vacuous counts.
+    const_row = next(t for c, t in rows.items() if "band-constant" in c)
+    high_row = next(t for c, t in rows.items() if "band-high" in c)
+    const_count = expected["constant/padding"]
+    high_count = expected["high/random"]
+    assert const_count >= 1 and high_count >= 1, expected
+    assert f"constant/padding {const_count} " in const_row, (
+        f"constant row must show its region count {const_count}; got {const_row!r}"
+    )
+    assert f"high/random {high_count} " in high_row, (
+        f"high row must show its region count {high_count}; got {high_row!r}"
+    )
+    # Percentages present and ~sum to 100 across the two rows.
+    import re
+
+    pcts = [
+        int(re.search(r"(\d+)%", t).group(1))
+        for t in (const_row, high_row)
+    ]
+    assert abs(sum(pcts) - 100) <= 1, f"histogram %s must ~sum to 100; got {pcts}"
+
+
+def test_at073_sparkline_tracks_profile(tmp_path: Path) -> None:
+    """Black-box: a mixed image's sparkline has >=2 distinct ramp glyphs, and a
+    constant-only image's sparkline is uniform (AT-073 / LLR-045B.2, two-branch).
+
+    RED pre-impl: no ``.map-sparkline`` surface exists.
+    """
+    mixed = _two_band_loaded(tmp_path)
+    flat = _constant_only_loaded(tmp_path)
+
+    async def _spark(loaded) -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return _sparkline_text(app)
+
+    async def _both() -> "tuple[str, str]":
+        return await _spark(mixed), await _spark(flat)
+
+    mixed_spark, flat_spark = asyncio.run(_both())
+    assert len(set(mixed_spark)) >= 2, (
+        f"a mixed-entropy image's sparkline must vary (>=2 distinct glyphs); "
+        f"got {mixed_spark!r}"
+    )
+    assert flat_spark and len(set(flat_spark)) == 1, (
+        f"a constant-only image's sparkline must be uniform (1 glyph); "
+        f"got {flat_spark!r}"
+    )
+
+
+def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
+    """Pilot-geometry: the band bar + At-a-glance fit the viewport at 120x30 AND
+    80x24, docked side-by-side when wide and stacked when narrow (LLR-045B.3,
+    C-23 — measured regions, not fr-math).
+    """
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _measure(size) -> "dict":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            body = app.query_one("#workspace_body")
+            bar = app.query_one(".map-band-bar")
+            glance = app.query_one(".at-a-glance")
+            return {
+                "narrow": body.has_class("width-narrow"),
+                "body_right": body.region.right,
+                "bar": (bar.region.x, bar.region.y, bar.region.width, bar.region.right),
+                "glance": (
+                    glance.region.x,
+                    glance.region.y,
+                    glance.region.width,
+                    glance.region.right,
+                ),
+            }
+
+    wide = asyncio.run(_measure((120, 30)))
+    narrow = asyncio.run(_measure((80, 24)))
+
+    for tag, m in (("120x30", wide), ("80x24", narrow)):
+        bx, by, bw, bright = m["bar"]
+        gx, gy, gw, gright = m["glance"]
+        assert bw > 0 and gw > 0, f"{tag}: both widgets must have width; {m}"
+        # No horizontal overflow past the body's right edge (no clip off-screen).
+        assert bright <= m["body_right"], f"{tag}: band bar overflows body; {m}"
+        assert gright <= m["body_right"], f"{tag}: glance overflows body; {m}"
+
+    # Wide (>=120): NOT narrow → glance docked to the RIGHT of the bar (same row).
+    assert not wide["narrow"], f"120x30 must be the wide regime; {wide}"
+    assert wide["glance"][0] > wide["bar"][0], (
+        f"at 120x30 the glance must dock beside (right of) the band bar; {wide}"
+    )
+    # Narrow (<120): width-narrow → glance STACKS below the band bar.
+    assert narrow["narrow"], f"80x24 must be the narrow regime; {narrow}"
+    assert narrow["glance"][1] > narrow["bar"][1], (
+        f"at 80x24 the glance must stack below the band bar; {narrow}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-45 Inc-5 (R-TUI-050/051 retire) — the standalone entropy pop-up is
+# removed; its function lives in the always-visible Memory-Map band view. A
+# deletion still owes an observation (AT-075/076).
+# ---------------------------------------------------------------------------
+
+
+def test_at075_e_key_opens_no_modal_map_has_legend(tmp_path: Path) -> None:
+    """Black-box: pressing ``e`` opens no modal, and the map's band legend is
+    present (AT-075 / R-TUI-050/051 retire).
+
+    RED pre-delete: ``e`` was bound to ``show_entropy`` and pushed the
+    ``EntropyViewerScreen`` modal (the screen stack grew).
+    """
+    from textual.screen import ModalScreen
+
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[int, int, bool, list]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            before = len(app.screen_stack)
+            await pilot.press("e")
+            await pilot.pause()
+            after = len(app.screen_stack)
+            is_modal = isinstance(app.screen, ModalScreen)
+            legend = [_widget_plain(r) for r in app.query(".map-legend-row")]
+            return before, after, is_modal, legend
+
+    before, after, is_modal, legend = asyncio.run(_drive())
+    assert after == before, (
+        f"pressing 'e' must push no modal (stack {before} -> {after})"
+    )
+    assert not is_modal, "no ModalScreen may be active after pressing 'e'"
+    joined = " ".join(legend)
+    for band in ("constant/padding", "low", "medium", "high/random"):
+        assert band in joined, f"the map band legend must list {band!r}; got {legend}"
+
+
+def test_at076_entropy_screen_and_action_removed() -> None:
+    """Black-box: ``EntropyViewerScreen`` is gone from ``screens``, and
+    ``S19TuiApp`` has no ``show_entropy`` action or ``e`` binding (AT-076).
+
+    RED pre-delete: all three existed.
+    """
+    import s19_app.tui.screens as screens_module
+
+    assert not hasattr(screens_module, "EntropyViewerScreen"), (
+        "EntropyViewerScreen must be removed from s19_app.tui.screens"
+    )
+    assert not hasattr(S19TuiApp, "action_show_entropy"), (
+        "S19TuiApp.action_show_entropy must be removed"
+    )
+    bound = {b.key: b.action for b in S19TuiApp.BINDINGS if hasattr(b, "key")}
+    assert bound.get("e") != "show_entropy", (
+        f"the 'e' -> show_entropy binding must be removed; got {bound.get('e')!r}"
     )
 
 
@@ -4489,10 +4852,17 @@ def test_tc028_memory_map_renderer_adds_no_coverage_computation() -> None:
     assert "ranges" in attrs and "range_validity" in attrs, (
         "update_memory_map must read LoadedFile.ranges / range_validity"
     )
+    # Gather BOTH attribute-form (``x.compute_entropy(...)``) and bare-name
+    # (``compute_entropy(...)`` — the actual import+call shape) so an inline
+    # entropy recompute trips the guard regardless of call form (review F2).
     calls = {
         node.func.attr
         for node in ast.walk(tree)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+    } | {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
     forbidden_calls = {
         "validate_artifact_consistency",
@@ -4501,6 +4871,12 @@ def test_tc028_memory_map_renderer_adds_no_coverage_computation() -> None:
         "build_range_validity_hex",
         "parse_a2l_file",
         "parse_mac_file",
+        # batch-45 (R-TUI-060, M4): entropy is computed on the worker-thread
+        # load path (load_service.build_loaded_*) and cached on
+        # ``LoadedFile.entropy_windows``; ``update_memory_map`` must only READ
+        # that field, never recompute it inline (render-only / off-thread).
+        "compute_entropy",
+        "_merge_band_runs",
     }
     leaked_calls = sorted(forbidden_calls & calls)
     assert leaked_calls == [], (
@@ -7382,51 +7758,10 @@ def test_ac5_files_list_grows_beyond_legacy_cap(tmp_path: Path) -> None:
     )
 
 
-def test_ac6_map_cells_render_contiguous_band(tmp_path: Path) -> None:
-    """AC-6 / B-15: adjacent map cells form a contiguous glyph band.
-
-    Intent: the operator reported the minimap stripes looked uncomfortably
-    separated. Root cause: each `MapCell` rendered a single centered `█`
-    inside a multi-column grid track, leaving blank gutter columns. The fix
-    fills each cell's content width with glyphs, so (a) every cell's render
-    equals `█ * content_width`, (b) at least one track is >= 2 columns wide
-    (the artifact zone), and (c) same-row neighbours are horizontally
-    contiguous (`right.x == left.x + left.width` with the glyph run filling
-    the width, no blank gutter remains).
-    """
-    from s19_app.tui.screens_directionb import MapCell
-
-    async def _drive() -> "list[tuple[str, int, object]]":
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _mounted_map_panel(app)
-            await pilot.pause()
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            return [
-                (cell.render().plain, cell.content_size.width, cell.region)
-                for cell in cells[:32]
-            ]
-
-    data = asyncio.run(_drive())
-    assert data, "the mounted map grid must contain cells"
-    for plain, width, _region in data:
-        assert width >= 1, "a mounted cell must have layout width"
-        assert plain == "█" * width, (
-            f"cell render must fill its content width; got {plain!r} for width {width}"
-        )
-    assert any(width >= 2 for _p, width, _r in data), (
-        "at least one grid track must be wider than 1 column at 120x30 "
-        "(otherwise this test cannot observe the old gutter artifact)"
-    )
-    regions = [r for _p, _w, r in data]
-    row_y = regions[0].y
-    same_row = sorted((r for r in regions if r.y == row_y), key=lambda r: r.x)
-    assert len(same_row) >= 2, "need >= 2 same-row cells to check contiguity"
-    for left, right in zip(same_row, same_row[1:]):
-        assert right.x == left.x + left.width, (
-            f"same-row cells must be contiguous; {left} then {right}"
-        )
+# RETIRED batch-45 (R-TUI-060): ``test_ac6_map_cells_render_contiguous_band``
+# (B-15) asserted the ``MapCell`` glyph-fill contiguity across the grid tracks.
+# The entropy band view removes the cell grid entirely (the band bar is a single
+# proportional segment row), so the gutter-artifact invariant no longer applies.
 
 
 # ---------------------------------------------------------------------------
@@ -7544,54 +7879,12 @@ def _install_two_far_ranges_loaded_file(app: "S19TuiApp", tmp_path: Path) -> "ob
     return loaded
 
 
-def test_ac1_open_in_hex_snaps_to_nearest_present_row(tmp_path: Path) -> None:
-    """AC-1 / B-01: Open-in-Hex repositions to the nearest present row
-    (RED-first: the old `focus_base in row_bases` guard left the window on
-    page 1, so the selected far region never appeared).
-
-    Intent: the operator clicks a Memory Map cell over/near the second range
-    (whose coarse `cell_start` falls in the inter-range gap — an absent
-    address) and presses "Open in Hex View". The Workspace hex view must
-    render the row of the nearest present address at-or-after the cell start
-    (range B's first row, `0x00100000`), not silently stay on range A's page.
-    """
-    from textual.widgets import Button as _Button
-    from textual.widgets import Static as _Static
-
-    from s19_app.tui.screens_directionb import MapCell, MemoryMapPanel
-
-    async def _drive() -> "tuple[bool, int, str]":
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            _install_two_far_ranges_loaded_file(app, tmp_path)
-            app.action_show_screen("map")
-            app.update_memory_map()
-            await pilot.pause()
-            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
-            cells = list(app.query_one("#map_grid").query(MapCell))
-            cell = _cell_containing(cells, 0x100000)
-            assert cell is not None, "a cell must cover range B's start"
-            assert cell.cell_start not in (app.current_file.row_bases or []), (
-                "precondition: the coarse cell start must NOT be a present row "
-                f"base (got 0x{cell.cell_start:08X}) — otherwise this test "
-                "cannot observe the snap"
-            )
-            panel.on_map_cell_selected(MapCell.Selected(cell))
-            await pilot.pause()
-            panel.query_one("#map_open_hex_button", _Button).press()
-            for _ in range(4):
-                await pilot.pause()
-            hex_text = str(app.query_one("#hex_view", _Static).render())
-            workspace_visible = app._is_layout_visible("#screen_workspace")
-            return workspace_visible, app._hex_window_start, hex_text
-
-    workspace_visible, window_start, hex_text = asyncio.run(_drive())
-    assert workspace_visible, "Open-in-Hex must switch to the Workspace screen"
-    assert "0x00100000" in hex_text, (
-        "the hex view must render range B's first row (nearest present row "
-        f"at-or-after the gap cell start); window_start={window_start}"
-    )
+# RETIRED batch-45 (R-TUI-060): ``test_ac1_open_in_hex_snaps_to_nearest_present_
+# row`` (B-01) drove the Open-in-Hex nearest-present-row snap through the removed
+# ``MapCell`` + ``on_map_cell_selected`` surface. RE-COVERED in Inc-3 (R-TUI-062)
+# by ``test_b01_region_click_snaps_hex_to_far_range`` — a real region click over
+# a far range plus the direct absent-in-gap ``update_hex_view`` snap assertion.
+# (Coverage flag closed.)
 
 
 # ===========================================================================

@@ -47,7 +47,6 @@ from s19_app.tui.screens import LoadFileScreen
 # that would silently steal a keystroke if the focus were on the primary
 # button instead of the Input. The colliding letters are:
 #   s -> action_save_project
-#   e -> action_show_entropy
 #   r -> action_refresh_files
 #   l -> action_load_file
 #   p -> action_load_project

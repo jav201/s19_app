@@ -49,7 +49,12 @@ from typing import Any, List, Mapping, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual.app import ComposeResult
-from textual.containers import Container, Horizontal, ScrollableContainer
+from textual.containers import (
+    Container,
+    Horizontal,
+    ScrollableContainer,
+    Vertical,
+)
 from textual.message import Message
 from textual.widgets import (
     Button,
@@ -64,7 +69,9 @@ from textual.widgets import (
 from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
+from .entropy_style import ENTROPY_BAND_LABELS, band_style
 from .os_clipboard_input import OsClipboardInput
+from .services.entropy_service import EntropyWindow
 from .services.flow_model import (
     BLOCK_PATCH,
     BLOCK_SOURCE,
@@ -164,27 +171,247 @@ class ScreenScaffold(Container):
         yield EmptyStatePanel()
 
 
-#: Default grid geometry (columns, rows) used when the panel's live content
-#: region has not been measured yet (headless unit tests, pre-mount renders).
-#: Kept small and fixed so the cell count is a pure function of
-#: ``(span, geometry)`` and never drifts with runtime layout (LLR-041.2, R-4).
-DEFAULT_GRID_COLS = 16
-DEFAULT_GRID_ROWS = 8
+#: Total character width the entropy band bar is drawn across (batch-45,
+#: R-TUI-060). Fixed so each run's segment width is a deterministic function of
+#: ``round(_BAND_BAR_WIDTH * run_bytes / total_bytes)`` — independent of live
+#: layout geometry, exactly as the cell count was kept geometry-pure (LLR-041.2).
+_BAND_BAR_WIDTH = 60
 
-#: The VISUAL column count of ``#map_grid``. Must equal the ``grid-size`` of the
-#: ``#map_grid`` rule in ``styles.tcss`` — the two are the single source of
-#: truth for how the cells wrap on screen, so arrow-key Up/Down (``∓ cols``)
-#: lands on the cell the operator sees one row away (US-036). Kept equal to
-#: ``DEFAULT_GRID_COLS`` so headless and rendered geometries agree.
-MAP_GRID_COLS = DEFAULT_GRID_COLS
+#: 9-glyph entropy ramp (0.0 → 8.0 bits/byte) for the At-a-glance sparkline
+#: (batch-45, R-TUI-061 / LLR-045B.2). Index 0 = a space (near-zero entropy),
+#: index 8 = a full block (maximal entropy). Mirrors the prototype ``BARS``.
+_ENTROPY_BAR_RAMP = " ▁▂▃▄▅▆▇█"
 
-#: A single kibibyte, used only for the "≈ N KiB/cell" header label arithmetic.
-_KIB = 1024
+#: Fixed histogram bar width for the At-a-glance per-band rows (LLR-045B.1) —
+#: geometry-pure like ``_BAND_BAR_WIDTH``.
+_GLANCE_BAR_WIDTH = 6
 
-#: Filled block glyph rendered inside each cell; its colour comes from the
-#: cell's ``sev-*`` CSS class (single source of truth = color_policy), never a
-#: hard-coded severity hex in this module (LLR-041.3).
-_CELL_GLYPH = "█"
+#: Fixed number of sparkline columns the profile is sampled to (LLR-045B.2).
+_SPARKLINE_WIDTH = 24
+
+
+def entropy_ramp_glyph(entropy: float) -> str:
+    """Map a Shannon entropy value (0.0–8.0) to its :data:`_ENTROPY_BAR_RAMP` glyph.
+
+    Summary:
+        Round ``entropy`` to the nearest integer band index and clamp it into
+        ``[0, 8]`` to pick one of the nine ramp glyphs (batch-45, R-TUI-061 /
+        LLR-045B.2). A constant-fill window (``0.0``) maps to the leading space;
+        a maximal-entropy window (``8.0``) to the full block.
+
+    Args:
+        entropy (float): Entropy in bits/byte, normally ``0.0 ≤ H ≤ 8.0``.
+
+    Returns:
+        str: The single ramp glyph for ``entropy``.
+
+    Data Flow:
+        - Called once per sampled window by :func:`sparkline_glyphs` /
+          :func:`_sparkline_segments`.
+
+    Dependencies:
+        Uses:
+            - _ENTROPY_BAR_RAMP
+        Used by:
+            - sparkline_glyphs / _sparkline_segments / tests
+
+    Example:
+        >>> entropy_ramp_glyph(0.0), entropy_ramp_glyph(8.0)
+        (' ', '█')
+    """
+    index = int(round(entropy))
+    index = max(0, min(len(_ENTROPY_BAR_RAMP) - 1, index))
+    return _ENTROPY_BAR_RAMP[index]
+
+
+def band_histogram(
+    runs: Sequence[Tuple[str, int, int]],
+) -> List[Tuple[str, int, float]]:
+    """Tally merged region runs per band into ``(band, count, pct)`` rows.
+
+    Summary:
+        Count how many merged region runs fall in each band and compute each
+        band's share of the total region count (batch-45, R-TUI-061 /
+        LLR-045B.1). Rows are returned for OCCUPIED bands only (count > 0), in
+        the canonical :data:`ENTROPY_BAND_LABELS` order. The count is a REGION
+        (merged-run) count — consistent with the region list — not a raw
+        window count. A pure tally over the already-merged runs; no re-parse.
+
+    Args:
+        runs (Sequence[Tuple[str, int, int]]): The merged
+            ``(band, bytes, start)`` runs from :func:`_merge_band_runs`.
+
+    Returns:
+        List[Tuple[str, int, float]]: One ``(band_label, region_count,
+        percentage)`` per occupied band, in band order; ``[]`` when ``runs`` is
+        empty. Percentages are ``100 * count / total`` and sum to ~100.
+
+    Data Flow:
+        - Reads each run's band; produces the histogram rows the At-a-glance
+          panel renders.
+
+    Dependencies:
+        Uses:
+            - ENTROPY_BAND_LABELS
+        Used by:
+            - MemoryMapPanel._build_glance_widgets / tests
+
+    Example:
+        >>> band_histogram([("low", 256, 0), ("low", 256, 4096),
+        ...                 ("high/random", 256, 8192)])
+        [('low', 2, 66.66666666666667), ('high/random', 1, 33.33333333333333)]
+    """
+    total = len(runs)
+    if total == 0:
+        return []
+    counts = {label: 0 for label in ENTROPY_BAND_LABELS}
+    for band, _bytes, _start in runs:
+        if band in counts:
+            counts[band] += 1
+    return [
+        (label, counts[label], 100.0 * counts[label] / total)
+        for label in ENTROPY_BAND_LABELS
+        if counts[label] > 0
+    ]
+
+
+def sparkline_glyphs(windows: Sequence[EntropyWindow], width: int) -> str:
+    """Sample the entropy profile to a fixed-width ramp-glyph string.
+
+    Summary:
+        Sub-sample ``windows`` with step ``max(1, N // width)`` and map each
+        sampled window's entropy to its :func:`entropy_ramp_glyph` (batch-45,
+        R-TUI-061 / LLR-045B.2). The plain (uncoloured) glyph string; the
+        rendered sparkline colours it per band via :func:`_sparkline_segments`.
+
+    Args:
+        windows (Sequence[EntropyWindow]): The loader-computed entropy windows.
+        width (int): Target column budget the profile is sampled down to.
+
+    Returns:
+        str: One ramp glyph per sampled window; ``""`` for empty input.
+
+    Data Flow:
+        - Reads each sampled window's ``entropy``; used by the pure unit test
+          and any plain-text sparkline read.
+
+    Dependencies:
+        Uses:
+            - entropy_ramp_glyph
+        Used by:
+            - tests (TC-061.2)
+
+    Example:
+        >>> from s19_app.tui.services.entropy_service import EntropyWindow
+        >>> w = lambda e: EntropyWindow(0, 256, 256, e, "x", False)
+        >>> sparkline_glyphs([w(0.0), w(8.0)], 24)
+        ' █'
+    """
+    if not windows:
+        return ""
+    step = max(1, len(windows) // max(1, width))
+    return "".join(entropy_ramp_glyph(w.entropy) for w in windows[::step])
+
+
+def _sparkline_segments(
+    windows: Sequence[EntropyWindow], width: int
+) -> List[Tuple[str, str]]:
+    """Sample the profile and group it into ``(band, glyphs)`` colour segments.
+
+    Summary:
+        Sub-sample ``windows`` (step ``max(1, N // width)``) and group
+        consecutive sampled windows of the SAME band into runs, each carrying
+        that band's concatenated ramp glyphs (batch-45, LLR-045B.2). One
+        band-styled ``Static`` per segment lets the sparkline be band-coloured
+        through the ``band-*`` CSS classes (single colour source) rather than
+        per-glyph widgets or hard-coded Rich colours.
+
+    Args:
+        windows (Sequence[EntropyWindow]): The loader-computed entropy windows.
+        width (int): Target column budget for sampling.
+
+    Returns:
+        List[Tuple[str, str]]: ``(band, glyphs)`` colour segments in profile
+        order; ``[]`` for empty input.
+
+    Data Flow:
+        - Reads each sampled window's ``band`` + ``entropy``; produces the
+          per-band sparkline segments the panel mounts.
+
+    Dependencies:
+        Uses:
+            - entropy_ramp_glyph
+        Used by:
+            - MemoryMapPanel._build_glance_widgets
+    """
+    if not windows:
+        return []
+    step = max(1, len(windows) // max(1, width))
+    segments: List[Tuple[str, str]] = []
+    for window in windows[::step]:
+        glyph = entropy_ramp_glyph(window.entropy)
+        if segments and segments[-1][0] == window.band:
+            band, glyphs = segments[-1]
+            segments[-1] = (band, glyphs + glyph)
+        else:
+            segments.append((window.band, glyph))
+    return segments
+
+
+def _merge_band_runs(
+    windows: Sequence[EntropyWindow],
+) -> List[Tuple[str, int, int]]:
+    """Merge contiguous same-band entropy windows into region runs.
+
+    Summary:
+        Collapse an ascending-address ``EntropyWindow`` sequence into one run
+        per maximal stretch of ADDRESS-CONTIGUOUS same-band windows, summing
+        their byte counts (batch-45, R-TUI-060 / LLR-045A.4). A run extends
+        onto the next window only when the band matches AND the window is
+        physically adjacent (``run_start + run_total == window.start``); a band
+        change OR an address discontinuity starts a new run. The contiguity
+        break matters because ``compute_entropy`` walks per-contiguous-range,
+        so two physically separate same-band regions (e.g. two padding blocks
+        across an address gap) sit back-to-back in the window list and must NOT
+        collapse into one span (review F1). Pure arithmetic over already-
+        computed windows — no re-parse, no entropy recomputation.
+
+    Args:
+        windows (Sequence[EntropyWindow]): The loader-computed
+            ``LoadedFile.entropy_windows`` in ascending address order.
+
+    Returns:
+        List[Tuple[str, int, int]]: One ``(band_label, summed_bytes,
+        start_addr)`` per run, in window order; ``[]`` for empty input.
+
+    Data Flow:
+        - Reads each window's ``band`` / ``sample_count`` / ``start``; produces
+          the run list the band bar + region list render from.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel.render_ranges`` (band bar + region list)
+
+    Example:
+        >>> from s19_app.tui.services.entropy_service import EntropyWindow
+        >>> w = lambda s, band: EntropyWindow(s, s + 256, 256, 0.0, band, False)
+        >>> _merge_band_runs([w(0, "low"), w(256, "low"), w(512, "high/random")])
+        [('low', 512, 0), ('high/random', 256, 512)]
+        >>> _merge_band_runs([w(0, "low"), w(4096, "low")])  # gap → 2 runs
+        [('low', 256, 0), ('low', 256, 4096)]
+    """
+    runs: List[Tuple[str, int, int]] = []
+    for window in windows:
+        if (
+            runs
+            and runs[-1][0] == window.band
+            and runs[-1][2] + runs[-1][1] == window.start
+        ):
+            band, total, start = runs[-1]
+            runs[-1] = (band, total + window.sample_count, start)
+        else:
+            runs.append((window.band, window.sample_count, window.start))
+    return runs
 
 
 def derive_image_span(
@@ -745,228 +972,86 @@ def coverage_stats(
     )
 
 
-#: The four arrow keys and their (row, column) focus deltas on the minimap
-#: grid — Left/Right step one cell, Up/Down step one visual row. Consumed by
-#: ``adjacent_cell_index``; kept as data so the handler stays a table lookup.
-_ARROW_DELTAS = {
-    "left": (0, -1),
-    "right": (0, 1),
-    "up": (-1, 0),
-    "down": (1, 0),
-}
-
-
-def adjacent_cell_index(
-    current: int, key: str, count: int, cols: int
-) -> Optional[int]:
-    """Return the grid index one arrow-step from ``current``, clamped.
+class RegionRow(Static):
+    """A single clickable entropy region-list row (batch-45, R-TUI-062).
 
     Summary:
-        Compute the focus target for an arrow key over a ``count``-cell grid
-        laid out ``cols`` columns wide (US-036 keyboard nav). Left/Right move
-        ``∓1`` in mount order; Up/Down move ``∓cols`` (one visual row). The
-        result is clamped to ``[0, count)`` — stepping off the first/last cell
-        or above the top / below the bottom row is a no-op (returns the same
-        index), so focus never wraps. Returns ``None`` for a non-arrow key or
-        an empty grid. Pure arithmetic — no widget access, no parsing.
+        One row of the ``.map-region-list`` — an address · size · band summary
+        of one merged entropy run. A SINGLE real click posts
+        :class:`Activated` carrying the run's ``[region_start, region_end)``
+        window; the enclosing :class:`MemoryMapPanel` handles it by populating
+        the detail pane (``build_detail_text``, keeping the R-TUI-041 R-3 A2L
+        naming + its C-17 markup-safety guard alive on a live path) and posting
+        :class:`MemoryMapPanel.OpenInHexRequested` for direct region→hex nav
+        (LLR-045C.1 — no reveal-button, no two-step). The row itself shows
+        addr/size/band ONLY — no file-derived A2L text (security B3). A click on
+        padding/legend/empty area hits no ``RegionRow`` and is an inert no-op
+        (LLR-045C.3).
 
     Args:
-        current (int): The focused cell's index in mount order.
-        key (str): The pressed key (one of ``_ARROW_DELTAS`` or anything else).
-        count (int): Total number of cells in the grid.
-        cols (int): Visual column count (``MAP_GRID_COLS``).
-
-    Returns:
-        Optional[int]: The target index (possibly ``== current`` at an edge),
-        or ``None`` when ``key`` is not an arrow or the grid is empty.
+        content (Text): The markup-safe ``{glyph} 0x.. · N B · band`` row text.
+        region_start (int): Inclusive start address of the run.
+        region_end (int): Exclusive end address of the run
+            (``region_start + run_bytes``).
+        classes (str): Space-joined CSS classes (``map-region-row`` + the
+            run's ``band-*`` token).
 
     Data Flow:
-        - Called by ``MemoryMapPanel.focus_adjacent_cell`` with the current
-          focus index; its result selects which cell receives ``.focus()``.
+        - Mounted by ``MemoryMapPanel._build_band_widgets``; on click posts
+          :class:`Activated` → ``MemoryMapPanel.on_region_row_activated``.
 
     Dependencies:
         Used by:
-            - ``MemoryMapPanel.focus_adjacent_cell``
-
-    Example:
-        >>> adjacent_cell_index(0, "right", 32, 16)
-        1
-        >>> adjacent_cell_index(0, "left", 32, 16)  # clamp at first cell
-        0
-        >>> adjacent_cell_index(3, "down", 32, 16)
-        19
-        >>> adjacent_cell_index(3, "up", 32, 16)  # clamp above top row
-        3
-        >>> adjacent_cell_index(0, "enter", 32, 16) is None
-        True
-    """
-    delta = _ARROW_DELTAS.get(key)
-    if delta is None or count <= 0 or cols <= 0:
-        return None
-    row_delta, col_delta = delta
-    target = current + col_delta + row_delta * cols
-    if target < 0 or target >= count:
-        return current
-    return target
-
-
-class MapCell(Static):
-    """A single focusable, clickable cell of the Memory Map minimap grid.
-
-    Summary:
-        Carries the address window ``[cell_start, cell_end)`` and status of one
-        grid tile so both the pointer-click and the keyboard-focus/``Enter``
-        paths can resolve which cell was selected (LLR-041.4).
-
-        Navigation (US-036):
-            - ``Tab`` / ``Shift+Tab`` — Textual's default focus traversal steps
-              cell to cell (each cell is ``can_focus``).
-            - Arrow keys — Left/Right move focus to the previous/next cell in
-              mount order; Up/Down move one grid row (``∓ cols``); focus clamps
-              at the grid edges (no wrap). Handled by delegating to
-              ``MemoryMapPanel.focus_adjacent_cell`` (the panel owns the cell
-              list + column count — a single source of truth). Arrows only MOVE
-              focus; they do NOT select.
-            - Click / ``Enter`` — posts :class:`Selected`, which the panel
-              handles by rendering the detail pane (the select step).
-
-        Purely presentational — it stores windows, never parses.
-
-    Args:
-        cell_start (int): Inclusive window start of this cell.
-        cell_end (int): Exclusive window end of this cell.
-        status (str): The cell status (``"valid"`` / ``"invalid"`` / ``"gap"``).
-        classes (str): The space-joined CSS classes (``map-cell`` + the
-            ``sev-*`` status class).
-
-    Returns:
-        None
-
-    Data Flow:
-        - Mounted by ``MemoryMapPanel.render_ranges``; on click/``Enter`` posts
-          :class:`Selected` → ``MemoryMapPanel.on_map_cell_selected``.
-
-    Dependencies:
-        Used by:
-            - ``MemoryMapPanel.render_ranges``
-
-    Example:
-        >>> cell = MapCell(0, 16, "valid", "map-cell sev-ok")
-        >>> (cell.cell_start, cell.cell_end, cell.status)
-        (0, 16, 'valid')
+            - ``MemoryMapPanel._build_band_widgets``
     """
 
-    can_focus = True
-
-    class Selected(Message):
-        """A map cell was activated (click or ``Enter``).
+    class Activated(Message):
+        """A region row was clicked (single-click region→hex + detail).
 
         Args:
-            cell (MapCell): The activated cell.
+            region_start (int): The run's inclusive start address (the hex
+                focus address).
+            region_end (int): The run's exclusive end address.
         """
 
-        def __init__(self, cell: "MapCell") -> None:
+        def __init__(self, region_start: int, region_end: int) -> None:
             super().__init__()
-            self.cell = cell
+            self.region_start = region_start
+            self.region_end = region_end
 
     def __init__(
-        self, cell_start: int, cell_end: int, status: str, classes: str
+        self,
+        content: Text,
+        region_start: int,
+        region_end: int,
+        classes: str,
     ) -> None:
-        super().__init__(safe_text(_CELL_GLYPH), classes=classes)
-        self.cell_start = cell_start
-        self.cell_end = cell_end
-        self.status = status
-
-    def render(self) -> Text:
-        """
-        Summary:
-            Render the cell as a run of ``█`` glyphs filling the cell's
-            current content width, so adjacent cells form a contiguous band
-            instead of lone centered glyphs separated by blank grid-track
-            columns (batch-31 AC-6 / B-15).
-
-        Returns:
-            Text: A markup-safe run of ``_CELL_GLYPH`` sized to the content
-            width (minimum one glyph before layout has assigned a size).
-
-        Data Flow:
-            - Called by Textual on every (re)render, including after resize,
-              so the fill tracks the live grid-track width; colour still comes
-              solely from the ``sev-*`` CSS class on the widget.
-
-        Dependencies:
-            Uses:
-                - ``safe_text`` (markup-safe constant glyph, C-17-consistent)
-            Used by:
-                - Textual render dispatch
-
-        Example:
-            >>> MapCell(0, 16, "valid", "map-cell sev-ok").render().plain
-            '█'
-        """
-        width = max(1, self.content_size.width)
-        return safe_text(_CELL_GLYPH * width)
+        super().__init__(content, classes=classes)
+        self.region_start = region_start
+        self.region_end = region_end
 
     def on_click(self) -> None:
-        """Post :class:`Selected` when the cell is clicked."""
-        self.focus()
-        self.post_message(self.Selected(self))
-
-    def on_key(self, event) -> None:  # type: ignore[no-untyped-def]
-        """Handle ``Enter`` (select) and the arrow keys (move focus).
-
-        Summary:
-            ``Enter`` posts :class:`Selected` (the select step). An arrow key
-            moves focus to the adjacent cell via the parent
-            :class:`MemoryMapPanel` and is CONSUMED (``event.stop()``) so it
-            does not also scroll the enclosing ``#map_content``
-            ``ScrollableContainer`` — the consumption is scoped to a focused
-            cell only, so arrows retain their normal scroll behaviour when
-            focus is elsewhere. Arrows never select.
-
-        Args:
-            event: The Textual key event (``event.key`` is the key name).
-
-        Dependencies:
-            Uses:
-                - ``MemoryMapPanel.focus_adjacent_cell``
-            Used by:
-                - Textual key-event dispatch (only while this cell is focused)
-        """
-        if event.key == "enter":
-            event.stop()
-            self.post_message(self.Selected(self))
-            return
-        if event.key in _ARROW_DELTAS:
-            panel = self._map_panel()
-            if panel is not None:
-                event.stop()
-                panel.focus_adjacent_cell(self, event.key)
-
-    def _map_panel(self) -> Optional["MemoryMapPanel"]:
-        """Return the enclosing ``MemoryMapPanel`` ancestor, or ``None``."""
-        node = self.parent
-        while node is not None:
-            if isinstance(node, MemoryMapPanel):
-                return node
-            node = node.parent
-        return None
+        """Post :class:`Activated` for this region on a single click."""
+        self.post_message(self.Activated(self.region_start, self.region_end))
 
 
 class MemoryMapPanel(Container):
-    """Colour-coded 2-D spatial minimap of the loaded image's memory ranges.
+    """Entropy band view of the loaded image's mapped memory.
 
     Summary:
-        Renders the firmware image span as a grid of address-window cells,
-        each coloured ``valid``/``invalid``/``gap`` from the already-computed
-        ``LoadedFile.ranges`` and ``LoadedFile.range_validity`` handed to
-        ``render_ranges``. Cell size auto-scales so the whole span fits the
-        visible grid, and a header shows the "≈ N KiB/cell" ratio. It is a
-        pure presentational widget — it performs NO coverage, parsing,
-        validation or file I/O of its own (LLR-041.7). Cell colours route
-        exclusively through ``css_class_for_severity`` (LLR-041.3); no
-        severity hex is hard-coded. With no ranges it preserves the neutral
-        no-file note (LLR-041.9).
+        Renders the image as an ENTROPY band view (batch-45, R-TUI-060): a
+        proportional band bar + a per-region list (address · size · band) + a
+        band legend, merged by ``_merge_band_runs`` from the loader-computed
+        ``LoadedFile.entropy_windows`` handed to ``render_ranges``. This
+        replaced the batch-27 ``sev-*`` validity cell grid (the ``MapCell`` +
+        arrow-nav machinery was removed in batch-45 Inc-5; a single click on a
+        region row drives detail + hex nav via ``on_region_row_activated``). It
+        is a pure presentational widget — it performs NO entropy, coverage,
+        parsing or validation of its own (LLR-045A.2 / LLR-041.7).
+        Band colours route through the ``band-*`` CSS classes owned by
+        ``entropy_style`` + ``styles.tcss`` (LLR-045A.3); no colour hex is
+        hard-coded. The coverage stats strip is retained unchanged. With no
+        image / no entropy it preserves the neutral no-data note (LLR-045A.5).
 
     Args:
         None
@@ -975,17 +1060,20 @@ class MemoryMapPanel(Container):
         None
 
     Data Flow:
-        - ``render_ranges`` receives the pre-computed ``ranges`` and
-          ``range_validity`` from ``S19TuiApp.update_memory_map``, derives the
-          image span and per-cell status by arithmetic on those already-parsed
-          values, and mounts one ``.map-cell`` widget per cell into
-          ``#map_grid`` carrying its ``sev-*`` status class.
-        - Selecting a cell populates ``#map_detail`` (status chip, window,
-          covering region, cell-scoped issues, region count); the
-          ``#map_stats`` strip shows the seven coverage statistics derived by
-          ``coverage_stats`` (US-037 / LLR-041.8).
-        - With no ranges the header shows the neutral empty note, no cells are
-          mounted, and the stats strip is blanked (LLR-041.9).
+        - ``render_ranges`` receives the pre-computed ``ranges`` +
+          ``range_validity`` + ``entropy_windows`` from
+          ``S19TuiApp.update_memory_map``, merges contiguous same-band windows
+          via ``_merge_band_runs``, and mounts ``.map-band-seg`` segments (the
+          band bar) plus the ``.map-region-row`` region list, the band legend,
+          and the docked ``.at-a-glance`` histogram/sparkline into
+          ``#map_grid`` — no per-cell ``.map-cell`` widgets are mounted.
+        - Clicking a region row drives ``on_region_row_activated`` → populates
+          ``#map_detail`` (via ``build_detail_text``: status chip, covering
+          region, A2L symbols, issues) and posts ``OpenInHexRequested`` for
+          single-click hex nav; the ``#map_stats`` strip shows the seven
+          coverage statistics derived by ``coverage_stats`` (US-037 / LLR-041.8).
+        - With no ranges / no entropy the header shows the neutral empty note,
+          no segments/rows are mounted, and the stats strip is blanked (LLR-041.9).
         - ``#map_grid`` and ``#map_detail`` sit in a ``#map_body`` sub-container
           laid horizontally when wide and stacked under ``width-narrow`` — the
           reflow rules live in ``styles.tcss`` (LLR-041.10).
@@ -1006,10 +1094,7 @@ class MemoryMapPanel(Container):
     """
 
     _EMPTY_TEXT = "No file loaded - press Ctrl+L (or 'l') to load a file."
-    _DETAIL_HINT = (
-        "Click a cell, or focus the grid and use arrows "
-        "(<-/->/up/down) then Enter to inspect."
-    )
+    _DETAIL_HINT = "Click a region row to inspect it and jump to the hex view."
 
     class OpenInHexRequested(Message):
         """The operator asked to jump to the hex view at a cell's start (US-036).
@@ -1048,32 +1133,28 @@ class MemoryMapPanel(Container):
         #: (LLR-041.5 / LLR-041.8, arch MINOR-3). Never re-derived here.
         self._issues: List[ValidationIssue] = []
         #: The enriched A2L tags handed in by ``update_memory_map`` (R-TUI-041
-        #: R-3) — the read-only source for naming a region/cell by the A2L
-        #: symbol(s) overlapping it (detail pane + per-cell tooltip). Never
-        #: re-parsed; joined via ``symbols_in_window``.
+        #: R-3) — the read-only source for naming a region by the A2L symbol(s)
+        #: overlapping it (region-triggered detail pane). Never re-parsed;
+        #: joined via ``symbols_in_window``.
         self._a2l_tags: List[Mapping[str, Any]] = []
-        #: The currently-selected cell's start address, or ``None`` before any
-        #: selection — carried on the Open-in-Hex message (LLR-041.6).
+        #: The currently-selected region's start address, or ``None`` before any
+        #: selection — carried on the Open-in-Hex message (LLR-041.6 / R-TUI-062).
         self._selected_cell_start: Optional[int] = None
-        #: The visual column count the last grid was laid out with — used by
-        #: arrow-key Up/Down (``∓ cols``). Equals ``MAP_GRID_COLS`` (the CSS
-        #: ``grid-size``), the single source of truth for on-screen wrapping.
-        self._grid_cols: int = MAP_GRID_COLS
 
     def compose(self) -> ComposeResult:
-        """Compose the header, the cell grid and the (empty) placeholders.
+        """Compose the header, the band-view body and the (empty) placeholders.
 
         Summary:
-            Yield the full-width "≈ N KiB/cell" header, then a ``#map_body``
-            horizontal sub-container holding the ``#map_grid`` cell grid and
-            the ``#map_detail`` pane side by side (the wide-regime layout;
+            Yield the full-width header, then a ``#map_body`` horizontal
+            sub-container holding the ``#map_grid`` band-view container and the
+            ``#map_detail`` pane side by side (the wide-regime layout;
             ``#map_body`` stacks them vertically under ``width-narrow`` — the
-            reflow lives in ``styles.tcss``, LLR-041.10), and finally the
-            full-width ``#map_stats`` coverage strip (US-037 / LLR-041.8).
+            reflow lives in ``styles.tcss``), and finally the full-width
+            ``#map_stats`` coverage strip (US-037 / LLR-041.8).
 
         Returns:
-            ComposeResult: the header, the grid+detail body, and the stats
-            strip.
+            ComposeResult: the header, the band-view + detail body, and the
+            stats strip.
 
         Dependencies:
             Used by:
@@ -1084,42 +1165,11 @@ class MemoryMapPanel(Container):
             Container(id="map_grid"),
             Container(
                 Static(safe_text(self._DETAIL_HINT), id="map_detail_body"),
-                Button(
-                    "Open in Hex View",
-                    id="map_open_hex_button",
-                    classes="hidden",
-                ),
                 id="map_detail",
             ),
             id="map_body",
         )
         yield Container(Static("", id="map_stats_body"), id="map_stats")
-
-    def _grid_geometry(self) -> Tuple[int, int]:
-        """Return the (cols, rows) grid geometry to scale cells against.
-
-        Summary:
-            Read the live content-region size of ``#map_grid`` when the panel
-            is mounted and measured, else fall back to the fixed
-            ``DEFAULT_GRID_COLS``/``DEFAULT_GRID_ROWS``. Kept separate so tests
-            can reason about the cell count as a pure function of geometry
-            (LLR-041.2, R-4).
-
-        Returns:
-            Tuple[int, int]: ``(cols, rows)`` — always ``>= 1`` each.
-
-        Dependencies:
-            Used by:
-                - ``render_ranges``
-        """
-        try:
-            grid = self.query_one("#map_grid", Container)
-            size = grid.content_size
-            cols = size.width if size.width > 0 else DEFAULT_GRID_COLS
-            rows = size.height if size.height > 0 else DEFAULT_GRID_ROWS
-        except Exception:
-            cols, rows = DEFAULT_GRID_COLS, DEFAULT_GRID_ROWS
-        return (max(1, cols), max(1, rows))
 
     def render_ranges(
         self,
@@ -1127,48 +1177,65 @@ class MemoryMapPanel(Container):
         range_validity: Sequence[bool],
         issues: Sequence[ValidationIssue] = (),
         a2l_tags: Sequence[Mapping[str, Any]] = (),
+        entropy_windows: Sequence[EntropyWindow] = (),
     ) -> None:
-        """Render the colour-coded minimap grid from already-computed ranges.
+        """Render the entropy band view from already-computed windows.
 
         Summary:
-            Build the image span, auto-scale the cell size to the visible
-            grid, and mount one ``MapCell`` widget per cell coloured by its
-            overlap status. The input is consumed verbatim from the
-            ``LoadedFile`` snapshot and the pre-computed ``issues`` list — no
-            range is re-derived and no coverage/validation is computed here
-            (LLR-041.7). Cell content is built as markup-safe ``Text``
-            (LLR-041.11). The ordered ranges and the issue list are stored so
-            cell selection can assemble the detail pane (LLR-041.4/.5).
+            Merge the loader-computed ``entropy_windows`` into contiguous
+            same-band runs and render the Memory-Map body as a proportional
+            band bar + a per-region list + a band legend (batch-45, R-TUI-060 /
+            LLR-045A.2..045A.6). This REPLACES the batch-27 ``sev-*`` validity
+            cell grid — no ``MapCell`` is mounted. All input is consumed
+            verbatim from the ``LoadedFile`` snapshot; no range is re-derived
+            and no entropy/coverage/validation is computed here (LLR-045A.2 M4,
+            LLR-041.7). Every segment/row is a widget carrying its
+            ``band-*`` CSS class (colour owned by ``styles.tcss``) with
+            markup-safe ``Text`` content (LLR-041.11). The coverage stats strip
+            is retained unchanged (validity signal). The ordered ranges + issue
+            list are still stored so the retained ``build_detail_text`` (re-wired
+            to region-row selection in a later increment) stays usable.
 
         Args:
             ranges (Sequence[Tuple[int, int]]): Contiguous ``(start, end)``
-                memory ranges from ``LoadedFile.ranges`` (``end`` exclusive).
+                memory ranges from ``LoadedFile.ranges`` (``end`` exclusive) —
+                used only for the retained coverage stats strip.
             range_validity (Sequence[bool]): Per-range validity flags from
                 ``LoadedFile.range_validity``, positionally aligned with
-                ``ranges``.
+                ``ranges`` — used only for the coverage stats strip.
             issues (Sequence[ValidationIssue]): The already-computed
-                ``S19TuiApp._validation_issues`` — the single canonical source
-                for the cell-scoped issue list and the region-issue count
-                (LLR-041.5); defaults to empty for the no-issue / headless
-                path.
+                ``S19TuiApp._validation_issues`` — the canonical source for the
+                stats strip issue count and the retained detail-pane join
+                (LLR-041.5); defaults to empty for the headless path.
+            a2l_tags (Sequence[Mapping[str, Any]]): The enriched A2L tags for
+                the retained detail-pane region naming (R-TUI-041 R-3);
+                deliberately NOT used by the new region-list rows, which are
+                addr/size/band-only (security B3).
+            entropy_windows (Sequence[EntropyWindow]): The loader-computed
+                per-window entropy over the image (``LoadedFile.entropy_windows``);
+                empty on the no-file path. The trailing default keeps every
+                pre-batch-45 caller working (C-26 safe, mirrors the batch-43
+                ``a2l_tags`` 4th-arg pattern).
 
         Returns:
             None
 
         Data Flow:
-            - When ``ranges`` is empty, show the neutral empty note, mount no
-              cells and reset the detail pane (LLR-041.9).
-            - Otherwise derive the span, cell count and bytes-per-cell, then
-              mount a ``MapCell`` widget per cell into ``#map_grid`` with its
-              ``sev-*`` status class and its ``[cell_start, cell_end)`` window;
-              the header shows the "≈ N KiB/cell" ratio. The summary text is
-              stored on ``rendered_text``.
+            - When there is no image or no entropy (``ranges`` empty, zero
+              span, or ``entropy_windows`` empty), show the neutral no-data
+              note, mount no segments/rows and blank the stats strip — never
+              raise (LLR-045A.5 / LLR-041.9).
+            - Otherwise merge windows via ``_merge_band_runs`` and mount the
+              band bar (``.map-band-bar``), region list (``.map-region-list``)
+              and legend (``.map-band-legend``) into ``#map_grid``; the header
+              shows a band summary. The summary is stored on ``rendered_text``.
+              These three are addressed by CLASS (not id) because they are
+              re-mounted every render (an id would trip ``DuplicateIds``).
 
         Dependencies:
             Uses:
-                - ``derive_image_span`` / ``cell_count_for_geometry`` /
-                  ``bytes_per_cell`` / ``cell_status`` /
-                  ``status_to_css_class`` / ``MapCell``
+                - ``_merge_band_runs`` / ``band_style`` / ``ENTROPY_BAND_LABELS``
+                  / ``safe_text`` / ``derive_image_span``
             Used by:
                 - ``S19TuiApp.update_memory_map``
         """
@@ -1187,7 +1254,7 @@ class MemoryMapPanel(Container):
 
         span_start, span_end = derive_image_span(ranges)
         span = span_end - span_start
-        if not ranges or span <= 0:
+        if not ranges or span <= 0 or not entropy_windows:
             self._ordered_ranges = []
             self.rendered_text = self._EMPTY_TEXT
             header.update(self._EMPTY_TEXT)
@@ -1203,76 +1270,164 @@ class MemoryMapPanel(Container):
         ordered.sort(key=lambda item: item[0])
         self._ordered_ranges = ordered
 
-        cols, rows = self._grid_geometry()
-        count = cell_count_for_geometry(span, cols, rows)
-        per_cell = bytes_per_cell(span, count)
-        #: Record the VISUAL column count for arrow-key Up/Down; the on-screen
-        #: wrapping is fixed by the ``#map_grid`` CSS ``grid-size`` (MAP_GRID_COLS),
-        #: not the measured content geometry used only for the cell *count*.
-        self._grid_cols = MAP_GRID_COLS
+        runs = _merge_band_runs(entropy_windows)
+        grid.mount(*self._build_band_widgets(runs, entropy_windows))
 
-        cells: List[MapCell] = []
-        for index in range(count):
-            cell_start = span_start + index * per_cell
-            cell_end = min(span_end, cell_start + per_cell)
-            status = cell_status(cell_start, cell_end, ordered)
-            sev_class = status_to_css_class(status)
-            cell = MapCell(
-                cell_start, cell_end, status, f"map-cell {sev_class}"
-            )
-            # R-TUI-041 R-3: hover tooltip naming the A2L symbol(s) in the cell.
-            # MUST be a Rich ``Text`` — Textual markup-parses a bare ``str``
-            # tooltip, so a Text keeps a hostile A2L name literal (security F1).
-            cell.tooltip = self._cell_tooltip(cell_start, cell_end, status)
-            cells.append(cell)
-        if cells:
-            grid.mount(*cells)
-
-        kib_per_cell = per_cell / _KIB
-        summary = f"≈ {kib_per_cell:.2f} KiB/cell ({count} cells, {per_cell} B/cell)"
+        total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
+        summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
         self.rendered_text = summary
         header.update(safe_text(summary))
 
         self._render_stats(ranges, range_validity, self._issues, empty=False)
 
-    def _cell_tooltip(
-        self, cell_start: int, cell_end: int, status: str
-    ) -> Text:
-        """Markup-safe hover tooltip for one ``MapCell`` (R-TUI-041 R-3).
+    def _build_band_widgets(
+        self,
+        runs: Sequence[Tuple[str, int, int]],
+        windows: Sequence[EntropyWindow],
+    ) -> List[Container]:
+        """Build the band row (bar + At-a-glance), region list and legend.
 
         Summary:
-            Compose the cell's address window + status and, when A2L symbol(s)
-            overlap the cell window, their name(s) (capped) — as a Rich
-            ``Text``. The return MUST be ``Text`` (never a ``str``): Textual
-            8.2.8 renders a bare ``str`` tooltip through ``markup=True``
-            (``Content.from_markup``), so a hostile A2L name like ``evil[red]``
-            would inject markup or raise ``MarkupError`` on hover; a ``Text`` is
-            rendered via ``Content.from_rich_text`` literally (security review
-            F1 / the batch-27 markup BLOCKER class). The window + status are
-            developer-formatted ints/literals; only the symbol names are
-            file-derived, and they flow through ``symbol_list_text`` (safe).
+            Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
+            R-TUI-061): a ``.map-band-row`` docking the proportional
+            ``.map-band-bar`` (one segment per run, width ∝ byte share) beside
+            the ``.at-a-glance`` panel (per-band histogram + profile sparkline,
+            LLR-045B), then the ``.map-region-list`` (one addr/size/band row per
+            run) and the ``.map-band-legend`` (one row per band label). Each is
+            addressed by CLASS (not id) because they are re-mounted every render
+            (an id would trip ``DuplicateIds``). Every segment/row is a widget
+            carrying its ``band-*`` CSS class (``styles.tcss`` owns the colour)
+            with markup-safe ``Text`` via ``safe_text`` (LLR-041.11). Region
+            rows + the At-a-glance panel carry no file-derived text — region
+            rows are addr/size/band only; the histogram/sparkline use constant
+            band labels (security B3). At ``width-narrow`` the band row reflows
+            to vertical (band bar over glance) so both fit the 80×24 floor
+            (LLR-045B.3).
 
         Args:
-            cell_start (int): Inclusive cell-window start.
-            cell_end (int): Exclusive cell-window end.
-            status (str): The cell status literal (``valid``/``invalid``/``gap``).
+            runs (Sequence[Tuple[str, int, int]]): The merged
+                ``(band_label, summed_bytes, start_addr)`` runs from
+                ``_merge_band_runs`` (non-empty).
+            windows (Sequence[EntropyWindow]): The loader-computed entropy
+                windows the sparkline profile is sampled from.
 
         Returns:
-            Text: The markup-safe tooltip content.
+            List[Container]: ``[band_row, region_list, legend]`` ready to mount
+            into ``#map_grid``.
+
+        Data Flow:
+            - Reads ``runs`` + ``windows`` + the ``entropy_style`` band maps;
+              produces the widgets ``render_ranges`` mounts.
 
         Dependencies:
             Uses:
-                - ``symbols_in_window`` / ``symbol_list_text``
+                - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text`` /
+                  ``_build_glance_widgets``
             Used by:
-                - ``render_ranges`` (per-cell ``MapCell.tooltip``)
+                - ``render_ranges``
         """
-        text = Text()
-        text.append(f"0x{cell_start:08X}-0x{cell_end - 1:08X} ({status})")
-        names = symbols_in_window(self._a2l_tags, cell_start, cell_end)
-        if names:
-            text.append("\n")
-            text.append(symbol_list_text(names))
-        return text
+        total_bytes = sum(run_bytes for _band, run_bytes, _start in runs) or 1
+
+        segments: List[Static] = []
+        region_rows: List[RegionRow] = []
+        for band, run_bytes, start in runs:
+            token, glyph, _meaning = band_style(band)
+            width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_bytes))
+            segments.append(
+                Static(safe_text(glyph * width), classes=f"map-band-seg {token}")
+            )
+            region_rows.append(
+                RegionRow(
+                    safe_text(f"{glyph} 0x{start:08X} · {run_bytes} B · {band}"),
+                    region_start=start,
+                    region_end=start + run_bytes,
+                    classes=f"map-region-row {token}",
+                )
+            )
+
+        legend_rows: List[Static] = []
+        for band in ENTROPY_BAND_LABELS:
+            token, glyph, meaning = band_style(band)
+            legend_rows.append(
+                Static(
+                    safe_text(f"{glyph} {band} — {meaning}"),
+                    classes=f"map-legend-row {token}",
+                )
+            )
+
+        # Re-mounted every render after ``grid.remove_children()`` (whose removal
+        # is deferred), so these carry CLASSES, not unique IDs — an ID would trip
+        # ``DuplicateIds`` when the old container is still registered at re-render
+        # (the same reason the retired cell grid used ``.map-cell``, not an id).
+        band_bar = Horizontal(*segments, classes="map-band-bar")
+        glance = self._build_glance_widgets(runs, windows)
+        return [
+            Horizontal(band_bar, glance, classes="map-band-row"),
+            Vertical(*region_rows, classes="map-region-list"),
+            Vertical(*legend_rows, classes="map-band-legend"),
+        ]
+
+    def _build_glance_widgets(
+        self,
+        runs: Sequence[Tuple[str, int, int]],
+        windows: Sequence[EntropyWindow],
+    ) -> Container:
+        """Build the docked "At a glance" panel (histogram + sparkline).
+
+        Summary:
+            Assemble the ``.at-a-glance`` panel (batch-45, R-TUI-061): a title,
+            one band-styled histogram row per OCCUPIED band (``{glyph} {label}
+            {count} {bar} {pct}%`` — region counts via :func:`band_histogram`,
+            LLR-045B.1), and a band-coloured profile ``.map-sparkline`` of the
+            entropy windows (one band-styled segment per contiguous same-band
+            run of sampled ramp glyphs, :func:`_sparkline_segments`,
+            LLR-045B.2). Colour flows solely through the ``band-*`` CSS classes;
+            every text sink is a markup-safe ``safe_text`` over CONSTANT band
+            labels — no file-derived text (security B3).
+
+        Args:
+            runs (Sequence[Tuple[str, int, int]]): The merged region runs (the
+                histogram's region tally).
+            windows (Sequence[EntropyWindow]): The entropy windows the
+                sparkline profile is sampled from.
+
+        Returns:
+            Container: The ``.at-a-glance`` panel to dock beside the band bar.
+
+        Data Flow:
+            - Reads ``runs`` (histogram) + ``windows`` (sparkline); produces the
+              docked panel.
+
+        Dependencies:
+            Uses:
+                - ``band_histogram`` / ``_sparkline_segments`` / ``band_style``
+                  / ``safe_text``
+            Used by:
+                - ``_build_band_widgets``
+        """
+        children: List[Static] = [
+            Static(safe_text("At a glance"), classes="glance-title")
+        ]
+        for band, count, pct in band_histogram(runs):
+            token, glyph, _meaning = band_style(band)
+            bar = "█" * max(1, round(_GLANCE_BAR_WIDTH * pct / 100.0))
+            children.append(
+                Static(
+                    safe_text(f"{glyph} {band} {count} {bar} {pct:.0f}%"),
+                    classes=f"map-glance-row {token}",
+                )
+            )
+
+        spark_segments: List[Static] = [
+            Static(safe_text(glyphs), classes=f"map-sparkline-seg {band_style(band)[0]}")
+            for band, glyphs in _sparkline_segments(windows, _SPARKLINE_WIDTH)
+        ]
+        children.append(
+            Horizontal(*spark_segments, classes="map-sparkline")
+            if spark_segments
+            else Static(safe_text(""), classes="map-sparkline")
+        )
+        return Vertical(*children, classes="at-a-glance")
 
     def _render_stats(
         self,
@@ -1360,12 +1515,12 @@ class MemoryMapPanel(Container):
         return text
 
     def _reset_detail(self) -> None:
-        """Clear the detail pane back to its neutral hint and hide the jump.
+        """Clear the detail pane back to its neutral hint.
 
         Summary:
-            Return the detail body to the "select a cell" hint and hide the
-            Open-in-Hex button — used on every fresh render so a stale
-            selection from a prior file never lingers.
+            Return the detail body to the "click a region row" hint — used on
+            every fresh render so a stale selection from a prior file never
+            lingers.
 
         Dependencies:
             Used by:
@@ -1373,12 +1528,10 @@ class MemoryMapPanel(Container):
         """
         try:
             body = self.query_one("#map_detail_body", Static)
-            button = self.query_one("#map_open_hex_button", Button)
         except Exception:
             return
         self._selected_cell_start = None
         body.update(safe_text(self._DETAIL_HINT))
-        button.add_class("hidden")
 
     def build_detail_text(
         self,
@@ -1470,100 +1623,38 @@ class MemoryMapPanel(Container):
         text.append(f"{region_issue_count} issue(s) in region")
         return text
 
-    def on_map_cell_selected(self, event: "MapCell.Selected") -> None:
-        """Render the detail pane for the activated cell (LLR-041.4).
+    def on_region_row_activated(self, event: "RegionRow.Activated") -> None:
+        """Handle a region-row click: populate detail + jump to hex (R-TUI-062).
 
         Summary:
-            Handle a :class:`MapCell.Selected` message by composing the
-            markup-safe detail body for that cell and revealing the
-            Open-in-Hex jump. Stores the cell start so the jump can carry it.
+            On a single :class:`RegionRow.Activated` (one click), populate the
+            retained ``#map_detail`` pane for the clicked run's
+            ``[region_start, region_end)`` window via ``build_detail_text``
+            (LLR-045C — this keeps the R-TUI-041 R-3 A2L-symbol region naming
+            and its C-17 markup-safety guard alive on a LIVE path), then post
+            :class:`OpenInHexRequested` so the reused app handler switches to
+            the Workspace/hex screen and repositions the hex window to the
+            run's start (LLR-045C.1). The detail is populated BEFORE the nav
+            message so the pane reflects the selection when the operator returns
+            to the map. The window status is derived from the already-stored
+            ``_ordered_ranges`` via ``cell_status`` — no re-parse (LLR-041.7).
 
         Args:
-            event (MapCell.Selected): The cell-activation message.
+            event (RegionRow.Activated): The clicked run's window.
 
         Dependencies:
             Uses:
-                - ``build_detail_text``
+                - ``cell_status`` / ``build_detail_text`` / ``OpenInHexRequested``
             Used by:
-                - Textual message dispatch (from ``MapCell``)
+                - Textual message dispatch (from ``RegionRow``)
         """
         event.stop()
-        cell = event.cell
-        self._selected_cell_start = cell.cell_start
+        start, end = event.region_start, event.region_end
+        self._selected_cell_start = start
+        status = cell_status(start, end, self._ordered_ranges)
         body = self.query_one("#map_detail_body", Static)
-        body.update(
-            self.build_detail_text(cell.cell_start, cell.cell_end, cell.status)
-        )
-        self.query_one("#map_open_hex_button", Button).remove_class("hidden")
-
-    def focus_adjacent_cell(self, current: "MapCell", key: str) -> None:
-        """Move focus to the cell one arrow-step from ``current`` (US-036).
-
-        Summary:
-            Resolve the target cell index from ``adjacent_cell_index`` over the
-            current ``#map_grid`` children (mount order) and the stored visual
-            column count, then ``.focus()`` it. Focus clamps at the grid edges
-            (no wrap). This only MOVES focus — selection stays on click/Enter,
-            matching AT-036a (press Right, then Enter). The panel owns the cell
-            list + column count, so ``MapCell`` needs no sibling access.
-
-        Args:
-            current (MapCell): The currently-focused cell.
-            key (str): The arrow key pressed (``left``/``right``/``up``/
-                ``down``).
-
-        Returns:
-            None
-
-        Data Flow:
-            - Reads the ``#map_grid`` ``MapCell`` children; computes the target
-              via ``adjacent_cell_index``; calls ``.focus()`` on it (or on the
-              same cell at an edge — a harmless no-op move).
-
-        Dependencies:
-            Uses:
-                - ``adjacent_cell_index``
-            Used by:
-                - ``MapCell.on_key`` (arrow keys)
-        """
-        try:
-            grid = self.query_one("#map_grid", Container)
-        except Exception:
-            return
-        cells = list(grid.query(MapCell))
-        if not cells or current not in cells:
-            return
-        index = cells.index(current)
-        target = adjacent_cell_index(index, key, len(cells), self._grid_cols)
-        if target is None:
-            return
-        cells[target].focus()
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Post :class:`OpenInHexRequested` for the Open-in-Hex button.
-
-        Summary:
-            Translate the detail pane's "Open in Hex View" press into an
-            :class:`OpenInHexRequested` carrying the selected cell's start so
-            ``app.py`` drives ``update_hex_view`` and switches screen — the
-            panel renders no hex itself (LLR-041.6).
-
-        Args:
-            event (Button.Pressed): The Textual button-press event.
-
-        Dependencies:
-            Uses:
-                - ``OpenInHexRequested``
-            Used by:
-                - Textual button-press dispatch
-        """
-        if event.button.id != "map_open_hex_button":
-            return
-        event.stop()
-        if self._selected_cell_start is not None:
-            self.post_message(
-                self.OpenInHexRequested(self._selected_cell_start)
-            )
+        body.update(self.build_detail_text(start, end, status))
+        self.post_message(self.OpenInHexRequested(start))
 
 
 def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:

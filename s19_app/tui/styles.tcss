@@ -521,6 +521,27 @@ Screen {
     color: #d9a35b;
 }
 
+/* entropy band colours (batch-45, R-TUI-060)
+ * Class tokens are owned by entropy_style.ENTROPY_BAND_CLASS (NOT the frozen
+ * color_policy `sev-*` domain). Colour is a secondary cue — bands also carry a
+ * distinct texture glyph (ENTROPY_BAND_GLYPH) so they read without colour (C-10).
+ */
+.band-constant {
+    color: #6b7280;
+}
+
+.band-low {
+    color: #5fb98a;
+}
+
+.band-medium {
+    color: #d9a35b;
+}
+
+.band-high {
+    color: #e06c75;
+}
+
 /* --- Issues Report dedicated rail screen (batch-02 increment 7) ----------
  * LLR-011.1: the validation Issues `DataTable`, its severity filter row and
  * the summary line — promoted out of the old Workspace Status tile into
@@ -606,23 +627,99 @@ Screen {
     layout: vertical;
 }
 
+/* batch-45 (R-TUI-060): the map body is the entropy band view (band bar +
+ * region list + legend stacked vertically); the batch-27 validity cell grid
+ * (and its `.map-cell` rules + MapCell class) was removed in Inc-5. */
 #map_grid {
     width: 1fr;
     height: auto;
-    layout: grid;
-    grid-size: 16;
-    grid-gutter: 0;
+    layout: vertical;
 }
 
-.map-cell {
+/* batch-45 R-TUI-061: the band bar docks BESIDE the At-a-glance panel in a
+ * band row; at width-narrow (< 120) the row reflows to vertical (bar over
+ * glance) so both fit the 80x24 floor (LLR-045B.3). Re-mounted per render →
+ * addressed by CLASS (not id) to avoid DuplicateIds. */
+.map-band-row {
+    width: 100%;
+    height: auto;
+    layout: horizontal;
+}
+
+#workspace_body.width-narrow .map-band-row {
+    layout: vertical;
+}
+
+/* Entropy band bar: takes the remaining row width beside the glance panel;
+ * one proportional segment per merged run, each sized to its glyph content. */
+.map-band-bar {
+    width: 1fr;
+    height: 1;
+    layout: horizontal;
+}
+
+#workspace_body.width-narrow .map-band-bar {
+    width: 100%;
+}
+
+.map-band-seg {
+    width: auto;
+    height: 1;
+}
+
+/* "At a glance": docked beside the band bar at >=120, full-width below it when
+ * narrow. Title + per-band histogram rows + a band-coloured profile sparkline. */
+.at-a-glance {
+    width: 28;
+    height: auto;
+    margin-left: 1;
+}
+
+#workspace_body.width-narrow .at-a-glance {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 1;
+}
+
+.glance-title {
     width: 100%;
     height: 1;
-    min-width: 2;
-    text-align: center;
+    text-style: bold;
 }
 
-.map-cell:focus {
-    text-style: reverse;
+.map-glance-row {
+    width: 100%;
+    height: 1;
+}
+
+.map-sparkline {
+    width: 100%;
+    height: 1;
+    layout: horizontal;
+}
+
+.map-sparkline-seg {
+    width: auto;
+    height: 1;
+}
+
+/* Per-region list + band legend: one full-width row each. */
+.map-region-list {
+    width: 100%;
+    height: auto;
+    margin-top: 1;
+}
+
+.map-band-legend {
+    width: 100%;
+    height: auto;
+    margin-top: 1;
+}
+
+.map-region-row,
+.map-legend-row {
+    width: 100%;
+    height: 1;
 }
 
 #map_detail {
@@ -1061,75 +1158,9 @@ ModalScreen {
     margin-top: 1;
 }
 
-/* --- Entropy viewer modal (batch-26, LLR-036.2/036.3) -------------------
- * Reuses the shared `.modal-dialog` token styling and box model (the same
- * container measured at 48/76 cols, §2.6 C-13) so the strip + jump-list
- * content-width budget holds by construction. Caps the dialog height and
- * scrolls the body so both surfaces fit the 80- and 120-col regimes. The
- * strip cells carry their band colours inline as Rich `Text` styles
- * (`ENTROPY_BAND_COLOUR`, screens.py) — NOT the frozen `sev-*` classes — so
- * no per-band CSS rule is needed here. The `#entropy_strip` Static wraps its
- * cells into the content width (no horizontal overflow, LLR-036.3). */
-#entropy_dialog {
-    height: 90%;
-}
-
-#entropy_body {
-    height: 1fr;
-    overflow-y: auto;
-}
-
-/* The strip is a `Horizontal` of per-cell clickable `EntropyCell` widgets
- * (US-063, LLR-063.2). `width: 100%` keeps the container within the modal
- * content budget (no horizontal overflow, LLR-036.3/063.3) and `overflow-x:
- * auto` scroll-reaches the tail cells on a full 512-window page; the empty-image
- * case renders a plain `Static` under the same id. */
-#entropy_strip {
-    height: auto;
-    width: 100%;
-    overflow-x: auto;
-    margin-bottom: 1;
-}
-
-.entropy-cell {
-    width: 1;
-    height: 1;
-}
-
-/* In-modal band-colour legend (US-063, LLR-063.1): one auto-height row per
- * `ENTROPY_BAND_COLOUR` band + the low-confidence dim cue. `height: auto` keeps
- * it out of the `1fr` scroll body's flex; it scroll-reaches at 80x24. */
-#entropy_legend {
-    height: auto;
-    margin-bottom: 1;
-    padding: 0 1;
-}
-
-#entropy_jump_list {
-    height: auto;
-    max-height: 60%;
-}
-
-/* --- Entropy paging + sort controls (US-062, LLR-062.1/.2/.3) --------------
- * A single auto-height control row above the strip: sort toggle + Prev/Next
- * page buttons + a `page P/Q` position indicator. `height: auto` keeps the row
- * from consuming the `1fr` scroll body; the buttons are compact so the row
- * fits (or scroll-reaches) both the 80- and 120-col regimes — the page size
- * itself is a FIXED 512-window budget, not a geometry-measured value. */
-#entropy_controls {
-    height: auto;
-    margin-bottom: 1;
-}
-
-#entropy_controls Button {
-    min-width: 6;
-    margin-right: 1;
-}
-
-.entropy-page-indicator {
-    height: auto;
-    padding: 1 1 0 1;
-}
+/* The entropy-viewer modal (batch-26 `#entropy_*` / `.entropy-*` rules) was
+ * removed in batch-45 Inc-5 — its function moved into the always-visible
+ * Memory-Map band view (R-TUI-060/061/062). */
 
 .modal-buttons {
     layout: horizontal;

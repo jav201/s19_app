@@ -46,7 +46,6 @@ from .operations import get_operation, list_operation_ids
 from .rail import Rail, RailItem
 from .screens import (
     ChangeSetJsonScreen,
-    EntropyViewerScreen,
     EntryJsonScreen,
     LegendScreen,
     LoadFileScreen,
@@ -799,7 +798,6 @@ class S19TuiApp(App):
         Binding("t", "view_reports", "View reports", show=False),
         Binding("x", "operations_view", "Operations", show=True),
         Binding("k", "show_legend", "Legend", show=True),
-        Binding("e", "show_entropy", "Entropy", show=True),
         Binding("b", "before_after_report", "Before/After report", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
@@ -4597,71 +4595,6 @@ class S19TuiApp(App):
         """
         self.push_screen(LegendScreen())
 
-    def action_show_entropy(self) -> None:
-        """
-        Summary:
-            Open the entropy-viewer modal over the loaded image (HLR-036, key
-            ``e``). Snapshots the current image's ``mem_map`` into a fresh
-            :class:`EntropyViewerScreen` (push-time snapshot, LLR-036.2) and
-            pushes it; when the operator activates a jump row the screen
-            dismisses with that window's start address, and the
-            :func:`_focus_entropy_target` callback moves the main hex view's
-            focus there (LLR-036.5, dismiss-with-target). With NO image loaded
-            the action is a safe no-op notify — never a crash (LLR-036.4 /
-            HLR-036 empty boundary).
-
-        Returns:
-            None
-
-        Data Flow:
-            - ``self.current_file`` is ``None`` → ``notify`` + return (no-op).
-            - else → ``push_screen(EntropyViewerScreen(mem_map), callback)``;
-              the callback validates + focuses the returned address via the
-              existing ``_apply_goto`` / ``update_hex_view`` path.
-
-        Dependencies:
-            Uses:
-                - ``EntropyViewerScreen`` / ``current_file``
-                - ``_focus_entropy_target``
-            Used by:
-                - The ``e`` key binding (BINDINGS)
-        """
-        loaded = self.current_file
-        if loaded is None:
-            self.notify("No image loaded — nothing to classify.")
-            return
-        self.push_screen(
-            EntropyViewerScreen(loaded.mem_map), self._focus_entropy_target
-        )
-
-    def _focus_entropy_target(self, target: Optional[int]) -> None:
-        """
-        Summary:
-            Callback for :meth:`action_show_entropy`'s pushed modal — move the
-            main hex view's focus to the jump target the operator picked
-            (LLR-036.5). ``None`` (Close / empty selection) is a no-op. The
-            address is routed through the existing ``_apply_goto`` guard (it
-            rejects out-of-range addresses on the status line) and
-            ``update_hex_view``, so no new focus plumbing is introduced.
-
-        Args:
-            target (Optional[int]): The dismissed window's start address, or
-                ``None`` when the modal was closed without a jump.
-
-        Returns:
-            None
-
-        Dependencies:
-            Uses:
-                - ``_apply_goto`` / ``update_hex_view``
-            Used by:
-                - ``action_show_entropy`` (push_screen callback)
-        """
-        if target is None or self.current_file is None:
-            return
-        if self._apply_goto("main", target):
-            self.update_hex_view(target)
-
     # Screens that own both real content and an `EmptyStatePanel`; the panel
     # is shown only while no file is loaded (LLR-002.3). Each tuple is the
     # screen container id and the id of its real-content child to hide.
@@ -8448,11 +8381,13 @@ class S19TuiApp(App):
               so it shows its neutral no-file note.
             - Otherwise pass ``current_file.ranges``,
               ``current_file.range_validity``, the pre-computed
-              ``_validation_issues`` and the enriched ``_a2l_enriched_tags``
-              (R-TUI-041 R-3 region/cell symbol naming) straight through to
-              ``MemoryMapPanel.render_ranges``. The renderer reads these
-              already-computed model fields verbatim — it adds no coverage
-              computation, parsing or analysis (LLR-012.1 / LLR-012.4).
+              ``_validation_issues``, the enriched ``_a2l_enriched_tags``
+              (R-TUI-041 R-3 region/cell symbol naming) and the loader-computed
+              ``current_file.entropy_windows`` (batch-45 R-TUI-060 band view)
+              straight through to ``MemoryMapPanel.render_ranges``. The renderer
+              reads these already-computed model fields verbatim — it adds no
+              coverage computation, entropy computation, parsing or analysis
+              (LLR-012.1 / LLR-012.4 / LLR-045A.2 M4).
 
         Dependencies:
             Uses:
@@ -8462,13 +8397,14 @@ class S19TuiApp(App):
         """
         panel = self.query_one("#memory_map_panel", MemoryMapPanel)
         if not self.current_file:
-            panel.render_ranges([], [], [], [])
+            panel.render_ranges([], [], [], [], [])
             return
         panel.render_ranges(
             self.current_file.ranges,
             self.current_file.range_validity,
             self._validation_issues,
             self._a2l_enriched_tags,
+            self.current_file.entropy_windows,
         )
         self.logger.info(
             "Memory Map updated. ranges=%d", len(self.current_file.ranges)
