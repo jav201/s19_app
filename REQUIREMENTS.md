@@ -4018,10 +4018,12 @@ retain `markup=False`; window titles are constant strings.
   `s19_app/tui/styles.tcss` (`#patch_editor_panel { layout: horizontal }` + `#workspace_body.width-narrow
   #patch_editor_panel { layout: vertical }`, `.patch-window` / `.patch-window-body` / `.patch-docked-row`,
   `#patch_win_script { width: 2fr }`, duplicate `#patch_saveback_row` reconciled). `app.py` diff = 0.
-- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at_063a_*` (3-across @120×30: 3 distinct
-  `region.x` + `MIN_USABLE_W/H` floors + non-overlap + no clip) + `::test_at_063b_*` (stacked @80×24:
-  1 distinct x + 3 ascending y) + `::test_at_063c_*` (reparent-safety + one observable action per window,
-  both sizes) + the layout-agnostic white-box `TC-46.1/46.2`; `tests/test_tui_patch_editor_v2.py` FOLD-6
+- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at063a_three_across_at_120` (3-across
+  @120×30: 3 distinct `region.x` + `MIN_USABLE_W/H` floors + non-overlap + no clip) +
+  `::test_at063b_stacked_at_80` (stacked @80×24: 1 distinct x + 3 ascending y) +
+  `::test_at063c_reparent_safety_at_80` + `::test_at063c_reparent_safety_at_120` (reparent-safety + one
+  observable action per window, both sizes) + the layout-agnostic white-box
+  `::test_tc46_1_window_structure_layout_agnostic` + `::test_tc46_2_paste_in_viewport_at_body_scroll0`; `tests/test_tui_patch_editor_v2.py` FOLD-6
   markup/`CappedTextArea` census; `tests/test_tui_patch_variant.py` + `tests/test_tui_directionb.py` pass
   UNCHANGED (FOLD-1). Snapshot: the two `patch-comfortable-*` cells ride `_batch46_patch_drift_marks`
   (`xfail(strict=False)`) until the canonical-CI regen.
@@ -4038,8 +4040,9 @@ amendment of the original all-visible acceptance).
 - Code: `s19_app/tui/screens_directionb.py` (docked button-row `Horizontal`s as window-body siblings);
   `s19_app/tui/styles.tcss` (`.patch-docked-row` / `.patch-docked-group` outside `.patch-window-body`;
   wrapping button-grids so no button clips horizontally). `app.py` diff = 0.
-- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at_064a_*` (reachable-under-scroll @80×24,
-  17 named buttons) + `::test_at_064b_*` (all-visible @120×30) + `::test_at_064c_*` (revealed save-back +
+- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at064a_reachable_under_scroll_at_80`
+  (reachable-under-scroll @80×24, 17 named buttons) + `::test_at064b_reachable_under_scroll_at_120`
+  (all-visible @120×30) + `::test_at064c_revealed_rows_reachable_at_80` (revealed save-back +
   before/after reachable @80×24); the `_fully_visible` oracle (region ⊆ screen ∧ every scrollable ancestor's
   `content_region`) + the structural "no `VerticalScroll` ancestor" docked-sibling check. RED-proven on the
   batch-22 2×2 tree (buttons below the starved `1fr` fold).
