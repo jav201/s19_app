@@ -1,7 +1,11 @@
 # PLAN — batch-46 · Patch Editor responsive 3-column redesign (field-audit B2 + U8)
 
 > Living compendium. Created Phase 0 (2026-07-15). Updated at every gate.
-> **STATUS: Phase 3 Inc-1 GATED + COMMITTED (`e05ffec`) → Inc-2 (docs) next. D1=STACKED; run-mode=AUTONOMOUS-THROUGH-SELF-MERGE. Branch `feat/batch-46-patch-3col`.**
+> **STATUS: Phase 3 CLOSED (Inc-1 `e05ffec` + Inc-2 `9e44f2a`) → Phase 4 (validation gate) IN PROGRESS. D1=STACKED; run-mode=AUTONOMOUS-THROUGH-SELF-MERGE. Branch `feat/batch-46-patch-3col`.**
+>
+> **Inc-2:** REQUIREMENTS.md §36 (R-TUI-063/064) + §6.5 amendments (supersede the two 2×2 rows, amend R-TUI-046,
+> note R-PATCH-VARIANT-SELECT-001). Docs-only, no test impact. **Phase 4:** authoritative full-suite gate run
+> against the final committed state, then qa-reviewer reconciles both layers → `04-validation.md`.
 >
 > **Inc-1 result:** 3-window layout shipped (app.py diff = 0, pure-CSS). Gate 1394 passed / 0 failed / 5 xfailed
 > (2 batch-46 patch-drift + 3 pre-existing), C-27 clean, ruff clean, code-review APPROVE-WITH-NITS (all applied).

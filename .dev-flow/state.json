@@ -3,7 +3,7 @@
     "language": "en",
     "batch_id": "2026-07-15-batch-46",
     "batch_objective": "Patch Editor responsive 3-column redesign (field-audit B2 + U8): restructure PatchEditorPanel from the 2x2 grid into three bordered windows (PATCH SCRIPT / CHECKS / JSON EDIT) with docked button rows always reachable, laid out 3-columns when wide (>=120) and vertically stacked at the 80x24 floor. Realized as CSS + compose restructure reusing the existing width-narrow 120-col regime (zero new Python, no TabbedContent). Layout-only: every action/message/service call preserved. Deferred: app start width/height + font scale.",
-    "current_phase": 3,
+    "current_phase": 6,
     "phase_status": "in-progress",
     "standing_authorization": "BATCH-46 KICKOFF (2026-07-15): plan-first gate honored. Operator saw the full PLAN.md and DECIDED (AskUserQuestion 2026-07-15): D1 = STACKED (CSS-only, no TabbedContent). RUN MODE = AUTONOMOUS THROUGH SELF-MERGE. Agent runs Phases 1->6 autonomously (7-section review packet in-conversation at each phase gate AND each Phase-3 increment gate, self-approving with a named Coverage/Certainty/Evidence axis check) to 'PR opened + CI green'; then a FINAL independent PR-level qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression via C-26, every gate carry discharged) MUST come back clean; only then merge, then /dev-flow-sync. A HIGH final-QA finding BLOCKS the merge and returns to operator. Snapshot regen = canonical-CI follow-up PR post-merge (local regen FORBIDDEN, reference_snapshot_regen_env). GUARDRAILS: engine-frozen set OFF-LIMITS (core.py/hexfile.py/range_index.py/validation/ /tui/a2l.py/tui/mac.py/tui/color_policy.py) + frozen TEST files; C-27 frozen dual-guard each increment; layout-only (no wiring/behavior change); preserve 14 leaf ids + 2 hidden-row ids; C-26 reverse-census the 6 superseded 2x2 tests. DECISION-RECORDING (operator ack): every autonomous decision -> PLAN.md log + decisions_log + 05-postmortem + vault at sync. PER-BATCH; NEVER carried from batch-45.",
     "route": "full /dev-flow (high-risk core-screen restructure; supersedes 6 pinned 2x2-grid layout/census tests + drifts 2 patch snapshot cells). Plan-first gate: operator sees the Phase-0/1 plan before choosing run mode. Feature batch off origin/main 1bf3b19 (post #84 backlog refresh). Origin = operator-approved prototype prototypes/patch_editor_layout.prototype.py, responsive 3-col + docked buttons. Branch feat/batch-46-patch-3col (not yet cut).",
@@ -13,9 +13,9 @@
         "1": 1,
         "2": 1,
         "3": 2,
-        "4": 0,
-        "5": 0,
-        "6": 0
+        "4": 1,
+        "5": 1,
+        "6": 1
     },
     "artifacts": {
         "plan": ".dev-flow/2026-07-15-batch-46/PLAN.md",
@@ -46,6 +46,18 @@
             "decision": "Phase-1 APPROVE (autonomous self-approval, named-axis check). Advancing to Phase 2 triple review.",
             "notes": "01-requirements.md + 01b-qa-strategy complete. US=2 (US-U8, US-B2), HLR=2 (HLR-063 responsive 3-window, HLR-064 docked reachability), LLR=7 (063.1-.4 + 064.1-.3), AT=5 (063a/b/c + 064a/b). New rows R-TUI-063/064; §6.5 SUPERSEDE R-PATCH-2X2-LAYOUT-001 + R-PATCH-2X2-SNAPSHOT-001, AMEND R-TUI-046 (paste->JSON window), NOTE R-PATCH-VARIANT-SELECT-001. Reverse-census (82 hits/10 files) found 2 files BEYOND kickoff: test_tui_directionb.py:7955 (#patch_pane_entries .patch-section-title, non-frozen non-tc031) + test_tui_patch_variant.py (#patch_pane_variant x4). styles.tcss patch CSS spans 801-852 AND 985-1009 with a DUPLICATE #patch_saveback_row rule (:838 + :999) to reconcile. Increment cut: Inc-1 (screens_directionb.py + styles.tcss + test_tui_patch_layout.py, RED-first) / Inc-2 (test_tui_patch_editor_v2.py + test_tui_directionb.py + test_tui_patch_variant.py + test_tui_snapshot.py) / Inc-3 (REQUIREMENTS.md). AXIS CHECK: Coverage OK (US->AT + LLR->TC/AT complete; LLR-064.2 analysis-deferred to Phase-3 pilot, flagged); Certainty OK (every AT names real RED on current 2x2 tree; boundary=both regimes); Evidence OK (14 leaf ids + all claims file:line cited; C-28 cleared with binding refs; frozen membership confirmed). RECONCILE: canonical window ids = patch_win_script/_checks/_json (qa _WINDOW_IDS placeholder resolves to these). CARRY to Phase 2: O-1 (nested scroll @80x24 - Phase-3 pilot, escalate if UX-affecting); A2/R-2 geometry re-measure; duplicate CSS reconcile. Security surface: NONE (layout-only, no markup-flip/C-17, no new external surface) - Phase-2 security pass expected light."
         }
+        {
+            "phase": 5,
+            "date": "2026-07-15",
+            "decision": "Phase-5 postmortem authored (orchestrator-synthesized, both lenses). APPROVE close-ready. 2 control candidates -> operator AskUserQuestion (control-encode always asks).",
+            "notes": "Clean batch: 0 HIGH, 0 scope drift, 0 story-kill, all gates green, app.py diff=0. ROOT CAUSES: RC-1 AT-064 physically-impossible (Phase-1 measured width not height, inherited prototype full-screen budget; FOLD-8 iterate-to-refine, non-defect - measurement caught it); RC-2 C-26 census under-counted by 1 (test_tui_variants clicks the MOVED #patch_variant_info_button - census keyed on container ids missed interaction-tests of moved leaf ids); RC-3 concurrent-session branch contention (operational, mitigated by prompt commit). CONTROL CANDIDATES (stack-specific -> docs/engineering-rules.md; PROPOSE not encode): CAND-A two-axis geometry-budget measurement (refines C-23: measure BOTH width+height of real container budget at Phase 1, never assume an axis / inherit a full-screen prototype budget); CAND-B reverse-census covers interaction-tests of MOVED widgets (refines C-26: reverse-grep pilot.click/press/scroll on a moved widget id, not only container-structure asserts). Metrics iters 0:1/1:1/2:1/3:2/4:1/5:1. Awaiting operator on control encoding; feature ships regardless -> Phase 6."
+        },
+        {
+            "phase": 4,
+            "date": "2026-07-15",
+            "decision": "Phase-4 validation APPROVE (autonomous, axis-check clean). -> Phase 5 postmortem.",
+            "notes": "Authoritative gate (orchestrator-owned C-25, final committed state): 1394 passed / 0 failed / 5 xfailed (2 batch-46 patch drift + 3 pre-existing) / 2 skipped, exit 0, 12:11. qa-reviewer 04-validation.md: 6 ATs -> real single nodes (test_at063a_three_across_at_120, test_at063b_stacked_at_80, test_at063c_reparent_safety_at_80/_120, test_at064a/b_reachable_under_scroll_at_80/120, test_at064c_revealed_rows_reachable_at_80); C-18 PASS (one node per AT full chain); RED-on-2x2 executed at Inc-1 (7 fail/2 pass stashed). TC-46.1/46.2 -> LLR; FOLD-6 census in test_at058b; LLR-064.2 deferred-then-measured confirmed (widths {44,22,23}@120, MIN_USABLE 15/5, no D-3 rung). Bidirectional matrix complete. C-27 0 frozen; app.py diff=0; FOLD-1 (variant+directionb unchanged); C-26 miss (test_tui_variants) fixed+green; FOLD-8 recorded as requirement-wrong iterate-to-refine. Coverage/Certainty/Evidence MET, 0 blocker."
+        },
         {
             "phase": 3,
             "date": "2026-07-15",

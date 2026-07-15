@@ -60,3 +60,19 @@ the INCREMENT snapshot step, not the Phase-4 full-suite run. (Origin: batch-45 F
 entropy modal removed the footer-visible `e`/Entropy `Binding(show=True)`; the Footer renders on
 every screen, so 18 wide-cell tc016s snapshots drifted, but the increment handling marked only the
 2 map cells — surfaced only at the Phase-4 full-suite run. Test-only fix, no shipped defect.)
+
+## C-29 — two-axis geometry-budget measurement (Phase 1, extends C-23)
+When a spec sets an acceptance threshold that depends on HOW MUCH fits in a container — "all N buttons
+visible", "the strip shows K cells", a visible-row count, an all-at-once claim — Phase 1 MUST pilot-measure
+BOTH axes of that container's real budget (width in columns AND height in rows) against the ACTUAL app
+chrome at the target regimes, never measure one axis and assume the other. In particular, do NOT inherit a
+throwaway prototype's budget when the prototype renders the feature as the WHOLE screen but production boxes
+it inside chrome (command bar / status / footer / rail) — the prototype's row/column count does not transfer
+(the C-16 non-transfer trap, on the vertical axis). If the measured budget cannot satisfy the threshold,
+relax the acceptance at draft time (e.g. reachable-under-scroll instead of all-visible) rather than shipping
+a physically-impossible AT. (Origin: batch-46 RC-1 — the spec pilot-measured the patch panel WIDTH
+("70 cols @80×24") but ASSUMED its height, inheriting `patch_editor_layout.prototype.py`'s full-screen
+~22-row budget; the real boxed panel gets ~5 content rows @80×24, so "every one of 17 three-row buttons
+`_fully_visible` at the floor" (AT-064a) was physically unachievable — caught only by the Phase-3 pilot
+measurement, forcing a mid-increment stop + the FOLD-8 iterate-to-refine to a reachable-under-scroll floor.
+A Phase-1 both-axes measurement would have set the right threshold a phase earlier.)
