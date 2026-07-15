@@ -3,8 +3,8 @@
     "language": "en",
     "batch_id": "2026-07-14-batch-45",
     "batch_objective": "Memory-map ENTROPY 'Band-Bands' view (field-audit N1/U3/N3): replace the Memory Map's validation-only cell colouring with an entropy visualization \u2014 a proportional segmented region bar (contiguous same-band runs, width proportional to size) + per-region list (address/size/band) + docked 'At a glance' histogram; band model mirrors entropy_service.ENTROPY_BANDS; textures + grid (U3); region rows drive click-to-hex (N3). AND retire the entropy pop-up (EntropyViewerScreen/US-036 + batch-37 paging/sort/legend R-TUI-050/051) \u2014 its function moves into and is superseded by the Memory Map view. Requirement amendments on R-TUI-035/036/050/051 (\u00a76.5 before/after).",
-    "current_phase": 3,
-    "phase_status": "in-progress",
+    "current_phase": 4,
+    "phase_status": "approved",
     "standing_authorization": "BATCH-45-SPECIFIC, operator AskUserQuestion 2026-07-14 at kickoff. RUN MODE = 'Plan-approval gate' (verbatim option label + description: 'I present the spec/plan and stop for your approval before implementing; then drive to PR, stopping before merge'). INTERPRETATION: a SINGLE operator gate at the Phase-1 plan/spec \u2014 the agent runs Phase 0->1, PRESENTS the spec, and STOPS for operator approval before Phase 2/3. AFTER approval the agent runs Phases 2->6 AUTONOMOUSLY (review packets in-conversation at each gate, self-approving with a named exit-criteria axis check), through to 'PR opened + CI green'. MERGE = NOT GRANTED: stop there; the OPERATOR merges. Never self-merge. DECISION-RECORDING: every autonomous decision -> PLAN.md log + decisions_log + 05-postmortem + vault at sync. GUARDRAILS: engine-frozen set OFF-LIMITS (core.py/hexfile.py/range_index.py/validation/ /tui/a2l.py/tui/mac.py/tui/color_policy.py); entropy colours via a NEW band class map (do NOT edit color_policy.py) or frozen css_class_for_severity read-only; snapshot regen canonical-CI ONLY (LOCAL REGEN FORBIDDEN); C-27 frozen dual-guard each increment; requirement amendments on locked R-TUI-035/036/050/051 via \u00a76.5 before/after (never silent edit). PER-BATCH RULE: batch-45-only; NEVER carried. Return to operator on: the Phase-1 plan-approval gate, PR-opened+CI-green (for merge), or a genuine operator-only decision. >>> UPDATE 2026-07-14 (operator: 'Approved, take it all the way to merge.'): PLAN APPROVED (Phase-1 gate) + MERGE AUTHORITY NOW GRANTED. Agent runs Phases 2->6 autonomously (review packets in-conversation at each gate, self-approving with a named axis check) through PR opened + CI green; then a FINAL independent PR-level qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression via C-26, every gate carry discharged) MUST come back clean; only then merge, then /dev-flow-sync. A HIGH final-QA finding BLOCKS the merge and returns to operator. Snapshot regen = canonical-CI follow-up PR post-merge.",
     "route": "full /dev-flow, plan-approval gate (operator approves gates; no self-merge). Feature batch off origin/main a015e28 (post #78 snapshot regen, #79 placeholder sweep, #80 field-audit backlog). Origin = operator-approved prototype pick: prototypes/memory_map_entropy.prototype.py Variant 3 BAND BANDS. Branch feat/batch-45-map-entropy.",
     "rc1": "PASS @ a015e28 (2026-07-14). git fetch clean; branch cut off origin/main tip a015e28 (#80 merged). Already-shipped check: the ENTROPY MAP (N1) is NOT-IMPLEMENTED (field audit: map colours by validation-overlap only; entropy never plumbed into render_ranges); EntropyViewerScreen EXISTS (to be retired). Stories proceed.",
@@ -22,7 +22,8 @@
         "1": ".dev-flow/2026-07-14-batch-45/01-requirements.md",
         "1b": ".dev-flow/2026-07-14-batch-45/01b-qa-strategy-and-verification.md",
         "2": ".dev-flow/2026-07-14-batch-45/02-review.md",
-        "3": ".dev-flow/2026-07-14-batch-45/03-increments/"
+        "3": ".dev-flow/2026-07-14-batch-45/03-increments/",
+        "4": ".dev-flow/2026-07-14-batch-45/04-validation.md"
     },
     "decisions_log": [
         {
@@ -96,6 +97,12 @@
             "date": "2026-07-15",
             "decision": "Phase-4 iterate-to-fix: snapshot footer-drift containment (autonomous)",
             "notes": "First full gate run (C-25, orchestrator-owned, 12:27): 1374 passed / 0 NON-snapshot failures / 5 xfail / 2 skip, but 18 tc016s snapshot cells FAILED. ROOT CAUSE (verified): Inc-5 removed Binding('e','show_entropy','Entropy',show=True) which was FOOTER-VISIBLE (workspace baseline SVG contains 'Entropy' label) -> retiring the modal drifts the footer on every wide-width cell. Inc-2 _batch45_map_drift_marks only covered the 2 map cells -> containment miss. FIX (test-only): added _batch45_footer_drift_marks -> xfail(strict=False) the 18 footer-drifted cells (restyled x both densities x {120x30,160x40} + diff/patch 120x30); 80x24 NOT marked (footer truncates). Snapshot subset now 12 passed/20 xfailed/0 FAILED/0 xpassed (tight, C-22 per-cell). No product code touched (binding removal correct). Re-running full suite for clean gate artifact."
+        },
+        {
+            "phase": 4,
+            "date": "2026-07-15",
+            "decision": "Phase-4 gate APPROVE \u2014 PASS (autonomous)",
+            "notes": "Clean gate re-run (C-19/C-25 single complete): 1374 passed / 0 failed / 2 skipped / 23 xfailed / exit 0 in 12:48. qa-reviewer reconciled: C-18 9/9 AT (069-076) = one on-disk node each w/ RED counterfactual + shipped-surface obs; Layer A TC-060.x/061.x/062.x + census + AST-purity guard (compute_entropy+_merge_band_runs, attr+bare-name) green; bidirectional matrix complete; 23 xfail accounted (20 batch-45 drift [18 footer + 2 map] + 3 pre-existing, 0 mask regression, 0 xpassed on batch-45); C-27 0 frozen diffs (entropy_service.py non-frozen, docstring only). Coverage/Certainty/Evidence all PASS. Phase 5 (postmortem) dispatched."
         }
     ],
     "obsidian_synced": false,

@@ -1,73 +1,59 @@
-# Validation — s19_app — Batch 2026-07-14-batch-45
+# 04-validation.md — batch-45 (Memory-Map entropy Band-Bands view)
 
-> **Artifact language:** canonical English scaffold. Generate in the batch's development language (`state.json` `language`); for Spanish batches translate headers/labels.
-> Phase 4 artifact. Owner: `qa-reviewer`. Executes the validation strategy fixed in Phase 1.
+**Gate verdict: PASS.** Gate run (orchestrator-owned, single complete run, C-19/C-25):
+`pytest -q -m "not slow"` → **1374 passed / 2 skipped / 20 deselected / 23 xfailed / 0 failed /
+exit 0** in 12:48. Shipped surface: the Memory Map screen (`#screen_map` / `MemoryMapPanel` /
+`RegionRow`), driven end-to-end via `S19TuiApp` + Textual `pilot`.
 
-## ✅ Verdict (read first)
+## 1. Layer B (black-box) — C-18 realization gate: 9/9 AT = one on-disk node each
 
-- **Result:** PASS  /  FAIL → `iterate-to-fix` (P3, impl defect) or `iterate-to-refine` (P1, requirement defect)
-- **Requirements:** `<P>`/`<T>` pass · `<N>` blocker fails
-- **Black-box acceptance (Layer B):** ✓ every story's `AT` observes its outcome through the shipped surface (boundary + negative)  /  ⚠ `<N>` stories with no deliverable observation
-- **Surface-reachability (bidirectional):** ✓ all named inputs AND outputs/deliverables reached/observed at the surface  /  ⚠ `<N>` gaps
-- **Supersession inspection:** ✓ all surviving refs negative  /  ⚠ live dependency found
-- **Test ledger:** ✓ reconciles (`base − D + A = post`)  /  ✗ mismatch
-- **Evidence checklist (qa-reviewer):** ✓ complete  /  ✗ `<missing items>`
+| AT | node (tests/test_tui_directionb.py) | observed through surface | RED counterfactual |
+|---|---|---|---|
+| AT-069 | `test_at069_high_region_renders_high_band` :3911 | `.map-region-row` over high block → `band-high` + `▓` + `high/random` | uniform sev-* grid, no region row |
+| AT-070 | `test_at070_constant_vs_high_bands_differ` :3941 | reads BOTH rows; glyph+class differ (C-10 two-branch, one node) | no region rows, neither branch readable |
+| AT-071 | `test_at071_region_list_rows_addr_size_band` :3982 | one row/run: `0x… · N B · band` | grid mounts .map-cell, 0 rows |
+| AT-071b | `test_at071b_disjoint_same_band_regions_stay_separate` :4014 | two same-band blocks + gap → 2 rows (not merged 512B) | band-only merge collapses to 1×512B |
+| AT-072 | `test_at072_histogram_per_band_counts` :4372 | `.map-glance-row` counts = tallies, %≈100 | no .at-a-glance surface |
+| AT-073 | `test_at073_sparkline_tracks_profile` :4421 | mixed ≥2 glyphs / constant uniform (two-branch, one node) | no .map-sparkline |
+| AT-074 | `test_at074_single_click_repositions_hex` :4121 | ONE real `pilot.click` → hex reveals + `#hex_view` row token (C-12/C-16) | rows exist but no click nav |
+| AT-075 | `test_at075_e_key_opens_no_modal_map_has_legend` :4514 | `pilot.press("e")` → stack unchanged + band legend present | `e`→push EntropyViewerScreen |
+| AT-076 | `test_at076_entropy_screen_and_action_removed` :4551 | EntropyViewerScreen/action/binding absent | all three existed |
 
-> If every line is ✓, the Detail below is reference only. Any ⚠/✗ → read the matching part.
+**9/9 realized as single nodes — no blocker.** Hardening nodes: `test_map_band_view_survives_rerender`
+:4064 (DuplicateIds), `test_b01_region_click_snaps_hex_to_far_range` :4198 (B-01 re-cover),
+`test_at_r3_region_click_detail_names_a2l_symbol_literally` :4240 (C-17 on the LIVE region-detail
+path), `test_at073b_glance_geometry_fits_and_reflows` :4454 (C-23 pilot-measured 120×30 + 80×24).
 
----
+## 2. Layer A (white-box)
+TC-061.1 `test_tc061_1_band_histogram_counts` :4322; TC-061.2 `test_tc061_2_sparkline_ramp_mapping`
+:4344; TC-062.1 `test_tc062_1_region_activation_posts_single_open_in_hex` :4157; TC-060.x band
+compute in test_entropy_service.py (unchanged, green); census test_entropy_style.py 8 nodes (LLR-045A.1).
+**AST-purity guard** `test_tc028` extended: `compute_entropy` + `_merge_band_runs` added to
+`forbidden_calls` (attribute AND bare-name form) → renderer is render-only; entropy computed on the
+worker-thread load path (`load_service.build_loaded_*`) cached on `LoadedFile.entropy_windows`.
 
-## Detail (reference)
+## 3. Bidirectional surface-reachability
+IN (all via handler `update_memory_map` ← `build_loaded_*`): two-band image, disjoint same-band gap,
+constant-only image, two far ranges (~1 MiB), hostile A2L symbol. OUT (observed on rendered tree /
+hex): band bar/region rows, glance histogram, sparkline, hex reposition, band legend, modal-absence.
+No output asserted against a bare service return.
 
-### Layer A — functional (white-box): per-requirement results
-> `TC-NNN` ↔ LLR/HLR. `Result` = pass / fail. `Evidence` = command output, observed behavior, inspection note, or analysis result.
+## 4. xfail accounting (23; 0 mask a regression)
+- 1–18 batch-45 **footer-drift** (`_batch45_footer_drift_marks`): removed footer-visible `e`/Entropy
+  binding drifts wide-cell footers; cosmetic SVG baseline drift; behavior asserted green by §1.
+- 19–20 batch-45 **map-drift** (`_batch45_map_drift_marks`): band view replaced the cell grid (intended).
+- 21–23 pre-existing (test_tui_app:1784, test_tui_public_api:162, test_validation_engine:211) — predate
+  the batch, untouched. All 20 batch-45 → canonical-CI regen post-merge (batch-44 lane); 0 xpassed on them.
 
-| Req | Method | Executed verification | Numeric threshold | Result | Evidence |
-|-----|--------|-----------------------|-------------------|--------|----------|
-| HLR-001 | test | `pytest … -k TC-001` | exit 0 | | |
-| LLR-001.1 | test (unit) | `…` | `…` | | |
+## 5. Engine-frozen (C-27 dual-guard)
+0 frozen-source diffs + 0 frozen-test-file diffs vs main (passed each increment). `entropy_service.py`
+is NON-frozen — docstring-only edit; new view logic all in non-frozen screens_directionb.py/app.py.
 
-### Layer B — behavioral (black-box) acceptance
-> `AT-NNN` ↔ user story. Drive the SHIPPED surface (Textual Pilot `App.run_test()` / CLI / artifact-on-disk), assert the outcome with representative + boundary + negative inputs PLUS the actual deliverable observed. An output-producing story's `AT` FAILS if the deliverable is silently absent. `AT-NNN` reconciled to the real collected node per V-5.
+## 6. Axis check → PASS
+- Coverage: golden + two-branch + boundary/gap + far-nav + deletion/empty + geometry-floor + hostile
+  markup — every US→AT + LLR→TC chain green.
+- Certainty: each AT a single node with a captured RED; AST guard blocks silent inline recompute.
+- Evidence: gate tail (1374 passed/0 failed/exit 0) + every claim cites a node id/file:line.
 
-| US | Acceptance test (`AT-NNN`) | Surface driven | Deliverable observed (path / element) | repr · boundary · negative | Result |
-|----|----------------------------|----------------|---------------------------------------|----------------------------|--------|
-| US-001 | `AT-NNN` | `<handler/screen/CLI>` | `<file:path non-empty + content \| element>` | ✓·✓·✓ | pass / fail |
-
-### Bidirectional surface-reachability matrix (extends A-5, batch-11)
-> Every named INPUT dimension AND every named OUTPUT/deliverable is exercised/observed through the handler — not only the service API.
-
-| Direction | US dimension / deliverable | Service param / producer | Reached/observed at surface? | TC / AT | Status |
-|-----------|---------------------------|--------------------------|------------------------------|---------|--------|
-| input | `<dimension>` | `<param>` | yes/no | `TC-NNN` | ✓ / gap |
-| output | `<deliverable>` | `<producer>` | yes/no | `AT-NNN` | ✓ / gap |
-
-### Supersession-completeness inspection (batch-09 V-3)
-> Grep the whole class of superseded markers/constants; every surviving reference must be a NEGATIVE assertion (absence), not a live dependency.
-
-| Superseded marker | grep result | All surviving refs negative? | Evidence (file:line) |
-|-------------------|-------------|------------------------------|----------------------|
-| `<marker>` | `<N hits>` | yes/no | `<…>` |
-
-### Signed-balance test ledger (batch-07 / 09)
-> `post = base − D + A`. State counts in collected / passed-lean / passed-full form.
-
-| base | − D | + A | = post | actual collected | passed-lean / full | reconciles? |
-|------|-----|-----|--------|------------------|--------------------|-------------|
-| `<N>` | `<N>` | `<N>` | `<N>` | `<N>` | `<N>` / `<N>` | yes/no |
-
-### Gaps detected
-| ID | Requirement | Gap | Severity | Proposed action |
-|----|-------------|-----|----------|-----------------|
-| G-001 | | | blocker / major / minor | |
-
-### Escaped-bug regression (if a defect escaped the suite)
-> The fix ships a shipped-surface regression that demonstrably FAILS pre-fix (capture the failing run) then passes. Id provisional per V-5.
-> **QC-2 — value-discriminating counterfactual:** when the pre-fix RED is a *shape* failure (TypeError, missing-arg, constructor/signature mismatch) rather than a *value* mismatch, the regression proves the call path is wired, not that the assertion discriminates the right value. Confirm the POST-fix assertion also fails on a wrong-but-well-typed value. (Origin: batch-16.)
-
-| Regression id (`AT-NNN` / `TC-NNN`) | Pre-fix run (evidence it FAILED) | Pre-fix RED kind (value / shape) | Post-fix value-discriminating? (QC-2) | Post-fix result | Reconciled node |
-|-------------------------------------|----------------------------------|----------------------------------|----------------------------------------|-----------------|-----------------|
-| | | | | | |
-
-### Evidence checklist — qa-reviewer (full)
-> Attach `qa-reviewer`'s completed evidence checklist (items in `~/.claude/agents/qa-reviewer.md`), each marked ✓/✗ with one-line evidence. An unchecked or evidence-less item blocks the gate.
+**Verdict PASS — close gate.** Carry (not a blocker): post-merge `snapshot-regen.yml` regenerates the
+20 drift baselines + retires the two marker functions.
