@@ -521,6 +521,27 @@ Screen {
     color: #d9a35b;
 }
 
+/* entropy band colours (batch-45, R-TUI-060)
+ * Class tokens are owned by entropy_style.ENTROPY_BAND_CLASS (NOT the frozen
+ * color_policy `sev-*` domain). Colour is a secondary cue — bands also carry a
+ * distinct texture glyph (ENTROPY_BAND_GLYPH) so they read without colour (C-10).
+ */
+.band-constant {
+    color: #6b7280;
+}
+
+.band-low {
+    color: #5fb98a;
+}
+
+.band-medium {
+    color: #d9a35b;
+}
+
+.band-high {
+    color: #e06c75;
+}
+
 /* --- Issues Report dedicated rail screen (batch-02 increment 7) ----------
  * LLR-011.1: the validation Issues `DataTable`, its severity filter row and
  * the summary line — promoted out of the old Workspace Status tile into
