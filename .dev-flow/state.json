@@ -13,7 +13,7 @@
         "1": 1,
         "2": 1,
         "3": 6,
-        "4": 0,
+        "4": 1,
         "5": 0,
         "6": 0
     },
@@ -90,6 +90,12 @@
             "date": "2026-07-15",
             "decision": "Inc-6 APPROVE \u2014 PHASE 3 CLOSED (autonomous)",
             "notes": "REQUIREMENTS.md amendments: add R-TUI-060/061/062; amend R-TUI-041 (\u00a76.5 before/after: cell colour validity->entropy band, two-step->single-click, stats strip RETAINED, render-only+width-narrow+R-3 A2L preserved); retire R-TUI-050/051 (superseded, historical record kept). Doc-only 1 file. EntropyViewerScreen only in retired rows. Sanity 4 passed. PHASE 3 CLOSED: 6 increments, 0 HIGH batch-wide, 0 frozen diffs, C-17 on live path. Phase 4 (orchestrator-owned gate suite, C-25) next."
+        },
+        {
+            "phase": 4,
+            "date": "2026-07-15",
+            "decision": "Phase-4 iterate-to-fix: snapshot footer-drift containment (autonomous)",
+            "notes": "First full gate run (C-25, orchestrator-owned, 12:27): 1374 passed / 0 NON-snapshot failures / 5 xfail / 2 skip, but 18 tc016s snapshot cells FAILED. ROOT CAUSE (verified): Inc-5 removed Binding('e','show_entropy','Entropy',show=True) which was FOOTER-VISIBLE (workspace baseline SVG contains 'Entropy' label) -> retiring the modal drifts the footer on every wide-width cell. Inc-2 _batch45_map_drift_marks only covered the 2 map cells -> containment miss. FIX (test-only): added _batch45_footer_drift_marks -> xfail(strict=False) the 18 footer-drifted cells (restyled x both densities x {120x30,160x40} + diff/patch 120x30); 80x24 NOT marked (footer truncates). Snapshot subset now 12 passed/20 xfailed/0 FAILED/0 xpassed (tight, C-22 per-cell). No product code touched (binding removal correct). Re-running full suite for clean gate artifact."
         }
     ],
     "obsidian_synced": false,

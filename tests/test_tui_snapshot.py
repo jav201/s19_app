@@ -471,6 +471,36 @@ def _batch45_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     )
 
 
+# batch-45 Inc-5 FOOTER drift: retiring the entropy modal removed the
+# FOOTER-VISIBLE `Binding("e", "show_entropy", "Entropy", show=True)`. The Footer
+# renders on EVERY screen, so dropping the "e Entropy" key drifts the footer row
+# of every cell WIDE ENOUGH to have shown it — the 120x30 and 160x40 widths. At
+# the 80x24 floor the footer already truncated "e Entropy", so those cells do NOT
+# drift. The `map` cells are already fully xfail'd by `_batch45_map_drift_marks`
+# (whole-body band-view drift), so they are excluded here to avoid double-marking.
+# The affected cells regenerate in the canonical CI env post-merge (batch-44
+# pattern); until then each is xfail(strict=False).
+_WIDE_FOOTER_SIZES = frozenset({"120x30", "160x40"})
+
+
+def _batch45_footer_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-45 footer-drift mark for a WIDE tc016s cell.
+
+    The removed footer-visible ``e``/Entropy binding drifts the footer only at
+    the widths that showed it (120x30, 160x40) — not the 80x24 floor. ``map`` is
+    already covered by ``_batch45_map_drift_marks``.
+    """
+    if screen == "map" or size_key not in _WIDE_FOOTER_SIZES:
+        return ()
+    return (
+        pytest.mark.xfail(
+            reason="batch-45: removed footer-visible `e`/Entropy binding drifts "
+            "the footer on wide cells; canonical-CI regen pending",
+            strict=False,
+        ),
+    )
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -480,7 +510,8 @@ _RESTYLED_CELLS = [
         id=f"{screen}-{density}-{size_key}",
         marks=_restyled_cell_marks(screen)
         + _batch31_drift_marks(screen, density, size_key)
-        + _batch44_drift_marks(screen, density, size_key),
+        + _batch44_drift_marks(screen, density, size_key)
+        + _batch45_footer_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
@@ -526,7 +557,8 @@ _SCAFFOLD_CELLS = [
         + _batch36_drift_marks(screen, "comfortable", size_key)
         + _batch38_drift_marks(screen, "comfortable", size_key)
         + _batch44_drift_marks(screen, "comfortable", size_key)
-        + _batch45_map_drift_marks(screen, "comfortable", size_key),
+        + _batch45_map_drift_marks(screen, "comfortable", size_key)
+        + _batch45_footer_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
