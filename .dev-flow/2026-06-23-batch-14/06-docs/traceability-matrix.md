@@ -81,7 +81,7 @@ AT.
   — verified byte-identical on HEAD before any batch-14 edit, **0 introduced**.
   Backlog item, out of US-015 scope.
 - **N-2 (V-5 reconciliation):** spec provisional ids (TC-212..226, engine-guard
-  `TC-221`/`TC-031`, AT-NNN) reconciled to the real node names above. The spec's
+  `TC-221`/`TC-031`, AT-<n>) reconciled to the real node names above. The spec's
   `test_tc031_engine_modules_unchanged_vs_main` node does not exist on disk; the
   live guard names are `..._have_no_diff_vs_main` / `..._have_no_name_only_diff_vs_main`.
   No behavioral impact.

@@ -394,7 +394,7 @@ both extension buckets (`:363-369`) → loose JSON in the project dir is also in
 ### LLR-053.1 — Envelope and schema
 - **Traceability:** HLR-053
 - **Statement:** The filter parser shall accept exactly this top-level shape —
-  `{"format": "s19app-report-filter", "version": "1.0", "include": {"symbols": [<str>...],
+  `{"format": "s19app-report-filter", "version": "1.0", "include": {"symbols": [<string>...],
   "addresses": [{"start": <hex-or-int>, "end": <hex-or-int>}...]}}` — where `start`/`end`
   accept a JSON integer or a `"0x"`-prefixed hex string, `end` is exclusive (matching
   `ChangeSummaryEntry.address_end`, `changes/model.py:333`), the address domain is pinned to

@@ -319,7 +319,7 @@ Specify batch-14: two data-fidelity / correctness improvements surfaced by funct
 7. Both save call-sites threaded (TC-219 + TC-220); default = 32.
 8. Frozen-engine guard 0 diffs (TC-221).
 9. No US-016 over-correction: unresolvable inputs still refuse with a diagnostic, 0 exceptions (TC-225).
-10. **Dual traceability complete:** every story has BOTH a passing AT-NNN (Layer B) and its LLR→TC-NNN chain (Layer A).
+10. **Dual traceability complete:** every story has BOTH a passing AT-<n> (Layer B) and its LLR→TC-<n> chain (Layer A).
 11. **Cross-format data integrity (D2):** TC-226 shows 0 byte delta + 0 errors round-tripping S19↔re-parse, HEX→S19, and S19→HEX at the 32-byte default (the Intel-HEX emitter itself is unchanged).
 
 ### 5.4 A-5 surface-reachability matrix (standing Phase-4 row)
@@ -375,7 +375,7 @@ Baseline: **894 collected** (re-measured this phase, `pytest --collect-only`).
 | J-2 | Added TC-226 cross-format integrity (D2) under LLR-015.4 | HLR-015 re-read — no change (TC-226 strengthens the existing reader-as-oracle threshold; emitter signature unchanged) | §5.2 Layer A LLR-015.4 row + §5.3 item 11 |
 | J-3 | D1 cosmetic confirmation (operator question) | HLR-015 re-read — no change (S0 already specified inert; confirmation is informative) | §6.2 D1 sub-bullet |
 
-Provisional reconciliations owed at Phase 4: (a) test file paths — TC-212..218/226 assumed `test_changes_apply.py` (fold if no `test_changes_io.py`); (b) all `-k`/node ids + AT-NNN → real `def test_*` names (V-5 now covers AT ids per the updated process); (c) TC-222 assertion channel pending LLR-016.1's surfacing mechanism (locked as panel `sev-error`); (d) TC-224 pre-fix-fail output captured as evidence; (e) AT-NNN ↔ realizing-node map reconciled (AT-015.1→TC-219/220, AT-015.2→TC-226, AT-015.3→TC-213/217, AT-016.1→TC-224, AT-016.2→TC-222/225).
+Provisional reconciliations owed at Phase 4: (a) test file paths — TC-212..218/226 assumed `test_changes_apply.py` (fold if no `test_changes_io.py`); (b) all `-k`/node ids + AT-<n> → real `def test_*` names (V-5 now covers AT ids per the updated process); (c) TC-222 assertion channel pending LLR-016.1's surfacing mechanism (locked as panel `sev-error`); (d) TC-224 pre-fix-fail output captured as evidence; (e) AT-<n> ↔ realizing-node map reconciled (AT-015.1→TC-219/220, AT-015.2→TC-226, AT-015.3→TC-213/217, AT-016.1→TC-224, AT-016.2→TC-222/225).
 
 ### 6.5b Phase-3 spec amendments (Inc 1)
 

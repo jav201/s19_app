@@ -24,7 +24,7 @@
 - **Amendment B = draft-time verification at implementation time** — software-dev flagged the false premise via §6.5 Before/After; code-reviewer independently confirmed `get_memory_map` (core.py:485) folds all records and that a populated S0@0 can never corrupt the data-record map (the later data record overwrites it).
 - **Reader-as-oracle with a non-vacuous negative control** — TC-218 corrupts a *data-record* byte (not inert S0); data-record-map oracle (Amendment B) keeps S0 population and data corruption independently asserted (TC-215 / TC-218).
 - **Cross-format integrity multi-directional** — TC-226 (S19↔reparse, HEX→S19@32, S19→HEX) at 0 delta. Boundary discipline on C4 (252 accept / 253 reject).
-- **Mid-batch process change absorbed cleanly** — the two-layer AT-NNN model landed in `/dev-flow` mid-flight; Phase-1 iter-2 folded it with no thrash.
+- **Mid-batch process change absorbed cleanly** — the two-layer AT-<n> model landed in `/dev-flow` mid-flight; Phase-1 iter-2 folded it with no thrash.
 
 ## What didn't / scope drift
 - **RC-1 stale base** — Phase 0/1 derived against a tree 2 PRs behind `origin/main`; US-016 fully specified then dropped. Wasted Phase-1 effort a `git fetch` would have prevented. The dev-flow assumed a current base with no gate asserting it.
@@ -55,5 +55,5 @@ Reconciled with `.dev-flow/BACKLOG.md`:
 - **C-11 (NEW) — decide ownership of the C-10 checks:** shift-left to QA at AT-authoring time, or make them an explicit code-review checklist line (both F1/F2 were code-review-caught).
 - **CRC-width AT (LOW, latent-gap closer):** one AT asserting `crc.py:879` emits ≤32-byte records (the map oracle is width-agnostic).
 - **C-1** dev-flow-sync unfilled-template reject-check (P1, not exercised this batch — Phase-4 was filled). **GAP #2** manifest composition (P1, next feature). **C-9** hex-window AT (P2). **C-7/4a** app.py ruff cleanup (P2, own micro-PR). **C-6** retire TC-230/231 ids (P3). obsidian_synced ride-along (done this batch).
-- **N-2 (Phase 6):** align spec engine-guard node name (`test_tc031_engine_modules_unchanged_vs_main` does not exist → live `..._have_no_diff_vs_main`) + provisional TC-NNN ids to reconciled `test_tc*` names, so the next batch doesn't inherit dead citations.
+- **N-2 (Phase 6):** align spec engine-guard node name (`test_tc031_engine_modules_unchanged_vs_main` does not exist → live `..._have_no_diff_vs_main`) + provisional TC-<n> ids to reconciled `test_tc*` names, so the next batch doesn't inherit dead citations.
 - **Endorse keeping AT + TC as independent layers** (do NOT consolidate "AT-subsumes-TC"): this batch is direct evidence they catch different failure classes (AT caught C3; TC layer stayed solid while the AT layer had the first-cut defects).
