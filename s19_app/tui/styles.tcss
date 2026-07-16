@@ -953,23 +953,47 @@ DataTable > .datatable--odd-row {
 }
 
 /* The three colour groups (LLR-076.2). Blue is `$accent-calm`, the ONE declared
- * accent var (:26). Green/yellow have NO var — the Calm Dark token set declares
+ * accent var (:26). Purple/cyan have NO var — the Calm Dark token set declares
  * only the accent + the structural navy steps (:21-31) — so they carry the
  * literal `insight_style` hex with its constant NAMED in the comment, which is
  * this file's established idiom for non-accent palette hues (`.sev-*` :529-547,
- * `.band-*` :566). These are deliberately NOT `sev-*` classes: a chip group is a
- * FUNCTION cue (what the button does), not a severity verdict, and
- * `color_policy` stays the single source of truth for severity. */
+ * `.band-*` :566).
+ *
+ * ⚠ THE CHIP FAMILY IS NON-VERDICT BY CONSTRUCTION (Inc-2b, operator ruling
+ * 2026-07-16). GREEN / YELLOW / RED are RESERVED for VERDICTS inside this panel
+ * and the family may claim none of them. Inc-2 shipped apply=GREEN and
+ * checks=YELLOW; Inc-3 lands the per-check verdict glyphs in the SAME panel
+ * (`_GLYPH_STYLE` = ✓ GREEN / ✗ RED / ◐ YELLOW), so those two hues would have
+ * meant BOTH "this button applies / runs checks" AND "this check passed /
+ * partially passed" on one screen. THE VERDICT CUE MUST NEVER BE AMBIGUOUS — it
+ * is what tells an analyst whether a patch passed — so the FUNCTION cue yields
+ * and moves to non-verdict hues. §6.5 Amendment F (batch-47: yellow ≡ warning
+ * app-wide) is one batch old and stays intact; this change protects it.
+ *
+ * The triple below is FORCED, not preferred: of `insight_style`'s non-verdict
+ * hues, DGRAY is itself a cue (grey ≡ "not yet checked", REQUIREMENTS.md §6.5),
+ * LBLUE is HILITE's hue desaturated (both ~223°, so not distinguishable as a
+ * group), and LABEL/VALUE are body-text greys. HILITE (~223°) / PURPLE (~274°)
+ * / CYAN (~199°) are the only three that resolve DISTINCTLY — which is what
+ * AT-076a asserts. CYAN is also `.sev-info` (:541), but this panel mounts no
+ * `sev-*` consumer (`PatchEditorPanel` carries none; the `sev-info` status line
+ * lives in the SEPARATE `AbDiffPanel`), so no in-panel hue collides.
+ *
+ * These remain deliberately NOT `sev-*` CLASSES: a chip group is a FUNCTION cue
+ * (what the button does), not a severity verdict, and `color_policy` stays the
+ * single source of truth for severity. Reusing the class would let a severity
+ * retune silently retint these buttons. (Inc-2 rejected the class and then
+ * reused the HUE anyway — that was the gap Inc-2b closes.) */
 #patch_editor_panel .patch-chip-entry .patch-chip {
     color: $accent-calm;
 }
 
 #patch_editor_panel .patch-chip-apply .patch-chip {
-    color: #54efae;              /* insight_style.GREEN */
+    color: #b565f3;              /* insight_style.PURPLE */
 }
 
 #patch_editor_panel .patch-chip-checks .patch-chip {
-    color: #f6ff8f;              /* insight_style.YELLOW */
+    color: #7dd3fc;              /* insight_style.CYAN */
 }
 
 /* US-028 (LLR-035.2) — the variant group composes ABOVE the execute group;

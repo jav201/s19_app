@@ -418,3 +418,102 @@ does not, the fold was implemented as a column and the design — not the test �
 - [x] **C-30 leak probe measured, not reasoned** — §4.1; 0 non-patch drift ⇒ the N/A verdict is evidence
 - [x] **§6.5 amendment recorded before the element was removed** — Amendment D, Before/After, in `REQUIREMENTS.md`
 - [x] **Uncertainty surfaced, not hidden** — R-2-1/R-2-2 are **my own errors**, reported in full with the runs that caught them; TC-076.3's unmet literal threshold is **declared** rather than claimed; the two wrong PLAN.md figures are reported rather than absorbed; the container-vs-button class placement is explained as a **non-deviation** rather than inflated into one
+
+---
+
+# Inc-2b — chip family shifts to NON-VERDICT hues (operator ruling 2026-07-16)
+
+## The defect Inc-2 shipped
+
+Inc-2 claimed **GREEN `#54efae`** and **YELLOW `#f6ff8f`** as a *function* cue. Inc-3 concurrently
+lands `_GLYPH_STYLE = {"✓": GREEN, "✗": RED, "◐": YELLOW}` as a *verdict* cue **in the same panel**.
+Inside `#patch_editor_panel` that made green = "apply-path button" AND "check passed"; yellow =
+"checks-group button" AND "check partial".
+
+Inc-2 **correctly rejected** the `.sev-ok` / `.sev-warning` *classes* (frozen `color_policy.py` is
+severity's source of truth) and then **reused the hue anyway**. Rejecting the class and keeping the
+hue buys the coupling it was trying to avoid, with none of the traceability. That is the gap.
+
+**Ruling: GREEN / YELLOW / RED stay RESERVED for verdicts inside this panel.** The verdict cue must
+never be ambiguous — it is what tells an analyst whether a patch passed. §6.5 **Amendment F**
+(batch-47: yellow ≡ warning app-wide) is one batch old and stays intact; this change protects it.
+
+## Before / After palette
+
+| Chip group | Before (Inc-2) | After (Inc-2b) | `insight_style` constant | Verdict hue? |
+|---|---|---|---|---|
+| `patch-chip-entry`  | `$accent-calm` `#91abec` | `$accent-calm` `#91abec` — **unchanged** | `HILITE` (via the `$accent-calm` var, :26) | no → no |
+| `patch-chip-apply`  | `#54efae` **GREEN** | **`#b565f3`** | `PURPLE` | **YES → no** |
+| `patch-chip-checks` | `#f6ff8f` **YELLOW** | **`#7dd3fc`** | `CYAN` | **YES → no** |
+
+**No verdict hue (GREEN `#54efae` / YELLOW `#f6ff8f` / RED `#fd8383`) remains anywhere in the chip
+family**, and no `sev-*` class is reused. Measured, not asserted:
+
+```
+$ awk 'NR>=924 && NR<=1000' s19_app/tui/styles.tcss | grep -nE "#54efae|#f6ff8f|#fd8383|sev-ok|sev-warning|sev-error"
+NONE — no verdict hue/class in the chip family
+```
+
+**The triple is FORCED, not preferred.** Of `insight_style`'s non-verdict hues: `DGRAY` is itself a
+cue (grey ≡ "not yet checked", REQUIREMENTS.md §6.5); `LBLUE #bbc8e8` is `HILITE`'s hue desaturated
+(both ≈223°, indistinguishable *as a group cue*); `LABEL`/`VALUE` are body-text greys. `HILITE`
+(≈223°) / `PURPLE` (≈274°) / `CYAN` (≈199°) are the only three that resolve distinctly. **No new
+colour was introduced.**
+
+⚠ **Declared, not hidden:** `CYAN #7dd3fc` is also `.sev-info` (:541). This is *not* an in-panel
+collision — `PatchEditorPanel` (`screens_directionb.py:2203-3862`) mounts **no `sev-*` consumer**;
+the `sev-info` status line belongs to the **separate** `AbDiffPanel` (:3863+). Verified by grep over
+the panel's own line range. It is a weaker adjacency than the one being fixed (info is not a verdict,
+and Inc-3's glyph set is GREEN/RED/YELLOW only), but it is real and worth recording.
+
+## Mutation evidence (Gate 1 — AT-076a must still discriminate)
+
+Both prior increments recorded a RED that did not discriminate. This one was **executed**, not
+reasoned: `patch-chip-checks` flipped to the apply hue (`#7dd3fc` → `#b565f3`), i.e. two groups
+sharing one colour — the exact regression the shift could introduce.
+
+```
+$ python -m pytest -q tests/test_tui_patch_chips.py::test_at076a_docked_buttons_are_grouped_chips
+E  AssertionError: @(80, 24): the three chip groups must resolve to three DISTINCT colours;
+E    got {'entry': (145, 171, 236), 'apply': (181, 101, 243), 'checks': (181, 101, 243)}
+E  assert 2 == 3
+1 failed in 1.49s
+```
+
+Mutation reverted; `grep -c MUTANT styles.tcss` → **0**. **AT-076a needed NO change to stay
+meaningful** — it asserts three *distinct resolved RGB values*, never the literal hexes, so the
+palette shift passed through it untouched. That is the oracle working as designed.
+
+## Gates — all MEASURED
+
+| Gate | Result |
+|---|---|
+| **1. AT-076a discriminates** | ✓ mutation-tested above → RED (`2 == 3`). Unchanged oracle. |
+| **2. C-30 leak probe (re-run)** | ✓ **full** snapshot suite = **all 32 cells** (`test_tui_snapshot.py` is the only `snap_compare` file) → **30 passed / 2 xfailed / 0 failed**. **0 non-patch drift.** Valid because non-patch cells are unmarked strict oracles. AT-076b green at both regimes; all chip rules stay `#patch_editor_panel`-rooted (TC-076.1 green). |
+| **3. C-22** | ✓ drift stayed inside the 2 already-marked cells (`patch-comfortable-80x24`, `patch-comfortable-120x30`); **0 XPASS**, **nothing new marked**, `test_tui_snapshot.py` untouched. **No local regen.** |
+| **4. Four suites, ONE run** | ✓ `pytest -q tests/test_tui_patch_chips.py tests/test_tui_patch_layout.py tests/test_tui_theme.py tests/test_tui_snapshot.py` → **64 passed, 2 xfailed, 0 failed** in 112.41s. |
+| **5. C-27 dual-guard + ruff** | ✓ raw `git diff main` over the frozen set = **empty**; both guard arms **7 passed**; `ruff check tests/test_tui_patch_chips.py` → **All checks passed!** |
+
+⚠ **Confounder, declared:** the gate run executed against a tree carrying **Inc-3's uncommitted WIP**
+(another agent is live in this worktree). The AT-076a colour result is purely mine. The snapshot
+result is *shared* with Inc-3 — which makes the "0 non-patch drift" conclusion **stronger**, not
+weaker, since it holds with both increments in the tree. The 2 patch cells were already drifting from
+Inc-1 before I touched anything.
+
+## Folded-in Inc-2 code-review nits
+
+- **F3 [LOW] — FIXED.** `tests/test_tui_patch_chips.py`: `_in_patch_panel(node: object)` → `DOMNode`
+  (`from textual.dom import DOMNode`); `_chip_rule_sets(...) -> list[object]` → `list[RuleSet]`
+  (`from textual.css.model import RuleSet`). Both import paths **verified against the installed
+  textual 8.2.8**, not assumed. Repo convention: hints must agree with the docstring.
+- **F4 [LOW] — DELIBERATELY NOT CHANGED.** `_CHIP_CLASS in rule.selectors` substring-matches a
+  hypothetical `.patch-chippy`. It **fails safe** (over-includes in a leak probe: a false positive
+  would make AT-076b *stricter*, never blind). Tightening it would trade a safe-failing check for a
+  cleverer one with a worse failure direction, against the brief's explicit instruction. Left as-is.
+
+## Scope
+
+**2 files, both in scope:** `s19_app/tui/styles.tcss`, `tests/test_tui_patch_chips.py`. Inc-3's four
+WIP files (`app.py`, `screens_directionb.py`, `services/change_service.py`,
+`tests/test_tui_patch_glyphs.py`) were **read-only** and remain dirty and untouched. No branch switch,
+no commit, no `git stash`/`checkout`/`reset`.

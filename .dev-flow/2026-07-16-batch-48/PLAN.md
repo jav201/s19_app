@@ -120,6 +120,35 @@ Patch snapshots: exactly 2 cells (`patch-comfortable-80x24` / `-120x30`; `_TWO_S
 - R5 **Positional index-alignment** — an off-by-one silently mislabels a row's check result.
 - R6 **48-id preserve tuple** — a moved/renamed id trips the census.
 
+## 🔎 Phase-5 CONTROL CANDIDATE (operator-requested 2026-07-16 — raise at the post-mortem)
+**Gap: a SHARED-NAMESPACE collision between two individually-correct increments is invisible to every control
+we have.** Origin: Inc-2 review **F1**. Inc-2 claimed GREEN/YELLOW as a chip *function* cue; Inc-3
+concurrently claimed the same hues as a glyph *verdict* cue, same panel. **Neither increment was wrong alone;
+every AT was green** (AT-076a: the 3 chip colours are mutually distinct — true; Inc-3: right glyph→right
+colour — true). The defect exists **only in the overlap**, which no artifact owns.
+**Why each control was blind — the AXIS is wrong, not the rigor:**
+- **C-26 keys on touched SYMBOLS.** No shared symbol exists: Inc-2 wrote a **hex literal in CSS**, Inc-3 an
+  `insight_style` **constant in Python**. Same *value*, no shared *name*. (Same root as Inc-2's seed-gap —
+  symbol-keyed seeds were blind to `styles.tcss`, a non-symbol artifact.)
+- **Dual traceability is per-chain.** HLR-076 and HLR-077 are separate `US→HLR→LLR→TC` chains. A **100%
+  complete matrix is fully consistent with this bug** — completeness of each chain says nothing about two
+  chains competing for one resource.
+- **C-10(b)** buys one AT per *branch of one policy*; not across *two policies that never call each other*.
+**General shape (ONE control, not four patches):** a **shared, finite semantic namespace scoped to a
+container**, with multiple independent claimants, each locally valid. Hue is one instance; the shape also
+covers **keybindings · widget ids · CSS specificity · markup sinks · glyph vocabulary**. ⚠ Same failure
+family as **R-NEW-1's missed sweep** and **C-28** — three sightings, one root: *the census axis is keyed to
+code symbols, but the defect lives in a shared namespace no symbol names.*
+⚠ **What caught it is NOT reproducible** — a reviewer voluntarily read a **sibling agent's uncommitted WIP**.
+No control required that. **Do not credit the process.**
+**Candidates (evaluate at P5; do NOT pre-adopt):** (a) per-container **semantic-namespace registry**
+(hue→meaning, key→action, glyph→verdict) that a claiming increment must consult+extend, with a test asserting
+no entry carries 2 meanings in one scope; (b) **Phase-2 cross-increment collision pass** over the *planned*
+increment set; (c) extend C-26 to census **values/artifacts**, not only symbols; (d) accept + rely on review,
+stated explicitly. ⚠ **(b) is cheapest and would have caught this BEFORE Inc-2 was cut — the collision was
+predictable from HLR-076 + HLR-077 alone and did not need code to exist.** Precedent: batch-47 **MJ-1**
+(writer-census at Phase 2, before code) proves this class is catchable pre-implementation.
+
 ## Out-of-scope carries (backlog — see MEMORY.md LIVE BACKLOG)
 Issues Report tiers (PARKED — **but still owns P0 B1 Issues paging no-op; parked ≠ fixed**) · field-audit B3
 A2L two-extra-chars (needs live repro) · discoverability gap · Issues filter/sort · universal paste · Flow
@@ -127,6 +156,21 @@ Builder (flow.json persistence · CHECK+CRC seam · multi-image) · report_servi
 P-1 1-based index · **delete `prototypes/screen_upgrades.*` + `out/` AFTER this batch** (§10.4).
 
 ## Decision log
+- **2026-07-16 P3 Inc-2b — OPERATOR DECISION: chip palette shifts to NON-VERDICT hues.** Raised by the Inc-2
+  code review as F1 (MEDIUM). Inside `#patch_editor_panel` the Inc-2 chip family claimed GREEN `#54efae` +
+  YELLOW `#f6ff8f` as a **function** cue, while Inc-3's `_GLYPH_STYLE = {"✓": GREEN, "✗": RED, "◐": YELLOW}`
+  claims the same hues as a **verdict** cue — green = "apply-path button" *and* "check passed"; yellow =
+  "checks-group button" *and* "check partial". The reviewer found this in Inc-3's *uncommitted WIP*, i.e. it
+  was hypothetical for about one increment. **Ruling: chips → `$accent-calm`/CYAN/PURPLE/LBLUE (all already in
+  `insight_style`; no new colours). GREEN/YELLOW/RED stay RESERVED for verdicts inside this panel.**
+  **Why:** the verdict cue is the one that must never be ambiguous — it is what tells an analyst whether a
+  patch passed. And §6.5 **Amendment F** (batch-47, operator-decided: *yellow ≡ warning app-wide*) was bought
+  ONE BATCH AGO; spending it back here would leave the next reader an exception to memorise. Inc-2 is the
+  increment that *claims* the hue → cheap to fix now, expensive after the Inc-4 pass/fail strip lands.
+  ⚠ **Note the mechanism, not just the outcome:** Inc-2's rejection of `.sev-ok`/`.sev-warning` **was correct**
+  (frozen `color_policy.py` stays severity's source of truth; reusing the class would let a severity retune
+  silently retint buttons). The bug was never the *rejection* — it was reusing the **hue** after correctly
+  rejecting the **class**. Right call, wrong palette.
 - **2026-07-16 P0**: RC-1 PASS @ 6551aed. Authorization restated from the operator's explicit cross-batch
   grant. Already-shipped check: R-TUI-074 highest → new = **R-TUI-075+**; check-glyph 0 hits = NEW; the live
   before/after CARD is NOT shipped (the existing `#patch_before_after_button` → `action_before_after_report`

@@ -67,6 +67,8 @@ import re
 from pathlib import Path
 
 from textual.css.match import match
+from textual.css.model import RuleSet
+from textual.dom import DOMNode
 from textual.widgets import Button
 
 from s19_app.tui.app import S19TuiApp
@@ -109,7 +111,7 @@ _STYLES_TCSS = (
 )
 
 
-def _in_patch_panel(node: object) -> bool:
+def _in_patch_panel(node: DOMNode) -> bool:
     """True when ``node`` is `#patch_editor_panel` or one of its descendants."""
     return any(
         getattr(a, "id", None) == _PANEL_ID
@@ -117,7 +119,7 @@ def _in_patch_panel(node: object) -> bool:
     )
 
 
-def _chip_rule_sets(app: S19TuiApp) -> list[object]:
+def _chip_rule_sets(app: S19TuiApp) -> list[RuleSet]:
     """Every parsed `RuleSet` in the app stylesheet belonging to the chip family.
 
     Selected on the rule's own SELECTOR text so a NEW chip rule is picked up
