@@ -511,6 +511,14 @@ def _batch46_patch_drift_marks(screen: str, density: str, size_key: str) -> tupl
     three-window responsive layout. Marked ``xfail(strict=False)`` until the
     canonical-CI baseline regen lands, then retired.
     """
+    # RETIRED (batch-47 regen PR): the canonical-CI regen has LANDED - all 29
+    # drifting tc016s baselines were refreshed from the merged batch-47 `main`
+    # (snapshot-regen.yml @ textual==8.2.8), so every cell now MATCHES its
+    # baseline and this mark is stale. Left as an early no-op for provenance
+    # (same convention as _batch45_map_drift_marks). Leaving it LIVE would make
+    # the cell XPASS silently under strict=False and mask future regressions.
+    return ()
+
     if screen == "patch" and size_key in ("80x24", "120x30"):
         return (
             pytest.mark.xfail(
@@ -548,6 +556,14 @@ def _batch47_workspace_drift_marks(screen: str, density: str, size_key: str) -> 
     (US-WS, HLR-066/067). Marked ``xfail(strict=False)`` until the canonical-CI
     baseline regen lands (batch-47 Inc-7 theme + regen), then retired.
     """
+    # RETIRED (batch-47 regen PR): the canonical-CI regen has LANDED - all 29
+    # drifting tc016s baselines were refreshed from the merged batch-47 `main`
+    # (snapshot-regen.yml @ textual==8.2.8), so every cell now MATCHES its
+    # baseline and this mark is stale. Left as an early no-op for provenance
+    # (same convention as _batch45_map_drift_marks). Leaving it LIVE would make
+    # the cell XPASS silently under strict=False and mask future regressions.
+    return ()
+
     if screen == "workspace":
         return (
             pytest.mark.xfail(
@@ -582,6 +598,14 @@ def _batch47_a2l_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     (US-A2L, HLR-068/069). Marked ``xfail(strict=False)`` until the canonical-CI
     baseline regen lands (batch-47 Inc-7 theme + regen), then retired.
     """
+    # RETIRED (batch-47 regen PR): the canonical-CI regen has LANDED - all 29
+    # drifting tc016s baselines were refreshed from the merged batch-47 `main`
+    # (snapshot-regen.yml @ textual==8.2.8), so every cell now MATCHES its
+    # baseline and this mark is stale. Left as an early no-op for provenance
+    # (same convention as _batch45_map_drift_marks). Leaving it LIVE would make
+    # the cell XPASS silently under strict=False and mask future regressions.
+    return ()
+
     if screen == "a2l":
         return (
             pytest.mark.xfail(
@@ -618,6 +642,14 @@ def _batch47_mac_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     green (changed region below the fold). Marked ``xfail(strict=False)`` until
     the canonical-CI baseline regen lands (batch-47 theme + regen), then retired.
     """
+    # RETIRED (batch-47 regen PR): the canonical-CI regen has LANDED - all 29
+    # drifting tc016s baselines were refreshed from the merged batch-47 `main`
+    # (snapshot-regen.yml @ textual==8.2.8), so every cell now MATCHES its
+    # baseline and this mark is stale. Left as an early no-op for provenance
+    # (same convention as _batch45_map_drift_marks). Leaving it LIVE would make
+    # the cell XPASS silently under strict=False and mask future regressions.
+    return ()
+
     if screen == "mac" and size_key in _WIDE_FOOTER_SIZES:
         return (
             pytest.mark.xfail(
@@ -654,6 +686,14 @@ def _batch47_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     ``xfail(strict=False)`` until the canonical-CI baseline regen lands (batch-47
     theme + regen follow-up), then retired.
     """
+    # RETIRED (batch-47 regen PR): the canonical-CI regen has LANDED - all 29
+    # drifting tc016s baselines were refreshed from the merged batch-47 `main`
+    # (snapshot-regen.yml @ textual==8.2.8), so every cell now MATCHES its
+    # baseline and this mark is stale. Left as an early no-op for provenance
+    # (same convention as _batch45_map_drift_marks). Leaving it LIVE would make
+    # the cell XPASS silently under strict=False and mask future regressions.
+    return ()
+
     if screen == "map" and size_key in ("80x24", "120x30"):
         return (
             pytest.mark.xfail(
@@ -703,6 +743,14 @@ def _batch47_theme_drift_marks(screen: str, density: str, size_key: str) -> tupl
         or (screen == "mac" and size_key == "80x24")
         or screen == "diff"
     )
+    # RETIRED (batch-47 regen PR): the canonical-CI regen has LANDED - all 29
+    # drifting tc016s baselines were refreshed from the merged batch-47 `main`
+    # (snapshot-regen.yml @ textual==8.2.8), so every cell now MATCHES its
+    # baseline and this mark is stale. Left as an early no-op for provenance
+    # (same convention as _batch45_map_drift_marks). Leaving it LIVE would make
+    # the cell XPASS silently under strict=False and mask future regressions.
+    return ()
+
     if covers_remaining:
         return (
             pytest.mark.xfail(
