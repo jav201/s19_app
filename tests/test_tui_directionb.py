@@ -2622,10 +2622,12 @@ def test_tc033_modals_render_with_calm_dark_tokens(tmp_path: Path) -> None:
     """
     from textual.widgets import Button, Label
 
-    # Calm Dark token values from styles.tcss (the single source of truth).
-    accent = "#4EC9D4"
-    bg_base = "#11141A"
-    bg_panel = "#171B23"
+    # Theme token values from styles.tcss (the single source of truth).
+    # batch-47 Inc-8 (US-FND) re-themed the $-vars to the navy/pastel
+    # insight_style depth stack — the var NAMES are unchanged, only the hues.
+    accent = "#91ABEC"   # $accent-calm — insight_style.HILITE
+    bg_base = "#0A0E1B"  # $bg-base — insight_style.DEPTH_BG
+    bg_panel = "#0F1525"  # $bg-panel — insight_style.DEPTH_PANEL
 
     async def _drive() -> dict[str, dict[str, str]]:
         app = S19TuiApp(base_dir=tmp_path)

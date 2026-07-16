@@ -4,7 +4,8 @@
 > Origin: `prototypes/screen_upgrades.HANDOFF-PLAN.md` (operator-approved 2026-07-15).
 
 ## Where we are
-- **Phase 3 — Implementation** — STARTING Inc-1 (Foundation). Autonomous per-increment gates.
+- **Phase 3 — Implementation** — ✅ COMPLETE (8/8 increments; all HLR-065..074 closed, 20 ATs realized). → Phase 4.
+- **Phase 4 — Validation** — STARTING (orchestrator-owned full gate run, C-25).
 - **Phase 2 — Cross-review** — APPROVE-WITH-FOLDS → folds applied → re-gate APPROVE. 0 blockers / 0 HIGH.
 - **Phase 1 — Requirements** — APPROVED. **Phase 0 — DoR** — APPROVED.
 - Branch `claude/screen-upgrades-handoff-0874f9` @ `19bf1eb` (== origin/main tip). RC-1 PASS.
@@ -48,8 +49,10 @@ postmortem.
 - **Inc-4 — US-A2L** — ✅ DONE. tuple[Text] cells + glyph + A2LDetailCard + RowHighlighted; 6 green (AT-068/069/069b★/069c★); dual review 0 HIGH (security APPROVE-CLEAN); §6.5 Amd E (accents subsumed by severity). 6 a2l cells drift.
 - **Inc-5 — US-MAC** — ✅ DONE. glyph col + coverage strip + C-17; 7 green (AT-070/070b★/070c/070d/071); dual review, F1 MEDIUM fixed (glyph off in_mem, ✓=in-image; +AT-070d MAC-only ·). 4 wide mac cells drift.
 - **Inc-6 — US-MAP Memory Map BIG** — ✅ DONE. bands+hatch + MapRuler + N-sym(range_index) + inspector peek; 8 ATs green; C-29 both-axes measured; code-review 0 HIGH (F3 docstring fixed). 2 map cells drift.
-- **Inc-7 — US-WS classed hex** — STARTING. hexview.py 00/FF dim·ASCII cyan·rest bright (LLR-066.3, deferred from Inc-3). Small.
-- Canonical AT registry: **20** (+AT-070d). Snapshot drift so far: 6 WS + 6 A2L + 4 MAC + 2 MAP = 18 cells xfail.
+- **Inc-7 — US-WS classed hex** — ✅ DONE `a3fa896`. hexview _hex_byte_style; 7 green; highlight priority preserved; NO new drift; 0 HIGH. **HLR-066 fully closed.**
+- **Inc-8 — US-FND app-wide theme** — ✅ DONE. navy $-vars + .db-pane chrome + sev-* pastel restyle (§6.5 Amd C recorded); AT-065a/b; 29 cells drift (0 xpassed, non-masking); color_policy 0-diff; code-review APPROVE-CLEAN 0 findings.
+- Canonical AT registry: **20**. Snapshot drift: all **29 tc016s cells** xfail(strict=False) → single canonical-CI regen follow-up PR post-merge.
+- **Carry:** chip-button CSS deferred to Batch B (patch-editor chips; no consumer here). Amendments A–E recorded.
 
 ## Phase-1 result (2026-07-15)
 - `01-requirements.md` (architect): 5 US, **10 HLR** (HLR-065..074 = R-TUI-065..074), **32 LLR**,

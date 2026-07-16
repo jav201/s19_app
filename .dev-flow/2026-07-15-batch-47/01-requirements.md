@@ -730,12 +730,19 @@ See §1.3. Additional: **dolphie idiom** = muted label / bright value, soft past
 - **C-26 reverse-census (MN-7 — run BEFORE the map edit):** the map surfaces already carry interaction/snapshot tests that this edit will touch. Enumerate and re-run them first — in `test_tui_directionb.py`: the **`MemoryMapPanel` interaction tests (23)** and the **`RegionRow` interaction tests (9)** — plus the canonical-CI snapshot cells for the Memory-Map BIG screen. No moved/renamed leaf ids may silently drop from these (C-26 touched-symbol reverse census; census keyed on the moved leaf ids, per the batch-46 C-29/C-26 lesson).
 - **Re-derived reqs:** HLR-072 (LLR-072.1–072.4) · HLR-073 (LLR-073.1–073.3) · HLR-074 (LLR-074.1–074.3) · AT-072a/072b/073/074. **Status update:** any Manual R-TUI-060/041 rows whose checks become Automated by AT-072a/072b/073/074 are promoted in REQUIREMENTS.md at Phase 6.
 
-**Amendment C — Conditional `sev-*` hue restyle (US-FND / HLR-065, LLR-065.4)**
-- **Before:** `sev-*` rules in `styles.tcss:499-515` carry their current hues.
-- **After (conditional):** IF the navy/pastel palette changes any `sev-*` rule's hue, the specific Before → After hue is recorded here at the increment that makes the change; class NAMES and severity semantics (Red/Green/White/Grey + Orange MAC) are preserved regardless, and `color_policy.py` stays frozen (0-diff).
-- **Deleted / New tokens:** none unless a hue changes (then: Before hex → After hex per class, filled at Phase 3).
-- **Parent-HLR re-read:** HLR-065 / LLR-065.4 already mandate name+semantics preservation; this block is the placeholder the Phase-3 increment fills if hues move.
-- **Re-derived reqs:** LLR-065.4 · TC-065.4 (round-trip) · AT-065a/AT-065b.
+**Amendment C — `sev-*` hue restyle to the pastel palette (US-FND / HLR-065, LLR-065.4 — REALIZED Inc-8)**
+- **Before → After (exact hex per class, `styles.tcss:499-515`):**
+  | class | Before → After | palette / family (semantics preserved) |
+  |---|---|---|
+  | `.sev-ok` | `#5fb98a → #54efae` | GREEN — memory-checked + present |
+  | `.sev-error` | `#e06c75 → #fd8383` | RED — schema/structural failure |
+  | `.sev-warning` | `#d9a35b → #f6ff8f` | YELLOW — warning |
+  | `.sev-info` | `#4ec9d4 → #7dd3fc` | CYAN — info |
+  | `.sev-neutral` | `#6b7280 → #969aad` | DGRAY — not-yet-checked (Grey) |
+- **Preserved unchanged:** `.mac_out_of_range` stays `#d9a35b` (the "Orange = MAC warning" cue survives); `band-*` rules untouched (separate entropy domain). All `sev-*` class NAMES unchanged; severity SEMANTICS (Red/Green/White/Grey + Orange MAC) intact — every hue stays in its correct color family.
+- **Deleted / New tokens:** Deleted — the 5 old sev-* hues. New — the 5 pastel sev-* hues (above).
+- **Parent-HLR re-read:** HLR-065 / LLR-065.4 mandate name+semantics preservation — satisfied (families preserved). `color_policy.py` (the sev-*→class MAP + `css_class_for_severity` round-trip) stays **frozen, 0-diff** — the restyle is entirely in `styles.tcss`. Verified: `git diff main -- color_policy.py` empty; `test_color_policy_round_trip` green.
+- **Re-derived reqs:** LLR-065.4 · TC-065.4 (round-trip, green) · AT-065b (asserts the NEW pastel `.sev-error` resolves + round-trip intact).
 
 **Amendment D — `human_bytes` binary (1024) size convention (US-FND / HLR-065, LLR-065.2 — operator decision 2026-07-15, applied Inc-1)**
 - **Before:** `human_bytes(n)` used the DECIMAL/SI (1000) divisor + `KB/MB/GB` units (Inc-1 first cut, matching the initial qa TC-065.1 threshold `10**9 → "1.0 GB"`).

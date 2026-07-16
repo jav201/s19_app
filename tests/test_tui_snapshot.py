@@ -670,6 +670,55 @@ def _batch47_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-47 Inc-8 (R-TUI-065, US-FND app-wide navy/pastel theme): `styles.tcss`
+# swaps the app `$`-variables to the insight_style navy depth stack
+# (bg-base -> #0a0e1b, bg-panel -> #0f1525, fg-base -> #e9e9e9, rule -> #1b233a,
+# accent-calm -> #91abec), aligns the five `sev-*` hues to the pastel palette
+# (§6.5 Amendment C), and adds the dolphie panel chrome (`.db-pane` tall border
+# + border-title accent + zebra odd-row). The `Screen`/panel/rail/footer styling
+# is rendered on EVERY screen, so the theme drifts EVERY tc016s cell (C-28
+# shared-chrome). The per-screen Inc-3..7 marks + the batch-46 patch mark already
+# cover workspace (6), a2l (6), mac-WIDE (4), map (2) and patch (2); this mark
+# covers the REMAINING cells the theme drifts — issues (6), mac-80x24 (2), and
+# diff (1) — so every one of the 29 cells rides exactly ONE xfail(strict=False)
+# (no double-marking, per the batch-45 footer precedent). The change is cosmetic
+# only (no binding add/remove this increment), so no NEW footer-key drift beyond
+# the theme repaint. SVG baselines regenerate in the canonical CI env
+# (snapshot-regen.yml, pinned textual==8.2.8) as the batch-47 post-merge
+# follow-up PR — NEVER locally (reference_snapshot_regen_env). This mark retires
+# with that regen, alongside the sibling batch-47 per-screen marks.
+def _batch47_theme_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 Inc-8 app-wide theme drift marks.
+
+    The navy/pastel `styles.tcss` restyle repaints the shared chrome on every
+    screen, drifting every tc016s cell. The per-screen Inc-3..7 marks + the
+    batch-46 patch mark already cover workspace / a2l / mac-WIDE / map / patch;
+    this mark covers exactly the cells they do NOT — issues (all), the narrow
+    mac-80x24 cells, and the diff scaffold — so each cell carries one
+    ``xfail(strict=False)``. Retired when the canonical-CI baseline regen lands
+    (batch-47 post-merge follow-up), together with the per-screen marks.
+    """
+    covers_remaining = (
+        screen == "issues"
+        or (screen == "mac" and size_key == "80x24")
+        or screen == "diff"
+    )
+    if covers_remaining:
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 Inc-8 R-TUI-065 US-FND: app-wide navy/pastel theme "
+                    "(styles.tcss $-var swap + sev-* pastel align + dolphie panel "
+                    "chrome) repaints shared chrome on every screen; SVG baseline "
+                    "regen pending in canonical CI (snapshot-regen.yml, batch-47 "
+                    "post-merge follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -683,7 +732,8 @@ _RESTYLED_CELLS = [
         + _batch45_footer_drift_marks(screen, density, size_key)
         + _batch47_workspace_drift_marks(screen, density, size_key)
         + _batch47_a2l_drift_marks(screen, density, size_key)
-        + _batch47_mac_drift_marks(screen, density, size_key),
+        + _batch47_mac_drift_marks(screen, density, size_key)
+        + _batch47_theme_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
@@ -732,7 +782,8 @@ _SCAFFOLD_CELLS = [
         + _batch45_map_drift_marks(screen, "comfortable", size_key)
         + _batch45_footer_drift_marks(screen, "comfortable", size_key)
         + _batch46_patch_drift_marks(screen, "comfortable", size_key)
-        + _batch47_map_drift_marks(screen, "comfortable", size_key),
+        + _batch47_map_drift_marks(screen, "comfortable", size_key)
+        + _batch47_theme_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

@@ -19,11 +19,16 @@ the Textual CSS engine, so the assertions are deterministic and explicit.
 
 from __future__ import annotations
 
+import asyncio
 import re
 from pathlib import Path
 
 import pytest
+from textual.color import Color
+from textual.widgets import Static
 
+from s19_app.tui import insight_style
+from s19_app.tui.app import S19TuiApp
 from s19_app.tui.color_policy import (
     SEVERITY_CLASS_MAP,
     css_class_for_severity,
@@ -216,4 +221,87 @@ def test_tc_013b_stylesheet_defines_rule_for_each_sev_class(
     assert "color:" in rule.group("body"), (
         f"TC-013(b): the .{sev_class} rule defines no `color:` — "
         "the severity class would render with no color."
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-065a / AT-065b — batch-47 US-FND app-wide navy/pastel theme
+# (HLR-065, LLR-065.3 / 065.4). The AT layer drives the live Textual app and
+# asserts on RESOLVED styles, complementing the text-level TC-012/TC-013 checks
+# above. ``insight_style`` is the palette source of truth (LLR-065.1); the
+# navy/pastel hex values asserted here match the operator-approved SVG palette.
+# ---------------------------------------------------------------------------
+
+
+def test_at065a_palette(tmp_path: Path) -> None:
+    """AT-065a: the navy/pastel palette is applied app-wide.
+
+    Intent (HLR-065 / LLR-065.3): booting the app and navigating to the
+    Workspace screen must resolve the navy depth-stack — the ``Screen``
+    background is the app ``DEPTH_BG`` and a ``.db-pane`` surface is the
+    ``DEPTH_PANEL`` step. This proves the ``$``-variable swap (bg-base /
+    bg-panel) reached the rendered widget tree, not just the stylesheet text.
+    RED before the theme (Screen bg was ``#11141a``, pane ``#171b23``); GREEN
+    after (``#0a0e1b`` / ``#0f1525``).
+    """
+
+    async def _drive() -> tuple[Color, Color]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            panes = app.query(".db-pane")
+            assert panes, "no .db-pane widgets mounted on the Workspace screen"
+            return app.screen.styles.background, panes.first().styles.background
+
+    screen_bg, pane_bg = asyncio.run(_drive())
+
+    assert screen_bg == Color.parse(insight_style.DEPTH_BG), (
+        f"AT-065a: Screen background {screen_bg} != DEPTH_BG "
+        f"{insight_style.DEPTH_BG} — the navy $bg-base swap did not reach the "
+        "rendered screen."
+    )
+    assert pane_bg == Color.parse(insight_style.DEPTH_PANEL), (
+        f"AT-065a: .db-pane background {pane_bg} != DEPTH_PANEL "
+        f"{insight_style.DEPTH_PANEL} — the navy $bg-panel swap did not reach "
+        "the rendered panels."
+    )
+
+
+def test_at065b_sev_semantics(tmp_path: Path) -> None:
+    """AT-065b: the ``sev-*`` contract survives the restyle (names + semantics).
+
+    Two halves (LLR-065.4):
+
+    1. ``css_class_for_severity`` still maps every ``ValidationSeverity`` to its
+       canonical ``sev-*`` class — the frozen ``color_policy.py`` round-trip is
+       intact (the restyle touched ``styles.tcss`` only).
+    2. A live widget carrying ``sev-error`` resolves to the red-family hue — the
+       class was neither dropped nor renamed, and the Inc-8 pastel restyle
+       bound it to ``insight_style.RED``. RED before the theme (``#e06c75``);
+       GREEN after (``#fd8383``).
+    """
+
+    # (1) round-trip — color_policy frozen, 0-diff.
+    for severity in ValidationSeverity:
+        assert css_class_for_severity(severity) == SEVERITY_CLASS_MAP[severity], (
+            f"AT-065b: {severity!r} no longer round-trips to its mapped class."
+        )
+
+    # (2) resolved hue — sev-error is still applied and is red-family.
+    async def _resolve_sev_error() -> Color:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            probe = Static("x", classes="sev-error")
+            await app.screen.mount(probe)
+            await pilot.pause()
+            return probe.styles.color
+
+    color = asyncio.run(_resolve_sev_error())
+    assert color == Color.parse(insight_style.RED), (
+        f"AT-065b: a sev-error widget resolved to {color}, expected the pastel "
+        f"RED {insight_style.RED} — the restyle dropped/renamed the class or "
+        "left it unbound."
     )

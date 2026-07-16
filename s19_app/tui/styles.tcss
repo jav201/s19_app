@@ -23,11 +23,12 @@
  * `$accent`, `$text`, `$background` are theme built-ins; the tokens below are
  * the batch-02 Calm Dark layer. `$accent-calm` is the single accent hue.
  */
-$accent-calm: #4ec9d4;          /* the one Calm Dark accent — cyan-blue */
-$bg-base: #11141a;              /* dark-only app background */
-$bg-panel: #171b23;             /* dark-only panel surface */
-$fg-base: #c8ccd4;              /* dark-only primary foreground */
-$rule: #2a2f3a;                 /* dark-only border / divider tone */
+$accent-calm: #91abec;          /* the one accent — navy/pastel hilite (insight_style.HILITE) */
+$bg-base: #0a0e1b;              /* dark-only app background (insight_style.DEPTH_BG) */
+$bg-panel: #0f1525;             /* dark-only panel surface (insight_style.DEPTH_PANEL) */
+$fg-base: #e9e9e9;              /* dark-only primary foreground (insight_style.VALUE) */
+$rule: #1b233a;                 /* dark-only border / divider tone (insight_style.DEPTH_BORDER) */
+$odd-row: #131a2c;             /* zebra odd-row surface (insight_style.DEPTH_ODD_ROW) */
 
 Screen {
     layout: vertical;
@@ -233,11 +234,25 @@ Screen {
     width: 1fr;
 }
 
+/* batch-47 US-FND (LLR-065.3): the dolphie panel idiom — a `tall` framed
+ * border with an accent border-title and a muted border-subtitle, over the
+ * navy panel surface. Applied to the broad `.db-pane` class so every screen's
+ * titled panes (border titles set in Phase-3 Inc-3, LLR-066.1) pick it up. */
 .db-pane {
-    border: round $rule;
+    border: tall $rule;
+    border-title-color: $accent-calm;
+    border-title-background: $bg-panel;
+    border-subtitle-color: #969aad;
     background: $bg-panel;
     padding: 1;
     height: 100%;
+}
+
+/* batch-47 US-FND (LLR-065.3): zebra odd-row surface for the record/tag
+ * DataTables — a subtle navy step above the panel surface. Applies only where
+ * a DataTable enables `zebra_stripes`; inert elsewhere. */
+DataTable > .datatable--odd-row {
+    background: $odd-row;
 }
 
 /* batch-31 AC-7 (B-20): compact one-row Load-project button — borderless so
@@ -492,31 +507,38 @@ Screen {
 }
 
 
-/* --- Severity classes (LLR-005.2) ----------------------------------------
+/* --- Severity classes (LLR-005.2 / batch-47 LLR-065.4) -------------------
  * Class names and severity meaning are fixed by color_policy.SEVERITY_CLASS_MAP
- * and MUST NOT change. Only the hex values are tuned to the Calm Dark palette.
+ * and MUST NOT change. Only the hex values are tuned — batch-47 US-FND aligns
+ * them to the navy/pastel insight_style palette (§6.5 Amendment C). The hue
+ * FAMILY (and thus the severity semantics) is preserved for every class:
+ * ok=green, error=red, warning=warm, info=cyan, neutral=grey. The explicit
+ * "Orange = MAC warning" cue lives in the separate .mac_out_of_range overlay
+ * (+ frozen MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"), left unchanged below.
  */
 .sev-ok {
-    color: #5fb98a;
+    color: #54efae;              /* was #5fb98a — insight_style.GREEN */
 }
 
 .sev-error {
-    color: #e06c75;
+    color: #fd8383;              /* was #e06c75 — insight_style.RED */
 }
 
 .sev-warning {
-    color: #d9a35b;
+    color: #f6ff8f;              /* was #d9a35b — insight_style.YELLOW */
 }
 
 .sev-info {
-    color: #4ec9d4;
+    color: #7dd3fc;              /* was #4ec9d4 — insight_style.CYAN */
 }
 
 .sev-neutral {
-    color: #6b7280;
+    color: #969aad;             /* was #6b7280 — insight_style.DGRAY */
 }
 
-/* MAC out-of-range overlay — preserved (pairs with MAC_ADDRESS_OVERLAY_STYLE). */
+/* MAC out-of-range overlay — preserved (pairs with MAC_ADDRESS_OVERLAY_STYLE).
+ * Left at the amber/orange3 hue so the explicit "Orange = MAC warning" cue is
+ * retained regardless of the sev-warning restyle above (LLR-065.4). */
 .mac_out_of_range {
     color: #d9a35b;
 }
