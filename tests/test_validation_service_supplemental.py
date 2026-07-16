@@ -159,15 +159,25 @@ def _drive_load(
     asyncio.run(_run())
 
 
+def _strip_glyph(name_cell: str) -> str:
+    """batch-47 (LLR-068.1): the A2L name cell now carries a leading in-image
+    glyph (``✓ ``/``· ``). Strip it so name-keyed assertions read the tag name."""
+    for glyph in ("✓ ", "· "):
+        if name_cell.startswith(glyph):
+            return name_cell[len(glyph):]
+    return name_cell
+
+
 def _a2l_row_list(app: S19TuiApp) -> list[tuple[str, tuple]]:
     """Rendered ``#a2l_tags_list`` rows as ``(name_cell_text, cells)`` pairs
     (cells are the styled ``rich.text.Text`` objects; name is column 0 per
-    ``_build_a2l_table_cells``)."""
+    ``_build_a2l_table_cells``, with the batch-47 in-image glyph prefix
+    stripped)."""
     table = app.query_one("#a2l_tags_list", DataTable)
     rows: list[tuple[str, tuple]] = []
     for index in range(table.row_count):
         cells = table.get_row_at(index)
-        rows.append((str(cells[0]), tuple(cells)))
+        rows.append((_strip_glyph(str(cells[0])), tuple(cells)))
     return rows
 
 

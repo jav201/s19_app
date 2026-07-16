@@ -74,7 +74,17 @@ from .screens_directionb import (
 )
 from .color_policy import css_class_for_severity
 from .entropy_style import band_style
-from .insight_style import CYAN, GREEN, RED, VALUE, YELLOW, human_bytes, microbar
+from .insight_style import (
+    CYAN,
+    DGRAY,
+    GREEN,
+    LABEL,
+    RED,
+    VALUE,
+    YELLOW,
+    human_bytes,
+    microbar,
+)
 from .services.entropy_service import EntropyWindow
 from .issues_view import GroupedIssuesPanel, IssueRow
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
@@ -573,6 +583,170 @@ _STRIP_CELL_GLYPH = "█"
 #: (batch-47, LLR-067.2). NOT an entropy band glyph — ``entropy_style`` owns only
 #: ``· ░ ▒ ▓``; this hatch marks the holes between mapped ranges.
 _STRIP_GAP_GLYPH = "╱"
+
+#: Placeholder shown in the A2L detail card before any tag is highlighted
+#: (batch-47, LLR-069.1).
+_A2L_CARD_HINT = "Highlight a tag to inspect its fields."
+
+
+def _card_field(text: Text, label: str, value: object) -> None:
+    """
+    Summary:
+        Append a ``label value`` line to an A2L detail-card ``Text``, skipping
+        blank/absent values (batch-47, LLR-069.2). The label is a fixed,
+        developer-supplied token (muted); the value is appended literally so a
+        file-derived value can never be interpreted as Rich markup (C-17).
+
+    Args:
+        text (Text): The card ``Text`` being composed (mutated in place).
+        label (str): Fixed field label (never file-derived).
+        value (object): The field value; ``None``/empty-string lines are elided.
+
+    Returns:
+        None
+
+    Data Flow:
+        - Called by :func:`_a2l_detail_card_text` per optional field.
+        - Uses ``Text.append`` (literal), never ``Text.from_markup``.
+
+    Dependencies:
+        Uses:
+            - rich.text.Text ; LABEL ; VALUE
+        Used by:
+            - _a2l_detail_card_text
+    """
+    if value is None or value == "":
+        return
+    text.append("\n")
+    text.append(f"{label} ", style=LABEL)
+    text.append(str(value), style=VALUE)
+
+
+def _a2l_detail_card_text(tag: Optional[dict]) -> Text:
+    """
+    Summary:
+        Compose the A2L detail card as a single markup-safe Rich ``Text`` from a
+        highlighted enriched tag: a header line (in-image glyph + name + cyan
+        address) followed by the tag's description, unit·conversion, record
+        layout, byte order, and limits (batch-47, LLR-069.2 / LLR-069.3). Every
+        file-derived value is appended literally (``Text.append``), never
+        f-strung into a markup string, so hostile bracket/link/ANSI/unbalanced
+        input renders verbatim with no ``MarkupError`` (C-17).
+
+    Args:
+        tag (Optional[dict]): The highlighted enriched A2L tag, or ``None`` when
+            no row is highlighted (renders the placeholder hint).
+
+    Returns:
+        Text: The composed card content. Never a ``str``; never markup-parsed.
+
+    Data Flow:
+        - ``None`` → a muted placeholder hint.
+        - Otherwise header (glyph/name/address) + per-field lines via
+          :func:`_card_field`; untrusted values appended literally.
+
+    Dependencies:
+        Uses:
+            - rich.text.Text ; _card_field ; VALUE ; CYAN ; GREEN ; DGRAY ; LABEL
+        Used by:
+            - A2LDetailCard.show_tag
+    """
+    if not tag:
+        return Text(_A2L_CARD_HINT, style=DGRAY)
+    text = Text()
+    in_mem = bool(tag.get("in_memory"))
+    text.append("✓ " if in_mem else "· ", style=GREEN if in_mem else DGRAY)
+    text.append(
+        str(tag.get("display_identifier") or tag.get("name") or "UNKNOWN"),
+        style=VALUE,
+    )
+    addr = tag.get("address")
+    if isinstance(addr, int):
+        text.append("  ")
+        text.append(f"0x{addr:08X}", style=CYAN)
+    _card_field(text, "desc", tag.get("description"))
+    unit = tag.get("unit")
+    conversion = tag.get("conversion")
+    if unit or conversion:
+        text.append("\n")
+        text.append("unit ", style=LABEL)
+        text.append(str(unit) if unit else "—", style=VALUE)
+        if conversion:
+            text.append(" · conv ", style=LABEL)
+            text.append(str(conversion), style=VALUE)
+    _card_field(text, "layout", tag.get("record_layout_name"))
+    _card_field(text, "byteorder", tag.get("effective_byte_order"))
+    lower = tag.get("lower_limit")
+    upper = tag.get("upper_limit")
+    if lower is not None or upper is not None:
+        text.append("\n")
+        text.append("limits ", style=LABEL)
+        text.append(
+            f"{lower if lower is not None else ''}..{upper if upper is not None else ''}",
+            style=VALUE,
+        )
+    return text
+
+
+class A2LDetailCard(Static):
+    """
+    Summary:
+        A one-widget A2L detail card mounted at the top of ``#a2l_hex_pane``
+        (batch-47, LLR-069.1). It renders the highlighted tag's hidden fields
+        above the (shrunken) hex view in the same pane — no new pane. The card
+        keeps a bounded height so the hex view below stays reachable at the
+        80×24 floor (C-29); its content is a single markup-safe Rich ``Text``.
+
+    Data Flow:
+        - ``show_tag(tag)`` replaces the rendered content via
+          :func:`_a2l_detail_card_text` (a markup-safe ``Text``).
+        - Constructed with the placeholder hint so it renders before any
+          highlight.
+
+    Dependencies:
+        Uses:
+            - _a2l_detail_card_text
+        Used by:
+            - _compose_screen_a2l (mount) ; on_data_table_row_highlighted (update)
+
+    Note (Textual internal-name shadowing): the only instance member added is
+    the public ``show_tag`` method — no ``_nodes``/``_context`` (or any other
+    ``Widget`` private) name is introduced, so mounting cannot silently deadlock.
+    """
+
+    DEFAULT_CSS = """
+    A2LDetailCard {
+        height: auto;
+        max-height: 5;
+        overflow-y: auto;
+        padding: 0 1;
+        border-bottom: solid $panel;
+    }
+    """
+
+    def show_tag(self, tag: Optional[dict]) -> None:
+        """
+        Summary:
+            Update the card to show ``tag``'s fields, or the placeholder hint
+            when ``tag`` is ``None`` (batch-47, LLR-069.2).
+
+        Args:
+            tag (Optional[dict]): The highlighted enriched A2L tag, or ``None``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Delegates composition to :func:`_a2l_detail_card_text` and calls
+              ``Static.update`` with the resulting ``Text``.
+
+        Dependencies:
+            Uses:
+                - _a2l_detail_card_text
+            Used by:
+                - on_data_table_row_highlighted
+        """
+        self.update(_a2l_detail_card_text(tag))
 
 #: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
 #: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
@@ -3976,6 +4150,11 @@ class S19TuiApp(App):
             classes="db-pane density-compact",
         )
         _hex_pane = Container(
+            A2LDetailCard(
+                _a2l_detail_card_text(None),
+                id="a2l_detail_card",
+                markup=False,
+            ),
             Label("Hex Viewer", id="alt_hex_title"),
             Container(
                 Input(placeholder="Search ASCII text", id="alt_search_input"),
@@ -6116,6 +6295,52 @@ class S19TuiApp(App):
             if isinstance(tag, dict):
                 self._jump_to_tag_by_data(tag)
             return
+
+    def on_data_table_row_highlighted(
+        self, event: DataTable.RowHighlighted
+    ) -> None:
+        """
+        Summary:
+            Update the A2L detail card as the ``#a2l_tags_list`` cursor moves
+            (batch-47, LLR-069.2). Distinct from ``on_data_table_row_selected``
+            (which JUMPS the hex view on enter/click): highlight fires on cursor
+            move, giving live per-tag feedback in the card without changing the
+            hex position.
+
+        Args:
+            event (DataTable.RowHighlighted): Event payload carrying
+                ``data_table`` and ``row_key``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Ignore non-A2L tables.
+            - Resolve the row_key to an enriched tag via ``_a2l_row_key_to_tag``.
+            - Hand the tag (or ``None``) to the mounted ``A2LDetailCard``.
+
+        Dependencies:
+            Uses:
+                - ``A2LDetailCard.show_tag``
+            Used by:
+                - Textual event dispatch for ``DataTable.RowHighlighted``
+        """
+        table = getattr(event, "data_table", None)
+        table_id = getattr(table, "id", None) if table is not None else None
+        if table_id != "a2l_tags_list":
+            return
+        row_key = getattr(event, "row_key", None)
+        key_value = getattr(row_key, "value", row_key)
+        tag = (
+            self._a2l_row_key_to_tag.get(key_value)
+            if isinstance(key_value, str)
+            else None
+        )
+        try:
+            card = self.query_one("#a2l_detail_card", A2LDetailCard)
+        except Exception:
+            return
+        card.show_tag(tag if isinstance(tag, dict) else None)
 
     def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
         """
@@ -9164,17 +9389,27 @@ class S19TuiApp(App):
             cells = self._build_a2l_table_cells(tag)
             severity = _a2l_tag_row_severity(tag, issue_severity_map)
             style = _severity_style(severity)
-            rich_cells = tuple(Text(cell, style=style) if style else Text(cell) for cell in cells)
+            # LLR-068.1: the builder returns markup-safe Rich ``Text`` cells with
+            # per-cell accents (name/address/source). Row-level severity (US-033,
+            # the A2L Red/Green/White/Grey contract) overrides those accents when
+            # present, preserving the pre-batch uniform per-row colouring.
+            if style:
+                for cell in cells:
+                    cell.style = style
             try:
-                a2l_table.add_row(*rich_cells, key=row_key)
+                a2l_table.add_row(*cells, key=row_key)
             except Exception:
-                a2l_table.add_row(*rich_cells)
+                a2l_table.add_row(*cells)
         page_num = start // page_size + 1
         total_pages = max(1, (total_tags + page_size - 1) // page_size)
-        summary_label.update(
+        in_image = sum(1 for tag in tags if tag.get("in_memory"))
+        summary_text = Text(
             f"Page {page_num}/{total_pages} | tags {start + 1}-{end} / {total_tags} "
             f"(page size {page_size}; +/- to change page)"
         )
+        summary_text.append("  ·  ")
+        summary_text.append(f"{in_image} in image", style=GREEN)
+        summary_label.update(summary_text)
         self._debug_log(
             run_id="initial",
             hypothesis_id="H3",
@@ -9190,27 +9425,42 @@ class S19TuiApp(App):
         )
         self._flush_logger()
 
-    def _build_a2l_table_cells(self, tag: dict) -> tuple[str, ...]:
+    def _build_a2l_table_cells(self, tag: dict) -> tuple[Text, ...]:
         """
         Summary:
             Project one enriched A2L tag into the 16-cell tuple the DataTable row
-            expects, keeping every field the previous ListView renderer surfaced.
+            expects, keeping every field the previous ListView renderer surfaced
+            (batch-47, LLR-068.1/068.3). Every cell is a markup-safe Rich
+            ``Text`` (built via ``safe_text``), so every file-derived value —
+            name, source, unit, function group, memory region, raw/physical
+            value — renders literally and can never be interpreted as Rich
+            markup (C-17). The name cell carries a leading in-image glyph
+            (``✓`` when ``tag["in_memory"]`` is truthy, else ``·``); the name is
+            bright, the address cyan, the source muted. Row-level severity
+            colouring is layered on top by ``update_a2l_tags_view`` (it overrides
+            these accent styles when a severity applies), preserving the A2L
+            Red/Green/White/Grey row-colour contract.
 
         Args:
             tag (dict): Enriched A2L tag with value, memory, and schema fields.
 
         Returns:
-            tuple[str, ...]: 16-string tuple aligned with the DataTable columns.
+            tuple[Text, ...]: 16-cell tuple of Rich ``Text`` aligned with the
+            DataTable columns; the name cell (index 0) carries the leading
+            in-image glyph.
 
         Data Flow:
             - Format address/length/limits defensively so missing fields stay blank.
             - Reuse ``_a2l_tag_in_memory_display`` / ``_a2l_tag_unit_display`` helpers
               so display conventions remain centralized.
+            - Wrap each cell via ``safe_text`` (``Text`` constructor, never
+              ``Text.from_markup``) so the tuple is markup-safe by construction.
 
         Dependencies:
             Uses:
                 - ``_a2l_tag_in_memory_display``
                 - ``_a2l_tag_unit_display``
+                - ``safe_text`` ; ``VALUE`` / ``CYAN`` / ``DGRAY``
             Used by:
                 - ``update_a2l_tags_view``
         """
@@ -9219,6 +9469,7 @@ class S19TuiApp(App):
         addr_text = f"0x{addr:08X}" if isinstance(addr, int) else "n/a"
         len_text = str(length) if isinstance(length, int) else "n/a"
         name_text = str(tag.get("name") or "UNKNOWN").replace("\n", " ").strip()
+        glyph = "✓" if tag.get("in_memory") else "·"
         source_text = str(tag.get("source") or "assigned")
         raw_value_text = str(tag.get("raw_value") if tag.get("raw_value") is not None else "")
         physical_value_text = str(
@@ -9237,22 +9488,22 @@ class S19TuiApp(App):
         access_text = str(tag.get("access") or "")
         dtype_text = str(tag.get("datatype") or "")
         return (
-            name_text,
-            addr_text,
-            len_text,
-            source_text,
-            raw_value_text,
-            physical_value_text,
-            in_mem_text,
-            region_text,
-            limits_text,
-            unit_text,
-            bit_text,
-            endian_text,
-            virt_text,
-            func_text,
-            access_text,
-            dtype_text,
+            safe_text(f"{glyph} {name_text}", style=VALUE),
+            safe_text(addr_text, style=CYAN),
+            safe_text(len_text),
+            safe_text(source_text, style=DGRAY),
+            safe_text(raw_value_text),
+            safe_text(physical_value_text),
+            safe_text(in_mem_text),
+            safe_text(region_text),
+            safe_text(limits_text),
+            safe_text(unit_text),
+            safe_text(bit_text),
+            safe_text(endian_text),
+            safe_text(virt_text),
+            safe_text(func_text),
+            safe_text(access_text),
+            safe_text(dtype_text),
         )
 
     def _filter_a2l_tags(self, tags: list[dict]) -> list[dict]:

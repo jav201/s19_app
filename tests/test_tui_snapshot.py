@@ -563,6 +563,40 @@ def _batch47_workspace_drift_marks(screen: str, density: str, size_key: str) -> 
     return ()
 
 
+# batch-47 (R-TUI-068/069, US-A2L Explorer MID): the A2L screen's tag-table name
+# cell gains a leading in-image glyph (`✓`/`·`, LLR-068.1), `#a2l_tags_summary`
+# gains a colored in-image count (LLR-068.2), and a NEW detail card mounts at the
+# top of `#a2l_hex_pane` above the (shrunken) hex view (LLR-069.1). All three
+# repaint the A2L body, so every `a2l-*` tc016s cell (both densities x 3 sizes =
+# 6 cells) drifts. The batch-47 Inc-4 snapshot run showed EXACTLY the 6 a2l cells
+# mismatched (mac/issues/workspace-non-theme/map/patch/diff unaffected → C-28
+# shared-chrome clean; no footer/header/rail binding change this increment). The
+# SVG baselines must be regenerated in canonical CI (snapshot-regen.yml, pinned
+# textual==8.2.8) — NOT locally. Until the batch-47 theme+regen follow-up (Inc-7)
+# lands, the 6 a2l cells ride xfail(strict=False) (C-22 upper bound).
+def _batch47_a2l_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 A2L insight-layer drift marks.
+
+    The 6 ``a2l`` cells (both densities x 3 sizes) drift when the A2L screen
+    gains the name-cell in-image glyph + colored summary count + detail card
+    (US-A2L, HLR-068/069). Marked ``xfail(strict=False)`` until the canonical-CI
+    baseline regen lands (batch-47 Inc-7 theme + regen), then retired.
+    """
+    if screen == "a2l":
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-068/069 US-A2L: tag-table in-image glyph + "
+                    "colored summary count + detail card in #a2l_hex_pane; SVG "
+                    "baseline regen pending in canonical CI (snapshot-regen.yml, "
+                    "batch-47 Inc-7 theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -574,7 +608,8 @@ _RESTYLED_CELLS = [
         + _batch31_drift_marks(screen, density, size_key)
         + _batch44_drift_marks(screen, density, size_key)
         + _batch45_footer_drift_marks(screen, density, size_key)
-        + _batch47_workspace_drift_marks(screen, density, size_key),
+        + _batch47_workspace_drift_marks(screen, density, size_key)
+        + _batch47_a2l_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
