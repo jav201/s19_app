@@ -39,7 +39,9 @@ at Inc-7. Deviation from architect's 6-inc cut (helpers+theme merged in Inc-1) �
 postmortem.
 
 ## Where we are (current increment)
-- **Inc-1 — Foundation helpers** — STARTING. software-dev implement + tests; then code-reviewer; then gate.
+- **Inc-1 — Foundation helpers** — ✅ DONE `b91e9fb`. 6 green, 0 HIGH. Binary units (§6.5 Amd D).
+- **Inc-2 — US-WS data** — ✅ DONE. models.py 2 defaulted fields + load_service; 4 green, MN-6 blast-radius 222/0, 0 HIGH.
+- **Inc-3 — US-WS render** — STARTING. app.py titles/sections/memstrip/#ws_stats/classed-hex + MJ-1 merge-carry (LLR-066.7). First app.py + snapshot-drift increment.
 
 ## Phase-1 result (2026-07-15)
 - `01-requirements.md` (architect): 5 US, **10 HLR** (HLR-065..074 = R-TUI-065..074), **32 LLR**,

@@ -38,8 +38,12 @@ def build_loaded_s19(
 
     Data Flow:
         - Reads ``S19File.records`` (``core.py:226``) and each record's
-          ``.type`` / ``.data`` (``core.py:98``/``core.py:145``), read-only —
-          no write to the frozen reader.
+          ``.type`` / ``.data`` / ``.address`` (``core.py:98``/``core.py:145``/
+          ``core.py:125``), read-only — no write to the frozen reader.
+        - Derives ``out_of_order_count`` from
+          ``S19File.get_out_of_order_records()`` (``core.py:542``) and
+          ``entry_point`` from the first S7/S8/S9 terminator record's address
+          (batch-47, LLR-066.5).
         - Computes per-window entropy over ``mem_map`` once here (worker
           thread) and caches it on ``LoadedFile.entropy_windows`` for the
           Memory-Map band view (batch-45, R-TUI-060 / LLR-045A.2).
@@ -48,7 +52,7 @@ def build_loaded_s19(
     Dependencies:
         Uses:
             - build_mem_map_s19, build_row_bases, build_range_validity_s19,
-              compute_entropy
+              compute_entropy, S19File.get_out_of_order_records
         Used by:
             - S19TuiApp._parse_loaded_file
     """
@@ -56,6 +60,10 @@ def build_loaded_s19(
     ranges = s19.get_memory_ranges()
     source_s0_header = next(
         (bytes(record.data) for record in s19.records if record.type == "S0"),
+        None,
+    )
+    entry_point = next(
+        (record.address for record in s19.records if record.type in {"S7", "S8", "S9"}),
         None,
     )
     return LoadedFile(
@@ -73,6 +81,8 @@ def build_loaded_s19(
         mac_diagnostics=[],
         source_s0_header=source_s0_header,
         entropy_windows=compute_entropy(mem_map),
+        out_of_order_count=len(s19.get_out_of_order_records()),
+        entry_point=entry_point,
     )
 
 
@@ -88,6 +98,11 @@ def build_loaded_hex(
     Mirrors ``build_loaded_s19``: caches per-window entropy over ``mem_map``
     on ``LoadedFile.entropy_windows`` for the Memory-Map band view (batch-45,
     R-TUI-060 / LLR-045A.2).
+
+    Intel-HEX has no S-record ordering concept and discards type 03/05
+    start-address records (``hexfile.py:135-137``), so ``out_of_order_count``
+    is ``0`` and ``entry_point`` is ``None`` for every HEX load (batch-47,
+    LLR-066.5).
     """
     mem_map = dict(hex_file.memory)
     ranges = hex_file.get_ranges()
@@ -105,4 +120,6 @@ def build_loaded_hex(
         mac_records=[],
         mac_diagnostics=[],
         entropy_windows=compute_entropy(mem_map),
+        out_of_order_count=0,  # Intel-HEX has no S-record ordering concept
+        entry_point=None,  # HEX discards type 03/05 start-address records (hexfile.py:135-137)
     )
