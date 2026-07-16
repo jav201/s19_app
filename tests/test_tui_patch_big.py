@@ -38,12 +38,33 @@ security review — same class as BL-1, different widget): ``#patch_variant_sele
 label and its value, and Textual's ``SelectCurrent.update(prompt)``
 (``_select.py:615``) hands the bare ``str`` label to a markup-enabled ``Static``
 -> ``Content.from_markup`` (``visual.py:103``). Measured at ``textual==8.2.8``:
-a variant id of ``[/nope]`` raised ``MarkupError`` **out of ``set_variants``**;
-``[link=http://evil]…`` injected a link from project-file data. AT-075d's
-"no ``MarkupError``" clause names ``set_variants`` as its ingress, so this sink
-sits directly on the gate-blocking path and could not be dodged without
-weakening the AT — i.e. exactly the partial-fix trap BL-1 names. Fixed at the
-panel's render boundary (literal ``Text`` labels); ``app.py`` unchanged.
+a variant id of ``[red]PWNED[/red]`` rendered ``plain='PWNED'`` with an injected
+``Span(0,5,'red')``; ``[/nope]`` and ``[link=http://evil]click[/link]`` each
+raised ``MarkupError`` **out of ``set_variants``** (the ``Content`` grammar
+rejects the unquoted value). AT-075d's "no ``MarkupError``" clause names
+``set_variants`` as its ingress, so this sink sits directly on the gate-blocking
+path and could not be dodged without weakening the AT — i.e. exactly the
+partial-fix trap BL-1 names. Fixed at the panel's render boundary (literal
+``Text`` labels); ``app.py`` unchanged.
+
+**Inc-1b — the class is THREE sites wide; the other two are now closed.** The
+Inc-1 security review probed every ``Select`` option-label site against the
+installed ``textual==8.2.8`` and measured two more LIVE in ``main``:
+``#patch_doc_file_select`` (label = a FILENAME read off disk) and
+``AbDiffPanel``'s ``#diff_select_a``/``#diff_select_b`` (same project-derived
+variant ids). Both are fixed here. ``screens.py:1057`` was probed and is **NOT
+live** — it already carries ``escape_markup(name)`` under a C-15 probe comment
+dated 2026-07-10; it is the precedent, not a bug. AT-075f asserts all three.
+
+**⚠ TWO MARKUP ENGINES, DIFFERENT GRAMMARS — do not conflate them** (the F3
+correction). ``rich.text.Text.from_markup`` drives the DataTable cell path
+(AT-075e) and ACCEPTS a bare ``[link=http://evil]``, injecting a real link span
+— AT-075e's traceback confirms it. Textual's ``Content.from_markup`` drives the
+``Static``/Select-label path (AT-075f) and REQUIRES a quoted value, so the same
+payload RAISES ``MarkupError`` there instead of injecting. Link *injection* is
+therefore real only on the DataTable path. The exposure is identical on both;
+only the consequence differs. Scoping the next sweep by the wrong engine's
+behaviour would mis-classify the sites.
 
 **AT-075e sink note (what this AT discriminates).** Textual's
 ``default_cell_formatter`` (``_data_table.py:202-222``) sets
@@ -72,10 +93,10 @@ import pytest
 from rich.text import Text
 from textual.content import Content
 from textual.coordinate import Coordinate
-from textual.widgets import Button, DataTable, Input
+from textual.widgets import Button, DataTable, Input, Select
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens_directionb import PatchEditorPanel
+from s19_app.tui.screens_directionb import AbDiffPanel, PatchEditorPanel
 
 # The batch-46 FOLD-8 reachable-under-scroll primitive, reused rather than
 # re-implemented — `_reach` is the established way to drive a docked patch
@@ -150,13 +171,18 @@ def _row_cells(app: S19TuiApp, row: int) -> list[object]:
     ]
 
 
-def _payload_derived_spans(cell: Text, payload: str) -> list:
-    """Return the spans of ``cell`` attributable to ``payload``'s own text.
+def _payload_derived_spans(cell: Text) -> list:
+    """Return the spans of ``cell`` that the payload's own bracket text produced.
 
     A correct (literal-``Text``) implementation carries at most ONE span: the
     whole-cell role style applied by the renderer. Any span carrying a ``link``
     style, or any span that does not cover the WHOLE cell, is markup the
     payload's own bracket text produced — i.e. injection.
+
+    The payload itself is deliberately NOT a parameter: the test does not need
+    to know what the payload was. Injection is detectable from the cell's own
+    shape (a link span, or a span that fails to cover the whole cell), so the
+    check stays honest for any payload — including ones nobody enumerated.
     """
     suspect = []
     for span in cell.spans:
@@ -243,7 +269,7 @@ def test_at075e_c17_entries_table(tmp_path: Path) -> None:
         )
 
         # (iii) no span the payload's own text produced.
-        injected = _payload_derived_spans(value_cell, payload)
+        injected = _payload_derived_spans(value_cell)
         assert injected == [], (
             f"payload {payload!r} produced payload-derived span(s) {injected!r} "
             "— file data must never name a style or inject a link"
@@ -484,7 +510,13 @@ def test_at075d_c17_variant(tmp_path: Path, payload: str) -> None:
     Intent (AT-075d ★★, LLR-075.4): the variant id reaching ``set_variants``
     is PROJECT-FILE-DERIVED, so the NEW variant/scope line is a new sink for
     untrusted text. Each MD-1 payload must appear VERBATIM in the line's
-    ``Text.plain``, contribute NO span, and raise NO ``MarkupError``.
+    ``Text.plain``, contribute no ``link`` span, and raise NO ``MarkupError``.
+
+    NOT "no span": ``label_value`` legitimately applies its own LABEL/CYAN
+    spans, so a blanket ``spans == []`` here would assert a falsehood. The
+    VERBATIM ``.plain`` clause is what discriminates injection — any injected
+    span must consume the payload's brackets, which mangles ``plain``. The
+    link filter catches the one span class that injects without consuming.
 
     The counterfactual is an f-string into markup
     (``f"Variant {variant_id}"`` handed to a markup-enabled ``Static``):
@@ -521,3 +553,141 @@ def test_at075d_c17_variant(tmp_path: Path, payload: str) -> None:
         f"variant id {payload!r} injected link span(s) {injected!r} — project "
         "file data must never inject a link"
     )
+
+
+# ===========================================================================
+# AT-075f ★★ — GATE-BLOCKING C-17: the Select OPTION LABEL, all three sites
+# (Inc-1b — closes F4: AT-075d guarded this sink only by ACCIDENT)
+# ===========================================================================
+#
+# WHY THIS AT EXISTS (F4, the security review's MEDIUM finding). AT-075d reads
+# only `#patch_variant_scope_line` — it never observes the Select's own label.
+# It catches the Select sink ONLY through the crash path: `[/nope]` and
+# `[link=…]` raise `MarkupError` out of `set_variants`, so the test errors out.
+# But `[red]PWNED[/red]` does NOT raise — on a `str` label it silently mangles
+# `plain` to 'PWNED' and injects `Span(0,5,'red')`, and AT-075d STILL PASSES.
+# A regression to `str` labels would therefore ship the span-injection class
+# undetected. This AT asserts the `SelectCurrent` `#label` VISUAL directly.
+#
+# TWO MARKUP ENGINES ARE IN PLAY — do not conflate them:
+#   * `rich.text.Text.from_markup`   — the DataTable cell path (AT-075e).
+#     Grammar accepts a bare `[link=http://evil]` -> injects a LINK span.
+#   * `textual.content.Content.from_markup` — the `Static` / Select-label path
+#     (this AT). Its grammar REQUIRES a quoted value, so the same bare-URL
+#     payload RAISES `MarkupError` instead of injecting. Measured, 8.2.8.
+# The consequence differs per engine; the exposure does not.
+
+
+def _select_label_visual(app: S19TuiApp, select_id: str) -> Content:
+    """Return a ``Select``'s displayed-label RENDER-PATH content.
+
+    ``Select._watch_value`` hands the chosen option's LABEL to
+    ``SelectCurrent.update(prompt)`` (``_select.py:615``), which forwards it to
+    a markup-enabled ``Static#label``. Reading that ``Static``'s ``.visual`` is
+    the only way to observe what the dropdown will actually paint — the label
+    the test itself passed in proves nothing about the sink.
+    """
+    from textual.widgets import Static
+    from textual.widgets._select import SelectCurrent
+
+    current = app.query_one(select_id, Select).query_one(SelectCurrent)
+    return current.query_one("#label", Static).visual
+
+
+def _assert_label_literal(line: Content, payload: str, site: str) -> None:
+    """Assert a Select label rendered ``payload`` literally, with no markup."""
+    assert line.plain == payload, (
+        f"{site}: the hostile option label {payload!r} must render VERBATIM; "
+        f"got {line.plain!r}. A mangled plain (e.g. 'PWNED' from "
+        "'[red]PWNED[/red]') means Content.from_markup consumed the brackets "
+        "— i.e. the label reached the sink as a bare str."
+    )
+    assert list(line.spans) == [], (
+        f"{site}: the option label {payload!r} produced span(s) "
+        f"{list(line.spans)!r}. A literal Text label carries NO spans; any "
+        "span here is markup the file-derived text itself named. THIS is the "
+        "clause AT-075d cannot see: [red]PWNED[/red] does not raise, so a "
+        "crash-only guard passes while the injection ships."
+    )
+
+
+@pytest.mark.parametrize("payload", MD1_PAYLOADS)
+def test_at075f_c17_patch_variant_select_label(tmp_path: Path, payload: str) -> None:
+    """``#patch_variant_select``: a hostile variant id renders literally.
+
+    Intent: ``app.py:3744`` maps each project ``variant.variant_id`` to BOTH
+    the option label and its value. The label is the sink. Ingress is the REAL
+    populator, ``PatchEditorPanel.set_variants``.
+    """
+
+    async def _drive() -> Content:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.set_variants([(payload, payload), ("other", "other")], payload)
+            await pilot.pause()
+            return _select_label_visual(app, "#patch_variant_select")
+
+    _assert_label_literal(asyncio.run(_drive()), payload, "#patch_variant_select")
+
+
+@pytest.mark.parametrize("payload", MD1_PAYLOADS)
+def test_at075f_c17_patch_doc_file_select_label(tmp_path: Path, payload: str) -> None:
+    """``#patch_doc_file_select``: a hostile CHANGE-FILE NAME renders literally.
+
+    Intent: the payload here is a **filename on disk** —
+    ``app.py:3693`` -> ``_scan_patch_change_files()`` reads
+    ``workarea/patches/`` and hands each bare component name to
+    ``set_change_files`` as the option label. An attacker who can drop a file
+    into the work area names this label. Ingress is the REAL populator.
+    """
+
+    async def _drive() -> Content:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            panel.set_change_files([payload, "other.json"])
+            await pilot.pause()
+            # Select the hostile option so its label becomes the displayed one.
+            app.query_one("#patch_doc_file_select", Select).value = payload
+            await pilot.pause()
+            return _select_label_visual(app, "#patch_doc_file_select")
+
+    _assert_label_literal(asyncio.run(_drive()), payload, "#patch_doc_file_select")
+
+
+@pytest.mark.parametrize("payload", MD1_PAYLOADS)
+def test_at075f_c17_ab_diff_select_labels(tmp_path: Path, payload: str) -> None:
+    """``#diff_select_a`` / ``#diff_select_b``: hostile variant ids render literally.
+
+    Intent: ``app.py:3511`` hands ``AbDiffPanel.set_variants`` the SAME
+    project-file-derived ``variant_id``s as the patch panel, and the panel maps
+    them to both dropdowns' option labels. Both selects are asserted — the
+    populator writes them in one loop, so a fix that missed one is exactly the
+    partial-fix trap.
+    """
+
+    async def _drive() -> dict[str, Content]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            panel = app.query_one("#ab_diff_panel", AbDiffPanel)
+            # set_variants preselects options[0] on BOTH selects, so the
+            # hostile label becomes the displayed one with no further driving.
+            panel.set_variants([(payload, payload)])
+            await pilot.pause()
+            return {
+                select_id: _select_label_visual(app, select_id)
+                for select_id in ("#diff_select_a", "#diff_select_b")
+            }
+
+    for select_id, line in asyncio.run(_drive()).items():
+        _assert_label_literal(line, payload, select_id)

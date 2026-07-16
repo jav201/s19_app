@@ -2597,12 +2597,15 @@ class PatchEditorPanel(ScrollableContainer):
             None
 
         Data Flow:
-            - Map each name to a ``(name, name)`` option pair and hand them to
-              the ``Select`` via ``set_options``; an empty list clears the
-              options, and Textual falls back to the blank prompt.
+            - Map each name to a ``(safe_text(name), name)`` option pair and
+              hand them to the ``Select`` via ``set_options``; an empty list
+              clears the options, and Textual falls back to the blank prompt.
+              The VALUE stays the bare ``str`` — the ``Select.Changed`` handler
+              forwards it verbatim and never renders it.
 
         Dependencies:
             Uses:
+                - ``safe_text``
                 - ``textual.widgets.Select.set_options``
             Used by:
                 - ``S19TuiApp._prefill_patch_change_files``
@@ -2610,7 +2613,19 @@ class PatchEditorPanel(ScrollableContainer):
         Example:
             >>> panel.set_change_files(["changes.json", "changes-1.json"])
         """
-        options = [(name, name) for name in names]
+        # C-17 (Inc-1b — the THIRD site of the class the Inc-1 security review
+        # measured): the option LABEL is a FILENAME read off disk
+        # (`app.py:3693` -> `_scan_patch_change_files()` over
+        # `workarea/patches/`), so anyone who can drop a file into the work
+        # area names it. `Select._watch_value` hands the label to
+        # `SelectCurrent.update(prompt)` (`_select.py:615`) -> a markup-enabled
+        # `Static` -> `Content.from_markup` (`visual.py:103`). Measured at
+        # `textual==8.2.8`: `[red]PWNED[/red]` -> plain 'PWNED' +
+        # Span(0,5,'red'); `[/nope]` and `[link=…]` -> `MarkupError` out of
+        # `set_change_files`. `update` takes a `RenderableType`, so a literal
+        # `Text` label is passed through unparsed — same fix shape as
+        # `set_variants` below.
+        options = [(safe_text(str(name)), name) for name in names]
         self.query_one("#patch_doc_file_select", Select).set_options(options)
 
     def set_variants(
@@ -3892,12 +3907,24 @@ class AbDiffPanel(Container):
                 active.
 
         Dependencies:
+            Uses:
+                - ``safe_text``
             Used by:
                 - ``S19TuiApp.action_show_screen`` (diff activation)
         """
-        options = list(variants) + [
-            ("(external path below)", self._EXTERNAL_OPTION)
+        # C-17 (Inc-1b): same live sink as `PatchEditorPanel.set_variants` —
+        # `app.py:3511` hands this method the SAME project-file-derived
+        # `variant_id`s, and each becomes a `Select` option LABEL ->
+        # `SelectCurrent.update` -> markup-enabled `Static` ->
+        # `Content.from_markup`. Measured at `textual==8.2.8` with the same
+        # payloads: span injection on `[red]…[/red]`, `MarkupError` on
+        # `[/nope]` / `[link=…]`. Literal `Text` labels; the VALUE stays the
+        # bare `str` (`_selected_variant` compares it against
+        # `_EXTERNAL_OPTION` and never renders it).
+        options: List[Tuple[Any, str]] = [
+            (safe_text(str(label)), value) for label, value in variants
         ]
+        options.append((safe_text("(external path below)"), self._EXTERNAL_OPTION))
         for select_id in ("#diff_select_a", "#diff_select_b"):
             select = self.query_one(select_id, Select)
             select.set_options(options)

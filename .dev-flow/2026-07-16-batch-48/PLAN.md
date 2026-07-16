@@ -125,5 +125,25 @@ P-1 1-based index · **delete `prototypes/screen_upgrades.*` + `out/` AFTER this
   **writes a report file**, US-061 — a distinct feature, `app.py:2158`/`:2639`). 6 stories READY.
 
 ## Test ledger
-Baseline `pytest -q -m "not slow"` @ 6551aed: **1416 passed / 0 failed / 3 xfailed** (post-regen: the 29
-theme xfails retired). To be reconciled per increment.
+Baseline `pytest -q -m "not slow"` @ 6551aed — **MEASURED 2026-07-16, twice independently** (Inc-1 dev +
+Inc-1 code review, agreeing): **1454 collected / 1449 passed / 2 skipped / 3 xfailed** (1449+2+3 = 1454 ✓).
+⚠ **Supersedes the prior "1416 passed" figure, which does NOT reconcile. Cause UNKNOWN — do not infer one.**
+The orchestrator's proffered explanation ("batch-47's regen retired 29 xfails → they became passes") was
+**checked and is false**: 1416+29 = 1445 ≠ 1449, and this very line already claimed 1416 was *post*-regen
+(its `3 xfailed` matches the measurement exactly). Only `passed` was stale, by 33. **A wrong story in the
+ledger is worse than an acknowledged gap** — later increments would reconcile against a fiction.
+Branch @ `faa65cb`: **1463 collected / 1456 passed / 2 skipped / 5 xfailed** — Δ **+9 collected** = exactly
+the 9 new ATs in `test_tui_patch_big.py`; +2 xfail = the 2 patch snapshot cells (C-22).
+
+## ⚠ Ordering constraints (load-bearing — not housekeeping)
+- **Inc-2's title de-dup MUST land BEFORE the batch-48 canonical-CI snapshot-regen PR.** The border title
+  `¹PATCH SCRIPT` currently duplicates the in-body `Label("PATCH SCRIPT")` (`screens_directionb.py:2735` +
+  `:3029`). The de-dup is correctly deferred out of Inc-1 (removing the Label means editing the **pinned**
+  contract `test_tui_patch_layout.py:583`, which Inc-1's scope never covered) — but the 2 patch cells are
+  **xfailed**, so the duplication is **invisible to CI**. If the de-dup slips past the regen, **the regen
+  bakes the duplicate into the SVG baselines and it permanently stops reading as drift.** The deferral is
+  safe; the *unpinned ordering* was not. (Inc-1 code review F5, MEDIUM.)
+- **Inc-2 must DELETE-AND-RESTATE, not hide.** Replace `:583`'s `"patch-window-title" in c.classes` assertion
+  with a `border_title` assertion — preserving the protected property (*each window self-describes*) in a
+  **stronger** form. Do **NOT** hide the Label via CSS: a hidden element still satisfies the class check,
+  converting `:583` into a **false-confidence test**. §6.5 amendment required for the removal.
