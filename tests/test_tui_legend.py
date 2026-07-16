@@ -85,7 +85,7 @@ def test_legend_table_has_documented_artifacts_and_rows() -> None:  # TC-S1 stru
     with a non-blank colour and meaning (a blank-meaning legend must fail)."""
     assert set(LEGEND_TABLE) == {"A2L", "MAC", "Issues", "Hex"}
     assert set(LEGEND_TABLE["A2L"]) == {"Red", "Green", "White", "Grey"}
-    assert set(LEGEND_TABLE["MAC"]) == {"Red", "Orange", "Green", "White", "Grey"}
+    assert set(LEGEND_TABLE["MAC"]) == {"Red", "Pale yellow", "Green", "White", "Grey"}
     assert set(LEGEND_TABLE["Issues"]) == {"Errors", "Warnings", "Optional info"}
     assert set(LEGEND_TABLE["Hex"]) == {"Yellow", "Orange3"}
     for artifact, rows in LEGEND_TABLE.items():
@@ -187,7 +187,7 @@ def test_at023b_mac_legend_button_opens(tmp_path: Path) -> None:
 
     on_legend, meanings = asyncio.run(_drive())
     assert on_legend
-    assert LEGEND_TABLE["MAC"]["Orange"][1] in meanings
+    assert LEGEND_TABLE["MAC"]["Pale yellow"][1] in meanings
 
 
 def test_at023c_issues_legend_button_opens(tmp_path: Path) -> None:
@@ -411,9 +411,15 @@ def test_tc322_hex_block_coupled_to_overlay_styles() -> None:  # TC-322
     Fails if either ``FOCUS_HIGHLIGHT_STYLE`` / ``MAC_ADDRESS_OVERLAY_STYLE``
     is renamed/re-valued or the ``_colour_name_from_style`` canonicalization
     drifts. The overlay colours are interaction styles, NOT severities, so
-    they are deliberately absent from ``COLOUR_SEVERITY`` (the digit is
-    retained: a stripped ``"Orange"`` would collide with the WARNING key and
-    wrongly paint the row ``sev-warning``). The meanings are markup-free
+    they are deliberately absent from ``COLOUR_SEVERITY`` — a name that IS a
+    ``COLOUR_SEVERITY`` key would wrongly paint the interaction row with that
+    severity's class. The ``Orange3`` digit is retained so the row names the
+    actual overlay constant precisely. (Historic note: this previously also
+    avoided a stripped ``"Orange"`` colliding with the WARNING key — since
+    §6.5 Amendment F the WARNING key is ``"Pale yellow"``, so that specific
+    collision no longer exists; ``"Yellow"`` remains reserved for the
+    focus-highlight row, which is why WARNING is not named ``"Yellow"``.)
+    The meanings are markup-free
     (S-01: the modal renders each row through a markup-enabled ``Label``).
     """
     from s19_app.tui.color_policy import (

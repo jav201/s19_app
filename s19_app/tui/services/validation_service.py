@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from typing import Callable, Optional
 
+from rich.text import Text
+
 from ...validation import (
     ValidationIssue,
     ValidationReport,
@@ -12,9 +14,68 @@ from ...validation import (
 )
 from ...validation.model import CoverageMetrics
 from ..a2l_validate import validate_a2l_internal_issues
+from ..insight_style import GREEN, LABEL, VALUE, microbar
 from ..models import LoadedFile
 
 logger = logging.getLogger(__name__)
+
+#: Cell budget for the MAC coverage strip's inline micro-bar (batch-47,
+#: LLR-071.1). Small and fixed — the strip is a single always-visible line, so
+#: the bar is a coarse glance-cue, not a measured full-width gauge.
+_MAC_STRIP_BAR_WIDTH = 5
+
+
+def build_mac_coverage_strip(
+    coverage: Optional[CoverageMetrics], bar_width: int = _MAC_STRIP_BAR_WIDTH
+) -> Text:
+    """
+    Summary:
+        Build the always-visible MAC coverage strip as a C-17-safe Rich ``Text``:
+        ``MAC→S19 X of Y <micro-bar>  ·  A2L↔MAC N matches`` where ``X`` /
+        ``Y`` / ``N`` are ``CoverageMetrics.mac_in_s19`` / ``mac_total`` /
+        ``a2l_mac_address_matches`` (LLR-071.1). A ``None`` coverage (no report
+        yet) renders the ``0 of 0`` boundary. The line carries ONLY numeric
+        counts — no file-derived text — so no untrusted string reaches this sink.
+
+    Args:
+        coverage (Optional[CoverageMetrics]): The session's coverage metrics, or
+            ``None`` when no validation report exists yet (renders zeros).
+        bar_width (int): Micro-bar cell count (defaults to
+            :data:`_MAC_STRIP_BAR_WIDTH`).
+
+    Returns:
+        rich.text.Text: The composed strip. Built via ``append`` / ``append_text``
+        (never ``Text.from_markup``) so it is markup-safe by construction; the
+        fill fraction uses ``mac_in_s19_pct`` (guarded → ``0.0`` when
+        ``mac_total == 0``, so the micro-bar never divides by zero).
+
+    Data Flow:
+        - Read the three counts from ``coverage`` (or a fresh ``CoverageMetrics``).
+        - Append the label / value / micro-bar / matches segments.
+        - Consumed by ``S19TuiApp.update_mac_view`` → ``#mac_coverage_strip``.
+
+    Dependencies:
+        Uses:
+            - ``insight_style.microbar`` / ``LABEL`` / ``VALUE`` / ``GREEN``
+            - ``CoverageMetrics.mac_in_s19_pct``
+        Used by:
+            - ``S19TuiApp.update_mac_view`` (strip render, LLR-071.2)
+            - ``tests/test_tui_mac_coverage.py``
+
+    Example:
+        >>> build_mac_coverage_strip(
+        ...     CoverageMetrics(mac_total=2, mac_in_s19=1)
+        ... ).plain.startswith("MAC→S19 1 of 2")
+        True
+    """
+    cov = coverage or CoverageMetrics()
+    text = Text()
+    text.append("MAC→S19 ", style=LABEL)
+    text.append(f"{cov.mac_in_s19} of {cov.mac_total} ", style=VALUE)
+    text.append_text(microbar(cov.mac_in_s19_pct() / 100.0, bar_width, style=GREEN))
+    text.append("  ·  A2L↔MAC ", style=LABEL)
+    text.append(f"{cov.a2l_mac_address_matches} matches", style=VALUE)
+    return text
 
 
 def supplemental_a2l_row_issues(

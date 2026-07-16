@@ -73,7 +73,7 @@ The system has three layers that should be modified together when behavior cross
 
 ### Severity / colour conventions (from REQUIREMENTS.md)
 
-A2L row colouring: Red = schema/structural failure; Green = memory-checked + present; White = valid record without image hit; Grey = not yet checked. MAC row colouring adds Orange for warning-level overlap/alias/symbol-only-in-MAC findings. Validation logic that affects row colour must produce a `ValidationIssue` whose severity round-trips through `css_class_for_severity`.
+A2L row colouring: Red = schema/structural failure; Green = memory-checked + present; White = valid record without image hit; Grey = not yet checked. MAC row colouring adds **Yellow** for warning-level overlap/alias/symbol-only-in-MAC findings (**was Orange before batch-47** — see REQUIREMENTS.md "Warning cue: Orange → Yellow" / §6.5 Amendment F: warning rows render `.sev-warning` `#f6ff8f`; **Orange is re-scoped, not removed** — it remains the MAC-*specific* cue on the `⚠` record glyph, the frozen `MAC_ADDRESS_OVERLAY_STYLE` hex overlay, and the `.mac_out_of_range` Sections-list labels). Validation logic that affects row colour must produce a `ValidationIssue` whose severity round-trips through `css_class_for_severity`.
 
 ## Conventions to preserve
 

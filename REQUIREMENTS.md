@@ -379,7 +379,7 @@ Notes:
 MAC row severity/color semantics shall follow:
 
 - `Red`: MAC parse failed, invalid/missing name, invalid/missing hexadecimal address, and same-name A2L↔MAC address mismatch.
-- `Orange`: symbol exists in MAC but not in A2L, duplicate-address alias when alias policy is warning, and overlap ambiguity findings.
+- `Yellow` (warning; **was `Orange` before batch-47 — see §6.5 Amendment F below**): symbol exists in MAC but not in A2L, duplicate-address alias when alias policy is warning, and overlap ambiguity findings. Rendered `#f6ff8f` via `.sev-warning`. **`Orange` is re-scoped, not removed** — it remains the MAC-*specific* cue on the `⚠` record glyph (`orange3`), the hex MAC-address overlay (frozen `MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`), and the Sections-list out-of-range labels (`.mac_out_of_range` `#d9a35b`).
 - `Green`: exact name+address match with A2L (with optional future promotion for image-backed value-resolvable states).
 - `White`: structurally valid MAC entry with no hard inconsistency but not positively cross-confirmed.
 - `Grey`: no A2L loaded or validation context missing.
@@ -396,6 +396,60 @@ The Issues panel shall classify at least the following:
 - `Errors`: MAC parse error, empty name, invalid/missing address, duplicate MAC symbol name, A2L parser/structure errors, invalid A2L address field type, duplicate A2L symbol, broken GROUP/FUNCTION references, and A2L↔MAC same-name address mismatch.
 - `Warnings`: MAC address out of S19 range, A2L range out of S19 range, overlap ambiguity, symbol-only-in-MAC, symbol-only-in-A2L, and duplicate-address alias when policy emits warning.
 - `Optional info`: valid-but-not-image-backed, not-checked-without-primary-image, and virtual/dependent/non-memory-backed object notes.
+
+### Severity colour restyle — batch-47 (§6.5 Amendment C)
+
+**Amended in batch `2026-07-15-batch-47`** (US-FND / R-TUI-065, LLR-065.4): the `sev-*` class **NAMES**
+and every severity **MEANING** above (A2L Red/Green/White/Grey · the MAC row policy · the Issues tile
+policy) are **UNCHANGED**. The rendered hues were retuned in `styles.tcss` to the navy/pastel
+`insight_style` palette, each staying inside its colour family — and **one documented cue's colour NAME
+moved: the warning-level row cue is now `Yellow`, not `Orange` (§6.5 Amendment F, below).**
+
+| class | Before → After | family / semantics (preserved) |
+|-------|----------------|--------------------------------|
+| `.sev-ok` | `#5fb98a` → `#54efae` | GREEN — memory checked + found in image |
+| `.sev-error` | `#e06c75` → `#fd8383` | RED — structural / schema failure |
+| `.sev-warning` | `#d9a35b` → `#f6ff8f` | YELLOW — warning |
+| `.sev-info` | `#4ec9d4` → `#7dd3fc` | CYAN — info |
+| `.sev-neutral` | `#6b7280` → `#969aad` | DGRAY — not checked yet (Grey) |
+
+**Preserved unchanged:** `.mac_out_of_range` stays `#d9a35b` (paired with the frozen
+`MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`); the `band-*` entropy rules (R-TUI-060) are a deliberately
+separate colour domain and are untouched. `s19_app/tui/color_policy.py` — the `SEVERITY_CLASS_MAP` and the
+`css_class_for_severity` round-trip — remains **frozen and 0-diff** (the restyle is entirely in
+`styles.tcss`); `tests/test_color_policy_round_trip.py` (frozen) stays green, and
+`tests/test_tui_theme.py::test_at065b_sev_semantics` (AT-065b) asserts the live `sev-error` resolves to
+the new pastel red **and** that the round-trip holds for all five severities. See
+`.dev-flow/2026-07-15-batch-47/01-requirements.md` §6.5 Amendment C.
+
+### Warning cue: Orange → Yellow; Orange re-scoped to MAC-specific — batch-47 (§6.5 Amendment F)
+
+**Amended in batch `2026-07-15-batch-47`** (US-FND / R-TUI-065, LLR-065.4 — operator decision 2026-07-16).
+
+- **Before:** *"MAC row colouring adds **Orange** for warning-level overlap/alias/symbol-only-in-MAC
+  findings"* — the warning-level **row** cue was Orange (`.sev-warning` = `#d9a35b`).
+- **After:** warning-level **rows** (MAC **and** Issues) render **`Yellow` `#f6ff8f`** via `.sev-warning`.
+  **`Orange` is re-scoped, not removed** — it remains the **MAC-specific** cue on: the MAC record `⚠`
+  status glyph (`orange3`, R-TUI-070) · the hex-view MAC address overlay (frozen
+  `MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`) · the Sections-list "MAC out-of-range @ 0x…" labels
+  (`.mac_out_of_range` `#d9a35b`).
+- **Why:** Amendment C's palette retune rebound `.sev-warning` orange→yellow. Amendment C originally
+  claimed the row cue survived via `.mac_out_of_range` — **it does not**: that class paints only the
+  Sections-list out-of-range labels (`app.py`), never the MAC/Issues warning rows, which are painted
+  `css_class_for_severity(WARNING)` = `.sev-warning`. Caught by a live-app probe at the batch's final
+  PR-level QA (`WARNING → .sev-warning → Color(246,255,143)`). The convention is amended to describe what
+  actually renders rather than ship a doc/behaviour contradiction.
+- **Severity MEANING is unchanged** (warning is still warning); `sev-*` class names unchanged;
+  `color_policy.py` frozen 0-diff.
+- **Code/Validation:** `s19_app/tui/legend.py` (legend label `"Orange"` → `"Pale yellow"`; `"Yellow"` is
+  reserved — it is the Hex focus-highlight row key and would collide with the `COLOUR_SEVERITY`
+  invariant `TC-322` asserts) · `tests/test_tui_theme.py::test_at065c_legend_labels_match_resolved_hue`
+  (**AT-065c** — binds every legend colour LABEL to the hue its severity class resolves to, by HSV
+  family; closes the gap that let the stale label ship, since AT-065b probes only `sev-error`) ·
+  `tests/goldens/batch35/at055b-project-report.md` (2 legend lines rebaselined — the shipped report said
+  "Orange" for a yellow class).
+- **Status:** Automated — added in batch `2026-07-15-batch-47` (Inc-10). See
+  `.dev-flow/2026-07-15-batch-47/01-requirements.md` §6.5 Amendment F.
 
 ---
 
@@ -536,6 +590,19 @@ one accent hue plus the five severity colors defined by
 - Validation: `Automated` via `tests/test_tui_theme.py`
   (TC-012 token-budget inspection backed by 16 cases, TC-013 severity
   round-trip + per-`sev-*` rule) — covers LLR-005.1, LLR-005.2
+- Status: **Amended in batch `2026-07-15-batch-47`** (US-FND / R-TUI-065, LLR-065.3/065.4;
+  §6.5 Amendments C). The normative structure is **retained verbatim** — still dark-only, still
+  **exactly one** accent hue plus the five `color_policy.SEVERITY_CLASS_MAP` severity colours, still no
+  light-theme variant, `MAC_ADDRESS_OVERLAY_STYLE` / `FOCUS_HIGHLIGHT_STYLE` still unchanged. Only the
+  hues moved, from the batch-02 "Calm Dark" set to the navy/pastel `insight_style` palette:
+  - **Accent — Before → After:** `$accent-calm: #4ec9d4` → `#91abec` (`insight_style.HILITE`).
+  - **Depth stack — Before → After:** `$bg-base: #11141a → #0a0e1b` · `$bg-panel: #171b23 → #0f1525` ·
+    `$fg-base: #c8ccd4 → #e9e9e9` · `$rule: #2a2f3a → #1b233a`; NEW `$odd-row: #131a2c` (zebra surface).
+  - **Five severity colours — Before → After:** see §3 "Severity colour restyle — batch-47" above
+    (class names + semantics preserved; `color_policy.py` 0-diff).
+  TC-012 / TC-013 pass unchanged (the token budget and the round-trip are hue-agnostic); the panel
+  chrome + zebra additions are R-TUI-065. This row remains the theme *contract*; R-TUI-065 is the
+  batch-47 palette + helper-module requirement that realizes it.
 
 **R-TUI-025**: The validation issues table must be presented as a dedicated
 rail screen (no longer nested inside the Workspace Status tile), preserving
@@ -639,6 +706,15 @@ supersedes/extends R-TUI-026.
     are retired with the grid (Inc-5); the `#map_stats` / `tc041_8` / detail
     `build_detail_text` tests remain green. New/reworked coverage lives on
     R-TUI-060/061/062.
+  **Amended in batch `2026-07-15-batch-47`** (US-MAP / R-TUI-072/073/074; §6.5
+  Amendment B — **extends**, supersedes nothing). The batch-45 band-bands view is
+  **retained in full**; batch-47 adds an address ruler, a `╱` gap hatch,
+  humanized sizes, enriched region rows, and an inspector hex peek. Detail on
+  **R-TUI-060** below (the amendment is recorded once, there) and on the new
+  **R-TUI-072 / R-TUI-073 / R-TUI-074** rows. The render-only contract, the
+  `width-narrow` two-regime reflow, the `#map_stats` coverage strip (HLR-037),
+  and the batch-43 R-3 A2L-symbol region naming with its `safe_text` guard are
+  all preserved.
 
 **R-TUI-042**: Three prototype-approved (throwaway-prototype design intent,
 implemented + verified in Textual) view enhancements, all render-only over the
@@ -709,6 +785,37 @@ state (LLR-042.11); the batch diffs no engine-frozen path (LLR-042.12).
   (`test_at_043_c17_file_derived_hostile_ref_symbol_renders_literal`).
   Follow-up (R-043-3): the worker `precompute_issue_datatable_payload` + its now
   dead-written caches await a separate batch.
+- **Amended in batch `2026-07-15-batch-47`** (US-WS / R-TUI-066 / R-TUI-067;
+  §6.5 Amendment A — the batch-28 part **(c)** text above is the *Before*). Parts
+  (a) A2L density and (b) Issues grouping are **unaffected**.
+  - **Workspace memory strip — Before:** `#ws_memstrip` coloured each segment
+    **valid/invalid/gap only**, reusing the batch-27 `cell_status` path, and the
+    stat pane carried "coverage %, range / error / warning counts; **no entropy**"
+    (the D3-descoped limitation, `update_memory_strip`, `app.py:8300`).
+    **After:** the strip colours each segment by its **entropy band** — class +
+    texture glyph via the non-frozen `entropy_style.band_style` (`· ░ ▒ ▓`),
+    reading the worker-cached `LoadedFile.entropy_windows` (R-TUI-060 /
+    LLR-045A.2) — and marks unmapped address gaps with an **app-supplied `╱`**
+    glyph (`_STRIP_GAP_GLYPH`, `app.py:628`; NOT an entropy band, NOT sourced
+    from `entropy_style`). The valid/invalid/gap colouring is **retained as the
+    no-entropy fallback**: an empty `entropy_windows` renders the batch-28 strip
+    unchanged and never raises (LLR-067.3). See **R-TUI-067**.
+  - **Deleted / New tokens:** Deleted — the "no entropy (D3 descoped)"
+    limitation *for this surface*. New — entropy band styling on `#ws_memstrip`,
+    the `╱` gap glyph. Render-only: no entropy is computed here (the strip reads
+    the worker-thread cache).
+  - **Preserved:** the bounded-strip contract, the `#ws_stats` pane (now also
+    carrying the R-TUI-066 loader-facts line), and the per-range micro-bar —
+    which is **retargeted** onto `insight_style.microbar`, retiring the now-dead
+    `build_coverage_bar_text` / `coverage_bar_cells` and its test (Inc-3).
+    `sev-*` semantics are unaffected (bands use the separate `band-*` domain).
+  - **Validation:** `at040a` / `at040b` (`tests/test_tui_directionb.py`) are
+    **retargeted in place** to the Amendment-A band contract + the fallback
+    branch; new `Automated` coverage on
+    `tests/test_tui_workspace_insight.py::test_at067_memstrip` (AT-067 — ≥2
+    distinct band styles **and** ≥1 `╱`, both pilot sizes). The 6 `workspace`
+    snapshot cells ride `_batch47_workspace_drift_marks` (`xfail(strict=False)`)
+    until the canonical-CI regen. Frozen-engine diff = 0.
 
 **R-TUI-043**: The Load-file modal (`LoadFileScreen`) must (a) land initial
 keyboard focus on its path `Input` (`#load_path`) — never on the primary
@@ -3940,6 +4047,48 @@ dimension.
   until canonical-CI regen (`_batch45_map_drift_marks`, `tests/test_tui_snapshot.py`).
 - Status: Added in batch `2026-07-14-batch-45` (US-045a / R-TUI-060, LLR-045A / LLR-045D). Frozen-engine
   diff = 0.
+- **Amended in batch `2026-07-15-batch-47`** (US-MAP / R-TUI-072/073/074, LLR-072.1–074.3; §6.5
+  Amendment B — Before → After; the batch-45 text above is the *Before*). The band-bands view is
+  **EXTENDED, not replaced** — nothing above is superseded.
+  - **Before:** the proportional segmented band bar carries no marker for unmapped gaps and no address
+    ruler; region-list rows read `{glyph} 0x{start} · {N} B · {band}` — a raw byte count, no size
+    micro-bar, no symbol count, no explicit open affordance; the `#map_detail` inspector carries no hex
+    peek.
+  - **After:** (a) unmapped gaps render as an **app-supplied `╱` hatch** segment (`.map-band-gap`,
+    `_MAP_GAP_HATCH`, `screens_directionb.py:205`/`:1580`) — NOT an entropy band, NOT from
+    `entropy_style`; (b) a NEW **address ruler** (`MapRuler`, `screens_directionb.py:1103`) renders
+    beneath the strip with exactly 5 ticks at 0/25/50/75/100 % of the span; (c) sizes are **humanized**
+    via `insight_style.human_bytes` (binary 1024 / `KiB…PiB`, §6.5 Amendment D) — `0x10000` reads
+    `64.0 KiB`; (d) region rows gain a **size micro-bar** + an **`N sym`** count (via the frozen
+    `range_index` membership primitives, read-only — never a linear scan) + an explicit **`↵`**
+    open-in-hex affordance; (e) the inspector gains a **≤3-row hex peek at the region start** plus span
+    / size / dominant band. See **R-TUI-072 / R-TUI-073 / R-TUI-074**.
+  - **Deleted / New tokens:** New — `MapRuler`, the `╱` hatch + `.map-band-gap`, `N sym`, the size
+    micro-bar, the `↵` affordance, the inspector hex peek, humanized sizes. Deleted — none.
+  - **Preserved (contract unchanged):** the entropy-band styling contract (`entropy_style` remains the
+    single source of band colour + texture; the `band-*` domain stays separate from the frozen `sev-*`);
+    the worker-thread compute-once cache (`update_memory_map` still never recomputes entropy inline —
+    `test_tc028` AST purity guard green); `RegionRow.Activated` / `MemoryMapPanel.OpenInHexRequested`
+    **reused unchanged** (R-TUI-062 single-click → hex intact); the `#map_stats` coverage strip;
+    `_merge_band_runs`; the no-data neutral state. The batch-45 statement's "Region-list rows carry
+    addr/size/band ONLY — no file-derived (A2L) text (security B3)" is **narrowed**: rows now also carry
+    a derived **integer** `N sym` count (still no file-derived text); file-derived A2L symbol *names*
+    surface only in the `#map_detail` inspector, on the batch-43-hardened
+    `symbols_in_window` → `symbol_list_text` → `safe_text` path — for which batch-47 makes a
+    hostile-input AT **mandatory** (LLR-074.3 / MN-4).
+  - **Geometry (C-29, both axes measured — not assumed):** the real boxed `#map_grid` is **66×14 @80×24
+    and 52×12 @120×30** (the wide regime is *narrower* — the detail pane docks beside the grid). At the
+    measured 52 columns the ruler drops the `0x` tick prefix (C-13.1 fallback); the region list is
+    `height: auto` with overflow **reachable-under-scroll**; the 3-row peek fits `#map_detail`.
+  - **Status promotion:** **none required** — R-TUI-041 and R-TUI-060 were already `Automated`; no
+    `Manual`/`Partial` row falls under AT-072a/072b/073/074. The new behaviour is `Automated` on its own
+    rows (R-TUI-072/073/074).
+  - **Validation (additive; the batch-45 nodes above pass UNCHANGED):**
+    `tests/test_tui_map_big.py::test_at072a_bands` · `::test_at072b_ruler` · `::test_at073_sym_count` ·
+    `::test_at074_inspector`. C-26 reverse-census run **before** the edit over the 32 touched
+    interaction tests in `tests/test_tui_directionb.py` (23 `MemoryMapPanel` + 9 `RegionRow`) — all
+    non-frozen, all green, changes additive. The 2 `map` snapshot cells re-mark under
+    `_batch47_map_drift_marks`; `_batch45_map_drift_marks` is subsumed. Frozen-engine diff = 0.
 
 **R-TUI-061**: The Memory Map docks an **"At a glance"** panel beside the band bar: (a) a per-band
 **histogram** — one band-styled row per OCCUPIED band showing its REGION count (merged-run tally,
@@ -4048,3 +4197,277 @@ amendment of the original all-visible acceptance).
   batch-22 2×2 tree (buttons below the starved `1fr` fold).
 - Status: Added batch-46 (US-B2 / HLR-064, LLR-064.1–.3; FOLD-8 reachable-under-scroll floor). Frozen-engine
   diff = 0.
+
+---
+
+# 37. Visual data-insight layer — Foundation · Workspace · A2L · MAC · Memory Map (batch-47)
+
+> Field-audit **screen-upgrades Batch A** (`prototypes/screen_upgrades.HANDOFF-PLAN.md`, operator-approved
+> 2026-07-15): the app computes far more than it shows — entropy windows, coverage metrics, out-of-order
+> records, the entry point, and ~14 A2L fields are all parsed and then never rendered. Batch A adds a
+> **render-level insight layer** over five screens (Foundation theme + Workspace MID + A2L Explorer MID +
+> MAC View MID + Memory Map BIG) that surfaces them. **Presentation-only** — no parser, engine, or
+> validation-logic change; every value is read from a pre-computed field. The sole additive data are two
+> **derived** `LoadedFile` fields (`out_of_order_count`, `entry_point`), computed in the non-frozen
+> `load_service`. Amends R-TUI-024 + §3 (severity restyle, §6.5 Amendment C), R-TUI-042(c) (memstrip
+> entropy, Amendment A), and R-TUI-041 / R-TUI-060 (band-bands extension, Amendment B).
+> **Out of scope (deliberate):** Issues Report tiers (PARKED) · Patch Editor BIG (Batch B) · raising the
+> 120-col caps · Flow Builder. `chip-button` CSS is deliberately absent — its only consumer is Batch B, so
+> it ships with its consumer rather than as orphan CSS.
+> Stories: `.dev-flow/2026-07-15-batch-47/01-requirements.md` (US-FND / US-WS / US-A2L / US-MAC / US-MAP).
+
+**R-TUI-065**: The TUI shall provide an app-wide navy/pastel theme in `styles.tcss` and a NEW non-frozen
+`s19_app/tui/insight_style.py` module exposing the dolphie-derived palette constants (`LABEL #c5c7d2`,
+`VALUE #e9e9e9`, `GREEN #54efae`, `YELLOW #f6ff8f`, `RED #fd8383`, `HILITE #91abec`, `LBLUE #bbc8e8`,
+`DGRAY #969aad`, `PURPLE #b565f3`, `CYAN #7dd3fc`, depth stack `DEPTH_BG #0a0e1b` / `DEPTH_PANEL #0f1525`
+/ `DEPTH_ODD_ROW #131a2c` / `DEPTH_BORDER #1b233a`) plus four **pure** formatting helpers — `human_bytes`,
+`label_value`, `microbar`, `threshold_style`. The three `Text`-returning helpers shall construct Rich
+`Text` objects, never `str`, so they are **C-17-safe by construction** (a `Text` carries no markup to
+parse) — this is the reusable safety primitive every screen story consumes. `human_bytes` uses the
+**binary** 1024 divisor + `KiB/MiB/GiB/TiB/PiB` (§6.5 Amendment D, operator decision: firmware spans are
+powers of two, so a decimal read-out misaligns with the hex ranges the analyst reads). The theme applies
+app-wide via the `Screen` rule and adds the panel idiom (`.db-pane` `border: tall` + accent border-title +
+muted border-subtitle) and a zebra odd-row surface (`DataTable > .datatable--odd-row`, inert unless a
+table sets `zebra_stripes`). The `sev-*` class **NAMES and severity semantics are preserved** — only hues
+move (§3 restyle table / §6.5 Amendment C); `color_policy.py` and `css_class_for_severity` stay **frozen
+and 0-diff**, the restyle being entirely in CSS.
+- Code: `s19_app/tui/insight_style.py` (NEW, non-frozen — palette `:34-62`, `human_bytes:68`,
+  `label_value:119`, `microbar:160`, `threshold_style:207`), `s19_app/tui/styles.tcss` (`$`-vars `:26-31`
+  incl. NEW `$odd-row`; `.db-pane` `:237-247`; `datatable--odd-row` `:252-254`; `sev-*` `:510-541`)
+- Validation: `Automated` — `tests/test_tui_insight_style.py`
+  (`::test_palette_constants_present_and_correct` (TC-065.1), `::test_human_bytes` (TC-065.2, binary
+  thresholds `1024 → "1.0 KiB"` / `0x10000 → "64.0 KiB"` / `1<<30 → "1.0 GiB"`), `::test_microbar`,
+  `::test_microbar_returns_text`, `::test_label_value_returns_text` (the `Text`-not-`str` property),
+  `::test_threshold_style`) and `tests/test_tui_theme.py::test_at065a_palette` (AT-065a — Screen bg ==
+  `DEPTH_BG` ∧ `.db-pane` bg == `DEPTH_PANEL`) + `::test_at065b_sev_semantics` (AT-065b — live `sev-error`
+  resolves the pastel red **and** `css_class_for_severity` round-trips for all 5 severities). TC-012 /
+  TC-013 pass unchanged (hue-agnostic); `tests/test_color_policy_round_trip.py` (frozen) green.
+- Status: Added in batch `2026-07-15-batch-47` (US-FND / HLR-065, LLR-065.1–.4; §6.5 Amendments C + D).
+  Frozen-engine diff = 0 (`color_policy.py` 0-diff under the restyle). The app-wide restyle was sequenced
+  **LAST** (Inc-8) so each functional increment kept live snapshot regression-coverage; it drives all 29
+  `_batch47_*_drift_marks` `xfail(strict=False)` cells (0 xpassed → the C-22 census is non-masking),
+  retired by the canonical-CI regen follow-up PR.
+
+**R-TUI-066**: When a file is loaded, the Workspace screen shall render border titles on its three panes;
+section rows carrying an in-range glyph + cyan address + right-aligned humanized size (`human_bytes`) +
+a size micro-bar (`microbar(size / biggest)`) + an entropy glyph; hex bytes **classed by kind** (`00`/`FF`
+dim-grey, printable-ASCII cyan, all other bytes bright) without changing the public hex constants
+(`MAX_HEX_BYTES` / `MAX_HEX_ROWS` / `HEX_WIDTH` / `SEARCH_ENCODING`); and a **loader-facts** line in
+`#ws_stats` reading `Loader N err · ⚠K OOO · Entry 0x…`, where `N = len(LoadedFile.errors)`,
+`K = LoadedFile.out_of_order_count`, and `Entry = LoadedFile.entry_point` (`—` when absent). The two
+derived fields shall be populated in the non-frozen `load_service` — `out_of_order_count =
+len(S19File.get_out_of_order_records())` and `entry_point` = the first S7/S8/S9 terminator record's
+address (`None` for every Intel-HEX load, which discards type 03/05 start-address records,
+`hexfile.py:135-137`) — and declared **defaulted, appended after `entropy_windows`** on the `LoadedFile`
+dataclass (`out_of_order_count: int = 0`, `entry_point: Optional[int] = None`) so that every existing
+constructor that omits them keeps compiling and takes the safe defaults. Because `LoadedFile` is **rebuilt
+by explicit field-copy — not mutated** — when a MAC is attached or the primary is reloaded, both merge
+sites shall **carry the two fields forward from the source payload** and shall NOT re-default them:
+without this the loader facts read correctly on a direct S19 load and then silently **lie** after a MAC
+attach. `#ws_stats` keeps `markup=False` and carries only numeric counts + a hex address — **no
+file-derived free text** (error COUNT, never error message text), so C-17 is `N/A` here **with a stated
+reason**, not overlooked.
+- Code: `s19_app/tui/models.py:72-73` (the two defaulted derived fields),
+  `s19_app/tui/services/load_service.py` (`build_loaded_s19` — `entry_point` scan `:65`, fields `:84-85`;
+  `build_loaded_hex` — `:123-124`, both constant by construction),
+  `s19_app/tui/app.py` (`build_loader_facts_text:852` → `#ws_stats`; `update_sections:8453` retargeted onto
+  `insight_style.microbar`; `_compose_screen_workspace` border titles; the carry-forward at the two merge
+  sites `:6954` primary-reload-preserving-MAC and `:6997` `_merge_mac_with_existing_primary`),
+  `s19_app/tui/hexview.py` (`_hex_byte_style:27` → `render_hex_view_text:360`)
+- Validation: `Automated` — `tests/test_tui_workspace_insight.py::test_at066a_ooo` (AT-066a — `#ws_stats`
+  contains `⚠4 OOO` for `examples/case_00_public/prg.s19`) + `::test_at066b_entry_present` (AT-066b —
+  `Entry 0x80000000` for `case_01`; boundary: a **present** `0x0` renders `0x00000000`, distinct from
+  ABSENT `—`) + `::test_at066c_entry_absent_hex` (AT-066c — inline `IntelHexFile` → `Entry —`) +
+  `::test_at066d_merge_preserves_facts` (**AT-066d, the MJ-1 counterfactual** — load S19 OOO=4 → attach MAC
+  → `#ws_stats` STILL `⚠4 OOO` + entry preserved) + the derived-field units `::test_ooo_count_populated` /
+  `::test_entry_point_s19` / `::test_entry_point_hex_none` / `::test_fields_default_on_bare_construction`
+  (MN-6 constructor-census); `tests/test_tui_hexview_classed.py` (7 TCs incl. the edge-pinned
+  `::test_tc066_6_printable_ascii_class_boundaries`); `tests/test_tui_directionb.py::test_at040a`
+  (section rows, retargeted in place). Every AT runs at **both 80×24 and 120×30**.
+- Status: Added in batch `2026-07-15-batch-47` (US-WS / HLR-066, LLR-066.1–.7). Frozen-engine diff = 0 —
+  the additive dataclass fields are safe because **no frozen test file constructs `LoadedFile`** (~40
+  non-frozen test sites plus `crc.py:1425` / `placeholders.py:67` omit them and take the defaults, no
+  behaviour change). The merge carry-forward (LLR-066.7) is **MJ-1**: the Phase-2 writer-census (C-15.1)
+  enumerated all four `LoadedFile(` construction sites and caught the drop **before any code was cut** —
+  general class: *any additive field on a copy-constructed snapshot needs a writer-census of every
+  construction/merge site*. Dead `build_coverage_bar_text` / `coverage_bar_cells` + its test removed
+  (Inc-3, own-mess-only). HEX `Entry —` is **correct product behaviour**, not a defect (structural:
+  `hexfile.py` discards types 03/05).
+
+**R-TUI-067**: When a file with computed entropy windows is loaded, `#ws_memstrip` shall colour each
+address segment by its **entropy band** — CSS class + texture glyph from `entropy_style.band_style(label)`
+(glyph set `· ░ ▒ ▓`) — reading the worker-cached `LoadedFile.entropy_windows` (never recomputing on the
+UI thread), and shall mark unmapped address gaps with a `╱` glyph that is **app-supplied and NOT sourced
+from `entropy_style`** (it indicates an unmapped address, not an entropy band). If `entropy_windows` is
+empty, the strip shall fall back to the pre-existing batch-28 valid/invalid/gap colouring without error.
+This retires the "no entropy (D3 descoped)" limitation for this surface (§6.5 Amendment A; amends
+R-TUI-042(c)). Band colour flows through the `band-*` domain, deliberately separate from the frozen
+`sev-*` severity classes.
+- Code: `s19_app/tui/app.py` (`update_memory_strip:8636` → `#ws_memstrip`; `_STRIP_GAP_GLYPH = "╱"` `:628`,
+  applied `:8709`), `s19_app/tui/entropy_style.py` (`band_style:69`, `ENTROPY_BAND_GLYPH:53` — REUSED
+  unchanged), `s19_app/tui/models.py` (`LoadedFile.entropy_windows`, read-only)
+- Validation: `Automated` — `tests/test_tui_workspace_insight.py::test_at067_memstrip` (AT-067 — ≥2
+  distinct band styles from `{· ░ ▒ ▓}` **and** ≥1 `╱`, at both pilot sizes) +
+  `tests/test_tui_directionb.py::test_at040b` (retargeted in place to the Amendment-A band contract **and**
+  the empty-windows fallback branch). Geometry: C-29 both-axes structural invariant measured for the
+  `#ws_memstrip` container at 80×24 and 120×30 (Inc-3) — no cell count assumed.
+- Status: Added in batch `2026-07-15-batch-47` (US-WS / HLR-067, LLR-067.1–.4; §6.5 Amendment A).
+  Frozen-engine diff = 0 (render-only over the batch-45 worker cache).
+
+**R-TUI-068**: When A2L tags are displayed, `_build_a2l_table_cells` shall return a `tuple[Text, ...]` in
+which **every one of the 16 cells is a Rich `Text`** (via `safe_text` or equivalent), never a bare `str` —
+covering every file-derived value (`name`, `source`, `unit`, `function_group`, `memory_region`,
+`raw_value`, `physical_value`) plus the address and a leading **in-image glyph** (`✓` when the tag's
+`in_memory` flag is truthy, else `·`; the key is `in_memory`, **not** `in_image`), with zebra rows; and
+`#a2l_tags_summary` shall render a coloured in-image count. No file-derived value is f-strung into a
+markup string. This table-cell path is a **C-17 sink distinct from the detail card** (R-TUI-069) and
+carries its own gate-blocking hostile-input AT.
+- Code: `s19_app/tui/app.py::_build_a2l_table_cells:9542` (was a 16-tuple of plain `str`) → `#a2l_tags_list`
+  + `#a2l_tags_summary`; `safe_text` (`s19_app/tui/screens_directionb.py:615`); `in_memory` flag from the
+  frozen `s19_app/tui/a2l.py:1316` (read-only)
+- Validation: `Automated` — `tests/test_tui_a2l_detail.py::test_at068_glyph_branches` (AT-068 — `✓` on
+  `in_memory`-truthy **and** `·` on falsy, both branches asserted **by content**, C-10) +
+  `::test_at069c_c17_table_name` (**AT-069c ★, gate-blocking** — a hostile A2L NAME renders verbatim in the
+  cell `Text.plain` with `spans == []`) + `::test_cells_are_text_and_glyph` (TC — the all-16-cells-are-`Text`
+  property) + `::test_summary_count` (count == `in_memory`-truthy tags). Both pilot sizes.
+- Status: Added in batch `2026-07-15-batch-47` (US-A2L / HLR-068, LLR-068.1–.3). Frozen-engine diff = 0.
+  **§6.5 Amendment E** — the originally-specified per-cell accents (name bright / address cyan / source
+  muted) **are built** in `_build_a2l_table_cells` but are **not visible on the live table**: every A2L row
+  resolves to a REQUIREMENTS-level A2L **severity** colour (Red/Green/White/Grey — §3 / R-A2L-ISSUE-
+  RECONCILE-002 / `_SEVERITY_TO_RICH_STYLE`), applied as a whole-cell `.style` override in
+  `update_a2l_tags_view`, so the severity contract subsumes them. Per engineering-rule 7 the conflict was
+  **surfaced, not averaged** — the severity contract stays **dominant**, and the shipped A2L deliverable is
+  the glyph column + coloured summary + zebra (neither AT-068 nor AT-069c asserts live-table accent colour,
+  so no acceptance criterion is unmet and no deliverable is silently dropped). Promoting accents onto
+  non-error rows would require a severity-restyle decision + its own amendment — **operator follow-up, out
+  of Batch-A scope**.
+
+**R-TUI-069**: When an `#a2l_tags_list` row is **highlighted**, a NEW `on_data_table_row_highlighted`
+handler shall update a NEW detail card mounted at the top of `#a2l_hex_pane` (the hex view shrinking below
+it in the same pane — no new pane) with the selected tag's description, unit·conversion, record layout,
+byte order, and limits. RowHighlighted is specified over the pre-existing `on_data_table_row_selected`
+(which fires only on explicit selection) so the card gives **live cursor-move feedback**. The card body
+shall be composed **at the `Text` level** (append/join Rich `Text`), so a file-derived value is NEVER
+f-strung into a markup string; all card fields render via `safe_text` / Rich `Text` / `markup=False`. The
+card widget's private members shall not be named `_nodes` or `_context` (Textual internal-name shadowing →
+silent mount crash / idle boot deadlock with no traceback).
+- Code: `s19_app/tui/app.py` (`A2LDetailCard:734` — `#a2l_detail_card`, only new member `show_tag`;
+  `_a2l_detail_card_text:668` + `_card_field`; `on_data_table_row_highlighted:6345`); `safe_text`
+  (`s19_app/tui/screens_directionb.py:615`)
+- Validation: `Automated` — `tests/test_tui_a2l_detail.py::test_at069_card_highlight` (AT-069 — highlighting
+  a **non-default** row renders THAT tag's description + unit) + `::test_at069b_c17_card` (**AT-069b ★,
+  gate-blocking** — the full MD-1 payload verbatim in the card `Text.plain`, no payload-derived span, no
+  `MarkupError`); widget member-name inspection (`set(dir(Widget)) ∩ {show_tag} == ∅`). Both pilot sizes.
+  Geometry: C-29 both axes of the real `#a2l_hex_pane` measured (Inc-4) → card `h=5`, hex **not occluded**
+  at 80×24.
+- Status: Added in batch `2026-07-15-batch-47` (US-A2L / HLR-069, LLR-069.1–.4). Frozen-engine diff = 0.
+  C-17 holds **by construction** (`safe_text = Text(value)` + `.append`; never `Text.from_markup`).
+
+**R-TUI-070**: When MAC records are displayed, each record row shall carry a leading coloured **status
+glyph** derived from the **finest available discriminator** — `✓` (parse-ok **and** in-image) · `⚠`
+(parse-ok, out-of-image — the existing Orange MAC-warning semantics) · `✗` (parse-error) · `·` (parse-ok
+but never image-checked, e.g. a MAC-only load with no primary) — with cyan addresses over the table's
+existing `zebra_stripes`, and MAC names (untrusted, file-derived) rendered C-17-safe. A collapsed/lossy
+status proxy shall NOT key the glyph: it cannot distinguish *in-image* from *not-yet-checked* and yields a
+**false-green** `✓` asserting a check that never ran.
+- Code: `s19_app/tui/app.py` (`_mac_status_glyph:583` — keyed off `row[3]` `in_mem_text`;
+  `update_mac_view:9043` / `_populate_mac_datatable:9192` → `#mac_records_list`); MAC name cells via
+  `Text().append` / `safe_text` (`s19_app/tui/screens_directionb.py:615`)
+- Validation: `Automated` — `tests/test_tui_mac_coverage.py::test_at070_glyph_branches` (AT-070 — both `✓`
+  and `⚠` by content, `case_02`) + `::test_at070b_c17_name` (**AT-070b ★, gate-blocking** — a hostile MAC
+  name verbatim in `Text.plain`, no `red`/`link` span, no `MarkupError`) + `::test_at070c_parse_error`
+  (AT-070c — a parse-error record → `✗`, NEW inline malformed fixture) + `::test_at070d_mac_only_unchecked_glyph`
+  (AT-070d — a MAC-only parse-ok record → grey `·`, **not** a false-green `✓`). All 4 glyph branches
+  nodalized (C-10); both pilot sizes.
+- Status: Added in batch `2026-07-15-batch-47` (US-MAC / HLR-070, LLR-070.1–.2). Frozen-engine diff = 0.
+  The 4th branch is an **in-increment iterate-to-fix** (Inc-5 F1, MEDIUM): the glyph first keyed off the
+  collapsed Status string and rendered a false-green `✓` for MAC-only loads; re-keying onto `in_mem_text`
+  fixed it with **no amendment needed** — the requirement always meant `✓` = in-image, the code was wrong.
+  AT-070d closes the branch. *Heuristic: a display cue must key off the finest available discriminator,
+  never a lossy proxy string.*
+
+**R-TUI-071**: While a MAC file is loaded, the MAC View shall render a coverage strip above
+`#mac_records_list` reading `MAC→S19 X of Y ▓▓▓░░ · A2L↔MAC N matches`, with `X =
+CoverageMetrics.mac_in_s19`, `Y = mac_total`, `N = a2l_mac_address_matches` and the micro-bar via
+`insight_style.microbar` — shown **independent of the primary file type**, superseding the previous
+conditional pct-line. `mac_total == 0` shall render `0 of 0` with an empty micro-bar (no divide-by-zero;
+`mac_in_s19_pct` returns `0.0`). With no MAC loaded the strip shall be absent.
+- Code: `s19_app/tui/services/validation_service.py::build_mac_coverage_strip:28` (NEW, **non-frozen** —
+  the frozen `validation/` is read-only here), `s19_app/tui/app.py::_update_mac_coverage_strip:9150`
+  (`show=` visibility gate) → the NEW `#mac_coverage_strip` Static in `_compose_screen_mac`;
+  `CoverageMetrics.mac_total` / `mac_in_s19` / `a2l_mac_address_matches` (frozen
+  `s19_app/validation/model.py:168`/`:169`/`:173`, read-only)
+- Validation: `Automated` — `tests/test_tui_mac_coverage.py::test_at071_strip` (AT-071 — `#mac_coverage_strip`
+  contains `1 of 2` == the fixture's `CoverageMetrics`, both pilot sizes) +
+  `::test_build_mac_coverage_strip_counts` (TC — counts) + `::test_zero_total_no_divzero` (MN-3 boundary)
+- Status: Added in batch `2026-07-15-batch-47` (US-MAC / HLR-071, LLR-071.1–.2). Frozen-engine diff = 0.
+
+**R-TUI-072**: When the Memory Map renders, the proportional band strip shall mark unmapped gaps with an
+**app-supplied `╱` hatch** segment (NOT an entropy band, NOT from `entropy_style`), display **humanized**
+sizes via `insight_style.human_bytes` (binary 1024 / `KiB…PiB`), and render a NEW **address ruler**
+beneath the strip with **exactly 5 tick labels** at 0/25/50/75/100 % of the address span — tick 0 % ==
+span start and tick 100 % == span end. Entropy band colour + texture continue to flow solely from
+`entropy_style` (the `band-*` domain, separate from the frozen `sev-*`). This **extends** the batch-45
+band-bands view (R-TUI-060 / R-TUI-041; §6.5 Amendment B) — nothing there is superseded.
+- Code: `s19_app/tui/screens_directionb.py` (`MemoryMapPanel._build_band_widgets:1505`; `_MAP_GAP_HATCH =
+  "╱"` `:205`, applied `:1580` as `.map-band-gap`; `MapRuler:1103` — a NEW widget, checked against
+  `dir(Widget)` for `_nodes`/`_context` shadowing), `s19_app/tui/insight_style.py::human_bytes:68`
+- Validation: `Automated` — `tests/test_tui_map_big.py::test_at072a_bands` (AT-072a — ≥2 band styles + ≥1
+  `╱` hatch, `case_02`/4 ranges) + `::test_at072b_ruler` (AT-072b — **exactly 5** ticks; first == span
+  start, last == span end). Both pilot sizes. **Geometry (C-29, both axes MEASURED):** the real boxed
+  `#map_grid` is **66×14 @80×24 and 52×12 @120×30** — the wide regime is *narrower* (the detail pane docks
+  beside the grid), so no axis was assumed and no prototype full-screen budget inherited; at the measured
+  52 columns the ruler drops the `0x` tick prefix (C-13.1 fallback). The 2 `map` snapshot cells ride
+  `_batch47_map_drift_marks` (`xfail(strict=False)`) until the canonical-CI regen.
+- Status: Added in batch `2026-07-15-batch-47` (US-MAP / HLR-072, LLR-072.1–.4; §6.5 Amendment B amends
+  R-TUI-060 / R-TUI-041). Frozen-engine diff = 0. C-26 reverse-census run **before** the edit over the 32
+  touched interaction tests (23 `MemoryMapPanel` + 9 `RegionRow` in `tests/test_tui_directionb.py`) — all
+  green, changes additive.
+
+**R-TUI-073**: When Memory Map region rows render, each `RegionRow` shall show a **size micro-bar**
+(`microbar(region_size / largest_region)`), an **`N sym`** count of A2L enriched-tag addresses falling
+within the region span, and an explicit **`↵`** open-in-hex affordance. The symbol count shall be computed
+via the frozen `range_index` membership primitives (`build_sorted_range_index` /
+`address_in_sorted_ranges` / `range_in_sorted_ranges`, consumed **read-only**) — **never a linear scan**
+(many addresses × many ranges is precisely the case `range_index` exists for). The activation action is
+**reused, not rebuilt**: `RegionRow.Activated` → `MemoryMapPanel.OpenInHexRequested` are unchanged, so the
+R-TUI-062 single-click → hex contract stays intact. Rows carry addr/size/band + the derived **integer**
+count only — still **no file-derived text** (security B3 narrowed, not relaxed).
+- Code: `s19_app/tui/screens_directionb.py` (`_region_symbol_counts:1455` → `_build_region_row:1617`; the
+  `_tag_address` helper), `s19_app/tui/insight_style.py::microbar:160`, `s19_app/range_index.py` (frozen,
+  read-only), `app._a2l_enriched_tags` (read-only)
+- Validation: `Automated` — `tests/test_tui_map_big.py::test_at073_sym_count` (AT-073 — per-region `N sym`
+  == an **independent `range_index` oracle** + `↵` present, both pilot sizes); the no-linear-scan property
+  by inspection; `RegionRow` / `MemoryMapPanel` interaction tests in `tests/test_tui_directionb.py` pass
+  UNCHANGED (message contract preserved). Boundary: a region with 0 symbols → `0 sym`; no A2L loaded → all
+  rows `0 sym`. **Geometry (C-29):** the region list is `height: auto` with overflow
+  **reachable-under-scroll** (measured Inc-6) — no row count asserted.
+- Status: Added in batch `2026-07-15-batch-47` (US-MAP / HLR-073, LLR-073.1–.3; §6.5 Amendment B).
+  Frozen-engine diff = 0.
+
+**R-TUI-074**: When a Memory Map region row is activated, `on_region_row_activated` shall populate the
+existing `#map_detail_body` with the region's span, size, dominant band, and a **hex peek of up to 3 rows
+starting at the region's start address** (a region shorter than 3 rows shows only the available bytes),
+reusing the existing `RegionRow.Activated` message and handler. File-derived **A2L symbol names DO surface
+here** — via the batch-43-hardened `symbols_in_window` → `symbol_list_text` → `safe_text` path — so every
+file-derived symbol/region value in `#map_detail_body` shall render via `safe_text` / Rich `Text` /
+`markup=False`, and a hostile-input AT for this sink is **mandatory, not conditional**.
+- Code: `s19_app/tui/screens_directionb.py` (`on_region_row_activated` → `#map_detail_body`;
+  `_region_hex_peek:1977`; `symbols_in_window` / `symbol_list_text` / `safe_text:615`, REUSED),
+  `s19_app/tui/app.py::dominant_band_label:797`
+- Validation: `Automated` — `tests/test_tui_map_big.py::test_at074_inspector` (**AT-074 ★** — activating a
+  **NON-first** region row renders a hex peek whose first address == that region's start, **with a
+  mandatory C-17 sub-assertion (MN-4)**: a `[red]` / `sensor[unclosed` A2L symbol name renders **verbatim**
+  in `#map_detail_body`, no `MarkupError`). Both pilot sizes. Boundary: no region activated → the existing
+  `_DETAIL_HINT`. **Geometry (C-29):** the 3-row peek fits the measured `#map_detail`.
+- Status: Added in batch `2026-07-15-batch-47` (US-MAP / HLR-074, LLR-074.1–.3; §6.5 Amendment B).
+  Frozen-engine diff = 0.
+
+> **C-17 gate-blocking set for this batch — 4 sinks, all green:** AT-069b (A2L detail card) · AT-069c (A2L
+> table cell — a **distinct** sink, not covered by the card's AT) · AT-070b (MAC name) · AT-074's mandatory
+> sub-assertion (Memory-Map region inspector). Each asserts the full payload set `[red]…[/red]` ·
+> `[link=http://x]u[/link]` · `\x1b[31mX\x1b[0m` (ANSI) · `sensor[unclosed` renders **verbatim** in
+> `Text.plain` with no payload-derived span and no `MarkupError`. The unbalanced-bracket `sensor[unclosed`
+> is the **discriminating counterfactual** — it would raise or mis-span under `Text.from_markup` — which is
+> what makes the ATs genuine rather than vacuous. Safety holds **by construction**
+> (`safe_text = Text(value)` + `.append`; never `Text.from_markup`, never an f-string into markup).

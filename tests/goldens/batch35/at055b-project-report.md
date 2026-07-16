@@ -30,14 +30,14 @@
 
 ### MAC
 - **Red** — parse failed, invalid/missing name or hex address, or A2L↔MAC same-name address mismatch
-- **Orange** — warning: symbol only in MAC (not A2L), duplicate-address alias, or overlap ambiguity
+- **Pale yellow** — warning: symbol only in MAC (not A2L), duplicate-address alias, or overlap ambiguity
 - **Green** — exact name + address match with A2L
 - **White** — structurally valid MAC entry, no hard inconsistency, not positively cross-confirmed
 - **Grey** — no A2L loaded, or validation context missing
 
 ### Issues
 - **Errors** (Red) — parse/structure errors, empty name, invalid/missing address, duplicate symbol, broken GROUP/FUNCTION references, or A2L↔MAC same-name mismatch
-- **Warnings** (Orange) — address/range out of S19 range, overlap ambiguity, symbol-only-in-MAC, symbol-only-in-A2L, or warning-policy alias
+- **Warnings** (Pale yellow) — address/range out of S19 range, overlap ambiguity, symbol-only-in-MAC, symbol-only-in-A2L, or warning-policy alias
 - **Optional info** (Cyan) — valid-but-not-image-backed, not-checked-without-primary-image, or virtual/dependent non-memory-backed objects
 
 ### Hex

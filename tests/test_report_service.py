@@ -746,7 +746,7 @@ def test_report_omits_legend_when_disabled(tmp_path: Path) -> None:
     """
     text = _legend_report_text(tmp_path, include_legend=False)
     assert "## Legend" not in text
-    sample_meaning = LEGEND_TABLE["MAC"]["Orange"][1]
+    sample_meaning = LEGEND_TABLE["MAC"]["Pale yellow"][1]
     assert sample_meaning not in text
 
 

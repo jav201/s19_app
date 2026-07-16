@@ -525,6 +525,200 @@ def _batch46_patch_drift_marks(screen: str, density: str, size_key: str) -> tupl
     return ()
 
 
+# batch-47 (R-TUI-066/067, US-WS Workspace MID insight layer): the Workspace
+# screen gains pane BORDER TITLES (LLR-066.1), a loader-facts line in `#ws_stats`
+# (`Loader N err · ⚠K OOO · Entry 0x…`, LLR-066.4), entropy-banded section rows
+# with ✓/cyan-address/human_bytes/entropy-glyph (LLR-066.2), and an
+# entropy-banded `#ws_memstrip` with `╱` gap glyphs (LLR-067.1/067.2). All four
+# repaint the Workspace body, so every `workspace-*` tc016s cell (both densities
+# x 3 sizes = 6 cells) drifts. No other screen renders the Workspace body, so
+# containment is Workspace-only — the batch-47 Inc-3 snapshot run showed EXACTLY
+# the 6 workspace cells mismatched (no a2l/mac/issues/map/patch/diff/flow cell
+# moved → C-28 shared-chrome clean; no footer/header/rail binding change this
+# increment). The SVG baselines must be regenerated in the canonical CI env
+# (snapshot-regen.yml, pinned textual==8.2.8) — NOT locally (local regen drifts
+# unrelated baselines, per reference_snapshot_regen_env). Until the batch-47
+# theme+regen follow-up (Inc-7) lands, the 6 workspace cells ride
+# xfail(strict=False) (C-22 upper bound); the follow-up regen retires these marks.
+def _batch47_workspace_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 Workspace insight-layer drift marks.
+
+    The 6 ``workspace`` cells (both densities x 3 sizes) drift when the Workspace
+    gains border titles + loader-facts + entropy section rows + entropy memstrip
+    (US-WS, HLR-066/067). Marked ``xfail(strict=False)`` until the canonical-CI
+    baseline regen lands (batch-47 Inc-7 theme + regen), then retired.
+    """
+    if screen == "workspace":
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-066/067 US-WS: Workspace border titles + "
+                    "loader-facts + entropy section rows + entropy memstrip; SVG "
+                    "baseline regen pending in canonical CI (snapshot-regen.yml, "
+                    "batch-47 Inc-7 theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
+# batch-47 (R-TUI-068/069, US-A2L Explorer MID): the A2L screen's tag-table name
+# cell gains a leading in-image glyph (`✓`/`·`, LLR-068.1), `#a2l_tags_summary`
+# gains a colored in-image count (LLR-068.2), and a NEW detail card mounts at the
+# top of `#a2l_hex_pane` above the (shrunken) hex view (LLR-069.1). All three
+# repaint the A2L body, so every `a2l-*` tc016s cell (both densities x 3 sizes =
+# 6 cells) drifts. The batch-47 Inc-4 snapshot run showed EXACTLY the 6 a2l cells
+# mismatched (mac/issues/workspace-non-theme/map/patch/diff unaffected → C-28
+# shared-chrome clean; no footer/header/rail binding change this increment). The
+# SVG baselines must be regenerated in canonical CI (snapshot-regen.yml, pinned
+# textual==8.2.8) — NOT locally. Until the batch-47 theme+regen follow-up (Inc-7)
+# lands, the 6 a2l cells ride xfail(strict=False) (C-22 upper bound).
+def _batch47_a2l_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 A2L insight-layer drift marks.
+
+    The 6 ``a2l`` cells (both densities x 3 sizes) drift when the A2L screen
+    gains the name-cell in-image glyph + colored summary count + detail card
+    (US-A2L, HLR-068/069). Marked ``xfail(strict=False)`` until the canonical-CI
+    baseline regen lands (batch-47 Inc-7 theme + regen), then retired.
+    """
+    if screen == "a2l":
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-068/069 US-A2L: tag-table in-image glyph + "
+                    "colored summary count + detail card in #a2l_hex_pane; SVG "
+                    "baseline regen pending in canonical CI (snapshot-regen.yml, "
+                    "batch-47 Inc-7 theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
+# batch-47 (R-TUI-070/071, US-MAC View MID): the MAC records table gains a
+# leading status glyph folded into the Tag cell (`✓`/`⚠`/`✗`, LLR-070.1), cyan
+# addresses (LLR-070), and a NEW `#mac_coverage_strip` Static above the records
+# list (LLR-071.1). These repaint the MAC records pane. The batch-47 Inc-5
+# snapshot run showed EXACTLY the 4 WIDE `mac` cells (120x30 + 160x40, both
+# densities) drift — the 2 `mac-*-80x24` cells stay green (the narrow layout
+# renders the changed records pane below the snapshot fold, C-22 per-cell). No
+# a2l/issues/workspace-non-theme/map/patch/diff cell moved (C-28 shared-chrome
+# clean; no footer/header/rail binding change this increment). The SVG baselines
+# regenerate in canonical CI (snapshot-regen.yml, pinned textual==8.2.8) — NOT
+# locally. Until the batch-47 theme+regen follow-up lands, the 4 wide mac cells
+# ride xfail(strict=False) (C-22 upper bound).
+def _batch47_mac_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 MAC insight-layer drift marks.
+
+    The 4 WIDE ``mac`` cells (both densities x {120x30, 160x40}) drift when the
+    MAC records table gains the status glyph + cyan addresses and the coverage
+    strip mounts (US-MAC, HLR-070/071). The narrow ``mac-*-80x24`` cells stay
+    green (changed region below the fold). Marked ``xfail(strict=False)`` until
+    the canonical-CI baseline regen lands (batch-47 theme + regen), then retired.
+    """
+    if screen == "mac" and size_key in _WIDE_FOOTER_SIZES:
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-070/071 US-MAC: records status-glyph column + "
+                    "cyan addresses + #mac_coverage_strip; SVG baseline regen "
+                    "pending in canonical CI (snapshot-regen.yml, batch-47 "
+                    "theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
+# batch-47 (R-TUI-072/073/074, US-MAP Memory Map BIG): the map band strip gains
+# `╱` hatch gaps + span-proportional segment widths (LLR-072.1), a NEW MapRuler
+# 5-tick address ruler beneath the strip (LLR-072.3), and enriched region rows
+# (humanized size + size micro-bar + `N sym` count + `↵` affordance, LLR-072.2 /
+# 073). All repaint the map body, so BOTH map scaffold cells (80x24 + 120x30,
+# comfortable) drift. The region inspector hex peek (LLR-074) shows only on
+# activation and the snapshot captures the un-activated `_DETAIL_HINT` state, so
+# it does not drift the baseline. No other screen renders the map body (C-28
+# shared-chrome clean; no footer/header/rail binding change this increment). SVG
+# baselines regenerate in canonical CI (snapshot-regen.yml, pinned
+# textual==8.2.8) — NOT locally. Until the batch-47 theme+regen follow-up lands,
+# the 2 map cells ride xfail(strict=False) (C-22 per-cell upper bound).
+def _batch47_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 Memory-Map BIG insight-layer drift marks.
+
+    The 2 ``map`` scaffold cells (comfortable x {80x24, 120x30}) drift when the
+    band strip gains hatch gaps + a span-proportional layout, the address ruler
+    mounts, and region rows are enriched (US-MAP, HLR-072/073/074). Marked
+    ``xfail(strict=False)`` until the canonical-CI baseline regen lands (batch-47
+    theme + regen follow-up), then retired.
+    """
+    if screen == "map" and size_key in ("80x24", "120x30"):
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-072/073/074 US-MAP: band strip hatch gaps + "
+                    "span-proportional widths + 5-tick address ruler + enriched "
+                    "region rows (size micro-bar + N sym + ↵); SVG baseline regen "
+                    "pending in canonical CI (snapshot-regen.yml, batch-47 "
+                    "theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
+# batch-47 Inc-8 (R-TUI-065, US-FND app-wide navy/pastel theme): `styles.tcss`
+# swaps the app `$`-variables to the insight_style navy depth stack
+# (bg-base -> #0a0e1b, bg-panel -> #0f1525, fg-base -> #e9e9e9, rule -> #1b233a,
+# accent-calm -> #91abec), aligns the five `sev-*` hues to the pastel palette
+# (§6.5 Amendment C), and adds the dolphie panel chrome (`.db-pane` tall border
+# + border-title accent + zebra odd-row). The `Screen`/panel/rail/footer styling
+# is rendered on EVERY screen, so the theme drifts EVERY tc016s cell (C-28
+# shared-chrome). The per-screen Inc-3..7 marks + the batch-46 patch mark already
+# cover workspace (6), a2l (6), mac-WIDE (4), map (2) and patch (2); this mark
+# covers the REMAINING cells the theme drifts — issues (6), mac-80x24 (2), and
+# diff (1) — so every one of the 29 cells rides exactly ONE xfail(strict=False)
+# (no double-marking, per the batch-45 footer precedent). The change is cosmetic
+# only (no binding add/remove this increment), so no NEW footer-key drift beyond
+# the theme repaint. SVG baselines regenerate in the canonical CI env
+# (snapshot-regen.yml, pinned textual==8.2.8) as the batch-47 post-merge
+# follow-up PR — NEVER locally (reference_snapshot_regen_env). This mark retires
+# with that regen, alongside the sibling batch-47 per-screen marks.
+def _batch47_theme_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 Inc-8 app-wide theme drift marks.
+
+    The navy/pastel `styles.tcss` restyle repaints the shared chrome on every
+    screen, drifting every tc016s cell. The per-screen Inc-3..7 marks + the
+    batch-46 patch mark already cover workspace / a2l / mac-WIDE / map / patch;
+    this mark covers exactly the cells they do NOT — issues (all), the narrow
+    mac-80x24 cells, and the diff scaffold — so each cell carries one
+    ``xfail(strict=False)``. Retired when the canonical-CI baseline regen lands
+    (batch-47 post-merge follow-up), together with the per-screen marks.
+    """
+    covers_remaining = (
+        screen == "issues"
+        or (screen == "mac" and size_key == "80x24")
+        or screen == "diff"
+    )
+    if covers_remaining:
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 Inc-8 R-TUI-065 US-FND: app-wide navy/pastel theme "
+                    "(styles.tcss $-var swap + sev-* pastel align + dolphie panel "
+                    "chrome) repaints shared chrome on every screen; SVG baseline "
+                    "regen pending in canonical CI (snapshot-regen.yml, batch-47 "
+                    "post-merge follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -535,7 +729,11 @@ _RESTYLED_CELLS = [
         marks=_restyled_cell_marks(screen)
         + _batch31_drift_marks(screen, density, size_key)
         + _batch44_drift_marks(screen, density, size_key)
-        + _batch45_footer_drift_marks(screen, density, size_key),
+        + _batch45_footer_drift_marks(screen, density, size_key)
+        + _batch47_workspace_drift_marks(screen, density, size_key)
+        + _batch47_a2l_drift_marks(screen, density, size_key)
+        + _batch47_mac_drift_marks(screen, density, size_key)
+        + _batch47_theme_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
@@ -583,7 +781,9 @@ _SCAFFOLD_CELLS = [
         + _batch44_drift_marks(screen, "comfortable", size_key)
         + _batch45_map_drift_marks(screen, "comfortable", size_key)
         + _batch45_footer_drift_marks(screen, "comfortable", size_key)
-        + _batch46_patch_drift_marks(screen, "comfortable", size_key),
+        + _batch46_patch_drift_marks(screen, "comfortable", size_key)
+        + _batch47_map_drift_marks(screen, "comfortable", size_key)
+        + _batch47_theme_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

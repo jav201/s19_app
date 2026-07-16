@@ -43,9 +43,10 @@ Memory Map and A2B Diff panels are unchanged.
 
 from __future__ import annotations
 
+import bisect
 from dataclasses import dataclass
 from math import ceil
-from typing import Any, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -71,7 +72,9 @@ from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
+from .insight_style import human_bytes, microbar
 from .os_clipboard_input import OsClipboardInput
+from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
 from .services.flow_model import (
     BLOCK_PATCH,
@@ -189,6 +192,28 @@ _GLANCE_BAR_WIDTH = 6
 
 #: Fixed number of sparkline columns the profile is sampled to (LLR-045B.2).
 _SPARKLINE_WIDTH = 24
+
+#: Cell width of the per-region size micro-bar on each ``RegionRow`` (batch-47,
+#: R-TUI-073 / LLR-073.1). Kept short so the enriched row (glyph · addr · size ·
+#: bar · N sym · band · ↵) fits the tightest measured region-row width — 52 cols
+#: at 120x30 (C-29 pilot measurement, Inc-6).
+_REGION_MICROBAR_WIDTH = 4
+
+#: App-supplied hatch glyph marking an unmapped address gap in the band strip
+#: (batch-47, R-TUI-072 / LLR-072.1). NOT an entropy band and NOT sourced from
+#: ``entropy_style`` — the strip's band glyphs come from ``ENTROPY_BAND_GLYPH``.
+_MAP_GAP_HATCH = "╱"
+
+#: Open-in-hex affordance glyph on each ``RegionRow`` (batch-47, LLR-073.2). A
+#: hint that a single click drives the reused ``RegionRow.Activated`` nav.
+_OPEN_IN_HEX_GLYPH = "↵"  # ↵
+
+#: Target row count for the Memory-Map region inspector hex peek (batch-47,
+#: R-TUI-074 / LLR-074.2). The ``#map_detail`` pane is ``height: auto`` and
+#: reachable under scroll (C-29 pilot: 2 visible rows @120x30 / 1 @80x24; the
+#: detail Static already overflows-under-scroll by the batch-45 design), so a
+#: 3-row peek is content that is reachable under scroll, never clipped.
+_MAP_PEEK_ROWS = 3
 
 
 def entropy_ramp_glyph(entropy: float) -> str:
@@ -745,6 +770,45 @@ def covering_range(
     return first_valid
 
 
+def _tag_address(tag: Mapping[str, Any]) -> Optional[int]:
+    """Return an A2L tag's integer address, or ``None`` for a hostile shape.
+
+    Summary:
+        Extract the ``address`` of an enriched A2L tag as a real ``int``,
+        rejecting the same hostile shapes ``symbols_in_window`` rejects — a
+        non-dict tag, a missing/``None``/``str`` address, or a ``bool`` (which
+        is an ``int`` subclass but is never a valid address). The shared guard
+        keeps the region-row symbol count (LLR-073.1) aligned with the
+        detail-pane symbol join.
+
+    Args:
+        tag (Mapping[str, Any]): One enriched A2L tag dict.
+
+    Returns:
+        Optional[int]: The tag's address as an ``int``, or ``None`` when the
+        shape is malformed.
+
+    Data Flow:
+        - Read-only over one already-parsed tag dict; no analysis.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets`` (per-region ``N sym`` count)
+
+    Example:
+        >>> _tag_address({"name": "CAL", "address": 0x10})
+        16
+        >>> _tag_address({"name": "CAL", "address": True}) is None
+        True
+    """
+    if not isinstance(tag, dict):
+        return None
+    addr = tag.get("address")
+    if isinstance(addr, bool) or not isinstance(addr, int):
+        return None
+    return addr
+
+
 def symbols_in_window(
     tags: Sequence[Mapping[str, Any]],
     start: int,
@@ -1036,6 +1100,93 @@ class RegionRow(Static):
         self.post_message(self.Activated(self.region_start, self.region_end))
 
 
+class MapRuler(Horizontal):
+    """Address ruler beneath the entropy band strip (batch-47, R-TUI-072).
+
+    Summary:
+        A single-row ruler of exactly five evenly-spaced tick labels at
+        0 / 25 / 50 / 75 / 100 % of the image address span (LLR-072.3): tick 0 %
+        is the span start and tick 100 % is the span end. Each tick is a
+        markup-safe ``.map-ruler-tick`` ``Static`` distributed by ``width: 1fr``
+        so the five labels spread across the strip without overlap at both the
+        80x24 and 120x30 regimes (C-29 two-axis pilot: the ruler spans the full
+        ``#map_grid`` content width — 66 cols @80x24, 52 cols @120x30). Labels
+        are 8 hex digits WITHOUT the ``0x`` prefix (C-13.1 deficit-matched
+        fallback: five ``0x``-prefixed labels overflow the 52-col grid @120x30;
+        dropping ``0x`` recovers 2 cols/label = 10 cols, which fits). The widget
+        is self-styled via ``DEFAULT_CSS`` (no ``styles.tcss`` edit) and carries
+        NO member named ``_nodes`` / ``_context`` (Textual internal-shadowing
+        guard — verified ``set(dir(Widget)) & {_span_start, _span_end} == ∅``).
+
+    Args:
+        span_start (int): Inclusive image span start (0 % tick address).
+        span_end (int): Exclusive image span end (100 % tick address).
+
+    Data Flow:
+        - Built by ``MemoryMapPanel._build_band_widgets`` from the same
+          ``derive_image_span`` bounds the band bar uses; mounted as a
+          ``#map_grid`` child beneath the band row.
+
+    Dependencies:
+        Uses:
+            - ``safe_text`` (markup-safe tick labels)
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets``
+
+    Example:
+        >>> ruler = MapRuler(0x80000000, 0x80010000)
+        >>> ruler._span_start, ruler._span_end
+        (2147483648, 2147549184)
+    """
+
+    #: Number of ruler ticks (0/25/50/75/100 %). Fixed by LLR-072.3.
+    _TICK_COUNT = 5
+
+    DEFAULT_CSS = """
+    MapRuler {
+        width: 100%;
+        height: 1;
+        layout: horizontal;
+    }
+    MapRuler .map-ruler-tick {
+        width: 1fr;
+        height: 1;
+    }
+    """
+
+    def __init__(self, span_start: int, span_end: int) -> None:
+        super().__init__(classes="map-ruler")
+        self._span_start = span_start
+        self._span_end = span_end
+
+    def compose(self) -> ComposeResult:
+        """Yield the five markup-safe tick labels across the span.
+
+        Summary:
+            Emit one ``.map-ruler-tick`` ``Static`` per tick at
+            ``i / (N-1)`` of the span for ``i in 0..N-1``; tick 0 is exactly the
+            span start and the final tick is exactly the span end (no rounding
+            drift at the endpoints, LLR-072.3). Labels are 8-hex-digit addresses.
+
+        Returns:
+            ComposeResult: five ``.map-ruler-tick`` ``Static`` widgets.
+
+        Dependencies:
+            Uses:
+                - ``safe_text``
+            Used by:
+                - Textual mount pipeline
+        """
+        span = self._span_end - self._span_start
+        last = self._TICK_COUNT - 1
+        for index in range(self._TICK_COUNT):
+            if index == last:
+                addr = self._span_end
+            else:
+                addr = self._span_start + span * index // last
+            yield Static(safe_text(f"{addr:08X}"), classes="map-ruler-tick")
+
+
 class MemoryMapPanel(Container):
     """Entropy band view of the loaded image's mapped memory.
 
@@ -1141,6 +1292,14 @@ class MemoryMapPanel(Container):
         #: The currently-selected region's start address, or ``None`` before any
         #: selection — carried on the Open-in-Hex message (LLR-041.6 / R-TUI-062).
         self._selected_cell_start: Optional[int] = None
+        #: ``{region_start: band_label}`` for the last render's merged runs
+        #: (batch-47, R-TUI-074) — the inspector reads a region's dominant band
+        #: from its own run rather than recomputing entropy (LLR-074.1).
+        self._run_bands: Dict[int, str] = {}
+        #: The loaded image's address→byte map handed in by ``update_memory_map``
+        #: (batch-47, R-TUI-074) — the read-only source for the inspector hex
+        #: peek (LLR-074.2). Empty on the no-file path; never re-parsed.
+        self._mem_map: Mapping[int, int] = {}
 
     def compose(self) -> ComposeResult:
         """Compose the header, the band-view body and the (empty) placeholders.
@@ -1179,6 +1338,7 @@ class MemoryMapPanel(Container):
         issues: Sequence[ValidationIssue] = (),
         a2l_tags: Sequence[Mapping[str, Any]] = (),
         entropy_windows: Sequence[EntropyWindow] = (),
+        mem_map: Optional[Mapping[int, int]] = None,
     ) -> None:
         """Render the entropy band view from already-computed windows.
 
@@ -1217,6 +1377,12 @@ class MemoryMapPanel(Container):
                 empty on the no-file path. The trailing default keeps every
                 pre-batch-45 caller working (C-26 safe, mirrors the batch-43
                 ``a2l_tags`` 4th-arg pattern).
+            mem_map (Optional[Mapping[int, int]]): The loaded image's
+                address→byte map (``LoadedFile.mem_map``), read-only, for the
+                region-inspector hex peek (batch-47, R-TUI-074 / LLR-074.2).
+                ``None`` (the default) keeps every pre-batch-47 caller working
+                and leaves the peek empty (C-26 safe, same trailing-default
+                pattern as ``entropy_windows``).
 
         Returns:
             None
@@ -1251,6 +1417,8 @@ class MemoryMapPanel(Container):
         grid.remove_children()
         self._issues = list(issues)
         self._a2l_tags = list(a2l_tags)
+        self._mem_map = mem_map or {}
+        self._run_bands = {}
         self._reset_detail()
 
         span_start, span_end = derive_image_span(ranges)
@@ -1272,7 +1440,10 @@ class MemoryMapPanel(Container):
         self._ordered_ranges = ordered
 
         runs = _merge_band_runs(entropy_windows)
-        grid.mount(*self._build_band_widgets(runs, entropy_windows))
+        self._run_bands = {start: band for band, _run_bytes, start in runs}
+        grid.mount(
+            *self._build_band_widgets(runs, entropy_windows, span_start, span_end)
+        )
 
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
         summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
@@ -1281,70 +1452,144 @@ class MemoryMapPanel(Container):
 
         self._render_stats(ranges, range_validity, self._issues, empty=False)
 
+    def _region_symbol_counts(
+        self, runs: Sequence[Tuple[str, int, int]]
+    ) -> Dict[int, int]:
+        """Count A2L enriched-tag addresses per region via ``range_index``.
+
+        Summary:
+            Return ``{region_start: N sym}`` — the number of ``_a2l_enriched_tags``
+            addresses falling inside each merged run's ``[start, start+bytes)``
+            span (batch-47, R-TUI-073 / LLR-073.1). Built with the frozen
+            ``range_index`` membership primitives, NOT a linear
+            O(tags × regions) scan: one ``build_sorted_range_index`` over ALL
+            region ranges (O(R log R)), then a single pass over the tags where
+            each address is tested with ``address_in_sorted_ranges`` (O(log R))
+            and, when it hits, located to its owning region by the same
+            ``bisect_right`` on the shared ``starts`` vector that the primitive
+            uses internally — O(T log R) total, no per-region re-scan.
+
+        Args:
+            runs (Sequence[Tuple[str, int, int]]): The merged
+                ``(band_label, summed_bytes, start_addr)`` runs (disjoint spans).
+
+        Returns:
+            Dict[int, int]: ``{region_start: symbol_count}`` for every run.
+
+        Data Flow:
+            - Reads ``self._a2l_tags`` (read-only) + ``runs``; produces the
+              per-region counts the region rows render.
+
+        Dependencies:
+            Uses:
+                - ``build_sorted_range_index`` / ``address_in_sorted_ranges``
+                  (frozen ``range_index``, read-only) / ``bisect.bisect_right``
+                  / ``_tag_address``
+            Used by:
+                - ``_build_band_widgets``
+        """
+        region_ranges = [
+            (start, start + run_bytes) for _band, run_bytes, start in runs
+        ]
+        index = build_sorted_range_index(region_ranges)
+        starts, _ends = index
+        counts: Dict[int, int] = {start: 0 for start in starts}
+        for tag in self._a2l_tags:
+            addr = _tag_address(tag)
+            if addr is None or not address_in_sorted_ranges(addr, index):
+                continue
+            slot = bisect.bisect_right(starts, addr) - 1
+            counts[starts[slot]] += 1
+        return counts
+
     def _build_band_widgets(
         self,
         runs: Sequence[Tuple[str, int, int]],
         windows: Sequence[EntropyWindow],
+        span_start: int,
+        span_end: int,
     ) -> List[Container]:
-        """Build the band row (bar + At-a-glance), region list and legend.
+        """Build the band row (bar + glance), address ruler, region list, legend.
 
         Summary:
             Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
-            R-TUI-061): a ``.map-band-row`` docking the proportional
-            ``.map-band-bar`` (one segment per run, width ∝ byte share) beside
-            the ``.at-a-glance`` panel (per-band histogram + profile sparkline,
-            LLR-045B), then the ``.map-region-list`` (one addr/size/band row per
-            run) and the ``.map-band-legend`` (one row per band label). Each is
-            addressed by CLASS (not id) because they are re-mounted every render
-            (an id would trip ``DuplicateIds``). Every segment/row is a widget
-            carrying its ``band-*`` CSS class (``styles.tcss`` owns the colour)
-            with markup-safe ``Text`` via ``safe_text`` (LLR-041.11). Region
-            rows + the At-a-glance panel carry no file-derived text — region
-            rows are addr/size/band only; the histogram/sparkline use constant
-            band labels (security B3). At ``width-narrow`` the band row reflows
-            to vertical (band bar over glance) so both fit the 80×24 floor
-            (LLR-045B.3).
+            R-TUI-061; extended batch-47, R-TUI-072/073): a ``.map-band-row``
+            docking the proportional ``.map-band-bar`` beside the
+            ``.at-a-glance`` panel, a NEW :class:`MapRuler` address ruler beneath
+            the band row (5 ticks, LLR-072.3), then the ``.map-region-list`` and
+            the ``.map-band-legend``. The band bar now spans the whole image
+            ADDRESS SPACE (width ∝ byte share of ``span_end - span_start``, not
+            of the mapped-bytes total), so unmapped address gaps between runs
+            render as ``╱`` hatch segments (``.map-band-gap``, LLR-072.1); a
+            contiguous image (no gap) keeps its pre-batch-47 widths (span ==
+            mapped bytes). Each region row is enriched to ``{glyph} 0x{addr}
+            {human_bytes} {microbar} {N} sym {band} ↵`` — a humanized size
+            (LLR-072.2), a size micro-bar vs the largest region (LLR-073.1), the
+            ``range_index`` symbol count (LLR-073.1) and the ``↵`` open-in-hex
+            affordance (LLR-073.2). Region rows still carry NO file-derived text
+            (band labels + counts only — security B3). Each sub-widget is
+            addressed by CLASS (re-mounted every render; an id would trip
+            ``DuplicateIds``) with markup-safe ``safe_text`` content. At
+            ``width-narrow`` the band row reflows to vertical (LLR-045B.3).
 
         Args:
             runs (Sequence[Tuple[str, int, int]]): The merged
                 ``(band_label, summed_bytes, start_addr)`` runs from
-                ``_merge_band_runs`` (non-empty).
+                ``_merge_band_runs`` (non-empty), ascending by start.
             windows (Sequence[EntropyWindow]): The loader-computed entropy
                 windows the sparkline profile is sampled from.
+            span_start (int): Inclusive image span start (``derive_image_span``).
+            span_end (int): Exclusive image span end (``derive_image_span``).
 
         Returns:
-            List[Container]: ``[band_row, region_list, legend]`` ready to mount
-            into ``#map_grid``.
+            List[Container]: ``[band_row, ruler, region_list, legend]`` ready to
+            mount into ``#map_grid``.
 
         Data Flow:
-            - Reads ``runs`` + ``windows`` + the ``entropy_style`` band maps;
+            - Reads ``runs`` + ``windows`` + the span + ``self._a2l_tags``;
               produces the widgets ``render_ranges`` mounts.
 
         Dependencies:
             Uses:
                 - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text`` /
-                  ``_build_glance_widgets``
+                  ``human_bytes`` / ``microbar`` / ``MapRuler`` /
+                  ``_region_symbol_counts`` / ``_build_glance_widgets``
             Used by:
                 - ``render_ranges``
         """
-        total_bytes = sum(run_bytes for _band, run_bytes, _start in runs) or 1
+        total_span = max(1, span_end - span_start)
+        largest_region = max(
+            (run_bytes for _band, run_bytes, _start in runs), default=1
+        ) or 1
+        sym_counts = self._region_symbol_counts(runs)
 
         segments: List[Static] = []
         region_rows: List[RegionRow] = []
+        cursor = span_start
         for band, run_bytes, start in runs:
             token, glyph, _meaning = band_style(band)
-            width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_bytes))
+            # Hatch the unmapped gap (if any) preceding this run — an
+            # app-supplied ``╱`` marker, NOT an entropy band (LLR-072.1).
+            if start > cursor:
+                gap_width = max(
+                    1, round(_BAND_BAR_WIDTH * (start - cursor) / total_span)
+                )
+                segments.append(
+                    Static(
+                        safe_text(_MAP_GAP_HATCH * gap_width),
+                        classes="map-band-seg map-band-gap",
+                    )
+                )
+            seg_width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_span))
             segments.append(
-                Static(safe_text(glyph * width), classes=f"map-band-seg {token}")
+                Static(safe_text(glyph * seg_width), classes=f"map-band-seg {token}")
             )
             region_rows.append(
-                RegionRow(
-                    safe_text(f"{glyph} 0x{start:08X} · {run_bytes} B · {band}"),
-                    region_start=start,
-                    region_end=start + run_bytes,
-                    classes=f"map-region-row {token}",
+                self._build_region_row(
+                    band, glyph, token, run_bytes, start, largest_region, sym_counts
                 )
             )
+            cursor = start + run_bytes
 
         legend_rows: List[Static] = []
         for band in ENTROPY_BAND_LABELS:
@@ -1364,9 +1609,69 @@ class MemoryMapPanel(Container):
         glance = self._build_glance_widgets(runs, windows)
         return [
             Horizontal(band_bar, glance, classes="map-band-row"),
+            MapRuler(span_start, span_end),
             Vertical(*region_rows, classes="map-region-list"),
             Vertical(*legend_rows, classes="map-band-legend"),
         ]
+
+    def _build_region_row(
+        self,
+        band: str,
+        glyph: str,
+        token: str,
+        run_bytes: int,
+        start: int,
+        largest_region: int,
+        sym_counts: Mapping[int, int],
+    ) -> RegionRow:
+        """Compose one enriched region-list row (batch-47, R-TUI-073).
+
+        Summary:
+            Build the ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym {band}
+            ↵`` row as a Rich ``Text`` (single-space separators so the row fits
+            the tightest measured region-row width — 52 cols @120x30, C-29): a
+            humanized size (LLR-072.2), a ``_REGION_MICROBAR_WIDTH``-cell size
+            micro-bar of ``run_bytes / largest_region`` (LLR-073.1), the region's
+            ``range_index`` symbol count (LLR-073.1) and the ``↵`` open-in-hex
+            affordance (LLR-073.2). Every field is developer-formatted or a
+            constant band label — NO file-derived text reaches the row (B3).
+
+        Args:
+            band (str): The run's band label.
+            glyph (str): The band's texture glyph (``entropy_style``).
+            token (str): The band's ``band-*`` CSS class token.
+            run_bytes (int): The run's byte size.
+            start (int): The run's inclusive start address.
+            largest_region (int): The largest run's byte size (micro-bar
+                denominator; ``>= 1``).
+            sym_counts (Mapping[int, int]): ``{region_start: N sym}`` from
+                ``_region_symbol_counts``.
+
+        Returns:
+            RegionRow: The composed clickable region row.
+
+        Data Flow:
+            - Pure composition over the run + counts; produces one row widget.
+
+        Dependencies:
+            Uses:
+                - ``human_bytes`` / ``microbar`` / ``safe_text`` / ``RegionRow``
+            Used by:
+                - ``_build_band_widgets``
+        """
+        n_sym = sym_counts.get(start, 0)
+        frac = run_bytes / largest_region if largest_region else 0.0
+        content = Text()
+        content.append_text(safe_text(f"{glyph} 0x{start:08X} "))
+        content.append_text(safe_text(f"{human_bytes(run_bytes)} "))
+        content.append_text(microbar(frac, _REGION_MICROBAR_WIDTH))
+        content.append_text(safe_text(f" {n_sym} sym {band} {_OPEN_IN_HEX_GLYPH}"))
+        return RegionRow(
+            content,
+            region_start=start,
+            region_end=start + run_bytes,
+            classes=f"map-region-row {token}",
+        )
 
     def _build_glance_widgets(
         self,
@@ -1625,27 +1930,30 @@ class MemoryMapPanel(Container):
         return text
 
     def on_region_row_activated(self, event: "RegionRow.Activated") -> None:
-        """Handle a region-row click: populate detail + jump to hex (R-TUI-062).
+        """Handle a region-row click: populate the inspector + jump to hex.
 
         Summary:
             On a single :class:`RegionRow.Activated` (one click), populate the
-            retained ``#map_detail`` pane for the clicked run's
-            ``[region_start, region_end)`` window via ``build_detail_text``
-            (LLR-045C — this keeps the R-TUI-041 R-3 A2L-symbol region naming
-            and its C-17 markup-safety guard alive on a LIVE path), then post
-            :class:`OpenInHexRequested` so the reused app handler switches to
-            the Workspace/hex screen and repositions the hex window to the
-            run's start (LLR-045C.1). The detail is populated BEFORE the nav
-            message so the pane reflects the selection when the operator returns
-            to the map. The window status is derived from the already-stored
-            ``_ordered_ranges`` via ``cell_status`` — no re-parse (LLR-041.7).
+            retained ``#map_detail`` inspector for the clicked run's
+            ``[region_start, region_end)`` window (batch-45 LLR-045C + batch-47
+            R-TUI-074): the ``build_detail_text`` body (status chip, span/size,
+            R-TUI-041 R-3 A2L-symbol region naming with its C-17 markup-safety
+            guard), then a humanized size + the region's dominant band + a ≤3-row
+            hex peek at the region start (LLR-074.1/074.2). It then posts
+            :class:`OpenInHexRequested` so the reused app handler switches to the
+            Workspace/hex screen (LLR-045C.1). Detail is populated BEFORE the nav
+            message so the pane reflects the selection when the operator returns.
+            Every file-derived string in the inspector (A2L symbol names via
+            ``build_detail_text``) renders through ``safe_text`` — the peek adds
+            only developer-formatted hex, no untrusted text (C-17 / MN-4).
 
         Args:
             event (RegionRow.Activated): The clicked run's window.
 
         Dependencies:
             Uses:
-                - ``cell_status`` / ``build_detail_text`` / ``OpenInHexRequested``
+                - ``cell_status`` / ``build_detail_text`` / ``band_style`` /
+                  ``human_bytes`` / ``_region_hex_peek`` / ``OpenInHexRequested``
             Used by:
                 - Textual message dispatch (from ``RegionRow``)
         """
@@ -1653,9 +1961,73 @@ class MemoryMapPanel(Container):
         start, end = event.region_start, event.region_end
         self._selected_cell_start = start
         status = cell_status(start, end, self._ordered_ranges)
+        detail = self.build_detail_text(start, end, status)
+        detail.append("\n")
+        detail.append(f"Size: {human_bytes(end - start)}\n")
+        band = self._run_bands.get(start)
+        if band is not None:
+            _token, glyph, _meaning = band_style(band)
+            detail.append(f"Dominant band: {glyph} {band}\n")
+        detail.append(f"Peek @ 0x{start:08X}:\n")
+        detail.append(self._region_hex_peek(start, end))
         body = self.query_one("#map_detail_body", Static)
-        body.update(self.build_detail_text(start, end, status))
+        body.update(detail)
         self.post_message(self.OpenInHexRequested(start))
+
+    def _region_hex_peek(self, start: int, end: int) -> Text:
+        """Render a ≤3-row hex peek at a region's start (batch-47, R-TUI-074).
+
+        Summary:
+            Return a markup-safe ``Text`` hex+ASCII peek of up to
+            ``_MAP_PEEK_ROWS`` 16-byte rows beginning at ``start``, using the
+            plain ``hexview.render_hex_view`` renderer over the stored
+            ``self._mem_map`` (LLR-074.2). Row bases start at the
+            ``HEX_WIDTH``-aligned base of ``start`` and stop at the region end,
+            so the first rendered row is the ``HEX_WIDTH``-aligned row that
+            CONTAINS ``start`` (standard hex-grid convention); when the region
+            start is 16-aligned (the common case) that row address equals the
+            region start, otherwise it is the aligned row containing it. A
+            region shorter than three rows
+            shows only the available rows. The peek carries only developer hex
+            formatting — no file-derived text — but is still wrapped in
+            ``safe_text`` for uniform markup-safety. An empty ``_mem_map`` (no
+            file / headless) yields an empty ``Text`` rather than raising.
+
+        Args:
+            start (int): The region's inclusive start address.
+            end (int): The region's exclusive end address.
+
+        Returns:
+            Text: The composed, markup-safe hex peek (possibly empty).
+
+        Data Flow:
+            - Reads ``self._mem_map`` (read-only) + the region bounds; produces
+              the ``Text`` appended to ``#map_detail_body``.
+
+        Dependencies:
+            Uses:
+                - ``hexview.render_hex_view`` / ``hexview.HEX_WIDTH`` /
+                  ``safe_text``
+            Used by:
+                - ``on_region_row_activated``
+        """
+        if not self._mem_map:
+            return safe_text("")
+        from .hexview import HEX_WIDTH, render_hex_view
+
+        base = start - (start % HEX_WIDTH)
+        row_bases: List[int] = []
+        addr = base
+        while addr < end and len(row_bases) < _MAP_PEEK_ROWS:
+            row_bases.append(addr)
+            addr += HEX_WIDTH
+        # Pass the stored map directly (no O(N) copy — large images are 40M+);
+        # supplying ``row_bases`` skips ``build_row_bases`` so only the ≤3 peek
+        # rows are materialised.
+        rendered = render_hex_view(
+            self._mem_map, row_bases=row_bases, max_rows=_MAP_PEEK_ROWS
+        )
+        return safe_text(rendered)
 
 
 def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:

@@ -39,6 +39,12 @@ class LoadedFile:
             path (``load_service.build_loaded_*``) and cached here so the
             Memory-Map band view reads them without recomputing on the UI
             thread (batch-45, R-TUI-060 / LLR-045A.2). Empty for an empty map.
+        out_of_order_count (int): Number of non-monotonic S19 data records
+            (``len(S19File.get_out_of_order_records())``); ``0`` for HEX loads
+            and any construction that omits it (batch-47, LLR-066.5).
+        entry_point (Optional[int]): Address of the S19 terminator record
+            (S7/S8/S9), or ``None`` when absent — including all HEX loads, which
+            discard type 03/05 start-address records (batch-47, LLR-066.5).
 
     Data Flow:
         - Produced by ``S19TuiApp._parse_loaded_file``.
@@ -63,6 +69,8 @@ class LoadedFile:
     variant_id: Optional[str] = None
     source_s0_header: Optional[bytes] = None
     entropy_windows: List[EntropyWindow] = field(default_factory=list)
+    out_of_order_count: int = 0  # non-monotonic S19 data records (LLR-066.5)
+    entry_point: Optional[int] = None  # S7/S8/S9 terminator address; None for HEX (LLR-066.5)
 
 
 @dataclass(frozen=True)
