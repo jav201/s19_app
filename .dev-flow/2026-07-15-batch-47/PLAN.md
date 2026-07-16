@@ -27,7 +27,10 @@
 | 4 | US-A2L | app.py (_build_a2l_table_cells→tuple[Text]·detail card·row-highlight) · test_tui_a2l_detail.py NEW · a2l_injection NEW | 3 | A2L feature cells |
 | 5 | US-MAC | app.py (glyph+strip) · validation_service.py (gating) · test_tui_mac_coverage.py NEW · mac_injection+parse-error NEW | 4 | MAC feature cells |
 | 6 | US-MAP | screens_directionb.py (bands·ruler·RegionRow·inspector) · test_tui_map_big.py NEW | 2 | Map feature cells |
-| 7 | US-FND theme | styles.tcss (app-wide navy/pastel) · test_tui_theme.py NEW (AT-065a/b) · test_tui_snapshot.py (drift marks, C-22/C-28) | 3 | ALL cells (theme) → canonical-CI regen follow-up PR |
+| 7 | US-WS classed hex | hexview.py (00/FF dim·ASCII cyan·rest bright, LLR-066.3, DEFERRED from Inc-3) · test | 2 | WS+A2L+Map hex cells |
+| 8 | US-FND theme | styles.tcss (app-wide navy/pastel) · test_tui_theme.py NEW (AT-065a/b) · test_tui_snapshot.py (drift marks, C-22/C-28) | 3 | ALL cells (theme) → canonical-CI regen follow-up PR |
+
+**Inc-3 note:** classed hex (LLR-066.3) SPLIT OFF from Inc-3 → new **Inc-7** (own hexview.py increment; no dedicated AT, white-box TC-066.6 only → no orphan). hexview.py is shared by WS + A2L + Map hex, so its drift is broader — done as its own increment before theme.
 
 **DECISION (orchestrator, autonomous, 2026-07-15):** theme (styles.tcss $-vars) sequenced LAST (Inc-7),
 split from the Inc-1 helpers. WHY: the app-wide theme drifts every snapshot cell; applying it last
@@ -41,7 +44,8 @@ postmortem.
 ## Where we are (current increment)
 - **Inc-1 — Foundation helpers** — ✅ DONE `b91e9fb`. 6 green, 0 HIGH. Binary units (§6.5 Amd D).
 - **Inc-2 — US-WS data** — ✅ DONE. models.py 2 defaulted fields + load_service; 4 green, MN-6 blast-radius 222/0, 0 HIGH.
-- **Inc-3 — US-WS render** — STARTING. app.py titles/sections/memstrip/#ws_stats/classed-hex + MJ-1 merge-carry (LLR-066.7). First app.py + snapshot-drift increment.
+- **Inc-3 — US-WS render** — ✅ DONE. app.py titles/stats/MJ-1/sections/memstrip; 14 green (AT-066a/b/c/d + AT-067); 6-cell drift xfail (C-28 clean); F1 dead-code cleanup applied; 0 HIGH. classed-hex→Inc-7.
+- **Inc-4 — US-A2L** — STARTING. colored/zebra table + in-image glyph + detail card + C-17 (AT-068/069/069b/069c).
 
 ## Phase-1 result (2026-07-15)
 - `01-requirements.md` (architect): 5 US, **10 HLR** (HLR-065..074 = R-TUI-065..074), **32 LLR**,

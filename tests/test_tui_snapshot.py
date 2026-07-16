@@ -525,6 +525,44 @@ def _batch46_patch_drift_marks(screen: str, density: str, size_key: str) -> tupl
     return ()
 
 
+# batch-47 (R-TUI-066/067, US-WS Workspace MID insight layer): the Workspace
+# screen gains pane BORDER TITLES (LLR-066.1), a loader-facts line in `#ws_stats`
+# (`Loader N err · ⚠K OOO · Entry 0x…`, LLR-066.4), entropy-banded section rows
+# with ✓/cyan-address/human_bytes/entropy-glyph (LLR-066.2), and an
+# entropy-banded `#ws_memstrip` with `╱` gap glyphs (LLR-067.1/067.2). All four
+# repaint the Workspace body, so every `workspace-*` tc016s cell (both densities
+# x 3 sizes = 6 cells) drifts. No other screen renders the Workspace body, so
+# containment is Workspace-only — the batch-47 Inc-3 snapshot run showed EXACTLY
+# the 6 workspace cells mismatched (no a2l/mac/issues/map/patch/diff/flow cell
+# moved → C-28 shared-chrome clean; no footer/header/rail binding change this
+# increment). The SVG baselines must be regenerated in the canonical CI env
+# (snapshot-regen.yml, pinned textual==8.2.8) — NOT locally (local regen drifts
+# unrelated baselines, per reference_snapshot_regen_env). Until the batch-47
+# theme+regen follow-up (Inc-7) lands, the 6 workspace cells ride
+# xfail(strict=False) (C-22 upper bound); the follow-up regen retires these marks.
+def _batch47_workspace_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 Workspace insight-layer drift marks.
+
+    The 6 ``workspace`` cells (both densities x 3 sizes) drift when the Workspace
+    gains border titles + loader-facts + entropy section rows + entropy memstrip
+    (US-WS, HLR-066/067). Marked ``xfail(strict=False)`` until the canonical-CI
+    baseline regen lands (batch-47 Inc-7 theme + regen), then retired.
+    """
+    if screen == "workspace":
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-066/067 US-WS: Workspace border titles + "
+                    "loader-facts + entropy section rows + entropy memstrip; SVG "
+                    "baseline regen pending in canonical CI (snapshot-regen.yml, "
+                    "batch-47 Inc-7 theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -535,7 +573,8 @@ _RESTYLED_CELLS = [
         marks=_restyled_cell_marks(screen)
         + _batch31_drift_marks(screen, density, size_key)
         + _batch44_drift_marks(screen, density, size_key)
-        + _batch45_footer_drift_marks(screen, density, size_key),
+        + _batch45_footer_drift_marks(screen, density, size_key)
+        + _batch47_workspace_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")

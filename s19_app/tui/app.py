@@ -73,6 +73,9 @@ from .screens_directionb import (
     status_to_css_class,
 )
 from .color_policy import css_class_for_severity
+from .entropy_style import band_style
+from .insight_style import CYAN, GREEN, RED, VALUE, YELLOW, human_bytes, microbar
+from .services.entropy_service import EntropyWindow
 from .issues_view import GroupedIssuesPanel, IssueRow
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
@@ -566,95 +569,121 @@ WORKSPACE_MEMSTRIP_DEFAULT_COLS = 76
 #: fills the cell; composed via ``safe_text`` so the band stays markup-safe.
 _STRIP_CELL_GLYPH = "█"
 
+#: App-supplied gap glyph for an unmapped address window in the memory strip
+#: (batch-47, LLR-067.2). NOT an entropy band glyph — ``entropy_style`` owns only
+#: ``· ░ ▒ ▓``; this hatch marks the holes between mapped ranges.
+_STRIP_GAP_GLYPH = "╱"
+
 #: Filled / empty glyphs for the range-magnitude micro-bar. Neither is a Rich
 #: markup metacharacter, but the bar is composed into a ``rich.text.Text`` (never
 #: a markup-parsed string) so the render surface stays markup-safe by construction.
-_BAR_FILLED_GLYPH = "█"
-_BAR_EMPTY_GLYPH = "░"
-
-
-def coverage_bar_cells(
-    size: int, max_size: int, width: int = SECTIONS_COVERAGE_BAR_WIDTH
-) -> int:
+def dominant_band_label(
+    entropy_windows: Sequence[EntropyWindow], start: int, end: int
+) -> Optional[str]:
     """
     Summary:
-        Compute the filled-cell count for a range-magnitude coverage micro-bar
-        (LLR-042.7 / R4). The bar's fill width is proportional to this range's
-        byte-size **relative to the largest rendered range** — a relative-
-        magnitude spark, NOT a covered-fraction (a contiguous range is 100%
-        covered by definition). Pure arithmetic; no widget or file access.
+        Return the entropy band label covering the most bytes of the half-open
+        address window ``[start, end)``, or ``None`` when no computed entropy
+        window overlaps it (batch-47, LLR-066.2 / LLR-067.1). Pure arithmetic
+        over the already-computed ``LoadedFile.entropy_windows`` — it recomputes
+        no entropy.
 
     Args:
-        size (int): This range's byte-size (``end - start``).
-        max_size (int): The largest range byte-size among the rendered rows.
-        width (int): Total bar cell budget (defaults to
-            ``SECTIONS_COVERAGE_BAR_WIDTH``).
+        entropy_windows (Sequence[EntropyWindow]): Loader-computed windows in
+            ascending address order (``LoadedFile.entropy_windows``).
+        start (int): Inclusive window start address.
+        end (int): Exclusive window end address.
 
     Returns:
-        int: Filled-cell count in ``[0, width]``. ``0`` for a non-positive
-        ``size`` / ``max_size`` / ``width``; otherwise at least ``1`` so any
-        non-empty range shows a bar, and exactly ``width`` for the largest
-        range. Monotonic non-decreasing in ``size`` (a larger range never
-        yields a narrower bar).
+        Optional[str]: The band label with the greatest total overlapping byte
+        span in ``[start, end)``; ``None`` when no window overlaps (empty
+        windows or an all-gap window).
 
     Data Flow:
-        - Called per range row by ``build_coverage_bar_text`` /
-          ``S19TuiApp.update_sections``.
-
-    Dependencies:
-        Used by:
-            - ``build_coverage_bar_text``
-            - (test) TC-042.7
-
-    Example:
-        >>> coverage_bar_cells(100, 100, 8)
-        8
-        >>> coverage_bar_cells(1, 100, 8)
-        1
-        >>> coverage_bar_cells(0, 100, 8)
-        0
-    """
-    if width <= 0 or max_size <= 0 or size <= 0:
-        return 0
-    filled = round(size / max_size * width)
-    return max(1, min(width, filled))
-
-
-def build_coverage_bar_text(
-    size: int, max_size: int, width: int = SECTIONS_COVERAGE_BAR_WIDTH
-) -> Text:
-    """
-    Summary:
-        Compose the markup-safe range-magnitude micro-bar as a ``rich.text.Text``
-        of ``filled`` block glyphs followed by an empty-track remainder
-        (LLR-042.7). Colour is NOT encoded here — the range row's ``sev-*`` CSS
-        class (added by ``update_sections``) colours the whole label, so the bar
-        inherits validity colour.
-
-    Args:
-        size (int): This range's byte-size.
-        max_size (int): The largest rendered range byte-size.
-        width (int): Total bar cell budget.
-
-    Returns:
-        Text: A fixed-``width`` bar (``filled`` block glyphs + empty track),
-        composed markup-safe (``Text.append`` never parses markup).
-
-    Data Flow:
-        - Called by ``update_sections``; appended as the range row's third line.
+        - Accumulates overlap byte counts per band label, then returns the
+          arg-max; ties resolve to the first band reaching the max (dict
+          insertion order over the ascending-address windows).
+        - Called by ``update_sections`` (per range row) and
+          ``update_memory_strip`` (per strip cell) to pick a cell's band glyph.
 
     Dependencies:
         Uses:
-            - ``coverage_bar_cells``
+            - EntropyWindow (read-only)
         Used by:
             - ``S19TuiApp.update_sections``
-            - (test) TC-042.7
+            - ``S19TuiApp.update_memory_strip``
+
+    Example:
+        >>> from s19_app.tui.services.entropy_service import EntropyWindow
+        >>> w = EntropyWindow(0x0, 0x100, 256, 0.0, "constant/padding", False)
+        >>> dominant_band_label([w], 0x0, 0x80)
+        'constant/padding'
+        >>> dominant_band_label([w], 0x200, 0x280) is None
+        True
     """
-    filled = coverage_bar_cells(size, max_size, width)
-    bar = Text()
-    bar.append(_BAR_FILLED_GLYPH * filled)
-    bar.append(_BAR_EMPTY_GLYPH * max(0, width - filled))
-    return bar
+    totals: dict[str, int] = {}
+    for window in entropy_windows:
+        lo = max(start, window.start)
+        hi = min(end, window.end)
+        if hi > lo:
+            totals[window.band] = totals.get(window.band, 0) + (hi - lo)
+    if not totals:
+        return None
+    return max(totals, key=lambda label: totals[label])
+
+
+def build_loader_facts_text(
+    error_count: int, ooo_count: int, entry_point: Optional[int]
+) -> Text:
+    """
+    Summary:
+        Compose the Workspace loader-facts line
+        ``Loader N err · ⚠K OOO · Entry <hex-or-—>`` as a markup-safe
+        ``rich.text.Text`` (batch-47, LLR-066.4 / LLR-066.6). Carries only
+        numeric counts and a formatted hex entry address — never any
+        file-derived free text — so the line is C-17-inert by construction.
+
+    Args:
+        error_count (int): ``len(LoadedFile.errors)`` — loader-level error count.
+        ooo_count (int): ``LoadedFile.out_of_order_count`` — non-monotonic S19
+            data-record count.
+        entry_point (Optional[int]): ``LoadedFile.entry_point`` — the S7/S8/S9
+            terminator address. A present-but-zero entry (``0x0``) renders
+            ``Entry 0x00000000`` (PRESENT); ``None`` renders ``Entry —``
+            (ABSENT, e.g. every HEX load).
+
+    Returns:
+        Text: The single loader-facts line, styled (err red when non-zero, OOO
+        yellow when non-zero, entry cyan). Never a ``str``; never markup-parsed.
+
+    Data Flow:
+        - Pure formatting of already-derived scalars; appended by
+          ``update_workspace_stats`` under the coverage-stats block in
+          ``#ws_stats``.
+
+    Dependencies:
+        Uses:
+            - rich.text.Text ; CYAN ; RED ; VALUE ; YELLOW
+        Used by:
+            - ``S19TuiApp.update_workspace_stats``
+            - (test) AT-066a/AT-066b/AT-066c/AT-066d over ``#ws_stats``
+
+    Example:
+        >>> build_loader_facts_text(0, 4, 0x0).plain
+        'Loader 0 err · ⚠4 OOO · Entry 0x00000000'
+        >>> build_loader_facts_text(0, 0, None).plain
+        'Loader 0 err · ⚠0 OOO · Entry —'
+    """
+    entry = f"0x{entry_point:08X}" if entry_point is not None else "—"
+    text = Text()
+    text.append("Loader ")
+    text.append(f"{error_count} err", style=RED if error_count else VALUE)
+    text.append(" · ")
+    text.append(f"⚠{ooo_count} OOO", style=YELLOW if ooo_count else VALUE)
+    text.append(" · ")
+    text.append("Entry ")
+    text.append(entry, style=CYAN)
+    return text
 
 
 def build_workspace_stats_text(
@@ -1400,6 +1429,14 @@ class S19TuiApp(App):
             id="ws_right",
             classes="db-pane",
         )
+        # Pane border titles/subtitles — the dolphie-idiom insight chrome
+        # (batch-47, LLR-066.1). Static labels; no file-derived text.
+        _left_pane.border_title = "Workspace"
+        _left_pane.border_subtitle = "sections"
+        _center_pane.border_title = "Hex View"
+        _center_pane.border_subtitle = "bytes"
+        _right_pane.border_title = "Context"
+        _right_pane.border_subtitle = "coverage"
         _panes = Horizontal(
             _left_pane,
             _center_pane,
@@ -6967,6 +7004,10 @@ class S19TuiApp(App):
             # A new primary is a new image: keep the incoming payload's
             # variant identity (stamped at apply time), never the old one.
             variant_id=primary_loaded.variant_id,
+            # Derived loader facts belong to the NEW primary image — carry them
+            # forward so the merge does not reset them to defaults (LLR-066.7).
+            out_of_order_count=primary_loaded.out_of_order_count,
+            entry_point=primary_loaded.entry_point,
         )
 
     def _merge_mac_with_existing_primary(self, mac_loaded: LoadedFile) -> LoadedFile:
@@ -7010,6 +7051,10 @@ class S19TuiApp(App):
             # The primary image is unchanged — its variant identity survives
             # the MAC overlay (project MAC follow-up load, LLR-005.6).
             variant_id=existing.variant_id,
+            # The primary's derived loader facts survive the MAC overlay — carry
+            # them forward so the merge does not reset them (LLR-066.7, AT-066d).
+            out_of_order_count=existing.out_of_order_count,
+            entry_point=existing.entry_point,
         )
 
     def _invalidate_mac_view_cache(self) -> None:
@@ -8151,9 +8196,12 @@ class S19TuiApp(App):
         Data Flow:
             - Clear widget, refresh the Workspace stat pane and the whole-image
               memory strip, and short-circuit when no file is loaded.
-            - Append at most ``MAX_SECTIONS_PRIMARY_RANGES`` memory-range rows with
-              OK/ERROR coloring plus a range-magnitude coverage micro-bar as an
-              added third line (LLR-042.7), then a truncation row when more exist.
+            - Append at most ``MAX_SECTIONS_PRIMARY_RANGES`` memory-range rows,
+              each an in-range ``✓`` glyph + cyan address, a humanized size
+              (``human_bytes``) with the range's dominant entropy-band glyph, and
+              a size micro-bar (``microbar(size / biggest)``) as the third line
+              (LLR-042.7 / batch-47 LLR-066.2), then a truncation row when more
+              exist. OK/ERROR ``sev-*`` colouring is retained on the row label.
             - Append at most ``MAX_SECTIONS_OUT_OF_RANGE`` MAC out-of-range rows; when
               truncated, add a single summary row pointing users at the Issues panel.
 
@@ -8161,7 +8209,8 @@ class S19TuiApp(App):
             Uses:
                 - ``_collect_mac_out_of_range_addresses``
                 - ``css_class_for_severity``
-                - ``build_coverage_bar_text``
+                - ``dominant_band_label`` / ``band_style`` / ``human_bytes`` /
+                  ``microbar``
                 - ``update_workspace_stats``
                 - ``update_memory_strip``
             Used by:
@@ -8179,12 +8228,27 @@ class S19TuiApp(App):
         range_cap = MAX_SECTIONS_PRIMARY_RANGES
         visible_ranges = list(zip(ranges[:range_cap], validity[:range_cap]))
         max_size = max((end - start for (start, end), _ in visible_ranges), default=0)
+        entropy_windows = self.current_file.entropy_windows
         for (start, end), is_valid in visible_ranges:
             size = end - start
+            band_glyph = ""
+            if entropy_windows:
+                band_label = dominant_band_label(entropy_windows, start, end)
+                if band_label is not None:
+                    band_glyph = band_style(band_label)[1]
             content = Text()
-            content.append(f"0x{start:08X}\n")
-            content.append(f"– 0x{end - 1:08X}  {size}B\n")
-            content.append_text(build_coverage_bar_text(size, max_size))
+            content.append("✓ ", style=GREEN)
+            content.append(f"0x{start:08X}\n", style=CYAN)
+            content.append(f"– 0x{end - 1:08X}  ")
+            content.append(human_bytes(size).rjust(9), style=VALUE)
+            if band_glyph:
+                content.append(f" {band_glyph}")
+            content.append("\n")
+            content.append_text(
+                microbar(
+                    size / max_size if max_size else 0.0, SECTIONS_COVERAGE_BAR_WIDTH
+                )
+            )
             label = Label(content)
             severity = ValidationSeverity.OK if is_valid else ValidationSeverity.ERROR
             label.add_class(css_class_for_severity(severity))
@@ -8249,12 +8313,15 @@ class S19TuiApp(App):
             - Otherwise compute ``coverage_stats`` over the already-parsed
               ``ranges`` / ``range_validity`` and the pre-computed
               ``_validation_issues``, tally ERROR / WARNING counts, and render
-              the markup-safe stat text into ``#ws_stats``.
+              the markup-safe stat text into ``#ws_stats``, followed by the
+              loader-facts line (``Loader N err · ⚠K OOO · Entry <hex-or-—>``,
+              batch-47 LLR-066.4) built from the derived ``LoadedFile`` fields.
 
         Dependencies:
             Uses:
                 - ``coverage_stats``
                 - ``build_workspace_stats_text``
+                - ``build_loader_facts_text``
             Used by:
                 - ``update_sections``
         """
@@ -8284,20 +8351,31 @@ class S19TuiApp(App):
             1 for issue in self._validation_issues
             if issue.severity is ValidationSeverity.WARNING
         )
-        body.update(build_workspace_stats_text(stats, error_count, warning_count))
+        text = build_workspace_stats_text(stats, error_count, warning_count)
+        text.append("\n")
+        text.append_text(
+            build_loader_facts_text(
+                len(self.current_file.errors),
+                self.current_file.out_of_order_count,
+                self.current_file.entry_point,
+            )
+        )
+        body.update(text)
 
     def update_memory_strip(self) -> None:
         """
         Summary:
             Refresh the Workspace whole-image memory strip (``#ws_memstrip``): a
-            single-row band whose cells are coloured valid / invalid / gap over
-            the already-computed ``current_file.ranges`` / ``range_validity``,
-            reusing the batch-27 ``cell_status`` / ``status_to_css_class`` path
-            in a rows=1 variant (LLR-042.8 / US-040b). The mounted cell count is
-            BOUNDED to the band's measured content width via
-            ``cell_count_for_geometry`` (rows=1), so a hostile huge image never
-            mounts unbounded cells. Display arithmetic only — no new parse /
-            coverage / validation. No entropy (D3 descoped).
+            single-row band whose mapped cells are coloured by their dominant
+            entropy band (``entropy_style.band_style`` over the loader-computed
+            ``current_file.entropy_windows``) and whose unmapped gaps get the
+            ``╱`` hatch (batch-47, LLR-067.1/067.2). When no entropy windows are
+            present it FALLS BACK to the batch-27 valid / invalid / gap colouring
+            via ``cell_status`` / ``status_to_css_class`` (LLR-067.3). The
+            mounted cell count is BOUNDED to the band's measured content width
+            via ``cell_count_for_geometry`` (rows=1), so a hostile huge image
+            never mounts unbounded cells. Display arithmetic only — no new parse
+            / coverage / validation / entropy computation.
 
         Args:
             None
@@ -8318,7 +8396,7 @@ class S19TuiApp(App):
             Uses:
                 - ``derive_image_span`` / ``cell_count_for_geometry`` /
                   ``bytes_per_cell`` / ``cell_status`` / ``status_to_css_class``
-                  / ``safe_text``
+                  / ``dominant_band_label`` / ``band_style`` / ``safe_text``
             Used by:
                 - ``update_sections``
         """
@@ -8349,11 +8427,36 @@ class S19TuiApp(App):
         cols = size.width if size.width > 0 else WORKSPACE_MEMSTRIP_DEFAULT_COLS
         count = cell_count_for_geometry(span, cols, 1)
         per_cell = bytes_per_cell(span, count)
+        entropy_windows = self.current_file.entropy_windows
         cells: list[Static] = []
         for index in range(count):
             cell_start = span_start + index * per_cell
             cell_end = min(span_end, cell_start + per_cell)
             status = cell_status(cell_start, cell_end, ordered)
+            if entropy_windows:
+                # Entropy-banded view (batch-47, LLR-067.1/067.2): gaps get the
+                # app-supplied ``╱`` hatch; mapped cells take their dominant
+                # band's glyph + ``band-*`` class from ``entropy_style``.
+                if status == "gap":
+                    cells.append(
+                        Static(
+                            safe_text(_STRIP_GAP_GLYPH),
+                            classes=f"strip-cell {status_to_css_class('gap')}",
+                        )
+                    )
+                    continue
+                band_label = dominant_band_label(entropy_windows, cell_start, cell_end)
+                if band_label is not None:
+                    band_class, glyph, _meaning = band_style(band_label)
+                    cells.append(
+                        Static(
+                            safe_text(glyph),
+                            classes=f"strip-cell {band_class}",
+                        )
+                    )
+                    continue
+            # No entropy windows (LLR-067.3 fallback) or a mapped cell with no
+            # overlapping window: keep the pre-existing valid/invalid/gap band.
             sev_class = status_to_css_class(status)
             cells.append(
                 Static(

@@ -7196,46 +7196,6 @@ def _ws_stats_text(app: "S19TuiApp") -> str:
     return str(app.query_one("#ws_stats").render())
 
 
-def test_tc_042_7_coverage_bar_arithmetic_pure() -> None:
-    """TC-042.7 / LLR-042.7 (white-box): the micro-bar is a pure range-magnitude
-    spark — largest range → full bar, non-empty range → ≥1 cell, empty/zero-max
-    → no cells, monotonic non-decreasing in size — and its colour is the
-    validity ``sev-*`` class.
-
-    Intent: pins the bar semantics (R4) that AT-040a observes through the render
-    surface. If the fill ever became a covered-fraction (always full) or lost
-    monotonicity, or the colour stopped tracking validity, this fails.
-    """
-    from s19_app.tui.app import (
-        SECTIONS_COVERAGE_BAR_WIDTH,
-        build_coverage_bar_text,
-        coverage_bar_cells,
-    )
-    from s19_app.tui.color_policy import css_class_for_severity
-    from s19_app.validation.model import ValidationSeverity
-
-    width = SECTIONS_COVERAGE_BAR_WIDTH
-
-    # Largest range fills the whole bar; a smaller non-empty range shows ≥1 cell.
-    assert coverage_bar_cells(34, 34, width) == width, "largest range → full bar"
-    assert coverage_bar_cells(11, 34, width) >= 1, "non-empty range → at least 1 cell"
-    # Empty range and zero-max guards → no cells, no divide-by-zero.
-    assert coverage_bar_cells(0, 34, width) == 0
-    assert coverage_bar_cells(5, 0, width) == 0
-    # Monotonic non-decreasing in size (a larger range never yields a narrower bar).
-    assert coverage_bar_cells(16, 34, width) >= coverage_bar_cells(11, 34, width)
-    assert coverage_bar_cells(34, 34, width) >= coverage_bar_cells(16, 34, width)
-
-    # The rendered bar is a fixed-width Text whose filled-glyph count == cells.
-    bar = build_coverage_bar_text(11, 34, width)
-    assert bar.plain.count("█") == coverage_bar_cells(11, 34, width)
-    assert len(bar.plain) == width, "bar is a fixed-width track (no row widening)"
-
-    # Colour = validity class (the row's sev-* class the label carries).
-    assert css_class_for_severity(ValidationSeverity.OK) == "sev-ok"
-    assert css_class_for_severity(ValidationSeverity.ERROR) == "sev-error"
-
-
 def test_tc_042_9_stat_pane_values_pure() -> None:
     """TC-042.9 / LLR-042.9 (white-box): the stat-pane text is exactly coverage %
     + range count from ``coverage_stats`` and the passed error/warning tallies;
@@ -7498,14 +7458,16 @@ def _strip_cell_classes(app: "S19TuiApp") -> list[str]:
 
 
 def test_at040b_memory_strip_valid_and_gap_cells(tmp_path: Path) -> None:
-    """AT-040b / LLR-042.8 (black-box, C-10b): a gapped image renders a memory
-    strip with ≥1 valid-class (``sev-ok``) cell AND ≥1 gap-class (``sev-neutral``)
-    cell, colour routed via ``css_class_for_severity`` (the ``status_to_css_class``
-    single source of truth).
+    """AT-040b / LLR-042.8 + batch-47 HLR-067 (black-box, C-10b): a gapped image
+    with computed entropy renders a memory strip whose covered cells carry an
+    entropy ``band-*`` class AND whose gaps carry the neutral discriminator
+    (``sev-neutral``), so the strip still shows BOTH covered and gap regions.
 
-    Intent: observe the shipped ``#ws_memstrip`` cells over case_02 (valid ranges
-    separated by real gaps) — the strip must show BOTH covered and gap regions.
-    A strip that painted every cell one colour (lost the gap discriminator) fails.
+    Intent: observe the shipped ``#ws_memstrip`` cells over case_02 (mapped ranges
+    separated by real gaps). Amendment A (batch-47) replaced the covered cells'
+    validity colouring with an ENTROPY-BAND colouring (``entropy_style.band_style``);
+    the gap discriminator (neutral) is retained. A strip that painted every cell
+    one class (lost the covered/gap distinction) fails.
     """
     from s19_app.tui.color_policy import css_class_for_severity
     from s19_app.validation.model import ValidationSeverity
@@ -7521,11 +7483,11 @@ def test_at040b_memory_strip_valid_and_gap_cells(tmp_path: Path) -> None:
 
     classes = asyncio.run(_drive())
     assert classes, "case_02 must mount memory-strip cells"
-    # Colour classes are exactly what css_class_for_severity emits — no hard-code.
-    ok_class = css_class_for_severity(ValidationSeverity.OK)
+    # Covered cells now carry an entropy band-* class (Amendment A, HLR-067);
+    # gaps keep the neutral class from css_class_for_severity (single source).
     gap_class = css_class_for_severity(ValidationSeverity.NEUTRAL)
-    assert any(ok_class in c for c in classes), (
-        f"case_02's covered ranges must produce a {ok_class} cell; got {classes}"
+    assert any("band-" in c for c in classes), (
+        f"case_02's covered ranges must produce an entropy band-* cell; got {classes}"
     )
     assert any(gap_class in c for c in classes), (
         f"case_02's gaps must produce a {gap_class} cell; got {classes}"
