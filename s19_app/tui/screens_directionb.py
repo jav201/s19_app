@@ -72,7 +72,18 @@ from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
-from .insight_style import CYAN, PURPLE, VALUE, human_bytes, label_value, microbar
+from .insight_style import (
+    CYAN,
+    DGRAY,
+    GREEN,
+    PURPLE,
+    RED,
+    VALUE,
+    YELLOW,
+    human_bytes,
+    label_value,
+    microbar,
+)
 from .os_clipboard_input import OsClipboardInput
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
@@ -2263,6 +2274,22 @@ class PatchEditorPanel(ScrollableContainer):
 
     _ENTRIES_COLUMNS = ("Kind", "Address", "Value / bytes", "Status", "Linkage")
 
+    #: Check-glyph → render style (batch-48 LLR-077.3). The glyph is FOLDED
+    #: into the ``Kind`` cell as its own leading span, so this map lives at the
+    #: render boundary while ``ChangeService`` owns the token → glyph half —
+    #: the panel imports nothing from the service layer (C-7 purity).
+    #:
+    #: The two halves are keyed on the same 4 characters in two modules, so
+    #: ``test_tui_patch_glyphs.py::test_tc077_3_glyph_map`` asserts they stay
+    #: TOTAL over each other. Without that guard a glyph renamed on the service
+    #: side would fall through to the ``·`` style and mis-colour silently.
+    _GLYPH_STYLE = {
+        "✓": GREEN,
+        "✗": RED,
+        "◐": YELLOW,
+        "·": DGRAY,
+    }
+
     #: The E6 execution scopes in selector cycle order (LLR-006.6) and their
     #: button labels. The scope tokens are the service vocabulary
     #: (``variant_execution_service.EXECUTION_SCOPES``) spelled locally so
@@ -3476,6 +3503,64 @@ class PatchEditorPanel(ScrollableContainer):
         event.stop()
         self.post_message(self.ChangeFileSelected(str(event.value)))
 
+    def _kind_cell(self, row: object) -> Text:
+        """Build the ``Kind`` cell — the check glyph FOLDED in as a leading span.
+
+        Summary:
+            Render column 0 as ``"<glyph> <kind>"`` in one ``Text``: the glyph
+            leads in its own verdict-coloured span, the kind text follows in
+            the cell's PURPLE role style (LLR-077.3/077.4).
+
+            **No sixth column is added** — this is the house idiom, not an
+            invention: the A2L table folds its in-image glyph into the name
+            cell (``app.py:9548``) and the MAC table folds its status glyph
+            into the Tag cell "as its own span" (``app.py:9223-9226``), both
+            keeping the column count unchanged. A leading COLUMN would instead
+            shift ``Coordinate(row, 1)`` / ``(row, 2)`` under every existing
+            index-reader (``tests/test_tui_patch_editor_v2.py:2578``,
+            ``:3208-3209``, whose docstring pins the order as contract) and
+            force a width relaxation at 80x24 that the fold makes unnecessary.
+
+            The glyph is also NOT redundant with the ``Status`` column:
+            ``status_text`` is the CONTAINMENT verdict (``MemoryStatus``), the
+            glyph is the CHECK-RUN verdict — different semantics, different
+            lifetimes. Folding into ``Kind`` puts visual distance between them.
+
+        Args:
+            row (object): One ``ChangeEntryRow``; ``check_glyph`` is read
+                duck-typed (defaulting to ``·``) so this view widget keeps
+                importing nothing from the service layer (C-7).
+
+        Returns:
+            Text: The cell — ``.style`` is the PURPLE role style (so the role
+            assertion still reads the cell), ``.plain`` starts with the glyph,
+            and ``.spans`` carries exactly the glyph's own style span.
+
+        Data Flow:
+            - Look the glyph's style up in ``_GLYPH_STYLE``; an unknown glyph
+              falls back to the muted ``DGRAY``.
+            - ``append`` the glyph, then ``append`` the kind text.
+
+        Dependencies:
+            Uses:
+                - ``_GLYPH_STYLE`` ; ``insight_style.PURPLE`` / ``DGRAY``
+            Used by:
+                - ``refresh_entries``
+
+        Note (C-17):
+            ``kind_text`` is file-derived. ``Text.append`` takes its argument
+            LITERALLY — it never markup-parses — so appending it is the same
+            guarantee ``safe_text`` gives the other four cells. The cell is
+            still a ``Text``, so ``default_cell_formatter`` never sees a
+            ``str`` to hand to ``Text.from_markup`` (LLR-075.6). The glyph
+            itself is one of four author-owned constants (LLR-077.6).
+        """
+        glyph = str(getattr(row, "check_glyph", "·"))
+        cell = Text(style=PURPLE)
+        cell.append(f"{glyph} ", style=self._GLYPH_STYLE.get(glyph, DGRAY))
+        cell.append(str(row.kind_text))
+        return cell
+
     def refresh_entries(self, rows: Sequence[object]) -> None:
         """Repopulate the entries table from shaped display rows.
 
@@ -3486,6 +3571,10 @@ class PatchEditorPanel(ScrollableContainer):
             line and hide the table; otherwise hide the empty-state line
             and show the table (LLR-003.1). Also refresh the SCRIPT window's
             live entry-count border subtitle (LLR-075.1).
+
+            The ``Kind`` cell additionally carries the row's check-run verdict
+            as a leading span (batch-48 LLR-077.4 — see ``_kind_cell``); the
+            column set stays at the same five.
 
             **Every cell is constructed as a Rich ``Text`` via ``safe_text``
             — regardless of whether a role style is assigned to it — and NO
@@ -3511,20 +3600,22 @@ class PatchEditorPanel(ScrollableContainer):
         Args:
             rows (Sequence[object]): The ``ChangeEntryRow`` objects produced
                 by ``ChangeService.rows`` — each exposes ``kind_text``,
-                ``address_text``, ``value_text``, ``status_text`` and
-                ``linkage_text``. Typed as ``object`` so this view widget
-                imports nothing from the service layer.
+                ``address_text``, ``value_text``, ``status_text``,
+                ``linkage_text`` and ``check_glyph``. Typed as ``object`` so
+                this view widget imports nothing from the service layer.
 
         Data Flow:
-            - Clear and refill the table from the row list, each cell wrapped
-              by ``safe_text`` (a literal ``Text``; never ``from_markup``).
+            - Clear and refill the table from the row list: the ``Kind`` cell
+              via ``_kind_cell`` (glyph span + kind text), the other four
+              wrapped by ``safe_text`` (a literal ``Text``; never
+              ``from_markup``).
             - Toggle the ``.hidden`` class on the table and the empty-state
               line by whether the list is empty.
             - Set the SCRIPT window's ``N entries`` border subtitle.
 
         Dependencies:
             Uses:
-                - ``safe_text`` ; ``insight_style.PURPLE`` / ``CYAN`` /
+                - ``_kind_cell`` ; ``safe_text`` ; ``insight_style.CYAN`` /
                   ``VALUE``
             Used by:
                 - ``S19TuiApp`` Patch Editor action handler
@@ -3534,7 +3625,7 @@ class PatchEditorPanel(ScrollableContainer):
         table.clear()
         for row in rows:
             table.add_row(
-                safe_text(str(row.kind_text), PURPLE),
+                self._kind_cell(row),
                 safe_text(str(row.address_text), CYAN),
                 safe_text(str(row.value_text), VALUE),
                 safe_text(str(row.status_text)),

@@ -1169,6 +1169,14 @@ class S19TuiApp(App):
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
         self._change_service = ChangeService()
+        #: Monotonic image-load generation (batch-48 LLR-077.2). Bumped once
+        #: per image install in ``_apply_prepared_load`` and pushed into
+        #: ``_change_service``, which stamps it onto each check run so the
+        #: Patch Editor's per-entry glyphs can never describe a PREVIOUS
+        #: image: the service above is built once, here, and is never rebuilt
+        #: on load, while a check run reads its ``actual_bytes`` from the
+        #: image. ``0`` == no image loaded yet.
+        self._image_generation: int = 0
         #: Multi-variant project state (LLR-005.5/005.6): the active project's
         #: ordered S19/HEX variant inventory, or ``None`` when no project is
         #: active. Built by ``workspace.build_variant_set`` on project
@@ -7891,6 +7899,9 @@ class S19TuiApp(App):
 
         Data Flow:
             - Mutate ``current_file``, reset MAC/hex/issues paging anchors, and sync A2L.
+            - Bump ``_image_generation`` and push it into ``_change_service`` so a
+              completed check run cannot keep describing the previous image
+              (LLR-077.2).
             - When ``precomputed`` is True, copy MAC cache + validation results into the
               app's cache members so ``update_mac_view`` treats them as a cache hit.
             - Attach ``bases_set`` to the ``LoadedFile`` for fast hex rendering.
@@ -7925,6 +7936,47 @@ class S19TuiApp(App):
             ):
                 self._variant_set.active_id = pending_variant
         self.current_file = loaded
+        # batch-48 (LLR-077.2, the BL-4 arm): a NEW image is now installed, so
+        # any completed check run describes a PREVIOUS one. Bump the monotonic
+        # generation and push it into the change service, which compares it
+        # against the token it stamped at run time and degrades every entry
+        # glyph to `·` on a mismatch. The bump lives HERE — the single install
+        # point F-09 below names — rather than in `_apply_loaded_file`: that
+        # method is only the SYNCHRONOUS wrapper, and the worker path reaches
+        # this method directly via `call_from_thread` (`_start_load_worker`),
+        # so a bump one frame up would miss every real async load.
+        #
+        # This bumps on EVERY install, including a MAC/A2L attach that leaves
+        # the image bytes alone — deliberately, and it is the conservative
+        # direction, not an oversight. Over-refusing costs the analyst a
+        # re-run and shows `·`, which is honest; under-refusing renders a
+        # verdict that is a lie. Narrowing the trigger would mean deciding
+        # here whether an install "really" changed the image, which is the
+        # kind of inference that produced the BL-4 defect in the first place.
+        self._image_generation += 1
+        self._change_service.set_image_generation(self._image_generation)
+        # ...and RE-RENDER the entries table, or the invalidation is invisible.
+        # Nothing else re-renders it on load: the four existing `refresh_entries`
+        # sites all hang off a Patch-Editor action, an undo/redo, or the panel's
+        # own mount. So the stamp alone would go stale in the service while the
+        # TABLE kept painting the verdicts of the previous image — the user-facing
+        # half of the same defect. This is a render call over data the service
+        # already holds; it re-derives nothing and applies nothing. (It also
+        # refreshes each row's containment `status_text`, which was likewise
+        # stale-until-next-action before this batch.)
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            # App not mounted (headless unit tests drive this pipeline on a
+            # bare `S19TuiApp()` with no screen stack) — no tree to render
+            # into, the same tolerance `_apply_empty_state` documents just
+            # below. NOT a real-app path: the panel mounts during compose,
+            # which precedes both `App.on_mount`'s startup load and any
+            # user-triggered one. The service-side stamp above is set either
+            # way, so nothing is skipped that a later render would need.
+            pass
+        else:
+            panel.refresh_entries(self._change_service.rows(loaded.ranges))
         # F-09 (LLR-056.3): every load path — project load, loose-file
         # load, variant activation — funnels through this install point,
         # so the sticky report-filter selection dies with the previous

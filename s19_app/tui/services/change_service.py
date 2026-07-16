@@ -81,6 +81,28 @@ _CHECK_RESULT_SEVERITY: Dict[str, ValidationSeverity] = {
     "uncheckable": ValidationSeverity.WARNING,
 }
 
+#: The batch-48 check-glyph vocabulary (LLR-077.3) — a CLOSED 4-token set.
+#: Author-controlled constants; no file-derived text ever reaches a glyph
+#: (LLR-077.6). The render styles live at the render boundary
+#: (``screens_directionb._GLYPH_STYLE``); ``test_tui_patch_glyphs.py``
+#: asserts the two maps stay total over each other.
+GLYPH_PASS = "✓"
+GLYPH_FAIL = "✗"
+GLYPH_UNCHECKABLE = "◐"
+#: No check result is current for the live document AND the live image —
+#: the honest degradation of LLR-077.2's provenance stamp, and the state of
+#: every row before any run.
+GLYPH_NO_RESULT = "·"
+
+#: Check-result token → glyph. An UNRECOGNISED token maps to
+#: :data:`GLYPH_UNCHECKABLE`, mirroring ``_CHECK_RESULT_SEVERITY``'s
+#: WARNING default rather than inventing a second policy (LLR-077.3).
+_CHECK_RESULT_GLYPH: Dict[str, str] = {
+    "pass": GLYPH_PASS,
+    "fail": GLYPH_FAIL,
+    "uncheckable": GLYPH_UNCHECKABLE,
+}
+
 #: How many byte tokens an entries-table value cell shows before eliding.
 _ROW_BYTES_PREVIEW = 8
 
@@ -247,6 +269,13 @@ class ChangeEntryRow:
             entry's address (the LLR-002.8 per-entry status arm).
         linkage_text (str): The informative linkage classification from the
             last apply summary, or ``"-"`` before any apply.
+        check_glyph (str): The last check run's verdict for THIS entry
+            (batch-48 LLR-077.1) — one token of the closed vocabulary
+            :data:`GLYPH_PASS` / :data:`GLYPH_FAIL` / :data:`GLYPH_UNCHECKABLE`
+            / :data:`GLYPH_NO_RESULT`. Defaults to :data:`GLYPH_NO_RESULT`, so
+            the field is additive and breaks no caller. Rendered as the
+            LEADING SPAN of the ``Kind`` cell — not as a sixth column
+            (LLR-077.4).
 
     Returns:
         None: Dataclass container.
@@ -262,6 +291,7 @@ class ChangeEntryRow:
     value_text: str
     status_text: str
     linkage_text: str
+    check_glyph: str = GLYPH_NO_RESULT
 
 
 @dataclass(slots=True)
@@ -355,6 +385,40 @@ class ChangeService:
         #: The result object of the most recent check run (``None`` before
         #: any run or when the seam is unfilled).
         self.last_check_result: Optional[object] = None
+        #: The image-load generation this service currently believes is
+        #: loaded (batch-48 LLR-077.2, the BL-4 arm). A monotonic token
+        #: OWNED BY ``app.py`` and pushed here via :meth:`set_image_generation`
+        #: on every image install; ``0`` means "no image has been loaded".
+        #: Object identity (``id(mem_map)``) is deliberately NOT used — CPython
+        #: reuses ``id()`` values after GC, so a freed map and a freshly-loaded
+        #: one can collide into a false "same image" match, which is precisely
+        #: the bug this token exists to prevent.
+        self.image_generation: int = 0
+        #: The two-part provenance stamp of :attr:`last_check_result` —
+        #: ``(document_signature, image_generation)`` describing the INPUTS the
+        #: run was executed over (LLR-077.2 ★). ``rows`` emits result glyphs
+        #: only while BOTH parts still equal the live values; on any mismatch
+        #: every glyph degrades to :data:`GLYPH_NO_RESULT`.
+        #:
+        #: Both parts are load-bearing, and neither alone suffices:
+        #:
+        #: - ``last_check_result`` survives ``add_entry`` / ``remove_entry`` /
+        #:   ``load`` / ``load_text`` (it is reset ONLY by ``undo`` / ``redo``),
+        #:   so a mutated document would otherwise be index-aligned onto a
+        #:   stale result. A COUNT is insufficient — an in-place per-entry JSON
+        #:   edit preserves the count — hence a CONTENT signature.
+        #: - ``run_checks`` reads each entry's ``actual_bytes`` from the IMAGE,
+        #:   and this service is constructed once at ``app.py`` init and never
+        #:   rebuilt on file load. Without the generation arm: check image A
+        #:   (all pass) → load image B → the document is untouched → a
+        #:   document-only signature still MATCHES → the glyphs render,
+        #:   describing image A. Reachable via the most routine action in the
+        #:   app, with no error path.
+        #:
+        #: ``mac_records`` / ``a2l_tags`` are also ``check_runner`` inputs but
+        #: drive ``CheckRunEntry.linkage``, NOT ``.result``; the glyph renders
+        #: ``.result`` only, so they are deliberately NOT covered.
+        self._last_check_stamp: Optional[Tuple[object, int]] = None
         #: The change-set undo history (US-068a / LLR-068a.1): a bounded stack
         #: of DEEP-COPY :class:`ChangeDocument` snapshots, each captured
         #: immediately before a document-mutating operation. :meth:`undo` pops
@@ -1259,6 +1323,12 @@ class ChangeService:
             self.document, mem_map, ranges, mac_records, a2l_tags
         )
         self.last_check_result = result
+        # LLR-077.2: stamp the result with the INPUTS it was run over, so the
+        # glyph can refuse to describe a document or an image it never saw.
+        self._last_check_stamp = (
+            self._document_signature(),
+            self.image_generation,
+        )
         aggregates = dict(getattr(result, "aggregates", {}) or {})
         passed = int(aggregates.get("passed", 0))
         failed = int(aggregates.get("failed", 0))
@@ -1351,6 +1421,122 @@ class ChangeService:
         return rows
 
     # ------------------------------------------------------------------
+    # Check-result provenance (batch-48 LLR-077.2)
+    # ------------------------------------------------------------------
+
+    def set_image_generation(self, generation: int) -> None:
+        """
+        Summary:
+            Record which image generation is currently loaded (LLR-077.2).
+
+            The token is OWNED BY ``app.py`` — a monotonic counter bumped on
+            every image install — and pushed here so :meth:`rows` can tell a
+            check result that describes the LIVE image from one that describes
+            a previous load. This service is constructed once at app init and
+            never rebuilt on load, so without this push a completed run
+            outlives the image it was run against.
+
+        Args:
+            generation (int): The app's monotonic image-load counter. Values
+                are compared for equality only; the service reads no meaning
+                into the number itself.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Store the token; :meth:`run_checks` snapshots it into
+              ``_last_check_stamp``; :meth:`rows` compares live vs stamped.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp._apply_prepared_load`` (the single install
+                  point every load path funnels through)
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.set_image_generation(1)
+            >>> service.image_generation
+            1
+        """
+        self.image_generation = generation
+
+    def _document_signature(self) -> Tuple[Tuple[str, int, Tuple[int, ...]], ...]:
+        """
+        Summary:
+            Fingerprint the live document's entries for the LLR-077.2 stamp.
+
+            The per-entry tuple is ``(entry_type, address, encoded_bytes)`` in
+            document order, so an added, removed, reordered, or in-place-edited
+            entry all change it. Containment ``status`` is deliberately EXCLUDED
+            — ``rows`` re-stamps it on every call, and it is an output of
+            classification, not an input the check run consumed.
+
+        Returns:
+            Tuple[Tuple[str, int, Tuple[int, ...]], ...]: The ordered per-entry
+            fingerprint; empty for an empty document.
+
+        Data Flow:
+            - Read ``self.document.entries``; ``encoded_bytes`` is already an
+              immutable tuple (``ChangeEntry.__post_init__``), so the result is
+              directly comparable.
+
+        Dependencies:
+            Used by:
+                - run_checks (records the stamp) / rows (compares it)
+
+        Example:
+            >>> service = ChangeService()
+            >>> service._document_signature()
+            ()
+        """
+        return tuple(
+            (entry.entry_type, entry.address, entry.encoded_bytes)
+            for entry in self.document.entries
+        )
+
+    def _check_glyphs(self) -> list[str]:
+        """
+        Summary:
+            Derive the per-entry check glyphs of the last run, in document
+            order — but ONLY while that run's two-part provenance stamp still
+            matches the live document and the live image (LLR-077.1/.2).
+
+        Returns:
+            list[str]: One glyph per RESULT record, positionally aligned to the
+            document's entries. Empty when no run has happened or when either
+            stamp part is stale — the caller then renders
+            :data:`GLYPH_NO_RESULT` for every row (the honest degradation).
+
+        Data Flow:
+            - Refuse on ``last_check_result is None`` or on a stamp mismatch.
+            - Otherwise map each record's ``result`` token through
+              ``_CHECK_RESULT_GLYPH``; an unrecognised token → ``◐``.
+
+        Dependencies:
+            Uses:
+                - _document_signature / _CHECK_RESULT_GLYPH
+            Used by:
+                - rows
+
+        Example:
+            >>> ChangeService()._check_glyphs()
+            []
+        """
+        result = self.last_check_result
+        if result is None:
+            return []
+        live_stamp = (self._document_signature(), self.image_generation)
+        if self._last_check_stamp != live_stamp:
+            return []
+        return [
+            _CHECK_RESULT_GLYPH.get(
+                str(getattr(record, "result", "")), GLYPH_UNCHECKABLE
+            )
+            for record in (getattr(result, "entries", []) or [])
+        ]
+
+    # ------------------------------------------------------------------
     # Display shaping (entries table + declaration faults)
     # ------------------------------------------------------------------
 
@@ -1372,21 +1558,40 @@ class ChangeService:
             list[ChangeEntryRow]: One row per entry in document order —
             kind, hex address, value-or-bytes preview, containment status
             (`` / fault``-suffixed when an ERROR finding names the entry's
-            address), and the last apply's linkage classification (``"-"``
-            before any apply).
+            address), the last apply's linkage classification (``"-"``
+            before any apply), and the last check run's per-entry
+            ``check_glyph`` (batch-48 LLR-077.1).
 
         Data Flow:
             - ``classify_containment`` stamps each entry's status.
             - ERROR-severity issue addresses mark matching rows faulted.
             - Linkage text joins from ``last_summary`` per address range.
+            - ``_check_glyphs`` supplies the per-entry verdict glyph, joined
+              **BY DOCUMENT-ORDER INDEX** (LLR-077.1).
 
         Dependencies:
             Uses:
-                - classify_containment
+                - classify_containment / _check_glyphs
             Used by:
                 - PatchEditorPanel.refresh_entries (via app.py)
+
+        Note (LLR-077.1 — the join key is POSITIONAL, never the address):
+            ``CheckRunEntry`` records are built "one per document entry in
+            document order" (``changes/model.py:660-661``) and carry no id, so
+            ``glyphs[i]`` describes ``entries[i]``. Address-matching would be
+            wrong twice over: it re-derives a key the contract already fixes,
+            and it collapses two entries that share a start address. The
+            entries table is ``cursor_type="row"``, so the row index the user's
+            cursor lands on IS this index — the chain is index-keyed end to end.
+
+        Note (why ``glyphs`` may be SHORTER than ``entries``):
+            A stale or refused run yields ``[]`` and every row falls back to
+            ``·``. The ``check_runner`` seam is injectable, so a stub may also
+            return fewer records than the document has entries; the bounds
+            check keeps that a missing glyph rather than an ``IndexError``.
         """
         classify_containment(self.document, ranges)
+        glyphs = self._check_glyphs()
         fault_addresses = {
             issue.address
             for issue in self.document.issues
@@ -1398,7 +1603,7 @@ class ChangeService:
             for record in self.last_summary.entries:
                 linkage_by_start[record.address_start] = record.linkage
         rendered: list[ChangeEntryRow] = []
-        for entry in self.document.entries:
+        for index, entry in enumerate(self.document.entries):
             if entry.entry_type == ENTRY_KIND_STRING:
                 value_text = (
                     entry.value
@@ -1423,6 +1628,11 @@ class ChangeService:
                     value_text=value_text,
                     status_text=status_text,
                     linkage_text=linkage_by_start.get(entry.address, "-"),
+                    check_glyph=(
+                        glyphs[index]
+                        if index < len(glyphs)
+                        else GLYPH_NO_RESULT
+                    ),
                 )
             )
         return rendered

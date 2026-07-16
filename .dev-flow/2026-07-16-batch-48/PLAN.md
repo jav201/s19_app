@@ -141,6 +141,22 @@ family as **R-NEW-1's missed sweep** and **C-28** — three sightings, one root:
 code symbols, but the defect lives in a shared namespace no symbol names.*
 ⚠ **What caught it is NOT reproducible** — a reviewer voluntarily read a **sibling agent's uncommitted WIP**.
 No control required that. **Do not credit the process.**
+🎯 **OPERATOR'S CALL (2026-07-16) — leading candidate; target = the GLOBAL `/dev-flow` + `/fast-dev-flow`
+rules** (classified **project-agnostic** per the control-placement policy → global command, NOT
+`docs/engineering-rules.md`): *"the code is not correctly traced — the code did not reference the requirements
+even though it covers both requirements."* **This beats candidate (b):** a Phase-2 pass depends on someone
+*noticing*; a **code↔requirement edge makes the overlap QUERYABLE** — structural, not diligence-dependent.
+⚠ **Refinement — a back-reference ALONE does not catch it.** Two sites tagged `HLR-076` and `HLR-077` both
+using `#54efae` still look fine individually. The tag is the **enabling edge**; the oracle is the **reverse
+index `resource → {requirements claiming it}`**, flagging any resource with **≥2 claimants in one scope**.
+✅ **Already half-built (MEASURED 2026-07-16):** `screens_directionb.py` = **25** `LLR-075`/`R-TUI-075` comment
+back-refs · `styles.tcss` = **1** `HLR-076` · `REQUIREMENTS.md` already maps `R-*` → files + tests. **Both
+directions exist.** Three gaps only: **convention, not contract** (unenforced) · **file-granular**, not
+symbol/value-granular · **never traversed in reverse**. This is *closing* an edge, not inventing one.
+⚠ **Cost to weigh honestly:** requirement tags in code **ROT** — a drifted tag is worse than no tag (it
+asserts a trace that no longer holds). Any encoding owes a staleness answer (CI: every `R-*`/`LLR-*` tag names
+a live requirement), else we buy a second false-confidence surface — the exact failure this batch keeps
+hitting (Inc-2's vacuous `getattr` guard; the old class-based title oracle).
 **Candidates (evaluate at P5; do NOT pre-adopt):** (a) per-container **semantic-namespace registry**
 (hue→meaning, key→action, glyph→verdict) that a claiming increment must consult+extend, with a test asserting
 no entry carries 2 meanings in one scope; (b) **Phase-2 cross-increment collision pass** over the *planned*
