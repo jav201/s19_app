@@ -14,6 +14,7 @@ from ..range_index import (
     range_in_sorted_ranges as _range_in_sorted_ranges,
 )
 from .color_policy import FOCUS_HIGHLIGHT_STYLE, MAC_ADDRESS_OVERLAY_STYLE
+from .insight_style import CYAN, DGRAY, VALUE
 
 
 MAX_HEX_BYTES = 65536
@@ -21,6 +22,41 @@ HEX_WIDTH = 16
 FOCUS_CONTEXT_ROWS = 64
 MAX_HEX_ROWS = 512
 SEARCH_ENCODING = "ascii"
+
+
+def _hex_byte_style(value: int) -> str:
+    """
+    Summary:
+        Classify a hex byte by kind and return the matching palette colour for its
+        rendered two-hex-digit cell: ``00``/``FF`` (constant/padding) read as dim
+        grey, printable ASCII (``0x20``-``0x7E``) as cyan, and every other byte as
+        the bright value colour. This gives the analyst a glanceable read of a hex
+        window's byte make-up without changing any character rendered.
+
+    Args:
+        value (int): A byte value in ``0..255``.
+
+    Returns:
+        str: One of :data:`insight_style.DGRAY` / :data:`insight_style.CYAN` /
+        :data:`insight_style.VALUE` — a Rich style string applied to the byte cell.
+
+    Data Flow:
+        - Pure comparison over ``value``; no I/O, no markup parsing.
+        - Called by ``render_hex_view_text`` for each present byte cell that carries
+          no higher-priority search/MAC highlight style.
+
+    Dependencies:
+        Uses:
+            - insight_style.DGRAY / insight_style.CYAN / insight_style.VALUE
+        Used by:
+            - render_hex_view_text
+    """
+    if value in (0x00, 0xFF):
+        return DGRAY
+    if 0x20 <= value <= 0x7E:
+        return CYAN
+    return VALUE
+
 
 def build_sorted_range_index(ranges: List[Tuple[int, int]]) -> RangeIndex:
     """
@@ -363,10 +399,15 @@ def render_hex_view_text(
         - Materialize rows via ``_collect_hex_rows``.
         - For each row, append the 2-cell marker prefix (no ``style=``), then the address,
           the hex byte cells, and the ASCII gutter with their existing highlight styles.
+        - Each present hex byte cell that carries no search/MAC highlight is classed by
+          kind via ``_hex_byte_style`` (``00``/``FF`` dim, printable-ASCII cyan, else
+          bright); the ASCII gutter is left unclassed. Classing only adds ``Text`` spans —
+          the ``.plain`` string is unchanged, and the highlight styles keep priority.
 
     Dependencies:
         Uses:
             - ``_collect_hex_rows``
+            - ``_hex_byte_style``
             - ``FOCUS_HIGHLIGHT_STYLE`` / ``MAC_ADDRESS_OVERLAY_STYLE``
         Used by:
             - ``S19TuiApp.update_hex_view`` / ``update_alt_hex_view`` / ``update_mac_hex_view``
@@ -417,7 +458,8 @@ def render_hex_view_text(
             if value is None:
                 text.append("   ")
             else:
-                text.append(f"{value:02X} ", style=style)
+                byte_style = style if style is not None else _hex_byte_style(value)
+                text.append(f"{value:02X} ", style=byte_style)
         text.append(" |")
         for offset, value in enumerate(row_bytes):
             addr = row_addr + offset
