@@ -4,8 +4,11 @@
 > Origin: `prototypes/screen_upgrades.HANDOFF-PLAN.md` (operator-approved 2026-07-15).
 
 ## Where we are
-- **Phase 3 — Implementation** — ✅ COMPLETE (8/8 increments; all HLR-065..074 closed, 20 ATs realized). → Phase 4.
-- **Phase 4 — Validation** — STARTING (orchestrator-owned full gate run, C-25).
+- **Phase 6 — Documentation** — docs written (traceability / functionality / diagrams / exec-summary) + **REQUIREMENTS.md registry updated** (10 new R-TUI-065..074 rows + 4 amendments). → commit, push, PR, CI, final PR-QA, merge, sync.
+- **Phase 5 — Post-mortem** — ✅ APPROVE. Clean batch. **C-30 encoded** (operator-approved); CAND-B declined.
+- **Phase 4 — Validation** — ✅ PASS. **1416 passed / 0 failed / 32 xfailed**, exit 0. 20/20 ATs single-node (C-18); 0 LLRs uncovered; frozen 0-diff.
+- **Phase 3 — Implementation** — ✅ COMPLETE (8/8 increments; all HLR-065..074 closed).
+- **Correction (Phase 6):** LLR count is **36**, not the 32 the Phase-1 summary reported (all 36 green; coverage unaffected).
 - **Phase 2 — Cross-review** — APPROVE-WITH-FOLDS → folds applied → re-gate APPROVE. 0 blockers / 0 HIGH.
 - **Phase 1 — Requirements** — APPROVED. **Phase 0 — DoR** — APPROVED.
 - Branch `claude/screen-upgrades-handoff-0874f9` @ `19bf1eb` (== origin/main tip). RC-1 PASS.

@@ -76,3 +76,21 @@ a physically-impossible AT. (Origin: batch-46 RC-1 — the spec pilot-measured t
 `_fully_visible` at the floor" (AT-064a) was physically unachievable — caught only by the Phase-3 pilot
 measurement, forcing a mid-increment stop + the FOLD-8 iterate-to-refine to a reachable-under-scroll floor.
 A Phase-1 both-axes measurement would have set the right threshold a phase earlier.)
+
+## C-30 — app-wide restyle sequencing (Phase 3, extends C-22/C-28)
+When a batch pairs an APP-WIDE visual change (a theme/palette swap, a global CSS-variable remap, a
+base-widget restyle) with per-screen functional increments, sequence the app-wide restyle **LAST** — after
+every functional increment has landed. An app-wide restyle drifts EVERY snapshot cell, so applying it early
+forces a blanket `xfail` across the whole matrix and **suppresses snapshot regression-coverage for the rest of
+the batch** (C-22 tells you to mark drift per-cell, C-28 tells you to sweep shared chrome — but neither
+dictates WHEN the restyle runs, which is what decides whether the remaining cells stay live). Sequencing it
+last lets each functional increment drift and mark only its OWN feature cells, keeps every untouched cell live
+as a regression guard, and collapses the restyle's drift into ONE canonical-CI regen. **Corollary (a cheap
+signal the sequencing is right):** a shared-renderer change (a hex/byte formatter, a cell builder used by
+several screens) sequenced AFTER its consumer screens will often drift ZERO new cells, because those cells are
+already marked. (Origin: batch-47 — an operator-approved app-wide navy/pastel theme + five per-screen insight
+layers. The orchestrator split the theme out of the foundation increment and moved it to last (Inc-8): Inc-3..6
+each marked only their own 2–6 cells; Inc-7 (classed hex, shared by 3 screens) drifted **0 NEW** cells; Inc-8's
+theme then drifted all 29 at once → 29 xfail / 0 xpassed / a single regen PR. Had the theme led the batch, all
+29 cells would have been xfail'd from increment 1 and every later functional regression would have rendered
+into an already-suppressed cell.)
