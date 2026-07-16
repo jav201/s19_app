@@ -2709,11 +2709,34 @@ class PatchEditorPanel(ScrollableContainer):
             Render the change-flow editor as three bordered windows
             (HLR-063) — ``#patch_win_script`` (PATCH SCRIPT),
             ``#patch_win_checks`` (CHECKS) and ``#patch_win_json``
-            (JSON EDIT). Each window is a constant title ``Label`` + a
+            (JSON EDIT). Each window is a constant **border title** + a
             scrollable ``VerticalScroll`` body + one or more **docked
             button-row siblings of the body** (not descendants of it), so an
             action button is never trapped below the body's inner scroll fold
-            (HLR-064 / the field-audit B2 fix). The pre-existing grouping
+            (HLR-064 / the field-audit B2 fix).
+
+            **batch-48 (§6.5 Amendment D): the in-body title ``Label`` is
+            GONE.** R-TUI-063 originally specified a constant-title ``Label``
+            as each window's first child; Inc-1 added the dolphie-idiom
+            ``border_title`` (LLR-075.1), which rendered the SAME constant a
+            second time — so each window read its own name twice. The border
+            title supersedes the Label: it is strictly stronger (it self-
+            describes on the window's own chrome, it cannot be scrolled away
+            from its window, and it spends 0 content rows against the measured
+            ~5-row @80x24 budget). The protected property — *each window
+            self-describes* — is preserved and re-pinned in that stronger form
+            by ``test_tui_patch_layout.py::test_tc46_1_*``, which now asserts
+            ``border_title`` instead of the Label's class.
+
+            **batch-48 (HLR-076): the docked buttons are CHIPS.** Each
+            button-bearing container carries a ``patch-chip-{entry,apply,
+            checks}`` group class and each ``Button`` a ``patch-chip``; the
+            colour rules live in ``styles.tcss`` scoped under
+            ``#patch_editor_panel`` (LLR-076.1 — the C-30 containment). This
+            is a CLASSES-ONLY restyle: no id is added-in-place-of, renamed,
+            moved, or re-parented (LLR-076.3).
+
+            The pre-existing grouping
             sub-containers ``#patch_pane_entries``, ``#patch_pane_changefile``,
             ``#patch_pane_variant`` and ``#patch_doc_file_row`` are preserved
             intact as **non-scrolling** groups (FOLD-1) so every leaf id and
@@ -2732,12 +2755,12 @@ class PatchEditorPanel(ScrollableContainer):
 
         Returns:
             ComposeResult: The Patch Editor widget tree — three
-            ``#patch_win_*`` window containers, each holding a title, a
-            scrollable body and its docked button-row sibling(s).
+            ``#patch_win_*`` window containers, each a border-titled window
+            holding a scrollable body and its docked button-row sibling(s).
 
         Data Flow:
             - Each window ``Container`` lays its children out vertically
-              (title / body / docked rows); ``#patch_editor_panel`` lays the
+              (body / docked rows); ``#patch_editor_panel`` lays the
               three windows out horizontally when wide and vertically (with a
               panel scroll) when ``width-narrow`` is set (styles.tcss).
 
@@ -2747,7 +2770,6 @@ class PatchEditorPanel(ScrollableContainer):
         """
         # ================= PATCH SCRIPT window =================
         script_window = Container(
-            Label("PATCH SCRIPT", classes="patch-window-title"),
             VerticalScroll(
                 Container(
                     Label(
@@ -2821,35 +2843,56 @@ class PatchEditorPanel(ScrollableContainer):
             ),
             # Docked button rows — siblings of the body (the B2 fix): never
             # trapped below the body's inner scroll fold.
+            # HLR-076: `patch-chip-entry` (blue) = the ENTRY-ACTIONS group —
+            # the buttons that edit the change document itself.
             Horizontal(
-                Button("Add", id="patch_entry_add_button"),
-                Button("Edit", id="patch_entry_edit_button"),
-                Button("Remove", id="patch_entry_remove_button"),
+                Button("Add", id="patch_entry_add_button", classes="patch-chip"),
+                Button("Edit", id="patch_entry_edit_button", classes="patch-chip"),
+                Button(
+                    "Remove",
+                    id="patch_entry_remove_button",
+                    classes="patch-chip",
+                ),
                 # US-068b: the per-entry JSON editor for the SELECTED
                 # entries-table row — disabled for a file-backed document.
-                Button("Edit JSON", id="patch_entry_edit_json_button"),
+                Button(
+                    "Edit JSON",
+                    id="patch_entry_edit_json_button",
+                    classes="patch-chip",
+                ),
                 id="patch_doc_entry_buttons",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-entry",
             ),
             # US-068a: change-set Undo / Redo in their own dedicated row —
             # disabled for a file-backed document (A-01 data-loss guard).
+            # LLR-076.2 `assumed` arm resolved: undo/redo MOVE the entry
+            # document, so they are entry-actions (blue), not apply-path.
             Horizontal(
-                Button("Undo", id="patch_undo_button"),
-                Button("Redo", id="patch_redo_button"),
+                Button("Undo", id="patch_undo_button", classes="patch-chip"),
+                Button("Redo", id="patch_redo_button", classes="patch-chip"),
                 id="patch_history_controls",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-entry",
             ),
             # batch-37 (US-064a): Refresh re-reads the loaded change file from
             # its own source_path. The 5-button census is pinned by
             # test_tui_patch_editor_v2 / the layout TC.
+            # HLR-076: `patch-chip-apply` (green) = the APPLY-PATH group.
             Horizontal(
-                Button("Load", id="patch_doc_load_button"),
-                Button("Refresh", id="patch_doc_refresh_button"),
-                Button("Validate", id="patch_doc_validate_button"),
-                Button("Apply", id="patch_doc_apply_button"),
-                Button("Save", id="patch_doc_save_button"),
+                Button("Load", id="patch_doc_load_button", classes="patch-chip"),
+                Button(
+                    "Refresh",
+                    id="patch_doc_refresh_button",
+                    classes="patch-chip",
+                ),
+                Button(
+                    "Validate",
+                    id="patch_doc_validate_button",
+                    classes="patch-chip",
+                ),
+                Button("Apply", id="patch_doc_apply_button", classes="patch-chip"),
+                Button("Save", id="patch_doc_save_button", classes="patch-chip"),
                 id="patch_doc_controls",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-apply",
             ),
             # US-028 (LLR-035.2): the variant group composes ABOVE the execute
             # group (R-PATCH-VARIANT-SELECT-001 / TC-035.2). Kept intact as a
@@ -2861,6 +2904,9 @@ class PatchEditorPanel(ScrollableContainer):
                     Label("Active variant", classes="patch-field-label"),
                     # US-067: the "?" info button is ALWAYS rendered beside the
                     # selector so its click target always exists.
+                    # LLR-076.2 `assumed` arm resolved: the variant group
+                    # scopes WHAT A RUN TARGETS, so both of its button-bearing
+                    # rows join the apply-path group (green).
                     Horizontal(
                         Select(
                             [],
@@ -2869,8 +2915,13 @@ class PatchEditorPanel(ScrollableContainer):
                             allow_blank=True,
                             disabled=True,
                         ),
-                        Button("?", id="patch_variant_info_button"),
+                        Button(
+                            "?",
+                            id="patch_variant_info_button",
+                            classes="patch-chip",
+                        ),
                         id="patch_variant_select_row",
+                        classes="patch-chip-apply",
                     ),
                     id="patch_variant_row",
                 ),
@@ -2882,11 +2933,15 @@ class PatchEditorPanel(ScrollableContainer):
                         Button(
                             f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
                             id="patch_execute_scope_button",
+                            classes="patch-chip",
                         ),
                         Button(
-                            "Execute scope", id="patch_execute_run_button"
+                            "Execute scope",
+                            id="patch_execute_run_button",
+                            classes="patch-chip",
                         ),
                         id="patch_execute_buttons",
+                        classes="patch-chip-apply",
                     ),
                     # LLR-075.3: the variant + execution scope as a readable
                     # LINE. Before this, the scope was legible only from
@@ -2901,11 +2956,16 @@ class PatchEditorPanel(ScrollableContainer):
                     # unedited. markup=False is defence-in-depth: every
                     # update() passes a literal Text, so the file-derived
                     # variant id is never markup-parsed (LLR-075.4 / C-17).
+                    # batch-48 (code-review F4): `.patch-stat-line`, not the
+                    # borrowed `.patch-field-label` — this renders a
+                    # label+VALUE pair (label_value sets both colours on the
+                    # Text itself), so the field label's `color: $fg-base` was
+                    # inert here and only its padding was ever wanted.
                     Static(
                         "",
                         id="patch_variant_scope_line",
                         markup=False,
-                        classes="patch-field-label",
+                        classes="patch-stat-line",
                     ),
                     id="patch_execute_row",
                 ),
@@ -2917,7 +2977,6 @@ class PatchEditorPanel(ScrollableContainer):
         )
         # ================= CHECKS window =================
         checks_window = Container(
-            Label("CHECKS", classes="patch-window-title"),
             VerticalScroll(
                 Label(
                     "",
@@ -2952,8 +3011,13 @@ class PatchEditorPanel(ScrollableContainer):
             # clarity help stay together in #patch_checks_controls (their
             # parentage is pinned by test_at057a); docked here so the button is
             # reachable by scrolling the CHECKS window into view.
+            # HLR-076: `patch-chip-checks` (yellow) = the CHECKS group.
             Container(
-                Button("Run checks", id="patch_checks_run_button"),
+                Button(
+                    "Run checks",
+                    id="patch_checks_run_button",
+                    classes="patch-chip",
+                ),
                 Label(
                     "Checks: runs the loaded change document's checks "
                     "against the loaded image. Needs kind 'check' (a "
@@ -2965,14 +3029,13 @@ class PatchEditorPanel(ScrollableContainer):
                     classes="patch-field-label",
                 ),
                 id="patch_checks_controls",
-                classes="patch-docked-group",
+                classes="patch-docked-group patch-chip-checks",
             ),
             id="patch_win_checks",
             classes="patch-window",
         )
         # ================= JSON EDIT window =================
         json_window = Container(
-            Label("JSON EDIT", classes="patch-window-title"),
             VerticalScroll(
                 # batch-36 (US-058): the change-set paste group in a scrollable
                 # body so the editor's first line sits inside the visible
@@ -2992,12 +3055,20 @@ class PatchEditorPanel(ScrollableContainer):
                 classes="patch-window-body",
             ),
             Horizontal(
-                Button("Parse pasted", id="patch_paste_parse_button"),
+                Button(
+                    "Parse pasted",
+                    id="patch_paste_parse_button",
+                    classes="patch-chip",
+                ),
                 # US-064b: opens the full-size JSON popup over the paste buffer;
                 # disabled by the app for a file-backed document (A-01 guard).
-                Button("Edit JSON", id="patch_edit_json_button"),
+                Button(
+                    "Edit JSON",
+                    id="patch_edit_json_button",
+                    classes="patch-chip",
+                ),
                 id="patch_paste_controls",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-apply",
             ),
             # The hidden save-back prompt is a docked group revealed by the
             # app's save-back handler on a successful save; docked so its
@@ -3009,10 +3080,20 @@ class PatchEditorPanel(ScrollableContainer):
                     Button(
                         f"Width: {self._saveback_width} bytes/line",
                         id="patch_saveback_width_button",
+                        classes="patch-chip",
                     ),
-                    Button("Write file", id="patch_saveback_confirm_button"),
-                    Button("Don't save", id="patch_saveback_decline_button"),
+                    Button(
+                        "Write file",
+                        id="patch_saveback_confirm_button",
+                        classes="patch-chip",
+                    ),
+                    Button(
+                        "Don't save",
+                        id="patch_saveback_decline_button",
+                        classes="patch-chip",
+                    ),
                     id="patch_saveback_buttons",
+                    classes="patch-chip-apply",
                 ),
                 id="patch_saveback_row",
                 classes="hidden patch-docked-group",
@@ -3029,8 +3110,10 @@ class PatchEditorPanel(ScrollableContainer):
                     Button(
                         "Write before/after report",
                         id="patch_before_after_button",
+                        classes="patch-chip",
                     ),
                     id="patch_before_after_buttons",
+                    classes="patch-chip-apply",
                 ),
                 id="patch_before_after_row",
                 classes="hidden patch-docked-group",

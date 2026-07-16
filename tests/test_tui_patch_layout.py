@@ -45,7 +45,7 @@ import json
 from pathlib import Path
 
 from textual.containers import VerticalScroll
-from textual.widgets import Button, DataTable, TextArea
+from textual.widgets import Button, DataTable, Label, TextArea
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens_directionb import PatchEditorPanel
@@ -562,11 +562,28 @@ _WINDOW_BODY = {
 def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
     """TC-46.1 (white-box, layout-agnostic) — window structure + reflow rule.
 
-    Intent: LLR-063.1 / LLR-064.1 (q-m3) — each window holds a title ``Label``,
-    a ``VerticalScroll`` body, and a docked button-row that is a SIBLING of the
-    body (not a descendant), and the ``width-narrow`` reflow selector exists in
-    ``styles.tcss``. No ``layout.name`` is pinned (the wide token is a design
-    call, M-A3); the AT geometry oracle carries the actual arrangement.
+    Intent: LLR-063.1 / LLR-064.1 (q-m3) — each window SELF-DESCRIBES with a
+    constant title, holds a ``VerticalScroll`` body, and has a docked
+    button-row that is a SIBLING of the body (not a descendant); and the
+    ``width-narrow`` reflow selector exists in ``styles.tcss``. No
+    ``layout.name`` is pinned (the wide token is a design call, M-A3); the AT
+    geometry oracle carries the actual arrangement.
+
+    **batch-48 (§6.5 Amendment D) — DELETE-AND-RESTATE, not hide.** This test
+    asserted ``any("patch-window-title" in c.classes for c in win.children)``.
+    Inc-1 gave each window a ``border_title`` carrying the same constant, so
+    the in-body ``Label`` rendered the title a SECOND time; Inc-2 removes the
+    Label. The protected property is *each window self-describes* — NOT *a
+    Label with a given class exists* — so the assertion is RESTATED on
+    ``border_title``, which is strictly stronger:
+
+    - it pins the title's TEXT (the class check passed on an empty Label), and
+    - it cannot be satisfied by a hidden widget.
+
+    That last point is why the Label was DELETED rather than hidden via CSS: a
+    ``display: none`` Label still satisfies ``"patch-window-title" in
+    c.classes``, which would have converted this line into a false-confidence
+    test that stays green while the window shows nothing.
     """
 
     async def _run() -> dict[str, object]:
@@ -579,13 +596,30 @@ def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
             for win_id in _WINDOW_IDS:
                 win = app.query_one(f"#{win_id}")
                 child_ids = [c.id for c in win.children]
-                title_ok = any(
-                    "patch-window-title" in c.classes for c in win.children
-                )
+                border_title = str(win.border_title or "")
+                # Any direct child re-rendering the window's own name is the
+                # duplicate §6.5 Amendment D removed. Matched on the RENDERED
+                # TEXT (not the retired `.patch-window-title` class) so a
+                # re-added Label cannot dodge it by dropping the class.
+                #
+                # `Label.render()` -> `Content`, whose `.plain` is the text.
+                # NOTE: a `Label` at textual==8.2.8 has NO `.renderable`
+                # attribute — an earlier `getattr(c, "renderable", "")` form
+                # of this check silently compared "" and passed VACUOUSLY
+                # (mutation-caught: it stayed green with the duplicate Label
+                # re-added). Read the render path, not a guessed attribute.
+                bare_title = border_title.lstrip("¹²³")
+                title_labels = [
+                    c.id or type(c).__name__
+                    for c in win.children
+                    if isinstance(c, Label)
+                    and c.render().plain.strip() == bare_title
+                ]
                 body = app.query_one(f"#{_WINDOW_BODY[win_id]}")
                 docked = app.query_one(f"#{_WINDOW_DOCKED[win_id]}")
                 result[win_id] = {
-                    "title_ok": title_ok,
+                    "border_title": border_title,
+                    "title_labels": title_labels,
                     "body_is_scroll": isinstance(body, VerticalScroll),
                     "docked_is_body_sibling": (
                         docked.parent is win and body.parent is win
@@ -598,7 +632,21 @@ def test_tc46_1_window_structure_layout_agnostic(tmp_path: Path) -> None:
 
     result = asyncio.run(_run())
     for win_id, r in result.items():
-        assert r["title_ok"], f"{win_id} missing its constant title Label"
+        # batch-48 §6.5 Amendment D: the window self-describes on its OWN
+        # border chrome. Sourced from the panel's constant, not re-spelled, so
+        # a title rename cannot pass here by being copied into the oracle.
+        expected = PatchEditorPanel._WINDOW_BORDER_TITLES[win_id]
+        assert r["border_title"] == expected, (
+            f"{win_id} must self-describe via its constant border_title "
+            f"{expected!r}; got {r['border_title']!r}"
+        )
+        # The de-dup itself: the in-body title Label must NOT come back. The
+        # border title is the single title surface — a re-added Label would
+        # render the window's name twice (the Inc-1 -> Inc-2 defect).
+        assert not r["title_labels"], (
+            f"{win_id} carries {r['title_labels']} in-body title Label(s) "
+            "duplicating its border_title (§6.5 Amendment D removed them)"
+        )
         assert r["body_is_scroll"], (
             f"{win_id} body must be a VerticalScroll, got {r['child_ids']}"
         )

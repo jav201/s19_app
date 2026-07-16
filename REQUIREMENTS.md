@@ -4153,7 +4153,8 @@ activation posts none.
 **R-TUI-063**: When the Patch Editor screen is shown, the TUI shall render its content as three bordered
 windows — `#patch_win_script` (PATCH SCRIPT: entries table + inputs + change-file + variant + execute),
 `#patch_win_checks` (CHECKS: issue count + issues + status + results + help), `#patch_win_json` (JSON EDIT:
-paste `CappedTextArea` + revealed save-back + before/after) — each a constant-title `Label` + a scrollable
+paste `CappedTextArea` + revealed save-back + before/after) — each a constant **border title**
+(**AMENDED batch-48 §6.5 Amendment D — was: a constant-title `Label`**) + a scrollable
 `VerticalScroll` body + docked button-row sibling(s) of that body. It shall lay the three windows out
 horizontally (3 columns, asymmetric `grid-columns: 2fr 1fr 1fr`) while the terminal is ≥120 columns and
 vertically stacked while it is <120 columns, via the existing `#workspace_body.width-narrow` CSS regime
@@ -4196,6 +4197,83 @@ amendment of the original all-visible acceptance).
   `content_region`) + the structural "no `VerticalScroll` ancestor" docked-sibling check. RED-proven on the
   batch-22 2×2 tree (buttons below the starved `1fr` fold).
 - Status: Added batch-46 (US-B2 / HLR-064, LLR-064.1–.3; FOLD-8 reachable-under-scroll floor). Frozen-engine
+  diff = 0.
+
+### Window self-description: in-body title Label → border title — batch-48 (§6.5 Amendment D)
+
+> **Amends R-TUI-063** (US-P1 / HLR-075, LLR-075.1; batch-48 Inc-2). A locked requirement's named element
+> is REMOVED, so this is recorded Before → After rather than edited silently. **The protected property is
+> preserved in a stronger form; nothing is relaxed.**
+
+- **Before (batch-46, the *Before* text is R-TUI-063's original clause above):** each of the three windows
+  is "**a constant-title `Label`** + a scrollable `VerticalScroll` body + docked button-row sibling(s) of
+  that body". The title `Label` (`.patch-window-title`, `styles.tcss:880`) was the window's first child and
+  its sole self-description; `screens_directionb.py:2750` / `:2920` / `:2975` created the three.
+- **After (batch-48):** each window is "**a constant border title** + a scrollable body + docked
+  sibling(s)". The three in-body `Label`s are **DELETED**; each window's constant name lives on its own
+  `border_title` (`¹PATCH SCRIPT` / `²CHECKS` / `³JSON EDIT`, `PatchEditorPanel._WINDOW_BORDER_TITLES`),
+  set in `compose` and hosted by `.patch-window`'s pre-existing `border: round $rule` (`styles.tcss:864`).
+  Titles remain **CONSTANT author strings, never file-derived** — the C-17 / F3 clause is untouched.
+- **Why (the defect this closes):** batch-48 Inc-1 added the dolphie-idiom `border_title` (LLR-075.1)
+  **without** removing the Label, so every window rendered its own name **TWICE** — once on the border,
+  once in the body. The border title supersedes the Label on every axis: it self-describes on the window's
+  own chrome, it cannot be scrolled away from the window it names, and it spends **0 content rows** against
+  the MEASURED ~5-row @80×24 body budget (FOLD-8). Keeping both was pure duplication.
+- **Why it had to land in Inc-2, before the batch's canonical-CI snapshot regen:** the two
+  `patch-comfortable-*` cells ride `_batch48_patch_drift_marks` (`xfail(strict=False)`), so the duplication
+  is **invisible to CI**. Had it slipped past the regen, the regen would have **baked the duplicate into
+  the SVG baselines** and it would have permanently stopped reading as drift.
+- **Deleted / New tokens:** **Deleted** — the three `Label(..., classes="patch-window-title")` widgets
+  **and** the now-consumerless `.patch-window-title` CSS rule (`styles.tcss:880-887`), removed with its
+  last consumer rather than left dead. **New** — none (`border_title` + `_WINDOW_BORDER_TITLES` landed in
+  Inc-1 under LLR-075.1). **Unchanged** — every `_MUST_PRESERVE_IDS` id (the Labels carried **no id**;
+  verified), the body/docked-sibling relationship (R-TUI-064), the `width-narrow` regime, the C-17
+  constant-title clause.
+- **Parent-HLR re-read:** R-TUI-063's protected property is **each window self-describes with a constant
+  title** — NOT "a `Label` of a given class exists". That property is preserved and, per the oracle change
+  below, now pinned **more strictly** than before. R-TUI-064 is untouched: no docked row moved, and
+  removing a 1-row body child can only *improve* reachability.
+- **Oracle: DELETE-AND-RESTATE, not hide.** `tests/test_tui_patch_layout.py::test_tc46_1_*` asserted
+  `any("patch-window-title" in c.classes for c in win.children)`. It now asserts (a) `border_title` equals
+  the panel's own constant — **stronger: the class check passed on an empty Label, this pins the TEXT** —
+  and (b) **no direct child re-renders the window's name**, so the duplicate cannot return. The Label was
+  **DELETED, never hidden via CSS**: a `display: none` Label still satisfies the class check, which would
+  have converted that line into a **false-confidence test** — green while the window showed nothing.
+- **Validation:** `Automated` — `tests/test_tui_patch_layout.py::test_tc46_1_window_structure_layout_agnostic`
+  (restated; **mutation-verified**: re-adding the `PATCH SCRIPT` Label turns it RED —
+  `patch_win_script carries ['Label'] in-body title Label(s) duplicating its border_title`) +
+  `tests/test_tui_patch_big.py::test_at075a_*` (the border titles + live subtitles). Snapshot: the 2
+  `patch-comfortable-*` cells ride `_batch48_patch_drift_marks` until the canonical-CI regen.
+- **Status:** Amended in batch `2026-07-16-batch-48` (US-P1 / HLR-075, LLR-075.1; §6.5 Amendment D —
+  Before → After). Frozen-engine diff = 0.
+
+### Docked buttons rendered as colour-grouped chips — batch-48 (R-TUI-076)
+
+> **Notes R-TUI-063 / R-TUI-064** (US-P1 / HLR-076, LLR-076.1–076.4; batch-48 Inc-2). **NO amendment
+> owed** — a classes-only restyle: no widget id is added-in-place-of, renamed, moved between containers, or
+> re-parented, and every docked row keeps its sibling relationship to its window body (the B2 fix). The
+> full R-TUI-076 row is written at Phase 6; this note records the batch-47 carry landing and its C-30
+> verdict.
+
+- **The batch-47 carry.** Batch-47 deferred the chip-button CSS for want of a consumer, correctly: the only
+  chip-like rule then was `.issue-code-chip` (`styles.tcss:1023`), which styles a **`Label`, not a
+  `Button`** — a visual precedent, not a reusable rule. The Patch Editor's docked rows are that consumer,
+  so batch-48 creates the family.
+- **C-30 = N/A, and it is FALSIFIABLE rather than asserted.** C-30 governs an *app-wide* restyle; this
+  family is scoped to descendants of `#patch_editor_panel`, so no non-patch widget can match it. Recorded
+  re-bind condition (§2.4-8): if a chip rule ever must go app-wide, **C-30 re-binds** and the chip
+  increment is re-sequenced LAST.
+- **Severity conventions: NO amendment.** The chip family adds **no** `sev-*` rule and changes **no**
+  severity hue. A chip group is a **function** cue (what the button does), not a severity verdict;
+  `color_policy.py` stays frozen, 0-diff.
+- **Validation:** `Automated` — `tests/test_tui_patch_chips.py::test_at076b_c30_leak_probe_no_chip_rule_matches_outside_patch`
+  (**the C-30 leak probe** — asks Textual's own matcher whether any chip `RuleSet` matches any `Button`
+  outside the panel; **mutation-verified**: a bare `Button` selector turns it RED with **26** measured
+  leaks) + `::test_tc076_1_every_chip_selector_is_panel_rooted` (the source-level peer — **mutation-verified
+  as NOT redundant**: it catches an unscoped class selector the matcher probe is structurally blind to) +
+  `::test_at076a_docked_buttons_are_grouped_chips` + `::test_tc076_2_group_assignment_on_docked_containers`;
+  `tests/test_tui_patch_layout.py` (all 48 `_MUST_PRESERVE_IDS` present and in role).
+- **Status:** Added in batch `2026-07-16-batch-48` (US-P1 / HLR-076, LLR-076.1–076.4). Frozen-engine
   diff = 0.
 
 ---

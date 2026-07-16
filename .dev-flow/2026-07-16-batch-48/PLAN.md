@@ -37,8 +37,12 @@ structural addition; measure geometry with it present).
 **Panel** (`screens_directionb.py`): `PatchEditorPanel` :2192 (spans 2192-3468), `compose` :2644. Windows
 `#patch_win_script` :2835 (body :2758) · `#patch_win_checks` :2890 (body :2860) · `#patch_win_json` :2958
 (body :2911). Sub-containers `#patch_pane_entries` :2727 · `#patch_pane_changefile` :2756 ·
-`#patch_pane_variant` :2832 · `#patch_doc_file_row` :2754. **20 distinct Button ids** across 9 docked
-containers (all SIBLINGS of the body — the HLR-064/B2 fix). Entries table `DataTable#patch_doc_entries_table`
+`#patch_pane_variant` :2832 · `#patch_doc_file_row` :2754. ⚠ **CORRECTED at Inc-2 (MEASURED against the
+live tree; the draft-time figures below were mine and were wrong): 21 Buttons, not 20** · **8 `.patch-docked-*`
+roots**, not 9 — "9" counted *button-bearing containers*, a different set. Harmless only because the ATs
+enumerate the live tree rather than trusting this line; had an AT asserted `== 20`, it would have pinned my
+error as the contract. **Treat every unmeasured recon count here as `assumed` until an increment measures it.**
+All docked rows are SIBLINGS of the body (the HLR-064/B2 fix). Entries table `DataTable#patch_doc_entries_table`
 :2696 (`zebra_stripes=True`, `cursor_type="row"`), columns `_ENTRIES_COLUMNS` :2264 = Kind/Address/Value·bytes/
 Status/Linkage, rows built by `refresh_entries(rows)` :3217 from `ChangeEntryRow` (`change_service.py:1357`),
 attrs `kind_text/address_text/value_text/status_text/linkage_text`. Empty state `#patch_doc_empty_state` :2701.
@@ -102,6 +106,10 @@ variant_execution(2) · `patch_win_*` → patch_editor_v2/patch_layout/variants 
 directionb(3)/patch_layout(1) · `last_check_result` → undo_redo_ux(2)/change_service(1)/patch_editor_v2(1) ·
 `CheckRunResult` → checks_engine(8)/report_service(5)/variant_execution(2) · `_HISTORY_MAX` →
 change_service(6) · `CappedTextArea` → capped_text_area(11)/patch_editor_v2(4). **Frozen test set: CLEAN.**
+⚠ **SEED GAP found at Inc-2 — `test_tui_theme.py` is a real C-26 hit these seeds MISSED.** The seeds keyed on
+**code symbols** (`PatchEditorPanel`, `patch_win_*`, …) and therefore cannot see consumers of a **non-symbol
+artifact** — `styles.tcss`. Any increment touching CSS/assets must census on the **artifact**, not just on the
+symbols. (Generalizes: seed lists are a starting point, never the census.)
 Patch snapshots: exactly 2 cells (`patch-comfortable-80x24` / `-120x30`; `_TWO_SIZE_SCAFFOLDS` :815).
 
 ## Risks / watch-items
