@@ -379,7 +379,7 @@ Notes:
 MAC row severity/color semantics shall follow:
 
 - `Red`: MAC parse failed, invalid/missing name, invalid/missing hexadecimal address, and same-name A2L↔MAC address mismatch.
-- `Orange`: symbol exists in MAC but not in A2L, duplicate-address alias when alias policy is warning, and overlap ambiguity findings.
+- `Yellow` (warning; **was `Orange` before batch-47 — see §6.5 Amendment F below**): symbol exists in MAC but not in A2L, duplicate-address alias when alias policy is warning, and overlap ambiguity findings. Rendered `#f6ff8f` via `.sev-warning`. **`Orange` is re-scoped, not removed** — it remains the MAC-*specific* cue on the `⚠` record glyph (`orange3`), the hex MAC-address overlay (frozen `MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`), and the Sections-list out-of-range labels (`.mac_out_of_range` `#d9a35b`).
 - `Green`: exact name+address match with A2L (with optional future promotion for image-backed value-resolvable states).
 - `White`: structurally valid MAC entry with no hard inconsistency but not positively cross-confirmed.
 - `Grey`: no A2L loaded or validation context missing.
@@ -400,9 +400,10 @@ The Issues panel shall classify at least the following:
 ### Severity colour restyle — batch-47 (§6.5 Amendment C)
 
 **Amended in batch `2026-07-15-batch-47`** (US-FND / R-TUI-065, LLR-065.4): the `sev-*` class **NAMES**
-and every severity **semantic** above (A2L Red/Green/White/Grey · MAC Red/Orange/Green/White/Grey · the
-Issues tile policy) are **UNCHANGED**. Only the rendered hues were retuned in `styles.tcss` to the
-navy/pastel `insight_style` palette, each staying inside its colour family:
+and every severity **MEANING** above (A2L Red/Green/White/Grey · the MAC row policy · the Issues tile
+policy) are **UNCHANGED**. The rendered hues were retuned in `styles.tcss` to the navy/pastel
+`insight_style` palette, each staying inside its colour family — and **one documented cue's colour NAME
+moved: the warning-level row cue is now `Yellow`, not `Orange` (§6.5 Amendment F, below).**
 
 | class | Before → After | family / semantics (preserved) |
 |-------|----------------|--------------------------------|
@@ -413,14 +414,42 @@ navy/pastel `insight_style` palette, each staying inside its colour family:
 | `.sev-neutral` | `#6b7280` → `#969aad` | DGRAY — not checked yet (Grey) |
 
 **Preserved unchanged:** `.mac_out_of_range` stays `#d9a35b` (paired with the frozen
-`MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`), so the explicit **`Orange` = MAC warning** cue above
-survives the `sev-warning` restyle; the `band-*` entropy rules (R-TUI-060) are a deliberately separate
-colour domain and are untouched. `s19_app/tui/color_policy.py` — the `SEVERITY_CLASS_MAP` and the
+`MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`); the `band-*` entropy rules (R-TUI-060) are a deliberately
+separate colour domain and are untouched. `s19_app/tui/color_policy.py` — the `SEVERITY_CLASS_MAP` and the
 `css_class_for_severity` round-trip — remains **frozen and 0-diff** (the restyle is entirely in
 `styles.tcss`); `tests/test_color_policy_round_trip.py` (frozen) stays green, and
 `tests/test_tui_theme.py::test_at065b_sev_semantics` (AT-065b) asserts the live `sev-error` resolves to
 the new pastel red **and** that the round-trip holds for all five severities. See
 `.dev-flow/2026-07-15-batch-47/01-requirements.md` §6.5 Amendment C.
+
+### Warning cue: Orange → Yellow; Orange re-scoped to MAC-specific — batch-47 (§6.5 Amendment F)
+
+**Amended in batch `2026-07-15-batch-47`** (US-FND / R-TUI-065, LLR-065.4 — operator decision 2026-07-16).
+
+- **Before:** *"MAC row colouring adds **Orange** for warning-level overlap/alias/symbol-only-in-MAC
+  findings"* — the warning-level **row** cue was Orange (`.sev-warning` = `#d9a35b`).
+- **After:** warning-level **rows** (MAC **and** Issues) render **`Yellow` `#f6ff8f`** via `.sev-warning`.
+  **`Orange` is re-scoped, not removed** — it remains the **MAC-specific** cue on: the MAC record `⚠`
+  status glyph (`orange3`, R-TUI-070) · the hex-view MAC address overlay (frozen
+  `MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"`) · the Sections-list "MAC out-of-range @ 0x…" labels
+  (`.mac_out_of_range` `#d9a35b`).
+- **Why:** Amendment C's palette retune rebound `.sev-warning` orange→yellow. Amendment C originally
+  claimed the row cue survived via `.mac_out_of_range` — **it does not**: that class paints only the
+  Sections-list out-of-range labels (`app.py`), never the MAC/Issues warning rows, which are painted
+  `css_class_for_severity(WARNING)` = `.sev-warning`. Caught by a live-app probe at the batch's final
+  PR-level QA (`WARNING → .sev-warning → Color(246,255,143)`). The convention is amended to describe what
+  actually renders rather than ship a doc/behaviour contradiction.
+- **Severity MEANING is unchanged** (warning is still warning); `sev-*` class names unchanged;
+  `color_policy.py` frozen 0-diff.
+- **Code/Validation:** `s19_app/tui/legend.py` (legend label `"Orange"` → `"Pale yellow"`; `"Yellow"` is
+  reserved — it is the Hex focus-highlight row key and would collide with the `COLOUR_SEVERITY`
+  invariant `TC-322` asserts) · `tests/test_tui_theme.py::test_at065c_legend_labels_match_resolved_hue`
+  (**AT-065c** — binds every legend colour LABEL to the hue its severity class resolves to, by HSV
+  family; closes the gap that let the stale label ship, since AT-065b probes only `sev-error`) ·
+  `tests/goldens/batch35/at055b-project-report.md` (2 legend lines rebaselined — the shipped report said
+  "Orange" for a yellow class).
+- **Status:** Automated — added in batch `2026-07-15-batch-47` (Inc-10). See
+  `.dev-flow/2026-07-15-batch-47/01-requirements.md` §6.5 Amendment F.
 
 ---
 

@@ -172,12 +172,21 @@ and non-masking).
 | patch (parked, shared-chrome) | 2 | Inc-8 |
 | **Total** | **29** | — |
 
-**3 pre-existing xfails** (identified on `main`, outside the batch-47 marks): `test_tui_app.py:1784`,
-`test_tui_public_api.py:162`, and `test_validation_engine.py:211` (the frozen-test known xfail). A
-fourth pre-existing marker (`test_tui_snapshot.py:516`) is either deselected under `-m "not slow"` or
-xpasses — the authoritative gate reconciles to exactly **32 xfailed = 29 batch-47 theme-drift + 3
-pre-existing**. Exact identity of the residual 3 is not load-bearing: all pre-date batch-47 and none is
-a batch-47 regression.
+**Pre-existing xfails — ATTRIBUTION CORRECTED at the final PR-QA (2026-07-16):** the 2 `patch` cells in
+the table above are marked by **`_batch46_patch_drift_marks`** (`test_tui_snapshot.py:507`), which exists
+UNCHANGED on `main` — they are therefore **pre-existing marks, not batch-47 additions**. Corrected
+accounting: **batch-47 added 27 marks**, and **pre-existing xfails are 5, not 3**:
+`test_tui_app.py:1784`, `test_tui_public_api.py:162`, `test_validation_engine.py:211` (frozen-test known
+xfail), + the 2 batch-46 `patch` cells. The authoritative gate still reconciles to exactly
+**32 xfailed = 27 batch-47 theme-drift + 5 pre-existing** (0 xpassed). None is a batch-47 regression.
+
+> ⚠ **REGEN-SCOPE TRAP (must be carried into the canonical-CI regen follow-up PR).** The 29 drifting
+> cells span FIVE mark helpers: `_batch47_workspace/_a2l/_mac/_map/_theme_drift_marks` **and**
+> `_batch46_patch_drift_marks`. A regen that retires only the `_batch47_*` helpers leaves the batch-46
+> patch mark live over two cells whose baselines were just refreshed → those cells **XPASS silently**
+> under `strict=False`, and the mark then masks any future patch-screen regression. **The regen PR MUST
+> retire `_batch46_patch_drift_marks` as well** (batch-46's own drift is long since regenerated — PR #82
+> lane; the mark is now only masking batch-47's theme drift).
 
 **Snapshot regen is a canonical-CI-only follow-up PR** (`snapshot-regen.yml`, textual==8.2.8), NOT a
 batch-47 failure. Local regen is prohibited (`reference_snapshot_regen_env` — local textual drift

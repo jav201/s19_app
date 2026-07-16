@@ -8470,9 +8470,13 @@ class S19TuiApp(App):
             - Append at most ``MAX_SECTIONS_PRIMARY_RANGES`` memory-range rows,
               each an in-range ``✓`` glyph + cyan address, a humanized size
               (``human_bytes``) with the range's dominant entropy-band glyph, and
-              a size micro-bar (``microbar(size / biggest)``) as the third line
-              (LLR-042.7 / batch-47 LLR-066.2), then a truncation row when more
-              exist. OK/ERROR ``sev-*`` colouring is retained on the row label.
+              a size micro-bar (``microbar(size / biggest, floor=True)``) as the
+              third line (LLR-042.7 / batch-47 LLR-066.2), then a truncation row
+              when more exist. The bar is floored to >=1 filled cell because at
+              ``SECTIONS_COVERAGE_BAR_WIDTH`` (8) any range under 6.25% of the
+              largest would otherwise render invisible (a 64 B vector table
+              beside a 512 KiB image). OK/ERROR ``sev-*`` colouring is retained
+              on the row label.
             - Append at most ``MAX_SECTIONS_OUT_OF_RANGE`` MAC out-of-range rows; when
               truncated, add a single summary row pointing users at the Issues panel.
 
@@ -8517,7 +8521,9 @@ class S19TuiApp(App):
             content.append("\n")
             content.append_text(
                 microbar(
-                    size / max_size if max_size else 0.0, SECTIONS_COVERAGE_BAR_WIDTH
+                    size / max_size if max_size else 0.0,
+                    SECTIONS_COVERAGE_BAR_WIDTH,
+                    floor=True,
                 )
             )
             label = Label(content)

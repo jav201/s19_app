@@ -44,9 +44,10 @@ def _colour_name_from_style(style: str) -> str:
         Derive a display colour NAME from a Rich style string by dropping the
         modifier tokens and title-casing the remaining colour token AS-IS
         (LLR-059.3). The shade digit is deliberately RETAINED
-        (``"bold orange3" -> "Orange3"``), because the digit-stripped
-        ``"Orange"`` collides with the ``COLOUR_SEVERITY`` WARNING key and
-        would wrongly paint the Hex overlay row ``sev-warning``.
+        (``"bold orange3" -> "Orange3"``): it names the Rich colour the hex
+        view actually paints, and keeping these Hex names disjoint from the
+        ``COLOUR_SEVERITY`` keys is what stops an overlay row (an interaction
+        highlight, NOT a severity) from being painted ``sev-*`` — see TC-322.
 
     Args:
         style (str): a Rich style string, e.g. ``"bold yellow"`` /
@@ -136,8 +137,8 @@ LEGEND_TABLE: Dict[str, LegendRows] = {
             "parse failed, invalid/missing name or hex address, or A2L↔MAC "
             "same-name address mismatch",
         ),
-        "Orange": (
-            "Orange",
+        "Pale yellow": (
+            "Pale yellow",
             "warning: symbol only in MAC (not A2L), duplicate-address alias, "
             "or overlap ambiguity",
         ),
@@ -163,7 +164,7 @@ LEGEND_TABLE: Dict[str, LegendRows] = {
             "A2L↔MAC same-name mismatch",
         ),
         "Warnings": (
-            "Orange",
+            "Pale yellow",
             "address/range out of S19 range, overlap ambiguity, "
             "symbol-only-in-MAC, symbol-only-in-A2L, or warning-policy alias",
         ),
@@ -182,9 +183,21 @@ LEGEND_TABLE: Dict[str, LegendRows] = {
 # severity it represents. TC-S1 asserts every ValidationSeverity in
 # SEVERITY_CLASS_MAP is reachable here. "White" (default foreground, no
 # severity) is deliberately absent.
+#
+# Every KEY here is a colour WORD shown verbatim to the operator, while the row
+# is painted with `css_class_for_severity(<value>)` — so a key must name the hue
+# its severity class actually RESOLVES to, or the legend teaches a wrong key
+# (AT-065c). WARNING is "Pale yellow", not "Orange": batch-47 Inc-8 rebound
+# `.sev-warning` to insight_style.YELLOW (#f6ff8f), and WARNING-severity rows
+# (MAC + Issues) are painted from that class. "Pale yellow" — rather than a bare
+# "Yellow" — keeps these keys disjoint from the `_colour_name_from_style` Hex
+# names ("Yellow" / "Orange3"), which are interaction styles and MUST NOT
+# resolve a severity (LLR-059.1 / TC-322). The orange "MAC address overlay" cue
+# is unaffected and stays documented in the "Hex" block via "Orange3"
+# (= frozen MAC_ADDRESS_OVERLAY_STYLE).
 COLOUR_SEVERITY: Dict[str, ValidationSeverity] = {
     "Red": ValidationSeverity.ERROR,
-    "Orange": ValidationSeverity.WARNING,
+    "Pale yellow": ValidationSeverity.WARNING,
     "Cyan": ValidationSeverity.INFO,
     "Green": ValidationSeverity.OK,
     "Grey": ValidationSeverity.NEUTRAL,

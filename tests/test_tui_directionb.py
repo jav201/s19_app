@@ -7235,7 +7235,10 @@ def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
     Intent: observe the shipped `#sections_list` render, not a proxy. Width is
     proven over case_02 (four all-valid ranges of differing sizes); the colour
     branch is proven over case_04 (one valid + one INVALID range) so the
-    valid≠invalid discriminator is actually exercised.
+    valid≠invalid discriminator is actually exercised. The small-range branch
+    drives a 64 B range beside a 512 KiB range — the normal firmware shape, whose
+    ratio (0.012%) rounds to 0 cells without the fill floor. case_02 structurally
+    cannot catch that: its four ranges are all 32-100% of the largest.
     """
 
     async def _drive_width() -> list[tuple[tuple[int, int], str, object]]:
@@ -7243,6 +7246,20 @@ def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             _install_case_02_loaded_file(app)
+            app.update_sections()
+            await pilot.pause()
+            return _section_bar_lines(app)
+
+    async def _drive_small_range() -> list[tuple[tuple[int, int], str, object]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            loaded = _install_case_02_loaded_file(app)
+            # A 64 B vector table beside a 512 KiB image: frac = 64/524288 =
+            # 0.000122 → round(0.000122 * 8) == 0 filled cells without the floor.
+            loaded.ranges = [(0x00000000, 0x00000040), (0x80000000, 0x80080000)]
+            loaded.range_validity = [True, True]
+            loaded.entropy_windows = []
             app.update_sections()
             await pilot.pause()
             return _section_bar_lines(app)
@@ -7273,6 +7290,17 @@ def test_at040a_per_range_micro_bar_colour_and_width(tmp_path: Path) -> None:
     assert filled[largest] > filled[smallest], (
         f"the largest range's bar must be strictly wider than the smallest's "
         f"(magnitude spark); filled cells were {filled!r}"
+    )
+
+    # --- small-range branch (64 B beside 512 KiB — the counterfactual) ---
+    small_rows = asyncio.run(_drive_small_range())
+    assert len(small_rows) == 2, "small-range scenario has two ranges"
+    small = [r for r in small_rows if (r[0][1] - r[0][0]) == 0x40]
+    assert small, f"the 64 B range must render a row; rows were {small_rows!r}"
+    small_bar = small[0][1]
+    assert "█" in small_bar, (
+        f"a range far smaller than the largest (64 B vs 512 KiB) must STILL "
+        f"render a visible micro-bar (>=1 filled cell); bar was {small_bar!r}"
     )
 
     # --- colour branch (case_04, valid + invalid) ---

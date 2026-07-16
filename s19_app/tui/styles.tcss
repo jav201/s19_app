@@ -512,9 +512,19 @@ DataTable > .datatable--odd-row {
  * and MUST NOT change. Only the hex values are tuned — batch-47 US-FND aligns
  * them to the navy/pastel insight_style palette (§6.5 Amendment C). The hue
  * FAMILY (and thus the severity semantics) is preserved for every class:
- * ok=green, error=red, warning=warm, info=cyan, neutral=grey. The explicit
- * "Orange = MAC warning" cue lives in the separate .mac_out_of_range overlay
- * (+ frozen MAC_ADDRESS_OVERLAY_STYLE = "bold orange3"), left unchanged below.
+ * ok=green, error=red, warning=warm, info=cyan, neutral=grey.
+ *
+ * NOTE (§6.5 Amendment F, 2026-07-16): an earlier version of this comment said
+ * the "Orange = MAC warning" cue "lives in the separate .mac_out_of_range
+ * overlay". That was WRONG — .mac_out_of_range paints only the Sections-list
+ * "MAC out-of-range @ 0x…" labels (app.py), NOT the MAC/Issues warning ROWS,
+ * which are painted css_class_for_severity(WARNING) = .sev-warning. Retuning
+ * .sev-warning below therefore DID move the documented row cue orange→yellow.
+ * Resolved per operator decision: warning severity renders pale yellow on all
+ * screens; ORANGE is re-scoped to the MAC-specific cues — the ⚠ record glyph
+ * (orange3), the hex MAC overlay (frozen MAC_ADDRESS_OVERLAY_STYLE =
+ * "bold orange3"), and .mac_out_of_range (#d9a35b, unchanged below).
+ * REQUIREMENTS.md's severity-convention section is amended to match.
  */
 .sev-ok {
     color: #54efae;              /* was #5fb98a — insight_style.GREEN */

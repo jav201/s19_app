@@ -107,6 +107,47 @@ def test_microbar() -> None:
     assert microbar(1.0, 0).plain == ""
 
 
+def test_microbar_floor_opt_in() -> None:
+    """TC-065.2b / LLR-042.7: ``microbar(..., floor=True)`` guarantees >=1 filled
+    cell for any NON-EMPTY range, while ``frac == 0`` still renders an empty bar.
+
+    WHY: this is the section-row micro-bar's documented contract (ported from the
+    retired ``coverage_bar_cells``: "at least 1 so any non-empty range shows a
+    bar"). At the shipped ``SECTIONS_COVERAGE_BAR_WIDTH`` of 8, any range under
+    6.25% of the largest — a 64 B vector table beside a 512 KiB image, i.e. the
+    normal firmware shape — rounds to 0 cells and renders an INVISIBLE bar. The
+    floor is opt-in: the MAC coverage strip and the Memory-Map region rows
+    legitimately show an empty bar for "0 of N", so the default must not change.
+    """
+    from s19_app.tui.app import SECTIONS_COVERAGE_BAR_WIDTH
+
+    width = SECTIONS_COVERAGE_BAR_WIDTH  # 8 — the shipped section-row bar width
+
+    # Largest range → full bar.
+    assert microbar(1.0, width, floor=True).plain.count("█") == width
+    # Any non-empty range → at least one cell, however small the ratio.
+    for frac in (0.00012, 0.03, 0.0625, 0.5):
+        filled = microbar(frac, width, floor=True).plain.count("█")
+        assert filled >= 1, f"non-empty range (frac={frac}) must show >=1 cell"
+    # An EMPTY range still shows an empty bar — that distinction is the point.
+    assert microbar(0.0, width, floor=True).plain.count("█") == 0
+    assert microbar(-0.5, width, floor=True).plain.count("█") == 0
+    # Monotonic non-decreasing in frac (a larger range never yields a narrower bar).
+    fracs = [0.0, 0.00012, 0.03, 0.0625, 0.25, 0.5, 0.75, 1.0]
+    counts = [microbar(f, width, floor=True).plain.count("█") for f in fracs]
+    assert counts == sorted(counts), f"fill must be monotonic in frac; got {counts!r}"
+    # Fixed-width track: total glyph count is always `width`, whatever the fill.
+    for frac in fracs:
+        assert len(microbar(frac, width, floor=True).plain) == width
+    # width 0 → empty Text, no crash and no floored cell to place.
+    assert microbar(1.0, 0, floor=True).plain == ""
+
+    # NO LEAK: the default (floor=False) still rounds a tiny frac down to 0 — the
+    # MAC coverage strip / Memory-Map region rows keep today's exact behavior.
+    assert microbar(0.00012, width).plain.count("█") == 0
+    assert microbar(0.00012, width, floor=False).plain.count("█") == 0
+
+
 def test_microbar_returns_text() -> None:
     """TC-065.2 / TC-065.4: ``microbar`` returns ``rich.text.Text``, not ``str``.
 
