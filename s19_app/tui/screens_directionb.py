@@ -72,7 +72,7 @@ from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
-from .insight_style import human_bytes, microbar
+from .insight_style import CYAN, PURPLE, VALUE, human_bytes, label_value, microbar
 from .os_clipboard_input import OsClipboardInput
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
@@ -2274,6 +2274,27 @@ class PatchEditorPanel(ScrollableContainer):
         "assignments": "per assignment",
     }
 
+    #: The three windows' border titles (LLR-075.1). CONSTANT author strings —
+    #: never file-derived (C-17). The superscript ordinal names the window's
+    #: read order in the three-column regime.
+    _WINDOW_BORDER_TITLES = {
+        "patch_win_script": "¹PATCH SCRIPT",
+        "patch_win_checks": "²CHECKS",
+        "patch_win_json": "³JSON EDIT",
+    }
+
+    #: The JSON window's border subtitle (LLR-075.1) — the change-set schema
+    #: token, spelled locally so this view widget imports nothing from the
+    #: service layer (the panel's own paste label already reads "v2 JSON").
+    _JSON_SCHEMA_SUBTITLE = "v2 schema"
+
+    #: The CHECKS window's border subtitle before any check run (LLR-075.1).
+    _NO_RUN_SUBTITLE = "no run yet"
+
+    #: The variant/scope line's placeholder when no variant is active
+    #: (LLR-075.3 invalid boundary — a neutral placeholder, never a crash).
+    _NO_VARIANT_PLACEHOLDER = "-"
+
     #: The save-back S19 record widths in selector cycle order (US-015 /
     #: LLR-015.3). 32 is the default (the populated-S0 / 32-byte mode); 16 is
     #: the legacy empty-S0 / 16-byte mode. Spelled locally so this view widget
@@ -2546,6 +2567,11 @@ class PatchEditorPanel(ScrollableContainer):
         #: (US-015 / LLR-015.3) — cycled by ``#patch_saveback_width_button``;
         #: carried on the ``SaveBackDecision``. Defaults to 32.
         self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
+        #: The active variant id the variant/scope line shows (LLR-075.3),
+        #: mirrored from ``set_variants`` — ``app.py`` remains the ONLY
+        #: populator (the US-026 ownership split). File-derived, so it reaches
+        #: the line only through a literal ``Text`` append (LLR-075.4 / C-17).
+        self._active_variant: Optional[str] = None
 
     def set_change_files(self, names: Sequence[str]) -> None:
         """Populate the change-file dropdown with the patches-folder files.
@@ -2636,10 +2662,30 @@ class PatchEditorPanel(ScrollableContainer):
             >>> panel.set_variants([("a", "a"), ("b", "b")], "b")
         """
         select = self.query_one("#patch_variant_select", Select)
-        select.set_options(options)
+        # C-17 (LLR-075.4, WIDENED — a SECOND live sink found in Phase 3):
+        # the option LABEL is project-file-derived (`app.py:3740-3742` maps
+        # each `variant.variant_id` to BOTH label and value), and Textual's
+        # `SelectCurrent.update(prompt)` (`_select.py:615`) hands a bare `str`
+        # label to a markup-enabled `Static` -> `Content.from_markup`
+        # (`visual.py:103`). Measured at `textual==8.2.8`: a variant id of
+        # `[/nope]` raised `MarkupError` out of `set_variants`; `[link=…]`
+        # injected a link from project data. `update` takes a `RenderableType`,
+        # so a literal `Text` label is passed through unparsed — the same fix
+        # shape as LLR-075.6, applied at the panel's render boundary so
+        # `app.py` stays unchanged.
+        select.set_options(
+            [(safe_text(str(label)), value) for label, value in options]
+        )
         if active_id is not None and len(options) >= 2:
             select.value = active_id
         select.disabled = len(options) < 2
+        # LLR-075.3: mirror the active variant onto the variant/scope line.
+        # Driving it from HERE (the single populator) is what keeps the line
+        # from going stale: a dropdown pick routes through
+        # ``_handle_select_variant`` -> load -> ``_apply_prepared_load`` ->
+        # ``_refresh_patch_variant_select`` -> back into this method.
+        self._active_variant = active_id
+        self._refresh_variant_scope_line()
 
     def compose(self) -> ComposeResult:
         """Lay out the Patch Editor as three responsive bordered windows.
@@ -2685,7 +2731,7 @@ class PatchEditorPanel(ScrollableContainer):
                 - Textual ``ScrollableContainer`` compose lifecycle
         """
         # ================= PATCH SCRIPT window =================
-        yield Container(
+        script_window = Container(
             Label("PATCH SCRIPT", classes="patch-window-title"),
             VerticalScroll(
                 Container(
@@ -2827,6 +2873,25 @@ class PatchEditorPanel(ScrollableContainer):
                         ),
                         id="patch_execute_buttons",
                     ),
+                    # LLR-075.3: the variant + execution scope as a readable
+                    # LINE. Before this, the scope was legible only from
+                    # #patch_execute_scope_button's own label. An ADDED id —
+                    # no existing id moves, is renamed, or is re-parented
+                    # (§2.4-6). Nested INSIDE #patch_execute_row (still a
+                    # descendant of #patch_pane_variant per LLR-075.3, and
+                    # adjacent to the button that cycles it) so
+                    # #patch_pane_variant's pinned direct-child list stays
+                    # exactly [patch_variant_row, patch_execute_row] —
+                    # TC-035.2 / R-PATCH-VARIANT-SELECT-001 stay green
+                    # unedited. markup=False is defence-in-depth: every
+                    # update() passes a literal Text, so the file-derived
+                    # variant id is never markup-parsed (LLR-075.4 / C-17).
+                    Static(
+                        "",
+                        id="patch_variant_scope_line",
+                        markup=False,
+                        classes="patch-field-label",
+                    ),
                     id="patch_execute_row",
                 ),
                 id="patch_pane_variant",
@@ -2836,7 +2901,7 @@ class PatchEditorPanel(ScrollableContainer):
             classes="patch-window",
         )
         # ================= CHECKS window =================
-        yield Container(
+        checks_window = Container(
             Label("CHECKS", classes="patch-window-title"),
             VerticalScroll(
                 Label(
@@ -2891,7 +2956,7 @@ class PatchEditorPanel(ScrollableContainer):
             classes="patch-window",
         )
         # ================= JSON EDIT window =================
-        yield Container(
+        json_window = Container(
             Label("JSON EDIT", classes="patch-window-title"),
             VerticalScroll(
                 # batch-36 (US-058): the change-set paste group in a scrollable
@@ -2958,6 +3023,99 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_win_json",
             classes="patch-window",
         )
+        # LLR-075.1: the dolphie-idiom border title + subtitle on each window
+        # (the batch-47 `app.py:1651-1656` Workspace-pane precedent). The
+        # titles are CONSTANT author strings; the subtitles carry LIVE state
+        # and are re-set by refresh_entries (SCRIPT: entry count) and
+        # refresh_check_results (CHECKS: run state). The JSON subtitle is the
+        # static schema token. `.patch-window` already draws `border: round
+        # $rule` (styles.tcss:864), so the border chrome exists to host them.
+        script_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_script"]
+        checks_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_checks"]
+        json_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_json"]
+        checks_window.border_subtitle = self._NO_RUN_SUBTITLE
+        json_window.border_subtitle = self._JSON_SCHEMA_SUBTITLE
+        yield script_window
+        yield checks_window
+        yield json_window
+
+    def _set_window_subtitle(self, window_id: str, subtitle: str) -> None:
+        """Set one patch window's live border subtitle (LLR-075.1).
+
+        Summary:
+            Write ``subtitle`` onto the ``#patch_win_*`` container's
+            ``border_subtitle``. Tolerates a not-yet-mounted tree so the
+            ``refresh_*`` renderers stay callable from ``on_mount`` and from
+            ``app.py`` alike.
+
+        Args:
+            window_id (str): The window container id — one of
+                ``_WINDOW_BORDER_TITLES``' keys.
+            subtitle (str): The author-composed live state token. NEVER
+                file-derived (C-17): every caller passes a count or a fixed
+                token, never a document string.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Query the window container; assign ``border_subtitle``.
+
+        Dependencies:
+            Used by:
+                - ``PatchEditorPanel.refresh_entries`` (SCRIPT entry count)
+                - ``PatchEditorPanel.refresh_check_results`` (CHECKS run state)
+
+        Example:
+            >>> panel._set_window_subtitle("patch_win_script", "3 entries")
+        """
+        windows = self.query(f"#{window_id}")
+        if windows:
+            windows.first(Container).border_subtitle = subtitle
+
+    def _refresh_variant_scope_line(self) -> None:
+        """Render the variant + execution-scope line (LLR-075.3 / LLR-075.4).
+
+        Summary:
+            Compose ``Variant <id> · Scope <label>`` as a Rich ``Text`` and
+            write it to ``#patch_variant_scope_line``. The scope label comes
+            from the panel's OWN local vocabulary (``_SCOPE_LABELS``), so this
+            view widget still imports nothing from the service layer (C-7).
+            The variant id is project-file-derived and is therefore appended
+            LITERALLY — never f-strung into a markup string and never passed
+            to ``Text.from_markup`` (LLR-075.4 / C-17).
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``self._active_variant`` (mirrored from ``set_variants``) +
+              ``self._execute_scope`` (cycled by the scope button) →
+              ``label_value`` pairs → ``Static.update``.
+
+        Dependencies:
+            Uses:
+                - ``insight_style.label_value``
+            Used by:
+                - ``PatchEditorPanel.set_variants``
+                - ``PatchEditorPanel.on_button_pressed`` (the scope cycle)
+                - ``PatchEditorPanel.on_mount``
+
+        Example:
+            >>> panel._refresh_variant_scope_line()
+        """
+        lines = self.query("#patch_variant_scope_line")
+        if not lines:
+            return
+        variant = self._active_variant or self._NO_VARIANT_PLACEHOLDER
+        # `label_value` appends both segments literally — the C-17-safe
+        # constructor. A hostile variant id renders as its own characters.
+        line = label_value("Variant", variant, CYAN)
+        line.append(" · ")
+        line.append_text(
+            label_value("Scope", self._SCOPE_LABELS[self._execute_scope])
+        )
+        lines.first(Static).update(line)
 
     def on_mount(self) -> None:
         """Initialise the entries table columns and the empty state.
@@ -2974,6 +3132,9 @@ class PatchEditorPanel(ScrollableContainer):
         table = self.query_one("#patch_doc_entries_table", DataTable)
         table.add_columns(*self._ENTRIES_COLUMNS)
         self.refresh_entries([])
+        # LLR-075.3: render the line's no-variant/default-scope initial state
+        # so it never mounts blank.
+        self._refresh_variant_scope_line()
 
     def request_action(self, action: str) -> None:
         """Post an :class:`ActionRequested` message for ``action``.
@@ -3143,6 +3304,9 @@ class PatchEditorPanel(ScrollableContainer):
             event.button.label = (
                 f"Scope: {self._SCOPE_LABELS[self._execute_scope]}"
             )
+            # LLR-075.3: the line and the button label are two views of the
+            # SAME `_execute_scope` — cycle them together or the line lies.
+            self._refresh_variant_scope_line()
             return
         actions = {
             "patch_entry_add_button": "add_entry",
@@ -3222,7 +3386,29 @@ class PatchEditorPanel(ScrollableContainer):
             ``ChangeEntryRow`` list (kind, address, value-or-bytes, status,
             linkage). When the list is empty, show the neutral empty-state
             line and hide the table; otherwise hide the empty-state line
-            and show the table (LLR-003.1).
+            and show the table (LLR-003.1). Also refresh the SCRIPT window's
+            live entry-count border subtitle (LLR-075.1).
+
+            **Every cell is constructed as a Rich ``Text`` via ``safe_text``
+            — regardless of whether a role style is assigned to it — and NO
+            bare ``str`` is passed to ``add_row`` (LLR-075.6 / C-17).** This
+            CLOSES A LIVE, EXPLOITABLE SINK: ``ChangeService.rows`` sets
+            ``value_text = entry.value``, the raw file-derived change-set
+            string, and Textual's ``default_cell_formatter``
+            (``_data_table.py:202-222``) sets ``possible_markup=True`` and
+            calls ``Text.from_markup`` **on any bare ``str``**. Measured
+            against the pre-fix code at ``textual==8.2.8``:
+            ``[red]PWNED[/red]`` injected ``Span(0,5,'red')`` and mangled the
+            content; ``[link=http://evil]click[/link]`` injected a LINK from
+            file data; ``[/nope]`` raised ``MarkupError`` and CRASHED this
+            method. A ``Text`` cell is passed through unparsed, so
+            constructing every cell is the fix.
+
+            The three role styles (LLR-075.2) are a SEPARATE, presentational
+            concern. ``status_text`` and ``linkage_text`` carry no role style
+            — **that is not a licence to pass them as bare ``str``**; a
+            role-driven conversion covering only the three styled cells is
+            the partial fix that leaves the sink live.
 
         Args:
             rows (Sequence[object]): The ``ChangeEntryRow`` objects produced
@@ -3232,11 +3418,16 @@ class PatchEditorPanel(ScrollableContainer):
                 imports nothing from the service layer.
 
         Data Flow:
-            - Clear and refill the table from the row list.
+            - Clear and refill the table from the row list, each cell wrapped
+              by ``safe_text`` (a literal ``Text``; never ``from_markup``).
             - Toggle the ``.hidden`` class on the table and the empty-state
               line by whether the list is empty.
+            - Set the SCRIPT window's ``N entries`` border subtitle.
 
         Dependencies:
+            Uses:
+                - ``safe_text`` ; ``insight_style.PURPLE`` / ``CYAN`` /
+                  ``VALUE``
             Used by:
                 - ``S19TuiApp`` Patch Editor action handler
         """
@@ -3245,12 +3436,17 @@ class PatchEditorPanel(ScrollableContainer):
         table.clear()
         for row in rows:
             table.add_row(
-                row.kind_text,
-                row.address_text,
-                row.value_text,
-                row.status_text,
-                row.linkage_text,
+                safe_text(str(row.kind_text), PURPLE),
+                safe_text(str(row.address_text), CYAN),
+                safe_text(str(row.value_text), VALUE),
+                safe_text(str(row.status_text)),
+                safe_text(str(row.linkage_text)),
             )
+        count = len(rows)
+        self._set_window_subtitle(
+            "patch_win_script",
+            f"{count} {'entry' if count == 1 else 'entries'}",
+        )
         if rows:
             table.remove_class("hidden")
             empty_state.add_class("hidden")
@@ -3454,6 +3650,8 @@ class PatchEditorPanel(ScrollableContainer):
         Data Flow:
             - Update the status label, remove prior result children, mount
               one classed ``Static`` per row.
+            - Set the CHECKS window's run-state border subtitle (LLR-075.1):
+              the row count when a run produced rows, else the no-run token.
 
         Dependencies:
             Used by:
@@ -3464,6 +3662,13 @@ class PatchEditorPanel(ScrollableContainer):
         container.remove_children()
         for row in rows:
             container.mount(Static(row.text, classes=row.css_class, markup=False))
+        # LLR-075.1: derived from the ROW COUNT, never from `status_line` —
+        # the status line is service-shaped text and the subtitle must stay an
+        # author-composed token (C-17).
+        self._set_window_subtitle(
+            "patch_win_checks",
+            f"{len(rows)} checked" if rows else self._NO_RUN_SUBTITLE,
+        )
 
 
 class AbDiffPanel(Container):
