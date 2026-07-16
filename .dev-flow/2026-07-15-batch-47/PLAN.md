@@ -46,7 +46,9 @@ postmortem.
 - **Inc-2 — US-WS data** — ✅ DONE. models.py 2 defaulted fields + load_service; 4 green, MN-6 blast-radius 222/0, 0 HIGH.
 - **Inc-3 — US-WS render** — ✅ DONE. app.py titles/stats/MJ-1/sections/memstrip; 14 green (AT-066a/b/c/d + AT-067); 6-cell drift xfail (C-28 clean); F1 dead-code cleanup applied; 0 HIGH. classed-hex→Inc-7.
 - **Inc-4 — US-A2L** — ✅ DONE. tuple[Text] cells + glyph + A2LDetailCard + RowHighlighted; 6 green (AT-068/069/069b★/069c★); dual review 0 HIGH (security APPROVE-CLEAN); §6.5 Amd E (accents subsumed by severity). 6 a2l cells drift.
-- **Inc-5 — US-MAC** — STARTING. status glyph ✓/⚠/✗ + coverage strip + C-17 MAC names (AT-070/070b★/070c/071).
+- **Inc-5 — US-MAC** — ✅ DONE. glyph col + coverage strip + C-17; 7 green (AT-070/070b★/070c/070d/071); dual review, F1 MEDIUM fixed (glyph off in_mem, ✓=in-image; +AT-070d MAC-only ·). 4 wide mac cells drift.
+- **Inc-6 — US-MAP Memory Map BIG** — STARTING. pastel bands+hatch + address ruler + N-sym rows + region inspector hex-peek (AT-072a/072b/073/074). C-29 both-axes measure.
+- Canonical AT registry: **20** (+AT-070d).
 
 ## Phase-1 result (2026-07-15)
 - `01-requirements.md` (architect): 5 US, **10 HLR** (HLR-065..074 = R-TUI-065..074), **32 LLR**,

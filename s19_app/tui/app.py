@@ -123,7 +123,10 @@ from .services.manifest_writer import (
     verify_written_manifest,
     write_project_manifest,
 )
-from .services.validation_service import build_validation_report
+from .services.validation_service import (
+    build_mac_coverage_strip,
+    build_validation_report,
+)
 from .services.variant_execution_service import (
     EXECUTION_SCOPES,
     PROJECT_MANIFEST_NAME,
@@ -562,6 +565,46 @@ def _severity_style(severity: ValidationSeverity) -> str:
             - ``precompute_mac_datatable_payload``
     """
     return _SEVERITY_TO_RICH_STYLE.get(severity, "")
+
+
+#: Leading MAC status glyph + Rich style (batch-47, LLR-070.1). Derived from the
+#: record's precomputed ``Status`` + ``InMem`` cells so the render layer never
+#: re-runs validation. Per LLR-070.1 and the sev-* convention (green = memory-
+#: checked + present): ``✗`` red = parse-error; ``⚠`` orange = parse-ok +
+#: out-of-image (the existing MAC-warning orange); ``✓`` green = parse-ok +
+#: in-image; ``·`` grey = NOT image-checked (MAC-only load / no address → the
+#: "not yet checked" state — must NOT read as a green "verified present").
+_MAC_GLYPH_PARSE_ERROR: tuple[str, str] = ("✗", "red")
+_MAC_GLYPH_OUT_OF_IMAGE: tuple[str, str] = ("⚠", "orange3")
+_MAC_GLYPH_IN_IMAGE: tuple[str, str] = ("✓", "green")
+_MAC_GLYPH_UNCHECKED: tuple[str, str] = ("·", "grey50")
+
+
+def _mac_status_glyph(status: str, in_mem: str) -> tuple[str, str]:
+    """
+    Summary:
+        Return the ``(glyph, style)`` for a MAC row from its precomputed
+        ``Status`` string and ``InMem`` cell (``"yes"``/``"no"``/``"n/a"``),
+        per LLR-070.1. ``✓`` green is reserved for a memory-checked + present
+        record; an un-image-checked record (MAC-only load, no primary) renders
+        the grey ``·`` "not yet checked" cue, never a false green.
+
+    Args:
+        status (str): The row's ``Status`` column value (``"ERR_PARSE"`` etc.).
+        in_mem (str): The row's ``InMem`` column value — ``"yes"`` (in image),
+            ``"no"`` (out of image), or ``"n/a"`` (not image-checked).
+
+    Returns:
+        tuple[str, str]: ``(glyph, rich_style)`` — one of the four
+        ``_MAC_GLYPH_*`` constants.
+    """
+    if status == "ERR_PARSE":
+        return _MAC_GLYPH_PARSE_ERROR
+    if in_mem == "no":
+        return _MAC_GLYPH_OUT_OF_IMAGE
+    if in_mem == "yes":
+        return _MAC_GLYPH_IN_IMAGE
+    return _MAC_GLYPH_UNCHECKED
 
 
 #: Fixed cell budget for the Workspace per-range coverage micro-bar (LLR-042.7).
@@ -4219,6 +4262,9 @@ class S19TuiApp(App):
                 Button("Legend", id="mac_legend_button"),
                 id="mac_page_controls",
             ),
+            # Always-visible MAC->S19 coverage strip above the records list
+            # (batch-47, LLR-071.1/071.2). Numeric-only content → markup=False.
+            Static("", id="mac_coverage_strip", markup=False),
             Container(
                 DataTable(id="mac_records_list", zebra_stripes=True, cursor_type="row"),
                 Label("", id="mac_records_summary"),
@@ -9034,6 +9080,9 @@ class S19TuiApp(App):
         summary_label = self.query_one("#mac_records_summary", Label)
         self._mac_row_key_to_address = {}
         mac_table.clear(columns=False)
+        # Blank the coverage strip by default; the loaded-MAC path re-shows it
+        # below (LLR-071.2 — gated on a MAC being loaded, not on file type).
+        self._update_mac_coverage_strip(show=False)
         if not self.current_file or not self.current_file.mac_records:
             summary_label.update("No MAC loaded.")
             self._refresh_no_mac_validation()
@@ -9072,6 +9121,7 @@ class S19TuiApp(App):
         visible_styles = cell_styles[start:end]
         visible_meta = self._mac_view_cache_meta[start:end]
         self._populate_mac_datatable(mac_table, visible_rows, visible_styles, visible_meta, start)
+        self._update_mac_coverage_strip(show=True)
         page_num = start // page_size + 1
         total_pages = max(1, (total + page_size - 1) // page_size)
         summary_text = (
@@ -9095,6 +9145,48 @@ class S19TuiApp(App):
             time.perf_counter() - populate_started,
         )
         self._flush_logger()
+
+    def _update_mac_coverage_strip(self, *, show: bool) -> None:
+        """
+        Summary:
+            Render (or blank) the always-visible MAC coverage strip
+            ``#mac_coverage_strip`` (batch-47, LLR-071.1/071.2). When a MAC is
+            loaded the strip shows ``build_mac_coverage_strip`` from the session's
+            ``CoverageMetrics`` — independent of the primary file type,
+            superseding the old primary-only pct-line. When no MAC is loaded the
+            strip is blanked.
+
+        Args:
+            show (bool): True → render the coverage strip; False → blank it.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Read ``self._validation_report.coverage`` (or ``None`` when no
+              report exists yet) and hand it to ``build_mac_coverage_strip``,
+              which formats a numeric-only, C-17-safe Rich ``Text``.
+            - Defensively no-op when the strip node is not mounted (headless unit
+              tests that fake ``query_one``).
+
+        Dependencies:
+            Uses:
+                - ``build_mac_coverage_strip``
+            Used by:
+                - ``update_mac_view``
+        """
+        try:
+            strip = self.query_one("#mac_coverage_strip", Static)
+        except Exception:
+            return
+        if strip is None:
+            return
+        if not show:
+            strip.update("")
+            return
+        report = self._validation_report
+        coverage = report.coverage if report is not None else None
+        strip.update(build_mac_coverage_strip(coverage))
 
     def _populate_mac_datatable(
         self,
@@ -9121,12 +9213,19 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Construct ``rich.text.Text`` cells so severity coloring renders correctly.
+            - Fold a leading status glyph (``✓``/``⚠``/``✗``, coloured per the
+              precomputed ``Status`` column via ``_mac_status_glyph``) into the
+              Tag cell as its own span, then append the file-derived name in the
+              row severity style (batch-47, LLR-070.1/070.2 — the name is a
+              ``Text`` segment, never markup-parsed).
+            - Colour the Address cell cyan (LLR-070); style the rest by severity.
             - Build row-key strings of the form ``mac:<absolute_index>``.
             - Record the per-row address in ``_mac_row_key_to_address`` for jump logic.
-            - Invoke ``DataTable.add_rows`` once with the fully-assembled iterable.
+            - Invoke ``DataTable.add_row`` once per row (per-row key).
 
         Dependencies:
+            Uses:
+                - ``_mac_status_glyph``
             Used by:
                 - ``update_mac_view``
         """
@@ -9136,8 +9235,22 @@ class S19TuiApp(App):
         keys: list[str] = []
         for i, row in enumerate(visible_rows):
             style = visible_styles[i] if i < len(visible_styles) else ""
-            rich_cells = tuple(Text(str(cell), style=style) if style else Text(str(cell)) for cell in row)
-            rendered_rows.append(rich_cells)
+            status = str(row[4]) if len(row) > 4 else ""
+            in_mem = str(row[3]) if len(row) > 3 else ""
+            glyph, glyph_style = _mac_status_glyph(status, in_mem)
+            rich_cells: list[Text] = []
+            for col, cell in enumerate(row):
+                cell_str = str(cell)
+                if col == 0:
+                    tag_cell = Text()
+                    tag_cell.append(f"{glyph} ", style=glyph_style)
+                    tag_cell.append(cell_str, style=style or None)
+                    rich_cells.append(tag_cell)
+                elif col == 1:
+                    rich_cells.append(Text(cell_str, style=CYAN))
+                else:
+                    rich_cells.append(Text(cell_str, style=style) if style else Text(cell_str))
+            rendered_rows.append(tuple(rich_cells))
             absolute_index = start + i
             row_key = f"mac:{absolute_index}"
             keys.append(row_key)

@@ -597,6 +597,42 @@ def _batch47_a2l_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-47 (R-TUI-070/071, US-MAC View MID): the MAC records table gains a
+# leading status glyph folded into the Tag cell (`✓`/`⚠`/`✗`, LLR-070.1), cyan
+# addresses (LLR-070), and a NEW `#mac_coverage_strip` Static above the records
+# list (LLR-071.1). These repaint the MAC records pane. The batch-47 Inc-5
+# snapshot run showed EXACTLY the 4 WIDE `mac` cells (120x30 + 160x40, both
+# densities) drift — the 2 `mac-*-80x24` cells stay green (the narrow layout
+# renders the changed records pane below the snapshot fold, C-22 per-cell). No
+# a2l/issues/workspace-non-theme/map/patch/diff cell moved (C-28 shared-chrome
+# clean; no footer/header/rail binding change this increment). The SVG baselines
+# regenerate in canonical CI (snapshot-regen.yml, pinned textual==8.2.8) — NOT
+# locally. Until the batch-47 theme+regen follow-up lands, the 4 wide mac cells
+# ride xfail(strict=False) (C-22 upper bound).
+def _batch47_mac_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 MAC insight-layer drift marks.
+
+    The 4 WIDE ``mac`` cells (both densities x {120x30, 160x40}) drift when the
+    MAC records table gains the status glyph + cyan addresses and the coverage
+    strip mounts (US-MAC, HLR-070/071). The narrow ``mac-*-80x24`` cells stay
+    green (changed region below the fold). Marked ``xfail(strict=False)`` until
+    the canonical-CI baseline regen lands (batch-47 theme + regen), then retired.
+    """
+    if screen == "mac" and size_key in _WIDE_FOOTER_SIZES:
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-070/071 US-MAC: records status-glyph column + "
+                    "cyan addresses + #mac_coverage_strip; SVG baseline regen "
+                    "pending in canonical CI (snapshot-regen.yml, batch-47 "
+                    "theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -609,7 +645,8 @@ _RESTYLED_CELLS = [
         + _batch44_drift_marks(screen, density, size_key)
         + _batch45_footer_drift_marks(screen, density, size_key)
         + _batch47_workspace_drift_marks(screen, density, size_key)
-        + _batch47_a2l_drift_marks(screen, density, size_key),
+        + _batch47_a2l_drift_marks(screen, density, size_key)
+        + _batch47_mac_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
