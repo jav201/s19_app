@@ -93,7 +93,7 @@
 | US-MAP | AT-073 | `_build_region_row` → `RegionRow` | per-region `N sym` == an **independent `range_index` oracle** + `↵` affordance present | `…::test_at073_sym_count` (L153) | pass |
 | US-MAP | **AT-074 ★** | `on_region_row_activated` / `_region_hex_peek` → `#map_detail_body` | activate a **non-first** region → hex-peek first address == that region's start; **+ mandatory C-17 sub-assertion (MN-4)**: bracketed A2L symbol name verbatim in `#map_detail_body` | `…::test_at074_inspector` (L201) | pass |
 
-**Behavioral chain: 20/20 canonical ATs → exactly one collected on-disk node each, at both pilot sizes.
+**Behavioral chain: 21/21 canonical ATs (21st = **AT-065c** US-FND/HLR-065/LLR-065.4 -> `tests/test_tui_theme.py::test_at065c_legend_labels_match_resolved_hues`, added Inc-10 with 6.5 Amendment F: binds every legend colour LABEL to the hue its severity class resolves to, by HSV family; closes the gap AT-065b left by probing `sev-error` only) → exactly one collected on-disk node each, at both pilot sizes.
 No AT covered-in-parts; no orphan; no missing node. Every US has ≥1 AT.**
 
 ### 1c. C-17 gate-blocking set (4 sinks — all green)
@@ -212,6 +212,6 @@ holes:
 | Tree HEAD reconciled | `12c5d1c` (branch `claude/screen-upgrades-handoff-0874f9`) |
 | Total iterations (sum of phases) | 5 (phases 0–4, 1 each; phases 5–6 = 0) + 1 **in-increment** iterate-to-fix (Inc-5 F1) |
 | Increments | 8 (all ≤5 files; 0 cap trips) |
-| Validation passed | **yes** — 20/20 ATs, 36/36 LLRs, 0 failed, exit 0 |
+| Validation passed | **yes** — 21/21 ATs, 36/36 LLRs, 0 failed, exit 0 |
 | Gaps | **none** |
 | Synced to Obsidian | pending (`/dev-flow-sync` after merge) |

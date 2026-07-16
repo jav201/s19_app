@@ -6,7 +6,8 @@
 ## Where we are
 - **Phase 6 — Documentation** — docs written (traceability / functionality / diagrams / exec-summary) + **REQUIREMENTS.md registry updated** (10 new R-TUI-065..074 rows + 4 amendments). → commit, push, PR, CI, final PR-QA, merge, sync.
 - **Phase 5 — Post-mortem** — ✅ APPROVE. Clean batch. **C-30 encoded** (operator-approved); CAND-B declined.
-- **Phase 4 — Validation** — ✅ PASS. **1416 passed / 0 failed / 32 xfailed**, exit 0. 20/20 ATs single-node (C-18); 0 LLRs uncovered; frozen 0-diff.
+- **Phase 4 — Validation** — ✅ PASS. **1416 passed / 0 failed / 32 xfailed**, exit 0. 20/20 ATs single-node at the gate (C-18) → **21/21** after AT-065c (Inc-10); 0 LLRs uncovered; frozen 0-diff.
+- **Final PR-QA #1 → BLOCK (1 HIGH)** → Inc-9 (restore micro-bar floor, operator-chosen) + Inc-10 (legend label/hue + AT sizes + §6.5 Amendment F) → **Final PR-QA #2 → MERGE-CLEAR** (HIGH-1 mutation-tested: `floor=False` → the shipped-surface AT fails).
 - **Phase 3 — Implementation** — ✅ COMPLETE (8/8 increments; all HLR-065..074 closed).
 - **Correction (Phase 6):** LLR count is **36**, not the 32 the Phase-1 summary reported (all 36 green; coverage unaffected).
 - **Phase 2 — Cross-review** — APPROVE-WITH-FOLDS → folds applied → re-gate APPROVE. 0 blockers / 0 HIGH.

@@ -296,7 +296,7 @@ new pastel red **and** that the round-trip still holds for all five severities.
 - **A2L accents deferred rather than blended** (Amendment E) — see §4.2.
 
 ### Next steps / open items
-1. **Canonical-CI snapshot-regen follow-up PR** — retires the 29 `_batch47_*_drift_marks` xfails.
+1. **Canonical-CI snapshot-regen follow-up PR** — regenerates the 29 drifting cells and retires **six** mark helpers: the five `_batch47_workspace/_a2l/_mac/_map/_theme_drift_marks` (**27** cells) **AND `_batch46_patch_drift_marks`** (the last **2** `patch` cells). ⚠ Only 27 of the 29 are `_batch47_*` — retiring just those leaves the batch-46 mark live over 2 freshly-regenerated cells, which then **XPASS silently** under `strict=False` and mask future patch-screen regressions.
    Regen only in `snapshot-regen.yml` @ textual==8.2.8; **local regen is prohibited** (it drifts
    unrelated baselines).
 2. **`chip-button` CSS** ships with Batch B (Patch Editor BIG), its only consumer.

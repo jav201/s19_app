@@ -9,8 +9,8 @@
 - **Top 3:** ① C-17 markup-safety held **by construction** across all new render sinks (`safe_text = Text()`, never `from_markup`), all 4 gate-blocking C-17 ATs genuine · ② the Phase-2 writer-census (C-15.1) caught **MJ-1** (loader-facts would lie after MAC attach) *before any code* · ③ theme-LAST sequencing preserved live snapshot regression-coverage through the functional increments (Inc-7 classed-hex drifted 0 new cells).
 - **What didn't:** the agent-liveness `.output`-file proxy was broken (0 B during runs) → pivoted mid-batch to a python-process + file-writes liveness proxy.
 - **New control this batch:** 1 proposed — **CAND-A** "app-wide restyle sequencing LAST" (stack-specific → `docs/engineering-rules.md`, extends C-22/C-28). CAND-B assessed → lesson-only. Both **PROPOSED, not encoded** — operator decides.
-- **Open items → next batch (Batch B = Patch Editor BIG):** 3 — biggest = the canonical-CI snapshot-regen follow-up PR that retires the 29 theme-drift xfails.
-- **Metrics:** iterations Σ5 (phases 0–4, 1 each; +1 in-increment iterate-to-fix at Inc-5) · findings ~19 closed / 0 escaped · ledger ~1394 → **1416 passed** · 20 ATs · **36 LLRs** · §6.5 amendments A–E · 8 increments, all ≤5 files, 0 cap trips.
+- **Open items → next batch (Batch B = Patch Editor BIG):** 3 — biggest = the canonical-CI snapshot-regen follow-up PR that regenerates the 29 theme-drift cells and retires **six** mark helpers (five `_batch47_*` = 27 cells **+ `_batch46_patch_drift_marks`** = 2 cells — see the trap in the carry table below).
+- **Metrics:** iterations Σ5 (phases 0–4, 1 each; +1 in-increment iterate-to-fix at Inc-5) · findings ~19 closed / 0 escaped · ledger ~1394 → **1416 passed** · **21 ATs** (20 at the Phase-4 gate + **AT-065c** added Inc-10) · **36 LLRs** · §6.5 amendments **A–F** · 8 increments + 2 post-QA fix increments (Inc-9/10), all ≤5 files, 0 cap trips.
 
 > Enough to know the batch's health and what carries forward. Detail below only for the why.
 
@@ -55,8 +55,8 @@
 | Where caught (Phase 2 / P3 gate / P4) | 14 / 5 / 0 |
 | Test ledger (base − D + A = post) | ~1394 → **1416 passed** (net +22; 0 failed, 32 xfailed, 2 skipped, 20 deselected; exit 0) |
 | Files touched · increments (cap trips) | ~15 non-frozen files · 8 increments (0 cap trips; every increment ≤5 files) |
-| AT count / LLR count | 20 canonical ATs (19 base + AT-070d self-owned Inc-5) / **36 LLRs** (065.1–074.3; enumerated 065:4·066:7·067:4·068:3·069:4·070:2·071:2·072:4·073:3·074:3 — corrected at Phase 6 from the "32" the Phase-1 summary reported; all 36 green, coverage conclusion unaffected) |
-| §6.5 amendments | 5 (A–E), each with Before/After + parent-HLR re-read |
+| AT count / LLR count | **21** canonical ATs (19 base + AT-070d Inc-5 + **AT-065c** Inc-10 w/ Amendment F) / **36 LLRs** (065.1–074.3; enumerated 065:4·066:7·067:4·068:3·069:4·070:2·071:2·072:4·073:3·074:3 — corrected at Phase 6 from the "32" the Phase-1 summary reported; all 36 green, coverage conclusion unaffected) |
+| §6.5 amendments | **6 (A–F)**, each with Before/After + parent-HLR re-read. **F** added post-final-QA (operator decision): warning rows render pale yellow, ORANGE re-scoped to the MAC-specific cues — and it **corrects Amendment C's false claim** that the Orange row cue survived via `.mac_out_of_range` |
 | Snapshot drift | 29 drifting tc016s cells, all `xfail(strict=False)`, **0 xpassed** (non-masking) → 1 canonical-CI regen follow-up PR. **Attribution corrected at the final PR-QA:** batch-47 added **27** marks; the 2 `patch` cells ride `_batch46_patch_drift_marks` (pre-existing on `main`), so pre-existing xfails are **5, not 3**. ⚠ **REGEN-SCOPE TRAP:** a regen that retires only the four `_batch47_*` mark helpers leaves the batch-46 patch mark live → those 2 cells **XPASS silently** under `strict=False`. The regen PR MUST also retire `_batch46_patch_drift_marks`. |
 
 ### Root causes (only if a phase took ≥2 iterations)
@@ -111,7 +111,7 @@ No **phase** took ≥2 iterations. The corrections below were all caught by revi
 
 | Item | Type (process/product) | Reason deferred | Trigger / owner |
 |------|------------------------|-----------------|-----------------|
-| Canonical-CI snapshot-regen follow-up PR (retire the 29 `_batch47_*_drift_marks` xfails) | process | Local regen forbidden (`reference_snapshot_regen_env`); regen only in `snapshot-regen.yml` @ textual==8.2.8 | Post-merge follow-up PR; orchestrator |
+| Canonical-CI snapshot-regen follow-up PR — regen all **29** drifting cells and retire **SIX** mark helpers: the five `_batch47_workspace/_a2l/_mac/_map/_theme_drift_marks` (**27** cells) **AND `_batch46_patch_drift_marks`** (the remaining **2** `patch` cells) | process | ⚠ **TRAP:** only 27 of the 29 are `_batch47_*`. Retiring just the `_batch47_*` helpers leaves the batch-46 patch mark live over 2 freshly-regenerated cells → they **XPASS silently** under `strict=False` and the mark then masks future patch-screen regressions. Batch-46's own drift was regenerated long ago (PR #82 lane) — that mark now only masks batch-47's theme drift. Local regen forbidden (`reference_snapshot_regen_env`); regen only in `snapshot-regen.yml` @ textual==8.2.8 | Post-merge follow-up PR; orchestrator |
 | `chip-button` CSS | product | No consumer in Batch A; would be dead CSS | Batch B (Patch Editor BIG) — lands with its consumer |
 | A2L per-cell accents (Amendment E) — promote to requirements or drop | product | Subsumed by severity-row contract; not a Batch-A deliverable | Operator follow-up |
 | Insight-layer reuse into Patch Editor BIG (`insight_style` helpers, `safe_text` cell pattern, color roles) | product | Batch B scope | Batch B Phase-1 (reuse, don't rebuild) |

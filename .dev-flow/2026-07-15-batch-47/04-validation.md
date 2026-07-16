@@ -12,7 +12,7 @@
 
 - **Result:** **PASS.** No `iterate-to-fix` / `iterate-to-refine` triggered — 0 black-box FAIL.
 - **Requirements:** 10/10 HLR (065–074) pass · 0 blocker fails. Every LLR (065.1–074.3) has ≥1 green node.
-- **Black-box acceptance (Layer B):** ✓ all **20 canonical ATs** observe their deliverable through the SHIPPED screen (`App.run_test`), each reconciled to **exactly one** on-disk collected node, each executed at **both 80×24 and 120×30**. Boundary + C-17 negative controls present.
+- **Black-box acceptance (Layer B):** ✓ all **21 canonical ATs** observe their deliverable through the SHIPPED screen (`App.run_test`), each reconciled to **exactly one** on-disk collected node, each executed at **both 80×24 and 120×30**. Boundary + C-17 negative controls present.
 - **Surface-reachability (bidirectional):** ✓ every named input dimension AND every output/deliverable exercised/observed through the handler/screen, not the service API.
 - **Frozen-guard (C-27 dual-guard):** ✓ `git diff --stat main` **empty** for the frozen src set AND the 9 frozen test files at HEAD `12c5d1c`; `color_policy.py` 0-diff under the sev-* restyle.
 - **Authoritative gate:** `1416 passed, 2 skipped, 20 deselected, 32 xfailed, 1 warning` — **exit 0, 0 failed** (17:35). 32 xfailed = 29 batch-47 theme-drift tc016s cells (all `xfail(strict=False)`) + 3 pre-existing.
@@ -54,7 +54,7 @@ below was **grep-confirmed present + collected** at HEAD `12c5d1c`; each is part
 | 19 | AT-073 | `…::test_at073_sym_count` (L153) | — | per-region `N sym` == independent `range_index` oracle + `↵` | ✓·✓·✓ |
 | 20 | **AT-074 ★** | `…::test_at074_inspector` (L201) | **C-17 sub** | non-first region activate → hex peek first addr==region start; bracketed A2L symbol verbatim in `#map_detail_body` | ✓·✓·✓ |
 
-**Reconciliation result: 20/20 canonical ATs realized to exactly one collected on-disk node.** No AT
+**Reconciliation result: 21/21 canonical ATs realized to exactly one collected on-disk node.** (20 at the Phase-4 gate + **AT-065c** `tests/test_tui_theme.py::test_at065c_legend_labels_match_resolved_hues`, added post-gate in Inc-10 to close the legend label-vs-hue gap that AT-065b -- probing only `sev-error` -- could not catch. Node verified present + green at the final PR-QA.) No AT
 covered-in-parts; no orphan; no missing node. (Canonical set = 19 base nodes from `02-review` +
 `AT-070d`, the Inc-5 C-10 fourth-branch addition self-owned by its increment — no orphan.)
 
@@ -252,7 +252,7 @@ re-read (`feedback_requirement_amendment_before_after`).
 ## 8. Gate verdict
 
 **Axis check:**
-- **Coverage:** ✓ 20/20 ATs realized single-node (both regimes); 100% LLR → ≥1 green node; C-10 all
+- **Coverage:** ✓ 21/21 ATs realized single-node (both regimes); 100% LLR → ≥1 green node; C-10 all
   branches nodalized (entry present/absent, MAC ✓/⚠/✗/·, A2L in/out); C-17 4 sinks gate-green;
   bidirectional reachability complete.
 - **Certainty:** ✓ AT-066d/AT-070d are genuine counterfactuals; C-17 ATs discriminate via the

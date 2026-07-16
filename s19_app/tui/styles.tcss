@@ -547,8 +547,13 @@ DataTable > .datatable--odd-row {
 }
 
 /* MAC out-of-range overlay — preserved (pairs with MAC_ADDRESS_OVERLAY_STYLE).
- * Left at the amber/orange3 hue so the explicit "Orange = MAC warning" cue is
- * retained regardless of the sev-warning restyle above (LLR-065.4). */
+ * Left at the amber/orange3 hue. NOTE (§6.5 Amendment F): this class paints ONLY
+ * the Sections-list "MAC out-of-range @ 0x…" labels (app.py) — it does NOT paint
+ * the MAC/Issues warning ROWS (those are .sev-warning). An earlier comment here
+ * claimed it retained "the Orange = MAC warning cue regardless of the sev-warning
+ * restyle"; that was WRONG. Per Amendment F, warning ROWS render pale yellow and
+ * ORANGE is re-scoped to the MAC-specific cues: this overlay, the ⚠ record glyph
+ * (orange3), and the frozen MAC_ADDRESS_OVERLAY_STYLE hex overlay (LLR-065.4). */
 .mac_out_of_range {
     color: #d9a35b;
 }
