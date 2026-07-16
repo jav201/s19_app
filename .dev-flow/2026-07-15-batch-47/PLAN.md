@@ -47,8 +47,9 @@ postmortem.
 - **Inc-3 — US-WS render** — ✅ DONE. app.py titles/stats/MJ-1/sections/memstrip; 14 green (AT-066a/b/c/d + AT-067); 6-cell drift xfail (C-28 clean); F1 dead-code cleanup applied; 0 HIGH. classed-hex→Inc-7.
 - **Inc-4 — US-A2L** — ✅ DONE. tuple[Text] cells + glyph + A2LDetailCard + RowHighlighted; 6 green (AT-068/069/069b★/069c★); dual review 0 HIGH (security APPROVE-CLEAN); §6.5 Amd E (accents subsumed by severity). 6 a2l cells drift.
 - **Inc-5 — US-MAC** — ✅ DONE. glyph col + coverage strip + C-17; 7 green (AT-070/070b★/070c/070d/071); dual review, F1 MEDIUM fixed (glyph off in_mem, ✓=in-image; +AT-070d MAC-only ·). 4 wide mac cells drift.
-- **Inc-6 — US-MAP Memory Map BIG** — STARTING. pastel bands+hatch + address ruler + N-sym rows + region inspector hex-peek (AT-072a/072b/073/074). C-29 both-axes measure.
-- Canonical AT registry: **20** (+AT-070d).
+- **Inc-6 — US-MAP Memory Map BIG** — ✅ DONE. bands+hatch + MapRuler + N-sym(range_index) + inspector peek; 8 ATs green; C-29 both-axes measured; code-review 0 HIGH (F3 docstring fixed). 2 map cells drift.
+- **Inc-7 — US-WS classed hex** — STARTING. hexview.py 00/FF dim·ASCII cyan·rest bright (LLR-066.3, deferred from Inc-3). Small.
+- Canonical AT registry: **20** (+AT-070d). Snapshot drift so far: 6 WS + 6 A2L + 4 MAC + 2 MAP = 18 cells xfail.
 
 ## Phase-1 result (2026-07-15)
 - `01-requirements.md` (architect): 5 US, **10 HLR** (HLR-065..074 = R-TUI-065..074), **32 LLR**,

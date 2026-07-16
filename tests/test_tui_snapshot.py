@@ -633,6 +633,43 @@ def _batch47_mac_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     return ()
 
 
+# batch-47 (R-TUI-072/073/074, US-MAP Memory Map BIG): the map band strip gains
+# `╱` hatch gaps + span-proportional segment widths (LLR-072.1), a NEW MapRuler
+# 5-tick address ruler beneath the strip (LLR-072.3), and enriched region rows
+# (humanized size + size micro-bar + `N sym` count + `↵` affordance, LLR-072.2 /
+# 073). All repaint the map body, so BOTH map scaffold cells (80x24 + 120x30,
+# comfortable) drift. The region inspector hex peek (LLR-074) shows only on
+# activation and the snapshot captures the un-activated `_DETAIL_HINT` state, so
+# it does not drift the baseline. No other screen renders the map body (C-28
+# shared-chrome clean; no footer/header/rail binding change this increment). SVG
+# baselines regenerate in canonical CI (snapshot-regen.yml, pinned
+# textual==8.2.8) — NOT locally. Until the batch-47 theme+regen follow-up lands,
+# the 2 map cells ride xfail(strict=False) (C-22 per-cell upper bound).
+def _batch47_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-47 Memory-Map BIG insight-layer drift marks.
+
+    The 2 ``map`` scaffold cells (comfortable x {80x24, 120x30}) drift when the
+    band strip gains hatch gaps + a span-proportional layout, the address ruler
+    mounts, and region rows are enriched (US-MAP, HLR-072/073/074). Marked
+    ``xfail(strict=False)`` until the canonical-CI baseline regen lands (batch-47
+    theme + regen follow-up), then retired.
+    """
+    if screen == "map" and size_key in ("80x24", "120x30"):
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-47 R-TUI-072/073/074 US-MAP: band strip hatch gaps + "
+                    "span-proportional widths + 5-tick address ruler + enriched "
+                    "region rows (size micro-bar + N sym + ↵); SVG baseline regen "
+                    "pending in canonical CI (snapshot-regen.yml, batch-47 "
+                    "theme+regen follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -694,7 +731,8 @@ _SCAFFOLD_CELLS = [
         + _batch44_drift_marks(screen, "comfortable", size_key)
         + _batch45_map_drift_marks(screen, "comfortable", size_key)
         + _batch45_footer_drift_marks(screen, "comfortable", size_key)
-        + _batch46_patch_drift_marks(screen, "comfortable", size_key),
+        + _batch46_patch_drift_marks(screen, "comfortable", size_key)
+        + _batch47_map_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

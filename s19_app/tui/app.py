@@ -8779,6 +8779,7 @@ class S19TuiApp(App):
             self._validation_issues,
             self._a2l_enriched_tags,
             self.current_file.entropy_windows,
+            self.current_file.mem_map,
         )
         self.logger.info(
             "Memory Map updated. ranges=%d", len(self.current_file.ranges)
