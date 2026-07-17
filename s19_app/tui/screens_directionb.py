@@ -46,7 +46,7 @@ from __future__ import annotations
 import bisect
 from dataclasses import dataclass
 from math import ceil
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -2203,6 +2203,241 @@ class FlowBuilderPanel(ScrollableContainer):
         self.query_one("#flow_result", Static).update(text)
 
 
+class _Unset:
+    """Sentinel type for "argument not supplied" (batch-48 LLR-080.2).
+
+    ``None`` cannot serve: it is a MEANINGFUL value for ``mem_map`` — "no
+    image is loaded" (LLR-080.4) — and conflating it with "not supplied" is
+    the bug. ``refresh_entries`` has FIVE call sites and one of them (the
+    panel's own ``on_mount`` self-call) has no ``mem_map`` to give; an
+    unconditional retain would let that call NULL a map a real load had
+    already supplied. Sentinel ⇒ preserve; explicit ``None`` ⇒ clear.
+    """
+
+
+_UNSET = _Unset()
+
+#: The before/after card's neutral states (batch-48 LLR-080.4). Author-fixed
+#: literals — nothing file-derived reaches the card (LLR-080.7).
+CARD_NO_SELECTION = "Select an entry row to preview its bytes."
+CARD_NO_IMAGE = "No image loaded — before-bytes unavailable."
+#: Rendered for an address the loaded image does not map (A4: absence is
+#: UNMAPPED, never zero). MUST stay distinguishable from a real ``0x00``, whose
+#: rendering is ``"00"`` — asserted by TC-080.3, not left to inspection.
+CARD_UNMAPPED_TOKEN = "--"
+#: Byte columns the card renders before eliding.
+#:
+#: **C-29-MEASURED (batch-48 Inc-7), both axes, both regimes, with the card
+#: mounted and a row selected. Nothing inherited:**
+#:
+#: ===========  ==================  ======================  ==============
+#: regime       body content (w×h)  **card content width**  card region
+#: ===========  ==================  ======================  ==============
+#: 80×24        64×42               **62**                  64×4
+#: 120×30       38×42               **36**  ← binding       38×4
+#: ===========  ==================  ======================  ==============
+#:
+#: The widest painted line is ``"before  "`` (8) + ``max_bytes * 3 - 1``, so
+#: **8 bytes ⇒ 31 cells**, clearing the binding 36 with 5 to spare. The worst
+#: reachable HEADER — a 32-bit address, a long run, and the elision note
+#: (``"0xFFFFFFFF · 65536 bytes (first 8)"``) — is **34**, which also clears
+#: 36. TC-080.6 asserts the painted width against the measured container at
+#: both regimes rather than trusting this table.
+#:
+#: ⚠ **The card's budget is 36, NOT the body's 38 — do not inherit the body
+#: figure, and do not inherit ``_HISTORY_STRIP_BUDGET_COLS``' 38 either.** The
+#: card's own ``padding: 0 1`` costs 2 cells, so the container it actually
+#: renders into is narrower than the container it sits in. This is the same
+#: C-29 error class that produced ``_HISTORY_STRIP_BUDGET_COLS``' warning
+#: against ``_CHECK_STRIP_BAR_CELLS`` — one scale smaller, and it is why the
+#: rule is "measure the container you are IN", not "measure nearby".
+CARD_BYTES_MAX = 8
+
+
+def before_after_card_text(
+    address: Optional[int],
+    before: Optional[Sequence[Optional[int]]],
+    after: Sequence[int],
+    max_bytes: int = CARD_BYTES_MAX,
+) -> Text:
+    """Compose the live before/after card's content (batch-48 LLR-080.3).
+
+    Summary:
+        Render the loaded image's bytes at the selected entry's address span
+        beside the bytes that entry would write, with the DIFFERING positions
+        brightened. Pure: it reads no widget, no service and no app, so the
+        panel that calls it stays presentational (C-7) and this function is
+        unit-testable without a running app.
+
+        **Read-only by construction (LLR-080.5):** it returns a ``Text`` and
+        touches nothing. There is no apply/save path out of here.
+
+        **Colour (LLR-080.3) — no new hue is claimed.** A differing byte is
+        the datum the analyst is here for, so it takes ``VALUE`` ("bright
+        value text — the datum a label describes"); an identical byte is
+        context, so it takes ``DGRAY`` ("secondary"). Those two constants'
+        DOCUMENTED meanings already are "matters" vs "secondary", so the diff
+        cue costs **zero** new claimants inside ``#patch_editor_panel``.
+        GREEN/YELLOW/RED are reserved for verdicts here (the Inc-2b ruling);
+        MAGENTA is scoped to the budget/capacity family and its hue is
+        asserted as a measured optimum against a census, so a second claimant
+        would invalidate that measurement — not merely crowd the palette.
+
+    Args:
+        address (Optional[int]): The selected entry's raw start address, or
+            ``None`` when NO ROW is selected (→ the no-selection state).
+        before (Optional[Sequence[Optional[int]]]): The image's byte at each
+            address of the span, ``None`` per position the image does not map;
+            or ``None`` for the whole sequence when NO IMAGE is loaded (→ the
+            no-image state). The two ``None`` levels are distinct and must not
+            be conflated: "no image at all" vs "this address is unmapped".
+        after (Sequence[int]): The entry's ``encoded_bytes`` — what it would
+            write.
+        max_bytes (int): Byte columns rendered before eliding.
+
+    Returns:
+        Text: A Rich ``Text``. Never markup-parsed — every fragment is
+        appended literally, so no input can inject a span (C-17). The input
+        set is ints only, which is what keeps LLR-080.7's N/A honest.
+
+    Data Flow:
+        - ``address is None`` → the no-selection line; no bytes rendered.
+        - ``before is None`` → the no-image line; **no bytes rendered at all**
+          (not even ``after``) — with no image there is no comparison to make,
+          and a lone byte row on a "before/after" card invites reading it as a
+          before. Refusing to render beats rendering a guess.
+        - Otherwise → header (address + span length), then the ``before`` and
+          ``after`` rows, differing positions brightened.
+
+    Dependencies:
+        Uses:
+            - ``insight_style.CYAN`` / ``LABEL`` / ``VALUE`` / ``DGRAY``
+        Used by:
+            - :class:`BeforeAfterCard` (via
+              ``PatchEditorPanel._render_before_after_card``)
+
+    Example:
+        >>> t = before_after_card_text(0x200, [0xAA, 0xBB], [0x01, 0xBB])
+        >>> "0x200" in t.plain
+        True
+    """
+    text = Text()
+    if address is None:
+        text.append(CARD_NO_SELECTION, style=DGRAY)
+        return text
+    if before is None:
+        text.append(CARD_NO_IMAGE, style=DGRAY)
+        return text
+
+    shown = min(len(after), max_bytes)
+    text.append(f"0x{address:X}", style=CYAN)
+    text.append(" · ", style=LABEL)
+    text.append(f"{len(after)} byte{'' if len(after) == 1 else 's'}", style=LABEL)
+    if shown < len(after):
+        text.append(f" (first {shown})", style=LABEL)
+
+    for label, values in (("before", before), ("after", after)):
+        text.append("\n")
+        text.append(f"{label:<7} ", style=LABEL)
+        for index in range(shown):
+            if index:
+                text.append(" ")
+            image_byte = before[index] if index < len(before) else None
+            # An UNMAPPED position is not "unchanged" — it is unknown, so it
+            # can never be dimmed as context. `is None` (not falsiness): a
+            # mapped 0x00 is a real byte and must compare as one.
+            differs = image_byte is None or image_byte != after[index]
+            value = values[index] if index < len(values) else None
+            token = (
+                CARD_UNMAPPED_TOKEN if value is None else f"{value:02X}"
+            )
+            text.append(token, style=VALUE if differs else DGRAY)
+    return text
+
+
+class BeforeAfterCard(Static):
+    """The live before/after preview card (batch-48 LLR-080.1 — the HEADLINE).
+
+    Summary:
+        A read-only card mounted inside ``#patch_win_script_body``, directly
+        under the entries table it describes. Selecting an entry row shows the
+        image bytes currently at that entry's address beside the bytes the
+        entry would write — live, BEFORE any apply. It applies nothing
+        (LLR-080.5); it renders a ``Text`` and stops.
+
+        **Why it lives INSIDE the scrollable body**, not docked beside it: the
+        docked button rows are SIBLINGS of the body (batch-46's HLR-064 fix
+        for field-audit B2). Content added inside the body costs SCROLL, not
+        docked reachability, so the card cannot push a button below the fold
+        the way the pre-batch-46 tree did. That is a structural argument, and
+        it is MEASURED rather than trusted — AT-080d drives every named button
+        to ``_fully_visible`` at 80×24 and 120×30 with the card mounted.
+
+    Data Flow:
+        - ``show_entry(...)`` replaces the content via
+          :func:`before_after_card_text`.
+        - Mounts with the no-selection state already painted, so it never
+          mounts blank (the Inc-6 lesson: blank is not the empty state, it is
+          nothing).
+
+    Dependencies:
+        Uses:
+            - before_after_card_text
+        Used by:
+            - ``PatchEditorPanel.compose`` (mount) ;
+              ``PatchEditorPanel._render_before_after_card`` (update)
+
+    Note (Textual internal-name shadowing):
+        The only member added is the public ``show_entry`` method — no
+        ``_nodes`` / ``_context`` (or any other ``Widget`` private) name is
+        introduced, so mounting cannot silently crash or deadlock the boot
+        with no traceback (`reference_textual_internal_name_shadowing`).
+        TC-080.1 asserts the collision set is empty rather than trusting this
+        paragraph.
+    """
+
+    DEFAULT_CSS = """
+    BeforeAfterCard {
+        height: auto;
+        max-height: 4;
+        overflow-y: auto;
+        padding: 0 1;
+        border-top: solid $panel;
+    }
+    """
+
+    def show_entry(
+        self,
+        address: Optional[int],
+        before: Optional[Sequence[Optional[int]]],
+        after: Sequence[int],
+    ) -> None:
+        """Update the card to preview one entry (LLR-080.3/.4).
+
+        Args:
+            address (Optional[int]): Entry start address; ``None`` → the
+                no-selection state.
+            before (Optional[Sequence[Optional[int]]]): Image bytes per span
+                position (``None`` per unmapped position); ``None`` → the
+                no-image state.
+            after (Sequence[int]): The entry's ``encoded_bytes``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Delegates composition to :func:`before_after_card_text` and
+              calls ``Static.update`` with the resulting ``Text``.
+
+        Dependencies:
+            Uses:
+                - before_after_card_text
+            Used by:
+                - ``PatchEditorPanel._render_before_after_card``
+        """
+        self.update(before_after_card_text(address, before, after))
+
+
 class PatchEditorPanel(ScrollableContainer):
     """Consolidated Patch Editor rail screen — the single v2 change flow.
 
@@ -2683,6 +2918,17 @@ class PatchEditorPanel(ScrollableContainer):
         #: populator (the US-026 ownership split). File-derived, so it reaches
         #: the line only through a literal ``Text`` append (LLR-075.4 / C-17).
         self._active_variant: Optional[str] = None
+        #: The loaded image's sparse memory map, RETAINED from
+        #: ``refresh_entries``' parameter for the before/after card's
+        #: row-selection render (batch-48 LLR-080.2). ``None`` is MEANINGFUL —
+        #: "no image loaded" — which is why that parameter's default is a
+        #: sentinel and not ``None``. The panel never fetches this itself
+        #: (C-7): it arrives as data, or not at all.
+        self._mem_map: Optional[Mapping[int, int]] = None
+        #: The rows last rendered into the entries table, retained so the card
+        #: resolves the highlighted row POSITIONALLY (LLR-080.3). The table is
+        #: ``cursor_type="row"``, so a cursor index indexes this list directly.
+        self._entry_rows: List[object] = []
 
     def set_change_files(self, names: Sequence[str]) -> None:
         """Populate the change-file dropdown with the patches-folder files.
@@ -2897,6 +3143,15 @@ class PatchEditorPanel(ScrollableContainer):
                         id="patch_doc_empty_state",
                         markup=False,
                     ),
+                    # batch-48 (LLR-080.1) — the live before/after card, the
+                    # HEADLINE. Mounted INSIDE the scrollable body, directly
+                    # under the table whose selection drives it: content here
+                    # costs SCROLL, while the docked button rows are siblings
+                    # of the body (batch-46's B2 fix), so the card cannot push
+                    # a button below the fold. Measured, not assumed —
+                    # AT-080d drives every named button at both regimes with
+                    # the card mounted.
+                    BeforeAfterCard(id="patch_before_after_card"),
                     Container(
                         Label("Address", classes="patch-field-label"),
                         # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in
@@ -3767,7 +4022,11 @@ class PatchEditorPanel(ScrollableContainer):
         cell.append(str(row.kind_text))
         return cell
 
-    def refresh_entries(self, rows: Sequence[object]) -> None:
+    def refresh_entries(
+        self,
+        rows: Sequence[object],
+        mem_map: Union[Mapping[int, int], None, _Unset] = _UNSET,
+    ) -> None:
         """Repopulate the entries table from shaped display rows.
 
         Summary:
@@ -3808,10 +4067,35 @@ class PatchEditorPanel(ScrollableContainer):
             rows (Sequence[object]): The ``ChangeEntryRow`` objects produced
                 by ``ChangeService.rows`` — each exposes ``kind_text``,
                 ``address_text``, ``value_text``, ``status_text``,
-                ``linkage_text`` and ``check_glyph``. Typed as ``object`` so
-                this view widget imports nothing from the service layer.
+                ``linkage_text``, ``check_glyph``, and (batch-48 LLR-080.3)
+                the raw ``address`` / ``encoded_bytes`` the before/after card
+                needs. Typed as ``object`` so this view widget imports nothing
+                from the service layer.
+            mem_map (Union[Mapping[int, int], None, _Unset]): The loaded
+                image's sparse memory map, threaded in as a PARAMETER so the
+                panel keeps importing nothing from the service layer and never
+                reaches the running app (C-7 / the ``MemoryMapPanel.
+                render_ranges(…, mem_map=…)`` precedent). Typed ``Mapping``,
+                not ``Dict`` — read-only by type (LLR-080.5). RETAINED for the
+                card's row-selection render, under these semantics:
+
+                * **omitted** (the ``_UNSET`` sentinel) ⇒ **preserve** the
+                  retained map;
+                * explicit **``None``** ⇒ **clear** it ("no image loaded");
+                * a mapping ⇒ replace it.
+
+                ⚠ **The sentinel is load-bearing, not defensive.** This method
+                has FIVE call sites and ``on_mount``'s self-call supplies no
+                ``mem_map`` (C-7: the panel cannot fetch one). An
+                unconditional ``self._mem_map = mem_map`` would let that call
+                NULL a retained map — benign today only by call ORDERING, an
+                unstated invariant, which is exactly the MJ-1 defect shape.
+                TC-080.2a tests the semantics directly rather than appealing
+                to that ordering.
 
         Data Flow:
+            - Retain ``mem_map`` (per the semantics above) and the row list —
+              the card needs both at SELECTION time, which is after this call.
             - Clear and refill the table from the row list: the ``Kind`` cell
               via ``_kind_cell`` (glyph span + kind text), the other four
               wrapped by ``safe_text`` (a literal ``Text``; never
@@ -3819,14 +4103,23 @@ class PatchEditorPanel(ScrollableContainer):
             - Toggle the ``.hidden`` class on the table and the empty-state
               line by whether the list is empty.
             - Set the SCRIPT window's ``N entries`` border subtitle.
+            - Re-render the before/after card, because ``table.clear()`` drops
+              the cursor and a card left describing a row that no longer
+              exists is worse than a neutral one.
 
         Dependencies:
             Uses:
-                - ``_kind_cell`` ; ``safe_text`` ; ``insight_style.CYAN`` /
-                  ``VALUE``
+                - ``_kind_cell`` ; ``safe_text`` ;
+                  :meth:`_render_before_after_card` ;
+                  ``insight_style.CYAN`` / ``VALUE``
             Used by:
-                - ``S19TuiApp`` Patch Editor action handler
+                - ``S19TuiApp`` Patch Editor action handler (4 sites, all
+                  supplying ``mem_map``) ; :meth:`on_mount` (the self-call,
+                  which supplies none — see the sentinel note above)
         """
+        if not isinstance(mem_map, _Unset):
+            self._mem_map = mem_map
+        self._entry_rows = list(rows)
         table = self.query_one("#patch_doc_entries_table", DataTable)
         empty_state = self.query_one("#patch_doc_empty_state", Static)
         table.clear()
@@ -3849,6 +4142,118 @@ class PatchEditorPanel(ScrollableContainer):
         else:
             table.add_class("hidden")
             empty_state.remove_class("hidden")
+        self._render_before_after_card()
+
+    def on_data_table_row_highlighted(
+        self, event: DataTable.RowHighlighted
+    ) -> None:
+        """Drive the before/after card as the entries cursor moves (LLR-080.3).
+
+        Summary:
+            The entries table is ``cursor_type="row"``, so the highlighted row
+            index IS the document-order entry index — the card previews THAT
+            entry. Highlight (not ``RowSelected``) is the right event: it fires
+            on cursor movement, giving the analyst a live read-out without
+            requiring a commit keystroke — the ``A2LDetailCard`` precedent
+            (batch-47 LLR-069.2).
+
+        Args:
+            event (DataTable.RowHighlighted): Event payload carrying
+                ``data_table`` and ``cursor_row``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Ignore every table but ``#patch_doc_entries_table``.
+            - Hand ``event.cursor_row`` to :meth:`_render_before_after_card`.
+            - The event is NOT stopped: ``S19TuiApp.on_data_table_row_highlighted``
+              also listens (for the A2L card) and filters by table id, so
+              letting it bubble costs nothing and stopping it would couple this
+              panel to that handler's business.
+
+        Dependencies:
+            Uses:
+                - :meth:`_render_before_after_card`
+            Used by:
+                - Textual event dispatch for ``DataTable.RowHighlighted``
+        """
+        table = getattr(event, "data_table", None)
+        if getattr(table, "id", None) != "patch_doc_entries_table":
+            return
+        self._render_before_after_card(event.cursor_row)
+
+    def _render_before_after_card(self, index: Optional[int] = None) -> None:
+        """Render the before/after card for one entry index (LLR-080.3/.4).
+
+        Summary:
+            Resolve the selected entry POSITIONALLY, read the image bytes at
+            its address span out of the retained ``mem_map``, and hand both
+            byte runs to the card.
+
+        Args:
+            index (Optional[int]): The entry's document-order index. ``None``
+                → read the table's current cursor row (the post-refresh and
+                mount-time path).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Resolve the index; out of range / no rows → the card's
+              no-selection state.
+            - ``mem_map is None`` → the card's no-image state (LLR-080.4). No
+              byte values are rendered — with no image there is no comparison,
+              and fabricating one is the failure this card must never have.
+            - Otherwise read ``mem_map`` per address in
+              ``[address, address + len(encoded_bytes))``; an ABSENT address
+              yields ``None`` → the unmapped placeholder, never ``00`` (A4).
+
+        Note (the join is POSITIONAL — never address-matched):
+            ``ChangeEntry`` carries no id; the contract is document order
+            (``changes/model.py:660-661``), and ``cursor_type="row"`` makes
+            the cursor row index that same index. Address-matching would be
+            wrong twice: it re-derives a key the contract already fixes, and
+            it COLLAPSES two entries that share a start address — a real
+            document shape, and one an address join structurally cannot get
+            right. TC-080.3's same-address fixture pins this.
+
+        Note (read-only — LLR-080.5):
+            This reads ``mem_map`` with ``.get`` and writes nothing. No
+            ``apply`` / ``save_patched`` path is reachable from here.
+
+        Dependencies:
+            Uses:
+                - :meth:`BeforeAfterCard.show_entry`
+            Used by:
+                - :meth:`refresh_entries` ;
+                  :meth:`on_data_table_row_highlighted`
+        """
+        cards = self.query("#patch_before_after_card")
+        if not cards:
+            return
+        card = cards.first(BeforeAfterCard)
+        if index is None and self._entry_rows:
+            index = self.query_one(
+                "#patch_doc_entries_table", DataTable
+            ).cursor_row
+        if index is None or not 0 <= index < len(self._entry_rows):
+            card.show_entry(None, None, ())
+            return
+        # Direct attribute access, NOT `getattr(row, ..., default)`: these
+        # fields are REQUIRED for the card, and a default would silently paint
+        # an empty preview if the row shape ever drifted. Loud beats silent —
+        # and a byte this card shows is a byte an analyst will trust.
+        row = self._entry_rows[index]
+        address = int(row.address)
+        after = tuple(row.encoded_bytes)
+        if self._mem_map is None:
+            card.show_entry(address, None, after)
+            return
+        before = [
+            self._mem_map.get(address + offset) for offset in range(len(after))
+        ]
+        card.show_entry(address, before, after)
 
     def refresh_issues(self, lines: Sequence[str]) -> None:
         """Render the persistent declaration-fault area (LLR-002.8).

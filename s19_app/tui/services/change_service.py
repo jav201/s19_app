@@ -283,6 +283,28 @@ class ChangeEntryRow:
             the field is additive and breaks no caller. Rendered as the
             LEADING SPAN of the ``Kind`` cell — not as a sixth column
             (LLR-077.4).
+        address (int): The entry's RAW start address (batch-48 LLR-080.3) —
+            the before/after card's span origin. Carried as the ``int`` beside
+            the ``0x``-formatted ``address_text`` because the card must index
+            ``mem_map`` (an ``int``-keyed sparse dict), and re-parsing the
+            display string would re-derive a datum the entry already holds.
+            Defaults to ``0``, so the field is additive and breaks no caller.
+        encoded_bytes (Tuple[int, ...]): The entry's resolved target byte run
+            (batch-48 LLR-080.3) — the card's "after" bytes, and the span
+            LENGTH that bounds its "before" read (``addressed_range`` uses the
+            ENCODED length, LLR-001.5). Carried raw for the same reason as
+            ``address``: ``value_text`` is an ELIDED preview
+            (``.. (N bytes)``), so it is lossy and cannot reconstruct the run.
+            Defaults to ``()``.
+
+    Note (batch-48 D-5 — why these ride the ROW and ``mem_map`` does not):
+        ``address``/``encoded_bytes`` are per-ENTRY data that ``rows()``
+        already holds while building each row, so a defaulted field reaches
+        every ``refresh_entries`` call site free — the ``check_glyph``
+        precedent (LLR-077.5). ``mem_map`` is per-IMAGE and is needed at
+        row-SELECTION time, not refresh time, so it cannot ride here and is
+        threaded as a panel parameter instead (LLR-080.2). That asymmetry is
+        deliberate; do not "helpfully" move either one to match the other.
 
     Returns:
         None: Dataclass container.
@@ -291,6 +313,8 @@ class ChangeEntryRow:
         Used by:
             - ChangeService.rows
             - PatchEditorPanel.refresh_entries (the screen widget)
+            - PatchEditorPanel._render_before_after_card (the card, via the
+              retained row list — batch-48 LLR-080.3)
     """
 
     kind_text: str
@@ -299,6 +323,8 @@ class ChangeEntryRow:
     status_text: str
     linkage_text: str
     check_glyph: str = GLYPH_NO_RESULT
+    address: int = 0
+    encoded_bytes: Tuple[int, ...] = ()
 
 
 @dataclass(slots=True)
@@ -1745,6 +1771,11 @@ class ChangeService:
                         if index < len(glyphs)
                         else GLYPH_NO_RESULT
                     ),
+                    # LLR-080.3: the card's span origin + "after" bytes, raw.
+                    # `address_text` is formatted and `value_text` is elided,
+                    # so neither can serve — the card needs the ints.
+                    address=entry.address,
+                    encoded_bytes=entry.encoded_bytes,
                 )
             )
         return rendered

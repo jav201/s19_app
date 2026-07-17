@@ -2056,7 +2056,12 @@ class S19TuiApp(App):
         except (ValueError, KeyError) as exc:
             self.set_status(f"Patch Editor: {exc}")
 
-        panel.refresh_entries(service.rows(loaded_ranges))
+        # batch-48 (LLR-080.2) — site 1 of 5: push the image's memory map so
+        # the before/after card can read its "before" bytes. `mem_map` is
+        # already resolved above (`loaded.mem_map if loaded is not None else
+        # None`), and an explicit `None` is MEANINGFUL ("no image loaded"),
+        # which the panel's sentinel default keeps distinct from "not supplied".
+        panel.refresh_entries(service.rows(loaded_ranges), mem_map=mem_map)
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: the JSON popup opens ONLY for a
         # paste-authored / empty document — disable Edit-JSON whenever the
@@ -2271,7 +2276,11 @@ class S19TuiApp(App):
         loaded = self.current_file
         loaded_ranges = loaded.ranges if loaded is not None else None
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        panel.refresh_entries(service.rows(loaded_ranges))
+        # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh path).
+        panel.refresh_entries(
+            service.rows(loaded_ranges),
+            mem_map=loaded.mem_map if loaded is not None else None,
+        )
         panel.refresh_issues(service.issue_lines())
         # batch-40 S1: a history move (undo/redo) restores a change-set whose
         # entries no longer match the pre-move check run, so the stale Checks
@@ -3913,7 +3922,11 @@ class S19TuiApp(App):
         loaded = self.current_file
         loaded_ranges = loaded.ranges if loaded is not None else None
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        panel.refresh_entries(service.rows(loaded_ranges))
+        # batch-48 (LLR-080.2) — site 3 of 5 (the change-file load path).
+        panel.refresh_entries(
+            service.rows(loaded_ranges),
+            mem_map=loaded.mem_map if loaded is not None else None,
+        )
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: a dropdown-picked file is file-backed
         # (``source_path is not None``) → disable Edit-JSON (no clobber path).
@@ -8028,7 +8041,20 @@ class S19TuiApp(App):
             # way, so nothing is skipped that a later render would need.
             pass
         else:
-            panel.refresh_entries(self._change_service.rows(loaded.ranges))
+            # batch-48 (LLR-080.2) — site 4 of 5, and the one the Phase-2
+            # writer census MISSED: it was added by Inc-3 (the BL-4 arm) after
+            # that census was written, and nothing re-derived the census.
+            #
+            # This is the ONLY load-triggered site, which makes it the one the
+            # CARD most depends on: a new image means new "before" bytes. The
+            # panel's retain semantics are sentinel⇒preserve, so omitting
+            # `mem_map` here would leave the card holding the PREVIOUS image's
+            # map and painting stale before-bytes — the exact staleness defect
+            # this site exists to fix (the glyph half, above), one seam over.
+            panel.refresh_entries(
+                self._change_service.rows(loaded.ranges),
+                mem_map=loaded.mem_map,
+            )
         # F-09 (LLR-056.3): every load path — project load, loose-file
         # load, variant activation — funnels through this install point,
         # so the sticky report-filter selection dies with the previous
