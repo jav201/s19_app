@@ -94,3 +94,23 @@ each marked only their own 2–6 cells; Inc-7 (classed hex, shared by 3 screens)
 theme then drifted all 29 at once → 29 xfail / 0 xpassed / a single regen PR. Had the theme led the batch, all
 29 cells would have been xfail'd from increment 1 and every later functional regression would have rendered
 into an already-suppressed cell.)
+
+## C-32 — assert the PAINTED result, and mutate your own oracle (Phase 3, Textual render path)
+A Textual widget test that reads a **pre-layout proxy** instead of the **painted** surface cannot fail on the
+axis that matters. `Static.render()` / a `DataTable` cell's stored value / `TextArea.get_line().spans` are all
+computed **before** compositing, so an oracle reading them is **blind to geometry and visibility**: a widget
+with `display: none`, a strip that wrapped to two lines, a card of zero area — all pass a content-only oracle.
+When a story's promise is that the analyst **sees** something (a strip fits on one line, a card is visible, a
+verdict glyph is on the right row), the `AT`/`TC` MUST observe the **rendered** result — `widget.region`
+(height/width/area), `_render_line(y)` segments, `scroll_visible()` reachability — not the pre-layout content.
+⚠ **The painted result has its OWN confounders — moving closer to the pixels is necessary, not sufficient:**
+the cursor line re-styles independently (a payload on the cursor row is MASKED), `_render_line(y)` indexes
+**visual** lines not document lines (a wrapped line's tail answers to `y+1`), and an **absence** assertion
+("no injected span") is green on a widget that painted nothing. So the discharge is: **apply the mutation to
+your OWN new oracle and watch it fail** — flip the widget to `display: none`, move the payload to the cursor
+line, force a wrap — before trusting a green. (Origin: batch-48 — Inc-4 F2: the CHECKS-strip tests all read
+`Static.render()`; a `display:none` strip shipped green, only a `region.height` arm caught it. Inc-5 AT-079c:
+the gate-blocking C-17 JSON oracle read `.spans`, which is **always** `[]` on `get_line` — vacuous TWICE, the
+re-point to the painted `_render_line` path ALSO vacuous until the cursor-line mask was found. Inc-7 M-6: 22
+content oracles stayed green on an invisible card; only the geometry arm went RED. Three sightings, one batch;
+the fix that held was mutating each new oracle, not reasoning about it.)

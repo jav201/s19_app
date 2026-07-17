@@ -61,7 +61,7 @@ snapshot_drift_cells: 2  # patch-comfortable-80x24 / -120x30 (xfail strict=False
 tests_base_reduced: 1449 # `-m "not slow"` @ 6551aed (measured, corrected from a stale 1416)
 tests_post_reduced: 1540 # `-m "not slow"` @ ef7fe74 (Inc-7)
 tests_post_full: 1560    # `pytest -q` unfiltered @ ef7fe74 → 1560 passed / 0 failed / 5 xfailed (EXIT=1 = pre-existing syrupy artifact, §7 below)
-new_control: PENDING      # operator decision required (per feedback_devflow_control_encode_approval) — candidates in §8
+new_control: C-31, C-32   # operator-approved 2026-07-17: C-31 (input-set-is-an-oracle) → global dev-flow.md; C-32 (assert-the-painted-result) → project docs/engineering-rules.md. Unified A/C traceability control DEFERRED to a focused follow-up (needs its CI staleness guard). §8.
 open_items_next: [phase6-docs, amendment-D-§6.5-reconcile, snapshot-regen-PR(+2 orphan tc036s), prototypes-delete, LLR-four/three-sites-errata, OptionList-sweep, control-encode-decision]
 ```
 
