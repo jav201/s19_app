@@ -1169,6 +1169,14 @@ class S19TuiApp(App):
         #: Patch Editor change-list orchestration — owns the change-list and
         #: sequences the ``cdfx``-package calls (LLR-007.5 / C-8).
         self._change_service = ChangeService()
+        #: Monotonic image-load generation (batch-48 LLR-077.2). Bumped once
+        #: per image install in ``_apply_prepared_load`` and pushed into
+        #: ``_change_service``, which stamps it onto each check run so the
+        #: Patch Editor's per-entry glyphs can never describe a PREVIOUS
+        #: image: the service above is built once, here, and is never rebuilt
+        #: on load, while a check run reads its ``actual_bytes`` from the
+        #: image. ``0`` == no image loaded yet.
+        self._image_generation: int = 0
         #: Multi-variant project state (LLR-005.5/005.6): the active project's
         #: ordered S19/HEX variant inventory, or ``None`` when no project is
         #: active. Built by ``workspace.build_variant_set`` on project
@@ -2039,14 +2047,21 @@ class S19TuiApp(App):
                 )
                 self._report_change_result(result)
                 panel.refresh_check_results(
-                    service.check_rows(), result.message
+                    service.check_rows(),
+                    result.message,
+                    service.check_aggregates(),
                 )
             elif event.action == "execute_scope":
                 self._trigger_execute_scope(event.scope_text or SCOPE_ACTIVE)
         except (ValueError, KeyError) as exc:
             self.set_status(f"Patch Editor: {exc}")
 
-        panel.refresh_entries(service.rows(loaded_ranges))
+        # batch-48 (LLR-080.2) — site 1 of 5: push the image's memory map so
+        # the before/after card can read its "before" bytes. `mem_map` is
+        # already resolved above (`loaded.mem_map if loaded is not None else
+        # None`), and an explicit `None` is MEANINGFUL ("no image loaded"),
+        # which the panel's sentinel default keeps distinct from "not supplied".
+        panel.refresh_entries(service.rows(loaded_ranges), mem_map=mem_map)
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: the JSON popup opens ONLY for a
         # paste-authored / empty document — disable Edit-JSON whenever the
@@ -2056,7 +2071,11 @@ class S19TuiApp(App):
         # US-068a / LLR-068a.4 A-01 guard: undo/redo is available ONLY for a
         # paste-authored / empty document — disable both controls whenever the
         # document is file-backed so the history path cannot clobber it.
-        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # batch-48 LLR-081.3: the same call renders the history strip, so the
+        # strip and the buttons read ONE state (writer census, site 1 of 3).
+        panel.set_undo_redo_enabled(
+            service.document.source_path is None, service.history_depths()
+        )
         # US-068b / LLR-068b.4 A-01 guard: the per-entry JSON edit is available
         # ONLY for a paste-authored / empty document — disable it whenever the
         # document is file-backed so a per-entry edit cannot clobber it.
@@ -2238,10 +2257,15 @@ class S19TuiApp(App):
               ``last_check_result`` so ``check_rows`` returns the cleared state,
               batch-40 S1), and re-sync the Edit-JSON + Undo/Redo enable state
               from the restored document's ``source_path`` (LLR-068a.4).
+            - batch-48 LLR-081.3: the same ``set_undo_redo_enabled`` call
+              re-renders the history strip from ``history_depths()``. This is
+              THE site that moves the history, so the depths it pushes are the
+              strip's whole point.
 
         Dependencies:
             Uses:
                 - ``ChangeService.rows`` / ``issue_lines`` / ``check_rows``
+                  / ``check_aggregates`` / ``history_depths``
                 - ``PatchEditorPanel.refresh_entries`` / ``refresh_issues``
                   / ``refresh_check_results`` / ``set_edit_json_enabled``
                   / ``set_undo_redo_enabled``
@@ -2252,15 +2276,32 @@ class S19TuiApp(App):
         loaded = self.current_file
         loaded_ranges = loaded.ranges if loaded is not None else None
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        panel.refresh_entries(service.rows(loaded_ranges))
+        # batch-48 (LLR-080.2) — site 2 of 5 (the history/refresh path).
+        panel.refresh_entries(
+            service.rows(loaded_ranges),
+            mem_map=loaded.mem_map if loaded is not None else None,
+        )
         panel.refresh_issues(service.issue_lines())
         # batch-40 S1: a history move (undo/redo) restores a change-set whose
         # entries no longer match the pre-move check run, so the stale Checks
         # panel must not persist. ``undo``/``redo`` reset ``last_check_result``
         # → ``check_rows`` returns the cleared state; render it here.
-        panel.refresh_check_results(service.check_rows(), "")
+        # batch-48 LLR-078.3: the pass/fail strip rides that SAME reset —
+        # ``check_aggregates()`` reads all-zero once ``last_check_result`` is
+        # None, so the strip clears in step with the rows. Omitting it here
+        # (while the post-run site supplies it) would leave a stale count.
+        panel.refresh_check_results(
+            service.check_rows(), "", service.check_aggregates()
+        )
         panel.set_edit_json_enabled(service.document.source_path is None)
-        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # batch-48 LLR-081.3 (writer census, site 2 of 3): THE site that moves
+        # the history. `undo`/`redo` shift a snapshot between the two stacks, so
+        # the depths this pushes are the whole point of the strip — an omission
+        # here would freeze it at its pre-move numbers while the buttons updated
+        # around it (the batch-38 Inc-4 F1 stale-panel shape).
+        panel.set_undo_redo_enabled(
+            service.document.source_path is None, service.history_depths()
+        )
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
 
     def on_patch_editor_panel_undo_requested(
@@ -3881,14 +3922,26 @@ class S19TuiApp(App):
         loaded = self.current_file
         loaded_ranges = loaded.ranges if loaded is not None else None
         panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
-        panel.refresh_entries(service.rows(loaded_ranges))
+        # batch-48 (LLR-080.2) — site 3 of 5 (the change-file load path).
+        panel.refresh_entries(
+            service.rows(loaded_ranges),
+            mem_map=loaded.mem_map if loaded is not None else None,
+        )
         panel.refresh_issues(service.issue_lines())
         # US-064b / LLR-064b.4 A-01 guard: a dropdown-picked file is file-backed
         # (``source_path is not None``) → disable Edit-JSON (no clobber path).
         panel.set_edit_json_enabled(service.document.source_path is None)
         # US-068a / LLR-068a.4 A-01 guard: same file-backed doc → disable
         # Undo/Redo so the history path cannot clobber it either.
-        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # batch-48 LLR-081.3 (writer census, site 3 of 3): a dropdown-picked
+        # file is always file-backed, so `enabled` is False here and the strip
+        # renders `history off` regardless of the depths. The depths are pushed
+        # anyway — the census is the contract, and a site that happens to be
+        # redundant TODAY is the one that silently misreports when the A-01
+        # guard's condition changes.
+        panel.set_undo_redo_enabled(
+            service.document.source_path is None, service.history_depths()
+        )
         # US-068b / LLR-068b.4 A-01 guard: same file-backed doc → disable the
         # per-entry JSON edit so it cannot clobber the loaded document either.
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
@@ -4308,6 +4361,26 @@ class S19TuiApp(App):
         self.update_validation_issues_view()
         # LLR-002.3: show the no-file empty-state panels until a file loads.
         self._apply_empty_state()
+        # batch-48 LLR-081.3 (writer census, site 4 of 4 — the INITIAL render).
+        # ⚠ The LLR names THREE sites and all three are ACTION sites, so none
+        # of them fires before the analyst's first action: the Patch Editor
+        # opened blank, and "blank" is not the empty state — it is nothing. The
+        # empty state (`0 back / 0 fwd / 0-of-20`) is exactly the state a fresh
+        # screen is in and it must PAINT. This site is app-side rather than in
+        # `PatchEditorPanel.on_mount` (which is where the sibling
+        # `_refresh_variant_scope_line` / `_refresh_paste_gauge` mount-time
+        # renders live, for this same never-mount-blank reason) because the
+        # panel is a view: it cannot know `_HISTORY_MAX` without importing the
+        # service layer, and a panel-side default would have to invent a bound
+        # — rendering `0/0`, a wrong capacity on the surface that exists to
+        # report capacity.
+        #
+        # This is the MJ-1 shape exactly: that census also counted three
+        # `refresh_entries` sites and missed a mount-time fourth.
+        self.query_one("#patch_editor_panel", PatchEditorPanel).set_undo_redo_enabled(
+            self._change_service.document.source_path is None,
+            self._change_service.history_depths(),
+        )
         # Keep startup focus off the command-bar inputs so the unmodified
         # single-key bindings (rail digits 1-8, `/`, `g`, paging) fire
         # normally until the user explicitly focuses an input (LLR-004.5 —
@@ -7891,6 +7964,9 @@ class S19TuiApp(App):
 
         Data Flow:
             - Mutate ``current_file``, reset MAC/hex/issues paging anchors, and sync A2L.
+            - Bump ``_image_generation`` and push it into ``_change_service`` so a
+              completed check run cannot keep describing the previous image
+              (LLR-077.2).
             - When ``precomputed`` is True, copy MAC cache + validation results into the
               app's cache members so ``update_mac_view`` treats them as a cache hit.
             - Attach ``bases_set`` to the ``LoadedFile`` for fast hex rendering.
@@ -7925,6 +8001,60 @@ class S19TuiApp(App):
             ):
                 self._variant_set.active_id = pending_variant
         self.current_file = loaded
+        # batch-48 (LLR-077.2, the BL-4 arm): a NEW image is now installed, so
+        # any completed check run describes a PREVIOUS one. Bump the monotonic
+        # generation and push it into the change service, which compares it
+        # against the token it stamped at run time and degrades every entry
+        # glyph to `·` on a mismatch. The bump lives HERE — the single install
+        # point F-09 below names — rather than in `_apply_loaded_file`: that
+        # method is only the SYNCHRONOUS wrapper, and the worker path reaches
+        # this method directly via `call_from_thread` (`_start_load_worker`),
+        # so a bump one frame up would miss every real async load.
+        #
+        # This bumps on EVERY install, including a MAC/A2L attach that leaves
+        # the image bytes alone — deliberately, and it is the conservative
+        # direction, not an oversight. Over-refusing costs the analyst a
+        # re-run and shows `·`, which is honest; under-refusing renders a
+        # verdict that is a lie. Narrowing the trigger would mean deciding
+        # here whether an install "really" changed the image, which is the
+        # kind of inference that produced the BL-4 defect in the first place.
+        self._image_generation += 1
+        self._change_service.set_image_generation(self._image_generation)
+        # ...and RE-RENDER the entries table, or the invalidation is invisible.
+        # Nothing else re-renders it on load: the four existing `refresh_entries`
+        # sites all hang off a Patch-Editor action, an undo/redo, or the panel's
+        # own mount. So the stamp alone would go stale in the service while the
+        # TABLE kept painting the verdicts of the previous image — the user-facing
+        # half of the same defect. This is a render call over data the service
+        # already holds; it re-derives nothing and applies nothing. (It also
+        # refreshes each row's containment `status_text`, which was likewise
+        # stale-until-next-action before this batch.)
+        try:
+            panel = self.query_one("#patch_editor_panel", PatchEditorPanel)
+        except Exception:
+            # App not mounted (headless unit tests drive this pipeline on a
+            # bare `S19TuiApp()` with no screen stack) — no tree to render
+            # into, the same tolerance `_apply_empty_state` documents just
+            # below. NOT a real-app path: the panel mounts during compose,
+            # which precedes both `App.on_mount`'s startup load and any
+            # user-triggered one. The service-side stamp above is set either
+            # way, so nothing is skipped that a later render would need.
+            pass
+        else:
+            # batch-48 (LLR-080.2) — site 4 of 5, and the one the Phase-2
+            # writer census MISSED: it was added by Inc-3 (the BL-4 arm) after
+            # that census was written, and nothing re-derived the census.
+            #
+            # This is the ONLY load-triggered site, which makes it the one the
+            # CARD most depends on: a new image means new "before" bytes. The
+            # panel's retain semantics are sentinel⇒preserve, so omitting
+            # `mem_map` here would leave the card holding the PREVIOUS image's
+            # map and painting stale before-bytes — the exact staleness defect
+            # this site exists to fix (the glyph half, above), one seam over.
+            panel.refresh_entries(
+                self._change_service.rows(loaded.ranges),
+                mem_map=loaded.mem_map,
+            )
         # F-09 (LLR-056.3): every load path — project load, loose-file
         # load, variant activation — funnels through this install point,
         # so the sticky report-filter selection dies with the previous

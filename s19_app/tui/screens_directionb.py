@@ -46,7 +46,7 @@ from __future__ import annotations
 import bisect
 from dataclasses import dataclass
 from math import ceil
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from rich.text import Text
 from textual.app import ComposeResult
@@ -68,11 +68,25 @@ from textual.widgets import (
     TextArea,
 )
 
-from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
-from .insight_style import human_bytes, microbar
+from .insight_style import (
+    CYAN,
+    DGRAY,
+    GREEN,
+    LABEL,
+    PURPLE,
+    RED,
+    VALUE,
+    YELLOW,
+    cap_gauge_style,
+    human_bytes,
+    label_value,
+    microbar,
+)
+from .json_highlight import JsonHighlightTextArea
+from .os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS
 from .os_clipboard_input import OsClipboardInput
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
@@ -2189,6 +2203,241 @@ class FlowBuilderPanel(ScrollableContainer):
         self.query_one("#flow_result", Static).update(text)
 
 
+class _Unset:
+    """Sentinel type for "argument not supplied" (batch-48 LLR-080.2).
+
+    ``None`` cannot serve: it is a MEANINGFUL value for ``mem_map`` — "no
+    image is loaded" (LLR-080.4) — and conflating it with "not supplied" is
+    the bug. ``refresh_entries`` has FIVE call sites and one of them (the
+    panel's own ``on_mount`` self-call) has no ``mem_map`` to give; an
+    unconditional retain would let that call NULL a map a real load had
+    already supplied. Sentinel ⇒ preserve; explicit ``None`` ⇒ clear.
+    """
+
+
+_UNSET = _Unset()
+
+#: The before/after card's neutral states (batch-48 LLR-080.4). Author-fixed
+#: literals — nothing file-derived reaches the card (LLR-080.7).
+CARD_NO_SELECTION = "Select an entry row to preview its bytes."
+CARD_NO_IMAGE = "No image loaded — before-bytes unavailable."
+#: Rendered for an address the loaded image does not map (A4: absence is
+#: UNMAPPED, never zero). MUST stay distinguishable from a real ``0x00``, whose
+#: rendering is ``"00"`` — asserted by TC-080.3, not left to inspection.
+CARD_UNMAPPED_TOKEN = "--"
+#: Byte columns the card renders before eliding.
+#:
+#: **C-29-MEASURED (batch-48 Inc-7), both axes, both regimes, with the card
+#: mounted and a row selected. Nothing inherited:**
+#:
+#: ===========  ==================  ======================  ==============
+#: regime       body content (w×h)  **card content width**  card region
+#: ===========  ==================  ======================  ==============
+#: 80×24        64×42               **62**                  64×4
+#: 120×30       38×42               **36**  ← binding       38×4
+#: ===========  ==================  ======================  ==============
+#:
+#: The widest painted line is ``"before  "`` (8) + ``max_bytes * 3 - 1``, so
+#: **8 bytes ⇒ 31 cells**, clearing the binding 36 with 5 to spare. The worst
+#: reachable HEADER — a 32-bit address, a long run, and the elision note
+#: (``"0xFFFFFFFF · 65536 bytes (first 8)"``) — is **34**, which also clears
+#: 36. TC-080.6 asserts the painted width against the measured container at
+#: both regimes rather than trusting this table.
+#:
+#: ⚠ **The card's budget is 36, NOT the body's 38 — do not inherit the body
+#: figure, and do not inherit ``_HISTORY_STRIP_BUDGET_COLS``' 38 either.** The
+#: card's own ``padding: 0 1`` costs 2 cells, so the container it actually
+#: renders into is narrower than the container it sits in. This is the same
+#: C-29 error class that produced ``_HISTORY_STRIP_BUDGET_COLS``' warning
+#: against ``_CHECK_STRIP_BAR_CELLS`` — one scale smaller, and it is why the
+#: rule is "measure the container you are IN", not "measure nearby".
+CARD_BYTES_MAX = 8
+
+
+def before_after_card_text(
+    address: Optional[int],
+    before: Optional[Sequence[Optional[int]]],
+    after: Sequence[int],
+    max_bytes: int = CARD_BYTES_MAX,
+) -> Text:
+    """Compose the live before/after card's content (batch-48 LLR-080.3).
+
+    Summary:
+        Render the loaded image's bytes at the selected entry's address span
+        beside the bytes that entry would write, with the DIFFERING positions
+        brightened. Pure: it reads no widget, no service and no app, so the
+        panel that calls it stays presentational (C-7) and this function is
+        unit-testable without a running app.
+
+        **Read-only by construction (LLR-080.5):** it returns a ``Text`` and
+        touches nothing. There is no apply/save path out of here.
+
+        **Colour (LLR-080.3) — no new hue is claimed.** A differing byte is
+        the datum the analyst is here for, so it takes ``VALUE`` ("bright
+        value text — the datum a label describes"); an identical byte is
+        context, so it takes ``DGRAY`` ("secondary"). Those two constants'
+        DOCUMENTED meanings already are "matters" vs "secondary", so the diff
+        cue costs **zero** new claimants inside ``#patch_editor_panel``.
+        GREEN/YELLOW/RED are reserved for verdicts here (the Inc-2b ruling);
+        MAGENTA is scoped to the budget/capacity family and its hue is
+        asserted as a measured optimum against a census, so a second claimant
+        would invalidate that measurement — not merely crowd the palette.
+
+    Args:
+        address (Optional[int]): The selected entry's raw start address, or
+            ``None`` when NO ROW is selected (→ the no-selection state).
+        before (Optional[Sequence[Optional[int]]]): The image's byte at each
+            address of the span, ``None`` per position the image does not map;
+            or ``None`` for the whole sequence when NO IMAGE is loaded (→ the
+            no-image state). The two ``None`` levels are distinct and must not
+            be conflated: "no image at all" vs "this address is unmapped".
+        after (Sequence[int]): The entry's ``encoded_bytes`` — what it would
+            write.
+        max_bytes (int): Byte columns rendered before eliding.
+
+    Returns:
+        Text: A Rich ``Text``. Never markup-parsed — every fragment is
+        appended literally, so no input can inject a span (C-17). The input
+        set is ints only, which is what keeps LLR-080.7's N/A honest.
+
+    Data Flow:
+        - ``address is None`` → the no-selection line; no bytes rendered.
+        - ``before is None`` → the no-image line; **no bytes rendered at all**
+          (not even ``after``) — with no image there is no comparison to make,
+          and a lone byte row on a "before/after" card invites reading it as a
+          before. Refusing to render beats rendering a guess.
+        - Otherwise → header (address + span length), then the ``before`` and
+          ``after`` rows, differing positions brightened.
+
+    Dependencies:
+        Uses:
+            - ``insight_style.CYAN`` / ``LABEL`` / ``VALUE`` / ``DGRAY``
+        Used by:
+            - :class:`BeforeAfterCard` (via
+              ``PatchEditorPanel._render_before_after_card``)
+
+    Example:
+        >>> t = before_after_card_text(0x200, [0xAA, 0xBB], [0x01, 0xBB])
+        >>> "0x200" in t.plain
+        True
+    """
+    text = Text()
+    if address is None:
+        text.append(CARD_NO_SELECTION, style=DGRAY)
+        return text
+    if before is None:
+        text.append(CARD_NO_IMAGE, style=DGRAY)
+        return text
+
+    shown = min(len(after), max_bytes)
+    text.append(f"0x{address:X}", style=CYAN)
+    text.append(" · ", style=LABEL)
+    text.append(f"{len(after)} byte{'' if len(after) == 1 else 's'}", style=LABEL)
+    if shown < len(after):
+        text.append(f" (first {shown})", style=LABEL)
+
+    for label, values in (("before", before), ("after", after)):
+        text.append("\n")
+        text.append(f"{label:<7} ", style=LABEL)
+        for index in range(shown):
+            if index:
+                text.append(" ")
+            image_byte = before[index] if index < len(before) else None
+            # An UNMAPPED position is not "unchanged" — it is unknown, so it
+            # can never be dimmed as context. `is None` (not falsiness): a
+            # mapped 0x00 is a real byte and must compare as one.
+            differs = image_byte is None or image_byte != after[index]
+            value = values[index] if index < len(values) else None
+            token = (
+                CARD_UNMAPPED_TOKEN if value is None else f"{value:02X}"
+            )
+            text.append(token, style=VALUE if differs else DGRAY)
+    return text
+
+
+class BeforeAfterCard(Static):
+    """The live before/after preview card (batch-48 LLR-080.1 — the HEADLINE).
+
+    Summary:
+        A read-only card mounted inside ``#patch_win_script_body``, directly
+        under the entries table it describes. Selecting an entry row shows the
+        image bytes currently at that entry's address beside the bytes the
+        entry would write — live, BEFORE any apply. It applies nothing
+        (LLR-080.5); it renders a ``Text`` and stops.
+
+        **Why it lives INSIDE the scrollable body**, not docked beside it: the
+        docked button rows are SIBLINGS of the body (batch-46's HLR-064 fix
+        for field-audit B2). Content added inside the body costs SCROLL, not
+        docked reachability, so the card cannot push a button below the fold
+        the way the pre-batch-46 tree did. That is a structural argument, and
+        it is MEASURED rather than trusted — AT-080d drives every named button
+        to ``_fully_visible`` at 80×24 and 120×30 with the card mounted.
+
+    Data Flow:
+        - ``show_entry(...)`` replaces the content via
+          :func:`before_after_card_text`.
+        - Mounts with the no-selection state already painted, so it never
+          mounts blank (the Inc-6 lesson: blank is not the empty state, it is
+          nothing).
+
+    Dependencies:
+        Uses:
+            - before_after_card_text
+        Used by:
+            - ``PatchEditorPanel.compose`` (mount) ;
+              ``PatchEditorPanel._render_before_after_card`` (update)
+
+    Note (Textual internal-name shadowing):
+        The only member added is the public ``show_entry`` method — no
+        ``_nodes`` / ``_context`` (or any other ``Widget`` private) name is
+        introduced, so mounting cannot silently crash or deadlock the boot
+        with no traceback (`reference_textual_internal_name_shadowing`).
+        TC-080.1 asserts the collision set is empty rather than trusting this
+        paragraph.
+    """
+
+    DEFAULT_CSS = """
+    BeforeAfterCard {
+        height: auto;
+        max-height: 4;
+        overflow-y: auto;
+        padding: 0 1;
+        border-top: solid $panel;
+    }
+    """
+
+    def show_entry(
+        self,
+        address: Optional[int],
+        before: Optional[Sequence[Optional[int]]],
+        after: Sequence[int],
+    ) -> None:
+        """Update the card to preview one entry (LLR-080.3/.4).
+
+        Args:
+            address (Optional[int]): Entry start address; ``None`` → the
+                no-selection state.
+            before (Optional[Sequence[Optional[int]]]): Image bytes per span
+                position (``None`` per unmapped position); ``None`` → the
+                no-image state.
+            after (Sequence[int]): The entry's ``encoded_bytes``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Delegates composition to :func:`before_after_card_text` and
+              calls ``Static.update`` with the resulting ``Text``.
+
+        Dependencies:
+            Uses:
+                - before_after_card_text
+            Used by:
+                - ``PatchEditorPanel._render_before_after_card``
+        """
+        self.update(before_after_card_text(address, before, after))
+
+
 class PatchEditorPanel(ScrollableContainer):
     """Consolidated Patch Editor rail screen — the single v2 change flow.
 
@@ -2263,6 +2512,103 @@ class PatchEditorPanel(ScrollableContainer):
 
     _ENTRIES_COLUMNS = ("Kind", "Address", "Value / bytes", "Status", "Linkage")
 
+    #: Check-glyph → render style (batch-48 LLR-077.3). The glyph is FOLDED
+    #: into the ``Kind`` cell as its own leading span, so this map lives at the
+    #: render boundary while ``ChangeService`` owns the token → glyph half —
+    #: the panel imports nothing from the service layer (C-7 purity).
+    #:
+    #: The two halves are keyed on the same 4 characters in two modules, so
+    #: ``test_tui_patch_glyphs.py::test_tc077_3_glyph_map`` asserts they stay
+    #: TOTAL over each other. Without that guard a glyph renamed on the service
+    #: side would fall through to the ``·`` style and mis-colour silently.
+    _GLYPH_STYLE = {
+        "✓": GREEN,
+        "✗": RED,
+        "◐": YELLOW,
+        "·": DGRAY,
+    }
+
+    #: Cell budget for the CHECKS pass/fail strip's bar (LLR-078.1).
+    #:
+    #: ⚠ RESOLVED at Inc-5 (the Inc-4 F1 note is superseded; its history is in
+    #: the increment record). The strip is an INTENTIONAL TWO-LINE widget:
+    #: counts on line 1, bar on line 2. The C-29 measurement chain that forces
+    #: it, RE-MEASURED at Inc-5 against the real container:
+    #:
+    #:   120x30  window w=22 → body interior w=18 → STRIP CONTENT w=14
+    #:    80x24  window w=68 → body interior w=66 → STRIP CONTENT w=62
+    #:
+    #: **14 is the budget at 120x30 — the batch's primary regime.** Two figures
+    #: above it were each one container too generous: 22-23 is the WINDOW width
+    #: (``test_tui_patch_layout.py:56-58``, which Inc-4 sized 8 cells against),
+    #: and 16 is the BODY's content width. Each level costs borders + padding.
+    #:
+    #: The one-line layout does not fit at ANY separator width: the counts
+    #: alone are 15 chars at the old spacing, and even the tightest form
+    #: (``✓123 ✗456 ◐789`` = 14 exactly) leaves 0 cells for a bar. Worse, the
+    #: old one-line form did not merely overflow — it wrapped MID-TOKEN once a
+    #: count reached 2 digits, orphaning ``◐`` from its number and making the
+    #: number read as a label on the bar:
+    #:
+    #:   agg 12/34/56 → line0 '✓ 12  ✗ 34  ◐ '   line1 '56  █░░░░░░░  '
+    #:
+    #: That is a WRONG-ANSWER defect on a verdict surface, reachable by any
+    #: change-set with >= 10 entries — not an overflow nuisance. Making the two
+    #: lines intentional costs nothing at 120x30 (h=2 is what already painted)
+    #: and one scrolled row at 80x24, and it removes the mid-token wrap.
+    #:
+    #: REJECTED: responsive width (needs geometry in the builder — a
+    #: first-layout-0 hazard, and it breaks the ``__new__`` unit tests) ·
+    #: dropping the bar (fits, but guts HLR-078's proportional bar — an
+    #: acceptance relaxation, not an implementation choice).
+    _CHECK_STRIP_BAR_CELLS = 8
+
+    #: The history strip's key-hint line (LLR-081.2). The two bindings are the
+    #: batch-40 S2 ``ctrl+z`` / ``ctrl+y`` pair; this batch adds NO App-level
+    #: ``Binding(show=True)``, so the hint is panel-local text and C-28's
+    #: shared-chrome census does not fire (LLR-081.4).
+    _HISTORY_HINT = "ctrl+z / ctrl+y"
+    #: The history strip's DISABLED line. Shown whenever the Undo/Redo buttons
+    #: are disabled — today the batch-38 A-01 file-backed guard, but the panel
+    #: is a view and is told the STATE, not the reason, so this text names
+    #: neither. It carries no key hints: the same guard gates the bindings, so
+    #: the keys are inert and a hint for them would be a wrong answer.
+    _HISTORY_OFF = "history off"
+
+    #: The history strip's TWO-LINE shape — position on line 1, key hints on
+    #: line 2 — is intentional, and the C-29 budget it is measured against is
+    #: the SCRIPT window's, NOT the CHECKS window's. MEASURED at Inc-6 with the
+    #: strip mounted (`region` / `content_region` off the live tree):
+    #:
+    #:   120x30  #patch_history_controls content w=38 → STRIP CONTENT w=38
+    #:    80x24  #patch_history_controls content w=64 → STRIP CONTENT w=64
+    #:
+    #: **38 is the budget — do NOT inherit ``_CHECK_STRIP_BAR_CELLS``'s 14.**
+    #: That 14 is the CHECKS window's content width at 120x30, and at that
+    #: regime the patch layout is a 3-column split in which the SCRIPT window is
+    #: nearly three times wider (44 vs 22). Inheriting a figure measured on a
+    #: sibling container is precisely the C-29 error, and the record was sitting
+    #: right there in `_CHECK_STRIP_BAR_CELLS` inviting it.
+    #:
+    #: Line 1's worst case is bounded WITHOUT a width assumption: ``back`` and
+    #: ``forward`` are snapshot counts that `_push_history` evicts at
+    #: `_HISTORY_MAX` (20) and `undo`/`redo` conserve, so ``back + forward <=
+    #: 20`` and every count is at most 2 digits. The widest reachable line 1 is
+    #: ``↶ 20 back  ↷ 0 fwd  20/20`` = 25 cells; line 2 is 15. Both clear 38
+    #: with room, so the two lines are a READING-ORDER choice (position, then
+    #: how to move it), not a wrap workaround like the CHECKS strip's.
+    _HISTORY_STRIP_BUDGET_COLS = 38
+
+    #: The shared 64 KiB paste cap, in CHARS (LLR-079.4). Aliased from the
+    #: single source (``os_clipboard_input.py:72``) rather than re-spelled, so
+    #: the gauge's denominator and the truncation it predicts cannot drift.
+    _PASTE_CAP_CHARS = _CLIPBOARD_READ_CAP_CHARS
+    #: Percent-of-cap cutoffs for the gauge's escalation (:func:`cap_gauge_style`).
+    #: ``100`` is lower-inclusive, so AT the cap — the first point at which the
+    #: next pasted character is silently dropped — already reads bold.
+    _PASTE_GAUGE_WARN_PCT = 75.0
+    _PASTE_GAUGE_BAD_PCT = 100.0
+
     #: The E6 execution scopes in selector cycle order (LLR-006.6) and their
     #: button labels. The scope tokens are the service vocabulary
     #: (``variant_execution_service.EXECUTION_SCOPES``) spelled locally so
@@ -2273,6 +2619,27 @@ class PatchEditorPanel(ScrollableContainer):
         "all": "all variants",
         "assignments": "per assignment",
     }
+
+    #: The three windows' border titles (LLR-075.1). CONSTANT author strings —
+    #: never file-derived (C-17). The superscript ordinal names the window's
+    #: read order in the three-column regime.
+    _WINDOW_BORDER_TITLES = {
+        "patch_win_script": "¹PATCH SCRIPT",
+        "patch_win_checks": "²CHECKS",
+        "patch_win_json": "³JSON EDIT",
+    }
+
+    #: The JSON window's border subtitle (LLR-075.1) — the change-set schema
+    #: token, spelled locally so this view widget imports nothing from the
+    #: service layer (the panel's own paste label already reads "v2 JSON").
+    _JSON_SCHEMA_SUBTITLE = "v2 schema"
+
+    #: The CHECKS window's border subtitle before any check run (LLR-075.1).
+    _NO_RUN_SUBTITLE = "no run yet"
+
+    #: The variant/scope line's placeholder when no variant is active
+    #: (LLR-075.3 invalid boundary — a neutral placeholder, never a crash).
+    _NO_VARIANT_PLACEHOLDER = "-"
 
     #: The save-back S19 record widths in selector cycle order (US-015 /
     #: LLR-015.3). 32 is the default (the populated-S0 / 32-byte mode); 16 is
@@ -2546,6 +2913,22 @@ class PatchEditorPanel(ScrollableContainer):
         #: (US-015 / LLR-015.3) — cycled by ``#patch_saveback_width_button``;
         #: carried on the ``SaveBackDecision``. Defaults to 32.
         self._saveback_width: int = self.SAVEBACK_WIDTHS[0]
+        #: The active variant id the variant/scope line shows (LLR-075.3),
+        #: mirrored from ``set_variants`` — ``app.py`` remains the ONLY
+        #: populator (the US-026 ownership split). File-derived, so it reaches
+        #: the line only through a literal ``Text`` append (LLR-075.4 / C-17).
+        self._active_variant: Optional[str] = None
+        #: The loaded image's sparse memory map, RETAINED from
+        #: ``refresh_entries``' parameter for the before/after card's
+        #: row-selection render (batch-48 LLR-080.2). ``None`` is MEANINGFUL —
+        #: "no image loaded" — which is why that parameter's default is a
+        #: sentinel and not ``None``. The panel never fetches this itself
+        #: (C-7): it arrives as data, or not at all.
+        self._mem_map: Optional[Mapping[int, int]] = None
+        #: The rows last rendered into the entries table, retained so the card
+        #: resolves the highlighted row POSITIONALLY (LLR-080.3). The table is
+        #: ``cursor_type="row"``, so a cursor index indexes this list directly.
+        self._entry_rows: List[object] = []
 
     def set_change_files(self, names: Sequence[str]) -> None:
         """Populate the change-file dropdown with the patches-folder files.
@@ -2571,12 +2954,15 @@ class PatchEditorPanel(ScrollableContainer):
             None
 
         Data Flow:
-            - Map each name to a ``(name, name)`` option pair and hand them to
-              the ``Select`` via ``set_options``; an empty list clears the
-              options, and Textual falls back to the blank prompt.
+            - Map each name to a ``(safe_text(name), name)`` option pair and
+              hand them to the ``Select`` via ``set_options``; an empty list
+              clears the options, and Textual falls back to the blank prompt.
+              The VALUE stays the bare ``str`` — the ``Select.Changed`` handler
+              forwards it verbatim and never renders it.
 
         Dependencies:
             Uses:
+                - ``safe_text``
                 - ``textual.widgets.Select.set_options``
             Used by:
                 - ``S19TuiApp._prefill_patch_change_files``
@@ -2584,7 +2970,19 @@ class PatchEditorPanel(ScrollableContainer):
         Example:
             >>> panel.set_change_files(["changes.json", "changes-1.json"])
         """
-        options = [(name, name) for name in names]
+        # C-17 (Inc-1b — the THIRD site of the class the Inc-1 security review
+        # measured): the option LABEL is a FILENAME read off disk
+        # (`app.py:3693` -> `_scan_patch_change_files()` over
+        # `workarea/patches/`), so anyone who can drop a file into the work
+        # area names it. `Select._watch_value` hands the label to
+        # `SelectCurrent.update(prompt)` (`_select.py:615`) -> a markup-enabled
+        # `Static` -> `Content.from_markup` (`visual.py:103`). Measured at
+        # `textual==8.2.8`: `[red]PWNED[/red]` -> plain 'PWNED' +
+        # Span(0,5,'red'); `[/nope]` and `[link=…]` -> `MarkupError` out of
+        # `set_change_files`. `update` takes a `RenderableType`, so a literal
+        # `Text` label is passed through unparsed — same fix shape as
+        # `set_variants` below.
+        options = [(safe_text(str(name)), name) for name in names]
         self.query_one("#patch_doc_file_select", Select).set_options(options)
 
     def set_variants(
@@ -2636,10 +3034,30 @@ class PatchEditorPanel(ScrollableContainer):
             >>> panel.set_variants([("a", "a"), ("b", "b")], "b")
         """
         select = self.query_one("#patch_variant_select", Select)
-        select.set_options(options)
+        # C-17 (LLR-075.4, WIDENED — a SECOND live sink found in Phase 3):
+        # the option LABEL is project-file-derived (`app.py:3740-3742` maps
+        # each `variant.variant_id` to BOTH label and value), and Textual's
+        # `SelectCurrent.update(prompt)` (`_select.py:615`) hands a bare `str`
+        # label to a markup-enabled `Static` -> `Content.from_markup`
+        # (`visual.py:103`). Measured at `textual==8.2.8`: a variant id of
+        # `[/nope]` raised `MarkupError` out of `set_variants`; `[link=…]`
+        # injected a link from project data. `update` takes a `RenderableType`,
+        # so a literal `Text` label is passed through unparsed — the same fix
+        # shape as LLR-075.6, applied at the panel's render boundary so
+        # `app.py` stays unchanged.
+        select.set_options(
+            [(safe_text(str(label)), value) for label, value in options]
+        )
         if active_id is not None and len(options) >= 2:
             select.value = active_id
         select.disabled = len(options) < 2
+        # LLR-075.3: mirror the active variant onto the variant/scope line.
+        # Driving it from HERE (the single populator) is what keeps the line
+        # from going stale: a dropdown pick routes through
+        # ``_handle_select_variant`` -> load -> ``_apply_prepared_load`` ->
+        # ``_refresh_patch_variant_select`` -> back into this method.
+        self._active_variant = active_id
+        self._refresh_variant_scope_line()
 
     def compose(self) -> ComposeResult:
         """Lay out the Patch Editor as three responsive bordered windows.
@@ -2648,11 +3066,34 @@ class PatchEditorPanel(ScrollableContainer):
             Render the change-flow editor as three bordered windows
             (HLR-063) — ``#patch_win_script`` (PATCH SCRIPT),
             ``#patch_win_checks`` (CHECKS) and ``#patch_win_json``
-            (JSON EDIT). Each window is a constant title ``Label`` + a
+            (JSON EDIT). Each window is a constant **border title** + a
             scrollable ``VerticalScroll`` body + one or more **docked
             button-row siblings of the body** (not descendants of it), so an
             action button is never trapped below the body's inner scroll fold
-            (HLR-064 / the field-audit B2 fix). The pre-existing grouping
+            (HLR-064 / the field-audit B2 fix).
+
+            **batch-48 (§6.5 Amendment D): the in-body title ``Label`` is
+            GONE.** R-TUI-063 originally specified a constant-title ``Label``
+            as each window's first child; Inc-1 added the dolphie-idiom
+            ``border_title`` (LLR-075.1), which rendered the SAME constant a
+            second time — so each window read its own name twice. The border
+            title supersedes the Label: it is strictly stronger (it self-
+            describes on the window's own chrome, it cannot be scrolled away
+            from its window, and it spends 0 content rows against the measured
+            ~5-row @80x24 budget). The protected property — *each window
+            self-describes* — is preserved and re-pinned in that stronger form
+            by ``test_tui_patch_layout.py::test_tc46_1_*``, which now asserts
+            ``border_title`` instead of the Label's class.
+
+            **batch-48 (HLR-076): the docked buttons are CHIPS.** Each
+            button-bearing container carries a ``patch-chip-{entry,apply,
+            checks}`` group class and each ``Button`` a ``patch-chip``; the
+            colour rules live in ``styles.tcss`` scoped under
+            ``#patch_editor_panel`` (LLR-076.1 — the C-30 containment). This
+            is a CLASSES-ONLY restyle: no id is added-in-place-of, renamed,
+            moved, or re-parented (LLR-076.3).
+
+            The pre-existing grouping
             sub-containers ``#patch_pane_entries``, ``#patch_pane_changefile``,
             ``#patch_pane_variant`` and ``#patch_doc_file_row`` are preserved
             intact as **non-scrolling** groups (FOLD-1) so every leaf id and
@@ -2671,12 +3112,12 @@ class PatchEditorPanel(ScrollableContainer):
 
         Returns:
             ComposeResult: The Patch Editor widget tree — three
-            ``#patch_win_*`` window containers, each holding a title, a
-            scrollable body and its docked button-row sibling(s).
+            ``#patch_win_*`` window containers, each a border-titled window
+            holding a scrollable body and its docked button-row sibling(s).
 
         Data Flow:
             - Each window ``Container`` lays its children out vertically
-              (title / body / docked rows); ``#patch_editor_panel`` lays the
+              (body / docked rows); ``#patch_editor_panel`` lays the
               three windows out horizontally when wide and vertically (with a
               panel scroll) when ``width-narrow`` is set (styles.tcss).
 
@@ -2685,8 +3126,7 @@ class PatchEditorPanel(ScrollableContainer):
                 - Textual ``ScrollableContainer`` compose lifecycle
         """
         # ================= PATCH SCRIPT window =================
-        yield Container(
-            Label("PATCH SCRIPT", classes="patch-window-title"),
+        script_window = Container(
             VerticalScroll(
                 Container(
                     Label(
@@ -2703,6 +3143,15 @@ class PatchEditorPanel(ScrollableContainer):
                         id="patch_doc_empty_state",
                         markup=False,
                     ),
+                    # batch-48 (LLR-080.1) — the live before/after card, the
+                    # HEADLINE. Mounted INSIDE the scrollable body, directly
+                    # under the table whose selection drives it: content here
+                    # costs SCROLL, while the docked button rows are siblings
+                    # of the body (batch-46's B2 fix), so the card cannot push
+                    # a button below the fold. Measured, not assumed —
+                    # AT-080d drives every named button at both regimes with
+                    # the card mounted.
+                    BeforeAfterCard(id="patch_before_after_card"),
                     Container(
                         Label("Address", classes="patch-field-label"),
                         # batch-31 AC-2 (B-03): OsClipboardInput (a drop-in
@@ -2760,35 +3209,76 @@ class PatchEditorPanel(ScrollableContainer):
             ),
             # Docked button rows — siblings of the body (the B2 fix): never
             # trapped below the body's inner scroll fold.
+            # HLR-076: `patch-chip-entry` (blue) = the ENTRY-ACTIONS group —
+            # the buttons that edit the change document itself.
             Horizontal(
-                Button("Add", id="patch_entry_add_button"),
-                Button("Edit", id="patch_entry_edit_button"),
-                Button("Remove", id="patch_entry_remove_button"),
+                Button("Add", id="patch_entry_add_button", classes="patch-chip"),
+                Button("Edit", id="patch_entry_edit_button", classes="patch-chip"),
+                Button(
+                    "Remove",
+                    id="patch_entry_remove_button",
+                    classes="patch-chip",
+                ),
                 # US-068b: the per-entry JSON editor for the SELECTED
                 # entries-table row — disabled for a file-backed document.
-                Button("Edit JSON", id="patch_entry_edit_json_button"),
+                Button(
+                    "Edit JSON",
+                    id="patch_entry_edit_json_button",
+                    classes="patch-chip",
+                ),
                 id="patch_doc_entry_buttons",
+                classes="patch-docked-row patch-chip-entry",
+            ),
+            # batch-48 (LLR-081.2): the history strip, directly ABOVE the
+            # Undo/Redo row it describes. DOCKED as a sibling of the body (not
+            # inside it) for the same reason the buttons are: it must stay
+            # beside the controls it labels rather than scrolling away from
+            # them. It renders derived integers + author-fixed key hints and
+            # NOTHING file-derived (C-17 / LLR-081 boundary catalog "error").
+            # It carries no `patch-chip-*` group class — it holds no Button,
+            # and the group classes cue BUTTON function (HLR-076). And no
+            # `.patch-field-label`: that class's `color: $fg-base` would be
+            # INERT here (every fragment of the strip's `Text` sets its own
+            # style), so it would claim a styling role it does not play — the
+            # F4 finding that produced `.patch-stat-line`. `.patch-docked-row`
+            # alone supplies all this needs: width 100%, height auto, and the
+            # padding that aligns it with the buttons below.
+            Static(
+                "",
+                id="patch_history_strip",
+                markup=False,
                 classes="patch-docked-row",
             ),
             # US-068a: change-set Undo / Redo in their own dedicated row —
             # disabled for a file-backed document (A-01 data-loss guard).
+            # LLR-076.2 `assumed` arm resolved: undo/redo MOVE the entry
+            # document, so they are entry-actions (blue), not apply-path.
             Horizontal(
-                Button("Undo", id="patch_undo_button"),
-                Button("Redo", id="patch_redo_button"),
+                Button("Undo", id="patch_undo_button", classes="patch-chip"),
+                Button("Redo", id="patch_redo_button", classes="patch-chip"),
                 id="patch_history_controls",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-entry",
             ),
             # batch-37 (US-064a): Refresh re-reads the loaded change file from
             # its own source_path. The 5-button census is pinned by
             # test_tui_patch_editor_v2 / the layout TC.
+            # HLR-076: `patch-chip-apply` (green) = the APPLY-PATH group.
             Horizontal(
-                Button("Load", id="patch_doc_load_button"),
-                Button("Refresh", id="patch_doc_refresh_button"),
-                Button("Validate", id="patch_doc_validate_button"),
-                Button("Apply", id="patch_doc_apply_button"),
-                Button("Save", id="patch_doc_save_button"),
+                Button("Load", id="patch_doc_load_button", classes="patch-chip"),
+                Button(
+                    "Refresh",
+                    id="patch_doc_refresh_button",
+                    classes="patch-chip",
+                ),
+                Button(
+                    "Validate",
+                    id="patch_doc_validate_button",
+                    classes="patch-chip",
+                ),
+                Button("Apply", id="patch_doc_apply_button", classes="patch-chip"),
+                Button("Save", id="patch_doc_save_button", classes="patch-chip"),
                 id="patch_doc_controls",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-apply",
             ),
             # US-028 (LLR-035.2): the variant group composes ABOVE the execute
             # group (R-PATCH-VARIANT-SELECT-001 / TC-035.2). Kept intact as a
@@ -2800,6 +3290,9 @@ class PatchEditorPanel(ScrollableContainer):
                     Label("Active variant", classes="patch-field-label"),
                     # US-067: the "?" info button is ALWAYS rendered beside the
                     # selector so its click target always exists.
+                    # LLR-076.2 `assumed` arm resolved: the variant group
+                    # scopes WHAT A RUN TARGETS, so both of its button-bearing
+                    # rows join the apply-path group (green).
                     Horizontal(
                         Select(
                             [],
@@ -2808,8 +3301,13 @@ class PatchEditorPanel(ScrollableContainer):
                             allow_blank=True,
                             disabled=True,
                         ),
-                        Button("?", id="patch_variant_info_button"),
+                        Button(
+                            "?",
+                            id="patch_variant_info_button",
+                            classes="patch-chip",
+                        ),
                         id="patch_variant_select_row",
+                        classes="patch-chip-apply",
                     ),
                     id="patch_variant_row",
                 ),
@@ -2821,11 +3319,39 @@ class PatchEditorPanel(ScrollableContainer):
                         Button(
                             f"Scope: {self._SCOPE_LABELS[self._execute_scope]}",
                             id="patch_execute_scope_button",
+                            classes="patch-chip",
                         ),
                         Button(
-                            "Execute scope", id="patch_execute_run_button"
+                            "Execute scope",
+                            id="patch_execute_run_button",
+                            classes="patch-chip",
                         ),
                         id="patch_execute_buttons",
+                        classes="patch-chip-apply",
+                    ),
+                    # LLR-075.3: the variant + execution scope as a readable
+                    # LINE. Before this, the scope was legible only from
+                    # #patch_execute_scope_button's own label. An ADDED id —
+                    # no existing id moves, is renamed, or is re-parented
+                    # (§2.4-6). Nested INSIDE #patch_execute_row (still a
+                    # descendant of #patch_pane_variant per LLR-075.3, and
+                    # adjacent to the button that cycles it) so
+                    # #patch_pane_variant's pinned direct-child list stays
+                    # exactly [patch_variant_row, patch_execute_row] —
+                    # TC-035.2 / R-PATCH-VARIANT-SELECT-001 stay green
+                    # unedited. markup=False is defence-in-depth: every
+                    # update() passes a literal Text, so the file-derived
+                    # variant id is never markup-parsed (LLR-075.4 / C-17).
+                    # batch-48 (code-review F4): `.patch-stat-line`, not the
+                    # borrowed `.patch-field-label` — this renders a
+                    # label+VALUE pair (label_value sets both colours on the
+                    # Text itself), so the field label's `color: $fg-base` was
+                    # inert here and only its padding was ever wanted.
+                    Static(
+                        "",
+                        id="patch_variant_scope_line",
+                        markup=False,
+                        classes="patch-stat-line",
                     ),
                     id="patch_execute_row",
                 ),
@@ -2836,8 +3362,7 @@ class PatchEditorPanel(ScrollableContainer):
             classes="patch-window",
         )
         # ================= CHECKS window =================
-        yield Container(
-            Label("CHECKS", classes="patch-window-title"),
+        checks_window = Container(
             VerticalScroll(
                 Label(
                     "",
@@ -2856,6 +3381,18 @@ class PatchEditorPanel(ScrollableContainer):
                     classes="patch-field-label",
                     markup=False,
                 ),
+                # batch-48 (LLR-078.1): the pass/fail strip, ABOVE the
+                # results area. Renders integer counts + closed-vocabulary
+                # glyphs + a bar and NOTHING file-derived — the blocked-run
+                # reason keeps its `patch_checks_status` sink above (C-17 /
+                # LLR-078.5). `markup=False` is belt-and-braces: the strip is
+                # fed a `Text`, which Static never markup-parses.
+                Static(
+                    "",
+                    id="patch_checks_strip",
+                    markup=False,
+                    classes="patch-field-label",
+                ),
                 Container(id="patch_checks_results"),
                 id="patch_win_checks_body",
                 classes="patch-window-body",
@@ -2872,8 +3409,13 @@ class PatchEditorPanel(ScrollableContainer):
             # clarity help stay together in #patch_checks_controls (their
             # parentage is pinned by test_at057a); docked here so the button is
             # reachable by scrolling the CHECKS window into view.
+            # HLR-076: `patch-chip-checks` (yellow) = the CHECKS group.
             Container(
-                Button("Run checks", id="patch_checks_run_button"),
+                Button(
+                    "Run checks",
+                    id="patch_checks_run_button",
+                    classes="patch-chip",
+                ),
                 Label(
                     "Checks: runs the loaded change document's checks "
                     "against the loaded image. Needs kind 'check' (a "
@@ -2885,14 +3427,13 @@ class PatchEditorPanel(ScrollableContainer):
                     classes="patch-field-label",
                 ),
                 id="patch_checks_controls",
-                classes="patch-docked-group",
+                classes="patch-docked-group patch-chip-checks",
             ),
             id="patch_win_checks",
             classes="patch-window",
         )
         # ================= JSON EDIT window =================
-        yield Container(
-            Label("JSON EDIT", classes="patch-window-title"),
+        json_window = Container(
             VerticalScroll(
                 # batch-36 (US-058): the change-set paste group in a scrollable
                 # body so the editor's first line sits inside the visible
@@ -2903,7 +3444,25 @@ class PatchEditorPanel(ScrollableContainer):
                         "Paste change-set (v2 JSON)",
                         classes="patch-field-label",
                     ),
-                    CappedTextArea(
+                    # batch-48 (LLR-079.4): the paste-cap gauge. The 64 KiB cap
+                    # already truncates SILENTLY (`capped_text_area.py:120`/
+                    # `:157`); this is the missing budget read-out. It renders
+                    # integers + author-fixed labels only — the buffer's own
+                    # text never reaches it (C-17), only its `len`.
+                    # `markup=False` is belt-and-braces: it is fed a `Text`.
+                    Static(
+                        "",
+                        id="patch_paste_gauge",
+                        markup=False,
+                        classes="patch-field-label",
+                    ),
+                    # batch-48 (LLR-079.1): was a plain `CappedTextArea`. The
+                    # subclass keeps BOTH paste ingresses capped and adds
+                    # in-place JSON colouring via the widget's own
+                    # `_highlights` map. NO markup path is introduced — see
+                    # `json_highlight.py`'s module docstring for the pinned
+                    # `_render_line` verification (C-17 / LLR-079.3).
+                    JsonHighlightTextArea(
                         DUMMY_CHANGESET_TEXT, id="patch_paste_text"
                     ),
                     id="patch_paste_row",
@@ -2912,12 +3471,20 @@ class PatchEditorPanel(ScrollableContainer):
                 classes="patch-window-body",
             ),
             Horizontal(
-                Button("Parse pasted", id="patch_paste_parse_button"),
+                Button(
+                    "Parse pasted",
+                    id="patch_paste_parse_button",
+                    classes="patch-chip",
+                ),
                 # US-064b: opens the full-size JSON popup over the paste buffer;
                 # disabled by the app for a file-backed document (A-01 guard).
-                Button("Edit JSON", id="patch_edit_json_button"),
+                Button(
+                    "Edit JSON",
+                    id="patch_edit_json_button",
+                    classes="patch-chip",
+                ),
                 id="patch_paste_controls",
-                classes="patch-docked-row",
+                classes="patch-docked-row patch-chip-apply",
             ),
             # The hidden save-back prompt is a docked group revealed by the
             # app's save-back handler on a successful save; docked so its
@@ -2929,10 +3496,20 @@ class PatchEditorPanel(ScrollableContainer):
                     Button(
                         f"Width: {self._saveback_width} bytes/line",
                         id="patch_saveback_width_button",
+                        classes="patch-chip",
                     ),
-                    Button("Write file", id="patch_saveback_confirm_button"),
-                    Button("Don't save", id="patch_saveback_decline_button"),
+                    Button(
+                        "Write file",
+                        id="patch_saveback_confirm_button",
+                        classes="patch-chip",
+                    ),
+                    Button(
+                        "Don't save",
+                        id="patch_saveback_decline_button",
+                        classes="patch-chip",
+                    ),
                     id="patch_saveback_buttons",
+                    classes="patch-chip-apply",
                 ),
                 id="patch_saveback_row",
                 classes="hidden patch-docked-group",
@@ -2949,8 +3526,10 @@ class PatchEditorPanel(ScrollableContainer):
                     Button(
                         "Write before/after report",
                         id="patch_before_after_button",
+                        classes="patch-chip",
                     ),
                     id="patch_before_after_buttons",
+                    classes="patch-chip-apply",
                 ),
                 id="patch_before_after_row",
                 classes="hidden patch-docked-group",
@@ -2958,6 +3537,99 @@ class PatchEditorPanel(ScrollableContainer):
             id="patch_win_json",
             classes="patch-window",
         )
+        # LLR-075.1: the dolphie-idiom border title + subtitle on each window
+        # (the batch-47 `app.py:1651-1656` Workspace-pane precedent). The
+        # titles are CONSTANT author strings; the subtitles carry LIVE state
+        # and are re-set by refresh_entries (SCRIPT: entry count) and
+        # refresh_check_results (CHECKS: run state). The JSON subtitle is the
+        # static schema token. `.patch-window` already draws `border: round
+        # $rule` (styles.tcss:864), so the border chrome exists to host them.
+        script_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_script"]
+        checks_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_checks"]
+        json_window.border_title = self._WINDOW_BORDER_TITLES["patch_win_json"]
+        checks_window.border_subtitle = self._NO_RUN_SUBTITLE
+        json_window.border_subtitle = self._JSON_SCHEMA_SUBTITLE
+        yield script_window
+        yield checks_window
+        yield json_window
+
+    def _set_window_subtitle(self, window_id: str, subtitle: str) -> None:
+        """Set one patch window's live border subtitle (LLR-075.1).
+
+        Summary:
+            Write ``subtitle`` onto the ``#patch_win_*`` container's
+            ``border_subtitle``. Tolerates a not-yet-mounted tree so the
+            ``refresh_*`` renderers stay callable from ``on_mount`` and from
+            ``app.py`` alike.
+
+        Args:
+            window_id (str): The window container id — one of
+                ``_WINDOW_BORDER_TITLES``' keys.
+            subtitle (str): The author-composed live state token. NEVER
+                file-derived (C-17): every caller passes a count or a fixed
+                token, never a document string.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Query the window container; assign ``border_subtitle``.
+
+        Dependencies:
+            Used by:
+                - ``PatchEditorPanel.refresh_entries`` (SCRIPT entry count)
+                - ``PatchEditorPanel.refresh_check_results`` (CHECKS run state)
+
+        Example:
+            >>> panel._set_window_subtitle("patch_win_script", "3 entries")
+        """
+        windows = self.query(f"#{window_id}")
+        if windows:
+            windows.first(Container).border_subtitle = subtitle
+
+    def _refresh_variant_scope_line(self) -> None:
+        """Render the variant + execution-scope line (LLR-075.3 / LLR-075.4).
+
+        Summary:
+            Compose ``Variant <id> · Scope <label>`` as a Rich ``Text`` and
+            write it to ``#patch_variant_scope_line``. The scope label comes
+            from the panel's OWN local vocabulary (``_SCOPE_LABELS``), so this
+            view widget still imports nothing from the service layer (C-7).
+            The variant id is project-file-derived and is therefore appended
+            LITERALLY — never f-strung into a markup string and never passed
+            to ``Text.from_markup`` (LLR-075.4 / C-17).
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``self._active_variant`` (mirrored from ``set_variants``) +
+              ``self._execute_scope`` (cycled by the scope button) →
+              ``label_value`` pairs → ``Static.update``.
+
+        Dependencies:
+            Uses:
+                - ``insight_style.label_value``
+            Used by:
+                - ``PatchEditorPanel.set_variants``
+                - ``PatchEditorPanel.on_button_pressed`` (the scope cycle)
+                - ``PatchEditorPanel.on_mount``
+
+        Example:
+            >>> panel._refresh_variant_scope_line()
+        """
+        lines = self.query("#patch_variant_scope_line")
+        if not lines:
+            return
+        variant = self._active_variant or self._NO_VARIANT_PLACEHOLDER
+        # `label_value` appends both segments literally — the C-17-safe
+        # constructor. A hostile variant id renders as its own characters.
+        line = label_value("Variant", variant, CYAN)
+        line.append(" · ")
+        line.append_text(
+            label_value("Scope", self._SCOPE_LABELS[self._execute_scope])
+        )
+        lines.first(Static).update(line)
 
     def on_mount(self) -> None:
         """Initialise the entries table columns and the empty state.
@@ -2974,6 +3646,81 @@ class PatchEditorPanel(ScrollableContainer):
         table = self.query_one("#patch_doc_entries_table", DataTable)
         table.add_columns(*self._ENTRIES_COLUMNS)
         self.refresh_entries([])
+        # LLR-075.3: render the line's no-variant/default-scope initial state
+        # so it never mounts blank.
+        self._refresh_variant_scope_line()
+        # LLR-079.4: the buffer mounts NON-empty (`DUMMY_CHANGESET_TEXT`), so a
+        # gauge that only rode `TextArea.Changed` would read a stale `0 / 64K`
+        # until the analyst's first keystroke.
+        self._refresh_paste_gauge()
+
+    def on_text_area_changed(self, event: TextArea.Changed) -> None:
+        """Keep the paste-cap gauge in step with the buffer (LLR-079.4).
+
+        Summary:
+            Re-render the gauge whenever the paste buffer's content changes —
+            which is every ingress at once (bracketed paste, ``ctrl+v``,
+            typing, and the app's programmatic ``load_text``), because
+            ``TextArea.Changed`` is posted by the document edit itself rather
+            than by any one caller. A per-call-site refresh would be the
+            batch-38 Inc-4 F1 stale-panel shape: an omitted site leaves a
+            wrong number on screen.
+
+        Args:
+            event (TextArea.Changed): The originating widget's change message.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+
+        Data Flow:
+            - Filter to ``#patch_paste_text`` → :meth:`_refresh_paste_gauge`.
+            - The id filter matters: ``Changed`` bubbles, so an unfiltered
+              handler would repaint the gauge from an unrelated ``TextArea``.
+
+        Dependencies:
+            Uses:
+                - :meth:`_refresh_paste_gauge`
+            Used by:
+                - Textual message dispatch (the ``#patch_paste_text`` buffer)
+        """
+        if event.text_area.id == "patch_paste_text":
+            self._refresh_paste_gauge()
+
+    def _refresh_paste_gauge(self) -> None:
+        """Render the gauge from the buffer's CURRENT length (LLR-079.4).
+
+        Summary:
+            Read ``#patch_paste_text``'s length and hand it to
+            :meth:`_paste_gauge_text`. The length is read from the widget
+            here — not passed in — so no caller can supply a count that
+            disagrees with what is on screen.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            None — both ids are composed by this panel.
+
+        Data Flow:
+            - ``len(TextArea.text)`` → :meth:`_paste_gauge_text` →
+              ``#patch_paste_gauge``.
+
+        Dependencies:
+            Uses:
+                - :meth:`_paste_gauge_text`
+            Used by:
+                - :meth:`on_mount`, :meth:`on_text_area_changed`
+        """
+        buffer = self.query_one("#patch_paste_text", TextArea)
+        self.query_one("#patch_paste_gauge", Static).update(
+            self._paste_gauge_text(len(buffer.text))
+        )
 
     def request_action(self, action: str) -> None:
         """Post an :class:`ActionRequested` message for ``action``.
@@ -3143,6 +3890,9 @@ class PatchEditorPanel(ScrollableContainer):
             event.button.label = (
                 f"Scope: {self._SCOPE_LABELS[self._execute_scope]}"
             )
+            # LLR-075.3: the line and the button label are two views of the
+            # SAME `_execute_scope` — cycle them together or the line lies.
+            self._refresh_variant_scope_line()
             return
         actions = {
             "patch_entry_add_button": "add_entry",
@@ -3214,7 +3964,69 @@ class PatchEditorPanel(ScrollableContainer):
         event.stop()
         self.post_message(self.ChangeFileSelected(str(event.value)))
 
-    def refresh_entries(self, rows: Sequence[object]) -> None:
+    def _kind_cell(self, row: object) -> Text:
+        """Build the ``Kind`` cell — the check glyph FOLDED in as a leading span.
+
+        Summary:
+            Render column 0 as ``"<glyph> <kind>"`` in one ``Text``: the glyph
+            leads in its own verdict-coloured span, the kind text follows in
+            the cell's PURPLE role style (LLR-077.3/077.4).
+
+            **No sixth column is added** — this is the house idiom, not an
+            invention: the A2L table folds its in-image glyph into the name
+            cell (``app.py:9548``) and the MAC table folds its status glyph
+            into the Tag cell "as its own span" (``app.py:9223-9226``), both
+            keeping the column count unchanged. A leading COLUMN would instead
+            shift ``Coordinate(row, 1)`` / ``(row, 2)`` under every existing
+            index-reader (``tests/test_tui_patch_editor_v2.py:2578``,
+            ``:3208-3209``, whose docstring pins the order as contract) and
+            force a width relaxation at 80x24 that the fold makes unnecessary.
+
+            The glyph is also NOT redundant with the ``Status`` column:
+            ``status_text`` is the CONTAINMENT verdict (``MemoryStatus``), the
+            glyph is the CHECK-RUN verdict — different semantics, different
+            lifetimes. Folding into ``Kind`` puts visual distance between them.
+
+        Args:
+            row (object): One ``ChangeEntryRow``; ``check_glyph`` is read
+                duck-typed (defaulting to ``·``) so this view widget keeps
+                importing nothing from the service layer (C-7).
+
+        Returns:
+            Text: The cell — ``.style`` is the PURPLE role style (so the role
+            assertion still reads the cell), ``.plain`` starts with the glyph,
+            and ``.spans`` carries exactly the glyph's own style span.
+
+        Data Flow:
+            - Look the glyph's style up in ``_GLYPH_STYLE``; an unknown glyph
+              falls back to the muted ``DGRAY``.
+            - ``append`` the glyph, then ``append`` the kind text.
+
+        Dependencies:
+            Uses:
+                - ``_GLYPH_STYLE`` ; ``insight_style.PURPLE`` / ``DGRAY``
+            Used by:
+                - ``refresh_entries``
+
+        Note (C-17):
+            ``kind_text`` is file-derived. ``Text.append`` takes its argument
+            LITERALLY — it never markup-parses — so appending it is the same
+            guarantee ``safe_text`` gives the other four cells. The cell is
+            still a ``Text``, so ``default_cell_formatter`` never sees a
+            ``str`` to hand to ``Text.from_markup`` (LLR-075.6). The glyph
+            itself is one of four author-owned constants (LLR-077.6).
+        """
+        glyph = str(getattr(row, "check_glyph", "·"))
+        cell = Text(style=PURPLE)
+        cell.append(f"{glyph} ", style=self._GLYPH_STYLE.get(glyph, DGRAY))
+        cell.append(str(row.kind_text))
+        return cell
+
+    def refresh_entries(
+        self,
+        rows: Sequence[object],
+        mem_map: Union[Mapping[int, int], None, _Unset] = _UNSET,
+    ) -> None:
         """Repopulate the entries table from shaped display rows.
 
         Summary:
@@ -3222,41 +4034,226 @@ class PatchEditorPanel(ScrollableContainer):
             ``ChangeEntryRow`` list (kind, address, value-or-bytes, status,
             linkage). When the list is empty, show the neutral empty-state
             line and hide the table; otherwise hide the empty-state line
-            and show the table (LLR-003.1).
+            and show the table (LLR-003.1). Also refresh the SCRIPT window's
+            live entry-count border subtitle (LLR-075.1).
+
+            The ``Kind`` cell additionally carries the row's check-run verdict
+            as a leading span (batch-48 LLR-077.4 — see ``_kind_cell``); the
+            column set stays at the same five.
+
+            **Every cell is a Rich ``Text`` — the ``Kind`` cell via
+            ``_kind_cell``, the other four via ``safe_text`` — regardless of
+            whether a role style is assigned to it, and NO bare ``str`` is
+            passed to ``add_row`` (LLR-075.6 / C-17).** This
+            CLOSES A LIVE, EXPLOITABLE SINK: ``ChangeService.rows`` sets
+            ``value_text = entry.value``, the raw file-derived change-set
+            string, and Textual's ``default_cell_formatter``
+            (``_data_table.py:202-222``) sets ``possible_markup=True`` and
+            calls ``Text.from_markup`` **on any bare ``str``**. Measured
+            against the pre-fix code at ``textual==8.2.8``:
+            ``[red]PWNED[/red]`` injected ``Span(0,5,'red')`` and mangled the
+            content; ``[link=http://evil]click[/link]`` injected a LINK from
+            file data; ``[/nope]`` raised ``MarkupError`` and CRASHED this
+            method. A ``Text`` cell is passed through unparsed, so
+            constructing every cell is the fix.
+
+            The three role styles (LLR-075.2) are a SEPARATE, presentational
+            concern. ``status_text`` and ``linkage_text`` carry no role style
+            — **that is not a licence to pass them as bare ``str``**; a
+            role-driven conversion covering only the three styled cells is
+            the partial fix that leaves the sink live.
 
         Args:
             rows (Sequence[object]): The ``ChangeEntryRow`` objects produced
                 by ``ChangeService.rows`` — each exposes ``kind_text``,
-                ``address_text``, ``value_text``, ``status_text`` and
-                ``linkage_text``. Typed as ``object`` so this view widget
-                imports nothing from the service layer.
+                ``address_text``, ``value_text``, ``status_text``,
+                ``linkage_text``, ``check_glyph``, and (batch-48 LLR-080.3)
+                the raw ``address`` / ``encoded_bytes`` the before/after card
+                needs. Typed as ``object`` so this view widget imports nothing
+                from the service layer.
+            mem_map (Union[Mapping[int, int], None, _Unset]): The loaded
+                image's sparse memory map, threaded in as a PARAMETER so the
+                panel keeps importing nothing from the service layer and never
+                reaches the running app (C-7 / the ``MemoryMapPanel.
+                render_ranges(…, mem_map=…)`` precedent). Typed ``Mapping``,
+                not ``Dict`` — read-only by type (LLR-080.5). RETAINED for the
+                card's row-selection render, under these semantics:
+
+                * **omitted** (the ``_UNSET`` sentinel) ⇒ **preserve** the
+                  retained map;
+                * explicit **``None``** ⇒ **clear** it ("no image loaded");
+                * a mapping ⇒ replace it.
+
+                ⚠ **The sentinel is load-bearing, not defensive.** This method
+                has FIVE call sites and ``on_mount``'s self-call supplies no
+                ``mem_map`` (C-7: the panel cannot fetch one). An
+                unconditional ``self._mem_map = mem_map`` would let that call
+                NULL a retained map — benign today only by call ORDERING, an
+                unstated invariant, which is exactly the MJ-1 defect shape.
+                TC-080.2a tests the semantics directly rather than appealing
+                to that ordering.
 
         Data Flow:
-            - Clear and refill the table from the row list.
+            - Retain ``mem_map`` (per the semantics above) and the row list —
+              the card needs both at SELECTION time, which is after this call.
+            - Clear and refill the table from the row list: the ``Kind`` cell
+              via ``_kind_cell`` (glyph span + kind text), the other four
+              wrapped by ``safe_text`` (a literal ``Text``; never
+              ``from_markup``).
             - Toggle the ``.hidden`` class on the table and the empty-state
               line by whether the list is empty.
+            - Set the SCRIPT window's ``N entries`` border subtitle.
+            - Re-render the before/after card, because ``table.clear()`` drops
+              the cursor and a card left describing a row that no longer
+              exists is worse than a neutral one.
 
         Dependencies:
+            Uses:
+                - ``_kind_cell`` ; ``safe_text`` ;
+                  :meth:`_render_before_after_card` ;
+                  ``insight_style.CYAN`` / ``VALUE``
             Used by:
-                - ``S19TuiApp`` Patch Editor action handler
+                - ``S19TuiApp`` Patch Editor action handler (4 sites, all
+                  supplying ``mem_map``) ; :meth:`on_mount` (the self-call,
+                  which supplies none — see the sentinel note above)
         """
+        if not isinstance(mem_map, _Unset):
+            self._mem_map = mem_map
+        self._entry_rows = list(rows)
         table = self.query_one("#patch_doc_entries_table", DataTable)
         empty_state = self.query_one("#patch_doc_empty_state", Static)
         table.clear()
         for row in rows:
             table.add_row(
-                row.kind_text,
-                row.address_text,
-                row.value_text,
-                row.status_text,
-                row.linkage_text,
+                self._kind_cell(row),
+                safe_text(str(row.address_text), CYAN),
+                safe_text(str(row.value_text), VALUE),
+                safe_text(str(row.status_text)),
+                safe_text(str(row.linkage_text)),
             )
+        count = len(rows)
+        self._set_window_subtitle(
+            "patch_win_script",
+            f"{count} {'entry' if count == 1 else 'entries'}",
+        )
         if rows:
             table.remove_class("hidden")
             empty_state.add_class("hidden")
         else:
             table.add_class("hidden")
             empty_state.remove_class("hidden")
+        self._render_before_after_card()
+
+    def on_data_table_row_highlighted(
+        self, event: DataTable.RowHighlighted
+    ) -> None:
+        """Drive the before/after card as the entries cursor moves (LLR-080.3).
+
+        Summary:
+            The entries table is ``cursor_type="row"``, so the highlighted row
+            index IS the document-order entry index — the card previews THAT
+            entry. Highlight (not ``RowSelected``) is the right event: it fires
+            on cursor movement, giving the analyst a live read-out without
+            requiring a commit keystroke — the ``A2LDetailCard`` precedent
+            (batch-47 LLR-069.2).
+
+        Args:
+            event (DataTable.RowHighlighted): Event payload carrying
+                ``data_table`` and ``cursor_row``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Ignore every table but ``#patch_doc_entries_table``.
+            - Hand ``event.cursor_row`` to :meth:`_render_before_after_card`.
+            - The event is NOT stopped: ``S19TuiApp.on_data_table_row_highlighted``
+              also listens (for the A2L card) and filters by table id, so
+              letting it bubble costs nothing and stopping it would couple this
+              panel to that handler's business.
+
+        Dependencies:
+            Uses:
+                - :meth:`_render_before_after_card`
+            Used by:
+                - Textual event dispatch for ``DataTable.RowHighlighted``
+        """
+        table = getattr(event, "data_table", None)
+        if getattr(table, "id", None) != "patch_doc_entries_table":
+            return
+        self._render_before_after_card(event.cursor_row)
+
+    def _render_before_after_card(self, index: Optional[int] = None) -> None:
+        """Render the before/after card for one entry index (LLR-080.3/.4).
+
+        Summary:
+            Resolve the selected entry POSITIONALLY, read the image bytes at
+            its address span out of the retained ``mem_map``, and hand both
+            byte runs to the card.
+
+        Args:
+            index (Optional[int]): The entry's document-order index. ``None``
+                → read the table's current cursor row (the post-refresh and
+                mount-time path).
+
+        Returns:
+            None
+
+        Data Flow:
+            - Resolve the index; out of range / no rows → the card's
+              no-selection state.
+            - ``mem_map is None`` → the card's no-image state (LLR-080.4). No
+              byte values are rendered — with no image there is no comparison,
+              and fabricating one is the failure this card must never have.
+            - Otherwise read ``mem_map`` per address in
+              ``[address, address + len(encoded_bytes))``; an ABSENT address
+              yields ``None`` → the unmapped placeholder, never ``00`` (A4).
+
+        Note (the join is POSITIONAL — never address-matched):
+            ``ChangeEntry`` carries no id; the contract is document order
+            (``changes/model.py:660-661``), and ``cursor_type="row"`` makes
+            the cursor row index that same index. Address-matching would be
+            wrong twice: it re-derives a key the contract already fixes, and
+            it COLLAPSES two entries that share a start address — a real
+            document shape, and one an address join structurally cannot get
+            right. TC-080.3's same-address fixture pins this.
+
+        Note (read-only — LLR-080.5):
+            This reads ``mem_map`` with ``.get`` and writes nothing. No
+            ``apply`` / ``save_patched`` path is reachable from here.
+
+        Dependencies:
+            Uses:
+                - :meth:`BeforeAfterCard.show_entry`
+            Used by:
+                - :meth:`refresh_entries` ;
+                  :meth:`on_data_table_row_highlighted`
+        """
+        cards = self.query("#patch_before_after_card")
+        if not cards:
+            return
+        card = cards.first(BeforeAfterCard)
+        if index is None and self._entry_rows:
+            index = self.query_one(
+                "#patch_doc_entries_table", DataTable
+            ).cursor_row
+        if index is None or not 0 <= index < len(self._entry_rows):
+            card.show_entry(None, None, ())
+            return
+        # Direct attribute access, NOT `getattr(row, ..., default)`: these
+        # fields are REQUIRED for the card, and a default would silently paint
+        # an empty preview if the row shape ever drifted. Loud beats silent —
+        # and a byte this card shows is a byte an analyst will trust.
+        row = self._entry_rows[index]
+        address = int(row.address)
+        after = tuple(row.encoded_bytes)
+        if self._mem_map is None:
+            card.show_entry(address, None, after)
+            return
+        before = [
+            self._mem_map.get(address + offset) for offset in range(len(after))
+        ]
+        card.show_entry(address, before, after)
 
     def refresh_issues(self, lines: Sequence[str]) -> None:
         """Render the persistent declaration-fault area (LLR-002.8).
@@ -3380,8 +4377,95 @@ class PatchEditorPanel(ScrollableContainer):
         """
         self.query_one("#patch_edit_json_button", Button).disabled = not enabled
 
-    def set_undo_redo_enabled(self, enabled: bool) -> None:
-        """Toggle the Undo/Redo controls' enabled state (US-068a, A-01 guard).
+    def _history_strip_text(
+        self, enabled: bool, depths: Optional[Mapping[str, int]]
+    ) -> Text:
+        """Build the history strip's renderable (LLR-081.2).
+
+        Summary:
+            Compose the analyst's position in the undo/redo history — steps
+            available backward and forward, the depth against the bound, and
+            the keys that move it — as TWO deliberate lines:
+
+                ``↶ 1 back  ↷ 1 fwd  2/20``
+                ``ctrl+z / ctrl+y``
+
+            When the controls are DISABLED the strip renders a single muted
+            ``history off`` line and NO key hints, because the keys are inert:
+            ``ctrl+z``/``ctrl+y`` route through the same ``_patch_history_
+            action_allowed`` A-01 guard that disables the buttons. Printing a
+            hint for a key that does nothing is a wrong answer, not chrome.
+
+        Args:
+            enabled (bool): The Undo/Redo controls' enabled state, so the strip
+                and the buttons cannot disagree about whether a step exists
+                (LLR-081.3). The panel is told the STATE, never the reason: it
+                is a view, and "file-backed" is the caller's A-01 rationale.
+            depths (Optional[Mapping[str, int]]): ``ChangeService.
+                history_depths()`` — ``back`` / ``forward`` / ``bound``.
+                Duck-typed so this view widget imports nothing from the service
+                layer (C-7). ``None`` or a missing key reads 0, which renders
+                the honest empty state.
+
+        Returns:
+            rich.text.Text: The strip's renderable. Never a ``str`` — and never
+            any file-derived text: derived integers and an author-fixed
+            vocabulary only (C-17).
+
+        Data Flow:
+            - Disabled → the muted ``history off`` line, nothing else.
+            - Else → glyph + count per direction, ``back+forward`` against
+              ``bound``, then the key-hint line.
+            - Counts are rendered VALUE when non-zero and DGRAY at zero, so
+              "no step that way" reads as absent rather than as a number. No
+              new hue: the strip is chrome, not a verdict (GREEN/YELLOW/RED
+              stay reserved for verdicts inside this panel — Inc-2b).
+
+        Dependencies:
+            Uses:
+                - ``_HISTORY_HINT`` / ``_HISTORY_OFF`` ; ``insight_style``
+                  ``LABEL`` / ``VALUE`` / ``DGRAY``
+            Used by:
+                - :meth:`set_undo_redo_enabled`
+
+        Example:
+            >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
+            >>> panel._history_strip_text(
+            ...     True, {"back": 1, "forward": 1, "bound": 20}
+            ... ).plain
+            '↶ 1 back  ↷ 1 fwd  2/20\\nctrl+z / ctrl+y'
+        """
+        if not enabled:
+            return Text(self._HISTORY_OFF, style=DGRAY)
+
+        counts = depths or {}
+        back = int(counts.get("back", 0))
+        forward = int(counts.get("forward", 0))
+        bound = int(counts.get("bound", 0))
+
+        text = Text()
+        for index, (glyph, count, noun) in enumerate(
+            (("↶", back, "back"), ("↷", forward, "fwd"))
+        ):
+            if index:
+                text.append("  ", style=LABEL)
+            text.append(f"{glyph} ", style=LABEL)
+            text.append(str(count), style=VALUE if count else DGRAY)
+            text.append(f" {noun}", style=LABEL)
+        # Depth against the bound. `back + forward` is the number of snapshots
+        # the history holds, which `_push_history`'s eviction caps at `bound`
+        # and `undo`/`redo` conserve — so this total saturates rather than
+        # growing (LLR-081.1's derivation; AT-081b's 21st-op arm).
+        text.append("  ", style=LABEL)
+        text.append(f"{back + forward}/{bound}", style=LABEL)
+        text.append("\n", style=LABEL)
+        text.append(self._HISTORY_HINT, style=DGRAY)
+        return text
+
+    def set_undo_redo_enabled(
+        self, enabled: bool, depths: Optional[Mapping[str, int]] = None
+    ) -> None:
+        """Toggle the Undo/Redo controls + render the history strip (US-068a / LLR-081.2).
 
         Summary:
             Enable or disable ``#patch_undo_button`` and ``#patch_redo_button``
@@ -3394,17 +4478,36 @@ class PatchEditorPanel(ScrollableContainer):
             replaced through the history path (batch-37 ``set_edit_json_enabled``
             precedent).
 
+            **batch-48 (LLR-081.2/.3): this is ALSO the history strip's seam**,
+            deliberately — the strip answers "is a step back available?", which
+            is the same question the enable state answers. Rendering both from
+            ONE call means the strip and the buttons cannot disagree; a
+            separate ``refresh_history`` would be a second seam that a future
+            call site could forget, which is exactly the batch-38 Inc-4 F1
+            stale-panel defect.
+
         Args:
             enabled (bool): ``True`` to enable both controls (paste-authored /
                 empty document); ``False`` to disable them (file-backed).
+            depths (Optional[Mapping[str, int]]): ``ChangeService.
+                history_depths()`` — threaded in as a PARAMETER so the panel
+                keeps importing nothing from the service layer and never
+                reaches the running app (C-7 / the ``MemoryMapPanel.
+                render_ranges(…, mem_map=…)`` precedent). Defaulted, so no
+                existing caller breaks; ``None`` renders the empty state.
 
         Dependencies:
+            Uses:
+                - :meth:`_history_strip_text`
             Used by:
                 - ``S19TuiApp`` Patch Editor action / change-file / history
-                  handlers
+                  handlers (all THREE push the depths — LLR-081.3)
         """
         self.query_one("#patch_undo_button", Button).disabled = not enabled
         self.query_one("#patch_redo_button", Button).disabled = not enabled
+        self.query_one("#patch_history_strip", Static).update(
+            self._history_strip_text(enabled, depths)
+        )
 
     def set_entry_edit_json_enabled(self, enabled: bool) -> None:
         """Toggle the per-entry Edit-JSON control's enabled state (US-068b).
@@ -3431,16 +4534,198 @@ class PatchEditorPanel(ScrollableContainer):
             "#patch_entry_edit_json_button", Button
         ).disabled = not enabled
 
+    def _paste_gauge_text(self, used_chars: int) -> Text:
+        """Build the paste-cap gauge's renderable (LLR-079.4).
+
+        Summary:
+            Render ``<used>K / 64.0K`` against the shared 64 KiB paste cap,
+            styled by :func:`cap_gauge_style` so the read-out ESCALATES as the
+            buffer fills.
+
+            **Units are CHARS, not bytes, and that is deliberate.** The cap
+            (``_CLIPBOARD_READ_CAP_CHARS``, ``os_clipboard_input.py:72``)
+            truncates on ``text[:CAP]`` — a **character** slice — so a
+            byte-denominated gauge would disagree with the truncation it
+            exists to predict, by up to 4x on non-ASCII input. ``human_bytes``
+            is therefore NOT used here despite being the house size helper: it
+            is a *byte* humanizer, and rendering a char count through it would
+            print a confident, wrong unit. ``K`` = 1024 chars.
+
+            **Hue (operator ruling, 2026-07-16):** the gauge escalates as a
+            WARNING (§6.5 Amendment F's semantics, app-wide, unnarrowed) but
+            must NOT reuse GREEN/YELLOW/RED, because inside
+            ``#patch_editor_panel`` those three are VERDICT hues
+            (``_GLYPH_STYLE``, the pass/fail strip). ``threshold_style``
+            returns exactly those three and is therefore NOT usable here;
+            :func:`cap_gauge_style` escalates within the MAGENTA family
+            instead (quiet grey → magenta → bold magenta), whose hue is the
+            MEASURED optimum against the full app-wide claimant census
+            (``test_tc079_5*``): no hue on the circle separates further from
+            every claimed hue than MAGENTA does.
+            ⚠ The earlier ">= 43 deg from every claimant" wording here was
+            FALSE and is retracted (Inc-5b). It was not merely wrong — it was
+            UNSATISFIABLE: against the complete census the best any hue
+            achieves is 40.77 deg, so no colour could have satisfied it. It
+            "passed" only because the census omitted the hues that would have
+            failed it. The binding assertion is now optimality plus an
+            ANCHORED floor (24 deg — beating the 23.5 deg pair the app already
+            ships and reads fine), which is self-calibrating and cannot go
+            unsatisfiable. See REQUIREMENTS.md §6.5 Amendment F-1.
+
+        Args:
+            used_chars (int): The buffer's current ``len(text)``. Read from
+                the widget by :meth:`_refresh_paste_gauge`; never a
+                caller-supplied count.
+
+        Returns:
+            rich.text.Text: The gauge line. Never a ``str`` — and never any
+            file-derived text: an integer and author-fixed labels only
+            (C-17 / LLR-079.3). The pasted buffer reaches this method as a
+            ``len``, so no payload character can reach the render path even
+            in principle.
+
+        Raises:
+            None. Integer arithmetic and a constant divisor.
+
+        Data Flow:
+            - ``used_chars`` → percent of ``_PASTE_CAP_CHARS`` →
+              :func:`cap_gauge_style` → :func:`label_value`.
+            - No clamp on the percentage: ``cap_gauge_style``'s top band is
+              lower-inclusive, so at-cap and over-cap both read bold.
+
+        Dependencies:
+            Uses:
+                - ``_PASTE_CAP_CHARS`` / ``_PASTE_GAUGE_WARN_PCT`` /
+                  ``_PASTE_GAUGE_BAD_PCT`` ; ``insight_style.cap_gauge_style``
+                  / ``LABEL``
+            Used by:
+                - :meth:`_refresh_paste_gauge`
+
+        Example:
+            >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
+            >>> panel._paste_gauge_text(32768).plain
+            '32.0K / 64.0K'
+        """
+        cap = self._PASTE_CAP_CHARS
+        pct = (used_chars / cap) * 100.0
+        text = Text()
+        # The USED figure escalates; the denominator is a constant, so it stays
+        # muted. `label_value` would have styled these the other way round.
+        text.append(
+            f"{used_chars / 1024:.1f}K",
+            style=cap_gauge_style(
+                pct, self._PASTE_GAUGE_WARN_PCT, self._PASTE_GAUGE_BAD_PCT
+            ),
+        )
+        text.append(f" / {cap / 1024:.1f}K", style=LABEL)
+        return text
+
+    def _check_strip_text(self, aggregates: Optional[Mapping[str, int]]) -> Text:
+        """Build the CHECKS pass/fail strip's renderable (LLR-078.1).
+
+        Summary:
+            Compose ``✓P ✗F ◐U`` from the three aggregate counts, each glyph
+            carrying its ``_GLYPH_STYLE`` verdict colour, followed on a SECOND
+            LINE by a proportional bar of the PASS rate.
+
+            **The line break is intentional, not overflow** — see
+            ``_CHECK_STRIP_BAR_CELLS`` for the C-29 measurement that forces it.
+            In one sentence: the strip's real content budget at 120x30 is 14
+            cells, the tightest one-line counts consume all 14 at 3 digits, and
+            the previous one-line form wrapped MID-TOKEN at 2 digits — reading
+            a count as a bar label. Two deliberate lines cost h=2, which is
+            exactly what the wrapped form already painted.
+
+        Args:
+            aggregates (Optional[Mapping[str, int]]): The three counts —
+                duck-typed so this view widget imports nothing from the
+                service layer (C-7). ``None`` or a missing key reads ``0``;
+                A3 guarantees the real seam always carries all three.
+
+        Returns:
+            rich.text.Text: The strip line. Never a ``str`` — and never any
+            file-derived text: integers and a closed glyph vocabulary only
+            (C-17 / LLR-078.5).
+
+        Data Flow:
+            - Read the three counts; append a styled glyph + count per
+              verdict; append ``microbar(passed / total)``.
+            - ``total == 0`` short-circuits ``frac`` to ``0.0`` — there is no
+              division, so a 0-entry run cannot raise (LLR-078.4).
+            - The bar is UNFLOORED (the helper's default). ``floor=True`` is
+              reserved for bars meaning "this row exists" (batch-47
+              LLR-042.7); this bar means "this fraction passed". MEASURED: the
+              floor is gated on ``clamped > 0.0`` (``insight_style.py:214``),
+              so it does NOT affect a 0-pass run — both settings render an
+              empty bar there. What it changes is a small-but-nonzero rate: 1
+              passed of 20 is ``round(0.05 * 8) == 0`` cells unfloored and 1
+              floored.
+            - ⚠ **The reason is REDUNDANCY, not asymmetry** (Inc-5, correcting
+              this docstring's own third-time-repeated claim). The tempting
+              justification — "overstating passes is the harm, and the floor
+              only overstates" — is FALSE, and falsifying it needs no new
+              measurement: ``round()`` overstates passes at the TOP end too,
+              floored or not. **19 of 20 → ``round(0.95 * 8) == 8`` — a FULL
+              bar, pixel-identical to 20 of 20.** A bar that paints "all
+              passed" over a real failure is the same harm, at the end where
+              the floor is not even involved; there is no asymmetry to appeal
+              to. The honest reason ``floor=False`` is right is that the
+              AUTHORITATIVE counts sit on the line above, so +-1 cell of
+              rounding either way costs nothing — the bar is a shape cue, not
+              the datum. The default is therefore the correct default because
+              it is the default, and nothing here needs an override.
+
+        Dependencies:
+            Uses:
+                - ``_GLYPH_STYLE`` / ``_CHECK_STRIP_BAR_CELLS`` ;
+                  ``insight_style.microbar`` / ``GREEN`` / ``VALUE``
+            Used by:
+                - :meth:`refresh_check_results`
+
+        Example:
+            >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
+            >>> panel._check_strip_text(
+            ...     {"passed": 2, "failed": 1, "uncheckable": 1}
+            ... ).plain
+            '✓2 ✗1 ◐1\\n████░░░░'
+        """
+        counts = aggregates or {}
+        passed = int(counts.get("passed", 0))
+        failed = int(counts.get("failed", 0))
+        uncheckable = int(counts.get("uncheckable", 0))
+        total = passed + failed + uncheckable
+
+        text = Text()
+        for index, (glyph, count) in enumerate(
+            (("✓", passed), ("✗", failed), ("◐", uncheckable))
+        ):
+            if index:
+                text.append(" ", style=VALUE)
+            text.append(glyph, style=self._GLYPH_STYLE[glyph])
+            text.append(str(count), style=VALUE)
+        # Line 2 — see `_CHECK_STRIP_BAR_CELLS`: the bar cannot share line 1 at
+        # the measured 14-cell budget, so it gets its own line rather than
+        # wrapping into one mid-token.
+        text.append("\n", style=VALUE)
+        frac = passed / total if total else 0.0
+        text.append_text(
+            microbar(frac, self._CHECK_STRIP_BAR_CELLS, style=GREEN)
+        )
+        return text
+
     def refresh_check_results(
-        self, rows: Sequence[object], status_line: str
+        self,
+        rows: Sequence[object],
+        status_line: str,
+        aggregates: Optional[Mapping[str, int]] = None,
     ) -> None:
-        """Render the check-run display (LLR-004.5).
+        """Render the check-run display (LLR-004.5) + the pass/fail strip (LLR-078.1).
 
         Summary:
             Replace the check-results area with one ``Static`` per result
             row, each carrying its ``sev-*`` class (the
-            ``css_class_for_severity`` colour the service shaped), and set
-            the aggregate-count status line.
+            ``css_class_for_severity`` colour the service shaped), set the
+            aggregate-count status line, and render the pass/fail strip.
 
         Args:
             rows (Sequence[object]): The ``ChangeService.check_rows``
@@ -3450,20 +4735,46 @@ class PatchEditorPanel(ScrollableContainer):
             status_line (str): The three-aggregate-count line (``Checks: P
                 passed, F failed, U uncheckable``) or the pending-seam
                 message.
+            aggregates (Optional[Mapping[str, int]]): The three counts for
+                the strip — ``ChangeService.check_aggregates()``, threaded in
+                as a PARAMETER so the panel keeps importing nothing from the
+                service layer and never reaches the running app (C-7 /
+                LLR-078.2; the ``MemoryMapPanel.render_ranges(…, mem_map=…)``
+                precedent). Defaulted, so no existing caller breaks; ``None``
+                renders the all-zero cleared strip.
 
         Data Flow:
-            - Update the status label, remove prior result children, mount
-              one classed ``Static`` per row.
+            - Update the status label, render the strip, remove prior result
+              children, mount one classed ``Static`` per row.
+            - Set the CHECKS window's run-state border subtitle (LLR-075.1):
+              the row count when a run produced rows, else the no-run token.
+            - The strip CLEARS by riding ``last_check_result``'s existing
+              ``undo``/``redo`` reset (``change_service.py:538`` / ``:570``):
+              the history call site passes the accessor's all-zero mapping,
+              so the strip and ``check_rows()`` always read one state
+              (LLR-078.3). An omitted history site would leave a stale count
+              — the batch-38 Inc-4 F1 defect.
 
         Dependencies:
             Used by:
-                - ``S19TuiApp`` run-checks action handling
+                - ``S19TuiApp`` run-checks action handling (post-run site)
+                - ``S19TuiApp._refresh_patch_history_view`` (cleared state)
         """
         self.query_one("#patch_checks_status", Label).update(status_line)
+        self.query_one("#patch_checks_strip", Static).update(
+            self._check_strip_text(aggregates)
+        )
         container = self.query_one("#patch_checks_results", Container)
         container.remove_children()
         for row in rows:
             container.mount(Static(row.text, classes=row.css_class, markup=False))
+        # LLR-075.1: derived from the ROW COUNT, never from `status_line` —
+        # the status line is service-shaped text and the subtitle must stay an
+        # author-composed token (C-17).
+        self._set_window_subtitle(
+            "patch_win_checks",
+            f"{len(rows)} checked" if rows else self._NO_RUN_SUBTITLE,
+        )
 
 
 class AbDiffPanel(Container):
@@ -3687,12 +4998,24 @@ class AbDiffPanel(Container):
                 active.
 
         Dependencies:
+            Uses:
+                - ``safe_text``
             Used by:
                 - ``S19TuiApp.action_show_screen`` (diff activation)
         """
-        options = list(variants) + [
-            ("(external path below)", self._EXTERNAL_OPTION)
+        # C-17 (Inc-1b): same live sink as `PatchEditorPanel.set_variants` —
+        # `app.py:3511` hands this method the SAME project-file-derived
+        # `variant_id`s, and each becomes a `Select` option LABEL ->
+        # `SelectCurrent.update` -> markup-enabled `Static` ->
+        # `Content.from_markup`. Measured at `textual==8.2.8` with the same
+        # payloads: span injection on `[red]…[/red]`, `MarkupError` on
+        # `[/nope]` / `[link=…]`. Literal `Text` labels; the VALUE stays the
+        # bare `str` (`_selected_variant` compares it against
+        # `_EXTERNAL_OPTION` and never renders it).
+        options: List[Tuple[Any, str]] = [
+            (safe_text(str(label)), value) for label, value in variants
         ]
+        options.append((safe_text("(external path below)"), self._EXTERNAL_OPTION))
         for select_id in ("#diff_select_a", "#diff_select_b"):
             select = self.query_one(select_id, Select)
             select.set_options(options)

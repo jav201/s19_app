@@ -4153,7 +4153,8 @@ activation posts none.
 **R-TUI-063**: When the Patch Editor screen is shown, the TUI shall render its content as three bordered
 windows — `#patch_win_script` (PATCH SCRIPT: entries table + inputs + change-file + variant + execute),
 `#patch_win_checks` (CHECKS: issue count + issues + status + results + help), `#patch_win_json` (JSON EDIT:
-paste `CappedTextArea` + revealed save-back + before/after) — each a constant-title `Label` + a scrollable
+paste `CappedTextArea` + revealed save-back + before/after) — each a constant **border title**
+(**AMENDED batch-48 §6.5 Amendment D — was: a constant-title `Label`**) + a scrollable
 `VerticalScroll` body + docked button-row sibling(s) of that body. It shall lay the three windows out
 horizontally (3 columns, asymmetric `grid-columns: 2fr 1fr 1fr`) while the terminal is ≥120 columns and
 vertically stacked while it is <120 columns, via the existing `#workspace_body.width-narrow` CSS regime
@@ -4196,6 +4197,256 @@ amendment of the original all-visible acceptance).
   `content_region`) + the structural "no `VerticalScroll` ancestor" docked-sibling check. RED-proven on the
   batch-22 2×2 tree (buttons below the starved `1fr` fold).
 - Status: Added batch-46 (US-B2 / HLR-064, LLR-064.1–.3; FOLD-8 reachable-under-scroll floor). Frozen-engine
+  diff = 0.
+
+### Window self-description: in-body title Label → border title — batch-48 (§6.5 Amendment D)
+
+> **Amends R-TUI-063** (US-P1 / HLR-075, LLR-075.1; batch-48 Inc-2). A locked requirement's named element
+> is REMOVED, so this is recorded Before → After rather than edited silently. **The protected property is
+> preserved in a stronger form; nothing is relaxed.**
+
+- **Before (batch-46, the *Before* text is R-TUI-063's original clause above):** each of the three windows
+  is "**a constant-title `Label`** + a scrollable `VerticalScroll` body + docked button-row sibling(s) of
+  that body". The title `Label` (`.patch-window-title`, `styles.tcss:880`) was the window's first child and
+  its sole self-description; `screens_directionb.py:2750` / `:2920` / `:2975` created the three.
+- **After (batch-48):** each window is "**a constant border title** + a scrollable body + docked
+  sibling(s)". The three in-body `Label`s are **DELETED**; each window's constant name lives on its own
+  `border_title` (`¹PATCH SCRIPT` / `²CHECKS` / `³JSON EDIT`, `PatchEditorPanel._WINDOW_BORDER_TITLES`),
+  set in `compose` and hosted by `.patch-window`'s pre-existing `border: round $rule` (`styles.tcss:864`).
+  Titles remain **CONSTANT author strings, never file-derived** — the C-17 / F3 clause is untouched.
+- **Why (the defect this closes):** batch-48 Inc-1 added the dolphie-idiom `border_title` (LLR-075.1)
+  **without** removing the Label, so every window rendered its own name **TWICE** — once on the border,
+  once in the body. The border title supersedes the Label on every axis: it self-describes on the window's
+  own chrome, it cannot be scrolled away from the window it names, and it spends **0 content rows** against
+  the MEASURED ~5-row @80×24 body budget (FOLD-8). Keeping both was pure duplication.
+- **Why it had to land in Inc-2, before the batch's canonical-CI snapshot regen:** the two
+  `patch-comfortable-*` cells ride `_batch48_patch_drift_marks` (`xfail(strict=False)`), so the duplication
+  is **invisible to CI**. Had it slipped past the regen, the regen would have **baked the duplicate into
+  the SVG baselines** and it would have permanently stopped reading as drift.
+- **Deleted / New tokens:** **Deleted** — the three `Label(..., classes="patch-window-title")` widgets
+  **and** the now-consumerless `.patch-window-title` CSS rule (`styles.tcss:880-887`), removed with its
+  last consumer rather than left dead. **New** — none (`border_title` + `_WINDOW_BORDER_TITLES` landed in
+  Inc-1 under LLR-075.1). **Unchanged** — every `_MUST_PRESERVE_IDS` id (the Labels carried **no id**;
+  verified), the body/docked-sibling relationship (R-TUI-064), the `width-narrow` regime, the C-17
+  constant-title clause.
+- **Parent-HLR re-read:** R-TUI-063's protected property is **each window self-describes with a constant
+  title** — NOT "a `Label` of a given class exists". That property is preserved and, per the oracle change
+  below, now pinned **more strictly** than before. R-TUI-064 is untouched: no docked row moved, and
+  removing a 1-row body child can only *improve* reachability.
+- **Oracle: DELETE-AND-RESTATE, not hide.** `tests/test_tui_patch_layout.py::test_tc46_1_*` asserted
+  `any("patch-window-title" in c.classes for c in win.children)`. It now asserts (a) `border_title` equals
+  the panel's own constant — **stronger: the class check passed on an empty Label, this pins the TEXT** —
+  and (b) **no direct child re-renders the window's name**, so the duplicate cannot return. The Label was
+  **DELETED, never hidden via CSS**: a `display: none` Label still satisfies the class check, which would
+  have converted that line into a **false-confidence test** — green while the window showed nothing.
+- **Validation:** `Automated` — `tests/test_tui_patch_layout.py::test_tc46_1_window_structure_layout_agnostic`
+  (restated; **mutation-verified**: re-adding the `PATCH SCRIPT` Label turns it RED —
+  `patch_win_script carries ['Label'] in-body title Label(s) duplicating its border_title`) +
+  `tests/test_tui_patch_big.py::test_at075a_*` (the border titles + live subtitles). Snapshot: the 2
+  `patch-comfortable-*` cells ride `_batch48_patch_drift_marks` until the canonical-CI regen.
+- **Status:** Amended in batch `2026-07-16-batch-48` (US-P1 / HLR-075, LLR-075.1; §6.5 Amendment D —
+  Before → After). Frozen-engine diff = 0.
+
+### C-17 observation point: `get_line(i).spans` → the PAINTED result — batch-48 (§6.5 Amendment E)
+
+> **Amends HLR-079 / LLR-079.3 + AT-079b / AT-079c ★★** (US-P4; batch-48 Inc-5). A locked, **gate-blocking**
+> acceptance test's observation point is MOVED, so it is recorded Before → After rather than edited
+> silently. **Nothing is relaxed — the amended oracle is strictly stronger, and the one it replaces could
+> not fail at all.**
+
+- **Before (Phase-2 MJ-5, the locked text):** "Observe the RENDER path: for each line `i`,
+  **`TextArea.get_line(i).plain`** contains the payload **verbatim**, and **`.spans`** contains **no span
+  attributable to the payload's own text**. Asserting `ta.text` is TAUTOLOGICAL and does NOT discharge this."
+  AT-079b's pass condition was "≥3 distinct token styles across `get_line(i).spans` summed over the buffer's
+  lines".
+- **After (batch-48 Inc-5):** both ATs observe **`TextArea._render_line(y)`** — the composited `Strip` of
+  `(text, style)` segments. AT-079c asserts, per payload: the payload's characters paint **verbatim** in the
+  concatenated segment text **AND** no segment carries a **payload-derived style** (no injected colour, no
+  `style.link`, no emphasis) **AND** nothing raises. AT-079b asserts **≥3 distinct token styles** across the
+  painted segments. The `.plain`-verbatim and 0-raises clauses are **retained** — they always did real work.
+- **Why (the defect this closes): the locked `.spans` clause was CONSTANT-TRUE.** MEASURED at the
+  `textual==8.2.8` pin: `_render_line` (`_text_area.py:1440`) does `line = self.get_line(line_index)` and
+  stylizes **that local copy** (`:1503`), while `get_line` (`:1328`) unconditionally returns a fresh
+  `Text(line_string, end="", no_wrap=True)`. An external caller's `get_line(i).spans` is therefore **always
+  `[]`** — with `_highlights` fully populated:
+  ```
+  get_line(0) : '{"a": 1}'  spans= []
+  _highlights : {0: [(1, 4, 'json.key'), (6, 7, 'json.number')]}
+  ```
+  So AT-079c passed on a safe implementation, on an unsafe one, and on one **never written**, and AT-079b was
+  **unsatisfiable by any implementation** of the mechanism LLR-079.1 mandates. This is the *exact* defect the
+  locked text itself names for `ta.text` ("passes even if the rendering path is unsafe"), **reproduced one
+  accessor over**: Phase 2 correctly diagnosed the tautology and then moved the observation point one step
+  short of the render path. A constant-true gate is **forced** to change; the only open question was who
+  recorded it.
+- **The measurement that proves the NEW oracle discriminates** (the obligation the old one could never
+  meet): `tests/test_tui_patch_json.py::test_tc079_3_c17_oracle_discriminates` applies the natural wrong
+  implementation — a `TextArea` whose `get_line` returns `Text.from_markup(...)` — and asserts the AT-079c
+  predicate **REJECTS** it. Measured: `[red]PWNED[/red]` paints as `PWNED` (brackets **consumed**) carrying
+  `color=red`. The old `.spans` oracle reads `[]` for that same unsafe widget — i.e. **passes it**.
+  - ⚠ **Correction (Inc-5b): this originally read "the predicate fails on both axes". It failed on ONE.**
+    `_assert_payload_is_inert` checked `link` / `bold` / `italic` and **never read `style.color`** — the
+    colour axis was described in four places (this line, the AT-079c notes, the predicate's own docstring, the
+    commit message) and implemented in none. Measured: the Inc-5 predicate **PASSES**
+    `[('[red]PWNED[/red]', Style(color='red'))]`. It was **not a false green** — every payload that reaches a
+    real markup parser gets *consumed*, so the verbatim axis carried the gate — but that is the **Inc-1b rule
+    exactly** (*assert plain verbatim AND spans, or the fix is guarded by accident*), and it was accidental in
+    precisely that way. Realistic escape: a highlighter that **styles** `[red]` without **consuming** it (a
+    regex tokenizer extension) paints verbatim and meets no colour check. **Inc-5b adds the axis** (compared
+    against the control line's own painted colours ∪ the highlighter's token hues, both read from source) plus
+    `::test_tc079_3b_inert_predicate_colour_axis_discriminates` — a dedicated arm, because
+    `test_tc079_3_c17_oracle_discriminates` **cannot** certify the colour axis: its buffer consumes the markup,
+    so it fails on the verbatim axis and would pass identically with no colour check at all. That is exactly
+    how the absent axis shipped unnoticed.
+- **Two measured traps this amendment also closes** (each would have re-blinded the gate):
+  1. **`_render_line(y)` indexes VISUAL lines, not document lines.** At the patch panel's 120×30 width the
+     buffer is ~17 cells and every payload wraps, so `_render_line(1)` returns the wrapped *tail of line 0*.
+     An oracle reading the wrong line asserts on text that was never under test. Pinned by
+     `_assert_no_wrapping` (fails loudly instead of degrading silently).
+  2. ⚠ **The cursor line MASKS payload-derived styles.** `_render_line:1460-1461` does
+     `line.stylize(cursor_line_style)` over the **entire** cursor line, after any style it carries, so rich's
+     later span wins. Measured on the unsafe control, both lines markup-parsed:
+     `line 0 (cursor) → [('P','#121212'), ('WNED','#e0e0e0')]` **(masked)** vs `line 1 → [('SECOND','red')]`
+     **(injected)**. A payload placed on line 0 would therefore **pass on a provably unsafe buffer**. Pinned
+     by `_assert_off_cursor_line`.
+- **Payload set: UNCHANGED** (LLR-079.3, spelled once in `tests/test_tui_patch_json.py::_PAYLOADS`) —
+  `[red]PWNED[/red]` (injects **silently**; raises nothing under rich's grammar — the Inc-1b lesson) ·
+  `[/nope]` (raises under `from_markup`) · `[link=http://evil]click[/link]` (a non-colour effect, so a
+  colour-only oracle would miss it) · ANSI `\x1b[31mX\x1b[0m` · plus the **JSON-specific** hostile case
+  `{"symbol": "sensor[unclosed", "v": 1}` (the one that looks like real change-set content).
+  ⚠ **A crash-only payload set is insufficient**, which is why every payload is asserted on **both** axes.
+- **Markup engines are NOT interchangeable** (recorded so the next sweep is scoped right): `rich`'s
+  `Text.from_markup` (the `TextArea` line path, DataTable cells) and Textual's `Content.from_markup`
+  (`Static` / `Select` labels) have **different grammars** — the latter *rejects* an unquoted `[link=…]` with
+  `MarkupError` rather than injecting it. Conflating them mis-scopes a payload set.
+- **Validation:** `Automated` — `tests/test_tui_patch_json.py::test_at079c_hostile_paste_renders_literally`
+  ★★ (gate-blocking) + `::test_tc079_3_c17_oracle_discriminates` (the anti-vacuity proof) +
+  `::test_at079b_structure_differentiated_in_place` + `::test_at079d_feature_detect_fallback`
+  (**mutation-verified**: removing the monkeypatch turns it RED — it observes the fallback, not the masking)
+  + `::test_tc079_2_non_ascii_byte_offsets` (**mutation-verified**: codepoint offsets turn it RED, and it is
+  the ONLY test that moves — the byte/codepoint defect is silent and no C-17 arm can see it).
+- **Status:** Amended in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.3; §6.5 Amendment E —
+  Before → After). Frozen-engine diff = 0.
+
+### Paste-cap gauge hue: a new MAGENTA family, non-confusable with any verdict — batch-48 (§6.5 Amendment F-1)
+
+> **Notes §3 + §6.5 Amendment F** (US-P4 / HLR-079, LLR-079.4; batch-48 Inc-5, **operator-decided
+> 2026-07-16**). **Amendment F is NOT narrowed** — yellow remains the app-wide warning cue. This records a
+> new palette constant and the reasoning that constrains it.
+
+- **The ruling (operator, verbatim):** *"Do the amendment F as you recommend but try to choose different
+  color that does not conflict or can easily be confused for one or several of the current rules."*
+  ⇒ the paste-cap gauge **escalates as a warning** (Amendment F's semantics, app-wide, intact) **but must not
+  reuse GREEN / YELLOW / RED**, so nothing inside `#patch_editor_panel` can be misread as a **verdict**
+  (`_GLYPH_STYLE` = check passed / partial / failed; the pass-fail strip).
+- **A new hue is authorised — the first this batch.** Every prior increment brief said "introduce no new
+  colour"; that is lifted **for this purpose only**, because Inc-2b measured the palette at capacity
+  (HILITE / PURPLE / CYAN are the only distinct non-verdict hues and all three are doubly claimed).
+- **New token:** `insight_style.MAGENTA = "#f586da"` (hue **314.6°**, sat 45%, val 96% — inside the pastel
+  band the palette already occupies). Its comment names why it exists and what it must never be confused
+  with. **Nothing else in the palette changes; `color_policy.py` stays frozen, 0-diff.**
+- **MEASURED, not eyeballed** (`tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance`): its
+  nearest claimants are `.band-high`/`only_a` `#e06c75` (**40.7°**) and PURPLE (**40.8°**). **40.7° is not a
+  threshold it clears — it is the maximum ANY hue on the circle achieves** against the 14 claimants, and this
+  hue is that maximum. For scale, Inc-2b measured **HILITE↔CYAN at 23.5°** and accepted that pair as distinct.
+- **The objective is the FLANK RULE, not a distance.** Orange is the worked example: at **37.7°** it sits
+  between RED (0°) and YELLOW (64.8°) — a verdict on each side. **Distance from the nearest claimant is a
+  necessary condition, not the objective; "not sitting between two verdicts" is.** This is asserted as a
+  computed predicate (`_is_verdict_flanked`), with its own anti-vacuity arm (`::test_tc079_5d_flank_rule_has_teeth`).
+
+#### ⚠ Amendment F-1, Before → After (batch-48 **Inc-5b**) — the Inc-5 record was measurably false
+
+> Inc-5's hue census was **hand-curated and unchecked**, and it omitted `#e06c75` (`.band-high` +
+> `AbDiffPanel._KIND_MARKUP["only_a"]`) — which sits **38.4°** from the hue Inc-5 certified, i.e. **below
+> Inc-5's own 40° floor**. `test_tc079_5_magenta_hue_distance` therefore certified a **false universal**: it
+> passed *only because its input set omitted the input that would fail it*. This is a **vacuous INPUT SET**,
+> not a vacuous assertion — the arithmetic was exact, and **no mutation of the code under test can catch it**.
+> The user-visible risk was cosmetic; the reason it blocked is that a test certifying a false universal is the
+> artifact everyone cites later instead of re-measuring.
+
+| Claim (Inc-5, shipped) | Status | Corrected (Inc-5b, measured against the complete 14-entry census) |
+| --- | --- | --- |
+| `MAGENTA = "#f587d6"`, hue 316.9° | **Moved** | `#f586da`, hue **314.6°** — the max-min point of the non-flanked circle |
+| "**≥ 43.0°** from every chromatic claimant" | **False, and UNSATISFIABLE** | Nothing on the circle reaches 43°; the global best is **40.77°**. `#f587d6` was actually at **38.4°** |
+| Nearest = RED 43.1° / PURPLE 43.1° | **False** | Nearest = `#e06c75` **40.7°**, PURPLE **40.8°**, RED 45.4° |
+| `orange3` = `#d75f00` (26.5°) | **Wrong colour** | Rich resolves `orange3` to **`#d78700` (37.7°)**; `#d75f00` is `darkorange3`. Inc-5 measured a hue the app never paints |
+| "Rejected lime arc at [104.9°, 114.8°], min-dist 45.0°" — Inc-5's *headline finding* | **Does not exist** | An artifact of omitting rich `green` (**`#008000`, 120°** — `ValidationSeverity.OK` + the `✓` MAC glyph), which sits ~13° from it. With the census complete the global and admissible optima are the **same point**, and it is this magenta |
+| "Both arcs are asserted in the test" | **False** | Only one was (`:707`). The lime appeared solely inside an f-string error message |
+| "A full-circle scan (see the test)" | **False** | The test performed **no scan** — it hardcoded `313.9 <= h <= 320.0`. The rule lived in prose; only its precomputed output was asserted. **That decoupling IS the mechanism of the bug** |
+| Test lives in `tests/test_tui_insight_style.py` | **Wrong file** | `tests/test_tui_patch_json.py` (the named file exists, so the citation looked plausible) |
+| `_MIN_HUE_SEPARATION_DEG = 40.0` | **Retired — see below** | `24.0`, demoted to an anchor; the binding constraint is now optimality |
+
+- **The 40° floor is withdrawn, and not because it was inconvenient.** It was **invented** at Inc-5 from a
+  single anecdote (Inc-2b called HILITE↔CYAN at 23.5° "distinct"). Measured against the complete census it is
+  **0.77° from infeasible** — a 43° floor admits the **empty set**; a 40° floor admits a **1.53°** arc. A
+  constraint that barely admits its own answer is not measuring anything; it is a coincidence, and any future
+  chromatic literal anywhere in the app would flip it to unsatisfiable and turn the test red for a reason
+  unrelated to the gauge. Meanwhile **the app ships HILITE↔LBLUE at 0.19°** and **RED↔`#e06c75` at 4.66°** and
+  reads them fine — because hue is not the only discriminator (saturation, value, glyph, and container all
+  carry). A floor two orders of magnitude stricter than the palette applies to itself was never honest.
+- **What replaces it** — two things that are *derived* rather than invented:
+  1. **An anchored sanity floor**, `24.0` — beat **23.5°**, the closest chromatic pair this repo has
+     explicitly measured and accepted. In-repo evidence, not a number picked at a gate. The hue clears it by ~17°.
+  2. **Optimality** (the binding assertion): MAGENTA is the **max-min point of the non-flanked circle**,
+     computed from the census on every run. This is **self-calibrating** — it can never become unsatisfiable,
+     it cannot be gamed by nudging a constant, and if the palette grows it fails with the **new optimum in the
+     message**. It is what binds census and arc so they cannot drift apart again.
+- **The census is now guarded, because hand-curation was the root cause.**
+  `::test_tc079_5c_hue_census_is_complete` sweeps every `#rrggbb` literal in `s19_app/` and requires each to be
+  either **claimed** or **excluded with a written reason** — an omission now fails loudly instead of silently
+  shrinking the universal. Exclusions carry their justification in code (HTML-export palette = a browser
+  surface; `DEPTH_*` = backgrounds at val ≤ 22.7%; achromatic literals below ~20% sat where hue is meaningless).
+  ⚠ **Stated gap:** rich **named** styles (`orange3`, `green`, `red`, `grey50`) are invisible to a hex sweep and
+  remain hand-enumerated; a new named chromatic style would not be caught. Widening the sweep to resolve named
+  colours is the honest next step and is **out of Inc-5b's scope**.
+- **Status:** Amended in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.4; §6.5 Amendment F-1 —
+  Before → After). Frozen-engine diff = 0.
+- **Escalation rides INTENSITY within the one new family**, not three new hues — the smallest addition that
+  reads as escalation, and a shape the palette already uses (HILITE/LBLUE are the same hue at 38.6% / 19.4%
+  saturation, measured **0.2°** apart). `cap_gauge_style(pct, warn, bad)` → `DGRAY` (room) → `MAGENTA` (≥75%)
+  → `bold MAGENTA` (≥100%, where the next pasted character is silently dropped).
+- **`threshold_style` is NOT reused and NOT parametrised** (the brief left this call to Phase 3): it returns
+  exactly GREEN/YELLOW/RED. A palette parameter would let **any** caller inject **any** three hues into
+  **any** container — reopening the very shared-namespace hole the Inc-2b reservation exists to close — and
+  it would not fit regardless: the gauge's escalation is **one hue at three intensities**, not three hues.
+  Different codomain ⇒ a sibling function, not a fork. The four lines of band arithmetic they share do not
+  warrant an abstraction.
+- **Validation:** `Automated` — `tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance` (the anchored
+  floor + the flank rule + the **computed** optimality assertion against every claimant) +
+  `::test_tc079_5c_hue_census_is_complete` (**Inc-5b** — the census is swept, not trusted) +
+  `::test_tc079_5d_flank_rule_has_teeth` (**Inc-5b** — the flank predicate can fire) +
+  `::test_tc079_5b_cap_gauge_escalates_without_verdict_hues` (the three bands are mutually distinct AND no
+  reachable input returns a verdict hue) + `::test_at079a_gauge_tracks_buffer`.
+- **Status:** Added in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.4; operator-decided); **hue and
+  measurement corrected in Inc-5b** (§6.5 Amendment F-1 Before → After, above). Frozen-engine diff = 0.
+
+### Docked buttons rendered as colour-grouped chips — batch-48 (R-TUI-076)
+
+> **Notes R-TUI-063 / R-TUI-064** (US-P1 / HLR-076, LLR-076.1–076.4; batch-48 Inc-2). **NO amendment
+> owed** — a classes-only restyle: no widget id is added-in-place-of, renamed, moved between containers, or
+> re-parented, and every docked row keeps its sibling relationship to its window body (the B2 fix). The
+> full R-TUI-076 row is written at Phase 6; this note records the batch-47 carry landing and its C-30
+> verdict.
+
+- **The batch-47 carry.** Batch-47 deferred the chip-button CSS for want of a consumer, correctly: the only
+  chip-like rule then was `.issue-code-chip` (`styles.tcss:1023`), which styles a **`Label`, not a
+  `Button`** — a visual precedent, not a reusable rule. The Patch Editor's docked rows are that consumer,
+  so batch-48 creates the family.
+- **C-30 = N/A, and it is FALSIFIABLE rather than asserted.** C-30 governs an *app-wide* restyle; this
+  family is scoped to descendants of `#patch_editor_panel`, so no non-patch widget can match it. Recorded
+  re-bind condition (§2.4-8): if a chip rule ever must go app-wide, **C-30 re-binds** and the chip
+  increment is re-sequenced LAST.
+- **Severity conventions: NO amendment.** The chip family adds **no** `sev-*` rule and changes **no**
+  severity hue. A chip group is a **function** cue (what the button does), not a severity verdict;
+  `color_policy.py` stays frozen, 0-diff.
+- **Validation:** `Automated` — `tests/test_tui_patch_chips.py::test_at076b_c30_leak_probe_no_chip_rule_matches_outside_patch`
+  (**the C-30 leak probe** — asks Textual's own matcher whether any chip `RuleSet` matches any `Button`
+  outside the panel; **mutation-verified**: a bare `Button` selector turns it RED with **26** measured
+  leaks) + `::test_tc076_1_every_chip_selector_is_panel_rooted` (the source-level peer — **mutation-verified
+  as NOT redundant**: it catches an unscoped class selector the matcher probe is structurally blind to) +
+  `::test_at076a_docked_buttons_are_grouped_chips` + `::test_tc076_2_group_assignment_on_docked_containers`;
+  `tests/test_tui_patch_layout.py` (all 48 `_MUST_PRESERVE_IDS` present and in role).
+- **Status:** Added in batch `2026-07-16-batch-48` (US-P1 / HLR-076, LLR-076.1–076.4). Frozen-engine
   diff = 0.
 
 ---

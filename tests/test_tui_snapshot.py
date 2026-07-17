@@ -767,6 +767,59 @@ def _batch47_theme_drift_marks(screen: str, density: str, size_key: str) -> tupl
     return ()
 
 
+# batch-48 Inc-1 (R-TUI-075, US-P1 — the Patch Editor EASY layer): the three
+# patch windows gain dolphie-idiom BORDER TITLES (`¹PATCH SCRIPT` / `²CHECKS` /
+# `³JSON EDIT`) + live BORDER SUBTITLES (`0 entries` / `no run yet` /
+# `v2 schema`, LLR-075.1), and `#patch_execute_row` gains the NEW
+# `#patch_variant_scope_line` reading `Variant - · Scope active variant`
+# (LLR-075.3). All three repaint the Patch Editor's window chrome, so both
+# `patch` scaffold cells (comfortable x {80x24, 120x30}) drift.
+#
+# ⚠ Unlike every mark above, these two cells are STRICT GREEN oracles at HEAD —
+# `_batch46_patch_drift_marks` was RETIRED by batch-47's regen PR (#87), so a
+# repaint fails CI **RED, not xfail**. Hence this mark (C-22 upper bound).
+#
+# C-22 per-cell prediction, MEASURED (not reasoned) by running the full tc016s
+# suite at Inc-1: EXACTLY 2 failed / 27 passed — `patch-comfortable-80x24` and
+# `patch-comfortable-120x30`, and NO other cell. Containment is patch-only: no
+# workspace/a2l/mac/issues/map/diff/flow cell moved (**C-28 shared-chrome
+# clean** — this increment changes no footer/header/rail binding), and `map`,
+# the other `_TWO_SIZE_SCAFFOLDS` screen, is untouched.
+#
+# NOTE the entries table does NOT contribute: the snapshot scaffold loads no
+# change document, so `refresh_entries([])` renders the empty state and zero
+# rows — the LLR-075.2 role styles and the LLR-075.6 `Text` cells are NOT
+# visible in these cells. What repaints is the window chrome + the scope line.
+#
+# The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml,
+# pinned textual==8.2.8) as a batch-48 post-merge follow-up PR — NEVER locally
+# (reference_snapshot_regen_env: local regen drifts unrelated baselines). This
+# mark retires with that regen.
+def _batch48_patch_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-48 Patch Editor EASY-layer drift marks.
+
+    The 2 ``patch`` scaffold cells (comfortable x {80x24, 120x30}) drift when the
+    three windows gain border titles + live subtitles and the variant/scope line
+    mounts (US-P1, HLR-075). Marked ``xfail(strict=False)`` until the
+    canonical-CI baseline regen lands (batch-48 post-merge follow-up), then
+    retired — the ``_batch45``/``_batch46``/``_batch47`` pattern.
+    """
+    if screen == "patch" and size_key in ("80x24", "120x30"):
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-48 Inc-1 R-TUI-075 US-P1: patch windows gain border "
+                    "titles + live subtitles (LLR-075.1) and the variant/scope "
+                    "line mounts (LLR-075.3); SVG baseline regen pending in "
+                    "canonical CI (snapshot-regen.yml, batch-48 post-merge "
+                    "follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -831,7 +884,8 @@ _SCAFFOLD_CELLS = [
         + _batch45_footer_drift_marks(screen, "comfortable", size_key)
         + _batch46_patch_drift_marks(screen, "comfortable", size_key)
         + _batch47_map_drift_marks(screen, "comfortable", size_key)
-        + _batch47_theme_drift_marks(screen, "comfortable", size_key),
+        + _batch47_theme_drift_marks(screen, "comfortable", size_key)
+        + _batch48_patch_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (

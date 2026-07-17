@@ -876,15 +876,13 @@ DataTable > .datatable--odd-row {
     margin-bottom: 1;
 }
 
-/* Constant window title (never file-derived — C-17 / F3). */
-.patch-window-title {
-    width: 100%;
-    height: 1;
-    text-style: bold;
-    color: $fg-base;
-    background: $bg-panel;
-    padding: 0 1;
-}
+/* batch-48 (§6.5 Amendment D): the in-body `.patch-window-title` Label is
+ * REMOVED — batch-48 Inc-1 put each window's constant title on the WINDOW's
+ * `border_title` (still a constant author string, never file-derived — C-17 /
+ * F3), which duplicated it on screen. The border title supersedes it, so this
+ * rule's only three consumers are gone and the rule is deleted with them
+ * rather than left dead. The title chrome now comes from `.patch-window`'s
+ * `border: round $rule` (:864) + the theme's border-title tokens. */
 
 /* The body is a `VerticalScroll` sized to its content (`height: auto`) so it
  * never holds an inner fold that could trap the docked rows below it; the
@@ -921,6 +919,81 @@ DataTable > .datatable--odd-row {
     layout: grid;
     grid-size: 2;
     grid-gutter: 0 1;
+}
+
+/* --- Chip buttons (batch-48, HLR-076 / LLR-076.1) — the batch-47 CARRY -----
+ * Batch-47 deferred this family for want of a consumer, which was correct: the
+ * only chip-like rule then was `.issue-code-chip` (:1023), which styles a
+ * `Label`, NOT a `Button` — it is the visual PRECEDENT for the compact/bold/
+ * colour-cued idiom, not a rule this can reuse. The Patch Editor's docked rows
+ * are that consumer: each button-bearing container carries a `patch-chip-*`
+ * GROUP class and each `Button` carries `patch-chip`, so the container supplies
+ * the hue (what this group of buttons DOES) and the button supplies the chip
+ * shape.
+ *
+ * ⚠ C-30 CONTAINMENT (LLR-076.1) — this scoping is the ENTIRE basis of the
+ * "C-30 = N/A for batch-48" verdict (§2.4-8). EVERY rule below is rooted at
+ * `#patch_editor_panel`, so nothing outside the Patch Editor can match it:
+ * no bare `Button` selector, no unscoped class rule. AT-076b is the falsifying
+ * leak probe; if a rule here ever needs to go app-wide, C-30 RE-BINDS and the
+ * chip increment must be re-sequenced LAST.
+ *
+ * Textual's `Button` renders 3 rows tall (`border-top`/`border-bottom: tall`
+ * in its DEFAULT_CSS) and reserves `min-width: 16`. A chip collapses that to a
+ * single row of bold coloured text, so the family SPENDS NO rows against the
+ * measured ~5-row @80x24 docked budget (LLR-076.4 / FOLD-8
+ * reachable-under-scroll). `:disabled` (`text-opacity: 0.6`) and `:focus`
+ * (`text-style`) are text-based in Button's own DEFAULT_CSS, so both cues
+ * survive `border: none` unaided — no rule is added for them. */
+#patch_editor_panel .patch-chip {
+    height: 1;
+    min-width: 8;
+    border: none;
+    text-style: bold;
+}
+
+/* The three colour groups (LLR-076.2). Blue is `$accent-calm`, the ONE declared
+ * accent var (:26). Purple/cyan have NO var — the Calm Dark token set declares
+ * only the accent + the structural navy steps (:21-31) — so they carry the
+ * literal `insight_style` hex with its constant NAMED in the comment, which is
+ * this file's established idiom for non-accent palette hues (`.sev-*` :529-547,
+ * `.band-*` :566).
+ *
+ * ⚠ THE CHIP FAMILY IS NON-VERDICT BY CONSTRUCTION (Inc-2b, operator ruling
+ * 2026-07-16). GREEN / YELLOW / RED are RESERVED for VERDICTS inside this panel
+ * and the family may claim none of them. Inc-2 shipped apply=GREEN and
+ * checks=YELLOW; Inc-3 lands the per-check verdict glyphs in the SAME panel
+ * (`_GLYPH_STYLE` = ✓ GREEN / ✗ RED / ◐ YELLOW), so those two hues would have
+ * meant BOTH "this button applies / runs checks" AND "this check passed /
+ * partially passed" on one screen. THE VERDICT CUE MUST NEVER BE AMBIGUOUS — it
+ * is what tells an analyst whether a patch passed — so the FUNCTION cue yields
+ * and moves to non-verdict hues. §6.5 Amendment F (batch-47: yellow ≡ warning
+ * app-wide) is one batch old and stays intact; this change protects it.
+ *
+ * The triple below is FORCED, not preferred: of `insight_style`'s non-verdict
+ * hues, DGRAY is itself a cue (grey ≡ "not yet checked", REQUIREMENTS.md §6.5),
+ * LBLUE is HILITE's hue desaturated (both ~223°, so not distinguishable as a
+ * group), and LABEL/VALUE are body-text greys. HILITE (~223°) / PURPLE (~274°)
+ * / CYAN (~199°) are the only three that resolve DISTINCTLY — which is what
+ * AT-076a asserts. CYAN is also `.sev-info` (:541), but this panel mounts no
+ * `sev-*` consumer (`PatchEditorPanel` carries none; the `sev-info` status line
+ * lives in the SEPARATE `AbDiffPanel`), so no in-panel hue collides.
+ *
+ * These remain deliberately NOT `sev-*` CLASSES: a chip group is a FUNCTION cue
+ * (what the button does), not a severity verdict, and `color_policy` stays the
+ * single source of truth for severity. Reusing the class would let a severity
+ * retune silently retint these buttons. (Inc-2 rejected the class and then
+ * reused the HUE anyway — that was the gap Inc-2b closes.) */
+#patch_editor_panel .patch-chip-entry .patch-chip {
+    color: $accent-calm;
+}
+
+#patch_editor_panel .patch-chip-apply .patch-chip {
+    color: #b565f3;              /* insight_style.PURPLE */
+}
+
+#patch_editor_panel .patch-chip-checks .patch-chip {
+    color: #7dd3fc;              /* insight_style.CYAN */
 }
 
 /* US-028 (LLR-035.2) — the variant group composes ABOVE the execute group;
@@ -1129,6 +1202,17 @@ DataTable > .datatable--odd-row {
 
 .patch-field-label {
     color: $fg-base;
+    padding: 0 1;
+}
+
+/* batch-48 (code-review F4): a label+VALUE stat line, not a field label.
+ * `#patch_variant_scope_line` borrowed `.patch-field-label`, but it renders an
+ * `insight_style.label_value` pair which sets BOTH colours on the `Text`
+ * itself — so `.patch-field-label`'s `color: $fg-base` is inert there and only
+ * its padding was ever wanted. Its own class says exactly that, and nothing
+ * more. Scoped under `#patch_editor_panel` for the same C-30 containment as
+ * the chip family above. */
+#patch_editor_panel .patch-stat-line {
     padding: 0 1;
 }
 
