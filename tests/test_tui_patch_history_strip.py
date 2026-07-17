@@ -108,6 +108,8 @@ import inspect
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from textual.content import Content
 from textual.widget import Widget
 from textual.widgets import Button, Static
@@ -669,13 +671,25 @@ def test_tc081_4_no_binding_diff() -> None:
     The ``ctrl+z`` / ``ctrl+y`` bindings already exist (batch-40 S2); this
     increment DISPLAYS them and does not touch them.
     """
-    completed = subprocess.run(
-        ["git", "diff", "main", "--", "s19_app/tui/app.py"],
-        cwd=_repo_root(),
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    try:
+        completed = subprocess.run(
+            ["git", "diff", "main", "--", "s19_app/tui/app.py"],
+            cwd=_repo_root(),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        # Match the established frozen-guard convention
+        # (test_engine_unchanged.py:151): when git is unavailable or the
+        # 'main' ref is missing (e.g. CI's shallow/detached checkout, which
+        # does not fetch the main branch), this cross-``main`` diff cannot
+        # run — SKIP, do not error. The binding-drift verdict is a dev-time
+        # guard; the local increment gate is where it is authoritative.
+        pytest.skip(
+            "git is unavailable or the 'main' ref is missing in this "
+            f"environment — TC-081.4's binding-diff arm cannot run: {exc}"
+        )
     changed = [
         line
         for line in completed.stdout.splitlines()
