@@ -297,6 +297,9 @@ stated explicitly. ⚠ **(b) is cheapest and would have caught this BEFORE Inc-2
 predictable from HLR-076 + HLR-077 alone and did not need code to exist.** Precedent: batch-47 **MJ-1**
 (writer-census at Phase 2, before code) proves this class is catchable pre-implementation.
 
+## Phase-4 carries (post-merge regen PR)
+- **The canonical-CI snapshot-regen follow-up must ALSO delete 2 ORPHAN baselines** (Phase-4 §7): `tests/__snapshots__/test_tui_snapshot/test_tc036s_entropy_modal_snapshot[entropy-comfortable-{80x24,120x30}].svg`. The test was retired in **batch-45** (entropy pop-up → Band-Bands); its baselines were never cleaned up and are **on main**. They are the sole cause of `pytest -q` (full, unfiltered) exiting **1** via syrupy's unused-snapshot session-fail (`selected_all_collected_items()` true only on a complete run). **NOT a batch-48 regression** — batch-48 touched 0 baselines vs base `6551aed`; the full suite exits 1 on the base tree too. The PR-blocking CI gate `-m "not slow"` exits 0. Deleting these 2 + regenerating the 2 patch drift cells makes `pytest -q` exit 0 again. Also fix the dangling comment ref at `test_tui_snapshot.py:440`.
+
 ## Out-of-scope carries (backlog — see MEMORY.md LIVE BACKLOG)
 Issues Report tiers (PARKED — **but still owns P0 B1 Issues paging no-op; parked ≠ fixed**) · field-audit B3
 A2L two-extra-chars (needs live repro) · discoverability gap · Issues filter/sort · universal paste · Flow
