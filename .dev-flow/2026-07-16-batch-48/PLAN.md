@@ -223,6 +223,35 @@ read it.** → Candidate: **when a helper's semantics are in question, read the 
 measuring it.** Feeds the operator's code↔requirement traceability candidate — *an oracle nobody reads is an
 untraversed edge.*
 
+## 🔑 PHASE-5 CANDIDATE — **the input set is itself an oracle** (Inc-5b, HIGH-1's root)
+**Proposed by the Inc-5b agent, NOT encoded — needs operator approval** ([[feedback_devflow_control_encode_approval]]):
+> *"When a test certifies a UNIVERSAL, the input set is itself an oracle and must be **derived or guarded**,
+> never hand-listed — **code mutation cannot test an input set.**"*
+**Why this is a NEW class, and the ninth instance this batch.** The first eight were vacuous **assertions** —
+checks that could not fail, all findable by mutating the code. HIGH-1 is a vacuous **INPUT SET**: the
+assertion was real, the arithmetic **exact**, the measurement honest — and it was still wrong because the
+**set it quantified over** was incomplete (`#e06c75`, 38.44°, omitted; live in the *same module*). **Mutate
+the code and it still passes.** One level above everything the batch had been hunting.
+**Evidence it generalises (same root, three sites, one batch):**
+- Inc-5's **arc** was hardcoded while its rule ("don't sit between two verdicts") lived only in prose → the
+  census could be hand-edited invisibly. Fix: `_admissible_optimum()` **computes** the arc every run.
+- Inc-5's **F2** claimed a colour axis in four documents; the code checked `link`/`bold`/`italic` only.
+- Inc-5b **committed the F2 defect WHILE FIXING F2** — its first census draft hardcoded `#d78700` under a
+  comment claiming it was "resolved via `rich.color.Color.parse`". Caught by re-reading its own diff against
+  its own claims; fixed by making the claim **true**, not by softening it.
+⇒ All three are **one shape: a claim in prose with nothing binding it to code.** ⚠ **This is the operator's
+own traceability call, arriving from a different direction** — a hand-listed census IS an untraversed
+code↔assertion edge. **Assess whether ONE control subsumes both before encoding.**
+**Corroborating proof the fix works:** M3 (drop `#e06c75` from the census) now fails **both** the guard **and**
+the hue test, because optimality **recomputes from the census**. Under Inc-5 that mutation was **silently
+green**. Census and arc can no longer drift apart — which was the actual bug.
+⚠ **And the orchestrator's floor was UNSATISFIABLE, not merely arbitrary**: best achievable = **40.77°**; the
+shipped claim was **≥43°** — a property **no colour can have**, "passing" only because the census omitted the
+failing hues. **A constraint that barely admits its own answer measures nothing** (43 → empty set; 40 → a
+1.53° arc). Replaced by an **anchored** floor (24°, beating the **23.5°** pair the app already ships and reads
+fine) **plus optimality** — self-calibrating, can never go unsatisfiable. Lesson: **anchor a threshold to
+something the system already demonstrates, never to an invented round number.**
+
 ## 🔎 Phase-5 CONTROL CANDIDATE (operator-requested 2026-07-16 — raise at the post-mortem)
 **Gap: a SHARED-NAMESPACE collision between two individually-correct increments is invisible to every control
 we have.** Origin: Inc-2 review **F1**. Inc-2 claimed GREEN/YELLOW as a chip *function* cue; Inc-3
