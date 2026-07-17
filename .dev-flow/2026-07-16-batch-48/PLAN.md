@@ -128,6 +128,56 @@ Patch snapshots: exactly 2 cells (`patch-comfortable-80x24` / `-120x30`; `_TWO_S
 - R5 **Positional index-alignment** — an off-by-one silently mislabels a row's check result.
 - R6 **48-id preserve tuple** — a moved/renamed id trips the census.
 
+## 🔴 INC-5 RULINGS (2026-07-16) — both blockers resolved
+
+### RULING 1 (orchestrator, §6.5 amendment owed) — **AT-079b/c re-point to the PAINTED result**
+`AT-079c` ★★ (the batch's **gate-blocking C-17 AT**) is **VACUOUS — constant-true.** MEASURED at the pin:
+`_render_line` (`:1440`) stylizes a **local copy** — `line = self.get_line(i)` — and `get_line` (`:1328`) is
+unconditionally `Text(line_string, ...)`. So `.spans` is **ALWAYS `[]`**, with `_highlights` fully populated:
+```
+get_line(0) : '{"a": 1}'  spans= []
+_highlights : {0: [(1,4,'json.key'), (6,7,'json.number')]}
+```
+⇒ the AT passes on a safe implementation, an unsafe one, **and one never written**. It is the *exact* defect
+01b itself names for `ta.text` (*"passes even if the rendering path is unsafe"*), **reproduced one accessor
+over.** This is the **SEVENTH** vacuous check on this batch.
+**Ruled: re-point AT-079b/c to the PAINTED result (`_render_line(y)` segments).** This is **not a judgment
+call — a constant-true gate is forced to change**; the only question was who records it. **§6.5 Before/After
+amendment REQUIRED** (never silently edit a locked requirement — [[feedback_requirement_amendment_before_after]]).
+⚠ **Same correction F2 forces on Inc-4's strip. ONE ROOT, TWO INCREMENTS.** *"Assert the PAINTED result"* now
+has **THREE sightings in one batch** (Inc-4 F2 · Inc-5 AT-079c · the `display=False` probe) → **Phase-5
+control candidate in its own right.**
+
+### RULING 2 (OPERATOR, 2026-07-16) — **gauge: Amendment F's SEMANTICS, but a NON-CONFUSABLE hue**
+Operator: *"Do the amendment F as you recommend but try to choose different color that does not conflict or
+can easily be confused for one or several of the current rules."*
+⇒ **The gauge escalates as a WARNING (Amendment F is app-wide and stands, NOT narrowed) — but it must NOT
+reuse GREEN/YELLOW/RED**, so nothing inside `#patch_editor_panel` can be misread as a verdict. Both of the
+operator's prior rulings survive intact; neither is spent.
+⚠ **This AUTHORIZES A NEW HUE** — the first time this batch has. Every prior brief said "introduce NO new
+colour"; that constraint is **lifted for this one purpose only** because Inc-2b MEASURED the palette at
+capacity (HILITE/PURPLE/CYAN are the only distinct non-verdict hues, and all three are now doubly claimed).
+**Hue census (angles) — everything currently claimed:**
+| Claimant | Hue |
+|---|---|
+| RED `#fd8383` — **verdict** | ~0° |
+| **Orange** — MAC-specific cue (Amd F *preserved* it: `⚠` glyph · `MAC_ADDRESS_OVERLAY_STYLE` · `.mac_out_of_range`) | ~30° |
+| YELLOW `#f6ff8f` — **verdict** + warning app-wide | ~66° |
+| GREEN `#54efae` — **verdict** | ~158° |
+| CYAN `#7dd3fc` — address role + checks chip + `.sev-info` | ~199° |
+| HILITE/LBLUE `#91abec`/`#bbc8e8` — entry chip | ~223° |
+| PURPLE `#b565f3` — kind role + apply chip | ~274° |
+⛔ **ORANGE IS REJECTED and this is the trap to name:** it *looks* free inside the patch panel, but at **~30°
+it sits BETWEEN RED (0°) and YELLOW (66°)** — the two hues most likely to be misread as a verdict, which is
+precisely what the operator ruled out. It is also the MAC cue **Amendment F deliberately preserved** — taking
+it here would spend a second operator decision to satisfy the first.
+✅ **The free band is ~300-330° (magenta/pink):** **46° from PURPLE, 40° from RED.** Inc-2b measured
+**HILITE↔CYAN at 24°** as "the closest pair, still distinct" ⇒ **40°+ is comfortable.**
+**Constraint for the implementer: MEASURE, do not eyeball.** Compute the actual hue angle of any candidate and
+assert **≥40° from EVERY claimant above**. Escalation may ride **intensity/boldness within the one new family**
+rather than three new hues — prefer the smallest addition that reads as escalation. **If nothing clears 40°,
+STOP and report** — that is a namespace decision, not an implementation choice.
+
 ## ⚠ INC-5 BINDING CORRECTIONS (Inc-4 code review F1/F2 — read BEFORE the geometry pass)
 - **F1 — the C-29 risk was recorded INVERTED. The strip wraps at 120×30 and FITS at 80×24.** PILOT-MEASURED:
   `120×30` body interior **w=18** → strip **w=16 h=2 (WRAPS)** · `80×24` body interior **w=66** → strip
