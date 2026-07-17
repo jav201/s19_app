@@ -2066,7 +2066,11 @@ class S19TuiApp(App):
         # US-068a / LLR-068a.4 A-01 guard: undo/redo is available ONLY for a
         # paste-authored / empty document — disable both controls whenever the
         # document is file-backed so the history path cannot clobber it.
-        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # batch-48 LLR-081.3: the same call renders the history strip, so the
+        # strip and the buttons read ONE state (writer census, site 1 of 3).
+        panel.set_undo_redo_enabled(
+            service.document.source_path is None, service.history_depths()
+        )
         # US-068b / LLR-068b.4 A-01 guard: the per-entry JSON edit is available
         # ONLY for a paste-authored / empty document — disable it whenever the
         # document is file-backed so a per-entry edit cannot clobber it.
@@ -2248,10 +2252,15 @@ class S19TuiApp(App):
               ``last_check_result`` so ``check_rows`` returns the cleared state,
               batch-40 S1), and re-sync the Edit-JSON + Undo/Redo enable state
               from the restored document's ``source_path`` (LLR-068a.4).
+            - batch-48 LLR-081.3: the same ``set_undo_redo_enabled`` call
+              re-renders the history strip from ``history_depths()``. This is
+              THE site that moves the history, so the depths it pushes are the
+              strip's whole point.
 
         Dependencies:
             Uses:
                 - ``ChangeService.rows`` / ``issue_lines`` / ``check_rows``
+                  / ``check_aggregates`` / ``history_depths``
                 - ``PatchEditorPanel.refresh_entries`` / ``refresh_issues``
                   / ``refresh_check_results`` / ``set_edit_json_enabled``
                   / ``set_undo_redo_enabled``
@@ -2276,7 +2285,14 @@ class S19TuiApp(App):
             service.check_rows(), "", service.check_aggregates()
         )
         panel.set_edit_json_enabled(service.document.source_path is None)
-        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # batch-48 LLR-081.3 (writer census, site 2 of 3): THE site that moves
+        # the history. `undo`/`redo` shift a snapshot between the two stacks, so
+        # the depths this pushes are the whole point of the strip — an omission
+        # here would freeze it at its pre-move numbers while the buttons updated
+        # around it (the batch-38 Inc-4 F1 stale-panel shape).
+        panel.set_undo_redo_enabled(
+            service.document.source_path is None, service.history_depths()
+        )
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
 
     def on_patch_editor_panel_undo_requested(
@@ -3904,7 +3920,15 @@ class S19TuiApp(App):
         panel.set_edit_json_enabled(service.document.source_path is None)
         # US-068a / LLR-068a.4 A-01 guard: same file-backed doc → disable
         # Undo/Redo so the history path cannot clobber it either.
-        panel.set_undo_redo_enabled(service.document.source_path is None)
+        # batch-48 LLR-081.3 (writer census, site 3 of 3): a dropdown-picked
+        # file is always file-backed, so `enabled` is False here and the strip
+        # renders `history off` regardless of the depths. The depths are pushed
+        # anyway — the census is the contract, and a site that happens to be
+        # redundant TODAY is the one that silently misreports when the A-01
+        # guard's condition changes.
+        panel.set_undo_redo_enabled(
+            service.document.source_path is None, service.history_depths()
+        )
         # US-068b / LLR-068b.4 A-01 guard: same file-backed doc → disable the
         # per-entry JSON edit so it cannot clobber the loaded document either.
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
@@ -4324,6 +4348,26 @@ class S19TuiApp(App):
         self.update_validation_issues_view()
         # LLR-002.3: show the no-file empty-state panels until a file loads.
         self._apply_empty_state()
+        # batch-48 LLR-081.3 (writer census, site 4 of 4 — the INITIAL render).
+        # ⚠ The LLR names THREE sites and all three are ACTION sites, so none
+        # of them fires before the analyst's first action: the Patch Editor
+        # opened blank, and "blank" is not the empty state — it is nothing. The
+        # empty state (`0 back / 0 fwd / 0-of-20`) is exactly the state a fresh
+        # screen is in and it must PAINT. This site is app-side rather than in
+        # `PatchEditorPanel.on_mount` (which is where the sibling
+        # `_refresh_variant_scope_line` / `_refresh_paste_gauge` mount-time
+        # renders live, for this same never-mount-blank reason) because the
+        # panel is a view: it cannot know `_HISTORY_MAX` without importing the
+        # service layer, and a panel-side default would have to invent a bound
+        # — rendering `0/0`, a wrong capacity on the surface that exists to
+        # report capacity.
+        #
+        # This is the MJ-1 shape exactly: that census also counted three
+        # `refresh_entries` sites and missed a mount-time fourth.
+        self.query_one("#patch_editor_panel", PatchEditorPanel).set_undo_redo_enabled(
+            self._change_service.document.source_path is None,
+            self._change_service.history_depths(),
+        )
         # Keep startup focus off the command-bar inputs so the unmodified
         # single-key bindings (rail digits 1-8, `/`, `g`, paging) fire
         # normally until the user explicitly focuses an input (LLR-004.5 —

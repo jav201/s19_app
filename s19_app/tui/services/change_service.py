@@ -113,6 +113,13 @@ _ROW_BYTES_PREVIEW = 8
 #: set-level (not keystroke-level) snapshots is ample for interactive editing.
 _HISTORY_MAX = 20
 
+#: The keys of :meth:`ChangeService.history_depths` in canonical order — the
+#: history strip's data contract (LLR-081.1). ``back`` / ``forward`` are the
+#: number of steps ``undo`` / ``redo`` can actually take from here; ``bound`` is
+#: :data:`_HISTORY_MAX`, published so the strip can show the depth AGAINST the
+#: limit without importing the constant.
+HISTORY_DEPTH_KEYS: tuple[str, ...] = ("back", "forward", "bound")
+
 
 def parse_address(address_text: str) -> int:
     """
@@ -569,6 +576,67 @@ class ChangeService:
         self.last_summary = None
         self.last_check_result = None
         return self.document
+
+    def history_depths(self) -> dict[str, int]:
+        """
+        Summary:
+            Return how many history steps are available backward and forward
+            from the live document, plus the history bound — the history
+            strip's data source (LLR-081.1).
+
+        Returns:
+            dict[str, int]: Every key of :data:`HISTORY_DEPTH_KEYS` in
+            canonical order — ``back`` (steps :meth:`undo` can take),
+            ``forward`` (steps :meth:`redo` can take), and ``bound``
+            (:data:`_HISTORY_MAX`). Never partial.
+
+        Data Flow:
+            - ``back`` is ``len(self._undo_stack)``; ``forward`` is
+              ``len(self._redo_stack)``; ``bound`` is the module constant.
+
+        Dependencies:
+            Uses:
+                - self._undo_stack ; self._redo_stack ; _HISTORY_MAX
+            Used by:
+                - app.py, threaded into
+                  ``PatchEditorPanel.set_undo_redo_enabled`` at all THREE
+                  call sites (LLR-081.3)
+                - tests/test_tui_patch_history_strip.py
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.history_depths()
+            {'back': 0, 'forward': 0, 'bound': 20}
+        """
+        # DERIVED, never stored. No history cursor exists and this method does
+        # NOT introduce one: a cursor would be a second source of truth that
+        # `undo`/`redo`/`_push_history` would each have to remember to move,
+        # and the one that forgot would silently misreport where the analyst
+        # is in their own edit history.
+        #
+        # Why these two lengths are the step counts EXACTLY — the derivation is
+        # the same predicate the moves themselves use, not a parallel model:
+        #
+        #   * `undo` no-ops iff `not self._undo_stack` (:533) and otherwise pops
+        #     exactly one snapshot (:536). So the number of undo steps
+        #     available IS `len(self._undo_stack)`. `redo` is the mirror
+        #     (:565/:568).
+        #   * `_push_history` appends the PRE-mutation document (:504), so
+        #     after N mutations the stack holds N snapshots and N steps back
+        #     exist — there is no "current position" snapshot on either stack
+        #     to discount. This is where an off-by-one would live if the stacks
+        #     held the live document too; they do not (it is `self.document`).
+        #   * `bound` is honoured without arithmetic here: `_push_history`
+        #     evicts at `> _HISTORY_MAX` (:505-506), so `back` saturates at 20
+        #     rather than growing. `undo`/`redo` only MOVE snapshots between
+        #     the two stacks (:535-536 / :567-568), which conserves
+        #     `back + forward` — so the total cannot exceed the bound either,
+        #     and `redo`'s unbounded-looking `append` (:567) cannot breach it.
+        return {
+            "back": len(self._undo_stack),
+            "forward": len(self._redo_stack),
+            "bound": _HISTORY_MAX,
+        }
 
     # ------------------------------------------------------------------
     # Entry mutation — both kinds (LLR-003.4)

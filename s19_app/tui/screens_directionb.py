@@ -2328,6 +2328,42 @@ class PatchEditorPanel(ScrollableContainer):
     #: acceptance relaxation, not an implementation choice).
     _CHECK_STRIP_BAR_CELLS = 8
 
+    #: The history strip's key-hint line (LLR-081.2). The two bindings are the
+    #: batch-40 S2 ``ctrl+z`` / ``ctrl+y`` pair; this batch adds NO App-level
+    #: ``Binding(show=True)``, so the hint is panel-local text and C-28's
+    #: shared-chrome census does not fire (LLR-081.4).
+    _HISTORY_HINT = "ctrl+z / ctrl+y"
+    #: The history strip's DISABLED line. Shown whenever the Undo/Redo buttons
+    #: are disabled — today the batch-38 A-01 file-backed guard, but the panel
+    #: is a view and is told the STATE, not the reason, so this text names
+    #: neither. It carries no key hints: the same guard gates the bindings, so
+    #: the keys are inert and a hint for them would be a wrong answer.
+    _HISTORY_OFF = "history off"
+
+    #: The history strip's TWO-LINE shape — position on line 1, key hints on
+    #: line 2 — is intentional, and the C-29 budget it is measured against is
+    #: the SCRIPT window's, NOT the CHECKS window's. MEASURED at Inc-6 with the
+    #: strip mounted (`region` / `content_region` off the live tree):
+    #:
+    #:   120x30  #patch_history_controls content w=38 → STRIP CONTENT w=38
+    #:    80x24  #patch_history_controls content w=64 → STRIP CONTENT w=64
+    #:
+    #: **38 is the budget — do NOT inherit ``_CHECK_STRIP_BAR_CELLS``'s 14.**
+    #: That 14 is the CHECKS window's content width at 120x30, and at that
+    #: regime the patch layout is a 3-column split in which the SCRIPT window is
+    #: nearly three times wider (44 vs 22). Inheriting a figure measured on a
+    #: sibling container is precisely the C-29 error, and the record was sitting
+    #: right there in `_CHECK_STRIP_BAR_CELLS` inviting it.
+    #:
+    #: Line 1's worst case is bounded WITHOUT a width assumption: ``back`` and
+    #: ``forward`` are snapshot counts that `_push_history` evicts at
+    #: `_HISTORY_MAX` (20) and `undo`/`redo` conserve, so ``back + forward <=
+    #: 20`` and every count is at most 2 digits. The widest reachable line 1 is
+    #: ``↶ 20 back  ↷ 0 fwd  20/20`` = 25 cells; line 2 is 15. Both clear 38
+    #: with room, so the two lines are a READING-ORDER choice (position, then
+    #: how to move it), not a wrap workaround like the CHECKS strip's.
+    _HISTORY_STRIP_BUDGET_COLS = 38
+
     #: The shared 64 KiB paste cap, in CHARS (LLR-079.4). Aliased from the
     #: single source (``os_clipboard_input.py:72``) rather than re-spelled, so
     #: the gauge's denominator and the truncation it predicts cannot drift.
@@ -2937,6 +2973,26 @@ class PatchEditorPanel(ScrollableContainer):
                 ),
                 id="patch_doc_entry_buttons",
                 classes="patch-docked-row patch-chip-entry",
+            ),
+            # batch-48 (LLR-081.2): the history strip, directly ABOVE the
+            # Undo/Redo row it describes. DOCKED as a sibling of the body (not
+            # inside it) for the same reason the buttons are: it must stay
+            # beside the controls it labels rather than scrolling away from
+            # them. It renders derived integers + author-fixed key hints and
+            # NOTHING file-derived (C-17 / LLR-081 boundary catalog "error").
+            # It carries no `patch-chip-*` group class — it holds no Button,
+            # and the group classes cue BUTTON function (HLR-076). And no
+            # `.patch-field-label`: that class's `color: $fg-base` would be
+            # INERT here (every fragment of the strip's `Text` sets its own
+            # style), so it would claim a styling role it does not play — the
+            # F4 finding that produced `.patch-stat-line`. `.patch-docked-row`
+            # alone supplies all this needs: width 100%, height auto, and the
+            # padding that aligns it with the buttons below.
+            Static(
+                "",
+                id="patch_history_strip",
+                markup=False,
+                classes="patch-docked-row",
             ),
             # US-068a: change-set Undo / Redo in their own dedicated row —
             # disabled for a file-backed document (A-01 data-loss guard).
@@ -3916,8 +3972,95 @@ class PatchEditorPanel(ScrollableContainer):
         """
         self.query_one("#patch_edit_json_button", Button).disabled = not enabled
 
-    def set_undo_redo_enabled(self, enabled: bool) -> None:
-        """Toggle the Undo/Redo controls' enabled state (US-068a, A-01 guard).
+    def _history_strip_text(
+        self, enabled: bool, depths: Optional[Mapping[str, int]]
+    ) -> Text:
+        """Build the history strip's renderable (LLR-081.2).
+
+        Summary:
+            Compose the analyst's position in the undo/redo history — steps
+            available backward and forward, the depth against the bound, and
+            the keys that move it — as TWO deliberate lines:
+
+                ``↶ 1 back  ↷ 1 fwd  2/20``
+                ``ctrl+z / ctrl+y``
+
+            When the controls are DISABLED the strip renders a single muted
+            ``history off`` line and NO key hints, because the keys are inert:
+            ``ctrl+z``/``ctrl+y`` route through the same ``_patch_history_
+            action_allowed`` A-01 guard that disables the buttons. Printing a
+            hint for a key that does nothing is a wrong answer, not chrome.
+
+        Args:
+            enabled (bool): The Undo/Redo controls' enabled state, so the strip
+                and the buttons cannot disagree about whether a step exists
+                (LLR-081.3). The panel is told the STATE, never the reason: it
+                is a view, and "file-backed" is the caller's A-01 rationale.
+            depths (Optional[Mapping[str, int]]): ``ChangeService.
+                history_depths()`` — ``back`` / ``forward`` / ``bound``.
+                Duck-typed so this view widget imports nothing from the service
+                layer (C-7). ``None`` or a missing key reads 0, which renders
+                the honest empty state.
+
+        Returns:
+            rich.text.Text: The strip's renderable. Never a ``str`` — and never
+            any file-derived text: derived integers and an author-fixed
+            vocabulary only (C-17).
+
+        Data Flow:
+            - Disabled → the muted ``history off`` line, nothing else.
+            - Else → glyph + count per direction, ``back+forward`` against
+              ``bound``, then the key-hint line.
+            - Counts are rendered VALUE when non-zero and DGRAY at zero, so
+              "no step that way" reads as absent rather than as a number. No
+              new hue: the strip is chrome, not a verdict (GREEN/YELLOW/RED
+              stay reserved for verdicts inside this panel — Inc-2b).
+
+        Dependencies:
+            Uses:
+                - ``_HISTORY_HINT`` / ``_HISTORY_OFF`` ; ``insight_style``
+                  ``LABEL`` / ``VALUE`` / ``DGRAY``
+            Used by:
+                - :meth:`set_undo_redo_enabled`
+
+        Example:
+            >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
+            >>> panel._history_strip_text(
+            ...     True, {"back": 1, "forward": 1, "bound": 20}
+            ... ).plain
+            '↶ 1 back  ↷ 1 fwd  2/20\\nctrl+z / ctrl+y'
+        """
+        if not enabled:
+            return Text(self._HISTORY_OFF, style=DGRAY)
+
+        counts = depths or {}
+        back = int(counts.get("back", 0))
+        forward = int(counts.get("forward", 0))
+        bound = int(counts.get("bound", 0))
+
+        text = Text()
+        for index, (glyph, count, noun) in enumerate(
+            (("↶", back, "back"), ("↷", forward, "fwd"))
+        ):
+            if index:
+                text.append("  ", style=LABEL)
+            text.append(f"{glyph} ", style=LABEL)
+            text.append(str(count), style=VALUE if count else DGRAY)
+            text.append(f" {noun}", style=LABEL)
+        # Depth against the bound. `back + forward` is the number of snapshots
+        # the history holds, which `_push_history`'s eviction caps at `bound`
+        # and `undo`/`redo` conserve — so this total saturates rather than
+        # growing (LLR-081.1's derivation; AT-081b's 21st-op arm).
+        text.append("  ", style=LABEL)
+        text.append(f"{back + forward}/{bound}", style=LABEL)
+        text.append("\n", style=LABEL)
+        text.append(self._HISTORY_HINT, style=DGRAY)
+        return text
+
+    def set_undo_redo_enabled(
+        self, enabled: bool, depths: Optional[Mapping[str, int]] = None
+    ) -> None:
+        """Toggle the Undo/Redo controls + render the history strip (US-068a / LLR-081.2).
 
         Summary:
             Enable or disable ``#patch_undo_button`` and ``#patch_redo_button``
@@ -3930,17 +4073,36 @@ class PatchEditorPanel(ScrollableContainer):
             replaced through the history path (batch-37 ``set_edit_json_enabled``
             precedent).
 
+            **batch-48 (LLR-081.2/.3): this is ALSO the history strip's seam**,
+            deliberately — the strip answers "is a step back available?", which
+            is the same question the enable state answers. Rendering both from
+            ONE call means the strip and the buttons cannot disagree; a
+            separate ``refresh_history`` would be a second seam that a future
+            call site could forget, which is exactly the batch-38 Inc-4 F1
+            stale-panel defect.
+
         Args:
             enabled (bool): ``True`` to enable both controls (paste-authored /
                 empty document); ``False`` to disable them (file-backed).
+            depths (Optional[Mapping[str, int]]): ``ChangeService.
+                history_depths()`` — threaded in as a PARAMETER so the panel
+                keeps importing nothing from the service layer and never
+                reaches the running app (C-7 / the ``MemoryMapPanel.
+                render_ranges(…, mem_map=…)`` precedent). Defaulted, so no
+                existing caller breaks; ``None`` renders the empty state.
 
         Dependencies:
+            Uses:
+                - :meth:`_history_strip_text`
             Used by:
                 - ``S19TuiApp`` Patch Editor action / change-file / history
-                  handlers
+                  handlers (all THREE push the depths — LLR-081.3)
         """
         self.query_one("#patch_undo_button", Button).disabled = not enabled
         self.query_one("#patch_redo_button", Button).disabled = not enabled
+        self.query_one("#patch_history_strip", Static).update(
+            self._history_strip_text(enabled, depths)
+        )
 
     def set_entry_edit_json_enabled(self, enabled: bool) -> None:
         """Toggle the per-entry Edit-JSON control's enabled state (US-068b).
