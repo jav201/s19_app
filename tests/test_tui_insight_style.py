@@ -28,6 +28,8 @@ from s19_app.tui.insight_style import (
     HILITE,
     LABEL,
     LBLUE,
+    MICROBAR_EMPTY,
+    MICROBAR_FILLED,
     PURPLE,
     RED,
     VALUE,
@@ -195,3 +197,104 @@ def test_threshold_style() -> None:
     # just below each cutoff stays in the lower band
     assert threshold_style(49.999, warn, bad) == GREEN
     assert threshold_style(79.999, warn, bad) == YELLOW
+
+
+def test_tc078_4_microbar_unfloored() -> None:
+    """TC-078.4: the CHECKS strip's bar is proportional (``floor=False``).
+
+    WHY (LLR-078.4): ``floor=True`` guarantees a positive fraction at least one
+    filled cell — right for a bar meaning "this row exists, here is its
+    magnitude" (the Workspace section rows, LLR-042.7, whose floor batch-47
+    Inc-9 had to RESTORE after a cleanup dropped it). The CHECKS pass/fail bar
+    means "this fraction PASSED", which inverts the harm: it must never round a
+    pass rate UP, because overstating passes understates a failure.
+
+    ⚠ **The widely-repeated reason for this choice is WRONG, and this test is
+    where it was caught.** Both 01b (AT-078b: "a floored bar would show 1
+    filled cell and fail") and the Inc-4 brief state that flooring would render
+    a run with ZERO passes as one filled cell. MEASURED: it does not.
+    ``microbar``'s floor is gated on ``clamped > 0.0``
+    (``insight_style.py:214``) — the helper's own docstring says so ("``frac <=
+    0`` still renders an empty bar") — so a 0-pass run renders an EMPTY bar
+    under BOTH settings, and no zero-case assertion anywhere can discriminate
+    the floor. The conclusion (``floor=False``) survives; the stated reason does
+    not.
+
+    The REAL harm is a small-but-NONZERO rate: 1 passed of 20 is
+    ``round(0.05 * 8) == 0`` cells honestly, and a floored bar paints 1 —
+    overstating a 5% pass rate as 12.5%. That case is the behavioural
+    discriminator asserted below; without it, ``floor=True`` is caught only by
+    the structural AST arm.
+
+    The zero-total boundary is asserted on the ARITHMETIC the strip performs
+    (``passed / total`` guarded by ``total == 0 → 0.0``): the helper cannot be
+    handed a ZeroDivisionError, so the guard lives at the call site and is
+    asserted through the strip builder itself.
+    """
+    import ast
+    import inspect
+    import textwrap
+
+    from s19_app.tui.screens_directionb import PatchEditorPanel
+
+    # The helper's unfloored contract, at both extremes.
+    assert microbar(0.0, 8).plain == MICROBAR_EMPTY * 8
+    assert MICROBAR_FILLED not in microbar(0.0, 8).plain, (
+        "frac=0.0 must yield ZERO filled cells; a FLOORED bar shows 1 and "
+        "claims a pass that never happened"
+    )
+    assert microbar(1.0, 8).plain == MICROBAR_FILLED * 8
+    # The contrast that makes the choice load-bearing: same frac, floored.
+    assert microbar(0.01, 8, floor=True).plain.startswith(MICROBAR_FILLED)
+    assert microbar(0.01, 8, floor=False).plain == MICROBAR_EMPTY * 8
+
+    # The strip's CALL SITE must not floor. Walked via AST, NOT a substring
+    # grep: `"floor=True" not in source` matched this method's own DOCSTRING
+    # (which explains why flooring is wrong) and failed on correct code.
+    tree = ast.parse(
+        textwrap.dedent(inspect.getsource(PatchEditorPanel._check_strip_text))
+    )
+    microbar_calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and getattr(node.func, "id", None) == "microbar"
+    ]
+    assert len(microbar_calls) == 1, (
+        f"expected exactly one microbar call in the strip builder; found "
+        f"{len(microbar_calls)}"
+    )
+    floor_kwargs = [
+        kw for kw in microbar_calls[0].keywords if kw.arg == "floor"
+    ]
+    assert not floor_kwargs or floor_kwargs[0].value.value is False, (
+        "the CHECKS strip's bar must be UNFLOORED (LLR-078.4) — it must pass "
+        "floor=False or omit the argument; its call site floors the bar"
+    )
+
+    # The zero-total guard: no division on an empty run, and frac == 0.0.
+    panel = PatchEditorPanel.__new__(PatchEditorPanel)
+    zero = panel._check_strip_text(
+        {"passed": 0, "failed": 0, "uncheckable": 0}
+    )
+    assert zero.plain.endswith(MICROBAR_EMPTY * 8), (
+        f"a 0-total run must render an EMPTY bar; got {zero.plain!r}"
+    )
+    # all-passed -> frac == 1.0 -> a full bar
+    full = panel._check_strip_text(
+        {"passed": 4, "failed": 0, "uncheckable": 0}
+    )
+    assert full.plain.endswith(MICROBAR_FILLED * 8), (
+        f"an all-passed run must render a FULL bar; got {full.plain!r}"
+    )
+
+    # The BEHAVIOURAL discriminator for the floor (see the ⚠ above): 1 passed
+    # of 20 -> round(0.05 * 8) == 0 cells. A floored bar paints 1 and overstates
+    # a 5% pass rate as 12.5%. The zero-total case CANNOT catch this.
+    small = panel._check_strip_text(
+        {"passed": 1, "failed": 19, "uncheckable": 0}
+    )
+    assert small.plain.endswith(MICROBAR_EMPTY * 8), (
+        "a small-but-nonzero pass rate (1 of 20) must round DOWN to an empty "
+        f"bar — a floored bar would overstate it; got {small.plain!r}"
+    )

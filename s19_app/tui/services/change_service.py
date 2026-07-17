@@ -62,7 +62,7 @@ from ..changes import (
 )
 from ..changes.check import run_check_document
 from ..changes.io import parse_change_document
-from ..changes.model import CheckRunResult
+from ..changes.model import CHECK_AGGREGATE_KEYS, CheckRunResult
 from ..color_policy import css_class_for_severity
 from ..mac import parse_mac_file
 from .a2l_service import enrich_tags_and_render
@@ -1357,6 +1357,50 @@ class ChangeService:
             issues=list(getattr(result, "issues", []) or []),
             ok=failed == 0,
         )
+
+    def check_aggregates(self) -> dict[str, int]:
+        """
+        Summary:
+            Return the last check run's three aggregate counts, or an
+            all-zero mapping when no result is current — the CHECKS
+            pass/fail strip's data source (LLR-078.2).
+
+        Returns:
+            dict[str, int]: Every key of :data:`CHECK_AGGREGATE_KEYS`
+            (``passed`` / ``failed`` / ``uncheckable``) in canonical order,
+            each an ``int``. Never partial: A3 guarantees the engine emits
+            all three even at zero, and the ``.get(key, 0)`` default holds
+            the contract if a duck-typed seam ever does not.
+
+        Data Flow:
+            - Read ``last_check_result.aggregates``; coerce each key to
+              ``int``. ``last_check_result is None`` — no run yet, or an
+              ``undo``/``redo`` reset it (``:538`` / ``:570``) — yields the
+              all-zero mapping, which is how the strip CLEARS: it rides the
+              EXISTING reset rather than re-implementing invalidation.
+            - The cleared mapping is deliberately indistinguishable from a
+              0-entry run's aggregates: both are honestly "nothing passed,
+              nothing failed, nothing was uncheckable".
+
+        Dependencies:
+            Uses:
+                - CHECK_AGGREGATE_KEYS ; self.last_check_result
+            Used by:
+                - app.py, threaded into
+                  ``PatchEditorPanel.refresh_check_results`` at BOTH call
+                  sites (LLR-078.3)
+                - tests/test_tui_patch_checks_strip.py
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.check_aggregates()
+            {'passed': 0, 'failed': 0, 'uncheckable': 0}
+        """
+        result = self.last_check_result
+        if result is None:
+            return {key: 0 for key in CHECK_AGGREGATE_KEYS}
+        aggregates = getattr(result, "aggregates", None) or {}
+        return {key: int(aggregates.get(key, 0)) for key in CHECK_AGGREGATE_KEYS}
 
     def check_rows(self) -> list[CheckResultRow]:
         """

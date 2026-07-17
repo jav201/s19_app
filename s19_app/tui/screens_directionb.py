@@ -2290,6 +2290,13 @@ class PatchEditorPanel(ScrollableContainer):
         "·": DGRAY,
     }
 
+    #: Cell budget for the CHECKS pass/fail strip's bar (LLR-078.1). Fixed and
+    #: small — the strip is one always-visible line inside a window measured at
+    #: 22-23 columns wide in the 120x30 three-column regime (C-29 /
+    #: ``test_tui_patch_layout.py:55-60``), so the bar is a glance-cue sized to
+    #: fit beside the three counts, not a measured gauge.
+    _CHECK_STRIP_BAR_CELLS = 8
+
     #: The E6 execution scopes in selector cycle order (LLR-006.6) and their
     #: button labels. The scope tokens are the service vocabulary
     #: (``variant_execution_service.EXECUTION_SCOPES``) spelled locally so
@@ -3022,6 +3029,18 @@ class PatchEditorPanel(ScrollableContainer):
                     classes="patch-field-label",
                     markup=False,
                 ),
+                # batch-48 (LLR-078.1): the pass/fail strip, ABOVE the
+                # results area. Renders integer counts + closed-vocabulary
+                # glyphs + a bar and NOTHING file-derived — the blocked-run
+                # reason keeps its `patch_checks_status` sink above (C-17 /
+                # LLR-078.5). `markup=False` is belt-and-braces: the strip is
+                # fed a `Text`, which Static never markup-parses.
+                Static(
+                    "",
+                    id="patch_checks_strip",
+                    markup=False,
+                    classes="patch-field-label",
+                ),
                 Container(id="patch_checks_results"),
                 id="patch_win_checks_body",
                 classes="patch-window-body",
@@ -3576,9 +3595,10 @@ class PatchEditorPanel(ScrollableContainer):
             as a leading span (batch-48 LLR-077.4 — see ``_kind_cell``); the
             column set stays at the same five.
 
-            **Every cell is constructed as a Rich ``Text`` via ``safe_text``
-            — regardless of whether a role style is assigned to it — and NO
-            bare ``str`` is passed to ``add_row`` (LLR-075.6 / C-17).** This
+            **Every cell is a Rich ``Text`` — the ``Kind`` cell via
+            ``_kind_cell``, the other four via ``safe_text`` — regardless of
+            whether a role style is assigned to it, and NO bare ``str`` is
+            passed to ``add_row`` (LLR-075.6 / C-17).** This
             CLOSES A LIVE, EXPLOITABLE SINK: ``ChangeService.rows`` sets
             ``value_text = entry.value``, the raw file-derived change-set
             string, and Textual's ``default_cell_formatter``
@@ -3816,16 +3836,88 @@ class PatchEditorPanel(ScrollableContainer):
             "#patch_entry_edit_json_button", Button
         ).disabled = not enabled
 
+    def _check_strip_text(self, aggregates: Optional[Mapping[str, int]]) -> Text:
+        """Build the CHECKS pass/fail strip's renderable (LLR-078.1).
+
+        Summary:
+            Compose ``✓ P  ✗ F  ◐ U`` from the three aggregate counts, each
+            glyph carrying its ``_GLYPH_STYLE`` verdict colour, followed by a
+            proportional bar of the PASS rate.
+
+        Args:
+            aggregates (Optional[Mapping[str, int]]): The three counts —
+                duck-typed so this view widget imports nothing from the
+                service layer (C-7). ``None`` or a missing key reads ``0``;
+                A3 guarantees the real seam always carries all three.
+
+        Returns:
+            rich.text.Text: The strip line. Never a ``str`` — and never any
+            file-derived text: integers and a closed glyph vocabulary only
+            (C-17 / LLR-078.5).
+
+        Data Flow:
+            - Read the three counts; append a styled glyph + count per
+              verdict; append ``microbar(passed / total)``.
+            - ``total == 0`` short-circuits ``frac`` to ``0.0`` — there is no
+              division, so a 0-entry run cannot raise (LLR-078.4).
+            - The bar is UNFLOORED (the helper's default). ``floor=True`` is
+              reserved for bars meaning "this row exists" (batch-47
+              LLR-042.7); this bar means "this fraction passed", so it must
+              not round a small pass rate UP. MEASURED: the floor is gated on
+              ``clamped > 0.0`` (``insight_style.py:214``), so it does NOT
+              affect a 0-pass run — both settings render an empty bar there.
+              What it would corrupt is a small-but-nonzero rate: 1 passed of
+              20 is ``round(0.05 * 8) == 0`` cells honestly, but a floored bar
+              paints 1, overstating the pass rate. Overstating passes is the
+              harm this bar must not do.
+
+        Dependencies:
+            Uses:
+                - ``_GLYPH_STYLE`` / ``_CHECK_STRIP_BAR_CELLS`` ;
+                  ``insight_style.microbar`` / ``GREEN`` / ``VALUE``
+            Used by:
+                - :meth:`refresh_check_results`
+
+        Example:
+            >>> panel = PatchEditorPanel()
+            >>> panel._check_strip_text(
+            ...     {"passed": 2, "failed": 1, "uncheckable": 1}
+            ... ).plain
+            '✓ 2  ✗ 1  ◐ 1  ████░░░░'
+        """
+        counts = aggregates or {}
+        passed = int(counts.get("passed", 0))
+        failed = int(counts.get("failed", 0))
+        uncheckable = int(counts.get("uncheckable", 0))
+        total = passed + failed + uncheckable
+
+        text = Text()
+        for glyph, count in (
+            ("✓", passed),
+            ("✗", failed),
+            ("◐", uncheckable),
+        ):
+            text.append(glyph, style=self._GLYPH_STYLE[glyph])
+            text.append(f" {count}  ", style=VALUE)
+        frac = passed / total if total else 0.0
+        text.append_text(
+            microbar(frac, self._CHECK_STRIP_BAR_CELLS, style=GREEN)
+        )
+        return text
+
     def refresh_check_results(
-        self, rows: Sequence[object], status_line: str
+        self,
+        rows: Sequence[object],
+        status_line: str,
+        aggregates: Optional[Mapping[str, int]] = None,
     ) -> None:
-        """Render the check-run display (LLR-004.5).
+        """Render the check-run display (LLR-004.5) + the pass/fail strip (LLR-078.1).
 
         Summary:
             Replace the check-results area with one ``Static`` per result
             row, each carrying its ``sev-*`` class (the
-            ``css_class_for_severity`` colour the service shaped), and set
-            the aggregate-count status line.
+            ``css_class_for_severity`` colour the service shaped), set the
+            aggregate-count status line, and render the pass/fail strip.
 
         Args:
             rows (Sequence[object]): The ``ChangeService.check_rows``
@@ -3835,18 +3927,35 @@ class PatchEditorPanel(ScrollableContainer):
             status_line (str): The three-aggregate-count line (``Checks: P
                 passed, F failed, U uncheckable``) or the pending-seam
                 message.
+            aggregates (Optional[Mapping[str, int]]): The three counts for
+                the strip — ``ChangeService.check_aggregates()``, threaded in
+                as a PARAMETER so the panel keeps importing nothing from the
+                service layer and never reaches the running app (C-7 /
+                LLR-078.2; the ``MemoryMapPanel.render_ranges(…, mem_map=…)``
+                precedent). Defaulted, so no existing caller breaks; ``None``
+                renders the all-zero cleared strip.
 
         Data Flow:
-            - Update the status label, remove prior result children, mount
-              one classed ``Static`` per row.
+            - Update the status label, render the strip, remove prior result
+              children, mount one classed ``Static`` per row.
             - Set the CHECKS window's run-state border subtitle (LLR-075.1):
               the row count when a run produced rows, else the no-run token.
+            - The strip CLEARS by riding ``last_check_result``'s existing
+              ``undo``/``redo`` reset (``change_service.py:538`` / ``:570``):
+              the history call site passes the accessor's all-zero mapping,
+              so the strip and ``check_rows()`` always read one state
+              (LLR-078.3). An omitted history site would leave a stale count
+              — the batch-38 Inc-4 F1 defect.
 
         Dependencies:
             Used by:
-                - ``S19TuiApp`` run-checks action handling
+                - ``S19TuiApp`` run-checks action handling (post-run site)
+                - ``S19TuiApp._refresh_patch_history_view`` (cleared state)
         """
         self.query_one("#patch_checks_status", Label).update(status_line)
+        self.query_one("#patch_checks_strip", Static).update(
+            self._check_strip_text(aggregates)
+        )
         container = self.query_one("#patch_checks_results", Container)
         container.remove_children()
         for row in rows:

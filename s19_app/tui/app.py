@@ -2047,7 +2047,9 @@ class S19TuiApp(App):
                 )
                 self._report_change_result(result)
                 panel.refresh_check_results(
-                    service.check_rows(), result.message
+                    service.check_rows(),
+                    result.message,
+                    service.check_aggregates(),
                 )
             elif event.action == "execute_scope":
                 self._trigger_execute_scope(event.scope_text or SCOPE_ACTIVE)
@@ -2266,7 +2268,13 @@ class S19TuiApp(App):
         # entries no longer match the pre-move check run, so the stale Checks
         # panel must not persist. ``undo``/``redo`` reset ``last_check_result``
         # → ``check_rows`` returns the cleared state; render it here.
-        panel.refresh_check_results(service.check_rows(), "")
+        # batch-48 LLR-078.3: the pass/fail strip rides that SAME reset —
+        # ``check_aggregates()`` reads all-zero once ``last_check_result`` is
+        # None, so the strip clears in step with the rows. Omitting it here
+        # (while the post-run site supplies it) would leave a stale count.
+        panel.refresh_check_results(
+            service.check_rows(), "", service.check_aggregates()
+        )
         panel.set_edit_json_enabled(service.document.source_path is None)
         panel.set_undo_redo_enabled(service.document.source_path is None)
         panel.set_entry_edit_json_enabled(service.document.source_path is None)
