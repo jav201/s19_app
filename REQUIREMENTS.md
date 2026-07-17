@@ -4247,6 +4247,123 @@ amendment of the original all-visible acceptance).
 - **Status:** Amended in batch `2026-07-16-batch-48` (US-P1 / HLR-075, LLR-075.1; §6.5 Amendment D —
   Before → After). Frozen-engine diff = 0.
 
+### C-17 observation point: `get_line(i).spans` → the PAINTED result — batch-48 (§6.5 Amendment E)
+
+> **Amends HLR-079 / LLR-079.3 + AT-079b / AT-079c ★★** (US-P4; batch-48 Inc-5). A locked, **gate-blocking**
+> acceptance test's observation point is MOVED, so it is recorded Before → After rather than edited
+> silently. **Nothing is relaxed — the amended oracle is strictly stronger, and the one it replaces could
+> not fail at all.**
+
+- **Before (Phase-2 MJ-5, the locked text):** "Observe the RENDER path: for each line `i`,
+  **`TextArea.get_line(i).plain`** contains the payload **verbatim**, and **`.spans`** contains **no span
+  attributable to the payload's own text**. Asserting `ta.text` is TAUTOLOGICAL and does NOT discharge this."
+  AT-079b's pass condition was "≥3 distinct token styles across `get_line(i).spans` summed over the buffer's
+  lines".
+- **After (batch-48 Inc-5):** both ATs observe **`TextArea._render_line(y)`** — the composited `Strip` of
+  `(text, style)` segments. AT-079c asserts, per payload: the payload's characters paint **verbatim** in the
+  concatenated segment text **AND** no segment carries a **payload-derived style** (no injected colour, no
+  `style.link`, no emphasis) **AND** nothing raises. AT-079b asserts **≥3 distinct token styles** across the
+  painted segments. The `.plain`-verbatim and 0-raises clauses are **retained** — they always did real work.
+- **Why (the defect this closes): the locked `.spans` clause was CONSTANT-TRUE.** MEASURED at the
+  `textual==8.2.8` pin: `_render_line` (`_text_area.py:1440`) does `line = self.get_line(line_index)` and
+  stylizes **that local copy** (`:1503`), while `get_line` (`:1328`) unconditionally returns a fresh
+  `Text(line_string, end="", no_wrap=True)`. An external caller's `get_line(i).spans` is therefore **always
+  `[]`** — with `_highlights` fully populated:
+  ```
+  get_line(0) : '{"a": 1}'  spans= []
+  _highlights : {0: [(1, 4, 'json.key'), (6, 7, 'json.number')]}
+  ```
+  So AT-079c passed on a safe implementation, on an unsafe one, and on one **never written**, and AT-079b was
+  **unsatisfiable by any implementation** of the mechanism LLR-079.1 mandates. This is the *exact* defect the
+  locked text itself names for `ta.text` ("passes even if the rendering path is unsafe"), **reproduced one
+  accessor over**: Phase 2 correctly diagnosed the tautology and then moved the observation point one step
+  short of the render path. A constant-true gate is **forced** to change; the only open question was who
+  recorded it.
+- **The measurement that proves the NEW oracle discriminates** (the obligation the old one could never
+  meet): `tests/test_tui_patch_json.py::test_tc079_3_c17_oracle_discriminates` applies the natural wrong
+  implementation — a `TextArea` whose `get_line` returns `Text.from_markup(...)` — and asserts the AT-079c
+  predicate **REJECTS** it. Measured: `[red]PWNED[/red]` paints as `PWNED` (brackets **consumed**) carrying
+  `color=red`, and the predicate fails on both axes. The old `.spans` oracle reads `[]` for that same unsafe
+  widget — i.e. **passes it**.
+- **Two measured traps this amendment also closes** (each would have re-blinded the gate):
+  1. **`_render_line(y)` indexes VISUAL lines, not document lines.** At the patch panel's 120×30 width the
+     buffer is ~17 cells and every payload wraps, so `_render_line(1)` returns the wrapped *tail of line 0*.
+     An oracle reading the wrong line asserts on text that was never under test. Pinned by
+     `_assert_no_wrapping` (fails loudly instead of degrading silently).
+  2. ⚠ **The cursor line MASKS payload-derived styles.** `_render_line:1460-1461` does
+     `line.stylize(cursor_line_style)` over the **entire** cursor line, after any style it carries, so rich's
+     later span wins. Measured on the unsafe control, both lines markup-parsed:
+     `line 0 (cursor) → [('P','#121212'), ('WNED','#e0e0e0')]` **(masked)** vs `line 1 → [('SECOND','red')]`
+     **(injected)**. A payload placed on line 0 would therefore **pass on a provably unsafe buffer**. Pinned
+     by `_assert_off_cursor_line`.
+- **Payload set: UNCHANGED** (LLR-079.3, spelled once in `tests/test_tui_patch_json.py::_PAYLOADS`) —
+  `[red]PWNED[/red]` (injects **silently**; raises nothing under rich's grammar — the Inc-1b lesson) ·
+  `[/nope]` (raises under `from_markup`) · `[link=http://evil]click[/link]` (a non-colour effect, so a
+  colour-only oracle would miss it) · ANSI `\x1b[31mX\x1b[0m` · plus the **JSON-specific** hostile case
+  `{"symbol": "sensor[unclosed", "v": 1}` (the one that looks like real change-set content).
+  ⚠ **A crash-only payload set is insufficient**, which is why every payload is asserted on **both** axes.
+- **Markup engines are NOT interchangeable** (recorded so the next sweep is scoped right): `rich`'s
+  `Text.from_markup` (the `TextArea` line path, DataTable cells) and Textual's `Content.from_markup`
+  (`Static` / `Select` labels) have **different grammars** — the latter *rejects* an unquoted `[link=…]` with
+  `MarkupError` rather than injecting it. Conflating them mis-scopes a payload set.
+- **Validation:** `Automated` — `tests/test_tui_patch_json.py::test_at079c_hostile_paste_renders_literally`
+  ★★ (gate-blocking) + `::test_tc079_3_c17_oracle_discriminates` (the anti-vacuity proof) +
+  `::test_at079b_structure_differentiated_in_place` + `::test_at079d_feature_detect_fallback`
+  (**mutation-verified**: removing the monkeypatch turns it RED — it observes the fallback, not the masking)
+  + `::test_tc079_2_non_ascii_byte_offsets` (**mutation-verified**: codepoint offsets turn it RED, and it is
+  the ONLY test that moves — the byte/codepoint defect is silent and no C-17 arm can see it).
+- **Status:** Amended in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.3; §6.5 Amendment E —
+  Before → After). Frozen-engine diff = 0.
+
+### Paste-cap gauge hue: a new MAGENTA family, non-confusable with any verdict — batch-48 (§6.5 Amendment F-1)
+
+> **Notes §3 + §6.5 Amendment F** (US-P4 / HLR-079, LLR-079.4; batch-48 Inc-5, **operator-decided
+> 2026-07-16**). **Amendment F is NOT narrowed** — yellow remains the app-wide warning cue. This records a
+> new palette constant and the reasoning that constrains it.
+
+- **The ruling (operator, verbatim):** *"Do the amendment F as you recommend but try to choose different
+  color that does not conflict or can easily be confused for one or several of the current rules."*
+  ⇒ the paste-cap gauge **escalates as a warning** (Amendment F's semantics, app-wide, intact) **but must not
+  reuse GREEN / YELLOW / RED**, so nothing inside `#patch_editor_panel` can be misread as a **verdict**
+  (`_GLYPH_STYLE` = check passed / partial / failed; the pass-fail strip).
+- **A new hue is authorised — the first this batch.** Every prior increment brief said "introduce no new
+  colour"; that is lifted **for this purpose only**, because Inc-2b measured the palette at capacity
+  (HILITE / PURPLE / CYAN are the only distinct non-verdict hues and all three are doubly claimed).
+- **New token:** `insight_style.MAGENTA = "#f587d6"` (hue **316.9°**, sat 45%, val 96% — inside the pastel
+  band the palette already occupies). Its comment names why it exists and what it must never be confused
+  with. **Nothing else in the palette changes; `color_policy.py` stays frozen, 0-diff.**
+- **MEASURED, not eyeballed** (`tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance`): **≥ 43.0°
+  from every chromatic claimant.** Nearest: RED 43.1° · PURPLE 43.1° · orange3 69.6° · `.mac_out_of_range`
+  77.4° · HILITE 94.1° · LBLUE 94.2° · YELLOW 107.9° · CYAN 117.5° · GREEN 162.1°. For scale, Inc-2b measured
+  **HILITE↔CYAN at 23.5°** and accepted that pair as distinct.
+- **⚠ Two corrections to the brief's own figures, from the measurement:**
+  1. **The "free band ≈ 300-330°" is wrong.** Only **[313.9°, 320.0°]** — **6.1° wide** — clears 40° from
+     every claimant. The brief's "46° from PURPLE, 40° from RED" describes **two different points**, not one
+     hue; at 320° the distance to RED is exactly 40.0° and at 313.9° the distance to PURPLE is 40.2°. The
+     chosen 316.9° is the **max-min** point of that arc.
+  2. **The global optimum is REJECTED, and it is the finding worth keeping.** A full-circle scan finds a
+     *second* ≥40° arc at **[104.9°, 114.8°]** (a lime) whose min distance is **larger** (45.0° vs 43.1°). It
+     is still wrong: at ~110° it sits **between YELLOW (64.8°) and GREEN (154.8°)** — flanked by two verdict
+     hues — which is the *exact* geometry that disqualified Orange (~26°, between RED and YELLOW).
+     **Distance from the nearest claimant is a necessary condition, not the objective; "not sitting between
+     two verdicts" is the objective.** Both arcs are asserted in the test so this cannot be re-picked by eye.
+- **Escalation rides INTENSITY within the one new family**, not three new hues — the smallest addition that
+  reads as escalation, and a shape the palette already uses (HILITE/LBLUE are the same hue at 38.6% / 19.4%
+  saturation, measured **0.2°** apart). `cap_gauge_style(pct, warn, bad)` → `DGRAY` (room) → `MAGENTA` (≥75%)
+  → `bold MAGENTA` (≥100%, where the next pasted character is silently dropped).
+- **`threshold_style` is NOT reused and NOT parametrised** (the brief left this call to Phase 3): it returns
+  exactly GREEN/YELLOW/RED. A palette parameter would let **any** caller inject **any** three hues into
+  **any** container — reopening the very shared-namespace hole the Inc-2b reservation exists to close — and
+  it would not fit regardless: the gauge's escalation is **one hue at three intensities**, not three hues.
+  Different codomain ⇒ a sibling function, not a fork. The four lines of band arithmetic they share do not
+  warrant an abstraction.
+- **Validation:** `Automated` — `tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance` (the
+  ≥40° assertion against every claimant + the admissible-arc pin) +
+  `::test_tc079_5b_cap_gauge_escalates_without_verdict_hues` (the three bands are mutually distinct AND no
+  reachable input returns a verdict hue) + `::test_at079a_gauge_tracks_buffer`.
+- **Status:** Added in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.4; operator-decided). Frozen-engine
+  diff = 0.
+
 ### Docked buttons rendered as colour-grouped chips — batch-48 (R-TUI-076)
 
 > **Notes R-TUI-063 / R-TUI-064** (US-P1 / HLR-076, LLR-076.1–076.4; batch-48 Inc-2). **NO amendment

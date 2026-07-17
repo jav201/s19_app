@@ -68,7 +68,6 @@ from textual.widgets import (
     TextArea,
 )
 
-from .capped_text_area import CappedTextArea
 from .changes.io import DUMMY_CHANGESET_TEXT
 from .color_policy import css_class_for_severity
 from .entropy_style import ENTROPY_BAND_LABELS, band_style
@@ -76,14 +75,18 @@ from .insight_style import (
     CYAN,
     DGRAY,
     GREEN,
+    LABEL,
     PURPLE,
     RED,
     VALUE,
     YELLOW,
+    cap_gauge_style,
     human_bytes,
     label_value,
     microbar,
 )
+from .json_highlight import JsonHighlightTextArea
+from .os_clipboard_input import _CLIPBOARD_READ_CAP_CHARS
 from .os_clipboard_input import OsClipboardInput
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
@@ -2291,28 +2294,49 @@ class PatchEditorPanel(ScrollableContainer):
     }
 
     #: Cell budget for the CHECKS pass/fail strip's bar (LLR-078.1).
-    #: ⚠ CORRECTED (Inc-4 code review F1 — the original note here was wrong in
-    #: both directions and is retracted). PILOT-MEASURED in the real app:
     #:
-    #:   120x30  body interior w=18 → strip w=16 h=2  ← WRAPS to two lines
-    #:    80x24  body interior w=66 → strip w=64 h=1  ← fits on one
+    #: ⚠ RESOLVED at Inc-5 (the Inc-4 F1 note is superseded; its history is in
+    #: the increment record). The strip is an INTENTIONAL TWO-LINE widget:
+    #: counts on line 1, bar on line 2. The C-29 measurement chain that forces
+    #: it, RE-MEASURED at Inc-5 against the real container:
     #:
-    #: So the strip is NOT "one always-visible line", and the window is NOT the
-    #: budget: 22-23 is the WINDOW width recorded at
-    #: ``test_tui_patch_layout.py:56-58``; the strip's real container is 16
-    #: after borders + padding. Sizing 8 cells against the 22-23 figure
-    #: INHERITED a recorded number instead of pilot-measuring the real
-    #: container — which is the C-29 error itself, not merely an open C-29 gap
-    #: (C-29 exists to forbid exactly that inheritance).
+    #:   120x30  window w=22 → body interior w=18 → STRIP CONTENT w=14
+    #:    80x24  window w=68 → body interior w=66 → STRIP CONTENT w=62
     #:
-    #: Nothing is lost today: both lines paint in full, no count is truncated,
-    #: and the window already scrolls (body h=40 vs window h=11), so the extra
-    #: row costs scroll, not visibility. Hence MEDIUM, deferred to Inc-5's
-    #: geometry pass — where the counts alone measure 15 chars against a 16-col
-    #: body, so the bar CANNOT share the line at 120x30 at any width worth
-    #: drawing. That is a design decision (tighter separators / responsive
-    #: width / an intentional two-line strip), not a width tweak.
+    #: **14 is the budget at 120x30 — the batch's primary regime.** Two figures
+    #: above it were each one container too generous: 22-23 is the WINDOW width
+    #: (``test_tui_patch_layout.py:56-58``, which Inc-4 sized 8 cells against),
+    #: and 16 is the BODY's content width. Each level costs borders + padding.
+    #:
+    #: The one-line layout does not fit at ANY separator width: the counts
+    #: alone are 15 chars at the old spacing, and even the tightest form
+    #: (``✓123 ✗456 ◐789`` = 14 exactly) leaves 0 cells for a bar. Worse, the
+    #: old one-line form did not merely overflow — it wrapped MID-TOKEN once a
+    #: count reached 2 digits, orphaning ``◐`` from its number and making the
+    #: number read as a label on the bar:
+    #:
+    #:   agg 12/34/56 → line0 '✓ 12  ✗ 34  ◐ '   line1 '56  █░░░░░░░  '
+    #:
+    #: That is a WRONG-ANSWER defect on a verdict surface, reachable by any
+    #: change-set with >= 10 entries — not an overflow nuisance. Making the two
+    #: lines intentional costs nothing at 120x30 (h=2 is what already painted)
+    #: and one scrolled row at 80x24, and it removes the mid-token wrap.
+    #:
+    #: REJECTED: responsive width (needs geometry in the builder — a
+    #: first-layout-0 hazard, and it breaks the ``__new__`` unit tests) ·
+    #: dropping the bar (fits, but guts HLR-078's proportional bar — an
+    #: acceptance relaxation, not an implementation choice).
     _CHECK_STRIP_BAR_CELLS = 8
+
+    #: The shared 64 KiB paste cap, in CHARS (LLR-079.4). Aliased from the
+    #: single source (``os_clipboard_input.py:72``) rather than re-spelled, so
+    #: the gauge's denominator and the truncation it predicts cannot drift.
+    _PASTE_CAP_CHARS = _CLIPBOARD_READ_CAP_CHARS
+    #: Percent-of-cap cutoffs for the gauge's escalation (:func:`cap_gauge_style`).
+    #: ``100`` is lower-inclusive, so AT the cap — the first point at which the
+    #: next pasted character is silently dropped — already reads bold.
+    _PASTE_GAUGE_WARN_PCT = 75.0
+    _PASTE_GAUGE_BAD_PCT = 100.0
 
     #: The E6 execution scopes in selector cycle order (LLR-006.6) and their
     #: button labels. The scope tokens are the service vocabulary
@@ -3109,7 +3133,25 @@ class PatchEditorPanel(ScrollableContainer):
                         "Paste change-set (v2 JSON)",
                         classes="patch-field-label",
                     ),
-                    CappedTextArea(
+                    # batch-48 (LLR-079.4): the paste-cap gauge. The 64 KiB cap
+                    # already truncates SILENTLY (`capped_text_area.py:120`/
+                    # `:157`); this is the missing budget read-out. It renders
+                    # integers + author-fixed labels only — the buffer's own
+                    # text never reaches it (C-17), only its `len`.
+                    # `markup=False` is belt-and-braces: it is fed a `Text`.
+                    Static(
+                        "",
+                        id="patch_paste_gauge",
+                        markup=False,
+                        classes="patch-field-label",
+                    ),
+                    # batch-48 (LLR-079.1): was a plain `CappedTextArea`. The
+                    # subclass keeps BOTH paste ingresses capped and adds
+                    # in-place JSON colouring via the widget's own
+                    # `_highlights` map. NO markup path is introduced — see
+                    # `json_highlight.py`'s module docstring for the pinned
+                    # `_render_line` verification (C-17 / LLR-079.3).
+                    JsonHighlightTextArea(
                         DUMMY_CHANGESET_TEXT, id="patch_paste_text"
                     ),
                     id="patch_paste_row",
@@ -3296,6 +3338,78 @@ class PatchEditorPanel(ScrollableContainer):
         # LLR-075.3: render the line's no-variant/default-scope initial state
         # so it never mounts blank.
         self._refresh_variant_scope_line()
+        # LLR-079.4: the buffer mounts NON-empty (`DUMMY_CHANGESET_TEXT`), so a
+        # gauge that only rode `TextArea.Changed` would read a stale `0 / 64K`
+        # until the analyst's first keystroke.
+        self._refresh_paste_gauge()
+
+    def on_text_area_changed(self, event: TextArea.Changed) -> None:
+        """Keep the paste-cap gauge in step with the buffer (LLR-079.4).
+
+        Summary:
+            Re-render the gauge whenever the paste buffer's content changes —
+            which is every ingress at once (bracketed paste, ``ctrl+v``,
+            typing, and the app's programmatic ``load_text``), because
+            ``TextArea.Changed`` is posted by the document edit itself rather
+            than by any one caller. A per-call-site refresh would be the
+            batch-38 Inc-4 F1 stale-panel shape: an omitted site leaves a
+            wrong number on screen.
+
+        Args:
+            event (TextArea.Changed): The originating widget's change message.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+
+        Data Flow:
+            - Filter to ``#patch_paste_text`` → :meth:`_refresh_paste_gauge`.
+            - The id filter matters: ``Changed`` bubbles, so an unfiltered
+              handler would repaint the gauge from an unrelated ``TextArea``.
+
+        Dependencies:
+            Uses:
+                - :meth:`_refresh_paste_gauge`
+            Used by:
+                - Textual message dispatch (the ``#patch_paste_text`` buffer)
+        """
+        if event.text_area.id == "patch_paste_text":
+            self._refresh_paste_gauge()
+
+    def _refresh_paste_gauge(self) -> None:
+        """Render the gauge from the buffer's CURRENT length (LLR-079.4).
+
+        Summary:
+            Read ``#patch_paste_text``'s length and hand it to
+            :meth:`_paste_gauge_text`. The length is read from the widget
+            here — not passed in — so no caller can supply a count that
+            disagrees with what is on screen.
+
+        Args:
+            None.
+
+        Returns:
+            None.
+
+        Raises:
+            None — both ids are composed by this panel.
+
+        Data Flow:
+            - ``len(TextArea.text)`` → :meth:`_paste_gauge_text` →
+              ``#patch_paste_gauge``.
+
+        Dependencies:
+            Uses:
+                - :meth:`_paste_gauge_text`
+            Used by:
+                - :meth:`on_mount`, :meth:`on_text_area_changed`
+        """
+        buffer = self.query_one("#patch_paste_text", TextArea)
+        self.query_one("#patch_paste_gauge", Static).update(
+            self._paste_gauge_text(len(buffer.text))
+        )
 
     def request_action(self, action: str) -> None:
         """Post an :class:`ActionRequested` message for ``action``.
@@ -3853,13 +3967,96 @@ class PatchEditorPanel(ScrollableContainer):
             "#patch_entry_edit_json_button", Button
         ).disabled = not enabled
 
+    def _paste_gauge_text(self, used_chars: int) -> Text:
+        """Build the paste-cap gauge's renderable (LLR-079.4).
+
+        Summary:
+            Render ``<used>K / 64.0K`` against the shared 64 KiB paste cap,
+            styled by :func:`cap_gauge_style` so the read-out ESCALATES as the
+            buffer fills.
+
+            **Units are CHARS, not bytes, and that is deliberate.** The cap
+            (``_CLIPBOARD_READ_CAP_CHARS``, ``os_clipboard_input.py:72``)
+            truncates on ``text[:CAP]`` — a **character** slice — so a
+            byte-denominated gauge would disagree with the truncation it
+            exists to predict, by up to 4x on non-ASCII input. ``human_bytes``
+            is therefore NOT used here despite being the house size helper: it
+            is a *byte* humanizer, and rendering a char count through it would
+            print a confident, wrong unit. ``K`` = 1024 chars.
+
+            **Hue (operator ruling, 2026-07-16):** the gauge escalates as a
+            WARNING (§6.5 Amendment F's semantics, app-wide, unnarrowed) but
+            must NOT reuse GREEN/YELLOW/RED, because inside
+            ``#patch_editor_panel`` those three are VERDICT hues
+            (``_GLYPH_STYLE``, the pass/fail strip). ``threshold_style``
+            returns exactly those three and is therefore NOT usable here;
+            :func:`cap_gauge_style` escalates within the MAGENTA family
+            instead (quiet grey → magenta → bold magenta), whose hue is
+            MEASURED >= 43 deg from every claimant.
+
+        Args:
+            used_chars (int): The buffer's current ``len(text)``. Read from
+                the widget by :meth:`_refresh_paste_gauge`; never a
+                caller-supplied count.
+
+        Returns:
+            rich.text.Text: The gauge line. Never a ``str`` — and never any
+            file-derived text: an integer and author-fixed labels only
+            (C-17 / LLR-079.3). The pasted buffer reaches this method as a
+            ``len``, so no payload character can reach the render path even
+            in principle.
+
+        Raises:
+            None. Integer arithmetic and a constant divisor.
+
+        Data Flow:
+            - ``used_chars`` → percent of ``_PASTE_CAP_CHARS`` →
+              :func:`cap_gauge_style` → :func:`label_value`.
+            - No clamp on the percentage: ``cap_gauge_style``'s top band is
+              lower-inclusive, so at-cap and over-cap both read bold.
+
+        Dependencies:
+            Uses:
+                - ``_PASTE_CAP_CHARS`` / ``_PASTE_GAUGE_WARN_PCT`` /
+                  ``_PASTE_GAUGE_BAD_PCT`` ; ``insight_style.cap_gauge_style``
+                  / ``LABEL``
+            Used by:
+                - :meth:`_refresh_paste_gauge`
+
+        Example:
+            >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
+            >>> panel._paste_gauge_text(32768).plain
+            '32.0K / 64.0K'
+        """
+        cap = self._PASTE_CAP_CHARS
+        pct = (used_chars / cap) * 100.0
+        text = Text()
+        # The USED figure escalates; the denominator is a constant, so it stays
+        # muted. `label_value` would have styled these the other way round.
+        text.append(
+            f"{used_chars / 1024:.1f}K",
+            style=cap_gauge_style(
+                pct, self._PASTE_GAUGE_WARN_PCT, self._PASTE_GAUGE_BAD_PCT
+            ),
+        )
+        text.append(f" / {cap / 1024:.1f}K", style=LABEL)
+        return text
+
     def _check_strip_text(self, aggregates: Optional[Mapping[str, int]]) -> Text:
         """Build the CHECKS pass/fail strip's renderable (LLR-078.1).
 
         Summary:
-            Compose ``✓ P  ✗ F  ◐ U`` from the three aggregate counts, each
-            glyph carrying its ``_GLYPH_STYLE`` verdict colour, followed by a
-            proportional bar of the PASS rate.
+            Compose ``✓P ✗F ◐U`` from the three aggregate counts, each glyph
+            carrying its ``_GLYPH_STYLE`` verdict colour, followed on a SECOND
+            LINE by a proportional bar of the PASS rate.
+
+            **The line break is intentional, not overflow** — see
+            ``_CHECK_STRIP_BAR_CELLS`` for the C-29 measurement that forces it.
+            In one sentence: the strip's real content budget at 120x30 is 14
+            cells, the tightest one-line counts consume all 14 at 3 digits, and
+            the previous one-line form wrapped MID-TOKEN at 2 digits — reading
+            a count as a bar label. Two deliberate lines cost h=2, which is
+            exactly what the wrapped form already painted.
 
         Args:
             aggregates (Optional[Mapping[str, int]]): The three counts —
@@ -3879,14 +4076,26 @@ class PatchEditorPanel(ScrollableContainer):
               division, so a 0-entry run cannot raise (LLR-078.4).
             - The bar is UNFLOORED (the helper's default). ``floor=True`` is
               reserved for bars meaning "this row exists" (batch-47
-              LLR-042.7); this bar means "this fraction passed", so it must
-              not round a small pass rate UP. MEASURED: the floor is gated on
-              ``clamped > 0.0`` (``insight_style.py:214``), so it does NOT
-              affect a 0-pass run — both settings render an empty bar there.
-              What it would corrupt is a small-but-nonzero rate: 1 passed of
-              20 is ``round(0.05 * 8) == 0`` cells honestly, but a floored bar
-              paints 1, overstating the pass rate. Overstating passes is the
-              harm this bar must not do.
+              LLR-042.7); this bar means "this fraction passed". MEASURED: the
+              floor is gated on ``clamped > 0.0`` (``insight_style.py:214``),
+              so it does NOT affect a 0-pass run — both settings render an
+              empty bar there. What it changes is a small-but-nonzero rate: 1
+              passed of 20 is ``round(0.05 * 8) == 0`` cells unfloored and 1
+              floored.
+            - ⚠ **The reason is REDUNDANCY, not asymmetry** (Inc-5, correcting
+              this docstring's own third-time-repeated claim). The tempting
+              justification — "overstating passes is the harm, and the floor
+              only overstates" — is FALSE, and falsifying it needs no new
+              measurement: ``round()`` overstates passes at the TOP end too,
+              floored or not. **19 of 20 → ``round(0.95 * 8) == 8`` — a FULL
+              bar, pixel-identical to 20 of 20.** A bar that paints "all
+              passed" over a real failure is the same harm, at the end where
+              the floor is not even involved; there is no asymmetry to appeal
+              to. The honest reason ``floor=False`` is right is that the
+              AUTHORITATIVE counts sit on the line above, so +-1 cell of
+              rounding either way costs nothing — the bar is a shape cue, not
+              the datum. The default is therefore the correct default because
+              it is the default, and nothing here needs an override.
 
         Dependencies:
             Uses:
@@ -3896,11 +4105,11 @@ class PatchEditorPanel(ScrollableContainer):
                 - :meth:`refresh_check_results`
 
         Example:
-            >>> panel = PatchEditorPanel()
+            >>> panel = PatchEditorPanel.__new__(PatchEditorPanel)
             >>> panel._check_strip_text(
             ...     {"passed": 2, "failed": 1, "uncheckable": 1}
             ... ).plain
-            '✓ 2  ✗ 1  ◐ 1  ████░░░░'
+            '✓2 ✗1 ◐1\\n████░░░░'
         """
         counts = aggregates or {}
         passed = int(counts.get("passed", 0))
@@ -3909,13 +4118,17 @@ class PatchEditorPanel(ScrollableContainer):
         total = passed + failed + uncheckable
 
         text = Text()
-        for glyph, count in (
-            ("✓", passed),
-            ("✗", failed),
-            ("◐", uncheckable),
+        for index, (glyph, count) in enumerate(
+            (("✓", passed), ("✗", failed), ("◐", uncheckable))
         ):
+            if index:
+                text.append(" ", style=VALUE)
             text.append(glyph, style=self._GLYPH_STYLE[glyph])
-            text.append(f" {count}  ", style=VALUE)
+            text.append(str(count), style=VALUE)
+        # Line 2 — see `_CHECK_STRIP_BAR_CELLS`: the bar cannot share line 1 at
+        # the measured 14-cell budget, so it gets its own line rather than
+        # wrapping into one mid-token.
+        text.append("\n", style=VALUE)
         frac = passed / total if total else 0.0
         text.append_text(
             microbar(frac, self._CHECK_STRIP_BAR_CELLS, style=GREEN)

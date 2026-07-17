@@ -139,8 +139,29 @@ def test_ac_1_3_ctrl_v_small_clipboard_unchanged() -> None:
 
 def test_five_construction_sites_yield_capped_text_area() -> None:
     """The class swap actually landed: every one of the five paste surfaces is
-    a ``CappedTextArea`` at its construction site (static source proof — no app
-    mount required)."""
+    capped **at its construction site** (static source proof — no app mount
+    required).
+
+    ⚠ **The oracle is `issubclass`, not a class-NAME allowlist** (widened at
+    batch-48 Inc-5, which is when the old form's flaw became visible). The
+    protected property is *"this site is capped"*. The previous form filtered
+    construction calls through a hardcoded ``{"TextArea", "CappedTextArea"}``
+    name set and demanded the recorded name be exactly ``"CappedTextArea"`` —
+    so when Inc-5 swapped ``#patch_paste_text`` to ``JsonHighlightTextArea``
+    (a ``CappedTextArea`` SUBCLASS that inherits both capped ingresses
+    untouched), the site fell out of the filter entirely and the test failed
+    with ``got None`` — reporting an uncapped surface where the cap was in
+    fact intact. It was a **false alarm the first time a subclass appeared**,
+    and the same shape would have been a **false pass** had a subclass ever
+    OVERRIDDEN the cap while keeping the name.
+
+    Resolving each constructor name against its own module and asking
+    ``issubclass(cls, CappedTextArea)`` binds the assertion to the class
+    HIERARCHY rather than to a spelling. It stays a static source proof — the
+    ids and their constructors are still read out of the AST, so a site that
+    silently reverts to a bare ``TextArea`` is still caught (mutation-verified
+    at Inc-5: reverting ``#patch_paste_text`` to ``TextArea`` turns this RED).
+    """
     import ast
     from pathlib import Path
 
@@ -148,16 +169,17 @@ def test_five_construction_sites_yield_capped_text_area() -> None:
     import s19_app.tui.screens_directionb as directionb_mod
 
     ids_by_module = {
-        Path(screens_mod.__file__): {
+        screens_mod: {
             "changeset_json_text",
             "entry_json_text",
             "report_declared_regions",
             "operation_config",
         },
-        Path(directionb_mod.__file__): {"patch_paste_text"},
+        directionb_mod: {"patch_paste_text"},
     }
 
-    for path, expected_ids in ids_by_module.items():
+    for module, expected_ids in ids_by_module.items():
+        path = Path(module.__file__)
         tree = ast.parse(path.read_text(encoding="utf-8"))
         found: dict[str, str] = {}
         for node in ast.walk(tree):
@@ -165,13 +187,23 @@ def test_five_construction_sites_yield_capped_text_area() -> None:
                 continue
             func = node.func
             name = func.id if isinstance(func, ast.Name) else None
-            if name not in {"TextArea", "CappedTextArea"}:
+            if name is None:
                 continue
             for kw in node.keywords:
                 if kw.arg == "id" and isinstance(kw.value, ast.Constant):
                     found[kw.value.value] = name
         for wid in expected_ids:
-            assert found.get(wid) == "CappedTextArea", (
-                f"{path.name}: #{wid} must be constructed as CappedTextArea, "
-                f"got {found.get(wid)!r}"
+            constructor = found.get(wid)
+            assert constructor is not None, (
+                f"{path.name}: no construction site found for #{wid}"
+            )
+            cls = getattr(module, constructor, None)
+            assert cls is not None, (
+                f"{path.name}: #{wid} is constructed as {constructor!r}, which "
+                f"is not importable from the module — the AST name must "
+                f"resolve for the cap to be provable"
+            )
+            assert isinstance(cls, type) and issubclass(cls, CappedTextArea), (
+                f"{path.name}: #{wid} must be constructed as CappedTextArea or "
+                f"a subclass of it (the 64 KiB paste cap); got {constructor!r}"
             )

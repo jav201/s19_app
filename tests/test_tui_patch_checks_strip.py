@@ -166,6 +166,28 @@ _EMPTY_BAR = MICROBAR_EMPTY * 8
 _BAR_2_OF_7 = MICROBAR_FILLED * 2 + MICROBAR_EMPTY * 6
 
 
+def _expect(passed: int, failed: int, uncheckable: int, bar: str) -> str:
+    """The strip's expected TWO-LINE plain text: counts on line 1, bar on line 2.
+
+    ⚠ The line break is the strip's INTENTIONAL shape (batch-48 Inc-5), not
+    overflow. Spelled once here rather than inline at five call sites, because
+    the previous one-line form (``✓ P  ✗ F  ◐ U  bar``) was re-spelled at each
+    of them — so the format lived in five places and the C-29 budget that
+    governs it lived in none.
+
+    WHY two lines (the measurement, not a preference): the strip's real content
+    budget is **14 cells** at 120x30 — the batch's primary regime — and the
+    tightest possible one-line counts consume all 14 at 3 digits, leaving zero
+    for a bar. The old form did not merely overflow, it wrapped MID-TOKEN once
+    any count reached 2 digits (``✓ 12  ✗ 34  ◐ `` / ``56  █░░░░░░░``),
+    orphaning ``◐`` from its count and making ``56`` read as a label on the
+    bar. That is a wrong-answer defect on a verdict surface, reachable by any
+    change-set with >= 10 entries. The geometry arm that pins this — including
+    the fact that it PAINTS — is ``test_tc078_5_strip_geometry_painted``.
+    """
+    return f"✓{passed} ✗{failed} ◐{uncheckable}" + "\n" + bar
+
+
 # ---------------------------------------------------------------------------
 # Fixtures / drivers
 # ---------------------------------------------------------------------------
@@ -277,7 +299,7 @@ def test_at078a_counts(tmp_path: Path) -> None:
         f"uncheckable; got {aggregates!r}"
     )
 
-    assert strip.plain == f"✓ 2  ✗ 1  ◐ 3  {_EXPECTED_BAR}", (
+    assert strip.plain == _expect(2, 1, 3, _EXPECTED_BAR), (
         "the strip must read each verdict's own count and a bar filled to the "
         f"PASS rate (2 of 6 -> 3 of 8 cells); got {strip.plain!r}"
     )
@@ -285,9 +307,9 @@ def test_at078a_counts(tmp_path: Path) -> None:
     # Counts == aggregates EXACTLY, read back off the rendered text so a
     # renumbered strip cannot pass by agreeing with itself.
     rendered = {
-        "passed": int(strip.plain.split("✓ ")[1].split(" ")[0]),
-        "failed": int(strip.plain.split("✗ ")[1].split(" ")[0]),
-        "uncheckable": int(strip.plain.split("◐ ")[1].split(" ")[0]),
+        "passed": int(strip.plain.split("✓")[1].split(" ")[0]),
+        "failed": int(strip.plain.split("✗")[1].split(" ")[0]),
+        "uncheckable": int(strip.plain.split("◐")[1].splitlines()[0]),
     }
     assert rendered == aggregates, (
         f"the strip's counts {rendered!r} must equal the run's aggregates "
@@ -345,7 +367,7 @@ def test_at078b_zero_total(tmp_path: Path) -> None:
     assert aggregates == {"passed": 0, "failed": 0, "uncheckable": 0}, (
         f"a 0-entry run must aggregate to all-zero; got {aggregates!r}"
     )
-    assert strip.plain == f"✓ 0  ✗ 0  ◐ 0  {_EMPTY_BAR}", (
+    assert strip.plain == _expect(0, 0, 0, _EMPTY_BAR), (
         "a 0-total run must render 0/0/0 with an EMPTY bar — a floored bar "
         f"would fill one cell and claim a pass that never happened; got "
         f"{strip.plain!r}"
@@ -404,14 +426,14 @@ def test_at078c_cleared(tmp_path: Path) -> None:
 
     after_run, after_undo = asyncio.run(_drive())
 
-    assert after_run == f"✓ 2  ✗ 1  ◐ 4  {_BAR_2_OF_7}", (
+    assert after_run == _expect(2, 1, 4, _BAR_2_OF_7), (
         f"precondition: the run must leave a NON-ZERO strip; got {after_run!r}"
     )
     assert after_undo != after_run, (
         "the strip must CHANGE off its post-run state on undo — it still reads "
         f"{after_undo!r}, the batch-38 Inc-4 F1 stale-panel defect"
     )
-    assert after_undo == f"✓ 0  ✗ 0  ◐ 0  {_EMPTY_BAR}", (
+    assert after_undo == _expect(0, 0, 0, _EMPTY_BAR), (
         f"undo must CLEAR the strip to all-zero; got {after_undo!r}"
     )
 
@@ -466,7 +488,27 @@ def test_tc078_1_strip_mounted(tmp_path: Path) -> None:
     )
 
     # §2.4-10: no new member may shadow a Textual Widget internal.
+    #
+    # ⚠ F3 (Inc-4 code review, fixed at Inc-5) — this was the batch's SIXTH
+    # vacuous check. It read only the second assert below, whose operands are
+    # BOTH literals: a hand-written name set and `dir(Widget)`. Nothing bound
+    # either to `PatchEditorPanel`, so it was constant-true — the reviewer
+    # evaluated it WITHOUT importing the panel and it passed. It would have
+    # gone on passing had the members been renamed, never added, or the whole
+    # strip deleted. Same root cause as the three grep oracles this file
+    # already fixed (an oracle keyed to the AUTHOR'S DECLARATION rather than
+    # derived from the code), surviving in set form.
+    #
+    # The fix is the first assert: bind the literal to the class FIRST, so the
+    # names must actually exist on `PatchEditorPanel` before the collision
+    # question is even meaningful. `vars()` (not `dir()`) is deliberate — it
+    # reads the class's OWN namespace, so an inherited attribute of the same
+    # name cannot satisfy it.
     new_members = {"_check_strip_text", "_CHECK_STRIP_BAR_CELLS"}
+    assert new_members <= set(vars(PatchEditorPanel)), (
+        f"the strip's members must exist on PatchEditorPanel itself; missing "
+        f"{new_members - set(vars(PatchEditorPanel))!r}"
+    )
     assert not (new_members & set(dir(Widget))), (
         f"new members collide with Textual Widget internals: "
         f"{new_members & set(dir(Widget))!r}"
@@ -564,7 +606,7 @@ def test_tc078_2_aggregates_param(tmp_path: Path) -> None:
         f"the strip builder must return a rich.text.Text; got {type(built).__name__}"
     )
     # A None mapping is the cleared strip, not a crash (the parameter default).
-    assert panel._check_strip_text(None).plain.startswith("✓ 0"), (
+    assert panel._check_strip_text(None).plain.startswith("✓0"), (
         "a None mapping must render the all-zero cleared strip"
     )
 
@@ -624,4 +666,86 @@ def test_tc078_3_both_sites(tmp_path: Path) -> None:
             f"the aggregates argument at line {call.lineno} must be the LIVE "
             "service accessor check_aggregates(), not a literal or a stashed "
             f"value; got {ast.dump(argument)[:80]}"
+        )
+
+
+# ===========================================================================
+# TC-078.5 — the strip's GEOMETRY, asserted on the PAINTED result (Inc-4 F2)
+# ===========================================================================
+
+
+def test_tc078_5_strip_geometry_painted(tmp_path: Path) -> None:
+    """The strip PAINTS two lines, unwrapped, at both supported sizes (C-29).
+
+    ⚠ **This is the arm whose absence let the Inc-4 F1 wrap ship.** Every
+    other oracle in this file reads ``Static.render()`` — the pre-layout
+    ``Content`` the builder produced — which is geometry-independent by
+    construction. MEASURED at Inc-4 review: mount the strip, update it, set
+    ``display = False``, and all six of them still pass. **A strip that
+    renders nothing at all shipped green.** The snapshot layer is blind too:
+    the two ``patch-comfortable-*`` cells are ``xfail(strict=False)``, so they
+    ABSORB drift rather than reporting it. So the visibility axis — exactly
+    C-29's axis — had no oracle anywhere.
+
+    The oracle here is ``Static.render_line(y)``: the composited ``Strip``,
+    after layout, wrapping, and the ``display`` check. It discriminates
+    (mutation-verified at Inc-5): with ``display = False`` the region becomes
+    ``0x0`` and ``render_line(0).text`` is ``''``.
+
+    **What this CAN see at each size, and what it cannot.** ``render_line``
+    resolves for a widget that is laid out but scrolled out of view, so both
+    sizes assert the same painted contract. What it does NOT assert is
+    on-screen compositing at 80x24: there the Patch Editor stacks its windows
+    and the strip lands at **y=59 on a 24-row screen**, below the fold at
+    scroll 0. That is batch-46's deliberate ``VerticalScroll`` body design (the
+    strip is not a docked button, so the B2 reachability contract does not
+    bind it), NOT a defect — but it is also why a naive ``region.height == 1``
+    assertion here would have been another FALSE ORACLE: it reads "fits" for a
+    widget that is not on screen at all. The height asserted below is **2**,
+    and it is the intentional two-line shape, not a fit claim.
+
+    The fixture uses **2-digit counts (12/34/56)**, which is the discriminator:
+    the wrap this arm exists to catch is invisible at the single-digit counts
+    every other test in this file uses.
+    """
+
+    async def _run(size: tuple[int, int]) -> tuple[int, str, str]:
+        app = S19TuiApp()
+        async with app.run_test(size=size) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            panel = app.query_one("#patch_editor_panel", PatchEditorPanel)
+            # Drive the strip through its real render entry point; the 2-digit
+            # counts are what make a mid-token wrap visible.
+            panel.refresh_check_results(
+                [], "", {"passed": 12, "failed": 34, "uncheckable": 56}
+            )
+            await pilot.pause()
+            strip = app.query_one("#patch_checks_strip", Static)
+            return (
+                strip.region.height,
+                strip.render_line(0).text,
+                strip.render_line(1).text,
+            )
+
+    for size in ((80, 24), (120, 30)):
+        height, painted0, painted1 = asyncio.run(_run(size))
+
+        assert height == 2, (
+            f"{size}: the strip must paint exactly TWO lines — counts then bar "
+            f"(the intentional shape forced by the 14-cell budget at 120x30); "
+            f"got height={height}. height==0 means it painted NOTHING"
+        )
+        # Line 1 carries ALL THREE counts, each still joined to its glyph. The
+        # old one-line form failed exactly here at 2 digits: '◐' painted with
+        # its count '56' pushed onto the next line.
+        assert painted0.strip() == "✓12 ✗34 ◐56", (
+            f"{size}: line 1 must carry all three glyph+count tokens intact "
+            f"and unwrapped; got {painted0!r}. A count separated from its "
+            f"glyph reads as a label on the bar"
+        )
+        # Line 2 is the bar ALONE — no count fragment wrapped onto it.
+        assert painted1.strip() == MICROBAR_FILLED + MICROBAR_EMPTY * 7, (
+            f"{size}: line 2 must be the bar alone (12 of 102 passed -> 1 of 8 "
+            f"cells); got {painted1!r}"
         )

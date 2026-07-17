@@ -13,10 +13,19 @@ This is the NON-frozen foundation module every screen story of batch-47 consumes
    Python constants so renderers that build Rich ``Text`` inline (not via CSS
    classes) can colour from the single source.
 
-2. Four pure, headless formatting **helpers** (LLR-065.2) — ``human_bytes``,
-   ``label_value``, ``microbar``, ``threshold_style``. Like ``entropy_style``,
-   this module imports no Textual symbol, so both the view code and the unit
-   tests can consume it without pulling a UI dependency into the test surface.
+2. Five pure, headless formatting **helpers** — ``human_bytes``,
+   ``label_value``, ``microbar``, ``threshold_style`` (LLR-065.2) and
+   ``cap_gauge_style`` (batch-48, LLR-079.4). Like ``entropy_style``, this
+   module imports no Textual symbol, so both the view code and the unit tests
+   can consume it without pulling a UI dependency into the test surface.
+
+   ⚠ ``threshold_style`` and ``cap_gauge_style`` are DELIBERATELY separate, not
+   one parametrised helper. Adding a palette parameter to ``threshold_style``
+   would let any caller inject any three hues into any container — which is the
+   very hole the batch-48 Inc-2b hue reservation exists to close — and it would
+   not fit anyway: the gauge's escalation is **one hue at three intensities**,
+   not three hues. Different codomain, different function; the four lines of
+   band arithmetic they share are not worth an abstraction.
 
 C-17 (untrusted-text markup safety): the two ``Text``-returning helpers build a
 ``rich.text.Text`` via constructor + ``append`` and NEVER via
@@ -50,6 +59,39 @@ DGRAY = "#969aad"
 PURPLE = "#b565f3"
 #: Cyan accent (addresses).
 CYAN = "#7dd3fc"
+#: Magenta accent — **the BUDGET/CAPACITY family, and nothing else** (batch-48
+#: Inc-5, operator-decided 2026-07-16).
+#:
+#: **Why it exists.** The Patch Editor's paste-cap gauge must escalate as its
+#: buffer fills, and §6.5 Amendment F makes YELLOW ≡ *warning* app-wide — so the
+#: obvious cue is :func:`threshold_style`'s GREEN/YELLOW/RED. **The operator
+#: ruled that out for this surface:** inside ``#patch_editor_panel`` those three
+#: hues are already claimed as **verdicts** (``_GLYPH_STYLE`` = a check
+#: passed / was partial / failed; the pass-fail strip). A gauge painted yellow
+#: there makes an analyst read one hue two ways in one container. The gauge
+#: therefore keeps Amendment F's *semantics* (it escalates as a warning) and
+#: takes a hue that **cannot be mistaken for a verdict**.
+#:
+#: **What it must never be confused with:** GREEN ``#54efae`` / YELLOW
+#: ``#f6ff8f`` / RED ``#fd8383`` (verdicts) · Orange (the MAC-specific record
+#: cue Amendment F preserved) · PURPLE ``#b565f3`` (kind role / apply chip) ·
+#: CYAN ``#7dd3fc`` (address role / ``.sev-info``) · HILITE (entry chip).
+#:
+#: **MEASURED, not eyeballed** (``tests/test_tui_insight_style.py::
+#: test_tc079_5_magenta_hue_distance``): hue **316.9°**, which is **>= 43.0°**
+#: from every chromatic claimant — its two nearest are RED (43.1°) and PURPLE
+#: (43.1°). For scale, Inc-2b measured HILITE<->CYAN at **23.5°** and accepted
+#: that pair as distinct. Saturation/value (45% / 96%) sit inside the pastel
+#: band the rest of the palette occupies (RED 48/99, PURPLE 58/95, CYAN 50/99).
+#:
+#: ⚠ **The admissible hue space is 6.1° wide — do NOT re-pick this by eye.** A
+#: full-circle scan (see the test) finds exactly two arcs clearing 40° from
+#: every claimant: **[313.9°, 320.0°]** (this one) and **[104.9°, 114.8°]** (a
+#: lime). The lime is REJECTED for the same reason Orange was: at ~110° it sits
+#: BETWEEN YELLOW (64.8°) and GREEN (154.8°) — flanked by two verdict hues — so
+#: its larger raw distance (45.0°) buys a worse cue. Distance from the nearest
+#: claimant is not the whole objective; not sitting between two verdicts is.
+MAGENTA = "#f587d6"
 
 #: Navy "depth stack" — four steps from app background to panel border.
 DEPTH_BG = "#0a0e1b"
@@ -261,3 +303,51 @@ def threshold_style(pct: float, warn: float, bad: float) -> str:
     if pct >= warn:
         return YELLOW
     return GREEN
+
+
+def cap_gauge_style(pct: float, warn: float, bad: float) -> str:
+    """
+    Summary:
+        Classify a **fill-against-a-capacity** percentage into an escalation
+        step within the single :data:`MAGENTA` family, returning the matching
+        Rich style string. Bands are lower-inclusive and assume a higher
+        percentage is worse: ``pct < warn`` → :data:`DGRAY` (quiet — there is
+        room), ``warn <= pct < bad`` → :data:`MAGENTA`, ``pct >= bad`` →
+        ``"bold "`` + :data:`MAGENTA` (at/over the cap; content is being lost).
+
+    Args:
+        pct (float): The fill percentage (typically ``0.0..100.0``). Values
+            outside the range classify by the same comparisons — there is no
+            clamp, because a buffer *over* its cap is a real state.
+        warn (float): Lower-inclusive cutoff into the warn band.
+        bad (float): Lower-inclusive cutoff into the at-cap band.
+
+    Returns:
+        str: One of :data:`DGRAY`, :data:`MAGENTA`, or ``f"bold {MAGENTA}"``.
+        **Never GREEN / YELLOW / RED** — that is this function's entire reason
+        to exist. Boundary cases: ``pct == warn`` → magenta, ``pct == bad`` →
+        bold magenta.
+
+    Data Flow:
+        - Pure comparison; no I/O.
+        - Called by ``PatchEditorPanel._paste_gauge_text`` (LLR-079.4) and by
+          ``tests/test_tui_insight_style.py`` (TC-079.5).
+
+    Dependencies:
+        Uses:
+            - DGRAY ; MAGENTA
+        Used by:
+            - s19_app.tui.screens_directionb (the paste-cap gauge)
+            - tests/test_tui_insight_style.py
+
+    Example:
+        >>> cap_gauge_style(10.0, 75.0, 100.0) == DGRAY
+        True
+        >>> cap_gauge_style(100.0, 75.0, 100.0) == f"bold {MAGENTA}"
+        True
+    """
+    if pct >= bad:
+        return f"bold {MAGENTA}"
+    if pct >= warn:
+        return MAGENTA
+    return DGRAY
