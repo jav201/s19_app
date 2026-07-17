@@ -2290,11 +2290,28 @@ class PatchEditorPanel(ScrollableContainer):
         "·": DGRAY,
     }
 
-    #: Cell budget for the CHECKS pass/fail strip's bar (LLR-078.1). Fixed and
-    #: small — the strip is one always-visible line inside a window measured at
-    #: 22-23 columns wide in the 120x30 three-column regime (C-29 /
-    #: ``test_tui_patch_layout.py:55-60``), so the bar is a glance-cue sized to
-    #: fit beside the three counts, not a measured gauge.
+    #: Cell budget for the CHECKS pass/fail strip's bar (LLR-078.1).
+    #: ⚠ CORRECTED (Inc-4 code review F1 — the original note here was wrong in
+    #: both directions and is retracted). PILOT-MEASURED in the real app:
+    #:
+    #:   120x30  body interior w=18 → strip w=16 h=2  ← WRAPS to two lines
+    #:    80x24  body interior w=66 → strip w=64 h=1  ← fits on one
+    #:
+    #: So the strip is NOT "one always-visible line", and the window is NOT the
+    #: budget: 22-23 is the WINDOW width recorded at
+    #: ``test_tui_patch_layout.py:56-58``; the strip's real container is 16
+    #: after borders + padding. Sizing 8 cells against the 22-23 figure
+    #: INHERITED a recorded number instead of pilot-measuring the real
+    #: container — which is the C-29 error itself, not merely an open C-29 gap
+    #: (C-29 exists to forbid exactly that inheritance).
+    #:
+    #: Nothing is lost today: both lines paint in full, no count is truncated,
+    #: and the window already scrolls (body h=40 vs window h=11), so the extra
+    #: row costs scroll, not visibility. Hence MEDIUM, deferred to Inc-5's
+    #: geometry pass — where the counts alone measure 15 chars against a 16-col
+    #: body, so the bar CANNOT share the line at 120x30 at any width worth
+    #: drawing. That is a design decision (tighter separators / responsive
+    #: width / an intentional two-line strip), not a width tweak.
     _CHECK_STRIP_BAR_CELLS = 8
 
     #: The E6 execution scopes in selector cycle order (LLR-006.6) and their

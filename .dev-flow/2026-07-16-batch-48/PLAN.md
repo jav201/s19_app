@@ -128,6 +128,51 @@ Patch snapshots: exactly 2 cells (`patch-comfortable-80x24` / `-120x30`; `_TWO_S
 - R5 **Positional index-alignment** — an off-by-one silently mislabels a row's check result.
 - R6 **48-id preserve tuple** — a moved/renamed id trips the census.
 
+## ⚠ INC-5 BINDING CORRECTIONS (Inc-4 code review F1/F2 — read BEFORE the geometry pass)
+- **F1 — the C-29 risk was recorded INVERTED. The strip wraps at 120×30 and FITS at 80×24.** PILOT-MEASURED:
+  `120×30` body interior **w=18** → strip **w=16 h=2 (WRAPS)** · `80×24` body interior **w=66** → strip
+  **w=64 h=1 (fits)**. **22-23 is the WINDOW width** (`test_tui_patch_layout.py:56-58`), **not** the content
+  budget — the real container is **16**. Inc-4 sized 8 cells against the inherited figure ⇒ **that IS the C-29
+  error**, not an open gap. ⚠ **The orchestrator's brief compounded it by sending the reviewer to measure
+  80×24 — the size that already works.** Aimed there, Inc-5 would have "closed" the gap while the wrap
+  survived at the primary regime this batch exists to build. **Counts alone = 15 chars vs a 16-col body ⇒ the
+  bar CANNOT share the line at 120×30 at any width worth drawing.** That is a DESIGN decision (tighter
+  separators `✓2 ✗1 ◐3 ` = 9 + a 7-cell bar = 16 · responsive width · intentional two-line strip) — not a tweak.
+- **F2 — no oracle in Inc-4 observes the PAINTED strip; both test layers are blind to visibility.** All ATs
+  read `Static.render()` (**pre-layout `Content`**, geometry-independent). **MEASURED: mount the strip, update
+  it, set `display = False` — all 6 tests still pass.** The snapshot layer is blind too (the 2 patch cells are
+  `xfail(strict=False)`, so they *absorb* drift). **A strip that renders nothing at all ships green.** This is
+  WHY F1 went unseen. → **Inc-5 owes ONE geometry arm at BOTH sizes** (e.g. `query_one("#patch_checks_strip")
+  .region.height == 1`) — the assertion that would have caught F1. The data contract is well covered; the
+  uncaught axis is **visibility**, exactly C-29's axis.
+- **F3 [LOW] — the SIXTH vacuous check** (`tests/test_tui_patch_checks_strip.py:521-525`): both operands are
+  **literals**, so it is **constant-true** — the reviewer evaluated it *without importing the panel* and it
+  passed. Same root cause the dev fixed in its 3 grep oracles (*an oracle keyed to the AUTHOR'S DECLARATION,
+  not derived from the code*), surviving in set form. Fix: `assert new_members <= set(vars(PatchEditorPanel))`
+  first, binding the literal to the code.
+- **F4 [LOW] — the floor rationale is applied at ONE END only.** *"Overstating passes is the harm"* — but
+  `round()` overstates passes at the TOP end regardless of `floor`: **19-of-20 → 8/8 filled, identical to
+  20/20.** No symmetric ceiling exists. The conclusion survives a THIRD time; the reasoning is still wrong.
+  **The honest justification is REDUNDANCY, not asymmetry:** the authoritative counts sit beside the bar, so
+  ±1 cell of rounding either way costs nothing.
+- **F5 [LOW]** — TC-078.4 arms 1-4 duplicate `test_microbar_floor_opt_in` (~60 lines above, same file, width
+  8). Optional trim; the AST + builder arms are the genuinely new ones.
+
+## 🔑 PHASE-5 LESSON (Inc-4 review process note — the sharpest of the batch)
+**The fact the dev "measured" was ALREADY RECORDED TWICE in the file it was editing.** `microbar`'s own
+docstring says *"`frac <= 0` still renders an empty bar"* (`insight_style.py:176-177`), and
+`test_microbar_floor_opt_in:137` — **~60 lines above where TC-078.4 was added, from batch-47 Inc-9, the very
+HIGH-1 fix this reasoning invokes** — already asserts `microbar(0.0, width, floor=True).plain.count("█") == 0`.
+So the orchestrator's false claim was refutable **by reading**, and the dev's first draft asserted the opposite
+before measuring. **Same root cause the dev confessed for `Static.renderable`** (*"the house had already
+recorded it and I had not read it"*) — **second instance, same increment.** Measurement saved it, but
+measurement was the SECOND-cheapest way to learn it; **reading the file it was already in was the cheapest.**
+⚠ This **rhymes exactly** with the LIVE BACKLOG's `Select`-label finding (*"the gap is not 'find the sink' —
+it is 'when a sink is found, sweep every site of that class'"*). Both are **the house already knew, and nobody
+read it.** → Candidate: **when a helper's semantics are in question, read the helper's own oracle before
+measuring it.** Feeds the operator's code↔requirement traceability candidate — *an oracle nobody reads is an
+untraversed edge.*
+
 ## 🔎 Phase-5 CONTROL CANDIDATE (operator-requested 2026-07-16 — raise at the post-mortem)
 **Gap: a SHARED-NAMESPACE collision between two individually-correct increments is invisible to every control
 we have.** Origin: Inc-2 review **F1**. Inc-2 claimed GREEN/YELLOW as a chip *function* cue; Inc-3
