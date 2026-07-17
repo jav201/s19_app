@@ -4283,8 +4283,21 @@ amendment of the original all-visible acceptance).
   meet): `tests/test_tui_patch_json.py::test_tc079_3_c17_oracle_discriminates` applies the natural wrong
   implementation — a `TextArea` whose `get_line` returns `Text.from_markup(...)` — and asserts the AT-079c
   predicate **REJECTS** it. Measured: `[red]PWNED[/red]` paints as `PWNED` (brackets **consumed**) carrying
-  `color=red`, and the predicate fails on both axes. The old `.spans` oracle reads `[]` for that same unsafe
-  widget — i.e. **passes it**.
+  `color=red`. The old `.spans` oracle reads `[]` for that same unsafe widget — i.e. **passes it**.
+  - ⚠ **Correction (Inc-5b): this originally read "the predicate fails on both axes". It failed on ONE.**
+    `_assert_payload_is_inert` checked `link` / `bold` / `italic` and **never read `style.color`** — the
+    colour axis was described in four places (this line, the AT-079c notes, the predicate's own docstring, the
+    commit message) and implemented in none. Measured: the Inc-5 predicate **PASSES**
+    `[('[red]PWNED[/red]', Style(color='red'))]`. It was **not a false green** — every payload that reaches a
+    real markup parser gets *consumed*, so the verbatim axis carried the gate — but that is the **Inc-1b rule
+    exactly** (*assert plain verbatim AND spans, or the fix is guarded by accident*), and it was accidental in
+    precisely that way. Realistic escape: a highlighter that **styles** `[red]` without **consuming** it (a
+    regex tokenizer extension) paints verbatim and meets no colour check. **Inc-5b adds the axis** (compared
+    against the control line's own painted colours ∪ the highlighter's token hues, both read from source) plus
+    `::test_tc079_3b_inert_predicate_colour_axis_discriminates` — a dedicated arm, because
+    `test_tc079_3_c17_oracle_discriminates` **cannot** certify the colour axis: its buffer consumes the markup,
+    so it fails on the verbatim axis and would pass identically with no colour check at all. That is exactly
+    how the absent axis shipped unnoticed.
 - **Two measured traps this amendment also closes** (each would have re-blinded the gate):
   1. **`_render_line(y)` indexes VISUAL lines, not document lines.** At the patch panel's 120×30 width the
      buffer is ~17 cells and every payload wraps, so `_render_line(1)` returns the wrapped *tail of line 0*.
@@ -4329,24 +4342,65 @@ amendment of the original all-visible acceptance).
 - **A new hue is authorised — the first this batch.** Every prior increment brief said "introduce no new
   colour"; that is lifted **for this purpose only**, because Inc-2b measured the palette at capacity
   (HILITE / PURPLE / CYAN are the only distinct non-verdict hues and all three are doubly claimed).
-- **New token:** `insight_style.MAGENTA = "#f587d6"` (hue **316.9°**, sat 45%, val 96% — inside the pastel
+- **New token:** `insight_style.MAGENTA = "#f586da"` (hue **314.6°**, sat 45%, val 96% — inside the pastel
   band the palette already occupies). Its comment names why it exists and what it must never be confused
   with. **Nothing else in the palette changes; `color_policy.py` stays frozen, 0-diff.**
-- **MEASURED, not eyeballed** (`tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance`): **≥ 43.0°
-  from every chromatic claimant.** Nearest: RED 43.1° · PURPLE 43.1° · orange3 69.6° · `.mac_out_of_range`
-  77.4° · HILITE 94.1° · LBLUE 94.2° · YELLOW 107.9° · CYAN 117.5° · GREEN 162.1°. For scale, Inc-2b measured
-  **HILITE↔CYAN at 23.5°** and accepted that pair as distinct.
-- **⚠ Two corrections to the brief's own figures, from the measurement:**
-  1. **The "free band ≈ 300-330°" is wrong.** Only **[313.9°, 320.0°]** — **6.1° wide** — clears 40° from
-     every claimant. The brief's "46° from PURPLE, 40° from RED" describes **two different points**, not one
-     hue; at 320° the distance to RED is exactly 40.0° and at 313.9° the distance to PURPLE is 40.2°. The
-     chosen 316.9° is the **max-min** point of that arc.
-  2. **The global optimum is REJECTED, and it is the finding worth keeping.** A full-circle scan finds a
-     *second* ≥40° arc at **[104.9°, 114.8°]** (a lime) whose min distance is **larger** (45.0° vs 43.1°). It
-     is still wrong: at ~110° it sits **between YELLOW (64.8°) and GREEN (154.8°)** — flanked by two verdict
-     hues — which is the *exact* geometry that disqualified Orange (~26°, between RED and YELLOW).
-     **Distance from the nearest claimant is a necessary condition, not the objective; "not sitting between
-     two verdicts" is the objective.** Both arcs are asserted in the test so this cannot be re-picked by eye.
+- **MEASURED, not eyeballed** (`tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance`): its
+  nearest claimants are `.band-high`/`only_a` `#e06c75` (**40.7°**) and PURPLE (**40.8°**). **40.7° is not a
+  threshold it clears — it is the maximum ANY hue on the circle achieves** against the 14 claimants, and this
+  hue is that maximum. For scale, Inc-2b measured **HILITE↔CYAN at 23.5°** and accepted that pair as distinct.
+- **The objective is the FLANK RULE, not a distance.** Orange is the worked example: at **37.7°** it sits
+  between RED (0°) and YELLOW (64.8°) — a verdict on each side. **Distance from the nearest claimant is a
+  necessary condition, not the objective; "not sitting between two verdicts" is.** This is asserted as a
+  computed predicate (`_is_verdict_flanked`), with its own anti-vacuity arm (`::test_tc079_5d_flank_rule_has_teeth`).
+
+#### ⚠ Amendment F-1, Before → After (batch-48 **Inc-5b**) — the Inc-5 record was measurably false
+
+> Inc-5's hue census was **hand-curated and unchecked**, and it omitted `#e06c75` (`.band-high` +
+> `AbDiffPanel._KIND_MARKUP["only_a"]`) — which sits **38.4°** from the hue Inc-5 certified, i.e. **below
+> Inc-5's own 40° floor**. `test_tc079_5_magenta_hue_distance` therefore certified a **false universal**: it
+> passed *only because its input set omitted the input that would fail it*. This is a **vacuous INPUT SET**,
+> not a vacuous assertion — the arithmetic was exact, and **no mutation of the code under test can catch it**.
+> The user-visible risk was cosmetic; the reason it blocked is that a test certifying a false universal is the
+> artifact everyone cites later instead of re-measuring.
+
+| Claim (Inc-5, shipped) | Status | Corrected (Inc-5b, measured against the complete 14-entry census) |
+| --- | --- | --- |
+| `MAGENTA = "#f587d6"`, hue 316.9° | **Moved** | `#f586da`, hue **314.6°** — the max-min point of the non-flanked circle |
+| "**≥ 43.0°** from every chromatic claimant" | **False, and UNSATISFIABLE** | Nothing on the circle reaches 43°; the global best is **40.77°**. `#f587d6` was actually at **38.4°** |
+| Nearest = RED 43.1° / PURPLE 43.1° | **False** | Nearest = `#e06c75` **40.7°**, PURPLE **40.8°**, RED 45.4° |
+| `orange3` = `#d75f00` (26.5°) | **Wrong colour** | Rich resolves `orange3` to **`#d78700` (37.7°)**; `#d75f00` is `darkorange3`. Inc-5 measured a hue the app never paints |
+| "Rejected lime arc at [104.9°, 114.8°], min-dist 45.0°" — Inc-5's *headline finding* | **Does not exist** | An artifact of omitting rich `green` (**`#008000`, 120°** — `ValidationSeverity.OK` + the `✓` MAC glyph), which sits ~13° from it. With the census complete the global and admissible optima are the **same point**, and it is this magenta |
+| "Both arcs are asserted in the test" | **False** | Only one was (`:707`). The lime appeared solely inside an f-string error message |
+| "A full-circle scan (see the test)" | **False** | The test performed **no scan** — it hardcoded `313.9 <= h <= 320.0`. The rule lived in prose; only its precomputed output was asserted. **That decoupling IS the mechanism of the bug** |
+| Test lives in `tests/test_tui_insight_style.py` | **Wrong file** | `tests/test_tui_patch_json.py` (the named file exists, so the citation looked plausible) |
+| `_MIN_HUE_SEPARATION_DEG = 40.0` | **Retired — see below** | `24.0`, demoted to an anchor; the binding constraint is now optimality |
+
+- **The 40° floor is withdrawn, and not because it was inconvenient.** It was **invented** at Inc-5 from a
+  single anecdote (Inc-2b called HILITE↔CYAN at 23.5° "distinct"). Measured against the complete census it is
+  **0.77° from infeasible** — a 43° floor admits the **empty set**; a 40° floor admits a **1.53°** arc. A
+  constraint that barely admits its own answer is not measuring anything; it is a coincidence, and any future
+  chromatic literal anywhere in the app would flip it to unsatisfiable and turn the test red for a reason
+  unrelated to the gauge. Meanwhile **the app ships HILITE↔LBLUE at 0.19°** and **RED↔`#e06c75` at 4.66°** and
+  reads them fine — because hue is not the only discriminator (saturation, value, glyph, and container all
+  carry). A floor two orders of magnitude stricter than the palette applies to itself was never honest.
+- **What replaces it** — two things that are *derived* rather than invented:
+  1. **An anchored sanity floor**, `24.0` — beat **23.5°**, the closest chromatic pair this repo has
+     explicitly measured and accepted. In-repo evidence, not a number picked at a gate. The hue clears it by ~17°.
+  2. **Optimality** (the binding assertion): MAGENTA is the **max-min point of the non-flanked circle**,
+     computed from the census on every run. This is **self-calibrating** — it can never become unsatisfiable,
+     it cannot be gamed by nudging a constant, and if the palette grows it fails with the **new optimum in the
+     message**. It is what binds census and arc so they cannot drift apart again.
+- **The census is now guarded, because hand-curation was the root cause.**
+  `::test_tc079_5c_hue_census_is_complete` sweeps every `#rrggbb` literal in `s19_app/` and requires each to be
+  either **claimed** or **excluded with a written reason** — an omission now fails loudly instead of silently
+  shrinking the universal. Exclusions carry their justification in code (HTML-export palette = a browser
+  surface; `DEPTH_*` = backgrounds at val ≤ 22.7%; achromatic literals below ~20% sat where hue is meaningless).
+  ⚠ **Stated gap:** rich **named** styles (`orange3`, `green`, `red`, `grey50`) are invisible to a hex sweep and
+  remain hand-enumerated; a new named chromatic style would not be caught. Widening the sweep to resolve named
+  colours is the honest next step and is **out of Inc-5b's scope**.
+- **Status:** Amended in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.4; §6.5 Amendment F-1 —
+  Before → After). Frozen-engine diff = 0.
 - **Escalation rides INTENSITY within the one new family**, not three new hues — the smallest addition that
   reads as escalation, and a shape the palette already uses (HILITE/LBLUE are the same hue at 38.6% / 19.4%
   saturation, measured **0.2°** apart). `cap_gauge_style(pct, warn, bad)` → `DGRAY` (room) → `MAGENTA` (≥75%)
@@ -4357,12 +4411,14 @@ amendment of the original all-visible acceptance).
   it would not fit regardless: the gauge's escalation is **one hue at three intensities**, not three hues.
   Different codomain ⇒ a sibling function, not a fork. The four lines of band arithmetic they share do not
   warrant an abstraction.
-- **Validation:** `Automated` — `tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance` (the
-  ≥40° assertion against every claimant + the admissible-arc pin) +
+- **Validation:** `Automated` — `tests/test_tui_patch_json.py::test_tc079_5_magenta_hue_distance` (the anchored
+  floor + the flank rule + the **computed** optimality assertion against every claimant) +
+  `::test_tc079_5c_hue_census_is_complete` (**Inc-5b** — the census is swept, not trusted) +
+  `::test_tc079_5d_flank_rule_has_teeth` (**Inc-5b** — the flank predicate can fire) +
   `::test_tc079_5b_cap_gauge_escalates_without_verdict_hues` (the three bands are mutually distinct AND no
   reachable input returns a verdict hue) + `::test_at079a_gauge_tracks_buffer`.
-- **Status:** Added in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.4; operator-decided). Frozen-engine
-  diff = 0.
+- **Status:** Added in batch `2026-07-16-batch-48` (US-P4 / HLR-079, LLR-079.4; operator-decided); **hue and
+  measurement corrected in Inc-5b** (§6.5 Amendment F-1 Before → After, above). Frozen-engine diff = 0.
 
 ### Docked buttons rendered as colour-grouped chips — batch-48 (R-TUI-076)
 

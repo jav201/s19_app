@@ -77,21 +77,35 @@ CYAN = "#7dd3fc"
 #: cue Amendment F preserved) · PURPLE ``#b565f3`` (kind role / apply chip) ·
 #: CYAN ``#7dd3fc`` (address role / ``.sev-info``) · HILITE (entry chip).
 #:
-#: **MEASURED, not eyeballed** (``tests/test_tui_insight_style.py::
-#: test_tc079_5_magenta_hue_distance``): hue **316.9°**, which is **>= 43.0°**
-#: from every chromatic claimant — its two nearest are RED (43.1°) and PURPLE
-#: (43.1°). For scale, Inc-2b measured HILITE<->CYAN at **23.5°** and accepted
-#: that pair as distinct. Saturation/value (45% / 96%) sit inside the pastel
-#: band the rest of the palette occupies (RED 48/99, PURPLE 58/95, CYAN 50/99).
+#: **MEASURED, not eyeballed** (``tests/test_tui_patch_json.py::
+#: test_tc079_5_magenta_hue_distance``): hue **314.6°**, sat 45%, val 96% — the
+#: pastel band the rest of the palette occupies (RED 48/99, PURPLE 58/95, CYAN
+#: 50/99). Its nearest claimants are ``.band-high``/``only_a`` ``#e06c75``
+#: (**40.7°**) and PURPLE (**40.8°**).
 #:
-#: ⚠ **The admissible hue space is 6.1° wide — do NOT re-pick this by eye.** A
-#: full-circle scan (see the test) finds exactly two arcs clearing 40° from
-#: every claimant: **[313.9°, 320.0°]** (this one) and **[104.9°, 114.8°]** (a
-#: lime). The lime is REJECTED for the same reason Orange was: at ~110° it sits
-#: BETWEEN YELLOW (64.8°) and GREEN (154.8°) — flanked by two verdict hues — so
-#: its larger raw distance (45.0°) buys a worse cue. Distance from the nearest
-#: claimant is not the whole objective; not sitting between two verdicts is.
-MAGENTA = "#f587d6"
+#: ⚠ **Do NOT re-pick this by eye — but read WHY, because the reason changed.**
+#: 40.7° is not a threshold this hue clears; it is the **maximum any hue on the
+#: circle achieves** against the 14 claimants, and this hue is that maximum. The
+#: test asserts optimality, not a floor, so a re-pick by eye will fail with the
+#: correct hue in the message.
+#:
+#: ⚠ **Inc-5 shipped three false claims here; all are corrected above.** It said
+#: **">= 43.0° from every chromatic claimant"** — measured against a complete
+#: census that is not merely false but **unsatisfiable** (nothing reaches 43°).
+#: It cited the test in ``test_tui_insight_style.py``; the test is in
+#: ``test_tui_patch_json.py``. And it documented a "rejected lime arc at
+#: [104.9°, 114.8°]" as its headline finding — **that arc does not exist**; it
+#: was an artifact of omitting rich ``green`` (#008000, 120°, the
+#: ``ValidationSeverity.OK`` style), which sits ~13° from it. The root cause of
+#: all three: Inc-5's hue census was hand-curated and unchecked, and it omitted
+#: ``#e06c75`` — 38.4°, i.e. **below Inc-5's own floor**. The census is now
+#: guarded by ``test_tc079_5c_hue_census_is_complete``.
+#:
+#: **The surviving reasoning, which was right:** distance from the nearest
+#: claimant is a necessary condition, not the objective — **not sitting between
+#: two verdict hues is**. That is what disqualified Orange (37.7°, between RED
+#: and YELLOW), and it is asserted as a computed predicate rather than prose.
+MAGENTA = "#f586da"
 
 #: Navy "depth stack" — four steps from app background to panel border.
 DEPTH_BG = "#0a0e1b"

@@ -3991,8 +3991,19 @@ class PatchEditorPanel(ScrollableContainer):
             (``_GLYPH_STYLE``, the pass/fail strip). ``threshold_style``
             returns exactly those three and is therefore NOT usable here;
             :func:`cap_gauge_style` escalates within the MAGENTA family
-            instead (quiet grey → magenta → bold magenta), whose hue is
-            MEASURED >= 43 deg from every claimant.
+            instead (quiet grey → magenta → bold magenta), whose hue is the
+            MEASURED optimum against the full app-wide claimant census
+            (``test_tc079_5*``): no hue on the circle separates further from
+            every claimed hue than MAGENTA does.
+            ⚠ The earlier ">= 43 deg from every claimant" wording here was
+            FALSE and is retracted (Inc-5b). It was not merely wrong — it was
+            UNSATISFIABLE: against the complete census the best any hue
+            achieves is 40.77 deg, so no colour could have satisfied it. It
+            "passed" only because the census omitted the hues that would have
+            failed it. The binding assertion is now optimality plus an
+            ANCHORED floor (24 deg — beating the 23.5 deg pair the app already
+            ships and reads fine), which is self-calibrating and cannot go
+            unsatisfiable. See REQUIREMENTS.md §6.5 Amendment F-1.
 
         Args:
             used_chars (int): The buffer's current ``len(text)``. Read from

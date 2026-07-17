@@ -450,3 +450,177 @@ budget at 120×30 is the binding constraint and it is now measured three times o
 - [✓] **File count within cap** — **5 of 5** code/test + 2 briefed docs (`REQUIREMENTS.md` §6.5 amendments,
   this record). The 6th file (`test_tui_insight_style.py`) was **declined**, not silently taken.
 - [✓] **Review packet attached** — in-conversation.
+
+---
+
+# Inc-5b — closing the HIGH the Inc-5 review blocked on
+
+> ⚠ **Everything above this line about the gauge hue is superseded.** §5's
+> "`MAGENTA #f587d6`, hue 316.9°, ≥43.0° from every claimant" and §272's ruling record are **measurably
+> false**. They are left in place as the record of what was claimed; this section is what is true.
+
+## 1. What changed
+
+**F1 [HIGH] — the hue census was incomplete, and the omission broke Inc-5's own 40° floor.**
+`#e06c75` (`.band-high` at `styles.tcss:579` + `AbDiffPanel._KIND_MARKUP["only_a"]` at
+`screens_directionb.py:4269` — **my own module**) sits **38.44°** from `#f587d6`, i.e. **below**
+`_MIN_HUE_SEPARATION_DEG = 40.0`. `test_tc079_5_magenta_hue_distance` passed **only because its census
+omitted the hue that would fail it**.
+
+This is a **new class** for this batch: not a vacuous *assertion* (the arithmetic was exact) but a
+**vacuous INPUT SET**. Mutating the code under test cannot catch it — the mutant passes. A test that
+certifies a false universal is the artifact everyone cites later instead of re-measuring; that is why a
+cosmetic risk blocked.
+
+**The sweep found more than the review did.** Mechanically extracting every `#rrggbb` in
+`s19_app/**/*.{py,tcss}` (29 distinct literals) and resolving rich's named styles surfaced **three** further
+Inc-5 errors:
+
+| # | Inc-5 claim | Truth |
+| --- | --- | --- |
+| 1 | `orange3` = `#d75f00` (26.5°) | Rich resolves `orange3` → **`#d78700` (37.7°)**. `#d75f00` is `darkorange3`. **I measured a hue the app never paints.** |
+| 2 | Rich **named** severity styles absent from the census | `app.py::_SEVERITY_TO_RICH_STYLE` + `_MAC_GLYPH_*` paint `green` = **`#008000` (120°)** — *not* `GREEN #54efae` (154.8°) — and `red` = `#800000`. |
+| 3 | "Rejected lime arc [104.9°, 114.8°], min-dist 45.0°" — **my headline finding** | **The arc does not exist.** It was an artifact of omission #2: rich `green` sits ~13° from it and rules it out on distance alone. With the census complete, the global and admissible optima are the **same point** — this magenta. My prose reasoning was right; every number attached to it was wrong. |
+
+**And the shipped claim was not just false — it was unsatisfiable.** `≥43.0° from every chromatic claimant`
+(`insight_style.py:81-82`, §6.5 Amd F-1, the commit message) describes a property **no colour can have**:
+against the complete census the best any hue on the circle achieves is **40.77°**.
+
+Also corrected: `insight_style.py:81` cited the test in `tests/test_tui_insight_style.py`. It is in
+`tests/test_tui_patch_json.py`. That file exists, so the citation read as plausible.
+
+## 2. The census, and how it was swept (not hand-curated)
+
+**14 claimants**, each with its live site. The three Inc-5 omitted: `#e06c75` (355.3°), `#4ec9d4` (184.9°),
+`#5fb98a` (148.7°); plus corrected `orange3` and the two rich named styles.
+
+**The fix is not "add the missing entries" — that is just hand-curating again, which is what failed.**
+`::test_tc079_5c_hue_census_is_complete` sweeps every `#rrggbb` in `s19_app/` and requires each to be
+**claimed** or **excluded with a written reason**. Exclusions carry their justification *in code*:
+
+- **HTML diff-report palette** (8 literals, `diff_report_service.py`) — a **browser** surface, never the TUI; shares no container with the gauge.
+- **`DEPTH_*` navy stack** (4) — **backgrounds** at val ≤ 22.7%; hue is only confusable on a foreground cue.
+- **Achromatic** (5) — below ~20% sat, hue is not a meaningful coordinate. (LBLUE is 19.4% and is nonetheless **claimed**: claimed beats excluded.)
+
+A sweep alone would be the *wrong* instrument — it cannot tell a live rule from a commented-out one
+(`styles.tcss` says `was #4ec9d4` beside a live `#4ec9d4`) and cannot see named colours. So the census stays
+hand-written **and checkable**: a new literal lands in neither dict and the guard fails, forcing a human to
+classify it rather than letting it be omitted in silence.
+
+**Named colours are RESOLVED, not transcribed.** `_named_hex()` calls `rich.color.Color.parse(...)`, so
+`orange3` is whatever rich says it is. Transcribing by hand is exactly how Inc-5 recorded `#d75f00` and
+measured a hue the app never paints; the app *names* these colours, so rich's resolver is the only oracle for
+what they paint.
+
+⚠ **Stated gap, not papered over:** rich named styles are invisible to a hex *sweep*, so the SET of names
+(`orange3`, `green`, `red`) is still hand-enumerated — their **values** are resolved, but a **new** named
+chromatic style added elsewhere would not be caught. Widening the sweep to detect named-colour literals is the
+honest next step; **out of Inc-5b's scope**.
+
+**⚠ One error caught in my own Inc-5b code, mid-increment.** The first draft of this census hardcoded
+`"#d78700"` under a comment claiming the value was "resolved via `rich.color.Color.parse`". That is the **F2
+defect verbatim** — prose describing code that does not exist — committed by me while fixing F2. Found by
+re-reading my own diff against its claims rather than by a test. Fixed by making the claim true (`_named_hex`),
+not by softening the comment. Two further self-caught slips: `#e9e9e9` and `#c5c7d2` were excluded as "FG body
+text" / "muted text"; they are `VALUE` and `LABEL`. Plausible-sounding, wrong — the same class, verified by
+grepping each exclusion against its real site instead of trusting the reason I had written.
+
+## 3. The computed arc — the load-bearing half
+
+Inc-5 hardcoded `assert 313.9 <= h <= 320.0` while the *rule* lived in prose. **That decoupling IS the
+mechanism of the bug**: census and arc were two hand-maintained constants with nothing binding them, so when
+the census turned out wrong the arc did not move and nothing went red.
+
+`_admissible_optimum()` now scans the circle at 0.01° against the census on every run, and
+`_is_verdict_flanked()` encodes the actual objective as a predicate. Verdict hues partition the circle into
+arcs of 64.8° / 90.0° / 205.2°; a hue is *flanked* iff it sits in an arc narrower than a semicircle — the two
+narrow ones. That rejects Orange (37.7°, RED→YELLOW) and would have rejected the lime (YELLOW→GREEN) had it
+existed. `::test_tc079_5d_flank_rule_has_teeth` proves the predicate can fire.
+
+**Measured:** global max-min = admissible max-min = **314.57°, 40.77°**, not flanked.
+
+## 4. The final hue
+
+**`MAGENTA = "#f586da"`** — hue **314.59°**, sat **45.3%**, val **96.1%**, min-dist **40.75°** (max available:
+40.77°; shortfall 0.02°). One hex digit per channel off `#f587d6`; sat/val essentially unchanged (was
+44.9/96.1), so it stays visually magenta and inside the pastel band (RED 48/99, PURPLE 58/95, CYAN 50/99).
+
+Against the **full 14-entry** census: `#e06c75` **40.75** · PURPLE **40.81** · RED 45.39 · rich red 45.39 ·
+`.mac_out_of_range` 79.68 · orange3 83.07 · HILITE 91.75 · LBLUE 91.94 · YELLOW 110.21 · CYAN 115.24 ·
+`only_b` 129.68 · GREEN 159.77 · rich green 165.39 · `.band-low` 165.94.
+
+**I did not take the reviewer's `#f587da` on trust.** Measured: hue 314.73°, min-dist **40.62°** — it clears,
+but it is 0.13° off the optimum. `#f586da` is the computed max-min point.
+
+## 5. Judgment on the 40° floor — I invented it, and it should go
+
+**It is over-strict and it was never honest.** Evidence:
+
+1. **Invented from one anecdote.** Inc-2b called HILITE↔CYAN at 23.5° "the closest pair, still distinct". I turned that into "≥40" at a gate. Nothing derives 40.
+2. **It is 0.77° from infeasible.** A 43° floor admits the **empty set**; 40° admits a **1.53°** arc. A constraint that barely admits its own answer measures nothing — it is a coincidence. Any future chromatic literal anywhere in the app flips it to unsatisfiable and turns this test red for a reason unrelated to the gauge.
+3. **It is ~200× stricter than the palette applies to itself.** The app ships **HILITE↔LBLUE at 0.19°** (same hue, different saturation) and **RED↔`#e06c75` at 4.66°** and reads them fine — because hue is not the only discriminator (saturation, value, glyph, container all carry). As the review notes, `#e06c75` and RED are **the same red family 4.7° apart**, so the real constraint from "reds" is just *the nearest red*.
+
+**What replaces it** — both *derived*, neither invented:
+
+1. **Anchored sanity floor `24.0`:** beat **23.5°**, the closest chromatic pair this repo has explicitly measured and accepted. In-repo evidence rather than a gate-time number. The hue clears it by ~17°.
+2. **Optimality (binding):** MAGENTA is the **max-min point of the non-flanked circle**, recomputed from the census every run. **Self-calibrating** — cannot become unsatisfiable, cannot be gamed by nudging a constant, and if the palette grows it fails **with the new optimum in the message**. This is what binds census and arc so they cannot drift apart again.
+
+**⚠ This needs a §6.5 amendment and I have written one** — Amd F-1 said ≥43°. Recorded as a Before → After
+table (`REQUIREMENTS.md` §6.5 Amendment F-1), listing all eight false claims and the floor's withdrawal with
+its rationale.
+
+**Note I did not pick the green option.** Keeping 40 and nudging the hue *also* passes — that was the
+lower-effort path. I moved the hue **and** withdrew the floor because the artifacts must state what is true,
+and "≥40°" was not.
+
+## 6. F2 [MEDIUM] — the colour axis, and why the fix needed a new test
+
+`_assert_payload_is_inert` checked `link` / `bold` / `italic` and **never read `style.color`**, while four
+documents (incl. its own closing docstring line, describing `_style_colors` code it never called) claimed a
+colour axis. Confirmed: the Inc-5 predicate **PASSES** `[('[red]PWNED[/red]', Style(color='red'))]`.
+
+**Not a false green** — every payload reaching a real markup parser gets *consumed*, so the verbatim axis
+carried the gate. But that is **the Inc-1b rule exactly** (*assert `plain` verbatim AND spans, or the fix is
+guarded by accident*), and it was accidental in precisely that way. Realistic escape: a highlighter that
+**styles** `[red]` without **consuming** it (a regex tokenizer extension) paints verbatim and meets no colour
+check.
+
+**Disposition: added the axis** (not deleted the claims). `permitted = _style_colors(control_segments) |
+_TOKEN_HUES`, both read from source (`_TOKEN_HUES` derives from `json_highlight._JSON_SYNTAX_STYLES`) so a
+re-theme moves oracle and code together.
+
+⚠ **The axis needed its own arm, and this is the important part.**
+`test_tc079_3_c17_oracle_discriminates` **cannot** certify it: its unsafe buffer *consumes* the markup, so the
+predicate fails on the **verbatim** axis and would fail identically with no colour check at all — **which is
+exactly how Inc-5 shipped a documented-but-absent axis with no test noticing**. Certifying a new axis with an
+arm that cannot isolate it would repeat this batch's signature defect one level up. So
+`::test_tc079_3b_inert_predicate_colour_axis_discriminates` probes the axis directly against the
+verbatim-but-styled escape. Mutation M5 confirms it is the **only** test that fails when the axis is gutted.
+
+## 7. F3 / F4
+
+- **F3 ✓** — `test_tui_patch_checks_strip.py:748` now reads `PatchEditorPanel._CHECK_STRIP_BAR_CELLS` instead of hardcoding `1 + 7`. Same discipline as the arc: a hardcoded copy of a value the code owns keeps passing after the constant moves, then certifies the **old** geometry.
+- **F4 ✗ DEFERRED, not dropped.** Its site is `screens_directionb.py:2329` — a **6th** file. Both F3/F4 were LOW "fold if clean"; busting the cap for a comment is not clean. F3 was preferred because it is an anti-drift *binding*, whereas F4 documents a non-defect — and F4's claim (4-digit counts wrap to 3 lines token-cleanly) is one I would have to **verify** before asserting, which is more scope, not less. **Carried to Batch B.**
+
+## 8. Files modified (5 of 5)
+
+1. `tests/test_tui_patch_json.py` — census + guard + computed arc + flank rule + F2 axis + its arm
+2. `s19_app/tui/insight_style.py` — `MAGENTA` `#f587d6` → `#f586da`; all three false claims corrected
+3. `REQUIREMENTS.md` — §6.5 Amd F-1 Before → After; Amd E's "both axes" corrected
+4. `tests/test_tui_patch_checks_strip.py` — F3
+5. `.dev-flow/2026-07-16-batch-48/03-increments/increment-05.md` — this section
+
+## 9. Post-mortem — the root cause is one gap, seen twice
+
+Inc-5's defect and F2's defect are **the same failure**: *a claim in prose, with nothing binding it to the
+code*. The arc was prose whose precomputed output was asserted; the colour axis was prose with no
+implementation. Both survived review because both **read** as measured.
+
+The general control this suggests (**not encoding it — that needs operator approval**, per the standing rule):
+
+> **When a test certifies a UNIVERSAL ("X is true of EVERY Y"), the input set Y is itself an oracle and must
+> be derived or guarded — never hand-listed.** Code mutation cannot test an input set: the mutant passes. This
+> is a distinct class from vacuous assertions (C-10) and belongs beside it.
+
+Instances: this increment (hue census); batch-47 Inc-3 (deleted the micro-bar's only oracle); the Select-label
+sweep (a C-15 probe fixed **one** site of a class in batch-33 — a missed sweep, then three re-discoveries).

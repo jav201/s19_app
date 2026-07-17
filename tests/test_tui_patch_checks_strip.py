@@ -745,7 +745,14 @@ def test_tc078_5_strip_geometry_painted(tmp_path: Path) -> None:
             f"glyph reads as a label on the bar"
         )
         # Line 2 is the bar ALONE — no count fragment wrapped onto it.
-        assert painted1.strip() == MICROBAR_FILLED + MICROBAR_EMPTY * 7, (
-            f"{size}: line 2 must be the bar alone (12 of 102 passed -> 1 of 8 "
-            f"cells); got {painted1!r}"
+        # 12 of 102 passed -> 11.8% -> 1 filled cell, the rest empty. The width
+        # is READ from the widget (Inc-5b F3) rather than spelled "1 + 7": a
+        # hardcoded copy of a value the code owns is the same bind-the-literal
+        # defect as Inc-5's hardcoded hue arc — it keeps passing after the
+        # constant moves, and then certifies the OLD geometry.
+        bar_cells = PatchEditorPanel._CHECK_STRIP_BAR_CELLS
+        expected_bar = MICROBAR_FILLED + MICROBAR_EMPTY * (bar_cells - 1)
+        assert painted1.strip() == expected_bar, (
+            f"{size}: line 2 must be the bar alone (12 of 102 passed -> 1 of "
+            f"{bar_cells} cells); got {painted1!r}"
         )

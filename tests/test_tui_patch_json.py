@@ -76,7 +76,11 @@ from __future__ import annotations
 
 import asyncio
 import colorsys
+import pathlib
+import re
 
+from rich.color import Color
+from rich.style import Style
 from rich.text import Text
 from textual.app import App, ComposeResult
 from textual.widgets import Static, TextArea
@@ -95,6 +99,7 @@ from s19_app.tui.insight_style import (
     cap_gauge_style,
 )
 from s19_app.tui.json_highlight import (
+    _JSON_SYNTAX_STYLES,
     JsonHighlightTextArea,
     highlights_supported,
     tokenize_json_line,
@@ -224,8 +229,23 @@ def _style_colors(segments: list[tuple[str, object]]) -> set[str]:
     return colors
 
 
+#: The hues the JSON highlighter legitimately paints, READ FROM THE HIGHLIGHTER
+#: rather than restated. A payload wearing one of these is not evidence of
+#: injection (payload 5 is genuine JSON and correctly highlights); a payload
+#: wearing anything else is. Bound to the source dict so a re-theme of the
+#: highlighter cannot silently widen or narrow this oracle.
+_TOKEN_HUES = {
+    style.color.name
+    for style in _JSON_SYNTAX_STYLES.values()
+    if style.color is not None
+}
+
+
 def _assert_payload_is_inert(
-    segments: list[tuple[str, object]], payload: str, where: str
+    segments: list[tuple[str, object]],
+    payload: str,
+    where: str,
+    control_segments: list[tuple[str, object]],
 ) -> None:
     """AT-079c's predicate: ``payload`` painted VERBATIM and carrying NO style
     of its own.
@@ -238,8 +258,33 @@ def _assert_payload_is_inert(
       the silent case, where the text survives but `PWNED` comes out red, or
       `click` comes out as a live link.
 
-    Asserted against the CONTROL line's own painted colour, so the reference is
-    what this widget paints for trusted text rather than a hardcoded hex.
+    ⚠ **Inc-5b added the COLOUR axis, which Inc-5 documented but never wrote.**
+    Inc-5's version checked ``link`` / ``bold`` / ``italic`` and stopped — it
+    never read ``style.color`` — yet this docstring's closing line described
+    comparing against the control line's painted colour, and three further
+    artifacts (§6.5 Amendment E's "fails on both axes", the AT-079c notes, the
+    commit message) claimed a colour check that did not exist. Measured: the
+    Inc-5 predicate PASSES on ``[('[red]PWNED[/red]', Style(color='red'))]`` —
+    text verbatim, painted red, no complaint.
+
+    This was **not** a false green: the gate discriminated via the verbatim axis,
+    because every payload that reaches a real markup parser gets CONSUMED. But
+    that is the Inc-1b rule exactly — *assert plain verbatim AND spans, or the
+    fix is guarded by accident* — and it was accidental in precisely that way. A
+    realistic escape: a highlighter extension that STYLES ``[red]`` without
+    CONSUMING it (a regex tokenizer that colours bracket runs) paints verbatim
+    and meets no colour check.
+
+    The reference is the CONTROL line's own painted colours plus the legitimate
+    token hues, so the oracle is what this widget paints for TRUSTED text rather
+    than a hardcoded hex — a restyle moves both sides together.
+
+    Args:
+        segments: ``(text, style)`` pairs from ``_render_line`` for the payload.
+        payload: The hostile string that must survive verbatim and inert.
+        where: Human label for assertion messages.
+        control_segments: The same, for the trusted CONTROL line — the colour
+            reference. Without it a colour assertion would need a hardcoded hex.
     """
     painted = "".join(text for text, _ in segments)
     assert payload in painted, (
@@ -247,6 +292,10 @@ def _assert_payload_is_inert(
         f"{payload!r} is absent from {painted.rstrip()!r} — a markup parser "
         f"consumed it"
     )
+    # Colours the widget legitimately paints for TRUSTED text: the control
+    # line's own, plus the JSON token hues (payload 5 is real JSON, so its keys
+    # and strings correctly colour — that is highlighting, not injection).
+    permitted = _style_colors(control_segments) | _TOKEN_HUES
     for text, style in segments:
         if not text.strip() or style is None:
             continue
@@ -256,6 +305,14 @@ def _assert_payload_is_inert(
         )
         assert not style.bold and not style.italic, (
             f"{where}: payload-derived emphasis on {text!r}"
+        )
+        if style.color is None:
+            continue
+        assert style.color.name in permitted, (
+            f"{where}: payload-derived COLOUR {style.color.name!r} on {text!r}. "
+            f"The widget paints trusted text in {sorted(permitted)!r}; this hue "
+            f"came from the payload's own markup, i.e. a parser HONOURED it "
+            f"without consuming it"
         )
 
 
@@ -302,7 +359,10 @@ def test_at079c_hostile_paste_renders_literally() -> None:
 
     for payload in _PAYLOADS:
         _assert_payload_is_inert(
-            painted[payload], payload, f"payload {payload!r}"
+            painted[payload],
+            payload,
+            f"payload {payload!r}",
+            painted["__control__"],
         )
 
     # The token hues may NOT be attributed to a payload's own bracket text.
@@ -376,16 +436,16 @@ def test_tc079_3_c17_oracle_discriminates() -> None:
                 '{"control": 1}\n[red]PWNED[/red]', id="unsafe"
             )
 
-    async def _run() -> list[tuple[str, object]]:
+    async def _run() -> tuple[list[tuple[str, object]], list[tuple[str, object]]]:
         app = _Host()
         async with app.run_test(size=(80, 24)) as pilot:
             await pilot.pause()
             widget = app.query_one("#unsafe", _UnsafeMarkupTextArea)
             _assert_no_wrapping(widget)
             _assert_off_cursor_line(widget, 1)
-            return _segments(widget, 1)
+            return _segments(widget, 1), _segments(widget, 0)
 
-    unsafe_segments = asyncio.run(_run())
+    unsafe_segments, control_segments = asyncio.run(_run())
 
     # The unsafe buffer really did honour the markup — measured, not assumed.
     painted = "".join(text for text, _ in unsafe_segments)
@@ -405,7 +465,10 @@ def test_tc079_3_c17_oracle_discriminates() -> None:
     # ...and the AT-079c predicate REJECTS it. This is the whole point.
     try:
         _assert_payload_is_inert(
-            unsafe_segments, "[red]PWNED[/red]", "positive control"
+            unsafe_segments,
+            "[red]PWNED[/red]",
+            "positive control",
+            control_segments,
         )
     except AssertionError:
         pass
@@ -414,6 +477,49 @@ def test_tc079_3_c17_oracle_discriminates() -> None:
             "AT-079c's predicate PASSED a markup-parsing buffer — the oracle "
             "cannot fail and is therefore non-evidence, which is exactly the "
             "defect this arm exists to prevent recurring"
+        )
+
+
+def test_tc079_3b_inert_predicate_colour_axis_discriminates() -> None:
+    """The COLOUR axis of the inert predicate fires on its own (Inc-5b).
+
+    ⚠ **This arm is the reason Inc-5b's F2 fix is a fix and not a gesture.**
+    ``test_tc079_3_c17_oracle_discriminates`` cannot certify the colour axis: its
+    unsafe buffer CONSUMES the markup, so the predicate already fails on the
+    VERBATIM axis and would fail identically with no colour check at all — which
+    is precisely how Inc-5 shipped a documented-but-absent colour axis without
+    any test noticing. Adding an axis and certifying it with an arm that cannot
+    isolate it would repeat this batch's signature defect one level up.
+
+    So this probes the axis directly, against the realistic escape the axis
+    exists to catch: a highlighter that STYLES ``[red]`` without CONSUMING it (a
+    regex tokenizer extension that colours bracket runs). Such a renderer paints
+    the payload verbatim — passing the verbatim axis — and is caught only here.
+    """
+    control = [('{"control": 1}', Style(color=LBLUE))]
+    payload = "[red]PWNED[/red]"
+
+    # Sanity: a renderer that paints the payload verbatim and INERT passes. If
+    # this raised, the arm below would prove nothing about the colour axis.
+    _assert_payload_is_inert(
+        [(payload, Style(color=LBLUE))], payload, "inert probe", control
+    )
+
+    # The escape: verbatim, but wearing a hue the widget never paints.
+    try:
+        _assert_payload_is_inert(
+            [(payload, Style(color="red"))], payload, "styled probe", control
+        )
+    except AssertionError as exc:
+        assert "COLOUR" in str(exc), (
+            f"the predicate rejected the styled probe, but not via the colour "
+            f"axis — got {exc}. The axis is still unproven"
+        )
+    else:
+        raise AssertionError(
+            "the inert predicate PASSED a payload painted in a hue the widget "
+            "never paints for trusted text. This is the Inc-5 F2 defect "
+            "recurring: the colour axis is documented but not enforced"
         )
 
 
@@ -635,10 +741,41 @@ def _hue_distance(a: float, b: float) -> float:
     return min(delta, 360.0 - delta)
 
 
-#: Every hue already claimed inside the app, with what claims it. Orange is
-#: included as TWO entries because Amendment F re-scoped it to a MAC-specific
-#: cue rather than removing it: `orange3` (the `⚠` record glyph + the frozen
-#: `MAC_ADDRESS_OVERLAY_STYLE`) and `#d9a35b` (`.mac_out_of_range`).
+def _named_hex(name: str) -> str:
+    """Resolve a rich colour NAME (``"orange3"``) to ``#rrggbb`` via rich itself.
+
+    ⚠ Resolved, never transcribed. Inc-5 hand-wrote ``orange3`` as ``#d75f00``
+    and measured a hue **the app never paints** — ``#d75f00`` is
+    ``darkorange3``; rich resolves ``orange3`` to ``#d78700``, 11deg away. The
+    app names these colours, so the app's own resolver is the only oracle for
+    what they paint.
+    """
+    rgb = Color.parse(name).get_truecolor()
+    return f"#{rgb.red:02x}{rgb.green:02x}{rgb.blue:02x}"
+
+
+#: Every chromatic hue painted anywhere in the app, with its LIVE site.
+#:
+#: ⚠ **Inc-5b: this census was WRONG and the error was invisible.** Inc-5 shipped
+#: a nine-entry hand-curated list that OMITTED ``#e06c75`` — which sits 38.4deg
+#: from the hue this test certifies, i.e. BELOW Inc-5's own 40deg floor. The test
+#: passed only because its INPUT SET omitted the input that would fail it: a
+#: vacuous input set, not a vacuous assertion (the arithmetic was exact). No
+#: mutation of the code under test can catch that — the mutant passes too. The
+#: fix is therefore NOT "add the missing entry"; it is
+#: :func:`test_tc079_5c_hue_census_is_complete`, which mechanically proves this
+#: dict accounts for every colour literal in ``s19_app/``. Hand-curation is fine;
+#: UNCHECKED hand-curation is what failed.
+#:
+#: Two further Inc-5 errors this census corrects, both found by that sweep:
+#:
+#: * ``orange3`` was recorded as ``#d75f00`` (26.5deg). Rich resolves ``orange3``
+#:   to **#d78700 (37.7deg)**; ``#d75f00`` is ``darkorange3``. Inc-5 measured a
+#:   colour the app never paints.
+#: * The rich NAMED severity styles (``app.py::_SEVERITY_TO_RICH_STYLE`` and the
+#:   ``_MAC_GLYPH_*`` pairs) were omitted wholesale. ``green`` is **#008000
+#:   (120deg)** — NOT ``GREEN`` ``#54efae`` (154.8deg). This omission is what
+#:   invented the "rejected lime arc" (see the test docstring).
 _CLAIMED_HUES = {
     "RED (verdict)": RED,
     "YELLOW (verdict + app-wide warning)": YELLOW,
@@ -647,69 +784,303 @@ _CLAIMED_HUES = {
     "HILITE (entry chip)": HILITE,
     "LBLUE (json.string / secondary)": LBLUE,
     "PURPLE (kind role / apply chip)": PURPLE,
-    "orange3 (MAC record glyph + hex overlay)": "#d75f00",
-    "mac_out_of_range (Sections labels)": "#d9a35b",
+    # Amendment F re-scoped Orange to MAC-specific cues rather than removing it,
+    # so it is claimed at BOTH of its surviving sites (orange3 is resolved below).
+    "mac_out_of_range (Sections labels; styles.tcss:526)": "#d9a35b",
+    # The three Inc-5 omitted. #e06c75 is the one that breaks Inc-5's floor.
+    "band-high + AbDiffPanel only_a (tcss:579, screens_directionb.py:4269)": "#e06c75",
+    "AbDiffPanel only_b (screens_directionb.py:4270)": "#4ec9d4",
+    "band-low (styles.tcss:571)": "#5fb98a",
+    # Rich NAMED styles: not hex, so the source sweep cannot see them. RESOLVED
+    # through rich rather than transcribed — transcribing is how Inc-5 recorded
+    # orange3 as #d75f00 (darkorange3) and measured a hue the app never paints.
+    "orange3 (MAC ⚠ glyph + frozen MAC_ADDRESS_OVERLAY_STYLE)": _named_hex("orange3"),
+    "rich 'green' (ValidationSeverity.OK + ✓ MAC glyph)": _named_hex("green"),
+    "rich 'red' (ValidationSeverity.ERROR + ✗ MAC glyph)": _named_hex("red"),
 }
 
-#: The operator's constraint, as a number: the gauge's hue must not be
-#: confusable with ANY claimant. Inc-2b measured HILITE<->CYAN at 23.5deg and
-#: accepted that pair as "closest, still distinct", so 40 is comfortable.
-_MIN_HUE_SEPARATION_DEG = 40.0
+#: Colour literals in ``s19_app/`` that are deliberately NOT hue claimants, each
+#: with the reason. The completeness guard requires every swept literal to be
+#: either claimed above or excluded HERE — an omission fails the guard rather
+#: than silently shrinking the census, which is precisely the Inc-5 defect.
+_EXCLUDED_LITERALS = {
+    # --- HTML diff-report export: rendered by a BROWSER, never by the TUI. It
+    # is a separate document with its own (solarized) palette and shares no
+    # container with the gauge, so hue collision there is not confusable.
+    "#b58900": "diff_report_service HTML export — browser surface, not the TUI",
+    "#dc322f": "diff_report_service HTML export — browser surface, not the TUI",
+    "#268bd2": "diff_report_service HTML export — browser surface, not the TUI",
+    "#ffd54d": "diff_report_service HTML changed-byte span — browser surface",
+    "#fdf6e3": "diff_report_service HTML body background — browser surface",
+    "#073642": "diff_report_service HTML body text — browser surface",
+    "#93a1a1": "diff_report_service HTML table borders — browser surface",
+    "#000000": "diff_report_service HTML kind fallback + changed-byte contrast",
+    # --- DEPTH_* navy stack: BACKGROUNDS at value <= 22.7%. A hue is only
+    # confusable when it paints a foreground cue; these are near-black fills
+    # behind every cue, including the gauge.
+    "#0a0e1b": "DEPTH_BG — background fill (val 10.6%), not a foreground cue",
+    "#0f1525": "DEPTH_PANEL — background fill (val 14.5%), not a foreground cue",
+    "#131a2c": "DEPTH_ODD_ROW — background fill (val 17.3%), not a foreground cue",
+    "#1b233a": "DEPTH_BORDER — border fill (val 22.7%), not a foreground cue",
+    # --- Achromatic / near-achromatic: hue is not a meaningful coordinate below
+    # ~20% saturation — these read as grey, so no hue distance protects anything.
+    # (LBLUE is 19.4% and is nonetheless CLAIMED above: claimed beats excluded.)
+    "#ffffff": "achromatic (sat 0%) — AbDiffPanel unknown-kind fallback",
+    "#e9e9e9": "achromatic (sat 0%) — insight_style.VALUE",
+    "#c5c7d2": "near-achromatic (sat 6.2%) — insight_style.LABEL",
+    "#969aad": "near-achromatic (sat 13.3%) — insight_style.DGRAY",
+    "#6b7280": "near-achromatic (sat 16.4%) — .band-constant / truncation note",
+}
+
+#: The floor, and it is NOT the constraint — see the test docstring. Anchored to
+#: a measurement the repo already made and accepted rather than to a number
+#: invented at the gate: Inc-2b measured HILITE<->CYAN at **23.5deg** and ruled
+#: that pair "closest, still distinct". The gauge must beat the closest pair the
+#: app already ships and accepts. It clears this by ~17deg; the binding
+#: constraints are the flank rule and the optimality assertion below.
+_MIN_HUE_SEPARATION_DEG = 24.0
+
+#: How far MAGENTA may fall short of the provable optimum (quantisation slack on
+#: the 0.01deg scan + the 8-bit sRGB grid the hex must land on).
+_HUE_OPTIMALITY_TOLERANCE_DEG = 0.25
+
+
+def _min_claimed_distance(hue: float) -> tuple[float, str]:
+    """The nearest claimant to ``hue``: its distance in degrees, and its name."""
+    claimant, hex_color = min(
+        _CLAIMED_HUES.items(),
+        key=lambda kv: _hue_distance(hue, _hue_degrees(kv[1])),
+    )
+    return _hue_distance(hue, _hue_degrees(hex_color)), claimant
+
+
+def _is_verdict_flanked(hue: float) -> bool:
+    """Whether ``hue`` sits BETWEEN two verdict hues — the actual objective.
+
+    The three verdict hues partition the circle into three arcs. Two of them are
+    narrow (RED->YELLOW 64.8deg, YELLOW->GREEN 90.0deg); a hue inside either is
+    read against a verdict on BOTH sides, which is what disqualified Orange. The
+    third arc (GREEN->RED) is 205.2deg — the open field, where a hue has no
+    verdict flanking it in any useful sense. So: flanked iff inside an arc
+    narrower than a semicircle.
+    """
+    verdicts = sorted({_hue_degrees(c) for c in (RED, YELLOW, GREEN)})
+    for index, low in enumerate(verdicts):
+        high = verdicts[(index + 1) % len(verdicts)]
+        width = (high - low) % 360.0
+        if width >= 180.0:
+            continue
+        if (hue - low) % 360.0 < width:
+            return True
+    return False
+
+
+def _admissible_optimum(step: float = 0.01) -> tuple[float, float]:
+    """Scan the circle: the non-flanked hue FARTHEST from every claimant.
+
+    Returns:
+        tuple[float, float]: ``(hue_degrees, distance_to_nearest_claimant)``.
+    """
+    best_hue, best_distance = 0.0, -1.0
+    for tick in range(int(360.0 / step)):
+        hue = tick * step
+        if _is_verdict_flanked(hue):
+            continue
+        distance, _ = _min_claimed_distance(hue)
+        if distance > best_distance:
+            best_hue, best_distance = hue, distance
+    return best_hue, best_distance
 
 
 def test_tc079_5_magenta_hue_distance() -> None:
-    """The gauge's hue is >= 40deg from EVERY claimed hue (operator ruling).
+    """The gauge's hue is the PROVABLY most-separated hue the palette allows.
 
-    ⚠ **MEASURED, not eyeballed — and the measurement changed the answer.**
-    The ruling authorised a new hue for the cap gauge (the first this batch)
-    because the palette is at capacity, but constrained it: it must NOT reuse
-    GREEN/YELLOW/RED, so nothing in ``#patch_editor_panel`` can be misread as a
-    VERDICT, and it must not be confusable with anything else either.
+    ⚠ **Inc-5b rewrote this test, and the rewrite is the point.** Inc-5's
+    version hardcoded its verdict — ``assert 313.9 <= h <= 320.0`` — while the
+    RULE that produced those numbers lived only in prose. Census and arc were
+    two hand-maintained constants with nothing binding them, so when the census
+    turned out to be missing ``#e06c75`` (38.4deg away, under Inc-5's own 40deg
+    floor) the arc did not move and nothing went red. This version COMPUTES the
+    arc from the census on every run: the two cannot drift apart again.
 
-    **Orange was rejected up front** — it looks free inside the patch panel but
-    at ~26deg it sits BETWEEN RED (0deg) and YELLOW (65deg), the two hues most
-    confusable with a verdict, and it is the MAC cue Amendment F preserved.
+    **What the operator actually ruled** is two clauses, and only one of them is
+    a distance:
 
-    **The same test rejects the global optimum**, which is the finding worth
-    keeping: a full-circle scan shows only TWO arcs clear 40deg from every
-    claimant — **[313.9, 320.0]** (magenta) and **[104.9, 114.8]** (a lime).
-    The lime's minimum distance is LARGER (45.0 vs 43.1), and it is still
-    wrong: at ~110deg it sits between YELLOW (65deg) and GREEN (155deg) —
-    flanked by two verdict hues, the exact geometry that disqualified Orange.
-    Distance from the nearest claimant is a necessary condition, not the
-    objective; "not sitting between two verdicts" is the objective.
+    1. The gauge must never paint a VERDICT hue — nothing inside
+       ``#patch_editor_panel`` may be misread as "check passed / failed".
+    2. It must not be confusable with anything else the app paints.
 
-    The admissible arc is **6.1deg wide**, which is why this is a test and not
-    a comment: MAGENTA cannot be re-picked by eye without re-running this.
+    **The objective is the FLANK RULE, not the floor.** Orange is the worked
+    example: it looks free inside the patch panel, but at 37.7deg it sits
+    between RED (0deg) and YELLOW (64.8deg) — a verdict on each side. That is
+    what disqualifies it, and no distance threshold expresses it.
+    :func:`test_tc079_5d_flank_rule_has_teeth` proves this predicate can fire.
+
+    **Why the 40deg floor is gone (Inc-5b, deliberate — not to make this pass).**
+    Inc-5 invented ">= 40deg" from a single anecdote (Inc-2b called HILITE<->CYAN
+    at 23.5deg "distinct"), and three shipped artifacts hardened it into
+    ">= 43.0deg from every chromatic claimant". Measured against the COMPLETE
+    census, that claim is not merely false — it is **unsatisfiable**: the best
+    any hue on the circle achieves is **40.77deg**. A 43deg floor admits the
+    empty set; a 40deg floor admits a 1.53deg arc, i.e. it sits 0.77deg from
+    infeasible and constrains nothing — it just happens to admit its own answer.
+    Meanwhile the app ships HILITE<->LBLUE at **0.19deg** and RED<->#e06c75 at
+    **4.66deg** and reads them fine, because hue is not the only discriminator
+    (saturation, value, glyph, and container all carry). A floor two orders of
+    magnitude stricter than the palette applies to itself was never measuring
+    non-confusability.
+
+    So the floor is demoted to an in-repo ANCHOR (beat 23.5deg, the closest pair
+    the repo already accepted) and the real assertion is **optimality**: MAGENTA
+    is the max-min point of the non-flanked circle. That is self-calibrating —
+    it can never become unsatisfiable, it cannot be gamed by nudging a constant,
+    and if the palette grows it fails with the NEW optimum in the message.
+
+    **The "rejected lime arc" does not exist.** Inc-5's headline finding — a
+    second, farther arc at [104.9, 114.8] rejected for sitting between two
+    verdicts — was itself a census artifact. It came from omitting rich
+    ``green`` (**#008000, 120deg**, the ``ValidationSeverity.OK`` style and the
+    ``✓`` MAC glyph), which sits ~13deg from that arc and rules it out on
+    distance alone. With the census complete, the global optimum and the
+    admissible optimum are the SAME point, and it is this magenta. The prose
+    reasoning ("distance is necessary, not the objective") was right; every
+    number attached to it was wrong.
     """
     magenta_hue = _hue_degrees(MAGENTA)
-
     distances = {
         claimant: _hue_distance(magenta_hue, _hue_degrees(hex_color))
         for claimant, hex_color in _CLAIMED_HUES.items()
     }
-    for claimant, distance in sorted(distances.items(), key=lambda kv: kv[1]):
-        assert distance >= _MIN_HUE_SEPARATION_DEG, (
-            f"MAGENTA ({MAGENTA}, hue {magenta_hue:.1f}deg) is only "
-            f"{distance:.1f}deg from {claimant} — under the "
-            f"{_MIN_HUE_SEPARATION_DEG}deg floor the operator's "
-            f"non-confusability ruling requires. Full measurement: "
-            f"{ {k: round(v, 1) for k, v in distances.items()} }"
-        )
+    nearest_distance, nearest = _min_claimed_distance(magenta_hue)
+    measurement = {k: round(v, 2) for k, v in sorted(distances.items(), key=lambda kv: kv[1])}
 
-    # The ruling's PRIMARY clause, asserted directly rather than inferred from
-    # an angle: the gauge may never paint a verdict hue.
+    # Clause 1, asserted directly rather than inferred from an angle.
     assert MAGENTA not in {GREEN, YELLOW, RED}, (
         "the gauge's hue must not BE a verdict hue"
     )
-    # It sits in the measured admissible arc, not merely far from its nearest
-    # neighbour — this is what excludes the lime.
-    assert 313.9 <= magenta_hue <= 320.0, (
-        f"MAGENTA's hue ({magenta_hue:.1f}deg) must sit in the measured "
-        f"admissible arc [313.9, 320.0]. The other >=40deg arc "
-        f"([104.9, 114.8], a lime) is REJECTED: it lies between YELLOW and "
-        f"GREEN, i.e. between two verdicts"
+    # Clause 1, the geometric half: the objective.
+    assert not _is_verdict_flanked(magenta_hue), (
+        f"MAGENTA ({MAGENTA}, hue {magenta_hue:.2f}deg) sits BETWEEN two "
+        f"verdict hues. Distance cannot buy this back — it is the geometry "
+        f"that disqualified Orange"
     )
+    # Clause 2, as an anchored sanity floor (NOT the binding constraint).
+    assert nearest_distance >= _MIN_HUE_SEPARATION_DEG, (
+        f"MAGENTA ({MAGENTA}, hue {magenta_hue:.2f}deg) is only "
+        f"{nearest_distance:.2f}deg from {nearest} — closer than "
+        f"HILITE<->CYAN (23.5deg), the tightest pair this repo has explicitly "
+        f"accepted as distinct. Full measurement: {measurement}"
+    )
+    # Clause 2, the binding constraint: it is the BEST available, not merely
+    # adequate. This is what replaces Inc-5's hardcoded arc.
+    optimum_hue, optimum_distance = _admissible_optimum()
+    assert nearest_distance >= optimum_distance - _HUE_OPTIMALITY_TOLERANCE_DEG, (
+        f"MAGENTA ({MAGENTA}, hue {magenta_hue:.2f}deg) is {nearest_distance:.2f}deg "
+        f"from its nearest claimant ({nearest}), but a non-flanked hue at "
+        f"{optimum_hue:.2f}deg reaches {optimum_distance:.2f}deg. Re-pick MAGENTA "
+        f"at ~{optimum_hue:.2f}deg (keep sat ~45% / val ~96% so it stays in the "
+        f"pastel band), then update insight_style.MAGENTA's comment and "
+        f"REQUIREMENTS.md §6.5 Amendment F-1 with the NEW measured distance. Do "
+        f"not relax this tolerance to make it pass. Full measurement: {measurement}"
+    )
+
+
+def test_tc079_5c_hue_census_is_complete() -> None:
+    """Every colour literal in ``s19_app/`` is CLAIMED or EXCLUDED-with-a-reason.
+
+    ⚠ **This test exists because Inc-5's census was hand-curated and wrong, and
+    nothing could see it.** ``test_tc079_5_magenta_hue_distance`` certifies a
+    universal ("MAGENTA is far from EVERY claimant"), and a universal is only as
+    true as its input set. Mutating the code under test cannot catch a missing
+    input — the mutant passes. The only oracle for a census is a sweep of the
+    thing being censused, so that is what this is.
+
+    It does NOT replace the hand-written census: a sweep cannot tell a live rule
+    from a commented-out one (``styles.tcss`` says ``was #4ec9d4`` right next to
+    a live ``#4ec9d4``), and it cannot see rich's NAMED colours at all. What it
+    CAN do is make the hand-curation checkable — a new colour literal lands in
+    neither dict and this fails, forcing a human to classify it rather than
+    letting it be omitted in silence.
+
+    ⚠ **Known gap, stated rather than papered over:** rich named styles
+    (``"orange3"``, ``"green"``, ``"red"``, ``"grey50"``) are invisible to a hex
+    sweep. They are enumerated in ``_CLAIMED_HUES`` by hand from
+    ``app.py::_SEVERITY_TO_RICH_STYLE`` and the ``_MAC_GLYPH_*`` pairs, and a new
+    named chromatic style would NOT be caught here. Widening the sweep to resolve
+    named colours is the honest next step; it is out of Inc-5b's scope.
+    """
+    source_root = pathlib.Path(__file__).resolve().parents[1] / "s19_app"
+    assert source_root.is_dir(), f"cannot locate the package at {source_root}"
+
+    literal = re.compile(r"#[0-9a-fA-F]{6}\b")
+    swept: dict[str, list[str]] = {}
+    for path in sorted(source_root.rglob("*")):
+        if path.suffix not in (".py", ".tcss"):
+            continue
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            for match in literal.findall(line):
+                swept.setdefault(match.lower(), []).append(
+                    f"{path.relative_to(source_root).as_posix()}:{number}"
+                )
+    assert swept, "the sweep found no colour literals at all — it is broken"
+
+    # MAGENTA is the SUBJECT of the census, not a claimant against itself.
+    accounted = (
+        {c.lower() for c in _CLAIMED_HUES.values()}
+        | set(_EXCLUDED_LITERALS)
+        | {MAGENTA.lower()}
+    )
+    unaccounted = {c: sites for c, sites in swept.items() if c not in accounted}
+    assert not unaccounted, (
+        f"colour literals in s19_app/ are in NEITHER _CLAIMED_HUES nor "
+        f"_EXCLUDED_LITERALS: { {c: s[:2] for c, s in unaccounted.items()} }. "
+        f"Add each to _CLAIMED_HUES (if it paints a foreground cue an analyst "
+        f"could confuse with the gauge) or to _EXCLUDED_LITERALS WITH A REASON. "
+        f"Do not omit it — an omitted claimant is exactly the Inc-5 defect this "
+        f"guard exists to prevent: it makes the hue test certify a universal "
+        f"that is false. If you add a claimant, re-run "
+        f"test_tc079_5_magenta_hue_distance: MAGENTA may need to move."
+    )
+
+    # The excluded set may not rot into a list of colours nobody paints any
+    # more: a stale exclusion is a reason nobody re-examines.
+    stale = set(_EXCLUDED_LITERALS) - set(swept)
+    assert not stale, (
+        f"_EXCLUDED_LITERALS names colours that no longer appear in s19_app/: "
+        f"{sorted(stale)}. Drop them — a stale exclusion is dead justification"
+    )
+    # Same for the hex claimants. The rich NAMED claimants are legitimately
+    # absent from a hex sweep, so they are excused — resolved through rich, not
+    # restated, so this cannot drift out of step with _CLAIMED_HUES.
+    named = {_named_hex(n) for n in ("orange3", "green", "red")}
+    stale_claims = {
+        c.lower() for c in _CLAIMED_HUES.values()
+    } - set(swept) - named
+    assert not stale_claims, (
+        f"_CLAIMED_HUES names hues no longer painted in s19_app/: "
+        f"{sorted(stale_claims)}. A phantom claimant over-constrains the hue "
+        f"search and could push MAGENTA off its optimum for no reason"
+    )
+
+
+def test_tc079_5d_flank_rule_has_teeth() -> None:
+    """The flank predicate FIRES — it is not a constant-false decoration.
+
+    ``test_tc079_5_magenta_hue_distance`` leans on ``_is_verdict_flanked`` for
+    its primary clause, so a predicate that can never return True would make
+    that assertion vacuous — the same class of defect as the census omission it
+    was written to fix, one level up. Pinned against the two hues the reasoning
+    actually rejected, plus MAGENTA's own arc.
+    """
+    # Orange: the worked example in the ruling. 37.7deg, between RED and YELLOW.
+    assert _is_verdict_flanked(_hue_degrees("#d78700"))
+    # The lime Inc-5 wrongly believed was a contender: between YELLOW and GREEN.
+    assert _is_verdict_flanked(110.0)
+    # A verdict hue is trivially flanked by its own neighbours' arcs.
+    assert _is_verdict_flanked(_hue_degrees(YELLOW) + 1.0)
+    # The GREEN->RED arc is the open field — 205deg wide, not "between".
+    assert not _is_verdict_flanked(_hue_degrees(MAGENTA))
+    assert not _is_verdict_flanked(200.0)
 
 
 def test_tc079_5b_cap_gauge_escalates_without_verdict_hues() -> None:
