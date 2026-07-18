@@ -872,15 +872,19 @@ def _make_validation_issues(n: int) -> list[ValidationIssue]:
     return issues
 
 
-def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """With thousands of issues, the summary reports a single page-sized window.
+def test_update_validation_issues_view_pages_at_mount_cap(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """The Issues summary pages at the grouped-panel MOUNT CAP, not the
+    configured viewer page size.
 
-    Post-retirement (batch-29) the Issues surface is the grouped panel (capped
-    at ``_GROUP_DISPLAY_MAX``), so the DataTable ``add_row`` / ``issue:`` row-key
-    windowing assertion retires; the windowing invariant is re-observed through
-    the summary line and ``_get_window_bounds`` — the same window math the
-    grouped panel pages on.
+    Field-audit B1: the grouped panel mounts at most ``_GROUP_DISPLAY_MAX`` rows,
+    so the paging stride must be capped there — a larger
+    ``validation_issues_page_size`` (here 150) is capped to the mount limit so no
+    mounted row is skipped. (The prior version set the stride to 150 and asserted
+    ``rows 1-150`` — window math only, never that those 150 rows were reachable;
+    they were not, since the panel only mounts 40.)
     """
+    from s19_app.tui.issues_view import _GROUP_DISPLAY_MAX
+
     app = S19TuiApp(base_dir=tmp_path)
     summary_captured: list[str] = []
 
@@ -898,20 +902,65 @@ def test_update_validation_issues_view_pages_large_issue_list(tmp_path: Path, mo
     monkeypatch.setattr(app, "query_one", _query)
     total = 5000
     app._validation_issues = _make_validation_issues(total)
-    app.validation_issues_page_size = 150
+    app.validation_issues_page_size = 150  # larger than the mount cap...
     app._validation_issues_window_start = 0
 
     app.update_validation_issues_view()
 
-    # Window math: page 1 covers rows 1-150 of 5000 (the grouped panel pages on
-    # the same bounds; only the summary is asserted since no DataTable remains).
-    assert app._get_window_bounds(total, 0, 150) == (0, 150)
+    # ...capped to _GROUP_DISPLAY_MAX: page 1 covers rows 1-40, not 1-150.
+    assert app._issues_page_size() == _GROUP_DISPLAY_MAX
     assert app._validation_issues_window_start == 0
     assert summary_captured and "page 1/" in summary_captured[-1]
-    assert "rows 1-150/5000" in summary_captured[-1]
+    assert f"rows 1-{_GROUP_DISPLAY_MAX}/5000" in summary_captured[-1]
 
 
-def test_validation_issues_paging_actions_advance_window(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+def test_validation_issues_paging_reaches_rows_past_mount_cap(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    """B1 regression: PgDn reaches issues BEYOND the first mounted page.
+
+    With ``_GROUP_DISPLAY_MAX + 5`` issues, ``page_next`` advances the window to
+    ``_GROUP_DISPLAY_MAX`` so the last 5 issues become the mounted window and the
+    summary reports the second page. Pre-fix the stride (200) exceeded the mount
+    cap (40): ``page_next`` clamped to a no-op and those 5 rows were unreachable.
+    """
+    from s19_app.tui.issues_view import _GROUP_DISPLAY_MAX
+
+    app = S19TuiApp(base_dir=tmp_path)
+    summary_captured: list[str] = []
+
+    class FakeLabel:
+        def update(self, text: str) -> None:
+            summary_captured.append(text)
+
+    def _query(selector: str, *_a, **_k):
+        if selector == "#validation_issues_summary":
+            return FakeLabel()
+        return None
+
+    monkeypatch.setattr(app, "query_one", _query)
+    total = _GROUP_DISPLAY_MAX + 5
+    app._validation_issues = _make_validation_issues(total)
+    app._validation_issues_window_start = 0
+
+    app.update_validation_issues_view()
+    assert app._validation_issues_window_start == 0
+
+    app.action_validation_issues_page_next()
+
+    assert app._validation_issues_window_start == _GROUP_DISPLAY_MAX, (
+        "PgDn must advance past the mount cap so rows beyond the first page are "
+        "reachable (B1) — pre-fix it clamped to a no-op at 0"
+    )
+    assert summary_captured
+    assert f"rows {_GROUP_DISPLAY_MAX + 1}-{total}/{total}" in summary_captured[-1]
+
+
+def test_validation_issues_paging_actions_advance_by_mount_cap(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    from s19_app.tui.issues_view import _GROUP_DISPLAY_MAX
+
     app = S19TuiApp(base_dir=tmp_path)
     renders: list[int] = []
 
@@ -927,8 +976,9 @@ def test_validation_issues_paging_actions_advance_window(tmp_path: Path, monkeyp
         return None
 
     monkeypatch.setattr(app, "query_one", _query)
-    app._validation_issues = _make_validation_issues(450)
-    app.validation_issues_page_size = 100
+    total = 450
+    app._validation_issues = _make_validation_issues(total)
+    app.validation_issues_page_size = 100  # capped to the mount cap
     app._validation_issues_window_start = 0
 
     original = app.update_validation_issues_view
@@ -943,11 +993,13 @@ def test_validation_issues_paging_actions_advance_window(tmp_path: Path, monkeyp
     app.action_validation_issues_page_next()
     app.action_validation_issues_page_prev()
 
-    assert renders == [100, 200, 100]
-    # Advance past the end should clamp.
-    app._validation_issues_window_start = 400
+    cap = _GROUP_DISPLAY_MAX
+    assert renders == [cap, 2 * cap, cap]
+    # Advance past the end clamps at the last page start.
+    max_start = ((total - 1) // cap) * cap
+    app._validation_issues_window_start = max_start
     app.action_validation_issues_page_next()
-    assert app._validation_issues_window_start == 400
+    assert app._validation_issues_window_start == max_start
 
 
 def test_compute_mac_view_payload_matches_build_cache(tmp_path: Path):

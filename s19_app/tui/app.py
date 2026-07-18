@@ -86,7 +86,7 @@ from .insight_style import (
     microbar,
 )
 from .services.entropy_service import EntropyWindow
-from .issues_view import GroupedIssuesPanel, IssueRow
+from .issues_view import _GROUP_DISPLAY_MAX, GroupedIssuesPanel, IssueRow
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
 from .services.before_after_service import compose_before_after_report
@@ -1373,6 +1373,37 @@ class S19TuiApp(App):
                 - Settings menu application handlers
         """
         return max(1, min(int(value), self.viewer_page_size_max))
+
+    def _issues_page_size(self) -> int:
+        """
+        Summary:
+            Return the Issues screen's paging stride, bounded by the grouped
+            panel's mount cap. The grouped Issues panel mounts at most
+            ``_GROUP_DISPLAY_MAX`` non-virtualized ``IssueRow`` widgets (a DoS
+            cap), so the paging stride must never exceed it — otherwise rows past
+            the cap are truncated AND skipped by PgUp/PgDn, i.e. unreachable
+            (field-audit B1). A smaller configured ``validation_issues_page_size``
+            is honoured; a larger one is capped at ``_GROUP_DISPLAY_MAX``.
+
+        Args:
+            None
+
+        Returns:
+            int: ``min(_GROUP_DISPLAY_MAX, clamped validation_issues_page_size)``.
+
+        Data Flow:
+            - Read the (clamped) configured issues page size and cap at the
+              grouped-panel mount limit.
+
+        Dependencies:
+            Uses:
+                - ``_clamp_viewer_page_size`` / ``issues_view._GROUP_DISPLAY_MAX``
+            Used by:
+                - ``update_validation_issues_view``
+                - ``_render_validation_issues_groups``
+                - ``action_validation_issues_page_next`` / ``_page_prev``
+        """
+        return min(_GROUP_DISPLAY_MAX, self._clamp_viewer_page_size(self.validation_issues_page_size))
 
     def _is_layout_visible(self, layout_id: str) -> bool:
         """Return True when a layout container is currently visible."""
@@ -6940,7 +6971,7 @@ class S19TuiApp(App):
         warning_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.WARNING)
         info_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.INFO)
         total = len(filtered)
-        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        page_size = self._issues_page_size()
         max_start = max(0, ((total - 1) // page_size) * page_size) if total else 0
         self._validation_issues_window_start = max(0, min(self._validation_issues_window_start, max_start))
         start, end = self._get_window_bounds(total, self._validation_issues_window_start, page_size)
@@ -7011,7 +7042,7 @@ class S19TuiApp(App):
             panel.render_groups([], {}, truncated=False)
             return
         total = len(filtered)
-        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        page_size = self._issues_page_size()
         start, end = self._get_window_bounds(
             total, self._validation_issues_window_start, page_size
         )
@@ -7057,7 +7088,7 @@ class S19TuiApp(App):
         total = len(self._filtered_validation_issues())
         if total == 0:
             return
-        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        page_size = self._issues_page_size()
         max_start = max(0, ((total - 1) // page_size) * page_size)
         self._validation_issues_window_start = min(
             max_start, self._validation_issues_window_start + page_size
@@ -7068,7 +7099,7 @@ class S19TuiApp(App):
         """Rewind the validation-issues viewer window by one configured page."""
         if not self._validation_issues:
             return
-        page_size = self._clamp_viewer_page_size(self.validation_issues_page_size)
+        page_size = self._issues_page_size()
         self._validation_issues_window_start = max(
             0, self._validation_issues_window_start - page_size
         )

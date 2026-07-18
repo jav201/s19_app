@@ -1,100 +1,88 @@
-# fast-dev-flow spec — A2L CHARACTERISTIC length from resolved RECORD_LAYOUT (P-1)
+# fast-dev-flow spec — Issues paging stride matches the mount cap (B1)
 
 - **Date:** 2026-07-18
-- **Batch:** a2l-record-layout-length (backlog P-1, follow-up to the a2l-missing-length-fix)
+- **Batch:** issues-paging-stride (backlog B1, field-audit P0)
 - **Flow:** /fast-dev-flow
 - **Language:** English
-- **Run mode / merge:** Autonomous through self-merge (operator-authorized this batch; per-batch, not carried). Surface any HIGH finding / unexpected fallout before merge.
+- **Run mode / merge:** Autonomous through self-merge (operator-authorized for this run of prior-backlog items; per-batch). Surface any HIGH finding / scope creep.
 - **Status:** Phase A — spec
 
 ---
 
 ## 1. Objective
 
-Populate a scalar `CHARACTERISTIC`'s byte `length` by **resolving its RECORD_LAYOUT**, so records
-that reference a project-named layout (e.g. `RL_U8`, whose *name* encodes no size) become
-memory-checkable instead of landing `length=None` → grey "not checked". This is the deeper root the
-a2l-missing-length-fix (🅰) flagged: `_infer_length_characteristic` hunted a non-standard `LENGTH`
-keyword and `sizeof_from_deposit(name)`, never resolving the actual layout definition.
+Make the Issues screen's PgUp/PgDn actually page through every issue. Today they are a no-op on any
+list of ≤200 issues, and issues at indices 40–199 of every page are **permanently unreachable**.
 
-## 2. Root cause (grounded)
+## 2. Root cause (grounded, reproduction confirmed)
 
-`_infer_length_characteristic` (`a2l.py:707`) derives the element size only via
-`sizeof_from_deposit(deposit)`, which pattern-matches size-encoded *names* (`__UBYTE_Z` → 1) or a
-datatype keyword. A project layout named `RL_U8` matches neither → `el=None` → `length=None`. Yet the
-layout **is** defined (`/begin RECORD_LAYOUT RL_U8  FNC_VALUES 1 UBYTE …`), and the sibling helper
-`_resolve_record_layout(name, record_layouts_by_name)` already resolves it to `decode_type=UBYTE`
-(size 1) — but only for decode metadata (`a2l.py:1164`), never wired into `length`.
+The grouped Issues panel mounts at most `_GROUP_DISPLAY_MAX = 40` non-virtualized `IssueRow` widgets
+(a deliberate DoS/perf cap — `issues_view.py:52`). But the paging **stride** is
+`validation_issues_page_size = 200` (`app.py:1117`), used in four sites:
+`update_validation_issues_view` (summary), `_render_validation_issues_groups` (the `filtered[start:end]`
+window fed to the panel), and `action_validation_issues_page_next/prev`.
 
-Confirmed on `examples/case_01_basic_valid/firmware.a2l`: `CAL_BLOCK_A`/`CAL_BLOCK_B`
-(`VALUE 0x… RL_U8 …`) resolve to `byte_size=1` via `_resolve_record_layout` but parsed with
-`length=None` before this fix.
+Because the stride (200) exceeds the mount cap (40):
+- `_render_validation_issues_groups` slices a 200-wide window but `render_groups` mounts only its
+  first 40 and truncates → rows 40–199 of the window are shown as a truncation note, never mounted.
+- `page_next` advances `_validation_issues_window_start` by 200. For total ≤ 200, `max_start = 0`, so
+  it clamps → **no-op**. For total > 200, page 2 starts at index 200 → rows 40–199 are skipped on
+  every page. Either way, indices 40–199 are unreachable.
 
 ## 3. The fix
 
-Thread `record_layouts_by_name` into `_infer_length_characteristic`; when `sizeof_from_deposit`
-yields nothing **and** the object is a scalar `VALUE`, resolve the layout and take its element
-datatype size:
+Tie the Issues paging stride to the mount cap so every mounted-then-paged row is reachable, and keep
+it robust to the (currently fixed) `validation_issues_page_size`:
 
 ```python
-el = sizeof_from_deposit(deposit)
-if el is None and char_type == "VALUE" and record_layouts_by_name:
-    meta = _resolve_record_layout(deposit, record_layouts_by_name)
-    if meta and meta.get("decode_type"):
-        el = DATATYPE_SIZES.get(meta["decode_type"])
+def _issues_page_size(self) -> int:
+    # The grouped Issues panel mounts at most _GROUP_DISPLAY_MAX rows (a DoS cap),
+    # so the paging stride must not exceed it or rows past the cap become
+    # unreachable (B1). Honour a smaller configured size; never a larger one.
+    return min(_GROUP_DISPLAY_MAX, self._clamp_viewer_page_size(self.validation_issues_page_size))
 ```
 
-The existing MATRIX_DIM / VAL_BLK / return-`el` logic is unchanged and runs after.
-
-**Conservative `VALUE`-only scope — a correctness decision, not laziness.** The byte-range memory
-check (`_memory_range_in_map(addr, length, mem_map)`) trusts `length`. A CURVE/MAP is an array over
-its axes, so the element datatype size UNDER-reports the true span → the check would falsely pass on
-too few bytes (false-green). Deriving those correctly needs axis/MATRIX_DIM resolution (a larger
-feature). So CURVE/MAP/VAL_BLK stay `length=None` (honest grey) unless already sized by a MATRIX_DIM
-or a name-encoded deposit. Scalar `VALUE` is safe because element size == total size.
-
-`a2l.py` is already UNFROZEN (🅰) — **no engine-unfreeze increment needed** this batch.
+Use `_issues_page_size()` in all four sites in place of
+`self._clamp_viewer_page_size(self.validation_issues_page_size)`. Import `_GROUP_DISPLAY_MAX` from
+`issues_view`.
 
 ## 4. Acceptance criteria (observable)
 
-- **AC-1** — When a scalar `VALUE` CHARACTERISTIC references a RECORD_LAYOUT whose name encodes no
-  size (`RL_U8`) but whose definition is `FNC_VALUES 1 UBYTE …`, the parsed tag shall have
-  `length == 1` (the datatype size), not `None`.
-- **AC-2** — With that length and the address present in the loaded image, the tag shall be
-  memory-checked: `schema_ok=True`, `memory_checked=True`, `in_memory` reflecting coverage (no longer
-  grey/`memory_checked=False`).
-- **AC-3** (no false-green) — A `CURVE` or `MAP` CHARACTERISTIC referencing a name-only RECORD_LAYOUT
-  shall keep `length == None` (not the element size), so the memory check does not pass on an
-  under-counted span.
-- **AC-4** — A CHARACTERISTIC whose deposit name already encodes a size (`__UWORD_Z`) or whose layout
-  is absent from `record_layouts_by_name` shall be unchanged (2 / `None` respectively) — the fallback
-  is additive.
-- **AC-5** — Full gate `pytest -q -m "not slow"` stays green (0 failures); no frozen engine test file
-  is modified.
+- **AC-1 (reachability — the real fix)** — With `_GROUP_DISPLAY_MAX + 5` issues, after one
+  `action_validation_issues_page_next` the window start advances to `_GROUP_DISPLAY_MAX` and the
+  summary reports the second page (`rows 41-45/45`), so the last 5 issues become the mounted window.
+  (Pre-fix: page_next is a no-op, window stays at 0, those 5 are unreachable.)
+- **AC-2 (no-op eliminated)** — With `_GROUP_DISPLAY_MAX + 5` issues at window 0, `page_next` changes
+  `_validation_issues_window_start` (was unchanged pre-fix).
+- **AC-3 (stride == cap)** — `_issues_page_size()` returns `_GROUP_DISPLAY_MAX` when
+  `validation_issues_page_size` is its default (200), and honours a smaller value (e.g. 25 → 25).
+- **AC-4 (paging math)** — `page_next`/`page_prev` advance/rewind `_validation_issues_window_start`
+  by `_GROUP_DISPLAY_MAX` and clamp at the last page start.
+- **AC-5** — Full gate `pytest -q -m "not slow"` green; no frozen engine test file modified.
 
 ## 5. Security flags
 
-Scanned objective + criteria + description. No auth/secrets/external/PII/destructive-DB/network
-patterns. `security_required: **false**`. The change lives in an existing parser of untrusted A2L;
-it derives a length from already-parsed layout tokens (ints), adds no input surface, and *tightens*
-coverage honesty (refuses to guess CURVE/MAP spans).
+Scanned. No auth/secrets/external/PII/destructive-DB/network patterns. `security_required: **false**`.
+The change only *tightens* how many widgets mount per page (stays ≤ the existing DoS cap).
 
 ## 6. Files (blast radius)
 
-**Increment 1 — fix + tests (3 files):**
-1. `s19_app/tui/a2l.py` — thread `record_layouts_by_name`, VALUE-only layout-size fallback.
-2. `tests/test_a2l_record_layout_length.py` — **NEW** AC-1..AC-4 unit/behavioral proofs.
-3. `REQUIREMENTS.md` — note layout-derived length under the A2L parsing/colour rows.
+**Increment 1 — fix + tests (2 files):**
+1. `s19_app/tui/app.py` — import `_GROUP_DISPLAY_MAX`, add `_issues_page_size()`, use it in the four
+   issues paging sites.
+2. `tests/test_tui_app.py` — correct the two tests that pinned the stride==configurable-size contract
+   (they set 150/100 and asserted window math only, never reachability) to the mount-cap stride, and
+   **add the AC-1 reachability test** the old pair never had.
 
-**Frozen, preserved unchanged:** `test_tui_a2l.py`, `test_validation_a2l.py`, all `_ENGINE_TEST_FILES`.
-(Measured: a2l/validation/directionb/supplemental/missing-length suites = 210 passed with the fix.)
+**Increment 2 — docs (1 file):**
+3. `REQUIREMENTS.md` — note the Issues paging stride is bounded by the mount cap.
+
+**Frozen, preserved unchanged:** all `_ENGINE_TEST_FILES` (this is a TUI-layer change; no engine edit).
 
 ## 7. Pending / deferred
 
-- **P-1b** CURVE/MAP/axis length derivation (needs AXIS_DESCR + MATRIX_DIM resolution) — the honest
-  next step for array types; deliberately out of scope to avoid false-green.
-- **P-2** (unchanged) re-freeze `a2l.py` against a post-fix baseline — should come AFTER P-1 so we do
-  not re-freeze then re-edit.
+- The rest of the prior backlog (B3 A2L "two extra chars", discoverability gap, Flow Builder rail-8),
+  plus the a2l P-1b / P-2 carries.
 
 ## 8. Batch status
 
