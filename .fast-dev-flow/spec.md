@@ -1,82 +1,100 @@
-# fast-dev-flow spec — batch 44 — Flow Builder tracer slice (source→patch→write-out, run-only)
+# fast-dev-flow spec — JSON editor fills its window height
 
-- **Status:** closed 2026-07-14 (AC-1..5 green; full gate `1373 passed / 2 skipped / 23 xfailed / 11 xpassed / 0 failed`; RED-first for AC-1 + AC-4; security-reviewer pass F1/F2/F4/F5 mitigated; C-27 dual-guard clean; 0 frozen diffs; autonomous + self-merge). **Follow-up: canonical-CI snapshot regen PR retires the 20 rail-drift xfails.**
-- **Created:** 2026-07-13
-- **Branch:** `claude/batch-44-flow-builder-tracer` @ `fa4b118` (= origin/main tip; RC-1 clean, merge-base == origin/main)
-- **Route:** /fast-dev-flow (operator-chosen: run-only tracer; persistence split to batch-45). Design: `.fast-dev-flow/ADR-flow-builder-tracer.md`.
-- **Run mode / merge:** TBD at Phase-A gate. Decisions → MEMORY.md at close.
-- **security_required:** TRUE — the new `flow_execution_service` consumes untrusted change-document content (via the already-hardened `parse_change_document`/`read_change_document`) and the new rail-8 panel renders block labels/refs (must be markup-safe). NO new untrusted-file loader (flow persistence is batch-45). Modest surface — established patterns only.
+- **Status:** Phase C (implemented; gates green; AC-1 size RATIFIED)
+- **⚠ AC-1 observation-size RATIFICATION (orchestrator, 2026-07-18, C-23/C-29 measurement correction):** the
+  approved AC-1 said "at **120×30** → editor `region.height` > 8". PILOT-MEASURED, that is **unsatisfiable**:
+  at a 30-row terminal the global `#workspace_shell` reserves the lower rows, so `#patch_editor_panel` maxes
+  at ~13 rows and the JSON window body at ~9 — the editor is capped at 8 by *available room*, not by CSS
+  (measured: 120×30 → 8, 120×50 → **26**, 80×24 → 8). The empty-space defect the operator reported manifests
+  only at ≥~34 rows (the operator's screenshot was a tall terminal). **Ratified correction:** the growth arm
+  observes at **120×50** (where free space exists and the mutation discriminates: flip to `height: 8` → RED);
+  a **floor/no-regression arm stays at 120×30**. The shipped fix is unchanged and correct — it fills the
+  window whenever room exists, which is exactly the operator's terminal. No scope change; a test-size
+  correction the agent surfaced by measuring rather than assuming (this is why C-23 exists).
+- **Date:** 2026-07-18
+- **Branch:** `fix/patch-json-editor-fill-height` (off `main` `7440108`; RC-1 clean — branched from origin/main tip)
+- **Route:** /fast-dev-flow (small, scoped UI/layout fix)
+- **Language:** English
+- **Run mode / merge:** TBD at Phase-A gate (per-batch authorization; batch-48's grant does NOT carry).
+- **security_required:** FALSE (layout-only; see §6 — one C-17 preservation watch-item folded into AC-4).
 
-## 1. Objective
+## 1. Objective (BLUF)
+The Patch Editor's JSON editor (`#patch_paste_text`, a `JsonHighlightTextArea`) is pinned to a
+**fixed `height: 8`** (`styles.tcss:1239`), so it shows a scrollbar and leaves the rest of the
+`#patch_win_json` window empty below it (operator screenshot). Make the editor **flex to fill the window's
+available vertical space** at both terminal sizes, instead of the fixed 8-row cap.
 
-Ship the narrowest runnable Flow Builder vertical: compose an ordered list of typed blocks **SOURCE → PATCH → WRITE-OUT**, run it from rail item 8, and produce observable output (a written S19/HEX file + a renderable run result). Reuse the existing ops + the `_execute_one_variant` state model; **no persistence, no CHECK/CRC, no multi-image** (see ADR §7/§9). All work in NON-frozen modules.
+## 2. Root cause (recon-verified)
+`.patch-window-body { height: auto }` (`:891`, shared by all 3 windows) hugs its content at the top of a
+taller window; `#patch_paste_row` has no height rule (auto); `#patch_paste_text { height: 8 }` is a fixed
+cap. Chain: `#patch_win_json` (tall) → `#patch_win_json_body` (auto) → `#patch_paste_row` (auto) →
+`#patch_paste_text` (8). Nothing in the chain claims the leftover space. `height: 1fr` is the established
+idiom here (12 existing uses, incl. every other window body's main content).
+**History:** the fixed `height: 8` was an intentional batch-36 (F-01) compromise; the full-screen
+`#changeset_json_dialog` modal (`height: 90%`, opened by "Edit JSON") was created as the escape hatch for a
+"readable multi-line editor the height-starved in-panel box cannot give." This batch makes the in-panel box
+use its own space; the modal stays as-is.
 
-## 2. User stories
+## 3. Scope
+**IN:** the JSON editor fills its window body's available height, scoped to the JSON window only. Expected
+fix = a small set of `1fr` height rules on the JSON window's own body/row/editor in `styles.tcss`
+(CSS-only if possible; pilot-measured), with a `min-height` floor so it stays usable at the 80×24 floor.
+**OUT (do NOT touch):**
+- The `#changeset_json_dialog` modal (batch-36/64b escape hatch) — unchanged.
+- The other two windows (`#patch_win_script`, `#patch_win_checks`) and the shared `.patch-window-body`
+  rule — the change must be JSON-window-scoped, not app-wide (C-30 sibling).
+- Any behaviour/wiring: paste ingress, the cap gauge, the C-17 `_render_line` colouring path of
+  `JsonHighlightTextArea` (`json_highlight.py`), the 64 KiB cap. **Layout-only.**
+- The docked buttons (`#patch_paste_controls`) must stay reachable-under-scroll (no B2 regression).
 
-- **US-44a (headless engine):** As a developer, I want a Textual-free `flow_execution_service.run_flow(flow, ctx)` that threads `(mem_map, ranges)` through the ordered blocks (seed via `build_loaded_*`, patch via `apply_change_document`, sink via `emit_*`/`save_patched_image`) and returns a well-formed `FlowRunResult`, so the block model is proven independent of the UI.
-- **US-44b (rail-8 UI):** As an operator, I want a Flow Builder screen on rail item 8 where I add Source/Patch/WriteOut blocks from a dropdown into an ordered list and press Run to execute the flow and see per-block status + the written file, so I can chain operations without editing files by hand.
+## 4. Observable acceptance criteria
+- **AC-1 (fills at 120×30):** When the Patch Editor is shown at 120×30, `#patch_paste_text`'s rendered
+  `region.height` is **> 8** (grows past the old fixed cap to consume the JSON window's free space);
+  MEASURED, not asserted against a CSS constant (C-32 assert-the-painted-result).
+- **AC-2 (fills at 80×24, no overflow):** When shown at 80×24, `#patch_paste_text` fills the JSON window
+  body's available height and does **not** push `#patch_paste_controls` below reachability — the docked
+  buttons resolve reachable-under-scroll (reuse the batch-46 B2 contract). A HIGH if B2 recurs.
+- **AC-3 (JSON-window-scoped):** `#patch_win_script` (entries table) and `#patch_win_checks` content
+  heights are **unchanged** by this change (the fix does not touch the shared body rule) — measured at
+  both sizes.
+- **AC-4 (C-17 preserved):** After the resize, a hostile pasted payload (`[red]PWNED[/red]`, `[/nope]`)
+  still renders literally via `_render_line` — no markup parse, no style leak (the batch-48 AT-079c
+  contract holds; layout must not alter the paint path).
+- **AC-5 (gauge intact):** The cap gauge (`#patch_paste_gauge`) still renders above the editor; the
+  editor's growth does not displace or overlap it.
 
-## 3. Acceptance criteria (observable)
+## 5. Test mapping (each AC → a named test; C-29 geometry via `App.run_test(size=…)`)
+- AC-1/AC-2 → a new geometry test in `tests/test_tui_patch_json.py`, driving the panel at both sizes and
+  asserting `#patch_paste_text.region.height` + docked-row reachability (C-32: measure the region).
+- AC-3 → assert the other two windows' body heights unchanged (measured, both sizes).
+- AC-4 → reuse/extend the existing AT-079c hostile-input assertion post-resize (do NOT weaken it).
+- AC-5 → assert `#patch_paste_gauge` present + above the editor.
+- Coverage-claim discipline: each named test confirmed on disk before Phase-C sign-off.
 
-- **AC-1 (engine happy path — RED-first):** Given a `Flow` = [`SourceBlock`(a project S19), `PatchBlock`(a project change-doc that applies ≥1 byte at a known address), `WriteOutBlock`(name.s19, fmt="s19")] and a `FlowContext`(project_dir), `run_flow` writes `name.s19` into the workarea with the patched byte present, and returns `FlowRunResult(status="ok")` with **3** `block_results` all `"ok"` and `written_paths == [that file]`. RED: `flow_model`/`run_flow` do not exist.
-- **AC-2 (isolation / collect-don't-abort):** A `Flow` whose `SourceBlock` references a missing/invalid image yields `FlowRunResult(status="error")` with `len(block_results) == len(flow.blocks)` (source=`error`, downstream=`skipped`), **no exception raised**, and **no output file written** — mirroring `VariantExecutionResult` (LLR-006.4).
-- **AC-3 (write-out format):** A `WriteOutBlock` with `fmt="hex"` emits Intel HEX (`emit_intel_hex_from_mem_map`) and `fmt="s19"` emits S19 (`save_patched_image`/`emit_s19_from_mem_map`); asserted by the written file round-tripping through `IntelHexFile`/`S19File` respectively.
-- **AC-4 (rail-8 UI — RED-first):** Rail item 8 shows "Flow Builder"; `#screen_flow` lets a user add Source/Patch/WriteOut blocks via the dropdown into an ordered list, and Run executes `run_flow` and renders the `FlowRunResult` (per-block status chips + the written path). Pilot AT drives add→add→add→Run and reads the result pane. RED: rail-8 is the "Bookmarks - coming soon" placeholder; `#screen_flow` absent.
-- **AC-5 (markup-safe labels):** A block referencing a change-doc / output whose name carries hostile markup (`evil[red]`) renders **literally** in the block list and result pane (`markup=False` / `safe_text`) — no `MarkupError`, no style leak (the batch-27/43 class).
+## 6. Security flags
+Scanned: matches on **`user input` / `paste` / `escape`** — the JSON editor is a known **untrusted-input
+sink** (C-17). BUT this change is **layout-only (CSS height)**: no new input surface, no new markup path,
+no touch to `JsonHighlightTextArea._render_line`. → **`security_required: false`**, with one watch-item
+folded into **AC-4**: the resize must preserve the existing C-17 painted-path contract (verified by
+re-running the hostile-input assertion post-resize, not a full security review). **If Phase B finds it must
+touch the render/paint path, STOP and re-flag.**
 
-## 4. Validation strategy
+## 7. Snapshot impact (C-22, stack-specific)
+The JSON window is in the 2 patch scaffold snapshot cells (`patch-comfortable-{80x24,120x30}`), **just
+regenerated by PR #89**. Resizing the editor **will drift both cells again** → a **canonical-CI regen is
+owed as a post-merge follow-up** (local regen FORBIDDEN; mark the 2 cells `xfail(strict=False)` for the
+PR via a `_fdf_json_height_drift_marks`-style helper, retire on regen — the established pattern).
 
-RED-first: AC-1 (headless `run_flow` end-to-end over a tmp project — reuse `test_variant_execution`'s `_make_project`/`_write_v2_document` helpers) and AC-4 (Pilot over `#screen_flow`) shown failing pre-code. AC-2/AC-3 headless unit. AC-5 markup-safety AT. Full gate `pytest -q -m "not slow"` + C-27 dual-guard each increment (no frozen file touched — new services + rail/app/screens_directionb, all non-frozen; ops in `changes/` reused, not modified). Coverage-claim discipline: confirm each named test exists on disk before closing.
+## 8. Increment plan (≤5 files; likely 1 increment)
+1. **Inc-1 (AC-1..5):** `s19_app/tui/styles.tcss` (the JSON-window-scoped `1fr` rules + `min-height` floor)
+   · `tests/test_tui_patch_json.py` (geometry + scope + gauge tests) · `tests/test_tui_snapshot.py` (the
+   2-cell xfail drift marks) · possibly `s19_app/tui/screens_directionb.py` (only if a container needs an
+   explicit height for `1fr` to cascade — pilot-measure first; prefer CSS-only). ≤4 files.
 
-## 5. Non-goals (OUT — deferred per ADR §9)
-
-- **Persistence** (flow.json load/save) → batch-45 (the untrusted-file loader + its manifest-guard replication).
-- **CHECK / CRC blocks** → batch-46 (the CRC-into-loop seam, ADR §7).
-- **Multi-image scope / report fusion** → batch-47.
-- Reorder/validation UX polish, no-data-state refinement → batch-48.
-- Any engine-frozen module (ops in `apply.py`/`io.py`/`check.py` are REUSED, never edited).
-
-## 6. Detected security flags
-
-- [x] **Input / attack surface** — untrusted change-doc content flows through the new `flow_execution_service` (via `parse_change_document`/`read_change_document`, already hardened); block labels/refs render in the new panel (must be `markup=False`/`safe_text`). File-refs (`SourceBlock.image_ref`, `PatchBlock.change_doc_ref`) resolve against `project_dir` — reuse the `_resolve_manifest_entry` containment guard (defense-in-depth), never a bespoke path resolver.
-- **`security_required: true`.** No NEW untrusted-file loader (persistence deferred), no auth/secret/network. Risk = markup injection via a block label (mitigate: markup-safe render) + path escape via a file-ref (mitigate: reuse `_resolve_manifest_entry`). security-reviewer mini-pass on the new service's untrusted-input handling before code.
-
-## 7. Increment plan (≤5 files each, 2 increments)
-
-1. **Inc-1 — headless engine (US-44a; AC-1/AC-2/AC-3):** `s19_app/tui/services/flow_model.py` (frozen `FlowBlock`/`SourceBlock`/`PatchBlock`/`WriteOutBlock`/`Flow` + `FlowContext`/`BlockResult`/`FlowRunResult`) + `s19_app/tui/services/flow_execution_service.py` (`run_flow`, Textual-free, threads `(mem_map, ranges)`, reuses `build_loaded_*`/`apply_change_document`/`emit_*`/`save_patched_image`, resolves file-refs via `_resolve_manifest_entry`, collect-don't-abort) + `tests/test_flow_execution.py`. = 3 files.
-2. **Inc-2 — rail-8 UI (US-44b; AC-4/AC-5):** `s19_app/tui/rail.py` (`RailEntry` "bookmarks"→"flow"/"Flow Builder"), `s19_app/tui/app.py` (`SCREEN_CONTAINER_IDS` + `_compose_screen_flow`), `s19_app/tui/screens_directionb.py` (`FlowBuilderPanel`: dropdown-add, ordered block list, Run, result pane; drop `BookmarksPlaceholder`), `tests/test_tui_directionb.py` (or a new `test_tui_flow.py`). = 4 files. Then update REQUIREMENTS.md (new R-TUI-059 Flow Builder tracer).
-
-(2 increments; the tracer keel is Inc-1 — fully testable headless.)
-
-## 8. Batch status
-
+## 9. Batch status
 | Field | Value |
 |-------|-------|
-| Current phase | closed |
-| Started | 2026-07-13 |
-| Closed | 2026-07-14 |
+| Current phase | A (awaiting gate) |
+| Started | 2026-07-18 |
+| Route | /fast-dev-flow |
 | Promoted to /dev-flow | no |
-| Notes | RC-1 clean; ADR banked; persistence → b-45; snapshot regen follow-up pending |
-
-## 9. Close
-
-### What changed
-Shipped the Flow Builder tracer (R-TUI-059): rail item 8 (dropped "Bookmarks") now composes + runs an ordered typed-block pipeline **SOURCE → PATCH → WRITE-OUT**. New Textual-free `flow_execution_service.run_flow` threads `(mem_map, ranges)` through the blocks (reusing `build_loaded_*`/`apply_change_document`/`save_patched_image`, mirroring `_execute_one_variant` isolation); new `flow_model` typed blocks; new rail-8 `FlowBuilderPanel` (dropdown-add + Run) → `RunRequested` → app runs over `_active_project_dir()` and renders `FlowRunResult`. No frozen module touched (ops reused).
-
-### How it was tested
-- Full gate: **1373 passed / 2 skipped / 23 xfailed / 11 xpassed / 0 failed** (+4 net tests).
-- Inc-1 engine (`test_flow_execution.py`): AC-1 happy path (patched byte in written file), AC-2 isolation, F1 path-escape blocked, AC-3 hex+s19. Inc-2 UI (`test_tui_directionb.py`): AC-4 add→Run→result (RED-first), rail-key-8, AC-5 markup-safe.
-- C-27 dual-guard clean; ruff clean; the rail/census/commandbar tests updated for the rename.
-
-### Open risks / pending
-- **Snapshot regen follow-up:** the rail-8 relabel drifts 20 `tc016s`/`tc036s` cells → `xfail(strict=False)` via `_batch44_drift_marks`. A canonical-CI regen PR (snapshot-regen.yml, textual==8.2.8) retires the marks post-merge (the batch-36/37/38 pattern). 11 cells xpassed (didn't drift) — harmless under strict=False.
-- **Scope note:** Inc-2 touched 6 code files (vs the ≤5 guideline) — the rail rename rippled into `test_tui_commandbar.py` + rail-census updates. Surfaced, not silent.
-- Run is synchronous on the UI thread (fine for the tracer's small images; worker-ize in polish).
-
-### Security flags — handling
-`security_required: true`. security-reviewer pre-code pass: **F1** (containment) — `run_flow` resolves every file-ref via `_resolve_manifest_entry` before any open; **F2** — write-out only via `save_patched_image(source_kind=fmt)`; **F4** — all panel sinks via `safe_text`; **F5** — per-block isolation. All applied + locked (path-escape AT, markup-safe AT). No residual.
-
-### Suggested commit message
-```
-feat(tui): batch-44 — Flow Builder tracer (source→patch→write-out, rail-8) (R-TUI-059)
-```
