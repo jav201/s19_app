@@ -234,14 +234,19 @@ def test_at_036a_missing_schema_red_row_has_matching_error_issue(tmp_path: Path)
         assert {"RPM", "BROKEN_CHAR", "NOLEN_CHAR", "VIRT_CHAR"} <= set(rows), (
             f"A2L table missing expected tag rows; rendered names: {sorted(rows)}"
         )
-        # Observable 1 — red rows for both schema_ok=False arms (a2l.py:1290-1291).
+        # Observable 1 — a missing *address* (non-virtual) is the only schema_ok=False
+        # arm: BROKEN_CHAR renders red (_tag_schema_and_applicability address branch).
         assert all(cell.style == error_style for cell in rows["BROKEN_CHAR"]), (
             "BROKEN_CHAR (missing address, non-virtual) row is not ERROR-styled"
         )
-        assert all(cell.style == error_style for cell in rows["NOLEN_CHAR"]), (
-            "NOLEN_CHAR (missing length) row is not ERROR-styled"
+        # Boundary — a valid address with an underivable *length* is spec-valid
+        # (ASAM size is derived), so NOLEN_CHAR must NOT render red — it is
+        # "valid, not memory-checked" (a2l-missing-length-fix batch).
+        assert all(cell.style != error_style for cell in rows["NOLEN_CHAR"]), (
+            "NOLEN_CHAR (missing length, valid address) must NOT render red — "
+            "an underivable length is valid, not a schema failure"
         )
-        # Boundary — virtual/no-address tag is exempt by construction (a2l.py:1288-1289).
+        # Boundary — virtual/no-address tag is exempt by construction (virtual branch).
         assert all(cell.style != error_style for cell in rows["VIRT_CHAR"]), (
             "VIRT_CHAR (virtual, no address) must NOT render red"
         )
@@ -263,9 +268,10 @@ def test_at_036a_missing_schema_red_row_has_matching_error_issue(tmp_path: Path)
         )
         assert broken[0][_SEV] == ValidationSeverity.ERROR
         assert "missing address/length" in broken[0][_MESSAGE]
-        assert nolen, (
-            f"missing-length arm produced no {SUPPLEMENTAL_CODE} issue; "
-            f"rendered issue rows: {issue_rows!r}"
+        assert not nolen, (
+            f"missing-length tag (valid address) must NOT gain a "
+            f"{SUPPLEMENTAL_CODE} issue — its length is derivable-in-spec, not a "
+            f"schema failure; rendered issue rows: {issue_rows!r}"
         )
         assert not any(row[_SYMBOL] == "VIRT_CHAR" for row in supplemental), (
             "virtual-exempt tag must not gain a supplemental issue"

@@ -5416,7 +5416,10 @@ _ENGINE_PATHS: tuple[str, ...] = (
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    "s19_app/tui/a2l.py",
+    # NOTE: ``s19_app/tui/a2l.py`` was deliberately UNFROZEN in the
+    # a2l-missing-length-fix batch (operator-approved parsing-logic fix to
+    # ``_tag_schema_and_applicability``). It is intentionally absent from this
+    # frozen set so the sanctioned edit does not trip TC-031.
     "s19_app/tui/mac.py",
     "s19_app/tui/color_policy.py",
 )
@@ -6448,30 +6451,40 @@ def test_at_038c_a2l_error_row_keeps_severity_style(tmp_path: Path) -> None:
     carries its severity style after the density polish.
 
     Intent: the density polish must not disturb the per-row `_severity_style`
-    colouring. An ERROR issue mapped to a real case_01 symbol (`CAL_BLOCK_A`)
-    must still red that row — i.e. its DataTable cells must be `rich.text.Text`
-    styled "red" (the frozen `_SEVERITY_TO_RICH_STYLE[ERROR]`). A polish that
-    dropped the styled `Text` cells (or flipped to markup) would fail this.
+    colouring. An A2L symbol carrying a real ERROR-severity issue (`CAL_BLOCK_A`,
+    duplicated in the loaded A2L so the recomputed report emits
+    `A2L_DUPLICATE_SYMBOL`) must still red that row via the issue-severity map —
+    i.e. its DataTable cells must be `rich.text.Text` styled "red" (the frozen
+    `_SEVERITY_TO_RICH_STYLE[ERROR]`). A polish that dropped the styled `Text`
+    cells (or flipped to markup) would fail this.
+
+    The red MUST come from the REAL recomputed report, not a hand-seeded
+    ``_validation_issues``: ``update_a2l_view`` rebuilds the issue list from the
+    current file pair (LLR-037.3), so a pre-seeded issue is discarded before the
+    row renders. Injecting a genuine duplicate exercises the production
+    issue-map -> red path. (Before the a2l-missing-length-fix batch this test
+    leaned unknowingly on ``CAL_BLOCK_A``'s missing-length ``schema_ok=False``;
+    that batch corrected the verdict — an underivable length is not a schema
+    failure — exposing that the seed never wired through. See
+    ``.fast-dev-flow/spec.md`` §AC-5.)
     """
+    import copy
+
     from rich.text import Text
     from textual.widgets import DataTable
-
-    from s19_app.validation.model import ValidationIssue, ValidationSeverity
 
     async def _drive() -> dict[str, object]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
             _load_case_01(app)
-            app._validation_issues = [
-                ValidationIssue(
-                    code="A2L_DUPLICATE_SYMBOL",
-                    severity=ValidationSeverity.ERROR,
-                    message="seeded error for CAL_BLOCK_A",
-                    artifact="a2l",
-                    symbol="CAL_BLOCK_A",
-                )
-            ]
+            # Duplicate CAL_BLOCK_A so the recomputed report flags a
+            # symbol-carrying A2L_DUPLICATE_SYMBOL ERROR the issue-severity map
+            # maps to a red row (robust to update_a2l_view's issue recompute,
+            # unlike a hand-seeded _validation_issues).
+            tags = app.current_a2l_data["tags"]
+            original = next(t for t in tags if t.get("name") == "CAL_BLOCK_A")
+            tags.append(copy.deepcopy(original))
             app.update_a2l_view()
             await pilot.press("2")
             await pilot.pause()

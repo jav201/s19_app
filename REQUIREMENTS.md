@@ -373,6 +373,16 @@ Notes:
 
 - Absence from S19/HEX does not invalidate an A2L record.
 - Schema validity must be judged by A2L object type, not by image presence.
+- An **underivable length is not a schema failure**. Per ASAM MCD-2 MC a
+  MEASUREMENT/CHARACTERISTIC size is *derived* (Datatype / RECORD_LAYOUT), so a
+  record with a valid address whose length could not be derived is spec-valid:
+  it renders White/Grey ("valid, not memory-checked"), never Red. Only a missing
+  *address* is a schema concern. Source: `_tag_schema_and_applicability` in
+  `s19_app/tui/a2l.py` (split into distinct address / length branches by the
+  a2l-missing-length-fix batch, which UNFROZE `a2l.py` from the C-27 dual-guard
+  frozen set). Regression: `tests/test_a2l_missing_length_fix.py` and the
+  `NOLEN_CHAR` boundary in `tests/test_validation_service_supplemental.py`
+  (`test_at_036a_*`).
 
 ### MAC Tag/Parameter Validation Criteria
 

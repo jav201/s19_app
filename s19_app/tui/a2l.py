@@ -1281,14 +1281,23 @@ def _memory_range_in_map(address: int, length: int, mem_map: Dict[int, int]) -> 
 
 
 def _tag_schema_and_applicability(tag: dict) -> tuple[bool, bool, str]:
-    """Return (schema_ok, memory_check_applicable, reason_if_schema_bad)."""
+    """Return (schema_ok, memory_check_applicable, reason_if_schema_bad).
+
+    ASAM MCD-2 MC derives a MEASUREMENT/CHARACTERISTIC size (Datatype /
+    RECORD_LAYOUT), so an object whose length could not be *derived* is still
+    spec-valid — only a missing *address* is a schema concern. A valid address
+    with an underivable length is therefore ``schema_ok`` but not
+    memory-checkable (renders white/grey, never red).
+    """
     virtual = tag.get("virtual") is True
     address = tag.get("address")
     length = tag.get("length")
     if virtual and address is None:
         return True, False, ""
-    if address is None or length is None:
+    if address is None:
         return False, False, "missing address/length"
+    if length is None:
+        return True, False, ""
     return True, True, ""
 
 
