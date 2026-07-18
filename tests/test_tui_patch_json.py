@@ -83,7 +83,7 @@ from rich.color import Color
 from rich.style import Style
 from rich.text import Text
 from textual.app import App, ComposeResult
-from textual.widgets import Static, TextArea
+from textual.widgets import Button, Static, TextArea
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.insight_style import (
@@ -1127,3 +1127,328 @@ def test_tc079_5b_cap_gauge_escalates_without_verdict_hues() -> None:
                 f"{verdict_name} VERDICT hue — inside #patch_editor_panel that "
                 f"reads as a check result, which is what the operator ruled out"
             )
+
+
+# ===========================================================================
+# fix/patch-json-editor-fill-height — the JSON editor fills its window height
+# ===========================================================================
+#
+# The editor `#patch_paste_text` moved from a fixed `height: 8` to `1fr`
+# (min-height: 8), with `1fr` on `#patch_win_json_body` and `#patch_paste_row`
+# so the fill cascades down the JSON window ONLY. Every assertion below reads the
+# PAINTED `region` (C-32 assert-the-painted-result), never a CSS constant.
+#
+# ⚠ **MEASURED CEILING — why the growth is observed at 120x50, not 120x30.** The
+# spec's AC-1 names 120x30, but a pilot region capture showed the whole
+# `#workspace_shell` is only ~15 rows tall at a 30-row terminal (the app's global
+# layout reserves the lower rows for another pane), so `#patch_editor_panel` maxes
+# at ~13 rows and the JSON window at ~9 content rows — the editor is capped at 8
+# by AVAILABLE ROOM there, identically under `height: 8` and under `1fr`. The
+# empty-space defect the fix targets only manifests once the JSON window has free
+# vertical space, i.e. at ~34+ rows. So the growth arm observes 120x50 (mutation-
+# discriminating: `height: 8` -> editor 8, `1fr` -> editor 26), and 120x30 is
+# covered by a no-regression / floor arm. This is a spec/reality reconciliation
+# surfaced in the review packet, not a silent test-size swap.
+
+_FILL_TALL = (120, 50)  # JSON window has real free vertical space here
+_FLOOR = (80, 24)  # the tight floor (min-height keeps the editor usable)
+_PRIMARY = (120, 30)  # the spec's AC-1 size — panel too short to grow (see above)
+
+# Reachability-under-scroll primitives (FOLD-8 / B2), lifted verbatim from
+# tests/test_tui_patch_layout.py so this file stays self-contained.
+_DOCKED_JSON_BUTTONS = ("patch_paste_parse_button", "patch_edit_json_button")
+
+
+def _fully_visible(app: S19TuiApp, w: object) -> bool:
+    """True if ``w`` is fully on screen AT THE CURRENT SCROLL (0-area -> False)."""
+    r = w.region
+    if r.area == 0:
+        return False
+    if not app.screen.region.contains_region(r):
+        return False
+    node = w.parent
+    while node is not None and node is not app.screen:
+        if getattr(node, "is_scrollable", False):
+            if not node.content_region.contains_region(r):
+                return False
+        node = node.parent
+    return True
+
+
+def _scrollers(app: S19TuiApp, w: object) -> list:
+    """``w``'s ancestors that ACTUALLY scroll (``show_vertical_scrollbar``)."""
+    out = []
+    node = w.parent
+    while node is not None and node is not app.screen:
+        if getattr(node, "show_vertical_scrollbar", False):
+            out.append(node)
+        node = node.parent
+    return out
+
+
+async def _reach(app: S19TuiApp, pilot: object, w: object) -> None:
+    """Scroll ``w``'s real scrolling ancestors so ``w`` enters the viewport."""
+    for _ in range(6):
+        for sc in _scrollers(app, w):
+            sc.scroll_y = max(
+                0, w.region.y - sc.content_region.y + sc.scroll_offset.y
+            )
+        await pilot.pause()
+    await pilot.pause()
+
+
+def _json_window_bodies(app: S19TuiApp) -> dict[str, object]:
+    """The three windows' scrollable bodies, keyed by window id."""
+    from textual.containers import VerticalScroll
+
+    bodies = {}
+    for wid in ("patch_win_json", "patch_win_script", "patch_win_checks"):
+        bodies[wid] = app.query_one(f"#{wid}").query_one(VerticalScroll)
+    return bodies
+
+
+# ---------------------------------------------------------------------------
+# AC-1 — the editor GROWS past the old fixed cap to fill the JSON window
+# ---------------------------------------------------------------------------
+
+
+def test_ac1_editor_fills_json_window_when_room_exists() -> None:
+    """At 120x50 the editor grows past 8 and fills the JSON window body flush.
+
+    C-32: the assertion reads ``#patch_paste_text.region.height`` — the PAINTED
+    region — not the CSS. MEASURED: under the shipped ``height: 1fr`` the editor
+    is 26 rows and its bottom is flush with the JSON body's content region; under
+    a reverted ``height: 8`` it is 8 (the mutation that makes this RED, verified
+    by hand). A ``display:none`` / zero-area editor has ``region.height == 0``,
+    which also fails the ``> 8`` assertion — so this arm cannot green on an
+    invisible widget.
+    """
+
+    async def _run() -> tuple[int, int, int]:
+        app = S19TuiApp()
+        async with app.run_test(size=_FILL_TALL) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+            body = _json_window_bodies(app)["patch_win_json"]
+            return (
+                editor.region.height,
+                editor.region.bottom,
+                body.content_region.bottom,
+            )
+
+    editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+    assert editor_h > 8, (
+        f"the JSON editor must GROW past the old fixed cap of 8 when the window "
+        f"has free vertical space (120x50); painted region.height is {editor_h}"
+    )
+    # Fills flush: no empty gap between the editor and the bottom of the window
+    # body (the visible defect was the empty band below a height-8 editor).
+    assert editor_bottom == body_bottom, (
+        f"the editor must fill its window body flush (no empty band below it); "
+        f"editor bottom {editor_bottom} vs body content bottom {body_bottom}"
+    )
+
+
+def test_ac1b_editor_holds_min_floor_at_primary_size() -> None:
+    """At 120x30 the editor still consumes its window and never shrinks below 8.
+
+    Growth is NOT observable at 120x30 (the ~15-row ``#workspace_shell`` ceiling
+    — see the section header), so this is a no-regression / floor arm, NOT a
+    growth arm. It pins two painted facts: the editor keeps its usable height
+    (>= the min-height floor of 8, i.e. the flex rule did not let it collapse to
+    7 as a bare ``1fr`` would), and it still reaches the JSON body bottom (no new
+    empty band introduced at this size).
+    """
+
+    async def _run() -> tuple[int, int, int]:
+        app = S19TuiApp()
+        async with app.run_test(size=_PRIMARY) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+            body = _json_window_bodies(app)["patch_win_json"]
+            return (
+                editor.region.height,
+                editor.region.bottom,
+                body.content_region.bottom,
+            )
+
+    editor_h, editor_bottom, body_bottom = asyncio.run(_run())
+    assert editor_h >= 8, (
+        f"the min-height floor must keep the editor usable at the primary size; "
+        f"painted region.height is {editor_h} (a bare 1fr would collapse to 7)"
+    )
+    assert editor_bottom >= body_bottom, (
+        f"the editor must still reach the JSON body bottom at 120x30 (no new "
+        f"empty band); editor bottom {editor_bottom} vs body bottom {body_bottom}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AC-2 — at 80x24 the editor fills, and the docked buttons stay reachable (B2)
+# ---------------------------------------------------------------------------
+
+
+def test_ac2_docked_buttons_reachable_under_scroll_at_floor() -> None:
+    """At 80x24 the resized editor does NOT push the docked JSON buttons off-reach.
+
+    THE HARD GATE (a B2 recurrence is a HIGH). The docked rows are SIBLINGS of the
+    JSON window body, so scrolling the window/panel into view must bring each
+    button fully on screen. MEASURED via the batch-46 reachable-under-scroll
+    contract (``_reach`` then ``_fully_visible``), reading painted regions.
+    """
+
+    async def _run() -> tuple[int, dict[str, bool]]:
+        app = S19TuiApp()
+        async with app.run_test(size=_FLOOR) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+            reach = {}
+            for bid in _DOCKED_JSON_BUTTONS:
+                button = app.query_one(f"#{bid}", Button)
+                await _reach(app, pilot, button)
+                reach[bid] = _fully_visible(app, button)
+            return editor.region.height, reach
+
+    editor_h, reach = asyncio.run(_run())
+    # The min-height floor keeps the editor usable at the tight floor ...
+    assert editor_h >= 8, (
+        f"at 80x24 the editor must keep its usable floor; region.height {editor_h}"
+    )
+    # ... without trapping any docked button below reachability (the B2 gate).
+    unreachable = [bid for bid, ok in reach.items() if not ok]
+    assert unreachable == [], (
+        f"@80x24 docked JSON buttons NOT reachable-under-scroll after the editor "
+        f"grew: {unreachable} — this is the B2 defect (HIGH). reach={reach}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AC-3 — the fill is JSON-window-scoped (no leak to the other two windows)
+# ---------------------------------------------------------------------------
+
+
+def test_ac3_fill_does_not_leak_to_sibling_windows() -> None:
+    """The 1fr fill is scoped to the JSON window; CHECKS / SCRIPT are untouched.
+
+    MEASURED at 120x50, where the discriminator is sharpest: the JSON body fills
+    its tall window (~28 of 29 rows), but the CHECKS window — whose content is a
+    few rows — must NOT stretch to fill its equally-tall window. Had the shared
+    ``.patch-window-body`` rule been given ``1fr`` (the C-30 leak this guards),
+    the CHECKS body would stretch too. The SCRIPT body stays content-driven
+    (its own tall table), i.e. ``height: auto`` behaviour unchanged.
+    """
+
+    async def _run() -> dict[str, tuple[int, int]]:
+        app = S19TuiApp()
+        async with app.run_test(size=_FILL_TALL) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            out = {}
+            for wid, body in _json_window_bodies(app).items():
+                win = app.query_one(f"#{wid}")
+                out[wid] = (win.content_region.height, body.region.height)
+            return out
+
+    dims = asyncio.run(_run())
+    json_win_h, json_body_h = dims["patch_win_json"]
+    checks_win_h, checks_body_h = dims["patch_win_checks"]
+    script_win_h, script_body_h = dims["patch_win_script"]
+
+    # The JSON body DID fill its window (the intended effect / the contrast).
+    assert json_body_h >= json_win_h - 2, (
+        f"the JSON body should fill its window; body {json_body_h} vs window "
+        f"content {json_win_h}"
+    )
+    # The CHECKS window is just as tall, but its body must stay content-sized —
+    # this is the no-leak proof.
+    assert checks_win_h >= 20, (
+        f"precondition: the CHECKS window must be tall at 120x50 for the leak "
+        f"test to bite; got window content height {checks_win_h}"
+    )
+    assert checks_body_h <= 6, (
+        f"C-30 LEAK: the CHECKS window body stretched to {checks_body_h} rows in "
+        f"a {checks_win_h}-row window — the fill was NOT scoped to the JSON "
+        f"window (the shared .patch-window-body rule was changed)"
+    )
+    # The SCRIPT body remains content-driven (auto), not forced to the window.
+    assert script_body_h != script_win_h or script_body_h > script_win_h, (
+        f"the SCRIPT body should track its own content, not the window; body "
+        f"{script_body_h} vs window {script_win_h}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AC-4 — C-17 preserved: hostile paste still inert AFTER the resize
+# ---------------------------------------------------------------------------
+
+
+def test_ac4_hostile_paste_inert_after_resize() -> None:
+    """After the height change, a hostile payload still renders literally and inert.
+
+    The resize is layout-only and must not touch the ``_render_line`` paint path
+    (C-17). This drives the RESIZED panel and re-runs the AT-079c inert predicate
+    on the silent-injection payload (``[red]PWNED[/red]``) — the one that raises
+    nothing under rich's grammar — reusing the module's own oracle. It observes
+    the painted result at 80x24, the non-wrapping regime the AT-079c harness
+    established (the resize does not change the editor's WIDTH there, so no new
+    wrapping is introduced). Complements — does not replace —
+    ``test_at079c_hostile_paste_renders_literally`` (full payload set).
+    """
+
+    async def _run() -> tuple[list, list, int]:
+        app = S19TuiApp()
+        async with app.run_test(size=_FLOOR) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            buffer = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+            buffer.text = _payload_buffer()
+            await pilot.pause()
+            _assert_no_wrapping(buffer)
+            payload = "[red]PWNED[/red]"
+            line_index = _PAYLOAD_LINES[payload]
+            _assert_off_cursor_line(buffer, line_index)
+            return (
+                _segments(buffer, line_index),
+                _segments(buffer, 0),
+                buffer.region.height,
+            )
+
+    payload_segments, control_segments, editor_h = asyncio.run(_run())
+    # The resize is really in effect (flex floor), not a stale height-8 build.
+    assert editor_h >= 8
+    _assert_payload_is_inert(
+        payload_segments, "[red]PWNED[/red]", "post-resize C-17", control_segments
+    )
+
+
+# ---------------------------------------------------------------------------
+# AC-5 — the cap gauge stays above the editor after the growth
+# ---------------------------------------------------------------------------
+
+
+def test_ac5_gauge_stays_above_editor() -> None:
+    """The cap gauge renders above the (now taller) editor and is not overlapped.
+
+    MEASURED at 120x50, where the editor is at its tallest: the gauge's painted
+    region sits strictly above the editor's, so the editor's growth pushes DOWN
+    from the gauge rather than displacing or overlapping it.
+    """
+
+    async def _run() -> tuple[int, int, int]:
+        app = S19TuiApp()
+        async with app.run_test(size=_FILL_TALL) as pilot:
+            app.action_show_screen("patch")
+            await pilot.pause()
+            gauge = app.query_one("#patch_paste_gauge", Static)
+            editor = app.query_one("#patch_paste_text", JsonHighlightTextArea)
+            return gauge.region.bottom, editor.region.y, editor.region.height
+
+    gauge_bottom, editor_y, editor_h = asyncio.run(_run())
+    assert editor_h > 8, "precondition: the editor must have grown at 120x50"
+    assert gauge_bottom <= editor_y, (
+        f"the cap gauge must stay above the editor after it grows; gauge bottom "
+        f"{gauge_bottom} is not above editor top {editor_y}"
+    )

@@ -813,6 +813,54 @@ def _batch48_patch_drift_marks(screen: str, density: str, size_key: str) -> tupl
     return ()
 
 
+# fix/patch-json-editor-fill-height (Inc-1): the JSON editor `#patch_paste_text`
+# flexes from a fixed `height: 8` to `1fr` (with a `min-height: 8` floor), and
+# `#patch_win_json_body` / `#patch_paste_row` gain `1fr` so the fill cascades
+# (JSON-window-scoped — the shared `.patch-window-body` and the other two
+# windows are untouched). The editor stays 8 rows at both snapshot sizes (30
+# rows is too short to grow, 24 floors at min-height), but the JSON-window body
+# no longer needs its overflow scrollbar and the docked rows shift up 1 row.
+#
+# ⚠ ONLY the 120x30 cell drifts — MEASURED, not assumed (the batch brief
+# predicted both). At 120x30 the three windows sit 3-across and the JSON window
+# is fully in the captured frame, so its repaint lands. At 80x24 the windows
+# STACK and the JSON window sits BELOW THE FOLD (document y ~73 in a 24-row
+# frame), so its repaint is off-frame and the SVG is byte-identical — running
+# the cell xpasses. Marking it xfail would mask a future regression (the
+# `_batch46_patch_drift_marks:518` XPASS caveat), so it is left LIVE. Containment
+# is patch-only (C-28 shared-chrome clean — no footer/header/rail binding
+# changes; `map`, the other _TWO_SIZE_SCAFFOLDS screen, is untouched). Marked
+# `xfail(strict=False)` until the canonical-CI baseline regen lands (post-merge
+# follow-up, snapshot-regen.yml @ textual==8.2.8 — NEVER regenerated locally),
+# then retired — the `_batch46`/`_batch47`/`_batch48` pattern.
+def _fdf_json_height_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the JSON-editor-fill-height drift mark (fix/patch-json-editor-fill-height).
+
+    The ``patch-comfortable-120x30`` scaffold cell drifts when the JSON editor
+    flexes to fill its window: the ``#patch_win_json`` body loses its overflow
+    scrollbar and the docked button rows shift up one row. The 80x24 cell does
+    NOT drift (the JSON window is below the fold there), so it is not marked.
+    ``xfail(strict=False)`` until the canonical-CI baseline regen lands, then
+    retired.
+    """
+    del density
+    if screen == "patch" and size_key == "120x30":
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "fix/patch-json-editor-fill-height Inc-1: #patch_paste_text "
+                    "flexes from height:8 to 1fr (+min-height:8) with 1fr on "
+                    "#patch_win_json_body / #patch_paste_row; the JSON window "
+                    "repaints (scrollbar dropped, docked rows shift up 1 row). "
+                    "SVG baseline regen pending in canonical CI "
+                    "(snapshot-regen.yml, post-merge follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -878,7 +926,8 @@ _SCAFFOLD_CELLS = [
         + _batch46_patch_drift_marks(screen, "comfortable", size_key)
         + _batch47_map_drift_marks(screen, "comfortable", size_key)
         + _batch47_theme_drift_marks(screen, "comfortable", size_key)
-        + _batch48_patch_drift_marks(screen, "comfortable", size_key),
+        + _batch48_patch_drift_marks(screen, "comfortable", size_key)
+        + _fdf_json_height_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
