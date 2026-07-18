@@ -94,7 +94,32 @@ PR via a `_fdf_json_height_drift_marks`-style helper, retire on regen — the es
 ## 9. Batch status
 | Field | Value |
 |-------|-------|
-| Current phase | A (awaiting gate) |
+| Current phase | **closed 2026-07-18** |
 | Started | 2026-07-18 |
-| Route | /fast-dev-flow |
+| Route | /fast-dev-flow (autonomous through self-merge) |
 | Promoted to /dev-flow | no |
+| Merged | **PR #90 `2f25bef`** (squash) — CI green (tui-ci 22m44s + snapshot) |
+
+## 10. Close
+### What changed
+The Patch Editor JSON editor (`#patch_paste_text`) now flexes to `1fr` and fills the `#patch_win_json`
+window's free vertical height (min-height `8` floor at the 80×24 minimum), instead of a fixed `height: 8`
+that scrollbarred and left the window empty below it. CSS-only, JSON-window-scoped; the shared
+`.patch-window-body` rule and the "Edit JSON" modal are untouched.
+
+### How it was tested
+6 new AC tests (geometry via `region.height` — C-32); B2 reachability measured at 80×24 (no regression);
+C-17 hostile-paste re-verified post-resize (AT-079c holds); reduced gate **1547 passed / 0 failed**; C-27
+dual-guard 0 frozen diff; ruff clean. Mutation: flip to `height: 8` → AC-1 RED.
+
+### Open risks / pending
+- **Post-merge canonical-CI snapshot regen** for `patch-comfortable-120x30` + retire `_fdf_json_height_drift_marks`
+  (in flight as of close).
+- **AC-1 size ratified** to 120×50 (the growth is unobservable at 120×30 — the panel is space-constrained
+  there; the operator's terminal is taller). No scope change.
+- If the operator wants the editor to grow at 30-row terminals too, that needs a global `#workspace_shell`
+  layout change — out of this fix's scope.
+
+### Security flags — handling
+`security_required: false`. The C-17 preservation watch-item (AC-4) was verified: the resize did not touch
+`JsonHighlightTextArea._render_line`; hostile paste renders literally post-resize.

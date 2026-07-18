@@ -843,21 +843,12 @@ def _fdf_json_height_drift_marks(screen: str, density: str, size_key: str) -> tu
     ``xfail(strict=False)`` until the canonical-CI baseline regen lands, then
     retired.
     """
-    del density
-    if screen == "patch" and size_key == "120x30":
-        return (
-            pytest.mark.xfail(
-                reason=(
-                    "fix/patch-json-editor-fill-height Inc-1: #patch_paste_text "
-                    "flexes from height:8 to 1fr (+min-height:8) with 1fr on "
-                    "#patch_win_json_body / #patch_paste_row; the JSON window "
-                    "repaints (scrollbar dropped, docked rows shift up 1 row). "
-                    "SVG baseline regen pending in canonical CI "
-                    "(snapshot-regen.yml, post-merge follow-up)"
-                ),
-                strict=False,
-            ),
-        )
+    # RETIRED (json-height regen PR): the canonical-CI regen has LANDED - the
+    # patch-comfortable-120x30 cell now matches its regenerated baseline (JSON
+    # editor filling its window), so the xfail is dropped and the cell is a
+    # live regression guard again. No-op stub for lineage, matching the
+    # _batch45/46/47/48 retirement convention.
+    del screen, density, size_key
     return ()
 
 
