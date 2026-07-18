@@ -804,19 +804,12 @@ def _batch48_patch_drift_marks(screen: str, density: str, size_key: str) -> tupl
     canonical-CI baseline regen lands (batch-48 post-merge follow-up), then
     retired — the ``_batch45``/``_batch46``/``_batch47`` pattern.
     """
-    if screen == "patch" and size_key in ("80x24", "120x30"):
-        return (
-            pytest.mark.xfail(
-                reason=(
-                    "batch-48 Inc-1 R-TUI-075 US-P1: patch windows gain border "
-                    "titles + live subtitles (LLR-075.1) and the variant/scope "
-                    "line mounts (LLR-075.3); SVG baseline regen pending in "
-                    "canonical CI (snapshot-regen.yml, batch-48 post-merge "
-                    "follow-up)"
-                ),
-                strict=False,
-            ),
-        )
+    # RETIRED (batch-48 regen PR): the canonical-CI regen has LANDED - the 2
+    # patch scaffold cells (comfortable x {80x24, 120x30}) now match their
+    # regenerated baselines (Patch Editor BIG layout), so the xfail is dropped
+    # and the cells are live regression guards again. Kept as a no-op stub for
+    # lineage, matching the _batch45/46/47 retirement convention.
+    del screen, density, size_key
     return ()
 
 
