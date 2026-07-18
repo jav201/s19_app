@@ -1044,6 +1044,11 @@ class S19TuiApp(App):
         Binding("t", "view_reports", "View reports", show=False),
         Binding("x", "operations_view", "Operations", show=True),
         Binding("k", "show_legend", "Legend", show=True),
+        # Discoverability: `?` opens Textual's built-in help panel, which lists
+        # EVERY active binding (key + description) — so the many show=False keys
+        # (rails 1-8, save/load project, dump-json, before/after report, undo/redo,
+        # paging) are learnable from the UI. show=True so the Footer advertises it.
+        Binding("question_mark", "show_help_panel", "Help", show=True),
         Binding("b", "before_after_report", "Before/After report", show=False),
         Binding("1", "show_screen('workspace')", "Workspace", show=False),
         Binding("2", "show_screen('a2l')", "A2L Explorer", show=False),
@@ -4255,6 +4260,7 @@ class S19TuiApp(App):
                 Button("All", id="a2l_filter_all"),
                 Button("Invalid", id="a2l_filter_invalid"),
                 Button("In-Memory", id="a2l_filter_inmem"),
+                Button("Legend", id="a2l_legend_button"),
                 Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
                 Button("Find next", id="a2l_tag_find_next"),
                 Button("Page Prev", id="a2l_page_prev_button"),
@@ -10101,6 +10107,7 @@ class S19TuiApp(App):
         elif event.button.id in (
             "mac_legend_button",
             "issues_legend_button",
+            "a2l_legend_button",
         ):
             self.action_show_legend()
 
