@@ -7780,11 +7780,14 @@ def test_ac3_issues_pgdn_pgup_page_the_grouped_panel(tmp_path: Path) -> None:
     """AC-3 / B-04: PgDn / PgUp page the Issues window (RED-first: the keys
     named by `GroupedIssuesPanel.TRUNCATION_NOTE` had no binding at all).
 
-    Intent: with more filtered issues than one page (page size 200), pressing
-    PgDn on the Issues screen must advance `_validation_issues_window_start`
-    by one page (and re-render), and PgUp must rewind it — through the real
-    key dispatch, not by calling the action directly.
+    Intent: with more filtered issues than one page, pressing PgDn on the Issues
+    screen must advance `_validation_issues_window_start` by one page (and
+    re-render), and PgUp must rewind it — through the real key dispatch, not by
+    calling the action directly. The page stride is the grouped-panel mount cap
+    `_GROUP_DISPLAY_MAX`, not the configured viewer page size (field-audit B1 —
+    a larger stride skipped rows past the cap).
     """
+    from s19_app.tui.issues_view import _GROUP_DISPLAY_MAX
     from s19_app.validation.model import ValidationIssue, ValidationSeverity
 
     async def _drive() -> "tuple[int, int, int]":
@@ -7816,8 +7819,9 @@ def test_ac3_issues_pgdn_pgup_page_the_grouped_panel(tmp_path: Path) -> None:
 
     before, after_down, after_up = asyncio.run(_drive())
     assert before == 0
-    assert after_down == S19TuiApp.validation_issues_page_size, (
-        f"PgDn must advance the issues window by one page; got {after_down}"
+    assert after_down == _GROUP_DISPLAY_MAX, (
+        f"PgDn must advance the issues window by one page (the mount-cap "
+        f"stride {_GROUP_DISPLAY_MAX}); got {after_down}"
     )
     assert after_up == 0, f"PgUp must rewind the issues window; got {after_up}"
 
