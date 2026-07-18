@@ -748,7 +748,10 @@ header and a per-issue code "chip", beside the retained `#issues_hex_pane` live
 peek (selection repaints it via `_update_issues_hex_pane`); the grouped view
 preserves the existing paging window + severity filter and mounts at most a
 bounded display window (`_GROUP_DISPLAY_MAX`) so a hostile large-N issue list
-cannot flood the widget tree, and every file-derived string (`.code` / `.symbol`
+cannot flood the widget tree — and the PgUp/PgDn paging stride is bounded by that
+same `_GROUP_DISPLAY_MAX` (`_issues_page_size`) so every issue stays reachable
+(field-audit B1: a larger stride truncated-and-skipped the rows past the cap and
+no-op'd PgDn on ≤200-issue lists) — and every file-derived string (`.code` / `.symbol`
 / `.message`) is rendered markup-safe (US-039 / HLR-039.a/.b / LLR-042.3–.6/.10);
 (c) **Workspace** shows inline coverage signal without opening the Memory Map —
 a per-range range-magnitude micro-bar (validity colour + width ∝ range size, NOT
