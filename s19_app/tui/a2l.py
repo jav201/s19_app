@@ -704,7 +704,11 @@ def _infer_length_measurement(lines: list[str], header: Optional[dict]) -> Optio
     return None
 
 
-def _infer_length_characteristic(lines: list[str], header: Optional[dict]) -> Optional[int]:
+def _infer_length_characteristic(
+    lines: list[str],
+    header: Optional[dict],
+    record_layouts_by_name: Optional[dict[str, dict]] = None,
+) -> Optional[int]:
     explicit = None
     matrix = None
     number_ascii = None
@@ -731,6 +735,18 @@ def _infer_length_characteristic(lines: list[str], header: Optional[dict]) -> Op
     deposit = str(h.get("deposit") or "")
     char_type = h.get("char_type")
     el = sizeof_from_deposit(deposit)
+    if el is None and char_type == "VALUE" and record_layouts_by_name:
+        # Scalar VALUE only: the deposit name carries no size hint (e.g. a
+        # project-named layout like ``RL_U8``), so resolve the RECORD_LAYOUT
+        # and take its element datatype size (ASAM MCD-2 MC — a scalar's size
+        # IS its element size). Restricted to VALUE on purpose: a CURVE/MAP is
+        # an array over its axes, so the element size would UNDER-report the
+        # real span and make the byte-range memory check falsely pass on too
+        # few bytes. Those stay length=None (honest grey) unless a MATRIX_DIM
+        # or a name-encoded deposit already sized them above.
+        meta = _resolve_record_layout(deposit, record_layouts_by_name)
+        if meta and meta.get("decode_type"):
+            el = DATATYPE_SIZES.get(meta["decode_type"])
     if char_type == "ASCII" and number_ascii is not None:
         return number_ascii
     if el is None:
@@ -1038,7 +1054,9 @@ def extract_a2l_tags(
                 if name == "MEASUREMENT" and tag["length"] is None:
                     tag["length"] = _infer_length_measurement(lines, header_meas)
                 if name == "CHARACTERISTIC" and tag["length"] is None:
-                    tag["length"] = _infer_length_characteristic(lines, header_char)
+                    tag["length"] = _infer_length_characteristic(
+                        lines, header_char, record_layouts_by_name
+                    )
 
                 for child in section.get("children") or []:
                     if child.get("name") == "AXIS_DESCR":

@@ -1,152 +1,101 @@
-# fast-dev-flow spec — A2L missing-length no longer flagged as ERROR (engine-unfreeze)
+# fast-dev-flow spec — A2L CHARACTERISTIC length from resolved RECORD_LAYOUT (P-1)
 
 - **Date:** 2026-07-18
-- **Batch:** a2l-missing-length-fix
-- **Flow:** /fast-dev-flow (engine-unfreeze increment included)
+- **Batch:** a2l-record-layout-length (backlog P-1, follow-up to the a2l-missing-length-fix)
+- **Flow:** /fast-dev-flow
 - **Language:** English
-- **Run mode / merge:** Autonomous through self-merge (operator-authorized this batch; standing auth is per-batch and does NOT carry). Surface any HIGH finding or scope creep immediately.
-- **Status:** Phase A — spec (autonomy granted; no external gate)
+- **Run mode / merge:** Autonomous through self-merge (operator-authorized this batch; per-batch, not carried). Surface any HIGH finding / unexpected fallout before merge.
+- **Status:** Phase A — spec
 
 ---
 
 ## 1. Objective
 
-Stop the A2L view from painting a **spec-valid** record RED when its byte length cannot be
-*derived* from the file. Under ASAM MCD-2 MC, a `MEASUREMENT`/`CHARACTERISTIC` size is **derived**
-(MEASUREMENT ← Datatype; CHARACTERISTIC ← RECORD_LAYOUT / Deposit), not required inline. A record
-with a valid address but no derivable length is therefore **valid, just not memory-checkable** — it
-must render white/grey ("valid, not memory-checked"), never red.
+Populate a scalar `CHARACTERISTIC`'s byte `length` by **resolving its RECORD_LAYOUT**, so records
+that reference a project-named layout (e.g. `RL_U8`, whose *name* encodes no size) become
+memory-checkable instead of landing `length=None` → grey "not checked". This is the deeper root the
+a2l-missing-length-fix (🅰) flagged: `_infer_length_characteristic` hunted a non-standard `LENGTH`
+keyword and `sizeof_from_deposit(name)`, never resolving the actual layout definition.
 
 ## 2. Root cause (grounded)
 
-`s19_app/tui/a2l.py:1283` `_tag_schema_and_applicability`:
+`_infer_length_characteristic` (`a2l.py:707`) derives the element size only via
+`sizeof_from_deposit(deposit)`, which pattern-matches size-encoded *names* (`__UBYTE_Z` → 1) or a
+datatype keyword. A project layout named `RL_U8` matches neither → `el=None` → `length=None`. Yet the
+layout **is** defined (`/begin RECORD_LAYOUT RL_U8  FNC_VALUES 1 UBYTE …`), and the sibling helper
+`_resolve_record_layout(name, record_layouts_by_name)` already resolves it to `decode_type=UBYTE`
+(size 1) — but only for decode metadata (`a2l.py:1164`), never wired into `length`.
 
-```python
-if address is None or length is None:
-    return False, False, "missing address/length"   # conflates the two
-```
-
-`schema_ok=False` → `app.py:378` `_a2l_tag_row_severity` returns `ERROR` → red row. The conflation
-means *missing length alone* (address present) is treated identically to *missing address*.
-
-Verified sufficiency: `validation/rules.py` emits **no** length-keyed issue (only
-`A2L_STRUCTURE_ERROR`/`A2L_INVALID_ADDRESS`/`A2L_DUPLICATE_SYMBOL`/warnings), so the red comes
-*purely* from `schema_ok` — fixing the source flips the colour with no separate `ValidationIssue`
-in the loop. (Confirms the backlog's "flows via schema_ok/valid, not a ValidationIssue" claim.)
-
-Deeper root (NOT in scope this batch): `_infer_length_characteristic` (a2l.py:707) hunts a
-non-standard `LENGTH` keyword instead of resolving the RECORD_LAYOUT, so `length` lands `None`
-often. Resolving RECORD_LAYOUT is a larger parser feature — deferred, noted as pending.
+Confirmed on `examples/case_01_basic_valid/firmware.a2l`: `CAL_BLOCK_A`/`CAL_BLOCK_B`
+(`VALUE 0x… RL_U8 …`) resolve to `byte_size=1` via `_resolve_record_layout` but parsed with
+`length=None` before this fix.
 
 ## 3. The fix
 
-Split the condition so the three cases are distinct:
+Thread `record_layouts_by_name` into `_infer_length_characteristic`; when `sizeof_from_deposit`
+yields nothing **and** the object is a scalar `VALUE`, resolve the layout and take its element
+datatype size:
 
 ```python
-if virtual and address is None:
-    return True, False, ""            # unchanged — virtual exempt
-if address is None:
-    return False, False, "missing address/length"   # missing ADDRESS stays a concern (RED)
-if length is None:
-    return True, False, ""            # NEW: valid address, underivable length -> valid, not checkable
-return True, True, ""                 # both present -> memory-check applies
+el = sizeof_from_deposit(deposit)
+if el is None and char_type == "VALUE" and record_layouts_by_name:
+    meta = _resolve_record_layout(deposit, record_layouts_by_name)
+    if meta and meta.get("decode_type"):
+        el = DATATYPE_SIZES.get(meta["decode_type"])
 ```
 
-Result for a valid-address + missing-length tag: `schema_ok=True, memory_checked=False,
-in_memory=None` → `_a2l_tag_row_severity` falls through to `NEUTRAL` (grey), never `ERROR`.
+The existing MATRIX_DIM / VAL_BLK / return-`el` logic is unchanged and runs after.
 
-**Reason-string decision:** the missing-*address* branch keeps the existing `"missing
-address/length"` string verbatim. This preserves the frozen test
-`test_tui_a2l.py::test_validate_a2l_tags_marks_missing_address_or_length_invalid` (its only case is
-`address=None`, still `schema_ok=False`) so **no frozen test file is touched**. Minor cosmetic debt
-(the string still reads "/length" on an address-only failure) — refining it would require unfreezing
-the tc032 test-file guard; deferred.
+**Conservative `VALUE`-only scope — a correctness decision, not laziness.** The byte-range memory
+check (`_memory_range_in_map(addr, length, mem_map)`) trusts `length`. A CURVE/MAP is an array over
+its axes, so the element datatype size UNDER-reports the true span → the check would falsely pass on
+too few bytes (false-green). Deriving those correctly needs axis/MATRIX_DIM resolution (a larger
+feature). So CURVE/MAP/VAL_BLK stay `length=None` (honest grey) unless already sized by a MATRIX_DIM
+or a name-encoded deposit. Scalar `VALUE` is safe because element size == total size.
 
-## 4. Engine-unfreeze (C-27 dual-guard sanction)
+`a2l.py` is already UNFROZEN (🅰) — **no engine-unfreeze increment needed** this batch.
 
-`a2l.py` is git-frozen by TWO guards that `git diff main` the file and assert empty:
-- `tests/test_engine_unchanged.py::test_tc027_*` (`_ENGINE_PATHS`, line 125)
-- `tests/test_tui_directionb.py::test_tc031_*` (`_ENGINE_PATHS`, line 5419)
+## 4. Acceptance criteria (observable)
 
-Both will trip once `a2l.py` differs from `main`. Sanction: **remove `"s19_app/tui/a2l.py"` from
-`_ENGINE_PATHS` in both files**, with a comment citing this operator-approved parsing-logic fix. The
-other six engine modules (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `mac.py`,
-`color_policy.py`) stay frozen.
+- **AC-1** — When a scalar `VALUE` CHARACTERISTIC references a RECORD_LAYOUT whose name encodes no
+  size (`RL_U8`) but whose definition is `FNC_VALUES 1 UBYTE …`, the parsed tag shall have
+  `length == 1` (the datatype size), not `None`.
+- **AC-2** — With that length and the address present in the loaded image, the tag shall be
+  memory-checked: `schema_ok=True`, `memory_checked=True`, `in_memory` reflecting coverage (no longer
+  grey/`memory_checked=False`).
+- **AC-3** (no false-green) — A `CURVE` or `MAP` CHARACTERISTIC referencing a name-only RECORD_LAYOUT
+  shall keep `length == None` (not the element size), so the memory check does not pass on an
+  under-counted span.
+- **AC-4** — A CHARACTERISTIC whose deposit name already encodes a size (`__UWORD_Z`) or whose layout
+  is absent from `record_layouts_by_name` shall be unchanged (2 / `None` respectively) — the fallback
+  is additive.
+- **AC-5** — Full gate `pytest -q -m "not slow"` stays green (0 failures); no frozen engine test file
+  is modified.
 
-> **⚠ Risk surfaced:** this **permanently unfreezes `a2l.py`** — future view-only batches editing it
-> accidentally would no longer be caught by these two guards. Accepted for this batch per operator
-> approval; a re-freeze-against-new-baseline follow-up is noted as pending (§8).
+## 5. Security flags
 
-Neither guard file is itself in `_ENGINE_TEST_FILES`, so editing them is unconstrained.
+Scanned objective + criteria + description. No auth/secrets/external/PII/destructive-DB/network
+patterns. `security_required: **false**`. The change lives in an existing parser of untrusted A2L;
+it derives a length from already-parsed layout tokens (ints), adds no input surface, and *tightens*
+coverage honesty (refuses to guess CURVE/MAP spans).
 
-## 5. Acceptance criteria (observable)
+## 6. Files (blast radius)
 
-- **AC-1** — When `validate_a2l_tags` is given a tag with a valid int `address` and `length=None`
-  (non-virtual) and a mem_map, the result shall have `schema_ok=True`, `valid=True`,
-  `memory_checked=False`, `in_memory=None`, `reason=""`.
-- **AC-2** — When `_a2l_tag_row_severity` is given that tag (schema_ok=True, memory_checked=False,
-  not virtual), it shall return `NEUTRAL` (not `ERROR`).
-- **AC-3** — When a tag has `address=None` (non-virtual), the verdict shall be unchanged:
-  `schema_ok=False`, `reason="missing address/length"`, row severity `ERROR`.
-- **AC-4** — When a virtual tag has `address=None, length=None`, it shall stay `schema_ok=True`
-  (unchanged), not red.
-- **AC-5** (end-to-end, via existing `NOLEN_CHAR` fixture) — In `test_at_036a`, the `NOLEN_CHAR`
-  (missing length, valid address) row shall render **non-ERROR** styled AND produce **no**
-  supplemental ERROR issue on the Issues surface, while `BROKEN_CHAR` (missing address) stays red
-  with its issue.
-- **AC-6** — The full engine guard suite (`test_tc027_*`, `test_tc031_*`, `test_tc032_*`) shall pass:
-  a2l.py is sanctioned; all other engine modules and all frozen test files are byte-identical to
-  `main`.
+**Increment 1 — fix + tests (3 files):**
+1. `s19_app/tui/a2l.py` — thread `record_layouts_by_name`, VALUE-only layout-size fallback.
+2. `tests/test_a2l_record_layout_length.py` — **NEW** AC-1..AC-4 unit/behavioral proofs.
+3. `REQUIREMENTS.md` — note layout-derived length under the A2L parsing/colour rows.
 
-## 6. Security flags
+**Frozen, preserved unchanged:** `test_tui_a2l.py`, `test_validation_a2l.py`, all `_ENGINE_TEST_FILES`.
+(Measured: a2l/validation/directionb/supplemental/missing-length suites = 210 passed with the fix.)
 
-Scanned objective + criteria + description. **No** auth/secrets/external-integration/PII/
-destructive-DB/network patterns fired. `security_required: **false**`.
+## 7. Pending / deferred
 
-Residual note (not a flag): the change lives in a parser that already consumes untrusted A2L input.
-It **narrows** what is flagged (fewer false ERRORs); it adds no input surface and no external action.
-Reason strings still flow through the unchanged `validation/model.py` sanitiser/truncation. No
-weakening of existing hardening.
+- **P-1b** CURVE/MAP/axis length derivation (needs AXIS_DESCR + MATRIX_DIM resolution) — the honest
+  next step for array types; deliberately out of scope to avoid false-green.
+- **P-2** (unchanged) re-freeze `a2l.py` against a post-fix baseline — should come AFTER P-1 so we do
+  not re-freeze then re-edit.
 
-## 7. Files (blast radius)
+## 8. Batch status
 
-**Increment 1 — complete fix, suite-green (5 files):**
-1. `s19_app/tui/a2l.py` — split the condition (the fix). *[engine-unfrozen this batch]*
-2. `tests/test_engine_unchanged.py` — remove a2l.py from `_ENGINE_PATHS` (+comment).
-3. `tests/test_tui_directionb.py` — remove a2l.py from `_ENGINE_PATHS` (+comment).
-4. `tests/test_validation_service_supplemental.py` — flip `test_at_036a` NOLEN_CHAR assertions
-   (row non-red + no supplemental issue) + refresh the a2l.py line-ref comments.
-5. `tests/test_a2l_missing_length_fix.py` — **NEW** unit + severity proof tests (AC-1..AC-4).
-
-**Increment 2 — docs/traceability (≤2 files):**
-6. `REQUIREMENTS.md` — update the A2L colour requirement row + note the fix/unfreeze.
-7. `CLAUDE.md` — correct the "Engine-frozen guard" paragraph (a2l.py no longer in the frozen set).
-
-**Frozen, preserved unchanged:** `tests/test_tui_a2l.py`, `tests/test_validation_a2l.py`, all other
-`_ENGINE_TEST_FILES`, and the six still-frozen engine modules.
-
-## 8. Pending / deferred
-
-- **P-1** RECORD_LAYOUT resolution in `_infer_length_characteristic` (the deeper root: many lengths
-  land `None` because the parser never resolves the layout). Larger parser feature — separate batch.
-- **P-2** Re-freeze `a2l.py` against a post-fix baseline so accidental future edits are caught again
-  (the guards were removed, not re-baselined). Needs a small guard-mechanism design.
-- **P-3** Reason-string precision on the missing-address branch ("/length" is now imprecise) —
-  blocked by the tc032 frozen-test guard on `test_tui_a2l.py`; cosmetic.
-
-## 9. Findings surfaced during implementation
-
-- **F-1 (test-quality, MEDIUM) — `test_at_038c_a2l_error_row_keeps_severity_style` was a
-  false-confidence test.** It seeded an A2L ERROR issue for `CAL_BLOCK_A` and asserted a red row,
-  but (a) `update_a2l_view` recomputes `_validation_issues` from the file pair (LLR-037.3) so the
-  seed was **silently discarded** before render, and (b) `CAL_BLOCK_A` is itself a missing-length
-  tag (`VALUE 0x80000010 RL_U8` → address present, length underivable), so its "red" came *only*
-  from the `schema_ok=False` bug this batch fixes — never from the issue-map path it claimed to
-  test. The fix exposed it (row went white). **Resolved:** rewrote the test to inject a genuine
-  duplicate `CAL_BLOCK_A`, so the real recomputed report emits `A2L_DUPLICATE_SYMBOL` ERROR and the
-  row reds via the production issue-map path (verified end-to-end). This is the vacuous-check class
-  the operator's C-31 (input-set-is-an-oracle) targets.
-
-## 10. Batch status
-
-| Current phase | Phase C — implemented; final full-gate re-run in flight |
+| Current phase | Phase A — spec written |

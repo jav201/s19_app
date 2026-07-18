@@ -383,6 +383,15 @@ Notes:
   frozen set). Regression: `tests/test_a2l_missing_length_fix.py` and the
   `NOLEN_CHAR` boundary in `tests/test_validation_service_supplemental.py`
   (`test_at_036a_*`).
+- A scalar **VALUE** CHARACTERISTIC's length is **derived from its resolved
+  RECORD_LAYOUT** when the deposit *name* encodes no size (e.g. a project layout
+  `RL_U8` defined as `FNC_VALUES 1 UBYTE`). `_infer_length_characteristic`
+  (`s19_app/tui/a2l.py`) resolves the layout's element datatype size, so such
+  records become memory-checkable (green/white with an image hit) instead of grey.
+  CURVE/MAP deliberately stay unsized (element size would under-count an array
+  span and falsely pass the byte-range check — a false-green); array sizing needs
+  AXIS_DESCR/MATRIX_DIM resolution (deferred, P-1b). Regression:
+  `tests/test_a2l_record_layout_length.py`.
 
 ### MAC Tag/Parameter Validation Criteria
 
