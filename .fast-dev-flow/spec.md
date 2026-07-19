@@ -1,89 +1,105 @@
-# fast-dev-flow spec — Issues paging stride matches the mount cap (B1)
+# fast-dev-flow spec — Discoverability: help panel + A2L Legend button
 
 - **Date:** 2026-07-18
-- **Batch:** issues-paging-stride (backlog B1, field-audit P0)
+- **Batch:** discoverability-help-panel (prior backlog — the field-audit discoverability gap)
 - **Flow:** /fast-dev-flow
 - **Language:** English
-- **Run mode / merge:** Autonomous through self-merge (operator-authorized for this run of prior-backlog items; per-batch). Surface any HIGH finding / scope creep.
+- **Run mode / merge:** Autonomous through self-merge (operator-authorized for the prior-backlog run; approach + scope explicitly confirmed). Surface any HIGH finding / scope creep.
 - **Status:** Phase A — spec
 
 ---
 
 ## 1. Objective
 
-Make the Issues screen's PgUp/PgDn actually page through every issue. Today they are a no-op on any
-list of ≤200 issues, and issues at indices 40–199 of every page are **permanently unreachable**.
+Make the app's keyboard bindings discoverable. Today **24 of 27 app bindings are footer-invisible**
+(`show=False`) and there is **no help surface** — a user cannot learn most keys from the UI.
 
-## 2. Root cause (grounded, reproduction confirmed)
+## 2. Root cause / opportunity (grounded)
 
-The grouped Issues panel mounts at most `_GROUP_DISPLAY_MAX = 40` non-virtualized `IssueRow` widgets
-(a deliberate DoS/perf cap — `issues_view.py:52`). But the paging **stride** is
-`validation_issues_page_size = 200` (`app.py:1117`), used in four sites:
-`update_validation_issues_view` (summary), `_render_validation_issues_groups` (the `filtered[start:end]`
-window fed to the panel), and `action_validation_issues_page_next/prev`.
+`S19TuiApp.BINDINGS` has 24 `show=False` vs 3 `show=True`; the rail screen keys (1–8), save/load
+project, dump-json, before/after report, undo/redo, paging keys, etc. never appear on the Footer.
+Textual 8.2.8 ships a **free built-in help panel** — `App.action_show_help_panel` /
+`action_hide_help_panel` + the `HelpPanel` widget — that renders **every** active binding (key +
+description) in a dockable panel. It is currently unbound.
 
-Because the stride (200) exceeds the mount cap (40):
-- `_render_validation_issues_groups` slices a 200-wide window but `render_groups` mounts only its
-  first 40 and truncates → rows 40–199 of the window are shown as a truncation note, never mounted.
-- `page_next` advances `_validation_issues_window_start` by 200. For total ≤ 200, `max_start = 0`, so
-  it clamps → **no-op**. For total > 200, page 2 starts at index 200 → rows 40–199 are skipped on
-  every page. Either way, indices 40–199 are unreachable.
+The A2L screen also lacks the on-screen **Legend** button that MAC (`#mac_legend_button`) and Issues
+(`#issues_legend_button`) both have; A2L relies only on the `k` key (`action_show_legend`).
 
-## 3. The fix
+## 3. The change (additive — no existing layout altered; honours the v1-redesign rejection)
 
-Tie the Issues paging stride to the mount cap so every mounted-then-paged row is reachable, and keep
-it robust to the (currently fixed) `validation_issues_page_size`:
-
-```python
-def _issues_page_size(self) -> int:
-    # The grouped Issues panel mounts at most _GROUP_DISPLAY_MAX rows (a DoS cap),
-    # so the paging stride must not exceed it or rows past the cap become
-    # unreachable (B1). Honour a smaller configured size; never a larger one.
-    return min(_GROUP_DISPLAY_MAX, self._clamp_viewer_page_size(self.validation_issues_page_size))
-```
-
-Use `_issues_page_size()` in all four sites in place of
-`self._clamp_viewer_page_size(self.validation_issues_page_size)`. Import `_GROUP_DISPLAY_MAX` from
-`issues_view`.
+- **Inc 1 — Help panel.** Add one footer-*visible* binding
+  `Binding("question_mark", "show_help_panel", "Help", show=True)` to `S19TuiApp.BINDINGS`. It calls
+  Textual's built-in `action_show_help_panel`, which lists all bindings — so all 24 invisible keys
+  become discoverable in one place, and future bindings are auto-included. No new action method, no
+  layout change.
+- **Inc 2 — A2L Legend button.** Add `Button("Legend", id="a2l_legend_button")` to the A2L filter
+  button row in `_compose_screen_a2l`, and route `#a2l_legend_button` in `on_button_pressed` to the
+  existing `action_show_legend` (exactly as the MAC/Issues buttons do).
 
 ## 4. Acceptance criteria (observable)
 
-- **AC-1 (reachability — the real fix)** — With `_GROUP_DISPLAY_MAX + 5` issues, after one
-  `action_validation_issues_page_next` the window start advances to `_GROUP_DISPLAY_MAX` and the
-  summary reports the second page (`rows 41-45/45`), so the last 5 issues become the mounted window.
-  (Pre-fix: page_next is a no-op, window stays at 0, those 5 are unreachable.)
-- **AC-2 (no-op eliminated)** — With `_GROUP_DISPLAY_MAX + 5` issues at window 0, `page_next` changes
-  `_validation_issues_window_start` (was unchanged pre-fix).
-- **AC-3 (stride == cap)** — `_issues_page_size()` returns `_GROUP_DISPLAY_MAX` when
-  `validation_issues_page_size` is its default (200), and honours a smaller value (e.g. 25 → 25).
-- **AC-4 (paging math)** — `page_next`/`page_prev` advance/rewind `_validation_issues_window_start`
-  by `_GROUP_DISPLAY_MAX` and clamp at the last page start.
-- **AC-5** — Full gate `pytest -q -m "not slow"` green; no frozen engine test file modified.
+- **AC-1** — A `Binding` for `question_mark → show_help_panel` with `show=True` is present in
+  `S19TuiApp.BINDINGS` (Footer advertises "Help").
+- **AC-2** — Pressing `?` mounts Textual's `HelpPanel` (a `HelpPanel` widget is present in the DOM
+  after the key); pressing it again / the panel's close removes it. (Driven through real key
+  dispatch.)
+- **AC-3** — The A2L screen renders a visible `#a2l_legend_button`, and pressing it pushes a
+  `LegendScreen` (same outcome as the `k` key and the MAC/Issues Legend buttons).
+- **AC-4** — Full gate `pytest -q -m "not slow"` green **except** the expected Footer SVG drift (see
+  §6); no engine module or frozen test file modified.
 
 ## 5. Security flags
 
 Scanned. No auth/secrets/external/PII/destructive-DB/network patterns. `security_required: **false**`.
-The change only *tightens* how many widgets mount per page (stays ≤ the existing DoS cap).
+Both changes are read-only UI affordances over existing actions.
 
-## 6. Files (blast radius)
+## 6. Snapshot drift (expected, handled)
 
-**Increment 1 — fix + tests (2 files):**
-1. `s19_app/tui/app.py` — import `_GROUP_DISPLAY_MAX`, add `_issues_page_size()`, use it in the four
-   issues paging sites.
-2. `tests/test_tui_app.py` — correct the two tests that pinned the stride==configurable-size contract
-   (they set 150/100 and asserted window math only, never reachability) to the mount-cap stride, and
-   **add the AC-1 reachability test** the old pair never had.
+A footer-*visible* binding renders on the Footer of **every** screen, so the wide-cell `tc016s` SVG
+baselines drift (batch-45 FOOTER-DRIFT precedent). Adding the A2L Legend button also drifts the A2L
+screen cells. Per the snapshot-regen policy these regenerate **only in canonical CI** (textual==8.2.8),
+not locally. Handling: mark the expected-drift cells (a `_discoverability_drift_marks` xfail set, tight
+per-cell, 0 xpassed) so the PR gate is honest, then a **canonical-CI snapshot-regen** follow-up clears
+them (the batch-45/48 pattern).
 
-**Increment 2 — docs (1 file):**
-3. `REQUIREMENTS.md` — note the Issues paging stride is bounded by the mount cap.
+## 7. Files (blast radius)
 
-**Frozen, preserved unchanged:** all `_ENGINE_TEST_FILES` (this is a TUI-layer change; no engine edit).
+**Increment 1 (2 files):**
+1. `s19_app/tui/app.py` — the `?` Help binding.
+2. `tests/test_tui_directionb.py` (or a new test file) — AC-1/AC-2 (binding present + `?` mounts HelpPanel).
 
-## 7. Pending / deferred
+**Increment 2 (2 files):**
+3. `s19_app/tui/app.py` — the A2L Legend button + `on_button_pressed` route (same file, one increment later).
+4. `tests/…` — AC-3 (button present + pushes LegendScreen).
 
-- The rest of the prior backlog (B3 A2L "two extra chars", discoverability gap, Flow Builder rail-8),
-  plus the a2l P-1b / P-2 carries.
+**Increment 3 — snapshot drift marks + docs (2 files):**
+5. `tests/test_tui_snapshot.py` — the expected Footer/A2L drift xfail marks.
+6. `REQUIREMENTS.md` — note the help-panel discoverability affordance + A2L Legend parity.
 
-## 8. Batch status
+## 8. Deferred (rest of the discoverability gap — separate items)
 
-| Current phase | Phase A — spec written |
+- Footer mid-word truncation at 120 cols · settings-menu surfacing (palette-only today) · CRC-write
+  2-deep modal chain · the 14/30 A2L tag fields dropped from the table.
+
+## 9. HIGH finding — Increment 2 (A2L Legend button) DROPPED
+
+Implementing the A2L Legend button surfaced a conflict with a **deliberate prior decision, C-13**:
+A2L omits the Legend button on purpose because its filter row is too crowded — a button there
+**clips off-screen at 80 cols** (measured: right edge at col 93 on an 80-col screen → unreachable),
+so A2L uses the footer-visible `k` key instead. `test_tui_legend.py::test_at023e_c13_geometry_at_80_cols`
+and `::test_tc023_2_mac_issues_buttons_present_a2l_absent` encode this. My button reintroduced the
+exact bug those tests guard.
+
+The button was also **redundant**: the A2L legend is already reachable via the footer-visible `k`
+key, and Increment 1's help panel lists `k → Legend`, making it discoverable at **every** width —
+strictly better than a button that can't fit at 80 cols. **Decision (operator surfaced): drop the
+A2L Legend button; ship only the help panel.** The two C-13 tests are left intact (restored to
+green); the discoverability goal is fully met by the help panel.
+
+`test_tc081_4_no_binding_diff` (the batch-48 C-28 binding-census guard) is updated to **sanction**
+the one intended `?`→`show_help_panel` binding (whose snapshot drift is handled by
+`_discoverability_drift_marks`) while still firing for any other binding change.
+
+## 10. Batch status
+
+| Current phase | Phase B — Inc 1 (help panel) shipped; Inc 2 (A2L Legend) dropped per C-13 |

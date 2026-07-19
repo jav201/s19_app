@@ -690,16 +690,24 @@ def test_tc081_4_no_binding_diff() -> None:
             "git is unavailable or the 'main' ref is missing in this "
             f"environment — TC-081.4's binding-diff arm cannot run: {exc}"
         )
+    # The discoverability-help-panel batch deliberately adds ONE App-level
+    # binding — the footer-visible `?` → `show_help_panel` (the whole point of
+    # that batch) — and handles the resulting shared-chrome snapshot drift via
+    # `test_tui_snapshot._discoverability_drift_marks`. It is the sanctioned
+    # exception; the C-28 census still fires for any OTHER binding change.
+    _SANCTIONED_BINDING_MARKERS = ("show_help_panel",)
     changed = [
         line
         for line in completed.stdout.splitlines()
         if line.startswith(("+", "-"))
         and not line.startswith(("+++", "---"))
         and "Binding(" in line
+        and not any(marker in line for marker in _SANCTIONED_BINDING_MARKERS)
     ]
     assert not changed, (
-        "this batch must add no App-level Binding — a shared-chrome binding "
-        "drifts every screen's snapshot (C-28). Changed lines:\n"
+        "this batch must add no UNSANCTIONED App-level Binding — a shared-chrome "
+        "binding drifts every screen's snapshot (C-28), so any addition must be "
+        "paired with a snapshot drift-mark. Changed lines:\n"
         + "\n".join(changed)
     )
 

@@ -852,6 +852,41 @@ def _fdf_json_height_drift_marks(screen: str, density: str, size_key: str) -> tu
     return ()
 
 
+# feat/discoverability-help-panel: the footer-visible `?`/Help binding renders on
+# the Footer of EVERY screen, so every tc016s cell WIDE ENOUGH to show it (120x30
+# + 160x40) drifts its footer row — the batch-45 FOOTER-DRIFT precedent. At the
+# 80x24 floor the footer already truncates before the new key, so those cells do
+# NOT drift. The A2L Legend button adds to the A2L body drift, but only at those
+# same wide sizes. MEASURED (not reasoned) by running the full tc016s suite: EXACTLY
+# 19 cells failed — all restyled 120x30/160x40 (16) + map/patch/diff
+# comfortable-120x30 (3); NO 80x24 cell, no other. The SVG baselines regenerate in
+# the canonical CI env (snapshot-regen.yml, pinned textual==8.2.8) as a post-merge
+# follow-up — NEVER locally (reference_snapshot_regen_env). This mark retires with
+# that regen (the _batch45_footer / _batch47 / _batch48 pattern).
+def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the discoverability footer-drift marks (feat/discoverability-help-panel).
+
+    The footer-visible ``?``/Help binding (and the A2L ``Legend`` button) drift
+    every wide (120x30 / 160x40) tc016s cell's footer row. Marked
+    ``xfail(strict=False)`` until the canonical-CI baseline regen lands, then
+    retired.
+    """
+    del screen, density
+    if size_key in _WIDE_FOOTER_SIZES:
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "feat/discoverability-help-panel: footer-visible '?'/Help "
+                    "binding + A2L Legend button drift every wide (120x30/160x40) "
+                    "tc016s footer; SVG baseline regen pending in canonical CI "
+                    "(snapshot-regen.yml @ textual==8.2.8, post-merge follow-up)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -866,7 +901,8 @@ _RESTYLED_CELLS = [
         + _batch47_workspace_drift_marks(screen, density, size_key)
         + _batch47_a2l_drift_marks(screen, density, size_key)
         + _batch47_mac_drift_marks(screen, density, size_key)
-        + _batch47_theme_drift_marks(screen, density, size_key),
+        + _batch47_theme_drift_marks(screen, density, size_key)
+        + _discoverability_drift_marks(screen, density, size_key),
     )
     for screen in _RESTYLED_SCREENS
     for density in ("compact", "comfortable")
@@ -917,6 +953,7 @@ _SCAFFOLD_CELLS = [
         + _batch46_patch_drift_marks(screen, "comfortable", size_key)
         + _batch47_map_drift_marks(screen, "comfortable", size_key)
         + _batch47_theme_drift_marks(screen, "comfortable", size_key)
+        + _discoverability_drift_marks(screen, "comfortable", size_key)
         + _batch48_patch_drift_marks(screen, "comfortable", size_key)
         + _fdf_json_height_drift_marks(screen, "comfortable", size_key),
     )
