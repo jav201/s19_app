@@ -1050,6 +1050,15 @@ DataTable > .datatable--odd-row {
 /* US-020a: Issues Report split — the issues list (left) beside a hex pane
  * (right) that shows the bytes at the selected issue's address. Mirrors the
  * #diff_columns horizontal split. */
+/* batch-49 (LLR-082.1/.2): the severity-distribution strip — one always-visible
+ * line above the grouped list carrying the coloured Errors/Warnings/Info counts
+ * + micro-bars. Author text only (no file-derived content reaches it). */
+#issues_severity_strip {
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
 #issues_columns {
     layout: horizontal;
     width: 100%;
@@ -1058,17 +1067,23 @@ DataTable > .datatable--odd-row {
 
 /* US-039: left slot holds the grouped-dense view (the SOLE visible Issues
  * surface). The legacy DataTable is a stacked-but-hidden compatibility
- * surface (see below), so the grouped panel fills the whole stack. */
+ * surface (see below), so the grouped panel fills the whole stack. batch-49
+ * (LLR-082.4): the frame + author border-title/subtitle live on this stack
+ * (dolphie `.db-pane` idiom) — the inner grouped panel drops its own border so
+ * there is a single titled frame, not two. */
 #issues_list_stack {
     layout: vertical;
     width: 2fr;
     height: 100%;
+    border: round $rule;
+    border-title-color: $accent-calm;
+    border-title-background: $bg-panel;
+    border-subtitle-color: #969aad;
 }
 
 #validation_issues_groups {
     width: 100%;
     height: 100%;
-    border: round $rule;
 }
 
 /* US-039 grouped-dense rows: a bold per-severity group header, then compact
@@ -1122,10 +1137,100 @@ DataTable > .datatable--odd-row {
     padding: 1;
 }
 
+/* batch-49 (LLR-082.4): author border-title on the existing round frame. */
 #issues_hex_pane {
     width: 1fr;
     height: 100%;
     border: round $rule;
+    border-title-color: $accent-calm;
+    border-title-background: $bg-panel;
+}
+
+/* ---------------------------------------------------------------------------
+ * batch-49 (LLR-083.5 / LLR-084.*): the dedicated CHECKS rail screen
+ * (`#screen_checks`) — a read-only mirror of the last check run. Mirrors the
+ * `#issues_*` / `.issue-*` blocks above: an aggregate strip over a grouped
+ * list beside a titled hex peek. Severity colour comes from the frozen `sev-*`
+ * classes (color_policy) applied on the header / rows — no hex is set here.
+ * ------------------------------------------------------------------------- */
+#checks_content {
+    width: 100%;
+    height: 1fr;
+}
+
+#checks_content.hidden {
+    display: none;
+}
+
+#checks_aggregate_strip {
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
+#checks_columns {
+    layout: horizontal;
+    width: 100%;
+    height: 1fr;
+}
+
+/* The grouped-dense panel carries the author border-title/subtitle frame
+ * directly (there is no wrapping list-stack as on the Issues screen). */
+#checks_grouped {
+    width: 2fr;
+    height: 100%;
+    border: round $rule;
+    border-title-color: $accent-calm;
+    border-title-background: $bg-panel;
+    border-subtitle-color: #969aad;
+}
+
+#checks_hex_pane {
+    width: 1fr;
+    height: 100%;
+    border: round $rule;
+    border-title-color: $accent-calm;
+    border-title-background: $bg-panel;
+}
+
+.check-group-header {
+    width: 100%;
+    height: auto;
+    text-style: bold;
+    padding: 1 1 0 1;
+}
+
+.check-row {
+    layout: horizontal;
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
+.check-row:focus {
+    text-style: reverse;
+}
+
+.check-detail {
+    width: 1fr;
+    height: auto;
+}
+
+/* The file-derived linkage symbol rides its own muted, width:auto cell so it
+ * trails the 1fr detail span without forcing horizontal overflow. */
+.check-linkage {
+    width: auto;
+    height: auto;
+    color: #6b7280;
+    margin-left: 1;
+}
+
+.checks-empty-note,
+.checks-truncation-note,
+.checks-no-run-note {
+    width: 100%;
+    height: auto;
+    padding: 1;
 }
 
 /* Patch Editor — the batch-07 consolidated v2 panel: ONE change-flow section

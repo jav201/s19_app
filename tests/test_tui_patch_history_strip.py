@@ -693,9 +693,14 @@ def test_tc081_4_no_binding_diff() -> None:
     # The discoverability-help-panel batch deliberately adds ONE App-level
     # binding — the footer-visible `?` → `show_help_panel` (the whole point of
     # that batch) — and handles the resulting shared-chrome snapshot drift via
-    # `test_tui_snapshot._discoverability_drift_marks`. It is the sanctioned
+    # `test_tui_snapshot._discoverability_drift_marks`. It is a sanctioned
     # exception; the C-28 census still fires for any OTHER binding change.
-    _SANCTIONED_BINDING_MARKERS = ("show_help_panel",)
+    # batch-49 (HLR-083) deliberately adds the ninth rail-nav binding
+    # `Binding("9", "show_screen('checks')", "Checks", show=False)` — a
+    # NON-footer-visible (`show=False`) navigation key, so it does not drift the
+    # footer/shared-chrome; the 9-item RAIL drift it accompanies is handled by
+    # the canonical-CI snapshot regen (spec R-5 / C-30). Sanctioned here.
+    _SANCTIONED_BINDING_MARKERS = ("show_help_panel", "show_screen('checks')")
     changed = [
         line
         for line in completed.stdout.splitlines()

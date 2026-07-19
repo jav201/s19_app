@@ -28,6 +28,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, ScrollableContainer
@@ -35,6 +36,7 @@ from textual.message import Message
 from textual.widgets import Static
 
 from .color_policy import css_class_for_severity
+from .insight_style import CYAN, RED, YELLOW, microbar
 from .screens_directionb import safe_text
 from ..validation import ValidationIssue, ValidationSeverity
 
@@ -65,14 +67,103 @@ SEVERITY_LABELS: Dict[ValidationSeverity, str] = {
     ValidationSeverity.INFO: "INFO",
 }
 
+#: Author-controlled leading glyph per severity group header (batch-49,
+#: LLR-082.3). A closed map keyed by :data:`SEVERITY_ORDER`; the glyphs are
+#: fixed author constants (never file-derived — C-17).
+_SEVERITY_GLYPH: Dict[ValidationSeverity, str] = {
+    ValidationSeverity.ERROR: "✗",
+    ValidationSeverity.WARNING: "⚠",
+    ValidationSeverity.INFO: "•",
+}
+
+#: Short strip label per severity (batch-49, LLR-082.1).
+_STRIP_SEVERITY_LABEL: Dict[ValidationSeverity, str] = {
+    ValidationSeverity.ERROR: "Errors",
+    ValidationSeverity.WARNING: "Warnings",
+    ValidationSeverity.INFO: "Info",
+}
+
+#: Fixed per-severity accent for the strip label + micro-bar (batch-49,
+#: LLR-082.1): ERROR→RED, WARNING→YELLOW, INFO→CYAN, from ``insight_style``.
+_STRIP_SEVERITY_STYLE: Dict[ValidationSeverity, str] = {
+    ValidationSeverity.ERROR: RED,
+    ValidationSeverity.WARNING: YELLOW,
+    ValidationSeverity.INFO: CYAN,
+}
+
+#: Micro-bar cell count for the severity strip — a coarse glance cue, matching
+#: the MAC coverage strip's fixed small scale (batch-49, LLR-082.1).
+_ISSUES_STRIP_BAR_WIDTH: int = 5
+
+
+def build_issues_severity_strip(error: int, warning: int, info: int) -> Text:
+    """
+    Summary:
+        Build the Issues Report severity-distribution strip as a C-17-safe Rich
+        ``Text``: ``Errors N <bar>  Warnings M <bar>  Info K <bar>`` where each
+        count is rendered in its fixed severity accent (ERROR→:data:`RED`,
+        WARNING→:data:`YELLOW`, INFO→:data:`CYAN`) beside a proportional
+        :func:`microbar` whose fill fraction is ``count / total`` (LLR-082.1).
+        The slot set is bounded by :data:`SEVERITY_ORDER`, so a future issue
+        severity is not silently dropped. The line carries ONLY integer counts
+        and author constants — no file-derived text reaches this sink.
+
+    Args:
+        error (int): Whole-list ERROR count.
+        warning (int): Whole-list WARNING count.
+        info (int): Whole-list INFO count.
+
+    Returns:
+        rich.text.Text: The composed strip, built via ``append`` /
+        ``append_text`` (never markup parsing) so it is markup-safe by
+        construction. ``total == 0`` renders empty bars with no division.
+
+    Data Flow:
+        - Map the three counts onto :data:`SEVERITY_ORDER`, compute each bar's
+          fill fraction against the total (guarded → ``0.0`` when total is 0).
+        - Consumed by ``S19TuiApp.update_validation_issues_view`` →
+          ``#issues_severity_strip``.
+
+    Dependencies:
+        Uses:
+            - ``insight_style.microbar`` / ``RED`` / ``YELLOW`` / ``CYAN``
+            - :data:`SEVERITY_ORDER` / :data:`_STRIP_SEVERITY_LABEL`
+        Used by:
+            - ``S19TuiApp.update_validation_issues_view``
+            - ``tests/test_tui_issues_view.py``
+
+    Example:
+        >>> build_issues_severity_strip(3, 1, 2).plain.startswith("Errors 3")
+        True
+        >>> build_issues_severity_strip(0, 0, 0).plain
+        'Errors 0 ░░░░░  Warnings 0 ░░░░░  Info 0 ░░░░░'
+    """
+    counts: Dict[ValidationSeverity, int] = {
+        ValidationSeverity.ERROR: error,
+        ValidationSeverity.WARNING: warning,
+        ValidationSeverity.INFO: info,
+    }
+    total = error + warning + info
+    text = Text()
+    for index, severity in enumerate(SEVERITY_ORDER):
+        count = counts[severity]
+        style = _STRIP_SEVERITY_STYLE[severity]
+        if index:
+            text.append("  ")
+        text.append(f"{_STRIP_SEVERITY_LABEL[severity]} {count} ", style=style)
+        frac = count / total if total else 0.0
+        text.append_text(microbar(frac, _ISSUES_STRIP_BAR_WIDTH, style=style))
+    return text
+
 
 class IssueGroupHeader(Static):
     """A per-severity group header carrying the group's label and issue count.
 
     Summary:
         One header precedes each severity group in the grouped Issues view
-        (LLR-042.3). It renders ``"<LABEL>  (<count>)"`` as markup-safe text
-        and is coloured by the group's severity through the frozen
+        (LLR-042.3). It renders ``"<glyph> <LABEL>  (<count>)"`` (the leading
+        author-constant severity glyph is batch-49 LLR-082.3) as markup-safe
+        text and is coloured by the group's severity through the frozen
         ``css_class_for_severity`` (LLR-042.4 palette source; no hard-coded
         hex). The label and integer count are also stored as attributes so a
         white-box test can read the count without parsing the rendered string.
@@ -102,8 +193,9 @@ class IssueGroupHeader(Static):
 
     def __init__(self, severity: ValidationSeverity, count: int) -> None:
         label = SEVERITY_LABELS.get(severity, str(severity.value).upper())
+        glyph = _SEVERITY_GLYPH.get(severity, "")
         super().__init__(
-            safe_text(f"{label}  ({count})"),
+            safe_text(f"{glyph} {label}  ({count})"),
             classes=f"issue-group-header {css_class_for_severity(severity)}",
         )
         #: The group's display label (e.g. ``"ERRORS"``).

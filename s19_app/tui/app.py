@@ -86,7 +86,18 @@ from .insight_style import (
     microbar,
 )
 from .services.entropy_service import EntropyWindow
-from .issues_view import _GROUP_DISPLAY_MAX, GroupedIssuesPanel, IssueRow
+from .issues_view import (
+    _GROUP_DISPLAY_MAX,
+    GroupedIssuesPanel,
+    IssueRow,
+    build_issues_severity_strip,
+)
+from .checks_view import (
+    CHECK_GROUP_ORDER,
+    CheckRow,
+    GroupedChecksPanel,
+    build_checks_aggregate_strip,
+)
 from ..validation import ValidationIssue, ValidationReport, ValidationSeverity
 from .services.a2l_service import enrich_tags_and_render
 from .services.before_after_service import compose_before_after_report
@@ -1046,7 +1057,7 @@ class S19TuiApp(App):
         Binding("k", "show_legend", "Legend", show=True),
         # Discoverability: `?` opens Textual's built-in help panel, which lists
         # EVERY active binding (key + description) — so the many show=False keys
-        # (rails 1-8, save/load project, dump-json, before/after report, undo/redo,
+        # (rails 1-9, save/load project, dump-json, before/after report, undo/redo,
         # paging) are learnable from the UI. show=True so the Footer advertises it.
         Binding("question_mark", "show_help_panel", "Help", show=True),
         Binding("b", "before_after_report", "Before/After report", show=False),
@@ -1058,6 +1069,7 @@ class S19TuiApp(App):
         Binding("6", "show_screen('patch')", "Patch Editor", show=False),
         Binding("7", "show_screen('diff')", "A2B Diff", show=False),
         Binding("8", "show_screen('flow')", "Flow Builder", show=False),
+        Binding("9", "show_screen('checks')", "Checks", show=False),
         ("plus", "page_next_context", "Page+"),
         ("minus", "page_prev_context", "Page-"),
         ("comma", "hex_page_prev", "Hex-"),
@@ -1578,6 +1590,7 @@ class S19TuiApp(App):
                 self._compose_screen_patch(),
                 self._compose_screen_diff(),
                 self._compose_screen_flow(),
+                self._compose_screen_checks(),
                 id="workspace_body",
             ),
             id="workspace_shell",
@@ -1751,6 +1764,16 @@ class S19TuiApp(App):
             Used by:
                 - ``compose``
         """
+        _issues_list_stack = Container(
+            GroupedIssuesPanel(id="validation_issues_groups"),
+            id="issues_list_stack",
+        )
+        # Author-constant border titles (batch-49, LLR-082.4) — never
+        # file-derived (C-17); the matching border/title CSS lives in styles.tcss.
+        _issues_list_stack.border_title = "Issues"
+        _issues_list_stack.border_subtitle = "grouped"
+        _issues_hex_pane = Static("", id="issues_hex_pane", markup=False)
+        _issues_hex_pane.border_title = "Hex Peek"
         _issues_content = Container(
             Container(
                 Button("Issues: All", id="issues_filter_all"),
@@ -1759,12 +1782,10 @@ class S19TuiApp(App):
                 Button("Legend", id="issues_legend_button"),
                 id="validation_issues_filters",
             ),
+            Static("", id="issues_severity_strip", markup=False),
             Container(
-                Container(
-                    GroupedIssuesPanel(id="validation_issues_groups"),
-                    id="issues_list_stack",
-                ),
-                Static("", id="issues_hex_pane", markup=False),
+                _issues_list_stack,
+                _issues_hex_pane,
                 id="issues_columns",
             ),
             Label("", id="validation_issues_summary"),
@@ -1775,6 +1796,63 @@ class S19TuiApp(App):
             _issues_content,
             EmptyStatePanel(),
             id="screen_issues",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_checks(self) -> Container:
+        """
+        Summary:
+            Build the dedicated CHECKS rail screen (``#screen_checks``, the
+            ninth activity-rail screen — batch-49 LLR-083.5) as a read-only
+            mirror of the last check run: an aggregate pass/fail/uncheckable
+            strip above a grouped-by-outcome list beside a hex peek pane.
+            Modelled on ``_compose_screen_issues``; hidden at startup.
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_checks`` holding the ``Checks`` title label, a
+            ``#checks_content`` container (the ``#checks_aggregate_strip``
+            ``Static`` above a ``#checks_columns`` horizontal split whose left
+            ``GroupedChecksPanel`` (``#checks_grouped``) sits beside the hex
+            peek ``#checks_hex_pane``), and an ``EmptyStatePanel``.
+
+        Data Flow:
+            - ``update_checks_view`` drives ``#checks_grouped`` +
+              ``#checks_aggregate_strip`` from ``_change_service`` (LLR-084.3).
+            - While no ``LoadedFile`` is present ``_apply_empty_state`` shows
+              the ``EmptyStatePanel`` and hides ``#checks_content``
+              (LLR-084.6).
+
+        Dependencies:
+            Uses:
+                - ``GroupedChecksPanel`` / ``EmptyStatePanel``
+            Used by:
+                - ``compose``
+        """
+        # Author-constant border titles (batch-49, LLR-083.5 / R-4) — never
+        # file-derived (C-17); the matching border/title CSS lives in
+        # styles.tcss (a titled pane renders its title only with a border).
+        _checks_grouped = GroupedChecksPanel(id="checks_grouped")
+        _checks_grouped.border_title = "Checks"
+        _checks_grouped.border_subtitle = "grouped"
+        _checks_hex_pane = Static("", id="checks_hex_pane", markup=False)
+        _checks_hex_pane.border_title = "Hex Peek"
+        _checks_content = Container(
+            Static("", id="checks_aggregate_strip", markup=False),
+            Container(
+                _checks_grouped,
+                _checks_hex_pane,
+                id="checks_columns",
+            ),
+            id="checks_content",
+        )
+        return Container(
+            Label("Checks", classes="db-screen-title"),
+            _checks_content,
+            EmptyStatePanel(),
+            id="screen_checks",
             classes="db-screen hidden",
         )
 
@@ -2087,6 +2165,11 @@ class S19TuiApp(App):
                     result.message,
                     service.check_aggregates(),
                 )
+                # batch-49 LLR-084.7 (site 1 of 2): the dedicated CHECKS screen
+                # is a read-only mirror of the same ``last_check_result``, so it
+                # rides this post-run refresh — the CHECKS screen and the Patch
+                # panel read one state.
+                self.update_checks_view()
             elif event.action == "execute_scope":
                 self._trigger_execute_scope(event.scope_text or SCOPE_ACTIVE)
         except (ValueError, KeyError) as exc:
@@ -2329,6 +2412,11 @@ class S19TuiApp(App):
         panel.refresh_check_results(
             service.check_rows(), "", service.check_aggregates()
         )
+        # batch-49 LLR-084.7 (site 2 of 2): the CHECKS screen rides the SAME
+        # undo/redo reset of ``last_check_result`` (``change_service.py:571/603``)
+        # so its grouped list + aggregate strip clear in step with the Patch
+        # panel — no stale rows (the batch-38 Inc-4 F1 stale-panel shape).
+        self.update_checks_view()
         panel.set_edit_json_enabled(service.document.source_path is None)
         # batch-48 LLR-081.3 (writer census, site 2 of 3): THE site that moves
         # the history. `undo`/`redo` shift a snapshot between the two stacks, so
@@ -4824,8 +4912,8 @@ class S19TuiApp(App):
         self.logger.info("A2L JSON exported: %s", output)
 
     #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
-    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow —
-    #: the rail order of the keymap proposal (keys 1-8).
+    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow, Checks —
+    #: the rail order of the keymap proposal (keys 1-9; batch-49 LLR-083.2).
     SCREEN_CONTAINER_IDS = {
         "workspace": "screen_workspace",
         "a2l": "screen_a2l",
@@ -4835,6 +4923,7 @@ class S19TuiApp(App):
         "patch": "screen_patch",
         "diff": "screen_diff",
         "flow": "screen_flow",
+        "checks": "screen_checks",
     }
 
     #: One extra command-palette command outside ``BINDINGS``: the viewer
@@ -4889,12 +4978,12 @@ class S19TuiApp(App):
         """
         Summary:
             Activate a Direction B rail screen, showing its container and
-            hiding the other seven (LLR-002.1).
+            hiding the other eight (LLR-002.1).
 
         Args:
             screen_key (str): One of the keys of ``SCREEN_CONTAINER_IDS``
                 (``workspace`` / ``a2l`` / ``mac`` / ``map`` / ``issues`` /
-                ``patch`` / ``diff`` / ``flow``).
+                ``patch`` / ``diff`` / ``flow`` / ``checks``).
 
         Returns:
             None
@@ -4909,7 +4998,7 @@ class S19TuiApp(App):
               persistent command bar, rail and footer stay mounted.
             - Moves the activity rail's single active marker to the target
               screen via ``Rail.set_active`` (LLR-001.2), so the rail
-              reflects the active screen for both the ``1``-``8`` key path
+              reflects the active screen for both the ``1``-``9`` key path
               and the rail-click path.
 
         Dependencies:
@@ -4917,7 +5006,7 @@ class S19TuiApp(App):
                 - ``SCREEN_CONTAINER_IDS``
                 - ``Rail.set_active``
             Used by:
-                - The ``1``-``8`` key bindings
+                - The ``1``-``9`` key bindings
                 - ``on_rail_selected`` (the activity rail click path)
 
         Example:
@@ -4940,6 +5029,10 @@ class S19TuiApp(App):
         elif screen_key == "patch":
             self._prefill_patch_change_files()
             self._refresh_patch_variant_select()
+        elif screen_key == "checks":
+            # Lazy read-only mirror rebuilt on entry (batch-49, LLR-083.6);
+            # checks state changes only on run/undo/redo, so no load hook.
+            self.update_checks_view()
 
     def action_show_legend(self) -> None:
         """
@@ -4973,6 +5066,7 @@ class S19TuiApp(App):
         ("screen_workspace", "workspace_panes"),
         ("screen_issues", "issues_content"),
         ("screen_map", "map_content"),
+        ("screen_checks", "checks_content"),
     )
 
     def _apply_empty_state(self) -> None:
@@ -6928,6 +7022,106 @@ class S19TuiApp(App):
             f"sym={symbol} addr={addr} line={line_no} | {issue.message}"
         )
 
+    def _update_issues_severity_strip(
+        self, error: int, warning: int, info: int
+    ) -> None:
+        """
+        Summary:
+            Repaint the ``#issues_severity_strip`` from the whole-list severity
+            counts via :func:`build_issues_severity_strip` (batch-49, LLR-082.2).
+            A guarded no-op when the strip is not mounted (no active screen /
+            widget absent), mirroring ``_update_mac_coverage_strip``'s guard.
+
+        Args:
+            error (int): Whole-list ERROR count.
+            warning (int): Whole-list WARNING count.
+            info (int): Whole-list INFO count.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Query ``#issues_severity_strip``; on absence, return.
+            - Hand the three counts to ``build_issues_severity_strip`` and push
+              the resulting markup-safe ``Text`` into the strip.
+
+        Dependencies:
+            Uses:
+                - ``build_issues_severity_strip``
+            Used by:
+                - ``update_validation_issues_view``
+        """
+        try:
+            strip = self.query_one("#issues_severity_strip", Static)
+        except Exception:
+            return
+        if strip is None:  # headless unit tests fake query_one -> None
+            return
+        strip.update(build_issues_severity_strip(error, warning, info))
+
+    def update_checks_view(self) -> None:
+        """
+        Summary:
+            Rebuild the read-only CHECKS screen (``#screen_checks``) from the
+            last check run (batch-49, LLR-084.3): group the
+            ``ChangeService.check_display_rows()`` fail → uncheckable → pass
+            into ``#checks_grouped`` and repaint the pass/fail/uncheckable
+            ``#checks_aggregate_strip`` from ``check_aggregates()``. When a
+            file is loaded but no check has run (``last_check_result is
+            None``), render the distinct "no check run yet" note instead of a
+            zeroed list (LLR-084.6, R-6). A guarded no-op when the screen is
+            not mounted (no active screen / widget absent), mirroring
+            ``_render_validation_issues_groups`` plus the headless
+            ``query_one -> None`` guard (Inc-1 F1).
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Data Flow:
+            - No mounted screen (headless / monkeypatched call) or no
+              ``#checks_grouped`` panel present → no-op.
+            - Read ``check_display_rows()`` + ``check_aggregates()``; when
+              ``last_check_result is None`` render the no-run note, else group
+              the rows by ``result`` and render them; always repaint the
+              aggregate strip (all-zero when no run — it rides the reset).
+
+        Dependencies:
+            Uses:
+                - ``ChangeService.check_display_rows`` / ``check_aggregates``
+                - ``GroupedChecksPanel.render_groups`` / ``render_no_run``
+                - ``build_checks_aggregate_strip``
+            Used by:
+                - ``action_show_screen`` (the ``checks`` nav-refresh hook)
+        """
+        if not self.screen_stack:
+            return
+        try:
+            panel = self.query_one("#checks_grouped", GroupedChecksPanel)
+        except Exception:
+            return
+        if panel is None:  # headless unit tests fake query_one -> None
+            return
+        rows = self._change_service.check_display_rows()
+        aggregates = self._change_service.check_aggregates()
+        if self._change_service.last_check_result is None:
+            panel.render_no_run()
+        else:
+            group_counts = {
+                token: sum(1 for row in rows if row.result == token)
+                for token in CHECK_GROUP_ORDER
+            }
+            panel.render_groups(rows, group_counts)
+        try:
+            strip = self.query_one("#checks_aggregate_strip", Static)
+        except Exception:
+            return
+        if strip is None:
+            return
+        strip.update(build_checks_aggregate_strip(aggregates))
+
     def update_validation_issues_view(self) -> None:
         """
         Summary:
@@ -6963,6 +7157,13 @@ class S19TuiApp(App):
         populate_started = time.perf_counter()
         summary_label = self.query_one("#validation_issues_summary", Label)
         filtered = self._filtered_validation_issues()
+        # Whole-list severity distribution (batch-49, LLR-082.2) — computed
+        # before the empty-filter short-circuit so the strip reflects the full
+        # distribution (a 0/0/0 boundary only when the list is truly empty).
+        error_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.ERROR)
+        warning_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.WARNING)
+        info_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.INFO)
+        self._update_issues_severity_strip(error_count, warning_count, info_count)
         if not filtered:
             summary_label.update("No validation issues.")
             self._render_validation_issues_groups()
@@ -6972,9 +7173,6 @@ class S19TuiApp(App):
             )
             self._flush_logger()
             return
-        error_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.ERROR)
-        warning_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.WARNING)
-        info_count = sum(1 for item in self._validation_issues if item.severity == ValidationSeverity.INFO)
         total = len(filtered)
         page_size = self._issues_page_size()
         max_start = max(0, ((total - 1) // page_size) * page_size) if total else 0
@@ -6983,17 +7181,23 @@ class S19TuiApp(App):
         self._validation_issues_window_start = start
         page_num = start // page_size + 1
         total_pages = max(1, (total + page_size - 1) // page_size)
-        summary_text = " | ".join(
-            [
-                f"total={len(self._validation_issues)}",
-                f"errors={error_count}",
-                f"warnings={warning_count}",
-                f"info={info_count}",
-                f"filter={self.validation_issue_filter_mode}",
-                f"page {page_num}/{total_pages} rows {start + 1}-{end}/{total}",
-            ]
-        )
-        summary_label.update(summary_text)
+        # Severity-coloured summary line (batch-49, LLR-082.5): the errors/
+        # warnings/info tokens carry RED/YELLOW/CYAN spans, but the ``.plain``
+        # content stays byte-identical to the former " | ".join(...) so existing
+        # summary tests keep passing. Built via append (never Text.from_markup).
+        summary = Text()
+        summary.append(f"total={len(self._validation_issues)}")
+        summary.append(" | ")
+        summary.append(f"errors={error_count}", style=RED)
+        summary.append(" | ")
+        summary.append(f"warnings={warning_count}", style=YELLOW)
+        summary.append(" | ")
+        summary.append(f"info={info_count}", style=CYAN)
+        summary.append(" | ")
+        summary.append(f"filter={self.validation_issue_filter_mode}")
+        summary.append(" | ")
+        summary.append(f"page {page_num}/{total_pages} rows {start + 1}-{end}/{total}")
+        summary_label.update(summary)
         self._render_validation_issues_groups()
         self.logger.info(
             "Load phase boundary: populate_issues_table_done rows=%d total=%d elapsed=%.3f",
@@ -7087,6 +7291,83 @@ class S19TuiApp(App):
                 - Textual message dispatch (from ``IssueRow``)
         """
         self._update_issues_hex_pane(event.address)
+
+    def on_check_row_selected(self, event: "CheckRow.Selected") -> None:
+        """
+        Summary:
+            Repaint the retained ``#checks_hex_pane`` when a CHECKS row is
+            activated by a real click or ``Enter`` (batch-49, LLR-084.5, C-16
+            real mechanism). Mirrors ``on_issue_row_selected``: an
+            ``address is None`` entry (an uncheckable/unaddressed check) yields
+            the neutral peek placeholder, never a crash.
+
+        Args:
+            event (CheckRow.Selected): The row-activation message carrying the
+                selected check entry's integer address (or ``None``).
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_update_checks_hex_pane``
+            Used by:
+                - Textual message dispatch (from ``CheckRow``)
+        """
+        self._update_checks_hex_pane(event.address)
+
+    def _update_checks_hex_pane(self, address: Optional[int]) -> None:
+        """Render the selected check entry's address bytes in ``#checks_hex_pane`` (LLR-084.5).
+
+        Summary:
+            On a CHECKS-row selection, show a focused hex+ASCII window around the
+            entry's ``address`` in the Checks screen's hex pane
+            (``#checks_hex_pane``). When the entry carries no address (an
+            uncheckable entry with ``actual_bytes=None`` and no resolvable
+            location) or no file is loaded, show a fixed placeholder and clear
+            any bytes from a prior selection — never a stale render. Mirrors
+            ``_update_issues_hex_pane`` (``app.py`` Issues peek), including its
+            headless/absent-pane guards (the Inc-1 F1 ``query_one -> None``
+            shape) so a row-select on an unmounted tree is a safe no-op.
+
+        Args:
+            address (Optional[int]): The selected entry's address, or ``None``.
+
+        Returns:
+            None
+
+        Data Flow:
+            - No mounted screen (headless call) or no ``#checks_hex_pane`` present
+              → no-op.
+            - ``address`` is not an int / no file → the placeholder string.
+            - Else render a ±``context``-row window via ``render_hex_view_text``
+              focused at ``address`` into the pane.
+
+        Dependencies:
+            Uses:
+                - ``render_hex_view_text``
+            Used by:
+                - ``on_check_row_selected``
+        """
+        # No mounted screen (e.g. a headless unit-test call) -> no DOM to query.
+        if not self.screen_stack:
+            return
+        matches = self.query("#checks_hex_pane")
+        if not matches:
+            return
+        pane = matches.first(Static)
+        if pane is None:  # headless unit tests fake query -> None (Inc-1 F1)
+            return
+        if not isinstance(address, int) or not self.current_file:
+            pane.update("(check entry has no address — nothing to show)")
+            return
+        base = address - (address % 16)
+        context_rows = 6
+        low = max(0, base - 16 * context_rows)
+        row_bases = list(range(low, base + 16 * (context_rows + 1), 16))
+        pane.update(
+            render_hex_view_text(self.current_file.mem_map, address, row_bases, None)
+        )
 
     def action_validation_issues_page_next(self) -> None:
         """Advance the validation-issues viewer window by one configured page."""
