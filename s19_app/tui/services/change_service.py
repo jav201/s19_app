@@ -355,6 +355,52 @@ class CheckResultRow:
     css_class: str
 
 
+@dataclass(slots=True)
+class CheckDisplayRow:
+    """
+    Summary:
+        One grouped display row of the dedicated CHECKS screen (batch-49,
+        LLR-084.2) — the address / expected / actual / result line plus the
+        entry's ``address_start`` (for the hex peek), the ``sev-*`` class for
+        the row's ``result``, and the entry's ``linkage_symbol`` carried
+        apart from ``text``. Distinct from the flat :class:`CheckResultRow`
+        the Patch Editor renders: this exposes the per-entry ADDRESS (for the
+        peek) and the grouping ``result`` token, and keeps the file-derived
+        ``linkage_symbol`` in its own field so the widget renders it in a
+        dedicated markup-safe cell (C-17), never interpolated into ``text``.
+
+    Args:
+        result (str): The entry's result token — ``"pass"`` / ``"fail"`` /
+            ``"uncheckable"`` — the grouping key for the CHECKS screen.
+        address (Optional[int]): The entry's ``address_start``, carried for
+            the CHECKS hex peek (LLR-084.5).
+        text (str): The rendered row — author-domain address range +
+            expected / actual hex + result token, with the file-derived
+            ``reason`` appended only when present (uncheckable rows).
+        css_class (str): The ``sev-*`` class for the result — ``sev-error``
+            (fail) / ``sev-warning`` (uncheckable) / ``sev-ok`` (pass), via
+            ``css_class_for_severity``.
+        linkage_symbol (Optional[str]): The entry's matching MAC/A2L symbol
+            name (file-derived), rendered in its OWN cell; ``None`` when the
+            entry is standalone. Optional so the four core fields keep the
+            LLR-084.2 positional contract.
+
+    Returns:
+        None: Dataclass container.
+
+    Dependencies:
+        Used by:
+            - ChangeService.check_display_rows
+            - tui.checks_view.GroupedChecksPanel.render_groups (via app.py)
+    """
+
+    result: str
+    address: Optional[int]
+    text: str
+    css_class: str
+    linkage_symbol: Optional[str] = None
+
+
 class ChangeService:
     """
     Summary:
@@ -1554,6 +1600,86 @@ class ChangeService:
                         f"actual [{actual}] -> {token}{suffix}"
                     ),
                     css_class=css_class_for_severity(severity),
+                )
+            )
+        return rows
+
+    def check_display_rows(self) -> list[CheckDisplayRow]:
+        """
+        Summary:
+            Shape the last check-run result into GROUPED display rows for the
+            dedicated CHECKS screen (batch-49, LLR-084.2), one per entry —
+            each carrying the ``result`` token (grouping key), the entry's
+            ``address_start`` (for the hex peek), a markup-safe row ``text``,
+            the ``sev-*`` css class for the result, and the entry's
+            ``linkage_symbol`` (rendered in its own cell). Distinct from the
+            flat :meth:`check_rows` the Patch Editor renders: this exposes the
+            per-entry ADDRESS and keeps ``linkage_symbol`` apart from ``text``
+            so the CHECKS widget can group + peek + colour + C-17-render.
+
+        Returns:
+            list[CheckDisplayRow]: One :class:`CheckDisplayRow` per result
+            entry in result order; empty when no check run is current
+            (``last_check_result is None`` — no run yet, or an ``undo`` /
+            ``redo`` reset it), mirroring :meth:`check_rows`.
+
+        Data Flow:
+            - Read the duck-shaped ``entries`` records of
+              ``last_check_result`` (the LLR-004.3 per-entry field set); map
+              each ``result`` token → severity via
+              :data:`_CHECK_RESULT_SEVERITY` → ``css_class_for_severity``;
+              compose ``text`` from the author-domain address range +
+              expected / actual hex + the result token, appending the
+              file-derived ``reason`` only when present (uncheckable rows).
+              ``linkage_symbol`` rides its own field, never folded into
+              ``text``.
+
+        Dependencies:
+            Uses:
+                - css_class_for_severity / _CHECK_RESULT_SEVERITY
+                - CheckDisplayRow
+            Used by:
+                - S19TuiApp.update_checks_view (batch-49 Inc-3)
+                - tests/test_tui_checks_view.py
+
+        Example:
+            >>> service = ChangeService()
+            >>> service.check_display_rows()
+            []
+        """
+        result = self.last_check_result
+        if result is None:
+            return []
+        rows: list[CheckDisplayRow] = []
+        for record in getattr(result, "entries", []) or []:
+            token = str(getattr(record, "result", "uncheckable"))
+            severity = _CHECK_RESULT_SEVERITY.get(
+                token, ValidationSeverity.WARNING
+            )
+            start = int(getattr(record, "address_start", 0))
+            end = int(getattr(record, "address_end", start + 1))
+            expected = " ".join(
+                f"{byte:02X}"
+                for byte in (getattr(record, "expected_bytes", ()) or ())
+            )
+            actual_bytes = getattr(record, "actual_bytes", None)
+            actual = (
+                " ".join(f"{byte:02X}" for byte in actual_bytes)
+                if actual_bytes is not None
+                else "-"
+            )
+            reason = getattr(record, "reason", None)
+            suffix = f" ({reason})" if reason else ""
+            rows.append(
+                CheckDisplayRow(
+                    result=token,
+                    address=start,
+                    text=(
+                        f"0x{start:X}-0x{end - 1:X} expected [{expected}] "
+                        f"actual [{actual}] -> {token}{suffix}"
+                    ),
+                    css_class=css_class_for_severity(severity),
+                    linkage_symbol=getattr(record, "linkage_symbol", None),
                 )
             )
         return rows

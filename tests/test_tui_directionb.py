@@ -8,7 +8,8 @@ Covers the increment-2 LLRs:
   - LLR-007.1 (skeleton) — the two-regime ``width-narrow`` class
 
 the increment-3 LLRs:
-  - LLR-001.1 — activity-rail composition (8 ordered items on keys 1-8)
+  - LLR-001.1 — activity-rail composition (9 ordered items on keys 1-9;
+    batch-49 LLR-083.1 appended Checks as the 9th)
   - LLR-001.2 — single active rail item (Workspace active at startup)
   - LLR-001.3 — rail glyph rendering with ASCII fallback
 
@@ -130,7 +131,7 @@ from s19_app.tui.rail import RAIL_ENTRIES, Rail, RailItem
 from s19_app.tui.screens_directionb import EmptyStatePanel
 
 
-# The 8 Direction B rail screen container ids, in rail order (keys 1-8).
+# The 9 Direction B rail screen container ids, in rail order (keys 1-9).
 SCREEN_IDS = [
     "screen_workspace",
     "screen_a2l",
@@ -140,6 +141,7 @@ SCREEN_IDS = [
     "screen_patch",
     "screen_diff",
     "screen_flow",
+    "screen_checks",
 ]
 
 # Rail screen-key -> container id, matching S19TuiApp.SCREEN_CONTAINER_IDS.
@@ -152,6 +154,7 @@ SCREEN_KEYS = [
     "patch",
     "diff",
     "flow",
+    "checks",
 ]
 
 
@@ -215,13 +218,14 @@ def test_tc003_show_screen_swaps_to_each_rail_screen(tmp_path: Path) -> None:
         )
 
 
-def test_tc003_rail_keys_1_to_8_route_screens(tmp_path: Path) -> None:
-    """Pressing keys ``1``-``8`` activates rail screens 1-8 in order.
+def test_tc003_rail_keys_1_to_9_route_screens(tmp_path: Path) -> None:
+    """Pressing keys ``1``-``9`` activates rail screens 1-9 in order.
 
-    Intent: the keymap-proposal binding of digits 1-8 to
-    ``show_screen(...)`` is wired; pressing each digit makes exactly its
-    rail screen visible. The legacy ``1``/``2``/``3`` view-toggle meaning
-    is intentionally superseded (LLR-004.4).
+    Intent: the keymap-proposal binding of digits 1-9 to
+    ``show_screen(...)`` is wired (batch-49 LLR-083.3 adds key 9 → Checks);
+    pressing each digit makes exactly its rail screen visible. The legacy
+    ``1``/``2``/``3`` view-toggle meaning is intentionally superseded
+    (LLR-004.4).
     """
 
     async def _drive() -> dict[str, list[str]]:
@@ -229,14 +233,14 @@ def test_tc003_rail_keys_1_to_8_route_screens(tmp_path: Path) -> None:
         result: dict[str, list[str]] = {}
         async with app.run_test() as pilot:
             await pilot.pause()
-            for digit, expected_id in zip("12345678", SCREEN_IDS):
+            for digit, expected_id in zip("123456789", SCREEN_IDS):
                 await pilot.press(digit)
                 await pilot.pause()
                 result[digit] = _visible_screens(app)
         return result
 
     per_digit = asyncio.run(_drive())
-    for digit, expected_id in zip("12345678", SCREEN_IDS):
+    for digit, expected_id in zip("123456789", SCREEN_IDS):
         assert per_digit[digit] == [expected_id], (
             f"Key '{digit}' should activate {expected_id}, "
             f"got {per_digit[digit]}"
@@ -444,8 +448,9 @@ def test_tc037_scaffold_screens_carry_empty_state(tmp_path: Path) -> None:
 # Increment 3 — activity rail widget + rail navigation wiring
 # ===========================================================================
 
-# The 8 rail items, in rail order, paired with their screen key and the
+# The 9 rail items, in rail order, paired with their screen key and the
 # normative LLR-001.3 glyph -> screen mapping table (Unicode + ASCII).
+# batch-49 (LLR-083.1): Checks appended as the 9th entry on key 9.
 EXPECTED_RAIL = [
     ("workspace", "◫", "#"),
     ("a2l", "≡", "="),
@@ -455,20 +460,21 @@ EXPECTED_RAIL = [
     ("patch", "✎", "P"),
     ("diff", "⏚", "D"),
     ("flow", "✦", "F"),
+    ("checks", "☑", "C"),
 ]
 
 
 # ---------------------------------------------------------------------------
-# TC-001 — rail composes 8 ordered items on keys 1-8 (LLR-001.1)
+# TC-001 — rail composes 9 ordered items on keys 1-9 (LLR-001.1 / LLR-083.1)
 # ---------------------------------------------------------------------------
 
 
-def test_tc001_rail_composes_eight_ordered_items(tmp_path: Path) -> None:
-    """The activity rail composes exactly 8 items in the keymap rail order.
+def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
+    """The activity rail composes exactly 9 items in the keymap rail order.
 
-    Intent: LLR-001.1 — the rail is fixed at eight items (OQ-3 resolved),
-    ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Bookmarks. Each
-    item's 1-based position is its ``1``-``8`` keymap key, and that key
+    Intent: LLR-001.1 / batch-49 LLR-083.1 — the rail is fixed at nine items,
+    ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow, Checks. Each
+    item's 1-based position is its ``1``-``9`` keymap key, and that key
     routes the item's screen via ``action_show_screen``.
     """
 
@@ -485,17 +491,17 @@ def test_tc001_rail_composes_eight_ordered_items(tmp_path: Path) -> None:
     assert keys == [key for key, _, _ in EXPECTED_RAIL], (
         f"Rail item order should match the keymap rail order, got {keys}"
     )
-    assert positions == [1, 2, 3, 4, 5, 6, 7, 8], (
-        f"Rail items must be positioned 1-8 in order, got {positions}"
+    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9], (
+        f"Rail items must be positioned 1-9 in order, got {positions}"
     )
 
 
-def test_tc001_rail_keys_1_to_8_route_through_rail_items(tmp_path: Path) -> None:
-    """Pressing ``1``-``8`` activates the screen of the same-position rail item.
+def test_tc001_rail_keys_1_to_9_route_through_rail_items(tmp_path: Path) -> None:
+    """Pressing ``1``-``9`` activates the screen of the same-position rail item.
 
-    Intent: LLR-001.1 — each rail item is bound to its ``1``-``8`` key. The
-    digit keys must route to the same screen that rail item represents, so
-    keyboard navigation and the rail agree.
+    Intent: LLR-001.1 / batch-49 LLR-083.1 — each rail item is bound to its
+    ``1``-``9`` key. The digit keys must route to the same screen that rail
+    item represents, so keyboard navigation and the rail agree.
     """
 
     async def _drive() -> dict[str, str]:
@@ -503,14 +509,14 @@ def test_tc001_rail_keys_1_to_8_route_through_rail_items(tmp_path: Path) -> None
         result: dict[str, str] = {}
         async with app.run_test() as pilot:
             await pilot.pause()
-            for digit, (screen_key, _, _) in zip("12345678", EXPECTED_RAIL):
+            for digit, (screen_key, _, _) in zip("123456789", EXPECTED_RAIL):
                 await pilot.press(digit)
                 await pilot.pause()
                 result[digit] = app.query_one(Rail).active_key
         return result
 
     per_digit = asyncio.run(_drive())
-    for digit, (screen_key, _, _) in zip("12345678", EXPECTED_RAIL):
+    for digit, (screen_key, _, _) in zip("123456789", EXPECTED_RAIL):
         assert per_digit[digit] == screen_key, (
             f"Key '{digit}' should activate rail item '{screen_key}', "
             f"got '{per_digit[digit]}'"
@@ -570,9 +576,9 @@ def test_tc002_active_marker_moves_and_clears_previous(tmp_path: Path) -> None:
                 if item.has_class("-active")
             ]
 
-            # Key path — exactly one active for every digit 1-8.
+            # Key path — exactly one active for every digit 1-9.
             key_states: list[list[str]] = []
-            for digit in "12345678":
+            for digit in "123456789":
                 await pilot.press(digit)
                 await pilot.pause()
                 key_states.append(
@@ -604,7 +610,7 @@ def test_tc002_active_marker_moves_and_clears_previous(tmp_path: Path) -> None:
     assert after_mac == ["mac"], (
         f"After activating item 3 only MAC should be active, got {after_mac}"
     )
-    for digit, state in zip("12345678", key_states):
+    for digit, state in zip("123456789", key_states):
         screen_key = EXPECTED_RAIL[int(digit) - 1][0]
         assert state == [screen_key], (
             f"Key '{digit}': exactly the '{screen_key}' item must be "
@@ -695,7 +701,7 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             ]
 
     rendered = asyncio.run(_drive())
-    assert len(rendered) == 8, f"expected 8 rail items, got {len(rendered)}"
+    assert len(rendered) == 9, f"expected 9 rail items, got {len(rendered)}"
     for (screen_key, glyph), (exp_key, _, exp_ascii) in zip(rendered, EXPECTED_RAIL):
         assert screen_key == exp_key, f"order: {screen_key} != {exp_key}"
         assert glyph == exp_ascii, (
@@ -738,7 +744,7 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
-    assert len(seen) == 8, f"expected all 8 screens visited, got {len(seen)}"
+    assert len(seen) == 9, f"expected all 9 screens visited, got {len(seen)}"
     for key, has_find, has_goto, has_palette in seen:
         assert has_find, f"find input missing on screen '{key}'"
         assert has_goto, f"go-to input missing on screen '{key}'"
@@ -776,7 +782,7 @@ def test_tc010_ctrl_k_opens_palette_from_every_screen(tmp_path: Path) -> None:
         return results
 
     results = asyncio.run(_drive())
-    assert len(results) == 8
+    assert len(results) == 9
     for key, is_open, focused_id in results:
         assert is_open, f"palette did not open on screen '{key}'"
         assert focused_id == "palette_input", (
@@ -878,7 +884,7 @@ def test_tc038_project_a2l_labels_render_in_command_bar(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
-    assert len(seen) == 8
+    assert len(seen) == 9
     for key, project, a2l in seen:
         assert "demo_project" in project, (
             f"project name missing from command bar on '{key}': {project!r}"

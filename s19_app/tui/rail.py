@@ -5,18 +5,18 @@ batch-02-direction-b-restyle, increment 3:
 
   - ``RailEntry`` — the immutable description of one rail item (screen key,
     Unicode glyph, ASCII-fallback glyph, label);
-  - ``RAIL_ENTRIES`` — the eight ordered rail items (Workspace, A2L, MAC,
-    Map, Issues, Patch, Diff, Bookmarks) on keys ``1``-``8``, carrying the
+  - ``RAIL_ENTRIES`` — the nine ordered rail items (Workspace, A2L, MAC,
+    Map, Issues, Patch, Diff, Flow, Checks) on keys ``1``-``9``, carrying the
     normative LLR-001.3 glyph -> screen mapping;
   - ``RailItem`` — one selectable row in the rail;
-  - ``Rail`` — the vertical rail composing the eight items, tracking the
+  - ``Rail`` — the vertical rail composing the nine items, tracking the
     single active item and emitting ``Rail.Selected`` on click.
 
 The rail is a presentational widget (s19_app CLAUDE.md TUI architecture):
 it takes its entries at construction, emits a ``Rail.Selected`` message on
 click, and exposes ``set_active``; it never calls the engine or a service.
 ``S19TuiApp`` owns the routing — it handles ``Rail.Selected`` and the
-``1``-``8`` key bindings, calls ``action_show_screen``, and keeps the rail's
+``1``-``9`` key bindings, calls ``action_show_screen``, and keeps the rail's
 active marker in sync via ``set_active``.
 """
 
@@ -43,7 +43,7 @@ class RailEntry:
     Args:
         key (str): The screen key understood by ``action_show_screen``
             (e.g. ``"workspace"``, ``"a2l"``); also the rail item's
-            ``1``-``8`` keymap key is its 1-based position.
+            ``1``-``9`` keymap key is its 1-based position.
         glyph (str): The Unicode glyph rendered by default (LLR-001.3).
         ascii_glyph (str): The single-character ASCII fallback glyph for
             terminals that cannot render the Unicode glyph (LLR-001.3).
@@ -71,10 +71,11 @@ class RailEntry:
     label: str
 
 
-#: The eight ordered Direction B rail items on keys ``1``-``8`` (LLR-001.1).
-#: The glyph / ascii_glyph columns are the normative LLR-001.3 mapping table:
-#: Workspace=(U+25EB,#), A2L=(U+2261,=), MAC=(U+25C9,@), Map=(U+25A4,M),
-#: Issues=(!,!), Patch=(U+270E,P), Diff=(U+23DA,D), Flow=(U+2726,F).
+#: The nine ordered Direction B rail items on keys ``1``-``9`` (LLR-001.1,
+#: batch-49 LLR-083.1). The glyph / ascii_glyph columns are the normative
+#: LLR-001.3 mapping table: Workspace=(U+25EB,#), A2L=(U+2261,=),
+#: MAC=(U+25C9,@), Map=(U+25A4,M), Issues=(!,!), Patch=(U+270E,P),
+#: Diff=(U+23DA,D), Flow=(U+2726,F), Checks=(U+2611,C).
 RAIL_ENTRIES: tuple[RailEntry, ...] = (
     RailEntry("workspace", "◫", "#", "Workspace"),
     RailEntry("a2l", "≡", "=", "A2L Explorer"),
@@ -84,6 +85,7 @@ RAIL_ENTRIES: tuple[RailEntry, ...] = (
     RailEntry("patch", "✎", "P", "Patch Editor"),
     RailEntry("diff", "⏚", "D", "A2B Diff"),
     RailEntry("flow", "✦", "F", "Flow Builder"),
+    RailEntry("checks", "☑", "C", "Checks"),
 )
 
 
@@ -99,7 +101,7 @@ class RailItem(Static, can_focus=True):
 
     Args:
         entry (RailEntry): The rail item this row represents.
-        position (int): 1-based rail position; also the item's ``1``-``8``
+        position (int): 1-based rail position; also the item's ``1``-``9``
             keymap key.
         active (bool): When True the row is composed with the ``-active``
             accent marker. Defaults to False.
@@ -178,10 +180,10 @@ class RailItem(Static, can_focus=True):
 
 
 class Rail(Widget):
-    """Vertical activity rail listing the eight Direction B screens.
+    """Vertical activity rail listing the nine Direction B screens.
 
     Summary:
-        Composes the eight ordered ``RailItem`` rows (LLR-001.1) and keeps
+        Composes the nine ordered ``RailItem`` rows (LLR-001.1) and keeps
         exactly one of them marked active with the ``-active`` accent
         marker (LLR-001.2). It is a presentational widget: clicking a row
         bubbles a ``Rail.Selected`` message to ``S19TuiApp``; the app does
@@ -190,7 +192,7 @@ class Rail(Widget):
 
     Args:
         entries (tuple[RailEntry, ...]): The ordered rail items. Defaults
-            to ``RAIL_ENTRIES`` (the eight Direction B screens).
+            to ``RAIL_ENTRIES`` (the nine Direction B screens).
         active (str): The screen key of the item active at startup.
             Defaults to ``"workspace"`` (LLR-001.2 — Workspace active at
             startup).

@@ -1,0 +1,76 @@
+{
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-07-16-batch-48",
+  "batch_objective": "Screen-upgrades Batch B (prototypes/screen_upgrades.HANDOFF-PLAN.md §4.5): Patch Editor BIG, on batch-46's three-window layout (#patch_win_script/_checks/_json). Ships: (1) EASY layer — window border titles + subtitles (entry count / run state / schema), entries table colour roles (op purple, address cyan, bytes bright), docked button rows as colour-grouped CHIPS (entry-actions blue / apply-path green / checks yellow; this is the chip-button CSS deferred out of batch-47 Inc-8 — the patch rows are its consumer), variant+scope line in label/value idiom; (2) check-glyph column on entries (check/half/cross from the LAST CheckRunResult per entry; no run yet -> dot grey); (3) CHECKS pass/fail strip (counts + microbar from CheckRunResult.aggregates); (4) JSON window syntax-ish colouring + paste-cap gauge (N KB / 64KB, CappedTextArea); (5) LIVE before/after card (HEADLINE) — on entry-row select, before-bytes read from LoadedFile.mem_map at the entry address vs the entry's patch bytes, coloured; READ-ONLY preview, applies nothing; (6) history strip (position in the undo/redo stack, _HISTORY_MAX=20). Render-only: no wiring/behaviour change; preserve every batch-46 widget id.",
+  "current_phase": 6,
+  "phase_status": "approved",
+  "standing_authorization": "BATCH-48 KICKOFF (2026-07-16). AUTHORIZATION SOURCE = operator directives given during batch-47, recorded verbatim: (1) 2026-07-15 mid-Inc-5: 'Continue autonomously with the next one.' (2) 2026-07-15: 'continue autonomously through both batches.' (3) 2026-07-16 (mid final-QA): 'take it up to PR merge.' (4) 2026-07-16 post-merge: 'continue with the regen PR, then batch B ... Just make sure the backlog gets carried because we had a lot of items to address.' => RUN MODE = AUTONOMOUS THROUGH SELF-MERGE, same gated model as batch-46/47: agent runs Phases 0->6 autonomously, presenting a 7-section review packet in-conversation at each phase gate AND each Phase-3 increment gate and self-approving with a named Coverage/Certainty/Evidence axis check, to 'PR opened + CI green'; then a FINAL independent PR-level qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs incl. frozen TEST files, no cross-increment regression via C-26, every gate carry discharged) MUST come back clean; only then merge, then /dev-flow-sync. A HIGH final-QA finding BLOCKS the merge and returns to the operator (this gate FIRED in batch-47 and is not a formality). Snapshot regen = canonical-CI-only follow-up PR post-merge (local regen FORBIDDEN, reference_snapshot_regen_env). NOTE per feedback_standing_auth_per_batch: authorization is per-batch and never silently carried — this block RESTATES the operator's explicit cross-batch grant rather than inheriting batch-47's. Operator retains the right to correct it. DECISION-RECORDING: every autonomous decision -> PLAN.md log + decisions_log + 05-postmortem + vault at sync. GUARDRAILS: engine-frozen set OFF-LIMITS (core.py/hexfile.py/range_index.py/validation/ /tui/a2l.py/tui/mac.py/tui/color_policy.py) + the 9 frozen TEST files; C-27 dual-guard every increment; C-17 markup-safety on ALL new untrusted-text sinks (esp. the PASTED JSON in the JSON window — colour via a tokenizer over a trusted-rendered Text, NEVER markup-parse pasted content); C-29 two-axis geometry re-measure WITH the before/after card added (the card must NOT push docked button rows below reachability — that was field-audit B2, the exact defect batch-46 fixed -> AT it explicitly); C-30 (NEW, batch-47): sequence any app-wide restyle LAST (this batch is patch-screen-scoped, so C-30 likely N/A — confirm at Phase 1); preserve every batch-46 widget id (14 leaf + 2 hidden-row ids are census/test-pinned, FOLD-1).",
+  "route": "full /dev-flow (Batch B of the operator-approved screen-upgrade prototype verdict; the BIG tier adds a structural element — the live before/after card — plus a C-17 sink over PASTED JSON and a C-29 geometry re-measure of the batch-46 docked-row reachability contract). Branch feat/batch-48-patch-big off origin/main 6551aed (post batch-47 #86 + regen #87).",
+  "rc1": "PASS @ 6551aed (2026-07-16). git fetch clean; branch cut off origin/main tip; merge-base == tip == HEAD, no rebase. ALREADY-SHIPPED CHECK: highest existing row = R-TUI-074 -> new rows start R-TUI-075. Patch check-glyph column: 0 hits -> NEW. LIVE before/after CARD: NOT shipped — the 19 'before/after' hits in screens_directionb.py are the EXISTING #patch_before_after_button / patch_before_after_row -> action_before_after_report (US-061), which WRITES A REPORT FILE; the handoff §4.5 item 5 headline is an in-panel READ-ONLY card on entry-row select reading LoadedFile.mem_map ('surfaces live what today exists only in generated reports'). Distinct feature; proceeds.",
+  "iterations_per_phase": {
+    "0": 1,
+    "1": 1,
+    "2": 2,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
+  },
+  "artifacts": {
+    "plan": ".dev-flow/2026-07-16-batch-48/PLAN.md",
+    "1": ".dev-flow/2026-07-16-batch-48/01-requirements.md",
+    "2": ".dev-flow/2026-07-16-batch-48/02-review.md",
+    "3": ".dev-flow/2026-07-16-batch-48/03-increments/",
+    "4": ".dev-flow/2026-07-16-batch-48/04-validation.md",
+    "5": ".dev-flow/2026-07-16-batch-48/05-postmortem.md",
+    "6": ".dev-flow/2026-07-16-batch-48/06-docs/"
+  },
+  "backlog_carry": "OPERATOR-FLAGGED 2026-07-16 ('make sure the backlog gets carried'). Consolidated LIVE BACKLOG now in memory MEMORY.md (single list, was scattered across 4 sources). IN THIS BATCH: Patch Editor BIG + chip-button CSS (batch-47 Inc-8 deferral — the patch docked-button rows are the consumer). NOT in this batch, still open: (1) Issues Report PARKED (no tier picked) BUT still owns P0 field-audit B1 'Issues PgUp/PgDn no-op' (stride 200 vs _GROUP_DISPLAY_MAX=40; issues_view.py:52,267, app.py:6741) — PARKED != FIXED, verify against the current build; (2) field-audit residue: B3 A2L 'two extra chars' (needs LIVE REPRO), discoverability gap (14/25 bindings invisible), Issues filter/sort, universal paste; (3) Flow Builder (rail-8, deferred): flow.json persistence (untrusted-loader security), CHECK+CRC blocks (the CRC-into-loop seam, ADR §7), multi-image scope; (4) long-standing: report_service:1091 raw source_path heading, frozen a2l.py:926 F841 (cannot fix while frozen), P-1 1-based index; (5) closeout: delete prototypes/screen_upgrades.* + prototypes/out/ ONLY AFTER this batch (handoff §10.4 absorb-then-delete — Batch B needs §4.5); repo hygiene: worktree rail-8-snapshot-baselines-481a06 on chore/backlog-refresh-batch45 + 5 detached cursor worktrees.",
+  "decisions_log": [
+    {
+      "phase": 0,
+      "date": "2026-07-16",
+      "decision": "Batch-48 kickoff: RC-1 PASS @ 6551aed; branch feat/batch-48-patch-big cut. Authorization RESTATED from the operator's explicit cross-batch grant (not inherited). Recon dispatched. Phase-0 intake in progress.",
+      "notes": "Predecessor batch-47 fully closed: PR #86 (768f70a) + regen PR #87 (6551aed) merged, vault synced (gallery refreshed 90/90 + 46 orphans pruned), backlog consolidated into MEMORY.md. RC-1 already-shipped: R-TUI-074 is the highest row (new = R-TUI-075+); check-glyph 0 hits = NEW; the live before/after CARD is NOT shipped (the existing #patch_before_after_button writes a REPORT, US-061 — a distinct feature). Stories to derive from handoff §4.5 items 1-6 + the chip-button CSS carry. Not advancing to Phase 1 until the Phase-0 DoR gate is presented + self-approved with a named axis check."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-16",
+      "decision": "Phase-2 triple review -> BLOCK (4 blockers incl 1 HIGH security, 8 majors) -> folds applied -> orchestrator PINNED the 26-AT registry -> single-agent reconciliation -> re-gate APPROVE. -> Phase 3.",
+      "notes": "architect + security in parallel; BOTH returned BLOCK and independently hit the same 2 defects (id collision, JSON surface). BL-1 (HIGH, security): THREAT MODEL INVERTED - the paste buffer is SAFE BY CONSTRUCTION (verified in installed textual 8.2.8: TextArea.get_line returns Text(literal), styles via theme lookup, unknown token skipped -> payload cannot name a style) while the ENTRIES TABLE is a LIVE EXPLOITABLE from_markup sink AT HEAD (change_service.py:1402 entry.value raw JSON -> bare str -> default_cell_formatter -> Text.from_markup; PROVEN: [red] style injection, [link=http://evil] LINK INJECTION FROM FILE DATA, [/nope] MarkupError CRASH) - and the batch rewrites exactly those lines while sec2.4-4 steered Phase 3 away. Partial-fix trap: 3 roles enumerated vs 5 columns. FOLD: NEW LLR-075.6 (all cells Text regardless of role, gate-blocking) + NEW AT-075e** w/ TAUTOLOGY GUARD (get_cell_at()==payload PASSES on the vulnerable code -> the AT must assert the cell IS a Text not a str). This batch now FIXES A PRE-EXISTING LIVE VULNERABILITY. BL-2: the 2 docs used the SAME ids for DIFFERENT things (01b never got the D-2 US-P1 split -> everything off by one; NO -> 01b pointer resolved; C-18 unachievable) - the orchestrator's own security brief inherited the retired numbering. BL-3: glyph COLUMN -> FOLD INTO THE KIND CELL per the batch-47 A2L(app.py:9548)/MAC(app.py:9223) precedent verified in source -> qa T-1 (Coordinate(row,1/2) readers) DISSOLVES (0-line diff on the 32-hit census file, now a NORMATIVE gate = a free correctness signal) + AMENDMENT C RETIRED (the pre-committed amendment was the tell that the design was paying rent on a wrong choice). BL-4 (MJ-1 class, caught a phase earlier than batch-47): the provenance stamp fingerprinted the DOCUMENT but check_runner reads actual_bytes from the IMAGE and ChangeService is built once at app.py:1171 -> check image A (all pass) -> load image B -> glyphs still describe image A. FOLD: stamp = (document_signature, image_generation) via an app.py monotonic token bumped in _apply_loaded_file; id(mem_map) STRUCK (id reuse). MAJORS: MJ-1 4th refresh_entries site (screens_directionb.py:2976 on_mount self-call would null mem_map) + retain semantics (sentinel-preserve; None stays meaningful); MJ-2 the pre-committed relaxation would VOID its own gate-blocking AT-080d (width-narrow <120 fires at 80x24 -> card unmounted -> B2 gate passes VACUOUSLY) -> anti-vacuity two-arm form stated now; MJ-3 HLR-076 over-claim -> structural invariant; MJ-4 OPERATOR DECISION (AskUserQuestion): JSON colouring = IN-PLACE TextArea._highlights (only route that fits the ~5-row 80x24 floor; security verified C-17-safe; cosmetic-only failure behind feature-detect) + AT-079d tests the fallback (CI pinned at 8.2.8 can never exercise degradation); MJ-5 observe get_line().plain/.spans (ta.text is TAUTOLOGICAL); MJ-6 the mandated counterfactual sensor[unclosed does NOT discriminate (plain identical to safe path) -> ADD [/nope] (the only crash-class payload); the false claim was PROPAGATING 47->48 from test_tui_a2l_detail.py -> BACKLOG CARRY to fix at origin; MJ-7 mechanical grep gate chosen over a narrowed AT (an AT over a header that does not exist yet passes vacuously = the MJ-2 class); MJ-8 C-13.1 ladder framing dropped (gauge-only recovers ZERO of the colouring deficit = an acceptance relaxation, not a rung). ORCHESTRATOR PROCESS FAILURE (recorded): dispatched 2 parallel fold agents that each minted AT ids -> RE-CREATED the BL-2 divergence; batch-47 taught this exact lesson (pin the crosswalk BEFORE dispatching folds) and I failed to reapply it. Fixed by pinning the 26-AT registry in 02-review.md + ONE reconciliation agent owning both files. RULING: AT-077c (document staleness) and AT-077e (image staleness) stay SPLIT - distinct triggers, and BL-4's branch is the one that was MISSED (C-10 per-branch + C-18). FINAL: 7 HLR (R-TUI-075..081), 37 LLR, 26 AT (6 gate-blocking: AT-075d/075e/079c C-17 + AT-077c/077e staleness + AT-080d C-29), 45 TC, 0 modal should. Reconciliation VERIFIED: comm both directions EMPTY, 26/26 id-for-id. AT-079b's or-disjunction struck (the same self-voiding shape as MJ-2, missed by both reviewers, caught by qa's re-read)."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-17",
+      "decision": "validation-approved",
+      "notes": "matrix green 26 ATs/37 LLRs 100%; full suite 1560 passed/0 failed; EXIT=1 root-caused as pre-existing syrupy unused-snapshot artifact (2 orphan tc036s baselines on main), not a batch-48 regression"
+    },
+    {
+      "phase": 5,
+      "date": "2026-07-17",
+      "decision": "postmortem-approved; C-31+C-32 encoded, A/C deferred",
+      "notes": "operator AskUserQuestion: C-31 input-set-is-an-oracle (global dev-flow), C-32 assert-painted-result (project engineering-rules); unified code<->requirement traceability index deferred pending CI staleness guard"
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-17",
+      "decision": "docs complete; Amendment-D reconciled",
+      "notes": "06-docs suite; 5 stale 'unmodified' claims swept (agent hand-listed 3, real set was 5 - C-31's shape live)"
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-17",
+      "decision": "PR #88 opened, CI green after Inc-6b fix, MERGED squash fbafb82",
+      "notes": "final PR-QA MERGE-CLEAR (4 axes); CI caught real defect both local+QA missed (test_tc081_4 git-diff-main not CI-robust); Inc-6b fixed to skip-on-unresolvable-main per frozen-guard convention; operator authorized merge-once-CI-green"
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-17",
+      "decision": "synced-to-obsidian",
+      "notes": "G:\\...\\s19_app\\dev-flow-batches6-07-16-batch-48\\ — 6 artifacts + 06-docs + README; pilot gallery re-stamped (patch-scoped, captured flows byte-identical verified)"
+    }
+  ],
+  "obsidian_synced": true,
+  "created_at": "2026-07-16T18:00:00Z"
+}
