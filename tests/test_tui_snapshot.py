@@ -866,24 +866,19 @@ def _fdf_json_height_drift_marks(screen: str, density: str, size_key: str) -> tu
 def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     """Return the discoverability footer-drift marks (feat/discoverability-help-panel).
 
-    The footer-visible ``?``/Help binding (and the A2L ``Legend`` button) drift
-    every wide (120x30 / 160x40) tc016s cell's footer row. Marked
-    ``xfail(strict=False)`` until the canonical-CI baseline regen lands, then
-    retired.
+    The footer-visible ``?``/Help binding drifts every wide (120x30 / 160x40)
+    tc016s cell's footer row. Marked ``xfail(strict=False)`` until the
+    canonical-CI baseline regen lands, then retired.
     """
-    del screen, density
-    if size_key in _WIDE_FOOTER_SIZES:
-        return (
-            pytest.mark.xfail(
-                reason=(
-                    "feat/discoverability-help-panel: footer-visible '?'/Help "
-                    "binding + A2L Legend button drift every wide (120x30/160x40) "
-                    "tc016s footer; SVG baseline regen pending in canonical CI "
-                    "(snapshot-regen.yml @ textual==8.2.8, post-merge follow-up)"
-                ),
-                strict=False,
-            ),
-        )
+    # RETIRED (discoverability regen PR): the canonical-CI regen has LANDED - the
+    # 19 wide tc016s baselines were refreshed from the merged #95 `main`
+    # (snapshot-regen.yml @ textual==8.2.8, run 29669309190; containment confirmed
+    # EXACTLY the 19 discoverability footer cells moved - 16 restyled wide + 3
+    # scaffold-120x30, no 80x24, no other), so every cell now MATCHES its baseline
+    # and this mark is stale. Left as an early no-op for provenance (the
+    # _batch45_footer / _batch47 / _batch48 retirement convention). Leaving it LIVE
+    # would make each cell XPASS silently under strict=False and mask regressions.
+    del screen, density, size_key
     return ()
 
 
