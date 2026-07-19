@@ -356,6 +356,17 @@ table paging while explicit page buttons trigger the same underlying actions.
   `action_mac_records_page_next`, `action_mac_records_page_prev`)
 - Validation: `Automated` via `tests/test_tui_app.py`
 
+**R-TUI-DISCOVER-001**: Keyboard bindings must be discoverable from the UI. A
+footer-visible `?` binding opens Textual's built-in help panel, which lists every
+active binding (so the many `show=False` keys — rails `1`–`8`, save/load project,
+dump-JSON, before/after report, undo/redo, paging — are learnable without external
+docs). The A2L screen carries the on-screen `Legend` button that MAC and Issues
+have (parity), routed to the shared `action_show_legend`.
+
+- Code: `s19_app/tui/app.py` (`BINDINGS` `question_mark → show_help_panel`;
+  `#a2l_legend_button` in `_compose_screen_a2l` → `action_show_legend`)
+- Validation: `Automated` via `tests/test_discoverability.py`
+
 ---
 
 # 3. Validation Engine (cross-artifact severity & issues policy)
