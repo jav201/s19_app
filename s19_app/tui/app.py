@@ -4260,7 +4260,6 @@ class S19TuiApp(App):
                 Button("All", id="a2l_filter_all"),
                 Button("Invalid", id="a2l_filter_invalid"),
                 Button("In-Memory", id="a2l_filter_inmem"),
-                Button("Legend", id="a2l_legend_button"),
                 Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
                 Button("Find next", id="a2l_tag_find_next"),
                 Button("Page Prev", id="a2l_page_prev_button"),
@@ -10107,7 +10106,6 @@ class S19TuiApp(App):
         elif event.button.id in (
             "mac_legend_button",
             "issues_legend_button",
-            "a2l_legend_button",
         ):
             self.action_show_legend()
 

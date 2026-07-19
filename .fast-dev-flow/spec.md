@@ -81,6 +81,25 @@ them (the batch-45/48 pattern).
 - Footer mid-word truncation at 120 cols · settings-menu surfacing (palette-only today) · CRC-write
   2-deep modal chain · the 14/30 A2L tag fields dropped from the table.
 
-## 9. Batch status
+## 9. HIGH finding — Increment 2 (A2L Legend button) DROPPED
 
-| Current phase | Phase A — spec written |
+Implementing the A2L Legend button surfaced a conflict with a **deliberate prior decision, C-13**:
+A2L omits the Legend button on purpose because its filter row is too crowded — a button there
+**clips off-screen at 80 cols** (measured: right edge at col 93 on an 80-col screen → unreachable),
+so A2L uses the footer-visible `k` key instead. `test_tui_legend.py::test_at023e_c13_geometry_at_80_cols`
+and `::test_tc023_2_mac_issues_buttons_present_a2l_absent` encode this. My button reintroduced the
+exact bug those tests guard.
+
+The button was also **redundant**: the A2L legend is already reachable via the footer-visible `k`
+key, and Increment 1's help panel lists `k → Legend`, making it discoverable at **every** width —
+strictly better than a button that can't fit at 80 cols. **Decision (operator surfaced): drop the
+A2L Legend button; ship only the help panel.** The two C-13 tests are left intact (restored to
+green); the discoverability goal is fully met by the help panel.
+
+`test_tc081_4_no_binding_diff` (the batch-48 C-28 binding-census guard) is updated to **sanction**
+the one intended `?`→`show_help_panel` binding (whose snapshot drift is handled by
+`_discoverability_drift_marks`) while still firing for any other binding change.
+
+## 10. Batch status
+
+| Current phase | Phase B — Inc 1 (help panel) shipped; Inc 2 (A2L Legend) dropped per C-13 |
