@@ -1,0 +1,42 @@
+%% Batch-51 Flow Builder — block-pipeline data flow.
+%% run_flow threads a single working (mem_map, ranges) pair through the ordered
+%% blocks and collects one BlockResult per block into FlowRunResult.
+%% Accurate to s19_app/tui/services/flow_execution_service.py::run_flow.
+flowchart TD
+    subgraph INPUT[" "]
+        FLOW["Flow(blocks=[...])"]
+        CTX["FlowContext(project_dir, mac_records?, a2l_data?)"]
+    end
+
+    FLOW --> RF["run_flow(flow, ctx)"]
+    CTX --> RF
+
+    RF --> LOOP{{"for each block\n(aborted? -> skip rest)"}}
+
+    LOOP -->|SourceBlock| LOAD["LOAD\n_resolve_manifest_entry + build_loaded_s19/hex\nSEED mem_map / ranges"]
+    LOOP -->|PatchBlock| PATCH["PATCH\nread_change_document + apply_change_document\nMUTATE mem_map in place"]
+    LOOP -->|CheckBlock| CHECK["CHECK (read-only)\nread_change_document + run_check_document\nimage passed through UNCHANGED"]
+    LOOP -->|WriteOutBlock| WRITE["WRITE-OUT\nsave_patched_image(source_kind=fmt)\nSINK to work-area file"]
+
+    %% working image threaded through every block
+    LOAD -. "(mem_map, ranges)" .-> PATCH
+    PATCH -. "(mem_map, ranges)" .-> CHECK
+    CHECK -. "(mem_map, ranges) unchanged" .-> WRITE
+
+    %% per-block outcomes collected
+    LOAD -->|"errors -> WARN Findings\nstatus=notices (no abort)\nunopenable -> STOP aborted=True"| BR["BlockResult (append)"]
+    PATCH -->|"status=ok\nfailure -> STOP aborted=True"| BR
+    CHECK -->|"passed/failed/uncheckable\nfailed>0 -> notices\nown-op invalid + block-own-op -> error\nNEVER aborts chain"| BR
+    WRITE -->|"status=ok + written path\nfailure -> STOP aborted=True"| BR
+
+    BR --> ROLLUP["3-way roll-up\n(see flow-status-classifier)"]
+    WRITE --> WP["written_paths[]"]
+    CHECK -. "final ranges" .-> IR["image_ranges[] (final footprint)"]
+    PATCH -. "final ranges" .-> IR
+    LOAD -. "final ranges" .-> IR
+
+    ROLLUP --> RESULT["FlowRunResult\nstatus · block_results · written_paths · image_ranges"]
+    WP --> RESULT
+    IR --> RESULT
+
+    RESULT --> RENDER["FlowBuilderPanel.render_result\n(Direction-A Pipeline Ledger)"]

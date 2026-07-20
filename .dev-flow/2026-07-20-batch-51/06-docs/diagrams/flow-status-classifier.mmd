@@ -1,0 +1,22 @@
+%% Batch-51 Flow Builder — 3-way flow-status classifier (LLR-087.2).
+%% Accurate to flow_execution_service.py:300-308 (the roll-up after the block loop).
+%% Order matters: FAILED keys on `aborted` ALONE; ISSUES on notices/error/findings;
+%% else CLEAN. A CHECK error never sets `aborted`, so it lands in ISSUES not FAILED.
+flowchart TD
+    END(["end of run_flow\n(block loop complete)"]) --> Q1{"aborted == True?\n(image broken by an\naborting LOAD / PATCH / WRITE-OUT STOP)"}
+
+    Q1 -->|yes| FAILED["FLOW_STATUS_ERROR\nFAILED (sev-error)\nno / partial output"]
+
+    Q1 -->|no| Q2{"any BlockResult.status in\n{notices, error}\nOR any BlockResult.findings?"}
+
+    Q2 -->|yes| ISSUES["FLOW_STATUS_ISSUES\ncompleted-with-issues\nISSUES / amber (sev-warning)\noutput produced WITH advisories"]
+
+    Q2 -->|no| CLEAN["FLOW_STATUS_OK\nCLEAN (sev-ok)\nevery block clean"]
+
+    FAILED --> CARRIER["FlowRunResult.status\n(single machine-readable carrier)"]
+    ISSUES --> CARRIER
+    CLEAN --> CARRIER
+    CARRIER --> BANNER["render_result banner\n_FLOW_STATUS_BANNER map"]
+
+    %% key insight: a non-aborting CHECK error routes to ISSUES, not FAILED
+    NOTE["note: a CHECK block never sets aborted\n-> a CHECK 'error' reaches ISSUES via Q2,\nnot FAILED via Q1 (chain-never-blocked)"] -.-> Q2

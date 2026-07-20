@@ -17,25 +17,62 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Sequence, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 #: Block ``kind`` discriminators (the JSON-persistence tag, batch-45).
 BLOCK_SOURCE = "source"
 BLOCK_PATCH = "patch"
 BLOCK_WRITE_OUT = "write_out"
+BLOCK_CHECK = "check"
 
 #: WRITE-OUT emit formats — the ``save_patched_image`` ``source_kind`` values.
 WRITE_FMT_S19 = "s19"
 WRITE_FMT_HEX = "hex"
 
+#: CHECK per-block gating vocabulary (batch-51, LLR-086.1). ``advisory`` (the
+#: default) never changes any status beyond informational; ``block-own-op``
+#: marks ONLY the CHECK block itself ``error`` when its own operation is
+#: invalid (an unresolvable/unreadable check document) — the CHAIN is never
+#: blocked either way (LLR-086.4).
+CHECK_GATING_ADVISORY = "advisory"
+CHECK_GATING_BLOCK_OWN = "block-own-op"
+
 #: Per-block outcome tokens (mirrors ``variant_execution_service`` VARIANT_*).
 BLOCK_STATUS_OK = "ok"
 BLOCK_STATUS_ERROR = "error"
 BLOCK_STATUS_SKIPPED = "skipped"
+#: Advisory outcome — the block ran, the image is intact, but it carries WARN
+#: findings (integrity notices, non-blocking check faults) (batch-51, LLR-085.1).
+BLOCK_STATUS_NOTICES = "notices"
 
 #: Whole-flow outcome tokens.
 FLOW_STATUS_OK = "ok"
 FLOW_STATUS_ERROR = "error"
+#: Amber outcome — output was produced WITH advisories (a ``notices`` block, a
+#: non-aborting block ``error``, or a WARN finding); distinct from ``error``
+#: (image broken, no/partial output) (batch-51, LLR-087.1).
+FLOW_STATUS_ISSUES = "completed-with-issues"
+
+#: Advisory finding severity (batch-51, LLR-085.1). ``FINDING_WARN`` is the
+#: non-aborting notice channel surfaced on ``BlockResult.findings``. The value
+#: is internal — block/flow status, not this string, drives the frozen
+#: ``sev-*`` render. (STOP is modelled by ``aborted`` + ``BLOCK_STATUS_ERROR``,
+#: so no separate finding severity is needed.)
+FINDING_WARN = "warn"
+
+
+@dataclass(frozen=True)
+class Finding:
+    """An advisory finding attached to a block (collect-don't-abort).
+
+    Args:
+        severity (str): ``FINDING_WARN`` (advisory, non-aborting).
+        message (str): The human-readable finding text. May be file-derived
+            (parser error text) — render markup-safe at the UI boundary.
+    """
+
+    severity: str
+    message: str
 
 
 @dataclass(frozen=True)
@@ -85,8 +122,30 @@ class WriteOutBlock:
     kind: str = BLOCK_WRITE_OUT
 
 
-#: A tracer-slice block (open for CHECK/CRC extension — ADR §7/§9).
-FlowBlock = Union[SourceBlock, PatchBlock, WriteOutBlock]
+@dataclass(frozen=True)
+class CheckBlock:
+    """Verify block — run a check document against the working image, read-only.
+
+    The block reports which addresses are present/absent (present/absent
+    aggregate counts) and passes the working ``(mem_map, ranges)`` through
+    UNCHANGED to downstream blocks; a CHECK never aborts the chain (LLR-086.4).
+
+    Args:
+        check_doc_ref (str): A PROJECT-RELATIVE check-document filename,
+            resolved against the project directory through the containment
+            guard, then read via ``read_change_document``.
+        gating (str): ``CHECK_GATING_ADVISORY`` (default) or
+            ``CHECK_GATING_BLOCK_OWN`` — affects ONLY this block's own status
+            when its operation is invalid; never the chain.
+    """
+
+    check_doc_ref: str
+    gating: str = CHECK_GATING_ADVISORY
+    kind: str = BLOCK_CHECK
+
+
+#: A tracer-slice block (open for CRC extension — ADR §7/§9).
+FlowBlock = Union[SourceBlock, PatchBlock, WriteOutBlock, CheckBlock]
 
 
 @dataclass(frozen=True)
@@ -128,10 +187,13 @@ class BlockResult:
     Args:
         index (int): The block's position in the flow.
         kind (str): The block ``kind``.
-        status (str): ``"ok"`` / ``"error"`` / ``"skipped"`` (skipped when an
-            upstream block failed — a broken source can't feed a patch).
+        status (str): ``"ok"`` / ``"notices"`` / ``"error"`` / ``"skipped"``
+            (skipped when an upstream block failed — a broken source can't feed
+            a patch; notices when the block ran with advisory findings).
         summary (str): A one-line human-readable outcome.
         diagnostics (List[str]): Failure text / containment findings.
+        findings (List[Finding]): Advisory (non-aborting) findings — parser
+            integrity notices, non-blocking check faults (batch-51, LLR-085.1).
     """
 
     index: int
@@ -139,6 +201,7 @@ class BlockResult:
     status: str
     summary: str = ""
     diagnostics: List[str] = field(default_factory=list)
+    findings: List[Finding] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -149,13 +212,22 @@ class FlowRunResult:
     ``VariantExecutionResult`` isolation, LLR-006.4).
 
     Args:
-        status (str): ``"ok"`` when every block succeeded, else ``"error"``.
+        status (str): ``"ok"`` (CLEAN — every block clean),
+            ``"completed-with-issues"`` (output produced with advisories), or
+            ``"error"`` (FAILED — image broken by an aborting block).
         block_results (List[BlockResult]): One per block, in flow order.
         written_paths (List[Path]): The files WRITE-OUT blocks produced.
         diagnostics (List[str]): Whole-flow notes.
+        image_ranges (List[Tuple[int, int]]): The working image's final
+            ``(start, end)`` address footprint — the ranges after the last
+            block, used by the Direction-A memory ribbon (batch-51, LLR-088.4,
+            §6.5 AMD-1). Empty when no image was ever loaded (an unresolvable
+            SOURCE). Additive per §6.3 R-6. A separate ``before`` footprint is a
+            batch-52 carry (CRC is the first range-growing block).
     """
 
     status: str
     block_results: List[BlockResult] = field(default_factory=list)
     written_paths: List[Path] = field(default_factory=list)
     diagnostics: List[str] = field(default_factory=list)
+    image_ranges: List[Tuple[int, int]] = field(default_factory=list)

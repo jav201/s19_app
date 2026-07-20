@@ -1,0 +1,35 @@
+%% Batch-51 Flow Builder — Panel Run -> run_flow -> render_result sequence.
+%% Shipped surface: the real #flow_run button -> run_flow handler -> render_result,
+%% the surface every AT drives (app.py wiring unchanged this batch).
+sequenceDiagram
+    actor Eng as Engineer
+    participant Panel as FlowBuilderPanel
+    participant App as S19TuiApp
+    participant Run as run_flow (flow_execution_service)
+    participant Eng2 as check / load / patch / write engines
+    participant Disk as work area (files)
+
+    Note over Eng,Panel: compose blocks (kind dropdown + ref + gating -> _make_flow_block -> Add)
+    Eng->>Panel: press Run (#flow_run)
+    Panel->>App: post RunRequested(Flow(blocks=self._blocks))
+    App->>Run: run_flow(flow, FlowContext(project_dir=...))
+
+    loop each block (stop appending real work once aborted)
+        Run->>Eng2: LOAD build_loaded_* / PATCH apply_* / CHECK run_check_document / WRITE save_patched_image
+        Eng2-->>Run: loaded image / mutated map / check aggregates / saved path
+        Run->>Run: append BlockResult (ok | notices | error | skipped)
+        opt WRITE-OUT
+            Eng2->>Disk: write image file
+        end
+    end
+
+    Run->>Run: 3-way roll-up -> status; image_ranges = final ranges
+    Run-->>App: FlowRunResult(status, block_results, written_paths, image_ranges)
+    App->>Panel: render_result(result)
+
+    Note over Panel: mount into #flow_result (VerticalScroll)
+    Panel->>Panel: banner (CLEAN/ISSUES/FAILED, enum-derived)
+    Panel->>Panel: one node/block + sev-* gutter + glyph
+    Panel->>Panel: safe_text sinks (summary, findings, diagnostics, written paths)
+    Panel->>Panel: N-1 separators + single memory ribbon + caption
+    Panel-->>Eng: rendered Pipeline Ledger

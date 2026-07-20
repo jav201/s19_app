@@ -4687,14 +4687,16 @@ def _static_plain(app: "S19TuiApp", selector: str) -> str:
 
 
 def test_at_flow_add_blocks_and_run_renders_result(tmp_path: Path) -> None:
-    """AC-4: rail-8 is the Flow Builder; adding Source/Patch/WriteOut blocks and
-    pressing Run executes the flow and renders the result (with the written
-    path).
+    """AC-4: rail-8 is the Flow Builder; adding Load/Patch/WriteOut blocks and
+    pressing Run executes the flow and renders the Direction-A result (a CLEAN
+    banner + the written path).
 
     RED pre-code: rail-8 is the Bookmarks placeholder; ``#screen_flow`` and the
-    panel are absent.
+    panel are absent. Reconciled at batch-51 Inc-2: ``#flow_result`` is now a
+    ``VerticalScroll`` of block nodes + banner + written-path lines (was a flat
+    ``Static``), and SOURCE is surfaced as "LOAD" (its ``"source"`` tag is kept).
     """
-    from textual.widgets import Button
+    from textual.widgets import Button, Static
 
     async def _drive() -> tuple[list[str], str, str]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -4714,17 +4716,23 @@ def test_at_flow_add_blocks_and_run_renders_result(tmp_path: Path) -> None:
             app.query_one("#flow_run", Button).press()
             await pilot.pause()
             await pilot.pause()
-            return visible, blocks_text, _static_plain(app, "#flow_result")
+            banner = str(
+                app.query_one("#flow_result .flow-banner", Static).render()
+            )
+            wrote = " ".join(
+                str(w.render()) for w in app.query("#flow_result .flow-wrote")
+            )
+            return visible, blocks_text, f"{banner} {wrote}"
 
     visible, blocks_text, result_text = asyncio.run(_drive())
 
     assert visible == ["screen_flow"], f"rail-8 must show #screen_flow; {visible}"
-    # The composed flow lists all three blocks in order.
-    assert "SOURCE" in blocks_text and "prg.s19" in blocks_text
+    # The composed flow lists all three blocks in order (SOURCE surfaced LOAD).
+    assert "LOAD" in blocks_text and "prg.s19" in blocks_text
     assert "PATCH" in blocks_text and "patch.json" in blocks_text
     assert "WRITE-OUT" in blocks_text and "out.s19" in blocks_text
-    # Run succeeded and the result names the written file.
-    assert "Run: ok" in result_text, f"run should succeed; got {result_text!r}"
+    # Run succeeded (CLEAN banner) and the result names the written file.
+    assert "CLEAN" in result_text, f"run should succeed; got {result_text!r}"
     assert "out.s19" in result_text, f"result must name the output; {result_text!r}"
 
 
