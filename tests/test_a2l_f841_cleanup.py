@@ -40,21 +40,25 @@ def test_tc094_no_f841_finding_in_a2l() -> None:
     Intent: R-A2L-010's numeric threshold is ``0 errors`` (pre-state: 1). This
     runs ruff over the whole module — so it catches BOTH the removed ``header``
     store and any accidental new dead store the edit might introduce — and
-    asserts a clean exit. Skips (does not fail) only if ruff is absent from the
-    environment, so the check is honest about non-execution.
+    asserts a clean exit. It **skips** (does not fail) when ruff is not
+    importable, so a runtime-only environment (e.g. the CI ``tui-ci`` job, which
+    installs no dev tooling) reports honest non-execution rather than a spurious
+    failure — ruff is exercised in dev / pre-commit where it is installed.
     """
-    try:
-        completed = subprocess.run(
-            [sys.executable, "-m", "ruff", "check", "--select", "F841",
-             str(_REPO_ROOT / "s19_app" / "tui" / "a2l.py")],
-            cwd=_REPO_ROOT,
-            capture_output=True,
-            text=True,
-        )
-    except FileNotFoundError:  # pragma: no cover - env without ruff
-        import pytest
+    import importlib.util
 
-        pytest.skip("ruff is not installed in this environment")
+    import pytest
+
+    if importlib.util.find_spec("ruff") is None:
+        pytest.skip("ruff is not installed in this environment (runtime-only)")
+
+    completed = subprocess.run(
+        [sys.executable, "-m", "ruff", "check", "--select", "F841",
+         str(_REPO_ROOT / "s19_app" / "tui" / "a2l.py")],
+        cwd=_REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
 
     assert completed.returncode == 0, (
         "ruff --select F841 must report zero findings on a2l.py after the "
