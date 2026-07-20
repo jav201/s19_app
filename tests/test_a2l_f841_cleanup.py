@@ -78,13 +78,18 @@ def test_at094_demo_parse_stable_after_dead_store_removal() -> None:
     binding and their direct use in the tag build. This drives the shipped
     ``parse_a2l_file`` over the real demo fixture and pins invariants that flow
     through exactly that neighbourhood — the total tag count, MEASUREMENT header
-    propagation (datatype + derived length), and the one CHARACTERISTIC whose
-    single-line header parses (char_type + length). A live line caught by the
-    delete would perturb at least one of these.
+    propagation (datatype + derived length), and CHARACTERISTIC parsing. A live
+    line caught by the delete would perturb at least one of these.
 
-    These are the current, verified-correct outputs; the assertion is a
-    regression sentinel, not a claim that the demo *should* parse only one
-    CHARACTERISTIC (a separate, pre-existing multi-line-header limitation).
+    Batch-54 update: the old comment here claimed the demo "should parse only one
+    CHARACTERISTIC" (the pre-batch-54 multi-line-header limitation). That is now
+    FALSE — multi-line header assembly lands all 50 CHARACTERISTICs. The
+    structural counts below (75 tags, 25 MEAS, 50 CHAR) are unchanged; the
+    ``ASAM.C.VIRTUAL.ASCII`` char_type/length pins survive but are now a *genuine*
+    parse (pre-batch-54 they were a ``ASCII /* … */`` comment-token artifact —
+    char_type ASCII by luck, deposit garbage; now deposit resolves correctly).
+    The 1→50 delta assertion lives in ``tests/test_a2l_multiline_headers.py``.
+    These remain regression sentinels for the dead-store removal.
     """
     data = parse_a2l_file(_DEMO_A2L)
     tags = data["tags"]
@@ -102,8 +107,11 @@ def test_at094_demo_parse_stable_after_dead_store_removal() -> None:
     assert len(meas_with_length) == 24
     assert all(t.get("datatype") for t in meas_with_length)
 
-    # header_char propagation intact: the single-line-header CHARACTERISTIC that
-    # parses keeps its char_type + derived length.
+    # header_char propagation intact: ASAM.C.VIRTUAL.ASCII keeps its char_type +
+    # derived length. Post-batch-54 this is a genuine multi-line parse (its
+    # deposit now resolves to RL.FNC.UBYTE.ROW_DIR instead of the pre-batch
+    # comment-token garbage), while char_type/length are unchanged.
     ascii_char = next(t for t in characteristics if t.get("name") == "ASAM.C.VIRTUAL.ASCII")
     assert ascii_char.get("char_type") == "ASCII"
     assert ascii_char.get("length") == 100
+    assert ascii_char.get("deposit") == "RL.FNC.UBYTE.ROW_DIR"

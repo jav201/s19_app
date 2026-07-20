@@ -282,6 +282,117 @@ def _split_line_respecting_quotes(line: str) -> list[str]:
     return tokens
 
 
+#: Sentinel joining body lines before comment-stripping so a ``//`` line comment
+#: can be truncated at the next line boundary (not the whole flattened body).
+_A2L_LINE_SENTINEL = "\n"
+
+
+def _strip_a2l_comments(text: str) -> str:
+    """
+    Summary:
+        Remove A2L block (``/* … */``) and line (``//``) comments from a
+        (possibly multi-line) body while preserving the bytes of any quoted
+        string verbatim. A single linear pass with a quote-state machine: ``/``
+        and ``*`` inside ``"…"`` are literal; a ``//`` truncates only to the
+        next newline sentinel (never the whole body); an unterminated ``/*`` or
+        ``"`` consumes to end without raising.
+
+    Args:
+        text (str): Raw A2L text, typically several body lines joined by
+            ``_A2L_LINE_SENTINEL``.
+
+    Returns:
+        str: ``text`` with comments removed and every quoted span byte-identical.
+
+    Raises:
+        None: Malformed/unterminated comment or quote syntax degrades gracefully.
+
+    Data Flow:
+        - Scan char-by-char, tracking whether the cursor is inside a quoted span.
+        - Outside quotes: drop ``/* … */`` (spanning newlines) and ``// … <\n>``.
+        - Inside quotes: copy literally; a ``"`` closes only when not backslash
+          escaped (same convention as ``_split_line_respecting_quotes``).
+
+    Dependencies:
+        Uses:
+            - ``_A2L_LINE_SENTINEL``
+        Used by:
+            - ``_flatten_body_tokens``
+
+    Example:
+        >>> _strip_a2l_comments('CURVE /* c */ 0x1  // tail\\nRL')
+        'CURVE  0x1  \\nRL'
+    """
+    out: list[str] = []
+    i = 0
+    n = len(text)
+    in_string = False
+    while i < n:
+        c = text[i]
+        if in_string:
+            out.append(c)
+            if c == '"' and text[i - 1] != "\\":
+                in_string = False
+            i += 1
+            continue
+        if c == '"':
+            in_string = True
+            out.append(c)
+            i += 1
+            continue
+        if c == "/" and i + 1 < n and text[i + 1] == "*":
+            i += 2
+            while i + 1 < n and not (text[i] == "*" and text[i + 1] == "/"):
+                i += 1
+            i = i + 2 if i + 1 < n else n
+            continue
+        if c == "/" and i + 1 < n and text[i + 1] == "/":
+            i += 2
+            while i < n and text[i] != _A2L_LINE_SENTINEL:
+                i += 1
+            continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
+def _flatten_body_tokens(lines: list[str]) -> list[str]:
+    """
+    Summary:
+        Join a section's body lines, strip comments across the joined text, and
+        tokenise the result honouring quoted spans — the multi-line analogue of
+        ``_split_line_respecting_quotes``. Join-first so a block comment that
+        spans several lines is removed as one unit.
+
+    Args:
+        lines (list[str]): The section body lines (no ``/begin``/``/end``).
+
+    Returns:
+        list[str]: Whitespace/newline-separated tokens with comments removed and
+        quoted strings preserved as single tokens.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - ``\\n``-join → ``_strip_a2l_comments`` → ``_split_line_respecting_quotes``.
+
+    Dependencies:
+        Uses:
+            - ``_strip_a2l_comments`` ; ``_split_line_respecting_quotes`` ;
+              ``_A2L_LINE_SENTINEL``
+        Used by:
+            - ``assemble_characteristic_header`` ; AXIS_DESCR capture in
+              ``extract_a2l_tags``
+
+    Example:
+        >>> _flatten_body_tokens(['CURVE /* c */', '0x1 RL'])
+        ['CURVE', '0x1', 'RL']
+    """
+    body = _A2L_LINE_SENTINEL.join(lines)
+    return _split_line_respecting_quotes(_strip_a2l_comments(body))
+
+
 def sizeof_from_deposit(deposit: str) -> Optional[int]:
     """Infer element size from common record layout naming (e.g. __UBYTE_Z)."""
     u = deposit.upper()
@@ -321,28 +432,120 @@ def parse_measurement_header(line: str) -> Optional[dict]:
     }
 
 
-def parse_characteristic_header(line: str) -> Optional[dict]:
-    """Parse CHARACTERISTIC mandatory line."""
-    parts = _split_line_respecting_quotes(line)
-    if len(parts) < 7:
+def _characteristic_from_tokens(tokens: list[str]) -> Optional[dict]:
+    """
+    Summary:
+        Build a CHARACTERISTIC mandatory-header dict from a flat token list by
+        anchoring on the first ``CHARACTERISTIC_KINDS`` token (the ``Type``) and
+        reading the 7 positional mandatory params from there:
+        ``Type Address Deposit MaxDiff Conversion LowerLimit UpperLimit``. Fails
+        closed (returns ``None``) when no kind token is present or fewer than 7
+        tokens follow it — never raises ``IndexError``.
+
+    Args:
+        tokens (list[str]): Comment-stripped, quote-respecting header tokens
+            (single line or flattened multi-line body).
+
+    Returns:
+        Optional[dict]: The shipped header dict (``char_type``,
+        ``address_inline``, ``deposit``, ``max_diff``, ``conversion``,
+        ``lower_limit``, ``upper_limit``, ``datatype``), or ``None``.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - Find the first token in ``CHARACTERISTIC_KINDS`` (the anchor).
+        - Slice 7 params from the anchor; ``None`` if the slice is short.
+        - Parse the address via ``int(x, 0)``; ``ValueError`` → ``None`` address.
+
+    Dependencies:
+        Uses:
+            - ``CHARACTERISTIC_KINDS``
+        Used by:
+            - ``parse_characteristic_header`` ; ``assemble_characteristic_header``
+
+    Note:
+        Anchoring on the first kind token treats a bare unquoted kind-word used
+        as a name/long-identifier as the Type — a documented non-goal (the real
+        ASAM corpus always quotes or dots identifiers, so this cannot occur
+        there; a synthetic bare-kind-word-before-Type degrades to
+        ``address=None``, never a crash).
+
+    Example:
+        >>> _characteristic_from_tokens(["desc", "VALUE", "0x10", "RL", "0",
+        ...                              "CM", "0", "255"])["char_type"]
+        'VALUE'
+    """
+    anchor: Optional[int] = None
+    for idx, token in enumerate(tokens):
+        if token in CHARACTERISTIC_KINDS:
+            anchor = idx
+            break
+    if anchor is None:
         return None
-    if parts[0] not in CHARACTERISTIC_KINDS:
+    params = tokens[anchor : anchor + 7]
+    if len(params) < 7:
         return None
-    addr_raw = parts[1]
     try:
-        address_inline = int(addr_raw, 0)
+        address_inline: Optional[int] = int(params[1], 0)
     except ValueError:
         address_inline = None
     return {
-        "char_type": parts[0],
+        "char_type": params[0],
         "address_inline": address_inline,
-        "deposit": parts[2],
-        "max_diff": parts[3],
-        "conversion": parts[4],
-        "lower_limit": parts[5],
-        "upper_limit": parts[6],
+        "deposit": params[2],
+        "max_diff": params[3],
+        "conversion": params[4],
+        "lower_limit": params[5],
+        "upper_limit": params[6],
         "datatype": None,
     }
+
+
+def parse_characteristic_header(line: str) -> Optional[dict]:
+    """Parse a single-line CHARACTERISTIC mandatory header (back-compat shim)."""
+    return _characteristic_from_tokens(_split_line_respecting_quotes(line))
+
+
+def assemble_characteristic_header(lines: list[str]) -> Optional[dict]:
+    """
+    Summary:
+        Assemble a CHARACTERISTIC mandatory header whose params may span multiple
+        body lines (the real ASAM convention). Flattens the body with comment
+        stripping, then anchors on the first ``CHARACTERISTIC_KINDS`` token. The
+        single-line case is a strict subset (one line flattens to its own
+        tokens), so this never regresses ``parse_characteristic_header``.
+
+    Args:
+        lines (list[str]): The CHARACTERISTIC block's body lines (no
+            ``/begin``/``/end``; nested ``AXIS_DESCR`` etc. already split out by
+            ``build_section_tree``).
+
+    Returns:
+        Optional[dict]: Same shape as ``parse_characteristic_header`` (shipped
+        keys ``char_type``/``address_inline``/``deposit``/``max_diff``/
+        ``conversion``/``lower_limit``/``upper_limit``/``datatype``), or ``None``
+        when no kind token / fewer than 7 params.
+
+    Raises:
+        None.
+
+    Data Flow:
+        - ``_flatten_body_tokens(lines)`` → ``_characteristic_from_tokens``.
+
+    Dependencies:
+        Uses:
+            - ``_flatten_body_tokens`` ; ``_characteristic_from_tokens``
+        Used by:
+            - CHARACTERISTIC branch of ``extract_a2l_tags``
+
+    Example:
+        >>> assemble_characteristic_header(['"desc"', 'CURVE 0x810300',
+        ...     'RL.X 0 CM 0 255'])["address_inline"]
+        8455936
+    """
+    return _characteristic_from_tokens(_flatten_body_tokens(lines))
 
 
 def _first_header_line(
@@ -932,13 +1135,13 @@ def extract_a2l_tags(
             lines = section.get("lines", [])
             if name in target_sections:
                 parsed_name, description = parse_begin_meta(meta)
-                hdr_line, _ = _first_header_line(name, lines)
-                header_meas = (
-                    parse_measurement_header(hdr_line) if name == "MEASUREMENT" and hdr_line else None
-                )
-                header_char = (
-                    parse_characteristic_header(hdr_line) if name == "CHARACTERISTIC" and hdr_line else None
-                )
+                if name == "MEASUREMENT":
+                    hdr_line, _ = _first_header_line(name, lines)
+                    header_meas = parse_measurement_header(hdr_line) if hdr_line else None
+                    header_char = None
+                else:  # CHARACTERISTIC — assemble a possibly multi-line header.
+                    header_meas = None
+                    header_char = assemble_characteristic_header(lines)
 
                 tag: dict = {
                     "section": name,
@@ -1059,11 +1262,13 @@ def extract_a2l_tags(
 
                 for child in section.get("children") or []:
                     if child.get("name") == "AXIS_DESCR":
-                        first = _find_first_non_empty_line(child.get("lines") or [])
+                        axis_tokens = _flatten_body_tokens(child.get("lines") or [])
                         tag["axis_meta"].append(
                             {
                                 "name": parse_begin_meta(child.get("meta", "") or "")[0],
-                                "header_tokens": _split_line_respecting_quotes(first or ""),
+                                "header_tokens": axis_tokens,
+                                "max_axis_points": axis_tokens[3] if len(axis_tokens) > 3 else None,
+                                "external": "AXIS_PTS_REF" in axis_tokens,
                             }
                         )
 
