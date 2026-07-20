@@ -122,11 +122,10 @@ _ENGINE_PATHS: list[str] = [
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # ``s19_app/tui/a2l.py`` was temporarily UNFROZEN for the
-    # a2l-missing-length-fix / a2l-record-layout-length batches (operator-
-    # approved parsing-logic fixes) and RE-FROZEN in batch-50 (P-2) once its
-    # sanctioned edits landed. It is a read-only oracle again.
-    "s19_app/tui/a2l.py",
+    # ``s19_app/tui/a2l.py`` is temporarily UNFROZEN for batch-54 (operator-
+    # approved multi-line A2L header parsing) — absent from the frozen set so
+    # the sanctioned parser edits do not trip the guard. RE-FREEZE is tracked
+    # as a post-merge follow-up PR (batch-50 P-2 pattern).
     "s19_app/tui/mac.py",
 ]
 

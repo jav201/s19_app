@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .a2l import (
+    assemble_characteristic_header,
     build_section_tree,
     classify_address,
     extract_memory_segments,
@@ -9,6 +10,7 @@ from .a2l import (
 )
 
 __all__ = [
+    "assemble_characteristic_header",
     "build_section_tree",
     "classify_address",
     "extract_memory_segments",
