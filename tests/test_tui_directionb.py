@@ -5430,10 +5430,11 @@ _ENGINE_PATHS: tuple[str, ...] = (
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # ``s19_app/tui/a2l.py`` is temporarily UNFROZEN for batch-54 (operator-
-    # approved multi-line A2L header parsing) — absent from TC-031's frozen set
-    # so the sanctioned parser edits do not trip the guard. RE-FREEZE is a
-    # post-merge follow-up PR (batch-50 P-2 pattern).
+    # ``s19_app/tui/a2l.py`` was UNFROZEN for batch-54 (operator-approved
+    # multi-line A2L header parsing) and RE-FROZEN here once those edits landed
+    # on ``main`` — a read-only oracle again, guarded by TC-031 vs ``main`` like
+    # the other engine modules. Any further edit needs an explicit unfreeze.
+    "s19_app/tui/a2l.py",
     "s19_app/tui/mac.py",
     "s19_app/tui/color_policy.py",
 )
