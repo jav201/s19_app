@@ -1,90 +1,79 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-20-batch-54",
-  "batch_objective": "Multi-line A2L header parsing \u2014 the P-1b PREREQUISITE (split batch-A of two). Make the A2L parser correctly read CHARACTERISTIC / MEASUREMENT / AXIS_DESCR headers whose mandatory parameters span multiple lines (the real ASAM convention), so char_type / deposit(record_layout) / address / axis MaxAxisPoints populate instead of None. Core-parser change: parse_characteristic_header + parse_measurement_header (multi-line token assembly), _first_header_line (gather full header), build_section_tree (/* */ comment stripping), axis_meta capture (full AXIS_DESCR body + external flag). Requires an a2l.py UNFREEZE (operator-approved). Follow-up batch-55 = the inline-axis length summer (P-1b proper) built on this.",
+  "batch_id": "2026-07-20-batch-55",
+  "batch_objective": "P-1b inline-axis length summer — derive a correct byte length for CURVE/MAP CHARACTERISTICs (currently None) by summing the RECORD_LAYOUT span × inline axis point-counts. Consumes batch-54's axis_meta (max_axis_points STR + external flag). record_layout_full_span reads layout['lines'] (RECORD_LAYOUT 1/2/3 = POSITION INDICES not counts; datatype=token[2]); inline axis counts gated on STD_AXIS/FIX_AXIS only (COM_AXIS/AXIS_PTS_REF/external -> stay grey/None). Safety contract: full-span-or-None (never under-report). R2 DoS byte-cap on the decode path. Oracle values: STD_AXIS CURVE=25 B, real inline MAP=51 B. Needs an a2l.py UNFREEZE (operator-approved), re-frozen post-merge (PR-B). Built on the batch-50 §7 verified seed.",
   "current_phase": 6,
   "phase_status": "in-progress",
-  "route": "full /dev-flow (core-parser change, high regression surface across all CHARACTERISTIC/MEASUREMENT tags). Branch claude/a2l-multiline-headers-b54 off origin/main tip 640de1b (RC-1 clean). Real worktree trusting-lichterman-f08516. Split scope chosen by operator (AskUserQuestion 2026-07-20): this batch = header parsing only; length summer = batch-55.",
-  "rc1": "PASS @ 640de1b (2026-07-20). git fetch clean; origin/main == 640de1b (batch-51 FB merged); branch cut fresh off it. INDEPENDENT verifies: batch-51 A2L diff EMPTY (a2l.py + a2l_service untouched by batch-51); a2l.py IS re-frozen in _ENGINE_PATHS on 640de1b (needs unfreeze); parse_characteristic_header STILL has `len(parts) < 7` single-line guard (a2l.py:327) -> multi-line parsing NOT shipped -> batch is genuinely needed (ALREADY-SHIPPED check = NOT shipped).",
+  "route": "full /dev-flow (core-parser length-derivation change on a2l.py; regression surface across all CHARACTERISTIC length output; touches the frozen engine module under a sanctioned unfreeze). Branch claude/p1b-inline-axis-length-e90fee off origin/main tip a58d4e0 (RC-1 clean).",
+  "rc1": "PASS @ a58d4e0 (2026-07-20). git fetch clean; origin/main == a58d4e0 (batch-54 re-freeze merged, PR #103); merge-base == HEAD == origin/main (no rebase). ALREADY-SHIPPED check = NOT shipped: executed parse_a2l_file over the real ASAP2_Demo_V161.a2l -> all CURVE/MAP length=None today. Prerequisite CONFIRMED LIVE: axis_meta populated (CURVE.STD_AXIS -> {max_axis_points:'8', external:False}; CURVE.COM_AXIS -> external:True). a2l.py IS re-frozen in _ENGINE_PATHS on a58d4e0 (needs the sanctioned unfreeze).",
   "standing_authorization": {
     "date": "2026-07-20",
-    "operator_phrasing": "AskUserQuestion 2026-07-20: Scope='Split into two batches'; Unfreeze a2l.py='Yes \u2014 unfreeze for this batch, re-freeze at close'; Autonomy='Autonomous + self-merge'. Preceded by 'coordinate with the agent so you can start once he finishes; PR merged and documentation also updated. I assume you will use /dev-flow.'",
+    "operator_phrasing": "/dev-flow kickoff AskUserQuestion 2026-07-20 (batch-55): Autonomy='Autonomous + self-merge'; a2l unfreeze='Yes — unfreeze, re-freeze at close'; Decision-recording='Full recording (standard)'. Invocation: 'start batch-55: the P-1b inline-axis length summer (CURVE/MAP length derivation). It's the top backlog item; the multi-line-header prerequisite shipped in batch-54.'",
     "autonomy": "end-to-end autonomous; agent self-approves every phase and increment gate with a named Coverage/Certainty/Evidence axis check",
-    "merge_authority": "GRANTED. Merge gated: green CI + a FINAL independent PR-level qa-reviewer pass over the whole diff vs main (dual traceability intact, 0 OTHER-engine-frozen diffs [a2l.py IS the sanctioned unfreeze target this batch], no cross-increment regression via C-26, every gate carry discharged). A HIGH finding BLOCKS the merge and returns to the operator. Snapshot regen = canonical-CI-only follow-up PR (local FORBIDDEN).",
-    "a2l_unfreeze": "APPROVED for this batch (operator AskUserQuestion). Pattern = batch-50 P-2: unfreeze a2l.py from the C-27 dual-guard set to allow the sanctioned parser edits; RE-FREEZE as a post-merge follow-up PR once edits land. a2l.py stays the canonical A2L module (add public symbols here + re-export from facades).",
-    "decision_recording": "FULL \u2014 every un-asked decision -> PLAN.md decision log + state.json.decisions_log + 05-postmortem + vault at sync"
+    "merge_authority": "GRANTED. Merge gated: green CI + a FINAL independent PR-level qa-reviewer pass over the whole diff vs main (dual traceability intact; 0 OTHER-engine-frozen diffs [a2l.py IS the sanctioned unfreeze target this batch]; no cross-increment regression via C-26; every gate carry discharged). A HIGH finding BLOCKS the merge and returns to the operator. Snapshot regen = canonical-CI-only follow-up PR (local FORBIDDEN).",
+    "a2l_unfreeze": "APPROVED for batch-55 (operator AskUserQuestion 2026-07-20). Pattern = batch-50 P-2 / batch-54 PR-B: unfreeze a2l.py from the C-27 dual-guard set for the sanctioned length-summer edits; RE-FREEZE as a post-merge follow-up PR-B once edits land on main (a same-PR re-freeze self-trips the vs-main guard). a2l.py stays the canonical A2L module (add public symbols here + re-export from facades).",
+    "decision_recording": "FULL — every un-asked decision -> PLAN.md decision log + state.json.decisions_log + 05-postmortem + vault at sync"
   },
-  "coordination": {
-    "flow_builder_session": "local_50824fd9-000a-48e9-8aca-b4af8cb2d9c7 (batch-51 MERGED PR #101 -> 640de1b). Its next batches = 52 (CRC) / 53 (persistence), so this A2L batch took 54 (length-summer follow-up = 55) to avoid collision. batch-51 A2L blast radius = ZERO (verified at its merge + independently here). batch-51's own /dev-flow-sync still pending (its step; does not affect this code base).",
-    "batch_number_note": "FB reserved 52/53; A2L P-1b split = 54 (headers) + 55 (length). Flag to FB if numbering needs reconciliation."
-  },
-  "iterations_per_phase": {
-    "0": 0,
-    "1": 0,
-    "2": 0,
-    "3": 0,
-    "4": 0,
-    "5": 0,
-    "6": 0
-  },
+  "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
-    "plan": ".dev-flow/2026-07-20-batch-54/PLAN.md",
-    "1": ".dev-flow/2026-07-20-batch-54/01-requirements.md",
-    "2": ".dev-flow/2026-07-20-batch-54/02-review.md",
-    "3": ".dev-flow/2026-07-20-batch-54/03-increments/",
-    "4": ".dev-flow/2026-07-20-batch-54/04-validation.md",
-    "5": ".dev-flow/2026-07-20-batch-54/05-postmortem.md"
+    "plan": ".dev-flow/2026-07-20-batch-55/PLAN.md",
+    "1": ".dev-flow/2026-07-20-batch-55/01-requirements.md",
+    "2": ".dev-flow/2026-07-20-batch-55/02-review.md",
+    "3": ".dev-flow/2026-07-20-batch-55/03-increments/",
+    "4": ".dev-flow/2026-07-20-batch-55/04-validation.md",
+    "5": ".dev-flow/2026-07-20-batch-55/05-postmortem.md"
   },
   "decisions_log": [
     {
-      "phase": 6,
+      "phase": 0,
       "date": "2026-07-20",
-      "decision": "Phase-5 postmortem SELF-APPROVED (close batch -> Phase 6); NO new control",
-      "notes": "05-postmortem written. Clean batch: iters 0/0/0/0/0, +29 tests, 1652 passed/0 failed, 0 snapshot drift, 0 blocker, code-review APPROVE. Root cause of smooth run = C-35 (draft-time execution) validating itself. Assessed the unfreeze/re-freeze PR asymmetry as a corollary of existing C-27 (unfreeze REMOVES from set -> same-PR OK; re-freeze ADDS -> post-merge) -> documented, NOT a new control (general-controls-not-narrow-patches). No AskUserQuestion needed. Next: a2l.py re-freeze PR-B + batch-55 length summer (consumes axis_meta.max_axis_points[str]/external). Advancing to Phase 6 docs + PR-A.",
-      "phase_marker": 5
+      "decision": "kickoff (autonomous + self-merge; a2l.py unfreeze approved; full decision-recording)",
+      "notes": "batch-55 P-1b inline-axis length summer. Operator /dev-flow AskUserQuestion 2026-07-20: Autonomous+self-merge; unfreeze a2l.py YES (re-freeze post-merge PR-B); Full recording. RC-1 clean @ a58d4e0 (origin/main = batch-54 re-freeze). ALREADY-SHIPPED = NOT shipped (all CURVE/MAP length=None today, executed probe). Prerequisite (batch-54 multi-line headers) CONFIRMED LIVE: axis_meta carries max_axis_points(STR)+external. Verified design seed retained in .dev-flow/2026-07-19-batch-50/01-requirements.md §7 + 02-review.md §0/§1/§2. Rolled state.json from batch-54 (MERGED PRs #102/#103); batch-54 artifacts remain in its dir. Branch claude/p1b-inline-axis-length-e90fee already cut off a58d4e0."
     },
     {
-      "phase": 5,
+      "phase": 0,
       "date": "2026-07-20",
-      "decision": "Phase-4 validation PASS; gate SELF-APPROVED (autonomous)",
-      "notes": "qa-reviewer wrote 04-validation.md (consumed C-25 gate run). 1652 passed/0 failed/2 skip/3 xfail; 29 snapshots 0 DRIFT (Phase-1 R3 confirmed). V-5/C-18: 30 on-disk nodes (1 @slow), each gate-blocking AT (096/097/098/099/100/101/102)+AT-103 -> named node, no satisfied-in-parts. Ledger 1623 base +29 =1652 reconciles. Counterfactuals value-discriminating (QC-2). Bidirectional surface-reachability complete. 2 non-blocking flags (cosmetic 31->30 test count corrected; multi-line limits white-box+transitive, documented). 0 engine-frozen diffs (a2l.py sanctioned-unfrozen). Axis met -> approve. Advancing to Phase 5.",
-      "phase_marker": 4
-    },
-    {
-      "phase": 4,
-      "date": "2026-07-20",
-      "decision": "Inc-1 + Inc-2 APPROVED; Phase 3 COMPLETE (autonomous)",
-      "notes": "Inc-1 unfreeze a2l.py (2 guard files, 11 guard tests pass). Inc-2 parser (a2l.py +249 / a2l_parse.py facade / NEW test_a2l_multiline_headers.py 31 tests / test_a2l_f841_cleanup.py C-26 census). Results: ruff clean; new file 30 passed (incl @slow 2MB DoS); A2L suite 69 passed/2 pre-existing skips; frozen guards 11; C-34 full guard-host test_tui_directionb.py+engine_unchanged 175 passed/exit0 (no escape). Oracle spot-check: 50/50 char_type, 50/50 addr-not-None (5 addr==0), all pinned values. code-reviewer INDEPENDENT APPROVE 0 HIGH/MEDIUM (stripper verified //-newline-only/linear-O(n)/quote-state/unterminated-safe/escape-parity; kind-anchor fail-closed+shipped keys; no regression; oracles vs disk; 32/32 discriminating). 2 LOW intentional (escape-parity by design; max_axis_points str -> batch-55 casts). Gate-blocking AT-096/097/098/099/100/101/102 all green. Snapshot suite NOT run local (canonical-CI only) -> verify 0 drift at Phase-4. Axis met -> approve. Advancing to Phase 4 (orchestrator-owned gate suite C-25).",
-      "phase_marker": 3
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-20",
-      "decision": "Phase-2 triple review PASS-with-folds (0 blockers) -> gate SELF-APPROVED (autonomous)",
-      "notes": "architect+qa+security parallel, ALL no-blocker. architect DISPROVED both candidate-blockers by execution (no kind-anchor false-positive: anchor-index dist {1:49,2:1} all on true Type; no comment-bleed: 0 interspersed comments in corpus) + all oracle values confirmed. qa: 0 typos, all counterfactuals genuine. security: stripper crash-free + LINEAR-time, no new external surface, no dormant markup sink, fail-closed. 6 MAJOR + 9 MINOR/LOW = all AT/LLR folds, applied to 01-req \u00a74.9: arch-M3 AT-097 `address is not None` (5/50 addr==0 truthiness trap) + ==50; qa-M1 AT-099 gate-blocking; qa-M2 AT-099 synth count guard len==8; qa-M3 AT-101 positive-control; arch-M1 anchor-unbounded AT+neg-TC+non-goal; arch-M2 `//` newline-sentinel scope+TC; sec-F1 DoS case; sec-F2 render-C17 AT-103; sec-F3 quote-parity TC; arch-m3 shipped dict keys; census + line-scan-limitation noted. MEASUREMENT deferral CONFIRMED sound by all 3. Gate-blocking now AT-096/097/098/099/100/101/102. Axis met -> approve. INCREMENT PLAN: Inc-1 UNFREEZE a2l.py (2 guard files); Inc-2 parser (a2l.py + a2l_parse.py facade + NEW test_a2l_multiline_headers.py + C-26 census test_a2l_f841_cleanup.py = 4 files). Re-freeze = post-merge PR-B. Advancing to Phase 3.",
-      "phase_marker": 2
+      "decision": "Phase-0 DoR gate SELF-APPROVED (autonomous)",
+      "notes": "3 stories READY: US-P1b (CURVE/MAP inline-axis length None->25/51 via parse_a2l_file + A2L view; external COM_AXIS stays None) + US-DoS (MAX_A2L_DECODE_BYTES clamp on the raw-decode path, R2) + US-P2b (re-freeze a2l.py, post-merge PR-B). Carry OUT: direct multi-line surface-limit AT (batch-54 Phase-4 flag, tangential). Executed-verified this session: record_layouts_by_name[name]['lines'] = raw component strings, tokens[1]=POSITION INDEX (discard), tokens[2]=DATATYPE; CURVE.STD_AXIS 1xUBYTE+8xSBYTE+8xSWORD=25 B reproduced. Design focus = FNC_VALUES/component dimensionality (CURVE axis_x; MAP axis_x*axis_y) + full-span-or-None contract. Axis: Coverage/Certainty/Evidence all met -> approve. Advancing to Phase 1 (architect + qa parallel).",
+      "phase_marker": 0
     },
     {
       "phase": 1,
       "date": "2026-07-20",
       "decision": "Phase-1 requirements SELF-APPROVED (autonomous)",
-      "notes": "Assembled from parallel architect (4 HLR/~10 LLR, execution-verified) + qa (AT catalog). Canonical AT/TC registry pinned (C-21): AT-096..102 / TC-097..102; gate-blocking AT-096/097/098/100/101. New ids R-A2L-011/012/013. Approach (C-35 executed @640de1b): _strip_a2l_comments + _flatten_body_tokens + CHARACTERISTIC_KIND anchor -> 50/50 demo chars (genuine 0 today; '1' is spurious comment-token match); single-line strict subset (no regression); 8/8 hostile-comment safe; synthetic conftest chars stay None (0 snapshot drift). Scope HEADER-only (length None=batch-55); MEASUREMENT multi-line DEFERRED (absent from corpus, no-regression AT-099) - autonomous, confirm at P2 if wanted. File budget ~5+1 -> may split guard edits Inc-2. Lint 6 shall/0 modal-should/0 placeholders. Axis met -> approve. -> Phase 2 triple review."
+      "notes": "Assembled from parallel architect (3 HLR / 11 LLR, C-35 execution-verified) + qa (AT-104..112 / TC-133..142). architect probe REPRODUCED all oracles over the real demo: CURVE.STD_AXIS=25, MAP.STD_AXIS.STD_AXIS=51, FIX_AXIS.PAR_DIST=12, COM_AXIS=None; full-corpus sweep 12 CURVE/MAP all length=None today, 8 derive/4 stay grey, ZERO false-None (taxonomy complete for corpus). New ids R-A2L-008 (summer, reserved by batch-50) / R-A2L-014 (DoS) / R-A2L-015 (re-freeze). C-31 census constants + completeness invariant (TC-135). Full-span-or-None safety contract; AT-106 (external COM_AXIS stays None) = false-green anchor. CROSS-BATCH CATCH: batch-54 shipped test_at102_curve_map_length_stays_none (non-frozen) that this summer flips RED -> tracked LLR-SUP.1/TC-140 §6.5 amendment (None->25/51); independently confirmed at tests/test_a2l_multiline_headers.py:329, NOT in _ENGINE_TEST_FILES. Two autonomous decisions recorded: (1) gate-blocking set reconciled to qa's AT-104..111 (architect's 104/105/106 understated; no-regression/malformed/DoS are main-PR gates); (2) summer symbols PRIVATE _record_layout_full_span/_inline_axis_counts, no facade (matches _resolve_record_layout/_infer_length_characteristic precedent; C-3/C-11). §6.5 A1 REQUIREMENTS.md:402-405 prose amendment + A2 batch-54 test supersession. Lint: 14 shall in HLR/LLR, 0 modal-should in normative, 0 unfilled placeholders. Axis met -> approve. -> Phase 2 triple review.",
+      "phase_marker": 1
     },
     {
-      "phase": 1,
+      "phase": 2,
       "date": "2026-07-20",
-      "decision": "Phase-0 DoR gate SELF-APPROVED (autonomous)",
-      "notes": "2 stories READY: US-ML1 (multi-line CHARACTERISTIC/MEASUREMENT header parsing; observable 1/50->50/50 demo chars with char_type) + US-ML2 (multi-line comment-stripped AXIS_DESCR body -> MaxAxisPoints + external-axis flag in axis_meta). Scope guard: HEADER fields only, array length stays None (batch-55). C-35 draft-verified the mechanism against the real demo (build_section_tree keeps /* */ comments; nested blocks in children; fix = flatten comment-stripped quote-respecting body, skip LongIdentifier, positional read). Axis: Coverage/Certainty/Evidence met -> approve. Advancing to Phase 1 (architect + qa parallel).",
-      "phase_marker": 0
+      "decision": "Phase-2 triple review PASS-with-folds (0 blockers) -> gate SELF-APPROVED (autonomous)",
+      "notes": "architect+qa+security parallel, ALL no-blocker, each executed probes vs the real demo. 5 MAJOR + 4 positive/MINOR, ALL folded into 01-requirements.md before Phase 3. architect: taxonomy COMPLETE (13-tag census, 0 unlisted components), all wiring cites accurate, MAJ1 AT-105-cant-discriminate-XY-swap -> TC-133 size-asymmetric MAP oracle; MIN2 CUBOID note+AT-109 anchor; MIN3 skip-vs-None explicit. qa: M-1 AT-108-oracle-unfulfillable (length alone != colour flip w/o mem_map; enrich doesnt emit sev-*) -> covering-map + _a2l_tag_row_severity; M-2 TC-135-hand-listed-census -> derive observed from parse; M-3 FIX_AXIS-no-VALUE-AT + label mismatch -> AT-107 retargeted to demo FIX_AXIS==12 (gate-blocking) + AT-107b synthetic=13; verified _ENGINE_TEST_FILES excludes both new files. security: F1 single-clamp-SUFFICIENT (reverse-swept all length consumers; only per-byte sink is _extract_raw_bytes:1037) [recorded 02-review]; F2 base-0->base-10 cast; F3 try/except-not-isdigit guard; F4 huge-digit '9'*5000 vector; F5 no-new-surface. Gate-blocking now AT-104/105/106/107/107b/108/109/110/111. Two prior autonomous decisions (D1 gate set, D2 private symbols) unchanged. C-21 re-cut: AT set changed -> increment plan re-reconciled (Inc-1 unfreeze 2 files; Inc-2 summer 4 files; PR-B re-freeze). Lint: 17 shall, 0 modal-should in normative, 0 placeholders. Axis met -> approve. Advancing to Phase 3.",
+      "phase_marker": 2
     },
     {
-      "phase": 0,
+      "phase": 3,
       "date": "2026-07-20",
-      "decision": "kickoff (autonomous + self-merge; a2l.py unfreeze approved)",
-      "notes": "P-1b batch-A (multi-line A2L header parsing). Operator AskUserQuestion 2026-07-20: SPLIT scope (this batch = header parsing; batch-55 = length summer), unfreeze a2l.py YES (re-freeze at close), autonomous+self-merge. Trigger met: FB batch-51 merged (PR #101, origin/main 640de1b), zero A2L collision confirmed. RC-1 clean @ 640de1b; multi-line parsing NOT shipped (a2l.py:327 len<7 guard still present). Branch claude/a2l-multiline-headers-b54 cut off 640de1b. Discarded batch-50 working state.json (closed, captured in vault+memory). Origin of the need: batch-50 Phase-2 draft-time-execution finding (49/50 demo CHARACTERISTICs parse char_type=None). C-35 applies: EXECUTE the parser over the real ASAM demo at draft time."
+      "decision": "Inc-1 + Inc-2 APPROVED; Phase 3 COMPLETE (autonomous)",
+      "notes": "Inc-1 unfreeze a2l.py (2 guard files; 11 guard tests pass exit0; inline diff review = exactly the 2 tuple removals + NOTE swaps). Inc-2 the summer: a2l.py +192 (constants + _inline_axis_counts base-10-try/except + _record_layout_full_span full-span-or-None + _extract_raw_bytes clamp + post-axis-walk block) + NEW tests/test_a2l_inline_axis_length.py (18 tests) + AT-102 supersession + REQUIREMENTS.md prose. Results: ruff clean; new file 18 passed; A2L suite 54 passed; C-27 dual-guard 11 passed; all exit0. C-35 probe: 25/51/12/None/None ALL MATCH, 8 derived/4 grey, 0 false-None. code-reviewer INDEPENDENT: 0 HIGH; crux verified (swap-discrimination live, cap boundary, clamp byte-identical, non-vacuous tests). TWO Phase-3 catches: (1) dev fail-loud caught orchestrator's Phase-2 fold error '08'->None = C-36 PHANTOM (base-0-only; base-10 makes '08'=8 valid) -> corrected 4.9 + 6.5 A3. (2) code-review F1 MEDIUM: ALIGNMENT_* 2-token directives silently skipped -> under-report/false-green on real A2Ls -> OPERATOR AskUserQuestion 2026-07-20 = 'Safe now + alignment-aware follow-up' -> force-None guard + TC-133b applied (18 tests, 5 oracles unchanged); §6.5 A4 + R4 registered; batch-56 backlog = alignment-aware sizing. F2 LOW pre-existing out-of-scope. File footprint clean (Inc-1 2 + Inc-2 4). Axis met -> approve. Advancing to Phase 4 (orchestrator-owned C-25 gate suite).",
+      "phase_marker": 3
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-20",
+      "decision": "Phase-4 validation PASS; gate SELF-APPROVED (autonomous)",
+      "notes": "Orchestrator-owned C-25 gate run (first attempt failed on an unset-$TMPDIR redirect, NOT a test failure; re-run clean): 1670 passed / 2 skip / 21 deselected / 3 xfail, 0 fail, exit0, 29 snapshots passed = 0 DRIFT (conservatively-predicted A2L-row drift did NOT materialize -> no regen PR, like batch-54). Ledger 1652 base + 18 new (test_a2l_inline_axis_length.py, authoritative collect=18) = 1670, reconciles. qa-reviewer wrote 04-validation.md (consumed the run). Layer A: every LLR -> green TC on disk. Layer B / V-5/C-18: 9 gate-blocking ATs (104/105/106/107/107b/108/109/110/111) each -> EXACTLY ONE on-disk node through parse_a2l_file (AT-108 also enrich+_a2l_tag_row_severity); no satisfied-in-parts; AT-112 post-merge. Bidirectional surface-reachability complete (STD/FIX/COM/RES/CUBOID/malformed/'08'/huge-digit/DoS/ALIGNMENT/scalar/no-kind all exercised). Counterfactuals value-discriminating + code-encoded (AT-106 false-green anchor, AT-108 reverted->not-OK, TC-133 XY-swap, TC-133b alignment->None, TC-135 derived census). FROZEN-DIFF (C-27): git diff main -- s19_app/ = a2l.py ONLY (sanctioned unfreeze) + guard files; NO other engine module. §6.5 A1/A2/A3/A4 all landed+green. NON-BLOCKING flags: (1) test_a2l_inline_axis_length.py is git-UNTRACKED -> must git add at commit (Phase 6); (2) AT-108 enum deviation documented (reverted row INFO not NEUTRAL; test pins memory_checked False/not-OK — sound). Axis met -> approve. Advancing to Phase 5.",
+      "phase_marker": 4
+    },
+    {
+      "phase": 5,
+      "date": "2026-07-20",
+      "decision": "Phase-5 postmortem SELF-APPROVED (close batch -> Phase 6); NO new control",
+      "notes": "architect co-authored 05-postmortem.md. Clean batch: iters 0/0/0/0/0/0, +18 tests, 1670 passed/0 fail, 0 snapshot drift, 0 blocker, 0 engine-frozen diffs outside sanctioned a2l.py. Two IN-GATE corrections absorbed w/o looping any phase: (1) '08' C-36 phantom (orchestrator fold error, dev fail-loud caught) (2) ALIGNMENT false-green hole (code-review caught, operator-ruled force-None). Root cause of smooth run = verified batch-50 §7 seed + C-35 draft-time execution (reproduced 25/51/12/None before code). NO NEW CONTROL (general-controls-not-narrow-patches): '08'=fresh C-36 instance; ALIGNMENT=C-10/C-31 completeness gap caught by code-review census; C-27/C-35/C-25 all fired as designed -> cite batch-55 as instances in the lineage, don't mint per-incident. No AskUserQuestion needed. Next: PR-A (docs+commit+merge), PR-B re-freeze a2l.py, batch-56 alignment-aware sizing (operator-approved A4 follow-up). Harness nit: give the gate-run a defined $TMPDIR. Advancing to Phase 6 docs + PR.",
+      "phase_marker": 5
     }
   ],
   "obsidian_synced": false,
-  "created_at": "2026-07-20T14:00:00Z"
+  "created_at": "2026-07-20T15:30:00Z"
 }

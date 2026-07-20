@@ -27,6 +27,12 @@ DATATYPE_SIZES: dict[str, int] = {
     "FLOAT64_IEEE": 8,
 }
 
+# DoS bound: the maximum on-disk byte span the A2L decoder will materialize or
+# derive for a single record. Caps both the CURVE/MAP length summer and the
+# per-byte ``_extract_raw_bytes`` loop against a hostile/oversized layout (1 MiB;
+# well above any legitimate single CHARACTERISTIC span on these ECU images).
+MAX_A2L_DECODE_BYTES = 1_048_576
+
 DATATYPE_STRUCT_CODES: dict[str, str] = {
     "UBYTE": "B",
     "SBYTE": "b",
@@ -67,6 +73,14 @@ CHARACTERISTIC_KINDS = frozenset(
         "ASCII",
     }
 )
+
+# Axis-kind census (C-31): inline axes derive length in-tag; external axes store
+# their points in a separate AXIS_PTS record, so a CURVE/MAP carrying one stays
+# ``length=None`` (honest grey). The two subsets are disjoint and their union is
+# the full observed vocabulary — gated on, never hand-listed at a call site.
+_DERIVABLE_AXIS_KINDS = frozenset({"STD_AXIS", "FIX_AXIS"})
+_EXTERNAL_AXIS_KINDS = frozenset({"COM_AXIS", "RES_AXIS", "CURVE_AXIS"})
+ALL_AXIS_KINDS = _DERIVABLE_AXIS_KINDS | _EXTERNAL_AXIS_KINDS
 
 MEASUREMENT_BODY_KEYWORDS = frozenset(
     {
@@ -1000,6 +1014,169 @@ def _resolve_record_layout(layout_name: Optional[str], record_layouts_by_name: d
     }
 
 
+def _inline_axis_counts(axis_meta: list[dict]) -> Optional[list[int]]:
+    """
+    Summary:
+        Resolve the ordered inline axis point-counts for a CURVE/MAP, or ``None``
+        when the axis set is empty, any axis is external, or any ``MaxAxisPoints``
+        is not a positive decimal integer (the full-span-or-None entry gate).
+
+    Args:
+        axis_meta (list[dict]): The tag's ``axis_meta`` entries built at parse
+            time; each carries ``header_tokens`` (token[0] = axis kind),
+            ``max_axis_points`` (a decimal STRING), and an ``external`` flag.
+
+    Returns:
+        Optional[list[int]]: One positive int per axis in AXIS_DESCR order when
+            every axis is inline (STD_AXIS/FIX_AXIS) and numerically sized; else
+            ``None``.
+
+    Raises:
+        None: A non-numeric, leading-zero, or oversized ``max_axis_points`` is
+            caught and yields ``None`` rather than propagating (collect-don't-abort).
+
+    Data Flow:
+        - Reject an empty axis list.
+        - Per axis: read the kind from ``header_tokens[0]``, reject a kind outside
+          ``_DERIVABLE_AXIS_KINDS`` and the ``external`` flag, then base-10
+          ``int``-cast the string ``max_axis_points`` inside a try/except.
+        - Return the ordered counts, or ``None`` on the first failure.
+
+    Dependencies:
+        Uses:
+            - ``_DERIVABLE_AXIS_KINDS``
+        Used by:
+            - ``extract_a2l_tags`` post-axis-walk length pass
+
+    Example:
+        >>> _inline_axis_counts([{"header_tokens": ["STD_AXIS"], "max_axis_points": "8", "external": False}])
+        [8]
+    """
+    if not axis_meta:
+        return None
+    counts: list[int] = []
+    for axis in axis_meta:
+        header_tokens = axis.get("header_tokens") or []
+        if not header_tokens:
+            return None
+        if header_tokens[0] not in _DERIVABLE_AXIS_KINDS:
+            return None
+        if axis.get("external"):
+            return None
+        mp = axis.get("max_axis_points")
+        if mp is None:
+            return None
+        try:
+            count = int(str(mp).strip())
+        except (ValueError, TypeError):
+            return None
+        if count <= 0:
+            return None
+        counts.append(count)
+    return counts
+
+
+def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[int]:
+    """
+    Summary:
+        Sum a CURVE/MAP's on-disk byte span from its resolved RECORD_LAYOUT and
+        the ordered inline axis counts, or return ``None`` (full-span-or-None) if
+        any component, datatype, or needed axis count is unclassifiable.
+
+    Args:
+        layout (dict): A ``record_layouts_by_name`` entry; ``layout["lines"]`` are
+            the raw RECORD_LAYOUT body lines. Per line, token[0] is the component
+            name and token[2] is the datatype — token[1] is the ASAM POSITION
+            INDEX, never a count.
+        axis_counts (list[int]): Ordered inline axis point-counts ``[n_x, n_y, n_z]``
+            from ``_inline_axis_counts``.
+
+    Returns:
+        Optional[int]: The total byte span (Σ ``size × element_count`` over
+            recognised components) when EVERY non-empty line is a classifiable
+            summable component and the running total stays within
+            ``MAX_A2L_DECODE_BYTES``; else ``None``.
+
+    Raises:
+        None: An unrecognised line (incl. an unmodeled span-affecting directive
+            like ``ALIGNMENT_*``), an unknown datatype, a truncated component, an
+            absent needed axis count, an empty contribution, or an over-cap total
+            all degrade to ``None`` (never a wrong-but-non-None length → no
+            false-green from an under-reported span).
+
+    Data Flow:
+        - Iterate ``layout["lines"]``; ONLY a genuinely empty/whitespace line is
+          skipped. Every other non-empty line must classify as a summable
+          component or force ``None`` — a span-affecting directive we do not model
+          (``ALIGNMENT_*`` padding, ``AXIS_RESCALE_X``, ``RESERVED``, a standalone
+          comment) must never be silently skipped, or the span under-reports.
+        - Map token[0] to an element count via the §2.5 taxonomy keyed on
+          ``axis_counts`` (NO_AXIS_PTS/NO_RESCALE → 1; AXIS_PTS_X/Y/Z → the axis
+          count; FNC_VALUES → ``math.prod(axis_counts)``); resolve token[2] size
+          via ``DATATYPE_SIZES.get``.
+        - Accumulate ``size × count``; bail to ``None`` on any unrecognised line,
+          truncated component, unknown datatype, missing axis count, or over-cap
+          total.
+
+    Dependencies:
+        Uses:
+            - ``DATATYPE_SIZES``
+            - ``MAX_A2L_DECODE_BYTES``
+            - ``math.prod``
+        Used by:
+            - ``extract_a2l_tags`` post-axis-walk length pass
+
+    Example:
+        >>> _record_layout_full_span(
+        ...     {"lines": ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 SBYTE", "FNC_VALUES 3 SWORD"]},
+        ...     [8],
+        ... )
+        25
+    """
+    total = 0
+    contributed = False
+    for line in layout.get("lines") or []:
+        tokens = line.split()
+        if not tokens:
+            continue
+        component = tokens[0]
+        if component in ("NO_AXIS_PTS_X", "NO_AXIS_PTS_Y", "NO_AXIS_PTS_Z", "NO_RESCALE_X"):
+            element_count = 1
+        elif component == "AXIS_PTS_X":
+            if len(axis_counts) < 1:
+                return None
+            element_count = axis_counts[0]
+        elif component == "AXIS_PTS_Y":
+            if len(axis_counts) < 2:
+                return None
+            element_count = axis_counts[1]
+        elif component == "AXIS_PTS_Z":
+            if len(axis_counts) < 3:
+                return None
+            element_count = axis_counts[2]
+        elif component == "FNC_VALUES":
+            element_count = math.prod(axis_counts)
+        else:
+            # Any non-empty line that is not a summable component forces
+            # full-span-or-None: an ALIGNMENT_* padding directive (2 tokens, would
+            # add inter-component padding we do not model), an unmodeled component
+            # (AXIS_RESCALE_X / RESERVED), or a standalone comment. Skipping it
+            # would UNDER-REPORT the true span → a false-green.
+            return None
+        if len(tokens) < 3:
+            return None  # recognised component missing its datatype token
+        size = DATATYPE_SIZES.get(tokens[2])
+        if size is None:
+            return None
+        total += size * element_count
+        contributed = True
+        if total > MAX_A2L_DECODE_BYTES:
+            return None
+    if not contributed:
+        return None
+    return total
+
+
 def _decode_scalar(raw: bytes, decode_type: str, decode_endian: str) -> Any:
     if decode_type == "FLOAT16_IEEE":
         return None
@@ -1031,6 +1208,8 @@ def _extract_raw_bytes(mem_map: Optional[Dict[int, int]], address: Optional[int]
     if mem_map is None:
         return {"raw_bytes": None, "raw_available": False, "missing_ranges": [], "overlap_conflict": False}
     if address is None or byte_size is None or byte_size <= 0:
+        return {"raw_bytes": None, "raw_available": False, "missing_ranges": [], "overlap_conflict": False}
+    if byte_size > MAX_A2L_DECODE_BYTES:
         return {"raw_bytes": None, "raw_available": False, "missing_ranges": [], "overlap_conflict": False}
     missing: list[int] = []
     values: list[int] = []
@@ -1271,6 +1450,19 @@ def extract_a2l_tags(
                                 "external": "AXIS_PTS_REF" in axis_tokens,
                             }
                         )
+
+                if (
+                    name == "CHARACTERISTIC"
+                    and tag.get("char_type") in ("CURVE", "MAP")
+                    and tag.get("length") is None
+                ):
+                    axis_counts = _inline_axis_counts(tag.get("axis_meta") or [])
+                    if axis_counts is not None:
+                        layout = record_layouts_by_name.get(
+                            str(tag.get("record_layout_name") or "")
+                        )
+                        if layout:
+                            tag["length"] = _record_layout_full_span(layout, axis_counts)
 
                 if not tag.get("effective_byte_order"):
                     layout = record_layouts_by_name.get(str(tag.get("record_layout_name") or ""))

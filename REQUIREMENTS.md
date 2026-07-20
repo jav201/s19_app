@@ -399,10 +399,14 @@ Notes:
   `RL_U8` defined as `FNC_VALUES 1 UBYTE`). `_infer_length_characteristic`
   (`s19_app/tui/a2l.py`) resolves the layout's element datatype size, so such
   records become memory-checkable (green/white with an image hit) instead of grey.
-  CURVE/MAP deliberately stay unsized (element size would under-count an array
-  span and falsely pass the byte-range check — a false-green); array sizing needs
-  AXIS_DESCR/MATRIX_DIM resolution (deferred, P-1b). Regression:
-  `tests/test_a2l_record_layout_length.py`.
+  A CURVE/MAP CHARACTERISTIC with **inline STD_AXIS/FIX_AXIS** axes is sized by
+  summing its resolved RECORD_LAYOUT on-disk span × inline axis point-counts
+  (`_record_layout_full_span` × `_inline_axis_counts`, full-span-or-None), so such
+  records become memory-checkable. CURVE/MAP with an **external axis**
+  (COM_AXIS/RES_AXIS/CURVE_AXIS or AXIS_PTS_REF) deliberately stay `length=None`
+  (the axis storage lives in a separate AXIS_PTS record). Regression:
+  `tests/test_a2l_record_layout_length.py` and
+  `tests/test_a2l_inline_axis_length.py`.
 
 ### MAC Tag/Parameter Validation Criteria
 
