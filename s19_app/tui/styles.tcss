@@ -203,6 +203,105 @@ Screen {
     height: 1;
 }
 
+/* Unload feature Inc-2 — the persistent Workspace "Loaded" panel
+ * (`#loaded_panel`): a compact readout of the three typed artifact slots
+ * (S19/HEX · MAC · A2L). It lives OUTSIDE `#workspace_panes` so it stays visible
+ * in the no-file empty state. Kept deliberately borderless/marginless so its
+ * footprint (title + 3 slot rows + unload-all row = 5 rows) survives the 80x24
+ * floor geometry budget (C-13/C-23) without clipping the hex panes below. Slot
+ * rows are re-mounted per render (addressed by CLASS, never id — the
+ * `MemoryMapPanel` pattern), so every rule keys on classes. Colours reuse the
+ * batch-47 navy/pastel insight tokens: `$accent-calm` for the `[u]`/`[U]`
+ * affordance + the title, `#969aad` (insight_style.DGRAY) for the dim absent
+ * slots. */
+#loaded_panel {
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
+#loaded_title {
+    width: 100%;
+    height: 1;
+    color: $accent-calm;
+    text-style: bold;
+}
+
+#loaded_slots {
+    width: 100%;
+    height: auto;
+    layout: vertical;
+}
+
+/* 80x24-floor graceful degradation (C-13/C-23). Under the `width-narrow`
+ * regime the workspace body is only ~9 rows tall (the status bar/log tail eats
+ * the rest), so a full 5-row panel would clip the hex panes below. Narrow ⇒
+ * drop the title and cap the slot list to 2 scrollable rows: the two lead slots
+ * stay visible and the panes keep a positive height. The `U` key still unloads
+ * all, and per-slot `[u]` stays reachable, so no function is lost at the floor.
+ * Wide (>=120) keeps the full auto-height vertical panel. */
+#workspace_body.width-narrow #loaded_title {
+    display: none;
+}
+
+#workspace_body.width-narrow #loaded_slots {
+    height: 2;
+    overflow-y: auto;
+}
+
+.loaded-slot,
+.loaded-allrow {
+    width: 100%;
+    height: 1;
+}
+
+.loaded-kind {
+    width: 6;
+    height: 1;
+    color: $accent-calm;
+    text-style: bold;
+}
+
+.loaded-detail {
+    width: 1fr;
+    height: 1;
+    color: $fg-base;
+}
+
+/* Absent slot (and the disabled unload-all label): dim (insight_style.DGRAY). */
+.loaded-absent {
+    color: #969aad;
+}
+
+.loaded-slot-absent .loaded-kind {
+    color: #969aad;
+    text-style: none;
+}
+
+/* The `[u]` / `[U]` affordance — a compact borderless accent control that reads
+ * as an inline bracketed button within the 80-col floor. */
+.loaded-unload {
+    width: auto;
+    min-width: 3;
+    height: 1;
+    color: $accent-calm;
+    background: $bg-panel;
+}
+
+.loaded-unload:hover {
+    color: $bg-base;
+    background: $accent-calm;
+    text-style: bold;
+}
+
+.loaded-alllabel {
+    width: 1fr;
+    height: 1;
+    color: $fg-base;
+    text-align: right;
+    padding-right: 1;
+}
+
 /* >= 120-column fixed-width regime (LLR-008.1). */
 #ws_left {
     width: 22;

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter, deque
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import json
 from pathlib import Path
 import time
@@ -62,6 +62,7 @@ from .screens_directionb import (
     FlowBuilderPanel,
     CoverageStats,
     EmptyStatePanel,
+    LoadedArtifactsPanel,
     MemoryMapPanel,
     PatchEditorPanel,
     bytes_per_cell,
@@ -1017,6 +1018,250 @@ def precompute_mac_datatable_payload(
     return tuple(widths_list), cell_rows, styles
 
 
+def _has_primary(loaded: LoadedFile) -> bool:
+    """
+    Summary:
+        Report whether a snapshot carries a live S19/HEX image spine.
+
+    Args:
+        loaded (LoadedFile): Snapshot to inspect.
+
+    Returns:
+        bool: ``True`` when ``file_type`` is a primary kind and at least one
+            memory range is present.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Reads ``file_type`` and ``ranges`` only; no mutation.
+
+    Dependencies:
+        Uses:
+            - ``LoadedFile`` fields ``file_type`` / ``ranges``.
+        Used by:
+            - ``_unload_mac`` (keep-vs-drop decision) and the Inc-2 panel.
+
+    Example:
+        >>> _has_primary(LoadedFile(path=Path("f.s19"), file_type="s19",
+        ...     mem_map={0: 1}, row_bases=[0], ranges=[(0, 1)],
+        ...     range_validity=[True], errors=[], a2l_path=None, a2l_data=None))
+        True
+    """
+    return loaded.file_type in {"s19", "hex"} and bool(loaded.ranges)
+
+
+def _has_mac(loaded: LoadedFile) -> bool:
+    """
+    Summary:
+        Report whether a snapshot carries MAC metadata.
+
+    Args:
+        loaded (LoadedFile): Snapshot to inspect.
+
+    Returns:
+        bool: ``True`` when a ``mac_path`` is attached or MAC records exist.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Reads ``mac_path`` and ``mac_records`` only; no mutation.
+
+    Dependencies:
+        Uses:
+            - ``LoadedFile`` fields ``mac_path`` / ``mac_records``.
+        Used by:
+            - ``_unload_primary`` (MAC-only-vs-``None`` decision) and the
+              Inc-2 panel.
+
+    Example:
+        >>> lf = LoadedFile(path=Path("t.mac"), file_type="mac", mem_map={},
+        ...     row_bases=[], ranges=[], range_validity=[], errors=[],
+        ...     a2l_path=None, a2l_data=None, mac_records=[{"name": "RPM"}])
+        >>> _has_mac(lf)
+        True
+    """
+    return loaded.mac_path is not None or bool(loaded.mac_records)
+
+
+def _has_a2l(loaded: LoadedFile) -> bool:
+    """
+    Summary:
+        Report whether a snapshot carries an attached A2L companion.
+
+    Args:
+        loaded (LoadedFile): Snapshot to inspect.
+
+    Returns:
+        bool: ``True`` when an ``a2l_path`` or parsed ``a2l_data`` is present.
+
+    Raises:
+        None
+
+    Data Flow:
+        - Reads ``a2l_path`` and ``a2l_data`` only; no mutation.
+
+    Dependencies:
+        Uses:
+            - ``LoadedFile`` fields ``a2l_path`` / ``a2l_data``.
+        Used by:
+            - The Inc-2 "Loaded" panel A2L slot.
+
+    Example:
+        >>> lf = LoadedFile(path=Path("f.s19"), file_type="s19", mem_map={},
+        ...     row_bases=[], ranges=[], range_validity=[], errors=[],
+        ...     a2l_path=Path("m.a2l"), a2l_data={"x": 1})
+        >>> _has_a2l(lf)
+        True
+    """
+    return loaded.a2l_path is not None or loaded.a2l_data is not None
+
+
+def _unload_a2l(loaded: LoadedFile) -> Optional[LoadedFile]:
+    """
+    Summary:
+        Rebuild a snapshot with the A2L companion removed, keeping the spine
+        and every derived loader fact (the inverse of an A2L attach).
+
+    Args:
+        loaded (LoadedFile): Current snapshot with an A2L to drop.
+
+    Returns:
+        Optional[LoadedFile]: A copy with ``a2l_path``/``a2l_data`` cleared.
+            Never ``None`` — the A2L is a companion, so the spine always
+            survives its removal.
+
+    Raises:
+        None
+
+    Data Flow:
+        - ``dataclasses.replace`` copies every field, overriding only the two
+          A2L fields, so the image/MAC spine and all derived facts
+          (``entropy_windows`` / ``source_s0_header`` / ``out_of_order_count``
+          / ``entry_point``) carry forward untouched.
+
+    Dependencies:
+        Uses:
+            - ``dataclasses.replace``.
+        Used by:
+            - ``S19TuiApp._apply_unload`` for ``kind == "a2l"``.
+
+    Example:
+        >>> lf = LoadedFile(path=Path("f.s19"), file_type="s19",
+        ...     mem_map={0: 1}, row_bases=[0], ranges=[(0, 1)],
+        ...     range_validity=[True], errors=[], a2l_path=Path("m.a2l"),
+        ...     a2l_data={"x": 1})
+        >>> _unload_a2l(lf).a2l_data is None
+        True
+    """
+    return replace(loaded, a2l_path=None, a2l_data=None)
+
+
+def _unload_mac(loaded: LoadedFile) -> Optional[LoadedFile]:
+    """
+    Summary:
+        Rebuild a snapshot with MAC metadata removed (the inverse of a MAC
+        attach), keeping the image spine when one is present.
+
+    Args:
+        loaded (LoadedFile): Current snapshot with MAC data to drop.
+
+    Returns:
+        Optional[LoadedFile]: A copy with ``mac_path``/``mac_records``/
+            ``mac_diagnostics`` cleared when a primary image spine survives;
+            ``None`` when the MAC was itself the spine (MAC-only load), since
+            nothing remains to render.
+
+    Raises:
+        None
+
+    Data Flow:
+        - When ``_has_primary`` holds, ``dataclasses.replace`` clears only the
+          three MAC fields; the image, A2L companion, and every derived fact
+          carry forward.
+        - Otherwise the MAC was the spine, so the result is ``None``.
+
+    Dependencies:
+        Uses:
+            - ``_has_primary`` / ``dataclasses.replace``.
+        Used by:
+            - ``S19TuiApp._apply_unload`` for ``kind == "mac"``.
+
+    Example:
+        >>> lf = LoadedFile(path=Path("f.s19"), file_type="s19",
+        ...     mem_map={0: 1}, row_bases=[0], ranges=[(0, 1)],
+        ...     range_validity=[True], errors=[], a2l_path=None,
+        ...     a2l_data=None, mac_records=[{"name": "RPM"}])
+        >>> _unload_mac(lf).mac_records
+        []
+    """
+    if _has_primary(loaded):
+        return replace(loaded, mac_path=None, mac_records=[], mac_diagnostics=[])
+    return None
+
+
+def _unload_primary(loaded: LoadedFile) -> Optional[LoadedFile]:
+    """
+    Summary:
+        Rebuild a snapshot with the S19/HEX image (and every image-derived
+        fact) removed, degrading to a MAC-only spine when a MAC is present.
+
+    Args:
+        loaded (LoadedFile): Current snapshot whose primary image is dropped.
+
+    Returns:
+        Optional[LoadedFile]: A MAC-only copy (``file_type="mac"``; image map/
+            rows/ranges and all image-derived facts and caches cleared;
+            ``mac_*`` and ``a2l_*`` kept) when a MAC survives; ``None`` when no
+            MAC is present, since the image was the last spine and a companion
+            A2L cannot outlive it.
+
+    Raises:
+        None
+
+    Data Flow:
+        - When ``_has_mac`` holds, ``dataclasses.replace`` clears the image map/
+          rows/ranges, the derived facts (``entropy_windows`` /
+          ``source_s0_header`` / ``out_of_order_count`` / ``entry_point``), the
+          lazy caches (``range_index`` / ``bases_set``), and ``variant_id``,
+          while retaining MAC and A2L fields.
+        - Otherwise no spine survives, so the result is ``None`` (the companion
+          A2L clears with it).
+
+    Dependencies:
+        Uses:
+            - ``_has_mac`` / ``dataclasses.replace``.
+        Used by:
+            - ``S19TuiApp._apply_unload`` for ``kind == "primary"``.
+
+    Example:
+        >>> lf = LoadedFile(path=Path("f.s19"), file_type="s19",
+        ...     mem_map={0: 1}, row_bases=[0], ranges=[(0, 1)],
+        ...     range_validity=[True], errors=[], a2l_path=None,
+        ...     a2l_data=None, mac_records=[{"name": "RPM"}])
+        >>> _unload_primary(lf).file_type
+        'mac'
+    """
+    if _has_mac(loaded):
+        return replace(
+            loaded,
+            file_type="mac",
+            mem_map={},
+            row_bases=[],
+            ranges=[],
+            range_validity=[],
+            entropy_windows=[],
+            source_s0_header=None,
+            out_of_order_count=0,
+            entry_point=None,
+            range_index=None,
+            bases_set=None,
+            variant_id=None,
+        )
+    return None
+
+
 class S19TuiApp(App):
     """Main TUI app with workarea, project management, and views."""
 
@@ -1046,6 +1291,10 @@ class S19TuiApp(App):
         ("g", "focus_goto", "Go-to"),
         ("q", "quit", "Quit"),
         Binding("l", "load_file", "Load file", show=False),
+        # Unload-all teardown; per-artifact unload is driven by the Inc-2
+        # Workspace "Loaded" panel calling `_apply_unload`. `show=False` keeps
+        # the 80-col footer uncrowded (C-13).
+        Binding("U", "unload_all", "Unload all", show=False),
         Binding("r", "refresh_files", "Refresh workarea", show=False),
         Binding("o", "open_workarea", "Open workarea", show=False),
         Binding("s", "save_project", "Save project", show=False),
@@ -1660,10 +1909,14 @@ class S19TuiApp(App):
             - An ``EmptyStatePanel`` is composed alongside the panes;
               ``_apply_empty_state`` shows it (and hides ``#workspace_panes``)
               while no ``LoadedFile`` is present (LLR-002.3).
+            - A persistent ``LoadedArtifactsPanel`` (``#loaded_panel``, unload
+              feature Inc-2) is composed OUTSIDE ``#workspace_panes`` so it stays
+              visible in the no-file empty state; ``_refresh_loaded_panel``
+              drives its ``render_slots`` after every load and unload.
 
         Dependencies:
             Uses:
-                - ``EmptyStatePanel``
+                - ``EmptyStatePanel`` / ``LoadedArtifactsPanel``
             Used by:
                 - ``compose``
         """
@@ -1718,8 +1971,12 @@ class S19TuiApp(App):
             id="workspace_panes",
         )
         _memstrip = Container(id="ws_memstrip")
+        # The persistent "Loaded" panel (unload feature Inc-2) sits OUTSIDE
+        # `#workspace_panes` so `_apply_empty_state` (which hides the panes with
+        # no file) never hides it — it is the always-visible load-state readout.
         return Container(
             _memstrip,
+            LoadedArtifactsPanel(),
             _panes,
             EmptyStatePanel(),
             id="screen_workspace",
@@ -7728,6 +7985,173 @@ class S19TuiApp(App):
             source_s0_header=existing.source_s0_header,
         )
 
+    def _apply_unload(self, kind: str) -> None:
+        """
+        Summary:
+            Tear down one artifact (or all) from ``current_file`` and refresh
+            every view so each renderer reaches its no-file branch when the
+            snapshot becomes ``None``.
+
+        Args:
+            kind (str): One of ``"primary"``, ``"mac"``, ``"a2l"``, ``"all"``.
+                ``"all"`` clears ``current_file`` outright; the others dispatch
+                to the matching module-level ``_unload_*`` rebuild.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: When ``kind`` is not one of the four accepted values.
+
+        Data Flow:
+            - ``"all"`` sets the new snapshot to ``None``; otherwise, when a
+              file is loaded, dispatch to ``_unload_primary``/``_unload_mac``/
+              ``_unload_a2l`` over ``current_file``. With nothing loaded the
+              per-artifact path is a status-line no-op.
+            - Install the rebuilt (or ``None``) snapshot, invalidate the MAC
+              view cache, toggle the empty-state panels, then re-run the same
+              renderer set the load path uses (``update_sections`` →
+              ``update_hex_view``/``update_alt_hex_view``/``update_mac_hex_view``
+              → ``update_a2l_view`` (which drives ``update_mac_view``) →
+              ``update_project_labels`` → ``update_memory_map``).
+            - Set a status line naming what was unloaded.
+
+        Dependencies:
+            Uses:
+                - ``_unload_primary`` / ``_unload_mac`` / ``_unload_a2l``.
+                - ``_invalidate_mac_view_cache`` / ``_apply_empty_state`` and
+                  the ``update_*`` renderers.
+            Used by:
+                - ``action_unload_all`` (``U`` binding) and the Inc-2
+                  Workspace "Loaded" panel (per-artifact ``[u]`` controls).
+        """
+        if kind == "all":
+            new: Optional[LoadedFile] = None
+            label = "all artifacts"
+        else:
+            if self.current_file is None:
+                self.set_status("Nothing to unload.")
+                return
+            if kind == "primary":
+                new = _unload_primary(self.current_file)
+                label = "primary image"
+            elif kind == "mac":
+                new = _unload_mac(self.current_file)
+                label = "MAC"
+            elif kind == "a2l":
+                new = _unload_a2l(self.current_file)
+                label = "A2L"
+            else:
+                raise ValueError(f"unknown unload kind: {kind!r}")
+
+        self.current_file = new
+        # Mirror the load-path install: the MAC cache is keyed on the previous
+        # records, and the empty-state panels key on `current_file is None`.
+        self._invalidate_mac_view_cache()
+        self._apply_empty_state()
+        # Same renderer set the load path's call_later chain runs, called
+        # directly (unload is cheap, no need to yield between phases).
+        self.update_sections()
+        self.update_hex_view()
+        self.update_alt_hex_view()
+        self.update_mac_hex_view()
+        self.update_a2l_view()
+        self.update_project_labels()
+        self.update_memory_map()
+        self._refresh_loaded_panel()
+        self.set_status(f"Unloaded {label}.")
+
+    def _refresh_loaded_panel(self) -> None:
+        """
+        Summary:
+            Drive the Workspace "Loaded" panel to redraw its three artifact
+            slots from the current ``current_file`` snapshot (unload feature
+            Inc-2). Guarded so a not-yet-mounted tree (headless unit tests) is a
+            no-op, matching ``_apply_empty_state`` / ``update_memory_map``.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Raises:
+            None
+
+        Data Flow:
+            - Resolve ``#loaded_panel`` and call ``render_slots(current_file)``;
+              a missing widget tree is tolerated.
+
+        Dependencies:
+            Uses:
+                - ``LoadedArtifactsPanel.render_slots``.
+            Used by:
+                - ``_apply_unload`` (post-unload refresh) and the load path's
+                  ``_step_finalize`` (post-load refresh).
+        """
+        try:
+            panel = self.query_one("#loaded_panel", LoadedArtifactsPanel)
+        except Exception:
+            return
+        panel.render_slots(self.current_file)
+
+    def on_loaded_artifacts_panel_unload_requested(
+        self, message: "LoadedArtifactsPanel.UnloadRequested"
+    ) -> None:
+        """
+        Summary:
+            Handle a ``[u]`` / ``[U]`` press from the Workspace "Loaded" panel by
+            unloading the named artifact (unload feature Inc-2).
+
+        Args:
+            message (LoadedArtifactsPanel.UnloadRequested): Carries the artifact
+                key (``"primary"`` / ``"mac"`` / ``"a2l"`` / ``"all"``).
+
+        Returns:
+            None
+
+        Raises:
+            None
+
+        Data Flow:
+            - Stop the message and dispatch to ``_apply_unload(message.artifact)``,
+              which rebuilds ``current_file`` and refreshes every view (including
+              this panel via ``_refresh_loaded_panel``).
+
+        Dependencies:
+            Uses:
+                - ``_apply_unload``.
+            Used by:
+                - Textual message dispatch (from ``LoadedArtifactsPanel``).
+        """
+        message.stop()
+        self._apply_unload(message.artifact)
+
+    def action_unload_all(self) -> None:
+        """
+        Summary:
+            ``U`` binding handler — unload every artifact at once.
+
+        Args:
+            None
+
+        Returns:
+            None
+
+        Raises:
+            None
+
+        Data Flow:
+            - Delegates to ``_apply_unload("all")``.
+
+        Dependencies:
+            Uses:
+                - ``_apply_unload``.
+            Used by:
+                - The ``U`` key binding.
+        """
+        self._apply_unload("all")
+
     def _invalidate_mac_view_cache(self) -> None:
         """
         Summary:
@@ -8486,6 +8910,7 @@ class S19TuiApp(App):
             try:
                 self.update_project_labels()
                 self.update_memory_map()
+                self._refresh_loaded_panel()
             finally:
                 total_elapsed = time.perf_counter() - load_started
                 self.logger.info(
