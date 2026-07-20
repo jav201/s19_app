@@ -72,7 +72,13 @@ The frozen guards diff a2l.py against the **`main`** ref (`git diff --stat main 
 - **Phase 2** ✅ triple review complete → BLOCKERS on P-1b → operator **DESCOPED** (2026-07-19): defer P-1b, ship F841 + P-2 only. F841 + P-2 reviewed CLEAN by all 3 agents. Reduced gate self-approved. See `02-review.md`.
 - **Phase 3** ✅ COMPLETE — Inc-1 (F841) APPROVED. a2l.py −1 dead-store line + NEW test_a2l_f841_cleanup.py (TC-094/AT-094). ruff F841 0; new test 2 passed; frozen guards 10 passed; C-34 full guard-host 174 passed; code-reviewer independent APPROVE 0 findings.
 - **Phase 4** ▶ in progress — orchestrator-owned gate suite `pytest -q -m "not slow"` running (C-25); expected baseline+2 green.
-- **PR-B (P-2 re-freeze)** — pending PR-A merge (post-merge follow-up).
+- **Phase 5** ✅ postmortem approved; **C-35 encoded** (global dev-flow.md, operator-approved) + lineage memory updated.
+- **Phase 6** ✅ docs written (traceability-matrix, functionality, executive-summary; diagrams N/A — no architectural change). No REQUIREMENTS.md change (F841/P-2 add no behavior).
+- **PR-A** ✅ committed `9e9a90f`, pushed, opened [#99](https://github.com/jav201/s19_app/pull/99). ▶ CI running (tui-ci blocking + snapshot advisory). Awaiting green → final PR-QA gate → self-merge.
+- **PR-B (P-2 re-freeze)** — PENDING PR-A merge. Prepared edits (guard-files-only, off MERGED main):
+  1. `tests/test_engine_unchanged.py` — re-add `"s19_app/tui/a2l.py"` to `_ENGINE_PATHS` (after `validation` @ ~:124); delete the 5-line UNFROZEN NOTE (:125-129).
+  2. `tests/test_tui_directionb.py` — re-add `"s19_app/tui/a2l.py"` to the tc031 `_ENGINE_PATHS` tuple (@ ~:5424); delete the UNFROZEN NOTE (:5425-5428).
+  Verify: `pytest -k "tc031 or tc032 or tc027"` green + `git diff main -- s19_app/tui/a2l.py` empty.
 
 ## REDUCED SCOPE (post-Phase-2 operator descope)
 - **PR-A / Inc-1 — F841:** delete dead `header` local (`a2l.py:942`) + TC-094/AT-094 in a NON-frozen sibling.
