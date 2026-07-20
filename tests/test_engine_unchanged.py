@@ -122,11 +122,11 @@ _ENGINE_PATHS: list[str] = [
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # NOTE: ``s19_app/tui/a2l.py`` was deliberately UNFROZEN in the
-    # a2l-missing-length-fix batch (operator-approved parsing-logic fix to
-    # ``_tag_schema_and_applicability`` — a valid-address/underivable-length
-    # record is spec-valid, not a schema failure). It is intentionally absent
-    # from this frozen set so the sanctioned edit does not trip the guard.
+    # ``s19_app/tui/a2l.py`` was temporarily UNFROZEN for the
+    # a2l-missing-length-fix / a2l-record-layout-length batches (operator-
+    # approved parsing-logic fixes) and RE-FROZEN in batch-50 (P-2) once its
+    # sanctioned edits landed. It is a read-only oracle again.
+    "s19_app/tui/a2l.py",
     "s19_app/tui/mac.py",
 ]
 
