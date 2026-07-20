@@ -327,18 +327,19 @@ def test_at101_megabyte_unterminated_block_is_linear(tmp_path: Path) -> None:
 
 
 def test_at102_curve_map_length_stays_none() -> None:
-    """CURVE/MAP STD_AXIS chars keep ``length is None`` (batch-55 owns the summer).
+    """Inline STD_AXIS CURVE/MAP now report the summed byte length (batch-55 summer landed).
 
-    Intent: now that the header populates ``deposit``/``char_type``, the length
-    inferer must still NOT size a CURVE/MAP from its element-only deposit (that
-    would under-report the array span). This guards the batch boundary — a
-    premature length summer would trip here.
+    Intent: batch-54 populated ``deposit``/``char_type``/``axis_meta``; batch-55's
+    inline-axis summer consumes them, so ``ASAM.C.CURVE.STD_AXIS`` sizes to 25 and
+    ``ASAM.C.MAP.STD_AXIS.STD_AXIS`` to 51. The None-anchor role (external axis
+    stays grey) moved to AT-106 (``ASAM.C.CURVE.COM_AXIS``) in
+    ``tests/test_a2l_inline_axis_length.py``.
     """
     chars = _chars(_DEMO_A2L)
     curve = next(t for t in chars if t["name"] == "ASAM.C.CURVE.STD_AXIS")
     cmap = next(t for t in chars if t["name"] == "ASAM.C.MAP.STD_AXIS.STD_AXIS")
-    assert curve["length"] is None
-    assert cmap["length"] is None
+    assert curve["length"] == 25
+    assert cmap["length"] == 51
 
 
 # ---------------------------------------------------------------------------
