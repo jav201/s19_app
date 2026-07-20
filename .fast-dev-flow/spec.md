@@ -1,105 +1,57 @@
-# fast-dev-flow spec — Discoverability: help panel + A2L Legend button
+# fast-dev-flow spec — Memory Map "No file loaded" when S19+MAC coexist
 
-- **Date:** 2026-07-18
-- **Batch:** discoverability-help-panel (prior backlog — the field-audit discoverability gap)
+- **Date:** 2026-07-20
+- **Batch:** fix-memmap-entropy-merge
 - **Flow:** /fast-dev-flow
 - **Language:** English
-- **Run mode / merge:** Autonomous through self-merge (operator-authorized for the prior-backlog run; approach + scope explicitly confirmed). Surface any HIGH finding / scope creep.
-- **Status:** Phase A — spec
+- **Run mode / merge:** to confirm at the Phase-A gate (default: operator merges). Surface any HIGH finding / scope creep.
+- **Status:** CLOSED 2026-07-20.
+- **Branch:** `claude/fix-memmap-entropy-merge` off `main` `1cc5683`.
 
 ---
 
 ## 1. Objective
+Fix a real bug: the **Memory Map view shows "No file loaded" even though an S19/HEX is loaded**, whenever a **MAC coexists** with the primary image. Restore the map (and, defensively, stop the empty state from ever mislabelling a loaded image as "no file").
 
-Make the app's keyboard bindings discoverable. Today **24 of 27 app bindings are footer-invisible**
-(`show=False`) and there is **no help surface** — a user cannot learn most keys from the UI.
+## 2. Root cause (diagnosed + reproduced)
+- `LoadedFile.entropy_windows` (added batch-45, PR #81) is a **derived loader fact**, computed at load in `load_service` and consumed by the Memory Map: `MemoryMapPanel.render_ranges` (`s19_app/tui/screens_directionb.py:1452`) shows `_EMPTY_TEXT = "No file loaded - press Ctrl+L…"` when `not entropy_windows`.
+- When an S19/HEX + MAC **coexist**, the app rebuilds `LoadedFile` via `_merge_primary_with_existing_mac` (`app.py:7652`) and `_merge_mac_with_existing_primary` (`app.py:7699`). Both explicitly carry `out_of_order_count` + `entry_point` forward as "derived loader facts" **but omit `entropy_windows`** → it resets to its empty default → the map falsely shows "No file loaded".
+- **Not introduced by the recent A2L batches.** batch-45 added the field + the dependency without updating the two merge constructors (a missed writer-site).
+- **Reproduced:** `examples/case_01_basic_valid/` (firmware.s19 + firmware.mac + firmware.a2l). A pure S19 (no MAC) works — it returns the `load_service`-built payload with `entropy_windows` intact.
 
-## 2. Root cause / opportunity (grounded)
-
-`S19TuiApp.BINDINGS` has 24 `show=False` vs 3 `show=True`; the rail screen keys (1–8), save/load
-project, dump-json, before/after report, undo/redo, paging keys, etc. never appear on the Footer.
-Textual 8.2.8 ships a **free built-in help panel** — `App.action_show_help_panel` /
-`action_hide_help_panel` + the `HelpPanel` widget — that renders **every** active binding (key +
-description) in a dockable panel. It is currently unbound.
-
-The A2L screen also lacks the on-screen **Legend** button that MAC (`#mac_legend_button`) and Issues
-(`#issues_legend_button`) both have; A2L relies only on the `k` key (`action_show_legend`).
-
-## 3. The change (additive — no existing layout altered; honours the v1-redesign rejection)
-
-- **Inc 1 — Help panel.** Add one footer-*visible* binding
-  `Binding("question_mark", "show_help_panel", "Help", show=True)` to `S19TuiApp.BINDINGS`. It calls
-  Textual's built-in `action_show_help_panel`, which lists all bindings — so all 24 invisible keys
-  become discoverable in one place, and future bindings are auto-included. No new action method, no
-  layout change.
-- **Inc 2 — A2L Legend button.** Add `Button("Legend", id="a2l_legend_button")` to the A2L filter
-  button row in `_compose_screen_a2l`, and route `#a2l_legend_button` in `on_button_pressed` to the
-  existing `action_show_legend` (exactly as the MAC/Issues buttons do).
+## 3. User stories
+- As an engineer, when I load an S19 alongside a MAC, I want the Memory Map to render the actual map (not "No file loaded"), so I can see coverage.
+- As a maintainer, I want the empty-state message to distinguish "no file loaded" from "loaded but no entropy data", so a display gap never masquerades as an unloaded file.
 
 ## 4. Acceptance criteria (observable)
+- **AC-1** — When an S19/HEX primary and a MAC are merged (either order), the resulting `LoadedFile.entropy_windows` **shall equal the surviving primary image's** `entropy_windows` (non-empty for a non-empty image), not the empty default. *(Verified against both `_merge_primary_with_existing_mac` and `_merge_mac_with_existing_primary`.)*
+- **AC-2** — When an S19/HEX + MAC coexist, `MemoryMapPanel.render_ranges` fed the merged payload **shall render the band view** (header ≠ `_EMPTY_TEXT`), i.e. the map is drawn.
+- **AC-3** — When `render_ranges` is given non-empty `ranges` but empty `entropy_windows`, its empty-state header **shall NOT read "No file loaded"** — it shall show a distinct "no entropy/coverage detail" message, reserving the "No file loaded" text for the genuinely-no-image case (`not ranges`).
+- **AC-4 (regression)** — A pure S19 load (no MAC) **shall** still render the map unchanged (no behavior change on the non-coexistence path).
 
-- **AC-1** — A `Binding` for `question_mark → show_help_panel` with `show=True` is present in
-  `S19TuiApp.BINDINGS` (Footer advertises "Help").
-- **AC-2** — Pressing `?` mounts Textual's `HelpPanel` (a `HelpPanel` widget is present in the DOM
-  after the key); pressing it again / the panel's close removes it. (Driven through real key
-  dispatch.)
-- **AC-3** — The A2L screen renders a visible `#a2l_legend_button`, and pressing it pushes a
-  `LegendScreen` (same outcome as the `k` key and the MAC/Issues Legend buttons).
-- **AC-4** — Full gate `pytest -q -m "not slow"` green **except** the expected Footer SVG drift (see
-  §6); no engine module or frozen test file modified.
+## 5. Out of scope
+- The unload feature (separate design/batch). The A2L length work (batch-56). Any entropy recomputation change (`compute_entropy` is unchanged — the fix only carries the already-computed windows forward). No engine-frozen module is touched (`core.py`/`hexfile.py`/`range_index.py`/`validation/`/`tui/a2l.py`/`tui/mac.py`/`tui/color_policy.py`).
 
-## 5. Security flags
+## 6. Security flags
+- Scanned objective + criteria + description for sensitive patterns (auth / secrets / external integrations / PII / destructive DB / input surface / network exposure).
+- **No flags fire.** The change is an in-memory carry-forward of an already-computed field + a UI string; it adds no input surface, no external call, no secret/auth/PII/DB/network path. Parsing is untouched.
+- **`security_required: false`.**
 
-Scanned. No auth/secrets/external/PII/destructive-DB/network patterns. `security_required: **false**`.
-Both changes are read-only UI affordances over existing actions.
-
-## 6. Snapshot drift (expected, handled)
-
-A footer-*visible* binding renders on the Footer of **every** screen, so the wide-cell `tc016s` SVG
-baselines drift (batch-45 FOOTER-DRIFT precedent). Adding the A2L Legend button also drifts the A2L
-screen cells. Per the snapshot-regen policy these regenerate **only in canonical CI** (textual==8.2.8),
-not locally. Handling: mark the expected-drift cells (a `_discoverability_drift_marks` xfail set, tight
-per-cell, 0 xpassed) so the PR gate is honest, then a **canonical-CI snapshot-regen** follow-up clears
-them (the batch-45/48 pattern).
-
-## 7. Files (blast radius)
-
-**Increment 1 (2 files):**
-1. `s19_app/tui/app.py` — the `?` Help binding.
-2. `tests/test_tui_directionb.py` (or a new test file) — AC-1/AC-2 (binding present + `?` mounts HelpPanel).
-
-**Increment 2 (2 files):**
-3. `s19_app/tui/app.py` — the A2L Legend button + `on_button_pressed` route (same file, one increment later).
-4. `tests/…` — AC-3 (button present + pushes LegendScreen).
-
-**Increment 3 — snapshot drift marks + docs (2 files):**
-5. `tests/test_tui_snapshot.py` — the expected Footer/A2L drift xfail marks.
-6. `REQUIREMENTS.md` — note the help-panel discoverability affordance + A2L Legend parity.
-
-## 8. Deferred (rest of the discoverability gap — separate items)
-
-- Footer mid-word truncation at 120 cols · settings-menu surfacing (palette-only today) · CRC-write
-  2-deep modal chain · the 14/30 A2L tag fields dropped from the table.
-
-## 9. HIGH finding — Increment 2 (A2L Legend button) DROPPED
-
-Implementing the A2L Legend button surfaced a conflict with a **deliberate prior decision, C-13**:
-A2L omits the Legend button on purpose because its filter row is too crowded — a button there
-**clips off-screen at 80 cols** (measured: right edge at col 93 on an 80-col screen → unreachable),
-so A2L uses the footer-visible `k` key instead. `test_tui_legend.py::test_at023e_c13_geometry_at_80_cols`
-and `::test_tc023_2_mac_issues_buttons_present_a2l_absent` encode this. My button reintroduced the
-exact bug those tests guard.
-
-The button was also **redundant**: the A2L legend is already reachable via the footer-visible `k`
-key, and Increment 1's help panel lists `k → Legend`, making it discoverable at **every** width —
-strictly better than a button that can't fit at 80 cols. **Decision (operator surfaced): drop the
-A2L Legend button; ship only the help panel.** The two C-13 tests are left intact (restored to
-green); the discoverability goal is fully met by the help panel.
-
-`test_tc081_4_no_binding_diff` (the batch-48 C-28 binding-census guard) is updated to **sanction**
-the one intended `?`→`show_help_panel` binding (whose snapshot drift is handled by
-`_discoverability_drift_marks`) while still firing for any other binding change.
+## 7. Plan (increments)
+- **Inc-1 (1 file):** `app.py` — carry `entropy_windows` forward in both merge constructors (7652 → `primary_loaded.entropy_windows`; 7699 → `existing.entropy_windows`). *(Consider whether other derived fields are also missed — quick audit of the merge kwargs vs LoadedFile derived fields.)*
+- **Inc-2 (1-2 files):** `screens_directionb.py` — split the `render_ranges` empty branch: `not ranges` → "No file loaded"; `ranges but not entropy_windows` → a distinct "no entropy detail" message (still draws the coverage stats strip). + a regression test in a NON-frozen test file (S19+MAC merge preserves `entropy_windows`; render draws the map; loaded-but-no-entropy ≠ "No file loaded").
 
 ## 10. Batch status
+- CLOSED 2026-07-20. All 4 ACs covered + green; no regressions; no security flags.
 
-| Current phase | Phase B — Inc 1 (help panel) shipped; Inc 2 (A2L Legend) dropped per C-13 |
+## 11. Close
+
+**What changed.** The S19+MAC merge constructors (`_merge_primary_with_existing_mac`, `_merge_mac_with_existing_primary` in `app.py`) now carry the primary image's derived loader facts `entropy_windows` **and** `source_s0_header` forward — they were previously dropped, resetting `entropy_windows` to `[]` and making the Memory Map falsely report "No file loaded" whenever an S19/HEX coexisted with a MAC. A quick audit found `source_s0_header` was dropped by the same omission (latent S0-header loss on coexistence) and is now carried too. Defensively, `MemoryMapPanel.render_ranges` splits its empty state: `not ranges` → "No file loaded"; ranges-present-but-no-entropy → a distinct `_NO_ENTROPY_TEXT` note with the real coverage stats — so a loaded image can never be mislabelled "No file loaded" again.
+
+**How it was tested.** `tests/test_memmap_entropy_merge.py` (4 tests): `test_merge_primary_with_existing_mac_carries_entropy_and_s0` + `test_merge_mac_with_existing_primary_carries_entropy_and_s0` (AC-1, both merges), `test_memory_map_renders_when_s19_and_mac_coexist` (AC-2, through `update_memory_map`), `test_render_ranges_loaded_no_entropy_not_labelled_no_file` (AC-3). All 4 pass. Regression: `test_tui_app.py -k "merge or memory or mac"` 23 passed; `test_tui_directionb.py -k "memory or map or entropy or band"` 22 passed; engine-frozen dual-guard 11 passed (0 frozen files touched); ruff clean. Reproduced originally with `examples/case_01_basic_valid` (s19+mac+a2l).
+
+**Open risks / pending.** None. Full suite runs in CI on the PR.
+
+**Security flags.** None fired (`security_required: false`) — in-memory carry-forward + a UI string; no new input surface, external call, or secret/auth/PII/DB/network path.
+
+**Suggested commit message.** `fix(tui): carry entropy_windows + source_s0_header through the S19+MAC merge`

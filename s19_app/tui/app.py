@@ -7667,8 +7667,13 @@ class S19TuiApp(App):
             variant_id=primary_loaded.variant_id,
             # Derived loader facts belong to the NEW primary image — carry them
             # forward so the merge does not reset them to defaults (LLR-066.7).
+            # entropy_windows + source_s0_header were previously dropped here: the
+            # empty entropy list made the Memory Map falsely report "No file
+            # loaded" whenever an S19/HEX coexisted with a MAC (fix-memmap-entropy).
             out_of_order_count=primary_loaded.out_of_order_count,
             entry_point=primary_loaded.entry_point,
+            entropy_windows=primary_loaded.entropy_windows,
+            source_s0_header=primary_loaded.source_s0_header,
         )
 
     def _merge_mac_with_existing_primary(self, mac_loaded: LoadedFile) -> LoadedFile:
@@ -7714,8 +7719,13 @@ class S19TuiApp(App):
             variant_id=existing.variant_id,
             # The primary's derived loader facts survive the MAC overlay — carry
             # them forward so the merge does not reset them (LLR-066.7, AT-066d).
+            # entropy_windows + source_s0_header were previously dropped here: the
+            # empty entropy list made the Memory Map falsely report "No file
+            # loaded" once a MAC was overlaid on a loaded image (fix-memmap-entropy).
             out_of_order_count=existing.out_of_order_count,
             entry_point=existing.entry_point,
+            entropy_windows=existing.entropy_windows,
+            source_s0_header=existing.source_s0_header,
         )
 
     def _invalidate_mac_view_cache(self) -> None:

@@ -1272,6 +1272,10 @@ class MemoryMapPanel(Container):
     """
 
     _EMPTY_TEXT = "No file loaded - press Ctrl+L (or 'l') to load a file."
+    #: Shown when an image IS loaded but yields no entropy band detail (zero
+    #: span or band-less image) — kept distinct from ``_EMPTY_TEXT`` so a loaded
+    #: image is never mislabelled "No file loaded" (fix-memmap-entropy AC-3).
+    _NO_ENTROPY_TEXT = "No entropy detail for this image."
     _DETAIL_HINT = "Click a region row to inspect it and jump to the hex view."
 
     class OpenInHexRequested(Message):
@@ -1451,9 +1455,18 @@ class MemoryMapPanel(Container):
         span = span_end - span_start
         if not ranges or span <= 0 or not entropy_windows:
             self._ordered_ranges = []
-            self.rendered_text = self._EMPTY_TEXT
-            header.update(self._EMPTY_TEXT)
-            self._render_stats([], [], self._issues, empty=True)
+            if not ranges:
+                # Genuinely no image loaded.
+                empty_msg = self._EMPTY_TEXT
+                self._render_stats([], [], self._issues, empty=True)
+            else:
+                # An image IS loaded but has no entropy band detail (zero span or
+                # band-less) — never mislabel it "No file loaded"; still show the
+                # coverage stats strip from the real ranges (fix-memmap-entropy AC-3).
+                empty_msg = self._NO_ENTROPY_TEXT
+                self._render_stats(ranges, range_validity, self._issues, empty=False)
+            self.rendered_text = empty_msg
+            header.update(empty_msg)
             return
 
         ordered: List[Tuple[int, int, bool]] = []
