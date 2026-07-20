@@ -939,7 +939,6 @@ def extract_a2l_tags(
                 header_char = (
                     parse_characteristic_header(hdr_line) if name == "CHARACTERISTIC" and hdr_line else None
                 )
-                header = header_meas or header_char
 
                 tag: dict = {
                     "section": name,
