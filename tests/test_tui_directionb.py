@@ -5422,10 +5422,11 @@ _ENGINE_PATHS: tuple[str, ...] = (
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # NOTE: ``s19_app/tui/a2l.py`` was deliberately UNFROZEN in the
-    # a2l-missing-length-fix batch (operator-approved parsing-logic fix to
-    # ``_tag_schema_and_applicability``). It is intentionally absent from this
-    # frozen set so the sanctioned edit does not trip TC-031.
+    # ``s19_app/tui/a2l.py`` was temporarily UNFROZEN for the
+    # a2l-missing-length-fix / a2l-record-layout-length batches and RE-FROZEN
+    # in batch-50 (P-2) once its sanctioned edits landed — a read-only oracle
+    # again, so TC-031 guards it vs ``main`` like the other engine modules.
+    "s19_app/tui/a2l.py",
     "s19_app/tui/mac.py",
     "s19_app/tui/color_policy.py",
 )
