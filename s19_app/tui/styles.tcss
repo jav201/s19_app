@@ -1668,3 +1668,65 @@ ModalScreen {
 #workspace_shell.width-narrow .rail-item {
     padding: 0;
 }
+
+/* --- Flow Builder — Direction A "Pipeline Ledger" (batch-51, R-TUI-088) ----
+ * The run-result pane: a flow-status banner, one vertical block-node per
+ * BlockResult with a `sev-*` status gutter, an `N-1` bordered separator
+ * between nodes (tone `$rule`, LLR-088.3), the single memory ribbon
+ * (LLR-088.4 / AMD-1), and the written-path lines. Colour flows through the
+ * frozen `.sev-*` classes (styles.tcss:529-546); this block owns only layout.
+ */
+#flow_gating {
+    width: 18;
+}
+
+#flow_result {
+    height: 1fr;
+    border: round $rule;
+    padding: 0 1;
+}
+
+.flow-banner {
+    text-style: bold;
+    width: auto;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+.flow-node {
+    height: auto;
+    padding: 0 0 0 1;
+}
+
+.flow-node-head {
+    text-style: bold;
+}
+
+.flow-node-summary {
+    padding-left: 2;
+}
+
+.flow-finding, .flow-diag {
+    padding-left: 4;
+}
+
+/* Block separator (LLR-088.3): a one-cell bordered rule of tone `$rule`
+ * between consecutive nodes — the border IS the divider (no `Rule` widget). */
+.flow-sep {
+    height: 1;
+    border-top: solid $rule;
+    margin: 0 1;
+}
+
+.flow-ribbon {
+    height: 1;
+    margin-top: 1;
+}
+
+.flow-ribbon-cap {
+    height: 1;
+}
+
+.flow-wrote, .flow-run-diag {
+    padding-left: 1;
+}

@@ -58,6 +58,7 @@ from textual.containers import (
     VerticalScroll,
 )
 from textual.message import Message
+from textual.widget import Widget
 from textual.widgets import (
     Button,
     DataTable,
@@ -91,9 +92,20 @@ from .os_clipboard_input import OsClipboardInput
 from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
 from .services.flow_model import (
+    BLOCK_CHECK,
     BLOCK_PATCH,
     BLOCK_SOURCE,
+    BLOCK_STATUS_ERROR,
+    BLOCK_STATUS_NOTICES,
+    BLOCK_STATUS_OK,
+    BLOCK_STATUS_SKIPPED,
     BLOCK_WRITE_OUT,
+    CHECK_GATING_ADVISORY,
+    CHECK_GATING_BLOCK_OWN,
+    FLOW_STATUS_ERROR,
+    FLOW_STATUS_ISSUES,
+    FLOW_STATUS_OK,
+    CheckBlock,
     Flow,
     FlowBlock,
     FlowRunResult,
@@ -2044,10 +2056,21 @@ class MemoryMapPanel(Container):
         return safe_text(rendered)
 
 
-def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:
-    """Build a typed :class:`FlowBlock` from the panel's (kind, ref) selection.
+def _make_flow_block(
+    kind: str, ref: str, gating: str = CHECK_GATING_ADVISORY
+) -> Optional[FlowBlock]:
+    """Build a typed :class:`FlowBlock` from the panel's selection.
 
-    Returns ``None`` for an unknown kind or an empty ref (the panel no-ops).
+    Args:
+        kind (str): The block-kind discriminator (``BLOCK_SOURCE`` — surfaced as
+            "Load" — / ``BLOCK_PATCH`` / ``BLOCK_CHECK`` / ``BLOCK_WRITE_OUT``).
+        ref (str): The block's project-relative ref (image / doc / output name).
+        gating (str): The CHECK gating flag (``CHECK_GATING_ADVISORY`` default or
+            ``CHECK_GATING_BLOCK_OWN``); used only when ``kind == BLOCK_CHECK``.
+
+    Returns:
+        Optional[FlowBlock]: The built block, or ``None`` for an unknown kind or
+        an empty ref (the panel no-ops).
     """
     ref = ref.strip()
     if not ref:
@@ -2056,6 +2079,8 @@ def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:
         return SourceBlock(ref)
     if kind == BLOCK_PATCH:
         return PatchBlock(ref)
+    if kind == BLOCK_CHECK:
+        return CheckBlock(ref, gating=gating)
     if kind == BLOCK_WRITE_OUT:
         return WriteOutBlock(ref)
     return None
@@ -2064,12 +2089,117 @@ def _make_flow_block(kind: str, ref: str) -> Optional[FlowBlock]:
 def _flow_block_label(block: FlowBlock) -> str:
     """One-line display label for a block (plain text — rendered markup-safe)."""
     if isinstance(block, SourceBlock):
-        return f"SOURCE  {block.image_ref}  ({block.file_type})"
+        return f"LOAD  {block.image_ref}  ({block.file_type})"
     if isinstance(block, PatchBlock):
         return f"PATCH   {block.change_doc_ref}"
+    if isinstance(block, CheckBlock):
+        return f"CHECK  {block.check_doc_ref}  ({block.gating})"
     if isinstance(block, WriteOutBlock):
         return f"WRITE-OUT  {block.output_name}  ({block.fmt})"
     return "?"
+
+
+#: Block-status → frozen ``sev-*`` CSS class (LLR-088.1). Lives HERE, not in the
+#: frozen ``color_policy.py`` (D4): the flow render maps a block STATUS token to
+#: an existing ``.sev-*`` class directly, it does not route through
+#: ``SEVERITY_CLASS_MAP`` (which keys on ``ValidationSeverity``). 0 diff to the
+#: frozen file. Every ``BLOCK_STATUS_*`` token has an entry (no unmapped status).
+_BLOCK_STATUS_SEV_CLASS = {
+    BLOCK_STATUS_OK: "sev-ok",
+    BLOCK_STATUS_NOTICES: "sev-warning",
+    BLOCK_STATUS_ERROR: "sev-error",
+    BLOCK_STATUS_SKIPPED: "sev-neutral",
+}
+
+#: A per-status gutter glyph (enum-derived, never file-derived).
+_BLOCK_STATUS_GLYPH = {
+    BLOCK_STATUS_OK: "●",        # ● ok
+    BLOCK_STATUS_NOTICES: "◈",   # ◈ notices
+    BLOCK_STATUS_ERROR: "✖",     # ✖ error
+    BLOCK_STATUS_SKIPPED: "○",   # ○ skipped
+}
+
+#: Flow-status → (banner text, ``sev-*`` class) (LLR-088.5). The banner text is
+#: derived from the status ENUM, so it is NOT a markup sink (out of the C-17
+#: sweep — the coordinator's exclusion, security F1).
+_FLOW_STATUS_BANNER = {
+    FLOW_STATUS_OK: ("CLEAN", "sev-ok"),
+    FLOW_STATUS_ISSUES: ("ISSUES", "sev-warning"),
+    FLOW_STATUS_ERROR: ("FAILED", "sev-error"),
+}
+
+#: The memory ribbon's fixed cell budget. A FIXED strip sized to clear the
+#: tightest supported regime's measured content width — so it fits the 80×24
+#: floor AND every wider regime with no horizontal overflow (LLR-088.4,
+#: C-13/C-23/C-29). MEASURED in the mounted ``#flow_result`` via
+#: ``App.run_test`` — NOT inherited from the HTML prototype's ~82/150-col budget
+#: (C-16). Measured content widths (both axes, over a real LOAD→WRITE-OUT run):
+#:
+#: ===========  ==============================  ====================
+#: regime       ``#flow_result`` content width  region (border+pad)
+#: ===========  ==============================  ====================
+#: 80×24        **70**  ← binding floor          74  (= 70 + 2 + 2)
+#: 120×30       92                               96
+#: 160×40       132                              136
+#: ===========  ==============================  ====================
+#:
+#: 48 cells clears the binding 70-col floor by 22, so the strip never wraps or
+#: overflows at any regime. ``test_flow_builder_render.py::
+#: test_ribbon_geometry_measured`` re-measures and asserts ``ribbon.region.width
+#: <= container content width`` at 80×24 AND wide rather than trusting this table.
+_RIBBON_CELLS = 48
+
+_RIBBON_FILLED = "█"  # █ mapped
+_RIBBON_GAP = "░"     # ░ gap
+
+
+def _memory_ribbon_text(
+    ranges: Sequence[Tuple[int, int]], cells: int = _RIBBON_CELLS
+) -> Text:
+    """Render the working image's address footprint as a fixed-width strip.
+
+    Summary:
+        Map ``[min_start, max_end)`` across ``cells`` columns; a column is filled
+        (mapped) when any range intersects it, else a gap. Pure + int-derived
+        (address integers only — NOT file text), so the strip is NOT a markup
+        sink and is deterministically unit-testable. Batch-51 renders a SINGLE
+        strip (§6.5 AMD-1): there is no range-growing block yet, so a "before"
+        row would be identical — the twin/before row is a batch-52 CRC carry.
+
+    Args:
+        ranges (Sequence[Tuple[int, int]]): The image's ``(start, end)`` ranges
+            (``FlowRunResult.image_ranges``); empty when no image was loaded.
+        cells (int): The fixed cell budget (defaults to the measured
+            ``_RIBBON_CELLS``).
+
+    Returns:
+        Text: A ``Text`` of exactly ``cells`` block/gap glyphs, or an empty
+        ``Text`` when there is no footprint / a non-positive budget.
+    """
+    if not ranges or cells <= 0:
+        return Text("")
+    low = min(start for start, _ in ranges)
+    high = max(end for _, end in ranges)
+    if high <= low:
+        return Text(_RIBBON_FILLED * cells)
+    span = high - low
+    glyphs = []
+    for i in range(cells):
+        col_lo = low + span * i / cells
+        col_hi = low + span * (i + 1) / cells
+        filled = any(start < col_hi and end > col_lo for start, end in ranges)
+        glyphs.append(_RIBBON_FILLED if filled else _RIBBON_GAP)
+    return Text("".join(glyphs))
+
+
+def _ribbon_caption(ranges: Sequence[Tuple[int, int]]) -> str:
+    """One-line ribbon caption (int-derived: range count + hex extents)."""
+    if not ranges:
+        return "no image loaded"
+    low = min(start for start, _ in ranges)
+    high = max(end for _, end in ranges)
+    plural = "" if len(ranges) == 1 else "s"
+    return f"{len(ranges)} range{plural} · 0x{low:X}‥ 0x{high:X}"
 
 
 class FlowBuilderPanel(ScrollableContainer):
@@ -2101,11 +2231,22 @@ class FlowBuilderPanel(ScrollableContainer):
               ``S19TuiApp.on_flow_builder_panel_run_requested``
     """
 
-    #: The dropdown block-kind options (label, ``kind`` value).
+    #: The dropdown block-kind options (label, ``kind`` value). SOURCE is
+    #: surfaced as "Load" (LLR-088.7 / D1) but keeps the ``BLOCK_SOURCE``
+    #: ("source") discriminator so batch-53 persistence is unaffected.
     _KIND_OPTIONS = [
-        ("Source (image)", BLOCK_SOURCE),
+        ("Load (image)", BLOCK_SOURCE),
         ("Patch (change doc)", BLOCK_PATCH),
+        ("Check (address list)", BLOCK_CHECK),
         ("Write-out (file)", BLOCK_WRITE_OUT),
+    ]
+
+    #: The CHECK per-block gating options (label, gating value) — the minimal
+    #: user-visible setter (LLR-086.1, the OPEN gating-UI flag). Read by Add only
+    #: when the kind is CHECK; ignored otherwise.
+    _GATING_OPTIONS = [
+        ("advisory", CHECK_GATING_ADVISORY),
+        ("block-own-op", CHECK_GATING_BLOCK_OWN),
     ]
 
     class RunRequested(Message):
@@ -2137,6 +2278,12 @@ class FlowBuilderPanel(ScrollableContainer):
                 allow_blank=False,
                 id="flow_kind",
             ),
+            Select(
+                self._GATING_OPTIONS,
+                value=CHECK_GATING_ADVISORY,
+                allow_blank=False,
+                id="flow_gating",
+            ),
             Input(
                 placeholder="ref (image / change-doc / output name)",
                 id="flow_ref",
@@ -2150,7 +2297,7 @@ class FlowBuilderPanel(ScrollableContainer):
             Button("Clear", id="flow_clear"),
             id="flow_run_row",
         )
-        yield Static("", id="flow_result", markup=False)
+        yield VerticalScroll(id="flow_result")
 
     def _blocks_text(self) -> Text:
         if not self._blocks:
@@ -2169,7 +2316,8 @@ class FlowBuilderPanel(ScrollableContainer):
         if event.button.id == "flow_add":
             kind = str(self.query_one("#flow_kind", Select).value)
             ref = self.query_one("#flow_ref", Input).value
-            block = _make_flow_block(kind, ref)
+            gating = str(self.query_one("#flow_gating", Select).value)
+            block = _make_flow_block(kind, ref, gating)
             if block is None:
                 return
             self._blocks.append(block)
@@ -2182,25 +2330,111 @@ class FlowBuilderPanel(ScrollableContainer):
         elif event.button.id == "flow_clear":
             self._blocks.clear()
             self._refresh_blocks()
-            self.query_one("#flow_result", Static).update(safe_text(""))
+            self.query_one("#flow_result", VerticalScroll).remove_children()
 
     def render_result(self, result: FlowRunResult) -> None:
-        """Paint the ``#flow_result`` pane from a run outcome (markup-safe)."""
-        text = Text()
-        text.append(f"Run: {result.status}\n")
-        for block_result in result.block_results:
-            text.append(f"  [{block_result.status}] ")
-            text.append(safe_text(f"{block_result.kind}: {block_result.summary}"))
-            text.append("\n")
+        """Paint the ``#flow_result`` pane as the Direction-A Pipeline Ledger.
+
+        Summary:
+            Mount, into the ``#flow_result`` :class:`VerticalScroll`, the
+            flow-status banner (LLR-088.5), one vertical block-node per
+            ``BlockResult`` with a ``sev-*`` status gutter (LLR-088.1/.2), an
+            ``N−1`` bordered separator between nodes (LLR-088.3), the single
+            memory ribbon of the image footprint (LLR-088.4 / §6.5 AMD-1), and
+            the written-path lines. EVERY file-derived string is rendered in its
+            OWN ``Static(safe_text(...), markup=False)`` so a hostile payload
+            renders literally (LLR-088.6 / C-17); the banner + ribbon are
+            enum/int-derived and are correctly out of that sweep.
+
+        Args:
+            result (FlowRunResult): The run outcome to paint.
+
+        Returns:
+            None
+        """
+        container = self.query_one("#flow_result", VerticalScroll)
+        container.remove_children()
+
+        widgets: List[Widget] = []
+
+        banner_text, banner_class = _FLOW_STATUS_BANNER.get(
+            result.status, (result.status.upper(), "sev-neutral")
+        )
+        widgets.append(
+            Static(banner_text, markup=False, classes=f"flow-banner {banner_class}")
+        )
+
+        blocks = result.block_results
+        for position, block_result in enumerate(blocks):
+            sev = _BLOCK_STATUS_SEV_CLASS.get(block_result.status, "sev-neutral")
+            glyph = _BLOCK_STATUS_GLYPH.get(block_result.status, "·")
+            head = Text(f"{glyph} {block_result.kind:<9} {block_result.status}")
+            node_children: List[Static] = [
+                Static(head, markup=False, classes="flow-node-head")
+            ]
+            if block_result.summary:
+                node_children.append(
+                    Static(
+                        safe_text(block_result.summary),  # SINK: summary
+                        markup=False,
+                        classes="flow-node-summary",
+                    )
+                )
+            for finding in block_result.findings:
+                node_children.append(
+                    Static(
+                        safe_text(finding.message),  # SINK: finding message
+                        markup=False,
+                        classes="flow-finding sev-warning",
+                    )
+                )
             for diagnostic in block_result.diagnostics:
-                text.append("      ")
-                text.append(safe_text(diagnostic))
-                text.append("\n")
+                node_children.append(
+                    Static(
+                        safe_text(diagnostic),  # SINK: diagnostic
+                        markup=False,
+                        classes="flow-diag sev-error",
+                    )
+                )
+            widgets.append(
+                Vertical(*node_children, classes=f"flow-node {sev}")
+            )
+            if position < len(blocks) - 1:
+                widgets.append(Static("", classes="flow-sep"))
+
+        widgets.append(
+            Static(
+                _memory_ribbon_text(result.image_ranges),
+                markup=False,
+                classes="flow-ribbon sev-info",
+            )
+        )
+        widgets.append(
+            Static(
+                _ribbon_caption(result.image_ranges),
+                markup=False,
+                classes="flow-ribbon-cap sev-neutral",
+            )
+        )
+
         for path in result.written_paths:
-            text.append("wrote: ")
-            text.append(safe_text(str(path)))
-            text.append("\n")
-        self.query_one("#flow_result", Static).update(text)
+            widgets.append(
+                Static(
+                    safe_text(str(path)),  # SINK: written path
+                    markup=False,
+                    classes="flow-wrote sev-ok",
+                )
+            )
+        for diagnostic in result.diagnostics:
+            widgets.append(
+                Static(
+                    safe_text(diagnostic),  # SINK: flow-diagnostic
+                    markup=False,
+                    classes="flow-run-diag sev-error",
+                )
+            )
+
+        container.mount(*widgets)
 
 
 class _Unset:
