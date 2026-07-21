@@ -17,7 +17,7 @@
     "wire_crc_py_deferred": "OPERATOR 2026-07-20 (AskUserQuestion 'Wire crc.py'='Diferir a follow-up'): do NOT wire the width-general kernel into shipped operations/crc.py this batch. The preview-only view uses the kernel directly; the result-identical crc32_stream refactor is deferred to a follow-up, stays in BACKLOG.",
     "batch_number": "58 per batch-57 deferral (57 = headless keel; 58 = the view + E4/E5/E6 + emit_job)."
   },
-  "current_phase": 4,
+  "current_phase": 5,
   "phase_status": "in-progress",
   "collision_resolution": "RESOLVED 2026-07-21: Javier adjudicated live (AskUserQuestion 'Dueno b58'='Esta sesion sigue') — THIS session owns batch-58 from Phase 3. Stand-down message delivered to local_b3ec8612 via ccd_session_mgmt.send_message. Branch rebased onto origin/main 1e3125b (RC-1 currency restored, merge-base==tip; PR #111 was docs-only .dev-flow/BACKLOG.md, clean rebase). Primary checkout stays on feat/batch-58-crc-designer-view (other session remains parked; RC-1 already-shipped grep is the mutual backstop). Base ref for this batch is now 1e3125b.",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
@@ -63,6 +63,12 @@
       "date": "2026-07-21",
       "decision": "Phase 3 COMPLETE — 7 increments all gate-APPROVED; advancing to Phase 4",
       "notes": "All 7 increments implemented + independently reviewed, 0 HIGH surviving. Commits: Inc-1 c16e01a (E4), Inc-2 c7a07a1 (E5 facade), Inc-3 8726fea (E6, code-review HIGH F1 vacuous digest test FIXED - oracle pinned 0x9C5BCBBD), Inc-4 05682e6+24424cb (view scaffold+rail, F1/F2 census fixed), Inc-5 4e66c3a (live verdict - reviewer proved AT-CRC-DSN-016 RED on handler removal), Inc-6 6659a43 (Load/Save - code+security both OK, traversal-proof, markup spans==[]), Inc-7 181e747 (coverage+gap-conflict+preview-only). Every increment: 0 frozen diffs (static census), RED->GREEN, per-increment CRC regression green. LOW carries -> postmortem/BACKLOG (Inc-5 F1 recompute-fanout/F2 preset-name; Inc-6 code-F1 redundant-name/sec-F1 overwrite-note/sec-F2 sanitize-collision; Inc-7 F1 _build_target-private-import/F2 conflict-format-dup). ENV: recurring checkout-hazard (tc031/engine-unchanged subprocess `git checkout main` stranded the shared primary twice on tool-timeout) — recovered losslessly each time, mitigated by per-increment commits + static frozen checks + branch re-verify after each sub-agent."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-21",
+      "decision": "Phase 4 validation PASS (self-approved); advancing to Phase 5",
+      "notes": "Orchestrator-owned gate run (C-25): pytest -m 'not slow' -k 'not tc031' --ignore=test_engine_unchanged.py -> 1757 passed / 2 skipped / 3 xfailed / 23 failed. The 23 = 19 EXPECTED snapshot rail-drift (test_tc016s, canonical-CI regen) + 4 census escapes (tc006/tc010/tc038 hardcoded ==9; tc081_4 binding-drift guard). iterate-to-fix commit b809c98: tc006/010/038 -> ==len(SCREEN_KEYS) (derived, C-26-correct); tc081_4 sanctions the batch-58 crc_designer Binding (guard NOT weakened); reverse-census clean (no other rail-9). Re-verify census files: 179 passed/0 failed. qa-reviewer reconciliation (04-validation.md): all 19 ATs realized to ONE on-disk node each (17 distinct; 013b/058-07 + 017/058-08 legitimately share a node; 0 UNREALIZED, C-18 holds), all 22 LLRs traced, 5 formerly-vacuous ATs confirmed non-vacuous, 52 AT/TC nodes pass. Frozen static-check: 0 frozen paths touched (tc031/engine-unchanged not run locally=hazard, verified statically + run in canonical CI). Axis: Coverage/Certainty/Evidence all met. Residual = the snapshot-regen closeout PR (baseline maintenance, non-blocking, canonical-CI-only)."
     }
   ],
   "obsidian_synced": false,
