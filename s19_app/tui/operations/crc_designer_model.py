@@ -551,14 +551,150 @@ def parse_template(text: str) -> tuple[Optional[CrcTemplate], list[str]]:
     return CrcTemplate(algorithm=algorithm, aliases=aliases, schema_version=schema_version), []
 
 
+def _is_flat_config(data: dict[str, Any]) -> bool:
+    """
+    Summary:
+        Report whether ``data`` is today's FLAT ``crc_config`` shape rather
+        than the evolved job shape (LLR-E6.1): it carries ``polynomial`` and
+        lacks all of ``algorithm`` / ``algorithm_ref`` / ``targets``.
+
+    Args:
+        data (dict[str, Any]): The parsed top-level job JSON object.
+
+    Returns:
+        bool: ``True`` for a flat config (route to the up-convert branch).
+
+    Dependencies:
+        Used by:
+            - parse_job
+    """
+    return (
+        "algorithm" not in data
+        and "algorithm_ref" not in data
+        and "targets" not in data
+        and "polynomial" in data
+    )
+
+
+def _upconvert_flat_algorithm(data: dict[str, Any]) -> CrcAlgorithm:
+    """
+    Summary:
+        Up-convert a flat ``crc_config``'s algorithm params into a
+        :class:`CrcAlgorithm` (LLR-E6.1): ``polynomial`` → ``poly``,
+        ``reverse`` → ``refin==refout``, ``final_xor`` → ``xorout``, a fixed
+        ``width=32`` (the shipped 32-bit codec) and ``check=None`` (a flat
+        config carries no published known-answer).
+
+    Args:
+        data (dict[str, Any]): The parsed flat-config JSON object.
+
+    Returns:
+        CrcAlgorithm: The equivalent parametric algorithm, named ``"custom"``
+        (parity with the inline-algorithm default).
+
+    Raises:
+        KeyError: A required flat field is missing.
+        TypeError: ``reverse`` is not a boolean.
+        ValueError: An int field is not hex/int-parseable. Callers (``parse_job``)
+            convert all three into one collected error.
+
+    Dependencies:
+        Uses:
+            - _parse_int, CrcAlgorithm
+        Used by:
+            - parse_job
+    """
+    reverse = data["reverse"]
+    _require(isinstance(reverse, bool), "field 'reverse' must be a boolean")
+    return CrcAlgorithm(
+        name="custom",
+        width=32,
+        poly=_parse_int(data["polynomial"]),
+        init=_parse_int(data["init"]),
+        refin=reverse,
+        refout=reverse,
+        xorout=_parse_int(data["final_xor"]),
+        check=None,
+    )
+
+
+def _upconvert_flat_targets(data: dict[str, Any]) -> tuple[CrcTarget, ...]:
+    """
+    Summary:
+        Up-convert a flat ``crc_config``'s ``regions`` / ``groups`` into the
+        internal target list (LLR-E6.1), matching today's
+        ``crc.compute_region_crc`` / ``compute_group_crc`` semantics: each
+        ``regions`` entry becomes a single-range target and each ``groups``
+        entry a multi-range target, both ``intra_gap="skip"`` (present bytes
+        only) + ``join="concat"`` (declared order, butted together). A
+        ``groups`` entry's ``output_bytes`` becomes ``store_width``. Each raw
+        target is validated by :func:`_build_target` (single-sourced rules).
+
+    Args:
+        data (dict[str, Any]): The parsed flat-config JSON object.
+
+    Returns:
+        tuple[CrcTarget, ...]: One target per region then per group, in file
+        order.
+
+    Raises:
+        KeyError: A required region/group/span field is missing.
+        TypeError: A ``regions`` / ``groups`` value has the wrong JSON type.
+        ValueError: No ``regions`` and no ``groups``, or a ``_build_target``
+            rule violation. Callers convert all into one collected error.
+
+    Dependencies:
+        Uses:
+            - _build_target
+        Used by:
+            - parse_job
+    """
+    raw_regions = data.get("regions", [])
+    _require(isinstance(raw_regions, list), "field 'regions' must be a list")
+    raw_groups = data.get("groups", [])
+    _require(isinstance(raw_groups, list), "field 'groups' must be a list")
+    _require(bool(raw_regions) or bool(raw_groups),
+             "at least one of 'regions' / 'groups' must be present and non-empty")
+
+    raw_targets: list[dict[str, Any]] = []
+    for region in raw_regions:
+        _require(isinstance(region, dict), "each 'regions' entry must be a JSON object")
+        raw_targets.append({
+            "ranges": [{"start": region["start"], "end": region["end"]}],
+            "intra_gap": "skip",
+            "join": "concat",
+            "output_address": region["output_address"],
+            "store_width": 4,
+            "store_endianness": "little",
+        })
+    for group in raw_groups:
+        _require(isinstance(group, dict), "each 'groups' entry must be a JSON object")
+        raw_spans = group["regions"]
+        _require(isinstance(raw_spans, list) and bool(raw_spans),
+                 "each group's 'regions' must be a non-empty list")
+        raw_targets.append({
+            "ranges": [{"start": s["start"], "end": s["end"]} for s in raw_spans],
+            "intra_gap": "skip",
+            "join": "concat",
+            "output_address": group["output_address"],
+            "store_width": group.get("output_bytes", 4),
+            "store_endianness": "little",
+        })
+    return tuple(_build_target(i, t) for i, t in enumerate(raw_targets))
+
+
 def parse_job(
     text: str, resolver: AlgorithmResolver = preset_by_name
 ) -> tuple[Optional[CrcJob], list[str]]:
     """
     Summary:
-        Parse an evolved ``crc_config`` job into a typed :class:`CrcJob`,
-        collect-don't-abort. The algorithm comes from an inline ``algorithm``
-        object OR an ``algorithm_ref`` name resolved via ``resolver``.
+        Parse a ``crc_config`` job into a typed :class:`CrcJob`,
+        collect-don't-abort. Accepts BOTH the evolved shape — algorithm from an
+        inline ``algorithm`` object OR an ``algorithm_ref`` name resolved via
+        ``resolver``, plus explicit ``targets`` — AND today's FLAT shape
+        (``polynomial``/``init``/``reverse``/``final_xor`` + ``regions``/
+        ``groups``), which is up-converted into the same internal target list
+        (LLR-E6.1/E6.2).
 
     Args:
         text (str): The raw JSON job text.
@@ -568,18 +704,21 @@ def parse_job(
     Returns:
         tuple[Optional[CrcJob], list[str]]: ``(job, [])`` on success;
         ``(None, [one error])`` on any fault (bad JSON, unknown ref, over-ceiling
-        range count, invalid target).
+        range count, invalid target, bad flat field).
 
     Raises:
         None: Every fault is a collected error string.
 
     Data Flow:
-        - ``json.loads`` → object guard → resolve algorithm → build each target
-          (:func:`_build_target`) → range-count ceiling → :class:`CrcJob`.
+        - ``json.loads`` → object guard → flat-vs-evolved branch
+          (:func:`_is_flat_config`): flat → :func:`_upconvert_flat_algorithm`
+          + :func:`_upconvert_flat_targets`; evolved → resolve algorithm +
+          :func:`_build_target` per target → range-count ceiling →
+          :class:`CrcJob`.
 
     Dependencies:
         Uses:
-            - json, _build_algorithm, _build_target, the resolver
+            - json, _build_algorithm, _build_target, _upconvert_flat_*, the resolver
         Used by:
             - the designer job authoring/preview (R-CRC-DSN-008/009), tests
     """
@@ -590,24 +729,29 @@ def parse_job(
     if not isinstance(data, dict):
         return None, ["CRC job top level must be a JSON object"]
     try:
-        if data.get("algorithm") is not None:
-            inline = data["algorithm"]
-            _require(isinstance(inline, dict), "'algorithm' must be a JSON object")
-            name = str(data.get("algorithm_name") or inline.get("name", "custom"))
-            algorithm = _build_algorithm(inline, name)
-        elif data.get("algorithm_ref") is not None:
-            ref = str(data["algorithm_ref"])
-            resolved = resolver(ref)
-            _require(resolved is not None, f"unknown algorithm_ref {ref!r}")
-            assert resolved is not None
-            algorithm = resolved
+        if _is_flat_config(data):
+            algorithm = _upconvert_flat_algorithm(data)
+            targets = _upconvert_flat_targets(data)
         else:
-            raise ValueError("job needs an 'algorithm' object or an 'algorithm_ref'")
+            if data.get("algorithm") is not None:
+                inline = data["algorithm"]
+                _require(isinstance(inline, dict), "'algorithm' must be a JSON object")
+                name = str(data.get("algorithm_name") or inline.get("name", "custom"))
+                algorithm = _build_algorithm(inline, name)
+            elif data.get("algorithm_ref") is not None:
+                ref = str(data["algorithm_ref"])
+                resolved = resolver(ref)
+                _require(resolved is not None, f"unknown algorithm_ref {ref!r}")
+                assert resolved is not None
+                algorithm = resolved
+            else:
+                raise ValueError("job needs an 'algorithm' object or an 'algorithm_ref'")
 
-        raw_targets = data["targets"]
-        _require(isinstance(raw_targets, list) and bool(raw_targets),
-                 "'targets' must be a non-empty list")
-        targets = tuple(_build_target(i, t) for i, t in enumerate(raw_targets))
+            raw_targets = data["targets"]
+            _require(isinstance(raw_targets, list) and bool(raw_targets),
+                     "'targets' must be a non-empty list")
+            targets = tuple(_build_target(i, t) for i, t in enumerate(raw_targets))
+
         total_ranges = sum(len(t.ranges) for t in targets)
         _require(total_ranges <= RANGE_COUNT_CEILING,
                  f"job declares {total_ranges} ranges, over the {RANGE_COUNT_CEILING} ceiling")
@@ -665,6 +809,72 @@ def emit_template(template: CrcTemplate) -> str:
             "xorout": _hex(a.xorout, nib),
             "check": _hex(a.check, nib) if a.check is not None else None,
         },
+    }
+    return json.dumps(payload, indent=2) + "\n"
+
+
+def _target_payload(target: CrcTarget) -> dict[str, Any]:
+    """Serialize one :class:`CrcTarget` to its round-tripping JSON dict."""
+    return {
+        "ranges": [{"start": _hex(s, 8), "end": _hex(e, 8)} for s, e in target.ranges],
+        "intra_gap": target.intra_gap,
+        "join": target.join,
+        "pad_byte": _hex(target.pad_byte, 2),
+        "output_address": _hex(target.output_address, 8),
+        "store_width": target.store_width,
+        "store_endianness": target.store_endianness,
+        "on_gap_conflict": target.on_gap_conflict,
+    }
+
+
+def emit_job(job: CrcJob) -> str:
+    """
+    Summary:
+        Serialize a :class:`CrcJob` to JSON text that round-trips through
+        :func:`parse_job`: ``parse_job(emit_job(job))[0] == job`` (LLR-E6.3).
+        The algorithm is emitted INLINE (so no resolver is needed to re-parse)
+        with its ``name``; every :class:`CrcTarget` field is emitted; ints are
+        width-appropriate ``0x`` hex strings (the :func:`emit_template` idiom).
+
+    Args:
+        job (CrcJob): The job to serialize.
+
+    Returns:
+        str: Pretty-printed JSON (2-space indent, trailing newline).
+
+    Data Flow:
+        - Build an inline ``algorithm`` object + a ``targets`` list
+          (:func:`_target_payload`); ``json.dumps``.
+
+    Dependencies:
+        Uses:
+            - json, _hex, _target_payload
+        Used by:
+            - the designer job Save / preview surface, tests
+
+    Example:
+        >>> from .crc_kernel import SEED_ALGORITHM
+        >>> t = CrcTarget(((0, 2),), "skip", "concat", 0xFF, 0x10, 4, "little")
+        >>> job = CrcJob(SEED_ALGORITHM, (t,))
+        >>> parse_job(emit_job(job))[0] == job
+        True
+    """
+    a = job.algorithm
+    nib = a.store_bytes() * 2
+    payload: dict[str, Any] = {
+        "schema_version": job.schema_version,
+        "operation": "crc",
+        "algorithm": {
+            "name": a.name,
+            "width": a.width,
+            "poly": _hex(a.poly, nib),
+            "init": _hex(a.init, nib),
+            "refin": a.refin,
+            "refout": a.refout,
+            "xorout": _hex(a.xorout, nib),
+            "check": _hex(a.check, nib) if a.check is not None else None,
+        },
+        "targets": [_target_payload(t) for t in job.targets],
     }
     return json.dumps(payload, indent=2) + "\n"
 
