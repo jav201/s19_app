@@ -404,9 +404,14 @@ Notes:
   (`_record_layout_full_span` × `_inline_axis_counts`, full-span-or-None), so such
   records become memory-checkable. CURVE/MAP with an **external axis**
   (COM_AXIS/RES_AXIS/CURVE_AXIS or AXIS_PTS_REF) deliberately stay `length=None`
-  (the axis storage lives in a separate AXIS_PTS record). Regression:
-  `tests/test_a2l_record_layout_length.py` and
-  `tests/test_a2l_inline_axis_length.py`.
+  (the axis storage lives in a separate AXIS_PTS record). When the RECORD_LAYOUT
+  declares `ALIGNMENT_*` directives in its body, `_record_layout_full_span`
+  accounts for inter-component padding (each component's start aligned up to its
+  datatype's declared alignment; module-wide `MOD_COMMON` defaults are not
+  honored; no trailing pad) — batch-56. Regression:
+  `tests/test_a2l_record_layout_length.py`,
+  `tests/test_a2l_inline_axis_length.py`, and
+  `tests/test_a2l_alignment_sizing.py`.
 
 ### MAC Tag/Parameter Validation Criteria
 
