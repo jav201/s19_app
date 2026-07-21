@@ -17,7 +17,7 @@
     "wire_crc_py_deferred": "OPERATOR 2026-07-20 (AskUserQuestion 'Wire crc.py'='Diferir a follow-up'): do NOT wire the width-general kernel into shipped operations/crc.py this batch. The preview-only view uses the kernel directly; the result-identical crc32_stream refactor is deferred to a follow-up, stays in BACKLOG.",
     "batch_number": "58 per batch-57 deferral (57 = headless keel; 58 = the view + E4/E5/E6 + emit_job)."
   },
-  "current_phase": 3,
+  "current_phase": 4,
   "phase_status": "in-progress",
   "collision_resolution": "RESOLVED 2026-07-21: Javier adjudicated live (AskUserQuestion 'Dueno b58'='Esta sesion sigue') — THIS session owns batch-58 from Phase 3. Stand-down message delivered to local_b3ec8612 via ccd_session_mgmt.send_message. Branch rebased onto origin/main 1e3125b (RC-1 currency restored, merge-base==tip; PR #111 was docs-only .dev-flow/BACKLOG.md, clean rebase). Primary checkout stays on feat/batch-58-crc-designer-view (other session remains parked; RC-1 already-shipped grep is the mutual backstop). Base ref for this batch is now 1e3125b.",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
@@ -57,6 +57,12 @@
       "date": "2026-07-21",
       "decision": "COLLISION RESOLVED (Javier: this session owns b58) + Phase 3 STARTED; increment cut recorded",
       "notes": "Stand-down sent to local_b3ec8612; rebased onto 1e3125b (clean). Increment plan (engine-first, <=5 files each): Inc-1 E4 word codec (crc.py encode_word/decode_word big+wide + LE wrappers) [LLR-E4.1/.2/.3; AT-CRC-DSN-014]; Inc-2 E5 crc_template.py facade [LLR-E5.1/.2; AT-CRC-DSN-015]; Inc-3 E6 parse_job flat up-convert + emit_job [LLR-E6.1/.2/.3; AT-058-01, AT-CRC-DSN-012]; Inc-4 view scaffold+rail+form+preset [LLR-V1.1/.2; AT-058-02; C-22/C-28 snapshot census]; Inc-5 live KAT verdict+custom vector+JSON preview [LLR-V2.1/.2,V3.1,V4.1; AT-CRC-DSN-016/011, AT-058-03/04]; Inc-6 Load/Save+save-KAT+markup+warns [LLR-V5.1/.2/.3/.4; AT-058-05/10/06, AT-CRC-DSN-015]; Inc-7 coverage strip+per-policy preview+gap-conflict+preview-only guard [LLR-V6.x/V7.1/V8.1; AT-058-07/08/09, AT-CRC-DSN-013/013b/017]. software-dev implements per increment; code-reviewer at each gate; self-approve with named axis check."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-21",
+      "decision": "Phase 3 COMPLETE — 7 increments all gate-APPROVED; advancing to Phase 4",
+      "notes": "All 7 increments implemented + independently reviewed, 0 HIGH surviving. Commits: Inc-1 c16e01a (E4), Inc-2 c7a07a1 (E5 facade), Inc-3 8726fea (E6, code-review HIGH F1 vacuous digest test FIXED - oracle pinned 0x9C5BCBBD), Inc-4 05682e6+24424cb (view scaffold+rail, F1/F2 census fixed), Inc-5 4e66c3a (live verdict - reviewer proved AT-CRC-DSN-016 RED on handler removal), Inc-6 6659a43 (Load/Save - code+security both OK, traversal-proof, markup spans==[]), Inc-7 181e747 (coverage+gap-conflict+preview-only). Every increment: 0 frozen diffs (static census), RED->GREEN, per-increment CRC regression green. LOW carries -> postmortem/BACKLOG (Inc-5 F1 recompute-fanout/F2 preset-name; Inc-6 code-F1 redundant-name/sec-F1 overwrite-note/sec-F2 sanitize-collision; Inc-7 F1 _build_target-private-import/F2 conflict-format-dup). ENV: recurring checkout-hazard (tc031/engine-unchanged subprocess `git checkout main` stranded the shared primary twice on tool-timeout) — recovered losslessly each time, mitigated by per-increment commits + static frozen checks + branch re-verify after each sub-agent."
     }
   ],
   "obsidian_synced": false,
