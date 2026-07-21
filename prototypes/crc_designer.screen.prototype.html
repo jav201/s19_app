@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CRC Algorithm Designer — TUI design (bound to the built types)</title><style>
+  :root{
+    --bg:#0a0e1b; --panel:#0f1525; --rule:#1b233a; --odd:#131a2c;
+    --fg:#e9e9e9; --accent:#91abec;
+    --ok:#54efae; --warn:#f6ff8f; --err:#fd8383; --info:#7dd3fc; --neutral:#969aad;
+    --mono:"Cascadia Code","JetBrains Mono","Consolas","DejaVu Sans Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{background:#05070f;color:var(--fg);font-family:var(--mono);margin:0;padding:22px;font-size:14px;line-height:1.35}
+  h1{font-size:17px;margin:0 0 2px;font-weight:600}
+  h2{font-size:14.5px;margin:26px 0 2px;color:var(--accent)}
+  .sub{color:var(--neutral);font-size:12.5px;margin:0 0 4px;max-width:120ch}
+  .sub b{color:var(--fg);font-weight:600}
+  .sub code{color:var(--info)}
+  .regime-note{color:var(--neutral);font-size:12px;margin:0 0 8px;max-width:120ch}
+  .regime-note code{color:var(--info)}
+  .state-h{margin:16px 0 6px;color:var(--fg);font-size:13px;font-weight:600;border-left:3px solid var(--accent);padding-left:9px}
+  .state-h .k{color:var(--neutral);font-weight:400;font-size:12px;margin-left:6px}
+  .stage{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:#03050c;padding:12px;max-width:100%}
+  .term{background:var(--bg);border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+  .term.floor{width:82ch}
+  .term.wide{width:150ch;font-size:11px;line-height:1.4;margin:0 auto}
+  .cmdbar{display:flex;justify-content:space-between;background:#0c122a;border-bottom:1px solid var(--rule);
+          padding:3px 10px;color:var(--neutral);font-size:1em}
+  .cmdbar b{color:var(--accent)}
+  .body{display:flex}
+  .rail{flex:0 0 15ch;width:15ch;border-right:1px solid var(--rule);padding:6px 0;background:#0b1022}
+  .term.wide .rail{flex:0 0 16ch;width:16ch}
+  .rail .ri{padding:2px 9px;color:var(--neutral);font-size:1em;white-space:nowrap}
+  .rail .ri .n{display:inline-block;width:1.4ch;color:#42506f}
+  .rail .ri.active{background:#18223f;color:var(--fg);border-left:2px solid var(--accent);padding-left:7px}
+  .rail .ri.active .n{color:var(--accent)}
+  .rail .ri.new{color:var(--info)}
+  .screen{flex:1;padding:8px 12px;min-width:0}
+  .scr-title{color:var(--accent);font-weight:600;border-bottom:1px solid var(--rule);padding-bottom:4px;
+             margin-bottom:7px;display:flex;justify-content:space-between;align-items:baseline}
+  .banner{font-size:.92em;padding:1px 9px;border-radius:10px;font-weight:600;letter-spacing:.04em}
+  .b-match{color:var(--bg);background:var(--ok)} .b-mism{color:var(--bg);background:var(--err)}
+  .b-idle{color:var(--neutral);background:#141b30} .b-none{color:var(--bg);background:var(--neutral)}
+  .hint{color:var(--neutral);font-size:.9em;margin:2px 0 8px}
+  .fut-tag{color:#6f7fb0;font-size:.82em;border:1px solid #243258;border-radius:3px;padding:0 4px;margin-left:4px}
+  .typetag{color:#6f7fb0;font-size:.8em;font-style:italic}
+  .grow{flex:1}
+  .ctl{background:#101830;border:1px solid var(--rule);border-radius:4px;padding:2px 8px;color:var(--fg);font-size:.95em}
+  .ctl.sel{color:var(--accent)} .ctl.inp{color:var(--fg);min-width:9ch}
+  .ctl.btn{background:#15224a;border-color:#2a3c6b}
+  .ctl.primary{background:#1d3a5f;border-color:var(--accent);color:#dbe7ff}
+  .ctl.ghost{background:transparent;color:var(--neutral)}
+  .dsplit{display:flex;gap:14px}
+  .formcol{flex:1.15;min-width:0}
+  .verifycol{flex:1;min-width:0;border-left:1px solid var(--rule);padding-left:12px}
+  .grp{margin:0 0 9px}
+  .grp-h{color:#5a688f;font-size:.86em;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--rule);padding-bottom:2px;margin-bottom:4px}
+  .grp-h .badge{float:right;text-transform:none;letter-spacing:0;color:var(--neutral)}
+  .fld{display:grid;grid-template-columns:12ch 1fr;gap:6px;align-items:baseline;padding:1px 0;font-size:.97em}
+  .fld .lbl{color:var(--neutral)}
+  .fld .val{color:var(--fg)}
+  .fld .val.num{color:var(--info)}
+  .fld .tog{color:var(--accent)}
+  .fld .tog .off{color:#3d4a6b}
+  .fld .note{color:var(--neutral);font-size:.86em}
+  .presetbar{display:flex;gap:6px;align-items:center;margin-bottom:7px;flex-wrap:wrap}
+  /* the hero: live known-answer verdict — binds to CrcAlgorithm.kat_ok() */
+  .hero{border:1px solid #23406a;border-radius:7px;background:linear-gradient(180deg,#0d1c30,#0a1320);padding:9px 11px;margin-bottom:9px}
+  .hero .cap{color:var(--neutral);font-size:.82em;text-transform:uppercase;letter-spacing:.07em}
+  .hero .big{font-size:1.9em;font-weight:600;letter-spacing:.02em;margin:2px 0 1px;line-height:1.1}
+  .hero .big.ok{color:var(--ok)} .hero .big.bad{color:var(--err)} .hero .big.none{color:var(--neutral)}
+  .hero .vsline{font-size:.9em;color:var(--neutral)}
+  .hero .vsline b.ok{color:var(--ok)} .hero .vsline b.bad{color:var(--err)} .hero .vsline b.none{color:var(--fg)}
+  .hero .vec{margin-top:5px;display:flex;gap:6px;align-items:center;font-size:.9em}
+  .hero .vec .ipt{background:#0b1526;border:1px solid var(--rule);border-radius:3px;padding:0 6px;color:var(--fg)}
+  .hero .reflane{margin-top:6px;font-size:.8em;color:var(--neutral)}
+  .jsonbox{border:1px solid var(--rule);border-radius:5px;background:#03050c;padding:7px 9px;font-size:.86em;overflow-x:auto;white-space:pre;line-height:1.35}
+  .jsonbox .k{color:var(--accent)} .jsonbox .s{color:var(--ok)} .jsonbox .n{color:var(--info)}
+  .jsonbox .b{color:var(--warn)} .jsonbox .p{color:var(--neutral)}
+  .warnrow{color:var(--warn);font-size:.9em;margin:5px 0 0;padding-left:2px}
+  .warnrow .pre{color:var(--neutral)}
+  .foot{color:var(--neutral);font-size:.9em;border-top:1px solid var(--rule);margin-top:7px;padding-top:4px}
+  .foot b{color:#7f8db5}
+  .s-ok{color:var(--ok)} .s-warn{color:var(--warn)} .s-err{color:var(--err)}
+  .s-neu{color:var(--neutral)} .s-info{color:var(--info)} .s-acc{color:var(--accent)}
+  .imgprev{border:1px dashed #2a3c6b;border-radius:6px;background:#0a1526;padding:8px 10px;margin-top:9px}
+  .imgprev .ph{color:var(--info);font-size:.86em;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .imgprev .ph .typetag{float:right}
+  .imgprev .bar{letter-spacing:-.5px;white-space:nowrap}
+  .fill{color:var(--accent)} .gap{color:#2b3656} .tail{color:var(--ok)}
+  .imgprev .rowline{display:flex;gap:8px;align-items:center;font-size:.92em;margin:2px 0;flex-wrap:wrap}
+  .imgprev .rowline .lab{color:var(--neutral);width:11ch;flex:0 0 11ch}
+  .legend,.note{margin:14px 0 0;max-width:120ch;font-size:12.5px;color:var(--neutral)}
+  .legend h3{color:var(--fg);font-size:13px;margin:16px 0 5px}
+  .legend ul{margin:4px 0;padding-left:18px} .legend li{margin:3px 0}
+  .legend code{color:var(--info)}
+  .note{background:#0c1226;border:1px solid var(--rule);border-radius:6px;padding:10px 13px}
+  .note b{color:var(--warn)} .note code{color:var(--info)}
+  .cmp{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 0}
+  .cmp .card{flex:1;min-width:34ch;border:1px solid var(--rule);border-radius:6px;background:#0c1226;padding:9px 12px}
+  .cmp .card h4{margin:0 0 4px;color:var(--accent);font-size:13px}
+  .cmp .card.a{border-left:3px solid var(--ok)} .cmp .card.b{border-left:3px solid var(--info)}
+  .cmp .card p{margin:3px 0;font-size:12px}
+  /* mini load/check/save flow strip (Variant B) */
+  .flowstrip{display:flex;flex-wrap:wrap;align-items:center;gap:5px;border:1px solid var(--rule);border-radius:6px;background:#0a1120;padding:6px 9px;margin-bottom:7px;font-size:.86em}
+  .fs-node{background:#131c30;border:1px solid var(--rule);border-radius:4px;padding:1px 7px;color:var(--fg);white-space:nowrap}
+  .fs-node.fs-file{background:#241a10;border-color:#c2410c;color:#fed7aa}
+  .fs-node.fs-1{border-color:var(--accent);color:var(--accent)}
+  .fs-node.fs-2{border-color:var(--ok);color:var(--ok)}
+  .fs-node.fs-3{border-color:var(--warn);color:var(--warn)}
+  .fs-arr{color:#3d4a6b}
+  .fs-note{flex-basis:100%;color:var(--neutral);font-size:.92em;margin-top:1px}
+  .fs-note b{color:var(--err)} .fs-note .g{color:var(--info)}
+</style></head><body>
+
+<h1>CRC Algorithm Designer &mdash; TUI design</h1>
+<p class="sub">Every field, verdict, and JSON block below <b>binds to a real, tested type</b> from the built keel: the form maps to <code>crc_kernel.CrcAlgorithm</code>, the coverage strip to <code>crc_designer_model.CrcTarget</code>, the JSON to <code>emit_template</code> / <code>parse_job</code>, and the hero verdict to <code>CrcAlgorithm.kat_ok()</code> (a genuine <b>tri-state</b>). All hex values are the actual engine outputs.</p>
+<p class="regime-note">Two <b>view-boundary variants</b>: <span class="s-ok">Variant A</span> = authoring bench only; <span class="s-info">Variant B</span> (chosen) adds multi-range coverage preview over the loaded image.</p>
+
+<div class="cmp">
+  <div class="card a"><h4>Variant A &mdash; Authoring bench only</h4>
+    <p>Build + KAT-verify + save/load an <b>algorithm template</b> (<code>*.crc.json</code>, pure math). Running over firmware stays in the CRC operation / CRC block.</p>
+    <p class="s-neu">JSON preview = <code>emit_template()</code> output. The template has NO addresses &mdash; it is reusable.</p></div>
+  <div class="card b"><h4>Variant B &mdash; Bench + multi-range coverage preview <span class="s-info">(chosen)</span></h4>
+    <p>Everything in A, plus a per-firmware <b>job</b>: an <code>algorithm_ref</code> + one or more <code>CrcTarget</code>s (multi-range, with the <b>intra</b>&times;<b>join</b> gap toggles), previewed over real bytes.</p>
+    <p class="s-neu">JSON preview = a <code>parse_job()</code>-shaped job. Preview only &mdash; never writes firmware.</p></div>
+</div>
+
+<!-- ───────────────────────── VARIANT A ───────────────────────── -->
+<h2>Variant A &middot; authoring bench only</h2>
+<div class="state-h">MATCH &mdash; <span class="typetag">kat_ok() &rarr; True</span></div>
+<div class="stage"><div class="term wide">
+  <div class="cmdbar"><span>project <b>demo_ecu</b> &nbsp;&middot;&nbsp; template lib <b>.s19tool/templates/</b> &nbsp;&middot;&nbsp; <span class="s-neu">7 presets</span></span><span>Ctrl+K palette</span></div>
+  <div class="body">
+    <div class="rail">
+      <div class="ri"><span class="n">1</span> Workspace</div><div class="ri"><span class="n">2</span> A2L</div>
+      <div class="ri"><span class="n">3</span> MAC</div><div class="ri"><span class="n">4</span> Map</div>
+      <div class="ri"><span class="n">5</span> Patch</div><div class="ri"><span class="n">6</span> Issues</div>
+      <div class="ri"><span class="n">7</span> Diff</div><div class="ri"><span class="n">8</span> Flow</div>
+      <div class="ri"><span class="n">9</span> Checks</div><div class="ri active new"><span class="n">0</span> CRC Design</div>
+    </div>
+    <div class="screen">
+      <div class="scr-title"><span>CRC Algorithm Designer &mdash; template</span><span class="banner b-match">VERIFIED</span></div>
+      <div class="presetbar">
+        <span class="s-neu">preset</span><span class="ctl sel">CRC-32/ISO-HDLC &#9662;</span>
+        <span class="ctl ghost">= zlib / seed</span><span class="grow"></span>
+        <span class="ctl btn">&#128190; Save as&hellip;</span><span class="ctl btn">&#128193; Load</span><span class="ctl ghost">&#8635; Reset</span>
+      </div>
+      <div class="dsplit">
+        <div class="formcol">
+          <div class="grp">
+            <div class="grp-h">algorithm <span class="badge">crc_kernel.CrcAlgorithm &middot; KAT-verifiable</span></div>
+            <div class="fld"><span class="lbl">width</span><span class="val num">32 <span class="note">bits &mdash; result word size ("byte-window length")</span></span></div>
+            <div class="fld"><span class="lbl">poly</span><span class="val num">0x04C11DB7</span></div>
+            <div class="fld"><span class="lbl">init</span><span class="val num">0xFFFFFFFF <span class="note">(seed / start value)</span></span></div>
+            <div class="fld"><span class="lbl">refin</span><span class="tog">[&#10003; on]<span class="off"> / off</span> <span class="note">reflect input bytes</span></span></div>
+            <div class="fld"><span class="lbl">refout</span><span class="tog">[&#10003; on]<span class="off"> / off</span> <span class="note">reflect final register</span></span></div>
+            <div class="fld"><span class="lbl">xorout</span><span class="val num">0xFFFFFFFF <span class="note">(finish value)</span></span></div>
+            <div class="fld"><span class="lbl">check</span><span class="val num">0xCBF43926 <span class="note">expected CRC of "123456789"</span></span></div>
+          </div>
+          <div class="grp">
+            <div class="grp-h">template json <span class="badge">emit_template() &middot; round-trips</span></div>
+            <div class="jsonbox"><span class="p">{</span>
+  <span class="k">"schema_version"</span>: <span class="n">1</span>,
+  <span class="k">"name"</span>: <span class="s">"CRC-32/ISO-HDLC"</span>,
+  <span class="k">"aliases"</span>: [<span class="s">"zlib"</span>, <span class="s">"PKZIP"</span>, <span class="s">"CRC-32"</span>],
+  <span class="k">"operation"</span>: <span class="s">"crc"</span>,
+  <span class="k">"algorithm"</span>: <span class="p">{</span>
+    <span class="k">"width"</span>: <span class="n">32</span>, <span class="k">"poly"</span>: <span class="s">"0x04C11DB7"</span>, <span class="k">"init"</span>: <span class="s">"0xFFFFFFFF"</span>,
+    <span class="k">"refin"</span>: <span class="b">true</span>, <span class="k">"refout"</span>: <span class="b">true</span>, <span class="k">"xorout"</span>: <span class="s">"0xFFFFFFFF"</span>,
+    <span class="k">"check"</span>: <span class="s">"0xCBF43926"</span>
+  <span class="p">}</span>
+<span class="p">}</span></div>
+          </div>
+        </div>
+        <div class="verifycol">
+          <div class="hero">
+            <div class="cap">live known-answer verify &mdash; crc("123456789")</div>
+            <div class="big ok">0xCBF43926</div>
+            <div class="vsline">expected <b class="ok">0xCBF43926</b> &nbsp;&mdash;&nbsp; <b class="ok">&#10003; MATCH</b></div>
+            <div class="vec"><span class="s-neu">test vec</span><span class="ipt">123456789</span><span class="s-neu">&rarr;</span><span class="s-info">0xCBF43926</span></div>
+            <div class="reflane">verdict source: <span class="s-acc">CrcAlgorithm.kat_ok()</span> &rarr; <span class="s-ok">True</span></div>
+          </div>
+          <div class="grp">
+            <div class="grp-h">preset check table <span class="badge">crc_kernel.PRESETS &middot; self-verifying</span></div>
+            <div class="fld"><span class="lbl s-ok">&#10003;</span><span class="val">CRC-8/SMBUS <span class="s-neu">&rarr; 0xF4</span></span></div>
+            <div class="fld"><span class="lbl s-ok">&#10003;</span><span class="val">CRC-16/CCITT-FALSE <span class="s-neu">&rarr; 0x29B1</span></span></div>
+            <div class="fld"><span class="lbl s-ok">&#10003;</span><span class="val">CRC-16/MODBUS <span class="s-neu">&rarr; 0x4B37</span></span></div>
+            <div class="fld"><span class="lbl s-ok">&#10003;</span><span class="val">CRC-16/XMODEM <span class="s-neu">&rarr; 0x31C3</span></span></div>
+            <div class="fld"><span class="lbl s-ok">&#10003;</span><span class="val">CRC-32C <span class="s-neu">&rarr; 0xE3069283</span></span></div>
+            <div class="fld"><span class="lbl s-ok">&#10003;</span><span class="val">CRC-64/XZ <span class="s-neu">&rarr; 0x995D&hellip;39FA</span></span></div>
+          </div>
+          <div class="foot"><b>Scope:</b> authoring + verify only. Hand the saved template to rail-<b>9 Flow</b> &rsaquo; CRC block or the CRC operation to run over an image.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<div class="state-h">MISMATCH &mdash; <span class="typetag">kat_ok() &rarr; False (flipped refout on CCITT-FALSE)</span></div>
+<div class="stage"><div class="term wide">
+  <div class="cmdbar"><span>project <b>demo_ecu</b> &nbsp;&middot;&nbsp; <span class="s-neu">unsaved edits</span></span><span>Ctrl+K palette</span></div>
+  <div class="body">
+    <div class="rail">
+      <div class="ri"><span class="n">1</span> Workspace</div><div class="ri"><span class="n">2</span> A2L</div>
+      <div class="ri"><span class="n">3</span> MAC</div><div class="ri"><span class="n">4</span> Map</div>
+      <div class="ri"><span class="n">5</span> Patch</div><div class="ri"><span class="n">6</span> Issues</div>
+      <div class="ri"><span class="n">7</span> Diff</div><div class="ri"><span class="n">8</span> Flow</div>
+      <div class="ri"><span class="n">9</span> Checks</div><div class="ri active new"><span class="n">0</span> CRC Design</div>
+    </div>
+    <div class="screen">
+      <div class="scr-title"><span>CRC Algorithm Designer &mdash; template</span><span class="banner b-mism">MISMATCH</span></div>
+      <div class="presetbar">
+        <span class="s-neu">preset</span><span class="ctl sel">CRC-16/CCITT-FALSE &#9662;</span>
+        <span class="ctl ghost s-warn">&#9679; edited: refout</span><span class="grow"></span>
+        <span class="ctl btn">&#128190; Save as&hellip;</span><span class="ctl btn">&#128193; Load</span><span class="ctl ghost">&#8635; Reset</span>
+      </div>
+      <div class="dsplit">
+        <div class="formcol">
+          <div class="grp">
+            <div class="grp-h">algorithm <span class="badge">crc_kernel.CrcAlgorithm</span></div>
+            <div class="fld"><span class="lbl">width</span><span class="val num">16</span></div>
+            <div class="fld"><span class="lbl">poly</span><span class="val num">0x1021</span></div>
+            <div class="fld"><span class="lbl">init</span><span class="val num">0xFFFF</span></div>
+            <div class="fld"><span class="lbl">refin</span><span class="tog"><span class="off">on / </span>[&#10007; off]</span></div>
+            <div class="fld"><span class="lbl s-warn">refout</span><span class="tog s-warn">[&#10003; on]<span class="off"> / off</span> <span class="note s-warn">&larr; you flipped this</span></span></div>
+            <div class="fld"><span class="lbl">xorout</span><span class="val num">0x0000</span></div>
+            <div class="fld"><span class="lbl">check</span><span class="val num">0x29B1 <span class="note">(preset reference &mdash; unchanged)</span></span></div>
+          </div>
+          <div class="warnrow">&#9888; <span class="pre">check mismatch:</span> this variant no longer matches its preset reference &mdash; save is allowed, but rename it (it is no longer CCITT-FALSE). <span class="s-neu">One error string, rendered markup=False.</span></div>
+        </div>
+        <div class="verifycol">
+          <div class="hero">
+            <div class="cap">live known-answer verify &mdash; crc("123456789")</div>
+            <div class="big bad">0x8D94</div>
+            <div class="vsline">expected <b class="bad">0x29B1</b> &nbsp;&mdash;&nbsp; <b class="bad">&#10007; MISMATCH</b></div>
+            <div class="vec"><span class="s-neu">test vec</span><span class="ipt">123456789</span><span class="s-neu">&rarr;</span><span class="s-err">0x8D94</span></div>
+            <div class="reflane s-warn">refin off, refout on &mdash; asymmetric reflection has <b>no catalogue vector</b> (RK-3); supply a device reference to trust it.</div>
+          </div>
+          <div class="foot"><b>Why this matters:</b> the verdict flips red the instant the math diverges &mdash; a mis-tailored variant is caught before it touches firmware.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ───────────────────────── VARIANT B ───────────────────────── -->
+<h2>Variant B &middot; bench + multi-range coverage preview</h2>
+<div class="state-h">Job over the loaded image &mdash; <span class="typetag">CrcJob = algorithm_ref + CrcTarget[]</span></div>
+<div class="stage"><div class="term wide">
+  <div class="cmdbar"><span>project <b>demo_ecu</b> &nbsp;&middot;&nbsp; loaded <b>firmware_v2.s19</b> &nbsp;&middot;&nbsp; <span class="s-neu">4.1 KB &middot; 1 range</span></span><span>Ctrl+K palette</span></div>
+  <div class="body">
+    <div class="rail">
+      <div class="ri"><span class="n">1</span> Workspace</div><div class="ri"><span class="n">2</span> A2L</div>
+      <div class="ri"><span class="n">3</span> MAC</div><div class="ri"><span class="n">4</span> Map</div>
+      <div class="ri"><span class="n">5</span> Patch</div><div class="ri"><span class="n">6</span> Issues</div>
+      <div class="ri"><span class="n">7</span> Diff</div><div class="ri"><span class="n">8</span> Flow</div>
+      <div class="ri"><span class="n">9</span> Checks</div><div class="ri active new"><span class="n">0</span> CRC Design</div>
+    </div>
+    <div class="screen">
+      <div class="scr-title"><span>CRC Algorithm Designer &mdash; job</span><span class="banner b-match">VERIFIED</span></div>
+      <div class="flowstrip">
+        <span class="fs-node fs-file">JSON file</span><span class="fs-arr">&rarr;</span>
+        <span class="fs-node fs-1">&#9312; parse + validate</span><span class="fs-arr">&rarr;</span>
+        <span class="fs-node">populate</span><span class="fs-arr">&rarr;</span>
+        <span class="fs-node fs-2">&#9313; edit &middot; live KAT</span><span class="fs-arr">&rarr;</span>
+        <span class="fs-node fs-3">&#9314; check == KAT on save</span><span class="fs-arr">&rarr;</span>
+        <span class="fs-node fs-file">JSON file</span>
+        <span class="fs-note">Load routes through <span class="g">read_template</span>/<span class="g">parse_job</span>; a parse fault &rarr; <b>one error, form not populated</b> (collect-don't-abort). Save runs <span class="g">emit_template</span>/<span class="g">emit_job</span>. &#9315; run/preview &rarr; <span class="g">gap_conflict</span>.</span>
+      </div>
+      <div class="presetbar">
+        <span class="s-neu">algorithm_ref</span><span class="ctl sel">CRC-32/ISO-HDLC &#9662;</span>
+        <span class="ctl ghost s-warn">&#9679; target[0].join=fill</span><span class="grow"></span>
+        <span class="ctl btn">&#128190; Save job</span><span class="ctl btn">&#128193; Load</span>
+      </div>
+      <div class="dsplit">
+        <div class="formcol">
+          <div class="grp">
+            <div class="grp-h">algorithm <span class="badge">CrcAlgorithm (via ref) &middot; read-only here</span></div>
+            <div class="fld"><span class="lbl">width / poly</span><span class="val num">32 &middot; 0x04C11DB7</span></div>
+            <div class="fld"><span class="lbl">init / xorout</span><span class="val num">0xFFFFFFFF / 0xFFFFFFFF</span></div>
+            <div class="fld"><span class="lbl">refin / refout</span><span class="tog">[&#10003; on] / [&#10003; on]</span></div>
+          </div>
+          <!-- the ONLY structural addition vs Variant A: a CrcTarget editor -->
+          <div class="imgprev">
+            <div class="ph">&#9673; target[0] coverage over loaded image <span class="typetag">crc_designer_model.CrcTarget</span></div>
+            <div class="rowline"><span class="lab">ranges[0]</span><span class="ctl inp">0x8000</span><span class="s-neu">&hellip;</span><span class="ctl inp">0x8008</span><span class="s-neu">8 B present</span></div>
+            <div class="rowline"><span class="lab">ranges[1]</span><span class="ctl inp">0x8010</span><span class="s-neu">&hellip;</span><span class="ctl inp">0x8018</span><span class="s-neu">8 B present</span><span class="ctl btn">+ range</span></div>
+            <div class="rowline"><span class="lab s-neu">window</span><span class="bar"><span class="fill">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span><span class="gap">&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;&#9617;</span><span class="fill">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span></span><span class="s-neu">8 + gap 8 + 8</span></div>
+            <div class="rowline"><span class="lab">intra_gap</span><span class="tog">[skip]<span class="off"> / fill</span></span><span class="s-neu">&nbsp;&middot;&nbsp;</span><span class="lab">join</span><span class="tog"><span class="off">concat / </span>[&#10003; fill]</span><span class="s-neu">&nbsp;&middot;&nbsp;</span><span class="lab">pad_byte</span><span class="val num">0xFF</span></div>
+            <div class="rowline"><span class="lab s-err">on_gap_conflict</span><span class="tog s-err">[abort]<span class="off"> / warn / ignore</span></span><span class="s-neu">&mdash; aborts if a filled/skipped gap holds real data</span></div>
+            <div class="rowline"><span class="lab s-err">&#9888; safety</span><span class="s-neu">gap 0x8008&hellip;0x8010 erased? &rarr;</span><span class="s-ok">clean &#10003;</span><span class="s-neu">(would ABORT on stray data, e.g. 0x800A=0x99)</span></div>
+            <div class="rowline"><span class="lab s-neu">concat &rarr;</span><span class="s-neu">16 B (butt ranges)</span><span class="s-info">0x9C5BCBBD</span></div>
+            <div class="rowline"><span class="lab s-warn">fill 0xFF &rarr;</span><span class="s-neu">24 B (pad the gap)</span><span class="s-info">0x2A8A3950</span><span class="s-warn">&nbsp;&larr; active</span></div>
+            <div class="rowline"><span class="lab">output_address</span><span class="val num">0x8018</span><span class="s-neu">&middot; store_width</span><span class="val num">4</span><span class="s-neu">&middot; store_endianness</span><span class="tog">[little]</span><span class="s-neu">&rarr; store_word&rarr;</span><span class="s-info">50 39 8A 2A</span></div>
+          </div>
+        </div>
+        <div class="verifycol">
+          <div class="hero">
+            <div class="cap">live known-answer verify &mdash; crc("123456789")</div>
+            <div class="big ok">0xCBF43926</div>
+            <div class="vsline">expected <b class="ok">0xCBF43926</b> &nbsp;<b class="ok">&#10003; MATCH</b> <span class="s-neu">(gap policy doesn't touch the algorithm)</span></div>
+            <div class="reflane">the KAT window is contiguous, so <span class="s-acc">intra_gap</span>/<span class="s-acc">join</span> can't change it &mdash; the image preview is where their effect shows.</div>
+          </div>
+          <div class="grp">
+            <div class="grp-h">job json <span class="badge">parse_job() shape &middot; *.crc_config.json</span></div>
+            <div class="jsonbox"><span class="p">{</span>
+  <span class="k">"schema_version"</span>: <span class="n">1</span>,
+  <span class="k">"algorithm_ref"</span>: <span class="s">"CRC-32/ISO-HDLC"</span>,
+  <span class="k">"targets"</span>: [<span class="p">{</span>
+    <span class="k">"ranges"</span>: [
+      <span class="p">{</span><span class="k">"start"</span>:<span class="s">"0x8000"</span>,<span class="k">"end"</span>:<span class="s">"0x8008"</span><span class="p">}</span>,
+      <span class="p">{</span><span class="k">"start"</span>:<span class="s">"0x8010"</span>,<span class="k">"end"</span>:<span class="s">"0x8018"</span><span class="p">}</span>
+    ],
+    <span class="k">"intra_gap"</span>: <span class="s">"skip"</span>, <span class="k">"join"</span>: <span class="s">"fill"</span>, <span class="k">"pad_byte"</span>: <span class="s">"0xFF"</span>,
+    <span class="k">"on_gap_conflict"</span>: <span class="s">"abort"</span>,
+    <span class="k">"output_address"</span>: <span class="s">"0x8018"</span>,
+    <span class="k">"store_width"</span>: <span class="n">4</span>, <span class="k">"store_endianness"</span>: <span class="s">"little"</span>
+  <span class="p">}</span>]
+<span class="p">}</span></div>
+          </div>
+          <div class="foot"><b>Preview only.</b> Writing the CRC into the image happens in the CRC operation / CRC block &mdash; the designer never mutates firmware.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ───────────────────────── FLOOR ───────────────────────── -->
+<h2>80&times;24 floor &nbsp;<span class="sub">(constrained fallback &mdash; verify column collapses under the form)</span></h2>
+<div class="stage"><div class="term floor">
+  <div class="cmdbar"><span>project <b>demo_ecu</b> &nbsp;&middot;&nbsp; CRC-32/ISO-HDLC</span><span>Ctrl+K</span></div>
+  <div class="body">
+    <div class="rail">
+      <div class="ri"><span class="n">1</span> Workspace</div><div class="ri"><span class="n">2</span> A2L</div>
+      <div class="ri"><span class="n">3</span> MAC</div><div class="ri"><span class="n">4</span> Map</div>
+      <div class="ri"><span class="n">5</span> Patch</div><div class="ri"><span class="n">6</span> Issues</div>
+      <div class="ri"><span class="n">7</span> Diff</div><div class="ri"><span class="n">8</span> Flow</div>
+      <div class="ri"><span class="n">9</span> Checks</div><div class="ri active new"><span class="n">0</span> CRC</div>
+    </div>
+    <div class="screen">
+      <div class="scr-title"><span>CRC Designer</span><span class="banner b-match">VERIFIED</span></div>
+      <div class="presetbar"><span class="ctl sel">CRC-32/ISO-HDLC &#9662;</span><span class="grow"></span><span class="ctl btn">&#128190;</span><span class="ctl btn">&#128193;</span></div>
+      <div class="hero">
+        <div class="cap">crc("123456789") &middot; kat_ok()</div>
+        <div class="big ok">0xCBF43926</div>
+        <div class="vsline">exp <b class="ok">0xCBF43926</b> &nbsp;<b class="ok">&#10003; MATCH</b></div>
+      </div>
+      <div class="grp">
+        <div class="fld"><span class="lbl">width</span><span class="val num">32</span></div>
+        <div class="fld"><span class="lbl">poly</span><span class="val num">0x04C11DB7</span></div>
+        <div class="fld"><span class="lbl">init</span><span class="val num">0xFFFFFFFF</span></div>
+        <div class="fld"><span class="lbl">refin/out</span><span class="tog">[on]/[on]</span></div>
+        <div class="fld"><span class="lbl">xorout</span><span class="val num">0xFFFFFFFF</span></div>
+        <div class="fld"><span class="lbl">intra/join</span><span class="tog">[skip]/[concat]</span></div>
+        <div class="fld"><span class="lbl">store</span><span class="val">4 B <span class="tog">[le]</span></span></div>
+      </div>
+      <div class="foot"><b>VERIFIED</b> &mdash; hand to Flow &rsaquo; CRC block to run</div>
+    </div>
+  </div>
+</div></div>
+
+<div class="legend">
+  <h3>How it binds to the built types</h3>
+  <ul>
+    <li><b>Form &rarr; <code>crc_kernel.CrcAlgorithm</code>:</b> width / poly / init / refin / refout / xorout / check are its exact fields. The preset selector is <code>PRESETS</code>; picking one populates the form (<code>preset_by_name</code>).</li>
+    <li><b>Hero verdict &rarr; <code>CrcAlgorithm.kat_ok()</code>:</b> a real tri-state &mdash; <span class="s-ok">True = MATCH</span>, <span class="s-err">False = MISMATCH</span>, <span class="banner b-none">no check</span> = no-expected (when <code>check</code> is unset). The view renders the returned state directly; no extra logic.</li>
+    <li><b>Coverage strip &rarr; <code>crc_designer_model.CrcTarget</code>:</b> its fields, 1:1 &mdash; <code>ranges[]</code> (add/remove), <code>intra_gap</code>, <code>join</code>, <code>pad_byte</code>, <code>on_gap_conflict</code>, <code>output_address</code>, <code>store_width</code>, <code>store_endianness</code>. The two CRCs are <code>compute_target_crc</code>; the stored bytes are <code>store_word</code>.</li>
+    <li><b>Gap safety &rarr; <code>on_gap_conflict</code> (obs #2):</b> before filling, the engine checks the gap against the real image; on stray data it <span class="s-err">aborts</span> (default) rather than emit a CRC that silently diverges from the device. Backed by <code>gap_conflict()</code> in the runnable prototype.</li>
+    <li><b>JSON blocks are the serializers:</b> Variant A = <code>emit_template()</code> (template, no addresses); Variant B = a <code>parse_job()</code>-shaped job (<code>algorithm_ref</code> + <code>targets[]</code>). Load routes through <code>read_template</code> / <code>parse_job</code>, collect-don't-abort &mdash; a fault is one string in the warn row.</li>
+  </ul>
+</div>
+<div class="note"><b>Honest numbers, from the tested engine.</b> <code>0xCBF43926</code> (seed = zlib), the preset table, the mismatch <code>0x8D94</code>, the coverage oracles <code>concat=0x9C5BCBBD</code> / <code>fill=0x2A8A3950</code>, and the little-endian store <code>50 39 8A 2A</code> are all real outputs asserted in <code>tests/test_crc_kernel.py</code> / <code>tests/test_crc_designer_model.py</code> (28 passing); the gap-safety abort is backed by <code>gap_conflict()</code> in the prototype. <b>Production refinements:</b> <code>check</code> is always the CRC of <code>"123456789"</code> (standard KAT, validated on save &mdash; #3); performance (256-entry LUT built at init) and shift-direction (reflected &rarr; LSB-first) are <i>engine</i> concerns, not template fields (#1, #4). The one piece the JSON implies but the keel doesn't yet emit is a whole-job serializer (<code>emit_job</code>) &mdash; the flagged follow-up.</div>
+</body></html>
