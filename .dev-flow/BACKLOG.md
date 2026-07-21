@@ -1,309 +1,56 @@
 # s19_app — dev-flow BACKLOG (cross-batch, prioritized)
 
-> Single prioritized queue for open feature work. `origin/main` tip = `be62c97` (batch-38 merged —
-> PRs #70 `4c3b821` + snapshot #71 `be62c97`; vault-synced 2026-07-13). **The entire B-01..B-24
-> backlog is SHIPPED** (P1 batches 31–35, P2 batch-37, P3 batch-38). What remains = hygiene + small
-> polish + one flaky-test spike, then the NEW Flow Builder (multi-batch, deferred — see CLOSURE PLAN
-> below). **RC-1 every batch open:** `git fetch`; assert merge-base
-> == origin/main tip; cut a fresh branch off origin/main; per-story already-shipped grep before
-> deriving. **Engine-frozen set OFF-LIMITS:** core.py, hexfile.py, range_index.py, validation/,
-> tui/a2l.py, tui/mac.py, tui/color_policy.py (TUI-side write logic → `tui/changes/io.py`) — AND the
-> frozen TEST files (`_ENGINE_TEST_FILES`: test_tui_a2l.py, test_tui_mac.py, test_validation_*, …;
-> batch-38 F-1 lesson). ≤5 files/increment; every behavioral change ships a black-box `AT-NNN` shown
-> failing pre-fix; commits/PRs only on operator approval; **ask the approval model at every batch
-> kickoff — a standing authorization is never carried across batches**
-> (feedback_standing_auth_per_batch). **Last refresh: 2026-07-12 (batch-38 close).**
+> **THE single canonical open-work queue.** Reconciled at every batch close (`/dev-flow` Phase 6 / `/fast-dev-flow` Phase C — mandatory close step, 2026-07-20). Any other list (memory `LIVE BACKLOG`, a postmortem) POINTS here, never replaces it.
+>
+> **`origin/main` tip = `69a2a49`** (batch-55 P-1b + re-freeze #104/#105 · memmap fix #106 · unload feature #107 · snapshot regen #108). **Last refresh: 2026-07-20 (post-#108).**
+>
+> **RC-1 every batch:** `git fetch`; assert merge-base == `origin/main` tip; cut a fresh branch off it; per-story already-shipped grep before deriving. **Engine-frozen set OFF-LIMITS** (needs an explicit operator unfreeze, re-frozen post-merge PR-B): `core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py` — AND the frozen TEST files (`_ENGINE_TEST_FILES`). ≤5 files/increment; every behavioral change ships a black-box `AT-NNN` shown failing pre-fix. **Standing authorization is NEVER carried across batches — ask at every kickoff** (`feedback_standing_auth_per_batch`). **All changes go through ≥ `/fast-dev-flow`** (`feedback_all_changes_tracked_min_fast_dev_flow`).
 
 ## Status legend
-`P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct, direct(global ~/.claude)}
-
-Full B-01..B-24 backlog detail: `.dev-flow/project_baseline_backlog_2026-07-09.md` (vault memory)
-with the 2026-07-11 status reconciliation. **Entire P1 set is CLOSED** (batches 31–35); batch-36
-closed US-058/059/060 (B-22/B-24/B-23); **batch-37 closes the entire P2 set — B-11/B-12/B-13/B-14**
-(US-061/062/063/064a/064b). What remains is P3 + the Bookmarks scaffold + hygiene carries.
+`P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct}
 
 ---
 
 ## OPEN QUEUE
 
-### FIELD AUDIT — post-batch-44 (2026-07-14) — operator issue sweep, code-grounded
+### 🔺 TOP — active / parked
+- **batch-56 — alignment-aware A2L padding sizing** (P-1b follow-up). `/dev-flow`. **Phase-1 DONE, PARKED 2026-07-20** (branch `claude/a2l-alignment-aware-b56`, WIP `741e86e`; autonomous+self-merge+a2l-unfreeze granted at kickoff). batch-55 force-Nones any summable CURVE/MAP layout carrying an `ALIGNMENT_*` (2-token padding) directive (safe honest-grey); batch-56 = a cumulative-offset padding walk in `_record_layout_full_span` so alignment-bearing layouts SIZE CORRECTLY. Architect pinned **R-A** (padding only when `ALIGNMENT_*` declared in the RECORD_LAYOUT body → packed default preserves batch-55 oracles 25/51/12) · **R-B** per-datatype `_DATATYPE_ALIGNMENT_DIRECTIVE` · **R-C = NO trailing record pad**. **⚠ AWAITING OPERATOR: RISK-1** — MOD_COMMON module-wide alignment is UNDER-MODELLED (layout-local only; a real ECU aligned via MOD_COMMON sizes packed). Architect recommends ship-layout-local + defer MOD_COMMON to a follow-up. Needs a non-demo alignment oracle fixture. Seed: `.dev-flow/2026-07-20-batch-55/` §6.5 A4 + code-review F1.
 
-> Operator ran the shipped tool on a real client file and filed ~25 issues + questions. Audited every
-> one against the code (3 parallel read-only agents). **Headline: most are already SHIPPED-WORKS
-> (batches 29–44); the real work is ~4 bugs + ~4 new features + a big discoverability gap.** Several
-> complaints describe **pre-batch-31/36/37 behavior** → FIRST confirm the operator is on the current
-> build (the Flow-Builder rail in the screenshot says yes, but "entropy truncated / can't paste paths
-> / tiny JSON box / no load-project" all read as stale). Answered questions: A2L undeclared-length IS
-> inferred from `DATATYPE_SIZES` (a2l.py:13-28), independent of `A2L_ADDRESS_EXCEEDS_32BIT`; CRC
-> multi-region IS shipped (batch-32 groups); "v2 change-set" = schema-v2 not variant-2; uncheckable
-> reason exists but sits on the status line.
+### P1 — open features
+- **Issues Report v2 — filter (name/type) + sort.** PARKED — operator never picked a tier in the v2 prototype verdict. Data (`symbol`/`code`/`severity`) already on each row; only a 3-way severity filter today. `app.py:6564`, `issues_view.py:173`. *(B1 PgUp/PgDn no-op ✅ FIXED batch-49 #94.)*
+- **Universal paste — paste into ALL text boxes.** PARTIAL. A2B-diff + file-load paths are paste-enabled (`OsClipboardInput`); search/goto/filter/name/save are stock `Input`. Extend the widget. `os_clipboard_input.py`, `command_bar.py`.
+- **CRC Algorithm Designer** (`/dev-flow`, design pass DONE 2026-07-20, **PENDING OPERATOR APPROVAL**): reusable algorithm template (`*.crc.json`, pure math) + per-firmware job (`algorithm_ref` + `targets[]`); full parametric 8/16/32/64; multi-range coverage w/ two gap levels; **Variant B** (preview-only, never writes). Engine VERIFIED (7 presets + zlib oracles). Artifacts in `docs/crc-algorithm-designer/` + `prototypes/crc_designer.*`.
 
-> **UPDATE 2026-07-15 — batch-45 SHIPPED N1 + N3 + U3 + U7** (Memory-Map entropy "Band-Bands" view +
-> retire the entropy pop-up; PRs [#81](https://github.com/jav201/s19_app/pull/81) `4608953` +
-> snapshot [#82](https://github.com/jav201/s19_app/pull/82) `dc4879f`; R-TUI-060/061/062, R-TUI-041
-> amended, R-TUI-050/051 retired). **NEXT (operator-approved): B2 + U8 — patch-editor responsive
-> 3-column** (prototype DONE, `prototypes/patch_editor_layout.prototype.py`, responsive 3-col +
-> docked buttons chosen). Remaining field-audit work: P0 B1 (Issues paging) + B3 (A2L two-chars,
-> needs repro); P1 N2 (Issues filter/sort) + N4 (paste everywhere); P2 polish + P3 discoverability.
+### P2 — A2L discoverability follow-ups (core '?' help SHIPPED batch-49 #95)
+- Settings-surfacing · footer-truncation · CRC-modal-depth · only 14 of 30 A2L fields shown. In-app hints / onboarding pass.
 
-**P0 — real bugs (small fix, high value)**
-- **B1 — Issues PgUp/PgDn are no-ops.** SHIPPED-BUGGY. Bindings wired but page **stride=200** while
-  panel mounts only **40** rows (`_GROUP_DISPLAY_MAX`) → no-op for 41–200 issues. Fix: page by the
-  40-row cap. `issues_view.py:52,267`, `app.py:6741`.
-- **B2 — Patch buttons unreachable / 3 scrollbars.** SHIPPED-BUGGY. Change-file pane holds the most
-  widgets but gets the smallest grid row (`1fr` of `1fr 2fr 2fr auto`); buttons overflow its fold,
-  scroll fragmented across ~5 regions. Fix: weight the row / hoist the button row. **← operator's
-  item-1; pairs with U8 3-window redesign. PROTOTYPE DONE + operator-chose responsive 3-column
-  (`prototypes/patch_editor_layout.prototype.py`: docked button rows + 3-col-when-wide/tabbed-at-floor;
-  start-geometry+font-scale DEFERRED). ← THE OPERATOR-APPROVED NEXT BATCH.** `styles.tcss:704-721`.
-- **B3 — A2L address shows "two extra chars" (clicks correct).** SHIPPED-BUGGY, NEEDS-REPRO. Likely a
-  >32-bit address (`f"0x{addr:08X}"` non-truncating) + hex-view clamp; but "at the end" implies a
-  low-order discrepancy that display/click (same `tag["address"]` int) can't produce in audited code.
-  Needs live repro w/ the real symbol+value. `app.py:9180,6265`, `a2l.py:984`.
+### P3 — carries / hygiene (fold opportunistically into a themed fast-flow)
+- **P-3 (A2L)** — reason-string precision on the address branch. BLOCKED by frozen `tc032` (needs the unfreeze). `validate_a2l_tags`.
+- **report_service:1091** — raw `check.source_path` heading; sanitize/relabel (batch-39 carry).
+- **P-1** — 1-based index convention for the axis-count / inline-axis surface (DEFERRED; no concrete defect).
+- **Unload cosmetic** — a MAC-only state (after unloading the S19 spine) keeps the S19 `path` for the window title; the Loaded panel labels correctly from `mac_path`. Re-title on unload. (#107 follow-up.)
+- **Throwaway prototype cleanup** — `prototypes/unload_state.*` (logic absorbed into the shipped unload feature). `prototypes/screen_upgrades.*` KEPT by operator decision 2026-07-17 (Batch A/B design source).
 
-**P1 — genuinely-new features**
-- **N1 — Entropy/density-shaded memory map** (operator item-2: histogram / "at a glance", grid,
-  textures). **✅ SHIPPED batch-45 (R-TUI-060/061 `4608953`)** — the map now renders entropy as a
-  proportional band bar + textured region list + docked "At a glance" histogram/sparkline (prototype
-  Variant 3 · BAND BANDS). Entropy plumbed on the worker-thread load path (`LoadedFile.entropy_windows`)
-  via the NEW non-frozen `entropy_style.py`.
-- **N2 — Issues filter (name + type) + sort.** PARTIAL. Only 3-way severity filter today; data
-  (`symbol`/`code`/`severity`) already on each row. `app.py:6564`, `issues_view.py:173`.
-- **N3 — Single-click map→hex nav.** **✅ SHIPPED batch-45 (R-TUI-062)** — a single click on a region
-  row now repositions the hex view (RegionRow.on_click → OpenInHexRequested; the 2-step reveal-button
-  path was deleted with the grid).
-- **N4 — Paste into ALL text boxes.** PARTIAL. A2B-diff paths + file-load already paste-enabled
-  (`OsClipboardInput`); search/goto/filter/name/save are stock `Input`. Extend the widget.
-  `os_clipboard_input.py`, `command_bar.py:142`.
+### Needs-repro
+- **A2L address "two extra chars"** — the >32-bit case is handled (batch-38 `A2L_ADDRESS_EXCEEDS_32BIT` warning). If a DIFFERENT case, needs a concrete repro (symbol + value). `app.py`, `a2l.py`.
 
-**P2 — UX / presentation polish**
-- **U1** surface uncheckable-entry reason inline on the row (exists on status line, `check.py:350`).
-- **U2** relabel "v2 change-set" box (schema-v2 ≠ variant-2) — trivial.
-- **U3** denser map cells / grid lines / textures — **✅ SHIPPED batch-45** (folded into N1: band segments + texture glyphs `·░▒▓` + `band-*` classes).
-- **U4** load-project as inline dropdown vs modal list (functionality shipped, `screens.py:638`).
-- **U5** bigger workspace files allocation at 80×24 (elastic already, splits left col 1:1).
-- **U6** ASCII in the hex-only "### Modifications" table (`report_service.py:970`) — "Change-entry
-  linkage" already has before+after ASCII.
-- **U7** entropy strip: description-first landing — **SUPERSEDED batch-45**: the standalone entropy
-  strip/modal is retired; region-row selection now populates the map detail pane (description) *and*
-  navigates to hex (single click).
-- **U8** 3 distinct windows for patch/checks (gestalt) — stronger than today's labeled sections;
-  pairs with B2. **PROTOTYPE DONE → operator-chose responsive 3-column (docked buttons); THE
-  OPERATOR-APPROVED NEXT BATCH** (see B2).
+### Flow Builder (rail-8, multi-batch — the parallel FB session's stream)
+- **batch-51 SHIPPED** ([#101](https://github.com/jav201/s19_app/pull/101) `640de1b`): CHECK block + LOAD integrity-notices + `completed-with-issues` amber status + "Pipeline Ledger" render. NEW global control **C-36**.
+- **Next: batch-52 = CRC block** (template lib + address-space growth; the **CRC-into-loop seam** — split `write_crc_image` into a pure inject stage + shared write, ADR §7) + the before/after twin ribbon (§6.5 AMD-1) → **batch-53 = `flow.json` persistence** (untrusted-loader security — replicate the manifest guards) → **multi-image scope + report fusion**. ADR: `.fast-dev-flow/ADR-flow-builder-tracer.md`.
 
-**P3 — discoverability (biggest lever, mostly NOT code)** — SHIPPED but operator couldn't find:
-report-filter (R-RPT-FILTER-001, "most important" — exists), CRC multi-region (batch-32 groups),
-Refresh + JSON popup (R-TUI-052/053), persistent "Write before/after report" button (US-061),
-load-project (`p`). → in-app hints / onboarding pass. (Entropy paging/sort/legend R-TUI-050/051
-RETIRED batch-45 — superseded by the always-visible Band-Bands map.)
-
-**Won't-fix (format-inherent — explain):** Markdown per-byte colour + MD side-by-side — Markdown can't
-express either; HTML report already does BOTH (`diff_report_service.py:1765,1868`).
-
-### P3 — low
-- **B-16/B-17/B-18/B-19 — SHIPPED batch-38 (US-065/066/067/068a/068b).** The entire P3 pool is
-  CLOSED (pending commit/PR). See DONE below. What remains open is the Bookmarks scaffold + hygiene
-  carries.
-
-### Rail-8 "Bookmarks" → Flow Builder (NEW multi-batch feature, DEFERRED after hygiene)
-- **Operator decision 2026-07-13:** Bookmarks is DROPPED (reports already track memory-address
-  values, so bookmarks are redundant). Rail item 8 is instead repurposed into a **functional-block
-  Flow Builder** — compose already-coded operations (patch → check → CRC → write-out) as an ordered
-  pipeline of typed blocks, run across the project's S19 image(s), emit output file(s). Dropdown-to-add
-  (no drag-drop). Architect grounding: most of the execution engine ALREADY exists
-  (`variant_execution_service` runs ordered, state-threading, multi-op {patch,check} plans); NEW work
-  = a typed-block vocabulary + a thin `flow_execution_service` + the rail-8 UI + persistence. All named
-  ops are in NON-frozen modules. **Multi-batch roadmap:** b-N tracer (`source→patch→write-out`, run,
-  observable output) → +check/crc blocks (CRC-into-loop = the real seam) → flow persistence → multi-image
-  scope + report fusion → polish. **Deferred: operator finishes the open hygiene/polish backlog FIRST.**
-
-### Hygiene carries (fold opportunistically)
-- **S-F7** (P3): `report_service` surfaces raw `linkage_symbol` — sanitize/relabel. batch-35 carry.
-- **`canonical_report_bytes` helper consolidation** (P3): consolidate the duplicated
-  report-byte-identity golden helpers into one canonicalizer. batch-35 carry.
-- **`__setattr__` retire** (P3): retire the `__setattr__` shim once callers are migrated. batch-35
-  carry.
-- **P-1 / P-2 / P-3** (P3): the standing process/polish carries from the baseline backlog
-  (coverage-% `.6f` display; A2L-symbol region names + per-cell tooltips R-TUI-041 R-3;
-  pre-existing full-suite TUI global-state flake). See baseline backlog for detail.
-- **Native bracketed-paste 64 KiB cap gap (P3, NEW — batch-37 surfaced, US-064-adjacent,
-  PRE-EXISTING; batch-38 EXTENDS).** Neither `#patch_paste_text`, the batch-37 `#changeset_json_text`
-  popup, NOR batch-38's new `#entry_json_text` per-entry popup caps Textual's native bracketed paste
-  at 64 KiB; the 65 KiB `os_clipboard_input` funnel guards a *different* ingress. Include
-  `#entry_json_text` when this carry lands. **Flow:** `/dev-flow` or `direct`.
-- **batch-38 LOW review carries (P3, NEW).** All reviewer-accepted non-blocking. Inc-4 F1: the Checks
-  results panel goes stale after undo/redo (`last_check_result` not reset in `undo`/`redo`;
-  `_refresh_patch_history_view` refreshes entries+issues but not check-results) — secondary
-  user-invoked surface. Inc-4 F2: undo/redo discoverability is below the entries-pane fold →
-  proposed `ctrl+z`/`ctrl+y` key bindings routed to the same `UndoRequested`/`RedoRequested`
-  messages. Inc-5 F1: a per-entry edit that changes an address to collide with a sibling passes the
-  per-entry parse but is re-detected + blocked at the document Validate/Apply/Save gate (by-design,
-  LLR-068b.3). Detail: `.dev-flow/2026-07-12-batch-38/05-postmortem.md` §6.
-- **batch-38 patch snapshot regen (P3, NEW).** The 2 `patch` density cells
-  (`test_tc016s_density_layout_snapshot[patch-comfortable-80x24 / -120x30]`) are `xfail(strict=False)`
-  from US-065's copy change + US-067's info button (`_batch38_drift_marks`, `test_tui_snapshot.py`).
-  Regenerate ONLY in canonical CI **post-merge** (local regen drifts unrelated baselines), then
-  retire the xfails + the helper. A follow-up snapshot-baselines PR, as in #67/#69.
-- **~9 LOW review carries (P3, NEW — batch-37 increment reviews).** All reviewer-accepted as
-  non-blocking; groom only if they recur. Inc-1: TC-328 uses a status-line proxy for the None-guard.
-  Inc-2: AT-061a activation via `.press()` not `pilot.click` (zero suite precedent; still routes
-  end-to-end through the message→handler, not a proxy) + b-path asserts distributed across the node.
-  Inc-3: `ENTROPY_STRIP_MAX_CELLS` vestigial after the fixed-512 page budget + a drift-mark unused
-  arg. Inc-4: page-2 real-click is unit-covered (TC-327), AT drives page-0 cells + a benign
-  deferred-mount race (`call_after_refresh`, green across toggles). Inc-5: `Escape` not bound on
-  `ChangeSetJsonScreen` (Cancel button is; data-safe). Detail:
-  `.dev-flow/2026-07-11-batch-37/05-postmortem.md` §6.
-- **Snapshot-baseline regen (batch-37 carry)** (P3): the batch-36 patch cells were regenerated and
-  their xfails retired via PR #67 (merged). NOW the **2 entropy snapshot cells**
-  (`test_tc036s_entropy_modal_snapshot[entropy-comfortable-80x24 / -120x30]`,
-  `test_tui_snapshot.py:613-634`) are `xfail(strict=False)`-until-baseline — they snapshot the new
-  `#entropy_controls` / `#entropy_legend` / `#entropy_cell_k` surface. Regenerate ONLY in the
-  canonical CI env **post-merge** (local regen drifts unrelated baselines —
-  `reference_snapshot_regen_env`), then retire the xfails + the batch-37 `_batch37_entropy_drift_marks`.
-  A follow-up snapshot-baselines PR, as in batches 35/36.
-- **Snapshot-baseline regen (batch-44 carry) — DONE (PR pending):** the batch-44 rail-8 relabel
-  (`"Bookmarks"`/U+2736 → `"Flow Builder"`/U+2726, R-TUI-059) redrew the activity rail in every
-  snapshot cell. Regenerated in the canonical CI env (`snapshot-regen.yml` `workflow_dispatch`,
-  `textual==8.2.8`, **run 29346071860 at main `1fcdca3`**); containment confirmed **exactly 20 cells
-  moved** (all `test_tc016s_density_layout_snapshot` + the `entropy-comfortable-120x30`
-  `test_tc036s_entropy_modal_snapshot` cell — 40 insertions / 40 deletions, no other screen). Delta
-  verified as the pure rail relabel (`✦  Flow Builder` ← `✶  Bookmarks`). Baselines committed +
-  `_batch44_drift_marks` neutered to `return ()` (`test_tui_snapshot.py`). Follow-up
-  snapshot-baselines PR (the #67/#69/#71 lane); tui-ci on the PR is the authoritative green gate.
+### Deferred control-encodes (need their own AskUserQuestion before touching `~/.claude/commands/`)
+- **1c — code↔requirement REVERSE-index control** (deferred batch-48): `resource → {claimants}`, flag ≥2 claimants in one scope, WITH a CI staleness guard (every `R-*`/`LLR-*` code tag names a live requirement). Half-built: 25 back-refs in `screens_directionb.py`; `REQUIREMENTS.md` maps `R-*`→files. Detail: `project_devflow_control_lineage`.
+- **1d — markup-sink SWEEP rule** (un-encoded candidate): when a markup sink is found, sweep EVERY site of that widget class (4 surfaces, 3 separate discoveries: batch-33 `screens.py` → batch-43 tooltips → batch-48 DataTable + Select). Assert `plain` verbatim AND `spans == []`.
 
 ---
 
-## Lessons carried (feed the next census)
-- **Census cross-file sweep (batch-37, US-064a → C-26 / C-CAND-A, operator-approved).** Inc-1 added
-  `#patch_doc_refresh_button` to `#patch_doc_controls` and updated its HOME-file id census
-  (`test_at057a` in `test_tui_patch_editor_v2.py`) but NOT the SIBLING census
-  `test_tc319_regroup_section_structure_census` in `test_tui_patch_layout.py`, which pins the SAME
-  container's child order in a different file; the additive button broke the sibling pin and slipped
-  every per-increment gate, caught only by the Phase-4 whole-suite run (orchestrator-fixed test-only,
-  0 shipped defect). **Rule (C-26, extends C-14):** when an increment adds/moves/removes a widget in
-  a PINNED structure (an id-census or exact-child-list layout test), grep the touched widget id AND
-  its parent container id across ALL of `tests/` before closing the increment — every file that pins
-  the surface must be in the increment's run scope and, if it asserts order/membership, superseded to
-  the shipped state. Origin: `.dev-flow/2026-07-11-batch-37/04-validation.md` §7,
-  `05-postmortem.md` §2 F-1 / §7. (Companion candidate C-CAND-B — verify existing-widget-class claims
-  at draft time, from the S-01 spec-premise miss — proposed, lower priority, may be declined as
-  already covered by Engineering Rule 8.)
-- **Writer-census includes report-byte-identity goldens (batch-36, US-059).** Whenever a
-  report-content SOURCE changes (e.g. `LEGEND_TABLE`, or any string that renders into a generated
-  report), the supersession census MUST enumerate every byte-identity / full-output golden that
-  snapshots rendered report bytes as a superseded consumer. From
-  `.dev-flow/2026-07-11-batch-36/05-postmortem.md` §7.
-
----
-
-## DONE (batches 31–38, shipped) — do NOT redo, verify-shipped if in doubt
-- **batch-38 (US-065/066/067/068a/068b — the entire P3 pool B-16/B-17/B-18/B-19) — pending
-  commit/PR.** US-065 (B-16) change-set free-path label clarity — title `"Change document (JSON)"` +
-  placeholder framed as an alternative to the `patches/` dropdown (R-TUI-054); US-066 (B-17) defensive
-  `A2L_ADDRESS_EXCEEDS_32BIT` WARNING for tag addresses > 0xFFFFFFFF, produced TUI-side in
-  `services/validation_service.py` (engine frozen), C-17 markup-safe (R-TUI-055); US-067 (B-18)
-  variant-selector info button → `VariantHelpScreen` modal (R-TUI-056); US-068a (B-19) patch-editor
-  undo/redo, bounded deep-copy history `_HISTORY_MAX=20` in ChangeService + A-01 file-loaded guard
-  (R-TUI-057); US-068b (B-19) per-entry JSON popup `EntryJsonScreen` (single-entry seed, validated
-  `parse_change_document`) + A-01 guard (R-TUI-058). REQUIREMENTS §35. Gate green
-  (`1377 passed, 2 skipped, 5 xfailed, 0 failed`; ledger 1358→1377, +19); 6/6 black-box ATs C-18
-  single-node; frozen 0 (source + test). Autonomous + self-merge (operator grant, batch-38-only).
-  Root causes: F-1 frozen-TEST-file guard gap (AT-066a briefly in frozen test_tui_a2l.py, fixed
-  test-only); F-2 Phase-1 multi-author contract drift (Phase-2 caught). No scope drift.
-- **batch-37 (US-061/062/063/064a/064b — the entire P2 set B-11/B-12/B-13/B-14) — MERGED PRs #68
-  `18f1d30` + snapshot #69 `5a6c45b`.** US-061 (B-11) persistent before/after-report control
-  (R-TUI-049); US-062 (B-12) entropy viewer paging past the 512 cap + entropy/address sort
-  (R-TUI-050); US-063 (B-13) entropy band-colour legend + clickable strip cells that navigate
-  (R-TUI-051); US-064a (B-14) patch-editor Refresh re-reads the file over `document.source_path`
-  (R-TUI-052); US-064b (B-14) full-size JSON popup editor with the file-loaded disable-guard
-  (R-TUI-053). REQUIREMENTS §34.
-- **batch-36 (US-058/059/060) — snapshot PR #67 merged (`978a900` tip line).** US-058 (B-22)
-  patch-editor readable paste box reparented (R-TUI-046); US-059 (B-24) hex-view colour legend in
-  modal + report (R-TUI-047); US-060 (B-23) fixtures relocated to `examples/` + 54 MB duplicate A2L
-  pruned, 96 M → ~42 M (R-TUI-048). REQUIREMENTS §33.
-- **batch-35 (B-07, LAST P1) — PR #64 `2a647d1` + snapshot PR #65.** Report filter whitelist
-  (R-RPT-FILTER-001) + patch-editor regroup into labeled patch-script / checks sections (R-TUI-045).
-  Closes the 2026-07-09 P1 set. REQUIREMENTS §32.
-- **batch-34 (B-08/09/10) — PR #63 `79699a5`.** Merged context windows, HTML side-by-side panes with
-  per-byte highlights, linkage `HH HH |ascii|` cells (fast-flow reports lane).
-- **batch-33 (B-02) — PR #61 `f79834e` + snapshot PR #62.** Check results explain themselves +
-  per-entry taint (R-CHK-002).
-- **batch-32 (B-21) — PR #60 `dd91941`.** CRC groups (`groups` beside legacy `regions`,
-  declared-order concat → one CRC → one output_address + output_bytes {1,2,4,8} LE).
-- **batch-31 (P1 quick strike B-01/03/04/05/06/15/20) — PR #58 `91d884a` + regen PR #59.** Hex-nav
-  snap, clipboard inputs ×7, Issues PgUp/PgDn, Load-project button; goto/search to absent address
-  repositions nearby.
-
-## DONE (batches 14–28) — condensed; full lineage in the vault
-Features #1–#12 + #17 and the #8 patch-editor line (US-026..031, b21/b22/b23) + #11 legend +
-#10 issues + #9 one-line hex + declared-region round-trip (D-1/D-2) + A2L↔issues reconcile +
-before/after report (#12(a)+(c)) + entropy viewer (#12(b), b26) + variant dropdown (#8 CLOSED, b23).
-Full detail: `.dev-flow/project_baseline_backlog_2026-07-09.md` and the vault batch log.
+## DONE (recent — do NOT redo; verify-shipped if in doubt)
+- **post-55 fast-flows (2026-07-20):** **memmap "No file loaded" bug** ([#106](https://github.com/jav201/s19_app/pull/106)) — S19+MAC coexistence merge dropped `entropy_windows`+`source_s0_header`; carried forward + split the empty message. **Unload feature** ([#107](https://github.com/jav201/s19_app/pull/107) `ae4aef2` + regen [#108]) — Workspace `LoadedArtifactsPanel` + inverse-merge `_unload_*` (Variant B).
+- **batch-55** (P-1b inline-axis length summer) — [#104](https://github.com/jav201/s19_app/pull/104) `a9608c8` + re-freeze [#105]. CURVE/MAP inline STD_AXIS/FIX_AXIS → correct byte length; external stays None (full-span-or-None). Also 🅰 missing-length (#92) · P-1 scalar length (#93) · P-2 re-freeze (#100).
+- **🅱 report diff vs patched S19** — VERIFIED-WORKING 2026-07-18 (no code change; `compose_before_after_report` re-reads both sides fresh). Do NOT rebuild.
+- **batch-54** (multi-line A2L header parsing — P-1b prerequisite) #102/#103. **batch-50** (a2l.py F841 + re-freeze) #99/#100; NEW C-35. **batch-49** (Issues MID + CHECKS rail #94/#95) #97; NEW C-33/C-34. **batch-48** (Patch Editor BIG) `fbafb82`; C-31/C-32. **batch-47** (screen-upgrades Batch A: insight layer + navy/pastel) `768f70a`; C-30. **batch-45** (Memory-Map entropy Band-Bands + single-click map-nav) #81/#82; R-TUI-060/061/062.
+- **Field-audit (2026-07-14) items SHIPPED:** N1 entropy-shaded map (b45) · N3 single-click map-nav (b45) · B1 Issues paging (b49 #94) · B2/U8 patch 3-window (b47/48) · discoverability '?' help (b49 #95).
+- **batches 31–46** (B-01..B-24 baseline + CRC groups + report filter + patch regroup + untrusted-text hardening + TUI-flake root-cause + Flow Builder tracer). Full lineage: `.dev-flow/project_baseline_backlog_2026-07-09.md` + the vault batch log.
 
 ## Controls encoded — do NOT re-encode
-RC-1, C-1..C-28 (canonical record: `project_devflow_control_lineage.md`). **PLACEMENT SPLIT (batch-45,
-operator-directed 2026-07-15):** the global `/dev-flow` command stays PROJECT-AGNOSTIC — stack-specific
-controls **C-13/C-13.1/C-22/C-23 relocated to this repo's `docs/engineering-rules.md`** ([PR #83](https://github.com/jav201/s19_app/pull/83) `299d04e`); **NEW C-28** (shared-chrome/footer binding-drift snapshot
-census) encoded there; only project-agnostic **C-16/C-17/C-27** stay global + a standing
-"classify-before-encode: stack-specific→project doc" policy. Rule: keep general flows general
-(`feedback_devflow_general_flows_project_agnostic`). **C-26 (touched-symbol
-reverse census — generalizes C-14 + C-24) ENCODED 2026-07-12 (batch-37).** **batch-38 proposes
-C-CAND-A (primary): the per-increment frozen-file guard must run BOTH `test_engine_unchanged` (SOURCE
-freeze) AND `test_tc032`/`test_tc031` (engine TEST-file freeze) — origin batch-38 F-1, a stray AT in
-frozen `test_tui_a2l.py` passed the increment gate because only the source-freeze guard ran; and
-C-CAND-B (secondary): a Phase-1 shared-contract convergence step (issue codes / producer sink / AT
-targets reconciled across §4/intake/PLAN/01b before the Phase-2 gate) — origin F-2.** Both await
-per-control operator approval before entering the lineage. Standing: two-layer AT/TC + dual
-traceability; inline-paste-at-gates; writer-census sweeps (C-14 / C-15.1 / C-26); dev-flow
-control-encode approval (always ask before editing `~/.claude/commands/`).
-
----
-
-## CLOSURE PLAN — operator-approved 2026-07-13 (finish open work BEFORE the Flow Builder)
-
-Everything B-01..B-24 shipped; batch-38 snapshot regen DONE (PR #71). Remaining = hygiene + small
-polish + one spike, grouped into 3 small themed batches, then the Flow Builder (multi-batch).
-
-- **Batch 39 — "Untrusted-text hardening" (`/fast-dev-flow`) — DONE** ([PR #72](https://github.com/jav201/s19_app/pull/72) `fbd8aaa`): ① native paste **64 KiB cap** on all **5** stock TextAreas (pre-pass expanded 3→5) via `CappedTextArea`; ② **S-F7** escape `linkage_symbol` at report render sink `report_service:977` (was mis-specced :625); ③ **P-3** `markup=False` on `#status_text` + 3 notify sites + docstring fix. Pre-code+final security PASS.
-- **Batch 40 — "Small UX fixes" (`/fast-dev-flow`) — DONE** ([PR #73](https://github.com/jav201/s19_app/pull/73) `0954826`): ④ undo/redo reset `last_check_result` + refresh Checks panel; ⑤ `ctrl+z`/`ctrl+y` bindings (A-01 guard preserved); ⑦ coverage `.6f`→`.2f`. (⑥ A2L-symbol region names + per-cell tooltips R-TUI-041 R-3 → **its own future batch**, operator 2026-07-13.)
-- **Batch 41 — "Repo & test hygiene" (`/fast-dev-flow`) — DONE 2026-07-13:** ⑧ `_canonical_report_bytes`
-  consolidated onto `conftest.canonical_report_bytes` (2 local copies deleted; 3 importers); ⑨
-  `object.__setattr__` bypass retired in 2 files (`source_name=` kwarg — field already declared, zero
-  production change); ⑩ **P-2** 7 of 8 ruff hits cleared (frozen `a2l.py:926` F841 = documented carry);
-  ⑤ `Escape`→cancel binding on `ChangeSetJsonScreen` (RED-first AT); ⑥ vestigial `ENTROPY_STRIP_MAX_CELLS`
-  removed (live `ENTROPY_MAX_ROWS` preserved). Gate **1394 passed / 0 failed / 3 xfailed** (+1 test), 0
-  frozen diffs, C-27 dual-guard ×2, C-26 census clean, `security_required: false`. **⑪ P-1 DEFERRED**
-  (no concrete defect — re-logged below). 12 code files, net −44 lines.
-- **Spike ⑫ — DONE (batch-42, 2026-07-13):** full-suite TUI global-state flake root-caused via `/diagnose` +
-  FIXED. Root cause: `workspace.py::setup_logging` attached a `RotatingFileHandler` to the process-global
-  `s19tui` logger on every `S19TuiApp.__init__`; the per-path dedup guard never matched across tests (fresh
-  `tmp_path` each) → handlers accumulated 1:1 with app constructions, never closed → O(N) log fan-out →
-  intermittent `pilot`/`WaitForScreenTimeout` failures ("different unrelated test fails each run; passes in
-  isolation"). Fix bounds the handler set to 1 per process (batch-42 fast-flow, self-merged). **Retires the
-  standing per-batch control-run tax (C-CANDIDATE-C).**
-- **Item ⑥ — DONE (batch-43, 2026-07-13):** A2L-symbol region names + Memory-Map per-cell tooltips
-  (**R-TUI-041 R-3**, deferred at batch-27). Render-only over `_a2l_enriched_tags`: the detail-pane
-  covering region is named by overlapping A2L symbol(s) (capped 3 + "+N more"), and each `MapCell` gets a
-  hover tooltip listing the symbols in the cell + its window/status. New `symbols_in_window` /
-  `symbol_list_text` / `_cell_tooltip`; `update_memory_map` passes tags as `render_ranges`'s 4th arg.
-  `a2l.py` only READ (frozen, untouched). `security_required: TRUE` — security-reviewer pre-code pass
-  (F1): a `str` tooltip is markup-parsed by Textual 8.2.8 (would inject/crash on hover) → mitigation =
-  tooltip is a Rich `Text` (never f-string); detail pane via `Text.append(safe_text)`. Gate **1400
-  passed / 0 failed / 3 xfailed** (+5 tests), 0 frozen diffs, C-27 dual-guard ×2, C-26 census clean,
-  RED-first for AC-1 + AC-2. fast-dev-flow, autonomous + self-merge. REQUIREMENTS R-TUI-041 amended.
-
-> **Tracking rule (operator, 2026-07-13):** ALL code changes go through **at least `/fast-dev-flow`**
-> (tracked: spec + branch + PR + tests). Do NOT do trivial/hygiene items as untracked `direct` edits —
-> consolidate them into a fast-dev-flow batch. This supersedes the earlier "mostly direct" framing for
-> batch 41 and any "fold opportunistically / direct" note elsewhere in this backlog.
-- **Flow Builder** (batches 44+, roadmap above). **Design DONE** (`.fast-dev-flow/ADR-flow-builder-tracer.md`,
-  system-design pass 2026-07-14). **batch-44 tracer DONE** (R-TUI-059): rail-8 Flow Builder runs
-  SOURCE→PATCH→WRITE-OUT via new `flow_model` + `flow_execution_service.run_flow` (reuses the ops +
-  `_execute_one_variant` state model) + `FlowBuilderPanel`. Gate 1373 pass / 0 fail; snapshot regen
-  follow-up pending (rail-8 relabel drift, `_batch44_drift_marks` xfail). **NEXT: b-45 flow persistence
-  (`flow.json` untrusted loader — security-focused); b-46 CHECK + CRC blocks (the CRC-into-loop seam,
-  ADR §7 — split `write_crc_image` into a pure inject stage + shared write); b-47 multi-image scope.**
-
-**Accepted, no action:** batch-38 Inc-5 F1 (cross-entry collision caught at doc gate, by-design);
-batch-37 ~9 LOW carries (groom only if they recur). **C-CAND-B** (Phase-1 contract convergence) left
-proposed-only (operator chose C-CAND-A/C-27 only, 2026-07-13).
+RC-1, **C-1..C-36** (canonical: `project_devflow_control_lineage.md`). Stack-specific controls (C-13/C-13.1/C-22/C-23/C-28/C-29/C-30) live in `docs/engineering-rules.md`; global flows stay project-agnostic (`feedback_devflow_general_flows_project_agnostic`). **NEW 2026-07-20: backlog carry-over is a mandatory close step in both flows** (`feedback_backlog_carryover_enforced`).
