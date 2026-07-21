@@ -72,3 +72,9 @@
 - Dispatch `architect` + `qa-reviewer` + `security-reviewer` in parallel over 01-requirements + 01b-qa-catalog.
 - Fold blockers (esp. the 4 reconciliation items above) into a single canonical §4.9 splice + §5.2 reconciliation; re-derive the increment cut (C-21) if the AT set changes.
 - Then Phase 3 (implementation, ≤5 files/inc).
+
+### Phase 2 — DONE (self-approved, autonomous), iter=1 → Phase 3
+- **3 reviewers**, 0 HIGH / 0 redesign. architect: 3 reconciliation blockers (all id/registry) + 2 major. qa: 4 major (coverage/reachability). **security: 1 real MAJOR — `ALIGNMENT 0`/neg → `align_up` `o%0` ZeroDivisionError NOT caught by `(ValueError,TypeError)`.**
+- **Fold (02-review.md):** canonical registry **AT-113..122 / TC-143..153**; primary fixture = multi-class **16/13**; **R-C=17** (no trailing pad); **+AT-122** (hostile alignment value non-int/0/neg → None) merging sec-M3+qa-M4; MOD_COMMON=**26** pinned as AT-114's named RED. Spec edits landed: LLR-A56.2 non-positive guard, LLR-A56.5 `align_up a<=1` short-circuit, §4.9 splice.
+- **Re-cut (C-21):** Inc-1 unfreeze(2) · Inc-2 walk + NEW `test_a2l_alignment_sizing.py`(2) · Inc-3 supersede+docs(2) · PR-B re-freeze. New tests import `_write_a2l`/`_axis_meta` from the batch-55 module.
+- **Decision:** the R-C no-trailing-pad ruling and the RISK-1 MOD_COMMON deferral are operator-set (kickoff); all other folds are unambiguous reviewer-agreed reconciliations. Recorded in state.json decisions_log.

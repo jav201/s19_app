@@ -21,18 +21,26 @@
     "primary_fixture_oracle": "01-requirements §2.5 fixture = ALIGNMENT_WORD 2, axis_counts=[2] -> 8 (packed 7). 01b-qa-catalog §B fixture = multi-class (WORD+LONG) -> 16 (packed 13). Both hand-computed + probe-grounded; pick ONE canonical primary at the fold.",
     "R_C_status": "01-requirements DECIDES R-C = reading (i) no-trailing-pad (firmly, §6.2). 01b-qa-catalog treats R-C as OPEN (AT-119: 17 no-trailing / 24 trailing). Operator/spec ruling = no trailing pad (R-C reading i). Reconcile: R-C is CLOSED = no trailing pad; AT-119 asserts the no-trailing value."
   },
-  "current_phase": 2,
+  "current_phase": 3,
   "phase_status": "not-started",
-  "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
+  "iterations_per_phase": {"0": 0, "1": 0, "2": 1, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
     "1": ".dev-flow/2026-07-20-batch-56/01-requirements.md",
     "1b": ".dev-flow/2026-07-20-batch-56/01b-qa-catalog.md",
+    "2": ".dev-flow/2026-07-20-batch-56/02-review.md",
     "plan": ".dev-flow/2026-07-20-batch-56/PLAN.md"
+  },
+  "increment_plan": {
+    "Inc-1": "UNFREEZE: remove a2l.py from both _ENGINE_PATHS + swap NOTE blocks. Files: tests/test_engine_unchanged.py, tests/test_tui_directionb.py (2). TC-152.",
+    "Inc-2": "Alignment-aware walk: a2l.py (_DATATYPE_ALIGNMENT_DIRECTIVE + _collect_declared_alignments fail-closed non-int AND non-positive + align_up a<=1 guard + rewrite _record_layout_full_span cumulative-offset walk, no trailing pad, MOD_COMMON never read, DoS cap inside walk) + NEW tests/test_a2l_alignment_sizing.py (imports _write_a2l/_axis_meta from batch-55 module). Files: 2. AT-113..120,122 / TC-143..150.",
+    "Inc-3": "Supersede + docs: tests/test_a2l_inline_axis_length.py TC-133b amend (None->14/13/13, §6.5) + REQUIREMENTS.md:402-409 prose. Files: 2. TC-151.",
+    "PR-B": "POST-MERGE, separate: re-insert a2l.py both _ENGINE_PATHS; guard files only. TC-153/AT-121."
   },
   "decisions_log": [
     {"phase": 0, "date": "2026-07-20", "decision": "kickoff + intake (original)", "notes": "batch-56 alignment-aware padding sizing authored on branch claude/a2l-alignment-aware-b56. US-A56 + US-P2b56 both READY. Parked before Phase 2."},
     {"phase": 1, "date": "2026-07-20", "decision": "requirements + qa catalog authored (WIP 741e86e)", "notes": "01-requirements.md (2 US / 2 HLR / 7+2 LLR, R-A/R-B/R-C pinned, C-35 draft-time execution over synthetic + demo, ALL MATCH) + 01b-qa-catalog.md (AT/TC registry). Phase-1 code NOT started."},
-    {"phase": 0, "date": "2026-07-21", "decision": "RESUME kickoff re-authorized (operator, per-batch)", "notes": "Autonomy never carried; re-asked at resume. Operator: autonomous+self-merge; RISK-1 ship-layout-local/defer-MOD_COMMON; a2l.py unfreeze granted (+PR-B re-freeze). RC-1 PASS @ 7954652 on fresh branch feat/batch-56-alignment-aware. batch-59 given a minimal dev-flow close first (BACKLOG reconciled). Phase-2 reconciliation items recorded (id ranges, test file, fixture oracle, R-C). -> Phase 2."}
+    {"phase": 0, "date": "2026-07-21", "decision": "RESUME kickoff re-authorized (operator, per-batch)", "notes": "Autonomy never carried; re-asked at resume. Operator: autonomous+self-merge; RISK-1 ship-layout-local/defer-MOD_COMMON; a2l.py unfreeze granted (+PR-B re-freeze). RC-1 PASS @ 7954652 on fresh branch feat/batch-56-alignment-aware. batch-59 given a minimal dev-flow close first (BACKLOG reconciled). Phase-2 reconciliation items recorded (id ranges, test file, fixture oracle, R-C). -> Phase 2."},
+    {"phase": 2, "date": "2026-07-21", "decision": "cross-review DONE (3 reviewers) -> fold APPLIED -> self-approved (autonomous) -> Phase 3", "notes": "architect (3 reconciliation blockers B1 AT-113 8/7-vs-16/13, B2 AT-115/117 semantic collision, B3 disjoint LLR ids; +2 major file-budget/under-cover; +minor stale anchors); qa (4 major: malformed-value AT missing, AT-113 conflict, AT-115 collision, new-file helper orphan; +3 minor); security (0 HIGH, 1 MAJOR real: ALIGNMENT 0/neg -> align_up o%0 ZeroDivisionError NOT caught by (ValueError,TypeError); +2 minor). ALL Certainty-axis, 0 redesign. FOLD (02-review.md §1-§3): canonical registry AT-113..122/TC-143..153 (multi-class 16/13 primary; R-C=17 no-trailing; +AT-122 hostile-alignment merging sec-M3+qa-M4; MOD_COMMON=26 pinned as AT-114 RED). Load-bearing spec edits landed: LLR-A56.2 non-positive-alignment guard (return None if <1), LLR-A56.5 align_up a<=1 short-circuit before modulo, §4.9 splice -> 02-review §2. Re-cut increments (C-21, AT set grew +119/120/122): Inc-1 unfreeze(2) / Inc-2 walk+NEW test file(2) / Inc-3 supersede+docs(2) / PR-B re-freeze. NEW tests -> non-frozen tests/test_a2l_alignment_sizing.py importing _write_a2l/_axis_meta. Axis Coverage/Certainty/Evidence all met post-fold; Phase-2 iter=1."}
   ],
   "obsidian_synced": false,
   "created_at": "2026-07-20T00:00:00Z"
