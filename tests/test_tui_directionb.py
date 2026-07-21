@@ -448,9 +448,10 @@ def test_tc037_scaffold_screens_carry_empty_state(tmp_path: Path) -> None:
 # Increment 3 — activity rail widget + rail navigation wiring
 # ===========================================================================
 
-# The 9 rail items, in rail order, paired with their screen key and the
+# The 10 rail items, in rail order, paired with their screen key and the
 # normative LLR-001.3 glyph -> screen mapping table (Unicode + ASCII).
 # batch-49 (LLR-083.1): Checks appended as the 9th entry on key 9.
+# batch-58 (LLR-V1.1): CRC Designer appended as the 10th entry on key 0.
 EXPECTED_RAIL = [
     ("workspace", "◫", "#"),
     ("a2l", "≡", "="),
@@ -461,6 +462,7 @@ EXPECTED_RAIL = [
     ("diff", "⏚", "D"),
     ("flow", "✦", "F"),
     ("checks", "☑", "C"),
+    ("crc_designer", "⊕", "R"),
 ]
 
 
@@ -491,8 +493,8 @@ def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
     assert keys == [key for key, _, _ in EXPECTED_RAIL], (
         f"Rail item order should match the keymap rail order, got {keys}"
     )
-    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9], (
-        f"Rail items must be positioned 1-9 in order, got {positions}"
+    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (
+        f"Rail items must be positioned 1-10 in order, got {positions}"
     )
 
 
@@ -701,7 +703,7 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             ]
 
     rendered = asyncio.run(_drive())
-    assert len(rendered) == 9, f"expected 9 rail items, got {len(rendered)}"
+    assert len(rendered) == 10, f"expected 10 rail items, got {len(rendered)}"
     for (screen_key, glyph), (exp_key, _, exp_ascii) in zip(rendered, EXPECTED_RAIL):
         assert screen_key == exp_key, f"order: {screen_key} != {exp_key}"
         assert glyph == exp_ascii, (
