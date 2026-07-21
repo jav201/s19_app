@@ -73,6 +73,7 @@ from .screens_directionb import (
     safe_text,
     status_to_css_class,
 )
+from .crc_designer_view import CrcDesignerPanel
 from .color_policy import css_class_for_severity
 from .entropy_style import band_style
 from .insight_style import (
@@ -1319,6 +1320,7 @@ class S19TuiApp(App):
         Binding("7", "show_screen('diff')", "A2B Diff", show=False),
         Binding("8", "show_screen('flow')", "Flow Builder", show=False),
         Binding("9", "show_screen('checks')", "Checks", show=False),
+        Binding("0", "show_screen('crc_designer')", "CRC Designer", show=False),
         ("plus", "page_next_context", "Page+"),
         ("minus", "page_prev_context", "Page-"),
         ("comma", "hex_page_prev", "Hex-"),
@@ -1840,6 +1842,7 @@ class S19TuiApp(App):
                 self._compose_screen_diff(),
                 self._compose_screen_flow(),
                 self._compose_screen_checks(),
+                self._compose_screen_crc_designer(),
                 id="workspace_body",
             ),
             id="workspace_shell",
@@ -2183,6 +2186,40 @@ class S19TuiApp(App):
             Label("Flow Builder", classes="db-screen-title"),
             FlowBuilderPanel(),
             id="screen_flow",
+            classes="db-screen hidden",
+        )
+
+    def _compose_screen_crc_designer(self) -> Container:
+        """
+        Summary:
+            Build the rail-10 CRC Designer screen (``#screen_crc_designer``,
+            HLR-V1 / LLR-V1.1) — the preview-only parameter-form surface hosting
+            a :class:`CrcDesignerPanel`. Routed by the EXISTING data-driven
+            ``action_show_screen`` (key ``0`` / rail click); no dedicated show
+            handler is added.
+
+        Args:
+            None
+
+        Returns:
+            Container: ``#screen_crc_designer`` holding a title label and the
+            ``CrcDesignerPanel``. Hidden at startup.
+
+        Data Flow:
+            - Static composition. Activating the CRC Designer rail item shows
+              this container; the panel owns its own form state and preset
+              population (LLR-V1.2).
+
+        Dependencies:
+            Uses:
+                - ``CrcDesignerPanel``
+            Used by:
+                - ``compose``
+        """
+        return Container(
+            Label("CRC Designer", classes="db-screen-title"),
+            CrcDesignerPanel(),
+            id="screen_crc_designer",
             classes="db-screen hidden",
         )
 
@@ -5169,8 +5206,9 @@ class S19TuiApp(App):
         self.logger.info("A2L JSON exported: %s", output)
 
     #: Rail screen-key -> ``#workspace_body`` child container id (LLR-002.1).
-    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow, Checks —
-    #: the rail order of the keymap proposal (keys 1-9; batch-49 LLR-083.2).
+    #: Ordered Workspace, A2L, MAC, Map, Issues, Patch, Diff, Flow, Checks,
+    #: CRC Designer — the rail order of the keymap proposal (keys 1-9 then 0
+    #: for the 10th; batch-49 LLR-083.2, batch-58 LLR-V1.1).
     SCREEN_CONTAINER_IDS = {
         "workspace": "screen_workspace",
         "a2l": "screen_a2l",
@@ -5181,6 +5219,7 @@ class S19TuiApp(App):
         "diff": "screen_diff",
         "flow": "screen_flow",
         "checks": "screen_checks",
+        "crc_designer": "screen_crc_designer",
     }
 
     #: One extra command-palette command outside ``BINDINGS``: the viewer

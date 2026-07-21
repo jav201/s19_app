@@ -1,45 +1,76 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-20-batch-57",
-  "batch_objective": "CRC Algorithm Designer — headless integration (keel-first). Adopt + harden the already-built parametric CRC keel (crc_kernel.py width-general 8-64 engine + crc_designer_model.py template/job/coverage model, 34 tests) and complete its run-path integration: E7 LUT fast-path in the kernel (perf, result-identical) and E8 on_gap_conflict enforcement helper (apply the gap_conflict safety policy). The Variant B TUI view is DEFERRED to batch-58. Requirements pre-written at docs/crc-algorithm-designer/01-requirements.md.",
-  "route": "full /dev-flow (new engine surface + a safety-critical write-path policy). Branch claude/crc-algorithm-designer-8f82ae rebased onto origin/main tip f2109cf (RC-1 ff-merge clean; untracked keel preserved). Keel re-verified green on f2109cf: 119 CRC tests + frozen guard + ruff.",
-  "rc1": "PASS @ f2109cf (2026-07-20). git fetch clean; branch was stale at a58d4e0 (batch-54 close) -> ff-merged onto origin/main f2109cf (batch-55 + post-55 fast-flows #104-108). Keel files untracked -> preserved by ff. ALREADY-SHIPPED check: no CRC Designer surface on origin/main (crc.py still the 32-bit-only shipped engine; crc_kernel/crc_designer_model are this batch's new additive modules) -> batch genuinely needed.",
+  "batch_id": "2026-07-20-batch-58",
+  "batch_objective": "CRC Algorithm Designer — the Variant B TUI view built on the batch-57 headless keel, engine-first. Engine prerequisites (headless, operations/, non-frozen): E4 store endianness/width (encode_word/decode_word + big-endian), E5 template loader crc_template.py (collect-don't-abort), E6 job up-converter + emit_job (evolved crc_config + back-compat flat). Then the Variant B view (#screen_crc_designer, Flow-Builder rail-8 pattern): editable form + preset selector (R-001/006), live KAT verdict (R-002), custom test vector (R-003), round-tripping JSON preview (R-004), Load/Save + check==compute('123456789') enforce-on-save (R-005/007), coverage strip + per-policy live preview (R-008/009), gap-conflict surfacing (R-011), preview-only guard (R-010). DEFERRED to follow-up: wiring the width-general kernel into shipped crc.py operation.",
+  "route": "full /dev-flow. New TUI view surface + engine loader/serializer + untrusted-file surface (template loader). Branch feat/batch-58-crc-designer-view cut off origin/main tip 84180b4 (RC-1 clean: HEAD==origin/main, 0 ahead/0 behind). Design requirements pre-exist at docs/crc-algorithm-designer/01-requirements.md (adopted). Keel merged in #110 (crc_kernel.py + crc_designer_model.py, 45 tests).",
+  "rc1": "PASS @ 84180b4 (2026-07-20). git fetch clean; HEAD==origin/main==84180b4, 0/0 ahead-behind; fresh branch cut off it. ALREADY-SHIPPED check: no CRC Designer VIEW on origin/main (crc_kernel/crc_designer_model are headless keel only; #screen_crc_designer does not exist); E4/E5/E6 not present (crc.py still 32-bit encode_le/decode_le only; no crc_template.py; crc_config.py still flat-only). Batch genuinely needed.",
   "standing_authorization": {
     "date": "2026-07-20",
-    "operator_phrasing": "AskUserQuestion 2026-07-20: Autonomy='Autonomo + self-merge'; Language='Ingles (default dev)'; Decision-recording='Si, registro completo'. Preceded by 'Arrancamos, adelante.'",
-    "autonomy": "end-to-end autonomous; agent self-approves every phase and increment gate with a named Coverage/Certainty/Evidence axis check",
+    "operator_phrasing": "AskUserQuestion 2026-07-20 (this session): Accion='Batch-58 via /dev-flow'; Autonomia='Autonomo + self-merge'; Higiene='Limpiar los 4 worktrees del proyecto'. Then scope AskUserQuestion: Alcance='Todo en batch-58' (E4/E5/E6 + full Variant B view, engine-first); Wire-crc.py='Diferir a follow-up'. Preceded by operator note 'arrancar batch-58 = la vista Variant B cuando quieras ... llama /dev-flow o /fast-dev-flow segun el tamano. Recuerda mantener el backlog actualizado.'",
+    "autonomy": "end-to-end autonomous; agent self-approves every phase and increment gate with a named Coverage/Certainty/Evidence axis check; presents full review packets + living PLAN.md in-conversation at every gate",
     "merge_authority": "GRANTED. Merge gated: green CI + a FINAL independent PR-level qa-reviewer pass over the whole diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression via C-26, every gate carry discharged). A HIGH finding BLOCKS the merge and returns to the operator. Snapshot regen (if any) = canonical-CI-only follow-up PR (local FORBIDDEN).",
     "decision_recording": "FULL — every un-asked decision -> PLAN.md decision log + state.json.decisions_log + 05-postmortem + vault at sync"
   },
   "scope_decisions": {
-    "view_deferred": "AUTONOMOUS 2026-07-20: batch-57 = headless integration only (keel + E7 LUT + E8 enforcement). The Variant B TUI view (CRC Designer screen) is DEFERRED to batch-58 — keel-first like the Flow Builder tracer, keeps batch-57 bounded. Operator may object.",
-    "e6_deferred": "AUTONOMOUS: E6 legacy-crc_config up-converter DEFERRED to the view batch — only needed when the CRC operation/view consumes a job; not on batch-57's critical path.",
-    "batch_number": "57 chosen to avoid collision: 52/53 = Flow Builder; 54/55 = A2L P-1b; 56 = alignment-aware A2L (parked)."
+    "all_in_b58": "OPERATOR 2026-07-20 (AskUserQuestion 'Alcance b58'='Todo en batch-58'): E4/E5/E6 headless engine completion + the full Variant B view in one batch, engine-first increment order (mirrors design doc §11.4 + Flow-Builder keel-first).",
+    "wire_crc_py_deferred": "OPERATOR 2026-07-20 (AskUserQuestion 'Wire crc.py'='Diferir a follow-up'): do NOT wire the width-general kernel into shipped operations/crc.py this batch. The preview-only view uses the kernel directly; the result-identical crc32_stream refactor is deferred to a follow-up, stays in BACKLOG.",
+    "batch_number": "58 per batch-57 deferral (57 = headless keel; 58 = the view + E4/E5/E6 + emit_job)."
   },
   "current_phase": 6,
   "phase_status": "in-progress",
+  "collision_resolution": "RESOLVED 2026-07-21: Javier adjudicated live (AskUserQuestion 'Dueno b58'='Esta sesion sigue') — THIS session owns batch-58 from Phase 3. Stand-down message delivered to local_b3ec8612 via ccd_session_mgmt.send_message. Branch rebased onto origin/main 1e3125b (RC-1 currency restored, merge-base==tip; PR #111 was docs-only .dev-flow/BACKLOG.md, clean rebase). Primary checkout stays on feat/batch-58-crc-designer-view (other session remains parked; RC-1 already-shipped grep is the mutual backstop). Base ref for this batch is now 1e3125b.",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
-    "plan": ".dev-flow/2026-07-20-batch-57/PLAN.md",
-    "1": ".dev-flow/2026-07-20-batch-57/01-requirements.md",
-    "design_req": "docs/crc-algorithm-designer/01-requirements.md"
+    "plan": ".dev-flow/2026-07-20-batch-58/PLAN.md",
+    "design_req": "docs/crc-algorithm-designer/01-requirements.md",
+    "1": ".dev-flow/2026-07-20-batch-58/01-requirements.md",
+    "2": ".dev-flow/2026-07-20-batch-58/02-review.md"
   },
   "decisions_log": [
     {
       "phase": 0,
       "date": "2026-07-20",
-      "decision": "kickoff (autonomous + self-merge; English; full decision recording)",
-      "notes": "CRC Algorithm Designer headless integration. Operator AskUserQuestion 2026-07-20 after 'Arrancamos, adelante'. RC-1: branch was stale @ a58d4e0 -> ff-merged onto origin/main f2109cf; keel (crc_kernel.py+crc_designer_model.py, 34 tests) preserved + re-verified green (119 CRC tests). SCOPE (autonomous): batch-57 = keel adoption + E7 LUT + E8 enforcement (headless); Variant B view -> batch-58; E6 up-converter -> batch-58. Design requirements pre-exist at docs/crc-algorithm-designer/01-requirements.md (adopted by this flow)."
+      "decision": "kickoff + Phase-0 intake APPROVED (autonomous + self-merge; English; full decision recording)",
+      "notes": "batch-58 = CRC Algorithm Designer Variant B view + engine prerequisites. RC-1 PASS @ 84180b4 (HEAD==origin/main, 0/0). Scope (operator AskUserQuestion): all in b58 engine-first; defer crc.py wire. Stories: US-E4/E5/E6 (engine) + US-V1..V8 (view, R-CRC-DSN-001..011). Design requirements adopted from docs/crc-algorithm-designer/01-requirements.md. Worktree hygiene done (git registry clean; 3 dirs left as locked shells)."
     },
     {
-      "phase": 6,
+      "phase": 1,
       "date": "2026-07-20",
-      "decision": "Phases 1-5 SELF-APPROVED (autonomous); advancing to Phase 6 (PR)",
-      "notes": "Streamlined (autonomous, recorded): design requirements adopted (Phase 1); rigor concentrated on an independent code-reviewer pass at the increment gate (Phase 2/3). Phase 3 = commit 1341fd3 (Inc-1 adopt keel / Inc-2 E7 LUT / Inc-3 E8 enforcement, 42 tests). code-reviewer: LUT proven byte-identical to crc_stream (all widths incl. odd, both refin/refout); enforcement correct; 1 HIGH F1 (parse_job crash on non-object 'algorithm') + F2/F3 -> all FIXED at gate (063bea5, +3 tests -> 45). Phase 4: pre-fix full suite 1730 passed/0 failed/3 xfailed/29 snapshots, exit 0 (23m26s); post-fix targeted 45 green; 0 engine-frozen diffs; frozen guards green. Post-fix full-suite = merge gate via CI. Axis met at every gate. Next: push + PR; on green CI run final independent qa-reviewer pass over whole diff vs main -> self-merge (HIGH blocks) -> /dev-flow-sync.",
-      "phase_marker": 5
+      "decision": "SELF-APPROVED (autonomous); advancing to Phase 2",
+      "notes": "architect produced 01-requirements.md: 11 US / 11 HLR / 21 LLR / 18 AT. Count corrected 10->11 (US-E4/E5/E6 + V1..V8). Draft-time C-35 execution probes ALL PASS vs merged keel 84180b4 (KAT 0xCBF43926; 7 presets; coverage concat=0x9C5BCBBD/fill=0x2A8A3950; gap_conflict+abort; store_word big/little; crc_lut==crc_stream). 4 keel-API discrepancies bound to real symbols: E5 loader lives in crc_designer_model.py -> crc_template.py facade; encode_word/decode_word NEW in crc.py (no big-endian decode exists); parse_job evolved-only -> flat up-convert branch + emit_job NEW; rail is fixed 9-tuple keys 1-9 -> 10th key/glyph is an open layout decision. Axis: Coverage/Certainty/Evidence all met, no unfilled template slots, no should-in-requirement. Open Qs -> Phase 2: rail key/glyph, sanitize_project_name binding, snapshot-regen closeout, RK-3."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-20",
+      "decision": "cross-review DONE -> iterate-to-refine -> refine APPLIED -> Phase-2 re-gate PASS",
+      "notes": "3 reviewers (separate files per D2): architect PASS 0-blocker; security OK 0-blocker 1-major; qa CHANGES-REQUESTED 3 BLOCKERS (all AT-authoring vacuity, Certainty axis) + 5 major + 5 minor. Blockers: B1 AT-058-04 JSON-preview must read MOUNTED widget (C-12); B2 AT-058-05 must Save->file->Load THROUGH the view (C-12); B3 AT-CRC-DSN-016 must capture before/after ONE field-change event (C-16). iterate-to-refine folded ALL blockers+majors+minors into 01-requirements.md via §6.5 (11 amendment rows). Post-refine: 11 US / 11 HLR / 22 LLR (+LLR-V5.4) / 19 AT (+AT-058-10 three-warn-conditions). Re-gate: through-surface gates verified present; Certainty gap closed. Phase 2 = PASS."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-20",
+      "decision": "PAUSE before Phase 3 — TWO-SESSION COLLISION, escalate to operator (autonomy grant does not cover this)",
+      "notes": "Mid-Phase-2, cross-session messages from local_b3ec8612 revealed a parallel autonomous session set up to build+self-merge batch-58, treating THIS session as hygiene-only. Verified real: its PR #111 (docs-only .dev-flow/BACKLOG.md) is MERGED; origin/main advanced 84180b4->1e3125b; the session is parked (isRunning:false) waiting on a hygiene git-signal (primary-on-main). Javier is asleep (per that session). DECISION (autonomous, recorded): do NOT proceed to Phase 3 implementation and do NOT self-merge — an unattended self-merge into a two-owner conflict is the one irreversible harm and Javier's pre-collision autonomy grant cannot authorize it. Keep primary checkout on feat/batch-58-crc-designer-view (NOT main) so the other session stays parked and cannot collide. Phases 0-2 (verified requirements + cross-review) preserved as a reusable handoff for whichever session Javier picks. Await Javier's adjudication. Backstop: both flows' RC-1 already-shipped grep would catch a merged #screen_crc_designer, so whoever merges first stops the other."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-21",
+      "decision": "COLLISION RESOLVED (Javier: this session owns b58) + Phase 3 STARTED; increment cut recorded",
+      "notes": "Stand-down sent to local_b3ec8612; rebased onto 1e3125b (clean). Increment plan (engine-first, <=5 files each): Inc-1 E4 word codec (crc.py encode_word/decode_word big+wide + LE wrappers) [LLR-E4.1/.2/.3; AT-CRC-DSN-014]; Inc-2 E5 crc_template.py facade [LLR-E5.1/.2; AT-CRC-DSN-015]; Inc-3 E6 parse_job flat up-convert + emit_job [LLR-E6.1/.2/.3; AT-058-01, AT-CRC-DSN-012]; Inc-4 view scaffold+rail+form+preset [LLR-V1.1/.2; AT-058-02; C-22/C-28 snapshot census]; Inc-5 live KAT verdict+custom vector+JSON preview [LLR-V2.1/.2,V3.1,V4.1; AT-CRC-DSN-016/011, AT-058-03/04]; Inc-6 Load/Save+save-KAT+markup+warns [LLR-V5.1/.2/.3/.4; AT-058-05/10/06, AT-CRC-DSN-015]; Inc-7 coverage strip+per-policy preview+gap-conflict+preview-only guard [LLR-V6.x/V7.1/V8.1; AT-058-07/08/09, AT-CRC-DSN-013/013b/017]. software-dev implements per increment; code-reviewer at each gate; self-approve with named axis check."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-21",
+      "decision": "Phase 3 COMPLETE — 7 increments all gate-APPROVED; advancing to Phase 4",
+      "notes": "All 7 increments implemented + independently reviewed, 0 HIGH surviving. Commits: Inc-1 c16e01a (E4), Inc-2 c7a07a1 (E5 facade), Inc-3 8726fea (E6, code-review HIGH F1 vacuous digest test FIXED - oracle pinned 0x9C5BCBBD), Inc-4 05682e6+24424cb (view scaffold+rail, F1/F2 census fixed), Inc-5 4e66c3a (live verdict - reviewer proved AT-CRC-DSN-016 RED on handler removal), Inc-6 6659a43 (Load/Save - code+security both OK, traversal-proof, markup spans==[]), Inc-7 181e747 (coverage+gap-conflict+preview-only). Every increment: 0 frozen diffs (static census), RED->GREEN, per-increment CRC regression green. LOW carries -> postmortem/BACKLOG (Inc-5 F1 recompute-fanout/F2 preset-name; Inc-6 code-F1 redundant-name/sec-F1 overwrite-note/sec-F2 sanitize-collision; Inc-7 F1 _build_target-private-import/F2 conflict-format-dup). ENV: recurring checkout-hazard (tc031/engine-unchanged subprocess `git checkout main` stranded the shared primary twice on tool-timeout) — recovered losslessly each time, mitigated by per-increment commits + static frozen checks + branch re-verify after each sub-agent."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-21",
+      "decision": "Phase 4 validation PASS (self-approved); advancing to Phase 5",
+      "notes": "Orchestrator-owned gate run (C-25): pytest -m 'not slow' -k 'not tc031' --ignore=test_engine_unchanged.py -> 1757 passed / 2 skipped / 3 xfailed / 23 failed. The 23 = 19 EXPECTED snapshot rail-drift (test_tc016s, canonical-CI regen) + 4 census escapes (tc006/tc010/tc038 hardcoded ==9; tc081_4 binding-drift guard). iterate-to-fix commit b809c98: tc006/010/038 -> ==len(SCREEN_KEYS) (derived, C-26-correct); tc081_4 sanctions the batch-58 crc_designer Binding (guard NOT weakened); reverse-census clean (no other rail-9). Re-verify census files: 179 passed/0 failed. qa-reviewer reconciliation (04-validation.md): all 19 ATs realized to ONE on-disk node each (17 distinct; 013b/058-07 + 017/058-08 legitimately share a node; 0 UNREALIZED, C-18 holds), all 22 LLRs traced, 5 formerly-vacuous ATs confirmed non-vacuous, 52 AT/TC nodes pass. Frozen static-check: 0 frozen paths touched (tc031/engine-unchanged not run locally=hazard, verified statically + run in canonical CI). Axis: Coverage/Certainty/Evidence all met. Residual = the snapshot-regen closeout PR (baseline maintenance, non-blocking, canonical-CI-only)."
     }
   ],
   "obsidian_synced": false,
-  "created_at": "2026-07-20T18:00:00Z"
+  "created_at": "2026-07-20T22:30:00Z"
 }

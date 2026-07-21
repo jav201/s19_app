@@ -700,7 +700,16 @@ def test_tc081_4_no_binding_diff() -> None:
     # NON-footer-visible (`show=False`) navigation key, so it does not drift the
     # footer/shared-chrome; the 9-item RAIL drift it accompanies is handled by
     # the canonical-CI snapshot regen (spec R-5 / C-30). Sanctioned here.
-    _SANCTIONED_BINDING_MARKERS = ("show_help_panel", "show_screen('checks')")
+    # batch-58 (LLR-V1.1) adds the tenth rail-nav binding
+    # `Binding("0", "show_screen('crc_designer')", "CRC Designer", show=False)` —
+    # again NON-footer-visible (`show=False`), so it does not drift the
+    # footer/shared-chrome; the 10-item RAIL drift it accompanies is handled by
+    # the canonical-CI snapshot regen (same C-30 path). Sanctioned here.
+    _SANCTIONED_BINDING_MARKERS = (
+        "show_help_panel",
+        "show_screen('checks')",
+        "show_screen('crc_designer')",
+    )
     changed = [
         line
         for line in completed.stdout.splitlines()

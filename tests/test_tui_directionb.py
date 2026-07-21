@@ -131,7 +131,7 @@ from s19_app.tui.rail import RAIL_ENTRIES, Rail, RailItem
 from s19_app.tui.screens_directionb import EmptyStatePanel
 
 
-# The 9 Direction B rail screen container ids, in rail order (keys 1-9).
+# The 10 Direction B rail screen container ids, in rail order (keys 1-9 then 0).
 SCREEN_IDS = [
     "screen_workspace",
     "screen_a2l",
@@ -142,6 +142,7 @@ SCREEN_IDS = [
     "screen_diff",
     "screen_flow",
     "screen_checks",
+    "screen_crc_designer",
 ]
 
 # Rail screen-key -> container id, matching S19TuiApp.SCREEN_CONTAINER_IDS.
@@ -155,7 +156,17 @@ SCREEN_KEYS = [
     "diff",
     "flow",
     "checks",
+    "crc_designer",
 ]
+
+# Rail keys in rail order: digits 1-9 then 0 for the 10th screen (keys 1-9 exhausted).
+RAIL_KEYS_IN_ORDER = "1234567890"
+
+# Consistency guard (C-28 rail census): the test enumerations MUST track the
+# production rail — a future rail add/remove that skips these trips loudly here.
+assert len(SCREEN_IDS) == len(SCREEN_KEYS) == len(RAIL_ENTRIES), (
+    "rail census drift: SCREEN_IDS/SCREEN_KEYS must match len(RAIL_ENTRIES)"
+)
 
 
 def _visible_screens(app: S19TuiApp) -> list[str]:
@@ -448,9 +459,10 @@ def test_tc037_scaffold_screens_carry_empty_state(tmp_path: Path) -> None:
 # Increment 3 — activity rail widget + rail navigation wiring
 # ===========================================================================
 
-# The 9 rail items, in rail order, paired with their screen key and the
+# The 10 rail items, in rail order, paired with their screen key and the
 # normative LLR-001.3 glyph -> screen mapping table (Unicode + ASCII).
 # batch-49 (LLR-083.1): Checks appended as the 9th entry on key 9.
+# batch-58 (LLR-V1.1): CRC Designer appended as the 10th entry on key 0.
 EXPECTED_RAIL = [
     ("workspace", "◫", "#"),
     ("a2l", "≡", "="),
@@ -461,6 +473,7 @@ EXPECTED_RAIL = [
     ("diff", "⏚", "D"),
     ("flow", "✦", "F"),
     ("checks", "☑", "C"),
+    ("crc_designer", "⊕", "R"),
 ]
 
 
@@ -491,8 +504,8 @@ def test_tc001_rail_composes_nine_ordered_items(tmp_path: Path) -> None:
     assert keys == [key for key, _, _ in EXPECTED_RAIL], (
         f"Rail item order should match the keymap rail order, got {keys}"
     )
-    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9], (
-        f"Rail items must be positioned 1-9 in order, got {positions}"
+    assert positions == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (
+        f"Rail items must be positioned 1-10 in order, got {positions}"
     )
 
 
@@ -701,7 +714,7 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
             ]
 
     rendered = asyncio.run(_drive())
-    assert len(rendered) == 9, f"expected 9 rail items, got {len(rendered)}"
+    assert len(rendered) == 10, f"expected 10 rail items, got {len(rendered)}"
     for (screen_key, glyph), (exp_key, _, exp_ascii) in zip(rendered, EXPECTED_RAIL):
         assert screen_key == exp_key, f"order: {screen_key} != {exp_key}"
         assert glyph == exp_ascii, (
@@ -744,7 +757,9 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
-    assert len(seen) == 9, f"expected all 9 screens visited, got {len(seen)}"
+    assert len(seen) == len(SCREEN_KEYS), (
+        f"expected all {len(SCREEN_KEYS)} screens visited, got {len(seen)}"
+    )
     for key, has_find, has_goto, has_palette in seen:
         assert has_find, f"find input missing on screen '{key}'"
         assert has_goto, f"go-to input missing on screen '{key}'"
@@ -782,7 +797,7 @@ def test_tc010_ctrl_k_opens_palette_from_every_screen(tmp_path: Path) -> None:
         return results
 
     results = asyncio.run(_drive())
-    assert len(results) == 9
+    assert len(results) == len(SCREEN_KEYS)
     for key, is_open, focused_id in results:
         assert is_open, f"palette did not open on screen '{key}'"
         assert focused_id == "palette_input", (
@@ -884,7 +899,7 @@ def test_tc038_project_a2l_labels_render_in_command_bar(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
-    assert len(seen) == 9
+    assert len(seen) == len(SCREEN_KEYS)
     for key, project, a2l in seen:
         assert "demo_project" in project, (
             f"project name missing from command bar on '{key}': {project!r}"
@@ -5617,8 +5632,9 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
     """Every rail item (a new Direction B control) responds to its key.
 
     Intent: LLR-013.1 — the activity rail is mouse-clickable; it must also
-    be fully keyboard-driven. Pressing each of keys ``1``-``8`` activates the
-    matching rail screen and moves the single active marker, with no mouse.
+    be fully keyboard-driven. Pressing each of keys ``1``-``9`` then ``0``
+    (the 10th screen; keys 1-9 exhausted) activates the matching rail screen
+    and moves the single active marker, with no mouse.
     """
 
     async def _drive() -> list[tuple[str, str, str]]:
@@ -5626,8 +5642,8 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
         seen: list[tuple[str, str, str]] = []
         async with app.run_test() as pilot:
             await pilot.pause()
-            for index, screen_key in enumerate(SCREEN_KEYS, start=1):
-                await pilot.press(str(index))
+            for key, screen_key in zip(RAIL_KEYS_IN_ORDER, SCREEN_KEYS):
+                await pilot.press(key)
                 await pilot.pause()
                 visible = _visible_screens(app)
                 active = app.query_one(Rail).active_key
