@@ -17,7 +17,7 @@
     "wire_crc_py_deferred": "OPERATOR 2026-07-20 (AskUserQuestion 'Wire crc.py'='Diferir a follow-up'): do NOT wire the width-general kernel into shipped operations/crc.py this batch. The preview-only view uses the kernel directly; the result-identical crc32_stream refactor is deferred to a follow-up, stays in BACKLOG.",
     "batch_number": "58 per batch-57 deferral (57 = headless keel; 58 = the view + E4/E5/E6 + emit_job)."
   },
-  "current_phase": 5,
+  "current_phase": 6,
   "phase_status": "in-progress",
   "collision_resolution": "RESOLVED 2026-07-21: Javier adjudicated live (AskUserQuestion 'Dueno b58'='Esta sesion sigue') — THIS session owns batch-58 from Phase 3. Stand-down message delivered to local_b3ec8612 via ccd_session_mgmt.send_message. Branch rebased onto origin/main 1e3125b (RC-1 currency restored, merge-base==tip; PR #111 was docs-only .dev-flow/BACKLOG.md, clean rebase). Primary checkout stays on feat/batch-58-crc-designer-view (other session remains parked; RC-1 already-shipped grep is the mutual backstop). Base ref for this batch is now 1e3125b.",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
