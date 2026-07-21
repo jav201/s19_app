@@ -1034,3 +1034,160 @@ def test_verdict_hero_center_aligned_in_hero_row(tmp_path: Path) -> None:
         f"the verdict hero must be center-aligned, got {content_align!r}"
     )
     assert crc_hero, "the verdict hero must carry the crc-hero class"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# batch-59 Inc-2 — the LIVE coverage-window hero (block glyphs + oracle-pinned
+# policy CRCs) + boundary/empty acceptance (HLR-L1, LLR-L1.1/L1.2/L1.3/L1.4;
+# AT-B59-01/02/10/11)
+# ─────────────────────────────────────────────────────────────────────────────
+async def _window_after(
+    tmp_path: Path,
+    mem_map: dict[int, int] | None,
+    ranges: str,
+    join: str = "fill",
+    pad: str = "0xFF",
+) -> tuple[str, set[str], object, str]:
+    """Drive the coverage strip and read the mounted #crc_coverage_window.
+
+    Returns the window's rendered plain text, its distinct span-style set, the
+    ``_render_markup`` flag, and the live verdict (a liveness witness). The window
+    is read through ``render()`` — the visual the widget actually paints (M5).
+    """
+    app = S19TuiApp(base_dir=tmp_path)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        if mem_map is not None:
+            app.current_file = _loaded(mem_map)
+        await pilot.press("0")
+        await pilot.pause()
+        app.query_one("#crc_coverage_ranges", Input).value = ranges
+        app.query_one("#crc_coverage_join", Select).value = join
+        app.query_one("#crc_coverage_pad_byte", Input).value = pad
+        await pilot.pause()
+        window = app.query_one("#crc_coverage_window", Static)
+        rendered = window.render()
+        return (
+            str(rendered),
+            {str(span.style) for span in rendered.spans},
+            window._render_markup,
+            _verdict(app),
+        )
+
+
+def test_coverage_window_renders_colored_glyphs_with_live_oracles(
+    tmp_path: Path,
+) -> None:
+    """The window renders colored glyphs + LIVE-computed policy oracles (AT-B59-01).
+
+    Signature fidelity (LLR-L1.1/L1.3, D-1/B2): over the §3.2 fixture with a
+    two-range ``join="fill"`` target, the mounted ``#crc_coverage_window``
+    renders (a) ≥1 block glyph, (b) ``len({span.style}) >= 2`` DISTINCT colors
+    (not a monochrome label — present=accent, pad-fill=warn), (c)
+    ``_render_markup is False`` (the one new C-17 sink), and (d) its ``.plain``
+    CONTAINS BOTH pinned oracles ``0x9C5BCBBD`` (concat) AND ``0x2A8A3950``
+    (fill) — the anti-mock teeth: a hardcoded-hex window would drop the live
+    compute and fail this pin (proven RED with a stubbed wrong oracle).
+    """
+    plain, styles, markup, alive = asyncio.run(
+        _window_after(
+            tmp_path, _fixture_mem(), "0x8000-0x8008, 0x8010-0x8018", join="fill"
+        )
+    )
+    assert "█" in plain or "░" in plain, f"the window must draw block glyphs, got {plain!r}"
+    assert len(styles) >= 2, (
+        f"the window must paint >= 2 DISTINCT colors, got {styles!r}"
+    )
+    assert markup is False, "the coverage window must render markup=False (C-17)"
+    assert "0x9C5BCBBD" in plain, f"the LIVE concat oracle must render, got {plain!r}"
+    assert "0x2A8A3950" in plain, f"the LIVE fill oracle must render, got {plain!r}"
+    assert alive != "", "the app must stay alive with the window mounted"
+
+
+def test_coverage_window_deltas_and_repins_on_range_edit(tmp_path: Path) -> None:
+    """The window content DELTAS and re-pins the live oracle on a range edit (AT-B59-02).
+
+    Live-data fidelity (LLR-L1.1, B2): after narrowing to a SINGLE range the
+    window's rendered content DIFFERS from the two-range content (a measured
+    delta, not "content present"), AND shows the recomputed single-range oracle
+    ``0x88AA689F`` (== ``compute_region_crc`` over the same span) while the
+    two-range concat oracle ``0x9C5BCBBD`` is GONE — a range-width-only mock that
+    never re-digests ``mem_map`` would delta but keep the stale oracle.
+    """
+
+    async def _drive() -> tuple[str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.current_file = _loaded(_fixture_mem())
+            await pilot.press("0")
+            await pilot.pause()
+            app.query_one("#crc_coverage_ranges", Input).value = (
+                "0x8000-0x8008, 0x8010-0x8018"
+            )
+            app.query_one("#crc_coverage_join", Select).value = "fill"
+            await pilot.pause()
+            two_range = str(app.query_one("#crc_coverage_window", Static).render())
+            app.query_one("#crc_coverage_ranges", Input).value = "0x8000-0x8008"
+            await pilot.pause()
+            one_range = str(app.query_one("#crc_coverage_window", Static).render())
+            return two_range, one_range
+
+    two_range, one_range = asyncio.run(_drive())
+    assert one_range != two_range, "the window must delta on a range edit (not static)"
+    assert "0x88AA689F" in one_range, (
+        f"the single-range window must re-pin the region oracle, got {one_range!r}"
+    )
+    assert "0x9C5BCBBD" not in one_range, (
+        f"the stale two-range oracle must be gone after the edit, got {one_range!r}"
+    )
+
+
+def test_coverage_window_empty_state_no_image(tmp_path: Path) -> None:
+    """No image loaded → the shipped empty-state note, no glyphs, no crash (AT-B59-10).
+
+    Boundary (LLR-L1.4): with ``current_file`` unset the window renders the
+    SHIPPED empty-state string (shared with the preview so they never diverge),
+    computes no glyphs, and the app stays alive.
+    """
+    plain, styles, markup, alive = asyncio.run(
+        _window_after(tmp_path, None, "0x8000-0x8008", join="concat")
+    )
+    assert "Load an image" in plain, f"the empty window must be graceful, got {plain!r}"
+    assert "█" not in plain and "░" not in plain, "no glyphs without an image"
+    assert markup is False, "the empty window must still render markup=False (C-17)"
+    assert alive != "", "the app must stay alive with no image loaded"
+
+
+def test_coverage_window_malformed_range_markup_safe(tmp_path: Path) -> None:
+    """A malformed/inverted range → markup-safe note, no crash, mem_map intact (AT-B59-11).
+
+    Boundary (LLR-L1.4): an inverted range surfaces the ``Invalid coverage``
+    fault note (reusing the ``_build_coverage_target`` path), renders
+    ``markup=False``, does not crash, and never mutates ``mem_map``.
+    """
+
+    async def _drive() -> tuple[str, object, bool, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.current_file = _loaded(_fixture_mem())
+            mem_obj = app.current_file.mem_map
+            before = dict(mem_obj)
+            await pilot.press("0")
+            await pilot.pause()
+            app.query_one("#crc_coverage_ranges", Input).value = "0x8010-0x8000"
+            await pilot.pause()
+            window = app.query_one("#crc_coverage_window", Static)
+            plain = str(window.render())
+            same = app.current_file.mem_map is mem_obj
+            unchanged = dict(app.current_file.mem_map) == before
+            return plain, window._render_markup, same, unchanged
+
+    plain, markup, same, unchanged = asyncio.run(_drive())
+    assert "Invalid coverage" in plain, (
+        f"an inverted range must warn markup-safely, got {plain!r}"
+    )
+    assert markup is False, "the fault window must render markup=False (C-17)"
+    assert same, "the window must not replace the loaded mem_map (preview-only)"
+    assert unchanged, "the window must not mutate the loaded mem_map (US-V8)"

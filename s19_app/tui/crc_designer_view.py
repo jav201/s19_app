@@ -70,11 +70,19 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
 from textual.widgets import Button, Input, Label, Select, Static, Switch
 
+from .insight_style import (
+    DGRAY,
+    HILITE,
+    MICROBAR_EMPTY,
+    MICROBAR_FILLED,
+    YELLOW,
+)
 from .operations.crc_designer_model import (
     ENDIANNESS_VALUES,
     INTRA_GAP_VALUES,
@@ -84,10 +92,24 @@ from .operations.crc_designer_model import (
     _build_target,
     compute_target_crc,
     evaluate_target,
+    store_word,
 )
 from .operations.crc_kernel import PRESETS, SEED_ALGORITHM, CrcAlgorithm, preset_by_name
 from .operations.crc_template import CrcTemplate, emit_template, read_template
 from .workspace import ensure_template_lib, sanitize_project_name
+
+#: The graceful empty-state note shown when no image is loaded — shared by the
+#: coverage preview and the coverage-window hero so the two surfaces never
+#: diverge (batch-59 A12; the value is the batch-58 shipped string).
+_COVERAGE_EMPTY_STATE = "Load an image to preview coverage CRCs over real bytes."
+
+#: The block-glyph budget for the coverage-window hero line (batch-59 LLR-L1.1,
+#: OQ-3/C-23). PILOT-MEASURED: the boxed ``#crc_coverage_window`` usable inner
+#: width is 64 cols at the 80x24 floor (100% stacked) and 55 cols at 120x30
+#: (the narrower 2fr regime); 48 leaves headroom under the 55-col minimum so the
+#: contiguous-span window line never wraps. NOT inherited from the prototype's
+#: 150-col line (C-29 non-transfer).
+_COVERAGE_WINDOW_GLYPHS = 48
 
 #: Custom-vector interpretation modes (LLR-V3.1). ``ascii`` encodes the raw text
 #: as UTF-8 bytes (so ``123456789`` reproduces the KAT); ``hex`` reads
@@ -882,7 +904,7 @@ class CrcDesignerPanel(ScrollableContainer):
         loaded = getattr(self.app, "current_file", None)
         mem_map = loaded.mem_map if loaded is not None else None
         if not mem_map:
-            return "Load an image to preview coverage CRCs over real bytes."
+            return _COVERAGE_EMPTY_STATE
         try:
             target = self._build_coverage_target()
         except (ValueError, KeyError) as exc:
@@ -907,6 +929,88 @@ class CrcDesignerPanel(ScrollableContainer):
         ]
         lines.extend(evaluation.diagnostics)
         return "\n".join(lines)
+
+    def _render_coverage_window(self, algo: CrcAlgorithm) -> Text:
+        """Render the multi-range coverage window as colored block glyphs (LLR-L1.1).
+
+        Summary:
+            The Variant-B signature (HLR-L1): draw the current target's memory
+            window as a block-glyph run per range (present bytes, accent hue) and
+            per inter-range gap (erased grey when ``join="concat"``, pad-fill in
+            the warning hue when ``join="fill"``), then the LIVE concat and fill
+            policy CRC hexes and the active-policy store-word bytes. The two CRCs
+            are computed over the real ``mem_map`` via the shipped
+            :func:`compute_target_crc` (reused verbatim — 0 new engine math), so a
+            static mock would fail the oracle pin (D-1 / B2). No image loaded → the
+            shipped empty-state note (no glyph compute); a malformed range → a
+            markup-safe ``Invalid coverage`` note (reusing the
+            :meth:`_build_coverage_target` fault path). Built via
+            :class:`~rich.text.Text` ``append`` — NEVER ``Text.from_markup`` — so
+            operator range text on the fault branch renders literally (C-17; the
+            widget is ``markup=False``, LLR-L1.2). The window only READS
+            ``mem_map`` (US-V8 preview-only, R-4).
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm the CRCs are computed with.
+
+        Returns:
+            Text: The colored block-glyph window (glyphs + concat/fill hexes +
+            store bytes), or the empty-state / invalid-coverage note.
+
+        Data Flow:
+            - :meth:`_build_coverage_target` → per-range/per-gap glyph runs
+              (:data:`insight_style` palette) + :func:`compute_target_crc`
+              (``join`` concat/fill) + :func:`store_word` → styled ``Text``.
+
+        Dependencies:
+            Uses:
+                - :meth:`_build_coverage_target`, :func:`compute_target_crc`,
+                  :func:`store_word`, :func:`_format_hex`, the ``insight_style``
+                  palette
+            Used by:
+                - :meth:`_recompute`
+        """
+        loaded = getattr(self.app, "current_file", None)
+        mem_map = loaded.mem_map if loaded is not None else None
+        if not mem_map:
+            return Text(_COVERAGE_EMPTY_STATE)
+        try:
+            target = self._build_coverage_target()
+        except (ValueError, KeyError) as exc:
+            return Text(f"Invalid coverage: {exc}")
+
+        span = target.ranges[-1][1] - target.ranges[0][0]
+        bytes_per_glyph = max(1, -(-span // _COVERAGE_WINDOW_GLYPHS))  # ceil-divide
+        text = Text()
+        prev_end: int | None = None
+        for start, end in target.ranges:
+            if prev_end is not None and start > prev_end:
+                gap_glyphs = max(1, round((start - prev_end) / bytes_per_glyph))
+                if target.join == "fill":
+                    text.append(MICROBAR_FILLED * gap_glyphs, style=YELLOW)
+                else:
+                    text.append(MICROBAR_EMPTY * gap_glyphs, style=DGRAY)
+            range_glyphs = max(1, round((end - start) / bytes_per_glyph))
+            text.append(MICROBAR_FILLED * range_glyphs, style=HILITE)
+            prev_end = end
+        text.append("\n")
+
+        try:
+            concat_crc = compute_target_crc(mem_map, algo, replace(target, join="concat"))
+            fill_crc = compute_target_crc(mem_map, algo, replace(target, join="fill"))
+        except ValueError as exc:
+            text.append(f"Cannot compute: {exc}", style=DGRAY)
+            return text
+        active_crc = fill_crc if target.join == "fill" else concat_crc
+        store_bytes = store_word(active_crc, target)
+        text.append("concat ", style=DGRAY)
+        text.append(_format_hex(concat_crc, target.store_width), style=HILITE)
+        text.append("   fill ", style=DGRAY)
+        text.append(_format_hex(fill_crc, target.store_width), style=YELLOW)
+        text.append("\n")
+        text.append("store ", style=DGRAY)
+        text.append(store_bytes.hex(" ").upper(), style=HILITE)
+        return text
 
     def _recompute(self) -> None:
         """Recompute the live surfaces from the current fields.
@@ -945,6 +1049,7 @@ class CrcDesignerPanel(ScrollableContainer):
             preview = self.query_one("#crc_json_preview", Static)
             warnings = self.query_one("#crc_warnings", Static)
             coverage = self.query_one("#crc_coverage_preview", Static)
+            window = self.query_one("#crc_coverage_window", Static)
         except NoMatches:
             # Mid-mount: a change event arrived before every surface exists.
             return
@@ -957,6 +1062,7 @@ class CrcDesignerPanel(ScrollableContainer):
             preview.update(warning)
             warnings.update("")
             coverage.update(warning)
+            window.update(warning)
             return
         algo = template.algorithm
         verdict.update(self._verdict_text(algo))
@@ -964,6 +1070,7 @@ class CrcDesignerPanel(ScrollableContainer):
         preview.update(self._preview_text(template))
         warnings.update(self._live_warnings_text(algo))
         coverage.update(self._coverage_preview_text(algo))
+        window.update(self._render_coverage_window(algo))
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Route the Save / Load button presses (LLR-V5.1 / V5.2).
