@@ -123,6 +123,18 @@ def test_lut_matches_oracle_for_non_catalogue_refin_ne_refout() -> None:
         assert crc_lut(data, **odd) == crc_stream(data, **odd)
 
 
+def test_lut_matches_oracle_for_non_byte_aligned_widths() -> None:
+    # F2: exercise the shift = width-8 arithmetic on non-multiple-of-8 widths;
+    # no catalogue check pins these, so the crc_stream oracle is the only guard.
+    cases = [dict(width=12, poly=0x80F, init=0x000), dict(width=24, poly=0x864CFB, init=0xB704CE)]
+    for case in cases:
+        for refin in (False, True):
+            for refout in (False, True):
+                params = dict(**case, refin=refin, refout=refout, xorout=0)
+                for data in _diff_vectors():
+                    assert crc_lut(data, **params) == crc_stream(data, **params), case
+
+
 def test_compute_routes_through_lut_and_preserves_kat() -> None:
     # compute() now uses crc_lut; the KAT values must be byte-identical.
     for preset in PRESETS:

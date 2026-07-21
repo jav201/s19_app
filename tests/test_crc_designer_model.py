@@ -149,7 +149,7 @@ def test_evaluate_target_warn_proceeds_with_diagnostic() -> None:
     # AT-E8-warn: warn policy → CRC computed, conflict surfaced, not refused.
     ev = evaluate_target(_dirty_mem(), SEED_ALGORITHM, _dirty_fill_target("warn"))
     assert ev.refused is False
-    assert ev.crc is not None
+    assert ev.crc == 0x2A8A3950  # same padded-window CRC as the clean oracle (fill ignores mem in the gap)
     assert ev.conflicts == (0x800A,)
     assert len(ev.diagnostics) == 1 and "warn" in ev.diagnostics[0]
 
@@ -158,7 +158,7 @@ def test_evaluate_target_ignore_is_silent() -> None:
     # AT-E8-ignore: ignore policy → CRC computed, no diagnostic (conflict still recorded).
     ev = evaluate_target(_dirty_mem(), SEED_ALGORITHM, _dirty_fill_target("ignore"))
     assert ev.refused is False
-    assert ev.crc is not None
+    assert ev.crc == 0x2A8A3950
     assert ev.conflicts == (0x800A,)
     assert ev.diagnostics == ()
 
@@ -260,6 +260,28 @@ def test_parse_job_reports_unknown_ref_and_bad_targets() -> None:
         '{"algorithm_ref":"CRC-32/ISO-HDLC","targets":[{"ranges":[{"start":0,"end":1}],"join":"weird","output_address":0}]}'
     )
     assert bad_policy is None and len(errors3) == 1
+
+
+def test_parse_job_non_object_inline_algorithm_is_collected_not_raised() -> None:
+    # F1 regression: a string/list where an 'algorithm' object is expected (the
+    # classic 'meant algorithm_ref' typo) must collect-don't-abort, never raise.
+    for bad_algo in ('"CRC-32/ISO-HDLC"', "[1, 2]", "5"):
+        job, errors = parse_job(
+            '{"algorithm": ' + bad_algo + ', "targets":[{"ranges":[{"start":0,"end":1}],"output_address":0}]}'
+        )
+        assert job is None and len(errors) == 1
+
+
+def test_parse_job_null_algorithm_name_does_not_become_literal_none() -> None:
+    # F1 rider: "algorithm_name": null must fall back to the inline name, not "None".
+    text = (
+        '{"algorithm_name": null, "algorithm": {"name": "MyCRC", "width": 16, '
+        '"poly": "0x1021", "init": "0x0", "refin": false, "refout": false, "xorout": "0x0"}, '
+        '"targets":[{"ranges":[{"start":0,"end":1}],"output_address":0}]}'
+    )
+    job, errors = parse_job(text)
+    assert errors == []
+    assert job is not None and job.algorithm.name == "MyCRC"
 
 
 def test_read_template_faults_are_collected(tmp_path: Path) -> None:

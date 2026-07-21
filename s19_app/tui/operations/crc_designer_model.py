@@ -592,7 +592,9 @@ def parse_job(
     try:
         if data.get("algorithm") is not None:
             inline = data["algorithm"]
-            algorithm = _build_algorithm(inline, str(data.get("algorithm_name", inline.get("name", "custom"))))
+            _require(isinstance(inline, dict), "'algorithm' must be a JSON object")
+            name = str(data.get("algorithm_name") or inline.get("name", "custom"))
+            algorithm = _build_algorithm(inline, name)
         elif data.get("algorithm_ref") is not None:
             ref = str(data["algorithm_ref"])
             resolved = resolver(ref)
