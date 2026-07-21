@@ -122,11 +122,9 @@ _ENGINE_PATHS: list[str] = [
     "s19_app/hexfile.py",
     "s19_app/range_index.py",
     "s19_app/validation",
-    # ``s19_app/tui/a2l.py`` was UNFROZEN for batch-55 (operator-approved P-1b
-    # inline-axis length summer) and RE-FROZEN here once those edits landed on
-    # ``main``. It is a read-only oracle again; any further edit needs an
-    # explicit unfreeze.
-    "s19_app/tui/a2l.py",
+    # ``s19_app/tui/a2l.py`` is UNFROZEN for batch-56 (operator-approved
+    # alignment-aware summer); RE-FREEZE in follow-up PR-B once these edits land
+    # on ``main``.
     "s19_app/tui/mac.py",
 ]
 

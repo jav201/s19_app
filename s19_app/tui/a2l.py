@@ -27,6 +27,33 @@ DATATYPE_SIZES: dict[str, int] = {
     "FLOAT64_IEEE": 8,
 }
 
+# Each sizable datatype → its governing ``ALIGNMENT_<CLASS> N`` directive (R-B,
+# batch-56). Alignment is per-DATATYPE, not per-byte-width: ``ALIGNMENT_WORD``
+# (2-byte int) and ``ALIGNMENT_FLOAT16_IEEE`` (2-byte float) are distinct
+# directives that share a width, so a per-datatype map is the ASAM-correct
+# discriminant. The key-set MUST equal ``DATATYPE_SIZES`` (every sizable datatype
+# has a governing alignment class — asserted by TC-143).
+_DATATYPE_ALIGNMENT_DIRECTIVE: dict[str, str] = {
+    "UBYTE": "ALIGNMENT_BYTE",
+    "SBYTE": "ALIGNMENT_BYTE",
+    "BYTE": "ALIGNMENT_BYTE",
+    "UWORD": "ALIGNMENT_WORD",
+    "SWORD": "ALIGNMENT_WORD",
+    "WORD": "ALIGNMENT_WORD",
+    "ULONG": "ALIGNMENT_LONG",
+    "SLONG": "ALIGNMENT_LONG",
+    "LONG": "ALIGNMENT_LONG",
+    "A_UINT64": "ALIGNMENT_INT64",
+    "A_INT64": "ALIGNMENT_INT64",
+    "FLOAT16_IEEE": "ALIGNMENT_FLOAT16_IEEE",
+    "FLOAT32_IEEE": "ALIGNMENT_FLOAT32_IEEE",
+    "FLOAT64_IEEE": "ALIGNMENT_FLOAT64_IEEE",
+}
+# The set of RECORD_LAYOUT body directive names that declare an alignment. A body
+# line whose token[0] is one of these is consumed by the alignment collector and
+# skipped by the span walk (it induces padding, it is not a summable component).
+_ALIGNMENT_DIRECTIVES = frozenset(_DATATYPE_ALIGNMENT_DIRECTIVE.values())
+
 # DoS bound: the maximum on-disk byte span the A2L decoder will materialize or
 # derive for a single record. Caps both the CURVE/MAP length summer and the
 # per-byte ``_extract_raw_bytes`` loop against a hostile/oversized layout (1 MiB;
@@ -1076,6 +1103,100 @@ def _inline_axis_counts(axis_meta: list[dict]) -> Optional[list[int]]:
     return counts
 
 
+def align_up(o: int, a: int) -> int:
+    """
+    Summary:
+        Round ``o`` up to the next multiple of ``a`` — the inter-component padding
+        primitive for the alignment-aware span walk (batch-56).
+
+    Args:
+        o (int): The current running offset.
+        a (int): The alignment; ``a <= 1`` means no padding (packed).
+
+    Returns:
+        int: The smallest multiple of ``a`` that is ``>= o``; ``o`` unchanged when
+            ``a <= 1`` or ``o`` is already aligned.
+
+    Raises:
+        None: The ``a <= 1`` short-circuit returns BEFORE any ``o % a``, so a
+            non-positive alignment can never raise ``ZeroDivisionError`` (Phase-2
+            sec-M3 defense-in-depth; the collector already fails such values closed).
+
+    Data Flow:
+        - Return ``o`` immediately if ``a <= 1``.
+        - Else compute ``o % a``; return ``o`` if already aligned, else pad up.
+
+    Dependencies:
+        Uses:
+            - (none)
+        Used by:
+            - ``_record_layout_full_span``
+
+    Example:
+        >>> align_up(6, 4)
+        8
+    """
+    if a <= 1:
+        return o
+    remainder = o % a
+    return o if remainder == 0 else o + (a - remainder)
+
+
+def _collect_declared_alignments(lines: list[str]) -> Optional[dict[str, int]]:
+    """
+    Summary:
+        First pass over a RECORD_LAYOUT body: collect the declared
+        ``ALIGNMENT_<CLASS> N`` directives into ``{directive_name: N}``, or return
+        ``None`` (full-span-or-None) on a malformed or non-positive alignment value.
+
+    Args:
+        lines (list[str]): The RECORD_LAYOUT body lines (``layout["lines"]``); the
+            ONLY input — MOD_COMMON / the module tree is never consulted (R-A).
+
+    Returns:
+        Optional[dict[str, int]]: ``{directive_name: N}`` for every well-formed
+            ``ALIGNMENT_*`` line (last declaration wins on a duplicate); ``{}`` for
+            a packed layout; ``None`` if any alignment value is non-int or ``< 1``.
+
+    Raises:
+        None: A non-int alignment value is caught by ``try/except`` and a
+            non-positive one is rejected explicitly — both fail closed to ``None``
+            so a hostile ``ALIGNMENT_WORD 0`` / ``-4`` never reaches ``align_up``
+            with ``a < 1`` (Phase-2 sec-M3).
+
+    Data Flow:
+        - Iterate the lines; skip any whose token[0] is not an alignment directive.
+        - For a directive line with >= 2 tokens, ``int(token[1])`` in a try/except
+          returning ``None`` on failure; return ``None`` if the value is ``< 1``.
+        - Record ``{directive_name: value}`` (last wins).
+
+    Dependencies:
+        Uses:
+            - ``_ALIGNMENT_DIRECTIVES``
+        Used by:
+            - ``_record_layout_full_span``
+
+    Example:
+        >>> _collect_declared_alignments(["ALIGNMENT_WORD 2", "ALIGNMENT_LONG 4"])
+        {'ALIGNMENT_WORD': 2, 'ALIGNMENT_LONG': 4}
+    """
+    declared: dict[str, int] = {}
+    for line in lines or []:
+        tokens = line.split()
+        if not tokens or tokens[0] not in _ALIGNMENT_DIRECTIVES:
+            continue
+        if len(tokens) < 2:
+            continue
+        try:
+            value = int(tokens[1])
+        except (ValueError, TypeError):
+            return None
+        if value < 1:
+            return None
+        declared[tokens[0]] = value
+    return declared
+
+
 def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[int]:
     """
     Summary:
@@ -1098,30 +1219,43 @@ def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[i
             ``MAX_A2L_DECODE_BYTES``; else ``None``.
 
     Raises:
-        None: An unrecognised line (incl. an unmodeled span-affecting directive
-            like ``ALIGNMENT_*``), an unknown datatype, a truncated component, an
-            absent needed axis count, an empty contribution, or an over-cap total
-            all degrade to ``None`` (never a wrong-but-non-None length → no
-            false-green from an under-reported span).
+        None: An unrecognised non-alignment line, an unknown datatype, a
+            truncated component, an absent needed axis count, a malformed or
+            non-positive alignment value, an empty contribution, or an over-cap
+            total all degrade to ``None`` (never a wrong-but-non-None length → no
+            false-green from an under-reported span). ``ALIGNMENT_*`` lines are
+            consumed as padding directives, not forced to ``None`` (batch-56).
 
     Data Flow:
-        - Iterate ``layout["lines"]``; ONLY a genuinely empty/whitespace line is
-          skipped. Every other non-empty line must classify as a summable
-          component or force ``None`` — a span-affecting directive we do not model
-          (``ALIGNMENT_*`` padding, ``AXIS_RESCALE_X``, ``RESERVED``, a standalone
-          comment) must never be silently skipped, or the span under-reports.
+        - First pass: ``_collect_declared_alignments(layout["lines"])`` →
+          ``{directive: N}`` (or ``None`` on a malformed/non-positive value, which
+          propagates full-span-or-None). A packed layout yields ``{}`` → every
+          alignment resolves to 1 → the walk is byte-identical to batch-55.
+        - Walk ``layout["lines"]`` with a running ``offset``: skip empty lines and
+          ``ALIGNMENT_*`` directives (consumed in the first pass); every other
+          non-empty line must classify as a summable component or force ``None``
+          (an unmodeled ``AXIS_RESCALE_X`` / ``RESERVED`` / comment must never be
+          silently skipped, or the span under-reports).
         - Map token[0] to an element count via the §2.5 taxonomy keyed on
           ``axis_counts`` (NO_AXIS_PTS/NO_RESCALE → 1; AXIS_PTS_X/Y/Z → the axis
           count; FNC_VALUES → ``math.prod(axis_counts)``); resolve token[2] size
           via ``DATATYPE_SIZES.get``.
-        - Accumulate ``size × count``; bail to ``None`` on any unrecognised line,
+        - Per component: ``offset = align_up(offset, alignment)`` (alignment =
+          the declared value for the datatype's R-B class, else 1) then
+          ``offset += size × count``. Bail to ``None`` on any unrecognised line,
           truncated component, unknown datatype, missing axis count, or over-cap
           total.
+        - Return the final ``offset`` — the last component's end offset, with NO
+          trailing pad-to-max-alignment (R-C reading (i)) — or ``None`` if nothing
+          contributed.
 
     Dependencies:
         Uses:
             - ``DATATYPE_SIZES``
             - ``MAX_A2L_DECODE_BYTES``
+            - ``_collect_declared_alignments``
+            - ``_DATATYPE_ALIGNMENT_DIRECTIVE``
+            - ``align_up``
             - ``math.prod``
         Used by:
             - ``extract_a2l_tags`` post-axis-walk length pass
@@ -1133,13 +1267,18 @@ def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[i
         ... )
         25
     """
-    total = 0
+    declared = _collect_declared_alignments(layout.get("lines") or [])
+    if declared is None:
+        return None  # a malformed / non-positive ALIGNMENT_* value → full-span-or-None
+    offset = 0
     contributed = False
     for line in layout.get("lines") or []:
         tokens = line.split()
         if not tokens:
             continue
         component = tokens[0]
+        if component in _ALIGNMENT_DIRECTIVES:
+            continue  # an alignment directive, already consumed in the first pass
         if component in ("NO_AXIS_PTS_X", "NO_AXIS_PTS_Y", "NO_AXIS_PTS_Z", "NO_RESCALE_X"):
             element_count = 1
         elif component == "AXIS_PTS_X":
@@ -1157,24 +1296,28 @@ def _record_layout_full_span(layout: dict, axis_counts: list[int]) -> Optional[i
         elif component == "FNC_VALUES":
             element_count = math.prod(axis_counts)
         else:
-            # Any non-empty line that is not a summable component forces
-            # full-span-or-None: an ALIGNMENT_* padding directive (2 tokens, would
-            # add inter-component padding we do not model), an unmodeled component
-            # (AXIS_RESCALE_X / RESERVED), or a standalone comment. Skipping it
-            # would UNDER-REPORT the true span → a false-green.
+            # A non-empty, non-alignment line that is not a summable component
+            # forces full-span-or-None: an unmodeled component (AXIS_RESCALE_X /
+            # RESERVED) or a standalone comment. Skipping it would UNDER-REPORT the
+            # true span → a false-green.
             return None
         if len(tokens) < 3:
             return None  # recognised component missing its datatype token
-        size = DATATYPE_SIZES.get(tokens[2])
+        datatype = tokens[2]
+        size = DATATYPE_SIZES.get(datatype)
         if size is None:
             return None
-        total += size * element_count
+        # R-B: pad this component's start up to its datatype's declared alignment
+        # (an undeclared class → alignment 1 → no padding). R-C: no trailing pad.
+        alignment = declared.get(_DATATYPE_ALIGNMENT_DIRECTIVE.get(datatype), 1)
+        offset = align_up(offset, alignment)
+        offset += size * element_count
         contributed = True
-        if total > MAX_A2L_DECODE_BYTES:
+        if offset > MAX_A2L_DECODE_BYTES:
             return None
     if not contributed:
         return None
-    return total
+    return offset
 
 
 def _decode_scalar(raw: bytes, decode_type: str, decode_endian: str) -> Any:

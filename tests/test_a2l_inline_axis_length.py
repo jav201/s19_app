@@ -177,21 +177,22 @@ def test_tc133_full_span_or_none_on_unclassifiable() -> None:
 
 
 def test_tc133b_alignment_directive_forces_none() -> None:
-    # TC-133b (arch/code-review F1: alignment force-None)
-    """An ALIGNMENT_* padding directive forces full-span-or-None (never under-report).
+    # TC-133b → superseded by batch-56 (LLR-SUP56.1 / §6.5 AMD-1): alignment-aware padding.
+    """ALIGNMENT_* is consumed as a padding directive and pads component starts (batch-56).
 
-    Intent: ALIGNMENT_BYTE/WORD/LONG/INT64/FLOAT16/FLOAT32/FLOAT64 are 2-token
-    RECORD_LAYOUT directives that induce inter-component PADDING the summer does
-    not model. Silently skipping such a line (the old ``len < 3`` skip) would
-    UNDER-REPORT the true span — a false-green, the exact failure full-span-or-None
-    exists to prevent. Any such line must force ``None``.
+    Intent: batch-55 authored this to lock the blanket force-``None`` on any
+    ALIGNMENT_* line (code-review F1); batch-56 deliberately flips that to an
+    alignment-aware cumulative-offset walk. ALIGNMENT_BYTE/WORD/LONG/INT64/FLOAT*
+    now pad each component's start up to its datatype's declared alignment; only an
+    unmodeled NON-alignment line still forces ``None`` (that false-green anchor role
+    passes to test_a2l_alignment_sizing::AT-116). See §6.5 AMD-1 (Before→After).
     """
     summable = {
         "lines": ["NO_AXIS_PTS_X 1 UBYTE", "AXIS_PTS_X 2 UBYTE", "FNC_VALUES 3 SWORD"],
     }
-    # Counterfactual: without alignment this is a clean, summable 13 (1 + 4×1 + 4×2).
+    # No alignment declared → packed 13 (1 + 4×1 + 4×2). RETAINED from batch-55.
     assert _record_layout_full_span(summable, [4]) == 13
-    # Same layout + a 2-token ALIGNMENT_WORD directive → must force None, NOT 13.
+    # ALIGNMENT_WORD 2 pads FNC_VALUES (SWORD) start 5→6 → 14 (was None in batch-55).
     with_alignment = {
         "lines": [
             "NO_AXIS_PTS_X 1 UBYTE",
@@ -200,8 +201,9 @@ def test_tc133b_alignment_directive_forces_none() -> None:
             "FNC_VALUES 3 SWORD",
         ],
     }
-    assert _record_layout_full_span(with_alignment, [4]) is None
-    # A trailing ALIGNMENT_LONG (after all summable components) still forces None.
+    assert _record_layout_full_span(with_alignment, [4]) == 14
+    # ALIGNMENT_LONG 4 governs no present LONG-class datatype → zero effect → 13
+    # (proves a declared alignment affects ONLY components of its governed class).
     trailing_align = {
         "lines": [
             "NO_AXIS_PTS_X 1 UBYTE",
@@ -210,7 +212,7 @@ def test_tc133b_alignment_directive_forces_none() -> None:
             "ALIGNMENT_LONG 4",
         ],
     }
-    assert _record_layout_full_span(trailing_align, [4]) is None
+    assert _record_layout_full_span(trailing_align, [4]) == 13
 
 
 # ---------------------------------------------------------------------------
