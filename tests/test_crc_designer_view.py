@@ -25,11 +25,12 @@ import asyncio
 import copy
 from pathlib import Path
 
-from textual.widgets import Input, Select
+from textual.widgets import Input, Select, Static
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.operations import crc_kernel
-from s19_app.tui.operations.crc_kernel import SEED_ALGORITHM
+from s19_app.tui.operations.crc_designer_model import CrcTemplate, parse_template
+from s19_app.tui.operations.crc_kernel import SEED_ALGORITHM, preset_by_name
 from s19_app.tui.rail import Rail
 
 #: The named form widget ids the scaffold must present (LLR-V1.2): the preset
@@ -166,3 +167,176 @@ def test_form_and_preset_populates_off_seed_without_mutating_catalogue(
     assert list(crc_kernel.PRESETS) == list(catalogue_snapshot), (
         "PRESETS contents must be unchanged after preset selection"
     )
+
+
+def _verdict(app: S19TuiApp) -> str:
+    """Read the mounted ``#crc_kat_verdict`` widget's rendered content."""
+    return str(app.query_one("#crc_kat_verdict", Static).content)
+
+
+def test_live_verdict_transitions_on_single_field_events(tmp_path: Path) -> None:
+    """A single field-change event flips the verdict (AT-CRC-DSN-016, B3).
+
+    Intent (LLR-V2.1): the verdict recomputes WITHIN the change event, no Run.
+    Capture the verdict BEFORE and AFTER one real ``Input.Changed`` and assert
+    the TRANSITION, not the end state: breaking ``xorout`` moves
+    ``MATCH -> MISMATCH``; a second single event clearing ``check`` moves
+    ``MISMATCH -> NO-EXPECTED``. An end-state-only assertion is the defect.
+    """
+
+    async def _drive() -> tuple[str, str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+
+            before = _verdict(app)  # seed CRC-32 kat == check -> MATCH
+
+            # Single real event: break xorout (kat changes, check pinned).
+            app.query_one("#crc_field_xorout", Input).value = "0x00000000"
+            await pilot.pause()
+            after_break = _verdict(app)
+
+            # Single real event: clear check -> no expected value to compare.
+            app.query_one("#crc_field_check", Input).value = ""
+            await pilot.pause()
+            after_clear = _verdict(app)
+            return before, after_break, after_clear
+
+    before, after_break, after_clear = asyncio.run(_drive())
+
+    assert before == "MATCH", f"seed verdict must be MATCH, got {before!r}"
+    assert after_break == "MISMATCH", (
+        f"breaking xorout must transition to MISMATCH, got {after_break!r}"
+    )
+    assert before != after_break, "the verdict must TRANSITION, not stay put (B3)"
+    assert after_clear == "NO-EXPECTED", (
+        f"clearing check must transition to NO-EXPECTED, got {after_clear!r}"
+    )
+    assert after_break != after_clear, "second event must also TRANSITION (B3)"
+
+
+def test_live_verdict_every_preset_reads_match(tmp_path: Path) -> None:
+    """Every catalogue preset yields a MATCH verdict (AT-CRC-DSN-011, M1).
+
+    Intent (LLR-V2.1): the preset set is derived from ``crc_kernel.PRESETS``
+    (``len >= 7``, no hand-typed list, C-31); selecting each through the mounted
+    selector recomputes the verdict to MATCH read from the mounted widget.
+    """
+    assert len(crc_kernel.PRESETS) >= 7, "the seed catalogue must carry >= 7 presets"
+
+    async def _drive() -> dict[str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            selector = app.query_one("#crc_preset_select", Select)
+            verdicts: dict[str, str] = {}
+            for preset in crc_kernel.PRESETS:
+                selector.value = preset.name
+                await pilot.pause()
+                verdicts[preset.name] = _verdict(app)
+            return verdicts
+
+    verdicts = asyncio.run(_drive())
+    for preset in crc_kernel.PRESETS:
+        assert verdicts[preset.name] == "MATCH", (
+            f"preset {preset.name} must read MATCH, got {verdicts[preset.name]!r}"
+        )
+
+
+def test_custom_vector_ascii_and_hex_reproduce_kat(tmp_path: Path) -> None:
+    """ASCII and hex custom vectors both compute the seed KAT (AT-058-03).
+
+    Intent (LLR-V3.1): the seed algorithm's CRC over the ASCII vector
+    ``123456789`` (the default) and over the equivalent hex ``31..39`` both equal
+    ``SEED_ALGORITHM.kat()`` (0xCBF43926), read from the mounted result widget.
+    """
+
+    async def _drive() -> tuple[str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+
+            ascii_result = str(
+                app.query_one("#crc_custom_vector_result", Static).content
+            )
+
+            app.query_one("#crc_custom_vector_mode", Select).value = "hex"
+            app.query_one("#crc_custom_vector", Input).value = (
+                "31 32 33 34 35 36 37 38 39"
+            )
+            await pilot.pause()
+            hex_result = str(
+                app.query_one("#crc_custom_vector_result", Static).content
+            )
+            return ascii_result, hex_result
+
+    ascii_result, hex_result = asyncio.run(_drive())
+    expected = SEED_ALGORITHM.kat()
+    assert int(ascii_result, 16) == expected, (
+        f"ASCII 123456789 must reproduce the KAT, got {ascii_result!r}"
+    )
+    assert int(hex_result, 16) == expected, (
+        f"hex 31..39 must reproduce the KAT, got {hex_result!r}"
+    )
+
+
+def test_json_preview_roundtrips_through_mounted_widget(tmp_path: Path) -> None:
+    """The mounted preview text parses back to the current template (AT-058-04, B1).
+
+    Intent (LLR-V4.1): after a representative edit (selecting the CRC-16/MODBUS
+    preset), READ the ``#crc_json_preview`` widget's rendered text and assert
+    ``parse_template(<that text>)[0] == current_template`` with ``errors == []``
+    — NOT ``parse_template(emit_template(t))`` in the test (through-surface gate).
+    """
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            app.query_one("#crc_preset_select", Select).value = "CRC-16/MODBUS"
+            await pilot.pause()
+            return str(app.query_one("#crc_json_preview", Static).content)
+
+    rendered = asyncio.run(_drive())
+    template, errors = parse_template(rendered)
+    assert errors == [], f"mounted preview must parse cleanly, got {errors!r}"
+    expected = CrcTemplate(algorithm=preset_by_name("CRC-16/MODBUS"))
+    assert template == expected, (
+        "the mounted preview must round-trip to the current MODBUS template"
+    )
+
+
+def test_verdict_fault_guard_out_of_range_width(tmp_path: Path) -> None:
+    """An out-of-range width warns markup-safely without crashing (LLR-V2.2).
+
+    Intent: entering ``width=4`` (``crc_stream`` would raise ``ValueError``,
+    crc_kernel.py:125) renders a markup-safe warning in the verdict widget and
+    leaves the app alive — the compute-boundary fault guard.
+    """
+
+    async def _drive() -> tuple[str, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            app.query_one("#crc_field_width", Input).value = "4"
+            await pilot.pause()
+            verdict_widget = app.query_one("#crc_kat_verdict", Static)
+            markup_off = verdict_widget._render_markup is False
+            return str(verdict_widget.content), markup_off
+
+    verdict, markup_off = asyncio.run(_drive())
+    assert "Cannot compute" in verdict, (
+        f"an out-of-range width must warn, not crash; got {verdict!r}"
+    )
+    assert verdict != "MATCH"
+    assert markup_off, "the verdict widget must render markup-safe (C-17)"

@@ -1,19 +1,35 @@
-"""CRC Designer rail-screen parameter form (batch-58, Phase-3 Inc-4).
+"""CRC Designer rail-screen parameter form (batch-58, Phase-3 Inc-4/Inc-5).
 
 Home of :class:`CrcDesignerPanel` — the editable parameter form composed inside
-the ``#screen_crc_designer`` rail screen (HLR-V1 / LLR-V1.1 / LLR-V1.2). This
-increment ships the scaffold: a preset selector plus the seven ``algorithm``
-fields (``width`` / ``poly`` / ``init`` / ``refin`` / ``refout`` / ``xorout`` /
+the ``#screen_crc_designer`` rail screen (HLR-V1 / LLR-V1.1 / LLR-V1.2). Inc-4
+shipped the scaffold: a preset selector plus the seven ``algorithm`` fields
+(``width`` / ``poly`` / ``init`` / ``refin`` / ``refout`` / ``xorout`` /
 ``check``) and the three ``serialization`` fields (``output_address`` /
 ``store_width`` / ``store_endianness``), and preset-driven population that reads
 the read-only :data:`crc_kernel.PRESETS` catalogue via :func:`preset_by_name`
-without mutating it. The live known-answer verdict, custom-vector, JSON preview,
-Load/Save and multi-range coverage surfaces are later increments (LLR-V2..V5).
+without mutating it.
+
+Inc-5 adds the three live-recompute surfaces, all driven off the real Textual
+change events (``Input.Changed`` / ``Switch.Changed`` / ``Select.Changed``) —
+no Run button (LLR-V2.1 / V2.2 / V3.1 / V4.1):
+
+- ``#crc_kat_verdict`` — the tri-state known-answer verdict (``MATCH`` /
+  ``MISMATCH`` / ``NO-EXPECTED``) recomputed from the current fields.
+- ``#crc_custom_vector`` (+ mode) — an operator vector (ASCII or hex) whose CRC
+  under the current algorithm is shown; ASCII ``123456789`` reproduces the KAT.
+- ``#crc_json_preview`` — the live ``emit_template`` render that round-trips
+  back through :func:`parse_template` to the same typed template.
+
+The compute boundary is guarded: an out-of-range width / non-hex field renders a
+markup-safe warning rather than crashing the screen. Load/Save and multi-range
+coverage remain later increments (LLR-V5).
 
 The panel is presentational (s19_app CLAUDE.md TUI architecture): it imports the
 headless ``crc_kernel`` / ``crc_designer_model`` primitives for read-only
-lookups and vocabulary constants only, and never calls the range/validation
-engine or writes firmware (US-V6 preview-only).
+lookups, vocabulary constants and JSON serialization only, and never calls the
+range/validation engine or writes firmware (US-V6 preview-only). Every live
+surface renders ``markup=False`` (C-17): file/preset-derived text never reaches
+a markup sink.
 """
 
 from __future__ import annotations
@@ -23,8 +39,61 @@ from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
 from textual.widgets import Input, Label, Select, Static, Switch
 
-from .operations.crc_designer_model import ENDIANNESS_VALUES
+from .operations.crc_designer_model import (
+    ENDIANNESS_VALUES,
+    CrcTemplate,
+    emit_template,
+)
 from .operations.crc_kernel import PRESETS, SEED_ALGORITHM, CrcAlgorithm, preset_by_name
+
+#: Custom-vector interpretation modes (LLR-V3.1). ``ascii`` encodes the raw text
+#: as UTF-8 bytes (so ``123456789`` reproduces the KAT); ``hex`` reads
+#: whitespace-tolerant hex pairs. An explicit mode is required because
+#: ``123456789`` is itself valid hex — auto-detect would mis-read the KAT input.
+_VECTOR_MODES: tuple[str, ...] = ("ascii", "hex")
+
+#: Tri-state display tokens for the live verdict (LLR-V2.1). The source is the
+#: merged :meth:`CrcAlgorithm.kat_ok` ``True`` / ``False`` / ``None``.
+_VERDICT_TOKENS: dict[bool | None, str] = {
+    True: "MATCH",
+    False: "MISMATCH",
+    None: "NO-EXPECTED",
+}
+
+
+def _decode_vector(raw: str, mode: str) -> bytes:
+    """Decode the custom-vector text under ``mode`` (LLR-V3.1).
+
+    Summary:
+        Turn the operator's custom-vector text into the byte stream to digest:
+        ``ascii`` UTF-8 encodes it (so ``123456789`` reproduces the KAT), ``hex``
+        strips whitespace and reads hex pairs.
+
+    Args:
+        raw (str): The raw custom-vector field text.
+        mode (str): One of :data:`_VECTOR_MODES` (``"ascii"`` / ``"hex"``).
+
+    Returns:
+        bytes: The decoded byte stream.
+
+    Raises:
+        ValueError: When ``mode == "hex"`` and ``raw`` is not valid hex — caught
+            by the caller and rendered as a markup-safe warning.
+
+    Data Flow:
+        - Pure decode; no widget or engine state.
+
+    Dependencies:
+        Used by:
+            - :meth:`CrcDesignerPanel._custom_vector_text`
+
+    Example:
+        >>> _decode_vector("31 32 33", "hex")
+        b'123'
+    """
+    if mode == "hex":
+        return bytes.fromhex("".join(raw.split()))
+    return raw.encode("utf-8")
 
 
 def _format_hex(value: int, byte_width: int) -> str:
@@ -153,6 +222,39 @@ class CrcDesignerPanel(ScrollableContainer):
                 ),
                 classes="crc-field-row",
             )
+        with Vertical(id="crc_live_verify", classes="crc-field-group"):
+            yield Label(
+                "Known-answer verdict (123456789)", classes="crc-group-title"
+            )
+            yield Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict")
+        with Vertical(id="crc_custom_vector_group", classes="crc-field-group"):
+            yield Label("Custom test vector", classes="crc-group-title")
+            yield Horizontal(
+                Label("Mode", classes="crc-field-label"),
+                Select(
+                    [(mode, mode) for mode in _VECTOR_MODES],
+                    value=_VECTOR_MODES[0],
+                    allow_blank=False,
+                    id="crc_custom_vector_mode",
+                ),
+                classes="crc-field-row",
+            )
+            yield self._text_row("Vector", "crc_custom_vector", "123456789")
+            yield Horizontal(
+                Label("CRC of vector", classes="crc-field-label"),
+                Static(
+                    "",
+                    id="crc_custom_vector_result",
+                    markup=False,
+                    classes="crc-verdict",
+                ),
+                classes="crc-field-row",
+            )
+        with Vertical(id="crc_json_preview_group", classes="crc-field-group"):
+            yield Label("Template JSON preview", classes="crc-group-title")
+            yield Static(
+                "", id="crc_json_preview", markup=False, classes="crc-json-preview"
+            )
 
     @staticmethod
     def _text_row(label: str, field_id: str, value: str) -> Horizontal:
@@ -228,14 +330,15 @@ class CrcDesignerPanel(ScrollableContainer):
         self.query_one("#crc_field_store_width", Input).value = str(byte_width)
 
     def on_select_changed(self, event: Select.Changed) -> None:
-        """Populate the form when the preset selector changes (LLR-V1.2).
+        """Repopulate on a preset change; recompute on any select change.
 
         Summary:
             On a ``#crc_preset_select`` change, resolve the chosen preset via
-            :func:`preset_by_name` and repopulate the algorithm fields. Changes
-            to the serialization endianness selector are ignored here. The
-            mount-time initial event (fired before the sibling fields exist) is
-            tolerated as a no-op.
+            :func:`preset_by_name` and repopulate the algorithm fields
+            (LLR-V1.2). For every select change (preset, endianness, custom
+            vector mode) the live surfaces are recomputed (LLR-V2.1 / V3.1 /
+            V4.1). The mount-time initial event (fired before the sibling fields
+            exist) is tolerated as a no-op.
 
         Args:
             event (Select.Changed): The selection-change message.
@@ -245,23 +348,238 @@ class CrcDesignerPanel(ScrollableContainer):
 
         Data Flow:
             - ``#crc_preset_select`` → ``preset_by_name(value)`` →
-              :meth:`_apply_algorithm`.
+              :meth:`_apply_algorithm`; then :meth:`_recompute` for any select.
 
         Dependencies:
             Uses:
-                - ``preset_by_name``
+                - ``preset_by_name``, :meth:`_apply_algorithm`, :meth:`_recompute`
         """
-        if event.select.id != "crc_preset_select":
-            return
-        value = event.value
-        if value is None or value is Select.BLANK:
-            return
-        algo = preset_by_name(str(value))
-        if algo is None:
+        if event.select.id == "crc_preset_select":
+            value = event.value
+            if value is not None and value is not Select.BLANK:
+                algo = preset_by_name(str(value))
+                if algo is not None:
+                    try:
+                        self._apply_algorithm(algo)
+                    except NoMatches:
+                        # Mount-time initial Changed can arrive before the field
+                        # widgets are queryable; seed values are set in compose.
+                        return
+        self._recompute()
+
+    def on_mount(self) -> None:
+        """Populate the live surfaces once all fields are mounted (LLR-V2.1).
+
+        Summary:
+            Establish the initial verdict / custom-vector / preview state from
+            the seed fields so the first ``BEFORE`` capture reads a real verdict
+            (``MATCH`` for the seed) — the transition gate (AT-CRC-DSN-016) needs
+            a populated pre-edit state.
+
+        Returns:
+            None
+
+        Data Flow:
+            - :meth:`_recompute` over the composed seed fields.
+        """
+        self._recompute()
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        """Recompute the live surfaces on any field / vector edit (LLR-V2.1).
+
+        Args:
+            event (Input.Changed): The field-change message (unused; the handler
+                reads all current field values).
+
+        Returns:
+            None
+        """
+        self._recompute()
+
+    def on_switch_changed(self, event: Switch.Changed) -> None:
+        """Recompute the live surfaces on a reflect-in/out toggle (LLR-V2.1).
+
+        Args:
+            event (Switch.Changed): The switch-change message (unused).
+
+        Returns:
+            None
+        """
+        self._recompute()
+
+    def _current_algorithm(self) -> CrcAlgorithm:
+        """Build a :class:`CrcAlgorithm` from the current form fields.
+
+        Summary:
+            Read the seven algorithm fields plus the preset-selector name into a
+            typed :class:`CrcAlgorithm` (LLR-V2.1). Hex fields accept an optional
+            ``0x`` prefix; an empty ``check`` field maps to ``None`` (the
+            no-expected tri-state). Field values are read live, never cached.
+
+        Returns:
+            CrcAlgorithm: The algorithm the form currently describes.
+
+        Raises:
+            ValueError: A non-numeric width or non-hex parameter — caught by
+                :meth:`_recompute` and rendered as a markup-safe warning
+                (LLR-V2.2).
+
+        Data Flow:
+            - ``#crc_field_*`` widget values → parsed ints/bools →
+              :class:`CrcAlgorithm`.
+
+        Dependencies:
+            Used by:
+                - :meth:`_recompute`
+        """
+        width_text = self.query_one("#crc_field_width", Input).value.strip()
+        width = int(width_text) if width_text else 0
+        check_text = self.query_one("#crc_field_check", Input).value.strip()
+        check = int(check_text, 16) if check_text else None
+        return CrcAlgorithm(
+            name=str(self.query_one("#crc_preset_select", Select).value),
+            width=width,
+            poly=self._hex_field("#crc_field_poly"),
+            init=self._hex_field("#crc_field_init"),
+            refin=self.query_one("#crc_field_refin", Switch).value,
+            refout=self.query_one("#crc_field_refout", Switch).value,
+            xorout=self._hex_field("#crc_field_xorout"),
+            check=check,
+        )
+
+    def _hex_field(self, selector: str) -> int:
+        """Parse a hex ``#crc_field_*`` value (``0x`` optional; empty → ``0``)."""
+        text = self.query_one(selector, Input).value.strip()
+        return int(text, 16) if text else 0
+
+    def _verdict_text(self, algo: CrcAlgorithm) -> str:
+        """Render the tri-state known-answer verdict token (LLR-V2.1 / V2.2).
+
+        Summary:
+            Compute :meth:`CrcAlgorithm.kat_ok` and map the ``True`` / ``False``
+            / ``None`` tri-state to ``MATCH`` / ``MISMATCH`` / ``NO-EXPECTED``.
+            A compute fault (width ∉ [8, 64]) is caught and rendered as a
+            markup-safe warning rather than propagated.
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm.
+
+        Returns:
+            str: The verdict token, or a ``Cannot compute`` warning.
+
+        Dependencies:
+            Uses:
+                - :meth:`CrcAlgorithm.kat_ok`
+            Used by:
+                - :meth:`_recompute`
+        """
+        try:
+            return _VERDICT_TOKENS[algo.kat_ok()]
+        except ValueError as exc:
+            return f"Cannot compute: {exc}"
+
+    def _custom_vector_text(self, algo: CrcAlgorithm) -> str:
+        """Render the current algorithm's CRC over the custom vector (LLR-V3.1).
+
+        Summary:
+            Decode ``#crc_custom_vector`` under its mode and digest it with
+            ``algo`` (:meth:`CrcAlgorithm.compute`); an ASCII ``123456789``
+            reproduces the KAT. A malformed vector or compute fault renders a
+            markup-safe warning, never a crash.
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm.
+
+        Returns:
+            str: The ``0x``-prefixed CRC, or a markup-safe warning.
+
+        Dependencies:
+            Uses:
+                - :func:`_decode_vector`, :meth:`CrcAlgorithm.compute`
+            Used by:
+                - :meth:`_recompute`
+        """
+        mode = str(self.query_one("#crc_custom_vector_mode", Select).value)
+        raw = self.query_one("#crc_custom_vector", Input).value
+        try:
+            data = _decode_vector(raw, mode)
+        except ValueError as exc:
+            return f"Invalid vector: {exc}"
+        try:
+            return _format_hex(algo.compute(data), algo.store_bytes())
+        except ValueError as exc:
+            return f"Cannot compute: {exc}"
+
+    def _preview_text(self, algo: CrcAlgorithm) -> str:
+        """Render the live template JSON preview (LLR-V4.1).
+
+        Summary:
+            Serialize ``CrcTemplate(algo)`` via :func:`emit_template`; the text
+            round-trips back through :func:`parse_template` to the same typed
+            template (the AT-058-04 gate reads THIS mounted widget's text). The
+            output is rendered ``markup=False`` — its ``[]`` array literals never
+            reach a markup sink (C-17).
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm.
+
+        Returns:
+            str: The pretty-printed template JSON, or a markup-safe warning.
+
+        Dependencies:
+            Uses:
+                - :func:`emit_template`, :class:`CrcTemplate`
+            Used by:
+                - :meth:`_recompute`
+        """
+        try:
+            return emit_template(CrcTemplate(algorithm=algo))
+        except (ValueError, TypeError) as exc:
+            return f"Cannot render preview: {exc}"
+
+    def _recompute(self) -> None:
+        """Recompute the three live surfaces from the current fields.
+
+        Summary:
+            The single recompute entry point wired to every change event
+            (LLR-V2.1). Build the current algorithm and refresh the verdict,
+            custom-vector CRC and JSON preview. A field that cannot even form an
+            algorithm (non-hex parameter) renders one markup-safe warning across
+            the surfaces instead of crashing (LLR-V2.2). During mount — before
+            all sibling widgets exist — the ``NoMatches`` is swallowed;
+            :meth:`on_mount` performs the first full compute.
+
+        Returns:
+            None
+
+        Data Flow:
+            - :meth:`_current_algorithm` → :meth:`_verdict_text` /
+              :meth:`_custom_vector_text` / :meth:`_preview_text` → each
+              ``Static.update`` (markup-safe).
+
+        Dependencies:
+            Uses:
+                - :meth:`_current_algorithm`, :meth:`_verdict_text`,
+                  :meth:`_custom_vector_text`, :meth:`_preview_text`
+            Used by:
+                - :meth:`on_mount`, :meth:`on_input_changed`,
+                  :meth:`on_switch_changed`, :meth:`on_select_changed`
+        """
+        try:
+            verdict = self.query_one("#crc_kat_verdict", Static)
+            custom_result = self.query_one("#crc_custom_vector_result", Static)
+            preview = self.query_one("#crc_json_preview", Static)
+        except NoMatches:
+            # Mid-mount: a change event arrived before every surface exists.
             return
         try:
-            self._apply_algorithm(algo)
-        except NoMatches:
-            # Mount-time initial Changed can arrive before the field widgets
-            # are queryable; the seed values are already set in compose.
+            algo = self._current_algorithm()
+        except (ValueError, NoMatches) as exc:
+            warning = f"Invalid parameters: {exc}"
+            verdict.update(warning)
+            custom_result.update("—")
+            preview.update(warning)
             return
+        verdict.update(self._verdict_text(algo))
+        custom_result.update(self._custom_vector_text(algo))
+        preview.update(self._preview_text(algo))
