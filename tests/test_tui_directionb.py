@@ -757,7 +757,9 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
-    assert len(seen) == 9, f"expected all 9 screens visited, got {len(seen)}"
+    assert len(seen) == len(SCREEN_KEYS), (
+        f"expected all {len(SCREEN_KEYS)} screens visited, got {len(seen)}"
+    )
     for key, has_find, has_goto, has_palette in seen:
         assert has_find, f"find input missing on screen '{key}'"
         assert has_goto, f"go-to input missing on screen '{key}'"
@@ -795,7 +797,7 @@ def test_tc010_ctrl_k_opens_palette_from_every_screen(tmp_path: Path) -> None:
         return results
 
     results = asyncio.run(_drive())
-    assert len(results) == 9
+    assert len(results) == len(SCREEN_KEYS)
     for key, is_open, focused_id in results:
         assert is_open, f"palette did not open on screen '{key}'"
         assert focused_id == "palette_input", (
@@ -897,7 +899,7 @@ def test_tc038_project_a2l_labels_render_in_command_bar(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
-    assert len(seen) == 9
+    assert len(seen) == len(SCREEN_KEYS)
     for key, project, a2l in seen:
         assert "demo_project" in project, (
             f"project name missing from command bar on '{key}': {project!r}"

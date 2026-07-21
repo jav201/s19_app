@@ -2,9 +2,11 @@
 
 > Living compendium. Updated at every gate + significant checkpoint. Human mirror of `state.json`.
 
-## Where we are — Phase 3 (Implementation) IN PROGRESS
-- **Phase 0 APPROVED · Phase 1 DONE · Phase 2 DONE (re-gate PASS) · Phase 3 STARTED.**
-- Branch `feat/batch-58-crc-designer-view` **rebased onto `origin/main` `1e3125b`** (RC-1 currency restored; base ref now `1e3125b`).
+## Where we are — Phase 4 (Validation) IN PROGRESS
+- **Phase 0-3 DONE.** Phase 3 = **7/7 increments gate-APPROVED** (0 HIGH surviving; commits Inc-1 c16e01a → Inc-7 181e747; 12 commits total). Full functional suite running.
+- Branch `feat/batch-58-crc-designer-view` on `origin/main` `1e3125b`.
+- **Phase-4 approach:** functional suite run EXCLUDING `tc031`/`engine_unchanged` (checkout-hazard — `git checkout main` stranded the shared checkout twice; frozen verified STATICALLY = 0 diffs throughout; they run in canonical CI). **19 snapshot baselines are expected rail-drift** → canonical-CI regen closeout PR (local FORBIDDEN). Authoritative full-suite+snapshot gate = canonical CI on the PR.
+- **LOW carries → postmortem/BACKLOG:** Inc-3 code-F2 (parse_job loader-asymmetry doc) + F3 (missing-polynomial diag) · Inc-5 F1 recompute-fanout + F2 preset-name-carry · Inc-6 code-F1 redundant-name-write + sec-F1 overwrite-note + sec-F2 sanitize-collision(accept) · Inc-7 F1 `_build_target` private-import+"target 1" wording + F2 conflict-format-dup.
 - Artifacts editor-invisible (worktree-not-editor-root): pasted inline at each gate.
 
 ### ✅ COLLISION RESOLVED (2026-07-21)
