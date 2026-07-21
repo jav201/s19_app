@@ -37,9 +37,26 @@ warnings (LLR-V5.1 / V5.2 / V5.3 / V5.4):
   (``check == compute("123456789")``) and name warnings.
 - ``#crc_warnings`` — the live ``store_width < ceil(width/8)`` truncation warning.
 
-Multi-range coverage + the fill-no-pad warning remain Inc-7 (LLR-V6/V7). Every
-sink that shows template/file-derived text — including the JSON preview that
-embeds the loaded ``name`` / ``aliases`` verbatim — renders ``markup=False``.
+Inc-7 adds the multi-range coverage strip + per-policy preview (LLR-V6/V7/V8):
+
+- ``#crc_coverage_ranges`` / ``#crc_coverage_intra_gap`` / ``#crc_coverage_join``
+  / ``#crc_coverage_pad_byte`` / ``#crc_coverage_on_gap_conflict`` — the coverage
+  editor (ordered ranges + the two gap-policy toggles + pad byte + safety policy)
+  from which a :class:`CrcTarget` is built (validated through the shared
+  ``_build_target`` fault path).
+- ``#crc_coverage_preview`` — while an image is loaded, the target's CRC over the
+  real ``mem_map`` for BOTH gap policies (concat AND fill) side by side; a
+  ``join="fill"`` target honors ``on_gap_conflict`` (``abort`` refuses the
+  preview with no CRC, ``warn`` proceeds with a diagnostic, ``ignore`` silent).
+  No image loaded → a graceful "load an image" state.
+- The ``#crc_warnings`` surface gains the fill-with-no-``pad_byte`` warning (the
+  third of the three warn conditions).
+
+The view is preview-only (LLR-V8.1): it reads ``mem_map`` but NEVER mutates it
+and never writes firmware bytes — the only file write is the ``*.crc.json``
+template on Save. Every sink that shows template/file-derived text — including
+the JSON preview that embeds the loaded ``name`` / ``aliases`` verbatim, and the
+gap-conflict diagnostics — renders ``markup=False``.
 
 The panel is presentational (s19_app CLAUDE.md TUI architecture): it imports the
 headless ``crc_kernel`` / ``crc_designer_model`` primitives for read-only
@@ -51,12 +68,23 @@ a markup sink.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 from textual.app import ComposeResult
 from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
 from textual.widgets import Button, Input, Label, Select, Static, Switch
 
-from .operations.crc_designer_model import ENDIANNESS_VALUES
+from .operations.crc_designer_model import (
+    ENDIANNESS_VALUES,
+    INTRA_GAP_VALUES,
+    JOIN_VALUES,
+    ON_GAP_CONFLICT_VALUES,
+    CrcTarget,
+    _build_target,
+    compute_target_crc,
+    evaluate_target,
+)
 from .operations.crc_kernel import PRESETS, SEED_ALGORITHM, CrcAlgorithm, preset_by_name
 from .operations.crc_template import CrcTemplate, emit_template, read_template
 from .workspace import ensure_template_lib, sanitize_project_name
@@ -246,6 +274,50 @@ class CrcDesignerPanel(ScrollableContainer):
                     id="crc_field_store_endianness",
                 ),
                 classes="crc-field-row",
+            )
+        with Vertical(id="crc_coverage_group", classes="crc-field-group"):
+            yield Label("Coverage (preview-only)", classes="crc-group-title")
+            yield self._text_row(
+                "Ranges (start-end, comma-separated)",
+                "crc_coverage_ranges",
+                "0x00008000-0x00008008, 0x00008010-0x00008018",
+            )
+            yield Horizontal(
+                Label("Intra-range gap", classes="crc-field-label"),
+                Select(
+                    [(value, value) for value in INTRA_GAP_VALUES],
+                    value=INTRA_GAP_VALUES[0],
+                    allow_blank=False,
+                    id="crc_coverage_intra_gap",
+                ),
+                classes="crc-field-row",
+            )
+            yield Horizontal(
+                Label("Join (between ranges)", classes="crc-field-label"),
+                Select(
+                    [(value, value) for value in JOIN_VALUES],
+                    value=JOIN_VALUES[0],
+                    allow_blank=False,
+                    id="crc_coverage_join",
+                ),
+                classes="crc-field-row",
+            )
+            yield self._text_row("Pad byte", "crc_coverage_pad_byte", "0xFF")
+            yield Horizontal(
+                Label("On gap conflict", classes="crc-field-label"),
+                Select(
+                    [(value, value) for value in ON_GAP_CONFLICT_VALUES],
+                    value=ON_GAP_CONFLICT_VALUES[0],
+                    allow_blank=False,
+                    id="crc_coverage_on_gap_conflict",
+                ),
+                classes="crc-field-row",
+            )
+            yield Static(
+                "",
+                id="crc_coverage_preview",
+                markup=False,
+                classes="crc-verdict",
             )
         with Vertical(id="crc_live_verify", classes="crc-field-group"):
             yield Label(
@@ -610,20 +682,27 @@ class CrcDesignerPanel(ScrollableContainer):
             return f"Cannot render preview: {exc}"
 
     def _live_warnings_text(self, algo: CrcAlgorithm) -> str:
-        """Render the form-computable live warnings (LLR-V5.4b).
+        """Render the form-computable live warnings (LLR-V5.4b / V5.4a).
 
         Summary:
-            The single form-computable warning that does not need the loaded
-            image: ``store_width < ceil(width/8)`` — a stored field too narrow
-            for the CRC silently truncates its detection strength, so it is a
-            mandatory warn. The fill-no-``pad_byte`` warning needs the coverage
-            strip and lands with it in Inc-7. Rendered ``markup=False``.
+            The two form-computable warnings that do not need the loaded image,
+            each rendered independently on its own line (LLR-V5.4, M4):
+
+            - ``store_width < ceil(width/8)`` — a stored field too narrow for the
+              CRC silently truncates its detection strength (mandatory warn).
+            - the coverage strip selects ``intra_gap`` or ``join`` = ``"fill"``
+              while ``pad_byte`` is unset — the filled bytes then silently default,
+              so the operator is warned to set an explicit pad byte (the third
+              warn condition, LLR-V5.4a).
+
+            All lines render ``markup=False``.
 
         Args:
             algo (CrcAlgorithm): The current algorithm.
 
         Returns:
-            str: The warning line, or ``""`` when the stored field is wide enough.
+            str: The warning lines joined by newlines, or ``""`` when neither
+            condition holds.
 
         Dependencies:
             Uses:
@@ -631,30 +710,182 @@ class CrcDesignerPanel(ScrollableContainer):
             Used by:
                 - :meth:`_recompute`
         """
+        warnings: list[str] = []
         text = self.query_one("#crc_field_store_width", Input).value.strip()
         try:
             store_width = int(text) if text else None
         except ValueError:
-            return ""
+            store_width = None
         required = algo.store_bytes()
         if store_width is not None and store_width < required:
-            return (
+            warnings.append(
                 f"store width {store_width} bytes < required {required} bytes "
                 "(ceil(width/8)); the stored CRC will be truncated"
             )
-        return ""
+        intra_gap = str(self.query_one("#crc_coverage_intra_gap", Select).value)
+        join = str(self.query_one("#crc_coverage_join", Select).value)
+        pad_raw = self.query_one("#crc_coverage_pad_byte", Input).value.strip()
+        if (intra_gap == "fill" or join == "fill") and not pad_raw:
+            warnings.append(
+                "fill policy selected but pad_byte is unset; the filled bytes "
+                "default to 0xFF — set an explicit pad byte"
+            )
+        return "\n".join(warnings)
+
+    def _parse_ranges(self, raw: str) -> list[tuple[int, int]]:
+        """Parse the coverage ``start-end`` range list (LLR-V6.1).
+
+        Summary:
+            Read the comma-separated ``#crc_coverage_ranges`` text into an
+            ordered list of half-open ``(start, end)`` hex ranges (``0x`` prefix
+            optional), preserving DECLARED order. A malformed token or an empty
+            list raises :class:`ValueError`, which the caller renders as a
+            markup-safe warning.
+
+        Args:
+            raw (str): The raw ranges-field text.
+
+        Returns:
+            list[tuple[int, int]]: The ranges in declared order.
+
+        Raises:
+            ValueError: A token is not ``start-end`` hex, or no range is given.
+
+        Dependencies:
+            Used by:
+                - :meth:`_build_coverage_target`
+        """
+        ranges: list[tuple[int, int]] = []
+        for token in raw.split(","):
+            token = token.strip()
+            if not token:
+                continue
+            if "-" not in token:
+                raise ValueError(f"range {token!r} must be 'start-end'")
+            start_text, _, end_text = token.partition("-")
+            ranges.append((int(start_text.strip(), 16), int(end_text.strip(), 16)))
+        if not ranges:
+            raise ValueError("enter at least one range as 'start-end'")
+        return ranges
+
+    def _build_coverage_target(self) -> CrcTarget:
+        """Build the coverage :class:`CrcTarget` from the strip + serialization.
+
+        Summary:
+            Assemble the coverage-strip fields (ranges + ``intra_gap`` + ``join``
+            + ``pad_byte`` + ``on_gap_conflict``) and the serialization fields
+            (``output_address`` / ``store_width`` / ``store_endianness``) into a
+            raw target dict and validate it through the shared
+            :func:`_build_target` fault path (LLR-V6.1) — so an inverted range or
+            out-of-range field surfaces the same collected error the loader uses.
+            An empty ``pad_byte`` field defaults to ``0xFF`` for the compute (the
+            unset state itself drives the fill-no-pad warning, LLR-V5.4a).
+
+        Returns:
+            CrcTarget: The validated target the preview digests.
+
+        Raises:
+            ValueError: A malformed range/field or a ``_build_target`` rule
+                violation — caught by :meth:`_coverage_preview_text`.
+
+        Dependencies:
+            Uses:
+                - :meth:`_parse_ranges`, :func:`_build_target`
+            Used by:
+                - :meth:`_coverage_preview_text`
+        """
+        ranges = self._parse_ranges(
+            self.query_one("#crc_coverage_ranges", Input).value
+        )
+        pad_raw = self.query_one("#crc_coverage_pad_byte", Input).value.strip()
+        pad_byte = int(pad_raw, 16) if pad_raw else 0xFF
+        store_text = self.query_one("#crc_field_store_width", Input).value.strip()
+        raw = {
+            "ranges": [{"start": start, "end": end} for start, end in ranges],
+            "intra_gap": str(self.query_one("#crc_coverage_intra_gap", Select).value),
+            "join": str(self.query_one("#crc_coverage_join", Select).value),
+            "pad_byte": pad_byte,
+            "output_address": self._hex_field("#crc_field_output_address"),
+            "store_width": int(store_text) if store_text else 4,
+            "store_endianness": str(
+                self.query_one("#crc_field_store_endianness", Select).value
+            ),
+            "on_gap_conflict": str(
+                self.query_one("#crc_coverage_on_gap_conflict", Select).value
+            ),
+        }
+        return _build_target(0, raw)
+
+    def _coverage_preview_text(self, algo: CrcAlgorithm) -> str:
+        """Render the per-policy coverage preview over the loaded image (LLR-V6.2 / V7.1).
+
+        Summary:
+            While an image is loaded, compute the target's CRC over the real
+            ``mem_map`` for BOTH gap policies (``concat`` AND ``fill``) and show
+            them side by side, marking the active ``join`` (LLR-V6.2). A
+            ``join="fill"`` target is first evaluated under its
+            ``on_gap_conflict`` policy (:func:`evaluate_target`, LLR-V7.1):
+            ``abort`` refuses the preview (no CRC, a refusal notice), ``warn``
+            proceeds and appends the plain-text diagnostic, ``ignore`` proceeds
+            silently. No image loaded → a graceful "load an image" note and no
+            compute. The view only READS ``mem_map`` — never mutates it, never
+            writes firmware (LLR-V8.1). All text renders ``markup=False``.
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm.
+
+        Returns:
+            str: The per-policy preview, a refusal notice, or the empty-state
+            note — all markup-safe.
+
+        Dependencies:
+            Uses:
+                - :meth:`_build_coverage_target`, :func:`evaluate_target`,
+                  :func:`compute_target_crc`
+            Used by:
+                - :meth:`_recompute`
+        """
+        loaded = getattr(self.app, "current_file", None)
+        mem_map = loaded.mem_map if loaded is not None else None
+        if not mem_map:
+            return "Load an image to preview coverage CRCs over real bytes."
+        try:
+            target = self._build_coverage_target()
+        except (ValueError, KeyError) as exc:
+            return f"Invalid coverage: {exc}"
+        try:
+            evaluation = evaluate_target(mem_map, algo, target)
+        except ValueError as exc:
+            return f"Cannot preview: {exc}"
+        if evaluation.refused:
+            shown = ", ".join(f"0x{addr:X}" for addr in evaluation.conflicts[:8])
+            return (
+                "Preview refused (on_gap_conflict=abort): "
+                f"{len(evaluation.conflicts)} present byte(s) at {shown} conflict "
+                "with a filled gap; no CRC shown."
+            )
+        concat_crc = compute_target_crc(mem_map, algo, replace(target, join="concat"))
+        fill_crc = compute_target_crc(mem_map, algo, replace(target, join="fill"))
+        lines = [
+            f"Active policy: join={target.join}",
+            f"concat: {_format_hex(concat_crc, target.store_width)}",
+            f"fill:   {_format_hex(fill_crc, target.store_width)}",
+        ]
+        lines.extend(evaluation.diagnostics)
+        return "\n".join(lines)
 
     def _recompute(self) -> None:
-        """Recompute the three live surfaces from the current fields.
+        """Recompute the live surfaces from the current fields.
 
         Summary:
             The single recompute entry point wired to every change event
             (LLR-V2.1). Build the current algorithm and refresh the verdict,
-            custom-vector CRC and JSON preview. A field that cannot even form an
-            algorithm (non-hex parameter) renders one markup-safe warning across
-            the surfaces instead of crashing (LLR-V2.2). During mount — before
-            all sibling widgets exist — the ``NoMatches`` is swallowed;
-            :meth:`on_mount` performs the first full compute.
+            custom-vector CRC, JSON preview, live warnings and coverage preview.
+            A field that cannot even form an algorithm (non-hex parameter)
+            renders one markup-safe warning across the surfaces instead of
+            crashing (LLR-V2.2). During mount — before all sibling widgets exist
+            — the ``NoMatches`` is swallowed; :meth:`on_mount` performs the first
+            full compute.
 
         Returns:
             None
@@ -662,13 +893,14 @@ class CrcDesignerPanel(ScrollableContainer):
         Data Flow:
             - :meth:`_current_template` → :meth:`_verdict_text` /
               :meth:`_custom_vector_text` / :meth:`_preview_text` /
-              :meth:`_live_warnings_text` → each ``Static.update`` (markup-safe).
+              :meth:`_live_warnings_text` / :meth:`_coverage_preview_text` →
+              each ``Static.update`` (markup-safe).
 
         Dependencies:
             Uses:
                 - :meth:`_current_template`, :meth:`_verdict_text`,
                   :meth:`_custom_vector_text`, :meth:`_preview_text`,
-                  :meth:`_live_warnings_text`
+                  :meth:`_live_warnings_text`, :meth:`_coverage_preview_text`
             Used by:
                 - :meth:`on_mount`, :meth:`on_input_changed`,
                   :meth:`on_switch_changed`, :meth:`on_select_changed`
@@ -678,6 +910,7 @@ class CrcDesignerPanel(ScrollableContainer):
             custom_result = self.query_one("#crc_custom_vector_result", Static)
             preview = self.query_one("#crc_json_preview", Static)
             warnings = self.query_one("#crc_warnings", Static)
+            coverage = self.query_one("#crc_coverage_preview", Static)
         except NoMatches:
             # Mid-mount: a change event arrived before every surface exists.
             return
@@ -689,12 +922,14 @@ class CrcDesignerPanel(ScrollableContainer):
             custom_result.update("—")
             preview.update(warning)
             warnings.update("")
+            coverage.update(warning)
             return
         algo = template.algorithm
         verdict.update(self._verdict_text(algo))
         custom_result.update(self._custom_vector_text(algo))
         preview.update(self._preview_text(template))
         warnings.update(self._live_warnings_text(algo))
+        coverage.update(self._coverage_preview_text(algo))
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Route the Save / Load button presses (LLR-V5.1 / V5.2).

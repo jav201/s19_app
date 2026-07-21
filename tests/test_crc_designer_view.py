@@ -27,8 +27,11 @@ from pathlib import Path
 
 from textual.widgets import Button, Input, Select, Static, Switch
 
+from s19_app.tui import crc_designer_view
 from s19_app.tui.app import S19TuiApp
+from s19_app.tui.models import LoadedFile
 from s19_app.tui.operations import crc_kernel
+from s19_app.tui.operations.crc import compute_region_crc
 from s19_app.tui.operations.crc_designer_model import (
     CrcTemplate,
     emit_template,
@@ -599,3 +602,280 @@ def test_store_width_too_small_warns_live(tmp_path: Path) -> None:
         f"a too-small store_width must warn live, got {after!r}"
     )
     assert markup_off, "the warnings widget must render markup-safe (C-17)"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Inc-7 — coverage strip + per-policy preview + gap-conflict + fill-no-pad warn
+# + preview-only guard (LLR-V6.1/V6.2, V7.1, V8.1; AT-058-07/08/09/10,
+# AT-CRC-DSN-013/013b/017)
+# ─────────────────────────────────────────────────────────────────────────────
+def _fixture_mem() -> dict[int, int]:
+    """The canonical §3.2 image: two ranges with an 8-byte erased gap between.
+
+    ``0x8000-0x8008`` = bytes ``00..07``; ``0x8010-0x8018`` = bytes ``10..17``;
+    ``0x8008-0x8010`` is absent (erased). Probe-confirmed oracles under the seed
+    CRC-32/ISO-HDLC: ``concat == 0x9C5BCBBD``, ``fill(0xFF) == 0x2A8A3950``.
+    """
+    mem = {0x8000 + i: i for i in range(8)}
+    mem.update({0x8010 + i: 0x10 + i for i in range(8)})
+    return mem
+
+
+def _loaded(mem_map: dict[int, int]) -> LoadedFile:
+    """Wrap ``mem_map`` in a minimal loaded-image snapshot for the preview."""
+    return LoadedFile(
+        path=Path("preview.s19"),
+        file_type="s19",
+        mem_map=dict(mem_map),
+        row_bases=[],
+        ranges=[],
+        range_validity=[],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+
+async def _coverage_preview(
+    tmp_path: Path,
+    mem_map: dict[int, int] | None,
+    ranges: str,
+    join: str,
+    on_conflict: str = "abort",
+    pad: str = "0xFF",
+    intra: str = "skip",
+) -> str:
+    """Drive the coverage strip through the mounted view and read the preview.
+
+    Sets ``current_file`` (so the preview digests real bytes; ``None`` leaves the
+    empty state), shows the screen, drives the coverage-strip widgets, and
+    returns the rendered ``#crc_coverage_preview`` content (M5: through-widget).
+    """
+    app = S19TuiApp(base_dir=tmp_path)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        if mem_map is not None:
+            app.current_file = _loaded(mem_map)
+        await pilot.press("0")
+        await pilot.pause()
+        app.query_one("#crc_coverage_ranges", Input).value = ranges
+        app.query_one("#crc_coverage_intra_gap", Select).value = intra
+        app.query_one("#crc_coverage_join", Select).value = join
+        app.query_one("#crc_coverage_pad_byte", Input).value = pad
+        app.query_one("#crc_coverage_on_gap_conflict", Select).value = on_conflict
+        await pilot.pause()
+        return str(app.query_one("#crc_coverage_preview", Static).content)
+
+
+def test_coverage_preview_shows_both_policy_oracles(tmp_path: Path) -> None:
+    """Both §3.2 policy CRCs render in the mounted preview (AT-058-07 / AT-CRC-DSN-013b, M5).
+
+    Intent (LLR-V6.2): over the named §3.2 fixture image, a two-range
+    ``join="fill"`` target's preview widget shows BOTH probe-confirmed oracle
+    hexes — ``0x9C5BCBBD`` (concat) and ``0x2A8A3950`` (fill(0xFF)) — read from
+    the mounted ``#crc_coverage_preview``, not merely "two numbers render". A
+    wrong policy/range would drop an oracle and go RED.
+    """
+    text = asyncio.run(
+        _coverage_preview(
+            tmp_path,
+            _fixture_mem(),
+            "0x8000-0x8008, 0x8010-0x8018",
+            join="fill",
+        )
+    )
+    assert "0x9C5BCBBD" in text, f"the concat oracle must render, got {text!r}"
+    assert "0x2A8A3950" in text, f"the fill(0xFF) oracle must render, got {text!r}"
+
+
+def test_coverage_single_range_skip_equals_region_crc(tmp_path: Path) -> None:
+    """A single-range skip target's preview == the region CRC (AT-CRC-DSN-013).
+
+    Intent (LLR-V6.2): a one-range ``intra_gap="skip"`` target over the fixture
+    digests exactly the present bytes, so its previewed CRC equals
+    ``crc.compute_region_crc`` over the same span (pinned to ``0x88AA689F``).
+    """
+    mem = _fixture_mem()
+    oracle = compute_region_crc(mem, 0x8000, 0x8008)
+    assert oracle == 0x88AA689F, "the region-CRC oracle is pinned (non-vacuous)"
+    text = asyncio.run(
+        _coverage_preview(tmp_path, mem, "0x8000-0x8008", join="concat")
+    )
+    assert f"0x{oracle:08X}" in text, (
+        f"a single-range skip preview must equal the region CRC, got {text!r}"
+    )
+
+
+def test_coverage_no_image_shows_empty_state(tmp_path: Path) -> None:
+    """With no image loaded the preview shows a graceful note (LLR-V6.2 boundary)."""
+    text = asyncio.run(
+        _coverage_preview(tmp_path, None, "0x8000-0x8008", join="concat")
+    )
+    assert "Load an image" in text, f"the no-image state must be graceful, got {text!r}"
+
+
+def test_gap_conflict_clean_previews_dirty_abort_refuses(tmp_path: Path) -> None:
+    """Gap-conflict honoring across abort/warn/ignore + concat (AT-058-08 / AT-CRC-DSN-017).
+
+    Intent (LLR-V7.1), asserting painted content (C-32):
+    - clean fill gap → CRC shown, no refusal;
+    - a stray non-pad byte in the filled span + ``abort`` → refusal notice, the
+      conflict address surfaced, and NO CRC value shown;
+    - ``warn`` → CRC shown PLUS a diagnostic; ``ignore`` → CRC shown, silent;
+    - ``join="concat"`` never conflicts → CRC shown, no refusal.
+    """
+    ranges = "0x8000-0x8008, 0x8010-0x8018"
+    dirty = _fixture_mem()
+    dirty[0x800A] = 0x99  # a real byte where the operator promised an erased gap
+
+    clean = asyncio.run(
+        _coverage_preview(tmp_path, _fixture_mem(), ranges, join="fill", on_conflict="abort")
+    )
+    assert "0x2A8A3950" in clean and "refused" not in clean.lower(), (
+        f"a clean fill gap must preview the CRC, got {clean!r}"
+    )
+
+    abort_text = asyncio.run(
+        _coverage_preview(tmp_path, dict(dirty), ranges, join="fill", on_conflict="abort")
+    )
+    assert "refused" in abort_text.lower(), (
+        f"abort + conflict must refuse the preview, got {abort_text!r}"
+    )
+    assert "0x800A" in abort_text, "the conflicting address must be surfaced"
+    assert "0x2A8A3950" not in abort_text and "0x9C5BCBBD" not in abort_text, (
+        f"a refused preview must show NO CRC, got {abort_text!r}"
+    )
+
+    warn_text = asyncio.run(
+        _coverage_preview(tmp_path, dict(dirty), ranges, join="fill", on_conflict="warn")
+    )
+    assert "0x2A8A3950" in warn_text, "warn must still show the CRC"
+    assert "gap-safety" in warn_text, "warn must append the diagnostic"
+
+    ignore_text = asyncio.run(
+        _coverage_preview(tmp_path, dict(dirty), ranges, join="fill", on_conflict="ignore")
+    )
+    assert "0x2A8A3950" in ignore_text, "ignore must show the CRC"
+    assert "gap-safety" not in ignore_text, "ignore must proceed silently"
+
+    concat_text = asyncio.run(
+        _coverage_preview(tmp_path, dict(dirty), ranges, join="concat", on_conflict="abort")
+    )
+    assert "refused" not in concat_text.lower(), "concat never conflicts"
+    assert "0x9C5BCBBD" in concat_text, "concat must still preview its CRC"
+
+
+def test_coverage_inverted_range_warns_not_crash(tmp_path: Path) -> None:
+    """An inverted range surfaces a markup-safe warning via _build_target (LLR-V6.1)."""
+    text = asyncio.run(
+        _coverage_preview(tmp_path, _fixture_mem(), "0x8008-0x8000", join="concat")
+    )
+    assert "Invalid coverage" in text, (
+        f"an inverted range must warn, not crash, got {text!r}"
+    )
+
+
+def test_three_warn_conditions_through_view(tmp_path: Path) -> None:
+    """All three warn conditions fire through the mounted view (AT-058-10, M4, C-18).
+
+    One session exercising each of the three independent warnings:
+    (1) ``join="fill"`` with ``pad_byte`` unset → ``#crc_warnings``;
+    (2) ``store_width < ceil(width/8)`` → ``#crc_warnings``;
+    (3) ``check != compute("123456789")`` on Save → ``#crc_loadsave_status``.
+    """
+
+    async def _drive() -> tuple[str, str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+
+            # (1) fill policy with no pad byte.
+            app.query_one("#crc_coverage_join", Select).value = "fill"
+            app.query_one("#crc_coverage_pad_byte", Input).value = ""
+            await pilot.pause()
+            warn_fill = str(app.query_one("#crc_warnings", Static).content)
+
+            # (2) store_width narrower than ceil(width/8).
+            app.query_one("#crc_field_store_width", Input).value = "1"
+            await pilot.pause()
+            warn_store = str(app.query_one("#crc_warnings", Static).content)
+
+            # (3) a wrong pinned check on Save.
+            app.query_one("#crc_field_name", Input).value = "ThreeWarn"
+            app.query_one("#crc_field_check", Input).value = "0x00000000"
+            await pilot.pause()
+            app.query_one("#crc_save_btn", Button).press()
+            await pilot.pause()
+            save_status = str(app.query_one("#crc_loadsave_status", Static).content)
+            return warn_fill, warn_store, save_status
+
+    warn_fill, warn_store, save_status = asyncio.run(_drive())
+    assert "pad_byte" in warn_fill and "unset" in warn_fill, (
+        f"(1) fill with no pad_byte must warn, got {warn_fill!r}"
+    )
+    assert "truncated" in warn_store, (
+        f"(2) a too-small store_width must warn, got {warn_store!r}"
+    )
+    assert "check does not match" in save_status, (
+        f"(3) a check mismatch on Save must warn, got {save_status!r}"
+    )
+
+
+def test_preview_only_mem_map_unchanged(tmp_path: Path) -> None:
+    """No firmware write path and mem_map is unchanged by any action (AT-058-09, LLR-V8.1).
+
+    Structural (inspection): the view module references NO firmware-write symbol.
+    Behavioral (C-12): after a full preview interaction — coverage edits, every
+    gap policy, Save, a malformed Load — the loaded ``mem_map`` is the SAME object
+    with identical contents.
+    """
+    source = Path(crc_designer_view.__file__).read_text(encoding="utf-8")
+    for symbol in (
+        "emit_s19_from_mem_map",
+        "copy_into_workarea",
+        "write_crc_image",
+        "inject_crcs",
+    ):
+        assert symbol not in source, (
+            f"the preview-only view must not reference the firmware writer {symbol!r}"
+        )
+
+    bad = tmp_path / "bad.crc.json"
+    bad.write_text("{ not json", encoding="utf-8")
+
+    async def _drive() -> tuple[bool, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.current_file = _loaded(_fixture_mem())
+            mem_obj = app.current_file.mem_map
+            before = dict(mem_obj)
+            await pilot.press("0")
+            await pilot.pause()
+
+            # Exercise every coverage control + a conflict + Save + a bad Load.
+            app.query_one("#crc_coverage_ranges", Input).value = (
+                "0x8000-0x8008, 0x8010-0x8018"
+            )
+            app.query_one("#crc_coverage_intra_gap", Select).value = "fill"
+            app.query_one("#crc_coverage_join", Select).value = "fill"
+            app.query_one("#crc_coverage_pad_byte", Input).value = "0x00"
+            app.query_one("#crc_coverage_on_gap_conflict", Select).value = "warn"
+            await pilot.pause()
+            app.query_one("#crc_field_name", Input).value = "Interact"
+            await pilot.pause()
+            app.query_one("#crc_save_btn", Button).press()
+            await pilot.pause()
+            app.query_one("#crc_load_path", Input).value = str(bad)
+            app.query_one("#crc_load_btn", Button).press()
+            await pilot.pause()
+
+            same_object = app.current_file.mem_map is mem_obj
+            unchanged = dict(app.current_file.mem_map) == before
+            return same_object, unchanged
+
+    same_object, unchanged = asyncio.run(_drive())
+    assert same_object, "the loaded mem_map object must not be replaced by the view"
+    assert unchanged, "no Designer action may mutate the loaded mem_map"
