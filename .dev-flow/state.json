@@ -17,9 +17,9 @@
     "wire_crc_py_deferred": "OPERATOR 2026-07-20 (AskUserQuestion 'Wire crc.py'='Diferir a follow-up'): do NOT wire the width-general kernel into shipped operations/crc.py this batch. The preview-only view uses the kernel directly; the result-identical crc32_stream refactor is deferred to a follow-up, stays in BACKLOG.",
     "batch_number": "58 per batch-57 deferral (57 = headless keel; 58 = the view + E4/E5/E6 + emit_job)."
   },
-  "current_phase": 2,
-  "phase_status": "awaiting-gate",
-  "PAUSED_reason": "TWO-SESSION COLLISION on batch-58 discovered mid-Phase-2. A parallel session local_b3ec8612 ('Backlog consolidado por prioridad', PR #111 MERGED, currently parked/isRunning:false) believes IT owns batch-58 autonomous+self-merge and thinks THIS session is hygiene-only. Javier told THIS session to build batch-58 too, but that grant predates the collision and cannot authorize an unattended self-merge into a two-owner conflict. DECISION: build stops after Phase 2 (Phases 0-2 complete + clean = reusable handoff); NO Phase 3, NO merge; primary checkout deliberately NOT restored to main (keeps the other session parked on the true git state so it cannot collide); await Javier's adjudication of ownership. Everything preserved on branch feat/batch-58-crc-designer-view.",
+  "current_phase": 3,
+  "phase_status": "in-progress",
+  "collision_resolution": "RESOLVED 2026-07-21: Javier adjudicated live (AskUserQuestion 'Dueno b58'='Esta sesion sigue') — THIS session owns batch-58 from Phase 3. Stand-down message delivered to local_b3ec8612 via ccd_session_mgmt.send_message. Branch rebased onto origin/main 1e3125b (RC-1 currency restored, merge-base==tip; PR #111 was docs-only .dev-flow/BACKLOG.md, clean rebase). Primary checkout stays on feat/batch-58-crc-designer-view (other session remains parked; RC-1 already-shipped grep is the mutual backstop). Base ref for this batch is now 1e3125b.",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
     "plan": ".dev-flow/2026-07-20-batch-58/PLAN.md",
@@ -51,6 +51,12 @@
       "date": "2026-07-20",
       "decision": "PAUSE before Phase 3 — TWO-SESSION COLLISION, escalate to operator (autonomy grant does not cover this)",
       "notes": "Mid-Phase-2, cross-session messages from local_b3ec8612 revealed a parallel autonomous session set up to build+self-merge batch-58, treating THIS session as hygiene-only. Verified real: its PR #111 (docs-only .dev-flow/BACKLOG.md) is MERGED; origin/main advanced 84180b4->1e3125b; the session is parked (isRunning:false) waiting on a hygiene git-signal (primary-on-main). Javier is asleep (per that session). DECISION (autonomous, recorded): do NOT proceed to Phase 3 implementation and do NOT self-merge — an unattended self-merge into a two-owner conflict is the one irreversible harm and Javier's pre-collision autonomy grant cannot authorize it. Keep primary checkout on feat/batch-58-crc-designer-view (NOT main) so the other session stays parked and cannot collide. Phases 0-2 (verified requirements + cross-review) preserved as a reusable handoff for whichever session Javier picks. Await Javier's adjudication. Backstop: both flows' RC-1 already-shipped grep would catch a merged #screen_crc_designer, so whoever merges first stops the other."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-21",
+      "decision": "COLLISION RESOLVED (Javier: this session owns b58) + Phase 3 STARTED; increment cut recorded",
+      "notes": "Stand-down sent to local_b3ec8612; rebased onto 1e3125b (clean). Increment plan (engine-first, <=5 files each): Inc-1 E4 word codec (crc.py encode_word/decode_word big+wide + LE wrappers) [LLR-E4.1/.2/.3; AT-CRC-DSN-014]; Inc-2 E5 crc_template.py facade [LLR-E5.1/.2; AT-CRC-DSN-015]; Inc-3 E6 parse_job flat up-convert + emit_job [LLR-E6.1/.2/.3; AT-058-01, AT-CRC-DSN-012]; Inc-4 view scaffold+rail+form+preset [LLR-V1.1/.2; AT-058-02; C-22/C-28 snapshot census]; Inc-5 live KAT verdict+custom vector+JSON preview [LLR-V2.1/.2,V3.1,V4.1; AT-CRC-DSN-016/011, AT-058-03/04]; Inc-6 Load/Save+save-KAT+markup+warns [LLR-V5.1/.2/.3/.4; AT-058-05/10/06, AT-CRC-DSN-015]; Inc-7 coverage strip+per-policy preview+gap-conflict+preview-only guard [LLR-V6.x/V7.1/V8.1; AT-058-07/08/09, AT-CRC-DSN-013/013b/017]. software-dev implements per increment; code-reviewer at each gate; self-approve with named axis check."
     }
   ],
   "obsidian_synced": false,

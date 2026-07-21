@@ -2,16 +2,26 @@
 
 > Living compendium. Updated at every gate + significant checkpoint. Human mirror of `state.json`.
 
-## Where we are — ⛔ PAUSED after Phase 2 (two-session collision; awaiting Javier)
-- **Phase 0 APPROVED · Phase 1 DONE · Phase 2 DONE (re-gate PASS).** Phase 3 NOT started.
-- Branch `feat/batch-58-crc-designer-view` @ base `84180b4`. NOTE: origin/main advanced to `1e3125b` (parallel session's PR #111, docs-only BACKLOG) — this branch is stale-by-1 but NOT rebased (paused).
+## Where we are — Phase 3 (Implementation) IN PROGRESS
+- **Phase 0 APPROVED · Phase 1 DONE · Phase 2 DONE (re-gate PASS) · Phase 3 STARTED.**
+- Branch `feat/batch-58-crc-designer-view` **rebased onto `origin/main` `1e3125b`** (RC-1 currency restored; base ref now `1e3125b`).
 - Artifacts editor-invisible (worktree-not-editor-root): pasted inline at each gate.
 
-### 🚨 COLLISION + PAUSE (2026-07-20, autonomous decision — escalated to operator)
-A **parallel autonomous session** `local_b3ec8612` ("Backlog consolidado por prioridad", PR #111 MERGED, parked/`isRunning:false`) is set up to build **batch-58 (this same feature) autonomously + self-merge**, and believes THIS session is hygiene-only. Javier told THIS session to build batch-58 too, but that grant **predates the collision** and cannot authorize an unattended self-merge into a two-owner conflict.
-- **Decision:** stop after Phase 2 (Phases 0-2 = clean, reusable handoff); **NO Phase 3, NO merge.** Keep the primary checkout on this feature branch (NOT `main`) so the other session **stays parked on the true git state and cannot collide**. Await Javier's ownership call.
-- **Backstop:** both flows' RC-1 already-shipped grep would catch a merged `#screen_crc_designer` → whoever merges first stops the other.
-- **Handoff value:** the expensive part is done — a keel-verified requirements spec (11 US / 11 HLR / 22 LLR / 19 AT, C-35 probes PASS) + a full 3-lens cross-review with the 3 AT-vacuity blockers already folded. Either session can start at Phase 3 from `.dev-flow/2026-07-20-batch-58/` on this branch.
+### ✅ COLLISION RESOLVED (2026-07-21)
+A parallel session `local_b3ec8612` was also set up to build batch-58. I paused after Phase 2 and escalated; **Javier adjudicated live: THIS session owns batch-58 from Phase 3.** Stand-down message delivered to the parallel session; it stays parked (primary checkout intentionally NOT on `main`). Mutual backstop: RC-1 already-shipped grep catches a merged `#screen_crc_designer`.
+
+### Phase-3 increment cut (engine-first, ≤5 files each)
+| Inc | Scope | LLR | AT | Notes |
+|---|---|---|---|---|
+| 1 | E4 word codec — `crc.py` `encode_word`/`decode_word` (big+wide) + `encode_le`/`decode_le` wrappers | E4.1/.2/.3 | AT-CRC-DSN-014 | new `test_crc_word_codec.py` |
+| 2 | E5 `crc_template.py` facade (re-export loader from `crc_designer_model`) | E5.1/.2 | AT-CRC-DSN-015 | new `test_crc_template_loader.py` |
+| 3 | E6 `parse_job` flat up-convert branch + `emit_job` (`crc_designer_model.py`) | E6.1/.2/.3 | AT-058-01, AT-CRC-DSN-012 | new `test_crc_job_upconvert.py`; back-compat fixtures unchanged |
+| 4 | View scaffold + rail wiring (key `0`/glyph `⊕`/`R`) + form + preset population | V1.1/.2 | AT-058-02 | screen file + app.py rail edits; **C-22/C-28 snapshot census** |
+| 5 | Live KAT verdict (recompute-on-change) + custom vector + JSON preview | V2.1/.2, V3.1, V4.1 | AT-CRC-DSN-016/011, AT-058-03/04 | centerpiece; before/after single-event AT |
+| 6 | Load/Save + save-time KAT + markup-safety + 3 warn conditions | V5.1/.2/.3/.4 | AT-058-05/10/06, AT-CRC-DSN-015 | markup=False all sinks incl JSON preview |
+| 7 | Coverage strip + per-policy preview + gap-conflict + preview-only guard | V6.x, V7.1, V8.1 | AT-058-07/08/09, AT-CRC-DSN-013/013b/017 | §3.2 fixture oracle |
+
+`software-dev` implements per increment (review packet each); `code-reviewer` independent review at each gate; self-approve with a named Coverage/Certainty/Evidence axis check.
 
 ## Objective
 Ship the **Variant B CRC Designer TUI view** on the merged batch-57 headless keel, **engine-first**. Preview-only — never writes firmware. Design governed by `docs/crc-algorithm-designer/01-requirements.md` (adopted).

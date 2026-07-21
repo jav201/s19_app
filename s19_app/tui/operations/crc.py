@@ -477,6 +477,92 @@ def compute_group_crc(
     )
 
 
+def encode_word(value: int, *, store_width: int, endianness: str = "little") -> bytes:
+    """
+    Summary:
+        Encode a CRC word into exactly ``store_width`` bytes in the given byte
+        order (batch-58, LLR-E4.1): the strict codec a job's
+        ``store_endianness="big"`` and padded ``store_width`` serialize
+        through. ``"big"`` stores MSB-first; ``"little"`` is byte-identical to
+        the positional :func:`encode_le`. A wider ``store_width`` zero-extends
+        (the padding bytes land at the high end for the chosen endianness).
+        Unlike :func:`encode_le`, this codec REJECTS a value that does not fit
+        ``store_width`` rather than truncating (:func:`encode_le` masks first,
+        then delegates here, so its truncation is preserved).
+
+    Args:
+        value (int): The CRC value; must be non-negative and fit
+            ``8 * store_width`` bits.
+        store_width (int): The stored-field width in bytes.
+        endianness (str): ``"little"`` or ``"big"``.
+
+    Returns:
+        bytes: Exactly ``store_width`` bytes in the requested byte order.
+
+    Raises:
+        ValueError: If ``endianness`` is not ``"little"``/``"big"``, or ``value``
+            is negative or too wide for ``store_width`` bytes.
+
+    Data Flow:
+        - Validate the byte order and the value fits; emit via ``int.to_bytes``.
+
+    Dependencies:
+        Used by:
+            - encode_le (masks first, then delegates with endianness="little")
+            - the job "would store" preview / inject path (store_endianness)
+            - tests/test_crc_word_codec.py (AT-CRC-DSN-014, LLR-E4.1)
+
+    Example:
+        >>> encode_word(0x01020304, store_width=4, endianness="big").hex(" ")
+        '01 02 03 04'
+    """
+    if endianness not in ("little", "big"):
+        raise ValueError(
+            f"encode_word endianness must be 'little' or 'big', got {endianness!r}"
+        )
+    if value < 0 or value >> (8 * store_width):
+        raise ValueError(
+            f"encode_word value {value:#x} does not fit {store_width} bytes"
+        )
+    return value.to_bytes(store_width, endianness)
+
+
+def decode_word(data: Iterable[int], *, endianness: str = "little") -> int:
+    """
+    Summary:
+        Decode a big- or little-endian byte sequence of any length into an int
+        (batch-58, LLR-E4.2) — the inverse of :func:`encode_word`.
+        ``endianness="little"`` is byte-identical to :func:`decode_le`.
+
+    Args:
+        data (Iterable[int]): The stored bytes, in the given byte order.
+        endianness (str): ``"little"`` or ``"big"``.
+
+    Returns:
+        int: The decoded value.
+
+    Raises:
+        ValueError: If ``endianness`` is not ``"little"``/``"big"``.
+
+    Data Flow:
+        - Validate the byte order; materialize the bytes; combine.
+
+    Dependencies:
+        Used by:
+            - decode_le (delegates with endianness="little")
+            - tests/test_crc_word_codec.py (LLR-E4.2 round-trip)
+
+    Example:
+        >>> hex(decode_word(b'\\x01\\x02\\x03\\x04', endianness="big"))
+        '0x1020304'
+    """
+    if endianness not in ("little", "big"):
+        raise ValueError(
+            f"decode_word endianness must be 'little' or 'big', got {endianness!r}"
+        )
+    return int.from_bytes(bytes(data), endianness)
+
+
 def encode_le(value: int, width: int) -> bytes:
     """
     Summary:
@@ -485,7 +571,9 @@ def encode_le(value: int, width: int) -> bytes:
         value. Width 4 is byte-identical to :func:`encode_le32`; width 8
         zero-extends (high 4 bytes = 0x00 for any 32-bit CRC); widths 1/2
         truncate to the low bytes (the caller owes the truncation warning,
-        LLR-WID-001.3).
+        LLR-WID-001.3). A thin, byte-identical wrapper: it masks to the field
+        width (preserving the lenient truncation) then delegates the byte
+        emission to :func:`encode_word` (batch-58, LLR-E4.3).
 
     Args:
         value (int): The CRC value; only its low ``8 * width`` bits encode.
@@ -495,9 +583,11 @@ def encode_le(value: int, width: int) -> bytes:
         bytes: Exactly ``width`` bytes, little-endian.
 
     Data Flow:
-        - Mask to ``8 * width`` bits, emit little-endian.
+        - Mask to ``8 * width`` bits, emit little-endian via encode_word.
 
     Dependencies:
+        Uses:
+            - encode_word (endianness="little")
         Used by:
             - encode_le32 (fixed-4 wrapper)
             - the group-aware inject path (increment 3)
@@ -508,7 +598,7 @@ def encode_le(value: int, width: int) -> bytes:
         b'\\x01\\x02'
     """
     mask = (1 << (8 * width)) - 1
-    return (value & mask).to_bytes(width, "little")
+    return encode_word(value & mask, store_width=width, endianness="little")
 
 
 def decode_le(data: Iterable[int]) -> int:
@@ -516,7 +606,9 @@ def decode_le(data: Iterable[int]) -> int:
     Summary:
         Decode little-endian bytes of ANY length into an int (batch-32,
         LLR-WID-001.2) — the length-driven inverse of :func:`encode_le`.
-        :func:`decode_le32` remains the fixed-4 wrapper.
+        :func:`decode_le32` remains the fixed-4 wrapper. A thin, byte-identical
+        wrapper over :func:`decode_word` with ``endianness="little"`` (batch-58,
+        LLR-E4.3).
 
     Args:
         data (Iterable[int]): The stored bytes, low byte first.
@@ -525,9 +617,11 @@ def decode_le(data: Iterable[int]) -> int:
         int: The decoded value.
 
     Data Flow:
-        - Materialize the bytes; combine little-endian.
+        - Materialize the bytes; combine little-endian via decode_word.
 
     Dependencies:
+        Uses:
+            - decode_word (endianness="little")
         Used by:
             - the group-aware check path (increment 3)
             - tests/test_crc_engine.py (width codec table)
@@ -536,7 +630,7 @@ def decode_le(data: Iterable[int]) -> int:
         >>> hex(decode_le(b'\\x01\\x02'))
         '0x201'
     """
-    return int.from_bytes(bytes(data), "little")
+    return decode_word(data, endianness="little")
 
 
 def encode_le32(crc: int) -> bytes:
