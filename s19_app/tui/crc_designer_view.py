@@ -70,11 +70,19 @@ from __future__ import annotations
 
 from dataclasses import replace
 
+from rich.text import Text
 from textual.app import ComposeResult
 from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
 from textual.widgets import Button, Input, Label, Select, Static, Switch
 
+from .insight_style import (
+    DGRAY,
+    HILITE,
+    MICROBAR_EMPTY,
+    MICROBAR_FILLED,
+    YELLOW,
+)
 from .operations.crc_designer_model import (
     ENDIANNESS_VALUES,
     INTRA_GAP_VALUES,
@@ -84,10 +92,24 @@ from .operations.crc_designer_model import (
     _build_target,
     compute_target_crc,
     evaluate_target,
+    store_word,
 )
 from .operations.crc_kernel import PRESETS, SEED_ALGORITHM, CrcAlgorithm, preset_by_name
 from .operations.crc_template import CrcTemplate, emit_template, read_template
 from .workspace import ensure_template_lib, sanitize_project_name
+
+#: The graceful empty-state note shown when no image is loaded — shared by the
+#: coverage preview and the coverage-window hero so the two surfaces never
+#: diverge (batch-59 A12; the value is the batch-58 shipped string).
+_COVERAGE_EMPTY_STATE = "Load an image to preview coverage CRCs over real bytes."
+
+#: The block-glyph budget for the coverage-window hero line (batch-59 LLR-L1.1,
+#: OQ-3/C-23). PILOT-MEASURED: the boxed ``#crc_coverage_window`` usable inner
+#: width is 64 cols at the 80x24 floor (100% stacked) and 55 cols at 120x30
+#: (the narrower 2fr regime); 48 leaves headroom under the 55-col minimum so the
+#: contiguous-span window line never wraps. NOT inherited from the prototype's
+#: 150-col line (C-29 non-transfer).
+_COVERAGE_WINDOW_GLYPHS = 48
 
 #: Custom-vector interpretation modes (LLR-V3.1). ``ascii`` encodes the raw text
 #: as UTF-8 bytes (so ``123456789`` reproduces the KAT); ``hex`` reads
@@ -216,6 +238,29 @@ class CrcDesignerPanel(ScrollableContainer):
         super().__init__(id="crc_designer_panel", classes="crc-designer-form")
 
     def compose(self) -> ComposeResult:
+        """Compose the Variant-B "coverage-first bench" (batch-59 LLR-L2.1/L2.3).
+
+        Summary:
+            Re-arrange every batch-58 ``#crc_*`` widget (same ids, same
+            ``markup=False`` sinks, same handler wiring) into the approved bench:
+            a full-width help line and preset selector, then a **hero row**
+            (``#crc_hero_row``) holding the coverage window (``#crc_coverage_window``,
+            2fr — an empty placeholder this increment; the live glyph render lands
+            in Inc-2) beside ``#crc_top_right`` (the verdict hero above the
+            Warnings tile), then a **3-column bench** (``#crc_bench``): c1 =
+            Algorithm + Serialization, c2 = Coverage + Custom vector, c3 = Job
+            JSON + Template + Load/Save. No widget id, handler, or behavior
+            changes — only the nesting (HLR-L4).
+
+        Returns:
+            ComposeResult: the re-nested bench widget tree.
+
+        Data Flow:
+            - Each ``.crc-field-group`` is built once, then placed into a column
+              ``Vertical`` / the hero row; ``query_one("#…")`` resolves any of
+              them anywhere in the subtree, so the shipped ``_recompute`` /
+              Load/Save handlers keep firing (LLR-L4.1).
+        """
         algo = SEED_ALGORITHM
         byte_width = algo.store_bytes()
         yield Static(
@@ -234,110 +279,59 @@ class CrcDesignerPanel(ScrollableContainer):
             ),
             classes="crc-field-row",
         )
-        with Vertical(id="crc_template_fields", classes="crc-field-group"):
-            yield Label("Template", classes="crc-group-title")
-            yield self._text_row("Name", "crc_field_name", algo.name)
-            yield self._text_row(
-                "Aliases (comma-separated)", "crc_field_aliases", ""
-            )
-        with Vertical(id="crc_algorithm_fields", classes="crc-field-group"):
-            yield Label("Algorithm", classes="crc-group-title")
-            yield self._text_row("Width (bits)", "crc_field_width", str(algo.width))
-            yield self._text_row(
+
+        algorithm_group = Vertical(
+            Label("Algorithm", classes="crc-group-title"),
+            self._text_row("Width (bits)", "crc_field_width", str(algo.width)),
+            self._text_row(
                 "Polynomial", "crc_field_poly", _format_hex(algo.poly, byte_width)
-            )
-            yield self._text_row(
-                "Init", "crc_field_init", _format_hex(algo.init, byte_width)
-            )
-            yield self._switch_row("Reflect in", "crc_field_refin", algo.refin)
-            yield self._switch_row("Reflect out", "crc_field_refout", algo.refout)
-            yield self._text_row(
+            ),
+            self._text_row("Init", "crc_field_init", _format_hex(algo.init, byte_width)),
+            self._switch_row("Reflect in", "crc_field_refin", algo.refin),
+            self._switch_row("Reflect out", "crc_field_refout", algo.refout),
+            self._text_row(
                 "XOR out", "crc_field_xorout", _format_hex(algo.xorout, byte_width)
-            )
-            yield self._text_row(
+            ),
+            self._text_row(
                 "Check",
                 "crc_field_check",
                 "" if algo.check is None else _format_hex(algo.check, byte_width),
-            )
-        with Vertical(id="crc_serialization_fields", classes="crc-field-group"):
-            yield Label("Serialization", classes="crc-group-title")
-            yield self._text_row(
-                "Output address", "crc_field_output_address", "0x00000000"
-            )
-            yield self._text_row("Store width (bytes)", "crc_field_store_width", str(byte_width))
-            yield Horizontal(
-                Label("Store endianness", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in ENDIANNESS_VALUES],
-                    value=ENDIANNESS_VALUES[0],
-                    allow_blank=False,
-                    id="crc_field_store_endianness",
-                ),
-                classes="crc-field-row",
-            )
-        with Vertical(id="crc_coverage_group", classes="crc-field-group"):
-            yield Label("Coverage (preview-only)", classes="crc-group-title")
-            yield self._text_row(
+            ),
+            id="crc_algorithm_fields",
+            classes="crc-field-group",
+        )
+        serialization_group = Vertical(
+            Label("Serialization", classes="crc-group-title"),
+            self._text_row("Output address", "crc_field_output_address", "0x00000000"),
+            self._text_row("Store width (bytes)", "crc_field_store_width", str(byte_width)),
+            self._select_row(
+                "Store endianness", "crc_field_store_endianness", ENDIANNESS_VALUES
+            ),
+            id="crc_serialization_fields",
+            classes="crc-field-group",
+        )
+        coverage_group = Vertical(
+            Label("Coverage (preview-only)", classes="crc-group-title"),
+            self._text_row(
                 "Ranges (start-end, comma-separated)",
                 "crc_coverage_ranges",
                 "0x00008000-0x00008008, 0x00008010-0x00008018",
-            )
-            yield Horizontal(
-                Label("Intra-range gap", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in INTRA_GAP_VALUES],
-                    value=INTRA_GAP_VALUES[0],
-                    allow_blank=False,
-                    id="crc_coverage_intra_gap",
-                ),
-                classes="crc-field-row",
-            )
-            yield Horizontal(
-                Label("Join (between ranges)", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in JOIN_VALUES],
-                    value=JOIN_VALUES[0],
-                    allow_blank=False,
-                    id="crc_coverage_join",
-                ),
-                classes="crc-field-row",
-            )
-            yield self._text_row("Pad byte", "crc_coverage_pad_byte", "0xFF")
-            yield Horizontal(
-                Label("On gap conflict", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in ON_GAP_CONFLICT_VALUES],
-                    value=ON_GAP_CONFLICT_VALUES[0],
-                    allow_blank=False,
-                    id="crc_coverage_on_gap_conflict",
-                ),
-                classes="crc-field-row",
-            )
-            yield Static(
-                "",
-                id="crc_coverage_preview",
-                markup=False,
-                classes="crc-verdict",
-            )
-        with Vertical(id="crc_live_verify", classes="crc-field-group"):
-            yield Label(
-                "Known-answer verdict (123456789)", classes="crc-group-title"
-            )
-            yield Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict")
-        with Vertical(id="crc_custom_vector_group", classes="crc-field-group"):
-            yield Label("Custom test vector", classes="crc-group-title")
-            yield Horizontal(
-                Label("Mode", classes="crc-field-label"),
-                Select(
-                    [(mode, mode) for mode in _VECTOR_MODES],
-                    value=_VECTOR_MODES[0],
-                    allow_blank=False,
-                    id="crc_custom_vector_mode",
-                ),
-                classes="crc-field-row",
-            )
-            yield self._text_row("Vector", "crc_custom_vector", "123456789")
-            yield Horizontal(
+            ),
+            self._select_row("Intra-range gap", "crc_coverage_intra_gap", INTRA_GAP_VALUES),
+            self._select_row("Join (between ranges)", "crc_coverage_join", JOIN_VALUES),
+            self._text_row("Pad byte", "crc_coverage_pad_byte", "0xFF"),
+            self._select_row(
+                "On gap conflict", "crc_coverage_on_gap_conflict", ON_GAP_CONFLICT_VALUES
+            ),
+            Static("", id="crc_coverage_preview", markup=False, classes="crc-verdict"),
+            id="crc_coverage_group",
+            classes="crc-field-group",
+        )
+        custom_vector_group = Vertical(
+            Label("Custom test vector", classes="crc-group-title"),
+            self._select_row("Mode", "crc_custom_vector_mode", _VECTOR_MODES),
+            self._text_row("Vector", "crc_custom_vector", "123456789"),
+            Horizontal(
                 Label("CRC of vector", classes="crc-field-label"),
                 Static(
                     "",
@@ -346,26 +340,62 @@ class CrcDesignerPanel(ScrollableContainer):
                     classes="crc-verdict",
                 ),
                 classes="crc-field-row",
-            )
-        with Vertical(id="crc_json_preview_group", classes="crc-field-group"):
-            yield Label("Template JSON preview", classes="crc-group-title")
-            yield Static(
-                "", id="crc_json_preview", markup=False, classes="crc-json-preview"
-            )
-        with Vertical(id="crc_warnings_group", classes="crc-field-group"):
-            yield Label("Warnings", classes="crc-group-title")
-            yield Static("", id="crc_warnings", markup=False, classes="crc-warnings")
-        with Vertical(id="crc_loadsave_group", classes="crc-field-group"):
-            yield Label("Load / Save", classes="crc-group-title")
-            yield self._text_row("Template path (load)", "crc_load_path", "")
-            yield Horizontal(
+            ),
+            id="crc_custom_vector_group",
+            classes="crc-field-group",
+        )
+        json_preview_group = Vertical(
+            Label("Template JSON preview", classes="crc-group-title"),
+            Static("", id="crc_json_preview", markup=False, classes="crc-json-preview"),
+            id="crc_json_preview_group",
+            classes="crc-field-group",
+        )
+        template_group = Vertical(
+            Label("Template", classes="crc-group-title"),
+            self._text_row("Name", "crc_field_name", algo.name),
+            self._text_row("Aliases (comma-separated)", "crc_field_aliases", ""),
+            id="crc_template_fields",
+            classes="crc-field-group",
+        )
+        loadsave_group = Vertical(
+            Label("Load / Save", classes="crc-group-title"),
+            self._text_row("Template path (load)", "crc_load_path", ""),
+            Horizontal(
                 Button("Save template", id="crc_save_btn"),
                 Button("Load template", id="crc_load_btn"),
                 classes="crc-field-row",
-            )
-            yield Static(
-                "", id="crc_loadsave_status", markup=False, classes="crc-status"
-            )
+            ),
+            Static("", id="crc_loadsave_status", markup=False, classes="crc-status"),
+            id="crc_loadsave_group",
+            classes="crc-field-group",
+        )
+        verdict_group = Vertical(
+            Label("Known-answer verdict (123456789)", classes="crc-group-title"),
+            Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict"),
+            id="crc_live_verify",
+            classes="crc-field-group crc-hero",
+        )
+        warnings_group = Vertical(
+            Label("Warnings", classes="crc-group-title"),
+            Static("", id="crc_warnings", markup=False, classes="crc-warnings"),
+            id="crc_warnings_group",
+            classes="crc-field-group",
+        )
+
+        # Hero row: the wide coverage window (2fr, live render lands in Inc-2)
+        # beside the verdict hero + Warnings right column (1fr).
+        yield Horizontal(
+            Static("", id="crc_coverage_window", markup=False),
+            Vertical(verdict_group, warnings_group, id="crc_top_right"),
+            id="crc_hero_row",
+        )
+        # 3-column parameter bench below the hero row.
+        yield Horizontal(
+            Vertical(algorithm_group, serialization_group, id="crc_bench_c1"),
+            Vertical(coverage_group, custom_vector_group, id="crc_bench_c2"),
+            Vertical(json_preview_group, template_group, loadsave_group, id="crc_bench_c3"),
+            id="crc_bench",
+        )
 
     @staticmethod
     def _text_row(label: str, field_id: str, value: str) -> Horizontal:
@@ -400,6 +430,32 @@ class CrcDesignerPanel(ScrollableContainer):
         return Horizontal(
             Label(label, classes="crc-field-label"),
             Switch(value=value, id=field_id, classes="crc-field-switch"),
+            classes="crc-field-row",
+        )
+
+    @staticmethod
+    def _select_row(
+        label: str, field_id: str, values: tuple[str, ...]
+    ) -> Horizontal:
+        """Build a labelled vocabulary ``Select`` row seeded to ``values[0]``.
+
+        Args:
+            label (str): The human-readable field label.
+            field_id (str): The ``#crc_*`` id the pilot/handlers query.
+            values (tuple[str, ...]): The allowed vocabulary; the first is the
+                seed value (``allow_blank=False``), matching the batch-58 rows.
+
+        Returns:
+            Horizontal: The label + ``Select`` row.
+        """
+        return Horizontal(
+            Label(label, classes="crc-field-label"),
+            Select(
+                [(value, value) for value in values],
+                value=values[0],
+                allow_blank=False,
+                id=field_id,
+            ),
             classes="crc-field-row",
         )
 
@@ -848,7 +904,7 @@ class CrcDesignerPanel(ScrollableContainer):
         loaded = getattr(self.app, "current_file", None)
         mem_map = loaded.mem_map if loaded is not None else None
         if not mem_map:
-            return "Load an image to preview coverage CRCs over real bytes."
+            return _COVERAGE_EMPTY_STATE
         try:
             target = self._build_coverage_target()
         except (ValueError, KeyError) as exc:
@@ -873,6 +929,103 @@ class CrcDesignerPanel(ScrollableContainer):
         ]
         lines.extend(evaluation.diagnostics)
         return "\n".join(lines)
+
+    def _render_coverage_window(self, algo: CrcAlgorithm) -> Text:
+        """Render the multi-range coverage window as colored block glyphs (LLR-L1.1).
+
+        Summary:
+            The Variant-B signature (HLR-L1): draw the current target's memory
+            window as a block-glyph run per range (present bytes, accent hue) and
+            per inter-range gap (erased grey when ``join="concat"``, pad-fill in
+            the warning hue when ``join="fill"``), then the LIVE concat and fill
+            policy CRC hexes and the active-policy store-word bytes. The two CRCs
+            are computed over the real ``mem_map`` via the shipped
+            :func:`compute_target_crc` (reused verbatim — 0 new engine math), so a
+            static mock would fail the oracle pin (D-1 / B2). No image loaded → the
+            shipped empty-state note (no glyph compute); a malformed range → a
+            markup-safe ``Invalid coverage`` note (reusing the
+            :meth:`_build_coverage_target` fault path). Built via
+            :class:`~rich.text.Text` ``append`` — NEVER ``Text.from_markup`` — so
+            operator range text on the fault branch renders literally (C-17; the
+            widget is ``markup=False``, LLR-L1.2). The window only READS
+            ``mem_map`` (US-V8 preview-only, R-4).
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm the CRCs are computed with.
+
+        Returns:
+            Text: The colored block-glyph window (glyphs + concat/fill hexes +
+            store bytes), or the empty-state / invalid-coverage note.
+
+        Data Flow:
+            - :meth:`_build_coverage_target` → per-range/per-gap glyph runs
+              (:data:`insight_style` palette) + :func:`compute_target_crc`
+              (``join`` concat/fill) + :func:`store_word` → styled ``Text``.
+
+        Dependencies:
+            Uses:
+                - :meth:`_build_coverage_target`, :func:`compute_target_crc`,
+                  :func:`store_word`, :func:`_format_hex`, the ``insight_style``
+                  palette
+            Used by:
+                - :meth:`_recompute`
+        """
+        loaded = getattr(self.app, "current_file", None)
+        mem_map = loaded.mem_map if loaded is not None else None
+        if not mem_map:
+            return Text(_COVERAGE_EMPTY_STATE)
+        try:
+            target = self._build_coverage_target()
+        except (ValueError, KeyError) as exc:
+            # Markup-safe by construction: Text() (NOT Text.from_markup) renders
+            # the echoed raw operator token literally — the sink's safety rests on
+            # markup=False, NOT on the source being int-only (this fault branch DOES
+            # echo raw operator text; F2-minor / AT-B59-09).
+            return Text(f"Invalid coverage: {exc}")
+
+        span = target.ranges[-1][1] - target.ranges[0][0]
+        bytes_per_glyph = max(1, -(-span // _COVERAGE_WINDOW_GLYPHS))  # ceil-divide
+        text = Text()
+        prev_end: int | None = None
+        for start, end in target.ranges:
+            if prev_end is not None and start > prev_end:
+                gap_glyphs = max(1, round((start - prev_end) / bytes_per_glyph))
+                if target.join == "fill":
+                    text.append(MICROBAR_FILLED * gap_glyphs, style=YELLOW)
+                else:
+                    text.append(MICROBAR_EMPTY * gap_glyphs, style=DGRAY)
+            range_glyphs = max(1, round((end - start) / bytes_per_glyph))
+            text.append(MICROBAR_FILLED * range_glyphs, style=HILITE)
+            prev_end = end
+        text.append("\n")
+
+        try:
+            concat_crc = compute_target_crc(mem_map, algo, replace(target, join="concat"))
+            fill_crc = compute_target_crc(mem_map, algo, replace(target, join="fill"))
+            # F1: gate the ACTIVE-policy store word through the shipped abort
+            # contract so the hero agrees with the sibling preview — a dirty fill
+            # gap under on_gap_conflict="abort" refuses the CRC (crc=None), and the
+            # window must NOT emit that divergent store word (evaluate_target,
+            # AT-058-08). Showing both concat+fill hexes for comparison stays fine.
+            evaluation = evaluate_target(mem_map, algo, target)
+        except ValueError as exc:
+            text.append(f"Cannot compute: {exc}", style=DGRAY)
+            return text
+        text.append("concat ", style=DGRAY)
+        text.append(_format_hex(concat_crc, target.store_width), style=HILITE)
+        text.append("   fill ", style=DGRAY)
+        text.append(_format_hex(fill_crc, target.store_width), style=YELLOW)
+        text.append("\n")
+        if evaluation.refused:
+            text.append("store — refused (on_gap_conflict=abort)", style=YELLOW)
+            return text
+        store_bytes = store_word(evaluation.crc, target)
+        text.append("store ", style=DGRAY)
+        text.append(store_bytes.hex(" ").upper(), style=HILITE)
+        for diagnostic in evaluation.diagnostics:
+            text.append("\n")
+            text.append(diagnostic, style=YELLOW)
+        return text
 
     def _recompute(self) -> None:
         """Recompute the live surfaces from the current fields.
@@ -911,6 +1064,7 @@ class CrcDesignerPanel(ScrollableContainer):
             preview = self.query_one("#crc_json_preview", Static)
             warnings = self.query_one("#crc_warnings", Static)
             coverage = self.query_one("#crc_coverage_preview", Static)
+            window = self.query_one("#crc_coverage_window", Static)
         except NoMatches:
             # Mid-mount: a change event arrived before every surface exists.
             return
@@ -923,6 +1077,7 @@ class CrcDesignerPanel(ScrollableContainer):
             preview.update(warning)
             warnings.update("")
             coverage.update(warning)
+            window.update(warning)
             return
         algo = template.algorithm
         verdict.update(self._verdict_text(algo))
@@ -930,6 +1085,7 @@ class CrcDesignerPanel(ScrollableContainer):
         preview.update(self._preview_text(template))
         warnings.update(self._live_warnings_text(algo))
         coverage.update(self._coverage_preview_text(algo))
+        window.update(self._render_coverage_window(algo))
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Route the Save / Load button presses (LLR-V5.1 / V5.2).
