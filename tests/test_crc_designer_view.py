@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import re
 from pathlib import Path
 
 from textual.widgets import Button, Input, Select, Static, Switch
@@ -1191,3 +1192,186 @@ def test_coverage_window_malformed_range_markup_safe(tmp_path: Path) -> None:
     assert markup is False, "the fault window must render markup=False (C-17)"
     assert same, "the window must not replace the loaded mem_map (preview-only)"
     assert unchanged, "the window must not mutate the loaded mem_map (US-V8)"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# batch-59 Inc-3 — F1 abort-contract fix on the window + fidelity/preservation/
+# security ATs (HLR-L1/L4/L5, LLR-L1.4/L4.1/L5.1; F1/F2, AT-B59-06/08/09)
+# ─────────────────────────────────────────────────────────────────────────────
+#: A hex-byte pair, used to detect an EMITTED store word (`store 50 39 8A 2A`)
+#: vs the refusal line (`store — refused …`), which carries no hex pair.
+_STORE_WORD_BYTES = re.compile(r"store [0-9A-F]{2}")
+
+
+async def _window_text(
+    tmp_path: Path,
+    mem_map: dict[int, int],
+    ranges: str,
+    join: str,
+    on_conflict: str,
+    pad: str = "0xFF",
+) -> str:
+    """Drive the coverage strip (incl. on_gap_conflict) and read the window text."""
+    app = S19TuiApp(base_dir=tmp_path)
+    async with app.run_test() as pilot:
+        await pilot.pause()
+        app.current_file = _loaded(mem_map)
+        await pilot.press("0")
+        await pilot.pause()
+        app.query_one("#crc_coverage_ranges", Input).value = ranges
+        app.query_one("#crc_coverage_join", Select).value = join
+        app.query_one("#crc_coverage_pad_byte", Input).value = pad
+        app.query_one("#crc_coverage_on_gap_conflict", Select).value = on_conflict
+        await pilot.pause()
+        return str(app.query_one("#crc_coverage_window", Static).render())
+
+
+def test_coverage_window_dirty_gap_abort_refuses_store(tmp_path: Path) -> None:
+    """A dirty fill gap under abort refuses the store word on the window (F1/F2).
+
+    Safety consistency (F1): the window's active-policy store output must honor
+    the SAME shipped abort contract as the sibling preview (AT-058-08,
+    ``evaluate_target``). A stray non-pad byte in the filled inter-range gap +
+    ``join="fill"`` + ``on_gap_conflict="abort"`` refuses the CRC, so the window
+    must render the refusal and NOT emit the divergent store word — whereas a
+    CLEAN gap DOES emit it. The measured clean→dirty delta pins F1 so a future
+    refactor can't silently flip the hero back to a divergent value.
+    """
+    ranges = "0x8000-0x8008, 0x8010-0x8018"
+    dirty = _fixture_mem()
+    dirty[0x800A] = 0x99  # real byte where the operator promised an erased gap
+
+    clean_text = asyncio.run(
+        _window_text(tmp_path, _fixture_mem(), ranges, join="fill", on_conflict="abort")
+    )
+    dirty_text = asyncio.run(
+        _window_text(tmp_path, dict(dirty), ranges, join="fill", on_conflict="abort")
+    )
+
+    # Clean: the store word IS emitted (the actionable output the window shows).
+    assert _STORE_WORD_BYTES.search(clean_text), (
+        f"a clean fill gap must emit the store word, got {clean_text!r}"
+    )
+    # Dirty + abort: the window refuses and emits NO divergent store word.
+    assert "refused" in dirty_text.lower(), (
+        f"a dirty fill gap under abort must refuse on the window, got {dirty_text!r}"
+    )
+    assert not _STORE_WORD_BYTES.search(dirty_text), (
+        f"a refused window must NOT emit the divergent store word, got {dirty_text!r}"
+    )
+
+
+def test_recompute_handler_fires_through_relayout(tmp_path: Path) -> None:
+    """A reused field event drives _recompute through the re-nested tree (AT-B59-06).
+
+    Preservation (HLR-L4, C-12): the verdict widget lives in the hero row and the
+    ``#crc_field_xorout`` field in bench column c1 — DIFFERENT branches of the
+    re-nested tree — yet a single real ``Input.Changed`` still fires the shared
+    ``_recompute`` and transitions ``#crc_kat_verdict`` MATCH→MISMATCH. The field's
+    bench-column ancestry is asserted so the transition is proven to fire THROUGH
+    the new layout, not a flat form.
+    """
+
+    async def _drive() -> tuple[bool, str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            field_in_bench = _has_ancestor(
+                app.query_one("#crc_field_xorout"), "crc_bench_c1"
+            )
+            before = _verdict(app)
+            app.query_one("#crc_field_xorout", Input).value = "0x00000000"
+            await pilot.pause()
+            after = _verdict(app)
+            return field_in_bench, before, after
+
+    field_in_bench, before, after = asyncio.run(_drive())
+    assert field_in_bench, "#crc_field_xorout must live in bench column c1 (re-nested)"
+    assert before == "MATCH", f"seed verdict must be MATCH, got {before!r}"
+    assert after == "MISMATCH", (
+        f"the reused handler must transition the verdict through the layout, got {after!r}"
+    )
+    assert before != after, "the verdict must TRANSITION through the re-nested tree"
+
+
+def test_bench_column_ancestry_teeth_computed(tmp_path: Path) -> None:
+    """The distinct-column-ancestor teeth are a COMPUTED comparison (AT-B59-08).
+
+    Fidelity teeth (HLR-L5, LLR-L5.1, C-31): on the live bench tree the three
+    probes resolve to exactly 3 distinct bench-column ancestors (``len == 3``).
+    The flat-form counterfactual is computed IN-CODE by re-running the SAME
+    ancestor walk with an EMPTY bench-column set (simulating "no bench columns
+    exist"): every probe then collapses to the single ``crc_designer_panel``
+    sentinel → ``len == 1``. The demonstrated teeth is the executed
+    ``len(bench) == 3`` vs ``len(flat) == 1`` comparison, not prose.
+    """
+
+    async def _drive() -> tuple[int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            probes = [
+                app.query_one("#crc_field_width"),
+                app.query_one("#crc_coverage_ranges"),
+                app.query_one("#crc_json_preview"),
+            ]
+            # Live bench tree: each probe's first bench-column ancestor.
+            bench = {_first_ancestor_id(w, _BENCH_COLUMN_IDS) for w in probes}
+            # Flat-form algebra, computed: with NO bench columns to match, the
+            # same walk collapses every probe to the panel sentinel.
+            flat = {_first_ancestor_id(w, ()) for w in probes}
+            return len(bench), len(flat)
+
+    live_len, flat_len = asyncio.run(_drive())
+    assert live_len == 3, f"the bench must yield 3 distinct column ancestors, got {live_len}"
+    assert flat_len == 1, (
+        f"a flat single-panel-ancestor compose collapses to 1 (the teeth), got {flat_len}"
+    )
+
+
+def test_coverage_window_hostile_markup_renders_literally(tmp_path: Path) -> None:
+    """A hostile markup range renders literally with no injected span (AT-B59-09, F1).
+
+    Markup-sink regression lock (C-17, LLR-L1.4): driving a ``[link=evil]…[/]``
+    payload plus a bare ``[`` token into ``#crc_coverage_ranges`` makes the range
+    malformed, so the window echoes the raw token through its ``Invalid coverage``
+    fault branch. Assert (a) no crash (the app stays alive), (b) the bracket
+    payload appears VERBATIM in ``.plain`` (rendered literally, not interpreted),
+    (c) ``render().spans`` carry NO input-derived style span (no ``link``) — the
+    sink is markup-safe by construction (``Text()``/``append``, never
+    ``from_markup``). Crash-only would be insufficient (MEMORY markup-sink rule).
+    """
+
+    async def _drive() -> tuple[str, list, object, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app.current_file = _loaded(_fixture_mem())
+            await pilot.press("0")
+            await pilot.pause()
+            app.query_one("#crc_coverage_ranges", Input).value = (
+                "[link=evil]0x8000-0x8008[/], ["
+            )
+            await pilot.pause()
+            window = app.query_one("#crc_coverage_window", Static)
+            rendered = window.render()
+            return (
+                str(rendered),
+                list(rendered.spans),
+                window._render_markup,
+                _verdict(app),
+            )
+
+    plain, spans, markup, alive = asyncio.run(_drive())
+    assert alive != "", "the app must stay alive after a hostile range string"
+    assert markup is False, "the window must render markup=False (C-17)"
+    assert "[link=evil]" in plain, (
+        f"the hostile markup must render literally in the window, got {plain!r}"
+    )
+    assert all("link" not in str(span.style).lower() for span in spans), (
+        f"the window must apply no input-derived (link) style span, got {spans!r}"
+    )

@@ -977,6 +977,10 @@ class CrcDesignerPanel(ScrollableContainer):
         try:
             target = self._build_coverage_target()
         except (ValueError, KeyError) as exc:
+            # Markup-safe by construction: Text() (NOT Text.from_markup) renders
+            # the echoed raw operator token literally — the sink's safety rests on
+            # markup=False, NOT on the source being int-only (this fault branch DOES
+            # echo raw operator text; F2-minor / AT-B59-09).
             return Text(f"Invalid coverage: {exc}")
 
         span = target.ranges[-1][1] - target.ranges[0][0]
@@ -998,18 +1002,29 @@ class CrcDesignerPanel(ScrollableContainer):
         try:
             concat_crc = compute_target_crc(mem_map, algo, replace(target, join="concat"))
             fill_crc = compute_target_crc(mem_map, algo, replace(target, join="fill"))
+            # F1: gate the ACTIVE-policy store word through the shipped abort
+            # contract so the hero agrees with the sibling preview — a dirty fill
+            # gap under on_gap_conflict="abort" refuses the CRC (crc=None), and the
+            # window must NOT emit that divergent store word (evaluate_target,
+            # AT-058-08). Showing both concat+fill hexes for comparison stays fine.
+            evaluation = evaluate_target(mem_map, algo, target)
         except ValueError as exc:
             text.append(f"Cannot compute: {exc}", style=DGRAY)
             return text
-        active_crc = fill_crc if target.join == "fill" else concat_crc
-        store_bytes = store_word(active_crc, target)
         text.append("concat ", style=DGRAY)
         text.append(_format_hex(concat_crc, target.store_width), style=HILITE)
         text.append("   fill ", style=DGRAY)
         text.append(_format_hex(fill_crc, target.store_width), style=YELLOW)
         text.append("\n")
+        if evaluation.refused:
+            text.append("store — refused (on_gap_conflict=abort)", style=YELLOW)
+            return text
+        store_bytes = store_word(evaluation.crc, target)
         text.append("store ", style=DGRAY)
         text.append(store_bytes.hex(" ").upper(), style=HILITE)
+        for diagnostic in evaluation.diagnostics:
+            text.append("\n")
+            text.append(diagnostic, style=YELLOW)
         return text
 
     def _recompute(self) -> None:
