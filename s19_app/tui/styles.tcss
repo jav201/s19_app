@@ -1829,3 +1829,131 @@ ModalScreen {
 .flow-wrote, .flow-run-diag {
     padding-left: 1;
 }
+
+/* --- CRC Designer "coverage-first bench" (batch-59) ----------------------
+ * The `crc-*` classes were UNDEFINED before this batch, so the panel fell back
+ * to Textual's default vertical stacking (the flat form). These rules supply
+ * the Variant-B bench: a hero row (2fr coverage window + 1fr verdict/warnings)
+ * over a 3-column parameter grid, both reflowing to a vertical stack under the
+ * existing `#workspace_body.width-narrow` cascade (LLR-L2.2 / L2.4 / L3.1).
+ * Colors bind theme tokens (`$accent-calm` accent, `$rule` borders, `$bg-panel`
+ * surfaces) — no hardcoded prototype hexes.
+ */
+#crc_designer_panel {
+    padding: 0 1;
+}
+
+#crc_designer_help {
+    color: #969aad;
+    margin-bottom: 1;
+}
+
+.crc-field-group {
+    border: round $rule;
+    background: $bg-panel;
+    padding: 0 1;
+    margin-bottom: 1;
+    height: auto;
+}
+
+.crc-group-title {
+    color: $accent-calm;
+    text-style: bold;
+}
+
+.crc-field-row {
+    height: auto;
+}
+
+.crc-field-label {
+    width: auto;
+    padding-right: 1;
+}
+
+/* Hero row: the coverage window (2fr) beside the verdict/warnings column (1fr). */
+#crc_hero_row {
+    layout: horizontal;
+    height: auto;
+    margin-bottom: 1;
+}
+
+#crc_coverage_window {
+    width: 2fr;
+    height: auto;
+    min-height: 6;
+    padding: 1 2;
+    border: round $accent-calm;
+    background: $bg-panel;
+    color: $fg-base;
+}
+
+#crc_top_right {
+    width: 1fr;
+    height: auto;
+    padding-left: 1;
+}
+
+/* The verdict hero — the distinguishing property is `content-align`, NOT the
+ * border (every `.crc-field-group` already has one). LLR-L3.1 / AT-B59-05. */
+.crc-hero {
+    content-align: center middle;
+    min-height: 5;
+}
+
+/* The 3-column parameter bench below the hero row. */
+#crc_bench {
+    layout: horizontal;
+    height: auto;
+}
+
+#crc_bench_c1 {
+    width: 1fr;
+    height: auto;
+    padding-right: 1;
+}
+
+#crc_bench_c2 {
+    width: 1fr;
+    height: auto;
+    padding: 0 1;
+}
+
+#crc_bench_c3 {
+    width: 1fr;
+    height: auto;
+    padding-left: 1;
+}
+
+#crc_json_preview_group {
+    min-height: 11;
+}
+
+#crc_json_preview {
+    min-height: 8;
+}
+
+/* width-narrow reflow: at the 80x24 floor the hero row and the bench both stack
+ * vertically so the 2fr window and the 3 columns never crush (LLR-L2.2/L2.4). */
+#workspace_body.width-narrow #crc_hero_row {
+    layout: vertical;
+}
+
+#workspace_body.width-narrow #crc_coverage_window {
+    width: 100%;
+}
+
+#workspace_body.width-narrow #crc_top_right {
+    width: 100%;
+    padding-left: 0;
+}
+
+#workspace_body.width-narrow #crc_bench {
+    layout: vertical;
+}
+
+#workspace_body.width-narrow #crc_bench_c1,
+#workspace_body.width-narrow #crc_bench_c2,
+#workspace_body.width-narrow #crc_bench_c3 {
+    width: 100%;
+    padding: 0;
+}

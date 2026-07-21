@@ -216,6 +216,29 @@ class CrcDesignerPanel(ScrollableContainer):
         super().__init__(id="crc_designer_panel", classes="crc-designer-form")
 
     def compose(self) -> ComposeResult:
+        """Compose the Variant-B "coverage-first bench" (batch-59 LLR-L2.1/L2.3).
+
+        Summary:
+            Re-arrange every batch-58 ``#crc_*`` widget (same ids, same
+            ``markup=False`` sinks, same handler wiring) into the approved bench:
+            a full-width help line and preset selector, then a **hero row**
+            (``#crc_hero_row``) holding the coverage window (``#crc_coverage_window``,
+            2fr — an empty placeholder this increment; the live glyph render lands
+            in Inc-2) beside ``#crc_top_right`` (the verdict hero above the
+            Warnings tile), then a **3-column bench** (``#crc_bench``): c1 =
+            Algorithm + Serialization, c2 = Coverage + Custom vector, c3 = Job
+            JSON + Template + Load/Save. No widget id, handler, or behavior
+            changes — only the nesting (HLR-L4).
+
+        Returns:
+            ComposeResult: the re-nested bench widget tree.
+
+        Data Flow:
+            - Each ``.crc-field-group`` is built once, then placed into a column
+              ``Vertical`` / the hero row; ``query_one("#…")`` resolves any of
+              them anywhere in the subtree, so the shipped ``_recompute`` /
+              Load/Save handlers keep firing (LLR-L4.1).
+        """
         algo = SEED_ALGORITHM
         byte_width = algo.store_bytes()
         yield Static(
@@ -234,110 +257,59 @@ class CrcDesignerPanel(ScrollableContainer):
             ),
             classes="crc-field-row",
         )
-        with Vertical(id="crc_template_fields", classes="crc-field-group"):
-            yield Label("Template", classes="crc-group-title")
-            yield self._text_row("Name", "crc_field_name", algo.name)
-            yield self._text_row(
-                "Aliases (comma-separated)", "crc_field_aliases", ""
-            )
-        with Vertical(id="crc_algorithm_fields", classes="crc-field-group"):
-            yield Label("Algorithm", classes="crc-group-title")
-            yield self._text_row("Width (bits)", "crc_field_width", str(algo.width))
-            yield self._text_row(
+
+        algorithm_group = Vertical(
+            Label("Algorithm", classes="crc-group-title"),
+            self._text_row("Width (bits)", "crc_field_width", str(algo.width)),
+            self._text_row(
                 "Polynomial", "crc_field_poly", _format_hex(algo.poly, byte_width)
-            )
-            yield self._text_row(
-                "Init", "crc_field_init", _format_hex(algo.init, byte_width)
-            )
-            yield self._switch_row("Reflect in", "crc_field_refin", algo.refin)
-            yield self._switch_row("Reflect out", "crc_field_refout", algo.refout)
-            yield self._text_row(
+            ),
+            self._text_row("Init", "crc_field_init", _format_hex(algo.init, byte_width)),
+            self._switch_row("Reflect in", "crc_field_refin", algo.refin),
+            self._switch_row("Reflect out", "crc_field_refout", algo.refout),
+            self._text_row(
                 "XOR out", "crc_field_xorout", _format_hex(algo.xorout, byte_width)
-            )
-            yield self._text_row(
+            ),
+            self._text_row(
                 "Check",
                 "crc_field_check",
                 "" if algo.check is None else _format_hex(algo.check, byte_width),
-            )
-        with Vertical(id="crc_serialization_fields", classes="crc-field-group"):
-            yield Label("Serialization", classes="crc-group-title")
-            yield self._text_row(
-                "Output address", "crc_field_output_address", "0x00000000"
-            )
-            yield self._text_row("Store width (bytes)", "crc_field_store_width", str(byte_width))
-            yield Horizontal(
-                Label("Store endianness", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in ENDIANNESS_VALUES],
-                    value=ENDIANNESS_VALUES[0],
-                    allow_blank=False,
-                    id="crc_field_store_endianness",
-                ),
-                classes="crc-field-row",
-            )
-        with Vertical(id="crc_coverage_group", classes="crc-field-group"):
-            yield Label("Coverage (preview-only)", classes="crc-group-title")
-            yield self._text_row(
+            ),
+            id="crc_algorithm_fields",
+            classes="crc-field-group",
+        )
+        serialization_group = Vertical(
+            Label("Serialization", classes="crc-group-title"),
+            self._text_row("Output address", "crc_field_output_address", "0x00000000"),
+            self._text_row("Store width (bytes)", "crc_field_store_width", str(byte_width)),
+            self._select_row(
+                "Store endianness", "crc_field_store_endianness", ENDIANNESS_VALUES
+            ),
+            id="crc_serialization_fields",
+            classes="crc-field-group",
+        )
+        coverage_group = Vertical(
+            Label("Coverage (preview-only)", classes="crc-group-title"),
+            self._text_row(
                 "Ranges (start-end, comma-separated)",
                 "crc_coverage_ranges",
                 "0x00008000-0x00008008, 0x00008010-0x00008018",
-            )
-            yield Horizontal(
-                Label("Intra-range gap", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in INTRA_GAP_VALUES],
-                    value=INTRA_GAP_VALUES[0],
-                    allow_blank=False,
-                    id="crc_coverage_intra_gap",
-                ),
-                classes="crc-field-row",
-            )
-            yield Horizontal(
-                Label("Join (between ranges)", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in JOIN_VALUES],
-                    value=JOIN_VALUES[0],
-                    allow_blank=False,
-                    id="crc_coverage_join",
-                ),
-                classes="crc-field-row",
-            )
-            yield self._text_row("Pad byte", "crc_coverage_pad_byte", "0xFF")
-            yield Horizontal(
-                Label("On gap conflict", classes="crc-field-label"),
-                Select(
-                    [(value, value) for value in ON_GAP_CONFLICT_VALUES],
-                    value=ON_GAP_CONFLICT_VALUES[0],
-                    allow_blank=False,
-                    id="crc_coverage_on_gap_conflict",
-                ),
-                classes="crc-field-row",
-            )
-            yield Static(
-                "",
-                id="crc_coverage_preview",
-                markup=False,
-                classes="crc-verdict",
-            )
-        with Vertical(id="crc_live_verify", classes="crc-field-group"):
-            yield Label(
-                "Known-answer verdict (123456789)", classes="crc-group-title"
-            )
-            yield Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict")
-        with Vertical(id="crc_custom_vector_group", classes="crc-field-group"):
-            yield Label("Custom test vector", classes="crc-group-title")
-            yield Horizontal(
-                Label("Mode", classes="crc-field-label"),
-                Select(
-                    [(mode, mode) for mode in _VECTOR_MODES],
-                    value=_VECTOR_MODES[0],
-                    allow_blank=False,
-                    id="crc_custom_vector_mode",
-                ),
-                classes="crc-field-row",
-            )
-            yield self._text_row("Vector", "crc_custom_vector", "123456789")
-            yield Horizontal(
+            ),
+            self._select_row("Intra-range gap", "crc_coverage_intra_gap", INTRA_GAP_VALUES),
+            self._select_row("Join (between ranges)", "crc_coverage_join", JOIN_VALUES),
+            self._text_row("Pad byte", "crc_coverage_pad_byte", "0xFF"),
+            self._select_row(
+                "On gap conflict", "crc_coverage_on_gap_conflict", ON_GAP_CONFLICT_VALUES
+            ),
+            Static("", id="crc_coverage_preview", markup=False, classes="crc-verdict"),
+            id="crc_coverage_group",
+            classes="crc-field-group",
+        )
+        custom_vector_group = Vertical(
+            Label("Custom test vector", classes="crc-group-title"),
+            self._select_row("Mode", "crc_custom_vector_mode", _VECTOR_MODES),
+            self._text_row("Vector", "crc_custom_vector", "123456789"),
+            Horizontal(
                 Label("CRC of vector", classes="crc-field-label"),
                 Static(
                     "",
@@ -346,26 +318,62 @@ class CrcDesignerPanel(ScrollableContainer):
                     classes="crc-verdict",
                 ),
                 classes="crc-field-row",
-            )
-        with Vertical(id="crc_json_preview_group", classes="crc-field-group"):
-            yield Label("Template JSON preview", classes="crc-group-title")
-            yield Static(
-                "", id="crc_json_preview", markup=False, classes="crc-json-preview"
-            )
-        with Vertical(id="crc_warnings_group", classes="crc-field-group"):
-            yield Label("Warnings", classes="crc-group-title")
-            yield Static("", id="crc_warnings", markup=False, classes="crc-warnings")
-        with Vertical(id="crc_loadsave_group", classes="crc-field-group"):
-            yield Label("Load / Save", classes="crc-group-title")
-            yield self._text_row("Template path (load)", "crc_load_path", "")
-            yield Horizontal(
+            ),
+            id="crc_custom_vector_group",
+            classes="crc-field-group",
+        )
+        json_preview_group = Vertical(
+            Label("Template JSON preview", classes="crc-group-title"),
+            Static("", id="crc_json_preview", markup=False, classes="crc-json-preview"),
+            id="crc_json_preview_group",
+            classes="crc-field-group",
+        )
+        template_group = Vertical(
+            Label("Template", classes="crc-group-title"),
+            self._text_row("Name", "crc_field_name", algo.name),
+            self._text_row("Aliases (comma-separated)", "crc_field_aliases", ""),
+            id="crc_template_fields",
+            classes="crc-field-group",
+        )
+        loadsave_group = Vertical(
+            Label("Load / Save", classes="crc-group-title"),
+            self._text_row("Template path (load)", "crc_load_path", ""),
+            Horizontal(
                 Button("Save template", id="crc_save_btn"),
                 Button("Load template", id="crc_load_btn"),
                 classes="crc-field-row",
-            )
-            yield Static(
-                "", id="crc_loadsave_status", markup=False, classes="crc-status"
-            )
+            ),
+            Static("", id="crc_loadsave_status", markup=False, classes="crc-status"),
+            id="crc_loadsave_group",
+            classes="crc-field-group",
+        )
+        verdict_group = Vertical(
+            Label("Known-answer verdict (123456789)", classes="crc-group-title"),
+            Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict"),
+            id="crc_live_verify",
+            classes="crc-field-group crc-hero",
+        )
+        warnings_group = Vertical(
+            Label("Warnings", classes="crc-group-title"),
+            Static("", id="crc_warnings", markup=False, classes="crc-warnings"),
+            id="crc_warnings_group",
+            classes="crc-field-group",
+        )
+
+        # Hero row: the wide coverage window (2fr, live render lands in Inc-2)
+        # beside the verdict hero + Warnings right column (1fr).
+        yield Horizontal(
+            Static("", id="crc_coverage_window", markup=False),
+            Vertical(verdict_group, warnings_group, id="crc_top_right"),
+            id="crc_hero_row",
+        )
+        # 3-column parameter bench below the hero row.
+        yield Horizontal(
+            Vertical(algorithm_group, serialization_group, id="crc_bench_c1"),
+            Vertical(coverage_group, custom_vector_group, id="crc_bench_c2"),
+            Vertical(json_preview_group, template_group, loadsave_group, id="crc_bench_c3"),
+            id="crc_bench",
+        )
 
     @staticmethod
     def _text_row(label: str, field_id: str, value: str) -> Horizontal:
@@ -400,6 +408,32 @@ class CrcDesignerPanel(ScrollableContainer):
         return Horizontal(
             Label(label, classes="crc-field-label"),
             Switch(value=value, id=field_id, classes="crc-field-switch"),
+            classes="crc-field-row",
+        )
+
+    @staticmethod
+    def _select_row(
+        label: str, field_id: str, values: tuple[str, ...]
+    ) -> Horizontal:
+        """Build a labelled vocabulary ``Select`` row seeded to ``values[0]``.
+
+        Args:
+            label (str): The human-readable field label.
+            field_id (str): The ``#crc_*`` id the pilot/handlers query.
+            values (tuple[str, ...]): The allowed vocabulary; the first is the
+                seed value (``allow_blank=False``), matching the batch-58 rows.
+
+        Returns:
+            Horizontal: The label + ``Select`` row.
+        """
+        return Horizontal(
+            Label(label, classes="crc-field-label"),
+            Select(
+                [(value, value) for value in values],
+                value=values[0],
+                allow_blank=False,
+                id=field_id,
+            ),
             classes="crc-field-row",
         )
 
