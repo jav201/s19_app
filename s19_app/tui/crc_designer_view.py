@@ -21,8 +21,25 @@ no Run button (LLR-V2.1 / V2.2 / V3.1 / V4.1):
   back through :func:`parse_template` to the same typed template.
 
 The compute boundary is guarded: an out-of-range width / non-hex field renders a
-markup-safe warning rather than crashing the screen. Load/Save and multi-range
-coverage remain later increments (LLR-V5).
+markup-safe warning rather than crashing the screen.
+
+Inc-6 adds Load/Save through the ``crc_template`` facade plus the form-level
+warnings (LLR-V5.1 / V5.2 / V5.3 / V5.4):
+
+- ``#crc_field_name`` / ``#crc_field_aliases`` — the template identity fields
+  that become the untrusted, load-derived surface.
+- ``#crc_save_btn`` / ``#crc_load_btn`` + ``#crc_load_path`` —
+  Save writes ``emit_template`` to ``<template-lib>/<sanitized-name>.crc.json``
+  (a bounded write; an all-symbol name warns and writes nothing), Load reads a
+  chosen file through :func:`read_template` (collect-don't-abort: a fault
+  surfaces exactly one error, never a crash).
+- ``#crc_loadsave_status`` — the Save/Load outcome + the save-time known-answer
+  (``check == compute("123456789")``) and name warnings.
+- ``#crc_warnings`` — the live ``store_width < ceil(width/8)`` truncation warning.
+
+Multi-range coverage + the fill-no-pad warning remain Inc-7 (LLR-V6/V7). Every
+sink that shows template/file-derived text — including the JSON preview that
+embeds the loaded ``name`` / ``aliases`` verbatim — renders ``markup=False``.
 
 The panel is presentational (s19_app CLAUDE.md TUI architecture): it imports the
 headless ``crc_kernel`` / ``crc_designer_model`` primitives for read-only
@@ -37,14 +54,12 @@ from __future__ import annotations
 from textual.app import ComposeResult
 from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
-from textual.widgets import Input, Label, Select, Static, Switch
+from textual.widgets import Button, Input, Label, Select, Static, Switch
 
-from .operations.crc_designer_model import (
-    ENDIANNESS_VALUES,
-    CrcTemplate,
-    emit_template,
-)
+from .operations.crc_designer_model import ENDIANNESS_VALUES
 from .operations.crc_kernel import PRESETS, SEED_ALGORITHM, CrcAlgorithm, preset_by_name
+from .operations.crc_template import CrcTemplate, emit_template, read_template
+from .workspace import ensure_template_lib, sanitize_project_name
 
 #: Custom-vector interpretation modes (LLR-V3.1). ``ascii`` encodes the raw text
 #: as UTF-8 bytes (so ``123456789`` reproduces the KAT); ``hex`` reads
@@ -156,6 +171,10 @@ class CrcDesignerPanel(ScrollableContainer):
         Uses:
             - ``crc_kernel`` (``PRESETS`` / ``SEED_ALGORITHM`` / ``preset_by_name``)
             - ``crc_designer_model.ENDIANNESS_VALUES`` (serialization vocabulary)
+            - ``crc_template`` facade (``read_template`` / ``emit_template`` /
+              ``CrcTemplate``) for Load/Save
+            - ``workspace`` (``ensure_template_lib`` / ``sanitize_project_name``)
+              for the bounded template-library write
         Used by:
             - ``S19TuiApp._compose_screen_crc_designer``
 
@@ -187,6 +206,12 @@ class CrcDesignerPanel(ScrollableContainer):
             ),
             classes="crc-field-row",
         )
+        with Vertical(id="crc_template_fields", classes="crc-field-group"):
+            yield Label("Template", classes="crc-group-title")
+            yield self._text_row("Name", "crc_field_name", algo.name)
+            yield self._text_row(
+                "Aliases (comma-separated)", "crc_field_aliases", ""
+            )
         with Vertical(id="crc_algorithm_fields", classes="crc-field-group"):
             yield Label("Algorithm", classes="crc-group-title")
             yield self._text_row("Width (bits)", "crc_field_width", str(algo.width))
@@ -255,6 +280,20 @@ class CrcDesignerPanel(ScrollableContainer):
             yield Static(
                 "", id="crc_json_preview", markup=False, classes="crc-json-preview"
             )
+        with Vertical(id="crc_warnings_group", classes="crc-field-group"):
+            yield Label("Warnings", classes="crc-group-title")
+            yield Static("", id="crc_warnings", markup=False, classes="crc-warnings")
+        with Vertical(id="crc_loadsave_group", classes="crc-field-group"):
+            yield Label("Load / Save", classes="crc-group-title")
+            yield self._text_row("Template path (load)", "crc_load_path", "")
+            yield Horizontal(
+                Button("Save template", id="crc_save_btn"),
+                Button("Load template", id="crc_load_btn"),
+                classes="crc-field-row",
+            )
+            yield Static(
+                "", id="crc_loadsave_status", markup=False, classes="crc-status"
+            )
 
     @staticmethod
     def _text_row(label: str, field_id: str, value: str) -> Horizontal:
@@ -297,10 +336,12 @@ class CrcDesignerPanel(ScrollableContainer):
 
         Summary:
             Set the seven algorithm field widgets plus the derived
-            ``store_width`` from ``algo``. Hex parameters are zero-padded to the
-            algorithm's whole-byte width; a ``None`` ``check`` clears the field.
-            Serialization ``output_address`` / ``store_endianness`` are left as
-            the operator set them — a preset carries no placement.
+            ``store_width`` from ``algo``, the template ``name`` field, and clear
+            ``aliases`` (a preset/algorithm carries none; a Load re-sets aliases
+            afterwards). Hex parameters are zero-padded to the algorithm's
+            whole-byte width; a ``None`` ``check`` clears the field. Serialization
+            ``output_address`` / ``store_endianness`` are left as the operator
+            set them — a preset carries no placement.
 
         Args:
             algo (CrcAlgorithm): The preset (or seed) to read values from. Never
@@ -318,6 +359,8 @@ class CrcDesignerPanel(ScrollableContainer):
                 - :meth:`on_select_changed`
         """
         byte_width = algo.store_bytes()
+        self.query_one("#crc_field_name", Input).value = algo.name
+        self.query_one("#crc_field_aliases", Input).value = ""
         self.query_one("#crc_field_width", Input).value = str(algo.width)
         self.query_one("#crc_field_poly", Input).value = _format_hex(algo.poly, byte_width)
         self.query_one("#crc_field_init", Input).value = _format_hex(algo.init, byte_width)
@@ -411,10 +454,11 @@ class CrcDesignerPanel(ScrollableContainer):
         """Build a :class:`CrcAlgorithm` from the current form fields.
 
         Summary:
-            Read the seven algorithm fields plus the preset-selector name into a
-            typed :class:`CrcAlgorithm` (LLR-V2.1). Hex fields accept an optional
-            ``0x`` prefix; an empty ``check`` field maps to ``None`` (the
-            no-expected tri-state). Field values are read live, never cached.
+            Read the seven algorithm fields plus the template ``name`` field
+            into a typed :class:`CrcAlgorithm` (LLR-V2.1). Hex fields accept an
+            optional ``0x`` prefix; an empty ``check`` field maps to ``None``
+            (the no-expected tri-state). Field values are read live, never
+            cached.
 
         Returns:
             CrcAlgorithm: The algorithm the form currently describes.
@@ -437,7 +481,7 @@ class CrcDesignerPanel(ScrollableContainer):
         check_text = self.query_one("#crc_field_check", Input).value.strip()
         check = int(check_text, 16) if check_text else None
         return CrcAlgorithm(
-            name=str(self.query_one("#crc_preset_select", Select).value),
+            name=self.query_one("#crc_field_name", Input).value.strip(),
             width=width,
             poly=self._hex_field("#crc_field_poly"),
             init=self._hex_field("#crc_field_init"),
@@ -451,6 +495,33 @@ class CrcDesignerPanel(ScrollableContainer):
         """Parse a hex ``#crc_field_*`` value (``0x`` optional; empty → ``0``)."""
         text = self.query_one(selector, Input).value.strip()
         return int(text, 16) if text else 0
+
+    def _current_template(self) -> CrcTemplate:
+        """Build a :class:`CrcTemplate` from the current form fields (LLR-V4.1).
+
+        Summary:
+            Wrap :meth:`_current_algorithm` together with the comma-separated
+            ``#crc_field_aliases`` field into a typed :class:`CrcTemplate` — the
+            artifact the JSON preview renders and Save writes. Empty alias tokens
+            are dropped. The ``name`` / ``aliases`` are file/operator-derived and
+            flow only into ``markup=False`` sinks (C-17, LLR-V5.3).
+
+        Returns:
+            CrcTemplate: The template the form currently describes.
+
+        Raises:
+            ValueError: A non-numeric width or non-hex parameter — caught by
+                :meth:`_recompute` / the Save handler and rendered markup-safe.
+
+        Dependencies:
+            Uses:
+                - :meth:`_current_algorithm`
+            Used by:
+                - :meth:`_recompute`, :meth:`_save_template`
+        """
+        aliases_text = self.query_one("#crc_field_aliases", Input).value
+        aliases = tuple(a.strip() for a in aliases_text.split(",") if a.strip())
+        return CrcTemplate(algorithm=self._current_algorithm(), aliases=aliases)
 
     def _verdict_text(self, algo: CrcAlgorithm) -> str:
         """Render the tri-state known-answer verdict token (LLR-V2.1 / V2.2).
@@ -510,32 +581,68 @@ class CrcDesignerPanel(ScrollableContainer):
         except ValueError as exc:
             return f"Cannot compute: {exc}"
 
-    def _preview_text(self, algo: CrcAlgorithm) -> str:
-        """Render the live template JSON preview (LLR-V4.1).
+    def _preview_text(self, template: CrcTemplate) -> str:
+        """Render the live template JSON preview (LLR-V4.1 / V5.3).
 
         Summary:
-            Serialize ``CrcTemplate(algo)`` via :func:`emit_template`; the text
+            Serialize ``template`` via :func:`emit_template`; the text
             round-trips back through :func:`parse_template` to the same typed
             template (the AT-058-04 gate reads THIS mounted widget's text). The
-            output is rendered ``markup=False`` — its ``[]`` array literals never
-            reach a markup sink (C-17).
+            output is rendered ``markup=False`` — its ``[]`` array literals AND
+            the embedded (possibly hostile) ``name`` / ``aliases`` never reach a
+            markup sink (C-17, LLR-V5.3 F1: this is the highest-risk sink).
 
         Args:
-            algo (CrcAlgorithm): The current algorithm.
+            template (CrcTemplate): The current template.
 
         Returns:
             str: The pretty-printed template JSON, or a markup-safe warning.
 
         Dependencies:
             Uses:
-                - :func:`emit_template`, :class:`CrcTemplate`
+                - :func:`emit_template`
             Used by:
                 - :meth:`_recompute`
         """
         try:
-            return emit_template(CrcTemplate(algorithm=algo))
+            return emit_template(template)
         except (ValueError, TypeError) as exc:
             return f"Cannot render preview: {exc}"
+
+    def _live_warnings_text(self, algo: CrcAlgorithm) -> str:
+        """Render the form-computable live warnings (LLR-V5.4b).
+
+        Summary:
+            The single form-computable warning that does not need the loaded
+            image: ``store_width < ceil(width/8)`` — a stored field too narrow
+            for the CRC silently truncates its detection strength, so it is a
+            mandatory warn. The fill-no-``pad_byte`` warning needs the coverage
+            strip and lands with it in Inc-7. Rendered ``markup=False``.
+
+        Args:
+            algo (CrcAlgorithm): The current algorithm.
+
+        Returns:
+            str: The warning line, or ``""`` when the stored field is wide enough.
+
+        Dependencies:
+            Uses:
+                - :meth:`CrcAlgorithm.store_bytes`
+            Used by:
+                - :meth:`_recompute`
+        """
+        text = self.query_one("#crc_field_store_width", Input).value.strip()
+        try:
+            store_width = int(text) if text else None
+        except ValueError:
+            return ""
+        required = algo.store_bytes()
+        if store_width is not None and store_width < required:
+            return (
+                f"store width {store_width} bytes < required {required} bytes "
+                "(ceil(width/8)); the stored CRC will be truncated"
+            )
+        return ""
 
     def _recompute(self) -> None:
         """Recompute the three live surfaces from the current fields.
@@ -553,14 +660,15 @@ class CrcDesignerPanel(ScrollableContainer):
             None
 
         Data Flow:
-            - :meth:`_current_algorithm` → :meth:`_verdict_text` /
-              :meth:`_custom_vector_text` / :meth:`_preview_text` → each
-              ``Static.update`` (markup-safe).
+            - :meth:`_current_template` → :meth:`_verdict_text` /
+              :meth:`_custom_vector_text` / :meth:`_preview_text` /
+              :meth:`_live_warnings_text` → each ``Static.update`` (markup-safe).
 
         Dependencies:
             Uses:
-                - :meth:`_current_algorithm`, :meth:`_verdict_text`,
-                  :meth:`_custom_vector_text`, :meth:`_preview_text`
+                - :meth:`_current_template`, :meth:`_verdict_text`,
+                  :meth:`_custom_vector_text`, :meth:`_preview_text`,
+                  :meth:`_live_warnings_text`
             Used by:
                 - :meth:`on_mount`, :meth:`on_input_changed`,
                   :meth:`on_switch_changed`, :meth:`on_select_changed`
@@ -569,17 +677,159 @@ class CrcDesignerPanel(ScrollableContainer):
             verdict = self.query_one("#crc_kat_verdict", Static)
             custom_result = self.query_one("#crc_custom_vector_result", Static)
             preview = self.query_one("#crc_json_preview", Static)
+            warnings = self.query_one("#crc_warnings", Static)
         except NoMatches:
             # Mid-mount: a change event arrived before every surface exists.
             return
         try:
-            algo = self._current_algorithm()
+            template = self._current_template()
         except (ValueError, NoMatches) as exc:
             warning = f"Invalid parameters: {exc}"
             verdict.update(warning)
             custom_result.update("—")
             preview.update(warning)
+            warnings.update("")
             return
+        algo = template.algorithm
         verdict.update(self._verdict_text(algo))
         custom_result.update(self._custom_vector_text(algo))
-        preview.update(self._preview_text(algo))
+        preview.update(self._preview_text(template))
+        warnings.update(self._live_warnings_text(algo))
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        """Route the Save / Load button presses (LLR-V5.1 / V5.2).
+
+        Args:
+            event (Button.Pressed): The button-press message.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :meth:`_save_template`, :meth:`_load_template`
+        """
+        if event.button.id == "crc_save_btn":
+            self._save_template()
+        elif event.button.id == "crc_load_btn":
+            self._load_template()
+
+    def _save_template(self) -> None:
+        """Save the current template to the library (LLR-V5.2 / V5.4c, F2/F3).
+
+        Summary:
+            Build the current template, normalize its ``name`` through
+            :func:`sanitize_project_name`, and write ``emit_template`` to the
+            fixed ``<template-lib>/<sanitized-basename>.crc.json`` — a bounded
+            write (F3: only the basename is name-derived, the directory is fixed).
+            An all-symbol / empty name (``sanitize`` → ``None``) writes NOTHING
+            and warns (F2). On Save the known-answer is validated
+            (``check == compute("123456789")``, obs #3) and a mismatch WARNS but
+            still writes (LLR-V5.4c). Every status/warning renders ``markup=False``
+            (C-17). No firmware is ever written (US-V8).
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :meth:`_current_template`, ``sanitize_project_name``,
+                  ``ensure_template_lib``, :func:`emit_template`,
+                  :meth:`CrcAlgorithm.kat_ok`
+            Used by:
+                - :meth:`on_button_pressed`
+        """
+        status = self.query_one("#crc_loadsave_status", Static)
+        try:
+            template = self._current_template()
+        except (ValueError, NoMatches) as exc:
+            status.update(f"Cannot save: invalid parameters: {exc}")
+            return
+        safe_name = sanitize_project_name(template.algorithm.name)
+        if safe_name is None:
+            status.update(
+                "Cannot save: template name is empty after sanitization; "
+                "nothing written."
+            )
+            return
+        # Save-time known-answer validation (obs #3): warn, do not block.
+        kat_warning = ""
+        try:
+            if template.algorithm.kat_ok() is False:
+                kat_warning = (
+                    "check does not match the computed CRC of 123456789 "
+                    "(saved anyway)"
+                )
+        except ValueError as exc:
+            kat_warning = f"could not validate the known-answer: {exc} (saved anyway)"
+        lib_dir = ensure_template_lib(self.app.base_dir)
+        target = lib_dir / f"{safe_name}.crc.json"
+        try:
+            target.write_text(emit_template(template), encoding="utf-8")
+        except OSError as exc:
+            status.update(f"Cannot save: {exc}")
+            return
+        if kat_warning:
+            status.update(f"Saved {target.name} with warning: {kat_warning}")
+        else:
+            status.update(f"Saved template to {target.name}")
+
+    def _load_template(self) -> None:
+        """Load a template file through the E5 facade (LLR-V5.1 / V5.3).
+
+        Summary:
+            Resolve ``#crc_load_path`` and read it through
+            :func:`read_template` (the ``crc_template`` facade — collect-don't
+            abort). A fault surfaces EXACTLY ONE markup-safe error and leaves the
+            form unchanged (AT-CRC-DSN-015); a valid file populates the form via
+            :meth:`_apply_template`, after which the live surfaces recompute so
+            the (possibly hostile) ``name`` / ``aliases`` render literally at
+            every ``markup=False`` sink incl. the JSON preview (C-17, F1).
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :func:`read_template`, :meth:`_apply_template`
+            Used by:
+                - :meth:`on_button_pressed`
+        """
+        status = self.query_one("#crc_loadsave_status", Static)
+        raw = self.query_one("#crc_load_path", Input).value.strip()
+        if not raw:
+            status.update("Cannot load: enter a template path.")
+            return
+        template, errors = read_template(raw, self.app.base_dir)
+        if errors or template is None:
+            first = errors[0] if errors else "template could not be read"
+            status.update(f"Load failed: {first}")
+            return
+        self._apply_template(template)
+        status.update("Loaded template from file.")
+
+    def _apply_template(self, template: CrcTemplate) -> None:
+        """Populate the form from a loaded template, then recompute (LLR-V5.1).
+
+        Summary:
+            Set the algorithm fields (via :meth:`_apply_algorithm`), the template
+            ``name`` and the comma-joined ``aliases`` from ``template``, then
+            recompute the live surfaces. The ``name`` / ``aliases`` are untrusted
+            file-derived text; they reach only ``markup=False`` sinks (C-17).
+
+        Args:
+            template (CrcTemplate): The loaded template. Never mutated.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - :meth:`_apply_algorithm`, :meth:`_recompute`
+            Used by:
+                - :meth:`_load_template`
+        """
+        self._apply_algorithm(template.algorithm)
+        self.query_one("#crc_field_name", Input).value = template.algorithm.name
+        self.query_one("#crc_field_aliases", Input).value = ", ".join(template.aliases)
+        self._recompute()

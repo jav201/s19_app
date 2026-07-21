@@ -19,6 +19,11 @@ WORKAREA_TEMP = "temp"
 WORKAREA_PATCHES = "patches"
 LOGS_SUBDIR = "logs"
 LOG_FILENAME = "s19tui.log"
+# Reusable, cross-project CRC algorithm-template library (batch-58 LLR-V5.2, F3).
+# A single fixed directory under ``.s19tool/`` — the Designer's Save writes only
+# ``<sanitized-basename>.crc.json`` here, so a template name can never redirect the
+# write outside this bounded directory.
+WORKAREA_TEMPLATES = "templates"
 # Default size cap for ``copy_into_workarea``. Cap rationale (per security
 # Finding S-N02): realistic A2L upper end is ~100 MB per
 # ``tests/conftest.py`` generators; 256 MB leaves ~2.5x headroom. The cap is
@@ -48,6 +53,34 @@ def ensure_workarea(base_dir: Path) -> Path:
     (workarea / WORKAREA_PATCHES).mkdir(parents=True, exist_ok=True)
     (workarea_root / LOGS_SUBDIR).mkdir(parents=True, exist_ok=True)
     return workarea
+
+
+def ensure_template_lib(base_dir: Path) -> Path:
+    """
+    Summary:
+        Ensure the CRC template library directory exists and return it
+        (batch-58 LLR-V5.2 / F3). The library is the single fixed
+        ``<base_dir>/.s19tool/templates`` directory that the CRC Designer's Save
+        writes ``*.crc.json`` templates into; the write basename is name-derived
+        but the directory is fixed, so a template name can never escape it.
+
+    Args:
+        base_dir (Path): The app base directory (``S19TuiApp.base_dir``).
+
+    Returns:
+        Path: The (now-existing) ``<base_dir>/.s19tool/templates`` directory.
+
+    Data Flow:
+        - ``base_dir`` / :data:`WORKAREA_DIRNAME` / :data:`WORKAREA_TEMPLATES`,
+          ``mkdir(parents=True, exist_ok=True)``.
+
+    Dependencies:
+        Used by:
+            - s19_app.tui.crc_designer_view.CrcDesignerPanel (Save/Load)
+    """
+    lib = base_dir / WORKAREA_DIRNAME / WORKAREA_TEMPLATES
+    lib.mkdir(parents=True, exist_ok=True)
+    return lib
 
 
 def setup_logging(base_dir: Path) -> logging.Logger:
