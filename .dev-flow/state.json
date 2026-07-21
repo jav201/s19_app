@@ -22,7 +22,8 @@
     "R_C_status": "01-requirements DECIDES R-C = reading (i) no-trailing-pad (firmly, §6.2). 01b-qa-catalog treats R-C as OPEN (AT-119: 17 no-trailing / 24 trailing). Operator/spec ruling = no trailing pad (R-C reading i). Reconcile: R-C is CLOSED = no trailing pad; AT-119 asserts the no-trailing value."
   },
   "current_phase": 6,
-  "phase_status": "in-progress",
+  "phase_status": "awaiting-sync",
+  "merge_result": "PR-A #114 bcd854f (feature) + PR-B #115 1e03dff (a2l.py re-freeze) BOTH MERGED to origin/main 2026-07-21. tui-ci green on both; final PR-level qa CLEAN 0-HIGH. a2l.py re-frozen (git diff main -- a2l.py empty). Remaining: /dev-flow-sync (b56 + pending b57/b58/b59) to the Obsidian vault; RISK-1 MOD_COMMON deferred follow-up; snapshot-regen (19 tc016s, canonical-CI only, shared b58/b59 carry).",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 1, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
     "1": ".dev-flow/2026-07-20-batch-56/01-requirements.md",
