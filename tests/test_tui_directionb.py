@@ -131,7 +131,7 @@ from s19_app.tui.rail import RAIL_ENTRIES, Rail, RailItem
 from s19_app.tui.screens_directionb import EmptyStatePanel
 
 
-# The 9 Direction B rail screen container ids, in rail order (keys 1-9).
+# The 10 Direction B rail screen container ids, in rail order (keys 1-9 then 0).
 SCREEN_IDS = [
     "screen_workspace",
     "screen_a2l",
@@ -142,6 +142,7 @@ SCREEN_IDS = [
     "screen_diff",
     "screen_flow",
     "screen_checks",
+    "screen_crc_designer",
 ]
 
 # Rail screen-key -> container id, matching S19TuiApp.SCREEN_CONTAINER_IDS.
@@ -155,7 +156,17 @@ SCREEN_KEYS = [
     "diff",
     "flow",
     "checks",
+    "crc_designer",
 ]
+
+# Rail keys in rail order: digits 1-9 then 0 for the 10th screen (keys 1-9 exhausted).
+RAIL_KEYS_IN_ORDER = "1234567890"
+
+# Consistency guard (C-28 rail census): the test enumerations MUST track the
+# production rail — a future rail add/remove that skips these trips loudly here.
+assert len(SCREEN_IDS) == len(SCREEN_KEYS) == len(RAIL_ENTRIES), (
+    "rail census drift: SCREEN_IDS/SCREEN_KEYS must match len(RAIL_ENTRIES)"
+)
 
 
 def _visible_screens(app: S19TuiApp) -> list[str]:
@@ -5619,8 +5630,9 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
     """Every rail item (a new Direction B control) responds to its key.
 
     Intent: LLR-013.1 — the activity rail is mouse-clickable; it must also
-    be fully keyboard-driven. Pressing each of keys ``1``-``8`` activates the
-    matching rail screen and moves the single active marker, with no mouse.
+    be fully keyboard-driven. Pressing each of keys ``1``-``9`` then ``0``
+    (the 10th screen; keys 1-9 exhausted) activates the matching rail screen
+    and moves the single active marker, with no mouse.
     """
 
     async def _drive() -> list[tuple[str, str, str]]:
@@ -5628,8 +5640,8 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
         seen: list[tuple[str, str, str]] = []
         async with app.run_test() as pilot:
             await pilot.pause()
-            for index, screen_key in enumerate(SCREEN_KEYS, start=1):
-                await pilot.press(str(index))
+            for key, screen_key in zip(RAIL_KEYS_IN_ORDER, SCREEN_KEYS):
+                await pilot.press(key)
                 await pilot.pause()
                 visible = _visible_screens(app)
                 active = app.query_one(Rail).active_key
