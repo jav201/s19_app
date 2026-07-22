@@ -474,6 +474,53 @@ class PreparedLoad:
     mac_cell_styles: list = field(default_factory=list)
 
 
+def format_report_log_line(
+    kind: str,
+    source: str,
+    output: str,
+    outcome: str,
+) -> str:
+    """
+    Summary:
+        Build the single-line, metadata-only log record for a
+        report-generation event (N3 observability). The line names the
+        report KIND, its SOURCE artifact(s), the OUTPUT path(s) and the
+        OUTCOME — and never carries report body content or memory/byte
+        values, honoring the emitter modules' deliberate "no body in logs"
+        design (spec AC-5).
+
+    Args:
+        kind (str): Report kind — ``"project"`` / ``"before-after"`` /
+            ``"diff"``.
+        source (str): Source artifact name(s)/path(s) — metadata only.
+        output (str): Written output path(s), or ``"-"`` when none was
+            written (a refusal/failure).
+        outcome (str): ``"ok"`` on success, else a short reason string
+            (e.g. ``"rejected: ..."`` / ``"refused"`` / ``"failed: ..."``)
+            that carries NO body content.
+
+    Returns:
+        str: e.g.
+        ``"report kind=before-after source=prg.s19 output=a.md|a.html outcome=ok"``.
+
+    Data Flow:
+        - Pure string builder; the caller logs it on the ``"s19tui"``
+          logger (``self.logger``) so it reaches
+          ``.s19tool/logs/s19tui.log`` (AC-6).
+
+    Dependencies:
+        Uses:
+            - none
+        Used by:
+            - ``S19TuiApp._log_report_event``
+
+    Example:
+        >>> format_report_log_line("diff", "a.s19|b.s19", "d.md|d.html", "ok")
+        'report kind=diff source=a.s19|b.s19 output=d.md|d.html outcome=ok'
+    """
+    return f"report kind={kind} source={source} output={output} outcome={outcome}"
+
+
 def _build_a2l_name_index(a2l_data: Optional[dict]) -> dict[str, list[dict]]:
     index: dict[str, list[dict]] = {}
     if not a2l_data:
@@ -3170,12 +3217,23 @@ class S19TuiApp(App):
             workarea=self.workarea,
             report_filter=report_filter,
         )
+        source_name = loaded.path.name if loaded is not None else "-"
         if result.written:
+            self._log_report_event(
+                "before-after",
+                source_name,
+                f"{result.md_path}|{result.html_path}",
+                "ok",
+                ok=True,
+            )
             self.set_status(
                 f"Before/after report written: {result.md_path} "
                 f"| {result.html_path}"
             )
             return
+        self._log_report_event(
+            "before-after", source_name, "-", "refused", ok=False
+        )
         self.set_status(
             "Before/after report refused: " + " ".join(result.diagnostics)
         )
@@ -3864,15 +3922,77 @@ class S19TuiApp(App):
                 project_dir, results, options, variant_set=variant_set
             )
         except ValueError as exc:
+            self._log_report_event(
+                "project", project_dir.name, "-", f"rejected: {exc}", ok=False
+            )
             self.call_from_thread(self.set_status, f"Report rejected: {exc}")
             return
         except Exception as exc:
             self.logger.exception("Report generation failed: %s", exc)
+            self._log_report_event(
+                "project",
+                project_dir.name,
+                "-",
+                f"failed: {type(exc).__name__}",
+                ok=False,
+            )
             self.call_from_thread(
                 self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
             )
             return
+        self._log_report_event(
+            "project", project_dir.name, str(report_path), "ok", ok=True
+        )
         self.call_from_thread(self._finish_generate_report, report_path)
+
+    def _log_report_event(
+        self,
+        kind: str,
+        source: str,
+        output: str,
+        outcome: str,
+        *,
+        ok: bool,
+    ) -> None:
+        """
+        Summary:
+            Emit one metadata-only report-generation log line on the app's
+            ``"s19tui"`` file logger (N3 observability): INFO on success,
+            WARNING on failure/refusal — so no report action is ever silent
+            in ``.s19tool/logs/s19tui.log`` (spec AC-1..4/AC-6). The line
+            carries only metadata (kind, source, output path, outcome),
+            never report body content (AC-5).
+
+        Args:
+            kind (str): Report kind — ``"project"`` / ``"before-after"`` /
+                ``"diff"``.
+            source (str): Source artifact name(s)/path(s) — metadata only.
+            output (str): Written output path(s), or ``"-"`` on
+                refusal/failure.
+            outcome (str): ``"ok"`` or a short reason string (no body).
+            ok (bool): ``True`` logs at INFO; ``False`` at WARNING.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Builds the line via :func:`format_report_log_line` and routes
+              it to ``self.logger`` (the ``setup_logging`` rotating file
+              logger). Thread-safe — callable from the generation worker.
+
+        Dependencies:
+            Uses:
+                - :func:`format_report_log_line` / ``self.logger``
+            Used by:
+                - ``_start_generate_report_worker`` (project)
+                - ``action_before_after_report`` (before-after)
+                - ``on_ab_diff_panel_report_requested`` (diff)
+        """
+        line = format_report_log_line(kind, source, output, outcome)
+        if ok:
+            self.logger.info(line)
+        else:
+            self.logger.warning(line)
 
     def _finish_generate_report(self, report_path: Path) -> None:
         """
@@ -3896,7 +4016,6 @@ class S19TuiApp(App):
                 - ``_start_generate_report_worker`` (via ``call_from_thread``)
         """
         self._last_execution = None
-        self.logger.info("Report generated: %s", report_path)
         self.set_status(
             f"Report: {report_path.parent.name}/{report_path.name}"
         )
@@ -4579,18 +4698,30 @@ class S19TuiApp(App):
             a2l_records=a2l_tags,
             mac_records=mac_records,
         )
+        diff_source = (
+            project_dir.name if project_dir is not None else (dest_input or "-")
+        )
         md = generate_diff_report(result, **kwargs)
         if not md.written:
+            self._log_report_event(
+                "diff", diff_source, "-", "refused", ok=False
+            )
             panel.set_status(
                 "Report refused: " + "; ".join(md.diagnostics), "sev-error"
             )
             return
         html = generate_diff_report_html(result, **kwargs)
         if not html.written:
+            self._log_report_event(
+                "diff", diff_source, "-", "refused (html)", ok=False
+            )
             panel.set_status(
                 "HTML report refused: " + "; ".join(html.diagnostics), "sev-error"
             )
             return
+        self._log_report_event(
+            "diff", diff_source, f"{md.path}|{html.path}", "ok", ok=True
+        )
         panel.set_status(
             f"Diff report written: {md.path}  |  {html.path}", "sev-ok"
         )
