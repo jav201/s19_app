@@ -1,58 +1,63 @@
-# Quick Spec — s19_app · N5 progress feedback for report generation
+# Quick Spec — s19_app · N1 legend per-screen + N2 log-line width
 
-> Minimal spec for `/fast-dev-flow`. Observable acceptance criteria only.
+> Minimal spec for `/fast-dev-flow`. Observable acceptance criteria only. Two small increments.
 
 - **Date:** 2026-07-23
-- **Batch:** n5-progress-indicators
+- **Batch:** n1-n2-legend-tasklog
 - **Flow:** /fast-dev-flow
 - **Language:** English
 - **Run mode / merge:** autonomous end-to-end + self-merge (operator-granted this batch, per-batch).
-- **Status:** CLOSED 2026-07-23. Report-gen progress shipped; load-progress finding recorded; before/after+diff+CRC+A2L carried.
-- **Branch:** `fix/n5-progress-indicators` off `main` `d1d0285` (RC-1 verified HEAD == origin/main tip).
+- **Status:** CLOSED 2026-07-23. N1 legend-per-screen + N2 width-aware log cap shipped.
+- **Branch:** `feat/n1-n2-legend-tasklog` off `main` `5ec46b3` (RC-1 verified HEAD == origin/main tip).
 
 ---
 
-## 0. Phase-A finding that reshaped this spec (honest scoping)
+## 0. Phase-A findings (C-35, honest scoping)
 
-The initial premise ("long-running actions have NO progress bar") is **partly false**: the file **load** path ALREADY drives a persistent `ProgressBar(id="progress_bar")` in `#workspace_status_bar` via `set_progress(10→50→100)` (`load_from_path` / load worker / error handler). A load `LoadingIndicator` would be **redundant**. The genuine gap is **report generation**: `_trigger_generate_report` → `_start_generate_report_worker` (`@work`, off-thread, genuinely slow) → `_finish_generate_report` use only `set_status` (text) and **never `set_progress`** — so the bar shows no activity during a report and sits at its last value (e.g. `100` left over from the previous load), reading as "done" while a report is actually running. N5 fills that gap by reusing the existing bar.
+- **N1:** `legend.LEGEND_TABLE` is already keyed by artifact section — exactly `['A2L', 'MAC', 'Issues', 'Hex']`. `screens.LegendScreen.compose` renders **all four** regardless of the active screen. Fix = filter to the active screen's relevant section(s) via a small screen→sections map.
+- **N2:** the log-tail truncation is a **code cap** — `_append_log_line` does `line = trimmed[:50]` (app.py:11247), NOT a CSS width (the backlog guessed CSS). The `#log_line_1..4` Labels already sit in the full-width `#workspace_status_bar`; the `[:50]` slice is what truncates long paths. Fix = cap width-aware (to the app's current width) instead of a fixed 50.
 
 ---
 
 ## 1. Objective (1 line)
 
-Drive the existing `#progress_bar` during **project-report generation** so a slow, off-thread report shows visible progress (start → done) and resets on failure — the user can tell a report is advancing and is never misled by a stale `100`.
+Make the Legend modal show only the classes the **current screen** actually paints (N1), and let the status-bar **activity-log lines** use the full viewport width so long `.s19tool/workarea/…` paths are readable at fullscreen instead of being clipped at 50 chars (N2).
 
 ---
 
 ## 2. User stories (Connextra)
 
-- As an engineer generating a project report over many variants, I want the progress bar to move while the report is being built, so I know it is working and not hung.
-- As an engineer, I want a **failed** report to reset the bar (not leave it mid-fill), so the bar's state never lies about what happened.
+- As an engineer on the A2L (or MAC / Issues / Map) screen, I want the Legend to list only that screen's classifications, so I'm not shown swatches for artifacts that screen doesn't paint.
+- As an engineer maximizing the window, I want the activity-log lines to show full file paths, so I can read the whole `.s19tool/workarea/<project>/…` path instead of a 50-char stub.
 
 ---
 
 ## 3. Acceptance criteria (observable)
 
-- [ ] **AC-1 (kickoff shows activity):** When `_trigger_generate_report` starts a report, the system shall set the progress bar to an in-progress value (>0 and <100) before the worker completes.
-- [ ] **AC-2 (advances in the worker):** The `_start_generate_report_worker` shall drive `set_progress` (via `call_from_thread`) to a mid value before the heavy `generate_project_report` call.
-- [ ] **AC-3 (completes at 100):** When `_finish_generate_report` runs on success, the system shall set the progress bar to `100`.
-- [ ] **AC-4 (resets on failure):** When report generation is rejected (`ValueError`) or crashes (worker `except`), the system shall reset the progress bar to `0` — never leave it stuck mid-fill.
-- [ ] **AC-5 (no regression to load progress):** The load path's existing `set_progress(10/50/100)` behaviour is unchanged.
+**N1 — legend per-screen**
+- [ ] **AC-1:** When the Legend modal is opened from the **A2L** screen, it lists the **A2L** section rows and NOT the MAC / Issues / Hex sections.
+- [ ] **AC-2:** From the **MAC** screen → MAC only; from **Issues** → Issues only; from **Memory-Map** → Hex only.
+- [ ] **AC-3 (fallback, no regression):** From a screen with no single mapped section (e.g. Workspace / Flow / CRC-Designer), the Legend shows the full table (all four sections) — never an empty legend.
+- [ ] **AC-4 (frozen round-trip intact):** Every rendered legend row's `sev-*` class still comes from `color_policy.css_class_for_severity` / `COLOUR_SEVERITY` (the frozen `SEVERITY_CLASS_MAP` oracle is unchanged and only read).
+
+**N2 — log-line width**
+- [ ] **AC-5:** When a log message longer than 50 chars is appended at a **wide** viewport (e.g. 200×50), the stored/rendered log line contains the full message (untruncated up to the app width), not a 50-char stub.
+- [ ] **AC-6:** At a **narrow** viewport the line is still bounded (capped to the app width, with a sensible floor) — it never grows unbounded and never bisects a rendered escape (markup stays off).
 
 ---
 
 ## 4. Validation strategy
 
-Unit + `App.run_test()` Pilot in `tests/`. (a) **AC-1/AC-3/AC-4** unit-ish: instantiate `S19TuiApp`, mount, and call the three seams directly — a small `_set_report_progress(value)` helper (or the direct `set_progress` calls) — asserting `query_one("#progress_bar", ProgressBar).progress` after each; AC-4 asserts reset to 0 on the reject/crash paths. (b) **AC-2** driven: drive a real project report through the worker with a Pilot, `pilot.pause()` to completion, and assert the bar reached 100 (end state) — the worker's mid-drive is covered by the seam unit test (threads make the mid-value racy to observe live). (c) **AC-5** regression: the existing load tests stay green; a load still drives 10/50/100. Each AC maps to a named test; RED shown pre-fix (the report worker has no `set_progress` today → the bar stays at its prior value across a report). Manual smoke: generate a report, watch the bar move 0→100.
+`App.run_test()` Pilot + unit tests in `tests/`. **N1:** open the Legend from each screen (drive `action_show_legend` after `action_show_screen`), read the `LegendScreen`'s rendered `.legend-artifact` heading labels, and assert the set equals the expected section(s) (AC-1/2), the fallback shows all four (AC-3), and each `.legend-row` still carries a frozen `sev-*` class (AC-4). **N2:** append a >50-char path via `_append_log_line` at a wide size, assert the rendered `#log_line_4` label text contains the full path (AC-5); at a narrow size assert it is bounded to the width (AC-6). Each AC maps to a named test; RED shown pre-fix (today the legend renders all four sections from every screen, and `_append_log_line` clips at 50). Manual smoke: open the legend on A2L vs MAC; load a deep path and read the log tail maximized.
 
 ---
 
-## 5. Non-goals (OUT — carried to BACKLOG as N5 follow-ups)
+## 5. Non-goals (OUT)
 
-- **Before/after** and **diff** report progress, **CRC** compute progress, **A2L** enrichment/validation progress — same `set_progress` pattern, separate fast-flow follow-ups (kept out to hold this batch fast + ≤5 files).
-- A distinct **indeterminate** activity spinner / an "active vs idle" visual state for the bar — the bar is determinate; N5 drives it with discrete report steps (mirrors the load path's 10/50/100), not a new widget.
-- Re-homing the bar to idle after any op — the bar reflects the last op's terminal state (0 on failure, 100 on success), consistent with the load path.
-- No change to report content, the worker threading model, or load semantics.
+- No change to the legend **content/meanings** or the frozen `SEVERITY_CLASS_MAP` / `color_policy` (read-only).
+- No new legend widget or per-screen legend buttons — the single modal is reused, only its row set is filtered.
+- No redesign of the status bar layout; only the per-line character cap becomes width-aware.
+- Report/CRC/A2L **progress** indicators (N5 follow-ups) are unrelated and out.
 
 ---
 
@@ -64,7 +69,7 @@ Unit + `App.run_test()` Pilot in `tests/`. (a) **AC-1/AC-3/AC-4** unit-ish: inst
 
 **`security_required`:** `false`
 
-The change drives an existing progress widget from the existing report-generation call sites. No input surface, no external/network/secret path, no engine-frozen module. No pattern fires.
+Both changes are read-only presentation: filtering an existing modal's rows and widening an existing log-line cap. No input surface, no external/secret/network path. The log line keeps `markup=False` (the existing injection scrub) — widening the cap does not reintroduce a markup sink. Engine-frozen `color_policy.py` is read-only. No pattern fires.
 
 ---
 
@@ -76,32 +81,29 @@ The change drives an existing progress widget from the existing report-generatio
 | Started | 2026-07-23 |
 | Closed | - |
 | Promoted to /dev-flow | no |
-| Notes | Pivoted after the disk finding (§0): load already has progress; report-gen is the real gap. Before/after + diff + CRC + A2L carried. |
+| Notes | Two increments: Inc-1 N1 legend filter; Inc-2 N2 width-aware log cap. Base `5ec46b3`. |
 
 ---
 
 ## 8. Close (filled in phase C)
 
 ### What changed
-Report generation now drives the persistent `#progress_bar` (reusing the existing `set_progress`): kickoff `_trigger_generate_report` → 15; worker `_start_generate_report_worker` → 55 (via `call_from_thread`) before the heavy `generate_project_report`; success `_finish_generate_report` → 100; rejection (`ValueError`) or crash (worker `except`) → reset to 0. No new widget — the same determinate bar the load path uses. Load progress (10/50/100) is untouched.
+**N1:** `LegendScreen` now takes an optional `sections` filter; `action_show_legend` passes the active screen's `LEGEND_TABLE` section(s) via a new `_SCREEN_LEGEND_SECTIONS` map (A2L→A2L, MAC→MAC, Issues→Issues, Map/Patch/Diff→Hex, Checks→Issues), tracked by a new `_active_screen_key` set in `action_show_screen`. Unmapped screens (Workspace/Flow/CRC-Designer) fall back to the full table. **N2:** `_append_log_line` caps to `max(50, self.size.width)` instead of a fixed 50, so long paths use the full viewport span.
+
+### Honest scoping note
+N2's truncation was a **code cap** (`trimmed[:50]`), NOT a CSS width as the backlog guessed — `styles.tcss` needed no change (the `#workspace_status_bar` Labels already span full width).
 
 ### How it was tested
-`tests/test_report_progress.py` (4): AC-2/3 driven (real report through the report-seam surface → bar 100); AC-4 driven (monkeypatched `generate_project_report` raises → bar reset to 0, no crash); AC-1 (worker stubbed → kickoff leaves bar 0<p<100); AC-3 unit (`_finish_generate_report` → 100). RED-verified: with the success seam disabled the driven + unit tests fail (bar never reaches 100). Regression: `test_tui_report_seam.py` + `test_report_logging.py` (share the worker) green.
+`tests/test_legend_scope_and_logwidth.py` (5): N1 per-screen scope (a2l/mac/issues/map → exactly their section), N1 unmapped→full table, N1 rows keep frozen `sev-*` classes; N2 long path untruncated at 200-wide, N2 bounded at 80-wide. RED-verified (both fixes disabled → legend shows all four, path clips at 50). `test_tui_legend.py` (14) regression green.
 
 ### Open risks / pending
-- Report **before/after** + **diff**, **CRC** compute, **A2L** enrichment/validation still lack progress feedback — carried to BACKLOG as N5 follow-ups (same `set_progress` pattern).
-- The bar is determinate but the report has no true percent signal; 15/55/100 are coarse activity steps (mirrors the load path's 10/50/100), not a measured fraction.
+- The `_SCREEN_LEGEND_SECTIONS` map is a curated best-fit; if a screen's painted classes change, the map needs updating (a stale entry would mislead). Low risk — the 4 sections are stable.
+- `Checks` → `Issues` is a judgement call (checks render pass/fail severity); revisit if checks grow their own palette.
 
 ### Security flags — handling
-None fired (`security_required: false`) — a visibility drive of an existing widget from existing call sites.
+None fired (`security_required: false`). The log line keeps `markup=False`; a wider cap adds no markup sink. Frozen `color_policy` read-only.
 
 ### Suggested commit message
 ```
-feat(tui): drive #progress_bar during report generation (N5)
-
-Report generation was silent on the progress bar (only set_status); the
-off-thread worker left the bar at its prior value (e.g. 100 from the last
-load), reading as "done" while a report ran. Drive set_progress at the four
-report seams — kickoff 15, worker-mid 55, success 100, failure 0 — reusing
-the bar the load path already uses. Load progress unchanged.
+feat(tui): scope Legend to the active screen + width-aware log lines (N1, N2)
 ```
