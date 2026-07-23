@@ -2074,7 +2074,9 @@ def test_at051b_doc_kind_loud_status_capped_log_and_not_ok(
     assert "'change'" in status
     assert "(0 passed, 0 failed, 2 uncheckable)" in status
     assert any("Checks: not run" in line for line in outcomes["log_lines"])
-    assert all(len(line) <= 50 for line in outcomes["log_lines"])
+    # N2: the activity-log cap is width-aware (max(50, viewport width)); at this
+    # test's 120-col viewport a line may run to 120 chars (was a fixed 50).
+    assert all(len(line) <= 120 for line in outcomes["log_lines"])
     assert outcomes["ok"] is False
 
 
