@@ -24,6 +24,7 @@ BLOCK_SOURCE = "source"
 BLOCK_PATCH = "patch"
 BLOCK_WRITE_OUT = "write_out"
 BLOCK_CHECK = "check"
+BLOCK_CRC = "crc"
 
 #: WRITE-OUT emit formats — the ``save_patched_image`` ``source_kind`` values.
 WRITE_FMT_S19 = "s19"
@@ -144,8 +145,33 @@ class CheckBlock:
     kind: str = BLOCK_CHECK
 
 
-#: A tracer-slice block (open for CRC extension — ADR §7/§9).
-FlowBlock = Union[SourceBlock, PatchBlock, WriteOutBlock, CheckBlock]
+@dataclass(frozen=True)
+class CrcBlock:
+    """Finalization block — compute a CRC over the working (post-patch) image
+    and inject it, growing the image when the output window is outside the
+    loaded ranges (batch-52, ADR §7 "CRC-into-loop seam").
+
+    The block computes over the CURRENT threaded ``(mem_map, ranges)`` — i.e.
+    after all upstream PATCH mutations — via the shared CRC kernel
+    (``parse_crc_config`` → ``check_regions`` → ``inject_crcs``), then threads
+    the CRC-injected working image forward. A CRC positioned before any PATCH
+    (or in a flow with no PATCH) emits a non-blocking WARN (LLR-091.1).
+
+    Args:
+        config_ref (str): A PROJECT-RELATIVE CRC template-config filename
+            (a ``.s19tool/templates/`` JSON parsed by ``parse_crc_config``),
+            resolved against the project directory through the SAME manifest
+            containment guard the other refs use (never an absolute/escaping
+            path); an untrusted input — a malformed or unsafe ref fails the
+            block closed (LLR-092.1/.2).
+    """
+
+    config_ref: str
+    kind: str = BLOCK_CRC
+
+
+#: A tracer-slice block (SOURCE/PATCH/CHECK/WRITE-OUT + the batch-52 CRC block).
+FlowBlock = Union[SourceBlock, PatchBlock, WriteOutBlock, CheckBlock, CrcBlock]
 
 
 @dataclass(frozen=True)
@@ -222,8 +248,13 @@ class FlowRunResult:
             ``(start, end)`` address footprint — the ranges after the last
             block, used by the Direction-A memory ribbon (batch-51, LLR-088.4,
             §6.5 AMD-1). Empty when no image was ever loaded (an unresolvable
-            SOURCE). Additive per §6.3 R-6. A separate ``before`` footprint is a
-            batch-52 carry (CRC is the first range-growing block).
+            SOURCE). Additive per §6.3 R-6.
+        pre_crc_ranges (List[Tuple[int, int]]): The working image footprint
+            captured immediately BEFORE the first CRC growth — the "before"
+            side of the Direction-A twin ribbon (batch-52, LLR-094.1). Defaults
+            to (and equals) the SOURCE/post-patch footprint; when no CRC block
+            grows the image it equals ``image_ranges`` (before == after).
+            Additive; empty when no image was ever loaded.
     """
 
     status: str
@@ -231,3 +262,4 @@ class FlowRunResult:
     written_paths: List[Path] = field(default_factory=list)
     diagnostics: List[str] = field(default_factory=list)
     image_ranges: List[Tuple[int, int]] = field(default_factory=list)
+    pre_crc_ranges: List[Tuple[int, int]] = field(default_factory=list)
