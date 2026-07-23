@@ -2526,23 +2526,31 @@ _RIBBON_GAP = "░"     # ░ gap
 
 
 def _memory_ribbon_text(
-    ranges: Sequence[Tuple[int, int]], cells: int = _RIBBON_CELLS
+    ranges: Sequence[Tuple[int, int]],
+    cells: int = _RIBBON_CELLS,
+    window: Optional[Tuple[int, int]] = None,
 ) -> Text:
     """Render the working image's address footprint as a fixed-width strip.
 
     Summary:
-        Map ``[min_start, max_end)`` across ``cells`` columns; a column is filled
-        (mapped) when any range intersects it, else a gap. Pure + int-derived
-        (address integers only — NOT file text), so the strip is NOT a markup
-        sink and is deterministically unit-testable. Batch-51 renders a SINGLE
-        strip (§6.5 AMD-1): there is no range-growing block yet, so a "before"
-        row would be identical — the twin/before row is a batch-52 CRC carry.
+        Map ``[min_start, max_end)`` (or the explicit ``window``) across
+        ``cells`` columns; a column is filled (mapped) when any range intersects
+        it, else a gap. Pure + int-derived (address integers only — NOT file
+        text), so the strip is NOT a markup sink and is deterministically
+        unit-testable. Batch-52 (§6.5 AMD-1) renders a twin before/after pair
+        over a COMMON ``window`` (the grown extent) so the CRC-added window
+        shows as EXTRA filled cells on the after strip.
 
     Args:
         ranges (Sequence[Tuple[int, int]]): The image's ``(start, end)`` ranges
-            (``FlowRunResult.image_ranges``); empty when no image was loaded.
+            (``FlowRunResult.image_ranges`` / ``pre_crc_ranges``); empty when no
+            image was loaded.
         cells (int): The fixed cell budget (defaults to the measured
             ``_RIBBON_CELLS``).
+        window (Optional[Tuple[int, int]]): An explicit ``(low, high)`` address
+            axis to map across — used to render the before + after strips on a
+            SHARED axis so growth is visible. ``None`` derives the axis from
+            ``ranges`` (batch-51 single-strip behaviour, unchanged).
 
     Returns:
         Text: A ``Text`` of exactly ``cells`` block/gap glyphs, or an empty
@@ -2550,8 +2558,11 @@ def _memory_ribbon_text(
     """
     if not ranges or cells <= 0:
         return Text("")
-    low = min(start for start, _ in ranges)
-    high = max(end for _, end in ranges)
+    if window is not None:
+        low, high = window
+    else:
+        low = min(start for start, _ in ranges)
+        high = max(end for _, end in ranges)
     if high <= low:
         return Text(_RIBBON_FILLED * cells)
     span = high - low
@@ -2705,6 +2716,20 @@ class FlowBuilderPanel(ScrollableContainer):
             self._refresh_blocks()
             self.query_one("#flow_result", VerticalScroll).remove_children()
 
+    def on_mount(self) -> None:
+        # F3 (LLR-094.3): the per-block gating control is CHECK-only — hidden for
+        # SOURCE (default), PATCH, WRITE-OUT, and CRC.
+        self._sync_gating_visibility(str(self.query_one("#flow_kind", Select).value))
+
+    def on_select_changed(self, event: Select.Changed) -> None:
+        # Only the block-kind selector toggles the gating control's visibility.
+        if event.select.id == "flow_kind":
+            self._sync_gating_visibility(str(event.value))
+
+    def _sync_gating_visibility(self, kind: str) -> None:
+        """Show the gating control only for CHECK; hide it otherwise (F3)."""
+        self.query_one("#flow_gating", Select).display = kind == BLOCK_CHECK
+
     def render_result(self, result: FlowRunResult) -> None:
         """Paint the ``#flow_result`` pane as the Direction-A Pipeline Ledger.
 
@@ -2775,16 +2800,43 @@ class FlowBuilderPanel(ScrollableContainer):
             if position < len(blocks) - 1:
                 widgets.append(Static("", classes="flow-sep"))
 
+        # §6.5 AMD-1 twin ribbon (LLR-094.1/.2): when a CRC block grew the image
+        # (pre_crc_ranges differs from the final footprint), render a "before"
+        # strip over a COMMON axis so the CRC-added window shows as extra filled
+        # cells on the after strip. No growth → single strip (batch-51 behaviour,
+        # existing `.flow-ribbon` class + caption unchanged).
+        after_ranges = result.image_ranges
+        before_ranges = result.pre_crc_ranges
+        grown = bool(before_ranges) and list(before_ranges) != list(after_ranges)
+        if grown and after_ranges:
+            axis = (
+                min(start for start, _ in after_ranges),
+                max(end for _, end in after_ranges),
+            )
+            widgets.append(
+                Static(
+                    _memory_ribbon_text(before_ranges, window=axis),
+                    markup=False,
+                    classes="flow-ribbon-before sev-neutral",
+                )
+            )
+            widgets.append(
+                Static(
+                    "before: " + _ribbon_caption(before_ranges),
+                    markup=False,
+                    classes="flow-ribbon-before-cap sev-neutral",
+                )
+            )
         widgets.append(
             Static(
-                _memory_ribbon_text(result.image_ranges),
+                _memory_ribbon_text(after_ranges),
                 markup=False,
                 classes="flow-ribbon sev-info",
             )
         )
         widgets.append(
             Static(
-                _ribbon_caption(result.image_ranges),
+                (("after: " if grown else "") + _ribbon_caption(after_ranges)),
                 markup=False,
                 classes="flow-ribbon-cap sev-neutral",
             )
