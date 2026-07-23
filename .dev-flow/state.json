@@ -16,16 +16,40 @@
   "current_phase": 6,
   "phase_status": "approved",
   "blocker": "WEEKLY USAGE LIMIT HIT 2026-07-22 (resets ~5am America/Mexico_City). The Phase-1 architect fold subagent died to it. Phases 2-6 depend on subagents (architect/qa/security/software-dev/code-reviewer) that will keep failing until reset; the pool is shared with the main loop. PAUSED at the Phase-1 checkpoint (clean, artifacts persisted) pending operator direction / limit reset. Resume: Phase 2 cross-agent review off 01-requirements.md + 01b-qa-catalog.md.",
-  "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
+  "iterations_per_phase": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
+  },
   "artifacts": {
     "plan": ".dev-flow/2026-07-22-batch-52/PLAN.md",
     "1": ".dev-flow/2026-07-22-batch-52/01-requirements.md",
     "1b": ".dev-flow/2026-07-22-batch-52/01b-qa-catalog.md"
   },
   "decisions_log": [
-    {"phase": 0, "date": "2026-07-22", "decision": "kickoff", "notes": "batch-52 FB CRC block scaffolded off 6e64c48; autonomy end-to-end + self-merge granted; plan operator-approved as-is."},
-    {"phase": 1, "date": "2026-07-22", "decision": "approved (self, autonomy)", "notes": "01-requirements (architect: 6 US, 6 HLR, 19 LLR, AT-123-129, TC-346-361) + 01b-qa-catalog (qa: 11 AT, 14 TC) authored in parallel. Reconciled inline (architect fold subagent died to weekly limit): R-D1 this-doc ids authoritative (qa AT-130-140/TC-350-363 superseded; deviation from batch-56 precedent, recorded); R-D2 C-10 branch coverage folded onto AT-124/125; R-D3 field summary-not-message; R-D4 config_ref contained via _resolve_manifest_entry (flow block != standalone F-S-02); R-D5 fail-close ABORT vs ordering WARN split; R-D6 WARN substring 'CRC before PATCH'; R-D7 pre_crc_ranges captured before first CRC growth. Axis-check: Coverage OK (dual traceability complete), Certainty OK (all symbols disk-cited C-35; RED pre-state recorded), Evidence OK (file:line citations). Then HIT WEEKLY LIMIT -> paused before Phase 2."}
+    {
+      "phase": 0,
+      "date": "2026-07-22",
+      "decision": "kickoff",
+      "notes": "batch-52 FB CRC block scaffolded off 6e64c48; autonomy end-to-end + self-merge granted; plan operator-approved as-is."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-22",
+      "decision": "approved (self, autonomy)",
+      "notes": "01-requirements (architect: 6 US, 6 HLR, 19 LLR, AT-123-129, TC-346-361) + 01b-qa-catalog (qa: 11 AT, 14 TC) authored in parallel. Reconciled inline (architect fold subagent died to weekly limit): R-D1 this-doc ids authoritative (qa AT-130-140/TC-350-363 superseded; deviation from batch-56 precedent, recorded); R-D2 C-10 branch coverage folded onto AT-124/125; R-D3 field summary-not-message; R-D4 config_ref contained via _resolve_manifest_entry (flow block != standalone F-S-02); R-D5 fail-close ABORT vs ordering WARN split; R-D6 WARN substring 'CRC before PATCH'; R-D7 pre_crc_ranges captured before first CRC growth. Axis-check: Coverage OK (dual traceability complete), Certainty OK (all symbols disk-cited C-35; RED pre-state recorded), Evidence OK (file:line citations). Then HIT WEEKLY LIMIT -> paused before Phase 2."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-23",
+      "decision": "synced-to-obsidian",
+      "notes": "01 - Proyectos/s19_app/dev-flow-batches/2026-07-22-batch-52/ (+ pilot evidence refreshed d1d0285)"
+    }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-22T00:00:00Z"
 }
