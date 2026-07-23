@@ -3824,6 +3824,10 @@ class S19TuiApp(App):
             self.set_status("Report: no prior execution - running active scope...")
         else:
             self.set_status("Report: generating from last execution...")
+        # N5: drive the persistent #progress_bar so report generation shows
+        # visible activity (the worker is off-thread and otherwise silent on the
+        # bar). Kickoff → in-progress; worker mid → 55; success → 100; failure → 0.
+        self.set_progress(15)
         self._start_generate_report_worker(
             project_dir,
             variant_set,
@@ -3918,6 +3922,9 @@ class S19TuiApp(App):
                 declared_regions=tuple(declared_regions),
                 report_filter=report_filter,
             )
+            # N5: mid-progress before the heavy assembly (thread-safe via
+            # call_from_thread — set_progress touches the UI widget).
+            self.call_from_thread(self.set_progress, 55)
             report_path = generate_project_report(
                 project_dir, results, options, variant_set=variant_set
             )
@@ -3925,6 +3932,8 @@ class S19TuiApp(App):
             self._log_report_event(
                 "project", project_dir.name, "-", f"rejected: {exc}", ok=False
             )
+            # N5: reset the bar on a rejected report — never leave it mid-fill.
+            self.call_from_thread(self.set_progress, 0)
             self.call_from_thread(self.set_status, f"Report rejected: {exc}")
             return
         except Exception as exc:
@@ -3936,6 +3945,8 @@ class S19TuiApp(App):
                 f"failed: {type(exc).__name__}",
                 ok=False,
             )
+            # N5: reset the bar on a crashed report — never leave it mid-fill.
+            self.call_from_thread(self.set_progress, 0)
             self.call_from_thread(
                 self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
             )
@@ -4016,6 +4027,7 @@ class S19TuiApp(App):
                 - ``_start_generate_report_worker`` (via ``call_from_thread``)
         """
         self._last_execution = None
+        self.set_progress(100)  # N5: report complete — bar reaches 100.
         self.set_status(
             f"Report: {report_path.parent.name}/{report_path.name}"
         )

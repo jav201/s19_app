@@ -1,57 +1,58 @@
-# Quick Spec — s19_app · N3 Report-generation observability
+# Quick Spec — s19_app · N5 progress feedback for report generation
 
-> Minimal spec for `/fast-dev-flow`. Goal: capture what's needed in 5-10 minutes without IEEE 830 overhead.
-> **Hard rule:** acceptance criteria must be **observable** (input → verifiable output).
+> Minimal spec for `/fast-dev-flow`. Observable acceptance criteria only.
 
-- **Date:** 2026-07-21
-- **Batch:** n3-report-logging
+- **Date:** 2026-07-23
+- **Batch:** n5-progress-indicators
 - **Flow:** /fast-dev-flow
 - **Language:** English
-- **Run mode / merge:** autonomous end-to-end + self-merge (operator-granted this batch, per-batch only).
-- **Status:** Phase C — validating.
-- **Branch:** `fix/n3-report-logging` off `main` `9bb50f2` (post-#117, RC-1 verified HEAD == origin/main tip).
+- **Run mode / merge:** autonomous end-to-end + self-merge (operator-granted this batch, per-batch).
+- **Status:** CLOSED 2026-07-23. Report-gen progress shipped; load-progress finding recorded; before/after+diff+CRC+A2L carried.
+- **Branch:** `fix/n5-progress-indicators` off `main` `d1d0285` (RC-1 verified HEAD == origin/main tip).
+
+---
+
+## 0. Phase-A finding that reshaped this spec (honest scoping)
+
+The initial premise ("long-running actions have NO progress bar") is **partly false**: the file **load** path ALREADY drives a persistent `ProgressBar(id="progress_bar")` in `#workspace_status_bar` via `set_progress(10→50→100)` (`load_from_path` / load worker / error handler). A load `LoadingIndicator` would be **redundant**. The genuine gap is **report generation**: `_trigger_generate_report` → `_start_generate_report_worker` (`@work`, off-thread, genuinely slow) → `_finish_generate_report` use only `set_status` (text) and **never `set_progress`** — so the bar shows no activity during a report and sits at its last value (e.g. `100` left over from the previous load), reading as "done" while a report is actually running. N5 fills that gap by reusing the existing bar.
 
 ---
 
 ## 1. Objective (1 line)
 
-Make report generation observable: emit a structured log line (report kind · source artifact(s) · output path · success/failure) to `.s19tool/logs/s19tui.log` every time the app generates a project report, a before/after report, or a diff report — closing a confirmed fail-loud gap where these actions currently write **nothing** to the log.
+Drive the existing `#progress_bar` during **project-report generation** so a slow, off-thread report shows visible progress (start → done) and resets on failure — the user can tell a report is advancing and is never misled by a stale `100`.
 
 ---
 
 ## 2. User stories (Connextra)
 
-- As an engineer operating the TUI, I want every report I generate to leave a log entry (what kind, from what source, to what path, and whether it succeeded), so that I can audit and troubleshoot report activity from `s19tui.log` instead of guessing.
-- As a support/maintainer, I want a **failed** report generation to log its failure, so that a silent no-output is never indistinguishable from a success.
+- As an engineer generating a project report over many variants, I want the progress bar to move while the report is being built, so I know it is working and not hung.
+- As an engineer, I want a **failed** report to reset the bar (not leave it mid-fill), so the bar's state never lies about what happened.
 
 ---
 
 ## 3. Acceptance criteria (observable)
 
-> The app's file log is the rotating logger wired by `workspace.py::setup_logging` → `logging.getLogger("s19tui")` → `.s19tool/logs/s19tui.log`. "The log gains an entry" means that file's content, read back after the action.
-
-- [ ] **AC-1 (project report success):** When a project report is generated successfully (`generate_project_report` call site in `app.py`), the system shall append one log line to `s19tui.log` naming the report **kind** (project), the **source** (project name/dir), the **output path**, and a success marker.
-- [ ] **AC-2 (before/after report success):** When a before/after report is generated (`compose_before_after_report` call site), the system shall append a log line naming kind (before/after), source (before + after paths/names), output path, and success.
-- [ ] **AC-3 (diff report success):** When a diff report is generated (`generate_diff_report` / `generate_diff_report_html` call site), the system shall append a log line naming kind (diff), source, output path(s), and success.
-- [ ] **AC-4 (failure is logged, not silent):** When a report generation raises (e.g. `generate_project_report` throws `FileExistsError` on the 100-report same-second cap, or any emitter raises), the system shall append a log line at WARNING/ERROR level naming the kind, the source, and the failure — never leaving zero trace.
-- [ ] **AC-5 (metadata only — privacy constraint):** The logged lines shall contain only **metadata** (kind, source name/path, output path, outcome); they shall **not** contain report body content or memory/byte values. (Honors the emitters' original "no body in logs" design intent.)
-- [ ] **AC-6 (lands in the file):** The emitted lines shall reach the `s19tui.log` **file** (logged on the `"s19tui"` logger or a child such as `"s19tui.report"`), verifiable by reading the file — not merely a `getLogger(__name__)` call that never propagates to the file handler.
+- [ ] **AC-1 (kickoff shows activity):** When `_trigger_generate_report` starts a report, the system shall set the progress bar to an in-progress value (>0 and <100) before the worker completes.
+- [ ] **AC-2 (advances in the worker):** The `_start_generate_report_worker` shall drive `set_progress` (via `call_from_thread`) to a mid value before the heavy `generate_project_report` call.
+- [ ] **AC-3 (completes at 100):** When `_finish_generate_report` runs on success, the system shall set the progress bar to `100`.
+- [ ] **AC-4 (resets on failure):** When report generation is rejected (`ValueError`) or crashes (worker `except`), the system shall reset the progress bar to `0` — never leave it stuck mid-fill.
+- [ ] **AC-5 (no regression to load progress):** The load path's existing `set_progress(10/50/100)` behaviour is unchanged.
 
 ---
 
 ## 4. Validation strategy
 
-Unit/integration tests, headless, in `tests/`. The clean seam: a small formatting helper (e.g. `_report_log_fields(kind, sources, output_path, outcome) -> str`, or the log call routed through a `"s19tui.report"` child logger) that the three `app.py` call sites use. Tests wire a real logger via `setup_logging(tmp_path)` (or attach a `FileHandler` to `getLogger("s19tui")` against a temp `.s19tool/logs/s19tui.log`), invoke the logging path for each report kind + the failure path, then **read the log file back** and assert the expected metadata substrings are present (AC-1..4, AC-6) and that body/byte content is absent (AC-5). This is a black-box, output-then-consume assertion over the produced log file (C-12/C-31/C-32) — not a mock-was-called check. Manual smoke: launch `s19tui`, generate one report, `tail` `s19tui.log`, confirm the line.
+Unit + `App.run_test()` Pilot in `tests/`. (a) **AC-1/AC-3/AC-4** unit-ish: instantiate `S19TuiApp`, mount, and call the three seams directly — a small `_set_report_progress(value)` helper (or the direct `set_progress` calls) — asserting `query_one("#progress_bar", ProgressBar).progress` after each; AC-4 asserts reset to 0 on the reject/crash paths. (b) **AC-2** driven: drive a real project report through the worker with a Pilot, `pilot.pause()` to completion, and assert the bar reached 100 (end state) — the worker's mid-drive is covered by the seam unit test (threads make the mid-value racy to observe live). (c) **AC-5** regression: the existing load tests stay green; a load still drives 10/50/100. Each AC maps to a named test; RED shown pre-fix (the report worker has no `set_progress` today → the bar stays at its prior value across a report). Manual smoke: generate a report, watch the bar move 0→100.
 
 ---
 
-## 5. Non-goals (OUT)
+## 5. Non-goals (OUT — carried to BACKLOG as N5 follow-ups)
 
-- **No logging inside the pure emitter modules** (`report_service.py` / `diff_report_service.py` / `before_after_service.py`) — they are deliberately Textual-free, headless, and documented as "performs NO logging"; logging goes at the `app.py` orchestration call sites where the `"s19tui"` logger already lives. Keeps the pure/orchestration split intact.
-- No new log rotation / retention / format framework — reuse the existing `setup_logging` handler and the app's current `self.logger.info/…` convention.
-- No log-viewer UI, no surfacing these lines in the in-app task panel (that is N2/N5 territory).
-- No change to report content, filenames, or destinations.
-- Not touching the engine-frozen set (none of these targets are frozen).
+- **Before/after** and **diff** report progress, **CRC** compute progress, **A2L** enrichment/validation progress — same `set_progress` pattern, separate fast-flow follow-ups (kept out to hold this batch fast + ≤5 files).
+- A distinct **indeterminate** activity spinner / an "active vs idle" visual state for the bar — the bar is determinate; N5 drives it with discrete report steps (mirrors the load path's 10/50/100), not a new widget.
+- Re-homing the bar to idle after any op — the bar reflects the last op's terminal state (0 on failure, 100 on success), consistent with the load path.
+- No change to report content, the worker threading model, or load semantics.
 
 ---
 
@@ -59,17 +60,11 @@ Unit/integration tests, headless, in `tests/`. The clean seam: a small formattin
 
 > Scanned sections 1-4.
 
-- [ ] Auth / identity
-- [ ] Secrets / config
-- [ ] External integrations
-- [ ] Sensitive data (PII, payments, health, encryption)
-- [ ] Destructive DB
-- [ ] Input / attack surface
-- [ ] Network / exposure
+- [ ] Auth / identity · [ ] Secrets / config · [ ] External integrations · [ ] Sensitive data · [ ] Destructive DB · [ ] Input / attack surface · [ ] Network / exposure
 
 **`security_required`:** `false`
 
-**Note (not a flag, but a design constraint):** logging is an information-disclosure surface. AC-5 explicitly bounds the log to **metadata only** (no report body, no memory/byte values), preserving the emitters' original privacy intent. No auth/secret/PII/external/DB/network/input pattern fires → `security_required: false`, but the metadata-only bound is a hard acceptance criterion, not optional.
+The change drives an existing progress widget from the existing report-generation call sites. No input surface, no external/network/secret path, no engine-frozen module. No pattern fires.
 
 ---
 
@@ -77,45 +72,36 @@ Unit/integration tests, headless, in `tests/`. The clean seam: a small formattin
 
 | Field | Value |
 |-------|-------|
-| Current phase | C |
-| Started | 2026-07-21 |
-| Closed | - (pending full-suite green + merge) |
+| Current phase | A |
+| Started | 2026-07-23 |
+| Closed | - |
 | Promoted to /dev-flow | no |
-| Notes | 1 increment; app.py + tests/test_report_logging.py (2 files). Base `9bb50f2` post-#117. |
+| Notes | Pivoted after the disk finding (§0): load already has progress; report-gen is the real gap. Before/after + diff + CRC + A2L carried. |
 
 ---
 
 ## 8. Close (filled in phase C)
 
 ### What changed
-Report generation now leaves a structured, metadata-only trace in `.s19tool/logs/s19tui.log`. Added a pure module-level formatter `format_report_log_line(kind, source, output, outcome)` and an app method `S19TuiApp._log_report_event(...)` (INFO on success / WARNING on failure), wired at the three `app.py` orchestration call sites — the project-report worker (`_start_generate_report_worker`: success + `ValueError` reject + crash), `action_before_after_report` (success + refusal, previously fully silent), and the diff handler (`on_ab_diff_panel_report_requested`: md + html success + both refusals, previously fully silent). The thin path-only line in `_finish_generate_report` was replaced by the structured success line emitted in the worker (which has the project source in scope). No logging was added inside the pure emitter services — they stay Textual-free/headless by design (non-goal honored).
-
-### Finding (honest scoping correction)
-The backlog framed this as "`report_service.py` has ZERO logger calls" — true for the pure service module, but the **project-report app call site already logged** (thinly: path-only success + a crash `logger.exception`). The genuinely silent surfaces were **before/after** and **diff** (zero logging, incl. their refusal branches) and the project **reject** (`ValueError`) branch. N3 enriches the project line and closes the silent surfaces.
+Report generation now drives the persistent `#progress_bar` (reusing the existing `set_progress`): kickoff `_trigger_generate_report` → 15; worker `_start_generate_report_worker` → 55 (via `call_from_thread`) before the heavy `generate_project_report`; success `_finish_generate_report` → 100; rejection (`ValueError`) or crash (worker `except`) → reset to 0. No new widget — the same determinate bar the load path uses. Load progress (10/50/100) is untouched.
 
 ### How it was tested
-`tests/test_report_logging.py` (6 tests, all green; full suite re-run in Phase C):
-- `test_format_report_log_line_names_all_four_fields` / `_is_metadata_only` — AC-1/2/3 format + AC-5.
-- `test_log_report_event_success_is_info` / `_failure_is_warning` — AC-1..4 level routing on the real method.
-- `test_report_line_reaches_s19tui_log_file` — AC-6, line lands in `s19tui.log` via `setup_logging`.
-- `test_before_after_report_generation_logs_to_file` — **driven gold-standard AT**: boots the real app (`base_dir=tmp_path`), drives the `b` before/after action, reads the produced `s19tui.log`, asserts the `report kind=before-after … outcome=ok` line and NO entry-byte leak (AC-2+AC-5+AC-6). **RED verified**: with the before/after log call disabled the driven AT fails (no `report kind=` line) — the test has teeth.
-- Regression: `test_before_after_report.py` + `test_report_service.py` (60 green), `test_tui_diff_screen.py` + `test_diff_report_service.py` + `test_tui_diff_compare_realpath.py` + `test_tui_app.py` (113 passed / 1 xfailed).
+`tests/test_report_progress.py` (4): AC-2/3 driven (real report through the report-seam surface → bar 100); AC-4 driven (monkeypatched `generate_project_report` raises → bar reset to 0, no crash); AC-1 (worker stubbed → kickoff leaves bar 0<p<100); AC-3 unit (`_finish_generate_report` → 100). RED-verified: with the success seam disabled the driven + unit tests fail (bar never reaches 100). Regression: `test_tui_report_seam.py` + `test_report_logging.py` (share the worker) green.
 
 ### Open risks / pending
-- **AC-1 (project) and AC-3 (diff) are not driven end-to-end through the app** — covered by the pure formatter + level-routing + file-landing tests, and the call sites are straight-line. A follow-up could add driven ATs for the project + diff report kinds (mirror the before/after driven AT). Low risk (mechanism proven; call sites trivial).
-- Diff `source` is the project/destination name (the diff has no single file source); acceptable metadata.
+- Report **before/after** + **diff**, **CRC** compute, **A2L** enrichment/validation still lack progress feedback — carried to BACKLOG as N5 follow-ups (same `set_progress` pattern).
+- The bar is determinate but the report has no true percent signal; 15/55/100 are coarse activity steps (mirrors the load path's 10/50/100), not a measured fraction.
 
 ### Security flags — handling
-`security_required: false`. The metadata-only bound (AC-5) is enforced structurally (the formatter interpolates only its four given fields; callers pass names/paths, never bodies) and asserted by `_is_metadata_only` + the driven AT's `"AA BB"`-absence check.
+None fired (`security_required: false`) — a visibility drive of an existing widget from existing call sites.
 
 ### Suggested commit message
 ```
-fix(tui): log report generation to s19tui.log (N3 observability)
+feat(tui): drive #progress_bar during report generation (N5)
 
-Report generation left no trace in the log: before/after and diff reports
-logged nothing (incl. their refusal branches) and the project report logged
-only a thin path-only success line + crash. Add format_report_log_line() +
-S19TuiApp._log_report_event() (INFO ok / WARNING fail), wired at the three
-app.py call sites, emitting a metadata-only line (kind, source, output,
-outcome). Pure emitter services stay no-logging by design.
+Report generation was silent on the progress bar (only set_status); the
+off-thread worker left the bar at its prior value (e.g. 100 from the last
+load), reading as "done" while a report ran. Drive set_progress at the four
+report seams — kickoff 15, worker-mid 55, success 100, failure 0 — reusing
+the bar the load path already uses. Load progress unchanged.
 ```
