@@ -104,6 +104,7 @@ from ..range_index import address_in_sorted_ranges, build_sorted_range_index
 from .services.entropy_service import EntropyWindow
 from .services.flow_model import (
     BLOCK_CHECK,
+    BLOCK_CRC,
     BLOCK_PATCH,
     BLOCK_SOURCE,
     BLOCK_STATUS_ERROR,
@@ -117,6 +118,7 @@ from .services.flow_model import (
     FLOW_STATUS_ISSUES,
     FLOW_STATUS_OK,
     CheckBlock,
+    CrcBlock,
     Flow,
     FlowBlock,
     FlowRunResult,
@@ -2449,6 +2451,8 @@ def _make_flow_block(
         return CheckBlock(ref, gating=gating)
     if kind == BLOCK_WRITE_OUT:
         return WriteOutBlock(ref)
+    if kind == BLOCK_CRC:
+        return CrcBlock(ref)
     return None
 
 
@@ -2462,6 +2466,8 @@ def _flow_block_label(block: FlowBlock) -> str:
         return f"CHECK  {block.check_doc_ref}  ({block.gating})"
     if isinstance(block, WriteOutBlock):
         return f"WRITE-OUT  {block.output_name}  ({block.fmt})"
+    if isinstance(block, CrcBlock):
+        return f"CRC  {block.config_ref}"
     return "?"
 
 
@@ -2604,6 +2610,7 @@ class FlowBuilderPanel(ScrollableContainer):
         ("Load (image)", BLOCK_SOURCE),
         ("Patch (change doc)", BLOCK_PATCH),
         ("Check (address list)", BLOCK_CHECK),
+        ("CRC (template)", BLOCK_CRC),
         ("Write-out (file)", BLOCK_WRITE_OUT),
     ]
 
