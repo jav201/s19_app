@@ -17,6 +17,7 @@ from textual.widgets import (
     DataTable,
     Footer,
     Header,
+    HelpPanel,
     Input,
     Label,
     ListItem,
@@ -5493,6 +5494,37 @@ class S19TuiApp(App):
             # checks state changes only on run/undo/redo, so no load hook.
             self.update_checks_view()
 
+    def action_show_help_panel(self) -> None:
+        """
+        Summary:
+            Toggle Textual's built-in help panel (N6). The footer-visible ``?``
+            binding routes here (its action name stays ``show_help_panel`` so the
+            discoverability contract — key/label/visibility — is unchanged). The
+            stock ``App.action_show_help_panel`` only MOUNTS the panel, leaving no
+            keyboard way to dismiss it; this override makes ``?`` an on/off toggle:
+            press once to show, press again to hide.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Query the mounted ``HelpPanel``; if present, delegate to the stock
+              ``action_hide_help_panel`` (removes it), otherwise to the stock
+              ``super().action_show_help_panel`` (mounts it). No panel state is
+              re-implemented here.
+
+        Dependencies:
+            Uses:
+                - ``HelpPanel`` (presence probe)
+                - ``App.action_show_help_panel`` / ``App.action_hide_help_panel``
+            Used by:
+                - The ``question_mark`` key binding
+        """
+        if self.query(HelpPanel):
+            self.action_hide_help_panel()
+        else:
+            super().action_show_help_panel()
+
     def action_show_legend(self) -> None:
         """
         Summary:
@@ -6911,6 +6943,11 @@ class S19TuiApp(App):
         else:
             self.logger.info("A2L view refresh complete: path=%s elapsed_seconds=%.3f", copied, view_elapsed)
         self.update_project_labels()
+        # N7: the standalone A2L load path mutates current_file.a2l_path but,
+        # unlike the merge path (_apply_loaded_file), never redrew the top
+        # "Loaded" panel — so the A2L filename only appeared after a screen
+        # switch. Refresh it here (C-15.1: the only orphaned load site).
+        self._refresh_loaded_panel()
         self.set_progress(100, f"Loaded {copied.name}")
         self.set_status(f"A2L loaded: {copied.name}")
         self.logger.info("DBG H5 load_a2l_from_path reached completion: path=%s", copied)

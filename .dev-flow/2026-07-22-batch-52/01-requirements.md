@@ -511,4 +511,17 @@ See §1.3. Additionally: **pre_crc_ranges** — a new additive `FlowRunResult` f
 
 ### 6.5 Requirement amendments (Before / After · Deleted / New)
 
-*(Empty at draft. Any Phase-3 spec amendment or Phase-4 iterate-to-refine change is recorded here as a Before → After block with the parent-HLR re-read result and the re-derived TC/AT.)*
+**None — no locked requirement was amended, deleted, or added in this batch.**
+
+The Phase-3 shared-axis ribbon decision (rendering before+after over a COMMON
+48-cell `window` so "after cells > before cells" holds under growth) was an
+**implementation detail of LLR-094.1**, not a requirement change — recorded as a
+design note in `PLAN.md` (2026-07-23) and `05-postmortem.md`, both of which state
+"§6.5 stays empty — no locked requirement changed". The `AMD-1` references
+elsewhere in this file point to **batch-51's** `image_ranges`-ribbon amendment
+(carried forward as context), not a batch-52 amendment.
+
+*(Filled 2026-07-23 during the N6/N7 fast-flow: the artifact-completeness
+pre-commit hook flags a section left with only template guidance; this records
+the already-documented fact that batch-52 had no amendment. No requirement
+content changed — batch-52 is merged.)*
