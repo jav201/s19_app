@@ -1438,6 +1438,9 @@ class S19TuiApp(App):
         self.workarea = ensure_workarea(self.base_dir)
         self.load_path = load_path
         self.log_lines = deque(maxlen=4)
+        # N1: the active rail screen, so the Legend modal can scope its rows to
+        # what THIS screen paints (updated by ``action_show_screen``).
+        self._active_screen_key: str = "workspace"
         self._a2l_cache_key: Optional[tuple[str, int, int]] = None
         self._a2l_cache_data: Optional[dict[str, Any]] = None
         self._a2l_enriched_tags: list[dict[str, Any]] = []
@@ -5365,6 +5368,22 @@ class S19TuiApp(App):
         "crc_designer": "screen_crc_designer",
     }
 
+    #: N1: which ``legend.LEGEND_TABLE`` section(s) each rail screen actually
+    #: paints, so the Legend modal shows only those rows. A screen absent here
+    #: (Workspace / Flow / CRC-Designer) falls back to the FULL table (AC-3) —
+    #: never an empty legend. The section keys are LEGEND_TABLE artifact keys
+    #: (``A2L`` / ``MAC`` / ``Issues`` / ``Hex``); the row colours still
+    #: round-trip through the frozen ``SEVERITY_CLASS_MAP`` (read-only).
+    _SCREEN_LEGEND_SECTIONS: Dict[str, tuple[str, ...]] = {
+        "a2l": ("A2L",),
+        "mac": ("MAC",),
+        "issues": ("Issues",),
+        "map": ("Hex",),
+        "patch": ("Hex",),
+        "diff": ("Hex",),
+        "checks": ("Issues",),
+    }
+
     #: One extra command-palette command outside ``BINDINGS``: the viewer
     #: page-size settings menu lost its ``#view_bar`` trigger in increment 2
     #: (G-1) — it is resurfaced here so it stays keyboard-reachable (C-9).
@@ -5454,6 +5473,7 @@ class S19TuiApp(App):
         """
         if screen_key not in self.SCREEN_CONTAINER_IDS:
             return
+        self._active_screen_key = screen_key  # N1: track for the Legend scope.
         target_id = self.SCREEN_CONTAINER_IDS[screen_key]
         for container_id in self.SCREEN_CONTAINER_IDS.values():
             container = self.query_one(f"#{container_id}")
@@ -5496,7 +5516,10 @@ class S19TuiApp(App):
                 - The ``k`` key binding
                 - ``on_button_pressed`` (the MAC / Issues Legend buttons)
         """
-        self.push_screen(LegendScreen())
+        # N1: scope the legend to the active screen's section(s); a screen with
+        # no mapped section falls back to the full table (AC-3).
+        sections = self._SCREEN_LEGEND_SECTIONS.get(self._active_screen_key)
+        self.push_screen(LegendScreen(sections=sections))
 
     # Screens that own both real content and an `EmptyStatePanel`; the panel
     # is shown only while no file is loaded (LLR-002.3). Each tuple is the
@@ -11244,7 +11267,13 @@ class S19TuiApp(App):
         trimmed = message.strip()
         if not trimmed:
             return
-        line = trimmed[:50]
+        # N2: cap width-aware so long `.s19tool/workarea/…` paths are readable at
+        # fullscreen (was a fixed 50 that clipped every path). Floor of 50 keeps
+        # the narrow-viewport minimum; `self.size.width` is 0 before mount ->
+        # max() falls back to the floor. markup stays off at construction, so a
+        # wider cap reintroduces no markup sink.
+        cap = max(50, getattr(self.size, "width", 0))
+        line = trimmed[:cap]
         self.log_lines.append(line)
         self._render_log_lines()
 

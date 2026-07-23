@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Mapping, Optional, Tuple
+from typing import TYPE_CHECKING, List, Mapping, Optional, Sequence, Tuple
 
 from rich.markup import escape as escape_markup
 from textual import work
@@ -779,9 +779,23 @@ class LegendScreen(ModalScreen[None]):
             - tests/test_tui_legend.py
     """
 
+    def __init__(self, sections: Optional[Sequence[str]] = None) -> None:
+        """Optionally scope the legend to a subset of ``LEGEND_TABLE`` sections.
+
+        Args:
+            sections (Optional[Sequence[str]]): The ``LEGEND_TABLE`` artifact
+                keys to show (e.g. ``("A2L",)``). ``None`` (the default) shows
+                every section — the batch-51 behaviour and the N1 fallback for a
+                screen with no single mapped section (AC-3).
+        """
+        super().__init__()
+        self._sections = tuple(sections) if sections is not None else None
+
     def compose(self) -> ComposeResult:
         rows: List[Label] = []
         for artifact, table in LEGEND_TABLE.items():
+            if self._sections is not None and artifact not in self._sections:
+                continue
             rows.append(Label(artifact, classes="legend-artifact"))
             for classification, (colour, meaning) in table.items():
                 severity = COLOUR_SEVERITY.get(colour)
