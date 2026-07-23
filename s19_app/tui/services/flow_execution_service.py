@@ -51,6 +51,7 @@ from .flow_model import (
     WRITE_FMT_S19,
     BlockResult,
     CheckBlock,
+    CrcBlock,
     Finding,
     Flow,
     FlowContext,
@@ -61,6 +62,9 @@ from .flow_model import (
 )
 from .load_service import build_loaded_hex, build_loaded_s19
 from .variant_execution_service import _resolve_manifest_entry
+from ..operations.crc import check_regions, inject_crcs
+from ..operations.crc_config import parse_crc_config
+from ..operations.model import OperationInput
 
 
 def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
@@ -282,6 +286,94 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
                     continue
 
+            elif isinstance(block, CrcBlock):
+                # LLR-089.2..092.3: compute a CRC over the CURRENT (post-patch)
+                # threaded image via the shared kernel, inject it, and thread the
+                # (possibly grown) working image forward. A malformed/unsafe
+                # config fails the block CLOSED (aborts); a CRC before any PATCH
+                # is a non-blocking WARN. crc.py is reused verbatim, never edited.
+                if mem_map is None or ranges is None:
+                    aborted = _record_error(
+                        result, index, kind, "no image", [],
+                        "crc block has no upstream image",
+                    )
+                    continue
+                issues = []
+                path = _resolve_manifest_entry(
+                    ctx.project_dir, block.config_ref,
+                    "CrcBlock.config_ref", issues,
+                )
+                if path is None or not path.exists():
+                    # LLR-092.1: containment reject (absolute/escape/reparse) or
+                    # a missing target — fail closed BEFORE opening any file.
+                    aborted = _record_error(
+                        result, index, kind, "config unresolved", issues,
+                        "crc config not found or not inside the project",
+                    )
+                    continue
+                config, config_errors = parse_crc_config(
+                    path.read_text(encoding="utf-8")
+                )
+                if config is None or config_errors:
+                    # LLR-092.2: malformed config → error, image un-injected.
+                    aborted = _record_error(
+                        result, index, kind, "config malformed", [],
+                        "crc config invalid: "
+                        + "; ".join(config_errors[:3]),
+                    )
+                    continue
+                # LLR-094.1: capture the pre-CRC footprint ONCE, before the first
+                # growth (PATCH mutates in place and never grows, so this is the
+                # SOURCE/post-patch footprint).
+                if not result.pre_crc_ranges:
+                    result.pre_crc_ranges = [
+                        (int(start), int(end)) for start, end in ranges
+                    ]
+                op_input = OperationInput(
+                    mem_map=mem_map,
+                    ranges=list(ranges),
+                    input_path=None,
+                    variant_id=None,
+                    file_type=WRITE_FMT_S19,
+                )
+                crc_regions = check_regions(op_input, config)
+                # LLR-089.3 / LLR-090.1: inject_crcs builds a WORKING COPY (never
+                # mutates the input map/ranges) and grows ranges via
+                # _extend_ranges; reassign the threaded image to it.
+                mem_map, ranges, written_regions = inject_crcs(
+                    op_input, crc_regions
+                )
+                injected = len(written_regions)
+                # LLR-091.1: a CRC before any PATCH (or a flow with no PATCH) →
+                # non-blocking WARN + notices; `aborted` stays unset.
+                patch_indices = [
+                    i for i, b in enumerate(flow.blocks)
+                    if isinstance(b, PatchBlock)
+                ]
+                crc_before_patch = (
+                    not patch_indices or index < min(patch_indices)
+                )
+                summary = (
+                    f"injected {injected} CRC region"
+                    f"{'' if injected == 1 else 's'}"
+                )
+                if crc_before_patch:
+                    crc_block = BlockResult(
+                        index, kind, BLOCK_STATUS_NOTICES, summary
+                    )
+                    crc_block.findings.append(
+                        Finding(
+                            FINDING_WARN,
+                            "CRC before PATCH: the image is finalized before "
+                            "any patch is applied",
+                        )
+                    )
+                    result.block_results.append(crc_block)
+                else:
+                    result.block_results.append(
+                        BlockResult(index, kind, BLOCK_STATUS_OK, summary)
+                    )
+
             else:  # pragma: no cover - guards an unknown block kind
                 aborted = _record_error(
                     result, index, kind, "unknown block", [],
@@ -314,6 +406,10 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     # the batch-52 CRC block first grows the image.
     if ranges is not None:
         result.image_ranges = [(int(start), int(end)) for start, end in ranges]
+    # LLR-094.1: when no CRC block ran, the "before" ribbon equals the "after"
+    # (no growth) — default pre_crc_ranges to the final footprint.
+    if not result.pre_crc_ranges:
+        result.pre_crc_ranges = list(result.image_ranges)
     return result
 
 
