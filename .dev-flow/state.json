@@ -13,7 +13,7 @@
     "operator_phrasing": "Q (b52 autonomy, plan shown first): 'Autonomo end-to-end + self-merge'; 'Arranca con el plan tal cual'. Preceded by 'continue to the next phase'.",
     "decision_recording_ack": "Every un-asked decision (gate self-approvals, design-default adoptions, review-fold rulings) is logged in PLAN.md decision log + state.json.decisions_log + 05-postmortem.md, carried to the vault at /dev-flow-sync."
   },
-  "current_phase": 1,
+  "current_phase": 6,
   "phase_status": "approved",
   "blocker": "WEEKLY USAGE LIMIT HIT 2026-07-22 (resets ~5am America/Mexico_City). The Phase-1 architect fold subagent died to it. Phases 2-6 depend on subagents (architect/qa/security/software-dev/code-reviewer) that will keep failing until reset; the pool is shared with the main loop. PAUSED at the Phase-1 checkpoint (clean, artifacts persisted) pending operator direction / limit reset. Resume: Phase 2 cross-agent review off 01-requirements.md + 01b-qa-catalog.md.",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},

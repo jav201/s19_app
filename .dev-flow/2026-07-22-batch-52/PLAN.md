@@ -41,7 +41,15 @@ Engine-frozen set OFF-LIMITS (none of the targets are frozen); ≤5 files/increm
 FB-P1 flow.json persistence (batch-53); FB-P2 PKI extraction (BLOCKED, operator-defining); FB-P3 CRC-as-subflow; multi-image scope. CRC-as-single-block here, not decomposed.
 
 ## Test ledger
-base (post-6e64c48) = TBD (Phase-3 Inc-1 captures). Signed balance per gate.
+- Inc-1 (engine): `tests/test_flow_crc_block.py` 12 · Inc-2 (UI): `tests/test_flow_crc_ui.py` 2 · Inc-3 (ribbon/F3/G-1): `tests/test_flow_crc_ribbon.py` 5 = **19 new**, all green. Combined flow+crc suite = 53 green. RED-verified: Inc-1 inject-threading, Inc-3 twin-ribbon. crc.py/crc_config.py diff-vs-main empty (frozen-safe).
+
+## Phase-3 status (2026-07-23, resumed from the Phase-1 checkpoint 80c8be3)
+- **Inc-1 DONE** `3022abd` — CrcBlock + BLOCK_CRC + pre_crc_ranges (flow_model); CRC branch in run_flow (compute→inject→thread, ordering WARN, fail-close). AT-123/124/125/126/127 + TC-346/347/351.
+- **Inc-2 DONE** `ba9e138` — CRC in `_KIND_OPTIONS` + `_make_flow_block` + `_flow_block_label`. AT-128 + TC-356.
+- **Inc-3 DONE** `71c7f13` — twin ribbon (shared-axis `window`), F3 gating-hide (on_mount/on_select_changed), G-1. AT-129 + TC-358/360/361.
 
 ## Decision log
 - 2026-07-22 · Phase 0 kickoff · autonomy end-to-end + self-merge; plan approved as-is; batch-id 2026-07-22-batch-52 (free dir, FB stream).
+- 2026-07-22 · Phase 1 · requirements + qa-catalog authored + reconciled (R-D1..D7); paused (weekly limit) before Phase 2.
+- 2026-07-23 · Phase 2 · review + security gate PASS (inline, C-33); all spec anchors disk-verified accurate; `_resolve_manifest_entry` reuse confirms containment posture.
+- 2026-07-23 · Phase 3 · **DESIGN NOTE (no requirement change):** the ribbon maps [low,high) across a FIXED 48 cells, so per-strip normalisation would REDUCE filled cells on growth. Resolved by rendering before+after over a COMMON axis (additive `window` param) so "after cells > before cells" (LLR-094.2 threshold) holds as intended. Implementation detail of LLR-094.1; §6.5 stays empty. AT-124b uses a patch at 0x1003 (in-region) so the no-grow config output at 0x1000 stays in-range.
