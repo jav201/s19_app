@@ -12,6 +12,7 @@ from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer
 from textual.message import Message
 from textual.screen import ModalScreen
+from textual.widget import Widget
 from textual.widgets import (
     Button,
     Input,
@@ -30,7 +31,18 @@ from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .os_clipboard_input import OsClipboardInput
-from .legend import COLOUR_SEVERITY, LEGEND_TABLE
+from .legend import (
+    BAND_DOMAIN_NOTE,
+    BAND_GAP_HATCH_NOTE,
+    COLOUR_SEVERITY,
+    LEGEND_EXAMPLES,
+    LEGEND_TABLE,
+    ROLE_CAPTION,
+    ROLE_LINE,
+    ROLE_SUB,
+    ROLE_WARNING_SAMPLE,
+    build_band_key_rows,
+)
 from .models import LoadedFile
 from .operations.crc import CrcWriteResult, inject_crcs, write_crc_image
 from .operations.crc_config import (
@@ -747,8 +759,25 @@ class SelectVariantScreen(ModalScreen[Optional[str]]):
             self.dismiss(variant_id)
 
 
+#: N8 — map a :class:`~s19_app.tui.legend.LegendLine` role to its card CSS class
+#: (``legend-card-*``, defined in ``styles.tcss`` Inc-3 — weight/dim only, never a
+#: ``sev-*``/``band-*`` colour, LLR-N8-6.2). ``ROLE_WARNING_SAMPLE`` is rendered
+#: separately (painted inline orange + tagged ``#legend_mac_warning_sample``).
+_CARD_ROLE_CLASS: dict[str, str] = {
+    ROLE_SUB: "legend-card-sub",
+    ROLE_LINE: "legend-card-line",
+    ROLE_CAPTION: "legend-card-caption",
+}
+
+#: The Rich style the MAC DataTable paints a WARNING row with, kept in sync with
+#: ``app._SEVERITY_TO_RICH_STYLE[ValidationSeverity.WARNING]`` (``"orange3"``);
+#: not imported (``app`` imports this module). AT-N8-07 couples the painted
+#: segment to app's live value, so a divergence goes RED (AMD-7).
+_MAC_WARNING_SAMPLE_STYLE = "orange3"
+
+
 class LegendScreen(ModalScreen[None]):
-    """Read-only classification-legend modal (HLR-023 / LLR-023.1).
+    """Read-only classification-legend modal (HLR-023 / LLR-023.1; N8 cards).
 
     Summary:
         Renders every :data:`s19_app.tui.legend.LEGEND_TABLE` row — one
@@ -779,20 +808,123 @@ class LegendScreen(ModalScreen[None]):
             - tests/test_tui_legend.py
     """
 
-    def __init__(self, sections: Optional[Sequence[str]] = None) -> None:
-        """Optionally scope the legend to a subset of ``LEGEND_TABLE`` sections.
+    def __init__(
+        self,
+        sections: Optional[Sequence[str]] = None,
+        view_key: Optional[str] = None,
+    ) -> None:
+        """Scope the legend to a screen's section(s) and per-view example card.
 
         Args:
             sections (Optional[Sequence[str]]): The ``LEGEND_TABLE`` artifact
-                keys to show (e.g. ``("A2L",)``). ``None`` (the default) shows
-                every section — the batch-51 behaviour and the N1 fallback for a
-                screen with no single mapped section (AC-3).
+                keys to show (e.g. ``("A2L",)``). ``None`` shows every section
+                (the batch-51 behaviour / N1 full-table fallback for a screen
+                with no mapped section, AC-3); ``()`` shows none (an
+                example-only view such as Workspace — N8 LLR-N8-1.2).
+            view_key (Optional[str]): The active screen key (``workspace`` /
+                ``a2l`` / ``map`` / ``mac`` / ``issues``) selecting the N8
+                example card and the key type (band key for ``map``). ``None``
+                preserves the exact pre-N8 render (no card).
         """
         super().__init__()
         self._sections = tuple(sections) if sections is not None else None
+        self._view_key = view_key
 
-    def compose(self) -> ComposeResult:
-        rows: List[Label] = []
+    def _render_card(self) -> List[Static]:
+        """
+        Summary:
+            Render the N8 per-view annotated example card — the ``LegendLine``
+            rows in :data:`LEGEND_EXAMPLES` for ``self._view_key`` — as
+            ``Static`` widgets (so long lines wrap, HLR-N8-6), each classed by
+            its role. The ``warning_sample`` row is painted inline orange and
+            tagged ``#legend_mac_warning_sample`` (AMD-7/AMD-11). Returns ``[]``
+            when the view has no card (``view_key`` is ``None`` or unmapped).
+
+        Returns:
+            List[Static]: the ordered card widgets, or ``[]``.
+
+        Data Flow:
+            - Reads ``LEGEND_EXAMPLES`` (legend.py, static author data);
+              markup-bearing lines carry pre-escaped literal brackets (TC-N8-11).
+            - Consumed by :meth:`compose`, placed above the colour/band key.
+
+        Dependencies:
+            Uses:
+                - LEGEND_EXAMPLES / ROLE_WARNING_SAMPLE / _CARD_ROLE_CLASS
+                - rich.markup.escape (warning-sample content)
+            Used by:
+                - LegendScreen.compose
+        """
+        card = LEGEND_EXAMPLES.get(self._view_key) if self._view_key else None
+        if not card:
+            return []
+        widgets: List[Static] = []
+        for line in card:
+            if line.role == ROLE_WARNING_SAMPLE:
+                widgets.append(
+                    Static(
+                        f"[{_MAC_WARNING_SAMPLE_STYLE}]"
+                        f"{escape_markup(line.text)}[/]",
+                        id="legend_mac_warning_sample",
+                        classes="legend-card-line",
+                    )
+                )
+            else:
+                widgets.append(
+                    Static(
+                        line.text,
+                        classes=_CARD_ROLE_CLASS.get(line.role, "legend-card-line"),
+                    )
+                )
+        return widgets
+
+    def _render_key(self) -> List[Widget]:
+        """
+        Summary:
+            Render the colour/band key below the card. For ``view_key == "map"``
+            this is the entropy band key derived from ``ENTROPY_BANDS`` via
+            ``build_band_key_rows`` (``band-*`` classes — an entropy domain,
+            LLR-N8-3.2), rendered ``markup=False`` since each range reads
+            ``[lo,hi)`` (a literal bracket). For every other view it is the
+            ``LEGEND_TABLE`` severity key filtered by ``self._sections`` and
+            painted through ``css_class_for_severity`` — the pre-N8 rows, now
+            ``Static`` so long meanings wrap instead of truncating (HLR-N8-6).
+
+        Returns:
+            List[Widget]: artifact-header + classification/band rows; possibly
+            empty (an example-only view passed ``sections=()``).
+
+        Data Flow:
+            - Reads ``LEGEND_TABLE`` + ``COLOUR_SEVERITY`` and, for the map,
+              ``build_band_key_rows``; colours via ``css_class_for_severity``.
+            - Consumed by :meth:`compose`, placed below the example card.
+
+        Dependencies:
+            Uses:
+                - LEGEND_TABLE / COLOUR_SEVERITY / css_class_for_severity
+                - build_band_key_rows / BAND_GAP_HATCH_NOTE / BAND_DOMAIN_NOTE
+            Used by:
+                - LegendScreen.compose
+        """
+        if self._view_key == "map":
+            rows: List[Widget] = [
+                Label("Entropy bands", classes="legend-artifact")
+            ]
+            for band in build_band_key_rows():
+                rows.append(
+                    Static(
+                        f"{band.glyph}  {band.label}  {band.range_text} — "
+                        f"{band.meaning}",
+                        markup=False,
+                        classes=f"legend-row {band.css_class}".strip(),
+                    )
+                )
+            rows.append(
+                Static(BAND_GAP_HATCH_NOTE, markup=False, classes="legend-row")
+            )
+            rows.append(Static(BAND_DOMAIN_NOTE, classes="legend-card-caption"))
+            return rows
+        rows = []
         for artifact, table in LEGEND_TABLE.items():
             if self._sections is not None and artifact not in self._sections:
                 continue
@@ -805,12 +937,14 @@ class LegendScreen(ModalScreen[None]):
                     else ""
                 )
                 classes = f"legend-row {sev_class}".strip()
-                rows.append(
-                    Label(f"{classification} — {meaning}", classes=classes)
-                )
+                rows.append(Static(f"{classification} — {meaning}", classes=classes))
+        return rows
+
+    def compose(self) -> ComposeResult:
+        body = self._render_card() + self._render_key()
         yield Container(
             Label("Classification legend", classes="modal-title"),
-            ScrollableContainer(*rows, id="legend_body"),
+            ScrollableContainer(*body, id="legend_body"),
             Container(
                 Button("Close", id="legend_close", classes="modal-confirm"),
                 id="legend_buttons",
