@@ -13,12 +13,12 @@
     "operator_phrasing": "Q (kickoff): 'empieza FB-P1b (generacion de reporte)'. Autonomy: 'Autonomo pero plan/prototipo primero'. Trigger: 'Solo con ReportBlock (explicito)'. Prototype: 'Prototipo primero'. Approval: 'aprobado, arranca autonomo con esos defaults'. Model: switched session to Opus 5 via UI.",
     "decision_recording_ack": "GRANTED — every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md."
   },
-  "current_phase": 2,
+  "current_phase": 3,
   "phase_status": "in-progress",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
-    "2": 0,
+    "2": 1,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -27,7 +27,8 @@
   "artifacts": {
     "plan": ".dev-flow/2026-07-24-batch-60/PLAN.md",
     "1": ".dev-flow/2026-07-24-batch-60/01-requirements.md",
-    "1b": ".dev-flow/2026-07-24-batch-60/01b-qa-catalog.md"
+    "1b": ".dev-flow/2026-07-24-batch-60/01b-qa-catalog.md",
+    "2": ".dev-flow/2026-07-24-batch-60/02-review.md"
   },
   "decisions_log": [
     {
@@ -41,6 +42,12 @@
       "date": "2026-07-24",
       "decision": "requirements + qa catalog authored (self, autonomy)",
       "notes": "3 US / 3 HLR / 7 LLR / AT-001..008 / TC-001..013. All anchors draft-time verified on disk (flow_execution_service.py:378-387, flow_model.py:232-287, report_service.py:107/110/412/455/1557/1560/1613); no 'assumed' markers. Reuse-not-fork: _report_filename imported (batch-53 _resolve_manifest_entry precedent). Every AT carries a counterfactual; decision discriminators pinned (D-1->AT-006 no-block-no-report, D-2->AT-005 positional, D-3->AT-002 viewer-visibility, D-4->AT-007 collision). C-17 battery is per-metacharacter (avoids the batch-53 qa M-1 collapsed-proxy miss) and closes the batch-53 qa M-3 carry. No open questions to P2."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-24",
+      "decision": "GATE FAILED then RESOLVED — iterate-to-refine applied inline as AMD-1..14 (§6.5-authoritative)",
+      "notes": "qa verdict FAIL (3 HIGH / 9 MAJOR / 7 minor); security 0-HIGH but OK-only-with-F1..F6-folded. The two reviewers CONVERGED independently on all three HIGHs. I re-verified the load-bearing claims myself before accepting: (1) MarkdownIt('gfm-like') has linkify=True -> bare URLs render <a> and ~~x~~ renders <s> in a ledger cell -> the spec's CommonMark escape set was written for the WRONG GRAMMAR; (2) the `if aborted:` skip guard at flow_execution_service.py:119-124 sits ABOVE the try holding the ReportBlock branch (:378), so operator decision D-6 (aborted run still writes) was UNIMPLEMENTABLE as specified; (3) the prototype's summary=='error' FAILED-proxy matches only the generic except — all 8 _record_error shapes would misclassify. MY RULINGS beyond the reviews: (a) AMD-1 escape '/' rather than sec's scheme-colon regex — I probed both against the real parser: escaping '/' kills http:// AND protocol-relative //host (which the regex leaves LIVE) and renders INVISIBLY, so no readability cost; (b) AMD-6 reuse-vs-fork — a NEW _md_safe is CORRECT: the prior art (diff_report_service._md_cell/_md_table_cell) escapes only |/backslash for a never-linkify-audited sink, so reusing it would be a DOWNGRADE and extending it would silently change two shipped generators this batch does not test; rationale recorded in-spec to avoid a silent fork; (c) AMD-8 raised sec's path-leak from LOW to major (the batch objective is a SHAREABLE record and the fix is one line); (d) AMD-11 ruled the report path does NOT join written_paths (that is the image-output contract; a report is a record); (e) AMD-3 chose option (a) keep-and-implement D-6 over (b) withdraw, since D-6 is an operator-approved decision. Regression checklist DECLARED IN ADVANCE (test_flow_persistence.py:350 'deferred' assert will be replaced by 'reports/') so the edit cannot be mistaken for silencing a failure. C-21 remapped: AT-001/005/009/010 -> Inc-2, AT-004/011 -> Inc-3, Inc-1 owns unit precursors only. Carry out: sec F11 (report_service has NO markdown escaping at all vs the same sink) -> separate hardening batch."
     }
   ],
   "obsidian_synced": false,
