@@ -56,6 +56,12 @@ P0 intake ✓ (plan + prototype approved) → **P1 requirements (IN PROGRESS)** 
 ## Decision log
 - 2026-07-24 P0: kickoff off 4f4f20f; autonomous+self-merge (plan+prototype-first satisfied); storage = named flows; prototype ALL-CASES-HELD + colored Artifact approved; D1/D2 captured. → P1.
 - 2026-07-24 P1: architect + qa dispatched to author requirements folding D1/D2 + the 4 OQs + the report-block model.
+- 2026-07-24 P3 Inc-1: data layer (`b056036`, pre-resume) — serialize + hardened V1-V7 loader + census.
+- 2026-07-24 P3 RESUME (fresh session, Opus 4.8): auth RE-CONFIRMED autonomous+self-merge. `import_flow_file` service seam ratified ("continua").
+- 2026-07-24 P3 Inc-2 (`2f9607b`): save_flow_json + list_saved_flows + import_flow_file (AMD-4 cap) + AT-001/P1-10/P1-11; 2 move-aside RED-verified. 37 tests.
+- 2026-07-24 P3 Inc-3 (`a749054`): Save/Load/Import UI — modals + name-strip + quarantine card + REPORT label arm (AMD-2) + handlers + styles. 6 pilots; C-34 full directionb 185 pass 0-reg; C-38 union sweep clean.
+- 2026-07-24 P3 Inc-4 (`637dc9d`): dirty-guard confirm-discard modal (AMD-8); AT-005 counterfactual RED-verified.
+- 2026-07-24 P4: final gates — security 0-HIGH (1 LOW F1), qa 0-HIGH (3 MAJOR defense-in-depth). Folded F1 + qa M-1/M-2 into hardening `87283db` (per-branch output_name, cap boundaries, V7 drive-relative symmetry; RED-verified). qa M-3 deferred → FB-P1b.
 
 ## Out-of-scope carries
 - Report-block EXECUTION semantics (generating the actual report content) may exceed FB-P1's persistence scope — architect to scope at Phase 1 (serialize-now vs execute-now).
