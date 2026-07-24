@@ -457,3 +457,15 @@ def test_tc_n8_04_a2l_card_covers_every_live_column(tmp_path: Path) -> None:
     card = _text("a2l")
     for label in labels:
         assert label in card, f"live A2L column {label!r} has no legend line (AMD-8)"
+
+
+# --------------------------------------------------------------------------- #
+# TC-N8-11b (AMD-9 defense-in-depth) — the band-key notes render on the map view
+# (BAND_DOMAIN_NOTE with markup enabled) but live OUTSIDE LEGEND_EXAMPLES, so the
+# _all_lines() tripwire above does not reach them. Guard them here so a future
+# literal '[' added to either note can't open a tag and crash the modal.
+# --------------------------------------------------------------------------- #
+def test_tc_n8_11b_band_notes_are_markup_safe():
+    for note in (L.BAND_DOMAIN_NOTE, L.BAND_GAP_HATCH_NOTE):
+        content = Content.from_markup(note)  # no MarkupError
+        assert content.plain  # renders to visible text
