@@ -15,6 +15,15 @@
   },
   "current_phase": 3,
   "phase_status": "in-progress",
+  "pause_checkpoint": {
+    "date": "2026-07-24",
+    "reason": "Context window very high (operator-flagged). Paused after Inc-1 at a COHERENT boundary (data layer DONE + code-reviewed + committed b056036) to resume FRESH — avoid a mid-increment context death. NOT aborted; the on-disk tree is clean and committed.",
+    "inc1_result": "DONE + GREEN + GATED + COMMITTED (b056036). flow_persistence_service.py (serialize + hardened V1-V7 loader + census REJECTING_CODES + drive-relative FLOW-UNSAFE-REF + ref-less report branch) + flow_model.py (field-less ReportBlock + union) + flow_execution_service.py (report no-op BLOCK_STATUS_OK) + tests/test_flow_persistence.py. 28 new + 47 regression pass; RED-verified (move-aside C-20); ruff clean; frozen guard green. Inline code-review PASS (fail-closed whole-flow invariant verified at flow_persistence_service.py:446-449; AMD-1/5/6/11/12 compliant). 4 files.",
+    "resume_at": "Phase 3, Inc-2. Per PLAN.md increment plan + 02-review.md AMDs (authoritative): Inc-2 = service completion (save_flow_json + list_saved_flows) + Import (copy_into_workarea max_size=FLOW_SIZE_CAP_BYTES, AMD-4/F1) + tests (AT-001 on-disk, AT-P1-10/11 import output-then-consume C-12). Inc-3 = UI (SaveFlow/LoadFlow modals in screens.py + FlowBuilderPanel name-strip/Save-Load row + _flow_block_label REPORT arm AMD-2 + quarantine card painted C-32 + app handlers + styles.tcss; AT-002/003/004/006). Inc-4 = dirty-guard confirm-discard modal (AMD-8/AT-P1-18) + fold-in ATs. C-21: each hardened AT owns its increment. C-34: run FULL test_tui_directionb.py at the UI increment gate; C-38 render_result isinstance sweep for the widened union.",
+    "carries": ["FLOW-UNSAFE-REF is a NEW public code (ratified; census-guarded) — if AMD-11's deferred guard-edit later moves drive-relative into the guard as MANIFEST-PATH-ESCAPE, that is a §6.5 amendment", "V7 output_name drive-relative gap (defense-in-depth only; save_patched_image is runtime write authority) — Inc-2/3 may tighten", "_flow_block_label REPORT arm MUST land in Inc-3 or AT-006 is vacuous (AMD-2)", "confirm the full non-slow suite (Inc-1 background run didn't finish in 10min) shows 0 regressions at the next gate"],
+    "authorization_reminder": "AUTONOMOUS + self-merge (per-batch; plan+prototype-first satisfied). Final qa AND security PR-pass 0-HIGH before self-merge. Per-batch; re-confirm at resume if a new session.",
+    "base": "4f4f20f (origin/main tip); branch feat/batch-53-flow-persistence; Inc-1 = b056036."
+  },
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
     "plan": ".dev-flow/2026-07-24-batch-53/PLAN.md",
