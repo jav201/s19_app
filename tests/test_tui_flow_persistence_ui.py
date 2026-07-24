@@ -30,7 +30,7 @@ from pathlib import Path
 from textual.widgets import Button, Input, ListView, Static
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens import SaveFlowScreen
+from s19_app.tui.screens import ConfirmDiscardScreen, SaveFlowScreen
 from s19_app.tui.services.flow_model import Flow, ReportBlock, SourceBlock
 from s19_app.tui.services.flow_persistence_service import save_flow_json
 
@@ -286,3 +286,77 @@ def test_tc018_no_project_save_and_load_render_error_card(tmp_path: Path) -> Non
     for button_id in ("flow_save", "flow_load"):
         banners = asyncio.run(_drive(button_id))
         assert any("FAILED" in b for b in banners), button_id
+
+
+# --------------------------------------------------------------------------- #
+# Inc-4 · AT-005 / AT-P1-18 — dirty-guard confirm-discard on Load-over-dirty
+# --------------------------------------------------------------------------- #
+
+def test_at005_dirty_guard_cancel_keeps_blocks_confirm_replaces(tmp_path: Path) -> None:
+    """OQ-3 / LLR-003.6 / AMD-8: loading over a DIRTY flow prompts a
+    confirm-discard modal. Cancel keeps the current blocks verbatim (the
+    counterfactual — a Cancel that still called set_blocks would replace them and
+    go RED); Discard proceeds; a subsequent CLEAN load shows no modal."""
+    project = _make_project(tmp_path)
+    save_flow_json(Flow(name="o", blocks=[SourceBlock("other.s19")]), "other", project)
+
+    async def _load_other(app, pilot):
+        app.query_one("#flow_load", Button).press()
+        await pilot.pause()
+        app.screen.query_one("#flow_list", ListView).index = 0
+        app.screen.query_one("#flow_load_ok", Button).press()
+        await pilot.pause()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            app.current_project_dir = project
+            await pilot.press("8")
+            await pilot.pause()
+            # Make the flow dirty.
+            app.query_one("#flow_ref", Input).value = "keep.s19"
+            app.query_one("#flow_add", Button).press()
+            await pilot.pause()
+
+            # (a) dirty + Load -> confirm modal shown; Cancel -> blocks kept.
+            await _load_other(app, pilot)
+            modal_on_cancel = any(
+                isinstance(s, ConfirmDiscardScreen) for s in app.screen_stack
+            )
+            app.screen.query_one("#flow_discard_cancel", Button).press()
+            await pilot.pause()
+            blocks_after_cancel = app.query_one("#flow_blocks", Static).render().plain
+
+            # (b) dirty + Load -> Discard -> blocks replaced with the loaded flow.
+            await _load_other(app, pilot)
+            app.screen.query_one("#flow_discard_ok", Button).press()
+            await pilot.pause()
+            await pilot.pause()
+            blocks_after_discard = app.query_one("#flow_blocks", Static).render().plain
+            strip_after_discard = _painted(app.query_one("#flow_name_strip", Static))
+
+            # (c) clean + Load -> NO modal (loads directly).
+            await _load_other(app, pilot)
+            modal_on_clean = any(
+                isinstance(s, ConfirmDiscardScreen) for s in app.screen_stack
+            )
+            return {
+                "modal_on_cancel": modal_on_cancel,
+                "blocks_after_cancel": blocks_after_cancel,
+                "blocks_after_discard": blocks_after_discard,
+                "strip_after_discard": strip_after_discard,
+                "modal_on_clean": modal_on_clean,
+            }
+
+    r = asyncio.run(_drive())
+    # (a) modal appeared; Cancel kept the dirty blocks verbatim (no set_blocks).
+    assert r["modal_on_cancel"]
+    assert "keep.s19" in r["blocks_after_cancel"]
+    assert "other.s19" not in r["blocks_after_cancel"]
+    # (b) Discard replaced the blocks and cleared dirty (✓).
+    assert "other.s19" in r["blocks_after_discard"]
+    assert "keep.s19" not in r["blocks_after_discard"]
+    assert "✓" in r["strip_after_discard"]
+    # (c) a clean load shows no confirm modal.
+    assert not r["modal_on_clean"]

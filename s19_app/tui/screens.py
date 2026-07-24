@@ -855,6 +855,49 @@ class LoadFlowScreen(ModalScreen[Optional[str]]):
         status.update(f"imported flows/{imported.name}")
 
 
+class ConfirmDiscardScreen(ModalScreen[bool]):
+    """Confirm-discard modal shown before a Load replaces UNSAVED flow edits.
+
+    Summary:
+        The dirty-guard (OQ-3 / LLR-003.6 / AMD-8): when Load is confirmed over a
+        dirty flow (``●``), this modal asks the operator to confirm discarding the
+        current edits. Discard dismisses ``True`` (the app proceeds with
+        ``set_blocks``); Cancel dismisses ``False`` (the current blocks are kept —
+        no data loss). Mirrors the project modals' box model.
+
+    Args:
+        target (str): The stem of the flow about to be loaded (shown, markup-safe).
+    """
+
+    def __init__(self, target: str) -> None:
+        super().__init__()
+        self.target = target
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Discard unsaved flow edits?", classes="modal-title"),
+            Label(
+                f"Loading '{self.target}' replaces the current unsaved flow.",
+                classes="modal-hint",
+                markup=False,
+            ),
+            Container(
+                Button("Discard", id="flow_discard_ok", classes="modal-confirm"),
+                Button("Cancel", id="flow_discard_cancel"),
+                id="flowdiscard_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "flow_discard_ok":
+            self.dismiss(True)
+        elif event.button.id == "flow_discard_cancel":
+            self.dismiss(False)
+
+
 class SelectVariantScreen(ModalScreen[Optional[str]]):
     """Modal dialog for selecting the active S19/HEX variant of a project.
 

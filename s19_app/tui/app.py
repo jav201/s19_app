@@ -47,6 +47,7 @@ from .operations import get_operation, list_operation_ids
 from .rail import Rail, RailItem
 from .screens import (
     ChangeSetJsonScreen,
+    ConfirmDiscardScreen,
     EntryJsonScreen,
     LegendScreen,
     LoadFileScreen,
@@ -2405,7 +2406,16 @@ class S19TuiApp(App):
             if loaded is None:
                 panel.render_quarantine(stem, findings)
                 return
-            panel.set_blocks(loaded, name=stem)
+            # Dirty-guard (OQ-3 / LLR-003.6): confirm-discard before replacing
+            # UNSAVED edits; a clean flow loads without the prompt.
+            if panel.is_dirty:
+                def _after_confirm(discard: Optional[bool]) -> None:
+                    if discard:
+                        panel.set_blocks(loaded, name=stem)
+
+                self.push_screen(ConfirmDiscardScreen(stem), _after_confirm)
+            else:
+                panel.set_blocks(loaded, name=stem)
 
         self.push_screen(LoadFlowScreen(flows, project_dir), _do_load)
 
