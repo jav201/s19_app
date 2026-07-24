@@ -1,0 +1,53 @@
+You are a TUI engineer working in THIS repo (your cwd):
+a Textual TUI (pinned textual==8.2.8, rich==15.0.0) for S19/HEX/A2L/MAC firmware
+files. This is a DESIGN PROTOTYPE task — throwaway code, NO production edits.
+
+GOAL (feature "N8"): redesign the in-app "Legend" modal into a COMPREHENSIVE
+PER-VIEW REFERENCE. Today `LegendScreen` (in s19_app/tui/screens.py, data in
+s19_app/tui/legend.py) shows only colour rows per section, already scoped to the
+active view (N1). N8: for EACH view, the legend must EXPLAIN EVERY informational
+element that view shows on screen — every text field, info tile, number, column,
+glyph and colour — with a small annotated example (a "card") ABOVE the colour
+key. Layout is decided: "CARD ON TOP" (an annotated example card, then the colour
+key below it, single column, scrollable), 120-column regime.
+
+DO NOT re-inventory the code — a complete, code-grounded element inventory of
+every view already exists at:
+    prototypes/legend_n8.INVENTORY.md   <-- READ THIS FIRST; it is your content spec.
+It catalogs, per view (Workspace, A2L Explorer, Memory Map, MAC, Issues, Checks),
+every element + its meaning. Turn each view's inventory into legend content.
+
+A starter Textual prototype already exists — reuse its skeleton, patterns and its
+honest-render setup (real CSS_PATH="../s19_app/tui/styles.tcss", real LEGEND_TABLE
++ COLOUR_SEVERITY from s19_app.tui.legend, css_class_for_severity from
+s19_app.tui.color_policy, a `shot` entry that captures SVGs via
+run_test()/save_screenshot()):
+    prototypes/legend_n8.prototype.py
+
+YOUR DELIVERABLE (all inside prototypes/ ONLY):
+1. prototypes/legend_n8.kimi.prototype.py — a runnable standalone Textual App
+   showing the COMPREHENSIVE "card on top" legend for these 5 views: Workspace,
+   A2L Explorer, Memory Map, MAC, Issues. Switch views with keys (or show them
+   stacked). Each view: an annotated example CARD explaining every element from
+   the inventory, then the colour key (Workspace is example-only, no colour key).
+   - Design for 120x40. Bodies scroll (ScrollableContainer).
+   - Reuse the REAL .sev-* / band-* colours via CSS_PATH; NOTE custom vars like
+     $accent-calm do NOT resolve inside an inline `CSS=` block — use hex literals
+     there (accent #91abec, panel #0f1525, rule #1b233a). The sev/band classes DO
+     come from CSS_PATH.
+   - A `shot` subcommand that writes one SVG per view at 120x40. Run everything
+     with PYTHONUTF8=1 so block/arrow glyphs (· ░ ▒ ▓ ╱ ▁▂▅█ ✓ ✗ ⚠ ◐ ↵) encode.
+2. prototypes/legend_n8.variant_kimi.<view>.svg — the captured SVG per view.
+3. prototypes/legend_n8.kimi.NOTES.md — for each view, the EXACT proposed legend
+   copy (the text of every explanation), plus a note on what you'd cut if the
+   density overwhelms, plus the important gotcha the inventory flags: the MAC
+   DataTable paints WARNING as inline `orange3` while the legend words call it
+   "Pale yellow" — explain how your legend reconciles that.
+
+HARD CONSTRAINTS:
+- Write ONLY inside prototypes/. Do NOT edit any production module.
+- These files are git-frozen — READ ONLY, never edit: core.py, hexfile.py,
+  range_index.py, validation/, tui/a2l.py, tui/mac.py, tui/color_policy.py.
+- No firmware/DB/disk mutations; no tests; keep it runnable, skip polish.
+- Verify your prototype actually runs and the `shot` writes non-empty SVGs before
+  you finish (run: PYTHONUTF8=1 python prototypes/legend_n8.kimi.prototype.py shot).

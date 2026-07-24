@@ -51,9 +51,13 @@ def _install_prg(app: S19TuiApp) -> None:
 
 def _modal_meanings(screen: LegendScreen) -> list[str]:
     """The per-row meanings rendered in the legend modal body (artifact
-    header Labels carry no ``' — '`` separator and are skipped)."""
+    header Labels carry no ``' — '`` separator and are skipped).
+
+    N8: the classification key rows are now ``Static`` (wrap, not truncate —
+    HLR-N8-6); the query targets ``Static`` (``Label ⊂ Static``, so the artifact
+    headers are matched too and skipped by the separator filter)."""
     out: list[str] = []
-    for label in screen.query("#legend_body Label"):
+    for label in screen.query("#legend_body Static"):
         text = str(label.render())
         if " — " in text:
             out.append(text.split(" — ", 1)[1])
@@ -292,11 +296,16 @@ def test_at023e_c13_geometry_at_80_cols(tmp_path: Path) -> None:
 
 def test_at023f_legend_shows_without_file_loaded(tmp_path: Path) -> None:
     """AT-023f — empty boundary: with NO file loaded the static legend still
-    opens with every documented row (the legend is static, not data-driven)."""
+    opens with every documented row (the legend is static, not data-driven).
+
+    N8: opened on the genuinely unmapped `flow` screen so the full-table
+    fallback (every section) is exercised — Workspace is now example-only."""
 
     async def _drive() -> tuple[bool, int]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("flow")
             await pilot.pause()
             app.set_focus(None)
             await pilot.press("k")
@@ -317,6 +326,10 @@ def test_tc023_1_modal_renders_all_table_rows(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
+            # N8: `flow` is unmapped → full-table fallback (Workspace is now
+            # example-only).
+            app.action_show_screen("flow")
+            await pilot.pause()
             app.set_focus(None)
             await pilot.press("k")
             await pilot.pause()
@@ -328,7 +341,7 @@ def test_tc023_1_modal_renders_all_table_rows(tmp_path: Path) -> None:
             return headers, _modal_meanings(app.screen)
 
     headers, meanings = asyncio.run(_drive())
-    assert headers == list(LEGEND_TABLE)  # A2L, MAC, Issues in order
+    assert headers == list(LEGEND_TABLE)  # A2L, MAC, Issues, Hex in order
     assert len(meanings) == _TOTAL_ROWS
 
 
@@ -380,6 +393,10 @@ def test_at059a_hex_legend_present_in_modal(tmp_path: Path) -> None:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
+            # N8: open on the unmapped `flow` screen so the full table (incl. the
+            # Hex section) renders — Workspace is now example-only.
+            app.action_show_screen("flow")
+            await pilot.pause()
             app.set_focus(None)  # user not typing in a filter field
             await pilot.press("k")
             await pilot.pause()
@@ -420,7 +437,8 @@ def test_tc322_hex_block_coupled_to_overlay_styles() -> None:  # TC-322
     collision no longer exists; ``"Yellow"`` remains reserved for the
     focus-highlight row, which is why WARNING is not named ``"Yellow"``.)
     The meanings are markup-free
-    (S-01: the modal renders each row through a markup-enabled ``Label``).
+    (S-01: the modal renders each row through a markup-enabled ``Static`` —
+    ``Label`` pre-N8; both parse markup, so the bracket-free rule still holds).
     """
     from s19_app.tui.color_policy import (
         FOCUS_HIGHLIGHT_STYLE,
@@ -467,6 +485,10 @@ def test_tc_s2_report_and_modal_render_same_rows(tmp_path: Path) -> None:
     async def _drive() -> list[str]:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            # N8: full table via the unmapped `flow` screen (no example card, so
+            # the modal meanings are exactly the LEGEND_TABLE rows).
+            app.action_show_screen("flow")
             await pilot.pause()
             app.set_focus(None)
             await pilot.press("k")

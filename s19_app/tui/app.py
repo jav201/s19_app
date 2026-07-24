@@ -5376,10 +5376,15 @@ class S19TuiApp(App):
     #: (``A2L`` / ``MAC`` / ``Issues`` / ``Hex``); the row colours still
     #: round-trip through the frozen ``SEVERITY_CLASS_MAP`` (read-only).
     _SCREEN_LEGEND_SECTIONS: Dict[str, tuple[str, ...]] = {
+        # N8: Workspace is example-only (LLR-N8-1.2) and Map renders the entropy
+        # band key, not the LEGEND_TABLE["Hex"] severity rows (LLR-N8-3.3) — both
+        # map to () so `compose` shows zero severity rows. `patch`/`diff` keep
+        # ("Hex",) (out of N8 scope); `flow` stays unmapped → full-table fallback.
+        "workspace": (),
         "a2l": ("A2L",),
         "mac": ("MAC",),
         "issues": ("Issues",),
-        "map": ("Hex",),
+        "map": (),
         "patch": ("Hex",),
         "diff": ("Hex",),
         "checks": ("Issues",),
@@ -5549,9 +5554,13 @@ class S19TuiApp(App):
                 - ``on_button_pressed`` (the MAC / Issues Legend buttons)
         """
         # N1: scope the legend to the active screen's section(s); a screen with
-        # no mapped section falls back to the full table (AC-3).
+        # no mapped section falls back to the full table (AC-3). N8: also pass
+        # the active view key so the modal renders the per-view example card and
+        # the map's entropy band key (LLR-N8-1.4).
         sections = self._SCREEN_LEGEND_SECTIONS.get(self._active_screen_key)
-        self.push_screen(LegendScreen(sections=sections))
+        self.push_screen(
+            LegendScreen(sections=sections, view_key=self._active_screen_key)
+        )
 
     # Screens that own both real content and an `EmptyStatePanel`; the panel
     # is shown only while no file is loaded (LLR-002.3). Each tuple is the
