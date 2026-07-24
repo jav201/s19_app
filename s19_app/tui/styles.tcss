@@ -1550,6 +1550,23 @@ ModalScreen {
     margin-top: 1;
 }
 
+/* N8 example-card lines (LLR-N8-6.2): weight / dim / layout ONLY — never a
+ * `sev-*` or `band-*` colour, so an annotated card line cannot be mistaken for a
+ * colour-key row. Disjoint from `.sev-*` (:636-660) and `.band-*` (:665-679). */
+.legend-card-sub {
+    text-style: bold;
+    margin-top: 1;
+}
+
+.legend-card-line {
+    margin-left: 1;
+}
+
+.legend-card-caption {
+    text-style: dim;
+    margin-left: 1;
+}
+
 /* The entropy-viewer modal (batch-26 `#entropy_*` / `.entropy-*` rules) was
  * removed in batch-45 Inc-5 — its function moved into the always-visible
  * Memory-Map band view (R-TUI-060/061/062). */

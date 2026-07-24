@@ -27,6 +27,7 @@ from s19_app.tui.services.entropy_service import ENTROPY_BANDS
 # Textual's Static/Label default to markup=True, so the modal renders each line
 # through Content.from_markup — the same path TC-N8-11 must guard.
 from textual.content import Content
+from textual.widgets import DataTable, Static
 
 VIEW_KEYS = ("workspace", "a2l", "map", "mac", "issues")
 
@@ -363,3 +364,96 @@ def test_at_n8_05_issues_card_above_key(tmp_path: Path) -> None:
     assert "families" in text or "Severity strip" in text, "issues card missing"
     assert L.LEGEND_TABLE["Issues"]["Errors"][1] in text
     assert L.LEGEND_TABLE["Issues"]["Optional info"][1] in text
+
+
+# --------------------------------------------------------------------------- #
+# AT-N8-06 (Inc-3, AMD-5) — the long Issues "Errors" key meaning (148 chars)
+# renders as a `Static` that actually WRAPS (height >= 2) at 120 cols, so its
+# tail survives. The wrap (not the tail substring) is the counterfactual: a
+# pre-N8 `Label` row would be height 1 (`type(row) is Static`, not isinstance —
+# `Label ⊂ Static`).
+# --------------------------------------------------------------------------- #
+def test_at_n8_06_long_key_row_is_static_and_wraps(tmp_path: Path) -> None:
+    tail = "same-name mismatch"  # tail of the 148-char Issues "Errors" meaning
+    assert tail in L.LEGEND_TABLE["Issues"]["Errors"][1]  # oracle: it IS the tail
+
+    async def _drive() -> tuple[bool, int, bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            legend = await _open_legend_on(app, pilot, "issues")
+            rows = [
+                w
+                for w in legend.query("#legend_body Static")
+                if tail in str(w.render())
+            ]
+            assert len(rows) == 1, f"expected one row carrying {tail!r}, got {len(rows)}"
+            row = rows[0]
+            return type(row) is Static, row.size.height, tail in str(row.render())
+
+    is_static, height, tail_present = asyncio.run(_drive())
+    assert is_static, "the long key row must be a Static (wraps), not a Label"
+    assert height >= 2, f"expected the row to wrap (height>=2), got {height}"
+    assert tail_present  # secondary readability check (the tail is present)
+
+
+# --------------------------------------------------------------------------- #
+# AT-N8-07 (Inc-3, AMD-7/AMD-11) — the MAC reconciliation sample row is painted
+# the SAME inline style the MAC DataTable paints a WARNING row with
+# (`app._SEVERITY_TO_RICH_STYLE[WARNING]`), coupled to that live value — NOT a
+# hex literal. Reads the painted segment's colour off `#legend_mac_warning_sample`.
+# --------------------------------------------------------------------------- #
+def test_at_n8_07_mac_warning_sample_painted_warning_style(tmp_path: Path) -> None:
+    from s19_app.tui.app import _SEVERITY_TO_RICH_STYLE
+    from s19_app.tui.screens import _MAC_WARNING_SAMPLE_STYLE
+    from s19_app.validation import ValidationSeverity
+
+    warning_style = _SEVERITY_TO_RICH_STYLE[ValidationSeverity.WARNING]
+    # (a) anti-drift coupling: screens paints with the SAME style the MAC table
+    # uses — if app re-values WARNING, screens.py must follow or this goes RED.
+    assert _MAC_WARNING_SAMPLE_STYLE == warning_style, (
+        "the legend orange sample must track app's MAC WARNING inline style"
+    )
+
+    async def _drive() -> tuple[set, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            legend = await _open_legend_on(app, pilot, "mac")
+            sample = legend.query_one("#legend_mac_warning_sample", Static)
+            # The rendered Content carries the painted span styles; the widget's
+            # own `render_line` is pre-compositor (base CSS colour only), so read
+            # the paint intent off the Content spans.
+            content = sample.render()
+            span_styles = {span.style for span in getattr(content, "spans", [])}
+            return span_styles, content.plain
+
+    span_styles, plain = asyncio.run(_drive())
+    # (b) painted-segment check: the sample row's segment carries exactly the MAC
+    # WARNING inline style (not a hex literal, not a sev-*/band-* class).
+    assert warning_style in span_styles, (
+        f"warning sample not painted {warning_style!r}: {span_styles}"
+    )
+    assert "NOT_IN_A2L" in plain  # it IS the warning-row sample, not a stray row
+
+
+# --------------------------------------------------------------------------- #
+# TC-N8-04 (Inc-3, AMD-8) — C-31 live-column oracle: every LIVE #a2l_tags_list
+# column label has a legend line in the a2l card, so a 17th A2L column added
+# without a legend entry goes RED. Derived from the shipped table, not a hand-list.
+# --------------------------------------------------------------------------- #
+def test_tc_n8_04_a2l_card_covers_every_live_column(tmp_path: Path) -> None:
+    async def _drive() -> list[str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("a2l")
+            await pilot.pause()
+            table = app.query_one("#a2l_tags_list", DataTable)
+            return [str(col.label) for col in table.columns.values()]
+
+    labels = asyncio.run(_drive())
+    assert len(labels) >= 16, f"expected >=16 live A2L columns, got {len(labels)}"
+    card = _text("a2l")
+    for label in labels:
+        assert label in card, f"live A2L column {label!r} has no legend line (AMD-8)"
