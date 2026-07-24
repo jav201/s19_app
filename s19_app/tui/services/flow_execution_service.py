@@ -57,6 +57,7 @@ from .flow_model import (
     FlowContext,
     FlowRunResult,
     PatchBlock,
+    ReportBlock,
     SourceBlock,
     WriteOutBlock,
 )
@@ -373,6 +374,17 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     result.block_results.append(
                         BlockResult(index, kind, BLOCK_STATUS_OK, summary)
                     )
+
+            elif isinstance(block, ReportBlock):
+                # batch-53 FB-P1 (AMD-1 / LLR-004.3): a report block is a no-op
+                # in FB-P1 — content generation is deferred to FB-P1b. Emit an OK
+                # BlockResult (green-preserving, honest) and thread the working
+                # (mem_map, ranges) forward UNCHANGED so a report-bearing flow
+                # runs without error and the whole-flow rollup stays `ok`.
+                result.block_results.append(
+                    BlockResult(index, kind, BLOCK_STATUS_OK,
+                                "report generation deferred (FB-P1b)")
+                )
 
             else:  # pragma: no cover - guards an unknown block kind
                 aborted = _record_error(

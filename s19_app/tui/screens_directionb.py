@@ -123,6 +123,7 @@ from .services.flow_model import (
     FlowBlock,
     FlowRunResult,
     PatchBlock,
+    ReportBlock,
     SourceBlock,
     WriteOutBlock,
 )
@@ -2468,6 +2469,8 @@ def _flow_block_label(block: FlowBlock) -> str:
         return f"WRITE-OUT  {block.output_name}  ({block.fmt})"
     if isinstance(block, CrcBlock):
         return f"CRC  {block.config_ref}"
+    if isinstance(block, ReportBlock):
+        return "REPORT  (generation deferred - FB-P1b)"
     return "?"
 
 
@@ -2644,11 +2647,42 @@ class FlowBuilderPanel(ScrollableContainer):
             super().__init__()
             self.flow = flow
 
+    class SaveRequested(Message):
+        """The operator pressed Save… — carries the current flow to the app.
+
+        The app opens :class:`SaveFlowScreen` for the target name, then persists
+        via ``save_flow_json`` (batch-53 FB-P1, LLR-003.2/.7).
+
+        Args:
+            flow (Flow): The current composed flow (name = the display name).
+        """
+
+        def __init__(self, flow: Flow) -> None:
+            super().__init__()
+            self.flow = flow
+
+    class LoadRequested(Message):
+        """The operator pressed Load… — the app opens :class:`LoadFlowScreen`.
+
+        Carries nothing: the app lists ``flows/*.json`` and, on a chosen stem,
+        loads through the hardened ``load_flow_json`` (LLR-003.3/.7).
+        """
+
     def __init__(self) -> None:
         super().__init__(id="flow_panel")
         self._blocks: List[FlowBlock] = []
+        #: Display name shown in the name strip; identity is the FILENAME on save.
+        self._flow_name: str = "flow"
+        #: Unsaved-edits flag — glyph ``●`` (dirty) / ``✓`` (saved), C-10 primary.
+        self._dirty: bool = False
 
     def compose(self) -> ComposeResult:
+        yield Static(
+            self._name_strip_text(),
+            id="flow_name_strip",
+            markup=False,
+            classes=self._name_strip_class(),
+        )
         yield Label(
             "Flow Builder (tracer): pick a block kind, enter its "
             "project-relative ref, Add; then Run.",
@@ -2679,9 +2713,137 @@ class FlowBuilderPanel(ScrollableContainer):
         yield Horizontal(
             Button("Run", id="flow_run", variant="primary"),
             Button("Clear", id="flow_clear"),
+            Button("Save…", id="flow_save"),
+            Button("Load…", id="flow_load"),
             id="flow_run_row",
         )
         yield VerticalScroll(id="flow_result")
+
+    def _name_strip_text(self) -> Text:
+        """The name-strip line: ``Flow: <name>  <glyph>`` (glyph-primary, C-10).
+
+        The name is rendered markup-safe (a loaded/imported name can be hostile);
+        the glyph ``●`` (dirty) / ``✓`` (saved) is the PRIMARY state cue, colour
+        the secondary one.
+        """
+        glyph = "●" if self._dirty else "✓"
+        text = Text()
+        text.append("Flow: ")
+        text.append(safe_text(self._flow_name))
+        text.append(f"  {glyph}")
+        return text
+
+    def _name_strip_class(self) -> str:
+        """``sev-warning`` when dirty, ``sev-neutral`` when saved (secondary cue)."""
+        return "flow-name-strip " + ("sev-warning" if self._dirty else "sev-neutral")
+
+    def _refresh_name_strip(self) -> None:
+        strip = self.query_one("#flow_name_strip", Static)
+        strip.update(self._name_strip_text())
+        strip.set_classes(self._name_strip_class())
+
+    def _mark_dirty(self) -> None:
+        """Flag unsaved edits and repaint the name strip."""
+        self._dirty = True
+        self._refresh_name_strip()
+
+    @property
+    def current_flow(self) -> Flow:
+        """The current composed flow (name = the display name), for Save."""
+        return Flow(name=self._flow_name, blocks=list(self._blocks))
+
+    @property
+    def is_dirty(self) -> bool:
+        """Whether the flow has unsaved edits (the dirty-guard reads this)."""
+        return self._dirty
+
+    def set_blocks(self, flow: Flow, name: Optional[str] = None) -> None:
+        """Replace the composed flow from a loaded :class:`Flow` (LLR-003.7).
+
+        Summary:
+            Swap in the loaded blocks, set the display name (the on-disk stem
+            when the app passes ``name``, else the envelope name), clear the
+            dirty flag (a just-loaded flow is clean), repaint the block list +
+            name strip, and clear any prior run/quarantine output.
+
+        Args:
+            flow (Flow): The validated, loaded flow.
+            name (Optional[str]): The filename stem to show as identity; defaults
+                to ``flow.name`` (the embedded display name).
+        """
+        self._blocks = list(flow.blocks)
+        self._flow_name = name if name is not None else flow.name
+        self._dirty = False
+        self._refresh_blocks()
+        self._refresh_name_strip()
+        self.query_one("#flow_result", VerticalScroll).remove_children()
+
+    def mark_saved(self, stem: str) -> None:
+        """Record a successful save: identity = ``stem``, clear dirty, confirm.
+
+        Mounts a ``✓ saved flows/<stem>.json`` note into ``#flow_result`` and
+        repaints the name strip to the saved (``✓``) state (LLR-003.2).
+        """
+        self._flow_name = stem
+        self._dirty = False
+        self._refresh_name_strip()
+        container = self.query_one("#flow_result", VerticalScroll)
+        container.remove_children()
+        container.mount(
+            Static(
+                safe_text(f"✓ saved flows/{stem}.json"),
+                markup=False,
+                classes="flow-save-note sev-ok",
+            )
+        )
+
+    def render_quarantine(
+        self, flow_name: str, findings: List[ValidationIssue]
+    ) -> None:
+        """Paint a rejected load's findings WITHOUT touching the current flow.
+
+        Summary:
+            Mount a bordered ``sev-error`` quarantine card into ``#flow_result``
+            with a header, one markup-safe line per finding, and a
+            ``Current flow unchanged.`` footer. ``set_blocks`` is NOT called, so
+            the block list and name strip are unchanged (LLR-003.5 / C-32). Every
+            file-derived string (the picked name, each finding message) is
+            rendered ``safe_text`` + ``markup=False`` (C-17).
+
+        Args:
+            flow_name (str): The rejected file's stem (untrusted — markup-safe).
+            findings (List[ValidationIssue]): The loader's fail-closed findings.
+        """
+        container = self.query_one("#flow_result", VerticalScroll)
+        container.remove_children()
+        children: List[Static] = [
+            Static(
+                safe_text(
+                    f"✗ LOAD REJECTED — flows/{flow_name}.json "
+                    f"({len(findings)} findings)"
+                ),
+                markup=False,
+                classes="flow-quarantine-head",
+            )
+        ]
+        for finding in findings:
+            children.append(
+                Static(
+                    safe_text(finding.message),  # SINK: file-derived finding text
+                    markup=False,
+                    classes="flow-quarantine-line",
+                )
+            )
+        children.append(
+            Static(
+                "Current flow unchanged.",
+                markup=False,
+                classes="flow-quarantine-foot",
+            )
+        )
+        container.mount(
+            Container(*children, classes="flow-quarantine sev-error")
+        )
 
     def _blocks_text(self) -> Text:
         if not self._blocks:
@@ -2707,14 +2869,22 @@ class FlowBuilderPanel(ScrollableContainer):
             self._blocks.append(block)
             self.query_one("#flow_ref", Input).value = ""
             self._refresh_blocks()
+            self._mark_dirty()
         elif event.button.id == "flow_run":
             self.post_message(
-                self.RunRequested(Flow(name="flow", blocks=list(self._blocks)))
+                self.RunRequested(Flow(name=self._flow_name, blocks=list(self._blocks)))
             )
+        elif event.button.id == "flow_save":
+            self.post_message(self.SaveRequested(self.current_flow))
+        elif event.button.id == "flow_load":
+            self.post_message(self.LoadRequested())
         elif event.button.id == "flow_clear":
+            had_blocks = bool(self._blocks)
             self._blocks.clear()
             self._refresh_blocks()
             self.query_one("#flow_result", VerticalScroll).remove_children()
+            if had_blocks:
+                self._mark_dirty()
 
     def on_mount(self) -> None:
         # F3 (LLR-094.3): the per-block gating control is CHECK-only — hidden for
