@@ -78,9 +78,11 @@ from textual.widgets import Button, Input, Label, Select, Static, Switch
 
 from .insight_style import (
     DGRAY,
+    GREEN,
     HILITE,
     MICROBAR_EMPTY,
     MICROBAR_FILLED,
+    RED,
     YELLOW,
 )
 from .operations.crc_designer_model import (
@@ -117,12 +119,16 @@ _COVERAGE_WINDOW_GLYPHS = 48
 #: ``123456789`` is itself valid hex — auto-detect would mis-read the KAT input.
 _VECTOR_MODES: tuple[str, ...] = ("ascii", "hex")
 
-#: Tri-state display tokens for the live verdict (LLR-V2.1). The source is the
-#: merged :meth:`CrcAlgorithm.kat_ok` ``True`` / ``False`` / ``None``.
-_VERDICT_TOKENS: dict[bool | None, str] = {
-    True: "MATCH",
-    False: "MISMATCH",
-    None: "NO-EXPECTED",
+#: Tri-state display tokens for the live verdict (LLR-V2.1; realign R7). The
+#: source is the merged :meth:`CrcAlgorithm.kat_ok` ``True`` / ``False`` /
+#: ``None``. Each maps to a glyph-primary token (the app's MAC/Issues convention
+#: — glyph first, severity colour second, C-10) plus its :mod:`insight_style`
+#: colour: ``✓ MATCH`` GREEN, ``✗ MISMATCH`` RED, ``○ NO-EXPECTED`` DGRAY. The
+#: ``.plain`` still substring-matches the bare token (``"MATCH" in "✓ MATCH"``).
+_VERDICT_TOKENS: dict[bool | None, tuple[str, str]] = {
+    True: ("✓ MATCH", GREEN),
+    False: ("✗ MISMATCH", RED),
+    None: ("○ NO-EXPECTED", DGRAY),
 }
 
 
@@ -238,28 +244,29 @@ class CrcDesignerPanel(ScrollableContainer):
         super().__init__(id="crc_designer_panel", classes="crc-designer-form")
 
     def compose(self) -> ComposeResult:
-        """Compose the Variant-B "coverage-first bench" (batch-59 LLR-L2.1/L2.3).
+        """Compose the realigned "coverage-first bench" (batch-59 + realign R1/R5/R6).
 
         Summary:
             Re-arrange every batch-58 ``#crc_*`` widget (same ids, same
-            ``markup=False`` sinks, same handler wiring) into the approved bench:
-            a full-width help line and preset selector, then a **hero row**
-            (``#crc_hero_row``) holding the coverage window (``#crc_coverage_window``,
-            2fr — an empty placeholder this increment; the live glyph render lands
-            in Inc-2) beside ``#crc_top_right`` (the verdict hero above the
-            Warnings tile), then a **3-column bench** (``#crc_bench``): c1 =
-            Algorithm + Serialization, c2 = Coverage + Custom vector, c3 = Job
-            JSON + Template + Load/Save. No widget id, handler, or behavior
-            changes — only the nesting (HLR-L4).
+            ``markup=False`` sinks, same handler wiring) into the realigned
+            bench: a full-width help line, then a **hero row** (``#crc_hero_row``)
+            holding the live coverage window (``#crc_coverage_window``, 2fr)
+            beside ``#crc_top_right`` (the glyph verdict hero above the Warnings
+            tile), then a **3-column bench** (``#crc_bench``) regrouped by data
+            flow (R5): c1 = Algorithm (preset first, R1), c2 = Coverage + Store
+            placement, c3 = Custom vector + Template + Load/Save, and finally the
+            Template-JSON preview as a **full-width strip** below the bench (R6).
+            No widget id, handler, or behavior changes — only the nesting and
+            labels (HLR-L4).
 
         Returns:
             ComposeResult: the re-nested bench widget tree.
 
         Data Flow:
             - Each ``.crc-field-group`` is built once, then placed into a column
-              ``Vertical`` / the hero row; ``query_one("#…")`` resolves any of
-              them anywhere in the subtree, so the shipped ``_recompute`` /
-              Load/Save handlers keep firing (LLR-L4.1).
+              ``Vertical`` / the hero row / the full-width strip; ``query_one("#…")``
+              resolves any of them anywhere in the subtree, so the shipped
+              ``_recompute`` / Load/Save handlers keep firing (LLR-L4.1).
         """
         algo = SEED_ALGORITHM
         byte_width = algo.store_bytes()
@@ -269,19 +276,21 @@ class CrcDesignerPanel(ScrollableContainer):
             id="crc_designer_help",
             markup=False,
         )
-        yield Horizontal(
-            Label("Preset", classes="crc-field-label"),
-            Select(
-                [(preset.name, preset.name) for preset in PRESETS],
-                value=algo.name,
-                allow_blank=False,
-                id="crc_preset_select",
-            ),
-            classes="crc-field-row",
-        )
 
+        # R1: the preset selector is the first row of the Algorithm group (it
+        # populates the algorithm fields) — nothing floats above the hero.
         algorithm_group = Vertical(
             Label("Algorithm", classes="crc-group-title"),
+            Horizontal(
+                Label("Preset", classes="crc-field-label"),
+                Select(
+                    [(preset.name, preset.name) for preset in PRESETS],
+                    value=algo.name,
+                    allow_blank=False,
+                    id="crc_preset_select",
+                ),
+                classes="crc-field-row",
+            ),
             self._text_row("Width (bits)", "crc_field_width", str(algo.width)),
             self._text_row(
                 "Polynomial", "crc_field_poly", _format_hex(algo.poly, byte_width)
@@ -301,9 +310,12 @@ class CrcDesignerPanel(ScrollableContainer):
             classes="crc-field-group",
         )
         serialization_group = Vertical(
-            Label("Serialization", classes="crc-group-title"),
-            self._text_row("Output address", "crc_field_output_address", "0x00000000"),
-            self._text_row("Store width (bytes)", "crc_field_store_width", str(byte_width)),
+            Label("Store placement", classes="crc-group-title"),
+            self._text_row("Address", "crc_field_output_address", "0x00000000"),
+            self._text_row(
+                "Bytes", "crc_field_store_width", str(byte_width),
+                placeholder="ceil(width/8)",
+            ),
             self._select_row(
                 "Store endianness", "crc_field_store_endianness", ENDIANNESS_VALUES
             ),
@@ -311,17 +323,18 @@ class CrcDesignerPanel(ScrollableContainer):
             classes="crc-field-group",
         )
         coverage_group = Vertical(
-            Label("Coverage (preview-only)", classes="crc-group-title"),
+            Label("Coverage · preview-only", classes="crc-group-title"),
             self._text_row(
-                "Ranges (start-end, comma-separated)",
+                "Ranges",
                 "crc_coverage_ranges",
                 "0x00008000-0x00008008, 0x00008010-0x00008018",
+                placeholder="start-end, start-end, …",
             ),
-            self._select_row("Intra-range gap", "crc_coverage_intra_gap", INTRA_GAP_VALUES),
-            self._select_row("Join (between ranges)", "crc_coverage_join", JOIN_VALUES),
+            self._select_row("Intra gap", "crc_coverage_intra_gap", INTRA_GAP_VALUES),
+            self._select_row("Join gaps", "crc_coverage_join", JOIN_VALUES),
             self._text_row("Pad byte", "crc_coverage_pad_byte", "0xFF"),
             self._select_row(
-                "On gap conflict", "crc_coverage_on_gap_conflict", ON_GAP_CONFLICT_VALUES
+                "On conflict", "crc_coverage_on_gap_conflict", ON_GAP_CONFLICT_VALUES
             ),
             Static("", id="crc_coverage_preview", markup=False, classes="crc-verdict"),
             id="crc_coverage_group",
@@ -332,7 +345,7 @@ class CrcDesignerPanel(ScrollableContainer):
             self._select_row("Mode", "crc_custom_vector_mode", _VECTOR_MODES),
             self._text_row("Vector", "crc_custom_vector", "123456789"),
             Horizontal(
-                Label("CRC of vector", classes="crc-field-label"),
+                Label("CRC", classes="crc-field-label"),
                 Static(
                     "",
                     id="crc_custom_vector_result",
@@ -345,7 +358,10 @@ class CrcDesignerPanel(ScrollableContainer):
             classes="crc-field-group",
         )
         json_preview_group = Vertical(
-            Label("Template JSON preview", classes="crc-group-title"),
+            Label(
+                "Template JSON · round-trips through parse_template",
+                classes="crc-group-title",
+            ),
             Static("", id="crc_json_preview", markup=False, classes="crc-json-preview"),
             id="crc_json_preview_group",
             classes="crc-field-group",
@@ -353,16 +369,21 @@ class CrcDesignerPanel(ScrollableContainer):
         template_group = Vertical(
             Label("Template", classes="crc-group-title"),
             self._text_row("Name", "crc_field_name", algo.name),
-            self._text_row("Aliases (comma-separated)", "crc_field_aliases", ""),
+            self._text_row(
+                "Aliases", "crc_field_aliases", "", placeholder="comma-separated"
+            ),
             id="crc_template_fields",
             classes="crc-field-group",
         )
         loadsave_group = Vertical(
             Label("Load / Save", classes="crc-group-title"),
-            self._text_row("Template path (load)", "crc_load_path", ""),
+            self._text_row(
+                "Load path", "crc_load_path", "",
+                placeholder="path/to/name.crc.json",
+            ),
             Horizontal(
-                Button("Save template", id="crc_save_btn"),
-                Button("Load template", id="crc_load_btn"),
+                Button("Save", id="crc_save_btn"),
+                Button("Load", id="crc_load_btn"),
                 classes="crc-field-row",
             ),
             Static("", id="crc_loadsave_status", markup=False, classes="crc-status"),
@@ -370,7 +391,7 @@ class CrcDesignerPanel(ScrollableContainer):
             classes="crc-field-group",
         )
         verdict_group = Vertical(
-            Label("Known-answer verdict (123456789)", classes="crc-group-title"),
+            Label("Known answer · 123456789", classes="crc-group-title"),
             Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict"),
             id="crc_live_verify",
             classes="crc-field-group crc-hero",
@@ -382,36 +403,48 @@ class CrcDesignerPanel(ScrollableContainer):
             classes="crc-field-group",
         )
 
-        # Hero row: the wide coverage window (2fr, live render lands in Inc-2)
-        # beside the verdict hero + Warnings right column (1fr).
+        # Hero row: the wide live coverage window (2fr) beside the glyph verdict
+        # hero + Warnings right column (1fr).
         yield Horizontal(
             Static("", id="crc_coverage_window", markup=False),
             Vertical(verdict_group, warnings_group, id="crc_top_right"),
             id="crc_hero_row",
         )
-        # 3-column parameter bench below the hero row.
+        # 3-column parameter bench below the hero row, regrouped by data flow (R5).
         yield Horizontal(
-            Vertical(algorithm_group, serialization_group, id="crc_bench_c1"),
-            Vertical(coverage_group, custom_vector_group, id="crc_bench_c2"),
-            Vertical(json_preview_group, template_group, loadsave_group, id="crc_bench_c3"),
+            Vertical(algorithm_group, id="crc_bench_c1"),
+            Vertical(coverage_group, serialization_group, id="crc_bench_c2"),
+            Vertical(custom_vector_group, template_group, loadsave_group, id="crc_bench_c3"),
             id="crc_bench",
         )
+        # R6: the flat JSON text gets the wide surface — a full-width strip below
+        # the bench instead of wrapping inside the narrow third column.
+        yield json_preview_group
 
     @staticmethod
-    def _text_row(label: str, field_id: str, value: str) -> Horizontal:
+    def _text_row(
+        label: str, field_id: str, value: str, placeholder: str = ""
+    ) -> Horizontal:
         """Build a labelled single-line ``Input`` row.
 
         Args:
             label (str): The human-readable field label.
             field_id (str): The ``#crc_field_*`` id the pilot/handlers query.
             value (str): The initial (seed) field value.
+            placeholder (str): The dim syntax hint shown when the field is empty
+                (realign R4 — hints move out of the label into the ``Input``).
 
         Returns:
             Horizontal: The label + ``Input`` row.
         """
         return Horizontal(
             Label(label, classes="crc-field-label"),
-            Input(value=value, id=field_id, classes="crc-field-input"),
+            Input(
+                value=value,
+                id=field_id,
+                placeholder=placeholder,
+                classes="crc-field-input",
+            ),
             classes="crc-field-row",
         )
 
@@ -651,20 +684,26 @@ class CrcDesignerPanel(ScrollableContainer):
         aliases = tuple(a.strip() for a in aliases_text.split(",") if a.strip())
         return CrcTemplate(algorithm=self._current_algorithm(), aliases=aliases)
 
-    def _verdict_text(self, algo: CrcAlgorithm) -> str:
-        """Render the tri-state known-answer verdict token (LLR-V2.1 / V2.2).
+    def _verdict_text(self, algo: CrcAlgorithm) -> Text:
+        """Render the glyph-primary tri-state known-answer verdict (LLR-V2.1 / V2.2; R7).
 
         Summary:
             Compute :meth:`CrcAlgorithm.kat_ok` and map the ``True`` / ``False``
-            / ``None`` tri-state to ``MATCH`` / ``MISMATCH`` / ``NO-EXPECTED``.
-            A compute fault (width ∉ [8, 64]) is caught and rendered as a
-            markup-safe warning rather than propagated.
+            / ``None`` tri-state to the glyph-primary tokens ``✓ MATCH`` (GREEN)
+            / ``✗ MISMATCH`` (RED) / ``○ NO-EXPECTED`` (DGRAY) — glyph first,
+            severity colour second (the app's MAC/Issues convention, C-10). A
+            compute fault (width ∉ [8, 64]) renders a ``⚠ Cannot compute`` YELLOW
+            warning rather than propagating. Built with :class:`~rich.text.Text`
+            ``append`` (never ``Text.from_markup``) so the ``markup=False`` sink
+            stays injection-safe (C-17); the ``.plain`` still substring-matches
+            the bare token.
 
         Args:
             algo (CrcAlgorithm): The current algorithm.
 
         Returns:
-            str: The verdict token, or a ``Cannot compute`` warning.
+            Text: The styled glyph-primary verdict, or a ``⚠ Cannot compute``
+            warning.
 
         Dependencies:
             Uses:
@@ -673,9 +712,11 @@ class CrcDesignerPanel(ScrollableContainer):
                 - :meth:`_recompute`
         """
         try:
-            return _VERDICT_TOKENS[algo.kat_ok()]
+            ok = algo.kat_ok()
         except ValueError as exc:
-            return f"Cannot compute: {exc}"
+            return Text(f"⚠ Cannot compute: {exc}", style=YELLOW)
+        token, color = _VERDICT_TOKENS[ok]
+        return Text(token, style=f"bold {color}")
 
     def _custom_vector_text(self, algo: CrcAlgorithm) -> str:
         """Render the current algorithm's CRC over the custom vector (LLR-V3.1).
@@ -737,12 +778,14 @@ class CrcDesignerPanel(ScrollableContainer):
         except (ValueError, TypeError) as exc:
             return f"Cannot render preview: {exc}"
 
-    def _live_warnings_text(self, algo: CrcAlgorithm) -> str:
-        """Render the form-computable live warnings (LLR-V5.4b / V5.4a).
+    def _live_warnings_text(self, algo: CrcAlgorithm) -> Text:
+        """Render the form-computable live warnings (LLR-V5.4b / V5.4a; R7).
 
         Summary:
             The two form-computable warnings that do not need the loaded image,
-            each rendered independently on its own line (LLR-V5.4, M4):
+            each rendered independently on its own ``⚠``-prefixed YELLOW line
+            (LLR-V5.4, M4); when neither holds the tile shows a ``✓ none`` GREEN
+            confirmation (realign R7 — a positive clean state, not a blank):
 
             - ``store_width < ceil(width/8)`` — a stored field too narrow for the
               CRC silently truncates its detection strength (mandatory warn).
@@ -751,14 +794,16 @@ class CrcDesignerPanel(ScrollableContainer):
               so the operator is warned to set an explicit pad byte (the third
               warn condition, LLR-V5.4a).
 
-            All lines render ``markup=False``.
+            Built with :class:`~rich.text.Text` ``append`` (never
+            ``Text.from_markup``); all lines render at the ``markup=False`` sink
+            (C-17).
 
         Args:
             algo (CrcAlgorithm): The current algorithm.
 
         Returns:
-            str: The warning lines joined by newlines, or ``""`` when neither
-            condition holds.
+            Text: The ``⚠``-prefixed warning lines, or a ``✓ none`` confirmation
+            when neither condition holds.
 
         Dependencies:
             Uses:
@@ -786,7 +831,14 @@ class CrcDesignerPanel(ScrollableContainer):
                 "fill policy selected but pad_byte is unset; the filled bytes "
                 "default to 0xFF — set an explicit pad byte"
             )
-        return "\n".join(warnings)
+        if not warnings:
+            return Text("✓ none", style=GREEN)
+        rendered = Text()
+        for index, warning in enumerate(warnings):
+            if index:
+                rendered.append("\n")
+            rendered.append(f"⚠ {warning}", style=YELLOW)
+        return rendered
 
     def _parse_ranges(self, raw: str) -> list[tuple[int, int]]:
         """Parse the coverage ``start-end`` range list (LLR-V6.1).

@@ -214,12 +214,16 @@ def test_live_verdict_transitions_on_single_field_events(tmp_path: Path) -> None
 
     before, after_break, after_clear = asyncio.run(_drive())
 
-    assert before == "MATCH", f"seed verdict must be MATCH, got {before!r}"
-    assert after_break == "MISMATCH", (
+    # R7: the verdict is glyph-primary (`✓ MATCH` etc.), so assert `.plain`
+    # CONTAINS the token — the transition (before != after) is still the teeth.
+    assert "MATCH" in before and "MISMATCH" not in before, (
+        f"seed verdict must be MATCH, got {before!r}"
+    )
+    assert "MISMATCH" in after_break, (
         f"breaking xorout must transition to MISMATCH, got {after_break!r}"
     )
     assert before != after_break, "the verdict must TRANSITION, not stay put (B3)"
-    assert after_clear == "NO-EXPECTED", (
+    assert "NO-EXPECTED" in after_clear, (
         f"clearing check must transition to NO-EXPECTED, got {after_clear!r}"
     )
     assert after_break != after_clear, "second event must also TRANSITION (B3)"
@@ -250,7 +254,8 @@ def test_live_verdict_every_preset_reads_match(tmp_path: Path) -> None:
 
     verdicts = asyncio.run(_drive())
     for preset in crc_kernel.PRESETS:
-        assert verdicts[preset.name] == "MATCH", (
+        # R7: glyph-primary verdict — `.plain` contains the token.
+        assert "MATCH" in verdicts[preset.name] and "MISMATCH" not in verdicts[preset.name], (
             f"preset {preset.name} must read MATCH, got {verdicts[preset.name]!r}"
         )
 
@@ -516,7 +521,9 @@ def test_load_malformed_file_surfaces_one_error(tmp_path: Path) -> None:
     assert status.startswith("Load failed:"), (
         f"a malformed load must surface one error, got {status!r}"
     )
-    assert verdict == "MATCH", "a load fault must leave the form unchanged (app alive)"
+    assert "MATCH" in verdict and "MISMATCH" not in verdict, (
+        "a load fault must leave the form unchanged (app alive)"
+    )
 
 
 def test_save_all_symbol_name_writes_nothing_and_warns(tmp_path: Path) -> None:
@@ -598,7 +605,8 @@ def test_store_width_too_small_warns_live(tmp_path: Path) -> None:
             return before, str(widget.content), widget._render_markup is False
 
     before, after, markup_off = asyncio.run(_drive())
-    assert before == "", "the seed store_width (4) is wide enough; no warning"
+    # R7: a clean warnings tile shows a positive `✓ none`, not a blank.
+    assert before == "✓ none", "the seed store_width (4) is wide enough; ✓ none"
     assert "truncated" in after, (
         f"a too-small store_width must warn live, got {after!r}"
     )
@@ -921,12 +929,14 @@ def test_bench_columns_pairwise_distinct_ancestors(tmp_path: Path) -> None:
 
     Structural teeth (LLR-L2.1 / L5.1, C-31): on the mounted screen a
     ``#crc_bench`` container exists, and the three probes ``#crc_field_width``
-    (c1), ``#crc_coverage_ranges`` (c2), ``#crc_json_preview`` (c3) resolve
-    under PAIRWISE-DISTINCT bench columns — ``len(distinct) == 3``. In the
-    shipped flat form none of them has a ``#crc_bench_c*`` ancestor, so all
-    three collapse to the ``crc_designer_panel`` sentinel → ``len == 1`` → this
-    assertion is FALSE (the RED counterfactual that guards against a revert to
-    the vertical form).
+    (c1 Algorithm), ``#crc_coverage_ranges`` (c2 Coverage), ``#crc_custom_vector``
+    (c3 Custom vector) resolve under PAIRWISE-DISTINCT bench columns —
+    ``len(distinct) == 3``. (The realign moved ``#crc_json_preview`` out to a
+    full-width strip, so a c3-resident field is the c3 probe now.) In the shipped
+    flat form none of them has a ``#crc_bench_c*`` ancestor, so all three collapse
+    to the ``crc_designer_panel`` sentinel → ``len == 1`` → this assertion is
+    FALSE (the RED counterfactual that guards against a revert to the vertical
+    form).
     """
 
     async def _drive() -> tuple[bool, set[str]]:
@@ -936,7 +946,7 @@ def test_bench_columns_pairwise_distinct_ancestors(tmp_path: Path) -> None:
             await pilot.press("0")
             await pilot.pause()
             bench_present = app.query("#crc_bench").first() is not None
-            probes = ("crc_field_width", "crc_coverage_ranges", "crc_json_preview")
+            probes = ("crc_field_width", "crc_coverage_ranges", "crc_custom_vector")
             distinct = {
                 _first_ancestor_id(app.query_one(f"#{p}"), _BENCH_COLUMN_IDS)
                 for p in probes
@@ -1289,8 +1299,10 @@ def test_recompute_handler_fires_through_relayout(tmp_path: Path) -> None:
 
     field_in_bench, before, after = asyncio.run(_drive())
     assert field_in_bench, "#crc_field_xorout must live in bench column c1 (re-nested)"
-    assert before == "MATCH", f"seed verdict must be MATCH, got {before!r}"
-    assert after == "MISMATCH", (
+    assert "MATCH" in before and "MISMATCH" not in before, (
+        f"seed verdict must be MATCH, got {before!r}"
+    )
+    assert "MISMATCH" in after, (
         f"the reused handler must transition the verdict through the layout, got {after!r}"
     )
     assert before != after, "the verdict must TRANSITION through the re-nested tree"
@@ -1317,7 +1329,7 @@ def test_bench_column_ancestry_teeth_computed(tmp_path: Path) -> None:
             probes = [
                 app.query_one("#crc_field_width"),
                 app.query_one("#crc_coverage_ranges"),
-                app.query_one("#crc_json_preview"),
+                app.query_one("#crc_custom_vector"),
             ]
             # Live bench tree: each probe's first bench-column ancestor.
             bench = {_first_ancestor_id(w, _BENCH_COLUMN_IDS) for w in probes}
@@ -1374,4 +1386,77 @@ def test_coverage_window_hostile_markup_renders_literally(tmp_path: Path) -> Non
     )
     assert all("link" not in str(span.style).lower() for span in spans), (
         f"the window must apply no input-derived (link) style span, got {spans!r}"
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# realign — right-column reachability + full-width JSON strip (operator-flagged
+# "right sidebar scrollbar pinned / content unreachable"; R6 full-width JSON)
+# ─────────────────────────────────────────────────────────────────────────────
+#: Every right-hand / lower widget the operator reported as unreachable — the
+#: verdict, warnings, the custom-vector result, the template + load/save fields
+#: and buttons, and the JSON preview.
+_RIGHT_COLUMN_IDS = (
+    "crc_kat_verdict",
+    "crc_warnings",
+    "crc_custom_vector_result",
+    "crc_field_name",
+    "crc_field_aliases",
+    "crc_load_path",
+    "crc_save_btn",
+    "crc_load_btn",
+    "crc_json_preview",
+)
+
+
+def test_right_column_widgets_reachable_and_json_full_width(tmp_path: Path) -> None:
+    """Every right-hand widget scrolls into view and the JSON preview is full-width.
+
+    Operator-flagged bug (realign): the right-hand content (verdict, warnings,
+    custom-vector result, template + load/save fields and buttons, JSON preview)
+    was effectively unreachable behind a scrollbar pinned at the top. After the
+    realign the panel allows vertical scrolling and each such widget scrolls into
+    a NON-EMPTY on-screen region (``region.area > 0``) — the reachability teeth,
+    not mere "widget exists". R6: the Template JSON preview is a full-width strip
+    OUTSIDE the 3-column bench (no ``#crc_bench_c*`` ancestor) and wider than a
+    single bench column — measured, not asserted by prose.
+    """
+
+    async def _drive() -> tuple[dict[str, int], bool, bool, int, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            panel = app.query_one("#crc_designer_panel")
+            scrollable = panel.allow_vertical_scroll
+            reach: dict[str, int] = {}
+            for wid in _RIGHT_COLUMN_IDS:
+                widget = app.query_one(f"#{wid}")
+                widget.scroll_visible(animate=False)
+                await pilot.pause()
+                reach[wid] = widget.region.area
+            json_group = app.query_one("#crc_json_preview_group")
+            json_group.scroll_visible(animate=False)
+            await pilot.pause()
+            json_in_bench = any(
+                _has_ancestor(app.query_one("#crc_json_preview"), col)
+                for col in _BENCH_COLUMN_IDS
+            )
+            json_width = json_group.region.width
+            column_width = app.query_one("#crc_bench_c1").region.width
+            return reach, scrollable, json_in_bench, json_width, column_width
+
+    reach, scrollable, json_in_bench, json_width, column_width = asyncio.run(_drive())
+    assert scrollable, "the designer panel must allow vertical scroll so lower content is reachable"
+    for wid, area in reach.items():
+        assert area > 0, (
+            f"{wid} must scroll into a non-empty on-screen region (reachable), got area={area}"
+        )
+    assert not json_in_bench, (
+        "R6: the JSON preview must live OUTSIDE the 3-column bench (full-width strip)"
+    )
+    assert json_width > column_width, (
+        f"R6: the JSON strip must be wider than one bench column (full-width); "
+        f"got json={json_width} vs column={column_width}"
     )
