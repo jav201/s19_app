@@ -54,6 +54,7 @@ from .variant_execution_service import (
     MANIFEST_PATH_ESCAPE,
     _resolve_manifest_entry,
 )
+from ..workspace import copy_into_workarea, sanitize_project_name
 
 #: The one supported envelope version (``Flow.schema_version`` defaults to 1).
 FLOW_SCHEMA_VERSION = 1
@@ -61,6 +62,12 @@ FLOW_SCHEMA_VERSION = 1
 #: Byte cap for a flow.json read (probed BEFORE parse — a pre-parse DoS guard).
 #: Deliberately tight: a flow is a small pipeline description, not a payload.
 FLOW_SIZE_CAP_BYTES = 1_048_576  # 1 MiB
+
+#: Named-flow storage subdirectory under the active project work area
+#: (``.s19tool/workarea/<project>/flows/``). A subdirectory, so
+#: ``validate_project_files`` (which skips subdirs) is unaffected — no
+#: ``workspace.py`` edit is needed.
+FLOWS_SUBDIR = "flows"
 
 #: Structural sanity caps (fail closed outside them).
 FLOW_MIN_BLOCKS = 1
@@ -506,3 +513,126 @@ def load_flow_json(
         )
         return None, findings
     return dict_to_flow(payload, project_dir)
+
+
+def save_flow_json(flow: Flow, raw_name: str, project_dir: Path) -> Optional[Path]:
+    """Serialize ``flow`` and write it to ``flows/<sanitized>.json`` (LLR-001.2).
+
+    Summary:
+        Compute the write-side filename through the SAME ``sanitize_project_name``
+        the project-save path uses (write-side containment — the sanitiser, not
+        the embedded display name, is the identity). When the raw name sanitises
+        to ``None`` (empty / punctuation-only) NOTHING is written and ``None`` is
+        returned. Otherwise the ``flows/`` subdirectory is created and the
+        schema-v1 envelope is written pretty-printed UTF-8.
+
+    Args:
+        flow (Flow): The in-memory flow to persist (trusted-side).
+        raw_name (str): The operator-typed flow name (untrusted text → sanitised
+            to a filesystem-safe stem).
+        project_dir (Path): The active ``.s19tool/workarea/<project>/`` directory.
+
+    Returns:
+        Optional[Path]: The absolute path written (``flows/<clean>.json``), or
+        ``None`` when ``raw_name`` sanitises to ``None`` (no file created).
+
+    Data Flow:
+        - ``raw_name`` → ``sanitize_project_name`` → ``clean`` (or ``None`` stop).
+        - ``flow`` → :func:`flow_to_dict` → ``json.dumps(..., indent=2)`` → file.
+        - The write-side inverse of :func:`load_flow_json`; a saved file round-trips.
+
+    Dependencies:
+        Uses:
+            - sanitize_project_name (write-side containment, workspace.py)
+            - flow_to_dict / json
+        Used by:
+            - the app Save handler (later increment)
+
+    Example:
+        >>> save_flow_json(Flow(name="n", blocks=[ReportBlock()]),
+        ...                "Nightly Release!  ", project_dir).name
+        'NightlyRelease.json'
+    """
+    clean = sanitize_project_name(raw_name)
+    if clean is None:
+        return None
+    flows_dir = project_dir / FLOWS_SUBDIR
+    flows_dir.mkdir(parents=True, exist_ok=True)
+    target = flows_dir / f"{clean}.json"
+    target.write_text(json.dumps(flow_to_dict(flow), indent=2), encoding="utf-8")
+    return target
+
+
+def list_saved_flows(project_dir: Path) -> List[str]:
+    """List the saved flow stems under ``flows/`` (LLR-003.3).
+
+    Summary:
+        Return the sorted stems of every ``flows/*.json`` file in the project
+        (the names the Load modal lists). A missing ``flows/`` directory yields an
+        empty list — a project with no saved flows is not an error.
+
+    Args:
+        project_dir (Path): The active ``.s19tool/workarea/<project>/`` directory.
+
+    Returns:
+        List[str]: Sorted ``*.json`` stems (e.g. ``["nightly", "release"]``);
+        empty when the ``flows/`` directory is absent or holds no ``.json`` file.
+
+    Data Flow:
+        - ``project_dir/flows`` → ``glob("*.json")`` → sorted stems.
+        - Feeds the ``LoadFlowScreen`` ListView (later increment).
+
+    Dependencies:
+        Uses:
+            - pathlib.Path.glob
+        Used by:
+            - the app Load handler / LoadFlowScreen (later increment)
+    """
+    flows_dir = project_dir / FLOWS_SUBDIR
+    if not flows_dir.is_dir():
+        return []
+    return sorted(entry.stem for entry in flows_dir.glob("*.json") if entry.is_file())
+
+
+def import_flow_file(picked: Path, project_dir: Path) -> Path:
+    """Copy an external ``flow.json`` into ``flows/`` (never loaded in place).
+
+    Summary:
+        Copy the operator-picked external file into the project's ``flows/``
+        subdirectory through the SAME ``copy_into_workarea`` containment guard the
+        project-save path uses (reparse-point / workarea-containment / size cap),
+        binding the size cap to :data:`FLOW_SIZE_CAP_BYTES` (AMD-4/F1) so an
+        oversize import is refused AT THE COPY STEP — the 1 MiB flow DoS cap is
+        not defeated by the guard's 256 MB default. The caller then loads the
+        RETURNED copy (C-12 output-then-consume), never the external source.
+
+    Args:
+        picked (Path): The external file the operator selected (untrusted).
+        project_dir (Path): The active ``.s19tool/workarea/<project>/`` directory;
+            the copy lands in its ``flows/`` subdirectory.
+
+    Returns:
+        Path: The absolute path of the copy inside ``flows/`` (name collisions
+        deduplicated with an ``_<N>`` suffix by ``copy_into_workarea``).
+
+    Raises:
+        WorkareaContainmentError: When the destination is not workarea-contained,
+            the source/destination traverses a reparse point, or the source
+            exceeds :data:`FLOW_SIZE_CAP_BYTES`. Surfaced by the app handler as an
+            error card, never a crash (LLR-003.4).
+        FileNotFoundError: When ``picked`` does not exist.
+
+    Data Flow:
+        - ``picked`` → ``copy_into_workarea(..., max_size_bytes=FLOW_SIZE_CAP_BYTES)``
+          → a file under ``project_dir/flows/`` → the app then ``load_flow_json``\\ s
+          THAT path (the handler-produced artifact, not the external source).
+
+    Dependencies:
+        Uses:
+            - copy_into_workarea (containment + size cap, workspace.py)
+        Used by:
+            - the app Import handler (later increment)
+    """
+    return copy_into_workarea(
+        picked, project_dir / FLOWS_SUBDIR, max_size_bytes=FLOW_SIZE_CAP_BYTES
+    )

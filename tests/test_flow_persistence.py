@@ -55,12 +55,18 @@ from s19_app.tui.services.flow_persistence_service import (
     FLOW_UNKNOWN_KIND,
     FLOW_UNSAFE_OUTPUT_NAME,
     FLOW_UNSAFE_REF,
+    FLOW_SIZE_CAP_BYTES,
+    FLOWS_SUBDIR,
     REJECTING_CODES,
     dict_to_flow,
     flow_to_dict,
+    import_flow_file,
+    list_saved_flows,
     load_flow_json,
+    save_flow_json,
 )
 from s19_app.tui.services.variant_execution_service import MANIFEST_PATH_ESCAPE
+from s19_app.tui.workspace import WorkareaContainmentError, copy_into_workarea
 
 
 @pytest.fixture
@@ -291,3 +297,160 @@ def test_report_noop_keeps_rollup_ok(project_dir: Path) -> None:
     report = result.block_results[0]
     assert report.status == BLOCK_STATUS_OK
     assert "deferred" in report.summary
+
+
+# --------------------------------------------------------------------------- #
+# Inc-2 · AT-001 / TC-002 — save_flow_json: sanitiser is write-side containment
+# --------------------------------------------------------------------------- #
+
+def test_save_flow_json_sanitises_and_roundtrips(project_dir: Path) -> None:
+    """A raw name saves under the SANITISED stem, on disk, and reloads equal.
+
+    The observable US-001 deliverable: a file at
+    ``flows/<sanitize_project_name(name)>.json`` that is non-empty, valid JSON,
+    ``schema_version:1``, with the built blocks — then round-trips through
+    ``load_flow_json`` field-by-field.
+    """
+    flow = _good_flow()
+    saved = save_flow_json(flow, "Nightly Release!  ", project_dir)
+
+    # Landed under flows/ at the sanitised stem (spaces + '!' stripped).
+    assert saved is not None
+    assert saved == project_dir / FLOWS_SUBDIR / "NightlyRelease.json"
+    assert saved.parent == project_dir / FLOWS_SUBDIR
+    assert saved.exists() and saved.stat().st_size > 0
+
+    # On-disk envelope is valid JSON, schema v1, block count matches.
+    payload = json.loads(saved.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == 1
+    assert len(payload["blocks"]) == len(flow.blocks)
+
+    # Round-trips back to an equal Flow (non-default enums preserved).
+    reloaded, findings = load_flow_json(saved, project_dir)
+    assert findings == []
+    assert reloaded is not None
+    assert list(reloaded.blocks) == list(flow.blocks)
+
+
+def test_save_flow_json_empty_after_clean_writes_nothing(project_dir: Path) -> None:
+    """A whitespace- / punctuation-only name sanitises to ``None`` → no file, no dir."""
+    for bad in ("   ", "!!!", "@@@"):
+        assert save_flow_json(_good_flow(), bad, project_dir) is None, bad
+    assert not (project_dir / FLOWS_SUBDIR).exists()
+
+
+def test_save_flow_json_sanitiser_contains_traversal(project_dir: Path) -> None:
+    """The sanitiser IS the write-side containment: a ``../``-bearing name is
+    reduced to a safe stem that stays INSIDE ``flows/``, never one level up.
+
+    Counterfactual: were the raw name written verbatim, ``../../escape`` would
+    land above ``flows/`` — this asserts the sanitised copy is contained and the
+    naive-escape target does not exist.
+    """
+    flows_dir = (project_dir / FLOWS_SUBDIR).resolve()
+    for hostile in ("../../escape", "..\\..\\escape"):
+        saved = save_flow_json(_good_flow(), hostile, project_dir)
+        assert saved is not None
+        # Contained: the write is inside flows/, and the traversal target is not.
+        assert saved.parent == project_dir / FLOWS_SUBDIR
+        assert saved.resolve().is_relative_to(flows_dir)
+        assert not (project_dir / "escape.json").exists()
+
+
+# --------------------------------------------------------------------------- #
+# Inc-2 · LLR-003.3 — list_saved_flows
+# --------------------------------------------------------------------------- #
+
+def test_list_saved_flows_empty_when_no_dir(project_dir: Path) -> None:
+    assert list_saved_flows(project_dir) == []
+
+
+def test_list_saved_flows_returns_sorted_stems(project_dir: Path) -> None:
+    save_flow_json(_good_flow(), "release", project_dir)
+    save_flow_json(_good_flow(), "nightly", project_dir)
+    save_flow_json(_good_flow(), "alpha", project_dir)
+    assert list_saved_flows(project_dir) == ["alpha", "nightly", "release"]
+
+
+# --------------------------------------------------------------------------- #
+# Inc-2 · AT-P1-10 / TC-014 — Import: COPY then Load-what-was-written (C-12)
+# --------------------------------------------------------------------------- #
+
+def test_import_copies_then_loads_the_copy_not_the_source(
+    project_dir: Path, tmp_path: Path
+) -> None:
+    """C-12 output-then-consume: the consumer (load) observes the HANDLER-PRODUCED
+    copy under ``flows/``, never the external source.
+
+    The discriminator: after the copy, MUTATE the external file and assert the
+    loaded content still matches the COPY. A handler that loaded the external in
+    place (copying only as a side-effect) would reload the mutated content → RED.
+    """
+    external_dir = tmp_path / "outside"
+    external_dir.mkdir()
+    external = external_dir / "vendor_flow.json"
+    external.write_text(json.dumps(flow_to_dict(_good_flow())), encoding="utf-8")
+
+    imported = import_flow_file(external, project_dir)
+    assert imported.parent == project_dir / FLOWS_SUBDIR  # handler-produced artifact
+
+    # Mutate the EXTERNAL source AFTER the copy — the copy must be untouched.
+    external.write_text(
+        json.dumps(flow_to_dict(Flow(name="tampered", blocks=[ReportBlock()]))),
+        encoding="utf-8",
+    )
+
+    reloaded, findings = load_flow_json(imported, project_dir)
+    assert findings == []
+    assert reloaded is not None
+    # Loaded from the COPY (5 kinds), not the post-copy external (1 report block).
+    assert list(reloaded.blocks) == list(_good_flow().blocks)
+
+
+def test_import_dedups_second_import_of_same_name(
+    project_dir: Path, tmp_path: Path
+) -> None:
+    """A second import of the same filename dedups to ``_1``; both loadable (TC-035)."""
+    external = tmp_path / "flow.json"
+    external.write_text(json.dumps(flow_to_dict(_good_flow())), encoding="utf-8")
+
+    first = import_flow_file(external, project_dir)
+    second = import_flow_file(external, project_dir)
+    assert first != second
+    assert second.stem.endswith("_1")
+    for copied in (first, second):
+        reloaded, findings = load_flow_json(copied, project_dir)
+        assert findings == [] and reloaded is not None
+
+
+def test_import_over_size_cap_refused_at_copy_step(
+    project_dir: Path, tmp_path: Path
+) -> None:
+    """AMD-4/F1: an external file over the 1 MiB FLOW cap is refused AT THE COPY,
+    proving the copy binds ``FLOW_SIZE_CAP_BYTES`` — not the 256 MB copy default.
+
+    Counterfactual: the handler copies with the default cap → a >1 MiB flow lands
+    and defeats the DoS bound → RED (this raise would not fire).
+    """
+    oversize = tmp_path / "huge.json"
+    oversize.write_bytes(b"{}" + b" " * (FLOW_SIZE_CAP_BYTES + 1))
+    assert oversize.stat().st_size > FLOW_SIZE_CAP_BYTES
+    with pytest.raises(WorkareaContainmentError):
+        import_flow_file(oversize, project_dir)
+    # Nothing landed under flows/.
+    assert list_saved_flows(project_dir) == []
+
+
+# --------------------------------------------------------------------------- #
+# Inc-2 · AT-P1-11 / TC-036 — Hostile import destination refused
+# --------------------------------------------------------------------------- #
+
+def test_import_hostile_dest_outside_workarea_refused(tmp_path: Path) -> None:
+    """A destination OUTSIDE any ``.s19tool/workarea/`` root is refused; nothing
+    is written (the containment guard is the authority, not the handler)."""
+    external = tmp_path / "flow.json"
+    external.write_text(json.dumps(flow_to_dict(_good_flow())), encoding="utf-8")
+    hostile_dest = tmp_path / "not_a_workarea" / FLOWS_SUBDIR
+    with pytest.raises(WorkareaContainmentError):
+        copy_into_workarea(external, hostile_dest, max_size_bytes=FLOW_SIZE_CAP_BYTES)
+    assert not hostile_dest.exists()
