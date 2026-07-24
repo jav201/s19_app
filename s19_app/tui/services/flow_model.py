@@ -25,6 +25,9 @@ BLOCK_PATCH = "patch"
 BLOCK_WRITE_OUT = "write_out"
 BLOCK_CHECK = "check"
 BLOCK_CRC = "crc"
+#: Ref-less report block (batch-53 FB-P1, D2 / AMD-5) — persists + round-trips;
+#: content generation is deferred to FB-P1b (run_flow treats it as a no-op).
+BLOCK_REPORT = "report"
 
 #: WRITE-OUT emit formats — the ``save_patched_image`` ``source_kind`` values.
 WRITE_FMT_S19 = "s19"
@@ -170,8 +173,27 @@ class CrcBlock:
     kind: str = BLOCK_CRC
 
 
-#: A tracer-slice block (SOURCE/PATCH/CHECK/WRITE-OUT + the batch-52 CRC block).
-FlowBlock = Union[SourceBlock, PatchBlock, WriteOutBlock, CheckBlock, CrcBlock]
+@dataclass(frozen=True)
+class ReportBlock:
+    """Report block — a ref-less terminal marker that a flow produces a report.
+
+    Field-less by design (AMD-5, LOCKED for FB-P1): it carries no ``*_ref`` and
+    no WRITE target, so it serializes as ``{"kind": "report"}`` and round-trips
+    through the hardened loader's ref-less path (strict-keys ``{"kind"}`` still
+    fires on any smuggled field). ``run_flow`` treats it as a no-op emitting
+    ``BLOCK_STATUS_OK`` — report CONTENT generation is deferred to FB-P1b. Any
+    future output field must pass the loader's V7 ``FLOW-UNSAFE-OUTPUT-NAME``
+    shape check, which is why none is added here yet.
+    """
+
+    kind: str = BLOCK_REPORT
+
+
+#: A tracer-slice block (SOURCE/PATCH/CHECK/WRITE-OUT + the batch-52 CRC block +
+#: the batch-53 ref-less REPORT block).
+FlowBlock = Union[
+    SourceBlock, PatchBlock, WriteOutBlock, CheckBlock, CrcBlock, ReportBlock
+]
 
 
 @dataclass(frozen=True)
