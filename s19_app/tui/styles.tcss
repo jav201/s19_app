@@ -1847,6 +1847,50 @@ ModalScreen {
     padding-left: 1;
 }
 
+/* --- Flow persistence (batch-53 FB-P1): name strip, save note, quarantine ---
+ * The name strip is the dirty/saved state cue (glyph-primary `●`/`✓`, C-10);
+ * colour flows through the frozen `.sev-*` classes (secondary). The quarantine
+ * card is a bordered `.sev-error` box mounted into `#flow_result` on a rejected
+ * load — every file-derived line is a markup-safe `Static` (C-17). Layout only.
+ */
+.flow-name-strip {
+    text-style: bold;
+    width: auto;
+    padding: 0 1;
+    margin-bottom: 1;
+}
+
+.flow-save-note {
+    text-style: bold;
+    width: auto;
+    padding: 0 1;
+}
+
+.flow-quarantine {
+    height: auto;
+    border: round $rule;
+    padding: 0 1;
+}
+
+.flow-quarantine-head {
+    text-style: bold;
+}
+
+.flow-quarantine-line {
+    padding-left: 2;
+}
+
+.flow-quarantine-foot {
+    text-style: italic;
+    margin-top: 1;
+}
+
+/* Sanitiser hint under a modal input (batch-53 SaveFlowScreen). */
+.modal-hint {
+    color: #969aad;
+    padding: 0 1;
+}
+
 /* --- CRC Designer "coverage-first bench" (batch-59) ----------------------
  * The `crc-*` classes were UNDEFINED before this batch, so the panel fell back
  * to Textual's default vertical stacking (the flat form). These rules supply

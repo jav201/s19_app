@@ -50,9 +50,11 @@ from .screens import (
     EntryJsonScreen,
     LegendScreen,
     LoadFileScreen,
+    LoadFlowScreen,
     LoadProjectScreen,
     OperationsScreen,
     ReportViewerScreen,
+    SaveFlowScreen,
     SaveProjectPayload,
     SaveProjectScreen,
     SelectVariantScreen,
@@ -2319,6 +2321,93 @@ class S19TuiApp(App):
             return
         result = run_flow(event.flow, FlowContext(project_dir=project_dir))
         panel.render_result(result)
+
+    def _flow_no_project_error(self, panel: "FlowBuilderPanel") -> None:
+        """Render the no-project error card on the flow panel (mirrors Run)."""
+        from .services.flow_model import FLOW_STATUS_ERROR, FlowRunResult
+
+        panel.render_result(
+            FlowRunResult(
+                status=FLOW_STATUS_ERROR,
+                diagnostics=["no project loaded - load or save a project first"],
+            )
+        )
+
+    def on_flow_builder_panel_save_requested(
+        self, event: "FlowBuilderPanel.SaveRequested"
+    ) -> None:
+        """Save the composed flow to ``flows/<name>.json`` (batch-53, LLR-003.7).
+
+        Summary:
+            Resolve the active project, list existing saved flows for the
+            overwrite notice, and open :class:`SaveFlowScreen`. On confirm, write
+            through ``save_flow_json`` (``sanitize_project_name`` is the write-side
+            containment authority) and mark the panel saved; a no-project state
+            renders the error card, an un-sanitisable name a status message.
+
+        Args:
+            event (FlowBuilderPanel.SaveRequested): Carries the current flow.
+        """
+        from .services.flow_persistence_service import list_saved_flows, save_flow_json
+
+        panel = self.query_one("#flow_panel", FlowBuilderPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self._flow_no_project_error(panel)
+            return
+        existing = list_saved_flows(project_dir)
+
+        def _do_save(raw_name: Optional[str]) -> None:
+            if raw_name is None:
+                return
+            saved = save_flow_json(event.flow, raw_name, project_dir)
+            if saved is None:
+                self.set_status("Flow name is empty after sanitising - not saved.")
+                return
+            panel.mark_saved(saved.stem)
+
+        self.push_screen(SaveFlowScreen(event.flow.name, existing), _do_save)
+
+    def on_flow_builder_panel_load_requested(
+        self, event: "FlowBuilderPanel.LoadRequested"
+    ) -> None:
+        """Load a saved flow into the panel, hardened (batch-53, LLR-003.7).
+
+        Summary:
+            Resolve the active project, list ``flows/*.json``, and open
+            :class:`LoadFlowScreen` (which also handles Import). On a chosen stem,
+            load through the fail-closed ``load_flow_json``: a valid flow is routed
+            to ``panel.set_blocks`` (identity = the stem), a rejection to the
+            quarantine card (current flow untouched). A no-project state renders
+            the error card.
+
+        Args:
+            event (FlowBuilderPanel.LoadRequested): The Load request (no payload).
+        """
+        from .services.flow_persistence_service import (
+            FLOWS_SUBDIR,
+            list_saved_flows,
+            load_flow_json,
+        )
+
+        panel = self.query_one("#flow_panel", FlowBuilderPanel)
+        project_dir = self._active_project_dir()
+        if project_dir is None:
+            self._flow_no_project_error(panel)
+            return
+        flows = list_saved_flows(project_dir)
+
+        def _do_load(stem: Optional[str]) -> None:
+            if stem is None:
+                return
+            flow_path = project_dir / FLOWS_SUBDIR / f"{stem}.json"
+            loaded, findings = load_flow_json(flow_path, project_dir)
+            if loaded is None:
+                panel.render_quarantine(stem, findings)
+                return
+            panel.set_blocks(loaded, name=stem)
+
+        self.push_screen(LoadFlowScreen(flows, project_dir), _do_load)
 
     def _compose_screen_patch(self) -> Container:
         """

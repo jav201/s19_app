@@ -31,6 +31,7 @@ from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
 from .hexview import MAX_HEX_ROWS, render_hex_view_text
 from .os_clipboard_input import OsClipboardInput
+from .workspace import sanitize_project_name
 from .legend import (
     BAND_DOMAIN_NOTE,
     BAND_GAP_HATCH_NOTE,
@@ -683,6 +684,175 @@ class LoadProjectScreen(ModalScreen[Optional[str]]):
             label_widget = selected.query_one(Label)
             name = label_widget.text if hasattr(label_widget, "text") else str(label_widget)
             self.dismiss(name)
+
+
+class SaveFlowScreen(ModalScreen[Optional[str]]):
+    """Modal to name and save the current Flow Builder pipeline (batch-53 FB-P1).
+
+    Summary:
+        A unified Save / Save-As dialog (D1): one ``OsClipboardInput`` prefilled
+        with the current flow name, a sanitiser hint, and a live
+        ``(overwrites existing)`` notice shown when the sanitised name already
+        maps to a saved ``flows/<name>.json``. Save dismisses with the RAW typed
+        name (the app runs ``save_flow_json`` → ``sanitize_project_name`` as the
+        write-side containment authority); Cancel dismisses with ``None``.
+        Mirrors :class:`SaveProjectScreen` (LLR-003.2).
+
+    Args:
+        default_name (str): The current flow name to prefill (editing = Save-As).
+        existing (List[str]): Saved flow stems (``list_saved_flows``) — the
+            overwrite notice fires when the sanitised input is one of these.
+    """
+
+    def __init__(self, default_name: str, existing: Optional[List[str]] = None) -> None:
+        super().__init__()
+        self.default_name = default_name
+        self.existing: List[str] = list(existing or [])
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Save flow as:", classes="modal-title"),
+            OsClipboardInput(placeholder="letters, numbers, - _", id="flow_save_name"),
+            Label(
+                "Name is sanitised (letters, numbers, - _); "
+                "identity is the filename.",
+                classes="modal-hint",
+                markup=False,
+            ),
+            Label("", id="flow_overwrite_notice", classes="sev-warning", markup=False),
+            Container(
+                Button("Save", id="flow_save_ok", classes="modal-confirm"),
+                Button("Cancel", id="flow_save_cancel"),
+                id="flowsave_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_mount(self) -> None:
+        self.query_one("#flow_save_name", Input).value = self.default_name
+        self._refresh_overwrite_notice(self.default_name)
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if event.input.id == "flow_save_name":
+            self._refresh_overwrite_notice(event.value)
+
+    def _refresh_overwrite_notice(self, raw: str) -> None:
+        """Show ``(overwrites existing)`` when the sanitised name already exists."""
+        clean = sanitize_project_name(raw)
+        notice = self.query_one("#flow_overwrite_notice", Label)
+        notice.update("(overwrites existing)" if clean in self.existing else "")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "flow_save_cancel":
+            self.dismiss(None)
+            return
+        if event.button.id == "flow_save_ok":
+            raw = self.query_one("#flow_save_name", Input).value.strip()
+            if not raw:
+                return
+            self.dismiss(raw)
+
+
+class LoadFlowScreen(ModalScreen[Optional[str]]):
+    """Modal to pick a saved flow to load, or Import an external ``flow.json``.
+
+    Summary:
+        Lists ``flows/*.json`` stems in a ``ListView`` with Import…/Load/Cancel.
+        Import opens a tkinter filedialog and COPIES the picked file into
+        ``flows/`` via ``import_flow_file`` (never loaded in place — the copy is
+        containment- and size-guarded); the new stem is appended to the list. A
+        containment/size rejection (or any raise) shows an inline status line,
+        never a crash. Load dismisses with the highlighted stem; Cancel with
+        ``None`` (LLR-003.3/.4). Mirrors :class:`LoadProjectScreen`.
+
+    Args:
+        flows (List[str]): The saved flow stems to list.
+        project_dir (Path): The active project dir — the Import copy destination
+            (``project_dir/flows``).
+    """
+
+    def __init__(self, flows: List[str], project_dir: Path) -> None:
+        super().__init__()
+        self.flows: List[str] = list(flows)
+        self.project_dir = project_dir
+
+    def compose(self) -> ComposeResult:
+        yield Container(
+            Label("Load flow:", classes="modal-title"),
+            ListView(
+                *[
+                    ListItem(Label(stem, markup=False), name=stem)
+                    for stem in self.flows
+                ],
+                id="flow_list",
+            ),
+            Label("", id="flow_import_status", classes="sev-warning", markup=False),
+            Container(
+                Button("Import…", id="flow_import"),
+                Button("Load", id="flow_load_ok", classes="modal-confirm"),
+                Button("Cancel", id="flow_load_cancel"),
+                id="loadflow_buttons",
+                classes="modal-buttons",
+            ),
+            id="load_dialog",
+            classes="modal-dialog",
+        )
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "flow_load_cancel":
+            self.dismiss(None)
+            return
+        if event.button.id == "flow_import":
+            self._import_external()
+            return
+        if event.button.id == "flow_load_ok":
+            selected = self.query_one("#flow_list", ListView).highlighted_child
+            if selected is None or selected.name is None:
+                return
+            # Identity travels on the ListItem's ``name`` (set to the stem), not
+            # parsed back out of the Label renderable (which is unreliable).
+            self.dismiss(selected.name)
+
+    def _import_external(self) -> None:
+        """Filedialog → containment-guarded COPY into ``flows/`` → refresh list.
+
+        A rejection or any raise is surfaced inline (``#flow_import_status``),
+        never a crash — the copy guard is the authority (LLR-003.4).
+        """
+        status = self.query_one("#flow_import_status", Label)
+        try:
+            import tkinter as tk
+            from tkinter import filedialog
+        except Exception as exc:  # pragma: no cover - headless
+            logger.warning("Flow import browse unavailable: %s", exc)
+            status.update("import unavailable in this environment")
+            return
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        picked = filedialog.askopenfilename(
+            filetypes=[("Flow JSON", "*.json"), ("All files", "*.*")]
+        )
+        root.destroy()
+        if not picked:
+            return
+        from .services.flow_persistence_service import import_flow_file
+        from .workspace import WorkareaContainmentError
+
+        try:
+            imported = import_flow_file(Path(picked), self.project_dir)
+        except (WorkareaContainmentError, OSError) as exc:
+            status.update(f"import refused: {type(exc).__name__}")
+            return
+        stem = imported.stem
+        if stem not in self.flows:
+            self.flows.append(stem)
+            self.query_one("#flow_list", ListView).append(
+                ListItem(Label(stem, markup=False), name=stem)
+            )
+        status.update(f"imported flows/{imported.name}")
 
 
 class SelectVariantScreen(ModalScreen[Optional[str]]):
