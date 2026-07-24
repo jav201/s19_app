@@ -419,12 +419,16 @@ def dict_to_flow(
             if resolved is None:
                 continue  # the guard appended its finding — block rejected
         # V7 — WRITE-target shape pre-check (runtime authority stays save_patched_image).
+        # The drive-relative arm mirrors V6: ``C:foo`` has a drive but is not
+        # absolute, so ``is_absolute()`` alone would let it through — reject it
+        # here too so the WRITE pre-check is symmetric with the READ one (F1).
         elif ref_field == "output_name":
             if (
                 "/" in ref
                 or "\\" in ref
                 or ".." in ref
                 or Path(ref).is_absolute()
+                or _is_drive_relative(ref)
                 or ref.strip().startswith(".")
             ):
                 findings.append(

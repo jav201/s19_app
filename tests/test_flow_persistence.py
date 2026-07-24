@@ -248,6 +248,57 @@ def test_negative_control_benign_output_name(project_dir: Path) -> None:
     assert flow is not None
 
 
+def test_output_name_shape_rejected_per_branch(project_dir: Path) -> None:
+    """AT-P1-08: each V7 hostile shape rejects on its OWN branch — a bare
+    separator, a backslash, POSIX/Windows absolute, a drive-relative ``C:x``
+    (F1), traversal, and hidden — so a regression dropping any single arm goes
+    RED (the collapsed ``..\\..\\x`` case tripped two arms at once)."""
+    for hostile in (
+        "sub/x.s19",       # bare forward separator
+        "sub\\x.s19",      # bare back separator
+        "/abs/x.s19",      # POSIX absolute
+        "C:\\abs\\x.s19",  # Windows absolute
+        "C:x.s19",         # drive-relative (F1 — not absolute, has a drive)
+        "..\\x.s19",       # traversal
+        ".hidden.s19",     # hidden
+    ):
+        payload = copy.deepcopy(_good_envelope())
+        payload["blocks"][4]["output_name"] = hostile
+        flow, findings = dict_to_flow(payload, project_dir)
+        assert flow is None, hostile
+        assert FLOW_UNSAFE_OUTPUT_NAME in {f.code for f in findings}, hostile
+
+
+def test_block_count_cap_boundary(project_dir: Path) -> None:
+    """LLR-002.3: exactly FLOW_MAX_BLOCKS accepts; one over rejects."""
+    at_cap = {
+        "schema_version": 1,
+        "name": "n",
+        "blocks": [{"kind": "report"} for _ in range(fps.FLOW_MAX_BLOCKS)],
+    }
+    flow, findings = dict_to_flow(at_cap, project_dir)
+    assert flow is not None and findings == []
+
+    over_cap = copy.deepcopy(at_cap)
+    over_cap["blocks"].append({"kind": "report"})
+    flow, findings = dict_to_flow(over_cap, project_dir)
+    assert flow is None
+    assert FLOW_BAD_STRUCTURE in {f.code for f in findings}
+
+
+def test_name_length_cap_boundary(project_dir: Path) -> None:
+    """LLR-002.3: a name at FLOW_MAX_NAME_LEN accepts; one char over rejects."""
+    base = {"schema_version": 1, "blocks": [{"kind": "report"}]}
+    at_cap = {**base, "name": "a" * fps.FLOW_MAX_NAME_LEN}
+    flow, findings = dict_to_flow(at_cap, project_dir)
+    assert flow is not None and findings == []
+
+    over_cap = {**base, "name": "a" * (fps.FLOW_MAX_NAME_LEN + 1)}
+    flow, findings = dict_to_flow(over_cap, project_dir)
+    assert flow is None
+    assert FLOW_BAD_FIELD in {f.code for f in findings}
+
+
 def test_no_open_nonexistent_but_safe_ref(project_dir: Path) -> None:
     """A valid relative ref that does NOT exist on disk still loads clean —
     existence is not required and no path is opened (OQ-2)."""
