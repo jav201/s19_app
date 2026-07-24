@@ -1878,13 +1878,58 @@ ModalScreen {
     text-style: bold;
 }
 
+/* R3: rows center 1-tall labels on 3-tall selects (kills the label/input
+ * vertical off-by-one). */
 .crc-field-row {
     height: auto;
+    align-vertical: middle;
 }
 
+/* R2: a fixed 13-col right-aligned dim label gutter — every input starts on one
+ * column, labels right-align toward their value (dim so values dominate). */
 .crc-field-label {
-    width: auto;
+    width: 13;
+    text-align: right;
     padding-right: 1;
+    color: #969aad;
+}
+
+/* R9: compact borderless 1-tall inputs — the focus cue is a background shift,
+ * not a 3-tall border (halves the per-row chrome). */
+.crc-field-input {
+    border: none;
+    height: 1;
+    background: $background;
+    padding: 0 1;
+}
+.crc-field-input:focus {
+    background: $rule;
+}
+.crc-field-switch {
+    border: none;
+    height: 1;
+}
+
+/* Selects keep their overlay chrome (bordered, 3-tall) but stop eating the row. */
+#crc_designer_panel Select {
+    width: 1fr;
+    max-width: 34;
+}
+
+/* R9: 1-tall compact buttons — Save + Load fit side-by-side in a bench column. */
+#crc_designer_panel Button {
+    border: none;
+    height: 1;
+    min-width: 8;
+    margin-right: 2;
+    background: $rule;
+    color: $accent-calm;
+}
+
+/* R7: the Warnings tile — ⚠ lines / ✓ none carry their own Text colour, so the
+ * class stays colour-neutral. */
+.crc-warnings {
+    height: auto;
 }
 
 /* Hero row: the coverage window (2fr) beside the verdict/warnings column (1fr). */
@@ -1897,7 +1942,8 @@ ModalScreen {
 #crc_coverage_window {
     width: 2fr;
     height: auto;
-    min-height: 6;
+    min-height: 5;
+    max-height: 8;
     padding: 1 2;
     border: round $accent-calm;
     background: $bg-panel;
@@ -1914,7 +1960,7 @@ ModalScreen {
  * border (every `.crc-field-group` already has one). LLR-L3.1 / AT-B59-05. */
 .crc-hero {
     content-align: center middle;
-    min-height: 5;
+    min-height: 3;
 }
 
 /* The 3-column parameter bench below the hero row. */
@@ -1941,12 +1987,15 @@ ModalScreen {
     padding-left: 1;
 }
 
+/* R6: the JSON preview is a full-width strip below the bench — wide flat text
+ * gets the wide surface, so the min-height relaxes (no longer a tall column tile). */
 #crc_json_preview_group {
-    min-height: 11;
+    width: 100%;
+    min-height: 6;
 }
 
 #crc_json_preview {
-    min-height: 8;
+    min-height: 4;
 }
 
 /* width-narrow reflow: at the 80x24 floor the hero row and the bench both stack
@@ -1955,8 +2004,14 @@ ModalScreen {
     layout: vertical;
 }
 
+/* R8: at the 80x24 floor stack full-width AND cap the hero so the verdict lands
+ * on screen 1 — drop the padding WITH the cap (2 border + 2 pad = 4 rows = zero
+ * content, C-29). */
 #workspace_body.width-narrow #crc_coverage_window {
     width: 100%;
+    min-height: 3;
+    max-height: 4;
+    padding: 0 1;
 }
 
 #workspace_body.width-narrow #crc_top_right {
@@ -1973,4 +2028,10 @@ ModalScreen {
 #workspace_body.width-narrow #crc_bench_c3 {
     width: 100%;
     padding: 0;
+}
+
+/* R8: hide the redundant help line at the floor (the title + Legend already
+ * carry the "preview-only" cue). */
+#workspace_body.width-narrow #crc_designer_help {
+    display: none;
 }
