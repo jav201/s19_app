@@ -335,19 +335,27 @@ def test_report_strict_keys_reject_smuggled_field(project_dir: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# ReportBlock run_flow no-op — whole-flow rollup stays ok (AMD-1)
+# ReportBlock in run_flow — whole-flow rollup stays ok (batch-53 AMD-1)
 # --------------------------------------------------------------------------- #
 
 def test_report_noop_keeps_rollup_ok(project_dir: Path) -> None:
     """A report-only flow runs without error; the report block is OK and the
-    whole-flow rollup stays `ok` (AMD-1: not SKIPPED/NOTICES). Report-only so no
-    source block can abort the chain first (AMD-12/m-6)."""
+    whole-flow rollup stays `ok` (batch-53 AMD-1: not SKIPPED/NOTICES).
+    Report-only so no source block can abort the chain first (AMD-12/m-6).
+
+    batch-60 (FB-P1b) DECLARED REGRESSION EDIT (02-review.md regression
+    checklist): the block is no longer a no-op — it GENERATES the report — so the
+    ``"deferred"`` summary assert is replaced by the shipped ``reports/`` path.
+    The rollup-stays-`ok` assert is PRESERVED: that is the live batch-53 AMD-1
+    contract and it must keep holding. The test now writes a file as a side
+    effect (it runs against a real project dir), which is expected.
+    """
     result = run_flow(Flow(name="report-only", blocks=[ReportBlock()]), FlowContext(project_dir=project_dir))
     assert result.status == FLOW_STATUS_OK
     assert len(result.block_results) == 1
     report = result.block_results[0]
     assert report.status == BLOCK_STATUS_OK
-    assert "deferred" in report.summary
+    assert "reports/" in report.summary
 
 
 # --------------------------------------------------------------------------- #

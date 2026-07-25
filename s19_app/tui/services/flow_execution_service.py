@@ -61,6 +61,7 @@ from .flow_model import (
     SourceBlock,
     WriteOutBlock,
 )
+from .flow_report_service import FlowReportState, write_flow_report
 from .load_service import build_loaded_hex, build_loaded_s19
 from .variant_execution_service import _resolve_manifest_entry
 from ..operations.crc import check_regions, inject_crcs
@@ -117,7 +118,12 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
 
     for index, block in enumerate(flow.blocks):
         kind = getattr(block, "kind", "?")
-        if aborted:
+        # batch-60 FB-P1b (§6.5 AMD-3 / D-6): a REPORT block is EXEMPT from the
+        # upstream-abort skip. The run you most need a durable record of is the
+        # one where the image broke, so the report still writes — carrying
+        # ``aborted=True`` into its state (FAILED label). It does NOT clear the
+        # flag: every block after it still skips.
+        if aborted and not isinstance(block, ReportBlock):
             result.block_results.append(
                 BlockResult(index, kind, BLOCK_STATUS_SKIPPED,
                             "skipped (upstream error)")
@@ -376,15 +382,47 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                     )
 
             elif isinstance(block, ReportBlock):
-                # batch-53 FB-P1 (AMD-1 / LLR-004.3): a report block is a no-op
-                # in FB-P1 — content generation is deferred to FB-P1b. Emit an OK
-                # BlockResult (green-preserving, honest) and thread the working
-                # (mem_map, ranges) forward UNCHANGED so a report-bearing flow
-                # runs without error and the whole-flow rollup stays `ok`.
-                result.block_results.append(
-                    BlockResult(index, kind, BLOCK_STATUS_OK,
-                                "report generation deferred (FB-P1b)")
+                # batch-60 FB-P1b (LLR-003.1/.3): compose a POSITIONAL report of
+                # the run so far and write it under <project>/reports/. The
+                # working (mem_map, ranges) thread forward UNCHANGED — a report
+                # is a record, not an operation on the image.
+                #
+                # Field sources matter (AMD-9): ``result.image_ranges`` is only
+                # assigned AFTER this loop, so the footprint must come from the
+                # LOCAL threaded ``ranges``; ``pre_crc_ranges`` is read as it
+                # stands NOW, so a pre-CRC report legitimately omits its line.
+                # The report's own path is NOT appended to ``written_paths``
+                # (AMD-11 — that list is the image-output contract).
+                report_state = FlowReportState(
+                    flow_name=flow.name,
+                    block_results=list(result.block_results),
+                    aborted=aborted,
+                    image_ranges=(
+                        [(int(start), int(end)) for start, end in ranges]
+                        if ranges else None
+                    ),
+                    pre_crc_ranges=list(result.pre_crc_ranges),
+                    written_paths=list(result.written_paths),
+                    project_dir=ctx.project_dir,
                 )
+                try:
+                    report_path = write_flow_report(report_state, ctx.project_dir)
+                except Exception as exc:  # noqa: BLE001 - degrade, never abort
+                    # LLR-003.1 (AMD-12): a failed report write is recorded, not
+                    # swallowed and not fatal — the diagnostic names the exception
+                    # type (mirroring the generic handler) so a permission or
+                    # containment failure stays distinguishable from a benign miss.
+                    # `aborted` is deliberately NOT set: later blocks still run.
+                    result.block_results.append(
+                        BlockResult(index, kind, BLOCK_STATUS_ERROR,
+                                    "report write failed",
+                                    [f"{type(exc).__name__}: {exc}"])
+                    )
+                else:
+                    result.block_results.append(
+                        BlockResult(index, kind, BLOCK_STATUS_OK,
+                                    f"wrote reports/{report_path.name}")
+                    )
 
             else:  # pragma: no cover - guards an unknown block kind
                 aborted = _record_error(

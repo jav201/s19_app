@@ -26,6 +26,8 @@ from textual.widgets import (
     TextArea,
 )
 
+from markdown_it import MarkdownIt
+
 from .capped_text_area import CappedTextArea
 from .changes.verify import STATUS_VERIFIED
 from .color_policy import css_class_for_severity
@@ -75,6 +77,39 @@ logger = logging.getLogger("s19tui")
 #: freeze the TUI rendering it. Referenced as a module global at call
 #: time so tests can lower it without multi-MB fixtures.
 VIEWER_SIZE_CAP_BYTES = 2 * REPORT_MAX_TOTAL_BYTES
+
+
+def _hardened_markdown_parser() -> MarkdownIt:
+    """Build the report viewer's Markdown parser with its risky extensions OFF.
+
+    Summary:
+        ``textual.widgets.Markdown`` defaults to ``MarkdownIt("gfm-like")``, which
+        enables **linkify** and **raw HTML**. A report embeds file-derived text
+        (block summaries echoing a change-doc name, finding messages, filenames),
+        so under the default parser a bare ``http://…`` in a hostile filename
+        becomes a live link and ``~~x~~`` strikes a ledger row through — a
+        deception primitive in a document meant to be an audit record.
+
+        This factory keeps tables (the reports are table-heavy) but turns
+        ``linkify`` and ``html`` off, so no live link or raw-HTML node can be
+        produced from document text no matter what reaches the renderer. It is
+        the ENFORCING half of the batch-60 markup contract (§6.5 AMD-13); the
+        composer's ``flow_report_service._md_safe`` is the best-effort half that
+        travels with the ``.md`` file once it leaves the app.
+
+        It also hardens the pre-existing project reports, whose generator does
+        not escape file-derived text at all (carried as a follow-up).
+
+    Returns:
+        MarkdownIt: A ``gfm-like`` parser with ``linkify`` and ``html`` disabled.
+
+    Dependencies:
+        Used by:
+            - ReportViewerScreen.compose (the ``#report_markdown`` widget)
+    """
+    # Options are passed at construction: `.configure({"options": …})` REPLACES
+    # the whole options mapping and would drop defaults such as ``maxNesting``.
+    return MarkdownIt("gfm-like", {"linkify": False, "html": False})
 
 
 # --- Calm Dark modal re-skin (batch-02 increment 8, LLR-015.1) --------------
@@ -1402,7 +1437,12 @@ class ReportViewerScreen(ModalScreen[None]):
             ),
             listing,
             ScrollableContainer(
-                Markdown("", open_links=False, id="report_markdown"),
+                Markdown(
+                    "",
+                    open_links=False,
+                    parser_factory=_hardened_markdown_parser,
+                    id="report_markdown",
+                ),
                 id="report_markdown_scroll",
             ),
             Label("Declared regions (name,start,end per line):"),
