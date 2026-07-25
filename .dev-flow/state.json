@@ -13,8 +13,8 @@
     "operator_phrasing": "Q (kickoff): 'empieza FB-P1b (generacion de reporte)'. Autonomy: 'Autonomo pero plan/prototipo primero'. Trigger: 'Solo con ReportBlock (explicito)'. Prototype: 'Prototipo primero'. Approval: 'aprobado, arranca autonomo con esos defaults'. Model: switched session to Opus 5 via UI.",
     "decision_recording_ack": "GRANTED — every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md."
   },
-  "current_phase": 3,
-  "phase_status": "in-progress",
+  "current_phase": 6,
+  "phase_status": "awaiting-sync",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -28,7 +28,10 @@
     "plan": ".dev-flow/2026-07-24-batch-60/PLAN.md",
     "1": ".dev-flow/2026-07-24-batch-60/01-requirements.md",
     "1b": ".dev-flow/2026-07-24-batch-60/01b-qa-catalog.md",
-    "2": ".dev-flow/2026-07-24-batch-60/02-review.md"
+    "2": ".dev-flow/2026-07-24-batch-60/02-review.md",
+    "4": ".dev-flow/2026-07-24-batch-60/04-validation.md",
+    "5": ".dev-flow/2026-07-24-batch-60/05-postmortem.md",
+    "6": ".dev-flow/2026-07-24-batch-60/06-docs/"
   },
   "decisions_log": [
     {
@@ -48,6 +51,18 @@
       "date": "2026-07-24",
       "decision": "GATE FAILED then RESOLVED — iterate-to-refine applied inline as AMD-1..14 (§6.5-authoritative)",
       "notes": "qa verdict FAIL (3 HIGH / 9 MAJOR / 7 minor); security 0-HIGH but OK-only-with-F1..F6-folded. The two reviewers CONVERGED independently on all three HIGHs. I re-verified the load-bearing claims myself before accepting: (1) MarkdownIt('gfm-like') has linkify=True -> bare URLs render <a> and ~~x~~ renders <s> in a ledger cell -> the spec's CommonMark escape set was written for the WRONG GRAMMAR; (2) the `if aborted:` skip guard at flow_execution_service.py:119-124 sits ABOVE the try holding the ReportBlock branch (:378), so operator decision D-6 (aborted run still writes) was UNIMPLEMENTABLE as specified; (3) the prototype's summary=='error' FAILED-proxy matches only the generic except — all 8 _record_error shapes would misclassify. MY RULINGS beyond the reviews: (a) AMD-1 escape '/' rather than sec's scheme-colon regex — I probed both against the real parser: escaping '/' kills http:// AND protocol-relative //host (which the regex leaves LIVE) and renders INVISIBLY, so no readability cost; (b) AMD-6 reuse-vs-fork — a NEW _md_safe is CORRECT: the prior art (diff_report_service._md_cell/_md_table_cell) escapes only |/backslash for a never-linkify-audited sink, so reusing it would be a DOWNGRADE and extending it would silently change two shipped generators this batch does not test; rationale recorded in-spec to avoid a silent fork; (c) AMD-8 raised sec's path-leak from LOW to major (the batch objective is a SHAREABLE record and the fix is one line); (d) AMD-11 ruled the report path does NOT join written_paths (that is the image-output contract; a report is a record); (e) AMD-3 chose option (a) keep-and-implement D-6 over (b) withdraw, since D-6 is an operator-approved decision. Regression checklist DECLARED IN ADVANCE (test_flow_persistence.py:350 'deferred' assert will be replaced by 'reports/') so the edit cannot be mistaken for silencing a failure. C-21 remapped: AT-001/005/009/010 -> Inc-2, AT-004/011 -> Inc-3, Inc-1 owns unit precursors only. Carry out: sec F11 (report_service has NO markdown escaping at all vs the same sink) -> separate hardening batch."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-24",
+      "decision": "Inc-1/2/3 implemented + gated on the AMENDED contract",
+      "notes": "Inc-1 e0521cb composer (_md_safe against the real gfm-like+linkify grammar, explicit aborted flag, byte budget reusing _ByteBudget, relative paths); Inc-2 3c2f80f wire (skip-guard exemption makes D-6 real; footprint from the LOCAL threaded ranges); Inc-3 e8ef802 ledger surfacing (0 code change — render_result already paints the summary) + the ENFORCING hardened viewer parser. C-34 gate: 187 passed, 0 NEW snapshot drift. Every load-bearing AT move-aside RED-verified. Test-side lesson: 5 of my own failures were assert bugs from asserting against the DOC's vocabulary instead of the code's emitted text (write_out vs WRITE-OUT, the -01-report.md collision shape, escaped markdown source vs rendered, alphabetical sorted() inverting write order)."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-24",
+      "decision": "VALIDATION PASS + both FINAL gates 0-HIGH; 6 MAJOR folded across two hardening commits",
+      "notes": "Full non-slow suite @ e172fb3: 1970 passed / 19 pre-existing tc016s (0 batch-60 regressions; 0 new drift from the viewer change). security 0-HIGH: folded F1 (fuzzy linkify — www.x/x.com/a@b/IDN passed through because the escape set covered only scheme + protocol-relative; root cause was C-31 ON US — the TC-004 battery had 11 payloads and NOT ONE was fuzzy) + F2 (absolute host path via exception text) + F3 + F4; carried F5. qa 0-HIGH: mutation-tested every AMD fold RED; independently found the same heading-oracle blind spot my F4 had just closed; folded M-1 (the byte budget was ENTIRELY unpinned — deleting the guard left all 38 tests green because the fixture sat 2.8x under the limit), M-2, M-3, M-4 (the report never rendered diagnostics, so a FAILED run never said WHY — and diagnostics turned out to be the channel F2's redaction actually guards) + the vacuous 'WRITE-OUT' assert. PROCESS: gates ran concurrently and duplicated a finding; a recorded gate must name its commit."
     }
   ],
   "obsidian_synced": false,
