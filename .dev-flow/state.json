@@ -13,12 +13,12 @@
     "operator_phrasing": "arranca /dev-flow con report_service escaping, autonomo con self-merge",
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
-  "current_phase": 2,
-  "phase_status": "awaiting-gate",
+  "current_phase": 3,
+  "phase_status": "ready",
   "iterations_per_phase": {
     "0": 0,
-    "1": 0,
-    "2": 1,
+    "1": 1,
+    "2": 2,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -29,6 +29,7 @@
     "1": ".dev-flow/2026-07-25-batch-62/01-requirements.md",
     "1b": ".dev-flow/2026-07-25-batch-62/01b-qa-catalog.md",
     "1-architect": ".dev-flow/2026-07-25-batch-62/01-requirements-architect.md",
+    "1c": ".dev-flow/2026-07-25-batch-62/01c-fold-measurements.md",
     "2": ".dev-flow/2026-07-25-batch-62/02-review.md",
     "2-architect": ".dev-flow/2026-07-25-batch-62/02-review-architect.md",
     "2-qa": ".dev-flow/2026-07-25-batch-62/02-review-qa.md",
@@ -52,6 +53,18 @@
       "date": "2026-07-25",
       "decision": "GATE FAILED -> iterate-to-refine (iteration 1)",
       "notes": "architect FAIL 7B/8M/7m; qa FAIL 7B/6M/5m; security OK-with-folds 0B/6M/5m+2LOW. Blockers force the gate. DESIGN CORE SURVIVED adversarial re-measurement (D-4, D-5 ordering, D-6, R-1/Mode B, and the field inventory independently re-derived complete). What failed is the layer above: acceptance thresholds false against the shipped artifact + an unimplementable TC registry. FOUR of the blockers are MY OWN errors, all now measured false: (E-1) I adopted the architect AT ids assuming a 1:1 semantic match 'to be confirmed' - REFUTED, the two definitions diverge and the adopted AT-157 cannot see the registry's own Blocker #1; (E-2) I over-claimed that batch-39's guard is blind to the data-loss class - it counts RAW-SOURCE pipes and does go RED, it is blind to the other 32 fields; (E-3) my 'exactly 2 lines' golden-drift prediction is wrong, it is 3 (the golden has TWO variant rows and the probe sampled a twice-emitted field once - C-31 applied to the probe), so a CORRECT implementation would have tripped my own gate; (E-4) D-5's 'benign no-op arm still holds' is false - _md_safe('SYM_A')->'SYM\\_A' breaks 3 assertion sites across 2 files, one of which was in no C-27 target list. Independent convergence on 5 blockers across two reviewers. Security found the oracle itself is blind: & is unescaped so &vert; forges a table fragment while every token stays 'text' and assert_field_inert scores it GREEN. Also: batch-60's _redact_absolute_paths (shareability=MAJOR) was silently dropped and Mode B structurally hardens against adding it later. C-21 fires: AT set changed (AT-163 new) -> increment cut re-derived to 4 increments."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-25",
+      "decision": "iterate-to-refine FOLD COMPLETE (iteration 1 of 3) — 01-requirements.md revision 2",
+      "notes": "All 14 blockers + ~20 majors discharged through a 42-entry Sec-6.5 amendment log (A-01..A-42), each Before -> After, no silent edit of a locked requirement; Sec-11 is the blocker->amendment matrix. Resumed in a fresh session; authorization RE-CONFIRMED at kickoff (per-batch, never inherited) as AUTONOMOUS + self-merge. NEW rulings D-10..D-27. Load-bearing: D-12 Mode A ESCAPES the backtick instead of removing it (removal silently falsifies an audit record - FOO`BAR was written as FOOBAR) and Mode B is DECLARED LOSSY with a visible U+FFFD marker; D-13 adds & to MD_ESCAPE (the oracle-blindness root - &vert; forged a table fragment with every token still 'text'); D-14 rewrites assert_field_inert so clause 2 compares against expected_display(payload, mode), giving the oracle a way to FAIL on that class - both fixes were needed, either alone leaves one direction open. D-11 is the OPERATOR ruling on the lost batch-60 severity criterion: partial fold, _redact_absolute_paths applied to issue.message, Mode-B path fields stay raw BY DESIGN because CN-6's canonicaliser depends on the raw bytes, divergence accepted in writing and carried to BACKLOG at MAJOR. EVERY threshold was EXECUTED, not predicted (01c-fold-measurements.md, 9 measurements + re-verified anchors): golden drift is exactly lines {14,15,51} and the enlarged escape set adds ZERO further drift; flow-report blast radius is 1 test of 52 with 0 goldens moved (the security review predicted the goldens would move - they do not, the repo has 3 goldens and none is a flow report); <in-memory document> -> (in-memory document) costs nothing. THE FOLD CAUGHT AN ERROR IN ITSELF: A-26 first named Cc/Cf and claimed to close the survivor list, but U+2028 is Zl and passes both that filter and the newline collapse - corrected to Cc/Cf/Zl/Zp. Fourth instance in this batch of asserting a threshold from an un-enumerated category, and it surfaced only because the fold's OWN thresholds were executed."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-25",
+      "decision": "RE-GATE PASS (iteration 2) -> Phase 3",
+      "notes": "Coverage/Certainty/Evidence all MET. Auditing the discharge matrix against the SOURCE reviews (not against itself) found two uncovered majors - arch M-7 mis-scoped probe framing, qa M-6 the false 'no private symbol' claim - closed as A-42 and A-41. STATED WEAKNESS, not hidden: this is a SELF-GATE. The operator's resume instruction was explicit that the three Phase-2 reviewers must not be re-dispatched, so no independent reviewer ran over the folded spec. Bounded by (a) every load-bearing claim being executed with its transcript in-repo - a self-gate over measurements is a different object from a self-gate over reasoning - and (b) the merge gate being unchanged and independent: fresh qa-reviewer AND security-reviewer over the whole diff vs main, 0-HIGH to merge. Phase-3 obligations carried explicitly: expected_display written per mode BEFORE the first AT; pin 3 evaluates the assembled line template (a per-source-line form is pre-measured to false-positive at 11 sites); the golden gate is a one-shot artifact asserting the LINE-NUMBER set {14,15,51}, not a surviving test; Inc-1's exit is exactly ONE re-baselined flow-report case, not zero."
     }
   ],
   "obsidian_synced": false,

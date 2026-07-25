@@ -1,5 +1,13 @@
 # 01 — Requirements (architect derivation) · batch-62 · `report_service` markdown escaping
 
+> ⚠ **PARTIALLY SUPERSEDED (2026-07-25, Phase-1 fold iteration 1).** This artifact is preserved as
+> the derivation record. Where it collides with `01-requirements.md`, the canonical registry rules,
+> and **`01-requirements.md` §6.5 records every change with Before/After.** Superseded here:
+> the closed 7-type live-token enumeration (A-01), the bare `TC-376…387` ids (A-02), the "benign
+> no-op arm still holds" claim (A-03), the 2-line golden drift prediction (A-04), `HLR-095…099`'s
+> wording (A-05…A-09), `LLR-095.1/.2`, `LLR-097.1/.2`, `LLR-098.1/.2/.3` (A-12…A-18), the
+> `:974-976` anchor (A-33) and the `US-062-*` spelling — **a C-26 census must grep `US-B62-`**.
+
 - **Batch:** `2026-07-25-batch-62` · **Branch:** `claude/batch-62-report-escaping` @ `8d3c504`
 - **Author role:** Phase-1 architect · **Artifact language:** English
 - **Method:** IEEE 830 + EARS. Every anchor below is `file:line` verified on disk at draft time;

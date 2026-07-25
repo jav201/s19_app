@@ -76,3 +76,52 @@ Both FAIL reviewers reached these **separately**, which is why they are not judg
 ## Process note
 
 Both Phase-2 sub-agents self-corrected in their own reports (the architect withdrew a false finding about `LLR-095.2` after a bad grep; qa found 4 of its 7 blockers in its own catalog). Adversarial self-review is doing real work here and should be preserved in Phase 1's fold.
+
+---
+
+# Re-gate — Phase 2, iteration 2 (2026-07-25, after the Phase-1 fold)
+
+## VERDICT: **PASS → Phase 3.**
+
+Input: `01-requirements.md` **revision 2** (§6.5 amendment log, 42 entries) + `01c-fold-measurements.md`.
+
+### Assessment on the authorized axis
+
+**Coverage — MET.** All 14 blockers and every major/minor carry a named amendment; §11 is the
+matrix. Two coverage gaps were found by auditing the matrix against the source reviews rather than
+against itself — arch **M-7** (P-4's mis-scoped probe framing) and qa **M-6** (the false
+"no private symbol" claim) had no amendment row — and were closed as **A-42** and **A-41**. The
+minors are carried explicitly rather than absorbed silently.
+
+**Certainty — MET, and this is where iteration 1 failed.** The four false acceptance thresholds are
+replaced by executed ones (`01c` M-1…M-4). The fold's own new thresholds were **also** executed, and
+one of them was wrong: **A-26 named `Cc`/`Cf` and claimed to close a survivor list containing U+2028,
+which is `Zl`** (`01c` M-7). Corrected in-place. A fold that only re-measured the *inherited*
+thresholds would have shipped that.
+
+**Evidence — MET.** `01c-fold-measurements.md` carries nine measurements plus a re-verified anchor
+table, in-repo and re-runnable, because the iteration-1 reviewers' probes lived in a scratchpad that
+does not survive the session.
+
+### What this gate did NOT do — stated, not hidden
+
+**No independent reviewer ran over the folded spec.** The operator's resume instruction was explicit
+that the three Phase-2 reviewers must not be re-dispatched (the expensive derivation is on disk), so
+this re-gate is a **self-gate**. That is a real weakness on a batch whose recurring failure is
+*asserting a threshold I did not execute*. Two things bound it:
+
+1. Every load-bearing claim in the fold is executed and its transcript is in `01c` — a self-gate over
+   measurements is a different object from a self-gate over reasoning.
+2. The **merge gate is unchanged and independent**: PR + CI green, then a fresh `qa-reviewer` **and**
+   `security-reviewer` pass over the whole diff vs `main`, 0-HIGH to merge. Any threshold this
+   self-gate got wrong still has to survive that.
+
+### Carried into Phase 3 as obligations, not open questions
+
+- `expected_display(payload, mode)` must be written down per mode **before** the first AT is authored
+  — it is the oracle's only definition (A-20).
+- Pin 3 evaluates the **assembled line template** (`01c` M-9); a per-source-line form is pre-measured
+  to false-positive at 11 sites.
+- The golden gate is a **one-shot** artifact pasted verbatim into the Inc-2 packet, asserting the
+  line-number set `{14, 15, 51}` — not a surviving regression test.
+- Inc-1's exit is **exactly one** re-baselined flow-report case, not zero (A-13/A-35).

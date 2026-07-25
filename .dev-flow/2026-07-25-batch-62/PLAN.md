@@ -2,33 +2,52 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — ⏸ PAUSED AT A CLEAN CHECKPOINT (2026-07-25, operator-agreed)
+## Where we are — Phase-1 fold DONE, Phase-2 re-gate PASSED (2026-07-25)
 
-**Phase 0 CLOSED (`approve`). Phase 1 CLOSED (`approve`). Phase 2 GATE FAILED → `iterate-to-refine`, iteration 1 of 3.**
+**Phase 0 CLOSED. Phase 1 CLOSED → re-opened for `iterate-to-refine` iteration 1 → CLOSED again.
+Phase 2 re-gate: PASS. Next action: Phase 3, Inc-1.**
 
-### RESUME HERE (read in this order, then act)
+### What the fold did
 
-1. **`02-review.md`** — the consolidated verdict and **the fold list**. This is the entry point; it names every blocker with evidence and says what survived.
-2. `01-requirements.md` — the canonical registry + rulings D-1…D-9. **Four rulings are measured WRONG** (E-1…E-4 in `02-review.md`) and must be re-issued, not patched over.
-3. The three source reviews (`02-review-architect.md`, `02-review-qa.md`, `02-review-security.md`) only if a specific finding needs its full evidence.
+`01-requirements.md` is **revision 2**. It discharges all 14 blockers and ~20 majors from
+`02-review.md` through a **§6.5 amendment log of 40 entries (A-01…A-40)**, each with explicit
+Before → After. No locked requirement was silently edited. §11 is the blocker → amendment matrix.
 
-**The task on resume is the Phase-1 refinement fold**, not re-derivation. Do NOT re-run Phase 0/1 or re-dispatch the reviewers — the expensive work is done and on disk. Discharge the 14 blockers + ~20 majors listed in `02-review.md`, record each as a **§6.5 Before/After amendment** (never a silent edit of a locked requirement), then re-run Phase 2.
+**Every threshold this fold states was executed, not predicted** — that is the whole point of the
+iteration, since three of the four gate failures were predictions promoted to acceptance criteria:
 
-**Do not re-litigate what survived:** D-4 (leaf module), D-5's `_MD_ESCAPE` ordering, D-6, R-1/Mode B sufficiency, the field inventory (independently re-derived complete), and the negative controls. Two reviewers attacked these and could not refute them.
+| Threshold | Measured result |
+|---|---|
+| Golden drift (`at055b`) | **exactly lines 14, 15, 51** — and the enlarged escape set adds **zero** further drift |
+| Flow-report blast radius of the escape-set change | **1 test of 52** (`test_flow_report_service.py:415`), **0 goldens moved** — the security review predicted the goldens would move; they do not |
+| `<in-memory document>` → `(in-memory document)` | **zero** test/golden impact — the literal exists only at `report_service.py:894`, `:1093` |
+| `&` at `MD_ESCAPE` index 1 | backslash-first ordering preserved (`x\&y` → `x\\\&y`); `\&vert;` renders literally, live tokens `[]` |
+| U+FFFD as the Mode-B loss marker | category `So`, survives the C0 filter, inert bare in both grammars |
+| A-16 residue predicate inside `canonical_report_bytes` | all **3** existing goldens pass it **today** — breaks no consumer on day one |
 
-**C-21 already fired** — the AT set changed (`AT-163` is new), so the increment cut in `02-review.md` §"Increment cut" is the re-derived one. Use it.
+**The fold caught one error in itself** (§7 C-6): A-26 first named `Cc`/`Cf` and claimed to close the
+surviving-character list — **U+2028 is `Zl`** and passes both that filter and the newline collapse.
+Corrected to `Cc`/`Cf`/`Zl`/`Zp` with U+2028 named in the counterfactual. Fourth instance of this
+batch's recurring class, and it surfaced only because the fold's own thresholds were executed.
 
-### State at pause
+### Two findings resolved rather than annotated
 
-- Branch `claude/batch-62-report-escaping` @ base `8d3c504` (RC-1 PASS, merge-base == `origin/main` tip at cut).
-- **Zero production code written.** Only `.dev-flow/2026-07-25-batch-62/` artifacts exist. Nothing to un-do.
-- `state.json`: `current_phase: 2`, `phase_status: awaiting-gate`, `iterations_per_phase["2"]: 1`.
+- **The oracle was blind.** `&` unescaped meant `SYM_A&vert;PASSED` renders a forged table fragment
+  while every token stays `text`, so `assert_field_inert` scored it GREEN. Closed **structurally in
+  both directions**: A-10 escapes `&` so the attack fails, and A-20's fidelity clause gives the
+  oracle a way to fail on the class. Either fix alone leaves one direction open.
+- **The lost severity criterion.** batch-60 raised absolute-path exposure LOW → MAJOR on
+  shareability grounds; batch-62 never mentioned `_redact_absolute_paths`. **Operator-ruled
+  (D-11/A-24): partial fold** — redaction applied to `issue.message`, Mode-B path fields stay raw by
+  design (CN-6 depends on the raw bytes), the divergence recorded as accepted, and RR-2 carried to
+  `BACKLOG.md` at MAJOR.
+
+### State
+
+- Branch `claude/batch-62-report-escaping` @ base `8d3c504`. **Still zero production code.**
+- Authorization re-confirmed at this session's kickoff: **AUTONOMOUS + self-merge** (per-batch, not
+  inherited). Operator also ruled D-11 directly.
 - No PR open for batch-62.
-- Authorization: AUTONOMOUS + self-merge — **but per `feedback_standing_auth_per_batch` this is per-BATCH and the resuming session must re-confirm it at kickoff.** Do not assume it carries.
-
-### Why we paused here (recorded so the next session does not repeat it)
-
-Token budget for the session was exceeded (engineering rule 6 — surfaced, not silently overrun): this session ran batch-61 end-to-end, two closeout PRs, the vault sync, and batch-62 phases 0–2. The remaining fold is large and touches the AT/TC registry, the assertion helper, the payload set and four of my own rulings. Executing it on a nearly-exhausted context risks exactly the failure these reviews just caught — sampling once what is emitted twice.
 
 ## Objective
 
@@ -96,6 +115,11 @@ Engine-frozen set OFF-LIMITS (`core.py`, `hexfile.py`, `range_index.py`, `valida
 | 1 | 0 | Route confirmed as full `/dev-flow` | Security-relevant, derivable requirements, real black-box ATs — unlike batch-61, which was correctly routed to `/fast-dev-flow`. |
 | 2 | 0 | 3 stories READY; `diagnostics` OUT | Each story carries a defect measured RED on the current tree. `diagnostics` is a distinct concern. |
 | 3 | 0 | RC-1 deferred until #135 merged | Cutting earlier would have derived against a tree one merge stale. |
+| 4 | 1 (iter 1) | **Mode A escapes the backtick; Mode B declared lossy with a U+FFFD marker** (D-12) | Removal silently falsifies an audit record — `` FOO`BAR `` was written as `FOOBAR`, a different symbol. The "context-free" premise died when Mode B was introduced. **Measured** cost: 1 test, 0 goldens. |
+| 5 | 1 (iter 1) | **`&` added to `MD_ESCAPE`** + the oracle gains a fidelity clause (D-13, D-14) | Both were needed. Escaping `&` kills the attack; the fidelity clause gives the oracle a way to **fail** on the class. Either alone leaves one direction open. |
+| 6 | 1 (iter 1) | **Operator ruling D-11** — redact `issue.message`, Mode-B paths stay raw | Closes the severity criterion lost between batches, in writing, in both directions. RR-2 carried to `BACKLOG.md` at MAJOR. |
+| 7 | 1 (iter 1) | **`$`/`:`/`=` escape extension DECLINED** (D-22) | `:` appears in every address-bearing string; the constructs are outside the modelled grammar and are carried as RR-1 instead. Recorded so it is a decision, not an omission. |
+| 8 | 2 (iter 2) | **Re-gate self-approved; no independent reviewer re-dispatched** | Operator instruction. The weakness is stated in `02-review.md`, and the independent qa + security pass at the **merge** gate is unchanged. |
 
 ## Test ledger
 

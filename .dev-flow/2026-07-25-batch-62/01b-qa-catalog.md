@@ -1,5 +1,14 @@
 # 01b — QA acceptance catalog — batch-62 `report_service` markdown escaping
 
+> ⚠ **PARTIALLY SUPERSEDED (2026-07-25, Phase-1 fold iteration 1).** Preserved as the validation-method
+> record; `01-requirements.md` rules on collisions and its §6.5 carries every Before/After. **This
+> artifact's `TC-376…398` ARE the TC registry (A-02).** Superseded here: `assert_field_inert` §3.4
+> (A-20 — clause 1 is false on every benign table row, clause 2 joins raw and cooked content and
+> `visible()` is undefined), the payload table and `G-1`/`G-3`/`G-4` (A-21 — +2 HTML payloads,
+> emission-context parsing, `MUTATING_RULES`), `TC-382` (A-26, A-38), `TC-396` (A-18 — no longer
+> conditional), `TC-397` (A-27), the AT→file target map (A-30), the "no private symbol" claim
+> (restated: *no AT references the mechanism under change*), and the `US-062-*` spelling.
+
 **Phase:** 1 (validation method + acceptance catalog). **Language:** English.
 **Base:** `claude/batch-62-report-escaping` @ `8d3c504`.
 **Author:** `qa-reviewer`. **Status:** READY for Phase-2 review.
