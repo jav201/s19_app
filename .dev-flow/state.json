@@ -14,7 +14,7 @@
     "decision_recording_ack": "GRANTED — every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md."
   },
   "current_phase": 6,
-  "phase_status": "awaiting-sync",
+  "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -63,8 +63,15 @@
       "date": "2026-07-24",
       "decision": "VALIDATION PASS + both FINAL gates 0-HIGH; 6 MAJOR folded across two hardening commits",
       "notes": "Full non-slow suite @ e172fb3: 1970 passed / 19 pre-existing tc016s (0 batch-60 regressions; 0 new drift from the viewer change). security 0-HIGH: folded F1 (fuzzy linkify — www.x/x.com/a@b/IDN passed through because the escape set covered only scheme + protocol-relative; root cause was C-31 ON US — the TC-004 battery had 11 payloads and NOT ONE was fuzzy) + F2 (absolute host path via exception text) + F3 + F4; carried F5. qa 0-HIGH: mutation-tested every AMD fold RED; independently found the same heading-oracle blind spot my F4 had just closed; folded M-1 (the byte budget was ENTIRELY unpinned — deleting the guard left all 38 tests green because the fixture sat 2.8x under the limit), M-2, M-3, M-4 (the report never rendered diagnostics, so a FAILED run never said WHY — and diagnostics turned out to be the channel F2's redaction actually guards) + the vacuous 'WRITE-OUT' assert. PROCESS: gates ran concurrently and duplicated a finding; a recorded gate must name its commit."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-24",
+      "decision": "synced-to-obsidian",
+      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches\\2026-07-24-batch-60\\ (01/01b/02/04/05/PLAN + 06-docs + README index with metrics frontmatter). Dashboard.md preserved. VISUAL EVIDENCE REFRESHED this time (batch-53 had skipped it on a judgement call): the trigger is 'the diff touched s19_app/tui/' and batch-60 did, so all 15 pilot cases were regenerated (15 passed) and re-copied from merged main; visual-evidence.md re-stamped. PROCESS CATCH: my first copy used the wrong SHAPE (cp -r of the per-case subdirs) and created 92 stray directories in a vault dir whose convention is FLAT pilot_<case>_<frame>.svg files; I undid my own directories and redid it per the helper documented in visual-evidence.md section 5 — READ THE DOCUMENTED HELPER BEFORE IMPROVISING A VAULT COPY. Final: 90/90 live assets fresh; 6 orphan files of the RETIRED pv__case_06 case left in place (deletion needs operator approval). REPO-HYGIENE FINDING (reported, not fixed): the PRIMARY checkout is on the merged branch claude/batch-53-flow-persistence-resume-59a54d, not main."
     }
   ],
-  "obsidian_synced": false,
-  "created_at": "2026-07-24T00:00:00Z"
+  "obsidian_synced": true,
+  "created_at": "2026-07-24T00:00:00Z",
+  "merge_result": "MERGED 2026-07-24 — PR #131 squash 5e50365 to main (self-merge, autonomous+self-merge with plan/prototype-first satisfied). tui-ci PASS (35m49s); snapshot advisory-fail = the 19 pre-existing tc016s. Full non-slow suite @ e172fb3: 1970 passed / 0 batch-60 regressions."
 }
