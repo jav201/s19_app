@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pytest
 
+from s19_app.tui.screens import _hardened_markdown_parser
 from s19_app.tui.services import flow_report_service as frs
 from s19_app.tui.services.flow_execution_service import run_flow
 from s19_app.tui.services.flow_model import (
@@ -111,6 +112,30 @@ def test_at002_flow_report_is_listed_by_the_shipped_consumer(project: Path) -> N
     assert REPORT_FILENAME_REGEX.match(written.name), written.name
 
 
+def test_at002b_report_renders_inert_through_the_shipped_viewer_parser(
+    project: Path,
+) -> None:
+    """The FULL C-12 loop (AMD-14 m-7, final-gate M-3): drive the report the
+    handler wrote through the parser the SHIPPED viewer actually uses. This is
+    the assert that would have caught the original escape-set/sink mismatch —
+    `list_project_reports` alone only proves the file is visible, not safe.
+
+    Hostile text arrives the way it really would: through a block ref.
+    """
+    hostile = "www.evil.com ~~VOID~~ http://evil.example <b>x</b>"
+    run_flow(
+        Flow(name=hostile, blocks=[SourceBlock("prg.s19"), ReportBlock()]),
+        FlowContext(project_dir=project),
+    )
+    written = _reports(project)[0]
+    rendered = _hardened_markdown_parser().render(_read(written))
+
+    assert "<a href" not in rendered     # no live link, any linkify family
+    assert "<s>" not in rendered         # no strikethrough forgery
+    assert "<b>x</b>" not in rendered    # no raw HTML
+    assert "<table" in rendered          # the ledger still renders
+
+
 # --------------------------------------------------------------------------- #
 # AT-005 — positional: the report covers blocks BEFORE it only (D-2)
 # --------------------------------------------------------------------------- #
@@ -120,9 +145,12 @@ def test_at005_report_covers_only_blocks_before_it(project: Path) -> None:
         SourceBlock("prg.s19"), ReportBlock(), WriteOutBlock("late.s19"),
     ])
     run_flow(flow, FlowContext(project_dir=project))
-    text = _read(_reports(project)[0])
-    assert "SOURCE" in text
-    assert "WRITE-OUT" not in text   # executed AFTER the report
+    rendered = _rendered(_reports(project)[0])
+    assert "SOURCE" in rendered
+    # The kind is `write_out`, so `kind.upper()` is WRITE_OUT — asserting the
+    # HYPHEN form would be vacuous (it can never appear). Proven by mutation at
+    # the final gate: leaking a future row left the hyphen assert GREEN.
+    assert "WRITE_OUT" not in rendered   # executed AFTER the report
 
 
 # --------------------------------------------------------------------------- #
@@ -203,6 +231,49 @@ def test_at008_report_write_failure_degrades_without_aborting(project: Path) -> 
     assert (project / "after.s19").exists()
     # A failed write can never read CLEAN — the error block degrades the rollup.
     assert result.status != "ok"
+
+
+def test_tc011b_exhausted_collision_slots_degrade_through_the_same_path(
+    project: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AMD-12's second degrade path (final-gate M-2): `_report_filename` raises
+    FileExistsError once all 99 same-second slots are taken. It must degrade like
+    any other write failure — recorded, not fatal."""
+    frozen = datetime(2026, 7, 24, 22, 40, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(frs, "_default_now", lambda: frozen)
+
+    reports = project / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    stamp = frozen.strftime("%Y%m%dT%H%M%SZ")
+    (reports / f"{stamp}-report.md").write_text("x", encoding="utf-8")
+    for n in range(1, 100):
+        (reports / f"{stamp}-{n:02d}-report.md").write_text("x", encoding="utf-8")
+
+    result = run_flow(
+        Flow(name="n", blocks=[SourceBlock("prg.s19"), ReportBlock(),
+                               WriteOutBlock("after.s19")]),
+        FlowContext(project_dir=project),
+    )
+    report_block = result.block_results[1]
+    assert report_block.status == BLOCK_STATUS_ERROR
+    assert "FileExistsError" in report_block.diagnostics[0]
+    # Never fatal: the following block still ran.
+    assert result.block_results[2].status == BLOCK_STATUS_OK
+    assert (project / "after.s19").exists()
+
+
+def test_hostile_flow_name_cannot_influence_the_report_path(project: Path) -> None:
+    """AMD-14/m-5: the filename is timestamp-derived and the directory is a code
+    constant, so a traversal-shaped flow NAME can only ever reach report CONTENT."""
+    run_flow(
+        Flow(name="../../evil", blocks=[SourceBlock("prg.s19"), ReportBlock()]),
+        FlowContext(project_dir=project),
+    )
+    written = _reports(project)
+    assert len(written) == 1
+    assert written[0].parent == project / "reports"
+    assert REPORT_FILENAME_REGEX.match(written[0].name), written[0].name
+    assert not (project.parent.parent / "evil").exists()
 
 
 # --------------------------------------------------------------------------- #

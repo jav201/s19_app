@@ -352,14 +352,14 @@ def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
     findings_lines = ["## Findings", ""]
     any_finding = False
     for br in state.block_results:
+        label = f"- **[{_md_safe(br.kind.upper())} #{br.index + 1}]**"
         shown = list(br.findings)[:MAX_REPORT_FINDINGS_PER_BLOCK]
         for finding in shown:
             any_finding = True
             severity = getattr(finding, "severity", "warning")
             message = getattr(finding, "message", finding)
             findings_lines.append(
-                f"- **[{_md_safe(br.kind.upper())} #{br.index + 1}]** "
-                f"({_md_safe(severity)}) "
+                f"{label} ({_md_safe(severity)}) "
                 f"{_md_safe(_redact_absolute_paths(message))}"
             )
         suppressed = len(br.findings) - len(shown)
@@ -368,6 +368,18 @@ def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
             findings_lines.append(
                 f"- *{suppressed} more findings omitted (per-block cap "
                 f"{MAX_REPORT_FINDINGS_PER_BLOCK}).*"
+            )
+        # Diagnostics carry the REASON a block failed (final-gate M-4): every
+        # abort site and the report-write degrade handler record their cause
+        # here, not in `findings`. Without them a FAILED report says
+        # "source unresolved" and never says WHY — the opposite of an honest
+        # durable record. They are exception text, so this is also the channel
+        # F2's path redaction actually guards.
+        for diagnostic in list(br.diagnostics)[:MAX_REPORT_FINDINGS_PER_BLOCK]:
+            any_finding = True
+            findings_lines.append(
+                f"{label} (diagnostic) "
+                f"{_md_safe(_redact_absolute_paths(diagnostic))}"
             )
     findings_lines.append("")
     if any_finding:
