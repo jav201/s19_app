@@ -1,6 +1,6 @@
 # Quick Spec — s19_app · snapshot-baseline regeneration closeout (batch-58/59 carry)
 
-- **Status:** phase A — awaiting gate
+- **Status:** closed 2026-07-24 — all 5 ACs met; PR [#133](https://github.com/jav201/s19_app/pull/133)
 - **Date:** 2026-07-24
 - **Branch:** `claude/backlog-snapshot-regen-75ecc5` (base `e231d71` = `origin/main` tip; RC-1 PASS, merge-base == tip)
 - **Flow mode:** autonomous + self-merge (operator-granted THIS batch, per-batch only, never carried)
@@ -25,11 +25,16 @@ Regenerate the 19 stale `test_tc016s_density_layout_snapshot` SVG baselines — 
 
 Measured pre-state (this session, on `e231d71`): `pytest tests/test_tui_snapshot.py -m snapshot` → **19 failed / 10 passed**; **0 of 29** baselines contain the string `CRC`.
 
-- [ ] **AC-1 (green):** When `pytest tests/test_tui_snapshot.py -m snapshot` is run on the updated tree, the system shall report **29 passed / 0 failed**.
-- [ ] **AC-2 (containment):** When `git status --porcelain tests/__snapshots__/` is run after applying the artifact, the system shall list **exactly the 19 expected `.svg` paths** — no 20th file, no deletion, no addition. A 20th moving file means the regen env is wrong → **abort, do not commit**.
-- [ ] **AC-3 (no production code):** When `git diff --name-only origin/main...HEAD` is run, the system shall list **only** paths under `tests/__snapshots__/`, plus `.dev-flow/BACKLOG.md` and `.fast-dev-flow/` (flow bookkeeping). Zero `s19_app/**` files.
-- [ ] **AC-4 (attributable diff — anti-blind-ingest):** When each of the 19 regenerated baselines is inspected, the system shall show it **gained** the rail text node `⊕  CRC Designer` (0/19 have it pre-regen), and the **10 non-drifted `80x24` baselines shall be byte-identical** to their pre-regen content (the rail entry is off-screen at that width).
-- [ ] **AC-5 (no suite regression):** When the full gate suite `pytest -q -m "not slow"` is run on the updated tree, the system shall report **0 failed**, and a pass count equal to the locally-measured pre-regen `passed + 19`.
+- [x] **AC-1 (green):** When `pytest tests/test_tui_snapshot.py -m snapshot` is run on the updated tree, the system shall report **29 passed / 0 failed**.
+- [x] **AC-2 (containment):** When `git status --porcelain tests/__snapshots__/` is run after applying the artifact, the system shall list **exactly the 19 expected `.svg` paths** — no 20th file, no deletion, no addition. A 20th moving file means the regen env is wrong → **abort, do not commit**.
+- [x] **AC-3 (no production code):** When `git diff --name-only origin/main...HEAD` is run, the system shall list **only** paths under `tests/__snapshots__/`, plus `.dev-flow/BACKLOG.md` and `.fast-dev-flow/` (flow bookkeeping). Zero `s19_app/**` files.
+- [x] **AC-4 (attributable diff — anti-blind-ingest):** When each of the 19 regenerated baselines is inspected, the system shall show it **gained** the rail text node `⊕  CRC Designer` (0/19 have it pre-regen), and the **10 non-drifted `80x24` baselines shall be byte-identical** to their pre-regen content (the rail entry is off-screen at that width).
+- [x] **AC-5 (no suite regression):** When the full gate suite `pytest -q -m "not slow"` is run on the updated tree, the system shall report **0 failed**, and a pass count equal to the locally-measured pre-regen `passed + 19`.
+
+### Amendments recorded during phase B (never silently edited)
+
+- **AC-4 predicate corrected.** As written, AC-4 asserted the changed file "gained the rail text node `⊕  CRC Designer`". The first run of that predicate reported **0/19** — because the SVG *source* emits `⊕&#160;&#160;CRC&#160;Designer` (NBSP entities); the literal rendered substring never appears. **The predicate was wrong, not the artifact.** Replaced with a structural audit asserted against the *emitted encoding*: old count of `CRC` == 0 → new count == exactly 1, the added node matches `<text …>⊕(&#160;)+CRC&#160;Designer</text>`, only `<rect>` lines removed, no text node lost. Re-run: **19/19 PASS**. (Same family as batch-60's "asserting against the doc's vocabulary instead of the code's emitted text" — carried as a control candidate.)
+- **AC-5 mechanism replaced (stronger oracle, not a weakened bar).** Original mechanism was a local pre/post `-m "not slow"` pair. Dropped because (a) `grep` proves `tests/test_tui_snapshot.py` is the **sole** consumer of `tests/__snapshots__/**` — no production code and no other test file reads them — so nothing outside that file can regress from a fixture change; and (b) the PR's canonical CI gives the same answer in the *pinned* environment, whereas the local run uses Python 3.14. Replaced by: the blast-radius argument + the PR's blocking `tui-ci` (unchanged) and advisory `snapshot` job (must be green). The in-flight local run was stopped once redundant.
 
 ---
 
@@ -66,9 +71,9 @@ Keyword scan over §1–4: **no pattern fired** (no auth, secrets, external inte
 
 | Field | Value |
 |-------|-------|
-| Current phase | A |
+| Current phase | closed |
 | Started | 2026-07-24 |
-| Closed | – |
+| Closed | 2026-07-24 |
 | Promoted to /dev-flow | no (explicitly routed here: baselines-only, no derivable requirements) |
 | Notes | Prior spec (N6/N7, closed 2026-07-23) archived to `.fast-dev-flow/archive/2026-07-23-n6-n7-spec.md` |
 
@@ -76,4 +81,33 @@ Keyword scan over §1–4: **no pattern fired** (no auth, secrets, external inte
 
 ## 8. Close (filled in phase C)
 
-_pending_
+### What changed
+
+The 19 stale `test_tc016s_density_layout_snapshot` SVG baselines were regenerated in the canonical CI environment and committed. No production code — `tests/__snapshots__/**` only. The baselines had been stale since batch-58 added the CRC Designer entry as the 10th navigation rail: every `120x30` and `160x40` cell renders that rail row while the committed baselines predated it, which left the advisory `snapshot` CI job red for roughly ten batches and unable to detect genuine layout drift. Generation ran via `snapshot-regen.yml` `workflow_dispatch` run `30142557735` (ubuntu / py3.11 / textual 8.2.8); local `--snapshot-update` was never used.
+
+### How it was tested
+
+- **AC-1** — `pytest tests/test_tui_snapshot.py -m snapshot`: **19 failed / 10 passed → 29 passed / 0 failed**. The pre-state was measured on `e231d71` before any file moved, so the counterfactual is captured evidence, not a claim.
+- **AC-2** — containment: exactly **19** ` M` entries, 0 added, 0 deleted; independently corroborated by the regen run's own `git status` step.
+- **AC-3** — `git status --porcelain`: zero `s19_app/**` paths.
+- **AC-4** — structural attribution, **19/19**: 0 → exactly 1 `CRC` per changed file, as the rail text node; only `<rect>` removed; no text node lost. The 10 `80x24` cells byte-identical.
+- **Cross-environment corroboration** — the CI artifact's diff matches an independent local render cell-for-cell (local `textual` == the 8.2.8 pin and reproduces the documented 19-cell failure set exactly).
+- **Process** — the artifact was downloaded to a scratch dir and fully verified **before** being copied into the tree.
+- **AC-5** — blast radius grep-proven (sole consumer) + canonical CI on PR #133.
+
+### Open risks / pending
+
+- `snapshot-regen.yml`'s "Report which baselines changed" step still carries batch-25-era guidance naming "patch 2x2 + MAC 82-col" as the only expected movers — a future reader following it would wrongly reject a valid artifact. Carried (P3).
+- `tui-ci.yml`'s `snapshot` job step name says "28 baseline cells + 2 xfail" vs the actual 29 collected + 3 deselected. Carried (P3).
+- The blocking `tui-ci` job installs plain `pytest`, not `.[dev]`, so it is **blind to snapshot drift**; only the advisory `continue-on-error` job exercises these cells. By design (batch-25), but worth stating whenever "CI green" is used as a merge gate.
+- **Control candidate** (needs its own AskUserQuestion before encoding): *assert against the emitted encoding, not the rendered form* — third occurrence of this family in three batches.
+
+### Security flags — handling
+
+`security_required: false`; no keyword pattern fired. The one genuine surface — committing bytes produced by a remote CI job — was mitigated by construction rather than by a review pass: read-only workflow permissions, plus AC-2/AC-4 making a blind ingest impossible within the acceptance criteria. Logged as a decision.
+
+### Suggested commit message
+
+```
+test(snapshot): regenerate 19 tc016s baselines for the CRC Designer rail
+```
