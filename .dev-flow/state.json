@@ -1,20 +1,20 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-24-batch-60",
-  "batch_objective": "FB-P1b = flow-run report GENERATION. batch-53 shipped the ReportBlock as model+persist+no-op; this batch makes a report-bearing flow generate content: a pure compose_flow_report over the FlowRunResult state so far, written to the project reports/ dir under the shipped <ts>-report.md convention so list_project_reports + ReportViewerScreen surface it with no new viewer. Explicit trigger (ReportBlock only) + positional semantics.",
-  "note_prior_batch": "batch-53 (FB-P1 flow.json persistence) DONE + MERGED #129 fa2c252 + closeout #130 556db0c. state.json rotated batch-53 -> batch-60 (52-59 + n8 + 53 taken). Carry consumed by this batch: FB-P1b report generation + the qa M-3 markup-sink guard.",
-  "route": "full /dev-flow. Phase-0 done (RC-1 @ 556db0c; prototype built + operator-APPROVED). AUTONOMOUS + self-merge with plan+prototype-first (satisfied). Phase 1 done.",
-  "rc1": "PASS @ 556db0c (2026-07-24). Branch feat/batch-60-fb-p1b-report-gen cut off origin/main tip 556db0c; merge-base == tip. ALREADY-SHIPPED check: the ReportBlock branch in flow_execution_service.py:378-387 is still the batch-53 no-op ('report generation deferred (FB-P1b)') -> generation is genuinely greenfield. Report write seam verified: report_service.py :107 fmt, :110 regex, :412 _report_filename, :455 list_project_reports, :1557 injectable clock.",
+  "batch_id": "2026-07-25-batch-62",
+  "batch_objective": "report_service markdown escaping. Project reports embed file-derived text (project_name, variant_id, filenames, region names, declaration errors) with no grammar-level escaping. Close it at the composer for EVERY file-derived field. Measured at Phase 0: ~~x~~ and **x** and [t](url) all still produce s_open/strong_open/link_open through the batch-60 HARDENED viewer parser; a raw | in variant_id opens two phantom table columns.",
+  "note_prior_batch": "batch-61 (snapshot regen) DONE+MERGED #133 4cac228 + #134 bf2004e + #135 8d3c504 (vault-sync record). state.json rotated batch-60 -> batch-62 (61 was a /fast-dev-flow batch and never held the state machine).",
+  "route": "full /dev-flow. Phase 0 CLOSED (approve). Phase 1 in progress.",
+  "rc1": "PASS @ 8d3c504 (2026-07-25). Branch claude/batch-62-report-escaping cut off origin/main; merge-base == tip verified. ALREADY-SHIPPED check: batch-39 escapes ONLY linkage_symbol via _md_table_cell (table shape, not grammar); batch-60 hardened the VIEWER parser but its own docstring names project reports as a carried follow-up -> the composer-side gap is genuinely open.",
   "standing_authorization": {
-    "date": "2026-07-24",
-    "autonomy": "AUTONOMOUS end-to-end + self-merge (operator-granted THIS batch, per-batch only, NEVER carried) WITH a plan+prototype-first precondition that is SATISFIED (prototype built and approved: 'aprobado, arranca autonomo con esos defaults'). Self-approve each gate with a named Coverage/Certainty/Evidence axis check; present packets in-conversation.",
-    "merge_authority": "GRANTED. Final PR-level qa-reviewer AND security-reviewer 0-HIGH over the whole diff vs main before self-merge (the report composer is a new markup sink). Squash merge; blocking tui-ci green (snapshots advisory).",
-    "operator_phrasing": "Q (kickoff): 'empieza FB-P1b (generacion de reporte)'. Autonomy: 'Autonomo pero plan/prototipo primero'. Trigger: 'Solo con ReportBlock (explicito)'. Prototype: 'Prototipo primero'. Approval: 'aprobado, arranca autonomo con esos defaults'. Model: switched session to Opus 5 via UI.",
-    "decision_recording_ack": "GRANTED — every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md."
+    "date": "2026-07-25",
+    "autonomy": "AUTONOMOUS end-to-end + self-merge, granted THIS batch (per-batch, NEVER carried). Self-approve each gate with a named Coverage/Certainty/Evidence axis; present packets in-conversation.",
+    "merge_authority": "GRANTED. Final independent qa-reviewer AND security-reviewer 0-HIGH over the whole diff vs main before self-merge (this batch IS a security surface). Squash merge; tui-ci green (snapshot advisory).",
+    "operator_phrasing": "arranca /dev-flow con report_service escaping, autonomo con self-merge",
+    "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
-  "current_phase": 6,
-  "phase_status": "approved",
+  "current_phase": 2,
+  "phase_status": "awaiting-gate",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -25,53 +25,35 @@
     "6": 0
   },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-24-batch-60/PLAN.md",
-    "1": ".dev-flow/2026-07-24-batch-60/01-requirements.md",
-    "1b": ".dev-flow/2026-07-24-batch-60/01b-qa-catalog.md",
-    "2": ".dev-flow/2026-07-24-batch-60/02-review.md",
-    "4": ".dev-flow/2026-07-24-batch-60/04-validation.md",
-    "5": ".dev-flow/2026-07-24-batch-60/05-postmortem.md",
-    "6": ".dev-flow/2026-07-24-batch-60/06-docs/"
+    "plan": ".dev-flow/2026-07-25-batch-62/PLAN.md",
+    "1": ".dev-flow/2026-07-25-batch-62/01-requirements.md",
+    "1b": ".dev-flow/2026-07-25-batch-62/01b-qa-catalog.md",
+    "1-architect": ".dev-flow/2026-07-25-batch-62/01-requirements-architect.md",
+    "2": ".dev-flow/2026-07-25-batch-62/02-review.md",
+    "2-architect": ".dev-flow/2026-07-25-batch-62/02-review-architect.md",
+    "2-qa": ".dev-flow/2026-07-25-batch-62/02-review-qa.md",
+    "2-security": ".dev-flow/2026-07-25-batch-62/02-review-security.md"
   },
   "decisions_log": [
     {
       "phase": 0,
-      "date": "2026-07-24",
-      "decision": "kickoff + prototype APPROVED",
-      "notes": "FB-P1b scaffolded off 556db0c. RC-1 PASS (no-op still in place = greenfield). Operator answered the 3 kickoff questions: autonomy = autonomous+self-merge with plan/prototype-first; trigger = EXPLICIT (only when a ReportBlock is present, NOT implicit-always); prototype first. Prototype built (prototypes/fb_p1b_report.{prototype.py,example.md,NOTES.md}) — runnable compose-from-FlowRunResult with a HOSTILE change_doc_ref proving markup-safety; self-check green. Operator APPROVED with my recommended defaults for OQ-1..4 -> D-3 reuse <ts>-report.md, D-4 N blocks allowed, D-5 path in the panel ledger, D-6 aborted run still writes. Model: operator switched the session to Opus 5 via the UI mid-batch."
+      "date": "2026-07-25",
+      "decision": "Definition of Ready — approve (self, autonomy)",
+      "notes": "3 stories READY (US-062-1 viewer render / US-062-2 exported .md / US-062-3 table shape), each carrying a defect MEASURED RED on the current tree via C-35 execution probes, not assumed. Phase-0 corrected the backlog premise in BOTH directions: partial escaping DOES exist (batch-39 _md_table_cell, one field, table-shape only), AND the batch-60 hardened viewer is NOT sufficient (token-stream probe: ~~x~~ -> s_open, **x** -> strong_open, [t](url) -> link_open; linkify OFF kills only BARE urls). Pipe-injection probe: variant_id 'v1|INJECTED|COL' -> 7 structural pipes vs 5 benign. OUT: diagnostics rendering (batch-60 carry, functionality not security). OPEN design question deferred to Phase 1/2 by execution probe, not analogy: where the shared escaper lives. RC-1 deliberately deferred until PR #135 merged so derivation ran against the true tip."
     },
     {
       "phase": 1,
-      "date": "2026-07-24",
-      "decision": "requirements + qa catalog authored (self, autonomy)",
-      "notes": "3 US / 3 HLR / 7 LLR / AT-001..008 / TC-001..013. All anchors draft-time verified on disk (flow_execution_service.py:378-387, flow_model.py:232-287, report_service.py:107/110/412/455/1557/1560/1613); no 'assumed' markers. Reuse-not-fork: _report_filename imported (batch-53 _resolve_manifest_entry precedent). Every AT carries a counterfactual; decision discriminators pinned (D-1->AT-006 no-block-no-report, D-2->AT-005 positional, D-3->AT-002 viewer-visibility, D-4->AT-007 collision). C-17 battery is per-metacharacter (avoids the batch-53 qa M-1 collapsed-proxy miss) and closes the batch-53 qa M-3 carry. No open questions to P2."
+      "date": "2026-07-25",
+      "decision": "requirements derived + reconciled (self, autonomy)",
+      "notes": "5 HLR / 13 LLR / 6 AT / TC-376-387. Rulings D-1..D-9. D-4 (the batch's central design question) resolved by EXECUTION not analogy and the answer was NEITHER option I framed at Phase 0: a leaf module markdown_safety.py with md_safe (Mode A) + md_code (Mode B), because flow_report_service and diff_report_service both import FROM report_service so importing _md_safe back is a hard circular import. D-5 removes _md_table_cell because _MD_ESCAPE already carries | after backslash. Renamed US-062-* -> US-B62-* (US-062 taken by batch-37, REQUIREMENTS.md:3686/3749). Reconciled a real id collision between the two parallel agents (both used TC-376..387 / AT-157..159 with different content) by ruling the architect registry authoritative rather than averaging."
     },
     {
       "phase": 2,
-      "date": "2026-07-24",
-      "decision": "GATE FAILED then RESOLVED — iterate-to-refine applied inline as AMD-1..14 (§6.5-authoritative)",
-      "notes": "qa verdict FAIL (3 HIGH / 9 MAJOR / 7 minor); security 0-HIGH but OK-only-with-F1..F6-folded. The two reviewers CONVERGED independently on all three HIGHs. I re-verified the load-bearing claims myself before accepting: (1) MarkdownIt('gfm-like') has linkify=True -> bare URLs render <a> and ~~x~~ renders <s> in a ledger cell -> the spec's CommonMark escape set was written for the WRONG GRAMMAR; (2) the `if aborted:` skip guard at flow_execution_service.py:119-124 sits ABOVE the try holding the ReportBlock branch (:378), so operator decision D-6 (aborted run still writes) was UNIMPLEMENTABLE as specified; (3) the prototype's summary=='error' FAILED-proxy matches only the generic except — all 8 _record_error shapes would misclassify. MY RULINGS beyond the reviews: (a) AMD-1 escape '/' rather than sec's scheme-colon regex — I probed both against the real parser: escaping '/' kills http:// AND protocol-relative //host (which the regex leaves LIVE) and renders INVISIBLY, so no readability cost; (b) AMD-6 reuse-vs-fork — a NEW _md_safe is CORRECT: the prior art (diff_report_service._md_cell/_md_table_cell) escapes only |/backslash for a never-linkify-audited sink, so reusing it would be a DOWNGRADE and extending it would silently change two shipped generators this batch does not test; rationale recorded in-spec to avoid a silent fork; (c) AMD-8 raised sec's path-leak from LOW to major (the batch objective is a SHAREABLE record and the fix is one line); (d) AMD-11 ruled the report path does NOT join written_paths (that is the image-output contract; a report is a record); (e) AMD-3 chose option (a) keep-and-implement D-6 over (b) withdraw, since D-6 is an operator-approved decision. Regression checklist DECLARED IN ADVANCE (test_flow_persistence.py:350 'deferred' assert will be replaced by 'reports/') so the edit cannot be mistaken for silencing a failure. C-21 remapped: AT-001/005/009/010 -> Inc-2, AT-004/011 -> Inc-3, Inc-1 owns unit precursors only. Carry out: sec F11 (report_service has NO markdown escaping at all vs the same sink) -> separate hardening batch."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-24",
-      "decision": "Inc-1/2/3 implemented + gated on the AMENDED contract",
-      "notes": "Inc-1 e0521cb composer (_md_safe against the real gfm-like+linkify grammar, explicit aborted flag, byte budget reusing _ByteBudget, relative paths); Inc-2 3c2f80f wire (skip-guard exemption makes D-6 real; footprint from the LOCAL threaded ranges); Inc-3 e8ef802 ledger surfacing (0 code change — render_result already paints the summary) + the ENFORCING hardened viewer parser. C-34 gate: 187 passed, 0 NEW snapshot drift. Every load-bearing AT move-aside RED-verified. Test-side lesson: 5 of my own failures were assert bugs from asserting against the DOC's vocabulary instead of the code's emitted text (write_out vs WRITE-OUT, the -01-report.md collision shape, escaped markdown source vs rendered, alphabetical sorted() inverting write order)."
-    },
-    {
-      "phase": 4,
-      "date": "2026-07-24",
-      "decision": "VALIDATION PASS + both FINAL gates 0-HIGH; 6 MAJOR folded across two hardening commits",
-      "notes": "Full non-slow suite @ e172fb3: 1970 passed / 19 pre-existing tc016s (0 batch-60 regressions; 0 new drift from the viewer change). security 0-HIGH: folded F1 (fuzzy linkify — www.x/x.com/a@b/IDN passed through because the escape set covered only scheme + protocol-relative; root cause was C-31 ON US — the TC-004 battery had 11 payloads and NOT ONE was fuzzy) + F2 (absolute host path via exception text) + F3 + F4; carried F5. qa 0-HIGH: mutation-tested every AMD fold RED; independently found the same heading-oracle blind spot my F4 had just closed; folded M-1 (the byte budget was ENTIRELY unpinned — deleting the guard left all 38 tests green because the fixture sat 2.8x under the limit), M-2, M-3, M-4 (the report never rendered diagnostics, so a FAILED run never said WHY — and diagnostics turned out to be the channel F2's redaction actually guards) + the vacuous 'WRITE-OUT' assert. PROCESS: gates ran concurrently and duplicated a finding; a recorded gate must name its commit."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-24",
-      "decision": "synced-to-obsidian",
-      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches\\2026-07-24-batch-60\\ (01/01b/02/04/05/PLAN + 06-docs + README index with metrics frontmatter). Dashboard.md preserved. VISUAL EVIDENCE REFRESHED this time (batch-53 had skipped it on a judgement call): the trigger is 'the diff touched s19_app/tui/' and batch-60 did, so all 15 pilot cases were regenerated (15 passed) and re-copied from merged main; visual-evidence.md re-stamped. PROCESS CATCH: my first copy used the wrong SHAPE (cp -r of the per-case subdirs) and created 92 stray directories in a vault dir whose convention is FLAT pilot_<case>_<frame>.svg files; I undid my own directories and redid it per the helper documented in visual-evidence.md section 5 — READ THE DOCUMENTED HELPER BEFORE IMPROVISING A VAULT COPY. Final: 90/90 live assets fresh; 6 orphan files of the RETIRED pv__case_06 case left in place (deletion needs operator approval). REPO-HYGIENE FINDING (reported, not fixed): the PRIMARY checkout is on the merged branch claude/batch-53-flow-persistence-resume-59a54d, not main."
+      "date": "2026-07-25",
+      "decision": "GATE FAILED -> iterate-to-refine (iteration 1)",
+      "notes": "architect FAIL 7B/8M/7m; qa FAIL 7B/6M/5m; security OK-with-folds 0B/6M/5m+2LOW. Blockers force the gate. DESIGN CORE SURVIVED adversarial re-measurement (D-4, D-5 ordering, D-6, R-1/Mode B, and the field inventory independently re-derived complete). What failed is the layer above: acceptance thresholds false against the shipped artifact + an unimplementable TC registry. FOUR of the blockers are MY OWN errors, all now measured false: (E-1) I adopted the architect AT ids assuming a 1:1 semantic match 'to be confirmed' - REFUTED, the two definitions diverge and the adopted AT-157 cannot see the registry's own Blocker #1; (E-2) I over-claimed that batch-39's guard is blind to the data-loss class - it counts RAW-SOURCE pipes and does go RED, it is blind to the other 32 fields; (E-3) my 'exactly 2 lines' golden-drift prediction is wrong, it is 3 (the golden has TWO variant rows and the probe sampled a twice-emitted field once - C-31 applied to the probe), so a CORRECT implementation would have tripped my own gate; (E-4) D-5's 'benign no-op arm still holds' is false - _md_safe('SYM_A')->'SYM\\_A' breaks 3 assertion sites across 2 files, one of which was in no C-27 target list. Independent convergence on 5 blockers across two reviewers. Security found the oracle itself is blind: & is unescaped so &vert; forges a table fragment while every token stays 'text' and assert_field_inert scores it GREEN. Also: batch-60's _redact_absolute_paths (shareability=MAJOR) was silently dropped and Mode B structurally hardens against adding it later. C-21 fires: AT set changed (AT-163 new) -> increment cut re-derived to 4 increments."
     }
   ],
-  "obsidian_synced": true,
-  "created_at": "2026-07-24T00:00:00Z",
-  "merge_result": "MERGED 2026-07-24 — PR #131 squash 5e50365 to main (self-merge, autonomous+self-merge with plan/prototype-first satisfied). tui-ci PASS (35m49s); snapshot advisory-fail = the 19 pre-existing tc016s. Full non-slow suite @ e172fb3: 1970 passed / 0 batch-60 regressions."
+  "obsidian_synced": false,
+  "created_at": "2026-07-25T00:00:00Z"
 }
