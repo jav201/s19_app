@@ -20,6 +20,12 @@ dependencies = [
     # so nothing breaks; no upper ceiling. Required-minimum bound for the
     # dev-only pytest-textual-snapshot extra below.
     "textual>=8.0.2",
+    # Direct import since batch-60: `screens._hardened_markdown_parser` builds the
+    # report viewer's parser explicitly (linkify + raw HTML off). It also arrives
+    # transitively via rich/textual, but a module-level import in the TUI must not
+    # rely on a transitive edge — a dropped or renamed dependency would fail the
+    # whole app at import time, not at report-view time (final-gate F3).
+    "markdown-it-py>=3",
 ]
 
 [project.optional-dependencies]

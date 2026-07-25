@@ -29,19 +29,28 @@ Markup safety (C-17, AMD-1/2/5 — the load-bearing surface):
 The report embeds file-derived text (block summaries echoing a ``change_doc_ref``,
 finding messages, written filenames, the flow name) and is rendered by
 ``textual.widgets.Markdown``, which builds ``MarkdownIt("gfm-like")`` with
-**linkify enabled**. That grammar is NOT plain CommonMark: a bare ``http://…``
-autolinks and ``~~x~~`` strikes through. :func:`_md_safe` is therefore written
-against *that* grammar — escaping ``/`` (which defuses both ``http://host`` and
-protocol-relative ``//host``, and renders invisibly) and ``~`` on top of the
-usual CommonMark set, and REMOVING backticks rather than escaping them so the
-helper stays context-free (backslash escapes are inert inside a code span).
+**linkify enabled**. That grammar is NOT plain CommonMark: ``~~x~~`` strikes
+through, and linkify autolinks THREE distinct families — scheme (``http://x``),
+protocol-relative (``//x``) and **fuzzy** (``www.evil.com``, ``evil.com``,
+``ops@evil.com``, IDN ``банк.рф``), the last of which needs neither a scheme nor
+a slash. :func:`_md_safe` is written against *that* grammar: on top of the usual
+CommonMark set it escapes ``~`` plus ``/``, ``.`` and ``@`` (all of which render
+invisibly, so filenames stay readable), and it REMOVES backticks rather than
+escaping them so the helper stays context-free (backslash escapes are inert
+inside a code span).
+
+This is the **best-effort** control, and it is the one that matters once the
+``.md`` leaves the app (GitHub, VS Code preview, Obsidian all autolink). The
+**enforcing** control is ``screens._hardened_markdown_parser``, which renders
+reports with linkify and raw HTML disabled regardless of document text.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import List, Optional, Sequence, Tuple
 
 from .flow_model import (
@@ -102,9 +111,20 @@ SECTION_HEADINGS = (
 )
 
 #: Markdown-structural characters escaped by :func:`_md_safe`. ``~`` kills
-#: strikethrough and ``/`` defuses linkify — both are gfm-like extensions absent
-#: from a plain CommonMark set (AMD-1).
-_MD_ESCAPE = ("\\", "|", "*", "_", "[", "]", "<", ">", "#", "~", "/")
+#: strikethrough; ``/``, ``.`` and ``@`` defuse the THREE linkify families —
+#: scheme (``http://x``), protocol-relative (``//x``), and **fuzzy** links, which
+#: need neither a scheme nor a slash (``www.evil.com``, ``evil.com``,
+#: ``ops@evil.com``, IDN ``банк.рф``). All are gfm-like extensions absent from a
+#: plain CommonMark set (AMD-1 + final-gate F1). ``\.``/``\@`` render invisibly,
+#: so filenames and addresses stay readable.
+_MD_ESCAPE = ("\\", "|", "*", "_", "[", "]", "<", ">", "#", "~", "/", ".", "@")
+
+#: Absolute-path shapes redacted out of finding messages before they enter the
+#: report (final-gate F2). ``_display_path`` only covers ``written_paths``; an
+#: OSError diagnostic such as ``FileExistsError: [WinError 183] … 'C:\\Users\\me\\…'``
+#: reaches the report through a block's findings, disclosing the operator's
+#: username and local layout in a document meant to be shareable (AMD-8's intent).
+_ABSOLUTE_PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|(?<![\w.])/)[^\s'\"<>|]+")
 
 
 def _default_now() -> datetime:
@@ -124,9 +144,11 @@ def _md_safe(value: object, limit: int = MAX_REPORT_CELL_CHARS) -> str:
         only grows it); then every markdown-structural character is escaped.
 
         The escape set targets ``MarkdownIt("gfm-like")`` with linkify enabled —
-        the grammar ``textual.widgets.Markdown`` actually uses — so it includes
-        ``~`` (strikethrough) and ``/`` (autolink), which a CommonMark set omits.
-        Escaping ``/`` renders invisibly, so paths stay readable.
+        the grammar ``textual.widgets.Markdown`` actually uses — so beyond the
+        CommonMark set it includes ``~`` (strikethrough) and the three linkify
+        triggers ``/`` (scheme + protocol-relative), ``.`` and ``@`` (**fuzzy**
+        links, which need no scheme at all). All render invisibly, so paths,
+        filenames and addresses stay readable.
 
     Args:
         value (object): The raw, untrusted value; rendered via ``str()``.
@@ -212,6 +234,34 @@ def _display_path(path: Path, project_dir: Optional[Path]) -> str:
         except (ValueError, OSError):
             return candidate.name
     return candidate.name
+
+
+def _redact_absolute_paths(message: object) -> str:
+    """Reduce any absolute path inside ``message`` to its basename (F2).
+
+    Summary:
+        Findings carry exception text, and an ``OSError`` on Windows embeds the
+        full absolute path (``FileExistsError: [WinError 183] … 'C:\\Users\\me\\…'``).
+        :func:`_display_path` only guards ``written_paths``, so this closes the
+        second disclosure channel at the single choke point every finding passes
+        through — covering the report block's own degrade handler, the generic
+        per-block handler, and any future one.
+
+    Args:
+        message (object): The raw finding message; rendered via ``str()``.
+
+    Returns:
+        str: The message with every absolute-path token replaced by its basename.
+
+    Dependencies:
+        Used by:
+            - compose_flow_report (findings section)
+    """
+    def _basename(match: "re.Match[str]") -> str:
+        token = match.group(0).rstrip("'\"")
+        return PurePath(token.replace("\\", "/")).name or token
+
+    return _ABSOLUTE_PATH_RE.sub(_basename, str(message))
 
 
 def _provisional_status(state: FlowReportState) -> str:
@@ -309,7 +359,8 @@ def compose_flow_report(state: FlowReportState, generated_at: datetime) -> str:
             message = getattr(finding, "message", finding)
             findings_lines.append(
                 f"- **[{_md_safe(br.kind.upper())} #{br.index + 1}]** "
-                f"({_md_safe(severity)}) {_md_safe(message)}"
+                f"({_md_safe(severity)}) "
+                f"{_md_safe(_redact_absolute_paths(message))}"
             )
         suppressed = len(br.findings) - len(shown)
         if suppressed > 0:

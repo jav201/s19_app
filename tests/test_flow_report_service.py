@@ -59,12 +59,21 @@ def _render_tokens(markdown: str) -> List[str]:
     return types
 
 
-def _live_structures(markdown: str, *, allow_headings: bool = True) -> set:
-    """Live markdown structures in ``markdown``, ignoring the report's OWN headings."""
-    found = set(_render_tokens(markdown)) & _LIVE_TOKENS
-    if allow_headings:
-        found.discard("heading_open")  # the report legitimately has its own headings
-    return found
+def _live_structures(markdown: str) -> set:
+    """Live markdown structures in ``markdown``, EXCLUDING headings.
+
+    Headings are handled separately by :func:`_heading_count`: the report has its
+    own ``#``/``##`` lines, so their mere presence proves nothing — an INJECTED
+    heading is detected as a heading COUNT above the benign baseline. Discarding
+    the token type outright (the first version of this helper) made the
+    ``# INJECTED heading`` payload assert nothing at all.
+    """
+    return (set(_render_tokens(markdown)) & _LIVE_TOKENS) - {"heading_open"}
+
+
+def _heading_count(markdown: str) -> int:
+    """How many headings the parser sees — the injected-heading discriminator."""
+    return _render_tokens(markdown).count("heading_open")
 
 
 def _state(**kwargs) -> FlowReportState:
@@ -166,9 +175,17 @@ def test_tc013_clean_and_issues_labels() -> None:
 # --------------------------------------------------------------------------- #
 
 @pytest.mark.parametrize("payload", [
-    "http://evil.example/x",            # linkify autolink (gfm-like, NOT CommonMark)
+    "http://evil.example/x",            # linkify: scheme
     "https://evil.example/x",
-    "//evil.example/x",                 # protocol-relative — the scheme-regex misses this
+    "//evil.example/x",                 # linkify: protocol-relative
+    # linkify: FUZZY — no scheme, no slash. The final-gate F1 gap: the first
+    # battery had 11 payloads and not one of them exercised this branch, so the
+    # oracle was correct while the INPUT SET was blind (C-31 on ourselves).
+    "www.evil.com",
+    "evil.com",
+    "ops@evil.example",                 # fuzzy email → mailto:
+    "банк.рф",                          # IDN fuzzy link
+    "a.b.c@d.co.uk",
     "~~approved~~ rejected.json",       # strikethrough = deception in an audit record
     "calib`code`.json",                 # code span
     "# INJECTED heading",               # heading
@@ -181,16 +198,21 @@ def test_tc013_clean_and_issues_labels() -> None:
 def test_tc004_hostile_payload_injects_no_live_structure(payload: str) -> None:
     """Per-branch battery (C-31): each payload targets ONE grammar feature, so a
     regression dropping any single escape goes RED (the batch-53 M-1 lesson)."""
-    state = _state(
-        flow_name=payload,
-        block_results=[
-            BlockResult(0, "patch", BLOCK_STATUS_NOTICES, f"applied {payload}",
-                        findings=[Finding("warning", f"unresolved in {payload}")]),
-        ],
-        written_paths=[Path(payload)],
-    )
-    report = compose_flow_report(state, _AT)
+    def _compose(text: str) -> str:
+        return compose_flow_report(_state(
+            flow_name=text,
+            block_results=[
+                BlockResult(0, "patch", BLOCK_STATUS_NOTICES, f"applied {text}",
+                            findings=[Finding("warning", f"unresolved in {text}")]),
+            ],
+            written_paths=[Path(text)],
+        ), _AT)
+
+    report = _compose(payload)
     assert _live_structures(report) == set(), payload
+    # An injected heading is a heading COUNT above the benign baseline — the
+    # report's own headings are constant, so this is falsifiable (F4).
+    assert _heading_count(report) == _heading_count(_compose("benign.txt")), payload
 
 
 def test_tc004_ledger_row_column_count_preserved_under_hostile_summary() -> None:
@@ -291,6 +313,24 @@ def test_tc016_written_paths_render_relative_not_absolute(tmp_path: Path) -> Non
     # The leak assertions hold on the raw markdown too — nothing absolute is in it.
     assert "Users" not in report
     assert ":\\" not in report and str(tmp_path) not in report
+
+
+def test_tc016b_exception_diagnostics_do_not_leak_absolute_paths() -> None:
+    """F2: `_display_path` guards `written_paths`, but an OSError message reaches
+    the report through a block's FINDINGS and carries the full host path
+    (username + local layout) into a document meant to be shareable."""
+    leaky = (r"FileExistsError: [WinError 183] Cannot create a file when that "
+             r"file already exists: 'C:\Users\jjgh8\AppData\Local\Temp\x\reports'")
+    state = _state(block_results=[
+        BlockResult(0, "report", BLOCK_STATUS_ERROR, "report write failed",
+                    findings=[Finding("error", leaky)]),
+    ])
+    report = compose_flow_report(state, _AT)
+    assert "Users" not in report
+    assert "jjgh8" not in report
+    assert "C:" not in report
+    # The useful part survives — this is redaction, not deletion.
+    assert "FileExistsError" in report and "reports" in report
 
 
 # --------------------------------------------------------------------------- #
