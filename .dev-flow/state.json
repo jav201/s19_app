@@ -13,14 +13,14 @@
     "operator_phrasing": "arranca /dev-flow con report_service escaping, autonomo con self-merge",
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
-  "current_phase": 3,
-  "phase_status": "ready",
+  "current_phase": 4,
+  "phase_status": "gate-failed-iterate",
   "iterations_per_phase": {
     "0": 0,
     "1": 1,
     "2": 2,
-    "3": 0,
-    "4": 0,
+    "3": 5,
+    "4": 1,
     "5": 0,
     "6": 0
   },
@@ -33,7 +33,8 @@
     "2": ".dev-flow/2026-07-25-batch-62/02-review.md",
     "2-architect": ".dev-flow/2026-07-25-batch-62/02-review-architect.md",
     "2-qa": ".dev-flow/2026-07-25-batch-62/02-review-qa.md",
-    "2-security": ".dev-flow/2026-07-25-batch-62/02-review-security.md"
+    "2-security": ".dev-flow/2026-07-25-batch-62/02-review-security.md",
+    "4": ".dev-flow/2026-07-25-batch-62/04-validation.md"
   },
   "decisions_log": [
     {
@@ -65,6 +66,18 @@
       "date": "2026-07-25",
       "decision": "RE-GATE PASS (iteration 2) -> Phase 3",
       "notes": "Coverage/Certainty/Evidence all MET. Auditing the discharge matrix against the SOURCE reviews (not against itself) found two uncovered majors - arch M-7 mis-scoped probe framing, qa M-6 the false 'no private symbol' claim - closed as A-42 and A-41. STATED WEAKNESS, not hidden: this is a SELF-GATE. The operator's resume instruction was explicit that the three Phase-2 reviewers must not be re-dispatched, so no independent reviewer ran over the folded spec. Bounded by (a) every load-bearing claim being executed with its transcript in-repo - a self-gate over measurements is a different object from a self-gate over reasoning - and (b) the merge gate being unchanged and independent: fresh qa-reviewer AND security-reviewer over the whole diff vs main, 0-HIGH to merge. Phase-3 obligations carried explicitly: expected_display written per mode BEFORE the first AT; pin 3 evaluates the assembled line template (a per-source-line form is pre-measured to false-positive at 11 sites); the golden gate is a one-shot artifact asserting the LINE-NUMBER set {14,15,51}, not a surviving test; Inc-1's exit is exactly ONE re-baselined flow-report case, not zero."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-25",
+      "decision": "Phase 3 CLOSED — 5 increments, 7 ATs shipped",
+      "notes": "Inc-1 leaf helper markdown_safety.py + 157-case battery (29 RED against the old escaper). Inc-2 golden-affecting sites; the golden gate hit the pre-measured changed-line set {14,15,51} EXACTLY, and line 51 still carries <RUN-ROOT> so R-1 holds. Inc-3 was SPLIT after measuring 7 files against a <=5 limit: Inc-3a prose fields + the D-11 host-path redaction (counterfactual: without it 'operator' and 'C:' reach the report; with it only the basename survives), Inc-3b the filter surface + the 14-field census (13 of 19 RED with the escaper neutralised). Inc-4 scope pins + the A-16 residue guard, measured in BOTH directions (fires at zero real call sites; driven to AssertionError to prove it can fire at all). Inc-1's battery REFUTED an approved ruling: D-10's 'a literal prefix defuses every block starter' is false when the prefix is itself a list marker (1) item -> ordered_list; --- -> hr; '- item' loses its marker on render) -> A-43, leading-position escape only. Suite 2168 -> 2195, 0 regressions."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-25",
+      "decision": "VALIDATION GATE FAILED -> Inc-5 (iteration 1)",
+      "notes": "AT layer COMPLETE: 7/7 realized as one named node each, all green, each shown RED pre-fix. TC layer NOT: 17 covered / 5 gaps / 1 superseded. TWO BLOCKERS. B-1 is the serious one and it is MINE: D-20/A-27 (MAX_REPORT_ISSUES_PER_VARIANT capping _declaration_error_lines) was ruled 'shall' at the fold, recorded in 6.5, and then never made it into any increment's file list - while THIS BATCH doubled that section's per-issue cost by raising issue.message's limit 240->500. The one section outside _ByteBudget is the one section the batch grew. Same failure mode the batch exists to punish, committed by me at a later stage. B-2: REPORT_CELL_CHARS=512 appears in tests only as an ARGUMENT, never with a boundary pair - deleting limit= from any of ~20 Mode-A sites turns no test red, which is verbatim the batch-60 defect the spec quoted at itself. Smaller gaps: TC-382 (no astral/NBSP/combining/large-string), TC-389 (truncation-appendix path untested), TC-385 (heading LEVEL unasserted - live_tokens is a type SET so a ##-># promotion is invisible), TC-381 (None), TC-398 (orphaned-backslash clause). Minor m-1: NO TC id is traceable to any node - the registry reads satisfied while nothing consumes it, which is the reverse-index control open since batch-48."
     }
   ],
   "obsidian_synced": false,

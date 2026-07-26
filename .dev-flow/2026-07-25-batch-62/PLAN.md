@@ -2,11 +2,36 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase 3 COMPLETE (2026-07-25)
+## Where we are — Phase-4 gate FAILED → Inc-5 (2026-07-25)
 
-**Phase 0 CLOSED. Phase 1 CLOSED → `iterate-to-refine` iteration 1 → CLOSED. Phase 2 re-gate PASS.
-Phase 3 CLOSED: Inc-1 · Inc-2 · Inc-3a · Inc-3b · **Inc-4**. All 7 ATs shipped.
-Next action: Phase 4 (validation).**
+**Phase 0 CLOSED. Phase 1 CLOSED → fold iteration 1 → CLOSED. Phase 2 re-gate PASS.
+Phase 3 CLOSED (5 increments, 7 ATs). **Phase 4: FAIL** → one closing increment.
+Next action: Inc-5, then re-run Phase 4.**
+
+### Phase-4 verdict — the AT layer is complete, the TC layer is not
+
+Full detail in `04-validation.md`. Headline: **7/7 ATs realized** as one named node each, all green,
+each shown RED pre-fix; **TC-376…398 = 17 covered / 5 gaps / 1 superseded**; **0 regressions**.
+
+Two blockers, and the first one is mine:
+
+- **B-1 — D-20/A-27 was never implemented.** `MAX_REPORT_ISSUES_PER_VARIANT` exists nowhere;
+  `_declaration_error_lines` is still uncapped. It was ruled `shall` at the fold, recorded in §6.5,
+  and then dropped on the way into the increment cut — while **this batch doubled that section's
+  per-issue cost** (`issue.message` 240 → 500). The one section outside `_ByteBudget` is the one
+  section the batch grew. Inc-3a and Inc-3b both edited that exact function and neither carried it.
+  Same failure mode the batch exists to punish, committed by me at a later stage.
+- **B-2 — `REPORT_CELL_CHARS` (512) is unpinned.** It appears in `tests/` only as an *argument*,
+  never with a boundary pair. Deleting `limit=REPORT_CELL_CHARS` from any of ~20 Mode-A sites turns
+  **no test red** — verbatim the batch-60 defect the spec quoted at itself.
+
+Smaller gaps: TC-382 (no astral / NBSP / combining / large-string case), TC-389 (the
+truncation-appendix path is escaped but untested), TC-385 (heading LEVEL unasserted — `live_tokens`
+is a type SET, so a `##`→`#` promotion is invisible), TC-381 (`None`), TC-398 (orphaned backslash).
+
+**m-1, worth its own decision:** **no TC id is traceable to any node.** The registry reads as
+satisfied while nothing consumes it — the reverse-index control the backlog has carried open since
+batch-48.
 
 ### Inc-4 record — the scope exclusions, pinned rather than assumed
 
