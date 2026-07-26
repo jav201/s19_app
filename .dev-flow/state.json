@@ -14,7 +14,7 @@
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
   "current_phase": 6,
-  "phase_status": "merge-gate-passed",
+  "phase_status": "merged",
   "iterations_per_phase": {
     "0": 0,
     "1": 1,
@@ -128,8 +128,20 @@
       "date": "2026-07-26",
       "decision": "MERGE GATE PASSED — both reviewers 0-HIGH on Inc-8; closeout fixes applied",
       "notes": "qa OK-TO-MERGE 0 HIGH: HIGH-2 closed AT THE ROOT (symbol-identity invariant 5/5 agree, was 3/5 disagree), 20 of 20 mutations killed on the escaping surface, flow_report_service verified byte-identical to main by comparing +/- lines and blob shas rather than grep (its first grep returned 1 - an unchanged COMMENT appearing as diff CONTEXT). security OK-TO-MERGE 0 HIGH: 14,736 baseline-diffed parses 0 deviations, all 6 guard mutations RED, redactor blob sha-identical to main. CI green on the Inc-8 head. CLOSEOUT: (a) m-11 - the old RR-2 bullet still claimed the redaction IS applied and sat directly below the bullet saying it is not; superseded not deleted so the reversal stays traceable; (b) security minor - the residue guard's rb'/home/' never matched an ESCAPED leak because Mode A renders it \\/home\\/, so Windows and macOS were covered and Linux was not; matters more now that unredacted host paths ride in issue.message; (c) security's INCONCLUSIVE item - it could not reproduce the lookbehind's justification and said so rather than assert a finding, so the comment now claims a precaution rather than a demonstrated fix. FRAMING CORRECTION I OWE: I said 'batch-62 touches flow-report redaction zero' - true of the REDACTOR (verified 3 ways) but flow-report OUTPUT does change, because _md_safe is still aliased to markdown_safety.md_safe (backtick escaped not removed, & escaped, Cc/Cf/Cs/Zl/Zp visible marker, leading block starter escaped). Intentional since Inc-1 with a re-baselined test under A-13, but the precise claim is 'the redactor is untouched', not 'the module is'. Both reviewers logged errors against THEMSELVES: security mis-scored HIGH-1 as non-reproducing (probe built from a docstring's prose illustration instead of the real test string) and later distrusted its own regex harness rather than assert; qa recorded it had cleared the vacuous width guard on its first pass."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-26",
+      "decision": "MERGED — PR #136 squash fbc9f2a",
+      "notes": "Both independent reviewers 0-HIGH on the final tip; CI green (tui-ci 37m38s, snapshot 1m43s) on the closeout head. main 8d3c504 -> fbc9f2a. Remaining close step: /dev-flow-sync to the vault."
     }
   ],
   "obsidian_synced": false,
-  "created_at": "2026-07-25T00:00:00Z"
+  "created_at": "2026-07-25T00:00:00Z",
+  "merged": {
+    "pr": 136,
+    "squash_sha": "fbc9f2a",
+    "date": "2026-07-26",
+    "base_before": "8d3c504"
+  }
 }
