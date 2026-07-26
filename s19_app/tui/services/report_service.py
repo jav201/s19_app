@@ -49,7 +49,7 @@ from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
-from .markdown_safety import md_code, md_safe, redact_absolute_paths
+from .markdown_safety import md_code, md_safe
 from .report_addendum import DECLARED_REGION_NAME_MAX, DeclaredRegion
 from .report_filter import ReportFilterMatcher
 from ..models import ProjectVariantSet
@@ -1044,15 +1044,21 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
         omitted = len(issues) - MAX_REPORT_ISSUES_PER_VARIANT
         issues = issues[:MAX_REPORT_ISSUES_PER_VARIANT]
     for issue in issues:
-        # D-11: `issue.message` carries parsed file text AND exception strings,
-        # so an absolute path reaches a shareable document through it. Redaction
-        # runs BEFORE escaping, so the escape count reflects what is emitted.
-        # The 500 limit matches `_scrub_issue_message`'s own cap — the report
-        # cap would have truncated a legitimately scrubbed message.
+        # D-11 REVERTED at Inc-8 (operator ruling). `issue.message` is escaped
+        # but NOT path-redacted: three revisions of a shape-inference redactor
+        # produced three integrity defects, the last of which made the report
+        # contradict itself about a symbol's identity, because every
+        # `ValidationIssue` template embeds a file-derived symbol in quotes and a
+        # path-shaped symbol is indistinguishable from a path. Host-path exposure
+        # is carried as a named MAJOR, to be solved by substituting KNOWN roots
+        # rather than inferring extent from punctuation.
+        #
+        # The 500 limit stays: it matches `_scrub_issue_message`'s own cap, which
+        # the report-wide cap would have truncated.
         line = (
             f"- [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
             f"{issue.severity.value}: "
-            f"{md_safe(redact_absolute_paths(issue.message), limit=500)}"
+            f"{md_safe(issue.message, limit=500)}"
         )
         if issue.address is not None:
             line += f" @ 0x{issue.address:X}"

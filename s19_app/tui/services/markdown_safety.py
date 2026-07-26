@@ -51,50 +51,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from pathlib import PurePath
 from typing import Tuple
-
-#: Absolute-path shapes reduced to a basename by :func:`redact_absolute_paths`.
-#: Promoted here from ``flow_report_service`` at batch-62 so the project report
-#: can share the control instead of re-deriving it (A-24).
-#:
-#: Four alternatives, in order, each fixing a shape the inherited single-branch
-#: pattern got wrong (all three measured through ``generate_project_report``):
-#:
-#: 1. **Quoted** drive-letter, UNC **or POSIX** path — spaces ALLOWED, because a
-#:    real ``OSError`` quotes the path and a home directory routinely contains
-#:    one (``'C:\\Users\\Javier Granados\\...'`` and
-#:    ``'/home/Javier Granados/...'`` were both disclosed verbatim before).
-#:    The trailing ``(?=['"])`` is **load-bearing**: without it the greedy class
-#:    ran to end-of-string on an *unclosed* quote, so the basename reduction ate
-#:    the entire rest of the diagnostic — ``"cannot open 'C:\\a\\prg.s19 --
-#:    expected 0x1000 got 0x2000"`` became ``"cannot open 'prg.s19"``, deleting
-#:    the failing address and the expected/actual bytes. That is unbounded
-#:    evidence loss, strictly worse than the URL corruption this branch was
-#:    added to fix, and reachable because ``_scrub_issue_message`` truncates at
-#:    500 characters and can strip the closing quote upstream. With the
-#:    lookahead an unclosed quote falls through to the whitespace-bounded
-#:    branches, which is the conservative read.
-#: 2. **Bare UNC** ``\\\\server\\share\\...`` — matched neither prior branch, so
-#:    an internal file server and client directory reached the report intact.
-#: 3. **Bare** drive-letter path, no spaces (an unquoted path cannot be
-#:    delimited from following prose, so stopping at whitespace is the only safe
-#:    read). The ``(?<![A-Za-z0-9])`` lookbehind is what keeps a URL intact:
-#:    without it, the ``p:`` of ``http://x`` matched and
-#:    ``http://vendor.example/spec`` was silently rewritten to ``httspec`` —
-#:    deletion inside an evidentiary record, which is exactly what this module
-#:    refuses to do everywhere else.
-#: 4. **POSIX** absolute path. ``:`` is in the lookbehind so the ``//`` of a
-#:    scheme-relative URL is not read as a path either.
-_ABSOLUTE_PATH_RE = re.compile(
-    r"""(?:
-          (?<=['"]) (?: \\\\ | [A-Za-z]:[\\/] | / ) [^'"<>|]+ (?=['"])
-        | (?<![\w.]) \\\\ [^\s'"<>|]+
-        | (?<![A-Za-z0-9]) [A-Za-z]:[\\/] [^\s'"<>|]*
-        | (?<![\w.:/]) / [^\s'"<>|]+
-    )""",
-    re.VERBOSE,
-)
 
 #: Markdown-structural characters escaped by :func:`md_safe`, **in application
 #: order**. ``\\`` MUST stay at index 0 so an inserted escape is never
@@ -185,56 +142,6 @@ def _normalise(text: str) -> str:
         LOSS_MARKER if unicodedata.category(ch) in _DROP_CATEGORIES else ch
         for ch in text
     )
-
-
-def redact_absolute_paths(message: object) -> str:
-    """Reduce any absolute path inside ``message`` to its basename.
-
-    Summary:
-        Parsed-file text and exception strings carry absolute paths — an
-        ``OSError`` on Windows embeds one whole (``FileExistsError: [WinError
-        183] … 'C:\\Users\\me\\…'``) — and a report is a document meant to be
-        shared, so the operator's username and directory layout must not travel
-        with it.
-
-        Batch-60 raised this from LOW to MAJOR for flow reports and shipped the
-        control there. Batch-62 applies it to the project report's highest-risk
-        field, ``issue.message``, and promotes the function here so the two
-        generators share one implementation rather than two that can drift.
-
-        **Scope, ruled explicitly (D-11).** This is applied to Mode-A prose
-        fields only. The Mode-B *path* fields deliberately keep their absolute
-        path: their raw bytes are substituted by a downstream canonicaliser, and
-        redacting them would defeat it. That divergence is an accepted, recorded
-        decision, not an oversight.
-
-    Args:
-        message (object): The raw message; rendered via ``str()``.
-
-    Returns:
-        str: The message with every absolute-path token replaced by its
-        basename.
-
-    Data Flow:
-        - Runs BEFORE :func:`md_safe`, so the escaper sees the already-shortened
-          text and the escape count reflects what is actually emitted.
-
-    Dependencies:
-        Uses:
-            - _ABSOLUTE_PATH_RE / PurePath
-        Used by:
-            - flow_report_service (findings + diagnostics)
-            - report_service (``issue.message``)
-
-    Example:
-        >>> redact_absolute_paths("failed: /home/op/secret/a.s19")
-        'failed: a.s19'
-    """
-    def _basename(match: "re.Match[str]") -> str:
-        token = match.group(0).rstrip("'\"")
-        return PurePath(token.replace("\\", "/")).name or token
-
-    return _ABSOLUTE_PATH_RE.sub(_basename, str(message))
 
 
 def _escape_leading_block_starter(text: str) -> str:

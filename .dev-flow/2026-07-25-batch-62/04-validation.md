@@ -322,3 +322,63 @@ diff.
 I ran mutation counterfactuals in the live worktree during the first security review (F5). For this
 round both reviewers worked from `git archive` exports and I did not touch the tree while they ran.
 That is the standing rule now.
+
+---
+
+## 10. Third block, and the operator's call — **Inc-8: D-11 withdrawn**
+
+The Inc-7 delta review split again: **security OK-TO-MERGE 0 HIGH** (and it opened with a correction
+of its own — it had wrongly reported HIGH-1 as non-reproducing, because it built its probe from the
+docstring's **prose illustration** instead of the real test string; C-31 applied to its own gate).
+**qa BLOCKED with HIGH-2.**
+
+### HIGH-2 — not a regression; my Inc-4 application of D-11, missed by both of us
+
+`redact_absolute_paths` infers path extent from punctuation. Every `ValidationIssue` template in this
+codebase embeds a file-derived symbol **in single quotes**:
+
+```
+validation/engine.py:92   f"MAC symbol '{name}' address 0x{addr:08X} not present in S19 image."
+validation/rules.py:509   f"{section_name} references unknown symbol '{symbol}'."
+```
+
+A path-shaped symbol therefore satisfies the pattern and is reduced to its last segment. Measured on
+one emitted line:
+
+```
+- [CROSS_MAC_S19_OUT_OF_RANGE] error: MAC symbol 'MAP\_A' … symbol=\/cal map\/MAP\_A
+```
+
+`message` says the symbol is `MAP_A`; `symbol=` on the same line says `/cal map/MAP_A`. **One report,
+two identities for one symbol**, in a document whose entire purpose is correlating symbols to
+addresses. No anomaly needed — just a path-shaped symbol and the project's own template.
+
+### The ruling: withdraw, don't iterate
+
+Three revisions of the same shape-inference approach produced three integrity defects (URL
+corruption → unbounded evidence deletion → symbol mis-identification). That is a signal about the
+**approach**, not the pattern. Operator ruled: **revert D-11 from this batch and carry it.**
+
+What that means concretely:
+
+- `report_service` no longer redacts `issue.message`; it escapes it, which is what this batch is
+  about.
+- `flow_report_service` keeps **main's** redactor, byte-for-byte — batch-62 now touches flow-report
+  redaction **zero**.
+- `markdown_safety` drops the promoted function; the leaf is once again purely an escaper.
+- **R-TUI-078 is WITHDRAWN** in `REQUIREMENTS.md`, with the reasoning preserved, because leaving a
+  requirement asserting a control that no longer exists is precisely the pattern this batch found
+  3-for-3.
+- Host-path exposure is carried at **MAJOR** with the correct construction named: substitute **known
+  roots** by literal replacement (the technique `canonical_report_bytes` already uses), which guesses
+  nothing and deletes nothing.
+
+**Increment budget: 6 files, one over the ≤5 limit, recorded deliberately.** A revert must be atomic
+— shipping the code revert while `REQUIREMENTS.md` still claimed the control would have created the
+exact defect class the revert exists to remove.
+
+### What this leaves batch-62 as
+
+Exactly what it set out to be: **markdown escaping at the composer**. That surface is the one both
+reviewers hammered and could not break — 15,816 baseline-diffed parses with zero structural
+deviations, 13 of 13 mutations killed, every guard shown able to fail.

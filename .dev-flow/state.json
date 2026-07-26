@@ -14,13 +14,13 @@
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
   "current_phase": 6,
-  "phase_status": "merge-gate-inc7-awaiting-reverify",
+  "phase_status": "merge-gate-inc8-awaiting-reverify",
   "iterations_per_phase": {
     "0": 0,
     "1": 1,
     "2": 2,
-    "3": 8,
-    "4": 4,
+    "3": 9,
+    "4": 5,
     "5": 1,
     "6": 1
   },
@@ -116,6 +116,12 @@
       "date": "2026-07-26",
       "decision": "DELTA RE-REVIEW: qa BLOCKED 1 HIGH -> Inc-7 (5 files). security OK 0 HIGH.",
       "notes": "Re-dispatching both reviewers over the Inc-6 delta paid for itself. security: OK-TO-MERGE 0 HIGH (all 7 new guards mutation-tested, all 7 RED; Cs mangles nothing legitimate across 13 Unicode classes). qa: BLOCKED with 1 HIGH - MY Inc-6 FIX WAS A REGRESSION, NOT A FIX. Allowing spaces inside a quoted path came with NO closing-quote requirement, so the greedy class ran to end-of-string on an UNCLOSED quote and the basename reduction ate the rest of the message: \"cannot open 'C:\u0007\\prg.s19 -- expected 0x1000 got 0x2000\" -> \"cannot open 'prg.s19\". The failing address, expected bytes, actual bytes AND the filename were deleted - unbounded evidence loss, strictly worse than the 3-char URL corruption the branch was added to fix, inside the function whose docstring says this module refuses to delete, and reachable because _scrub_issue_message truncates at 500 and can strip the closing quote upstream. Fixed with a closing-delimiter lookahead so an unclosed quote falls to the whitespace-bounded branches. Folded in sec D1: a quoted POSIX path was not an alternative so /home/<spaced name>/ leaked. Full matrix re-measured: 5 leak shapes redacted, 12 legitimate strings byte-identical, evidence preserved after an unclosed quote. ALSO closed: MAJOR-6 - the independent oracle expected_display had DRIFTED (missing Cs), 203 tests passed with oracle and impl disagreeing, and a future surrogate payload would have gone RED against a CORRECT implementation, the symmetric failure C-39 exists to prevent, ONE INCREMENT after encoding C-39; fixed by adding Cs plus a _DROP == _DROP_CATEGORIES pin that fixes the DATA while the oracle keeps re-deriving the ALGORITHM. D2 - Inc-6's 'corrected' table guard STILL could not fail (compared shape, not content; removing | from MD_ESCAPE left it green), THIRD occurrence in this batch of a docstring asserting detection power measurement contradicts; now the inventory row is compared cell-by-cell against expected_display and the counterfactual turns it RED. Ledger corrected: m-3 is NOT closed (the reviewer corrected my summary rather than accepting it); m-9/D1 bare-spaced-path residue NAMED in RR-2; m-7 false comment fixed. Suite 2215 -> 2218, 0 regressions, ruff clean. Both reviewers worked from git archive exports this round and I did not touch the tree while they ran."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-26",
+      "decision": "OPERATOR: D-11 WITHDRAWN from batch-62 (third block on the same control) -> Inc-8",
+      "notes": "qa BLOCKED with HIGH-2; security OK 0 HIGH (and self-corrected: it had wrongly reported HIGH-1 as non-reproducing because it built its probe from the docstring's PROSE ILLUSTRATION instead of the real test string - C-31 applied to its own gate). HIGH-2 is NOT an Inc-7 regression: it dates from Inc-4, my application of D-11, and both the reviewer and I missed it. redact_absolute_paths infers path extent from punctuation, and EVERY ValidationIssue template in s19_app/validation/ embeds a file-derived symbol in SINGLE QUOTES, so a path-shaped symbol is reduced to its last segment - producing one report line that states TWO identities for one symbol, in a document whose purpose is correlating symbols to addresses. Three revisions of the same shape-inference approach produced three integrity defects (URL corruption -> unbounded evidence deletion -> symbol mis-identification), which is a signal about the APPROACH not the pattern. I brought it back to the operator per my own commitment to escalate on a third block, and the ruling was: revert D-11, carry it. Inc-8: report_service no longer redacts issue.message; flow_report_service restored to main's redactor BYTE-FOR-BYTE so batch-62 touches flow-report redaction ZERO; markdown_safety drops the promoted function and is purely an escaper again; R-TUI-078 WITHDRAWN in REQUIREMENTS.md with the reasoning preserved; the carry names the CORRECT construction (substitute KNOWN roots by literal replacement, the canonical_report_bytes technique) and the strongest acceptance criterion available (symbol identity consistent across every field of one report). 6 files, ONE OVER the <=5 limit, recorded deliberately: a revert must be atomic, and shipping the code revert while REQUIREMENTS.md still claimed the control would have created the exact defect class the revert removes. batch-62 is now exactly what it set out to be - markdown escaping at the composer - which is the surface both reviewers hammered and could not break."
     }
   ],
   "obsidian_synced": false,

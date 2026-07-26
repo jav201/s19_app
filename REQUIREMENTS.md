@@ -4798,21 +4798,28 @@ spaces only).
   amendments A-01…A-43). Frozen-engine diff = 0. **Residual risk RR-1**: the modelled reader is a
   default `markdown-it` `gfm-like` parser, NOT "any GFM reader" — reader extensions (`:emoji:`,
   `$…$` math, `==highlight==`) are inert here and live on GitHub/VS Code/Obsidian; the escape-set
-  extension was declined (D-22) because `:` appears in every address-bearing string.
+  extension was declined (D-22) because `:` appears in every address-bearing string. **RR-2**:
+  project reports disclose host paths — R-TUI-078 was withdrawn at the merge gate (see below).
 
-**R-TUI-078**: When the project report emits `issue.message`, any absolute path inside it shall be
-reduced to its basename before escaping, so a shareable record cannot disclose the operator's
-username or local directory layout. The Mode-B **path** fields shall NOT be redacted — their raw
-bytes are load-bearing for the golden canonicaliser — and that divergence is an explicitly accepted,
-recorded decision rather than an omission.
-- Code: `s19_app/tui/services/markdown_safety.py::redact_absolute_paths` (promoted from
-  `flow_report_service`, which now aliases it), applied at `report_service.py` `_declaration_error_lines`
-- Validation: `Automated` — `tests/test_report_service.py::test_issue_message_absolute_path_is_redacted`
-  (asserts the basename SURVIVES — redaction, not deletion — and that the username, the directory
-  layout and the drive letter do not) · `tests/test_report_field_census.py::test_a16_*` (the
-  canonicaliser residue guard, driven to failure so it is provably not decorative)
-- Status: Added in batch `2026-07-25-batch-62` (D-11, operator ruling; `01-requirements.md` §6.5
-  A-24). Closes the severity criterion batch-60 raised from LOW to MAJOR for flow reports and that
-  batch-62 initially carried without mentioning. **Residual risk RR-2**: project reports still
-  disclose host paths in the three Mode-B path fields where flow reports do not — carried to
-  `.dev-flow/BACKLOG.md` at MAJOR.
+**R-TUI-078**: ~~When the project report emits `issue.message`, any absolute path inside it shall be
+reduced to its basename…~~ **WITHDRAWN before merge (batch-62 Inc-8, operator ruling).**
+
+The requirement was authored and implemented, then withdrawn at the merge gate. Recorded rather than
+deleted, because the reasoning is the useful part:
+
+Three revisions of a **shape-inference** redactor produced three integrity defects — it ate URLs
+(`http://vendor.example/spec` → `httspec`); it consumed to end-of-string on an unclosed quote,
+deleting a diagnostic's failing address and byte values; and finally it mangled quoted **symbol
+names**, because every `ValidationIssue` template in `s19_app/validation/` embeds a file-derived
+symbol in single quotes (`f"MAC symbol '{name}' address 0x…"`) and a path-shaped symbol is
+indistinguishable from a path. That last one made one report line state two different identities for
+the same symbol — in a document whose purpose is correlating symbols to addresses.
+
+The lesson is that path extent cannot be inferred from punctuation in prose that also carries quoted
+identifiers. The correct construction substitutes **known roots** (`Path.home()`, the project root,
+the temp root) by literal replacement — the technique `tests/conftest.py::canonical_report_bytes`
+already uses — which guesses nothing and deletes nothing.
+
+- Status: **withdrawn at `2026-07-25-batch-62`**; `flow_report_service` keeps its own batch-60
+  redactor unchanged. Host-path exposure in project reports is carried in `.dev-flow/BACKLOG.md` at
+  **MAJOR** with the design above.

@@ -25,7 +25,6 @@ import pytest
 from markdown_it import MarkdownIt
 
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
-from s19_app.tui.services.markdown_safety import redact_absolute_paths
 from s19_app.tui.services.report_addendum import DeclaredRegion
 from s19_app.tui.services.markdown_safety import TRUNCATION_MARKER
 from s19_app.tui.services.report_service import (
@@ -304,19 +303,14 @@ def test_census_every_planted_field_renders_verbatim(
     )
     assert marker in shown, f"{field}: the planted marker never reached the reader"
 
-    if mode == "A" and field not in ("region_name", "issue_message"):
+    if mode == "A" and field != "region_name":
         # region_name is capped at 80 upstream (its own cap is pinned in
         # test_report_service.py), so only marker presence is checked here.
-        want = expected_display(_payload(marker), "A", limit=512)
-        assert want in shown, f"{field}: rendered text != the specified survivor set"
-    elif field == "issue_message":
-        # D-11: this field passes redaction BEFORE escaping, so the survivor set
-        # is computed over the redacted value. Asserting the raw payload here
-        # would demand that redaction NOT happen — a test that would go green
-        # only by removing the control.
-        want = expected_display(
-            redact_absolute_paths(_payload(marker)), "A", limit=500
-        )
+        # `issue_message` used to need its own branch for the D-11 redaction;
+        # that ruling was reverted at Inc-8, so it is an ordinary Mode-A field
+        # again — its limit is 500, its own upstream cap.
+        limit = 500 if field == "issue_message" else 512
+        want = expected_display(_payload(marker), "A", limit=limit)
         assert want in shown, f"{field}: rendered text != the specified survivor set"
 
 
@@ -344,7 +338,7 @@ _ESCAPED_EXPRESSIONS = {
     ("md_safe", "issue.symbol"): "planted (issue_symbol)",
     ("md_safe", "name"): "planted (related_artifact) — the per-element join",
     ("md_safe", "project_name"): "planted (project_name)",
-    ("md_safe", "redact_absolute_paths(issue.message)"): "planted (issue_message)",
+    ("md_safe", "issue.message"): "planted (issue_message)",
     ("md_safe", "region.name"): "planted (region_name)",
     ("md_safe", "result.status"): "planted (status)",
     ("md_safe", "result.variant_id"): "planted (variant_id, 7 sites)",
