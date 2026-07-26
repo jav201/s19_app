@@ -76,6 +76,19 @@ REPORT_CONTEXT_BYTES_MAX = 4096
 #: ``assumed — verify per-regime``, measured at E7 — see review packet).
 REPORT_MAX_REGIONS_PER_VARIANT = 128
 
+#: Per-variant declaration-error cap (batch-62 D-20, closing security F7).
+#:
+#: ``_ByteBudget`` is consumed at hexdump-block granularity only, so the
+#: declaration-error section sits OUTSIDE the whole-document accounting — and a
+#: corrupt image can mint one issue per parse fault with no bound of its own.
+#: batch-62 made that worse before it made it better: raising ``issue.message``'s
+#: escape limit from 240 to 500 roughly doubled the section's per-issue cost.
+#:
+#: 200 mirrors ``flow_report_service.MAX_REPORT_FINDINGS_PER_BLOCK`` deliberately
+#: — the two sections have the same unbounded-input shape, so a reader comparing
+#: the two report kinds should not have to learn two numbers.
+MAX_REPORT_ISSUES_PER_VARIANT = 200
+
 #: Report-wide Mode-A character cap (batch-62 A-18). THIS module's cap, not the
 #: flow report's 240 — each consumer owns its own, because the leaf escaper takes
 #: a REQUIRED ``limit`` precisely so no cap policy is inherited by accident.
@@ -987,6 +1000,11 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
         and check results (LLR-007.4 (d) declaration-error subsection,
         per LLR-002.8 + B-2 — operator decision 2026-06-10).
 
+        Capped at :data:`MAX_REPORT_ISSUES_PER_VARIANT`, with the omitted count
+        stated in the document. This section is outside ``_ByteBudget``'s
+        hexdump-granularity accounting, so without a cap of its own a corrupt
+        image composes an unbounded report (batch-62 D-20).
+
     Args:
         result (VariantExecutionResult): One variant's execution outcome.
 
@@ -1010,6 +1028,10 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
     if not issues:
         lines.extend(["None.", ""])
         return lines
+    omitted = 0
+    if len(issues) > MAX_REPORT_ISSUES_PER_VARIANT:
+        omitted = len(issues) - MAX_REPORT_ISSUES_PER_VARIANT
+        issues = issues[:MAX_REPORT_ISSUES_PER_VARIANT]
     for issue in issues:
         # D-11: `issue.message` carries parsed file text AND exception strings,
         # so an absolute path reaches a shareable document through it. Redaction
@@ -1034,6 +1056,15 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
             )
             line += f" related={related}"
         lines.append(line)
+    if omitted:
+        # Explicit beats silent, matching the region and hexdump caps: the cut
+        # is stated in the document rather than leaving a reader to wonder
+        # whether 200 issues is all there was.
+        lines.append(
+            f"> TRUNCATED: {omitted} of {omitted + MAX_REPORT_ISSUES_PER_VARIANT} "
+            f"declaration errors omitted (cap: {MAX_REPORT_ISSUES_PER_VARIANT} "
+            f"issues per variant)."
+        )
     lines.append("")
     return lines
 

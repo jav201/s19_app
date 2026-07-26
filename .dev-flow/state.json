@@ -14,13 +14,13 @@
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
   "current_phase": 4,
-  "phase_status": "gate-failed-iterate",
+  "phase_status": "gate-passed",
   "iterations_per_phase": {
     "0": 0,
     "1": 1,
     "2": 2,
-    "3": 5,
-    "4": 1,
+    "3": 6,
+    "4": 2,
     "5": 0,
     "6": 0
   },
@@ -78,6 +78,12 @@
       "date": "2026-07-25",
       "decision": "VALIDATION GATE FAILED -> Inc-5 (iteration 1)",
       "notes": "AT layer COMPLETE: 7/7 realized as one named node each, all green, each shown RED pre-fix. TC layer NOT: 17 covered / 5 gaps / 1 superseded. TWO BLOCKERS. B-1 is the serious one and it is MINE: D-20/A-27 (MAX_REPORT_ISSUES_PER_VARIANT capping _declaration_error_lines) was ruled 'shall' at the fold, recorded in 6.5, and then never made it into any increment's file list - while THIS BATCH doubled that section's per-issue cost by raising issue.message's limit 240->500. The one section outside _ByteBudget is the one section the batch grew. Same failure mode the batch exists to punish, committed by me at a later stage. B-2: REPORT_CELL_CHARS=512 appears in tests only as an ARGUMENT, never with a boundary pair - deleting limit= from any of ~20 Mode-A sites turns no test red, which is verbatim the batch-60 defect the spec quoted at itself. Smaller gaps: TC-382 (no astral/NBSP/combining/large-string), TC-389 (truncation-appendix path untested), TC-385 (heading LEVEL unasserted - live_tokens is a type SET so a ##-># promotion is invisible), TC-381 (None), TC-398 (orphaned-backslash clause). Minor m-1: NO TC id is traceable to any node - the registry reads satisfied while nothing consumes it, which is the reverse-index control open since batch-48."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-25",
+      "decision": "Inc-5 closed both blockers -> VALIDATION GATE PASS (iteration 2)",
+      "notes": "3 files. B-1: MAX_REPORT_ISSUES_PER_VARIANT=200 caps _declaration_error_lines with the cut STATED in the document (matching the module's region/hexdump discipline). Counterfactual EXECUTED: cap=200 -> 200 lines + '> TRUNCATED:'; cap removed -> 300 lines, no marker, TC-397 RED. Fixture is 1.5x the cap and says so in its docstring (batch-60 lesson). B-2: REPORT_CELL_CHARS pinned by a boundary pair on descriptor.path.name - file-derived, in a table cell, NO upstream cap, so it is the field a cap can silently truncate; 512 survives verbatim, 513 truncates, both directions bite. All 5 TC gaps closed. TC-382's gap was ONE-SIDED: the battery had only characters that must be DROPPED, so an over-broad 'drop anything category-C-ish' filter would have passed - the new cases pin what must SURVIVE (NBSP is Zs, combining acute is Mn); its size case is ~2.1MB (~8750x the cap) replacing a 10k-char case three orders of magnitude under anything interesting. INC-5 CAUGHT A DEFECT IN ITSELF: TC-389's first draft asserted '\"](\" not in note' and FAILED against a correct implementation, because the escaped form is '\\](' - ']' is escaped and '(' needs none once the brackets are dead. That is this batch's own recurring defect (assert the token stream, not a character list) committed inside its own census; replaced with a token-set assertion and recorded in the test docstring. Also self-corrected: the validation artifact first stated 2205 passed, written from targeted runs BEFORE the full suite returned 2207 - corrected against the run and the correction left visible. m-1 partially closed: 7 TCs now traceable by node NAME; the other 16 stay covered by consolidated batteries with the mapping in 04-validation.md section 3, and the reverse-index control stays a project-wide backlog item rather than being invented unilaterally here. Suite 2168 -> 2207 (+39), 0 regressions, ruff clean, frozen guards green."
     }
   ],
   "obsidian_synced": false,

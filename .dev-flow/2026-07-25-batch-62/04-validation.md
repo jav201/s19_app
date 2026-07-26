@@ -6,7 +6,9 @@
 > touched file, frozen guards `tc027` + `tc031`×3 green. Re-running 34 minutes over identical bytes
 > would add no information, and saying so is more honest than presenting a second run as new evidence.
 
-## VERDICT: **FAIL → return to Phase 3 for one closing increment (Inc-5).**
+## VERDICT (iteration 1): **FAIL → return to Phase 3 for one closing increment (Inc-5).**
+
+> **Iteration 2 (after Inc-5): see §7. Both blockers closed, all five TC gaps closed.**
 
 The **AT layer is complete**: all seven ATs exist as exactly one named on-disk node each, all pass,
 and each was shown RED before its fix. **The TC layer is not**, and one finding is worse than a
@@ -135,3 +137,68 @@ Two blockers, both small, plus the three cheap TC gaps. Estimated 3 files:
    TC-381's `None`; TC-398's orphaned-backslash clause.
 
 Then re-run Phase 4.
+
+---
+
+## 7. Iteration 2 — after Inc-5
+
+**VERDICT: PASS.** Both blockers closed, all five TC gaps closed, 3 files, 0 regressions.
+
+### B-1 closed — the cap exists and is pinned in both directions
+
+`MAX_REPORT_ISSUES_PER_VARIANT = 200` (mirroring `flow_report_service`'s
+`MAX_REPORT_FINDINGS_PER_BLOCK` deliberately — same unbounded-input shape, so a reader comparing the
+two report kinds does not have to learn two numbers), applied in `_declaration_error_lines` with the
+cut **stated in the document**, matching the module's existing region and hexdump discipline.
+
+Executed counterfactual, not reasoned:
+
+```
+WITH cap=200 : 200 issue lines emitted, "> TRUNCATED:" present
+cap REMOVED  : 300 issue lines emitted, no marker       -> TC-397 goes RED
+```
+
+The TC-397 fixture is **1.5× the cap** (300 against 200) and says so in its own docstring, per the
+batch-60 lesson that a fixture 2.8× *under* a limit lets every test pass with the guard deleted.
+
+### B-2 closed — `REPORT_CELL_CHARS` pinned at a composer site
+
+`test_tc396_report_cell_cap_is_pinned_at_a_composer_site` drives `descriptor.path.name` — file-derived,
+lands in a table cell, and has **no** upstream cap, so it is the field a cap can silently truncate.
+Boundary pair: exactly 512 survives untouched and renders verbatim; 513 truncates with the marker.
+Both directions bite — a wider limit kills the second assertion, a narrower one kills the first.
+
+### TC gaps closed
+
+| TC | Node | Note |
+|---|---|---|
+| TC-382 | `test_tc382_unicode_that_is_not_deceptive_survives_intact` (5 classes) + `test_tc382_a_large_value_is_bounded_*` | The gap was one-sided: the battery had only the characters that must be DROPPED. These pin the ones that must SURVIVE — NBSP is `Zs`, a combining acute is `Mn` — so an over-broad "drop anything category-C-ish" filter now fails. The size case is **~2.1 MB (~8750× the cap)**, replacing a 10 000-char case three orders of magnitude under anything interesting. |
+| TC-389 | `test_tc389_truncation_appendix_note_is_escaped` | A second-order path that only exists when the region cap fires. Its own anti-vacuity assertion caught the first fixture: without a `mem_map` there are no regions, so the cap never fired and the test would have passed while proving nothing. |
+| TC-385 | `test_tc385_a_hostile_heading_cannot_change_its_own_level` | Reads the heading's `tag`, because `live_tokens` is a type SET — `heading_open` is already present in any benign report, so a `##`→`#` promotion was invisible to every other structural assertion in the file. |
+| TC-381 | `test_tc381_none_renders_as_text_not_as_an_empty_cell` | `None` → the literal `"None"`, pinned as a decision rather than an accident of `str()`: a cell that silently went blank would be indistinguishable from a field the report does not carry. |
+| TC-398 | `test_tc398_truncation_never_orphans_an_escape` | Checked at every offset across the boundary on a value made entirely of escapable characters, so every cut position lands on one. |
+
+### One finding from Inc-5 itself
+
+TC-389's first draft asserted `"](" not in note` and **failed against a correct implementation**: the
+escaped form is `\](` — the `]` is escaped and the `(` needs none, because a link is already dead once
+the brackets are. That is this batch's own recurring defect — *assert the token stream, not a
+character list* — committed inside its own census. Replaced with a token-set assertion plus a
+rendered-text check, and recorded in the test's docstring so the next reader sees why.
+
+### m-1 — partially closed, remainder carried
+
+Seven TCs are now traceable by node NAME (`test_tc381_`, `tc382`×2, `tc385`, `tc389`, `tc396`,
+`tc397`, `tc398`). The other sixteen remain covered by consolidated batteries with the mapping living
+in §3 of this file. The reverse-index control stays a backlog item — it is a project-wide convention
+question, not a batch-62 defect, and inventing it here unilaterally would be the wrong place.
+
+### Evidence
+
+Full suite **2207 passed, 2 skipped, 3 xfailed** (30:38), 29 snapshots passed; ruff clean on all
+three touched files; frozen guards `tc027` + `tc031`×3 green. Suite total across the batch:
+2168 → **2207** (+39 tests).
+
+*(This line first said 2205 — a number written from the targeted runs before the full suite came
+back. Corrected against the run. Noted rather than quietly overwritten, because writing a figure
+before measuring it is the exact habit this batch spent two gates removing.)*

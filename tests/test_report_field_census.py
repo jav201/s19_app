@@ -27,7 +27,11 @@ from markdown_it import MarkdownIt
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services.markdown_safety import redact_absolute_paths
 from s19_app.tui.services.report_addendum import DeclaredRegion
+from s19_app.tui.services.markdown_safety import TRUNCATION_MARKER
 from s19_app.tui.services.report_service import (
+    MAX_REPORT_ISSUES_PER_VARIANT,
+    REPORT_CELL_CHARS,
+    REPORT_MAX_REGIONS_PER_VARIANT,
     ReportOptions,
     generate_project_report,
 )
@@ -313,6 +317,171 @@ def test_every_table_row_keeps_its_header_width(hostile: str) -> None:
         elif tok.type in ("th_open", "td_open") and (in_head or in_body):
             width += 1
     assert checked >= 2, f"the guard must actually see rows, saw {checked}"
+
+
+# --------------------------------------------------------------------------- #
+# Caps and second-order paths (TC-385/389/396/397) — Inc-5, closing Phase 4
+# --------------------------------------------------------------------------- #
+
+
+def _one_variant_report(
+    tmp_path: Path,
+    *,
+    variant_id: str = "a",
+    path_name: str = "a.s19",
+    issues=(),
+    regions=(),
+    entries=None,
+    mem_map=None,
+) -> str:
+    summary = _summary(
+        list(entries) if entries is not None
+        else [_applied_entry(0x1000, (0x01,), (0xAA,), "standalone", "SYMA")],
+        source="src.json",
+        issues=list(issues),
+    )
+    results = [
+        VariantExecutionResult(
+            variant_id=variant_id,
+            status="ok",
+            change_summaries=[summary],
+            mem_map=dict(mem_map or {}),
+        )
+    ]
+    variant_set = ProjectVariantSet(
+        project_name="proj",
+        variants=(
+            VariantDescriptor(
+                variant_id=variant_id, path=Path(path_name), file_type="s19"
+            ),
+        ),
+        active_id=variant_id,
+    )
+    return generate_project_report(
+        tmp_path,
+        results,
+        ReportOptions(declared_regions=tuple(regions)),
+        variant_set=variant_set,
+    ).read_text(encoding="utf-8")
+
+
+def test_tc397_declaration_errors_are_capped_with_a_visible_marker(
+    tmp_path: Path,
+) -> None:
+    """TC-397 / D-20 — the one section outside the byte budget now has a cap.
+
+    `_ByteBudget` is consumed at hexdump-block granularity only, so this section
+    was unbounded — and batch-62 made it worse before better, raising
+    `issue.message`'s escape limit 240 -> 500 and roughly doubling the per-issue
+    cost.
+
+    The fixture is deliberately **1.5x the cap** (300 issues against 200), stated
+    here per the batch-60 lesson: that batch's byte budget was entirely unpinned
+    because its fixture sat 2.8x UNDER the limit, so every test passed with the
+    guard deleted. Deleting the cap turns this RED.
+    """
+    count = MAX_REPORT_ISSUES_PER_VARIANT + MAX_REPORT_ISSUES_PER_VARIANT // 2
+    assert count > MAX_REPORT_ISSUES_PER_VARIANT, "the fixture must cross the cap"
+    issues = [
+        ValidationIssue(
+            code="X-BULK",
+            severity=ValidationSeverity.ERROR,
+            message=f"bulk issue {index}",
+            artifact="changes",
+        )
+        for index in range(count)
+    ]
+    text = _one_variant_report(tmp_path, issues=issues)
+
+    emitted = [ln for ln in text.splitlines() if ln.startswith("- [X-BULK]")]
+    assert len(emitted) == MAX_REPORT_ISSUES_PER_VARIANT, (
+        f"expected the cap to hold at {MAX_REPORT_ISSUES_PER_VARIANT}, "
+        f"got {len(emitted)} emitted lines"
+    )
+    assert "> TRUNCATED:" in text, "the cut must be stated, never silent"
+    assert f"{count - MAX_REPORT_ISSUES_PER_VARIANT} of {count}" in text
+
+
+def test_tc396_report_cell_cap_is_pinned_at_a_composer_site(tmp_path: Path) -> None:
+    """TC-396 — the report's OWN Mode-A cap, pinned where it is applied.
+
+    `descriptor.path.name` is the right subject: it is file-derived, lands in a
+    table cell, and has **no** upstream cap of its own, so it is the field a cap
+    can silently truncate. The flow report's 240 is pinned elsewhere, but that is
+    a different constant for a different consumer — pinning it does not pin this.
+
+    Boundary pair, so deleting `limit=REPORT_CELL_CHARS` from the site (or
+    changing 512) goes RED in one direction or the other.
+    """
+    at_cap = "x" * REPORT_CELL_CHARS
+    over_cap = "y" * (REPORT_CELL_CHARS + 1)
+
+    text_at = _one_variant_report(tmp_path / "at", path_name=at_cap)
+    assert TRUNCATION_MARKER not in text_at, "a value exactly at the cap must survive"
+    assert at_cap in rendered_text(DEFAULT, text_at)
+
+    text_over = _one_variant_report(tmp_path / "over", path_name=over_cap)
+    assert TRUNCATION_MARKER in text_over, (
+        "one character over the cap must be truncated with a visible marker"
+    )
+
+
+def test_tc389_truncation_appendix_note_is_escaped(tmp_path: Path) -> None:
+    """TC-389 — a second-order path that only fires under truncation.
+
+    The region cap emits `Variant '<id>': …` notes. That bullet is easy to miss
+    because it exists only when the cap fires, so a hostile `variant_id` is
+    driven through it explicitly rather than trusted.
+    """
+    hostile = _payload("MKTRUNC")
+    count = REPORT_MAX_REGIONS_PER_VARIANT + 5
+    entries = [
+        _applied_entry(0x1000 + (index * 0x100), (0x01,), (0xAA,), "standalone", None)
+        for index in range(count)
+    ]
+    # A memory map is required: without mapped bytes there are no regions to
+    # dump, so the cap never fires and the fixture would prove nothing.
+    mem_map = {0x1000 + (index * 0x100): 0xAA for index in range(count)}
+    text = _one_variant_report(
+        tmp_path, variant_id=hostile, entries=entries, mem_map=mem_map
+    )
+
+    # The appendix emits the note as a bullet, so the prefix is "- Variant '".
+    note = next(
+        (ln for ln in text.splitlines() if ln.startswith("- Variant '")), None
+    )
+    assert note is not None, "the region cap did not fire — the fixture is vacuous"
+    assert "## Truncation appendix" in text
+    assert "MKTRUNC" in note
+
+    # Assert the TOKEN STREAM, not a character list. A first draft of this test
+    # checked `"](" not in note` and failed on a CORRECT implementation, because
+    # the escaped form is `\](` — the `]` is escaped and the `(` needs no escape
+    # (a link is already dead once the brackets are). That is this batch's own
+    # recurring defect, committed here in its own census.
+    assert live_tokens(VIEWER, note) == {
+        "bullet_list_open", "bullet_list_close", "list_item_open", "list_item_close",
+    }, "the note minted a construct beyond its own bullet"
+    assert rendered_text(VIEWER, note).startswith(f"Variant '{hostile}'")
+
+
+def test_tc385_a_hostile_heading_cannot_change_its_own_level(tmp_path: Path) -> None:
+    """TC-385 — the heading LEVEL, which a token-type set cannot see.
+
+    `live_tokens` returns a SET of types, so `heading_open` is already present in
+    any benign report and a payload that promoted `## Variant:` to `#` would slip
+    through every structural assertion in this file. The level is therefore read
+    off the token's own `tag`.
+    """
+    text = _one_variant_report(tmp_path, variant_id=_payload("MKHEAD"))
+    levels = [
+        tok.tag for tok in _walk(DEFAULT.parse(text)) if tok.type == "heading_open"
+    ]
+    assert levels.count("h1") == 1, (
+        f"exactly one H1 (the report title) must exist, got {levels.count('h1')} — "
+        "a field promoted its own heading"
+    )
+    assert "h2" in levels, "the per-variant H2 must still be an H2"
 
 
 def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> None:

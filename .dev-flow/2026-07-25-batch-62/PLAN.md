@@ -2,11 +2,40 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase-4 gate FAILED → Inc-5 (2026-07-25)
+## Where we are — Phase 4 PASS after Inc-5 (2026-07-25)
 
 **Phase 0 CLOSED. Phase 1 CLOSED → fold iteration 1 → CLOSED. Phase 2 re-gate PASS.
-Phase 3 CLOSED (5 increments, 7 ATs). **Phase 4: FAIL** → one closing increment.
-Next action: Inc-5, then re-run Phase 4.**
+Phase 3 CLOSED (6 increments, 7 ATs). Phase 4: FAIL → Inc-5 → **PASS**.
+Next action: Phase 5 (post-mortem).**
+
+### Inc-5 record — both Phase-4 blockers closed
+
+3 files: `report_service.py` · `test_report_field_census.py` · `test_report_markup_safety.py`.
+
+**B-1** — `MAX_REPORT_ISSUES_PER_VARIANT = 200` now caps `_declaration_error_lines`, with the cut
+stated in the document. Counterfactual executed, not reasoned:
+
+```
+WITH cap=200 : 200 issue lines emitted, "> TRUNCATED:" present
+cap REMOVED  : 300 issue lines emitted, no marker      -> TC-397 goes RED
+```
+
+The fixture is **1.5× the cap** and says so in its docstring.
+
+**B-2** — `REPORT_CELL_CHARS` pinned by a boundary pair on `descriptor.path.name` (file-derived, in a
+table cell, no upstream cap). 512 survives verbatim; 513 truncates. Both directions bite.
+
+All five TC gaps closed (TC-381/382/385/389/398). TC-382's gap was one-sided — the battery had only
+the characters that must be DROPPED; the new cases pin the ones that must SURVIVE (NBSP is `Zs`, a
+combining acute is `Mn`), so an over-broad filter now fails. Its size case is ~2.1 MB, replacing a
+10 000-char case three orders of magnitude under anything interesting.
+
+**Inc-5 caught one defect in itself:** TC-389's first draft asserted `"](" not in note` and failed
+against a **correct** implementation — the escaped form is `\](`, since `]` is escaped and `(` needs
+no escape once the brackets are dead. This batch's own recurring defect, committed inside its own
+census. Replaced with a token-set assertion.
+
+Suite **2207 passed** (2168 → 2207, +39 tests), 0 regressions.
 
 ### Phase-4 verdict — the AT layer is complete, the TC layer is not
 

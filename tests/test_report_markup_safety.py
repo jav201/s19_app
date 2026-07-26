@@ -514,6 +514,81 @@ def test_mode_b_never_truncates() -> None:
     assert TRUNCATION_MARKER not in md_code(long_path)
 
 
+@pytest.mark.parametrize("label,value", [
+    ("astral", "MK\U0001F600\U0001D400x"),          # 4-byte planes
+    ("nbsp", "MK x"),                            # Zs, NOT dropped
+    ("combining", "MKéx"),                      # base + combining acute
+    ("cjk", "MK校验x"),
+    ("rtl-text", "MKمرحباx"),                          # RTL letters, not an override
+])
+def test_tc382_unicode_that_is_not_deceptive_survives_intact(
+    label: str, value: str
+) -> None:
+    """TC-382 — the classes that must SURVIVE, not the ones that must be dropped.
+
+    The deception classes (`Cc`/`Cf`/`Zl`/`Zp`) are covered above. This is the
+    other half, and it is the half that catches an over-broad filter: a NBSP is
+    `Zs` and a combining acute is `Mn`, so a filter written as "drop anything
+    category-C-ish" would silently mangle ordinary international text.
+
+    Phase 4 recorded this as a gap: the original battery had only the deceptive
+    characters, so an over-broad filter would have passed every case.
+    """
+    escaped = md_safe(value, limit=240)
+    assert rendered_text(VIEWER, f"- {escaped}") == expected_display(value, "A"), (
+        f"{label}: legitimate text was altered"
+    )
+    assert LOSS_MARKER not in escaped, f"{label}: dropped as if it were deceptive"
+
+
+def test_tc382_a_large_value_is_bounded_without_scanning_it_whole() -> None:
+    """TC-382's size boundary, at a size that could actually show a cost.
+
+    The original case was 10 000 characters — three orders of magnitude under
+    anything interesting, which is the batch-60 "fixture 2.8x under the limit"
+    failure in miniature. `md_safe` clamps at `limit * 8` BEFORE normalising, so
+    a 2 MB value costs a bounded slice, not four full-string passes.
+    """
+    huge = "a|b" * 700_000          # ~2.1 MB, ~8750x the cap
+    out = md_safe(huge, limit=240)
+    assert len(out) <= 240 * 2 + len(TRUNCATION_MARKER)
+    assert out.endswith(TRUNCATION_MARKER)
+
+
+def test_tc381_none_renders_as_text_not_as_an_empty_cell() -> None:
+    """TC-381's `None` case — a field that is absent, not empty.
+
+    `md_safe(None)` yields the literal `"None"`, which is deliberate: a cell that
+    silently went blank would be indistinguishable from a field the report simply
+    does not carry. Pinned so the behaviour is a decision rather than an accident
+    of `str()`.
+    """
+    assert md_safe(None, limit=240) == "None"
+    assert md_code(None) == "None"
+
+
+def test_tc398_truncation_never_orphans_an_escape() -> None:
+    """TC-398 — truncation runs BEFORE escaping, so a cut cannot split a pair.
+
+    If the order were reversed, cutting at the cap could leave a trailing `\\`
+    with nothing to escape, and the reader would see a stray backslash — or
+    worse, the escape would consume the following structural character.
+
+    Checked at every offset around the boundary, and on a value made ENTIRELY of
+    escapable characters so every cut position lands on one.
+    """
+    for length in range(238, 246):
+        out = md_safe("|" * length, limit=240)
+        body = out[: -len(TRUNCATION_MARKER)] if out.endswith(TRUNCATION_MARKER) else out
+        assert not body.endswith("\\"), f"length {length}: orphaned backslash"
+        # Every backslash must be followed by the character it escapes — an
+        # equal count of `\` and `\|` means no backslash stands alone.
+        assert body.count("\\") == body.count("\\|"), (
+            f"length {length}: a backslash escapes nothing"
+        )
+        assert rendered_text(VIEWER, f"- {out}").count("|") == min(length, 240)
+
+
 def test_truncation_marker_is_distinct_from_the_validation_one() -> None:
     """Two markers exist. A test importing the wrong one is a false GREEN, so
     the difference is pinned and merging them must be a conscious act."""
