@@ -2,10 +2,40 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase 3, Inc-1 DONE (2026-07-25)
+## Where we are — Phase 3, Inc-2 DONE (2026-07-25)
 
 **Phase 0 CLOSED. Phase 1 CLOSED → `iterate-to-refine` iteration 1 → CLOSED. Phase 2 re-gate PASS.
-Phase 3 Inc-1 (the leaf helper + its battery) COMPLETE. Next action: Inc-2.**
+Phase 3: Inc-1 (leaf helper) COMPLETE · Inc-2 (golden-affecting sites) COMPLETE.
+Next action: Inc-3.**
+
+### Inc-2 record — the golden gate passed EXACTLY as pre-measured
+
+4 files (budget 5): `report_service.py` · the golden · `test_report_symbol_escape.py` ·
+`test_report_service.py`. Owns **AT-159, AT-160, AT-162, AT-163**.
+
+```
+diff --unified=0 golden.before tests/goldens/batch35/at055b-project-report.md
+@@ -14,2 +14,2 @@   | a | a.s19 …  ->  | a | a\.s19 …
+                    | b | b.s19 …  ->  | b | b\.s19 …
+@@ -51 +51 @@       - <RUN-ROOT>/…/chg.json …  ->  - `<RUN-ROOT>/…/chg.json` …
+```
+
+**Changed-line set = {14, 15, 51}** — the set derived at Phase 1 before any code existed, with no
+unpredicted line. Line 51 still carries `<RUN-ROOT>`, so the canonicaliser still fires through the
+Mode-B wrap and **R-1 holds**.
+
+**Two measured corrections to the review's file predictions** (both in my favour, both recorded
+rather than quietly enjoyed):
+
+- `tests/test_tui_report_filter_surface.py` and `tests/test_tui_report_seam.py` were expected to
+  need edits. They do **not**: both read the *same* golden through `canonical_report_bytes`, so
+  regenerating the golden fixes them. Inc-2 came in at 4 files, not 5.
+- `tests/test_report_service.py` was declared to have **2** affected sites (`:260`, `:1403`).
+  Measured: **five** — the inventory pair, the modified-files bullet, the modifications row, and
+  two checklist headings. The file was in the C-27 list, so the budget held, but the count was
+  under-stated for the second time in this batch.
+
+### Inc-1 record
 
 ### Inc-1 record
 
@@ -166,3 +196,15 @@ Engine-frozen set OFF-LIMITS (`core.py`, `hexfile.py`, `range_index.py`, `valida
 | Inc-1 frozen guards (C-27) | — | — | — | `tc027` 1 passed · `tc031` 3 passed |
 | Inc-1 counterfactual (old escaper) | — | — | — | **29 failed / 128 passed** — the battery has teeth |
 | Inc-1 FULL suite | — | 0 | +158 | **2168 passed, 2 skipped, 3 xfailed** (27:49) · 29 snapshots passed · ruff clean |
+| Inc-2 (targeted) | — | 0 | +4 AT | 241 passed · frozen guards `tc027` + `tc031`×3 green · ruff clean |
+| Inc-2 golden gate | — | — | — | changed-line set **{14, 15, 51}** — exactly the pre-measured set |
+| Inc-2 FULL suite | — | 0 | +4 | run 1: 2171 passed / **1 flake** · run 2 (same tree, same order): **2172 passed, 2 skipped, 3 xfailed** (31:03) · 29 snapshots passed |
+
+**Inc-2 flake, recorded not waved away.** The first full run failed
+`tests/test_tui_flow_persistence_ui.py::test_at002_name_strip_glyph_dirty_then_saved` with
+`NoMatches: No nodes match '#flow_panel'`. Not a regression: it passes alone (7/7), passes beside
+the new ATs (170/170), passes beside the flow-report suite, and the confirmatory full re-run on the
+**identical tree with the same `-p no:randomly` ordering** is fully green. `#flow_panel` is queried
+by `app.py:2313/2354/2394` and mounted by `screens_directionb.py:2672` — a Textual mount-timing
+path that Inc-2 does not touch (Inc-2 changed `report_service.py` and three test files). Carried to
+`BACKLOG.md` as a known-flaky TUI case in the batch-53 flow-builder rail.

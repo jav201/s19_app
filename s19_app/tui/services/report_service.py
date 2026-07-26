@@ -49,6 +49,7 @@ from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
+from .markdown_safety import md_code, md_safe
 from .report_addendum import DeclaredRegion
 from .report_filter import ReportFilterMatcher
 from ..models import ProjectVariantSet
@@ -74,6 +75,20 @@ REPORT_CONTEXT_BYTES_MAX = 4096
 #: Maximum modified regions dumped per variant (LLR-007.6;
 #: ``assumed — verify per-regime``, measured at E7 — see review packet).
 REPORT_MAX_REGIONS_PER_VARIANT = 128
+
+#: Report-wide Mode-A character cap (batch-62 A-18). THIS module's cap, not the
+#: flow report's 240 — each consumer owns its own, because the leaf escaper takes
+#: a REQUIRED ``limit`` precisely so no cap policy is inherited by accident.
+#:
+#: 512 is chosen against the fields, not by taste: ``descriptor.path.name`` and
+#: ``entry.linkage_symbol`` have NO upstream cap, and a filesystem basename
+#: reaches 255 characters. Adopting the flow report's 240 would have introduced
+#: SILENT data loss into an evidentiary document at ~20 sites while claiming to
+#: protect it. 512 holds any OS-bounded name verbatim and still bounds the
+#: pathological case; the modifications table is separately capped at
+#: :data:`REPORT_MAX_REGIONS_PER_VARIANT` rows, so the worst case stays far
+#: inside :data:`REPORT_MAX_TOTAL_BYTES`.
+REPORT_CELL_CHARS = 512
 
 #: Whole-document byte budget (LLR-007.6). Enforced at hexdump-block
 #: granularity: a block that would push the document past the budget is
@@ -804,8 +819,9 @@ def _inventory_lines(variant_set: ProjectVariantSet) -> List[str]:
     for descriptor in variant_set.variants:
         active = "yes" if descriptor.variant_id == variant_set.active_id else "no"
         lines.append(
-            f"| {descriptor.variant_id} | {descriptor.path.name} "
-            f"| {descriptor.file_type} | {active} |"
+            f"| {md_safe(descriptor.variant_id, limit=REPORT_CELL_CHARS)} "
+            f"| {md_safe(descriptor.path.name, limit=REPORT_CELL_CHARS)} "
+            f"| {md_safe(descriptor.file_type, limit=REPORT_CELL_CHARS)} | {active} |"
         )
     lines.append("")
     return lines
@@ -859,7 +875,8 @@ def _overview_lines(
             for check in result.check_results
         )
         lines.append(
-            f"| {result.variant_id} | {result.status} | {applied} "
+            f"| {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)} "
+            f"| {md_safe(result.status, limit=REPORT_CELL_CHARS)} | {applied} "
             f"| {passed} | {failed} | {uncheckable} |"
         )
     lines.append("")
@@ -889,7 +906,7 @@ def _modified_files_lines(result: VariantExecutionResult) -> List[str]:
         if summary.counts.get(DISPOSITION_APPLIED, 0) <= 0:
             continue
         source = (
-            str(summary.source_path)
+            f"`{md_code(summary.source_path)}`"
             if summary.source_path is not None
             else "<in-memory document>"
         )
@@ -898,7 +915,7 @@ def _modified_files_lines(result: VariantExecutionResult) -> List[str]:
             f"{summary.counts[DISPOSITION_APPLIED]})"
         )
         if summary.saved_path is not None:
-            bullet += f" - saved as `{summary.saved_path}`"
+            bullet += f" - saved as `{md_code(summary.saved_path)}`"
         bullets.append(bullet)
     if bullets:
         lines.extend(bullets)
@@ -941,7 +958,9 @@ def _modifications_lines(
     Dependencies:
         Uses:
             - _format_bytes / _matches_entry / _zero_match_notice
-            - diff_report_service._md_table_cell (symbol cell escape, S-F7)
+            - markdown_safety.md_safe (symbol + linkage cells; replaced
+              ``diff_report_service._md_table_cell``, which escaped table SHAPE
+              only — batch-62 D-5)
         Used by:
             - generate_project_report
     """
@@ -962,11 +981,6 @@ def _modifications_lines(
             lines.extend([_zero_match_notice(len(entries)), ""])
             return lines
         entries = kept
-    # Deferred import: ``diff_report_service`` imports from this module at load
-    # time, so a top-level import of ``_md_table_cell`` would be a circular
-    # import — resolve it lazily here, where both modules are fully loaded.
-    from .diff_report_service import _md_table_cell
-
     lines.extend(
         [
             "| Address | Length | Before | After | Linkage | Symbol |",
@@ -974,8 +988,11 @@ def _modifications_lines(
         ]
     )
     for entry in entries:
+        # The empty guard stays: ``md_safe("")`` would render "(empty)", but a
+        # linkage with no symbol is not an empty symbol — it is a standalone
+        # entry, and the golden's "-" says so.
         symbol_cell = (
-            _md_table_cell(entry.linkage_symbol)
+            md_safe(entry.linkage_symbol, limit=REPORT_CELL_CHARS)
             if entry.linkage_symbol
             else "-"
         )
@@ -984,7 +1001,7 @@ def _modifications_lines(
             f"| {entry.address_end - entry.address_start} "
             f"| {_format_bytes(entry.before_bytes)} "
             f"| {_format_bytes(entry.after_bytes)} "
-            f"| {entry.linkage} "
+            f"| {md_safe(entry.linkage, limit=REPORT_CELL_CHARS)} "
             f"| {symbol_cell} |"
         )
     lines.append("")
@@ -1088,7 +1105,7 @@ def _checklist_lines(
             return lines
     for check in result.check_results:
         source = (
-            str(check.source_path)
+            f"`{md_code(check.source_path)}`"
             if check.source_path is not None
             else "<in-memory document>"
         )
@@ -1114,7 +1131,7 @@ def _checklist_lines(
                 f"| {entry.address_end - entry.address_start} "
                 f"| {_format_bytes(entry.expected_bytes)} "
                 f"| {_format_bytes(entry.actual_bytes)} "
-                f"| {entry.result} |"
+                f"| {md_safe(entry.result, limit=REPORT_CELL_CHARS)} |"
             )
         lines.append("")
     return lines

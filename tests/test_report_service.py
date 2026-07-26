@@ -245,8 +245,12 @@ def test_full_report_content(tmp_path: Path) -> None:
     assert "- Assignment source: default" in text
     # (b) inventory
     assert "## Variant inventory" in text
-    assert "| a | a.s19 | s19 | yes |" in text
-    assert "| b | b.s19 | s19 | no |" in text
+    # §6.5 A-03/A-04 re-baseline (batch-62): the inventory row's file name is
+    # Mode-A escaped, so `.` carries a backslash in the SOURCE and renders
+    # invisibly. These are golden lines 14/15 — two of the three the Inc-2 gate
+    # predicted and measured.
+    assert "| a | a\\.s19 | s19 | yes |" in text
+    assert "| b | b\\.s19 | s19 | no |" in text
     # (c) overview
     assert "## Consolidated overview" in text
     assert "| a | ok | 2 | 1 | 1 | 0 |" in text
@@ -255,15 +259,21 @@ def test_full_report_content(tmp_path: Path) -> None:
     assert "## Variant: a" in text
     assert "## Variant: b" in text
     assert "### Modified files" in text
-    assert "- chg_a.json (applied entries: 2) - saved as `a-patched.s19`" in text
+    # §6.5 A-14 re-baseline (batch-62): the change-doc source path gains its
+    # Mode-B code span (the saved path already had one). This is golden line 51,
+    # the third and last line the Inc-2 gate predicted.
+    assert "- `chg_a.json` (applied entries: 2) - saved as `a-patched.s19`" in text
     assert "### Modifications" in text
-    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM_A |" in text
+    # §6.5 A-03 re-baseline (batch-62) — see the TC-314 site below.
+    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM\\_A |" in text
     assert "| 0x00001010 | 2 | 03 04 | CC DD | standalone | - |" in text
     assert "### Declaration errors" in text
     assert "- [CHG-COLLISION] error: entries at 0x2000 and 0x2001 collide" in text
     assert "- [CHG-ADDRESS-SYNTAX] error: entry 3 address is malformed" in text
     assert "### Checklists" in text
-    assert "#### Checklist: chk_a.json" in text
+    # §6.5 A-14 re-baseline (batch-62) — Mode-B code span, see the envelope
+    # checklist site below.
+    assert "#### Checklist: `chk_a.json`" in text
     assert "Passed: 1 - Failed: 1 - Uncheckable: 0" in text
     assert "| 0x00001000 | 2 | AA BB | AA BB | pass |" in text
     assert "| 0x00001010 | 2 | EE EE | CC DD | fail |" in text
@@ -1281,7 +1291,10 @@ def test_tc051_5_blocked_runs_render_checklists(tmp_path: Path) -> None:
     assert text.count("| uncheckable |") == 2
     # The zero-entry {0,0,0} envelope-fault boundary renders its header +
     # aggregates line with an empty table, without fault.
-    assert "#### Checklist: envelope.json" in text
+    # §6.5 A-14 re-baseline (batch-62): a check source path is a Mode-B field —
+    # emitted inside a code span, byte-faithful, never escaped, because a
+    # downstream canonicaliser substitutes its raw bytes.
+    assert "#### Checklist: `envelope.json`" in text
     assert "Passed: 0 - Failed: 0 - Uncheckable: 0" in text
 
 
@@ -1400,7 +1413,10 @@ def test_tc314_filtered_sections_and_audit_header(tmp_path: Path) -> None:
     assert "- Applied regions: shown 1 of 2 (hidden 1)" in text
 
     # Modifications: matched row present, unmatched absent.
-    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM_A |" in text
+    # §6.5 A-03 re-baseline (batch-62): `_` is escaped, so the source carries
+    # `SYM\_A`. The claim that the escaper is a no-op on benign symbols was
+    # measured false; the reader still sees `SYM_A`.
+    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM\\_A |" in text
     assert "| 0x00002000" not in text, (
         "TC-314: the unmatched modification row must be absent"
     )
