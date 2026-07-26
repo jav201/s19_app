@@ -448,6 +448,31 @@ def test_every_table_row_keeps_its_header_content(hostile: str, benign: str) -> 
                 "was discarded by row normalisation"
             )
 
+    # Inc-7: the assertions above compare SHAPE, and shape alone still cannot
+    # fail — removing `|` from `MD_ESCAPE` left them green. So the variant
+    # inventory row, whose three Mode-A values are all planted, is compared
+    # CELL-BY-CELL against the specified survivor set. This is the assertion
+    # that bites: a pipe injected into any of the three shifts the row and the
+    # expected value stops matching.
+    expected_inventory = [
+        expected_display(_payload(_MARKERS["variant_id"]), "A", limit=512),
+        expected_display(_payload(_MARKERS["path_name"]), "A", limit=512),
+        expected_display(_payload(_MARKERS["file_type"]), "A", limit=512),
+        "yes",
+    ]
+    inventory = next(
+        (row for row in hostile_rows if row and row[0].startswith(_MARKERS["variant_id"])),
+        None,
+    )
+    assert inventory is not None, (
+        "the inventory row was not found — the fixture no longer reaches it, so "
+        "this guard would pass vacuously"
+    )
+    assert inventory == expected_inventory, (
+        "the inventory row's positional cell CONTENT diverged from the specified "
+        "survivor set — a field shifted the columns"
+    )
+
 
 def test_a_pipe_injected_into_a_cell_is_caught_by_content_comparison() -> None:
     """The counterfactual for the guard above: prove the new form can fail.

@@ -61,9 +61,20 @@ from typing import Tuple
 #: Four alternatives, in order, each fixing a shape the inherited single-branch
 #: pattern got wrong (all three measured through ``generate_project_report``):
 #:
-#: 1. **Quoted** drive-letter or UNC path — spaces ALLOWED, because a real
-#:    Windows ``OSError`` quotes the path and a username routinely contains one
-#:    (``'C:\\Users\\Javier Granados\\...'`` was disclosed verbatim before).
+#: 1. **Quoted** drive-letter, UNC **or POSIX** path — spaces ALLOWED, because a
+#:    real ``OSError`` quotes the path and a home directory routinely contains
+#:    one (``'C:\\Users\\Javier Granados\\...'`` and
+#:    ``'/home/Javier Granados/...'`` were both disclosed verbatim before).
+#:    The trailing ``(?=['"])`` is **load-bearing**: without it the greedy class
+#:    ran to end-of-string on an *unclosed* quote, so the basename reduction ate
+#:    the entire rest of the diagnostic — ``"cannot open 'C:\\a\\prg.s19 --
+#:    expected 0x1000 got 0x2000"`` became ``"cannot open 'prg.s19"``, deleting
+#:    the failing address and the expected/actual bytes. That is unbounded
+#:    evidence loss, strictly worse than the URL corruption this branch was
+#:    added to fix, and reachable because ``_scrub_issue_message`` truncates at
+#:    500 characters and can strip the closing quote upstream. With the
+#:    lookahead an unclosed quote falls through to the whitespace-bounded
+#:    branches, which is the conservative read.
 #: 2. **Bare UNC** ``\\\\server\\share\\...`` — matched neither prior branch, so
 #:    an internal file server and client directory reached the report intact.
 #: 3. **Bare** drive-letter path, no spaces (an unquoted path cannot be
@@ -77,7 +88,7 @@ from typing import Tuple
 #:    scheme-relative URL is not read as a path either.
 _ABSOLUTE_PATH_RE = re.compile(
     r"""(?:
-          (?<=['"]) (?: \\\\ | [A-Za-z]:[\\/] ) [^'"<>|]+
+          (?<=['"]) (?: \\\\ | [A-Za-z]:[\\/] | / ) [^'"<>|]+ (?=['"])
         | (?<![\w.]) \\\\ [^\s'"<>|]+
         | (?<![A-Za-z0-9]) [A-Za-z]:[\\/] [^\s'"<>|]*
         | (?<![\w.:/]) / [^\s'"<>|]+

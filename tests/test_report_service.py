@@ -908,6 +908,73 @@ def test_issue_message_redaction_covers_spaced_and_unc_paths(tmp_path: Path) -> 
             assert leak not in line, f"{label}: {leak!r} leaked into the report"
 
 
+def test_issue_message_redaction_keeps_evidence_after_an_unclosed_quote(
+    tmp_path: Path,
+) -> None:
+    """Inc-7 / HIGH-1 — the worst regression this batch produced, now pinned.
+
+    Allowing spaces inside a quoted path (the spaced-username fix) initially came
+    without a closing-quote requirement, so a greedy class ran to end-of-string
+    on an UNCLOSED quote and the basename reduction ate the whole remainder:
+
+        BEFORE: "cannot open 'C:\\a\\prg.s19 -- expected 0x1000 got 0x2000"
+             -> "cannot open 'prg.s19"
+
+    The failing address, the expected and actual bytes, and the filename that
+    failed were all gone — the report recorded a different fact than the engine
+    produced. Unbounded evidence loss, strictly worse than the three-character
+    URL corruption the branch was added to fix, and reachable because
+    `_scrub_issue_message` truncates at 500 characters and can strip the closing
+    quote upstream.
+    """
+    backslash = chr(92)
+    message = (
+        "S19: cannot open 'C:" + backslash + "a" + backslash + "prg.s19"
+        " -- expected 0x1000 got 0x2000, consult /docs/spec.pdf"
+    )
+    text = _report_with_issue(tmp_path, _enriched_issue(message))
+    line = _issue_line(text, "S19: cannot open")
+
+    for fragment in ("expected 0x1000", "got 0x2000"):
+        assert fragment in line, (
+            f"{fragment!r} was deleted — the redactor consumed past the path"
+        )
+    assert "prg" in line, "the failing filename must survive as a basename"
+
+
+def test_issue_message_redaction_covers_quoted_posix_and_unc_with_spaces(
+    tmp_path: Path,
+) -> None:
+    """Inc-7 / D1 — two more shapes the input set had missed.
+
+    A quoted POSIX path was not an alternative in the spaces-allowed branch, so
+    `/home/<name with a space>/…` fell through to the whitespace-bounded branch
+    and disclosed the home directory. Same for a UNC server name containing a
+    space. Spaced home directories are ordinary on macOS and Linux.
+    """
+    backslash = chr(92)
+    for label, message, leaks in (
+        (
+            "quoted POSIX spaced",
+            "OSError: cannot open '/home/Javier Granados/secret-project/a.s19'",
+            ("Javier", "Granados", "secret-project"),
+        ),
+        (
+            "quoted UNC spaced",
+            "OSError: cannot open '" + backslash * 2 + "file server"
+            + backslash + "acme-corp" + backslash + "a.s19'",
+            ("file server", "acme-corp"),
+        ),
+    ):
+        text = _report_with_issue(
+            tmp_path / label.split()[0].lower(), _enriched_issue(message)
+        )
+        line = _issue_line(text, "OSError")
+        assert "a\\.s19" in line, f"{label}: the basename must survive"
+        for leak in leaks:
+            assert leak not in line, f"{label}: {leak!r} leaked into the report"
+
+
 def test_issue_message_redaction_does_not_eat_urls(tmp_path: Path) -> None:
     """The other direction, which had no test at all: no SILENT deletion.
 

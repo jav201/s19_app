@@ -167,7 +167,27 @@ NEGATIVE_CONTROLS = [
 # Oracle — re-implemented from the spec, NOT imported from the module
 # --------------------------------------------------------------------------- #
 
-_DROP = {"Cc", "Cf", "Zl", "Zp"}
+#: The oracle transcribes the spec's DROP SET. Inc-7 fix: it silently drifted
+#: when the implementation gained `Cs` at Inc-6 and this line did not — 203 tests
+#: passed with the two disagreeing, and a future surrogate payload would have gone
+#: **RED against a correct implementation**, which is the symmetric failure C-39
+#: was encoded to prevent.
+#:
+#: The pin below is the cheapest guard against the whole class and it does NOT
+#: compromise independence: it fixes the *data* while `expected_display` keeps
+#: re-deriving the *algorithm* from the specification.
+_DROP = {"Cc", "Cf", "Cs", "Zl", "Zp"}
+
+
+def test_the_oracle_transcribes_the_implementations_drop_set() -> None:
+    """`expected_display` must not disagree with the code about WHICH characters
+    are unrepresentable — only about what happens to them."""
+    from s19_app.tui.services.markdown_safety import _DROP_CATEGORIES
+
+    assert _DROP == set(_DROP_CATEGORIES), (
+        "the oracle's drop set drifted from the implementation's; a payload in "
+        "the added category would false-fail a correct escaper"
+    )
 
 
 def expected_display(value: object, mode: str, limit: int = 240) -> str:

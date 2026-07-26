@@ -1059,8 +1059,14 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
         if issue.symbol:
             line += f" symbol={md_safe(issue.symbol, limit=REPORT_CELL_CHARS)}"
         if issue.related_artifacts:
-            # Escaped PER ELEMENT, joined after: escaping the joined string
-            # would escape the separator too and fuse the list into one token.
+            # Escaped PER ELEMENT, joined after, so each element gets its own
+            # `limit` and its own empty-value handling.
+            #
+            # (An earlier version of this comment said escaping the joined string
+            # "would escape the separator too and fuse the list into one token".
+            # That is false — `,` is not in `MD_ESCAPE` — and a comment stating a
+            # wrong reason is how the next reader builds a wrong model. The
+            # per-element form is still the better choice, for the reason above.)
             related = ",".join(
                 md_safe(name, limit=REPORT_CELL_CHARS)
                 for name in issue.related_artifacts

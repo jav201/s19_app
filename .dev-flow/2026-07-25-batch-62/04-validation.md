@@ -257,3 +257,68 @@ in an export, not in the shared worktree.**
 The unbounded modifications/checklist row count (sec F4's cap), forgeable in-band markers (F7), the
 AST column-0 guard not following local assignments (F8 / qa m-3), and qa m-1/m-2/m-6/m-7 — all in
 `BACKLOG.md` with their measured evidence.
+
+---
+
+## 9. Delta re-review of Inc-6 → **Inc-7** (iteration 4)
+
+I re-dispatched both reviewers over `67d41f0..cd25230` because Inc-6 touched the security control they
+had probed. That call paid for itself.
+
+- **security: OK-TO-MERGE, 0 HIGH** (2 minor, 1 LOW). All seven new guards mutation-tested — all seven
+  go RED. It also confirmed `Cs` mangles nothing legitimate (13 Unicode classes checked; no real text
+  has category `Cs` in a UCS-4 `str`).
+- **qa: BLOCKED, 1 HIGH.** All five of its MAJORs verified closed by re-running each mutation — *and
+  the MAJOR-5 fix had introduced something worse.*
+
+### HIGH-1 — my Inc-6 fix was a regression, not a fix
+
+Allowing spaces inside a quoted path came **without a closing-quote requirement**, so the greedy class
+ran to end-of-string on an *unclosed* quote and the basename reduction ate the rest of the message:
+
+```
+IN : S19: cannot open 'C:\a\prg.s19 -- expected 0x1000 got 0x2000, consult /docs/spec.pdf
+OUT: S19: cannot open 'spec.pdf
+```
+
+The failing address, the expected bytes, the actual bytes **and the filename that failed** — deleted.
+I traded a three-character URL corruption for **unbounded evidence loss**, inside the function whose
+own docstring says this module refuses to delete. Reachable, not theoretical: `_scrub_issue_message`
+truncates at 500 characters and can strip the closing quote upstream.
+
+Fixed by requiring the closing delimiter, so an unclosed quote falls through to the whitespace-bounded
+branches — the conservative read. **D1** (security) is folded into the same branch: a quoted POSIX
+path was not an alternative, so `/home/<name with a space>/…` leaked. Full matrix now measured: 5
+leak shapes redacted, 12 legitimate strings byte-identical, evidence preserved after an unclosed quote.
+
+### MAJOR-6 — the independent oracle had drifted
+
+`_DROP_CATEGORIES` gained `Cs` at Inc-6; `expected_display`'s parallel `_DROP` did not. **203 tests
+passed with the two disagreeing**, and a future surrogate payload would have gone RED against a
+*correct* implementation — the symmetric failure C-39 was encoded to prevent, one increment after
+encoding it. Closed by adding `Cs` **and** a `_DROP == _DROP_CATEGORIES` pin: it fixes the *data*
+while the oracle keeps re-deriving the *algorithm*, so independence is preserved.
+
+### D2 — the "corrected" guard still could not fail
+
+Inc-6's rewrite compared row and cell **counts** and non-emptiness — shape, not content. Removing `|`
+from `MD_ESCAPE` left it green. **Third occurrence in this batch of a docstring asserting detection
+power that measurement contradicts.** Now the inventory row is compared cell-by-cell against
+`expected_display`; counterfactual executed — dropping the pipe escape turns it **RED** with an exact
+diff.
+
+### Ledger corrections
+
+- **m-3 is NOT closed** — the reviewer corrected my summary rather than accepting it. The A-23 column-0
+  guard is byte-identical to `67d41f0` and still misses the assign-then-interpolate shape that
+  `report_service.py` itself uses. Carried, correctly labelled.
+- **m-9 / D1 residue** — a **bare** (unquoted) path containing spaces still leaks its middle
+  components by design, because an unquoted path cannot be delimited from following prose. Named in
+  RR-2 rather than left in a source comment.
+- **m-7** — the false per-element-join rationale is corrected in place.
+
+### Process, restated because it recurred
+
+I ran mutation counterfactuals in the live worktree during the first security review (F5). For this
+round both reviewers worked from `git archive` exports and I did not touch the tree while they ran.
+That is the standing rule now.
