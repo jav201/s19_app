@@ -111,7 +111,21 @@ The Phase-2 review declared 2 affected sites in `test_report_service.py`; there 
 kickoff's field list was short by **4** fields. Neither miss cost anything, because the census keys
 on the *emitted document* rather than on a list — which is exactly why the census exists.
 
-## Controls earned — candidates, NOT encoded
+## Operator decision on the candidates (2026-07-25)
+
+**P-1 ENCODED as `C-39`** in the global `/dev-flow` command (Phase 1, beside C-35/C-36) — *pre-execute
+every executable threshold*, with the symmetric-failure framing (a predicted threshold false-fails a
+correct implementation just as readily as it passes a wrong one) and the rider to re-measure the
+fold's **own** new thresholds, not only the disputed ones.
+
+**P-2, P-3 and P-4 DECLINED this round** — carried to `.dev-flow/BACKLOG.md`, not dropped. Worth
+saying plainly which one I would raise again: **P-2**. It is the only candidate covering a gap no
+existing control touches — a `shall`-statement can be ruled, recorded in §6.5, and never reach an
+increment, which is exactly how B-1 shipped past five increments into the validation gate. P-3 has the
+strongest occurrence count (~7 over 3 batches) but is at least *visible* every time it fires; P-2 is
+invisible until something greps for the symbol.
+
+## Controls earned — candidates as raised
 
 Per the standing rule, no control is encoded without an explicit operator decision, and placement is
 classified first: project-agnostic controls belong in the global `/dev-flow` command, stack-specific

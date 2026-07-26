@@ -13,8 +13,8 @@
     "operator_phrasing": "arranca /dev-flow con report_service escaping, autonomo con self-merge",
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
-  "current_phase": 5,
-  "phase_status": "awaiting-control-encode-decision",
+  "current_phase": 6,
+  "phase_status": "pr-pending",
   "iterations_per_phase": {
     "0": 0,
     "1": 1,
@@ -22,7 +22,7 @@
     "3": 6,
     "4": 2,
     "5": 1,
-    "6": 0
+    "6": 1
   },
   "artifacts": {
     "plan": ".dev-flow/2026-07-25-batch-62/PLAN.md",
@@ -35,7 +35,8 @@
     "2-qa": ".dev-flow/2026-07-25-batch-62/02-review-qa.md",
     "2-security": ".dev-flow/2026-07-25-batch-62/02-review-security.md",
     "4": ".dev-flow/2026-07-25-batch-62/04-validation.md",
-    "5": ".dev-flow/2026-07-25-batch-62/05-postmortem.md"
+    "5": ".dev-flow/2026-07-25-batch-62/05-postmortem.md",
+    "6": ".dev-flow/2026-07-25-batch-62/06-docs.md"
   },
   "decisions_log": [
     {
@@ -91,6 +92,18 @@
       "date": "2026-07-25",
       "decision": "post-mortem written; 4 control candidates raised, NONE encoded (awaiting operator)",
       "notes": "Most reusable output: 'a threshold that can be executed before the code exists must be executed before it is promoted to an acceptance criterion' - 3 of 4 Phase-2 failures were predictions, and executing the fold's OWN thresholds caught a fresh one (A-26 named Cc/Cf and missed U+2028 which is Zl). Candidates, placement classified per feedback_devflow_general_flows_project_agnostic: P-1 pre-execute executable thresholds (agnostic, generalises C-22+C-31 in BOTH directions - a correct impl must not trip the gate either); P-2 every normative ruling gets an owning increment checked at the validation gate (agnostic; NO existing control covers this - C-18 covers ATs only; subsumes the backlog's open code<->requirement reverse-index item 1c rather than adding a parallel control); P-3 assert the emitted encoding never a character list (SPLIT: general form agnostic, markdown-it/Rich-vs-Textual specifics -> docs/engineering-rules.md; ~7th occurrence over 3 batches, 4 in this one); P-4 a guard must be shown able to fail (agnostic, complements C-32; the A-16 residue guard fires nowhere BY DESIGN which is indistinguishable from inert). DECLINED deliberately: a control mandating a TC id in every node name - that is a project-wide convention question (backlog item 1c) and inventing it inside one batch is the wrong place; folded into P-2. Per feedback_devflow_control_encode_approval NOTHING is encoded without an explicit operator AskUserQuestion."
+    },
+    {
+      "phase": 5,
+      "date": "2026-07-25",
+      "decision": "OPERATOR: encode P-1 only (as C-39); P-2/P-3/P-4 declined and carried",
+      "notes": "C-39 'pre-execute every executable threshold' encoded in the GLOBAL /dev-flow command at Phase 1 beside C-35/C-36, with the symmetric-failure framing (a predicted threshold false-fails a CORRECT implementation just as readily as it passes a wrong one) and the rider to re-measure the fold's OWN new thresholds not only the disputed ones. P-2, P-3, P-4 declined this round and written into BACKLOG.md with full evidence so they are carried, not dropped. Recorded plainly in 05-postmortem.md which one I would raise again: P-2, because it is the only candidate covering a gap no existing control touches - a shall-statement can be ruled, recorded in 6.5, and never reach an increment, which is exactly how B-1 sailed past five increments; P-3 has the higher occurrence count but is at least visible when it fires, whereas P-2 is invisible until something greps for the symbol."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-25",
+      "decision": "docs closed + BACKLOG reconciled (mandatory close step)",
+      "notes": "REQUIREMENTS.md R-TUI-077/078; markdown_safety module docstring carries the design record (why a LEAF, the mode truth table, the two caller contracts); both new caps document why their value is what it is AGAINST THE FIELDS not by taste; screens.py composer reference corrected. BACKLOG: batch-62 marked CODE COMPLETE with metrics, header tip refreshed 4cac228 -> 8d3c504 + branch tip, and EVERY carry written out (3 declined control candidates, RR-1/2/4, the 16-of-23 TC-id gap, the known-flaky #flow_panel case, the pre-existing ruff red on main). Deliberately NOT done: /dev-flow-sync (runs after merge, per its own procedure) and any snapshot/pilot-gallery refresh (batch-62 touched no tui/ rendering surface, 29 baselines green unchanged throughout). Remaining: PR + CI + independent qa AND security 0-HIGH + squash merge."
     }
   ],
   "obsidian_synced": false,
