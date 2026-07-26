@@ -13,15 +13,15 @@
     "operator_phrasing": "arranca /dev-flow con report_service escaping, autonomo con self-merge",
     "decision_recording_ack": "GRANTED - every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
-  "current_phase": 4,
-  "phase_status": "gate-passed",
+  "current_phase": 5,
+  "phase_status": "awaiting-control-encode-decision",
   "iterations_per_phase": {
     "0": 0,
     "1": 1,
     "2": 2,
     "3": 6,
     "4": 2,
-    "5": 0,
+    "5": 1,
     "6": 0
   },
   "artifacts": {
@@ -34,7 +34,8 @@
     "2-architect": ".dev-flow/2026-07-25-batch-62/02-review-architect.md",
     "2-qa": ".dev-flow/2026-07-25-batch-62/02-review-qa.md",
     "2-security": ".dev-flow/2026-07-25-batch-62/02-review-security.md",
-    "4": ".dev-flow/2026-07-25-batch-62/04-validation.md"
+    "4": ".dev-flow/2026-07-25-batch-62/04-validation.md",
+    "5": ".dev-flow/2026-07-25-batch-62/05-postmortem.md"
   },
   "decisions_log": [
     {
@@ -84,6 +85,12 @@
       "date": "2026-07-25",
       "decision": "Inc-5 closed both blockers -> VALIDATION GATE PASS (iteration 2)",
       "notes": "3 files. B-1: MAX_REPORT_ISSUES_PER_VARIANT=200 caps _declaration_error_lines with the cut STATED in the document (matching the module's region/hexdump discipline). Counterfactual EXECUTED: cap=200 -> 200 lines + '> TRUNCATED:'; cap removed -> 300 lines, no marker, TC-397 RED. Fixture is 1.5x the cap and says so in its docstring (batch-60 lesson). B-2: REPORT_CELL_CHARS pinned by a boundary pair on descriptor.path.name - file-derived, in a table cell, NO upstream cap, so it is the field a cap can silently truncate; 512 survives verbatim, 513 truncates, both directions bite. All 5 TC gaps closed. TC-382's gap was ONE-SIDED: the battery had only characters that must be DROPPED, so an over-broad 'drop anything category-C-ish' filter would have passed - the new cases pin what must SURVIVE (NBSP is Zs, combining acute is Mn); its size case is ~2.1MB (~8750x the cap) replacing a 10k-char case three orders of magnitude under anything interesting. INC-5 CAUGHT A DEFECT IN ITSELF: TC-389's first draft asserted '\"](\" not in note' and FAILED against a correct implementation, because the escaped form is '\\](' - ']' is escaped and '(' needs none once the brackets are dead. That is this batch's own recurring defect (assert the token stream, not a character list) committed inside its own census; replaced with a token-set assertion and recorded in the test docstring. Also self-corrected: the validation artifact first stated 2205 passed, written from targeted runs BEFORE the full suite returned 2207 - corrected against the run and the correction left visible. m-1 partially closed: 7 TCs now traceable by node NAME; the other 16 stay covered by consolidated batteries with the mapping in 04-validation.md section 3, and the reverse-index control stays a project-wide backlog item rather than being invented unilaterally here. Suite 2168 -> 2207 (+39), 0 regressions, ruff clean, frozen guards green."
+    },
+    {
+      "phase": 5,
+      "date": "2026-07-25",
+      "decision": "post-mortem written; 4 control candidates raised, NONE encoded (awaiting operator)",
+      "notes": "Most reusable output: 'a threshold that can be executed before the code exists must be executed before it is promoted to an acceptance criterion' - 3 of 4 Phase-2 failures were predictions, and executing the fold's OWN thresholds caught a fresh one (A-26 named Cc/Cf and missed U+2028 which is Zl). Candidates, placement classified per feedback_devflow_general_flows_project_agnostic: P-1 pre-execute executable thresholds (agnostic, generalises C-22+C-31 in BOTH directions - a correct impl must not trip the gate either); P-2 every normative ruling gets an owning increment checked at the validation gate (agnostic; NO existing control covers this - C-18 covers ATs only; subsumes the backlog's open code<->requirement reverse-index item 1c rather than adding a parallel control); P-3 assert the emitted encoding never a character list (SPLIT: general form agnostic, markdown-it/Rich-vs-Textual specifics -> docs/engineering-rules.md; ~7th occurrence over 3 batches, 4 in this one); P-4 a guard must be shown able to fail (agnostic, complements C-32; the A-16 residue guard fires nowhere BY DESIGN which is indistinguishable from inert). DECLINED deliberately: a control mandating a TC id in every node name - that is a project-wide convention question (backlog item 1c) and inventing it inside one batch is the wrong place; folded into P-2. Per feedback_devflow_control_encode_approval NOTHING is encoded without an explicit operator AskUserQuestion."
     }
   ],
   "obsidian_synced": false,
