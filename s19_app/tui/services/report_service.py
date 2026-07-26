@@ -524,42 +524,13 @@ def list_project_reports(project_dir: Path) -> List[Path]:
     return [path for _key, path in keyed] + foreign
 
 
-def _strip_ctl_local(value: object) -> str:
-    """
-    Summary:
-        Strip control characters (``ord < 0x20`` plus ``0x7F``) from one
-        filter-derived value (LLR-055.4). Local twin of the diff report's
-        ``_strip_ctl`` — this module performs no escaping on its existing
-        lines and none is added; ONLY the new filter-derived audit-header
-        text passes through here (ctl-strip removes newlines, so a hostile
-        filter filename cannot forge header lines — S-F5 minimum).
-
-    Args:
-        value (object): The raw filter-derived value (the filter file
-            name); rendered via ``str()``.
-
-    Returns:
-        str: The text with every control character removed.
-
-    Data Flow:
-        - Character filter over ``str(value)``; no other transformation.
-
-    Dependencies:
-        Used by:
-            - _audit_header_lines
-    """
-    return "".join(
-        ch for ch in str(value) if ord(ch) >= 0x20 and ord(ch) != 0x7F
-    )
-
-
 def _filter_display_name(report_filter: ReportFilterMatcher) -> str:
     """
     Summary:
         The filter file name the audit header renders (LLR-054.3), read
         from the declared ``ReportFilterMatcher.source_name`` field (the
         Inc-3 promotion of the Inc-2 duck-typed attribute). RAW text —
-        the caller sanitizes (``_strip_ctl_local``).
+        the caller sanitizes (``markdown_safety.md_safe``).
 
     Args:
         report_filter (ReportFilterMatcher): The resolved matcher.
@@ -712,7 +683,7 @@ def _audit_header_lines(
         applied filter file name plus the per-section shown/hidden counts
         (F-07: the project report counts Modifications rows, Checklists
         rows, and applied regions), closed by the F-03 informative
-        merged-context note. The name passes :func:`_strip_ctl_local`
+        merged-context note. The name passes :func:`markdown_safety.md_safe`
         (LLR-055.4 non-cell minimum).
 
     Args:
@@ -734,14 +705,14 @@ def _audit_header_lines(
 
     Dependencies:
         Uses:
-            - _strip_ctl_local
+            - markdown_safety.md_safe
         Used by:
             - generate_project_report
     """
     lines = [
         "## Report filter applied",
         "",
-        f"- Filter file: {_strip_ctl_local(filter_name)}",
+        f"- Filter file: {md_safe(filter_name, limit=REPORT_CELL_CHARS)}",
     ]
     for label, (shown, total) in (
         ("Modifications rows", modification_counts),

@@ -1441,7 +1441,8 @@ def test_tc314_filtered_sections_and_audit_header(tmp_path: Path) -> None:
     assert lines[2] == "## Report filter applied", (
         "TC-314: the audit header must be the first block after the title"
     )
-    assert "- Filter file: tc314-filter.json" in text
+    # §6.5 A-29 re-baseline (batch-62): the filter name is Mode-A escaped.
+    assert "- Filter file: tc314-filter\\.json" in text
     assert "- Modifications rows: shown 1 of 2 (hidden 1)" in text
     assert "- Checklist rows: shown 2 of 3 (hidden 1)" in text
     assert "- Applied regions: shown 1 of 2 (hidden 1)" in text
@@ -1499,7 +1500,7 @@ def test_tc314_zero_match_notice_report_still_written(tmp_path: Path) -> None:
         "TC-314: a zero-match filter must still write a non-empty report"
     )
     text = path.read_text(encoding="utf-8")
-    assert "- Filter file: zero.json" in text
+    assert "- Filter file: zero\\.json" in text
     assert "- Modifications rows: shown 0 of 2 (hidden 2)" in text
     assert "- Checklist rows: shown 0 of 3 (hidden 3)" in text
     assert "- Applied regions: shown 0 of 2 (hidden 2)" in text
@@ -1593,10 +1594,16 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
 ) -> None:
     """TC-318 (report_service half) / LLR-055.4 (C-17 file side).
 
-    Intent: ``report_service`` performs no escaping on its existing lines,
-    so the NEW filter-derived audit-header text must sanitize LOCALLY
-    (``_strip_ctl_local`` — the S-F5 non-cell minimum: ctl-strip removes
-    newlines, so a hostile name cannot forge header lines). A matcher
+    §6.5 A-29 re-baseline (batch-62): the local ``_strip_ctl_local`` minimum is
+    superseded by ``markdown_safety.md_safe``. BEFORE, the header carried the
+    ctl-STRIPPED literal name (control bytes deleted, nothing escaped). AFTER,
+    the name is fully grammar-escaped and its control bytes become VISIBLE loss
+    markers rather than vanishing — deleting bytes from an audit record turns
+    one filename into a different one silently. The intent assertions below are
+    unchanged and now hold against a strictly stronger control.
+
+    Intent: the filter-derived audit-header text must sanitize so a hostile
+    name cannot forge header lines. A matcher
     whose ``source_name`` carries pipe / glob / bracket / control bytes
     and whose patterns carry the full hostile corpus is driven through
     ``generate_project_report`` twice — a MATCHING run (the audit header
@@ -1628,8 +1635,9 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
         "TC-318: the audit header must stay the first block after the "
         f"title, got {hit_lines[:4]}"
     )
-    assert "- Filter file: a|b*[x].json" in hit_text, (
-        "TC-318: the header must carry the ctl-stripped literal name"
+    assert "- Filter file: a\\|b\\*\\[x\\]��\\.json" in hit_text, (
+        "TC-318: the header must carry the escaped name, with the two control "
+        "bytes surfaced as visible loss markers rather than deleted"
     )
     assert "- Modifications rows: shown 1 of 2 (hidden 1)" in hit_text, (
         "TC-318: the matching run must genuinely match (header renders "
@@ -1648,7 +1656,7 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
         now_fn=_fixed_clock,
     )
     zero_text = zero_path.read_text(encoding="utf-8")
-    assert "- Filter file: a|b*[x].json" in zero_text
+    assert "- Filter file: a\\|b\\*\\[x\\]��\\.json" in zero_text
     assert zero_text.count("filter matched 0 of 2 items") == 2, (
         "TC-318: the zero-match notice must render (mods + regions)"
     )

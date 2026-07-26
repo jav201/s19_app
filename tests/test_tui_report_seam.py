@@ -1410,7 +1410,8 @@ def test_at_055a_generate_surface_filtered_report_with_audit_header(
     assert lines[2] == "## Report filter applied", (
         "AT-055a: the audit header must be the first block after the title"
     )
-    assert "- Filter file: only-first.json" in text, (
+    # §6.5 A-29 re-baseline (batch-62): Mode-A escaped, renders unchanged.
+    assert "- Filter file: only-first\\.json" in text, (
         "AT-055a/F1: the audit header must carry the real filter filename"
     )
     assert "(unnamed filter)" not in text, (
@@ -1454,7 +1455,7 @@ def test_at_055c_generate_surface_zero_match_notice(tmp_path: Path) -> None:
         f"AT-055c: the zero-match report must still be written, got {names}"
     )
     text = texts[names[0]]
-    assert "- Filter file: matches-nothing.json" in text
+    assert "- Filter file: matches-nothing\\.json" in text
     assert "- Modifications rows: shown 0 of 1 (hidden 1)" in text
     assert "filter matched 0 of 1 items" in text, (
         "AT-055c: the zero-match notice must replace the section bodies"

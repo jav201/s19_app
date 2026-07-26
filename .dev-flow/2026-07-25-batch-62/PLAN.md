@@ -2,11 +2,44 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase 3, Inc-3a DONE (2026-07-25)
+## Where we are — Phase 3, Inc-3b DONE (2026-07-25)
 
 **Phase 0 CLOSED. Phase 1 CLOSED → `iterate-to-refine` iteration 1 → CLOSED. Phase 2 re-gate PASS.
-Phase 3: Inc-1 (leaf helper) · Inc-2 (golden sites) · **Inc-3a (prose fields + redaction)** COMPLETE.
-Next action: Inc-3b.**
+Phase 3: Inc-1 · Inc-2 · Inc-3a · **Inc-3b (filter surface + the census)** COMPLETE.
+Next action: Inc-4 (the last one).**
+
+### Inc-3b record — the census, and what it caught immediately
+
+5 files: `report_service.py` (F-29 filter name; `_strip_ctl_local` removed) ·
+`test_report_service.py` · `test_tui_report_filter_surface.py` · `test_tui_report_seam.py` ·
+**`tests/test_report_field_census.py` (new)**, carrying **AT-157** and **AT-158**.
+
+The census plants a uniquely-marked hostile payload in **14** file-derived fields reachable through
+`generate_project_report` and asserts, over the produced document: (a) the hostile document's
+live-token set never exceeds the benign one's, under BOTH the app's hardened parser and a default
+reader; (b) every planted value renders back verbatim against `expected_display`, imported from the
+Inc-1 battery so there is exactly one definition of the oracle; (c) every table row keeps its
+header's width; (d) no escaped value sits at the head of its own line template.
+
+**The census earned its place before it was even green.** Its static column-0 guard, written first
+as a regex over source lines, immediately flagged `report_service.py:1022` — which is a **false
+positive**: that is the third chunk of an implicitly-concatenated f-string whose assembled line
+begins `- [`. This is precisely the failure `01c` M-9 predicted for a per-source-line form.
+Rewritten over the **AST**, where Python merges adjacent literals into one `JoinedStr`, so the guard
+reads the assembled template and asks the question that matters.
+
+Two more of its own findings were fixture defects, not product defects, and both are the same class
+the batch keeps hitting — *a probe that tests something other than what it claims*:
+
+- the filename payload contained `/`, so `Path(...).name` returned everything after the slash and
+  the marker vanished — it was testing the OS path parser, not the escaper;
+- the `issue.message` expectation asserted the RAW payload, which would have gone green only by
+  **removing** the D-11 redaction.
+
+**Counterfactual (teeth):** with the escaper neutralised at the composer, **13 of 19** census cases
+go RED, including both ATs.
+
+### Inc-3 was SPLIT — measured, not planned around
 
 ### Inc-3 was SPLIT — measured, not planned around
 
@@ -240,6 +273,9 @@ Engine-frozen set OFF-LIMITS (`core.py`, `hexfile.py`, `range_index.py`, `valida
 | Inc-2 FULL suite | — | 0 | +4 | run 1: 2171 passed / **1 flake** · run 2 (same tree, same order): **2172 passed, 2 skipped, 3 xfailed** (31:03) · 29 snapshots passed |
 | Inc-3a (targeted) | — | 0 | +1 | 241 passed · golden consumers 41 passed (golden untouched) · frozen guards green |
 | Inc-3a FULL suite | — | 0 | +1 | **2173 passed, 2 skipped, 3 xfailed** (26:12) · 29 snapshots passed · ruff clean |
+| Inc-3b (targeted) | — | 0 | +19 | 81 passed (filter consumers) · census 19 passed · frozen guards green |
+| Inc-3b counterfactual | — | — | — | escaper neutralised at the composer → **13 of 19 census cases RED**, both ATs included |
+| Inc-3b FULL suite | — | 0 | +19 | **2192 passed, 2 skipped, 3 xfailed** (24:42) · 29 snapshots passed · ruff clean |
 
 **Inc-2 flake, recorded not waved away.** The first full run failed
 `tests/test_tui_flow_persistence_ui.py::test_at002_name_strip_glyph_dirty_then_saved` with
