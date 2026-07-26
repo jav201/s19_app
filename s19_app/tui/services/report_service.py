@@ -49,8 +49,8 @@ from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
-from .markdown_safety import md_code, md_safe
-from .report_addendum import DeclaredRegion
+from .markdown_safety import md_code, md_safe, redact_absolute_paths
+from .report_addendum import DECLARED_REGION_NAME_MAX, DeclaredRegion
 from .report_filter import ReportFilterMatcher
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
@@ -781,9 +781,9 @@ def _header_lines(
             - generate_project_report
     """
     return [
-        f"# Project report: {project_name}",
+        f"# Project report: {md_safe(project_name, limit=REPORT_CELL_CHARS)}",
         "",
-        f"- Project: {project_name}",
+        f"- Project: {md_safe(project_name, limit=REPORT_CELL_CHARS)}",
         f"- Generated (UTC): {generated_at.isoformat()}",
         f"- Tool version: {__version__}",
         f"- Context bytes: {options.context_bytes}",
@@ -908,7 +908,7 @@ def _modified_files_lines(result: VariantExecutionResult) -> List[str]:
         source = (
             f"`{md_code(summary.source_path)}`"
             if summary.source_path is not None
-            else "<in-memory document>"
+            else "(in-memory document)"
         )
         bullet = (
             f"- {source} (applied entries: "
@@ -1040,13 +1040,28 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
         lines.extend(["None.", ""])
         return lines
     for issue in issues:
-        line = f"- [{issue.code}] {issue.severity.value}: {issue.message}"
+        # D-11: `issue.message` carries parsed file text AND exception strings,
+        # so an absolute path reaches a shareable document through it. Redaction
+        # runs BEFORE escaping, so the escape count reflects what is emitted.
+        # The 500 limit matches `_scrub_issue_message`'s own cap — the report
+        # cap would have truncated a legitimately scrubbed message.
+        line = (
+            f"- [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+            f"{issue.severity.value}: "
+            f"{md_safe(redact_absolute_paths(issue.message), limit=500)}"
+        )
         if issue.address is not None:
             line += f" @ 0x{issue.address:X}"
         if issue.symbol:
-            line += f" symbol={issue.symbol}"
+            line += f" symbol={md_safe(issue.symbol, limit=REPORT_CELL_CHARS)}"
         if issue.related_artifacts:
-            line += f" related={','.join(issue.related_artifacts)}"
+            # Escaped PER ELEMENT, joined after: escaping the joined string
+            # would escape the separator too and fuse the list into one token.
+            related = ",".join(
+                md_safe(name, limit=REPORT_CELL_CHARS)
+                for name in issue.related_artifacts
+            )
+            line += f" related={related}"
         lines.append(line)
     lines.append("")
     return lines
@@ -1107,7 +1122,7 @@ def _checklist_lines(
         source = (
             f"`{md_code(check.source_path)}`"
             if check.source_path is not None
-            else "<in-memory document>"
+            else "(in-memory document)"
         )
         lines.extend(
             [
@@ -1294,7 +1309,10 @@ def _hexdump_section(
             f"(cap: {REPORT_MAX_REGIONS_PER_VARIANT} regions per variant)"
         )
         put([f"> TRUNCATED: {text}.", ""])
-        notes.append(f"Variant '{result.variant_id}': {text}.")
+        notes.append(
+            f"Variant '{md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}': "
+            f"{text}."
+        )
     image_top = max(result.mem_map) + 1
     omitted_blocks = 0
     for low, high in compute_hexdump_windows(
@@ -1311,7 +1329,10 @@ def _hexdump_section(
             f"(report size cap: {REPORT_MAX_TOTAL_BYTES} bytes)"
         )
         out.extend([f"> TRUNCATED: {text}.", ""])
-        notes.append(f"Variant '{result.variant_id}': {text}.")
+        notes.append(
+            f"Variant '{md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}': "
+            f"{text}."
+        )
     return out, notes
 
 
@@ -1459,7 +1480,11 @@ def _addendum_lines(
     """
     lines: List[str] = ["## Addendum: declared regions", ""]
     for region in regions:
-        lines.append(f"### {region.name} (0x{region.start:X}-0x{region.end:X})")
+        # The limit is the field's OWN upstream cap, not the report's: a name is
+        # already scrubbed to 80, so a wider cap here could never fire and a
+        # narrower one would truncate a legitimately-accepted name.
+        name = md_safe(region.name, limit=DECLARED_REGION_NAME_MAX)
+        lines.append(f"### {name} (0x{region.start:X}-0x{region.end:X})")
         hits: List[str] = []
         for result in variant_results:
             for summary in result.change_summaries:
@@ -1467,20 +1492,22 @@ def _addendum_lines(
                     if region.contains(entry.address_start):
                         hits.append(
                             f"- modification @ 0x{entry.address_start:X} "
-                            f"(variant {result.variant_id})"
+                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
                         )
                 for issue in summary.issues:
                     if issue.address is not None and region.contains(issue.address):
                         hits.append(
-                            f"- issue [{issue.code}] @ 0x{issue.address:X} "
-                            f"(variant {result.variant_id})"
+                            f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+                            f"@ 0x{issue.address:X} "
+                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
                         )
             for check in result.check_results:
                 for issue in check.issues:
                     if issue.address is not None and region.contains(issue.address):
                         hits.append(
-                            f"- issue [{issue.code}] @ 0x{issue.address:X} "
-                            f"(variant {result.variant_id})"
+                            f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+                            f"@ 0x{issue.address:X} "
+                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
                         )
         lines.extend(hits if hits else ["None."])
         lines.append("")
@@ -1607,7 +1634,7 @@ def generate_project_report(
     if options.include_legend:
         emit(_legend_lines())
     for result in variant_results:
-        emit([f"## Variant: {result.variant_id}", ""])
+        emit([f"## Variant: {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}", ""])
         emit(_modified_files_lines(result))
         emit(_modifications_lines(result, options.report_filter))
         emit(_declaration_error_lines(result))

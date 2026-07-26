@@ -841,8 +841,40 @@ def test_report_issue_line_shows_address_symbol_related(tmp_path: Path) -> None:
     )
     line = _issue_line(_report_with_issue(tmp_path, issue), "enriched issue")
     assert "@ 0x80040000" in line
-    assert "symbol=CAL_MAP" in line
+    # §6.5 A-03 re-baseline (batch-62): the symbol is Mode-A escaped.
+    assert "symbol=CAL\\_MAP" in line
+    # A-18: `related_artifacts` is escaped PER ELEMENT and joined after, so the
+    # separator stays a real separator instead of being escaped into the values.
     assert "related=a2l,mac" in line
+
+
+def test_issue_message_absolute_path_is_redacted(tmp_path: Path) -> None:
+    """D-11 — a host path inside `issue.message` never reaches the report.
+
+    `issue.message` carries parsed file text AND exception strings, and an
+    OSError on Windows embeds a whole absolute path. The report is a document
+    meant to be shared, so it must not carry the operator's username or
+    directory layout.
+
+    batch-60 raised exactly this from LOW to MAJOR and shipped the control for
+    FLOW reports; batch-62 applies it here after the divergence was ruled on
+    explicitly rather than inherited by silence.
+
+    Scope, asserted in both directions: prose fields are redacted, and the
+    Mode-B *path* fields deliberately are NOT — their raw bytes are substituted
+    by a downstream canonicaliser, so shortening them would defeat it.
+    """
+    hostile = (
+        "FileExistsError: [WinError 183] cannot create: "
+        "'C:\\Users\\operator\\secret-project\\build\\prg.s19'"
+    )
+    text = _report_with_issue(tmp_path, _enriched_issue(hostile))
+    line = _issue_line(text, "FileExistsError")
+
+    assert "prg\\.s19" in line, "the basename must survive — this is not deletion"
+    assert "operator" not in line, "the operator's username leaked"
+    assert "secret-project" not in line, "the local directory layout leaked"
+    assert "C:" not in line
 
 
 def test_report_issue_without_address_has_no_hex(tmp_path: Path) -> None:
@@ -914,7 +946,9 @@ def test_addendum_region_with_no_hits_shows_none(tmp_path: Path) -> None:
     addendum = _report_with_regions(tmp_path, [region], summary).split(
         "## Addendum: declared regions", 1
     )[1]
-    assert "empty_zone" in addendum
+    # §6.5 A-03 re-baseline (batch-62): the declared-region name is a Mode-A
+    # field, so `_` carries an escape in the source and renders invisibly.
+    assert "empty\\_zone" in addendum
     assert "None." in addendum
     assert "0x1000" not in addendum  # the out-of-region modification is not listed
 

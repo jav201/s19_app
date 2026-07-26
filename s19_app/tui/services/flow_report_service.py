@@ -52,10 +52,9 @@ reports with linkify and raw HTML disabled regardless of document text.
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import List, Optional, Sequence, Tuple
 
 from .flow_model import (
@@ -65,7 +64,12 @@ from .flow_model import (
     BLOCK_STATUS_SKIPPED,
     BlockResult,
 )
-from .markdown_safety import MD_ESCAPE, TRUNCATION_MARKER, md_safe
+from .markdown_safety import (
+    MD_ESCAPE,
+    TRUNCATION_MARKER,
+    md_safe,
+    redact_absolute_paths,
+)
 from .report_service import (
     REPORT_MAX_TOTAL_BYTES,
     REPORTS_DIR_NAME,
@@ -121,13 +125,6 @@ SECTION_HEADINGS = (
 #: :data:`markdown_safety.MD_ESCAPE` since batch-62, where the set and its
 #: application order are documented.
 _MD_ESCAPE = MD_ESCAPE
-
-#: Absolute-path shapes redacted out of finding messages before they enter the
-#: report (final-gate F2). ``_display_path`` only covers ``written_paths``; an
-#: OSError diagnostic such as ``FileExistsError: [WinError 183] … 'C:\\Users\\me\\…'``
-#: reaches the report through a block's findings, disclosing the operator's
-#: username and local layout in a document meant to be shareable (AMD-8's intent).
-_ABSOLUTE_PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|(?<![\w.])/)[^\s'\"<>|]+")
 
 
 def _default_now() -> datetime:
@@ -225,32 +222,10 @@ def _display_path(path: Path, project_dir: Optional[Path]) -> str:
     return candidate.name
 
 
-def _redact_absolute_paths(message: object) -> str:
-    """Reduce any absolute path inside ``message`` to its basename (F2).
-
-    Summary:
-        Findings carry exception text, and an ``OSError`` on Windows embeds the
-        full absolute path (``FileExistsError: [WinError 183] … 'C:\\Users\\me\\…'``).
-        :func:`_display_path` only guards ``written_paths``, so this closes the
-        second disclosure channel at the single choke point every finding passes
-        through — covering the report block's own degrade handler, the generic
-        per-block handler, and any future one.
-
-    Args:
-        message (object): The raw finding message; rendered via ``str()``.
-
-    Returns:
-        str: The message with every absolute-path token replaced by its basename.
-
-    Dependencies:
-        Used by:
-            - compose_flow_report (findings section)
-    """
-    def _basename(match: "re.Match[str]") -> str:
-        token = match.group(0).rstrip("'\"")
-        return PurePath(token.replace("\\", "/")).name or token
-
-    return _ABSOLUTE_PATH_RE.sub(_basename, str(message))
+#: Alias — owned by :func:`markdown_safety.redact_absolute_paths` since
+#: batch-62, so the project report shares this control instead of re-deriving
+#: it. Behaviour is unchanged for the flow report.
+_redact_absolute_paths = redact_absolute_paths
 
 
 def _provisional_status(state: FlowReportState) -> str:

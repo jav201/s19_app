@@ -2,11 +2,50 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase 3, Inc-2 DONE (2026-07-25)
+## Where we are — Phase 3, Inc-3a DONE (2026-07-25)
 
 **Phase 0 CLOSED. Phase 1 CLOSED → `iterate-to-refine` iteration 1 → CLOSED. Phase 2 re-gate PASS.
-Phase 3: Inc-1 (leaf helper) COMPLETE · Inc-2 (golden-affecting sites) COMPLETE.
-Next action: Inc-3.**
+Phase 3: Inc-1 (leaf helper) · Inc-2 (golden sites) · **Inc-3a (prose fields + redaction)** COMPLETE.
+Next action: Inc-3b.**
+
+### Inc-3 was SPLIT — measured, not planned around
+
+The cut budgeted Inc-3 at 3 files. Implemented as specified it broke **11 tests across 3 test
+files**, putting the increment at **7 files** against a ≤5 limit. Rather than quietly exceed it, the
+increment is split on a real seam — the report-filter surface is a distinct field with its own
+consumers:
+
+- **Inc-3a (this one, 4 files)** — the redaction promotion, headings, issues, addendum, truncation
+  notes, the variant heading, and the `(in-memory document)` literal.
+- **Inc-3b (next, 5 files)** — the filter name (F-29) + dropping `_strip_ctl_local`, which is what
+  the other 8 failures were, plus `tests/test_report_field_census.py` (new) carrying **AT-157** and
+  **AT-158**.
+
+The filter work was **backed out** of the working tree once measured, so Inc-3a ships a clean
+boundary rather than a half-migrated one.
+
+### Inc-3a record
+
+`markdown_safety.py` (gains `redact_absolute_paths`) · `flow_report_service.py` (alias; its local
+copy and now-unused `re`/`PurePath` imports removed) · `report_service.py` · `test_report_service.py`.
+
+**D-11 landed and is proven in both directions.** Counterfactual executed on the real helper:
+
+```
+WITHOUT redaction -> 'operator' present: True  | 'C:' present: True
+WITH    redaction -> 'operator' present: False | 'C:' present: False
+  emitted: FileExistsError: \[WinError 183\] cannot create: 'prg\.s19'
+```
+
+The basename survives — this is redaction, not deletion — while the username and directory layout
+do not. Mode-B path fields stay raw by design, which the same test asserts explicitly so the
+divergence cannot be "fixed" by accident later.
+
+`issue.message` takes `limit=500` (its own `_scrub_issue_message` cap) and `region.name` takes
+`DECLARED_REGION_NAME_MAX=80`; `related_artifacts` is escaped **per element** and joined after, so
+the separator stays a separator instead of being escaped into the values.
+
+### Inc-2 record — the golden gate passed EXACTLY as pre-measured
 
 ### Inc-2 record — the golden gate passed EXACTLY as pre-measured
 
@@ -199,6 +238,8 @@ Engine-frozen set OFF-LIMITS (`core.py`, `hexfile.py`, `range_index.py`, `valida
 | Inc-2 (targeted) | — | 0 | +4 AT | 241 passed · frozen guards `tc027` + `tc031`×3 green · ruff clean |
 | Inc-2 golden gate | — | — | — | changed-line set **{14, 15, 51}** — exactly the pre-measured set |
 | Inc-2 FULL suite | — | 0 | +4 | run 1: 2171 passed / **1 flake** · run 2 (same tree, same order): **2172 passed, 2 skipped, 3 xfailed** (31:03) · 29 snapshots passed |
+| Inc-3a (targeted) | — | 0 | +1 | 241 passed · golden consumers 41 passed (golden untouched) · frozen guards green |
+| Inc-3a FULL suite | — | 0 | +1 | **2173 passed, 2 skipped, 3 xfailed** (26:12) · 29 snapshots passed · ruff clean |
 
 **Inc-2 flake, recorded not waved away.** The first full run failed
 `tests/test_tui_flow_persistence_ui.py::test_at002_name_strip_glyph_dirty_then_saved` with

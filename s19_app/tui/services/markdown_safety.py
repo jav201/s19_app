@@ -51,7 +51,13 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from pathlib import PurePath
 from typing import Tuple
+
+#: Absolute-path shapes reduced to a basename by :func:`redact_absolute_paths`.
+#: Promoted here from ``flow_report_service`` at batch-62 so the project report
+#: can share the control instead of re-deriving it (A-24).
+_ABSOLUTE_PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|(?<![\w.])/)[^\s'\"<>|]+")
 
 #: Markdown-structural characters escaped by :func:`md_safe`, **in application
 #: order**. ``\\`` MUST stay at index 0 so an inserted escape is never
@@ -137,6 +143,56 @@ def _normalise(text: str) -> str:
         LOSS_MARKER if unicodedata.category(ch) in _DROP_CATEGORIES else ch
         for ch in text
     )
+
+
+def redact_absolute_paths(message: object) -> str:
+    """Reduce any absolute path inside ``message`` to its basename.
+
+    Summary:
+        Parsed-file text and exception strings carry absolute paths — an
+        ``OSError`` on Windows embeds one whole (``FileExistsError: [WinError
+        183] … 'C:\\Users\\me\\…'``) — and a report is a document meant to be
+        shared, so the operator's username and directory layout must not travel
+        with it.
+
+        Batch-60 raised this from LOW to MAJOR for flow reports and shipped the
+        control there. Batch-62 applies it to the project report's highest-risk
+        field, ``issue.message``, and promotes the function here so the two
+        generators share one implementation rather than two that can drift.
+
+        **Scope, ruled explicitly (D-11).** This is applied to Mode-A prose
+        fields only. The Mode-B *path* fields deliberately keep their absolute
+        path: their raw bytes are substituted by a downstream canonicaliser, and
+        redacting them would defeat it. That divergence is an accepted, recorded
+        decision, not an oversight.
+
+    Args:
+        message (object): The raw message; rendered via ``str()``.
+
+    Returns:
+        str: The message with every absolute-path token replaced by its
+        basename.
+
+    Data Flow:
+        - Runs BEFORE :func:`md_safe`, so the escaper sees the already-shortened
+          text and the escape count reflects what is actually emitted.
+
+    Dependencies:
+        Uses:
+            - _ABSOLUTE_PATH_RE / PurePath
+        Used by:
+            - flow_report_service (findings + diagnostics)
+            - report_service (``issue.message``)
+
+    Example:
+        >>> redact_absolute_paths("failed: /home/op/secret/a.s19")
+        'failed: a.s19'
+    """
+    def _basename(match: "re.Match[str]") -> str:
+        token = match.group(0).rstrip("'\"")
+        return PurePath(token.replace("\\", "/")).name or token
+
+    return _ABSOLUTE_PATH_RE.sub(_basename, str(message))
 
 
 def _escape_leading_block_starter(text: str) -> str:
