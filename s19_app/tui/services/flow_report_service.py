@@ -35,9 +35,14 @@ protocol-relative (``//x``) and **fuzzy** (``www.evil.com``, ``evil.com``,
 ``ops@evil.com``, IDN ``банк.рф``), the last of which needs neither a scheme nor
 a slash. :func:`_md_safe` is written against *that* grammar: on top of the usual
 CommonMark set it escapes ``~`` plus ``/``, ``.`` and ``@`` (all of which render
-invisibly, so filenames stay readable), and it REMOVES backticks rather than
-escaping them so the helper stays context-free (backslash escapes are inert
-inside a code span).
+invisibly, so filenames stay readable).
+
+Since batch-62 the escaper itself lives in :mod:`markdown_safety`, a leaf module
+shared with ``report_service``; the names below are thin aliases so this module's
+call sites and tests are unchanged. Two behaviours moved with it: a backtick is
+now ESCAPED rather than removed (removal silently rewrote one symbol as another
+in a record meant to be evidentiary), and ``&`` is escaped so an HTML entity
+cannot render as a character the file does not contain.
 
 This is the **best-effort** control, and it is the one that matters once the
 ``.md`` leaves the app (GitHub, VS Code preview, Obsidian all autolink). The
@@ -60,6 +65,7 @@ from .flow_model import (
     BLOCK_STATUS_SKIPPED,
     BlockResult,
 )
+from .markdown_safety import MD_ESCAPE, TRUNCATION_MARKER, md_safe
 from .report_service import (
     REPORT_MAX_TOTAL_BYTES,
     REPORTS_DIR_NAME,
@@ -81,8 +87,9 @@ MAX_REPORT_CELL_CHARS = 240
 #: cap of its own, so a corrupt image would otherwise compose an unbounded report.
 MAX_REPORT_FINDINGS_PER_BLOCK = 200
 
-#: Truncation marker appended to an over-cap cell.
-_TRUNCATION_MARKER = "… (truncated)"
+#: Truncation marker appended to an over-cap cell. Alias — owned by
+#: :mod:`markdown_safety` since batch-62.
+_TRUNCATION_MARKER = TRUNCATION_MARKER
 
 #: Body timestamp format (pinned so the composer is byte-deterministic, m-3).
 REPORT_BODY_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S UTC"
@@ -110,14 +117,10 @@ SECTION_HEADINGS = (
     "## Written files",
 )
 
-#: Markdown-structural characters escaped by :func:`_md_safe`. ``~`` kills
-#: strikethrough; ``/``, ``.`` and ``@`` defuse the THREE linkify families —
-#: scheme (``http://x``), protocol-relative (``//x``), and **fuzzy** links, which
-#: need neither a scheme nor a slash (``www.evil.com``, ``evil.com``,
-#: ``ops@evil.com``, IDN ``банк.рф``). All are gfm-like extensions absent from a
-#: plain CommonMark set (AMD-1 + final-gate F1). ``\.``/``\@`` render invisibly,
-#: so filenames and addresses stay readable.
-_MD_ESCAPE = ("\\", "|", "*", "_", "[", "]", "<", ">", "#", "~", "/", ".", "@")
+#: Markdown-structural characters escaped by :func:`_md_safe`. Alias — owned by
+#: :data:`markdown_safety.MD_ESCAPE` since batch-62, where the set and its
+#: application order are documented.
+_MD_ESCAPE = MD_ESCAPE
 
 #: Absolute-path shapes redacted out of finding messages before they enter the
 #: report (final-gate F2). ``_display_path`` only covers ``written_paths``; an
@@ -136,19 +139,12 @@ def _md_safe(value: object, limit: int = MAX_REPORT_CELL_CHARS) -> str:
     """Render ``value`` inert inside the report's markdown grammar (C-17).
 
     Summary:
-        Neutralise a file-derived string for embedding anywhere in the report —
-        table cell, list item or heading. Control bytes are stripped and
-        newlines/tabs collapsed (a cell is one line); backticks are REMOVED (not
-        escaped) so the helper is context-free, because a backslash escape is
-        inert inside a code span; the value is truncated BEFORE escaping (escaping
-        only grows it); then every markdown-structural character is escaped.
-
-        The escape set targets ``MarkdownIt("gfm-like")`` with linkify enabled —
-        the grammar ``textual.widgets.Markdown`` actually uses — so beyond the
-        CommonMark set it includes ``~`` (strikethrough) and the three linkify
-        triggers ``/`` (scheme + protocol-relative), ``.`` and ``@`` (**fuzzy**
-        links, which need no scheme at all). All render invisibly, so paths,
-        filenames and addresses stay readable.
+        Thin binding of :func:`markdown_safety.md_safe` to THIS module's cell
+        cap. The escaper moved to a leaf module at batch-62 so ``report_service``
+        could share it without a circular import; this wrapper exists so the
+        flow report keeps owning :data:`MAX_REPORT_CELL_CHARS` — the leaf takes
+        a required, keyword-only ``limit`` precisely so no consumer inherits
+        another's cap policy.
 
     Args:
         value (object): The raw, untrusted value; rendered via ``str()``.
@@ -162,23 +158,16 @@ def _md_safe(value: object, limit: int = MAX_REPORT_CELL_CHARS) -> str:
         - Called on every file-derived field by :func:`compose_flow_report`.
 
     Dependencies:
+        Uses:
+            - markdown_safety.md_safe
         Used by:
             - compose_flow_report
 
     Example:
-        >>> _md_safe("a|b `c` http://x")
-        'a\\\\|b c http:\\\\/\\\\/x'
+        >>> _md_safe("a|b http://x")
+        'a\\\\|b http:\\\\/\\\\/x'
     """
-    text = str(value)
-    text = text.replace("\r", " ").replace("\n", " ").replace("\t", " ")
-    text = "".join(ch if ch >= " " else " " for ch in text)  # drop control bytes
-    text = text.replace("`", "")  # context-free: remove, never escape (AMD-5)
-    text = text.strip()
-    if len(text) > limit:
-        text = text[:limit].rstrip() + _TRUNCATION_MARKER
-    for ch in _MD_ESCAPE:  # backslash FIRST — never double-escape
-        text = text.replace(ch, "\\" + ch)
-    return text or "(empty)"
+    return md_safe(value, limit=limit)
 
 
 @dataclass

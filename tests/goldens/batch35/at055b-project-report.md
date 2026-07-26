@@ -11,8 +11,8 @@
 
 | Variant | File | Type | Active |
 |---|---|---|---|
-| a | a.s19 | s19 | yes |
-| b | b.s19 | s19 | no |
+| a | a\.s19 | s19 | yes |
+| b | b\.s19 | s19 | no |
 
 ## Consolidated overview
 
@@ -48,7 +48,7 @@
 
 ### Modified files
 
-- <RUN-ROOT>/.s19tool/workarea/proj/chg.json (applied entries: 1) - saved as `<RUN-ROOT>/.s19tool/workarea/proj/a-patched.s19`
+- `<RUN-ROOT>/.s19tool/workarea/proj/chg.json` (applied entries: 1) - saved as `<RUN-ROOT>/.s19tool/workarea/proj/a-patched.s19`
 
 ### Modifications
 

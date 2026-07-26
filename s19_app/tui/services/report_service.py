@@ -49,7 +49,8 @@ from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
-from .report_addendum import DeclaredRegion
+from .markdown_safety import md_code, md_safe
+from .report_addendum import DECLARED_REGION_NAME_MAX, DeclaredRegion
 from .report_filter import ReportFilterMatcher
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
@@ -74,6 +75,44 @@ REPORT_CONTEXT_BYTES_MAX = 4096
 #: Maximum modified regions dumped per variant (LLR-007.6;
 #: ``assumed — verify per-regime``, measured at E7 — see review packet).
 REPORT_MAX_REGIONS_PER_VARIANT = 128
+
+#: Per-variant declaration-error cap (batch-62 D-20, closing security F7).
+#:
+#: ``_ByteBudget`` is consumed at hexdump-block granularity only, so the
+#: declaration-error section sits OUTSIDE the whole-document accounting — and a
+#: corrupt image can mint one issue per parse fault with no bound of its own.
+#: batch-62 made that worse before it made it better: raising ``issue.message``'s
+#: escape limit from 240 to 500 roughly doubled the section's per-issue cost.
+#:
+#: 200 mirrors ``flow_report_service.MAX_REPORT_FINDINGS_PER_BLOCK`` deliberately
+#: — the two sections have the same unbounded-input shape, so a reader comparing
+#: the two report kinds should not have to learn two numbers.
+MAX_REPORT_ISSUES_PER_VARIANT = 200
+
+#: Report-wide Mode-A character cap (batch-62 A-18). THIS module's cap, not the
+#: flow report's 240 — each consumer owns its own, because the leaf escaper takes
+#: a REQUIRED ``limit`` precisely so no cap policy is inherited by accident.
+#:
+#: 512 is chosen against the fields, not by taste: ``descriptor.path.name`` and
+#: ``entry.linkage_symbol`` have NO upstream cap, and a filesystem basename
+#: reaches 255 characters. Adopting the flow report's 240 would have introduced
+#: SILENT data loss into an evidentiary document at ~20 sites while claiming to
+#: protect it. 512 holds any OS-bounded name verbatim and still bounds the
+#: pathological case **per cell**.
+#:
+#: ⚠ It does NOT bound the document, and an earlier version of this comment
+#: claimed it did — "the modifications table is separately capped at
+#: ``REPORT_MAX_REGIONS_PER_VARIANT`` rows, so the worst case stays far inside
+#: ``REPORT_MAX_TOTAL_BYTES``". That is **false**, and measured so:
+#: :data:`REPORT_MAX_REGIONS_PER_VARIANT` is consumed by ``_hexdump_section``
+#: ONLY, so ``_modifications_lines`` and ``_checklist_lines`` emit one row per
+#: entry with no cap (5 000 entries → 5 000 rows; ~100 000 rows → ~208 MB, ~99×
+#: the 2 MiB budget). The unbounded row count is pre-existing, but escaping
+#: raised per-cell cost ~1.4–2×, so this batch amplified it. Capping those two
+#: tables — mirroring :data:`MAX_REPORT_ISSUES_PER_VARIANT` — is a carried
+#: follow-up; the comment is corrected now so the constant is not read as a
+#: guarantee it never provided.
+REPORT_CELL_CHARS = 512
 
 #: Whole-document byte budget (LLR-007.6). Enforced at hexdump-block
 #: granularity: a block that would push the document past the budget is
@@ -509,42 +548,13 @@ def list_project_reports(project_dir: Path) -> List[Path]:
     return [path for _key, path in keyed] + foreign
 
 
-def _strip_ctl_local(value: object) -> str:
-    """
-    Summary:
-        Strip control characters (``ord < 0x20`` plus ``0x7F``) from one
-        filter-derived value (LLR-055.4). Local twin of the diff report's
-        ``_strip_ctl`` — this module performs no escaping on its existing
-        lines and none is added; ONLY the new filter-derived audit-header
-        text passes through here (ctl-strip removes newlines, so a hostile
-        filter filename cannot forge header lines — S-F5 minimum).
-
-    Args:
-        value (object): The raw filter-derived value (the filter file
-            name); rendered via ``str()``.
-
-    Returns:
-        str: The text with every control character removed.
-
-    Data Flow:
-        - Character filter over ``str(value)``; no other transformation.
-
-    Dependencies:
-        Used by:
-            - _audit_header_lines
-    """
-    return "".join(
-        ch for ch in str(value) if ord(ch) >= 0x20 and ord(ch) != 0x7F
-    )
-
-
 def _filter_display_name(report_filter: ReportFilterMatcher) -> str:
     """
     Summary:
         The filter file name the audit header renders (LLR-054.3), read
         from the declared ``ReportFilterMatcher.source_name`` field (the
         Inc-3 promotion of the Inc-2 duck-typed attribute). RAW text —
-        the caller sanitizes (``_strip_ctl_local``).
+        the caller sanitizes (``markdown_safety.md_safe``).
 
     Args:
         report_filter (ReportFilterMatcher): The resolved matcher.
@@ -697,7 +707,7 @@ def _audit_header_lines(
         applied filter file name plus the per-section shown/hidden counts
         (F-07: the project report counts Modifications rows, Checklists
         rows, and applied regions), closed by the F-03 informative
-        merged-context note. The name passes :func:`_strip_ctl_local`
+        merged-context note. The name passes :func:`markdown_safety.md_safe`
         (LLR-055.4 non-cell minimum).
 
     Args:
@@ -719,14 +729,14 @@ def _audit_header_lines(
 
     Dependencies:
         Uses:
-            - _strip_ctl_local
+            - markdown_safety.md_safe
         Used by:
             - generate_project_report
     """
     lines = [
         "## Report filter applied",
         "",
-        f"- Filter file: {_strip_ctl_local(filter_name)}",
+        f"- Filter file: {md_safe(filter_name, limit=REPORT_CELL_CHARS)}",
     ]
     for label, (shown, total) in (
         ("Modifications rows", modification_counts),
@@ -766,9 +776,9 @@ def _header_lines(
             - generate_project_report
     """
     return [
-        f"# Project report: {project_name}",
+        f"# Project report: {md_safe(project_name, limit=REPORT_CELL_CHARS)}",
         "",
-        f"- Project: {project_name}",
+        f"- Project: {md_safe(project_name, limit=REPORT_CELL_CHARS)}",
         f"- Generated (UTC): {generated_at.isoformat()}",
         f"- Tool version: {__version__}",
         f"- Context bytes: {options.context_bytes}",
@@ -804,8 +814,9 @@ def _inventory_lines(variant_set: ProjectVariantSet) -> List[str]:
     for descriptor in variant_set.variants:
         active = "yes" if descriptor.variant_id == variant_set.active_id else "no"
         lines.append(
-            f"| {descriptor.variant_id} | {descriptor.path.name} "
-            f"| {descriptor.file_type} | {active} |"
+            f"| {md_safe(descriptor.variant_id, limit=REPORT_CELL_CHARS)} "
+            f"| {md_safe(descriptor.path.name, limit=REPORT_CELL_CHARS)} "
+            f"| {md_safe(descriptor.file_type, limit=REPORT_CELL_CHARS)} | {active} |"
         )
     lines.append("")
     return lines
@@ -859,7 +870,8 @@ def _overview_lines(
             for check in result.check_results
         )
         lines.append(
-            f"| {result.variant_id} | {result.status} | {applied} "
+            f"| {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)} "
+            f"| {md_safe(result.status, limit=REPORT_CELL_CHARS)} | {applied} "
             f"| {passed} | {failed} | {uncheckable} |"
         )
     lines.append("")
@@ -889,16 +901,16 @@ def _modified_files_lines(result: VariantExecutionResult) -> List[str]:
         if summary.counts.get(DISPOSITION_APPLIED, 0) <= 0:
             continue
         source = (
-            str(summary.source_path)
+            f"`{md_code(summary.source_path)}`"
             if summary.source_path is not None
-            else "<in-memory document>"
+            else "(in-memory document)"
         )
         bullet = (
             f"- {source} (applied entries: "
             f"{summary.counts[DISPOSITION_APPLIED]})"
         )
         if summary.saved_path is not None:
-            bullet += f" - saved as `{summary.saved_path}`"
+            bullet += f" - saved as `{md_code(summary.saved_path)}`"
         bullets.append(bullet)
     if bullets:
         lines.extend(bullets)
@@ -941,7 +953,9 @@ def _modifications_lines(
     Dependencies:
         Uses:
             - _format_bytes / _matches_entry / _zero_match_notice
-            - diff_report_service._md_table_cell (symbol cell escape, S-F7)
+            - markdown_safety.md_safe (symbol + linkage cells; replaced
+              ``diff_report_service._md_table_cell``, which escaped table SHAPE
+              only — batch-62 D-5)
         Used by:
             - generate_project_report
     """
@@ -962,11 +976,6 @@ def _modifications_lines(
             lines.extend([_zero_match_notice(len(entries)), ""])
             return lines
         entries = kept
-    # Deferred import: ``diff_report_service`` imports from this module at load
-    # time, so a top-level import of ``_md_table_cell`` would be a circular
-    # import — resolve it lazily here, where both modules are fully loaded.
-    from .diff_report_service import _md_table_cell
-
     lines.extend(
         [
             "| Address | Length | Before | After | Linkage | Symbol |",
@@ -974,8 +983,11 @@ def _modifications_lines(
         ]
     )
     for entry in entries:
+        # The empty guard stays: ``md_safe("")`` would render "(empty)", but a
+        # linkage with no symbol is not an empty symbol — it is a standalone
+        # entry, and the golden's "-" says so.
         symbol_cell = (
-            _md_table_cell(entry.linkage_symbol)
+            md_safe(entry.linkage_symbol, limit=REPORT_CELL_CHARS)
             if entry.linkage_symbol
             else "-"
         )
@@ -984,7 +996,7 @@ def _modifications_lines(
             f"| {entry.address_end - entry.address_start} "
             f"| {_format_bytes(entry.before_bytes)} "
             f"| {_format_bytes(entry.after_bytes)} "
-            f"| {entry.linkage} "
+            f"| {md_safe(entry.linkage, limit=REPORT_CELL_CHARS)} "
             f"| {symbol_cell} |"
         )
     lines.append("")
@@ -998,6 +1010,11 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
         ``ValidationIssue`` collected on the variant's change summaries
         and check results (LLR-007.4 (d) declaration-error subsection,
         per LLR-002.8 + B-2 — operator decision 2026-06-10).
+
+        Capped at :data:`MAX_REPORT_ISSUES_PER_VARIANT`, with the omitted count
+        stated in the document. This section is outside ``_ByteBudget``'s
+        hexdump-granularity accounting, so without a cap of its own a corrupt
+        image composes an unbounded report (batch-62 D-20).
 
     Args:
         result (VariantExecutionResult): One variant's execution outcome.
@@ -1022,15 +1039,55 @@ def _declaration_error_lines(result: VariantExecutionResult) -> List[str]:
     if not issues:
         lines.extend(["None.", ""])
         return lines
+    omitted = 0
+    if len(issues) > MAX_REPORT_ISSUES_PER_VARIANT:
+        omitted = len(issues) - MAX_REPORT_ISSUES_PER_VARIANT
+        issues = issues[:MAX_REPORT_ISSUES_PER_VARIANT]
     for issue in issues:
-        line = f"- [{issue.code}] {issue.severity.value}: {issue.message}"
+        # D-11 REVERTED at Inc-8 (operator ruling). `issue.message` is escaped
+        # but NOT path-redacted: three revisions of a shape-inference redactor
+        # produced three integrity defects, the last of which made the report
+        # contradict itself about a symbol's identity, because every
+        # `ValidationIssue` template embeds a file-derived symbol in quotes and a
+        # path-shaped symbol is indistinguishable from a path. Host-path exposure
+        # is carried as a named MAJOR, to be solved by substituting KNOWN roots
+        # rather than inferring extent from punctuation.
+        #
+        # The 500 limit stays: it matches `_scrub_issue_message`'s own cap, which
+        # the report-wide cap would have truncated.
+        line = (
+            f"- [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+            f"{issue.severity.value}: "
+            f"{md_safe(issue.message, limit=500)}"
+        )
         if issue.address is not None:
             line += f" @ 0x{issue.address:X}"
         if issue.symbol:
-            line += f" symbol={issue.symbol}"
+            line += f" symbol={md_safe(issue.symbol, limit=REPORT_CELL_CHARS)}"
         if issue.related_artifacts:
-            line += f" related={','.join(issue.related_artifacts)}"
+            # Escaped PER ELEMENT, joined after, so each element gets its own
+            # `limit` and its own empty-value handling.
+            #
+            # (An earlier version of this comment said escaping the joined string
+            # "would escape the separator too and fuse the list into one token".
+            # That is false — `,` is not in `MD_ESCAPE` — and a comment stating a
+            # wrong reason is how the next reader builds a wrong model. The
+            # per-element form is still the better choice, for the reason above.)
+            related = ",".join(
+                md_safe(name, limit=REPORT_CELL_CHARS)
+                for name in issue.related_artifacts
+            )
+            line += f" related={related}"
         lines.append(line)
+    if omitted:
+        # Explicit beats silent, matching the region and hexdump caps: the cut
+        # is stated in the document rather than leaving a reader to wonder
+        # whether 200 issues is all there was.
+        lines.append(
+            f"> TRUNCATED: {omitted} of {omitted + MAX_REPORT_ISSUES_PER_VARIANT} "
+            f"declaration errors omitted (cap: {MAX_REPORT_ISSUES_PER_VARIANT} "
+            f"issues per variant)."
+        )
     lines.append("")
     return lines
 
@@ -1088,9 +1145,9 @@ def _checklist_lines(
             return lines
     for check in result.check_results:
         source = (
-            str(check.source_path)
+            f"`{md_code(check.source_path)}`"
             if check.source_path is not None
-            else "<in-memory document>"
+            else "(in-memory document)"
         )
         lines.extend(
             [
@@ -1114,7 +1171,7 @@ def _checklist_lines(
                 f"| {entry.address_end - entry.address_start} "
                 f"| {_format_bytes(entry.expected_bytes)} "
                 f"| {_format_bytes(entry.actual_bytes)} "
-                f"| {entry.result} |"
+                f"| {md_safe(entry.result, limit=REPORT_CELL_CHARS)} |"
             )
         lines.append("")
     return lines
@@ -1277,7 +1334,10 @@ def _hexdump_section(
             f"(cap: {REPORT_MAX_REGIONS_PER_VARIANT} regions per variant)"
         )
         put([f"> TRUNCATED: {text}.", ""])
-        notes.append(f"Variant '{result.variant_id}': {text}.")
+        notes.append(
+            f"Variant '{md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}': "
+            f"{text}."
+        )
     image_top = max(result.mem_map) + 1
     omitted_blocks = 0
     for low, high in compute_hexdump_windows(
@@ -1294,7 +1354,10 @@ def _hexdump_section(
             f"(report size cap: {REPORT_MAX_TOTAL_BYTES} bytes)"
         )
         out.extend([f"> TRUNCATED: {text}.", ""])
-        notes.append(f"Variant '{result.variant_id}': {text}.")
+        notes.append(
+            f"Variant '{md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}': "
+            f"{text}."
+        )
     return out, notes
 
 
@@ -1442,7 +1505,11 @@ def _addendum_lines(
     """
     lines: List[str] = ["## Addendum: declared regions", ""]
     for region in regions:
-        lines.append(f"### {region.name} (0x{region.start:X}-0x{region.end:X})")
+        # The limit is the field's OWN upstream cap, not the report's: a name is
+        # already scrubbed to 80, so a wider cap here could never fire and a
+        # narrower one would truncate a legitimately-accepted name.
+        name = md_safe(region.name, limit=DECLARED_REGION_NAME_MAX)
+        lines.append(f"### {name} (0x{region.start:X}-0x{region.end:X})")
         hits: List[str] = []
         for result in variant_results:
             for summary in result.change_summaries:
@@ -1450,20 +1517,22 @@ def _addendum_lines(
                     if region.contains(entry.address_start):
                         hits.append(
                             f"- modification @ 0x{entry.address_start:X} "
-                            f"(variant {result.variant_id})"
+                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
                         )
                 for issue in summary.issues:
                     if issue.address is not None and region.contains(issue.address):
                         hits.append(
-                            f"- issue [{issue.code}] @ 0x{issue.address:X} "
-                            f"(variant {result.variant_id})"
+                            f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+                            f"@ 0x{issue.address:X} "
+                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
                         )
             for check in result.check_results:
                 for issue in check.issues:
                     if issue.address is not None and region.contains(issue.address):
                         hits.append(
-                            f"- issue [{issue.code}] @ 0x{issue.address:X} "
-                            f"(variant {result.variant_id})"
+                            f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+                            f"@ 0x{issue.address:X} "
+                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
                         )
         lines.extend(hits if hits else ["None."])
         lines.append("")
@@ -1590,7 +1659,7 @@ def generate_project_report(
     if options.include_legend:
         emit(_legend_lines())
     for result in variant_results:
-        emit([f"## Variant: {result.variant_id}", ""])
+        emit([f"## Variant: {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}", ""])
         emit(_modified_files_lines(result))
         emit(_modifications_lines(result, options.report_filter))
         emit(_declaration_error_lines(result))

@@ -245,8 +245,12 @@ def test_full_report_content(tmp_path: Path) -> None:
     assert "- Assignment source: default" in text
     # (b) inventory
     assert "## Variant inventory" in text
-    assert "| a | a.s19 | s19 | yes |" in text
-    assert "| b | b.s19 | s19 | no |" in text
+    # §6.5 A-03/A-04 re-baseline (batch-62): the inventory row's file name is
+    # Mode-A escaped, so `.` carries a backslash in the SOURCE and renders
+    # invisibly. These are golden lines 14/15 — two of the three the Inc-2 gate
+    # predicted and measured.
+    assert "| a | a\\.s19 | s19 | yes |" in text
+    assert "| b | b\\.s19 | s19 | no |" in text
     # (c) overview
     assert "## Consolidated overview" in text
     assert "| a | ok | 2 | 1 | 1 | 0 |" in text
@@ -255,15 +259,21 @@ def test_full_report_content(tmp_path: Path) -> None:
     assert "## Variant: a" in text
     assert "## Variant: b" in text
     assert "### Modified files" in text
-    assert "- chg_a.json (applied entries: 2) - saved as `a-patched.s19`" in text
+    # §6.5 A-14 re-baseline (batch-62): the change-doc source path gains its
+    # Mode-B code span (the saved path already had one). This is golden line 51,
+    # the third and last line the Inc-2 gate predicted.
+    assert "- `chg_a.json` (applied entries: 2) - saved as `a-patched.s19`" in text
     assert "### Modifications" in text
-    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM_A |" in text
+    # §6.5 A-03 re-baseline (batch-62) — see the TC-314 site below.
+    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM\\_A |" in text
     assert "| 0x00001010 | 2 | 03 04 | CC DD | standalone | - |" in text
     assert "### Declaration errors" in text
     assert "- [CHG-COLLISION] error: entries at 0x2000 and 0x2001 collide" in text
     assert "- [CHG-ADDRESS-SYNTAX] error: entry 3 address is malformed" in text
     assert "### Checklists" in text
-    assert "#### Checklist: chk_a.json" in text
+    # §6.5 A-14 re-baseline (batch-62) — Mode-B code span, see the envelope
+    # checklist site below.
+    assert "#### Checklist: `chk_a.json`" in text
     assert "Passed: 1 - Failed: 1 - Uncheckable: 0" in text
     assert "| 0x00001000 | 2 | AA BB | AA BB | pass |" in text
     assert "| 0x00001010 | 2 | EE EE | CC DD | fail |" in text
@@ -831,7 +841,10 @@ def test_report_issue_line_shows_address_symbol_related(tmp_path: Path) -> None:
     )
     line = _issue_line(_report_with_issue(tmp_path, issue), "enriched issue")
     assert "@ 0x80040000" in line
-    assert "symbol=CAL_MAP" in line
+    # §6.5 A-03 re-baseline (batch-62): the symbol is Mode-A escaped.
+    assert "symbol=CAL\\_MAP" in line
+    # A-18: `related_artifacts` is escaped PER ELEMENT and joined after, so the
+    # separator stays a real separator instead of being escaped into the values.
     assert "related=a2l,mac" in line
 
 
@@ -904,7 +917,9 @@ def test_addendum_region_with_no_hits_shows_none(tmp_path: Path) -> None:
     addendum = _report_with_regions(tmp_path, [region], summary).split(
         "## Addendum: declared regions", 1
     )[1]
-    assert "empty_zone" in addendum
+    # §6.5 A-03 re-baseline (batch-62): the declared-region name is a Mode-A
+    # field, so `_` carries an escape in the source and renders invisibly.
+    assert "empty\\_zone" in addendum
     assert "None." in addendum
     assert "0x1000" not in addendum  # the out-of-region modification is not listed
 
@@ -1281,7 +1296,10 @@ def test_tc051_5_blocked_runs_render_checklists(tmp_path: Path) -> None:
     assert text.count("| uncheckable |") == 2
     # The zero-entry {0,0,0} envelope-fault boundary renders its header +
     # aggregates line with an empty table, without fault.
-    assert "#### Checklist: envelope.json" in text
+    # §6.5 A-14 re-baseline (batch-62): a check source path is a Mode-B field —
+    # emitted inside a code span, byte-faithful, never escaped, because a
+    # downstream canonicaliser substitutes its raw bytes.
+    assert "#### Checklist: `envelope.json`" in text
     assert "Passed: 0 - Failed: 0 - Uncheckable: 0" in text
 
 
@@ -1394,13 +1412,17 @@ def test_tc314_filtered_sections_and_audit_header(tmp_path: Path) -> None:
     assert lines[2] == "## Report filter applied", (
         "TC-314: the audit header must be the first block after the title"
     )
-    assert "- Filter file: tc314-filter.json" in text
+    # §6.5 A-29 re-baseline (batch-62): the filter name is Mode-A escaped.
+    assert "- Filter file: tc314-filter\\.json" in text
     assert "- Modifications rows: shown 1 of 2 (hidden 1)" in text
     assert "- Checklist rows: shown 2 of 3 (hidden 1)" in text
     assert "- Applied regions: shown 1 of 2 (hidden 1)" in text
 
     # Modifications: matched row present, unmatched absent.
-    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM_A |" in text
+    # §6.5 A-03 re-baseline (batch-62): `_` is escaped, so the source carries
+    # `SYM\_A`. The claim that the escaper is a no-op on benign symbols was
+    # measured false; the reader still sees `SYM_A`.
+    assert "| 0x00001000 | 2 | 01 02 | AA BB | mac-linked | SYM\\_A |" in text
     assert "| 0x00002000" not in text, (
         "TC-314: the unmatched modification row must be absent"
     )
@@ -1449,7 +1471,7 @@ def test_tc314_zero_match_notice_report_still_written(tmp_path: Path) -> None:
         "TC-314: a zero-match filter must still write a non-empty report"
     )
     text = path.read_text(encoding="utf-8")
-    assert "- Filter file: zero.json" in text
+    assert "- Filter file: zero\\.json" in text
     assert "- Modifications rows: shown 0 of 2 (hidden 2)" in text
     assert "- Checklist rows: shown 0 of 3 (hidden 3)" in text
     assert "- Applied regions: shown 0 of 2 (hidden 2)" in text
@@ -1543,10 +1565,16 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
 ) -> None:
     """TC-318 (report_service half) / LLR-055.4 (C-17 file side).
 
-    Intent: ``report_service`` performs no escaping on its existing lines,
-    so the NEW filter-derived audit-header text must sanitize LOCALLY
-    (``_strip_ctl_local`` — the S-F5 non-cell minimum: ctl-strip removes
-    newlines, so a hostile name cannot forge header lines). A matcher
+    §6.5 A-29 re-baseline (batch-62): the local ``_strip_ctl_local`` minimum is
+    superseded by ``markdown_safety.md_safe``. BEFORE, the header carried the
+    ctl-STRIPPED literal name (control bytes deleted, nothing escaped). AFTER,
+    the name is fully grammar-escaped and its control bytes become VISIBLE loss
+    markers rather than vanishing — deleting bytes from an audit record turns
+    one filename into a different one silently. The intent assertions below are
+    unchanged and now hold against a strictly stronger control.
+
+    Intent: the filter-derived audit-header text must sanitize so a hostile
+    name cannot forge header lines. A matcher
     whose ``source_name`` carries pipe / glob / bracket / control bytes
     and whose patterns carry the full hostile corpus is driven through
     ``generate_project_report`` twice — a MATCHING run (the audit header
@@ -1578,8 +1606,9 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
         "TC-318: the audit header must stay the first block after the "
         f"title, got {hit_lines[:4]}"
     )
-    assert "- Filter file: a|b*[x].json" in hit_text, (
-        "TC-318: the header must carry the ctl-stripped literal name"
+    assert "- Filter file: a\\|b\\*\\[x\\]��\\.json" in hit_text, (
+        "TC-318: the header must carry the escaped name, with the two control "
+        "bytes surfaced as visible loss markers rather than deleted"
     )
     assert "- Modifications rows: shown 1 of 2 (hidden 1)" in hit_text, (
         "TC-318: the matching run must genuinely match (header renders "
@@ -1598,7 +1627,7 @@ def test_tc318_hostile_filter_name_and_patterns_sanitized(
         now_fn=_fixed_clock,
     )
     zero_text = zero_path.read_text(encoding="utf-8")
-    assert "- Filter file: a|b*[x].json" in zero_text
+    assert "- Filter file: a\\|b\\*\\[x\\]��\\.json" in zero_text
     assert zero_text.count("filter matched 0 of 2 items") == 2, (
         "TC-318: the zero-match notice must render (mods + regions)"
     )

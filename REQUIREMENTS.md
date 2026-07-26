@@ -4764,3 +4764,62 @@ file-derived symbol/region value in `#map_detail_body` shall render via `safe_te
 > is the **discriminating counterfactual** — it would raise or mis-span under `Text.from_markup` — which is
 > what makes the ATs genuine rather than vacuous. Safety holds **by construction**
 > (`safe_text = Text(value)` + `.append`; never `Text.from_markup`, never an f-string into markup).
+
+---
+
+## Project-report composer escaping — batch-62 (R-TUI-077 / R-TUI-078)
+
+**R-TUI-077**: When `generate_project_report` emits any file-derived value, that value shall be
+rendered inert in the report's markdown grammar at the COMPOSER — the layer that travels with the
+`.md` file once it leaves the app — via `markdown_safety.md_safe` (Mode A, escape) or
+`markdown_safety.md_code` (Mode B, byte-faithful inside a code span), selected by the two-observable
+truth table in `01-requirements.md` §4. Escaping shall be applied **exactly once**, at the
+line-assembly site, with an **explicit** per-site character `limit`. Mode B shall not truncate and
+shall not escape: its values are absolute paths whose raw bytes a downstream canonicaliser
+substitutes, and whose length depends on the operator's home directory. Two surfaces are excluded by
+scope and pinned by test rather than assumed: the hexdump ASCII gutter (every gutter line carries a
+`0x%08X` prefix, so an all-`0x60` image cannot close the fence) and `_format_bytes` (hex digits and
+spaces only).
+- Code: `s19_app/tui/services/markdown_safety.py` (**new leaf module** — imports nothing from
+  `s19_app`, which is load-bearing: `flow_report_service:63` and `diff_report_service:97` both import
+  FROM `report_service`, so a shared escaper in either generator is a circular import for the third
+  consumer), `s19_app/tui/services/report_service.py` (24 sites; `_md_table_cell` call and its
+  deferred import REMOVED; `_strip_ctl_local` REMOVED — superseded),
+  `s19_app/tui/services/flow_report_service.py` (aliases; behaviour preserved bar one case)
+- Validation: `Automated` — `tests/test_report_field_census.py` (**AT-157** app viewer · **AT-158**
+  default reader with linkify+html ON · **AT-161** hexdump fence · the 14-field census · every table
+  row keeps its header width · no escaped value at the head of a line template, checked over the
+  **AST** so implicit f-string concatenation is read as one assembled template) ·
+  `tests/test_report_symbol_escape.py` (**AT-159** positional cell content · **AT-160** the
+  re-captured golden's escaped forms · **AT-162** Mode-B path fidelity · **AT-163** exactly-once at
+  the sink) · `tests/test_report_markup_safety.py` (the escaper contract: 33 derived payloads + 2
+  negative controls, guards G-1…G-5, the newline-collapse counterfactual, caps, fail-closed)
+- Status: Added in batch `2026-07-25-batch-62` (US-B62-1/2/3, HLR-095…099; `01-requirements.md` §6.5
+  amendments A-01…A-43). Frozen-engine diff = 0. **Residual risk RR-1**: the modelled reader is a
+  default `markdown-it` `gfm-like` parser, NOT "any GFM reader" — reader extensions (`:emoji:`,
+  `$…$` math, `==highlight==`) are inert here and live on GitHub/VS Code/Obsidian; the escape-set
+  extension was declined (D-22) because `:` appears in every address-bearing string. **RR-2**:
+  project reports disclose host paths — R-TUI-078 was withdrawn at the merge gate (see below).
+
+**R-TUI-078**: ~~When the project report emits `issue.message`, any absolute path inside it shall be
+reduced to its basename…~~ **WITHDRAWN before merge (batch-62 Inc-8, operator ruling).**
+
+The requirement was authored and implemented, then withdrawn at the merge gate. Recorded rather than
+deleted, because the reasoning is the useful part:
+
+Three revisions of a **shape-inference** redactor produced three integrity defects — it ate URLs
+(`http://vendor.example/spec` → `httspec`); it consumed to end-of-string on an unclosed quote,
+deleting a diagnostic's failing address and byte values; and finally it mangled quoted **symbol
+names**, because every `ValidationIssue` template in `s19_app/validation/` embeds a file-derived
+symbol in single quotes (`f"MAC symbol '{name}' address 0x…"`) and a path-shaped symbol is
+indistinguishable from a path. That last one made one report line state two different identities for
+the same symbol — in a document whose purpose is correlating symbols to addresses.
+
+The lesson is that path extent cannot be inferred from punctuation in prose that also carries quoted
+identifiers. The correct construction substitutes **known roots** (`Path.home()`, the project root,
+the temp root) by literal replacement — the technique `tests/conftest.py::canonical_report_bytes`
+already uses — which guesses nothing and deletes nothing.
+
+- Status: **withdrawn at `2026-07-25-batch-62`**; `flow_report_service` keeps its own batch-60
+  redactor unchanged. Host-path exposure in project reports is carried in `.dev-flow/BACKLOG.md` at
+  **MAJOR** with the design above.

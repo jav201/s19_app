@@ -1011,6 +1011,67 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
         forms = {str(run_root), str(run_root.resolve())}
         for form in sorted(forms, key=len, reverse=True):
             data = data.replace(form.encode("utf-8"), RUN_ROOT_TOKEN)
-    return _RUN_ROOT_SPAN_RE.sub(
+    data = _RUN_ROOT_SPAN_RE.sub(
         lambda match: match.group(0).replace(b"\\", b"/"), data
     )
+    if run_root is not None:
+        _assert_no_host_path_residue(data, run_root)
+    return data
+
+
+#: Host-path shapes that must never survive tokenization (batch-62 A-16).
+#: The drive-letter pattern carries a lookbehind so an alphanumeric-prefixed
+#: ``x:`` is not read as a drive letter. It can only NARROW the guard, never
+#: broaden it, so it is safe either way — but the independent review could not
+#: reproduce a case where it changes the outcome, so this is a precaution, not a
+#: demonstrated fix. Making that claim load-bearing needs its own counterfactual.
+_HOST_PATH_RESIDUE = (
+    re.compile(rb"(?<![A-Za-z0-9])[A-Za-z]:[\\/]"),
+    re.compile(rb"[\\/]Users[\\/]"),
+    # Mode-A escaping renders a POSIX path as ``\/home\/…``, so a literal
+    # ``/home/`` never matched an ESCAPED leak: Windows and macOS shapes were
+    # covered, Linux was not. It matters more now that batch-62 withdrew D-11
+    # and a project report carries unredacted host paths in ``issue.message``.
+    re.compile(rb"[\\/]?home[\\/]"),
+)
+
+
+def _assert_no_host_path_residue(data: bytes, run_root: Path) -> None:
+    """Fail if an operator path survived canonicalization (batch-62 A-16).
+
+    Summary:
+        R-1 is the batch's highest-risk item: escaping a path before it reaches
+        the file makes the raw-byte substitution above MISS, and an absolute
+        operator path is then baked into a golden and committed. The mitigation
+        used to be a single assertion in a single AT.
+
+        Putting the check HERE makes every byte-identity consumer inherit it —
+        detection over prevention. It costs four lines and it cannot be
+        forgotten by the next batch that adds a path field.
+
+        Only applied when ``run_root`` is given: a stored golden is compared
+        with ``run_root=None`` and is the very artifact this protects, so
+        asserting on it would be circular.
+
+    Args:
+        data (bytes): The already-tokenized report bytes.
+        run_root (Path): The per-run root that was substituted.
+
+    Raises:
+        AssertionError: If a drive letter or home-directory shape survived.
+
+    Dependencies:
+        Used by:
+            - canonical_report_bytes
+    """
+    for pattern in _HOST_PATH_RESIDUE:
+        match = pattern.search(data)
+        if match:
+            line = next(
+                (ln for ln in data.split(b"\n") if match.group(0) in ln), b""
+            )
+            raise AssertionError(
+                "A-16: a host path survived canonicalization — an operator "
+                f"path is about to be compared or committed. Matched "
+                f"{match.group(0)!r} in: {line[:160]!r} (run_root={run_root})"
+            )

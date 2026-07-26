@@ -371,7 +371,14 @@ def test_at_056a_dropdown_selection_filters_both_triggers(
         assert "Report filter applied" in filtered_text, (
             f"AT-056a: {name} must carry the audit header"
         )
-        assert "only-first.json" in filtered_text, (
+        # §6.5 A-29 re-baseline (batch-62): the PROJECT report escapes the
+        # filter name; the diff reports still carry it literally because D-8
+        # defers their own escapers. Branching keeps both facts asserted —
+        # relaxing the check to "either form" would stop proving either.
+        expected_name = (
+            "only-first\\.json" if name == _PR_NAME else "only-first.json"
+        )
+        assert expected_name in filtered_text, (
             f"AT-056a: {name} audit header must carry the REAL filename"
         )
         baseline_text = baseline[name].decode("utf-8")
@@ -693,7 +700,8 @@ def test_at_056d_typed_path_valid_filters_missing_refuses(
         f"{sorted(outcomes['after_valid'])}"
     )
     text = outcomes["after_valid"][_PR_NAME].decode("utf-8")
-    assert "Report filter applied" in text and "ext-filter.json" in text, (
+    # §6.5 A-29 re-baseline (batch-62): Mode-A escaped in the project report.
+    assert "Report filter applied" in text and "ext-filter\\.json" in text, (
         "AT-056d: the next report must be filtered by the typed "
         "out-of-project file"
     )
@@ -942,13 +950,27 @@ def test_at_053b_hostile_valid_filter_proceeds_sanitized_everywhere(
     pr_text = written[_PR_NAME].decode("utf-8")
 
     # (c) every written file re-read: LLR-055.4 sanitation.
+    # §6.5 A-29 re-baseline (batch-62). The three reports NO LONGER agree on
+    # this line, and the split is the point rather than an accident:
+    #   - the PROJECT report escapes the name (batch-62's whole subject),
+    #   - the BEFORE/AFTER diff reports keep the literal, because D-8 defers
+    #     `diff_report_service`'s own escapers to a later batch (own goldens,
+    #     own un-audited HTML sink).
+    # Asserting them separately keeps that divergence visible; a shared loop
+    # would have to be weakened to the point of proving nothing about either.
+    for label, text in (("ba-md", md_text), ("ba-html", html_text)):
+        assert f"Filter file: {hostile_name}" in text, (
+            f"AT-053b: the {label} audit header must carry the literal "
+            "hostile filename (diff reports are deferred under D-8)"
+        )
+    assert "Filter file: \\[boom\\]\\`b\\`\\.json" in pr_text, (
+        "AT-053b: the project report's audit header must carry the ESCAPED "
+        "name — backticks escaped rather than deleted, so the recorded "
+        "filename is still the real one"
+    )
     for label, text in (
         ("ba-md", md_text), ("ba-html", html_text), ("project", pr_text)
     ):
-        assert f"Filter file: {hostile_name}" in text, (
-            f"AT-053b: the {label} audit header must carry the literal "
-            "hostile filename"
-        )
         assert "\x01" not in text, (
             f"AT-053b: no control byte may reach the {label} file"
         )
@@ -1342,6 +1364,7 @@ def test_tc_f1_filter_helper_wording_identical_across_report_modules() -> None:
     """
     from s19_app.tui.services import diff_report_service as drs
     from s19_app.tui.services import report_service as rs
+    from s19_app.tui.services.markdown_safety import md_safe
     from s19_app.tui.services.report_filter import (
         parse_report_filter,
         resolve_report_filter,
@@ -1353,10 +1376,19 @@ def test_tc_f1_filter_helper_wording_identical_across_report_modules() -> None:
             f"both report modules (total={total})"
         )
 
+    # §6.5 A-29 re-baseline (batch-62): `report_service._strip_ctl_local` is
+    # GONE — the twin it was pinned against is superseded by the shared
+    # `markdown_safety.md_safe`, which is a strict superset (it escapes the
+    # grammar, not just control bytes) and lives in ONE place, which is what the
+    # duplication this pin guarded was always waiting for.
+    #
+    # The contract still worth pinning is the OUTCOME, not the twin: neither
+    # module may let a control byte or a line break through.
     hostile = "a\x01b\r\nc"
-    assert rs._strip_ctl_local(hostile) == drs._strip_ctl(hostile), (
-        "TC-F1: the ctl-strip twins must sanitize identically"
-    )
+    sanitized = md_safe(hostile, limit=rs.REPORT_CELL_CHARS)
+    assert "\x01" not in sanitized and "\n" not in sanitized and "\r" not in sanitized
+    assert "\x01" not in drs._strip_ctl(hostile)
+    assert "\n" not in drs._strip_ctl(hostile)
 
     parsed, errors = parse_report_filter(_valid_filter_body())
     assert errors == []
