@@ -134,9 +134,15 @@
       "date": "2026-07-26",
       "decision": "MERGED — PR #136 squash fbc9f2a",
       "notes": "Both independent reviewers 0-HIGH on the final tip; CI green (tui-ci 37m38s, snapshot 1m43s) on the closeout head. main 8d3c504 -> fbc9f2a. Remaining close step: /dev-flow-sync to the vault."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-26",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-25-batch-62/ - 12 artifacts + generated README with the metrics frontmatter. Visual-evidence refresh RAN (the batch diff touched s19_app/tui/): pilot suite 15 passed, 80 flattened frames + 16 gifs re-copied from merged main fbc9f2a, visual-evidence.md stamped 2026-07-26. Stale reject-check: 15 vault files still predate the merge and ALL are the RETIRED pv__case_06 orphans plus desktop.ini - no LIVE asset is stale. Snapshots deliberately NOT regenerated (env-sensitive, canonical-CI-only). WARN surfaced rather than silently synced: the consolidated 01/02/04/05/06 artifacts carry no 'evidence checklist' section (the three reviewer artifacts do); they carry discharge matrices and measurement transcripts instead, but the phase gate should have required the section. Repo hygiene: primary checkout on main; stray worktrees listed for the operator, none touched."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-25T00:00:00Z",
   "merged": {
     "pr": 136,
