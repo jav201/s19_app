@@ -1020,15 +1020,19 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
 
 
 #: Host-path shapes that must never survive tokenization (batch-62 A-16).
-#: The drive-letter pattern carries the same lookbehind as the production
-#: redactor: without it the ``p:`` of an ESCAPED url (``http:\/\/…``, which is
-#: what Mode-A escaping produces) matches, and any future golden over a report
-#: that legitimately quotes a URL would fail with a misleading "a host path
-#: survived canonicalization".
+#: The drive-letter pattern carries a lookbehind so an alphanumeric-prefixed
+#: ``x:`` is not read as a drive letter. It can only NARROW the guard, never
+#: broaden it, so it is safe either way — but the independent review could not
+#: reproduce a case where it changes the outcome, so this is a precaution, not a
+#: demonstrated fix. Making that claim load-bearing needs its own counterfactual.
 _HOST_PATH_RESIDUE = (
     re.compile(rb"(?<![A-Za-z0-9])[A-Za-z]:[\\/]"),
     re.compile(rb"[\\/]Users[\\/]"),
-    re.compile(rb"/home/"),
+    # Mode-A escaping renders a POSIX path as ``\/home\/…``, so a literal
+    # ``/home/`` never matched an ESCAPED leak: Windows and macOS shapes were
+    # covered, Linux was not. It matters more now that batch-62 withdrew D-11
+    # and a project report carries unredacted host paths in ``issue.message``.
+    re.compile(rb"[\\/]?home[\\/]"),
 )
 
 

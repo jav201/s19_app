@@ -382,3 +382,49 @@ exact defect class the revert exists to remove.
 Exactly what it set out to be: **markdown escaping at the composer**. That surface is the one both
 reviewers hammered and could not break — 15,816 baseline-diffed parses with zero structural
 deviations, 13 of 13 mutations killed, every guard shown able to fail.
+
+---
+
+## 11. Merge gate CLOSED — both reviewers 0-HIGH on Inc-8
+
+| | |
+|---|---|
+| qa | **OK-TO-MERGE, 0 HIGH** — HIGH-2 closed at the root; symbol-identity invariant 5/5 agree (was 3/5 disagree); **20 of 20 mutations killed** on the escaping surface |
+| security | **OK-TO-MERGE, 0 HIGH** — 14,736 baseline-diffed parses, 0 structural deviations; all 6 guard mutations RED |
+| CI | `tui-ci` 36m5s pass · `snapshot` 1m19s pass |
+
+### A framing correction I owe, and it is mine
+
+I wrote — here and to the operator — that "batch-62 touches flow-report redaction zero." True of the
+**redactor**, and verified three ways: the hunks are absent from the diff, and `_ABSOLUTE_PATH_RE`
+and `_redact_absolute_paths` are byte-identical to `main` (sha-compared, not eyeballed).
+
+But **flow-report output does change**, and saying "zero blast radius on flow reports" blurred that.
+`flow_report_service._md_safe` is still aliased to `markdown_safety.md_safe`, which differs from
+main's local implementation: the backtick is escaped rather than removed, `&` is escaped, `Cc`/`Cf`/
+`Cs`/`Zl`/`Zp` become a visible marker instead of a bare control-strip, and a leading block starter
+is escaped. Those are intentional and documented since Inc-1, and one flow-report test was
+re-baselined for them under A-13 — but the precise statement is *the redactor is untouched*, not
+*the module is*.
+
+### Closed in the closeout commit
+
+- **m-11 (qa)** — the old RR-2 bullet still claimed `_redact_absolute_paths` **is** applied to
+  `issue.message` and sat directly below the bullet saying it is not. Two adjacent statements of
+  opposite facts, one bullet below where I spent the 6th file avoiding exactly that. Superseded, not
+  deleted, so the reversal stays traceable.
+- **security minor** — the residue guard's `rb"/home/"` never matched an *escaped* leak, because
+  Mode A renders it `\/home\/…`. Windows and macOS were covered; Linux was not. Pre-existing, and it
+  matters more now that unredacted host paths ride in `issue.message`.
+- **security inconclusive** — it could not reproduce the lookbehind's stated justification and said
+  so rather than asserting a finding. The comment now claims a precaution rather than a demonstrated
+  fix, because an unverified assertion in a docstring is this batch's most-repeated defect.
+
+### What the reviewers logged against themselves
+
+Both did, unprompted, and it is the healthiest signal in this record: security mis-scored HIGH-1 as
+non-reproducing (it built its probe from a docstring's prose illustration instead of the real test
+string) and later distrusted its own regex harness rather than assert a finding it could not stand
+behind; qa recorded that it had cleared the vacuous width guard on its first pass and should not
+have. Same defect class the batch spent nine increments chasing — *re-deriving behaviour instead of
+driving the real thing* — appearing on the gate side.
