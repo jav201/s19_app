@@ -94,11 +94,14 @@ def _hardened_markdown_parser() -> MarkdownIt:
         ``linkify`` and ``html`` off, so no live link or raw-HTML node can be
         produced from document text no matter what reaches the renderer. It is
         the ENFORCING half of the batch-60 markup contract (§6.5 AMD-13); the
-        composer's ``flow_report_service._md_safe`` is the best-effort half that
+        composer's ``markdown_safety.md_safe`` is the best-effort half that
         travels with the ``.md`` file once it leaves the app.
 
-        It also hardens the pre-existing project reports, whose generator does
-        not escape file-derived text at all (carried as a follow-up).
+        It hardens project reports too — and since batch-62 their generator
+        escapes file-derived text as well, so both halves are now present for
+        both report kinds. The two cannot drift silently: this half is pinned by
+        ``tests/test_flow_report_ui.py`` (``linkify is False``) and the composer
+        half by the payload set's re-derivation from the live parsers.
 
     Returns:
         MarkdownIt: A ``gfm-like`` parser with ``linkify`` and ``html`` disabled.

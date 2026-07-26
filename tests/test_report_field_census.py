@@ -315,6 +315,122 @@ def test_every_table_row_keeps_its_header_width(hostile: str) -> None:
     assert checked >= 2, f"the guard must actually see rows, saw {checked}"
 
 
+def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> None:
+    """A-16 — the guard inside `canonical_report_bytes` is not decorative.
+
+    It was measured to fire at ZERO real call sites, which is the point: it
+    should be silent today. But a guard that has never been seen to fail is
+    indistinguishable from one that cannot, so this drives it directly.
+
+    R-1 is what it defends: escaping a path before it reaches the file makes the
+    run-root substitution MISS, and an absolute operator path gets baked into a
+    golden and committed.
+    """
+    from conftest import canonical_report_bytes
+
+    # Benign: the run root is substituted, nothing survives.
+    clean = canonical_report_bytes(f"- saved as `{tmp_path}/a.s19`".encode(), tmp_path)
+    assert b"<RUN-ROOT>" in clean
+
+    # Hostile: a path the substitution cannot match — exactly what Mode A would
+    # produce by escaping the separators out of the run-root spelling.
+    for planted in (rb"- see C:\\Users\\op\\x.s19", rb"- see /home/op/x.s19"):
+        with pytest.raises(AssertionError, match="A-16"):
+            canonical_report_bytes(planted, tmp_path)
+
+
+# --------------------------------------------------------------------------- #
+# AT-161 + F-17 — the two scope EXCLUSIONS, pinned rather than assumed
+# --------------------------------------------------------------------------- #
+
+
+def test_at161_an_all_backtick_image_cannot_close_the_hexdump_fence(
+    tmp_path: Path,
+) -> None:
+    """AT-161 — the hexdump block is excluded from escaping, and that is SAFE.
+
+    The ASCII gutter renders raw image bytes, so byte `0x60` is a literal
+    backtick in the document. Escaping the gutter was rejected: it would corrupt
+    the one part of the report that must reproduce memory verbatim.
+
+    The exclusion is safe because every gutter line is prefixed by its
+    `0x%08X` address (`hexview.py`), so no line can ever consist of the three
+    backticks a closing fence needs. That is an argument, and arguments rot —
+    so this pins it with the worst input the format allows: an image made
+    ENTIRELY of `0x60`.
+    """
+    span = range(0x1000, 0x1040)
+    mem_map = {addr: 0x60 for addr in span}
+    summary = _summary(
+        [_applied_entry(0x1000, (0x60,), (0x60,), "standalone", "SYMA")],
+        source="src.json",
+    )
+    results = [
+        VariantExecutionResult(
+            variant_id="a",
+            status="ok",
+            change_summaries=[summary],
+            mem_map=mem_map,
+        )
+    ]
+    variant_set = ProjectVariantSet(
+        project_name="proj",
+        variants=(
+            VariantDescriptor(variant_id="a", path=Path("a.s19"), file_type="s19"),
+        ),
+        active_id="a",
+    )
+    text = generate_project_report(
+        tmp_path, results, ReportOptions(context_bytes=0), variant_set=variant_set
+    ).read_text(encoding="utf-8")
+
+    assert "`" in text, (
+        "the fixture must actually plant backticks in the gutter, else this "
+        "test proves nothing"
+    )
+    for md, label in ((VIEWER, "viewer"), (DEFAULT, "default")):
+        fences = [t for t in _walk(md.parse(text)) if t.type == "fence"]
+        assert len(fences) == 1, (
+            f"{label}: expected exactly one hexdump fence, got {len(fences)} — "
+            "the image closed the block and escaped into document scope"
+        )
+
+
+def test_f17_format_bytes_is_inert_by_construction(tmp_path: Path) -> None:
+    """F-17 — the byte cells are excluded from escaping; pin WHY.
+
+    `_format_bytes` emits two-hex-digit tokens and spaces, or `-`. None of those
+    characters is in `MD_ESCAPE`, so the cells are inert no matter what the
+    image contains — including `0x60`, whose ASCII form would be a backtick but
+    whose HEX form is the harmless `60`.
+    """
+    from s19_app.tui.services.report_service import _format_bytes
+
+    rendered = _format_bytes(range(256))
+    assert set(rendered) <= set("0123456789ABCDEF "), (
+        f"_format_bytes emitted a character outside the hex alphabet: "
+        f"{sorted(set(rendered) - set('0123456789ABCDEF '))}"
+    )
+    assert _format_bytes(None) == "-"
+
+    # And in a REAL table, not a bare line: a lone `| x |` is just a paragraph,
+    # so asserting "no live tokens" on one proves nothing.
+    table = f"| h1 | h2 |\n|---|---|\n| {rendered} | b |"
+    cells = []
+    in_body = in_cell = False
+    for tok in _walk(DEFAULT.parse(table)):
+        if tok.type == "tbody_open":
+            in_body = True
+        elif tok.type == "td_open" and in_body:
+            in_cell = True
+        elif tok.type == "inline" and in_cell:
+            cells.append("".join(
+                c.content for c in _walk([tok]) if c.type == "text"
+            ))
+            in_cell = False
+    assert cells == [rendered, "b"], "the byte cell did not round-trip verbatim"
+
+
 def test_no_escaped_field_is_emitted_at_the_head_of_its_line() -> None:
     """A-23 pin 3 — the column-0 precondition, as a static guard.
 

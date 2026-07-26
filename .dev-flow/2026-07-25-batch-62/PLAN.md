@@ -2,11 +2,39 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase 3, Inc-3b DONE (2026-07-25)
+## Where we are — Phase 3 COMPLETE (2026-07-25)
 
 **Phase 0 CLOSED. Phase 1 CLOSED → `iterate-to-refine` iteration 1 → CLOSED. Phase 2 re-gate PASS.
-Phase 3: Inc-1 · Inc-2 · Inc-3a · **Inc-3b (filter surface + the census)** COMPLETE.
-Next action: Inc-4 (the last one).**
+Phase 3 CLOSED: Inc-1 · Inc-2 · Inc-3a · Inc-3b · **Inc-4**. All 7 ATs shipped.
+Next action: Phase 4 (validation).**
+
+### Inc-4 record — the scope exclusions, pinned rather than assumed
+
+4 files: `tests/test_report_field_census.py` (AT-161 + the F-17 pin + the A-16 teeth test) ·
+`tests/conftest.py` (the A-16 residue guard) · `s19_app/tui/screens.py` (the stale composer
+reference deferred from Inc-1) · `REQUIREMENTS.md` (**R-TUI-077** and **R-TUI-078**).
+
+**AT-161** drives the worst input the format allows — an image made **entirely of `0x60`**, the
+backtick byte — and asserts exactly one `fence` token survives in both grammars. It carries its own
+anti-vacuity assertion (`"`" in text`), because a fence test on a fixture with no backticks proves
+nothing.
+
+**A-16** moves R-1's mitigation from a single assertion in a single AT into `canonical_report_bytes`,
+so every byte-identity consumer inherits it. Two measurements, in this order:
+
+1. **Does it fire anywhere real?** No — 56 tests across all three consumer files pass with it
+   installed. Phase 1 had only checked the three goldens, not the call sites.
+2. **Can it fire at all?** Yes — driven directly to `AssertionError` on both a Windows and a POSIX
+   host path. A guard never seen to fail is indistinguishable from one that cannot.
+
+It is scoped to `run_root is not None`: a stored golden is compared with `run_root=None` and is the
+very artifact this protects, so asserting on it would be circular.
+
+**Placement deviation, recorded:** the cut put AT-161 in `test_report_markup_safety.py`. It lives in
+the census file instead — that is the report-level file with the fixtures, while the battery is
+helper-level. File count is unaffected (4).
+
+### Inc-3b record — the census, and what it caught immediately
 
 ### Inc-3b record — the census, and what it caught immediately
 
@@ -276,6 +304,11 @@ Engine-frozen set OFF-LIMITS (`core.py`, `hexfile.py`, `range_index.py`, `valida
 | Inc-3b (targeted) | — | 0 | +19 | 81 passed (filter consumers) · census 19 passed · frozen guards green |
 | Inc-3b counterfactual | — | — | — | escaper neutralised at the composer → **13 of 19 census cases RED**, both ATs included |
 | Inc-3b FULL suite | — | 0 | +19 | **2192 passed, 2 skipped, 3 xfailed** (24:42) · 29 snapshots passed · ruff clean |
+| Inc-4 A-16 measurement | — | — | — | installed → 56 passed across all 3 consumers (fires nowhere) · driven directly → `AssertionError` on both host-path shapes (can fire) |
+| Inc-4 FULL suite | — | 0 | +3 | **2195 passed, 2 skipped, 3 xfailed** (34:19) · 29 snapshots passed · ruff clean · frozen guards green |
+
+**Phase-3 totals:** 5 increments, ≤5 files each, **7 ATs** (AT-157…163) all shipped and each shown
+RED before its fix. Suite 2168 → **2195** (+27 tests, 0 regressions).
 
 **Inc-2 flake, recorded not waved away.** The first full run failed
 `tests/test_tui_flow_persistence_ui.py::test_at002_name_strip_glyph_dirty_then_saved` with

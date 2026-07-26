@@ -4764,3 +4764,55 @@ file-derived symbol/region value in `#map_detail_body` shall render via `safe_te
 > is the **discriminating counterfactual** — it would raise or mis-span under `Text.from_markup` — which is
 > what makes the ATs genuine rather than vacuous. Safety holds **by construction**
 > (`safe_text = Text(value)` + `.append`; never `Text.from_markup`, never an f-string into markup).
+
+---
+
+## Project-report composer escaping — batch-62 (R-TUI-077 / R-TUI-078)
+
+**R-TUI-077**: When `generate_project_report` emits any file-derived value, that value shall be
+rendered inert in the report's markdown grammar at the COMPOSER — the layer that travels with the
+`.md` file once it leaves the app — via `markdown_safety.md_safe` (Mode A, escape) or
+`markdown_safety.md_code` (Mode B, byte-faithful inside a code span), selected by the two-observable
+truth table in `01-requirements.md` §4. Escaping shall be applied **exactly once**, at the
+line-assembly site, with an **explicit** per-site character `limit`. Mode B shall not truncate and
+shall not escape: its values are absolute paths whose raw bytes a downstream canonicaliser
+substitutes, and whose length depends on the operator's home directory. Two surfaces are excluded by
+scope and pinned by test rather than assumed: the hexdump ASCII gutter (every gutter line carries a
+`0x%08X` prefix, so an all-`0x60` image cannot close the fence) and `_format_bytes` (hex digits and
+spaces only).
+- Code: `s19_app/tui/services/markdown_safety.py` (**new leaf module** — imports nothing from
+  `s19_app`, which is load-bearing: `flow_report_service:63` and `diff_report_service:97` both import
+  FROM `report_service`, so a shared escaper in either generator is a circular import for the third
+  consumer), `s19_app/tui/services/report_service.py` (24 sites; `_md_table_cell` call and its
+  deferred import REMOVED; `_strip_ctl_local` REMOVED — superseded),
+  `s19_app/tui/services/flow_report_service.py` (aliases; behaviour preserved bar one case)
+- Validation: `Automated` — `tests/test_report_field_census.py` (**AT-157** app viewer · **AT-158**
+  default reader with linkify+html ON · **AT-161** hexdump fence · the 14-field census · every table
+  row keeps its header width · no escaped value at the head of a line template, checked over the
+  **AST** so implicit f-string concatenation is read as one assembled template) ·
+  `tests/test_report_symbol_escape.py` (**AT-159** positional cell content · **AT-160** the
+  re-captured golden's escaped forms · **AT-162** Mode-B path fidelity · **AT-163** exactly-once at
+  the sink) · `tests/test_report_markup_safety.py` (the escaper contract: 33 derived payloads + 2
+  negative controls, guards G-1…G-5, the newline-collapse counterfactual, caps, fail-closed)
+- Status: Added in batch `2026-07-25-batch-62` (US-B62-1/2/3, HLR-095…099; `01-requirements.md` §6.5
+  amendments A-01…A-43). Frozen-engine diff = 0. **Residual risk RR-1**: the modelled reader is a
+  default `markdown-it` `gfm-like` parser, NOT "any GFM reader" — reader extensions (`:emoji:`,
+  `$…$` math, `==highlight==`) are inert here and live on GitHub/VS Code/Obsidian; the escape-set
+  extension was declined (D-22) because `:` appears in every address-bearing string.
+
+**R-TUI-078**: When the project report emits `issue.message`, any absolute path inside it shall be
+reduced to its basename before escaping, so a shareable record cannot disclose the operator's
+username or local directory layout. The Mode-B **path** fields shall NOT be redacted — their raw
+bytes are load-bearing for the golden canonicaliser — and that divergence is an explicitly accepted,
+recorded decision rather than an omission.
+- Code: `s19_app/tui/services/markdown_safety.py::redact_absolute_paths` (promoted from
+  `flow_report_service`, which now aliases it), applied at `report_service.py` `_declaration_error_lines`
+- Validation: `Automated` — `tests/test_report_service.py::test_issue_message_absolute_path_is_redacted`
+  (asserts the basename SURVIVES — redaction, not deletion — and that the username, the directory
+  layout and the drive letter do not) · `tests/test_report_field_census.py::test_a16_*` (the
+  canonicaliser residue guard, driven to failure so it is provably not decorative)
+- Status: Added in batch `2026-07-25-batch-62` (D-11, operator ruling; `01-requirements.md` §6.5
+  A-24). Closes the severity criterion batch-60 raised from LOW to MAJOR for flow reports and that
+  batch-62 initially carried without mentioning. **Residual risk RR-2**: project reports still
+  disclose host paths in the three Mode-B path fields where flow reports do not — carried to
+  `.dev-flow/BACKLOG.md` at MAJOR.
