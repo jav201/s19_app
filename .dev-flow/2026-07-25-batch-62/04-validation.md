@@ -165,8 +165,16 @@ batch-60 lesson that a fixture 2.8× *under* a limit lets every test pass with t
 
 `test_tc396_report_cell_cap_is_pinned_at_a_composer_site` drives `descriptor.path.name` — file-derived,
 lands in a table cell, and has **no** upstream cap, so it is the field a cap can silently truncate.
-Boundary pair: exactly 512 survives untouched and renders verbatim; 513 truncates with the marker.
-Both directions bite — a wider limit kills the second assertion, a narrower one kills the first.
+
+> ⚠ **This claim was WRONG and is corrected at Inc-6.** It said *"Both directions bite — a wider limit
+> kills the second assertion, a narrower one kills the first."* The independent qa gate measured
+> otherwise: both fixtures were built FROM the constant (`"x" * REPORT_CELL_CHARS`), so they moved with
+> it and `512 → 240` left **197 + 93 tests passing**. What the test actually pinned was agreement
+> between the constant and the site's `limit` — useful, but not the property B-2 was raised for, so
+> **B-2 was not in fact closed at iteration 2.** Inc-6 closes it: a `REPORT_CELL_CHARS >= 255` floor
+> carrying the NTFS-basename reason, and a survive arm using a **literal** 255-character name.
+> Counterfactual now executed: `512 → 240` goes **RED**. The lesson is C-39's own — a threshold
+> asserted rather than executed — committed one gate after C-39 was written.
 
 ### TC gaps closed
 
@@ -202,3 +210,50 @@ three touched files; frozen guards `tc027` + `tc031`×3 green. Suite total acros
 *(This line first said 2205 — a number written from the targeted runs before the full suite came
 back. Corrected against the run. Noted rather than quietly overwritten, because writing a figure
 before measuring it is the exact habit this batch spent two gates removing.)*
+
+---
+
+## 8. Independent merge gate + Inc-6 (iteration 3)
+
+Both reviewers ran over the whole diff vs `main` at `67d41f0`, independently, and both returned
+**OK-TO-MERGE with 0 HIGH**. CI green: `tui-ci` 36m22s, `snapshot` 1m17s.
+
+They also returned **10 MAJOR findings between them**, several of which are defects rather than
+polish — so the merge was held and closed as **Inc-6** (5 files) rather than deferred behind a
+0-HIGH verdict. What each reviewer did is worth recording: qa mutation-tested **31 variants of the
+implementation** (22 killed, 9 survived); security ran **15,816 baseline-diffed parses** and could not
+produce a live construct through either mode.
+
+### Production defects found and fixed
+
+| # | Finding | Fix |
+|---|---|---|
+| qa MAJOR-5 / sec F3 | `_ABSOLUTE_PATH_RE` was wrong in **both** directions. It ate URLs — `http://vendor.example/spec` → `httspec`, because the `p:` of `http:` matched `[A-Za-z]:` — and it failed to redact a username containing a **space** or a **UNC** path, so `\fileserver\clients\acme-corp\…` reached the report verbatim. R-TUI-078 was traced `Automated` while proven only for a space-free username. | Four explicit alternatives (quoted-with-spaces, bare UNC, bare drive-letter with an `(?<![A-Za-z0-9])` lookbehind, POSIX with `:` in the lookbehind). Both directions now measured, with tests for each. |
+| sec F6 | `Cs` (lone surrogates) missing from `_DROP_CATEGORIES`: the value survived normalisation and then raised `UnicodeEncodeError` at write time — fail-closed by accident, contradicting `_normalise`'s stated contract. | `Cs` added; test asserts the marker substitution and that the result is writable. |
+| sec F4 | `REPORT_CELL_CHARS`'s docstring claimed the modifications table is bounded by `REPORT_MAX_REGIONS_PER_VARIANT`. **False** — that constant is consumed by `_hexdump_section` only. Measured: 5 000 entries → 5 000 rows; ~100 000 rows → ~208 MB, **~99× the declared 2 MiB budget**, and escaping raised per-cell cost ~1.4–2×. | Docstring corrected to state the truth. The row cap itself is a **carried follow-up** with the measured numbers. |
+
+### Test-integrity defects found and fixed
+
+| # | Finding | Fix |
+|---|---|---|
+| sec F1 | `test_every_table_row_keeps_its_header_width` was **vacuous**: GFM normalises every row to the header width, so cell-count equality holds by construction — measured across 8 shapes, the guard never fired. Worse, A-15 had made it **replace** LLR-097.2's source-text guard, which did have detection power. | Rewritten to compare positional cell **content** against the benign document, plus an explicit counterfactual proving the new form fails where the old could not, plus the static Mode-B-in-a-table guard **restored over the AST**. |
+| sec F2 / qa MAJOR-4 | The two Mode-B census payloads had an even backtick count (re-pairing with the caller's wrap) and no `|`, so they could not exercise D-6 at all. Removing `md_code` from a site left 197 + 73 tests passing. | A dedicated `_ATTACK_PATH` with an odd backtick count and a pipe, built as a string rather than a real path (Windows forbids `|` in filenames — which is *why* the old fixture was weak). |
+| qa MAJOR-1/2 | `_hostile_report` never populated `check_results`, so the **entire checklist section** was outside census reach; `check.source_path` (the batch-39 long-standing carry this batch closed) and `entry.result` had no test that could fail, while R-TUI-077 marks all sites `Automated`. | Both planted; the benign fixture gained a matching checklist so the two documents keep the same shape. |
+| qa MAJOR-2 | `assert len(PLANTED) == 14` could only fail when someone edited `PLANTED` — i.e. exactly when they were already updating it. | Replaced by `test_census_covers_every_escaped_expression_in_the_source`: the escaped-expression set is **derived by AST** from `report_service.py` and diffed against a table where every entry is justified. A new escape site is now RED until triaged; so is a disappearing one. |
+| qa MAJOR-3 | **My §7 claim was false** — see the correction inline above. | `>= 255` floor with the NTFS reason + a literal-length survive arm. `512 → 240` now goes RED, measured. |
+| qa m-4 | `conftest`'s residue pattern matched the `p:` of an **escaped** URL, so a future golden quoting a URL would fail with a misleading "host path survived". | Same lookbehind as the production redactor. |
+
+### Process finding — sec F5, and it is mine
+
+The reviewer observed the worktree **mutating during its review**: `REPORT_CELL_CHARS` flipping
+512 → 240 → 512 and an `md_code` call briefly replaced. That was me, running mutation counterfactuals
+in the live worktree while a review was reading it — it cost the reviewer four spurious failures and
+forced it to re-run everything against a pristine `git archive` export. The committed tip was always
+clean, but gate evidence must not be taken from a tree someone else is editing. **Run counterfactuals
+in an export, not in the shared worktree.**
+
+### Carried, not fixed here
+
+The unbounded modifications/checklist row count (sec F4's cap), forgeable in-band markers (F7), the
+AST column-0 guard not following local assignments (F8 / qa m-3), and qa m-1/m-2/m-6/m-7 — all in
+`BACKLOG.md` with their measured evidence.

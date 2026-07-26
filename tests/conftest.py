@@ -1020,8 +1020,13 @@ def canonical_report_bytes(raw: bytes, run_root: Optional[Path] = None) -> bytes
 
 
 #: Host-path shapes that must never survive tokenization (batch-62 A-16).
+#: The drive-letter pattern carries the same lookbehind as the production
+#: redactor: without it the ``p:`` of an ESCAPED url (``http:\/\/…``, which is
+#: what Mode-A escaping produces) matches, and any future golden over a report
+#: that legitimately quotes a URL would fail with a misleading "a host path
+#: survived canonicalization".
 _HOST_PATH_RESIDUE = (
-    re.compile(rb"[A-Za-z]:[\\/]"),
+    re.compile(rb"(?<![A-Za-z0-9])[A-Za-z]:[\\/]"),
     re.compile(rb"[\\/]Users[\\/]"),
     re.compile(rb"/home/"),
 )

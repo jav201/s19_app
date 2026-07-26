@@ -98,9 +98,20 @@ MAX_REPORT_ISSUES_PER_VARIANT = 200
 #: reaches 255 characters. Adopting the flow report's 240 would have introduced
 #: SILENT data loss into an evidentiary document at ~20 sites while claiming to
 #: protect it. 512 holds any OS-bounded name verbatim and still bounds the
-#: pathological case; the modifications table is separately capped at
-#: :data:`REPORT_MAX_REGIONS_PER_VARIANT` rows, so the worst case stays far
-#: inside :data:`REPORT_MAX_TOTAL_BYTES`.
+#: pathological case **per cell**.
+#:
+#: ⚠ It does NOT bound the document, and an earlier version of this comment
+#: claimed it did — "the modifications table is separately capped at
+#: ``REPORT_MAX_REGIONS_PER_VARIANT`` rows, so the worst case stays far inside
+#: ``REPORT_MAX_TOTAL_BYTES``". That is **false**, and measured so:
+#: :data:`REPORT_MAX_REGIONS_PER_VARIANT` is consumed by ``_hexdump_section``
+#: ONLY, so ``_modifications_lines`` and ``_checklist_lines`` emit one row per
+#: entry with no cap (5 000 entries → 5 000 rows; ~100 000 rows → ~208 MB, ~99×
+#: the 2 MiB budget). The unbounded row count is pre-existing, but escaping
+#: raised per-cell cost ~1.4–2×, so this batch amplified it. Capping those two
+#: tables — mirroring :data:`MAX_REPORT_ISSUES_PER_VARIANT` — is a carried
+#: follow-up; the comment is corrected now so the constant is not read as a
+#: guarantee it never provided.
 REPORT_CELL_CHARS = 512
 
 #: Whole-document byte budget (LLR-007.6). Enforced at hexdump-block

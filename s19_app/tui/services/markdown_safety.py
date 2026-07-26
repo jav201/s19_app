@@ -57,7 +57,33 @@ from typing import Tuple
 #: Absolute-path shapes reduced to a basename by :func:`redact_absolute_paths`.
 #: Promoted here from ``flow_report_service`` at batch-62 so the project report
 #: can share the control instead of re-deriving it (A-24).
-_ABSOLUTE_PATH_RE = re.compile(r"(?:[A-Za-z]:[\\/]|(?<![\w.])/)[^\s'\"<>|]+")
+#:
+#: Four alternatives, in order, each fixing a shape the inherited single-branch
+#: pattern got wrong (all three measured through ``generate_project_report``):
+#:
+#: 1. **Quoted** drive-letter or UNC path — spaces ALLOWED, because a real
+#:    Windows ``OSError`` quotes the path and a username routinely contains one
+#:    (``'C:\\Users\\Javier Granados\\...'`` was disclosed verbatim before).
+#: 2. **Bare UNC** ``\\\\server\\share\\...`` — matched neither prior branch, so
+#:    an internal file server and client directory reached the report intact.
+#: 3. **Bare** drive-letter path, no spaces (an unquoted path cannot be
+#:    delimited from following prose, so stopping at whitespace is the only safe
+#:    read). The ``(?<![A-Za-z0-9])`` lookbehind is what keeps a URL intact:
+#:    without it, the ``p:`` of ``http://x`` matched and
+#:    ``http://vendor.example/spec`` was silently rewritten to ``httspec`` —
+#:    deletion inside an evidentiary record, which is exactly what this module
+#:    refuses to do everywhere else.
+#: 4. **POSIX** absolute path. ``:`` is in the lookbehind so the ``//`` of a
+#:    scheme-relative URL is not read as a path either.
+_ABSOLUTE_PATH_RE = re.compile(
+    r"""(?:
+          (?<=['"]) (?: \\\\ | [A-Za-z]:[\\/] ) [^'"<>|]+
+        | (?<![\w.]) \\\\ [^\s'"<>|]+
+        | (?<![A-Za-z0-9]) [A-Za-z]:[\\/] [^\s'"<>|]*
+        | (?<![\w.:/]) / [^\s'"<>|]+
+    )""",
+    re.VERBOSE,
+)
 
 #: Markdown-structural characters escaped by :func:`md_safe`, **in application
 #: order**. ``\\`` MUST stay at index 0 so an inserted escape is never
@@ -91,8 +117,13 @@ EMPTY_MARKER = "(empty)"
 #: Unicode categories dropped by :func:`_normalise`. ``Cc``/``Cf`` cover C0, C1,
 #: RLO, ZWSP and BOM. ``Zl``/``Zp`` are NOT optional: ``U+2028 LINE SEPARATOR``
 #: is ``Zl``, so it passes a ``Cc``/``Cf``-only filter *and* the ``\\r\\n\\t``
-#: collapse, and it displays as a line break the bytes do not contain.
-_DROP_CATEGORIES = frozenset({"Cc", "Cf", "Zl", "Zp"})
+#: collapse, and it displays as a line break the bytes do not contain. ``Cs``
+#: (lone surrogates, reachable from a POSIX filename read with
+#: ``surrogateescape``) is included because leaving it out contradicted this
+#: function's own contract: the value survived normalisation and then raised
+#: ``UnicodeEncodeError`` at write time — fail-closed, but by accident rather
+#: than by the stated design.
+_DROP_CATEGORIES = frozenset({"Cc", "Cf", "Cs", "Zl", "Zp"})
 
 #: Block starters escaped ONLY in leading position (see
 #: :func:`_escape_leading_block_starter`). ``#`` and ``>`` are absent because

@@ -877,6 +877,53 @@ def test_issue_message_absolute_path_is_redacted(tmp_path: Path) -> None:
     assert "C:" not in line
 
 
+def test_issue_message_redaction_covers_spaced_and_unc_paths(tmp_path: Path) -> None:
+    """Inc-6 — two path shapes the first input set missed entirely.
+
+    The original test proved redaction only for a space-free username. Measured
+    on that version: a username containing a SPACE and a UNC path both reached
+    the report verbatim, because the pattern's character class stopped at the
+    space and UNC matched neither alternative. A client directory on an internal
+    file server in a shareable `.md` is the shape that matters most here.
+
+    C-31 in one line: the control was right, the INPUT SET was the oracle.
+    """
+    backslash = chr(92)
+    spaced = (
+        "OSError: cannot open '" + "C:" + backslash + "Users" + backslash
+        + "Javier Granados" + backslash + "secret-project" + backslash + "prg.s19'"
+    )
+    unc = (
+        "OSError: cannot open '" + backslash * 2 + "fileserver" + backslash
+        + "clients" + backslash + "acme-corp" + backslash + "prg.s19'"
+    )
+    for label, message, leaks in (
+        ("spaced username", spaced, ("Javier", "Granados", "secret-project")),
+        ("UNC path", unc, ("fileserver", "acme-corp", "clients")),
+    ):
+        text = _report_with_issue(tmp_path / label.split()[0], _enriched_issue(message))
+        line = _issue_line(text, "OSError")
+        assert "prg\\.s19" in line, f"{label}: the basename must survive"
+        for leak in leaks:
+            assert leak not in line, f"{label}: {leak!r} leaked into the report"
+
+
+def test_issue_message_redaction_does_not_eat_urls(tmp_path: Path) -> None:
+    """The other direction, which had no test at all: no SILENT deletion.
+
+    The inherited pattern read the `p:` of `http://` as a drive letter, so
+    `http://vendor.example/spec` was rewritten to `httspec` — deletion inside an
+    evidentiary record, which is exactly what this batch refused everywhere else
+    (it chose a visible marker over deletion three separate times). Parser error
+    text plausibly cites a spec URL, so this is reachable, not theoretical.
+    """
+    message = "A2L parse error near token http://vendor.example/spec#L12"
+    text = _report_with_issue(tmp_path, _enriched_issue(message))
+    line = _issue_line(text, "A2L parse error")
+    for fragment in ("vendor", "example", "spec"):
+        assert fragment in line, f"{fragment!r} was silently deleted from the message"
+
+
 def test_report_issue_without_address_has_no_hex(tmp_path: Path) -> None:
     """AT-025b — negative: an issue with no address shows no `@0x` (nor empty
     `symbol=`/`related=`), proving present/absent discrimination (C-10)."""

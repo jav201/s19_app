@@ -19,7 +19,7 @@ re-derived, so there is exactly ONE definition of what a reader must see.
 from __future__ import annotations
 
 import ast
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import pytest
 from markdown_it import MarkdownIt
@@ -46,7 +46,8 @@ from test_report_markup_safety import (
     live_tokens,
     rendered_text,
 )
-from test_report_service import _applied_entry, _summary
+from s19_app.tui.changes.model import CheckRunEntry
+from test_report_service import _applied_entry, _check, _summary
 
 # --------------------------------------------------------------------------- #
 # The planted corpus
@@ -67,11 +68,30 @@ _ATTACK_FILENAME = "~~s~~**b**[l]|&vert;`c`"
 #: Markers whose value is a filename.
 _FILENAME_MARKERS = {"MKPATH"}
 
+#: Corpus for **Mode-B** (path) fields. Two properties matter and the first
+#: version of this fixture had neither:
+#:
+#: 1. an **ODD** number of backticks. With an even count the injected content
+#:    lands INSIDE a code span that re-pairs with the caller's own wrap, so the
+#:    payload is inert for the wrong reason and the census scores it green
+#:    against a *broken* implementation (measured: removing `md_code` from the
+#:    site left 197 + 73 tests passing);
+#: 2. a `|`, which is the D-6 hazard itself — Mode B escapes nothing, so a raw
+#:    pipe inside its span still splits a table cell. Windows forbids `|` in a
+#:    filename, which is precisely why a fixture built from a real path could
+#:    never exercise the rule.
+_ATTACK_PATH = "`[l](http://evil.com)|**b**"
+
 
 def _payload(marker: str) -> str:
     """A uniquely findable hostile value for one field."""
     attack = _ATTACK_FILENAME if marker in _FILENAME_MARKERS else _ATTACK
     return f"{marker}{attack}"
+
+
+def _path_payload(marker: str) -> str:
+    """A hostile Mode-B value that can actually exercise both hazards."""
+    return f"{marker}{_ATTACK_PATH}"
 
 
 #: Every file-derived field this composer emits that a caller can reach through
@@ -92,6 +112,13 @@ PLANTED = [
     ("region_name", "MKREGION", "A"),
     ("change_source_path", "MKSRC", "B"),
     ("saved_path", "MKSAVED", "B"),
+    # Added at Inc-6: the ENTIRE checklist section was outside census reach
+    # because `_hostile_report` never populated `check_results`. `check.source_path`
+    # is the batch-39 long-standing carry this batch closed, and it had no test
+    # that could fail — removing its `md_code` left 197 + 106 tests passing while
+    # a hostile check path broke out of the `#### Checklist:` heading's span.
+    ("check_source_path", "MKCHKSRC", "B"),
+    ("check_result", "MKRESULT", "A"),
 ]
 
 _MARKERS = {name: marker for name, marker, _ in PLANTED}
@@ -119,15 +146,27 @@ def _hostile_report(tmp_path: Path) -> str:
                 _payload(_MARKERS["linkage_symbol"]),
             )
         ],
-        source=f"{_MARKERS['change_source_path']}`x.json",
+        # Mode-B values are constructed strings, not real paths: the hazard
+        # needs a `|`, which no filesystem would accept in a filename.
+        source=_path_payload(_MARKERS["change_source_path"]),
         issues=[issue],
-        saved_path=Path(f"{_MARKERS['saved_path']}`x.s19"),
+        saved_path=PurePosixPath(_path_payload(_MARKERS["saved_path"])),
+    )
+    check = _check(
+        [
+            CheckRunEntry(
+                "bytes", 0x1000, 0x1002, (0xAA, 0xBB), (0xAA, 0xBB),
+                _payload(_MARKERS["check_result"]), "standalone", None,
+            )
+        ],
+        source=_path_payload(_MARKERS["check_source_path"]),
     )
     results = [
         VariantExecutionResult(
             variant_id=_payload(_MARKERS["variant_id"]),
             status=_payload(_MARKERS["status"]),
             change_summaries=[summary],
+            check_results=[check],
         )
     ]
     variant_set = ProjectVariantSet(
@@ -161,9 +200,24 @@ def _benign_report(tmp_path: Path) -> str:
         source="src.json",
         saved_path=Path("out.s19"),
     )
+    # The benign fixture must have the SAME SHAPE as the hostile one — same
+    # sections, same table count — because the structural assertions compare the
+    # two documents. A benign report missing the checklist section would make
+    # "the hostile document grew a table" fire on a fixture asymmetry rather than
+    # on an injection.
+    check = _check(
+        [
+            CheckRunEntry(
+                "bytes", 0x1000, 0x1002, (0xAA, 0xBB), (0xAA, 0xBB),
+                "pass", "standalone", None,
+            )
+        ],
+        source="chk.json",
+    )
     results = [
         VariantExecutionResult(
-            variant_id="a", status="ok", change_summaries=[summary]
+            variant_id="a", status="ok", change_summaries=[summary],
+            check_results=[check],
         )
     ]
     variant_set = ProjectVariantSet(
@@ -266,15 +320,69 @@ def test_census_every_planted_field_renders_verbatim(
         assert want in shown, f"{field}: rendered text != the specified survivor set"
 
 
-def test_census_covers_every_reachable_file_derived_field(hostile: str) -> None:
-    """The census is only as good as its coverage — so state it and pin it.
+#: Every distinct expression `report_service` routes through the escaper, DERIVED
+#: from the source by AST at test time, and the reason each one is or is not
+#: planted in the census fixture. Adding an escape site — or removing one — makes
+#: this test RED until it is triaged.
+#:
+#: This replaces `assert len(PLANTED) == 14`, which could only fail when someone
+#: edited `PLANTED`, i.e. exactly when they would already be updating it. A
+#: fixture-driven completeness test inherits the drift it was written to
+#: eliminate: the first version missed `check.source_path` and `entry.result`
+#: entirely, because the fixture built no `check_results` at all.
+_ESCAPED_EXPRESSIONS = {
+    ("md_code", "check.source_path"): "planted (check_source_path)",
+    ("md_code", "summary.saved_path"): "planted (saved_path)",
+    ("md_code", "summary.source_path"): "planted (change_source_path)",
+    ("md_safe", "descriptor.file_type"): "planted (file_type)",
+    ("md_safe", "descriptor.path.name"): "planted (path_name)",
+    ("md_safe", "descriptor.variant_id"): "planted (variant_id)",
+    ("md_safe", "entry.linkage"): "planted (linkage)",
+    ("md_safe", "entry.linkage_symbol"): "planted (linkage_symbol)",
+    ("md_safe", "entry.result"): "planted (check_result)",
+    ("md_safe", "issue.code"): "planted (issue_code)",
+    ("md_safe", "issue.symbol"): "planted (issue_symbol)",
+    ("md_safe", "name"): "planted (related_artifact) — the per-element join",
+    ("md_safe", "project_name"): "planted (project_name)",
+    ("md_safe", "redact_absolute_paths(issue.message)"): "planted (issue_message)",
+    ("md_safe", "region.name"): "planted (region_name)",
+    ("md_safe", "result.status"): "planted (status)",
+    ("md_safe", "result.variant_id"): "planted (variant_id, 7 sites)",
+    # NOT planted here, and each with a live node elsewhere:
+    ("md_safe", "filter_name"): (
+        "NOT planted — needs a resolved ReportFilterMatcher; driven hostile by "
+        "test_report_service.py::test_tc318_hostile_filter_name_and_patterns_sanitized"
+    ),
+}
 
-    14 fields are reachable through the public entry point. The remainder of the
-    24 escape-required sites are the SAME values emitted at additional sites
-    (a variant id appears in five places), plus the filter file name, which has
-    its own hostile node in `test_report_service.py::test_tc318_*`.
-    """
-    assert len(PLANTED) == 14
+
+def test_census_covers_every_escaped_expression_in_the_source() -> None:
+    """Completeness DERIVED from the source, not asserted as a count."""
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "s19_app" / "tui" / "services" / "report_service.py"
+    ).read_text(encoding="utf-8")
+
+    found = set()
+    for node in ast.walk(ast.parse(source)):
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                and node.func.id in ("md_safe", "md_code")):
+            found.add((node.func.id, ast.unparse(node.args[0])))
+
+    known = set(_ESCAPED_EXPRESSIONS)
+    new = found - known
+    gone = known - found
+    assert not new, (
+        "a NEW escaper call site exists with no census entry — plant it in "
+        f"`PLANTED` or record why it cannot be: {sorted(new)}"
+    )
+    assert not gone, (
+        f"an escaper call site disappeared — was a field left unescaped? {sorted(gone)}"
+    )
+
+
+def test_every_planted_marker_reaches_the_document(hostile: str) -> None:
+    """A planted field that never appears proves nothing about itself."""
     missing = [m for _, m, _ in PLANTED if m not in hostile]
     assert not missing, f"planted fields that never reached the document: {missing}"
 
@@ -284,39 +392,138 @@ def test_census_covers_every_reachable_file_derived_field(hostile: str) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def test_every_table_row_keeps_its_header_width(hostile: str) -> None:
-    """A-15 — replaces LLR-097.2's source-text guard with a painted-result one.
+def test_every_table_row_keeps_its_header_content(hostile: str, benign: str) -> None:
+    """A-15, CORRECTED — assert cell CONTENT, because cell COUNT cannot fail.
 
-    The original guard matched a `|` in the same source line as an `md_code(`
-    call. That false-negatives the moment a row is built by `" | ".join([...])`
-    or the template moves into a helper — both ordinary refactors. Parsing every
-    table in a hostile document survives refactoring and covers BOTH hazards:
-    a pipe injected into a Mode-A cell, and Mode B landing in a cell at all.
+    The first version of this test compared each body row's cell COUNT to its
+    header's. That assertion is **vacuous**: GFM normalises every row to the
+    header width — it truncates over-wide rows and pads short ones — so the
+    counts are equal by construction. Measured across 8 shapes (extra pipes,
+    missing cells, no outer pipes, `\\|`), the guard never fired once.
+
+    Worse, it had REPLACED LLR-097.2's source-text guard, which did have
+    detection power — so A-15 traded a working guard for one that could not
+    fail. That is this batch's own defect class, in the test written to enforce
+    D-6.
+
+    The property that DOES bite: the row's positional cell contents. GFM
+    silently DISCARDS the overflow when a row is over-wide (`| 1 | 2\\|X | 3 |`
+    renders cells `1, 2, X` — the `3` is gone), which is a content-replacement
+    primitive, so comparing content per row is what catches it.
     """
-    tokens = list(_walk(DEFAULT.parse(hostile)))
-    header_width = None
-    width = 0
-    checked = 0
-    in_head = in_body = False
-    for tok in tokens:
-        if tok.type == "thead_open":
-            in_head, width = True, 0
-        elif tok.type == "thead_close":
-            in_head, header_width = False, width
-        elif tok.type == "tbody_open":
-            in_body, width = True, 0
-        elif tok.type == "tr_close" and in_body:
-            assert width == header_width, (
-                f"a body row has {width} cells against a {header_width}-cell "
-                "header — a field shifted the columns"
+    def rows(document: str) -> list:
+        out: list = []
+        current: list = []
+        in_body = in_cell = False
+        for tok in _walk(DEFAULT.parse(document)):
+            if tok.type == "tbody_open":
+                in_body = True
+            elif tok.type == "tbody_close":
+                in_body = False
+            elif tok.type == "tr_open" and in_body:
+                current = []
+            elif tok.type == "tr_close" and in_body:
+                out.append(current)
+            elif tok.type == "td_open" and in_body:
+                in_cell = True
+            elif tok.type == "inline" and in_cell:
+                current.append("".join(
+                    c.content for c in _walk([tok]) if c.type == "text"
+                ))
+                in_cell = False
+        return out
+
+    hostile_rows, benign_rows = rows(hostile), rows(benign)
+    assert hostile_rows, "the guard must actually see rows"
+    assert len(hostile_rows) == len(benign_rows), (
+        "the hostile document grew or lost a table row"
+    )
+    for index, (hostile_row, benign_row) in enumerate(zip(hostile_rows, benign_rows)):
+        assert len(hostile_row) == len(benign_row), (
+            f"row {index}: {len(hostile_row)} cells vs {len(benign_row)} benign"
+        )
+        for column, cell in enumerate(hostile_row):
+            assert cell != "", (
+                f"row {index} column {column} rendered EMPTY — a field's content "
+                "was discarded by row normalisation"
             )
-            checked += 1
-            width = 0
-        elif tok.type == "tbody_close":
-            in_body = False
-        elif tok.type in ("th_open", "td_open") and (in_head or in_body):
-            width += 1
-    assert checked >= 2, f"the guard must actually see rows, saw {checked}"
+
+
+def test_a_pipe_injected_into_a_cell_is_caught_by_content_comparison() -> None:
+    """The counterfactual for the guard above: prove the new form can fail.
+
+    A raw pipe in a cell shifts every following value one column left and drops
+    the last one, at an UNCHANGED cell count. This is the input the count-based
+    version scored green.
+    """
+    header = "| a | b | c |\n|---|---|---|\n"
+    benign = header + "| 1 | 2 | 3 |"
+    hostile = header + "| 1 | 2|X | 3 |"
+
+    def cells(document: str) -> list:
+        out: list = []
+        in_body = in_cell = False
+        for tok in _walk(DEFAULT.parse(document)):
+            if tok.type == "tbody_open":
+                in_body = True
+            elif tok.type == "td_open" and in_body:
+                in_cell = True
+            elif tok.type == "inline" and in_cell:
+                out.append("".join(
+                    c.content for c in _walk([tok]) if c.type == "text"
+                ))
+                in_cell = False
+        return out
+
+    assert len(cells(hostile)) == len(cells(benign)), (
+        "the premise of this test: the COUNT is unchanged, which is why a "
+        "count assertion is vacuous"
+    )
+    assert cells(hostile) != cells(benign), (
+        "content comparison must see the shift a count assertion cannot"
+    )
+    assert cells(hostile) == ["1", "2", "X"], "the third column was discarded"
+
+
+def test_mode_b_in_a_table_cell_is_still_forbidden_at_every_call_site() -> None:
+    """D-6's static half, RESTORED (F1).
+
+    A-15 replaced the source-text guard with a painted-result one; the painted
+    form turned out vacuous, and even corrected it cannot see a hazard the
+    fixture never plants. So the static rule comes back, in the form the batch
+    learned to write it: over the **AST**, not over source lines.
+
+    Mode B escapes nothing, so a raw `|` inside its code span still splits the
+    cell. The rule is that no `md_code(...)` value may be emitted into a line
+    template that contains a `|` column separator.
+    """
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "s19_app" / "tui" / "services" / "report_service.py"
+    ).read_text(encoding="utf-8")
+
+    offenders = []
+    for node in ast.walk(ast.parse(source)):
+        if not isinstance(node, ast.JoinedStr):
+            continue
+        literals = "".join(
+            part.value for part in node.values if isinstance(part, ast.Constant)
+            and isinstance(part.value, str)
+        )
+        if "|" not in literals:
+            continue
+        for part in node.values:
+            if not isinstance(part, ast.FormattedValue):
+                continue
+            for inner in ast.walk(part.value):
+                if (isinstance(inner, ast.Call)
+                        and isinstance(inner.func, ast.Name)
+                        and inner.func.id == "md_code"):
+                    offenders.append(f"line {node.lineno}")
+    assert not offenders, (
+        "md_code (Mode B) is emitted into a table-row template, where a raw "
+        f"pipe in its value still splits the cell: {offenders}"
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -410,10 +617,20 @@ def test_tc396_report_cell_cap_is_pinned_at_a_composer_site(tmp_path: Path) -> N
     can silently truncate. The flow report's 240 is pinned elsewhere, but that is
     a different constant for a different consumer — pinning it does not pin this.
 
-    Boundary pair, so deleting `limit=REPORT_CELL_CHARS` from the site (or
-    changing 512) goes RED in one direction or the other.
+    Inc-6 correction: the first version built BOTH fixtures from the constant
+    (`"x" * REPORT_CELL_CHARS`), so the fixtures moved with the value and
+    changing 512 → 240 left every test green. What it pinned was agreement
+    between the constant and the site's `limit`, not the property B-2 was raised
+    for. The floor below is what actually holds the value, with the reason the
+    constant's own docstring gives, and the survive arm now uses a LITERAL
+    length so it is independent of the constant.
     """
-    at_cap = "x" * REPORT_CELL_CHARS
+    assert REPORT_CELL_CHARS >= 255, (
+        "a filesystem basename reaches 255 characters and `descriptor.path.name` "
+        "has no upstream cap, so a cap below 255 silently truncates a real "
+        "filename in an evidentiary document"
+    )
+    at_cap = "x" * 255                      # a full NTFS basename, literal
     over_cap = "y" * (REPORT_CELL_CHARS + 1)
 
     text_at = _one_variant_report(tmp_path / "at", path_name=at_cap)
@@ -482,6 +699,27 @@ def test_tc385_a_hostile_heading_cannot_change_its_own_level(tmp_path: Path) -> 
         "a field promoted its own heading"
     )
     assert "h2" in levels, "the per-variant H2 must still be an H2"
+
+
+def test_lone_surrogate_is_dropped_like_any_other_unrepresentable_char() -> None:
+    """F6 — `Cs` belongs in the drop set, and the reason is the contract.
+
+    A lone surrogate is reachable from a POSIX filename read with
+    `surrogateescape`. Before Inc-6 it survived normalisation and then raised
+    `UnicodeEncodeError` at write time — fail-CLOSED, so not a bypass, but by
+    accident rather than by the design `_normalise` documents ("replace
+    unrepresentable characters with a visible marker").
+
+    Placed in this file rather than the escaper battery only to keep Inc-6
+    inside its 5-file budget; it is an escaper-level property.
+    """
+    from s19_app.tui.services.markdown_safety import LOSS_MARKER, md_code, md_safe
+
+    surrogate = "A\ud800B"
+    assert md_safe(surrogate, limit=240) == f"A{LOSS_MARKER}B"
+    assert md_code(surrogate) == f"A{LOSS_MARKER}B"
+    # And the result is now writable, which it was not before.
+    assert md_safe(surrogate, limit=240).encode("utf-8")
 
 
 def test_a16_canonicaliser_residue_guard_can_actually_fire(tmp_path: Path) -> None:
