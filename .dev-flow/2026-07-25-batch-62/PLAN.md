@@ -2,10 +2,47 @@
 
 > Living compendium. Updated at every gate and significant checkpoint.
 
-## Where we are — Phase-1 fold DONE, Phase-2 re-gate PASSED (2026-07-25)
+## Where we are — Phase 3, Inc-1 DONE (2026-07-25)
 
-**Phase 0 CLOSED. Phase 1 CLOSED → re-opened for `iterate-to-refine` iteration 1 → CLOSED again.
-Phase 2 re-gate: PASS. Next action: Phase 3, Inc-1.**
+**Phase 0 CLOSED. Phase 1 CLOSED → `iterate-to-refine` iteration 1 → CLOSED. Phase 2 re-gate PASS.
+Phase 3 Inc-1 (the leaf helper + its battery) COMPLETE. Next action: Inc-2.**
+
+### Inc-1 record
+
+4 files, no AT (helper-only increment): `markdown_safety.py` (new) ·
+`flow_report_service.py` (aliases + wrapper; `MAX_REPORT_CELL_CHARS` stays here) ·
+`tests/test_report_markup_safety.py` (new, 157 cases) · `tests/test_flow_report_service.py`
+(the one predicted re-baseline).
+
+**The measured prediction held exactly:** the flow-report suite went `1 failed, 51 passed` —
+same test, same reason as the fold measured before any code existed. Re-baselined under A-13 with
+the coverage it removed replaced by a new backtick-preservation case, not dropped.
+
+**Battery teeth, measured:** re-run against the pre-batch escaper, **29 of 157 go RED**, in exactly
+the families the findings named — entity spoofing, backtick deletion, `Cc`/`Cf`/`Zl` survivors, and
+leading block starters.
+
+### ⚠ Inc-1 refuted an approved ruling — A-43
+
+The battery falsified **D-10/A-23**, which both Phase-2 reviewers had converged on and I adopted:
+*"every file-derived interpolation carries a literal prefix, so no block starter can fire."*
+
+True behind `| ` and `# `. **False when the prefix is itself a list marker** — and
+`f"- {md_safe(...)}"` is a live emission shape (`flow_report_service.py:400`). Measured:
+
+| value behind `- ` | result |
+|---|---|
+| `1) item` | opens `ordered_list` — `)` is in no escape set |
+| `---` | emits `hr` |
+| `- item` | nested list, **marker consumed** — the reader sees `item`, the file says `- item` |
+
+The third is the dangerous one: it opens **no** construct, so a grammar-only assertion calls it
+inert while the display silently loses two characters. Only the fidelity clause catches it — which
+is the entire argument for having added that clause.
+
+Fix: escape `-`/`+`/`=` **in leading position only**, plus a leading `\d{1,9})`. Interior hyphens are
+untouched, so `mac-linked` still renders as `mac-linked` and the readability objection that killed
+whole-set escaping does not apply. Recorded as **A-43**, not patched in silently.
 
 ### What the fold did
 
@@ -125,4 +162,7 @@ Engine-frozen set OFF-LIMITS (`core.py`, `hexfile.py`, `range_index.py`, `valida
 
 | Stage | Base | −D | +A | Post |
 |---|---|---|---|---|
-| Phase 0 | TBD at Inc-1 | — | — | — |
+| Inc-1 (targeted: flow + report suites) | 265 | 0 | +158 | 265 passed |
+| Inc-1 frozen guards (C-27) | — | — | — | `tc027` 1 passed · `tc031` 3 passed |
+| Inc-1 counterfactual (old escaper) | — | — | — | **29 failed / 128 passed** — the battery has teeth |
+| Inc-1 FULL suite | — | 0 | +158 | **2168 passed, 2 skipped, 3 xfailed** (27:49) · 29 snapshots passed · ruff clean |

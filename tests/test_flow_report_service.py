@@ -411,5 +411,30 @@ def test_unicode_survives_composition() -> None:
 
 
 def test_name_that_sanitises_to_nothing_renders_empty_marker() -> None:
+    """A value with nothing left after normalisation renders the empty marker.
+
+    §6.5 A-13 re-baseline (batch-62). BEFORE: the second assertion used
+    ``flow_name="```"`` and expected ``"(empty)"``, because Mode A REMOVED
+    backticks, so a name made only of backticks sanitised to nothing. AFTER:
+    backticks are ESCAPED, so that name survives as ``\\`\\`\\``` and the case no
+    longer exercises the empty path at all — it was measuring backtick deletion,
+    not emptiness. Whitespace is now the input that actually reaches the marker.
+
+    Backtick PRESERVATION is asserted separately below, so the coverage this
+    edit removes is replaced rather than dropped.
+    """
     assert _md_safe("   ") == "(empty)"
-    assert "(empty)" in compose_flow_report(_state(flow_name="```"), _AT)
+    assert "(empty)" in compose_flow_report(_state(flow_name="   "), _AT)
+
+
+def test_backtick_only_name_is_preserved_not_deleted() -> None:
+    """The behaviour that replaced the case above: escape, never delete.
+
+    A report is an evidentiary record. Deleting a backtick rewrites one name as
+    a different one silently — ``FOO`BAR`` was recorded as ``FOOBAR``. The
+    escaped form is inert (no ``code_inline`` opens) AND faithful.
+    """
+    report = compose_flow_report(_state(flow_name="a`b"), _AT)
+    assert "a\\`b" in report
+    assert "code_inline" not in _render_tokens(report)
+    assert _live_structures(report) == set()
