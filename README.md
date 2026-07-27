@@ -208,13 +208,44 @@ Every one of these has an equivalent in the TUI, which is where the work has gon
 
 ## Formats
 
-| Format | Role | Parser |
-|--------|------|--------|
-| S19 (Motorola S-record) | firmware image | `s19_app/core.py` |
-| Intel HEX (`.hex`, `.ihex`) | firmware image | `s19_app/hexfile.py` |
-| A2L (ASAM) | calibration symbol metadata | `s19_app/tui/a2l.py` |
-| MAC (`TAG=hexaddr`) | flat symbol → address map | `s19_app/tui/mac.py` |
-| CDF 2.0 (`.cdfx`, ASAM) | calibration exchange for Vector vCDM | `s19_app/tui/cdfx/` |
+All open, publicly specified formats. None of them is vendor-private.
+
+| Format | Owner / standard | Also seen as | Parser |
+|--------|------------------|--------------|--------|
+| Motorola S-record | Motorola, mid-1970s | `.s19` `.s28` `.s37` `.s` `.s1` `.s2` `.s3` `.sx` `.srec` `.mot` `.exo` `.mxt` | `s19_app/core.py` |
+| Intel HEX | Intel | `.hex` `.ihex` | `s19_app/hexfile.py` |
+| A2L | **ASAM MCD-2 MC**, also called ASAP2 | `.a2l`, plus its `.aml` companion | `s19_app/tui/a2l.py` |
+| MAC symbol map | no branded standard — see below | `.mac` and equivalents | `s19_app/tui/mac.py` |
+| CDF 2.0 | **ASAM MCD-2 CAL** | `.cdfx` | `s19_app/tui/cdfx/` |
+
+**On the S-record family.** `S19`, `S28` and `S37` are the same format at three
+address widths — 16-bit (up to 64 KB), 24-bit (16 MB) and 32-bit (4 GB). The many
+extensions above are conventions, not different formats.
+
+**Extensions do not gate anything here.** Neither `core.py` nor the load service
+inspects the filename; the parsers key on record structure. A `.mot` or `.srec`
+file loads exactly like a `.s19`.
+
+**On MAC.** This is the one entry that is a *shape* rather than a named standard:
+a flat text listing of `TAG=hexaddr` lines. Different toolchains emit an
+equivalent symbol→address map under different names and extensions, and the
+parser reads the shape rather than claiming a particular vendor's format.
+
+**A2L belongs to ASAM, not to any tool vendor.** ASAM MCD-2 MC has been public
+since 1999 (current revision 1.7.1, 2018). Vendor tools such as Vector CANape and
+vCDM *consume* A2L and CDFX; they do not own them, and this project is written
+against the published standards rather than against any vendor's implementation.
+
+### Provenance
+
+This tool was built from **public specifications and public documentation only**.
+Every fixture under `examples/` is synthetic and generated in-repo, and the
+screenshots and GIF in this README are rendered from those fixtures — see
+[`docs/images/capture_readme_media.py`](docs/images/capture_readme_media.py),
+whose stated policy is that it may only ever read from `examples/`.
+
+**No employer, customer or otherwise proprietary artefact appears anywhere in
+this repository**, and none was used to build it.
 
 ---
 
