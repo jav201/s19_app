@@ -4823,3 +4823,45 @@ already uses — which guesses nothing and deletes nothing.
 - Status: **withdrawn at `2026-07-25-batch-62`**; `flow_report_service` keeps its own batch-60
   redactor unchanged. Host-path exposure in project reports is carried in `.dev-flow/BACKLOG.md` at
   **MAJOR** with the design above.
+
+## Report byte accounting vs the written file — batch-63 (R-TUI-097)
+
+**R-TUI-097**: Every report writer that consults a `_ByteBudget` shall obtain the bytes it writes
+from one shared encoder — `report_service.document_bytes(text: str) -> bytes` — and shall not encode
+or newline-translate on its own. `_line_bytes` shall remain exactly as shipped, charging one byte per
+line: that form is **partition invariant**, which is required because the composer accounts in ~12
+separate `emit()` batches, and it shall remain an upper bound of the encoder's output. Redefining
+`_line_bytes` in terms of the encoder is prohibited.
+
+The defect: `_line_bytes` charged `+1` per line while both writers used `Path.write_text`, which
+opens in **text mode** — so on a host whose `os.linesep` is CRLF the file was larger than the budget
+had been charged for it, by exactly `N - 2` bytes (measured 7/7 compositions, including
+hexdump-bearing ones, against the real `_ByteBudget`). In `flow_report_service` the shared allocator
+gates whether a section is **emitted at all** (`put` → `budget.fits`), so the undercount decided
+emission there, not merely a cap.
+
+- Code: `s19_app/tui/services/report_service.py` (`document_bytes` added beside `_line_bytes`; the
+  terminal write is `write_bytes`), `s19_app/tui/services/flow_report_service.py` (imports the
+  encoder from `report_service` — it already imports `_ByteBudget`/`_line_bytes` from there, so this
+  adds no import edge — and writes bytes).
+- Validation: `Automated` — `tests/test_report_document_bytes.py` (**AT-172** mutating the encoder
+  changes the project report's bytes on disk · **AT-174** the `+1`-per-line PIN and its
+  partition-invariance PIN, both independently load-bearing since `+1`→`+2` is itself
+  partition-invariant · **AT-193** the structural census, whose module set is derived by
+  import-graph walk and asserted non-empty · **AT-175** no `\r`, Windows-only) ·
+  `tests/test_flow_report_service.py` (**AT-173** the same seam for `write_flow_report`, patching
+  `flow_report_service.document_bytes` because that module binds the name with `from … import`).
+- **`AT-175` is explicitly NOT verified by the merge gate.** `tui-ci` and `snapshot-regen` both run
+  `ubuntu-latest`, where the *unpatched* writer already emitted LF — the undercount is zero there, so
+  any newline-keyed assertion is green before the fix on the very platform the gate runs on. The
+  load-bearing CI check is **AT-193**, which is RED pre-fix on every platform. This is stated rather
+  than papered over: CI verifies this requirement's *structure* and *arithmetic*, not its
+  platform-dependent *behaviour*.
+- Status: Added in batch `2026-07-26-batch-63` (US-B63-D3, HLR-102, LLR-102.1…4). Frozen-engine
+  diff = 0; goldens measured neutral over the whole suite, not assumed. **Scope carried, not
+  closed:** batch-63 shipped D3 only. D1 (the declared-region addendum's `O(R×V×E)` resident cost)
+  and D2 (a schema-legal address denying the report at the decimal `Length` column,
+  `report_service.py:996` and `:1171`) were returned to `.dev-flow/BACKLOG.md` at the Phase-2
+  re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
+  `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is
+  closed by neither this requirement nor a `_ByteBudget` remedy.

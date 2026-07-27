@@ -390,8 +390,52 @@ def compute_hexdump_windows(
 
 
 def _line_bytes(lines: Sequence[str]) -> int:
-    """Return the UTF-8 byte cost of ``lines`` joined with ``\\n``."""
+    """Return the UTF-8 byte cost of ``lines`` joined with ``\\n``.
+
+    The ``+ 1`` per line is deliberate and **must not** be re-derived from
+    :func:`document_bytes` (LLR-102.2). Sections are accounted in ~12 separate
+    ``emit()`` batches, so the accounting function has to be *partition
+    invariant*: this form charges the same total under every partition, whereas
+    ``len("\\n".join(batch))`` loses one byte per batch boundary and would
+    undercount linearly in the variant count. The whole document is therefore
+    over-accounted by exactly one byte — the conservative direction.
+    """
     return sum(len(line.encode("utf-8")) + 1 for line in lines)
+
+
+def document_bytes(text: str) -> bytes:
+    """
+    Summary:
+        Encode a composed report document to the exact bytes written to disk
+        (LLR-102.1) — the single seam where report bytes are made. Takes the
+        already-composed text rather than a line sequence so that both callers
+        can use it: :func:`generate_project_report` joins lines, while
+        ``flow_report_service.compose_flow_report`` returns a ``str``.
+
+    Args:
+        text (str): The composed document.
+
+    Returns:
+        bytes: ``text`` encoded UTF-8, with ``\\n`` preserved verbatim.
+
+    Data Flow:
+        - composed text -> bytes -> ``Path.write_bytes``. Writing bytes is what
+          makes the file platform-independent: ``Path.write_text`` opens in text
+          mode, so a host whose ``os.linesep`` is CRLF silently expands every
+          ``\\n`` and the file ends up larger than :func:`_line_bytes` charged
+          for it — by ``N - 2`` bytes, which matters because
+          ``flow_report_service`` gates section *emission* on that budget.
+
+    Dependencies:
+        Used by:
+            - generate_project_report
+            - flow_report_service.write_flow_report
+
+    Example:
+        >>> document_bytes("a\\nb")
+        b'a\\nb'
+    """
+    return text.encode("utf-8")
 
 
 @dataclass(slots=True)
@@ -1679,5 +1723,5 @@ def generate_project_report(
         )
 
     target = reports_dir / filename
-    target.write_text("\n".join(lines), encoding="utf-8")
+    target.write_bytes(document_bytes("\n".join(lines)))
     return target

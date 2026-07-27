@@ -438,3 +438,59 @@ def test_backtick_only_name_is_preserved_not_deleted() -> None:
     assert "a\\`b" in report
     assert "code_inline" not in _render_tokens(report)
     assert _live_structures(report) == set()
+
+
+# --------------------------------------------------------------------------
+# batch-63 D3 (R-TUI-097 / LLR-102.1) — the flow writer shares the one encoder
+# --------------------------------------------------------------------------
+
+
+def test_at173_replacing_the_encoder_changes_what_write_flow_report_writes(
+    tmp_path, monkeypatch
+) -> None:
+    """AT-173 / TC-472 — mutate the encoder, observe the file the flow writer produced.
+
+    ``flow_report_service`` imports ``_ByteBudget`` / ``_line_bytes`` FROM
+    ``report_service`` and gates whether a section is emitted at all on that shared
+    budget (``put`` -> ``budget.fits``). So the accounting undercount D3 fixes
+    decides *emission* here, not merely a cap — which is why this module is in
+    scope alongside the project report.
+
+    **The patch target is load-bearing.** That import is a
+    ``from .report_service import (...)``, so rebinding
+    ``report_service.document_bytes`` would leave the name this module already
+    holds untouched and this test would pass against an unfixed writer. It patches
+    the binding in the module under test — the standard patch-where-it-is-used
+    rule. Pre-fix it is RED on every platform including CI, because
+    ``write_flow_report`` reached ``Path.write_text`` and no encoder existed to
+    rebind.
+
+    Note this is also the first test of ``write_flow_report`` at all: every other
+    case in this file exercises the pure ``compose_flow_report``.
+    """
+    import s19_app.tui.services.flow_report_service as frs
+
+    sentinel = b"SENTINEL-FLOW-ENCODER"
+    monkeypatch.setattr(frs, "document_bytes", lambda text: sentinel)
+
+    target = frs.write_flow_report(_state(), tmp_path, now_fn=lambda: _AT)
+
+    assert target.read_bytes() == sentinel, (
+        "write_flow_report did not obtain its bytes from the shared encoder"
+    )
+
+
+def test_at173b_flow_report_bytes_equal_the_encoder_output(tmp_path) -> None:
+    """AT-173 / TC-475 — the written flow report is exactly the encoder's output.
+
+    Platform-independent: it never consults ``os.linesep``. On a CRLF host the
+    text-mode writer expanded every newline, so the file differed from what the
+    shared budget had been charged for it.
+    """
+    import s19_app.tui.services.flow_report_service as frs
+
+    target = frs.write_flow_report(_state(), tmp_path, now_fn=lambda: _AT)
+    raw = target.read_bytes()
+
+    assert raw == frs.document_bytes(raw.decode("utf-8"))
+    assert raw == frs.document_bytes(compose_flow_report(_state(), _AT))
