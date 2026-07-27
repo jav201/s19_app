@@ -72,6 +72,7 @@ from .report_service import (
     _ByteBudget,
     _line_bytes,
     _report_filename,
+    document_bytes,
 )
 
 #: Whole-document byte budget for a flow report. Bound to the project-report
@@ -453,5 +454,5 @@ def write_flow_report(
     reports_dir = Path(project_dir) / REPORTS_DIR_NAME
     reports_dir.mkdir(parents=True, exist_ok=True)
     target = reports_dir / _report_filename(reports_dir, generated_at)
-    target.write_text(compose_flow_report(state, generated_at), encoding="utf-8")
+    target.write_bytes(document_bytes(compose_flow_report(state, generated_at)))
     return target
