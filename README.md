@@ -231,6 +231,13 @@ a flat text listing of `TAG=hexaddr` lines. Different toolchains emit an
 equivalent symbol→address map under different names and extensions, and the
 parser reads the shape rather than claiming a particular vendor's format.
 
+*Not to be confused with a tuning "map pack".* The aftermarket world has richer,
+vendor-owned equivalents — EVC Electronic's WinOLS uses `.kp` / `.olsx`, and the
+Bosch-lineage DAMOS files appear as `.damos` / `.kp` / `.dcm`. Those carry
+conversion factors, axis definitions and folder structure, and are proprietary.
+**This tool does not read any of them.** What it reads is the plain
+`TAG=hexaddr` text form and nothing more.
+
 **A2L belongs to ASAM, not to any tool vendor.** ASAM MCD-2 MC has been public
 since 1999 (current revision 1.7.1, 2018). Vendor tools such as Vector CANape and
 vCDM *consume* A2L and CDFX; they do not own them, and this project is written
@@ -246,6 +253,14 @@ whose stated policy is that it may only ever read from `examples/`.
 
 **No employer, customer or otherwise proprietary artefact appears anywhere in
 this repository**, and none was used to build it.
+
+One clarification, since the wording invites misreading: the batch records under
+`.dev-flow/` repeatedly discuss keeping "client artefacts" and "operator
+firmware" out of the repository. That language is **preventive, not
+confessional** — it states what a *user* of this tool must never commit, and
+documents the controls that enforce it, such as the rule that snapshot baselines
+may render only from the public synthetic fixtures. It is not a record of
+proprietary data having been used here.
 
 ---
 
