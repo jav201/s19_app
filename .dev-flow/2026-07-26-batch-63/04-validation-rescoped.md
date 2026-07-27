@@ -44,9 +44,14 @@ Every AT is exactly ONE on-disk node (C-18). No AT is satisfied "in parts".
 ## 2b. Traceability: LLR → AT → TC → node (closes PR-gate M-1)
 
 `01b-qa-catalog-rescoped.md` is **superseded**, and its §4 semantics for `TC-467..479` are
-**retired** — three of those ids were bound there to different observables than the shipped nodes
-carry (catalog `TC-473` = the derived census, `TC-475` = report-writer output). A range reservation
-is not a catalog, so the shipped per-id semantics are defined here and nowhere else:
+**retired**. Measured at the PR delta gate, the divergence is total, not partial: **every id in
+`TC-470..479` carries a different observable in the superseded catalog** (e.g. catalog `TC-472` =
+batch-composability vs shipped = flow-writer mutation; catalog `TC-476` = `st_size == budget.used-1`
+vs shipped = the census; catalog `TC-478` = golden neutrality vs shipped = `AT-175`), and
+`TC-467..469` have **no shipped node at all**. An earlier draft of this sentence said "three of those
+ids", which understated it by 3.3× and would have invited a reader to trust the catalog for the seven
+it did not name. A range reservation is not a catalog, so the shipped per-id semantics are defined
+here and nowhere else:
 
 | LLR | AT | TC | on-disk node |
 |---|---|---|---|

@@ -4848,7 +4848,10 @@ emission there, not merely a cap.
   changes the project report's bytes on disk · **AT-174** the `+1`-per-line PIN and its
   partition-invariance PIN, both independently load-bearing since `+1`→`+2` is itself
   partition-invariant · **AT-193** the structural census, whose module set is derived by
-  import-graph walk and asserted non-empty · **AT-175** no `\r`, Windows-only) ·
+  import-graph walk and asserted non-empty, with **AT-193b** as its positive control — the census
+  asserts an ABSENCE, so on a fixed tree it passes whether or not its detector works, and AT-193b
+  drives every offending spelling (including `Path.open("w")`, this repo's house idiom) plus the
+  byte-mode negative controls · **AT-175** no `\r`, Windows-only) ·
   `tests/test_flow_report_service.py` (**AT-173** the same seam for `write_flow_report`, patching
   `flow_report_service.document_bytes` because that module binds the name with `from … import`).
 - **`AT-175` is explicitly NOT verified by the merge gate.** `tui-ci` and `snapshot-regen` both run
@@ -4861,7 +4864,7 @@ emission there, not merely a cap.
   diff = 0; goldens measured neutral over the whole suite, not assumed. **Scope carried, not
   closed:** batch-63 shipped D3 only. D1 (the declared-region addendum's `O(R×V×E)` resident cost)
   and D2 (a schema-legal address denying the report at the decimal `Length` column,
-  `report_service.py:996` and `:1171` — **line numbers as of `031ca8d`**; this batch added +44 lines
+  `report_service.py:996` and `:1171` — **line numbers as of `031ca8d`**; this batch added +47 lines (`git diff --numstat 031ca8d`: 49 insertions, 2 deletions)
   to that module, so re-derive rather than copy them) were returned to `.dev-flow/BACKLOG.md` at the
   Phase-2 re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
   `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is

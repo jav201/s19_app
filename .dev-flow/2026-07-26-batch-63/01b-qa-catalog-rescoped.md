@@ -1,3 +1,9 @@
+> **SUPERSEDED.** The normative spec is `01-requirements-rescoped-consolidated.md`
+> (revision 4, D3-ONLY). This artifact's SS4 `TC-467..479` semantics are **RETIRED**:
+> every id in `TC-470..479` binds a different observable here than the shipped nodes
+> carry, and `TC-467..469` have no shipped node at all. The live per-id table is
+> `04-validation-rescoped.md` SS2b. Retained for traceability, not for reference.
+
 # batch-63 (RE-SCOPED) — Phase-1 QA catalog: validation strategy + AT/TC registry
 
 **Base:** `claude/batch-63-report-table-caps` @ `031ca8d` == `origin/main` (RC-1 verified).

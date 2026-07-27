@@ -53,16 +53,21 @@ def _accounting_modules() -> list[Path]:
     """Return every service module that shares ``report_service``'s byte accounting.
 
     Summary:
-        Walk the service package's import graph and select the modules that bind
-        ``_ByteBudget`` or ``_line_bytes`` from ``report_service``, plus
-        ``report_service`` itself (it defines them).
+        Walk the service package **recursively** and select the modules that bind
+        ``_ByteBudget`` or ``_line_bytes`` from ``report_service`` in either the
+        relative or the absolute import spelling, plus ``report_service`` itself
+        (it defines them).
 
     Returns:
         list[Path]: The derived module set, sorted by name.
 
     Data Flow:
-        - ``s19_app/tui/services/*.py`` -> AST -> ``ImportFrom`` nodes naming the
-          accounting symbols -> the module set the census asserts over.
+        - ``s19_app/tui/services/**/*.py`` -> AST -> ``ImportFrom`` nodes naming
+          the accounting symbols -> the module set the census asserts over.
+        - Known residual, carried rather than claimed closed: a module binding
+          the accounting through plain ``import … as rs`` or
+          ``from . import report_service`` has no ``ImportFrom`` naming the
+          symbols and stays invisible here. No such module exists today.
 
     Dependencies:
         Used by:
@@ -122,21 +127,39 @@ def _text_mode_writes(path: Path) -> list[int]:
         if isinstance(func, ast.Attribute) and func.attr == "write_text":
             hits.append(node.lineno)
             continue
-        # open(...) / io.open(...) / codecs.open(...) in a writing text mode.
+        # open-family calls. PROVE-SAFE-OR-FLAG: a module that shares the byte
+        # accounting has no business opening a file whose mode this census
+        # cannot resolve, so anything not provably binary or read-only is an
+        # offender. Failing closed is what keeps the census honest — the earlier
+        # version read the mode from args[1] only, which is correct for
+        # `open(p, "w")` and `io.open(p, "wt")` but WRONG for `Path.open("w")`,
+        # where the mode is args[0]. That is this repo's own house idiom
+        # (`cli.py:91`, `app.py:1560`), so the narrow form missed the very
+        # spelling a future author is most likely to use.
         name = (
             func.attr if isinstance(func, ast.Attribute)
             else func.id if isinstance(func, ast.Name)
             else None
         )
-        if name != "open":
+        if name not in {"open", "fdopen", "NamedTemporaryFile", "TemporaryFile"}:
             continue
-        mode = None
-        if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant):
-            mode = node.args[1].value
-        for kw in node.keywords:
-            if kw.arg == "mode" and isinstance(kw.value, ast.Constant):
-                mode = kw.value.value
-        if isinstance(mode, str) and "b" not in mode and any(c in mode for c in "wax+"):
+
+        slots: list[ast.expr] = []
+        if isinstance(func, ast.Attribute) and node.args:
+            slots.append(node.args[0])          # Path.open(mode, …)
+        if len(node.args) >= 2:
+            slots.append(node.args[1])          # open(path, mode) / io.open(…)
+        slots += [kw.value for kw in node.keywords if kw.arg == "mode"]
+
+        if not slots:
+            continue                            # no mode given -> defaults to "r"
+
+        modes = [s.value for s in slots if isinstance(s, ast.Constant) and isinstance(s.value, str)]
+        proven_safe = any(
+            "b" in m or not any(c in m for c in "wax+")
+            for m in modes
+        )
+        if not proven_safe:
             hits.append(node.lineno)
     return hits
 
@@ -288,18 +311,32 @@ def test_at193b_the_text_mode_detector_can_actually_fire() -> None:
     """
     import tempfile
 
+    # Shaped to the RULE ("shall not encode or newline-translate on its own"),
+    # not to the detector. The first version of this list was shaped to the
+    # detector and therefore certified a completeness the detector did not have:
+    # it omitted `p.open("w")`, which is this repo's own house idiom for text
+    # writes and which the detector could not see.
     offending = (
         'p.write_text("x")',
         'open(p, "w")',
+        'p.open("w")',                  # pathlib positional — the house idiom
+        'p.open(mode="w")',
         'io.open(p, "wt")',
         'codecs.open(p, mode="a")',
         'open(p, "x")',
+        'os.fdopen(fd, "w")',
+        'm = "w"; open(p, m)',          # computed mode -> unresolvable -> flagged
+        'open(p, "w" + "")',
+        'tempfile.NamedTemporaryFile("w")',
     )
     clean = (
         'p.write_bytes(b"x")',
         'open(p, "wb")',
+        'p.open("wb")',
         'io.open(p, "rb")',
         'open(p, "r")',
+        'p.open()',                     # defaults to "r"
+        'open(p)',
     )
 
     with tempfile.TemporaryDirectory() as tmp:
