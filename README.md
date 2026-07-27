@@ -144,16 +144,22 @@ The TUI keeps its own on-disk area next to where you launched it:
 
 ---
 
-## The CLI
+## The CLI — deprecated
 
-The command-line interface is **not installed as a console script** — run it as
-a module:
+> **This is not the interface to build on. `s19tui` is.**
+> The CLI is **slated for removal** and is already half-gone: its console script was
+> deleted from `pyproject.toml`, so there is no `s19tool` command. What remains runs only
+> as a module. It is documented here so that anyone who finds a reference to it knows
+> what it is and what replaced it — not as a supported surface.
 
 ```bash
 python -m s19_app.cli <subcommand> <file>
 ```
 
-The subcommand comes *before* the file path.
+The subcommand comes *before* the file path — the reverse of what older docs show.
+
+<details>
+<summary>Remaining subcommands, for reference</summary>
 
 ```bash
 # General info
@@ -193,6 +199,10 @@ python -m s19_app.cli version
 Full subcommand list: `info`, `layout`, `ranges`, `gaps`, `version`, `verify`,
 `update-checksums`, `dump`, `dump-by-range`, `dump-all`, `patch-str`,
 `patch-hex`, `save`.
+
+</details>
+
+Every one of these has an equivalent in the TUI, which is where the work has gone.
 
 ---
 
@@ -250,18 +260,21 @@ full suite on pushes to `main` / `main-tui`, on Python 3.11.
 Things you will hit if you follow this README, stated plainly rather than
 papered over:
 
-- **No `s19tool` console script.** `pyproject.toml` registers only `s19tui`
-  (deliberately — commit `3a55416`). Use `python -m s19_app.cli` for the CLI.
-- **`verify` crashes on a non-UTF-8 console when it has failures to print.**
-  `cli.py` writes a `❌` and Windows `cp1252` consoles raise
-  `UnicodeEncodeError`. Workaround: `PYTHONIOENCODING=utf-8`. It is fine when
-  the file is clean, and fine everywhere on UTF-8 terminals.
-- **`dump` at an unmapped address prints blank rows** instead of saying nothing
-  is mapped there. Check `ranges` first.
-- **`dump-by-range --output` writes ANSI colour escapes into the file.** Fine on
-  a terminal (`cat`), noisy in an editor.
 - `project.toml` at the repo root is a pre-PEP-621 leftover. The build reads
   `pyproject.toml` only.
+
+**On the deprecated CLI**, kept here for anyone who still runs it. These are not
+TUI defects and are not being fixed — the surface is going away:
+
+- **No `s19tool` console script.** `pyproject.toml` registers only `s19tui`
+  (deliberately — commit `3a55416`). Use `python -m s19_app.cli`.
+- **`verify` crashes on a non-UTF-8 console when it has failures to print.**
+  `cli.py` writes a `❌` and Windows `cp1252` consoles raise
+  `UnicodeEncodeError` — so it fails exactly when it has something to tell you.
+  Workaround: `PYTHONIOENCODING=utf-8`.
+- **`dump` at an unmapped address prints blank rows** instead of saying nothing
+  is mapped there. Check `ranges` first.
+- **`dump-by-range --output` writes ANSI colour escapes into the file.**
 
 ---
 
