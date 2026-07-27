@@ -1,5 +1,21 @@
-# Requirements Document — s19_app — Batch 64 — **REVISION 2**
+# Requirements Document — s19_app — Batch 64 — **REVISION 3**
 
+> **Revision 3 — 2026-07-27, `iterate-to-refine` iteration 2.** Discharges the Phase-2 **RE-GATE**:
+> security **OK to ship, unconditional** (6/6 CLOSED, 5 LOW/nit folded here); qa **9/9 CLOSED** + 4 new
+> majors + 5 new minors; architect **9 CLOSED / 3 PARTIAL** + 1 new blocker + 4 new minors.
+> **Zero design objections from any lane across two gates.** Everything folded below is confined to
+> **§11 / §11.1 (the execution plan)** and to the **instrumentation** of two new nodes; nothing
+> re-derives a measurement and no requirement Statement changed.
+> **The blocker was `ARCH-N-1` = `QA-NEW-1` — the same finding from two lanes: §11.1's per-node
+> expected-verdict table asserted RED at Inc-1 for 8 of 28 nodes that are GREEN on `082ada9`.**
+> Revision 2 built that table to discharge `ARCH-B-3` and applied the mechanism only to the two nodes
+> the reviewer had named, so the defect survived inside its own fix. **Revision 3 re-derives the Inc-1
+> verdict for EVERY node by execution against the shipped producer** — the transcript is pasted in
+> §11.1 — and states the *rule* by which each verdict follows. §17.6 is the re-gate disposition table;
+> §9b gains **A-28 … A-40**. **This lane also found one defect neither re-gate lane raised**
+> (§11.1 note 3: the `≥ 50 %` RED-margin rule kills `TC-483`, the one genuinely-correct RED in the
+> `K-1/K/K+1` family, because a boundary node's RED is `threshold + 1` **by construction** — executed).
+>
 > **Revision 2 — 2026-07-27, `iterate-to-refine` iteration 1.** Discharges all **27** Phase-2 findings
 > (security S1–S6, qa B-1/M-1–M-4/m-1–m-4, architect B-1–B-3/M-1–M-6/m-1–m-3). **§17 is the
 > one-row-per-finding disposition table** — **25 `FOLDED`, 2 `FOLDED (narrowed)`, 0 findings rejected
@@ -61,7 +77,7 @@ requirement narrows what it claims in four places rather than over-promising.**
    ```
 
    `500 → 128000 @ R = 256` reproduces §7 T-2's *RED* figures on the work axis. Corroborated by the
-   security lane on its own fixture: **153 600 comparisons for 300 candidates at `R = 512`**, **19 200 at
+   security lane on its own fixture: **153600 comparisons for 300 candidates at `R = 512`**, **19200 at
    `R = 64`**. **Three folds, all landed:** `R-TUI-098` and `HLR-103` now claim **candidate consumption**
    independence, never total-work independence; **non-claim (e)** carries the residual with its numbers;
    and **`TC-498`** is a new region-comparison counter pinned to the `huge+tiny` geometry, so the oracle
@@ -107,6 +123,18 @@ requirement narrows what it claims in four places rather than over-promising.**
    (`notices=[]`), because it stops iterating before it reaches `v2` and `v3`. The incompatibility is
    *"cannot detect that anything was cut"*, not merely *"cannot count it"* — total, not partial.
 
+10. **(NEW in revision 3) The design survived two gates with zero objections; the execution PLAN did
+    not, twice, and for the same reason.** Revision 2's §11.1 verdict table was built to discharge
+    `ARCH-B-3` — *"`AT-196` is GREEN by construction, so 'every AT fails' is unsatisfiable"* — and it
+    applied that analysis **only to the two nodes the reviewer had named**. Executed against the shipped
+    producer, **8 of 28 rows were wrong** and Inc-1's gate was unsatisfiable for exactly the reason
+    revision 1's was. Revision 3 derives all 28 verdicts by execution and pastes the transcript (§11.1).
+    **The general lesson, and the one this batch should carry to its postmortem: a fold that fixes the
+    reviewer's EXAMPLES rather than the reviewer's CLASS re-plants the defect inside its own fix** —
+    which is the *"partially closed"* pattern batch-63 paid for, caught here at Phase 2 rather than at
+    Phase 3. The second-order form is worse: the artefact that *documents* the fix is the one that
+    carries the defect forward, because it now reads as evidence.
+
 ---
 
 ## 1. Introduction
@@ -141,7 +169,7 @@ registry. The `M-2` truncation-marker claim.
 | candidate | one leaf element examined for region membership. |
 | admitted / cut | a candidate whose formatted line is stored / dropped by the per-class cap. |
 | **candidate consumption** | the number of leaf elements pulled from the leaf sequences by ONE call. Measured by the injected counting iterable. The quantity `TC-488` / `TC-489` assert. |
-| **region ops (`A`)** | the number of `(candidate, declared-region)` comparisons performed by the attribution walk of `LLR-103.2`, summed over the call. `A` is **not** bounded by candidate consumption: it is `O(R)` per surviving candidate in the worst case (§10.7). The quantity `TC-498` asserts. **NEW in revision 2** — revision 1 had no term for it, which is why it had no oracle for it. |
+| **region ops (`A`)** | **PINNED in revision 3** (`ARCH-N-2` / `QA-NEW-2`): the number of **`ends[i] >= addr` comparisons** performed by the downward attribution walk of `LLR-103.2`, summed over the call. **Excluded, by definition:** the `pmax[i] >= addr` loop guard, the attribution `bisect_right(starts, addr)`, and the coalesced-cover reject pre-filter's own bisect. `A` is **not** bounded by candidate consumption: it is `O(R)` per surviving candidate in the worst case (§10.7). The quantity `TC-498` asserts. **NEW in revision 2** — revision 1 had no term for it, which is why it had no oracle for it; **revision 2 had the term but not the counting convention**, and three defensible conventions give three different numbers (§7 T-9). |
 | **AT** | Layer-B black-box acceptance test: drives `generate_project_report` and **reads the written report file** (or the `ReportViewerScreen` seam that renders it). An observable that can only be seen through an injected instrument is **not** an `AT` — it is a `TC` (qa M-3; `01b-qa-catalog.md:748`). |
 | **TC** | Layer-A white-box functional test against the HLR/LLR mechanism, including every mechanism-only observable (candidate consumption, region ops, direct `_addendum_lines` peak). |
 
@@ -165,12 +193,15 @@ with a first-class Acceptance block per story. §4 is `LLR-103.1…103.6`. **§5
 table plus the id ledger — the Phase-1 P-7 artefact.** §6 is dual traceability + the pre-fix
 executability ledger. §7 is the threshold register with every RED/GREEN and its provenance (T-1…T-9).
 §8 is the notice specification and its priced alternatives. §9 is the Phase-1 amendment log (A-1…A-9);
-**§9b is the revision-2 amendment log (A-10…A-27)**. §10 is residuals with numbers (§10.1…§10.10).
-§11 is the increment cut **plus §11.1's per-node expected-verdict table**. §12 is the
+**§9b is the revision-2 amendment log (A-10…A-27)**; **§9c is the revision-3 RE-GATE amendment log
+(A-28…A-40)**. §10 is residuals with numbers (§10.1…§10.10).
+§11 is the increment cut **plus §11.1's per-node expected-verdict table — re-derived by execution in
+revision 3, with its transcript and four notes**. §12 is the
 unresolved-contradiction register (X-1…X-9). §13 is the evidence checklist. §14 is the diagram, §15 what
-would change the recommendation, §16 the reconciliation log, and **§17 is the 27-row Phase-2 finding
-disposition table — the revision-2 P-7 artefact, including the one REJECTED item and the three review
-claims this lane found mechanically wrong.**
+would change the recommendation, §16 the reconciliation log (three events), and **§17 is the 27-row
+Phase-2 finding disposition table — the revision-2 P-7 artefact, including the one REJECTED item and the
+three review claims this lane found mechanically wrong — extended by §17.6's 15-row Phase-2 RE-GATE
+disposition and §17.7's "checked and could not fault" record (the revision-3 P-7 artefact).**
 
 ---
 
@@ -358,8 +389,8 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
 > lies inside an enclosing declared region costs `O(R)` in the worst case. Executed on the `huge+tiny`
 > geometry (one enclosing region + `R−1` narrow ones): **region ops `500 / 4000 / 32000 / 128000` at
 > `R = 1 / 8 / 64 / 256` for 500 candidates producing ONE hit** (architect Phase-2 §3), and
-> **153 600 region ops for 300 candidates at `R = 512`**, **19 200 at `R = 64`** (security Phase-2 §2).
-> `19 200` is bit-for-bit the figure §7 T-2 records as the defect being removed on the *candidate* axis.
+> **153600 region ops for 300 candidates at `R = 512`**, **19200 at `R = 64`** (security Phase-2 §2).
+> `19200` is bit-for-bit the figure §7 T-2 records as the defect being removed on the *candidate* axis.
 > The residual is §10.7; the oracle that can falsify it is `TC-498`;
 > **(f) — NEW in revision 2 — it does *not* claim the notice names ALL affected variants.** Above
 > `ADDENDUM_NOTICE_VARIANTS_MAX = 8` the notice states **how many** were not named but not **which**.
@@ -413,11 +444,17 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
     reproduction target, §7 T-1);
   - candidate consumption `consumed == N` at `R ∈ {1, 8, 64}` in **both** geometries (RED
     `300/2400/19200`, GREEN `300/300/300` — §7 T-2);
-  - **region ops `A ≤ c × (N + total_hits)`** at `R ∈ {1, 8, 64, 256}` under `huge+tiny` geometry —
-    **NEW in revision 2**, §7 T-9, `TC-498`. This arm is **expected RED against the adopted prefix-max
-    array** and is therefore specified as a **disclosure counter with a recorded value**, not a pass/fail
-    gate: see §7 T-9 for the exact form, which asserts the *measured* `A` equals the value §10.7
-    discloses. A gate that cannot pass is the same defect class as one that cannot fail;
+  - **region ops `A == R × N`** at `R ∈ {1, 8, 64, 256}` under `huge+tiny` geometry, with `A` as defined
+    at §1.3 (`ends[i] >= addr` comparisons only) — **NEW in revision 2**, §7 T-9, `TC-498`. This is a
+    **disclosure counter with a recorded value**, not a pass/fail bound: it asserts the *measured* `A`
+    equals the value §10.7 discloses, so the residual cannot go stale silently in either direction.
+    **The bound form `A ≤ c × (N + total_hits)` was CONSIDERED AND REJECTED** — under `huge+tiny` the
+    output is `R`-independent, so `N + total_hits` is fixed while `A = R × N` grows without bound in `R`
+    and no constant `c` exists. A gate that cannot pass is the same defect class as one that cannot
+    fail. *(**Bullet re-ordered in revision 3, `SEC-N2` / `ARCH-N-3`:** revision 2 opened this bullet in
+    bold with the `c`-bound — the form the system is designed to fail — and only then disclaimed it, so
+    a Phase-3 implementer skimming the "Numeric pass threshold" list, or a transcriber copying `HLR-103`
+    into `REQUIREMENTS.md`, would write the failing assertion.)*;
   - byte identity **0 differing bytes**, 5/5 fixture shapes + the hostile golden (§7 T-4);
   - **0** regressions across the union regression set (§6.3).
 - **Priority:** high
@@ -504,10 +541,40 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
   ^> TRUNCATED: (?:modification|change-file issue|check-file issue) hits in this region were capped at
   ```
 
-  **between the `## Addendum: declared regions` heading and the next `^## ` heading**, with the class
-  alternation built from `ADDENDUM_CLASS_LABELS` and the prefix from `ADDENDUM_TRUNCATION_NOTICE_FMT` —
-  never from a literal. `TC-499` is the positive control: a fixture that fires `:1134` while **no**
-  addendum cap fires must read **0** addendum notices.
+  **between the `## Addendum: declared regions` heading and the next `^## ` heading _or END-OF-FILE,
+  whichever comes first_**, with the class alternation built from `ADDENDUM_CLASS_LABELS` and the prefix
+  from `ADDENDUM_TRUNCATION_NOTICE_FMT` — never from a literal. `TC-499` is the positive control: a
+  fixture that fires `:1134` while **no** addendum cap fires must read **0** addendum notices.
+- **The `or EOF` arm is LOAD-BEARING, and an EMPTY SCOPE MUST FAIL THE TEST (NEW in revision 3,
+  `QA-NEW-3` major).** Revision 2's fold defined the scope as *"…and the next `^## `"* with no EOF arm.
+  **Executed on a real report from `generate_project_report`:**
+
+  ```
+  '## ' headings, in order:
+      ## Variant inventory
+      ## Consolidated overview
+      ## Legend
+      ## Variant: a
+      ## Addendum: declared regions
+  addendum is heading #5 of 5
+  next '^## ' after it: NONE - EOF        bytes after the addendum heading: 103
+
+  literal 'heading .. next ^## ':   scope found? False -> NO SCOPE -> reads 0 addendum notices, ALWAYS
+  'heading .. next ^## OR EOF':     scope found? True  -> 5 lines
+  ```
+
+  **The addendum is the LAST `## ` section.** `## Truncation appendix` is the only section emitted after
+  it, and only when `notes` is non-empty — and `notes` is populated **exclusively** by
+  `_hexdump_section`, which no notice fixture in §7 T-5 drives. A literal implementation of revision 2's
+  predicate therefore finds **no scope at all** and reads **0 addendum notices on every report**, making
+  `AT-197`, `AT-198`, `AT-199`, `AT-201`, `AT-202`, `AT-203` **and `TC-499`** vacuously "0 notices" —
+  GREEN on `AT-198`'s absence arms and RED on everything else, regardless of what the producer does.
+  **This is a defect revision 2's own S3 fold planted:** revision 1's report-wide count had the security
+  defect S3 named, but it did not have this one.
+  **Both clauses are mandatory:** (i) *"…or end-of-file, whichever comes first"*; and (ii) the Inc-1
+  harness's scope-extraction helper **shall raise / fail the test when the scope is empty or the heading
+  is absent** — it must never return an empty scope that then reads as zero notices. A predicate that
+  cannot distinguish *"no notice"* from *"no scope"* is not an oracle.
 - **Acceptance test(s):** **`AT-197`** (the evicted-evidence notice: class · count · **exact** variant
   set), **`AT-198`** (presence/absence: class total `≤ K` → no addendum notice anywhere; `K+1` → exactly
   one), **`AT-199`** (escaping + notice-forgery negative), **`AT-200`** (the notice reaches the written
@@ -589,7 +656,43 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
 - **Validation:** `test (unit)`
 - **Executed verification:** `pytest tests/test_report_addendum_bound.py -k "tc488 or tc489 or tc498"` — a
   re-iterable `list` subclass counting `__iter__` yields is substituted for each leaf sequence; `TC-498`
-  additionally counts region comparisons at the attribution call.
+  additionally counts region ops `A` through the named seam below.
+- **`A`'s instrument is a NAMED TEST SEAM, and `A` counts exactly one thing (NEW in revision 3 —
+  `ARCH-N-2` blocking-major + `QA-NEW-2`).** Revision 2 said only *"counts region comparisons at the
+  attribution call"*, which named neither the seam nor the convention. Both are pinned here, because an
+  exact-equality gate on an unpinned counter is satisfied by tuning the counter until it prints
+  `R × N` — the `ARCH-M-4` defect class, re-created on the new oracle.
+  - **The counted quantity.** One region op = **one `ends[i] >= addr` comparison** in the downward walk.
+    The `pmax[i] >= addr` loop guard, the attribution `bisect_right(starts, addr)`, and the coalesced-cover
+    reject pre-filter's bisect are **excluded**. Executed, `LLR-103.2` implemented verbatim, `huge+tiny`,
+    `N = 500`:
+
+    ```
+        R   A(ends only)   A(+pmax guard)   A(+both bisects)    R x N   which satisfies A == R x N
+        1            500             1000               2000      500   ends-only
+        8           4000             8000              10500     4000   ends-only
+       64          32000            64000              68000    32000   ends-only
+      256         128000           256000             261000   128000   ends-only
+    ```
+
+    **Only the `ends`-comparison convention satisfies the equality**, and it is also the only one that is
+    **invariant under the reversible design note below**, which authorises Phase 3 to drop the reject
+    pre-filter. Executed at `R = 256`: ends-only reads `128000` with the reject and `128000` without it;
+    the `+bisect` convention reads `261000` with and `260500` without. **A counter whose value moves with
+    a spec-sanctioned implementation choice cannot carry an exact-equality gate.**
+  - **The seam.** `_addendum_lines` shall expose its per-call region-op count through **one named,
+    test-only seam** — either a module-level `report_service._LAST_ADDENDUM_REGION_OPS: int` reset at
+    entry and written at exit, or an optional keyword-only `_ops_counter: Optional[Callable[[], None]]`
+    invoked once per counted comparison. Phase 3 picks one and records which in the docstring; **the
+    spec's obligation is that a seam exists and is named, exactly as `TC-488`'s counting sequence is.**
+    The seam does **not** exist on `082ada9`, which is why `TC-498` is `NOT EXECUTABLE PRE-FIX` (§6.2,
+    §11.1) rather than expected-RED.
+  - **The fixture precondition the equality rests on.** `A == R × N` is a law only when **every declared
+    region's `start` lies below the probe address**, so the downward walk visits all `R` entries. Executed:
+    under `huge+tiny` at `R = 256`, 256 of 256 region starts are below `0x5000`; under a counter-fixture
+    with 255 regions declared *above* the probe address the walk starts at `i = 0`, visits **1** of 256
+    entries and `A` reads `500`, not `128000`. **Without the precondition stated, `A == R × N` is fixture
+    luck, not a law**, and the test would be pinning an accident.
 - **Numeric pass threshold:** `consumed == N` for `R ∈ {1, 8, 64}` where `N` is computed by the test
   from its own fixture, **in both geometries**. Executed RED (architect Phase-1 §7.4): `300 / 2400 /
   19200` at `N = 300`. Executed GREEN on the prototype: `300 / 300 / 300`. Corroborated (qa Phase-1 §5.6,
@@ -663,7 +766,7 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
   `- issue [S1I] @ 0x1800 (variant v0)` and `- issue [S3I] @ 0x2000 (variant v1)`, and adds nothing
   (qa §5.3) — **2 hits lost, 0 gained**.
 - **Acceptance criteria (informative):**
-  - **`range_index.py` is engine-frozen (`tests/test_engine_unchanged.py:122`) and is NOT modified.**
+  - **`range_index.py` is engine-frozen (`tests/test_engine_unchanged.py:123`) and is NOT modified.**
     Consuming it is permitted; `report_service.py` imports it **0** times today (architect §7.1.7) —
     this is a `NEW` import. The coalescing helper lives in `report_service.py`, **never** in
     `range_index.py` (qa §6).
@@ -854,6 +957,12 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
   rendering, byte for byte** — hostile ids escape in both, benign ids escape in both, and neither is
   privileged. `TC-495` asserts that equality over an id set spanning `[A-Za-z0-9-]`, `_`, `.`, and the
   full hostile string `*_[x](http://e.example)~~z~~`.
+  **`TC-495` is one third of the escaping story, and revision 3 says so in one clause** (qa re-gate §8,
+  raised as an observation rather than a finding). The equality *notice-rendering == hit-line-rendering*
+  is also satisfied by an implementation that escapes **neither** side. What forbids that is the
+  **pair**: `AT-199` (a hostile id cannot forge a notice line — independently re-executed and cleared by
+  the security lane) plus `AT-196`'s byte identity, which pins the **hit-line** side to the shipped
+  escaped form. **`TC-495` + `AT-199` + `AT-196` is sufficient; `TC-495` alone is not.**
   **Provenance correction:** revision 1 attributed the "0 escape artefacts" threshold to
   *"qa §5.14 negative direction"*. `01b-qa-catalog.md:496-497` states the negative direction as a
   **requirement** and gives no transcript; its only `Executed:` line points at §3.4, the **hostile**
@@ -871,12 +980,52 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
     `ADDENDUM_NOTICE_VARIANTS_MAX` it states how many variants were unnamed, not which (§10.9); and it
     does **not** name the **severity** of what was dropped (§10.4, §8.2 — priced and rejected in writing,
     §12 X-8).
-  - **The notice must reach the file.** A notice produced by `_addendum_lines` but dropped by the
-    `emit()` byte-budget path in `generate_project_report` (`:1720`) would be invisible to every
-    white-box arm above — **`AT-200`** closes that (qa §5.15, C-31). *(Revision 1 carried this as
-    `TC-496`; revision 2 promotes it to a Layer-B `AT` because it is genuinely observed through the
-    written file and the `ReportViewerScreen` seam, and it is the **only** node that closes the
-    `emit()` hole for US-B64-2 — qa M-3.)*
+  - **The notice must reach the file — RATIONALE CORRECTED in revision 3 (`QA-NEW-6`).**
+    **`AT-200`** is retained and its *direction* is right, but the mechanism revision 2 stated is
+    **executed-false**, and the qa lane flagged it as **its own `QA-M-3` claim copied verbatim into the
+    spec** — an inherited claim presented as an executed one, which is exactly what the C-39 preamble
+    forbids and what §17.5 exists to catch. Executed on `082ada9`:
+
+    ```
+    def emit(batch: Sequence[str]) -> None:
+        lines.extend(batch)
+        budget.consume(_line_bytes(batch))
+
+    'fits' referenced inside emit()?                      False
+    budget.fits( call sites in generate_project_report:   NONE
+    emit is a closure local to generate_project_report:   True
+    ```
+
+    `emit()` **unconditionally** extends `lines` and merely *accounts* bytes; the only `budget.fits`
+    gate in the module is inside `_hexdump_section`. So there is **no `emit()` byte-budget hole to
+    close**, and the RED arm revision 2 stated (*"an `emit()` path that drops it"*) is **not
+    constructible from a test** without editing production code, because `emit` is a closure.
+    **The corrected justification:** `AT-200` is the **only Layer-B node that observes the notice
+    through the written file *and* the `ReportViewerScreen` seam** — i.e. the only node that certifies
+    US-B64-2's *delivery* rather than its *production*. It also **guards a hole the batch-63
+    `_ByteBudget` carry would open** if a future batch adds a `budget.fits` gate to `emit()` — which is
+    honest and forward-looking rather than a claim about today's code.
+    **Its falsifiability is carried by RED→GREEN across the Inc-1/Inc-2 boundary** (pre-fix: no notice
+    exists at all), **not by a mutant arm** — §11.1's row says so. *(Revision 1 carried this as
+    `TC-496`; revision 2 promoted it to a Layer-B `AT`, correctly, on the Layer-B grounds above — qa
+    M-3.)*
+  - **A sub-section split must key on the `md_safe`-ESCAPED region name (NEW in revision 3,
+    `QA-NEW-7`).** `AT-203` (and any node that reads *"inside region X's `### ` sub-section"*) splits the
+    addendum on a `### ` heading — and `_addendum_lines` renders that heading through
+    `md_safe(region.name, limit=DECLARED_REGION_NAME_MAX)`. Executed:
+
+    ```
+    DeclaredRegion(name='B_quiet') renders '### B\_quiet (0x1000-0x1FFF)'   split on '### B_quiet ' finds it? False
+    DeclaredRegion(name='A_flood') renders '### A\_flood (0x1000-0x1FFF)'   split on '### A_flood ' finds it? False
+    DeclaredRegion(name='Bquiet')  renders '### Bquiet (0x1000-0x1FFF)'     split on '### Bquiet '  finds it? True
+    DeclaredRegion(name='cal zone')renders '### cal zone (0x1000-0x1FFF)'   split on '### cal zone 'finds it? True
+    ```
+
+    A test that splits on the **raw** name finds no sub-section, and the *"absent from every other
+    region's sub-section"* half then passes **vacuously**. **Required, either form:** the fixture's
+    region names are drawn from `[A-Za-z0-9 ]` so the split is unambiguous, **or** the test derives the
+    heading through `md_safe`. **And in both cases the test shall assert both sub-sections were FOUND
+    before asserting anything about their contents.**
   - **The escaping expression is PINNED, and it is deliberately the one already censused (NEW in
     revision 2, architect B-2 + this lane's correction).** The variant identifiers recorded for the
     notice shall be escaped by `md_safe(result.variant_id, limit=REPORT_CELL_CHARS)` **at the recording
@@ -959,7 +1108,7 @@ Where a row folds a second lane's phrasing, the fold is stated in the row.
 | 12 | `OBS-notice-names-cut-variants` | **`AT-197`** (facet 2 — now **set EQUALITY**) · **`AT-202`** (**NEW** — the variant-axis P-6 control) | **Revision 2 is a repair of revision 1's weakening.** Revision 1 stated the facet as `{variants} ⊇ {cut}` — a representation check — and demoted the catalog's explicit false-positive boundary (`01b-qa-catalog.md:466-467`, *"a variant that contributed hits and was not cut (must not appear)"*) to prose with **no threshold, no id and no RED arm**. `FIX-H` is GREEN on the entire revision-1 acceptance set while inverting US-B64-2 for the attacker variant. **Now: set equality in `AT-197`, `FIX-H` a named RED arm, and a first-class node `AT-202` for the over-naming direction.** RED arms for the under-naming direction retained: `FIX-F` (names classes only), `SHIP` (dropped-count facet). |
 | 13 | `OBS-notice-absent-for-uncut-class` | **`AT-201`** (**NEW id** — was `AT-198` arm 3) | **The class-axis P-6 positive control.** Split to its own id in revision 2 (qa M-4 / C-18): revision 1's own row argued it is *"distinct from `AT-198` arms 1–2"* and then bound it to the same id, and `FIX-G` is RED on arms 1 and 3 for **two different reasons** (`n=2` vs `named=[…,'modification']`) which one collected node cannot report separately. RED arm `FIX-G`, GREEN on **six of the nine** other observables (qa §5.13) — and **GREEN on `AT-202`**, which is why the class control is not a substitute for the variant control. |
 | 14 | `OBS-notice-escapes-file-derived-text` | **`AT-199`** · **`TC-495`** | Folded with the architect lane's "notice-forgery negative" (`AT-199`): same surface, two directions. `AT-199` = hostile input cannot forge a notice line (architect §7.8: `>` is in `MD_ESCAPE`, `\r\n\t` collapsed — **independently re-executed and cleared with no finding** by the Phase-2 security lane, §5 V2). `TC-495` = **the notice's rendering of a value equals the neighbouring hit line's rendering of the same value**, over `[A-Za-z0-9-]`, `_`, `.` and the full hostile id. **Revision 2 replaces revision 1's "benign → 0 escape artefacts" threshold**, which false-fails a correct implementation on `variant_a` (qa M-1, security §7 non-gating note — **two lanes, same finding**). |
-| 15 | `OBS-notice-reaches-the-file` | **`AT-200`** (**PROMOTED** from `TC-496`) | **Revision 2 promotion (qa M-3).** The catalog classed this black-box through the file **and** the TUI seam (§5.15, §9); revision 1 demoted it to a `TC`, which under §6.3's wording stopped it counting toward US-B64-2's Layer-B obligation — even though it is the **only** node closing the `emit()` byte-budget hole at `:1720` (C-31). Extends `tests/test_tui_report_seam.py` beside the declared-region drive at `:355-372`. **`TC-496` is retired as an id, not reused** (§5.2). |
+| 15 | `OBS-notice-reaches-the-file` | **`AT-200`** (**PROMOTED** from `TC-496`) | **Revision 2 promotion (qa M-3).** The catalog classed this black-box through the file **and** the TUI seam (§5.15, §9); revision 1 demoted it to a `TC`, which under §6.3's wording stopped it counting toward US-B64-2's Layer-B obligation — even though it is the **only** node that observes the notice through the written file **and** the `ReportViewerScreen` seam, i.e. the only node certifying US-B64-2's **delivery** (C-31). Extends `tests/test_tui_report_seam.py` beside the declared-region drive at `:355-372`. **`TC-496` is retired as an id, not reused** (§5.2). **Justification corrected in revision 3 (`QA-NEW-6`, A-34):** revision 2's *"the only node closing the `emit()` byte-budget hole at `:1720`"* is **executed-false** — `emit()` never drops (no `fits` reference, no `budget.fits` call site in `generate_project_report`) and it is a **closure**, so the stated hole does not exist and its RED arm was not constructible. The **direction** (promote to a Layer-B `AT`) is right and is kept; only the mechanism was wrong, and the qa lane recorded that the wrong mechanism was its own `QA-M-3` claim copied verbatim. |
 | 16 | `OBS-residual-stated-with-numbers` | **`TC-497`** (inspection, bound to `R-TUI-098`, **owned by Inc-3 only**) | **Architect lane had no id.** Inspection at the merge gate; §10 supplies the numbers, §3's "does NOT claim" paragraph supplies the non-claim. **Revision 2:** its executable half is the explicit 7-string grep list in `R-TUI-098` (qa m-4), its judgement half is flagged as a judgement with a named reviewer, and it is **owned by Inc-3 alone** (architect M-3 — revision 1 had it created in Inc-1 and passing in Inc-3, which made Inc-2's "Inc-1 tests GREEN" gate unsatisfiable). |
 
 ### 5.2 Explicit retirements
@@ -1038,7 +1187,7 @@ allocations); `grep -rn "AT-19[4-9]\|TC-4[89][0-9]" REQUIREMENTS.md tests/` → 
 | US-B64-2 | the operator can name what was cut: class, count, **exactly** which variants | `generate_project_report` → report file | **AT-197** | notice names class `change-file issue`, dropped **2**, variant set **== {v2, v3}**; RED arms `SHIP` (none), `FIX-C` (`?`), `FIX-F` (no variants), **`FIX-H`** (`['v1','v2','v3']`), `FIX-A2` (none) |
 | US-B64-2 | no notice when nothing was cut; exactly one when something was | `generate_project_report` → report file | **AT-198** | class total `≤ K` → **0** addendum notice lines; `K+1` → **exactly 1**. **Arms 1–2 expected GREEN at Inc-1 by vacuity — see §11** |
 | US-B64-2 | a notice cannot be forged from document-derived text | `generate_project_report` → report file | **AT-199** | 1 notice line, not 2; `md_safe` escapes the injected `>`; `\r\n\t` collapsed. Independently re-executed and **cleared with no finding** by the Phase-2 security lane (§5 V2) |
-| US-B64-2 | the notice survives the byte-budget path and reaches the operator's eyes | `generate_project_report` → report file **and** `ReportViewerScreen` seam | **AT-200** | the notice line is present in the written file **and** in the rendered seam text; RED arm: an `emit()` path that drops it |
+| US-B64-2 | the notice is **delivered** — it reaches both the written file and the screen the operator reads | `generate_project_report` → report file **and** `ReportViewerScreen` seam | **AT-200** | the notice line is present in the written file **and** in the rendered seam text. **RED arm CORRECTED in revision 3 (`QA-NEW-6`): there is none.** Falsifiability is RED→GREEN across the Inc-1/Inc-2 boundary (pre-fix no notice exists). The revision-2 arm *"an `emit()` path that drops it"* is executed-false — `emit` never drops, and it is a closure |
 | US-B64-2 | a class that lost nothing is never named | `generate_project_report` → report file | **AT-201** | named classes == cut classes; RED arm **`FIX-G`** (`named=['change-file issue','modification']`) |
 | US-B64-2 | a variant that lost nothing is never named | `generate_project_report` → report file | **AT-202** | named variants == variants with ≥ 1 dropped hit; RED arm **`FIX-H`** (`['v1','v2','v3']` where `v1` lost nothing). **`FIX-G` is GREEN here** — the class control does not cover it |
 | US-B64-2 | the notice tells the operator WHICH region lost evidence | `generate_project_report` → report file, `R ≥ 2` | **AT-203** | notice inside the flooded region's `### ` sub-section, absent from every other; RED arm **`FIX-I`** (`under flooded region? False · under quiet region? True`) |
@@ -1071,11 +1220,19 @@ the ones that cannot are named here rather than covered by a blanket ✓ in §13
 
 | node | pre-fix status | why |
 |---|---|---|
-| `TC-490`, `TC-492`, `TC-495` (equality half) | **NOT EXECUTABLE PRE-FIX** | subject is a constant or a notice that does not exist on `082ada9`; authored `xfail(strict=True)` at Inc-1, first real verdict at Inc-2 |
+| `TC-490`, `TC-492`, `TC-495` (equality half), **`TC-498`** | **NOT EXECUTABLE PRE-FIX** | subject is a constant, a notice, or an attribution walk that does not exist on `082ada9`; authored `xfail(strict=True)` at Inc-1, first real verdict at Inc-2. **`TC-498` added in revision 3** (`ARCH-N-1(b)` / `QA-NEW-2`): its instrument lives inside the walk, and under the only *available* pre-fix seam the shipped producer is GREEN — see §7 T-9 |
 | `AT-196`, `TC-491` | **expected GREEN at Inc-1** | byte identity against a golden captured from the code under test — GREEN by construction (architect B-3) |
 | `AT-198` arms 1–2 | **expected GREEN at Inc-1 by vacuity** | they assert *absence* of a notice, and the shipped producer emits none |
+| **`TC-481`, `TC-482`, `TC-499`** | **expected GREEN at Inc-1 by vacuity — NEW in revision 3** | they assert *absence* (0 addendum notices, hit lines `≤ K` below the boundary) and the shipped producer has no notice concept and does not exceed `K` below `K+1`. **Executed, §11.1** |
+| **`TC-484`, `TC-485`, `TC-486`, `TC-487`, `TC-494`** | **expected GREEN at Inc-1 by construction — NEW in revision 3** | the shipped producer **already satisfies** each predicate: `None.`/`address is None`/1-byte (§3's own boundary catalog says so), the `:1719` guard on unchanged code, `DeclaredRegion.contains` being *correct* on nested and duplicate geometry, and the interleaved `mod,issue,mod,issue` order the golden records. **Executed, §11.1** |
 | `TC-497` | **not run before Inc-3** | its subject (`REQUIREMENTS.md` entry + PR body) does not exist until Inc-3 |
-| everything else | **expected RED at Inc-1** | with a pasted transcript from that run |
+| everything else — `AT-194`, `AT-197`, `AT-198` arm 1b, `AT-199…AT-203`, `TC-480`, `TC-483`, `TC-488`, `TC-489`, `TC-493` (**13 nodes, enumerated rather than left as a residual class**) | **expected RED at Inc-1** | with a pasted transcript from that run. **Revision 2 wrote *"everything else → expected RED"* and that sentence was false for 8 nodes** (`ARCH-N-1` / `QA-NEW-1`); revision 3 enumerates the class instead of naming it, so the ledger cannot silently absorb a node again |
+
+> **All four `xfail(strict=True)` nodes and all 13 expected-RED nodes read their constants through
+> `_const(name, fallback)` inside the test body — never a module-level import** (§11.1 note 4). A
+> module-level import of `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` on `082ada9` is a pytest **collection
+> error**, which `xfail` does not cover and which would take down every node in the file (executed:
+> `ImportError: cannot import name 'MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION'`).
 
 ### 6.3 Batch acceptance criteria
 
@@ -1091,12 +1248,31 @@ the ones that cannot are named here rather than covered by a blanket ✓ in §13
   against the **implemented** producer: `FIX-B`, `FIX-E`, `FIX-G` RED on `AT-196`; `FIX-G` RED on
   `AT-201`; `FIX-H` RED on `AT-202`; `FIX-I` RED on `AT-203`. **Without that last clause `AT-196` has no
   demonstrated detection power on this tree at all — only on a Phase-1 prototype.**
+  **EXTENDED in revision 3 (`ARCH-N-1` / `QA-NEW-1`): the regression-guard class is not two nodes, it is
+  eleven.** Revision 2 applied this analysis only to the two nodes the reviewer named. Executed against
+  the shipped producer (§11.1), `TC-481`, `TC-482`, `TC-484`, `TC-485`, `TC-486`, `TC-487`, `TC-494` and
+  `TC-499` are **also** GREEN at Inc-1, and each now carries its own Inc-2 mutant arm — `FIX-C`/`FIX-G`,
+  `FIX-G`, **`FIX-NONE`** (new), *(none — pure guard on unchanged code, stated in writing)*, `FIX-E`,
+  `FIX-E`, `FIX-B`, **`FIX-SCOPE`** (new). **A regression guard with no named arm and no written
+  "pure guard" note is an unfalsifiable node**, which is the defect class this batch exists to remove.
 - **A RED gate asserts the failing SIDE of the threshold on a NAMED fixture, never a verbatim figure**
   (architect M-4). Three lanes measured `AT-194`'s RED at `2.27` / `2.265` / `2.000` on three fixtures;
   `TC-493`'s at `1.98` / `1.982`; `TC-488`'s at `300/2400/19200` (architect) and `500/1000/4000` (qa).
   An Inc-1 test with its own fixture **cannot** reproduce another lane's number, and an author who tries
-  will either tune the fixture to hit it or record a false pass. Gate form: *RED strictly on the failing
-  side, by ≥ 50 % margin, with the fixture named and the transcript pasted.*
+  will either tune the fixture to hit it or record a false pass.
+  **Gate form — REVISED in revision 3, stated PER THRESHOLD FAMILY** (`ARCH-N-4` + `QA-NEW-5`, plus this
+  lane's own executed finding at §11.1 note 3). Revision 2 quantified *"RED on the failing side by
+  ≥ 50 %"* over **every** expected-RED node. That is undefined for the ~12 boolean nodes, and it
+  **actively kills `TC-483`** — the one genuinely-correct RED in the `K-1/K/K+1` family — because a
+  boundary node's RED is `threshold + 1` **by construction** (`201` vs `200` = 0.5 % over, executed).
+  Four families, four forms:
+
+  | family | nodes | RED gate form |
+  |---|---|---|
+  | **ratio-valued** | `AT-194` (`≤ 1.30`), `TC-493` (`≤ 1.25`) | RED strictly on the failing side **by ≥ 25 % margin over the threshold**, fixture named, transcript pasted. *Lowered from 50 % on an executed mechanism, not at a gate:* the delta doubles when `E` doubles, so the RED tends to exactly `2.000`, and `2.000 / 1.30 = 53.8 %` leaves the rule **3.8 pp** of headroom against the value the mechanism actually produces — an Inc-1 fixture reading `1.94` would be a *correct* RED that fails the gate |
+  | **boundary-valued** | `TC-481` / `TC-482` / `TC-483`, `AT-198` arms | **no margin.** The gate is the **adjacent pair**: the `K` fixture GREEN and the `K+1` fixture RED, both pasted, with `E` derived from `_const("MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION", 200)` at Inc-1. A margin rule here is a fixture-tuning incentive, which is what `ARCH-M-4` removed |
+  | **exact-equality / count** | `TC-488`, `TC-489` (`consumed == N`), `TC-498` (`A == R × N`), `TC-490` (`+N more`) | RED means observed ≠ required; the gate pastes **both** values and the per-arm ratio where it is defined. **Per-arm, not per-node:** `TC-488`'s `R = 1` arm reads `300 == 300` because the shipped producer *is* correct at `R = 1`; the node's RED comes from `R = 8` / `R = 64` and the gate names which arm carries it |
+  | **boolean** | `AT-197`, `AT-199…AT-203`, `AT-198` arm 1b, `TC-480`, and every expected-GREEN regression guard | RED means the asserted predicate is **false**, with the **observed value pasted** (e.g. `notices=[]`, `named=[]`) and the named arm stated. There is nothing to take a percentage of |
 - **Regression set (union of both lanes' checklists; baselines are per-subset and are NOT merged into
   one number):**
   - `pytest -q tests/test_report_service.py tests/test_tui_report_seam.py tests/test_report_field_census.py tests/test_manifest_writer.py tests/test_capped_text_area.py` → **123 passed** today (architect §7.7, 124.54 s). **`tests/test_report_field_census.py` is in this set AND is now owned by Inc-2** — revision 1 had it in the regression set and out of the structural census, which is how architect B-2 slipped through.
@@ -1270,7 +1446,7 @@ figures of §7 reproduced"*, which would **false-fail a correct Inc-1 test** wri
   ```
 
   **The two lanes agree exactly on the law (`A = R × N`) on two different fixtures.** The security lane's
-  `19 200 at R = 64` is bit-for-bit the figure T-2 records as the *defect being removed* on the candidate
+  `19200 at R = 64` is bit-for-bit the figure T-2 records as the *defect being removed* on the candidate
   axis.
 - **Why prefix-max cannot prune here (mechanism, not slip).** `pmax[i] = max(ends[0..i])` is
   non-decreasing, so the downward walk stops only when `pmax[j] ≤ addr`. One region with a large `end`
@@ -1278,13 +1454,44 @@ figures of §7 reproduced"*, which would **false-fail a correct Inc-1 test** wri
   entries for every candidate that clears the reject pre-filter. This is inherent to prefix-max
   attribution — and it is why `LLR-103.2` now pins the structure **in writing** (architect m-3).
 - **Threshold form — a DISCLOSURE COUNTER, not a pass/fail bound.** `TC-498` asserts
-  `A == R × N` at `R ∈ {1, 8, 64, 256}` under `huge+tiny`, with `N` derived from the fixture.
-  This is deliberate and stated: a bound like `A ≤ c × (N + hits)` **cannot pass** against the adopted
-  prefix-max array, and *"a gate that cannot pass is the same defect class as one that cannot fail"*
-  (security F2's own formulation). `TC-498` instead **pins the residual §10.7 discloses**, so that
-  (i) the number in §10.7 cannot go stale silently, and (ii) if a later batch swaps in an
-  output-sensitive structure, `TC-498` fails loudly and forces §10.7 to be re-read and rewritten rather
-  than quietly left over-claiming in the other direction.
+  `A == R × N` at `R ∈ {1, 8, 64, 256}` under `huge+tiny`, with `N` derived from the fixture and `A`
+  defined at §1.3 / `LLR-103.1`. This is deliberate and stated: a bound like `A ≤ c × (N + hits)`
+  **cannot pass** against the adopted prefix-max array, and *"a gate that cannot pass is the same defect
+  class as one that cannot fail"* (security F2's own formulation). `TC-498` instead **pins the residual
+  §10.7 discloses**, so that (i) the number in §10.7 cannot go stale silently, and (ii) if a later batch
+  swaps in an output-sensitive structure, `TC-498` fails loudly and forces §10.7 to be re-read and
+  rewritten rather than quietly left over-claiming in the other direction.
+  **The equality FORM is UPHELD by both re-gate lanes and is not reopened.** What revision 3 changes is
+  the *instrument* and the *expected verdicts*.
+- **`TC-498`'s Inc-1 verdict — CORRECTED in revision 3. It is `NOT EXECUTABLE PRE-FIX`, not RED**
+  (`ARCH-N-1(b)` blocker + `QA-NEW-2` major; independently re-executed by this lane). Revision 2 wrote
+  *"RED at Inc-1 (`SHIP` has no attribution walk to count)"* and *"GREEN at Inc-2"*. **Both verdicts
+  invert under the only instrument available pre-fix**, and the reason is that revision 2 named a
+  quantity without naming the seam that reads it. Executed on the shipped producer, `huge+tiny`,
+  `N = 500`, counting `DeclaredRegion.contains` calls:
+
+  ```
+      R  consumed(N)   contains calls A      R x N   A == R x N ?   hits emitted
+      1          500                500        500           True            500
+      8          500               4000       4000           True            500
+     64          500              32000      32000           True            500
+    256          500             128000     128000           True            500
+  ```
+
+  The shipped `_addendum_lines` (`report_service.py:1554-1583`) loops `for region: for candidate:` and
+  calls `DeclaredRegion.contains` **exactly `R × N` times** — it *is* the `O(R)` shape — so
+  `A == R × N` is **GREEN on `082ada9`** under that seam, where §11.1 said RED. And the adopted design
+  calls `contains` **zero** times, because it walks caller-local `starts` / `ends` / `pmax` arrays:
+
+  ```
+    DeclaredRegion.contains calls under the LLR-103.2 walk at R = 64:  0
+        -> the same seam reads A = 0, so `A == R x N` is RED at Inc-2, where 11.1 said GREEN
+  ```
+
+  **Neither available pre-fix seam yields "RED at Inc-1".** The counter that reads the quantity
+  `TC-498` asserts lives **inside the walk**, and the walk does not exist on `082ada9`. `TC-498`
+  therefore joins `TC-490` / `TC-492` / `TC-495` in the `xfail(strict=True)` class (§6.2, §11.1), and
+  the counting seam is now a **requirement obligation** on `LLR-103.1`, not an implementer's choice.
 - **`all-nested` is NOT this defect and is recorded so no one "fixes" it.** Under all-nested geometry
   `R` regions genuinely match, so `R` work per candidate is **output-proportional and irreducible** given
   `LLR-103.5`'s per-(region, class) dropped counts. That is the same trade as X-1, on the region axis
@@ -1376,8 +1583,13 @@ syntax= 400 K=200: CHG-COLLISION survives 0/2 | notice lines=1
 
 **All notice counting below is ADDENDUM-SCOPED** — lines matching `ADDENDUM_TRUNCATION_NOTICE_FMT`'s
 rendered prefix with a class from `ADDENDUM_CLASS_LABELS`, **between the `## Addendum: declared regions`
-heading and the next `^## `** (security S3; three pre-existing `> TRUNCATED:` emitters at
-`report_service.py:1134` / `:1383` / `:1403`, one of which fires on the `flood = 400` row above).
+heading and the next `^## ` _or END-OF-FILE, whichever comes first_** (security S3; three pre-existing
+`> TRUNCATED:` emitters at `report_service.py:1134` / `:1383` / `:1403`, one of which fires on the
+`flood = 400` row above). **The `or EOF` arm is NEW in revision 3 (`QA-NEW-3`) and is load-bearing: the
+addendum is the LAST `## ` section on an ordinary report (executed — heading #5 of 5, no next `^## `),
+so the revision-2 predicate found no scope and read 0 notices always, vacuating every threshold below.
+An empty scope must FAIL the test, never read as zero notices** — full transcript and reasoning at §3
+US-B64-2.
 
 - **Threshold (`AT-197`) — CHANGED in revision 2 (qa B-1):** at `flood = K` → exactly **1** addendum
   notice line for `change-file issue`, `{dropped} == 2` (derived by the test from its fixture), and the
@@ -1501,9 +1713,14 @@ label spellings (`change-issue` / `check-issue`) are **not** used; its observabl
    first-`K` admission, "dropped" is decided at the moment a candidate is examined, in variant-major
    order, so a per-(region, class) last-seen sentinel is sufficient (architect M-2). Under
    severity-priority, an already-admitted hit can be **evicted later** by a higher-severity arrival, so
-   the affected-variant set is not monotone in traversal order and a **membership set** is required —
-   `O(V)` per (region, class), which puts `V` back into the very bound this requirement exists to
-   establish. Prevention on the severity axis costs the `V`-independence claim on the memory axis.
+   the affected-variant set is **no longer CONTIGUOUS per variant** in traversal order and a
+   **membership set** is required — `O(V)` per (region, class), which puts `V` back into the very bound
+   this requirement exists to establish. Prevention on the severity axis costs the `V`-independence
+   claim on the memory axis.
+   *(**Term corrected in revision 3, `SEC-N4`.** Revision 2 wrote *"not monotone"*. The set **is** still
+   monotone — it only ever grows. What eviction destroys is **per-variant contiguity**, which is exactly
+   what the `O(1)` last-seen sentinel depends on. The conclusion is unchanged; the word was loose, and
+   §15 item 9 sends a future batch here for the precise reason.)*
 3. **It is not free on order either.** Emitting in document order after severity-ranked admission
    requires storing each admitted hit's document index alongside its line — extra resident state per hit
    and a sort at emission — for a bound whose entire purpose is to shrink resident state.
@@ -1710,7 +1927,7 @@ sentinel that `LLR-103.3`'s `V`-independence rests on. **Chosen: bound + disclos
   **new non-claim (e)** carries the work axis with its numbers; **new §10.7** is the residual.
 - **Why:** executed, two lanes independently, on two fixtures. Under `huge+tiny` geometry region ops read
   `500 / 4000 / 32000 / 128000` at `R = 1/8/64/256` for one matching region (architect Phase-2 §3), and
-  `153 600` at `R = 512` for 300 candidates (security Phase-2 §2). `19 200 at R = 64` is bit-for-bit
+  `153600` at `R = 512` for 300 candidates (security Phase-2 §2). `19200 at R = 64` is bit-for-bit
   §7 T-2's *RED*. The `R` multiplier is **relocated** from leaf consumption to region resolution.
 - **Acceptance changed:** `HLR-103`'s threshold list gains the region-ops arm; **`TC-498` is created**;
   `AT-195` is retired (A-14); `TC-497`'s verbatim set gains `500 → 128000`.
@@ -1771,7 +1988,9 @@ sentinel that `LLR-103.3`'s `V`-independence rests on. **Chosen: bound + disclos
 - **Before:** `AT-195` = candidate consumption via an injected counting sequence (a Layer-B id on a
   mechanism-only observable, and a verbatim duplicate of `TC-488`'s predicate).
   `TC-496` = the notice reaches the written file **and** the TUI seam (a Layer-A id on the only
-  file-observed node that closes the `emit()` byte-budget hole for US-B64-2).
+  file-observed node for US-B64-2). *(Revision 2's parenthetical here read *"…that closes the `emit()`
+  byte-budget hole"*; that clause is **struck in revision 3 as executed-false** — see A-34. The
+  retirement / promotion this row records is unaffected.)*
 - **After:** **`AT-195` RETIRED IN PLACE, not reused**; **`TC-496` promoted to `AT-200`**, content
   unchanged, `TC-496` retired in place.
 - **Why:** §1.3's `AT` definition and `01b-qa-catalog.md:748` (*"mechanism-only observables … never
@@ -1984,6 +2203,246 @@ sentinel that `LLR-103.3`'s `V`-independence rests on. **Chosen: bound + disclos
 
 ---
 
+## 9c. §6.5 amendment log — **REVISION 3** (A-28 … A-40)
+
+> The Phase-2 **RE-GATE** fold. **Every row below is confined to the execution plan (§11/§11.1), to the
+> instrumentation of two new nodes, or to a citation** — **no requirement Statement changed and no
+> measurement was re-derived**, which is why every parent re-read verdict in this block reads
+> *"no change required"* except A-29 (`LLR-103.1` gains the seam obligation) and A-31 (`LLR-103.5`'s
+> scope predicate). §17.6 maps all 19 re-gate finding ids → 16 rows → these amendments. Carry into `REQUIREMENTS.md` §6.5 at
+> Inc-3 together with A-1…A-27.
+
+### A-28 — §11.1's Inc-1 verdict column: asserted for 2 nodes → **DERIVED BY EXECUTION for all 28**
+
+- **Before:** a block row *"`TC-480…TC-489`, `TC-491`, `TC-493`, `TC-494` → **RED**, except `TC-491`"*,
+  plus per-node RED rows for every `AT` but `AT-196` and `AT-198` arms 1–2. Inc-1's gate: *"the table
+  reproduced exactly"*.
+- **After:** a per-node table with a **rule column** naming which of three categories each verdict
+  follows from, an **executed transcript** above it, an Inc-2 mutant arm (or a written *"pure regression
+  guard"* note) on every newly-GREEN row, and two **new arms** — `FIX-NONE` and `FIX-SCOPE`.
+- **Why:** executed on the shipped producer by three lanes independently. **8 of 28 rows were wrong:**
+  `TC-481` (199 hit lines, 0 notices), `TC-482` (200, 0), `TC-484` (`None.` on all three empty cases,
+  1-byte region inclusive), `TC-485` (a guard on unchanged code), `TC-486` (**1** hit — the shipped
+  addendum uses `DeclaredRegion.contains` and is *correct* on nested geometry; the RED belongs to
+  `range_index`'s primitive, a different subject), `TC-487` (3 and 2 hit lines), `TC-494` (the "expected
+  sequence" **is** the shipped sequence), `TC-499` (0 addendum notices on a producer with no notice
+  concept). **Revision 2 created this table to discharge `ARCH-B-3` and applied the mechanism only to
+  the two nodes the reviewer had named — so the defect it was written to fix survived inside it.**
+- **Acceptance changed:** no node's *threshold* changed. Eleven nodes move from *expected-RED* to
+  *expected-GREEN regression guard*, each acquiring a named Inc-2 mutant arm; `TC-498` moves to
+  `xfail(strict=True)` (A-30).
+- **Parent re-read:** `HLR-103` — no change required. `R-TUI-098` — no change required.
+- **Body edit landed:** §6.2 executability ledger; §6.3 (regression-guard clause extended); §11 Inc-1
+  and Inc-2 gates; §11.1 (table + transcript + notes 1–4).
+
+### A-29 — `TC-498`'s instrument: an unnamed "region comparison" → **a pinned quantity + a named seam**
+
+- **Before:** `LLR-103.1`: *"`TC-498` additionally counts region comparisons at the attribution call."*
+  §1.3: *"the number of `(candidate, declared-region)` comparisons … summed over the call."*
+- **After:** `A` = **`ends[i] >= addr` comparisons only** (the `pmax` guard, both bisects and the reject
+  pre-filter **excluded**); the walk **shall expose** its per-call count through one named test seam
+  (`_LAST_ADDENDUM_REGION_OPS` or an `_ops_counter` callback, Phase 3 picks and records which); and the
+  fixture precondition — *every declared region's `start` below the probe address* — is stated.
+- **Why:** executed. Three defensible conventions give **`128000` (ends-only) / `256000` (+pmax) /
+  `261000` (+bisects)** at `R = 256`, and only ends-only satisfies `A == R × N`. `LLR-103.2`'s own
+  reversible design note authorises dropping the reject pre-filter, which moves the `+bisect` figure
+  (`261000` → `260500`) but leaves ends-only **invariant**. **An exact-equality gate on an unpinned
+  counter is satisfied by tuning the counter until it prints `R × N` — the `ARCH-M-4` defect class,
+  re-created on the new oracle.** And without the fixture precondition the equality is fixture luck:
+  with 255 regions declared *above* the probe address the walk visits **1** of 256 entries and `A` reads
+  `500`.
+- **Acceptance changed:** the equality **form is unchanged and upheld by both re-gate lanes**; only the
+  quantity it ranges over is pinned.
+- **Parent re-read:** **`LLR-103.1` CHANGED** — it gains a seam obligation on the implementation.
+  `HLR-103` — no change required (its bullet is re-ordered by A-33, not re-scoped).
+- **Body edit landed:** §1.3 (`A`); §4 `LLR-103.1` (three new sub-bullets + transcripts); §7 T-9.
+
+### A-30 — `TC-498`'s expected verdicts: **RED @ Inc-1 / GREEN @ Inc-2** → **`xfail(strict=True)` / GREEN**
+
+- **Before:** §11.1: *"`TC-498` … expected @ Inc-1: **RED** (`SHIP` has no attribution walk to count);
+  @ Inc-2: GREEN."*
+- **After:** `NOT EXECUTABLE PRE-FIX`, `xfail(strict=True)` at Inc-1 alongside `TC-490`/`TC-492`/`TC-495`;
+  first real verdict at Inc-2.
+- **Why:** executed — **both stated verdicts invert under the only available pre-fix seam.** The shipped
+  `_addendum_lines` calls `DeclaredRegion.contains` **exactly `R × N`** times (`500 / 4000 / 32000 /
+  128000` at `R = 1/8/64/256`), so `A == R × N` is **GREEN today**; the adopted design calls `contains`
+  **zero** times, so the same seam reads `0` and the equality is **RED at Inc-2**. The counter that reads
+  the asserted quantity lives inside a walk that does not exist on `082ada9`.
+- **Acceptance changed:** none — the threshold is untouched; only its gate placement.
+- **Parent re-read:** `HLR-103` — no change required.
+- **Body edit landed:** §6.2 ledger; §7 T-9 (new sub-bullet + transcript); §11.1 row.
+
+### A-31 — the addendum scope: *"…and the next `^## `"* → *"…or END-OF-FILE, whichever comes first"*
+
+- **Before:** three sites (§3 US-B64-2, §7 T-5 preamble, §12 X-9) define the notice-counting scope as
+  *"between the `## Addendum: declared regions` heading and the next `^## `"*.
+- **After:** *"…or end-of-file, whichever comes first"*, **plus** a mandatory second clause: the
+  scope-extraction helper **shall fail the test on an empty scope or an absent heading**, never return
+  an empty scope that reads as zero notices.
+- **Why:** executed on a real report — **the addendum is the LAST `## ` section** (heading #5 of 5;
+  `## Truncation appendix` follows only when `notes` is non-empty, and `notes` is populated exclusively
+  by `_hexdump_section`, which no §7 T-5 fixture drives). A literal reading of revision 2's predicate
+  finds **no scope**, reads **0 addendum notices always**, and vacuates `AT-197`, `AT-198`, `AT-199`,
+  `AT-201`, `AT-202`, `AT-203` **and `TC-499`**. **This defect was planted by revision 2's own S3
+  fold** — revision 1's report-wide count had the defect S3 named, but not this one.
+- **Acceptance changed:** every notice threshold becomes decidable; none changes value.
+- **Parent re-read:** **`LLR-103.5` — no Statement change; its acceptance criteria gain the clause.**
+  `HLR-103` — no change required.
+- **Body edit landed:** §3 US-B64-2 (clause + transcript); §7 T-5 preamble; §12 X-9.
+
+### A-32 — Inc-1's constants: an unstated import → **`_const(name, fallback)`, deleted at Inc-2**
+
+- **Before:** `LLR-103.5`: *"The AT **quotes the constants** … Boundary fixtures derive `E` as
+  `K-1`/`K`/`K+1` from the **imported constant**"*, with no statement of how Inc-1 obtains them.
+- **After:** §11.1 note 4 — the module object is imported, never the names; each fixture reads its
+  constant in the test body through `_const(name, fallback)`; **Inc-2's gate requires the fallbacks
+  deleted** (`rg -n "_const\(" …` → 0 hits) and Inc-1's gate requires `pytest --collect-only` to report
+  **0 errors**.
+- **Why:** executed — all four constants are absent on `082ada9` and a module-level import raises
+  `ImportError`. A **module-level** import is a pytest **collection error**, which `xfail` does *not*
+  cover: it takes down every node in the file, including the ones whose RED is meaningful. And a
+  RED-by-`ImportError` is a **vacuous RED** — it proves nothing about whether the predicate reaches the
+  behaviour, which is the opposite of what §6.3 requires.
+- **Acceptance changed:** *"an AT quotes the constant, never its value"* now holds **from Inc-2 onward**,
+  enforced by a gate, rather than being asserted for a phase in which the constant does not exist.
+- **Parent re-read:** `LLR-103.5` / `LLR-103.6` — no change required; the rule they state is preserved
+  and given an enforcement point.
+- **Body edit landed:** §6.2 ledger (closing note); §11 Inc-1 + Inc-2 gates; §11.1 note 4.
+
+### A-33 — the Inc-1 RED gate: **one `≥ 50 %` margin over every node** → **four threshold families**
+
+- **Before:** §6.3 / §11 Inc-1: *"Every expected-RED node RED **on the failing side of its threshold by
+  ≥ 50 %**, on its own named fixture."*
+- **After:** a four-row family table — **ratio-valued** (`≥ 25 %` margin), **boundary-valued** (no
+  margin; the *adjacent pair* `K` GREEN / `K+1` RED), **exact-equality / count** (both values pasted,
+  per **arm**), **boolean** (the predicate false, with the observed value pasted).
+- **Why:** three executed reasons, one from each lane and one from this one. (i) `ARCH-N-4`: the
+  mechanism drives `AT-194`'s RED toward exactly `2.000`, and `2.000 / 1.30 = 53.8 %` leaves the rule
+  **3.8 pp** of headroom — an Inc-1 fixture reading `1.94` is a *correct* RED that fails the gate.
+  (ii) `QA-NEW-5`: ~12 nodes are **boolean** (`notices=[]`) and there is nothing to take 50 % of.
+  (iii) **this lane, executed:** a **boundary** node's RED is `threshold + 1` **by construction**, so
+  `TC-483` fails its threshold by **0.5 %** (`201` vs `200`) — a margin rule of any size kills **the one
+  genuinely-correct RED in the `K-1/K/K+1` family**, or forces the author to abandon the boundary
+  fixture, which is the fixture-tuning `ARCH-M-4` removed. Likewise `TC-488`'s `R = 1` arm reads 0.0 %
+  over because the shipped producer **is correct at `R = 1`**.
+- **Acceptance changed:** no threshold value changed; the *gate form* over them did.
+- **Parent re-read:** `HLR-103` — no change required.
+- **Body edit landed:** §6.3 (family table); §11 Inc-1 gate; §11.1 note 3 (with the arithmetic).
+
+### A-34 — `AT-200`'s rationale + RED arm: an `emit()` byte-budget hole → **the delivery observable**
+
+- **Before:** `LLR-103.5` / §6.2: *"A notice … dropped by the `emit()` byte-budget path (`:1720`) would
+  be invisible … `AT-200` closes that"*; RED arm *"an `emit()` path that drops it"*.
+- **After:** the justification is **the only Layer-B node that observes the notice through the written
+  file *and* the `ReportViewerScreen` seam** — US-B64-2's *delivery*, not its *production* — plus a
+  forward-looking note that it guards a hole the batch-63 `_ByteBudget` carry **would** open. The RED
+  arm is replaced by *"pre-fix no notice exists — RED at Inc-1, GREEN at Inc-2"*.
+- **Why:** executed — `emit()` unconditionally `lines.extend(batch)` and only *accounts* bytes; the sole
+  `budget.fits` gate in the module is inside `_hexdump_section`; and `emit` is a **closure**, so the
+  stated arm is not constructible from a test without editing production code. **The qa lane recorded
+  that this was its own `QA-M-3` claim copied verbatim into the spec** — an inherited claim presented as
+  an executed one, the exact thing the C-39 preamble forbids and §17.5 exists to catch. The *direction*
+  (promoting `TC-496 → AT-200`) is right and is kept.
+- **Acceptance changed:** `AT-200` keeps its threshold and loses a mutant arm it never had.
+- **Parent re-read:** `HLR-103` — no change required.
+- **Body edit landed:** §4 `LLR-103.5` (rewritten bullet + transcript); §6.2 table 1 `AT-200` row;
+  §11.1 `AT-200` row.
+
+### A-35 — `AT-203`'s `### ` split: the raw region name → **the `md_safe`-escaped heading**
+
+- **Before:** *"the notice is present inside `A_flood`'s `### ` sub-section and absent from `B_quiet`'s"*,
+  with the fixture region names carrying `_`.
+- **After:** the fixture's names are drawn from `[A-Za-z0-9 ]` **or** the test derives the heading through
+  `md_safe`; **and both sub-sections must be asserted FOUND before anything is asserted about their
+  contents.**
+- **Why:** executed — `_addendum_lines` renders `### md_safe(region.name, …)`, so
+  `DeclaredRegion("B_quiet", …)` emits `### B\_quiet (…)`. A test splitting on `### B_quiet ` finds **no
+  sub-section**, and the *"absent from every other region"* half then passes **vacuously**. The qa lane
+  walked into this while building the probe and reported `FIX-A` RED for exactly this reason before
+  renaming its fixture regions.
+- **Acceptance changed:** none — the threshold is unchanged; its fixture is constrained.
+- **Parent re-read:** `LLR-103.5` — no change required.
+- **Body edit landed:** §4 `LLR-103.5` (new bullet + transcript).
+
+### A-36 — `AT-198`'s collection: one id, three verdicts → **a parametrised family, one node per arm**
+
+- **Before:** §11.1 lists `AT-198` arm 1 (GREEN), arm 1b (RED), arm 2 (GREEN) under one id, and Inc-1's
+  gate demands the table be *"reproduced exactly"*.
+- **After:** *"`AT-198` is a parametrised family — `test_at198[le_K]` / `test_at198[K_plus_1]` /
+  `test_at198[interior]` — three collected nodes, one id."*
+- **Why:** one collected pytest node reports one verdict. Without this the Inc-1 gate cannot be checked
+  against the table at all. **Not a reopening of `QA-M-4`** — arms 1–2 stay under `AT-198`, exactly as
+  that finding recommended; making their verdicts explicit is what created the need to say how they are
+  collected.
+- **Acceptance changed:** none.
+- **Parent re-read:** `LLR-103.5` — no change required.
+- **Body edit landed:** §11.1 note 2.
+
+### A-37 — `HLR-103`'s region-ops bullet: leads with the **rejected** bound → leads with the adopted form
+
+- **Before:** *"**region ops `A ≤ c × (N + total_hits)`** … This arm is **expected RED** … and is
+  therefore specified as a disclosure counter … see §7 T-9 for the exact form."*
+- **After:** *"**region ops `A == R × N`** … (disclosure counter, §7 T-9, §10.7)"*, with the `c`-bound
+  moved underneath as the **stated-and-rejected** alternative and the reason `no constant c exists`.
+- **Why:** the bound that appeared **in the requirement's "Numeric pass threshold" list** — the list a
+  gate reader reads, and the text a transcriber copies into `REQUIREMENTS.md` — was the one the system
+  is designed to fail. Raised independently by `SEC-N2` and `ARCH-N-3`.
+- **Acceptance changed:** none — the adopted assertion was already `A == R × N` in §7 T-9; the bullet
+  now says so first.
+- **Parent re-read:** **`HLR-103` CHANGED** — threshold-list wording only, no scope change.
+- **Body edit landed:** §3 `HLR-103` "Numeric pass threshold".
+
+### A-38 — §15 item 7's reversal trigger: a field complaint → **a measurable arm plus the field arm**
+
+- **Before:** *"If §10.7's work-axis residual is **measured to matter in the field** — an operator … and
+  **reporting a slow report**"*.
+- **After:** arm (a) **`A > 10 000 000` region ops in one `generate_project_report` call** (≈ `R = 200`
+  against `N = 50 000`), readable from `TC-498`'s own counter on any real project with no new
+  instrumentation; arm (b) the field complaint, retained.
+- **Why:** `SEC-N3` — every other reversal trigger in §15 is structural or numeric, and *"a residual
+  whose reversal depends on a user complaining is one nobody owns."*
+- **Acceptance changed:** none.
+- **Parent re-read:** `R-TUI-098` — no change required; non-claim (e) is unaffected.
+- **Body edit landed:** §15 item 7.
+
+### A-39 — three citation / rendering corrections
+
+- **Before → After (a):** `range_index.py` is engine-frozen at `tests/test_engine_unchanged.py:122`
+  → **`:123`**, at two sites (§10.5, `LLR-103.2`). Executed: `_ENGINE_PATHS` opens at `:120`; `:121` is
+  `core.py`, **`:122` is `hexfile.py`**, `range_index.py` is at `:123`. The *fact* was right and the
+  *pointer* was wrong, in a fold whose own lesson was "cite what you verified" (`SEC-N1`).
+- **Before → After (b):** the document rendered both `19200` (13×) and `19 200` (7×) while `TC-497`
+  greps for the literal `19200 → 300`. **All narrow no-break spellings normalised to the grep-list
+  form** — `19 200` → `19200` (7 sites) and, found by this pass and folded with it, `153 600` →
+  `153600` (4 sites). `128000` was already consistent (13 / 0 before the fold). **A verbatim grep list that does not
+  match its own document is exactly the defect class this batch exists to remove** (`SEC-N5`).
+  **The only surviving `19 200` / `153 600` renderings in this document are the *Before* quotations in
+  this row and in §17.6's `SEC-N5` row** — which is what a Before → After log is for. A grep for the
+  narrow-space form therefore lands on the correction, not on a live figure. `TC-497`'s executable half
+  greps `REQUIREMENTS.md` + the PR body, neither of which carries a Before quotation, so the
+  normalisation is complete where it is gated.
+- **Before → After (c):** §8.2 reason 2 *"the affected-variant set is **not monotone** in traversal
+  order"* → *"is **no longer CONTIGUOUS per variant**"*. The set **is** monotone — it only ever grows;
+  what eviction destroys is per-variant contiguity, which is what the `O(1)` sentinel depends on. The
+  conclusion (`O(V)` membership set) was correct; the term was loose, and §15 item 9 sends a future
+  batch here for the precise reason (`SEC-N4`).
+- **Parent re-read:** none changed.
+- **Body edit landed:** §10.5; §4 `LLR-103.2`; §8.2; document-wide numeral normalisation.
+
+### A-40 — two stale cross-references
+
+- **Before → After (a):** §12's preamble *"X-2 **and X-5** carry an open obligation"* → *"X-5 carries an
+  open obligation; X-2 was CLOSED at Phase 2"*, matching its own X-2 row. §12 is the section a later
+  batch greps for open obligations (`ARCH-N-5`).
+- **Before → After (b):** §13 row 8a *"(`AT-194/195/196`) and (`AT-197/198/199`)"* → the **9 live**
+  `AT`s, with `AT-195` marked RETIRED. Revision 2's row cited the retired id and omitted all four nodes
+  revision 2 itself created — the one place in the document where a grep for `AT-195` landed on
+  something that looked live rather than on §5.2's retirement row (`QA-NEW-8`).
+- **Parent re-read:** none changed.
+- **Body edit landed:** §12 preamble; §13 row 8a.
+
+---
+
 ## 10. Residuals — each with its executed numbers
 
 ### 10.1 B-3(b) — reduced on the **candidate** axis, not eliminated (and see §10.7 for the work axis)
@@ -2090,7 +2549,7 @@ rejects both, with reasons, at §12 X-8. Both are carried to `BACKLOG-CODE.md` a
 ### 10.5 `range_index` is wrong on overlapping ranges — worked around, not fixed
 
 `address_in_sorted_ranges` returns **False** for an address genuinely inside an overlapping range
-(§2.6). The module is **engine-frozen** (`tests/test_engine_unchanged.py:122`), so batch-64 does not
+(§2.6). The module is **engine-frozen** (`tests/test_engine_unchanged.py:123`), so batch-64 does not
 touch it and instead coalesces at the call site (`LLR-103.2`).
 
 **REVISION 2 — revision 1's consumer carry was COPIED FROM A DOCSTRING, NOT CENSUSED (security S4).**
@@ -2151,7 +2610,7 @@ two fixtures, **same law**:
 | architect Phase-2 §3 | `huge+tiny`, `E = 500` at one address | 1 / 8 / 64 / 256 | 500 / 500 / 500 / 500 | **500 / 4000 / 32000 / 128000** | 1 / 1 / 1 / 1 |
 | security Phase-2 §2 | one broad + `R−1` narrow, `N = 300` | 1 / 8 / 64 / 512 | 300 / 300 / 300 / 300 | **300 / 2400 / 19200 / 153600** | 1 / 1 / 1 / 1 |
 
-**`A = R × N` exactly, with an `R`-independent output.** `19 200 @ R = 64` is bit-for-bit the figure §7
+**`A = R × N` exactly, with an `R`-independent output.** `19200 @ R = 64` is bit-for-bit the figure §7
 T-2 records as the *defect being removed* on the candidate axis, and `500 → 128000 @ R = 256` is the
 figure `TC-497` now requires verbatim in `REQUIREMENTS.md` and the PR body.
 
@@ -2269,8 +2728,8 @@ capped fixture.)*
 
 | # | Files | Content | Gate |
 |---|---|---|---|
-| **Inc-1** (3 files) | `tests/test_report_addendum_bound.py` **(NEW)** · `tests/goldens/batch64/addendum-below-bound.md` **(NEW)** · `tests/test_tui_report_seam.py` **(extend)** | `AT-194`, `AT-196…AT-203` + `TC-480…TC-495`, `TC-498`, `TC-499`, plus the byte-identity golden **captured from the SHIPPED producer on `082ada9`** (C-12). `AT-200` extends the existing declared-region seam drive at `:355-372`. **`TC-497` is NOT here** — it is Inc-3's. | the **per-node expected-verdict table below** is reproduced exactly, with a transcript pasted **from this run**. Every expected-RED node RED **on the failing side of its threshold by ≥ 50 %, on its own named fixture** — *never* a verbatim §7 figure |
-| **Inc-2** (2 files) | `s19_app/tui/services/report_service.py` · **`tests/test_report_field_census.py`** | the four constants (`LLR-103.6`) + the single-pass, region-indexed `_addendum_lines` (`LLR-103.1/.2/.3/.5`) + docstring in the mandated section order. **Census file obligations (§10.10):** (i) a `_ESCAPED_EXPRESSIONS` entry **iff** the implementation introduces a new `(func, ast.unparse(arg0))` pair — it will not if `LLR-103.5`'s pinned spelling is used, and the increment records which case obtained; (ii) **unconditionally**, a `PLANTED` entry driving a **capped** fixture so the notice's variant field renders through markdown-it under `test_at157` / `test_at158` / `test_census_every_planted_field_renders_verbatim` | every Inc-1 expected-RED node flips **GREEN**; every Inc-1 expected-GREEN regression guard **stays GREEN**; **the mutant arms reproduced against the IMPLEMENTED producer** (`FIX-B`/`FIX-E`/`FIX-G` RED on `AT-196`; `FIX-G` RED on `AT-201`; `FIX-H` RED on `AT-202`; `FIX-I` RED on `AT-203`; `FIX-A2` RED on `TC-488`); `TC-492`'s `K = 37` mutation green over the `K`-derived nodes; §6.3 regression set green per subset (`123 passed` / `44 passed`); `tests/test_engine_unchanged.py` → 1 passed |
+| **Inc-1** (3 files) | `tests/test_report_addendum_bound.py` **(NEW)** · `tests/goldens/batch64/addendum-below-bound.md` **(NEW)** · `tests/test_tui_report_seam.py` **(extend)** | `AT-194`, `AT-196…AT-203` + `TC-480…TC-495`, `TC-498`, `TC-499`, plus the byte-identity golden **captured from the SHIPPED producer on `082ada9`** (C-12). `AT-200` extends the existing declared-region seam drive at `:355-372`. **`TC-497` is NOT here** — it is Inc-3's. **Constants are read through the `_const(name, fallback)` helper, never imported at module level (§11.1 note 4).** | the **per-node expected-verdict table below** is reproduced exactly — **all four columns, including the `category` / rule column**, not the verdict alone — with a transcript pasted **from this run**. Every expected-RED node RED **per its threshold family (§6.3), on its own named fixture** — *never* a verbatim §7 figure. **`pytest --collect-only` reports 0 errors** (proving no module-level constant import survived). **Every expected-GREEN row is GREEN**; a GREEN row that comes back RED is a defect in the fixture, not a discovery |
+| **Inc-2** (2 files) | `s19_app/tui/services/report_service.py` · **`tests/test_report_field_census.py`** | the four constants (`LLR-103.6`) + the single-pass, region-indexed `_addendum_lines` (`LLR-103.1/.2/.3/.5`) + docstring in the mandated section order. **Census file obligations (§10.10):** (i) a `_ESCAPED_EXPRESSIONS` entry **iff** the implementation introduces a new `(func, ast.unparse(arg0))` pair — it will not if `LLR-103.5`'s pinned spelling is used, and the increment records which case obtained; (ii) **unconditionally**, a `PLANTED` entry driving a **capped** fixture so the notice's variant field renders through markdown-it under `test_at157` / `test_at158` / `test_census_every_planted_field_renders_verbatim` | every Inc-1 expected-RED node flips **GREEN**; every Inc-1 expected-GREEN regression guard **stays GREEN**; the four `xfail(strict=True)` nodes' markers **removed** and GREEN; **the mutant arms reproduced against the IMPLEMENTED producer** (`FIX-B`/`FIX-E`/`FIX-G` RED on `AT-196`; `FIX-G` RED on `AT-201`; `FIX-H` RED on `AT-202`; `FIX-I` RED on `AT-203`; `FIX-A2` RED on `TC-488`; **and, NEW in revision 3, the arms attached to the newly-GREEN Inc-1 rows** — `FIX-C`/`FIX-G` RED on `TC-481`, `FIX-G` RED on `TC-482`, `FIX-NONE` RED on `TC-484`, `FIX-E` RED on `TC-486` and `TC-487`, `FIX-B` RED on `TC-494`, `FIX-SCOPE` RED on `TC-499`); `TC-492`'s `K = 37` mutation green over the `K`-derived nodes; **`rg -n "_const\(" tests/test_report_addendum_bound.py` → 0 hits** (the Inc-1 constant fallbacks deleted, §11.1 note 4); §6.3 regression set green per subset (`123 passed` / `44 passed`); `tests/test_engine_unchanged.py` → 1 passed |
 | **Inc-3** (3 files) | `REQUIREMENTS.md` · `.dev-flow/BACKLOG-CODE.md` · `.dev-flow/2026-07-27-batch-64/PLAN.md` | `R-TUI-098` entry (**including non-claims (e) and (f)**) + traceability rows + the §6.5 amendment log of §9 **and §9b**; D1 closed **with its residuals restated by number**; the carries of §10.3 / §10.5 / §10.7 / §10.8 / §10.9 / §12 X-8; PLAN decision log. **`TC-497` is authored AND gated here.** | full non-slow suite; no requirement without a validation method; **`TC-497`'s 7-string grep list passes**, and its judgement half is signed by a named reviewer |
 
 ### 11.1 Per-node expected verdict at each gate — the table that replaces "every AT fails"
@@ -2281,27 +2740,159 @@ vacuous for `AT-198` arms 1–2 (they assert notice *absence*, and the shipped p
 author meeting it literally would have to manufacture a RED — e.g. by capturing the golden from something
 other than `082ada9`, which destroys the entire point of putting it in Inc-1.
 
-| node | authored | gated | expected @ Inc-1 | expected @ Inc-2 | falsifiability carried by |
-|---|---|---|---|---|---|
-| `AT-194` | Inc-1 | Inc-2 | **RED** (ratio > 1.30 on its fixture) | GREEN (≤ 1.30) | itself |
-| `AT-196` | Inc-1 | Inc-2 | **GREEN — regression guard, by construction** | GREEN | **mutant arms `FIX-B` / `FIX-E` / `FIX-G` RED, reproduced at Inc-2 against the implemented producer** |
-| `AT-197` | Inc-1 | Inc-2 | **RED** (`SHIP` emits no notice) | GREEN | itself + `FIX-C`/`FIX-F`/`FIX-H`/`FIX-A2` |
-| `AT-198` arm 1 (`≤ K` → 0) | Inc-1 | Inc-2 | **GREEN by vacuity** | GREEN | mutant arm `FIX-G` (`n=2`) at Inc-2 |
-| `AT-198` arm 1b (`K+1` → 1) | Inc-1 | Inc-2 | **RED** | GREEN | itself |
-| `AT-198` arm 2 (`E == K` conjunction) | Inc-1 | Inc-2 | **GREEN by vacuity** | GREEN | mutant arm `FIX-G` at Inc-2 |
-| `AT-199` | Inc-1 | Inc-2 | **RED** (no notice to forge against) | GREEN | itself |
-| `AT-200` | Inc-1 | Inc-2 | **RED** | GREEN | itself |
-| `AT-201` | Inc-1 | Inc-2 | **RED** | GREEN | itself + `FIX-G` |
-| `AT-202` | Inc-1 | Inc-2 | **RED** | GREEN | itself + **`FIX-H`** |
-| `AT-203` | Inc-1 | Inc-2 | **RED** | GREEN | itself + **`FIX-I`** |
-| `TC-480…TC-489`, `TC-491`, `TC-493`, `TC-494` | Inc-1 | Inc-2 | **RED**, except `TC-491` (GREEN, regression guard with `AT-196`) | GREEN | as noted |
-| `TC-490`, `TC-492`, `TC-495` | Inc-1 | Inc-2 | **`xfail(strict=True)` — NOT EXECUTABLE PRE-FIX** (subject does not exist on `082ada9`) | GREEN, `xfail` removed | first real verdict is Inc-2 |
-| **`TC-498`** | Inc-1 | Inc-2 | **RED** (`SHIP` has no attribution walk to count) | GREEN — records `A == R × N`, the §10.7 disclosure | itself; fails loudly if the structure is later changed |
-| **`TC-499`** | Inc-1 | Inc-2 | **RED** (no addendum notice concept exists) | GREEN | itself |
-| `TC-497` | **Inc-3** | **Inc-3** | n/a | n/a | its subject does not exist before Inc-3 |
+> **REVISION 3 — THIS TABLE WAS ITSELF THE DEFECT IT WAS BUILT TO FIX (`ARCH-N-1` blocker = `QA-NEW-1`
+> major; the same finding from two lanes).** Revision 2 created the table to discharge `ARCH-B-3` and
+> applied the "GREEN by construction / by vacuity" analysis to the **two nodes the reviewer had named**
+> (`AT-196`, `AT-198` arms 1–2) and to no others. **8 of 28 rows were wrong**, so Inc-1's gate — *"the
+> table reproduced exactly"* — was unsatisfiable for exactly the reason revision 1's gate was.
+> **Revision 3 re-derives the Inc-1 verdict for EVERY node by driving the shipped `_addendum_lines` /
+> `generate_project_report` on this tree** (`git diff --numstat 082ada9 -- s19_app/ tests/` → empty, so
+> the source under test **is** `082ada9`'s). The transcript is below the table. **A node whose verdict
+> is asserted without running it is this defect a third time.**
 
-**`AT-196` without the last column has no demonstrated detection power on this tree at all — only on a
-Phase-1 prototype.** That is why the mutant-arm reproduction is a **gate condition of Inc-2**, not a note.
+**Executed transcript (this lane, `scratchpad/r3_all28.py`, shipped producer imported and called):**
+
+```
+node             11.1 rev-2 said        ACTUAL   category               evidence
+----------------------------------------------------------------------------------------------------
+TC-480           RED                    RED      RED                    heading=True sub-heading=True hit lines=201 notices=0
+TC-481           RED                    GREEN    GREEN-by-vacuity       class total 199: hit lines=199  addendum notices=0    <== MISMATCH
+TC-482           RED                    GREEN    GREEN-by-vacuity       class total 200: hit lines=200  addendum notices=0    <== MISMATCH
+TC-483           RED                    RED      RED                    class total 201: hit lines=201  (> K)     <-- the only correct RED here
+TC-484           RED                    GREEN    GREEN-by-construction  'None.' in a/b/c=(True,True,True)  1-byte hits=1  past-end hits=0   <== MISMATCH
+TC-485           RED                    GREEN    GREEN-by-construction  guard source = ['if options.declared_regions:']       <== MISMATCH
+TC-486           RED                    GREEN    GREEN-by-construction  shipped emits 1 hit line: '- modification @ 0x5000 (variant v1)'  <== MISMATCH
+TC-487           RED                    GREEN    GREEN-by-construction  duplicate=3 hit lines   equal-start-nested=2 hit lines <== MISMATCH
+TC-488           RED                    RED      RED                    consumed=[300,2400,19200] -> consumed/N=[1,8,64]
+TC-489           RED                    RED      RED                    consumed=[300,2400,19200] -> consumed/N=[1,8,64]
+TC-491           GREEN                  GREEN    GREEN-by-construction  same producer, same input -> identical=True
+TC-493           RED                    RED      RED                    peak(E=2000)=180294 peak(E=4000)=361102 ratio=2.003 (> 1.25)
+TC-494           RED                    GREEN    GREEN-by-construction  shipped order = ['mod','issue','mod','issue']         <== MISMATCH
+TC-499           RED                    GREEN    GREEN-by-vacuity       addendum notices=0 (shipped emits no '> TRUNCATED:' at all) <== MISMATCH
+AT-196           GREEN by construction  GREEN    GREEN-by-construction  golden captured from the code under test
+AT-197           RED                    RED      RED                    addendum notices on SHIP at class total K+2 = 0
+AT-198 arm 1     GREEN by vacuity       GREEN    GREEN-by-vacuity       notices = 0
+AT-198 arm 1b    RED                    RED      RED                    notices = 0  (required: exactly 1)
+AT-198 arm 2     GREEN by vacuity       GREEN    GREEN-by-vacuity       notices = 0   hit lines = 200
+AT-199           RED                    RED      RED                    addendum notices on SHIP = 0 -> nothing to forge against
+AT-200           RED                    RED      RED                    addendum notices on SHIP = 0
+AT-201           RED                    RED      RED                    addendum notices on SHIP = 0
+AT-202           RED                    RED      RED                    addendum notices on SHIP = 0
+AT-203           RED                    RED      RED                    addendum notices on SHIP = 0
+
+  [TC-486 subject check] raw range_index over the UNCOALESCED set:
+        address_in_sorted_ranges(0x5000, ...) = False   (ground truth True)
+  [TC-486 subject check] shipped addendum via DeclaredRegion.contains: 1 hit  -> CORRECT
+```
+
+**`TC-490` / `TC-492` / `TC-495` / `TC-498` are not in that transcript because their subject does not
+exist pre-fix — see the `NOT EXECUTABLE PRE-FIX` rows below and §6.2's ledger.**
+
+| node | authored | gated | expected @ Inc-1 | rule the verdict follows from | expected @ Inc-2 | falsifiability carried by |
+|---|---|---|---|---|---|---|
+| `AT-194` | Inc-1 | Inc-2 | **RED** (ratio > 1.30 on its fixture) | genuinely falsifiable — the shipped producer's marginal cost grows with `E` | GREEN (≤ 1.30) | itself |
+| `AT-196` | Inc-1 | Inc-2 | **GREEN — regression guard, by construction** | the golden is captured **from** the code under test | GREEN | **mutant arms `FIX-B` / `FIX-E` / `FIX-G` RED, reproduced at Inc-2 against the implemented producer** |
+| `AT-197` | Inc-1 | Inc-2 | **RED** (`SHIP` emits no notice) | genuinely falsifiable — the asserted object does not exist | GREEN | itself + `FIX-C`/`FIX-F`/`FIX-H`/`FIX-A2` |
+| `AT-198` arm 1 (`≤ K` → 0) | Inc-1 | Inc-2 | **GREEN by vacuity** | asserts *absence*; the shipped producer emits none | GREEN | mutant arm `FIX-G` (`n=2`) at Inc-2 |
+| `AT-198` arm 1b (`K+1` → 1) | Inc-1 | Inc-2 | **RED** | genuinely falsifiable — requires exactly 1, reads 0 | GREEN | itself |
+| `AT-198` arm 2 (`E == K` conjunction) | Inc-1 | Inc-2 | **GREEN by vacuity** | asserts *absence*; shipped emits none | GREEN | mutant arm `FIX-G` at Inc-2 |
+| `AT-199` | Inc-1 | Inc-2 | **RED** (no notice to forge against) | genuinely falsifiable | GREEN | itself |
+| `AT-200` | Inc-1 | Inc-2 | **RED** | genuinely falsifiable | GREEN | itself (RED→GREEN across the increment boundary — **not** a mutant arm; see `LLR-103.5` and §17.6 `QA-NEW-6`) |
+| `AT-201` | Inc-1 | Inc-2 | **RED** | genuinely falsifiable | GREEN | itself + `FIX-G` |
+| `AT-202` | Inc-1 | Inc-2 | **RED** | genuinely falsifiable | GREEN | itself + **`FIX-H`** |
+| `AT-203` | Inc-1 | Inc-2 | **RED** | genuinely falsifiable | GREEN | itself + **`FIX-I`** |
+| `TC-480` | Inc-1 | Inc-2 | **RED** | the end-to-end shape requires ≥ 1 notice at class total `K+1`; shipped emits 0 | GREEN | itself |
+| **`TC-481`** | Inc-1 | Inc-2 | **GREEN by vacuity — REVISED in revision 3** | asserts `hit lines ≤ K` **and** 0 notices at class total `K-1`: shipped emits 199 ≤ 200 and has no notice concept | GREEN | **mutant arm `FIX-C` (`hits[:CAP]` — bounds the output, not the producer) RED at Inc-2**; `FIX-G` (spurious notice below the bound) RED |
+| **`TC-482`** | Inc-1 | Inc-2 | **GREEN by vacuity — REVISED in revision 3** | same, at class total `K` exactly: shipped emits 200 ≤ 200, 0 notices | GREEN | **mutant arm `FIX-G` RED** (already named at §7 T-5) |
+| `TC-483` | Inc-1 | Inc-2 | **RED** | class total `K+1`: shipped emits **201 > K**. **The only genuinely-RED node in the `K-1/K/K+1` family** | GREEN | itself |
+| **`TC-484`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | §3's boundary catalog already says all four sub-cases were *"executed against the **shipped** function … and `FIX-A` reproduces all four exactly"* — a node the shipped code already satisfies cannot be RED against it | GREEN | **named arm: `FIX-NONE` (drops the `None.` branch and stops skipping `issue.address is None`) RED at Inc-2** |
+| **`TC-485`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | it asserts a guard on **unchanged** code (`report_service.py:1719`, `if options.declared_regions:`) | GREEN | **pure regression guard over unchanged code — no mutant arm, and the row says so rather than inventing one** |
+| **`TC-486`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | **the RED belongs to a different subject.** `LLR-103.2`'s pre-state (`address_in_sorted_ranges(0x5000, …) = False`) is **`range_index`'s primitive** being wrong on a raw overlapping set. The shipped addendum uses `DeclaredRegion.contains` and is **correct**: 1 hit. `TC-486` guards a hazard the **NEW** implementation introduces (the coalescing precondition) | GREEN | **mutant arm `FIX-E` (raw `range_index` membership, no coalescing) RED at Inc-2** — executed RED on `FIX-GOLD`, §7 T-4 |
+| **`TC-487`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | `LLR-103.2` promises to **reproduce** today's `M`-times emission; shipped emits 3 and 2 on the two sub-fixtures | GREEN | **mutant arm `FIX-E` RED at Inc-2** (same reason as `TC-486`) |
+| `TC-488`, `TC-489` | Inc-1 | Inc-2 | **RED** | `consumed == N` fails at `R = 8` and `R = 64` (executed `2400` / `19200`) | GREEN | themselves + `FIX-A2` on the overlapping arm |
+| `TC-491` | Inc-1 | Inc-2 | **GREEN — regression guard, by construction** | golden captured from the code under test | GREEN | with `AT-196` |
+| `TC-493` | Inc-1 | Inc-2 | **RED** (ratio 2.003 > 1.25, executed) | genuinely falsifiable | GREEN | itself |
+| **`TC-494`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | the "expected sequence" **is** the shipped sequence — that is why the golden exists and why `LLR-103.4` is a *preservation* requirement | GREEN | **mutant arm `FIX-B` (per-class bucket concatenation) RED at Inc-2** — executed RED at §7 T-4 |
+| `TC-490`, `TC-492`, `TC-495` | Inc-1 | Inc-2 | **`xfail(strict=True)` — NOT EXECUTABLE PRE-FIX** (subject does not exist on `082ada9`) | no subject to assert against | GREEN, `xfail` removed | first real verdict is Inc-2 |
+| **`TC-498`** | Inc-1 | Inc-2 | **`xfail(strict=True)` — NOT EXECUTABLE PRE-FIX — REVISED in revision 3** | its instrument is the attribution walk's own region-op counter, and **the walk does not exist on `082ada9`**. Under the only *available* pre-fix seam (counting `DeclaredRegion.contains`) the shipped producer reads **exactly `R × N`**, so `A == R × N` is **GREEN** today — see §7 T-9 | GREEN — records `A == R × N`, the §10.7 disclosure | itself; fails loudly if the structure is later changed |
+| **`TC-499`** | Inc-1 | Inc-2 | **GREEN by vacuity — REVISED in revision 3** | it is the **positive control for addendum-scoped counting**, and its predicate (`0` addendum notices while a report-wide `> TRUNCATED:` fires) reads 0 on a producer with no notice concept at all | GREEN | **mutant arm `FIX-SCOPE` (count `> TRUNCATED:` report-wide instead of addendum-scoped) RED at Inc-2** — this is the arm that proves the scope predicate is scoped |
+| `TC-497` | **Inc-3** | **Inc-3** | n/a | subject does not exist before Inc-3 | n/a | its subject does not exist before Inc-3 |
+
+**Tally at Inc-1: 13 RED · 11 GREEN (regression guards) · 4 `xfail(strict=True)` · 1 n/a = 29 rows over
+28 live nodes** (`AT-198` occupies three rows — see note 2).
+
+**Note 1 — a GREEN row is not a free row.** Every newly-GREEN row above names an Inc-2 mutant arm, **or**
+states in writing that it is a pure regression guard over unchanged behaviour (`TC-485` only). Two arms
+are **new in revision 3** and must be built at Inc-2 alongside `FIX-B…FIX-I`: **`FIX-NONE`** (drops the
+`None.` branch and stops skipping `issue.address is None`) for `TC-484`, and **`FIX-SCOPE`** (counts
+`> TRUNCATED:` report-wide rather than addendum-scoped) for `TC-499`. `AT-196` without its last column
+has no demonstrated detection power on this tree at all — only on a Phase-1 prototype. That is why the
+mutant-arm reproduction is a **gate condition of Inc-2**, not a note.
+**Executability flag on the two new arms (C-39 honesty).** `FIX-NONE` and `FIX-SCOPE` are **specified
+here and NOT YET EXECUTED by any lane** — they mutate a producer that does not exist on `082ada9`, so
+they carry **no** RED figure in §7 and must not be covered by a blanket ✓ in §13. Their first real
+verdict is Inc-2, exactly like `FIX-B…FIX-I`'s reproduction against the implemented producer.
+**`FIX-C`, `FIX-E`, `FIX-B` and `FIX-G` — the arms attached to the other newly-GREEN rows — already
+exist and already carry executed RED figures** (§7 T-4, T-5); only their *assignment* to these nodes is
+new.
+
+**Note 2 — `AT-198` is a parametrised family, one collected node per arm (`QA-NEW-9`).** One collected
+pytest node reports one verdict, and `AT-198`'s three arms have three different Inc-1 verdicts. It is
+therefore authored as `test_at198[le_K]` (GREEN), `test_at198[K_plus_1]` (RED), `test_at198[interior]`
+(GREEN) — **three collected nodes, one id**, so the Inc-1 gate can be checked against this table row by
+row. This is not a reopening of `QA-M-4`: arms 1–2 stay under `AT-198`, exactly as that finding
+recommended.
+
+**Note 3 — a defect this lane found that neither re-gate lane raised: the `≥ 50 %` RED-margin rule
+kills `TC-483`.** Executed:
+
+```
+node       family               observed  threshold  margin over  >=50%  >=25%
+AT-194     ratio-valued              2.0        1.3        53.8%    YES   YES
+AT-194     ratio-valued            2.265        1.3        74.2%    YES   YES
+TC-493     ratio-valued            2.003       1.25        60.2%    YES   YES
+TC-483     boundary-valued           201        200         0.5%    NO    NO      <== killed by the rule
+TC-483     count (far-above)        4000        200      1900.0%    YES   YES
+TC-488     exact-equality            300        300         0.0%    NO    NO      <== R=1 arm; SHIP is CORRECT at R=1
+TC-488     exact-equality           2400        300       700.0%    YES   YES
+TC-488     exact-equality          19200        300      6300.0%    YES   YES
+```
+
+A **boundary** node's RED is `threshold + 1` **by construction** — that is what a `K+1` fixture *is*. A
+ratio-margin gate of any size either kills `TC-483`, the one genuinely-correct RED in the `K-1/K/K+1`
+family, or forces the author to abandon the boundary fixture for a far-above one — which is precisely
+the fixture-tuning `ARCH-M-4` removed from the ratio gates. Likewise `TC-488`'s `R = 1` arm reads 0.0 %
+over because at `R = 1` the shipped producer **is correct**; the node's RED comes from the other arms of
+the same conjunction. **§6.3 now states the gate per threshold family** rather than quantifying one
+margin over every expected-RED node.
+
+**Note 4 — how Inc-1 obtains the four constants (`QA-NEW-4`).** Executed on this tree:
+
+```
+hasattr(report_service, 'MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION') -> False
+hasattr(report_service, 'ADDENDUM_CLASS_LABELS')                  -> False
+hasattr(report_service, 'ADDENDUM_NOTICE_VARIANTS_MAX')           -> False
+hasattr(report_service, 'ADDENDUM_TRUNCATION_NOTICE_FMT')         -> False
+module-level `from ... import MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`
+    -> ImportError: cannot import name '...' from 's19_app.tui.services.report_service'
+getattr(report_service, 'MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION', 200) -> 200   (no exception)
+```
+
+A **module-level** import of any of the four is a pytest **collection error**, which `xfail` does not
+cover — it takes down every node in `tests/test_report_addendum_bound.py`, including the ones whose RED
+is meaningful. And a RED produced *by* an `ImportError` is a **vacuous RED**: it proves nothing about
+whether the predicate reaches the behaviour, which is the opposite of what §6.3 requires.
+**Mechanism, decided here rather than left to Phase 3:**
+
+- the test module **imports the module object** (`from s19_app.tui.services import report_service`) and
+  **never** the constant names at module level;
+- each `K`-derived or format-derived fixture reads its constant **inside the test body** through a single
+  module-level helper `_const(name, fallback)` = `getattr(report_service, name, fallback)`, with the four
+  fallbacks `200` / the three class labels / `8` / the notice format string;
+- **Inc-2's gate requires the fallbacks to be DELETED** — a one-line grep (`rg -n "_const\(" tests/test_report_addendum_bound.py` → **0 hits** after Inc-2) — so *"an AT quotes the constant, never its value"* is true from Inc-2 onward, which is where it matters, without making Inc-1's RED an import error.
+
+**`TC-492` still carries `xfail(strict=True)` regardless**, because its subject is the *existence* of the
+constants, not their value.
 
 **Rationale for putting the golden in Inc-1, not Inc-2:** if the golden is captured after the rewrite it
 certifies the rewrite against itself (C-12; both Phase-1 lanes flagged it independently, and the Phase-2
@@ -2340,8 +2931,11 @@ census that misses the one it does not:
 
 ## 12. Unresolved / flagged contradictions between the two lanes
 
-> Recorded rather than smoothed. Rows X-1…X-4 are **resolved here with the resolution stated**; X-2 and
-> X-5 carry an **open obligation**.
+> Recorded rather than smoothed. Rows X-1…X-4 are **resolved here with the resolution stated**;
+> **X-5 carries an open obligation. X-2 was CLOSED at Phase 2 and carries none** — *corrected in
+> revision 3 (`ARCH-N-5`): revision 2's preamble still said "X-2 and X-5 carry an open obligation" while
+> the X-2 row itself read "CLOSED at Phase 2 — no obligation carried". §12 is the section a later batch
+> greps for open obligations, so the preamble is the line that has to be right.*
 
 | # | Contradiction | Disposition |
 |---|---|---|
@@ -2353,7 +2947,7 @@ census that misses the one it does not:
 | **X-6** | **Constant name:** architect `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`; qa `MAX_ADDENDUM_HITS_PER_REGION_CLASS`. | Cosmetic. Architect's name adopted (`LLR-103.6` owns naming). Recorded so a grep for the qa name finds this line. |
 | **X-7** | **Notice wording:** architect `> TRUNCATED: …` (blockquote, one line per region+cut class); qa reference form `- _Truncated at 200 per class: …_` (list item, one line per region). | Architect's decision adopted; qa §9(a) explicitly deferred wording to the architect lane and its observables are wording-agnostic. Not a real contradiction — recorded for completeness. |
 | **X-8 (NEW)** | **Is disclosure sufficient, or must the batch PREVENT severity-blind eviction?** The Phase-2 security lane (S5) says the residual is real but §10.4 overstated it, and proposes two folds: a **dropped-severity histogram** in the notice, and **severity-priority admission** — the latter *"prevention at the specced cost"*, `O(R × 3K)`, subsequence-preserving. | **BOTH REJECTED for batch-64, with executed reasons; the underlying finding ACCEPTED and recorded.** (1) `ChangeSummaryEntry` (`changes/model.py:321-373`) has **no severity field** — the modification class cannot be ranked or histogrammed, so both folds must branch by class, and the security lane's probe sampled a `ValidationIssue`, which is why it did not surface this. (2) Severity-priority admission allows an **already-admitted hit to be evicted later**, so the affected-variant set is no longer monotone in traversal order and the `O(1)` last-seen sentinel (architect M-2) must become an `O(V)` membership set — **prevention on the severity axis costs the `V`-independence claim on the memory axis**, which is the bound this requirement exists to establish. (3) It also needs a stored document index per admitted hit plus a sort at emission. **What IS folded:** §10.4's overstatement is corrected with the executed mitigation; the real residual is renamed *"suppression of the SEVERITY SIGNAL, not of the evidence's existence"*; and §8.2's matrix now **prices** severity-priority admission instead of rejecting prevention having considered only one alternative. **Both folds carried to `BACKLOG-CODE.md` at MED as one item.** |
-| **X-9 (NEW)** | **Are the notice predicates decidable by counting `> TRUNCATED:`?** Revision 1 wrote *"0 notice lines anywhere in the report"*. | **NO — resolved by rescoping the predicate, not by weakening it.** Three pre-existing emitters (`report_service.py:1134` / `:1383` / `:1403`); `:1134` **fires on §7 T-5's own `flood = 400` row**, and `:1383` / `:1403` fire on axes the AT fixture does not control at all. All notice predicates are now **addendum-scoped** by rendered shape between the addendum heading and the next `^## `, with `TC-499` as the positive control. Recorded here so the next reader does not re-derive the three emitters. See A-17. |
+| **X-9 (NEW)** | **Are the notice predicates decidable by counting `> TRUNCATED:`?** Revision 1 wrote *"0 notice lines anywhere in the report"*. | **NO — resolved by rescoping the predicate, not by weakening it.** Three pre-existing emitters (`report_service.py:1134` / `:1383` / `:1403`); `:1134` **fires on §7 T-5's own `flood = 400` row**, and `:1383` / `:1403` fire on axes the AT fixture does not control at all. All notice predicates are now **addendum-scoped** by rendered shape between the addendum heading and the next `^## ` **or EOF, whichever comes first**, with `TC-499` as the positive control. **The `or EOF` arm is NEW in revision 3 (`QA-NEW-3`):** executed, the addendum is the **last** `## ` section of an ordinary report (heading #5 of 5; `## Truncation appendix` follows only when `notes` is non-empty, and `notes` is populated exclusively by `_hexdump_section`), so the revision-2 predicate resolved to **no scope** and read **0 addendum notices always** — vacuating `AT-197/198/199/201/202/203` **and** `TC-499`. **An empty scope shall FAIL the test, never read as zero notices.** Recorded here so the next reader does not re-derive the three emitters. See A-17, A-31. |
 
 ---
 
@@ -2370,12 +2964,12 @@ Every row carries a re-runnable citation.
 | 5 | Cost / latency estimated | ✓ | §7 T-1…T-8 — every threshold with RED and GREEN; §2.2 per-hit constants from both lanes |
 | 6 | Diagram when flow is non-trivial | ✓ | §14 mermaid — the loop inversion is the whole change |
 | 7 | What would change the recommendation | ✓ | §15 |
-| 8a | Every story has a first-class Acceptance block + `AT-NNN` | ✓ | §3 "Acceptance (black-box) — US-B64-1" (`AT-194/195/196`) and "— US-B64-2" (`AT-197/198/199`) |
+| 8a | Every story has a first-class Acceptance block + `AT-NNN` | ✓ **(row corrected in revision 3 — `QA-NEW-8`)** | §3 "Acceptance (black-box) — US-B64-1" (**`AT-194`, `AT-196`** — `AT-195` is **RETIRED**, §5.2) and "— US-B64-2" (**`AT-197`, `AT-198`, `AT-199`, `AT-200`, `AT-201`, `AT-202`, `AT-203`**). **9 live `AT`s.** Revision 2's row still read `AT-194/195/196` + `AT-197/198/199`: it cited the retired id and omitted all four nodes revision 2 itself created — the one place in the document where a grep for `AT-195` landed on something that looked live rather than on §5.2's retirement row |
 | 8b | Behavioral chain `US → AT → outcome` | ✓ | §6.2 table 1, 6 rows, each with its executed RED/GREEN |
 | 8c | Functional chain `US → HLR → LLR → TC` | ✓ | §6.2 table 2, 10 rows; `R-TUI-098`, `HLR-103` and every `LLR-103.x` appear; gap check stated |
 | 9 | **P-7 union preserved** | ✓ | §5.1 — 16 of 16 qa slugs bound; §5.2 — 1 explicit `RETIRED` with reason + 6 further retirements in writing |
 | 10 | Two-party-confirmed blocker recorded | ✓ | §2.6 — architect §7.1.5, qa §3.1, orchestrator, and this lane's own re-read of `range_index.py:62-68` |
-| 11 | Every threshold **whose subject exists on this tree** carries executed RED **and** GREEN from **this** tree | ✓ **(qualifier restored in revision 2 — qa m-2)** | §7 T-1…T-9; batch-63's `<1.5` / `2.0` / `R×3K+ε` / `559.7 GB` are **not** reused (§5.2). **Explicitly NOT covered by this ✓, and named rather than hidden:** `TC-490`, `TC-492`, `TC-495`'s equality half — subject is a constant or a notice that does not exist on `082ada9`; flagged `NOT EXECUTABLE PRE-FIX` in §6.2's ledger and `xfail(strict=True)` at Inc-1. The Phase-1 catalog carried this honesty flag (`01b-qa-catalog.md:750`, *"described rather than run … flagged as such rather than claimed"*) and **revision 1 dropped it into a flat ✓** — an honesty regression, corrected here |
+| 11 | Every threshold **whose subject exists on this tree** carries executed RED **and** GREEN from **this** tree | ✓ **(qualifier restored in revision 2 — qa m-2)** | §7 T-1…T-9; batch-63's `<1.5` / `2.0` / `R×3K+ε` / `559.7 GB` are **not** reused (§5.2). **Explicitly NOT covered by this ✓, and named rather than hidden:** `TC-490`, `TC-492`, `TC-495`'s equality half **and — added in revision 3 — `TC-498`** — subject is a constant, a notice, or an attribution walk that does not exist on `082ada9`; all four flagged `NOT EXECUTABLE PRE-FIX` in §6.2's ledger and `xfail(strict=True)` at Inc-1. The Phase-1 catalog carried this honesty flag (`01b-qa-catalog.md:750`, *"described rather than run … flagged as such rather than claimed"*) and **revision 1 dropped it into a flat ✓** — an honesty regression, corrected here. **§7 T-9 carries `TC-498`'s executed numbers for the SHIPPED producer and for `LLR-103.2`-implemented-verbatim; what it cannot carry is a pre-fix RED, and it says so** (A-30) |
 | 11b | RED figures are **not** presented as reproduction targets | ✓ **(NEW in revision 2 — architect M-4)** | §7 T-1 (2.27 / 2.265 / 2.000 across three fixtures), T-2 (300/2400/19200 vs 500/1000/4000), T-3 (1.98 / 1.982), T-4 (first-diff indices @3/@7, @5/@4) — each labelled fixture-specific, with §6.3's gate form *"failing side, ≥ 50 % margin, fixture named"* |
 | 12 | Competing lane thresholds resolved by execution, not averaged | ✓ | §7 T-1 (different quantities → one adopted, one retired in writing) · §7 T-3 (same quantity, both inside the executed gap `(1.02, 1.96)`, tighter adopted) · §12 X-5 (not averaged) |
 | 13 | Notice wording decided + justified + escaped | ✓ | §8.1 (constants), §8.2 (matrix), §8.3 (what it does not do), §2.7 (the sink), `TC-495` |
@@ -2457,8 +3051,13 @@ flowchart TB
 6. **If OB-4/F4 lands in the same release**, `AT-194` could be re-keyed from the marginal delta to the
    whole-report peak, which is a stronger and simpler observable. It is **unsatisfiable today** (§10.2)
    and must not be written now.
-7. **(NEW) If §10.7's work-axis residual is measured to matter in the field** — an operator declaring one
-   enclosing region plus many sub-blocks with a large candidate set, and reporting a slow report —
+7. **(NEW) If §10.7's work-axis residual crosses EITHER of two triggers** —
+   **(a) a measurable one, added in revision 3 (`SEC-N3`):** `A` on a real project report exceeds
+   **`10 000 000` region ops** in one `generate_project_report` call, i.e. roughly `R = 200` declared
+   regions against `N = 50 000` candidates — a figure that is well inside what an operator with a
+   fully-annotated calibration map can declare, and that `TC-498`'s own counter can be read for on any
+   real project without new instrumentation; **or (b) a field one:** an operator declares one enclosing
+   region plus many sub-blocks with a large candidate set and reports a slow report — then
    `LLR-103.2`'s **prefix-max array is replaced by a max-segment-tree over `ends`**, descending, giving
    output-sensitive `O((1 + k) log R)` enumeration. Nothing else in this spec changes: correctness is
    already proven for the enumeration contract (0 mismatches over 375 064 + ~150 000 swept addresses,
@@ -2500,9 +3099,38 @@ Per-decision audit table (body-edit-first; every row's "Body edit landed?" point
 Three findings changed the **shipped requirement text** (`R-TUI-098`): A-10 (non-claim (e)),
 A-13 (non-claim (f)), A-25 (non-claim (d)). Three changed `HLR-103`'s Statement: A-10, A-12/A-13, A-16.
 
+**Event 3 — Phase-2 RE-GATE fold, revision 3, 2026-07-27 (`iterate-to-refine` iteration 2).** Inputs:
+`02-regate-security.md` (OK-to-ship unconditional; 6/6 CLOSED; N1–N5 LOW/nit), `02-regate-qa.md` (9/9
+CLOSED; NEW-1…NEW-4 major, NEW-5…NEW-9 minor), `02-regate-architect.md` (9 CLOSED / 3 PARTIAL; N-1
+blocker, N-2 major, N-3/N-4/N-5 minor). **19 finding ids in**, with four cross-lane
+duplicate pairs (`ARCH-N-1`≡`QA-NEW-1`, `ARCH-N-2`≡`QA-NEW-2`, `ARCH-N-4`≡`QA-NEW-5`,
+`ARCH-N-3`≡`SEC-N2`) and two merged findings carrying two distinct sub-parts each —
+**dispositioned as 16 rows in §17.6, 0 silently dropped, 0 rejected.** Amendment rows **A-28 … A-40** (§9c).
+**No requirement Statement changed and no measurement was re-derived** — the entire fold is the
+execution plan (§11/§11.1), the instrumentation of `TC-498`/`TC-499`, and five citations. Two parents
+were re-read as CHANGED: **`LLR-103.1`** (A-29, it gains the region-op seam obligation) and **`HLR-103`**
+(A-37, threshold-list wording only). **One defect was found by this lane that no re-gate lane raised**
+and is folded with the rest: the `≥ 50 %` RED-margin rule kills `TC-483` (A-33, §11.1 note 3).
+
+| Decision | What changed | Parent re-read? | Body edit landed? |
+|---|---|---|---|
+| A-28 | §11.1's Inc-1 verdict column derived by execution for all 28 nodes | `HLR-103` / `R-TUI-098` — no change required | §11.1 table + transcript + note 1 |
+| A-29 | `A` pinned to `ends[i] >= addr`; a named seam required | **`LLR-103.1` CHANGED** — seam obligation | §1.3; §4 `LLR-103.1`; §7 T-9 |
+| A-30 | `TC-498` → `NOT EXECUTABLE PRE-FIX` | `HLR-103` — no change required | §6.2; §7 T-9; §11.1 |
+| A-31 | addendum scope gains `or EOF` + empty-scope-fails | `LLR-103.5` — acceptance criteria only | §3 US-B64-2; §7 T-5; §12 X-9 |
+| A-32 | Inc-1 constants via `_const(name, fallback)`, deleted at Inc-2 | `LLR-103.5`/`LLR-103.6` — no change required | §6.2; §11; §11.1 note 4 |
+| A-33 | the RED gate stated per threshold family | `HLR-103` — no change required | §6.3; §11; §11.1 note 3 |
+| A-34 | `AT-200`'s rationale + RED arm corrected | `HLR-103` — no change required | §4 `LLR-103.5`; §6.2; §11.1 |
+| A-35 | `AT-203`'s `### ` split keys on the escaped name | `LLR-103.5` — no change required | §4 `LLR-103.5` |
+| A-36 | `AT-198` a parametrised family | `LLR-103.5` — no change required | §11.1 note 2 |
+| A-37 | `HLR-103`'s ops bullet leads with the adopted form | **`HLR-103` CHANGED** — wording | §3 `HLR-103` |
+| A-38 | §15 item 7 gains a measurable arm | `R-TUI-098` — no change required | §15 item 7 |
+| A-39 | freeze-set line, numeral rendering, *contiguity* | none changed | §10.5; `LLR-103.2`; §8.2; doc-wide |
+| A-40 | §12 preamble, §13 row 8a | none changed | §12; §13 |
+
 ---
 
-## 17. Phase-2 finding disposition — all 27, one row each
+## 17. Phase-2 finding disposition — all 27, one row each (+ §17.6, the 19 re-gate finding ids)
 
 > **The P-7 artefact for revision 2.** batch-63's consolidation dropped 8 of ~18 observables; revision 1
 > of THIS document dropped `AT-197`'s variant-identity boundary from the catalog into prose. **A finding
@@ -2512,13 +3140,18 @@ A-13 (non-claim (f)), A-25 (non-claim (d)). Three changed `HLR-103`'s Statement:
 > **One named SUB-PART is rejected in writing** — `SEC-S5` fold 2, the severity histogram — at §17.4,
 > §5.2 and §12 X-8, with executed evidence and a backlog carry. Both narrowed rows say in the row which
 > option of the reviewer's own two was taken and which was declined.
-> Key: `<lane>-<id>`. `§` references are to sections of **this** document, revision 2.
+> Key: `<lane>-<id>`. `§` references are to sections of **this** document.
+> **REVISION 3: §17.6 below adds the 19 Phase-2 RE-GATE finding ids as 16 rows — 16 `FOLDED`,
+> 0 `REJECTED`, 0 `CARRIED` — keyed `ARCH-N-n` / `QA-NEW-n` / `SEC-Nn`, with the three cross-lane duplicates
+> dispositioned once and jointly. §17.7 records the re-gate findings this lane re-executed and could
+> not fault, and the rulings it does not reopen. Running total: **46 finding ids, 43 disposition rows,
+> 0 silently dropped.**
 
 ### 17.1 Blockers (5)
 
 | # | finding | sev | disposition | lands in |
 |---|---|---|---|---|
-| **SEC-S1** | `R-TUI-098` claims cost independent of `R`; the `R` multiplier is **relocated** into `LLR-103.2`'s attribution walk, where no acceptance looks. `153 600` region ops for 300 candidates at `R = 512`; `19 200` at `R = 64` | blocker | **FOLDED — security's arm (a), plus its mandatory G-2 fixture** | §3 `R-TUI-098` Statement (*"candidate consumption"*) + **non-claim (e)** · §3 `HLR-103` Statement + Rationale + threshold · §7 **T-9** (new) · §10.7 (new residual) · **`TC-498`** (new node) · §14 diagram `O(V×E·(log R + A) + R×3K)` · `TC-497` verbatim set gains `500 → 128000` · §9b **A-10** |
+| **SEC-S1** | `R-TUI-098` claims cost independent of `R`; the `R` multiplier is **relocated** into `LLR-103.2`'s attribution walk, where no acceptance looks. `153600` region ops for 300 candidates at `R = 512`; `19200` at `R = 64` | blocker | **FOLDED — security's arm (a), plus its mandatory G-2 fixture** | §3 `R-TUI-098` Statement (*"candidate consumption"*) + **non-claim (e)** · §3 `HLR-103` Statement + Rationale + threshold · §7 **T-9** (new) · §10.7 (new residual) · **`TC-498`** (new node) · §14 diagram `O(V×E·(log R + A) + R×3K)` · `TC-497` verbatim set gains `500 → 128000` · §9b **A-10** |
 | **ARCH-B-1** | same defect from the other side: `AT-195`/`TC-488`/`TC-489` count leaves and stay GREEN at `R = 256` while work grows ×256; `huge+tiny` executed `500 → 128000` | blocker | **FOLDED — architect's recommended fold 3 + fold 2 + fold 4** (narrow the claim, add the ops arm, record the `all-nested` irreducibility). Fold 1 (segment tree) **declined for batch-64** and moved to §15 item 7 as the named reversal trigger — which is the architect's own stated recommendation | as SEC-S1, plus §10.7's *"`all-nested` is irreducible"* paragraph and §4 `LLR-103.2`'s STRUCTURE PINNED bullet · §9b **A-10**, **A-11** |
 | **QA-B-1** | `AT-197`'s `{variants} ⊇ {v2,v3}` is a representation check; `FIX-H` is GREEN on the **entire** revision-1 acceptance set while inverting US-B64-2 for the attacker variant | blocker | **FOLDED — all three recommended sub-folds** (set equality · `FIX-H` a named RED arm · its own boundary arm) | §3 US-B64-2 outcome + *"Why this is not `AT-165` again"* (rewritten, with the `FIX-H` transcript) + boundary catalog · §4 `LLR-103.5` Statement + threshold · §5.1 row 12 · §6.2 · §7 T-5 · **`AT-202`** (new node) · §9b **A-12** |
 | **ARCH-B-2** | Inc-2's one-file cut is infeasible: `tests/test_report_field_census.py:353` is a source-AST census that fires on the notice's new `md_safe` site, and no increment owns the file | blocker | **FOLDED — architect's primary fold (add the file to Inc-2), WITH A CORRECTION** (§17.5): the census trip is **conditional on the expression spelling**, so revision 2 *also* pins the spelling. The alternative fold (reuse already-escaped strings) is **declined** — it leaves the sink unplanted, which the architect explicitly recommended against | §2.3 (two new constraint rows) · §4 `LLR-103.5` (pinned spelling + column-0 note) · §10.10 (new) · §11 Inc-2 gains the file with an **unconditional `PLANTED`** obligation + a conditional `_ESCAPED_EXPRESSIONS` obligation · §11 census table · §9b **A-23** |
@@ -2618,3 +3251,60 @@ right — but the *stated mechanism* is wrong and would mislead Phase 3 if copie
 wrong. 27 findings, **0** challenges to the single-pass / one-ordered-list / three-counters shape, and
 three independent soundness sweeps of `LLR-103.2` totalling **> 525 000** address checks with **0**
 mismatches (qa Phase-1 §3.1 P1e · security Phase-2 §5 V1 · architect Phase-2 §3).
+
+---
+
+### 17.6 Phase-2 **RE-GATE** disposition — all 19 finding ids, 16 rows (revision 3)
+
+> **Prior findings first, so nothing is assumed carried:** security **6 of 6 CLOSED, unconditional
+> OK-to-ship**; qa **9 of 9 CLOSED, no partials**; architect **9 CLOSED / 3 PARTIALLY CLOSED**
+> (`ARCH-B-1` → `ARCH-N-2`, `ARCH-B-3` → `ARCH-N-1`, `ARCH-M-4` → `ARCH-N-4`; each partial's residue is
+> a row below). **`ARCH-N-1` and `QA-NEW-1` are the SAME finding from two lanes** and are dispositioned
+> once, jointly. **19 finding ids across three lanes; 4 cross-lane duplicate pairs; two of the merged
+> findings (`ARCH-N-1`, `QA-NEW-2`) carry two structurally distinct sub-parts each and get a row apiece.
+> Dispositioned as 16 rows: `16 FOLDED · 0 REJECTED · 0 CARRIED`.**
+> **Zero design objections across two gates.** Every row below lands in §11/§11.1, in the
+> instrumentation of `TC-498`/`TC-499`, or in a citation.
+
+| # | lane · sev | finding | disposition | lands in |
+|---|---|---|---|---|
+| **`ARCH-N-1` = `QA-NEW-1`** | architect **blocker** · qa **major** | §11.1 asserts RED at Inc-1 for **8 of 28** nodes that are GREEN on `082ada9`; Inc-1's gate *"the table reproduced exactly"* is unsatisfiable — **`ARCH-B-3`'s defect class surviving `ARCH-B-3`'s fold** | **FOLDED — the architect's per-node re-derivation, not the alternative** (*"demote the gate to 'per the table, categories included'"*), **and applied to the whole catalog rather than to the named rows.** Every one of the 28 verdicts is re-derived by **driving the shipped producer**; the transcript is pasted; each row states the **rule** it follows from; every newly-GREEN row gets a named Inc-2 mutant arm or a written *"pure regression guard"* note. **qa's specific arm assignments adopted** (`FIX-E` for `TC-486`/`TC-487`); two arms **created** (`FIX-NONE`, `FIX-SCOPE`) | §6.2 ledger · §6.3 · §11 Inc-1 + Inc-2 gates · §11.1 (table + transcript + note 1) · §9c **A-28** |
+| **`ARCH-N-2` = `QA-NEW-2`** | architect **major** · qa **major** | `TC-498` names no instrument; `A == R × N` holds under only 1 of 3 counting conventions; `LLR-103.2`'s own reversibility note moves two of them | **FOLDED — the architect's "pin the counter" option, not the alternative** (*"drop the equality for a recorded-value-only assertion"*). **The equality FORM is UPHELD by both lanes and is not reopened.** `A` = `ends[i] >= addr` comparisons **only**; the `pmax` guard, both bisects and the reject pre-filter **excluded**, so the counter is invariant under the design note's sanctioned removal (executed: `128000` with the reject and `128000` without). **qa's seam requirement adopted in full** — the walk **shall** expose its count through one named test seam. **The fixture precondition is stated** (all `R` starts below the probe address), without which the equality is fixture luck | §1.3 (`A`) · §4 `LLR-103.1` (3 sub-bullets + transcripts) · §7 T-9 · §9c **A-29** |
+| **`ARCH-N-1(b)` = `QA-NEW-2(b)`** | architect **blocker** · qa **major** | both of `TC-498`'s stated verdicts **invert** under the obvious instrument: SHIP reads exactly `R × N` (GREEN at Inc-1 where §11.1 says RED); `FIX-A` reads `0` (RED at Inc-2 where §11.1 says GREEN) | **FOLDED — both lanes' shared conclusion.** `TC-498` is `NOT EXECUTABLE PRE-FIX`, `xfail(strict=True)` alongside `TC-490`/`TC-492`/`TC-495`. Independently re-executed by this lane: `500 / 4000 / 32000 / 128000` `contains` calls on SHIP; **0** under the `LLR-103.2` walk | §6.2 ledger · §7 T-9 (new sub-bullet + transcript) · §11.1 row · §9c **A-30** |
+| **`QA-NEW-3`** | qa **major** | the S3 addendum-scope fold is **vacuous as written**: the addendum is the **last** `## ` section, so *"heading … next `^## `"* finds no scope and reads 0 notices always | **FOLDED — both recommended clauses.** *"…or end-of-file, whichever comes first"* at all three sites, **and** an empty scope shall **fail the test**, never read as zero notices. Re-executed end-to-end by this lane: heading #5 of 5, `next '^## '` = NONE-EOF, literal predicate → **no scope**. Recorded plainly that **revision 2's own fold planted this** | §3 US-B64-2 (clause + transcript) · §7 T-5 preamble · §12 X-9 · §9c **A-31** |
+| **`QA-NEW-4`** | qa **major** | the Inc-1 nodes quote four constants that raise `ImportError` on `082ada9`; a module-level import is a **collection error**, which `xfail` does not cover, and a RED-by-import is a **vacuous RED**; the ledger names only `TC-490/492/495` | **FOLDED — qa's `getattr` option, made a spec obligation rather than a suggestion.** `_const(name, fallback)` read **inside the test body**, module object imported but never the names; **Inc-2's gate requires the fallbacks deleted** (`rg -n "_const\("` → 0) and Inc-1's requires `pytest --collect-only` → 0 errors. §6.2's *"everything else → expected RED"* is replaced by an **enumerated** 13-node class, so the ledger cannot silently absorb a node again | §6.2 ledger (rewritten + closing note) · §11 both gates · §11.1 note 4 · §9c **A-32** |
+| **`ARCH-N-4` + `QA-NEW-5`** | architect **minor** · qa **minor** | the `≥ 50 %` RED-margin rule is undefined for the ~12 boolean nodes, and has only **3.8 pp** of headroom for `AT-194` | **FOLDED — architect's `≥ 25 %` scoping AND qa's boolean clause, both, plus a THIRD family this lane found by execution.** A boundary node's RED is `threshold + 1` **by construction**, so `TC-483` fails by **0.5 %** and any margin rule kills the one genuinely-correct RED in the `K-1/K/K+1` family; and an exact-equality node's margin is **per-arm** (`TC-488`'s `R = 1` arm reads 0.0 % because SHIP is *correct* at `R = 1`). Four families, four gate forms | §6.3 (family table) · §11 Inc-1 gate · §11.1 note 3 (arithmetic) · §9c **A-33** |
+| **`QA-NEW-6`** | qa **minor** | `AT-200`'s `emit()`-byte-budget rationale and RED arm are **executed-false** — and the qa lane records it as **its own `QA-M-3` claim copied verbatim into the spec** | **FOLDED — qa's restatement, with the provenance noted as it asked.** The justification becomes *the only Layer-B node observing the notice through the file **and** the seam* (US-B64-2's delivery), plus the forward-looking *"guards a hole the batch-63 `_ByteBudget` carry would open"*. The RED arm is replaced by RED→GREEN across the increment boundary. Re-executed by this lane: `emit` never drops, has no `fits` reference, and is a **closure** | §4 `LLR-103.5` (rewritten bullet + transcript) · §6.2 table 1 · §11.1 row · §9c **A-34** |
+| **`QA-NEW-7`** | qa **minor** | `AT-203`'s `### ` split must key on the **`md_safe`-escaped** region name, or the "absent elsewhere" half passes vacuously | **FOLDED — qa's clause verbatim, plus its "assert both sub-sections were FOUND" half.** Re-executed: `DeclaredRegion("B_quiet", …)` renders `### B\_quiet (…)` | §4 `LLR-103.5` (new bullet + transcript) · §9c **A-35** |
+| **`QA-NEW-8`** | qa **minor** | §13 row 8a is stale — cites the retired `AT-195`, omits `AT-200…AT-203` | **FOLDED — one-line edit, as recommended.** It was the only place in the document where a grep for `AT-195` landed on something that looked live | §13 row 8a · §9c **A-40(b)** |
+| **`QA-NEW-9`** | qa **minor** | `AT-198` carries three §11.1 rows with three different Inc-1 verdicts under one id; *"the table reproduced exactly"* needs three collected nodes | **FOLDED — qa's parametrised-family statement verbatim.** Explicitly **not** a reopening of `QA-M-4`: arms 1–2 stay under `AT-198` | §11.1 note 2 · §9c **A-36** |
+| **`ARCH-N-3` = `SEC-N2`** | architect **minor** · security LOW | `HLR-103`'s threshold bullet leads in bold with the `c`-bound form that was **not** adopted, and only then disclaims it | **FOLDED — both lanes' identical fold.** The bullet leads with `A == R × N`; the `c`-bound moves underneath as the stated-and-rejected alternative with the reason no constant `c` exists | §3 `HLR-103` threshold list · §9c **A-37** |
+| **`ARCH-N-5`** | architect **minor** | §12's preamble contradicts its own X-2 row (*"X-2 and X-5 carry an open obligation"* vs *"CLOSED at Phase 2"*) | **FOLDED — the architect's wording.** §12 is the section a later batch greps for open obligations | §12 preamble · §9c **A-40(a)** |
+| **`SEC-N1`** | security LOW | the freeze-set citation is off by one at two sites: `:122` is `hexfile.py`, `range_index.py` is at `:123` | **FOLDED — corrected at both sites and re-verified on disk by this lane** (`_ENGINE_PATHS` opens `:120`; `:121` `core.py`, `:122` `hexfile.py`, `:123` `range_index.py`) | §10.5 · §4 `LLR-103.2` · §9c **A-39(a)** |
+| **`SEC-N3`** | security LOW | §15 item 7's reversal trigger is a field complaint, not a measurable threshold | **FOLDED — the security lane's suggested shape, with the number supplied.** Arm (a) `A > 10 000 000` region ops in one call (≈ `R = 200` × `N = 50 000`), readable from `TC-498`'s own counter; arm (b) the field complaint, retained | §15 item 7 · §9c **A-38** |
+| **`SEC-N4`** | security nit | §8.2 reason 2 says *"not monotone"* where it means *"not contiguous per variant"* | **FOLDED — the term corrected, the conclusion untouched.** The set **is** monotone; eviction destroys per-variant contiguity, which is what the `O(1)` sentinel depends on | §8.2 reason 2 · §9c **A-39(c)** |
+| **`SEC-N5`** | security nit | the document renders both `19200` and `19 200` while `TC-497` greps for one form | **FOLDED — normalised to the grep-list form**, `19 200` → `19200` (7 sites); **and `153 600` → `153600` (4 sites), found by this pass and folded with it.** `128000` was already consistent (13 / 0 before the fold). A verbatim grep list that does not match its own document is the defect class this batch exists to remove | document-wide · §9c **A-39(b)** |
+
+### 17.7 Re-gate findings this lane checked and could **not** fault
+
+Recorded because *"folded"* is only meaningful if the alternative was possible. **This lane re-executed
+every re-gate finding it folded and found none of them wrong.** In particular:
+
+- **`ARCH-N-1`'s eight mismatches all reproduce**, on a probe written independently of both lanes'
+  (`scratchpad/r3_all28.py` drives the shipped producer per node; the architect's `p7_inc1_verdicts.py`
+  and qa's `qa3_inc1verdicts.py` were read only after). The architect listed 8 and qa listed 4 of the
+  same 8; the union is the 8 in §11.1, and **no ninth mismatch exists** — `TC-480`, `TC-483`, `TC-488`,
+  `TC-489`, `TC-493` are correctly RED, and `TC-491` correctly GREEN.
+- **`TC-486`'s RED genuinely belongs to `range_index`'s primitive, not to the addendum** — executed both
+  sides: `address_in_sorted_ranges(0x5000, …) = False` on the uncoalesced set while the shipped
+  addendum, using `DeclaredRegion.contains`, emits the hit **correctly**. That is why the node lives on
+  `LLR-103.2` as a guard on the **new** implementation's coalescing precondition, with `FIX-E` as its
+  arm — and not as a defect of the shipped producer.
+- **The rulings the re-gate made and this revision does not reopen:** `AT-194` stays an `AT` (architect
+  §5 — `tracemalloc` substitutes nothing and names no private symbol; demoting it would leave US-B64-1
+  with **zero** black-box nodes able to go RED pre-fix, since `AT-196` is GREEN by construction; both
+  stated conditions are kept in §3's Deliverable clause). `TC-498`'s equality **form** is upheld by both
+  lanes. The `SEC-S5` fold-2 rejection stands, verified against the model on disk (8 fields, no
+  severity). `screens_directionb.py:1889` is **not** a live defect (206 fixtures, 89 032 addresses, 0
+  mismatches) and `apply.py::_linkage_index` remains the only live one. The increment table's **design**
+  is right; it was the **verdict column** that was wrong.
