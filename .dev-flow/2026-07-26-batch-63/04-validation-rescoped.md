@@ -41,6 +41,42 @@ authored before these survived, one of them by the orchestrator.
 
 Every AT is exactly ONE on-disk node (C-18). No AT is satisfied "in parts".
 
+## 2b. Traceability: LLR → AT → TC → node (closes PR-gate M-1)
+
+`01b-qa-catalog-rescoped.md` is **superseded**, and its §4 semantics for `TC-467..479` are
+**retired** — three of those ids were bound there to different observables than the shipped nodes
+carry (catalog `TC-473` = the derived census, `TC-475` = report-writer output). A range reservation
+is not a catalog, so the shipped per-id semantics are defined here and nowhere else:
+
+| LLR | AT | TC | on-disk node |
+|---|---|---|---|
+| LLR-102.1 (one encoder; both writers) | AT-172 | TC-470 | `test_report_document_bytes.py::test_at172_replacing_the_encoder_changes_what_the_project_report_writes` |
+| LLR-102.3 (platform-independent size) | AT-172 | TC-471 | `…::test_at172b_the_unpatched_report_is_exactly_the_encoder_output` |
+| LLR-102.1 (flow writer on the seam) | AT-173 | TC-472 | `test_flow_report_service.py::test_at173_replacing_the_encoder_changes_what_write_flow_report_writes` |
+| LLR-102.3 (flow bytes == encoder output) | AT-173 | TC-475 | `test_flow_report_service.py::test_at173b_flow_report_bytes_equal_the_encoder_output` |
+| LLR-102.2 (`+1`/line unchanged) | AT-174 **(PIN)** | TC-473 | `…::test_at174_line_bytes_charges_one_byte_per_line` |
+| LLR-102.2 (partition invariance) | AT-174 **(PIN)** | TC-474 | `…::test_at174b_line_bytes_is_partition_invariant` |
+| LLR-102.1 (no text-mode writer shares the budget) | AT-193 | TC-476 | `…::test_at193_no_accounting_module_writes_in_text_mode` |
+| LLR-102.1 (the census detector can fire) | AT-193 | TC-477 | `…::test_at193b_the_text_mode_detector_can_actually_fire` |
+| LLR-102.3 (Windows behaviour) | AT-175 | TC-478 | `…::test_at175_written_report_carries_no_cr_on_a_crlf_host` |
+| LLR-102.4 (golden neutrality) | — | TC-479 | the 29 snapshot cells + the 6-file derived observer set (§6) |
+
+Recorded plainly: **this is the batch's own OB-2 defect recurring inside the batch** — shipped ids
+whose semantics lived only in a superseded artifact. It is a documentation repair, not a code
+defect; every LLR already had an executed, mutation-killed verifier.
+
+## 2c. OB-SEC-1 discharged (closes PR-gate m-2)
+
+The Phase-2 security review obliged Phase 3 to paste the cross-module edit's numstat as evidence:
+
+```
+$ git diff --numstat origin/main -- s19_app/tui/services/flow_report_service.py
+2	1	s19_app/tui/services/flow_report_service.py
+```
+
+Two insertions, one deletion — exactly the import line plus the writer swap, and nothing else in the
+module batch-62 restored byte-for-byte.
+
 ## 3. What CI can and cannot verify — stated, not papered over
 
 `tui-ci.yml:25,:61` and `snapshot-regen.yml:23` all run `ubuntu-latest`. There, the **unpatched**

@@ -4861,7 +4861,8 @@ emission there, not merely a cap.
   diff = 0; goldens measured neutral over the whole suite, not assumed. **Scope carried, not
   closed:** batch-63 shipped D3 only. D1 (the declared-region addendum's `O(R×V×E)` resident cost)
   and D2 (a schema-legal address denying the report at the decimal `Length` column,
-  `report_service.py:996` and `:1171`) were returned to `.dev-flow/BACKLOG.md` at the Phase-2
-  re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
+  `report_service.py:996` and `:1171` — **line numbers as of `031ca8d`**; this batch added +44 lines
+  to that module, so re-derive rather than copy them) were returned to `.dev-flow/BACKLOG.md` at the
+  Phase-2 re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
   `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is
   closed by neither this requirement nor a `_ByteBudget` remedy.

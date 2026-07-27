@@ -456,14 +456,15 @@ def test_at173_replacing_the_encoder_changes_what_write_flow_report_writes(
     decides *emission* here, not merely a cap — which is why this module is in
     scope alongside the project report.
 
-    **The patch target is load-bearing.** That import is a
-    ``from .report_service import (...)``, so rebinding
+    **The patch target is load-bearing, though not for the reason first written
+    here.** That import is a ``from .report_service import (...)``, so rebinding
     ``report_service.document_bytes`` would leave the name this module already
-    holds untouched and this test would pass against an unfixed writer. It patches
-    the binding in the module under test — the standard patch-where-it-is-used
-    rule. Pre-fix it is RED on every platform including CI, because
-    ``write_flow_report`` reached ``Path.write_text`` and no encoder existed to
-    rebind.
+    holds untouched. Measured at the PR gate: the wrong target yields a
+    **false-NEGATIVE** — it is RED against a *correct* writer, not green against a
+    broken one — so it would block a good change rather than pass a bad one. It
+    patches the binding in the module under test, the standard
+    patch-where-it-is-used rule. Pre-fix this test is RED on every platform
+    including CI, because ``write_flow_report`` reached ``Path.write_text``.
 
     Note this is also the first test of ``write_flow_report`` at all: every other
     case in this file exercises the pure ``compose_flow_report``.

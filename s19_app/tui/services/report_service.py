@@ -407,10 +407,13 @@ def document_bytes(text: str) -> bytes:
     """
     Summary:
         Encode a composed report document to the exact bytes written to disk
-        (LLR-102.1) — the single seam where report bytes are made. Takes the
-        already-composed text rather than a line sequence so that both callers
-        can use it: :func:`generate_project_report` joins lines, while
-        ``flow_report_service.compose_flow_report`` returns a ``str``.
+        (LLR-102.1) — the single seam for every report writer **that consults a**
+        :class:`_ByteBudget`. Takes the already-composed text rather than a line
+        sequence so that both callers can use it: :func:`generate_project_report`
+        joins lines, while ``flow_report_service.compose_flow_report`` returns a
+        ``str``. ``diff_report_service`` is deliberately outside this seam — it
+        documents "no run cap, no byte budget", so it has no accounting that a
+        newline expansion could contradict.
 
     Args:
         text (str): The composed document.

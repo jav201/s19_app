@@ -14,7 +14,7 @@
     "operator_phrasing": "Autónomo + self-merge (AskUserQuestion, resume session 2026-07-26). The PRIOR session's identical grant did NOT travel; this is a fresh per-batch grant over the RE-SCOPED D1/D2/D3 objective.",
     "decision_recording_ack": "ASSUMED GRANTED under the standing pattern (batch-60/61/62) rather than re-asked; flagged in PLAN.md D-5 so the assumption is visible and correctable. Every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
-  "current_phase": 4,
+  "current_phase": 6,
   "phase_status": "in-progress",
   "resume_checkpoint": {
     "date": "2026-07-26",
@@ -53,7 +53,10 @@
     "2-rescoped-qa": ".dev-flow/2026-07-26-batch-63/02-review-rescoped-qa.md",
     "2-rescoped-security": ".dev-flow/2026-07-26-batch-63/02-review-rescoped-security.md",
     "2-regate-qa": ".dev-flow/2026-07-26-batch-63/02-regate-discharge-qa.md",
-    "2-regate-security": ".dev-flow/2026-07-26-batch-63/02-regate-security.md"
+    "2-regate-security": ".dev-flow/2026-07-26-batch-63/02-regate-security.md",
+    "1-architect-rev5-laneA": ".dev-flow/2026-07-26-batch-63/01-requirements-architect-rev5.md",
+    "1-architect-rev5-laneB": ".dev-flow/2026-07-26-batch-63/01-requirements-architect-rev5-lane-b.md",
+    "4-rescoped": ".dev-flow/2026-07-26-batch-63/04-validation-rescoped.md"
   },
   "decisions_log": [
     {

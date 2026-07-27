@@ -70,28 +70,75 @@ def _accounting_modules() -> list[Path]:
     """
     wanted = {"_ByteBudget", "_line_bytes"}
     found = [Path(rs.__file__)]
-    for path in sorted(_SERVICES.glob("*.py")):
+    for path in sorted(_SERVICES.rglob("*.py")):
         if path.name == Path(rs.__file__).name:
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom) and node.module == "report_service":
+            # Accept BOTH the relative and the absolute spelling: a module that
+            # writes ``from s19_app.tui.services.report_service import
+            # _ByteBudget`` shares the same accounting and must not be invisible
+            # to this census just because it spelled the import differently.
+            if isinstance(node, ast.ImportFrom) and node.module and (
+                node.module == "report_service" or node.module.endswith(".report_service")
+            ):
                 if wanted & {alias.name for alias in node.names}:
                     found.append(path)
                     break
     return sorted(found)
 
 
-def _write_text_calls(path: Path) -> list[int]:
-    """Return the line numbers of every ``.write_text(...)`` call in ``path``."""
+def _text_mode_writes(path: Path) -> list[int]:
+    """Return the line numbers of every TEXT-MODE document write in ``path``.
+
+    Summary:
+        Flag both spellings of the defect: ``Path.write_text(...)`` and an
+        ``open``-family call whose mode lacks ``b``. R-TUI-097 states the rule as
+        "shall not encode or newline-translate on its own", so keying only on the
+        ``write_text`` attribute would leave the census GREEN against the same
+        defect reintroduced through ``open(path, "w")`` — a predicate narrower
+        than its label, which is this batch's own recurring defect class.
+
+    Args:
+        path (Path): A module to scan.
+
+    Returns:
+        list[int]: Line numbers of the offending calls, empty when clean.
+
+    Data Flow:
+        - module source -> AST -> ``Call`` nodes -> the offender line numbers the
+          census asserts are absent.
+
+    Dependencies:
+        Used by:
+            - test_at193_no_accounting_module_writes_in_text_mode
+    """
     tree = ast.parse(path.read_text(encoding="utf-8"))
-    return [
-        node.lineno
-        for node in ast.walk(tree)
-        if isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Attribute)
-        and node.func.attr == "write_text"
-    ]
+    hits: list[int] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if isinstance(func, ast.Attribute) and func.attr == "write_text":
+            hits.append(node.lineno)
+            continue
+        # open(...) / io.open(...) / codecs.open(...) in a writing text mode.
+        name = (
+            func.attr if isinstance(func, ast.Attribute)
+            else func.id if isinstance(func, ast.Name)
+            else None
+        )
+        if name != "open":
+            continue
+        mode = None
+        if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant):
+            mode = node.args[1].value
+        for kw in node.keywords:
+            if kw.arg == "mode" and isinstance(kw.value, ast.Constant):
+                mode = kw.value.value
+        if isinstance(mode, str) and "b" not in mode and any(c in mode for c in "wax+"):
+            hits.append(node.lineno)
+    return hits
 
 
 def _one_variant_report(tmp_path: Path) -> Path:
@@ -221,11 +268,50 @@ def test_at193_no_accounting_module_writes_in_text_mode() -> None:
     )
     assert {m.name for m in modules} >= {"report_service.py", "flow_report_service.py"}
 
-    offenders = {m.name: _write_text_calls(m) for m in modules if _write_text_calls(m)}
+    offenders = {m.name: _text_mode_writes(m) for m in modules if _text_mode_writes(m)}
     assert not offenders, (
         f"these modules share the _ByteBudget accounting but write in text mode, "
         f"so the file can differ from what was charged: {offenders}"
     )
+
+
+def test_at193b_the_text_mode_detector_can_actually_fire() -> None:
+    """AT-193 / TC-477 — positive control for the detector itself.
+
+    ``AT-193`` asserts an ABSENCE, so on a fixed tree it passes whether or not
+    its detector works at all. This drives ``_text_mode_writes`` over a source
+    that contains each offending spelling and asserts it finds every one — and
+    over the byte-mode spellings and asserts it finds none.
+
+    Without this, hardening the detector to cover ``open(p, "w")`` would be an
+    unverified claim: the census would stay green either way.
+    """
+    import tempfile
+
+    offending = (
+        'p.write_text("x")',
+        'open(p, "w")',
+        'io.open(p, "wt")',
+        'codecs.open(p, mode="a")',
+        'open(p, "x")',
+    )
+    clean = (
+        'p.write_bytes(b"x")',
+        'open(p, "wb")',
+        'io.open(p, "rb")',
+        'open(p, "r")',
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        probe = Path(tmp) / "probe.py"
+
+        for src in offending:
+            probe.write_text(src, encoding="utf-8")
+            assert _text_mode_writes(probe), f"detector missed a text-mode write: {src}"
+
+        for src in clean:
+            probe.write_text(src, encoding="utf-8")
+            assert not _text_mode_writes(probe), f"detector false-positived on: {src}"
 
 
 # --------------------------------------------------------------------------
