@@ -15,7 +15,7 @@
     "decision_recording_ack": "ASSUMED GRANTED under the standing pattern (batch-60/61/62) rather than re-asked; flagged in PLAN.md D-5 so the assumption is visible and correctable. Every un-asked decision logged in PLAN.md + state.json.decisions_log + 05-postmortem.md and carried to the vault at sync."
   },
   "current_phase": 6,
-  "phase_status": "in-progress",
+  "phase_status": "approved",
   "resume_checkpoint": {
     "date": "2026-07-26",
     "event": "HOST CRASH (RAM exhaustion) killed the in-flight REV-5 pivot derivation. Tree verified on disk after the crash, per the interruption protocol — do not regenerate what landed.",
@@ -29,10 +29,10 @@
     "0": 0,
     "1": 3,
     "2": 3,
-    "3": 0,
-    "4": 0,
-    "5": 0,
-    "6": 0
+    "3": 1,
+    "4": 1,
+    "5": 1,
+    "6": 1
   },
   "artifacts": {
     "plan": ".dev-flow/2026-07-26-batch-63/PLAN.md",
@@ -56,7 +56,11 @@
     "2-regate-security": ".dev-flow/2026-07-26-batch-63/02-regate-security.md",
     "1-architect-rev5-laneA": ".dev-flow/2026-07-26-batch-63/01-requirements-architect-rev5.md",
     "1-architect-rev5-laneB": ".dev-flow/2026-07-26-batch-63/01-requirements-architect-rev5-lane-b.md",
-    "4-rescoped": ".dev-flow/2026-07-26-batch-63/04-validation-rescoped.md"
+    "4-rescoped": ".dev-flow/2026-07-26-batch-63/04-validation-rescoped.md",
+    "5": ".dev-flow/2026-07-26-batch-63/05-postmortem.md",
+    "6-traceability": ".dev-flow/2026-07-26-batch-63/06-docs/traceability-matrix.md",
+    "6-functionality": ".dev-flow/2026-07-26-batch-63/06-docs/functionality.md",
+    "6-executive": ".dev-flow/2026-07-26-batch-63/06-docs/executive-summary.md"
   },
   "decisions_log": [
     {
@@ -143,8 +147,26 @@
       "date": "2026-07-27",
       "decision": "Phase 3 CLOSED — D3-only shipped in ONE increment (4 files); 3 gates RED->GREEN, 2 pins green both sides by design",
       "notes": "Operator ruled D3-only at the re-gate escalation, then confirmed OB-4 and told me to run through to merge without stopping at each step. Revision 4 of the consolidated spec records the scope reduction and fixes the two rev-3 defects that were mine: AT-173's patch target (flow_report_service binds with `from .report_service import (...)`, so rebinding report_service.document_bytes leaves the module's own name untouched and the AT would pass against an unfixed writer — it now normatively patches flow_report_service.document_bytes, the patch-where-it-is-used rule) and the AST structural census RESTORED as AT-193 after rev-3 SUBSTITUTED it when the architect review had explicitly said to ADD it. AT-193's id was chosen carefully: AT-176 — which the discharge auditor called free — is actually used by 01-requirements-architect-rev5.md, the lane-A design carried to batch-64, and reusing an ambiguous id is the exact defect this batch is closing; AT-193 returns 0 hits across REQUIREMENTS.md, tests/, .dev-flow/ and docs/. IMPLEMENTATION IS 4 PRODUCTION LINES: document_bytes(text: str) -> bytes beside _line_bytes, both writers switched to write_bytes, +1 line in flow_report_service's EXISTING import tuple (so no new import edge and no cycle — security verified report_service does not name flow_report_service back). Typing the encoder on `str` rather than on `lines` is what makes one encoder serve both writers without touching compose_flow_report's public -> str return, which 39 tests cover. _line_bytes is UNCHANGED and its docstring now states why the +1 must not be re-derived from the encoder: the composer accounts in ~12 emit() batches so the accounting must be partition-invariant, and len(join) loses a byte per boundary. COUNTERFACTUAL CAPTURED BEFORE ANY PRODUCTION EDIT: 4 failed / 2 passed. The two passing are the AT-174 pins, and that is the SPECIFIED behaviour, not a gap — they pin _line_bytes, which the fix deliberately does not change; presenting them as evidence D3 was fixed would be this batch's own defect class. Post-fix 47 passed on the new + flow suites, ruff clean on all 4 files, frozen dual-guard 10 passed (C-27: source AND test-file guards, not one), report-adjacent derived observer set 116 passed. FOUND WHILE IMPLEMENTING: write_flow_report had ZERO tests — all 39 cases in test_flow_report_service.py exercise the pure compose_flow_report, so the writer was entirely uncovered, which is how D3 survived there unseen; AT-173 is the first test that touches it. REQUIREMENTS.md R-TUI-097 added, stating plainly that CI verifies this requirement's STRUCTURE and ARITHMETIC but not its platform-dependent BEHAVIOUR, because tui-ci and snapshot-regen both run ubuntu-latest where the unpatched writer already emits LF and the undercount is zero. BACKLOG reconciled with three new entries carrying full measurements: D1 returned (87-94 B/hit, product law on all three axes, and the two HIGH design constraints — per-class capping fixes cross-class 5/5 but NOT intra-class 0/1 or cross-variant 0/2, all three classes are document-derived so the attacker controls every cardinality, and bounding output does not bound traversal so only an injected counting iterable is falsifiable: 201 vs 2000); D2 returned (boundary 3572 but NOT stable, the AST-derived two-site set :996/:1171 with disjoint inputs, the shipped surface DENIES rather than crashes and misclassifies the error as operator input, and the eliminated-by-output candidates so they need not be re-argued); OB-2 the missing AT/TC registry with the 134-id spread and the 6 phantom TCs; OB-4 the resident-memory axis with its numbers, operator-confirmed as a carry rather than a signed risk acceptance because D3-only makes no memory claim to accept a residual against."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-27",
+      "decision": "MERGED — PR #139 squash c473152. batch-63 shipped D3 only.",
+      "notes": "Merge gate: qa-reviewer OK-TO-MERGE 0 HIGH (2 MAJOR/5 MINOR), security-reviewer OK-TO-MERGE 0 HIGH (0 MED/3 LOW), delta re-review after the folds OK-TO-MERGE 0 HIGH (3 MAJOR/4 MINOR). CI green on the final head 11b79a9 (tui-ci 33m48s, snapshot 1m44s). Full suite 2201 passed / 0 failed / 29 snapshots on that head. main 031ca8d -> c473152. I did NOT merge on the first 0-HIGH: two rounds of folds ran first because the findings were cheap and several were the batch's own defect class. ROUND 1 (47ac15a): AT-193's census predicate was narrower than its label (matched only the relative import spelling, globbed without subpackages, and keyed on the write_text attribute so open(p,'w') evaded it) — this matters more than its LOW/MAJOR grading because AT-193 is the ONLY R-TUI-097 check the merge gate can run, CI being Linux where the defect is zero; added AT-193b as a positive control since AT-193 asserts an ABSENCE and passes on a fixed tree whether or not its detector works; corrected my own AT-173 rationale, which was FALSE (measured: the wrong patch target is RED against a CORRECT writer, a false-negative, not the false-pass I claimed); scoped document_bytes's docstring to budget-consulting writers; added the LLR->AT->TC->node table after the shipped TC ids turned out to be defined nowhere normative — OB-2 recurring inside the batch. ROUND 2 (11b79a9): the delta review found the hardened detector STILL evadable, and by the worst possible route — Path.open('w') puts the mode in args[0], not args[1], and that is THIS REPO'S OWN IDIOM (cli.py:91, app.py:1560); worse, AT-193b's offending list had been shaped to the DETECTOR rather than to the RULE, so my positive control certified a completeness the detector lacked. Rewritten as prove-safe-or-flag over args[0]/args[1]/mode-kwarg across open/fdopen/NamedTemporaryFile/TemporaryFile, with a computed mode failing CLOSED; AT-193b re-shaped to the rule at 11 offending / 7 clean. Also corrected two of my own numbers: '+44 lines' was wrong (measured 49 insertions / 2 deletions = +47, and it had been correct at e978d2a — the closeout added 3 more and I COPIED instead of re-deriving, violating the very rule that commit established), and 'three of those TC ids diverge' understated it 3.3x (all ten of TC-470..479 bind a different observable in the superseded catalog; TC-467..469 have no shipped node). Residual carried rather than claimed closed: a module binding the accounting via plain 'import ... as rs' or 'from . import report_service' has no ImportFrom naming the symbols and stays invisible to the census; none exists today, recorded in the helper docstring. TWO UNPLANNED POSITIVES the gates surfaced: fail-closed IMPROVED (encoding now precedes the open, so an unencodable character can no longer leave a 0-byte file matching REPORT_FILENAME_REGEX and consuming a collision slot), and the merge gate turned out to have THREE Linux-RED checks rather than one (AT-172/173 kill by sentinel without involving newlines) — my own artifacts had undersold that by justifying them via symbol absence, the weak property they themselves criticise. Remaining close steps: post-merge REQUIREMENTS/backlog verification against the merged tip, then /dev-flow-sync."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-27",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-26-batch-63/ — 23 root artifacts + 06-docs/ (3) + the generated README with the full metrics frontmatter. GAP THE SYNC PRE-CHECK CAUGHT, recorded rather than papered over: Phase 5 and Phase 6 NEVER RAN before the merge — I went from the Phase-4 validation gate straight to PR and merge. The merge itself was properly gated (both independent reviewers 0-HIGH, a delta re-review 0-HIGH, CI green, full suite 2201/0), so nothing defective shipped, but 05-postmortem.md and 06-docs/ exist only because /dev-flow-sync's own pre-check refuses to sync an incomplete record. The flow's backstop worked; my sequencing did not. Also corrected while here: iterations_per_phase had 3:0/4:0/5:0/6:0 recorded while phases 3 and 4 had actually run. Template-completeness DETECT: 0 live placeholders across all 7 synced artifacts, every required section substantive. Repo hygiene: primary checkout on main, no stray branches checked out. VISUAL EVIDENCE REFRESHED: the trigger fired because the diff touched s19_app/tui/, though only the service-layer WRITERS and no rendering surface — pilot suite 15 passed in 54.19 s, 80 flattened frames + 16 gifs re-copied from merged main c473152, visual-evidence.md stamped. Post-copy reject-check: 99 live assets fresh, 5 stale and ALL of them the RETIRED pv__case_06 orphans that batch-62 already identified — no LIVE asset is stale. Snapshots deliberately NOT regenerated (env-sensitive, canonical-CI only). POSTMORTEM'S MOST REUSABLE OUTPUT: five vacuous acceptance criteria were authored for ONE defect, three of them AFTER the batch had already identified vacuity as its theme, and three of the five by me — the pattern being that 'is this predicate correct?' and 'can this predicate go RED on the unfixed tree?' are different questions, and every gate that asked only the first passed something that verified nothing. Sharpest instance: a positive control written to prove a detector worked, built only from cases the detector already caught. Four control candidates raised (P-5 can-it-go-RED, P-6 shape the positive control to the RULE, P-7 consolidation must preserve the union, P-3 standing at ~9 occurrences); NONE encoded, per the standing rule that control encoding needs an explicit operator AskUserQuestion."
     }
   ],
-  "obsidian_synced": false,
-  "created_at": "2026-07-26T00:00:00Z"
+  "obsidian_synced": true,
+  "created_at": "2026-07-26T00:00:00Z",
+  "merged": {
+    "pr": 139,
+    "squash_sha": "c473152",
+    "date": "2026-07-27",
+    "base_before": "031ca8d"
+  }
 }
