@@ -6,6 +6,33 @@ relocated here so the workflow command stays language- and framework-agnostic. C
 every /dev-flow batch alongside the general controls. Canonical history: memory
 project_devflow_control_lineage.md.
 
+## Backlog routing — where this project's canonical open work lives (Phase 0 + close)
+
+**Not a control; a routing fact.** Both `/dev-flow` (Phase 0 input, Phase 6 close) and `/fast-dev-flow`
+(Phase C step 6) ask *this document* which file is the project's canonical cross-batch backlog. Since
+**2026-07-27 the queue is PARTITIONED into two lanes**, so the answer is two files, not one:
+
+| Lane | File | Scope | Read it if your batch is about… |
+|---|---|---|---|
+| **A — code** | `.dev-flow/BACKLOG-CODE.md` | the s19_app application code **and the development flow of that code** — features, defects, Flow Builder, tests, CI, repo hygiene | production code, tests, CI |
+| **B — process** | `.dev-flow/BACKLOG-PROCESS.md` | engineering process — controls, skills, the global `/dev-flow` command, this document, the TUI course, the AT/TC registry | controls, flows, skills, templates |
+
+**`.dev-flow/BACKLOG.md` is a ROUTER and a lineage archive. It holds NO open work** — reading it
+alone returns an empty queue that is indistinguishable from "nothing pending", which is the exact
+failure this section exists to prevent.
+
+**Rules.** (1) **Read your lane at Phase 0**, before deriving anything. (2) **Reconcile the lane your
+batch belongs to** at close; touch the router only when the batch itself closes. (3) An item is
+**MOVED** between lanes, never copied — a partition is a split, and a stub left behind is a second
+de-facto source. (4) A carry that belongs to the other lane is **written there**, in that batch's own
+close, not left as a pointer.
+
+(Origin: batch-64 §7.9 — after the lane split (#143) both global flow commands still instructed every
+batch to reconcile *"the SINGLE canonical backlog `.dev-flow/BACKLOG.md`"*, i.e. the router. A batch
+obeying the instruction literally reconciles a file with no open work and silently drops its carries.
+Operator ruling 2026-07-28: the global commands must not hard-name any project's file layout, so they
+now delegate to this section and the routing lives here.)
+
 ## C-13 — geometry-budget / reuse-transfer check (Phase 1)
 A pattern proven in one container is NOT verified for another: when a spec reuses a
 layout/sizing/capacity pattern that works in container A for a different container B (a

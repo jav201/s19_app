@@ -1,0 +1,514 @@
+---
+name: dev-flow-lessons
+description: Control catalog of lessons learned from 38 dev-flow batch postmortems (s19_app) — vacuous-check detection, acceptance-test oracles, gates and evidence, test hygiene, multi-agent orchestration, security lens. Consult during any /dev-flow or /fast-dev-flow phase (requirements, review, implementation, validation, postmortem), before starting a batch, or when writing a postmortem. Trigger on "lessons learned", "catálogo de controles", "qué aprendimos en s19", "control catalog", "vacuous check", or when designing acceptance tests / increment gates.
+---
+
+# Dev-Flow Lessons — a control catalog for supervised AI development
+
+Hard-won testing and process controls distilled from **38 post-mortems** of one supervised,
+multi-agent, increment-gated development flow (s19_app). This is a reference you open to look up a
+control for the phase you are in — not a narrative to read end to end.
+
+## How to use this mid-flow
+
+1. Find your current dev-flow phase in the **index table** below.
+2. Read the controls tagged with that phase (jump by control ID).
+3. Before closing the phase, run the **meta-rule** against every assertion and every recorded RED
+   you produced.
+
+## The meta-rule (everything below is a special case of this)
+
+**The dominant defect class is the vacuous check: an assertion or fixture that passes on broken
+code.** A green suite full of vacuous checks is not evidence of anything — it is theater. Across
+the corpus these checks did not cluster in implementation; they clustered **one level up, in the
+SPECS and BRIEFS** — the artifacts that define what "correct" means. One batch shipped **9 vacuous
+checks into review, most authored by the spec/brief layer**, every one caught only because Phase-3
+hunted for them.
+
+> **Mutation-test every assert, and every recorded RED.** A check that cannot fail is
+> non-evidence. A RED (a test you claim proves a bug exists) that was *never actually executed* is
+> worthless — in the corpus, **3-of-5 and 4-of-7 agent RED-predictions were wrong** when finally
+> run ("the run won every time it was executed"). So: for every assertion, construct the mutation
+> it should catch and confirm the assertion goes RED under it; for every RED, run it and watch it
+> fail before you trust it.
+
+**Why vacuous checks concentrate in specs, not code.** A wrong line of code fails a decent test. A
+wrong *definition of correct* — a fixture that is a palindrome so reversal can't disturb it, a
+universal claim whose hand-listed input set omits the one failing case, an assertion of
+`spans == []` that is constant-true on safe input, unsafe input, and unwritten code alike —
+produces a check that is **structurally incapable of failing**. No amount of implementation
+testing finds it, because the check passes exactly as designed. You find it only by attacking the
+check itself with the mutation it purports to guard against.
+
+**The vacuous-check test, executable by hand.** For a check under suspicion, evaluate it twice:
+on correct code, and on code with the mutation the check claims to catch. A **discriminating**
+check is PASS on correct code and RED on the mutation — the gap between those two is the evidence.
+A **vacuous** check is PASS on *both*: the mutation walks straight through it. Three canonical
+pairs from the corpus:
+
+| Case | Vacuous version | Why it can't fail | Discriminating version |
+|---|---|---|---|
+| Palindrome fixture vs a reversal bug | `fixture = ['ok','warn','ok']; assert render(fixture) == fixture` | Fixture is a palindrome; a render that reverses output still equals it | Non-palindrome fixture `['ok','warn','err']` |
+| `spans==[]` on safe input | `text = 'hello world'; assert escape(text).spans == []` | No brackets in input → zero spans whether escaping works or not | Unsafe input `'[bold]hi[/bold]'` — mutant (escaping off) produces spans |
+| `result == expected … or True` | `assert result == expected or True` | OR-ed tautology can never fail | Drop the tautology: `assert result == expected` |
+
+Note where the vacuousness lives: in the first two it hides in the **fixture** (the input set); in
+the third it hides in the **assertion**. Both are spec-level defects — exactly why the corpus
+found them above the code. The lesson is not "write more tests"; it is "a test that does not
+separate correct from broken is a comment with a green checkmark."
+
+## Index — all controls, by phase
+
+Phase key: **P1-2** = requirements / spec / review (dev-flow phases 1-2; fast-dev-flow phase 1) ·
+**P3** = implementation · **P4** = validation & gates · **P5** = postmortem · **X** = cross-phase
+(orchestration / security, applies throughout).
+
+| Control | Name | The failure it closes | Phase | Prov. |
+|---|---|---|---|---|
+| META | mutation-test every assert and every RED | A check that cannot fail; a RED never executed | P1-2, P4 | corpus-wide |
+| C-10 | AT off a non-default value | A test that passes on the default state proves nothing about the shipped policy branch | P1-2 | b14,16,17 |
+| C-12 | output-then-consume through the artifact | Testing a handler and its consumer in isolation misses that the on-disk artifact between them is malformed | P1-2 | b16,17,20,26 |
+| C-13 / 13.1 | measure geometry under Pilot at draft | A layout "story" declared ready on arithmetic that was never measured against the real render | P1-2 | b17,18,22,24,26 |
+| C-14 | location-move census greps disk readers | Moving an artifact on disk silently orphans every test that reads it back by the old path | P3 | b21 |
+| C-15 / 15.1 | probe a framework symbol's runtime identity; grep assignment sites | A spec-conformant filter shipped DEAD because a sentinel resolved to an inherited `False` | P1-2, P3 | b23,24 |
+| C-18 | every AT = one on-disk node | "Covered in parts" across several artifacts means the end-to-end chain was never actually exercised | P1-2, P4 | b29,32,35-38,47,48 |
+| C-25 | one complete gate run owned by the orchestrator | Gate evidence assembled from fragments, or a validation agent that exits before the run completes | P4 | b35-38 |
+| C-31 | input-set-as-oracle | A test of a UNIVERSAL claim whose hand-listed input set omits the one failing member | P1-2 | b33,47,48 |
+| C-32 | assert-the-painted-result | Asserting a pre-layout proxy; a `display:none` strip shipped green because the proxy is geometry-independent | P4 | b48 |
+| **C-40** | **falsifiability before correctness** | A predicate that is correct, exact and complete — and never mentions the thing under test | P1-2, P4 | b63,64 |
+| **C-42** | **assert the EMITTED form** | Running the producer, then asserting against the form a human reads — false-fails a correct implementation | P1-2, P3 | b60-64 |
+| — | **freeze-then-measure** | Folding a spec silently expires every measurement taken against its previous text | P1-2, P4 | b64 |
+| — | reader-as-oracle (+ corrupted negative control) | Validating a writer against itself; a round-trip that can't distinguish good output from corrupt | P1-2 | b09-13 |
+| — | KAT anchor | Self-consistency that agrees with its own bug; no externally-published known answer pins reality | P1-2 | b12 |
+| — | assert-the-discriminating-negative | Only asserting what must exist, never the file that must NOT exist or the bytes that must NOT be written | P1-2 | b11,12 |
+| §3 | census & blast-radius principles | Incomplete checklists, inferred (not measured) behavior, narrow test filters, uncited symbols, stale contracts | P3, P4 | b05-12,28,37,38,46 |
+| §4 | gates & evidence rules | Gates passing on empty/fabricated artifacts; unproven escaped-bug fixes; non-idempotent decisions | P4 | b12,13,15,18,35,36 |
+| §5 | test hygiene & environment | Deleted oracles, AST phantom failures, flaky glob order, substring false-greens, decorative lint | P3 | b02-04,07-12,20,21,32,38,47,48 |
+| §6 | multi-agent orchestration | Sunk-cost review, dirty-tree git mutations, mis-attributed long runs, namespace collisions, stale renders | X | b01,05-07,12,24,33,38,46-48 |
+| §7 | security lens on "just text" | New string reaching a rendered/persisted surface treated as harmless because it is local | X | b19,24,27 |
+| §8 | honesty note | Importing single-project observations as universal law | P5 | corpus-wide |
+
+---
+
+## Phase 1-2 · Requirements, spec & review — designing oracles that can fail
+
+The V-model writes acceptance tests at spec time, so oracle-design controls belong here. This is
+where the corpus's vacuous checks were authored — apply the meta-rule to every AT you spec.
+
+### C-10 · Acceptance test exercises the shipped surface off a NON-DEFAULT value
+*(batch 14, 16, 17)*
+
+**Failure closed.** A default-valued fixture makes a test pass without touching the logic under
+test. If a feature has a policy branch (say, "verbose mode reformats the output"), a test run with
+verbose left at its default *off* value exercises the un-branched path and asserts nothing about
+the branch that shipped.
+
+**Example.** A formatter takes `precision`, default 2. A test that formats `3.14159` and asserts
+the result is non-empty passes whether precision is honored or ignored. Set `precision=5`, assert
+the exact string `"3.14159"` — now the assertion moves iff the branch works, and you write **one
+AT per policy branch**.
+
+**Rule.** Assert content, not non-emptiness; drive each test off a value that differs from the
+default; one acceptance test per policy branch.
+
+### C-12 · Output-then-consume chains through the written artifact
+*(batch 16, 17, 20, 26)*
+
+**Failure closed.** A producer and a consumer can each pass their own unit test while the artifact
+that flows between them — the file, the serialized record — is malformed. The bug lives in the
+seam, and neither isolated test can see the seam.
+
+**Example.** A handler writes a report to disk; a downstream service reads it. Test the full
+chain: call the handler → **re-read the written artifact from disk** → feed it to the
+**unmodified** real consumer → assert the exact end outcome. If you shimmed the read, you tested
+your shim, not the seam.
+
+**Rule.** The acceptance test drives handler → re-read the on-disk artifact → unmodified
+consumer → exact outcome. No shim across the seam.
+
+### C-13 · Measure geometry under Pilot at DRAFT time (+ C-13.1 deficit-matched fallback)
+*(batch 17, 18, 22, 24, 26)*
+
+**Failure closed.** A layout declared "ready" on paper arithmetic that the real renderer
+contradicts. Row and column budgets computed from ratios were measured up to **4.5x off** the
+truth; a fallback rung chosen for cheapness (trim 3 label columns) cannot close an actual 67-85
+column deficit.
+
+**Example.** Before calling a geometry story done, drive the real layout engine (a headless
+"Pilot" harness) at each target size and **measure width AND height** of the rendered panes. Pick
+a fallback by the **measured deficit**, not by which fallback is easiest.
+
+**Rule.** A geometry story is not "ready" until measured under the real renderer at draft time;
+size fallbacks to the measured deficit (C-13.1).
+
+### C-15 / C-15.1 · Probe a framework symbol's runtime identity; grep its assignment sites
+*(batch 23, 24)*
+
+**Failure closed.** A spec that reasons about a named framework symbol from its *name* can ship
+dead code. In the corpus a sentinel `Select.BLANK` resolved at runtime to an inherited
+`Widget.BLANK` whose value was the boolean `False` — so a spec-conformant filter against it was
+**always false and shipped dead, twice**. `hasattr` and behavior-claims do not catch this; only
+`repr()`/`type()` against the pinned version does.
+
+**Example.** At draft time, print `repr(SYMBOL)` and `type(SYMBOL)` in the pinned environment and
+read the actual identity. Then (C-15.1) grep **every assignment site** of any state your story
+consumes, so a value written somewhere unexpected can't invalidate the branch silently.
+
+**Rule.** Probe a named framework symbol's runtime `repr`/`type` at draft (C-15); grep every
+assignment site of consumed state (C-15.1). Names are not identities.
+
+### C-31 · Input-set-as-oracle
+*(batch 33, 47, 48)*
+
+**Failure closed.** A test that certifies a **universal** ("every hue is distinguishable", "all
+inputs round-trip") is only as strong as its input set — and a hand-listed input set is a spec
+artifact that can omit the one failing member. Code mutation cannot find this, because the code is
+correct; the *oracle's input list* is wrong. This is a defect **one level above the code**.
+
+**Example.** A census asserted every hue in a palette was distinguishable. The per-hue arithmetic
+was exact — but the hand-listed set of hues **omitted 38.44°**, the single hue that failed. The
+fix: the test must **derive or guard its input set** (enumerate the real domain, or assert the
+set's completeness), never trust a hand-typed list to be exhaustive.
+
+**Rule.** A test of a universal must derive or guard its input set; a hand-listed domain is an
+unproven spec claim, not an oracle.
+
+### C-40 · Falsifiability BEFORE correctness — "can it go RED?" is a separate question
+*(batch 63, 64)*
+
+**Failure closed.** A predicate can be **correct** — valid arithmetic, complete input set, measured
+threshold — and still **never mention the thing under test**. C-10 mutates the CODE, C-31 mutates the
+INPUT SET, C-39 executes the THRESHOLD; a predicate can satisfy all three and remain **invariant under
+the change it gates**. One batch produced **five** such acceptances for a single defect, three of them
+written *after* vacuity was already that batch's identified theme.
+
+**Example.** Five predicates each related an accounting helper to a string join — both pure functions
+of the same input — while the **file writer**, the actual subject of the fix, never appeared in the
+expression at all. Every one was arithmetically exact. The executed counterfactual read
+`RED cases against the WRONG implementation: 0`.
+
+**Rule — two limbs, both discharged by execution.**
+1. **The declared subject must be IN the expression.** Name the subject the predicate *itself declares*
+   it certifies, then confirm that subject appears in its own expression. *Corollary:* when the declared
+   subject is not the subject of the change, the predicate is a **regression PIN, not a gate** — keep it
+   and label it so.
+2. **A quantified set must come from the RULE, not the implementation.** A set drawn from what the code
+   currently handles certifies a completeness the code does not have.
+
+**Discharge:** name the mutation, **execute it**, paste the transcript — and run it where no other
+session is reading, then **restore it, confirmed by hash**. `git status` is *vacuous for an untracked
+file*: it reports identically whether or not the mutation was reverted.
+
+**The measurement that makes this operable, and the honest ceiling.** Encoded one-limb the rule flags
+**4 of 6** known-vacuous predicates; both limbs flag **9 of 9**, with **0** false positives over sound
+controls. But it was measured against a *laboratory corpus* — **nobody has yet measured whether it
+fires in a live batch.** Until someone counts acceptances actually rejected while citing it, "9/9" is
+a lab result, not evidence of effect.
+
+### assert the EMITTED form, never the rendered one
+*(batch 60-63 · the C-35 rider, and C-42 for stack specifics)*
+
+**Failure closed.** Executing the producer is **not enough** if the assertion is then written against
+the form a *human reads*. Producers escape, encode, wrap and substitute, so confirming a named output
+*exists* passes while a search for its readable form **false-fails a correct implementation**.
+
+**Example.** A heading emitted as a code span was unfindable by its bare text — the probe returned an
+impossible `-1`, which is the only reason it was caught. A snapshot export emits `&#160;` entities for
+spaces, so a literal search for a visible label returns **0 matches** while the label is plainly on
+screen; the emitted form returns **29/29**.
+
+**Rule.** Write the predicate against the bytes/tokens the **producer emits** — run it, paste the
+actual output, assert against that. Prefer the producer's own structured output (its parser's token
+stream, a language-aware source parse) to a substring search over serialized text: a substring search
+cannot tell a value from its own encoding.
+
+### reader-as-oracle (+ a MANDATORY corrupted negative control)
+*(batch 09-13 · 5 uses)*
+
+**Failure closed.** Validating a writer by inspecting its own output is circular — the check
+agrees with the writer's bug. And a round-trip through a reader is only evidence if the reader
+would **reject corruption**; a round-trip that passes on garbage proves nothing.
+
+**Example.** Validate a new writer by round-tripping its output through the **existing trusted
+reader**, and **always** include a corrupted negative control (feed the reader deliberately broken
+bytes and assert it fails). Pin **one canonical comparison form** — a `repr` mismatch between the
+two sides makes the comparison unpassable, i.e. vacuous.
+
+**Rule.** Round-trip a writer through the trusted reader; mandatory corrupted negative control;
+one canonical comparison form.
+
+### KAT anchor — pin at least one externally-published known answer
+*(batch 12)*
+
+**Failure closed.** Self-consistency tests agree with their own bug. If every test derives its
+expectation from the same implementation, a shared error is invisible — the whole suite is
+internally consistent and externally wrong.
+
+**Example.** Anchor at least one **Known-Answer Test** to an externally-published value. In the
+corpus, `crc32(b"123456789") == 0xCBF43926` (a standard published CRC check value) caught a seed
+bug that every self-consistent test had ratified.
+
+**Rule.** At least one assertion pins an externally-published known answer, not self-consistency.
+
+### assert-the-discriminating-negative
+*(batch 11, 12)*
+
+**Failure closed.** Asserting only what must be present, never what must be absent. A test that
+checks the right file exists misses that a **wrong** file was also written, or that bytes that
+must never appear did.
+
+**Example.** Assert the file that must **NOT** exist does not exist; assert the bytes that must
+**NOT** be written are absent. The negative is often the discriminating half of the oracle.
+
+**Rule.** Assert the discriminating negative — the artifact that must not exist, the bytes that
+must not be written.
+
+### Spec-side census rules (from §3)
+
+- **Symbol- and consumer-citation.** A named private symbol needs a grep-verified `file:line` or
+  it is a blocker. Cite the consumer's real **input type** before binding a producer to it — a
+  report bound to a service that consumes a different type had to be withdrawn. (b05,06,08,12)
+- **Cross-cutting contracts go stale on any edit.** A contract that spans artifacts is invalidated
+  the moment any cited low-level requirement is edited — especially gate-decision field
+  insertions. Re-derive it, don't trust the cached version. (b07,08,09)
+
+---
+
+## Phase 3 · Implementation — census, blast-radius & test hygiene
+
+### C-14 · A location move greps every disk reader (census the readers)
+*(batch 21)*
+
+**Failure closed.** Moving an artifact to a new on-disk location silently orphans every test and
+consumer that still reads the old path. A green suite hides it because the orphaned readers now
+read stale or absent data without erroring.
+
+**Example.** You relocate `build/report.json` to `dist/report.json`. Recursively grep (`rglob`)
+every reader of that artifact; **count a net-zero in-place rewrite as a touched file** that must
+be re-verified, not as untouched.
+
+**Rule.** On any on-disk location move, census every reader by recursive grep; net-0 in-place
+rewrites still count as touched.
+
+### Census & blast-radius principles (§3)
+
+A **census** is a completeness principle, not a fixed grep list — and blast-radius is how far a
+change actually reaches, which is almost always further than it looks.
+
+- **A census is a principle, not a checklist.** Never stamp "VERIFIED COMPLETE": re-running an
+  incomplete checklist can't detect that it is incomplete. Key the census on the **assertion
+  category** (what kind of thing must be true everywhere), not on a frozen list of sites. (b09,10)
+- **Build disposition tables from MEASURED behavior, not inferred.** In the corpus, measuring gave
+  355 true entries vs 192 inferred — inference missed **~half** (+85%). If you didn't run it, you
+  don't know it. (b06,07)
+
+### Test hygiene & environment (§5)
+
+- **Never delete a test in the same increment that changes the behavior it guards.** Port the
+  assertions first. A cleanup once killed a bar's only oracle (plus 3 nets) in one increment → an
+  invisible-bar bug reached PR-QA. (b47)
+- **Never edit a source file while a suite that AST-inspects it runs.** The line-shift produces
+  phantom failures; three agents independently hit this. (b48)
+- **Deterministic test inputs.** Sort filesystem-ordered collections and select by name — glob
+  order is a flaky gate. (b21)
+- **Kill substring false-greens.** Match `\b1\b`, not `1` (which is a substring of `100`); avoid
+  reconstruction tautologies where the test rebuilds the expected value from the same source it
+  checks. (b20)
+- **Signed-balance test ledger:** `post = base - D + A` on **collected** counts, where: `base` =
+  test count before the change; `D` = tests deleted; `A` = tests added; `post` = the count you
+  should observe after. A constant offset between expected and observed post-count is the
+  signature of a units bug — a passed-vs-collected mismatch in the corpus was missed by exactly
+  32. (b07-12)
+- **Run BOTH frozen-source AND frozen-test guards.** A new test added to a frozen test file passed
+  a source-only gate. (b38)
+- **Lint is a gate whose exit code blocks the commit.** `ruff … || echo` swallows the exit code —
+  the lint became decorative. Pre-provision the toolchain as a hard entry gate; a recommendation
+  that recurs unactioned across batches (ruff absent 3 batches running) is itself a process
+  failure. (b32,02,03,04)
+
+---
+
+## Phase 4 · Validation & gates — evidence that cannot be faked
+
+A gate is only as good as the evidence it reads, and the most common failure is a gate that passes
+on an **empty** or **fabricated** artifact.
+
+### C-18 · Every acceptance test = exactly ONE distinct on-disk node driving the full chain
+*(batch 29, 32, 35-38, 47, 48 — also applies at spec time when cutting increments)*
+
+**Failure closed.** "This acceptance criterion is covered in parts" — a bit by test A, a bit by
+test B — means the end-to-end chain was **never exercised as one thing**. The parts pass; the
+whole was never run. Reconciliation of coverage tables is a backstop, not a gate.
+
+**Example.** For each acceptance test there must exist exactly one concrete, on-disk test node
+that drives the full chain the criterion describes. If you cannot point to that single node, the
+criterion is **UNREALIZED**, no matter how green the neighborhood looks.
+
+**Rule.** Each AT maps to exactly one distinct on-disk test node exercising the full chain;
+"covered in parts" = unrealized.
+
+### C-25 · Gate evidence = one complete run owned by the orchestrator
+*(batch 35-38)*
+
+**Failure closed.** Gate evidence assembled from fragments, or produced by a validation agent that
+exits before the run finishes, is not evidence of a passing gate. A mandated-blocking call that
+exceeds a tool's output cap is a **spec bug**, not an excuse to read partial output.
+
+**Example.** The orchestrator runs the full gate once, reads the result **from its own captured
+output**, and the validation agent is **forbidden to exit first**. If the blocking run can't fit
+the tool budget, fix the spec (chunk it, redirect to a file), don't accept a truncated pass.
+
+**Rule.** One complete gate run, owned by the orchestrator, read from its own output; no early
+exit; a blocking call over the tool cap is a spec bug to fix.
+
+### C-32 · Assert-the-painted-result
+*(batch 48)*
+
+**Failure closed.** Asserting a pre-layout proxy instead of the rendered surface. A widget's
+`render()` output is **geometry-independent** — it returns the same content whether the widget is
+visible or clipped to zero size — so a `display:none` strip **shipped green** against a
+render-only assertion while painting nothing.
+
+**Example.** Observe the **rendered surface and its geometry** (does it occupy cells, at the
+expected position?), not just the pre-layout render string. And still **mutation-test the
+oracle**: a painted-result assertion can itself be vacuous.
+
+**Rule.** Assert the painted result plus geometry, never a geometry-independent proxy; then
+mutation-test that assertion too.
+
+### freeze-then-measure — a figure is admissible only if it names what it measured
+*(batch 64)*
+
+**Failure closed.** When a spec is still being folded, **every measurement silently expires**: each
+fold changes the text, each arm figure was measured against that text, so the next fold invalidates the
+last one's numbers without anyone noticing. One batch burned **three requirement iterations** to its
+soft cap this way, and the tell was an acceptance measured against an **890 B** body that shipped at
+**1 975 B** — with one of its published mutations *impossible* against the shipping bytes.
+
+**Rule.** Freeze the deliverable first — a manifest of each block with byte count and SHA256 — then
+measure **once** against the frozen bytes, and make it normative that **a figure is admissible only if
+it names the block hash it was measured against.** That is what converts "measured against what
+shipped" from an assertion into a checkable claim.
+
+**The ceiling, found by the batch that introduced the mechanism.** A false, self-contradictory count
+survived every gate **because its block matched its frozen hash**:
+
+> **A hash proves the text did not change. It does not prove the text was right.**
+
+Freeze protects against *drift*, never against *content*. Pair it with a reader who checks the claim.
+
+### Gates & evidence rules (§4)
+
+- **Gate on FILLED-ness, not presence.** Auto-reject artifacts containing placeholder tokens. A
+  blank Phase-4 template once passed a gate and let a bug escape. (b15)
+- **Escaped-bug proof is a ritual:** `git stash` the fix → observe the **verbatim RED** → `pop` →
+  observe GREEN. For **net-new files** use **move-aside**, never `git stash` — untracked files
+  stash nothing, and a bare `pop` can resurrect a parked stash into a conflict. (b15,35)
+- **Gate decisions need transport idempotency.** A disconnect-plus-retry once injected a phantom
+  approval. A gate decision must be idempotent under retry. (b12)
+- **Re-reconcile after any gate amendment.** When acceptance tests change (13→17 adopted
+  unchanged), the increment cut must be re-derived, or you get an unrealized pair. (b35,36)
+- **Verify-before-delete on irreversible deletion.** Prove coverage is preserved **before** the
+  delete; use `git rm` not `rm`; size is not a coverage proof. (b36)
+- **Pin the real base commit.** Use `git merge-base HEAD origin/main`, never a bare local ref;
+  CI-portable `git diff` tests must resolve the ref or `skip`, and must never read stdout
+  only. (b13,18)
+- **Blast-radius gate.** Run the full suite — or at least every file importing the touched
+  symbol — at each increment gate. A narrow `-k` filter in the corpus missed a crash, a 35-second
+  perf cliff, and a sibling-file census, all at once. (b28,37,38,46)
+
+---
+
+## Cross-phase · Multi-agent orchestration (§6)
+
+- **Parallel-for-review, sequential-for-implement.** Independent review passes (architect + QA +
+  security) carry no sunk-cost attachment and converge on real blockers; per-increment gating
+  localizes defects. A blocker caught in review is one iteration; the same defect caught
+  mid-implementation is a reopened increment. (b01,05,06)
+- **Interruption/resume.** Re-verify on-disk state before extending work — never regenerate
+  finished work — and checkpoint where the failing tests ARE the specced RED. (b24)
+- **Subagents must not run git mutations on a dirty tree.** A `git checkout` once discarded
+  uncommitted work; a commit once landed on a stale branch. Commit promptly in a contended
+  tree. (b07,12,33,46,47,48)
+- **Long-run liveness: a PID's existence is not evidence — the command line is.** A 57-minute run
+  was nearly killed on mis-attribution; a `.output` file can read 0 bytes while live. Verify by
+  command line, and budget verification subagents against the tool budget. (b33,46,47,48)
+- **Shared-namespace collision.** Two individually-correct increments can collide in a finite
+  container-scoped namespace (hues, keybindings, ids, CSS specificity). Symbol-keyed censuses are
+  **blind** to this — same value, different symbol — so you need a `resource → {claimants}`
+  reverse index. (b48)
+- **Provenance-stamp derived/rendered state** so a stale render fails loud instead of silently
+  showing old data. (b38,48)
+
+
+**Fix ids with per-id SEMANTICS before dispatch, not just ranges.** One batch fixed id *ranges* before
+dispatching two parallel lanes and declared the collision "removed by construction" — then both lanes
+filled the same range with **different content**, and 9-10 of 12 ids bound to different observables.
+Ranges are necessary and not sufficient. Assigning each id its *observable* before dispatch produced
+**zero collisions** in the following batch, with the lanes converging independently.
+
+**Brief a discharge audit against the SOURCE reviews, never against the fold's own amendment table.**
+An amendment table is a container; a green amendment count cannot see what the fold dropped. Audited
+against the sources, one fold was measured at **163 union items · 136 carried · 7 retired with reason ·
+20 dropped silently** — and it had printed "Unchanged" twice where executed diffs showed change. The
+same audit against the discharge matrix would have passed it.
+
+**Never read and write the same artifact from two sessions at once.** Dispatching a reader and a writer
+concurrently produced a phantom finding that would have blocked a gate on the claim that an entire fold
+never landed — the reader had snapshotted the file mid-write. In one batch this recurred **five times**,
+the last being an unrelated process rewriting a *shipped* file mid-review. Run mutations and
+counterfactuals in an export or your own increment tree.
+
+
+## Cross-phase · The security lens on "just text" (§7)
+
+> **The tell is not "new external surface" — it is "new string reaching a rendered/persisted
+> surface."** The corpus's security defects did not arrive through obvious network or auth
+> surfaces. They arrived through **text**: a feature that takes a new string and renders or
+> persists it is an injection surface, even when it looks like "just a label." Run the security
+> lens whenever a feature's shape is **"new string → rendered or stored surface,"** not only when
+> it adds an external endpoint. (b19,24,27)
+
+Concretely, in a terminal-UI corpus this meant that dynamic text flowing into a markup-parsing
+render path (labels, option lists, status lines) was an injection/crash surface: an unescaped `[`
+is parsed as a style tag and can crash the render or mis-style it. The generalization is
+provider-agnostic — any "harmless" string that reaches a parser, a template, a shell, or a
+persistence layer deserves the same review a network input gets. The category error is treating
+**rendering** as safe because it is **local**.
+
+---
+
+## Phase 5 · Postmortem — honesty note, the scope of these claims (§8)
+
+> **These are hard-won controls from ONE project's 38 batches — not universal law.** Every control
+> here was observed, and earned, in a single supervised multi-agent development flow over 38
+> increments. They are **battle-tested inside that corpus**, and the failure modes they close are
+> real and recurred. But a single-project observation is not a proven law: the frequencies (9
+> vacuous checks in one batch, ~half of inferences wrong, 3-of-5 REDs mispredicted) are
+> **evidence, not statistics**. Treat the catalog as a strong prior — a checklist worth defaulting
+> to — and re-earn each control in your own context rather than importing it as gospel.
+
+**What was deliberately excluded as too app-specific to teach.** Several lessons in the corpus
+were too tied to one application to generalize honestly, so they are not in this catalog:
+Intel-HEX byte-stability rules, a `variant_id` stem-collision, 1-based operator indices,
+single-owner chip / duplicate-PR hygiene, and a `state.json` surgical-edit mojibake failure. Where
+such a lesson had a generalizable moral, it was folded into the negative-oracle guidance
+(reader-as-oracle, the discriminating negative) rather than shipped as its own control. Naming the
+exclusions is part of the honesty: a catalog that claims to teach everything it saw is itself a
+vacuous check.
+
+When writing a new postmortem, also remember: **a recommendation that recurs unactioned across
+batches is itself a process failure** (ruff absent 3 batches running, §5) — track whether prior
+postmortem recommendations were actually adopted.
+
+---
+
+## Provenance
+
+- Distilled from **38 post-mortems** of the s19_app project's `.dev-flow` batches, deduplicated
+  through three distillation passes into this named control catalog (Bucket B). Batch numbers
+  (`bNN`) cite where in that corpus a control was earned; they reference the internal batch record
+  and expose no private application internals.
+- Distilled catalog canonical (interactive HTML): `G:\My Drive\Courses\dev-flow-lessons\index.html`
+- Local HTML copy this skill was extracted from: `C:\Users\jjgh8\.claude\docs\dev-flow-lessons.html`
+- Raw postmortems: `C:\Users\jjgh8\OneDrive\Documents\Github\s19_app\.dev-flow\*\05-postmortem.md`

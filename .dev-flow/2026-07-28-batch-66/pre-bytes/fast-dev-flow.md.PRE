@@ -1,0 +1,141 @@
+---
+description: Fast development flow for own repos — 3 compressed phases (minimal spec → supervised implementation → validation + close). Balances speed and quality without skipping security.
+---
+
+# /fast-dev-flow
+
+Intermediate flow between the direct one (CLAUDE.md default) and `/dev-flow` (full V-model). Designed for 30-90 minutes of work in own repos where we want minimal discipline without paying the full V-model ceremony.
+
+## When to use this flow
+
+The canonical routing matrix lives in `/dev-flow` ("When to use this flow"). This command is the **"small feature / risky refactor / non-trivial fix"** lane:
+
+```
+Trivial fix (typo, one-liner)?              → direct flow (CLAUDE.md default)
+Client deliverable / regulated context?     → /dev-flow (full V-model)
+Spike / exploratory experiment?             → free, no ceremony
+Anything else (small feature, risky         → HERE (/fast-dev-flow)
+refactor, non-trivial fix, internal improvement)
+```
+
+If invoked for a case that doesn't fit, warn and suggest the right route.
+
+## Language of artifacts
+
+If the user hasn't specified the development language, **ask** — one short question — before generating the spec. Default English; Spanish when requested. The spec and closing artifact are produced in that language; this command's instructions stay English.
+
+## Communication style
+
+BLUF / inductive: lead with the conclusion, then context. Technical, concrete, concise. (Inherits the Tone defaults in the global `CLAUDE.md`.)
+
+## Pre-checks
+
+1. Verify you are at a project root (signals: `.git/`, `package.json`, `pyproject.toml`, etc.). If unclear, **ask**.
+2. If `.fast-dev-flow/` does NOT exist, create it. If it already exists with an unclosed prior spec, warn and ask whether to resume or start fresh (archiving the previous one as `.fast-dev-flow/archive/<timestamp>-spec.md`).
+
+## Phase A — Minimal spec (5-10 min)
+
+### Actions
+1. If the user hasn't given enough context, **ask** in a single short round: objective, loose user stories, what is OUT of scope.
+2. Generate `.fast-dev-flow/spec.md` following `~/.claude/templates/fast-dev-flow/spec-template.md`.
+3. **If the design decision is not obvious** (e.g. structural change, new integration, real ambiguity), briefly delegate to `architect` for a 1-2 paragraph recommendation. If it's obvious, do NOT delegate — unnecessary overhead.
+4. Write **observable acceptance criteria**. Pattern: `When <input>, the system shall <observable output>`. Don't write "the system works well" or similar. **If it's not observable, it's not a criterion — it's a wish.**
+5. **Automatic detection of sensitive patterns** (see list below). Flag each detected pattern in section 6 of the spec. If at least one flag is positive, set `security_required: true` in the spec.
+
+### Patterns that trigger `security_required`
+Scan the spec (objective + criteria + description) for case-insensitive matches of:
+
+- **Auth / identity:** `login`, `logout`, `signin`, `password`, `token`, `jwt`, `oauth`, `oidc`, `saml`, `session`, `cookie`, `auth`, `authn`, `authz`, `permission`, `role`, `rbac`, `mfa`, `2fa`
+- **Secrets / config:** `secret`, `apikey`, `api_key`, `api key`, `.env`, `env var`, `credential`, `vault`
+- **External integrations:** `webhook`, `composio`, `mcp`, `n8n`, `third-party`, `external api`, `sdk`
+- **Sensitive data:** `pii`, `personal data`, `payment`, `credit card`, `billing`, `gdpr`, `ccpa`, `hipaa`, `encrypt`, `decrypt`, `hash`
+- **Destructive DB:** `drop table`, `delete from`, `truncate`, `migration`, `schema change`
+- **Input / surface:** `user input`, `file upload`, `form`, `sanitize`, `escape`, `xss`, `sqli`, `csrf`, `ssrf`, `cors`
+- **Network / exposure:** `expose`, `public endpoint`, `new route`, `webhook receiver`
+
+Any match → `security_required: true`. Report to the user which flags fired and why.
+
+### Gate
+- Present the full spec (summary).
+- List detected security flags (if any).
+- Ask for approval: `approve` / `iterate` / `cancel`.
+- **Do not advance to phase B without explicit approval.**
+
+## Phase B — Supervised implementation (the bulk)
+
+### Actions
+1. **If `security_required: true`**, BEFORE any code:
+   - Invoke the `security-check-before-tools` skill (if it applies to the context: new integrations, MCP, Composio).
+   - Or delegate a mini-review to `security-reviewer` focused on the patterns detected in phase A.
+   - Report the identified risks to the user and ask for confirmation before proceeding.
+2. Delegate to `software-dev` following the `supervised-incremental-development` skill.
+3. **Hard constraints:**
+   - ≤5 files per increment.
+   - Review packet (7 sections) at the end of EACH increment.
+   - Tests written in the same increment as the code they cover.
+   - No abstractions, helpers, or features not derivable from an approved acceptance criterion.
+4. **Gate per increment:** the user approves before advancing to the next.
+5. The phase ends when all acceptance criteria are covered by code + tests.
+
+### Difference vs `/dev-flow` phase 3
+- Here we don't require formal TC-IDs. Each test maps to an acceptance criterion by name or reference.
+- No `state.json` is maintained — progress lives in the conversation + commits.
+- Code review is **lightweight**: a quick self-review, or a single `code-reviewer` pass on risky increments — not a mandatory per-increment gate like `/dev-flow`.
+
+## Phase C — Validation + close (5-15 min)
+
+### Actions
+1. Delegate a light pass to `qa-reviewer`:
+   - Run the test suite and report pass/fail.
+   - Verify acceptance criteria one by one (manual smoke if applicable).
+2. **Coverage-claim discipline:** before reporting an acceptance criterion as "covered by test", confirm the named test function exists on disk (`Glob` / read the file). Coverage signed off from intent rather than the artifact is a false claim. (Same lesson as `/dev-flow` Phase 3, origin batch-08.)
+3. **If `security_required` was true**, final security pass:
+   - Confirm the risks identified in phase B were mitigated.
+   - If risks remain open, list them as pending in the close.
+4. Produce the **closing artifact** — a markdown block ready to paste into the PR description or CHANGELOG:
+   - **What changed** (1 paragraph).
+   - **How it was tested** (list of tests + manual smoke performed).
+   - **Open risks / pending** (if any).
+   - **Security flags fired and how they were handled** (if applicable).
+   - **Suggested commit message** (short, imperative).
+5. Update `.fast-dev-flow/spec.md`, marking the spec `closed` with the date.
+6. **Backlog reconciliation (MANDATORY — the carry-over contract).** Reconcile the project's SINGLE canonical cross-batch backlog **`.dev-flow/BACKLOG.md`** (create it if absent — one prioritized queue shared by BOTH flows, never a per-batch file): (a) mark every item this batch shipped `DONE` with its PR/SHA; (b) **carry forward, drop nothing** — append every open item plus every new carry / deferred finding / "Open risks / pending" from the closing artifact; (c) bump the recorded base ref + a "last refresh: <date>" line. **Include the `BACKLOG.md` edit in this batch's commit/PR** so the backlog travels with the code that changed it. The batch is not complete until the backlog reflects it — a fast-flow ships small, but the backlog still updates every time.
+
+### Final gate
+- Present the closing block to the user.
+- Ask for confirmation to mark the batch as complete.
+
+## Escape hatch — promotion to `/dev-flow`
+
+If during any phase you detect the batch grew beyond fast scope (e.g. >3 increments in phase B, serious requirements ambiguity, sustained scope drift), **stop and report**:
+
+> "This batch exceeded fast-dev-flow scope. I recommend promoting to /dev-flow for formal traceability and validation. Do I proceed? That implies:
+> 1. Archive the current `.fast-dev-flow/spec.md`.
+> 2. Run `/dev-flow-init` and migrate the user stories to IEEE 830 + EARS format.
+> 3. Continue from phase 1 of the V-model."
+
+Do not promote without explicit approval.
+
+## Hard rules
+
+- Never advance a phase without explicit user approval.
+- Never skip security-flag detection — it's part of this flow's value.
+- Never generate the spec without observable acceptance criteria. If the criteria aren't observable, mark the spec invalid and ask the user again.
+- Don't touch the Obsidian vault from this flow. Docs live in the repo (PR description / CHANGELOG).
+- Don't run git operations (commit, push, merge) — that's the user's decision.
+- **A batch is not complete until `.dev-flow/BACKLOG.md` is reconciled** (Phase C step 6): shipped items marked done, every carry/finding appended, base ref bumped, and the edit included in the batch's commit. The canonical backlog is ONE file shared with `/dev-flow` — never let a second copy become the de-facto source and drift. (Origin: 2026-07-20 operator audit — the backlog went ~10 batches stale because no close step enforced the update.)
+
+## Structure created in the project
+
+```
+.fast-dev-flow/
+├── spec.md              (current spec)
+└── archive/             (closed specs, optional)
+    └── <timestamp>-spec.md
+```
+
+Lightweight on purpose. No `state.json`, no matrix, no per-phase subfolders.
+
+## Tone
+
+Keep the flow conversational and agile. The philosophy is: spec in 5 minutes, supervised code, clean close. If the user feels you're being slow or heavy, that's a signal you're applying `/dev-flow` overhead here — correct it.
