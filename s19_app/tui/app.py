@@ -44,6 +44,7 @@ from .command_bar import CommandBar, PaletteEntry
 from .mac import parse_mac_file
 from .models import LoadedFile, ProjectVariantSet
 from .operations import get_operation, list_operation_ids
+from .os_clipboard_input import OsClipboardInput
 from .rail import Rail, RailItem
 from .screens import (
     ChangeSetJsonScreen,
@@ -1989,9 +1990,9 @@ class S19TuiApp(App):
         _center_pane = Container(
             Label("Hex View", id="hex_title"),
             Container(
-                Input(placeholder="Search ASCII text", id="search_input"),
+                OsClipboardInput(placeholder="Search ASCII text", id="search_input"),
                 Button("Find Next", id="search_button"),
-                Input(placeholder="Goto 0xADDR", id="goto_input"),
+                OsClipboardInput(placeholder="Goto 0xADDR", id="goto_input"),
                 Button("Goto", id="goto_button"),
                 id="hex_controls",
             ),
@@ -4883,12 +4884,14 @@ class S19TuiApp(App):
         _tags_pane = Container(
             Label("A2L Tags", id="a2l_tags_title"),
             Container(
-                Input(placeholder="Filter tags", id="a2l_tags_filter_input"),
+                OsClipboardInput(placeholder="Filter tags", id="a2l_tags_filter_input"),
                 Button("Field: name", id="a2l_filter_field"),
                 Button("All", id="a2l_filter_all"),
                 Button("Invalid", id="a2l_filter_invalid"),
                 Button("In-Memory", id="a2l_filter_inmem"),
-                Input(placeholder="Find in tag table", id="a2l_tag_find_input"),
+                OsClipboardInput(
+                    placeholder="Find in tag table", id="a2l_tag_find_input"
+                ),
                 Button("Find next", id="a2l_tag_find_next"),
                 Button("Page Prev", id="a2l_page_prev_button"),
                 Button("Page Next", id="a2l_page_next_button"),
@@ -4917,9 +4920,11 @@ class S19TuiApp(App):
             ),
             Label("Hex Viewer", id="alt_hex_title"),
             Container(
-                Input(placeholder="Search ASCII text", id="alt_search_input"),
+                OsClipboardInput(
+                    placeholder="Search ASCII text", id="alt_search_input"
+                ),
                 Button("Find Next", id="alt_search_button"),
-                Input(placeholder="Goto 0xADDR", id="alt_goto_input"),
+                OsClipboardInput(placeholder="Goto 0xADDR", id="alt_goto_input"),
                 Button("Goto", id="alt_goto_button"),
                 id="alt_hex_controls",
             ),
@@ -4993,9 +4998,11 @@ class S19TuiApp(App):
         _hex_pane = Container(
             Label("Hex Viewer", id="mac_hex_title"),
             Container(
-                Input(placeholder="Search ASCII text", id="mac_search_input"),
+                OsClipboardInput(
+                    placeholder="Search ASCII text", id="mac_search_input"
+                ),
                 Button("Find Next", id="mac_search_button"),
-                Input(placeholder="Goto 0xADDR", id="mac_goto_input"),
+                OsClipboardInput(placeholder="Goto 0xADDR", id="mac_goto_input"),
                 Button("Goto", id="mac_goto_button"),
                 id="mac_hex_controls",
             ),

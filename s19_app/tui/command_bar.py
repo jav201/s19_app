@@ -29,6 +29,8 @@ from textual.containers import Horizontal, Vertical
 from textual.message import Message
 from textual.widgets import Input, Label, ListItem, ListView
 
+from .os_clipboard_input import OsClipboardInput
+
 
 @dataclass(frozen=True)
 class PaletteEntry:
@@ -139,10 +141,16 @@ class CommandBar(Vertical):
             yield Label("›", id="command_bar_prompt", markup=False)
             yield Label("Project: (none)", id="cmdbar_project", markup=False)
             yield Label("A2L: (none)", id="cmdbar_a2l", markup=False)
-            yield Input(placeholder="Find ASCII text  ( / )", id="find_input")
-            yield Input(placeholder="Goto 0xADDR  ( g )", id="cmdbar_goto_input")
+            yield OsClipboardInput(
+                placeholder="Find ASCII text  ( / )", id="find_input"
+            )
+            yield OsClipboardInput(
+                placeholder="Goto 0xADDR  ( g )", id="cmdbar_goto_input"
+            )
         with Vertical(id="command_palette", classes="hidden"):
-            yield Input(placeholder="Command palette  (Ctrl+K)", id="palette_input")
+            yield OsClipboardInput(
+                placeholder="Command palette  (Ctrl+K)", id="palette_input"
+            )
             yield ListView(id="palette_list")
 
     def on_mount(self) -> None:
