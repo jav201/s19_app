@@ -19,6 +19,12 @@
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct}
 
+> ### 🔄 Flow revision — verify currency at Phase 0 (C-45)
+> **`flow_version: 2026.07.28-rev1` · `flow_hash: 0127a2767ff11c8a` · controls C-1…C-45.**
+> Three controls were encoded from this project on 2026-07-28 and pushed upstream so every project inherits them: **C-43** premise evaluation at every gate (artifact = `req-template` §2.7) · **C-44** session-close working-file reconciliation (artifact = the post-mortem's reconciliation + conditional-gate-discharge tables) · **C-45** the flow is a shared asset (PUSH portable controls upstream; PULL and verify currency before deriving).
+>
+> **Before deriving anything, re-derive the aggregate and compare** — the command is in `~/.claude/docs/FLOW-VERSION.md` (mirrored at `jav201/claude-skills/dev-flow/`). A mismatch is either uncommitted local work (push it) or staleness (pull it); the per-file rows say which. **Record the revision in `PLAN.md` beside the RC-1 line** — a batch that cannot state its flow revision cannot claim its controls were current.
+
 ---
 
 ## 🟡 P0 — RE-REVIEW OF batch-65 — **LARGELY RESOLVED at batch-70 (2026-07-28)**, 3 residuals below
