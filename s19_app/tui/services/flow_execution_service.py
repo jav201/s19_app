@@ -25,11 +25,13 @@ No Textual import (service-layer contract C-7).
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Tuple
+from dataclasses import replace
+from pathlib import Path
+from typing import Callable, Iterable, List, Optional, Sequence, Tuple
 
 from ...core import S19File
 from ...hexfile import IntelHexFile
-from ...validation.model import ValidationIssue
+from ...validation.model import ValidationIssue, ValidationSeverity
 from ..changes import (
     apply_change_document,
     read_change_document,
@@ -56,14 +58,22 @@ from .flow_model import (
     Flow,
     FlowContext,
     FlowRunResult,
+    FusedFlowRunResult,
     PatchBlock,
     ReportBlock,
     SourceBlock,
+    VariantRunOutcome,
     WriteOutBlock,
 )
 from .flow_report_service import FlowReportState, write_flow_report
 from .load_service import build_loaded_hex, build_loaded_s19
-from .variant_execution_service import _resolve_manifest_entry
+from .variant_execution_service import (
+    MANIFEST_PATH_ESCAPE,
+    SCOPE_ALL,
+    _resolve_manifest_entry,
+    plan_variant_executions,
+)
+from ..models import ProjectVariantSet, VariantDescriptor  # noqa: F401 - typing
 from ..operations.crc import check_regions, inject_crcs
 from ..operations.crc_config import parse_crc_config
 from ..operations.model import OperationInput
@@ -132,8 +142,21 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
         try:
             if isinstance(block, SourceBlock):
                 issues: List[ValidationIssue] = []
+                # batch-70 FB-P2 (LLR-104.1): when the run is variant-scoped the
+                # SOURCE ref/type come from the variant, NOT from the block. The
+                # binding is a project-RELATIVE ref precisely so it still passes
+                # through the reused containment seam below — the descriptor's
+                # own absolute path is rejected by that seam by design.
+                binding = _bound_source_ref(ctx, block, issues)
+                if binding is None:
+                    aborted = _record_error(
+                        result, index, kind, "variant image rejected", issues,
+                        "variant image is not inside the project directory",
+                    )
+                    continue
+                image_ref, file_type = binding
                 path = _resolve_manifest_entry(
-                    ctx.project_dir, block.image_ref,
+                    ctx.project_dir, image_ref,
                     "SourceBlock.image_ref", issues,
                 )
                 if path is None or not path.exists():
@@ -142,7 +165,7 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         "source image not found or not inside the project",
                     )
                     continue
-                if block.file_type == WRITE_FMT_HEX:
+                if file_type == WRITE_FMT_HEX:
                     loaded = build_loaded_hex(
                         path, IntelHexFile(str(path)), None, ctx.a2l_data
                     )
@@ -461,6 +484,212 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
     if not result.pre_crc_ranges:
         result.pre_crc_ranges = list(result.image_ranges)
     return result
+
+
+def _bound_source_ref(
+    ctx: FlowContext,
+    block: SourceBlock,
+    issues: List[ValidationIssue],
+) -> Optional[Tuple[str, str]]:
+    """Resolve the SOURCE block's ``(image_ref, file_type)`` for THIS run.
+
+    Summary:
+        Unscoped (``ctx.variant is None``) this is the identity — the block's
+        own ref and type, so today's single-image path is untouched (AC-6).
+        Variant-scoped it binds the variant's image instead (D-2), as a
+        **project-relative POSIX ref**: the caller feeds that ref to the REUSED
+        :func:`_resolve_manifest_entry`, which rejects absolute refs by design,
+        so handing it ``VariantDescriptor.path`` directly would fail every
+        variant. Relativising here is what keeps the containment seam shared
+        rather than forked (batch-69 spec §7).
+
+    Args:
+        ctx (FlowContext): The run context; ``ctx.variant`` selects the mode.
+        block (SourceBlock): The SOURCE block being executed.
+        issues (List[ValidationIssue]): Finding collector, appended in place.
+
+    Returns:
+        Optional[Tuple[str, str]]: ``(image_ref, file_type)``, or ``None`` when
+        the variant's image lies outside the project directory — one
+        ``MANIFEST-PATH-ESCAPE`` finding is recorded and the caller fails THAT
+        block, hence that variant, closed (LLR-104.7 / AC-7).
+
+    Data Flow:
+        - ``ctx.variant.path`` → ``relative_to(project_dir)`` → POSIX ref →
+          ``_resolve_manifest_entry`` (in the caller).
+
+    Dependencies:
+        Used by:
+            - run_flow (the SOURCE branch)
+
+    Example:
+        >>> _bound_source_ref(FlowContext(project_dir=Path(".")),
+        ...                   SourceBlock(image_ref="fw.s19"), [])
+        ('fw.s19', 's19')
+    """
+    if ctx.variant is None:
+        return block.image_ref, block.file_type
+    try:
+        relative = Path(ctx.variant.path).resolve().relative_to(
+            Path(ctx.project_dir).resolve()
+        )
+    except (ValueError, OSError):
+        issues.append(
+            ValidationIssue(
+                code=MANIFEST_PATH_ESCAPE,
+                severity=ValidationSeverity.ERROR,
+                message=(
+                    "variant image resolves outside the project directory - "
+                    f"variant skipped: {ctx.variant.variant_id!r}"
+                ),
+                artifact="flow",
+            )
+        )
+        return None
+    return relative.as_posix(), ctx.variant.file_type
+
+
+def _roll_up_variants(fused: FusedFlowRunResult) -> None:
+    """Fill the fused counts and the worst-across-variants status (D-5).
+
+    Summary:
+        Count each variant's own terminal status, then roll up: any ``error``
+        wins, else any ``completed-with-issues``, else ``ok``. The counts are
+        recorded ALONGSIDE the rolled-up word on purpose — one word over N
+        images hides exactly what the operator opened the report to see, and a
+        roll-up that cannot be inverted into per-variant outcomes is a summary
+        that lies by omission (LLR-104.4).
+
+    Args:
+        fused (FusedFlowRunResult): The result to fill, mutated in place.
+
+    Returns:
+        None
+
+    Dependencies:
+        Used by:
+            - run_flow_over_variants
+    """
+    fused.n_ok = sum(
+        1 for outcome in fused.variant_outcomes
+        if outcome.result.status == FLOW_STATUS_OK
+    )
+    fused.n_issues = sum(
+        1 for outcome in fused.variant_outcomes
+        if outcome.result.status == FLOW_STATUS_ISSUES
+    )
+    fused.n_error = sum(
+        1 for outcome in fused.variant_outcomes
+        if outcome.result.status == FLOW_STATUS_ERROR
+    )
+    if fused.n_error:
+        fused.status = FLOW_STATUS_ERROR
+    elif fused.n_issues:
+        fused.status = FLOW_STATUS_ISSUES
+    else:
+        fused.status = FLOW_STATUS_OK
+
+
+def run_flow_over_variants(
+    flow: Flow,
+    ctx: FlowContext,
+    variant_set: Optional["ProjectVariantSet"] = None,
+    manifest: Optional[object] = None,
+    scope: str = SCOPE_ALL,
+    *,
+    plan: Optional[Iterable["VariantDescriptor"]] = None,
+    run_one: Optional[Callable[[Flow, FlowContext], FlowRunResult]] = None,
+) -> FusedFlowRunResult:
+    """Execute ``flow`` once per planned variant, isolated, and fuse the results.
+
+    Summary:
+        Derive the planned image set from the project's OWN variant machinery
+        (``plan_variant_executions``) rather than a second parallel concept —
+        a flow-local path list would let a flow name images outside the project
+        and would fork the containment seam (D-1). Each variant runs under its
+        own :class:`FlowContext` and its own isolation boundary: an abort, or an
+        exception escaping :func:`run_flow`, is recorded as THAT variant's
+        outcome and the loop continues (D-3), because a fused report missing 4
+        of 5 images because the 1st failed is worse than useless.
+
+    Args:
+        flow (Flow): The flow to run; never mutated — the per-variant binding
+            lives on the context, not on the blocks (D-2).
+        ctx (FlowContext): The base context; ``ctx.variant`` is replaced per
+            variant.
+        variant_set (Optional[ProjectVariantSet]): The project's variant
+            inventory. Required unless ``plan`` is given.
+        manifest (Optional[ProjectManifest]): The parsed manifest, or ``None``.
+        scope (str): A ``variant_execution_service`` execution scope —
+            ``"active"`` / ``"all"`` / ``"assignments"``.
+        plan (Optional[Iterable[VariantDescriptor]]): The planned set, supplied
+            verbatim. This is the AC-1 observation seam: a counting iterable
+            passed here measures how many images the runner consumed, which is
+            a structural oracle — unlike wall-clock or peak-memory, which
+            batch-63 proved cannot distinguish cap-and-continue from
+            cap-and-break.
+        run_one (Optional[Callable[[Flow, FlowContext], FlowRunResult]]): The
+            per-variant executor; defaults to :func:`run_flow`. The second AC-1
+            seam — it makes the EXECUTION count directly observable rather than
+            inferred from the outcome list.
+
+    Returns:
+        FusedFlowRunResult: One :class:`VariantRunOutcome` per planned variant
+        in plan order, the D-5 roll-up, the inverted counts, and the union of
+        every variant's written image paths.
+
+    Data Flow:
+        - ``variant_set`` + ``manifest`` + ``scope`` → ``plan_variant_executions``
+          → descriptors → per-variant ``FlowContext`` → :func:`run_flow`.
+        - outcomes → :func:`_roll_up_variants` → status + ``n_ok``/``n_issues``/
+          ``n_error``.
+
+    Dependencies:
+        Uses:
+            - plan_variant_executions (D-1 reuse, never a parallel image list)
+            - run_flow / _roll_up_variants
+        Used by:
+            - s19_app.tui.app.S19TuiApp.on_flow_builder_panel_run_requested
+
+    Example:
+        >>> run_flow_over_variants(Flow(name="f"), FlowContext(project_dir=Path(".")),
+        ...                        plan=[]).diagnostics
+        ['no variants in scope - nothing was executed']
+    """
+    if plan is not None:
+        planned = list(plan)
+    elif variant_set is None:
+        raise ValueError("run_flow_over_variants needs a variant_set or a plan")
+    else:
+        planned = [
+            descriptor
+            for descriptor, _files in plan_variant_executions(
+                variant_set, manifest, scope
+            )
+        ]
+    execute = run_one if run_one is not None else run_flow
+    fused = FusedFlowRunResult(status=FLOW_STATUS_OK)
+    if not planned:
+        fused.diagnostics.append("no variants in scope - nothing was executed")
+        return fused
+    for descriptor in planned:
+        variant_ctx = replace(ctx, variant=descriptor)
+        try:
+            variant_result = execute(flow, variant_ctx)
+        except Exception as exc:  # noqa: BLE001 - per-variant isolation (D-3)
+            # run_flow is itself non-raising, so reaching here means an injected
+            # executor or a future regression broke that contract. Isolating it
+            # is the whole point: the remaining variants still run.
+            variant_result = FlowRunResult(
+                status=FLOW_STATUS_ERROR,
+                diagnostics=[f"{type(exc).__name__}: {exc}"],
+            )
+        fused.variant_outcomes.append(
+            VariantRunOutcome(str(descriptor.variant_id), variant_result)
+        )
+        fused.written_paths.extend(variant_result.written_paths)
+    _roll_up_variants(fused)
+    return fused
 
 
 def _load_error_message(err: dict) -> str:

@@ -17,7 +17,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple, Union
+
+if TYPE_CHECKING:  # pragma: no cover - typing only, keeps the runtime stdlib-only
+    from ..models import VariantDescriptor
 
 #: Block ``kind`` discriminators (the JSON-persistence tag, batch-45).
 BLOCK_SOURCE = "source"
@@ -221,11 +224,19 @@ class FlowContext:
         mac_records (Optional[Sequence[dict]]): Parsed project MAC records
             (shared linkage source), or ``None``.
         a2l_data (Optional[dict]): Parsed project A2L payload, or ``None``.
+        variant (Optional[VariantDescriptor]): The image this run is bound to
+            (batch-70 FB-P2, LLR-104.1). ``None`` — the default — is today's
+            unscoped single-image run, in which the SOURCE block's own
+            ``image_ref`` is used and nothing downstream changes (AC-6). When
+            set, the SOURCE block's ``image_ref``/``file_type`` are overridden
+            for the duration of THIS run; neither the ``Flow`` object nor the
+            flow file on disk is mutated (D-2).
     """
 
     project_dir: Path
     mac_records: Optional[Sequence[dict]] = None
     a2l_data: Optional[dict] = None
+    variant: Optional["VariantDescriptor"] = None
 
 
 @dataclass(slots=True)
@@ -285,3 +296,59 @@ class FlowRunResult:
     diagnostics: List[str] = field(default_factory=list)
     image_ranges: List[Tuple[int, int]] = field(default_factory=list)
     pre_crc_ranges: List[Tuple[int, int]] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class VariantRunOutcome:
+    """One variant's isolated flow-run outcome (batch-70 FB-P2, LLR-104.2).
+
+    Args:
+        variant_id (str): The executed variant's id — file-derived, so every
+            consumer renders it markup-safe (D-6).
+        result (FlowRunResult): That variant's whole-flow outcome, exactly as
+            an unscoped run would have produced it.
+    """
+
+    variant_id: str
+    result: FlowRunResult
+
+
+@dataclass(slots=True)
+class FusedFlowRunResult:
+    """The multi-image run outcome — one entry per PLANNED variant (LLR-104.2).
+
+    ``len(variant_outcomes) == len(planned)`` always: a variant that aborted, or
+    whose image ref failed containment, still contributes an outcome (D-3). A
+    fused run that dropped a variant would be exactly the silent omission this
+    feature exists to remove.
+
+    Args:
+        status (str): The roll-up across variants — any ``"error"`` →
+            ``"error"``; else any ``"completed-with-issues"`` → that; else
+            ``"ok"`` (D-5).
+        variant_outcomes (List[VariantRunOutcome]): One per planned variant, in
+            plan order.
+        n_ok (int): Variants whose own status was ``"ok"``.
+        n_issues (int): Variants whose own status was ``"completed-with-issues"``.
+        n_error (int): Variants whose own status was ``"error"``.
+        written_paths (List[Path]): Every image output across all variants, in
+            plan order — the image-output contract, unioned.
+        diagnostics (List[str]): Whole-run notes (e.g. an empty planned set).
+
+    Data Flow:
+        - Built by ``flow_execution_service.run_flow_over_variants``.
+        - Consumed by ``flow_fused_report_service.compose_fused_flow_report``
+          and by ``FlowBuilderPanel.render_result``.
+
+    Example:
+        >>> FusedFlowRunResult(status="ok").n_ok
+        0
+    """
+
+    status: str
+    variant_outcomes: List[VariantRunOutcome] = field(default_factory=list)
+    n_ok: int = 0
+    n_issues: int = 0
+    n_error: int = 0
+    written_paths: List[Path] = field(default_factory=list)
+    diagnostics: List[str] = field(default_factory=list)
