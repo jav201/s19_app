@@ -5,7 +5,7 @@
   "batch_objective": "D1 ONLY — bound the PRODUCER in _addendum_lines (s19_app/tui/services/report_service.py:1514) so the declared-region addendum stops consuming resident memory proportional to R x V x E. The function appends one fully-formatted string (each paying md_safe) per matching (region x variant x entry/issue) into a local hits list at :1565/:1571/:1579 and extends `lines` only at :1584, so the whole cost is paid BEFORE any output exists and every byte-budget or row-cap design is structurally blind to it. Measured 87-94 B resident per hit, product law confirmed on all three axes. D1 was specced at batch-63, BLOCKED at that batch's Phase-2 re-gate and RETURNED; batch-63 shipped D3 only. EXPLICITLY OUT OF SCOPE: OB-4/F4 (the two unbounded tables at 988 B/entry) and D2 (schema-legal address ValueError) — both stay carries in .dev-flow/BACKLOG-CODE.md. CONSTRAINT ON THE PR: D1 alone does NOT close the memory-exhaustion DoS (the neighbouring tables dominate), so the batch must state the residual with its numbers and must NOT claim closure.",
   "note_prior_batch": "batch-63 (report byte accounting, D3 only) DONE + MERGED PR #139 c473152 + closeout #140 79cde53 + control decisions #142 c779e3d. Vault synced 2026-07-27. Its D1/D2 were RETURNED to the backlog at the Phase-2 re-gate. Its full state at close is archived at .dev-flow/2026-07-26-batch-63/state-at-close.json.",
   "note_backlog_split": "THE OPEN QUEUE IS NOW SPLIT (PR #143, squash 082ada9, 2026-07-27). Lane A = .dev-flow/BACKLOG-CODE.md (app code + its dev flow) — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is now a ROUTER holding no open work.",
-  "route": "full /dev-flow. ALL PHASES CLOSED. Merged PR #149 squash b691f21; vault synced to 2026-07-28-batch-65. Remaining close-out: the dev-flow-lessons catalog entry + push to claude-skills.",
+  "route": "full /dev-flow. ALL PHASES CLOSED. Merged PR #149 squash b691f21; vault synced to 2026-07-28-batch-65. Close-out COMPLETE as of batch-70: the dev-flow-lessons catalog entry landed (claude-skills adbbae1 — it had been written and left uncommitted, which is what C-44 now exists to catch) and the recovery of this very state.json landed as PR #158 squash f1f3987. Merge-gate items 1-5 all discharged (3 + 4 at batch-70, b037186 / 14b8285 / ba19c3d; 2 + 5 had already landed).",
   "rc1": "VERIFIED 2026-07-27. git fetch origin; origin/main tip = 082ada9; HEAD = 082ada9; merge-base HEAD origin/main = 082ada9 (equal, no rebase needed); working tree clean; branch cut off that tip as claude/batch-64-addendum-producer-bound, renumbered mid-flight and now shipping as claude/batch-65-code-lane. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. Already-shipped check EXECUTED: grep R-TUI-095 REQUIREMENTS.md = 0, grep HLR-100 REQUIREMENTS.md = 0, grep MAX_ADDENDUM_HITS s19_app/ = 0 -> D1 is NOT shipped.",
   "standing_authorization": {
     "date": "2026-07-27",
@@ -43,8 +43,20 @@
     "2-architect": ".dev-flow/2026-07-28-batch-65/02-review-architect.md",
     "2-regate-security": ".dev-flow/2026-07-28-batch-65/02-regate-security.md",
     "2-regate-qa": ".dev-flow/2026-07-28-batch-65/02-regate-qa.md",
-    "2-regate-architect": ".dev-flow/2026-07-28-batch-65/02-regate-architect.md"
+    "2-regate-architect": ".dev-flow/2026-07-28-batch-65/02-regate-architect.md",
+    "3-inc1": ".dev-flow/2026-07-28-batch-65/03-increments/increment-001.md",
+    "3-inc2": ".dev-flow/2026-07-28-batch-65/03-increments/increment-002.md",
+    "3-inc3": ".dev-flow/2026-07-28-batch-65/03-increments/increment-003.md",
+    "4": ".dev-flow/2026-07-28-batch-65/04-validation.md",
+    "5": ".dev-flow/2026-07-28-batch-65/05-postmortem.md",
+    "6-traceability": ".dev-flow/2026-07-28-batch-65/06-docs/traceability-matrix.md",
+    "6-functionality": ".dev-flow/2026-07-28-batch-65/06-docs/functionality.md",
+    "6-executive": ".dev-flow/2026-07-28-batch-65/06-docs/executive-summary.md",
+    "6-architecture": ".dev-flow/2026-07-28-batch-65/06-docs/diagrams/architecture.md",
+    "7-merge-gate": ".dev-flow/2026-07-28-batch-65/07-merge-gate-qa.md",
+    "7b-merge-gate-regate": ".dev-flow/2026-07-28-batch-65/07b-merge-gate-qa-regate.md"
   },
+  "artifacts_census": "COMPLETE as of batch-70 (R-2): 21 mapped = 21 .md files on disk under .dev-flow/2026-07-28-batch-65/, verified by `find … -name '*.md' | wc -l`. The map previously listed 10, omitting all three increments, validation, the post-mortem, all four 06-docs files and BOTH merge-gate reports — i.e. every artifact produced after Phase 2, including the two gate documents the batch-65 re-review was chartered to examine.",
   "prior_work_mined": "batch-63 left D1 substantially specced and reviewed. Mined 2026-07-27 from .dev-flow/2026-07-26-batch-63/: the design (per-hit-class cap), 8 round-1 blockers + 9 re-gate blockers, all executed measurements, the design options and their verdicts, the named residuals, and the emission-order facts. Recorded in PLAN.md 'Inherited findings' so batch-64 designs for them rather than re-discovering them.",
   "decisions_log": [
     {
