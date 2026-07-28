@@ -59,6 +59,7 @@ from typing import (
 )
 
 from rich.text import Text
+from textual import events
 from textual.app import ComposeResult
 from textual.content import Content
 from textual.containers import (
@@ -1085,13 +1086,15 @@ class RegionRow(Static):
 
     Summary:
         One row of the ``.map-region-list`` — an address · size · band summary
-        of one merged entropy run. A SINGLE real click posts
-        :class:`Activated` carrying the run's ``[region_start, region_end)``
-        window; the enclosing :class:`MemoryMapPanel` handles it by populating
-        the detail pane (``build_detail_text``, keeping the R-TUI-041 R-3 A2L
-        naming + its C-17 markup-safety guard alive on a live path) and posting
+        of one merged entropy run. A real click posts :class:`Activated`
+        carrying the run's ``[region_start, region_end)`` window **and the
+        click-chain length**; the enclosing :class:`MemoryMapPanel` handles it
+        by populating the detail pane (``build_detail_text``, keeping the
+        R-TUI-041 R-3 A2L naming + its C-17 markup-safety guard alive on a live
+        path) and — **only on a double click (batch-67 N4a)** — posting
         :class:`MemoryMapPanel.OpenInHexRequested` for direct region→hex nav
-        (LLR-045C.1 — no reveal-button, no two-step). The row itself shows
+        (LLR-045C.1 — no reveal-button, no two-step). Before batch-67 a single
+        click did both. The row itself shows
         addr/size/band ONLY — no file-derived A2L text (security B3). A click on
         padding/legend/empty area hits no ``RegionRow`` and is an inert no-op
         (LLR-045C.3).
@@ -1114,18 +1117,30 @@ class RegionRow(Static):
     """
 
     class Activated(Message):
-        """A region row was clicked (single-click region→hex + detail).
+        """A region row was clicked, carrying the click-chain length.
 
         Args:
             region_start (int): The run's inclusive start address (the hex
                 focus address).
             region_end (int): The run's exclusive end address.
+            chain (int): Textual's click-chain length — ``1`` for a single
+                click (inspect only), ``2`` or more for a double click
+                (inspect + navigate). Defaults to ``1`` so a hand-constructed
+                message means "inspect", the non-navigating case.
+
+        Data Flow:
+            - ``chain`` originates at ``events.Click.chain`` and is the ONLY
+              input ``MemoryMapPanel.on_region_row_activated`` uses to decide
+              whether to post ``OpenInHexRequested`` (batch-67 N4a).
         """
 
-        def __init__(self, region_start: int, region_end: int) -> None:
+        def __init__(
+            self, region_start: int, region_end: int, chain: int = 1
+        ) -> None:
             super().__init__()
             self.region_start = region_start
             self.region_end = region_end
+            self.chain = chain
 
     def __init__(
         self,
@@ -1138,9 +1153,16 @@ class RegionRow(Static):
         self.region_start = region_start
         self.region_end = region_end
 
-    def on_click(self) -> None:
-        """Post :class:`Activated` for this region on a single click."""
-        self.post_message(self.Activated(self.region_start, self.region_end))
+    def on_click(self, event: events.Click) -> None:
+        """Post :class:`Activated` for this region, forwarding the click chain.
+
+        The row itself does not decide what a click means — it reports how many
+        clicks arrived and lets :class:`MemoryMapPanel` apply the policy, so the
+        single/double split lives in exactly one place (batch-67 N4a).
+        """
+        self.post_message(
+            self.Activated(self.region_start, self.region_end, chain=event.chain)
+        )
 
 
 class MapRuler(Horizontal):
@@ -1632,7 +1654,7 @@ class MemoryMapPanel(Container):
     #: span or band-less image) — kept distinct from ``_EMPTY_TEXT`` so a loaded
     #: image is never mislabelled "No file loaded" (fix-memmap-entropy AC-3).
     _NO_ENTROPY_TEXT = "No entropy detail for this image."
-    _DETAIL_HINT = "Click a region row to inspect it and jump to the hex view."
+    _DETAIL_HINT = "Click a region to inspect it - double-click to open in hex."
 
     class OpenInHexRequested(Message):
         """The operator asked to jump to the hex view at a cell's start (US-036).
@@ -2325,10 +2347,20 @@ class MemoryMapPanel(Container):
         return text
 
     def on_region_row_activated(self, event: "RegionRow.Activated") -> None:
-        """Handle a region-row click: populate the inspector + jump to hex.
+        """Handle a region-row click: inspect on single, navigate on double.
 
         Summary:
-            On a single :class:`RegionRow.Activated` (one click), populate the
+            **batch-67 N4a — the click semantics SPLIT.** Every activation, at
+            any chain length, populates the retained ``#map_detail`` inspector;
+            only a chain of 2 or more (a double click) additionally posts
+            :class:`MemoryMapPanel.OpenInHexRequested`. Before batch-67 a single
+            click did both, which made browsing regions a navigation trap — the
+            operator could not look at a region without being moved off the map.
+            Inspecting is the cheap, reversible action and gets the cheap
+            gesture; navigating is the disruptive one and gets the deliberate
+            gesture.
+
+            On a :class:`RegionRow.Activated`, populate the
             retained ``#map_detail`` inspector for the clicked run's
             ``[region_start, region_end)`` window (batch-45 LLR-045C + batch-47
             R-TUI-074): the ``build_detail_text`` body (status chip, span/size,
@@ -2343,7 +2375,8 @@ class MemoryMapPanel(Container):
             only developer-formatted hex, no untrusted text (C-17 / MN-4).
 
         Args:
-            event (RegionRow.Activated): The clicked run's window.
+            event (RegionRow.Activated): The clicked run's window plus the
+                click-chain length; ``event.chain >= 2`` gates the hex jump.
 
         Dependencies:
             Uses:
@@ -2367,7 +2400,9 @@ class MemoryMapPanel(Container):
         detail.append(self._region_hex_peek(start, end))
         body = self.query_one("#map_detail_body", Static)
         body.update(detail)
-        self.post_message(self.OpenInHexRequested(start))
+        # N4a: inspect always, navigate only on a deliberate double click.
+        if event.chain >= 2:
+            self.post_message(self.OpenInHexRequested(start))
 
     def _region_hex_peek(self, start: int, end: int) -> Text:
         """Render a ≤3-row hex peek at a region's start (batch-47, R-TUI-074).

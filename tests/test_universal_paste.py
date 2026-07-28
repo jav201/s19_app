@@ -1,11 +1,11 @@
-"""batch-66 AC-1 / AC-2 — OS-clipboard paste is universal across TUI text boxes.
+"""batch-67 AC-1 / AC-2 — OS-clipboard paste is universal across TUI text boxes.
 
 Summary:
     The TUI historically mixed two text-entry widgets: ``OsClipboardInput``
     (Ctrl+V reads the real OS clipboard through the tkinter → Win32 → PowerShell
     cascade) on the file-load and A2B-diff paths, and stock Textual ``Input``
     everywhere else — so Ctrl+V silently did nothing in the search, goto, filter,
-    palette, save-name and CRC boxes. batch-66 converts every remaining site.
+    palette, save-name and CRC boxes. batch-67 converts every remaining site.
 
     Two complementary oracles, because either alone is weak:
 
@@ -27,7 +27,7 @@ Dependencies:
     Uses:
         - ``s19_app.tui.app.S19TuiApp`` / ``s19_app.tui.os_clipboard_input``
     Used by:
-        - the batch-66 acceptance gate (AC-1, AC-2)
+        - the batch-67 acceptance gate (AC-1, AC-2)
 """
 
 from __future__ import annotations
@@ -75,7 +75,8 @@ def _stock_input_constructions(module_path: Path) -> List[Tuple[int, str]]:
 
     Dependencies:
         Used by:
-            - ``test_ac1_converted_modules_construct_no_stock_input``
+            - ``test_ac1_no_tui_module_constructs_a_stock_input``
+            - ``test_ac1_census_can_detect_an_offender``
 
     Example:
         >>> _stock_input_constructions(_TUI_DIR / "os_clipboard_input.py")

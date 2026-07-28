@@ -1,8 +1,19 @@
-# Quick Spec — s19_app · batch-66 feature slate (paste · map interaction · flow dual-entry)
+# Quick Spec — s19_app · batch-67 feature slate (paste · map interaction · flow dual-entry)
 
 - **Status:** open
 - **Date:** 2026-07-28
-- **Branch:** `claude/batch-66-feature-slate` (base `73e3fb9` = `origin/main` tip; RC-1 PASS, merge-base == tip)
+- **Branch:** `claude/batch-67-feature-slate` (base `73e3fb9` = `origin/main` tip; RC-1 PASS, merge-base == tip)
+
+> ⚠ **RENUMBERED 66 → 67 mid-batch (batch-number collision).** The parallel
+> PROCESS-lane session had already claimed `claude/batch-66-flow-backlog-routing`
+> (an empty placeholder branch at `73e3fb9`, 0 commits) before this branch was
+> cut. Same failure mode as the batch-64/65 collision recorded in project memory.
+> Resolved conservatively: **this** batch renumbered, the other branch untouched.
+> **Inc-1 and Inc-2 commit subjects still read "batch-66"** — they were written
+> before the collision was discovered and were NOT rewritten, because rewriting
+> history over a dirty working tree mid-increment risks the work for a label.
+> The mapping is recorded here and in the PR body rather than being silently
+> dropped.
 - **Flow mode:** autonomous + self-merge (operator-granted THIS batch at kickoff; per-batch only, never carried)
 - **Artifact language:** English (project default per `CLAUDE.md`; conversation stays Spanish)
 - **security_required:** true (see §6)

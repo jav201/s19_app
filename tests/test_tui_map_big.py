@@ -225,11 +225,15 @@ def test_at074_inspector(tmp_path: Path, size) -> None:
             row = next(
                 r for r in app.query(RegionRow) if r.region_start == non_first_start
             )
-            # Drive the shipped single-click path (RegionRow.on_click posts
-            # RegionRow.Activated, which bubbles to the panel handler). Used in
-            # place of pilot.click so the NON-first row is reachable at the
-            # 80x24 floor where it renders below the scroll fold.
-            row.on_click()
+            # Drive the shipped single-click path by posting the message
+            # RegionRow.on_click would post (chain=1), which bubbles to the
+            # panel handler. Used in place of pilot.click so the NON-first row
+            # is reachable at the 80x24 floor where it renders below the scroll
+            # fold. batch-67 N4a: chain=1 inspects WITHOUT navigating, which is
+            # exactly what this test asserts — it reads #map_detail_body.
+            row.post_message(
+                RegionRow.Activated(row.region_start, row.region_end, chain=1)
+            )
             await pilot.pause()
             await pilot.pause()
             return str(app.query_one("#map_detail_body").render())

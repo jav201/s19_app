@@ -3435,6 +3435,10 @@ def test_tc041_6_region_activation_focus_equals_region_start(
     click carries EXACTLY the run's ``region_start`` — no off-by-one, no
     row-base rounding on the panel side (the app handler owns the focus math /
     the nearest-present-row snap). Complements AT-074's behavioral hex-render.
+
+    batch-67 N4a: navigation moved to the double click, so the activation is
+    constructed with ``chain=2``. What is asserted — the address carried by the
+    posted message — is unchanged.
     """
     from s19_app.tui.screens_directionb import (
         MemoryMapPanel,
@@ -3465,7 +3469,7 @@ def test_tc041_6_region_activation_focus_equals_region_start(
 
             panel.post_message = _cap  # type: ignore[method-assign]
             panel.on_region_row_activated(
-                RegionRow.Activated(row.region_start, row.region_end)
+                RegionRow.Activated(row.region_start, row.region_end, chain=2)
             )
             return posted, row.region_start
 
@@ -3512,7 +3516,7 @@ def test_at036b_region_click_reveals_hex_at_region_start(tmp_path: Path) -> None
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
-            row = await _click_region_row(
+            row = await _double_click_region_row(
                 pilot, app, lambda r: "constant/padding" in _widget_plain(r)
             )
             ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
@@ -3893,6 +3897,9 @@ async def _click_region_row(pilot: "object", app: "S19TuiApp", match) -> "object
     precedent: ``test_tui_patch_editor_v2.py`` scroll-then-``pilot.click`` and
     ``test_tui_variants.py::test_at067a`` — NOT the retired cell path). Returns
     the clicked row so the caller can read its ``region_start``.
+
+    **batch-67 N4a:** a single click now INSPECTS ONLY. Callers that assert hex
+    navigation must use :func:`_double_click_region_row`.
     """
     from s19_app.tui.screens_directionb import RegionRow
 
@@ -3900,6 +3907,27 @@ async def _click_region_row(pilot: "object", app: "S19TuiApp", match) -> "object
     target.scroll_visible(animate=False)
     await pilot.pause()
     await pilot.click(target)
+    await pilot.pause()
+    await pilot.pause()
+    return target
+
+
+async def _double_click_region_row(
+    pilot: "object", app: "S19TuiApp", match
+) -> "object":
+    """Scroll the first matching ``RegionRow`` into view and REAL-double-click it.
+
+    batch-67 N4a: navigation to the hex view is now the double-click gesture, so
+    every test that asserts a region→hex jump drives ``pilot.double_click`` (a
+    genuine chain-2 pointer event produced by Textual, not a hand-built
+    ``Activated`` message). Returns the clicked row.
+    """
+    from s19_app.tui.screens_directionb import RegionRow
+
+    target = next(r for r in app.query(RegionRow) if match(r))
+    target.scroll_visible(animate=False)
+    await pilot.pause()
+    await pilot.double_click(target)
     await pilot.pause()
     await pilot.pause()
     return target
@@ -4161,7 +4189,7 @@ def test_at074_single_click_repositions_hex(tmp_path: Path) -> None:
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
-            row = await _click_region_row(
+            row = await _double_click_region_row(
                 pilot, app, lambda r: "high/random" in _widget_plain(r)
             )
             ws_visible = "hidden" not in app.query_one("#screen_workspace").classes
@@ -4178,8 +4206,13 @@ def test_at074_single_click_repositions_hex(tmp_path: Path) -> None:
 
 
 def test_tc062_1_region_activation_posts_single_open_in_hex(tmp_path: Path) -> None:
-    """A region activation posts EXACTLY ONE OpenInHexRequested; no activation
-    posts none (TC-062.1 / R-TUI-062, white-box message contract).
+    """A double-click region activation posts EXACTLY ONE OpenInHexRequested;
+    no activation posts none (TC-062.1 / R-TUI-062, white-box message contract).
+
+    batch-67 N4a: the navigating gesture is now ``chain=2``. The "exactly one,
+    not zero and not two" contract this test owns is unchanged — only the
+    gesture that triggers it moved. Single-click's new no-navigation behaviour
+    is owned by ``tests/test_map_click_chain.py``.
     """
     from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow
 
@@ -4207,7 +4240,7 @@ def test_tc062_1_region_activation_posts_single_open_in_hex(tmp_path: Path) -> N
             none_yet = len(posted)
             row = next(iter(app.query(RegionRow)))
             panel.on_region_row_activated(
-                RegionRow.Activated(row.region_start, row.region_end)
+                RegionRow.Activated(row.region_start, row.region_end, chain=2)
             )
             return none_yet, len(posted)
 
@@ -4238,8 +4271,11 @@ def test_b01_region_click_snaps_hex_to_far_range(tmp_path: Path) -> None:
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
-            # (1) Real click on the far range-B region (start 0x00100000).
-            await _click_region_row(pilot, app, lambda r: r.region_start == 0x100000)
+            # (1) Real double-click on the far range-B region (start 0x00100000)
+            # — batch-67 N4a made navigation the double-click gesture.
+            await _double_click_region_row(
+                pilot, app, lambda r: r.region_start == 0x100000
+            )
             for _ in range(3):
                 await pilot.pause()
             click_hex = str(app.query_one("#hex_view").render())
