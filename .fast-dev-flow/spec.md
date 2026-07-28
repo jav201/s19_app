@@ -1,6 +1,6 @@
 # Quick Spec — s19_app · batch-67 feature slate (paste · map interaction · flow dual-entry)
 
-- **Status:** open
+- **Status:** closed 2026-07-28 — all 8 ACs met; merge held pending `tui-ci` green
 - **Date:** 2026-07-28
 - **Branch:** `claude/batch-67-feature-slate` (base `73e3fb9` = `origin/main` tip; RC-1 PASS, merge-base == tip)
 
