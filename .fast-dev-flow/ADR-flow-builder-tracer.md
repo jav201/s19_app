@@ -142,3 +142,24 @@ CRC does **not** fit the uniform mutate-in-place block shape, for three concrete
 - **Block-list vs DAG.** A linear ordered list (not a graph) is right for the tracer and likely forever (the ops are a linear transform chain). Revisit only if multi-output/branching flows appear.
 - **Where `flow_model` lives.** `services/flow_model.py` (beside `variant_execution_service`) keeps it Textual-free and importable by the service; the panel imports it too. Alternative `tui/flow/` package if the vocabulary grows.
 - **Flow recommendation for batch-44:** run-only tracer (no flow.json) has a **modest** security surface and reuses proven ops → a good **/fast-dev-flow** candidate. If persistence is folded into batch-44, the untrusted-file loader argues for **/dev-flow**. Recommend: **fast-flow batch-44 (run-only) + a separate persistence batch-45**; decision deferred to operator.
+
+---
+
+## 11. PATCH dual entry — the change document is reachable from BOTH surfaces (batch-67, FB-P2)
+
+**Status:** confirmed on disk and pinned by test, 2026-07-28. Supersedes the FB-P2 backlog wording, which asked to "confirm the JSON change-doc input is surfaced in the FB UI" — it already was.
+
+A change document (`s19app-changeset` v2.0 JSON) is a first-class PATCH input from two independent surfaces:
+
+| Entry point | How the document is selected | Applies via |
+|---|---|---|
+| **Patch Editor** (PN-path flow) | `#patch_doc_file_select` — a `Select` populated from the project's documents, plus the entries table and per-entry JSON screen | `ChangeService.apply` → `apply_change_document` |
+| **Flow Builder** (rail-8) | the block-kind `Select` option *"Patch (change doc)"* + the project-relative `#flow_ref` box, persisted as `PatchBlock.change_doc_ref` in `flow.json` | `run_flow` PATCH branch → `read_change_document` → `apply_change_document` |
+
+**Both converge on the single engine function `apply_change_document`** — this is the load-bearing property, and it is asserted structurally (identity of the function object reached from each module), not assumed. Convergence is therefore by construction rather than by two implementations agreeing on one fixture.
+
+**One asymmetry, benign today and pinned so it stays visible.** `ChangeService.apply` recomputes `collision_issues` over the document's entries before delegating, because the Patch Editor lets the operator *build* overlapping entries interactively. The Flow Builder reads a finished document from disk and delegates directly. For a disk-parsed document the two issue sets are equal — asserted. If the editor's pre-apply rule ever grows beyond collision refresh, that assertion fails and whoever changed it must decide consciously whether the flow path needs the same rule.
+
+**Discoverability difference (NOT closed here, and deliberately so).** The Patch Editor offers a *picker*; the Flow Builder requires typing the filename into a free-text box that is shared by all four ref-taking block kinds (`image_ref` / `change_doc_ref` / `check_doc_ref` / `config_ref`). Turning that box into a per-kind picker is a UI design change, not a capability gap, and it would have to stay correct for all four kinds. Recorded as a backlog item rather than smuggled into a convergence batch. batch-67 did paste-enable the box (`OsClipboardInput`), so a copied path can at least be pasted.
+
+**Acceptance:** `tests/test_patch_dual_entry.py` — byte-identical emitted image from both paths (the oracle is the written `.s19`, not the summary object), a positive control proving the patch is not a no-op, the shared-engine identity check, and the asymmetry pin.
