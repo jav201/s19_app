@@ -5,7 +5,7 @@
   "batch_objective": "D1 ONLY — bound the PRODUCER in _addendum_lines (s19_app/tui/services/report_service.py:1514) so the declared-region addendum stops consuming resident memory proportional to R x V x E. The function appends one fully-formatted string (each paying md_safe) per matching (region x variant x entry/issue) into a local hits list at :1565/:1571/:1579 and extends `lines` only at :1584, so the whole cost is paid BEFORE any output exists and every byte-budget or row-cap design is structurally blind to it. Measured 87-94 B resident per hit, product law confirmed on all three axes. D1 was specced at batch-63, BLOCKED at that batch's Phase-2 re-gate and RETURNED; batch-63 shipped D3 only. EXPLICITLY OUT OF SCOPE: OB-4/F4 (the two unbounded tables at 988 B/entry) and D2 (schema-legal address ValueError) — both stay carries in .dev-flow/BACKLOG-CODE.md. CONSTRAINT ON THE PR: D1 alone does NOT close the memory-exhaustion DoS (the neighbouring tables dominate), so the batch must state the residual with its numbers and must NOT claim closure.",
   "note_prior_batch": "batch-63 (report byte accounting, D3 only) DONE + MERGED PR #139 c473152 + closeout #140 79cde53 + control decisions #142 c779e3d. Vault synced 2026-07-27. Its D1/D2 were RETURNED to the backlog at the Phase-2 re-gate. Its full state at close is archived at .dev-flow/2026-07-26-batch-63/state-at-close.json.",
   "note_backlog_split": "THE OPEN QUEUE IS NOW SPLIT (PR #143, squash 082ada9, 2026-07-27). Lane A = .dev-flow/BACKLOG-CODE.md (app code + its dev flow) — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is now a ROUTER holding no open work.",
-  "route": "full /dev-flow. Phase 2 APPROVED 2026-07-27 at the re-gate (operator decision at the iteration cap). Phase 3 IN PROGRESS: Inc-1 (tests + golden, no production code) dispatched.",
+  "route": "full /dev-flow. Phase 3 IN PROGRESS: Inc-1 DONE + committed 0a6595b (tests + golden, code-review OK no HIGH, 4 findings folded). Inc-2 (the bounded producer) dispatched.",
   "rc1": "VERIFIED 2026-07-27. git fetch origin; origin/main tip = 082ada9; HEAD = 082ada9; merge-base HEAD origin/main = 082ada9 (equal, no rebase needed); working tree clean; branch claude/batch-64-addendum-producer-bound cut off that tip. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. Already-shipped check EXECUTED: grep R-TUI-095 REQUIREMENTS.md = 0, grep HLR-100 REQUIREMENTS.md = 0, grep MAX_ADDENDUM_HITS s19_app/ = 0 -> D1 is NOT shipped.",
   "standing_authorization": {
     "date": "2026-07-27",
@@ -13,7 +13,8 @@
     "autonomy": "AUTONOMOUS end-to-end + SELF-MERGE, granted for THIS batch",
     "operator_phrasing": "Autónomo + self-merge",
     "merge_gate": "Merge remains gated on the final independent PR-level qa-reviewer pass over the whole diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression, every gate carry discharged). A HIGH finding blocks the merge and returns to the operator.",
-    "decision_recording": "Every decision taken instead of asking is logged in PLAN.md's decision log, in decisions_log below, and in 05-postmortem.md, and carried to the vault at /dev-flow-sync."
+    "decision_recording": "Every decision taken instead of asking is logged in PLAN.md's decision log, in decisions_log below, and in 05-postmortem.md, and carried to the vault at /dev-flow-sync.",
+    "reconfirmed": "2026-07-27, operator: \"ya sigue autónomo hasta merge\" — autonomy through to merge re-affirmed mid-batch. The merge gate is unchanged: the final independent PR-level qa-reviewer pass over the whole diff vs main must come back clean; a HIGH finding blocks the merge and returns to the operator."
   },
   "id_allocation": {
     "method": "EXECUTED union census across REQUIREMENTS.md + tests/ + .dev-flow/ on this tree (the project has no AT/TC registry — backlog OB-2 — so next-free is subset-dependent and must be measured, not assumed).",
@@ -123,6 +124,30 @@
       "date": "2026-07-27",
       "decision": "FIX-NONE / FIX-SCOPE carried as a BLOCKING Inc-1/Inc-2 gate condition rather than re-gated",
       "notes": "They are mutant arms against the NEW behaviour, so they cannot be fully executed before the producer exists; requiring them pre-implementation would require the implementation. Recorded as the one knowingly-open item at the Phase-2 gate."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-27",
+      "decision": "Inc-1 increment gate — APPROVE",
+      "notes": "Code review OK no HIGH; golden independently re-derived byte-identical from a clean 082ada9 export; all per-node verdicts matched 11.1. Four review findings folded before commit rather than carried."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-27",
+      "decision": "M3 ruled: optional ops_counter parameter, not a module-level global",
+      "notes": "Taken by the orchestrator without asking, under the autonomy grant. Rationale recorded in inc2_ruling."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-27",
+      "decision": "Autonomy through to merge re-affirmed by the operator mid-batch",
+      "notes": "Operator phrasing: \"ya sigue autónomo hasta merge\". The final PR-level qa gate still blocks the merge on a HIGH."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-27",
+      "decision": "/dev-flow-sync is part of this batch close-out",
+      "notes": "Operator instruction, given mid-batch: \"terminando el merge tambien haz /dev-flow-sync\". Runs after the merge, after the Lane A backlog reconciliation."
     }
   ],
   "obsidian_synced": false,
@@ -163,5 +188,16 @@
     "A_defined": "A = the number of ends[i] >= addr comparisons in the downward attribution walk; pmax guard, attribution bisect and reject-prefilter bisect EXCLUDED. Ends-only is the only convention INVARIANT under the design notes sanctioned removal of the reject pre-filter (128000 with and without; +bisect moves 261000 -> 260500).",
     "verdict_table": "All 28 nodes re-derived by driving the shipped producer, transcript pasted. 8 mismatches vs revision 2. Inc-1 tally 13 RED / 11 GREEN regression guards / 4 xfail(strict) / 1 n/a.",
     "open_named": "FIX-NONE and FIX-SCOPE mutant arms are SPECIFIED, NOT EXECUTED — flagged in 11.1 note 1, no 7 row, no 13 tick. Carried into Phase 3 as a BLOCKING Inc-1/Inc-2 gate condition rather than re-gated, because they are arms against the NEW behaviour and cannot be fully executed until the producer exists."
-  }
+  },
+  "inc1": {
+    "commit": "0a6595b",
+    "files": "tests/test_report_addendum_bound.py (NEW, 28 nodes) + tests/goldens/batch64/addendum-below-bound.md (NEW, 155702 B) + tests/test_tui_report_seam.py (AT-200, +144/-0). Zero production source: git diff vs 082ada9 over s19_app/ is empty.",
+    "verdicts": "13 RED / 12 GREEN regression guards / 4 xfail(strict) / 1 n/a — matched 11.1 node-for-node. --collect-only reports 0 errors, which is the proof no module-level import survived, so no RED is a vacuous RED-by-import. Fixture preconditions asserted BEFORE the failing predicate in six nodes.",
+    "golden": "Captured from the SHIPPED producer, then INDEPENDENTLY re-derived by the reviewer from a clean 082ada9 git archive export: byte-identical, SHA256 327adfb7...c0a73, 155702 B. Provenance established, not merely transcription.",
+    "code_review": "OK to advance, no HIGH. 3 MEDIUM + 2 LOW.",
+    "folded_before_commit": "M1 — _attack_results(4000) silently delivered 3842 while the failure message said 4000 (the flood overran _ATTACK_REGION); a predicate whose LABEL misstates what it tested is this batch own defect class, found inside the batch own tests. Added a contract guard; moved TC-483 far-above arm to 3000. M2 — the seam file called the constant primitive with an inline literal 200, so Inc-2 one-file deletion gate would have passed with a hardcoded value alive; now imports the accessor. L1 — the module docstring reproduced the very tally it refutes. L2 — zip() truncation made TC-494 first-difference position misreport on a strict prefix.",
+    "spec_defects_found": "TWO, both confirmed by the reviewer. (a) 11.1 summary tally is off by one against its own table (13+12+4+1=30 over 28 nodes + 2 extra AT-198 arm rows); the table is right and was FOLLOWED — no node adjusted to make the sum work. (b) TC-494 5-element order vs 11.1 illustrative 4 is NOT a contradiction: the spec probe carried no CheckRunResult, so the test fixture is strictly stronger and reaches LLR-103.4 check-result clause. Both corrections belong in Inc-3 amendment log."
+  },
+  "inc2_ruling": "Review finding M3 ruled by the orchestrator: use an OPTIONAL ops_counter parameter on _addendum_lines, NOT the module-level report_service._LAST_ADDENDUM_REGION_OPS that TC-498 currently pins. report_service has zero module-level mutable globals today, the function is shared by the TUI worker and the CLI, and the equality gate works identically either way — cheap now, expensive once shipped as contract. Inc-2 therefore also edits TC-498 (3 files, within the <=5 limit).",
+  "close_out_plan": "Operator instruction 2026-07-27: run /dev-flow-sync as part of the close-out, AFTER the merge. Sequence: Phase 4 validation -> Phase 5 postmortem -> Phase 6 docs + PR + CI green + final independent PR-level qa gate -> merge (self-merge granted) -> reconcile .dev-flow/BACKLOG-CODE.md (Lane A, the MANDATORY close step; NOT BACKLOG.md, which is now a router) -> /dev-flow-sync to the Obsidian vault. The batch is NOT closed until both the Lane A reconciliation and the sync are done."
 }

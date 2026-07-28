@@ -84,33 +84,30 @@ from s19_app.validation.model import ValidationIssue, ValidationSeverity
 from conftest import canonical_report_bytes
 
 # ---------------------------------------------------------------------------
-# LLR-103.6 constants — read through _const, NEVER imported at module level
+# LLR-103.6 constants — read off the MODULE OBJECT at call time
 # ---------------------------------------------------------------------------
-
-#: ``MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`` fallback (§8.1). DELETED at Inc-2.
-_K_FALLBACK = 200
-#: ``ADDENDUM_CLASS_LABELS`` fallback, indexed by class ordinal. DELETED at Inc-2.
-_LABELS_FALLBACK: Tuple[str, str, str] = (
-    "modification",
-    "change-file issue",
-    "check-file issue",
-)
-#: ``ADDENDUM_NOTICE_VARIANTS_MAX`` fallback (§8.1). DELETED at Inc-2.
-_VARIANTS_MAX_FALLBACK = 8
-#: ``ADDENDUM_TRUNCATION_NOTICE_FMT`` fallback (§8.1). DELETED at Inc-2.
-_NOTICE_FMT_FALLBACK = (
-    "> TRUNCATED: {label} hits in this region were capped at {cap}; "
-    "{dropped} more not listed (variants affected: {variants})."
-)
+#
+# The Inc-1 name/fallback constant helper and its four spec-pinned fallback
+# values are DELETED here, which is the Inc-2 gate: from this increment on, "an AT
+# quotes the constant, never its value" is true of every node below. They are
+# still read off the module OBJECT rather than imported by name, because
+# ``TC-492`` re-values the cap with ``monkeypatch.setattr`` and a by-name import
+# would bind the pre-mutation value.
 
 #: Class ordinals (§8.1): the addendum's three hit classes, in producer order.
 _CLASS_MODIFICATION = 0
 _CLASS_CHANGE_ISSUE = 1
 _CLASS_CHECK_ISSUE = 2
 
-#: The named region-op seam ``TC-498`` reads (LLR-103.1, "The seam"). Inc-2
-#: picks the module-level-int form; this name IS the pinned choice.
-_REGION_OPS_SEAM = "_LAST_ADDENDUM_REGION_OPS"
+#: The named region-op seam ``TC-498`` reads (LLR-103.1, "The seam"). Inc-1
+#: pinned the module-level-``int`` form; **Inc-2 changed it to the optional
+#: keyword-only parameter form the same LLR offers**, on an operator ruling:
+#: ``report_service`` carries no module-level mutable state today, and
+#: ``_addendum_lines`` is called by both the TUI report worker and the CLI, so a
+#: module global would be a cross-call race dressed as an instrument. The
+#: equality gate is identical either way; the seam is now a per-call
+#: one-element accumulator passed in by the caller.
+_REGION_OPS_SEAM = "ops_counter"
 
 #: The addendum's own ``## `` heading — the scope anchor (§3 US-B64-2).
 _ADDENDUM_HEADING = "## Addendum: declared regions"
@@ -119,57 +116,24 @@ _ADDENDUM_HEADING = "## Addendum: declared regions"
 _FIXED_INSTANT = datetime(2026, 7, 27, 12, 0, 0, tzinfo=timezone.utc)
 
 
-def _const(name: str, fallback: object) -> object:
-    """
-    Summary:
-        Read an ``LLR-103.6`` constant off the ``report_service`` MODULE
-        OBJECT, falling back to the spec's pinned value while the constant
-        does not exist (§11.1 note 4).
-
-    Args:
-        name (str): The constant's attribute name on ``report_service``.
-        fallback (object): The §8.1 value used while the attribute is absent.
-
-    Returns:
-        object: The module constant when defined, else ``fallback``.
-
-    Data Flow:
-        - Every ``K``-derived or format-derived fixture in this module reads its
-          constant through here, INSIDE the test body — never at import time,
-          because a module-level import of a not-yet-existing name is a pytest
-          collection error that ``xfail`` cannot cover.
-
-    Dependencies:
-        Uses:
-            - s19_app.tui.services.report_service (the module object)
-        Used by:
-            - every ``K``-derived / notice-format node in this module
-
-    Example:
-        >>> _const("MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION", 200)
-        200
-    """
-    return getattr(report_service, name, fallback)
-
-
 def _cap() -> int:
     """Return ``MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`` (``K``)."""
-    return int(_const("MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION", _K_FALLBACK))
+    return int(report_service.MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION)
 
 
 def _class_labels() -> Tuple[str, ...]:
     """Return ``ADDENDUM_CLASS_LABELS``, indexed by class ordinal."""
-    return tuple(_const("ADDENDUM_CLASS_LABELS", _LABELS_FALLBACK))
+    return tuple(report_service.ADDENDUM_CLASS_LABELS)
 
 
 def _variants_max() -> int:
     """Return ``ADDENDUM_NOTICE_VARIANTS_MAX``."""
-    return int(_const("ADDENDUM_NOTICE_VARIANTS_MAX", _VARIANTS_MAX_FALLBACK))
+    return int(report_service.ADDENDUM_NOTICE_VARIANTS_MAX)
 
 
 def _notice_fmt() -> str:
     """Return ``ADDENDUM_TRUNCATION_NOTICE_FMT``."""
-    return str(_const("ADDENDUM_TRUNCATION_NOTICE_FMT", _NOTICE_FMT_FALLBACK))
+    return str(report_service.ADDENDUM_TRUNCATION_NOTICE_FMT)
 
 
 # ---------------------------------------------------------------------------
@@ -1308,6 +1272,17 @@ def test_at194_addendum_marginal_resident_cost_flat_in_candidate_count(
     #7: a fixture built inside the traced window can never go green), and a
     warm-up generation precedes the measurement so module-level lazy state is
     not charged to the first sample.
+
+    **The warm-up runs at FULL scale in BOTH configurations (Inc-2 amendment).**
+    Inc-1 warmed with a 64-entry fixture and regions only. Measured on the
+    implemented producer, that leaves ~124 kB of one-time allocation charged to
+    whichever window runs first — the ``E = 2000`` no-regions sample — which is
+    larger than the whole marginal delta this node measures and drove
+    ``delta(2000)`` NEGATIVE (executed: ``without=793238 with=721753
+    delta=-71485`` on the first trial, ``delta=+52296`` on every trial after).
+    A warm-up that does not exercise the measured scale in the measured
+    configurations is not a warm-up. Nothing else changed: the threshold, the
+    positive-delta precondition and the ratio predicate are Inc-1's.
     """
     threshold = 1.30
     region = DeclaredRegion("calzone", 0x1000, 0x9FFF)
@@ -1347,8 +1322,9 @@ def test_at194_addendum_marginal_resident_cost_flat_in_candidate_count(
             tracemalloc.stop()
         return peak
 
-    warm = _fixture(64)
-    _peak(tmp_path / "warm", warm, (region,))
+    warm = _fixture(4000)
+    _peak(tmp_path / "warm-none", warm, ())
+    _peak(tmp_path / "warm-regions", warm, (region,))
 
     deltas: Dict[int, int] = {}
     for count in (2000, 4000):
@@ -2174,9 +2150,18 @@ def test_tc488_candidate_consumption_is_r_independent_overlapping() -> None:
     the counting iterable separates them.
 
     This node also carries the stealth-early-exit control: a per-class early
-    exit (``FIX-A2``) reads ``201/201/201`` here — RED at EVERY ``R`` — whereas
-    under disjoint geometry it cannot fire until ``N > R x K`` and two thirds
-    of the control is dead at this fixture scale.
+    exit (``FIX-A2``) is RED here at EVERY ``R``, whereas under disjoint
+    geometry it cannot fire until ``N > R x K`` and two thirds of the control
+    is dead at this fixture scale.
+
+    **The leaf size is ``> K``, and that is load-bearing (Inc-2 amendment).**
+    Inc-1 built the fixture with 100 candidates per leaf. A per-class early
+    exit cannot fire below the cap at all, so the control this node is credited
+    with in §6.2 and §11.1 was dead on its own fixture — executed against the
+    IMPLEMENTED producer, ``FIX-A2`` at 100/leaf reads ``[300, 300, 300]``
+    (GREEN, the exit never fires) and at 300/leaf reads ``[603, 603, 603]``
+    against ``N = 900`` (RED at every ``R``). The predicate is untouched;
+    only the fixture now reaches the boundary its own docstring claims.
 
     Threshold family: exact-equality — RED means observed != required, with
     both values and the per-arm ratio pasted. The ``R = 1`` arm reads
@@ -2185,8 +2170,15 @@ def test_tc488_candidate_consumption_is_r_independent_overlapping() -> None:
 
     Expected at Inc-1: **RED**. Expected at Inc-2: GREEN.
     """
+    per_leaf = _cap() + 100
+    assert per_leaf > _cap(), (
+        f"TC-488 fixture precondition: each leaf must carry MORE than the cap "
+        f"{_cap()}, otherwise a per-class early exit cannot fire and the "
+        f"stealth-early-exit control this node is credited with is dead"
+    )
     observed = {
-        count: _consumed(_overlapping_regions(count), 100) for count in (1, 8, 64)
+        count: _consumed(_overlapping_regions(count), per_leaf)
+        for count in (1, 8, 64)
     }
     failures = {
         count: (consumed, total)
@@ -2247,14 +2239,6 @@ def test_tc489_candidate_consumption_is_r_independent_disjoint() -> None:
 # ===========================================================================
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "NOT EXECUTABLE PRE-FIX (§6.2): ADDENDUM_NOTICE_VARIANTS_MAX and the "
-        "notice it caps do not exist on the base tree. First real verdict at "
-        "Inc-2, where the xfail marker is removed."
-    ),
-)
 def test_tc490_notice_caps_the_variant_list_with_a_plus_n_more_remainder(
     tmp_path: Path,
 ) -> None:
@@ -2342,14 +2326,6 @@ def test_tc490_notice_caps_the_variant_list_with_a_plus_n_more_remainder(
 # ===========================================================================
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "NOT EXECUTABLE PRE-FIX (§6.2 / LLR-103.6): the four constants do not "
-        "exist on the base tree — executed pre-state, rg over s19_app/ and "
-        "tests/ -> 0 hits. First real verdict at Inc-2."
-    ),
-)
 def test_tc492_cap_labels_and_notice_format_are_module_constants(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2516,14 +2492,6 @@ def test_tc494_emission_order_is_result_summary_interleaved() -> None:
 # ===========================================================================
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "NOT EXECUTABLE PRE-FIX (§6.2 / LLR-103.6): there is no notice to "
-        "compare a hit line against on the base tree. First real verdict at "
-        "Inc-2."
-    ),
-)
 def test_tc495_notice_renders_a_variant_id_exactly_as_a_hit_line_does(
     tmp_path: Path,
 ) -> None:
@@ -2603,17 +2571,6 @@ def test_tc495_notice_renders_a_variant_id_exactly_as_a_hit_line_does(
 # ===========================================================================
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "NOT EXECUTABLE PRE-FIX (§6.2 / §7 T-9, revision 3): the instrument is "
-        "the attribution walk's OWN region-op counter, and the walk does not "
-        "exist on the base tree. Under the only AVAILABLE pre-fix seam "
-        "(counting DeclaredRegion.contains) the shipped producer reads exactly "
-        "R x N, so the equality would be GREEN today for the wrong reason. "
-        "First real verdict at Inc-2."
-    ),
-)
 def test_tc498_region_ops_equal_r_times_n_under_huge_tiny_geometry() -> None:
     """TC-498 / LLR-103.1 / §10.7 — under ``huge+tiny`` geometry the producer's
     region-op count ``A`` equals ``R x N`` at ``R`` in ``{1, 8, 64, 256}``.
@@ -2635,10 +2592,16 @@ def test_tc498_region_ops_equal_r_times_n_under_huge_tiny_geometry() -> None:
     satisfies the equality, and it is the only one invariant under the
     spec-sanctioned choice to drop the reject pre-filter.
 
-    The seam is pinned too: ``report_service._LAST_ADDENDUM_REGION_OPS``, an
-    ``int`` reset at ``_addendum_lines`` entry and written at exit. An
-    exact-equality gate on an unpinned counter is satisfied by tuning the
-    counter until it prints ``R x N``.
+    The seam is pinned too: the keyword-only ``ops_counter`` parameter of
+    ``_addendum_lines``, a one-element accumulator the caller passes in and the
+    producer adds its per-call region-op total to. Inc-1 pinned the alternative
+    the LLR also offers — a module-level ``_LAST_ADDENDUM_REGION_OPS`` int —
+    and Inc-2 changed it on an operator ruling: ``report_service`` has no
+    module-level mutable state, and ``_addendum_lines`` is shared by the TUI
+    report worker and the CLI, so a module global would be a cross-call race
+    dressed as an instrument. The equality gate is unchanged by the swap; what
+    matters is that a seam EXISTS and is NAMED, so the counter cannot be tuned
+    until it prints ``R x N``.
 
     Fixture precondition the equality rests on: EVERY declared region's
     ``start`` lies below the probe address, so the downward walk visits all
@@ -2649,8 +2612,10 @@ def test_tc498_region_ops_equal_r_times_n_under_huge_tiny_geometry() -> None:
     """
     probe = 0x5000
     per_leaf = 100
-    assert hasattr(report_service, _REGION_OPS_SEAM), (
-        f"TC-498: the named region-op seam report_service.{_REGION_OPS_SEAM} "
+    assert _REGION_OPS_SEAM in inspect.signature(
+        report_service._addendum_lines
+    ).parameters, (
+        f"TC-498: the named region-op seam _addendum_lines({_REGION_OPS_SEAM}=) "
         f"does not exist — the attribution walk it counts has not been written"
     )
     for count in (1, 8, 64, 256):
@@ -2673,8 +2638,9 @@ def test_tc498_region_ops_equal_r_times_n_under_huge_tiny_geometry() -> None:
                 [_check(issues=[_issue("C", probe) for _ in range(per_leaf)])],
             )
         ]
-        report_service._addendum_lines(regions, results)
-        observed = getattr(report_service, _REGION_OPS_SEAM)
+        box = [0]
+        report_service._addendum_lines(regions, results, ops_counter=box)
+        observed = box[0]
         candidates = per_leaf * 3
         assert observed == count * candidates, (
             f"TC-498: region ops at R={count} read {observed}, the disclosed "

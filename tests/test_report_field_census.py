@@ -28,6 +28,7 @@ from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services.report_addendum import DeclaredRegion
 from s19_app.tui.services.markdown_safety import TRUNCATION_MARKER
 from s19_app.tui.services.report_service import (
+    MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION,
     MAX_REPORT_ISSUES_PER_VARIANT,
     REPORT_CELL_CHARS,
     REPORT_MAX_REGIONS_PER_VARIANT,
@@ -118,10 +119,47 @@ PLANTED = [
     # a hostile check path broke out of the `#### Checklist:` heading's span.
     ("check_source_path", "MKCHKSRC", "B"),
     ("check_result", "MKRESULT", "A"),
+    # Added at batch-64 Inc-2 (§10.10, unconditional): the addendum's truncation
+    # notice is the batch's ONE new markdown sink, and it lands OUTSIDE one of
+    # the two static guards that protect every other sink in this module —
+    # `test_no_escaped_field_is_emitted_at_the_head_of_its_line` walks
+    # `ast.JoinedStr` only, and the notice is built by `CONST.format(...)`, so it
+    # is structurally invisible there. `result.variant_id` was already planted,
+    # but the corpus never fired a cap, so a hostile id could never reach the
+    # NOTICE. `_addendum_flood` now drives one, which is what puts this field in
+    # front of `test_at157` / `test_at158` — escaped at the writer is not the
+    # same claim as inert at the reader.
+    ("notice_variant", "MKNOTICE", "A"),
 ]
 
 _MARKERS = {name: marker for name, marker, _ in PLANTED}
 _MODES = {name: mode for name, _, mode in PLANTED}
+
+#: The declared region every census fixture uses, and the addresses the flood
+#: below lands in.
+_CENSUS_REGION = (0x1000, 0x1FFF)
+
+#: How many of the flood's ``K + 1`` in-region issues the FIRST variant carries.
+#: Split across two variants so neither trips
+#: :data:`MAX_REPORT_ISSUES_PER_VARIANT` — this fixture exists to exercise the
+#: ADDENDUM's cap, and a second cap firing at the same time would make it
+#: ambiguous which one produced the document's blockquote.
+_FLOOD_FIRST = MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION // 2
+
+
+def _flood_issues(base: int, count: int, code: str) -> list:
+    """``count`` in-region issues that fill the addendum's per-class cap."""
+    return [
+        ValidationIssue(
+            code=code,
+            severity=ValidationSeverity.WARNING,
+            message=f"census flood {index}",
+            artifact="changes",
+            symbol=None,
+            address=base + index,
+        )
+        for index in range(count)
+    ]
 
 
 def _hostile_report(tmp_path: Path) -> str:
@@ -148,7 +186,7 @@ def _hostile_report(tmp_path: Path) -> str:
         # Mode-B values are constructed strings, not real paths: the hazard
         # needs a `|`, which no filesystem would accept in a filename.
         source=_path_payload(_MARKERS["change_source_path"]),
-        issues=[issue],
+        issues=[issue] + _flood_issues(0x1100, _FLOOD_FIRST, "CENSUS-FLOOD"),
         saved_path=PurePosixPath(_path_payload(_MARKERS["saved_path"])),
     )
     check = _check(
@@ -160,13 +198,32 @@ def _hostile_report(tmp_path: Path) -> str:
         ],
         source=_path_payload(_MARKERS["check_source_path"]),
     )
+    # The variant whose EVERY in-region hit past the cap is dropped — so the
+    # addendum's truncation notice names IT, with a hostile id, which is the
+    # only way a hostile value reaches the notice at all.
+    evicted = VariantExecutionResult(
+        variant_id=_payload(_MARKERS["notice_variant"]),
+        status="ok",
+        change_summaries=[
+            _summary(
+                [],
+                source="evicted.json",
+                issues=_flood_issues(
+                    0x1300,
+                    MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION - _FLOOD_FIRST + 1,
+                    "CENSUS-EVICTED",
+                ),
+            )
+        ],
+    )
     results = [
         VariantExecutionResult(
             variant_id=_payload(_MARKERS["variant_id"]),
             status=_payload(_MARKERS["status"]),
             change_summaries=[summary],
             check_results=[check],
-        )
+        ),
+        evicted,
     ]
     variant_set = ProjectVariantSet(
         project_name=_payload(_MARKERS["project_name"]),
@@ -176,6 +233,11 @@ def _hostile_report(tmp_path: Path) -> str:
                 path=Path(_payload(_MARKERS["path_name"])),
                 file_type=_payload(_MARKERS["file_type"]),
             ),
+            VariantDescriptor(
+                variant_id=_payload(_MARKERS["notice_variant"]),
+                path=Path("evicted.s19"),
+                file_type="s19",
+            ),
         ),
         active_id=_payload(_MARKERS["variant_id"]),
     )
@@ -184,7 +246,9 @@ def _hostile_report(tmp_path: Path) -> str:
         results,
         ReportOptions(
             declared_regions=(
-                DeclaredRegion(_payload(_MARKERS["region_name"])[:79], 0x1000, 0x1FFF),
+                DeclaredRegion(
+                    _payload(_MARKERS["region_name"])[:79], *_CENSUS_REGION
+                ),
             ),
         ),
         variant_set=variant_set,
@@ -197,6 +261,7 @@ def _benign_report(tmp_path: Path) -> str:
     summary = _summary(
         [_applied_entry(0x1000, (0x01,), (0xAA,), "standalone", "SYMA")],
         source="src.json",
+        issues=_flood_issues(0x1100, _FLOOD_FIRST, "CENSUS-FLOOD"),
         saved_path=Path("out.s19"),
     )
     # The benign fixture must have the SAME SHAPE as the hostile one — same
@@ -217,17 +282,42 @@ def _benign_report(tmp_path: Path) -> str:
         VariantExecutionResult(
             variant_id="a", status="ok", change_summaries=[summary],
             check_results=[check],
-        )
+        ),
+        # Symmetric with the hostile fixture's evicted variant: the benign
+        # document must fire the SAME addendum cap, otherwise the hostile one
+        # grows a blockquote the structural reference does not have and AT-157
+        # fires on a fixture asymmetry rather than on an injection.
+        VariantExecutionResult(
+            variant_id="b",
+            status="ok",
+            change_summaries=[
+                _summary(
+                    [],
+                    source="evicted.json",
+                    issues=_flood_issues(
+                        0x1300,
+                        MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION - _FLOOD_FIRST + 1,
+                        "CENSUS-EVICTED",
+                    ),
+                )
+            ],
+        ),
     ]
     variant_set = ProjectVariantSet(
         project_name="proj",
         variants=(
             VariantDescriptor(variant_id="a", path=Path("a.s19"), file_type="s19"),
+            VariantDescriptor(variant_id="b", path=Path("b.s19"), file_type="s19"),
         ),
         active_id="a",
     )
     path = generate_project_report(
-        tmp_path, results, ReportOptions(), variant_set=variant_set
+        tmp_path,
+        results,
+        ReportOptions(
+            declared_regions=(DeclaredRegion("benign zone", *_CENSUS_REGION),),
+        ),
+        variant_set=variant_set,
     )
     return path.read_text(encoding="utf-8")
 
