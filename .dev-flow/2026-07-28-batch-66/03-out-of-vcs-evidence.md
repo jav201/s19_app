@@ -20,6 +20,31 @@ Full PRE hashes are reproducible from the committed bytes: `sha256sum pre-bytes/
 **Rollback:** `cp pre-bytes/<name>.PRE <destination>`, then confirm the destination's hash returns to
 the PRE column above. The hash is the check — `git status` cannot see these files at all.
 
+### ⚠ The first commit of these bytes was CORRUPT, and the ledger above is what caught it
+
+`core.autocrlf=true` on this host. Committing the `.PRE` files as ordinary text normalised them, so
+**the stored blob was not the file it claimed to be**: `dev-flow.md.PRE` went in as `d46bb314…`
+against a recorded `e103af29…`. A rollback from that commit would have written LF where the original
+had CRLF — restoring a file that hashes differently from the thing it is supposed to restore, while
+looking perfectly healthy in `git log`.
+
+Both directions are broken and it is worth stating separately, because the second is invisible at
+commit time: `dev-flow.md.PRE` was **CRLF on disk** and was normalised **to LF on the way in**, while
+`fast-dev-flow.md.PRE` was **LF on disk**, stored unchanged, and would have been converted **to CRLF
+on the way out** at the next checkout. Same corruption, opposite direction, and only the first one
+produces a mismatch you can see without checking out.
+
+Fixed by `.gitattributes`: `.dev-flow/**/pre-bytes/** -text`. **`text eol=lf` — the pattern this repo
+already uses for snapshot and golden fixtures — would NOT have worked here**, because these four files
+carry *mixed* line endings by nature and `eol=lf` corrupts the CRLF one just as surely. Verbatim
+storage is the only correct setting for bytes whose hash is the contract.
+
+Verified after the fix, index blob vs working copy, all four: `MATCH`.
+
+This is batch-63's own lesson (text-mode writers and CRLF hosts) reappearing one layer up, in the
+*evidence* mechanism of a batch that cites it — which is the honest reason it is written here at
+length rather than fixed quietly.
+
 ## What changed, per file
 
 ### 1. `~/.claude/commands/dev-flow.md` — 4 sites

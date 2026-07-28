@@ -7,3 +7,13 @@ tests/__snapshots__/**/*.svg text eol=lf
 # same reason: the ATs undo CRLF on read, but LF-on-disk keeps the fixtures
 # byte-stable across Windows/Linux checkouts.
 tests/goldens/** text eol=lf
+
+# Out-of-VCS rollback bytes (batch-66). These are byte-exact copies of files that
+# live OUTSIDE this repo (~/.claude/commands/, ~/.claude/skills/, the course on G:),
+# and their recorded SHA256 IS the rollback check -- there is no git history to fall
+# back on. They carry MIXED line endings by nature (dev-flow.md is CRLF on this host,
+# fast-dev-flow.md is LF), so normalization in EITHER direction breaks the hash and
+# silently makes the rollback restore bytes that are not the originals. Store verbatim.
+# (Found the hard way: the first batch-66 commit stored dev-flow.md.PRE as d46bb314...
+# instead of the recorded e103af29..., under core.autocrlf=true.)
+.dev-flow/**/pre-bytes/** -text
