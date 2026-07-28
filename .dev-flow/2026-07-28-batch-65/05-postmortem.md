@@ -9,7 +9,10 @@
 > exist to stop, committed 46 times in one specification.**
 
 **Shipped:** D1 — `R-TUI-098` / `HLR-103` / `LLR-103.1…6`. `_addendum_lines` bounded.
-**Branch:** `claude/batch-65-addendum-producer-bound`, `082ada9` → `9d21d9a` (on the pre-migration backup `claude/batch-64-addendum-producer-bound`; not reachable from the shipping branch) (5 commits).
+**Shipped as:** `b691f21` — squash-merge of **PR #149**, parent `73e3fb9`, 2026-07-28. ✅ The commit that carries this batch into `origin/main`.
+**Development branch:** `claude/batch-65-addendum-producer-bound`, `082ada9` → `9d21d9a` (5 commits; on the pre-migration backup `claude/batch-64-addendum-producer-bound`).
+
+> ⚠️ **Recorded batch-70:** the 5 development commits are **not reachable from `origin/main` and never will be** — PR #149 was squash-merged into the single commit `b691f21`. `082ada9` (the base) is reachable; `9d21d9a` is not.
 **Scope:** D1 only. **Zero drift.** OB-4/F4 and D2 held as carries, as chartered.
 
 ---

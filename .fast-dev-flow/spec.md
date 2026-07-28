@@ -22,12 +22,14 @@ Decide — not merely enumerate — how a saved Flow runs across multiple images
 |---|---|
 | `variant_execution_service.py` (971 lines) | `ProjectManifest`, `plan_variant_executions`, `_execute_one_variant`, `VariantExecutionResult(variant_id, status, change_summaries, check_results, diagnostics, mem_map)` |
 | `flow_execution_service.py` (531 lines) | `run_flow` over one image; **already imports `_resolve_manifest_entry` from the variant service** — the containment seam is shared, not forked |
-| The seam marker | `flow_execution_service.py:343` passes `variant_id=None` — the single-variant assumption is explicit in the code |
+| ~~The seam marker~~ ❌ **WITHDRAWN batch-70** | ~~`flow_execution_service.py:343` passes `variant_id=None` — the single-variant assumption is explicit in the code~~ — **FALSE as characterized.** The line exists at that address but lives in the **CRC block handler**'s `OperationInput` (`:339-346`); `OperationInput.variant_id` is operations-kernel reporting metadata (`operations/model.py:44-46`), not a flow seam. See the corrected row below. |
+| The flow layer's variant dimension | **ABSENT — this feature builds it.** `run_flow(flow, ctx)` takes no variant; `FlowContext` = `project_dir` / `mac_records` / `a2l_data` (`flow_model.py:226-228`). Only 3 "variant" occurrences in 531 lines: docstring `:7`, the import `:66`, the CRC line `:343` |
+| The containment seam (genuinely reused) | `_resolve_manifest_entry` imported at `:66`, called at **4 sites** — `:135`, `:190`, `:250`, `:309` |
 | `FlowContext` | `project_dir`, `mac_records` only — **no variant dimension** |
 | `flow_report_service.py` | `compose_flow_report(state, generated_at)` over `FlowReportState(flow_name, block_results, aborted, image_ranges, pre_crc_ranges, written_paths, project_dir)` |
 | Status vocabularies | blocks: `ok` / `error` / `skipped` / `notices` · flow: `ok` / `error` / `completed-with-issues` |
 
-**Consequence:** this is mostly *threading an existing dimension*, not building one. The variant machinery, its manifest parsing and its containment checks are all shipped and proven.
+**Consequence — corrected batch-70 Phase 0 (executed against disk).** The *variant machinery* (manifest parsing, planning, containment) is shipped and proven, and FB-P2 reuses it. But the **flow layer's variant dimension does not exist and this feature builds it** — the original claim that this is "mostly threading an existing dimension, not building one" understated the work by resting on a mis-read seam marker (row 3 above). D-1..D-8 are unaffected: the correction moves the *effort/risk* premise, not any decision. Practical consequence for Inc-1: the binding points are `run_flow`'s signature, `FlowContext`, and the SOURCE `image_ref` override at `:135` — **not** the CRC `OperationInput` at `:343`.
 
 ---
 
@@ -75,13 +77,17 @@ This project has now spent **three** batches (62, 63, 65) on report producers th
 
 **AC-6** — Running a flow **unscoped** produces byte-identical output to today's single-image path. The new dimension must be additive.
 
+**AC-7** *(added batch-70 Phase 0 — operator-approved)* — A variant whose `image_ref` **fails containment** fails *that variant* closed, with its rejection code recorded, while the remaining variants still execute and appear in the fused report. The `REJECTING_CODES` completeness census covers the variant path. *Oracle: the existing C-31 census in `flow_persistence_service.py:117` — "every code here is exercised by ≥1 hostile case, so a new reject arm shipped without a battery row goes RED".*
+
+> **Why AC-7 exists — an incompleteness, not a falsehood.** §7 declares the containment constraint **mandatory** ("a variant whose ref fails containment must fail that variant closed without aborting the others — D-3 must not become a containment bypass"), yet **no AC-1..AC-6 observes it**. AC-2 covers *"variant k aborts"*, and an abort is not a containment rejection: one is an execution failure, the other is a ref pointing outside the project. Folding it into AC-2 was rejected — an AC with two distinct subjects is precisely where batch-65's `AT-197` lost its threshold. The disposition ENLARGES the requirement set rather than reinterpreting an existing member, and it consumes infrastructure that already exists rather than building a new oracle.
+
 ---
 
 ## 5. Increment plan for the implementation batch
 
 | Inc | Content |
 |---|---|
-| 1 | `FlowContext` gains the variant dimension; `run_flow` loops the planned set with per-variant isolation (D-1..D-3). AC-1, AC-2, AC-6. |
+| 1 | `FlowContext` gains the variant dimension; `run_flow` loops the planned set with per-variant isolation (D-1..D-3). Binding points are `run_flow`'s signature, `FlowContext`, and the SOURCE `image_ref` override at `flow_execution_service.py:135` — **not** the CRC `OperationInput` at `:343`. AC-1, AC-2, **AC-7**, AC-6. |
 | 2 | `FlowReportState` gains per-variant sections; fused composer + rollup (D-4..D-6). AC-3, AC-4. |
 | 3 | Per-variant producer bounding + the cut notice (D-7). AC-5. |
 | 4 | UI: scope selector in `FlowBuilderPanel`; wire through. |
