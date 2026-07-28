@@ -4953,7 +4953,7 @@ states how many further distinct variants were affected, not which: `affected = 
   only** — `range_index.py` is CONSUMED, never modified, and is engine-frozen.
   `s19_app/tui/services/report_addendum.py` — docstring only: `DeclaredRegion.contains` is no longer
   the addendum's membership path but remains the oracle its tests compare against.
-- Validation: `Automated` — `tests/test_report_addendum_bound.py` (28 nodes) ·
+- Validation: `Automated` — `tests/test_report_addendum_bound.py` (29 collected nodes) ·
   `tests/test_tui_report_seam.py::test_at200_truncation_notice_reaches_the_file_and_the_viewer` ·
   `tests/test_report_field_census.py` (the `notice_variant` `PLANTED` entry, so the batch's one new
   markdown sink renders through markdown-it under `AT-157` / `AT-158`; plus the head-of-line guard
@@ -4986,14 +4986,19 @@ states how many further distinct variants were affected, not which: `affected = 
   `AT-195` and `TC-496` are **retired ids and are not reused**: `AT-195` was mechanism-only under a
   black-box id and was withdrawn; `TC-496` was file-observed under a white-box id and was promoted to
   `AT-200`.
-- **Falsifiability is carried by executed mutants, not by assertion.** Eleven of the 28 nodes are
-  regression guards that were GREEN before the producer was rewritten, so each names a mutant arm
-  driven RED against the **implemented** producer — `FIX-B` (per-class bucket concatenation),
-  `FIX-E` / `FIX-E(b)` (raw membership / coalescing used for attribution), `FIX-G` (a notice for
-  every class), `FIX-H` (naming every contributing variant), `FIX-I` (all notices under the first
-  region), `FIX-A2` (per-class early exit), `FIX-C` (`hits[:CAP]` — bounding the output rather than
-  the producer), `FIX-NONE` and `FIX-SCOPE`. `TC-485` alone carries **no** arm and says so in
-  writing: it guards unchanged code.
+- **Falsifiability is carried by executed mutants, not by assertion.** Eleven nodes are regression
+  guards that were already GREEN before the producer was rewritten, so a passing run proves nothing
+  about them on its own; each therefore names a mutant arm driven RED against the **implemented**
+  producer. **Seven arms carry the guards** — `FIX-B` (per-class bucket concatenation), `FIX-E` /
+  `FIX-E(b)` (raw membership / coalescing used for attribution), `FIX-G` (a notice for every class),
+  `FIX-C` (`hits[:CAP]` — bounding the output rather than the producer), `FIX-NONE` and `FIX-SCOPE`.
+  `TC-485` alone carries **no** arm and says so in writing: it guards unchanged code. Three further
+  arms — `FIX-H` (naming every contributing variant), `FIX-I` (all notices under the first region)
+  and `FIX-A2` (per-class early exit) — belong to `AT-202`, `AT-203` and `AT-197`/`TC-488`, which
+  were genuinely RED at Inc-1 and so do not need one; they were executed anyway. Ten arms total.
+  **The arms are not re-runnable from the tree** — the mutant harness lived in a scratch export —
+  so this roster is a record, not a gate that a later batch can re-execute. Making them permanent,
+  as Inc-3 did for the head-of-line guard, is carried in `.dev-flow/BACKLOG-CODE.md`.
 - Status: Added in batch `2026-07-27-batch-64` (US-B64-1/2, HLR-103, LLR-103.1…103.6;
   `01-requirements.md` §6.5 amendment log §9 / §9b / §9c / §9d, A-1…A-46). Frozen-engine diff = 0;
   `tests/goldens/` unchanged — no golden was re-baselined.
