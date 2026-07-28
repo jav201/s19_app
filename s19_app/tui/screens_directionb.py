@@ -1165,6 +1165,68 @@ class RegionRow(Static):
         )
 
 
+class BandSegment(Static):
+    """A clickable entropy-band segment of the map's top strip (batch-67 N4b).
+
+    Summary:
+        One coloured run of the ``#map_grid`` band strip — the visual overview
+        above the region list. Before batch-67 the strip was inert decoration:
+        the same information was navigable in the region list below, but the
+        band the operator was actually looking at was not. This makes each
+        MAPPED run carry its ``[region_start, region_end)`` window and post the
+        SAME :class:`RegionRow.Activated` message a region row does, so the two
+        surfaces share one handler and one set of semantics — single click
+        inspects, double click opens in hex.
+
+        Deliberately a SIBLING of :class:`RegionRow`, not a subclass: Textual's
+        ``query(RegionRow)`` matches subclasses, so subclassing would silently
+        add ~N band widgets to every existing ``app.query(RegionRow)`` call
+        site (the region-count and ``N sym`` assertions in
+        ``tests/test_tui_map_big.py`` among them). A sibling reuses the message
+        without widening that query.
+
+        The unmapped ``╱`` gap hatch is NOT a ``BandSegment`` — it stays a plain
+        ``Static`` because there is no region behind it to inspect or open.
+
+    Args:
+        content (Text): The markup-safe repeated band glyph for this run.
+        region_start (int): Inclusive start address of the run.
+        region_end (int): Exclusive end address of the run.
+        classes (str): Space-joined CSS classes (``map-band-seg`` + the run's
+            ``band-*`` token) — unchanged from the pre-batch-67 ``Static``, so
+            the strip renders identically.
+
+    Data Flow:
+        - Mounted by ``MemoryMapPanel._build_band_widgets``; on click posts
+          :class:`RegionRow.Activated` → ``MemoryMapPanel.on_region_row_activated``.
+
+    Dependencies:
+        Uses:
+            - :class:`RegionRow.Activated` (the shared message)
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets``
+    """
+
+    def __init__(
+        self,
+        content: Text,
+        region_start: int,
+        region_end: int,
+        classes: str,
+    ) -> None:
+        super().__init__(content, classes=classes)
+        self.region_start = region_start
+        self.region_end = region_end
+
+    def on_click(self, event: events.Click) -> None:
+        """Post :class:`RegionRow.Activated` for this band run's window."""
+        self.post_message(
+            RegionRow.Activated(
+                self.region_start, self.region_end, chain=event.chain
+            )
+        )
+
+
 class MapRuler(Horizontal):
     """Address ruler beneath the entropy band strip (batch-47, R-TUI-072).
 
@@ -1998,8 +2060,15 @@ class MemoryMapPanel(Container):
                     )
                 )
             seg_width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_span))
+            # batch-67 N4b: a MAPPED run is clickable and carries its window;
+            # the gap hatch above stays an inert Static (no region behind it).
             segments.append(
-                Static(safe_text(glyph * seg_width), classes=f"map-band-seg {token}")
+                BandSegment(
+                    safe_text(glyph * seg_width),
+                    start,
+                    start + run_bytes,
+                    classes=f"map-band-seg {token}",
+                )
             )
             region_rows.append(
                 self._build_region_row(
