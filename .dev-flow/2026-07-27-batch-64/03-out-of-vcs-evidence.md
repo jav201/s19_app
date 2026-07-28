@@ -165,6 +165,51 @@ implausible-number catch, which is the luck C-42's mechanic 3 warns against rely
 end state is the better one for a Windows host, so it is **kept deliberately** rather than reverted;
 what was wrong was arriving there by accident.
 
+## 5c. POST-MERGE coherence — `main` moved under the batch, and what that invalidated
+
+`main` advanced 5 commits mid-batch. **PR #143 split `.dev-flow/BACKLOG.md` into `BACKLOG-CODE.md` +
+`BACKLOG-PROCESS.md` and reduced `BACKLOG.md` to a router.** That file was the *single* collision point
+this batch predicted at kickoff, and it was the *only* conflict — every other changed path was disjoint
+(they touched `README.md`, `REQUIREMENTS.md`, `docs/images/*`; this batch touched
+`docs/engineering-rules.md`, `state.json`, and 19 new files).
+
+**Resolved by re-derivation, because each side was right about a different thing:** `main`'s shape for
+the router (lineage only, carries in the lanes) and **this batch's** footer (the `LLR-B64-5.4` fix,
+since `C-1..C-36` was wrong in both directions). The 8 carries were split by lane — §7.1/§7.2/§7.8 to
+`BACKLOG-CODE.md`, §7.3–§7.7 to `BACKLOG-PROCESS.md` — and §7.8 was placed beside the `sec F5` rule it
+escalates, with its self-reference **re-pointed** because `sec F5` now lives in `BACKLOG-CODE.md`. That
+is the same drifting-pointer defect the code review caught as F1, avoided by re-derivation.
+
+Verified: 0 conflict markers · each of the 8 carries present **exactly once** across the three files ·
+of `main`'s process lane exactly **2 lines absent — the heading and lead this batch deliberately
+replaced**, with both replacements present. **2 replaced, 0 dropped.**
+
+### What the merge invalidated in this batch's own artifacts — stated, not carried silently
+
+| stale claim | reality | impact |
+|---|---|---|
+| `§3.6` / block 6: *"`.dev-flow/BACKLOG.md` takes **four spot edits**, not one contiguous insert"* | applied across **three** files under the two-lane layout | **description only** — the reconciliation content shipped in full |
+| `PP-5` cites `.dev-flow/BACKLOG.md:143-144` | the footer heading is now line **46** of the router | **line citation only** — PP-5 **re-run post-merge and GREEN on both clauses**, verified by content rather than by line number |
+| `03` §1 manifest row 6 | block 6's *bytes* were the source; its *application* changed shape | the frozen hashes for blocks 1–5 are unaffected |
+
+**None of this changes what shipped.** The four control texts are byte-verified in place and contain
+**zero** references to the backlog's structure (`engineering-rules.md` 0, `VERIFY.md` 0; the five hits
+in `dev-flow.md` are pre-existing flow text, not C-40 or the rider).
+
+### NEW FINDING, not this batch's doing but now live — carried
+
+**The global `/dev-flow` command's backlog-reconciliation rule is now stale for this project.** It
+instructs every batch to reconcile *"the project's **SINGLE** canonical cross-batch backlog:
+`.dev-flow/BACKLOG.md`"* and states *"the batch is NOT closed until `.dev-flow/BACKLOG.md` reflects
+it."* After #143 that file is a **router holding no open work** — a batch that follows the instruction
+literally would reconcile the wrong file and drop its carries on the floor.
+
+This is pre-existing text this batch did not touch, and the fix is a **placement question** the
+operator should rule on (the global command is project-agnostic and arguably should not hard-name a
+project's file layout at all, in which case the lane routing belongs in
+`docs/engineering-rules.md`). Recorded as a carry rather than fixed here, because it is outside the
+operator's encoding ruling for this batch.
+
 ## 6. Scope confinement
 
 ```
