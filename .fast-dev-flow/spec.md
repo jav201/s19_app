@@ -1,90 +1,66 @@
-# Quick Spec — s19_app · batch-67 feature slate (paste · map interaction · flow dual-entry)
+# Quick Spec — s19_app · batch-68 · N5: before/after + diff reports off the UI thread
 
-- **Status:** closed 2026-07-28 — all 8 ACs met; merge held pending `tui-ci` green
+- **Status:** closed 2026-07-28 — AC-1..AC-5 met; AC-6 delegated to `tui-ci` on the branch
 - **Date:** 2026-07-28
-- **Branch:** `claude/batch-67-feature-slate` (base `73e3fb9` = `origin/main` tip; RC-1 PASS, merge-base == tip)
-
-> ⚠ **RENUMBERED 66 → 67 mid-batch (batch-number collision).** The parallel
-> PROCESS-lane session had already claimed `claude/batch-66-flow-backlog-routing`
-> (an empty placeholder branch at `73e3fb9`, 0 commits) before this branch was
-> cut. Same failure mode as the batch-64/65 collision recorded in project memory.
-> Resolved conservatively: **this** batch renumbered, the other branch untouched.
-> **Inc-1 and Inc-2 commit subjects still read "batch-66"** — they were written
-> before the collision was discovered and were NOT rewritten, because rewriting
-> history over a dirty working tree mid-increment risks the work for a label.
-> The mapping is recorded here and in the PR body rather than being silently
-> dropped.
+- **Branch:** `claude/batch-68-report-worker` (base `488bf5d` = `origin/main` tip; RC-1 PASS, merge-base == tip)
 - **Flow mode:** autonomous + self-merge (operator-granted THIS batch at kickoff; per-batch only, never carried)
-- **Artifact language:** English (project default per `CLAUDE.md`; conversation stays Spanish)
-- **security_required:** true (see §6)
+- **Artifact language:** English (project default; conversation stays Spanish)
+- **security_required:** false (see §6)
 
-> **Scope note — the flow's own escape hatch fired and was NOT taken.** `/fast-dev-flow` recommends promotion to `/dev-flow` at >3 increments; this batch has 5. Reported rather than silently ignored: the operator sized this slate explicitly at kickoff after seeing the per-increment breakdown, and every increment is independently revertible with its own AT. Staying in fast-flow is the operator's call, recorded here so it is auditable.
+> **Flow choice CORRECTED after measuring, and stated rather than silently downgraded.** At the kickoff question I wrote *"probablemente `/dev-flow` por el riesgo"*. That was a guess made **before** reading the seams. Measured: the two handlers each wrap **one** pure composer call, the repo already ships a proven `@work(thread=True, exclusive=True)` template for exactly this in the same file, and the blast radius is **1 production file + 4 test files / 14 call sites**. A 6-phase V-model is not warranted by that shape, so this runs as `/fast-dev-flow`. If the seam had been tangled, the answer would have been the opposite.
 
 ---
 
 ## 1. Objective (1 line)
 
-Ship four user-facing features off the CODE-lane backlog — OS-clipboard paste in every remaining text box, the Memory-Map single/double-click split, clickable entropy bands, and a pinned dual-entry contract for PATCH change-documents.
+Move the before/after and A2B-diff report composition off the UI thread onto workers, so the TUI stops freezing outright during generation, and drive the existing progress bar at their seams.
 
 ---
 
 ## 2. User stories
 
-- As an **operator**, I want Ctrl+V to work in every text box (search, goto, filter, save-name, CRC fields), so that I stop hand-typing addresses and paths that are already on my clipboard.
-- As an **operator**, I want a single click on a memory-map region to *inspect* it without yanking me to the hex view, and a double click to make the jump, so that browsing regions is not a navigation trap.
-- As an **operator**, I want the entropy **bands** at the top of the map to be clickable like the region rows, so that the visual overview is a navigation surface and not just decoration.
-- As an **operator**, I want the change-document JSON to be a first-class PATCH input from **both** the Patch Editor and a Flow Builder block, so that the two entry points are a documented capability rather than an accident of implementation.
+- As an **operator**, I want the TUI to keep repainting while a before/after or diff report is generated, so that a slow report looks like work in progress instead of a hung application.
+- As an **operator**, I want the progress bar to move during those two reports the way it already does for the project report, so that I can tell the difference between "still working" and "finished".
 
 ---
 
-## 3. RC-1 verification — what disk says (premises corrected before deriving)
+## 3. RC-1 verification — what disk says
 
-Three findings changed the plan. None was in the backlog text.
-
-1. **N4a is a SPLIT, not an ADD.** `MemoryMapPanel.on_region_row_activated` (`screens_directionb.py:2327`) already populates the detail inspector (batch-47 R-TUI-074) **and** posts `OpenInHexRequested` (`:2370`) on one click. The backlog framed it as "add a details view". The work is moving the jump onto double-click. `event.chain` appears **nowhere** in `s19_app/tui/` — double-click support genuinely does not exist yet.
-2. **N4b is small, because the addresses are already in hand.** `_build_band_widgets` (`:1964`) loops over `(band, run_bytes, start)` runs and mounts a plain `Static` per segment (`:1980`). `RegionRow(content, region_start, region_end, classes)` has **exactly** that constructor shape and no `DEFAULT_CSS`, so the band strip can reuse it verbatim and inherit whatever click semantics AC-2 lands. Gap-hatch segments (`:1972`) stay plain `Static` — an unmapped gap has no region to open.
-3. **FB-P2's premise is half-wrong.** The change-doc input **is** surfaced in the Flow Builder (`Select` "Patch (change doc)" at `:2625` + a free-text ref `Input` at `:2705`), and the Patch Editor has a richer picker (`#patch_doc_file_select`, `:4012`, populated by `set_options`). So "confirm it is surfaced" is already answered YES. The real gap is that **nothing pins the two entries to the same behaviour** — they could diverge silently. The deliverable is therefore a convergence test + documentation, not new UI.
+1. **The freeze is real and total, not a missing indicator.** `app.py` has exactly **three** `@work` methods (`execute_scope`, `generate_report`, `load`). `action_before_after_report` and `on_ab_diff_panel_report_requested` are **not** among them, so `compose_before_after_report` / `generate_diff_report` / `generate_diff_report_html` all run on the UI event loop. The backlog framed N5's carry as "same `set_progress` pattern" — that understates it: you cannot drive a progress bar from the thread you are blocking.
+2. **Both seams are clean and identical in shape.** Each handler does cheap validation (which may `set_status` and return early), then **one** heavy pure call, then logging + a status write. `compose_before_after_report` and the two diff generators are Textual-free emitter services.
+3. **The template already exists in the same file.** `_start_generate_report_worker` is `@work(thread=True, exclusive=True, group="generate_report")`, marshals UI writes through `call_from_thread`, resets the bar to 0 on both the reject and crash arms, and calls `_log_report_event` **directly** from the worker — which is correct, not a latent bug: that method touches only `self.logger`, never a widget. Verified before copying the pattern.
+4. **Blast radius measured:** 14 call sites over `test_before_after_report.py` (9), `test_report_logging.py` (2), `test_tui_directionb.py` (2), `test_loadfilescreen_input.py` (1). Every one currently assumes the work completed by the time the handler returned.
 
 ---
 
 ## 4. Acceptance criteria (observable)
 
-**AC-1 — paste is universal.** When the TUI package is scanned, **zero** user-facing text-entry widgets shall be stock `Input`; all shall be `OsClipboardInput`. Baseline measured pre-fix: **16 stock sites across 5 files** (`app.py`×8, `command_bar.py`×3, `screens.py`×3, `crc_designer_view.py`×1, `screens_directionb.py`×1).
+**AC-1 — before/after composition leaves the UI thread.** When `action_before_after_report` runs, `compose_before_after_report` shall be invoked on a thread whose identity differs from the UI thread that dispatched the action. *(Falsifiable and RED pre-fix: today they are the same thread.)*
 
-**AC-2 — paste actually pastes.** When `action_paste` runs on a representative converted widget with clipboard text `"DEADBEEF"`, the widget `value` shall contain `"DEADBEEF"`.
+**AC-2 — diff composition leaves the UI thread.** Same for `generate_diff_report` **and** `generate_diff_report_html` — both are heavy and both must move, so the criterion binds each independently.
 
-**AC-3 — single click inspects only.** When a `RegionRow` receives a click with `chain == 1`, the `#map_detail_body` shall be populated for that run **and no** `OpenInHexRequested` message shall be posted.
+**AC-3 — the before/after bar moves and never sticks.** A successful before/after report shall drive `set_progress` to a kickoff value, then to `100`; a refused or crashed one shall reset it to `0`. No path may leave the bar at a mid-fill value.
 
-**AC-4 — double click navigates.** When a `RegionRow` receives a click with `chain == 2`, exactly one `OpenInHexRequested(region_start)` shall be posted.
+**AC-4 — the diff bar moves and never sticks.** Same three arms for the diff path, including the **html-refused-after-md-succeeded** arm, which is a distinct early return in today's code.
 
-**AC-5 — the OLD behaviour is gone (C-31/C-32 counterfactual).** An AT shall assert the pre-fix contract (single click posts `OpenInHexRequested`) and shall be shown **RED on the fixed tree** / GREEN on the unfixed tree, so the change of a shipped interaction is pinned in both directions.
+**AC-5 — the reports are still correct.** The written `.md` / `.html` paths, the `set_status` text, and the `_log_report_event` outcome for every existing arm (ok / refused / html-refused) are unchanged once the worker completes.
 
-**AC-6 — bands are clickable with the same semantics.** When a band-strip segment covering run `(start, start+run_bytes)` receives a single click, `#map_detail_body` shall show that window; on a double click exactly one `OpenInHexRequested(start)` shall be posted. When a **gap-hatch** segment is clicked, **no** message shall be posted.
-
-**AC-7 — dual entry converges.** Given one change-document file, the Patch-Editor path and the Flow-Builder `PatchBlock` path shall produce the **same** `(mem_map, ranges)` mutation over the same source image.
-
-**AC-8 — no regression.** Full non-slow suite green, and the 29 snapshot cells shall show **0 new** drift attributable to this batch.
+**AC-6 — no regression.** Full non-slow suite green; 29 snapshot cells unchanged (this batch renders no new text).
 
 ---
 
 ## 5. Out of scope
 
-- **N5 worker migration** (before/after + diff reports run on the UI thread; moving them to `@work` is a threading change, own batch).
-- The three MAJOR `report_service` defects (D1 addendum memory, D2 schema-legal address denial, F4 unbounded tables) — defects, not features; operator chose features this batch.
-- Issues Report v2 filter/sort (PARKED on an operator tier decision), PKI extraction (BLOCKED on operator definition), FB-P3 CRC sub-flow (deferred), A2L discoverability (needs a design pass).
-- Any edit to the engine-frozen set (`core.py`, `hexfile.py`, `range_index.py`, `validation/`, `tui/a2l.py`, `tui/mac.py`, `tui/color_policy.py`) or the frozen test files.
+- The project-report worker (`_start_generate_report_worker`) — already off-thread since batch-N5's first half; not touched.
+- The remaining N5 carries: CRC compute-over-large-coverage progress, and A2L enrichment granularity (the A2L **load** path already drives 10/50/100 — measured during the batch-67 review, so that carry is smaller than written).
+- Any progress *percentage* that claims to be a true completion fraction — the composers expose no step count, so the seams stay coarse like the project report's 15/55/100.
+- The engine-frozen set and the frozen test files.
 
 ---
 
 ## 6. Security flags
 
-`security_required: **true**` — three patterns fired.
-
-| Pattern | Where | Handling |
-|---|---|---|
-| **`user input` / paste** | AC-1/AC-2 widen an **untrusted external input** surface (OS clipboard) from 20 widgets to 36 | `OsClipboardInput` inserts only the **first line** of the payload and routes through `Input.replace`, identical to stock `Input._on_paste` policy. No new parsing path; the widening is of an already-audited widget (batch-31 B-03). Verify no converted site feeds a shell/eval sink. |
-| **`form` / file-derived text into a widget** | AC-6 mounts band segments as clickable widgets carrying file-derived entropy runs | Segment content already passes `safe_text` (`:1980`) — C-17 markup safety preserved verbatim; the change adds an address window, not new text. |
-| **`user input` (change doc)** | AC-7 exercises change-document resolution from two entry points | **Read-only test**; both paths already resolve through the reused `_resolve_manifest_entry` containment seam. The test must NOT fork that seam — asserting convergence is the point. |
+`security_required: **false**` — no pattern fired. The scan hits on "report" and "file" are pre-existing write paths that this batch **relocates without changing**: same composer, same arguments, same destination, same containment. No new input is parsed, no new file is written, no new surface is exposed. The one genuine concurrency consideration is not a security one: `exclusive=True` per group prevents two overlapping generations of the same kind from interleaving their status writes.
 
 ---
 
@@ -92,10 +68,7 @@ Three findings changed the plan. None was in the backlog text.
 
 | Inc | Content | Files (≤5) | AC |
 |---|---|---|---|
-| 1 | Universal paste A — `app.py` (8), `command_bar.py` (3) + census/behaviour tests | 3 | AC-1, AC-2 |
-| 2 | Universal paste B — `screens.py` (3), `screens_directionb.py` (1), `crc_designer_view.py` (1) | 3-4 | AC-1 |
-| 3 | N4a — click-chain split on `RegionRow` + counterfactual AT | 2 | AC-3, AC-4, AC-5 |
-| 4 | N4b — band segments reuse `RegionRow`; gaps stay inert | 2 | AC-6 |
-| 5 | FB-P2 — dual-entry convergence test + docs | 2-3 | AC-7 |
+| 1 | before/after → worker + progress; update its call sites | `app.py`, `test_before_after_report.py`, `test_report_logging.py`, new AT file | AC-1, AC-3 |
+| 2 | diff (md + html) → worker + progress; update its call sites | `app.py`, `test_tui_directionb.py`, `test_loadfilescreen_input.py`, AT file | AC-2, AC-4 |
 
-Close: full suite + snapshots (AC-8), backlog reconciliation, PR.
+Close: full suite + snapshots (AC-6), backlog reconciliation, PR, merge on `tui-ci` green.

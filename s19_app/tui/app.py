@@ -3273,20 +3273,24 @@ class S19TuiApp(App):
               ``_compute_a2l_enriched_tags()`` (the LLR-053.4 (c) record
               extents) and stamps the file's name as the matcher's
               ``source_name`` (mirrors ``_trigger_generate_report``).
-            - Gather ``last_summary``, ``LoadedFile.path``, the active
-              project dir, and the workarea root; the composer validates the
+            - Gather ``LoadedFile.path``, the active project dir and the
+              display name **on the UI thread** (reading ``current_file`` from
+              a worker would race a concurrent load), then hand them to
+              :meth:`_start_before_after_worker`. The composer validates the
               five LLR-038.2 preconditions and every LLR-038.4 refusal class
               itself — this handler never pre-duplicates them.
-            - ``written`` → one status line naming BOTH written paths.
-            - refusal → one status line carrying the composer's diagnostics;
-              no file was written, the app keeps running.
+            - **N5 (batch-68): the composition itself no longer runs here.**
+              It used to, on the UI event loop, so the terminal stopped
+              repainting for its whole duration. This method now only
+              validates, sets the progress kickoff, and dispatches; the
+              ``written`` / refusal status lines are written by the worker.
 
         Dependencies:
             Uses:
-                - ``compose_before_after_report``
+                - ``_start_before_after_worker`` (the composer's new home)
                 - ``read_report_filter_text`` / ``parse_report_filter``
                 - ``resolve_report_filter`` / ``_compute_a2l_enriched_tags``
-                - ``_active_project_dir`` / ``set_status``
+                - ``_active_project_dir`` / ``set_status`` / ``set_progress``
             Used by:
                 - key binding ``b`` (BINDINGS) after the save-back offer
                   notify in ``on_patch_editor_panel_save_back_decision``
@@ -3314,14 +3318,86 @@ class S19TuiApp(App):
                 mac_records,
                 source_name=filter_path.name,
             )
-        result = compose_before_after_report(
-            self._change_service.last_summary,
+        # N5 (batch-68): the composer is the expensive step and used to run
+        # HERE, on the UI event loop — the terminal stopped repainting for its
+        # whole duration, so a slow report was indistinguishable from a hang.
+        # Validation above stays on the UI thread (it is cheap and it owns the
+        # early-return status writes); only the composition is dispatched.
+        self.set_progress(15)
+        self._start_before_after_worker(
             loaded.path if loaded is not None else None,
-            project_dir=self._active_project_dir(),
-            workarea=self.workarea,
-            report_filter=report_filter,
+            self._active_project_dir(),
+            report_filter,
+            loaded.path.name if loaded is not None else "-",
         )
-        source_name = loaded.path.name if loaded is not None else "-"
+
+    @work(thread=True, exclusive=True, group="before_after_report")
+    def _start_before_after_worker(
+        self,
+        loaded_path: Optional[Path],
+        project_dir: Optional[Path],
+        report_filter: Optional[ReportFilterMatcher],
+        source_name: str,
+    ) -> None:
+        """
+        Summary:
+            Off-thread before/after report composition (N5, batch-68). Calls
+            the LLR-038.2 composer and marshals every UI write back through
+            ``call_from_thread``; ``_log_report_event`` is called directly
+            because it touches only ``self.logger``, never a widget — the same
+            division the shipped ``_start_generate_report_worker`` uses.
+
+            The progress bar is driven at three seams and is NEVER left
+            mid-fill: the caller sets 15 before dispatch, this worker sets 100
+            on success and 0 on both the refusal and the crash arm.
+
+        Args:
+            loaded_path (Optional[Path]): The loaded image path, or ``None``.
+            project_dir (Optional[Path]): Active project dir for the composer.
+            report_filter (Optional[ReportFilterMatcher]): Resolved filter, or
+                ``None`` when no filter file is configured.
+            source_name (str): Display name for the log line — resolved on the
+                UI thread by the caller, because reading ``self.current_file``
+                from a worker would race a concurrent load.
+
+        Returns:
+            None: Effects only — the written report pair, a log line, the
+            status text and the progress bar.
+
+        Data Flow:
+            - Consumes ``ChangeService.last_summary``; produces the written
+              ``.md``/``.html`` pair and the status/progress surface.
+
+        Dependencies:
+            Uses:
+                - ``compose_before_after_report`` / ``_log_report_event``
+                - ``set_status`` / ``set_progress`` (via ``call_from_thread``)
+            Used by:
+                - ``action_before_after_report`` (key binding ``b``)
+        """
+        try:
+            result = compose_before_after_report(
+                self._change_service.last_summary,
+                loaded_path,
+                project_dir=project_dir,
+                workarea=self.workarea,
+                report_filter=report_filter,
+            )
+        except Exception as exc:
+            self.logger.exception("Before/after report failed: %s", exc)
+            self._log_report_event(
+                "before-after",
+                source_name,
+                "-",
+                f"failed: {type(exc).__name__}",
+                ok=False,
+            )
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                self.set_status,
+                f"Before/after report failed: {type(exc).__name__}: {exc}",
+            )
+            return
         if result.written:
             self._log_report_event(
                 "before-after",
@@ -3330,16 +3406,22 @@ class S19TuiApp(App):
                 "ok",
                 ok=True,
             )
-            self.set_status(
+            self.call_from_thread(self.set_progress, 100)
+            self.call_from_thread(
+                self.set_status,
                 f"Before/after report written: {result.md_path} "
-                f"| {result.html_path}"
+                f"| {result.html_path}",
             )
             return
         self._log_report_event(
             "before-after", source_name, "-", "refused", ok=False
         )
-        self.set_status(
-            "Before/after report refused: " + " ".join(result.diagnostics)
+        # Refused is a legitimate outcome, not a crash — but the bar must
+        # still come back down rather than sit at the kickoff value.
+        self.call_from_thread(self.set_progress, 0)
+        self.call_from_thread(
+            self.set_status,
+            "Before/after report refused: " + " ".join(result.diagnostics),
         )
 
     @staticmethod
@@ -4817,29 +4899,104 @@ class S19TuiApp(App):
         diff_source = (
             project_dir.name if project_dir is not None else (dest_input or "-")
         )
-        md = generate_diff_report(result, **kwargs)
-        if not md.written:
+        # N5 (batch-68): BOTH generators used to run here, on the UI event
+        # loop, back to back — the diff path was the worst freeze in the app
+        # because it pays the cost twice. Everything above stays on the UI
+        # thread (widget reads + the "no comparison yet" early return).
+        self.set_progress(15)
+        self._start_diff_report_worker(panel, result, kwargs, diff_source)
+
+    @work(thread=True, exclusive=True, group="diff_report")
+    def _start_diff_report_worker(
+        self,
+        panel: AbDiffPanel,
+        result: object,
+        kwargs: dict,
+        diff_source: str,
+    ) -> None:
+        """
+        Summary:
+            Off-thread A2B diff report generation (N5, batch-68). Runs the
+            markdown generator, then the HTML generator, marshalling every
+            ``panel.set_status`` and ``set_progress`` write back to the UI
+            thread; ``_log_report_event`` is called directly because it only
+            touches ``self.logger``.
+
+            Progress is driven at four seams and never left mid-fill: the
+            caller sets 15, this worker sets 55 between the two generators,
+            100 on full success, and 0 on **each** of the three failure arms —
+            markdown refused, HTML refused (markdown already written), and an
+            unexpected crash.
+
+        Args:
+            panel (AbDiffPanel): The live panel, resolved on the UI thread by
+                the caller; every method call on it is marshalled.
+            result (object): The retained ``_diff_last_result`` comparison.
+            kwargs (dict): The shared generator arguments assembled on the UI
+                thread (mem maps, destination, A2L/MAC records).
+            diff_source (str): Display name for the log line.
+
+        Returns:
+            None: Effects only — the written pair, a log line, the panel status
+            and the progress bar.
+
+        Data Flow:
+            - Consumes the retained diff result; produces the ``.md``/``.html``
+              pair and the panel status surface.
+
+        Dependencies:
+            Uses:
+                - ``generate_diff_report`` / ``generate_diff_report_html``
+                - ``_log_report_event`` / ``AbDiffPanel.set_status``
+            Used by:
+                - ``on_ab_diff_panel_report_requested``
+        """
+        try:
+            md = generate_diff_report(result, **kwargs)
+            if not md.written:
+                self._log_report_event(
+                    "diff", diff_source, "-", "refused", ok=False
+                )
+                self.call_from_thread(self.set_progress, 0)
+                self.call_from_thread(
+                    panel.set_status,
+                    "Report refused: " + "; ".join(md.diagnostics),
+                    "sev-error",
+                )
+                return
+            self.call_from_thread(self.set_progress, 55)
+            html = generate_diff_report_html(result, **kwargs)
+        except Exception as exc:
+            self.logger.exception("Diff report failed: %s", exc)
             self._log_report_event(
-                "diff", diff_source, "-", "refused", ok=False
+                "diff", diff_source, "-", f"failed: {type(exc).__name__}", ok=False
             )
-            panel.set_status(
-                "Report refused: " + "; ".join(md.diagnostics), "sev-error"
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                panel.set_status,
+                f"Diff report failed: {type(exc).__name__}: {exc}",
+                "sev-error",
             )
             return
-        html = generate_diff_report_html(result, **kwargs)
         if not html.written:
             self._log_report_event(
                 "diff", diff_source, "-", "refused (html)", ok=False
             )
-            panel.set_status(
-                "HTML report refused: " + "; ".join(html.diagnostics), "sev-error"
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                panel.set_status,
+                "HTML report refused: " + "; ".join(html.diagnostics),
+                "sev-error",
             )
             return
         self._log_report_event(
             "diff", diff_source, f"{md.path}|{html.path}", "ok", ok=True
         )
-        panel.set_status(
-            f"Diff report written: {md.path}  |  {html.path}", "sev-ok"
+        self.call_from_thread(self.set_progress, 100)
+        self.call_from_thread(
+            panel.set_status,
+            f"Diff report written: {md.path}  |  {html.path}",
+            "sev-ok",
         )
 
     def _compose_screen_a2l(self) -> Container:
