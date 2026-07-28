@@ -5,7 +5,7 @@
   "batch_objective": "D1 ONLY — bound the PRODUCER in _addendum_lines (s19_app/tui/services/report_service.py:1514) so the declared-region addendum stops consuming resident memory proportional to R x V x E. The function appends one fully-formatted string (each paying md_safe) per matching (region x variant x entry/issue) into a local hits list at :1565/:1571/:1579 and extends `lines` only at :1584, so the whole cost is paid BEFORE any output exists and every byte-budget or row-cap design is structurally blind to it. Measured 87-94 B resident per hit, product law confirmed on all three axes. D1 was specced at batch-63, BLOCKED at that batch's Phase-2 re-gate and RETURNED; batch-63 shipped D3 only. EXPLICITLY OUT OF SCOPE: OB-4/F4 (the two unbounded tables at 988 B/entry) and D2 (schema-legal address ValueError) — both stay carries in .dev-flow/BACKLOG-CODE.md. CONSTRAINT ON THE PR: D1 alone does NOT close the memory-exhaustion DoS (the neighbouring tables dominate), so the batch must state the residual with its numbers and must NOT claim closure.",
   "note_prior_batch": "batch-63 (report byte accounting, D3 only) DONE + MERGED PR #139 c473152 + closeout #140 79cde53 + control decisions #142 c779e3d. Vault synced 2026-07-27. Its D1/D2 were RETURNED to the backlog at the Phase-2 re-gate. Its full state at close is archived at .dev-flow/2026-07-26-batch-63/state-at-close.json.",
   "note_backlog_split": "THE OPEN QUEUE IS NOW SPLIT (PR #143, squash 082ada9, 2026-07-27). Lane A = .dev-flow/BACKLOG-CODE.md (app code + its dev flow) — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is now a ROUTER holding no open work.",
-  "route": "full /dev-flow. Phase 2 gate FAILED — BLOCKED by ALL THREE lanes (5 blockers, 14 majors, 8 minors; 27 findings). NONE challenges the design; every fold is an edit to a claim, a predicate, a fixture, or the increment cut. iterate-to-refine iteration 1 IN PROGRESS on the Phase-1 spec.",
+  "route": "full /dev-flow. Phase 2 APPROVED 2026-07-27 at the re-gate (operator decision at the iteration cap). Phase 3 IN PROGRESS: Inc-1 (tests + golden, no production code) dispatched.",
   "rc1": "VERIFIED 2026-07-27. git fetch origin; origin/main tip = 082ada9; HEAD = 082ada9; merge-base HEAD origin/main = 082ada9 (equal, no rebase needed); working tree clean; branch claude/batch-64-addendum-producer-bound cut off that tip. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. Already-shipped check EXECUTED: grep R-TUI-095 REQUIREMENTS.md = 0, grep HLR-100 REQUIREMENTS.md = 0, grep MAX_ADDENDUM_HITS s19_app/ = 0 -> D1 is NOT shipped.",
   "standing_authorization": {
     "date": "2026-07-27",
@@ -21,12 +21,12 @@
     "allocated": "AT-194+, TC-480+, R-TUI-098, HLR-103",
     "retired_not_reused": "batch-63's never-implemented D1 ids AT-164..167, TC-440..454, R-TUI-095, HLR-100, LLR-100.1..4 are RETIRED. They are contested between batch-63's D1 spec and REV-5 lane A (which claims AT-164..178); reusing them would bind two different observables to one id. Their CONTENT carries forward; only the numbers are dropped."
   },
-  "current_phase": 1,
-  "phase_status": "iterating",
+  "current_phase": 3,
+  "phase_status": "in-progress",
   "iterations_per_phase": {
     "0": 0,
-    "1": 1,
-    "2": 0,
+    "1": 2,
+    "2": 2,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -39,7 +39,10 @@
     "1-qa": ".dev-flow/2026-07-27-batch-64/01b-qa-catalog.md",
     "2-security": ".dev-flow/2026-07-27-batch-64/02-review-security.md",
     "2-qa": ".dev-flow/2026-07-27-batch-64/02-review-qa.md",
-    "2-architect": ".dev-flow/2026-07-27-batch-64/02-review-architect.md"
+    "2-architect": ".dev-flow/2026-07-27-batch-64/02-review-architect.md",
+    "2-regate-security": ".dev-flow/2026-07-27-batch-64/02-regate-security.md",
+    "2-regate-qa": ".dev-flow/2026-07-27-batch-64/02-regate-qa.md",
+    "2-regate-architect": ".dev-flow/2026-07-27-batch-64/02-regate-architect.md"
   },
   "prior_work_mined": "batch-63 left D1 substantially specced and reviewed. Mined 2026-07-27 from .dev-flow/2026-07-26-batch-63/: the design (per-hit-class cap), 8 round-1 blockers + 9 re-gate blockers, all executed measurements, the design options and their verdicts, the named residuals, and the emission-order facts. Recorded in PLAN.md 'Inherited findings' so batch-64 designs for them rather than re-discovering them.",
   "decisions_log": [
@@ -108,6 +111,18 @@
       "date": "2026-07-27",
       "decision": "Phase 2 gate — iterate-to-refine (forced: 5 blockers)",
       "notes": "ONE refinement iteration folding all 27 findings, not three rounds. Discharge requires a 27-row disposition table (FOLDED / REJECTED-with-reason / CARRIED-with-destination); a silently vanished finding is the P-7 failure this project keeps repeating and it already happened once inside revision 1."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-27",
+      "decision": "Phase 2 gate — APPROVE at the re-gate (operator decision)",
+      "notes": "46 findings across two gates from six independent reviews, all dispositioned; ZERO design objections. Verified independently of the folding agent by deriving finding keys from the review artifacts: 27/27 then 19/19 present. Phase 1 reached 2 iterations of a soft cap of 3; the operator was given the choice of a third re-gate, acceptance, or re-scoping, and chose acceptance."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-27",
+      "decision": "FIX-NONE / FIX-SCOPE carried as a BLOCKING Inc-1/Inc-2 gate condition rather than re-gated",
+      "notes": "They are mutant arms against the NEW behaviour, so they cannot be fully executed before the producer exists; requiring them pre-implementation would require the implementation. Recorded as the one knowingly-open item at the Phase-2 gate."
     }
   ],
   "obsidian_synced": false,
@@ -134,5 +149,19 @@
     "cleared": "LLR-103.2's coalesce+prefix-max workaround is SOUND — security swept ~150k addresses over 9 adversarial suites + 200 random sets, 0 mismatches; architect swept 375,064 checks over 11 hand-built geometries + 3,000 random ones, 0 mismatches. The notice cannot be forged and leaks nothing. The F2 non-claim holds across all seven locations checked. The subsequence claim verified 72/72 configurations. K-1/K/K+1 genuinely escapes the in-domain max of 2.",
     "orchestrator_correction": "My earlier carry was WRONG. The range_index overlap defect does NOT reach validation/engine.py (ranges come from core.py::get_memory_ranges over a sorted unique-key dict -> disjoint by construction; 9 real fixtures, 0 overlapping pairs incl. case_03_overlapping_records) nor tui/hexview.py (a pure re-export facade). The LIVE one is s19_app/tui/changes/apply.py:465 _linkage_index over A2L tag ranges, which carries its OWN copy of the one-candidate shape at :511-518, so a range_index.py unfreeze would not repair it. Executed: [(4096,36864,BIG_ARRAY),(8192,8208,INNER)], addr=0x5000 -> (False,None), truth [BIG_ARRAY]. Also UNAUDITED: screens_directionb.py:1889 builds an index over ALL A2L tag regions. The consumer surface is ~8 modules, not the 2 I named.",
     "orchestrator_check_limitation": "My independent union check verified that every qa slug was BOUND to an id or RETIRED in writing — it did NOT verify that each observable retained its STRENGTH through the merge. AT-197 kept its id and lost its threshold, and my predicate could not see that dimension. Same failure class the batch is chasing, in my own verifier."
+  },
+  "regate_result": {
+    "security": "OK TO SHIP, UNCONDITIONAL. 6/6 CLOSED, 0 partials. No risk-acceptance signature requested: the S1 blocker was a requirement asserting a bound the design does not provide, and revision 2 RETRACTS the claim, names the residual with both lanes numbers, and builds the missing oracle — that is a fix, so there is nothing to sign. Security also SUSTAINED the rejection of its own S5 fold 2, writing that its finding was over-general (its probe sampled a ValidationIssue, true for 2 of 3 hit classes, false for the third). And it CLEARED screens_directionb.py:1889 — 206 fixtures, 89032 addresses swept, 0 mismatches — noting that the evidence cell it was replacing had been its own sentence resting on a docstring.",
+    "qa": "9/9 CLOSED, 0 partials, but NOT READY: 4 new blocking majors. FIX-H rebuilt and executed against the repaired AT-197: RED (was GREEN) — the fold is load-bearing.",
+    "architect": "9 CLOSED / 3 PARTIAL / 0 NOT CLOSED, 1 new blocker. Ruled AT-194 stays an AT (demoting it leaves US-B64-1 with zero black-box nodes able to go RED pre-fix). Verified its own B-2 and M-5 were over-general and said so.",
+    "central_finding": "ARCH-N-1 == QA-NEW-1, raised independently: 11.1 per-node table asserted RED at Inc-1 for >=9 of 28 nodes GREEN on 082ada9 — inside the very table created to discharge ARCH-B-3, because the fold fixed the two nodes the reviewer NAMED rather than the class. Third appearance of fix-the-instances-not-the-class in this batch.",
+    "qa_new3": "The addendum-scope fold was vacuous as written: the addendum is the LAST ## section, so \"heading .. next ^## \" finds no scope, reads 0 notices always, and takes six ATs plus TC-499 with it. An anti-vacuity fold that introduced vacuity.",
+    "qa_new4": "Four Inc-1 nodes quote constants raising ImportError at COLLECTION; xfail does not cover a collection error, so a RED-by-import is a vacuous RED."
+  },
+  "revision3": {
+    "own_finding": "Raised by NO lane: a >=50% RED-margin rule KILLS TC-483, because a boundary node RED is threshold+1 by construction (that is what a K+1 fixture IS). Any margin size either kills the one genuinely-correct RED in the K-1/K/K+1 family or forces abandoning the boundary fixture. The gate now states FOUR threshold families (ratio >=25% / boundary = adjacent pair, no margin / exact-equality = both values per arm / boolean = predicate false + observed value).",
+    "A_defined": "A = the number of ends[i] >= addr comparisons in the downward attribution walk; pmax guard, attribution bisect and reject-prefilter bisect EXCLUDED. Ends-only is the only convention INVARIANT under the design notes sanctioned removal of the reject pre-filter (128000 with and without; +bisect moves 261000 -> 260500).",
+    "verdict_table": "All 28 nodes re-derived by driving the shipped producer, transcript pasted. 8 mismatches vs revision 2. Inc-1 tally 13 RED / 11 GREEN regression guards / 4 xfail(strict) / 1 n/a.",
+    "open_named": "FIX-NONE and FIX-SCOPE mutant arms are SPECIFIED, NOT EXECUTED — flagged in 11.1 note 1, no 7 row, no 13 tick. Carried into Phase 3 as a BLOCKING Inc-1/Inc-2 gate condition rather than re-gated, because they are arms against the NEW behaviour and cannot be fully executed until the producer exists."
   }
 }
