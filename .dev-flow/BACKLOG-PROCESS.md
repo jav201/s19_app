@@ -32,6 +32,30 @@
   - **▸ (P1, new — batch-64 §7.9, found at the post-merge coherence review) the GLOBAL `/dev-flow` command's backlog-reconciliation rule is STALE for this project after the lane split (#143).** It instructs every batch to reconcile *"the project's **SINGLE** canonical cross-batch backlog: `.dev-flow/BACKLOG.md`"* and states *"the batch is NOT closed until `.dev-flow/BACKLOG.md` reflects it"* — but that file is now a **router holding no open work**, so a batch following the instruction literally reconciles the wrong file and drops its carries. **Placement is the real question and it needs an operator ruling:** the global command is project-agnostic and arguably must not hard-name a project's file layout at all, in which case the lane routing belongs in `docs/engineering-rules.md` and the global text should say "the project's canonical backlog, as its engineering-rules doc defines it". Pre-existing text; batch-64 did not introduce it and did not fix it, being outside the operator's encoding ruling. 5 occurrences in `~/.claude/commands/dev-flow.md`.
   - **▸ (P2, new — batch-64 §7.10, security merge-gate F3) out-of-VCS backups live only in a session-scoped `Temp` directory.** The three destinations outside version control (`~/.claude/commands/dev-flow.md`, `~/.claude/skills/tui-design/VERIFY.md`, the lineage memory) have no git history, so their `.PRE` copies ARE the rollback — and they sit under the agent session's scratchpad, which is not durable across sessions. All four were verified to match their recorded PRE hashes, so rollback worked *this* time. A durable location (or committing the PRE bytes into the batch artifacts) would make it work next time.
   - **▸ (P3, new — batch-64 §7.11, security merge-gate F5, a reviewer correcting its OWN prior ruling) the repo is PUBLIC, which was not the basis of the earlier host-path clearance.** At Phase 2 the security lane cleared the operator's account name in batch artifacts on the rationale *"their vault, their Drive"*. `gh repo view` returns **PUBLIC** — `.dev-flow/` is pushed world-readable, the exact trigger that text named. **The conclusion survives** (no credentials anywhere; `jjgh8` already appears in 38 files on `main` since batch-01, so this batch changes nothing about exposure) but the *rationale* was incomplete and is corrected here rather than left standing. Worth a deliberate ruling on whether `.dev-flow/` artifacts should carry host paths at all, given the repo's visibility.
+  - **▸ (P1, USER STORY, new — batch-64 §7.12) MEASURE WHETHER C-40 AND C-42 ACTUALLY FIRE, or admit they are paragraphs.**
+    *As the operator, I want evidence that C-40 and C-42 change behaviour in a subsequent batch, so that
+    I know we encoded a control and not a paragraph.* **Why this is not rhetorical:** C-40 was measured at
+    **9/9** discrimination and **0/5** false positives — but against a **laboratory corpus** assembled from
+    batch-63's documented failures. Nobody has measured whether it fires **in the wild**. That gap is this
+    batch's own thesis applied one level up: we asked *"is the control correct?"* and never asked *"can it
+    go RED on a live batch?"*
+    **Acceptance (black-box, and it can fail):** over the next **N=3** batches, count acceptances that were
+    **rejected or rewritten while explicitly citing C-40 or C-42**, taken from the gate artifacts rather than
+    from memory. **If the count is 0, the control is inert regardless of its 9/9** — and the finding is that
+    encoding it changed nothing, which is worth knowing and is currently unknowable. Report the count with
+    its citations either way; a non-zero count also tells us WHICH limb does the work in practice.
+    **Deliberately not a presence check** — "the text is in the file" is precisely what C-40 forbids.
+  - **▸ (P3, new — batch-64 §7.13) the occurrence→clause mapping behind `AT-B64-04` is HAND-AUTHORED, not derived from the rule.**
+    The measurer wrote which rider clause carries which occurrence, then measured mutations against that
+    hand-made map. **That is C-40's own limb 2 violated inside the measurement that certified C-40** — a set
+    drawn from the implementation rather than from the rule. It does not invalidate the 9/9 (the mutations
+    did bite, on disjoint occurrence sets) but the *set they range over* is an unproven spec claim, exactly
+    what C-31 exists to catch. Fix: derive the mapping from the rider's clause text, or guard it with a
+    completeness assertion.
+  - **▸ (P3, new — batch-64 §7.14) `AT-B64-04` occurrence #2 has NO executed reddening mutation.**
+    The union of all lost-sets is `{1,3,4,5,6,7,8,9}`; occurrence #2's carriers are `B + I`, deleting `B`
+    alone returns 9/9, and clause `I` was never deleted. Stated as a gap in the shipped artifacts rather
+    than hidden, but never closed. One more mutation closes it.
 
 ## MAJOR — there is no AT/TC registry
 

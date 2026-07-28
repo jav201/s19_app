@@ -60,6 +60,13 @@
 
 ## P3 — code carries / hygiene (fold opportunistically into a themed fast-flow)
 
+  - **▸ (P3, new — batch-64 §7.15) `prototypes/out/` is untracked AND not gitignored.**
+    The five prototype SOURCES were committed in PR #147 after a backup audit found them versioned nowhere;
+    `prototypes/out/` (32 generated SVGs, ~4 MB) was deliberately excluded as derived. It now sits untracked
+    and unignored forever, so it clutters every `git status` and is one careless `git add -A` away from
+    landing. One `.gitignore` line closes it. **Also here:** the batch-65 branch still carries
+    `tests/goldens/batch64/` under the old batch number — renaming it would break that batch's tests, so it
+    is that batch's call, not this backlog's.
   - **▸ (P2, new — batch-64 §7.1) FOUR vacuous predicates live on `main`, one carry.** `V-6`/`AT-172b` (`tests/test_report_document_bytes.py:208-221`) — on the merge-gate platform **BOTH** clauses are inert, not only the named one, and `REQUIREMENTS.md:4849` cites `AT-172` as covering **R-TUI-097**, so the requirement record carries a **false coverage claim**; `V-7` (`tests/test_flow_report_service.py:496`), the same round-trip tautology one line above the sound `:497`; `S-6`'s second assert (`tests/test_report_document_bytes.py:266`), dead by entailment behind a docstring (`:250-252`) whose stated justification is measurably false. **Fix shape for all: compare the file against an INDEPENDENTLY COMPOSED document, not against its own decode.** batch-64 was forbidden to touch `tests/` (D-5).
   - **▸ (P2, new — batch-64 §7.2) a FALSE COUNTERFACTUAL in batch-63's VALIDATION RECORD.** `.dev-flow/2026-07-26-batch-63/04-validation-rescoped.md:34` records a pre-fix **RED** for an observable measured **GREEN** in all four cells; the adjacent rows qualify where the authors knew, these two carry no qualifier. Squarely inside C-40's *"any measurement probe whose number a gate is keyed on"* — **and the gate layer had never been audited by any lane.**
   - **▸ (P2) RR-1 — reader extensions out of the modelled grammar.** `:x:`, `$…$` math and `==highlight==` are inert under `markdown-it` `gfm-like` and live on GitHub / VS Code / Obsidian, so a filename containing `:x:` can put a red ❌ beside a PASSED row while every token stays `text`. Escape-set extension **declined** (D-22 — `:` appears in every address-bearing string); declared out-of-model and written into R-TUI-077 instead.
