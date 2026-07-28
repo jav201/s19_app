@@ -1,6 +1,6 @@
 # Quick Spec — s19_app · batch-68 · N5: before/after + diff reports off the UI thread
 
-- **Status:** open
+- **Status:** closed 2026-07-28 — AC-1..AC-5 met; AC-6 delegated to `tui-ci` on the branch
 - **Date:** 2026-07-28
 - **Branch:** `claude/batch-68-report-worker` (base `488bf5d` = `origin/main` tip; RC-1 PASS, merge-base == tip)
 - **Flow mode:** autonomous + self-merge (operator-granted THIS batch at kickoff; per-batch only, never carried)
