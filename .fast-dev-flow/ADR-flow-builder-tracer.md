@@ -163,3 +163,30 @@ A change document (`s19app-changeset` v2.0 JSON) is a first-class PATCH input fr
 **Discoverability difference (NOT closed here, and deliberately so).** The Patch Editor offers a *picker*; the Flow Builder requires typing the filename into a free-text box that is shared by all four ref-taking block kinds (`image_ref` / `change_doc_ref` / `check_doc_ref` / `config_ref`). Turning that box into a per-kind picker is a UI design change, not a capability gap, and it would have to stay correct for all four kinds. Recorded as a backlog item rather than smuggled into a convergence batch. batch-67 did paste-enable the box (`OsClipboardInput`), so a copied path can at least be pasted.
 
 **Acceptance:** `tests/test_patch_dual_entry.py` — byte-identical emitted image from both paths (the oracle is the written `.s19`, not the summary object), a positive control proving the patch is not a no-op, the shared-engine identity check, and the asymmetry pin.
+
+---
+
+## 12. FB-P2 — multi-image runs + report fusion (batch-69 DESIGN; implementation pending)
+
+**Status:** decisions RESOLVED 2026-07-28, no code. Full rationale + acceptance criteria in `.fast-dev-flow/spec.md` (batch-69). This section records the durable architectural commitments so the implementation batch inherits decisions, not questions.
+
+**The dimension already exists.** `variant_execution_service.py` ships `ProjectManifest`, `plan_variant_executions` and `_execute_one_variant`; `flow_execution_service` already imports `_resolve_manifest_entry` from it, and marks the single-variant assumption explicitly by passing `variant_id=None`. FB-P2 threads an existing dimension rather than inventing one.
+
+| # | Decision |
+|---|---|
+| D-1 | The image set is the project's **variant set** (`plan_variant_executions`), never a path list in `flow.json` — a list would let a flow name images outside the project and would fork the containment seam. |
+| D-2 | `SourceBlock.image_ref` is **overridden per variant at run time**; the flow file is unchanged. A flow is a reusable recipe; binding it to N images is a property of the run. |
+| D-3 | **Per-variant isolation** — one variant's abort does not abort the run. A fused report missing 4 of 5 images because the first failed defeats the purpose. |
+| D-4 | **One fused report**, per-variant sections, no per-variant files. N files re-create the manual collation this feature removes. |
+| D-5 | Fused status = **worst across variants**, *plus* explicit `n_ok / n_issues / n_error`. A rollup that cannot be inverted into per-variant outcomes is a summary that lies by omission. |
+| D-6 | Variant identity is `variant_id`, file-derived, therefore escaped through the batch-62 `md_safe` path. No new escaping mode. |
+| **D-7** | **The fused report is bounded BY CONSTRUCTION, per variant, in the PRODUCER.** |
+| D-8 | No new viewer — write through `write_flow_report` so `REPORT_FILENAME_REGEX` and `ReportViewerScreen` pick it up unchanged (the FB-P1b reuse). |
+
+**D-7 is the one that must not be negotiated away.** This project has spent three batches (62, 63, 65) on unbounded report producers, and batch-63 measured `O(V×E)` traversal that exhausted the operator's machine. Fusion multiplies row cardinality by the variant count, so an unbounded fused report is a known failure being re-committed rather than discovered. Three constraints follow, each inherited from a measured finding rather than from caution:
+
+- **Per-variant caps**, so one pathological variant cannot evict the others' content — batch-63 D1's *class-selective eviction* finding applied to the variant axis.
+- **Charged in the producer, not the writer** — batch-63's Phase-2 result was precisely that *bounding output does not bound traversal*, and that the only falsifiable oracle is an injected counting iterable, since peak memory and wall time cannot distinguish cap-and-continue from cap-and-break.
+- **Name what was cut** (variant, section, dropped count). A silent truncation in an evidentiary document reads as "covered everything".
+
+**Security constraint carried into implementation:** every per-variant image ref resolves through the **reused** `_resolve_manifest_entry` — never a fork. Multi-image multiplies the number of resolutions per run, so a fork would multiply the escape surface. D-3 must not become a containment bypass: a variant whose ref fails containment fails *that variant* closed while the others continue, and the reject-arm census (`REJECTING_CODES`) must cover the variant path.
