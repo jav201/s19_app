@@ -5006,7 +5006,7 @@ states how many further distinct variants were affected, not which: `affected = 
   `.dev-flow/BACKLOG-CODE.md` item before this batch (batch-63 F2 / OB-4) and is untouched. The
   remaining six are **stated here and OWED to `BACKLOG-CODE.md`** as this batch's mandatory Lane-A
   close step; until that reconciliation lands they are recorded in this entry and in
-  `01-requirements.md` §10, and nowhere else: (c) the uncapped region cardinality `R` — a
+  `01-requirements.md` §10,: (c) the uncapped region cardinality `R` — a
   `MAX_DECLARED_REGIONS` mirroring `REPORT_MAX_REGIONS_PER_VARIANT = 128` would bound it; (e) the
   relocated `O(R)` attribution walk (`500 → 128000`), which capping `R` bounds in the same change;
   the addendum's notice not reaching the `## Truncation appendix` (three `> TRUNCATED:` emitters, two

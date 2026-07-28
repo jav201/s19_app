@@ -9,7 +9,7 @@
 > exist to stop, committed 46 times in one specification.**
 
 **Shipped:** D1 — `R-TUI-098` / `HLR-103` / `LLR-103.1…6`. `_addendum_lines` bounded.
-**Branch:** `claude/batch-65-addendum-producer-bound`, `082ada9` → `9d21d9a` (5 commits).
+**Branch:** `claude/batch-65-addendum-producer-bound`, `082ada9` → `9d21d9a` (on the pre-migration backup `claude/batch-64-addendum-producer-bound`; not reachable from the shipping branch) (5 commits).
 **Scope:** D1 only. **Zero drift.** OB-4/F4 and D2 held as carries, as chartered.
 
 ---
@@ -298,8 +298,8 @@ claim is not the same skill as applying a correction to its whole class.
 | Iterations | P0 ×0 · **P1 ×2** · **P2 ×2** (gate + re-gate) · P3 ×0 send-backs · P4 ×0 |
 | Independent reviews | **6** at Phase 2 (3 lanes × 2 rounds) + **2** increment code reviews + **1** Phase 4 |
 | Findings raised | **61** = 46 at Phase 2 (27 gate + 19 re-gate) · 11 at increment gates · 4 at Phase 4 |
-| Findings closed | 46/46 dispositioned, verified independently of the folder (27/27, then 19/19) · 9 of 11 folded in-increment, 2 carried and closed at Inc-3 · Phase 4: 3 folded, 1 carried |
-| Findings carried out | **F-4** + **F-3** + 3 non-gating gaps (G-1/G-2/G-3) — all now in Lane A. **Corrected at the merge gate:** this row previously read "3 folded, 1 carried" for Phase 4 and omitted F-3 entirely; the true tally is 2 folded + 1 carried + 1 that vanished *because* of the miscount, and the G-items were claimed to be in Lane A while being in neither backlog file. |
+| Findings closed | 46/46 dispositioned, verified independently of the folder (27/27, then 19/19) · 9 of 11 folded in-increment, 2 carried and closed at Inc-3 · Phase 4: 2 folded, 1 carried, 1 undispositioned (corrected at the merge gate) |
+| Findings carried out | **F-4** + **F-3** + 3 non-gating gaps (G-1/G-2/G-3) — all now in Lane A. **Corrected at the merge gate:** the metrics row above previously read "3 folded, 1 carried" for Phase 4 and omitted F-3 entirely; the true tally is 2 folded + 1 carried + 1 that vanished *because* of the miscount, and the G-items were claimed to be in Lane A while being in neither backlog file. |
 | Blockers | 5 at gate 1 · 1 + 4 blocking majors at re-gate · **0 HIGH at any increment gate** · 0 at Phase 4 |
 | Design objections to the shape | **0** (4 to named sub-components, all dispositioned in writing) |
 | Spec amendments | **46** — A-1…9 (rev 1) · A-10…27 (rev 2) · A-28…40 (rev 3) · A-41…46 (Phase 3) |

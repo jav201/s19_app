@@ -13,7 +13,7 @@ the migration is proven lossless and non-mutating by blob-SHA equality. All thre
 blocks are on the batch's own record-keeping, and all three are one-pass edits to
 `.dev-flow/BACKLOG-CODE.md`, `05-postmortem.md` and the artifact headings.
 
-- **HIGH-1** — the 64 → 65 renumber rewrote paths but not identity; `batch-65` now
+- **HIGH-1** — the 64 → 65 renumber rewrote paths but not identity; `batch-64` now
   resolves to a different, already-merged batch.
 - **HIGH-2** — `05-postmortem.md:302` claims `G-1/G-2/G-3` are *"all now in Lane A"*.
   They are in **neither** backlog file. A carry asserted as landed that did not land.
@@ -51,7 +51,7 @@ The operator's four questions, answered by execution.
 **(a) Does the batch-65 folder hold the complete artifact set? — YES, provably.**
 
 ```bash
-diff <(git ls-tree -r --name-only 98b5b7a .dev-flow/2026-07-27-batch-65/ | sed 's|.*batch-65/||' | sort) \
+diff <(git ls-tree -r --name-only 98b5b7a .dev-flow/2026-07-27-batch-64/ | sed 's|.*batch-64/||' | sort) \
      <(git ls-tree -r --name-only HEAD     .dev-flow/2026-07-28-batch-65/ | sed 's|.*batch-65/||' | sort)
 # → IDENTICAL ARTIFACT SET
 ```
@@ -65,7 +65,7 @@ lines:
 
 ```bash
 for f in $(git ls-tree -r --name-only HEAD .dev-flow/2026-07-28-batch-65/ | sed 's|.*batch-65/||'); do
-  diff <(git show 98b5b7a:.dev-flow/2026-07-27-batch-65/$f) <(git show HEAD:.dev-flow/2026-07-28-batch-65/$f) \
+  diff <(git show 98b5b7a:.dev-flow/2026-07-27-batch-64/$f) <(git show HEAD:.dev-flow/2026-07-28-batch-64/$f) \
   | grep "^[<>]" | grep -v "2026-07-2[78]-batch-6[45]"
 done
 # → no output: every artifact change is a batch-path rewrite and nothing else
@@ -98,7 +98,7 @@ unchanged context. Zero conflict markers anywhere in the diff.
 **(c) Did anything land in the OTHER batch's folder? — NO.**
 
 ```bash
-git diff origin/main...HEAD --stat -- .dev-flow/2026-07-27-batch-65/   # → empty
+git diff origin/main...HEAD --stat -- .dev-flow/2026-07-27-batch-64/   # → empty
 ```
 
 Nine filenames exist in both folders with **different** content — which is the
@@ -114,44 +114,45 @@ Path references were rewritten correctly and completely. **Identity references w
 not rewritten at all.**
 
 ```bash
-grep -rn "2026-07-27-batch-65" --include="*.md" --include="*.py" --include="*.json" . \
-  | grep -v "^./.dev-flow/2026-07-27-batch-65/"
-# → 2 hits, BOTH correct (they refer to the genuine merged batch-65)
-grep -rc "batch-65" .dev-flow/2026-07-28-batch-65/ | grep -v ":0$"
+grep -rn "2026-07-27-batch-64" --include="*.md" --include="*.py" --include="*.json" . \
+  | grep -v "^./.dev-flow/2026-07-27-batch-64/"
+# → 2 hits, BOTH correct (they refer to the genuine merged batch-64)
+grep -rc "batch-64" .dev-flow/2026-07-28-batch-64/ | grep -v ":0$"
 # → 69 occurrences across 19 files
-grep -rn "^# " .dev-flow/2026-07-28-batch-65/ | grep -c "batch-65"    # → 17 of 29 H1s
+grep -rn "^# " .dev-flow/2026-07-28-batch-64/ | grep -c "batch-64"    # → 17 of 29 H1s
 ```
 
 ---
 
 ## 3. Findings by severity
 
-### HIGH-1 — the renumber rewrote paths but not identity, and `batch-65` now resolves to a different merged batch
+### HIGH-1 — the renumber rewrote paths but not identity, and `batch-64` now resolves to a different merged batch
 
-`.dev-flow/2026-07-27-batch-65/` is occupied by the process lane's batch, merged as
-#144/#145/#146. Every surviving `batch-65` string in this batch therefore points a
+`.dev-flow/2026-07-27-batch-64/` is occupied by the process lane's batch, merged as
+#144/#145/#146. Every surviving `batch-64` string in this batch therefore points a
 reader at someone else's work.
 
-- **17 of 29 H1 headings** in `.dev-flow/2026-07-28-batch-65/` still read `batch-65`,
+- **17 of 29 H1 headings** in `.dev-flow/2026-07-28-batch-64/` still read `batch-64`,
   including `05-postmortem.md:1`, `04-validation.md:1`, `06-docs/executive-summary.md:1`,
   `06-docs/traceability-matrix.md:1`, `06-docs/diagrams/architecture.md:1`.
-- **`PLAN.md` in both folders carries the byte-identical H1** `# batch-65 — PLAN (living
+- **`PLAN.md` in both folders carries the byte-identical H1** `# batch-64 — PLAN (living
   compendium)` over different content. `05-postmortem.md` and `04-validation.md` are the
   same shape. The renumber disambiguated the directory and left the documents colliding —
   the same failure one level down. `/dev-flow-sync` folders by `batch_id` (correct), but
-  Obsidian search and `[[wikilink]]` resolution key on titles, and batch-65 is already
+  Obsidian search and `[[wikilink]]` resolution key on titles, and batch-64 is already
   in the vault (#146).
 - **`REQUIREMENTS.md` contradicts itself inside the shipped requirement.** `:4873`
-  `## Bounded declared-region addendum — batch-65 (R-TUI-098)` vs `:5002`
+  `## Bounded declared-region addendum — batch-64 (R-TUI-098)` vs `:5002`
   `Status: Added in batch 2026-07-28-batch-65`. The migration touched the second and not
   the first, so a reader cannot tell which is authoritative.
 - **`.dev-flow/BACKLOG-CODE.md` — the file the next batch reads at Phase 0 — misroutes.**
-  `:5` *"Last refresh: 2026-07-27 (batch-65 close) … batch-65 ships on
-  `claude/batch-65-addendum-producer-bound`"* — that branch is the **backup** of
+  `:5` *"Last refresh: 2026-07-27 (batch-64 close) … batch-64 ships on
+  `claude/batch-64-addendum-producer-bound`"* — that branch is the **backup** of
   pre-migration history per `state.json:233`, not the shipping branch. `:18` *"DONE,
-  batch-65"*. `:35` *"(P2, batch-65 Phase-4 F-4)"*. `:37` *"New defects found in passing
-  at batch-65"*. `origin/main`'s copy of this file contains **zero** `batch-65` strings,
-  so all 13 are this batch mislabelling itself.
+  batch-64"*. `:35` *"(P2, batch-64 Phase-4 F-4)"*. `:37` *"New defects found in passing
+  at batch-64"*. the only **four** `batch-64` strings in `origin/main`'s copy are the other batch's `§7.x`
+  bullets, so the other **nine** are this batch mislabelling itself. *(Corrected at the re-gate:
+  this row originally read "zero"; the true split at `7dfb82c` is 13 = 4 theirs + 9 mine.)*
 
 **Not in scope of this finding, and correctly left alone:** the stable id namespace —
 `US-B64-1/2`, `AT-194…203`, `TC-480…499`, `HLR-103`, `LLR-103.x`, and the golden path
@@ -228,7 +229,7 @@ revisions removing, and §17 exists to make exactly this impossible.
 
 ### MEDIUM-1 — the Phase-5 record cites a HEAD that is not on the shipping branch
 
-`05-postmortem.md:12`: *"**Branch:** `claude/batch-65-addendum-producer-bound`,
+`05-postmortem.md:12`: *"**Branch:** `claude/batch-64-addendum-producer-bound`,
 `082ada9` → `9d21d9a` (5 commits)."*
 
 ```bash
@@ -242,7 +243,7 @@ is being merged.
 
 ### MEDIUM-2 — `04-validation.md:13` self-contradicts on a single line
 
-> `- **Batch:** \`2026-07-28-batch-65\` · **Branch:** \`claude/batch-65-addendum-producer-bound\``
+> `- **Batch:** \`2026-07-28-batch-64\` · **Branch:** \`claude/batch-64-addendum-producer-bound\``
 
 New number, retired branch, one line apart.
 
@@ -305,8 +306,8 @@ non-claim contract in row 5, and `TC-497` does not grep it. But it is inside the
   persisted as artifacts"* — filed as process item 9 (`:437`). Recorded so the next
   reader does not go looking in the increment files.
 - **LOW-1** — `state.json` at HEAD drops `origin/main`'s `merged` key
-  (`{"pr":144,"squash_sha":"71126c9",…}`), and `.dev-flow/2026-07-27-batch-65/` has no
-  `state-at-close.json`. batch-65's close state survives only in git history
+  (`{"pr":144,"squash_sha":"71126c9",…}`), and `.dev-flow/2026-07-27-batch-64/` has no
+  `state-at-close.json`. batch-64's close state survives only in git history
   (`git show origin/main:.dev-flow/state.json`). That is the other lane's omission, but
   this batch is the one overwriting the shared file — and it *did* archive batch-63's.
 - **LOW-2** — `TC-497`'s window is `anchor → EOF` (`:2849`). Exact today because
@@ -384,3 +385,8 @@ RC-1; the branch is 1 commit behind on `prototypes/` only, zero overlap).
 Everything else on this page is green and stays green — rows 1, 1b, 2, 3, 4b, 5 and 6,
 plus lint, Layer B, template hygiene and blast radius. Once the three edits land this
 is a **MERGE**.
+
+
+---
+
+> **Correction applied 2026-07-28 after the re-gate.** The orchestrator's fix for HIGH-1 was a blanket `batch-64` -> `batch-65` pass over 20 artifact files. Its stated rationale — *my artifacts predate the collision, so every mention is a self-reference* — held for 19 of them (66/66 substitutions verified correct, line by line, by the re-gate). It did **not** hold for THIS file, which was written *after* the collision and is *about* it, so `batch-64` here meant the OTHER batch on nearly every line. Twenty-four lines have been restored and six references to the never-existent `.dev-flow/2026-07-27-batch-65/` cleared. **The rationale was never verified before it was acted on — which is the same defect class this batch spent two gates removing, committed while closing that batch's own findings.**

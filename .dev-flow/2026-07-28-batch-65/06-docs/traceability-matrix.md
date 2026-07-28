@@ -7,7 +7,7 @@
 (`s19_app/tui/services/report_service.py::_addendum_lines`). OB-4 / F4 (the two unbounded report
 tables), D2, OB-3 and OB-2 were held as carries and are **not** part of this batch's coverage.
 
-**Branch** `claude/batch-65-addendum-producer-bound` · **base** `082ada9` · **HEAD** `ba5f09a`.
+**Branch** `claude/batch-65-addendum-producer-bound` · **base** `082ada9` · **HEAD** `ba5f09a` (on the pre-migration backup `claude/batch-64-addendum-producer-bound`; not reachable from the shipping branch).
 **Source of this mapping:** `REQUIREMENTS.md` §`R-TUI-098` (the shipped entry) and
 `.dev-flow/2026-07-28-batch-65/04-validation.md` §1–§3. Nothing below is re-derived from memory.
 
