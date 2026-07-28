@@ -15,6 +15,8 @@
 > ⚠️ **Recorded batch-70:** the 5 development commits are **not reachable from `origin/main` and never will be** — PR #149 was squash-merged into the single commit `b691f21`. `082ada9` (the base) is reachable; `9d21d9a` is not.
 **Scope:** D1 only. **Zero drift.** OB-4/F4 and D2 held as carries, as chartered.
 
+> ℹ️ **The old batch number is retained DELIBERATELY in two places — do not "correct" them.** `US-B64-1` / `US-B64-2` and `tests/goldens/batch64/` keep the pre-renumbering `64`: the story ids are baked into passing tests, and the golden directory name is baked into the byte-identity oracle. Renaming either would churn a green suite and a double-proven golden to fix a label. *(Merge-gate corrective item 3, discharged batch-70.)*
+
 ---
 
 ## 1. The "instrument, not product" frame — verdict
