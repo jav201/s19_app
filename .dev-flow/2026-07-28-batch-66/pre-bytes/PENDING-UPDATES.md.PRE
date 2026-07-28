@@ -1,0 +1,129 @@
+# Textual course — PENDING UPDATES
+
+> **Status: NOT STARTED. Nothing here has been written into the course.** This is a queue, not a
+> changelog. Read it before the next course-update pass; delete an item only when the module actually
+> carries the content.
+>
+> **Language note:** written in English to match `00-syllabus.md`, the artifact it extends.
+> **Origin:** s19_app dev-flow batch-63 (2026-07-27). Operator ruling: decompose the "assert against
+> the emitted encoding" lesson across four destinations; this file is the course leg.
+> **Cross-reference:** the s19_app repo's `.dev-flow/BACKLOG.md` carries the other three legs (global
+> `/dev-flow` command, project `docs/engineering-rules.md`, `tui-design` skill) and points here.
+
+---
+
+## Why these items exist
+
+A production batch on s19_app produced **five acceptance criteria that verified nothing** — for a
+single defect, and three of them were written *after* the batch had already identified vacuity as its
+own theme. Every one of them was *correct*: valid arithmetic, complete input set, measured threshold.
+They failed for a reason none of the existing engineering controls reach.
+
+Two distinct lessons came out of it. Both are teachable, both belong in this course, and both are
+currently absent from it.
+
+**Lesson A — "can it go RED?" is a different question from "is it correct?"**
+A predicate can be correct and still not mention the thing under test. The five failures all related
+two pure functions of the same input while the component actually being fixed — the file writer —
+never appeared in the expression at all. No amount of mutating the *code* or the *input set* reddens
+a predicate that does not reference the subject.
+
+**Lesson B — assert against the form the producer EMITS, not the form a human reads.**
+Terminal and markup output has a source-form ≠ rendered-form gap. The rendered form is the one the
+author sees, and therefore the one the author reaches for — which is exactly why this keeps recurring
+(~9 occurrences across three batches of the origin project).
+
+---
+
+## M13 — Testing with Pilot  ·  PRIMARY HOME  ·  effort: medium
+
+**Why here:** M13 is already `[G]` (gap-fill) and already declares the s19_app test suite as its
+anchor, so concrete project examples are legitimate in this module. (They are explicitly *not*
+legitimate in the `tui-design` skill leg, which must carry general knowledge only — see
+Cross-references.)
+
+**The gap, stated precisely.** M13's current *Pitfalls* are **entirely about timing**:
+
+> missing `await pilot.pause()` (races); asserting before a worker finishes
+
+Those are tests that **fail flakily**. The module contains **nothing about tests that pass wrongly** —
+the more dangerous failure, because a flaky test announces itself and a vacuous one does not.
+
+**Add: a second pitfalls block, "assertions that cannot fail."** Four items:
+
+1. **Assert the emitted form, not the rendered one.** A Textual SVG snapshot emits `&#160;` entities
+   for spaces, so a literal substring search for a visible label returns **0 matches** while the label
+   is plainly there on screen. The predicate was wrong; the artifact was fine.
+2. **Colour lives in `render().spans`, not in the rendered string.** Searching the string for a colour
+   name or an ANSI code tests the wrong layer.
+3. **The mutation loop, with the step people skip.** Inject the falsehood → confirm RED → **verify the
+   mutation actually applied** (a typo'd mutation also "fails", for the wrong reason) → restore.
+4. **"Can it go RED?" as its own gate question.** Distinct from "is it correct?" — the assertion must
+   *reference the subject under test*. Worked example: two predicates that disagree about which is
+   arithmetically valid, where neither can fail because neither mentions the component being fixed.
+
+**Extend the existing exercise.** M13 currently ends with *"write a Pilot test for the M12
+progress/cancel flow"*. Add a second half: **mutate that test to prove it can fail** — break the
+cancel path, confirm RED, verify the break applied, restore. This turns the exercise from
+"write a test" into "write a test you have evidence about", which is the whole point.
+
+---
+
+## M14 — Architecture deep-dive  ·  the WHY  ·  effort: one paragraph
+
+M14 is already flagged `[G: compositor/driver]`. **The compositor is literally where source form
+becomes rendered form.** One paragraph there makes M13's rule *follow from the architecture* instead
+of landing as testing folklore: you assert on the emitted form because the compositor is a
+transformation, and a test that reads the far side of a transformation is testing the transformation,
+not your code.
+
+Do not expand this into a module. One paragraph, placed where the compositor is introduced.
+
+---
+
+## M17 — Images & pixel canvas  ·  CHECK FIRST  ·  effort: unknown
+
+A "pixel" in a terminal canvas is an emitted glyph plus colour codes — the same source ≠ rendered gap,
+in the module where it is most concrete. **This may already be covered by the existing density
+material. Read `M17-images-canvas.html` before writing anything.** Listed so it is not forgotten, not
+because a gap has been confirmed.
+
+---
+
+## ⚠ Structural gap — decide separately from the content above
+
+`verify_m*.js` harnesses exist for **M0–M6** and **M15–M20**. They do **not** exist for **M7–M14**:
+
+```
+present : m0 m1 m2 m3 m4 m5 m6 · m15 m16 m17 m18 m19 m20
+missing : m7 m8 m9 m10 m11 m12 m13 m14
+```
+
+Eight middle modules with no verification harness — **including M13, the testing module itself.** So
+the module that will teach *"prove your assertion can fail"* is one of the eight that has no
+mechanism proving its own content holds.
+
+**This is flagged, not planned.** Backfilling eight harnesses is a different-sized job than the
+content additions above, and whether it is worth doing is a separate call. It is recorded here
+because the irony makes it easy to notice now and easy to forget later.
+
+---
+
+## Cross-references — what goes WHERE
+
+The same lesson was deliberately split across four destinations. Keeping the boundary is the point;
+collapsing it is how project trivia ends up in general teaching material.
+
+| destination | carries | constraint |
+|---|---|---|
+| Global `/dev-flow` command | the portable principle: assert against what the producer emits; every acceptance names and **executes** the mutation that reddens it | stack-free |
+| Project `docs/engineering-rules.md` (s19_app) | markdown-it token types, entity spoofing, escaped-form ≠ character, code-span headings, AST-over-regex | project-bound; stays there |
+| Skill `tui-design` → `VERIFY.md` | extends the existing `## Pin the truth, not a string` section | **general only** — must hold for ANY Textual/terminal project; examples de-identified |
+| **This course (M13/M14/M17)** | the teaching version of both lessons, with worked examples | **may use s19_app examples in M13, which already declares it as anchor** |
+
+**Note on the skill leg, worth knowing while writing M13.** `VERIFY.md` already says *"assert on a
+runtime value, never on the presence of a label."* That rule is **necessary but not sufficient**, and
+this batch produced the counterexample: a substring search over SVG source **is** a runtime value, it
+satisfies the existing rule completely, and it returned 0/19 against a correct implementation. If M13
+teaches only "assert on runtime values", it inherits the same hole. The teachable step is one level
+deeper: *pin the truth in the form the producer emits it.*
