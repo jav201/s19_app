@@ -2,8 +2,8 @@
 
 **BLUF: every story is covered by an executed black-box acceptance keyed to the bytes that shipped;
 Layer A exists after being wrongly declared N/A by three parties and refuted by execution; the one
-acceptance that had never run (`AT-B64-04`) now measures 9/9 with three mutations biting disjoint
-clause sets. No gap blocks the merge. Two findings are carried, both with their numbers.**
+acceptance that had never run (`AT-B64-04`) now measures 9/9 with FOUR mutations biting on disjoint
+**occurrence** sets (the *clause* sets overlap), with occurrence #2 unmutated — a gap stated, not hidden. No gap blocks the merge. Two findings are carried, both with their numbers.**
 
 Evidence sources, all executed by parties other than the spec's author:
 `01c-arms-measurement.md` · `02c-discharge-audit.md` · `04-measurement-frozen.md` ·
@@ -33,7 +33,7 @@ Every figure names the block hash it was measured against, per `§3.0`'s normati
 | **AT-B64-01** | C-40 flags the known-vacuous corpus | **9/9 CI-domain · 8/9 full-domain** (block `5cb146e9…`) | delete limb 2 → **4/6** on the earlier corpus, losing exactly the P-6/P-7 members; anchor corruption → 6/9 → **2/9** |
 | **AT-B64-02** | C-40 does **not** flag sound predicates | **1/6 CI-normative · 0/6 full · 0/5 reclassified** | key limb 1 on "the writer" instead of the declared subject → **1/6 false positives** |
 | **AT-B64-03** | C-40 catches what C-10/C-31/C-39 do not | **confirmed** — `V-6` is invariant under code mutation, has no set to derive, and carries no threshold | — |
-| **AT-B64-04** | the C-35 rider's clauses are independently load-bearing | **9/9** (block `4b4e3bad…`) | three mutations on **disjoint** sets: 6/9, 7/9, 7/9, 8/9; all-needle corruption → **0/9** |
+| **AT-B64-04** | the C-35 rider's clauses are independently load-bearing | **9/9** (block `4b4e3bad…`) | **four** mutations on disjoint **occurrence** sets: `{D}`→6/9, `{B,G,H}`→7/9, `{C,F}`→7/9, `{A,C}`→8/9; all-needle corruption → **0/9**. Clause sets overlap (`{C,F}∩{A,C}={C}`); occurrence #2 has **no** executed reddening mutation |
 | **AT-B64-05** | rider's normative body is stack-free | **0/17 terms**, GREEN | inject `Textual` → RED; non-emptiness guard holds |
 | **AT-B64-06/07** | C-42 names five mechanics; boundary complement holds | **confirmed**, five mechanics across six bullets (split declared) | — |
 | **AT-B64-08** | `VERIFY.md` extension is de-identified | **0/12 terms**, GREEN, re-verified **post-paste on the live file** | two reddening mutations bite |
@@ -103,8 +103,12 @@ Ledger `post = 2201 − 0 + 0 = 2201`, as ruled by **D-5** (this batch adds noth
    they collide from `D-10`. Renaming mid-batch would break more citations than it fixes. Carried —
    same disease as `OB-2`.
 3. **Line-ending translation**, introduced by the orchestrator at the review-fold step and recorded in
-   `03-out-of-vcs-evidence.md §5b`. Content verified unaffected by `git diff --stat` (24 insertions,
-   3 deletions — not a whole-file rewrite). The uniform-CRLF end state is kept deliberately.
+   `03-out-of-vcs-evidence.md §5b`. ⚠ **The proof originally offered for it was VOID and is withdrawn:**
+   `git diff --stat` cannot show CRLF damage when `core.autocrlf=true` (measured: it is), so that
+   evidence *could not have failed* — this batch's own defect class, committed while documenting this
+   batch's own defect class. The conclusion survives on other evidence: the merge-gate reviewers
+   verified it independently two further ways (LF-normalised diffs `+2/-1`, `+20/-0`, `+7/-0`, `+12/-0`;
+   `.gitattributes` pins nothing in scope). The uniform-CRLF end state is kept deliberately.
 4. **Four vacuous predicates live on `main`** (`V-6`/`V-7` and two others) — **carry, not fix**, since
    D-5 forbids touching `tests/`. They are in `BACKLOG.md §7.1`.
 

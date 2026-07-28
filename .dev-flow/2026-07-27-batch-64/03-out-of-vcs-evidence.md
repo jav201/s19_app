@@ -87,8 +87,7 @@ The arm figures in `04-measurement-frozen.md` were measured against the frozen b
 now present in its destination **as an exact substring of the same bytes**, so those results transfer
 by identity rather than needing a re-run:
 
-- `AT-B64-04` **9/9** against block 2, three mutations biting **disjoint** clause sets (6/9, 7/9, 7/9,
-  8/9); all-needle corruption → 0/9. `arch BLOCKER-1` closed.
+- `AT-B64-04` **9/9** against block 2, **four** mutations biting on disjoint **occurrence** sets (`{D}`→6/9, `{B,G,H}`→7/9, `{C,F}`→7/9, `{A,C}`→8/9 — the *clause* sets are NOT disjoint, `{C,F} ∩ {A,C} = {C}`); all-needle corruption → 0/9. **Gap stated: occurrence #2 has no executed reddening mutation** — its carriers are `B + I`, deleting `B` alone returns 9/9, and `I` was never deleted. `arch BLOCKER-1` closed.
 - `AT-B64-01` **9/9 CI-domain · 8/9 full-domain**; `AT-B64-02` **1/6 CI-normative · 0/6 full · 0/5
   reclassified** — always reported with its domain named, because the domain is what makes it correct.
 - `AT-B64-05` 0/17 · `AT-B64-08` 0/12 (re-verified post-paste on the live file) · `AT-B64-10` 32 ids

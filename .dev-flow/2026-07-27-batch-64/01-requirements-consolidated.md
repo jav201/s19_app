@@ -1133,8 +1133,12 @@ fold (§4.3). `SKILL.md` was read by the QA reviewer: **no overlap** (A-30). The
 1. ~~**D-9 was ruled at 2.07×; the block is now 2.56×**~~ — **CLOSED by `D-10`** (§9.1, A-39). Every
    byte of the growth was review-mandated and decomposed, and the operator re-affirmed knowingly at the
    new figure on `02b`'s evidence. This was the last open item that could change shipped text.
-1a. **`arch BLOCKER-1` is RE-OPENED: `AT-B64-04` has still never been executed against the bytes that
-   ship** (A-31/A-40, audit §3.4 **FINDING B**). Its fold-2 discharge measured the superseded 890 B
+1a. **✅ DISCHARGED 2026-07-28 by the measurement pass — the text below is the fold-3 state, kept for
+   lineage.** `AT-B64-04` was executed against the frozen shipping block (`4b4e3bad…`): **9/9**, four
+   mutations biting on disjoint *occurrence* sets, all-needle corruption → 0/9. The merge-gate qa pass
+   independently re-verified the discharge. Residual gap recorded rather than buried: occurrence #2 has
+   **no** executed reddening mutation. — *(superseded text follows)* ~~**`arch BLOCKER-1` is RE-OPENED:
+   `AT-B64-04` has still never been executed against the bytes that ship**~~ (A-31/A-40, audit §3.4 **FINDING B**). Its fold-2 discharge measured the superseded 890 B
    rider body, and one of its two published mutations is **impossible** against the 1 975 B shipping
    body. `AT-B64-04` is the **sole load-bearing acceptance for `US-B64-2`**, so re-running it against
    §3.0's frozen `§3.2` hash — with mutations drawn from the *shipping* clause set — is a **blocking

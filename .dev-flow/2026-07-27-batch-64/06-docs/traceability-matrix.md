@@ -8,7 +8,7 @@ orphans. Layer A is realised by placement predicates (`PP-*`), not by minted `TC
 | US | outcome | HLR | AT | result | node |
 |---|---|---|---|---|---|
 | **US-B64-1** | C-40 encoded globally, absorbing P-6 + P-7 | HLR-B64-1 | AT-B64-01 / -02 / -03 | 9/9 CI · 8/9 full; 1/6 CI-normative negative; discrimination confirmed | `01c` §arms, `04-measurement-frozen.md` |
-| **US-B64-2** | P-3 leg 1 as a rider on C-35 (C-41 cancelled) | HLR-B64-2 | AT-B64-04 / -05 | **9/9**, three mutations on disjoint sets; 0/17 stack-free | `04-measurement-frozen.md` |
+| **US-B64-2** | P-3 leg 1 as a rider on C-35 (C-41 cancelled) | HLR-B64-2 | AT-B64-04 / -05 | **9/9**, four mutations on disjoint *occurrence* sets (clause sets overlap; occurrence #2 unmutated); 0/17 stack-free | `04-measurement-frozen.md` |
 | **US-B64-3** | C-42 in the project rules, five mechanics | HLR-B64-3 | AT-B64-06 / -07 | five mechanics confirmed; boundary complement holds | `02c`, code review §3 |
 | **US-B64-4** | `VERIFY.md` section extended, general-only | HLR-B64-4 | AT-B64-08 / -09 | 0/12 identifiers; 0/29 vs 29/29 direction gap | `04-measurement-frozen.md` |
 | **US-B64-6** | lineage registry consistent both directions | HLR-B64-5 | AT-B64-10 | PRE RED / POST GREEN, two independent carriers | `04-measurement-frozen.md` |
