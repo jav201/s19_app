@@ -5,7 +5,7 @@
   "batch_objective": "D1 ONLY — bound the PRODUCER in _addendum_lines (s19_app/tui/services/report_service.py:1514) so the declared-region addendum stops consuming resident memory proportional to R x V x E. The function appends one fully-formatted string (each paying md_safe) per matching (region x variant x entry/issue) into a local hits list at :1565/:1571/:1579 and extends `lines` only at :1584, so the whole cost is paid BEFORE any output exists and every byte-budget or row-cap design is structurally blind to it. Measured 87-94 B resident per hit, product law confirmed on all three axes. D1 was specced at batch-63, BLOCKED at that batch's Phase-2 re-gate and RETURNED; batch-63 shipped D3 only. EXPLICITLY OUT OF SCOPE: OB-4/F4 (the two unbounded tables at 988 B/entry) and D2 (schema-legal address ValueError) — both stay carries in .dev-flow/BACKLOG-CODE.md. CONSTRAINT ON THE PR: D1 alone does NOT close the memory-exhaustion DoS (the neighbouring tables dominate), so the batch must state the residual with its numbers and must NOT claim closure.",
   "note_prior_batch": "batch-63 (report byte accounting, D3 only) DONE + MERGED PR #139 c473152 + closeout #140 79cde53 + control decisions #142 c779e3d. Vault synced 2026-07-27. Its D1/D2 were RETURNED to the backlog at the Phase-2 re-gate. Its full state at close is archived at .dev-flow/2026-07-26-batch-63/state-at-close.json.",
   "note_backlog_split": "THE OPEN QUEUE IS NOW SPLIT (PR #143, squash 082ada9, 2026-07-27). Lane A = .dev-flow/BACKLOG-CODE.md (app code + its dev flow) — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is now a ROUTER holding no open work.",
-  "route": "full /dev-flow. Phases 0-5 CLOSED. Phase 6 IN PROGRESS: docs, PR, CI, final PR-level qa gate, merge, then the close-out chain.",
+  "route": "full /dev-flow. ALL PHASES CLOSED. Merged PR #149 squash b691f21; vault synced to 2026-07-28-batch-65. Remaining close-out: the dev-flow-lessons catalog entry + push to claude-skills.",
   "rc1": "VERIFIED 2026-07-27. git fetch origin; origin/main tip = 082ada9; HEAD = 082ada9; merge-base HEAD origin/main = 082ada9 (equal, no rebase needed); working tree clean; branch cut off that tip as claude/batch-64-addendum-producer-bound, renumbered mid-flight and now shipping as claude/batch-65-code-lane. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. Already-shipped check EXECUTED: grep R-TUI-095 REQUIREMENTS.md = 0, grep HLR-100 REQUIREMENTS.md = 0, grep MAX_ADDENDUM_HITS s19_app/ = 0 -> D1 is NOT shipped.",
   "standing_authorization": {
     "date": "2026-07-27",
@@ -23,7 +23,7 @@
     "retired_not_reused": "batch-63's never-implemented D1 ids AT-164..167, TC-440..454, R-TUI-095, HLR-100, LLR-100.1..4 are RETIRED. They are contested between batch-63's D1 spec and REV-5 lane A (which claims AT-164..178); reusing them would bind two different observables to one id. Their CONTENT carries forward; only the numbers are dropped."
   },
   "current_phase": 6,
-  "phase_status": "in-progress",
+  "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
     "1": 2,
@@ -178,9 +178,21 @@
       "date": "2026-07-28",
       "decision": "Merge-gate re-gate BLOCKED; five unblock items applied line-targeted",
       "notes": "The re-gate found that my own blanket fix for HIGH-1 corrupted the merge-gate report itself — the one file written AFTER the collision, where batch-64 meant the OTHER batch. My rationale held for 19 of 20 files (66/66 verified) and failed on the 20th. I acted on a rationale I had not verified, which is this batch's own defect class, committed while closing this batch's findings. Fixes applied without any blanket pass."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-28",
+      "decision": "synced-to-obsidian",
+      "notes": ".../01 - Proyectos/s19_app/dev-flow-batches/2026-07-28-batch-65/ — 17 files + 06-docs/. Collision handled, not assumed away: the parallel session process batch occupies the 2026-07-27-batch-64 slot and was VERIFIED UNTOUCHED (0 files modified during the sync). Dashboard.md left as-is."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-28",
+      "decision": "Recovered from a self-inflicted conflicted commit",
+      "notes": "A \"git merge --ff-only || git rebase\" chain conflicted on the OTHER batch folder (add/add on 7 files) plus state.json, and the commit went through WITH conflict markers as 62c7141. It was never pushed; origin/main was clean throughout. Preserved at backup/batch-65-conflicted-62c7141, then reset --hard to b691f21. Root cause: I chained a merge fallback without checking whether it conflicted before committing. Third self-inflicted mechanical error in this close-out sequence."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-27T00:00:00Z",
   "stories": {
     "US-B64-1": "As an operator generating a project report over a manifest with declared regions, I get the report without the tool consuming memory proportional to (regions x variants x entries), so a large or hostile change document cannot exhaust my machine. READY.",
@@ -238,5 +250,12 @@
   "control_candidates_raised": "NONE ENCODED — each needs its own operator AskUserQuestion. P-8 (NEW, the one the postmortem would raise first): a fixture must be sized against the POST-fix system, not the pre-fix one. AT-194's warm-up was noise against the old producer and decisive against the new one; TC-488's leaf size sat below the cap so the exit it exists to detect CANNOT FIRE. P-5 does not reach it — both COULD go RED at Inc-1, which is when P-5 asks. This is TEMPORAL vacuity: falsifiable at authoring time, not at gate time, because the system moved underneath it. Nothing re-asks. P-10 (NEW, process lane): a fold applies to the CLASS, not the instances the reviewer listed. 3-4 occurrences in one batch. P-7 covers not DROPPING; this is not UNDER-APPLYING. P-9 explicitly ruled NOT a peer — it belongs as a clause inside P-5. P-3 gains two more occurrences (the 19200/19 200 grep brittleness, the md_safe-escaped region-name trap). P-5 gains three occurrences as EVIDENCE, not as a new control.",
   "namespace_collision": "BOTH sessions used batch_id 2026-07-27-batch-64 and wrote DIFFERENT content into identically-named files in the SAME .dev-flow/2026-07-27-batch-64/ folder. The process lane's batch merged first (#144 C-40 + C-35 rider + C-42, #145 closeout, #146 Obsidian sync) and KEEPS the number 64. This code-lane batch is renumbered to 2026-07-28-batch-65 by operator decision. The parallel session had already renumbered a SNAPSHOT of this branch at Inc-2 and pushed origin/claude/batch-65-addendum-producer-bound; that snapshot was missing Inc-3, Phase 4, Phase 5 and Phase 6. This branch (claude/batch-65-code-lane) completes it: built off their renumbered base 374ad90, with the four owned files taken whole, BACKLOG-CODE.md 3-way merged (clean), and the seven missing artifacts relocated. The full pre-migration history is preserved at origin/claude/batch-64-addendum-producer-bound @ 98b5b7a. ROOT CAUSE, which the lane split did NOT solve: the lanes separated the QUEUES but left a single shared state.json and a single shared batch-number namespace. Carried to BACKLOG-PROCESS.md.",
   "deliberate_old_number_retention": "US-B64-1 / US-B64-2 and tests/goldens/batch64/ KEEP the old number ON PURPOSE: the story ids are baked into passing tests and the golden directory name is baked into the byte-identity oracle. Renaming either would churn a green suite and a double-proven golden to fix a label. Recorded so a later reader does not 'correct' them.",
-  "pre_migration_backup": "claude/batch-64-addendum-producer-bound @ 98b5b7a is the PRE-MIGRATION BACKUP and the only ref containing 9d21d9a and ba5f09a. claude/batch-65-addendum-producer-bound @ 374ad90 is NOT a backup — it is a live ancestor of this branch, pushed by the parallel session when it renumbered a snapshot taken at Inc-2."
+  "pre_migration_backup": "claude/batch-64-addendum-producer-bound @ 98b5b7a is the PRE-MIGRATION BACKUP and the only ref containing 9d21d9a and ba5f09a. claude/batch-65-addendum-producer-bound @ 374ad90 is NOT a backup — it is a live ancestor of this branch, pushed by the parallel session when it renumbered a snapshot taken at Inc-2.",
+  "merged": {
+    "pr": 149,
+    "squash_sha": "b691f21",
+    "date": "2026-07-28",
+    "base_before": "73e3fb9"
+  },
+  "visual_evidence": "Regenerated (15/15 pilot cases pass) and DELIBERATELY NOT COPIED. 85 of 90 assets are byte-identical to the vault; the 5 that differ do so ONLY by a random CSS id (terminal-<n>-) and a clock field (00:00:00 vs --:--:--). No UI surface changed — the batch touched report SERVICES, not rendering. FINDING: the gallery carries TWO nondeterminism sources, so \"is it stale?\" cannot be answered by byte comparison, which is the mechanism that let it freeze for two months before the 2026-07-02 audit."
 }
