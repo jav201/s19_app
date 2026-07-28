@@ -4869,3 +4869,144 @@ emission there, not merely a cap.
   Phase-2 re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
   `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is
   closed by neither this requirement nor a `_ByteBudget` remedy.
+
+## Bounded declared-region addendum — batch-64 (R-TUI-098)
+
+**R-TUI-098**: The declared-region report addendum shall consume the candidate set in a single pass
+**whose candidate consumption is independent of the declared-region count `R`**, shall bound its own
+resident allocation independently of the per-variant candidate count `E` and of the variant count
+`V`, shall preserve the pre-batch-64 emission order and be byte-identical to the pre-batch-64 output
+whenever no admission cap fires, and shall disclose every cap that does fire by naming the cut hit
+class, the dropped count, and **up to `ADDENDUM_NOTICE_VARIANTS_MAX` of the variants whose hits were
+dropped, with an explicit count of the remainder**.
+
+The defect (batch-63's carried item **D1**): `_addendum_lines` nested `for region → for variant →
+for entry/issue` and materialised one fully-formatted string per matching triple **before any output
+existed**, so no output-side `_ByteBudget` could reach it, and it re-read the whole candidate set
+once per declared region. Executed on the shipped producer at `R = 64`, `N = 300` candidates:
+candidate consumption `19200 → 300`. That is B-3(b) **reduced from `R×V×E` to `V×E` — not
+eliminated**: the `V×E` single pass survives and is not removable while `LLR-103.5` obliges the
+notice to state a dropped count, because `summary.entries` / `summary.issues` / `check.issues` are
+unsorted lists with no address index, so a candidate that has not been looked at cannot be
+classified.
+
+**What this requirement deliberately does NOT claim.** Each non-claim carries the number that was
+executed for it, because an over-claiming requirement is how a residual disappears:
+
+(a) **The project report's resident-memory exhaustion axis is NOT closed.** `_modifications_lines`
+and `_checklist_lines` remain uncapped at a measured **988 B/entry**, and the report's baseline peak
+with `declared_regions=()` still grows **×1.68 per E-doubling** and **×1.81 per V-doubling**
+(architect lane), **×1.94 per E-doubling** on the qa lane's fixture and **×1.77 per E-doubling** on
+the Phase-2 architect fixture — three fixtures, three figures, **not averaged**. At ordinary `R` and
+`V` those two tables **dominate** the addendum: 988 B/entry is ~11× the addendum's measured
+86.5–93.9 B/hit, and they scale with `E` where the bounded addendum no longer does. Any acceptance
+keyed to `generate_project_report`'s whole-report peak is therefore unsatisfiable, which is why
+`AT-194` keys on the **marginal delta** attributable to the addendum. This axis was already carried in
+`.dev-flow/BACKLOG-CODE.md` (batch-63 F2 / OB-4) and **stays there** — batch-64 must not be read as
+having pulled it in.
+
+(b) **Traversal below one pass is not claimed.** The `R` multiplier is removed **from candidate
+consumption**; the `V×E` pass is not, and **per-class early exit is refused on purpose** — a run
+that stopped looking could not report the dropped count or the affected-variant set, which is the
+entire content of the notice.
+
+(c) **The addendum's resident cost is not claimed independent of `R`.** It is `O(R × 3K)` by
+construction and `R` has no cardinality cap anywhere: **≈ 11.6 kB/region** at `K = 200` with no cap
+firing, rising to **≈ 20 kB/region** with all three caps firing at `ADDENDUM_NOTICE_VARIANTS_MAX`
+and worst-case escaped ids. Both are lower bounds.
+
+(d) **Intra-class and cross-variant eviction is DISCLOSED VIA THE NOTICE, NOT PREVENTED.** `K` is a
+first-`K`-in-document-order cut inside each class and the attacker authors the document order (all
+three classes are document-derived). A hit evicted from the addendum is **not** thereby removed from
+the report — `_declaration_error_lines` renders the same issue per variant under its own
+`MAX_REPORT_ISSUES_PER_VARIANT = 200` cap, and in every row of the executed transcript the
+"evicted" `CHG-COLLISION` was still in the report. The genuinely-lost case is flood and collision in
+the **same** variant past that variant's own 200-cap: both sinks drop it, two notices fire, and
+**neither names a severity**. What survives this change is suppression of the *severity signal*, not
+of the evidence's existence.
+
+(e) **The addendum's total WORK is not claimed independent of `R`.** The `R` multiplier is
+**relocated, not removed**: recovering region identity for a candidate that lies inside an enclosing
+declared region costs `O(R)` in the worst case. Executed on the `huge+tiny` geometry (one enclosing
+region + `R−1` narrow ones), **region ops `500 / 4000 / 32000 / 128000` at `R = 1 / 8 / 64 / 256`
+for 500 candidates producing ONE hit** — i.e. `500 → 128000` — and `153600` region ops for 300
+candidates at `R = 512`, `19200` at `R = 64`. `19200` is bit-for-bit the figure this batch records as
+the defect being removed on the *candidate* axis. `TC-498` asserts `A == R × N` as a **disclosure
+counter with a recorded value**, not a pass/fail bound, so the residual cannot go stale silently in
+either direction; the bound form `A ≤ c × (N + total_hits)` was **considered and rejected** because
+under `huge+tiny` the output is `R`-independent while `A` grows without bound in `R`, so no constant
+`c` exists and the gate could never pass.
+
+(f) **The notice does not name ALL affected variants.** Above `ADDENDUM_NOTICE_VARIANTS_MAX = 8` it
+states how many further distinct variants were affected, not which: `affected = 20` renders
+`v1, v2, v3, v4, v5, v6, v7, v8, +12 more`. The `+N more` remainder is required — an uncapped list is
+`O(V)` resident and puts the variant count straight back into the bound `LLR-103.3` establishes.
+
+- Code: `s19_app/tui/services/report_service.py` — the four `LLR-103.6` constants
+  (`MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION = 200`, `ADDENDUM_CLASS_LABELS`,
+  `ADDENDUM_NOTICE_VARIANTS_MAX = 8`, `ADDENDUM_TRUNCATION_NOTICE_FMT`) plus `_AddendumRegionIndex`,
+  `_build_addendum_region_index`, `_addendum_regions_for`, `_AddendumRegionHits`,
+  `_addendum_truncation_notice`, `_render_addendum` and the rewritten `_addendum_lines`
+  (**line numbers deliberately omitted** — batch-63's own entry above records how fast they go
+  stale; grep the symbol names). Membership reuses `report_filter._merge_ranges` (the in-repo
+  coalescing precedent) + `range_index.address_in_sorted_ranges` as a **sound reject pre-filter
+  only** — `range_index.py` is CONSUMED, never modified, and is engine-frozen.
+  `s19_app/tui/services/report_addendum.py` — docstring only: `DeclaredRegion.contains` is no longer
+  the addendum's membership path but remains the oracle its tests compare against.
+- Validation: `Automated` — `tests/test_report_addendum_bound.py` (28 nodes) ·
+  `tests/test_tui_report_seam.py::test_at200_truncation_notice_reaches_the_file_and_the_viewer` ·
+  `tests/test_report_field_census.py` (the `notice_variant` `PLANTED` entry, so the batch's one new
+  markdown sink renders through markdown-it under `AT-157` / `AT-158`; plus the head-of-line guard
+  extended to `.format()`-built module constants and its planted-violation positive control).
+
+  | node | binds | observes |
+  |---|---|---|
+  | **AT-194** | US-B64-1 / HLR-103 | marginal resident delta attributable to the addendum, ratio at `E: 2000→4000` **≤ 1.30** |
+  | **AT-196** | US-B64-1 / LLR-103.4 | byte identity vs the golden captured from the SHIPPED producer, 6/6 shapes |
+  | **AT-197** | US-B64-2 / LLR-103.5 | notice names cut class, dropped count, **exact** variant set |
+  | **AT-198** | US-B64-2 / LLR-103.3 | `≤ K` → 0 notices; `K+1` → exactly 1 (3 parametrised arms) |
+  | **AT-199** | US-B64-2 / LLR-103.5 | document-derived text cannot forge a notice |
+  | **AT-200** | US-B64-2 / LLR-103.5 | the notice reaches the **written file** and the `ReportViewerScreen` |
+  | **AT-201** | US-B64-2 / LLR-103.5 | a class that lost nothing is never named |
+  | **AT-202** | US-B64-2 / LLR-103.5 | a variant that lost nothing is never named |
+  | **AT-203** | US-B64-2 / LLR-103.5 | the notice sits under the flooded region's own `### ` sub-section |
+  | **TC-480** | HLR-103 | end-to-end addendum shape at the boundary |
+  | **TC-481 / TC-482 / TC-483** | LLR-103.3 | `K-1` / `K` / `K+1`, plus the far-above line-count bound |
+  | **TC-484 / TC-485** | LLR-103.3 | empty + negative domain (`None.`, `address is None`, 1-byte region); the `R = 0` guard |
+  | **TC-486 / TC-487** | LLR-103.2 | soundness over nested-overlapping regions; duplicate and equal-start-nested regions each emit |
+  | **TC-488 / TC-489** | LLR-103.1 | `consumed == N` at `R ∈ {1,8,64}`, overlapping **and** disjoint geometry |
+  | **TC-490 / TC-495** | LLR-103.5 | the `+N more` remainder over a non-contiguous contributor set; notice rendering **equals** hit-line rendering for the same id |
+  | **TC-491 / TC-494** | LLR-103.4 | golden harness determinism; the explicit interleaved emission order |
+  | **TC-492** | LLR-103.6 | the four constants exist, no bare `200` in the body, `K → 37` green over the `K`-derived nodes |
+  | **TC-493** | LLR-103.3 | direct `_addendum_lines` peak ratio per `E`-doubling **≤ 1.25** |
+  | **TC-497** | R-TUI-098 | **this entry** carries the residual figures verbatim (7-string grep) + a flagged inspection half |
+  | **TC-498** | LLR-103.1 | region ops `A == R × N` under `huge+tiny` — the §10.7 disclosure, non-claim (e) |
+  | **TC-499** | LLR-103.5 | addendum-**scoped** notice counting: a report-wide `> TRUNCATED:` is not an addendum notice |
+
+  `AT-195` and `TC-496` are **retired ids and are not reused**: `AT-195` was mechanism-only under a
+  black-box id and was withdrawn; `TC-496` was file-observed under a white-box id and was promoted to
+  `AT-200`.
+- **Falsifiability is carried by executed mutants, not by assertion.** Eleven of the 28 nodes are
+  regression guards that were GREEN before the producer was rewritten, so each names a mutant arm
+  driven RED against the **implemented** producer — `FIX-B` (per-class bucket concatenation),
+  `FIX-E` / `FIX-E(b)` (raw membership / coalescing used for attribution), `FIX-G` (a notice for
+  every class), `FIX-H` (naming every contributing variant), `FIX-I` (all notices under the first
+  region), `FIX-A2` (per-class early exit), `FIX-C` (`hits[:CAP]` — bounding the output rather than
+  the producer), `FIX-NONE` and `FIX-SCOPE`. `TC-485` alone carries **no** arm and says so in
+  writing: it guards unchanged code.
+- Status: Added in batch `2026-07-27-batch-64` (US-B64-1/2, HLR-103, LLR-103.1…103.6;
+  `01-requirements.md` §6.5 amendment log §9 / §9b / §9c / §9d, A-1…A-46). Frozen-engine diff = 0;
+  `tests/goldens/` unchanged — no golden was re-baselined.
+- **Residuals of this requirement, and where each one stands.** Non-claim (a) was already a
+  `.dev-flow/BACKLOG-CODE.md` item before this batch (batch-63 F2 / OB-4) and is untouched. The
+  remaining six are **stated here and OWED to `BACKLOG-CODE.md`** as this batch's mandatory Lane-A
+  close step; until that reconciliation lands they are recorded in this entry and in
+  `01-requirements.md` §10, and nowhere else: (c) the uncapped region cardinality `R` — a
+  `MAX_DECLARED_REGIONS` mirroring `REPORT_MAX_REGIONS_PER_VARIANT = 128` would bound it; (e) the
+  relocated `O(R)` attribution walk (`500 → 128000`), which capping `R` bounds in the same change;
+  the addendum's notice not reaching the `## Truncation appendix` (three `> TRUNCATED:` emitters, two
+  feed the appendix and two do not — unify); the **un-named severity** of a dropped ERROR;
+  `ADDENDUM_NOTICE_VARIANTS_MAX` possibly being low for `V > 8` projects; and
+  `changes/apply.py::_first_intersecting_symbol`, which carries its own local copy of the
+  overlapping-range defect and so would **not** be repaired by unfreezing `range_index.py` — it needs
+  a local fix.

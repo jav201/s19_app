@@ -2713,3 +2713,151 @@ def test_tc499_report_wide_truncation_is_not_an_addendum_notice(
         f"notice; addendum-scoped notices={_addendum_notices(text)} "
         f"report-wide={report_wide}"
     )
+
+
+# ===========================================================================
+# TC-497 — R-TUI-098: the SHIPPED requirement text carries the residuals
+# ===========================================================================
+
+#: The seven residual figures the spec's "Numeric pass threshold" pins for
+#: ``TC-497``, character for character. They are the numbers that make
+#: ``R-TUI-098``'s non-claims falsifiable: a requirement that says "not closed"
+#: without a figure cannot be checked against a later measurement.
+#:
+#: ``×`` is U+00D7 MULTIPLICATION SIGN with NO space before the digits, and
+#: ``→`` is U+2192 RIGHTWARDS ARROW with an ORDINARY U+0020 on each side.
+#: Both spellings were verified against the shipped document rather than
+#: transcribed: a NARROW NO-BREAK SPACE (U+202F) or a THIN SPACE (U+2009) around
+#: either glyph renders identically and would make this whole list vacuous —
+#: which is the exact defect class this batch exists to remove. See
+#: :func:`_typographic_variants`.
+_RESIDUAL_FIGURES: Tuple[str, ...] = (
+    "988 B/entry",
+    "×1.68",
+    "×1.81",
+    "×1.94",
+    "19200 → 300",
+    "500 → 128000",
+    "+N more",
+)
+
+#: Space-like characters that render as a space but are not U+0020. Written
+#: as ESCAPES on purpose: spelled as literals they are invisible in a diff,
+#: and one editor pass that "normalises whitespace" would silently empty this
+#: tuple and take the near-miss diagnostic with it.
+_LOOKALIKE_SPACES: Tuple[str, ...] = (
+    " ",  # NO-BREAK SPACE
+    " ",  # NARROW NO-BREAK SPACE
+    " ",  # THIN SPACE
+    " ",  # FIGURE SPACE
+)
+
+
+def _typographic_variants(figure: str) -> List[str]:
+    """Return the near-miss spellings of ``figure`` that render the same.
+
+    A verbatim grep that fails tells you the string is absent; it does not tell
+    you WHY. These variants separate "the author omitted the figure" from "the
+    author wrote it with a narrow space", which are different defects with
+    different fixes — and the second one is invisible in a rendered diff.
+    """
+    variants: List[str] = []
+    for space in _LOOKALIKE_SPACES:
+        if " " in figure:
+            variants.append(figure.replace(" ", space))
+    if "×" in figure:
+        variants.append(figure.replace("×", "× "))
+        for space in _LOOKALIKE_SPACES:
+            variants.append(figure.replace("×", "×" + space))
+    if "→" in figure:
+        variants.append(figure.replace(" → ", "→"))
+        variants.append(figure.replace("→", "->"))
+    return variants
+
+
+def test_tc497_shipped_requirement_carries_the_residuals_with_their_numbers() -> None:
+    """TC-497 / R-TUI-098 — the requirement as SHIPPED in ``REQUIREMENTS.md``
+    carries the §10 residuals **with their numbers**, verbatim.
+
+    Intent: `R-TUI-098` is the batch's only `inspection`-method requirement, and
+    an inspection with no procedure is a verdict nobody can reproduce. The spec
+    therefore fixes the procedure as an explicit seven-string grep list rather
+    than a judgement call. Each string is a number that makes one of the
+    requirement's non-claims checkable against a future measurement:
+
+    - ``988 B/entry`` — non-claim (a), the two uncapped neighbouring tables;
+    - ``×1.68`` / ``×1.81`` / ``×1.94`` — the three per-lane whole-report
+      growth figures, recorded SEPARATELY and never averaged;
+    - ``19200 → 300`` — B-3(b) reduced on the candidate axis;
+    - ``500 → 128000`` — non-claim (e), the `R` multiplier RELOCATED to the work
+      axis, the residual revision 1 of the spec claimed away;
+    - ``+N more`` — non-claim (f), the notice names at most
+      ``ADDENDUM_NOTICE_VARIANTS_MAX`` variants.
+
+    **Scope, stated rather than assumed.** The spec's threshold is "verbatim
+    >= 1 time in the union of ``REQUIREMENTS.md`` + the PR body". A pytest node
+    cannot read a PR body, so this asserts on ``REQUIREMENTS.md`` ALONE — which
+    is STRICTLY STRONGER than the union (a document satisfying this satisfies
+    the union) and, unlike the union form, is runnable in CI on every future
+    commit. The union form would let the durable artefact drop a figure as long
+    as a PR description that nobody re-reads once carried it.
+
+    **This node covers the executable half only.** `TC-497`'s other half — a
+    named reviewer recording ZERO occurrences of a whole-report-peak closure
+    claim and ZERO occurrences of an `R`-independence claim on the *work* axis —
+    is a JUDGEMENT and is flagged as one by the spec (qa m-4). It is signed in
+    the increment-3 review packet, not automated here: "no sentence anywhere
+    means X" has no pattern, and a regex pretending otherwise would be a
+    vacuous check wearing a verdict's clothes. What IS decidable, and is
+    asserted below, is the POSITIVE form: the shipped entry must contain an
+    explicit "does NOT claim" paragraph with the lettered non-claims.
+    """
+    requirements = (
+        Path(__file__).resolve().parents[1] / "REQUIREMENTS.md"
+    ).read_text(encoding="utf-8")
+
+    anchor = "**R-TUI-098**"
+    assert anchor in requirements, (
+        "TC-497 precondition: REQUIREMENTS.md carries no R-TUI-098 entry at "
+        f"all, so the grep list below would fail for the wrong reason "
+        f"(searched for {anchor!r})"
+    )
+
+    missing: List[str] = []
+    for figure in _RESIDUAL_FIGURES:
+        if figure in requirements:
+            continue
+        near = [v for v in _typographic_variants(figure) if v in requirements]
+        missing.append(
+            f"{figure!r} (ascii {ascii(figure)})"
+            + (
+                f" -- but a look-alike IS present: {[ascii(v) for v in near]}; "
+                "the figure was typographically mangled, not omitted"
+                if near
+                else " -- absent in every spelling"
+            )
+        )
+    assert not missing, (
+        "TC-497: R-TUI-098 as shipped in REQUIREMENTS.md does not carry every "
+        "residual figure verbatim, so a non-claim in it cannot be checked "
+        f"against a later measurement: {missing}"
+    )
+
+    # The requirement must state its non-claims explicitly, in the lettered
+    # form the spec fixes. This is the decidable half of "no closure claim":
+    # asserting the disclaimers are PRESENT, not that a claim is absent.
+    section = requirements[requirements.index(anchor):]
+    assert "does NOT claim" in section, (
+        "TC-497: the shipped R-TUI-098 entry carries the numbers but no "
+        "explicit non-claim paragraph, so a reader can take the figures as "
+        "evidence the axes are closed"
+    )
+    absent_letters = [
+        letter
+        for letter in "abcdef"
+        if f"({letter}) **" not in section
+    ]
+    assert not absent_letters, (
+        "TC-497: R-TUI-098's non-claims (a)-(f) are the residual index the "
+        f"figures above hang from; these are missing: {absent_letters}"
+    )
