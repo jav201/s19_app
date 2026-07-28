@@ -12,3 +12,6 @@ __pycache__/
 snapshot_report.html
 .screenshot_cache/
 tests/_artifacts/
+# Intermediate Textual SVG exports; the committed PNG/GIF are the deliverable
+# and docs/images/capture_readme_media.py regenerates these deterministically.
+docs/images/svg/

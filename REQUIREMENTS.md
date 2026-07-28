@@ -4821,7 +4821,7 @@ the temp root) by literal replacement — the technique `tests/conftest.py::cano
 already uses — which guesses nothing and deletes nothing.
 
 - Status: **withdrawn at `2026-07-25-batch-62`**; `flow_report_service` keeps its own batch-60
-  redactor unchanged. Host-path exposure in project reports is carried in `.dev-flow/BACKLOG.md` at
+  redactor unchanged. Host-path exposure in project reports is carried in `.dev-flow/BACKLOG-CODE.md` at
   **MAJOR** with the design above.
 
 ## Report byte accounting vs the written file — batch-63 (R-TUI-097)
@@ -4865,7 +4865,7 @@ emission there, not merely a cap.
   closed:** batch-63 shipped D3 only. D1 (the declared-region addendum's `O(R×V×E)` resident cost)
   and D2 (a schema-legal address denying the report at the decimal `Length` column,
   `report_service.py:996` and `:1171` — **line numbers as of `031ca8d`**; this batch added +47 lines (`git diff --numstat 031ca8d`: 49 insertions, 2 deletions)
-  to that module, so re-derive rather than copy them) were returned to `.dev-flow/BACKLOG.md` at the
+  to that module, so re-derive rather than copy them) were returned to `.dev-flow/BACKLOG-CODE.md` at the
   Phase-2 re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
   `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is
   closed by neither this requirement nor a `_ByteBudget` remedy.
