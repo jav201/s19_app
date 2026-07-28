@@ -210,6 +210,80 @@ project's file layout at all, in which case the lane routing belongs in
 `docs/engineering-rules.md`). Recorded as a carry rather than fixed here, because it is outside the
 operator's encoding ruling for this batch.
 
+## 5d. FINAL POST record — supersedes §2, and closes the security gate's F2 / F4
+
+The merge-gate security pass found §2's POST hashes **stale for three of five files** (F2) — correct:
+the review folds and the merge landed after §2 was written, so no record existed of the shipped state
+for two out-of-VCS files. **This table is the authoritative POST record.**
+
+| file | PRE bytes | POST bytes | Δ | POST sha256 |
+|---|---|---|---|---|
+| `docs/engineering-rules.md` | 15 127 | **19 435** | +4 308 | `5618029c…` |
+| `~/.claude/skills/tui-design/VERIFY.md` | 10 142 | **11 684** | +1 542 | `3c6016fc…` |
+| `~/.claude/commands/dev-flow.md` | 59 259 | **68 311** | +9 052 | `21a031f7…` |
+| `project_devflow_control_lineage.md` | 36 401 | **42 450** | +6 049 | `50cf146e…` |
+| `.dev-flow/BACKLOG.md` | 76 440 | **26 057** | **−50 383** | `781c82e9…` |
+
+**The `BACKLOG.md` shrink is `main`'s doing, not this batch's.** PR #143 moved its open work into
+`BACKLOG-CODE.md` (43 182 B) and `BACKLOG-PROCESS.md` (17 245 B), leaving a router. This batch's
+content is present across all three, each carry exactly once.
+
+### F4 — a vacuous check inside the anti-vacuity control, found by the security gate and FIXED
+
+The reviewer's own F1 text landed byte-verbatim, but its restore confirmation was a **disjunction**:
+
+> ~~confirming the restore in the same transcript (`git status` clean, **or** the file's hash back at
+> its pre-mutation value)~~
+
+For an **untracked** file — the class this batch mutated five of — `git status` reports identically
+whether or not the mutation was reverted, so the weaker arm of the disjunction can be satisfied while
+learning nothing. **A vacuous check inside the control that forbids vacuous checks.** Corrected:
+
+> confirming the restore in the same transcript **by the file's hash returning to its pre-mutation
+> value** — `git status` alone is insufficient and is outright **vacuous for an untracked file**, which
+> it reports identically whether or not the mutation was reverted
+
+**+147 B, byte-mode write, no newline translation** (CR/LF held at 276/276 — the §5b defect not
+repeated). The reviewer flagged this as its own wording and owned it; it is the tenth self-catch.
+
+**The arms still bind, re-proven at the right granularity.** §5b's proof was the whole normative body,
+which this fix changes (the discharge is inside it). The harness parses **limb spans**, so those are
+what matter:
+
+| span | frozen | live | identical |
+|---|---|---|---|
+| **limb 1** | 1 209 B `fb24cf1796b5b9c8` | 1 209 B `fb24cf1796b5b9c8` | **✅** |
+| **limb 2** | 1 007 B `791424bfe23ff975` | 1 007 B `791424bfe23ff975` | **✅** |
+| discharge | 1 888 B | 2 035 B | changed **by design** |
+
+Both limbs byte-identical ⇒ `AT-B64-01` (9/9 CI · 8/9 full) and `AT-B64-02` (1/6 CI-normative) hold.
+Only the discharge moved, and it describes *how to discharge* the rule, not *which predicates it flags*.
+
+### The security gate's HIGH was a read/write race, and it is now stale
+
+It reported an unresolved merge in the worktree — `MERGE_HEAD` set, `BACKLOG.md` at `UU`, the file
+changing size under it mid-read. **True when observed, and the observation was sound.** It is stale:
+`MERGE_HEAD` absent, **0 unmerged paths**, merge committed at `a77227f` + `ca36f66`.
+
+**The cause was orchestration, not the reviewer.** The operator directed the merge while both gate
+reviewers were mid-read; the risk was named in-conversation before it happened and the finding
+re-verified rather than waved away. **Third measured occurrence** of the un-encoded `sec F5` rule — and
+this time it hit the security gate itself, in the batch encoding the control that forbids it.
+
+### §6's scope claim, re-derived against `origin/main` (the PR's actual surface)
+
+The reviewer saw `README.md`, `.gitignore`, `REQUIREMENTS.md` and `docs/images/*` in the working tree
+and correctly called §6 false **of that tree**. Those are `main`'s commits, arriving via the merge.
+Against the diff that actually merges:
+
+```
+git diff --name-only origin/main...HEAD                       -> 24 files
+git diff --name-only origin/main...HEAD -- s19_app tests examples pyproject.toml  -> 0
+non-.dev-flow/ paths in that diff                             -> docs/engineering-rules.md  (only)
+```
+
+**Zero production code. One documentation file outside `.dev-flow/`.**
+
 ## 6. Scope confinement
 
 ```
