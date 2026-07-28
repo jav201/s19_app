@@ -150,9 +150,18 @@ reader at someone else's work.
   `claude/batch-64-addendum-producer-bound`"* — that branch is the **backup** of
   pre-migration history per `state.json:233`, not the shipping branch. `:18` *"DONE,
   batch-64"*. `:35` *"(P2, batch-64 Phase-4 F-4)"*. `:37` *"New defects found in passing
-  at batch-64"*. the only **four** `batch-64` strings in `origin/main`'s copy are the other batch's `§7.x`
-  bullets, so the other **nine** are this batch mislabelling itself. *(Corrected at the re-gate:
-  this row originally read "zero"; the true split at `7dfb82c` is 13 = 4 theirs + 9 mine.)*
+  at batch-64"*. **This count MOVES, so it is stated with its basis — a count without its commit
+  is a claim with an expiry date.** At **`7dfb82c`** the split was **13 = 4 theirs + 9 this batch
+  mislabelling itself**, and those 9 were the target of the corrective pass. **Re-derived at
+  `dc6aa71` (2026-07-28, batch-70, merge-gate item 1): 9 occurrences on 7 lines — 4 `§7.x` bullet
+  markers (theirs, `:118` `:125` `:126` `:148`) + 1 further legitimate reference to their `D-5`
+  constraint (`:125`) + 3 navigational / backup-branch-name / renumbering-event references
+  (`:7` `:27` `:28`) + 1 replica of this very claim (`:28`). ZERO mislabels remain.**
+  *(Corrected TWICE. This row first read "zero". It was then rewritten to "the only **four** …
+  so the other **nine** are this batch mislabelling itself" — which **contradicted its own
+  parenthetical in the same row**, "only four" against a stated total of 13, and whose
+  "mislabelling" category is now **empty**. The re-gate prescribed that wording as item 1's fix;
+  applying it verbatim would have planted a third false figure, so it was re-derived instead.)*
 
 **Not in scope of this finding, and correctly left alone:** the stable id namespace —
 `US-B64-1/2`, `AT-194…203`, `TC-480…499`, `HLR-103`, `LLR-103.x`, and the golden path
