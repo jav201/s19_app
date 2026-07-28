@@ -4899,29 +4899,104 @@ class S19TuiApp(App):
         diff_source = (
             project_dir.name if project_dir is not None else (dest_input or "-")
         )
-        md = generate_diff_report(result, **kwargs)
-        if not md.written:
+        # N5 (batch-68): BOTH generators used to run here, on the UI event
+        # loop, back to back — the diff path was the worst freeze in the app
+        # because it pays the cost twice. Everything above stays on the UI
+        # thread (widget reads + the "no comparison yet" early return).
+        self.set_progress(15)
+        self._start_diff_report_worker(panel, result, kwargs, diff_source)
+
+    @work(thread=True, exclusive=True, group="diff_report")
+    def _start_diff_report_worker(
+        self,
+        panel: AbDiffPanel,
+        result: object,
+        kwargs: dict,
+        diff_source: str,
+    ) -> None:
+        """
+        Summary:
+            Off-thread A2B diff report generation (N5, batch-68). Runs the
+            markdown generator, then the HTML generator, marshalling every
+            ``panel.set_status`` and ``set_progress`` write back to the UI
+            thread; ``_log_report_event`` is called directly because it only
+            touches ``self.logger``.
+
+            Progress is driven at four seams and never left mid-fill: the
+            caller sets 15, this worker sets 55 between the two generators,
+            100 on full success, and 0 on **each** of the three failure arms —
+            markdown refused, HTML refused (markdown already written), and an
+            unexpected crash.
+
+        Args:
+            panel (AbDiffPanel): The live panel, resolved on the UI thread by
+                the caller; every method call on it is marshalled.
+            result (object): The retained ``_diff_last_result`` comparison.
+            kwargs (dict): The shared generator arguments assembled on the UI
+                thread (mem maps, destination, A2L/MAC records).
+            diff_source (str): Display name for the log line.
+
+        Returns:
+            None: Effects only — the written pair, a log line, the panel status
+            and the progress bar.
+
+        Data Flow:
+            - Consumes the retained diff result; produces the ``.md``/``.html``
+              pair and the panel status surface.
+
+        Dependencies:
+            Uses:
+                - ``generate_diff_report`` / ``generate_diff_report_html``
+                - ``_log_report_event`` / ``AbDiffPanel.set_status``
+            Used by:
+                - ``on_ab_diff_panel_report_requested``
+        """
+        try:
+            md = generate_diff_report(result, **kwargs)
+            if not md.written:
+                self._log_report_event(
+                    "diff", diff_source, "-", "refused", ok=False
+                )
+                self.call_from_thread(self.set_progress, 0)
+                self.call_from_thread(
+                    panel.set_status,
+                    "Report refused: " + "; ".join(md.diagnostics),
+                    "sev-error",
+                )
+                return
+            self.call_from_thread(self.set_progress, 55)
+            html = generate_diff_report_html(result, **kwargs)
+        except Exception as exc:
+            self.logger.exception("Diff report failed: %s", exc)
             self._log_report_event(
-                "diff", diff_source, "-", "refused", ok=False
+                "diff", diff_source, "-", f"failed: {type(exc).__name__}", ok=False
             )
-            panel.set_status(
-                "Report refused: " + "; ".join(md.diagnostics), "sev-error"
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                panel.set_status,
+                f"Diff report failed: {type(exc).__name__}: {exc}",
+                "sev-error",
             )
             return
-        html = generate_diff_report_html(result, **kwargs)
         if not html.written:
             self._log_report_event(
                 "diff", diff_source, "-", "refused (html)", ok=False
             )
-            panel.set_status(
-                "HTML report refused: " + "; ".join(html.diagnostics), "sev-error"
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                panel.set_status,
+                "HTML report refused: " + "; ".join(html.diagnostics),
+                "sev-error",
             )
             return
         self._log_report_event(
             "diff", diff_source, f"{md.path}|{html.path}", "ok", ok=True
         )
-        panel.set_status(
-            f"Diff report written: {md.path}  |  {html.path}", "sev-ok"
+        self.call_from_thread(self.set_progress, 100)
+        self.call_from_thread(
+            panel.set_status,
+            f"Diff report written: {md.path}  |  {html.path}",
+            "sev-ok",
         )
 
     def _compose_screen_a2l(self) -> Container:

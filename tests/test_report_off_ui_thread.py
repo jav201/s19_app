@@ -115,6 +115,134 @@ def test_ac1_before_after_composes_off_the_ui_thread(
     )
 
 
+def _drive_diff_report(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, html_written: bool = True
+) -> tuple[int, List[int], Dict[str, Any]]:
+    """Drive a real diff-report request and return ``(ui thread, progress)``.
+
+    Summary:
+        Mirrors the shipped driver in ``tests/test_tui_diff_screen.py``:
+        monkeypatch ``compare_images`` so a comparison exists, press Compare
+        then Report, and let the app do the rest. The generators are wrapped by
+        the caller (not replaced here) so the real dispatch path is exercised.
+
+    Args:
+        tmp_path (Path): App base dir.
+        monkeypatch (pytest.MonkeyPatch): Test patcher.
+        html_written (bool): When ``False``, the HTML generator reports a
+            refusal so the html-refused-after-md-succeeded arm is reachable.
+
+    Returns:
+        tuple[int, List[int], Dict[str, Any]]: The UI thread ident, the
+        progress sequence, and ``{generator name: thread ident it ran on}``.
+
+    Dependencies:
+        Used by:
+            - the AC-2 and AC-4 tests
+    """
+    from s19_app.tui.services.diff_report_service import DiffReportResult
+    from tests.test_tui_diff_screen import _diff_result
+
+    fake = _diff_result([(0x10, 0x14, "changed")])
+    md_path = tmp_path / "20260101T000000Z-diff-report.md"
+    html_path = tmp_path / "20260101T000000Z-diff-report.html"
+    seen: Dict[str, Any] = {}
+
+    def _gen_md(*_a: Any, **_k: Any) -> Any:
+        seen["generate_diff_report"] = threading.get_ident()
+        md_path.write_text("md", encoding="utf-8")
+        return DiffReportResult(path=md_path, written=True)
+
+    def _gen_html(*_a: Any, **_k: Any) -> Any:
+        seen["generate_diff_report_html"] = threading.get_ident()
+        if not html_written:
+            return DiffReportResult(
+                path=None, written=False, diagnostics=["html refused"]
+            )
+        html_path.write_text("html", encoding="utf-8")
+        return DiffReportResult(path=html_path, written=True)
+
+    monkeypatch.setattr(app_mod, "compare_images", lambda *a, **k: fake)
+    monkeypatch.setattr(app_mod, "generate_diff_report", _gen_md)
+    monkeypatch.setattr(app_mod, "generate_diff_report_html", _gen_html)
+
+    progress: List[int] = []
+    original = S19TuiApp.set_progress
+
+    def _spy(self: S19TuiApp, value: int, message: Any = None) -> None:
+        progress.append(value)
+        return original(self, value, message)
+
+    monkeypatch.setattr(S19TuiApp, "set_progress", _spy)
+
+    async def _run() -> tuple[int, List[int]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            ui_thread = threading.get_ident()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            app.query_one("#diff_compare_button").press()
+            await pilot.pause()
+            progress.clear()
+            app.query_one("#diff_report_button").press()
+            await pilot.pause()
+            await app.workers.wait_for_complete()
+            await pilot.pause()
+            return ui_thread, list(progress), dict(seen)
+
+    return asyncio.run(_run())
+
+
+def test_ac2_diff_generators_run_off_the_ui_thread(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-2: BOTH diff generators are entered on a non-UI thread.
+
+    Binds the markdown and HTML generators independently. They are two separate
+    heavy calls with an early return between them, so moving only the first
+    would halve the freeze while making every status assertion look fixed —
+    the diff path is the worst of the two because it pays the cost twice.
+    """
+    ui_thread, _progress, seen = _drive_diff_report(tmp_path, monkeypatch)
+
+    for name in ("generate_diff_report", "generate_diff_report_html"):
+        assert seen.get(name) is not None, (
+            f"{name} was never invoked — the request did not reach the "
+            "generators, so this AC cannot bind"
+        )
+        assert seen[name] != ui_thread, (
+            f"{name} ran on the UI thread ({seen[name]}), freezing the "
+            "terminal for its duration"
+        )
+
+
+def test_ac4_diff_progress_never_sticks_mid_fill(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """AC-4: the diff bar reaches 100 on success and 0 when the HTML is refused.
+
+    The html-refused-after-md-succeeded arm is a distinct early return in the
+    shipped code, and it is the one most likely to be forgotten: the markdown
+    already succeeded, so a careless implementation leaves the bar at the 55
+    mid-value forever.
+    """
+    _ui, ok_progress, _seen = _drive_diff_report(
+        tmp_path, monkeypatch, html_written=True
+    )
+    assert ok_progress and ok_progress[-1] == 100, (
+        f"a fully written diff report must end at 100; sequence: {ok_progress}"
+    )
+
+    _ui2, refused_progress, _seen2 = _drive_diff_report(
+        tmp_path, monkeypatch, html_written=False
+    )
+    assert refused_progress and refused_progress[-1] == 0, (
+        f"an HTML-refused diff report must reset the bar to 0, not leave it at "
+        f"the 55 mid-value; sequence: {refused_progress}"
+    )
+
+
 def test_ac3_before_after_progress_never_sticks_mid_fill(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -212,6 +212,11 @@ def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
             app.query_one("#diff_compare_button").press()
             await pilot.pause()
             app.query_one("#diff_report_button").press()
+            # batch-68 N5: the two generators now run on a worker thread, so
+            # the status is written after this handler returns. A bare pause()
+            # passed only because the fake generators are instant — a race this
+            # suite must not depend on.
+            await app.workers.wait_for_complete()
             await pilot.pause()
             return str(app.query_one("#diff_status").render())
 
@@ -256,6 +261,11 @@ def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
             app.query_one("#diff_compare_button").press()
             await pilot.pause()
             app.query_one("#diff_report_button").press()
+            # batch-68 N5: the two generators now run on a worker thread, so
+            # the status is written after this handler returns. A bare pause()
+            # passed only because the fake generators are instant — a race this
+            # suite must not depend on.
+            await app.workers.wait_for_complete()
             await pilot.pause()
             return str(app.query_one("#diff_status").render())
 
