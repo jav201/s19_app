@@ -299,3 +299,24 @@ Zero production source, zero tests, zero fixtures, zero build config. The baseli
 re-derived at `c779e3d` before any edit — **2 201 passed, 2 skipped, 21 deselected, 3 xfailed, 29
 snapshots passed**, exit 0 — closing the oldest number in the batch, which four lanes had carried and
 none had re-derived. Ledger `post = 2201 − 0 + 0 = 2201`, as ruled by D-5.
+
+### 5e. FINAL POST record at merge — supersedes §5d (qa merge-gate delta D-2)
+
+§5d went stale on two rows within minutes of being written: `dev-flow.md` moved again for the HIGH-1
+fix, and **`VERIFY.md` was rewritten by an unrelated process** (+9 657 B — a `tui-design` skill update,
+not this batch). **Measured at merge:**
+
+| file | bytes | sha256 |
+|---|---|---|
+| `docs/engineering-rules.md` | **19435** | `5618029c…` |
+| `~/.claude/skills/tui-design/VERIFY.md` | **21341** | `5d7c7425…` |
+| `~/.claude/commands/dev-flow.md` | **68391** | `e103af29…` |
+| `project_devflow_control_lineage.md` | **42450** | `50cf146e…` |
+| `.dev-flow/BACKLOG.md` | **26057** | `781c82e9…` |
+
+**`US-B64-4` re-verified after that external rewrite rather than assumed:** block 4 re-derives at
+`b1cdc970…`, is **still an exact substring** of the live file (exactly 1 occurrence), **`PP-4` GREEN**
+(extension still between `## Pin the truth` and `## Mutation-test`, 0 new `##` from the block), and
+**`AT-B64-08` GREEN** at 0/12. The file now has 12 `##` headings, both added by the other process.
+
+**This row-staleness is itself the evidence for HIGH-3.** A POST hash record over files outside version control cannot stay true while anything else may write to them — which is exactly why §7.8 escalates the worktree-hygiene rule to a dependency of an encoded control, and why §7.10 asks for a durable backup location.

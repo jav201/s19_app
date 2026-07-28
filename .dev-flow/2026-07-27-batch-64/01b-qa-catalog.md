@@ -828,3 +828,10 @@ independently composed document, not against its own decode. **This batch must n
 - **I did not run the full suite.** The base figure `2201 passed` is carried from `PLAN.md:162`. Per
   the batch's own rule that carried numbers are re-derived, this should be re-measured at the Phase-3
   gate, not accepted from this document.
+
+> **⚠ CORRECTED 2026-07-28 (qa merge-gate delta D-1).** The enumeration below reads **8** and is
+> **superseded**: executing `AT-B64-04` against the frozen rider surfaced a 9th occurrence (the
+> `startswith("| 0x00001")` prefix guard), and amendment `A-18` recorded the set as under-drawn. The
+> shipped C-35 rider therefore carries **no total at all** — it says the enumeration *"has been
+> re-drawn"* and directs the reader to enumerate. **True count as measured: 9.** Left uncorrected in
+> the table below so the under-draw stays visible, which is the point.

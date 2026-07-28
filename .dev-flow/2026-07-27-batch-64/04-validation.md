@@ -99,9 +99,13 @@ Ledger `post = 2201 − 0 + 0 = 2201`, as ruled by **D-5** (this batch adds noth
 1. **`U-3(a)` and `U-4`** (union-ledger residue). `U-4` — the Phase-2 architect review's `163` is not
    reproducible from itself, because its 136 carried items are enumerated nowhere — is **unclosable by
    any fold**; it is a property of that review's output format.
-2. **The `D-` register collides.** Operator rulings run `D-1…D-11`; restoration ids run `D-01…D-20`;
-   they collide from `D-10`. Renaming mid-batch would break more citations than it fixes. Carried —
-   same disease as `OB-2`.
+2. **Two id registers collide inside this batch, and it is the same disease as `OB-2`.** (a) Operator
+   rulings run `D-1…D-11` while restoration ids run `D-01…D-20`, colliding from `D-10`. (b) The carry
+   labels `batch-64 §7.1…§7.11` collide with the consolidated spec's own `§7` item numbering, so a bare
+   presence check on `§7.10` returns a **false YES** (qa delta D-3). Renaming mid-batch would break more
+   citations than it fixes, so both are carried rather than fixed — and together they are the third
+   independent instance in one batch of *ids allocated without a registry*, which is precisely what
+   `OB-2` exists to close.
 3. **Line-ending translation**, introduced by the orchestrator at the review-fold step and recorded in
    `03-out-of-vcs-evidence.md §5b`. ⚠ **The proof originally offered for it was VOID and is withdrawn:**
    `git diff --stat` cannot show CRLF damage when `core.autocrlf=true` (measured: it is), so that
