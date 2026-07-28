@@ -1,6 +1,6 @@
-# batch-64 — Phase 1, QA lane: validation strategy + observable catalog
+# batch-65 — Phase 1, QA lane: validation strategy + observable catalog
 
-**Lane:** qa-reviewer, Phase 1. **Base:** `claude/batch-64-addendum-producer-bound` @ `082ada9` ==
+**Lane:** qa-reviewer, Phase 1. **Base:** `claude/batch-65-addendum-producer-bound` @ `082ada9` ==
 `origin/main`. **Artifact language:** English.
 **Under design:** US-B64-1 (bound the `_addendum_lines` producer) · US-B64-2 (a truncation notice that
 names the cut hit classes and variants).
@@ -508,7 +508,7 @@ R 1->2  @E500 (V1)     46804     89403    1.91
 
 ### 5.16 `OBS-residual-stated-with-numbers` — inspection, not a test (R-1)
 
-- **Observed:** `REQUIREMENTS.md`, the requirement text, and the PR body state that batch-64 does
+- **Observed:** `REQUIREMENTS.md`, the requirement text, and the PR body state that batch-65 does
   **not** close the report memory-exhaustion path, and carry the measured residual: the neighbouring
   `_modifications_lines` / `_checklist_lines` at **988 B/entry**, and the whole-report peak measured
   here at 344 231 B (`E=1000`) → 669 247 B (`E=2000`), **ratio 1.94, with no addendum present at all**.

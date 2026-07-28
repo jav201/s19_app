@@ -1,8 +1,8 @@
-# batch-64 — Phase-2 review: SECURITY lane
+# batch-65 — Phase-2 review: SECURITY lane
 
 **Reviewer:** independent security lane (the lane that filed batch-63's `02-review-rescoped-security.md`
 and `02-regate-security.md`).
-**Base:** `claude/batch-64-addendum-producer-bound` @ `082ada9` == `origin/main`.
+**Base:** `claude/batch-65-addendum-producer-bound` @ `082ada9` == `origin/main`.
 **Under review:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` (1213 lines), with `PLAN.md`,
 `01-requirements-architect.md`, `01b-qa-catalog.md` as supporting inputs.
 **Constraint honoured:** review only. `git status --porcelain` shows `M .dev-flow/state.json`,
@@ -217,7 +217,7 @@ across a re-ordered manifest).
 > "the same latent defect exists for **every other consumer** — `validation/engine.py` and
 > `tui/hexview.py`, named in `range_index.py`'s own `Used by` docstrings (`:59-60`) — and whether
 > *their* range sets can overlap is **unverified by this batch**… **This is the highest-value thing
-> batch-64 found that batch-64 is not fixing.**"
+> batch-65 found that batch-65 is not fixing.**"
 
 The list is the `Used by:` block of a docstring. It is neither complete nor correct. Executed census
 (`rg` over `s19_app/`, 10 modules import or re-export the primitives) plus per-consumer provenance:
@@ -286,15 +286,15 @@ change-file and check-file issue per variant, capped at `MAX_REPORT_ISSUES_PER_V
 ```
    flood=199  addendum class total=201
       SHIPPED addendum (uncapped)            : CHG-COLLISION lines = 2/2
-      batch-64 capped addendum (first K)     : CHG-COLLISION lines = 1/2   <-- the eviction S10.4 describes
+      batch-65 capped addendum (first K)     : CHG-COLLISION lines = 1/2   <-- the eviction S10.4 describes
       'Declaration errors' sections, all v   : CHG-COLLISION lines = 2/2   pre-existing '> TRUNCATED:' lines = 0
 
    flood=200  addendum class total=202
-      batch-64 capped addendum (first K)     : CHG-COLLISION lines = 0/2
+      batch-65 capped addendum (first K)     : CHG-COLLISION lines = 0/2
       'Declaration errors' sections, all v   : CHG-COLLISION lines = 2/2   pre-existing '> TRUNCATED:' lines = 0
 
    flood=400  addendum class total=402
-      batch-64 capped addendum (first K)     : CHG-COLLISION lines = 0/2
+      batch-65 capped addendum (first K)     : CHG-COLLISION lines = 0/2
       'Declaration errors' sections, all v   : CHG-COLLISION lines = 2/2   pre-existing '> TRUNCATED:' lines = 1
 ```
 
@@ -379,7 +379,7 @@ attach to.** I looked for a closure claim in five places and found none:
 | §6.2 behavioral row for `AT-194` (`:632`) | *"additional memory **attributable to the addendum**"* | correctly labelled |
 | §5.2 (`:609`) | *"Any acceptance keyed to `generate_project_report`'s **whole-report** peak — Unsatisfiable"*, retired **in writing** | the trap is closed |
 | §7 T-1 label discipline (`:704-708`) | *"It must **not** be labelled 'report generation is bounded'"*, and retires the per-hit-constant phrasing | explicitly self-policing |
-| §10.2 (`:1011-1025`) | restates with both lanes' figures, not averaged, and ends *"batch-64 must not pull it in"* | correct |
+| §10.2 (`:1011-1025`) | restates with both lanes' figures, not averaged, and ends *"batch-65 must not pull it in"* | correct |
 
 This is a materially better document than batch-63's on this axis, and I say so without qualification.
 The discipline is exemplary in one place: §7 T-1's *"What the adopted number does NOT establish"*

@@ -1,4 +1,4 @@
-# batch-64 — Phase 4 — Validation
+# batch-65 — Phase 4 — Validation
 
 > **Verdict: VALIDATED.** `R-TUI-098` / `HLR-103` / `LLR-103.1…103.6` are realized on this tree.
 > Layer A and Layer B both pass, traceability closes in **both** directions with **0 gaps**, and every
@@ -10,7 +10,7 @@
 > to nodes outside the guard class, one Inc-3 transcript count that does not reproduce, and the fact
 > that the ten mutant arms are **not re-runnable from the repo**.
 
-- **Batch:** `2026-07-28-batch-65` · **Branch:** `claude/batch-64-addendum-producer-bound`
+- **Batch:** `2026-07-28-batch-65` · **Branch:** `claude/batch-65-addendum-producer-bound`
 - **HEAD:** `22c5ab7` · **Base:** `082ada9` · **Working tree:** clean (`git status --porcelain` → empty)
 - **Requirement under validation:** `R-TUI-098` — the declared-region addendum is a bounded,
   order-preserving, self-disclosing producer.

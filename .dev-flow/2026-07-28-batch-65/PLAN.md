@@ -1,4 +1,4 @@
-# batch-64 — PLAN (living compendium)
+# batch-65 — PLAN (living compendium)
 
 > Updated at every gate and significant checkpoint. The operator reads THIS, not `state.json`.
 
@@ -37,7 +37,7 @@ declared-region addendum stops consuming resident memory proportional to `R × V
 
 This is backlog item **D1**, the top of `.dev-flow/BACKLOG-CODE.md` (Lane A). It was specced during
 batch-63, **BLOCKED at that batch's Phase-2 re-gate**, and RETURNED to the backlog; batch-63 shipped
-D3 only. batch-64 starts from that record rather than re-deriving it.
+D3 only. batch-65 starts from that record rather than re-deriving it.
 
 **Scope is D1 ONLY.** Explicitly OUT: OB-4/F4 (the two unbounded tables `_modifications_lines` /
 `_checklist_lines`) and D2 (the schema-legal address `ValueError`). Both stay as carries in
@@ -62,7 +62,7 @@ killed the operator's machine mid-batch-63.
 | `HEAD` | `082ada9` |
 | `merge-base HEAD origin/main` | `082ada9` — equal, no rebase needed |
 | working tree | clean |
-| branch | `claude/batch-64-addendum-producer-bound` |
+| branch | `claude/batch-65-addendum-producer-bound` |
 | frozen-source guard | `tests/test_engine_unchanged.py` → 1 passed |
 | already-shipped check | `grep "R-TUI-095\|MAX_ADDENDUM_HITS_PER_REGION" REQUIREMENTS.md s19_app/` → 0 hits; D1 is **not** shipped |
 
@@ -80,7 +80,7 @@ killed the operator's machine mid-batch-63.
 The project has no AT/TC registry (backlog OB-2), so "next free id" is subset-dependent. Measured
 across all three subsets on this tree:
 
-| family | `REQUIREMENTS.md` | `tests/` | `.dev-flow/` | union max | allocated to batch-64 |
+| family | `REQUIREMENTS.md` | `tests/` | `.dev-flow/` | union max | allocated to batch-65 |
 |---|---|---|---|---|---|
 | `AT`    | max 193 | max 193 | max 193 | **193** | **AT-194+** |
 | `TC`    | max 345 | max 477 | max 479 † | **479** | **TC-480+** |
@@ -143,7 +143,7 @@ Chosen over the alternative (batch-63's per-hit-class cap, `O(R × 3K)`) because
 the **B-3(b)** residual: under a cap-only design a region matching FEWER than the cap still traverses
 the full `O(V×E)`, so an attacker declares R narrow regions matching nothing, feeds `V×E` entries and
 pays the full product for zero output — the same attacker-selectable class of defect the batch exists
-to remove. batch-63's architect explicitly assigned that residual to batch-64 and named `range_index`
+to remove. batch-63's architect explicitly assigned that residual to batch-65 and named `range_index`
 as the primitive. `range_index.py` is engine-FROZEN but **consuming it needs no unfreeze** — verified,
 `report_service.py` imports it 0 times today.
 
@@ -155,7 +155,7 @@ inside `report_service.py`. This probe can force a design revision, so it runs b
 
 ## Risks / watch-items
 
-- **R-1 (highest) — batch-64 must NOT claim to close the memory-exhaustion DoS.** Security F2 is why
+- **R-1 (highest) — batch-65 must NOT claim to close the memory-exhaustion DoS.** Security F2 is why
   D1 was returned: the neighbouring tables dominate at **988 B/entry** and are untouched by D1, so any
   AT keyed to `generate_project_report`'s whole-report peak is **unsatisfiable**. Key every memory
   acceptance to `_addendum_lines` alone, and state the residual with its numbers in the requirement

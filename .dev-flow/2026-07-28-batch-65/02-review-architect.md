@@ -1,7 +1,7 @@
-# batch-64 — Phase-2 review, ARCHITECT lane (independent)
+# batch-65 — Phase-2 review, ARCHITECT lane (independent)
 
 > **Reviewing:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` (1213 lines, consolidated spec).
-> **Tree:** `claude/batch-64-addendum-producer-bound` @ `082ada9`. Every figure below was executed on
+> **Tree:** `claude/batch-65-addendum-producer-bound` @ `082ada9`. Every figure below was executed on
 > **this** tree by **this** lane (C-39). Nothing is inherited from the Phase-1 lanes or from batch-63.
 > **Probe scripts:** `…/scratchpad/p1_prefixmax.py`, `p2_cost.py`, `p3_subseq.py`, `p4_census.py`,
 > `p5_x2.py` (paths in §7).

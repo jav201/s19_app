@@ -1,7 +1,7 @@
-# Phase-2 RE-GATE — QA lane — batch-64
+# Phase-2 RE-GATE — QA lane — batch-65
 
 > **Reviewing:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` **revision 2** (2 620 lines),
-> commit `b09ae9a` on `claude/batch-64-addendum-producer-bound`.
+> commit `b09ae9a` on `claude/batch-65-addendum-producer-bound`.
 > **Against:** this lane's first gate, `02-review-qa.md` (B-1, M-1…M-4, m-1…m-4).
 > **Independence:** every transcript below was executed by **this** lane in the pristine
 > `git archive 082ada9` export at `…/scratchpad/exp64`, probes `qa3_b1.py`, `qa3_inc1verdicts.py`,

@@ -1,4 +1,4 @@
-# batch-64 — Increment 1 — Review Packet
+# batch-65 — Increment 1 — Review Packet
 
 > **Scope: TESTS AND GOLDEN ONLY.** `s19_app/tui/services/report_service.py` was **not** touched —
 > `git diff --stat 082ada9 -- s19_app/` is **empty**, which is what makes the golden a capture *from*
@@ -18,7 +18,7 @@ No tool was missing, so nothing was installed and nothing was silently skipped.
 
 ## 1. What changed
 
-Authored the batch-64 acceptance and test nodes for `R-TUI-098` / `HLR-103` / `LLR-103.1…103.6` — **29
+Authored the batch-65 acceptance and test nodes for `R-TUI-098` / `HLR-103` / `LLR-103.1…103.6` — **29
 collected pytest nodes over the 28 live ids of §6.2** — and captured the byte-identity golden **from the
 SHIPPED `_addendum_lines` at base revision `082ada9`**, before the producer is rewritten. The nodes are
 authored to the verdicts §11.1 derived by execution: **13 RED · 12 GREEN regression guards · 4
@@ -71,7 +71,7 @@ python -m pytest -q tests/test_tui_directionb.py -k "tc031 or tc032"
 python -m ruff check tests/test_report_addendum_bound.py tests/test_tui_report_seam.py
 ```
 
-Golden re-capture (valid **only** against the pre-batch-64 producer):
+Golden re-capture (valid **only** against the pre-batch-65 producer):
 
 ```bash
 python -c "import sys,tempfile; sys.path.insert(0,'tests'); \

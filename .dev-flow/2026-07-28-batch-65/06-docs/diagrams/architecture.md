@@ -1,4 +1,4 @@
-# batch-64 — diagrams
+# batch-65 — diagrams
 
 **Audience:** engineers reading the `_addendum_lines` rewrite.
 **Purpose:** show the shape change, the per-candidate decision, and the boundary of what was bounded.
@@ -76,7 +76,7 @@ flowchart TB
   C7["append this variant id to the named list<br/>O of 1 last-seen sentinel - contiguity makes this exact"]
   C8["increment the remainder count only<br/>renders later as +N more"]
   C9{"dropped counter greater than 0 at emit time?"}
-  C10["emit the hit lines only - byte-identical to pre-batch-64"]
+  C10["emit the hit lines only - byte-identical to pre-batch-65"]
   C11["emit hit lines, then ONE notice line<br/>INSIDE this region's own sub-section:<br/>TRUNCATED: label capped at cap; dropped more not listed; variants affected"]
 
   C0 --> C1 --> C2
@@ -140,7 +140,7 @@ multiplier from one axis of one function. It is drawn here at the same scale as 
 
 ```mermaid
 flowchart LR
-  subgraph closed["BOUNDED by batch-64"]
+  subgraph closed["BOUNDED by batch-65"]
     K1["addendum candidate consumption<br/>R x V x E to V x E<br/>19200 to 300 at R=64"]
     K2["addendum resident allocation<br/>V,E-linear to O of R x 3K<br/>marginal delta ratio 1.00, threshold 1.30"]
     K3["silent truncation to a NAMED cut<br/>class, dropped count, dropped variants, region"]

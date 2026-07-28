@@ -1,4 +1,4 @@
-# batch-64 — functional description
+# batch-65 — functional description
 
 **Audience:** a technical stakeholder — engineer, reviewer, or maintainer — who did not live this
 batch. **Purpose:** understand what changed in the report generator, what it now guarantees, and
@@ -43,7 +43,7 @@ attacker (or simply a very large legitimate change set) chooses `V` and `E`. Thi
 cause of the host RAM exhaustion that ended an earlier batch's session.
 
 It was carried as backlog item **D1**. It was specified during batch-63, **blocked at that batch's
-Phase-2 re-gate**, and returned. batch-64 started from that blocked record rather than re-deriving it.
+Phase-2 re-gate**, and returned. batch-65 started from that blocked record rather than re-deriving it.
 
 ---
 

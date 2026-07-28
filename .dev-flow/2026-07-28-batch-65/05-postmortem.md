@@ -1,4 +1,4 @@
-# batch-64 — post-mortem
+# batch-65 — post-mortem
 
 > **BLUF: six independent reviews, two increment code reviews and a validation pass raised 61 findings
 > and found ZERO correctness defects in the shipped producer. That is the batch's headline and its
@@ -9,7 +9,7 @@
 > exist to stop, committed 46 times in one specification.**
 
 **Shipped:** D1 — `R-TUI-098` / `HLR-103` / `LLR-103.1…6`. `_addendum_lines` bounded.
-**Branch:** `claude/batch-64-addendum-producer-bound`, `082ada9` → `9d21d9a` (5 commits).
+**Branch:** `claude/batch-65-addendum-producer-bound`, `082ada9` → `9d21d9a` (5 commits).
 **Scope:** D1 only. **Zero drift.** OB-4/F4 and D2 held as carries, as chartered.
 
 ---
@@ -164,7 +164,7 @@ artifact the batch itself was producing.
 `state.json`: *"my independent union check verified that every qa slug was BOUND … it did NOT verify
 that each observable retained its STRENGTH through the merge. `AT-197` kept its id and lost its
 threshold."* That single hole is the direct cause of gate 1's qa blocker. **The failure mode migrated
-from deletion (batch-63: 8 of 18 observables dropped) to dilution (batch-64: 16/16 bound, 3 weakened).**
+from deletion (batch-63: 8 of 18 observables dropped) to dilution (batch-65: 16/16 bound, 3 weakened).**
 
 **A gate artifact was invalidated by a post-hoc fold with no re-issue.** Inc-2's packet claimed
 `git diff … touches report_service.py only` — false, because the orchestrator applied the L1 docstring
@@ -184,7 +184,7 @@ because *"stating a partial run as a pass would be the exact failure mode §6.3 
 ## 4. Scope — D1 only, zero drift, and holding it was right
 
 batch-63 began as "cap two unbounded tables," grew to twelve axes and two competing designs, and
-shipped 4 lines. batch-64 was chartered D1-only at kickoff, and **nothing was pulled in**: OB-4/F4,
+shipped 4 lines. batch-65 was chartered D1-only at kickoff, and **nothing was pulled in**: OB-4/F4,
 D2, OB-3, OB-2 and the `M-2` marker claim all stayed carries and are all still in Lane A today.
 Under sustained pressure to close the DoS, the batch's own requirement says six times that it does not.
 
@@ -299,7 +299,7 @@ claim is not the same skill as applying a correction to its whole class.
 | Independent reviews | **6** at Phase 2 (3 lanes × 2 rounds) + **2** increment code reviews + **1** Phase 4 |
 | Findings raised | **61** = 46 at Phase 2 (27 gate + 19 re-gate) · 11 at increment gates · 4 at Phase 4 |
 | Findings closed | 46/46 dispositioned, verified independently of the folder (27/27, then 19/19) · 9 of 11 folded in-increment, 2 carried and closed at Inc-3 · Phase 4: 3 folded, 1 carried |
-| Findings carried out | **F-4** + 3 non-gating gaps (G-1/G-2/G-3) — all now in Lane A |
+| Findings carried out | **F-4** + **F-3** + 3 non-gating gaps (G-1/G-2/G-3) — all now in Lane A. **Corrected at the merge gate:** this row previously read "3 folded, 1 carried" for Phase 4 and omitted F-3 entirely; the true tally is 2 folded + 1 carried + 1 that vanished *because* of the miscount, and the G-items were claimed to be in Lane A while being in neither backlog file. |
 | Blockers | 5 at gate 1 · 1 + 4 blocking majors at re-gate · **0 HIGH at any increment gate** · 0 at Phase 4 |
 | Design objections to the shape | **0** (4 to named sub-components, all dispositioned in writing) |
 | Spec amendments | **46** — A-1…9 (rev 1) · A-10…27 (rev 2) · A-28…40 (rev 3) · A-41…46 (Phase 3) |
@@ -402,7 +402,7 @@ argument, not a re-listing.**
 1. **HIGH — OB-4/F4, the two unbounded tables.** `_modifications_lines` + `_checklist_lines` at
    **988 B/entry**, ~11× the addendum's 89 B/hit; ~99 MB for one change document at
    `MF_ENTRY_COUNT_CEILING = 100 000`, ~6.3 GB at 8 docs × 8 variants. **This is the actual DoS axis
-   and batch-64 explicitly did not touch it.** It is now the top of Lane A on merit, and batch-64 has
+   and batch-65 explicitly did not touch it.** It is now the top of Lane A on merit, and batch-65 has
    already paid for the hard part: the bounding pattern, the marginal-delta measurement technique, and
    the notice/disclosure shape are all worked examples now. Take it next while they are warm.
 2. **MAJOR — `changes/apply.py:465` `_linkage_index` carries its own copy of the one-candidate bisect
@@ -451,7 +451,7 @@ Every number and quotation above is drawn from `.dev-flow/2026-07-28-batch-65/` 
 `01-requirements.md` rev 3 + §9d, `01b-qa-catalog.md`, three `02-review-*.md`, three `02-regate-*.md`,
 `03-increments/increment-00{1,2,3}.md`, `04-validation.md`), `.dev-flow/state.json`,
 `.dev-flow/BACKLOG-CODE.md`, and the five commits `0a6595b · c2c63db · 22c5ab7 · 9d21d9a` on
-`claude/batch-64-addendum-producer-bound`. The diff shape (`+565/−33` over 2 production files, empty
+`claude/batch-65-addendum-producer-bound`. The diff shape (`+565/−33` over 2 production files, empty
 frozen-path diff) was re-derived here with `git diff --numstat main...HEAD`, not copied from an artifact.
 
 **Flagged as my inference, not as evidence:**

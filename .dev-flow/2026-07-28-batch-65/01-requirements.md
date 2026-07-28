@@ -29,7 +29,7 @@
 > **Artifact language:** English (engineering-workflow default).
 > **Normative keyword:** `shall`, only inside HLR/LLR **Statement** lines. `should` never appears in a
 > normative statement.
-> **Tree:** `claude/batch-64-addendum-producer-bound` @ `082ada9` (== `origin/main`).
+> **Tree:** `claude/batch-65-addendum-producer-bound` @ `082ada9` (== `origin/main`).
 > **Provenance rule (C-39, in force):** every threshold below carries its executed RED and GREEN from
 > **this** tree, with the lane and section that produced it. Nothing is inherited from batch-63.
 > **Where two lanes measured the same quantity and disagree, BOTH are recorded with provenance and the
@@ -363,8 +363,8 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
 > **Requirement text (for `REQUIREMENTS.md`).** The declared-region report addendum shall consume the
 > candidate set in a single pass **whose candidate consumption is independent of the declared-region
 > count**, shall bound its own resident allocation independently of the per-variant candidate count and
-> of the variant count, shall preserve the pre-batch-64 emission order and be byte-identical to the
-> pre-batch-64 output whenever no admission cap fires, and shall disclose every cap that does fire by
+> of the variant count, shall preserve the pre-batch-65 emission order and be byte-identical to the
+> pre-batch-65 output whenever no admission cap fires, and shall disclose every cap that does fire by
 > naming the cut hit class, the dropped count, and **up to `ADDENDUM_NOTICE_VARIANTS_MAX` of the
 > variants whose hits were dropped, with an explicit count of the remainder**.
 >
@@ -423,7 +423,7 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
 - **Statement:** When `generate_project_report` renders the declared-region addendum, the system
   shall consume each candidate exactly once regardless of the declared-region count, shall admit
   at most `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` hits per (region, hit class), shall preserve the
-  pre-batch-64 line sequence exactly while no cap has fired, and shall emit, inside the sub-section of
+  pre-batch-65 line sequence exactly while no cap has fired, and shall emit, inside the sub-section of
   the region whose cap fired, one truncation notice per (region, hit class) whose cap fired, naming
   that class, the dropped count, and **up to `ADDENDUM_NOTICE_VARIANTS_MAX` of the identifiers of the
   variants whose hits were dropped, with an explicit count of the remainder**.
@@ -856,7 +856,7 @@ batch-62 spent a whole batch on. It is an **acceptance** (`AT-199` + `TC-495`), 
 - **Traceability:** HLR-103 → US-B64-1
 - **Statement:** While no admission counter has reached `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` for
   any (region, hit class), the report bytes produced by `generate_project_report` shall be identical,
-  under `tests/conftest.py::canonical_report_bytes`, to the bytes produced by the pre-batch-64 producer
+  under `tests/conftest.py::canonical_report_bytes`, to the bytes produced by the pre-batch-65 producer
   over the same inputs; and within one region the emitted hit sequence shall be
   `for result → for summary → (that summary's entry hits, then that summary's issue hits) → after all
   of that result's summaries, that result's check-result issue hits`, with region sub-sections in the
@@ -1729,7 +1729,7 @@ label spellings (`change-issue` / `check-issue`) are **not** used; its observabl
 
 **Verdict: bound + disclose, as revision 1 chose — but now for stated, priced reasons rather than by
 omission.** Severity-priority admission is a **legitimate future batch** and is carried to
-`BACKLOG-CODE.md` as its own item together with the histogram; it is not a batch-64 change.
+`BACKLOG-CODE.md` as its own item together with the histogram; it is not a batch-65 change.
 
 **Why the dropped-severity histogram is rejected.** It shares reason 1 above (undefined for the
 modification class, so the format must branch by class), and it widens `AT-197`'s tuple to a quadruple in
@@ -1792,7 +1792,7 @@ sentinel that `LLR-103.3`'s `V`-independence rests on. **Chosen: bound + disclos
   (architect §7.3/§7.5; qa §3.2; RED arm `FIX-B` at golden index 3).
 - **Acceptance changed:** `LLR-103.4` becomes satisfiable at all. `LLR-103.3`'s Statement now says
   "one ordered hit list … and three independent admission counters".
-- **Parent HLR re-read:** `HLR-103` — no change required; it already says "preserve the pre-batch-64
+- **Parent HLR re-read:** `HLR-103` — no change required; it already says "preserve the pre-batch-65
   line sequence exactly".
 - **Body edit landed:** §4 `LLR-103.3` Statement + first Acceptance-criteria bullet.
 
@@ -2145,7 +2145,7 @@ sentinel that `LLR-103.3`'s `V`-independence rests on. **Chosen: bound + disclos
 ### A-24 — §10.5's consumer carry: a copied docstring → an executed census
 
 - **Before:** *"the same latent defect exists for **every other consumer** — `validation/engine.py` and
-  `tui/hexview.py` … **This is the highest-value thing batch-64 found that batch-64 is not fixing.**"*
+  `tui/hexview.py` … **This is the highest-value thing batch-65 found that batch-65 is not fixing.**"*
 - **After:** the executed per-consumer census. `validation/engine.py` and `tui/hexview.py` are
   **CLEARED**; the live item is **`changes/apply.py::_linkage_index` (`:438`) /
   `_first_intersecting_symbol` (`:470`)** over A2L tag ranges, which carries **its own copy** of the
@@ -2594,7 +2594,7 @@ variants. Executed on this tree, **two lanes, two fixtures, recorded separately*
 
 **Any acceptance keyed to `generate_project_report`'s whole-report peak is unsatisfiable**, which is why
 `AT-194` keys on the **marginal delta**. `R-TUI-098` asserts no whole-report bound, so F2 has nothing to
-attach to. **Stays a carry in `BACKLOG-CODE.md:17` — batch-64 must not pull it in.**
+attach to. **Stays a carry in `BACKLOG-CODE.md:17` — batch-65 must not pull it in.**
 
 ### 10.3 Region cardinality — an uncapped multiplier this batch does not close
 
@@ -2637,15 +2637,15 @@ Executed through the **shipped** functions against this document's own §7 T-5 f
 ```
  flood=199  addendum class total=201
     SHIPPED addendum (uncapped)            : CHG-COLLISION lines = 2/2
-    batch-64 capped addendum (first K)     : CHG-COLLISION lines = 1/2   <-- the eviction 10.4 describes
+    batch-65 capped addendum (first K)     : CHG-COLLISION lines = 1/2   <-- the eviction 10.4 describes
     'Declaration errors' sections, all v   : CHG-COLLISION lines = 2/2   pre-existing '> TRUNCATED:' = 0
 
  flood=200  addendum class total=202
-    batch-64 capped addendum (first K)     : CHG-COLLISION lines = 0/2
+    batch-65 capped addendum (first K)     : CHG-COLLISION lines = 0/2
     'Declaration errors' sections, all v   : CHG-COLLISION lines = 2/2   pre-existing '> TRUNCATED:' = 0
 
  flood=400  addendum class total=402
-    batch-64 capped addendum (first K)     : CHG-COLLISION lines = 0/2
+    batch-65 capped addendum (first K)     : CHG-COLLISION lines = 0/2
     'Declaration errors' sections, all v   : CHG-COLLISION lines = 2/2   pre-existing '> TRUNCATED:' = 1
 ```
 
@@ -2670,7 +2670,7 @@ rejects both, with reasons, at §12 X-8. Both are carried to `BACKLOG-CODE.md` a
 ### 10.5 `range_index` is wrong on overlapping ranges — worked around, not fixed
 
 `address_in_sorted_ranges` returns **False** for an address genuinely inside an overlapping range
-(§2.6). The module is **engine-frozen** (`tests/test_engine_unchanged.py:123`), so batch-64 does not
+(§2.6). The module is **engine-frozen** (`tests/test_engine_unchanged.py:123`), so batch-65 does not
 touch it and instead coalesces at the call site (`LLR-103.2`).
 
 **REVISION 2 — revision 1's consumer carry was COPIED FROM A DOCSTRING, NOT CENSUSED (security S4).**
@@ -3089,7 +3089,7 @@ census that misses the one it does not:
 | **X-5** | **Two per-hit constants over the same quantity, different fixtures:** architect **86.5 – 93.2 B/hit**; qa **93.9 / 93.3 / 89.1 B/hit**. Two whole-report baseline growth rates: architect **×1.68 / ×1.81**; qa **×1.94**. | **NOT averaged, NOT resolved — both recorded with provenance** (§2.2, §10.2). They are different fixtures measuring the same phenomenon and the spread is the honest uncertainty. No acceptance keys on either, so neither needs resolution; if a future batch wants to key on one, it must re-derive. |
 | **X-6** | **Constant name:** architect `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`; qa `MAX_ADDENDUM_HITS_PER_REGION_CLASS`. | Cosmetic. Architect's name adopted (`LLR-103.6` owns naming). Recorded so a grep for the qa name finds this line. |
 | **X-7** | **Notice wording:** architect `> TRUNCATED: …` (blockquote, one line per region+cut class); qa reference form `- _Truncated at 200 per class: …_` (list item, one line per region). | Architect's decision adopted; qa §9(a) explicitly deferred wording to the architect lane and its observables are wording-agnostic. Not a real contradiction — recorded for completeness. |
-| **X-8 (NEW)** | **Is disclosure sufficient, or must the batch PREVENT severity-blind eviction?** The Phase-2 security lane (S5) says the residual is real but §10.4 overstated it, and proposes two folds: a **dropped-severity histogram** in the notice, and **severity-priority admission** — the latter *"prevention at the specced cost"*, `O(R × 3K)`, subsequence-preserving. | **BOTH REJECTED for batch-64, with executed reasons; the underlying finding ACCEPTED and recorded.** (1) `ChangeSummaryEntry` (`changes/model.py:321-373`) has **no severity field** — the modification class cannot be ranked or histogrammed, so both folds must branch by class, and the security lane's probe sampled a `ValidationIssue`, which is why it did not surface this. (2) Severity-priority admission allows an **already-admitted hit to be evicted later**, so the affected-variant set is no longer monotone in traversal order and the `O(1)` last-seen sentinel (architect M-2) must become an `O(V)` membership set — **prevention on the severity axis costs the `V`-independence claim on the memory axis**, which is the bound this requirement exists to establish. (3) It also needs a stored document index per admitted hit plus a sort at emission. **What IS folded:** §10.4's overstatement is corrected with the executed mitigation; the real residual is renamed *"suppression of the SEVERITY SIGNAL, not of the evidence's existence"*; and §8.2's matrix now **prices** severity-priority admission instead of rejecting prevention having considered only one alternative. **Both folds carried to `BACKLOG-CODE.md` at MED as one item.** |
+| **X-8 (NEW)** | **Is disclosure sufficient, or must the batch PREVENT severity-blind eviction?** The Phase-2 security lane (S5) says the residual is real but §10.4 overstated it, and proposes two folds: a **dropped-severity histogram** in the notice, and **severity-priority admission** — the latter *"prevention at the specced cost"*, `O(R × 3K)`, subsequence-preserving. | **BOTH REJECTED for batch-65, with executed reasons; the underlying finding ACCEPTED and recorded.** (1) `ChangeSummaryEntry` (`changes/model.py:321-373`) has **no severity field** — the modification class cannot be ranked or histogrammed, so both folds must branch by class, and the security lane's probe sampled a `ValidationIssue`, which is why it did not surface this. (2) Severity-priority admission allows an **already-admitted hit to be evicted later**, so the affected-variant set is no longer monotone in traversal order and the `O(1)` last-seen sentinel (architect M-2) must become an `O(V)` membership set — **prevention on the severity axis costs the `V`-independence claim on the memory axis**, which is the bound this requirement exists to establish. (3) It also needs a stored document index per admitted hit plus a sort at emission. **What IS folded:** §10.4's overstatement is corrected with the executed mitigation; the real residual is renamed *"suppression of the SEVERITY SIGNAL, not of the evidence's existence"*; and §8.2's matrix now **prices** severity-priority admission instead of rejecting prevention having considered only one alternative. **Both folds carried to `BACKLOG-CODE.md` at MED as one item.** |
 | **X-9 (NEW)** | **Are the notice predicates decidable by counting `> TRUNCATED:`?** Revision 1 wrote *"0 notice lines anywhere in the report"*. | **NO — resolved by rescoping the predicate, not by weakening it.** Three pre-existing emitters (`report_service.py:1134` / `:1383` / `:1403`); `:1134` **fires on §7 T-5's own `flood = 400` row**, and `:1383` / `:1403` fire on axes the AT fixture does not control at all. All notice predicates are now **addendum-scoped** by rendered shape between the addendum heading and the next `^## ` **or EOF, whichever comes first**, with `TC-499` as the positive control. **The `or EOF` arm is NEW in revision 3 (`QA-NEW-3`):** executed, the addendum is the **last** `## ` section of an ordinary report (heading #5 of 5; `## Truncation appendix` follows only when `notes` is non-empty, and `notes` is populated exclusively by `_hexdump_section`), so the revision-2 predicate resolved to **no scope** and read **0 addendum notices always** — vacuating `AT-197/198/199/201/202/203` **and** `TC-499`. **An empty scope shall FAIL the test, never read as zero notices.** Recorded here so the next reader does not re-derive the three emitters. See A-17, A-31. |
 
 ---
@@ -3295,7 +3295,7 @@ and is folded with the rest: the `≥ 50 %` RED-margin rule kills `TC-483` (A-33
 | # | finding | sev | disposition | lands in |
 |---|---|---|---|---|
 | **SEC-S1** | `R-TUI-098` claims cost independent of `R`; the `R` multiplier is **relocated** into `LLR-103.2`'s attribution walk, where no acceptance looks. `153600` region ops for 300 candidates at `R = 512`; `19200` at `R = 64` | blocker | **FOLDED — security's arm (a), plus its mandatory G-2 fixture** | §3 `R-TUI-098` Statement (*"candidate consumption"*) + **non-claim (e)** · §3 `HLR-103` Statement + Rationale + threshold · §7 **T-9** (new) · §10.7 (new residual) · **`TC-498`** (new node) · §14 diagram `O(V×E·(log R + A) + R×3K)` · `TC-497` verbatim set gains `500 → 128000` · §9b **A-10** |
-| **ARCH-B-1** | same defect from the other side: `AT-195`/`TC-488`/`TC-489` count leaves and stay GREEN at `R = 256` while work grows ×256; `huge+tiny` executed `500 → 128000` | blocker | **FOLDED — architect's recommended fold 3 + fold 2 + fold 4** (narrow the claim, add the ops arm, record the `all-nested` irreducibility). Fold 1 (segment tree) **declined for batch-64** and moved to §15 item 7 as the named reversal trigger — which is the architect's own stated recommendation | as SEC-S1, plus §10.7's *"`all-nested` is irreducible"* paragraph and §4 `LLR-103.2`'s STRUCTURE PINNED bullet · §9b **A-10**, **A-11** |
+| **ARCH-B-1** | same defect from the other side: `AT-195`/`TC-488`/`TC-489` count leaves and stay GREEN at `R = 256` while work grows ×256; `huge+tiny` executed `500 → 128000` | blocker | **FOLDED — architect's recommended fold 3 + fold 2 + fold 4** (narrow the claim, add the ops arm, record the `all-nested` irreducibility). Fold 1 (segment tree) **declined for batch-65** and moved to §15 item 7 as the named reversal trigger — which is the architect's own stated recommendation | as SEC-S1, plus §10.7's *"`all-nested` is irreducible"* paragraph and §4 `LLR-103.2`'s STRUCTURE PINNED bullet · §9b **A-10**, **A-11** |
 | **QA-B-1** | `AT-197`'s `{variants} ⊇ {v2,v3}` is a representation check; `FIX-H` is GREEN on the **entire** revision-1 acceptance set while inverting US-B64-2 for the attacker variant | blocker | **FOLDED — all three recommended sub-folds** (set equality · `FIX-H` a named RED arm · its own boundary arm) | §3 US-B64-2 outcome + *"Why this is not `AT-165` again"* (rewritten, with the `FIX-H` transcript) + boundary catalog · §4 `LLR-103.5` Statement + threshold · §5.1 row 12 · §6.2 · §7 T-5 · **`AT-202`** (new node) · §9b **A-12** |
 | **ARCH-B-2** | Inc-2's one-file cut is infeasible: `tests/test_report_field_census.py:353` is a source-AST census that fires on the notice's new `md_safe` site, and no increment owns the file | blocker | **FOLDED — architect's primary fold (add the file to Inc-2), WITH A CORRECTION** (§17.5): the census trip is **conditional on the expression spelling**, so revision 2 *also* pins the spelling. The alternative fold (reuse already-escaped strings) is **declined** — it leaves the sink unplanted, which the architect explicitly recommended against | §2.3 (two new constraint rows) · §4 `LLR-103.5` (pinned spelling + column-0 note) · §10.10 (new) · §11 Inc-2 gains the file with an **unconditional `PLANTED`** obligation + a conditional `_ESCAPED_EXPRESSIONS` obligation · §11 census table · §9b **A-23** |
 | **ARCH-B-3** | `AT-196` is GREEN at Inc-1 **by construction**, so Inc-1's *"every AT fails"* and §6.3's *"every AT shown RED"* are unsatisfiable; `AT-198` arms 1–2 are GREEN by vacuity | blocker | **FOLDED — architect's fold verbatim, including the mandatory last clause** (falsifiability carried by the mutant arms, reproduced at Inc-2 against the **implemented** producer) | §6.3 (qualified + mutant-arm clause) · §11.1 **per-node expected-verdict table** (new) · §6.2 pre-fix executability ledger · §9b **A-23** |
@@ -3336,7 +3336,7 @@ and is folded with the rest: the `≥ 50 %` RED-margin rule kills `TC-483` (A-33
 
 **`SEC-S5` fold 2 — the dropped-severity histogram in `ADDENDUM_TRUNCATION_NOTICE_FMT`
 (`… 2 more not listed (1 error, 1 warning; variants affected: v2, v3)`), extending `AT-197`'s triple to a
-quadruple. REJECTED for batch-64.**
+quadruple. REJECTED for batch-65.**
 
 The rest of S5 is folded in full: §10.4's overstatement is corrected with the security lane's own
 transcripts, the real residual is renamed (*suppression of the severity **signal***), and §8.2 now prices

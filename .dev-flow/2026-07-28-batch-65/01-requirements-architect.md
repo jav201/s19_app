@@ -3,7 +3,7 @@
 > **Artifact language:** English (engineering-workflow default).
 > **Normative keyword:** `shall`, only inside HLR/LLR **Statement** lines. `should` never appears in a
 > normative statement.
-> **Tree:** `claude/batch-64-addendum-producer-bound` @ `082ada9` (`git rev-parse --short HEAD` →
+> **Tree:** `claude/batch-65-addendum-producer-bound` @ `082ada9` (`git rev-parse --short HEAD` →
 > `082ada9`). Every number below was **executed on this tree**; nothing is inherited from batch-63.
 
 ---
@@ -149,7 +149,7 @@ Both stories arrived through Definition of Ready and are **not re-scoped here**.
 > **Requirement text (for `REQUIREMENTS.md`).** The declared-region report addendum shall consume the
 > candidate set in a single pass whose cost is independent of the declared-region count, shall bound
 > its own resident allocation independently of the per-variant candidate count and of the variant
-> count, shall be byte-identical to the pre-batch-64 output whenever no admission cap fires, and shall
+> count, shall be byte-identical to the pre-batch-65 output whenever no admission cap fires, and shall
 > disclose every cap that does fire by naming the cut hit class, the dropped count, and the affected
 > variants.
 >
@@ -169,7 +169,7 @@ Both stories arrived through Definition of Ready and are **not re-scoped here**.
 - **Statement:** When `generate_project_report` renders the declared-region addendum, the system
   shall traverse the candidate set exactly once regardless of the declared-region count, shall admit
   at most `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` hits per (region, hit class), shall preserve the
-  pre-batch-64 line sequence exactly while no cap has fired, and shall emit one truncation notice per
+  pre-batch-65 line sequence exactly while no cap has fired, and shall emit one truncation notice per
   (region, hit class) whose cap fired, naming that class, the dropped count, and the affected variant
   identifiers.
 - **Rationale (informative):** the resident cost is paid before any output exists, so no output-side
@@ -337,7 +337,7 @@ Both stories arrived through Definition of Ready and are **not re-scoped here**.
 - **Traceability:** HLR-103 → US-B64-1
 - **Statement:** While no admission counter has reached `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` for
   any (region, hit class), the report bytes produced by `generate_project_report` shall be identical,
-  under `tests/conftest.py::canonical_report_bytes`, to the bytes produced by the pre-batch-64
+  under `tests/conftest.py::canonical_report_bytes`, to the bytes produced by the pre-batch-65
   producer over the same inputs.
 - **Validation:** `test (integration)`
 - **Executed verification:** `pytest tests/test_report_addendum_bound.py -k at196`, comparing against
@@ -903,7 +903,7 @@ document at `MF_ENTRY_COUNT_CEILING = 100_000` (`tui/changes/io.py:226`) and ~6.
 per `E`-doubling and **x1.81** per `V`-doubling (§7.6d). **Any acceptance keyed to
 `generate_project_report`'s whole-report peak is unsatisfiable**, which is why `AT-194` keys on the
 **marginal delta**. `R-TUI-098` asserts no whole-report bound, so F2 has nothing to attach to.
-**Stays a carry in `BACKLOG-CODE.md:17` — batch-64 must not pull it in.**
+**Stays a carry in `BACKLOG-CODE.md:17` — batch-65 must not pull it in.**
 
 ### 9.3 Region cardinality — an uncapped multiplier this batch does not close
 
@@ -928,12 +928,12 @@ claim" paragraph so no later batch can read a prevention claim into it.
 ### 9.5 `range_index` is wrong on overlapping ranges — worked around, not fixed
 
 `address_in_sorted_ranges` returns **False** for an address genuinely inside an overlapping range
-(§7.1.5). The module is **engine-frozen** (`tests/test_engine_unchanged.py:122`), so batch-64 does not
+(§7.1.5). The module is **engine-frozen** (`tests/test_engine_unchanged.py:122`), so batch-65 does not
 touch it and instead coalesces at the call site (LLR-103.2). **New carry** for `BACKLOG-CODE.md`: the
 same latent defect exists for every other consumer — `validation/engine.py` and `tui/hexview.py`
 (named in `range_index.py`'s own `Used by` docstrings) — and whether *their* range sets can overlap is
 **unverified by this batch**. Fixing it needs an operator unfreeze + a re-freeze PR; auditing the two
-consumers does not. **This is the highest-value thing batch-64 found that batch-64 is not fixing.**
+consumers does not. **This is the highest-value thing batch-65 found that batch-65 is not fixing.**
 
 ### 9.6 M-2 truncation-marker claim
 

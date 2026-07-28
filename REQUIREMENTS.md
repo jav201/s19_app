@@ -4870,12 +4870,12 @@ emission there, not merely a cap.
   `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is
   closed by neither this requirement nor a `_ByteBudget` remedy.
 
-## Bounded declared-region addendum — batch-64 (R-TUI-098)
+## Bounded declared-region addendum — batch-65 (R-TUI-098)
 
 **R-TUI-098**: The declared-region report addendum shall consume the candidate set in a single pass
 **whose candidate consumption is independent of the declared-region count `R`**, shall bound its own
 resident allocation independently of the per-variant candidate count `E` and of the variant count
-`V`, shall preserve the pre-batch-64 emission order and be byte-identical to the pre-batch-64 output
+`V`, shall preserve the pre-batch-65 emission order and be byte-identical to the pre-batch-65 output
 whenever no admission cap fires, and shall disclose every cap that does fire by naming the cut hit
 class, the dropped count, and **up to `ADDENDUM_NOTICE_VARIANTS_MAX` of the variants whose hits were
 dropped, with an explicit count of the remainder**.
@@ -4902,7 +4902,7 @@ the Phase-2 architect fixture — three fixtures, three figures, **not averaged*
 86.5–93.9 B/hit, and they scale with `E` where the bounded addendum no longer does. Any acceptance
 keyed to `generate_project_report`'s whole-report peak is therefore unsatisfiable, which is why
 `AT-194` keys on the **marginal delta** attributable to the addendum. This axis was already carried in
-`.dev-flow/BACKLOG-CODE.md` (batch-63 F2 / OB-4) and **stays there** — batch-64 must not be read as
+`.dev-flow/BACKLOG-CODE.md` (batch-63 F2 / OB-4) and **stays there** — batch-65 must not be read as
 having pulled it in.
 
 (b) **Traversal below one pass is not claimed.** The `R` multiplier is removed **from candidate

@@ -1,7 +1,7 @@
-# batch-64 — Phase-2 RE-GATE: SECURITY lane
+# batch-65 — Phase-2 RE-GATE: SECURITY lane
 
 **Reviewer:** the lane that filed `02-review-security.md` (BLOCK, S1 blocker + S2–S5 major + S6 minor).
-**Base:** `claude/batch-64-addendum-producer-bound` @ `b09ae9a`.
+**Base:** `claude/batch-65-addendum-producer-bound` @ `b09ae9a`.
 **Under re-gate:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` **revision 2** (2620 lines).
 **Scope:** narrow. (1) discharge of my own six findings; (2) new defects planted by what revision 2
 CHANGED. I did **not** re-litigate the `LLR-103.2` soundness clearance, the notice's

@@ -1,7 +1,7 @@
-# batch-64 — Phase-2 RE-GATE, ARCHITECT lane (narrow)
+# batch-65 — Phase-2 RE-GATE, ARCHITECT lane (narrow)
 
 > **Reviewing:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` **revision 2** (2620 lines).
-> **Tree:** `claude/batch-64-addendum-producer-bound` @ `b09ae9a`. Every figure below was executed on
+> **Tree:** `claude/batch-65-addendum-producer-bound` @ `b09ae9a`. Every figure below was executed on
 > **this** tree by **this** lane (C-39). Nothing is inherited from revision 1, from the other Phase-2
 > lanes, or from my own first-pass review except where a row explicitly says so.
 > **New probes:** `…/scratchpad/p6_tc498.py`, `…/scratchpad/p7_inc1_verdicts.py`.

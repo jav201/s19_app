@@ -1,4 +1,4 @@
-# Phase-2 review — QA lane — batch-64
+# Phase-2 review — QA lane — batch-65
 
 > **Reviewing:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` (consolidated, 1213 lines).
 > **Supporting:** `PLAN.md`, `01-requirements-architect.md`, `01b-qa-catalog.md`.
