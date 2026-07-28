@@ -76,6 +76,8 @@ from textual.containers import Horizontal, ScrollableContainer, Vertical
 from textual.css.query import NoMatches
 from textual.widgets import Button, Input, Label, Select, Static, Switch
 
+from .os_clipboard_input import OsClipboardInput
+
 from .insight_style import (
     DGRAY,
     GREEN,
@@ -439,7 +441,7 @@ class CrcDesignerPanel(ScrollableContainer):
         """
         return Horizontal(
             Label(label, classes="crc-field-label"),
-            Input(
+            OsClipboardInput(
                 value=value,
                 id=field_id,
                 placeholder=placeholder,

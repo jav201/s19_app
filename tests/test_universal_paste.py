@@ -42,13 +42,14 @@ import pytest
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.os_clipboard_input import OsClipboardInput
 
-#: Modules converted by batch-66 Inc-1. Inc-2 replaces this hand-kept list with
-#: a package-wide sweep; until then the census is scoped to what has landed, so
-#: a green increment means "everything claimed converted IS converted".
-_CONVERTED_MODULES = ("app.py", "command_bar.py")
-
 #: Repo-relative root of the TUI package under census.
 _TUI_DIR = Path(__file__).resolve().parents[1] / "s19_app" / "tui"
+
+#: The census sweeps the WHOLE package rather than a hand-kept list (Inc-2
+#: widened it from the Inc-1 pair). A list only pins the modules someone
+#: remembered to add; the sweep also fails on a NEW module that reintroduces a
+#: stock ``Input`` — which is the actual regression this batch must prevent.
+_SWEPT_MODULES = sorted(_TUI_DIR.rglob("*.py"))
 
 
 def _stock_input_constructions(module_path: Path) -> List[Tuple[int, str]]:
@@ -92,36 +93,58 @@ def _stock_input_constructions(module_path: Path) -> List[Tuple[int, str]]:
     return sorted(offenders)
 
 
-@pytest.mark.parametrize("module_name", _CONVERTED_MODULES)
-def test_ac1_converted_modules_construct_no_stock_input(module_name: str) -> None:
-    """AC-1: no converted module may instantiate a stock ``Input``.
+@pytest.mark.parametrize(
+    "module_path", _SWEPT_MODULES, ids=lambda p: p.name
+)
+def test_ac1_no_tui_module_constructs_a_stock_input(module_path: Path) -> None:
+    """AC-1: no module in ``s19_app/tui/`` may instantiate a stock ``Input``.
 
-    Measured pre-fix on ``73e3fb9``: ``app.py`` had 8 such constructions and
-    ``command_bar.py`` had 3 — so this assertion is RED on the unfixed tree,
-    not vacuously green.
+    Measured pre-fix on ``73e3fb9``: 16 such constructions across 5 modules
+    (``app.py`` 8, ``command_bar.py`` 3, ``screens.py`` 3,
+    ``screens_directionb.py`` 1, ``crc_designer_view.py`` 1) — so this
+    assertion is RED on the unfixed tree, not vacuously green.
+
+    Swept over the whole package rather than a fixed list, so a module added
+    later that reintroduces a stock ``Input`` fails here without anyone having
+    to remember to register it.
     """
-    offenders = _stock_input_constructions(_TUI_DIR / module_name)
+    offenders = _stock_input_constructions(module_path)
     assert offenders == [], (
-        f"{module_name} constructs stock Input() at "
+        f"{module_path.name} constructs stock Input() at "
         f"{[ln for ln, _ in offenders]} — Ctrl+V will silently do nothing "
         f"there. Use OsClipboardInput. Offending lines: "
         f"{[src for _, src in offenders]}"
     )
 
 
-def test_ac1_census_can_detect_an_offender() -> None:
+def test_ac1_census_can_detect_an_offender(tmp_path: Path) -> None:
     """AC-1 positive control: the census is not structurally unable to fail.
 
     A census that returns ``[]`` for every input is indistinguishable from a
-    correct one. Feed it a module that *does* construct a stock ``Input`` and
-    require a hit — otherwise the parametrized test above proves nothing.
+    correct one, and once the package is clean every real module returns ``[]``
+    — so with no positive control the sweep above would stay green even if
+    ``_stock_input_constructions`` were replaced by ``return []``.
+
+    Feeds it a synthetic module containing one construction plus the two shapes
+    that must NOT count (a ``query_one`` reference and an ``Input.Changed``
+    annotation), and requires exactly the construction to be reported.
     """
-    probe = _TUI_DIR / "screens.py"
-    assert _stock_input_constructions(probe), (
-        "screens.py is expected to still hold stock Input() constructions at "
-        "Inc-1 (they are Inc-2's scope). If it is already clean, this positive "
-        "control must be re-pointed at another unconverted module — do not "
-        "delete it, or the census loses its only proof that it can fail."
+    probe = tmp_path / "probe.py"
+    probe.write_text(
+        "from textual.widgets import Input\n"
+        "def build():\n"
+        "    w = Input(placeholder='x', id='y')\n"
+        "    ref = query_one('#y', Input)\n"
+        "    return w, ref\n"
+        "def on_input_changed(event: Input.Changed) -> None:\n"
+        "    pass\n",
+        encoding="utf-8",
+    )
+    offenders = _stock_input_constructions(probe)
+    assert [ln for ln, _ in offenders] == [3], (
+        "The census must report the construction on line 3 and ONLY that one: "
+        "a bare reference (line 4) and an attribute annotation (line 6) are "
+        f"legitimate and must not be flagged. Got: {offenders}"
     )
 
 

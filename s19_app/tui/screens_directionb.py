@@ -2702,7 +2702,7 @@ class FlowBuilderPanel(ScrollableContainer):
                 allow_blank=False,
                 id="flow_gating",
             ),
-            Input(
+            OsClipboardInput(
                 placeholder="ref (image / change-doc / output name)",
                 id="flow_ref",
             ),

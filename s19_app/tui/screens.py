@@ -541,7 +541,7 @@ class SaveProjectScreen(ModalScreen[Optional[SaveProjectPayload]]):
     def compose(self) -> ComposeResult:
         children: list = [
             Label("Save project folder under:", classes="modal-title"),
-            Input(
+            OsClipboardInput(
                 placeholder="C:\\path\\to\\parent\\folder",
                 id="project_parent_path",
             ),
@@ -1485,7 +1485,7 @@ class ReportViewerScreen(ModalScreen[None]):
             ),
             Container(
                 Label("Context bytes:"),
-                Input(
+                OsClipboardInput(
                     value=str(REPORT_CONTEXT_BYTES_DEFAULT),
                     id="report_context_bytes",
                 ),
@@ -1870,7 +1870,7 @@ class OperationsScreen(ModalScreen[None]):
                 id="operations_list",
             ),
             Label("CRC config (editable JSON):", id="operation_config_label"),
-            Input(
+            OsClipboardInput(
                 placeholder="config file path (.json)",
                 id="operation_config_path",
             ),
