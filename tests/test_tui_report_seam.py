@@ -63,6 +63,11 @@ from s19_app.tui.services.variant_execution_service import read_project_manifest
 
 from conftest import canonical_report_bytes
 
+# batch-64 Inc-1: AT-200 reuses the addendum-scoped notice oracle rather than
+# re-implementing it. A second copy of the scope predicate is a second place
+# for the "no notice" / "no scope" confusion to reappear (spec §3 US-B64-2).
+from test_report_addendum_bound import _addendum_notices, _cap
+
 # Two minimal valid S19 images (checksums verified against
 # s19_app.core.S19File) — a 2-variant project per the spec, so the seam is
 # exercised on a real multi-variant inventory.
@@ -370,6 +375,145 @@ def test_declared_region_in_dialog_reaches_report_addendum(tmp_path: Path) -> No
     assert "## Addendum: declared regions" in text
     assert "calzone" in text
     assert "modification @ 0x1000" in text
+
+
+# ---------------------------------------------------------------------------
+# batch-64 Inc-1 — AT-200 / LLR-103.5 / HLR-103 (US-B64-2): the truncation
+# notice is DELIVERED — it reaches the written file AND the screen the
+# operator reads. Authored at Inc-1 against the pre-fix producer, so its
+# falsifiability is the RED -> GREEN flip across the Inc-1/Inc-2 boundary.
+# ---------------------------------------------------------------------------
+
+#: The declared region AT-200 types into the report dialog. Every flood entry
+#: below falls inside it, so the region's ``modification`` class total is the
+#: entry count times the variant count.
+_AT200_REGION_INPUT = "calzone,0x1000,0x1FFF"
+_AT200_REGION_START = 0x1000
+
+
+def _write_flood_change_document(path: Path, entries: int) -> None:
+    """Overwrite ``chg.json`` with ``entries`` one-byte entries from 0x1000.
+
+    Local to AT-200 ONLY — ``_write_change_document`` (one entry) stays
+    untouched because the AT-055b golden was captured over it, exactly as
+    ``_write_two_entry_change_document`` is kept separate for the filtered
+    report tests. Entries beyond the 4-byte image are dispositioned
+    ``skipped-outside``; the addendum lists every entry regardless of
+    disposition, which is what makes this a usable flood through the surface.
+    """
+    path.write_text(
+        json.dumps(
+            {
+                "format": "s19app-changeset",
+                "version": "2.0",
+                "kind": "change",
+                "encoding": "utf-8",
+                "value_mode": "text",
+                "entries": [
+                    {
+                        "type": "bytes",
+                        "address": f"0x{_AT200_REGION_START + index:X}",
+                        "bytes": "AA",
+                    }
+                    for index in range(entries)
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def test_at200_truncation_notice_reaches_the_file_and_the_viewer(
+    tmp_path: Path,
+) -> None:
+    """AT-200 / LLR-103.5 / US-B64-2 — when the declared-region addendum's cap
+    fires, the truncation notice is present in the WRITTEN report file and in
+    the text the shipped ``ReportViewerScreen`` renders back.
+
+    Intent: this is the only Layer-B node that observes the notice through
+    BOTH the written file and the viewer seam — i.e. the only node that
+    certifies US-B64-2's *delivery* rather than its *production*. It also
+    guards a hole the batch-63 ``_ByteBudget`` carry would open if a future
+    batch added a ``budget.fits`` gate to ``generate_project_report``'s
+    ``emit()``.
+
+    Its RED arm was CORRECTED in spec revision 3: there is none. The
+    revision-2 arm ("an ``emit()`` path that drops it") is executed-false —
+    ``emit`` unconditionally extends ``lines`` and merely *accounts* bytes, and
+    it is a closure local to ``generate_project_report``, so the arm is not
+    constructible from a test without editing production code. Falsifiability
+    is carried by the RED -> GREEN flip across the increment boundary: pre-fix
+    no notice exists at all.
+
+    Expected at Inc-1: **RED**. Expected at Inc-2: GREEN.
+    """
+    cap = _cap()
+    flood = cap + 1
+
+    async def _drive() -> Tuple[str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        project_dir = _make_report_project(app, "proj")
+        _write_flood_change_document(project_dir / "chg.json", flood)
+        async with app.run_test() as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            app.action_view_reports()
+            await _flush(pilot)
+            screen = app.screen_stack[-1]
+            assert isinstance(screen, ReportViewerScreen)
+            screen.query_one("#report_declared_regions", TextArea).text = (
+                _AT200_REGION_INPUT
+            )
+            screen.query_one("#report_generate", Button).press()
+            await _flush(pilot)
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            active = app._active_project_dir()
+            assert active is not None
+            disk_text = list_project_reports(active)[0].read_text(encoding="utf-8")
+
+            app.action_view_reports()
+            await _flush(pilot)
+            viewer = app.screen_stack[-1]
+            assert isinstance(viewer, ReportViewerScreen)
+            await pilot.press("enter")
+            await _flush(pilot)
+            rendered = viewer.query_one("#report_markdown", Markdown).source
+            return disk_text, rendered
+
+    disk_text, rendered = asyncio.run(_drive())
+
+    # Fixture precondition, derived from the change document rather than from
+    # the report: a correct producer CAPS the rendered hit lines at K, so the
+    # flood cannot be confirmed by counting output lines.
+    assert flood > cap, (
+        f"AT-200 fixture precondition: the change document must declare more "
+        f"than {cap} in-region entries; it declares {flood}"
+    )
+    assert "## Addendum: declared regions" in disk_text, (
+        "AT-200 fixture precondition: the typed declared region must reach the "
+        "produced report's addendum"
+    )
+    assert rendered == disk_text, (
+        "AT-200 fixture precondition: the viewer must render the report's real "
+        "on-disk bytes, so 'reaches the viewer' is a delivery claim rather than "
+        "a rendering artefact"
+    )
+
+    in_file = _addendum_notices(disk_text)
+    in_viewer = _addendum_notices(rendered)
+    assert len(in_file) >= 1, (
+        f"AT-200: {flood} in-region entries per variant exceed the cap {cap}, "
+        f"but the written report discloses nothing; addendum-scoped notices in "
+        f"the file: {in_file}"
+    )
+    assert in_viewer == in_file, (
+        f"AT-200: the notice reached the file but not the screen the operator "
+        f"reads; file={in_file} viewer={in_viewer}"
+    )
 
 
 def test_parse_declared_regions_handles_hex_dec_and_skips_malformed() -> None:

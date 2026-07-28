@@ -38,12 +38,18 @@ synthetic in-memory fixtures / public example data exclusively.
 
 from __future__ import annotations
 
+import bisect
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Iterable, List, Optional, Sequence, Tuple
 
+from ...range_index import (
+    RangeIndex,
+    address_in_sorted_ranges,
+    build_sorted_range_index,
+)
 from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
@@ -51,7 +57,7 @@ from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
 from .markdown_safety import md_code, md_safe
 from .report_addendum import DECLARED_REGION_NAME_MAX, DeclaredRegion
-from .report_filter import ReportFilterMatcher
+from .report_filter import ReportFilterMatcher, _merge_ranges
 from ..models import ProjectVariantSet
 from .variant_execution_service import (
     SCOPE_ACTIVE,
@@ -88,6 +94,61 @@ REPORT_MAX_REGIONS_PER_VARIANT = 128
 #: — the two sections have the same unbounded-input shape, so a reader comparing
 #: the two report kinds should not have to learn two numbers.
 MAX_REPORT_ISSUES_PER_VARIANT = 200
+
+#: Per-(declared region, hit class) admission cap for the report addendum
+#: (batch-64, LLR-103.3/LLR-103.6).
+#:
+#: The addendum's cost used to be paid entirely BEFORE any output existed — one
+#: fully formatted string per matching (region, candidate) pair accumulated in a
+#: local list — so no output-side budget could reach it. This cap bounds the
+#: producer's OWN resident allocation at ``len(regions) x 3 x K`` hit lines,
+#: independently of the variant count and of the per-variant candidate count.
+#:
+#: 200 mirrors :data:`MAX_REPORT_ISSUES_PER_VARIANT` deliberately, for the same
+#: reason that constant mirrors ``flow_report_service`` — a reader comparing two
+#: caps in one document should not have to learn two numbers. The in-domain
+#: maximum is 2 hits per region, so the margin is ~100x.
+MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION = 200
+
+#: The addendum's three hit classes, INDEXED BY CLASS ORDINAL (batch-64, §8.1):
+#: ``0`` change-summary entries, ``1`` change-summary issues, ``2`` check-result
+#: issues. Consumed positionally by :func:`_addendum_truncation_notice` and by
+#: the acceptance suite — a mapping would break both.
+ADDENDUM_CLASS_LABELS: Tuple[str, str, str] = (
+    "modification",
+    "change-file issue",
+    "check-file issue",
+)
+
+#: Maximum variant identifiers NAMED in one truncation notice; beyond it the
+#: notice states how many further distinct variants were affected, not which.
+#:
+#: The cap is required, not cosmetic: an uncapped list is ``O(V)`` resident and
+#: would put the variant count straight back into the bound
+#: :data:`MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` exists to establish.
+ADDENDUM_NOTICE_VARIANTS_MAX = 8
+
+#: The addendum truncation notice (batch-64, LLR-103.5). A bound that silently
+#: drops evidence turns an evidentiary document into a misleading one, so every
+#: (region, hit class) whose cap fires discloses the class, the cap, the dropped
+#: count and the affected variants.
+#:
+#: ⚠ The literal ``> `` prefix is load-bearing twice over. It renders as a
+#: call-out rather than as one more ``- `` hit line, AND it is what keeps the
+#: notice's escaped values off column 0.
+#:
+#: That second job is GUARDED, as of batch-64 Inc-3:
+#: ``test_no_escaped_field_is_emitted_at_the_head_of_its_line``
+#: (``tests/test_report_field_census.py``) walked ``ast.JoinedStr`` only and was
+#: structurally blind to a ``.format()``-built template, so an earlier revision
+#: of this comment merely DOCUMENTED the hole. The guard now also walks
+#: ``NAME.format()`` over module-level string constants and rejects any template
+#: line that begins with a substitution field — so deleting the ``> `` here
+#: fails that test rather than silently removing the only protection.
+ADDENDUM_TRUNCATION_NOTICE_FMT = (
+    "> TRUNCATED: {label} hits in this region were capped at {cap}; "
+    "{dropped} more not listed (variants affected: {variants})."
+)
 
 #: Report-wide Mode-A character cap (batch-62 A-18). THIS module's cap, not the
 #: flow report's 240 — each consumer owns its own, because the leaf escaper takes
@@ -1511,21 +1572,362 @@ def _entropy_lines(result: VariantExecutionResult) -> List[str]:
     return lines
 
 
+@dataclass(frozen=True, slots=True)
+class _AddendumRegionIndex:
+    """
+    Summary:
+        The per-call address-membership structure the addendum resolves every
+        candidate against: a COALESCED half-open reject cover plus a
+        start-sorted view of the ORIGINAL regions with a prefix-maximum-of-ends
+        array for overlap-safe identity recovery.
+
+    Args:
+        cover (RangeIndex): ``build_sorted_range_index`` over the coalesced,
+            half-open ``(start, end + 1)`` cover. Sound REJECT pre-filter only.
+        starts (List[int]): Region starts, ascending.
+        ends (List[int]): The matching INCLUSIVE region ends, in ``starts``
+            order.
+        pmax (List[int]): ``pmax[i] = max(ends[0..i])`` — the downward walk's
+            prune.
+        order (List[int]): ``order[i]`` is the CALLER's index of the region at
+            sorted position ``i``, so hits land in the caller's region order.
+
+    Returns:
+        None: Frozen container.
+
+    Data Flow:
+        - Built once per :func:`_addendum_lines` call in ``O(R log R)``, then
+          read once per candidate.
+
+    Dependencies:
+        Uses:
+            - range_index.build_sorted_range_index
+        Used by:
+            - _build_addendum_region_index / _addendum_regions_for
+
+    Example:
+        >>> _build_addendum_region_index([]).order
+        []
+    """
+
+    cover: RangeIndex
+    starts: List[int]
+    ends: List[int]
+    pmax: List[int]
+    order: List[int]
+
+
+def _build_addendum_region_index(
+    regions: Sequence[DeclaredRegion],
+) -> _AddendumRegionIndex:
+    """
+    Summary:
+        Build the addendum's per-call region index (LLR-103.2): the coalesced
+        half-open reject cover and the start-sorted starts/ends/prefix-max
+        vectors that recover WHICH regions contain an address.
+
+    Args:
+        regions (Sequence[DeclaredRegion]): The operator-declared regions, in
+            caller order. May overlap, nest, or repeat.
+
+    Returns:
+        _AddendumRegionIndex: The structure :func:`_addendum_regions_for` reads.
+
+    Data Flow:
+        - ``DeclaredRegion`` is INCLUSIVE ``[start, end]`` and ``range_index``
+          is HALF-OPEN, so the cover is built from ``(start, end + 1)``.
+          Without the ``+ 1`` the end address of every declared region is a
+          false negative.
+        - The cover is COALESCED because ``address_in_sorted_ranges`` inspects a
+          single ``bisect_right(starts, addr) - 1`` candidate and is therefore
+          unsound over overlapping ranges — coalescing is a CORRECTNESS
+          precondition here, not an optimisation.
+        - ``report_filter._merge_ranges`` is REUSED rather than mirrored: it is
+          the same coalescing already applied to freely-overlapping A2L+MAC
+          spans at ``report_filter.py``'s ``build_sorted_range_index`` call, and
+          a second coalescer would be a second place for the ``+ 1`` convention
+          to drift.
+        - The cover cannot name a region (it returns ``bool`` and its ranges are
+          merged), so identity is recovered from the LOCAL vectors below.
+
+    Dependencies:
+        Uses:
+            - report_filter._merge_ranges
+            - range_index.build_sorted_range_index
+        Used by:
+            - _addendum_lines
+
+    Example:
+        >>> _build_addendum_region_index([DeclaredRegion("z", 0x10, 0x1F)]).ends
+        [31]
+    """
+    order = sorted(range(len(regions)), key=lambda i: regions[i].start)
+    starts = [regions[i].start for i in order]
+    ends = [regions[i].end for i in order]
+    pmax: List[int] = []
+    running = -1
+    for end in ends:
+        running = end if end > running else running
+        pmax.append(running)
+    cover = build_sorted_range_index(
+        _merge_ranges([(region.start, region.end + 1) for region in regions])
+    )
+    return _AddendumRegionIndex(
+        cover=cover, starts=starts, ends=ends, pmax=pmax, order=order
+    )
+
+
+def _addendum_regions_for(
+    address: int, index: _AddendumRegionIndex
+) -> Tuple[List[int], int]:
+    """
+    Summary:
+        Return the CALLER indices of every declared region containing
+        ``address``, plus the number of region ops the resolution cost
+        (LLR-103.1 / LLR-103.2).
+
+    Args:
+        address (int): The candidate address.
+        index (_AddendumRegionIndex): Output of
+            :func:`_build_addendum_region_index`.
+
+    Returns:
+        Tuple[List[int], int]: ``(matching caller indices, region ops)``. A
+        candidate inside ``M`` overlapping regions yields ``M`` indices, which
+        is what makes the addendum emit it once per matching region exactly as
+        the pre-batch-64 producer did.
+
+    Data Flow:
+        - The coalesced cover rejects non-members in ``O(log R)`` and is used
+          for NOTHING else — it is boolean and merged, so it can never name a
+          region.
+        - Identity comes from ``bisect_right(starts, address) - 1`` walked
+          DOWNWARD while ``pmax[i] >= address``, collecting every ``i`` whose
+          ``ends[i] >= address``. Every visited ``i`` has ``starts[i] <=
+          address`` by sortedness, so ``ends[i] >= address`` IS inclusive
+          containment.
+        - The returned op count is the disclosure counter of §10.7, and it
+          counts exactly ONE thing: ``ends[i] >= address`` comparisons in the
+          downward walk. The ``pmax`` guard and both bisects are EXCLUDED —
+          only that convention is invariant under dropping the reject
+          pre-filter, and an exact-equality gate on a counter that moves with a
+          sanctioned implementation choice is no gate.
+
+    Dependencies:
+        Uses:
+            - range_index.address_in_sorted_ranges
+            - bisect.bisect_right
+        Used by:
+            - _addendum_lines
+
+    Example:
+        >>> idx = _build_addendum_region_index([DeclaredRegion("z", 0x10, 0x1F)])
+        >>> _addendum_regions_for(0x1F, idx)
+        ([0], 1)
+    """
+    if not address_in_sorted_ranges(address, index.cover):
+        return [], 0
+    starts = index.starts
+    ends = index.ends
+    pmax = index.pmax
+    order = index.order
+    matched: List[int] = []
+    ops = 0
+    position = bisect.bisect_right(starts, address) - 1
+    while position >= 0 and pmax[position] >= address:
+        ops += 1
+        if ends[position] >= address:
+            matched.append(order[position])
+        position -= 1
+    return matched, ops
+
+
+@dataclass(slots=True)
+class _AddendumRegionHits:
+    """
+    Summary:
+        One declared region's ORDERED hit list plus its three per-class
+        admission counters and the ``O(1)`` state the truncation notice needs
+        (LLR-103.3).
+
+    Args:
+        lines (List[str]): Admitted hit lines, in traversal order.
+        admitted (List[int]): Admitted count per class ordinal.
+        dropped (List[int]): Rejected count per class ordinal.
+        named (List[List[str]]): Up to
+            :data:`ADDENDUM_NOTICE_VARIANTS_MAX` already-escaped variant ids per
+            class, in first-drop order.
+        distinct (List[int]): Distinct affected variants per class.
+        last_cut (List[Optional[str]]): Per class, the RAW variant id of the
+            most recent drop.
+
+    Returns:
+        None: Mutable per-region accumulator.
+
+    Data Flow:
+        - ONE ordered list, not three per-class lists: the pre-batch-64
+          emission order INTERLEAVES ``mod, issue, mod, issue`` per summary, so
+          three concatenated per-class lists would emit ``mod, mod, issue,
+          issue`` and break byte identity below the bound. With counters, the
+          admitted sequence is a SUBSEQUENCE of the shipped one by construction.
+        - ``distinct`` is counted with the ``last_cut`` sentinel rather than a
+          membership set. That is ``O(1)`` ONLY because ``variant_results`` is
+          the outermost loop, so one variant's drops are contiguous; an
+          ``O(V)`` set would put the variant count back into the very bound
+          this class establishes. PRECONDITION, stated because it is load-bearing
+          and not enforced here: each ``variant_id`` must occupy ONE contiguous
+          run of ``variant_results``. A repeated id breaks the sentinel — it is
+          named twice in the notice and ``distinct`` overcounts. Not reachable
+          through ``ProjectVariantSet`` today, which is why this is a documented
+          precondition rather than a guard.
+
+    Dependencies:
+        Used by:
+            - _addendum_lines
+
+    Example:
+        >>> _AddendumRegionHits.empty().dropped
+        [0, 0, 0]
+    """
+
+    lines: List[str]
+    admitted: List[int]
+    dropped: List[int]
+    named: List[List[str]]
+    distinct: List[int]
+    last_cut: List[Optional[str]]
+
+    @classmethod
+    def empty(cls) -> "_AddendumRegionHits":
+        """Return a zeroed accumulator for one region."""
+        return cls(
+            lines=[],
+            admitted=[0, 0, 0],
+            dropped=[0, 0, 0],
+            named=[[], [], []],
+            distinct=[0, 0, 0],
+            last_cut=[None, None, None],
+        )
+
+    def admit(
+        self, hit_class: int, line: str, variant_id: str, safe_variant_id: str
+    ) -> None:
+        """
+        Summary:
+            Admit ``line`` while this class is under
+            :data:`MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`; otherwise record the
+            drop against the notice.
+
+        Args:
+            hit_class (int): Class ordinal into
+                :data:`ADDENDUM_CLASS_LABELS`.
+            line (str): The formatted hit line.
+            variant_id (str): The RAW producing variant id — the sentinel key.
+            safe_variant_id (str): The same id already escaped for the document.
+
+        Returns:
+            None: Mutates this accumulator.
+
+        Data Flow:
+            - Traversal never stops on saturation: the dropped count and the
+              affected-variant set are exactly what a run that stopped looking
+              could not report.
+
+        Dependencies:
+            Used by:
+                - _addendum_lines
+        """
+        if self.admitted[hit_class] < MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION:
+            self.admitted[hit_class] += 1
+            self.lines.append(line)
+            return
+        self.dropped[hit_class] += 1
+        if self.last_cut[hit_class] == variant_id:
+            return
+        self.last_cut[hit_class] = variant_id
+        self.distinct[hit_class] += 1
+        if len(self.named[hit_class]) < ADDENDUM_NOTICE_VARIANTS_MAX:
+            self.named[hit_class].append(safe_variant_id)
+
+
+def _addendum_truncation_notice(
+    hit_class: int, region_hits: _AddendumRegionHits
+) -> str:
+    """
+    Summary:
+        Format one ``(region, cut class)`` truncation notice from
+        :data:`ADDENDUM_TRUNCATION_NOTICE_FMT` (LLR-103.5).
+
+    Args:
+        hit_class (int): Class ordinal whose cap fired.
+        region_hits (_AddendumRegionHits): That region's accumulator.
+
+    Returns:
+        str: The notice line, naming the class, the cap, the dropped count and
+        the affected variants — at most
+        :data:`ADDENDUM_NOTICE_VARIANTS_MAX` of them, then ``+N more``.
+
+    Data Flow:
+        - The variant ids are ALREADY escaped: they were escaped at the
+          recording site inside the traversal, by the same
+          ``md_safe(result.variant_id, limit=REPORT_CELL_CHARS)`` expression the
+          hit lines use, so the notice renders a given id byte-identically to
+          its neighbouring hit line.
+        - ``+N more`` names the count of unnamed DISTINCT affected variants, so
+          the notice's own size is bounded independently of the variant count.
+
+    Dependencies:
+        Uses:
+            - ADDENDUM_TRUNCATION_NOTICE_FMT / ADDENDUM_CLASS_LABELS
+        Used by:
+            - _addendum_lines
+
+    Example:
+        >>> hits = _AddendumRegionHits.empty()
+        >>> hits.dropped[1], hits.distinct[1] = 2, 0
+        >>> "change-file issue" in _addendum_truncation_notice(1, hits)
+        True
+    """
+    named = list(region_hits.named[hit_class])
+    remainder = region_hits.distinct[hit_class] - len(named)
+    if remainder > 0:
+        named.append(f"+{remainder} more")
+    return ADDENDUM_TRUNCATION_NOTICE_FMT.format(
+        label=ADDENDUM_CLASS_LABELS[hit_class],
+        cap=MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION,
+        dropped=region_hits.dropped[hit_class],
+        variants=", ".join(named),
+    )
+
+
 def _addendum_lines(
     regions: Sequence[DeclaredRegion],
     variant_results: Sequence[VariantExecutionResult],
+    *,
+    ops_counter: Optional[List[int]] = None,
 ) -> List[str]:
     """
     Summary:
-        Render the declared-region addendum (LLR-024.2): one sub-section per
-        region listing the modifications and validation issues whose address
-        falls within the region's inclusive ``[start, end]`` range, aggregated
-        across all variants. A region with no hits renders an explicit "None.".
+        Render the declared-region addendum (LLR-024.2, bounded by
+        R-TUI-098/HLR-103): one sub-section per region listing the
+        modifications and validation issues whose address falls within the
+        region's inclusive ``[start, end]`` range, aggregated across all
+        variants. A region with no hits renders an explicit "None."; a
+        ``(region, hit class)`` whose admission cap fires renders one
+        truncation notice naming what was dropped.
 
     Args:
-        regions (Sequence[DeclaredRegion]): The operator-declared regions.
+        regions (Sequence[DeclaredRegion]): The operator-declared regions, in
+            the order their sub-sections appear.
         variant_results (Sequence[VariantExecutionResult]): Per-variant E6
             outcomes — the same objects the per-variant report sections walk.
+        ops_counter (Optional[List[int]]): Test-only seam (LLR-103.1). A
+            one-element accumulator; ``ops_counter[0]`` is incremented by the
+            region ops this call performed. THE SEAM IS THIS PARAMETER, not a
+            module-level counter: ``report_service`` has no module-level mutable
+            state, and this function is shared by the TUI report worker and the
+            CLI, so a module global would be a cross-call race dressed up as an
+            instrument.
 
     Returns:
         List[str]: Markdown lines beginning with the
@@ -1536,6 +1938,19 @@ def _addendum_lines(
           the issues on its change summaries + check results
           (``ValidationIssue.address``) — the SAME address the issue renderer
           (``_declaration_error_lines``) reads (single source, TC-S3).
+        - SINGLE PASS: the declared-region loop is OUT of the candidate
+          traversal, so each leaf sequence is iterated exactly once per call
+          regardless of ``len(regions)``. The pre-batch-64 shape re-read every
+          leaf once per region and paid the whole cost — one fully formatted
+          string per matching (region, candidate) pair — before any output
+          existed, which is why no output budget could reach it.
+        - ``variant_results`` stays the OUTERMOST loop. That is load-bearing,
+          not incidental: it is what makes each variant's drops contiguous and
+          the ``+N more`` remainder countable with an ``O(1)`` sentinel instead
+          of an ``O(V)`` membership set.
+        - Traversal is NOT terminated on saturation. A run that stopped looking
+          could not report the dropped count or the affected variants, which is
+          the whole content of the notice.
         - Aggregates across ALL variants regardless of ``result.status`` —
           deliberately consistent with the per-variant report sections, which
           also emit for every variant; each hit line is tagged
@@ -1545,43 +1960,160 @@ def _addendum_lines(
 
     Dependencies:
         Uses:
-            - DeclaredRegion.contains
+            - _build_addendum_region_index / _addendum_regions_for
+            - _AddendumRegionHits / _addendum_truncation_notice
+            - md_safe
         Used by:
             - generate_project_report
             - tests/test_report_service.py
+            - tests/test_report_addendum_bound.py
+
+    Example:
+        >>> _addendum_lines([], [])
+        ['## Addendum: declared regions', '']
+    """
+    index = _build_addendum_region_index(regions)
+    per_region = [_AddendumRegionHits.empty() for _ in regions]
+    ops = 0
+
+    def _admit_issue_hits(
+        issues: Iterable[object],
+        hit_class: int,
+        variant_id: str,
+        safe_variant: str,
+    ) -> int:
+        """
+        Summary:
+            Admit one hit class of address-bearing issues, returning the
+            attribution cost so the caller can accumulate it. Extracted because
+            the change-summary and check-result arms are identical but for the
+            iterable and the class ordinal; the hit line is still built AFTER
+            the membership test, so a candidate that matches no region is never
+            formatted (the whole point of the batch).
+
+        Args:
+            issues (Iterable[object]): ``ValidationIssue`` objects; those with
+                ``address is None`` are skipped.
+            hit_class (int): The admission-counter ordinal — ``1`` for
+                change-summary issues, ``2`` for check-result issues.
+            variant_id (str): The raw variant id, used for de-duplication.
+            safe_variant (str): The once-escaped id rendered into the line.
+
+        Returns:
+            int: Region comparisons performed, for the ``ops_counter`` seam.
+
+        Data Flow:
+            - Reads ``index`` and mutates ``per_region``, both closed over.
+
+        Dependencies:
+            Uses:
+                - _addendum_regions_for / md_safe / _AddendumRegionHits.admit
+            Used by:
+                - _addendum_lines
+
+        Example:
+            >>> _addendum_lines([], [])
+            ['## Addendum: declared regions', '']
+        """
+        cost_total = 0
+        for issue in issues:
+            if issue.address is None:
+                continue
+            matched, cost = _addendum_regions_for(issue.address, index)
+            cost_total += cost
+            if not matched:
+                continue
+            line = (
+                f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
+                f"@ 0x{issue.address:X} "
+                f"(variant {safe_variant})"
+            )
+            for region_id in matched:
+                per_region[region_id].admit(
+                    hit_class, line, variant_id, safe_variant
+                )
+        return cost_total
+
+    for result in variant_results:
+        # Escaped ONCE per variant, at the recording site, and shared by the hit
+        # lines and the notice — which is what makes a given id render
+        # byte-identically in both.
+        safe_variant = md_safe(result.variant_id, limit=REPORT_CELL_CHARS)
+        for summary in result.change_summaries:
+            for entry in summary.entries:
+                matched, cost = _addendum_regions_for(entry.address_start, index)
+                ops += cost
+                if not matched:
+                    continue
+                line = (
+                    f"- modification @ 0x{entry.address_start:X} "
+                    f"(variant {safe_variant})"
+                )
+                for region_id in matched:
+                    per_region[region_id].admit(
+                        0, line, result.variant_id, safe_variant
+                    )
+            ops += _admit_issue_hits(
+                summary.issues, 1, result.variant_id, safe_variant
+            )
+        for check in result.check_results:
+            ops += _admit_issue_hits(
+                check.issues, 2, result.variant_id, safe_variant
+            )
+
+    if ops_counter is not None:
+        ops_counter[0] += ops
+    return _render_addendum(regions, per_region)
+
+
+def _render_addendum(
+    regions: Sequence[DeclaredRegion],
+    per_region: Sequence[_AddendumRegionHits],
+) -> List[str]:
+    """
+    Summary:
+        Emit the addendum's Markdown from the per-region accumulators: heading,
+        then one sub-section per region carrying its hit list (or "None.") and
+        one truncation notice per hit class whose cap fired.
+
+    Args:
+        regions (Sequence[DeclaredRegion]): The declared regions, in caller
+            order.
+        per_region (Sequence[_AddendumRegionHits]): One accumulator per region,
+            index-aligned with ``regions``.
+
+    Returns:
+        List[str]: The addendum's lines.
+
+    Data Flow:
+        - Each notice sits INSIDE its own region's sub-section, after that
+          region's hit list and before the region's trailing blank line, so the
+          document says WHICH region lost evidence.
+        - A region whose counters never fired emits no notice, and a report in
+          which nothing was cut emits none at all — which is what keeps the
+          below-bound document byte-identical to the pre-batch-64 one.
+
+    Dependencies:
+        Uses:
+            - md_safe / _addendum_truncation_notice
+        Used by:
+            - _addendum_lines
+
+    Example:
+        >>> _render_addendum([], [])
+        ['## Addendum: declared regions', '']
     """
     lines: List[str] = ["## Addendum: declared regions", ""]
-    for region in regions:
+    for region, hits in zip(regions, per_region):
         # The limit is the field's OWN upstream cap, not the report's: a name is
         # already scrubbed to 80, so a wider cap here could never fire and a
         # narrower one would truncate a legitimately-accepted name.
         name = md_safe(region.name, limit=DECLARED_REGION_NAME_MAX)
         lines.append(f"### {name} (0x{region.start:X}-0x{region.end:X})")
-        hits: List[str] = []
-        for result in variant_results:
-            for summary in result.change_summaries:
-                for entry in summary.entries:
-                    if region.contains(entry.address_start):
-                        hits.append(
-                            f"- modification @ 0x{entry.address_start:X} "
-                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
-                        )
-                for issue in summary.issues:
-                    if issue.address is not None and region.contains(issue.address):
-                        hits.append(
-                            f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
-                            f"@ 0x{issue.address:X} "
-                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
-                        )
-            for check in result.check_results:
-                for issue in check.issues:
-                    if issue.address is not None and region.contains(issue.address):
-                        hits.append(
-                            f"- issue [{md_safe(issue.code, limit=REPORT_CELL_CHARS)}] "
-                            f"@ 0x{issue.address:X} "
-                            f"(variant {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)})"
-                        )
-        lines.extend(hits if hits else ["None."])
+        lines.extend(hits.lines if hits.lines else ["None."])
+        for hit_class in range(len(ADDENDUM_CLASS_LABELS)):
+            if hits.dropped[hit_class]:
+                lines.append(_addendum_truncation_notice(hit_class, hits))
         lines.append("")
     return lines
 

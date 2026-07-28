@@ -51,8 +51,11 @@ class DeclaredRegion:
 
     Data Flow:
         - Constructed from the report dialog (Inc3) or a headless caller.
-        - Consumed by :func:`report_service._addendum_lines` for per-region
-          membership via :meth:`contains`.
+        - Consumed by :func:`report_service._addendum_lines`, which since
+          batch-64 decides membership through a coalesced half-open cover and a
+          caller-local attribution walk, NOT through :meth:`contains`.
+          :meth:`contains` remains the oracle the addendum tests compare that
+          walk against, so it is live API, not dead code.
 
     Dependencies:
         Uses:
