@@ -1,7 +1,8 @@
 # batch-64 — Post-mortem
 
-**BLUF: the control this batch encoded caught its own authors nine times while being written, including
-twice on the orchestrator and once on the reviewer auditing it. That is not embarrassment — it is the
+**BLUF: the control this batch encoded caught its own authors TWELVE times while being written — four
+times on the orchestrator, twice on reviewers auditing it, and once as a vacuous check inside the
+anti-vacuity clause itself. That is not embarrassment — it is the
 only evidence available that the control is operable, and it is the batch's single most reusable
 output. The process cost was disproportionate to four paragraphs of text, and that is stated plainly
 rather than absorbed.**
@@ -22,7 +23,7 @@ Encoded the control candidates the operator resolved at batch-63's postmortem. F
 
 **+26 334 B across five files. Zero production code.**
 
-## 2. The nine self-catches — the batch's primary output
+## 2. The twelve self-catches — the batch's primary output
 
 Every one was found by applying the control under encoding to the work encoding it.
 
@@ -37,6 +38,9 @@ Every one was found by applying the control under encoding to the work encoding 
 | 7 | `AT-B64-04` measured an **890 B body that ships at 1 975 B** | fold 2, caught by the audit |
 | 8 | the discharge auditor mis-scoped the census a **fourth** way, and committed a C-42 mechanic **inside its audit of C-42** | auditor |
 | 9 | the orchestrator used **`write_text`** applying the review folds — batch-63's own **D3** defect — inside the batch encoding *assert against the emitted encoding* | orchestrator |
+| **10** | **the mutation-hygiene clause confirmed its own restore by a DISJUNCTION** — *"`git status` clean, **or** the hash restored"* — and for an **untracked** file, the class this batch mutated five of, `git status` reports identically whether or not the mutation was reverted. **A vacuous check inside the control that forbids vacuous checks**, authored by the reviewer who had demanded the clause | security merge gate (its own text) |
+| **11** | the orchestrator's line-ending proof was **VOID**: `git diff --stat` cannot show CRLF damage when `core.autocrlf=true` (measured: it is), so the evidence **could not have failed** | orchestrator |
+| **12** | the **security reviewer's** own `read_text` probe reported `CR 0` — universal-newline translation, C-42 mechanic 4 — and the **qa reviewer's** substring predicate over-counted `§7.1` by matching `§7.10`/`§7.11` | both merge-gate reviewers, self-reported |
 
 Plus: `V-6` and `V-7`, **two tautological assertions live on `main`**, found only by executing the
 candidate control against batch-63's corpus. Both passed three 0-HIGH gates. C-10, C-31 and C-39 all
@@ -70,10 +74,15 @@ different questions, and every gate that asked only the first passed something t
   freeze, and it should have been the *first* move, not the fourth.
 - **The orchestrator's own fold repeated the defect class it was closing** — dropping observables while
   encoding "do not drop observables". Cause was structural: it **rewrote where it should have amended.**
-- **A read/write race I created** by dispatching a ledger-builder and a fold against the same file
-  concurrently, producing a phantom finding (`U-2`) that would have blocked the gate on the claim that
-  the whole fold never landed. **Second measured occurrence** of batch-62's `sec F5`, which sits in the
-  backlog **unencoded**.
+- **A read/write race I created**, and then repeated. Dispatching a ledger-builder and a fold against
+  the same file produced a phantom finding (`U-2`) that would have blocked a gate on the claim that the
+  whole fold never landed. It then recurred at the merge gate — the merge ran while both reviewers were
+  mid-read, and later `dev-flow.md` moved twice under them. **Five measured occurrences in one batch** of
+  batch-62's `sec F5`, which sits in the backlog **unencoded**, and the fifth was an *unrelated* process
+  rewriting `VERIFY.md` (+9 657 B) — **the first to touch shipped text**. Both the qa reviewer and I
+  re-ran the affected acceptances rather than assume: block 4 still an exact substring, `PP-4` and
+  `AT-B64-08` GREEN, `US-B64-4` intact. C-40 now *mandates* mutations, so this rule is a **dependency of
+  an encoded control** — which is why `§7.8` escalates it rather than merely carrying it.
 - **Proportionality.** ~14 agent runs for four paragraphs. `/fast-dev-flow` was flagged as the better
   route at intake; the operator kept `/dev-flow` and that is their call, but the ceremony/deliverable
   ratio is the honest headline cost.
@@ -82,12 +91,16 @@ different questions, and every gate that asked only the first passed something t
 
 | | |
 |---|---|
-| Phase iterations | 0:0 · **1:3 (soft cap)** · 2:1 · 3:1 · 4:0 |
+| Phase iterations | 0:0 · **1:3 (soft cap)** · 2:1 · 3:1 · 4:1 · 5:1 · 6:1 |
 | Phase-2 findings | architect 6B/10M/8m · qa 2B/4M/5m · security 0B/1M/2m |
 | Discharge audit | 38 source findings · 31 closed · 4 carried · 3 not closed |
 | Union ledger | 294 rows: 247 carried / 7 retired / 39 restored / 1 unplaceable |
 | Code review | **0 HIGH** / 4 MEDIUM / 3 LOW; byte fidelity **6/6**, placement **5/5** |
-| Operator rulings | 4 (course leg OUT · C-41→rider · V-FULL at 2.07× · re-affirm at 2.56×) |
+| Merge gate — security | BLOCKED 1H/3M/1L → delta **OK-TO-MERGE 0H/0M/1L** |
+| Merge gate — qa | BLOCKED 3H/6M/3L → delta **OK-TO-MERGE 0H**, 3 new MEDIUMs closed pre-merge |
+| CI on the merged head | `tui-ci` **pass 33m8s** · `snapshot` **pass 1m49s** |
+| Merged | PR **#144**, squash **`71126c9`**, `main` `082ada9` → `71126c9` |
+| Operator rulings | 6 (course leg OUT · C-41→rider · V-FULL at 2.07× · re-affirm at 2.56× · freeze-then-measure at the soft cap · merge-then-coherence-review) |
 | Suite | 2201 passed, 29 snapshots, exit 0 — **re-derived**, not carried |
 
 ## 6. Scope drift
@@ -100,7 +113,7 @@ knowingly.
 
 ## 7. Items proposed for the next batch
 
-All are in `.dev-flow/BACKLOG.md §7.1–7.8`. The four worth naming here:
+Eleven carries, split across the two lanes `main` introduced mid-batch — `BACKLOG-CODE.md` (§7.1/7.2/7.8) and `BACKLOG-PROCESS.md` (§7.3–7.7, 7.9–7.11). The five worth naming here:
 
 1. **Four vacuous predicates live on `main`** — `V-6`/`V-7` and two others; carry, not fix (D-5).
 2. **The worktree read/write hygiene rule** now has **two measured occurrences** and is a dependency of
@@ -121,3 +134,21 @@ All are in `.dev-flow/BACKLOG.md §7.1–7.8`. The four worth naming here:
 - **Phases 4 and 5 were authored by the orchestrator** rather than co-authored by `qa-reviewer` and
   `architect` sub-agents. Both are syntheses of evidence produced independently by other parties;
   every figure in them is cited to an executed transcript. Recorded as a deviation, not absorbed.
+
+## 9. The merge gate's own lesson — the freeze protected the wrong number
+
+Both merge gates BLOCKED first, and the sharpest finding was **HIGH-1**: the installed C-35 rider
+shipped *"Same family, **8 occurrences enumerated** … cite the enumeration, **never a total**"* — a
+sentence citing a total while forbidding one, contradicting an amendment that had ruled that same
+enumeration under-drawn at 9, and **falsifying `A-12`**, which was recorded closed on *"the encoded
+text carries no occurrence total."*
+
+**It survived every earlier gate because block 2 matched its frozen hash.** The freeze guaranteed the
+bytes were the reviewed bytes; it could say nothing about whether those bytes were *true*. That is the
+limit of the mechanism this batch introduced, discovered by the batch itself, and it belongs beside
+`§3` in any account of what freeze-then-measure buys:
+
+> **A hash proves the text did not change. It does not prove the text was right.**
+
+The corollary already recorded at `AT-B64-11` — *a hash proves* a *change, never the* right *one* —
+turns out to cut in the other direction too.

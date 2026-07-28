@@ -6,14 +6,24 @@
 **Batch id:** `2026-07-27-batch-64`
 **Route:** full `/dev-flow` (operator-invoked)
 **Language:** English (inherited from `state.json`, unchanged)
-**Status:** Phase 0 — awaiting gate
+**Status:** ✅ **MERGED + CLOSED OUT** — PR [#144](https://github.com/jav201/s19_app/pull/144), squash `71126c9`, 2026-07-28. Awaiting `/dev-flow-sync`.
 
 ---
 
 ## 1. Where we are
 
-Phase 0 (story intake) derived, four destinations verified on disk, control-id space derived.
-Awaiting the Definition-of-Ready gate. Nothing has been encoded yet.
+**Done.** All five in-scope stories shipped; the TUI-course leg was ruled OUT by the operator with its
+plan left durable. `main`: `082ada9 → 71126c9`. CI green on the merged head (`tui-ci` 33m8s,
+`snapshot` 1m49s). Both merge gates BLOCKED first and cleared at **0 HIGH** after folds. Zero
+production code at any point — the suite is unchanged at **2 201 passing**, re-derived not carried.
+
+Encoded: **C-40** + the **C-35 rider** (global), **C-42** (project rules), the **`VERIFY.md`**
+extension, and the lineage registrations including **C-29 back-registered**. `C-41` cancelled on
+measured evidence; its id remains free.
+
+**The batch's primary output is not the text — it is that the control caught its own authors twelve
+times while being written**, including a vacuous check inside the anti-vacuity clause itself, and two
+tautological assertions found **live on `main`** that all three pre-existing controls miss.
 
 ## 2. Objective
 
