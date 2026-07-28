@@ -134,11 +134,17 @@ ADDENDUM_NOTICE_VARIANTS_MAX = 8
 #: count and the affected variants.
 #:
 #: ⚠ The literal ``> `` prefix is load-bearing twice over. It renders as a
-#: call-out rather than as one more ``- `` hit line, AND it is the ONLY thing
-#: keeping the notice's escaped values off column 0: the notice is built by
-#: ``.format()``, so ``test_no_escaped_field_is_emitted_at_the_head_of_its_line``
-#: (``tests/test_report_field_census.py``) — which walks ``ast.JoinedStr`` only —
-#: is structurally blind to it. An edit that drops the prefix removes the guard.
+#: call-out rather than as one more ``- `` hit line, AND it is what keeps the
+#: notice's escaped values off column 0.
+#:
+#: That second job is GUARDED, as of batch-64 Inc-3:
+#: ``test_no_escaped_field_is_emitted_at_the_head_of_its_line``
+#: (``tests/test_report_field_census.py``) walked ``ast.JoinedStr`` only and was
+#: structurally blind to a ``.format()``-built template, so an earlier revision
+#: of this comment merely DOCUMENTED the hole. The guard now also walks
+#: ``NAME.format()`` over module-level string constants and rejects any template
+#: line that begins with a substitution field — so deleting the ``> `` here
+#: fails that test rather than silently removing the only protection.
 ADDENDUM_TRUNCATION_NOTICE_FMT = (
     "> TRUNCATED: {label} hits in this region were capped at {cap}; "
     "{dropped} more not listed (variants affected: {variants})."

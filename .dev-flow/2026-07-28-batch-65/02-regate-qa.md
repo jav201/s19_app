@@ -1,6 +1,6 @@
 # Phase-2 RE-GATE — QA lane — batch-64
 
-> **Reviewing:** `.dev-flow/2026-07-27-batch-64/01-requirements.md` **revision 2** (2 620 lines),
+> **Reviewing:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` **revision 2** (2 620 lines),
 > commit `b09ae9a` on `claude/batch-64-addendum-producer-bound`.
 > **Against:** this lane's first gate, `02-review-qa.md` (B-1, M-1…M-4, m-1…m-4).
 > **Independence:** every transcript below was executed by **this** lane in the pristine

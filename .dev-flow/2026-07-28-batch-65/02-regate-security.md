@@ -2,7 +2,7 @@
 
 **Reviewer:** the lane that filed `02-review-security.md` (BLOCK, S1 blocker + S2–S5 major + S6 minor).
 **Base:** `claude/batch-64-addendum-producer-bound` @ `b09ae9a`.
-**Under re-gate:** `.dev-flow/2026-07-27-batch-64/01-requirements.md` **revision 2** (2620 lines).
+**Under re-gate:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` **revision 2** (2620 lines).
 **Scope:** narrow. (1) discharge of my own six findings; (2) new defects planted by what revision 2
 CHANGED. I did **not** re-litigate the `LLR-103.2` soundness clearance, the notice's
 unforgeability/non-leakage clearance, or the F2 non-claim — all cleared at the first gate and unchanged.

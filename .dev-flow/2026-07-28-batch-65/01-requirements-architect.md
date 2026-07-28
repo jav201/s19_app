@@ -77,7 +77,7 @@ registry. The `M-2` truncation-marker claim.
 
 ### 1.4 References
 
-- `.dev-flow/2026-07-27-batch-64/PLAN.md` — §"Inherited findings" (10 items), designed for below.
+- `.dev-flow/2026-07-28-batch-65/PLAN.md` — §"Inherited findings" (10 items), designed for below.
 - `.dev-flow/2026-07-26-batch-63/02-review-rescoped-architect.md:118` (B-2), `:169` (B-3), `:211` (B-4).
 - `.dev-flow/2026-07-26-batch-63/02-regate-security.md:52` (F1), `:134` (F2).
 - `.dev-flow/BACKLOG-CODE.md:16` (D1), `:17` (OB-4), `:18` (F4).
@@ -462,9 +462,9 @@ batch-63's `AT-164..167` / `TC-440..454` / `R-TUI-095` / `HLR-100` are **RETIRED
 
 | # | Files | Content | Gate |
 |---|---|---|---|
-| **Inc-1** | `tests/test_report_addendum_bound.py` **(NEW)** · `.dev-flow/2026-07-27-batch-64/goldens/addendum_below_cap.md` **(NEW)** | `AT-194…199` + `TC-480…492`, plus the byte-identity golden **captured from the SHIPPED producer** (C-12: produce the output, then consume it). **All ATs RED.** | every AT fails, with the recorded RED figures of §7 reproduced |
+| **Inc-1** | `tests/test_report_addendum_bound.py` **(NEW)** · `.dev-flow/2026-07-28-batch-65/goldens/addendum_below_cap.md` **(NEW)** | `AT-194…199` + `TC-480…492`, plus the byte-identity golden **captured from the SHIPPED producer** (C-12: produce the output, then consume it). **All ATs RED.** | every AT fails, with the recorded RED figures of §7 reproduced |
 | **Inc-2** | `s19_app/tui/services/report_service.py` | the four constants (LLR-103.6) + the single-pass, region-indexed `_addendum_lines` (LLR-103.1/.2/.3/.5) + docstring in the mandated section order | Inc-1 tests GREEN; `pytest -q tests/test_report_service.py tests/test_tui_report_seam.py tests/test_report_field_census.py tests/test_manifest_writer.py tests/test_capped_text_area.py` → 123 passed; `tests/test_engine_unchanged.py` → 1 passed |
-| **Inc-3** | `REQUIREMENTS.md` · `.dev-flow/BACKLOG-CODE.md` · `.dev-flow/2026-07-27-batch-64/PLAN.md` | `R-TUI-098` entry + traceability rows; D1 closed **with its residuals restated by number**; PLAN decision log | full non-slow suite; no requirement without a validation method |
+| **Inc-3** | `REQUIREMENTS.md` · `.dev-flow/BACKLOG-CODE.md` · `.dev-flow/2026-07-28-batch-65/PLAN.md` | `R-TUI-098` entry + traceability rows; D1 closed **with its residuals restated by number**; PLAN decision log | full non-slow suite; no requirement without a validation method |
 
 **Rationale for putting the golden in Inc-1, not Inc-2:** if the golden is captured after the rewrite
 it certifies the rewrite against itself. C-12.

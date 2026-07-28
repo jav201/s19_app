@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path, PurePosixPath
+from string import Formatter
+from typing import Dict, List
 
 import pytest
 from markdown_it import MarkdownIt
@@ -947,6 +949,164 @@ def test_f17_format_bytes_is_inert_by_construction(tmp_path: Path) -> None:
     assert cells == [rendered, "b"], "the byte cell did not round-trip verbatim"
 
 
+def _report_service_source() -> str:
+    """Return `report_service.py`'s source text — the guard's subject."""
+    return (
+        Path(__file__).resolve().parents[1]
+        / "s19_app" / "tui" / "services" / "report_service.py"
+    ).read_text(encoding="utf-8")
+
+
+def _module_level_str_constants(tree: ast.Module) -> Dict[str, str]:
+    """Map every module-level `NAME = "..."` to its assembled template.
+
+    Adjacent string literals are merged into ONE `ast.Constant` at parse time —
+    the same parser courtesy the `JoinedStr` walk relies on — so an
+    implicitly-concatenated template arrives here already assembled, which is
+    the only form in which "does a line start with a field?" is answerable.
+    """
+    constants: Dict[str, str] = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+            value = node.value
+        elif isinstance(node, ast.AnnAssign) and node.value is not None:
+            targets = [node.target]
+            value = node.value
+        else:
+            continue
+        if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+            continue
+        for target in targets:
+            if isinstance(target, ast.Name):
+                constants[target.id] = value.value
+    return constants
+
+
+def _head_of_line_fields(template: str) -> List[str]:
+    """
+    Summary:
+        Return the `{field}` names that sit at the head of a line in a
+        `str.format` template — the positions where nothing of the author's own
+        defuses whatever the runtime value starts with.
+
+    Args:
+        template (str): An assembled `str.format` template, newlines included.
+
+    Returns:
+        List[str]: Field names in template order; a positional `{}` is reported
+        as `"<positional>"`. Empty when every line begins with a literal.
+
+    Data Flow:
+        - `string.Formatter().parse` splits the template into
+          `(literal, field, spec, conv)` tuples.
+        - A running `at_line_start` flag starts True (template start) and is
+          reset by each literal chunk: True iff that chunk ends in a newline.
+        - A field seen while the flag is True is at the head of its own line.
+
+    Dependencies:
+        Uses:
+            - string.Formatter
+        Used by:
+            - head_of_line_offenders
+    """
+    heads: List[str] = []
+    at_line_start = True
+    for literal, field, _spec, _conv in Formatter().parse(template):
+        if literal:
+            at_line_start = literal.endswith("\n")
+        if field is not None:
+            if at_line_start:
+                heads.append(field or "<positional>")
+            at_line_start = False
+    return heads
+
+
+def head_of_line_offenders(source: str) -> List[str]:
+    """
+    Summary:
+        Return every emission site in `report_service.py` that would put a
+        substitution at the head of its own report line, where a leading block
+        starter is no longer defused by the caller's literal prefix.
+
+    Args:
+        source (str): Python source text to analyse. Taken as a parameter
+            rather than read internally so the positive control can feed it
+            planted mutations of the real module.
+
+    Returns:
+        List[str]: One `"line N: ..."` description per offender, naming the
+        walk that found it. Empty on a clean source.
+
+    Raises:
+        SyntaxError: If `source` does not parse. The positive control's plants
+        must therefore stay syntactically valid.
+
+    Data Flow:
+        - Parse once; collect module-level `NAME = "..."` string constants.
+        - Walk 1, **f-strings** (`ast.JoinedStr`): the template and its values
+          are spelled at the same site, so the offender condition can be
+          precise — the head value is an `md_safe(...)` / `md_code(...)` call.
+        - Walk 2, **`NAME.format()` over a module-level constant**: template and
+          values are spelled in DIFFERENT places, and the escaping happens
+          somewhere else again — batch-64's notice escapes its variant ids at
+          the recording site inside the traversal, so they arrive here as
+          `", ".join(named)`. An offender condition keyed on `md_safe(...)`
+          appearing as the `.format()` argument would match NOTHING on the only
+          such site in the module: a guard that cannot fire. The decidable
+          invariant is the TEMPLATE's own shape — no line of a module-level
+          format template may begin with a substitution. Conservative (it flags
+          a head field whatever is bound to it), and the conservatism is free at
+          one site while the alternative is unfalsifiable.
+        - `ADDENDUM_TRUNCATION_NOTICE_FMT`'s literal `> ` prefix is exactly what
+          walk 2 holds in place; before batch-64 Inc-3 it was an unguarded
+          invariant documented in a comment.
+
+    Dependencies:
+        Uses:
+            - ast, _module_level_str_constants, _head_of_line_fields
+        Used by:
+            - test_no_escaped_field_is_emitted_at_the_head_of_its_line
+            - test_head_of_line_guard_detects_a_planted_violation
+
+    Example:
+        >>> head_of_line_offenders('T = "{a} x"\\nT.format(a=1)')
+        ['line 2: T.format() — {a} at the head of a line']
+    """
+    tree = ast.parse(source)
+    constants = _module_level_str_constants(tree)
+    offenders: List[str] = []
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.JoinedStr) and node.values:
+            head = node.values[0]
+            if not isinstance(head, ast.FormattedValue):
+                continue
+            call = head.value
+            if isinstance(call, ast.Call) and isinstance(call.func, ast.Name):
+                if call.func.id in ("md_safe", "md_code"):
+                    offenders.append(f"line {node.lineno}: {call.func.id}(...)")
+            continue
+
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not isinstance(func, ast.Attribute) or func.attr != "format":
+            continue
+        if not isinstance(func.value, ast.Name):
+            continue
+        template = constants.get(func.value.id)
+        if template is None:
+            continue
+        for field in _head_of_line_fields(template):
+            offenders.append(
+                f"line {node.lineno}: {func.value.id}.format() — "
+                f"{{{field}}} at the head of a line"
+            )
+
+    return offenders
+
+
 def test_no_escaped_field_is_emitted_at_the_head_of_its_line() -> None:
     """A-23 pin 3 — the column-0 precondition, as a static guard.
 
@@ -963,26 +1123,79 @@ def test_no_escaped_field_is_emitted_at_the_head_of_its_line() -> None:
     time, so the AST gives the assembled template for free and the guard asks
     the question that actually matters: is the escaped value the FIRST thing in
     its line?
+
+    **Extended in batch-64 Inc-3 to `.format()`-built module constants.** The
+    f-string walk alone was structurally blind to the batch's one new markdown
+    sink, and `report_service.py` said so in a comment beside
+    `ADDENDUM_TRUNCATION_NOTICE_FMT` — documenting the hole instead of closing
+    it, which left the notice's `> ` prefix an invariant with no guard behind
+    it. See :func:`head_of_line_offenders` for why the second walk asserts a
+    template shape rather than an argument spelling.
+
+    This node asserts an ABSENCE over a fixed tree, so it passes whether or not
+    its detector works. Its positive control is
+    :func:`test_head_of_line_guard_detects_a_planted_violation`, which drives
+    both walks on planted mutations of this same source.
     """
-    source = (
-        Path(__file__).resolve().parents[1]
-        / "s19_app" / "tui" / "services" / "report_service.py"
-    ).read_text(encoding="utf-8")
-
-    offenders = []
-    for node in ast.walk(ast.parse(source)):
-        if not isinstance(node, ast.JoinedStr) or not node.values:
-            continue
-        head = node.values[0]
-        if not isinstance(head, ast.FormattedValue):
-            continue
-        call = head.value
-        if isinstance(call, ast.Call) and isinstance(call.func, ast.Name):
-            if call.func.id in ("md_safe", "md_code"):
-                offenders.append(f"line {node.lineno}: {call.func.id}(...)")
-
+    offenders = head_of_line_offenders(_report_service_source())
     assert not offenders, (
         "a file-derived value is emitted at the head of its own line template, "
         "where a leading block starter is no longer defused by the caller's "
         f"literal prefix: {offenders}"
     )
+
+
+def test_head_of_line_guard_detects_a_planted_violation() -> None:
+    """Positive control for the column-0 guard — it can actually fire.
+
+    Modelled on `AT-193b`: the guard above asserts an absence, so on a clean
+    tree it is green whether its detector works or is a no-op. This plants the
+    offending spellings into the REAL `report_service.py` text — not a toy
+    module — and asserts each one is caught, so "green" upstream means "checked"
+    rather than "not looked".
+
+    Arm 3 is the load-bearing one for batch-64: removing the `> ` prefix from
+    `ADDENDUM_TRUNCATION_NOTICE_FMT` is the single edit that would put the
+    notice's escaped variant ids at column 0, and before this extension it was
+    caught by nothing.
+    """
+    source = _report_service_source()
+    assert not head_of_line_offenders(source), (
+        "control precondition: the unmutated source must be clean, else the "
+        "arms below cannot be attributed to their own plant"
+    )
+
+    # Arm 1 — f-string walk: an escaped value first in its own template.
+    arm1 = source.replace(
+        'ADDENDUM_TRUNCATION_NOTICE_FMT = (',
+        '_PLANTED_FSTRING = f"{md_safe(entry.symbol, limit=8)} planted"\n'
+        'ADDENDUM_TRUNCATION_NOTICE_FMT = (',
+        1,
+    )
+    # Arm 2 — format walk: a field at the head of a CONTINUATION line.
+    arm2 = source.replace(
+        '"{dropped} more not listed (variants affected: {variants})."',
+        '"\\n{dropped} more not listed (variants affected: {variants})."',
+        1,
+    )
+    # Arm 3 — format walk: the load-bearing `> ` prefix removed.
+    arm3 = source.replace(
+        '"> TRUNCATED: {label} hits in this region were capped at {cap}; "',
+        '"{label} hits in this region were capped at {cap}; "',
+        1,
+    )
+
+    for label, mutated, expected in (
+        ("f-string head", arm1, "md_safe(...)"),
+        ("format continuation-line head", arm2, "{dropped} at the head of a line"),
+        ("format template head (the `> ` prefix)", arm3, "{label} at the head of a line"),
+    ):
+        assert mutated != source, (
+            f"{label}: the plant did not apply — the spelling it patches has "
+            "moved, so this arm is measuring nothing"
+        )
+        offenders = head_of_line_offenders(mutated)
+        assert any(expected in offender for offender in offenders), (
+            f"{label}: the guard did not detect the planted violation; "
+            f"expected an offender containing {expected!r}, got {offenders}"
+        )

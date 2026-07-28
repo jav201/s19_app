@@ -3,10 +3,10 @@
 **Reviewer:** independent security lane (the lane that filed batch-63's `02-review-rescoped-security.md`
 and `02-regate-security.md`).
 **Base:** `claude/batch-64-addendum-producer-bound` @ `082ada9` == `origin/main`.
-**Under review:** `.dev-flow/2026-07-27-batch-64/01-requirements.md` (1213 lines), with `PLAN.md`,
+**Under review:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` (1213 lines), with `PLAN.md`,
 `01-requirements-architect.md`, `01b-qa-catalog.md` as supporting inputs.
 **Constraint honoured:** review only. `git status --porcelain` shows `M .dev-flow/state.json`,
-`?? .dev-flow/2026-07-26-batch-63/state-at-close.json`, `?? .dev-flow/2026-07-27-batch-64/` and nothing
+`?? .dev-flow/2026-07-26-batch-63/state-at-close.json`, `?? .dev-flow/2026-07-28-batch-65/` and nothing
 else; `git diff --numstat origin/main -- s19_app/ tests/` is empty. **Every counterfactual ran in a
 `git archive HEAD s19_app tests` export** at
 `…/scratchpad/b64sec`, never in this worktree (batch-62's lesson).

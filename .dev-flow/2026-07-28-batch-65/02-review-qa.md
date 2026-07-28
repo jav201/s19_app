@@ -1,6 +1,6 @@
 # Phase-2 review — QA lane — batch-64
 
-> **Reviewing:** `.dev-flow/2026-07-27-batch-64/01-requirements.md` (consolidated, 1213 lines).
+> **Reviewing:** `.dev-flow/2026-07-28-batch-65/01-requirements.md` (consolidated, 1213 lines).
 > **Supporting:** `PLAN.md`, `01-requirements-architect.md`, `01b-qa-catalog.md`.
 > **Independence:** this lane did not write the Phase-1 qa catalog. Every number below was executed by
 > **this** lane in a pristine `git archive` export of `082ada9` at

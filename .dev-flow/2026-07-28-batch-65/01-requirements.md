@@ -175,9 +175,9 @@ registry. The `M-2` truncation-marker claim.
 
 ### 1.4 References
 
-- `.dev-flow/2026-07-27-batch-64/PLAN.md` — 2 stories, 10 inherited findings, decision log.
-- `.dev-flow/2026-07-27-batch-64/01-requirements-architect.md` — architect lane (superseded by this file).
-- `.dev-flow/2026-07-27-batch-64/01b-qa-catalog.md` — qa lane, 16 observable slugs (superseded by this file).
+- `.dev-flow/2026-07-28-batch-65/PLAN.md` — 2 stories, 10 inherited findings, decision log.
+- `.dev-flow/2026-07-28-batch-65/01-requirements-architect.md` — architect lane (superseded by this file).
+- `.dev-flow/2026-07-28-batch-65/01b-qa-catalog.md` — qa lane, 16 observable slugs (superseded by this file).
 - `.dev-flow/2026-07-26-batch-63/02-review-rescoped-architect.md:118` (B-2), `:169` (B-3), `:211` (B-4).
 - `.dev-flow/2026-07-26-batch-63/02-regate-security.md:52` (F1), `:134` (F2).
 - `.dev-flow/BACKLOG-CODE.md:16` (D1), `:17` (OB-4), `:18` (F4).
@@ -194,7 +194,8 @@ table plus the id ledger — the Phase-1 P-7 artefact.** §6 is dual traceabilit
 executability ledger. §7 is the threshold register with every RED/GREEN and its provenance (T-1…T-9).
 §8 is the notice specification and its priced alternatives. §9 is the Phase-1 amendment log (A-1…A-9);
 **§9b is the revision-2 amendment log (A-10…A-27)**; **§9c is the revision-3 RE-GATE amendment log
-(A-28…A-40)**. §10 is residuals with numbers (§10.1…§10.10).
+(A-28…A-40)**; **§9d is the Phase-3 amendment log (A-41…A-46) — the rows found by IMPLEMENTING the
+document rather than re-reading it**. §10 is residuals with numbers (§10.1…§10.10).
 §11 is the increment cut **plus §11.1's per-node expected-verdict table — re-derived by execution in
 revision 3, with its transcript and four notes**. §12 is the
 unresolved-contradiction register (X-1…X-9). §13 is the evidence checklist. §14 is the diagram, §15 what
@@ -1253,7 +1254,8 @@ the ones that cannot are named here rather than covered by a blanket ✓ in §13
   the shipped producer (§11.1), `TC-481`, `TC-482`, `TC-484`, `TC-485`, `TC-486`, `TC-487`, `TC-494` and
   `TC-499` are **also** GREEN at Inc-1, and each now carries its own Inc-2 mutant arm — `FIX-C`/`FIX-G`,
   `FIX-G`, **`FIX-NONE`** (new), *(none — pure guard on unchanged code, stated in writing)*, `FIX-E`,
-  `FIX-E`, `FIX-B`, **`FIX-SCOPE`** (new). **A regression guard with no named arm and no written
+  **`FIX-E(b)`** (*corrected at Inc-3 from `FIX-E`, which is executed-GREEN on `TC-487` — §9d A-43*),
+  `FIX-B`, **`FIX-SCOPE`** (new). **A regression guard with no named arm and no written
   "pure guard" note is an unfalsifiable node**, which is the defect class this batch exists to remove.
 - **A RED gate asserts the failing SIDE of the threshold on a NAMED fixture, never a verbatim figure**
   (architect M-4). Three lanes measured `AT-194`'s RED at `2.27` / `2.265` / `2.000` on three fixtures;
@@ -2443,6 +2445,125 @@ sentinel that `LLR-103.3`'s `V`-independence rests on. **Chosen: bound + disclos
 
 ---
 
+## 9d. §6.5 amendment log — **PHASE 3, found while implementing** (A-41 … A-46)
+
+> Every row below was found by **running the thing the spec described**, not by re-reading the spec. That
+> is the point of recording them here: A-43 and A-44 are defects in a document whose whole purpose was to
+> remove that defect class, and A-45 is a case where the spec looked wrong and **was not** — the test was
+> stronger than the illustration. **No requirement Statement changes in this block**; A-41 selects
+> between two forms `LLR-103.1` already offered, A-42 and A-45 touch fixtures and evidence, A-43/A-44
+> correct §11.1, and A-46 discharges a §10.10 finding the spec had recorded as permanent.
+> Carry into `REQUIREMENTS.md` §6.5 at Inc-3 together with A-1…A-40.
+
+### A-41 — `LLR-103.1`'s region-op seam: a module global → a keyword-only parameter
+
+- **Before:** Inc-1 pinned `report_service._LAST_ADDENDUM_REGION_OPS`, a module-level `int` reset at
+  entry and written at exit, as the seam `TC-498` reads.
+- **After:** the keyword-only `_addendum_lines(..., ops_counter: Optional[List[int]] = None)` — the other
+  form the same LLR offers. **Operator ruling.** `report_service` carries no module-level mutable state
+  today, and `_addendum_lines` is called by both the TUI report worker and the CLI, so a module global is
+  a cross-call race dressed as an instrument. The equality gate (`A == R × N`) is identical either way;
+  what `LLR-103.1` requires is that a seam **exists and is named**, so the counter cannot be tuned until
+  it prints the disclosed value.
+- **Parent re-read:** `LLR-103.1` — no change required; both forms were already sanctioned.
+- **Body edit landed:** `TC-498` re-pointed at the parameter; the seam name pinned in the test module.
+
+### A-42 — `AT-194`'s warm-up and `TC-488`'s leaf size: two fixtures that made their own gate unreachable
+
+- **Before:** `AT-194` warmed with a 64-entry fixture, regions only; `TC-488` built 100 candidates per
+  leaf against a cap of 200.
+- **After:** `AT-194` warms **at full scale in BOTH configurations**, and `TC-488`'s leaf size is
+  `cap + 100`, **derived from the constant**, with an explicit fixture precondition asserting
+  `per_leaf > cap` and naming why. Executed causes: against the *bounded* producer `AT-194`'s old warm-up
+  left ~124 kB of one-time allocation charged to whichever window ran first, driving `delta(E=2000)`
+  **negative** (`-71485`) and failing the node's own `delta > 0` precondition — larger than the whole
+  marginal delta it measures; and a **per-class early exit cannot fire below the cap at all**, so
+  `TC-488`'s `consumed == N` read `300/300/300` under `FIX-A2` at 100 per leaf and `603/900` at 300.
+- **No predicate was weakened in either case.** Both were invisible at Inc-1 because the shipped
+  producer's numbers swamped them; both are decisive against the implemented one.
+- **Parent re-read:** `LLR-103.1`, `HLR-103` — no change required; the thresholds are untouched.
+- **Body edit landed:** the two fixtures in `tests/test_report_addendum_bound.py`.
+
+### A-43 — `TC-487`'s mutant arm: `FIX-E` → **`FIX-E(b)`**, because `FIX-E` has no detection power there
+
+- **Before:** §11.1 and §6.3 assign `TC-487` the arm `FIX-E` (raw `range_index` membership, coalescing
+  removed), *"same reason as `TC-486`"*.
+- **After:** **`FIX-E(b)`** — coalescing used for **attribution** rather than only as a reject
+  pre-filter. Executed against the implemented producer, **`FIX-E` is GREEN on `TC-487`**: both
+  sub-fixtures survive an uncoalesced bisect *by accident* — three duplicated regions leave
+  `bisect_right(starts, 0x1500) - 1 = 2` pointing at a region that still contains the probe, and
+  `sorted()` orders equal-start regions by `(start, end)` so the last candidate is the **widest**.
+  `FIX-E(b)` is RED on `TC-487`, `TC-486` and `AT-196`, and `TC-487`'s own docstring already names the
+  converse hazard (*"a coalescing step used for anything other than a reject pre-filter would silently
+  collapse these"*), so the node was right and only its arm was wrong.
+- **Why it matters beyond one cell:** §11.1 note 1 says a GREEN row is not a free row **because** it
+  names an arm. An arm that reads GREEN on the node it is assigned to restores exactly the
+  unfalsifiability the note exists to prevent, while looking discharged in the matrix. **"An arm exists"
+  and "an arm bites on THIS node" are different claims**, and revision 3 verified only the first.
+- **Parent re-read:** `LLR-103.2` — no change required; the requirement is unaffected.
+- **Body edit landed:** §11.1's `TC-487` row, §11's Inc-2 gate cell, §6.3's arm list, §11.1 note 1.
+
+### A-44 — §11.1's summary tally: `29 rows` → **`30 rows`**, table unchanged
+
+- **Before:** *"13 RED · 11 GREEN (regression guards) · 4 `xfail(strict=True)` · 1 n/a = 29 rows over 28
+  live nodes"*.
+- **After:** *"13 RED · **12** GREEN … = **30** rows"*. The table itself enumerates twelve GREEN rows and
+  `13 + 12 + 4 + 1 = 30`, which is also what *28 live nodes + 2 extra `AT-198` arm rows* requires. **The
+  table was right and was followed; no node was adjusted to make the sum work** — Inc-1 reported the
+  discrepancy and reproduced the table, which is the only reason this is arithmetic and not a verdict
+  change. Recorded because the tempting repair is the wrong one: a later reader reconciling 29 would have
+  to demote a GREEN row, and every one of the twelve carries an executed transcript.
+- **Parent re-read:** none.
+- **Body edit landed:** §11.1's tally sentence, with the correction stated inline.
+
+### A-45 — `TC-494`'s asserted order: **the spec's illustration was weaker than the test, not in conflict with it**
+
+- **Before:** §11.1's transcript and §6.2's rule statement both show the shipped emission order as the
+  4-element `['mod','issue','mod','issue']`; the authored `TC-494` asserts the **5-element**
+  `['modification','issue','modification','issue','issue']`. Inc-1 flagged this as a possible divergence.
+- **After:** **not a contradiction, and the test is not changed.** This document's probe fixture carried
+  no `CheckRunResult`, so it could not produce a check-result issue hit; the authored fixture carries
+  one. The 5-element sequence is therefore **strictly stronger** and is the only one of the two that
+  reaches `LLR-103.4`'s *"after all of that result's summaries, that result's check-result issue hits"*
+  clause — the third of the three hit classes, which a 4-element illustration never exercises. **The
+  illustrative evidence is corrected; the assertion stands.**
+- **Recorded because the reflex was the dangerous one.** "The spec printed 4 and the test asserts 5" is
+  the shape of a defect, and the cheap resolution — weaken the fixture until it matches the printed
+  evidence — would have deleted this node's only coverage of hit class 2 while making the document
+  self-consistent.
+- **Parent re-read:** `LLR-103.4` — no change required; its text already names all three classes.
+- **Body edit landed:** an evidence note under §11.1's `TC-494` row.
+
+### A-46 — §10.10's column-0 guard: *"structurally blind, unconditionally"* → **extended and closed**
+
+- **Before:** §10.10 fact 2 records that `test_no_escaped_field_is_emitted_at_the_head_of_its_line`
+  walks `ast.JoinedStr` only and is blind to a `.format()`-built notice, *"and no amount of
+  expression-pinning changes that"*. Inc-2 accordingly documented the blindness in
+  `ADDENDUM_TRUNCATION_NOTICE_FMT`'s own comment, leaving the literal `> ` prefix — the only thing
+  keeping the notice's escaped variant ids off column 0 — as an **unguarded** invariant.
+- **After:** the guard also walks `NAME.format()` over **module-level string constants** and rejects any
+  template line that begins with a substitution field. Executed on the plant that removes the `> `
+  prefix: the pre-Inc-3 guard returns `[]` (blind), the extended guard returns
+  `['line 1889: ADDENDUM_TRUNCATION_NOTICE_FMT.format() — {label} at the head of a line']`.
+- **The offender condition is a TEMPLATE SHAPE, not an argument spelling, and that was forced.** The
+  notice's ids are escaped at the recording site inside the traversal and arrive at `.format()` as
+  `", ".join(named)`, so a predicate keyed on `md_safe(...)` appearing as the argument would match
+  **nothing** on the only such site in the module — a guard that cannot fire, which is the defect class
+  under repair. The template-shape rule is conservative (it flags a head-of-line field whatever is bound
+  to it) and the conservatism is free at one site.
+- **§10.10's statement was correct about the shipped guard and wrong about permanence.** *"No amount of
+  expression-pinning changes that"* is true — and the fix is not expression-pinning.
+- **Positive control, because the guard asserts an ABSENCE.** `AT-193b`'s precedent applies: a guard over
+  a fixed tree passes whether or not its detector works, so
+  `test_head_of_line_guard_detects_a_planted_violation` drives **both** walks on planted mutations of the
+  real `report_service.py` text.
+- **Parent re-read:** `LLR-103.5`, `LLR-103.6` — no change required; the `> ` prefix was already
+  mandated, it simply had nothing enforcing it.
+- **Body edit landed:** `tests/test_report_field_census.py`; the corrected comment on
+  `ADDENDUM_TRUNCATION_NOTICE_FMT`.
+
+---
+
 ## 10. Residuals — each with its executed numbers
 
 ### 10.1 B-3(b) — reduced on the **candidate** axis, not eliminated (and see §10.7 for the work axis)
@@ -2708,6 +2829,14 @@ Executed against a minimal Inc-2 notice builder:
    new markdown sink lands outside one of the two static guards that protect every other sink in the
    module**, and no amount of expression-pinning changes that.
 
+   > **CLOSED at Inc-3 (§9d A-46) — and the sentence above is right about the shipped guard, wrong
+   > about permanence.** Expression-pinning indeed cannot reach it; a second **walk** can. The guard now
+   > also traverses `NAME.format()` over module-level string constants and rejects any template line
+   > beginning with a substitution field, so the `> ` prefix is enforced rather than merely documented.
+   > The offender condition had to be the **template's shape**, not the argument's spelling: the ids are
+   > escaped upstream and arrive as `", ".join(named)`, so an `md_safe(...)`-keyed predicate would match
+   > nothing on the only site that exists.
+
 **Obligation carried into Inc-2 (§11), unconditional:** a `PLANTED` entry so the notice's variant field
 joins the hostile corpus that `test_at157` / `test_at158` /
 `test_census_every_planted_field_renders_verbatim` render through markdown-it. Without it the new sink is
@@ -2729,8 +2858,8 @@ capped fixture.)*
 | # | Files | Content | Gate |
 |---|---|---|---|
 | **Inc-1** (3 files) | `tests/test_report_addendum_bound.py` **(NEW)** · `tests/goldens/batch64/addendum-below-bound.md` **(NEW)** · `tests/test_tui_report_seam.py` **(extend)** | `AT-194`, `AT-196…AT-203` + `TC-480…TC-495`, `TC-498`, `TC-499`, plus the byte-identity golden **captured from the SHIPPED producer on `082ada9`** (C-12). `AT-200` extends the existing declared-region seam drive at `:355-372`. **`TC-497` is NOT here** — it is Inc-3's. **Constants are read through the `_const(name, fallback)` helper, never imported at module level (§11.1 note 4).** | the **per-node expected-verdict table below** is reproduced exactly — **all four columns, including the `category` / rule column**, not the verdict alone — with a transcript pasted **from this run**. Every expected-RED node RED **per its threshold family (§6.3), on its own named fixture** — *never* a verbatim §7 figure. **`pytest --collect-only` reports 0 errors** (proving no module-level constant import survived). **Every expected-GREEN row is GREEN**; a GREEN row that comes back RED is a defect in the fixture, not a discovery |
-| **Inc-2** (2 files) | `s19_app/tui/services/report_service.py` · **`tests/test_report_field_census.py`** | the four constants (`LLR-103.6`) + the single-pass, region-indexed `_addendum_lines` (`LLR-103.1/.2/.3/.5`) + docstring in the mandated section order. **Census file obligations (§10.10):** (i) a `_ESCAPED_EXPRESSIONS` entry **iff** the implementation introduces a new `(func, ast.unparse(arg0))` pair — it will not if `LLR-103.5`'s pinned spelling is used, and the increment records which case obtained; (ii) **unconditionally**, a `PLANTED` entry driving a **capped** fixture so the notice's variant field renders through markdown-it under `test_at157` / `test_at158` / `test_census_every_planted_field_renders_verbatim` | every Inc-1 expected-RED node flips **GREEN**; every Inc-1 expected-GREEN regression guard **stays GREEN**; the four `xfail(strict=True)` nodes' markers **removed** and GREEN; **the mutant arms reproduced against the IMPLEMENTED producer** (`FIX-B`/`FIX-E`/`FIX-G` RED on `AT-196`; `FIX-G` RED on `AT-201`; `FIX-H` RED on `AT-202`; `FIX-I` RED on `AT-203`; `FIX-A2` RED on `TC-488`; **and, NEW in revision 3, the arms attached to the newly-GREEN Inc-1 rows** — `FIX-C`/`FIX-G` RED on `TC-481`, `FIX-G` RED on `TC-482`, `FIX-NONE` RED on `TC-484`, `FIX-E` RED on `TC-486` and `TC-487`, `FIX-B` RED on `TC-494`, `FIX-SCOPE` RED on `TC-499`); `TC-492`'s `K = 37` mutation green over the `K`-derived nodes; **`rg -n "_const\(" tests/test_report_addendum_bound.py` → 0 hits** (the Inc-1 constant fallbacks deleted, §11.1 note 4); §6.3 regression set green per subset (`123 passed` / `44 passed`); `tests/test_engine_unchanged.py` → 1 passed |
-| **Inc-3** (3 files) | `REQUIREMENTS.md` · `.dev-flow/BACKLOG-CODE.md` · `.dev-flow/2026-07-27-batch-64/PLAN.md` | `R-TUI-098` entry (**including non-claims (e) and (f)**) + traceability rows + the §6.5 amendment log of §9 **and §9b**; D1 closed **with its residuals restated by number**; the carries of §10.3 / §10.5 / §10.7 / §10.8 / §10.9 / §12 X-8; PLAN decision log. **`TC-497` is authored AND gated here.** | full non-slow suite; no requirement without a validation method; **`TC-497`'s 7-string grep list passes**, and its judgement half is signed by a named reviewer |
+| **Inc-2** (2 files) | `s19_app/tui/services/report_service.py` · **`tests/test_report_field_census.py`** | the four constants (`LLR-103.6`) + the single-pass, region-indexed `_addendum_lines` (`LLR-103.1/.2/.3/.5`) + docstring in the mandated section order. **Census file obligations (§10.10):** (i) a `_ESCAPED_EXPRESSIONS` entry **iff** the implementation introduces a new `(func, ast.unparse(arg0))` pair — it will not if `LLR-103.5`'s pinned spelling is used, and the increment records which case obtained; (ii) **unconditionally**, a `PLANTED` entry driving a **capped** fixture so the notice's variant field renders through markdown-it under `test_at157` / `test_at158` / `test_census_every_planted_field_renders_verbatim` | every Inc-1 expected-RED node flips **GREEN**; every Inc-1 expected-GREEN regression guard **stays GREEN**; the four `xfail(strict=True)` nodes' markers **removed** and GREEN; **the mutant arms reproduced against the IMPLEMENTED producer** (`FIX-B`/`FIX-E`/`FIX-G` RED on `AT-196`; `FIX-G` RED on `AT-201`; `FIX-H` RED on `AT-202`; `FIX-I` RED on `AT-203`; `FIX-A2` RED on `TC-488`; **and, NEW in revision 3, the arms attached to the newly-GREEN Inc-1 rows** — `FIX-C`/`FIX-G` RED on `TC-481`, `FIX-G` RED on `TC-482`, `FIX-NONE` RED on `TC-484`, `FIX-E` RED on `TC-486`, **`FIX-E(b)` RED on `TC-487`** (*corrected at Inc-3 — §9d A-43*), `FIX-B` RED on `TC-494`, `FIX-SCOPE` RED on `TC-499`); `TC-492`'s `K = 37` mutation green over the `K`-derived nodes; **`rg -n "_const\(" tests/test_report_addendum_bound.py` → 0 hits** (the Inc-1 constant fallbacks deleted, §11.1 note 4); §6.3 regression set green per subset (`123 passed` / `44 passed`); `tests/test_engine_unchanged.py` → 1 passed |
+| **Inc-3** (3 files) | `REQUIREMENTS.md` · `.dev-flow/BACKLOG-CODE.md` · `.dev-flow/2026-07-28-batch-65/PLAN.md` | `R-TUI-098` entry (**including non-claims (e) and (f)**) + traceability rows + the §6.5 amendment log of §9 **and §9b**; D1 closed **with its residuals restated by number**; the carries of §10.3 / §10.5 / §10.7 / §10.8 / §10.9 / §12 X-8; PLAN decision log. **`TC-497` is authored AND gated here.** | full non-slow suite; no requirement without a validation method; **`TC-497`'s 7-string grep list passes**, and its judgement half is signed by a named reviewer |
 
 ### 11.1 Per-node expected verdict at each gate — the table that replaces "every AT fails"
 
@@ -2808,18 +2937,27 @@ exist pre-fix — see the `NOT EXECUTABLE PRE-FIX` rows below and §6.2's ledger
 | **`TC-484`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | §3's boundary catalog already says all four sub-cases were *"executed against the **shipped** function … and `FIX-A` reproduces all four exactly"* — a node the shipped code already satisfies cannot be RED against it | GREEN | **named arm: `FIX-NONE` (drops the `None.` branch and stops skipping `issue.address is None`) RED at Inc-2** |
 | **`TC-485`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | it asserts a guard on **unchanged** code (`report_service.py:1719`, `if options.declared_regions:`) | GREEN | **pure regression guard over unchanged code — no mutant arm, and the row says so rather than inventing one** |
 | **`TC-486`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | **the RED belongs to a different subject.** `LLR-103.2`'s pre-state (`address_in_sorted_ranges(0x5000, …) = False`) is **`range_index`'s primitive** being wrong on a raw overlapping set. The shipped addendum uses `DeclaredRegion.contains` and is **correct**: 1 hit. `TC-486` guards a hazard the **NEW** implementation introduces (the coalescing precondition) | GREEN | **mutant arm `FIX-E` (raw `range_index` membership, no coalescing) RED at Inc-2** — executed RED on `FIX-GOLD`, §7 T-4 |
-| **`TC-487`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | `LLR-103.2` promises to **reproduce** today's `M`-times emission; shipped emits 3 and 2 on the two sub-fixtures | GREEN | **mutant arm `FIX-E` RED at Inc-2** (same reason as `TC-486`) |
+| **`TC-487`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | `LLR-103.2` promises to **reproduce** today's `M`-times emission; shipped emits 3 and 2 on the two sub-fixtures | GREEN | **mutant arm `FIX-E(b)` RED at Inc-2 — CORRECTED at Inc-3, see §9d A-43.** Revision 3 assigned `FIX-E`; executed against the implemented producer, **`FIX-E` is GREEN here** — both sub-fixtures survive an uncoalesced bisect by accident (duplicated regions leave the last candidate containing the probe; equal-start nesting sorts the WIDEST region last). The arm that bites is the **converse**, `FIX-E(b)` — coalescing used for **attribution** rather than as a reject pre-filter — which collapses three identical regions into one. `TC-486`'s assignment to `FIX-E` is correct and stands |
 | `TC-488`, `TC-489` | Inc-1 | Inc-2 | **RED** | `consumed == N` fails at `R = 8` and `R = 64` (executed `2400` / `19200`) | GREEN | themselves + `FIX-A2` on the overlapping arm |
 | `TC-491` | Inc-1 | Inc-2 | **GREEN — regression guard, by construction** | golden captured from the code under test | GREEN | with `AT-196` |
 | `TC-493` | Inc-1 | Inc-2 | **RED** (ratio 2.003 > 1.25, executed) | genuinely falsifiable | GREEN | itself |
 | **`TC-494`** | Inc-1 | Inc-2 | **GREEN by construction — REVISED in revision 3** | the "expected sequence" **is** the shipped sequence — that is why the golden exists and why `LLR-103.4` is a *preservation* requirement | GREEN | **mutant arm `FIX-B` (per-class bucket concatenation) RED at Inc-2** — executed RED at §7 T-4 |
+| ↳ *`TC-494` evidence note, Inc-3 (§9d A-45)* | — | — | — | the transcript's `['mod','issue','mod','issue']` is **this document's probe**, whose fixture carried no `CheckRunResult`. The authored test's fixture also carries one, so its asserted sequence is the **5-element** `['modification','issue','modification','issue','issue']`. That is **not a contradiction and not a divergence to reconcile**: the test fixture is strictly stronger and is the only one of the two that reaches `LLR-103.4`'s *"after all of that result's summaries, that result's check-result issue hits"* clause. **The illustrative evidence is corrected here; the test stands unchanged.** | — | — |
 | `TC-490`, `TC-492`, `TC-495` | Inc-1 | Inc-2 | **`xfail(strict=True)` — NOT EXECUTABLE PRE-FIX** (subject does not exist on `082ada9`) | no subject to assert against | GREEN, `xfail` removed | first real verdict is Inc-2 |
 | **`TC-498`** | Inc-1 | Inc-2 | **`xfail(strict=True)` — NOT EXECUTABLE PRE-FIX — REVISED in revision 3** | its instrument is the attribution walk's own region-op counter, and **the walk does not exist on `082ada9`**. Under the only *available* pre-fix seam (counting `DeclaredRegion.contains`) the shipped producer reads **exactly `R × N`**, so `A == R × N` is **GREEN** today — see §7 T-9 | GREEN — records `A == R × N`, the §10.7 disclosure | itself; fails loudly if the structure is later changed |
 | **`TC-499`** | Inc-1 | Inc-2 | **GREEN by vacuity — REVISED in revision 3** | it is the **positive control for addendum-scoped counting**, and its predicate (`0` addendum notices while a report-wide `> TRUNCATED:` fires) reads 0 on a producer with no notice concept at all | GREEN | **mutant arm `FIX-SCOPE` (count `> TRUNCATED:` report-wide instead of addendum-scoped) RED at Inc-2** — this is the arm that proves the scope predicate is scoped |
 | `TC-497` | **Inc-3** | **Inc-3** | n/a | subject does not exist before Inc-3 | n/a | its subject does not exist before Inc-3 |
 
-**Tally at Inc-1: 13 RED · 11 GREEN (regression guards) · 4 `xfail(strict=True)` · 1 n/a = 29 rows over
+**Tally at Inc-1: 13 RED · 12 GREEN (regression guards) · 4 `xfail(strict=True)` · 1 n/a = 30 rows over
 28 live nodes** (`AT-198` occupies three rows — see note 2).
+
+> **CORRECTED at Inc-3 (§9d A-44).** Revision 3 read *"11 GREEN … = 29 rows"*. The **table above was
+> right and was followed**; only this summary sentence was wrong. It enumerates **twelve** GREEN rows —
+> `AT-196`, `AT-198` arms 1 and 2, `TC-481`, `TC-482`, `TC-484`, `TC-485`, `TC-486`, `TC-487`,
+> `TC-491`, `TC-494`, `TC-499` — and `13 + 12 + 4 + 1 = 30`, which is also what *28 live nodes + 2 extra
+> `AT-198` arm rows* requires. Inc-1 reported the discrepancy and **adjusted no node to make the sum
+> work**, which is the only reason this is an arithmetic correction and not a verdict change. Recorded
+> so a later reader does not "fix" a node to reach 29.
 
 **Note 1 — a GREEN row is not a free row.** Every newly-GREEN row above names an Inc-2 mutant arm, **or**
 states in writing that it is a pure regression guard over unchanged behaviour (`TC-485` only). Two arms
@@ -2835,6 +2973,11 @@ verdict is Inc-2, exactly like `FIX-B…FIX-I`'s reproduction against the implem
 **`FIX-C`, `FIX-E`, `FIX-B` and `FIX-G` — the arms attached to the other newly-GREEN rows — already
 exist and already carry executed RED figures** (§7 T-4, T-5); only their *assignment* to these nodes is
 new.
+**A third arm turned out to be new as well (Inc-3, §9d A-43):** `TC-487`'s assignment to `FIX-E` was
+**wrong**, not merely unexecuted, so the arm that carries its falsifiability — **`FIX-E(b)`** — had to
+be built and executed at Inc-2 exactly like `FIX-NONE` and `FIX-SCOPE`. The general lesson is that "an
+arm already exists" and "an arm bites on THIS node" are different claims, and revision 3 checked only
+the first.
 
 **Note 2 — `AT-198` is a parametrised family, one collected node per arm (`QA-NEW-9`).** One collected
 pytest node reports one verdict, and `AT-198`'s three arms have three different Inc-1 verdicts. It is
@@ -2899,7 +3042,7 @@ certifies the rewrite against itself (C-12; both Phase-1 lanes flagged it indepe
 architect lane ratified the sequencing).
 
 **Golden path:** `tests/goldens/batch64/addendum-below-bound.md`, mirroring `tests/goldens/batch35/`.
-The architect lane proposed `.dev-flow/2026-07-27-batch-64/goldens/addendum_below_cap.md`; the qa path is
+The architect lane proposed `.dev-flow/2026-07-28-batch-65/goldens/addendum_below_cap.md`; the qa path is
 adopted because the artefact is consumed by a test and the repo's golden convention lives under `tests/`
 (§12 X-4).
 
@@ -2942,7 +3085,7 @@ census that misses the one it does not:
 | **X-1** | **Is one full pass irreducible?** Architect §0.3/§9.1: *"The single pass is the floor and is not removable: the candidates are an unsorted list, so membership cannot be decided without looking at each one once."* qa §3.3/§5.7: executed `FIX-A2` consuming **200 of `E = 4000`** with per-class early exit. | **The architect lane's claim is over-stated and is corrected in this document.** Early exit *is* achievable; it is **refused** because `LLR-103.5` needs the dropped count and the affected-variant list, which a truncated traversal cannot derive. §10.1 now reads "not removable **given `LLR-103.5`'s dropped-count obligation**". Resolved by reasoning over both lanes' executed evidence, not by preference. |
 | **X-2** | **The adopted `AT-194` GREEN was measured on a retired arm.** qa's `1.002` comes from `FIX-A2` (with early exit); the specced shape is `FIX-A` (without). | **CLOSED at Phase 2 — no obligation carried.** Both Phase-2 lanes measured `AT-194`'s exact form on `FIX-A`, at the shipped surface, fixtures built before `tracemalloc.start()`: **qa RED 2.265 / GREEN 0.998**; **architect RED 2.000 / GREEN 1.018 (3/3 reps, byte-deterministic)**. Both GREENs are ~22–23 % below the `1.30` bar. Transcripts pasted at §7 T-1. The Inc-2 re-derivation clause is **struck** from §11 and §7 T-1. The anti-widening rule is **kept** as policy with nothing pending. **Judgement recorded (architect §4):** it was closable at Phase 1 and carrying it was an error — *"carrying an unmeasured GREEN into Phase 3 means the first honest measurement happens at a gate where the only remaining moves are widen or return to Phase 1"*, which is the failure mode revision 1 named two paragraphs earlier. |
 | **X-3** | **`TC-489`'s disjoint arm is neither lane's.** qa specified disjoint geometry only as a *hazard* for an early-exit design; the architect lane specified no geometry at all. | **RESOLVED in revision 2: KEEP, scoped to geometry-independence ONLY.** Both Phase-2 lanes ruled on it and agree. It is **not** a stealth-early-exit control (qa m-1: the exit cannot fire until `N > R × K`, so at this fixture scale two thirds of the arm is dead, and `TC-488` catches `FIX-A2` at every `R`), and it has **zero** detection power for §10.7 (architect: it reads `500` at every `R` for a correct **and** an `O(R)` implementation). Its real value is catching an implementation whose candidate-consumption independence holds only under the overlapping fixture. **Do not strike; do not overrate.** The stealth-early-exit claim moves to `TC-488`; the R-work claim moves to the new `TC-498`. See A-22. |
-| **X-4** | **Golden location.** architect: `.dev-flow/2026-07-27-batch-64/goldens/addendum_below_cap.md`. qa: `tests/goldens/batch64/addendum-below-bound.md`. | **Resolved by repo convention** — the artefact is consumed by a test and `tests/goldens/batch35/` is the established home. qa's path adopted. Low stakes; reversible. |
+| **X-4** | **Golden location.** architect: `.dev-flow/2026-07-28-batch-65/goldens/addendum_below_cap.md`. qa: `tests/goldens/batch64/addendum-below-bound.md`. | **Resolved by repo convention** — the artefact is consumed by a test and `tests/goldens/batch35/` is the established home. qa's path adopted. Low stakes; reversible. |
 | **X-5** | **Two per-hit constants over the same quantity, different fixtures:** architect **86.5 – 93.2 B/hit**; qa **93.9 / 93.3 / 89.1 B/hit**. Two whole-report baseline growth rates: architect **×1.68 / ×1.81**; qa **×1.94**. | **NOT averaged, NOT resolved — both recorded with provenance** (§2.2, §10.2). They are different fixtures measuring the same phenomenon and the spread is the honest uncertainty. No acceptance keys on either, so neither needs resolution; if a future batch wants to key on one, it must re-derive. |
 | **X-6** | **Constant name:** architect `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION`; qa `MAX_ADDENDUM_HITS_PER_REGION_CLASS`. | Cosmetic. Architect's name adopted (`LLR-103.6` owns naming). Recorded so a grep for the qa name finds this line. |
 | **X-7** | **Notice wording:** architect `> TRUNCATED: …` (blockquote, one line per region+cut class); qa reference form `- _Truncated at 200 per class: …_` (list item, one line per region). | Architect's decision adopted; qa §9(a) explicitly deferred wording to the architect lane and its observables are wording-agnostic. Not a real contradiction — recorded for completeness. |

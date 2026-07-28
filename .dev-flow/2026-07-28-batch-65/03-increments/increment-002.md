@@ -377,7 +377,7 @@ Inc-3 amendment.** `TC-486`'s assignment to `FIX-E` is correct and was reproduce
 **Inc-3 — documentation and closure (3 files):** `REQUIREMENTS.md` (the `R-TUI-098` entry **including
 non-claims (e) and (f)**, traceability rows, the §6.5 amendment log of §9/§9b **plus A-41…A-43**),
 `.dev-flow/BACKLOG-CODE.md` (the §10.3 / §10.5 / §10.7 / §10.8 / §10.9 / §12 X-8 carries, each **with its
-number**), and `.dev-flow/2026-07-27-batch-64/PLAN.md`. `TC-497` is authored and gated there. Its gate:
+number**), and `.dev-flow/2026-07-28-batch-65/PLAN.md`. `TC-497` is authored and gated there. Its gate:
 the full non-slow suite, no requirement without a validation method, the 7-string grep list passing, and
 the judgement half signed by a named reviewer.
 
