@@ -224,9 +224,24 @@ def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
 
             before = _report_names(reports_dir)
             statuses.clear()
+            progress: list[int] = []
+            _original_progress = type(app).set_progress
+            app.set_progress = (  # type: ignore[method-assign]
+                lambda value, message=None: (
+                    progress.append(value),
+                    _original_progress(app, value, message),
+                )[1]
+            )
             app.set_focus(None)
             await pilot.press("b")
+            # batch-68 N5: the composer now runs on a worker thread, so the
+            # report pair does NOT exist when the key handler returns. Waiting
+            # on the worker makes this deterministic; a bare `pause()` passed
+            # only because the composition happened to be fast, which is a race
+            # this suite must not depend on.
+            await app.workers.wait_for_complete()
             await pilot.pause()
+            outcomes["progress"] = list(progress)
             outcomes["new_files"] = sorted(_report_names(reports_dir) - before)
             outcomes["statuses"] = list(statuses)
             outcomes["notices_all"] = list(notices)
@@ -248,6 +263,16 @@ def test_at_038a_saveback_trigger_report_pair_reread_from_surfaced_path(
     assert _HTML_NAME.match(html_new[0]), html_new[0]
 
     # --- surfaced path equals the dir-diff file (Q-M1) ----------------------
+    # batch-68 AC-3 (success arm): the bar must REACH 100 on a written report.
+    # Asserted here rather than in tests/test_report_off_ui_thread.py because
+    # this is the only place with a real save-back that makes the composer
+    # succeed; the standalone AC-3 test can only reach the refusal arm.
+    progress = outcomes["progress"]
+    assert progress and progress[-1] == 100, (
+        f"a successfully written before/after report must leave the progress "
+        f"bar at 100, not mid-fill. Sequence: {progress}"
+    )
+
     written = [s for s in outcomes["statuses"] if "Before/after report written" in s]
     assert len(written) == 1, (
         f"AT-038a: expected exactly one surfaced written-status line, "

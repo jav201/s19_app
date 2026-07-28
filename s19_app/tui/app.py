@@ -3273,20 +3273,24 @@ class S19TuiApp(App):
               ``_compute_a2l_enriched_tags()`` (the LLR-053.4 (c) record
               extents) and stamps the file's name as the matcher's
               ``source_name`` (mirrors ``_trigger_generate_report``).
-            - Gather ``last_summary``, ``LoadedFile.path``, the active
-              project dir, and the workarea root; the composer validates the
+            - Gather ``LoadedFile.path``, the active project dir and the
+              display name **on the UI thread** (reading ``current_file`` from
+              a worker would race a concurrent load), then hand them to
+              :meth:`_start_before_after_worker`. The composer validates the
               five LLR-038.2 preconditions and every LLR-038.4 refusal class
               itself — this handler never pre-duplicates them.
-            - ``written`` → one status line naming BOTH written paths.
-            - refusal → one status line carrying the composer's diagnostics;
-              no file was written, the app keeps running.
+            - **N5 (batch-68): the composition itself no longer runs here.**
+              It used to, on the UI event loop, so the terminal stopped
+              repainting for its whole duration. This method now only
+              validates, sets the progress kickoff, and dispatches; the
+              ``written`` / refusal status lines are written by the worker.
 
         Dependencies:
             Uses:
-                - ``compose_before_after_report``
+                - ``_start_before_after_worker`` (the composer's new home)
                 - ``read_report_filter_text`` / ``parse_report_filter``
                 - ``resolve_report_filter`` / ``_compute_a2l_enriched_tags``
-                - ``_active_project_dir`` / ``set_status``
+                - ``_active_project_dir`` / ``set_status`` / ``set_progress``
             Used by:
                 - key binding ``b`` (BINDINGS) after the save-back offer
                   notify in ``on_patch_editor_panel_save_back_decision``
@@ -3314,14 +3318,86 @@ class S19TuiApp(App):
                 mac_records,
                 source_name=filter_path.name,
             )
-        result = compose_before_after_report(
-            self._change_service.last_summary,
+        # N5 (batch-68): the composer is the expensive step and used to run
+        # HERE, on the UI event loop — the terminal stopped repainting for its
+        # whole duration, so a slow report was indistinguishable from a hang.
+        # Validation above stays on the UI thread (it is cheap and it owns the
+        # early-return status writes); only the composition is dispatched.
+        self.set_progress(15)
+        self._start_before_after_worker(
             loaded.path if loaded is not None else None,
-            project_dir=self._active_project_dir(),
-            workarea=self.workarea,
-            report_filter=report_filter,
+            self._active_project_dir(),
+            report_filter,
+            loaded.path.name if loaded is not None else "-",
         )
-        source_name = loaded.path.name if loaded is not None else "-"
+
+    @work(thread=True, exclusive=True, group="before_after_report")
+    def _start_before_after_worker(
+        self,
+        loaded_path: Optional[Path],
+        project_dir: Optional[Path],
+        report_filter: Optional[ReportFilterMatcher],
+        source_name: str,
+    ) -> None:
+        """
+        Summary:
+            Off-thread before/after report composition (N5, batch-68). Calls
+            the LLR-038.2 composer and marshals every UI write back through
+            ``call_from_thread``; ``_log_report_event`` is called directly
+            because it touches only ``self.logger``, never a widget — the same
+            division the shipped ``_start_generate_report_worker`` uses.
+
+            The progress bar is driven at three seams and is NEVER left
+            mid-fill: the caller sets 15 before dispatch, this worker sets 100
+            on success and 0 on both the refusal and the crash arm.
+
+        Args:
+            loaded_path (Optional[Path]): The loaded image path, or ``None``.
+            project_dir (Optional[Path]): Active project dir for the composer.
+            report_filter (Optional[ReportFilterMatcher]): Resolved filter, or
+                ``None`` when no filter file is configured.
+            source_name (str): Display name for the log line — resolved on the
+                UI thread by the caller, because reading ``self.current_file``
+                from a worker would race a concurrent load.
+
+        Returns:
+            None: Effects only — the written report pair, a log line, the
+            status text and the progress bar.
+
+        Data Flow:
+            - Consumes ``ChangeService.last_summary``; produces the written
+              ``.md``/``.html`` pair and the status/progress surface.
+
+        Dependencies:
+            Uses:
+                - ``compose_before_after_report`` / ``_log_report_event``
+                - ``set_status`` / ``set_progress`` (via ``call_from_thread``)
+            Used by:
+                - ``action_before_after_report`` (key binding ``b``)
+        """
+        try:
+            result = compose_before_after_report(
+                self._change_service.last_summary,
+                loaded_path,
+                project_dir=project_dir,
+                workarea=self.workarea,
+                report_filter=report_filter,
+            )
+        except Exception as exc:
+            self.logger.exception("Before/after report failed: %s", exc)
+            self._log_report_event(
+                "before-after",
+                source_name,
+                "-",
+                f"failed: {type(exc).__name__}",
+                ok=False,
+            )
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                self.set_status,
+                f"Before/after report failed: {type(exc).__name__}: {exc}",
+            )
+            return
         if result.written:
             self._log_report_event(
                 "before-after",
@@ -3330,16 +3406,22 @@ class S19TuiApp(App):
                 "ok",
                 ok=True,
             )
-            self.set_status(
+            self.call_from_thread(self.set_progress, 100)
+            self.call_from_thread(
+                self.set_status,
                 f"Before/after report written: {result.md_path} "
-                f"| {result.html_path}"
+                f"| {result.html_path}",
             )
             return
         self._log_report_event(
             "before-after", source_name, "-", "refused", ok=False
         )
-        self.set_status(
-            "Before/after report refused: " + " ".join(result.diagnostics)
+        # Refused is a legitimate outcome, not a crash — but the bar must
+        # still come back down rather than sit at the kickoff value.
+        self.call_from_thread(self.set_progress, 0)
+        self.call_from_thread(
+            self.set_status,
+            "Before/after report refused: " + " ".join(result.diagnostics),
         )
 
     @staticmethod
