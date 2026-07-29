@@ -65,6 +65,10 @@ from .flow_model import (
     VariantRunOutcome,
     WriteOutBlock,
 )
+from .flow_fused_report_service import (
+    build_fused_report_state,
+    write_fused_flow_report,
+)
 from .flow_report_service import FlowReportState, write_flow_report
 from .load_service import build_loaded_hex, build_loaded_s19
 from .variant_execution_service import (
@@ -404,6 +408,17 @@ def run_flow(flow: Flow, ctx: FlowContext) -> FlowRunResult:
                         BlockResult(index, kind, BLOCK_STATUS_OK, summary)
                     )
 
+            elif isinstance(block, ReportBlock) and ctx.defer_report:
+                # batch-70 FB-P2 (D-4): under a fused run the report is written
+                # ONCE, by run_flow_over_variants, with a section per variant.
+                # Writing here too would emit one file per variant — precisely
+                # the N-file collation this feature exists to remove. The block
+                # still reports, so the ledger never hides that it ran.
+                result.block_results.append(
+                    BlockResult(index, kind, BLOCK_STATUS_OK,
+                                "deferred to the fused report")
+                )
+
             elif isinstance(block, ReportBlock):
                 # batch-60 FB-P1b (LLR-003.1/.3): compose a POSITIONAL report of
                 # the run so far and write it under <project>/reports/. The
@@ -673,7 +688,7 @@ def run_flow_over_variants(
         fused.diagnostics.append("no variants in scope - nothing was executed")
         return fused
     for descriptor in planned:
-        variant_ctx = replace(ctx, variant=descriptor)
+        variant_ctx = replace(ctx, variant=descriptor, defer_report=True)
         try:
             variant_result = execute(flow, variant_ctx)
         except Exception as exc:  # noqa: BLE001 - per-variant isolation (D-3)
@@ -689,6 +704,20 @@ def run_flow_over_variants(
         )
         fused.written_paths.extend(variant_result.written_paths)
     _roll_up_variants(fused)
+    # D-4: ONE fused document, and only when the flow asked for a report at all
+    # — a flow with no REPORT block still writes none, exactly as unscoped.
+    if any(isinstance(block, ReportBlock) for block in flow.blocks):
+        try:
+            fused.report_path = write_fused_flow_report(
+                build_fused_report_state(flow.name, fused, ctx.project_dir),
+                ctx.project_dir,
+            )
+        except Exception as exc:  # noqa: BLE001 - degrade, never lose the run
+            # Mirrors run_flow's report handler: a failed write is RECORDED, not
+            # swallowed, and never costs the operator the run's results.
+            fused.diagnostics.append(
+                f"fused report write failed: {type(exc).__name__}: {exc}"
+            )
     return fused
 
 
