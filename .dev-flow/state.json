@@ -24,11 +24,34 @@
     "false_positive_caught": "A first census reported AT/TC max 841. It was a BINARY artefact — the grep swept tests/__pycache__/*.pyc. Re-run restricted to *.py/*.md. Recorded because an id allocated off a binary would bind two observables to one id.",
     "allocated": "AT-205+, TC-500+, R-TUI-099, HLR-104. Allocated from the MAXIMUM across all subsets + 1, not from any single subset."
   },
-  "current_phase": 1,
-  "phase_status": "not-started",
+  "current_phase": 6,
+  "phase_status": "implemented-awaiting-operator-merge",
+  "note_session_2": "SECOND SESSION (2026-07-28, worktree fb-p2-batch-70-impl-92b3cd). It opened on a NEW branch cut off origin/main that did NOT contain the nine Phase-0 commits; claude/fb-p2-batch-70-bfc118 was FAST-FORWARDED into it, so the PR carries Phase 0 + the implementation. The Phase-0 branch and its worktree are frozen — do not push to them. AUTONOMY WAS RE-ASKED at this kickoff per feedback_standing_auth_per_batch and the operator CHANGED it: AUTONOMOUS UNTIL THE PR (not supervised per-increment, which is what the previous session recorded below). The operator still merges; nothing was self-merged.",
   "iterations_per_phase": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-28-batch-70/PLAN.md"
+    "plan": ".dev-flow/2026-07-28-batch-70/PLAN.md",
+    "requirements": ".dev-flow/2026-07-28-batch-70/01-requirements.md",
+    "validation": ".dev-flow/2026-07-28-batch-70/04-validation.md",
+    "postmortem": ".dev-flow/2026-07-28-batch-70/05-postmortem.md",
+    "requirement_entry": "REQUIREMENTS.md - R-TUI-099",
+    "code": [
+      "s19_app/tui/services/flow_model.py",
+      "s19_app/tui/services/flow_execution_service.py",
+      "s19_app/tui/services/flow_fused_report_service.py (NEW)",
+      "s19_app/tui/screens_directionb.py",
+      "s19_app/tui/app.py"
+    ],
+    "tests": [
+      "tests/test_flow_multi_image.py (NEW, 11)",
+      "tests/test_flow_report_fusion.py (NEW, 13)",
+      "tests/test_flow_multi_image_ui.py (NEW, 11)"
+    ],
+    "commits": ["ebca4cc Inc-1", "4573d43 Inc-2+3", "2b6c3a5 Inc-4"]
+  },
+  "phase1_result": {
+    "premise_evaluation": "10 premises executed against disk. 9 TRUE, 1 FALSE. P-2 FALSE: VariantDescriptor.path is ABSOLUTE and _resolve_manifest_entry REJECTS absolute refs by design (variant_execution_service.py:263-272, executed both arms), so the design's unstated override FORM would have failed every variant and the tempting fix is to bypass the containment seam. Disposition ENLARGED D-2 rather than replacing it: LLR-104.1 binds a project-RELATIVE POSIX ref through the reused seam - and that is also what makes AC-7 reachable, because a path that will not relativise IS the containment rejection.",
+    "design_gap_found": "D-4's second clause ('no per-variant files') had NO owning increment in the inherited table. With a REPORT block, each variant's run_flow would have written its own report - V files, the manual collation FB-P2 exists to remove - and EVERY composer-level test would still have been green, because the defect is a count of FILES. Closed with FlowContext.defer_report + an artifact-on-disk acceptance.",
+    "d7_counterfactual": "EXECUTED on a COPY of the fixed tree (never the pre-change tree, which would fail at import and prove nothing). Three islice sites reverted; both AT-209 nodes fail ON THEIR ASSERTION: 'assert 1200 <= 60' and the missing '> **Cut in `a`:** findings: 25 omitted (cap 60 per variant).'"
   },
   "design_inherited": {
     "source": "batch-69, DESIGN ONLY, merged as PR #157 dc6aa71. Records: .fast-dev-flow/ADR-flow-builder-tracer.md §12 (durable commitments) and .fast-dev-flow/spec.md (full rationale, AC-1..AC-7, the 4-increment plan).",

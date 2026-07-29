@@ -1,15 +1,15 @@
 # PLAN — batch-70 · FB-P2 implementation (multi-image runs + report fusion)
 
-> **START HERE (cold resume).** Phase 0 is **CLOSED**. Next action: **Phase 1 — requirements derivation**, dispatching `architect` + `qa-reviewer` in parallel. Nothing else is pending; `origin/main` is correct, all three repos are clean, and every batch-65 obligation is discharged.
+> **START HERE.** Phases 0–5 are **CLOSED**. The implementation is complete and the PR is **awaiting the operator's merge**. Nothing is in flight.
 
 ## Where we are
 
 | | |
 |---|---|
-| **Phase** | 0 ✅ CLOSED → **1 ⏭️ not started** |
-| **Branch** | `claude/fb-p2-batch-70-bfc118` (pushed) |
+| **Phase** | 0–5 ✅ CLOSED → **6 — awaiting operator merge** |
+| **Branch** | `claude/fb-p2-batch-70-impl-92b3cd` — the Phase-0 branch `claude/fb-p2-batch-70-bfc118` was **fast-forwarded into it**, so all nine Phase-0 commits are in the PR. ⚠️ The Phase-0 branch + its worktree are **frozen**; do not push to them. |
 | **Base** | cut off `dc6aa71`; `origin/main` `f1f3987` merged in |
-| **Approval** | **Supervised per-increment** — operator approves every gate and merges the PR. *Not* autonomous, *not* self-merge. Re-ask at any new kickoff. |
+| **Approval** | ⚠️ **CHANGED at the second session's kickoff (re-asked, never inherited): AUTONOMOUS UNTIL THE PR.** The previous session's *supervised per-increment* did **not** carry. The operator still merges; nothing was self-merged. |
 | **Flow revision** | `2026.07.28-rev1` · `flow_hash 0127a2767ff11c8a` · C-1…C-45 — **verified current (C-45 PULL). Re-verify at session start.** |
 | **Ids allocated** | `AT-205+` · `TC-500+` · `R-TUI-099` · `HLR-104` |
 | **Language** | English artifacts |
@@ -37,14 +37,18 @@ The design cited `flow_execution_service.py:343`'s `variant_id=None` as *"the si
 
 ## Roadmap
 
-| Inc | Content | ACs | Decisions |
-|---|---|---|---|
-| 1 | `FlowContext` + `run_flow` gain the variant dimension; per-variant isolation; SOURCE `image_ref` override | AC-1, AC-2, **AC-7**, AC-6 | D-1…D-3 |
-| 2 | `FlowReportState` per-variant sections; fused composer + rollup | AC-3, AC-4 | D-4…D-6 |
-| 3 | 🔒 **per-variant producer bounding** + cut notice | AC-5 | **D-7** |
-| 4 | UI scope selector in `FlowBuilderPanel` | — | D-8 |
+| Inc | Content | ACs | Commit | Files |
+|---|---|---|---|---|
+| 1 | ✅ `FlowContext.variant` + `_bound_source_ref` + `run_flow_over_variants` with per-variant isolation | AC-1, AC-2, **AC-7**, AC-6 | `ebca4cc` | 3 |
+| 2+3 | ✅ `flow_fused_report_service` — fused composer, roll-up, 🔒 **per-variant producer bounding** + cut notice | AC-3, AC-4, **AC-5** | `4573d43` | 2 |
+| 4 | ✅ scope selector + fused rendering + `defer_report` (**D-4's unassigned half**) | D-4, LLR-104.6 | `2b6c3a5` | 5 |
 
-≤ 5 files per increment · supervised gate after each · `code-reviewer` on every diff before operator approval.
+All three increments stayed inside the ≤ 5-file budget.
+
+### Two findings worth carrying
+
+- **P-2 ❌** — the design said `SourceBlock.image_ref` is "overridden per variant" without saying in what **form**. `VariantDescriptor.path` is absolute and `_resolve_manifest_entry` **rejects absolute refs by design**, so the natural binding fails every variant and the natural fix is to bypass the containment seam. Bound a project-**relative** ref instead — which is also what makes **AC-7** observable, since a path that will not relativise *is* the containment rejection.
+- **D-4 had no owner** — its "**no per-variant files**" clause was in no increment row. With a REPORT block each variant would have written its own report, and **every composer-level test would still have passed**, because the defect is a count of FILES.
 
 ## 🔒 D-7 — non-negotiable
 
@@ -77,9 +81,11 @@ Patch-Editor variant path · FB-P3 CRC sub-flow · PKI extraction (⛔ blocked o
 
 | | |
 |---|---|
-| Base (`-m "not slow"`, collected) | **2319** |
-| Δ this batch | 0 — no code written yet |
-| Frozen-source guard | ✅ 1 passed |
+| Base (`-m "not slow"`, collected) at `244c5d9` | **2319** |
+| After | **2355** — `+36`, **fully attributed**: 35 new nodes + 1 auto-parametrised (`test_universal_paste.py::test_ac1_…[flow_fused_report_service.py]`, a pre-existing per-module guard that adopted the new module by itself) |
+| Frozen-source guards (C-27, both arms) | ✅ `test_engine_unchanged.py` **1 passed** · `test_tui_directionb -k tc031/tc032/engine` **7 passed** |
+| Lint | 7 ruff findings, **all pre-existing**, none in this batch's files |
+| **AC-5 counterfactual** | ✅ bounds reverted on a **copy of the fixed tree** → both `AT-209` nodes fail **on their assertion** (`assert 1200 <= 60`), never on an import error |
 
 ## Decision log
 
