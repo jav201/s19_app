@@ -63,11 +63,21 @@ requested and none was needed.
 |---|---|
 | Base (`-m "not slow"`, collected) at `244c5d9` | **2319** |
 | New nodes | **35** — `test_flow_multi_image.py` 11 · `test_flow_report_fusion.py` 13 · `test_flow_multi_image_ui.py` 11 |
-| Expected after | **2354** |
+| After | **2355** — `+36` |
 | Flow-suite regression (`-k flow`, at Inc-2+3) | **194 passed** |
 
-*(The full-suite line is filled from the executed run recorded in §6 — a suite figure is re-derived,
-never carried.)*
+**The `+36` is `+35` plus one, and the one is attributed, not assumed.** The delta was re-derived by
+diffing collected node ids against the base worktree at `244c5d9`:
+
+```
+$ comm -13 base.txt now.txt | grep -v "test_flow_multi_image\|test_flow_report_fusion"
+tests/test_universal_paste.py::test_ac1_no_tui_module_constructs_a_stock_input[flow_fused_report_service.py]
+
+$ comm -23 base.txt now.txt        # nodes lost
+(none)
+```
+
+A pre-existing **parametrised per-module guard** adopted the new module by itself. No node was lost.
 
 ## 5. Lint
 
@@ -77,7 +87,23 @@ deliberately not touched. Every file this batch created or edited is clean.
 
 ## 6. Executed full-suite run
 
-See the run recorded at close in `05-postmortem.md` §Test ledger.
+```
+$ python -m pytest -q -m "not slow"
+
+--------------------------- snapshot report summary ---------------------------
+29 snapshots passed.
+2350 passed, 2 skipped, 21 deselected, 3 xfailed in 1420.84s (0:23:40)
+```
+
+**Zero failures.** `2350 + 2 + 3 = 2355`, which reconciles exactly with the collected count. The 29
+snapshots passed unchanged — **no golden was re-baselined**, which matters because `tui-ci` is blind
+to snapshot drift and a silently regenerated baseline is invisible in a green run.
+
+**One honesty note on ordering.** This run started before `REQUIREMENTS.md` was appended and before
+the backlog/state reconciliation, so it did not cover them. The six test files that read those
+documents were re-run afterwards — `test_color_policy_round_trip`, `test_report_addendum_bound`,
+`test_tui_legend`, `test_tui_patch_json`, `test_tui_public_api`, `test_validation_engine` →
+**102 passed, 2 xfailed**. Nothing else in the suite reads a document this batch edited.
 
 ## 7. What was NOT validated
 

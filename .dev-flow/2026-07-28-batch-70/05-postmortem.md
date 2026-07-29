@@ -110,7 +110,9 @@ project rule *a carried number is re-derived, never copied*. The extra node is
 |---|---|
 | Base (`-m "not slow"`, collected) at `244c5d9` | **2319** |
 | After | **2355** — `+36`, fully attributed (35 new + 1 auto-parametrised) |
-| Full-suite result | *(recorded below from the executed run)* |
+| Full-suite result | **2350 passed, 2 skipped, 21 deselected, 3 xfailed** in 23:40 — zero failures; `2350+2+3 = 2355` reconciles with the collection |
+| Snapshots | **29 passed, none re-baselined** — recorded explicitly because `tui-ci` is blind to snapshot drift |
+| Post-append re-run | the six doc-reading test files, after `REQUIREMENTS.md` was appended → **102 passed, 2 xfailed** |
 | Frozen guards | `test_engine_unchanged.py` **1 passed** · `test_tui_directionb -k tc031/tc032/engine` **7 passed** |
 | Lint | 7 ruff findings, **all pre-existing**, none in this batch's files |
 
