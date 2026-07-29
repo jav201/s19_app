@@ -17,7 +17,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple, Union
+
+if TYPE_CHECKING:  # pragma: no cover - typing only, keeps the runtime stdlib-only
+    from ..models import VariantDescriptor
 
 #: Block ``kind`` discriminators (the JSON-persistence tag, batch-45).
 BLOCK_SOURCE = "source"
@@ -62,6 +65,18 @@ FLOW_STATUS_ISSUES = "completed-with-issues"
 #: is internal — block/flow status, not this string, drives the frozen
 #: ``sev-*`` render. (STOP is modelled by ``aborted`` + ``BLOCK_STATUS_ERROR``,
 #: so no separate finding severity is needed.)
+#: Run-scope discriminators (batch-70 FB-P2, LLR-104.6). They live HERE, in the
+#: pure-data layer, so ``FlowBuilderPanel`` can offer the choice without
+#: importing the execution engine (the panel's no-engine contract). The app maps
+#: them onto ``variant_execution_service``'s scopes EXPLICITLY — the string
+#: values coincide, and a coincidence is not an interface.
+FLOW_SCOPE_SINGLE = "single"
+FLOW_SCOPE_ALL_VARIANTS = "all"
+FLOW_SCOPE_ASSIGNMENTS = "assignments"
+
+#: Every scope the Run path accepts.
+FLOW_SCOPES = (FLOW_SCOPE_SINGLE, FLOW_SCOPE_ALL_VARIANTS, FLOW_SCOPE_ASSIGNMENTS)
+
 FINDING_WARN = "warn"
 
 
@@ -221,11 +236,26 @@ class FlowContext:
         mac_records (Optional[Sequence[dict]]): Parsed project MAC records
             (shared linkage source), or ``None``.
         a2l_data (Optional[dict]): Parsed project A2L payload, or ``None``.
+        variant (Optional[VariantDescriptor]): The image this run is bound to
+            (batch-70 FB-P2, LLR-104.1). ``None`` — the default — is today's
+            unscoped single-image run, in which the SOURCE block's own
+            ``image_ref`` is used and nothing downstream changes (AC-6). When
+            set, the SOURCE block's ``image_ref``/``file_type`` are overridden
+            for the duration of THIS run; neither the ``Flow`` object nor the
+            flow file on disk is mutated (D-2).
+        defer_report (bool): When ``True`` a REPORT block records its outcome
+            but writes NO file — its content is carried into the single fused
+            document instead (D-4: a fused run emits ONE report, never one per
+            variant, because N files re-create the manual collation FB-P2
+            exists to remove). Set by ``run_flow_over_variants``; ``False`` — the
+            default — is today's per-run report.
     """
 
     project_dir: Path
     mac_records: Optional[Sequence[dict]] = None
     a2l_data: Optional[dict] = None
+    variant: Optional["VariantDescriptor"] = None
+    defer_report: bool = False
 
 
 @dataclass(slots=True)
@@ -285,3 +315,63 @@ class FlowRunResult:
     diagnostics: List[str] = field(default_factory=list)
     image_ranges: List[Tuple[int, int]] = field(default_factory=list)
     pre_crc_ranges: List[Tuple[int, int]] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class VariantRunOutcome:
+    """One variant's isolated flow-run outcome (batch-70 FB-P2, LLR-104.2).
+
+    Args:
+        variant_id (str): The executed variant's id — file-derived, so every
+            consumer renders it markup-safe (D-6).
+        result (FlowRunResult): That variant's whole-flow outcome, exactly as
+            an unscoped run would have produced it.
+    """
+
+    variant_id: str
+    result: FlowRunResult
+
+
+@dataclass(slots=True)
+class FusedFlowRunResult:
+    """The multi-image run outcome — one entry per PLANNED variant (LLR-104.2).
+
+    ``len(variant_outcomes) == len(planned)`` always: a variant that aborted, or
+    whose image ref failed containment, still contributes an outcome (D-3). A
+    fused run that dropped a variant would be exactly the silent omission this
+    feature exists to remove.
+
+    Args:
+        status (str): The roll-up across variants — any ``"error"`` →
+            ``"error"``; else any ``"completed-with-issues"`` → that; else
+            ``"ok"`` (D-5).
+        variant_outcomes (List[VariantRunOutcome]): One per planned variant, in
+            plan order.
+        n_ok (int): Variants whose own status was ``"ok"``.
+        n_issues (int): Variants whose own status was ``"completed-with-issues"``.
+        n_error (int): Variants whose own status was ``"error"``.
+        written_paths (List[Path]): Every image output across all variants, in
+            plan order — the image-output contract, unioned.
+        report_path (Optional[Path]): The ONE fused report, written when the
+            flow carries a REPORT block (D-4). ``None`` when it does not — a
+            flow with no REPORT block still writes none, exactly as unscoped.
+        diagnostics (List[str]): Whole-run notes (e.g. an empty planned set).
+
+    Data Flow:
+        - Built by ``flow_execution_service.run_flow_over_variants``.
+        - Consumed by ``flow_fused_report_service.compose_fused_flow_report``
+          and by ``FlowBuilderPanel.render_result``.
+
+    Example:
+        >>> FusedFlowRunResult(status="ok").n_ok
+        0
+    """
+
+    status: str
+    variant_outcomes: List[VariantRunOutcome] = field(default_factory=list)
+    n_ok: int = 0
+    n_issues: int = 0
+    n_error: int = 0
+    written_paths: List[Path] = field(default_factory=list)
+    report_path: Optional[Path] = None
+    diagnostics: List[str] = field(default_factory=list)

@@ -5015,3 +5015,61 @@ states how many further distinct variants were affected, not which: `affected = 
   `changes/apply.py::_first_intersecting_symbol`, which carries its own local copy of the
   overlapping-range defect and so would **not** be repaired by unfreezing `range_index.py` — it needs
   a local fix.
+
+## Multi-image flow runs + report fusion — batch-70 (R-TUI-099)
+
+**R-TUI-099**: Given a project with a declared variant set, the Flow Builder shall execute a saved
+flow **once per planned variant** with per-variant isolation, and compose **exactly one** report
+carrying one section per executed variant, a worst-across-variants status, the counts that invert it
+(`n_ok` / `n_issues` / `n_error`), and a **per-variant bound charged in the producer** that names
+whatever it cut. A run left at the default scope shall be unchanged from the single-image path.
+
+The image set comes from the project's own variant machinery (`plan_variant_executions`), never from
+a flow-local path list — a list would let a flow name images outside the project and would fork
+`_resolve_manifest_entry`, the containment boundary batch-53 hardened. Every per-variant image ref
+resolves through that **reused** seam.
+
+**Where the binding actually is.** The batch-69 design cited
+`flow_execution_service.py:343`'s `variant_id=None` as the "single-variant seam". That line is real at
+that address but sits in the **CRC block handler**'s `OperationInput`, whose `variant_id` is
+operations-kernel reporting metadata (`operations/model.py:44-46`). The flow layer had **no** variant
+dimension; this requirement builds it. The binding points are `run_flow`'s signature, `FlowContext`,
+and the SOURCE branch — **not** `:343`. Corrected at batch-70 Phase 0 before any code was written.
+
+**Why the binding is a project-RELATIVE ref.** `VariantDescriptor.path` is absolute and
+`_resolve_manifest_entry` rejects absolute refs **by design**, so binding the descriptor's path
+directly would have failed every variant. `_bound_source_ref` derives
+`path.relative_to(project_dir).as_posix()` and feeds *that* to the seam. A path that will not
+relativise **is** the containment rejection, which is what makes the AC-7 arm observable at all.
+
+**What this requirement deliberately does NOT claim.**
+
+(a) **The fused document is not byte-budget-free.** Each variant's heading, status, footprint and cut
+notice are emitted **outside** the budget gate so no variant can vanish (AC-5); the overshoot this
+permits is `O(V × ~6 lines)` and is bounded only by the variant count, not by
+`FLOW_REPORT_MAX_TOTAL_BYTES`.
+
+(b) **The per-variant caps are row/finding caps, not byte caps.** `MAX_FUSED_LEDGER_ROWS_PER_VARIANT`
+and `MAX_FUSED_FINDINGS_PER_VARIANT` bound how many entries are FORMATTED; a single pathological
+`summary` string is still bounded only by `MAX_REPORT_CELL_CHARS` from the reused `md_safe` path.
+
+(c) **The Patch-Editor variant path is untouched**, as is FB-P3's CRC sub-flow and the engine-frozen set.
+
+- Automated by:
+  | Node | Covers | What it observes |
+  |---|---|---|
+  | **AT-205** / `TC-500` / `TC-501` | AC-1, LLR-104.2 | V variants → V executions, via an injected **counting iterable** over the planned set plus a counting executor — never wall-clock or peak-memory (batch-63) |
+  | **AT-206** / `TC-502` | AC-2, D-3 | variant *k* aborts; *k+1…V* still execute, and the planned set is never truncated |
+  | **AT-207** / `TC-503` | AC-3, D-6 | exactly one `### <variant_id>` section per variant; a metacharacter-bearing id renders escaped with **no unescaped occurrence anywhere** |
+  | **AT-208** / `TC-504` | AC-4, D-5 | the roll-up is the worst, and `n_ok + n_issues + n_error` equals the executed count |
+  | **AT-209** / `TC-505` | AC-5, D-7 | every variant survives · each cut names its dropped count · **the producer FORMATTED at most the cap per variant** |
+  | **AT-210** / `TC-506` | AC-6 | the unscoped binding is the identity, and `compose_flow_report` has no variant parameter, no variant branch, and is not edited |
+  | **AT-211** / `TC-507` / `TC-508` | AC-7, LLR-104.7 | a variant outside the project fails **that** variant closed with `MANIFEST-PATH-ESCAPE` recorded while the others run; the code is a `REJECTING_CODES` member, so the shipped C-31 census covers the variant path |
+  | `test_d4_*` (4 nodes) | D-4 | an **artifact-on-disk** count: one file in `reports/` after a fused run; the deferred REPORT block still appears in every variant's ledger; no report when the flow has none; an unscoped run still writes its own |
+  | `test_llr1046_*` (7 nodes) | LLR-104.6 | the scope Select drives the real Run button through the shipped app handler; the default routes to the single-image path; the `assignments` scope genuinely narrows the planned set; a variant scope with no variants degrades to an error card |
+- **AC-5's falsifiability is executed, not asserted.** With the `islice` bounds reverted on a **copy of
+  the fixed tree**, both `AT-209` nodes fail **on their assertion** — `assert 1200 <= 60`, and the
+  missing `> **Cut in `a`:** findings: 25 omitted` — never on an import error. A counterfactual run
+  against the pre-change tree would have failed at import and proven nothing.
+- Status: Added in batch `2026-07-28-batch-70` (US-FBP2-1/2, HLR-104, LLR-104.1…104.7;
+  `01-requirements.md` §2.7 premise table P-1…P-10, §6.5 amendment A-1). Frozen-engine diff = 0.

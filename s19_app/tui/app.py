@@ -2286,29 +2286,44 @@ class S19TuiApp(App):
         Summary:
             Handle the rail-8 Run (R-TUI-059): resolve the active project
             directory and execute the flow via the Textual-free
-            ``flow_execution_service.run_flow`` (reads bounded to the project,
-            writes to the work area — batch-44 security F1/F2), then hand the
-            ``FlowRunResult`` back to the panel. A no-project state renders an
-            error result instead of running. Runs synchronously — acceptable
-            for the tracer's small images; a worker is deferred to polish.
+            ``flow_execution_service`` (reads bounded to the project, writes to
+            the work area — batch-44 security F1/F2), then hand the result back
+            to the panel. A no-project state renders an error result instead of
+            running. Runs synchronously — acceptable for the tracer's small
+            images; a worker is deferred to polish.
+
+            batch-70 FB-P2 adds the scope (LLR-104.6). ``FLOW_SCOPE_SINGLE`` —
+            the default — takes the UNCHANGED single-image path; a variant scope
+            dispatches to ``run_flow_over_variants`` and paints the fused
+            result. A variant scope with no declared variant set degrades to an
+            error card rather than silently running one image, because
+            "it ran, over what you did not ask for" is the worse failure.
 
         Args:
-            event (FlowBuilderPanel.RunRequested): Carries the composed flow.
+            event (FlowBuilderPanel.RunRequested): Carries the composed flow and
+                the requested scope.
 
         Returns:
             None
 
         Dependencies:
             Uses:
-                - ``_active_project_dir`` / ``flow_execution_service.run_flow``
+                - ``_active_project_dir`` / ``run_flow`` / ``run_flow_over_variants``
+                - ``read_project_manifest`` (the manifest half of the plan)
             Used by:
                 - ``FlowBuilderPanel`` Run button (message dispatch)
         """
-        from .services.flow_execution_service import run_flow
+        from .services.flow_execution_service import run_flow, run_flow_over_variants
         from .services.flow_model import (
+            FLOW_SCOPE_ASSIGNMENTS,
+            FLOW_SCOPE_SINGLE,
             FLOW_STATUS_ERROR,
             FlowContext,
             FlowRunResult,
+        )
+        from .services.variant_execution_service import (
+            SCOPE_ALL,
+            SCOPE_ASSIGNMENTS,
         )
 
         panel = self.query_one("#flow_panel", FlowBuilderPanel)
@@ -2321,8 +2336,34 @@ class S19TuiApp(App):
                 )
             )
             return
-        result = run_flow(event.flow, FlowContext(project_dir=project_dir))
-        panel.render_result(result)
+        scope = getattr(event, "scope", FLOW_SCOPE_SINGLE)
+        if scope == FLOW_SCOPE_SINGLE:
+            panel.render_result(run_flow(event.flow, FlowContext(project_dir=project_dir)))
+            return
+        if self._variant_set is None or not self._variant_set.variants:
+            panel.render_result(
+                FlowRunResult(
+                    status=FLOW_STATUS_ERROR,
+                    diagnostics=[
+                        "no variants declared in this project - "
+                        "run over 'This image' instead"
+                    ],
+                )
+            )
+            return
+        # The flow-layer scope and the execution-layer scope share their string
+        # values; map them EXPLICITLY so the coupling survives a rename of either.
+        service_scope = (
+            SCOPE_ASSIGNMENTS if scope == FLOW_SCOPE_ASSIGNMENTS else SCOPE_ALL
+        )
+        fused = run_flow_over_variants(
+            event.flow,
+            FlowContext(project_dir=project_dir),
+            self._variant_set,
+            read_project_manifest(project_dir),
+            service_scope,
+        )
+        panel.render_fused_result(fused)
 
     def _flow_no_project_error(self, panel: "FlowBuilderPanel") -> None:
         """Render the no-project error card on the flow panel (mirrors Run)."""

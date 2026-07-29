@@ -115,6 +115,9 @@ from .services.flow_model import (
     BLOCK_WRITE_OUT,
     CHECK_GATING_ADVISORY,
     CHECK_GATING_BLOCK_OWN,
+    FLOW_SCOPE_ALL_VARIANTS,
+    FLOW_SCOPE_ASSIGNMENTS,
+    FLOW_SCOPE_SINGLE,
     FLOW_STATUS_ERROR,
     FLOW_STATUS_ISSUES,
     FLOW_STATUS_OK,
@@ -123,6 +126,7 @@ from .services.flow_model import (
     Flow,
     FlowBlock,
     FlowRunResult,
+    FusedFlowRunResult,
     PatchBlock,
     ReportBlock,
     SourceBlock,
@@ -2740,16 +2744,28 @@ class FlowBuilderPanel(ScrollableContainer):
         ("block-own-op", CHECK_GATING_BLOCK_OWN),
     ]
 
+    #: Run-scope options (batch-70 FB-P2, LLR-104.6). "This image" is the
+    #: DEFAULT and is today's single-image run, so the new dimension is opt-in
+    #: and an operator who never touches this control sees no change (AC-6).
+    _SCOPE_OPTIONS = [
+        ("This image", FLOW_SCOPE_SINGLE),
+        ("All variants", FLOW_SCOPE_ALL_VARIANTS),
+        ("Assigned variants", FLOW_SCOPE_ASSIGNMENTS),
+    ]
+
     class RunRequested(Message):
         """The operator pressed Run — carries the composed flow to the app.
 
         Args:
             flow (Flow): The ordered typed-block flow to execute.
+            scope (str): One of ``FLOW_SCOPES`` — which images to run over
+                (batch-70 FB-P2). Defaults to the single-image run.
         """
 
-        def __init__(self, flow: Flow) -> None:
+        def __init__(self, flow: Flow, scope: str = FLOW_SCOPE_SINGLE) -> None:
             super().__init__()
             self.flow = flow
+            self.scope = scope
 
     class SaveRequested(Message):
         """The operator pressed Save… — carries the current flow to the app.
@@ -2815,6 +2831,12 @@ class FlowBuilderPanel(ScrollableContainer):
         )
         yield Static(self._blocks_text(), id="flow_blocks", markup=False)
         yield Horizontal(
+            Select(
+                self._SCOPE_OPTIONS,
+                value=FLOW_SCOPE_SINGLE,
+                allow_blank=False,
+                id="flow_scope",
+            ),
             Button("Run", id="flow_run", variant="primary"),
             Button("Clear", id="flow_clear"),
             Button("Save…", id="flow_save"),
@@ -2976,7 +2998,10 @@ class FlowBuilderPanel(ScrollableContainer):
             self._mark_dirty()
         elif event.button.id == "flow_run":
             self.post_message(
-                self.RunRequested(Flow(name=self._flow_name, blocks=list(self._blocks)))
+                self.RunRequested(
+                    Flow(name=self._flow_name, blocks=list(self._blocks)),
+                    str(self.query_one("#flow_scope", Select).value),
+                )
             )
         elif event.button.id == "flow_save":
             self.post_message(self.SaveRequested(self.current_flow))
@@ -3128,6 +3153,103 @@ class FlowBuilderPanel(ScrollableContainer):
             widgets.append(
                 Static(
                     safe_text(diagnostic),  # SINK: flow-diagnostic
+                    markup=False,
+                    classes="flow-run-diag sev-error",
+                )
+            )
+
+        container.mount(*widgets)
+
+    def render_fused_result(self, fused: FusedFlowRunResult) -> None:
+        """Paint ``#flow_result`` for a MULTI-IMAGE run (batch-70 FB-P2).
+
+        Summary:
+            Mount the rolled-up status banner, the line that INVERTS it
+            (``n_ok`` / ``n_issues`` / ``n_error``, D-5 — a single word over N
+            images hides exactly what the operator pressed Run to see), one
+            node per variant carrying that variant's own status and block
+            summaries, and the single fused report path. Every file-derived
+            string — ``variant_id``, block summaries, diagnostics, the report
+            path — gets its OWN ``Static(safe_text(...), markup=False)`` so a
+            hostile payload renders literally (C-17); the banner and the counts
+            are enum/int-derived and are correctly outside that sweep.
+
+        Args:
+            fused (FusedFlowRunResult): The multi-image run outcome.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``safe_text`` / ``_FLOW_STATUS_BANNER`` / ``_BLOCK_STATUS_SEV_CLASS``
+            Used by:
+                - ``S19TuiApp.on_flow_builder_panel_run_requested``
+        """
+        container = self.query_one("#flow_result", VerticalScroll)
+        container.remove_children()
+
+        banner_text, banner_class = _FLOW_STATUS_BANNER.get(
+            fused.status, (fused.status.upper(), "sev-neutral")
+        )
+        widgets: List[Widget] = [
+            Static(banner_text, markup=False, classes=f"flow-banner {banner_class}"),
+            Static(
+                f"{len(fused.variant_outcomes)} variant(s): "
+                f"{fused.n_ok} ok / {fused.n_issues} issues / {fused.n_error} error",
+                markup=False,
+                classes="flow-node-summary sev-neutral",
+            ),
+        ]
+
+        for position, outcome in enumerate(fused.variant_outcomes):
+            # Reuse the banner map's severity half rather than forking a second
+            # status→class table that could drift out of step with it.
+            sev = _FLOW_STATUS_BANNER.get(
+                outcome.result.status, ("", "sev-neutral")
+            )[1]
+            node_children: List[Static] = [
+                Static(
+                    safe_text(f"{outcome.variant_id}  —  {outcome.result.status}"),
+                    markup=False,  # SINK: variant_id
+                    classes="flow-node-head",
+                )
+            ]
+            for block_result in outcome.result.block_results:
+                glyph = _BLOCK_STATUS_GLYPH.get(block_result.status, "·")
+                node_children.append(
+                    Static(
+                        safe_text(  # SINK: block kind + summary
+                            f"{glyph} {block_result.kind:<9} {block_result.summary}"
+                        ),
+                        markup=False,
+                        classes="flow-node-summary",
+                    )
+                )
+            for diagnostic in outcome.result.diagnostics:
+                node_children.append(
+                    Static(
+                        safe_text(diagnostic),  # SINK: diagnostic
+                        markup=False,
+                        classes="flow-diag sev-error",
+                    )
+                )
+            widgets.append(Vertical(*node_children, classes=f"flow-node {sev}"))
+            if position < len(fused.variant_outcomes) - 1:
+                widgets.append(Static("", classes="flow-sep"))
+
+        if fused.report_path is not None:
+            widgets.append(
+                Static(
+                    safe_text(f"fused report: {fused.report_path}"),  # SINK: path
+                    markup=False,
+                    classes="flow-wrote sev-ok",
+                )
+            )
+        for diagnostic in fused.diagnostics:
+            widgets.append(
+                Static(
+                    safe_text(diagnostic),  # SINK: run diagnostic
                     markup=False,
                     classes="flow-run-diag sev-error",
                 )

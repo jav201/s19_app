@@ -170,7 +170,15 @@ A change document (`s19app-changeset` v2.0 JSON) is a first-class PATCH input fr
 
 **Status:** decisions RESOLVED 2026-07-28, no code. Full rationale + acceptance criteria in `.fast-dev-flow/spec.md` (batch-69). This section records the durable architectural commitments so the implementation batch inherits decisions, not questions.
 
-**The dimension already exists.** `variant_execution_service.py` ships `ProjectManifest`, `plan_variant_executions` and `_execute_one_variant`; `flow_execution_service` already imports `_resolve_manifest_entry` from it, and marks the single-variant assumption explicitly by passing `variant_id=None`. FB-P2 threads an existing dimension rather than inventing one.
+**What is reused, and what is BUILT — corrected batch-70 Phase 0, executed against disk.**
+
+The *variant machinery* is genuinely shipped and reused: `variant_execution_service.py` ships `ProjectManifest` (`:160`), `plan_variant_executions` (`:600`), `_execute_one_variant` (`:682`) and `VariantExecutionResult` (`:547`); `flow_execution_service` imports `_resolve_manifest_entry` from it (`:66`) and calls it at **four** sites (`:135`, `:190`, `:250`, `:309`). That containment seam is shared, not forked.
+
+**The flow-layer variant dimension, however, does NOT exist and is BUILT by this feature.** `run_flow(flow: Flow, ctx: FlowContext)` takes no variant; `FlowContext` carries `project_dir` / `mac_records` / `a2l_data` only (`flow_model.py:226-228`). The only three occurrences of "variant" in the 531-line module are a docstring mention (`:7`), the `_resolve_manifest_entry` import (`:66`), and one CRC line (`:343`).
+
+> ⚠️ **Superseded claim (batch-69 design, corrected batch-70).** The design read `flow_execution_service.py:343`'s `variant_id=None` as *"the single-variant assumption is explicit in the code"* — a seam marker. **That reading is wrong.** The line is real and at that address, but it sits inside the **CRC block handler**, populating an `OperationInput` (`:339-346`); `OperationInput.variant_id` is the operations kernel's *reporting metadata* — "Project variant the snapshot belongs to (`LoadedFile.variant_id`); `None` outside multi-variant loads" (`s19_app/tui/operations/model.py:44-46`). It is not a flow-execution seam, and FB-P2 should *populate* it as a consequence rather than treat it as the binding point. **Why this correction matters operationally:** an implementer who trusts ":343 is the seam" wires the variant into the CRC `OperationInput` and believes Inc-1 is closed. The real Inc-1 surface is `run_flow`'s signature, `FlowContext`, and the SOURCE block's `image_ref` override at `:135`.
+
+Net effect on the plan: D-1..D-8 stand unchanged — the correction touches the *effort and risk* premise, not any decision. FB-P2 threads an existing **containment** seam while **building** the flow-layer variant dimension.
 
 | # | Decision |
 |---|---|

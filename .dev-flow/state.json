@@ -1,261 +1,123 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-28-batch-65",
-  "batch_objective": "D1 ONLY — bound the PRODUCER in _addendum_lines (s19_app/tui/services/report_service.py:1514) so the declared-region addendum stops consuming resident memory proportional to R x V x E. The function appends one fully-formatted string (each paying md_safe) per matching (region x variant x entry/issue) into a local hits list at :1565/:1571/:1579 and extends `lines` only at :1584, so the whole cost is paid BEFORE any output exists and every byte-budget or row-cap design is structurally blind to it. Measured 87-94 B resident per hit, product law confirmed on all three axes. D1 was specced at batch-63, BLOCKED at that batch's Phase-2 re-gate and RETURNED; batch-63 shipped D3 only. EXPLICITLY OUT OF SCOPE: OB-4/F4 (the two unbounded tables at 988 B/entry) and D2 (schema-legal address ValueError) — both stay carries in .dev-flow/BACKLOG-CODE.md. CONSTRAINT ON THE PR: D1 alone does NOT close the memory-exhaustion DoS (the neighbouring tables dominate), so the batch must state the residual with its numbers and must NOT claim closure.",
-  "note_prior_batch": "batch-63 (report byte accounting, D3 only) DONE + MERGED PR #139 c473152 + closeout #140 79cde53 + control decisions #142 c779e3d. Vault synced 2026-07-27. Its D1/D2 were RETURNED to the backlog at the Phase-2 re-gate. Its full state at close is archived at .dev-flow/2026-07-26-batch-63/state-at-close.json.",
-  "note_backlog_split": "THE OPEN QUEUE IS NOW SPLIT (PR #143, squash 082ada9, 2026-07-27). Lane A = .dev-flow/BACKLOG-CODE.md (app code + its dev flow) — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is now a ROUTER holding no open work.",
-  "route": "full /dev-flow. ALL PHASES CLOSED. Merged PR #149 squash b691f21; vault synced to 2026-07-28-batch-65. Remaining close-out: the dev-flow-lessons catalog entry + push to claude-skills.",
-  "rc1": "VERIFIED 2026-07-27. git fetch origin; origin/main tip = 082ada9; HEAD = 082ada9; merge-base HEAD origin/main = 082ada9 (equal, no rebase needed); working tree clean; branch cut off that tip as claude/batch-64-addendum-producer-bound, renumbered mid-flight and now shipping as claude/batch-65-code-lane. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. Already-shipped check EXECUTED: grep R-TUI-095 REQUIREMENTS.md = 0, grep HLR-100 REQUIREMENTS.md = 0, grep MAX_ADDENDUM_HITS s19_app/ = 0 -> D1 is NOT shipped.",
+  "batch_id": "2026-07-28-batch-70",
+  "batch_objective": "FB-P2 IMPLEMENTATION — run a saved Flow across multiple images/variants and fuse the per-image results into ONE report. Threads the project's existing variant set (plan_variant_executions) through flow_execution_service, overriding SourceBlock.image_ref per variant at run time with per-variant isolation, and composes a single fused report with per-variant sections. Design is CLOSED (batch-69, ADR §12 + .fast-dev-flow/spec.md): D-1..D-8 resolved, AC-1..AC-7 observable, 4 increments. D-7 IS NON-NEGOTIABLE: the fused report is bounded BY CONSTRUCTION, per variant, IN THE PRODUCER — batches 62/63/65 were all spent on unbounded report producers and one exhausted the operator's machine; fusion multiplies row cardinality by the variant count. Verified with an INJECTED COUNTING ITERABLE, never wall-clock or peak-memory (batch-63 proved those cannot distinguish cap-and-continue from cap-and-break). EXPLICITLY OUT OF SCOPE: the Patch-Editor variant path, FB-P3 CRC sub-flow, PKI extraction (blocked on operator definition), and the engine-frozen set.",
+  "note_prior_batch": "batch-65 (R-TUI-098, _addendum_lines producer bounding) DONE + MERGED PR #149 squash b691f21. Its close-out was completed but NEVER MERGED until batch-70 recovered it as PR #158 squash f1f3987 — origin/main had been asserting phase_status: in-progress and obsidian_synced: false for a finished batch, which misled THIS batch at its own Phase-0 intake. Full state at close archived at .dev-flow/2026-07-28-batch-65/state-at-close.json. All five merge-gate corrective items are now discharged.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "route": "full /dev-flow. PHASE 0 CLOSED (see phase0_result). NEXT = Phase 1 — requirements derivation, architect + qa-reviewer in parallel.",
+  "rc1": "VERIFIED 2026-07-28. git fetch origin; origin/main tip = dc6aa71 at cut; HEAD = merge-base = dc6aa71 (equal, no rebase needed); working tree clean. origin/main has since advanced to f1f3987 (PR #158, this batch's own recovery of batch-65's close-out) and that commit IS merged into this branch. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. ALREADY-SHIPPED CHECK EXECUTED: FlowContext has no variant field (flow_model.py:226-228 = project_dir/mac_records/a2l_data); run_flow(flow, ctx) takes no variant; only 3 'variant' occurrences in the 531-line flow_execution_service.py -> FB-P2 multi-image is NOT shipped.",
+  "flow_revision": "2026.07.28-rev1 · flow_hash 0127a2767ff11c8a · controls C-1..C-45. VERIFIED CURRENT against ~/.claude/docs/FLOW-VERSION.md at Phase 0 (C-45 PULL). Re-verify at every subsequent session: the aggregate command is in that manifest. Three controls were encoded FROM this batch and pushed upstream (claude-config 061bf93, claude-skills 18e499d): C-43 premise evaluation, C-44 session-close file reconciliation, C-45 the flow is a shared asset.",
   "standing_authorization": {
-    "date": "2026-07-27",
-    "session": "batch-64 kickoff (asked at this kickoff, NEVER inherited from batch-63)",
-    "autonomy": "AUTONOMOUS end-to-end + SELF-MERGE, granted for THIS batch",
-    "operator_phrasing": "Autónomo + self-merge",
-    "merge_gate": "Merge remains gated on the final independent PR-level qa-reviewer pass over the whole diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression, every gate carry discharged). A HIGH finding blocks the merge and returns to the operator.",
-    "decision_recording": "Every decision taken instead of asking is logged in PLAN.md's decision log, in decisions_log below, and in 05-postmortem.md, and carried to the vault at /dev-flow-sync.",
-    "reconfirmed": "2026-07-27, operator: \"ya sigue autónomo hasta merge\" — autonomy through to merge re-affirmed mid-batch. The merge gate is unchanged: the final independent PR-level qa-reviewer pass over the whole diff vs main must come back clean; a HIGH finding blocks the merge and returns to the operator."
+    "date": "2026-07-28",
+    "session": "batch-70 kickoff (asked at THIS kickoff, NEVER inherited from batch-65 or batch-69)",
+    "autonomy": "SUPERVISED PER-INCREMENT — the operator approves every gate and merges the PR. NOT autonomous. NOT self-merge.",
+    "operator_phrasing": "Supervisado por incrementos. Hagamos algo, en cada etapa, haz evaluaciones lógicas de las premisas (proposiciones lógicas) además de verificar junto a requerimiento; los requerimientos son ley pues están validados y verificados, si son nuevos no son ley hasta esa etapa. si la premisa es falsa, falta validación o verificación o el requerimiento se interpreta mal (ambiguo o incompleto) esto necesitamos ponerlo en práctica y si es fructífero agregarlo a backlog como implementación en dev-flow y fast-dev-flow.",
+    "operator_amendment": "Los axiomas (requerimientos validados) son re-litigables si existen contraejemplos o si son lógicamente invalidados (generalmente por INCOMPLETITUD), pero con el fin de AGRANDAR la base de verdad (requerimientos más completos).",
+    "premise_control_status": "ENCODED as C-43 during this batch, in both global flows + req-template §2.7 + the dev-flow-lessons catalog. It is no longer an experiment — Phase 1 onward MUST fill §2.7.",
+    "communication": "Decisions are presented as TABLES of Option / Expected result / Consequences. Prefer tables with ✅❌⚠️❓ glyphs over prose everywhere.",
+    "decision_recording": "Supervised, so few decisions are taken without asking; any that are get logged in PLAN.md's decision log, in decisions_log below, and in 05-postmortem.md."
   },
   "id_allocation": {
-    "method": "EXECUTED union census across REQUIREMENTS.md + tests/ + .dev-flow/ on this tree (the project has no AT/TC registry — backlog OB-2 — so next-free is subset-dependent and must be measured, not assumed).",
-    "measured": "AT max 193 in all three subsets. TC max: REQUIREMENTS 345, tests 477, .dev-flow 479 (a raw scan also reports TC-1728, a stray reference in .dev-flow/2026-07-08-batch-29/_qa-acceptance-validation.md:252, excluded after inspection). R-TUI max 97 in all three. HLR max 102 in all three.",
-    "allocated": "AT-194+, TC-480+, R-TUI-098, HLR-103",
-    "retired_not_reused": "batch-63's never-implemented D1 ids AT-164..167, TC-440..454, R-TUI-095, HLR-100, LLR-100.1..4 are RETIRED. They are contested between batch-63's D1 spec and REV-5 lane A (which claims AT-164..178); reusing them would bind two different observables to one id. Their CONTENT carries forward; only the numbers are dropped."
+    "method": "EXECUTED union census across REQUIREMENTS.md + tests/ + .dev-flow/ on this tree, restricted to *.py/*.md and EXCLUDING __pycache__ (the project has no AT/TC registry — backlog OB-2 — so next-free is subset-dependent and must be measured).",
+    "measured": "AT max: 203 (REQUIREMENTS.md), 203 (tests/), 204 (.dev-flow/). TC max: 499 (REQUIREMENTS.md), 499 (tests/), 1728 (.dev-flow/ — the KNOWN stray at .dev-flow/2026-07-08-batch-29/_qa-acceptance-validation.md:252, excluded after inspection, same exclusion batch-65 made). R-TUI max 098. HLR max 103.",
+    "false_positive_caught": "A first census reported AT/TC max 841. It was a BINARY artefact — the grep swept tests/__pycache__/*.pyc. Re-run restricted to *.py/*.md. Recorded because an id allocated off a binary would bind two observables to one id.",
+    "allocated": "AT-205+, TC-500+, R-TUI-099, HLR-104. Allocated from the MAXIMUM across all subsets + 1, not from any single subset."
   },
   "current_phase": 6,
-  "phase_status": "approved",
-  "iterations_per_phase": {
-    "0": 0,
-    "1": 2,
-    "2": 2,
-    "3": 0,
-    "4": 0,
-    "5": 0,
-    "6": 0
-  },
+  "phase_status": "implemented-awaiting-operator-merge",
+  "note_session_2": "SECOND SESSION (2026-07-28, worktree fb-p2-batch-70-impl-92b3cd). It opened on a NEW branch cut off origin/main that did NOT contain the nine Phase-0 commits; claude/fb-p2-batch-70-bfc118 was FAST-FORWARDED into it, so the PR carries Phase 0 + the implementation. The Phase-0 branch and its worktree are frozen — do not push to them. AUTONOMY WAS RE-ASKED at this kickoff per feedback_standing_auth_per_batch and the operator CHANGED it: AUTONOMOUS UNTIL THE PR (not supervised per-increment, which is what the previous session recorded below). The operator still merges; nothing was self-merged.",
+  "iterations_per_phase": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-28-batch-65/PLAN.md",
-    "1": ".dev-flow/2026-07-28-batch-65/01-requirements.md",
-    "1-architect": ".dev-flow/2026-07-28-batch-65/01-requirements-architect.md",
-    "1-qa": ".dev-flow/2026-07-28-batch-65/01b-qa-catalog.md",
-    "2-security": ".dev-flow/2026-07-28-batch-65/02-review-security.md",
-    "2-qa": ".dev-flow/2026-07-28-batch-65/02-review-qa.md",
-    "2-architect": ".dev-flow/2026-07-28-batch-65/02-review-architect.md",
-    "2-regate-security": ".dev-flow/2026-07-28-batch-65/02-regate-security.md",
-    "2-regate-qa": ".dev-flow/2026-07-28-batch-65/02-regate-qa.md",
-    "2-regate-architect": ".dev-flow/2026-07-28-batch-65/02-regate-architect.md"
+    "plan": ".dev-flow/2026-07-28-batch-70/PLAN.md",
+    "requirements": ".dev-flow/2026-07-28-batch-70/01-requirements.md",
+    "validation": ".dev-flow/2026-07-28-batch-70/04-validation.md",
+    "postmortem": ".dev-flow/2026-07-28-batch-70/05-postmortem.md",
+    "requirement_entry": "REQUIREMENTS.md - R-TUI-099",
+    "code": [
+      "s19_app/tui/services/flow_model.py",
+      "s19_app/tui/services/flow_execution_service.py",
+      "s19_app/tui/services/flow_fused_report_service.py (NEW)",
+      "s19_app/tui/screens_directionb.py",
+      "s19_app/tui/app.py"
+    ],
+    "tests": [
+      "tests/test_flow_multi_image.py (NEW, 11)",
+      "tests/test_flow_report_fusion.py (NEW, 13)",
+      "tests/test_flow_multi_image_ui.py (NEW, 11)"
+    ],
+    "commits": ["ebca4cc Inc-1", "4573d43 Inc-2+3", "2b6c3a5 Inc-4"]
   },
-  "prior_work_mined": "batch-63 left D1 substantially specced and reviewed. Mined 2026-07-27 from .dev-flow/2026-07-26-batch-63/: the design (per-hit-class cap), 8 round-1 blockers + 9 re-gate blockers, all executed measurements, the design options and their verdicts, the named residuals, and the emission-order facts. Recorded in PLAN.md 'Inherited findings' so batch-64 designs for them rather than re-discovering them.",
+  "phase1_result": {
+    "premise_evaluation": "10 premises executed against disk. 9 TRUE, 1 FALSE. P-2 FALSE: VariantDescriptor.path is ABSOLUTE and _resolve_manifest_entry REJECTS absolute refs by design (variant_execution_service.py:263-272, executed both arms), so the design's unstated override FORM would have failed every variant and the tempting fix is to bypass the containment seam. Disposition ENLARGED D-2 rather than replacing it: LLR-104.1 binds a project-RELATIVE POSIX ref through the reused seam - and that is also what makes AC-7 reachable, because a path that will not relativise IS the containment rejection.",
+    "design_gap_found": "D-4's second clause ('no per-variant files') had NO owning increment in the inherited table. With a REPORT block, each variant's run_flow would have written its own report - V files, the manual collation FB-P2 exists to remove - and EVERY composer-level test would still have been green, because the defect is a count of FILES. Closed with FlowContext.defer_report + an artifact-on-disk acceptance.",
+    "d7_counterfactual": "EXECUTED on a COPY of the fixed tree (never the pre-change tree, which would fail at import and prove nothing). Three islice sites reverted; both AT-209 nodes fail ON THEIR ASSERTION: 'assert 1200 <= 60' and the missing '> **Cut in `a`:** findings: 25 omitted (cap 60 per variant).'"
+  },
+  "design_inherited": {
+    "source": "batch-69, DESIGN ONLY, merged as PR #157 dc6aa71. Records: .fast-dev-flow/ADR-flow-builder-tracer.md §12 (durable commitments) and .fast-dev-flow/spec.md (full rationale, AC-1..AC-7, the 4-increment plan).",
+    "status_under_C43": "HYPOTHESIS, NOT AXIOM. batch-69 shipped no code and validated nothing; being written down by a prior batch does not make it verified. Every decision and AC enters Phase 1 as a hypothesis and must earn its own validation.",
+    "decisions": "D-1 image set = the project's variant set (plan_variant_executions), never a path list — a list escapes project containment. D-2 SourceBlock.image_ref overridden PER RUN; the flow file is untouched. D-3 per-variant isolation — one abort does not kill the run. D-4 ONE fused report, per-variant sections, no per-variant files. D-5 status = worst-across-variants PLUS explicit n_ok/n_issues/n_error (a rollup that cannot be inverted lies by omission). D-6 variant identity = variant_id, file-derived, escaped through the batch-62 md_safe path. D-7 the fused report is bounded BY CONSTRUCTION, per variant, IN THE PRODUCER. D-8 no new viewer — write through write_flow_report so REPORT_FILENAME_REGEX and ReportViewerScreen pick it up unchanged.",
+    "acceptance": "AC-1 V variants -> V executions (oracle: injected counting iterable). AC-2 variant k aborts, k+1..V still execute. AC-3 exactly one section per executed variant, variant_id escaped. AC-4 rolled-up status is the worst, and n_ok/n_issues/n_error sum to the executed count. AC-5 with every variant over the cap, EVERY variant is still represented and each cut section names its dropped count — must be shown FAILING against an unbounded implementation. AC-6 unscoped run is byte-identical to today's single-image path. AC-7 (added batch-70) a variant whose image_ref fails containment fails THAT variant closed with its rejection code while the others execute, and the REJECTING_CODES census covers the variant path."
+  },
+  "phase0_result": {
+    "verdict": "APPROVED. 2 findings, both folded into the inherited design before Phase 1; D-1..D-8 unchanged.",
+    "premise_evaluation": "10 design premises executed against disk. 8 TRUE exactly — including both file line-counts (971/531) and a cited line ADDRESS. 2 failed. This is the first application of C-43 and it paid for itself twice.",
+    "F1_FALSE": "The 'seam marker' premise is FALSE as characterized. ADR §12 and spec §2 read flow_execution_service.py:343's variant_id=None as 'the single-variant assumption is explicit in the code' and concluded FB-P2 is 'mostly threading an existing dimension, not building one'. The line is real AT THAT ADDRESS but sits inside the CRC BLOCK HANDLER's OperationInput (:339-346); OperationInput.variant_id is the operations kernel's REPORTING METADATA (s19_app/tui/operations/model.py:44-46). The module has NO variant dimension: the only three 'variant' occurrences in 531 lines are the docstring :7, the _resolve_manifest_entry import :66, and that CRC line. GENUINELY REUSED: _resolve_manifest_entry (4 call sites :135/:190/:250/:309) + plan_variant_executions. BUILT, not threaded: the flow-layer variant dimension. REAL Inc-1 BINDING POINTS: run_flow's signature, FlowContext (flow_model.py:226-228), and the SOURCE image_ref override at :135 — NOT :343. An implementer trusting the old text wires the variant into the CRC OperationInput and believes Inc-1 closed. Corrected in ADR §12 + spec §2 (commit b037186).",
+    "F2_INCOMPLETENESS": "spec §7 declares the containment constraint MANDATORY ('a variant whose ref fails containment must fail that variant closed without aborting the others — D-3 must not become a containment bypass'), yet NO AC-1..AC-6 observed it. AC-2 covers 'variant k aborts', and an abort is NOT a containment rejection. Folding into AC-2 was REJECTED: an AC with two distinct subjects is where batch-65's AT-197 lost its threshold. AC-7 added instead, consuming the EXISTING C-31 census REJECTING_CODES (flow_persistence_service.py:117 — 'a new reject arm shipped without a battery row goes RED') rather than building a new oracle. Spec §5 re-cut per C-21 so AC-7 has an owning increment (Inc-1). This is the operator's constructive-re-litigation rule working as intended: the requirement set came out LARGER.",
+    "gate_axes": "Coverage: all 7 ACs carry a declared observable and an owning increment. Certainty: RC-1 verified; already-shipped check executed and negative; 10/10 premises executed with pasted evidence. Evidence: every premise row cites a re-runnable probe or a file:line."
+  },
+  "increment_plan": {
+    "inc1": "FlowContext + run_flow gain the variant dimension; loop the planned set with per-variant isolation; SOURCE image_ref override. D-1..D-3. AC-1, AC-2, AC-7, AC-6. Binding points: run_flow signature, FlowContext, flow_execution_service.py:135 — NOT :343.",
+    "inc2": "FlowReportState gains per-variant sections; fused composer + rollup. D-4..D-6. AC-3, AC-4.",
+    "inc3": "PER-VARIANT PRODUCER BOUNDING + the cut notice. D-7. AC-5. Oracle = injected counting iterable; AC-5 must be shown RED against an unbounded implementation.",
+    "inc4": "UI: scope selector in FlowBuilderPanel; wire through. D-8.",
+    "constraint": "<= 5 files per increment. Supervised gate after each. code-reviewer reviews each diff before operator approval."
+  },
+  "security": {
+    "required": true,
+    "constraint": "Every per-variant image ref resolves through the REUSED _resolve_manifest_entry, NEVER a fork — that is the containment boundary batch-53 hardened, and flow_execution_service already imports it at :66. Multi-image multiplies resolutions per run, so a fork multiplies the escape surface. D-3 must not become a containment bypass. The REJECTING_CODES reject-arm census must cover the variant path (this is AC-7).",
+    "not_a_flag_but_recorded": "D-7 is a denial-of-service consideration, not a confidentiality one. Treated as load-bearing anyway because this project has already had a report producer exhaust host RAM."
+  },
   "decisions_log": [
     {
       "phase": 0,
-      "date": "2026-07-27",
-      "decision": "Scope fixed to D1 only",
-      "notes": "Operator ruling at kickoff. OB-4/F4 and D2 stay as carries in BACKLOG-CODE.md. batch-63 blocked by over-scoping; not repeating it."
+      "date": "2026-07-28",
+      "decision": "Scope = FB-P2 implementation only; supervised per-increment",
+      "notes": "Operator ruling at kickoff. Autonomy asked at THIS kickoff and NOT inherited."
     },
     {
       "phase": 0,
-      "date": "2026-07-27",
-      "decision": "Autonomous + self-merge",
-      "notes": "Operator answer at kickoff, per-batch, never inherited."
+      "date": "2026-07-28",
+      "decision": "Premise evaluation adopted as a standing gate obligation, then ENCODED as C-43",
+      "notes": "Operator instruction, amended mid-session to make axioms constructively re-litigable. It caught F-1 and F-2 on first use, so it was encoded in both global flows + req-template §2.7 + the lessons catalog rather than left as an experiment."
     },
     {
       "phase": 0,
-      "date": "2026-07-27",
-      "decision": "Allocate AT-194+/TC-480+/R-TUI-098/HLR-103 from an executed union census; RETIRE batch-63's contested D1 ids rather than reuse them",
-      "notes": "Taken by the agent without asking. The TC next-free spread across subsets is 134 real ids — OB-2 measured again — so the allocation is executed, not assumed."
+      "date": "2026-07-28",
+      "decision": "AC-7 adopted as a SEVENTH acceptance criterion rather than folded into AC-2",
+      "notes": "Operator choice from a 3-option table. Folding was rejected on this project's own evidence (batch-65 AT-197 lost its threshold as a two-subject acceptance). AC-7 consumes the existing REJECTING_CODES C-31 census rather than building a new oracle."
     },
     {
       "phase": 0,
-      "date": "2026-07-27",
+      "date": "2026-07-28",
+      "decision": "F-1 corrected in the inherited ADR + spec rather than carried as a backlog note",
+      "notes": "Operator instruction ('corrige'). The correction ENLARGES rather than deletes: it states what IS genuinely reused vs what is built, and names the real Inc-1 binding points, because that is the part that would have cost an increment."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-28",
       "decision": "Phase 0 gate — APPROVE",
-      "notes": "2 stories READY, 0 REFINE/SPIKE/OUT. No exit-criteria axis unmet: Coverage (both stories carry a declared observable acceptance), Certainty (RC-1 verified at 082ada9; already-shipped greps executed and all zero), Evidence (every number in PLAN.md from a cited run; _addendum_lines confirmed to have 0 direct tests)."
-    },
-    {
-      "phase": 0,
-      "date": "2026-07-27",
-      "decision": "Design = Option 2, single-pass + range_index",
-      "notes": "Operator choice at the Phase-0 gate. Closes residual B-3(b) in addition to the resident-memory axis."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-27",
-      "decision": "QA lane does NOT allocate AT/TC ids this batch; it names observables by slug and the architect lane owns allocation",
-      "notes": "Taken by the agent without asking. In batch-63 both Phase-1 lanes allocated independently, 9-10 of 12 AT ids bound different observables, costing two Phase-2 blockers and a consolidation that silently dropped 8 of ~18 union observables. Slug-then-bind removes the collision mechanism at its source. Every slug gets a destination or an explicit retirement line (P-7)."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-27",
-      "decision": "Requirement will NOT claim the memory-exhaustion DoS is closed",
-      "notes": "Taken by the agent without asking. Security F2 returned D1 precisely because the neighbouring unbounded tables dominate at 988 B/entry, making any whole-report peak acceptance unsatisfiable. The requirement claims only what the change does — the addendum marginal cost — and states the residual with its numbers. If the requirement never asserts closure, F2 has nothing to attach to."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-27",
-      "decision": "Phase 1 gate — APPROVE (self, under the autonomy grant)",
-      "notes": "Coverage: dual traceability complete, 16/16 catalog observables bound or retired in writing, verified independently by the orchestrator rather than trusting the consolidator self-check. Certainty: every threshold carries an executed RED and GREEN from this tree; no inherited batch-63 number promoted. Evidence: every row cites a re-runnable probe. The one named gap (X-2) is an implementation-time re-derivation with an explicit return-to-Phase-1 rule, not an unnamed hole."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-27",
-      "decision": "Adopt qa marginal-cost threshold form (<=1.30, RED 2.27, GREEN 1.002); RETIRE the architect 4x-sweep form (<=2.5, RED 5.54, GREEN 1.52) in writing",
-      "notes": "Resolved by evidence not preference: both lanes independently measured the same small-E anchoring artefact (qa bounded arm 2.22 at E=500; architect prototype adjacent doublings 1.35/0.90/1.24 at E 250->1000). The retired form denominator sits inside that artefact, which inflates its GREEN and FORCES the threshold up to 2.5 — widening a threshold to fit measurement noise is the batch-63 move."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-27",
-      "decision": "RETIRE OBS-traversal-early-exit",
-      "notes": "Mandating per-class early exit makes LLR-103.5's {dropped} count and {variants} list underivable; US-B64-2 (the operator can see what was cut) outranks the optimization. Not deleted — inverted into TC-489 as a positive control that fails on any stealth early exit. Sent to the Phase-2 qa lane for an independent ruling."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-27",
-      "decision": "Phase 2 gate — iterate-to-refine (forced: 5 blockers)",
-      "notes": "ONE refinement iteration folding all 27 findings, not three rounds. Discharge requires a 27-row disposition table (FOLDED / REJECTED-with-reason / CARRIED-with-destination); a silently vanished finding is the P-7 failure this project keeps repeating and it already happened once inside revision 1."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-27",
-      "decision": "Phase 2 gate — APPROVE at the re-gate (operator decision)",
-      "notes": "46 findings across two gates from six independent reviews, all dispositioned; ZERO design objections. Verified independently of the folding agent by deriving finding keys from the review artifacts: 27/27 then 19/19 present. Phase 1 reached 2 iterations of a soft cap of 3; the operator was given the choice of a third re-gate, acceptance, or re-scoping, and chose acceptance."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-27",
-      "decision": "FIX-NONE / FIX-SCOPE carried as a BLOCKING Inc-1/Inc-2 gate condition rather than re-gated",
-      "notes": "They are mutant arms against the NEW behaviour, so they cannot be fully executed before the producer exists; requiring them pre-implementation would require the implementation. Recorded as the one knowingly-open item at the Phase-2 gate."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-27",
-      "decision": "Inc-1 increment gate — APPROVE",
-      "notes": "Code review OK no HIGH; golden independently re-derived byte-identical from a clean 082ada9 export; all per-node verdicts matched 11.1. Four review findings folded before commit rather than carried."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-27",
-      "decision": "M3 ruled: optional ops_counter parameter, not a module-level global",
-      "notes": "Taken by the orchestrator without asking, under the autonomy grant. Rationale recorded in inc2_ruling."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-27",
-      "decision": "Autonomy through to merge re-affirmed by the operator mid-batch",
-      "notes": "Operator phrasing: \"ya sigue autónomo hasta merge\". The final PR-level qa gate still blocks the merge on a HIGH."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-27",
-      "decision": "/dev-flow-sync is part of this batch close-out",
-      "notes": "Operator instruction, given mid-batch: \"terminando el merge tambien haz /dev-flow-sync\". Runs after the merge, after the Lane A backlog reconciliation."
-    },
-    {
-      "phase": 4,
-      "date": "2026-07-27",
-      "decision": "Phase 4 gate — APPROVE (VALIDATED)",
-      "notes": "0 traceability gaps both directions; 9/9 AT REALIZED under C-18; suite figure reconciled independently as 2201+29+1+2=2233. Four documentation-side findings, two folded, one carried, one undispositioned (corrected at the merge gate) to Lane A."
-    },
-    {
-      "phase": 4,
-      "date": "2026-07-27",
-      "decision": "Lane-A backlog reconciliation written by the orchestrator",
-      "notes": "Inc-3 stopped at the file cap and disclosed the debt rather than improvising it. All six R-TUI-098 non-claims landed as first-class residuals WITH their executed numbers, plus F-4, the new apply.py:465 defect, the CLEARED note (including the withdrawal of my own wrong at-risk claim), and the rejected severity-histogram fold with its reason."
-    },
-    {
-      "phase": 5,
-      "date": "2026-07-27",
-      "decision": "Phase 5 gate — APPROVE, and the orchestrator ACCEPTS the postmortem rejection of its own frame",
-      "notes": "The 'instrument not product' frame was mine, repeated to the operator several times, and it was too flattering. Recorded in postmortem_headline. The governance watch-item on one-directional self-correction under self-merge is recorded separately and must be carried to batch-65."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-28",
-      "decision": "Renumber this batch 64 -> 65 and migrate onto the parallel session's rebased base",
-      "notes": "Operator decision after the collision surfaced at the PR (CONFLICTING, 10 paths, 9 of them batch artifacts + state.json; ZERO conflicts in production code, tests, REQUIREMENTS.md or BACKLOG-CODE.md). Did NOT push to claude/batch-65-addendum-producer-bound because another worktree holds it checked out — writing a branch a live session holds is the same failure class as the namespace collision itself."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-28",
-      "decision": "Merge-gate re-gate BLOCKED; five unblock items applied line-targeted",
-      "notes": "The re-gate found that my own blanket fix for HIGH-1 corrupted the merge-gate report itself — the one file written AFTER the collision, where batch-64 meant the OTHER batch. My rationale held for 19 of 20 files (66/66 verified) and failed on the 20th. I acted on a rationale I had not verified, which is this batch's own defect class, committed while closing this batch's findings. Fixes applied without any blanket pass."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-28",
-      "decision": "synced-to-obsidian",
-      "notes": ".../01 - Proyectos/s19_app/dev-flow-batches/2026-07-28-batch-65/ — 17 files + 06-docs/. Collision handled, not assumed away: the parallel session process batch occupies the 2026-07-27-batch-64 slot and was VERIFIED UNTOUCHED (0 files modified during the sync). Dashboard.md left as-is."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-28",
-      "decision": "Recovered from a self-inflicted conflicted commit",
-      "notes": "A \"git merge --ff-only || git rebase\" chain conflicted on the OTHER batch folder (add/add on 7 files) plus state.json, and the commit went through WITH conflict markers as 62c7141. It was never pushed; origin/main was clean throughout. Preserved at backup/batch-65-conflicted-62c7141, then reset --hard to b691f21. Root cause: I chained a merge fallback without checking whether it conflicted before committing. Third self-inflicted mechanical error in this close-out sequence."
+      "notes": "No exit-criteria axis unmet. 2 findings raised and both folded before Phase 1."
     }
   ],
-  "obsidian_synced": true,
-  "created_at": "2026-07-27T00:00:00Z",
+  "obsidian_synced": false,
+  "created_at": "2026-07-28T00:00:00Z",
   "stories": {
-    "US-B64-1": "As an operator generating a project report over a manifest with declared regions, I get the report without the tool consuming memory proportional to (regions x variants x entries), so a large or hostile change document cannot exhaust my machine. READY.",
-    "US-B64-2": "As an operator reading an evidentiary report, when the addendum was truncated I can see WHICH hit classes (and which variants) were cut, so I can distinguish \"there is no evidence\" from \"the evidence did not fit\". READY. This is the story batch-63 never wrote and the reason its security gate did not close."
+    "US-FBP2-1": "As an operator with a project holding several image variants, I run a saved Flow once and it executes against every variant, so I stop re-running the same flow by hand per image. READY.",
+    "US-FBP2-2": "As an operator reading the result of a multi-image run, I get ONE report whose per-variant sections and inverted counts let me tell which images passed and which did not, and whose evidence is never silently truncated, so a fused report cannot read as 'covered everything' when it was cut. READY."
   },
-  "design_decision": "Option 2 — single-pass, region-indexed. Walk result->summary->entry/issue ONCE, decide region membership via range_index.py binary-search primitives, append into per-(region,class) BOUNDED buckets. O(VxE.logR + Rx3K) instead of O(RxVxE). Chosen over batch-63 per-hit-class cap because it also closes residual B-3(b) (a region matching fewer than the cap still traverses the full VxE, so an attacker declares R narrow zero-match regions and pays the full product for zero output). range_index.py is ENGINE-FROZEN but consuming it needs no unfreeze — verified, report_service.py imports it 0 times. HIGHEST-RISK UNKNOWN sent to Phase 1 as mandatory probe P-1: whether the range_index API allows recovering WHICH region an address fell into or only WHETHER it fell into any; if boolean-only, the frozen-safe fallback is a fast reject pre-filter plus a local bisect inside report_service.py.",
-  "phase1_result": {
-    "ids": "R-TUI-098, HLR-103, LLR-103.1..x, AT-194..199 (6), TC-480..497 (18). Contiguous, no gaps. AT-200+/TC-498+ free.",
-    "design_correction_1": "Per-class BUCKETS break byte identity below the bound: the shipped emission order INTERLEAVES modifications and change-file issues per summary (mod,issue,mod,issue) while three concatenated per-class lists emit mod,mod,issue,issue. ADOPTED SHAPE: ONE ordered hit list per region + three admission COUNTERS, so the admitted sequence is a subsequence of the shipped one BY CONSTRUCTION. Byte identity executed 5/5 including exactly-at-K. batch-63 standing design shape is therefore wrong.",
-    "design_correction_2": "range_index.address_in_sorted_ranges is UNSOUND over overlapping ranges (inspects one bisect_right(starts,addr)-1 candidate, range_index.py:65-68) and returns bool so it can never name WHICH region; plus DeclaredRegion is inclusive while range_index is half-open, so without end+1 every region end address is a false negative. Found INDEPENDENTLY by both Phase-1 lanes and verified a third time by the orchestrator. LLR-103.2 workaround: coalesce to a disjoint half-open cover -> range_index becomes a SOUND O(log R) reject pre-filter; region identity from a caller-local bisect + prefix-max inside report_service.py. range_index.py untouched (frozen).",
-    "honest_scope": "B-3(b) is REDUCED from RxVxE to VxE, NOT eliminated (candidates are unsorted lists with no address index, so one pass is irreducible). The memory-exhaustion DoS is NOT closed. Intra-class and cross-variant eviction are DISCLOSED via the notice, not prevented. All three stated in requirement text.",
-    "open_obligation_X2": "AT-194's adopted GREEN (1.002) was measured on prototype FIX-A2, which includes the per-class early exit the spec RETIRES. It has NOT been measured on the implemented shape. Inc-2 must re-derive; if GREEN > 1.30 the threshold returns to Phase 1, NOT widened at the gate.",
-    "union_check": "Orchestrator ran an INDEPENDENT union check (slug set derived from the qa catalog, not from the consolidator table). 16 catalog slugs: 15 bound, 1 RETIRED in writing (OBS-traversal-early-exit). Two apparent misses (OBS-marginal-flat, OBS-traversal-bounded) resolved by reading as working names inside probe transcripts whose CONTENT is bound (TC-493) or retired in writing (the R x 3K bound). Retired batch-63 ids appear only in retirement/history context (lines 281/340/605/606)."
-  },
-  "phase2_result": {
-    "verdict": "BLOCKED by all three lanes, independently. 5 blockers / 14 majors / 8 minors.",
-    "top_blocker_two_party": "The R-independence claim is FALSE and its oracle is structurally unable to see it. Found INDEPENDENTLY by security (S1) and architect (B-1). R-TUI-098 claims cost independent of the declared-region count; the prefix-max attribution walk is O(R) per candidate under a huge+tiny geometry (one enclosing region + R-1 narrow ones). EXECUTED at E=500: consumed = 500/500/500/500 at R=1/8/64/256 while region ops = 500/4000/32000/128000, matches 1/1/1/1. The RxVxE product is RELOCATED, not removed, and consumed==N (the only guarding oracle) reads 500 in every case. Same vacuity class as batch-63 AT-165: the predicate does not test what its LABEL claims.",
-    "qa_blocker": "AT-197's {variants} superset check is a REPRESENTATION check, not IDENTITY. FIX-H (lists every variant that CONTRIBUTED to the cut class rather than every variant whose hits were DROPPED) is GREEN on AT-197, all three AT-198 arms and AT-196, while telling the operator that v1 — the attacker, all of whose hits were admitted — lost evidence. That INVERTS US-B64-2. The Phase-1 catalog HAD this boundary at 01b-qa-catalog.md:466-467; revision 1 reduced it to prose with no threshold, no id, no RED arm.",
-    "increment_blockers": "ARCH B-2: Inc-2's one-file cut is infeasible — tests/test_report_field_census.py:353 is a source-AST census that fires on the notice's new md_safe site and no increment owns that file. ARCH B-3: AT-196 is GREEN at Inc-1 BY CONSTRUCTION (byte identity vs a golden captured from the shipped producer), so Inc-1's 'every AT fails' gate is unsatisfiable for it. ARCH M-3: TC-497 owned by two increments.",
-    "X2_closed_twice": "Both lanes measured AT-194 at the shipped surface on FIX-A (the adopted no-early-exit shape), fixtures built before tracemalloc.start(): qa RED 2.265 / GREEN 0.998; architect RED 2.000 / GREEN 1.018 (3/3 reps). GREEN sits 22-23% below the 1.30 threshold. X-2 is CLOSED, not carried. The two REDs differ because the figure is fixture-specific, so the gate must require RED > threshold with the fixture named, never a verbatim number.",
-    "cleared": "LLR-103.2's coalesce+prefix-max workaround is SOUND — security swept ~150k addresses over 9 adversarial suites + 200 random sets, 0 mismatches; architect swept 375,064 checks over 11 hand-built geometries + 3,000 random ones, 0 mismatches. The notice cannot be forged and leaks nothing. The F2 non-claim holds across all seven locations checked. The subsequence claim verified 72/72 configurations. K-1/K/K+1 genuinely escapes the in-domain max of 2.",
-    "orchestrator_correction": "My earlier carry was WRONG. The range_index overlap defect does NOT reach validation/engine.py (ranges come from core.py::get_memory_ranges over a sorted unique-key dict -> disjoint by construction; 9 real fixtures, 0 overlapping pairs incl. case_03_overlapping_records) nor tui/hexview.py (a pure re-export facade). The LIVE one is s19_app/tui/changes/apply.py:465 _linkage_index over A2L tag ranges, which carries its OWN copy of the one-candidate shape at :511-518, so a range_index.py unfreeze would not repair it. Executed: [(4096,36864,BIG_ARRAY),(8192,8208,INNER)], addr=0x5000 -> (False,None), truth [BIG_ARRAY]. Also UNAUDITED: screens_directionb.py:1889 builds an index over ALL A2L tag regions. The consumer surface is ~8 modules, not the 2 I named.",
-    "orchestrator_check_limitation": "My independent union check verified that every qa slug was BOUND to an id or RETIRED in writing — it did NOT verify that each observable retained its STRENGTH through the merge. AT-197 kept its id and lost its threshold, and my predicate could not see that dimension. Same failure class the batch is chasing, in my own verifier."
-  },
-  "regate_result": {
-    "security": "OK TO SHIP, UNCONDITIONAL. 6/6 CLOSED, 0 partials. No risk-acceptance signature requested: the S1 blocker was a requirement asserting a bound the design does not provide, and revision 2 RETRACTS the claim, names the residual with both lanes numbers, and builds the missing oracle — that is a fix, so there is nothing to sign. Security also SUSTAINED the rejection of its own S5 fold 2, writing that its finding was over-general (its probe sampled a ValidationIssue, true for 2 of 3 hit classes, false for the third). And it CLEARED screens_directionb.py:1889 — 206 fixtures, 89032 addresses swept, 0 mismatches — noting that the evidence cell it was replacing had been its own sentence resting on a docstring.",
-    "qa": "9/9 CLOSED, 0 partials, but NOT READY: 4 new blocking majors. FIX-H rebuilt and executed against the repaired AT-197: RED (was GREEN) — the fold is load-bearing.",
-    "architect": "9 CLOSED / 3 PARTIAL / 0 NOT CLOSED, 1 new blocker. Ruled AT-194 stays an AT (demoting it leaves US-B64-1 with zero black-box nodes able to go RED pre-fix). Verified its own B-2 and M-5 were over-general and said so.",
-    "central_finding": "ARCH-N-1 == QA-NEW-1, raised independently: 11.1 per-node table asserted RED at Inc-1 for >=9 of 28 nodes GREEN on 082ada9 — inside the very table created to discharge ARCH-B-3, because the fold fixed the two nodes the reviewer NAMED rather than the class. Third appearance of fix-the-instances-not-the-class in this batch.",
-    "qa_new3": "The addendum-scope fold was vacuous as written: the addendum is the LAST ## section, so \"heading .. next ^## \" finds no scope, reads 0 notices always, and takes six ATs plus TC-499 with it. An anti-vacuity fold that introduced vacuity.",
-    "qa_new4": "Four Inc-1 nodes quote constants raising ImportError at COLLECTION; xfail does not cover a collection error, so a RED-by-import is a vacuous RED."
-  },
-  "revision3": {
-    "own_finding": "Raised by NO lane: a >=50% RED-margin rule KILLS TC-483, because a boundary node RED is threshold+1 by construction (that is what a K+1 fixture IS). Any margin size either kills the one genuinely-correct RED in the K-1/K/K+1 family or forces abandoning the boundary fixture. The gate now states FOUR threshold families (ratio >=25% / boundary = adjacent pair, no margin / exact-equality = both values per arm / boolean = predicate false + observed value).",
-    "A_defined": "A = the number of ends[i] >= addr comparisons in the downward attribution walk; pmax guard, attribution bisect and reject-prefilter bisect EXCLUDED. Ends-only is the only convention INVARIANT under the design notes sanctioned removal of the reject pre-filter (128000 with and without; +bisect moves 261000 -> 260500).",
-    "verdict_table": "All 28 nodes re-derived by driving the shipped producer, transcript pasted. 8 mismatches vs revision 2. Inc-1 tally 13 RED / 11 GREEN regression guards / 4 xfail(strict) / 1 n/a.",
-    "open_named": "FIX-NONE and FIX-SCOPE mutant arms are SPECIFIED, NOT EXECUTED — flagged in 11.1 note 1, no 7 row, no 13 tick. Carried into Phase 3 as a BLOCKING Inc-1/Inc-2 gate condition rather than re-gated, because they are arms against the NEW behaviour and cannot be fully executed until the producer exists."
-  },
-  "inc1": {
-    "commit": "0a6595b",
-    "files": "tests/test_report_addendum_bound.py (NEW, 28 nodes) + tests/goldens/batch64/addendum-below-bound.md (NEW, 155702 B) + tests/test_tui_report_seam.py (AT-200, +144/-0). Zero production source: git diff vs 082ada9 over s19_app/ is empty.",
-    "verdicts": "13 RED / 12 GREEN regression guards / 4 xfail(strict) / 1 n/a — matched 11.1 node-for-node. --collect-only reports 0 errors, which is the proof no module-level import survived, so no RED is a vacuous RED-by-import. Fixture preconditions asserted BEFORE the failing predicate in six nodes.",
-    "golden": "Captured from the SHIPPED producer, then INDEPENDENTLY re-derived by the reviewer from a clean 082ada9 git archive export: byte-identical, SHA256 327adfb7...c0a73, 155702 B. Provenance established, not merely transcription.",
-    "code_review": "OK to advance, no HIGH. 3 MEDIUM + 2 LOW.",
-    "folded_before_commit": "M1 — _attack_results(4000) silently delivered 3842 while the failure message said 4000 (the flood overran _ATTACK_REGION); a predicate whose LABEL misstates what it tested is this batch own defect class, found inside the batch own tests. Added a contract guard; moved TC-483 far-above arm to 3000. M2 — the seam file called the constant primitive with an inline literal 200, so Inc-2 one-file deletion gate would have passed with a hardcoded value alive; now imports the accessor. L1 — the module docstring reproduced the very tally it refutes. L2 — zip() truncation made TC-494 first-difference position misreport on a strict prefix.",
-    "spec_defects_found": "TWO, both confirmed by the reviewer. (a) 11.1 summary tally is off by one against its own table (13+12+4+1=30 over 28 nodes + 2 extra AT-198 arm rows); the table is right and was FOLLOWED — no node adjusted to make the sum work. (b) TC-494 5-element order vs 11.1 illustrative 4 is NOT a contradiction: the spec probe carried no CheckRunResult, so the test fixture is strictly stronger and reaches LLR-103.4 check-result clause. Both corrections belong in Inc-3 amendment log."
-  },
-  "inc2_ruling": "Review finding M3 ruled by the orchestrator: use an OPTIONAL ops_counter parameter on _addendum_lines, NOT the module-level report_service._LAST_ADDENDUM_REGION_OPS that TC-498 currently pins. report_service has zero module-level mutable globals today, the function is shared by the TUI worker and the CLI, and the equality gate works identically either way — cheap now, expensive once shipped as contract. Inc-2 therefore also edits TC-498 (3 files, within the <=5 limit).",
-  "close_out_plan": "Operator-approved close-out sequence (2026-07-27). The batch is NOT closed until every step is done.\n1. Phase 4 validation (orchestrator OWNS the one complete gate suite run — C-25 — and hands the tail to qa-reviewer).\n2. Phase 5 postmortem.\n3. Phase 6 docs + PR + CI green + FINAL independent PR-level qa gate over the whole diff vs main. A HIGH blocks the merge and returns to the operator.\n4. Merge (self-merge granted and re-affirmed mid-batch).\n5. MANDATORY close step: reconcile .dev-flow/BACKLOG-CODE.md (Lane A). NOT BACKLOG.md — this batch made it a router.\n6. /dev-flow-sync to the Obsidian vault.\n7. Update the SKILLS LIBRARY: ~/.claude/skills is a git repo (remote jav201/claude-skills, tip 09a7f80 at check time, tree clean). Add batch-64's entry to dev-flow-lessons/SKILL.md (421 lines, the control catalog distilled from postmortems) and push.",
-  "skills_library_boundary": "COLLISION RISK — a parallel agent is working the PROCESS lane and writes to the SAME repo. Ownership fixed 2026-07-27:\n- tui-design/VERIFY.md -> OTHER AGENT (its P-3 leg 3). DO NOT TOUCH. The repo's last three commits are all tui-design, so it is the live edit surface.\n- ~/.claude/commands/dev-flow.md -> OTHER AGENT (P-5 + P-3 leg 1). DO NOT TOUCH.\n- docs/engineering-rules.md in s19_app -> OTHER AGENT (P-3 leg 2). DO NOT TOUCH.\n- dev-flow-lessons/SKILL.md -> THIS batch, at close-out only.\nRECORDING a lesson in the catalog is NOT encoding a control. A new control still needs an explicit operator AskUserQuestion (feedback_devflow_control_encode_approval).",
-  "batch64_contribution_to_catalog": "The catalog's meta-rule says the dominant defect class is the vacuous check and it concentrates in SPECS, not code. batch-64 adds a MEASURED nuance: its three instrument defects were not in the spec, they were in the FIXTURES and the MEASUREMENT WINDOWS. (a) AT-194's warm-up allocation landed inside its own first measured window, driving delta(2000) to -71485 and making its precondition unreachable. (b) TC-488's fixture carried 100 candidates per leaf against a cap of 200, so the per-class early exit the gate NAMED could not fire and the arm was dead. (c) FIX-E survives TC-487 by accident because both sub-fixtures are equal-start, so bisect_right lands on a candidate whose end still covers the probe. None was a product bug; all three were instrument bugs, and all three were found by EXECUTING the mutation rather than reading it. That is evidence FOR the P-5 control the other agent is encoding, not a separate control.",
-  "postmortem_headline": "The orchestrator's standing frame — 'every post-Phase-1 defect was an instrument defect, not a product defect' — was REJECTED by the postmortem and replaced with: THE DESIGN WAS RIGHT AND THE DOCUMENT KEPT OUTRUNNING IT. The frame collapsed two classes that behave differently: ~14 OVER-CLAIMS (the document asserting a property the system does not have — R-independence false by a factor of R; 'the affected variants'; a scoping rule in shipped requirement text that was false about the report's own layout and would have made seven ATs permanently vacuous) and ~38 BLIND ORACLES (genuine instrument defects). Over-claiming is the exact sin the last three batches exist to stop, so calling it an instrument bug was too flattering. The causal link the frame hid: A CLAIM IS OVER-STATED EXACTLY WHERE NOTHING CAN FALSIFY IT — every over-claim sat on top of a missing or blind oracle. AND: part of 'no product defect' is a verdict the batch awarded itself. B-1/S1 was resolved by NARROWING THE REQUIREMENT, not fixing the structure; security offered 'keep the claim, fix the structure' as co-equal and never withdrew it. A = R x N is a real, executed, uncapped cost property of the shipped design, filed as a residual because the batch chose scope discipline. Right call, but it is a disposition, not an observation.",
-  "governance_watch_item": "ELEVEN self-corrections across four agents, and ALL ELEVEN WEAKENED a finding. NOT ONE STRENGTHENED ONE. Two readings fit and the record cannot separate them: benign (reviewers over-reach by design, so calibration is one-directional, and every weakening here was execution-backed) versus concerning (this batch ran AUTONOMY + SELF-MERGE, and a reviewer who weakens their own finding removes an obstacle to a merge they also authorise). Filed as a WATCH-ITEM, not a conclusion. Cheap test for batch-65: did any reviewer ever ESCALATE their own prior finding after execution? Here, none did.",
-  "cost_verdict": "The gates earned their keep; the artifact did not. Merging revision 1 ships a false R-independence claim with a gate structurally unable to notice it, plus seven silently-vacuous ATs — that justifies both gates. BUT three of the re-gate's most expensive findings were CREATED BY THE PREVIOUS FOLD: the batch spent a meaningful fraction of two gates reviewing damage it had just done to itself. THE LEVER IS A SMALLER DOCUMENT, NOT FEWER REVIEWS. ~14 agents was right for the risk and disproportionate to an artifact that was ours to size. 46 spec amendments, of which 40 repair the document's own prior claims; 6.1 spec lines per production line; ~1 spec defect per 75 spec lines; 75% of defect-finding effort spent on a document.",
-  "control_candidates_raised": "NONE ENCODED — each needs its own operator AskUserQuestion. P-8 (NEW, the one the postmortem would raise first): a fixture must be sized against the POST-fix system, not the pre-fix one. AT-194's warm-up was noise against the old producer and decisive against the new one; TC-488's leaf size sat below the cap so the exit it exists to detect CANNOT FIRE. P-5 does not reach it — both COULD go RED at Inc-1, which is when P-5 asks. This is TEMPORAL vacuity: falsifiable at authoring time, not at gate time, because the system moved underneath it. Nothing re-asks. P-10 (NEW, process lane): a fold applies to the CLASS, not the instances the reviewer listed. 3-4 occurrences in one batch. P-7 covers not DROPPING; this is not UNDER-APPLYING. P-9 explicitly ruled NOT a peer — it belongs as a clause inside P-5. P-3 gains two more occurrences (the 19200/19 200 grep brittleness, the md_safe-escaped region-name trap). P-5 gains three occurrences as EVIDENCE, not as a new control.",
-  "namespace_collision": "BOTH sessions used batch_id 2026-07-27-batch-64 and wrote DIFFERENT content into identically-named files in the SAME .dev-flow/2026-07-27-batch-64/ folder. The process lane's batch merged first (#144 C-40 + C-35 rider + C-42, #145 closeout, #146 Obsidian sync) and KEEPS the number 64. This code-lane batch is renumbered to 2026-07-28-batch-65 by operator decision. The parallel session had already renumbered a SNAPSHOT of this branch at Inc-2 and pushed origin/claude/batch-65-addendum-producer-bound; that snapshot was missing Inc-3, Phase 4, Phase 5 and Phase 6. This branch (claude/batch-65-code-lane) completes it: built off their renumbered base 374ad90, with the four owned files taken whole, BACKLOG-CODE.md 3-way merged (clean), and the seven missing artifacts relocated. The full pre-migration history is preserved at origin/claude/batch-64-addendum-producer-bound @ 98b5b7a. ROOT CAUSE, which the lane split did NOT solve: the lanes separated the QUEUES but left a single shared state.json and a single shared batch-number namespace. Carried to BACKLOG-PROCESS.md.",
-  "deliberate_old_number_retention": "US-B64-1 / US-B64-2 and tests/goldens/batch64/ KEEP the old number ON PURPOSE: the story ids are baked into passing tests and the golden directory name is baked into the byte-identity oracle. Renaming either would churn a green suite and a double-proven golden to fix a label. Recorded so a later reader does not 'correct' them.",
-  "pre_migration_backup": "claude/batch-64-addendum-producer-bound @ 98b5b7a is the PRE-MIGRATION BACKUP and the only ref containing 9d21d9a and ba5f09a. claude/batch-65-addendum-producer-bound @ 374ad90 is NOT a backup — it is a live ancestor of this branch, pushed by the parallel session when it renumbered a snapshot taken at Inc-2.",
-  "merged": {
-    "pr": 149,
-    "squash_sha": "b691f21",
-    "date": "2026-07-28",
-    "base_before": "73e3fb9"
-  },
-  "visual_evidence": "Regenerated (15/15 pilot cases pass) and DELIBERATELY NOT COPIED. 85 of 90 assets are byte-identical to the vault; the 5 that differ do so ONLY by a random CSS id (terminal-<n>-) and a clock field (00:00:00 vs --:--:--). No UI surface changed — the batch touched report SERVICES, not rendering. FINDING: the gallery carries TWO nondeterminism sources, so \"is it stale?\" cannot be answered by byte comparison, which is the mechanism that let it freeze for two months before the 2026-07-02 audit."
+  "open_carries_lane_A": {
+    "R-3": "P3 — the two batch-65 merge-gate documents had their MECHANICAL layer verified clean at batch-70 (21/21 file paths exist, 16/16 AT/TC nodes present, golden matches on both size and SHA256, the 2233->2319 suite delta fully attributed). The PROSE layer (741 lines, reasoning defects) remains unread. Non-blocking.",
+    "note": "R-1 and R-2 were discharged at batch-70 (ba19c3d, 1bd4ebf). All five batch-65 merge-gate corrective items are closed."
+  }
 }
