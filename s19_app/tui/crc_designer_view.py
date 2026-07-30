@@ -115,6 +115,22 @@ _COVERAGE_EMPTY_STATE = "Load an image to preview coverage CRCs over real bytes.
 #: 150-col line (C-29 non-transfer).
 _COVERAGE_WINDOW_GLYPHS = 48
 
+#: The live surfaces :meth:`CrcDesignerPanel._recompute` refreshes on every
+#: change event (batch-72 LLR-072-8.1). Declared here so the markup-safety
+#: census (AT-219) reads the SAME id set the recompute path resolves — a sink
+#: added to ``compose`` and to this tuple is covered without editing the test.
+#: ``_recompute`` consumes it BY NAME: the six ids carry six distinct roles with
+#: three different error-path strings, so a positional unpack would raise on the
+#: UI thread the moment a seventh surface is declared.
+_RECOMPUTE_SURFACE_IDS: tuple[str, ...] = (
+    "crc_kat_verdict",
+    "crc_custom_vector_result",
+    "crc_json_preview",
+    "crc_warnings",
+    "crc_coverage_preview",
+    "crc_coverage_window",
+)
+
 #: Custom-vector interpretation modes (LLR-V3.1). ``ascii`` encodes the raw text
 #: as UTF-8 bytes (so ``123456789`` reproduces the KAT); ``hex`` reads
 #: whitespace-tolerant hex pairs. An explicit mode is required because
@@ -253,9 +269,11 @@ class CrcDesignerPanel(ScrollableContainer):
             ``markup=False`` sinks, same handler wiring) into the realigned
             bench: a full-width help line, then a **hero row** (``#crc_hero_row``)
             holding the live coverage window (``#crc_coverage_window``, 2fr)
-            beside ``#crc_top_right`` (the glyph verdict hero above the Warnings
-            tile), then a **3-column bench** (``#crc_bench``) regrouped by data
-            flow (R5): c1 = Algorithm (preset first, R1), c2 = Coverage + Store
+            beside ``#crc_top_right`` (the Warnings tile — batch-72 HLR-072-2
+            demoted the verdict out of the hero row into the Algorithm group as
+            a ``Self-test`` row under ``Check``), then a **3-column bench**
+            (``#crc_bench``) regrouped by data flow (R5):
+            c1 = Algorithm (preset first, R1), c2 = Coverage + Store
             placement, c3 = Custom vector + Template + Load/Save, and finally the
             Template-JSON preview as a **full-width strip** below the bench (R6).
             No widget id, handler, or behavior changes — only the nesting and
@@ -298,8 +316,19 @@ class CrcDesignerPanel(ScrollableContainer):
                 "Polynomial", "crc_field_poly", _format_hex(algo.poly, byte_width)
             ),
             self._text_row("Init", "crc_field_init", _format_hex(algo.init, byte_width)),
-            self._switch_row("Reflect in", "crc_field_refin", algo.refin),
-            self._switch_row("Reflect out", "crc_field_refout", algo.refout),
+            # LLR-072-1.1: ONE labelled Reflection pair — each toggle carries its
+            # own `in` / `out` sub-label, and the `out` label separates the two
+            # switches so no toggle reads as the other one's row (HLR-072-1/3).
+            Horizontal(
+                Label("Reflection", classes="crc-field-label"),
+                Label("in", classes="crc-field-sublabel"),
+                Switch(value=algo.refin, id="crc_field_refin", classes="crc-field-switch"),
+                Label("out", classes="crc-field-sublabel"),
+                Switch(
+                    value=algo.refout, id="crc_field_refout", classes="crc-field-switch"
+                ),
+                classes="crc-field-row",
+            ),
             self._text_row(
                 "XOR out", "crc_field_xorout", _format_hex(algo.xorout, byte_width)
             ),
@@ -307,6 +336,15 @@ class CrcDesignerPanel(ScrollableContainer):
                 "Check",
                 "crc_field_check",
                 "" if algo.check is None else _format_hex(algo.check, byte_width),
+            ),
+            # LLR-072-2.1: the known-answer verdict is an annotation of the Check
+            # field it validates, not a hero tile — and it names the reference
+            # vector it self-tested against (HLR-072-2).
+            Horizontal(
+                Label("Self-test", classes="crc-field-label"),
+                Label("123456789", classes="crc-field-sublabel"),
+                Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict"),
+                classes="crc-field-row",
             ),
             id="crc_algorithm_fields",
             classes="crc-field-group",
@@ -392,12 +430,6 @@ class CrcDesignerPanel(ScrollableContainer):
             id="crc_loadsave_group",
             classes="crc-field-group",
         )
-        verdict_group = Vertical(
-            Label("Known answer · 123456789", classes="crc-group-title"),
-            Static("", id="crc_kat_verdict", markup=False, classes="crc-verdict"),
-            id="crc_live_verify",
-            classes="crc-field-group crc-hero",
-        )
         warnings_group = Vertical(
             Label("Warnings", classes="crc-group-title"),
             Static("", id="crc_warnings", markup=False, classes="crc-warnings"),
@@ -405,11 +437,12 @@ class CrcDesignerPanel(ScrollableContainer):
             classes="crc-field-group",
         )
 
-        # Hero row: the wide live coverage window (2fr) beside the glyph verdict
-        # hero + Warnings right column (1fr).
+        # Hero row: the wide live coverage window (2fr) beside the Warnings-only
+        # right column (1fr) — the verdict moved into the Algorithm group
+        # (LLR-072-2.2).
         yield Horizontal(
             Static("", id="crc_coverage_window", markup=False),
-            Vertical(verdict_group, warnings_group, id="crc_top_right"),
+            Vertical(warnings_group, id="crc_top_right"),
             id="crc_hero_row",
         )
         # 3-column parameter bench below the hero row, regrouped by data flow (R5).
@@ -447,24 +480,6 @@ class CrcDesignerPanel(ScrollableContainer):
                 placeholder=placeholder,
                 classes="crc-field-input",
             ),
-            classes="crc-field-row",
-        )
-
-    @staticmethod
-    def _switch_row(label: str, field_id: str, value: bool) -> Horizontal:
-        """Build a labelled boolean ``Switch`` row.
-
-        Args:
-            label (str): The human-readable field label.
-            field_id (str): The ``#crc_field_*`` id the pilot/handlers query.
-            value (bool): The initial (seed) switch state.
-
-        Returns:
-            Horizontal: The label + ``Switch`` row.
-        """
-        return Horizontal(
-            Label(label, classes="crc-field-label"),
-            Switch(value=value, id=field_id, classes="crc-field-switch"),
             classes="crc-field-row",
         )
 
@@ -1098,6 +1113,8 @@ class CrcDesignerPanel(ScrollableContainer):
             None
 
         Data Flow:
+            - :data:`_RECOMPUTE_SURFACE_IDS` → one ``query_one`` per id into a
+              name-keyed mapping (a missing id aborts the whole refresh).
             - :meth:`_current_template` → :meth:`_verdict_text` /
               :meth:`_custom_vector_text` / :meth:`_preview_text` /
               :meth:`_live_warnings_text` / :meth:`_coverage_preview_text` →
@@ -1105,6 +1122,7 @@ class CrcDesignerPanel(ScrollableContainer):
 
         Dependencies:
             Uses:
+                - :data:`_RECOMPUTE_SURFACE_IDS`
                 - :meth:`_current_template`, :meth:`_verdict_text`,
                   :meth:`_custom_vector_text`, :meth:`_preview_text`,
                   :meth:`_live_warnings_text`, :meth:`_coverage_preview_text`
@@ -1113,15 +1131,19 @@ class CrcDesignerPanel(ScrollableContainer):
                   :meth:`on_switch_changed`, :meth:`on_select_changed`
         """
         try:
-            verdict = self.query_one("#crc_kat_verdict", Static)
-            custom_result = self.query_one("#crc_custom_vector_result", Static)
-            preview = self.query_one("#crc_json_preview", Static)
-            warnings = self.query_one("#crc_warnings", Static)
-            coverage = self.query_one("#crc_coverage_preview", Static)
-            window = self.query_one("#crc_coverage_window", Static)
+            surfaces = {
+                surface_id: self.query_one(f"#{surface_id}", Static)
+                for surface_id in _RECOMPUTE_SURFACE_IDS
+            }
         except NoMatches:
             # Mid-mount: a change event arrived before every surface exists.
             return
+        verdict = surfaces["crc_kat_verdict"]
+        custom_result = surfaces["crc_custom_vector_result"]
+        preview = surfaces["crc_json_preview"]
+        warnings = surfaces["crc_warnings"]
+        coverage = surfaces["crc_coverage_preview"]
+        window = surfaces["crc_coverage_window"]
         try:
             template = self._current_template()
         except (ValueError, NoMatches) as exc:

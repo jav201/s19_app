@@ -26,7 +26,7 @@ import copy
 import re
 from pathlib import Path
 
-from textual.widgets import Button, Input, Select, Static, Switch
+from textual.widgets import Button, Input, Label, Select, Static, Switch
 
 from s19_app.tui import crc_designer_view
 from s19_app.tui.app import S19TuiApp
@@ -1000,51 +1000,14 @@ def test_bench_reflows_to_vertical_stack_when_narrow(tmp_path: Path) -> None:
     )
 
 
-def test_verdict_hero_center_aligned_in_hero_row(tmp_path: Path) -> None:
-    """The verdict is a center-aligned hero in #crc_top_right (AT-B59-05).
-
-    Verdict hero (LLR-L2.3 / L3.1): ``#crc_live_verify`` resolves under
-    ``#crc_top_right`` (the hero row) and NOT under any ``#crc_bench_c*`` column;
-    ``#crc_kat_verdict`` is its descendant; its applied
-    ``styles.content_align == ("center", "middle")`` — the finest discriminator
-    the plain ``.crc-field-group``s never set (every group already has a border,
-    so "border" is a collapsed proxy, M1) — and it carries the ``crc-hero`` class.
-    """
-
-    async def _drive() -> tuple[bool, bool, bool, tuple, bool]:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test() as pilot:
-            await pilot.pause()
-            await pilot.press("0")
-            await pilot.pause()
-            verify = app.query_one("#crc_live_verify")
-            under_top_right = _has_ancestor(verify, "crc_top_right")
-            under_bench = any(
-                _has_ancestor(verify, col) for col in _BENCH_COLUMN_IDS
-            )
-            kat_descendant = _has_ancestor(
-                app.query_one("#crc_kat_verdict"), "crc_live_verify"
-            )
-            content_align = tuple(verify.styles.content_align)
-            crc_hero = "crc-hero" in verify.classes
-            return (
-                under_top_right,
-                under_bench,
-                kat_descendant,
-                content_align,
-                crc_hero,
-            )
-
-    under_top_right, under_bench, kat_descendant, content_align, crc_hero = (
-        asyncio.run(_drive())
-    )
-    assert under_top_right, "#crc_live_verify must live in the hero row #crc_top_right"
-    assert not under_bench, "#crc_live_verify must NOT be inside a bench column"
-    assert kat_descendant, "#crc_kat_verdict must remain inside #crc_live_verify"
-    assert content_align == ("center", "middle"), (
-        f"the verdict hero must be center-aligned, got {content_align!r}"
-    )
-    assert crc_hero, "the verdict hero must carry the crc-hero class"
+# AT-B59-05 (``test_verdict_hero_center_aligned_in_hero_row``) was DELETED by
+# batch-72 LLR-072-2.4. Its five assertions are each falsified by design: the
+# operator's 2026-07-28 report is that the verdict tile does not earn hero
+# placement, so HLR-072-2 demotes it to a ``Self-test`` row annotating the Check
+# field it validates. This is a recorded requirement RETIREMENT (01-requirements
+# §6.5 A-1, ledger D = 1) — deleted, never edited into passing. The surviving
+# obligation (the verdict stays present, correctly parented and reachable) is
+# re-derived as AT-215 below.
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1460,3 +1423,341 @@ def test_right_column_widgets_reachable_and_json_full_width(tmp_path: Path) -> N
         f"R6: the JSON strip must be wider than one bench column (full-width); "
         f"got json={json_width} vs column={column_width}"
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# batch-72 Inc-3 — CRC Designer Variant B: the paired Reflection row + the KAT
+# demoted to a Self-test row under Check + the recompute-surface id census
+# (HLR-072-1/2/8, LLR-072-1.1/1.2/2.1/2.2/2.3/2.4/8.1; AT-213/215/219,
+# TC-510..513)
+# ─────────────────────────────────────────────────────────────────────────────
+#: The orphaned batch-58 helper LLR-072-1.2 deletes. Assembled from fragments on
+#: purpose: the requirement's pass threshold is a REPO-WIDE grep returning zero
+#: hits, which a literal in this file would itself falsify.
+_ORPHANED_SWITCH_HELPER = "_switch" + "_row"
+
+
+def _repo_root() -> Path:
+    """The worktree root, derived from the module under test (never cwd)."""
+    return Path(crc_designer_view.__file__).resolve().parents[2]
+
+
+def _custom_vector_result(app: S19TuiApp) -> str:
+    """Read the mounted ``#crc_custom_vector_result`` widget's rendered content."""
+    return str(app.query_one("#crc_custom_vector_result", Static).content)
+
+
+def test_reflection_pair_row_shares_one_band_and_drives_the_kernel(
+    tmp_path: Path,
+) -> None:
+    """refin/refout share one row band, are label-separated, and drive the CRC (AT-213).
+
+    HLR-072-1 / LLR-072-1.1. Three clauses, driven through the SHIPPED surface
+    (rail key ``0``, never a ``.focus()`` proxy — C-16):
+
+    1. **one band** — ``#crc_field_refin.region.y == #crc_field_refout.region.y``.
+       On the shipped tree they are stacked (measured ``y=32`` / ``y=33``), so
+       this clause is FALSE before the pair row.
+    2. **separable** — a ``Label`` renders strictly BETWEEN the two switches'
+       x-bands. Co-location alone is not the requirement: the operator's defect
+       was that one toggle reads as the other, so the interleaved label is the
+       fix and the assertion.
+    3. **C-10 non-default drive with measured values** (00-measurements M-7):
+       ``#crc_field_refin`` is seeded ``True`` by ``SEED_ALGORITHM``
+       (CRC-32/ISO-HDLC); driving it to ``False`` through the real ``Switch``
+       reactive path must transition ``#crc_custom_vector_result`` from
+       ``0xCBF43926`` (the externally published CRC-32 check value over the
+       seeded vector ``123456789``) to ``0x1898913F`` — the EXACT transition, so
+       a rewired-to-the-wrong-switch pair row cannot pass on a bare ``!=``.
+    """
+
+    async def _drive() -> tuple[int, int, int, bool, str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            refin = app.query_one("#crc_field_refin", Switch)
+            refout = app.query_one("#crc_field_refout", Switch)
+            row = refin.parent
+            between = [
+                label
+                for label in row.query(Label)
+                if refin.region.right <= label.region.x
+                and label.region.right <= refout.region.x
+            ]
+            seeded_on = refin.value
+            before = _custom_vector_result(app)
+            # The real Switch path: the reactive setter posts Switch.Changed,
+            # exactly as a click would (the file's Input.value idiom).
+            refin.value = False
+            await pilot.pause()
+            after = _custom_vector_result(app)
+            return (
+                refin.region.y,
+                refout.region.y,
+                len(between),
+                seeded_on,
+                before,
+                after,
+            )
+
+    refin_y, refout_y, between, seeded_on, before, after = asyncio.run(_drive())
+    assert refin_y == refout_y, (
+        f"the reflection toggles must share one row band; "
+        f"refin.y={refin_y} refout.y={refout_y}"
+    )
+    assert between == 1, (
+        "exactly one Label must render strictly between the two switches' "
+        f"x-bands (the separability cue); got {between}"
+    )
+    assert seeded_on, (
+        "SEED_ALGORITHM must seed refin=True, else the drive is not a "
+        "non-default transition (C-10)"
+    )
+    assert before == "0xCBF43926", (
+        f"the seeded vector CRC must be the published CRC-32 check value, got {before!r}"
+    )
+    assert after == "0x1898913F", (
+        f"driving refin True->False must move the CRC to 0x1898913F, got {after!r}"
+    )
+
+
+def test_kat_verdict_demoted_to_self_test_row_under_check(tmp_path: Path) -> None:
+    """The KAT verdict is a Self-test row inside the Algorithm group (AT-215).
+
+    HLR-072-2 / LLR-072-2.1. The verdict is re-parented, NOT deleted — batch-59's
+    hero tile is retired (§6.5 A-1) and the verdict becomes an annotation of the
+    ``Check`` field it validates:
+
+    1. ``#crc_kat_verdict`` has ancestor ``#crc_algorithm_fields``;
+    2. the reference vector ``123456789`` is named on screen inside that row —
+       without it the row reads ``Self-test ✓ MATCH`` and never says WHAT was
+       self-tested (the retired hero tile carried the only on-screen naming);
+    3. the verdict is still LIVE at its new parent: setting ``#crc_field_check``
+       to the measured ``0x00000000`` through the real ``Input.Changed`` path
+       transitions MATCH → MISMATCH. **Two near-misses are excluded explicitly**
+       (00-measurements M-7): clearing the field yields ``○ NO-EXPECTED`` and a
+       non-hex keystroke yields ``Invalid parameters: …`` — both would satisfy a
+       lazy "the text changed" assertion, neither satisfies this one;
+    4. ``#crc_live_verify`` is gone (the discriminating negative — clause 1 alone
+       is true of a tree that kept the wrapper and cloned the verdict).
+    """
+
+    async def _drive() -> tuple[bool, str, str, str, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            verdict = app.query_one("#crc_kat_verdict", Static)
+            in_algorithm = _has_ancestor(verdict, "crc_algorithm_fields")
+            row_text = " ".join(
+                str(child.render()) for child in verdict.parent.children
+            )
+            before = _verdict(app)
+            app.query_one("#crc_field_check", Input).value = "0x00000000"
+            await pilot.pause()
+            after = _verdict(app)
+            return (
+                in_algorithm,
+                row_text,
+                before,
+                after,
+                len(app.query("#crc_live_verify")),
+            )
+
+    in_algorithm, row_text, before, after, wrappers = asyncio.run(_drive())
+    assert in_algorithm, (
+        "#crc_kat_verdict must be re-parented under #crc_algorithm_fields"
+    )
+    assert "123456789" in row_text, (
+        f"the Self-test row must name the reference vector on screen, got {row_text!r}"
+    )
+    assert "MATCH" in before and "MISMATCH" not in before, (
+        f"the seed verdict must be MATCH at the new parent, got {before!r}"
+    )
+    assert "MISMATCH" in after, (
+        f"a real Input.Changed on #crc_field_check must reach the demoted "
+        f"verdict, got {after!r}"
+    )
+    assert "NO-EXPECTED" not in after and "Invalid parameters" not in after, (
+        f"the excluded near-misses must NOT satisfy this clause, got {after!r}"
+    )
+    assert wrappers == 0, (
+        f"the #crc_live_verify hero wrapper must no longer be composed, got {wrappers}"
+    )
+
+
+def test_recompute_surface_ids_are_the_live_markup_census(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """The recompute id tuple is the markup census AND is actually consumed (AT-219).
+
+    HLR-072-8 / LLR-072-8.1. Two clauses, deliberately different in kind:
+
+    **Clause 1 — the PIN, labelled as such.** Iterate the LIVE module-level
+    ``_RECOMPUTE_SURFACE_IDS`` (never a hand-list, C-31) and assert every
+    resolved widget reports ``_render_markup is False``. All six sinks are
+    already ``markup=False`` today, so this clause is INVARIANT under this batch:
+    it is a regression pin protecting the ``compose`` rewrite that echoes
+    user-typed text into these sinks (``Invalid parameters: {exc}``), not a gate
+    on new behaviour. A seventh surface declared later is covered automatically.
+
+    **Clause 2 — the GATE.** ``len(tuple) >= 6`` admits a tuple that is hoisted,
+    asserted, then IGNORED by a ``_recompute`` still carrying hardcoded queries.
+    So: monkeypatch the module tuple to carry one bogus id, drive one real
+    ``Input.Changed``, and assert ``_recompute`` takes its ``NoMatches`` early
+    return — the live surfaces do not move. This is the only clause that is
+    FALSE before the hoist.
+    """
+    surface_ids = crc_designer_view._RECOMPUTE_SURFACE_IDS
+    assert len(surface_ids) >= 6, (
+        f"the recompute surface census must cover >= 6 sinks, got {len(surface_ids)}"
+    )
+
+    async def _census() -> dict[str, object]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            return {
+                surface_id: app.query_one(f"#{surface_id}", Static)._render_markup
+                for surface_id in surface_ids
+            }
+
+    async def _gate() -> tuple[str, str]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            before = _verdict(app)
+            monkeypatch.setattr(
+                crc_designer_view,
+                "_RECOMPUTE_SURFACE_IDS",
+                surface_ids + ("crc_no_such_surface",),
+            )
+            app.query_one("#crc_field_xorout", Input).value = "0x00000000"
+            await pilot.pause()
+            return before, _verdict(app)
+
+    flags = asyncio.run(_census())
+    for surface_id, flag in flags.items():
+        assert flag is False, (
+            f"#{surface_id} is a recompute sink and must render markup=False "
+            f"(C-17), got {flag!r}"
+        )
+
+    before, after = asyncio.run(_gate())
+    assert "MATCH" in before and "MISMATCH" not in before, (
+        f"the gate needs a live MATCH baseline, got {before!r}"
+    )
+    assert after == before, (
+        "with a bogus id in the module tuple _recompute must take its NoMatches "
+        f"early return; the verdict moved {before!r} -> {after!r}, so the tuple "
+        "is declared but not consumed"
+    )
+
+
+def test_reflection_row_structure(tmp_path: Path) -> None:
+    """The pair row is ONE .crc-field-row holding both switches (TC-510).
+
+    White-box structure behind AT-213: both switches share a single
+    ``.crc-field-row`` parent inside ``#crc_algorithm_fields``, and that row
+    carries the row label plus a sub-label per toggle (``Reflection`` / ``in`` /
+    ``out``) — the label inventory the geometry clause of AT-213 measures.
+    """
+
+    async def _drive() -> tuple[bool, bool, bool, list[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            refin = app.query_one("#crc_field_refin", Switch)
+            refout = app.query_one("#crc_field_refout", Switch)
+            row = refin.parent
+            return (
+                refin.parent is refout.parent,
+                "crc-field-row" in row.classes,
+                _has_ancestor(refin, "crc_algorithm_fields"),
+                [str(label.render()) for label in row.query(Label)],
+            )
+
+    shared_row, is_field_row, in_algorithm, labels = asyncio.run(_drive())
+    assert shared_row, "both reflection switches must share ONE row container"
+    assert is_field_row, "the reflection pair row must be a .crc-field-row"
+    assert in_algorithm, "the reflection row must live inside #crc_algorithm_fields"
+    assert labels == ["Reflection", "in", "out"], (
+        f"the pair row must carry the row label plus one sub-label per toggle, "
+        f"got {labels!r}"
+    )
+
+
+def test_orphaned_per_toggle_helper_is_deleted() -> None:
+    """The single-toggle row helper is gone from the package and tests (TC-511).
+
+    LLR-072-1.2: the pair row is the only reflection construction site, so the
+    per-toggle helper is orphaned — deleted, not left dead. Asserted twice: the
+    attribute is absent from the class, and no ``.py`` file under ``s19_app/`` or
+    ``tests/`` still names it (the requirement's repo-wide grep threshold).
+    """
+    assert not hasattr(crc_designer_view.CrcDesignerPanel, _ORPHANED_SWITCH_HELPER), (
+        f"CrcDesignerPanel.{_ORPHANED_SWITCH_HELPER} is orphaned and must be deleted"
+    )
+    root = _repo_root()
+    scanned = 0
+    hits: list[str] = []
+    for tree in ("s19_app", "tests"):
+        for path in (root / tree).rglob("*.py"):
+            scanned += 1
+            if _ORPHANED_SWITCH_HELPER in path.read_text(encoding="utf-8"):
+                hits.append(str(path.relative_to(root)))
+    assert scanned > 0, f"the source scan resolved no files under {root} (bad root)"
+    assert hits == [], f"{_ORPHANED_SWITCH_HELPER} must have 0 hits, found in {hits!r}"
+
+
+def test_hero_right_column_holds_warnings_only(tmp_path: Path) -> None:
+    """#crc_top_right carries exactly one child group: Warnings (TC-512).
+
+    LLR-072-2.2: retiring the verdict tile must LEAVE the right column, not
+    empty it — the counterfactual for "the tile was removed" is a column with
+    zero children, which would silently drop the Warnings surface that
+    ``_recompute`` writes to.
+    """
+
+    async def _drive() -> tuple[list[str], bool]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            top_right = app.query_one("#crc_top_right")
+            child_ids = [str(child.id) for child in top_right.children]
+            return child_ids, _has_ancestor(
+                app.query_one("#crc_warnings"), "crc_top_right"
+            )
+
+    child_ids, warnings_inside = asyncio.run(_drive())
+    assert child_ids == ["crc_warnings_group"], (
+        f"#crc_top_right must hold the Warnings group alone, got {child_ids!r}"
+    )
+    assert warnings_inside, "#crc_warnings must still resolve under #crc_top_right"
+
+
+def test_retired_hero_selectors_absent_from_stylesheet() -> None:
+    """The .crc-hero and #crc_live_verify selectors are retired (TC-513).
+
+    LLR-072-2.3: the hero rule is dead CSS once the tile is gone. The stylesheet
+    is located from the package (never cwd) and a live CRC selector is asserted
+    present first, so a mis-resolved path cannot pass this vacuously.
+    """
+    stylesheet = _repo_root() / "s19_app" / "tui" / "styles.tcss"
+    text = stylesheet.read_text(encoding="utf-8")
+    assert "#crc_hero_row" in text, (
+        f"{stylesheet} does not look like the CRC stylesheet (non-vacuity guard)"
+    )
+    assert "crc-hero" not in text, "the .crc-hero rule must be retired"
+    assert "crc_live_verify" not in text, "no #crc_live_verify rule may remain"

@@ -1995,6 +1995,16 @@ ModalScreen {
     height: 1;
 }
 
+/* batch-72 LLR-072-1.1: the per-control sub-label inside a paired row (the
+ * `in` / `out` reflection toggles, the Self-test reference vector). Content-
+ * width so it never claims the 13-col label gutter, and it renders BETWEEN the
+ * two switches — that separation is the point (HLR-072-1 / HLR-072-3). */
+.crc-field-sublabel {
+    width: auto;
+    padding-right: 1;
+    color: #969aad;
+}
+
 /* Selects keep their overlay chrome (bordered, 3-tall) but stop eating the row. */
 #crc_designer_panel Select {
     width: 1fr;
@@ -2039,13 +2049,6 @@ ModalScreen {
     width: 1fr;
     height: auto;
     padding-left: 1;
-}
-
-/* The verdict hero — the distinguishing property is `content-align`, NOT the
- * border (every `.crc-field-group` already has one). LLR-L3.1 / AT-B59-05. */
-.crc-hero {
-    content-align: center middle;
-    min-height: 3;
 }
 
 /* The 3-column parameter bench below the hero row. */
