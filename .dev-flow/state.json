@@ -25,14 +25,25 @@
     "allocated": "AT-205+, TC-500+, R-TUI-099, HLR-104. Allocated from the MAXIMUM across all subsets + 1, not from any single subset."
   },
   "current_phase": 6,
-  "phase_status": "implemented-awaiting-operator-merge",
+  "phase_status": "done-merged",
+  "merged": "PR #159 SQUASH b457ef8, merged 2026-07-29T10:58:21Z. CI green at merge: tui-ci pass (29m18s) + snapshot pass (2m0s), mergeStateStatus CLEAN. This close-out commit exists because origin/main was left asserting phase_status implemented-awaiting-operator-merge and obsidian_synced false for a FINISHED batch - the exact stale-state defect batch-70 itself had to recover for batch-65 as PR #158, and the one that misled batch-70's own Phase-0 intake. Do not leave it for the next batch to find.",
   "note_session_2": "SECOND SESSION (2026-07-28, worktree fb-p2-batch-70-impl-92b3cd). It opened on a NEW branch cut off origin/main that did NOT contain the nine Phase-0 commits; claude/fb-p2-batch-70-bfc118 was FAST-FORWARDED into it, so the PR carries Phase 0 + the implementation. The Phase-0 branch and its worktree are frozen — do not push to them. AUTONOMY WAS RE-ASKED at this kickoff per feedback_standing_auth_per_batch and the operator CHANGED it: AUTONOMOUS UNTIL THE PR (not supervised per-increment, which is what the previous session recorded below). The operator still merges; nothing was self-merged.",
-  "iterations_per_phase": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 },
+  "iterations_per_phase": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
+  },
   "artifacts": {
     "plan": ".dev-flow/2026-07-28-batch-70/PLAN.md",
     "requirements": ".dev-flow/2026-07-28-batch-70/01-requirements.md",
     "validation": ".dev-flow/2026-07-28-batch-70/04-validation.md",
     "postmortem": ".dev-flow/2026-07-28-batch-70/05-postmortem.md",
+    "docs": ".dev-flow/2026-07-28-batch-70/06-docs/ (traceability-matrix, executive-summary, functionality, diagrams/architecture) - PRODUCED AT THE SYNC, not at merge: they did not exist when PR #159 was merged and the sync's own reject-check is what caught the missing Phase-6 deliverable.",
+    "review": "ABSENT BY ROUTE, not lost. The autonomous route ran no separate Phase-2 review; review evidence lives in the increment commit bodies and 05-postmortem.md section 5. Declared in the vault index and in 06-docs/traceability-matrix.md section 4 so a later reader does not hunt for a missing file.",
     "requirement_entry": "REQUIREMENTS.md - R-TUI-099",
     "code": [
       "s19_app/tui/services/flow_model.py",
@@ -46,7 +57,11 @@
       "tests/test_flow_report_fusion.py (NEW, 13)",
       "tests/test_flow_multi_image_ui.py (NEW, 11)"
     ],
-    "commits": ["ebca4cc Inc-1", "4573d43 Inc-2+3", "2b6c3a5 Inc-4"]
+    "commits": [
+      "ebca4cc Inc-1",
+      "4573d43 Inc-2+3",
+      "2b6c3a5 Inc-4"
+    ]
   },
   "phase1_result": {
     "premise_evaluation": "10 premises executed against disk. 9 TRUE, 1 FALSE. P-2 FALSE: VariantDescriptor.path is ABSOLUTE and _resolve_manifest_entry REJECTS absolute refs by design (variant_execution_service.py:263-272, executed both arms), so the design's unstated override FORM would have failed every variant and the tempting fix is to bypass the containment seam. Disposition ENLARGED D-2 rather than replacing it: LLR-104.1 binds a project-RELATIVE POSIX ref through the reused seam - and that is also what makes AC-7 reachable, because a path that will not relativise IS the containment rejection.",
@@ -108,9 +123,21 @@
       "date": "2026-07-28",
       "decision": "Phase 0 gate — APPROVE",
       "notes": "No exit-criteria axis unmet. 2 findings raised and both folded before Phase 1."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-29",
+      "decision": "synced-to-obsidian",
+      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches6-07-28-batch-70\\ . NOT A CLEAN SYNC and it is not reported as one: (a) 06-docs/ did not exist at merge and was PRODUCED at this sync - the reject-check caught the missing Phase-6 deliverable; (b) 02-review.md does not exist and was NOT fabricated - the autonomous route ran no separate Phase-2 review, recorded in the index and the traceability matrix; (c) 80 vault files in the legacy NESTED svgs/<case>/ layout that batch-47 recorded as PRUNED are BACK, dated 2026-07-27 - RULED 2026-07-29 by the operator: KEEP as historical context, and CLASSIFIED in visual-evidence.md section 6 so no future sync re-flags them. Root cause recorded with them: a sync between batch-47 and batch-63 copied recursively instead of using the section-5 flattening helper, which is why batch-47's deletion did not hold; (d) batch-66 has a .dev-flow/ folder in the repo and no vault counterpart."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-29",
+      "decision": "vault nested-layout duplicates KEPT and classified, not deleted",
+      "notes": "Operator ruling. 16 dirs / 80 files (75 live-case + 5 already-listed retired pv__case_06) declared in visual-evidence.md section 6 as SUPERSEDED-retained-as-context, with an explicit sync contract: exclude them from the freshness reject-check, compute freshness over the FLATTENED files only. Also recorded there: do not re-prune without first fixing the recursive-copy step, because the previous prune was undone by exactly that."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-28T00:00:00Z",
   "stories": {
     "US-FBP2-1": "As an operator with a project holding several image variants, I run a saved Flow once and it executes against every variant, so I stop re-running the same flow by hand per image. READY.",
