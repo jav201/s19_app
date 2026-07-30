@@ -117,7 +117,15 @@ layout. So rule (b) can never reach 0 without a redesign nobody has asked for.
 widgets, both on the CRC Designer screen, both produced by the **single** construction site
 `s19_app/tui/crc_designer_view.py:467`. The Switch-only subject set is therefore
 **complete by construction** — there is no other `Switch` anywhere that a future change could
-add without touching that one call. This is what makes (c) a narrow-but-honest gate rather than
+add without touching that one call.
+
+> ⚠️ **Superseded in part by the batch itself (§6.5 D-1).** The *count* above is true of
+> `origin/main`, the tree it was measured on. LLR-072-1.2 then deleted `_switch_row` — that one
+> `Switch(` call, invoked twice — and LLR-072-1.1 inlined both toggles, so post-batch there are
+> **two** construction sites (`:325`, `:327`), still both in `crc_designer_view.py`. The
+> completeness argument is unaffected because it never depended on the count: what it needs is that
+> `Switch` is constructed **only in that module**, which is what TC-514 asserts. Recorded here
+> because a measurement is true of the tree it was taken on, and this batch changed that tree. This is what makes (c) a narrow-but-honest gate rather than
 a rule tailored to one pair: state the completeness argument in the requirement, or the gate
 reads as special-pleading.
 
@@ -627,7 +635,7 @@ quantity by **zero**. See §6.4 G-3 — the pre-existing 2.54:1 violation is car
 | M-1 abutting focusable pairs, 120x30 | **16** | G-1 scope — confirms the briefed census |
 | M-1 same-class abutting pairs | **7** pre → **6** post | **G-1 re-scope: reject rule (b).** The "1 violation" premise is FALSE; a gate that is RED before *and after* is not a gate |
 | M-1 Switch-Switch abutting pairs | **1** pre → **0** post | **G-1 re-scope: adopt rule (c).** The only rule that is FALSE pre-batch and satisfiable post-batch |
-| M-1 `Switch` widgets in the whole app / construction sites | **2** / **1** (`crc_designer_view.py:467`) | G-1 — the subject set is complete by construction; state this so (c) does not read as special-pleading |
+| M-1 `Switch` widgets in the whole app / construction sites | **2** / **1** (`crc_designer_view.py:467`) — ⚠️ **true of `origin/main`; the batch itself changed the site count to 2** (`:325`, `:327`) by deleting `_switch_row` and inlining both toggles. See §6.5 **D-1**: TC-514 asserts single-module **confinement**, not a site count | G-1 — the subject set is complete by construction; state this so (c) does not read as special-pleading |
 | M-2 dialog @ `width: 96%`, 120x30 | **113** cols; content **107** after **6** cols chrome (`styles.tcss:1504–1508`) | Legend two-pane geometry — replaces the prototype-inherited number |
 | M-2 pane widths under `3fr`/`2fr` | card **64**, key **43** | Pin `2fr` explicitly; "about 40%" is not measurable |
 | M-2 key content rows @43 cols | **14** (mac) and **14** (map) in a **15**-row pane, `max_scroll_y == 0` | **AT-216 is achievable.** Add `key_pane.max_scroll_y == 0` as the cause-level assertion — only **1 row** of slack |

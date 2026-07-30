@@ -188,9 +188,18 @@ overlapping x-bands.
 > The Switch-only rule is the only one of the three that is FALSE before and satisfiable after.
 > **Why this is a general guard and not special-pleading for one pair:** the subject set is
 > **derived from the live DOM, never hand-listed** (C-31), and its completeness rests on a
-> **static fact about the source**: `Switch(` has exactly **one** construction site in the whole
-> package (`crc_designer_view.py:467`, executed grep), reached only from the Algorithm group, so
-> every `Switch` that can exist is on the CRC screen and inside the queried scope.
+> **static fact about the source**: every `Switch(` construction site in the package lives in
+> `crc_designer_view.py`, reached only from the Algorithm group, so every `Switch` that can exist
+> is on the CRC screen and inside the queried scope.
+>
+> ⚠️ **The property is single-module CONFINEMENT, not a site count — and this batch is why**
+> (§6.5 **D-1**). Revisions 2 and 3 of this document said "exactly **one** construction site
+> (`crc_designer_view.py:467`)". That was true of `origin/main` and **this batch falsified it**:
+> LLR-072-1.2 deleted `_switch_row` — one `Switch(` call invoked twice — and LLR-072-1.1 inlined
+> both toggles, so HEAD has **two** sites (`:325`, `:327`). Pinning the count would have shipped a
+> RED test; re-pinning it to `2` would re-plant the same brittle constant against the next refactor.
+> TC-514 therefore asserts what the count was standing in for: `Switch` is imported and constructed
+> **only** in `crc_designer_view.py`.
 > *Precision correction from the re-gate (N-4): `App.query` is **screen-scoped**
 > (`app._get_dom_base() -> Screen`), so it does not by itself certify "anywhere in the app" — the
 > **grep** carries that argument, not the query. The AT therefore queries the CRC screen and the
@@ -354,7 +363,8 @@ structural. No `demo`.
 |---|---|---|---|---|
 | US-072-1 | HLR-072-1 | 1.1, 1.2 | **AT-213** | TC-510 (pair-row structure), TC-511 (`_switch_row` orphan removal) |
 | US-072-1 | HLR-072-2 | 2.1, 2.2, 2.3, 2.4 | **AT-215** | TC-512 (`#crc_top_right` single child), TC-513 (`.crc-hero` selector absent) |
-| US-072-1 | HLR-072-3 | — *(guard over 1.1)* | **AT-214** | TC-514 (derived Switch set non-empty ≥ 2) |
+| US-072-1 | HLR-072-3 | — *(guard over 1.1)* | **AT-214** | TC-514 (`Switch` is constructed only in `crc_designer_view.py` — the confinement property, §6.5 D-1) |
+| US-072-2 | HLR-072-6 | 6.1 | *(covered by AT-217)* | **TC-520** (focus traversal — §6.5 D-2) |
 | US-072-2 | HLR-072-5 | 5.1, 5.2 | **AT-216** | TC-515 (pane ids + widget counts vs M-6), TC-516 (`#legend_body` is the wrapper; 9 sites non-empty) |
 | US-072-2 | HLR-072-6 | 6.1, 6.2 | **AT-217** | **TC-517 (the `legend-narrow` class flips at the 120 breakpoint)**, TC-518 (no `height: auto` on the key pane) |
 | US-072-2 | HLR-072-7 | 7.1 | **AT-218** *(pin)* | TC-519 (`legend.py` diff vs `origin/main` empty) |
@@ -473,6 +483,31 @@ disappearance is not a decision (C-40 limb 2, instance ii). All four are now dis
   (`tests/test_crc_designer_view.py:1003-1047`). **Deleted, never edited into passing.** Ledger `D = 1`.
 - **Re-derived acceptance:** AT-215 (clauses 1, 2, 4) covers the surviving obligation — the verdict
   remains present, correctly parented, and reachable.
+
+#### D-1 — TC-514's completeness oracle **RE-DERIVED** (the batch falsified its own spec constant)
+- **Before (revisions 2-3):** *"`Switch(` has exactly **one** construction site in the whole package
+  (`crc_designer_view.py:467`)"* — asserted as present-tense fact in HLR-072-3 and in
+  `00-measurements.md` M-1, and specified as TC-514's assertion.
+- **After:** TC-514 asserts **single-module confinement** — `Switch` is imported and every
+  `\bSwitch\(` site occurs **only** in `crc_designer_view.py` — plus a non-vacuity guard.
+- **Basis (executed at Inc-4):** `origin/main` → 1 site (`:467`); **HEAD → 2 sites (`:325`, `:327`)**.
+  The batch caused this itself: LLR-072-1.2 deleted `_switch_row` (one `Switch(` call invoked twice)
+  and LLR-072-1.1 inlined both toggles into the pair row, converting one site into two.
+- **Why re-derived rather than re-pinned:** asserting `== 1` ships a RED test; switching to `== 2`
+  re-plants the identical brittle constant for the next refactor to break. The requirement's own
+  stated purpose is that *every `Switch` that can exist is inside the queried scope* — that is a
+  **confinement** property, and it survived the refactor untouched. The count was only ever a proxy
+  for it.
+- **The general lesson, and it is C-39's rider read backwards:** a measured constant is true *of the
+  tree it was measured on*. When the batch **is** the thing that changes that tree, a spec constant
+  measured pre-batch can be falsified **by the batch's own success**. Prefer the invariant the
+  number stands for whenever the number is downstream of your own edit.
+- **Deleted token:** the "exactly one construction site" claim, in HLR-072-3 and in M-1.
+
+#### D-2 — TC-520 allocated **outside** the reserved block
+- `TC-510..TC-519` were reserved at Phase 1; the focus-traversal pin the C-16 flag produced at
+  Phase 3 is the eleventh TC. **`TC-520` is allocated** (census re-confirmed free) and now carries a
+  §5.2 traceability row. Recorded rather than left as an untraced node.
 
 #### A-8 — REQUIREMENTS.md registration target **CORRECTED**
 - **Before (§5.3.5, revision 1):** *"new/amended rows for the bench layout (batch-59 lineage §6.5
