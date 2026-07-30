@@ -31,8 +31,8 @@ key-first stack at the floor). Route: **full `/dev-flow`** (operator invoked it)
 | Phase | Status | Artifact |
 |---|---|---|
 | 0 — intake | ✅ done (prep) + RC-1 **re-verified at `31d87d0`** by the executing session | §2.6 of 01-requirements.md |
-| 1 — requirements | ✅ **APPROVED by the operator 2026-07-30** (0 iterations) | `.dev-flow/2026-07-30-batch-72/01-requirements.md` |
-| 2 — cross-review | 🔄 in-progress (architect ∥ qa-reviewer ∥ security-reviewer) | `.dev-flow/2026-07-30-batch-72/02-review.md` |
+| 1 — requirements | ✅ approved (rev 1) → ⚠️ **ITERATED → REVISION 2** (1 iteration) | `01-requirements.md` + `00-measurements.md` |
+| 2 — cross-review | ⚠️ **9 blockers → iterate**; re-gate on revision 2 in progress | `02-review.md` (+ 3 lane files) |
 | 3 — implementation | not-started | suggested cut below |
 | 4 — validation | not-started | — |
 | 5 — postmortem | not-started | — |
@@ -55,13 +55,42 @@ key-first stack at the floor). Route: **full `/dev-flow`** (operator invoked it)
 5. Re-run the ID census (AT-213..218, TC-510..519 reserved — a parallel batch may have
    consumed ids since 2026-07-30).
 
-## Suggested Phase-3 increment cut (re-derive after Phase 2 per C-21)
-- **Inc-1 — Legend B** (`screens.py` + `styles.tcss` + new AT file): the cheapest
-  surface (P-3: not snapshot-captured), no cross-dependency. ATs 216/217/218.
-- **Inc-2 — CRC B compose** (`crc_designer_view.py` + `styles.tcss`): pair row +
-  Self-test row + hero change + Select cap. ATs 213/215.
-- **Inc-3 — Guards** (test-only): AT-214 G-1 sweep + its RED counterfactual on old CSS
-  (C-40 transcript), REQUIREMENTS.md rows + §6.5 amendment for the batch-59 lineage.
+## Phase-2 outcome — 9 blockers, and what the iterate changed
+
+Three lanes ran in parallel. **The architect and qa lanes independently measured the same
+16 abutting focusable pairs and independently concluded G-1 was unsatisfiable** — convergent
+rediscovery is what upgraded that from an opinion to a measurement.
+
+Rather than adopt the reviewers' proposed fixes, the fold **executed its own thresholds first**
+(C-39 rider) into [`00-measurements.md`](00-measurements.md). That caught a defect *inside the
+review*: qa proposed re-scoping G-1 to "same widget class → exactly 1 violation"; measured, it is
+**7 pre-batch and 6 post-batch** — still unsatisfiable. Adopting it verbatim would have relocated
+the defect, not closed it.
+
+| Blocker | Disposition in revision 2 |
+|---|---|
+| A-1 AT-B59-05 contradiction | batch-59 verdict-hero **retired**, Before/After at §6.5 A-1, ledger `D=1`, deletion (never an edit-to-pass) |
+| A-2 no floor mechanism | **LLR-072-6.1** — the modal owns its own `on_mount`/`on_resize` regime hook at the same 120 breakpoint; **TC-517** asserts the class flips |
+| A-3 / Q-1 G-1 unsatisfiable | **re-scoped to `Switch`-only** (measured 1 → 0). Complete by construction: 2 Switches, 1 construction site |
+| A-4 G-2 proves the wrong thing | **retired** with an explicit written retirement line + backlog carry (§6.5 R-1) |
+| Q-4 / Q-5 AT-216 vacuous ×2 | anchored on the key-row **widget** (derived from `LEGEND_TABLE`), **region-containment** oracle, `max_scroll_y == 0` cause-clause, plus a `display:none` mutation discharge |
+| Q-8 HLR-072-4 has no AT | the **requirement itself was withdrawn on measurement** — §6.5 W-1 |
+| Q-9 stale ledger base | **2379** @ `b556e35`, measured 2026-07-30 |
+
+**The withdrawal is the headline.** `Select { height: 3 }` renders `CRC-32/ISO-HDLC` as
+**`CRC-32/I`** — 8 of 15 characters, no ellipsis, no overflow marker — and clips the bottom border
+on 4 of 6 Selects. Minimum legible height is 6, which is what `height: auto` already gives. The
+number came from the prototype pass and would have shipped a control that lies about its value.
+
+## Phase-3 increment cut (re-derived per C-21 — the AT set changed)
+- **Inc-1 — Legend two-pane** (`screens.py`, `styles.tcss`, new AT file): LLR-072-5.1/5.2, 7.1.
+  ATs 216/218 + TC-515/516/519.
+- **Inc-2 — Legend floor regime** (`screens.py`, `styles.tcss`): LLR-072-6.1/6.2. AT-217 + TC-517/518.
+  Split from Inc-1 because the regime hook is a *behaviour*, not a layout rule, and owes its own TC.
+- **Inc-3 — CRC compose** (`crc_designer_view.py`, `styles.tcss`, tests): LLR-072-1.1/1.2, 2.1-2.4,
+  8.1. ATs 213/215/219 + TC-510..513. Includes the AT-B59-05 deletion.
+- **Inc-4 — G-1 guard + docs** (tests, `REQUIREMENTS.md`): AT-214 with its C-40 counterfactual
+  transcript, TC-514, `R-TUI-100` + the two legend row amendments.
 
 ## Key decisions log
 | Date | Decision | Source |
