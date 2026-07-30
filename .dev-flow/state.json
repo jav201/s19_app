@@ -128,7 +128,13 @@
       "phase": 6,
       "date": "2026-07-29",
       "decision": "synced-to-obsidian",
-      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches6-07-28-batch-70\\ . NOT A CLEAN SYNC and it is not reported as one: (a) 06-docs/ did not exist at merge and was PRODUCED at this sync - the reject-check caught the missing Phase-6 deliverable; (b) 02-review.md does not exist and was NOT fabricated - the autonomous route ran no separate Phase-2 review, recorded in the index and the traceability matrix; (c) 80 vault files in the legacy NESTED svgs/<case>/ layout that batch-47 recorded as PRUNED are BACK, dated 2026-07-27, and now predate this merge - flagged for an operator ruling, NOT deleted, because sync never deletes from the vault; (d) batch-66 has a .dev-flow/ folder in the repo and no vault counterpart."
+      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches6-07-28-batch-70\\ . NOT A CLEAN SYNC and it is not reported as one: (a) 06-docs/ did not exist at merge and was PRODUCED at this sync - the reject-check caught the missing Phase-6 deliverable; (b) 02-review.md does not exist and was NOT fabricated - the autonomous route ran no separate Phase-2 review, recorded in the index and the traceability matrix; (c) 80 vault files in the legacy NESTED svgs/<case>/ layout that batch-47 recorded as PRUNED are BACK, dated 2026-07-27 - RULED 2026-07-29 by the operator: KEEP as historical context, and CLASSIFIED in visual-evidence.md section 6 so no future sync re-flags them. Root cause recorded with them: a sync between batch-47 and batch-63 copied recursively instead of using the section-5 flattening helper, which is why batch-47's deletion did not hold; (d) batch-66 has a .dev-flow/ folder in the repo and no vault counterpart."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-29",
+      "decision": "vault nested-layout duplicates KEPT and classified, not deleted",
+      "notes": "Operator ruling. 16 dirs / 80 files (75 live-case + 5 already-listed retired pv__case_06) declared in visual-evidence.md section 6 as SUPERSEDED-retained-as-context, with an explicit sync contract: exclude them from the freshness reject-check, compute freshness over the FLATTENED files only. Also recorded there: do not re-prune without first fixing the recursive-copy step, because the previous prune was undone by exactly that."
     }
   ],
   "obsidian_synced": true,
