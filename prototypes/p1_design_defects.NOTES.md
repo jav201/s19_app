@@ -40,9 +40,17 @@ lines deep in one flat scroll.
 
 ## 3. Captured states (THREE STATES / FRAME laws)
 
-Complete frames at real size, never crops. Pinned sizes: **120x30** (design size) and
-**80x24** (floor). CRC per variant: `empty@120x30`, `loaded@120x30`, `invalid@120x30`,
-`loaded@80x24`. Legend per variant: `workspace@120x30`, `mac@120x30`, `mac@80x24`.
+Complete frames at real size, never crops. Pinned sizes: **160x44** (high-density — the
+whole hero+bench fits one frame, added 2026-07-30 second pass on operator feedback
+"la escala no me ayuda"), **120x30** (design size) and **80x24** (floor). CRC per
+variant: `loaded@160x44`, `empty/loaded/bench/invalid@120x30`, `loaded/bench@80x24`,
+plus **shipped-state** frames (`crc_p1.shipped.*`) for before/after. Legend per
+variant: `mac+workspace@160x44`, `workspace/mac@120x30`, `mac@80x24`, plus
+`legend_p1.shipped.mac.*`. **Second-pass polish:** `Select { height: 3 }` in all CRC
+variants (kills the 4-6-row value wrap the first capture exposed); Legend C key area
+40%→50% + padding. **Reviewer page:** `p1-design-defects-review.html` (built by
+`p1_review_build.py`) inlines 28 frames with variant tabs + zoom — the SVGs are
+namespaced per file and their cdnjs `@font-face` stripped (`textLength` keeps the grid).
 **Dropped, stated (no silent caps):** legend `map`/`a2l`/`issues` shots (the variants
 reorganize card+key generically, so the band-key branch renders — runnable live, not
 captured); CRC `refused` state (needs a conflicting fixture; same tile as `loaded`).

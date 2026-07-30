@@ -51,6 +51,8 @@ class VariantA(CrcDesignerPanel):
     VariantA .crc-field-switch { border: none; height: 1; background: #1b233a; }
     VariantA .crc-field-switch:focus { background: #2b3a5e; }
     VariantA .proto-switch-state { color: #969aad; padding-left: 2; }
+    /* polish: stop narrow Selects wrapping their value over 4-6 rows */
+    VariantA Select { height: 3; }
     """
 
     def _switch_row(self, label: str, field_id: str, value: bool) -> Horizontal:  # type: ignore[override]
@@ -87,6 +89,7 @@ class VariantB(CrcDesignerPanel):
     VariantB .crc-field-switch { border: none; height: 1; background: #1b233a; }
     VariantB .crc-field-switch:focus { background: #2b3a5e; }
     VariantB #crc_top_right { width: 1fr; height: auto; padding-left: 1; }
+    VariantB Select { height: 3; }
     """
 
     def compose(self):
@@ -277,6 +280,7 @@ class VariantC(CrcDesignerPanel):
     VariantC #proto_diag_strip { height: auto; margin-bottom: 1; }
     VariantC #proto_diag_strip #crc_warnings_group { width: 2fr; margin-bottom: 0; }
     VariantC .proto-removed-note { width: 1fr; color: #969aad; padding: 1 2; }
+    VariantC Select { height: 3; }
     """
 
     def compose(self):
@@ -527,10 +531,23 @@ def _shot() -> None:
             app.current_file = _fixture()
             await pilot.press("0")
             await pilot.pause(); await pilot.pause()
+            app.query_one(_VARIANTS[variant])._recompute()
+            await pilot.pause()
             app.save_screenshot(str(here / f"crc_p1.variant_{variant}.80x24.loaded.svg"))
             app.query_one(_SCROLL_TARGET[variant]).scroll_visible(animate=False)
             await pilot.pause(); await pilot.pause()
             app.save_screenshot(str(here / f"crc_p1.variant_{variant}.80x24.bench.svg"))
+
+        # 160x44 high-density pass: hero + full bench in ONE frame (no fold).
+        app = app_mod.S19TuiApp()
+        async with app.run_test(size=(160, 44)) as pilot:
+            await pilot.pause()
+            app.current_file = _fixture()
+            await pilot.press("0")
+            await pilot.pause(); await pilot.pause()
+            app.query_one(_VARIANTS[variant])._recompute()
+            await pilot.pause()
+            app.save_screenshot(str(here / f"crc_p1.variant_{variant}.160x44.loaded.svg"))
 
     for variant in _VARIANTS:
         asyncio.run(run(variant))

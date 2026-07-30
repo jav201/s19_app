@@ -130,7 +130,7 @@ class VariantCLegend(LegendScreen):
     """C — Key-first outline: the reference answer on top, examples on demand."""
 
     DEFAULT_CSS = """
-    VariantCLegend #proto_key_top { height: auto; max-height: 40%; overflow-y: auto; }
+    VariantCLegend #proto_key_top { height: auto; max-height: 50%; overflow-y: auto; padding-bottom: 1; }
     VariantCLegend #proto_outline { height: 1fr; }
     VariantCLegend Collapsible { border: none; background: #0f1525; }
     """
@@ -198,6 +198,19 @@ def _shot() -> None:
             app.save_screenshot(
                 str(here / f"legend_p1.variant_{variant}.mac.80x24.svg")
             )
+
+        # 160x44 high-density pass.
+        app = app_mod.S19TuiApp()
+        async with app.run_test(size=(160, 44)) as pilot:
+            await pilot.pause()
+            for view in _SHOT_VIEWS:
+                app.push_screen(cls(sections=sections_map.get(view), view_key=view))
+                await pilot.pause(); await pilot.pause()
+                app.save_screenshot(
+                    str(here / f"legend_p1.variant_{variant}.{view}.160x44.svg")
+                )
+                app.pop_screen()
+                await pilot.pause()
 
     for variant in _VARIANTS:
         asyncio.run(run(variant))
