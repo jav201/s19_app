@@ -731,3 +731,87 @@ def test_tc519_legend_module_unchanged_vs_main() -> None:
     assert changed == [], (
         f"s19_app/tui/legend.py must be reused unmodified (vs {ref}): {changed}"
     )
+
+
+# --------------------------------------------------------------------------- #
+# TC-520 (Inc-4) — the focus traversal the two-pane split CHANGED.
+#
+# `01-requirements.md` §6.3 flagged this axis `assumed — verify in target
+# framework at Phase 3`. Verified at the Inc-1/2 gate, and it moved:
+# `ScrollableContainer.can_focus` is True on textual 8.2.8, so the modal went
+# from ONE focusable stop to THREE, and the stops follow pane document order —
+# wide `[card, key, close]`, floor `[key, card, close]`.
+#
+# The behaviour is ACCEPTED, not repaired, and this node pins it. The third stop
+# is REQUIRED, not incidental: at the floor the key is scroll-only by design
+# (AT-217 clause 3), so making the panes `can_focus = False` to restore the old
+# two-stop cycle would leave the colour key unreachable by keyboard at 80x24 and
+# fail guard G-4 outright.
+#
+# It pins the PROPERTIES, not the literal chain. A `== [card, key, close]`
+# equality would break on any future container that is merely passed through, and
+# would be asserting the framework's widget inventory rather than the operator-
+# visible guarantee. The three properties below are the guarantee.
+# --------------------------------------------------------------------------- #
+def test_tc520_legend_focus_traversal_is_pinned_in_both_regimes(
+    tmp_path: Path,
+) -> None:
+    """TC-520 — initial focus, pane reachability, and floor focus order.
+
+    Three properties, both regimes:
+
+    (a) **initial focus is ``#legend_close``** — the part that must NOT have
+        regressed. It is what `Enter` acts on the moment the modal opens, and it
+        is unchanged from the single-pane modal;
+    (b) **both panes appear in ``screen.focus_chain``** — the reachability
+        guarantee behind G-4. If a future change makes the panes non-focusable to
+        tidy the tab cycle, the floor key becomes keyboard-unreachable and this
+        arm goes RED at the cause;
+    (c) **at the 80x24 floor the key pane PRECEDES the card pane in the chain** —
+        the operator's key-first decision expressed in focus order, not only in
+        geometry. AT-217 pins the geometric order; nothing pinned the focus
+        order, and `move_child` is what produces both, so a reorder regression
+        that AT-217 caught geometrically is caught here at the second surface.
+
+    Nothing asserted a legend tab order anywhere before this node (measured at
+    the Inc-1/2 gate: ``focus_chain`` / ``focused.id`` / ``press("tab")`` return
+    zero hits across all four legend test files), so this is new coverage for a
+    behaviour this batch caused.
+    """
+
+    async def _drive(size: Tuple[int, int]) -> Tuple[str, List[str]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            legend = await _open_legend(app, pilot, "mac")
+            focused = legend.focused
+            return (
+                "" if focused is None else str(focused.id),
+                [str(widget.id) for widget in legend.focus_chain],
+            )
+
+    for size in ((120, 30), (80, 24)):
+        focused_id, chain = asyncio.run(_drive(size))
+
+        # (a) initial focus — unchanged from the single-pane modal.
+        assert focused_id == "legend_close", (
+            f"at {size} the Legend must open with #legend_close focused, "
+            f"got {focused_id!r} (chain={chain!r})"
+        )
+
+        # (b) both panes reachable by keyboard (G-4).
+        for pane in ("legend_card_pane", "legend_key_pane"):
+            assert pane in chain, (
+                f"at {size} #{pane} is not in the focus chain {chain!r} — the "
+                "floor key is scroll-only, so a non-focusable pane makes it "
+                "keyboard-unreachable"
+            )
+
+        # (c) floor order follows the key-first stacking.
+        if size == (80, 24):
+            assert chain.index("legend_key_pane") < chain.index(
+                "legend_card_pane"
+            ), (
+                f"at the floor the key pane must precede the card pane in the "
+                f"focus chain (key-first, the operator's decision): {chain!r}"
+            )

@@ -24,6 +24,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import re
+from itertools import permutations
 from pathlib import Path
 
 from textual.widgets import Button, Input, Label, Select, Static, Switch
@@ -1761,3 +1762,150 @@ def test_retired_hero_selectors_absent_from_stylesheet() -> None:
     )
     assert "crc-hero" not in text, "the .crc-hero rule must be retired"
     assert "crc_live_verify" not in text, "no #crc_live_verify rule may remain"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# batch-72 Inc-4 — G-1, the Switch separability guard (HLR-072-3; AT-214, TC-514)
+#
+# G-1 was originally scoped over "every pair of vertically-adjacent focusable
+# controls in the CRC form". That rule is FALSE of 16 pairs on the shipped tree
+# and Variant B fixes exactly ONE of them; the other 15 abut BY DESIGN
+# (`styles.tcss` `.crc-field-input { border: none; height: 1 }`, batch-59's
+# approved R9 compact-row decision). A same-widget-class rule was then proposed
+# and ALSO rejected on measurement — 7 violations pre-batch, 6 post, so it is RED
+# before AND after and proves nothing. The Switch-only rule is the only one of
+# the three that is FALSE before (1 pair) and satisfiable after (0 pairs).
+# Census: 00-measurements.md M-1.
+# ─────────────────────────────────────────────────────────────────────────────
+#: A ``Switch`` construction site. Word-bounded so a hypothetical ``MySwitch(``
+#: subclass call is not miscounted as one; the scan is scoped to ``s19_app/``, so
+#: this file's own occurrences are out of its reach.
+_SWITCH_CTOR = re.compile(r"\bSwitch\(")
+
+
+def _vertically_abutting(upper: Switch, lower: Switch) -> bool:
+    """The §1.3 relation: ``lower`` starts on the row ``upper`` ends, x-bands overlapping.
+
+    Verbatim from `01-requirements.md` §1.3 — ``b.region.y == a.region.y +
+    a.region.height`` AND ``a.x < b.x + b.width and b.x < a.x + a.width``. The
+    x-band clause is what stops two controls in different bench columns from
+    counting as stacked merely because their rows line up.
+    """
+    a, b = upper.region, lower.region
+    return (
+        b.y == a.y + a.height
+        and a.x < b.x + b.width
+        and b.x < a.x + a.width
+    )
+
+
+def test_at214_no_two_switches_render_vertically_abutting(tmp_path: Path) -> None:
+    """No two ``Switch`` widgets render vertically abutting (AT-214, G-1).
+
+    HLR-072-3. Three clauses in this node; the fourth (the C-40 counterfactual)
+    is executed at the gate rather than encoded, because a permanently-reverted
+    tree is not a counterfactual — transcript in
+    ``.dev-flow/2026-07-30-batch-72/03-increments/increment-004.md``.
+
+    1. the subject set is **DERIVED** from the live DOM — ``screen.query(Switch)``
+       filtered ``region.area > 0`` — never hand-listed (C-31). The area filter is
+       not cosmetic: zero-area ``SelectOverlay``-style phantoms sit at
+       ``Region(0,0,0,0)`` and a naive walk pairs them nonsensically at ``y=0``;
+    2. the derived set is **non-empty** (``>= 2``) — a broken walk, a renamed
+       widget class or a screen that never mounted would otherwise satisfy
+       clause 3 vacuously, which is the whole failure mode this control exists
+       to prevent;
+    3. **zero** abutting pairs under the §1.3 relation, checked over ordered
+       permutations so the relation is evaluated in both directions.
+
+    The guard coincides with AT-213's pair row *today* precisely because those
+    two switches are the only ones that exist — stated plainly rather than
+    dressed up as a broader property. What makes it a guard rather than a restatement
+    is that the subject set is derived: a third ``Switch`` added anywhere on this
+    screen tomorrow is policed automatically, and TC-514 carries the argument that
+    no ``Switch`` can be constructed outside it.
+    """
+
+    async def _drive() -> tuple[list[str], list[tuple[str, str]]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("0")
+            await pilot.pause()
+            switches = [
+                widget
+                for widget in app.screen.query(Switch)
+                if widget.region.area > 0
+            ]
+            abutting = [
+                (str(upper.id), str(lower.id))
+                for upper, lower in permutations(switches, 2)
+                if _vertically_abutting(upper, lower)
+            ]
+            return [str(widget.id) for widget in switches], abutting
+
+    switch_ids, abutting = asyncio.run(_drive())
+    assert len(switch_ids) >= 2, (
+        f"the derived Switch set must be non-empty (>= 2), got {switch_ids!r} — "
+        "a vacuous pass here would report GREEN on a screen that never mounted"
+    )
+    assert abutting == [], (
+        f"no two Switch widgets may render vertically abutting (G-1); "
+        f"abutting pairs: {abutting!r} out of {switch_ids!r}"
+    )
+
+
+def test_tc514_every_switch_construction_site_is_on_the_crc_designer() -> None:
+    """Every ``Switch`` in the package is constructed by the CRC Designer (TC-514).
+
+    AT-214 queries ``app.screen``, and ``App.query`` is **screen-scoped**
+    (``app._get_dom_base() -> Screen``): the query alone therefore certifies
+    "no abutting Switch pair *on the CRC screen*", NOT "anywhere in the app".
+    This node carries the completeness half of that argument, and it is the
+    load-bearing evidence — a static fact about the source, not a runtime one:
+
+    (a) exactly one module in ``s19_app/`` imports ``Switch`` at all, and
+    (b) every ``Switch(`` construction site in the package is in that module,
+
+    so every ``Switch`` that can exist is composed by ``CrcDesignerPanel`` and is
+    inside the scope AT-214 walks.
+
+    **Re-derived at Inc-4, not carried.** `01-requirements.md` HLR-072-3 and
+    00-measurements M-1 both record the site count as **1**
+    (``crc_designer_view.py:467``). That was true of ``origin/main`` and is FALSE
+    of this tree: LLR-072-1.2 deleted the per-toggle row helper (see
+    ``_ORPHANED_SWITCH_HELPER`` above — one ``Switch(`` call invoked twice) and
+    Inc-3 inlined both toggles into the pair row, so the count is now **2**
+    (``:325`` and ``:327``). The count was always incidental;
+    the property the requirement actually needs is *single-module confinement*,
+    which survives unchanged. Asserting the stale ``== 1`` would have shipped a
+    RED test; asserting a bare ``== 2`` would re-plant the same brittle number.
+    """
+    root = _repo_root()
+    package = root / "s19_app"
+    scanned = 0
+    construction_sites: list[str] = []
+    importers: list[str] = []
+    for path in package.rglob("*.py"):
+        scanned += 1
+        source = path.read_text(encoding="utf-8")
+        relative = path.relative_to(root).as_posix()
+        if _SWITCH_CTOR.search(source):
+            construction_sites.append(relative)
+        if re.search(r"^from textual\.widgets import .*\bSwitch\b", source, re.M):
+            importers.append(relative)
+
+    assert scanned > 0, f"the package scan resolved no .py files under {package}"
+    assert construction_sites, (
+        "the scan found no Switch construction site at all — the CRC Designer "
+        "composes two, so this is a broken scan, not a clean package"
+    )
+    assert set(construction_sites) == {"s19_app/tui/crc_designer_view.py"}, (
+        "every Switch construction site must live in the CRC Designer, else "
+        "AT-214's screen-scoped query is not a complete subject set; found "
+        f"{sorted(set(construction_sites))!r}"
+    )
+    assert set(importers) == {"s19_app/tui/crc_designer_view.py"}, (
+        "only the CRC Designer may import Switch; found "
+        f"{sorted(set(importers))!r}"
+    )

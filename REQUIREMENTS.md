@@ -3349,14 +3349,50 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 - Status: Added batch-18 (US-022 / HLR-022).
 
 **R-LEGEND-MODAL-001**: When the operator invokes the legend on a colour-coded view (the `k` key on A2L; the "Legend" button on MAC and Issues), the system shall open a read-only `LegendScreen` modal rendering every `LEGEND_TABLE` row, colourized via `color_policy.css_class_for_severity`, dismissable by Close; the static legend shall show even with no file loaded.
-- Code: `s19_app/tui/screens.py::LegendScreen` (`:474`) + `app.py::action_show_legend` (`:3059`), `Binding("k","show_legend")` (`:563`), MAC/Issues buttons (`:2477`/`:1171`), dispatch (`:7511`); `s19_app/tui/styles.tcss` `#legend_dialog`/`#legend_body` (US-023, LLR-023.1/.2).
-- Validation: `Automated` — `tests/test_tui_legend.py::test_at023a_a2l_legend_opens_via_key` / `::test_at023b_mac_legend_button_opens` / `::test_at023c_issues_legend_button_opens` / `::test_at023d_close_dismisses_modal` / `::test_at023f_legend_shows_without_file_loaded` (AT-023a–d,f) + `::test_tc023_1_modal_renders_all_table_rows` + `::test_tc023_2_mac_issues_buttons_present_a2l_absent` + `::test_tc_s2_report_and_modal_render_same_rows` (TC-S2 Q1/Q2 anti-drift).
-- Status: Added batch-18 (US-023 / HLR-023). §6.5 A1: A2L uses the `k` key (not a button) — the A2L filter row overflows at 80 & 120 cols (C-13 measurement).
+- Code: `s19_app/tui/screens.py::LegendScreen` (`:1039`) + `app.py::action_show_legend` (`:3059`), `Binding("k","show_legend")` (`:563`), MAC/Issues buttons (`:2477`/`:1171`), dispatch (`:7511`); `s19_app/tui/styles.tcss` `#legend_dialog`/`#legend_body` (US-023, LLR-023.1/.2). **batch-72:** `#legend_body` is the two-pane WRAPPER holding `#legend_card_pane` + `#legend_key_pane` (`screens.py::compose` `:1233-1237`); the `LEGEND_TABLE` rows the modal must render all live in the KEY pane.
+- Validation: `Automated` — `tests/test_tui_legend.py::test_at023a_a2l_legend_opens_via_key` / `::test_at023b_mac_legend_button_opens` / `::test_at023c_issues_legend_button_opens` / `::test_at023d_close_dismisses_modal` / `::test_at023f_legend_shows_without_file_loaded` (AT-023a–d,f) + `::test_tc023_1_modal_renders_all_table_rows` + `::test_tc023_2_mac_issues_buttons_present_a2l_absent` + `::test_tc_s2_report_and_modal_render_same_rows` (TC-S2 Q1/Q2 anti-drift). **batch-72:** `tests/test_legend_two_pane.py::test_tc516_legend_body_is_the_two_pane_wrapper` (TC-516 — the wrapper id is preserved AND all 9 shipped `#legend_body`-rooted query sites still resolve NON-EMPTY; C-38: a narrowed query that quietly empties still passes `all(...)`) + `::test_tc515_panes_hold_the_unmodified_render_output` (TC-515) + `::test_at218_pipeline_preserved_regression_pin` (AT-218) + `::test_tc520_legend_focus_traversal_is_pinned_in_both_regimes` (TC-520 — the modal opens with `#legend_close` focused and BOTH panes are in `focus_chain`).
+- Status: Added batch-18 (US-023 / HLR-023). §6.5 A1: A2L uses the `k` key (not a button) — the A2L filter row overflows at 80 & 120 cols (C-13 measurement). **Amended batch-72** (US-072-2 / HLR-072-5 / HLR-072-7, LLR-072-5.1): the single scrolling body became a two-pane wrapper; see the §6.5 Before/After under **R-LEGEND-GEOMETRY-001**. `LegendScreen`'s line ref is refreshed to `:1039` (the `:474` carried from batch-18 no longer addresses the class). The data layer is untouched — `git diff origin/main -- s19_app/tui/legend.py` is empty, asserted by `::test_tc519_legend_module_unchanged_vs_main`.
 
 **R-LEGEND-GEOMETRY-001**: The legend affordances shall fit the supported terminal regimes: the MAC/Issues "Legend" buttons render fully on-screen at 80 and 120 cols, the A2L view exposes no (clippable) legend button, and the opened modal fits within the terminal.
-- Code: `s19_app/tui/styles.tcss` `#legend_dialog { height: 90% }` + `#legend_body { height: 1fr; overflow-y: auto }` (US-023, LLR-023.3 / C-13).
-- Validation: `Automated` — `tests/test_tui_legend.py::test_at023e_c13_geometry_at_80_cols` (measured: MAC right=23, Issues=69 ≤80; A2L 0 buttons; modal within 80×30). `Manual` — SVG snapshot baselines for the 3 views + footer regenerate in canonical CI (G-1; never local).
-- Status: Added batch-18 (US-023 / HLR-023 / LLR-023.3).
+- Code: `s19_app/tui/styles.tcss` `#legend_dialog { height: 90%; width: 96% }` (`:1544`) + `#legend_body { height: 1fr; overflow: hidden }` (`:1549`) + `#legend_card_pane { width: 3fr; height: 1fr; overflow-y: auto }` (`:1554`) + `#legend_key_pane { width: 2fr; height: 1fr; overflow-y: auto }` (`:1560`) + the three `#legend_dialog.legend-narrow …` floor rules (`:1575-1587`); `screens.py::LegendScreen._apply_width_regime` (`:1247`) + `_LEGEND_NARROW_WIDTH` (`:1036`) (US-023, LLR-023.3 / C-13; batch-72 LLR-072-5.2 / 6.1 / 6.2).
+- Validation: `Automated` — `tests/test_tui_legend.py::test_at023e_c13_geometry_at_80_cols` (measured: MAC right=23, Issues=69 ≤80; A2L 0 buttons; modal within 80×30). **batch-72:** `tests/test_legend_two_pane.py::test_at216_key_pane_shows_warning_row_without_scrolling` (AT-216 — at 120×30 the MAC warning row is inside the key pane at `scroll_offset 0`, the key pane is inside `#legend_body`, and `key.max_scroll_y == 0`, the cause-level assertion, since the key fits with only ONE row of slack) + `::test_at217_floor_stacks_key_above_card_and_key_is_reachable` (AT-217 — at 80×24 key above card, `card.region.height >= 2`, key reachable under scroll) + `::test_tc517_width_regime_flips_class_and_pane_order` (TC-517 — the class AND document order flip at the breakpoint, both directions) + `::test_tc518_key_pane_never_uses_height_auto` (TC-518) + `::test_tc520_legend_focus_traversal_is_pinned_in_both_regimes` (TC-520 — at the floor the key pane precedes the card pane in `focus_chain`, so the key-first decision is pinned on the keyboard surface as well as the geometric one). `Manual` — SVG snapshot baselines for the 3 views + footer regenerate in canonical CI (G-1; never local). **Neither legend screen is snapshot-captured** — measured at batch-72 Phase 2, 0 legend snapshots on disk — so no baseline drifted and none was regenerated.
+- Status: Added batch-18 (US-023 / HLR-023 / LLR-023.3). **Amended batch-72 — see the §6.5 Before/After immediately below.**
+
+### Legend body: one scrolling column → two-pane wrapper — batch-72 (§6.5 amendment)
+
+> **Amends R-LEGEND-GEOMETRY-001 and R-LEGEND-MODAL-001** (US-072-2 / HLR-072-5 + HLR-072-6,
+> LLR-072-5.1/5.2/6.1/6.2; batch-72 Inc-1/2). A locked requirement's named CSS declaration MOVES to a
+> different element, so it is recorded Before → After rather than edited silently. **The protected
+> property — the operator can reach the colour key — is preserved in a stronger form; nothing is relaxed.**
+
+- **Before (batch-18):** `#legend_body { height: 1fr; overflow-y: auto }` — ONE scrolling column
+  holding the example card followed by the colour key.
+- **After (batch-72):** `#legend_body { height: 1fr; overflow: hidden }` — the wrapper no longer
+  scrolls; `overflow-y: auto` moves ONTO `#legend_card_pane` and `#legend_key_pane`, which are the
+  two scroll contexts. Keeping it on the body as well would have nested three scroll contexts.
+  `#legend_dialog` widens `70% → 96%` to pay for the second column.
+- **Why the id survives the split.** Retiring `#legend_body` was considered and **rejected on
+  measurement**: 9 descendant query sites across the three legend test files name it, as do both
+  requirement rows above. It is preserved as the wrapper, and TC-516 asserts all 9 sites still
+  resolve NON-EMPTY — C-38, because a narrowed query that quietly empties still satisfies
+  `all(...)` and `assert not …`.
+- **Basis (executed, `.dev-flow/2026-07-30-batch-72/00-measurements.md` M-2/M-3).** Before the split
+  the MAC colour key sat at content row **33** of a **15**-row viewport — 18 rows below the fold, which
+  is the defect. After it: dialog 113 cols, content 107 after 6 cols of modal chrome, card pane
+  **64** cols, key pane **43**, key content **14** rows in a **15**-row pane, `max_scroll_y == 0`.
+- **What the floor deliberately does NOT claim.** At 80×24 the body budget is **9** rows against a
+  **10 (mac) / 11 (map)** row key, so "both panes fully visible" is unachievable under any
+  non-degenerate CSS. AT-217 asserts **reachable under scroll** instead — the honest threshold
+  (C-29), not a weakened one. `height: auto` on the key pane is excluded by measurement: it starves
+  the card to **1** row and overflows the body.
+- **Focus traversal changed, and is ACCEPTED rather than repaired.** `ScrollableContainer.can_focus`
+  is True on textual 8.2.8, so the modal's tab cycle grew from 1 focusable stop to 3 and now follows
+  pane order — wide `[card, key, close]`, floor `[key, card, close]`. Initial focus is unchanged
+  (`#legend_close`). The third stop is **required**: at the floor the key is scroll-only by design, so
+  making the panes non-focusable to restore the old cycle would leave the colour key
+  keyboard-unreachable. Pinned by **TC-520** as three PROPERTIES, never as a literal chain — a
+  3-element equality would break on any future pass-through container and would assert the
+  framework's widget inventory rather than the operator-visible guarantee.
 
 # 25. Issues-report addendum + issue enrichment (batch-19)
 
@@ -5083,3 +5119,105 @@ and `MAX_FUSED_FINDINGS_PER_VARIANT` bound how many entries are FORMATTED; a sin
   against the pre-change tree would have failed at import and proven nothing.
 - Status: Added in batch `2026-07-28-batch-70` (US-FBP2-1/2, HLR-104, LLR-104.1…104.7;
   `01-requirements.md` §2.7 premise table P-1…P-10, §6.5 amendment A-1). Frozen-engine diff = 0.
+
+## CRC Designer bench layout + Switch separability — batch-72 (R-TUI-100)
+
+> **This registers the CRC Designer view in `REQUIREMENTS.md` for the first time.** The bench shipped
+> in batch-59 (merged #113) and was never given a requirement row: executed greps over this document
+> at batch-72 Phase 2 returned **0** hits for `crc_live_verify`, `verdict hero`, `crc_bench` and
+> `Designer`. The obligation was therefore to **ADD**, not to amend — batch-72's revision-1 draft
+> pointed at a row that does not exist, corrected as §6.5 **A-8**. The statement below describes the
+> **post-batch-72** state, which is the only state that has ever been registered.
+
+**R-TUI-100**: The CRC Designer's Algorithm group (`#crc_algorithm_fields`) shall present the
+`refin`/`refout` controls as ONE labelled `Reflection` row — a row label, then a sub-label
+immediately adjacent to each toggle, with the two `Switch` widgets sharing a single row band — and
+shall present the known-answer verdict as a `Self-test` row directly below the `Check` field it
+validates, naming the reference vector `123456789` on screen and preserving the id
+`#crc_kat_verdict`, its `markup=False` flag and its tri-state glyph tokens (`✓ MATCH` /
+`✗ MISMATCH` / `○ NO-EXPECTED`). The hero wrapper `#crc_live_verify` shall not be composed and
+`#crc_top_right` shall hold the Warnings group alone. **No two `Switch` widgets shall render
+vertically abutting** — for every pair, it is not the case that
+`b.region.y == a.region.y + a.region.height` with overlapping x-bands. Every id `_recompute` queries
+shall be declared in one module-level tuple that `_recompute` consumes **by name**, and every widget
+that tuple names shall report `_render_markup is False`.
+
+**Why the separability rule is scoped to `Switch` and not to every adjacent control.** The operator's
+defect was that one toggle reads as the other. The obvious general rule — no two vertically-adjacent
+focusable controls abut — is **FALSE of 16 pairs** on the pre-batch tree and this change fixes
+exactly **one**; the other 15 abut *by design* (`.crc-field-input { border: none; height: 1 }`,
+batch-59's approved compact-row decision). A same-widget-class rule was proposed and **also rejected
+on measurement**: 7 violations before, 6 after — RED before AND after, which is not a gate. The
+`Switch`-only rule is the only one of the three that is FALSE before (1 pair) and satisfiable after
+(0 pairs). Census: `.dev-flow/2026-07-30-batch-72/00-measurements.md` M-1.
+
+**What makes it a guard and not special-pleading for one pair.** The subject set is **derived from
+the live DOM**, never hand-listed (C-31), so a third `Switch` added to this screen is policed
+automatically. Its completeness rests on a static fact about the source rather than on the query:
+`App.query` is **screen-scoped** (`app._get_dom_base() -> Screen`), so it cannot by itself certify
+"anywhere in the app" — the source scan carries that argument. Exactly one module in `s19_app/`
+imports `Switch`, and every `Switch(` construction site in the package is in that module, so every
+`Switch` that can exist is composed by `CrcDesignerPanel` and is inside the scope the AT walks.
+
+**What this requirement deliberately does NOT claim.**
+
+(a) **No `Select` height cap.** A `#crc_designer_panel Select { height: 3 }` rule was specified and
+then **withdrawn on measurement**: at the bench's 12-col pane width it renders `CRC-32/ISO-HDLC` as
+`CRC-32/I` — 8 of 15 characters with **no ellipsis and no overflow marker** — and clips the bottom
+border on 4 of the 6 Selects. A cap that makes a control lie about its value is worse than the
+density it fixes; the measured lever is pane **width**, not height. §6.5 **W-1**, carried to backlog.
+
+(b) **No hero-extent ratio.** The bench's largest tile to smallest is **2.54:1** measured on `main`
+against a 6:1 design law — a pre-existing violation this batch neither causes nor worsens
+(retiring `#crc_live_verify` and giving its space to `#crc_warnings_group` changes the bounded
+quantity by **zero**). Encoding it here would make this batch's gate fail on batch-59's geometry.
+Carried to backlog with the measurement.
+
+(c) **No `Switch` state-word guarantee.** "A toggle's state is legible without relying on slider
+position" was a **Variant A** mechanism; the operator chose Variant B. Carried to backlog.
+
+(d) **The CRC screen at 80×24 is unmeasured** and no floor behaviour is claimed for it.
+
+- Code: `s19_app/tui/crc_designer_view.py::CrcDesignerPanel.compose` — the `Reflection` pair row
+  (`:322-331`), the `Self-test` row (`:343-348`) inside `#crc_algorithm_fields` (`:349`),
+  `#crc_top_right` holding the Warnings group alone (`:445`) inside `#crc_hero_row` (`:446`), and
+  `_RECOMPUTE_SURFACE_IDS` (`:125`) consumed by name in `_recompute` (`:1136`);
+  `s19_app/tui/styles.tcss` — the `.crc-hero` and `#crc_live_verify` rules retired. The per-toggle
+  `_switch_row` helper is deleted, not left dead (US-072-1/US-072-3, HLR-072-1/2/3/8,
+  LLR-072-1.1/1.2/2.1/2.2/2.3/2.4/8.1).
+- Validation: `Automated` — `tests/test_crc_designer_view.py::test_reflection_pair_row_shares_one_band_and_drives_the_kernel`
+  (AT-213 — one row band, a `Label` strictly between the two switches' x-bands, and a **C-10
+  non-default drive with measured values**: `refin` seeded `True`, driven `False` through the real
+  `Switch` path, asserting the exact transition `0xCBF43926 → 0x1898913F`, never a bare `!=`) +
+  `::test_kat_verdict_demoted_to_self_test_row_under_check` (AT-215 — re-parented, names the
+  reference vector, still live via a real `Input.Changed`, with the two near-misses `○ NO-EXPECTED`
+  and `Invalid parameters: …` **excluded explicitly**; `#crc_live_verify` empty is the discriminating
+  negative) + `::test_at214_no_two_switches_render_vertically_abutting` (AT-214 — the derived subject
+  set, asserted non-empty so a broken walk cannot pass vacuously, then zero abutting pairs) +
+  `::test_tc514_every_switch_construction_site_is_on_the_crc_designer` (TC-514 — the completeness
+  half: single-module confinement of every `Switch(` site and of the `Switch` import) +
+  `::test_recompute_surface_ids_are_the_live_markup_census` (AT-219 — clause 1 the markup PIN over
+  the live tuple, clause 2 the GATE: a bogus id monkeypatched into the tuple must make `_recompute`
+  take its `NoMatches` early return, which is the only clause FALSE before the hoist) +
+  `::test_reflection_row_structure` (TC-510) + `::test_orphaned_per_toggle_helper_is_deleted`
+  (TC-511, repo-wide grep → 0 hits) + `::test_hero_right_column_holds_warnings_only` (TC-512) +
+  `::test_retired_hero_selectors_absent_from_stylesheet` (TC-513).
+- **AT-214's falsifiability is executed, not asserted.** With `crc_designer_view.py` restored
+  **whole-file** from `origin/main` on a private copy, AT-214 fails on **its own assertion line**
+  (`abutting pairs: [('crc_field_refin', 'crc_field_refout')]`), never on an import error. The
+  whole-file revert is deliberate and is safe **only because AT-214 references no `#id`** — it
+  queries by widget type, so the subject set resolves in both trees. Reverting just the pair row
+  would raise `NameError` (the helper it would call is deleted) and an error is not an assertion
+  failure; reverting only the CSS may leave the AT GREEN, since the fusion is partly a `compose`
+  fact. Transcript with before / mutated / restored hashes:
+  `.dev-flow/2026-07-30-batch-72/03-increments/increment-004.md`.
+- Status: Added in batch `2026-07-30-batch-72` (US-072-1 / US-072-3; `01-requirements.md` §2.7
+  premise table P-1…P-12, §6.5 amendments W-1 / R-1 / A-1 / A-8). **Retires batch-59's verdict-hero
+  requirement** (US-L3 / HLR-L3 / LLR-L2.3+L3.1) and its acceptance test `AT-B59-05`
+  (`test_verdict_hero_center_aligned_in_hero_row`), whose five assertions are each falsified by this
+  layout by design — **deleted, never edited into passing**; the surviving obligation (the verdict
+  stays present, correctly parented and reachable) is re-derived into AT-215. Batch-59's
+  `AT-B59-03/08` bench-column tests survive unedited. Frozen-engine diff = 0. **No snapshot
+  regenerated** — the CRC screen is in neither snapshot screen list and 0 CRC snapshots exist on disk
+  (re-probed at Phase 2; the backlog's claim that "any change will drift the CRC snapshot cells" was
+  measured **FALSE**).
