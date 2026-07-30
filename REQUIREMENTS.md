@@ -5064,9 +5064,19 @@ and `MAX_FUSED_FINDINGS_PER_VARIANT` bound how many entries are FORMATTED; a sin
   | **AT-208** / `TC-504` | AC-4, D-5 | the roll-up is the worst, and `n_ok + n_issues + n_error` equals the executed count |
   | **AT-209** / `TC-505` | AC-5, D-7 | every variant survives · each cut names its dropped count · **the producer FORMATTED at most the cap per variant** |
   | **AT-210** / `TC-506` | AC-6 | the unscoped binding is the identity, and `compose_flow_report` has no variant parameter, no variant branch, and is not edited |
+  | **AT-212** / `TC-509` / `TC-509b` | AC-6 | **byte-golden (added batch-71)** — an unscoped run over a flow exercising **every block kind** writes a report byte-identical to one captured from `f1f3987`, the commit immediately before FB-P2 merged. Comparison via the shared `conftest.canonical_report_bytes`; golden at `tests/goldens/batch71/ac6-unscoped-flow-report.md` (710 B, LF-only) |
   | **AT-211** / `TC-507` / `TC-508` | AC-7, LLR-104.7 | a variant outside the project fails **that** variant closed with `MANIFEST-PATH-ESCAPE` recorded while the others run; the code is a `REJECTING_CODES` member, so the shipped C-31 census covers the variant path |
   | `test_d4_*` (4 nodes) | D-4 | an **artifact-on-disk** count: one file in `reports/` after a fused run; the deferred REPORT block still appears in every variant's ledger; no report when the flow has none; an unscoped run still writes its own |
   | `test_llr1046_*` (7 nodes) | LLR-104.6 | the scope Select drives the real Run button through the shipped app handler; the default routes to the single-image path; the `assignments` scope genuinely narrows the planned set; a variant scope with no variants degrades to an error card |
+- **AC-6 is now carried by a byte-golden, not only structurally (batch-71).** The original entry
+  proved AC-6 by construction — the single-image composer lives in a different module and is not
+  edited. That remains true and was **measured**: `git diff f1f3987 origin/main --
+  s19_app/tui/services/flow_report_service.py` → **0 lines**. But that same measurement is why a
+  golden over the *composer* would have been **vacuous** — it could not fail. The edited surface is
+  `flow_execution_service.py` (**+263 / −5**, two deletions on the unscoped SOURCE path), so
+  `AT-212` takes the golden **end-to-end through `run_flow`**. Driven RED on a copy of the fixed tree
+  by leaking the variant into the default path (`flow_name=f"{flow.name} [{ctx.variant}]"`), it fails
+  on the byte assertion. **The former non-claim "AC-6 has no byte-golden" is DISCHARGED.**
 - **AC-5's falsifiability is executed, not asserted.** With the `islice` bounds reverted on a **copy of
   the fixed tree**, both `AT-209` nodes fail **on their assertion** — `assert 1200 <= 60`, and the
   missing `> **Cut in `a`:** findings: 25 omitted` — never on an import error. A counterfactual run
