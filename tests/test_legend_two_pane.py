@@ -50,6 +50,7 @@ Geometry is read from measured ``region``s, never from the requested size tuple
 from __future__ import annotations
 
 import asyncio
+import re
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -150,6 +151,7 @@ def _measure_key_pane(tmp_path: Path) -> Dict[str, object]:
             await pilot.pause()
             legend = await _open_legend(app, pilot, "mac")
             body = legend.query_one("#legend_body")
+            card_pane = legend.query_one("#legend_card_pane")
             key_pane = legend.query_one("#legend_key_pane")
             rows = list(legend.query("#legend_key_pane .legend-row.sev-warning"))
             if len(rows) != 1:
@@ -164,6 +166,11 @@ def _measure_key_pane(tmp_path: Path) -> Dict[str, object]:
                 "key_max_scroll_y": key_pane.max_scroll_y,
                 "key_region": key_pane.region,
                 "body_region": body.region,
+                "card_region": card_pane.region,
+                # clause 0 — SIDE BY SIDE, card left. The defining property of
+                # the wide regime, and the one nothing else observes.
+                "key_right_of_card": key_pane.region.x >= card_pane.region.right,
+                "panes_share_a_row": key_pane.region.y == card_pane.region.y,
             }
 
     return asyncio.run(_drive())
@@ -172,8 +179,16 @@ def _measure_key_pane(tmp_path: Path) -> Dict[str, object]:
 def test_at216_key_pane_shows_warning_row_without_scrolling(tmp_path: Path) -> None:
     """AT-216 — at 120x30 the mac colour key is visible beside the card.
 
-    Four clauses, each failing on a different cause:
+    Five clauses, each failing on a different cause:
 
+    0. the panes are SIDE BY SIDE with the card left — ``key.region.x >=
+       card.region.right`` and both panes on the same ``region.y``. This is the
+       defining property of the wide regime and every other clause is blind to
+       it: an independent review removed the ``#legend_dialog.legend-narrow``
+       prefix from the narrow rules, collapsing 120x30 into a VERTICAL stack
+       (card ``Region(6,6,107,7)``, key ``Region(6,13,107,8)``), and all eight
+       tests in this module still passed — containment and ordering are equally
+       true of a stack. Swapping ``3fr``/``2fr`` was likewise unobserved;
     1. the key row is anchored on its ``{legend-row, sev-warning}`` classes
        INSIDE ``#legend_key_pane`` and CONTAINS the shipped meaning. Containment,
        not equality: the row is built ``f"{classification} — {meaning}"``
@@ -192,6 +207,17 @@ def test_at216_key_pane_shows_warning_row_without_scrolling(tmp_path: Path) -> N
     module's docstring.)
     """
     m = _measure_key_pane(tmp_path)
+
+    # clause 0 — side by side, card left. Nothing else in this module sees it.
+    assert m["key_right_of_card"], (
+        "the wide regime must place the key pane to the RIGHT of the card pane; "
+        f"key={m['key_region']} card={m['card_region']} — a vertical stack here "
+        "means the narrow rules are winning at 120 cols (unprefixed selectors)"
+    )
+    assert m["panes_share_a_row"], (
+        "the two panes must start on the same row in the wide regime; "
+        f"key={m['key_region']} card={m['card_region']}"
+    )
 
     # clause 1 — the anchor resolves, and it resolves uniquely.
     assert m["n_warning_rows"] == 1, (
@@ -623,30 +649,40 @@ def _rule_blocks_for(selector_fragment: str) -> List[Tuple[str, str]]:
 def test_tc518_key_pane_never_uses_height_auto(tmp_path: Path) -> None:
     """TC-518 — the key pane's height is a fraction, never ``auto``.
 
-    Two arms, because the source and the resolved style can disagree:
-    (a) no ``#legend_key_pane`` rule in ``styles.tcss`` declares ``height: auto``
-    (and there is more than one such rule, so the scan is not vacuous);
-    (b) the LIVE resolved height at the 80x24 floor is a ``FRACTION``.
+    Three arms, because the source and the resolved style can disagree AND the
+    two regimes resolve different rules:
+    (a) no ``#legend_key_pane`` rule in ``styles.tcss`` declares ``height:auto``
+        — matched by REGEX, not a whitespace-exact substring. An independent
+        review showed ``height:auto`` (no space) in the WIDE rule passed the old
+        substring scan *and* the floor probe, because at 80x24 the narrow rule
+        wins and the wide declaration is never resolved;
+    (b) the LIVE resolved height at the 80x24 floor is a ``FRACTION``;
+    (c) the LIVE resolved height at 120x30 is a ``FRACTION`` — the arm that
+        closes the gap (a) alone left open.
     """
     blocks = _rule_blocks_for("#legend_key_pane")
     assert len(blocks) >= 2, (
         f"expected the wide + narrow key-pane rules in styles.tcss, got {blocks}"
     )
+    height_auto = re.compile(r"height\s*:\s*auto", re.IGNORECASE)
     for selector, body in blocks:
-        assert "height: auto" not in body, (
+        assert not height_auto.search(body), (
             f"`height: auto` on the key pane is excluded by measurement (M-3: it "
             f"starves the card to 1 row and overflows #legend_body) — {selector!r}"
         )
 
-    async def _drive() -> Unit:
+    async def _drive(size: Tuple[int, int]) -> Unit:
         app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(80, 24)) as pilot:
+        async with app.run_test(size=size) as pilot:
             await pilot.pause()
             legend = await _open_legend(app, pilot, "mac")
             return legend.query_one("#legend_key_pane").styles.height.unit
 
-    unit = asyncio.run(_drive())
-    assert unit is Unit.FRACTION, f"the key pane resolved to {unit}, not a fraction"
+    for size in ((80, 24), (120, 30)):
+        unit = asyncio.run(_drive(size))
+        assert unit is Unit.FRACTION, (
+            f"at {size} the key pane resolved to {unit}, not a fraction"
+        )
 
 
 # --------------------------------------------------------------------------- #
