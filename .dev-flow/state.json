@@ -25,7 +25,8 @@
     "allocated": "AT-205+, TC-500+, R-TUI-099, HLR-104. Allocated from the MAXIMUM across all subsets + 1, not from any single subset."
   },
   "current_phase": 6,
-  "phase_status": "implemented-awaiting-operator-merge",
+  "phase_status": "done-merged",
+  "merged": "PR #159 SQUASH b457ef8, merged 2026-07-29T10:58:21Z. CI green at merge: tui-ci pass (29m18s) + snapshot pass (2m0s), mergeStateStatus CLEAN. This close-out commit exists because origin/main was left asserting phase_status implemented-awaiting-operator-merge and obsidian_synced false for a FINISHED batch - the exact stale-state defect batch-70 itself had to recover for batch-65 as PR #158, and the one that misled batch-70's own Phase-0 intake. Do not leave it for the next batch to find.",
   "note_session_2": "SECOND SESSION (2026-07-28, worktree fb-p2-batch-70-impl-92b3cd). It opened on a NEW branch cut off origin/main that did NOT contain the nine Phase-0 commits; claude/fb-p2-batch-70-bfc118 was FAST-FORWARDED into it, so the PR carries Phase 0 + the implementation. The Phase-0 branch and its worktree are frozen — do not push to them. AUTONOMY WAS RE-ASKED at this kickoff per feedback_standing_auth_per_batch and the operator CHANGED it: AUTONOMOUS UNTIL THE PR (not supervised per-increment, which is what the previous session recorded below). The operator still merges; nothing was self-merged.",
   "iterations_per_phase": { "0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0 },
   "artifacts": {

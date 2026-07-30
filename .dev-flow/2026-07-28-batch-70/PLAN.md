@@ -1,13 +1,13 @@
 # PLAN — batch-70 · FB-P2 implementation (multi-image runs + report fusion)
 
-> **START HERE.** Phases 0–5 are **CLOSED**. The implementation is complete and the PR is **awaiting the operator's merge**. Nothing is in flight.
+> **BATCH CLOSED.** All phases done; **PR [#159](https://github.com/jav201/s19_app/pull/159) MERGED as squash `b457ef8`** on 2026-07-29, CI green (`tui-ci` + `snapshot`). Nothing is in flight.
 
 ## Where we are
 
 | | |
 |---|---|
-| **Phase** | 0–5 ✅ CLOSED → **6 — awaiting operator merge** |
-| **Branch** | `claude/fb-p2-batch-70-impl-92b3cd` — the Phase-0 branch `claude/fb-p2-batch-70-bfc118` was **fast-forwarded into it**, so all nine Phase-0 commits are in the PR. ⚠️ The Phase-0 branch + its worktree are **frozen**; do not push to them. |
+| **Phase** | 0–6 ✅ **CLOSED — merged** |
+| **Branch** | `claude/fb-p2-batch-70-impl-92b3cd` (merged, squashed) — the Phase-0 branch `claude/fb-p2-batch-70-bfc118` was **fast-forwarded into it**, so all nine Phase-0 commits went in the PR. ⚠️ Both branches and their worktrees are now **spent**; do not push to them. |
 | **Base** | cut off `dc6aa71`; `origin/main` `f1f3987` merged in |
 | **Approval** | ⚠️ **CHANGED at the second session's kickoff (re-asked, never inherited): AUTONOMOUS UNTIL THE PR.** The previous session's *supervised per-increment* did **not** carry. The operator still merges; nothing was self-merged. |
 | **Flow revision** | `2026.07.28-rev1` · `flow_hash 0127a2767ff11c8a` · C-1…C-45 — **verified current (C-45 PULL). Re-verify at session start.** |
