@@ -21,7 +21,7 @@
     "allocated": "AT-212, TC-509, TC-509b."
   },
   "current_phase": 6,
-  "phase_status": "implemented-awaiting-operator-merge",
+  "phase_status": "done-merged",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -49,11 +49,21 @@
     "lint": "ruff on the new file -> All checks passed",
     "production_code": "NONE - git diff --stat origin/main -- s19_app/ is empty"
   },
-  "obsidian_synced": false,
+  "obsidian_synced": null,
   "created_at": "2026-07-30T00:00:00Z",
   "open_carries_lane_A": {
     "from_batch_70": "TWO of batch-70's three P3 carries REMAIN: (a) the fused document's O(V x ~6 lines) heading overshoot sits outside the byte budget; (b) per-variant caps bound ROWS, not bytes. The third (AC-6 byte-golden) is closed by THIS batch.",
     "from_batch_70_sync": "(c) a vault-sync step copies pilot SVGs recursively instead of using the section-5 flattening helper - the CAUSE behind batch-47's prune being undone; (d) batch-66 has a repo .dev-flow/ folder and no vault counterpart (undetermined).",
     "older": "R-3 - the batch-65 merge-gate docs' PROSE layer, P3, untouched."
-  }
+  },
+  "merged": "PR #161 SQUASH 4753589, merged 2026-07-30T16:07:28Z. CI green: tui-ci pass (34m58s) + snapshot pass (1m14s), mergeStateStatus CLEAN. Landing VERIFIED against origin/main's own copy, not the local one: golden + test present, stored blob 710 B with 0 CR bytes (survived the gitattributes round-trip), AT-212 in REQUIREMENTS.md, and git diff --stat 6d1b316 origin/main -- s19_app/ empty (test-only confirmed post-merge).",
+  "obsidian_sync_note": "NOT SYNCED, and deliberately not marked either way. /dev-flow-sync copies 01-requirements / 02-review / 04-validation / 05-postmortem / 06-docs; a /fast-dev-flow batch produces none of those - batch-71's whole record is SPEC.md. Marking it true would claim a sync that did not happen; marking it false implies an owed action that the route does not define. Null + this note states the actual situation. OPEN QUESTION for the operator: should fast-flow batches sync their SPEC.md to the vault, or is the repo their only home?",
+  "decisions_log": [
+    {
+      "phase": 6,
+      "date": "2026-07-30",
+      "decision": "close-out landed immediately after merge rather than deferred",
+      "notes": "batch-70 spent PR #158 recovering batch-65 from exactly this state and PR #160 fixing its own. Leaving origin/main asserting implemented-awaiting-operator-merge for a merged batch is the defect, not the paperwork."
+    }
+  ]
 }
