@@ -1,6 +1,6 @@
 # Requirements Document — s19_app — Batch 2026-07-30-batch-72
 
-> **Status: REVISION 2 — Phase-1 iterate complete, awaiting Phase-2 re-gate.**
+> **Status: REVISION 3 — Phase-2 re-gate discharged, Phase 2 APPROVED, Phase 3 authorized.**
 > Revision 1 was drafted by the prototyping session and approved at the Phase-1 gate
 > (2026-07-30). Phase 2 returned **9 blockers / 12 majors / 7 minors**
 > ([`02-review.md`](02-review.md)); this revision folds them, and every number the fold
@@ -186,22 +186,32 @@ overlapping x-bands.
 > (`.crc-field-input { border: none; height: 1 }`) is batch-59's approved R9 compact-row decision.
 > A same-widget-class rule was then proposed and also **rejected on measurement** (7 pre → 6 post).
 > The Switch-only rule is the only one of the three that is FALSE before and satisfiable after.
-> **Why this is a general guard and not special-pleading for one pair:** the subject set is derived
-> from the DOM (`app.query(Switch)`) and is **complete by construction** — the whole application
-> contains 2 `Switch` widgets, both from the single construction site `crc_designer_view.py:467`, so
-> a future third `Switch` enters the guarded set automatically. It coincides with HLR-072-1 *today*
-> precisely because those two switches are the only ones that exist.
+> **Why this is a general guard and not special-pleading for one pair:** the subject set is
+> **derived from the live DOM, never hand-listed** (C-31), and its completeness rests on a
+> **static fact about the source**: `Switch(` has exactly **one** construction site in the whole
+> package (`crc_designer_view.py:467`, executed grep), reached only from the Algorithm group, so
+> every `Switch` that can exist is on the CRC screen and inside the queried scope.
+> *Precision correction from the re-gate (N-4): `App.query` is **screen-scoped**
+> (`app._get_dom_base() -> Screen`), so it does not by itself certify "anywhere in the app" — the
+> **grep** carries that argument, not the query. The AT therefore queries the CRC screen and the
+> completeness claim is anchored to the single construction site.*
+> The guard coincides with HLR-072-1 *today* precisely because those two switches are the only ones
+> that exist — stated plainly rather than dressed up.
 
 **Acceptance: AT-214** —
-1. the subject set is **derived**, never hand-listed: `app.query(Switch)` filtered
-   `region.area > 0` (C-31);
+1. the subject set is **derived**: `screen.query(Switch)` filtered `region.area > 0` (C-31);
 2. the AT asserts the derived set is **non-empty** (`>= 2`), so a broken walk cannot pass vacuously;
 3. zero abutting `Switch` pairs under the §1.3 relation;
-4. **C-40 discharge:** an executed counterfactual must go RED **on this assertion line**, not on a
-   query error. Per Q-2 the counterfactual artifact is named explicitly: revert **`compose`'s pair
-   row to the two `_switch_row` calls** on a private copy (the CSS rule alone may not move the
-   geometry — the fusion is partly a *compose* fact), keep the AT's queried ids resolvable in both
-   trees, and paste the transcript showing an `assert` failure plus the restore hash.
+4. **C-40 discharge — counterfactual artifact named, and it is the WHOLE FILE:** on a private copy,
+   restore `crc_designer_view.py` from `origin/main` (`git checkout origin/main -- <file>`), run
+   AT-214, paste the transcript showing an `assert` failure plus the restore hash.
+   *Two wrong-reason failure modes are excluded by construction. (i) Reverting the CSS rule alone is
+   **not** sufficient — the fusion is partly a `compose` fact (two stacked `Horizontal` rows), so a
+   CSS-only revert may leave the AT GREEN. (ii) Reverting "just the pair row back to two
+   `_switch_row` calls" would raise `NameError`, because LLR-072-1.2 **deletes** `_switch_row` — an
+   error is not an assertion failure (`feedback_counterfactual_must_fail_on_its_assertion`). A
+   whole-file revert is safe here **specifically because AT-214 references no `#id`**: it queries by
+   widget type, so the set resolves in both trees.*
 
 ### HLR-072-4 — ~~Select chrome cap~~ **WITHDRAWN at revision 2**
 See §6.5 **W-1**. Measured (M-4): `height: 3` renders `CRC-32/ISO-HDLC` as **`CRC-32/I`** — 8 of 15
@@ -217,20 +227,27 @@ side-by-side — card left, key right — as two independently scrollable panes 
 
 **Acceptance: AT-216** — pilot 120x30, **mac** view, opened through the real `k` binding:
 1. **anchor on the widget, not the string** (Q-4): locate the key row by its
-   `{legend-row, sev-warning}` classes inside `#legend_key_pane` and compare its text to
-   `LEGEND_TABLE["MAC"]["Pale yellow"][1]` — derived from the data layer.
-   *Rationale: the literal `Pale yellow` also appears in a **card** caption (`legend.py:718`), i.e.
-   in the pane this assertion is meant to look away from;*
+   `{legend-row, sev-warning}` classes inside `#legend_key_pane` and assert
+   `LEGEND_TABLE["MAC"]["Pale yellow"][1] in row_text` — **containment, NOT equality**.
+   *Measured: the row is built as `f"{classification} — {meaning}"` (`screens.py:1191`), so
+   `text == meaning` is **False** and `meaning in text` is **True**; an `==` here would false-fail a
+   correct implementation. Both anchors independently disambiguate the panes — executed: **0** card
+   widgets carry `{legend-row, sev-warning}` and **0** contain the meaning string. The bare literal
+   `Pale yellow` does not disambiguate: it also appears in a **card** caption (`legend.py:718`);*
 2. **region containment, not rendered text** (Q-5 / project C-32):
-   `#legend_key_pane.region.contains_region(row.region)` with `scroll_offset == (0, 0)` asserted.
-   *Rationale: `render().plain` is geometry-blind — proven on the shipped tree, where the row sits
-   at `Region(x=22, y=27)` entirely outside `body.region=Region(22,6,76,15)` and the harness still
-   returns `True`;*
+   `#legend_key_pane.region.contains_region(row.region)` with `scroll_offset == (0, 0)` asserted;
+   **and `#legend_body.region.contains_region(#legend_key_pane.region)`**.
+   *Rationale for clause 2b (re-gate N-3): every other clause is relative to the pane, so all three
+   pass with the key pane rendered entirely off-dialog — executed, a CSS-specificity slip put the
+   pane at `x=113` outside a body spanning `[6,113)` and AT-216 stayed GREEN. `render().plain` is
+   independently geometry-blind — proven on the shipped tree, where the row sits at
+   `Region(x=22, y=27)` outside `body.region=Region(22,6,76,15)` and the harness still returns `True`;*
 3. **assert the cause, not only the symptom:** `#legend_key_pane.max_scroll_y == 0`.
    *Measured: key content is **14** rows in a **15**-row pane for both mac and map — **one row of
    slack**. This clause fails on budget exhaustion before the symptom appears;*
 4. **oracle mutation (C-32 discharge):** set the key pane `display: none` and confirm the AT goes
-   RED; paste the transcript.
+   RED; paste the transcript. *Note this mutation does **not** cover the off-dialog case — clause 2b
+   does; the two are complementary, not redundant.*
 
 *Measured geometry this requirement is pinned to: dialog `width: 96%` → 113 cols; modal chrome 6
 cols (`styles.tcss:1504-1508`, verified `113 − 107`); card pane `3fr` → **64** cols; key pane `2fr`
@@ -287,10 +304,22 @@ The six ids `_recompute` queries **shall** be declared as a module-level tuple i
 `crc_designer_view.py`, `_recompute` **shall** consume that tuple, and every widget it names
 **shall** report `_render_markup is False`.
 
-**Acceptance: AT-219** — pilot: iterate the **live module-level tuple** (not a hand-list) and assert
-each resolved widget's `_render_markup is False`; assert the tuple's length `>= 6` so a truncated
-tuple cannot pass vacuously. *This is the C-31 live-oracle pattern already used by
-`test_legend_n8.py:445-459`: a seventh surface added later is covered automatically.*
+**Acceptance: AT-219** — pilot, in two clauses that are deliberately different in kind:
+1. **the PIN (labelled as such):** iterate the **live module-level tuple** (never a hand-list) and
+   assert each resolved widget's `_render_markup is False`; assert `len(tuple) >= 6`.
+   *Honest labelling per C-40's corollary: all six sinks are **already** `markup=False` today
+   (`crc_designer_view.py:341,353,367,397,403,411`), so this clause is **invariant under this
+   batch** — it is a regression pin protecting the `compose` rewrite, not a gate on new behaviour.
+   It is exactly the guard S-1 asked for; it is simply not the thing that proves the hoist landed.*
+2. **the GATE (re-gate N-5/N-3):** `len(tuple) >= 6` admits a tuple that is hoisted, asserted, and
+   then **ignored** by a `_recompute` still carrying its hardcoded queries. So: monkeypatch the
+   module tuple to contain one bogus id, drive one `Input.Changed` through the surface, and assert
+   `_recompute` takes its `NoMatches` early return (`:1122-1124`) — i.e. the live surfaces do not
+   update. **This is the only clause that is FALSE before the hoist**, which is what makes it the
+   gate.
+
+*C-31 live-oracle pattern, as used by `test_legend_n8.py:445-459`: a seventh surface added later is
+covered by clause 1 automatically.*
 
 ## 4. Low-level requirements (LLR)
 
@@ -305,12 +334,12 @@ were an A-12 finding — every blocker in Phase 2 lived at LLR level.
 | **LLR-072-2.2** | HLR-072-2 | Hero row becomes `Horizontal(#crc_coverage_window, Vertical(warnings_group, id="crc_top_right"))`. | `#crc_top_right` has exactly one child group | `crc_top_right`, `crc_hero_row`, `crc_warnings_group` |
 | **LLR-072-2.3** | HLR-072-2 | `styles.tcss`: retire the `.crc-hero` (`:2005`) and `#crc_live_verify` rules. **No edit to `.crc-field-input` (`:1941-1948`) — batch-59's R9 decision stands.** | no `.crc-hero` / `#crc_live_verify` selector remains | `.crc-hero` |
 | **LLR-072-2.4** | HLR-072-2 | **Delete** `test_verdict_hero_center_aligned_in_hero_row` (AT-B59-05, `tests/test_crc_designer_view.py:1003-1047`). Deletion, not edit. | the function is absent; ledger `D = 1` | `AT-B59-05` |
-| **LLR-072-5.1** | HLR-072-5 | `LegendScreen.compose` (`screens.py:1194-1206`): replace `ScrollableContainer(*body, id="legend_body")` with `Horizontal(ScrollableContainer(*card, id="legend_card_pane"), ScrollableContainer(*key, id="legend_key_pane"), id="legend_body")`. **`_render_card()` / `_render_key()` are called unchanged and their returned widgets are re-parented, never reconstructed.** | both panes resolve; card/key widget counts match M-6 (mac 17/6, map 20/7) | `legend_body`, `legend_card_pane`, `legend_key_pane` |
+| **LLR-072-5.1** | HLR-072-5 | `LegendScreen.compose` (`screens.py:1194-1206`): replace `ScrollableContainer(*body, id="legend_body")` with `Horizontal(ScrollableContainer(*card, id="legend_card_pane"), ScrollableContainer(*key, id="legend_key_pane"), id="legend_body")` — **card first in compose, which is the WIDE order**; the floor order is produced at runtime by LLR-072-6.1's `move_child`, because textual 8.2.8 has no CSS ordering property. **`_render_card()` / `_render_key()` are called unchanged and their returned widgets are re-parented, never reconstructed.** | both panes resolve; card/key widget counts match M-6 (mac 17/6, map 20/7) | `legend_body`, `legend_card_pane`, `legend_key_pane` |
 | **LLR-072-5.2** | HLR-072-5 | `styles.tcss`: `#legend_dialog { width: 96% }`; `#legend_card_pane { width: 3fr; height: 1fr; overflow-y: auto }`; `#legend_key_pane { width: 2fr; height: 1fr; overflow-y: auto }`; **`overflow-y: auto` moves OFF `#legend_body` (`:1543-1546`) to `overflow: hidden`** so there are not three nested scroll contexts. | measured: card 64 cols, key 43 cols, `key.max_scroll_y == 0` at 120x30 | `#legend_body`, `#legend_dialog` |
-| **LLR-072-6.1** | HLR-072-6 | **The modal owns its own width regime.** `LegendScreen.on_mount` and `on_resize` read `self.app.size.width` against the **same breakpoint as `app.py:6202`** (`narrow = width < 120`) and toggle a `legend-narrow` class on `#legend_dialog`. | the class is present at 80x24 and absent at 120x30 — asserted by **TC-517**, because AT-217's geometry alone cannot distinguish "stacked because the rule fired" from "stacked because the panes collapsed" | `legend-narrow`, `legend_dialog` |
-| **LLR-072-6.2** | HLR-072-6 | `styles.tcss`: `#legend_dialog.legend-narrow #legend_body { layout: vertical }` with the key pane **first in document order**, `#legend_key_pane { width: 100%; height: 1fr }`, `#legend_card_pane { width: 100%; height: 1fr }`. **`height: auto` on the key pane is excluded by measurement** — it starves the card to 1 row and overflows `#legend_body`. | measured `1fr/1fr` at 80x24 → key h=4, card h=5, both non-zero, `key.max_scroll_y` 6 (mac) / 7 (map) | `legend-narrow`, `legend_key_pane`, `legend_card_pane` |
+| **LLR-072-6.1** | HLR-072-6 | **The modal owns its own width regime, and it owns the ORDER.** `LegendScreen.on_mount` and `on_resize` read **`self.app.size.width`** against the same breakpoint as `app.py:6202` (`narrow = width < 120`), toggle a `legend-narrow` class on `#legend_dialog`, **and reorder the panes via `#legend_body.move_child(...)`** — key before card when narrow, card before key when wide. Idempotent: safe to call on every resize. **`self.app.size.width` — NOT `self.size.width`**, which is 118 under `run_test(size=(120,30))` because of `Screen { padding: 1 }` and would flip the wide case into the narrow regime. | class present at 80x24 / absent at 120x30 **and** `#legend_key_pane` precedes `#legend_card_pane` in `#legend_body.children` when narrow — both asserted by **TC-517** | `legend-narrow`, `legend_dialog`, `legend_body` |
+| **LLR-072-6.2** | HLR-072-6 | `styles.tcss`, **every rule prefixed `#legend_dialog.legend-narrow`**: `… #legend_body { layout: vertical }`, `… #legend_key_pane { width: 100%; height: 1fr }`, `… #legend_card_pane { width: 100%; height: 1fr }`. **`height: auto` on the key pane is excluded by measurement** (it starves the card to 1 row and overflows `#legend_body`). | measured `1fr/1fr` at 80x24 → key h=4, card h=5, both non-zero, `key.max_scroll_y` 6 (mac) / 7 (map); **and the wide regime is unchanged** — card 64 / key 43 at 120x30 | `legend-narrow`, `legend_key_pane`, `legend_card_pane` |
 | **LLR-072-7.1** | HLR-072-7 | **No `legend.py` edit.** A grouping helper in `screens.py` is permitted **only** to wrap the widget lists returned by `_render_card()` / `_render_key()` in containers; it **shall not** reconstruct rows from text or re-wrap `#legend_mac_warning_sample`'s markup (S-2b). | `git diff origin/main -- s19_app/tui/legend.py` empty | `legend_mac_warning_sample` |
-| **LLR-072-8.1** | HLR-072-8 | Hoist `_recompute`'s six queried ids (`crc_designer_view.py:1115-1121`) into a module-level tuple; `_recompute` consumes it. | `len(tuple) >= 6`; `_recompute` behaviour unchanged | the six `_recompute` ids |
+| **LLR-072-8.1** | HLR-072-8 | Hoist `_recompute`'s six queried ids (`crc_designer_view.py:1115-1121`) into a module-level tuple and have `_recompute` consume it. **The six ids bind to six DISTINCT roles with three different error-path strings, so consumption shall be BY NAME (a mapping / named lookups), never a positional unpack** (re-gate N-5) — under an unpack the claimed "a 7th surface is covered automatically" becomes a `ValueError` raised on the UI thread, and AT-219 clause 1 cannot detect it. | `len(tuple) >= 6`; `_recompute` behaviour byte-identical on the happy path AND on the `Invalid parameters` error path; AT-219 clause 2 RED before the hoist | the six `_recompute` ids |
 
 ## 5. Validation strategy
 
@@ -394,7 +423,7 @@ disappearance is not a decision (C-40 limb 2, instance ii). All four are now dis
 |---|---|---|
 | **G-1** — control separability | `HANDOFF-PLAN.md:120` | ✅ **ENCODED, re-scoped to `Switch` pairs** — HLR-072-3 / AT-214. The original scope was measured unsatisfiable (P-9/P-11) |
 | **G-2** — state legible as glyph/word, not slider position alone | `HANDOFF-PLAN.md:121` | ❌ **RETIRED — see §6.5 R-1.** The rendered state word was **Variant A's** mechanism (`NOTES.md:66`); the operator chose **B**, which "steals nothing" (`:104`). Encoding A's guarantee against B's design is a category error, and revision 1's discharge (asserting the CRC vector changes) proved handler *wiring* — already covered at `test_crc_designer_view.py:414-415` — not legibility. **Carried to the backlog**, not dropped |
-| **G-3** — hero extent / the 6:1 law | `HANDOFF-PLAN.md:122` | ⚪ **NOT ENCODED, with reason stated.** The guard bounds *excess* hero extent; this batch reduces the hero-tile count from 2 to 1 (`#crc_live_verify` retired), so the change strictly *decreases* the quantity G-3 bounds and cannot violate it. Re-encode if a future batch adds hero extent |
+| **G-3** — hero extent / the 6:1 law | `HANDOFF-PLAN.md:122` | ⚪ **NOT ENCODED — and the first reason given for that was wrong.** *Rejected rationale (revision 2):* "the batch reduces the hero-tile count from 2 to 1, so it strictly decreases the quantity G-3 bounds." **Measured at the re-gate (N-6) and false:** `#crc_coverage_window` has area **305** while `#crc_live_verify` and `#crc_warnings_group` are identical `30x4` boxes of area **120** each — retiring one tile and giving its space to the other changes the bounded quantity by **zero**. Worse, G-3 is **already FALSE on `main`**: the measured ratio is **2.54:1** against a 6:1 law. *Actual reason it is not encoded:* it is a **pre-existing, unrelated violation** that this batch neither causes nor worsens; encoding it here would make batch-72's gate fail on batch-59's geometry. **Carried to the backlog with the measured 2.54:1**, which is the honest disposition |
 | **G-4** — the colour key is reachable within ≤1 interaction at 120x30 **and** 80x24 | `HANDOFF-PLAN.md:123` | ✅ **ENCODED, split by regime** — at 120x30 into AT-216 (0 interactions: visible at `scroll_offset 0`, `max_scroll_y == 0`) and at 80x24 into AT-217 clause 3 (1 interaction: reachable under scroll). Measurement is why it splits — the floor cannot satisfy 0 |
 
 ### 6.5 Requirement amendments (Before/After · Deleted/New)

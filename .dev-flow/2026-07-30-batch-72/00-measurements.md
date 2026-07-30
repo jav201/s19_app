@@ -591,6 +591,35 @@ writing into the requirement:
 
 ---
 
+## M-7 CRC kernel values named by AT-213 / AT-215 *(added at the Phase-2 re-gate)*
+
+Revision 2 labelled these "Measured" while they lived only in the qa lane review — a citation of
+another document is not evidence (C-43). Re-executed here, and independently reproduced by both
+re-gate reviewers:
+
+| Quantity | Value | Used by |
+|---|---|---|
+| `SEED_ALGORITHM` | CRC-32/ISO-HDLC, `refin=True`, `refout=True`, `check=0xcbf43926` | AT-213, AT-215 |
+| `#crc_custom_vector` seed | `"123456789"` (**not** empty — so the observable genuinely moves) | AT-213 |
+| default computed vector | **`0xCBF43926`** (the externally published CRC-32 check value) | AT-213 |
+| after driving `refin` → `False` (the non-default, C-10) | **`0x1898913F`** | AT-213 |
+| after driving `refout` → `False` | `0x649C2FD3` | *(not used — recorded to show `refin` was chosen deliberately)* |
+| `#crc_field_check` → `0x00000000` | verdict `✓ MATCH` → **`✗ MISMATCH`** | AT-215 |
+| `#crc_field_check` cleared | `○ NO-EXPECTED` (`check=None`) — **excluded near-miss** | AT-215 |
+| `#crc_field_check` non-hex | `"Invalid parameters: …"` — **excluded near-miss** | AT-215 |
+
+## M-8 Hero extent on `main` *(added at the Phase-2 re-gate — refutes a rationale, not a requirement)*
+
+```
+#crc_coverage_window   area = 305
+#crc_live_verify       30 x 4 = 120
+#crc_warnings_group    30 x 4 = 120
+ratio 305:120 = 2.54 : 1   (the G-3 "6:1 law" is ALREADY FALSE on main)
+```
+
+Retiring `#crc_live_verify` and giving its space to `#crc_warnings_group` changes the bounded
+quantity by **zero**. See §6.4 G-3 — the pre-existing 2.54:1 violation is carried to the backlog.
+
 ## Summary table — what the requirements must be amended to say
 
 | Measurement | Value | Requirement it constrains |

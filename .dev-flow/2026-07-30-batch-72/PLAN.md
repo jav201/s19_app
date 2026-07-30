@@ -31,8 +31,8 @@ key-first stack at the floor). Route: **full `/dev-flow`** (operator invoked it)
 | Phase | Status | Artifact |
 |---|---|---|
 | 0 — intake | ✅ done (prep) + RC-1 **re-verified at `31d87d0`** by the executing session | §2.6 of 01-requirements.md |
-| 1 — requirements | ✅ approved (rev 1) → ⚠️ **ITERATED → REVISION 2** (1 iteration) | `01-requirements.md` + `00-measurements.md` |
-| 2 — cross-review | ⚠️ **9 blockers → iterate**; re-gate on revision 2 in progress | `02-review.md` (+ 3 lane files) |
+| 1 — requirements | ✅ **REVISION 3** — rev 1 approved → 9 blockers → rev 2 → re-gate blocker → rev 3 (2 iterations) | `01-requirements.md` + `00-measurements.md` |
+| 2 — cross-review | ✅ **re-gate discharged** — qa `approve`, architect's 1 new blocker folded | `02-review.md`, `02-regate-architect.md`, `02-regate-qa.md` |
 | 3 — implementation | not-started | suggested cut below |
 | 4 — validation | not-started | — |
 | 5 — postmortem | not-started | — |
@@ -82,6 +82,33 @@ the defect, not closed it.
 on 4 of 6 Selects. Minimum legible height is 6, which is what `height: auto` already gives. The
 number came from the prototype pass and would have shipped a control that lies about its value.
 
+## Phase-2 RE-GATE — the fold introduced its own blocker, and that is why it ran
+
+qa returned **`approve`** (0 blockers; all 5 of its Phase-2 blockers closed, one *dissolved* by the
+HLR-072-4 withdrawal). The architect returned **1 new blocker — created by the fold itself**:
+
+> **N-1.** LLR-072-5.1 pinned `compose` as **card-first**; HLR-072-6 / AT-217 require **key first**
+> at the floor. Textual 8.2.8 has no CSS ordering property — only `dock`. Executed with exactly the
+> specified compose + CSS + hook: `key.y < card.y` → **False** at 80x24 in both views. The tell was
+> *inside the requirement*: LLR-072-6.2's threshold "key h=4, card h=5" is the **key-first**
+> measurement, so M-3 had measured a tree the requirement did not specify. Composing key-first
+> instead breaks HLR-072-5 (the key would render left at 120x30).
+> **Resolved in revision 3:** the regime hook owns the order — `#legend_body.move_child(key,
+> before=card)` when narrow, restored when wide. The reviewer executed this remedy and confirmed it
+> satisfies all three AT-217 clauses while keeping 64/43 in the wide regime.
+
+Six further majors folded, each with an executed basis: the narrow CSS rules were **unprefixed**
+(equal specificity + later source order → they overrode the wide regime, putting the key pane at
+`x=113`, outside the body); **AT-216 passed on that broken layout**, so it gains a
+`#legend_body.contains_region(pane)` clause; `App.query` is **screen-scoped**, so the Switch
+completeness argument is now anchored to the single construction site rather than to the query;
+AT-214's counterfactual must revert the **whole file** (reverting just the pair row raises
+`NameError`, since LLR-072-1.2 deletes `_switch_row` — an error is not an assertion failure);
+AT-219 gains a real gate clause (the pin was invariant — all six sinks are already `markup=False`);
+and **G-3's stated reason was a rationalisation** — measured, the hero tiles are identical `30x4`
+boxes, so the batch changes the bounded quantity by zero, and the 6:1 law is *already* violated on
+`main` at **2.54:1**.
+
 ## Phase-3 increment cut (re-derived per C-21 — the AT set changed)
 - **Inc-1 — Legend two-pane** (`screens.py`, `styles.tcss`, new AT file): LLR-072-5.1/5.2, 7.1.
   ATs 216/218 + TC-515/516/519.
@@ -119,9 +146,12 @@ number came from the prototype pass and would have shipped a control that lies a
   BACKLOG-PROCESS companion item (why `/tui-design` missed these) stays in lane B.
 
 ## Test ledger
-Base at prep: 2358 collected (batch-71 close). This batch: +6 AT nodes + TCs (ledger
-`post = base − D + A` reconciled at each gate; deletions expected 0 unless
-`_switch_row` orphan-removal drops a TC).
+**base = 2379**, measured `python -m pytest --collect-only -q` on 2026-07-30 @ `b556e35`
+(the prep session's 2358 was stale by 21 — M-5). **`D = 1`**: LLR-072-2.4 deletes
+`test_verdict_hero_center_aligned_in_hero_row` (AT-B59-05). `D = 1` is the **complete**
+deletion set — re-gate confirmed the node is non-parametrized and
+`grep -rl "_switch_row" tests/` → 0 files, so LLR-072-1.2's helper removal drops no TC.
+`A` = 7 ATs + 10 TCs. Reconcile `post = base − D + A` at each gate.
 
 ## Prototype teardown (batch-close obligation)
 DELETE `prototypes/crc_designer.p1.*`, `legend_p1.*`, `p1_design_defects.*`,
