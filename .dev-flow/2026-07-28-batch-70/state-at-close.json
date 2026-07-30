@@ -1,0 +1,150 @@
+{
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-07-28-batch-70",
+  "batch_objective": "FB-P2 IMPLEMENTATION — run a saved Flow across multiple images/variants and fuse the per-image results into ONE report. Threads the project's existing variant set (plan_variant_executions) through flow_execution_service, overriding SourceBlock.image_ref per variant at run time with per-variant isolation, and composes a single fused report with per-variant sections. Design is CLOSED (batch-69, ADR §12 + .fast-dev-flow/spec.md): D-1..D-8 resolved, AC-1..AC-7 observable, 4 increments. D-7 IS NON-NEGOTIABLE: the fused report is bounded BY CONSTRUCTION, per variant, IN THE PRODUCER — batches 62/63/65 were all spent on unbounded report producers and one exhausted the operator's machine; fusion multiplies row cardinality by the variant count. Verified with an INJECTED COUNTING ITERABLE, never wall-clock or peak-memory (batch-63 proved those cannot distinguish cap-and-continue from cap-and-break). EXPLICITLY OUT OF SCOPE: the Patch-Editor variant path, FB-P3 CRC sub-flow, PKI extraction (blocked on operator definition), and the engine-frozen set.",
+  "note_prior_batch": "batch-65 (R-TUI-098, _addendum_lines producer bounding) DONE + MERGED PR #149 squash b691f21. Its close-out was completed but NEVER MERGED until batch-70 recovered it as PR #158 squash f1f3987 — origin/main had been asserting phase_status: in-progress and obsidian_synced: false for a finished batch, which misled THIS batch at its own Phase-0 intake. Full state at close archived at .dev-flow/2026-07-28-batch-65/state-at-close.json. All five merge-gate corrective items are now discharged.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md — read THIS at Phase 0 and reconcile it at close. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "route": "full /dev-flow. PHASE 0 CLOSED (see phase0_result). NEXT = Phase 1 — requirements derivation, architect + qa-reviewer in parallel.",
+  "rc1": "VERIFIED 2026-07-28. git fetch origin; origin/main tip = dc6aa71 at cut; HEAD = merge-base = dc6aa71 (equal, no rebase needed); working tree clean. origin/main has since advanced to f1f3987 (PR #158, this batch's own recovery of batch-65's close-out) and that commit IS merged into this branch. Frozen-source guard tests/test_engine_unchanged.py -> 1 passed. ALREADY-SHIPPED CHECK EXECUTED: FlowContext has no variant field (flow_model.py:226-228 = project_dir/mac_records/a2l_data); run_flow(flow, ctx) takes no variant; only 3 'variant' occurrences in the 531-line flow_execution_service.py -> FB-P2 multi-image is NOT shipped.",
+  "flow_revision": "2026.07.28-rev1 · flow_hash 0127a2767ff11c8a · controls C-1..C-45. VERIFIED CURRENT against ~/.claude/docs/FLOW-VERSION.md at Phase 0 (C-45 PULL). Re-verify at every subsequent session: the aggregate command is in that manifest. Three controls were encoded FROM this batch and pushed upstream (claude-config 061bf93, claude-skills 18e499d): C-43 premise evaluation, C-44 session-close file reconciliation, C-45 the flow is a shared asset.",
+  "standing_authorization": {
+    "date": "2026-07-28",
+    "session": "batch-70 kickoff (asked at THIS kickoff, NEVER inherited from batch-65 or batch-69)",
+    "autonomy": "SUPERVISED PER-INCREMENT — the operator approves every gate and merges the PR. NOT autonomous. NOT self-merge.",
+    "operator_phrasing": "Supervisado por incrementos. Hagamos algo, en cada etapa, haz evaluaciones lógicas de las premisas (proposiciones lógicas) además de verificar junto a requerimiento; los requerimientos son ley pues están validados y verificados, si son nuevos no son ley hasta esa etapa. si la premisa es falsa, falta validación o verificación o el requerimiento se interpreta mal (ambiguo o incompleto) esto necesitamos ponerlo en práctica y si es fructífero agregarlo a backlog como implementación en dev-flow y fast-dev-flow.",
+    "operator_amendment": "Los axiomas (requerimientos validados) son re-litigables si existen contraejemplos o si son lógicamente invalidados (generalmente por INCOMPLETITUD), pero con el fin de AGRANDAR la base de verdad (requerimientos más completos).",
+    "premise_control_status": "ENCODED as C-43 during this batch, in both global flows + req-template §2.7 + the dev-flow-lessons catalog. It is no longer an experiment — Phase 1 onward MUST fill §2.7.",
+    "communication": "Decisions are presented as TABLES of Option / Expected result / Consequences. Prefer tables with ✅❌⚠️❓ glyphs over prose everywhere.",
+    "decision_recording": "Supervised, so few decisions are taken without asking; any that are get logged in PLAN.md's decision log, in decisions_log below, and in 05-postmortem.md."
+  },
+  "id_allocation": {
+    "method": "EXECUTED union census across REQUIREMENTS.md + tests/ + .dev-flow/ on this tree, restricted to *.py/*.md and EXCLUDING __pycache__ (the project has no AT/TC registry — backlog OB-2 — so next-free is subset-dependent and must be measured).",
+    "measured": "AT max: 203 (REQUIREMENTS.md), 203 (tests/), 204 (.dev-flow/). TC max: 499 (REQUIREMENTS.md), 499 (tests/), 1728 (.dev-flow/ — the KNOWN stray at .dev-flow/2026-07-08-batch-29/_qa-acceptance-validation.md:252, excluded after inspection, same exclusion batch-65 made). R-TUI max 098. HLR max 103.",
+    "false_positive_caught": "A first census reported AT/TC max 841. It was a BINARY artefact — the grep swept tests/__pycache__/*.pyc. Re-run restricted to *.py/*.md. Recorded because an id allocated off a binary would bind two observables to one id.",
+    "allocated": "AT-205+, TC-500+, R-TUI-099, HLR-104. Allocated from the MAXIMUM across all subsets + 1, not from any single subset."
+  },
+  "current_phase": 6,
+  "phase_status": "done-merged",
+  "merged": "PR #159 SQUASH b457ef8, merged 2026-07-29T10:58:21Z. CI green at merge: tui-ci pass (29m18s) + snapshot pass (2m0s), mergeStateStatus CLEAN. This close-out commit exists because origin/main was left asserting phase_status implemented-awaiting-operator-merge and obsidian_synced false for a FINISHED batch - the exact stale-state defect batch-70 itself had to recover for batch-65 as PR #158, and the one that misled batch-70's own Phase-0 intake. Do not leave it for the next batch to find.",
+  "note_session_2": "SECOND SESSION (2026-07-28, worktree fb-p2-batch-70-impl-92b3cd). It opened on a NEW branch cut off origin/main that did NOT contain the nine Phase-0 commits; claude/fb-p2-batch-70-bfc118 was FAST-FORWARDED into it, so the PR carries Phase 0 + the implementation. The Phase-0 branch and its worktree are frozen — do not push to them. AUTONOMY WAS RE-ASKED at this kickoff per feedback_standing_auth_per_batch and the operator CHANGED it: AUTONOMOUS UNTIL THE PR (not supervised per-increment, which is what the previous session recorded below). The operator still merges; nothing was self-merged.",
+  "iterations_per_phase": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
+  },
+  "artifacts": {
+    "plan": ".dev-flow/2026-07-28-batch-70/PLAN.md",
+    "requirements": ".dev-flow/2026-07-28-batch-70/01-requirements.md",
+    "validation": ".dev-flow/2026-07-28-batch-70/04-validation.md",
+    "postmortem": ".dev-flow/2026-07-28-batch-70/05-postmortem.md",
+    "docs": ".dev-flow/2026-07-28-batch-70/06-docs/ (traceability-matrix, executive-summary, functionality, diagrams/architecture) - PRODUCED AT THE SYNC, not at merge: they did not exist when PR #159 was merged and the sync's own reject-check is what caught the missing Phase-6 deliverable.",
+    "review": "ABSENT BY ROUTE, not lost. The autonomous route ran no separate Phase-2 review; review evidence lives in the increment commit bodies and 05-postmortem.md section 5. Declared in the vault index and in 06-docs/traceability-matrix.md section 4 so a later reader does not hunt for a missing file.",
+    "requirement_entry": "REQUIREMENTS.md - R-TUI-099",
+    "code": [
+      "s19_app/tui/services/flow_model.py",
+      "s19_app/tui/services/flow_execution_service.py",
+      "s19_app/tui/services/flow_fused_report_service.py (NEW)",
+      "s19_app/tui/screens_directionb.py",
+      "s19_app/tui/app.py"
+    ],
+    "tests": [
+      "tests/test_flow_multi_image.py (NEW, 11)",
+      "tests/test_flow_report_fusion.py (NEW, 13)",
+      "tests/test_flow_multi_image_ui.py (NEW, 11)"
+    ],
+    "commits": [
+      "ebca4cc Inc-1",
+      "4573d43 Inc-2+3",
+      "2b6c3a5 Inc-4"
+    ]
+  },
+  "phase1_result": {
+    "premise_evaluation": "10 premises executed against disk. 9 TRUE, 1 FALSE. P-2 FALSE: VariantDescriptor.path is ABSOLUTE and _resolve_manifest_entry REJECTS absolute refs by design (variant_execution_service.py:263-272, executed both arms), so the design's unstated override FORM would have failed every variant and the tempting fix is to bypass the containment seam. Disposition ENLARGED D-2 rather than replacing it: LLR-104.1 binds a project-RELATIVE POSIX ref through the reused seam - and that is also what makes AC-7 reachable, because a path that will not relativise IS the containment rejection.",
+    "design_gap_found": "D-4's second clause ('no per-variant files') had NO owning increment in the inherited table. With a REPORT block, each variant's run_flow would have written its own report - V files, the manual collation FB-P2 exists to remove - and EVERY composer-level test would still have been green, because the defect is a count of FILES. Closed with FlowContext.defer_report + an artifact-on-disk acceptance.",
+    "d7_counterfactual": "EXECUTED on a COPY of the fixed tree (never the pre-change tree, which would fail at import and prove nothing). Three islice sites reverted; both AT-209 nodes fail ON THEIR ASSERTION: 'assert 1200 <= 60' and the missing '> **Cut in `a`:** findings: 25 omitted (cap 60 per variant).'"
+  },
+  "design_inherited": {
+    "source": "batch-69, DESIGN ONLY, merged as PR #157 dc6aa71. Records: .fast-dev-flow/ADR-flow-builder-tracer.md §12 (durable commitments) and .fast-dev-flow/spec.md (full rationale, AC-1..AC-7, the 4-increment plan).",
+    "status_under_C43": "HYPOTHESIS, NOT AXIOM. batch-69 shipped no code and validated nothing; being written down by a prior batch does not make it verified. Every decision and AC enters Phase 1 as a hypothesis and must earn its own validation.",
+    "decisions": "D-1 image set = the project's variant set (plan_variant_executions), never a path list — a list escapes project containment. D-2 SourceBlock.image_ref overridden PER RUN; the flow file is untouched. D-3 per-variant isolation — one abort does not kill the run. D-4 ONE fused report, per-variant sections, no per-variant files. D-5 status = worst-across-variants PLUS explicit n_ok/n_issues/n_error (a rollup that cannot be inverted lies by omission). D-6 variant identity = variant_id, file-derived, escaped through the batch-62 md_safe path. D-7 the fused report is bounded BY CONSTRUCTION, per variant, IN THE PRODUCER. D-8 no new viewer — write through write_flow_report so REPORT_FILENAME_REGEX and ReportViewerScreen pick it up unchanged.",
+    "acceptance": "AC-1 V variants -> V executions (oracle: injected counting iterable). AC-2 variant k aborts, k+1..V still execute. AC-3 exactly one section per executed variant, variant_id escaped. AC-4 rolled-up status is the worst, and n_ok/n_issues/n_error sum to the executed count. AC-5 with every variant over the cap, EVERY variant is still represented and each cut section names its dropped count — must be shown FAILING against an unbounded implementation. AC-6 unscoped run is byte-identical to today's single-image path. AC-7 (added batch-70) a variant whose image_ref fails containment fails THAT variant closed with its rejection code while the others execute, and the REJECTING_CODES census covers the variant path."
+  },
+  "phase0_result": {
+    "verdict": "APPROVED. 2 findings, both folded into the inherited design before Phase 1; D-1..D-8 unchanged.",
+    "premise_evaluation": "10 design premises executed against disk. 8 TRUE exactly — including both file line-counts (971/531) and a cited line ADDRESS. 2 failed. This is the first application of C-43 and it paid for itself twice.",
+    "F1_FALSE": "The 'seam marker' premise is FALSE as characterized. ADR §12 and spec §2 read flow_execution_service.py:343's variant_id=None as 'the single-variant assumption is explicit in the code' and concluded FB-P2 is 'mostly threading an existing dimension, not building one'. The line is real AT THAT ADDRESS but sits inside the CRC BLOCK HANDLER's OperationInput (:339-346); OperationInput.variant_id is the operations kernel's REPORTING METADATA (s19_app/tui/operations/model.py:44-46). The module has NO variant dimension: the only three 'variant' occurrences in 531 lines are the docstring :7, the _resolve_manifest_entry import :66, and that CRC line. GENUINELY REUSED: _resolve_manifest_entry (4 call sites :135/:190/:250/:309) + plan_variant_executions. BUILT, not threaded: the flow-layer variant dimension. REAL Inc-1 BINDING POINTS: run_flow's signature, FlowContext (flow_model.py:226-228), and the SOURCE image_ref override at :135 — NOT :343. An implementer trusting the old text wires the variant into the CRC OperationInput and believes Inc-1 closed. Corrected in ADR §12 + spec §2 (commit b037186).",
+    "F2_INCOMPLETENESS": "spec §7 declares the containment constraint MANDATORY ('a variant whose ref fails containment must fail that variant closed without aborting the others — D-3 must not become a containment bypass'), yet NO AC-1..AC-6 observed it. AC-2 covers 'variant k aborts', and an abort is NOT a containment rejection. Folding into AC-2 was REJECTED: an AC with two distinct subjects is where batch-65's AT-197 lost its threshold. AC-7 added instead, consuming the EXISTING C-31 census REJECTING_CODES (flow_persistence_service.py:117 — 'a new reject arm shipped without a battery row goes RED') rather than building a new oracle. Spec §5 re-cut per C-21 so AC-7 has an owning increment (Inc-1). This is the operator's constructive-re-litigation rule working as intended: the requirement set came out LARGER.",
+    "gate_axes": "Coverage: all 7 ACs carry a declared observable and an owning increment. Certainty: RC-1 verified; already-shipped check executed and negative; 10/10 premises executed with pasted evidence. Evidence: every premise row cites a re-runnable probe or a file:line."
+  },
+  "increment_plan": {
+    "inc1": "FlowContext + run_flow gain the variant dimension; loop the planned set with per-variant isolation; SOURCE image_ref override. D-1..D-3. AC-1, AC-2, AC-7, AC-6. Binding points: run_flow signature, FlowContext, flow_execution_service.py:135 — NOT :343.",
+    "inc2": "FlowReportState gains per-variant sections; fused composer + rollup. D-4..D-6. AC-3, AC-4.",
+    "inc3": "PER-VARIANT PRODUCER BOUNDING + the cut notice. D-7. AC-5. Oracle = injected counting iterable; AC-5 must be shown RED against an unbounded implementation.",
+    "inc4": "UI: scope selector in FlowBuilderPanel; wire through. D-8.",
+    "constraint": "<= 5 files per increment. Supervised gate after each. code-reviewer reviews each diff before operator approval."
+  },
+  "security": {
+    "required": true,
+    "constraint": "Every per-variant image ref resolves through the REUSED _resolve_manifest_entry, NEVER a fork — that is the containment boundary batch-53 hardened, and flow_execution_service already imports it at :66. Multi-image multiplies resolutions per run, so a fork multiplies the escape surface. D-3 must not become a containment bypass. The REJECTING_CODES reject-arm census must cover the variant path (this is AC-7).",
+    "not_a_flag_but_recorded": "D-7 is a denial-of-service consideration, not a confidentiality one. Treated as load-bearing anyway because this project has already had a report producer exhaust host RAM."
+  },
+  "decisions_log": [
+    {
+      "phase": 0,
+      "date": "2026-07-28",
+      "decision": "Scope = FB-P2 implementation only; supervised per-increment",
+      "notes": "Operator ruling at kickoff. Autonomy asked at THIS kickoff and NOT inherited."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-28",
+      "decision": "Premise evaluation adopted as a standing gate obligation, then ENCODED as C-43",
+      "notes": "Operator instruction, amended mid-session to make axioms constructively re-litigable. It caught F-1 and F-2 on first use, so it was encoded in both global flows + req-template §2.7 + the lessons catalog rather than left as an experiment."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-28",
+      "decision": "AC-7 adopted as a SEVENTH acceptance criterion rather than folded into AC-2",
+      "notes": "Operator choice from a 3-option table. Folding was rejected on this project's own evidence (batch-65 AT-197 lost its threshold as a two-subject acceptance). AC-7 consumes the existing REJECTING_CODES C-31 census rather than building a new oracle."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-28",
+      "decision": "F-1 corrected in the inherited ADR + spec rather than carried as a backlog note",
+      "notes": "Operator instruction ('corrige'). The correction ENLARGES rather than deletes: it states what IS genuinely reused vs what is built, and names the real Inc-1 binding points, because that is the part that would have cost an increment."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-28",
+      "decision": "Phase 0 gate — APPROVE",
+      "notes": "No exit-criteria axis unmet. 2 findings raised and both folded before Phase 1."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-29",
+      "decision": "synced-to-obsidian",
+      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches6-07-28-batch-70\\ . NOT A CLEAN SYNC and it is not reported as one: (a) 06-docs/ did not exist at merge and was PRODUCED at this sync - the reject-check caught the missing Phase-6 deliverable; (b) 02-review.md does not exist and was NOT fabricated - the autonomous route ran no separate Phase-2 review, recorded in the index and the traceability matrix; (c) 80 vault files in the legacy NESTED svgs/<case>/ layout that batch-47 recorded as PRUNED are BACK, dated 2026-07-27 - RULED 2026-07-29 by the operator: KEEP as historical context, and CLASSIFIED in visual-evidence.md section 6 so no future sync re-flags them. Root cause recorded with them: a sync between batch-47 and batch-63 copied recursively instead of using the section-5 flattening helper, which is why batch-47's deletion did not hold; (d) batch-66 has a .dev-flow/ folder in the repo and no vault counterpart."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-29",
+      "decision": "vault nested-layout duplicates KEPT and classified, not deleted",
+      "notes": "Operator ruling. 16 dirs / 80 files (75 live-case + 5 already-listed retired pv__case_06) declared in visual-evidence.md section 6 as SUPERSEDED-retained-as-context, with an explicit sync contract: exclude them from the freshness reject-check, compute freshness over the FLATTENED files only. Also recorded there: do not re-prune without first fixing the recursive-copy step, because the previous prune was undone by exactly that."
+    }
+  ],
+  "obsidian_synced": true,
+  "created_at": "2026-07-28T00:00:00Z",
+  "stories": {
+    "US-FBP2-1": "As an operator with a project holding several image variants, I run a saved Flow once and it executes against every variant, so I stop re-running the same flow by hand per image. READY.",
+    "US-FBP2-2": "As an operator reading the result of a multi-image run, I get ONE report whose per-variant sections and inverted counts let me tell which images passed and which did not, and whose evidence is never silently truncated, so a fused report cannot read as 'covered everything' when it was cut. READY."
+  },
+  "open_carries_lane_A": {
+    "R-3": "P3 — the two batch-65 merge-gate documents had their MECHANICAL layer verified clean at batch-70 (21/21 file paths exist, 16/16 AT/TC nodes present, golden matches on both size and SHA256, the 2233->2319 suite delta fully attributed). The PROSE layer (741 lines, reasoning defects) remains unread. Non-blocking.",
+    "note": "R-1 and R-2 were discharged at batch-70 (ba19c3d, 1bd4ebf). All five batch-65 merge-gate corrective items are closed."
+  }
+}
