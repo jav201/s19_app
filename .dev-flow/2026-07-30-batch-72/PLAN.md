@@ -1,9 +1,25 @@
 # PLAN — batch 2026-07-30-batch-72 — P1 design-defect implementation (CRC B + Legend B)
 
 ## Where we are
-**Phase 1 DRAFTED, awaiting-gate.** Phase 0 complete. This batch was PREPARED by the
-prototyping session (the one that ran `/tui-design` → PR #164 and got the operator's
-variant verdict); a DIFFERENT session executes it to term. Nothing is implemented.
+**Phase 1 APPROVED (2026-07-30) → Phase 2 cross-agent review in progress.** Phase 0
+complete. This batch was PREPARED by the prototyping session (the one that ran
+`/tui-design` → PR #164 and got the operator's variant verdict); the EXECUTING session
+took it over at the Phase-1 gate and carries it to term under **full autonomy + merge
+authority**. Nothing is implemented yet.
+
+**Kickoff record (executing session, 2026-07-30).**
+- **RC-1 RE-VERIFIED**: `origin/main` tip = `31d87d0` (PR #164 squash, MERGED) = `HEAD`
+  = merge-base of `claude/batch-72-design-defect-634a67`. Collision re-check
+  `git ls-remote --heads origin | grep batch-72` → **0 hits**.
+- **flow: `2026.07.28-rev1` (hash verified)** — `~/.claude` 0 commits behind
+  `origin/main`; aggregate `sha256` = `0127a2767ff11c8a`, matching `FLOW-VERSION.md`
+  exactly (C-45 PULL discharged).
+- **Authorization (per-batch, asked and answered)**: Q1 = *"Full autonomy + merge"* —
+  the agent self-approves remaining gates, opens the PR, and merges **only** after the
+  final independent PR-level `qa-reviewer` pass over the whole diff vs `main` comes back
+  clean; a HIGH finding blocks the merge and returns to the operator. Q2 = *"Acknowledged"*.
+- **P-8 RESOLVED**: operator confirmed *"Stack, key first"* — the PROPOSED default was
+  confirmed, not overridden.
 
 ## Objective
 Ship the operator-decided redesigns: **CRC Designer Variant B** (paired Reflection row,
@@ -14,9 +30,9 @@ key-first stack at the floor). Route: **full `/dev-flow`** (operator invoked it)
 ## Status per phase
 | Phase | Status | Artifact |
 |---|---|---|
-| 0 — intake | ✅ done (this prep) | §2.6 of 01-requirements.md; RC-1 verified at `6ba0680` |
-| 1 — requirements | 📝 DRAFTED → **awaiting-gate** | `.dev-flow/2026-07-30-batch-72/01-requirements.md` |
-| 2 — cross-review | not-started | — |
+| 0 — intake | ✅ done (prep) + RC-1 **re-verified at `31d87d0`** by the executing session | §2.6 of 01-requirements.md |
+| 1 — requirements | ✅ **APPROVED by the operator 2026-07-30** (0 iterations) | `.dev-flow/2026-07-30-batch-72/01-requirements.md` |
+| 2 — cross-review | 🔄 in-progress (architect ∥ qa-reviewer ∥ security-reviewer) | `.dev-flow/2026-07-30-batch-72/02-review.md` |
 | 3 — implementation | not-started | suggested cut below |
 | 4 — validation | not-started | — |
 | 5 — postmortem | not-started | — |
@@ -53,8 +69,10 @@ key-first stack at the floor). Route: **full `/dev-flow`** (operator invoked it)
 | 2026-07-30 | CRC = Variant B; Legend = Variant B | operator, verbatim in 01-requirements §6.2 |
 | 2026-07-30 | KAT **demoted**, not removed (Gate-2 resolved by the B pick) | operator via variant choice |
 | 2026-07-30 | ONE batch, both stories, full `/dev-flow` | operator invoked `/dev-flow`; both stories drift zero snapshots (P-2/P-3) so the two-batch split lost its rationale |
-| 2026-07-30 | Floor stacking key-first = PROPOSED, confirm at gate | P-8 UNDECIDABLE |
 | 2026-07-30 | Backlog premise "CRC snapshot cells drift" is FALSE | executed probe, §2.7 P-2 |
+| 2026-07-30 | **P-8 CONFIRMED — floor stacking = key first** | operator at the Phase-1 gate; PROPOSED default confirmed, not overridden |
+| 2026-07-30 | **Standing auth GRANTED — full autonomy + merge** | operator kickoff Q1; merge still gated on a clean final PR-level qa pass |
+| 2026-07-30 | **Phase-1 gate APPROVED** (Coverage ✅ · Evidence ✅ · Certainty gap = P-8, dispositioned by the answer) | operator; 0 Phase-1 iterations |
 
 ## Risks / watch-items
 - `state.json` concurrency (batch-65 in flight, last-writer-wins).

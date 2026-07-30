@@ -2,7 +2,7 @@
   "project": "s19_app",
   "language": "en",
   "batch_id": "2026-07-30-batch-72",
-  "batch_objective": "Implement the operator-decided P1 design-defect redesigns: CRC Designer prototype-Variant B (paired Reflection row, KAT DEMOTED to a Self-test row under Check, Warnings owns the hero right column, Select height capped) and Legend modal prototype-Variant B (two-pane card||key, key-first stack at the 80-col floor, pending P-8 gate confirmation). Closes the four 2026-07-28 operator-flagged defects in BACKLOG-CODE.md lines 149-156.",
+  "batch_objective": "Implement the operator-decided P1 design-defect redesigns: CRC Designer prototype-Variant B (paired Reflection row, KAT DEMOTED to a Self-test row under Check, Warnings owns the hero right column, Select height capped) and Legend modal prototype-Variant B (two-pane card||key, key-first stack at the 80-col floor - P-8 CONFIRMED by the operator at the Phase-1 gate 2026-07-30). Closes the four 2026-07-28 operator-flagged defects in BACKLOG-CODE.md lines 149-156.",
   "note_prior_batch": "batch-71 (AC-6 byte-golden) DONE + MERGED PR #161 squash 4753589, close-out #162 b64a3a4. Its full state at close archived at .dev-flow/2026-07-30-batch-71/state-at-close.json.",
   "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md. Lane B = .dev-flow/BACKLOG-PROCESS.md (parallel agent). .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
   "route": "/dev-flow (full V-model) - operator invoked it explicitly. ONE batch, both stories.",
@@ -10,9 +10,9 @@
   "rc1": "VERIFIED 2026-07-30 by the prep session: git fetch; origin/main tip = 6ba0680 = merge-base of the prep branch (claude/crc-design-defects-prototypes-150cad). EXECUTING SESSION MUST RE-RUN RC-1: branch off the then-current origin/main AFTER PR #164 merges (this scaffold rides on #164). Already-shipped check: no REQUIREMENTS.md row describes a paired reflection row or a two-pane legend.",
   "number_collision_check": "EXECUTED 2026-07-30: git ls-remote --heads origin | grep batch-72 -> 0; no .dev-flow/*batch-72* dir. RE-CHECK at executing kickoff (two prior collisions: 64->65, 66->67).",
   "standing_authorization": {
-    "date": null,
-    "status": "NOT GRANTED - deliberately. Authorization is per-batch and was NOT asked by the prep session because a different session executes. The EXECUTING session MUST ask the two kickoff questions (autonomy + merge authority; decision-recording ack) before presenting the Phase-1 gate. Default until answered: operator approves every gate and merges the PR.",
-    "operator_direction_on_record": "2026-07-30: 'Ok, CRC viewer vamos con (B). Leyenda, dos paneles. (B) Por favor deja el plan hecho, llama /dev-flow para ello y deja todo listo para que otra sesion tome desde ahi para llevarlo a termino.'"
+    "date": "2026-07-30",
+    "status": "GRANTED by the executing session's kickoff gate. Q1 (autonomy + merge): operator selected 'Full autonomy + merge' - the agent self-approves all remaining gates (recording every decision), opens the PR, runs the final independent PR-level qa-reviewer pass over the whole diff vs main, merges on a clean result (a HIGH finding blocks and returns to the operator), then runs /dev-flow-sync. Q2 (decision-recording ack): operator selected 'Acknowledged'.",
+    "operator_direction_on_record": "2026-07-30: 'Ok, CRC viewer vamos con (B). Leyenda, dos paneles. (B) Por favor deja el plan hecho, llama /dev-flow para ello y deja todo listo para que otra sesion tome desde ahi para llevarlo a termino.' KICKOFF ANSWERS 2026-07-30 (executing session, AskUserQuestion verbatim labels): Q1='Full autonomy + merge'; Q2='Acknowledged'; P-8='Stack, key first (Recommended)'; Phase-1 gate='Approve'."
   },
   "id_allocation": {
     "method": "grep -rhoE over REQUIREMENTS.md + tests/ + .dev-flow/ (*.py/*.md), executed 2026-07-30 by the prep session.",
@@ -22,11 +22,11 @@
   },
   "premise_result": {
     "P2_FALSE": "Backlog line 153's 'any change will drift the CRC snapshot cells' is FALSE - executed: test_tui_snapshot.py:109-110 lists workspace/a2l/mac/issues + map/patch/diff; the CRC screen is absent and 0 crc snapshots exist on disk. NEITHER story needs a snapshot-regen follow-up PR. If any snapshot fails mid-batch, a premise was wrong: STOP, do not regen casually.",
-    "P8_OPEN": "Legend floor stacking key-first is a PROPOSED default (the operator picked variant B without addressing the floor; the B prototype has no narrow rule). CONFIRM AT THE PHASE-1 GATE.",
+    "P8_RESOLVED": "2026-07-30 Phase-1 gate: operator confirmed 'Stack, key first' - at the 80-col floor the Legend panes stack vertically, colour key above the example card. HLR-072-6 is no longer pending.",
     "full_table": ".dev-flow/2026-07-30-batch-72/01-requirements.md section 2.7 (9 premises, each executed or dispositioned)"
   },
-  "current_phase": 1,
-  "phase_status": "awaiting-gate",
+  "current_phase": 2,
+  "phase_status": "in-progress",
   "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
   "artifacts": {
     "plan": ".dev-flow/2026-07-30-batch-72/PLAN.md",
@@ -36,7 +36,11 @@
   "decisions_log": [
     {"phase": 0, "date": "2026-07-30", "decision": "CRC = Variant B; Legend = Variant B; KAT DEMOTED (implied by the B pick; C was the removal option)", "notes": "operator verdict, verbatim in standing_authorization.operator_direction_on_record and 01-requirements section 6.2"},
     {"phase": 0, "date": "2026-07-30", "decision": "ONE batch for both stories under full /dev-flow", "notes": "operator invoked /dev-flow; the earlier two-batch split (Legend fast-flow first) lost its rationale once P-2 proved zero snapshot drift for BOTH stories"},
-    {"phase": 1, "date": "2026-07-30", "decision": "Phase 1 DRAFTED by the prep session; gate NOT self-approved", "notes": "the executing session presents the gate; P-8 (floor stacking) is the named open decision"}
+    {"phase": 1, "date": "2026-07-30", "decision": "Phase 1 DRAFTED by the prep session; gate NOT self-approved", "notes": "the executing session presents the gate; P-8 (floor stacking) is the named open decision"},
+    {"phase": 0, "date": "2026-07-30", "decision": "RC-1 RE-VERIFIED by the executing session", "notes": "git fetch; origin/main tip = 31d87d0 (PR #164 squash, MERGED) = HEAD = merge-base of claude/batch-72-design-defect-634a67. Collision re-check: git ls-remote --heads origin | grep batch-72 -> 0 hits. Flow currency (C-45 PULL): ~/.claude 0 commits behind origin/main; aggregate sha256 = 0127a2767ff11c8a = FLOW-VERSION 2026.07.28-rev1 EXACT."},
+    {"phase": 0, "date": "2026-07-30", "decision": "Standing authorization GRANTED: full autonomy + merge authority; decision-recording acknowledged", "notes": "operator answers verbatim in standing_authorization. Merge remains gated on the final independent PR-level qa-reviewer pass over the whole diff vs main; a HIGH finding blocks the merge and returns to the operator."},
+    {"phase": 1, "date": "2026-07-30", "decision": "P-8 RESOLVED by the operator: Legend floor stacking = KEY FIRST", "notes": "at 80 cols the panes stack vertically with the colour key ABOVE the example card. The PROPOSED default was confirmed, not overridden. HLR-072-6 loses its pending marker."},
+    {"phase": 1, "date": "2026-07-30", "decision": "Phase-1 gate APPROVED by the operator", "notes": "presented inline: 2.7 premise table (9 rows) + section 3 (HLR-072-1..7, AT-213..218). Exit criteria at the gate: Coverage MET, Evidence MET, Certainty had ONE named gap (P-8 UNDECIDABLE) which the operator's answer dispositioned. Advance to Phase 2 cross-agent review."}
   ],
   "obsidian_synced": false,
   "created_at": "2026-07-30T00:00:00Z"

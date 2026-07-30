@@ -86,7 +86,7 @@ render unchanged.
 | P-5 | AT-B59-03/08 assert 3 distinct bench-column ancestors and survive Variant B | premise | ✅ TRUE | `tests/test_crc_designer_view.py:895,907,928,1312` read — teeth are a computed 3-column comparison; Variant B keeps `#crc_bench_c1/c2/c3` | file has 32 tests — full blast-radius re-read owed at Phase 2 |
 | P-6 | Reverse census (C-26): touched CRC ids pinned ONLY in `test_crc_designer_view.py`; legend nesting pinned in 3 files | premise | ✅ TRUE | `grep -rl` executed this session: CRC symbols → 1 file; `legend_body/legend_dialog/legend_mac_warning_sample` → `test_legend_n8.py`, `test_legend_scope_and_logwidth.py`, `test_tui_legend.py` | those 4 files ARE the test blast radius; re-grep at Phase 3 per increment |
 | P-7 | Variant B renders + computes live on the pin (textual 8.2.8) | hypothesis | ✅ TRUE | PR #164 frames: `crc_p1.variant_B.160x44.loaded.svg` shows live `concat 0x9C5BCBBD` etc.; `legend_p1.variant_B.*.svg` show both panes | prototype code is the shape reference; REWRITE properly (throwaway rule) |
-| P-8 | Floor (80x24) legend stacking order = key first | hypothesis | ❓ UNDECIDABLE | operator picked "B — dos paneles" without addressing the floor; prototype B squeezes panes side-by-side at 80 cols (no narrow rule was written) | **PROPOSED default: stack, key first** (the review page's stated hybrid). CONFIRM AT THE PHASE-1 GATE |
+| P-8 | Floor (80x24) legend stacking order = key first | hypothesis | ✅ **RESOLVED at the Phase-1 gate** | operator picked "B — dos paneles" without addressing the floor; prototype B squeezes panes side-by-side at 80 cols (no narrow rule was written). **Operator answer 2026-07-30, verbatim option label: "Stack, key first (Recommended)"** | The PROPOSED default was CONFIRMED, not overridden: at the 80-col floor the panes stack vertically, colour key ABOVE the example card. HLR-072-6 loses its pending marker; AT-217 is authored against it. Remains a **hypothesis** until AT-217 passes at Phase 3/4 — an operator decision fixes the requirement, it does not verify the implementation |
 | P-9 | Switch-row separability guard is encodable as a pilot AT that fails on the old CSS | hypothesis | ❓ UNDECIDABLE | not yet executed — no AT exists | Phase-3 obligation: counterfactual run on a copy with old CSS (C-40 discharge), transcript pasted |
 
 ## 3. High-level requirements (HLR)
@@ -135,7 +135,7 @@ scrollable, with the key's first rows visible on open without any scrolling.
 **Acceptance: AT-216** — pilot 120x30, mac view: both panes' first rows visible in the
 same frame; the key pane shows the `Pale yellow` row without scrolling the card pane.
 
-### HLR-072-6 — Legend floor stacking, key first *(pending P-8 confirmation)*
+### HLR-072-6 — Legend floor stacking, key first *(P-8 CONFIRMED by the operator, 2026-07-30)*
 At the 80-col floor the panes **shall** stack vertically with the colour key ABOVE the
 example card.
 **Acceptance: AT-217** — pilot 80x24, mac view: key pane region.y < card pane region.y;
