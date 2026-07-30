@@ -1,5 +1,18 @@
 # HANDOFF PLAN — P1 design-defect implementation (prototyped 2026-07-30)
 
+> **2026-07-30 UPDATE — GATES RESOLVED + BATCH SCAFFOLDED.** Operator verdict: **Gate 1
+> = CRC Variant B · Gate 2 = KAT DEMOTED · Gate 3 = Legend Variant B · Gate 4 = ONE
+> batch, full `/dev-flow`** (the two-batch split lost its rationale — see correction
+> below). The batch is scaffolded as **`2026-07-30-batch-72`**: Phase 1 drafted
+> awaiting-gate at `.dev-flow/2026-07-30-batch-72/01-requirements.md` + `PLAN.md`;
+> `state.json` points at it. Executing session: start from `PLAN.md` §Kickoff protocol.
+>
+> **CORRECTION (C-43 executed premise):** §3's "CRC cells WILL drift" — inherited from
+> backlog line 153 — is **FALSE**. Executed: `test_tui_snapshot.py:109-110` covers
+> workspace/a2l/mac/issues/map/patch/diff; the CRC screen is in NO snapshot list and
+> `tests/__snapshots__/` holds 0 crc captures. **Neither story drifts snapshots; no
+> regen follow-up PR.** (01-requirements §2.7 P-2.)
+
 > **For the executing session.** This is the scope + technical map for implementing the
 > four operator-flagged design defects of 2026-07-28 (`.dev-flow/BACKLOG-CODE.md`
 > §"Operator-flagged 2026-07-28"). The `/tui-design` PROTOTYPE pass those bullets demanded

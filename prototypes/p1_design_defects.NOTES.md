@@ -97,12 +97,16 @@ python prototypes/legend_p1.inapp_prototype.py shot
 SVGs land beside this file as `crc_p1.variant_<V>.<size>.<state>.svg` /
 `legend_p1.variant_<V>.<view>.<size>.svg`.
 
-## 7. Verdict — OPERATOR TO FILL
+## 7. Verdict — FILLED (operator, 2026-07-30)
 
 | Surface | Winner | Steals from | Notes |
 |---|---|---|---|
-| CRC Designer | ☐ A ☐ B ☐ C | | KAT: ☐ demote (B) ☐ remove (C) |
-| Legend modal | ☐ A ☐ B ☐ C | | |
+| CRC Designer | ☑ **B** | — | KAT: ☑ **demote** (implied by the B pick; C was the removal option) |
+| Legend modal | ☑ **B** (dos paneles) | — | floor stacking key-first = PROPOSED default, confirm at the batch-72 Phase-1 gate (P-8) |
+
+> Verbatim: *"Ok, CRC viewer vamos con (B). Leyenda, dos paneles. (B)"*. Implementation
+> batch: **2026-07-30-batch-72** (`.dev-flow/2026-07-30-batch-72/` — Phase 1 drafted,
+> awaiting-gate).
 
 Throwaway convention: absorb the decision into the implementing batch, then DELETE
 `crc_designer.p1.*`, `legend_p1.*`, `p1_design_defects.NOTES.md` and the SVGs

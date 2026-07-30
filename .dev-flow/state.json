@@ -1,69 +1,43 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-30-batch-71",
-  "batch_objective": "Close AC-6's byte-golden - the one carry batch-70 left on its own headline claim. R-TUI-099 says a run left at the default scope is unchanged from the single-image path; batch-70 shipped that with a STRUCTURAL guard only and recorded the missing golden as an explicit non-claim. TEST-ONLY: no production code.",
-  "note_prior_batch": "batch-70 (R-TUI-099, FB-P2 multi-image + report fusion) DONE + MERGED PR #159 squash b457ef8, close-out PR #160 squash 6d1b316, vault synced, step-9 verified on origin/main itself. Its full state at close is archived at .dev-flow/2026-07-28-batch-70/state-at-close.json.",
-  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md. Lane B = .dev-flow/BACKLOG-PROCESS.md (controls/skills/rules), worked by a parallel agent. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
-  "route": "/fast-dev-flow - test-only, two files. Spec: .dev-flow/2026-07-30-batch-71/SPEC.md",
-  "rc1": "VERIFIED 2026-07-30. git fetch origin; origin/main tip = 6d1b316; HEAD = merge-base = 6d1b316 (equal, no rebase needed); working tree clean. Branch claude/ac6-byte-golden-batch-71. Frozen guards BOTH arms: test_engine_unchanged.py -> 1 passed, test_tui_directionb -k tc031/tc032/engine -> 6 passed. ALREADY-SHIPPED CHECK EXECUTED: no tests/goldens/batch71/ existed and no test asserted flow-report byte identity for the unscoped path -> the golden is NOT shipped.",
-  "flow_revision": "2026.07.28-rev1 - flow_hash 0127a2767ff11c8a - controls C-1..C-45. VERIFIED CURRENT at kickoff (C-45 PULL).",
-  "number_collision_check": "EXECUTED. git ls-remote --heads origin | grep batch-7[12] -> no match; no .dev-flow/*batch-71* folder. Number and artifact namespace both FREE. This project has had two id collisions with a parallel lane (64->65, 66->67), so this is checked, not assumed.",
+  "batch_id": "2026-07-30-batch-72",
+  "batch_objective": "Implement the operator-decided P1 design-defect redesigns: CRC Designer prototype-Variant B (paired Reflection row, KAT DEMOTED to a Self-test row under Check, Warnings owns the hero right column, Select height capped) and Legend modal prototype-Variant B (two-pane card||key, key-first stack at the 80-col floor, pending P-8 gate confirmation). Closes the four 2026-07-28 operator-flagged defects in BACKLOG-CODE.md lines 149-156.",
+  "note_prior_batch": "batch-71 (AC-6 byte-golden) DONE + MERGED PR #161 squash 4753589, close-out #162 b64a3a4. Its full state at close archived at .dev-flow/2026-07-30-batch-71/state-at-close.json.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md. Lane B = .dev-flow/BACKLOG-PROCESS.md (parallel agent). .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "route": "/dev-flow (full V-model) - operator invoked it explicitly. ONE batch, both stories.",
+  "prepared_by": "The 2026-07-30 prototyping session (PR #164: /tui-design prototypes + frames + review page). THIS SESSION DID NOT IMPLEMENT. A different session executes from the Phase-1 gate onward.",
+  "rc1": "VERIFIED 2026-07-30 by the prep session: git fetch; origin/main tip = 6ba0680 = merge-base of the prep branch (claude/crc-design-defects-prototypes-150cad). EXECUTING SESSION MUST RE-RUN RC-1: branch off the then-current origin/main AFTER PR #164 merges (this scaffold rides on #164). Already-shipped check: no REQUIREMENTS.md row describes a paired reflection row or a two-pane legend.",
+  "number_collision_check": "EXECUTED 2026-07-30: git ls-remote --heads origin | grep batch-72 -> 0; no .dev-flow/*batch-72* dir. RE-CHECK at executing kickoff (two prior collisions: 64->65, 66->67).",
   "standing_authorization": {
-    "date": "2026-07-30",
-    "session": "batch-71 kickoff (asked at THIS kickoff, NEVER inherited from batch-70)",
-    "autonomy": "AUTONOMOUS UNTIL THE PR. The operator merges. Nothing is self-merged.",
-    "operator_phrasing": "borra las ramas gastadas y arranca el byte-golden de AC-6 -> then chose 'Autonomo hasta el PR' from the kickoff option table."
+    "date": null,
+    "status": "NOT GRANTED - deliberately. Authorization is per-batch and was NOT asked by the prep session because a different session executes. The EXECUTING session MUST ask the two kickoff questions (autonomy + merge authority; decision-recording ack) before presenting the Phase-1 gate. Default until answered: operator approves every gate and merges the PR.",
+    "operator_direction_on_record": "2026-07-30: 'Ok, CRC viewer vamos con (B). Leyenda, dos paneles. (B) Por favor deja el plan hecho, llama /dev-flow para ello y deja todo listo para que otra sesion tome desde ahi para llevarlo a termino.'"
   },
   "id_allocation": {
-    "method": "Census over *.py/*.md across REQUIREMENTS.md + tests/ + .dev-flow/, EXCLUDING the new test file - a census that includes the file it is sizing measures itself.",
-    "measured": "prior max AT-211, TC-508 (both from batch-70).",
-    "allocated": "AT-212, TC-509, TC-509b."
-  },
-  "current_phase": 6,
-  "phase_status": "done-merged",
-  "iterations_per_phase": {
-    "0": 0,
-    "1": 0,
-    "2": 0,
-    "3": 0,
-    "4": 0,
-    "5": 0,
-    "6": 0
-  },
-  "artifacts": {
-    "spec": ".dev-flow/2026-07-30-batch-71/SPEC.md",
-    "golden": "tests/goldens/batch71/ac6-unscoped-flow-report.md (710 B, LF-only, captured at f1f3987)",
-    "tests": "tests/test_flow_report_ac6_golden.py (3 nodes: AT-212, TC-509, TC-509b)",
-    "requirement_entry": "REQUIREMENTS.md - R-TUI-099 (AC-6 row added; the 'no byte-golden' non-claim DISCHARGED)"
+    "method": "grep -rhoE over REQUIREMENTS.md + tests/ + .dev-flow/ (*.py/*.md), executed 2026-07-30 by the prep session.",
+    "measured": "prior max AT-212, TC-509b (batch-71).",
+    "allocated": "AT-213..AT-218; TC-510..TC-519 RESERVED (assign within the block). RE-RUN the census at Phase 3 - a parallel batch may consume ids.",
+    "concurrency_note": "state.json is last-writer-wins and the parallel batch-65 (addendum lane) may still be in flight - re-read this file immediately before any edit."
   },
   "premise_result": {
-    "P2_FALSE": "'A byte-golden of the report COMPOSER would prove AC-6' is FALSE. git diff --stat f1f3987 origin/main -- flow_report_service.py = 0 lines: the composer is byte-untouched, so a golden over it CANNOT FAIL. That is the project's dominant defect class - the vacuous check - and it was caught before any code by executing the premise. The golden is taken END-TO-END through run_flow instead, whose unscoped SOURCE path really did change (+263/-5, two deletions there).",
-    "baseline_correction": "The carry proposed capturing from origin/main. origin/main NOW CONTAINS the change under test, so that baseline would have been circular. Captured from f1f3987 - b457ef8's parent, verified by git log - in a detached worktree.",
-    "falsifiability": "AT-212 passed first run, which proves nothing on its own. Driven RED on a COPY of the fixed tree by leaking the variant into the default path (flow_name=f'{flow.name} [{ctx.variant}]'); it fails on the BYTE assertion with the drift shown inline."
+    "P2_FALSE": "Backlog line 153's 'any change will drift the CRC snapshot cells' is FALSE - executed: test_tui_snapshot.py:109-110 lists workspace/a2l/mac/issues + map/patch/diff; the CRC screen is absent and 0 crc snapshots exist on disk. NEITHER story needs a snapshot-regen follow-up PR. If any snapshot fails mid-batch, a premise was wrong: STOP, do not regen casually.",
+    "P8_OPEN": "Legend floor stacking key-first is a PROPOSED default (the operator picked variant B without addressing the floor; the B prototype has no narrow rule). CONFIRM AT THE PHASE-1 GATE.",
+    "full_table": ".dev-flow/2026-07-30-batch-72/01-requirements.md section 2.7 (9 premises, each executed or dispositioned)"
   },
-  "verification": {
-    "collected": "2355 -> 2358 (+3, exact - no auto-parametrised node this time)",
-    "flow_suite": "208 passed (-k flow)",
-    "frozen_guards": "1 passed + 6 passed (C-27 both arms)",
-    "lint": "ruff on the new file -> All checks passed",
-    "production_code": "NONE - git diff --stat origin/main -- s19_app/ is empty"
+  "current_phase": 1,
+  "phase_status": "awaiting-gate",
+  "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
+  "artifacts": {
+    "plan": ".dev-flow/2026-07-30-batch-72/PLAN.md",
+    "1": ".dev-flow/2026-07-30-batch-72/01-requirements.md",
+    "inputs": "prototypes/p1_design_defects.HANDOFF-PLAN.md + p1_design_defects.NOTES.md (verdict section 7 FILLED) + p1-design-defects-review.html + the PR #164 SVG frames"
   },
-  "obsidian_synced": null,
-  "created_at": "2026-07-30T00:00:00Z",
-  "open_carries_lane_A": {
-    "from_batch_70": "TWO of batch-70's three P3 carries REMAIN: (a) the fused document's O(V x ~6 lines) heading overshoot sits outside the byte budget; (b) per-variant caps bound ROWS, not bytes. The third (AC-6 byte-golden) is closed by THIS batch.",
-    "from_batch_70_sync": "(c) a vault-sync step copies pilot SVGs recursively instead of using the section-5 flattening helper - the CAUSE behind batch-47's prune being undone; (d) batch-66 has a repo .dev-flow/ folder and no vault counterpart (undetermined).",
-    "older": "R-3 - the batch-65 merge-gate docs' PROSE layer, P3, untouched."
-  },
-  "merged": "PR #161 SQUASH 4753589, merged 2026-07-30T16:07:28Z. CI green: tui-ci pass (34m58s) + snapshot pass (1m14s), mergeStateStatus CLEAN. Landing VERIFIED against origin/main's own copy, not the local one: golden + test present, stored blob 710 B with 0 CR bytes (survived the gitattributes round-trip), AT-212 in REQUIREMENTS.md, and git diff --stat 6d1b316 origin/main -- s19_app/ empty (test-only confirmed post-merge).",
-  "obsidian_sync_note": "NOT SYNCED, and deliberately not marked either way. /dev-flow-sync copies 01-requirements / 02-review / 04-validation / 05-postmortem / 06-docs; a /fast-dev-flow batch produces none of those - batch-71's whole record is SPEC.md. Marking it true would claim a sync that did not happen; marking it false implies an owed action that the route does not define. Null + this note states the actual situation. OPEN QUESTION for the operator: should fast-flow batches sync their SPEC.md to the vault, or is the repo their only home?",
   "decisions_log": [
-    {
-      "phase": 6,
-      "date": "2026-07-30",
-      "decision": "close-out landed immediately after merge rather than deferred",
-      "notes": "batch-70 spent PR #158 recovering batch-65 from exactly this state and PR #160 fixing its own. Leaving origin/main asserting implemented-awaiting-operator-merge for a merged batch is the defect, not the paperwork."
-    }
-  ]
+    {"phase": 0, "date": "2026-07-30", "decision": "CRC = Variant B; Legend = Variant B; KAT DEMOTED (implied by the B pick; C was the removal option)", "notes": "operator verdict, verbatim in standing_authorization.operator_direction_on_record and 01-requirements section 6.2"},
+    {"phase": 0, "date": "2026-07-30", "decision": "ONE batch for both stories under full /dev-flow", "notes": "operator invoked /dev-flow; the earlier two-batch split (Legend fast-flow first) lost its rationale once P-2 proved zero snapshot drift for BOTH stories"},
+    {"phase": 1, "date": "2026-07-30", "decision": "Phase 1 DRAFTED by the prep session; gate NOT self-approved", "notes": "the executing session presents the gate; P-8 (floor stacking) is the named open decision"}
+  ],
+  "obsidian_synced": false,
+  "created_at": "2026-07-30T00:00:00Z"
 }
