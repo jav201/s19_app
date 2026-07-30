@@ -1,6 +1,15 @@
 # Validation — batch-70 · FB-P2 multi-image flow runs + report fusion
 
-Base `244c5d9` (Phase 0) → implementation `ebca4cc` · `4573d43` · `2b6c3a5`.
+## Verdict: **PASS-WITH-NOTES**
+
+All seven ACs plus D-4 and LLR-104.6 are observed through the shipped surface, the full suite is
+green, and AC-5's bound is falsified against an unbounded copy. **Not `PASS`, because three gaps are
+real and stated rather than closed** — AC-6 is carried structurally with no byte-golden; the fused
+document's `O(V × ~6 lines)` heading overshoot sits outside the byte budget; and the per-variant caps
+bound rows, not bytes. All three are recorded as non-claims in `REQUIREMENTS.md` R-TUI-099 and carried
+as P3 in `BACKLOG-CODE.md`. See §7.
+
+Base `244c5d9` (Phase 0) → implementation `ebca4cc` · `4573d43` · `2b6c3a5` → merged `b457ef8` (PR #159).
 
 ## 1. Acceptance matrix
 
