@@ -203,7 +203,8 @@ overlapping x-bands.
 > *Precision correction from the re-gate (N-4): `App.query` is **screen-scoped**
 > (`app._get_dom_base() -> Screen`), so it does not by itself certify "anywhere in the app" — the
 > **grep** carries that argument, not the query. The AT therefore queries the CRC screen and the
-> completeness claim is anchored to the single construction site.*
+> completeness claim is anchored to the **owning module**, `crc_designer_view.py` — see the D-1
+> note directly below for why it is the module and not a site count.*
 > The guard coincides with HLR-072-1 *today* precisely because those two switches are the only ones
 > that exist — stated plainly rather than dressed up.
 

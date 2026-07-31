@@ -101,7 +101,9 @@ Six further majors folded, each with an executed basis: the narrow CSS rules wer
 (equal specificity + later source order → they overrode the wide regime, putting the key pane at
 `x=113`, outside the body); **AT-216 passed on that broken layout**, so it gains a
 `#legend_body.contains_region(pane)` clause; `App.query` is **screen-scoped**, so the Switch
-completeness argument is now anchored to the single construction site rather than to the query;
+completeness argument is now anchored to the owning **module** rather than to the query (and, after
+Inc-4's D-1 catch, to the module rather than to a *site count* — the batch's own refactor turned one
+`Switch(` site into two);
 AT-214's counterfactual must revert the **whole file** (reverting just the pair row raises
 `NameError`, since LLR-072-1.2 deletes `_switch_row` — an error is not an assertion failure);
 AT-219 gains a real gate clause (the pin was invariant — all six sinks are already `markup=False`);
