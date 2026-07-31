@@ -4,7 +4,9 @@
 >
 > **Control-encode rule:** every control needs its own AskUserQuestion before it is encoded (`feedback_devflow_control_encode_approval`). Global flows stay project-agnostic — stack-specific controls go to `docs/engineering-rules.md` (`feedback_devflow_general_flows_project_agnostic`). Note the global `/dev-flow` command lives OUTSIDE this repo, so that leg is not covered by the project PR flow and needs its own before/after record in the batch artifacts.
 
-> **Last refresh: 2026-07-31 (backlog-carry audit — no batch).** `origin/main` tip = **`6524afd`**. Added ONE item: the carry-over control's input-side hole (new section below), routed here from the CODE lane per the router's *move, never copy* rule — its six app-side items live in [`BACKLOG-CODE.md`](BACKLOG-CODE.md). **This lane had not been reconciled since batch-66**, which is consistent with no process batch having closed since; stated rather than assumed.
+> **Last refresh: 2026-07-31 (cross-lane split — no batch).** `origin/main` tip = **`d2e9bdc`** (batch-73 merged). Operator ruled that an item spanning both lanes is **split into one entry per lane**, recorded as **Amendment A** in the [router](BACKLOG.md). Applied to the **three** measured cross-lane items — the AT/TC registry (which subsumes C-3), **1c** and **1d**. Their Lane A halves are staged under *PENDING MOVE TO LANE A* because `BACKLOG-CODE.md` is owned by in-flight batch-74. **One earlier classification of mine was WRONG and is corrected:** the *bytes-committed-as-evidence* candidate is **not** cross-lane — its `.gitattributes` leg already shipped in batch-66 (`.gitattributes:19`), so only the control encode remains and it stays wholly here.
+>
+> **Earlier refresh: 2026-07-31 (backlog-carry audit — no batch).** `origin/main` tip = **`6524afd`**. Added ONE item: the carry-over control's input-side hole (new section below), routed here from the CODE lane per the router's *move, never copy* rule — its six app-side items live in [`BACKLOG-CODE.md`](BACKLOG-CODE.md). **This lane had not been reconciled since batch-66**, which is consistent with no process batch having closed since; stated rather than assumed.
 >
 > **Earlier refresh: 2026-07-28 (batch-66 close).** Base ref: `origin/main` tip **`73e3fb9`** (batch-64
 > residue routing, #150). Batch-66 closed the §7.9 stale-flow-routing carry and opened four new items
@@ -100,7 +102,20 @@
 ## MAJOR — there is no AT/TC registry
 
   - **▸ (MAJOR, new — batch-63 OB-2, operator-identified) THERE IS NO AT/TC REGISTRY, and that is why id collisions keep recurring.** The operator's diagnosis, then measured. **The collision mechanism, isolated:** "the next free `TC` id" evaluates to **345 / 398 / 479** depending on whether you grep `REQUIREMENTS.md`, `+ tests/`, or `+ .dev-flow/` — a **134-id spread**, so two authors consulting different subsets *both* believe they are in free space. That is structural; it is not anyone's carelessness, and it defeats mitigations aimed at authors. **Measured on `031ca8d`, in three directions:** (a) `REQUIREMENTS.md` registers **20 of 73** live `AT` ids (**73 % unregistered**) and **97 of 188** live `TC` ids (**52 % unregistered**); (b) **6 phantom `TC` ids** — `TC-319/320/324/325/326/327` — are registered with **no node in either `TC-NNN` or `def test_tcNNN` form**, so the requirements doc asserts verifiers that do not exist; **`TC-319` is the exact node `CLAUDE.md` cites as the origin of control C-26** (`test_tc319_regroup_section_structure_census`), removed or renamed without the registry noticing; (c) **75 `AT` and 119 `TC` ids exist only in `.dev-flow/` batch docs**, minted by superseded designs and polluting the free pool. A fourth layer: **132** ids appear as function names vs **188** as `TC-NNN` text, so 56 are cited in tests with no node bearing the name — the same gap as the open C-3 item below, at full scale. **Evidence of the cost, twice in one batch:** batch-63's REV-4 lanes minted overlapping `TC-376..387`/`AT-157..159` with different content *and* reused live batch-48 ids `R-TUI-079/080/081` (2 of 11 Phase-2 blockers); the re-scoped Phase 1 then did it again — fixing id *ranges* before dispatch prevented range overlap but not per-id *semantics*, and 9–10 of 12 `AT` ids bound to different observables, found independently by all three Phase-2 lanes. **Shape of the fix:** a single registry file that is the one authority for id allocation, plus a guard test that FAILS when the registry and `tests/` diverge in either direction (unregistered node, or registered id with no node). Subsumes C-3 below and the batch-62 "16 of 23" carry. Deliberately NOT pulled into batch-63 (operator ruling 2026-07-27) — it is a project-wide process change and batch-63 was already at its iteration cap.
-  - **▸ (P2) C-3 — 16 of 23 TC ids are not traceable to any node.** Seven now are, by node name; the rest are covered by consolidated batteries with the mapping in `04-validation.md` §3. Folded into P-2.
+  - **▸ ✂️ SPLIT PER ROUTER AMENDMENT A (operator ruling 2026-07-31). The item above is CROSS-LANE and its two halves are now separately actionable.**
+    **Lane B half — DESIGN (this file, actionable now).** Produce the spec: the registry format and where it
+    lives; the guard's semantics in **both** directions (unregistered node · registered id with no node); the
+    allocation rule that closes the **134-id spread** (*"the next free `TC` id"* evaluates to **345 / 398 / 479**
+    depending on whether you grep `REQUIREMENTS.md`, `+ tests/`, or `+ .dev-flow/`, so two authors both believe
+    they are in free space); the disposition of the **6 phantom TCs** (`TC-319/320/324/325/326/327` — note
+    **`TC-319` is the node `CLAUDE.md` cites as the origin of control C-26**) and of the **75 `AT` / 119 `TC`**
+    ids that exist only in `.dev-flow/`; and how the guard stays cheap in CI. **Done-condition: the spec
+    exists and is reviewed.** ⚠ **Does NOT depend on today's id values, so it is NOT blocked by batch-74** —
+    which is actively renumbering ids (`96bcbd7`, the **third** collision in two days).
+    **Lane A half — BUILD:** staged below under *PENDING MOVE TO LANE A*.
+    **Neither half closes the item.** A batch that ships the registry file and reports "AT/TC registry DONE"
+    has shipped the half without enforcement — a document that drifts silently, i.e. the defect itself.
+  - **▸ (P2) C-3 — 16 of 23 TC ids are not traceable to any node.** Seven now are, by node name; the rest are covered by consolidated batteries with the mapping in `04-validation.md` §3. Folded into P-2. **Subsumed by the AT/TC registry above — it is the registry's Lane A guard that closes this, not the Lane B spec.**
 
 ## Control candidates raised and DECLINED (carried, not dropped)
 
@@ -109,4 +124,41 @@
 ## Deferred control-encodes (need their own AskUserQuestion before touching `~/.claude/commands/`)
 
 - **1c — code↔requirement REVERSE-index control** (deferred batch-48): `resource → {claimants}`, flag ≥2 claimants in one scope, WITH a CI staleness guard (every `R-*`/`LLR-*` code tag names a live requirement). Half-built: 25 back-refs in `screens_directionb.py`; `REQUIREMENTS.md` maps `R-*`→files. Detail: `project_devflow_control_lineage`.
+  **✂️ CROSS-LANE (Amendment A).** **Lane B half (here):** define the control — what a "claimant" is, what
+  scope it ranges over, and when ≥2 claimants is a defect rather than legitimate shared ownership. **Lane A
+  half:** the CI staleness guard, staged below. **Dependency: B → A** — the guard cannot be written before
+  the control says what it enforces.
 - **1d — markup-sink SWEEP rule** (un-encoded candidate): when a markup sink is found, sweep EVERY site of that widget class (4 surfaces, 3 separate discoveries: batch-33 `screens.py` → batch-43 tooltips → batch-48 DataTable + Select). Assert `plain` verbatim AND `spans == []`.
+  **✂️ CROSS-LANE (Amendment A).** **Lane B half (here):** encode the *rule* — a markup sink found at one
+  site obliges a sweep of every site of that widget class. Consider encoding it **together** with the
+  *"a defect registered against ONE flow command must be swept across BOTH"* candidate above: both are
+  instances of **sweep every site of the class**, and this project's standing preference is a general
+  control over two narrow patches (`feedback_general-controls-not-narrow-patches`). **Lane A half:** the
+  actual sweep assertions over the 4 known surfaces, staged below.
+
+## ⏳ PENDING MOVE TO LANE A — staged, NOT actionable here
+
+> **Why these are parked in the PROCESS lane.** Router **Amendment A** splits cross-lane items into one
+> entry per lane. These three are the **Lane A halves** and belong in
+> [`BACKLOG-CODE.md`](BACKLOG-CODE.md) — but that file was owned by **in-flight batch-74** at ruling time
+> (its Inc-3 must land the F4/D2 measurements there, and a merge conflict in exactly that file is how the
+> split would silently become a deletion). **Staged here rather than in a chat message, because a deferral
+> that lives outside the canonical queue is precisely the leak audited on 2026-07-31.**
+>
+> **▶ ACTION FOR WHOEVER CLOSES batch-74, OR THE NEXT LANE-A BATCH: move these three bullets verbatim into
+> `BACKLOG-CODE.md` and delete this section.** A move, not a copy. Nothing else in this file transfers.
+
+  - **▸ (MAJOR → Lane A) build the AT/TC registry file + its guard test.** Consumes the Lane B design spec
+    above — **do not start before it exists**, or the guard's semantics get invented at implementation time,
+    which is how the 134-id spread arose in the first place. The guard lives in `tests/` and must fail in
+    **both** directions. ⛔ **Blocked until batch-74 merges**: batch-74 is renumbering the live AT/TC set
+    (`96bcbd7`, third collision in two days), so a registry snapshotted now is born stale and its guard
+    reddens the day batch-74 lands. **Closes C-3 and the batch-62 "16 of 23" carry** — state that explicitly
+    at close rather than letting them lapse.
+  - **▸ (P2 → Lane A) the 1c CI staleness guard.** Every `R-*`/`LLR-*` code tag must name a live
+    requirement. Half-built already: 25 back-refs in `screens_directionb.py`, and `REQUIREMENTS.md` maps
+    `R-*` → files. Consumes 1c's Lane B control definition.
+  - **▸ (P2 → Lane A) the 1d markup-sink sweep assertions.** Over the 4 known surfaces (`screens.py`,
+    tooltips, DataTable, Select), asserting `plain` verbatim **and** `spans == []`. Consumes 1d's Lane B rule.
+    Note this is the **assert-the-emitted-form** family (C-42), so the assertions must be written against
+    what the widget emits, not against the rendered text.
