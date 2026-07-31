@@ -16,6 +16,40 @@
 > | **B** | [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) | engineering process — controls, skills, the global `/dev-flow` command, `docs/engineering-rules.md`, the TUI course, the AT/TC registry | process agent |
 >
 > **Rule for both lanes:** an item is moved between lanes, never copied. If a batch produces a carry that belongs to the other lane, write it there and leave no stub here.
+>
+> ### Amendment A — cross-lane items are SPLIT, not assigned (operator ruling 2026-07-31)
+>
+> **The two-lane model had no home for an item that legitimately needs work in BOTH lanes**, and the gap
+> was found the practical way: the operator asked whether the AT/TC registry item was *"skills and process
+> only"* so it could be handed to a process agent, and the question had no yes/no answer — the item's own
+> text defines its fix as *"a single registry file … **plus a guard test** that FAILS when the registry and
+> `tests/` diverge"*. The registry is process; the guard test is `tests/`, i.e. Lane A. Assigning the whole
+> item to either lane produces a half-fix, and **the half a process agent would ship is the half without
+> enforcement** — a registry that drifts silently, which is the defect the item exists to close.
+>
+> **Ruling: an item that spans both lanes is split into two entries, one per lane, each independently
+> actionable.** Not assigned to a "primary" lane, not duplicated, and not left cross-referenced from one
+> side. Concretely:
+>
+> - **Each half states its own deliverable and its own done-condition.** If half B is "design the registry
+>   format", B is done when the spec exists — not when the guard test passes.
+> - **Name the dependency direction explicitly** where one exists. Most splits are *design in B → build in
+>   A*, so A's entry must name the B artifact it consumes; an A half that can start without B is a sign
+>   the split is wrong.
+> - **Neither half may silently absorb the other.** A batch that closes one half and reports the *item*
+>   closed is the failure this amendment exists to prevent — the same shape as a carry that is dropped at
+>   a close.
+> - **Splitting is not free and is not the default.** Split only when both halves carry real work. An item
+>   whose other-lane leg has already shipped is NOT cross-lane — measured 2026-07-31: the
+>   *bytes-committed-as-evidence* candidate looked cross-lane, but its `.gitattributes` leg is already on
+>   `main` (`.gitattributes:19`, `.dev-flow/**/pre-bytes/** -text`, shipped by batch-66), so only the
+>   control encode remains and it stays wholly in Lane B. **Check whether the other leg is already shipped
+>   before splitting anything.**
+>
+> **Applied 2026-07-31 to the three measured cross-lane items** — the AT/TC registry (which subsumes C-3),
+> control candidate **1c**, and control candidate **1d**. See `BACKLOG-PROCESS.md`; their Lane A halves are
+> staged there under *"PENDING MOVE TO LANE A"* because `BACKLOG-CODE.md` was owned by in-flight batch-74
+> at ruling time and must not be edited under it.
 
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct}
