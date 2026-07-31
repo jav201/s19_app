@@ -66,3 +66,57 @@ defeats `LLR-106.3`'s ungated per-check-file structural lines).
 Phase-1 iteration 2**. The 3-iteration soft cap is live: **one more Phase-1 iteration remains before I
 escalate to the operator rather than loop** (the plan's explicit instruction — this area hit the cap in
 both Phase 1 and Phase 2 of batch-63).
+
+---
+
+# Phase-2 RE-GATE (iteration 2, discharge form) → **ITERATE — and the iteration cap is now REACHED**
+
+**Score: 3 DISCHARGED (BL-2, BL-4, partial-credit aside) · 4 PARTIAL · 3 NEW blockers introduced by the fold.**
+
+**The diagnosable pattern:** revision 2 tightened the *requirement* text and left the *AT predicate* at
+the old scope — so three ATs (AT-222/223, AT-227, AT-231) are now RED after a **correct** implementation.
+That is the BL-1 defect reproduced three more times, one level down. The reviewer's highest-leverage
+observation: the single rule *"when a requirement's scope moves, the AT predicate moves with it"* closes
+4 of the 7 open items.
+
+## Two executed refutations, both re-verified by the orchestrator
+
+1. **`LLR-105.7`'s reassurance is FALSE — the fold closed a forgery hole by re-opening a memory hole.**
+   I wrote that the Address cell is "already bounded in aggregate … 3574 B × 200 ≈ 715 kB/variant".
+   Executed: `_ADDRESS_RE` matches `'0x' + 'F'*100000`; **`int(raw, 16)` parses — CPython's
+   `int_max_str_digits` limit does not apply to base-16 parsing** (`changes/io.py:953`); the cell renders
+   **100,000 chars**. The real ceiling is `READ_SIZE_CAP_BYTES = 268,435,456` (`changes/io.py:224`).
+   **3574 is what a decimal-limited value happens to render to; it was never a ceiling.** At 200 rows ×
+   1 MB addresses, resident ≈ **200 MB** — and the cap lands in Inc-1 while the gate lands in Inc-3, so
+   between those increments nothing bounds it at all.
+2. **`BL-6`'s fix does not work.** `_checklist_lines:1243-1248` **already** computes
+   `kept = sum(1 for … if _matches_entry(...))` — lazily, per variant — whenever a filter is present. An
+   implementation that keeps that line, caps-and-**breaks** in the render loop, and reports
+   `dropped = kept − CAP` states the **true** count and passes AT-225 with zero traversal continuation.
+   **Deeper:** `LLR-105.4`'s declared subject ("traversal shall not terminate") has **no observable
+   consequence** — one-pass and precount-plus-break produce byte-identical documents *and* identical
+   `tracemalloc` ratios. **It is unfalsifiable as stated**, which means it is either not a requirement or
+   needs a different justification than the one I gave it.
+
+## New blockers created by the fold
+
+| # | Defect |
+|---|---|
+| **N-1** | `AT-222`/`AT-223` require *"widest cell ≤ `REPORT_CELL_CHARS`"*, but new `LLR-105.9` declares `3·171−1 = 512` **already equals** it, so a truncated cell is `512 + cue`. **Every cell AT-222 tests is truncated by construction — Inc-1's own gate is RED after a correct Inc-1.** |
+| **N-2** | `LLR-105.2` (Inc-2: a saturated check file **shall omit** header/rule) ⊥ `LLR-106.3` (Inc-3: header/rule **shall** be emitted outside the gate). Two unconditional `shall`s over the same lines, in different increments, with no precedence — they will be resolved differently. And the new clause has no AT and no TC. |
+| **N-3** | `HLR-106` now asserts `≤ REPORT_MAX_TOTAL_BYTES` with **no** overshoot term, while `LLR-106.3` asserts one and §7 names the check-file count `F` uncapped. The fold removed a *correct* qualifier while fixing an *incorrect* scope, and AT-227 inherited the tight form — still unsatisfiable, with a smaller coefficient. |
+
+Plus N-4…N-10: `HLR-105` now over-claims vs its own LLR set (the identical class the fold just fixed in
+HLR-106); `US-B74-3`'s text was never actually edited and still carries the premise P-20 marks FALSE;
+`LLR-105.9` has **no AT, no TC, no increment** and is contradicted by the only AT touching cell width;
+6 LLR→TC coverage gaps concentrated precisely in the LLRs the fold added.
+
+## Iteration accounting — **CAP REACHED, ESCALATING**
+
+Phase-1 iterations: 1 (initial) → **2** (the BL fold) → a third would be revision 3.
+Phase-2 iterations: 1 (cross-review) → **2** (this re-gate).
+
+`PLAN.md` §5 and the operator's launch instruction are explicit: *"Si topas el cap, escala conmigo — no
+hagas loop."* **This is the cap. Escalating to the operator rather than spending the last autonomous
+pass.** The fix list is small and surgical and no new measurement is required — but the decision to
+spend the final iteration, or to re-scope instead, is the operator's.
