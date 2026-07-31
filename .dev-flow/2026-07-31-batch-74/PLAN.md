@@ -118,3 +118,44 @@ templated copies of one change.
 | 3 | 0 | 2026-07-31 | **D-1 ruled: the producer bound is two-axis.** Driven by P-14 coming back FALSE. See §3. | autonomous, **flagged inline** |
 | 4 | 0 | 2026-07-31 | **D-2 deferred to Phase 1 rather than taking the plan's "mirror `MAX_REPORT_ISSUES_PER_VARIANT`".** That constant is 200, and 200 < 415 silently re-baselines another batch's byte-identity golden. Measured before choosing (C-39). | autonomous |
 | 5 | 0 | 2026-07-31 | Authorization asked fresh and granted: **full autonomy + merge**; recording **acknowledged + inline design-ruling flags**. | operator |
+
+---
+
+## 9. STATUS AT SESSION CUT — 2026-07-31, after Phase 2 PASSED
+
+**This is the plan's own designated cut point** (§0.4 of the handoff: *"After Phase 2 PASSES → Phases
+3-6"* — never between 1 and 2, because Phase 2 is Phase 1's gate and it rejected twice here).
+
+| | |
+|---|---|
+| **Phase** | 2 **approved**. Next action = **Inc-0 pre-flight**. |
+| **Iterations** | Phase 1: **3** · Phase 2: **3** — the soft cap, reached and escalated once. |
+| **Branch** | `claude/batch-74-s19-app-a693ff`, pushed, **7 commits, no PR yet** |
+| **Production code written** | **NONE.** Everything so far is specification + measurement. |
+| **Authorization** | Full autonomy + merge, granted 2026-07-31. **A resumed session MUST re-ask** — it is never inherited. |
+
+### What a resuming session does first
+
+1. **RC-1 again** — `origin/main` was `d81cb3d` at cut; re-fetch and rebase if it moved.
+2. **Re-ask the authorization model** (never inherited, including from this file).
+3. **Re-run the ID census** — batch-73 may have consumed ids since.
+4. **Inc-0**: capture AT-227's golden from the **shipped** producer in a commit touching **only**
+   `tests/goldens/batch74/`, so C-12 ordering is auditable via `git log --diff-filter=A`.
+5. Then Inc-1 → Inc-3 per §7 of `01-requirements.md`.
+
+### The three things most likely to bite the implementer
+
+1. **`REPORT_ADDRESS_HEX_DIGITS` is the policy number; `REPORT_ADDRESS_CHARS` is DERIVED from it.**
+   Deriving the cell width bottom-up from the golden census (widest golden Address cell = 10 chars)
+   puts it near 10-32 and makes **AT-226 RED after a correct implementation**.
+2. **AT-222 and AT-226 must derive `len(cue)` from the independently known elided count, never from
+   the emitted cell** — otherwise the predicate is circular and cannot fail.
+3. **`_format_bytes`'s `max_bytes` is REQUIRED, so all four call sites move in Inc-1's commit**
+   (`:1105`, `:1106`, `:1280`, `:1281`) even though `_checklist_lines`'s *cap* work waits for Inc-2.
+   Otherwise Inc-1's own gate is not green.
+
+### Iteration-budget warning for the resuming session
+
+Phases 1 and 2 each consumed their full 3-iteration budget. **Phase 3 starts with a fresh budget, but
+the same area produced 14 gate blockers in batch-62.** The operator's standing instruction holds:
+**on hitting the cap, escalate — do not loop.**
