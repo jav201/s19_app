@@ -271,6 +271,39 @@ Original entry (batch-69 design) follows: Run a saved flow across multiple image
 
 - **A2L address "two extra chars"** — the >32-bit case is handled (batch-38 `A2L_ADDRESS_EXCEEDS_32BIT` warning). If a DIFFERENT case, needs a concrete repro (symbol + value). `app.py`, `a2l.py`.
 
+## 🆕 Arrived 2026-07-31 by the router's Amendment A — Lane A halves of cross-lane items
+
+> **Transferred here from `BACKLOG-PROCESS.md`, verbatim, on 2026-07-31.** Router
+> [Amendment A](BACKLOG.md) splits an item spanning both lanes into one entry per lane; these are the
+> **Lane A halves**. They were staged in the PROCESS lane while `BACKLOG-CODE.md` was owned by in-flight
+> batch-74, and the move is now executed — batch-74 is fully closed and no batch holds this file.
+> **Their Lane B counterparts stay in `BACKLOG-PROCESS.md`; neither half closes its item.**
+>
+> ⚠ **`R-*` / `LLR-*` / `US-*` are NOT covered by the AT/TC registry** (operator scoping ruling
+> 2026-07-31) and have demonstrably collided — that gap is registered separately in the PROCESS lane.
+
+  - **▸ (MAJOR → Lane A) build the AT/TC registry file + its guard test. ✅ UNBLOCKED 2026-07-31 — both
+    preconditions are met.** (i) The Lane B spec exists and is merged: [`AT-TC-REGISTRY-SPEC.md`](AT-TC-REGISTRY-SPEC.md),
+    PR #174. **Its §9 is the ordered build contract with executable done-conditions — build from §9, not from
+    this bullet.** (ii) batch-74 **merged** (`537f27d`, #173), so the id set has stopped moving under the seed.
+    ⚠ **Seed figures are already stale**: the high-water mark went **`TC-524` → `TC-551`** in that one batch
+    (re-derived on `origin/main` 2026-07-31, not copied from batch-74's own text, which cites `TC-549`).
+    **Re-derive at the seed commit** (spec §1.3, §9 Inc-1) — the spec's numbers justify the design, they do not
+    seed the file. batch-74 also shipped `TC-549b`, a suffixed id, which is exactly the shape spec §2.2 rules on. The guard lives in `tests/` and must fail in **both** directions — but note §5.2:
+    two-way is **not** sufficient to catch the phantoms, so build G1–G7, not G1–G2. **Closes C-3 and the
+    batch-62 "16 of 23" carry** — state that explicitly at close rather than letting them lapse.
+    *(Original blocking rationale, now discharged, retained for lineage: "Blocked until batch-74 merges:
+    batch-74 is renumbering the live AT/TC set (`96bcbd7`, third collision in two days), so a registry
+    snapshotted now is born stale and its guard reddens the day batch-74 lands." The prediction held —
+    `TC-524` → `TC-549` in one batch.)*
+  - **▸ (P2 → Lane A) the 1c CI staleness guard.** Every `R-*`/`LLR-*` code tag must name a live
+    requirement. Half-built already: 25 back-refs in `screens_directionb.py`, and `REQUIREMENTS.md` maps
+    `R-*` → files. Consumes 1c's Lane B control definition.
+  - **▸ (P2 → Lane A) the 1d markup-sink sweep assertions.** Over the 4 known surfaces (`screens.py`,
+    tooltips, DataTable, Select), asserting `plain` verbatim **and** `spans == []`. Consumes 1d's Lane B rule.
+    Note this is the **assert-the-emitted-form** family (C-42), so the assertions must be written against
+    what the widget emits, not against the rendered text.
+
 ## Development flow OF the code — tests · CI · repo hygiene
 
   - **▸ (P2, new 2026-07-30) `examples/case_04_bad_checksums/` is the ONLY example case with no `.mac` file** — 7 of the 8 cases carry one. A `firmware.mac` for it exists on the unmerged `web/flask-viewer` branch and nowhere else. Measured: `ls examples/*/ | grep -c '\.mac$'` → 1 for every case except `case_04` → 0. Either the fixture is genuinely missing (and every MAC-view pilot frame for that case is exercising an empty linkage source), or its absence is deliberate and undocumented. **Decide which before that branch is deleted** — see `.dev-flow/BRANCH-AUDIT-2026-07-30.md`.
