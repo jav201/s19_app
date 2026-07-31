@@ -1,208 +1,127 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-31-batch-74",
-  "batch_objective": "RE-SCOPED by operator decision 2026-07-31 at the iteration cap. KEPT: OB-4 (producer bound on _modifications_lines/_checklist_lines - cardinality cap + byte-run width bound) and a NEW Address story - Phase-2 measurement found int('0x'+'F'*100000,16) PARSES (int_max_str_digits does not apply to base 16) so the Address cell renders 100,000 chars with a real ceiling of READ_SIZE_CAP_BYTES=268MB, and it was in nobody's charter. SPLIT to batch-75 with all measurements carried: F4 (_ByteBudget gate) and D2 (_format_length + app.py re-attribution).",
-  "note_prior_batch": "batch-72 (P1 design defects: CRC Designer Variant B + Legend two-pane) DONE + MERGED PR #166 squash 1abda8e, close-out #167 6524afd, obsidian_synced flag landed #168 37f2a4b. Its full state at close archived at .dev-flow/2026-07-30-batch-72/state-at-close.json.",
+  "batch_id": "2026-07-31-batch-75",
+  "batch_objective": "F4 + D2, split out of batch-74 by operator decision at the 3-iteration cap. F4: the report document is NOT byte-bounded and _ByteBudget as built cannot bound it - emit() accounts, never gates (executed: exactly 1 .fits gate vs 2 .consume sites; the single gate covers hexdump blocks only). F4 companion: V (variants) and F (check-files per variant) are uncapped anywhere. D2: the inline Length cell at report_service.py:1356 and :1582 (there is NO _format_length symbol - it must be CREATED) plus the app.py:4164 error re-attribution that presents an internal CPython ValueError as operator-input rejection.",
+  "note_prior_batch": "batch-74 (OB-4 producer bounding + the Address cell, R-TUI-101) DONE + MERGED: #173 537f27d, close-out #175, the two artifacts it never produced #177, obsidian_synced flag #178. Its full state at close archived at .dev-flow/2026-07-31-batch-74/state-at-close.json.",
   "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (resolved from docs/engineering-rules.md:17). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
-  "route": "/dev-flow (full V-model) - operator invoked it explicitly ('completo, no fast'). Plan inherited from .dev-flow/HANDOFF-2026-07-31.md section 'PLAN - batch-74', authored in a planning-only session and explicitly declared a HYPOTHESIS.",
-  "rc1": "VERIFIED 2026-07-31: git fetch; origin/main tip = d81cb3d = HEAD = merge-base of claude/batch-74-s19-app-a693ff; working tree clean. BASE MOVED since the plan was authored (6524afd -> 37f2a4b -> d81cb3d), so rather than trusting the plan's @6524afd addresses, diffed the target module across the move: 'git diff --stat 6524afd d81cb3d -- s19_app/tui/services/report_service.py' is EMPTY (2262 lines at both). Every plan address re-confirmed individually anyway in 00-measurements.md section 1. Flow currency (C-45 PULL): ~/.claude aggregate sha256 = 0127a2767ff11c8a = FLOW-VERSION 2026.07.28-rev1 EXACT.",
-  "number_collision_check": "EXECUTED 2026-07-31: 'git ls-remote --heads origin | grep batch-74' -> 0 hits; 'grep batch-73' -> 0 hits (the parallel batch has not started); no .dev-flow/*batch-74* dir. Two prior collisions in this repo (64->65, 66->67) motivate the check.",
+  "route": "/dev-flow (full V-model) - operator invoked it explicitly ('completo'). Charter: .dev-flow/BACKLOG-CODE.md line 79, block 'batch-75 CHARTER - split out of batch-74 by operator decision at the iteration cap'.",
+  "rc1": {
+    "origin_main_tip": "232eb0a4400ce5e48199bee17d4b6e8de562946e",
+    "merge_base_equals_tip": true,
+    "branch": "claude/batch-75-s19-app-a6fd1e",
+    "tree_clean": true,
+    "verified_at": "2026-07-31"
+  },
+  "flow_revision": {
+    "flow_version": "2026.07.28-rev1",
+    "controls": "C-1..C-45",
+    "manifest_flow_hash": "0127a2767ff11c8a",
+    "local_aggregate_hash": "896dcca61cf68d78",
+    "verdict": "MISMATCH, scoped and NON-BLOCKING. All 11 control-bearing command/template files are byte-exact vs the manifest. Only skills/dev-flow-lessons/SKILL.md diverges (local 641 lines / 01d608bb14069613 vs stamped 620 / 5c47db86ac2cf4ae) - local is AHEAD and the file is untracked in ~/.claude (.gitignore:3 = /*), its canonical home being jav201/claude-skills. The flow's ENFORCEABLE surface is current. Carried to Lane B: re-stamp FLOW-VERSION.md or record the catalog as deliberately outside the hash."
+  },
   "standing_authorization": {
-    "date": "2026-07-31",
-    "status": "GRANTED at this session's kickoff, asked FRESH per feedback_standing_auth_per_batch (never inherited - not from the launch prompt, not from the handoff plan, not from batch-72's grant). Q1 (autonomy + merge): operator selected 'Full autonomy + merge' - the agent self-approves all gates and increments (recording every decision), opens the PR, runs the final independent PR-level qa-reviewer pass over the whole diff vs main, merges on a clean result (a HIGH finding blocks and returns to the operator), then runs /dev-flow-sync. Q2 (decision-recording): operator selected 'Acknowledged + flag design rulings inline' - the STRONGER option: every autonomous DESIGN ruling is additionally surfaced in-conversation as it happens, not held to the next gate.",
-    "operator_direction_on_record": "2026-07-31 launch prompt (verbatim, abridged to its binding clauses): 'Ejecuta batch-74 en el repo s19_app siguiendo /dev-flow (completo, no fast).' / 'RESTRICCION DE DISENO, LA MAS IMPORTANTE: acota el PRODUCTOR, no el documento.' / 'FUERA DE ALCANCE, explicitamente: D-11 (redaccion de host paths) ... Tampoco diff_report_service.' / 'El plan es una HIPOTESIS ... re-derivalas en Phase 0 y registra TRUE/FALSE/UNDECIDABLE (C-43).' / 'Presupuesta iteraciones: ... Si topas el cap, escala conmigo - no hagas loop.' / 'Para cada AT responde \"puede ponerse en RED?\" aparte de \"es correcto?\", y EJECUTA la mutacion que lo enrojece (C-40).' / 'NO toques .dev-flow/state.json mientras PR #168 siga abierto.' KICKOFF ANSWERS 2026-07-31 (AskUserQuestion verbatim labels): Q1='Full autonomy + merge'; Q2='Acknowledged + flag design rulings inline'.",
-    "resumed_session_2026_07_31": "RE-ASKED AND RE-GRANTED in the resumed session, per the handoff's own bold instruction that authorization is NEVER inherited (not from the launch prompt, not from state.json, not from the handoff itself). AskUserQuestion verbatim labels: Q1 authorization = 'Autonomia total + merge'; Q2 rebase = 'Rebase ahora + force-push (recomendado)' - the operator explicitly approved the force-push, which the global rules class as destructive and requiring express approval; Q3 worktree = 'Trabajo en el worktree existente'. Operator added mid-turn: 'al final necesito que las ramas reconcilien sus cambios para hacer el merge a main.'"
+    "asked_at": "2026-07-31",
+    "asked_because": "Authorization is per-batch and NEVER inherited - operator standing rule, restated as non-negotiable #1 in this batch's launch prompt. Asked fresh at kickoff: not from the prompt, not from batch-74's grant.",
+    "autonomy_and_merge": "Autonomo + merge autorizado",
+    "merge_authority": true,
+    "merge_precondition": "MANDATORY final independent qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression, every gate carry discharged) AFTER the PR is opened and CI is green. A HIGH finding BLOCKS the merge and returns to the operator.",
+    "decision_recording": "Confirmado - every decision taken autonomously instead of asking is recorded in PLAN.md's decision log, state.json.decisions_log and 05-postmortem.md, and carried to the vault at /dev-flow-sync.",
+    "scope_ruling_d2b": "Fencear explicitamente - _applied_regions stays OUT of batch-75 with a written non-claim in the requirement; the acceptance is scoped to what IS bounded and the requirement states explicitly that it does not close whole-report residency.",
+    "operator_direction_on_record": "2026-07-31 launch prompt, binding clauses (verbatim, abridged): 'Ejecuta batch-75 en el repo s19_app siguiendo /dev-flow (completo).' / 'Trae las mediciones que batch-74 ya ejecuto; NO son re-derivables gratis.' / 'F4: el documento NO esta acotado por budget, y _ByteBudget tal como esta NO puede acotarlo - emit() contabiliza, nunca gatea. Ese es el hallazgo load-bearing.' / '_applied_regions ... Decide en Phase 1 si entra o si se fencea explicitamente, pero NO lo dejes sin disposicion.' / 'El titular de D2 en el backlog es FALSO ... El raise es por los digitos DECIMALES de Length.' / 'NO existe simbolo _format_length. Un borrador del charter lo invento.' / 'Siete premisas heredadas de esta area salieron falsas en batch-74. Trata el charter como punto de partida, no como verdad.' / 'IDS RESERVADOS: AT-250...AT-279 y TC-552...TC-599 ... NO tomes ids fuera de tu rango.' / 'Presupuesta iteraciones ... Si topas, escala conmigo - no hagas loop.' / 'Para cada AT responde \"puede ponerse en RED?\" aparte de \"es correcto?\", y EJECUTA la mutacion (C-40). Ojo con la clase nueva registrada en Lane B: fixtures vacuas.' / 'batch-74 llego a MERGE sin 04-validation.md ni 06-docs/ ... NO repitas eso.' KICKOFF ANSWERS (AskUserQuestion verbatim labels): Q1='Autonomo + merge autorizado'; Q2 scope D2b='Fencear explicitamente (recomendado)'; Q3 registro='Confirmado'."
   },
   "id_allocation": {
-    "method": "grep -rhoE 'AT-[0-9]{3}' / 'TC-[0-9]{3}' over REQUIREMENTS.md + tests/ + .dev-flow/ (*.py/*.md), executed 2026-07-31.",
-    "measured": "prior max AT-219, TC-520 (both batch-72).",
-    "allocated": "AT-220.. and TC-521.. - assign within the block at Phase 1. RE-RUN the census at Phase 3: batch-73 may run in parallel and consume ids.",
-    "concurrency_note": "state.json is last-writer-wins with no owner field - re-read it immediately before any edit. Verified immediately before claiming it for batch-74: it still read batch_id=2026-07-30-batch-72, current_phase=6/approved, merged.pr=166, obsidian_synced=true, i.e. fully closed and unowned. PR #168 (which the launch prompt named as the state.json owner) is MERGED as 37f2a4b.",
-    "collision_2026_07_31": "THIRD ID COLLISION IN THIS REPO (after 64->65 and 66->67), caught by the Phase-3 census re-run the plan mandates. batch-73 (branch claude/batch-73-linkage-fix-0372a0, now live) consumed AT-219..AT-223 and TC-520..TC-524 - EXACTLY the AT-220../TC-521.. block batch-74 had allocated at Phase 0. RESOLVED by renumbering batch-74's LIVE set to a clearly-disjoint block rather than shifting by four: AT-240..AT-249 and TC-540..TC-551. Renumber applied in DESCENDING order so a new id never collided with a not-yet-moved old one. Historical narrative in 01-requirements.md sections 0/2.7/5.2 still refers to superseded numbering ON PURPOSE - it records what revisions 1 and 2 said. File-disjointness re-verified at the same time: batch-73 touches changes/apply.py + tests/test_linkage_soundness.py + REQUIREMENTS.md + BACKLOG-CODE.md; ZERO overlap with report_service.py or tests/test_report*. The two shared files (REQUIREMENTS.md, BACKLOG-CODE.md) are close-time edits - whoever closes second rebases."
+    "reserved": "AT-250..AT-279, TC-552..TC-599",
+    "high_water_on_main_rederived": "AT-249, TC-551",
+    "rederived_independently": true,
+    "reason": "The AT/TC registry build (Lane B) may be running in parallel - do NOT take ids outside this range."
   },
-  "premise_result": {
-    "summary": "17 premises extracted from the inherited plan and executed against disk at d81cb3d. 16 TRUE, 1 FALSE, 0 UNDECIDABLE. Full table: .dev-flow/2026-07-31-batch-74/00-measurements.md section 1.",
-    "P14_FALSE": "THE LOAD-BEARING FALSE PREMISE. The plan and the backlog state OB-4's cost as a flat '988 B/entry'. MEASURED: 140.1 B/entry (_modifications_lines) and 126.1 B/entry (_checklist_lines) at an 8-byte run, and the cost is LINEAR IN THE ENTRY'S BYTE-RUN LENGTH (~ 92 + 6*run bytes), because _format_bytes renders 3 chars per byte into TWO cells per row. 988 B/entry is simply the value at a ~149-byte run. CONSEQUENCE: a row-count cap alone does NOT bound resident memory - _format_bytes (:538-556) has no limit and MF_RUN_LENGTH_CEILING = 1_048_576 (changes/io.py:232) lets ONE row cost ~6 MiB, so a 200-row cap bounds the table at ~1.2 GB. This directly falsifies the plan's Inc-1/Inc-2 sketch and forced design ruling D-1.",
-    "P15_TRUE_WITH_ADAPTATION": "batch-65's _addendum_lines shape transfers in three of its four mechanisms (admission counters with the cap applied AT admission; traversal NOT terminated on saturation so the notice can state a true dropped count; one truncation notice naming what was cut). The fourth - format only AFTER the membership test - has NO analogue: the addendum has a region-membership discriminator and these two producers have none, since every entry is a row by definition.",
-    "P6_TRUE": "The plan's load-bearing design constraint is confirmed at the source: emit() (:2215-2217) calls budget.consume(...) only - it ACCOUNTS, NEVER GATES. The sole budget.fits(...) gate is _hexdump_section:1455. So emit(_modifications_lines(...)) at :2243 has fully materialised the producer before consume is reached, and charging these tables to _ByteBudget would close F4 while leaving OB-4 completely untouched."
-  },
-  "current_phase": 6,
+  "current_phase": 2,
   "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
-    "1": 3,
-    "2": 3,
-    "3": 1,
-    "4": 1,
-    "5": 1,
-    "6": 1
+    "1": 1,
+    "2": 1,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
   },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-31-batch-74/PLAN.md",
-    "0": ".dev-flow/2026-07-31-batch-74/00-measurements.md",
-    "1": ".dev-flow/2026-07-31-batch-74/01-requirements.md",
-    "2": ".dev-flow/2026-07-31-batch-74/02-review.md",
-    "3": ".dev-flow/2026-07-31-batch-74/03-increments/",
-    "handoff": ".dev-flow/HANDOFF-2026-07-31-batch-74-resume.md",
-    "5": ".dev-flow/2026-07-31-batch-74/05-postmortem.md",
-    "6": ".dev-flow/2026-07-31-batch-74/06-closeout.md"
+    "0": ".dev-flow/2026-07-31-batch-75/00-measurements.md",
+    "plan": ".dev-flow/2026-07-31-batch-75/PLAN.md",
+    "1": ".dev-flow/2026-07-31-batch-75/01-requirements.md",
+    "2": ".dev-flow/2026-07-31-batch-75/02-review.md"
   },
   "decisions_log": [
     {
       "phase": 0,
       "date": "2026-07-31",
-      "decision": "RC-1 re-verified against a MOVED base, by differential rather than by re-derivation",
-      "notes": "The inherited plan was authored at origin/main = 6524afd; main is now d81cb3d (+2 commits: 37f2a4b batch-72 obsidian_synced, d81cb3d PR #169 backlog+handoff). Instead of blindly re-deriving ~20 line addresses, diffed the target module across the base move: 'git diff 6524afd d81cb3d -- s19_app/tui/services/report_service.py' returns EMPTY, and the file measures 2262 lines at both commits. That single command validates every @6524afd address at once. Each address was still re-confirmed individually in 00-measurements.md section 1 (P-1..P-5) rather than resting on the differential alone."
+      "decision": "approved",
+      "notes": "Phase 0 intake closed. RC-1 PASS at 232eb0a. All charter premises executed against disk: F4 CONFIRMED (1 .fits gate vs 2 .consume sites; emit never gates), D2 headline CONFIRMED FALSE as the charter states (huge address renders in 45 chars; the raise is on Length's decimal digits), _format_length confirmed ABSENT (0 hits). Charter line numbers stale by a uniform +330."
     },
     {
       "phase": 0,
       "date": "2026-07-31",
-      "decision": "AUTONOMOUS: branch reuse rather than cutting a second branch",
-      "notes": "The session worktree was pre-cut at claude/batch-74-s19-app-a693ff, already at the origin/main tip and clean. RC-1's actual requirement is merge-base == origin/main tip, which holds exactly. Cutting a second branch would fight the worktree for no gain."
+      "decision": "D-1 flow-hash mismatch ruled NON-BLOCKING",
+      "notes": "Taken autonomously. Divergence confined to the untracked dev-flow-lessons catalog; all 11 control-bearing files byte-exact. Carried to Lane B rather than blocking the batch."
     },
     {
       "phase": 0,
       "date": "2026-07-31",
-      "decision": "AUTONOMOUS DESIGN RULING D-1 (flagged inline to the operator): the producer bound is TWO-AXIS, not one",
-      "notes": "Forced by premise P-14 coming back FALSE. Axis (a) cardinality - cap admitted rows with an admission counter and a truncation notice naming what was cut (the batch-65 shape). Axis (b) per-row width - bound the rendered byte cells so one row cannot be arbitrarily large. Axis (b) is NOT in the inherited plan's increment sketch and is added purely on measurement: with _format_bytes unlimited and a 1 MiB upstream run ceiling, ONE row reaches ~6 MiB, so a cardinality-only cap of 200 bounds the table at ~1.2 GB and would ship a cap that demonstrably does not bound the quantity it claims to bound - the exact vacuous-acceptance failure mode this area is on record for (batch-63 wrote FIVE vacuous criteria for ONE defect)."
+      "decision": "D-2 related_artifacts cardinality axis STRUCK from scope",
+      "notes": "Taken autonomously. I measured it at 10,573,225 B/variant (5.04x budget) then found it NOT wire-reachable - validation/engine.py constructs it from short literals. Constructor-domain only, the same class as D2's original false headline. Recorded in 00-measurements.md sec 4.5 so it is not rediscovered as a threat."
     },
     {
       "phase": 0,
       "date": "2026-07-31",
-      "decision": "AUTONOMOUS: D-2 (cap value) DEFERRED to Phase 1 as an option table instead of taking the plan's 'mirror MAX_REPORT_ISSUES_PER_VARIANT'",
-      "notes": "C-39 - execute the threshold the gate is keyed on, never predict it. EXECUTED: tests/goldens/batch64/addendum-below-bound.md carries 415 rows in its Modifications section (consumed by tests/test_report_addendum_bound.py:793). So a cap < 415 drifts a byte-identity golden belonging to a DIFFERENT batch and testing a DIFFERENT bound; a cap >= 415 drifts zero goldens. The plan's suggested mirror constant is 200. batch-65 - the precedent this plan cites as exemplary - achieved '0 goldens re-baselined'; taking 200 unmeasured would have spent that property silently. Separately measured: the widest byte cell in ANY golden is 2 chars (1 byte), so axis (b) has a blast radius of exactly ZERO."
+      "decision": "D-3 charter B/variant figures SUPERSEDED by re-derived ones",
+      "notes": "Taken autonomously per C-39. Re-derived 311,625 B/variant vs the charter's 315,912 (-1.4%); floor multipliers 1.15x/2.49x/15.86x at V=1/10/100 vs the charter's 1.15x/2.51x/16.06x. Shape holds, figures do not. Re-derived govern."
     },
     {
       "phase": 0,
       "date": "2026-07-31",
-      "decision": "Batch-kickoff authorization asked FRESH and granted",
-      "notes": "Q1 = 'Full autonomy + merge'; Q2 = 'Acknowledged + flag design rulings inline'. Verbatim in standing_authorization. The launch prompt explicitly stated it does NOT grant authorization and that a resumed session must re-ask."
-    },
-    {
-      "phase": 0,
-      "date": "2026-07-31",
-      "decision": "Phase-0 gate SELF-APPROVED under the kickoff grant",
-      "notes": "Exit axes: Coverage MET (all 3 backlog items OB-4/F4/D2 intaken as stories with black-box outcomes; D-11 and diff_report_service explicitly fenced OUT). Evidence MET (17 premises each with an executed probe or a file:line; 3 measurement runs pasted; golden blast radius executed not predicted). Certainty MET-WITH-A-NAMED-CARRY: the falsification of P-14 is itself the Phase-0 certainty result, and the two undecided cap VALUES (D-2, D-3) are named, measured and carried to Phase 1 rather than left implicit. Advance to Phase 1."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-31",
-      "decision": "ITERATION CAP REACHED - ESCALATED TO OPERATOR instead of spending the last autonomous pass",
-      "notes": "Phase-2 cross-review (architect+qa+security, parallel) returned ITERATE from ALL THREE lanes: 12 raw blockers deduplicated to 7 distinct. The top blocker was found INDEPENDENTLY by all three lanes - HLR-106/AT-227 claimed a whole-document byte bound that is unsatisfiable, because _declaration_error_lines alone emits a measured 315,912 B/variant through the ungated emit(). Revision 2 folded all 7 + 16 majors. The Phase-2 RE-GATE (discharge form) then returned 3 DISCHARGED / 4 PARTIAL / 3 NEW blockers CREATED BY THE FOLD, with a diagnosable pattern: revision 2 moved the requirement scope and left the AT predicate behind, so three ATs are now RED after a CORRECT implementation - the same defect class reproduced one level down. Two executed refutations were re-verified by the orchestrator: (i) int('0x'+'F'*100000,16) PARSES because CPython's int_max_str_digits does not apply to base-16, so an Address cell renders 100,000 chars and the real ceiling is READ_SIZE_CAP_BYTES=268MB - my LLR-105.7 reassurance of 3574 B was false, and the fold closed a forgery hole by re-opening a memory hole; (ii) _checklist_lines:1243-1248 already computes a lazy filtered kept count, so BL-6's filtered-fixture remedy does not force traversal continuation, and LLR-105.4's declared subject has NO observable consequence at all (one-pass and precount-plus-break produce byte-identical documents AND identical tracemalloc ratios) - it is unfalsifiable as stated. Both Phase 1 and Phase 2 are now at 2 iterations with a third pending; the operator's launch instruction is explicit ('si topas el cap, escala conmigo - no hagas loop'), so the batch STOPS here for an operator decision rather than spending the final autonomous pass. NO PRODUCTION CODE HAS BEEN WRITTEN - the entire batch to date is specification work."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-31",
-      "decision": "OPERATOR RE-SCOPE at the iteration cap: keep OB-4 + Address, split F4 and D2 to batch-75",
-      "notes": "Presented four options at the escalation; operator selected 'Re-scope: OB-4 + Address, split out F4 & D2'. Rationale of record: F4's budget gate was the source of most Phase-2 blockers and cannot be honestly closed while five sibling producers stay ungated (_declaration_error_lines alone = 315,912 B/variant, 16.06x budget at V=100); D2 is UNREACHABLE through the shipped ingestion path (addressed_range bounds Length to 7 digits) and is the lowest-value of the three; while the Address cell - NOT in the original charter - is the genuinely wire-reachable unbounded field. Requirement surface 3 HLR/20 LLR/18 AT -> 2 HLR/9 LLR/10 AT."
+      "decision": "D2b (_applied_regions) FENCED",
+      "notes": "OPERATOR ruling at kickoff, not autonomous. Stays out of batch-75 with a written non-claim; keeps the batch at 2 stories in an area that hit the iteration cap in two separate batches (b63, b74)."
     },
     {
       "phase": 1,
       "date": "2026-07-31",
-      "decision": "AUTONOMOUS: TWO requirements WITHDRAWN with written reason rather than carried",
-      "notes": "LLR-105.4 ('traversal shall not terminate') was UNFALSIFIABLE - P-25: _checklist_lines:1243-1248 already computes a lazy filtered kept count, and one-pass vs precount-then-break produce byte-identical documents AND identical tracemalloc ratios, so the clause had no observable consequence. Replaced by LLR-105.4', a requirement on the dropped COUNT'S CORRECTNESS, which is observable and whose named mutation (report len(entries)-CAP) reddens it. LLR-105.9 (cue overshoot) folded into AT-222's predicate, which now quotes the FORMULA 3*B-1+len(cue) instead of REPORT_CELL_CHARS - revision 2's form was RED after a correct fix because 3*171-1 already equals 512."
+      "decision": "approved (revision 1)",
+      "notes": "R-TUI-102 derived from 2 executed lanes. P-14 (architect lane's wire-reachability claim) executed and found FALSE before it reached the spec."
     },
     {
       "phase": 2,
       "date": "2026-07-31",
-      "decision": "Phase-2 gate APPROVED (self-approved under the kickoff grant) on revision 3 + the re-gate fold",
-      "notes": "Focused re-gate returned APPROVE conditional on two mandatory folds, both section-5 edits with numbers already supplied and needing no new measurement; all five findings folded. F-1 added AT-229, the Address RESIDENCY gate: AT-226 constrains only the emitted token, so a format-then-slice implementation satisfies all three of its conjuncts while peaking at the full 268MB rendering (measured 9.996 vs 1.000 for the arithmetic form). The section-5.2 vacuity register had recorded 'an Address bound with no form change' but NOT the symmetric hole, 'a form change with no residency gate'. F-2 made REPORT_ADDRESS_CHARS derived TOP-DOWN from REPORT_ADDRESS_HEX_DIGITS - deriving it bottom-up from the golden census would have put it near 10-32 and made AT-226 RED after a correct implementation, i.e. N-1 reproduced on the newest requirement. F-3/F-4/F-5 folded: elided-count correctness incl. the leading-zero case, the Address cue must avoid '.' (in MD_ESCAPE), and TC-521..532 named individually instead of by range. Exit axes: Coverage MET (every LLR gated, every AT/TC owned by exactly one increment, no orphan); Certainty MET (every AT green-on-correct and red-on-a-named-mutation, with the circular-predicate trap called out for AT-222/226); Evidence MET (every number executed). Advance to Phase 3."
+      "decision": "BLOCK -> iterate-to-refine",
+      "notes": "security + qa independently found the same 3 core defects. B-1 HLR-102/LLR-102.x are LIVE ids cited in report_service.py:608/:622 - I derived the AT/TC namespace as instructed and ASSUMED HLR/LLR tracked R-TUI-. B-2 the refusal disclosure is O(V), contradicting HLR-102's own V-invariance clause; AT-251 would go RED for a CORRECT implementation. B-3 _hexdump_section's put() never gates, so my own LLR-102.4 exemption rested on a false premise (P-24). B-4 AT-252 vacuous - 4 kB fixture against a 2 MB budget, green on base AND fixed AND stubbed."
     },
     {
-      "phase": 3,
+      "phase": 2,
       "date": "2026-07-31",
-      "decision": "AUTONOMOUS: renumbered batch-74's live AT/TC set to AT-240..249 / TC-540..551 after detecting a THIRD id collision",
-      "notes": "The Phase-3 ID census re-run (mandated by the plan precisely because two prior collisions happened) found batch-73 had gone live and consumed AT-220..223 + TC-521..524, the exact block batch-74 allocated at Phase 0. Chose a clearly-disjoint block over a +4 shift: a shift risks off-by-one collisions during the rewrite and makes historical vs live references visually indistinguishable. Applied descending so no intermediate collision occurred. File-disjointness re-confirmed: zero overlap."
+      "decision": "F7 fairness ESCALATED to operator, ruled per-variant reservation",
+      "notes": "OPERATOR decision, not autonomous. An attacker controlling content controls emission order; an early 311,625 B variant blanks variants 8-100. Encoded as LLR-108.4/108.5 + AT-254."
     },
     {
-      "phase": 3,
+      "phase": 1,
       "date": "2026-07-31",
-      "decision": "Inc-0 COMPLETE - AT-247's byte-identity golden captured from the SHIPPED producer",
-      "notes": "Commit touches ONLY tests/goldens/batch74/, making the C-12 ordering auditable via 'git log --diff-filter=A -- tests/goldens/batch74/' preceding the first report_service.py commit - prose cannot enforce that once the file is in the tree, but the commit graph can. Fixture covers BOTH producers (2 variants x (1 change summary + 1 check result)): 10 Modifications rows + 8 Checklist rows, all under-cap, in-domain, sub-width (widest byte cell 11 chars). 3920 bytes, no host path. STORED BLOB verified LF-only via git cat-file (not the working file) per the repo's known autocrlf evidence-corruption trap; tests/goldens/** carries 'text eol=lf'."
+      "decision": "approved (revision 2)",
+      "notes": "21 amendments recorded in 01-requirements.md sec 9 with Before/After and Deleted/New tokens. Renumbered to HLR-108/109/110 after executing the true high-water (HLR-107/LLR-107, batch-74's split-out Length draft, review-only)."
     },
     {
-      "phase": 3,
+      "phase": 2,
       "date": "2026-07-31",
-      "decision": "Inc-1 APPROVED and committed f63d6d1 after an independent code review returned BLOCK on a HIGH finding",
-      "notes": "LLR-105.1/105.3/105.5/105.6/105.7; AT-240/242/242b/244/247/248 + TC-540..545; 82 passed. THE INCREMENT'S CENTRAL CLAIM SHIPPED WITHOUT A FALSIFIER. Every width-axis predicate authored at Inc-1 was OUTPUT-shaped, so a format-then-slice _format_bytes emits BYTE-IDENTICAL output, passed all 79 tests, and peaked at 56,683,416 B against the correct implementation's 9,490 B - 5,973x. AT-248 could not catch it either because its fixture uses a 1-byte run and never exercises the width axis. This is the house defect of this exact code area and it survived the implementer's own C-40 pass precisely because the mutation changes NO OUTPUT - which is why C-40 limb 1 (is the declared subject IN the expression?) has to be asked separately from 'is it correct?'. Closed by AT-242b, the section-5.1 residency oracle applied to the width axis. DISCHARGED BY THE ORCHESTRATOR on the real tree with a hash-verified restore (d40d8770 -> mutated -> d40d8770): under the mutation the output-shaped AT-242 PASSES while AT-242b FAILS on its own assertion line at ratio=2.738 > 1.15. The PAIR is the evidence, not either half. A first mutation attempt was ABORTED by its own apply-check when the target string did not match - a typo'd mutation also 'fails', for the wrong reason. Also folded F2: the anti-vacuity guard in test_f17 carried its own opt-out ('or 256 <= REPORT_BYTES_PER_CELL') that would auto-disable it if REPORT_CELL_CHARS were raised past 767, which is exactly the fixture-shrinking LLR-105.7 forbids. C-12 ordering audited on-branch: golden c613b6a 07:59 precedes the first report_service.py edit f63d6d1 08:40."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "AUTONOMOUS: three spec defects found BY IMPLEMENTING were corrected rather than worked around",
-      "notes": "(a) Section 7's AT column kept pre-renumber BARE numbers - the collision renumber replaced 'AT-220' but section 7 stores '220, 222, ...' with no prefix, so a string replace could not see them. Corrected to 240/242/244/247/248 and 241/243/245/246/249. (b) Section 5.1's CAP-ONLY figure 1.921 DID NOT REPRODUCE - measured 2.224 - because section 5.1 never DEFINED the CAP-ONLY shape, so two reconstructions differ. Verdict unchanged (both defective shapes sit far above the 1.15 gate) but a number whose counterfactual is undefined is not reproducible and should not have been quoted as though it were; the counterfactual now lives in code as _shipped_body/_cap_only_body. FUSED measured 1.000 EXACTLY, so the threshold was NOT widened. (c) P-18 is TRUE but its margin is ZERO, not comfortable: the batch-64 golden's largest single (document,variant) Modifications table is EXACTLY 200 = the cap, and a census that does not split on document boundaries reads 272 and would wrongly conclude the cap fires. Recorded in the constant's docstring."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "SESSION CUT after Inc-1 - handoff written for a fresh session to resume at Inc-2",
-      "notes": "Operator asked for the handoff. Cut taken mid-Phase-3 at a COHERENT state (the flow's interruption protocol): Inc-0 and Inc-1 are committed, pushed and green (82 passed), the tree is clean, 0 unpushed commits in the project repo AND in ~/.claude. Entry point: .dev-flow/HANDOFF-2026-07-31-batch-74-resume.md, which supersedes the original HANDOFF-2026-07-31.md section 'PLAN - batch-74' (large parts of that plan are now measurably FALSE and it must not be implemented from). The handoff records: the operator re-scope; the SEVEN falsified premises with their counterexamples; the three live traps on the Address axis (derive REPORT_ADDRESS_CHARS top-down or AT-246 reddens on correct code; truncating an address without changing its FORM is a forgery not a bound; bound at the SOURCE and prove it with a residency oracle because output predicates are blind to format-then-slice); batch-73's live status and the third id collision; and the wording carve-outs still owed at Inc-3. AUTHORIZATION IS NOT INHERITED - the handoff states in bold that the resuming session must re-ask, including from the handoff itself."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "RESUMED SESSION: RC-1 re-run, base HAD moved, rebased and force-pushed with operator approval",
-      "notes": "origin/main advanced d81cb3d -> de905f6 (batch-73 MERGED as PR #170). The rebase of the 13-commit branch was CLEAN: 0 conflicts, 0 behind / 13 ahead - batch-73's file-disjointness held exactly as predicted (it touched changes/apply.py + tests/test_linkage_soundness.py). Force-push used --force-with-lease. ID census RE-RUN against the MERGED main: it tops out at AT-223 / TC-524, so batch-74's renumbered live set AT-240..249 / TC-540..551 remains collision-free - no FOURTH collision."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "AUTONOMOUS DESIGN RULING (flagged inline): REPORT_ADDRESS_HEX_DIGITS = 16 is the POLICY number; REPORT_ADDRESS_CHARS = 49 is DERIVED from it",
-      "notes": "Section 5.3 deliberately left this value unchosen. Ruled on POLICY grounds - 16 hex digits is a 64-bit address space, the widest any target in this domain uses - and explicitly NOT from the golden census, which bounds what is REACHED, never what is ALLOWED. Census executed rather than inherited: the widest Address cell in ANY golden on disk is 0x00000000, 10 characters, so the bound carries 2x margin and drifts 0 goldens. TRAP 1 from the handoff thereby avoided - deriving REPORT_ADDRESS_CHARS bottom-up would have put it near 10-32 and made AT-246 RED after a CORRECT implementation. TC-550 executes both the derivation equality and the anti-bottom-up arm, computing the golden census at RUNTIME so the margin claim cannot go stale."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "AUTONOMOUS DESIGN RULINGS (flagged inline): per-check-file notice numbers; saturated-with-nothing-kept keeps today's table; a SEPARATE Address cue constant; TC-544 extended producer-side only",
-      "notes": "(1) LLR-105.2 mandates a per-file '> TRUNCATED:' line but never says WHOSE NUMBERS it carries. Ruled PER FILE (its own dropped count, its own kept total): a variant-wide count repeated under three headings reads as three separate drops, whereas per-file counts are locally verifiable and sum to the variant's drop. (2) A check file arriving saturated with ZERO kept rows keeps today's empty-table rendering - the cap dropped nothing there, so a notice would be a FALSE statement attributing to the cap what the filter removed. (3) The Address cue got its OWN constant rather than widening CUE_ALPHABET, because adding h/x/d/i/g to that alphabet would WEAKEN test_f17's byte-cell closed alphabet - a batch-62 escaping guard - for characters that can never appear in a byte cell. TC-551 asserts inertness against the REAL MD_ESCAPE, which cannot drift from the escaper it protects. (4) LLR-105.6's FILE-WIDE bare-literal ban was NOT extended to the Address constants: a whole-file integer-VALUE scan on a two-digit constant is a coincidence detector, not a policy-coupling detector (26 incidental occurrences of 16, all address strides, int(x,16) bases or byte offsets). The clause with teeth - the PRODUCER-side ban - WAS extended, and _format_address added to its subject set."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "Inc-2 APPROVED and committed b0eba5c after an independent code review returned BLOCK on TWO HIGH findings",
-      "notes": "THE HOUSE DEFECT RECURRED ON BOTH SIDES OF THE GATE, AND THAT IS THE LESSON. I authored TRAP 3's falsifier BEFORE writing the code and it paid: AT-249 measures 1.000 source-bounded vs 9.976 format-then-slice, and mutation M6b proves AT-246's three conjuncts ALL stay GREEN under that mutation - residency is the only honest oracle. Then the independent reviewer ran 16 mutations of its own and FIVE SURVIVED my 29-node suite. F1 HIGH: LLR-106.1/106.2's scope is BOTH producers but every Address predicate exercised only '### Modifications' - reverting ONLY the checklist call site left a 100,002-character forgeable cell with every node green, and section 5.2 had ALREADY registered 'one AT covering both sites' as vacuous. F2 HIGH: every Address fixture I wrote was all-F, and on an all-F value rendering the TRAILING digits instead of the leading ones is byte-identical, as is dropping the +3 from the very ceiling formula TC-549 QUOTES. F3: design ruling (2) had no falsifier - I had SELF-CAUGHT this gap and deferred fixing it; the reviewer found it independently AND EXECUTED it, which is the difference that mattered. F4: the negative-sign branch was uncovered. F5: my own '14 occurrences' figure did not reproduce - it is 26 - because I measured it on the Inc-1 file and then quoted it as current, i.e. this batch's own C-39 rule broken on my own number. ALL FIVE now redden, verified on a patched export with apply-check and hash-verified restore; the original 11 still redden; M6b still correctly PASSES. Ledger 18 -> 31 (+13, -0). In every one of these findings the shipped code was CORRECT at every site - what was missing was any predicate that could FAIL if it were not. Third consecutive increment in this module where the defect lived in the ACCEPTANCE, not the code."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "Inc-3 COMPLETE and committed b987090 - R-TUI-101 + the R-TUI-097/098 corrections + the batch-75 split",
-      "notes": "The split is what makes the operator's re-scope a SPLIT rather than a DELETION, so it was treated as load-bearing. BACKLOG-CODE.md gained a batch-75 charter carrying every unspent measurement: emit() ACCOUNTS but never GATES (which falsifies the 'charge them to _ByteBudget' remedy this backlog recommended TWICE); _declaration_error_lines at 315,912 B/variant -> 16.06x budget at V=100; D2's app.py half certified clean to re-route; D2's three acceptance traps. REQUIREMENTS.md: R-TUI-101 with SEVEN non-claims, each carrying its executed number; R-TUI-097's D2 line citations REMOVED rather than updated (a line number that must be re-derived before it can be trusted is not a citation) and its headline premise recorded FALSE; R-TUI-098 non-claim (a)'s flat 988 B/entry corrected to ~ 92 + 6*L, with its derived '~11x the addendum' comparison withdrawn as a property of one unstated run length rather than of the producers. NEW MAJOR found by DOING this increment and EXECUTED: TC-497 cannot tell an ASSERTION from its REFUTATION - it greps REQUIREMENTS.md for residual figures VERBATIM, so rewriting non-claim (a) to declare 988 B/entry FALSE left it GREEN. Registered in BACKLOG-CODE.md with the fix shape: bind the figure to its subject and its section, never a bare presence grep."
-    },
-    {
-      "phase": 4,
-      "date": "2026-07-31",
-      "decision": "Phase-4 gate suite run by the ORCHESTRATOR, never delegated (C-25)",
-      "notes": "pytest -q FULL including the slow marker: 2434 passed / 2 skipped / 3 xfailed / 29 snapshots in 25m08s, then re-run after the PR-gate discharge at 2436 passed / 2 skipped / 3 xfailed / 29 snapshots in 30m38s. Run locally, which is STRONGER than the blocking CI job on snapshots and weaker on nothing: tui-ci installs plain pytest and never the [dev] extra, so its 29 snapshot cells are SKIPPED there, and only the advisory continue-on-error job exercises them. Stated explicitly because citing 'CI green' without it would be false. Both engine-frozen guards green; ruff clean (courtesy only - the repo configures no linter and tui-ci has no lint step)."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-31",
-      "decision": "FINAL PR-LEVEL GATE returned BLOCK on one HIGH; discharged, then the merge decision RETURNED TO THE OPERATOR rather than self-merged",
-      "notes": "H-1 HIGH: the batch gated THREE surfaces with a residency oracle (_modifications_lines AT-248, _format_bytes AT-242b, _format_address AT-249) and left the FOURTH ungated. The gate executed it: a _checklist_lines that renders every row and slices the list at the budget is OUTPUT-IDENTICAL and survived all 31 nodes at ratio 9.087 vs a gate of 1.15. R-TUI-101's 'no intermediate full-population list' clause names BOTH producers, marked Validation Automated, and carried no non-claim for it. Closed by AT-241b + TC-546b (tests only, zero production change); the reviewer's mutation now reddens at 9.087, reproducing its number exactly. M-1 LOW, and the worse one for the author: REQUIREMENTS.md removed D2's stale line citations ARGUING that symbol names are more durable, then named `_format_length`, which DOES NOT EXIST (0 hits in the package) - a stale-but-real citation traded for a durable-looking fiction. Corrected in both live documents to name the real site (the inline address_end - address_start expression). The batch's own post-mortem BLUF was also corrected: it claimed 'every bound this batch ships is gated by a residency oracle', assembled from three confirming instances and never enumerated - the same defect the document was written to describe, recorded as L-7 rather than quietly fixed. AUTHORIZATION HANDLING: the standing grant says a HIGH finding blocks and returns to the operator, so despite full merge authority the merge was NOT self-approved; the operator was asked and selected 'Espero CI verde y mergeo'. Merged after CI went green on the discharged head."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-31",
-      "decision": "MERGED 537f27d (PR #173, squash) after CI green on the DISCHARGED head",
-      "notes": "The cross-host question mattered and was answered by execution, not by argument: the three residency gates are calibrated as ratios with a 1.15 threshold, and they had only ever run on Windows/py3.14. tui-ci runs ubuntu-latest/py3.11 and passed on BOTH heads (35m11s pre-discharge, 37m30s post-discharge) - the post-discharge run being the one that first exercised AT-241b off-host. A correct implementation renders byte-identical work in both measurement windows, so the ratio is 1.000 BY CONSTRUCTION rather than by calibration, which is why the gate is host-invariant. Post-merge canonical-doc integrity verified ON MERGED MAIN rather than on the branch (per the verify-merged-canonical-docs convention): R-TUI-101 x1, its heading x1, the batch-75 charter x1, no duplicated headers. The merged tree re-runs its own gates green."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-31",
-      "decision": "synced-to-obsidian",
-      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-07-31-batch-74\\ - copied 01-requirements, 02-review, 04-validation, 05-postmortem and 06-docs/ (2 files); 03-increments deliberately NOT synced per the vault convention since batch-04. README index written with the full metrics frontmatter. Dashboard.md already existed and was NOT overwritten. THE SYNC'S TEMPLATE-COMPLETENESS DETECT EARNED ITS KEEP: it found that batch-74 had reached MERGE with NO 04-validation.md and NO 06-docs/ at all - both phases had genuinely run, but neither produced its artifact, so Phase 4 was self-approved against runs held in conversation rather than against a document. Written and landed as PR #177 (squash c03247e) before syncing, with the late authoring flagged in 04-validation.md's own header rather than presented as a normal phase record, and the gap registered as a MAJOR in BACKLOG-PROCESS.md (the existing detect covers an artifact that EXISTS but is empty; it has no rule for one that is ABSENT). VISUAL EVIDENCE REFRESHED: the trigger fired on BOTH grounds (batch-74 touched s19_app/tui/ in one file, services/report_service.py, and every live asset predated the merge date). Source verified byte-identical to merged main before regenerating (git diff --stat origin/main -- s19_app/ empty). 15 cases regenerated, 15 passed in 56.52s; 75 flattened frames + 15 gifs re-copied with the vault's own section-5 -LiteralPath helper. Freshness 90/90 live assets; the 6 not refreshed are the DOCUMENTED pv__case_06 retired-case exclusions of section 6, verified BY NAME rather than inferred from a count. Both refresh stamps (the section-5 bullet and the footer) updated together, since they drifted apart once before. NO frame was expected to change - a service-layer report composer is not a captured surface - but that is an argument from the changed SURFACE, not a measured before/after byte-diff, and the stamp says so."
+      "decision": "batch descoped to SPEC ONLY",
+      "notes": "OPERATOR ruling. Implementation deferred to a fresh session with a full context window - this area hit the 3-iteration cap in b63 and b74 partly by running out of room mid-increment."
     }
   ],
-  "obsidian_synced": true,
+  "obsidian_synced": false,
   "created_at": "2026-07-31T00:00:00Z",
-  "merged": {
-    "pr": 173,
-    "squash": "537f27d",
-    "base": "093ff8e",
-    "date": "2026-07-31",
-    "ci": "tui-ci pass 37m30s; snapshot pass 1m41s (advisory job - it is the ONLY job that exercises the 29 snapshot cells; the blocking job installs plain pytest and SKIPS them)",
-    "local_gate": "pytest -q full incl. slow: 2436 passed, 2 skipped, 3 xfailed, 29 snapshots, 30m38s",
-    "branch_retained": "claude/batch-74-s19-app-a693ff (18 commits, not deleted)"
+  "batch_outcome": "SPEC ONLY, by operator ruling mid-batch ('solo enmiendas, para antes de Inc-1'). Phases 0-2 complete and re-gated; Inc-0..Inc-3 NOT implemented and registered as a P0 in BACKLOG-CODE.md. Phase 2 BLOCKED on 4 blockers (2 in clauses batch-75 itself authored, 1 the house vacuous-fixture defect); spec re-gated as revision 2.",
+  "artifacts_not_produced": {
+    "3_increments": "NOT PRODUCED - implementation was descoped by operator ruling before Inc-1. Declared, not silently omitted.",
+    "4_validation": "NOT PRODUCED - no code changed, so there is nothing to validate. Declared per non-negotiable #6.",
+    "5_postmortem": "NOT PRODUCED as a separate artifact - 02-review.md sec 5 carries the gate decision and 01-requirements.md sec 9 carries the full amendment record.",
+    "6_docs": "NOT PRODUCED - no shipped behaviour changed, so there is no functionality to document. Declared per non-negotiable #6."
   }
 }
