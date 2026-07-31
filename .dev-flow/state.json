@@ -186,9 +186,15 @@
       "date": "2026-07-31",
       "decision": "MERGED 537f27d (PR #173, squash) after CI green on the DISCHARGED head",
       "notes": "The cross-host question mattered and was answered by execution, not by argument: the three residency gates are calibrated as ratios with a 1.15 threshold, and they had only ever run on Windows/py3.14. tui-ci runs ubuntu-latest/py3.11 and passed on BOTH heads (35m11s pre-discharge, 37m30s post-discharge) - the post-discharge run being the one that first exercised AT-241b off-host. A correct implementation renders byte-identical work in both measurement windows, so the ratio is 1.000 BY CONSTRUCTION rather than by calibration, which is why the gate is host-invariant. Post-merge canonical-doc integrity verified ON MERGED MAIN rather than on the branch (per the verify-merged-canonical-docs convention): R-TUI-101 x1, its heading x1, the batch-75 charter x1, no duplicated headers. The merged tree re-runs its own gates green."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-31",
+      "decision": "synced-to-obsidian",
+      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\\01 - Proyectos\\s19_app\\dev-flow-batches\\2026-07-31-batch-74\\ - copied 01-requirements, 02-review, 04-validation, 05-postmortem and 06-docs/ (2 files); 03-increments deliberately NOT synced per the vault convention since batch-04. README index written with the full metrics frontmatter. Dashboard.md already existed and was NOT overwritten. THE SYNC'S TEMPLATE-COMPLETENESS DETECT EARNED ITS KEEP: it found that batch-74 had reached MERGE with NO 04-validation.md and NO 06-docs/ at all - both phases had genuinely run, but neither produced its artifact, so Phase 4 was self-approved against runs held in conversation rather than against a document. Written and landed as PR #177 (squash c03247e) before syncing, with the late authoring flagged in 04-validation.md's own header rather than presented as a normal phase record, and the gap registered as a MAJOR in BACKLOG-PROCESS.md (the existing detect covers an artifact that EXISTS but is empty; it has no rule for one that is ABSENT). VISUAL EVIDENCE REFRESHED: the trigger fired on BOTH grounds (batch-74 touched s19_app/tui/ in one file, services/report_service.py, and every live asset predated the merge date). Source verified byte-identical to merged main before regenerating (git diff --stat origin/main -- s19_app/ empty). 15 cases regenerated, 15 passed in 56.52s; 75 flattened frames + 15 gifs re-copied with the vault's own section-5 -LiteralPath helper. Freshness 90/90 live assets; the 6 not refreshed are the DOCUMENTED pv__case_06 retired-case exclusions of section 6, verified BY NAME rather than inferred from a count. Both refresh stamps (the section-5 bullet and the footer) updated together, since they drifted apart once before. NO frame was expected to change - a service-layer report composer is not a captured surface - but that is an argument from the changed SURFACE, not a measured before/after byte-diff, and the stamp says so."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-31T00:00:00Z",
   "merged": {
     "pr": 173,
