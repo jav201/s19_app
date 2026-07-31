@@ -1383,9 +1383,10 @@ writable entry remains.
 
 - Code: `s19_app/tui/cdfx/writer.py` (`_exclusion_issue`,
   `_empty_changelist_issue`)
-- Validation: `Automated` via `tests/test_cdfx_w_rules.py` and
-  `tests/test_cdfx_writer.py` (TC-019d unresolved-exclusion, TC-019h empty +
-  all-unresolved) — covers LLR-004.5, LLR-004.6
+- Validation: **RETIRED — no live verifier.** The cited suite
+  (`tests/test_cdfx_w_rules.py`, `tests/test_cdfx_writer.py`) was removed with the
+  `cdfx` package at batch-07 E3b; the unresolved-exclusion and empty/all-unresolved
+  ids are retired (see [`## Retired ids`](#retired-ids)). Covered LLR-004.5, LLR-004.6 while live.
 - Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-009**: The CDFX writer must emit a leading `Created with s19_app CDF
@@ -1409,9 +1410,9 @@ code and severity per violation.
 
 - Code: `s19_app/tui/cdfx/writer.py` (`validate_w_rules`,
   `validate_w_rules_bytes`, `_check_instance`)
-- Validation: `Automated` via `tests/test_cdfx_w_rules.py` (TC-019a..TC-019h —
-  each of the eight `W-*` structural codes provoked and asserted) — covers
-  LLR-006.1
+- Validation: **RETIRED — no live verifier.** `tests/test_cdfx_w_rules.py` (the eight
+  `W-*` structural codes, one id each) was removed with the `cdfx` package at batch-07
+  E3b; those ids are retired (see [`## Retired ids`](#retired-ids)). Covered LLR-006.1 while live.
 - Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-011**: The CDFX reader must parse a well-formed `.cdfx` file with
@@ -1474,9 +1475,11 @@ exception.
 - Code: `s19_app/tui/cdfx/reader.py` (`_safe_parse`, `_probe_size`,
   `_UnsafeXmlError`), reusing `s19_app/tui/workspace.py`
   (`DEFAULT_COPY_SIZE_CAP_BYTES`)
-- Validation: `Automated` via `tests/test_cdfx_safety.py` (TC-027a
-  billion-laughs rejection, TC-027b external-entity rejection, TC-035
-  size / nesting-depth bound) — covers LLR-006.6, LLR-006.8
+- Validation: **RETIRED — no live verifier.** `tests/test_cdfx_safety.py`
+  (billion-laughs rejection, external-entity rejection, size / nesting-depth bound)
+  was removed with the `cdfx` package at batch-07 E3b; the billion-laughs and
+  external-entity ids are retired (see [`## Retired ids`](#retired-ids)). The size / nesting-depth bound survives
+  as TC-035. Covered LLR-006.6, LLR-006.8 while live.
 - Status: Superseded in batch `2026-06-10-batch-07` (US-002 — cfdx/.cdfx flow retired in favor of the v2 address-only JSON change system; see R-CHG-*). Statement retained as historical record.
 
 **R-CDFX-015**: When a `.cdfx` is loaded while an A2L is loaded, the CDFX reader
@@ -3520,7 +3523,7 @@ convenience, not the security boundary) (HLR-017 / LLR-017.3, .4; detail in
 
 **R-PATCH-2X2-LAYOUT-001**: The Patch Editor shall lay its four area-panes out as a 2×2 grid — `#patch_pane_entries` (top-left), `#patch_pane_changefile` (top-right), `#patch_pane_checks` (bottom-left), `#patch_pane_variant` (bottom-right) — all visible together, each pane scrolling vertically and independently (`overflow-y: auto; overflow-x: hidden`). `#patch_editor_panel` shall be `layout: grid; grid-size: 2 3` with `grid-rows: 1fr 1fr auto`; the hidden `#patch_saveback_row` shall be a `column-span: 2` grid child in the `auto` third row (full width when shown, zero-height while hidden, panes not squeezed). Each area's pre-existing widget sub-tree is reparented wholesale — every `patch_*` inner id and its action wiring stay queryable. The Change-file control row `#patch_doc_controls` shall be an explicit `layout: grid; grid-size: 3` (Textual `Horizontal` does not wrap → would clip its five buttons) so Load·Validate·Apply·Save·Run-checks flow to two rows within the pane budget. The 2×2 holds at both supported terminal sizes (80×24 floor, 120×30).
 - Code: `s19_app/tui/screens_directionb.py::PatchEditorPanel.compose` four-pane reparent + save-back span child; `s19_app/tui/styles.tcss` `#patch_editor_panel` grid, `#patch_pane_*` overflow, `#patch_saveback_row { column-span: 2 }`, `#patch_doc_controls { grid-size: 3 }` (US-030, HLR-033 / LLR-033.1–033.4).
-- Validation: `Automated` — `tests/test_tui_patch_layout.py::test_at_033a_two_by_two_at_80_floor` (AT-033a, 80-col floor boundary gate) + `::test_at_033b_two_by_two_at_120` (AT-033b) + `::test_at_033c_reparent_safety_at_80` + `::test_at_033c_reparent_safety_at_120` (AT-033c, reparent-safety) + `::test_tc_pane_styles_and_grid` (TC-033, white-box grid + `grid_size_columns == 3`).
+- Validation: **RETIRED — no live verifier.** The 80-col floor gate, the 120-col gate and the two reparent-safety nodes were removed from `tests/test_tui_patch_layout.py` at `19bf1eb` (batch-46) when the 2×2 grid was superseded; their ids are retired (see [`## Retired ids`](#retired-ids)) and the observables now ride AT-063a/b/c + AT-064a/b/c. TC-033 remains LIVE against the modal-token pins in `tests/test_tui_directionb.py`.
 - Status: Added batch-22 (US-030 / HLR-033). Advances feature #8 (patch-editor) slice 2. Frozen-engine diff = 0.
 - **SUPERSEDED batch-46** (§36, R-TUI-063 / R-TUI-064): the 2×2 four-pane grid is replaced by the responsive three-window layout (`#patch_win_script` / `#patch_win_checks` / `#patch_win_json`, 3-across ≥120 / stacked <120). The four `#patch_pane_*` container ids are PRESERVED as non-scrolling grouping sub-containers (reparent-safety carried forward verbatim in LLR-063.4); `grid-size: 2 4`, `#patch_saveback_row { column-span: 2 }`, and AT-033a/b/c + TC-033 are retired → AT-063a/b/c + AT-064a/b/c. See `.dev-flow/2026-07-15-batch-46/01-requirements.md` §6.5 A-1.
 
@@ -3653,9 +3656,10 @@ standing post-merge canonical regen.
   labels, `#patch_checks_controls`), `s19_app/tui/styles.tcss` (section styling)
 - Validation: `Automated` via `tests/test_tui_patch_editor_v2.py` (AT-057a section
   labels + 15-id census + parentage, AT-057b per-button wiring + binding regression;
-  existing AT-032a/AT-052a green unmodified), `tests/test_tui_patch_layout.py` (TC-319
-  compose census; existing grid-3 pin green unmodified), `tests/test_tui_snapshot.py`
-  (TC-320 drift-set assertion: patch cells only)
+  existing AT-032a/AT-052a green unmodified). The `tests/test_tui_patch_layout.py` compose
+  census and the `tests/test_tui_snapshot.py` drift-set assertion are retired (see [`## Retired ids`](#retired-ids)):
+  the census survives as that file's `_MUST_PRESERVE_IDS` tuple consumed by AT-063c, and the
+  drift-set assertion is carried by TC-321
 - Status: Added in batch `2026-07-10-batch-35` (US-057 / HLR-057, LLR-057.1–.4).
   Frozen-engine diff = 0.
 
@@ -3690,8 +3694,9 @@ regen.
   (`#patch_editor_panel` grid + new `#patch_paste_row` rule: `column-span: 2; height: 100%;
   overflow-y: auto; overflow-x: hidden`)
 - Validation: `Automated` via `tests/test_tui_patch_layout.py`
-  (`test_at058a_paste_editor_in_viewport_and_separated` — AT-058a, both widths in one node;
-  `test_tc319_regroup_section_structure_census` — TC-319 census survives),
+  (`test_tc46_2_paste_in_viewport_at_body_scroll0` — TC-46.2, the single authoritative
+  paste-in-viewport verifier since `19bf1eb`; the earlier paste node and the regroup census
+  node are retired, see [`## Retired ids`](#retired-ids)),
   `tests/test_tui_patch_editor_v2.py::test_at058b_id_census_and_wiring_survive_reparent` (AT-058b —
   15-id census + wiring regression), `tests/test_tui_patch_variant.py::test_tc_035_2_variant_group_above_execute_row`
   (survives), `tests/test_tui_snapshot.py::test_tc321_batch36_patch_xfail_set` (TC-321 — patch xfail
@@ -3817,13 +3822,14 @@ page/sort control row + legend placement are pilot-measured at 80x24 and 120x30 
 - Code: `s19_app/tui/screens.py` (`EntropyViewerScreen`: `#entropy_sort_button`,
   `#entropy_page_prev/next`, `#entropy_page_indicator`; `action_toggle_sort`, `action_page_prev/next`;
   `_window_for_row`; display-copy sort + fixed-512 page slice), `s19_app/tui/styles.tcss`
-- Validation: `Automated` via
-  `tests/test_tui_entropy_viewer.py::test_at062a_page_past_cap_reaches_later_window` (AT-062a — a
-  window index ≥ 512 reachable + dismisses with its address; both widths),
-  `::test_at062b_sort_entropy_top_row_is_max` (AT-062b — entropy-desc row 0 is max + strip follows +
-  page reset), `::test_tc324_page_slice_math` (TC-324 — page clamp / union-reachable / strip==jump
-  slice / `page P/Q`), `::test_tc325_sort_key_no_mutation_and_remap` (TC-325 — entropy desc +
-  address tie-break; `_windows` unmutated; page reset; remap helper),
+- Validation: **RETIRED — no live verifier** for the four nodes below.
+  `tests/test_tui_entropy_viewer.py` is deleted (see the Status note under this section), taking
+  the page-past-cap, entropy-desc-sort, page-slice-math and sort-key-no-mutation nodes with it;
+  those ids are retired (see [`## Retired ids`](#retired-ids)). Retained historically: a window index ≥ 512 reachable +
+  dismisses with its address at both widths; entropy-desc row 0 is max + strip follows + page
+  reset; page clamp / union-reachable / strip==jump slice / `page P/Q`; entropy desc + address
+  tie-break with `_windows` unmutated, page reset and remap helper. Still `Automated` in the
+  same batch:
   `::test_at036b_jump_second_row_moves_focus` (AT-036b — the pre-existing dismiss-contract regression
   guard, green under the new remap). The 2 entropy snapshot cells
   (`test_tui_snapshot.py::test_tc036s_entropy_modal_snapshot[entropy-comfortable-80x24 / -120x30]`)
@@ -3862,10 +3868,10 @@ per-cell clickable widget is the baseline mechanism (deterministic, no offset ar
   four band meanings + dim cue present; both widths),
   `::test_at063b_click_strip_cell_dismisses_with_address` (AT-063b — a REAL `pilot.click` on
   `#entropy_cell_k` dismisses with the exact clicked cell's address under a non-default sort, C-16),
-  `::test_tc326_legend_derived_from_band_colour` (TC-326 —
-  `set(legend) == set(ENTROPY_BAND_COLOUR)`; non-blank; no `[`/`]`; derived not hardcoded),
-  `::test_tc327_action_jump_remap_and_bound` (TC-327 — `_window_for_row` remap under sort/page;
-  S-03 out-of-range no-op).
+  and — **RETIRED — no live verifier**, deleted with `tests/test_tui_entropy_viewer.py` (see
+  the Status note below), ids retired (see [`## Retired ids`](#retired-ids)) — the legend-derived-from-band-colour check
+  (`set(legend) == set(ENTROPY_BAND_COLOUR)`; non-blank; no `[`/`]`; derived not hardcoded) and
+  the jump-remap check (`_window_for_row` remap under sort/page; S-03 out-of-range no-op).
 - Status: Added in batch `2026-07-11-batch-37` (US-063 / HLR-063, LLR-063.1–.3). Frozen-engine
   diff = 0. **RETIRED / Superseded in batch `2026-07-14-batch-45`** (US-045a/c; §6.5 Before → After):
   the entropy modal's legend + clickable strip are **DELETED** with `EntropyViewerScreen` (Inc-5),
@@ -3899,9 +3905,9 @@ BOTH layout censuses that pin the `#patch_doc_controls` child order (home-file A
   external on-disk edit + Refresh → entries table shows the NEW on-disk entry, C-12),
   `::test_tc328_refresh_uses_source_path_not_widget_and_noops_when_unloaded` (TC-328 — refresh over
   `source_path` not the widget; None-guard), and the updated sibling census
-  `tests/test_tui_patch_layout.py::test_tc319_regroup_section_structure_census` (TC-319 — the
-  `#patch_doc_controls` child list updated to the shipped Load/Refresh/… order; Phase-4 cross-file
-  census fix).
+  the sibling census in `tests/test_tui_patch_layout.py` (the `#patch_doc_controls` child list
+  updated to the shipped Load/Refresh/… order; Phase-4 cross-file census fix) — that census
+  node is retired (see [`## Retired ids`](#retired-ids)) and its assertions now ride `_MUST_PRESERVE_IDS` under AT-063c.
 - Status: Added in batch `2026-07-11-batch-37` (US-064a / HLR-064a, LLR-064a.1–.2). Frozen-engine
   diff = 0.
 
@@ -4166,8 +4172,9 @@ dimension.
   two-branch), `test_at071_region_list_rows_addr_size_band`,
   `test_at071b_disjoint_same_band_regions_stay_separate` (contiguity break),
   `test_at035_map_shows_band_bar_and_summary_header`, `test_map_band_view_survives_rerender`, the
-  `_merge_band_runs` / `test_tc028` guards) and `tests/test_entropy_style.py` (TC-060.x — band-map
-  census + `band_style` fallback). The 2 `map` snapshot cells are `xfail(strict=False)`
+  `_merge_band_runs` / `test_tc028` guards) and `tests/test_entropy_style.py` (band-map census +
+  `band_style` fallback). A wildcard id stood in this position until the registry seed; it was
+  never an allocated id and named no node, so the concrete verifiers above replace it. The 2 `map` snapshot cells are `xfail(strict=False)`
   until canonical-CI regen (`_batch45_map_drift_marks`, `tests/test_tui_snapshot.py`).
 - Status: Added in batch `2026-07-14-batch-45` (US-045a / R-TUI-060, LLR-045A / LLR-045D). Frozen-engine
   diff = 0.
@@ -5459,3 +5466,48 @@ the byte-identity control, not on production traffic.
   `LLR-106.3`'s undefined "maximum elided count" (defined as `READ_SIZE_CAP_BYTES −
   REPORT_ADDRESS_HEX_DIGITS`, a **byte** cap used as an upper bound on a **digit** count), and
   `LLR-105.2`'s silence on whose numbers a per-check-file notice carries (ruled: its own).
+
+---
+
+## Retired ids
+
+A retired id **was** live and its verifier is gone. It is never reused, and it is recorded here
+rather than left in a `- Validation:` bullet still advertising a test that does not exist — the
+phantom defect that motivated `AT-TC-REGISTRY.jsonl`.
+
+This section is one of the two anchors under which the registry guard
+(`tests/test_id_registry.py`, rule **G4**) permits a non-live id to be named. Everywhere else in
+this document, an id in a `- Validation:` bullet must be `LIVE` in the registry.
+
+> Generated from `AT-TC-REGISTRY.jsonl` at the seed commit. The registry is the authority; if the
+> two ever disagree, the registry wins and this table is what is wrong.
+
+| Id | Why it is retired |
+|---|---|
+| `AT-033a` | Retired by REQUIREMENTS.md:3525 itself (batch-46 §36, R-TUI-063/064): the 2x2 four-pane grid was superseded by the responsive three-window layout and 'AT-033a/b/c + TC-033 are retired -> AT-063a/b/c + AT-064a/b/c'. The cited nodes test_at_033a/b/c_* were removed in 19bf1eb and exist nowhere at the seed commit; the Validation line at :3523 was never updated. |
+| `AT-033b` | Retired by REQUIREMENTS.md:3525 itself (batch-46 §36, R-TUI-063/064): the 2x2 four-pane grid was superseded by the responsive three-window layout and 'AT-033a/b/c + TC-033 are retired -> AT-063a/b/c + AT-064a/b/c'. The cited nodes test_at_033a/b/c_* were removed in 19bf1eb and exist nowhere at the seed commit; the Validation line at :3523 was never updated. |
+| `AT-033c` | Retired by REQUIREMENTS.md:3525 itself (batch-46 §36, R-TUI-063/064): the 2x2 four-pane grid was superseded by the responsive three-window layout and 'AT-033a/b/c + TC-033 are retired -> AT-063a/b/c + AT-064a/b/c'. The cited nodes test_at_033a/b/c_* were removed in 19bf1eb and exist nowhere at the seed commit; the Validation line at :3523 was never updated. |
+| `AT-058a` | Node test_at058a_paste_editor_in_viewport_and_separated was removed at 19bf1eb (batch-46) and replaced in the same commit by tests/test_tui_patch_layout.py::test_tc46_2_paste_in_viewport_at_body_scroll0, whose docstring names itself 'the single authoritative verifier of the paste-in-viewport outcome'. The observable is covered under TC-46.2; the id AT-058a is spent. |
+| `AT-062a` | Verifier lived in tests/test_tui_entropy_viewer.py, which does not exist at the seed commit. REQUIREMENTS.md:3839 and :3879 already stated the file 'is deleted' in prose while the Validation lines kept citing it as a live verifier. |
+| `AT-062b` | Verifier lived in tests/test_tui_entropy_viewer.py, which does not exist at the seed commit. REQUIREMENTS.md:3839 and :3879 already stated the file 'is deleted' in prose while the Validation lines kept citing it as a live verifier. |
+| `AT-195` | Transcribed from REQUIREMENTS.md:5106, which already declares AT-195 and TC-496 'retired ids and are not reused': AT-195 was mechanism-only under a black-box id and was withdrawn. |
+| `TC-019a` | Verifier lived in the cdfx/ test suite (tests/test_cdfx_*.py), which was removed when the cdfx package retired at batch-07 E3b; no such file exists at the seed commit. Recorded in tests/test_engine_unchanged.py's module docstring. |
+| `TC-019d` | Verifier lived in the cdfx/ test suite (tests/test_cdfx_*.py), which was removed when the cdfx package retired at batch-07 E3b; no such file exists at the seed commit. Recorded in tests/test_engine_unchanged.py's module docstring. |
+| `TC-019h` | Verifier lived in the cdfx/ test suite (tests/test_cdfx_*.py), which was removed when the cdfx package retired at batch-07 E3b; no such file exists at the seed commit. Recorded in tests/test_engine_unchanged.py's module docstring. |
+| `TC-027a` | Verifier lived in the cdfx/ test suite (tests/test_cdfx_*.py), which was removed when the cdfx package retired at batch-07 E3b; no such file exists at the seed commit. Recorded in tests/test_engine_unchanged.py's module docstring. |
+| `TC-027b` | Verifier lived in the cdfx/ test suite (tests/test_cdfx_*.py), which was removed when the cdfx package retired at batch-07 E3b; no such file exists at the seed commit. Recorded in tests/test_engine_unchanged.py's module docstring. |
+| `TC-141` | Cited only in the module docstring of tests/test_a2l_inline_axis_length.py:19 as a PLACEMENT constraint ('batch-55's new tests must NOT land there', LLR-P1b.7), not as an assertion that file makes. No node carries it and none should: the constraint is about where tests live, so the file it names is the subject, not the verifier. |
+| `TC-152` | Same shape as TC-141: cited only in the module docstring of tests/test_a2l_alignment_sizing.py:20 as a placement constraint ('batch-56's new tests must NOT land there', LLR-A56.6). No node asserts it. |
+| `TC-319` | REMOVED, not renamed - determined from git history. test_tc319_regroup_section_structure_census was added at 2a647d1 (batch-35) and removed at 19bf1eb (batch-46) when tests/test_tui_patch_layout.py was rewritten for the three-window layout. Its census assertion SURVIVES, re-homed as the module-level _MUST_PRESERVE_IDS tuple (tests/test_tui_patch_layout.py:67) consumed at :353 by _drive_reparent_safety, which feeds test_at063c_reparent_safety_at_80/_at_120. CONSEQUENCE FOR C-26: its evidentiary basis is intact but now carried by AT-063c, not TC-319. The id is dead; the evidence is not. Anyone tracing C-26 through TC-319 finds nothing and must follow AT-063c instead. |
+| `TC-320` | Cited once, at REQUIREMENTS.md:3658, as a parenthetical '(TC-320 drift-set assertion: patch cells only)' with no node reference anywhere in the repo and no node of that id in git history. The drift-set assertion it names is carried by tests/test_tui_snapshot.py::test_tc321_batch36_patch_xfail_set (TC-321, LIVE), which pins the patch xfail set to exactly the two patch cells. TC-320 is a stale second id for TC-321's observable. |
+| `TC-324` | Verifier lived in tests/test_tui_entropy_viewer.py, which does not exist at the seed commit. REQUIREMENTS.md:3839 and :3879 already stated the file 'is deleted' in prose while the Validation lines kept citing it as a live verifier. |
+| `TC-325` | Verifier lived in tests/test_tui_entropy_viewer.py, which does not exist at the seed commit. REQUIREMENTS.md:3839 and :3879 already stated the file 'is deleted' in prose while the Validation lines kept citing it as a live verifier. |
+| `TC-326` | Verifier lived in tests/test_tui_entropy_viewer.py, which does not exist at the seed commit. REQUIREMENTS.md:3839 and :3879 already stated the file 'is deleted' in prose while the Validation lines kept citing it as a live verifier. |
+| `TC-327` | Verifier lived in tests/test_tui_entropy_viewer.py, which does not exist at the seed commit. REQUIREMENTS.md:3839 and :3879 already stated the file 'is deleted' in prose while the Validation lines kept citing it as a live verifier. |
+| `TC-496` | Transcribed from REQUIREMENTS.md:5106-5107: TC-496 was file-observed under a white-box id and was promoted, and the id is not reused. |
+
+**Burned ids** — ids that *never* had a verifier in this repository, as opposed to losing one —
+are not listed here. They are recorded in the registry with `status: BURNED` and a `provenance`
+field. The two statuses are deliberately not merged: `RETIRED` is a coverage regression somebody
+should see, and there are 21 of those, where a bulk import would have buried them among
+422 inert rows.
