@@ -921,15 +921,57 @@ def test_f17_format_bytes_is_inert_by_construction(tmp_path: Path) -> None:
     characters is in `MD_ESCAPE`, so the cells are inert no matter what the
     image contains — including `0x60`, whose ASCII form would be a backtick but
     whose HEX form is the harmless `60`.
-    """
-    from s19_app.tui.services.report_service import _format_bytes
 
-    rendered = _format_bytes(range(256))
-    assert set(rendered) <= set("0123456789ABCDEF "), (
-        f"_format_bytes emitted a character outside the hex alphabet: "
-        f"{sorted(set(rendered) - set('0123456789ABCDEF '))}"
+    batch-74 (LLR-105.7) caps the run at `REPORT_BYTES_PER_CELL` values and
+    appends a cue stating the elided count, which introduces characters the
+    original closed alphabet did not admit. The alphabet is WIDENED to
+    `HEX | {" "} | CUE_ALPHABET` — asserted against the module constant, never
+    relaxed to a blacklist and never dodged by shrinking the fixture below the
+    cap. This is a whitelist by design: it makes "byte cells need no escaping" a
+    structural fact rather than an argument, so replacing it with reasoning
+    would be a security-relevant weakening.
+    """
+    from s19_app.tui.services.markdown_safety import MD_ESCAPE
+    from s19_app.tui.services.report_service import (
+        CUE_ALPHABET,
+        REPORT_BYTES_PER_CELL,
+        _format_bytes,
     )
-    assert _format_bytes(None) == "-"
+
+    HEX_AND_SPACE = set("0123456789ABCDEF ")
+    ALLOWED = HEX_AND_SPACE | set(CUE_ALPHABET)
+
+    # The in-cap arm: no cue, so the ORIGINAL closed alphabet still holds and
+    # the widening above cannot hide a leak on the untruncated path.
+    in_cap = _format_bytes(
+        range(REPORT_BYTES_PER_CELL), max_bytes=REPORT_BYTES_PER_CELL
+    )
+    assert set(in_cap) <= HEX_AND_SPACE, (
+        f"_format_bytes emitted a character outside the hex alphabet on an "
+        f"UNTRUNCATED run: {sorted(set(in_cap) - HEX_AND_SPACE)}"
+    )
+
+    # The fixture SCALES with the constant. A fixed `range(256)` would stop
+    # truncating if `REPORT_CELL_CHARS` were ever raised past 767 — no cue, the
+    # widened alphabet trivially satisfied, and this node green while testing
+    # nothing. That is the fixture-shrink LLR-105.7 forbids, arriving by itself.
+    rendered = _format_bytes(
+        [i % 256 for i in range(2 * REPORT_BYTES_PER_CELL)],
+        max_bytes=REPORT_BYTES_PER_CELL,
+    )
+    assert set(rendered) - HEX_AND_SPACE, (
+        "the truncated branch was never exercised — no cue character reached "
+        "the output, so the widened alphabet below is vacuous"
+    )
+    assert set(rendered) <= ALLOWED, (
+        f"_format_bytes emitted a character outside HEX | {{' '}} | "
+        f"CUE_ALPHABET: {sorted(set(rendered) - ALLOWED)}"
+    )
+    assert not (set(CUE_ALPHABET) & set(MD_ESCAPE)), (
+        f"the cue introduced a MD_ESCAPE character into an UNESCAPED cell: "
+        f"{sorted(set(CUE_ALPHABET) & set(MD_ESCAPE))}"
+    )
+    assert _format_bytes(None, max_bytes=REPORT_BYTES_PER_CELL) == "-"
 
     # And in a REAL table, not a bare line: a lone `| x |` is just a paragraph,
     # so asserting "no live tokens" on one proves nothing.

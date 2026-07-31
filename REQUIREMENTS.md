@@ -4944,13 +4944,37 @@ emission there, not merely a cap.
   platform-dependent *behaviour*.
 - Status: Added in batch `2026-07-26-batch-63` (US-B63-D3, HLR-102, LLR-102.1…4). Frozen-engine
   diff = 0; goldens measured neutral over the whole suite, not assumed. **Scope carried, not
-  closed:** batch-63 shipped D3 only. D1 (the declared-region addendum's `O(R×V×E)` resident cost)
-  and D2 (a schema-legal address denying the report at the decimal `Length` column,
-  `report_service.py:996` and `:1171` — **line numbers as of `031ca8d`**; this batch added +47 lines (`git diff --numstat 031ca8d`: 49 insertions, 2 deletions)
-  to that module, so re-derive rather than copy them) were returned to `.dev-flow/BACKLOG-CODE.md` at the
-  Phase-2 re-gate with their measurements. The report's **resident-memory** axis — `_modifications_lines` /
-  `_checklist_lines` uncapped at a measured 988 B/entry — is a peer of the document-byte axes and is
-  closed by neither this requirement nor a `_ByteBudget` remedy.
+  closed:** batch-63 shipped D3 only. D1 (the declared-region addendum's `O(R×V×E)` resident cost) and
+  D2 (the decimal `Length` column) were returned to `.dev-flow/BACKLOG-CODE.md` at the Phase-2 re-gate
+  with their measurements. **D1 was closed by `R-TUI-098` (batch-65).**
+- **Two corrections applied at batch-74, both on executed evidence rather than on re-reading:**
+  - **The `report_service.py` line citations for D2 are REMOVED, not updated.** They were pinned "as
+    of `031ca8d`" with an instruction to re-derive before use; three batches have since edited that
+    module, so a reader cannot tell a stale number from a current one. A line number that must be
+    re-derived before it can be trusted is not a citation. ⚠ **An earlier form of this very
+    amendment then named a symbol that does not exist** (`_format_length`, 0 hits in the
+    package) — trading a stale-but-real citation for a durable-looking fiction is a worse
+    failure than the one it fixed, and it was caught at the PR gate. The real site is the
+    **inline `Length` expression** `{entry.address_end - entry.address_start}` in
+    `_modifications_lines` and `_checklist_lines`; there is no `Length` formatter to name.
+  - **D2's premise was FALSIFIED** (batch-74 §2.7 **P-20**, executed). *"A schema-legal **address**
+    denies the report"* is false: a huge address renders fine, and the `raise` keys on **`Length`**'s
+    decimal digits. D2 is further **unreachable through the shipped ingestion path** —
+    `addressed_range` bounds `Length` to 7 decimal digits against a 4300-digit limit — so it is
+    constructor-domain hardening, not a wire threat, and is split to **batch-75** with that
+    measurement. The genuinely wire-reachable oversized field is the **`Address`**, which no
+    requirement had chartered until `R-TUI-101`.
+- The report's **resident-memory** axis — the two row producers uncapped at a measured **`≈ 92 + 6·L`
+  bytes per rendered entry**, *linear in the entry's byte-run length `L`* — is a peer of the
+  document-byte axes and is closed by neither this requirement nor a `_ByteBudget` remedy. Its
+  **cardinality** and **per-cell width** halves are closed by `R-TUI-101` (batch-74); its
+  **emitted-bytes** half (F4) is not.
+  > ⚠ **The flat `988 B/entry` this document previously quoted here is FALSE** (batch-74 §2.7
+  > **P-14**, executed). The cost is not a constant — 988 is its value at a run length of `L ≈ 149`.
+  > Measured at an 8-byte run: **140.1 B/entry** (`_modifications_lines`), **126.1 B/entry**
+  > (`_checklist_lines`). Quoting a function's value at one unstated input as though it were the
+  > function is what let a row-count cap look sufficient. It is not, which is why `R-TUI-101` bounds
+  > **two** axes: one row can cost ~6 MiB at `MF_RUN_LENGTH_CEILING`.
 
 ## Bounded declared-region addendum — batch-65 (R-TUI-098)
 
@@ -4975,17 +4999,31 @@ classified.
 **What this requirement deliberately does NOT claim.** Each non-claim carries the number that was
 executed for it, because an over-claiming requirement is how a residual disappears:
 
-(a) **The project report's resident-memory exhaustion axis is NOT closed.** `_modifications_lines`
-and `_checklist_lines` remain uncapped at a measured **988 B/entry**, and the report's baseline peak
-with `declared_regions=()` still grows **×1.68 per E-doubling** and **×1.81 per V-doubling**
-(architect lane), **×1.94 per E-doubling** on the qa lane's fixture and **×1.77 per E-doubling** on
-the Phase-2 architect fixture — three fixtures, three figures, **not averaged**. At ordinary `R` and
-`V` those two tables **dominate** the addendum: 988 B/entry is ~11× the addendum's measured
-86.5–93.9 B/hit, and they scale with `E` where the bounded addendum no longer does. Any acceptance
-keyed to `generate_project_report`'s whole-report peak is therefore unsatisfiable, which is why
-`AT-194` keys on the **marginal delta** attributable to the addendum. This axis was already carried in
-`.dev-flow/BACKLOG-CODE.md` (batch-63 F2 / OB-4) and **stays there** — batch-65 must not be read as
-having pulled it in.
+(a) **The project report's resident-memory exhaustion axis is NOT closed by THIS requirement.**
+`_modifications_lines` and `_checklist_lines` were uncapped when batch-65 shipped, and the report's
+baseline peak with `declared_regions=()` still grows **×1.68 per E-doubling** and **×1.81 per
+V-doubling** (architect lane), **×1.94 per E-doubling** on the qa lane's fixture and **×1.77 per
+E-doubling** on the Phase-2 architect fixture — three fixtures, three figures, **not averaged**. At
+ordinary `R` and `V` those two tables **dominate** the addendum, and they scale with `E` where the
+bounded addendum no longer does. Any acceptance keyed to `generate_project_report`'s whole-report peak
+is therefore unsatisfiable, which is why `AT-194` keys on the **marginal delta** attributable to the
+addendum. This axis was carried in `.dev-flow/BACKLOG-CODE.md` (batch-63 F2 / OB-4) — batch-65 must
+not be read as having pulled it in.
+
+> **Amended at batch-74 — two corrections, one to a NUMBER and one to the STATUS.**
+>
+> - **The number.** This paragraph quoted a flat **988 B/entry** and compared it to the addendum's
+>   86.5–93.9 B/hit as *"~11×"*. `988` is **not a constant** (§2.7 **P-14**, executed): the cost is
+>   **`≈ 92 + 6·L`**, linear in the entry's byte-run length, and 988 is merely its value at `L ≈ 149`.
+>   At an 8-byte run it is **140.1 / 126.1 B/entry**, i.e. **~1.5×** the addendum's per-hit cost, not
+>   ~11×. **The ratio was never a property of the producers — it was a property of one unstated run
+>   length**, and stating it as a bare multiple is what made a row-count cap look sufficient.
+> - **The status.** `R-TUI-101` (batch-74) closes the **cardinality** and **per-cell width** halves of
+>   this axis for both producers, and bounds the previously unchartered **`Address`** cell. What
+>   remains open, and stays carried: the **emitted-bytes** gate (F4 — five sibling producers still
+>   reach the ungated `emit`, `_declaration_error_lines` alone at **315,912 B/variant**), the uncapped
+>   variant count `V` and per-variant check-file count `F`, and `_applied_regions` as a third
+>   unbounded producer. **This paragraph must not now be read as still open in full.**
 
 (b) **Traversal below one pass is not claimed.** The `R` multiplier is removed **from candidate
 consumption**; the `V×E` pass is not, and **per-class early exit is refused on purpose** — a run
@@ -5267,3 +5305,157 @@ position" was a **Variant A** mechanism; the operator chose Variant B. Carried t
   regenerated** — the CRC screen is in neither snapshot screen list and 0 CRC snapshots exist on disk
   (re-probed at Phase 2; the backlog's claim that "any change will drift the CRC snapshot cells" was
   measured **FALSE**).
+
+## Report row-producer bounding + the `Address` cell — batch-74 (R-TUI-101)
+
+**R-TUI-101**: `_modifications_lines` and `_checklist_lines` shall bound their own **resident**
+allocation on two independent axes — admitted row **cardinality** and the rendered **width** of every
+byte-run cell — independently of the per-variant entry count `E` and of the per-entry byte-run length
+`L`; shall materialise no intermediate full-population list; and shall disclose in the document every
+bound that fires, with a **correct** count of what was dropped. `_checklist_lines`' cap shall be spent
+**summed across all of the variant's check files**. Separately, the `Address` cell shall render at most
+`REPORT_ADDRESS_HEX_DIGITS` hex digits, derived **arithmetically** rather than by formatting and
+slicing, and any truncated rendering **shall fail** `^-?0x[0-9A-F]+$` while stating the number of hex
+digits elided — so that a shortened address is impossible to read as a complete one.
+
+**The defect, and why a row cap alone does not close it.** The wire admits `MF_ENTRY_COUNT_CEILING =
+100_000` entries per change file at `MF_RUN_LENGTH_CEILING = 1_048_576` bytes per run. The producers'
+cost is **`≈ 92 + 6·L` bytes per rendered entry** — *linear in the run length* — so **one row can cost
+~6 MiB** and a 200-row cap alone bounds the table at ~1.2 GB. Both axes are required, and they are
+**mutually invariant** (executed: cap-only leaves the width ratio at 1.9476; width-only leaves the
+cardinality ratio at 2.00), which is why they carry separate acceptance.
+
+**Why the bound is on the PRODUCER and not on the document.** `emit()` (`report_service.py:2215-2217`)
+calls `budget.consume(...)` only — **it accounts, it never gates** — and `emit(_modifications_lines(...))`
+has fully evaluated the producer before `consume` is reached. Charging these tables to `_ByteBudget`,
+which this project's backlog recommended twice, would close the emitted-bytes axis and leave resident
+memory **completely** untouched. This is batch-63's finding restated: *bounding output does not bound
+traversal*.
+
+**Why the `Address` requirement constrains the FORM and not only the width.** A hex address truncated
+to `0xFFFF…` is still a well-formed numeral, so a shortened cell is **indistinguishable from a complete
+one** — measured understatement `2**12248` on a 3572-digit address. Bounding without changing the form
+would close a memory hole by opening a **forgery** hole in a document whose purpose is evidentiary. The
+elided count is derived from the **value**, `(n.bit_length() + 3) // 4 − REPORT_ADDRESS_HEX_DIGITS`, and
+never from the raw string: `int('0x0FF…', 16)` discards the wire's leading zeros, so `len(raw) − 2`
+disagrees with it by exactly the number of leading zeros.
+
+**The threat is wire-reachable and was unchartered.** `_ADDRESS_RE` is `^0x[0-9A-Fa-f]+$` with **no
+digit limit** (`changes/io.py:235`), and `int(raw, 16)` **parses without limit** — CPython's
+`int_max_str_digits` guard does **not** apply to base-16 parsing. `int('0x' + 'F'*100000, 16)` renders a
+**100,000-character** cell; the only real ceiling is `READ_SIZE_CAP_BYTES = 268,435,456`. An earlier
+revision of this batch's own specification reassured itself that the cell was "bounded at 3574
+characters" — **that was false, and 3574 is merely what a decimal-limited value happens to render to.**
+
+**What this requirement deliberately does NOT claim.** Each non-claim carries the number executed for
+it, because an over-claiming requirement is how a residual disappears:
+
+(a) **The document is NOT byte-bounded, and no whole-report memory claim is made.** Five producers stay
+on the ungated `emit`: `_modified_files_lines` (`:2242`), `_declaration_error_lines` (`:2244`),
+`_entropy_lines` (`:2250`), `_addendum_lines` (`:2252`), and the hexdump notes.
+`_declaration_error_lines` alone measures **315,912 B/variant** at 500-char issue fields — capped at 200
+*issues*, never at *bytes* — giving a document floor of `2,097,152 + V × 315,912`: **1.15× budget at
+V=1, 2.51× at V=10, 16.06× at V=100.** Chartered to batch-75 (F4).
+
+(b) **The variant count `V` and the per-variant check-file count `F` have no cap anywhere.** This
+requirement bounds `F × CAP` **rows**; it does not bound the `O(V × F × 7)` structural lines each check
+file emits regardless.
+
+(c) **`_applied_regions` (`:1288`) is a third unbounded producer and is out of scope** — peak `16,128 →
+160,992 B` at `N = 2000 → 4000`. This is why a whole-report residency acceptance is **unsatisfiable**
+here, and why every residency gate below keys on a single producer.
+
+(d) **Above the cap the Modifications table is no longer a COMPLETE record of the variant's
+modifications**, and it has **no second sink in the report**. The notice says so; the change summary
+remains the complete record.
+
+(e) **Traversal strategy is NOT constrained.** An earlier revision required that traversal "shall not
+terminate", so the notice could state a true dropped count. That clause was **withdrawn as
+unfalsifiable**: `_checklist_lines` already computes a lazy filtered `kept`, and one-pass versus
+precount-then-break produce **byte-identical documents and identical `tracemalloc` ratios**. What is
+required is the count's **correctness**, which is observable; the strategy that produces it is not.
+
+(f) **The truncation notices do not reach `## Truncation appendix`.** The two new emitters take the
+count from 3 to 4, following `_declaration_error_lines`' inline-only convention. Carried.
+
+(g) **`REPORT_ADDRESS_HEX_DIGITS` has no in-domain exercise.** Every address in every golden renders to
+8 hex digits (executed census: the widest `Address` cell on disk is `0x00000000`, 10 characters), so the
+bound fires only on values no target could have produced. Its correctness rests on that census and on
+the byte-identity control, not on production traffic.
+
+- Code: `s19_app/tui/services/report_service.py` — `MAX_REPORT_ROWS_PER_VARIANT`,
+  `REPORT_BYTES_PER_CELL` (**derived** from `REPORT_CELL_CHARS`, not a fourth policy number),
+  `REPORT_BYTES_TRUNCATION_CUE_FMT`, `CUE_ALPHABET`, `ROW_TRUNCATION_NOTICE_FMT`,
+  `REPORT_ADDRESS_HEX_DIGITS` (**the policy number**), `REPORT_ADDRESS_TRUNCATION_CUE_FMT`,
+  `REPORT_ADDRESS_MAX_ELIDED_DIGITS`, `REPORT_ADDRESS_CHARS` (**derived top-down** from the policy
+  number); `_format_bytes(values, *, max_bytes)` — `max_bytes` **required and keyword-only**, matching
+  the module's own `md_safe(limit=...)` policy so no cap is ever inherited by accident;
+  `_format_address`; the single-pass `_modifications_lines`; `_checklist_lines`' cross-file admission
+  budget and its saturated-file rendering.
+- Validation: `Automated` — `tests/test_report_producer_bound.py`. Cardinality:
+  `test_at240_modifications_admits_at_most_the_cap`,
+  `test_at241_checklist_cap_is_summed_across_check_files`,
+  `test_at245_saturated_check_file_states_its_own_drop`, `test_tc540_cap_arms`,
+  `test_tc546_cap_is_summed_over_three_check_files`,
+  `test_tc547_saturated_file_omits_the_table_header`,
+  `test_tc547b_saturated_file_with_nothing_kept_keeps_todays_empty_table`. Width:
+  `test_at242_byte_cell_is_bounded_and_states_the_elided_count`,
+  `test_at243_checklist_byte_cells_are_bounded`, `test_tc541_byte_cell_width_arms`. Counts:
+  `test_at244_notice_counts_the_kept_rows_not_the_population`,
+  `test_tc542_count_correctness_under_a_filter`,
+  `test_tc543_notice_names_the_constant_its_value_and_the_total`. Address:
+  `test_at246_truncated_address_cannot_read_as_a_complete_one`,
+  `test_tc549_elided_count_comes_from_the_value_not_the_raw_string`,
+  `test_tc549b_a_negative_address_keeps_its_sign_through_truncation`,
+  `test_tc550_address_chars_equals_its_own_derivation`,
+  `test_tc551_the_address_cue_is_inert_in_markdown`. Residency:
+  `test_at248_modifications_residency_is_independent_of_entry_count`,
+  `test_at241b_checklist_residency_is_independent_of_entry_count`,
+  `test_at242b_byte_cell_residency_is_independent_of_run_length`,
+  `test_at249_address_residency_is_independent_of_digit_count`, with
+  `test_tc545_the_residency_oracle_discriminates`,
+  `test_tc546b_the_checklist_residency_oracle_discriminates`,
+  `test_tc545b_the_width_residency_oracle_discriminates` and
+  `test_tc548_the_address_residency_oracle_discriminates` as their falsifiers.
+  **All four bounded surfaces carry a residency oracle, and that completeness was not free:**
+  `AT-241b`/`TC-546b` were added at the **PR gate**, where an independent pass executed the gap — a
+  `_checklist_lines` that renders every row and slices the list at the budget is **output-identical**
+  and survived all 31 nodes at a measured ratio of **9.087** against a gate of 1.15. Three surfaces had
+  been gated and the fourth had not, while this requirement's "no intermediate full-population list"
+  clause names **both** producers. Byte identity:
+  `test_at247_under_cap_report_is_byte_identical_to_the_shipped_output` against a golden captured from
+  the **shipped** producer in a pre-flight commit touching only `tests/goldens/batch74/` (C-12 ordering
+  auditable via `git log --diff-filter=A`). Source rule: `test_tc544_...`. Plus
+  `tests/test_report_field_census.py::test_f17`, amended by **widening** its closed alphabet to
+  `HEX ∪ {" "} ∪ CUE_ALPHABET` — never relaxed to a blacklist and never by shrinking its fixture,
+  because it is a batch-62 escaping guard that pins *why* byte cells are exempt from escaping.
+- **The three residency gates are the load-bearing acceptance, and the reason is executed, not
+  argued.** Every output-shaped predicate over these axes is **blind to format-then-slice**: rendering
+  the whole run (or the whole address) and cutting the string afterwards emits **byte-identical output**.
+  Measured on the width axis at Inc-1: seven output-shaped nodes — including the positive control and
+  `test_f17` — stayed GREEN while the implementation peaked at **56,683,416 B against 9,490 B (5,973×)**.
+  Measured on the Address axis at Inc-2: `AT-246`'s three conjuncts — width, form and elided count —
+  **all remain satisfied** under format-then-slice, while residency moves **1.000 → 9.976**. A
+  consumption counter is **not** a substitute on either axis: it was rejected on the cardinality axis as
+  invariant, and on the width axis it goes RED on *correct* code, because `_format_bytes` deliberately
+  drains an un-sized iterator to count what it elided.
+- **Fixture shape is part of this requirement's acceptance, not an implementation detail.** An all-`F`
+  address fixture cannot distinguish rendering the **leading** digits from rendering the **trailing**
+  ones, and cannot distinguish `(bit_length()+3)//4` from `bit_length()//4` — the `+3` is a no-op
+  whenever the top nibble is ≥ 8. Both defects survived a 29-node suite at the increment gate and were
+  found by the independent reviewer; `test_tc549_...` now carries a non-uniform, top-nibble-`<8` arm
+  with its fixture preconditions asserted, so the formula the node quotes is observable.
+- Status: Added in batch `2026-07-31-batch-74` (US-B74-1 / US-B74-2, HLR-105 / HLR-106,
+  LLR-105.1…105.7 + LLR-106.1…106.4). **Re-scoped by operator decision at the 3-iteration cap:** F4
+  (the `_ByteBudget` per-row gate) and D2 (the inline `Length` cell + the `app.py` error re-attribution) are
+  **split to batch-75** with every measurement carried into `.dev-flow/BACKLOG-CODE.md` — the split is
+  safe only because those numbers survived it. **Partially discharges `R-TUI-098` non-claim (a)** and
+  corrects two of its figures; see that section's batch-74 amendment. Frozen-engine diff = 0; **0
+  goldens re-baselined** (the widest golden `Address` cell is 10 characters against a bound of 18 before
+  the cue, and the largest single `(document, variant)` Modifications table is **exactly 200** — the
+  zero-drift property is *exactly* spent at `MAX_REPORT_ROWS_PER_VARIANT`, not comfortably held).
+  Wording carve-outs owed and carried to batch-75: `LLR-105.5`'s ambiguous "the total" (resolved in code
+  as the **kept** total), `LLR-105.7`'s set-inclusion being literally false for `values=None`,
+  `LLR-106.3`'s undefined "maximum elided count" (defined as `READ_SIZE_CAP_BYTES −
+  REPORT_ADDRESS_HEX_DIGITS`, a **byte** cap used as an upper bound on a **digit** count), and
+  `LLR-105.2`'s silence on whose numbers a per-check-file notice carries (ruled: its own).
