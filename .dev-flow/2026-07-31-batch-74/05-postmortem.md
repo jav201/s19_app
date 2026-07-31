@@ -16,10 +16,19 @@
 > whole of OB-4, and it is why every bound this batch ships is gated by a **residency oracle** whose own
 > discrimination is executed by a paired falsifier.
 >
-> **The second finding is about us, not the code.** Across three increments in this module, **every
-> real defect was in a specification or an acceptance — none was an implementation bug.** The shipped
-> code was correct at every site the reviewer attacked. What was missing, every time, was a predicate
-> that *could have failed* if it had not been.
+> **The second finding is about us, not the code.** Across three increments and two review gates in
+> this module, **every real defect was in a specification or an acceptance — none was an implementation
+> bug.** The shipped code was correct at every site every reviewer attacked. What was missing, every
+> time, was a predicate that *could have failed* if it had not been.
+>
+> ⚠ **This document asserted the completeness of its own remedy, and the assertion was FALSE.** An
+> earlier revision of this BLUF read *"every bound this batch ships is gated by a residency oracle
+> whose own discrimination is executed by a paired falsifier."* The final PR gate executed it: three
+> surfaces were gated and **`_checklist_lines`' cardinality was not**. A full-population-then-slice
+> checklist producer is output-identical and survived all 31 nodes at a ratio of **9.087**. Closed by
+> `AT-241b`/`TC-546b` before merge — but the lesson is that **the post-mortem repeated the batch's own
+> defect while describing it**: a universal claim, written from three confirming instances, never
+> enumerated the population it quantified over. See **L-7**.
 
 ## 1. What shipped
 
@@ -28,7 +37,7 @@
 | **Requirement** | `R-TUI-101` — two-axis producer bound on `_modifications_lines` / `_checklist_lines`, plus the `Address` cell |
 | **Merged as** | see `06-closeout.md` |
 | **Production files** | `s19_app/tui/services/report_service.py` (only) |
-| **Test ledger** | `tests/test_report_producer_bound.py` **0 → 31**; `test_report_field_census.py::test_f17` amended by **widening** a closed alphabet |
+| **Test ledger** | `tests/test_report_producer_bound.py` **0 → 33**; `test_report_field_census.py::test_f17` amended by **widening** a closed alphabet |
 | **Gate suite** | `pytest -q` (full, `slow` included): **2434 passed, 2 skipped, 3 xfailed, 29 snapshots**, 25m08s |
 | **Goldens re-baselined** | **0** |
 | **Frozen-engine diff** | **0** (both guards) |
@@ -124,6 +133,19 @@ The record shows my note and its finding as the same observation — but only on
 declare `988 B/entry` **FALSE** — and `TC-497` stayed **GREEN**. It cannot distinguish an assertion
 from its refutation. Registered as a MAJOR with its fix shape (bind the figure to its subject and its
 section; a bare token scan can only ever pin a token).
+
+### L-7 — A universal claim needs its population ENUMERATED, not sampled. **← found by this document being wrong**
+
+I wrote *"every bound this batch ships is gated by a residency oracle"* after gating three surfaces. I
+never listed the bounds this batch ships and checked them off. The fourth — `_checklist_lines`'
+cardinality — was named by the requirement in the same breath as the first, and was ungated. The claim
+was assembled from confirming instances, which is exactly how the seven false premises in §2 were
+assembled.
+
+**Transferable rule:** *when a summary says "every X", write the list of X and tick it.* The cost is one
+list; the failure mode is a document that certifies its own gap. Note the asymmetry that made this
+survivable: the omission was found because an independent gate **enumerated the producers** rather than
+reading the claim.
 
 ## 5. What went well
 

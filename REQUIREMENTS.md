@@ -4951,8 +4951,12 @@ emission there, not merely a cap.
   - **The `report_service.py` line citations for D2 are REMOVED, not updated.** They were pinned "as
     of `031ca8d`" with an instruction to re-derive before use; three batches have since edited that
     module, so a reader cannot tell a stale number from a current one. A line number that must be
-    re-derived before it can be trusted is not a citation — the symbol names are (`_format_length`,
-    and the two row producers).
+    re-derived before it can be trusted is not a citation. ⚠ **An earlier form of this very
+    amendment then named a symbol that does not exist** (`_format_length`, 0 hits in the
+    package) — trading a stale-but-real citation for a durable-looking fiction is a worse
+    failure than the one it fixed, and it was caught at the PR gate. The real site is the
+    **inline `Length` expression** `{entry.address_end - entry.address_start}` in
+    `_modifications_lines` and `_checklist_lines`; there is no `Length` formatter to name.
   - **D2's premise was FALSIFIED** (batch-74 §2.7 **P-20**, executed). *"A schema-legal **address**
     denies the report"* is false: a huge address renders fine, and the `raise` keys on **`Length`**'s
     decimal digits. D2 is further **unreachable through the shipped ingestion path** —
@@ -5406,11 +5410,19 @@ the byte-identity control, not on production traffic.
   `test_tc550_address_chars_equals_its_own_derivation`,
   `test_tc551_the_address_cue_is_inert_in_markdown`. Residency:
   `test_at248_modifications_residency_is_independent_of_entry_count`,
+  `test_at241b_checklist_residency_is_independent_of_entry_count`,
   `test_at242b_byte_cell_residency_is_independent_of_run_length`,
   `test_at249_address_residency_is_independent_of_digit_count`, with
   `test_tc545_the_residency_oracle_discriminates`,
+  `test_tc546b_the_checklist_residency_oracle_discriminates`,
   `test_tc545b_the_width_residency_oracle_discriminates` and
-  `test_tc548_the_address_residency_oracle_discriminates` as their falsifiers. Byte identity:
+  `test_tc548_the_address_residency_oracle_discriminates` as their falsifiers.
+  **All four bounded surfaces carry a residency oracle, and that completeness was not free:**
+  `AT-241b`/`TC-546b` were added at the **PR gate**, where an independent pass executed the gap — a
+  `_checklist_lines` that renders every row and slices the list at the budget is **output-identical**
+  and survived all 31 nodes at a measured ratio of **9.087** against a gate of 1.15. Three surfaces had
+  been gated and the fourth had not, while this requirement's "no intermediate full-population list"
+  clause names **both** producers. Byte identity:
   `test_at247_under_cap_report_is_byte_identical_to_the_shipped_output` against a golden captured from
   the **shipped** producer in a pre-flight commit touching only `tests/goldens/batch74/` (C-12 ordering
   auditable via `git log --diff-filter=A`). Source rule: `test_tc544_...`. Plus
@@ -5435,7 +5447,7 @@ the byte-identity control, not on production traffic.
   with its fixture preconditions asserted, so the formula the node quotes is observable.
 - Status: Added in batch `2026-07-31-batch-74` (US-B74-1 / US-B74-2, HLR-105 / HLR-106,
   LLR-105.1…105.7 + LLR-106.1…106.4). **Re-scoped by operator decision at the 3-iteration cap:** F4
-  (the `_ByteBudget` per-row gate) and D2 (`_format_length` + the `app.py` error re-attribution) are
+  (the `_ByteBudget` per-row gate) and D2 (the inline `Length` cell + the `app.py` error re-attribution) are
   **split to batch-75** with every measurement carried into `.dev-flow/BACKLOG-CODE.md` — the split is
   safe only because those numbers survived it. **Partially discharges `R-TUI-098` non-claim (a)** and
   corrects two of its figures; see that section's batch-74 amendment. Frozen-engine diff = 0; **0

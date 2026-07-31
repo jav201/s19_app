@@ -1852,3 +1852,177 @@ def test_tc551_the_address_cue_is_inert_in_markdown() -> None:
     allowed = set("0123456789ABCDEF") | {"x"} | set(rendered)
     stray = sorted(set(cell) - allowed)
     assert not stray, f"the truncated Address cell emitted stray characters {stray}"
+
+
+# ---------------------------------------------------------------------------
+# AT-241b / TC-546b — LLR-105.2's RESIDENCY half, added at the PR gate
+# ---------------------------------------------------------------------------
+#
+# The batch gated three surfaces with a residency oracle — `_modifications_lines`
+# (AT-248), `_format_bytes` (AT-242b) and `_format_address` (AT-249) — and left
+# the fourth ungated. The final PR-level review executed the gap: a
+# `_checklist_lines` that renders EVERY row and slices the list at the budget is
+# **output-identical** and survived all 31 nodes, at a measured residency ratio
+# of 9.087 against a gate of 1.15.
+#
+# That is this batch's own headline lesson, arriving one surface late:
+# LLR-105.1's "no intermediate full-population list" clause binds BOTH producers,
+# and an output-shaped predicate cannot see the difference. The asymmetry was an
+# omission, not redundancy — the identical defect shape planted in
+# `_modifications_lines` IS caught, by AT-248.
+
+
+def _checklist_oracle_fixture(count: int) -> VariantExecutionResult:
+    """Build a one-variant, one-check-file fixture of ``count`` narrow entries."""
+    return _result(
+        "v0",
+        [],
+        [_check([_check_entry(0x8000_0000 + 16 * i) for i in range(count)])],
+    )
+
+
+def _checklist_ratio(
+    producer: Callable[[VariantExecutionResult], List[str]],
+) -> Tuple[float, int, int]:
+    """Measure ``peak(E_hi) / peak(E_lo)`` for a checklist producer.
+
+    The §5.1 oracle, unchanged in shape from :func:`_ratio` — both measurement
+    points strictly above the cap, fixtures built and the producer warmed
+    OUTSIDE every measured window.
+    """
+    cap = _cap()
+    lo_count = _E_LO_MULTIPLE * cap
+    hi_count = _E_HI_MULTIPLE * cap
+    assert lo_count > cap and hi_count > cap, (
+        f"both measurement points must be strictly above the cap ({cap}); got "
+        f"E_lo={lo_count}, E_hi={hi_count}. Below the cap the ratio measures "
+        f"the fixture, not the bound."
+    )
+    lo_fixture = _checklist_oracle_fixture(lo_count)
+    hi_fixture = _checklist_oracle_fixture(hi_count)
+    producer(lo_fixture)  # warm-up at scale, outside every measured window
+    producer(hi_fixture)
+    lo_peak = _peak(producer, lo_fixture)
+    hi_peak = _peak(producer, hi_fixture)
+    return hi_peak / lo_peak, lo_peak, hi_peak
+
+
+def test_at241b_checklist_residency_is_independent_of_entry_count() -> None:
+    """AT-241b — LLR-105.1/105.2: `_checklist_lines` bounds its OWN allocation.
+
+    Intent (§5.1): past the cap a producer that admits rows as it finds them has
+    residency independent of ``E``, so the ratio is 1.000 by construction on any
+    host. One that materialises the full population and slices it emits the SAME
+    DOCUMENT while peaking with ``E`` — the defect AT-248 catches on the sibling
+    producer and which nothing caught here until the PR gate. ``TC-546b`` proves
+    this oracle can fail.
+    """
+    ratio, lo_peak, hi_peak = _checklist_ratio(report_service._checklist_lines)
+    assert ratio <= _RESIDENCY_THRESHOLD, (
+        f"_checklist_lines residency scales with E: peak(E_lo)={lo_peak} "
+        f"peak(E_hi)={hi_peak} ratio={ratio:.3f} > {_RESIDENCY_THRESHOLD} — the "
+        f"cap is applied to a fully materialised row list, not at admission"
+    )
+
+
+def _checklist_full_population_body(
+    result: VariantExecutionResult,
+) -> List[str]:
+    """The DEFECTIVE-ON-PURPOSE checklist counterfactual: render all, then slice.
+
+    Byte-identical output to :func:`report_service._checklist_lines` for an
+    unfiltered fixture, unbounded transient — every row exists before anything is
+    cut, which is precisely the allocation LLR-105.1's "no intermediate
+    full-population list" clause forbids.
+    """
+    lines = ["### Checklists", ""]
+    if not result.check_results:
+        lines.extend(["No checklists were executed for this variant.", ""])
+        return lines
+    cap = _cap()
+    per_cell = _bytes_per_cell()
+    admitted = 0
+    for check in result.check_results:
+        source = (
+            f"`{report_service.md_code(check.source_path)}`"
+            if check.source_path is not None
+            else "(in-memory document)"
+        )
+        lines.extend(
+            [
+                f"#### Checklist: {source}",
+                "",
+                f"Passed: {check.aggregates.get('passed', 0)} - "
+                f"Failed: {check.aggregates.get('failed', 0)} - "
+                f"Uncheckable: {check.aggregates.get('uncheckable', 0)}",
+                "",
+            ]
+        )
+        saturated = admitted >= cap
+        # THE DEFECT, and the only line that differs from the shipped producer.
+        all_rows = [
+            f"| {report_service._format_address(entry.address_start)} "
+            f"| {entry.address_end - entry.address_start} "
+            f"| {report_service._format_bytes(entry.expected_bytes, max_bytes=per_cell)} "
+            f"| {report_service._format_bytes(entry.actual_bytes, max_bytes=per_cell)} "
+            f"| {report_service.md_safe(entry.result, limit=report_service.REPORT_CELL_CHARS)} |"
+            for entry in check.entries
+        ]
+        file_kept = len(all_rows)
+        rows = all_rows[: max(0, cap - admitted)]
+        admitted += len(rows)
+        if not (saturated and file_kept):
+            lines.extend(
+                [
+                    "| Address | Length | Expected | Actual | Result |",
+                    "|---|---|---|---|---|",
+                ]
+            )
+            lines.extend(rows)
+        file_dropped = file_kept - len(rows)
+        if file_dropped:
+            lines.append(
+                report_service.ROW_TRUNCATION_NOTICE_FMT.format(
+                    section=f"Checklist: {source}",
+                    dropped=file_dropped,
+                    total=file_kept,
+                    cap=cap,
+                )
+            )
+        lines.append("")
+    return lines
+
+
+def test_tc546b_the_checklist_residency_oracle_discriminates() -> None:
+    """TC-546b — AT-241b's gate must be exceeded by the full-population shape.
+
+    Intent: the falsifier AT-241b needs. The counterfactual is first shown
+    OUTPUT-EQUIVALENT — that is the point, because it means no output-shaped
+    predicate in this file can tell the two apart — and then shown to fail the
+    gate the shipped producer passes. The transcript is printed so the numbers
+    are auditable.
+    """
+    cap = _cap()
+    for count in (cap - 1, cap, cap + 1, _E_LO_MULTIPLE * cap):
+        fixture = _checklist_oracle_fixture(count)
+        assert _checklist_full_population_body(fixture) == (
+            report_service._checklist_lines(fixture)
+        ), (
+            f"the counterfactual is not output-equivalent at E={count}, so it "
+            f"does not demonstrate the hole it exists to demonstrate"
+        )
+
+    shipped, _, _ = _checklist_ratio(report_service._checklist_lines)
+    full, _, _ = _checklist_ratio(_checklist_full_population_body)
+    print(
+        f"\nAT-241b checklist oracle (E: {_E_LO_MULTIPLE}·CAP -> "
+        f"{_E_HI_MULTIPLE}·CAP)\n"
+        f"  ADMISSION-BOUNDED (shipped) : {shipped:.3f}\n"
+        f"  FULL-POPULATION-THEN-SLICE  : {full:.3f}\n"
+        f"  gate                        : <= {_RESIDENCY_THRESHOLD}"
+    )
+    assert full > _RESIDENCY_THRESHOLD, (
+        f"the full-population shape passed the gate at {full:.3f} — AT-241b "
+        f"cannot detect the defect it exists to detect"
+    )
+    assert shipped <= _RESIDENCY_THRESHOLD
