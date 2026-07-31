@@ -27,16 +27,16 @@
     "P15_TRUE_WITH_ADAPTATION": "batch-65's _addendum_lines shape transfers in three of its four mechanisms (admission counters with the cap applied AT admission; traversal NOT terminated on saturation so the notice can state a true dropped count; one truncation notice naming what was cut). The fourth - format only AFTER the membership test - has NO analogue: the addendum has a region-membership discriminator and these two producers have none, since every entry is a row by definition.",
     "P6_TRUE": "The plan's load-bearing design constraint is confirmed at the source: emit() (:2215-2217) calls budget.consume(...) only - it ACCOUNTS, NEVER GATES. The sole budget.fits(...) gate is _hexdump_section:1455. So emit(_modifications_lines(...)) at :2243 has fully materialised the producer before consume is reached, and charging these tables to _ByteBudget would close F4 while leaving OB-4 completely untouched."
   },
-  "current_phase": 3,
-  "phase_status": "in-progress",
+  "current_phase": 6,
+  "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
     "1": 3,
     "2": 3,
     "3": 1,
-    "4": 0,
-    "5": 0,
-    "6": 0
+    "4": 1,
+    "5": 1,
+    "6": 1
   },
   "artifacts": {
     "plan": ".dev-flow/2026-07-31-batch-74/PLAN.md",
@@ -44,7 +44,9 @@
     "1": ".dev-flow/2026-07-31-batch-74/01-requirements.md",
     "2": ".dev-flow/2026-07-31-batch-74/02-review.md",
     "3": ".dev-flow/2026-07-31-batch-74/03-increments/",
-    "handoff": ".dev-flow/HANDOFF-2026-07-31-batch-74-resume.md"
+    "handoff": ".dev-flow/HANDOFF-2026-07-31-batch-74-resume.md",
+    "5": ".dev-flow/2026-07-31-batch-74/05-postmortem.md",
+    "6": ".dev-flow/2026-07-31-batch-74/06-closeout.md"
   },
   "decisions_log": [
     {
@@ -166,8 +168,35 @@
       "date": "2026-07-31",
       "decision": "Inc-3 COMPLETE and committed b987090 - R-TUI-101 + the R-TUI-097/098 corrections + the batch-75 split",
       "notes": "The split is what makes the operator's re-scope a SPLIT rather than a DELETION, so it was treated as load-bearing. BACKLOG-CODE.md gained a batch-75 charter carrying every unspent measurement: emit() ACCOUNTS but never GATES (which falsifies the 'charge them to _ByteBudget' remedy this backlog recommended TWICE); _declaration_error_lines at 315,912 B/variant -> 16.06x budget at V=100; D2's app.py half certified clean to re-route; D2's three acceptance traps. REQUIREMENTS.md: R-TUI-101 with SEVEN non-claims, each carrying its executed number; R-TUI-097's D2 line citations REMOVED rather than updated (a line number that must be re-derived before it can be trusted is not a citation) and its headline premise recorded FALSE; R-TUI-098 non-claim (a)'s flat 988 B/entry corrected to ~ 92 + 6*L, with its derived '~11x the addendum' comparison withdrawn as a property of one unstated run length rather than of the producers. NEW MAJOR found by DOING this increment and EXECUTED: TC-497 cannot tell an ASSERTION from its REFUTATION - it greps REQUIREMENTS.md for residual figures VERBATIM, so rewriting non-claim (a) to declare 988 B/entry FALSE left it GREEN. Registered in BACKLOG-CODE.md with the fix shape: bind the figure to its subject and its section, never a bare presence grep."
+    },
+    {
+      "phase": 4,
+      "date": "2026-07-31",
+      "decision": "Phase-4 gate suite run by the ORCHESTRATOR, never delegated (C-25)",
+      "notes": "pytest -q FULL including the slow marker: 2434 passed / 2 skipped / 3 xfailed / 29 snapshots in 25m08s, then re-run after the PR-gate discharge at 2436 passed / 2 skipped / 3 xfailed / 29 snapshots in 30m38s. Run locally, which is STRONGER than the blocking CI job on snapshots and weaker on nothing: tui-ci installs plain pytest and never the [dev] extra, so its 29 snapshot cells are SKIPPED there, and only the advisory continue-on-error job exercises them. Stated explicitly because citing 'CI green' without it would be false. Both engine-frozen guards green; ruff clean (courtesy only - the repo configures no linter and tui-ci has no lint step)."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-31",
+      "decision": "FINAL PR-LEVEL GATE returned BLOCK on one HIGH; discharged, then the merge decision RETURNED TO THE OPERATOR rather than self-merged",
+      "notes": "H-1 HIGH: the batch gated THREE surfaces with a residency oracle (_modifications_lines AT-248, _format_bytes AT-242b, _format_address AT-249) and left the FOURTH ungated. The gate executed it: a _checklist_lines that renders every row and slices the list at the budget is OUTPUT-IDENTICAL and survived all 31 nodes at ratio 9.087 vs a gate of 1.15. R-TUI-101's 'no intermediate full-population list' clause names BOTH producers, marked Validation Automated, and carried no non-claim for it. Closed by AT-241b + TC-546b (tests only, zero production change); the reviewer's mutation now reddens at 9.087, reproducing its number exactly. M-1 LOW, and the worse one for the author: REQUIREMENTS.md removed D2's stale line citations ARGUING that symbol names are more durable, then named `_format_length`, which DOES NOT EXIST (0 hits in the package) - a stale-but-real citation traded for a durable-looking fiction. Corrected in both live documents to name the real site (the inline address_end - address_start expression). The batch's own post-mortem BLUF was also corrected: it claimed 'every bound this batch ships is gated by a residency oracle', assembled from three confirming instances and never enumerated - the same defect the document was written to describe, recorded as L-7 rather than quietly fixed. AUTHORIZATION HANDLING: the standing grant says a HIGH finding blocks and returns to the operator, so despite full merge authority the merge was NOT self-approved; the operator was asked and selected 'Espero CI verde y mergeo'. Merged after CI went green on the discharged head."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-31",
+      "decision": "MERGED 537f27d (PR #173, squash) after CI green on the DISCHARGED head",
+      "notes": "The cross-host question mattered and was answered by execution, not by argument: the three residency gates are calibrated as ratios with a 1.15 threshold, and they had only ever run on Windows/py3.14. tui-ci runs ubuntu-latest/py3.11 and passed on BOTH heads (35m11s pre-discharge, 37m30s post-discharge) - the post-discharge run being the one that first exercised AT-241b off-host. A correct implementation renders byte-identical work in both measurement windows, so the ratio is 1.000 BY CONSTRUCTION rather than by calibration, which is why the gate is host-invariant. Post-merge canonical-doc integrity verified ON MERGED MAIN rather than on the branch (per the verify-merged-canonical-docs convention): R-TUI-101 x1, its heading x1, the batch-75 charter x1, no duplicated headers. The merged tree re-runs its own gates green."
     }
   ],
   "obsidian_synced": false,
-  "created_at": "2026-07-31T00:00:00Z"
+  "created_at": "2026-07-31T00:00:00Z",
+  "merged": {
+    "pr": 173,
+    "squash": "537f27d",
+    "base": "093ff8e",
+    "date": "2026-07-31",
+    "ci": "tui-ci pass 37m30s; snapshot pass 1m41s (advisory job - it is the ONLY job that exercises the 29 snapshot cells; the blocking job installs plain pytest and SKIPS them)",
+    "local_gate": "pytest -q full incl. slow: 2436 passed, 2 skipped, 3 xfailed, 29 snapshots, 30m38s",
+    "branch_retained": "claude/batch-74-s19-app-a693ff (18 commits, not deleted)"
+  }
 }
