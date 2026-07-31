@@ -428,8 +428,10 @@ To be added to `BACKLOG-PROCESS.md` **as a separate reviewed edit**, not folded 
 1. **(P2) `R-*` / `LLR-*` / `US-*` are unregistered and demonstrably collide.** batch-63 re-used live
    `R-TUI-079/080/081`. Scoped out by operator ruling; registered so the exposure is a decision, not an
    oversight.
-2. **(P3) Four of the five figures in the AT/TC registry item do not reproduce.** Corrected in §1; the
-   backlog text still carries them.
+2. **(P3) Three of the five figures in the AT/TC registry item do not reproduce, and a fourth attaches a
+   correct percentage to a false sentence.** Precisely: 73 % AT, the 134-id spread, and 75 AT/119 TC fail to
+   reproduce; TC's 52 % is right but *"registers 97 of 188"* should read **91** of 188; the 6 phantoms
+   reproduce id-for-id. Corrected in §1.1; the backlog text still carries the originals.
 3. **(P3) The item mislocates `TC-319`'s citation** as `CLAUDE.md`; it is `REQUIREMENTS.md` (§6.1).
 
 ---
