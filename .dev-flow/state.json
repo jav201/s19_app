@@ -25,12 +25,12 @@
     "P15_TRUE_WITH_ADAPTATION": "batch-65's _addendum_lines shape transfers in three of its four mechanisms (admission counters with the cap applied AT admission; traversal NOT terminated on saturation so the notice can state a true dropped count; one truncation notice naming what was cut). The fourth - format only AFTER the membership test - has NO analogue: the addendum has a region-membership discriminator and these two producers have none, since every entry is a row by definition.",
     "P6_TRUE": "The plan's load-bearing design constraint is confirmed at the source: emit() (:2215-2217) calls budget.consume(...) only - it ACCOUNTS, NEVER GATES. The sole budget.fits(...) gate is _hexdump_section:1455. So emit(_modifications_lines(...)) at :2243 has fully materialised the producer before consume is reached, and charging these tables to _ByteBudget would close F4 while leaving OB-4 completely untouched."
   },
-  "current_phase": 0,
-  "phase_status": "approved",
+  "current_phase": 2,
+  "phase_status": "awaiting-gate",
   "iterations_per_phase": {
     "0": 0,
-    "1": 0,
-    "2": 0,
+    "1": 2,
+    "2": 2,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -38,7 +38,9 @@
   },
   "artifacts": {
     "plan": ".dev-flow/2026-07-31-batch-74/PLAN.md",
-    "0": ".dev-flow/2026-07-31-batch-74/00-measurements.md"
+    "0": ".dev-flow/2026-07-31-batch-74/00-measurements.md",
+    "1": ".dev-flow/2026-07-31-batch-74/01-requirements.md",
+    "2": ".dev-flow/2026-07-31-batch-74/02-review.md"
   },
   "decisions_log": [
     {
@@ -76,6 +78,12 @@
       "date": "2026-07-31",
       "decision": "Phase-0 gate SELF-APPROVED under the kickoff grant",
       "notes": "Exit axes: Coverage MET (all 3 backlog items OB-4/F4/D2 intaken as stories with black-box outcomes; D-11 and diff_report_service explicitly fenced OUT). Evidence MET (17 premises each with an executed probe or a file:line; 3 measurement runs pasted; golden blast radius executed not predicted). Certainty MET-WITH-A-NAMED-CARRY: the falsification of P-14 is itself the Phase-0 certainty result, and the two undecided cap VALUES (D-2, D-3) are named, measured and carried to Phase 1 rather than left implicit. Advance to Phase 1."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "ITERATION CAP REACHED - ESCALATED TO OPERATOR instead of spending the last autonomous pass",
+      "notes": "Phase-2 cross-review (architect+qa+security, parallel) returned ITERATE from ALL THREE lanes: 12 raw blockers deduplicated to 7 distinct. The top blocker was found INDEPENDENTLY by all three lanes - HLR-106/AT-227 claimed a whole-document byte bound that is unsatisfiable, because _declaration_error_lines alone emits a measured 315,912 B/variant through the ungated emit(). Revision 2 folded all 7 + 16 majors. The Phase-2 RE-GATE (discharge form) then returned 3 DISCHARGED / 4 PARTIAL / 3 NEW blockers CREATED BY THE FOLD, with a diagnosable pattern: revision 2 moved the requirement scope and left the AT predicate behind, so three ATs are now RED after a CORRECT implementation - the same defect class reproduced one level down. Two executed refutations were re-verified by the orchestrator: (i) int('0x'+'F'*100000,16) PARSES because CPython's int_max_str_digits does not apply to base-16, so an Address cell renders 100,000 chars and the real ceiling is READ_SIZE_CAP_BYTES=268MB - my LLR-105.7 reassurance of 3574 B was false, and the fold closed a forgery hole by re-opening a memory hole; (ii) _checklist_lines:1243-1248 already computes a lazy filtered kept count, so BL-6's filtered-fixture remedy does not force traversal continuation, and LLR-105.4's declared subject has NO observable consequence at all (one-pass and precount-plus-break produce byte-identical documents AND identical tracemalloc ratios) - it is unfalsifiable as stated. Both Phase 1 and Phase 2 are now at 2 iterations with a third pending; the operator's launch instruction is explicit ('si topas el cap, escala conmigo - no hagas loop'), so the batch STOPS here for an operator decision rather than spending the final autonomous pass. NO PRODUCTION CODE HAS BEEN WRITTEN - the entire batch to date is specification work."
     }
   ],
   "obsidian_synced": false,
