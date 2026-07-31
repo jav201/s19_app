@@ -41,7 +41,8 @@
     "plan": ".dev-flow/2026-07-31-batch-74/PLAN.md",
     "0": ".dev-flow/2026-07-31-batch-74/00-measurements.md",
     "1": ".dev-flow/2026-07-31-batch-74/01-requirements.md",
-    "2": ".dev-flow/2026-07-31-batch-74/02-review.md"
+    "2": ".dev-flow/2026-07-31-batch-74/02-review.md",
+    "3": ".dev-flow/2026-07-31-batch-74/03-increments/"
   },
   "decisions_log": [
     {
@@ -115,6 +116,18 @@
       "date": "2026-07-31",
       "decision": "Inc-0 COMPLETE - AT-247's byte-identity golden captured from the SHIPPED producer",
       "notes": "Commit touches ONLY tests/goldens/batch74/, making the C-12 ordering auditable via 'git log --diff-filter=A -- tests/goldens/batch74/' preceding the first report_service.py commit - prose cannot enforce that once the file is in the tree, but the commit graph can. Fixture covers BOTH producers (2 variants x (1 change summary + 1 check result)): 10 Modifications rows + 8 Checklist rows, all under-cap, in-domain, sub-width (widest byte cell 11 chars). 3920 bytes, no host path. STORED BLOB verified LF-only via git cat-file (not the working file) per the repo's known autocrlf evidence-corruption trap; tests/goldens/** carries 'text eol=lf'."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "Inc-1 APPROVED and committed f63d6d1 after an independent code review returned BLOCK on a HIGH finding",
+      "notes": "LLR-105.1/105.3/105.5/105.6/105.7; AT-240/242/242b/244/247/248 + TC-540..545; 82 passed. THE INCREMENT'S CENTRAL CLAIM SHIPPED WITHOUT A FALSIFIER. Every width-axis predicate authored at Inc-1 was OUTPUT-shaped, so a format-then-slice _format_bytes emits BYTE-IDENTICAL output, passed all 79 tests, and peaked at 56,683,416 B against the correct implementation's 9,490 B - 5,973x. AT-248 could not catch it either because its fixture uses a 1-byte run and never exercises the width axis. This is the house defect of this exact code area and it survived the implementer's own C-40 pass precisely because the mutation changes NO OUTPUT - which is why C-40 limb 1 (is the declared subject IN the expression?) has to be asked separately from 'is it correct?'. Closed by AT-242b, the section-5.1 residency oracle applied to the width axis. DISCHARGED BY THE ORCHESTRATOR on the real tree with a hash-verified restore (d40d8770 -> mutated -> d40d8770): under the mutation the output-shaped AT-242 PASSES while AT-242b FAILS on its own assertion line at ratio=2.738 > 1.15. The PAIR is the evidence, not either half. A first mutation attempt was ABORTED by its own apply-check when the target string did not match - a typo'd mutation also 'fails', for the wrong reason. Also folded F2: the anti-vacuity guard in test_f17 carried its own opt-out ('or 256 <= REPORT_BYTES_PER_CELL') that would auto-disable it if REPORT_CELL_CHARS were raised past 767, which is exactly the fixture-shrinking LLR-105.7 forbids. C-12 ordering audited on-branch: golden c613b6a 07:59 precedes the first report_service.py edit f63d6d1 08:40."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: three spec defects found BY IMPLEMENTING were corrected rather than worked around",
+      "notes": "(a) Section 7's AT column kept pre-renumber BARE numbers - the collision renumber replaced 'AT-220' but section 7 stores '220, 222, ...' with no prefix, so a string replace could not see them. Corrected to 240/242/244/247/248 and 241/243/245/246/249. (b) Section 5.1's CAP-ONLY figure 1.921 DID NOT REPRODUCE - measured 2.224 - because section 5.1 never DEFINED the CAP-ONLY shape, so two reconstructions differ. Verdict unchanged (both defective shapes sit far above the 1.15 gate) but a number whose counterfactual is undefined is not reproducible and should not have been quoted as though it were; the counterfactual now lives in code as _shipped_body/_cap_only_body. FUSED measured 1.000 EXACTLY, so the threshold was NOT widened. (c) P-18 is TRUE but its margin is ZERO, not comfortable: the batch-64 golden's largest single (document,variant) Modifications table is EXACTLY 200 = the cap, and a census that does not split on document boundaries reads 272 and would wrongly conclude the cap fires. Recorded in the constant's docstring."
     }
   ],
   "obsidian_synced": false,
