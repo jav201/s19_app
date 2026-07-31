@@ -53,6 +53,7 @@ from ...range_index import (
 )
 from ...version import __version__
 from ..changes import DISPOSITION_APPLIED
+from ..changes.io import READ_SIZE_CAP_BYTES
 from ..hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 from ..legend import LEGEND_TABLE
 from .entropy_service import ENTROPY_BANDS, compute_entropy
@@ -237,6 +238,79 @@ REPORT_BYTES_TRUNCATION_CUE_FMT = " … (+{dropped} more bytes)"
 #: argument, so replacing it with reasoning would be a security-relevant
 #: weakening (batch-62 F-17).
 CUE_ALPHABET = "…(+)bemorsty"
+
+#: Hex-digit cap for one ``Address`` cell (batch-74, LLR-106.1). **This is the
+#: policy number**; :data:`REPORT_ADDRESS_CHARS` is its consequence, never the
+#: other way round.
+#:
+#: The threat is wire-reachable and was in nobody's charter until it was
+#: measured: ``changes.io._ADDRESS_RE`` is ``^0x[0-9A-Fa-f]+$`` with **no digit
+#: limit**, and ``int(raw, 16)`` parses without limit — CPython's
+#: ``int_max_str_digits`` guard does **not** apply to base-16 parsing. A
+#: wire-legal ``'0x' + 'F'*100000`` therefore renders a 100 000-character cell,
+#: and the only real ceiling is :data:`READ_SIZE_CAP_BYTES` (268 MB).
+#:
+#: 16 is a 64-bit address space — the widest any target in this domain uses.
+#: Every in-domain address renders to 8 digits (the widest ``Address`` cell in
+#: any golden is ``0x00000000``, 10 characters, executed census), so the bound
+#: carries 2x margin and fires only on values no target could have produced.
+#:
+#: ⚠ It must NOT be derived downwards from that census. Choosing 8 (or a cell
+#: width near 10) makes the *cap itself* fire on ordinary addresses; the census
+#: bounds what is REACHED, never what is ALLOWED.
+REPORT_ADDRESS_HEX_DIGITS = 16
+
+#: In-cell cue appended to an ``Address`` cut at
+#: :data:`REPORT_ADDRESS_HEX_DIGITS` (batch-74, LLR-106.2/106.4).
+#:
+#: ⚠ **The cue is what makes the bound honest, not decoration.** A hex address
+#: truncated to ``0xFFFF…`` is still a well-formed numeral, so a shortened cell
+#: is INDISTINGUISHABLE from a complete one — measured understatement ``2**12248``
+#: on a 3572-digit address. The cue's job is to break that shape: a truncated
+#: cell must FAIL ``^-?0x[0-9A-F]+$`` and must STATE how many digits are gone.
+#:
+#: Inertness (LLR-106.4): the ``Address`` cell is emitted UNESCAPED, and
+#: :data:`CUE_ALPHABET` covers ``_format_bytes`` only. The natural first spelling
+#: ``… (+99988 more hex digits.)`` would carry ``.``, which **is** in
+#: ``markdown_safety.MD_ESCAPE``. Every character here is outside ``MD_ESCAPE``
+#: and none is ``|`` — executed by ``TC-551`` against the real ``MD_ESCAPE``
+#: rather than against a hand-maintained whitelist that could drift away from it.
+#: ``…`` (U+2026) is precedented by ``markdown_safety.TRUNCATION_MARKER``.
+REPORT_ADDRESS_TRUNCATION_CUE_FMT = " … (+{dropped} more hex digits)"
+
+#: The largest elided-digit count the cue can ever state — the widest the cue's
+#: decimal field can grow (batch-74, LLR-106.3).
+#:
+#: Derived from the wire ceiling, not chosen: an address token lives inside a
+#: change file, so it cannot carry more hex digits than
+#: :data:`READ_SIZE_CAP_BYTES` bytes of text.
+#:
+#: ⚠ **The units are deliberately mixed, and naming that is the point.** This
+#: subtracts a DIGIT count from a BYTE count. It is sound only because one hex
+#: digit occupies at least one byte of file text, so the byte cap is a valid
+#: *upper bound* on the digit count — it is **not** an equality and must not be
+#: read as one. Nothing downstream needs it to be tight: the only consumer is
+#: :data:`REPORT_ADDRESS_CHARS`, which needs the WIDTH of the cue's decimal
+#: field, and that width is flat across eight orders of magnitude
+#: (``len(str(n))`` is 9 for every ``n`` in ``[1e8, 1e9)``).
+REPORT_ADDRESS_MAX_ELIDED_DIGITS = READ_SIZE_CAP_BYTES - REPORT_ADDRESS_HEX_DIGITS
+
+#: Character cap for one rendered ``Address`` cell (batch-74, LLR-106.3) —
+#: **derived top-down** from :data:`REPORT_ADDRESS_HEX_DIGITS`, never chosen, and
+#: never derived upwards from the golden census.
+#:
+#: The derivation is the definition: ``"0x"`` + the kept digits + the cue at its
+#: widest. ``TC-550`` executes this equality, so the constant cannot drift from
+#: its own statement.
+REPORT_ADDRESS_CHARS = (
+    len("0x")
+    + REPORT_ADDRESS_HEX_DIGITS
+    + len(
+        REPORT_ADDRESS_TRUNCATION_CUE_FMT.format(
+            dropped=REPORT_ADDRESS_MAX_ELIDED_DIGITS
+        )
+    )
+)
 
 #: The per-section row-cap notice (batch-74, LLR-105.5). Names the section, the
 #: governing constant AND its value, the dropped count and the total, so a
@@ -669,6 +743,63 @@ def _format_bytes(values: Optional[Iterable[int]], *, max_bytes: int) -> str:
     if not dropped:
         return rendered
     return rendered + REPORT_BYTES_TRUNCATION_CUE_FMT.format(dropped=dropped)
+
+
+def _format_address(value: int) -> str:
+    """
+    Summary:
+        Render one ``Address`` cell, bounded at
+        :data:`REPORT_ADDRESS_HEX_DIGITS` hex digits (batch-74, LLR-106.1/106.2).
+        A value inside the bound is byte-identical to the shipped
+        ``f"0x{value:08X}"``; a value past it renders its leading digits plus
+        :data:`REPORT_ADDRESS_TRUNCATION_CUE_FMT`.
+
+    Args:
+        value (int): The entry's address. Unbounded by construction —
+            ``changes.io._ADDRESS_RE`` carries no digit limit and ``int(raw, 16)``
+            parses without one, so a wire-legal file can reach 100 000 digits.
+
+    Returns:
+        str: e.g. ``"0x80040000"``, or
+        ``"0xFFFFFFFFFFFFFFFF … (+99984 more hex digits)"``.
+
+    Data Flow:
+        - The kept digits are derived ARITHMETICALLY — ``magnitude >> 4·(total −
+          kept)`` — never by formatting the value and slicing the result. The
+          full rendering IS the allocation being bounded, so producing it first
+          would pay the whole cost this function exists to avoid. Measured at
+          10**6 hex digits: shift+format **0.000002 s**, full format **0.0014 s**.
+        - ``bit_length()`` is O(1) (a limb count, not a scan) and the shift
+          allocates only the result's limbs, so residency is independent of the
+          value's size — the property ``AT-249`` gates.
+        - The elided count is the digit count OF THE VALUE, ``(bit_length()+3)//4
+          − kept``, never ``len(raw) − 2``: ``int('0x0FF…', 16)`` discards the
+          wire's leading zeros, so the two differ and a raw-string count misfires.
+
+    Dependencies:
+        Uses:
+            - REPORT_ADDRESS_HEX_DIGITS / REPORT_ADDRESS_TRUNCATION_CUE_FMT
+        Used by:
+            - _modifications_lines / _checklist_lines
+
+    Example:
+        >>> _format_address(0x80040000)
+        '0x80040000'
+    """
+    total = (value.bit_length() + 3) // 4
+    kept = REPORT_ADDRESS_HEX_DIGITS
+    if total <= kept:
+        return f"0x{value:08X}"
+    # Negative addresses are out of the wire domain (``_ADDRESS_RE`` admits no
+    # sign) but are constructor-reachable; carry the sign rather than silently
+    # rendering a positive token for a negative value.
+    magnitude = -value if value < 0 else value
+    sign = "-" if value < 0 else ""
+    leading = magnitude >> (4 * (total - kept))
+    return (
+        f"{sign}0x{leading:0{kept}X}"
+        + REPORT_ADDRESS_TRUNCATION_CUE_FMT.format(dropped=total - kept)
+    )
 
 
 def _report_filename(reports_dir: Path, timestamp: datetime) -> str:
@@ -1189,7 +1320,8 @@ def _modifications_lines(
 
     Dependencies:
         Uses:
-            - _format_bytes / _matches_entry / _zero_match_notice
+            - _format_address / _format_bytes / _matches_entry
+            - _zero_match_notice
             - MAX_REPORT_ROWS_PER_VARIANT / ROW_TRUNCATION_NOTICE_FMT
             - markdown_safety.md_safe (symbol + linkage cells; replaced
               ``diff_report_service._md_table_cell``, which escaped table SHAPE
@@ -1220,7 +1352,7 @@ def _modifications_lines(
                 else "-"
             )
             rows.append(
-                f"| 0x{entry.address_start:08X} "
+                f"| {_format_address(entry.address_start)} "
                 f"| {entry.address_end - entry.address_start} "
                 f"| {_format_bytes(entry.before_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {_format_bytes(entry.after_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
@@ -1361,6 +1493,15 @@ def _checklist_lines(
         aggregates line keeps the PRE-FILTER counts (the audit header
         discloses the hidden row count).
 
+        At most :data:`MAX_REPORT_ROWS_PER_VARIANT` rows are admitted **summed
+        across all of the variant's check files** (batch-74, LLR-105.2). The
+        sum is what makes the bound a bound: the check-file count ``F`` has no
+        cap anywhere, so a per-table cap would leave ``F x CAP`` unbounded. A
+        check file that arrives already saturated renders its heading and
+        aggregates followed by its own ``> TRUNCATED:`` line, and **omits the
+        table header and rule** — an empty table with no local explanation is
+        worse than no table.
+
     Args:
         result (VariantExecutionResult): One variant's execution outcome.
         report_filter (Optional[ReportFilterMatcher]): The resolved
@@ -1374,10 +1515,19 @@ def _checklist_lines(
         - Filtered rows are classified via :func:`_matches_entry`; the
           zero-match test spans the variant's WHOLE checklist row
           population (all check files).
+        - ``admitted`` carries the variant-wide admission budget ACROSS files;
+          ``file_kept`` counts the rows that WOULD have rendered from THIS file
+          under the active filter (LLR-105.4′), so each file's notice states its
+          own dropped count and its own total. A variant-wide count repeated
+          under three headings would read as three separate drops.
+        - Only a cap-bounded ``rows`` buffer is resident per file; no
+          full-population list is built.
 
     Dependencies:
         Uses:
-            - _format_bytes / _matches_entry / _zero_match_notice
+            - _format_address / _format_bytes / _matches_entry
+            - _zero_match_notice
+            - MAX_REPORT_ROWS_PER_VARIANT / ROW_TRUNCATION_NOTICE_FMT
         Used by:
             - generate_project_report
     """
@@ -1396,6 +1546,7 @@ def _checklist_lines(
         if total and not kept:
             lines.extend([_zero_match_notice(total), ""])
             return lines
+    admitted = 0
     for check in result.check_results:
         source = (
             f"`{md_code(check.source_path)}`"
@@ -1410,21 +1561,55 @@ def _checklist_lines(
                 f"Failed: {check.aggregates.get('failed', 0)} - "
                 f"Uncheckable: {check.aggregates.get('uncheckable', 0)}",
                 "",
-                "| Address | Length | Expected | Actual | Result |",
-                "|---|---|---|---|---|",
             ]
         )
+        # Saturation is read BEFORE this file admits anything, because it is
+        # what decides whether this file gets a table at all.
+        saturated = admitted >= MAX_REPORT_ROWS_PER_VARIANT
+        rows: List[str] = []
+        file_kept = 0
         for entry in check.entries:
             if report_filter is not None and not _matches_entry(
                 report_filter, entry
             ):
                 continue
-            lines.append(
-                f"| 0x{entry.address_start:08X} "
+            file_kept += 1
+            if admitted >= MAX_REPORT_ROWS_PER_VARIANT:
+                continue
+            admitted += 1
+            rows.append(
+                f"| {_format_address(entry.address_start)} "
                 f"| {entry.address_end - entry.address_start} "
                 f"| {_format_bytes(entry.expected_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {_format_bytes(entry.actual_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {md_safe(entry.result, limit=REPORT_CELL_CHARS)} |"
+            )
+        # A file that arrives already saturated AND had rows to show renders no
+        # table header and no rule (LLR-105.2): a reader of check file 3 must
+        # meet a stated reason, not an empty table. A file that arrives
+        # saturated with nothing to show is unaffected by the cap, so it keeps
+        # today's empty-table rendering rather than acquiring a false notice.
+        if not (saturated and file_kept):
+            lines.extend(
+                [
+                    "| Address | Length | Expected | Actual | Result |",
+                    "|---|---|---|---|---|",
+                ]
+            )
+            lines.extend(rows)
+        file_dropped = file_kept - len(rows)
+        if file_dropped:
+            # PER CHECK FILE, stating this file's own numbers. The cap is a
+            # per-variant budget, so a variant-wide count repeated under three
+            # headings would read as three separate drops; the per-file count is
+            # locally verifiable and sums to the variant's drop.
+            lines.append(
+                ROW_TRUNCATION_NOTICE_FMT.format(
+                    section=f"Checklist: {source}",
+                    dropped=file_dropped,
+                    total=file_kept,
+                    cap=MAX_REPORT_ROWS_PER_VARIANT,
+                )
             )
         lines.append("")
     return lines
