@@ -36,12 +36,22 @@
     "rederived_independently": true,
     "reason": "The AT/TC registry build (Lane B) may be running in parallel - do NOT take ids outside this range."
   },
-  "current_phase": 0,
+  "current_phase": 2,
   "phase_status": "approved",
-  "iterations_per_phase": {"0": 0, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0},
+  "iterations_per_phase": {
+    "0": 0,
+    "1": 1,
+    "2": 1,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
+  },
   "artifacts": {
     "0": ".dev-flow/2026-07-31-batch-75/00-measurements.md",
-    "plan": ".dev-flow/2026-07-31-batch-75/PLAN.md"
+    "plan": ".dev-flow/2026-07-31-batch-75/PLAN.md",
+    "1": ".dev-flow/2026-07-31-batch-75/01-requirements.md",
+    "2": ".dev-flow/2026-07-31-batch-75/02-review.md"
   },
   "decisions_log": [
     {
@@ -73,8 +83,45 @@
       "date": "2026-07-31",
       "decision": "D2b (_applied_regions) FENCED",
       "notes": "OPERATOR ruling at kickoff, not autonomous. Stays out of batch-75 with a written non-claim; keeps the batch at 2 stories in an area that hit the iteration cap in two separate batches (b63, b74)."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-31",
+      "decision": "approved (revision 1)",
+      "notes": "R-TUI-102 derived from 2 executed lanes. P-14 (architect lane's wire-reachability claim) executed and found FALSE before it reached the spec."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "BLOCK -> iterate-to-refine",
+      "notes": "security + qa independently found the same 3 core defects. B-1 HLR-102/LLR-102.x are LIVE ids cited in report_service.py:608/:622 - I derived the AT/TC namespace as instructed and ASSUMED HLR/LLR tracked R-TUI-. B-2 the refusal disclosure is O(V), contradicting HLR-102's own V-invariance clause; AT-251 would go RED for a CORRECT implementation. B-3 _hexdump_section's put() never gates, so my own LLR-102.4 exemption rested on a false premise (P-24). B-4 AT-252 vacuous - 4 kB fixture against a 2 MB budget, green on base AND fixed AND stubbed."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "F7 fairness ESCALATED to operator, ruled per-variant reservation",
+      "notes": "OPERATOR decision, not autonomous. An attacker controlling content controls emission order; an early 311,625 B variant blanks variants 8-100. Encoded as LLR-108.4/108.5 + AT-254."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-31",
+      "decision": "approved (revision 2)",
+      "notes": "21 amendments recorded in 01-requirements.md sec 9 with Before/After and Deleted/New tokens. Renumbered to HLR-108/109/110 after executing the true high-water (HLR-107/LLR-107, batch-74's split-out Length draft, review-only)."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "batch descoped to SPEC ONLY",
+      "notes": "OPERATOR ruling. Implementation deferred to a fresh session with a full context window - this area hit the 3-iteration cap in b63 and b74 partly by running out of room mid-increment."
     }
   ],
   "obsidian_synced": false,
-  "created_at": "2026-07-31T00:00:00Z"
+  "created_at": "2026-07-31T00:00:00Z",
+  "batch_outcome": "SPEC ONLY, by operator ruling mid-batch ('solo enmiendas, para antes de Inc-1'). Phases 0-2 complete and re-gated; Inc-0..Inc-3 NOT implemented and registered as a P0 in BACKLOG-CODE.md. Phase 2 BLOCKED on 4 blockers (2 in clauses batch-75 itself authored, 1 the house vacuous-fixture defect); spec re-gated as revision 2.",
+  "artifacts_not_produced": {
+    "3_increments": "NOT PRODUCED - implementation was descoped by operator ruling before Inc-1. Declared, not silently omitted.",
+    "4_validation": "NOT PRODUCED - no code changed, so there is nothing to validate. Declared per non-negotiable #6.",
+    "5_postmortem": "NOT PRODUCED as a separate artifact - 02-review.md sec 5 carries the gate decision and 01-requirements.md sec 9 carries the full amendment record.",
+    "6_docs": "NOT PRODUCED - no shipped behaviour changed, so there is no functionality to document. Declared per non-negotiable #6."
+  }
 }

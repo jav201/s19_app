@@ -13,13 +13,19 @@ from `state.json.language = "en"`, unchanged).
 
 | Phase | Status |
 |---|---|
-| **0 — intake** | ⏳ **awaiting-gate** |
-| 1 — requirements | not-started |
-| 2 — cross-review | not-started |
-| 3 — implementation | not-started |
-| 4 — validation | not-started |
-| 5 — post-mortem | not-started |
-| 6 — docs + PR | not-started |
+| **0 — intake** | ✅ approved |
+| **1 — requirements** | ✅ approved at **revision 2** (1 iteration) |
+| **2 — cross-review** | ✅ approved after a **BLOCK** + re-gate (1 iteration) |
+| 3 — implementation | 🚫 **DESCOPED by operator ruling** — owed, registered P0 in `BACKLOG-CODE.md` |
+| 4 — validation | 🚫 N/A — no code changed. **Declared, not omitted.** |
+| 5 — post-mortem | 🚫 folded into `02-review.md` §5 + `01-requirements.md` §9 |
+| 6 — docs | 🚫 N/A — no shipped behaviour changed. **Declared, not omitted.** |
+
+> **Outcome: SPEC ONLY.** Operator ruled mid-batch (*"solo enmiendas, para antes de Inc-1"*) that
+> implementation moves to a fresh session with a full context window — this area hit the 3-iteration cap
+> in b63 and b74 partly by running out of room mid-increment. **Every non-produced artifact is declared
+> above with its reason** (non-negotiable #6: batch-74 reached MERGE missing two artifacts and
+> `/dev-flow-sync` caught it, not the gate).
 
 ## RC-1 + flow revision
 

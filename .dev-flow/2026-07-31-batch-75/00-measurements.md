@@ -205,9 +205,38 @@ were invalid. Fails **closed** (no partial file) — any fix must preserve that.
 | `MF_RUN_LENGTH_CEILING` | 1,048,576 | `changes/io.py:232` |
 | `MAX_ROWS_PER_VARIANT` | **ABSENT** | ← the name is `MAX_REPORT_ROWS_PER_VARIANT` |
 
-## 8. Id range — re-derived independently
+## 8. Id ranges — re-derived independently
 
 ```
 AT high-water on main = AT-249      TC high-water on main = TC-551
 ```
 Matches the reservation. **batch-75 uses AT-250…AT-279 and TC-552…TC-599 only.**
+
+### 8.1 The namespace I did NOT derive, and it cost a Phase-2 blocker
+
+**`HLR`/`LLR` are a SEPARATE counter from `R-TUI-`, and revision 1 assumed they tracked it.** Both
+Phase-2 lanes found this independently. Executed at Phase 2:
+
+```
+grep -rhoE "HLR-[0-9]{3}" s19_app/ REQUIREMENTS.md              -> high-water HLR-106
+grep -rhoE "HLR-[0-9]{3}" ... .dev-flow/ tests/ (excl. batch-75) -> high-water HLR-107
+same for LLR                                                     -> LLR-106 / LLR-107
+```
+
+| id | already means | cited at |
+|---|---|---|
+| `LLR-102.1` | `document_bytes` is the single encoder seam (batch-63) | **`report_service.py:622`** |
+| `LLR-102.2` | `_line_bytes` is partition-invariant; redefining it is **prohibited** | **`report_service.py:608`** |
+| `HLR-102`, `LLR-102.3/.4` | batch-63 / `R-TUI-097` | `REQUIREMENTS.md:4945` |
+| `HLR-107`, `LLR-107.x` | **batch-74's split-out `Length` draft** — review artifacts only, never shipped | `.dev-flow/2026-07-31-batch-74/02-review.md` |
+
+`LLR-102.4` was the sharpest collision: it already means **golden neutrality**, and batch-75's golden PIN
+sat beside it.
+
+**Resolution: `HLR-108`/`109`/`110`, `LLR-108.x`/`109.x`/`110.x`.** `HLR-107` is **not** reused despite
+being batch-75's own inherited `Length` draft — reusing an id whose draft content differs is the very
+defect this section records.
+
+> **Lesson for the next batch: derive EVERY id namespace the batch will write, not only the one the
+> charter names.** The operator's instruction covered `AT`/`TC` and I derived exactly those. An
+> instruction to derive one namespace is not a statement that the others are safe.
