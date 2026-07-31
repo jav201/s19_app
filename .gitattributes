@@ -17,3 +17,11 @@ tests/goldens/** text eol=lf
 # (Found the hard way: the first batch-66 commit stored dev-flow.md.PRE as d46bb314...
 # instead of the recorded e103af29..., under core.autocrlf=true.)
 .dev-flow/**/pre-bytes/** -text
+
+# The AT/TC id registry is append-only and one line per id ON PURPOSE: that is
+# what makes a concurrent block reservation a contiguous run of new lines, so two
+# batches reserving overlapping ranges collide as a LOUD git merge conflict that
+# names the exact lines, instead of a silent last-writer-wins overwrite (the
+# state.json hazard the design exists to avoid -- AT-TC-REGISTRY-SPEC.md 4.3).
+# Pinning LF keeps that diff line-granular and identical on every host.
+AT-TC-REGISTRY.jsonl text eol=lf

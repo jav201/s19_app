@@ -2,7 +2,9 @@
 
 > **Canonical open-work queue for the CODE lane.** Split out of [`BACKLOG.md`](BACKLOG.md) on 2026-07-27 by operator ruling; that file is now the router and lineage archive. Scope: the s19_app application code (features, defects, Flow Builder) **and the development flow of that code** (tests, CI, repo hygiene). Engineering process, controls and skills live in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) — do not add them here.
 >
-> **Last refresh: 2026-07-31 (batch-75 close — SPEC ONLY, `R-TUI-102`).** `origin/main` tip at its cut = **`232eb0a`**. batch-75 shipped its **requirements only** by operator ruling mid-batch; Inc-0…Inc-3 are **owed** and registered as a P0 above. Phase 2 **BLOCKED** on 4 blockers — two of them in clauses batch-75 itself authored, one the house vacuous-fixture defect — and the spec was re-gated as **revision 2**. **Three false premises were executed and killed, two of them originating INSIDE the batch** (a review lane's wire-reachability claim; the batch's own `_hexdump_section` exemption). **The `R-TUI-101` wording carve-outs are declared STILL OPEN, not discharged** (batch-75 never edited `REQUIREMENTS.md`). New Lane-B carry: re-stamp `FLOW-VERSION.md` for the 641-line `dev-flow-lessons/SKILL.md`.
+> **Last refresh: 2026-07-31 (AT/TC registry Lane A close — registry file + G1–G7 guard, `/fast-dev-flow`, PR [#181](https://github.com/jav201/s19_app/pull/181)).** `origin/main` tip at its cut = **`232eb0a`**; **rebased onto `1984341` (batch-75) before merge**. Shipped `AT-TC-REGISTRY.jsonl` (**1 370 rows**) + `tests/test_id_registry.py` (**G1–G7**, no `slow` marker) + `tools/id_registry.py` (the tokenizer library **shared** by seeder and guard). high-water **AT-281 / TC-610**; `next_free` **AT-282 / TC-611**. ⚠️ **The reservation mechanism was exercised for real, not hypothetically:** this batch seeded `AT-250…279` + `TC-552…599` as `RESERVED` for batch-75 while batch-75 was in flight, and batch-75 then minted **exactly inside that block** (max `AT-279` / `TC-599`). Because it is SPEC-ONLY those ids stay `RESERVED` — they convert to `LIVE` when its Inc-0…Inc-3 write the nodes. **Three of the item's queued premises were imprecise and the corpus corrected them** (phantoms are **24**, not 11 — the spec's pattern discarded suffixes; the §6.2 residue is **5**, not 73 — form-3 binding IS derivable; `TC-319` was **removed, not renamed**, but C-26's evidentiary basis survives under `AT-063c`). Gate suite **2428 passed / 2 skipped / 21 deselected / 3 xfailed**, 29 snapshots, exit 0 — run twice. ⚠️ **Neither lane half closes the item** (router Amendment A), and marking **C-3** + the batch-62 "16 of 23" carry closed is **owed in `BACKLOG-PROCESS.md`**, the Lane B file this batch was scoped out of.
+>
+> **Earlier refresh: 2026-07-31 (batch-75 close — SPEC ONLY, `R-TUI-102`).** `origin/main` tip at its cut = **`232eb0a`**. batch-75 shipped its **requirements only** by operator ruling mid-batch; Inc-0…Inc-3 are **owed** and registered as a P0 above. Phase 2 **BLOCKED** on 4 blockers — two of them in clauses batch-75 itself authored, one the house vacuous-fixture defect — and the spec was re-gated as **revision 2**. **Three false premises were executed and killed, two of them originating INSIDE the batch** (a review lane's wire-reachability claim; the batch's own `_hexdump_section` exemption). **The `R-TUI-101` wording carve-outs are declared STILL OPEN, not discharged** (batch-75 never edited `REQUIREMENTS.md`). New Lane-B carry: re-stamp `FLOW-VERSION.md` for the 641-line `dev-flow-lessons/SKILL.md`.
 >
 > **Earlier refresh: 2026-07-31 (batch-73 close — `_first_intersecting_symbol` soundness, `/fast-dev-flow`).** `origin/main` tip at its cut = **`d81cb3d`** (PRs #168 + #169 merged after the audit line below was written, which is why that line's `6524afd` is stale). Closed the MAJOR linkage-probe defect under "New defects found in passing at batch-65" and **corrected three things that bullet had wrong** (wrong function named; the recommended in-repo fix pattern loses the symbol; the defect also reaches MAC aliases, not just A2L). Amended **`R-CHG-002`** (Amendment A) and added `AT-220`..`AT-223` / `TC-521`..`TC-524`. Returned **two P3 carries** (the rejected innermost-attribution arm; a stale `.fast-dev-flow/spec.md` reported as found). ⚠️ **batch-74 runs in parallel on `report_service.py` and shares only this file** — whoever closed second rebased.
 >
@@ -337,8 +339,52 @@ Original entry (batch-69 design) follows: Run a saved flow across multiple image
 > ⚠ **`R-*` / `LLR-*` / `US-*` are NOT covered by the AT/TC registry** (operator scoping ruling
 > 2026-07-31) and have demonstrably collided — that gap is registered separately in the PROCESS lane.
 
-  - **▸ (MAJOR → Lane A) build the AT/TC registry file + its guard test. ✅ UNBLOCKED 2026-07-31 — both
-    preconditions are met.** (i) The Lane B spec exists and is merged: [`AT-TC-REGISTRY-SPEC.md`](AT-TC-REGISTRY-SPEC.md),
+  - **✅ (MAJOR → Lane A) build the AT/TC registry file + its guard test — DONE 2026-07-31**
+    (`/fast-dev-flow`, autonomous-to-PR; artifacts
+    [`.fast-dev-flow/archive/2026-07-31-at-tc-registry-lane-a-spec.md`](../.fast-dev-flow/archive/2026-07-31-at-tc-registry-lane-a-spec.md)).
+    Shipped `AT-TC-REGISTRY.jsonl` (**1 370 rows** — 849 LIVE · 422 BURNED · 78 RESERVED · 21 RETIRED),
+    `tools/id_registry.py` (the tokenizer/corpus library **shared** by seeder and guard, so the two
+    cannot disagree), `tools/seed_id_registry.py`, `tests/test_id_registry.py` (**G1–G7** + cost bound
+    + well-formedness, 13 tests, **no `slow` marker**), `tools/counterfactual_id_registry.py`,
+    a repaired `REQUIREMENTS.md` (21 stale verifier assertions + a new `## Retired ids` section), and
+    the allocation-authority pointer in `CLAUDE.md` + `docs/engineering-rules.md`.
+    **Re-derived at the seed commit `232eb0a`, nothing copied:** high-water **AT-281 / TC-610**,
+    `next_free` **AT-282 / TC-611**. `AT-250…279` + `TC-552…599` seeded `RESERVED` for **batch-75**,
+    which may be running concurrently — this batch minted from **above** that block (`AT-280/281`,
+    `TC-600…610`).
+    **Three of the queued premises were imprecise and the corpus corrected them.** (a) The phantom
+    population is **24**, not 11 — the spec's figure used a pattern that discards suffixes, so its own
+    §1.1 finding (*"the figure measures the grep"*) reproduced one level down; the spec's 11 all
+    reproduce inside the 24. (b) The §6.2 residue is **5**, not 73: form-3 binding IS derivable in two
+    attested shapes (docstring-enclosing, and the banner comment above a node), leaving only
+    module-docstring citations unbound — and those are deliberately left unbound, because binding a
+    file-level summary to whichever function comes first invents a relationship the source never made.
+    (c) **`TC-319` was REMOVED, not renamed** (`2a647d1` → `19bf1eb`), *but* **C-26's evidentiary basis
+    survives**, re-homed as `_MUST_PRESERVE_IDS` (`tests/test_tui_patch_layout.py:67`, consumed at
+    `:353`) under **AT-063c**. The id is dead; the evidence is not.
+    **One recorded premise correction on the spec itself:** G4 as worded fires on 28 citations, 11 of
+    which are honest history *already saying* the verifier was deleted. G4 is scoped to the
+    **verifier-asserting** line — which is how §6.1 describes the defect — so history keeps its ids.
+    All 7 phantoms the item cites are in `- Validation:` bullets, so nothing cited escapes. Exempt
+    anchors used: **2 of the 5** the spec allows.
+    **✅ Closes C-3 and the batch-62 "16 of 23" carry** — the `nodes` field is N:M in both directions
+    (212 ids bound that way; `TC-24.3` → five nodes is the worked consolidated-battery case), which is
+    what batch-62's accepted resolution required, and **G2 enforces it**. ⚠ The C-3 row itself lives at
+    `.dev-flow/BACKLOG-PROCESS.md:135` — the Lane B file this batch was instructed not to touch — so
+    **marking that row is owed to the next Lane B reconciliation.**
+    ⚠ **This half does NOT close the item** (router Amendment A); the Lane B design half does not
+    either. `R-*` / `LLR-*` / `US-*` remain out of scope and still collide — that gap stays in Lane B.
+    **Carries:** ▸ **(P3)** `TC-355` advertises a "no-raise" arm in `tests/test_flow_crc_block.py:10`
+    that **no node asserts** and that never had one (`git log -S tc355` over all refs is empty) —
+    seeded `BURNED` so it reads as *no claim was ever made* rather than *coverage was lost*; write the
+    verifier or drop the claim. ▸ **(P3)** `EXPECTED_SCANNED_TEST_FILES` is a manual constant every
+    test-adding PR must bump — deliberate (it makes corpus growth a decision), but someone will want to
+    automate it, and automating it deletes the bound. ▸ **(P3)** `statement` for the ~1 000
+    mechanically-bound ids is generated boilerplate, so §3.5's *"is my TC-410 your TC-410?"* is only
+    answerable for hand-dispositioned and newly-minted ids; filling these in is incremental work, not a
+    batch.
+    *(Original entry, retained for lineage:)* ✅ UNBLOCKED 2026-07-31 — both
+    preconditions are met. (i) The Lane B spec exists and is merged: [`AT-TC-REGISTRY-SPEC.md`](AT-TC-REGISTRY-SPEC.md),
     PR #174. **Its §9 is the ordered build contract with executable done-conditions — build from §9, not from
     this bullet.** (ii) batch-74 **merged** (`537f27d`, #173), so the id set has stopped moving under the seed.
     ⚠ **Seed figures are already stale**: the high-water mark went **`TC-524` → `TC-551`** in that one batch

@@ -33,6 +33,32 @@ obeying the instruction literally reconciles a file with no open work and silent
 Operator ruling 2026-07-28: the global commands must not hard-name any project's file layout, so they
 now delegate to this section and the routing lives here.)
 
+## AT/TC id allocation — where ids come from (Phase 1, before any id is written)
+
+**Not a control; a routing fact, like the section above.** `AT-TC-REGISTRY.jsonl` at the repository
+root is the **single authority** for `AT-*` and `TC-*` id allocation. Do not grep `tests/`,
+`REQUIREMENTS.md` or `.dev-flow/` for the next free number — three honest greps of this repo have
+returned three different answers, and that disagreement is what the registry exists to end.
+
+| Question | Answer |
+|---|---|
+| What is the next free id? | `AT-TC-REGISTRY.jsonl` line 1, `_meta.next_free`. Nothing else is consultable. |
+| How do I take one? | Append `RESERVED` rows with `reserved_by` and a one-sentence `statement`, **and merge that to `main` on its own small PR before the batch's work**. A reservation on an unmerged branch prevents nothing — that is verbatim the batch-64/65 collision. |
+| Can I fill a gap or reuse a retired id? | **No.** Allocation is monotonic; every status is permanently spent. Gaps are how "free space" becomes a matter of opinion. |
+| Does my new test need a global id? | Prefer a **batch-scoped** id (`AT-B76-01`, `AT-N9-03`). Those cannot collide across batches by construction and the global pool never has to carry them. |
+| Who checks? | `tests/test_id_registry.py`, rules G1–G7, in the PR lane. It is not marked `slow`. |
+
+**When the guard goes red, the registry is usually right.** G1 means you minted an id without
+registering it; G2 means a node was renamed or deleted under a registered id; G4 means
+`REQUIREMENTS.md` is advertising a verifier that does not exist. Fix the cause, not the threshold.
+
+Full design rationale, the id grammar, and the status semantics: `.dev-flow/AT-TC-REGISTRY-SPEC.md`
+(allocation rule in its §4). Retired ids are listed in `REQUIREMENTS.md` under `## Retired ids`.
+
+⚠ **`R-*`, `LLR-*` and `US-*` are NOT covered** (operator scoping ruling 2026-07-31) and have
+demonstrably collided — batch-63 re-used live `R-TUI-079/080/081`. That gap is registered separately
+in `.dev-flow/BACKLOG-PROCESS.md`; do not assume the registry protects those spaces.
+
 ## C-13 — geometry-budget / reuse-transfer check (Phase 1)
 A pattern proven in one container is NOT verified for another: when a spec reuses a
 layout/sizing/capacity pattern that works in container A for a different container B (a
