@@ -113,9 +113,15 @@
       "date": "2026-07-31",
       "decision": "batch descoped to SPEC ONLY",
       "notes": "OPERATOR ruling. Implementation deferred to a fresh session with a full context window - this area hit the 3-iteration cap in b63 and b74 partly by running out of room mid-increment."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-31",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-31-batch-75/. Synced 00-measurements.md, 01-requirements.md, 02-review.md, PLAN.md, state-at-close.json + README. 04/05/06-docs NOT synced because they were never produced - declared in PLAN.md and artifacts_not_produced. Visual-evidence refresh SKIPPED correctly: batch-75 touched 0 files under s19_app/tui/ and the gallery was refreshed 2026-07-31 at batch-74 close (90/90 live assets fresh). NOTE: the sync pre-requisite current_phase>=6 was NOT met (batch closed at phase 2 by operator ruling, spec-only) - surfaced to the operator rather than silently overridden."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-31T00:00:00Z",
   "batch_outcome": "SPEC ONLY, by operator ruling mid-batch ('solo enmiendas, para antes de Inc-1'). Phases 0-2 complete and re-gated; Inc-0..Inc-3 NOT implemented and registered as a P0 in BACKLOG-CODE.md. Phase 2 BLOCKED on 4 blockers (2 in clauses batch-75 itself authored, 1 the house vacuous-fixture defect); spec re-gated as revision 2.",
   "artifacts_not_produced": {
@@ -123,5 +129,12 @@
     "4_validation": "NOT PRODUCED - no code changed, so there is nothing to validate. Declared per non-negotiable #6.",
     "5_postmortem": "NOT PRODUCED as a separate artifact - 02-review.md sec 5 carries the gate decision and 01-requirements.md sec 9 carries the full amendment record.",
     "6_docs": "NOT PRODUCED - no shipped behaviour changed, so there is no functionality to document. Declared per non-negotiable #6."
+  },
+  "merged": {
+    "pr": 180,
+    "squash_sha": "1984341",
+    "merged_at": "2026-07-31T22:06:43Z",
+    "base": "main",
+    "ci_at_merge": "tui-ci success + snapshot success"
   }
 }
