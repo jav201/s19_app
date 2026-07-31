@@ -80,16 +80,39 @@ a premise table that cannot record its own author's errors is decoration.
 > list; **shall not** terminate traversal on saturation; and **shall** disclose every bound that fires
 > inside the document.
 
-### HLR-106 ← US-B74-2
-> The two bounded producers **shall** gate row admission on the shared `_ByteBudget`, so the written
-> document is bounded by `REPORT_MAX_TOTAL_BYTES` plus a per-variant structural overshoot that is
-> stated explicitly; and a variant **shall never** vanish because an earlier variant was expensive.
+### HLR-106 ← US-B74-2 — **REVISION 2: re-scoped from the document to the producers**
+> **Neither producer shall admit a row once the shared `_ByteBudget` reports it does not fit**, so that
+> **the two producers' own contribution** to the written document is bounded by `REPORT_MAX_TOTAL_BYTES`;
+> and a variant **shall never** lose its section structure because an earlier variant was expensive.
 
-### HLR-107 ← US-B74-3
-> The `Length` column **shall** render every value in the entry domain without raising, in a form that
-> cannot be read as a decimal numeral when it is not one; and a failure originating inside report
-> composition **shall** be reported as a tool failure, preserving the fail-closed no-partial-file
-> guarantee.
+> ⚠️ **Before/After (C-43 §6.5 amendment — BL-1).**
+> **Before:** *"the written document is bounded by `REPORT_MAX_TOTAL_BYTES` plus a per-variant
+> structural overshoot"*. **After:** as above — the claim is scoped to **the two producers' contribution**.
+> **Why:** the original is **false and its AT was unsatisfiable.** Five producers stay on the ungated
+> `emit` (`:2215-2217`); `_declaration_error_lines` alone emits a measured **315,912 B/variant**
+> (capped at 200 *issues*, not at bytes), so the document floor is `2,097,152 + V×315,912` =
+> **1.15× budget at V=1, 2.51× at V=10, 16.06× at V=100** — regardless of this batch's work.
+> Routing those siblings through the gate is **scope expansion the operator explicitly forbade**
+> ("OB-4/F4/D2 and nothing more"), so the honest resolution is to bound what this batch owns and
+> **state the rest as a measured non-claim** (§7). F4's own figure — the module's `~208 MB` at `:170` —
+> **is** the two producers' contribution, so the re-scoped requirement closes F4 as chartered.
+
+### HLR-107 ← US-B74-3 — **REVISION 2: re-scoped to the reachable harm**
+> The `Length` column **shall** render every value in the `ChangeSummaryEntry` / `CheckRunEntry`
+> **constructor domain** without raising, in a form that cannot be read as a different number; the
+> `Address` column **shall not** be rendered in any truncated form that remains a well-formed numeral;
+> and a failure originating inside report composition **shall** be reported as a tool failure,
+> preserving the fail-closed no-partial-file guarantee.
+
+> ⚠️ **Before/After (BL-5).** **Before:** US-B74-3 was framed on *"a wire-legal address the report
+> cannot render"*. **After:** the story is split by reachability. **Why:** §2.7 P-20 marks that framing
+> FALSE in this same document, and `addressed_range = (address, address + len(encoded_bytes))`
+> (`changes/model.py:173-185`) bounds a file-derived `Length` at `MF_RUN_LENGTH_CEILING` → **7 decimal
+> digits** against a 4300-digit limit. **The `Length` defect is unreachable through the shipped
+> ingestion path** — it is constructor-domain hardening, and its ATs must be labelled as such rather
+> than claiming a wire threat. **The genuinely wire-reachable oversized field is the `Address`**
+> (`_ADDRESS_RE` has no digit limit, `changes/io.py:235`; measured 3574 chars), which revision 1
+> orphaned entirely.
 
 ### Acceptance blocks (Layer B — black-box through `generate_project_report`)
 
@@ -102,17 +125,20 @@ reddening mutation, to be **executed** on a copy of the fixed tree (C-40).
 | **AT-221** | 1 | Same, `### Checklists`, **disjoint** `check_results[].entries` fixture (P-12) | same |
 | **AT-222** | 1 | An entry with a `4·WIDTH` run → widest `Before`/`After` cell ≤ `REPORT_CELL_CHARS`, **and** the cue states the true dropped byte count | Remove `max_bytes` → cell returns to `3·run−1` (executed: **1537** chars at run=512) |
 | **AT-223** | 1 | Same for `Expected`/`Actual` | same |
-| **AT-224** | 1 | **Disclosure integrity, mods:** at `E = CAP+137` the notice states dropped `= 137` | `break` on saturation → 137 is a number only a full traversal knows. **The only predicate that catches cap-and-break** |
-| **AT-225** | 1 | Same, checklist, summed across ≥2 check files | same |
-| **AT-226** | 2 | Emitted bytes flat past the cap: `|Δ size|` between `E=2·CAP+10` and `E=2·CAP+1010` ≤ 32 B | Remove the cap arm → Δ ≈ 92 kB |
-| **AT-227** | 2 | Under a shrunken `REPORT_MAX_TOTAL_BYTES` with `V` variants, written size ≤ limit + `V×O(5 lines)` | Revert the gate to bare `consume` → unbounded in `V` |
-| **AT-228** | 2 | Under a **saturated** budget **every** variant still has exactly one `## Variant:` heading and one notice | Move the structural lines inside the gate → a variant vanishes |
-| **AT-229** | 3 | Fixture width derived from `sys.get_int_max_str_digits()` (**never** 3572) → the report **is written** and the row is present. **RED today** | Restore `f"{end-start}"` → `ValueError`, no file |
-| **AT-230** | 3 | Same at the **checklist** site, change-free fixture (P-12). **RED today** | same |
-| **AT-231** | 3 | Every emitted `Length` token matches `^-?0x[0-9A-F]+$` **or** `^-?[0-9]+$`; a negative length renders `-0x…` and the forged `0x-…` never appears | `f"0x{n:X}"` → emits `0x-1000`, rejected by the predicate |
-| **AT-232** | 3 | **Positive control** — an under-cap, in-domain, sub-width report is **byte-identical** to today (golden captured from the **shipped** producer *before* Inc-1, per C-12) | Set `CAP=1` → bytes differ |
-| **AT-233** | 3 | **Attribution:** an out-of-domain `context_bytes` still says `Report rejected:`; an internal composition `ValueError` says `Report failed:` | Widen the `try` back → both say "rejected" |
-| **AT-234** | 3 | **Fail-closed:** on any composition raise, `reports/` contains no new file | Move `write_bytes` before composition |
+| **AT-224** | 1 | **Disclosure integrity, mods — REVISION 2.** The fixture **shall** carry a `report_filter` matching a strict subset, so the disclosed dropped count is a **KEPT** count. At `E = CAP+137` filtered to `CAP+137` kept out of a larger population, the notice states dropped `= 137` | `break` on saturation. **REVISION 2 (BL-6):** revision 1's unfiltered form was **VACUOUS** — `total = sum(len(s.entries) …)` is `O(1)` per summary and never traverses entries, so a cap-and-break implementation states `137` correctly and passes. Only a **kept** count is unobtainable without full traversal |
+| **AT-225** | 1 | Same, checklist, summed across ≥2 check files, **also filtered** | same |
+| **AT-226** | 2 | Emitted bytes flat past the cap: `|Δ size|` between `E=2·CAP+10` and `E=2·CAP+1010`, bound **derived** as the decimal-digit growth of the notice's integers, **and** the test **shall** `assert` its fixture shape (exactly one change summary, no declaration errors) | Remove the cap arm → Δ ≈ 92 kB. **REVISION 2 (qa F-5):** `≤32 B` was picked, not derived, and on an unconstrained fixture (one change file per entry) the residual is **37,415 B** — RED after a correct fix |
+| **AT-227** | 2 | **REVISION 2 — re-scoped (BL-1).** Under a shrunken `REPORT_MAX_TOTAL_BYTES`, **the two producers' own emitted bytes** — measured as `size(report) − size(the same report with both producers stubbed empty)` — **shall** be ≤ the limit | Revert the gate to bare `consume` → the producers' contribution grows unbounded in `V`. The **whole-document** form was **UNSATISFIABLE** (315,912 B/variant of ungated sibling) |
+| **AT-228** | 2 | **REVISION 2 (BL-4 + M-5).** Under a **saturated** budget, every variant retains its **producer-owned** structure — one `### Modifications` heading, table header and rule — **and** one budget-cause notice | Move the structural lines inside the gate. The `## Variant:` clause is **struck**: it is emitted at `:2241` **outside both producers** and is invariant under every mutation this batch can make |
+| **AT-228b** | 2 | **NEW (BL-4).** Under a shrunken budget with `E < CAP` — so the cardinality cap **provably never fires** — the notice states the **budget-evicted count** and names that cause **distinctly** from the cap cause | Emit a single cause-agnostic notice → the two causes become indistinguishable, permitting silent evidence suppression |
+| **AT-229** | 3 | Fixture width derived from `sys.get_int_max_str_digits()` (**never** 3572) → the report **is written**. **RED today.** ⚠️ **Labelled constructor-domain** (BL-5): the fixture bypasses `changes/io.py`, so this is defence-in-depth, not a wire-reachable threat | Restore `f"{end-start}"` → `ValueError`, no file |
+| **AT-230** | 3 | Same at the **checklist** site, change-free fixture (P-12). **RED today.** Same constructor-domain label | same |
+| **AT-231** | 3 | **REVISION 2 (BL-7).** Each emitted `Length` token **shall equal** an independently derived `("-" if n<0 else "") + "0x" + format(abs(n),"X")` — **token equality, not regex membership**. The negative fixture's magnitude **shall** exceed `sys.get_int_max_str_digits()` digits, or the EAFP decimal branch is taken and the mutation is unreachable | `f"0x{abs(n):X}"` (**sign-dropped**) → renders a positive token for a negative length. Revision 1's regex **admitted** it, and admitted `lambda n: "0"` too |
+| **AT-231b** | 1 | **NEW (BL-3).** A wire-legal 3572-hex-digit `Address` renders **without truncation**; no emitted `Address` token is a well-formed numeral that understates the true value | Truncate the Address cell → the cell still matches `^0x[0-9A-F]+$` while understating by `2^12248`. **A truncated numeral that still parses as a numeral is a forgery**, not a bound |
+| **AT-232** | **2** | **Positive control** — an under-cap, in-domain, sub-width report is **byte-identical** to today. **REVISION 2:** retraced from story 3 to **US-B74-2 / LLR-106.4**, and moved to **Inc-1** — revision 1 landed it in Inc-4, leaving the three producer-rewriting increments with no byte-identity gate. The golden **shall** land in a pre-flight commit touching only `tests/goldens/batch74/`, auditable via `git log --diff-filter=A` preceding the first `report_service.py` commit (C-12 made mechanical, not prose) | Set `CAP=1` → bytes differ |
+| **AT-233a** | 3 | **Attribution, operator arm:** an out-of-domain `context_bytes` still says `Report rejected:` | Widen the `try` back |
+| **AT-233b** | 3 | **Attribution, tool arm:** an internal composition `ValueError` says `Report failed:`. **Split from AT-233 (C-18** — two disjoint fixtures cannot be one on-disk node) | Widen the `try` back → says "rejected" |
+| **AT-234** | 3 | **Fail-closed:** on any composition raise, `reports/` contains no new file. ⚠️ **LABELLED A PIN, NOT A GATE** — verified **green today** (write happens at `:2261` after all composition); nothing in this batch changes the ordering | Move `write_bytes` before composition |
 
 ---
 
@@ -121,15 +147,21 @@ reddening mutation, to be **executed** on a copy of the fixed tree (C-40).
 | LLR | Statement | Touched symbol (C-26) |
 |---|---|---|
 | **LLR-105.1** | `_modifications_lines` **shall** admit at most `MAX_REPORT_ROWS_PER_VARIANT` rows per variant, counted **at admission**, and **shall** build no intermediate full-population list — the `entries` flattening (`:1071-1075`) and the `kept` filter (`:1080-1082`) **shall** be fused into the single admission pass. | `_modifications_lines` |
-| **LLR-105.2** | `_checklist_lines` **shall** admit at most `MAX_REPORT_ROWS_PER_VARIANT` rows **summed across all of the variant's check files**, not per check-file table. A per-table cap is not a bound: the check-file count has no cap anywhere, so `N_files × C` is unbounded. | `_checklist_lines` |
-| **LLR-105.3** | Every unbounded-width cell — `Address`, `Length`, `Before`/`After`, `Expected`/`Actual` — **shall** render at most `REPORT_CELL_CHARS` characters. Byte-run cells **shall** be bounded **at the source**, by the count of byte values consumed (`REPORT_BYTES_PER_CELL`), **never** by slicing an already-rendered string — the rendered string *is* the allocation being bounded. | `_format_bytes` (**signature**) |
+| **LLR-105.2** | `_checklist_lines` **shall** admit at most `MAX_REPORT_ROWS_PER_VARIANT` rows **summed across all of the variant's check files**, not per check-file table. A per-table cap is not a bound: the check-file count has no cap anywhere, so `N_files × C` is unbounded. **REVISION 2 (arch M-2):** once the cap is exhausted, a subsequent check file **shall** render its heading and aggregates followed by a per-file `> TRUNCATED:` line, and **shall omit** the table header and rule — a reader of check file 3 must not meet an empty table with no local explanation. | `_checklist_lines` |
+| **LLR-105.3** | **REVISION 2 — scoped to byte-run cells only (BL-2, BL-3).** The **byte-run** cells (`Before`/`After`, `Expected`/`Actual`) **shall** be bounded **at the source**, by the count of byte values consumed (`REPORT_BYTES_PER_CELL`), **never** by slicing an already-rendered string — the rendered string *is* the allocation being bounded. `max_bytes` **shall** be a **required, keyword-only** parameter of `_format_bytes` (the module's own policy at `:154-155`: `md_safe` takes a required `limit` precisely so no cap policy is inherited by accident). **`Address` and `Length` are struck from this clause** — see LLR-105.7 and LLR-107.2. | `_format_bytes` (**signature**; 4 production call sites `:1105,:1106,:1280,:1281`) |
+| **LLR-105.7** | **NEW (BL-3, sec F2).** The `Address` cell **shall not** be truncated. A truncated hex address remains a well-formed `^0x[0-9A-F]+$` numeral, so a truncated cell is **indistinguishable from a complete one** and understates the true value silently — measured at `2^12248` for a wire-legal 3572-digit address. Its width is already bounded in aggregate by `MAX_REPORT_ROWS_PER_VARIANT` and by LLR-106.1's gate (3574 B × 200 ≈ 715 kB/variant). **A truncated numeral that still parses as a numeral is a forgery, not a bound** — the same reasoning LLR-107.2 applies to `Length`. | `_modifications_lines`, `_checklist_lines` |
 | **LLR-105.4** | Traversal **shall not** terminate on saturation: the producer **shall** stop formatting and appending but **shall** keep counting, so the notice states the true dropped count. | both producers |
-| **LLR-105.5** | Every bound that fires **shall** emit one in-document `> TRUNCATED:` notice naming the section, the cap value, the dropped count and the total; every width bound that fires **shall** emit an in-cell cue naming how many byte values were not rendered. A silently shortened byte run in an evidentiary document is a **correctness** defect, not a cosmetic one. | new format constants |
+| **LLR-105.5** | **REVISION 2 (BL-4).** Every bound that fires **shall** emit one in-document `> TRUNCATED:` notice carrying **`(cause, dropped, total)` per cause**, where cause ∈ {cardinality cap, byte budget}, naming the section and the governing constant. The two causes **shall** be reported **distinguishably** — a row dropped by `budget.fits` was not dropped by a cap, and conflating them permits an eviction to read as a policy cap. Every width bound that fires **shall** emit an in-cell cue naming how many byte values were not rendered. A silently shortened byte run in an evidentiary document is a **correctness** defect, not a cosmetic one. | new format constants |
+| **LLR-105.8** | **NEW (arch M-9, sec F6).** `_format_bytes` output **shall** satisfy `set(out) ⊆ HEX ∪ {" "} ∪ CUE_ALPHABET`, with `CUE_ALPHABET` a module-level constant. `tests/test_report_field_census.py::test_f17` **shall** be amended by **widening its closed alphabet to that constant** — never by relaxing it to a blacklist or shrinking its fixture. That test is a batch-62 escaping guard that pins *why* byte cells are exempt from escaping; replacing a structural whitelist with reasoning is a security-relevant weakening. | `CUE_ALPHABET`, `test_f17` |
+| **LLR-105.9** | **NEW (arch M-11).** `3·REPORT_BYTES_PER_CELL − 1 = 512` **already equals** `REPORT_CELL_CHARS` before the cue is appended, so a truncated cell **shall** be declared an **explicit overshoot** of `REPORT_CELL_CHARS` by at most the cue width — following the module's own precedent at `:180-182` ("the marker itself … is allowed past the budget — explicit beats silent"). Left unstated, Inc-1 and Inc-2 will resolve it differently. | `REPORT_BYTES_PER_CELL` |
 | **LLR-105.6** | The bounds **shall** be module-level named constants; no bare literal of any cap value **shall** appear in either producer body. | new constants |
 | **LLR-106.1** | Both producers **shall** take the live `_ByteBudget` as a **required, keyword-only** parameter (mirroring `_hexdump_section(result, options, budget)`, `:1369`) and **shall** admit a row only while `budget.fits(...)`, charging each admitted row with `consume`. An optional-with-`None` budget is **prohibited** — a silent bypass of the control. | both producers (**signature**) |
 | **LLR-106.2** | `generate_project_report` **shall** consume their output with a bare `lines.extend`, **not** `emit`, so no batch is charged twice. | `generate_project_report` (`:2243`, `:2245`) |
 | **LLR-106.3** | Each section's **structural** lines — heading, table header/rule, zero-population line, truncation notice — **shall** be emitted **outside** the gate and charged, so a variant is never silently absent. The permitted overshoot is `O(V × ~5 lines)` and **shall** be stated as a non-claim. | both producers |
 | **LLR-106.4** | With no cap and no gate firing, both producers **shall** be **byte-identical** to the shipped output. | both producers |
+| **LLR-106.5** | **NEW (BL-4).** Each producer **shall** emit one notice naming the **budget** cause with its own dropped count, distinct from the cardinality notice (LLR-105.5). Without it, budget eviction is silent — and because document order is stable and attacker-influenced, an adversary can front-load variant 1 to **deterministically suppress** a later variant's rows while the document still reads as complete. | both producers |
+| **LLR-106.6** | **NEW (arch M-6 / qa F-8).** Exactly-once charging **shall** be gated: `budget.used` after one variant **shall** equal `_line_bytes` of that variant's emitted lines. A double charge makes the document **smaller** than required — i.e. it makes AT-226/227 **easier** to pass, the canonical shape of a requirement whose violation relaxes its own acceptance. | `generate_project_report` `:2243`, `:2245` |
+| **LLR-106.7** | **NEW (arch m-5).** Allocation priority under a saturated budget **shall** be stated, not emergent: earlier sections have priority, extending `_hexdump_section`'s existing convention. Source order currently decides silently that Modifications outrank Checklists outrank hexdumps. | both producers |
 | **LLR-107.1** | Both `Length` sites (`:1104`, `:1279`) **shall** route through one shared `_format_length(length: int) -> str`. Two independent formatters over disjoint inputs is how one site gets fixed and the other does not. | new `_format_length` |
 | **LLR-107.2** | `_format_length` **shall** return the decimal form whenever CPython can produce it (EAFP: `try: return str(length)` / `except ValueError:`), otherwise `f"{sign}0x{abs(length):X}"`. The alternative form **shall** match `^-?0x[0-9A-F]+$`. `f"0x{length:X}"` on a negative value is **prohibited** — it renders `0x-1000`, which the predicate rejects, while the correct `-0x1000` passes. | new `_format_length` |
 | **LLR-107.3** | `_format_length` **shall not** change the rendering of any in-domain length. `MF_RUN_LENGTH_CEILING` bounds an in-domain length at 7 decimal digits — the alternative form is unreachable in-domain by ~4293 digits. | — |
@@ -145,7 +177,7 @@ Decided by the corrected census (P-18): max single `(document, variant)` Modific
 
 | Option | Expected result | Consequences |
 |---|---|---|
-| ✅ **200** — mirror `MAX_REPORT_ISSUES_PER_VARIANT` (`:96`) / `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` (`:111`) | Cap never fires on any golden → **0 re-baselined**, matching batch-65's cited property. One number governs all caps in the module | ⚠️ Boundary-exact: the golden's largest table **equals** the cap. **This is a feature — it makes that golden an off-by-one sentinel that goes RED on `>=` for `>`** — but it must be *declared* as such, or a later reader reads the zero-drift as slack |
+| ✅ **200** — mirror `MAX_REPORT_ISSUES_PER_VARIANT` (`:96`) / `MAX_ADDENDUM_HITS_PER_CLASS_PER_REGION` (`:111`) | Cap never fires on any golden → **0 re-baselined**, matching batch-65's cited property. One number governs all caps in the module — the module states this policy twice (`:93-95`, `:107-110`), which is sufficient rationale on its own | ⚠️ Boundary-exact: the golden's largest table **equals** the cap. **REVISION 2 (arch M-4): the "this is a feature / off-by-one sentinel" framing is STRUCK.** It does not survive inspection — the sentinel lives in **another batch's file that §6.4 forbids touching**, so the coupling cannot be recorded where it would be seen; it fires only for `>` → `>=`; and TC-521/522 already test `{CAP−1, CAP, CAP+1}` **deliberately** in this batch's own file. The real property is "zero golden drift", which 200 and 500 share. Coupling recorded in the constant's docstring + a sibling assertion, so a future edit names its cause |
 | ⚠️ 500 | Also 0 goldens; more evidence retained | ❌ A third cap number, against the module's twice-stated one-number policy (`:93-95`, `:107-110`) |
 | ❌ 415 | 0 goldens | ❌ **An artifact of my own miscount** — encoding it would put a constant in the tree whose recorded justification is false |
 | ❌ 128 | Tightest | ❌ Drifts `batch64/addendum-below-bound.md` (200 > 128) |
@@ -183,7 +215,7 @@ budget, and **`V` has no cap anywhere**. At `V=10` the document is ~16 MB — **
 |---|---|
 | ❌ Producer bound only | Closes the chartered `E`-axis (208 MB → 634 kB) but the document stays `O(V)`. Would force R-TUI-101 to claim F4 closed while the budget is exceeded 8× — over-claiming |
 | ❌ Gate `emit()` at section granularity | **Does not close OB-4** — the producer is fully evaluated before the gate sees it (P-6). Strictly worse |
-| ✅ **Per-row gate inside the producer** | Both axes by one mechanism: a row failing `fits` is never formatted, appended or emitted. Partial evidence preserved. **Two in-repo precedents:** `_hexdump_section:1451-1458` gates per block on this same budget; `flow_fused_report_service:301-367` gates per section on the shared `_ByteBudget` |
+| ✅ **Per-row gate inside the producer** | A row failing `fits` is **formatted, then discarded** — never appended, never emitted. **REVISION 2 (arch M-1):** revision 1 claimed such a row is "never **formatted**", which is **false** — `budget.fits(extra)` needs `extra = _line_bytes([row])`, so the row must exist first. The cited precedent is itself format-then-gate (`:1454-1455`). The gate therefore closes the **emitted** and **appended-residency** axes; the transient per-row formatting cost is `O(1)` and discarded, and the **OB-4 residency axis is closed by the cap and width bounds alone**. A false rationale inside a ruling is exactly what the P-6 and P-14 corrections are about. Partial evidence preserved. **Two in-repo precedents:** `_hexdump_section:1451-1458`; `flow_fused_report_service:301-367` |
 | ❌ Cap the variant count | Drops whole variants from an evidentiary document — the worst available loss, and out of charter |
 
 ⚠️ **Disclosed consequences of the ruling:** output becomes **position-dependent** (an early expensive
@@ -227,10 +259,35 @@ stays byte-identical.
 | batch-65's `ops_counter` seam | ✅ | n/a | ❌ **invariant** — traversal must continue, so consumption is `N` either way | ❌ **REJECT as vacuous here** |
 | Peak RSS / wall-clock | ❌ | — | — | ❌ **REJECT — flaky**; batch-64 measured cap-and-break vs cap-and-continue indistinguishable (19019/19019) |
 
-**Threshold 1.05, justified by execution, not taste:** FUSED **1.0000** · CAP-ONLY **1.1971** ·
-SHIPPED **2.0008** → 5% headroom above correct, 14% margin below the nearest defective. The fixture
-precondition `N_low ≥ 2·CAP` **shall** be asserted in the test body, or the ratio measures fixture luck.
-**Re-measure on the CI runner (ubuntu / py3.11) before the gate is claimed (C-39).**
+**REVISION 2 — the ratio is now DEFINED, and the threshold is host-invariant (qa F-6).**
+
+Revision 1 stated a threshold (`1.05`) but **never defined the ratio** — no numerator, no denominator.
+An implementer would have picked whichever definition passed. Worse, `1.05` was a **host-calibrated**
+constant (win32 / py3.14.4) with only a 14% band to the nearest defective, deferred to a CI re-measure
+with **no stated decision rule** if the re-measure landed in the band.
+
+**The ratio, defined:** `peak(E_hi) / peak(E_lo)` where `peak` is `tracemalloc`'s peak inside a window
+opened immediately before the producer call and closed immediately after, **with the fixture built
+outside the window**, and **both** `E_lo` and `E_hi` strictly above `MAX_REPORT_ROWS_PER_VARIANT`.
+
+Both points above the cap is what makes the predicate **host-invariant**: past the cap a correct
+implementation's residency is *independent of `E`*, so the ratio is **1.000 by construction on any
+host**, while any implementation still linear in `E` scales with `E_hi/E_lo`. The threshold stops
+being a calibration and becomes a statement of the property.
+
+| Implementation | ratio at `E: 2·CAP → 20·CAP` (reviewer-executed) |
+|---|---|
+| SHIPPED | **9.887** |
+| CAP-ONLY (keeps the `entries` flattening) | **1.921** |
+| FUSED single-pass (correct) | **1.000** |
+
+**Gate: `≤ 1.15`** — a 92% band below the nearest defective, and no host constant.
+**The fixture precondition `E_lo > CAP` shall be asserted in the test body**, or the ratio measures
+fixture luck. **These three numbers are the reviewer's; Inc-1 shall re-derive them on this tree and
+paste the transcript (C-39), and re-measure on the CI runner (ubuntu / py3.11) before the gate is
+claimed.** If the CI re-measure lands above 1.15 for the correct implementation, the **pre-declared
+disposition** is to re-derive the threshold from that run and record the change — **not** to widen it
+until green.
 
 ### 6.3 Rejected-as-vacuous register (the valuable half of C-40)
 
@@ -272,7 +329,9 @@ be **removed**, not updated).
 | Traversal below one pass | LLR-105.4 deliberately keeps the full `V×E` pass |
 | **`_applied_regions` (`:1288`) is a THIRD unbounded producer** — newly measured, peak `16,128 → 160,992` at `N=2000→4000` | **Out of scope. This is why no whole-report memory claim is made** (P-23) |
 | Truncation notices not reaching `## Truncation appendix` — **our two new emitters make it 3 → 5** | Following `_declaration_error_lines`'s inline-only convention; unification stays carried. Stated so the residual does not silently grow |
-| **NEW, created by our own fix:** the document is `REPORT_MAX_TOTAL_BYTES + O(V × ~5 lines)`, not `≤` | LLR-106.3 deliberately emits structural lines outside the gate so no variant vanishes |
+| **THE DOCUMENT IS NOT BUDGET-BOUNDED, and this batch does not make it so** — five producers stay on the ungated `emit` (`:2215-2217`): `_modified_files_lines` (`:2242`), **`_declaration_error_lines` (`:2244`)**, `_entropy_lines` (`:2250`), `_addendum_lines` (`:2252`), plus the hexdump notes. **Measured: `_declaration_error_lines` alone emits 315,912 B/variant** (capped at 200 *issues*, never at bytes) → document floor `2,097,152 + V×315,912` = **1.15× budget at V=1, 2.51× at V=10, 16.06× at V=100** | **BL-1.** Routing them through the gate is scope expansion the operator forbade. This batch bounds **its two producers' contribution**; the whole-document bound needs its own batch. Stated with its measured number rather than as "an overshoot" |
+| **The per-check-file structural block is ungated** — `_checklist_lines` emits **7 structural lines per check file** and the check-file count `F` has no cap anywhere, so `O(V × F × 7 lines)` sits outside the gate; the heading carries `md_code(source_path)`, which by design never truncates | sec F5. LLR-106.3 deliberately puts structural lines outside the gate so a section never vanishes; the `F` axis is a **new named residual**, not a closed one |
+| **NEW, created by our own fix:** the producers' own contribution is bounded, but each section's structural lines are charged outside the gate | LLR-106.3, so no variant loses its section structure |
 | **NEW:** above the cap the report is not a **complete** record of a variant's modifications | The consequence of D-2; the notice says so |
 | **NEW:** output is **position-dependent** under a saturated budget; hexdump output can change in already-saturated documents | The consequence of D-4 |
 | `diff_report_service` · D-11 · batch-73's `apply.py` | Fenced out |
@@ -281,15 +340,22 @@ be **removed**, not updated).
 
 ## 8. Increment cut (C-21: re-cut against the final LLR set)
 
-| Inc | Files (≤5) | Content |
-|---|---|---|
-| **1** | `report_service.py`, `tests/test_report_producer_bound.py` (new), `tests/test_report_field_census.py` | Constants; `_format_bytes(values, *, max_bytes)`; `_modifications_lines` rewritten single-pass (fuse `entries`+`kept`). **Third file is forced:** `test_f17` (`:927`, `_format_bytes(range(256))`) goes RED at a 171-byte cap. AT-220/222/224 |
-| **2** | `report_service.py`, `tests/test_report_producer_bound.py` | `_checklist_lines`, cap spanning all check files. **Not merged with Inc-1** — different shape, disjoint input. AT-221/223/225 |
-| **3** | `report_service.py`, `tests/test_report_producer_bound.py` | The F4 gate: budget as required kwarg, `emit`→`extend`, structural lines outside. AT-226/227/228 |
-| **4** | `report_service.py`, `tests/test_report_producer_bound.py`, `tests/goldens/batch74/` | `_format_length` + both sites + the positive-control golden. AT-229/230/231/232 |
-| **5** | `app.py`, `tests/test_tui_report_seam.py` | Attribution + fail-closed. AT-233/234 |
-| **6** | `REQUIREMENTS.md` | R-TUI-101 + non-claims + the R-TUI-097/098 amendments |
+**REVISION 2** — every AT **and** every TC now has an owning increment (arch M-10: revision 1 assigned
+no TC anywhere, so the functional chain `US→HLR→LLR→TC` terminated in §6.1 and never reached code).
 
-**Pre-flight before Inc-1** (not an increment): re-run the per-`(document,variant)` golden census and
-capture AT-232's golden from the **shipped** producer *before* any edit (C-12 — otherwise it certifies
-the rewrite against itself).
+| Inc | Files (≤5) | Content | ATs | TCs |
+|---|---|---|---|---|
+| **0** | `tests/goldens/batch74/` **only** | **Pre-flight commit.** Capture AT-232's golden from the **shipped** producer. A separate commit touching nothing else, so C-12 ordering is **auditable** via `git log --diff-filter=A -- tests/goldens/batch74/` preceding the first `report_service.py` commit (qa F-7: prose cannot enforce this after the fact). Re-run the per-`(document,variant)` golden census | — | — |
+| **1** | `report_service.py`, `tests/test_report_producer_bound.py` (new), `tests/test_report_field_census.py` | Constants + `CUE_ALPHABET`; `_format_bytes(values, *, max_bytes)` **required kwarg — and all FOUR production call sites updated in the same commit** (`:1105,:1106,:1280,:1281`; arch M-7: otherwise `_checklist_lines` breaks and Inc-1's own gate is not green, while its *cap* work still waits for Inc-2); `_modifications_lines` single-pass. **Third file forced:** `test_f17` (`:927`) goes RED at a 171-byte cap and **shall** be amended by widening its closed alphabet to `CUE_ALPHABET` (LLR-105.8) | 220, 222, 224, **231b**, **232** | 521, 523, 525, 527, 528, 534, 535 |
+| **2** | `report_service.py`, `tests/test_report_producer_bound.py` | `_checklist_lines`: cap spanning all check files + the per-file saturation rendering (LLR-105.2). **Not merged with Inc-1** — different shape, disjoint input | 221, 223, 225 | 522, 524, 526 |
+| **3** | `report_service.py`, `tests/test_report_producer_bound.py` | The F4 gate: budget as required kwarg, `emit`→`extend`, structural lines outside, **budget-cause notice** (LLR-106.5), exactly-once charging (LLR-106.6), priority (LLR-106.7) | 226, 227, 228, **228b** | new: signature/keyword-only · double-charge · priority |
+| **4** | `report_service.py`, `tests/test_report_producer_bound.py` | `_format_length` + both sites | 229, 230, 231 | 529, 530, 531 |
+| **5** | `app.py`, `tests/test_tui_report_seam.py` | Attribution + fail-closed | **233a**, **233b**, 234 *(pin)* | 532, 533 *(pin)* |
+| **6** | `REQUIREMENTS.md` | R-TUI-101 + non-claims + the R-TUI-097/098 amendments | — | — |
+
+**TC-536 stays put** in `tests/test_report_addendum_bound.py:793` — batch-64's file, untouched. Labelled
+**"PIN + boundary sentinel"** (qa F-13). Per arch M-4 the "off-by-one sentinel is a feature" framing is
+**struck** from D-2: the coupling lives in another batch's file where it cannot be seen, and TC-521/522
+already test `{CAP−1, CAP, CAP+1}` deliberately in *this* batch's file. The coupling is instead recorded
+in the new constant's docstring, plus a sibling assertion in `test_report_producer_bound.py` so the
+failure names its cause rather than surfacing as an unrelated byte diff.
