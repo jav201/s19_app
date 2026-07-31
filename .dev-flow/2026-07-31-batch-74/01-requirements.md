@@ -164,10 +164,20 @@ than calibrating to a machine.
 | Implementation | ratio at `E: 2·CAP → 20·CAP` |
 |---|---|
 | SHIPPED | 9.887 |
-| CAP-ONLY (keeps the flattening) | 1.921 |
+| CAP-ONLY (keeps the flattening) | ~~1.921~~ → **measured 2.224 at Inc-1** |
 | FUSED (correct) | 1.000 |
 
-**Gate `≤ 1.15`** — 92% band below the nearest defective. **`E_lo > CAP` shall be asserted in the test
+**Gate `≤ 1.15`** — a wide band below the nearest defective.
+
+> ⚠️ **Inc-1 amendment (C-39 rider — re-measure the fold's OWN numbers).** Re-derived on this tree:
+> SHIPPED **9.836** (spec said 9.887 — reproduces within 0.5%), FUSED **1.000** (**exact**), but
+> **CAP-ONLY measured 2.224, not 1.921.** Cause: **§5.1 never DEFINED the CAP-ONLY shape**, so the
+> reviewer's reconstruction and the implementer's differ in detail. Direction and verdict are
+> unchanged — both defective shapes sit far above the gate — but **a number whose counterfactual is
+> undefined is not reproducible, and this document should not have quoted it as though it were.**
+> The counterfactual is now DEFINED in code (`_shipped_body` / `_cap_only_body` in
+> `tests/test_report_producer_bound.py`), so the next run has something to reproduce against.
+> FUSED = 1.000 exactly, so the threshold was **not** widened. **`E_lo > CAP` shall be asserted in the test
 body.** Inc-1 **shall** re-derive these three numbers on this tree and paste the transcript (C-39).
 **Pre-declared disposition** if the CI runner (ubuntu/py3.11) puts a correct implementation above 1.15:
 re-derive the threshold from that run and record the change — **never widen it until green**.
@@ -218,12 +228,12 @@ Inc-2 derives it with its golden blast radius executed (widest golden Address ce
 | Inc | Files (≤5) | Content | ATs | TCs |
 |---|---|---|---|---|
 | **0** | `tests/goldens/batch74/` **only** | Pre-flight commit: capture AT-247's golden from the **shipped** producer. Separate commit so C-12 ordering is auditable via `git log --diff-filter=A` | — | — |
-| **1** | `report_service.py`, `tests/test_report_producer_bound.py` (new), `tests/test_report_field_census.py` | Constants + `CUE_ALPHABET`; `_format_bytes(values, *, max_bytes)` **with all four call sites updated in the same commit**; `_modifications_lines` single-pass. `test_f17` amended by **widening** its closed alphabet (LLR-105.7) | 220, 222, 224, 227, 228 | **TC-540** 105.1 cap arms `{CAP−1,CAP,CAP+1}` · **TC-541** 105.3 width in/out of cap · **TC-542** 105.4′ count correctness under filter · **TC-543** 105.5 notice names the constant, its value **and the total** *(re-gate F-5: revision 3 asserted only the dropped count)* · **TC-544** 105.6 **AST/source guard: no bare cap literal in either producer body or in any new test** *(re-gate F-5 — the clause governs the producer body and had no gate)* · **TC-545** the §5.1 oracle re-derivation transcript |
-| **2** | `report_service.py`, `tests/test_report_producer_bound.py` | `_checklist_lines` cap + per-file saturation rendering; `REPORT_ADDRESS_HEX_DIGITS` chosen and `REPORT_ADDRESS_CHARS` **derived from it** (LLR-106.3), then the Address bound + unforgeable form + inert cue at both sites | 221, 223, 225, 226, **229** | **TC-546** 105.2 cap summed across check files · **TC-547** 105.2 per-file saturated rendering omits header/rule · **TC-548** 106.1 arithmetic derivation, no full materialisation · **TC-549** 106.2 elided count vs `(bit_length()+3)//4`, incl. the **leading-zero** case `int('0x0FF…',16)` · **TC-550** 106.3 the constant equals its derivation · **TC-551** 106.4 cue alphabet inert, contains no `.` and no `|` |
+| **1** | `report_service.py`, `tests/test_report_producer_bound.py` (new), `tests/test_report_field_census.py` | Constants + `CUE_ALPHABET`; `_format_bytes(values, *, max_bytes)` **with all four call sites updated in the same commit**; `_modifications_lines` single-pass. `test_f17` amended by **widening** its closed alphabet (LLR-105.7) | 240, 242, 244, 247, 248 | **TC-540** 105.1 cap arms `{CAP−1,CAP,CAP+1}` · **TC-541** 105.3 width in/out of cap · **TC-542** 105.4′ count correctness under filter · **TC-543** 105.5 notice names the constant, its value **and the total** *(re-gate F-5: revision 3 asserted only the dropped count)* · **TC-544** 105.6 **AST/source guard: no bare cap literal in either producer body or in any new test** *(re-gate F-5 — the clause governs the producer body and had no gate)* · **TC-545** the §5.1 oracle re-derivation transcript |
+| **2** | `report_service.py`, `tests/test_report_producer_bound.py` | `_checklist_lines` cap + per-file saturation rendering; `REPORT_ADDRESS_HEX_DIGITS` chosen and `REPORT_ADDRESS_CHARS` **derived from it** (LLR-106.3), then the Address bound + unforgeable form + inert cue at both sites | 241, 243, 245, 246, **249** | **TC-546** 105.2 cap summed across check files · **TC-547** 105.2 per-file saturated rendering omits header/rule · **TC-548** 106.1 arithmetic derivation, no full materialisation · **TC-549** 106.2 elided count vs `(bit_length()+3)//4`, incl. the **leading-zero** case `int('0x0FF…',16)` · **TC-550** 106.3 the constant equals its derivation · **TC-551** 106.4 cue alphabet inert, contains no `.` and no `|` |
 | **3** | `REQUIREMENTS.md`, `.dev-flow/BACKLOG-CODE.md` | R-TUI-101 + its non-claims; the R-TUI-097/098 amendments; **the batch-75 split written into the backlog with every measurement above** | — | — |
 
 **The batch-64 addendum golden pin stays** in `tests/test_report_addendum_bound.py:793` untouched, labelled **"PIN + boundary
-sentinel"**. **Every AT (220-229) and every TC (521-532) has exactly one owning increment; no orphan.**
+sentinel"**. **Every AT (240-249) and every TC (540-551) has exactly one owning increment; no orphan.**
 
 **Authoring note for AT-242 and AT-246 (re-gate check 4):** derive `len(cue)` from the *independently
 known* elided count — for AT-242, `4·B − B = 3·B`; for AT-246, `(n.bit_length()+3)//4 −
