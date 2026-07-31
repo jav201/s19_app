@@ -102,5 +102,14 @@
   "requirements_touched": {
     "R-CHG-002": "AMENDED - Amendment A 'Overlapping linkage ranges resolve first-by-start'. Before/After table per the operator's requirement-amendment convention. The classification vocabulary and linkage's informative-only status are UNCHANGED; what changed is which symbol is reported when ranges overlap, which the requirement had never addressed."
   },
+  "obsidian_synced": true,
+  "obsidian_sync": {
+    "date": "2026-07-31",
+    "destination": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-31-batch-73/",
+    "copied": "SPEC.md + state-at-close.json + 2026-07-31-batch-73-README.md (generated index, 35/35 frontmatter keys, YAML validated, ledger 2370+12=2382 consistent)",
+    "mode": "ARTIFACTS-ONLY, by operator ruling 2026-07-31. This is the FIRST /fast-dev-flow batch archived in the vault - batch-67, batch-68 and batch-71 were fast-flows and remain unsynced; the ruling was not applied retroactively. It resolves the question batch-71 left open on record (its own obsidian_synced was deliberately left null rather than guessed).",
+    "state_json_untouched": "/dev-flow-sync steps 8-9 were deliberately NOT run. Those steps write obsidian_synced + a decisions_log entry into the SHARED .dev-flow/state.json and commit it - but that file describes batch-72 (already correctly synced 2026-07-30) and batch-74 was mid-flight on it. Running them would have overwritten a correct record and collided with a live batch. THIS FILE carries the flag instead, which is why this follow-up PR exists: a sync that no state file records is exactly the failure mode step 9 guards against.",
+    "reject_checks": "Structural template detect CLEAN on both artifacts (0 header-only tables, 0 empty/guidance-only sections, 0 live placeholder tokens). Repo hygiene: primary checkout on main. Visual-evidence refresh SKIPPED by operator decision - the step-5 trigger fired literally (batch-73 touched s19_app/tui/changes/apply.py) but its PURPOSE was not met, since apply.py is headless engine logic that renders nothing; all 176 vault assets therefore still date from batch-72's 2026-07-30 refresh, reported as a WARN rather than presented as clean."
+  },
   "created_at": "2026-07-31T00:00:00Z"
 }
