@@ -26,7 +26,7 @@
     "full_table": ".dev-flow/2026-07-30-batch-72/01-requirements.md section 2.7 (9 premises, each executed or dispositioned)"
   },
   "current_phase": 6,
-  "phase_status": "awaiting-sync",
+  "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
     "1": 2,
@@ -248,9 +248,15 @@
       "date": "2026-07-30",
       "decision": "AUTONOMOUS: prototype teardown scoped to THIS batch's 46 files only",
       "notes": "PLAN.md's teardown clause names crc_designer.p1.*, crc_p1.*, legend_p1.*, p1_design_defects.*, p1_review_build.py, p1-design-defects-review.html. A naive 'p1' glob would also have matched the NINE fb_p1_*/fb_p1b_* Flow Builder prototypes, which belong to a DIFFERENT batch and are still referenced by open backlog work - they are deliberately KEPT. Verified nothing outside prototypes/ and .dev-flow/ references the removed set."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-30",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-30-batch-72/. Copied 01/02/04/05 + 06-docs (03-increments excluded per vault convention). Template reject-check CLEAN: 0 live placeholder tokens, 0 header-only tables, verdict PASS present with 79 result rows. Visual evidence REFRESHED (batch touched s19_app/tui/ in 3 files): 15 pilot cases regenerated 15 passed 52.53s, 75 flattened frames + 15 gifs re-copied from merged main 6524afd; 75/75 live assets fresh, the 6 non-refreshed files verified BY NAME as the documented pv__case_06 retired-case exclusions. Also corrected a SECOND, stale refresh stamp in visual-evidence.md's footer which had drifted to batch-60 while the authoritative section-5 bullet already read batch-70 - two stamps for one fact and the duplicate was the stale one."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-30T00:00:00Z",
   "merged": {
     "pr": 166,
