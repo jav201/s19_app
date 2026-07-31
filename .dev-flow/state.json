@@ -2,7 +2,7 @@
   "project": "s19_app",
   "language": "en",
   "batch_id": "2026-07-31-batch-74",
-  "batch_objective": "Bound the PRODUCER (not the emitted document) in s19_app/tui/services/report_service.py, closing three MAJOR findings that are three axes of the SAME two functions _modifications_lines (:1031) and _checklist_lines (:1203): OB-4 (resident memory, unbounded row materialisation), F4 (emitted bytes, ~208 MB vs a declared 2 MiB budget) and D2 (a schema-legal >=3572-hex-digit address raises ValueError in the decimal Length column and is misreported as operator-input rejection). Closes OB-4/F4/D2 and NOTHING more; the R-TUI-098 residual line must be discharged explicitly rather than swallowed.",
+  "batch_objective": "RE-SCOPED by operator decision 2026-07-31 at the iteration cap. KEPT: OB-4 (producer bound on _modifications_lines/_checklist_lines - cardinality cap + byte-run width bound) and a NEW Address story - Phase-2 measurement found int('0x'+'F'*100000,16) PARSES (int_max_str_digits does not apply to base 16) so the Address cell renders 100,000 chars with a real ceiling of READ_SIZE_CAP_BYTES=268MB, and it was in nobody's charter. SPLIT to batch-75 with all measurements carried: F4 (_ByteBudget gate) and D2 (_format_length + app.py re-attribution).",
   "note_prior_batch": "batch-72 (P1 design defects: CRC Designer Variant B + Legend two-pane) DONE + MERGED PR #166 squash 1abda8e, close-out #167 6524afd, obsidian_synced flag landed #168 37f2a4b. Its full state at close archived at .dev-flow/2026-07-30-batch-72/state-at-close.json.",
   "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (resolved from docs/engineering-rules.md:17). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
   "route": "/dev-flow (full V-model) - operator invoked it explicitly ('completo, no fast'). Plan inherited from .dev-flow/HANDOFF-2026-07-31.md section 'PLAN - batch-74', authored in a planning-only session and explicitly declared a HYPOTHESIS.",
@@ -26,11 +26,11 @@
     "P6_TRUE": "The plan's load-bearing design constraint is confirmed at the source: emit() (:2215-2217) calls budget.consume(...) only - it ACCOUNTS, NEVER GATES. The sole budget.fits(...) gate is _hexdump_section:1455. So emit(_modifications_lines(...)) at :2243 has fully materialised the producer before consume is reached, and charging these tables to _ByteBudget would close F4 while leaving OB-4 completely untouched."
   },
   "current_phase": 2,
-  "phase_status": "awaiting-gate",
+  "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
-    "1": 2,
-    "2": 2,
+    "1": 3,
+    "2": 3,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -84,6 +84,24 @@
       "date": "2026-07-31",
       "decision": "ITERATION CAP REACHED - ESCALATED TO OPERATOR instead of spending the last autonomous pass",
       "notes": "Phase-2 cross-review (architect+qa+security, parallel) returned ITERATE from ALL THREE lanes: 12 raw blockers deduplicated to 7 distinct. The top blocker was found INDEPENDENTLY by all three lanes - HLR-106/AT-227 claimed a whole-document byte bound that is unsatisfiable, because _declaration_error_lines alone emits a measured 315,912 B/variant through the ungated emit(). Revision 2 folded all 7 + 16 majors. The Phase-2 RE-GATE (discharge form) then returned 3 DISCHARGED / 4 PARTIAL / 3 NEW blockers CREATED BY THE FOLD, with a diagnosable pattern: revision 2 moved the requirement scope and left the AT predicate behind, so three ATs are now RED after a CORRECT implementation - the same defect class reproduced one level down. Two executed refutations were re-verified by the orchestrator: (i) int('0x'+'F'*100000,16) PARSES because CPython's int_max_str_digits does not apply to base-16, so an Address cell renders 100,000 chars and the real ceiling is READ_SIZE_CAP_BYTES=268MB - my LLR-105.7 reassurance of 3574 B was false, and the fold closed a forgery hole by re-opening a memory hole; (ii) _checklist_lines:1243-1248 already computes a lazy filtered kept count, so BL-6's filtered-fixture remedy does not force traversal continuation, and LLR-105.4's declared subject has NO observable consequence at all (one-pass and precount-plus-break produce byte-identical documents AND identical tracemalloc ratios) - it is unfalsifiable as stated. Both Phase 1 and Phase 2 are now at 2 iterations with a third pending; the operator's launch instruction is explicit ('si topas el cap, escala conmigo - no hagas loop'), so the batch STOPS here for an operator decision rather than spending the final autonomous pass. NO PRODUCTION CODE HAS BEEN WRITTEN - the entire batch to date is specification work."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "OPERATOR RE-SCOPE at the iteration cap: keep OB-4 + Address, split F4 and D2 to batch-75",
+      "notes": "Presented four options at the escalation; operator selected 'Re-scope: OB-4 + Address, split out F4 & D2'. Rationale of record: F4's budget gate was the source of most Phase-2 blockers and cannot be honestly closed while five sibling producers stay ungated (_declaration_error_lines alone = 315,912 B/variant, 16.06x budget at V=100); D2 is UNREACHABLE through the shipped ingestion path (addressed_range bounds Length to 7 digits) and is the lowest-value of the three; while the Address cell - NOT in the original charter - is the genuinely wire-reachable unbounded field. Requirement surface 3 HLR/20 LLR/18 AT -> 2 HLR/9 LLR/10 AT."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: TWO requirements WITHDRAWN with written reason rather than carried",
+      "notes": "LLR-105.4 ('traversal shall not terminate') was UNFALSIFIABLE - P-25: _checklist_lines:1243-1248 already computes a lazy filtered kept count, and one-pass vs precount-then-break produce byte-identical documents AND identical tracemalloc ratios, so the clause had no observable consequence. Replaced by LLR-105.4', a requirement on the dropped COUNT'S CORRECTNESS, which is observable and whose named mutation (report len(entries)-CAP) reddens it. LLR-105.9 (cue overshoot) folded into AT-222's predicate, which now quotes the FORMULA 3*B-1+len(cue) instead of REPORT_CELL_CHARS - revision 2's form was RED after a correct fix because 3*171-1 already equals 512."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "Phase-2 gate APPROVED (self-approved under the kickoff grant) on revision 3 + the re-gate fold",
+      "notes": "Focused re-gate returned APPROVE conditional on two mandatory folds, both section-5 edits with numbers already supplied and needing no new measurement; all five findings folded. F-1 added AT-229, the Address RESIDENCY gate: AT-226 constrains only the emitted token, so a format-then-slice implementation satisfies all three of its conjuncts while peaking at the full 268MB rendering (measured 9.996 vs 1.000 for the arithmetic form). The section-5.2 vacuity register had recorded 'an Address bound with no form change' but NOT the symmetric hole, 'a form change with no residency gate'. F-2 made REPORT_ADDRESS_CHARS derived TOP-DOWN from REPORT_ADDRESS_HEX_DIGITS - deriving it bottom-up from the golden census would have put it near 10-32 and made AT-226 RED after a correct implementation, i.e. N-1 reproduced on the newest requirement. F-3/F-4/F-5 folded: elided-count correctness incl. the leading-zero case, the Address cue must avoid '.' (in MD_ESCAPE), and TC-521..532 named individually instead of by range. Exit axes: Coverage MET (every LLR gated, every AT/TC owned by exactly one increment, no orphan); Certainty MET (every AT green-on-correct and red-on-a-named-mutation, with the circular-predicate trap called out for AT-222/226); Evidence MET (every number executed). Advance to Phase 3."
     }
   ],
   "obsidian_synced": false,
