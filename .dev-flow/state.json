@@ -1,268 +1,83 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-30-batch-72",
-  "batch_objective": "Implement the operator-decided P1 design-defect redesigns: CRC Designer prototype-Variant B (paired Reflection row, KAT DEMOTED to a Self-test row under Check, Warnings owns the hero right column, Select height capped) and Legend modal prototype-Variant B (two-pane card||key, key-first stack at the 80-col floor - P-8 CONFIRMED by the operator at the Phase-1 gate 2026-07-30). Closes the four 2026-07-28 operator-flagged defects in BACKLOG-CODE.md lines 149-156.",
-  "note_prior_batch": "batch-71 (AC-6 byte-golden) DONE + MERGED PR #161 squash 4753589, close-out #162 b64a3a4. Its full state at close archived at .dev-flow/2026-07-30-batch-71/state-at-close.json.",
-  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md. Lane B = .dev-flow/BACKLOG-PROCESS.md (parallel agent). .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
-  "route": "/dev-flow (full V-model) - operator invoked it explicitly. ONE batch, both stories.",
-  "prepared_by": "The 2026-07-30 prototyping session (PR #164: /tui-design prototypes + frames + review page). THIS SESSION DID NOT IMPLEMENT. A different session executes from the Phase-1 gate onward.",
-  "rc1": "VERIFIED 2026-07-30 by the prep session: git fetch; origin/main tip = 6ba0680 = merge-base of the prep branch (claude/crc-design-defects-prototypes-150cad). EXECUTING SESSION MUST RE-RUN RC-1: branch off the then-current origin/main AFTER PR #164 merges (this scaffold rides on #164). Already-shipped check: no REQUIREMENTS.md row describes a paired reflection row or a two-pane legend.",
-  "number_collision_check": "EXECUTED 2026-07-30: git ls-remote --heads origin | grep batch-72 -> 0; no .dev-flow/*batch-72* dir. RE-CHECK at executing kickoff (two prior collisions: 64->65, 66->67).",
+  "batch_id": "2026-07-31-batch-74",
+  "batch_objective": "Bound the PRODUCER (not the emitted document) in s19_app/tui/services/report_service.py, closing three MAJOR findings that are three axes of the SAME two functions _modifications_lines (:1031) and _checklist_lines (:1203): OB-4 (resident memory, unbounded row materialisation), F4 (emitted bytes, ~208 MB vs a declared 2 MiB budget) and D2 (a schema-legal >=3572-hex-digit address raises ValueError in the decimal Length column and is misreported as operator-input rejection). Closes OB-4/F4/D2 and NOTHING more; the R-TUI-098 residual line must be discharged explicitly rather than swallowed.",
+  "note_prior_batch": "batch-72 (P1 design defects: CRC Designer Variant B + Legend two-pane) DONE + MERGED PR #166 squash 1abda8e, close-out #167 6524afd, obsidian_synced flag landed #168 37f2a4b. Its full state at close archived at .dev-flow/2026-07-30-batch-72/state-at-close.json.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (resolved from docs/engineering-rules.md:17). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "route": "/dev-flow (full V-model) - operator invoked it explicitly ('completo, no fast'). Plan inherited from .dev-flow/HANDOFF-2026-07-31.md section 'PLAN - batch-74', authored in a planning-only session and explicitly declared a HYPOTHESIS.",
+  "rc1": "VERIFIED 2026-07-31: git fetch; origin/main tip = d81cb3d = HEAD = merge-base of claude/batch-74-s19-app-a693ff; working tree clean. BASE MOVED since the plan was authored (6524afd -> 37f2a4b -> d81cb3d), so rather than trusting the plan's @6524afd addresses, diffed the target module across the move: 'git diff --stat 6524afd d81cb3d -- s19_app/tui/services/report_service.py' is EMPTY (2262 lines at both). Every plan address re-confirmed individually anyway in 00-measurements.md section 1. Flow currency (C-45 PULL): ~/.claude aggregate sha256 = 0127a2767ff11c8a = FLOW-VERSION 2026.07.28-rev1 EXACT.",
+  "number_collision_check": "EXECUTED 2026-07-31: 'git ls-remote --heads origin | grep batch-74' -> 0 hits; 'grep batch-73' -> 0 hits (the parallel batch has not started); no .dev-flow/*batch-74* dir. Two prior collisions in this repo (64->65, 66->67) motivate the check.",
   "standing_authorization": {
-    "date": "2026-07-30",
-    "status": "GRANTED by the executing session's kickoff gate. Q1 (autonomy + merge): operator selected 'Full autonomy + merge' - the agent self-approves all remaining gates (recording every decision), opens the PR, runs the final independent PR-level qa-reviewer pass over the whole diff vs main, merges on a clean result (a HIGH finding blocks and returns to the operator), then runs /dev-flow-sync. Q2 (decision-recording ack): operator selected 'Acknowledged'.",
-    "operator_direction_on_record": "2026-07-30: 'Ok, CRC viewer vamos con (B). Leyenda, dos paneles. (B) Por favor deja el plan hecho, llama /dev-flow para ello y deja todo listo para que otra sesion tome desde ahi para llevarlo a termino.' KICKOFF ANSWERS 2026-07-30 (executing session, AskUserQuestion verbatim labels): Q1='Full autonomy + merge'; Q2='Acknowledged'; P-8='Stack, key first (Recommended)'; Phase-1 gate='Approve'."
+    "date": "2026-07-31",
+    "status": "GRANTED at this session's kickoff, asked FRESH per feedback_standing_auth_per_batch (never inherited - not from the launch prompt, not from the handoff plan, not from batch-72's grant). Q1 (autonomy + merge): operator selected 'Full autonomy + merge' - the agent self-approves all gates and increments (recording every decision), opens the PR, runs the final independent PR-level qa-reviewer pass over the whole diff vs main, merges on a clean result (a HIGH finding blocks and returns to the operator), then runs /dev-flow-sync. Q2 (decision-recording): operator selected 'Acknowledged + flag design rulings inline' - the STRONGER option: every autonomous DESIGN ruling is additionally surfaced in-conversation as it happens, not held to the next gate.",
+    "operator_direction_on_record": "2026-07-31 launch prompt (verbatim, abridged to its binding clauses): 'Ejecuta batch-74 en el repo s19_app siguiendo /dev-flow (completo, no fast).' / 'RESTRICCION DE DISENO, LA MAS IMPORTANTE: acota el PRODUCTOR, no el documento.' / 'FUERA DE ALCANCE, explicitamente: D-11 (redaccion de host paths) ... Tampoco diff_report_service.' / 'El plan es una HIPOTESIS ... re-derivalas en Phase 0 y registra TRUE/FALSE/UNDECIDABLE (C-43).' / 'Presupuesta iteraciones: ... Si topas el cap, escala conmigo - no hagas loop.' / 'Para cada AT responde \"puede ponerse en RED?\" aparte de \"es correcto?\", y EJECUTA la mutacion que lo enrojece (C-40).' / 'NO toques .dev-flow/state.json mientras PR #168 siga abierto.' KICKOFF ANSWERS 2026-07-31 (AskUserQuestion verbatim labels): Q1='Full autonomy + merge'; Q2='Acknowledged + flag design rulings inline'."
   },
   "id_allocation": {
-    "method": "grep -rhoE over REQUIREMENTS.md + tests/ + .dev-flow/ (*.py/*.md), executed 2026-07-30 by the prep session.",
-    "measured": "prior max AT-212, TC-509b (batch-71).",
-    "allocated": "AT-213..AT-218; TC-510..TC-519 RESERVED (assign within the block). RE-RUN the census at Phase 3 - a parallel batch may consume ids.",
-    "concurrency_note": "state.json is last-writer-wins and the parallel batch-65 (addendum lane) may still be in flight - re-read this file immediately before any edit."
+    "method": "grep -rhoE 'AT-[0-9]{3}' / 'TC-[0-9]{3}' over REQUIREMENTS.md + tests/ + .dev-flow/ (*.py/*.md), executed 2026-07-31.",
+    "measured": "prior max AT-219, TC-520 (both batch-72).",
+    "allocated": "AT-220.. and TC-521.. - assign within the block at Phase 1. RE-RUN the census at Phase 3: batch-73 may run in parallel and consume ids.",
+    "concurrency_note": "state.json is last-writer-wins with no owner field - re-read it immediately before any edit. Verified immediately before claiming it for batch-74: it still read batch_id=2026-07-30-batch-72, current_phase=6/approved, merged.pr=166, obsidian_synced=true, i.e. fully closed and unowned. PR #168 (which the launch prompt named as the state.json owner) is MERGED as 37f2a4b."
   },
   "premise_result": {
-    "P2_FALSE": "Backlog line 153's 'any change will drift the CRC snapshot cells' is FALSE - executed: test_tui_snapshot.py:109-110 lists workspace/a2l/mac/issues + map/patch/diff; the CRC screen is absent and 0 crc snapshots exist on disk. NEITHER story needs a snapshot-regen follow-up PR. If any snapshot fails mid-batch, a premise was wrong: STOP, do not regen casually.",
-    "P8_RESOLVED": "2026-07-30 Phase-1 gate: operator confirmed 'Stack, key first' - at the 80-col floor the Legend panes stack vertically, colour key above the example card. HLR-072-6 is no longer pending.",
-    "full_table": ".dev-flow/2026-07-30-batch-72/01-requirements.md section 2.7 (9 premises, each executed or dispositioned)"
+    "summary": "17 premises extracted from the inherited plan and executed against disk at d81cb3d. 16 TRUE, 1 FALSE, 0 UNDECIDABLE. Full table: .dev-flow/2026-07-31-batch-74/00-measurements.md section 1.",
+    "P14_FALSE": "THE LOAD-BEARING FALSE PREMISE. The plan and the backlog state OB-4's cost as a flat '988 B/entry'. MEASURED: 140.1 B/entry (_modifications_lines) and 126.1 B/entry (_checklist_lines) at an 8-byte run, and the cost is LINEAR IN THE ENTRY'S BYTE-RUN LENGTH (~ 92 + 6*run bytes), because _format_bytes renders 3 chars per byte into TWO cells per row. 988 B/entry is simply the value at a ~149-byte run. CONSEQUENCE: a row-count cap alone does NOT bound resident memory - _format_bytes (:538-556) has no limit and MF_RUN_LENGTH_CEILING = 1_048_576 (changes/io.py:232) lets ONE row cost ~6 MiB, so a 200-row cap bounds the table at ~1.2 GB. This directly falsifies the plan's Inc-1/Inc-2 sketch and forced design ruling D-1.",
+    "P15_TRUE_WITH_ADAPTATION": "batch-65's _addendum_lines shape transfers in three of its four mechanisms (admission counters with the cap applied AT admission; traversal NOT terminated on saturation so the notice can state a true dropped count; one truncation notice naming what was cut). The fourth - format only AFTER the membership test - has NO analogue: the addendum has a region-membership discriminator and these two producers have none, since every entry is a row by definition.",
+    "P6_TRUE": "The plan's load-bearing design constraint is confirmed at the source: emit() (:2215-2217) calls budget.consume(...) only - it ACCOUNTS, NEVER GATES. The sole budget.fits(...) gate is _hexdump_section:1455. So emit(_modifications_lines(...)) at :2243 has fully materialised the producer before consume is reached, and charging these tables to _ByteBudget would close F4 while leaving OB-4 completely untouched."
   },
-  "current_phase": 6,
+  "current_phase": 0,
   "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
-    "1": 2,
-    "2": 1,
+    "1": 0,
+    "2": 0,
     "3": 0,
     "4": 0,
     "5": 0,
     "6": 0
   },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-30-batch-72/PLAN.md",
-    "0": ".dev-flow/2026-07-30-batch-72/00-measurements.md",
-    "1": ".dev-flow/2026-07-30-batch-72/01-requirements.md",
-    "2": ".dev-flow/2026-07-30-batch-72/02-review.md",
-    "2-lanes": "02-review-architect.md + 02-review-qa.md + 02-review-security.md",
-    "inputs": "prototypes/p1_design_defects.HANDOFF-PLAN.md + p1_design_defects.NOTES.md (verdict section 7 FILLED) + p1-design-defects-review.html + the PR #164 SVG frames"
+    "plan": ".dev-flow/2026-07-31-batch-74/PLAN.md",
+    "0": ".dev-flow/2026-07-31-batch-74/00-measurements.md"
   },
   "decisions_log": [
     {
       "phase": 0,
-      "date": "2026-07-30",
-      "decision": "CRC = Variant B; Legend = Variant B; KAT DEMOTED (implied by the B pick; C was the removal option)",
-      "notes": "operator verdict, verbatim in standing_authorization.operator_direction_on_record and 01-requirements section 6.2"
+      "date": "2026-07-31",
+      "decision": "RC-1 re-verified against a MOVED base, by differential rather than by re-derivation",
+      "notes": "The inherited plan was authored at origin/main = 6524afd; main is now d81cb3d (+2 commits: 37f2a4b batch-72 obsidian_synced, d81cb3d PR #169 backlog+handoff). Instead of blindly re-deriving ~20 line addresses, diffed the target module across the base move: 'git diff 6524afd d81cb3d -- s19_app/tui/services/report_service.py' returns EMPTY, and the file measures 2262 lines at both commits. That single command validates every @6524afd address at once. Each address was still re-confirmed individually in 00-measurements.md section 1 (P-1..P-5) rather than resting on the differential alone."
     },
     {
       "phase": 0,
-      "date": "2026-07-30",
-      "decision": "ONE batch for both stories under full /dev-flow",
-      "notes": "operator invoked /dev-flow; the earlier two-batch split (Legend fast-flow first) lost its rationale once P-2 proved zero snapshot drift for BOTH stories"
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "Phase 1 DRAFTED by the prep session; gate NOT self-approved",
-      "notes": "the executing session presents the gate; P-8 (floor stacking) is the named open decision"
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: branch reuse rather than cutting a second branch",
+      "notes": "The session worktree was pre-cut at claude/batch-74-s19-app-a693ff, already at the origin/main tip and clean. RC-1's actual requirement is merge-base == origin/main tip, which holds exactly. Cutting a second branch would fight the worktree for no gain."
     },
     {
       "phase": 0,
-      "date": "2026-07-30",
-      "decision": "RC-1 RE-VERIFIED by the executing session",
-      "notes": "git fetch; origin/main tip = 31d87d0 (PR #164 squash, MERGED) = HEAD = merge-base of claude/batch-72-design-defect-634a67. Collision re-check: git ls-remote --heads origin | grep batch-72 -> 0 hits. Flow currency (C-45 PULL): ~/.claude 0 commits behind origin/main; aggregate sha256 = 0127a2767ff11c8a = FLOW-VERSION 2026.07.28-rev1 EXACT."
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS DESIGN RULING D-1 (flagged inline to the operator): the producer bound is TWO-AXIS, not one",
+      "notes": "Forced by premise P-14 coming back FALSE. Axis (a) cardinality - cap admitted rows with an admission counter and a truncation notice naming what was cut (the batch-65 shape). Axis (b) per-row width - bound the rendered byte cells so one row cannot be arbitrarily large. Axis (b) is NOT in the inherited plan's increment sketch and is added purely on measurement: with _format_bytes unlimited and a 1 MiB upstream run ceiling, ONE row reaches ~6 MiB, so a cardinality-only cap of 200 bounds the table at ~1.2 GB and would ship a cap that demonstrably does not bound the quantity it claims to bound - the exact vacuous-acceptance failure mode this area is on record for (batch-63 wrote FIVE vacuous criteria for ONE defect)."
     },
     {
       "phase": 0,
-      "date": "2026-07-30",
-      "decision": "Standing authorization GRANTED: full autonomy + merge authority; decision-recording acknowledged",
-      "notes": "operator answers verbatim in standing_authorization. Merge remains gated on the final independent PR-level qa-reviewer pass over the whole diff vs main; a HIGH finding blocks the merge and returns to the operator."
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: D-2 (cap value) DEFERRED to Phase 1 as an option table instead of taking the plan's 'mirror MAX_REPORT_ISSUES_PER_VARIANT'",
+      "notes": "C-39 - execute the threshold the gate is keyed on, never predict it. EXECUTED: tests/goldens/batch64/addendum-below-bound.md carries 415 rows in its Modifications section (consumed by tests/test_report_addendum_bound.py:793). So a cap < 415 drifts a byte-identity golden belonging to a DIFFERENT batch and testing a DIFFERENT bound; a cap >= 415 drifts zero goldens. The plan's suggested mirror constant is 200. batch-65 - the precedent this plan cites as exemplary - achieved '0 goldens re-baselined'; taking 200 unmeasured would have spent that property silently. Separately measured: the widest byte cell in ANY golden is 2 chars (1 byte), so axis (b) has a blast radius of exactly ZERO."
     },
     {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "P-8 RESOLVED by the operator: Legend floor stacking = KEY FIRST",
-      "notes": "at 80 cols the panes stack vertically with the colour key ABOVE the example card. The PROPOSED default was confirmed, not overridden. HLR-072-6 loses its pending marker."
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "Batch-kickoff authorization asked FRESH and granted",
+      "notes": "Q1 = 'Full autonomy + merge'; Q2 = 'Acknowledged + flag design rulings inline'. Verbatim in standing_authorization. The launch prompt explicitly stated it does NOT grant authorization and that a resumed session must re-ask."
     },
     {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "Phase-1 gate APPROVED by the operator",
-      "notes": "presented inline: 2.7 premise table (9 rows) + section 3 (HLR-072-1..7, AT-213..218). Exit criteria at the gate: Coverage MET, Evidence MET, Certainty had ONE named gap (P-8 UNDECIDABLE) which the operator's answer dispositioned. Advance to Phase 2 cross-agent review."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-30",
-      "decision": "Phase-2 cross-review returned 9 blockers / 12 majors / 7 minors -> ITERATE back to Phase 1 (forced by the flow: blockers force the iterate)",
-      "notes": "architect / qa-reviewer / security-reviewer ran in parallel. The architect and qa lanes INDEPENDENTLY measured the same 16 abutting focusable pairs and independently concluded G-1 was unsatisfiable - convergent rediscovery is what upgraded it from opinion to measurement. Security: 0 blockers. All three exit axes unmet with named gaps. Artifact: 02-review.md."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: dispatched an executed-measurement run (00-measurements.md) BEFORE folding, instead of adopting the reviewers' proposed fixes",
-      "notes": "C-39 rider - re-measure the fold's OWN new thresholds. This caught the qa lane's proposed G-1 re-scope ('same widget class -> exactly 1 violation') as FALSE: measured 7 pre-batch and 6 post-batch, i.e. unsatisfiable. Adopting the review's fix verbatim would have relocated the defect rather than closed it."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: G-1 re-scoped to SWITCH-ONLY adjacency (measured rule (c): 1 violation pre -> 0 post)",
-      "notes": "Rejected rule (a) any-focusable (16 pre / 15 post) and rule (b) same-widget-class (7 pre / 6 post) on measurement. Defensible as a GENERAL guard, not special-pleading: the subject set is derived from app.query(Switch) and is complete by construction - the whole app holds 2 Switch widgets from 1 construction site (crc_designer_view.py:467), so a future third Switch joins the guarded set automatically. P-9 resolved FALSE-as-scoped; new P-11 TRUE."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: HLR-072-4 (Select height 3) WITHDRAWN on measurement",
-      "notes": "M-4 executed on a private tree copy: height 3 renders CRC-32/ISO-HDLC as 'CRC-32/I' - 8 of 15 chars, NO ellipsis, no overflow marker - and clips the bottom border on 4 of 6 Selects. Minimum legible height is 6, which is what height:auto already produces. The measured lever is pane WIDTH, not height, which is a bench-column redesign and out of scope. A cap that makes a control lie about its value is worse than the density it fixes. Recorded 6.5 W-1; carried to BACKLOG-CODE with the measurement. AT-219 reallocated to HLR-072-8."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: design guard G-2 (switch state legibility) RETIRED with an explicit written retirement line",
-      "notes": "Its discharge asserted handler WIRING (the CRC value changes on any parameter change - already covered at test_crc_designer_view.py:414-415), not state legibility. The rendered state word was Variant A's mechanism (NOTES.md:66); the operator chose Variant B, whose verdict row records 'Steals from: -'. Encoding A's guarantee against B's design is a category error. NOT dropped silently - 6.5 R-1 names exactly what is lost and it is carried to the backlog. G-3 and G-4 also dispositioned in 6.4 (revision 1 let both vanish with no disposition)."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: batch-59's verdict-hero requirement + AT-B59-05 RETIRED (deleted, not weakened)",
-      "notes": "test_verdict_hero_center_aligned_in_hero_row (test_crc_designer_view.py:1003-1047) hard-asserts #crc_live_verify on five arms, all falsified by Variant B, while revision 1 simultaneously required that file green. Recorded Before/After at 6.5 A-1 with the parent-HLR re-read; ledger D=1. The cheap way out - editing the test into passing - is explicitly forbidden by the LLR."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: added US-072-3 / HLR-072-8 / AT-219 (CRC render-sink markup census) from security S-1",
-      "notes": "2 of the 6 _recompute sinks were markup=False with NO test asserting it, in a batch that rewrites the compose setting those kwargs. Reachable payload: _recompute:1127-1135 echoes user-typed text into all six sinks and :1136-1142 has no try/except around .update(). Enforced via a live module-level id tuple (C-31 live-oracle), not a hand-list."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: LLR-072-6.1 gives the Legend modal its OWN width-regime hook",
-      "notes": "A-2: width-narrow reaches only #workspace_shell/#workspace_body in the BASE screen; LegendScreen is a pushed ModalScreen and textual 8.2.8 has no media queries, so the revision-1 mechanism could never fire. on_mount/on_resize now toggle a legend-narrow class against the SAME breakpoint as app.py:6202, with TC-517 asserting the class flips - AT-217's geometry alone cannot distinguish 'stacked because the rule fired' from 'stacked because the panes collapsed'."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: #legend_body PRESERVED as the two-pane wrapper (new premise P-12 FALSE)",
-      "notes": "9 descendant query sites across the 3 legend test files plus REQUIREMENTS.md R-LEGEND-MODAL-001 / R-LEGEND-GEOMETRY-001 name it. Retiring it would empty those queries, and per C-38 an emptied query still PASSES all(...)/assert-not assertions - it would have shipped green. overflow-y moves from #legend_body to the panes, which needs an R-LEGEND-GEOMETRY-001 amendment."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "Phase-1 REVISION 2 written; all 9 blockers folded; test ledger base corrected 2358 -> 2379",
-      "notes": "7 ATs (AT-213..219), 12 real LLRs replacing revision 1's one-line sketches, TC-510..519 assigned semantics rather than reserved as a range. Every geometry number now traces to 00-measurements.md. Next: Phase-2 RE-GATE on revision 2."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-30",
-      "decision": "Phase-2 RE-GATE run (architect + qa, discharge form). qa: APPROVE, 0 blockers, all 5 of its blockers closed. architect: 1 NEW blocker CREATED BY THE FOLD + 6 majors.",
-      "notes": "Artifacts 02-regate-architect.md / 02-regate-qa.md. The re-gate paid for itself: the fold's own new defect (N-1) would have surfaced mid-Phase-3. Reviewers were briefed NOT to re-litigate what measurement settled and NOT to manufacture findings; both stated clean axes explicitly."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: REVISION 3 - the Legend pane ORDER is owned by the regime hook, not by CSS (re-gate N-1)",
-      "notes": "LLR-072-5.1 pinned compose card-first while AT-217 required key-first at the floor; textual 8.2.8 has no CSS ordering property (only dock). Executed with the exact specified compose+CSS+hook: key.y < card.y was FALSE at 80x24 in both views. The tell was inside the requirement - LLR-072-6.2's threshold 'key h=4, card h=5' is the KEY-FIRST measurement, so M-3 had measured a tree the requirement did not specify. Fix: #legend_body.move_child(key, before=card) in the hook, idempotent; the reviewer executed the remedy and confirmed all three AT-217 clauses pass while the wide regime keeps 64/43."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: six further re-gate majors folded into revision 3",
-      "notes": "(1) LLR-072-6.2's narrow CSS rules are now PREFIXED - unprefixed they had equal specificity and later source order, overriding the wide regime and putting the key pane at x=113 outside the body. (2) AT-216 gains a #legend_body.contains_region(pane) clause - it passed GREEN on that broken off-dialog layout because every other clause is pane-relative. (3) AT-216 uses containment not equality: the row is f'{classification} - {meaning}' so == would false-fail a correct implementation. (4) The Switch completeness argument is re-anchored to the single construction site - App.query is screen-scoped and does not certify 'anywhere in the app'. (5) AT-214's counterfactual reverts the WHOLE FILE; reverting just the pair row raises NameError since LLR-072-1.2 deletes _switch_row, and an error is not an assertion failure. (6) LLR-072-8.1 forbids positional unpack of the hoisted id tuple."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: AT-219 split into an explicitly-labelled PIN clause and a real GATE clause",
-      "notes": "All six sinks are ALREADY markup=False, so the census clause is invariant under this batch - it is the regression pin S-1 asked for, but it cannot prove the hoist landed. Added the gate: monkeypatch the tuple with a bogus id, drive one Input.Changed, assert _recompute takes its NoMatches early return. That clause is the only one FALSE before the hoist."
-    },
-    {
-      "phase": 1,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: G-3's non-encoding rationale REPLACED - the first reason given was a rationalisation",
-      "notes": "Revision 2 argued 'the batch reduces hero-tile count 2->1 so it strictly decreases the bounded quantity'. Measured (M-8): #crc_live_verify and #crc_warnings_group are IDENTICAL 30x4 boxes (area 120 each) against #crc_coverage_window's 305, so the change is ZERO, and the 6:1 law is already FALSE on main at 2.54:1. Honest reason recorded instead: it is a pre-existing unrelated violation this batch neither causes nor worsens, and encoding it here would fail batch-72's gate on batch-59's geometry. Carried to the backlog with the measured ratio."
-    },
-    {
-      "phase": 2,
-      "date": "2026-07-30",
-      "decision": "Phase-2 gate APPROVED (self-approved under the kickoff grant) on revision 3",
-      "notes": "Exit axes: Coverage MET (HLR<->AT bijective 7<->7 per C-18; every LLR has a TC with a distinct stated observable; no orphan in the re-derived increment cut). Certainty MET (every AT carries a named single-file reddening mutation; the two pins are LABELLED as pins). Evidence MET (every geometry number traces to 00-measurements.md; ledger base 2379 @ b556e35; ID census re-confirmed). Advance to Phase 3."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-30",
-      "decision": "Inc-1 + Inc-2 (Legend two-pane + floor regime) APPROVED and committed 6854234",
-      "notes": "8 nodes (AT-216/217/218, TC-515..519). Implementer reported three things honestly rather than glossing: AT-216's display:none mutation reddens clause 2b ONLY (a hidden pane collapses to Region(0,0,0,0) and a zero region trivially contains a zero region); focus traversal CHANGED (2 stops -> 3, following pane order) with nothing anywhere asserting a legend tab order; and two extra counterfactuals were run and reverted."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-30",
-      "decision": "Inc-3 (CRC Variant B compose) APPROVED and committed a4f2d2e",
-      "notes": "7 nodes (AT-213/215/219, TC-510..513). Ledger 2387 -> 2393 exact. AT-B59-05 deleted, never edited into passing. TC-511 caught its own author: the first version's function NAME contained the token whose repo-wide count must be zero."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: independent code review returned BLOCK on F1 (HIGH); folded at 0169108 rather than deferred",
-      "notes": "The wide regime's DEFINING property - panes side by side, card left - was asserted by NOTHING. Removing the CSS prefix collapsed 120x30 into a vertical stack and all 8 legend nodes still passed: containment and ordering are equally true of a stack, and the module held zero assertions on region.x/right/width. AT-216 gained clause 0. C-40 discharge executed by the ORCHESTRATOR on the real tree with byte-verified restore: c65ac445 -> 010c44b2 -> c65ac445, failing on its own assertion line with exactly the stack the reviewer measured. F2 (MEDIUM) folded in the same commit: TC-518's whitespace-exact substring became a regex plus a 120x30 arm."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-30",
-      "decision": "Inc-4 (G-1 guard + focus pin + REQUIREMENTS.md) APPROVED and committed 37474b5",
-      "notes": "3 nodes (AT-214, TC-514, TC-520). R-TUI-100 registers the CRC Designer in REQUIREMENTS.md for the FIRST time. AT-214's whole-file counterfactual RED on its own assertion line with a control arm; the implementer also diagnosed why the sibling counterfactual had silently run green - s19_app is installed nowhere and resolves from sys.path[0]==cwd, so PYTHONPATH is appended too late to ever win."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: D-1 - the batch falsified its OWN spec constant; re-derived the property rather than re-pinning the number",
-      "notes": "HLR-072-3 and M-1 stated 'Switch( has exactly ONE construction site' - true of origin/main, made FALSE by this batch's own refactor (2 sites at :325/:327). Option A assert ==1 ships a RED test; option B assert ==2 re-plants the identical brittle constant for the next refactor; option C (TAKEN) asserts the invariant the count stood for - single-module confinement - which is what the requirement's stated purpose actually needs and which survived the refactor. Both stale documents corrected at d13bb1c. D-2: TC-520 fell outside the reserved TC-510..519 block; allocated and given a traceability row."
-    },
-    {
-      "phase": 4,
-      "date": "2026-07-30",
-      "decision": "Phase-4 gate suite run and collected BY THE ORCHESTRATOR (C-25), not delegated",
-      "notes": "python -m pytest -q -m 'not slow' -> 2370 passed, 2 skipped, 21 deselected, 3 xfailed, 29 snapshots passed, EXIT 0, 26m47s. Sum 2396 matches the ledger 2379-1+18 exactly. The run exceeded the 10-min tool cap and was backgrounded - evidence read from that ONE run's own output per C-19, never spliced. qa-reviewer then CONSUMED the tail to write 04-validation.md: 7/7 ATs and 11/11 TCs reconcile to exactly one on-disk node each, 0 UNREALIZED. Verdict PASS, all three axes met."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: corrected 04-validation.md's counterfactual ledger from FOUR to SIX",
-      "notes": "The docs-writer cross-read the validation artifact against 03-increments/ while building the traceability matrix and found two executed counterfactuals missing from the table (CF-5 the move_child no-op proving CSS can stack but cannot order; CF-6 the pre-batch _recompute re-bind, AT-219's only clause FALSE before the hoist). Both have pasted transcripts failing on their own assertion lines. Recorded as a correction rather than quietly renumbered - an evidence ledger that undercounts its own evidence is exactly what this batch spent four gates refusing to accept from anyone else."
-    },
-    {
-      "phase": 5,
-      "date": "2026-07-30",
-      "decision": "Phase-5 post-mortem found TWO defects the flow itself missed",
-      "notes": "(1) state.json was STALE BY FOUR PHASES - current_phase 2 with decisions_log ending at the Phase-2 approval, so every Phase 3-6 autonomous decision lived only in increment packets, against the operator's standing 'autonomy is never silent' requirement. Corrected by this edit. (2) Review finding F6 was neither discharged NOR carried - it fell between the fold and the carry; now carried to BACKLOG-CODE. The post-mortem also states plainly that ~20:1 prose-to-source is disproportionate for a layout change, and that running the measurement pass AT Phase 1 instead of as an iterate remedy would plausibly have collapsed Phase 1 to one iteration - all nine blockers were measurement questions."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-30",
-      "decision": "Final PR-level merge-gate review returned MERGE (0 HIGH); its MEDIUM-1 was CLOSED BEFORE merging, not after",
-      "notes": "The gate found two carries (G-001 AT-218 clause-4 labelling, G-004 the unmeasured CRC 80x24 floor) that existed only in batch-scoped artifacts which get archived - the F6 failure mode one level up, escaping the C-44 sweep's own mirroring step. Both were written into BACKLOG-CODE.md and pushed BEFORE the merge, so the merge was not taken on a conditional verdict. This batch's own post-mortem is emphatic that a conditional verdict is not an authorisation. LOW-1 (two surviving 'single construction site' phrasings) swept in the same commit."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-30",
-      "decision": "PR #166 MERGED by the agent under the kickoff grant; squash 1abda8e",
-      "notes": "Gate conditions all satisfied first: CI green on the FINAL head 5d78e11 (tui-ci 23m47s pass, snapshot 1m51s pass - re-run after the merge-gate fold, not inherited from an earlier head), and the independent PR-level qa pass returned MERGE with no HIGH finding. origin/main moved 31d87d0 -> 1abda8e."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-30",
-      "decision": "AUTONOMOUS: prototype teardown scoped to THIS batch's 46 files only",
-      "notes": "PLAN.md's teardown clause names crc_designer.p1.*, crc_p1.*, legend_p1.*, p1_design_defects.*, p1_review_build.py, p1-design-defects-review.html. A naive 'p1' glob would also have matched the NINE fb_p1_*/fb_p1b_* Flow Builder prototypes, which belong to a DIFFERENT batch and are still referenced by open backlog work - they are deliberately KEPT. Verified nothing outside prototypes/ and .dev-flow/ references the removed set."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-30",
-      "decision": "synced-to-obsidian",
-      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-30-batch-72/. Copied 01/02/04/05 + 06-docs (03-increments excluded per vault convention). Template reject-check CLEAN: 0 live placeholder tokens, 0 header-only tables, verdict PASS present with 79 result rows. Visual evidence REFRESHED (batch touched s19_app/tui/ in 3 files): 15 pilot cases regenerated 15 passed 52.53s, 75 flattened frames + 15 gifs re-copied from merged main 6524afd; 75/75 live assets fresh, the 6 non-refreshed files verified BY NAME as the documented pv__case_06 retired-case exclusions. Also corrected a SECOND, stale refresh stamp in visual-evidence.md's footer which had drifted to batch-60 while the authoritative section-5 bullet already read batch-70 - two stamps for one fact and the duplicate was the stale one."
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "Phase-0 gate SELF-APPROVED under the kickoff grant",
+      "notes": "Exit axes: Coverage MET (all 3 backlog items OB-4/F4/D2 intaken as stories with black-box outcomes; D-11 and diff_report_service explicitly fenced OUT). Evidence MET (17 premises each with an executed probe or a file:line; 3 measurement runs pasted; golden blast radius executed not predicted). Certainty MET-WITH-A-NAMED-CARRY: the falsification of P-14 is itself the Phase-0 certainty result, and the two undecided cap VALUES (D-2, D-3) are named, measured and carried to Phase 1 rather than left implicit. Advance to Phase 1."
     }
   ],
-  "obsidian_synced": true,
-  "created_at": "2026-07-30T00:00:00Z",
-  "merged": {
-    "pr": 166,
-    "url": "https://github.com/jav201/s19_app/pull/166",
-    "squash_sha": "1abda8e",
-    "merged_at": "2026-07-31T01:16:40Z",
-    "base_at_merge": "31d87d0"
-  }
+  "obsidian_synced": false,
+  "created_at": "2026-07-31T00:00:00Z"
 }
