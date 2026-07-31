@@ -1748,23 +1748,68 @@ the target range, `before_bytes`/`after_bytes`, disposition (applied /
 skipped-partial / skipped-outside / skipped-no-image / blocked), and an
 informative linkage classification (standalone / mac-linked / a2l-linked /
 both, with the matching symbol) computed via the sorted-range primitives —
-linkage never influences whether an entry is applied. The summary carries the
-document's collected `ValidationIssue` list, aggregate per-disposition counts,
-and a deterministic `to_dict()` under an injectable UTC clock.
+linkage never influences whether an entry is applied. **The declared ranges
+feeding that classification MAY overlap** (A2L tag extents nest; two MAC
+records may declare one address), and the reported symbol shall be the
+**first-by-start** declared range covering the address, ties resolving to
+declaration order. The summary carries the document's collected
+`ValidationIssue` list, aggregate per-disposition counts, and a deterministic
+`to_dict()` under an injectable UTC clock.
 
 - Code: `s19_app/tui/changes/apply.py` (`apply_change_document`,
-  `classify_containment`), `s19_app/tui/changes/model.py` (`ChangeSummary`,
-  `ChangeSummaryEntry`), reusing `s19_app/range_index.py`
+  `classify_containment`, `_linkage_index` disjoint-cover normalization),
+  `s19_app/tui/changes/model.py` (`ChangeSummary`, `ChangeSummaryEntry`),
+  reusing `s19_app/range_index.py`
 - Validation: `Automated` via `tests/test_changes_apply.py`
   (`test_error_blocks_apply_zero_writes_all_blocked`,
   `test_non_change_kind_blocks_apply`,
   `test_dispositions_inside_partial_outside`, `test_disposition_no_image`,
   `test_before_after_capture_exact_tuples_outside_keys_unchanged`,
-  `test_summary_shape_and_serialization_determinism`) and
+  `test_summary_shape_and_serialization_determinism`),
   `tests/test_changes_linkage.py`
   (`test_four_linkage_classifications_with_symbols`,
-  `test_both_linked_outside_entry_is_still_skipped`)
-- Status: Added in batch `2026-06-10-batch-07` (US-002 / HLR-002)
+  `test_both_linked_outside_entry_is_still_skipped`) and
+  `tests/test_linkage_soundness.py` (AT-220/TC-521
+  `test_at220_tc521_overlap_counterexample_resolves_enclosing_symbol`,
+  `test_at220_tc521_nested_overlap_resolves_first_by_start`; AT-221/TC-522
+  `test_at221_tc522_disjoint_ranges_match_pre_fix_and_ground_truth`,
+  `test_at221_tc522_a2l_overlapping_tags_do_not_lose_attribution`;
+  AT-222/TC-523
+  `test_at222_tc523_overlap_counterexample_through_apply_entry_point`,
+  `test_at222_tc523_overlap_counterexample_through_check_entry_point`,
+  `test_at222_tc523_mac_alias_through_check_entry_point`; AT-223/TC-524
+  `test_at223_tc524_duplicate_mac_addresses_resolve_to_first_declared`,
+  `test_at223_tc524_distinct_adjacent_mac_addresses_are_not_coalesced`)
+- Status: Added in batch `2026-06-10-batch-07` (US-002 / HLR-002);
+  **overlap clause amended in batch `2026-07-31-batch-73`** — see below.
+
+#### Overlapping linkage ranges resolve first-by-start — batch-73 (R-CHG-002 Amendment A)
+
+**Amended in batch `2026-07-31-batch-73`.** The classification vocabulary
+(standalone / mac-linked / a2l-linked / both) and linkage's informative-only
+status are **UNCHANGED**. What changed is which symbol is reported when the
+declared ranges overlap — previously undefined in the requirement and unsound
+in the code.
+
+| Aspect | Before | After |
+|---|---|---|
+| Overlapping ranges | Not addressed by the requirement; `_first_intersecting_symbol` conceded in its docstring that overlaps "may resolve to the nearest-start match only" | The **first-by-start** covering range wins, ties by declaration order — normative, and established by `_linkage_index` emitting a disjoint cover |
+| Address inside an enclosing range that starts earlier than a nested one | Could report **no linkage at all** (executed: `[(0x1000,0x9000,'BIG_ARRAY'),(0x2000,0x2010,'INNER')]`, addr `0x5000` → `(False, None)`) | Reports `BIG_ARRAY` |
+| Two MAC records at one address (aliases) | Reported the **last** declaration — an artifact of `bisect_right`, not a decision | Reports the **first** declaration |
+| Disjoint ranges (the common case) | — | **Unchanged**, and pinned: 8 000 generated probes assert three-way agreement with the frozen pre-fix implementation and a linear-scan oracle |
+
+- **Why:** the linkage symbol is displayed to the operator in reports and the
+  checks view. Wrong data presented confidently in an evidentiary document is
+  worse than absent data (operator ruling D-1, 2026-07-31). The
+  informative-only concession justified *imprecision*, never *incorrectness*.
+- **Not adopted:** `build_sorted_range_index(_merge_ranges(ranges))` — correct
+  for membership, wrong here, because `_merge_ranges` coalesces away which
+  symbol owned which span and this probe returns a name.
+- **Scope:** caller-local. `s19_app/range_index.py` keeps its disjointness
+  contract and needed no unfreeze; `_linkage_index`'s signature is unchanged,
+  so `s19_app/tui/changes/check.py` — the probe's other consumer — required no
+  edit and is covered by its own AT-222 arms.
+- Spec: `.dev-flow/2026-07-31-batch-73/SPEC.md`.
 
 **R-CHG-003**: After an apply with at least one applied entry on an
 S19-loaded image, the tool must offer to persist the patched image to
