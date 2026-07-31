@@ -4,7 +4,9 @@
 >
 > **Control-encode rule:** every control needs its own AskUserQuestion before it is encoded (`feedback_devflow_control_encode_approval`). Global flows stay project-agnostic — stack-specific controls go to `docs/engineering-rules.md` (`feedback_devflow_general_flows_project_agnostic`). Note the global `/dev-flow` command lives OUTSIDE this repo, so that leg is not covered by the project PR flow and needs its own before/after record in the batch artifacts.
 
-> **Last refresh: 2026-07-31 (AT/TC registry Lane B close — no batch).** `origin/main` tip = **`69f8f42`** — rebased onto batch-74's full close-out (`537f27d` #173 + #175 + #177 + #178) and the spec merge (`0fdc88b`, #174). The conflict with batch-74 was **append-vs-append at EOF**, with no rival edit to any shared text: **both sections are kept**, batch-74's first. Changes: the **Lane B design half is DELIVERED** and marked as such; the **Lane A half is UNBLOCKED** (batch-74 merged, so the id set stopped moving) with its build contract redirected to the spec's §9; **three new carries** registered in the new section at the end; and the MAJOR item's figures flagged in place as **three-of-five irreproducible**, retained verbatim rather than patched. **One undone action surfaced, not fixed:** batch-74 is now fully closed across **four** merged PRs and performed the *PENDING MOVE TO LANE A* transfer in **none** of them.
+> **Last refresh: 2026-07-31 (Amendment A move executed — no batch).** `origin/main` tip = **`fdfdf36`**. The three cross-lane **Lane A halves moved to [`BACKLOG-CODE.md`](BACKLOG-CODE.md)** and the *PENDING MOVE* section is retired to a signpost. **The undone-action record is discharged, but its finding is retained**: an explicitly-addressed one-sentence action survived **four** consecutive batch-74 PRs that each read this file. Nothing else in this lane changed.
+>
+> **Earlier refresh: 2026-07-31 (AT/TC registry Lane B close — no batch).** `origin/main` tip = **`69f8f42`** — rebased onto batch-74's full close-out (`537f27d` #173 + #175 + #177 + #178) and the spec merge (`0fdc88b`, #174). The conflict with batch-74 was **append-vs-append at EOF**, with no rival edit to any shared text: **both sections are kept**, batch-74's first. Changes: the **Lane B design half is DELIVERED** and marked as such; the **Lane A half is UNBLOCKED** (batch-74 merged, so the id set stopped moving) with its build contract redirected to the spec's §9; **three new carries** registered in the new section at the end; and the MAJOR item's figures flagged in place as **three-of-five irreproducible**, retained verbatim rather than patched. **One undone action surfaced, not fixed:** batch-74 is now fully closed across **four** merged PRs and performed the *PENDING MOVE TO LANE A* transfer in **none** of them.
 >
 > **Earlier refresh: 2026-07-31 (cross-lane split — no batch).** `origin/main` tip = **`d2e9bdc`** (batch-73 merged). Operator ruled that an item spanning both lanes is **split into one entry per lane**, recorded as **Amendment A** in the [router](BACKLOG.md). Applied to the **three** measured cross-lane items — the AT/TC registry (which subsumes C-3), **1c** and **1d**. Their Lane A halves are staged under *PENDING MOVE TO LANE A* because `BACKLOG-CODE.md` is owned by in-flight batch-74. **One earlier classification of mine was WRONG and is corrected:** the *bytes-committed-as-evidence* candidate is **not** cross-lane — its `.gitattributes` leg already shipped in batch-66 (`.gitattributes:19`), so only the control encode remains and it stays wholly here.
 >
@@ -151,39 +153,17 @@
   control over two narrow patches (`feedback_general-controls-not-narrow-patches`). **Lane A half:** the
   actual sweep assertions over the 4 known surfaces, staged below.
 
-## ⏳ PENDING MOVE TO LANE A — staged, NOT actionable here
+## ✅ MOVED TO LANE A 2026-07-31 — the three cross-lane Lane A halves
 
-> **Why these are parked in the PROCESS lane.** Router **Amendment A** splits cross-lane items into one
-> entry per lane. These three are the **Lane A halves** and belong in
-> [`BACKLOG-CODE.md`](BACKLOG-CODE.md) — but that file was owned by **in-flight batch-74** at ruling time
-> (its Inc-3 must land the F4/D2 measurements there, and a merge conflict in exactly that file is how the
-> split would silently become a deletion). **Staged here rather than in a chat message, because a deferral
-> that lives outside the canonical queue is precisely the leak audited on 2026-07-31.**
+> **Executed, not staged.** The three Lane A halves (AT/TC registry BUILD · 1c CI staleness guard ·
+> 1d markup-sink sweep assertions) now live in [`BACKLOG-CODE.md`](BACKLOG-CODE.md) under
+> *"Arrived 2026-07-31 by the router's Amendment A"*. **A move, not a copy — nothing of them remains
+> here.** Their **Lane B counterparts stay in this file** (the registry's design half, and the control
+> definitions for 1c and 1d), per router [Amendment A](BACKLOG.md): *neither half closes its item.*
 >
-> **▶ ACTION FOR WHOEVER CLOSES batch-74, OR THE NEXT LANE-A BATCH: move these three bullets verbatim into
-> `BACKLOG-CODE.md` and delete this section.** A move, not a copy. Nothing else in this file transfers.
-
-  - **▸ (MAJOR → Lane A) build the AT/TC registry file + its guard test. ✅ UNBLOCKED 2026-07-31 — both
-    preconditions are met.** (i) The Lane B spec exists and is merged: [`AT-TC-REGISTRY-SPEC.md`](AT-TC-REGISTRY-SPEC.md),
-    PR #174. **Its §9 is the ordered build contract with executable done-conditions — build from §9, not from
-    this bullet.** (ii) batch-74 **merged** (`537f27d`, #173), so the id set has stopped moving under the seed.
-    ⚠ **Seed figures are already stale**: the high-water mark went **`TC-524` → `TC-551`** in that one batch
-    (re-derived on `origin/main` 2026-07-31, not copied from batch-74's own text, which cites `TC-549`).
-    **Re-derive at the seed commit** (spec §1.3, §9 Inc-1) — the spec's numbers justify the design, they do not
-    seed the file. batch-74 also shipped `TC-549b`, a suffixed id, which is exactly the shape spec §2.2 rules on. The guard lives in `tests/` and must fail in **both** directions — but note §5.2:
-    two-way is **not** sufficient to catch the phantoms, so build G1–G7, not G1–G2. **Closes C-3 and the
-    batch-62 "16 of 23" carry** — state that explicitly at close rather than letting them lapse.
-    *(Original blocking rationale, now discharged, retained for lineage: "Blocked until batch-74 merges:
-    batch-74 is renumbering the live AT/TC set (`96bcbd7`, third collision in two days), so a registry
-    snapshotted now is born stale and its guard reddens the day batch-74 lands." The prediction held —
-    `TC-524` → `TC-549` in one batch.)*
-  - **▸ (P2 → Lane A) the 1c CI staleness guard.** Every `R-*`/`LLR-*` code tag must name a live
-    requirement. Half-built already: 25 back-refs in `screens_directionb.py`, and `REQUIREMENTS.md` maps
-    `R-*` → files. Consumes 1c's Lane B control definition.
-  - **▸ (P2 → Lane A) the 1d markup-sink sweep assertions.** Over the 4 known surfaces (`screens.py`,
-    tooltips, DataTable, Select), asserting `plain` verbatim **and** `spans == []`. Consumes 1d's Lane B rule.
-    Note this is the **assert-the-emitted-form** family (C-42), so the assertions must be written against
-    what the widget emits, not against the rendered text.
+> This heading is a **signpost, not open work** — it exists so a reader following an older reference to
+> *PENDING MOVE TO LANE A* lands on the disposition instead of on nothing. Delete it once no live text
+> points here.
 
 ## 🆕 Registered 2026-07-31 (batch-74) — control candidate: vacuous FIXTURES
 
@@ -211,4 +191,5 @@
 
     **The finding is not the arithmetic — it is that no figure declared its grep pattern or its corpus.** That is the parent item's own thesis one level up: *if "an id" is undefined, every measurement invents a definition, and two honest measurements disagree.* The 73 %/50 % divergence **IS** that ambiguity, measured — both patterns are defensible, they range over different universes, and nothing in the citation says which. **Consequence, and it is why the spec opens with a section the item does not ask for:** the root cause sits one layer **above** allocation. A registry that assigns ids without first defining what an id *is* inherits the bug it was built to fix. **Disposition: the originals are RETAINED verbatim** in the MAJOR item (flagged in place) as the record of what was claimed and acted on — patching them silently would destroy the evidence of how they got there. **Control candidate, NOT encoded** (needs its own AskUserQuestion per `feedback_devflow_control_encode_approval`): *a cited figure must carry the pattern, the file set and the ref that produced it, or it is not re-derivable — only re-inventable.* Companion to *"a carried number is re-derived, never copied"*: **re-derivation is impossible unless the original stated its derivation.** Same family as C-39.
   - **▸ (P3, NEW) the MAJOR item mislocates `TC-319`'s citation.** It states *"`TC-319` is the exact node `CLAUDE.md` cites as the origin of control C-26."* **In this repo `CLAUDE.md` contains neither `TC-319` nor `C-26`.** `TC-319` is cited 3× in `REQUIREMENTS.md` (`:3656`, `:3694`, `:3902`); `C-26` 5× in `REQUIREMENTS.md`. **The substance stands and is if anything worse than stated** — a control's cited census node has no implementation, and `test_tui_patch_layout.py` (the file `TC-319` names) *does* exist while `test_tc319_*` does not, so this is a rename-or-removal that has to be determined rather than assumed (spec §6.1). **Why this is worth a bullet rather than a silent fix:** anyone who greps `CLAUDE.md` to verify the finding gets zero hits and may conclude it was withdrawn.
-  - **▸ (RECORD, not a task — but it is an UNDONE action, do not read past it) the *PENDING MOVE TO LANE A* section above is STILL PENDING.** It instructs *"ACTION FOR WHOEVER CLOSES batch-74, OR THE NEXT LANE-A BATCH: move these three bullets verbatim into `BACKLOG-CODE.md` and delete this section."* batch-74 is now **fully closed — four merged PRs, `537f27d` (#173) + #175 + #177 + #178 — and performed it in none of them.** Verified against `origin/main` @ `69f8f42`, not assumed: the only batch-74 edit to this file is an append of two new sections. **The close-out PRs are what makes this worth registering rather than merely noting** — the instruction names *"whoever closes batch-74"*, the close-out ran across three further PRs including a dedicated state/merge-record pass, and the move was not among them. The three Lane A halves therefore still sit in the PROCESS lane, which is the exact anti-drift invariant the router protects (*every open item lives in exactly ONE canonical file*). Deliberately **not executed here**: this session's scope is the Lane B design and its carries, and the move writes to `BACKLOG-CODE.md`. **Next Lane-A batch owns it.**
+  - **▸ ✅ DISCHARGED 2026-07-31 — the move was executed** (see *"MOVED TO LANE A"* above; the three halves are in `BACKLOG-CODE.md`). **The finding this item made is what survives, and it is worth keeping:** the instruction named *"whoever closes batch-74"*, batch-74 then closed across **four** merged PRs including a dedicated state/merge-record pass, and **the move was in none of them** — an explicitly-addressed, single-sentence action was skipped by four consecutive passes that each read the file. It took a fifth, separately-directed pass to execute. *A staged move is not a scheduled one; if nothing owns it at a named gate, it does not happen.* **Candidate evidence for the input-side carry-over control** registered earlier in this file. Original text follows.
+    ~~**▸ (RECORD, not a task — but it is an UNDONE action, do not read past it) the *PENDING MOVE TO LANE A* section above is STILL PENDING.**~~ It instructs *"ACTION FOR WHOEVER CLOSES batch-74, OR THE NEXT LANE-A BATCH: move these three bullets verbatim into `BACKLOG-CODE.md` and delete this section."* batch-74 is now **fully closed — four merged PRs, `537f27d` (#173) + #175 + #177 + #178 — and performed it in none of them.** Verified against `origin/main` @ `69f8f42`, not assumed: the only batch-74 edit to this file is an append of two new sections. **The close-out PRs are what makes this worth registering rather than merely noting** — the instruction names *"whoever closes batch-74"*, the close-out ran across three further PRs including a dedicated state/merge-record pass, and the move was not among them. The three Lane A halves therefore still sit in the PROCESS lane, which is the exact anti-drift invariant the router protects (*every open item lives in exactly ONE canonical file*). Deliberately **not executed here**: this session's scope is the Lane B design and its carries, and the move writes to `BACKLOG-CODE.md`. **Next Lane-A batch owns it.**
