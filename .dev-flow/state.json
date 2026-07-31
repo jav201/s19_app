@@ -42,7 +42,8 @@
     "0": ".dev-flow/2026-07-31-batch-74/00-measurements.md",
     "1": ".dev-flow/2026-07-31-batch-74/01-requirements.md",
     "2": ".dev-flow/2026-07-31-batch-74/02-review.md",
-    "3": ".dev-flow/2026-07-31-batch-74/03-increments/"
+    "3": ".dev-flow/2026-07-31-batch-74/03-increments/",
+    "handoff": ".dev-flow/HANDOFF-2026-07-31-batch-74-resume.md"
   },
   "decisions_log": [
     {
@@ -128,6 +129,12 @@
       "date": "2026-07-31",
       "decision": "AUTONOMOUS: three spec defects found BY IMPLEMENTING were corrected rather than worked around",
       "notes": "(a) Section 7's AT column kept pre-renumber BARE numbers - the collision renumber replaced 'AT-220' but section 7 stores '220, 222, ...' with no prefix, so a string replace could not see them. Corrected to 240/242/244/247/248 and 241/243/245/246/249. (b) Section 5.1's CAP-ONLY figure 1.921 DID NOT REPRODUCE - measured 2.224 - because section 5.1 never DEFINED the CAP-ONLY shape, so two reconstructions differ. Verdict unchanged (both defective shapes sit far above the 1.15 gate) but a number whose counterfactual is undefined is not reproducible and should not have been quoted as though it were; the counterfactual now lives in code as _shipped_body/_cap_only_body. FUSED measured 1.000 EXACTLY, so the threshold was NOT widened. (c) P-18 is TRUE but its margin is ZERO, not comfortable: the batch-64 golden's largest single (document,variant) Modifications table is EXACTLY 200 = the cap, and a census that does not split on document boundaries reads 272 and would wrongly conclude the cap fires. Recorded in the constant's docstring."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "SESSION CUT after Inc-1 - handoff written for a fresh session to resume at Inc-2",
+      "notes": "Operator asked for the handoff. Cut taken mid-Phase-3 at a COHERENT state (the flow's interruption protocol): Inc-0 and Inc-1 are committed, pushed and green (82 passed), the tree is clean, 0 unpushed commits in the project repo AND in ~/.claude. Entry point: .dev-flow/HANDOFF-2026-07-31-batch-74-resume.md, which supersedes the original HANDOFF-2026-07-31.md section 'PLAN - batch-74' (large parts of that plan are now measurably FALSE and it must not be implemented from). The handoff records: the operator re-scope; the SEVEN falsified premises with their counterexamples; the three live traps on the Address axis (derive REPORT_ADDRESS_CHARS top-down or AT-246 reddens on correct code; truncating an address without changing its FORM is a forgery not a bound; bound at the SOURCE and prove it with a residency oracle because output predicates are blind to format-then-slice); batch-73's live status and the third id collision; and the wording carve-outs still owed at Inc-3. AUTHORIZATION IS NOT INHERITED - the handoff states in bold that the resuming session must re-ask, including from the handoff itself."
     }
   ],
   "obsidian_synced": false,
