@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, List, Mapping, Optional, Sequence, Tuple
 
 from rich.markup import escape as escape_markup
-from textual import work
+from textual import events, work
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, ScrollableContainer
@@ -1026,6 +1026,15 @@ _CARD_ROLE_CLASS: dict[str, str] = {
 #: segment to app's live value, so a divergence goes RED (AMD-7).
 _MAC_WARNING_SAMPLE_STYLE = "orange3"
 
+#: batch-72 LLR-072-6.1 — the width at or above which the Legend renders its two
+#: panes side by side. The SAME breakpoint the base screen uses for
+#: ``width-narrow`` (``app.py::_apply_width_regime``, ``narrow = width < 120``);
+#: the modal cannot reuse that class, because it is applied to
+#: ``#workspace_shell`` / ``#workspace_body`` on the BASE screen and a pushed
+#: ``ModalScreen`` is a descendant of neither — and textual 8.2.8 has no CSS
+#: media queries.
+_LEGEND_NARROW_WIDTH: int = 120
+
 
 class LegendScreen(ModalScreen[None]):
     """Read-only classification-legend modal (HLR-023 / LLR-023.1; N8 cards).
@@ -1192,10 +1201,40 @@ class LegendScreen(ModalScreen[None]):
         return rows
 
     def compose(self) -> ComposeResult:
-        body = self._render_card() + self._render_key()
+        """
+        Summary:
+            Build the modal as a title, a two-pane body (example card left,
+            colour/band key right — batch-72 LLR-072-5.1) and the Close row, so
+            the key stays visible without scrolling past the card.
+
+        Returns:
+            ComposeResult: the single ``#legend_dialog`` container; its
+            ``#legend_body`` wrapper holds the ``#legend_card_pane`` and
+            ``#legend_key_pane`` scroll panes in that order (the WIDE order —
+            the floor order is produced at runtime by
+            :meth:`_apply_width_regime`, textual 8.2.8 having no CSS ordering
+            property).
+
+        Data Flow:
+            - ``_render_card()`` / ``_render_key()`` are called unchanged; their
+              widgets are re-parented into the two panes, never reconstructed
+              (LLR-072-7.1 — the data layer ``legend.py`` is untouched).
+            - ``#legend_body`` is preserved as the wrapper id: 9 descendant
+              query sites across the legend test files select through it.
+
+        Dependencies:
+            Uses:
+                - LegendScreen._render_card / LegendScreen._render_key
+            Used by:
+                - S19TuiApp.action_show_legend (screen push)
+        """
         yield Container(
             Label("Classification legend", classes="modal-title"),
-            ScrollableContainer(*body, id="legend_body"),
+            Horizontal(
+                ScrollableContainer(*self._render_card(), id="legend_card_pane"),
+                ScrollableContainer(*self._render_key(), id="legend_key_pane"),
+                id="legend_body",
+            ),
             Container(
                 Button("Close", id="legend_close", classes="modal-confirm"),
                 id="legend_buttons",
@@ -1205,8 +1244,48 @@ class LegendScreen(ModalScreen[None]):
             classes="modal-dialog",
         )
 
+    def _apply_width_regime(self, width: int) -> None:
+        """
+        Summary:
+            Put the two-pane body in the regime ``width`` calls for: side by
+            side above the breakpoint, stacked key-above-card below it
+            (batch-72 LLR-072-6.1).
+
+        Args:
+            width (int): The terminal width in columns — the caller passes
+                ``self.app.size.width``, NOT ``self.size.width``, which is 2
+                smaller under ``Screen { padding: 1 }`` and would flip a
+                120-column terminal into the narrow regime.
+
+        Data Flow:
+            - Toggles ``legend-narrow`` on ``#legend_dialog``, which is what the
+              prefixed CSS rules key on.
+            - Reorders the panes inside ``#legend_body`` with ``move_child``:
+              textual 8.2.8 has no CSS ordering property, so document order IS
+              the stacking order. Idempotent — the move is skipped when the
+              wanted pane is already first, so every resize can call this.
+
+        Dependencies:
+            Used by:
+                - LegendScreen.on_mount
+                - LegendScreen.on_resize
+        """
+        narrow = width < _LEGEND_NARROW_WIDTH
+        self.query_one("#legend_dialog").set_class(narrow, "legend-narrow")
+        body = self.query_one("#legend_body")
+        card = self.query_one("#legend_card_pane")
+        key = self.query_one("#legend_key_pane")
+        first, second = (key, card) if narrow else (card, key)
+        if body.children and body.children[0] is not first:
+            body.move_child(first, before=second)
+
     def on_mount(self) -> None:
+        self._apply_width_regime(self.app.size.width)
         self.query_one("#legend_close", Button).focus()
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-apply the width regime when the terminal is resized."""
+        self._apply_width_regime(self.app.size.width)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "legend_close":

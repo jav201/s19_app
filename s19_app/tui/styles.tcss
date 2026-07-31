@@ -1536,13 +1536,54 @@ ModalScreen {
  * Reuses the shared `.modal-dialog` token styling; caps the dialog height
  * and scrolls the body so the full A2L/MAC/Issues legend fits the 80- and
  * 120-col regimes (C-13). The per-row `sev-*` classes colour the rows. */
+/* batch-72 LLR-072-5.2: the body is a two-pane wrapper, so the scroll context
+ * moves OFF `#legend_body` (`overflow: hidden`) and ONTO the panes — three
+ * nested scroll contexts otherwise. Measured at 120x30 (00-measurements M-2):
+ * dialog 113 cols, content 107 after 6 cols of modal chrome, card pane 64,
+ * key pane 43, body 15 rows, `#legend_key_pane.max_scroll_y == 0`. */
 #legend_dialog {
     height: 90%;
+    width: 96%;
 }
 
 #legend_body {
     height: 1fr;
+    overflow: hidden;
+}
+
+#legend_card_pane {
+    width: 3fr;
+    height: 1fr;
     overflow-y: auto;
+}
+
+#legend_key_pane {
+    width: 2fr;
+    height: 1fr;
+    overflow-y: auto;
+}
+
+/* batch-72 LLR-072-6.2 — the floor regime (< 120 cols), keyed on the
+ * `legend-narrow` class `LegendScreen._apply_width_regime` toggles. EVERY rule
+ * is prefixed `#legend_dialog.legend-narrow`: unprefixed they would have equal
+ * specificity to the wide rules above and later source order, so they would win
+ * in BOTH regimes and push the key pane outside `#legend_body`. The pane ORDER
+ * (key above card) is document order, produced by `move_child` — textual 8.2.8
+ * has no CSS ordering property. `height: auto` on the key pane is excluded by
+ * measurement (00-measurements M-3): it starves the card to 1 row and overflows
+ * the body. Measured at 80x24: key h=4, card h=5. */
+#legend_dialog.legend-narrow #legend_body {
+    layout: vertical;
+}
+
+#legend_dialog.legend-narrow #legend_key_pane {
+    width: 100%;
+    height: 1fr;
+}
+
+#legend_dialog.legend-narrow #legend_card_pane {
+    width: 100%;
+    height: 1fr;
 }
 
 .legend-artifact {
@@ -1954,6 +1995,16 @@ ModalScreen {
     height: 1;
 }
 
+/* batch-72 LLR-072-1.1: the per-control sub-label inside a paired row (the
+ * `in` / `out` reflection toggles, the Self-test reference vector). Content-
+ * width so it never claims the 13-col label gutter, and it renders BETWEEN the
+ * two switches — that separation is the point (HLR-072-1 / HLR-072-3). */
+.crc-field-sublabel {
+    width: auto;
+    padding-right: 1;
+    color: #969aad;
+}
+
 /* Selects keep their overlay chrome (bordered, 3-tall) but stop eating the row. */
 #crc_designer_panel Select {
     width: 1fr;
@@ -1998,13 +2049,6 @@ ModalScreen {
     width: 1fr;
     height: auto;
     padding-left: 1;
-}
-
-/* The verdict hero — the distinguishing property is `content-align`, NOT the
- * border (every `.crc-field-group` already has one). LLR-L3.1 / AT-B59-05. */
-.crc-hero {
-    content-align: center middle;
-    min-height: 3;
 }
 
 /* The 3-column parameter bench below the hero row. */
