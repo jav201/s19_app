@@ -1,0 +1,106 @@
+{
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-07-31-batch-73",
+  "batch_objective": "Make _first_intersecting_symbol (s19_app/tui/changes/apply.py) sound over OVERLAPPING declared ranges. Its one-candidate bisect returned the wrong linkage symbol - or 'no linkage' at all - for an address inside an enclosing range that starts earlier than a nested one. The linkage symbol is DISPLAYED TO THE OPERATOR in reports and the checks view, which is what makes wrong data here MAJOR rather than cosmetic.",
+  "note_prior_batch": "batch-72 (P1 design defects: CRC Variant B + Legend two-pane, R-TUI-100) DONE + MERGED PR #166 squash 1abda8e, close-out #167 6524afd, vault-sync flag #168 37f2a4b. Its full state at close is the shared .dev-flow/state.json, which batch-73 deliberately did NOT overwrite - see note_state_json below.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (reconciled by this batch). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "note_state_json": "The SHARED .dev-flow/state.json was deliberately LEFT UNTOUCHED. Two reasons, both current: (1) /fast-dev-flow does not maintain it ('progress lives in the conversation + commits'), and batch-71 - the previous fast-flow - set the precedent of a batch-local state-at-close.json instead. (2) batch-74 runs in parallel under FULL /dev-flow on report_service.py and legitimately needs to claim that file; state.json is last-writer-wins with no owner field (reference_state_json_is_single_batch_concurrency_hazard). Leaving it asserts only that batch-72 closed, which is TRUE. The launch prompt's rule 5 ('do not touch state.json while PR #168 is open') is SATISFIED for a different reason than written: #168 is MERGED, so that specific block had already lifted.",
+  "route": "/fast-dev-flow - one production file, one new test file. Plan of record: .dev-flow/HANDOFF-2026-07-31.md, section 'PLAN - batch-73'. Spec: .dev-flow/2026-07-31-batch-73/SPEC.md",
+  "rc1": "VERIFIED 2026-07-31. git fetch origin --prune; origin/main tip = d81cb3d; HEAD = merge-base = d81cb3d (equal, no rebase needed); working tree clean. Branch claude/batch-73-linkage-fix-0372a0. PREMISE CORRECTION: the plan is stamped against 6524afd, but PR #168 (batch-72 sync) and PR #169 (the handoff itself) BOTH merged between authoring and execution. git diff --stat 6524afd..d81cb3d = 4 files, ALL under .dev-flow/, ZERO source - so every @6524afd address still resolves, and each was re-derived rather than copied.",
+  "flow_revision": "2026.07.28-rev1 - flow_hash 0127a2767ff11c8a - controls C-1..C-45. VERIFIED CURRENT at kickoff (C-45 PULL): aggregate sha256 over the 12 manifest files matched exactly.",
+  "number_collision_check": "EXECUTED 2026-07-31. git ls-remote --heads origin | grep -E 'batch-7[34]' -> 0 hits; ls .dev-flow/ | grep -E 'batch-7[34]' -> 0 dirs. Number and artifact namespace both FREE. Checked, not assumed - this project has had two id collisions with a parallel lane (64->65, 66->67).",
+  "frozen_set_check": "EXECUTED. tests/test_engine_unchanged.py:120-130 _ENGINE_PATHS = core.py, hexfile.py, range_index.py, validation/, tui/a2l.py, tui/mac.py. s19_app/tui/changes/apply.py is ABSENT from that list. range_index.py needed NO unfreeze because the fix is caller-local: the shared primitives keep their disjointness contract and the producer establishes it.",
+  "standing_authorization": {
+    "date": "2026-07-31",
+    "session": "batch-73 kickoff (asked at THIS kickoff via AskUserQuestion - NEVER inherited from the plan, the handoff document, or the launch prompt, all three of which explicitly disclaim granting it)",
+    "autonomy": "AUTONOMOUS + MERGE. The agent self-approves the internal gates recording each decision, opens the PR, and may merge on CI green AND an independent review returning no HIGH finding. A HIGH finding blocks and returns to the operator.",
+    "operator_answers_verbatim": "Q1 (authorization model) = 'Autonomo + merge'. Q2 (overlap tie-break) = 'Primero por start (Recomendado)'. Q3 (design shape) = 'Cover disjunto - 1 archivo (Recomendado)'."
+  },
+  "id_allocation": {
+    "method": "grep -rhoE 'AT-[0-9]+' / 'TC-[0-9]+' over *.py + *.md across the repo, run BEFORE the new test file existed.",
+    "measured": "prior max AT-219 (batch-72), TC-520 (batch-72). TC-1728 appears in a raw scan but is the known legacy stray series, confirmed at .dev-flow/2026-07-28-batch-65/PLAN.md:90 and .dev-flow/2026-07-30-batch-72/02-regate-qa.md:372 - NOT the max.",
+    "allocated": "AT-220..AT-223, TC-521..TC-524. All four consumed; none reserved-but-unused."
+  },
+  "decisions_log": [
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "D-1 = (a) fix the probe - INHERITED from the operator's 2026-07-31 ruling in the plan, NOT re-opened",
+      "notes": "The plan states the rationale of record: wrong data presented confidently in an evidentiary document is worse than absent data. The launch prompt further instructed that if a measurement contradicted (a), the measurement be REPORTED rather than the decision quietly switched to (b). No measurement contradicted it - the section-6 pre-flight came back clean, which strengthens (a) rather than threatening it."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "Section-6 golden pre-flight EXECUTED before any code change - CLEAN, no STOP condition",
+      "notes": "The plan makes this load-bearing: 'if any golden changes, STOP and report it - it means the defect has been contaminating stored evidence'. Method: wrap the live probe so every call computes BOTH its current answer and a linear-scan ground truth, then drive the four Linkage-bearing goldens through their seven consuming test modules. Baseline first: 134 passed in 229.73s. Instrumented: 134 passed, exit 0, 490 probe calls, 0 calls over an index that actually contains an overlap, 0 divergences. P-9 (the plan's own [ASSUMED] premise) = TRUE. Stored evidence is uncontaminated, so this stayed a code fix and did not escalate."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "PREMISE P-1 FALSE: the plan's base 6524afd is stale; re-based on d81cb3d",
+      "notes": "Docs-only delta, zero source files, so no line number moved - but all were re-derived anyway per the launch prompt's rule 3. Also lifts the plan's rule 5: PR #168 is MERGED, so the state.json block it describes no longer applies (a different hazard - batch-74 - replaces it)."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "PREMISE P-11 FALSE: overlaps are NOT confined to A2L tag ranges - MAC aliases are overlaps too",
+      "notes": "Found by asking what else could produce an overlap rather than trusting the backlog's framing. MAC records project onto [a, a+1), so two records at one address overlap. examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.mac:6-7 ships ALIAS_1=80200010 and ALIAS_2=80200010. Pre-fix the operator was shown the LAST alias - an artifact of bisect_right landing on the last duplicate, not a decision anyone made. This premise coming back FALSE is what created AT-223; the plan's AT set had no criterion that could observe it, because its AT-2 runs over DISJOINT input by construction."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS then OPERATOR-CONFIRMED: design changed from the plan's prescribed prefix-max to a disjoint cover in _linkage_index",
+      "notes": "The plan section 4 prescribes 'prefix-max over ends (carry an argmax)'. Measured an alternative with IDENTICAL output and one third the blast radius, then put both to the operator rather than swapping silently. Enabling premise P-10, executed: _linkage_index's output reaches _classify_linkage -> _first_intersecting_symbol and NOTHING else (apply.py:316-327, check.py:293-347; repo-wide grep finds no other importer), so normalizing the producer is safe. Prefix-max needs a 3rd return value -> signature change -> drags in check.py:293-294 = 3 files. The cover keeps the 2-tuple signature = 1 file, and it restores the precondition the docstring already declared rather than working around it. Measured equivalent: 48 000 disjoint probes 0 mismatches, 48 000 overlapping probes 0 wrong for both designs (pre-fix wrong on 12 123 = 25.3%). Operator selected the cover."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "D-2 (NEW, operator): the overlap tie-break is FIRST-BY-START, ties by declaration order",
+      "notes": "Surfaced because the plan's counterexample does NOT disambiguate it - only BIG_ARRAY covers 0x5000. Nested ranges and MAC aliases do. First-by-start is what the function's own NAME (_first_intersecting_symbol) and docstring ('the first intersection') already promise, so the fix makes the code honest rather than redefining it. The rejected arm - innermost / most-specific attribution - is a different FEATURE and was carried to BACKLOG-CODE.md P3 rather than smuggled in."
+    },
+    {
+      "phase": "B",
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: Inc-2 collapsed into Inc-1 and the close, and the collapse is reported rather than presented as two increments",
+      "notes": "The plan's Inc-2 was 'call-site sweep - AT-3 drives the same assertions through check.py'. Writing that as a separate increment would have meant shipping Inc-1 with a test file that knowingly omitted half the probe's consumers. The check.py arms (AT-222) were therefore written in the SAME increment as the fix, which is also what the flow's own hard constraint requires ('tests written in the same increment as the code they cover'). Inc-1 = apply.py + tests/test_linkage_soundness.py + SPEC.md (3 files, under the 5-file cap)."
+    },
+    {
+      "phase": "B",
+      "date": "2026-07-31",
+      "decision": "Counterfactuals (C-31 / C-40): FIVE executed on an isolated COPY of the fixed tree, never on main",
+      "notes": "Export at scratchpad/cf-tree, pristine apply.py sha256(16) = 09a447ab935f9027, byte-exact restore verified after EVERY mutation. CF-1 restore the pre-fix _linkage_index body -> 6 RED including both check.py arms. CF-2 REPLACE max(start, frontier) WITH frontier (see the F1 entry below - the substituted VALUE matters and is easy to get wrong) -> reddens ONLY the disjoint positive control, on its own assertion line, with a concrete counterexample, which is the proof the plan demanded that AT-221 is not vacuous. CF-3 reverse the equal-start tie-break -> reddens ONLY the two alias arms while AT-220 stays green, proving AT-223 observes something AT-220 cannot. CF-4 frontier over-extends by one -> reddens the abutting-MAC-points control. CF-5 drop attribution on clipped pieces (the REJECTED _merge_ranges shape) -> reddens the attribution arm. Coverage: all 9 test functions go RED under at least one mutation; every failure is an AssertionError on the test's own assertion line, never an error."
+    },
+    {
+      "phase": "C",
+      "date": "2026-07-31",
+      "decision": "Independent merge-gate review returned MERGE (0 HIGH). 4 MEDIUM + 3 LOW; THREE folded before merging, ONE adjudicated FALSE.",
+      "notes": "The reviewer ran 1 058 400 differential probes against an independent linear-scan oracle over empty / single / zero-length / negative-length / equal-start / equal-end / nested / shared-endpoint / 2^200 inputs: 0 divergences, 0 cover-invariant violations. It also surfaced an unadvertised improvement: pre-fix, symbol/index alignment depended on sorted() being STABLE under equal starts; the cover's starts are strictly increasing, so that latent fragility is gone. Its ledger check reproduced exactly (2405 collected = 2396 base + 9)."
+    },
+    {
+      "phase": "C",
+      "date": "2026-07-31",
+      "decision": "Review finding F1 ('the recorded CF-2 is false and provably cannot redden AT-221') ADJUDICATED FALSE - the record stands unchanged",
+      "notes": "The reviewer substituted `lower = start`; the RECORDED mutation substitutes `lower = frontier`. Both were re-executed against the committed tree: `-> frontier` gives '1 failed, 11 passed', failing test_at221 on its own assertion line; `-> start` gives '6 failed', with AT-221 surviving - exactly what the reviewer observed. The reviewer's premise (max(start, frontier) == start on disjoint input) is TRUE; the inference is not, because the mutation does not replace the expression with `start`. Worked instance: start=135, frontier=116 (previous end, a disjoint GAP) -> max = 135 but frontier = 116, so the emitted piece widens across the gap and a gap address wrongly resolves to the following symbol. NOTHING was changed in response to F1 except SPEC.md section 7, which now states the substituted value explicitly and records this trap. The reviewer's SECONDARY point in the same finding WAS valid and is fixed: SPEC.md:168 pointed the mutation log at 'section 8', which is Security; it now points at this decisions_log entry.",
+      "controls": "C-43 - a premise arriving from a reviewer is a hypothesis on the same terms as one arriving from a plan. Re-executed rather than accepted, and rather than dismissed."
+    },
+    {
+      "phase": "C",
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: review findings F2 / F3 / F4 FOLDED before the merge - three real coverage gaps, none a defect in shipped code",
+      "notes": "F2: moving `frontier = end` out of the `if end > lower:` block produces an OVERLAPPING cover - the very invariant the fix rests on - and survived all 9 tests, because every case in the file had at most TWO ranges and only a swallowed middle range exercises the frontier's running-maximum property. F3: the 'ties resolving to declaration order' clause batch-73 made NORMATIVE in R-CHG-002 Amendment A had no discriminating test - the alias case cannot pin it, since two MAC records at one address project onto identical [a,a+1) ranges so start AND end tie under every sort key; a drift to sort key (start, end) would have silently shipped D-2's REJECTED innermost semantics. F4: a THIRD behaviour-change class was undocumented - partially overlapping, non-nested tags now report the earlier symbol where pre-fix they reported the later one, which is materially different from the two documented classes because pre-fix returned a wrong-but-plausible NAME rather than None, so an operator diffing an old report against a new one sees a symbol CHANGE, not a gap being filled. All three mutants verified KILLED by the new tests, each on its own assertion line, via an in-process patch plugin that left the working tree untouched: f2 -> 1 failed / 11 passed; f3 -> 1 failed / 11 passed; control (unmutated restatement) -> 12 passed.",
+      "artifacts": "3 new tests in tests/test_linkage_soundness.py (12 total, was 9); one new row in R-CHG-002 Amendment A; F5/F6 folded (the `probes == 8000` guard was true by loop construction and could not detect the degeneracy its comment claimed - now asserts payload: ranges_swept > 1000 and hits > 3000; the span generator was seeded on len(source), taking only 9 distinct values across 400 sources - now seeded on the case index). F7 (doctest Examples never executed by CI, repo-wide) carried to BACKLOG-CODE.md P3."
+    }
+  ],
+  "acceptance": {
+    "AT-220": "TC-521 - the overlap counterexample resolves to the enclosing range's symbol, plus an INVARIANT arm (added at the merge gate, review F2) asserting the cover stays pairwise disjoint when a middle range is swallowed and a later one partially overlaps (3 test functions). RED pre-fix.",
+    "AT-221": "TC-522 - disjoint ranges answer identically to the frozen pre-fix implementation AND a linear-scan ground truth across 8 000 generated probes, plus an attribution arm and a PARTIAL-OVERLAP arm (added at the merge gate, review F4) pinning that the earlier-declared tag owns the shared region (4 test functions). The sweep itself is GREEN pre-fix BY DESIGN - it is the positive control; its ability to fail is established by executed mutation (CF-2), not asserted.",
+    "AT-222": "TC-523 - the same observations driven through apply_change_document AND run_check_document (3 test functions). RED pre-fix. Exists because the probe is SHARED: a fix proven only through apply is proven for half its consumers.",
+    "AT-223": "TC-524 - duplicate MAC addresses resolve to the first declaration, an adjacency control proving abutting-but-distinct points are not coalesced, and a TIE-BREAK arm (added at the merge gate, review F3) using two A2L tags that share a start but differ in length - the only shape that can discriminate declaration order from range width (3 test functions). RED pre-fix.",
+    "_total": "12 test functions. Every one goes RED under at least one executed mutation."
+  },
+  "requirements_touched": {
+    "R-CHG-002": "AMENDED - Amendment A 'Overlapping linkage ranges resolve first-by-start'. Before/After table per the operator's requirement-amendment convention. The classification vocabulary and linkage's informative-only status are UNCHANGED; what changed is which symbol is reported when ranges overlap, which the requirement had never addressed."
+  },
+  "created_at": "2026-07-31T00:00:00Z"
+}

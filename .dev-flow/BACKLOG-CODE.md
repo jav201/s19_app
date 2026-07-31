@@ -2,7 +2,9 @@
 
 > **Canonical open-work queue for the CODE lane.** Split out of [`BACKLOG.md`](BACKLOG.md) on 2026-07-27 by operator ruling; that file is now the router and lineage archive. Scope: the s19_app application code (features, defects, Flow Builder) **and the development flow of that code** (tests, CI, repo hygiene). Engineering process, controls and skills live in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) — do not add them here.
 >
-> **Last refresh: 2026-07-31 (backlog-carry audit — no batch).** `origin/main` tip = **`6524afd`**, unchanged. Registered **six deferrals that were born outside a batch** and had therefore never entered this queue (new section below); three arrived narrower than their source document once re-executed against `6524afd`. **No batch closed** — the two open PRs at the time of writing are [#168](https://github.com/jav201/s19_app/pull/168) (batch-72 vault sync, `state.json` only) and [#165](https://github.com/jav201/s19_app/pull/165) (the `tui-ci` paths-filter bullet). The *mechanism* that let the six leak is a PROCESS item and is routed to [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md), not duplicated here.
+> **Last refresh: 2026-07-31 (batch-73 close — `_first_intersecting_symbol` soundness, `/fast-dev-flow`).** `origin/main` tip at its cut = **`d81cb3d`** (PRs #168 + #169 merged after the audit line below was written, which is why that line's `6524afd` is stale). Closed the MAJOR linkage-probe defect under "New defects found in passing at batch-65" and **corrected three things that bullet had wrong** (wrong function named; the recommended in-repo fix pattern loses the symbol; the defect also reaches MAC aliases, not just A2L). Amended **`R-CHG-002`** (Amendment A) and added `AT-220`..`AT-223` / `TC-521`..`TC-524`. Returned **two P3 carries** (the rejected innermost-attribution arm; a stale `.fast-dev-flow/spec.md` reported as found). ⚠️ **batch-74 runs in parallel on `report_service.py` and shares only this file** — whoever closed second rebased.
+>
+> **Earlier refresh: 2026-07-31 (backlog-carry audit — no batch).** `origin/main` tip = **`6524afd`**, unchanged. Registered **six deferrals that were born outside a batch** and had therefore never entered this queue (new section below); three arrived narrower than their source document once re-executed against `6524afd`. **No batch closed** — the two open PRs at the time of writing are [#168](https://github.com/jav201/s19_app/pull/168) (batch-72 vault sync, `state.json` only) and [#165](https://github.com/jav201/s19_app/pull/165) (the `tui-ci` paths-filter bullet). The *mechanism* that let the six leak is a PROCESS item and is routed to [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md), not duplicated here.
 >
 > **Earlier refresh: 2026-07-30 (batch-72 close — P1 design defects: CRC Variant B + Legend two-pane, PR [#166](https://github.com/jav201/s19_app/pull/166) squash `1abda8e`).** `origin/main` tip at its cut = **`31d87d0`** (PR #164, the prototypes + scaffold); at its close = **`1abda8e`**. Closed the four 2026-07-28 operator-flagged defect bullets, **corrected line 153's false snapshot-drift premise** (executed: the CRC screen is not snapshot-captured at all), registered **`R-TUI-100`**, and returned **five** new carries — two of them requirements that did not survive measurement (the Select-height cap **withdrawn**, guard **G-2 retired**). Gate suite `2370 passed / 2 skipped / 21 deselected / 3 xfailed`, 29 snapshots, exit 0; ledger `2379 − 1 + 18 = 2396` exact.
 >
@@ -93,7 +95,7 @@
 
 ### New defects found in passing at batch-65 — NOT this batch's scope
 
-  - **▸ (MAJOR, NEW — live defect in shipped code) `s19_app/tui/changes/apply.py:465` `_linkage_index` carries its OWN copy of the one-candidate bisect shape** (`:511-518`), so it is unsound over overlapping A2L tag ranges — and an unfreeze of `range_index.py` would NOT repair it. Executed: ranges `[(4096,36864,'BIG_ARRAY'),(8192,8208,'INNER')]`, `addr=0x5000` → returns `(False, None)`, ground truth `['BIG_ARRAY']`. Its docstring concedes the assumption for informative-only linkage, which is why this sits at MAJOR rather than HIGH — but the linkage IS shown to the operator. Also driven from `check.py:293-294`. **The fix pattern already exists in-repo:** `report_filter.py:737` does `build_sorted_range_index(_merge_ranges(ranges))`, and batch-65's `_addendum_lines` is a second worked example.
+  - **▸ ~~(MAJOR, NEW — live defect in shipped code) the one-candidate bisect is unsound over overlapping ranges~~ — DONE, batch-73** (PR pending merge; branch `claude/batch-73-linkage-fix-0372a0`, base `d81cb3d`). Fixed by normalizing `_linkage_index` to emit a **disjoint cover** that preserves per-span symbol ownership, so the probe's declared disjointness precondition holds by construction. `R-CHG-002` amended (Amendment A) with a normative **first-by-start** tie-break; `AT-220`..`AT-223` / `TC-521`..`TC-524` in `tests/test_linkage_soundness.py`. **Three corrections to this bullet, all executed at `d81cb3d`:** (1) it named the **wrong function** — `_linkage_index` (`:438`) contains no bisect; the unsound probe is `_first_intersecting_symbol` (`:470`, bisect `:513-518`). (2) The `report_filter.py:737` pattern it recommends **loses the symbol** — `_merge_ranges` coalesces away which symbol owned which span, and this probe returns a name; **not adopted**. (3) The defect was **not** confined to A2L: two MAC records at one address are an overlap too, and `examples/professional_validation/case_07_cross_reference_inconsistencies/firmware.mac:6-7` ships exactly that (`ALIAS_1`/`ALIAS_2` at `0x80200010`) — pre-fix the operator was shown the **last** alias. Measured impact: over randomized overlapping ranges the pre-fix probe answered wrongly on **12 123 / 48 000** probes (25.3%); over disjoint ranges the fix is **bit-identical** across 48 000 probes. **No stored evidence was contaminated** — the four committed goldens carrying a `Linkage` column were instrumented against a ground-truth oracle before any code changed: 490 probe calls, **0** over an overlapping index, **0** divergences.
   - **▸ (CLEARED — recorded so it is not re-audited) the same defect does NOT reach `validation/engine.py` or `tui/hexview.py`.** Ranges in `validation/engine.py` come from `core.py::get_memory_ranges` over a sorted unique-key dict → disjoint by construction (9 real fixtures, 0 overlapping pairs, including `case_03_overlapping_records`); `hexview.py` is a pure re-export facade that builds no range set. `screens_directionb.py:1889` also cleared — its runs are forced disjoint by `compute_entropy`'s tiling and `_merge_band_runs`' exact-adjacency rule (206 fixtures, **89 032 addresses swept, 0 attribution mismatches**). **An earlier claim in this project naming those first two as at-risk was WRONG and is withdrawn.**
   - **▸ (P2, security S5 fold 2 — REJECTED with reasons, carried) a dropped-severity histogram in the truncation notice.** Rejected because **the field does not exist for 1 of the 3 hit classes**: `ChangeSummaryEntry` (`changes/model.py:321-373`) has 8 fields and no severity; only `ValidationIssue` has one. A notice field undefined for a third of what it describes is worse than no field. Revisit only alongside a severity model that also covers modification entries.
 
@@ -201,6 +203,31 @@ Original entry (batch-69 design) follows: Run a saved flow across multiple image
 
 ## P3 — code carries / hygiene (fold opportunistically into a themed fast-flow)
 
+  - **▸ (P3, new — batch-73 D-2 rejected arm) linkage over nested ranges reports the OUTER symbol, not the most specific one.**
+    batch-73 made the probe sound and fixed the tie-break to **first-by-start**, which is what
+    `_first_intersecting_symbol`'s name and contract already promised. The operator explicitly chose that over
+    **innermost / most-specific** attribution. So for a genuinely nested pair the operator is now shown
+    `BIG_ARRAY` where `INNER` may be the more informative answer — executed:
+    `[(0x1000,0x9000,'BIG_ARRAY'),(0x2000,0x2010,'INNER')]`, addr `0x2008` → `BIG_ARRAY`.
+    **This is correct-per-contract, not a defect** — it is registered so the choice is re-openable rather than
+    forgotten. Revisiting it is a *semantic* change to what linkage means, needs its own operator ruling, and
+    would move `R-CHG-002` Amendment A's normative clause. The disjoint-cover mechanism can express it (emit the
+    narrowest covering range per span instead of the earliest), so the cost is in the decision, not the code.
+  - **▸ (P3, new — batch-73 merge-gate review F7) doctest `Example` blocks are never executed by CI, so they rot silently.**
+    `[tool.pytest.ini_options]` in `pyproject.toml` carries no `addopts`, and both CI jobs run bare
+    `pytest -q` / `pytest -q -m "not slow"` — so `--doctest-modules` is never applied. PROJECT_RULES.md
+    makes `Example` a docstring section, and the codebase has accumulated many; batch-73 added two
+    (`apply.py::_linkage_index`, `tests/test_linkage_soundness.py::_pre_fix_probe`), **both verified
+    passing by hand** (`python -m pytest --doctest-modules s19_app/tui/changes/apply.py -q` → 3 passed,
+    1 skipped). The gap is repo-wide, not batch-73's to close: enabling `--doctest-modules` globally
+    would collect every `Example` in the tree at once and is its own batch. **Scope it before enabling.**
+  - **▸ (P3, new — batch-73) `.fast-dev-flow/spec.md` still holds batch-69's design-only spec.**
+    batch-69 merged 2026-07-28 (#157) and was superseded by batch-70; recent fast-flows
+    (batch-71, batch-73) write `.dev-flow/<date>-batch-NN/SPEC.md` instead, so the `/fast-dev-flow`
+    pre-check that asks whether to resume "an unclosed prior spec" now fires on a stale file every
+    run. Either archive it to `.fast-dev-flow/archive/2026-07-28-batch-69-spec.md` (26 specs already
+    live there) or record the convention change in `docs/engineering-rules.md`. **Reported as found,
+    not folded in** — batch-73 did not touch it.
   - **▸ (P3, new — batch-64 §7.15) `prototypes/out/` is untracked AND not gitignored.**
     The five prototype SOURCES were committed in PR #147 after a backup audit found them versioned nowhere;
     `prototypes/out/` (32 generated SVGs, ~4 MB) was deliberately excluded as derived. It now sits untracked
