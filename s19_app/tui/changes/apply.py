@@ -442,28 +442,66 @@ def _linkage_index(
     Summary:
         Build the sorted binary-search linkage index plus the aligned symbol
         list from ``(start, end, symbol)`` triples (LLR-002.6 — the
-        ``build_sorted_range_index`` primitive, never a linear scan).
+        ``build_sorted_range_index`` primitive, never a linear scan),
+        normalizing overlapping input into a **disjoint cover** first so the
+        primitive's disjointness precondition holds by construction
+        (batch-73).
 
     Args:
         source (List[Tuple[int, int, Optional[str]]]): The MAC or A2L ranges
-            with their symbol names.
+            with their symbol names. Ranges MAY overlap — A2L tag extents can
+            nest, and two MAC records may declare the same address (aliases).
 
     Returns:
         Tuple[RangeIndex, List[Optional[str]]]: The ``(starts, ends)`` index
-        and the symbol list aligned with it. Alignment holds because the
-        triples are pre-sorted by start with the same key
-        ``build_sorted_range_index`` uses, and Python's stable sort leaves an
-        already-sorted input in identity order.
+        over the disjoint cover and the symbol list aligned with it. Each
+        covered address is attributed to the **first-by-start** declared range
+        containing it, ties resolving to declaration order (operator decision
+        D-2, 2026-07-31) — which is the semantics
+        ``_first_intersecting_symbol``'s name and contract already declare.
+        Alignment holds because the cover is emitted in ascending start order,
+        so ``build_sorted_range_index``'s stable sort leaves it in identity
+        order.
+
+    Data Flow:
+        - Sort the triples by start (stable, so equal starts keep declaration
+          order), then sweep once carrying a ``frontier`` — the highest end
+          emitted so far. Each range contributes the portion beyond the
+          frontier, or nothing when it is wholly swallowed by an earlier,
+          longer range. Coalescing is on ``>``, not ``>=``, so abutting
+          ranges (MAC points at consecutive addresses) stay distinct.
+        - The cover never grows the index: at most one piece per input range.
+        - An earlier range therefore keeps the whole overlap region, which is
+          what makes the attribution first-by-start rather than
+          nearest-start.
 
     Dependencies:
         Uses:
             - build_sorted_range_index
         Used by:
             - apply_change_document
+            - check.run_check_document
+
+    Example:
+        >>> index, symbols = _linkage_index(
+        ...     [(0x1000, 0x9000, "BIG_ARRAY"), (0x2000, 0x2010, "INNER")]
+        ... )
+        >>> index, symbols
+        (([4096], [36864]), ['BIG_ARRAY'])
     """
     ordered = sorted(source, key=lambda triple: triple[0])
-    index = build_sorted_range_index([(start, end) for start, end, _ in ordered])
-    symbols = [symbol for _, _, symbol in ordered]
+    cover: List[Tuple[int, int, Optional[str]]] = []
+    frontier: Optional[int] = None
+    for start, end, symbol in ordered:
+        if end <= start:
+            # Defensive: both linkage sources guarantee end > start today.
+            continue
+        lower = start if frontier is None else max(start, frontier)
+        if end > lower:
+            cover.append((lower, end, symbol))
+            frontier = end
+    index = build_sorted_range_index([(start, end) for start, end, _ in cover])
+    symbols = [symbol for _, _, symbol in cover]
     return index, symbols
 
 
@@ -488,18 +526,25 @@ def _first_intersecting_symbol(
     Returns:
         Tuple[bool, Optional[str]]: ``(True, symbol)`` on the first
         intersection found — the candidate at or before ``start``, else its
-        immediate successor — or ``(False, None)``. Like the shared
-        ``range_index`` primitives, the probe assumes the indexed ranges do
-        not overlap each other (MAC addresses are points; image and tag
-        ranges are normally disjoint); overlapping declared ranges may
-        resolve to the nearest-start match only — acceptable for an
-        informative-only annotation.
+        immediate successor — or ``(False, None)``.
+
+        Like the shared ``range_index`` primitives, this probe requires the
+        indexed ranges to be pairwise disjoint. **That precondition is
+        established by its only producer**, ``_linkage_index``, which
+        normalizes overlapping declared ranges into a disjoint cover
+        (batch-73); the resolved symbol is therefore the first-by-start
+        declared range covering the address. Before batch-73 the caveat was
+        merely *declared* here and overlapping ranges resolved to the
+        nearest-start match — which returned the wrong symbol, or none at
+        all, for an address inside an enclosing range. Callers building an
+        index by any other route must supply disjoint ranges themselves.
 
     Data Flow:
         - ``bisect_right`` on the starts vector locates the last range
           starting at or before ``start``; intersection holds when its end
           exceeds ``start``. Otherwise the next range intersects iff it
-          starts before ``end``.
+          starts before ``end``. Both arms are sound only because the index
+          is disjoint.
 
     Dependencies:
         Uses:
