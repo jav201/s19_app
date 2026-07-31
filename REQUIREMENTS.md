@@ -1796,6 +1796,7 @@ in the code.
 | Overlapping ranges | Not addressed by the requirement; `_first_intersecting_symbol` conceded in its docstring that overlaps "may resolve to the nearest-start match only" | The **first-by-start** covering range wins, ties by declaration order — normative, and established by `_linkage_index` emitting a disjoint cover |
 | Address inside an enclosing range that starts earlier than a nested one | Could report **no linkage at all** (executed: `[(0x1000,0x9000,'BIG_ARRAY'),(0x2000,0x2010,'INNER')]`, addr `0x5000` → `(False, None)`) | Reports `BIG_ARRAY` |
 | Two MAC records at one address (aliases) | Reported the **last** declaration — an artifact of `bisect_right`, not a decision | Reports the **first** declaration |
+| Two tags overlapping **partially** (neither nested), over the shared region | Reported the **later**-declared tag — a wrong-but-plausible *name*, not `None` | Reports the **earlier**-declared tag |
 | Disjoint ranges (the common case) | — | **Unchanged**, and pinned: 8 000 generated probes assert three-way agreement with the frozen pre-fix implementation and a linear-scan oracle |
 
 - **Why:** the linkage symbol is displayed to the operator in reports and the

@@ -213,6 +213,14 @@ Original entry (batch-69 design) follows: Run a saved flow across multiple image
     forgotten. Revisiting it is a *semantic* change to what linkage means, needs its own operator ruling, and
     would move `R-CHG-002` Amendment A's normative clause. The disjoint-cover mechanism can express it (emit the
     narrowest covering range per span instead of the earliest), so the cost is in the decision, not the code.
+  - **▸ (P3, new — batch-73 merge-gate review F7) doctest `Example` blocks are never executed by CI, so they rot silently.**
+    `[tool.pytest.ini_options]` in `pyproject.toml` carries no `addopts`, and both CI jobs run bare
+    `pytest -q` / `pytest -q -m "not slow"` — so `--doctest-modules` is never applied. PROJECT_RULES.md
+    makes `Example` a docstring section, and the codebase has accumulated many; batch-73 added two
+    (`apply.py::_linkage_index`, `tests/test_linkage_soundness.py::_pre_fix_probe`), **both verified
+    passing by hand** (`python -m pytest --doctest-modules s19_app/tui/changes/apply.py -q` → 3 passed,
+    1 skipped). The gap is repo-wide, not batch-73's to close: enabling `--doctest-modules` globally
+    would collect every `Example` in the tree at once and is its own batch. **Scope it before enabling.**
   - **▸ (P3, new — batch-73) `.fast-dev-flow/spec.md` still holds batch-69's design-only spec.**
     batch-69 merged 2026-07-28 (#157) and was superseded by batch-70; recent fast-flows
     (batch-71, batch-73) write `.dev-flow/<date>-batch-NN/SPEC.md` instead, so the `/fast-dev-flow`

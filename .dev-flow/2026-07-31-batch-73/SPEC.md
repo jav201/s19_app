@@ -165,14 +165,29 @@ padding.
 
 ## 7. Acceptance criteria — observable, each able to go RED
 
-Every criterion states the mutation that reddens it, and every mutation is **executed** (§8).
+Every criterion states the mutation that reddens it, and every mutation is **executed** — the
+transcripts and per-mutation kill lists live in `state-at-close.json` → `decisions_log`, entry
+*"Counterfactuals (C-31 / C-40)"*.
 
 | Id | Criterion (When … the system shall …) | Reddening mutation |
 |---|---|---|
 | **AT-220** | When the probe is given `[(4096,36864,'BIG_ARRAY'),(8192,8208,'INNER')]` and the span `[0x5000,0x5001)`, it shall return `(True, 'BIG_ARRAY')`. | Restore the pre-fix `_linkage_index` body (drop the cover sweep) → `(False, None)`. |
-| **AT-221** | When the indexed ranges are **pairwise disjoint**, the probe's answer shall equal **both** the frozen pre-fix implementation's answer **and** the linear-scan ground truth, over a deterministic generated sweep. | Corrupt the cover so it coalesces adjacent-but-disjoint ranges (drop the `max(start, frontier)` clamp) → attribution shifts and the differential assert fails. |
-| **AT-222** | AT-220 and AT-223's observations shall hold when driven through `check.py`'s public entry point, not `apply.py`'s — the probe is shared and a fix proven through one consumer is proven for half of them. | Same as AT-220; the assertion is on `check_change_document`'s emitted linkage symbol. |
+| **AT-220** (invariant arm) | When a middle range is wholly **swallowed** by an earlier one and a later range partially overlaps, the emitted cover shall remain pairwise disjoint. | Move `frontier = end` outside the `if end > lower:` block, so a swallowed range **lowers** the frontier → the cover overlaps and `0x32` resolves to `LATER_OVERLAP` instead of `OUTER`. |
+| **AT-221** | When the indexed ranges are **pairwise disjoint**, the probe's answer shall equal **both** the frozen pre-fix implementation's answer **and** the linear-scan ground truth, over a deterministic generated sweep. | Replace `max(start, frontier)` with **`frontier`** — on disjoint input with a gap, `frontier` is the *previous end*, strictly below `start`, so the emitted piece widens across the gap and a gap address wrongly resolves to the following symbol. |
+| **AT-222** | AT-220 and AT-223's observations shall hold when driven through `check.py`'s public entry point, not `apply.py`'s — the probe is shared and a fix proven through one consumer is proven for half of them. | Same as AT-220; the assertion is on `run_check_document`'s emitted linkage symbol. |
 | **AT-223** | When two MAC records declare the **same** address (`ALIAS_1`, `ALIAS_2`), the reported linkage symbol shall be the **first-declared** one. | Reverse the cover's tie-break to keep the last duplicate → returns `ALIAS_2`. |
+| **AT-223** (tie-break arm) | When two A2L tags share a start but differ in length, the reported symbol shall follow **declaration order**, not range width. | Change the sort key from `triple[0]` to `(triple[0], triple[1])` → the shorter range wins, which is D-2's **rejected** innermost semantics. |
+
+> ⚠️ **The AT-221 mutation is easy to state wrongly, and stating it wrongly matters.** Replacing the
+> expression with `start` *is* a no-op on disjoint input, because `max(start, frontier) == start`
+> there. The mutation that kills AT-221 replaces it with **`frontier`**, which is a *different*
+> value. An independent review of this batch mis-executed exactly this substitution and concluded
+> the criterion was unkillable. The batch's own recorded transcript is the counter-evidence, and it
+> is hand-verifiable from its own numbers: over
+> `[… (114,116,'SYM_4'), (135,141,'SYM_5')]` and the span `[0x7b,0x87)` = `[123,135)`, the baseline
+> answers `(False, None)` (a gap address: `starts[5]=135 < 135` is false), while the mutant widens
+> `SYM_5`'s piece to `[116,141)` and answers `(True,'SYM_5')` — which is exactly what the failure
+> output shows. The distinction is recorded here so the next reader does not have to rediscover it.
 
 **AT-221's differential oracle is not a tautology.** It embeds a clearly-labelled frozen copy of the
 `@d81cb3d` algorithm and asserts *new == frozen == ground-truth* **on the disjoint domain only**,

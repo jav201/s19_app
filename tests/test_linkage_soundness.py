@@ -221,6 +221,39 @@ def test_at220_tc521_overlap_counterexample_resolves_enclosing_symbol() -> None:
     )
 
 
+def test_at220_tc521_swallowed_middle_range_keeps_the_cover_disjoint() -> None:
+    """AT-220 (invariant arm) — a swallowed range must not rewind the frontier.
+
+    Three ranges where a MIDDLE one is wholly swallowed and a LATER one
+    partially overlaps.  Every other case in this module has at most two
+    ranges, and two ranges cannot exercise the frontier's *running-maximum*
+    property: only a swallowed range followed by a further range can, because
+    only then does ``frontier`` have to remember an end belonging to neither
+    neighbour.
+
+    Asserts the cover is **disjoint**, not merely that the answer looks right —
+    disjointness is the precondition ``_first_intersecting_symbol``'s
+    soundness now depends on, so it is the thing worth pinning directly.
+    """
+    source: List[Tuple[int, int, Optional[str]]] = [
+        (0x0000, 0x0064, "OUTER"),
+        (0x000A, 0x0014, "SWALLOWED"),
+        (0x001E, 0x00C8, "LATER_OVERLAP"),
+    ]
+
+    (starts, ends), symbols = _linkage_index(source)
+
+    assert all(
+        starts[i] >= ends[i - 1] for i in range(1, len(starts))
+    ), f"cover is not disjoint: starts={starts} ends={ends}"
+    assert len(symbols) == len(starts), "symbol list fell out of alignment"
+    # 0x32 sits inside OUTER and inside LATER_OVERLAP; OUTER starts first.
+    assert _probe(0x32, 0x33, source) == (True, "OUTER")
+    assert _ground_truth(0x32, 0x33, source) == (True, "OUTER")
+    # Past OUTER's end the later range owns the span.
+    assert _probe(0x70, 0x71, source) == (True, "LATER_OVERLAP")
+
+
 def test_at220_tc521_nested_overlap_resolves_first_by_start() -> None:
     """AT-220 (D-2 arm) — the smallest-start intersecting range wins.
 
@@ -254,14 +287,21 @@ def test_at221_tc522_disjoint_ranges_match_pre_fix_and_ground_truth() -> None:
     "looks" plausible.
     """
     probes = 0
-    for source in _disjoint_sources(seed=20260731, cases=400):
+    hits = 0
+    ranges_swept = 0
+    sources = _disjoint_sources(seed=20260731, cases=400)
+    for case, source in enumerate(sources):
         ceiling = (source[-1][1] if source else 0) + 40
-        span_rng = random.Random(0xC0FFEE + len(source))
+        # Seeded on the case INDEX, not on len(source) — the latter takes only
+        # 9 distinct values, so 400 sources would draw from 9 span streams.
+        span_rng = random.Random(0xC0FFEE + case)
+        ranges_swept += len(source)
         for _ in range(20):
             start = span_rng.randint(0, ceiling)
             length = span_rng.randint(1, 26)
             probes += 1
             live = _probe(start, start + length, source)
+            hits += 1 if live[0] else 0
             assert live == _pre_fix_probe(start, start + length, source), (
                 f"disjoint regression: span [{start:#x},{start + length:#x}) "
                 f"over {source} answered {live}, pre-fix answered "
@@ -271,8 +311,19 @@ def test_at221_tc522_disjoint_ranges_match_pre_fix_and_ground_truth() -> None:
                 f"disjoint answer disagrees with ground truth: span "
                 f"[{start:#x},{start + length:#x}) over {source} -> {live}"
             )
-    # A sweep that silently degenerated to zero probes would pass vacuously.
+    # Guard the sweep's PAYLOAD, not its loop arithmetic. ``probes == 8000``
+    # alone is true by construction of the loop nest and would still hold if
+    # every generated source were empty — it detects a short source list, not
+    # a sweep that tested nothing.
     assert probes == 8000
+    assert ranges_swept > 1000, (
+        f"the generator emitted only {ranges_swept} ranges across "
+        f"{len(sources)} sources — the sweep is not exercising the cover"
+    )
+    assert hits > 3000, (
+        f"only {hits} of {probes} probes intersected anything — the spans are "
+        "missing the ranges and the sweep proves little"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -299,6 +350,34 @@ def test_at223_tc524_duplicate_mac_addresses_resolve_to_first_declared() -> None
     assert _probe(0x80200010, 0x80200011, source) == (True, "ALIAS_1")
     # Pins the direction of the change: the pre-fix shape answered ALIAS_2.
     assert _pre_fix_probe(0x80200010, 0x80200011, source) == (True, "ALIAS_2")
+
+
+def test_at223_tc524_equal_start_unequal_length_uses_declaration_order() -> None:
+    """AT-223 (tie-break arm) — equal starts break to DECLARATION order.
+
+    ``R-CHG-002`` Amendment A states "ties resolving to declaration order",
+    and the alias test above cannot pin it: two MAC records at one address
+    project onto identical ``[a, a + 1)`` ranges, so start **and** end tie and
+    every sort key yields the same order.
+
+    Two A2L tags at one address with *different* lengths — a struct and its
+    first member, or a duplicated ``CHARACTERISTIC`` — do discriminate.  A sort
+    key of ``(start, end)`` instead of ``start`` would silently pick the
+    SHORTER range, which is precisely the innermost/most-specific semantics
+    D-2 REJECTED.  Without this test that drift ships green.
+    """
+    a2l_tags = [
+        {"name": "DECLARED_FIRST", "address": 0x4000, "length": 0x100},
+        {"name": "DECLARED_SECOND", "address": 0x4000, "length": 0x008},
+    ]
+    source = _a2l_linkage_source(a2l_tags)
+
+    assert _probe(0x4002, 0x4003, source) == (True, "DECLARED_FIRST")
+    assert _ground_truth(0x4002, 0x4003, source) == (True, "DECLARED_FIRST")
+    # Reversing only the DECLARATION order must flip the answer — otherwise
+    # this test is pinning the lengths, not the tie-break.
+    reversed_source = _a2l_linkage_source(list(reversed(a2l_tags)))
+    assert _probe(0x4002, 0x4003, reversed_source) == (True, "DECLARED_SECOND")
 
 
 def test_at223_tc524_distinct_adjacent_mac_addresses_are_not_coalesced() -> None:
@@ -338,6 +417,33 @@ def test_at221_tc522_a2l_overlapping_tags_do_not_lose_attribution() -> None:
         assert symbol is not None, f"{address:#x} resolved to a nameless range"
     # Past both tags there is genuinely nothing.
     assert _probe(0x4180, 0x4181, source) == (False, None)
+
+
+def test_at221_tc522_partial_overlap_region_reports_the_earlier_tag() -> None:
+    """AT-221 (partial-overlap arm) — R-CHG-002 Amendment A, third row.
+
+    Two A2L tags that overlap **partially** (neither nested) are the third
+    documented behaviour change, and the one an operator is most likely to
+    notice: pre-fix the overlap region reported a wrong-but-plausible NAME
+    (``TABLE_B``), not ``None``, so comparing an old report against a new one
+    shows a symbol *changing* rather than a gap being *filled*.
+
+    The attribution arm above asserts only that *some* symbol survives, which
+    cannot distinguish first-by-start from last-by-start.  This pins the value.
+    """
+    a2l_tags = [
+        {"name": "TABLE_A", "address": 0x4000, "length": 0x100},
+        {"name": "TABLE_B", "address": 0x4080, "length": 0x100},
+    ]
+    source = _a2l_linkage_source(a2l_tags)
+
+    # Inside the overlap [0x4080, 0x4100): the EARLIER-declared tag wins.
+    for address in (0x4080, 0x40C0, 0x40FF):
+        assert _probe(address, address + 1, source) == (True, "TABLE_A")
+        assert _pre_fix_probe(address, address + 1, source) == (True, "TABLE_B")
+    # Past TABLE_A's end only TABLE_B remains — unchanged by the fix.
+    assert _probe(0x4100, 0x4101, source) == (True, "TABLE_B")
+    assert _pre_fix_probe(0x4100, 0x4101, source) == (True, "TABLE_B")
 
 
 # ---------------------------------------------------------------------------
