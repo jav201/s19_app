@@ -2,7 +2,9 @@
 
 > **Canonical open-work queue for the CODE lane.** Split out of [`BACKLOG.md`](BACKLOG.md) on 2026-07-27 by operator ruling; that file is now the router and lineage archive. Scope: the s19_app application code (features, defects, Flow Builder) **and the development flow of that code** (tests, CI, repo hygiene). Engineering process, controls and skills live in [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md) — do not add them here.
 >
-> **Last refresh: 2026-07-31 (batch-73 close — `_first_intersecting_symbol` soundness, `/fast-dev-flow`).** `origin/main` tip at its cut = **`d81cb3d`** (PRs #168 + #169 merged after the audit line below was written, which is why that line's `6524afd` is stale). Closed the MAJOR linkage-probe defect under "New defects found in passing at batch-65" and **corrected three things that bullet had wrong** (wrong function named; the recommended in-repo fix pattern loses the symbol; the defect also reaches MAC aliases, not just A2L). Amended **`R-CHG-002`** (Amendment A) and added `AT-220`..`AT-223` / `TC-521`..`TC-524`. Returned **two P3 carries** (the rejected innermost-attribution arm; a stale `.fast-dev-flow/spec.md` reported as found). ⚠️ **batch-74 runs in parallel on `report_service.py` and shares only this file** — whoever closed second rebased.
+> **Last refresh: 2026-07-31 (batch-75 close — SPEC ONLY, `R-TUI-102`).** `origin/main` tip at its cut = **`232eb0a`**. batch-75 shipped its **requirements only** by operator ruling mid-batch; Inc-0…Inc-3 are **owed** and registered as a P0 above. Phase 2 **BLOCKED** on 4 blockers — two of them in clauses batch-75 itself authored, one the house vacuous-fixture defect — and the spec was re-gated as **revision 2**. **Three false premises were executed and killed, two of them originating INSIDE the batch** (a review lane's wire-reachability claim; the batch's own `_hexdump_section` exemption). **The `R-TUI-101` wording carve-outs are declared STILL OPEN, not discharged** (batch-75 never edited `REQUIREMENTS.md`). New Lane-B carry: re-stamp `FLOW-VERSION.md` for the 641-line `dev-flow-lessons/SKILL.md`.
+>
+> **Earlier refresh: 2026-07-31 (batch-73 close — `_first_intersecting_symbol` soundness, `/fast-dev-flow`).** `origin/main` tip at its cut = **`d81cb3d`** (PRs #168 + #169 merged after the audit line below was written, which is why that line's `6524afd` is stale). Closed the MAJOR linkage-probe defect under "New defects found in passing at batch-65" and **corrected three things that bullet had wrong** (wrong function named; the recommended in-repo fix pattern loses the symbol; the defect also reaches MAC aliases, not just A2L). Amended **`R-CHG-002`** (Amendment A) and added `AT-220`..`AT-223` / `TC-521`..`TC-524`. Returned **two P3 carries** (the rejected innermost-attribution arm; a stale `.fast-dev-flow/spec.md` reported as found). ⚠️ **batch-74 runs in parallel on `report_service.py` and shares only this file** — whoever closed second rebased.
 >
 > **Earlier refresh: 2026-07-31 (backlog-carry audit — no batch).** `origin/main` tip = **`6524afd`**, unchanged. Registered **six deferrals that were born outside a batch** and had therefore never entered this queue (new section below); three arrived narrower than their source document once re-executed against `6524afd`. **No batch closed** — the two open PRs at the time of writing are [#168](https://github.com/jav201/s19_app/pull/168) (batch-72 vault sync, `state.json` only) and [#165](https://github.com/jav201/s19_app/pull/165) (the `tui-ci` paths-filter bullet). The *mechanism* that let the six leak is a PROCESS item and is routed to [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md), not duplicated here.
 >
@@ -76,7 +78,59 @@
   - **▸ (MAJOR, REDESIGN NEEDED) host-path exposure in project reports — D-11/R-TUI-078 WITHDRAWN at the batch-62 merge gate (operator ruling 2026-07-26).** batch-62 implemented redaction on `issue.message`, and **three revisions of a shape-inference redactor produced three integrity defects**: it ate URLs (`http://vendor.example/spec` → `httspec`); it consumed to end-of-string on an unclosed quote, deleting a diagnostic's failing address and byte values; and finally it mangled quoted **symbol names**, because every `ValidationIssue` template in `s19_app/validation/` embeds a file-derived symbol in single quotes (`f"MAC symbol '{name}' address 0x…"`) and a path-shaped symbol is indistinguishable from a path — producing ONE report line stating TWO identities for the same symbol. Reverted; `flow_report_service` keeps main's batch-60 redactor untouched. **The correct construction, named so the next attempt does not repeat this:** substitute **KNOWN roots** (`Path.home()`, project root, temp root) by literal replacement — the technique `tests/conftest.py::canonical_report_bytes` already uses — plus at most a conservative whitespace-bounded catch-all. It guesses nothing and deletes nothing, and it covers spaced usernames BETTER than any pattern because the space is part of `Path.home()`. **Acceptance criterion to carry with it (the strongest available here):** *symbol identity is consistent across every field of one report* — for any issue carrying a `symbol`, the value inside `message` must equal the value at `symbol=` and in the Modifications/Checklist row. Black-box, needs no knowledge of the redactor, and fails on a shape-inference implementation.
   - **▸ (superseded by the bullet above — kept one release for lineage)** the batch-62 D-11 "partial fold" bullet said `_redact_absolute_paths` **is** applied to `issue.message` and framed the Mode-B divergence as an accepted ruling. **That is no longer true**: D-11 was withdrawn at the merge gate (Inc-8) and NOTHING in a project report is redacted. Superseded rather than deleted so the reversal is traceable; the live statement is the redesign carry above.
 
-### 🆕 batch-75 CHARTER — split out of batch-74 by operator decision at the iteration cap (2026-07-31)
+### 🔵 batch-75 — SPEC LANDED, IMPLEMENTATION OWED (2026-07-31, PR pending)
+
+> **batch-75 shipped its SPEC ONLY, by operator ruling mid-batch** ("solo enmiendas, para antes de
+> Inc-1"). Phases 0→2 are complete and re-gated; **Inc-0…Inc-3 are NOT implemented.** The spec is
+> `R-TUI-102` / `HLR-108`/`109`/`110` in `.dev-flow/2026-07-31-batch-75/01-requirements.md` **revision 2**.
+> A fresh session implements it with a full context window — this area hit the 3-iteration cap in b63 and
+> b74 partly by running out of room mid-increment.
+>
+> **What the spec already settles, so the implementing batch does not re-derive it:**
+> - **F4 CONFIRMED and sharper than chartered.** Exactly **1** `.fits` gate (`_hexdump_section`'s block
+>   loop) vs **2** `.consume` sites. `emit()` accounts and never gates — **and neither does
+>   `_hexdump_section`'s `put()`** (`:1748-1750`, consumes unconditionally; **5 ungated sites**,
+>   ≈178 B/variant). The charter's own framing missed the second one.
+> - **Re-derived floor: `2,097,152 + V × 311,625` B** → **1.15× / 2.49× / 15.86×** at `V = 1/10/100`. The
+>   charter's `315,912` and `2.51×`/`16.06×` run ~1.4% high. **Use the re-derived numbers.**
+> - 🆕 **`md_safe(limit=N)` bounds INPUT characters, not emitted bytes — measured 2.03× expansion.** Every
+>   per-cell cap in the module is input-shaped; any byte arithmetic from `REPORT_CELL_CHARS` is wrong by
+>   up to 2.03×. **Not in the charter.**
+> - 🆕 **`md_code` refuses truncation deliberately** (a cap would be machine-dependent and poison
+>   goldens), so capping the `#### Checklist:` heading is **FORECLOSED**.
+> - **OPERATOR RULING (F7 fairness):** the design uses a **per-variant byte reservation**, not first-fit.
+>   An attacker controlling content controls emission order; an early 311,625 B variant blanks variants
+>   8–100. `AT-254` is the acceptance.
+> - **Structural lines per check file are 6/7/8 by ARM, never a flat 7** — the charter's 7 and my own
+>   Phase-0 7 were both incomplete.
+>
+> ⚠ **Two premises came out FALSE from INSIDE batch-75** (not from the backlog): the Phase-1 architect
+> lane's *"the D2 `Length` defect is wire-reachable"* (**FALSE** — `end − start == len(encoded_bytes)`
+> on both wire paths, ≤ `MF_RUN_LENGTH_CEILING` → **7 decimal digits vs a 4300 limit**; D2 is
+> constructor-domain hardening) and my own revision-1 `LLR-102.4` exemption. **Treat every lane's output
+> as a starting point, exactly as the charter says to treat itself.**
+>
+> ⚠ **ID NAMESPACE TRAP, cost a Phase-2 blocker.** `HLR`/`LLR` are a **separate counter** from `R-TUI-`.
+> `HLR-102`/`LLR-102.x` are **live** (batch-63, cited at `report_service.py:608`/`:622`). True high-water
+> = **`HLR-107`/`LLR-107`**. **Derive every id namespace the batch will write, not only the one the
+> charter names.**
+
+  - **▸ (P0 — batch-75 IMPLEMENTATION) implement `R-TUI-102` revision 2: Inc-0…Inc-3.** Inc-0 pre-flight
+    golden · Inc-1 `emit`+`put` gating, per-variant reservation, aggregated disclosure, round-robin
+    appendix, derived allowance (`AT-250`…`AT-256`, `TC-552`…`TC-561`) · Inc-2 `_format_length` + both
+    call sites (`AT-257`…`AT-259`, `TC-562`…`TC-569`) · Inc-3 error re-attribution (`AT-260`…`AT-263`,
+    `TC-570`…`TC-572`). **Ids `AT-250`…`AT-279` / `TC-552`…`TC-599` are RESERVED and partly consumed by
+    the spec — take the rest from there, and re-derive the HLR/LLR high-water before adding any.**
+    Three premises carried as `assumed — verify at Inc-1`: **P-16** can the preamble be refused (if TRUE,
+    `HLR-108`'s V-invariance clause must be restated — a requirement-strength change, surface it at the
+    gate) · **P-17** does the appendix cap drift a golden · **P-25** does the reservation floor starve a
+    legitimate single-variant report.
+  - **▸ (P2, NEW — found at batch-75 Phase 2, out of scope there) a non-integer `context_bytes` makes the
+    Generate button do NOTHING.** `screens.py:1717-1719` logs and returns with no status, no toast, dialog
+    still open — where an out-of-**domain** integer produces a clear `Report rejected:` line. Asymmetric
+    and silent.
+
+### 🗒 batch-75 CHARTER (original, superseded by the block above — kept for lineage)
 
 > **Why this block exists.** batch-74 was re-scoped at the 3-iteration cap to **OB-4 + the `Address`
 > cell**, and **F4 + D2 were split out**. A split is only honest if the measurements survive it —
@@ -92,7 +146,8 @@
   - **▸ (MAJOR — batch-75, D2) the inline `Length` cell + the `app.py` error re-attribution.** ⚠ **There is no `_format_length` symbol** — an earlier draft of this charter named one (0 hits in the package, caught at the PR gate). The site is the inline expression `{entry.address_end - entry.address_start}` inside `_modifications_lines` and `_checklist_lines`; whoever takes D2 must CREATE the formatter, not find it. Full statement, and the **correction to its headline**, in the D2 bullet above. Carry these three, all executed: (1) the boundary literal is **not stable** — under `-X int_max_str_digits=1000` it moves from 3572 to 831 — so an acceptance must derive the width from `sys.get_int_max_str_digits()`, never hard-code it; (2) a bare-hex fallback is **forgeable as a decimal numeral**, so the predicate must be `^-?0x[0-9A-F]+$` — and **regex membership is the wrong shape**: `f"0x{abs(n):X}"` renders a positive token for a negative length and satisfies it, and `lambda n: "0"` passes too, so it must be **token EQUALITY against an independently derived string**; (3) the two sites take **disjoint inputs** (`change_summaries[].entries` vs `check_results[].entries`), so one AT cannot bind both. **The `app.py` half is CERTIFIED CLEAN to re-route** — batch-74's architect lane executed the sweep: the only `raise ValueError` in `variant_execution_service.py` is `:650` (unreachable — `app.py:4127` passes the constant), every `ValueError` in `report_service.py` is inside `ReportOptions.__post_init__`, and malformed operator files are **collected** as `ValidationIssue`s, never raised. **No legitimate operator-input `ValueError` is re-routed by the fix.** Bonus already identified: it also fixes the `:4144` tuple-unpack arity error currently surfacing as "Report rejected".
   - **▸ (MAJOR — batch-75 or later) `_applied_regions` (`report_service.py:1288`) is a THIRD unbounded producer.** Peak **16,128 → 160,992 B** at `N = 2000 → 4000`. Fenced out of batch-74 explicitly; it is why a whole-report residency acceptance was **unsatisfiable** there (**P-23**) and would be unsatisfiable in batch-75 too until this is bounded.
   - **▸ (P2 — batch-75 hygiene) truncation notices do not reach `## Truncation appendix`.** `R-TUI-101`'s two new emitters take the count from 3 to **4**, following `_declaration_error_lines`' inline-only convention. Either route all four to the appendix or state in the requirement that the appendix is not the notices' sink.
-  - **▸ (P3 — wording carve-outs OWED to `R-TUI-101`, found by implementing, not by review.** (1) `LLR-105.5`'s *"the total"* is ambiguous — kept total or pre-filter population? Resolved **in code** as the **kept** total, for consistency with `LLR-105.4′`. (2) `LLR-105.7`'s set-inclusion is **literally false for `values=None`** — `"-"` is in none of the three sets; it needs a non-`None` carve-out. (3) `LLR-106.3`'s derivation contains an **undefined term** — *"len(cue at the maximum elided count)"* never says what that count is; batch-74 defined it as `READ_SIZE_CAP_BYTES − REPORT_ADDRESS_HEX_DIGITS`. (4) `LLR-105.2` mandates a per-check-file notice but never says **whose numbers** it carries; batch-74 ruled per-file. Fold these into the requirement text when this area is next open.
+  - **▸ (P3 — wording carve-outs OWED to `R-TUI-101`) — ⚠️ EXPLICITLY STILL OPEN after batch-75, and said openly rather than quietly dropped.** batch-75 was ruled **spec-only** by the operator and **never edited `REQUIREMENTS.md`**, which is where all four carve-outs live — so there was no honest opportunity to fold them. They are **not** discharged. The batch that implements `R-TUI-102` touches `REQUIREMENTS.md` in all three increments and **is the right place to fold them**. *(Charter non-negotiable #8 required these be discharged **or** declared open; this is the declaration.)* Original text follows.
+    **▸ (P3 — wording carve-outs OWED to `R-TUI-101`, found by implementing, not by review.** (1) `LLR-105.5`'s *"the total"* is ambiguous — kept total or pre-filter population? Resolved **in code** as the **kept** total, for consistency with `LLR-105.4′`. (2) `LLR-105.7`'s set-inclusion is **literally false for `values=None`** — `"-"` is in none of the three sets; it needs a non-`None` carve-out. (3) `LLR-106.3`'s derivation contains an **undefined term** — *"len(cue at the maximum elided count)"* never says what that count is; batch-74 defined it as `READ_SIZE_CAP_BYTES − REPORT_ADDRESS_HEX_DIGITS`. (4) `LLR-105.2` mandates a per-check-file notice but never says **whose numbers** it carries; batch-74 ruled per-file. Fold these into the requirement text when this area is next open.
 
 ### Residuals OWED by `R-TUI-098` — the requirement states them; they are tracked here
 
