@@ -17,7 +17,8 @@
     "method": "grep -rhoE 'AT-[0-9]{3}' / 'TC-[0-9]{3}' over REQUIREMENTS.md + tests/ + .dev-flow/ (*.py/*.md), executed 2026-07-31.",
     "measured": "prior max AT-219, TC-520 (both batch-72).",
     "allocated": "AT-220.. and TC-521.. - assign within the block at Phase 1. RE-RUN the census at Phase 3: batch-73 may run in parallel and consume ids.",
-    "concurrency_note": "state.json is last-writer-wins with no owner field - re-read it immediately before any edit. Verified immediately before claiming it for batch-74: it still read batch_id=2026-07-30-batch-72, current_phase=6/approved, merged.pr=166, obsidian_synced=true, i.e. fully closed and unowned. PR #168 (which the launch prompt named as the state.json owner) is MERGED as 37f2a4b."
+    "concurrency_note": "state.json is last-writer-wins with no owner field - re-read it immediately before any edit. Verified immediately before claiming it for batch-74: it still read batch_id=2026-07-30-batch-72, current_phase=6/approved, merged.pr=166, obsidian_synced=true, i.e. fully closed and unowned. PR #168 (which the launch prompt named as the state.json owner) is MERGED as 37f2a4b.",
+    "collision_2026_07_31": "THIRD ID COLLISION IN THIS REPO (after 64->65 and 66->67), caught by the Phase-3 census re-run the plan mandates. batch-73 (branch claude/batch-73-linkage-fix-0372a0, now live) consumed AT-219..AT-223 and TC-520..TC-524 - EXACTLY the AT-220../TC-521.. block batch-74 had allocated at Phase 0. RESOLVED by renumbering batch-74's LIVE set to a clearly-disjoint block rather than shifting by four: AT-240..AT-249 and TC-540..TC-551. Renumber applied in DESCENDING order so a new id never collided with a not-yet-moved old one. Historical narrative in 01-requirements.md sections 0/2.7/5.2 still refers to superseded numbering ON PURPOSE - it records what revisions 1 and 2 said. File-disjointness re-verified at the same time: batch-73 touches changes/apply.py + tests/test_linkage_soundness.py + REQUIREMENTS.md + BACKLOG-CODE.md; ZERO overlap with report_service.py or tests/test_report*. The two shared files (REQUIREMENTS.md, BACKLOG-CODE.md) are close-time edits - whoever closes second rebases."
   },
   "premise_result": {
     "summary": "17 premises extracted from the inherited plan and executed against disk at d81cb3d. 16 TRUE, 1 FALSE, 0 UNDECIDABLE. Full table: .dev-flow/2026-07-31-batch-74/00-measurements.md section 1.",
@@ -25,8 +26,8 @@
     "P15_TRUE_WITH_ADAPTATION": "batch-65's _addendum_lines shape transfers in three of its four mechanisms (admission counters with the cap applied AT admission; traversal NOT terminated on saturation so the notice can state a true dropped count; one truncation notice naming what was cut). The fourth - format only AFTER the membership test - has NO analogue: the addendum has a region-membership discriminator and these two producers have none, since every entry is a row by definition.",
     "P6_TRUE": "The plan's load-bearing design constraint is confirmed at the source: emit() (:2215-2217) calls budget.consume(...) only - it ACCOUNTS, NEVER GATES. The sole budget.fits(...) gate is _hexdump_section:1455. So emit(_modifications_lines(...)) at :2243 has fully materialised the producer before consume is reached, and charging these tables to _ByteBudget would close F4 while leaving OB-4 completely untouched."
   },
-  "current_phase": 2,
-  "phase_status": "approved",
+  "current_phase": 3,
+  "phase_status": "in-progress",
   "iterations_per_phase": {
     "0": 0,
     "1": 3,
@@ -102,6 +103,18 @@
       "date": "2026-07-31",
       "decision": "Phase-2 gate APPROVED (self-approved under the kickoff grant) on revision 3 + the re-gate fold",
       "notes": "Focused re-gate returned APPROVE conditional on two mandatory folds, both section-5 edits with numbers already supplied and needing no new measurement; all five findings folded. F-1 added AT-229, the Address RESIDENCY gate: AT-226 constrains only the emitted token, so a format-then-slice implementation satisfies all three of its conjuncts while peaking at the full 268MB rendering (measured 9.996 vs 1.000 for the arithmetic form). The section-5.2 vacuity register had recorded 'an Address bound with no form change' but NOT the symmetric hole, 'a form change with no residency gate'. F-2 made REPORT_ADDRESS_CHARS derived TOP-DOWN from REPORT_ADDRESS_HEX_DIGITS - deriving it bottom-up from the golden census would have put it near 10-32 and made AT-226 RED after a correct implementation, i.e. N-1 reproduced on the newest requirement. F-3/F-4/F-5 folded: elided-count correctness incl. the leading-zero case, the Address cue must avoid '.' (in MD_ESCAPE), and TC-521..532 named individually instead of by range. Exit axes: Coverage MET (every LLR gated, every AT/TC owned by exactly one increment, no orphan); Certainty MET (every AT green-on-correct and red-on-a-named-mutation, with the circular-predicate trap called out for AT-222/226); Evidence MET (every number executed). Advance to Phase 3."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "AUTONOMOUS: renumbered batch-74's live AT/TC set to AT-240..249 / TC-540..551 after detecting a THIRD id collision",
+      "notes": "The Phase-3 ID census re-run (mandated by the plan precisely because two prior collisions happened) found batch-73 had gone live and consumed AT-220..223 + TC-521..524, the exact block batch-74 allocated at Phase 0. Chose a clearly-disjoint block over a +4 shift: a shift risks off-by-one collisions during the rewrite and makes historical vs live references visually indistinguishable. Applied descending so no intermediate collision occurred. File-disjointness re-confirmed: zero overlap."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "Inc-0 COMPLETE - AT-247's byte-identity golden captured from the SHIPPED producer",
+      "notes": "Commit touches ONLY tests/goldens/batch74/, making the C-12 ordering auditable via 'git log --diff-filter=A -- tests/goldens/batch74/' preceding the first report_service.py commit - prose cannot enforce that once the file is in the tree, but the commit graph can. Fixture covers BOTH producers (2 variants x (1 change summary + 1 check result)): 10 Modifications rows + 8 Checklist rows, all under-cap, in-domain, sub-width (widest byte cell 11 chars). 3920 bytes, no host path. STORED BLOB verified LF-only via git cat-file (not the working file) per the repo's known autocrlf evidence-corruption trap; tests/goldens/** carries 'text eol=lf'."
     }
   ],
   "obsidian_synced": false,
