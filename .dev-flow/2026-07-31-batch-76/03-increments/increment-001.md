@@ -113,8 +113,27 @@ exit 0
 increment's new nodes — so no existing node was silently deleted, renamed, or skipped to get green.
 Snapshots unchanged at 29, which is the expected result for a batch that touches no TUI file.
 
-*(Wall-clock is inflated because two suite runs were contending; the run itself is complete and its
-summary line is read from its own output, never stitched across partial runs.)*
+**Run TWICE, and the second run is the one that counts — a self-caught process defect.**
+
+| run | result | trustworthy? |
+|---|---|---|
+| run A | `2455 passed … exit 0` in 1615.78 s | ⚠️ **CONTAMINATED — do not cite** |
+| run B | `2455 passed … exit 0` in 1673.95 s | ✅ **the evidence** |
+
+⚠️ **Run A was launched BEFORE the counterfactual matrix was re-executed, so the mutation harness
+was writing to `report_service.py` while that suite was reading the same tree.** C-40 is explicit
+that a mutation must be run "where no other session is reading … never a tree a concurrent review is
+measuring", and I violated it against my own gate run. Run B was launched after the last mutation
+and is uncontaminated; the source hash was verified at `d13b43e1…4d2a` (the pre-mutation value)
+before and after.
+
+The two runs agree exactly, which is reassuring but is **not** what makes run B admissible — a
+contaminated run that happens to agree is still contaminated. Agreement is corroboration; provenance
+is the reason. Recorded here rather than quietly citing the number, because a green suite whose
+tree was being mutated underneath it is precisely the kind of evidence this project has been burned
+by before.
+
+*(Wall-clock on both is inflated because the two runs contended.)*
 
 ### 4.3 Premises executed at the open
 
