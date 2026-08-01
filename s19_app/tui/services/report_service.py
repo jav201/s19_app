@@ -279,6 +279,26 @@ REPORT_ADDRESS_HEX_DIGITS = 16
 #: ``…`` (U+2026) is precedented by ``markdown_safety.TRUNCATION_MARKER``.
 REPORT_ADDRESS_TRUNCATION_CUE_FMT = " … (+{dropped} more hex digits)"
 
+#: Hex digits kept in a shortened ``Length`` cell (batch-76, LLR-109.4).
+#:
+#: **REUSED from :data:`REPORT_ADDRESS_HEX_DIGITS`, never a fourth policy
+#: number.** The two cells sit side by side in the same row and are read
+#: together; independent widths would make one look truncated relative to the
+#: other for reasons that have nothing to do with the data.
+REPORT_LENGTH_HEX_DIGITS = REPORT_ADDRESS_HEX_DIGITS
+
+#: Integer-safe rational over-approximation of ``log10(2)`` (batch-76,
+#: LLR-109.2), used to bound a value's DECIMAL width from ``bit_length()``
+#: without ever rendering it.
+#:
+#: ⚠ **It must over-estimate, never under-estimate.** The bound decides whether
+#: ``str(value)`` is safe to evaluate at all, so an under-estimate would admit
+#: the very ``ValueError`` this exists to prevent. ``30103/100000`` is
+#: ``log10(2) = 0.301029995…`` rounded UP at the fifth decimal, and the ``+ 1``
+#: in :func:`_decimal_width_upper_bound` absorbs the truncating floor division.
+_LOG10_2_NUMERATOR = 30103
+_LOG10_2_DENOMINATOR = 100_000
+
 #: The largest elided-digit count the cue can ever state — the widest the cue's
 #: decimal field can grow (batch-74, LLR-106.3).
 #:
@@ -1207,6 +1227,106 @@ def _format_address(value: int) -> str:
     )
 
 
+def _decimal_width_upper_bound(value: int) -> int:
+    """
+    Summary:
+        An UPPER bound on ``len(str(value))``'s digit count, computed from
+        ``bit_length()`` alone (batch-76, LLR-109.2) — never by rendering the
+        value.
+
+    Args:
+        value (int): Any integer, of any width. The sign is ignored; the bound
+            covers digits only.
+
+    Returns:
+        int: A digit count that is never smaller than the true one.
+
+    Data Flow:
+        - ``bit_length()`` is O(1) (a limb count, not a scan), so this is cheap
+          at every magnitude — which is the point: the check has to be safe to
+          run on a value that ``str()`` would refuse to render.
+        - The bound is deliberately loose. A tight bound would need the decimal
+          expansion, and producing that expansion is exactly the operation being
+          guarded.
+
+    Dependencies:
+        Used by:
+            - _format_length
+
+    Example:
+        >>> _decimal_width_upper_bound(999)
+        4
+    """
+    bits = value.bit_length()
+    if bits == 0:
+        return 1
+    return (bits * _LOG10_2_NUMERATOR) // _LOG10_2_DENOMINATOR + 1
+
+
+def _format_length(value: int) -> str:
+    """
+    Summary:
+        Render one ``Length`` cell (batch-76, HLR-109 / LLR-109.1-109.3). A
+        value CPython can render decimally is emitted unchanged; one it cannot
+        is emitted as a bounded hex token carrying its sign and stating how many
+        hex digits were elided.
+
+    Args:
+        value (int): ``address_end - address_start``. Unbounded in the
+            CONSTRUCTOR domain — ``ChangeSummaryEntry`` / ``CheckRunEntry`` hold
+            independent endpoints and have no ``__post_init__`` validation.
+
+    Returns:
+        str: e.g. ``"4"``, ``"-12"``, or
+        ``"0xFFFFFFFFFFFFFFFF … (+1284 more hex digits)"``.
+
+    Data Flow:
+        - **In-domain renders DECIMAL, byte-identically to the shipped cell.**
+          This is not a style choice: ``AT-256`` pins the whole under-cap
+          document against a golden captured from the shipped producer, and that
+          golden carries ``| 1 |``, ``| 2 |``. Rendering hex in-domain — the way
+          :func:`_format_address` does, because ADDRESSES are hex in the shipped
+          output — would drift every Length cell in the repository.
+        - The domain test is an arithmetic upper bound vs
+          ``sys.get_int_max_str_digits()`` read **at call time**, so a host or a
+          test that moves the limit moves this with it. ``0`` means the limit is
+          disabled, hence always in-domain.
+        - ``str(value)`` is **never evaluated on the untested path** — that call
+          IS the ``ValueError``. Capping the rendered width instead ("format
+          then slice") does not help: the int->str conversion happens before the
+          slice, so it raises first. Measured, and it is why ``TC-568`` exists.
+        - The kept digits come from a SHIFT, never from formatting and slicing,
+          so residency stays independent of the value's size — the same
+          arithmetic :func:`_format_address` uses.
+
+    Dependencies:
+        Uses:
+            - REPORT_LENGTH_HEX_DIGITS / REPORT_ADDRESS_TRUNCATION_CUE_FMT
+            - _decimal_width_upper_bound
+        Used by:
+            - _modifications_lines / _checklist_lines
+
+    Example:
+        >>> _format_length(4)
+        '4'
+    """
+    limit = sys.get_int_max_str_digits()
+    if limit == 0 or _decimal_width_upper_bound(value) <= limit:
+        return str(value)
+    # Past here the decimal form is unrenderable, so nothing below may touch it.
+    magnitude = -value if value < 0 else value
+    sign = "-" if value < 0 else ""
+    total = (magnitude.bit_length() + 3) // 4
+    kept = REPORT_LENGTH_HEX_DIGITS
+    if total <= kept:
+        return f"{sign}0x{magnitude:0{kept}X}"
+    leading = magnitude >> (4 * (total - kept))
+    return (
+        f"{sign}0x{leading:0{kept}X}"
+        + REPORT_ADDRESS_TRUNCATION_CUE_FMT.format(dropped=total - kept)
+    )
+
+
 def _report_filename(reports_dir: Path, timestamp: datetime) -> str:
     """
     Summary:
@@ -1758,7 +1878,7 @@ def _modifications_lines(
             )
             rows.append(
                 f"| {_format_address(entry.address_start)} "
-                f"| {entry.address_end - entry.address_start} "
+                f"| {_format_length(entry.address_end - entry.address_start)} "
                 f"| {_format_bytes(entry.before_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {_format_bytes(entry.after_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {md_safe(entry.linkage, limit=REPORT_CELL_CHARS)} "
@@ -1984,7 +2104,7 @@ def _checklist_lines(
             admitted += 1
             rows.append(
                 f"| {_format_address(entry.address_start)} "
-                f"| {entry.address_end - entry.address_start} "
+                f"| {_format_length(entry.address_end - entry.address_start)} "
                 f"| {_format_bytes(entry.expected_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {_format_bytes(entry.actual_bytes, max_bytes=REPORT_BYTES_PER_CELL)} "
                 f"| {md_safe(entry.result, limit=REPORT_CELL_CHARS)} |"
