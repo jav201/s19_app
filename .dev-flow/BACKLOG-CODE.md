@@ -43,6 +43,25 @@
 
 ---
 
+## 🔵 batch-77 — IN FLIGHT (2026-08-01) — Memory Map redesign, Variant A
+
+> **Registered at Phase 0.** Charter INPUT: `prototypes/memmap_variant_a.HANDOFF.md` (operator-approved 2026-08-01, Variant A + the cross-cutting fixes). Branch `claude/batch-77-memmap-variant-a`, cut off `origin/main` @ **`f8747b8`**, RC-1 PASS. Plan: `.dev-flow/2026-08-01-batch-77/PLAN.md`; measurements: `00-measurements.md`.
+>
+> **Phase-0 premise evaluation: 15 evaluated — 9 TRUE, 4 FALSE, 1 IMPRECISE, 1 NEW defect found.** The charter's engineering direction survived execution; its **acceptance layer** did not — this project's dominant defect class arriving exactly where the charter itself warned it would.
+>
+> - ❌ **The charter's draft acceptance #1 is VACUOUS.** *"every region ≥1 visible bar column"* measures **TRUE on the pre-change tree**: `screens_directionb.py:2066` floors every run at `max(1, …)`. Invariant under the change it gates (**C-40 limb 1**). Replaced by **width monotonicity**, which IS red today because all five widths are equal.
+> - ❌ **S-2 cites `LLR-072.3` — an id with ZERO definitions in `REQUIREMENTS.md`.** The clause is `R-TUI-072` (`:4787`), guarded by the **live, passing** `AT-072b` asserting *exactly 5 ticks*. S-2 therefore **invalidates a shipped acceptance**, not a sentence. ⚠️ The id **is** cited at `tests/test_tui_map_big.py:118` — a **dangling reference**, and the charter's source for it. (`LLR-*` is **not** registry-covered — operator scoping ruling 2026-07-31.)
+> - 🆕 **NEW, uncharted: the band bar OVERFLOWS its own budget — 64 columns against `_BAND_BAR_WIDTH = 60`**, because all 9 segments independently floor at `max(1, …)`. Identical at 80×24 and 120×30. **Folded into US-77-1** rather than carried (D-2): it is the same expression that story rewrites.
+> - ✅ The charter's headline reproduces **exactly**: 5 regions, **1 030 B** mapped, **128.0 MiB** span, **59** gap-hatch columns. Its *"1-column sliver"* wording is imprecise — measured `[1,1,1,1,1]` = 5 columns, one per region. **The defect is non-discrimination** (256/256/256/200/62 B all render at 1 col), **not invisibility**.
+>
+> ⚠️ **Blast radius centres on `tests/test_tui_map_big.py`** — it hosts `AT-072a`, `AT-072b`, `AT-073`, `AT-074` **and** both `query(RegionRow)` sites. **C-26 reverse-grep** of every touched symbol (`RegionRow`, `.map-band-seg`, `.map-ruler-tick`, `.map-legend-row`, `#map_stats_body`) across all of `tests/` before any increment lands.
+
+  - **▸ (P1 — IN FLIGHT) Memory Map Variant A: `US-77-1`…`US-77-7`.** Gap-fold band bar (widths ∝ **mapped** bytes, gaps folded to fixed markers, bar bounded by its column budget; a dense no-gap image renders **byte-identical to today** as the control) · edge-labeled ruler · dual mapped/span stats with a humanized largest gap · legend demotion to the existing `k` LegendScreen · keyboard path (rows focusable, ↑↓/j/k, `Enter` inspect, `o` hex) · auto-select first region · selection styling. **`R-TUI-072` needs a §6.5 Before/After amendment + a re-derived `AT-072b`.**
+  - **▸ (P3, NEW — deferred from batch-77 Phase 0, decision D-4) `US-77-8` — log-scale microbar denominator + column-aligned region rows**, the two ideas ported from Variant C. Ruled **OUT of batch-77**: no measured defect motivates either, the charter explicitly forbids silent absorption, and the batch already carries 7 stories. **Registered, not dropped** — reversible on operator request.
+  - **▸ (P3, NEW — batch-77 Phase 0) Variant B (two-lane map) is a backlog CANDIDATE, not scheduled.** Evaluated and not chosen in the design session; the charter fences it out of this batch explicitly. Its own batch if the operator ever wants it.
+
+---
+
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct}
 
