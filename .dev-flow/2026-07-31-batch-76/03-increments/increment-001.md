@@ -100,6 +100,22 @@ one variant's hexdump, so an ungated `put` overshoots by a *bounded* amount per 
 a shrunken limit the ~47 kB allowance dwarfs the limit, so the overshoot hides inside the ceiling's
 own slack. Both reasons were found by the mutation staying green, not by reading the code.
 
+### 4.4 Full gate suite — the ONE complete run, evidence read from its own output (C-19/C-25)
+
+```
+2455 passed, 2 skipped, 21 deselected, 3 xfailed in 1615.78s
+29 snapshots passed.
+exit 0
+```
+
+**Test ledger reconciles exactly:** `post = base - D + A` = **2428 - 0 + 27 = 2455**. The baseline
+2428 is the figure recorded at the AT/TC-registry Lane-A close, and the +27 is exactly this
+increment's new nodes — so no existing node was silently deleted, renamed, or skipped to get green.
+Snapshots unchanged at 29, which is the expected result for a batch that touches no TUI file.
+
+*(Wall-clock is inflated because two suite runs were contending; the run itself is complete and its
+summary line is read from its own output, never stitched across partial runs.)*
+
 ### 4.3 Premises executed at the open
 
 | # | Verdict | Evidence |
@@ -134,7 +150,7 @@ the bound is invisible where it does not fire.
 - `TC-561`'s per-arm structural-line count (**7 / 6 / 8 / 7**) is **not** implemented; the shipped
   `TC-561` asserts the disclosure block's `O(1)` line count instead. **Declared, not silently
   dropped.**
-- The full gate suite result is recorded at §4 once the background run completes.
+- ~~The full gate suite result is recorded at §4 once the background run completes.~~ **DONE — see §4.4.**
 
 ---
 
