@@ -76,6 +76,12 @@ class Mutation:
     replacement: str
     nodes: Tuple[str, ...]
     claim: str
+    #: How many resolved arms these ``nodes`` MUST expand to. Asserted, because
+    #: without it "every arm reddened" counts only the arms that happened to run:
+    #: a parametrization silently shrunk from 7 arms to 1 would still print
+    #: ``ALL RED``, and the headline "21/21" would be unguarded prose. The whole
+    #: point of this file is that an arm count is evidence, so it is pinned.
+    expected_arms: int = 0
     #: A substitution for the SAME anchor that raises when the region executes,
     #: written to be syntactically valid in this anchor's position — a statement
     #: for a statement anchor, a raising expression for an expression anchor.
@@ -123,6 +129,27 @@ def _run(tree: Path, nodes: Sequence[str]) -> Dict[str, str]:
     return outcomes
 
 
+def _encode_for(source: bytes, text: str) -> bytes:
+    """Encode ``text`` with the newline convention ``source`` actually uses.
+
+    ⚠ **This is what makes the harness work on a fresh checkout at all.** This
+    repo has ``core.autocrlf=true``, so ``git worktree add`` materialises CRLF
+    files while an author's working copy may be LF. Anchors are written LF, so on
+    a genuine throwaway worktree every multiline anchor matched **0 times** and
+    the run aborted on the first mutation — meaning the documented procedure in
+    this module's own docstring could not reproduce the matrix it produced.
+    Found by an independent reviewer executing that procedure, not by the author.
+
+    Matching is newline-agnostic rather than newline-normalising: the file is
+    never rewritten into a different convention, so the byte-exact restore still
+    holds on both.
+    """
+    encoded = text.encode("utf-8")
+    if b"\r\n" in source and b"\r\n" not in encoded:
+        return encoded.replace(b"\n", b"\r\n")
+    return encoded
+
+
 def _substitute(target: Path, anchor: str, replacement: str) -> bytes:
     """Apply one substitution; abort unless the anchor matches EXACTLY once.
 
@@ -133,20 +160,16 @@ def _substitute(target: Path, anchor: str, replacement: str) -> bytes:
     that very check rather than by review.
     """
     source = target.read_bytes()
-    encoded = anchor.encode("utf-8")
+    encoded = _encode_for(source, anchor)
     count = source.count(encoded)
     if count != 1:
-        # An anchor whose newlines do not match the file's is a 0-match, and
-        # reporting it as "not found" alone would send the reader hunting for a
-        # typo, so say which it is.
-        crlf = source.count(encoded.replace(b"\n", b"\r\n"))
-        hint = f" (but matches {crlf}x with CRLF newlines)" if crlf else ""
         raise SystemExit(
-            f"ABORT: anchor matched {count} time(s) in {target.name}, expected 1"
-            f"{hint}. A multi-match anchor is how batch-76 mutated _format_address "
-            f"while believing it had mutated _format_length.\nanchor: {anchor!r}"
+            f"ABORT: anchor matched {count} time(s) in {target.name}, expected 1 "
+            f"(file uses {'CRLF' if b'\r\n' in source else 'LF'}). A multi-match "
+            f"anchor is how batch-76 mutated _format_address while believing it "
+            f"had mutated _format_length.\nanchor: {anchor!r}"
         )
-    target.write_bytes(source.replace(encoded, replacement.encode("utf-8")))
+    target.write_bytes(source.replace(encoded, _encode_for(source, replacement)))
     return source
 
 
@@ -173,6 +196,14 @@ def evaluate(tree: Path, mutation: Mutation, probe: bool) -> ArmResult:
     """Baseline, then mutate, then optionally probe reachability."""
     result = ArmResult()
     result.baseline = _run(tree, mutation.nodes)
+    if len(result.baseline) != mutation.expected_arms:
+        raise SystemExit(
+            f"ABORT: {mutation.label} resolved {len(result.baseline)} arm(s), "
+            f"expected {mutation.expected_arms}. An arm count is this harness's "
+            f"unit of evidence — a shrunk parametrization must not be able to "
+            f"report 'every arm reddened' over fewer arms.\n"
+            f"resolved: {sorted(result.baseline)}"
+        )
     green = [n for n, o in result.baseline.items() if o != "PASSED"]
     if green:
         raise SystemExit(
@@ -204,6 +235,7 @@ def evaluate(tree: Path, mutation: Mutation, probe: bool) -> ArmResult:
 MUTATIONS: Tuple[Mutation, ...] = (
     Mutation(
         label="M1",
+        expected_arms=7,
         finding="H-1",
         path=_SERVICE,
         anchor=(
@@ -229,6 +261,7 @@ MUTATIONS: Tuple[Mutation, ...] = (
     # nothing in the file could refuse a 1 GB ceiling.
     Mutation(
         label="M2",
+        expected_arms=5,
         finding="H-2",
         path=_SERVICE,
         anchor="    return block + appendix + headings + header",
@@ -241,6 +274,7 @@ MUTATIONS: Tuple[Mutation, ...] = (
     ),
     Mutation(
         label="M5",
+        expected_arms=5,
         finding="H-2",
         path=_SERVICE,
         anchor=(
@@ -268,6 +302,7 @@ MUTATIONS: Tuple[Mutation, ...] = (
     ),
     Mutation(
         label="M6",
+        expected_arms=1,
         finding="H-2",
         path=_SERVICE,
         anchor="    block = (\n        len(\"## Omitted content\") + 2\n        + len(REPORT_SECTION_KINDS) * (row + 1)\n        + 2\n    )",
@@ -278,6 +313,7 @@ MUTATIONS: Tuple[Mutation, ...] = (
     ),
     Mutation(
         label="M3",
+        expected_arms=1,
         finding="H-4",
         path=_SERVICE,
         anchor='            f"bytes {refusals.byte_count.get(kind, 0)}{suffix}"',
@@ -299,6 +335,7 @@ MUTATIONS: Tuple[Mutation, ...] = (
     # reading REPORT_CELL_CHARS as a byte bound WOULD have been sound.
     Mutation(
         label="M4",
+        expected_arms=2,
         finding="H-3",
         path="s19_app/tui/services/markdown_safety.py",
         anchor="    return _escape_leading_block_starter(text) or EMPTY_MARKER",
@@ -352,12 +389,17 @@ def main() -> int:
     args = parser.parse_args()
 
     tree = Path(args.tree).resolve()
-    root = Path(__file__).resolve().parent.parent
-    if tree == root:
+    # A main checkout has `.git` as a DIRECTORY; a linked worktree has it as a
+    # FILE containing a gitdir: pointer. That distinction is the robust guard —
+    # comparing against this file's own parent only protects the checkout the
+    # harness happens to be running FROM, so a copy of this script pointed at the
+    # real tree would sail past it.
+    if (tree / ".git").is_dir() or tree == Path(__file__).resolve().parent.parent:
         raise SystemExit(
-            "ABORT: refusing to mutate the working checkout. Pass a throwaway "
-            "worktree — mutating a tree a gate run is reading is what "
-            "contaminated batch-76's run A."
+            f"ABORT: {tree} is a main checkout, not a throwaway worktree. "
+            f"Refusing to mutate it — mutating a tree a gate run is reading is "
+            f"what contaminated batch-76's run A. Create one with:\n"
+            f"    git worktree add <tmpdir> HEAD --detach"
         )
 
     selected = [m for m in MUTATIONS if args.only in (None, m.label)]

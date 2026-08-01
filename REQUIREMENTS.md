@@ -5611,7 +5611,7 @@ falsified it. `TC-611` pins the 2.03×/4.03× expansion that makes those two qua
   `AT-252`): `test_at250_document_never_exceeds_the_stated_ceiling`,
   `test_at251_ceiling_holds_across_the_variant_count`,
   `test_at252_ceiling_holds_across_the_check_file_count`,
-  `test_tc552_each_ceiling_fixture_actually_overflows_its_own_limit`. Disclosure (`AT-253`):
+  `test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling`. Disclosure (`AT-253`):
   `test_at253_every_drop_is_disclosed_with_its_byte_total`,
   `test_tc560_disclosed_bytes_equal_the_refused_line_bytes`,
   `test_tc561_disclosure_line_count_is_bounded_by_the_closed_label_set`. Fairness (`AT-254`,
@@ -5622,8 +5622,11 @@ falsified it. `TC-611` pins the 2.03×/4.03× expansion that makes those two qua
   `test_tc554_the_census_walk_actually_finds_a_planted_write`,
   `test_tc573_the_hexdump_seam_refuses_when_the_gate_is_exhausted`. Gate behaviour:
   `test_tc557_a_refused_batch_does_not_grow_the_document`, `test_tc558_refusal_does_not_latch`.
-  Derived constants: `test_tc555_allowance_is_recomputed_independently_and_discriminates`,
-  `test_tc556_reservation_floor_covers_a_real_minimal_variant_record`. Appendix (`TC-559`):
+  Derived constants (`TC-555`, `TC-556`, `TC-611`, `TC-612`):
+  `test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations`,
+  `test_tc556_reservation_floor_covers_a_real_minimal_variant_record`,
+  `test_tc611_cell_allowance_must_not_be_derived_from_input_chars`,
+  `test_tc612_allowance_is_driven_by_the_closed_label_set`. Appendix (`TC-559`):
   `test_tc559_appendix_retention_is_round_robin_not_first_come`,
   `test_tc575_appendix_cap_is_inert_below_the_cap`. Regression PINs (`AT-255`, `AT-256`):
   `test_at255_pin_exhausted_report_is_still_usable`,

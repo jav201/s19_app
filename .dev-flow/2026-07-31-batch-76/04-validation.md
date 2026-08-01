@@ -129,7 +129,10 @@ final matrix.
 | G1–G7 guard (`tests/test_id_registry.py`) | **13 passed** |
 | New ids | `TC-611`, `TC-612` — taken from `_meta.next_free`, no letter suffix |
 | `high_water.TC` / `next_free.TC` | 610 → **612** / 611 → **613** |
-| Re-pointed rows | `TC-552`, `TC-555` — renamed nodes, statements updated |
+| Re-pointed rows | `TC-552`, `TC-555` — renamed nodes, statements updated **in `AT-TC-REGISTRY.jsonl`** |
+| Node names re-pointed in `REQUIREMENTS.md`'s `- Validation:` list | ✅ — **but only after the merge gate caught that they were not** (F-1, below) |
+| `TC-611`/`TC-612` added to `REQUIREMENTS.md`'s `- Validation:` list | ✅ — likewise (F-2) |
+| Every `test_*` node cited in `REQUIREMENTS.md` is defined in `tests/` | 15 missing, **all pre-existing**: 17 on the `origin/main` baseline, 17 − 2 = 15 after this fix, i.e. this closure broke exactly 2 and repaired exactly 2 |
 | C-18 (one id → exactly one node) | held; this is why the chartered `TC-555` discriminating arm was split to `TC-612` rather than added as a second node |
 | `EXPECTED_SCANNED_TEST_FILES` | **152**, unchanged — no new test module |
 | Registry diff | 5 insertions / 3 deletions over 1 373 rows; the other 1 368 byte-identical |
@@ -164,5 +167,47 @@ Inc-0 from the **shipped** producer in its own commit (C-12) rather than against
 | 3 | Ledger reconciled against 2482 | ✅ on collection: `2508 − 0 + 11 = 2519`; the +21 explained as the lean-vs-full CI form |
 | 4 | `04-validation.md` + `05-postmortem.md` + `06-docs/` | ✅ this file · ✅ written · ✅ **N/A declared in writing** with output neutrality verified |
 | 5 | Backlog reconciled in the right lane, never duplicated | ✅ CC-1/harness-bytes → `BACKLOG-PROCESS.md`; reservation-floor hardening → `BACKLOG-CODE.md` |
-| 6 | Independent `qa-reviewer` merge-gate pass returns clean | ⏳ next |
+| 6 | Independent `qa-reviewer` merge-gate pass returns clean | round 1 **BLOCK** → fixed → round 2 below |
 | 7 | `/dev-flow-sync` | ⏳ after 6 |
+
+---
+
+## §8 Merge gate — round 1: **BLOCK**, and it was right
+
+The independent pass confirmed **all four HIGH findings CLOSED**, re-derived by execution — including
+an exhaustive attack on H-3's bound (all 1 114 112 code points, plus 200 000 randomised 255-unit
+strings) that found **no counterexample** and confirmed `765` is exactly tight, with `256 × U+4E00`
+emitting 768. It independently reproduced the gate suite (`2514 passed … exit 0`), the ledger, the
+frozen set, C-18 over all 44 ids, and 21/21 arms.
+
+It then blocked on **two HIGH findings introduced by the closure commit itself**. Both were mine.
+
+| # | Finding | Fix |
+|---|---|---|
+| **F-1** | `REQUIREMENTS.md:5614` and `:5625` cite `test_tc552_…_its_own_limit` and `test_tc555_allowance_is_recomputed_independently_and_discriminates` — the two nodes **this closure renamed**. Propagated to the registry, not to the requirement. | node names corrected |
+| **F-2** | `TC-611`/`TC-612` — the two ids minted specifically to close H-2 and H-3 — appear **nowhere** in the `- Validation:` enumeration. Zero requirement-side traceability. | both added, with their ids |
+| **F-3** (MED) | the harness **aborts on a genuine fresh `git worktree`**: `core.autocrlf=true` makes it CRLF, anchors are LF, so M1/M5/M6 matched 0 times. 13 of 21 arms — the entire H-1 evidence — were unreachable by the procedure the harness's own docstring prescribes. | newline-agnostic matching |
+| **F-4** (LOW) | ratio table cited the pre-Option-3 product against the post-Option-3 cap | both refs now stated |
+
+**And `04-validation.md` §5 asserted the propagation was complete.** It was true of the registry and
+false of `REQUIREMENTS.md` — the one artifact a human reads to find a verifier. Corrected above.
+
+**Why no guard caught F-1 or F-2, which is the part worth carrying.** G4
+(`tests/test_id_registry.py:251`) checks that an id **cited** in `REQUIREMENTS.md` is `LIVE`. It matches
+**id tokens** (`TC-611`), never **node names** (`test_tc611_…`), and it cannot detect *under*-citation
+at all. So the registry guard passed, `13/13`, while the requirement was wrong in **both** directions —
+naming two nodes that do not exist and omitting two that do. Registered in `BACKLOG-PROCESS.md`.
+
+**The recursion held to the last.** This batch's thesis is that the defect reproduces inside its own
+fix. The merge-gate closure — whose entire subject is traceability between an id, its node, and its
+charter — shipped with two broken node citations.
+
+### Re-verification after the fixes
+
+| Check | Result |
+|---|---|
+| Cited-but-undefined nodes in `REQUIREMENTS.md` | 17 on `origin/main` → **15** now; this closure broke 2 and repaired 2 |
+| `TC-611`/`TC-612` cited in the `- Validation:` list | ✅ |
+| Harness on a **genuine** fresh worktree (`git worktree add`, CRLF, no `cp`, no normalisation) | ✅ **21/21 arms RED**, exit 0, via the documented procedure |
+| Harness refuses a main checkout (`.git` is a directory) | ✅ aborts with the `git worktree add` remedy |
+| Arm-count assertion, positive-controlled (claim M1 has 3 arms when it has 7) | ✅ aborts — "an arm count is this harness's unit of evidence" |

@@ -70,16 +70,20 @@ path calls cannot change any emitted document, and its only readers use it as th
 raising it purely **loosens** every assertion.
 
 **Design chosen, and the one rejected.** The reviewer offered "compare against an independently
-derived bound". Measured, a per-term-sound independent derivation (4 B/char) runs **2.5–3×** the
-product's value:
+derived bound". Measured, a per-term-sound independent derivation (4 B/char) runs **2–3×** the
+product's value. **Both columns are stated at both refs (C-39), because Option 3 landed inside this
+same increment and a single undated table would go stale the moment it was written** — which is
+exactly what the first draft of this section did:
 
-| V | product | independent cap | ratio |
-|---:|---:|---:|---:|
-| 0 | 47 534 | 145 838 | 3.07 |
-| 100 | 154 334 | 406 238 | 2.63 |
-| 400 | 474 734 | 1 187 438 | 2.50 |
+| V | product **at decision time** (pre-Option-3) | product **on HEAD** (post-Option-3) | independent cap | ratio at decision | ratio on HEAD |
+|---:|---:|---:|---:|---:|---:|
+| 0 | 47 534 | 63 726 | 145 838 | 3.07 | **2.29** |
+| 100 | 154 334 | 195 826 | 406 238 | 2.63 | **2.07** |
+| 400 | 474 734 | 592 126 | 1 187 438 | 2.50 | **2.01** |
 
-Substituting that *as* the ceiling would have **tripled** the bound and weakened all 7 ceiling ATs.
+The decision was taken on the left-hand ratios; the right-hand ones are what a reader re-deriving on
+`fd9124a` will get. The conclusion is unchanged either way — substituting the cap *as* the ceiling
+would still have **doubled to tripled** the bound and weakened all 7 ceiling ATs.
 So `_ceiling` keeps the tight product value and `TC-555` **sandwiches** it:
 
 * **floor** — measured: saturated `_disclosure_lines` (905 B) + measured header (181 B) + `V ×`
