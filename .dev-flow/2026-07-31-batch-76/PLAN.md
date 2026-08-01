@@ -123,10 +123,10 @@ stops it firing on the legitimate work *its own docstring says it exists not to 
 
 | Inc | Scope | Files | Owns | Status |
 |---|---|---|---|---|
-| **Inc-0** | Pre-flight golden capture from the **shipped** producer (C-12) | `tests/goldens/batch76/` | enables `AT-256` | ⏳ |
-| **Inc-1** | `emit` + `put` gating · per-variant reservation · aggregated disclosure · capped round-robin appendix · derived allowance | `report_service.py`, `tests/test_report_document_bound.py` (new), `REQUIREMENTS.md`, `AT-TC-REGISTRY.jsonl`, `tests/test_id_registry.py` | **AT-250…AT-256** · TC-552…TC-561 | ⏳ |
-| **Inc-2** | `_format_length` + both call sites | `report_service.py`, `tests/test_report_length_cell.py` (new), `REQUIREMENTS.md`, `AT-TC-REGISTRY.jsonl` | **AT-257…AT-259** · TC-562…TC-569 | ⏳ |
-| **Inc-3** | Error re-attribution | `app.py`, `tests/test_tui_report_attribution.py` (new), `REQUIREMENTS.md`, `AT-TC-REGISTRY.jsonl` | **AT-260…AT-263** · TC-570…TC-572 | ⏳ |
+| **Inc-0** | Pre-flight golden capture from the **shipped** producer (C-12) | `tests/goldens/batch76/` | enables `AT-256` | ✅ `5f60ffe` |
+| **Inc-1** | `emit` + `put` gating · per-variant reservation · aggregated disclosure · capped round-robin appendix · derived allowance | `report_service.py`, `tests/test_report_document_bound.py` (new), `REQUIREMENTS.md`, `AT-TC-REGISTRY.jsonl`, `tests/test_id_registry.py` | **AT-250…AT-256** · TC-552…TC-561 | ✅ `9ee848d` |
+| **Inc-2** | `_format_length` + both call sites | `report_service.py`, `tests/test_report_length_cell.py` (new), `REQUIREMENTS.md`, `AT-TC-REGISTRY.jsonl` | **AT-257…AT-259** · TC-562…TC-569 | ✅ `0b51409` |
+| **Inc-3** | Error re-attribution | `app.py`, `tests/test_tui_report_attribution.py` (new), `REQUIREMENTS.md`, `AT-TC-REGISTRY.jsonl` | **AT-260…AT-263** · TC-570…TC-572 | ✅ `660c1b0` |
 
 **Ordering is load-bearing and must not be inverted.** Inc-2 precedes Inc-3 because once
 `_format_length` lands, the natural `Length`-driven `ValueError` disappears; Inc-3 must then
@@ -199,6 +199,9 @@ file open) — but if iteration pressure forces a sacrifice, **Inc-2 is the cand
 
 | Gate | Base | −D | +A | Post | Reconciled |
 |---|---|---|---|---|---|
-| baseline `291bb76` | — | — | — | *(to be measured at Inc-0)* | ⏳ |
+| baseline `291bb76` | 2428 | 0 | 0 | 2428 | — |
+| Inc-1 | 2428 | 0 | +27 | 2455 | ✅ exact |
+| Inc-2 | 2455 | 0 | +19 | 2474 | ✅ exact |
+| Inc-3 | 2474 | 0 | +8 | **2482** | ✅ exact — measured 2482 |
 
 `tests/test_id_registry.py` baseline at intake: **13 passed**.

@@ -64,7 +64,9 @@
     "plan": ".dev-flow/2026-07-31-batch-76/PLAN.md",
     "0": ".dev-flow/2026-07-31-batch-76/00-measurements.md",
     "3_inc0": ".dev-flow/2026-07-31-batch-76/03-increments/increment-000.md",
-    "3_inc1": ".dev-flow/2026-07-31-batch-76/03-increments/increment-001.md"
+    "3_inc1": ".dev-flow/2026-07-31-batch-76/03-increments/increment-001.md",
+    "3_inc2": ".dev-flow/2026-07-31-batch-76/03-increments/increment-002.md",
+    "3_inc3": ".dev-flow/2026-07-31-batch-76/03-increments/increment-003.md"
   },
   "decisions_log": [
     {
@@ -102,6 +104,12 @@
       "date": "2026-07-31",
       "decision": "Inc-0 + Inc-1 landed; Inc-2/Inc-3 NOT started",
       "notes": "Three of my own acceptances were INERT on first execution, all the vacuous-FIXTURE class: TC-552 caught two before anything ran (rows=4000 against a 200-row cap), AT-254 asserted only that a ~20 B unconditional heading exists (true under any allocation, so it never tested fairness), and AT-250/252 could not see put ungated because their fixtures had no mem_map. Fixed by re-deriving fixtures from measurement and adding AT-264 and TC-573. Final matrix: 8 mutations, INERT none."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "Inc-2 and Inc-3 landed; all four increments complete",
+      "notes": "The mutation HARNESS failed three times across the batch, each reporting applied=True while proving nothing: an ambiguous anchor hit the wrong function (identical return blocks in _format_address/_format_length); a mutant landed after a return (dead code); a mutant changed the log while the node asserts the status. C-40's existing 'confirm the mutation applied' check passed in all three. Generalisation routed to Lane B: a counterfactual must be shown to move the predicate's DECLARED SUBJECT, not merely to modify the file. Also: AT-262 was folded as an assertion inside AT-260 (coverage-in-parts, forbidden by C-18) and now owns a distinct node."
     }
   ],
   "obsidian_synced": false,
@@ -109,14 +117,18 @@
   "progress": {
     "branch": "claude/batch-76-r-tui-102-impl (pushed)",
     "commits": [
-      "5f60ffe Inc-0 pre-flight golden",
-      "9ee848d Inc-1 HLR-108 document gating"
+      "5f60ffe Inc-0 golden",
+      "9ee848d Inc-1 HLR-108 document gating",
+      "0b51409 Inc-2 HLR-109 _format_length",
+      "660c1b0 Inc-3 HLR-110 error re-attribution"
     ],
     "inc0": "DONE - golden captured from the SHIPPED producer in its own commit (C-12), 7619 B at 0.3633% of cap, deterministic, 63 hexdump lines, 0 short-circuits.",
     "inc1": "CODE + TESTS DONE (27 nodes, all 8 counterfactual mutations RED, source hash restored). REQUIREMENTS.md and the TC-610 amendment are OWED.",
-    "inc2": "NOT STARTED - _format_length at report_service.py:1356 and :1582. D2, re-triaged P3 hardening.",
-    "inc3": "NOT STARTED - error re-attribution at app.py:4155/:4158/:4164. MUST follow Inc-2; the ordering is load-bearing.",
-    "pr": "NOT OPENED - deliberately. The full gate suite had not returned a clean end-to-end result at hand-off, so no green-CI claim is made."
+    "inc2": "DONE - _format_length created (P-6: did not exist) + both sites. 19 nodes, 8 mutations, INERT none. In-domain renders DECIMAL to preserve AT-256 byte-identity; mutation M8 reddens TC-566 AND AT-256 together.",
+    "inc3": "DONE - generation moved outside the except-ValueError span; single shared failure helper. 8 nodes, 5 mutations, INERT none. 42 pre-existing TUI report tests still green.",
+    "pr": "#184 open, NOT merged - Inc-0..Inc-3 all landed but REQUIREMENTS.md and the TC-610 amendment are still owed.",
+    "gate_suite": "2482 passed / 2 skipped / 21 deselected / 3 xfailed, 29 snapshots, exit 0. Ledger reconciles EXACTLY: 2428 + 27 + 19 + 8 = 2482.",
+    "gate_suite_provenance": "CLEAN - no mutation harness ran after this suite was launched (only doc writes and commits). Contrast Inc-1's run A, which was contaminated and is recorded as such."
   },
   "blocking_carry": {
     "id_guard": "THE NEXT STEP, and it blocks the other two. tests/test_id_registry.py::test_tc610 hard-asserts AT-250..279 / TC-552..599 stay RESERVED by batch-75, while G4 requires an id to be LIVE once REQUIREMENTS.md cites it as a verifier. Mutually unsatisfiable. Operator ruled (Q2): amend TC-610 to 'reserved-or-spent-by-its-owner'. Until then the ids MUST stay RESERVED and REQUIREMENTS.md must not cite them.",
