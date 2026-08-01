@@ -45,8 +45,8 @@
     "minted_so_far": "NONE - Phase 0 mints no ids.",
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31). AT-072b is an EXISTING global id being re-derived, not minted - it keeps its number."
   },
-  "current_phase": 0,
-  "phase_status": "awaiting-gate",
+  "current_phase": 2,
+  "phase_status": "in-progress",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -58,7 +58,10 @@
   },
   "artifacts": {
     "plan": ".dev-flow/2026-08-01-batch-77/PLAN.md",
-    "0": ".dev-flow/2026-08-01-batch-77/00-measurements.md"
+    "0": ".dev-flow/2026-08-01-batch-77/00-measurements.md",
+    "1": ".dev-flow/2026-08-01-batch-77/01-requirements.md",
+    "1_architect_lane": ".dev-flow/2026-08-01-batch-77/01-requirements-architect.md",
+    "1_qa_lane": ".dev-flow/2026-08-01-batch-77/01b-qa-validation.md"
   },
   "premise_evaluation_phase0": {
     "evaluated": 15,
@@ -114,6 +117,12 @@
       "date": "2026-08-01",
       "decision": "self-caught probe defect recorded rather than hidden",
       "notes": "My first stats/inspector probe queried #map_stats and #map_detail - CONTAINERS - and got back Blank objects for both. The text lives in #map_stats_body / #map_detail_body. Taken at face value it would have produced a FALSE finding ('stats pane renders nothing'). This is C-32/C-37 landing in my own Phase-0 probe rather than in a test."
+    },
+    {
+      "phase": 1,
+      "date": "2026-08-01",
+      "decision": "Phase 1 APPROVED (self-approved under the kickoff grant) - 01-requirements.md final at 578 lines",
+      "notes": "7 HLR (111-117), 20+ LLR, AT-B77-01..14, TC-B77-01..29, 6 carries, 2 section 6.5 amendments. Zero blockers: all eight raised by the two lanes are closed by operator rulings R1-R6. Exit criteria: Coverage - both traceability chains complete, no orphan. Certainty - every AT demonstrated RED by EXECUTED transcript, every predicate carries its reddening mutation. Evidence - every figure re-derived on this tree. No axis unmet, so approve rather than iterate."
     }
   ],
   "phase1_operator_rulings": {
@@ -122,7 +131,15 @@
     "R1_bar_width": "RECONCILE TO THE REAL CONTAINER, not the constant 60. The batch's central defect: .map-band-bar measures 21 cols at 120x30 and 66 at 80x24 against a 60 budget, so 2 of 5 mapped regions paint entirely outside it and are INVISIBLE. Reddens the live PIN tests/test_map_click_chain.py::test_ac6_clipped_segments_are_a_known_layout_limitation - deleting it is sanctioned by its own docstring, and the retirement must name the dropped observable (C-40 limb 2 instance ii).",
     "R2_dense_control": "RE-BASE THE GOLDEN after the width fix. Byte-identity with today's dense render is abandoned deliberately because R1 changes it by design. New control: gap-folding is a strict no-op on gapless images at fixed container width. Fixture MUST use unequal runs (768/256 -> [45,15]); equal 512/512 -> [30,30] is invariant under any monotone re-weighting and would be vacuous.",
     "R3_keyboard": "ARROWS + ENTER ONLY; j/k/o DROPPED. All three already bound app-wide; o/j frozen in _PRE_BATCH_BINDINGS under live TC-011; k must stay the legend key or US-77-4's hint becomes false. SCOPE REDUCTION: the charter's o = open-hex keyboard affordance is DESCOPED and registered as a carry. The N4a mouse split is unchanged and remains the route to hex.",
-    "R4_ruler_end": "LABEL THE LAST MAPPED BYTE (0x07FFFF3D), not the exclusive span_end (0x07FFFF3E). The two chartered clauses were mutually unsatisfiable. Also corrects my P-7: 4 of 5 ticks name unmapped addresses today, not 3."
+    "R4_ruler_end": "LABEL THE LAST MAPPED BYTE (0x07FFFF3D), not the exclusive span_end (0x07FFFF3E). The two chartered clauses were mutually unsatisfiable. Also corrects my P-7: 4 of 5 ticks name unmapped addresses today, not 3.",
+    "R5_fold_width": "ONE-COLUMN FOLD MARKER, ALWAYS. Measured at the reconciled 21-col container: fold=1 -> [4,4,4,3,1]; fold=2 -> [3,3,3,3,1], which collapses three runs to equal width and guts the strict limb, the load-bearing half of AT-B77-01 at 80x24 (finding N-1). DESCOPES the charter's '2-col marker + humanized size label at/above a fold threshold' (S-1) -> carry C-77-g. SECOND chartered feature descoped this batch; like the first it is registered, not dropped. FOLDED: LLR-111.2.",
+    "R6_rerender_selection": "PRESERVE the selection if the region still exists, else fall back to the first. No input document stated a policy. Requires TWO acceptance arms: a lone 'preserved' arm is green on an implementation that never re-selects, and a lone 'fallback' arm is green on one that always resets - neither alone distinguishes the spec from its two failure modes. Interacts with HLR-116: focus must follow selection or the keyboard story silently regresses. FOLDED: HLR-116, split into AT-B77-13 (preserve) and AT-B77-14 (fallback) per C-18, plus LLR-116.4/116.5."
+  },
+  "phase1_new_findings": {
+    "N-1": "THE TWO REGIMES REDDEN ON DIFFERENT LIMBS, and this corrects the QA lane. 80x24: visible>=1 True, monotone True, strict FALSE -> conjunction RED via strict. 120x30: visible>=1 FALSE, monotone True, strict TRUE -> conjunction RED via visible. At 120x30 two runs clip to 0 and 1 > 0 SATISFIES strictness, so the strict limb is GREEN at the broken regime. Consequence: AT-B77-01 must stay a SINGLE three-way conjunction - splitting it, or dropping either limb, ships one regime green. The monotone limb alone is green at both sizes and carries no falsifying power.",
+    "N-2": "MAP GEOMETRY IS NOT SETTLED AFTER ONE pilot.pause(). Architect traced 68 -> 68 -> 66 at 80x24 and read 23/50 at 120x30 where the settled value is 21. I REPRODUCED IT INDEPENDENTLY: 6 trials, trial 4 read width=23 where the other five read 21 (1 in 6). Without the mandatory settling helper (LLR-111.6) every geometry acceptance is intermittently flaky, and a flaky gate is indistinguishable from a broken one. The invisibility finding survives either reading; it is the column figure that moves. Registered as risk R-7.",
+    "architect_B1_dissolved": "The dense-byte-identity-vs-budget contradiction was an artifact of reasoning about a number that is never enforced. Once R1 corrected the width basis it disappeared.",
+    "TC_011_stays_green": "R3 leaves o/j/k untouched, so the frozen _PRE_BATCH_BINDINGS guard needs no supersession - verified against tests/test_tui_directionb.py:5460-5478."
   },
   "phase0_verdicts_corrected_at_phase1": {
     "summary": "FOUR of my own Phase-0 verdicts were wrong, and the pattern is ONE error, not four: I read the wrong LAYER and the wrong CORPUS, then reported the results as measurements. Each was genuinely executed - executing the wrong thing returns a plausible number, which is why it survived my own review. On every point where the charter and I disagreed, THE CHARTER WAS RIGHT.",
@@ -137,6 +154,7 @@
   "progress": {
     "branch": "claude/batch-77-memmap-variant-a (local, not yet pushed)",
     "phase0": "AWAITING GATE - 00-measurements.md and PLAN.md written; 15 premises evaluated; 7 stories classified (6 READY, 1 OUT); no ids minted; no requirements derived.",
-    "next": "On Phase-0 approval: Phase 1 (architect + qa-reviewer in parallel) derives HLR/LLR + the acceptance blocks, reserves AT/TC ids on their own small PR first, and authors the R-TUI-072 section 6.5 Before/After amendment."
+    "next": "Phase 2 cross-agent review: architect + qa-reviewer + security-reviewer in parallel over 01-requirements.md.",
+    "phase1": "APPROVED. Ids batch-scoped (no reservation PR). Two chartered features DESCOPED and registered as carries: C-77-f (o=open-hex keyboard affordance) and C-77-g (2-col fold marker + size label)."
   }
 }
