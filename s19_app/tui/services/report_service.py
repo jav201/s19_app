@@ -40,11 +40,12 @@ from __future__ import annotations
 
 import bisect
 import re
-from dataclasses import dataclass
+import sys
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from itertools import islice
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 from ...range_index import (
     RangeIndex,
@@ -332,6 +333,79 @@ ROW_TRUNCATION_NOTICE_FMT = (
 #: header/table content, is allowed past the budget — explicit beats
 #: silent).
 REPORT_MAX_TOTAL_BYTES = 2_097_152
+
+#: Closed set of section kinds a refusal is attributed to (batch-76, LLR-108.6).
+#:
+#: ⚠ **Closedness is the bound.** The aggregated disclosure block emits at most one
+#: row per member, so the block's line count is the cardinality of THIS tuple and
+#: nothing else — it cannot grow with the variant count ``V`` or the check-file
+#: count ``F``. That is the whole reason revision 2 replaced revision 1's
+#: per-refusal disclosure line, which was ``O(V)``: at ``V=100`` it measured ~558
+#: lines against a ~1 kB allowance, so a CORRECT implementation would have
+#: reddened the batch's own ceiling acceptance.
+REPORT_SECTION_KINDS: Tuple[str, ...] = (
+    "preamble",
+    "modified-files",
+    "modifications",
+    "declaration-errors",
+    "checklists",
+    "memory-regions",
+    "entropy",
+    "addendum",
+)
+
+#: How many variant indices one disclosure row names before ``+N more``
+#: (batch-76, LLR-108.6). Precedent: :data:`ADDENDUM_NOTICE_VARIANTS_MAX`, which
+#: solves the same problem for the addendum notice; reused rather than minting a
+#: second policy number.
+#:
+#: Only the integer INDEX of a variant in ``variant_results`` reaches a
+#: disclosure — never an operator-derived string. Revision 1 banned even that,
+#: which bought anonymity at the price of a disclosure an auditor could not
+#: reconcile to a variant, and was stricter than the shipped appendix (which
+#: already interpolates ``md_safe(variant_id, …)``).
+REPORT_DISCLOSURE_VARIANTS_MAX = ADDENDUM_NOTICE_VARIANTS_MAX
+
+#: The per-variant byte reservation's floor (batch-76, LLR-108.4).
+#:
+#: **DERIVED, never chosen.** A reservation of ``REPORT_MAX_TOTAL_BYTES // V``
+#: shrinks without limit as ``V`` grows; below this floor a variant could not
+#: even carry its own structural skeleton, so its section would be a heading with
+#: nothing under it. The floor is that skeleton's cost: the variant heading at its
+#: widest (a ``REPORT_CELL_CHARS``-bounded id) plus every fixed section heading
+#: and the blank line each carries.
+#:
+#: Executed check at the batch base: one variant's MINIMAL audit record measured
+#: **394 B** (a 2-variant report at 2 752 B minus a 1-variant report at 2 358 B).
+#: This derivation sits comfortably above that, and ``TC-556`` asserts the
+#: relation rather than the number — a hard-coded 394 would go stale the moment a
+#: section heading is renamed.
+_VARIANT_SKELETON_HEADINGS: Tuple[str, ...] = (
+    "### Modified files",
+    "### Modifications",
+    "### Declaration errors",
+    "### Checklists",
+    "### Memory regions",
+)
+REPORT_VARIANT_RESERVATION_FLOOR_BYTES = (
+    # "## Variant: " + the widest admissible id, and its newline
+    len("## Variant: ") + REPORT_CELL_CHARS + 1
+    # each fixed section heading, its newline, and the blank line after it
+    + sum(len(heading) + 2 for heading in _VARIANT_SKELETON_HEADINGS)
+)
+
+#: Cap on itemised truncation-appendix notes (batch-76, LLR-108.9).
+#:
+#: **DERIVED from the disclosure budget, never chosen.** Without a cap the
+#: appendix is ``O(V·F)`` — one note per variant per fired cap — which is the
+#: second unbounded term in the document.
+#:
+#: Executed against the batch base: **no byte-identity golden contains a
+#: truncation appendix at all** (``grep -rln '## Truncation appendix'
+#: tests/goldens/`` returns nothing), and the three assertions that reference one
+#: each exercise a SINGLE note. So any cap at or above 4 is inert against the
+#: current suite — P-17, measured, not assumed.
+REPORT_MAX_TRUNCATION_NOTES = 64
 
 #: ``ReportOptions.execution_mode`` domain (LLR-007.4 (a) / F-A-17).
 REPORT_MODE_BATCH = "batch"
@@ -684,6 +758,337 @@ class _ByteBudget:
     def consume(self, extra: int) -> None:
         """Account ``extra`` emitted bytes."""
         self.used += extra
+
+    def remaining(self) -> int:
+        """Bytes still admissible; never negative."""
+        return max(0, self.limit - self.used)
+
+
+def _disclosure_allowance(variant_count: int) -> int:
+    """
+    Summary:
+        The byte allowance the document may spend ABOVE
+        :data:`REPORT_MAX_TOTAL_BYTES` on content that is emitted
+        unconditionally (batch-76, LLR-108.7): the ``O(1)`` header, the
+        per-variant headings, the ``TRUNCATED`` markers, the capped truncation
+        appendix, and the single aggregated disclosure block.
+
+    Args:
+        variant_count (int): ``len(variant_results)`` — the only ``O(V)`` term,
+            and it is named rather than emergent (non-claim (j)).
+
+    Returns:
+        int: The allowance in bytes.
+
+    Data Flow:
+        - The integer field width is read from ``sys.maxsize`` AT CALL TIME
+          rather than typed as a literal, so the derivation has a fixed point on
+          any host instead of encoding this one's word size.
+        - Every term is an UPPER bound: the widest row the closed label set can
+          produce, times the cardinality of that set. Because
+          :data:`REPORT_SECTION_KINDS` is closed, this is ``O(1)`` in both ``V``
+          and ``F`` — the property that makes the ceiling invariant.
+
+    Dependencies:
+        Uses:
+            - REPORT_SECTION_KINDS / REPORT_DISCLOSURE_VARIANTS_MAX
+            - REPORT_MAX_TRUNCATION_NOTES / REPORT_CELL_CHARS
+        Used by:
+            - generate_project_report / the AT-250..AT-252 ceiling acceptances
+
+    Example:
+        >>> _disclosure_allowance(0) > 0
+        True
+    """
+    # Widest decimal field this host can render, read rather than typed.
+    width = len(str(sys.maxsize))
+    # One disclosure row at its widest: a label, three counts, and a bounded
+    # list of integer variant indices followed by "+N more".
+    widest_label = max(len(kind) for kind in REPORT_SECTION_KINDS)
+    row = (
+        len("- : sections , lines , bytes  (variants )")
+        + widest_label
+        + 3 * width
+        + REPORT_DISCLOSURE_VARIANTS_MAX * (width + 2)
+        + len(" +N more") + width
+    )
+    block = (
+        len("## Omitted content") + 2
+        + len(REPORT_SECTION_KINDS) * (row + 1)
+        + 2
+    )
+    # The capped appendix: each note names a variant (id bounded by
+    # REPORT_CELL_CHARS) and a cap sentence.
+    note = len("- Variant '': ") + REPORT_CELL_CHARS + 160
+    appendix = len("## Truncation appendix") + 2 + REPORT_MAX_TRUNCATION_NOTES * (note + 1)
+    # The one deliberate O(V) term (LLR-108.5): every variant's heading is
+    # emitted whatever its reservation, so no variant can vanish — plus the at
+    # most two unconditional ``> TRUNCATED:`` markers a variant's hexdump
+    # section can carry. Markers are unconditional for the same standing
+    # "explicit beats silent" reason recorded on REPORT_MAX_TOTAL_BYTES, so the
+    # ceiling has to account for them here or the bound would be understated.
+    marker = len("> TRUNCATED: .") + 256
+    headings = variant_count * (
+        len("## Variant: ") + REPORT_CELL_CHARS + 2 + 2 * (marker + 1)
+    )
+    # The O(1) header, exempted by P-16: measured flat at 181 B from V=1 to
+    # V=20 000, so exempting it does not weaken V-invariance the way exempting
+    # the O(V) inventory/overview would have.
+    header = 1024
+    return block + appendix + headings + header
+
+
+@dataclass(slots=True)
+class _Refusals:
+    """
+    Summary:
+        The ``O(1)`` refusal accumulator (batch-76, LLR-108.6). Keyed by a
+        CLOSED tuple of section-kind literals, so the disclosure it produces has
+        at most ``len(REPORT_SECTION_KINDS)`` rows however many batches are
+        refused.
+
+    Returns:
+        None: Dataclass container.
+
+    Data Flow:
+        - ``sections`` / ``lines`` / ``bytes`` are counted per kind. The BYTE
+          total is the one that matters: revision 1 disclosed "3 sections
+          omitted", which is satisfiable while telling an auditor nothing about
+          how much of their document is missing.
+        - ``variants`` holds integer INDICES only — never a variant id string.
+
+    Dependencies:
+        Used by:
+            - _EmissionGate / generate_project_report
+    """
+
+    sections: Dict[str, int] = field(default_factory=dict)
+    lines: Dict[str, int] = field(default_factory=dict)
+    byte_count: Dict[str, int] = field(default_factory=dict)
+    variants: Dict[str, List[int]] = field(default_factory=dict)
+
+    def record(self, kind: str, batch: Sequence[str], cost: int, variant: Optional[int]) -> None:
+        """Record one refused batch against ``kind``."""
+        self.sections[kind] = self.sections.get(kind, 0) + 1
+        self.lines[kind] = self.lines.get(kind, 0) + len(batch)
+        self.byte_count[kind] = self.byte_count.get(kind, 0) + cost
+        if variant is not None:
+            seen = self.variants.setdefault(kind, [])
+            if variant not in seen:
+                seen.append(variant)
+
+    def any(self) -> bool:
+        """Whether anything at all was refused."""
+        return bool(self.sections)
+
+    def total_bytes(self) -> int:
+        """Total refused bytes across every kind."""
+        return sum(self.byte_count.values())
+
+
+class _EmissionGate:
+    """
+    Summary:
+        The single admission seam for the whole document (batch-76, HLR-108).
+        Every line that reaches the file passes through :meth:`emit` or
+        :meth:`emit_unconditional` — there is no third way in, which is what
+        ``TC-553``'s AST census asserts.
+
+    Data Flow:
+        - **Two budgets, and BOTH must admit.** ``_budget`` is the document's;
+          ``_reservation`` is the current variant's share. Gating on the
+          reservation ALONE would break the ceiling: a FLOORED reservation
+          over-subscribes the document (``Σ = V · max(CAP//V, floor)``, measured
+          at **48.8× CAP** for ``V=100 000``, floor 1 024), so a large-`V` report
+          would blow the very bound this class exists to enforce. That is P-27,
+          found by executing the floor rather than by reading the clause.
+        - **Refusal is per-call and does not latch** (LLR-108.2): a batch too
+          large to fit is refused whole, and a later smaller batch is still
+          admitted. Latching would make the document's contents depend on
+          emission ORDER, which is attacker-controlled.
+        - **Unconditional emissions bypass both budgets** and are covered by
+          :func:`_disclosure_allowance`: the ``O(1)`` header (P-16) and each
+          variant's heading (LLR-108.5). They are what keep a budget-exhausted
+          report readable and keep every variant present.
+
+    Dependencies:
+        Used by:
+            - generate_project_report / _hexdump_section
+    """
+
+    __slots__ = ("lines", "_budget", "_reservation", "_refusals", "_variant")
+
+    def __init__(self, limit: int) -> None:
+        self.lines: List[str] = []
+        self._budget = _ByteBudget(limit=limit)
+        self._reservation: Optional[_ByteBudget] = None
+        self._refusals = _Refusals()
+        self._variant: Optional[int] = None
+
+    def begin_variant(self, index: int, reservation: int) -> None:
+        """Open a variant's own reservation; closes any previous one."""
+        self._variant = index
+        self._reservation = _ByteBudget(limit=reservation)
+
+    def end_variants(self) -> None:
+        """Leave per-variant scope; later batches are document-scoped again."""
+        self._variant = None
+        self._reservation = None
+
+    def fits(self, cost: int) -> bool:
+        """Whether ``cost`` bytes are admissible under BOTH active budgets."""
+        if not self._budget.fits(cost):
+            return False
+        if self._reservation is not None and not self._reservation.fits(cost):
+            return False
+        return True
+
+    def emit(self, batch: Sequence[str], kind: str) -> bool:
+        """Admit ``batch`` if it fits; otherwise refuse it WHOLE and record it.
+
+        Returns ``True`` when admitted. The batch is never partially admitted —
+        half a table is not a smaller table, it is a corrupt one.
+        """
+        if not batch:
+            return True
+        cost = _line_bytes(batch)
+        if not self.fits(cost):
+            self._refusals.record(kind, batch, cost, self._variant)
+            return False
+        self.lines.extend(batch)
+        self._budget.consume(cost)
+        if self._reservation is not None:
+            self._reservation.consume(cost)
+        return True
+
+    def emit_unconditional(self, batch: Sequence[str]) -> None:
+        """Admit ``batch`` past both budgets; charged to the allowance.
+
+        Reserved for the ``O(1)`` header and the per-variant headings. Every use
+        widens the ceiling by a term that :func:`_disclosure_allowance` must
+        account for, so this method is deliberately awkward to reach for.
+        """
+        if not batch:
+            return
+        self.lines.extend(batch)
+
+    @property
+    def refusals(self) -> _Refusals:
+        """The refusal accumulator, for the tail disclosure block."""
+        return self._refusals
+
+    @property
+    def budget(self) -> _ByteBudget:
+        """The document budget — read-only accounting for the hexdump seam."""
+        return self._budget
+
+
+def _disclosure_lines(refusals: _Refusals) -> List[str]:
+    """
+    Summary:
+        Render the single aggregated disclosure block (batch-76, LLR-108.6) —
+        emitted ONCE at the document tail, never per refusal.
+
+    Args:
+        refusals (_Refusals): The ``O(1)`` accumulator.
+
+    Returns:
+        List[str]: The block, or ``[]`` when nothing was refused.
+
+    Data Flow:
+        - One row per REFUSED member of the closed :data:`REPORT_SECTION_KINDS`
+          tuple, so the block's line count is bounded by that cardinality and is
+          invariant in ``V`` and ``F``.
+        - The BYTE total is stated, not just a section count: an auditor needs
+          to know how much of the document is missing, and "3 sections omitted"
+          does not say.
+        - Only integer variant INDICES appear, capped at
+          :data:`REPORT_DISCLOSURE_VARIANTS_MAX` with a ``+N more`` tail, so no
+          operator-derived string reaches the block.
+
+    Dependencies:
+        Used by:
+            - generate_project_report
+    """
+    if not refusals.any():
+        return []
+    out = ["## Omitted content", ""]
+    for kind in REPORT_SECTION_KINDS:
+        sections = refusals.sections.get(kind, 0)
+        if not sections:
+            continue
+        indices = refusals.variants.get(kind, [])
+        shown = indices[:REPORT_DISCLOSURE_VARIANTS_MAX]
+        listed = ", ".join(str(index) for index in shown)
+        if len(indices) > len(shown):
+            listed += f" +{len(indices) - len(shown)} more"
+        suffix = f" (variants {listed})" if listed else ""
+        out.append(
+            f"- {kind}: sections {sections}, "
+            f"lines {refusals.lines.get(kind, 0)}, "
+            f"bytes {refusals.byte_count.get(kind, 0)}{suffix}"
+        )
+    out.append("")
+    return out
+
+
+def _select_notes(notes: Sequence[Tuple[int, str]], cap: int) -> Tuple[List[str], int, int]:
+    """
+    Summary:
+        Choose which truncation-appendix notes to itemise (batch-76, LLR-108.9)
+        — **round-robin by variant**, at most one note per variant before any
+        variant's second.
+
+    Args:
+        notes (Sequence[Tuple[int, str]]): ``(variant_index, note_text)`` in
+            generation order.
+        cap (int): :data:`REPORT_MAX_TRUNCATION_NOTES`.
+
+    Returns:
+        Tuple[List[str], int, int]: the itemised notes, the count NOT itemised,
+        and the number of DISTINCT variants with an un-itemised note.
+
+    Data Flow:
+        - ``notes[:cap]`` — the obvious implementation — retains the EARLIEST,
+          which is attacker-choosable: flood with cheap region-cap notes from
+          variants named to sort ahead and the note naming the real target is
+          evicted. Round-robin makes eviction depend on how many notes a variant
+          produced, not on where it sits in the ordering.
+        - ``itemised + not_itemised == len(notes)`` is an invariant ``TC-559``
+          asserts, so a selection that silently drops a note cannot pass.
+
+    Dependencies:
+        Used by:
+            - generate_project_report
+    """
+    by_variant: Dict[int, List[str]] = {}
+    order: List[int] = []
+    for index, text in notes:
+        if index not in by_variant:
+            by_variant[index] = []
+            order.append(index)
+        by_variant[index].append(text)
+    selected: List[str] = []
+    chosen: Dict[int, int] = {index: 0 for index in order}
+    round_index = 0
+    while len(selected) < cap:
+        progressed = False
+        for index in order:
+            if len(selected) >= cap:
+                break
+            bucket = by_variant[index]
+            if round_index < len(bucket):
+                selected.append(bucket[round_index])
+                chosen[index] += 1
+                progressed = True
+        if not progressed:
+            break
+        round_index += 1
+    not_itemised = len(notes) - len(selected)
+    distinct = sum(
+        1 for index in order if chosen[index] < len(by_variant[index])
+    )
+    return selected, not_itemised, distinct
 
 
 def _format_bytes(values: Optional[Iterable[int]], *, max_bytes: int) -> str:
@@ -1699,8 +2104,8 @@ def _hexdump_block(
 def _hexdump_section(
     result: VariantExecutionResult,
     options: ReportOptions,
-    budget: _ByteBudget,
-) -> Tuple[List[str], List[str]]:
+    gate: _EmissionGate,
+) -> List[str]:
     """
     Summary:
         Build the per-variant hexdump section: one merged-window block per
@@ -1715,13 +2120,16 @@ def _hexdump_section(
             and dumps nothing.
         options (ReportOptions): Supplies ``context_bytes`` and the
             optional ``report_filter`` (LLR-055.2 (c)).
-        budget (_ByteBudget): The running whole-document byte budget —
-            consumed for every line this section emits; a block that no
-            longer fits is omitted and counted.
+        gate (_EmissionGate): The document's single admission seam (batch-76,
+            LLR-108.3). Every line this section emits is offered to it and may
+            be REFUSED; a refusal is recorded for the aggregated disclosure
+            rather than silently dropped. The section no longer returns its
+            lines — it emits them — so there is exactly one way into the
+            document, which is what ``TC-553``'s census asserts.
 
     Returns:
-        Tuple[List[str], List[str]]: The section's Markdown lines and the
-        truncation-appendix notes it produced (empty when no cap fired).
+        List[str]: The truncation-appendix notes this section produced (empty
+        when no cap fired).
 
     Data Flow:
         - With ``options.report_filter`` set (LLR-055.2 (c)), the applied
@@ -1742,27 +2150,35 @@ def _hexdump_section(
         Used by:
             - generate_project_report
     """
-    out: List[str] = []
     notes: List[str] = []
+    kind = "memory-regions"
 
-    def put(batch: Sequence[str]) -> None:
-        out.extend(batch)
-        budget.consume(_line_bytes(batch))
+    def put(batch: Sequence[str]) -> bool:
+        """Admit through the document gate (batch-76, LLR-108.3).
+
+        Revision 1 EXEMPTED this seam on the premise that it already gated. It
+        did not: ``put`` called ``budget.consume`` unconditionally and only the
+        block loop below ever consulted ``fits``, so five of its six call sites
+        emitted past an exhausted budget. That premise (P-24) was written by the
+        batch that was chartered to fix this defect, and executing it is what
+        found the exemption was covering the bug.
+        """
+        return gate.emit(batch, kind)
 
     put(["### Memory regions", ""])
     regions = _applied_regions(result)
     if not regions:
         put(["No modified regions.", ""])
-        return out, notes
+        return notes
     if options.report_filter is not None:
         kept = _applied_regions(result, options.report_filter)
         if not kept:
             put([_zero_match_notice(len(regions)), ""])
-            return out, notes
+            return notes
         regions = kept
     if not result.mem_map:
         put(["Post-change memory map unavailable - hexdumps omitted.", ""])
-        return out, notes
+        return notes
     total_regions = len(regions)
     if total_regions > REPORT_MAX_REGIONS_PER_VARIANT:
         omitted = total_regions - REPORT_MAX_REGIONS_PER_VARIANT
@@ -1771,7 +2187,11 @@ def _hexdump_section(
             f"{omitted} of {total_regions} modified regions omitted "
             f"(cap: {REPORT_MAX_REGIONS_PER_VARIANT} regions per variant)"
         )
-        put([f"> TRUNCATED: {text}.", ""])
+        # The MARKER is unconditional and charged to the allowance, not to the
+        # budget: an omission the document does not admit to is worse than the
+        # omission. That is the standing "explicit beats silent" policy already
+        # recorded on REPORT_MAX_TOTAL_BYTES.
+        gate.emit_unconditional([f"> TRUNCATED: {text}.", ""])
         notes.append(
             f"Variant '{md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}': "
             f"{text}."
@@ -1782,21 +2202,19 @@ def _hexdump_section(
         regions, options.context_bytes, image_top
     ):
         block = _hexdump_block(result.mem_map, low, high)
-        if not budget.fits(_line_bytes(block)):
+        if not gate.emit(block, kind):
             omitted_blocks += 1
-            continue
-        put(block)
     if omitted_blocks:
         text = (
             f"{omitted_blocks} hexdump block(s) omitted "
             f"(report size cap: {REPORT_MAX_TOTAL_BYTES} bytes)"
         )
-        out.extend([f"> TRUNCATED: {text}.", ""])
+        gate.emit_unconditional([f"> TRUNCATED: {text}.", ""])
         notes.append(
             f"Variant '{md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}': "
             f"{text}."
         )
-    return out, notes
+    return notes
 
 
 def _legend_lines() -> List[str]:
@@ -2538,55 +2956,99 @@ def generate_project_report(
     reports_dir.mkdir(parents=True, exist_ok=True)
     filename = _report_filename(reports_dir, generated_at)
 
-    budget = _ByteBudget(limit=REPORT_MAX_TOTAL_BYTES)
-    lines: List[str] = []
-    notes: List[str] = []
-
-    def emit(batch: Sequence[str]) -> None:
-        lines.extend(batch)
-        budget.consume(_line_bytes(batch))
+    gate = _EmissionGate(limit=REPORT_MAX_TOTAL_BYTES)
+    notes: List[Tuple[int, str]] = []
 
     header = _header_lines(variant_set.project_name, generated_at, options)
+    # P-16, EXECUTED: the header is O(1) — measured flat at 181 B from V=1 to
+    # V=20 000 — while the inventory and overview below are O(V) (62.0 then
+    # 65.0 B/variant; the slopes disagree, so the growth is O(V log V) as the
+    # id column widens). Uniform gating would therefore refuse the document's
+    # own TITLE at large V, contradicting AT-255. Exempting the WHOLE preamble
+    # instead — the reading the spec first sketched — would put an unbounded
+    # term inside the allowance and make HLR-108's V-invariance false while
+    # still stating it. So only the O(1) header is exempt; inventory and
+    # overview stay gated, refusable and disclosed.
     if options.report_filter is None:
-        emit(header)
+        gate.emit_unconditional(header)
     else:
         mod_counts, check_counts, region_counts = _filter_section_counts(
             variant_results, options.report_filter
         )
-        emit(header[:2])  # title + blank — audit header follows (S-F6)
-        emit(
+        gate.emit_unconditional(header[:2])  # title + blank — audit header follows (S-F6)
+        gate.emit(
             _audit_header_lines(
                 _filter_display_name(options.report_filter),
                 mod_counts,
                 check_counts,
                 region_counts,
-            )
+            ),
+            "preamble",
         )
-        emit(header[2:])
-    emit(_inventory_lines(variant_set))
-    emit(_overview_lines(variant_results))
+        gate.emit_unconditional(header[2:])
+    gate.emit(_inventory_lines(variant_set), "preamble")
+    gate.emit(_overview_lines(variant_results), "preamble")
     if options.include_legend:
-        emit(_legend_lines())
-    for result in variant_results:
-        emit([f"## Variant: {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}", ""])
-        emit(_modified_files_lines(result))
-        emit(_modifications_lines(result, options.report_filter))
-        emit(_declaration_error_lines(result))
-        emit(_checklist_lines(result, options.report_filter))
-        dump_lines, dump_notes = _hexdump_section(result, options, budget)
-        lines.extend(dump_lines)
-        notes.extend(dump_notes)
-        if options.include_entropy:
-            emit(_entropy_lines(result))
-    if options.declared_regions:
-        emit(_addendum_lines(options.declared_regions, variant_results))
-    if notes:
-        emit(
-            ["## Truncation appendix", ""]
-            + [f"- {note}" for note in notes]
-            + [""]
+        gate.emit(_legend_lines(), "preamble")
+
+    # LLR-108.4 — the per-variant reservation. Floored, because a share of
+    # CAP//V shrinks without limit; and applied ALONGSIDE the document budget,
+    # never instead of it (P-27: a floored reservation over-subscribes the
+    # document — Σ = V·max(CAP//V, floor), measured 48.8x CAP at V=100 000 —
+    # so reservation-only gating would break the very ceiling AT-250/251/252
+    # assert).
+    # Shares are cut from what is ACTUALLY LEFT, not from the whole cap: the
+    # preamble has already been charged by this point, so dividing
+    # REPORT_MAX_TOTAL_BYTES hands out shares that together exceed the remaining
+    # budget and lets the earlier variants spend the later ones'. Measured: at a
+    # 4 000 B limit the preamble takes ~2 000, so six shares of CAP//6 = 666
+    # promise 3 996 B against 2 000 B actually available.
+    reservation = max(
+        gate.budget.remaining() // max(len(variant_results), 1),
+        REPORT_VARIANT_RESERVATION_FLOOR_BYTES,
+    )
+    for index, result in enumerate(variant_results):
+        gate.begin_variant(index, reservation)
+        # LLR-108.5 — the heading is emitted whatever the reservation holds, so
+        # no variant can vanish from the audit record. This is the one
+        # deliberate O(V) term and it is named, not emergent (non-claim (j)).
+        gate.emit_unconditional(
+            [f"## Variant: {md_safe(result.variant_id, limit=REPORT_CELL_CHARS)}", ""]
         )
+        gate.emit(_modified_files_lines(result), "modified-files")
+        gate.emit(_modifications_lines(result, options.report_filter), "modifications")
+        gate.emit(_declaration_error_lines(result), "declaration-errors")
+        gate.emit(_checklist_lines(result, options.report_filter), "checklists")
+        notes.extend(
+            (index, note) for note in _hexdump_section(result, options, gate)
+        )
+        if options.include_entropy:
+            gate.emit(_entropy_lines(result), "entropy")
+    gate.end_variants()
+
+    if options.declared_regions:
+        gate.emit(
+            _addendum_lines(options.declared_regions, variant_results), "addendum"
+        )
+    if notes:
+        # LLR-108.9 — round-robin by variant. notes[:CAP] retains the EARLIEST,
+        # which lets a flood of cheap notes from variants ordered ahead evict
+        # the note naming the real target.
+        itemised, not_itemised, distinct = _select_notes(
+            notes, REPORT_MAX_TRUNCATION_NOTES
+        )
+        block = ["## Truncation appendix", ""] + [f"- {note}" for note in itemised]
+        if not_itemised:
+            block.append(
+                f"- {not_itemised} further note(s) across {distinct} variant(s) "
+                f"not itemised (cap: {REPORT_MAX_TRUNCATION_NOTES} notes)."
+            )
+        block.append("")
+        gate.emit_unconditional(block)
+    # LLR-108.6 — ONE aggregated disclosure block, at the tail, keyed by the
+    # closed section-kind tuple, so its line count is O(1) in V and F.
+    gate.emit_unconditional(_disclosure_lines(gate.refusals))
 
     target = reports_dir / filename
-    target.write_bytes(document_bytes("\n".join(lines)))
+    target.write_bytes(document_bytes("\n".join(gate.lines)))
     return target
