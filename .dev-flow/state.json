@@ -45,7 +45,7 @@
     "mint_nothing_new": true
   },
   "current_phase": 3,
-  "phase_status": "in-progress",
+  "phase_status": "awaiting-gate",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -116,6 +116,12 @@
       "date": "2026-07-31",
       "decision": "the three owed items landed; batch implementation complete",
       "notes": "TC-610's amendment was NECESSARY and that is executed, not argued: reverting a single id to RESERVED reddens G4 (28 of the 42 ids are cited on '- Validation:' bullets, so G4 genuinely inspects them); restored and hash-verified. PRECISION worth recording: R-TUI-101's own convention names test FUNCTIONS, and the tokenizer does not read 'test_at250_...' as a citation - so the G4 collision only bites when a bullet cites BARE ids. It is real and I executed it, but it was avoidable by convention. The flip to LIVE is right on independent grounds: the ids are spent and have nodes, so leaving them RESERVED would make the registry assert something false."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-31",
+      "decision": "merge gate BLOCK - returned to operator",
+      "notes": "The precondition worked exactly as designed: an independent pass found four HIGH findings, two of which I verified myself by execution. The batch's shipped CODE is sound (Inc-3 confirmed clean, frozen diff 0, traceability clean, all correctness hunts clean); the defects are in ACCEPTANCE STRENGTH - the same class this batch kept finding in itself."
     }
   ],
   "obsidian_synced": false,
@@ -168,5 +174,17 @@
       "driver": "the preamble is already charged when shares are cut; at a 4000 B limit six shares of CAP//6=666 promise 3996 B against 2000 B available",
       "authority": "found while building the AT-254 fixture"
     }
-  ]
+  ],
+  "merge_gate": {
+    "verdict": "BLOCK",
+    "ran": "final independent qa-reviewer pass over the whole diff vs main, as the kickoff merge precondition requires",
+    "high_findings": 4,
+    "H-1": "AT-252 (all 3 arms) and AT-251[V=1] stay GREEN with the byte gate fully removed. VERIFIED INDEPENDENTLY: gate -> return True gives '3 failed, 4 passed'. TC-552 guards raw>limit(4096) but the assertion's ceiling is limit+allowance(V)=52698, so the fixture sits 30-45kB BELOW the ceiling and needs no gate. This is Phase-2 blocker B-4 reproduced VERBATIM inside the revision written to close it (amendment A-4). HLR-108's F-invariance half has no working acceptance.",
+    "H-2": "The ceiling has no oracle: _ceiling() calls the product's own _disclosure_allowance. Substituting it with 1e9 keeps all 27 green. LLR-108.7/A-10 required TC-555 to recompute INDEPENDENTLY; the tautology was relocated, not removed.",
+    "H-3": "The allowance under-derives and the stated ceiling is measurably violated: note/headings terms use REPORT_CELL_CHARS (an INPUT char cap) as an EMITTED BYTE bound. Measured 4.03x on emoji ids; excess ~1000 B/variant, growing without bound in V. The chartered TC-556 (the 2.03x pin whose stated purpose was 'so the allowance is never re-derived from REPORT_CELL_CHARS') was silently repurposed to assert the reservation floor instead - and its repurposing was NOT declared, unlike TC-561's.",
+    "H-4": "AT-253's byte-equality claim is unrealized. VERIFIED INDEPENDENTLY: rendering a section COUNT under the 'bytes' label keeps all 27 green. A-6/F6 required equality with the sum of _line_bytes(refused).",
+    "medium": "M-1 REQUIREMENTS.md ships 7 non-claims against the spec's 11, dropping the 2.03x input-shaped-cap caveat that H-3 depends on. M-2 a FOURTH unrecorded amendment: the ceiling became a private V-dependent function instead of the spec's imported constant, which is what makes H-2 possible. M-3 B76-A3 has no acceptance at all.",
+    "my_own_error": "My increment-001 evidence table reported 'M1 -> AT-250/251/252 RED' and 'INERT: none'. The transcript line I was reading said '3 failed, 4 passed'. I read a per-mutant EXIT CODE as a per-arm verdict, so the mutation harness aggregated over parametrized arms and hid four green ones. This is the batch's own recurring defect landing in my evidence.",
+    "disposition": "MERGE BLOCKED and returned to the operator, per the kickoff precondition. Not fixed in-session: four HIGH findings in acceptance design deserve a fresh context, not a near-exhausted one."
+  }
 }
