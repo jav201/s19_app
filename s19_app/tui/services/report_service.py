@@ -414,6 +414,45 @@ REPORT_VARIANT_RESERVATION_FLOOR_BYTES = (
     + sum(len(heading) + 2 for heading in _VARIANT_SKELETON_HEADINGS)
 )
 
+#: The widest EMITTED-UTF-8-BYTE cost of a rendered ``variant_id`` (batch-76
+#: merge gate, ``LLR-108.7``).
+#:
+#: **This exists because ``REPORT_CELL_CHARS`` is a CHARACTER cap and was being
+#: charged as a BYTE bound.** ``md_safe(value, limit=N)`` truncates its INPUT at
+#: ``N`` characters and only then escapes, so its output can exceed ``N`` bytes
+#: several times over: measured, ``limit=512`` emits **1 039 B** for escaped
+#: ASCII (2.03x) and **2 063 B** for unescaped non-BMP code points (4.03x).
+#: Deriving an allowance term from ``REPORT_CELL_CHARS`` therefore understates it
+#: — the per-variant heading term allocated 524 B for a cell that can emit
+#: 2 063 B, and the stated ceiling was measurably violated at
+#: ``variant_id = chr(0x1F600) * 600``: **+3 757 B at V=50**, **+54 209 B at
+#: V=100**, growing ~1 009 B per variant without bound. ``TC-611`` pins the
+#: expansion so this can never be re-derived from the character cap.
+#:
+#: **DERIVED from the shipped surface, never chosen.** ``variant_id`` is a
+#: filename component (``workspace.py:485`` — ``item.name`` or ``item.stem``), so
+#: it is bounded at 255 UTF-16 code units. A code point costing 4 UTF-8 bytes is
+#: non-BMP and therefore costs 2 units, so only 127 of those fit; the
+#: byte-maximising choice within the cap is a 3-byte BMP character at 1 unit
+#: each. The supremum is thus ``3 * 255``, and escaping cannot beat it because
+#: every ``MD_ESCAPE`` member is ASCII and reaches only 2 bytes escaped.
+#: Measured: 255 x U+4E00 renders a 777 B heading, against 522 B for 255 escaped
+#: backticks and 520 B for 127 emoji.
+#:
+#: **The precondition is load-bearing and is stated in ``REQUIREMENTS.md``'s
+#: non-claims.** A ``variant_id`` constructed longer than the filesystem permits
+#: is outside this domain, exactly as ``US-B75-2``'s ``Length`` cell is. What this
+#: constant buys is that each allowance term is now sound *by construction*
+#: rather than by compensation: before it, the under-derived heading and note
+#: terms were covered only by slack in the ``TRUNCATED``-marker terms, so an edit
+#: to the markers would have silently falsified the ceiling. ``TC-555``'s slope
+#: floor is the guard that now catches that.
+_MAX_FILENAME_UTF16_UNITS = 255
+_MAX_UTF8_BYTES_PER_UTF16_UNIT = 3
+REPORT_VARIANT_ID_MAX_BYTES = (
+    _MAX_FILENAME_UTF16_UNITS * _MAX_UTF8_BYTES_PER_UTF16_UNIT
+)
+
 #: Cap on itemised truncation-appendix notes (batch-76, LLR-108.9).
 #:
 #: **DERIVED from the disclosure budget, never chosen.** Without a cap the
@@ -838,8 +877,8 @@ def _disclosure_allowance(variant_count: int) -> int:
         + 2
     )
     # The capped appendix: each note names a variant (id bounded by
-    # REPORT_CELL_CHARS) and a cap sentence.
-    note = len("- Variant '': ") + REPORT_CELL_CHARS + 160
+    # REPORT_VARIANT_ID_MAX_BYTES) and a cap sentence.
+    note = len("- Variant '': ") + REPORT_VARIANT_ID_MAX_BYTES + 160
     appendix = len("## Truncation appendix") + 2 + REPORT_MAX_TRUNCATION_NOTES * (note + 1)
     # The one deliberate O(V) term (LLR-108.5): every variant's heading is
     # emitted whatever its reservation, so no variant can vanish — plus the at
@@ -849,7 +888,7 @@ def _disclosure_allowance(variant_count: int) -> int:
     # ceiling has to account for them here or the bound would be understated.
     marker = len("> TRUNCATED: .") + 256
     headings = variant_count * (
-        len("## Variant: ") + REPORT_CELL_CHARS + 2 + 2 * (marker + 1)
+        len("## Variant: ") + REPORT_VARIANT_ID_MAX_BYTES + 2 + 2 * (marker + 1)
     )
     # The O(1) header, exempted by P-16: measured flat at 181 B from V=1 to
     # V=20 000, so exempting it does not weaken V-invariance the way exempting

@@ -5491,7 +5491,8 @@ the byte-identity control, not on production traffic.
 **R-TUI-102**: The report generator shall admit a batch of lines into the document only when its
 emitted UTF-8 byte length fits the remaining budget, and shall bound the produced file at
 `REPORT_MAX_TOTAL_BYTES + _disclosure_allowance(V)` independently of the variant count `V` and the
-per-variant check-file count `F`; shall apportion the budget as a **per-variant reservation** so that
+per-variant check-file count `F`, **for every `variant_id` the workspace surface can produce**
+(non-claim (h) states the domain and the measured excess outside it); shall apportion the budget as a **per-variant reservation** so that
 no variant's content can consume another's share, and shall emit every variant's section heading
 regardless of its reservation being spent; and shall disclose, **once per document**, the sections,
 lines and **bytes** refused per section kind, in a block whose line count is bounded by a closed
@@ -5573,6 +5574,29 @@ same honest lossiness `_format_address` ships; the cue announces incompleteness.
 `execute_project_variants`, unchanged. Moving a `ValueError` onto the tool-failure path also puts it
 on the path that writes a full traceback to `s19tui.log`, matching every other exception type;
 report-file redaction stays withdrawn per batch-62 D-11.
+
+(h) **The ceiling is claimed over `variant_id`s the workspace surface can produce, not over every
+constructible string.** The bound's per-variant terms derive from `REPORT_VARIANT_ID_MAX_BYTES = 765`
+— `3` UTF-8 bytes × the `255` UTF-16 code units a filename component holds, since `variant_id` *is* a
+filename component (`workspace.py:485`, `item.name` or `item.stem`) and a 4-byte code point is
+non-BMP and so costs 2 units, leaving a 3-byte BMP character as the byte-maximising choice.
+**Measured: 255 × U+4E00 renders a 777 B heading** — against 522 B for 255 escaped backticks and
+520 B for 127 emoji — and the heading term allocates exactly 777 B for it, so over this domain the
+bound holds *by construction*, with the measured whole-document margin **growing** in `V`
+(−15 364 B at `V=100`, −82 242 B at `V=400`).
+
+A `variant_id` constructed longer than the filesystem permits is **outside this domain**, exactly as
+`US-B75-2`'s `Length` cell is (non-claim (e)) — and there the ceiling is false, not merely loose: at
+`variant_id = chr(0x1F600) * 600` the document exceeded the stated ceiling by **+3 747 B at `V=50`**,
+**+54 200 B at `V=100`** and **+356 922 B at `V=400`**, an excess of ~1 009 B per variant growing
+without bound. That is the `V`-invariance clause of (b) failing, not slack being absorbed.
+
+This caveat is **stated rather than implied** because the previous wording asserted the bound
+unconditionally while the derivation charged `REPORT_CELL_CHARS` — a **character** cap — as a **byte**
+bound, understating the heading term at 524 B for a cell that can emit 2 063 B. It held only by
+compensation from the `TRUNCATED`-marker slack, so an edit to the markers would have silently
+falsified it. `TC-611` pins the 2.03×/4.03× expansion that makes those two quantities different, and
+`TC-555`'s slope floor refuses any future re-derivation that falls below the measured heading.
 
 - Design: `_EmissionGate` (the single admission seam: `emit` / `emit_unconditional`, both budgets
   consulted, refusal recorded and non-latching); `_Refusals` (the `O(1)` accumulator keyed by the

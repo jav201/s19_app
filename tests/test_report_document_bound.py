@@ -31,6 +31,8 @@ from __future__ import annotations
 
 import ast
 import inspect
+import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Sequence, Tuple
@@ -45,6 +47,7 @@ from s19_app.tui.changes.model import (
 )
 from s19_app.tui.models import ProjectVariantSet, VariantDescriptor
 from s19_app.tui.services import report_service
+from s19_app.tui.services.markdown_safety import md_safe
 from s19_app.tui.services.report_service import (
     REPORT_MAX_TOTAL_BYTES,
     REPORT_MAX_TRUNCATION_NOTES,
@@ -61,6 +64,29 @@ from s19_app.tui.services.variant_execution_service import VariantExecutionResul
 from conftest import canonical_report_bytes
 
 _INSTANT = datetime(2026, 7, 31, 12, 0, 0, tzinfo=timezone.utc)
+
+#: The emitted-byte width of one character at its worst. UTF-8 encodes a single
+#: code point in at most 4 bytes, so this — never 1, and never the *character*
+#: cap — is what a byte budget must charge per permitted character. Escaping is
+#: not the worst case: every member of ``MD_ESCAPE`` is ASCII and becomes 2 bytes
+#: when escaped, while an unescaped non-BMP code point is 4. See ``TC-611``.
+_MAX_UTF8_BYTES_PER_CHAR = 4
+
+#: The widest ``variant_id`` the SHIPPED surface can actually deliver, and the
+#: reason the ceiling holds at runtime despite the term-level under-derivation
+#: ``TC-611`` pins. ``variant_id`` is a filename component (``workspace.py:485``
+#: — ``item.name`` or ``item.stem``), so NTFS bounds it to **255 UTF-16 code
+#: units**. Within that cap the byte-maximising choice is a 3-byte BMP character:
+#: it costs 1 unit and 3 bytes, where a 4-byte code point costs 2 units and so
+#: only 127 of them fit. Measured: 255 x U+4E00 renders a 777 B heading, against
+#: 520 B for 127 emoji and 522 B for 255 escaped backticks.
+_WIDEST_REACHABLE_ID = "一" * 255
+
+#: The ``O(1)`` document header, measured flat at 181 B from V=1 to V=20 000
+#: (P-16) and allocated 1024 B by the product. The floor derivation uses the
+#: MEASURED value, because a floor built from the allocation would be comparing
+#: the product's number to itself.
+_MEASURED_HEADER_BYTES = 181
 
 _GOLDEN = (
     Path(__file__).parent / "goldens" / "batch76" / "document-bound-preflight.md"
@@ -186,6 +212,18 @@ def _raw_producer_bytes(results: Sequence[VariantExecutionResult]) -> int:
 
 
 def _ceiling(variant_count: int, limit: int = REPORT_MAX_TOTAL_BYTES) -> int:
+    """The number every ceiling AT asserts against.
+
+    This DOES read the product's :func:`_disclosure_allowance`, and that is safe
+    only because ``TC-555`` now bounds that constant on BOTH sides — a measured
+    floor and an independently derived cap. Before it did, substituting the
+    allowance for ``1_000_000_000 + variant_count`` left **27 nodes green**: a
+    ~1 GB ceiling is satisfied by anything, so every AT in this file was riding
+    an unvalidated constant. Keeping the tight product value here and validating
+    it there is what preserves the ATs' discriminating power; swapping in a
+    generous test-side derivation would have TRIPLED the ceiling and weakened
+    every acceptance it feeds.
+    """
     return limit + _disclosure_allowance(variant_count)
 
 
@@ -210,36 +248,84 @@ _WIDEST_CELL = report_service.REPORT_BYTES_PER_CELL
 _SHRUNK_LIMIT = 4096
 
 
-@pytest.mark.parametrize(
-    "label, results, limit",
-    [
+def _ceiling_at_arms() -> List[Tuple[str, List[VariantExecutionResult], int]]:
+    """EVERY arm of every ceiling AT, with the fixture that arm actually runs.
+
+    One row per *resolved* arm, not one row per AT. TC-552's job is to prove each
+    assertion is reachable, and "AT-252" is not an assertion — ``AT-252[1]``,
+    ``AT-252[3]`` and ``AT-252[10]`` are three, with three different fixtures.
+    Guarding a representative arm is how three of them went uninspected.
+    """
+    arms: List[Tuple[str, List[VariantExecutionResult], int]] = [
         # AT-250 runs against the REAL budget: 10 widest-cell variants.
         (
             "AT-250",
             [_result(f"v{i}", rows=200, width=_WIDEST_CELL, mem=4096) for i in range(10)],
             REPORT_MAX_TOTAL_BYTES,
-        ),
-        # AT-251's WORST arm is V=1 (the least raw output of the sweep). If the
-        # smallest arm overflows, every larger one does.
-        ("AT-251 worst arm (V=1)", [_result("v0", rows=60)], _SHRUNK_LIMIT),
-        ("AT-252", [_result("v0", rows=40, files=3, mem=4096)], _SHRUNK_LIMIT),
-    ],
+        )
+    ]
+    for variants in (1, 10, 100):
+        arms.append(
+            (
+                f"AT-251[{variants}]",
+                [_result(f"v{i}", rows=60, width=_WIDEST_CELL) for i in range(variants)],
+                _SHRUNK_LIMIT,
+            )
+        )
+    for files in (1, 3, 10):
+        arms.append(
+            (
+                f"AT-252[{files}]",
+                [_result("v0", rows=40, files=files, width=_WIDEST_CELL, mem=4096)],
+                _SHRUNK_LIMIT,
+            )
+        )
+    return arms
+
+
+_CEILING_ARMS = _ceiling_at_arms()
+
+
+@pytest.mark.parametrize(
+    "label, results, limit", _CEILING_ARMS, ids=[arm[0] for arm in _CEILING_ARMS]
 )
-def test_tc552_each_ceiling_fixture_actually_overflows_its_own_limit(
+def test_tc552_each_ceiling_fixture_actually_overflows_its_own_ceiling(
     label: str, results: List[VariantExecutionResult], limit: int
 ) -> None:
-    """TC-552 — for EACH ceiling AT separately, its own fixture overflows its own limit.
+    """TC-552 — for EACH ceiling arm, its own fixture overflows the number that
+    arm's AT actually asserts against: the CEILING, not the limit.
 
     Intent: revision 1 scoped this to AT-250 only, and AT-252's fixture reached
     ~4 kB against a 2 MB budget — green on the base tree, on the fixed tree, and
     against a stubbed gate. A ceiling assertion over a fixture that cannot
     overflow certifies nothing, and no CODE mutation can reveal it.
+
+    ⚠ **This node was calibrated against the wrong number and the defect it
+    exists to prevent survived inside it.** It guarded ``raw > limit`` where
+    ``limit = 4096``, but its ATs assert ``size <= limit + allowance(V)`` —
+    **52 698 B** at ``V=1``. AT-252's arms measured 6 939 / 13 465 / 20 936 B:
+    every one above the limit and all three 30–45 kB BELOW the ceiling, so no
+    gate was needed to satisfy them. Executed per-arm, removing the byte gate
+    entirely (``_EmissionGate.fits`` -> ``return True``) left **4 of 7 arms
+    GREEN** — ``AT-251[1]``, ``AT-252[1]``, ``AT-252[3]``, ``AT-252[10]`` — which
+    are exactly the four arms where ``raw > ceiling`` was false. That is the
+    whole finding: the falsifiability threshold is the ceiling.
+
+    **Shrinking the limit cannot fix it, which is why the fixtures grew instead.**
+    ``allowance(1) = 48 602 B`` does not depend on the limit, so even at
+    ``limit=0`` the V=1 ceiling is 48 602 B — above every AT-252 arm. The cells
+    were widened to ``REPORT_BYTES_PER_CELL`` rather than the rows increased, so
+    rows stay under ``MAX_REPORT_ROWS_PER_VARIANT`` and batch-74's row cap still
+    never fires: the byte gate remains the only thing that can bound these arms.
     """
     raw = _raw_producer_bytes(results)
-    assert raw > limit, (
+    ceiling = _ceiling(len(results), limit=limit)
+    assert raw > ceiling, (
         f"{label}'s fixture is VACUOUS: its raw producers total {raw} B against "
-        f"an effective limit of {limit} B, so the ceiling could never be reached "
-        f"and the assertion cannot fail"
+        f"the ceiling {ceiling} B ({limit} B limit + {ceiling - limit} B "
+        f"allowance) that this arm's AT asserts against, so the assertion cannot "
+        f"fail. Note it may well exceed the LIMIT — that is the calibration "
+        f"error this node itself shipped with, and it hid four inert arms."
     )
 
 
@@ -272,9 +358,14 @@ def test_at251_ceiling_holds_across_the_variant_count(
     overflows; at the real cap the V=1 arm cannot, and would be vacuous.
 
     Mutation: the reservation ``limit // max(V, 1)`` -> ``limit``.
+
+    ⚠ The cell width is ``_WIDEST_CELL`` because at the default width the V=1 arm
+    raised only 10 239 B against a 52 698 B ceiling and stayed GREEN with the
+    byte gate fully removed. TC-552 now guards every arm of this sweep against
+    its own ceiling.
     """
     monkeypatch.setattr(report_service, "REPORT_MAX_TOTAL_BYTES", _SHRUNK_LIMIT)
-    results = [_result(f"v{i}", rows=60) for i in range(variants)]
+    results = [_result(f"v{i}", rows=60, width=_WIDEST_CELL) for i in range(variants)]
     path = _generate(tmp_path, results)
     size = len(path.read_bytes())
     assert size <= _ceiling(variants, limit=_SHRUNK_LIMIT), (
@@ -294,9 +385,15 @@ def test_at252_ceiling_holds_across_the_check_file_count(
     only thing that can bound the document is this batch's byte gate.
 
     Mutation: ``put``'s ``if not gate.emit(...)`` -> unconditional emit.
+
+    ⚠ All three arms of this sweep were INERT as shipped: 6 939 / 13 465 /
+    20 936 B against a 52 698 B ceiling, all three green with the byte gate
+    removed. The cells are now ``_WIDEST_CELL``; rows stay at 40, well under
+    ``MAX_REPORT_ROWS_PER_VARIANT``, so the row cap still never fires and the
+    byte gate remains the only available bound.
     """
     monkeypatch.setattr(report_service, "REPORT_MAX_TOTAL_BYTES", _SHRUNK_LIMIT)
-    results = [_result("v0", rows=40, files=files, mem=4096)]
+    results = [_result("v0", rows=40, files=files, width=_WIDEST_CELL, mem=4096)]
     path = _generate(tmp_path, results)
     size = len(path.read_bytes())
     assert size <= _ceiling(1, limit=_SHRUNK_LIMIT), (
@@ -320,19 +417,61 @@ def test_at253_every_drop_is_disclosed_with_its_byte_total(
     about how much of their document is gone.
 
     Mutation (pair): delete the disclosure · emit it unconditionally.
+
+    ⚠ **The byte-equality claim A-6/F6 requires was unrealized, and this node is
+    weaker than the revision-1 text A-6 replaced.** As shipped it asserted only
+    that a number follows the word ``bytes`` and that the sum is ``> 0``.
+    Executed: rendering ``f"bytes {sections}"`` — a SECTION COUNT under the
+    "bytes" label — left **27 nodes green**. ``TC-560`` guards the accumulator
+    near-tautologically and never the rendering an auditor actually reads, so
+    nothing in the file compared the disclosed number to the bytes it names.
+
+    The refused totals below are accumulated **independently of
+    ``_Refusals.byte_count``**: the seam is wrapped and each refused batch is
+    weighed with ``_line_bytes`` in the test. Comparing the rendering to the
+    product's own accumulator would restate ``TC-560``.
     """
     monkeypatch.setattr(report_service, "REPORT_MAX_TOTAL_BYTES", 30_000)
+
+    independent: Dict[str, int] = {}
+    original_emit = report_service._EmissionGate.emit
+
+    def weighing_emit(self, batch, kind):  # type: ignore[no-untyped-def]
+        admitted = original_emit(self, batch, kind)
+        if not admitted and batch:
+            independent[kind] = independent.get(kind, 0) + _line_bytes(batch)
+        return admitted
+
+    monkeypatch.setattr(report_service._EmissionGate, "emit", weighing_emit)
+
     results = [_result(f"v{i}", rows=60) for i in range(4)]
     text = _generate(tmp_path, results).read_text(encoding="utf-8")
 
     assert "## Omitted content" in text, "content was refused but never disclosed"
-    disclosed = [ln for ln in text.splitlines() if ln.startswith("- ") and "bytes " in ln]
-    assert disclosed, "the disclosure block states no byte total"
-    total = sum(
-        int(ln.split("bytes ")[1].split(",")[0].split(" ")[0].rstrip(")").strip())
-        for ln in disclosed
+    assert independent, "nothing was refused — the fixture cannot exercise the disclosure"
+
+    # Parse the RENDERED block, per kind. The unit is asserted by position: the
+    # number must be the one introduced by the word "bytes".
+    row = re.compile(
+        r"^- (?P<kind>[^:]+): sections (?P<sections>\d+), "
+        r"lines (?P<lines>\d+), bytes (?P<bytes>\d+)"
     )
-    assert total > 0, "a refusal was recorded with a zero byte cost"
+    rendered: Dict[str, int] = {}
+    for line in text.splitlines():
+        match = row.match(line)
+        if match:
+            rendered[match.group("kind")] = int(match.group("bytes"))
+    assert rendered, "the disclosure block states no byte total"
+
+    assert rendered == independent, (
+        f"the disclosed byte totals do NOT equal the refused line bytes.\n"
+        f"  rendered:              {rendered}\n"
+        f"  independently weighed: {independent}\n"
+        f"An auditor reads the rendering, so a disclosure that states some other "
+        f"quantity under the 'bytes' label misreports how much of the document is "
+        f"gone — which 'sections 3' satisfied while saying nothing."
+    )
+    assert sum(rendered.values()) > 0, "a refusal was recorded with a zero byte cost"
     # kept > 0 AND cut > 0 — a report that dropped everything, or nothing,
     # cannot discriminate a partial-refusal bug.
     assert text.count("## Variant:") == 4, "a variant vanished"
@@ -682,24 +821,237 @@ def test_tc554_the_census_walk_actually_finds_a_planted_write() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_tc555_allowance_is_recomputed_independently_and_discriminates() -> None:
-    """TC-555 — recompute the allowance in the TEST, never by calling the product helper.
+def _measured_heading_bytes() -> int:
+    """The widest per-variant heading the shipped surface can emit, measured.
 
-    Intent: revision 1 asserted ``ALLOWANCE == _derive()``, which is an identity
-    and cannot fail. Here the O(V) slope is re-derived from two measured points
-    and compared to the closed-set cardinality the design claims bounds it.
+    This is the floor the allowance's ``O(V)`` slope has to clear. Asserting the
+    SLOPE rather than only the total is what makes an under-derived heading term
+    detectable at every ``V``: against the total alone, the constant block and
+    appendix terms dominate at small ``V`` and a wrong slope hides inside them —
+    measured, dropping the marker terms was caught at ``V=400`` and missed at
+    ``V=0/1/10/100``.
     """
-    # The V-dependent term must be exactly linear in V, and its slope must be
-    # the per-variant heading + marker allowance — not an emergent number.
+    return len(
+        f"## Variant: {md_safe(_WIDEST_REACHABLE_ID, limit=report_service.REPORT_CELL_CHARS)}".encode()
+    )
+
+
+def _measured_allowance_floor(variant_count: int) -> int:
+    """MEASURED lower bound: bytes the document really does emit unconditionally.
+
+    Nothing here is re-typed from the product's derivation — each term is
+    obtained by rendering the thing the term exists to cover and weighing it:
+    the disclosure block from a saturated accumulator, the header from the
+    shipped constant it was measured at (P-16), and the per-variant heading at
+    the widest id the shipped surface can actually deliver.
+    """
+    saturated = report_service._Refusals()
+    widest_int = 2**63 - 1
+    for kind in REPORT_SECTION_KINDS:
+        for variant in range(report_service.REPORT_DISCLOSURE_VARIANTS_MAX + 25):
+            saturated.record(kind, ["x"] * 5, widest_int, variant)
+    block = _line_bytes(report_service._disclosure_lines(saturated))
+    return block + _MEASURED_HEADER_BYTES + variant_count * _measured_heading_bytes()
+
+
+def _independent_allowance_cap(variant_count: int) -> int:
+    """INDEPENDENT upper bound, derived in the test from the closed label set,
+    the caps, and the **emitted-byte** width of a capped cell.
+
+    The only substantive difference from the product's derivation is the one that
+    matters: a capped cell is charged at ``_MAX_UTF8_BYTES_PER_CHAR`` bytes per
+    permitted character, never at one byte per character. A derivation that
+    reads ``REPORT_CELL_CHARS`` as a byte count cannot bound its own output —
+    that is ``TC-611``.
+    """
+    width = len(str(sys.maxsize))
+    cell = _MAX_UTF8_BYTES_PER_CHAR * report_service.REPORT_CELL_CHARS
+    row = (
+        len("- : sections , lines , bytes  (variants )")
+        + max(len(kind) for kind in REPORT_SECTION_KINDS)
+        + 3 * width
+        + report_service.REPORT_DISCLOSURE_VARIANTS_MAX * (width + 2)
+        + len(" +N more") + width
+    )
+    block = len("## Omitted content") + 2 + len(REPORT_SECTION_KINDS) * (row + 1) + 2
+    note = len("- Variant '': ") + cell + 160
+    appendix = (
+        len("## Truncation appendix") + 2 + REPORT_MAX_TRUNCATION_NOTES * (note + 1)
+    )
+    marker = len("> TRUNCATED: .") + 256
+    headings = variant_count * (len("## Variant: ") + cell + 2 + 2 * (marker + 1))
+    return block + appendix + headings + 1024
+
+
+@pytest.mark.parametrize("variants", [0, 1, 10, 100, 400])
+def test_tc555_allowance_is_bounded_on_both_sides_by_test_owned_derivations(
+    variants: int,
+) -> None:
+    """TC-555 — the allowance is SANDWICHED between a measured floor and an
+    independently derived cap, neither of which calls the product helper.
+
+    Intent: revision 1 asserted ``ALLOWANCE == _derive()``, an identity that
+    cannot fail. A-10 required an independent recomputation.
+
+    ⚠ **A-10's tautology was relocated, not removed, and this node is where it
+    landed.** As shipped it asserted ``slope_1 == slope_10``,
+    ``a0 > len(REPORT_SECTION_KINDS)`` (i.e. ``47534 > 8``) and
+    ``a(100) > a(10)`` — every one a property of ``_disclosure_allowance``
+    computed *from* ``_disclosure_allowance``. Executed: substituting the
+    allowance for ``1_000_000_000 + variant_count`` left **27 nodes green**,
+    this one among them. A ~1 GB allowance is not merely unnoticed, it satisfies
+    every ceiling in the file.
+
+    The cap is what refuses that mutation; the floor is what refuses an
+    under-derivation. One-sided bounds cannot do both, and the shipped node had
+    neither side.
+    """
+    allowance = _disclosure_allowance(variants)
+    floor = _measured_allowance_floor(variants)
+    cap = _independent_allowance_cap(variants)
+
+    assert allowance >= floor, (
+        f"at V={variants} the allowance is {allowance} B but the document emits "
+        f"at least {floor} B unconditionally (measured) — the ceiling it feeds is "
+        f"understated and AT-250..AT-252 would certify a bound that is false"
+    )
+    assert allowance <= cap, (
+        f"at V={variants} the allowance is {allowance} B against an independently "
+        f"derived cap of {cap} B. An allowance this large makes every ceiling "
+        f"assertion in this file vacuous — a 1 GB substitution passed 27 nodes"
+    )
+
+    # The O(V) SLOPE, asserted separately from the total. The total floor is
+    # dominated by its constant terms at small V, so a wrong per-variant term
+    # hides inside them; the slope is V-independent and cannot.
+    slope = _disclosure_allowance(variants + 1) - _disclosure_allowance(variants)
+    heading = _measured_heading_bytes()
+    assert slope >= heading, (
+        f"the allowance grows {slope} B per variant but a single heading measures "
+        f"{heading} B at the widest id the shipped surface can deliver — the O(V) "
+        f"term is under-derived and the ceiling is false for large V"
+    )
+
+
+def test_tc612_allowance_is_driven_by_the_closed_label_set() -> None:
+    """TC-612 — the discriminating arm: adding a label to the tuple MUST move the number.
+
+    §6 charters this as part of ``TC-555``. It is a separate node because C-18
+    binds one id to exactly one node and ``TC-555`` is now parametrized over
+    ``V``; the split is **declared** in the increment packet and the amendment
+    log rather than left for a reviewer to notice, which is precisely what
+    ``TC-556``'s undeclared repurposing did not do.
+
+    This is the arm §6 chartered and the shipped node did not have: it asserted
+    ``a0 > len(REPORT_SECTION_KINDS)``, which is ``47534 > 8`` and holds however
+    the derivation is written. Here the closed tuple is actually extended, so a
+    derivation that ignores the label set cannot pass.
+    """
+    original = report_service.REPORT_SECTION_KINDS
+    before = _disclosure_allowance(0)
+
+    def with_kinds(kinds: Tuple[str, ...]) -> int:
+        try:
+            report_service.REPORT_SECTION_KINDS = kinds
+            return _disclosure_allowance(0)
+        finally:
+            report_service.REPORT_SECTION_KINDS = original
+
+    # ⚠ The added label MUST NOT be wider than the widest existing one. The first
+    # draft of this node used a 21-character label against an 18-character max,
+    # so it moved the row width and would have passed even with the cardinality
+    # term replaced by the literal 1 — executed, that mutation left this node
+    # GREEN. A short label isolates cardinality as the only thing that can move
+    # the number.
+    widest = max(len(kind) for kind in original)
+    short = "x"
+    assert len(short) <= widest, "the probe label must not widen the row"
+    cardinality_only = with_kinds(original + (short,))
+    assert cardinality_only > before, (
+        f"adding a {len(short)}-character label (max existing is {widest}, so the "
+        f"row width cannot have moved) left the allowance at {before} B — the block "
+        f"term is not actually O(|REPORT_SECTION_KINDS|)"
+    )
+
+    # And the widest-label term is live too, asserted separately so that neither
+    # term can stand in for the other.
+    wider = with_kinds(original + ("w" * (widest + 7),))
+    assert wider > cardinality_only, (
+        "a label wider than every existing one did not widen the disclosure row — "
+        "the row term ignores the label set's width"
+    )
+    # And the O(V) term stays exactly linear: a slope that drifts with V would
+    # mean an unnamed V-dependent term crept into an "O(1) in V" bound.
     a0, a1, a10 = (_disclosure_allowance(v) for v in (0, 1, 10))
-    slope_1 = a1 - a0
-    slope_10 = (a10 - a0) / 10
-    assert slope_1 == slope_10, "the O(V) term is not linear in V"
-    # Discriminating arm: the block scales with the CLOSED label set, so a
-    # shorter set must produce a smaller allowance. If it does not, the label
-    # tuple is not actually driving the derivation.
-    assert a0 > len(REPORT_SECTION_KINDS), "the allowance ignores the label set"
-    assert _disclosure_allowance(100) > _disclosure_allowance(10)
+    assert a1 - a0 == (a10 - a0) / 10, "the O(V) term is not linear in V"
+
+
+@pytest.mark.parametrize(
+    "label, char, expected_factor",
+    [
+        ("escaped ASCII (MD_ESCAPE member)", "`", 2),
+        ("unescaped non-BMP code point", "\U0001F600", 4),
+    ],
+    ids=["escaped-ascii", "non-bmp"],
+)
+def test_tc611_cell_allowance_must_not_be_derived_from_input_chars(
+    label: str, char: str, expected_factor: int
+) -> None:
+    """TC-611 — ``md_safe``'s ``limit=`` is an INPUT-CHARACTER cap, and the bytes it
+    emits exceed it. Pins the expansion so no byte allowance is ever re-derived
+    from :data:`REPORT_CELL_CHARS`.
+
+    ⚠ **This node is §6's chartered ``TC-556``, restored.** The shipped ``TC-556``
+    asserts the reservation floor instead — a legitimate test, but §6 charters no
+    node for it, and unlike ``TC-561``'s repurposing this substitution was never
+    declared. Its absence is what let the allowance keep reading a character cap
+    as a byte bound: ``report_service.py:842`` (``note``) and ``:851-853``
+    (``headings``) both charge ``REPORT_CELL_CHARS`` bytes for a
+    ``REPORT_CELL_CHARS``-character cell. Measured, the heading term allocates
+    524 B for a cell that emits up to 2 063 B.
+
+    It carries a new id because ``TC-556`` is now ``LIVE`` against a different
+    node and re-pointing it would redden ``G2``.
+
+    **The charter's own constant was also under-derived.** It specifies "pins
+    2.03x" — the escaped-ASCII case, which this node keeps as its first arm. But
+    escaping is not the worst expansion: an escaped ``MD_ESCAPE`` member is ASCII
+    plus a backslash, 2 bytes, while an unescaped non-BMP code point is 4. The
+    true worst factor is **4.03x**, and a pin written at 2.03x would have
+    certified a bound that is still half of what the cap permits.
+    """
+    limit = report_service.REPORT_CELL_CHARS
+    emitted = md_safe(char * (2 * limit), limit=limit)
+    emitted_bytes = len(emitted.encode("utf-8"))
+
+    assert emitted_bytes > limit, (
+        f"{label}: md_safe emitted {emitted_bytes} B for limit={limit}. If the "
+        f"emitted size never exceeded the limit, reading REPORT_CELL_CHARS as a "
+        f"byte bound would be sound — it is not, and this is the pin that says so"
+    )
+    # The factor is asserted as a RELATION to the derived constant, never as a
+    # literal: a hard-coded 1039 or 2063 goes stale the moment the cap moves.
+    assert emitted_bytes >= expected_factor * limit, (
+        f"{label}: expansion measured {emitted_bytes / limit:.2f}x, below the "
+        f"{expected_factor}x this arm pins"
+    )
+    assert emitted_bytes <= _MAX_UTF8_BYTES_PER_CHAR * limit + 64, (
+        f"{label}: expansion measured {emitted_bytes / limit:.2f}x, ABOVE the "
+        f"{_MAX_UTF8_BYTES_PER_CHAR}x that TC-555's independent cap charges per "
+        f"character — that cap is now unsound"
+    )
+    # And the constant the allowance actually charges must cover the widest id the
+    # shipped surface can deliver. This is the pin that keeps
+    # REPORT_VARIANT_ID_MAX_BYTES honest if md_safe's escaping ever widens: the
+    # allowance terms are derived from the constant, so a constant that no longer
+    # bounds the rendering would understate the ceiling silently.
+    widest_rendered = len(md_safe(_WIDEST_REACHABLE_ID, limit=limit).encode("utf-8"))
+    assert report_service.REPORT_VARIANT_ID_MAX_BYTES >= widest_rendered, (
+        f"REPORT_VARIANT_ID_MAX_BYTES is "
+        f"{report_service.REPORT_VARIANT_ID_MAX_BYTES} B but the widest id the "
+        f"workspace surface can deliver renders as {widest_rendered} B — every "
+        f"allowance term derived from that constant is now understated"
+    )
 
 
 def test_tc556_reservation_floor_covers_a_real_minimal_variant_record(
