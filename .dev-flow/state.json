@@ -61,7 +61,10 @@
     "2": ".dev-flow/2026-07-31-batch-75/02-review.md"
   },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-31-batch-76/PLAN.md"
+    "plan": ".dev-flow/2026-07-31-batch-76/PLAN.md",
+    "0": ".dev-flow/2026-07-31-batch-76/00-measurements.md",
+    "3_inc0": ".dev-flow/2026-07-31-batch-76/03-increments/increment-000.md",
+    "3_inc1": ".dev-flow/2026-07-31-batch-76/03-increments/increment-001.md"
   },
   "decisions_log": [
     {
@@ -93,8 +96,56 @@
       "date": "2026-07-31",
       "decision": "D-2 force-checkout over 5 untracked prototypes files",
       "notes": "Taken autonomously AFTER proving all 5 byte-identical to their origin/main blobs via git hash-object - zero information at risk. They were untracked only because local main predated the commit that added them. prototypes/out/ left in place and reported as found."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "Inc-0 + Inc-1 landed; Inc-2/Inc-3 NOT started",
+      "notes": "Three of my own acceptances were INERT on first execution, all the vacuous-FIXTURE class: TC-552 caught two before anything ran (rows=4000 against a 200-row cap), AT-254 asserted only that a ~20 B unconditional heading exists (true under any allocation, so it never tested fairness), and AT-250/252 could not see put ungated because their fixtures had no mem_map. Fixed by re-deriving fixtures from measurement and adding AT-264 and TC-573. Final matrix: 8 mutations, INERT none."
     }
   ],
   "obsidian_synced": false,
-  "created_at": "2026-07-31T00:00:00Z"
+  "created_at": "2026-07-31T00:00:00Z",
+  "progress": {
+    "branch": "claude/batch-76-r-tui-102-impl (pushed)",
+    "commits": [
+      "5f60ffe Inc-0 pre-flight golden",
+      "9ee848d Inc-1 HLR-108 document gating"
+    ],
+    "inc0": "DONE - golden captured from the SHIPPED producer in its own commit (C-12), 7619 B at 0.3633% of cap, deterministic, 63 hexdump lines, 0 short-circuits.",
+    "inc1": "CODE + TESTS DONE (27 nodes, all 8 counterfactual mutations RED, source hash restored). REQUIREMENTS.md and the TC-610 amendment are OWED.",
+    "inc2": "NOT STARTED - _format_length at report_service.py:1356 and :1582. D2, re-triaged P3 hardening.",
+    "inc3": "NOT STARTED - error re-attribution at app.py:4155/:4158/:4164. MUST follow Inc-2; the ordering is load-bearing.",
+    "pr": "NOT OPENED - deliberately. The full gate suite had not returned a clean end-to-end result at hand-off, so no green-CI claim is made."
+  },
+  "blocking_carry": {
+    "id_guard": "THE NEXT STEP, and it blocks the other two. tests/test_id_registry.py::test_tc610 hard-asserts AT-250..279 / TC-552..599 stay RESERVED by batch-75, while G4 requires an id to be LIVE once REQUIREMENTS.md cites it as a verifier. Mutually unsatisfiable. Operator ruled (Q2): amend TC-610 to 'reserved-or-spent-by-its-owner'. Until then the ids MUST stay RESERVED and REQUIREMENTS.md must not cite them.",
+    "proven_by": "executed at Phase 0, both limbs, restored and hash-verified"
+  },
+  "requirement_amendments": [
+    {
+      "id": "B76-A1",
+      "clause": "LLR-108.8",
+      "before": "uniform gating including the preamble",
+      "after": "uniform EXCEPT the O(1) header (181 B, flat V=1..20000); inventory/overview stay gated and disclosed",
+      "driver": "P-16 TRUE. Preamble is O(V) (62.0 then 65.0 B/variant) and hits the cap at V~32285, so literal uniformity refuses the title and contradicts AT-255. The spec's own sketch (exempt the whole preamble) was REJECTED by measurement: it would put an O(V) term in the allowance and make HLR-108's V-invariance stated-but-false.",
+      "authority": "OPERATOR-APPROVED via AskUserQuestion"
+    },
+    {
+      "id": "B76-A2",
+      "clause": "LLR-108.4",
+      "before": "charged against its own reservation",
+      "after": "and against the document budget; an admission requires BOTH",
+      "driver": "P-27 NEW+FALSE. A floored reservation over-subscribes: sum = V*max(CAP//V,floor) = 48.8x CAP at V=100000. Reservation-only gating would break the ceiling AT-250/251/252 assert.",
+      "authority": "forced, not a judgement call"
+    },
+    {
+      "id": "B76-A3",
+      "clause": "LLR-108.4 (impl)",
+      "before": "shares cut from REPORT_MAX_TOTAL_BYTES",
+      "after": "shares cut from gate.budget.remaining()",
+      "driver": "the preamble is already charged when shares are cut; at a 4000 B limit six shares of CAP//6=666 promise 3996 B against 2000 B available",
+      "authority": "found while building the AT-254 fixture"
+    }
+  ]
 }
