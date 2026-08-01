@@ -17,4 +17,7 @@ Contents:
   by the seeder and ``tests/test_id_registry.py``.
 * ``seed_id_registry`` — the one-time seeder for ``AT-TC-REGISTRY.jsonl``.
 * ``counterfactual_id_registry`` — the recorded guard-can-fail evidence run.
+* ``mutation_harness`` — the PER-ARM counterfactual runner (batch-76 merge gate).
+  Imported by nothing: it is a command-line tool, and it mutates a throwaway
+  ``git worktree`` rather than the checkout it runs from.
 """

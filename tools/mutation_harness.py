@@ -102,15 +102,30 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _run(tree: Path, nodes: Sequence[str]) -> Dict[str, str]:
+#: The probe's sentinel. Written into the mutated region and READ BACK from the
+#: failure output — see :func:`_run`'s ``sentinel`` argument.
+PROBE_SENTINEL = "__MUTATION_PROBE_REACHED__"
+
+
+def _run(
+    tree: Path, nodes: Sequence[str], sentinel: Optional[str] = None
+) -> Dict[str, str]:
     """Run ``nodes`` and return ``{resolved_node_id: outcome}``.
 
     ``-v`` is what makes this per-arm: the summary line ``3 failed, 4 passed``
     is exactly the aggregate that hid four inert arms, so it is never parsed.
     ``-p no:randomly`` keeps arm order stable across the baseline/mutated pair.
+
+    When ``sentinel`` is given, an arm counts as having executed the region only
+    if that exact string appears in its failure line. Inferring reachability from
+    ``FAILED`` alone would credit the probe for a failure it did not cause — an
+    arm that was already going to fail for an unrelated reason would read as
+    "reached". The probe writes a sentinel precisely so something can read it.
     """
+    tb = "line" if sentinel else "no"
     proc = subprocess.run(
-        [sys.executable, "-m", "pytest", *nodes, "-v", "--tb=no", "-p", "no:randomly", "--no-header"],
+        [sys.executable, "-m", "pytest", *nodes, "-v", f"--tb={tb}",
+         "-p", "no:randomly", "--no-header"],
         cwd=tree,
         capture_output=True,
         text=True,
@@ -126,6 +141,10 @@ def _run(tree: Path, nodes: Sequence[str]) -> Dict[str, str]:
             f"cannot see arms is the defect this file exists to prevent.\n"
             f"--- stdout tail ---\n{proc.stdout[-2000:]}"
         )
+    if sentinel and sentinel not in proc.stdout:
+        # Every probed arm failed for some OTHER reason, so none of them can be
+        # said to have executed the region.
+        return {node: "PASSED" for node in outcomes}
     return outcomes
 
 
@@ -174,14 +193,14 @@ def _substitute(target: Path, anchor: str, replacement: str) -> bytes:
 
 
 def _apply_and_run(
-    tree: Path, mutation: Mutation, replacement: str
+    tree: Path, mutation: Mutation, replacement: str, sentinel: Optional[str] = None
 ) -> Dict[str, str]:
     """Substitute, run the nodes, restore, and verify the restore by hash."""
     target = tree / mutation.path
     before_hash = _sha256(target)
     original = _substitute(target, mutation.anchor, replacement)
     try:
-        return _run(tree, mutation.nodes)
+        return _run(tree, mutation.nodes, sentinel=sentinel)
     finally:
         target.write_bytes(original)
         after_hash = _sha256(target)
@@ -225,7 +244,9 @@ def evaluate(tree: Path, mutation: Mutation, probe: bool) -> ArmResult:
                 f"probe= for its anchor position, so reachability cannot be "
                 f"settled. Add one before trusting the green verdicts: {inert}"
             )
-        result.probed = _apply_and_run(tree, mutation, mutation.probe)
+        result.probed = _apply_and_run(
+            tree, mutation, mutation.probe, sentinel=PROBE_SENTINEL
+        )
     return result
 
 

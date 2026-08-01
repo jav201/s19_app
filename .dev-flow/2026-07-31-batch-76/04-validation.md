@@ -132,7 +132,7 @@ final matrix.
 | Re-pointed rows | `TC-552`, `TC-555` — renamed nodes, statements updated **in `AT-TC-REGISTRY.jsonl`** |
 | Node names re-pointed in `REQUIREMENTS.md`'s `- Validation:` list | ✅ — **but only after the merge gate caught that they were not** (F-1, below) |
 | `TC-611`/`TC-612` added to `REQUIREMENTS.md`'s `- Validation:` list | ✅ — likewise (F-2) |
-| Every `test_*` node cited in `REQUIREMENTS.md` is defined in `tests/` | 15 missing, **all pre-existing**: 17 on the `origin/main` baseline, 17 − 2 = 15 after this fix, i.e. this closure broke exactly 2 and repaired exactly 2 |
+| Every `test_*` node cited in `REQUIREMENTS.md` is defined in `tests/` | 15 missing, **all pre-existing**. Re-derived at three refs: `origin/main` **15** → `fd9124a` **17** → HEAD **15**. The branch broke 2 and repaired the same 2; **it did not reduce the pre-existing debt.** Asserted by SET identity, not by count: `{broken by branch} == {repaired at HEAD}`, `{new at HEAD} == ∅`, and HEAD's undefined set is identical to `origin/main`'s |
 | C-18 (one id → exactly one node) | held; this is why the chartered `TC-555` discriminating arm was split to `TC-612` rather than added as a second node |
 | `EXPECTED_SCANNED_TEST_FILES` | **152**, unchanged — no new test module |
 | Registry diff | 5 insertions / 3 deletions over 1 373 rows; the other 1 368 byte-identical |
@@ -206,17 +206,23 @@ charter — shipped with two broken node citations.
 
 | Check | Result |
 |---|---|
-| Cited-but-undefined nodes in `REQUIREMENTS.md` | 17 on `origin/main` → **15** now; this closure broke 2 and repaired 2 |
+| Cited-but-undefined nodes in `REQUIREMENTS.md` | `origin/main` **15** → `fd9124a` **17** → HEAD **15**, by SET identity. ⚠ My first statement of this said *"17 on origin/main → 15 now"*, which credits the branch with a debt reduction it did not make — I had measured the "baseline" with `git stash`, which stashes only **uncommitted** changes while HEAD still carried the renames, so I measured the branch and labelled it `main`. Caught by the round-2 gate |
 | `TC-611`/`TC-612` cited in the `- Validation:` list | ✅ |
 | Harness on a **genuine** fresh worktree (`git worktree add`, CRLF, no `cp`, no normalisation) | ✅ **21/21 arms RED**, exit 0, via the documented procedure |
 | Harness refuses a main checkout (`.git` is a directory) | ✅ aborts with the `git worktree add` remedy |
 | Arm-count assertion, positive-controlled (claim M1 has 3 arms when it has 7) | ✅ aborts — "an arm count is this harness's unit of evidence" |
 
-**Gate suite re-run in full on the final tree `08607da`**, rather than a targeted run: 8 test files
-read `REQUIREMENTS.md` (`test_color_policy_round_trip`, `test_report_addendum_bound`,
-`test_tui_evidence_packs`, `test_tui_legend`, `test_tui_patch_json`, `test_tui_public_api`,
-`test_validation_engine`, `test_id_registry`), so the blast radius of the F-1/F-2 edits is wider than
-the registry guard alone.
+**Gate suite re-run in full on the final tree `08607da`** rather than targeted, because the blast
+radius of the F-1/F-2 edits is wider than the registry guard alone.
+
+⚠ **The number I first gave for that radius was wrong, and so was the round-2 gate's correction of
+it.** I wrote "8 test files read `REQUIREMENTS.md`" from `grep -l REQUIREMENTS tests/*.py`; the gate
+corrected it to 7, excluding one docstring-only match. Re-derived by asking which files actually
+**open** the path rather than merely mention the string, the answer is **2**:
+`tests/test_id_registry.py` and `tests/test_report_addendum_bound.py`. The other six cite it in
+docstrings and comments. Both wrong numbers erred toward more coverage, and the full run was the
+right call regardless — but *"grep matched the token"* is not *"the test reads the file"*, which is
+the same substitution-of-a-proxy-for-the-property this batch has been about throughout.
 
 ```
 29 snapshots passed.
