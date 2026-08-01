@@ -1,6 +1,18 @@
 # batch-76 — Phase 4 validation (merge-gate closure)
 
-**Commit under test:** `fd9124a` · **Base:** `origin/main` = `291bb76` · **PR** [#184](https://github.com/jav201/s19_app/pull/184)
+## Verdict: **PASS**
+
+`R-TUI-102` (`HLR-108`/`109`/`110`) validated. All four merge-gate HIGH findings closed, each with a
+counterfactual executed **per parametrized arm**; full gate suite green twice on a settled tree; two
+rounds of independent merge-gate review, round 2 **CLEAR**. Merged as `bc02cdd` (PR #184), and the
+21/21 arm matrix reproduces on `origin/main` itself post-merge.
+
+Qualified by what is *not* claimed: non-claim (h) bounds the ceiling to `variant_id`s the workspace
+surface can produce, and four residuals are carried to the backlog lanes (§8, R2-b) rather than
+closed here.
+
+**Commit under test:** `fd9124a` → final `62f80c3` → merged `bc02cdd` · **Base:** `origin/main` =
+`291bb76` · **PR** [#184](https://github.com/jav201/s19_app/pull/184)
 
 ---
 

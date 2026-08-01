@@ -44,8 +44,8 @@
     "registry_high_water": "AT-281 / TC-610; next_free AT-282 / TC-611",
     "mint_nothing_new": true
   },
-  "current_phase": 4,
-  "phase_status": "awaiting-gate",
+  "current_phase": 6,
+  "phase_status": "synced",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -126,9 +126,21 @@
       "date": "2026-07-31",
       "decision": "merge gate BLOCK - returned to operator",
       "notes": "The precondition worked exactly as designed: an independent pass found four HIGH findings, two of which I verified myself by execution. The batch's shipped CODE is sound (Inc-3 confirmed clean, frozen diff 0, traceability clean, all correctness hunts clean); the defects are in ACCEPTANCE STRENGTH - the same class this batch kept finding in itself."
+    },
+    {
+      "phase": 6,
+      "date": "2026-08-01",
+      "decision": "phases 4/5/6 complete; batch MERGED as bc02cdd (PR #184)",
+      "notes": "Record advanced from phase 4 / awaiting-gate. The lag was bookkeeping, not an unmet gate: 04-validation.md, 05-postmortem.md and 06-docs/NOT-APPLICABLE.md were all written, the independent merge-gate pass returned CLEAR on its second round, CI was green and the PR is merged. current_phase was set to 4 when 04 was written and never advanced as 05 and 06 followed."
+    },
+    {
+      "phase": 6,
+      "date": "2026-08-01",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-31-batch-76/ - PLAN.md, 00-measurements.md, 04-validation.md, 05-postmortem.md, 06-docs/, state-at-close.json, 2026-07-31-batch-76-README.md. Phases 0-2 NOT duplicated: inherited from batch-75 and already in the vault. 03-increments not synced per the vault convention since batch-04. Visual evidence refreshed (trigger: the batch touched s19_app/tui/ in app.py and services/report_service.py): 15 gifs + 75 flattened frames from code verified byte-identical to merged main; 0 stale live assets. The 6 retired pv__case_06_large_nested_a2l files were EXCLUDED from the copy BY NAME rather than re-stamped fresh by the blanket *.gif helper. Dashboard.md already existed and was not overwritten."
     }
   ],
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-07-31T00:00:00Z",
   "progress": {
     "branch": "claude/batch-76-r-tui-102-impl (pushed)",
