@@ -44,7 +44,7 @@
     "registry_high_water": "AT-281 / TC-610; next_free AT-282 / TC-611",
     "mint_nothing_new": true
   },
-  "current_phase": 3,
+  "current_phase": 4,
   "phase_status": "awaiting-gate",
   "iterations_per_phase": {
     "0": 0,
@@ -66,7 +66,11 @@
     "3_inc0": ".dev-flow/2026-07-31-batch-76/03-increments/increment-000.md",
     "3_inc1": ".dev-flow/2026-07-31-batch-76/03-increments/increment-001.md",
     "3_inc2": ".dev-flow/2026-07-31-batch-76/03-increments/increment-002.md",
-    "3_inc3": ".dev-flow/2026-07-31-batch-76/03-increments/increment-003.md"
+    "3_inc3": ".dev-flow/2026-07-31-batch-76/03-increments/increment-003.md",
+    "3_inc4": ".dev-flow/2026-07-31-batch-76/03-increments/increment-004.md",
+    "4": ".dev-flow/2026-07-31-batch-76/04-validation.md",
+    "5": ".dev-flow/2026-07-31-batch-76/05-postmortem.md",
+    "6": ".dev-flow/2026-07-31-batch-76/06-docs/NOT-APPLICABLE.md"
   },
   "decisions_log": [
     {
@@ -185,12 +189,28 @@
     "H-4": "AT-253's byte-equality claim is unrealized. VERIFIED INDEPENDENTLY: rendering a section COUNT under the 'bytes' label keeps all 27 green. A-6/F6 required equality with the sum of _line_bytes(refused).",
     "medium": "M-1 REQUIREMENTS.md ships 7 non-claims against the spec's 11, dropping the 2.03x input-shaped-cap caveat that H-3 depends on. M-2 a FOURTH unrecorded amendment: the ceiling became a private V-dependent function instead of the spec's imported constant, which is what makes H-2 possible. M-3 B76-A3 has no acceptance at all.",
     "my_own_error": "My increment-001 evidence table reported 'M1 -> AT-250/251/252 RED' and 'INERT: none'. The transcript line I was reading said '3 failed, 4 passed'. I read a per-mutant EXIT CODE as a per-arm verdict, so the mutation harness aggregated over parametrized arms and hid four green ones. This is the batch's own recurring defect landing in my evidence.",
-    "disposition": "MERGE BLOCKED and returned to the operator, per the kickoff precondition. Not fixed in-session: four HIGH findings in acceptance design deserve a fresh context, not a near-exhausted one."
+    "disposition": "MERGE BLOCKED and returned to the operator, per the kickoff precondition. Not fixed in-session: four HIGH findings in acceptance design deserve a fresh context, not a near-exhausted one.",
+    "closure": {
+      "commit": "fd9124a",
+      "verdict_now": "four HIGH closed; awaiting the re-run independent qa-reviewer pass",
+      "authorization": "operator granted autonomous + merge authorized, with one declared stop for the H-3(b) decision (answered: Option 3)",
+      "per_arm_counterfactual": "21/21 arms RED across 6 mutations via tools/mutation_harness.py; harness positive-controlled on dead code (reported inert AND never-executed)",
+      "H-1": "CLOSED. Reproduced per-arm: 3 RED / 4 GREEN, and the 4 green arms are exactly the arms where raw > ceiling was false. TC-552 now guards every arm against its own ceiling. Shrinking _SHRUNK_LIMIT was NOT an available branch: allowance(1)=48602 is limit-independent, so even limit=0 leaves the ceiling above every AT-252 arm. Cells widened to REPORT_BYTES_PER_CELL; rows left at 60/40 so batch-74's row cap still never fires. M1 now 7/7 RED.",
+      "H-2": "CLOSED, and the finding was UNDERSTATED: _disclosure_allowance has ZERO production call sites - a test-consumed constant living in the product module, which is the mechanical reason a 1e9 substitution passed 27 nodes. TC-555 now sandwiches it (measured floor / independently derived cap / O(V) slope floor). REJECTED the reviewer's literal remedy on measurement: a per-term-sound independent derivation is 2.5-3x the product value, and adopting it as the ceiling would have tripled the bound and weakened all 7 ceiling ATs. TC-612 carries the chartered discriminating arm, split for C-18 and DECLARED.",
+      "H-3": "CLOSED. Violation reproduced: +3747/+54200/+356922 at V=50/100/400, a flat 1009.1 B/variant, i.e. the V-invariance clause failing rather than slack absorption. TC-611 restores the node section 6 chartered as TC-556 AND corrects its constant: the charter says 2.03x but the true worst case is 4.03x (unescaped non-BMP), so both arms are pinned. Operator chose Option 3: note/headings derive from REPORT_VARIANT_ID_MAX_BYTES = 3*255 = 765, the reachable filename bound, giving slope 1068->1321 with the heading portion exactly 777 = the measured supremum - sound by construction and tight. Non-claim (h) states the domain and the measured excess outside it. Output-neutral: zero production callers, plus the AT-256 golden pin.",
+      "H-4": "CLOSED. AT-253 now parses the rendered disclosure per kind with a positional regex and asserts dict EQUALITY against refused bytes weighed independently at the seam (wrapping _EmissionGate.emit), not against _Refusals.byte_count - which would have restated TC-560. M3 RED.",
+      "handoff_propositions_re_executed": "12 evaluated, 4 did not survive execution. (P-3) 'fixture must grow OR the limit shrink' had only one branch. (P-7) md_safe on a double quote is 1.03x, not 2.03x - the double quote is not in MD_ESCAPE; the 2.03x characters are the MD_ESCAPE members. (P-8) the chartered 2.03x pin was itself under-derived; the true worst is 4.03x. (P-9) the byte-maximising reachable id is a 3-byte BMP character at 777 B, not emoji, which cost 2 UTF-16 units so only 127 fit (520 B). (P-12) the registry is at the repo ROOT, not .dev-flow/. None changed a finding's disposition; all four changed the fix.",
+      "gate_suite": "2514 passed, 2 skipped, 3 xfailed, 29 snapshots, exit 0, 1734.87s. ONE run, none discarded. Ledger reconciles on collection: 2508 - 0 + 11 = 2519. The +21 over the handoff's passed count is the 21 slow-marked tests: tui-ci.yml runs -m 'not slow' on pull requests and the full suite on pushes, so the batch's local gate evidence used the LEAN form and those 21 were in no batch-76 evidence at all. This run used the FULL form - the one a merge to main triggers - and they pass.",
+      "self_caught": "The new harness found TWO defects in tests written in this same session: TC-612's probe label was 21 characters against an 18-character maximum, so it moved the row-width term rather than cardinality and passed with the cardinality factor gutted to 1; and TC-555's total floor was inert on 4 of 5 arms against a 2x slope error, because at small V the constant terms swallow a rate error. The harness also broke its own byte-exact-restore contract on a Windows newline round-trip, and its own SHA-256 check is what caught it.",
+      "control_candidates": "CC-1 per-arm counterfactual verdicts - the strongest single-occurrence evidence in the project - registered in BACKLOG-PROCESS.md, NOT encoded (needs its own AskUserQuestion). CC-2..CC-5 in 05-postmortem.md section 7.",
+      "carry": "REPORT_VARIANT_RESERVATION_FLOOR_BYTES (report_service.py:412) carries the same character-cap-as-byte-bound pattern, and its guard TC-556 measures the marginal against a 2-character variant id - the same narrow-fixture class. NOT a live defect and outside the approved scope; registered as P3 in BACKLOG-CODE.md."
+    }
   },
   "handoff": {
     "document": ".dev-flow/HANDOFF-2026-07-31-batch-76-merge-gate.md",
     "reason": "Four HIGH findings in ACCEPTANCE STRENGTH (not in shipped code) surfaced at the merge gate. Handed to a fresh session rather than fixed with a near-exhausted context - fixing acceptance design badly is how these defects were introduced in the first place.",
     "resume_at": "Close H-1..H-4, re-verify PER-ARM, re-run the independent qa-reviewer merge gate, then sync.",
-    "first_action": "ASK the operator for the authorization model. It is per-batch and never inherited - not from the handoff document, not from this file."
+    "first_action": "ASK the operator for the authorization model. It is per-batch and never inherited - not from the handoff document, not from this file.",
+    "status": "DISCHARGED at fd9124a - all four HIGH closed per-arm; sections 2-6 executed; section 3 item 1 implemented as tools/mutation_harness.py"
   }
 }
