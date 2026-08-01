@@ -211,3 +211,20 @@ charter — shipped with two broken node citations.
 | Harness on a **genuine** fresh worktree (`git worktree add`, CRLF, no `cp`, no normalisation) | ✅ **21/21 arms RED**, exit 0, via the documented procedure |
 | Harness refuses a main checkout (`.git` is a directory) | ✅ aborts with the `git worktree add` remedy |
 | Arm-count assertion, positive-controlled (claim M1 has 3 arms when it has 7) | ✅ aborts — "an arm count is this harness's unit of evidence" |
+
+**Gate suite re-run in full on the final tree `08607da`**, rather than a targeted run: 8 test files
+read `REQUIREMENTS.md` (`test_color_policy_round_trip`, `test_report_addendum_bound`,
+`test_tui_evidence_packs`, `test_tui_legend`, `test_tui_patch_json`, `test_tui_public_api`,
+`test_validation_engine`, `test_id_registry`), so the blast radius of the F-1/F-2 edits is wider than
+the registry guard alone.
+
+```
+29 snapshots passed.
+2514 passed, 2 skipped, 3 xfailed in 1652.38s (0:27:32)
+exit 0
+```
+
+Identical to §1. `report_service.py` (`8e2b8f4f…`) and `test_report_document_bound.py` (`a40f2708…`)
+hash **unchanged** from the round-1 run, which is the evidence that F-1…F-4 touched only
+`REQUIREMENTS.md`, the harness and `.dev-flow/` — no production or test code moved after the
+counterfactual matrix was executed.
