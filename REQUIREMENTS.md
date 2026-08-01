@@ -5461,13 +5461,172 @@ the byte-identity control, not on production traffic.
   goldens re-baselined** (the widest golden `Address` cell is 10 characters against a bound of 18 before
   the cue, and the largest single `(document, variant)` Modifications table is **exactly 200** — the
   zero-drift property is *exactly* spent at `MAX_REPORT_ROWS_PER_VARIANT`, not comfortably held).
-  Wording carve-outs owed and carried to batch-75: `LLR-105.5`'s ambiguous "the total" (resolved in code
-  as the **kept** total), `LLR-105.7`'s set-inclusion being literally false for `values=None`,
-  `LLR-106.3`'s undefined "maximum elided count" (defined as `READ_SIZE_CAP_BYTES −
-  REPORT_ADDRESS_HEX_DIGITS`, a **byte** cap used as an upper bound on a **digit** count), and
-  `LLR-105.2`'s silence on whose numbers a per-check-file notice carries (ruled: its own).
+  **Wording carve-outs — DISCHARGED at batch-76** (they were owed to batch-75, which shipped
+  spec-only and never opened this file; carried openly rather than quietly dropped). Each was already
+  resolved *in code* by batch-74; what follows is the normative text catching up with the
+  implementation, so the requirement and the code now say the same thing:
+
+  1. **`LLR-105.5` — "the total" means the KEPT total**, not the pre-filter population, for
+     consistency with `LLR-105.4′`. The ambiguity mattered because under a report filter the two
+     differ, and a notice quoting the population would overstate what the reader is missing.
+  2. **`LLR-105.7`'s set-inclusion carries a non-`None` carve-out.** As written it is *literally
+     false* for `values=None`: that case renders `"-"`, which belongs to none of the three sets the
+     clause quantifies over. The inclusion is asserted **only for a non-`None` run**; `"-"` is the
+     no-value rendering and is outside the claim.
+  3. **`LLR-106.3`'s "maximum elided count" is `READ_SIZE_CAP_BYTES − REPORT_ADDRESS_HEX_DIGITS`.**
+     The term was undefined, which left the derivation without a fixed point. ⚠ It subtracts a
+     **digit** count from a **byte** count on purpose: one hex digit occupies at least one byte of
+     file text, so the byte cap is a valid *upper bound* on the digit count. It is **not** an
+     equality and must not be read as one — nothing downstream needs it tight, because its only
+     consumer needs the *width* of the cue's decimal field, and that width is flat across eight
+     orders of magnitude.
+  4. **`LLR-105.2`'s per-check-file notice carries ITS OWN file's numbers**, not the variant's
+     running totals. Silence here is how a per-file notice quietly starts reporting a cross-file
+     figure, which would contradict `LLR-105.4′`'s summed cap.
 
 ---
+
+## Report document byte-bounding + the `Length` cell + failure attribution — batch-76 (R-TUI-102)
+
+**R-TUI-102**: The report generator shall admit a batch of lines into the document only when its
+emitted UTF-8 byte length fits the remaining budget, and shall bound the produced file at
+`REPORT_MAX_TOTAL_BYTES + _disclosure_allowance(V)` independently of the variant count `V` and the
+per-variant check-file count `F`; shall apportion the budget as a **per-variant reservation** so that
+no variant's content can consume another's share, and shall emit every variant's section heading
+regardless of its reservation being spent; and shall disclose, **once per document**, the sections,
+lines and **bytes** refused per section kind, in a block whose line count is bounded by a closed
+label tuple. Separately, every `Length` cell shall render without raising for every `int` difference
+constructible from the entry domain, deriving any shortened token **arithmetically** from
+`bit_length()` rather than by formatting and slicing, carrying the sign and stating the elided digit
+count. Separately, a `ValueError` escaping the report generator shall be reported on the
+**tool-failure** path and not on the operator-input-rejection path, while a `ValueError` escaping the
+operator-input span shall continue to be reported as a rejection.
+
+**The defect: the document had no byte gate at all.** `emit()` called `budget.consume(...)` and never
+`budget.fits(...)`. Executed at the batch base: **exactly 1** `.fits(` call against **2** `.consume(`
+calls, and the single gate sat inside `_hexdump_section`'s block loop — covering neither `emit` nor
+**five of the six** `put` sites. `R-TUI-101` bounded the row *producers*; nothing bounded the
+*document*, and the measured floor was **15.86×** the budget at `V=100`.
+
+**Why the reservation is required, and why it is not sufficient alone.** With global first-fit over
+attacker-ordered input, an early oversized variant spends the budget and every later variant is left
+as a bare heading — so *who gets documented* becomes the attacker's choice. But a **floored**
+reservation over-subscribes the document: `Σ = V·max(CAP//V, floor)`, measured **48.8× CAP** at
+`V = 100 000` with a 1 024 B floor. An admission therefore has to satisfy **both** its variant's
+reservation and the document budget; gating on the reservation alone would have broken the very
+ceiling this requirement states. The shares are cut from the budget **remaining after the preamble**,
+not from the whole cap — at a 4 000 B limit the preamble takes ~2 000, so six shares of `CAP//6` would
+promise 3 996 B against 2 000 B actually available.
+
+**Why the header is exempt and the rest of the preamble is not.** Executed: the preamble is `O(V)` —
+`inventory` and `overview` each carry one row per variant, measured **62.0** then **65.0** B/variant
+(the two slopes disagree, so the growth is `O(V log V)` as the id column widens), reaching the 2 MB
+cap at **`V ≈ 32 285`**. Gating it uniformly would refuse the document's own **title**. Exempting the
+whole preamble instead would place an unbounded term inside the allowance and make the `V`-invariance
+claim *stated and false*. The header alone is `O(1)` — measured flat at **181 B** from `V = 1` to
+`V = 20 000` — so only the header is emitted unconditionally, exactly as each variant's heading is.
+
+**Why the `Length` cell renders decimally in-domain.** Unlike `Address`, which is hex in the shipped
+output, `Length` is decimal there. An in-domain value therefore renders `str(value)` byte-identically
+to the pre-batch cell; only a value CPython cannot render decimally becomes a hex token. The domain
+test is an integer-safe **upper** bound on decimal width derived from `bit_length()` and compared
+against `sys.get_int_max_str_digits()` read **at call time**, so `str(value)` is never evaluated on
+the untested path — capping the rendered width does not help, because the int→str conversion precedes
+the slice and raises first.
+
+**Why failure attribution is decided by call site, not by cause.** A `ValueError` is not intrinsically
+an operator error, so no analysis of the exception could route it. `generate_project_report` simply
+sat inside the span guarded by `except ValueError`, which surfaces `"Report rejected: …"` — so an
+internal fault told the operator that *they* had typed something invalid. The operator-input span is
+the options construction and the scope guard; everything after it is the tool's own failure.
+
+**What this requirement deliberately does NOT claim.** Each non-claim carries the number executed for
+it, because an over-claiming requirement is how a residual disappears:
+
+(a) **Whole-report RESIDENCY is not bounded, and no memory claim is made.** `_applied_regions` is
+operator-fenced and remains unbounded; every producer is still fully evaluated before its gate can
+refuse it, so peak residency is `admitted_lines + max_producer_output`. This requirement bounds the
+**produced file**, not generation time or peak memory.
+
+(b) **One deliberate `O(V)` term survives: the per-variant heading set**, plus the `O(1)` header and
+the at-most-two `TRUNCATED` markers a variant's hexdump section can carry. All are charged to
+`_disclosure_allowance(V)` and named rather than emergent, so the `V`-invariance is *invariance above
+the named heading term*, not absolute invariance.
+
+(c) **`V` and `F` have no cardinality cap.** Bytes are invariant; traversal is not.
+
+(d) **A tight budget can still leave a late variant with a heading and no content.** The reservation
+governs the allocation *policy* — no variant is starved **by another** — not an absolute content
+guarantee; a floor cannot conjure bytes that do not exist.
+
+(e) **The `Length` half is hardening, not a live defect.** Both construction sites derive `Length`
+from `entry.addressed_range`, so `end − start == len(encoded_bytes)`, bounded by
+`MF_RUN_LENGTH_CEILING` → **7 decimal digits against a 4 300 limit**. It is reachable only through the
+constructor domain, where both entry classes hold independent endpoints and have no `__post_init__`
+validation. **The negative arm is constructor-only too** (`len(encoded_bytes) ≥ 0`).
+
+(f) **Non-collision covers shortened-vs-complete, not shortened-vs-shortened.** Two values sharing
+their top `REPORT_LENGTH_HEX_DIGITS` hex digits **and** their elided count render identically — the
+same honest lossiness `_format_address` ships; the cue announces incompleteness.
+
+(g) **Failure attribution re-routes by call site.** The rejection span still covers
+`execute_project_variants`, unchanged. Moving a `ValueError` onto the tool-failure path also puts it
+on the path that writes a full traceback to `s19tui.log`, matching every other exception type;
+report-file redaction stays withdrawn per batch-62 D-11.
+
+- Design: `_EmissionGate` (the single admission seam: `emit` / `emit_unconditional`, both budgets
+  consulted, refusal recorded and non-latching); `_Refusals` (the `O(1)` accumulator keyed by the
+  closed `REPORT_SECTION_KINDS` tuple); `_disclosure_lines`; `_select_notes` (round-robin by variant,
+  because `notes[:CAP]` retains the earliest and lets a flood evict the note naming the real target);
+  `_disclosure_allowance` (integer width read from `sys.maxsize` at call time);
+  `REPORT_VARIANT_RESERVATION_FLOOR_BYTES` (derived from the variant skeleton, measured against a
+  394 B minimal audit record); `_decimal_width_upper_bound`; `_format_length`;
+  `REPORT_LENGTH_HEX_DIGITS` (reused from `REPORT_ADDRESS_HEX_DIGITS`, not a fourth policy number);
+  the `report_failed` helper shared by both exception handlers in `_start_generate_report_worker`.
+- Validation: `Automated` — `tests/test_report_document_bound.py`. Ceiling (`AT-250`, `AT-251`,
+  `AT-252`): `test_at250_document_never_exceeds_the_stated_ceiling`,
+  `test_at251_ceiling_holds_across_the_variant_count`,
+  `test_at252_ceiling_holds_across_the_check_file_count`,
+  `test_tc552_each_ceiling_fixture_actually_overflows_its_own_limit`. Disclosure (`AT-253`):
+  `test_at253_every_drop_is_disclosed_with_its_byte_total`,
+  `test_tc560_disclosed_bytes_equal_the_refused_line_bytes`,
+  `test_tc561_disclosure_line_count_is_bounded_by_the_closed_label_set`. Fairness (`AT-254`,
+  `AT-264`): `test_at254_no_variant_vanishes_when_the_budget_is_spent_early`,
+  `test_at264_every_variant_heading_survives_a_fully_exhausted_budget`,
+  `test_tc574_reservation_and_budget_must_BOTH_admit`. Seam (`TC-553`, `TC-573`):
+  `test_tc553_no_producer_writes_to_the_document_outside_the_gate`,
+  `test_tc554_the_census_walk_actually_finds_a_planted_write`,
+  `test_tc573_the_hexdump_seam_refuses_when_the_gate_is_exhausted`. Gate behaviour:
+  `test_tc557_a_refused_batch_does_not_grow_the_document`, `test_tc558_refusal_does_not_latch`.
+  Derived constants: `test_tc555_allowance_is_recomputed_independently_and_discriminates`,
+  `test_tc556_reservation_floor_covers_a_real_minimal_variant_record`. Appendix (`TC-559`):
+  `test_tc559_appendix_retention_is_round_robin_not_first_come`,
+  `test_tc575_appendix_cap_is_inert_below_the_cap`. Regression PINs (`AT-255`, `AT-256`):
+  `test_at255_pin_exhausted_report_is_still_usable`,
+  `test_at256_pin_under_cap_report_is_byte_identical_to_the_inc0_golden`.
+- Validation: `Automated` — `tests/test_report_length_cell.py`. Both emission sites (`AT-257`,
+  `AT-258`, `AT-259`): `test_at257_modifications_length_cell_renders_and_is_unique`,
+  `test_at258_checklist_length_cell_renders_and_is_unique`,
+  `test_at259_negative_length_renders_with_its_sign`. Call-site census (`TC-562`):
+  `test_tc562_no_inline_length_arithmetic_survives_in_an_fstring`,
+  `test_tc563_the_inline_census_walk_finds_a_planted_fstring`. Boundary (`TC-564`):
+  `test_tc564_the_shortening_boundary_tracks_the_live_limit`,
+  `test_tc576_a_disabled_limit_means_always_in_domain`. Oracle and forgery (`TC-565`, `TC-567`):
+  `test_tc565_the_oracle_discriminates`,
+  `test_tc567_a_shortened_token_cannot_be_read_as_a_complete_decimal`. In-domain identity (`TC-566`):
+  `test_tc566_in_domain_values_render_decimally_and_keep_their_sign`. No-raise (`TC-568`):
+  `test_tc568_the_formatter_does_not_raise_where_str_would`,
+  `test_tc577_the_decimal_width_bound_never_understates`. Markdown inertness (`TC-569`):
+  `test_tc569_every_character_of_the_token_is_markdown_inert`.
+- Validation: `Automated` — `tests/test_tui_report_attribution.py`. Attribution (`AT-260`, `AT-261`):
+  `test_at260_a_valueerror_from_the_generator_is_the_tools_failure`,
+  `test_at261_out_of_domain_operator_input_is_still_a_rejection`. Structure (`TC-570`, `TC-572`):
+  `test_tc570_generation_is_outside_every_valueerror_guarded_span`,
+  `test_tc578_the_span_census_finds_a_planted_nesting`,
+  `test_tc572_the_tool_failure_sequence_exists_exactly_once`. Fail-closed (`AT-262`, `AT-263`,
+  `TC-571`): `test_at262_pin_neither_path_leaves_a_report_behind`,
+  `test_at263_pin_progress_resets_to_zero_on_both_branches`,
+  `test_tc571_the_failure_path_logs_a_failure_not_a_rejection`.
 
 ## Retired ids
 

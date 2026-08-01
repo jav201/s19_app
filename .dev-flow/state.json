@@ -110,6 +110,12 @@
       "date": "2026-07-31",
       "decision": "Inc-2 and Inc-3 landed; all four increments complete",
       "notes": "The mutation HARNESS failed three times across the batch, each reporting applied=True while proving nothing: an ambiguous anchor hit the wrong function (identical return blocks in _format_address/_format_length); a mutant landed after a return (dead code); a mutant changed the log while the node asserts the status. C-40's existing 'confirm the mutation applied' check passed in all three. Generalisation routed to Lane B: a counterfactual must be shown to move the predicate's DECLARED SUBJECT, not merely to modify the file. Also: AT-262 was folded as an assertion inside AT-260 (coverage-in-parts, forbidden by C-18) and now owns a distinct node."
+    },
+    {
+      "phase": 3,
+      "date": "2026-07-31",
+      "decision": "the three owed items landed; batch implementation complete",
+      "notes": "TC-610's amendment was NECESSARY and that is executed, not argued: reverting a single id to RESERVED reddens G4 (28 of the 42 ids are cited on '- Validation:' bullets, so G4 genuinely inspects them); restored and hash-verified. PRECISION worth recording: R-TUI-101's own convention names test FUNCTIONS, and the tokenizer does not read 'test_at250_...' as a citation - so the G4 collision only bites when a bullet cites BARE ids. It is real and I executed it, but it was avoidable by convention. The flip to LIVE is right on independent grounds: the ids are spent and have nodes, so leaving them RESERVED would make the registry assert something false."
     }
   ],
   "obsidian_synced": false,
@@ -128,7 +134,10 @@
     "inc3": "DONE - generation moved outside the except-ValueError span; single shared failure helper. 8 nodes, 5 mutations, INERT none. 42 pre-existing TUI report tests still green.",
     "pr": "#184 open, NOT merged - Inc-0..Inc-3 all landed but REQUIREMENTS.md and the TC-610 amendment are still owed.",
     "gate_suite": "2482 passed / 2 skipped / 21 deselected / 3 xfailed, 29 snapshots, exit 0. Ledger reconciles EXACTLY: 2428 + 27 + 19 + 8 = 2482.",
-    "gate_suite_provenance": "CLEAN - no mutation harness ran after this suite was launched (only doc writes and commits). Contrast Inc-1's run A, which was contaminated and is recorded as such."
+    "gate_suite_provenance": "CLEAN - no mutation harness ran after this suite was launched (only doc writes and commits). Contrast Inc-1's run A, which was contaminated and is recorded as such.",
+    "owed_items": "ALL THREE DISCHARGED at batch-76: TC-610 amended to reserved-or-spent-by-its-owner; 42 ids flipped RESERVED->LIVE with nodes+statements derived from the tree via the shared tools/id_registry library; R-TUI-102 written into REQUIREMENTS.md with its verifier column.",
+    "carve_outs": "The four R-TUI-101 wording carve-outs are DISCHARGED - folded into the R-TUI-101 section of REQUIREMENTS.md, which is where they always lived and which batch-75 never opened.",
+    "backlog": "BACKLOG-CODE.md header refreshed + P0 closed + 4 new carries registered. The mutation-harness control candidate routed to BACKLOG-PROCESS.md, not duplicated."
   },
   "blocking_carry": {
     "id_guard": "THE NEXT STEP, and it blocks the other two. tests/test_id_registry.py::test_tc610 hard-asserts AT-250..279 / TC-552..599 stay RESERVED by batch-75, while G4 requires an id to be LIVE once REQUIREMENTS.md cites it as a verifier. Mutually unsatisfiable. Operator ruled (Q2): amend TC-610 to 'reserved-or-spent-by-its-owner'. Until then the ids MUST stay RESERVED and REQUIREMENTS.md must not cite them.",

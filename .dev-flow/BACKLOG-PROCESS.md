@@ -21,6 +21,37 @@
 > global flow commands are now told to look — so a future batch finds this file from the project doc,
 > not from a hard-coded path inside a project-agnostic command.
 
+## 🆕 Control candidate from batch-76 (2026-07-31) — a counterfactual must move the predicate's DECLARED SUBJECT
+
+**C-40 already requires confirming "the mutation actually applied". That check PASSED in all three of
+this batch's harness failures and proved nothing in every one of them.** `applied = True` only
+establishes that bytes moved in the file, not that the thing the predicate READS changed.
+
+| # | What the mutant actually did | Why it read INERT |
+|---|---|---|
+| 1 | `_format_address` and `_format_length` carry a **byte-identical** `return` block, so `str.replace(old, new, 1)` mutated the **wrong function** | the mutation never touched the site under test |
+| 2 | the substituted call landed **after a `return`** — dead code | program behaviour was unchanged, so nothing could redden |
+| 3 | the mutation changed the **log** while the node asserts the **status** | mutation and assertion were about different observables |
+
+**This fails OPEN**, which is what makes it worse than the typo'd-mutation case C-40 already records:
+there the mutation does not apply at all and the transcript says so; here it applies, to the wrong
+thing, and reports a **live predicate as inert** — inviting the author to rewrite a perfectly good
+acceptance. Two of the three were only caught by re-reading the mutant against the node's declared
+subject; none was caught by a test.
+
+**Proposed discharge, all three mechanical:**
+1. the anchor must match **exactly once** in the file (count it; refuse to run otherwise);
+2. the mutated region must be **reachable** (not after a `return`/`raise`, not in dead code);
+3. the mutated expression must name an **observable the node actually reads**.
+
+Evidence: `.dev-flow/2026-07-31-batch-76/03-increments/increment-002.md` §4.2 and
+`increment-003.md` §4.2. Related but distinct: C-40 (falsifiability), C-31 (input-set vacuity), and
+the Lane-B **vacuous-FIXTURE** class — this batch hit that one three times too, and `TC-552` caught
+two of them on its own author.
+
+---
+
+
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct}
 
