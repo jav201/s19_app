@@ -43,9 +43,9 @@ Tier: **1** axiom (validated+verified) · **2** hypothesis (this batch/charter i
 | P-2 | Shipped demo: 5 regions, 1 030 B, ~128 MiB span → ≈59 `╱` columns | 3 | ✅ **TRUE** | Executed render: `mapped=1030 B, span=134217534 B (128.0 MiB), GAP columns = 59`. Reproduces exactly. |
 | P-3 | "…with all five regions in a **1-column sliver**" | 3 | ⚠️ **IMPRECISE** | Measured `per-run widths = [1, 1, 1, 1, 1]` = **5 columns**, one per region — not a collective 1-column sliver. The defect is non-discrimination, not invisibility. |
 | P-4 | **Draft acceptance #1** — "every region ≥1 visible bar column (today: 1-col sliver total)" | 2 | ❌ **FALSE / VACUOUS** | `min run width = 1 → every region >=1 col? **True**` on the **pre-change** tree. The `max(1, …)` floor guarantees it unconditionally. **Cannot go RED**; violates C-40 limb 1. |
-| P-5 | S-2 "amends **LLR-072.3**" | 3 | ❌ **FALSE** | `LLR-072.3` has **0** definitions in `origin/main:REQUIREMENTS.md`; the only `LLR-072.x` hits are inside the *range string* `LLR-072.1–074.3`. The clause is in **`R-TUI-072`** (`REQUIREMENTS.md:4787`). The id is cited in `tests/test_tui_map_big.py:118` — a **dangling reference**, which is where the charter took it from. |
+| P-5 | S-2 "amends **LLR-072.3**" | 3 | ⛔ **RETRACTED — my verdict was WRONG; the charter was RIGHT.** Corrected verdict: ✅ **TRUE, the id EXISTS.** | **Original (wrong) evidence:** 0 definitions in `origin/main:REQUIREMENTS.md`, so I called it dangling. **The corpus was the error.** `git show origin/main:REQUIREMENTS.md \| grep -cE '^\*\*LLR-[0-9]'` → **0**: that file defines **no LLR bodies at all**, so absence there is evidence of nothing. LLR bodies live in the batch artifacts: **`LLR-072.3 — address ruler` is defined at `.dev-flow/2026-07-15-batch-47/01-requirements.md:508`**, with its validation row at `:651`. It is cited at **4 shipped-source sites** (`screens_directionb.py:1239,1273,1300,2002`) plus `test_tui_map_big.py:118` and `test_tui_snapshot.py:670`. **Not dangling — load-bearing.** Found by the Phase-1 architect lane. |
 | P-6 | Ruler amendment is a wording change | 2 | ❌ **FALSE — understated** | `R-TUI-072` mandates *"exactly 5 tick labels at 0/25/50/75/100 %"*, guarded by **live** `AT-072b` (`tests/test_tui_map_big.py::test_at072b_ruler`, asserts `len(ticks) == 5`). S-2 **breaks a shipped acceptance** → requires a §6.5 Before/After amendment **and** an AT re-derivation. |
-| P-7 | Draft acceptance #3 — "3 of 5 ruler labels name an unmapped address" | 2 | ✅ **TRUE** | ticks `['00000000','01FFFFCF','03FFFF9F','05FFFF6E','07FFFF3E']`; ticks 2/3/4 fall in gaps. |
+| P-7 | Draft acceptance #3 — "3 of 5 ruler labels name an unmapped address" | 2 | ⚠️ **CORRECTED — it is 4 of 5, not 3** | ticks `['00000000','01FFFFCF','03FFFF9F','05FFFF6E','07FFFF3E']`. I counted ticks 2/3/4 and stopped. **`span_end` is EXCLUSIVE**: the last mapped byte is `0x07FFFF3D`, so tick 5 (`07FFFF3E`) also names an unmapped address. **4 of 5.** Found by the Phase-1 QA lane. This is why **operator ruling R4** labels the last mapped byte rather than the exclusive end. |
 | P-8 | S-3 — stats shows "Coverage: 0.00%" + raw-byte readouts | 3 | ✅ **TRUE** | `#map_stats_body` renders `Coverage: 0.00%  Bytes covered: 1030 / … / Largest gap: 67108408 bytes`. True coverage is `0.000767 %`; `f"{…:.2f}%"` (`:2304`) flattens it to `0.00%`. Largest gap is raw, un-humanized. |
 | P-9 | S-4 — a 4-row always-on legend sits in the map body | 3 | ✅ **TRUE** | `legend rows = 4` (`.map-legend-row`), built at `:2084-2104` into `.map-band-legend`. |
 | P-10 | S-5 — region rows are not keyboard-reachable | 3 | ✅ **TRUE** | `focusable_rows = 0` of 5 `RegionRow`s; `app.focused` is `RailItem`, never the map. |
@@ -53,9 +53,23 @@ Tier: **1** axiom (validated+verified) · **2** hypothesis (this batch/charter i
 | P-12 | S-7 — no selection class on rows | 3 | ✅ **TRUE** | `row_classes = [['map-region-row','band-constant'], ['map-region-row','band-medium'], …]` — band + base only, no selection marker. |
 | P-13 | Fold markers must not be `RegionRow`s; `BandSegment` is the sibling precedent | 1 | ✅ **TRUE** | `class RegionRow(Static)` `:1088`, `class BandSegment(Static)` `:1172` — **siblings**, neither subclasses the other. `tests/test_tui_map_big.py:177,226` do `app.query(RegionRow)`. Charter's `:1185-1190` has **drifted** (backlog warns line numbers are stale in both directions). |
 | P-14 | Gaps are already inert `Static`s | 3 | ✅ **TRUE** | measured `segments=9`, `BandSegment=5`, `RegionRow=5` → the 4 gaps are plain `Static`s already. The invariant is **preserved by construction**, not newly imposed. |
-| P-15 | 🆕 **NOT IN THE CHARTER** — the bar fits its 60-column budget | 3 | ❌ **FALSE** | Measured `TOTAL columns = 64` vs `_BAND_BAR_WIDTH = 60`. Nine segments each floored at `max(1, …)` sum past the budget. **Identical at 80×24 and 120×30.** |
+| P-15 | 🆕 **NOT IN THE CHARTER** — the bar fits its 60-column budget | 3 | ❌ **FALSE**, but ⚠️ **my ATTRIBUTION was wrong and the finding is much bigger** | Measured `TOTAL columns = 64` vs `_BAND_BAR_WIDTH = 60` — that part holds. **Wrong cause:** I wrote *"nine segments each floored at `max(1, …)`"*. On **dense** input the floor contributes **0** and `round()` alone overflows: `parts=[512,256,256,512,512]` → exact `[15.0,7.5,7.5,15.0,15.0]` → `[15,8,8,15,15]` = **61 > 60**, unfloored **identical**. On sparse the floor adds +5 and `round()` −1. **The budget is simply never enforced.** *(Phase-1 architect lane.)* **Wrong layer:** the real defect is one level down — **the constant was never reconciled with its container**, see P-31. |
+| P-16 | 🆕 **CORRECTS P-15 AND MY §3 CLAIM** — the constant matches its container | 3 | ❌ **FALSE — the batch's central defect** | Painted-layer probe, **executed by me** to verify the QA lane: `.map-band-bar` is **66 cols @80×24** but only **21 cols @120×30**, against a budget of **60**. At 120×30 the runs at `0x04000000` (x=58) and `0x07FFFF00` (x=89) paint **entirely outside the container**: **2 of 5 mapped regions are INVISIBLE**. **`_BAND_BAR_WIDTH` was never reconciled with the box it draws into.** Gap-folding inside a 21-column box still cannot show five regions — so this, not gap-folding, is the root cause. **Operator ruling R1: reconcile to the real container.** |
 
-**Score: 15 evaluated · 9 TRUE · 4 FALSE · 1 IMPRECISE · 1 new defect found.**
+**Score as first written: 15 evaluated · 9 TRUE · 4 FALSE · 1 IMPRECISE · 1 new defect.**
+**Score after Phase 1 re-executed it: 16 evaluated — and FOUR of my own verdicts were wrong.**
+
+| My Phase-0 verdict | Corrected by | Corrected verdict |
+|---|---|---|
+| P-5 `LLR-072.3` does not exist | architect lane | **It exists** (batch-47 `01-requirements.md:508`), cited at 4 shipped-source sites. My grep corpus contained **no LLR bodies at all** |
+| P-4 acceptance #1 is vacuous | QA lane | **Not vacuous — RED today** at 120×30. I measured a pre-layout proxy |
+| P-15 overflow caused by `max(1,…)` | architect lane | Caused by **`round()`**; the floor contributes **0** on dense input |
+| P-7 3 of 5 ticks unmapped | QA lane | **4 of 5** — `span_end` is exclusive |
+
+**The pattern is one error, not four: I read the wrong layer and the wrong corpus, then reported
+the results as measurements.** Every one of them was *executed* — and executing the wrong thing
+produces a plausible number, which is exactly why it survived my own review. **On every point
+where the charter and I disagreed, the charter was right.**
 
 ---
 
@@ -81,8 +95,26 @@ FIXTURE: 5 regions, mapped=1030 B, span=134217534 B (128.0 MiB), coverage=0.0007
   legend rows  = 4
 ```
 
-**Both regimes are byte-identical** — the defect is width-independent, so a
-narrow-vs-wide split buys nothing here.
+⛔ **RETRACTED — this claim was FALSE and it was the costliest error in this document.**
+I wrote: *"Both regimes are byte-identical — the defect is width-independent, so a
+narrow-vs-wide split buys nothing here."* That is true **only at the content layer**
+(`Static.render()`), which is a **pre-layout proxy (C-32)**. At the **painted** layer the two
+regimes are not remotely alike, and **the wide one is the broken one**:
+
+```
+--- size=(80,24) ---
+  .map-band-bar region x=[8,74)  width=66   (_BAND_BAR_WIDTH budget = 60)
+    all 5 RUNs visible=1          => INVISIBLE runs=0   visible cols total=64
+--- size=(120,30) ---
+  .map-band-bar region x=[26,47) width=21   (_BAND_BAR_WIDTH budget = 60)
+    RUN 0x04000000 x=[58,59) visible=0   <== INVISIBLE
+    RUN 0x07FFFF00 x=[89,90) visible=0   <== INVISIBLE
+    => runs=5  INVISIBLE runs=2  visible cols total=21
+```
+
+**Every geometry acceptance in this batch must be evaluated at BOTH regimes and must not
+assume they agree.** The pre-layout reading is what made the charter's acceptance #1 look
+vacuous when it is in fact RED today.
 
 ---
 

@@ -38,10 +38,12 @@
   },
   "id_allocation": {
     "authority": "AT-TC-REGISTRY.jsonl at the repo root, _meta.next_free on line 1. Do NOT grep tests/ or REQUIREMENTS.md - three honest greps have returned three different answers.",
-    "next_free_at_batch76_close": "AT-282 / TC-611",
+    "next_free_RE_DERIVED": "AT-282 / TC-613 (high_water AT-281 / TC-612), read from AT-TC-REGISTRY.jsonl line 1 _meta on 2026-08-01. 1373 rows.",
+    "my_own_stale_copy_CORRECTED": "I first recorded 'AT-282 / TC-611' by COPYING batch-76's state.json figure instead of re-deriving it from the registry. It was stale: batch-76's own merge-gate closure minted TC-611 and TC-612 AFTER that line was written, so TC next_free is 613, not 611. This is the project's 'a carried number is re-derived, never copied' rule, and I broke it in the very file that records the rule. Corrected here; recorded rather than silently overwritten.",
     "reservation_rule": "Append RESERVED rows with reserved_by + statement and MERGE THAT TO main ON ITS OWN SMALL PR BEFORE the batch's work. A reservation on an unmerged branch prevents nothing.",
-    "minted_so_far": "NONE - Phase 0 mints no ids. Phase 1 reserves.",
-    "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31)."
+    "batch_scoped_preference": "docs/engineering-rules.md:48 PREFERS batch-scoped ids, and the registry's own _meta.governed confirms it: 'Letter-initial bodies (AT-B64-04, ...) are batch-scoped / named-subspace ids, outside this authority by spec 2.3.' So AT-B77-nn / TC-B77-nn need NO reservation PR and cannot collide by construction. Decision D-7.",
+    "minted_so_far": "NONE - Phase 0 mints no ids.",
+    "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31). AT-072b is an EXISTING global id being re-derived, not minted - it keeps its number."
   },
   "current_phase": 0,
   "phase_status": "awaiting-gate",
@@ -114,6 +116,22 @@
       "notes": "My first stats/inspector probe queried #map_stats and #map_detail - CONTAINERS - and got back Blank objects for both. The text lives in #map_stats_body / #map_detail_body. Taken at face value it would have produced a FALSE finding ('stats pane renders nothing'). This is C-32/C-37 landing in my own Phase-0 probe rather than in a test."
     }
   ],
+  "phase1_operator_rulings": {
+    "asked_at": "2026-08-01",
+    "why_escalated": "All four reverse part of the operator-approved charter. The operator had selected plain decision-recording (not escalate-everything), so these were askable rather than mandatory - escalated anyway because each changes what gets built.",
+    "R1_bar_width": "RECONCILE TO THE REAL CONTAINER, not the constant 60. The batch's central defect: .map-band-bar measures 21 cols at 120x30 and 66 at 80x24 against a 60 budget, so 2 of 5 mapped regions paint entirely outside it and are INVISIBLE. Reddens the live PIN tests/test_map_click_chain.py::test_ac6_clipped_segments_are_a_known_layout_limitation - deleting it is sanctioned by its own docstring, and the retirement must name the dropped observable (C-40 limb 2 instance ii).",
+    "R2_dense_control": "RE-BASE THE GOLDEN after the width fix. Byte-identity with today's dense render is abandoned deliberately because R1 changes it by design. New control: gap-folding is a strict no-op on gapless images at fixed container width. Fixture MUST use unequal runs (768/256 -> [45,15]); equal 512/512 -> [30,30] is invariant under any monotone re-weighting and would be vacuous.",
+    "R3_keyboard": "ARROWS + ENTER ONLY; j/k/o DROPPED. All three already bound app-wide; o/j frozen in _PRE_BATCH_BINDINGS under live TC-011; k must stay the legend key or US-77-4's hint becomes false. SCOPE REDUCTION: the charter's o = open-hex keyboard affordance is DESCOPED and registered as a carry. The N4a mouse split is unchanged and remains the route to hex.",
+    "R4_ruler_end": "LABEL THE LAST MAPPED BYTE (0x07FFFF3D), not the exclusive span_end (0x07FFFF3E). The two chartered clauses were mutually unsatisfiable. Also corrects my P-7: 4 of 5 ticks name unmapped addresses today, not 3."
+  },
+  "phase0_verdicts_corrected_at_phase1": {
+    "summary": "FOUR of my own Phase-0 verdicts were wrong, and the pattern is ONE error, not four: I read the wrong LAYER and the wrong CORPUS, then reported the results as measurements. Each was genuinely executed - executing the wrong thing returns a plausible number, which is why it survived my own review. On every point where the charter and I disagreed, THE CHARTER WAS RIGHT.",
+    "P-5": "RETRACTED. LLR-072.3 EXISTS (.dev-flow/2026-07-15-batch-47/01-requirements.md:508), cited at 4 shipped-source sites in screens_directionb.py. I grepped REQUIREMENTS.md, which defines ZERO LLR bodies - absence there is evidence of nothing. Found by the architect lane.",
+    "P-4": "RETRACTED. The charter's draft acceptance #1 is NOT vacuous: it is RED TODAY at 120x30 (2 regions with 0 visible columns). I measured Static.render(), a pre-layout proxy (C-32). Disposition changes from REPLACE to RE-POINT AND ENLARGE - the requirement comes out larger (C-43 constructive). Found by the QA lane, verified independently by me.",
+    "P-15": "ATTRIBUTION CORRECTED. The 64-vs-60 overflow is caused by round(), not by the max(1,...) floor: on dense input the floor contributes 0 and round() alone yields 61. The budget is simply never enforced. Found by the architect lane.",
+    "P-7": "CORRECTED 3 -> 4. span_end is exclusive, so the final tick also names an unmapped address. Found by the QA lane.",
+    "irony_recorded": "I documented the C-32 wrong-layer trap as a self-catch in 00-measurements.md section 4 for the stats probe, then failed to apply it to the band-bar measurement in the same document."
+  },
   "obsidian_synced": false,
   "created_at": "2026-08-01T00:00:00Z",
   "progress": {
