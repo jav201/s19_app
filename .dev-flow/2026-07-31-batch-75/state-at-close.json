@@ -1,0 +1,140 @@
+{
+  "project": "s19_app",
+  "language": "en",
+  "batch_id": "2026-07-31-batch-75",
+  "batch_objective": "F4 + D2, split out of batch-74 by operator decision at the 3-iteration cap. F4: the report document is NOT byte-bounded and _ByteBudget as built cannot bound it - emit() accounts, never gates (executed: exactly 1 .fits gate vs 2 .consume sites; the single gate covers hexdump blocks only). F4 companion: V (variants) and F (check-files per variant) are uncapped anywhere. D2: the inline Length cell at report_service.py:1356 and :1582 (there is NO _format_length symbol - it must be CREATED) plus the app.py:4164 error re-attribution that presents an internal CPython ValueError as operator-input rejection.",
+  "note_prior_batch": "batch-74 (OB-4 producer bounding + the Address cell, R-TUI-101) DONE + MERGED: #173 537f27d, close-out #175, the two artifacts it never produced #177, obsidian_synced flag #178. Its full state at close archived at .dev-flow/2026-07-31-batch-74/state-at-close.json.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (resolved from docs/engineering-rules.md:17). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "route": "/dev-flow (full V-model) - operator invoked it explicitly ('completo'). Charter: .dev-flow/BACKLOG-CODE.md line 79, block 'batch-75 CHARTER - split out of batch-74 by operator decision at the iteration cap'.",
+  "rc1": {
+    "origin_main_tip": "232eb0a4400ce5e48199bee17d4b6e8de562946e",
+    "merge_base_equals_tip": true,
+    "branch": "claude/batch-75-s19-app-a6fd1e",
+    "tree_clean": true,
+    "verified_at": "2026-07-31"
+  },
+  "flow_revision": {
+    "flow_version": "2026.07.28-rev1",
+    "controls": "C-1..C-45",
+    "manifest_flow_hash": "0127a2767ff11c8a",
+    "local_aggregate_hash": "896dcca61cf68d78",
+    "verdict": "MISMATCH, scoped and NON-BLOCKING. All 11 control-bearing command/template files are byte-exact vs the manifest. Only skills/dev-flow-lessons/SKILL.md diverges (local 641 lines / 01d608bb14069613 vs stamped 620 / 5c47db86ac2cf4ae) - local is AHEAD and the file is untracked in ~/.claude (.gitignore:3 = /*), its canonical home being jav201/claude-skills. The flow's ENFORCEABLE surface is current. Carried to Lane B: re-stamp FLOW-VERSION.md or record the catalog as deliberately outside the hash."
+  },
+  "standing_authorization": {
+    "asked_at": "2026-07-31",
+    "asked_because": "Authorization is per-batch and NEVER inherited - operator standing rule, restated as non-negotiable #1 in this batch's launch prompt. Asked fresh at kickoff: not from the prompt, not from batch-74's grant.",
+    "autonomy_and_merge": "Autonomo + merge autorizado",
+    "merge_authority": true,
+    "merge_precondition": "MANDATORY final independent qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression, every gate carry discharged) AFTER the PR is opened and CI is green. A HIGH finding BLOCKS the merge and returns to the operator.",
+    "decision_recording": "Confirmado - every decision taken autonomously instead of asking is recorded in PLAN.md's decision log, state.json.decisions_log and 05-postmortem.md, and carried to the vault at /dev-flow-sync.",
+    "scope_ruling_d2b": "Fencear explicitamente - _applied_regions stays OUT of batch-75 with a written non-claim in the requirement; the acceptance is scoped to what IS bounded and the requirement states explicitly that it does not close whole-report residency.",
+    "operator_direction_on_record": "2026-07-31 launch prompt, binding clauses (verbatim, abridged): 'Ejecuta batch-75 en el repo s19_app siguiendo /dev-flow (completo).' / 'Trae las mediciones que batch-74 ya ejecuto; NO son re-derivables gratis.' / 'F4: el documento NO esta acotado por budget, y _ByteBudget tal como esta NO puede acotarlo - emit() contabiliza, nunca gatea. Ese es el hallazgo load-bearing.' / '_applied_regions ... Decide en Phase 1 si entra o si se fencea explicitamente, pero NO lo dejes sin disposicion.' / 'El titular de D2 en el backlog es FALSO ... El raise es por los digitos DECIMALES de Length.' / 'NO existe simbolo _format_length. Un borrador del charter lo invento.' / 'Siete premisas heredadas de esta area salieron falsas en batch-74. Trata el charter como punto de partida, no como verdad.' / 'IDS RESERVADOS: AT-250...AT-279 y TC-552...TC-599 ... NO tomes ids fuera de tu rango.' / 'Presupuesta iteraciones ... Si topas, escala conmigo - no hagas loop.' / 'Para cada AT responde \"puede ponerse en RED?\" aparte de \"es correcto?\", y EJECUTA la mutacion (C-40). Ojo con la clase nueva registrada en Lane B: fixtures vacuas.' / 'batch-74 llego a MERGE sin 04-validation.md ni 06-docs/ ... NO repitas eso.' KICKOFF ANSWERS (AskUserQuestion verbatim labels): Q1='Autonomo + merge autorizado'; Q2 scope D2b='Fencear explicitamente (recomendado)'; Q3 registro='Confirmado'."
+  },
+  "id_allocation": {
+    "reserved": "AT-250..AT-279, TC-552..TC-599",
+    "high_water_on_main_rederived": "AT-249, TC-551",
+    "rederived_independently": true,
+    "reason": "The AT/TC registry build (Lane B) may be running in parallel - do NOT take ids outside this range."
+  },
+  "current_phase": 2,
+  "phase_status": "approved",
+  "iterations_per_phase": {
+    "0": 0,
+    "1": 1,
+    "2": 1,
+    "3": 0,
+    "4": 0,
+    "5": 0,
+    "6": 0
+  },
+  "artifacts": {
+    "0": ".dev-flow/2026-07-31-batch-75/00-measurements.md",
+    "plan": ".dev-flow/2026-07-31-batch-75/PLAN.md",
+    "1": ".dev-flow/2026-07-31-batch-75/01-requirements.md",
+    "2": ".dev-flow/2026-07-31-batch-75/02-review.md"
+  },
+  "decisions_log": [
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "approved",
+      "notes": "Phase 0 intake closed. RC-1 PASS at 232eb0a. All charter premises executed against disk: F4 CONFIRMED (1 .fits gate vs 2 .consume sites; emit never gates), D2 headline CONFIRMED FALSE as the charter states (huge address renders in 45 chars; the raise is on Length's decimal digits), _format_length confirmed ABSENT (0 hits). Charter line numbers stale by a uniform +330."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "D-1 flow-hash mismatch ruled NON-BLOCKING",
+      "notes": "Taken autonomously. Divergence confined to the untracked dev-flow-lessons catalog; all 11 control-bearing files byte-exact. Carried to Lane B rather than blocking the batch."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "D-2 related_artifacts cardinality axis STRUCK from scope",
+      "notes": "Taken autonomously. I measured it at 10,573,225 B/variant (5.04x budget) then found it NOT wire-reachable - validation/engine.py constructs it from short literals. Constructor-domain only, the same class as D2's original false headline. Recorded in 00-measurements.md sec 4.5 so it is not rediscovered as a threat."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "D-3 charter B/variant figures SUPERSEDED by re-derived ones",
+      "notes": "Taken autonomously per C-39. Re-derived 311,625 B/variant vs the charter's 315,912 (-1.4%); floor multipliers 1.15x/2.49x/15.86x at V=1/10/100 vs the charter's 1.15x/2.51x/16.06x. Shape holds, figures do not. Re-derived govern."
+    },
+    {
+      "phase": 0,
+      "date": "2026-07-31",
+      "decision": "D2b (_applied_regions) FENCED",
+      "notes": "OPERATOR ruling at kickoff, not autonomous. Stays out of batch-75 with a written non-claim; keeps the batch at 2 stories in an area that hit the iteration cap in two separate batches (b63, b74)."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-31",
+      "decision": "approved (revision 1)",
+      "notes": "R-TUI-102 derived from 2 executed lanes. P-14 (architect lane's wire-reachability claim) executed and found FALSE before it reached the spec."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "BLOCK -> iterate-to-refine",
+      "notes": "security + qa independently found the same 3 core defects. B-1 HLR-102/LLR-102.x are LIVE ids cited in report_service.py:608/:622 - I derived the AT/TC namespace as instructed and ASSUMED HLR/LLR tracked R-TUI-. B-2 the refusal disclosure is O(V), contradicting HLR-102's own V-invariance clause; AT-251 would go RED for a CORRECT implementation. B-3 _hexdump_section's put() never gates, so my own LLR-102.4 exemption rested on a false premise (P-24). B-4 AT-252 vacuous - 4 kB fixture against a 2 MB budget, green on base AND fixed AND stubbed."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "F7 fairness ESCALATED to operator, ruled per-variant reservation",
+      "notes": "OPERATOR decision, not autonomous. An attacker controlling content controls emission order; an early 311,625 B variant blanks variants 8-100. Encoded as LLR-108.4/108.5 + AT-254."
+    },
+    {
+      "phase": 1,
+      "date": "2026-07-31",
+      "decision": "approved (revision 2)",
+      "notes": "21 amendments recorded in 01-requirements.md sec 9 with Before/After and Deleted/New tokens. Renumbered to HLR-108/109/110 after executing the true high-water (HLR-107/LLR-107, batch-74's split-out Length draft, review-only)."
+    },
+    {
+      "phase": 2,
+      "date": "2026-07-31",
+      "decision": "batch descoped to SPEC ONLY",
+      "notes": "OPERATOR ruling. Implementation deferred to a fresh session with a full context window - this area hit the 3-iteration cap in b63 and b74 partly by running out of room mid-increment."
+    },
+    {
+      "phase": 6,
+      "date": "2026-07-31",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-31-batch-75/. Synced 00-measurements.md, 01-requirements.md, 02-review.md, PLAN.md, state-at-close.json + README. 04/05/06-docs NOT synced because they were never produced - declared in PLAN.md and artifacts_not_produced. Visual-evidence refresh SKIPPED correctly: batch-75 touched 0 files under s19_app/tui/ and the gallery was refreshed 2026-07-31 at batch-74 close (90/90 live assets fresh). NOTE: the sync pre-requisite current_phase>=6 was NOT met (batch closed at phase 2 by operator ruling, spec-only) - surfaced to the operator rather than silently overridden."
+    }
+  ],
+  "obsidian_synced": true,
+  "created_at": "2026-07-31T00:00:00Z",
+  "batch_outcome": "SPEC ONLY, by operator ruling mid-batch ('solo enmiendas, para antes de Inc-1'). Phases 0-2 complete and re-gated; Inc-0..Inc-3 NOT implemented and registered as a P0 in BACKLOG-CODE.md. Phase 2 BLOCKED on 4 blockers (2 in clauses batch-75 itself authored, 1 the house vacuous-fixture defect); spec re-gated as revision 2.",
+  "artifacts_not_produced": {
+    "3_increments": "NOT PRODUCED - implementation was descoped by operator ruling before Inc-1. Declared, not silently omitted.",
+    "4_validation": "NOT PRODUCED - no code changed, so there is nothing to validate. Declared per non-negotiable #6.",
+    "5_postmortem": "NOT PRODUCED as a separate artifact - 02-review.md sec 5 carries the gate decision and 01-requirements.md sec 9 carries the full amendment record.",
+    "6_docs": "NOT PRODUCED - no shipped behaviour changed, so there is no functionality to document. Declared per non-negotiable #6."
+  },
+  "merged": {
+    "pr": 180,
+    "squash_sha": "1984341",
+    "merged_at": "2026-07-31T22:06:43Z",
+    "base": "main",
+    "ci_at_merge": "tui-ci success + snapshot success"
+  }
+}
