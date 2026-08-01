@@ -4122,6 +4122,29 @@ class S19TuiApp(App):
             Used by:
                 - ``_trigger_generate_report``
         """
+        def report_failed(exc: BaseException) -> None:
+            """LLR-110.2 — the SINGLE tool-failure branch, shared by both sites.
+
+            Both ``except`` handlers below call this rather than repeating the
+            log/progress/status sequence. Duplicating it is how the two branches
+            drift apart: one gets a progress reset and the other does not, and
+            nothing catches it because each is exercised by a different test.
+            ``TC-572`` asserts the sequence exists exactly once.
+            """
+            self.logger.exception("Report generation failed: %s", exc)
+            self._log_report_event(
+                "project",
+                project_dir.name,
+                "-",
+                f"failed: {type(exc).__name__}",
+                ok=False,
+            )
+            # N5: reset the bar on a crashed report — never leave it mid-fill.
+            self.call_from_thread(self.set_progress, 0)
+            self.call_from_thread(
+                self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
+            )
+
         try:
             if last is None:
                 scope = SCOPE_ACTIVE
@@ -4149,12 +4172,6 @@ class S19TuiApp(App):
                 declared_regions=tuple(declared_regions),
                 report_filter=report_filter,
             )
-            # N5: mid-progress before the heavy assembly (thread-safe via
-            # call_from_thread — set_progress touches the UI widget).
-            self.call_from_thread(self.set_progress, 55)
-            report_path = generate_project_report(
-                project_dir, results, options, variant_set=variant_set
-            )
         except ValueError as exc:
             self._log_report_event(
                 "project", project_dir.name, "-", f"rejected: {exc}", ok=False
@@ -4164,19 +4181,32 @@ class S19TuiApp(App):
             self.call_from_thread(self.set_status, f"Report rejected: {exc}")
             return
         except Exception as exc:
-            self.logger.exception("Report generation failed: %s", exc)
-            self._log_report_event(
-                "project",
-                project_dir.name,
-                "-",
-                f"failed: {type(exc).__name__}",
-                ok=False,
+            report_failed(exc)
+            return
+        # LLR-110.1 — generation sits OUTSIDE the operator-input span.
+        #
+        # It used to sit INSIDE the block above, so a ``ValueError`` raised
+        # anywhere in the generator — an internal accounting slip, a formatter
+        # that could not render a value — surfaced to the operator as
+        # "Report rejected: ...", i.e. as though THEY had typed something
+        # invalid. The operator-input span is the options construction and the
+        # scope guard; those are the only places a ``ValueError`` legitimately
+        # means "your input was out of domain" (P-11). Everything the tool does
+        # after that is the tool's own failure and is attributed to the tool.
+        #
+        # This re-routes by CALL SITE, not by cause (non-claim (g)): a
+        # ``ValueError`` is not intrinsically an operator error, so no analysis
+        # of the exception could have made this decision — only its position.
+        #
+        # N5: mid-progress before the heavy assembly (thread-safe via
+        # call_from_thread — set_progress touches the UI widget).
+        self.call_from_thread(self.set_progress, 55)
+        try:
+            report_path = generate_project_report(
+                project_dir, results, options, variant_set=variant_set
             )
-            # N5: reset the bar on a crashed report — never leave it mid-fill.
-            self.call_from_thread(self.set_progress, 0)
-            self.call_from_thread(
-                self.set_status, f"Report failed: {type(exc).__name__}: {exc}"
-            )
+        except Exception as exc:
+            report_failed(exc)
             return
         self._log_report_event(
             "project", project_dir.name, str(report_path), "ok", ok=True

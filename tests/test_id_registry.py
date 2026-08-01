@@ -67,7 +67,7 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 151
+EXPECTED_SCANNED_TEST_FILES = 152
 """Test modules scanned at the seed commit, including this one."""
 
 EXPECTED_SCANNED_TOTAL = EXPECTED_SCANNED_TEST_FILES + 1  # + REQUIREMENTS.md
