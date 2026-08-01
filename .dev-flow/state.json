@@ -186,5 +186,11 @@
     "medium": "M-1 REQUIREMENTS.md ships 7 non-claims against the spec's 11, dropping the 2.03x input-shaped-cap caveat that H-3 depends on. M-2 a FOURTH unrecorded amendment: the ceiling became a private V-dependent function instead of the spec's imported constant, which is what makes H-2 possible. M-3 B76-A3 has no acceptance at all.",
     "my_own_error": "My increment-001 evidence table reported 'M1 -> AT-250/251/252 RED' and 'INERT: none'. The transcript line I was reading said '3 failed, 4 passed'. I read a per-mutant EXIT CODE as a per-arm verdict, so the mutation harness aggregated over parametrized arms and hid four green ones. This is the batch's own recurring defect landing in my evidence.",
     "disposition": "MERGE BLOCKED and returned to the operator, per the kickoff precondition. Not fixed in-session: four HIGH findings in acceptance design deserve a fresh context, not a near-exhausted one."
+  },
+  "handoff": {
+    "document": ".dev-flow/HANDOFF-2026-07-31-batch-76-merge-gate.md",
+    "reason": "Four HIGH findings in ACCEPTANCE STRENGTH (not in shipped code) surfaced at the merge gate. Handed to a fresh session rather than fixed with a near-exhausted context - fixing acceptance design badly is how these defects were introduced in the first place.",
+    "resume_at": "Close H-1..H-4, re-verify PER-ARM, re-run the independent qa-reviewer merge gate, then sync.",
+    "first_action": "ASK the operator for the authorization model. It is per-batch and never inherited - not from the handoff document, not from this file."
   }
 }
