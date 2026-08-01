@@ -67,7 +67,7 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 149
+EXPECTED_SCANNED_TEST_FILES = 152
 """Test modules scanned at the seed commit, including this one."""
 
 EXPECTED_SCANNED_TOTAL = EXPECTED_SCANNED_TEST_FILES + 1  # + REQUIREMENTS.md
@@ -512,25 +512,77 @@ def test_tc609_registry_file_is_well_formed(corpus: _Corpus) -> None:
     assert not problems, _report("registry well-formedness", problems)
 
 
-def test_tc610_reservations_are_recorded_and_respected(corpus: _Corpus) -> None:
-    """TC-610 — the batch-75 block is reserved, and nothing was minted inside it.
+#: The reserved block, and the batches entitled to spend it. batch-75 made the
+#: reservation and shipped SPEC ONLY; batch-76 is the implementation of that
+#: same spec and is the batch that actually writes the nodes.
+_RESERVED_BLOCK = (("AT", 250, 279), ("TC", 552, 599))
+_BLOCK_OWNERS = ("batch-75", "batch-76")
 
-    The registry had to be BORN knowing this reservation. batch-75 is chartered
-    and may be running concurrently; a registry seeded without its block would
-    put ``next_free`` below work already in flight and then redden against it.
-    A guard that fires on legitimate work is worse than no guard, because it
+
+def test_tc610_reservations_are_recorded_and_respected(corpus: _Corpus) -> None:
+    """TC-610 — the block is accounted for, and no stranger minted inside it.
+
+    The registry had to be BORN knowing this reservation. batch-75 was chartered
+    and might have been running concurrently; a registry seeded without its block
+    would put ``next_free`` below work already in flight and then redden against
+    it. A guard that fires on legitimate work is worse than no guard, because it
     teaches everyone to wave it through.
+
+    AMENDED at batch-76 (operator ruling), and the reason is that the sentence
+    above had come true **of this very guard**. As first written it required
+    every id in the block to be ``RESERVED`` forever — which made the
+    reservation's own purpose unreachable:
+
+    * ``G4`` requires an id to be ``LIVE`` once ``REQUIREMENTS.md`` cites it as a
+      verifier;
+    * ``TC-610`` required it to stay ``RESERVED``.
+
+    Both were executed against the tree and both reddened, so the two guards were
+    **mutually unsatisfiable** for the work the block was reserved for. Worse,
+    the backlog note shipped alongside the registry already promised the
+    conversion — *"they convert to LIVE when its Inc-0…Inc-3 write the nodes"* —
+    so the guard contradicted its own design intent.
+
+    The invariant is therefore **reserved-or-spent-by-its-owner**, which is what
+    the guard was always for: nobody OUTSIDE the reservation may take an id from
+    the block. An owner spending its own reservation is the block working as
+    designed, not a violation.
     """
-    reserved = {
-        e.key: e for e in corpus.registry.entries if e.status == "RESERVED"
-    }
-    for space, low, high in (("AT", 250, 279), ("TC", 552, 599)):
+    by_key = corpus.registry.by_key()
+    unspent = 0
+    spent = 0
+    for space, low, high in _RESERVED_BLOCK:
         for stem in range(low, high + 1):
             key = f"{space}-{stem}"
-            assert key in reserved, f"{key} must be RESERVED for batch-75"
-            assert reserved[key].reserved_by == "batch-75", (
-                f"{key} is reserved by {reserved[key].reserved_by!r}, not batch-75"
-            )
+            entry = by_key.get(key)
+            # Accounted for at all: a hole in the block is how "free space"
+            # becomes a matter of opinion again.
+            assert entry is not None, f"{key} is not in the registry at all"
+            if entry.status == "RESERVED":
+                assert entry.reserved_by in _BLOCK_OWNERS, (
+                    f"{key} is reserved by {entry.reserved_by!r}, which is not "
+                    f"one of the block's owners {_BLOCK_OWNERS}"
+                )
+                unspent += 1
+            elif entry.status == "LIVE":
+                assert entry.origin in _BLOCK_OWNERS, (
+                    f"{key} was spent by {entry.origin!r}, a stranger to the "
+                    f"reservation — this is the exact collision the block exists "
+                    f"to prevent"
+                )
+                spent += 1
+            else:
+                raise AssertionError(
+                    f"{key} is {entry.status!r}; an id inside a live reservation "
+                    f"may only be RESERVED or LIVE"
+                )
+    # Not decoration: without this the loop is satisfiable by a block that is
+    # entirely unspent, which is the state the amendment exists to move past.
+    assert spent > 0, (
+        "no id in the block has been spent — TC-610 would then be asserting the "
+        "same thing it did before the amendment"
+    )
+    assert spent + unspent == sum(high - low + 1 for _, low, high in _RESERVED_BLOCK)
 
 
 # ---------------------------------------------------------------------------

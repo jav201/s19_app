@@ -21,6 +21,37 @@
 > global flow commands are now told to look — so a future batch finds this file from the project doc,
 > not from a hard-coded path inside a project-agnostic command.
 
+## 🆕 Control candidate from batch-76 (2026-07-31) — a counterfactual must move the predicate's DECLARED SUBJECT
+
+**C-40 already requires confirming "the mutation actually applied". That check PASSED in all three of
+this batch's harness failures and proved nothing in every one of them.** `applied = True` only
+establishes that bytes moved in the file, not that the thing the predicate READS changed.
+
+| # | What the mutant actually did | Why it read INERT |
+|---|---|---|
+| 1 | `_format_address` and `_format_length` carry a **byte-identical** `return` block, so `str.replace(old, new, 1)` mutated the **wrong function** | the mutation never touched the site under test |
+| 2 | the substituted call landed **after a `return`** — dead code | program behaviour was unchanged, so nothing could redden |
+| 3 | the mutation changed the **log** while the node asserts the **status** | mutation and assertion were about different observables |
+
+**This fails OPEN**, which is what makes it worse than the typo'd-mutation case C-40 already records:
+there the mutation does not apply at all and the transcript says so; here it applies, to the wrong
+thing, and reports a **live predicate as inert** — inviting the author to rewrite a perfectly good
+acceptance. Two of the three were only caught by re-reading the mutant against the node's declared
+subject; none was caught by a test.
+
+**Proposed discharge, all three mechanical:**
+1. the anchor must match **exactly once** in the file (count it; refuse to run otherwise);
+2. the mutated region must be **reachable** (not after a `return`/`raise`, not in dead code);
+3. the mutated expression must name an **observable the node actually reads**.
+
+Evidence: `.dev-flow/2026-07-31-batch-76/03-increments/increment-002.md` §4.2 and
+`increment-003.md` §4.2. Related but distinct: C-40 (falsifiability), C-31 (input-set vacuity), and
+the Lane-B **vacuous-FIXTURE** class — this batch hit that one three times too, and `TC-552` caught
+two of them on its own author.
+
+---
+
+
 ## Status legend
 `P0` next · `P1` high · `P2` medium · `P3` low · flow ∈ {/dev-flow, /fast-dev-flow, direct}
 
@@ -201,3 +232,19 @@
 
   - **▸ (P2, NEW — found at batch-75 Phase 0 by running the C-45 currency check) the `FLOW-VERSION.md` manifest is STALE against the shipped lessons catalog.** Local aggregate `896dcca61cf68d78` ≠ manifest `flow_hash 0127a2767ff11c8a` (`flow_version 2026.07.28-rev1`). **Direction executed: local is AHEAD, the manifest is behind.** All **11** control-bearing files (`commands/*.md` ×4, `templates/dev-flow/*.md` ×7) are **byte-exact**; the sole divergence is `skills/dev-flow-lessons/SKILL.md` — **641 lines local vs 620 stamped**, hash `01d608bb14069613` vs `5c47db86ac2cf4ae`. The file is **untracked** in `~/.claude` (`.gitignore:3` = `/*`; `git ls-files skills/` → 0), its canonical home being `jav201/claude-skills`. **Fix: re-stamp the manifest for the 641-line catalog, or record in `FLOW-VERSION.md` that the catalog is deliberately outside the hash and why.**
     **Why this is worth a bullet and not a silent re-stamp:** the manifest exists to make C-45's PULL obligation *mechanical* — *"a project can prove in one command whether the flow it is about to run is current."* Today that command returns a **mismatch for a flow that is, on every enforceable surface, current**. A check that cries wolf on a clean tree gets ignored, and the next batch that sees a mismatch will wave it through — which is exactly the failure C-45 was encoded to prevent. **The scoping work (11/11 exact, divergence confined to a reference document) had to be done by hand at Phase 0 to reach a non-blocking verdict; the manifest should make that verdict cheap.** Candidate improvement to carry with the fix: split the aggregate into a **controls hash** (commands + templates, gating) and a **catalog hash** (lessons, informational), so the one-command check answers the question that actually matters.
+
+## 🆕 Registered by batch-76's merge-gate closure (2026-07-31) — counterfactual harness design
+
+  - **▸ (P1, NEW — the strongest single-occurrence evidence in the project) a counterfactual verdict must be reported PER RESOLVED NODE ID, never per mutant.** This is §3 item 1 of `HANDOFF-2026-07-31-batch-76-merge-gate.md`, promoted from a hand-off note to a registered candidate because it is now **executed evidence, not a hypothesis**. batch-76's Inc-1 matrix derived one verdict per mutant **from the process exit code** over a node list containing parametrized tests. `pytest` exits non-zero if *any* arm fails, so `M1 gate disabled AT-250/251/252 applied=True RED 3 failed, 4 passed` was recorded as **"RED · INERT: none"** — and the string `4 passed` sat in the transcript unread. Re-executed per-arm at the merge gate: **4 of 7 arms stayed GREEN with `_EmissionGate.fits` substituted for `return True`, i.e. with the byte gate FULLY REMOVED** — `AT-251[1]`, `AT-252[1]`, `AT-252[3]`, `AT-252[10]`.
+    **Why the aggregate is not merely lossy but *optimistically* lossy, which is the part worth encoding:** the question a counterfactual asks is a **map** from arm to verdict; an exit code is a **boolean**. Collapsing the map with `any()` discards exactly the inert arms being hunted, and it fails safe in the wrong direction — the aggregate reads RED whenever a *single* arm is RED, so **the more arms a node carries, the more inert ones it can hide**. A representative arm is not a sample, it is a mask. And the four hidden arms were **not random**: they were precisely the four where `raw > ceiling` was false — one systematic calibration error, uniformly spread over the arms it touched, rendered as "no finding".
+    **Now mechanically enforced, so this candidate is about the RULE, not the tooling gap:** `tools/mutation_harness.py` (landed `fd9124a`) reports per resolved node id and never parses the summary line. It also enforces §3's items 2–4 (single-match anchor with a CRLF-mismatch hint; reachability probed **only where an arm stayed green**, since a RED arm already proves reachability; a green arm with no position-valid probe is an **abort**, not a pass), mutates a throwaway `git worktree` so it cannot contaminate a concurrent gate run, and is **positive-controlled** — a substitution after a `return` is correctly reported inert **and** never-executed. Items 2–4 were already registered in this file as a Lane B candidate; **that entry can now cite an implementation.**
+    **Two further candidates fell out of using it, both found in tests written in the same session** (registered here because they are verification-apparatus rules, not app code): **(a) a discriminating arm must vary exactly ONE term of the derivation it probes** — a first-draft `TC-612` probed the closed label set with a 21-character label against an 18-character maximum, so it moved the *row-width* term rather than the *cardinality* term and passed with the cardinality factor gutted to the literal `1`; **(b) assert the RATE separately from the TOTAL** — `TC-555`'s measured floor was inert on 4 of 5 arms against a 2× slope error, because at small `V` the constant terms dominate and swallow it. A total bound cannot police a rate.
+    **Control candidate, NOT encoded** (needs its own AskUserQuestion per `feedback_devflow_control_encode_approval`). Same family as C-40; this is the **reporting granularity** clause C-40 lacks.
+
+  - **▸ (P2, NEW) a harness that guarantees a byte-exact restore must do its I/O in BYTES.** `tools/mutation_harness.py`'s own first restore **failed its own SHA-256 check**: `read_text`/`write_text` apply newline translation on Windows, so round-tripping an LF file rewrote it as CRLF — content-equal, **not** byte-equal. **The check it carries for the code under test is what caught the defect in itself**, which is the useful part: the guarantee was real enough to fire on its author. Companion to `reference_evidence_bytes_need_gitattributes_text` (*assert the stored blob, not the file you handed git*) — same root cause, different door. Fixed in `fd9124a`; registered so the next harness starts in bytes.
+
+  - **▸ (P2, NEW — found by the batch-76 merge gate, round 1 BLOCK) `G4` cannot see NODE NAMES, so `REQUIREMENTS.md` can name verifiers that do not exist and omit verifiers that do — while the registry guard passes 13/13.** `tests/test_id_registry.py:251` checks that an **id token** cited in `REQUIREMENTS.md` (`TC-611`) resolves to a `LIVE` entry. It never looks at the **node name** (`test_tc611_...`) that sits beside it in the `- Validation:` enumeration, and it has no notion of *under*-citation. Both failure directions were live simultaneously in `fd9124a`: `REQUIREMENTS.md:5614`/`:5625` named `test_tc552_..._its_own_limit` and `test_tc555_allowance_is_recomputed_independently_and_discriminates` — **two nodes that the same commit had renamed** — while `TC-611`/`TC-612`, the two ids minted specifically to close H-2 and H-3, appeared **nowhere** in the enumeration. `AT-TC-REGISTRY.jsonl` was correct throughout and every one of its 44 rows resolved, which is exactly why the guard was silent.
+    **Why this is worth encoding rather than fixing once:** the registry is machine-checked and the requirement is not, so **the two drift apart in the one direction nobody watches** — a reader looking for a requirement's verifier reads `REQUIREMENTS.md`, not the JSONL. Executed baseline, re-derived at three refs: **15** cited-but-undefined `test_*` names already exist on `origin/main` (`test_tc028`, `test_ac1`, `test_f17`, …) — `origin/main` 15 -> `fd9124a` 17 -> `1db087c` 15, so the branch broke 2 and repaired the same 2 without reducing the debt. This is not a one-off — it is an accumulating class with no guard, and batch-76 added 2 more before the merge gate caught them. **Cheap mechanical form:** extend the corpus scan to also extract `` `test_[a-z0-9_]+` `` tokens from `REQUIREMENTS.md` and assert each is defined in `tests/`; freeze the 15 legacy misses at their current count the way `G5` freezes the non-conforming id set, so the number can only go down.
+    **⚠ This form covers ONE of the two directions, and the round-2 gate proved it by simulation rather than by argument.** Run against the three refs it goes green / **RED** / green — the RED at `fd9124a` being exactly the F-1 pair, so it *would* have caught F-1. It would **NOT** have caught F-2: the scan only walks names that are already cited, so an id that is omitted entirely gives it nothing to test and it stays green. Do not let the eventual encoding claim "both directions" on the strength of this half.
+    Companion direction (harder, and it needs SCOPING before it can be encoded): assert every `LIVE` registry id whose origin is the current batch is **cited** in `REQUIREMENTS.md`. Executed: a bare freeze is far too coarse — **581** LIVE ids are not so cited today. Scope it to ids whose requirement section exists, or to ids added in the same PR. **Control candidate, NOT encoded** (needs its own AskUserQuestion).
+    **Provenance note for whoever picks this up:** the defect was in the closure whose entire subject is traceability between an id, its node and its charter. That is the third time in batch-76 that an item's own thesis reproduced inside its fix, and it is the argument for a mechanical check over a careful reviewer.
