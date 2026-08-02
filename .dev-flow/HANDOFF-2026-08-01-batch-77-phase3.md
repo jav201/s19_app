@@ -123,7 +123,7 @@ The charter (`prototypes/memmap_variant_a.HANDOFF.md`) diagnosed a **symptom**: 
 | `.dev-flow/state.json`, `BACKLOG-CODE.md` | ✅ committed |
 | `prototypes/memmap_variant_a.*` + `memmap_redesign.proposals.html` | ✅ committed (`065bb95`) per charter §1 |
 | `prototypes/out/` | 📋 **untracked, PRE-DATES this session** — reported as found, never swept |
-| Branch `claude/batch-77-memmap-variant-a` | ⚠️ **LOCAL ONLY — never pushed. No PR exists.** |
+| Branch `claude/batch-77-memmap-variant-a` | ✅ **PUSHED** to `origin` (16 commits, 0 unpushed). **No PR opened yet** — the resuming session owns that. |
 | Scratchpad probes | 🗑️ outside the repo tree; all output transcribed into the artifacts |
 
 **Lane B owes one item** (`BACKLOG-PROCESS.md`, not yet written): **C-33's prescribed liveness discharge is obsolete.** `TaskOutput` is deprecated for agent tasks and its own docs forbid the C-33 usage; transcript files stay 0 bytes with frozen mtime (verified by sampling). There is currently **no in-band progress signal** for a subagent — only a wall-clock bound.

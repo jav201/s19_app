@@ -198,7 +198,7 @@
   "obsidian_synced": false,
   "created_at": "2026-08-01T00:00:00Z",
   "progress": {
-    "branch": "claude/batch-77-memmap-variant-a (local, not yet pushed)",
+    "branch": "claude/batch-77-memmap-variant-a (PUSHED to origin, 0 unpushed, no PR yet)",
     "phase0": "AWAITING GATE - 00-measurements.md and PLAN.md written; 15 premises evaluated; 7 stories classified (6 READY, 1 OUT); no ids minted; no requirements derived.",
     "next": "Phase 2 cross-agent review: architect + qa-reviewer + security-reviewer in parallel over 01-requirements.md.",
     "phase1": "APPROVED. Ids batch-scoped (no reservation PR). Two chartered features DESCOPED and registered as carries: C-77-f (o=open-hex keyboard affordance) and C-77-g (2-col fold marker + size label)."
@@ -268,9 +268,9 @@
   },
   "session_close_reconciliation_C44": {
     "committed": "All 11 batch-77 artifacts, state.json, BACKLOG-CODE.md, and the 6 charter files - through d125ca1.",
-    "branch_NOT_pushed": "claude/batch-77-memmap-variant-a is LOCAL ONLY. No PR exists. A commit that never lands is not a terminal state - the resuming session owns pushing it.",
+    "branch_NOT_pushed": "SUPERSEDED - the branch IS pushed. origin/claude/batch-77-memmap-variant-a, 0 unpushed commits. C-44 is explicit that a commit which never lands is not a terminal state, so pushing was the correct close rather than deferring it. No PR is open yet; the resuming session owns that.",
     "reported_as_found": "prototypes/out/ is untracked and PRE-DATES this session; never swept up.",
-    "lane_B_owed": "C-33's prescribed liveness discharge is OBSOLETE and is NOT yet written to BACKLOG-PROCESS.md. TaskOutput is deprecated for agent tasks and its own docs forbid the C-33 usage; transcript files stay 0 bytes with frozen mtime, verified by sampling. There is currently no in-band progress signal for a subagent - only a wall-clock bound.",
+    "lane_B_owed": "DISCHARGED - written into .dev-flow/BACKLOG-PROCESS.md at this close, not left as a pointer, per the routing rule that a carry belonging to the other lane is WRITTEN there in that batch own close.",
     "scratchpad": "Throwaway probes outside the repo tree; all output transcribed into the artifacts."
   }
 }
