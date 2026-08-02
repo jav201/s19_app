@@ -158,6 +158,12 @@
       "date": "2026-08-01",
       "decision": "Phase 2 APPROVED at revision 5 - self-approved under the kickoff grant",
       "notes": "Exit criteria met. Coverage: both traceability chains complete, no orphans after the R-10 removal, all ATs allocated exactly once. Certainty: every AT demonstrated RED by executed transcript; the two undischargeable ones are LABELLED PINs, not counted as discharged. Evidence: every figure re-derived on this tree, and the three I had reported wrong (LLR-072.3's existence, the case_08 percentages, the corpus count) are corrected with their provenance recorded. No axis unmet."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-01",
+      "decision": "Handoff at the Phase-2/3 boundary; Inc-0 correctly NOT executed",
+      "notes": "The operator asked for Inc-0. Revision 5 has no Inc-0 - my own earlier roadmap had one, and executing it would have captured the byte-golden BEFORE the width basis settles, pinning the retired arithmetic. That is the defect ordering constraint 3 exists to prevent and is exactly how [45,15] entered revision 1. Reported rather than performed. Did the preparatory work owned by no increment instead: stripped raw control bytes from the requirements document and launched the full-suite baseline."
     }
   ],
   "phase1_operator_rulings": {
@@ -245,5 +251,26 @@
       "Re-run section 6.4a for ANY domain/scope/withdrawal/wording change - standing obligation.",
       "AT-B77-02 is a labelled PIN (predicted - execute at Inc-3); AT-B77-09 is a PIN. Neither may be quietly upgraded to discharged."
     ]
+  },
+  "handoff": {
+    "document": ".dev-flow/HANDOFF-2026-08-01-batch-77-phase3.md",
+    "reason": "Phases 0-2 complete and approved; Phase 3 not started. Handed to a fresh session at a CLEAN PHASE BOUNDARY rather than mid-increment, because Inc-1 is INDIVISIBLE (4 files: CSS widen + container basis + bound + fold + settling) and a partial Inc-1 is the worst available handoff state.",
+    "resume_at": "Phase 3, Inc-1. There is NO Inc-0 - PLAN.md section 4's indicative roadmap is SUPERSEDED by requirements section 7, which runs Inc-1..Inc-9. The golden capture is Inc-3 BY DESIGN: capturing it before the basis settles pins the retired arithmetic, which is exactly how [45,15] got into revision 1.",
+    "first_action": "ASK THE OPERATOR FOR THE AUTHORIZATION MODEL. Per-batch, never inherited - not from the handoff, not from this file. The previous grant (autonomous + merge authorized) DOES NOT TRANSFER.",
+    "status": "OPEN"
+  },
+  "phase3_entry_gate": {
+    "toolchain": "Python 3.14.4 / pytest 8.4.2 / ruff 0.15.17, verified 2026-08-01",
+    "collection_baseline": "2519 tests on f8747b8; reconciles with batch-76's close (2508 - 0 + 11 = 2519)",
+    "full_suite_baseline": "launched at handoff - read its own output, never splice (C-19)",
+    "no_production_code_written": true,
+    "open_questions_for_phase3": "OQ-3 (delete _BAND_BAR_WIDTH or retain as a pre-layout fallback - Inc-1) and OQ-4 (focus-entry mechanism; the rail tab chain is SHARED - Inc-7)"
+  },
+  "session_close_reconciliation_C44": {
+    "committed": "All 11 batch-77 artifacts, state.json, BACKLOG-CODE.md, and the 6 charter files - through d125ca1.",
+    "branch_NOT_pushed": "claude/batch-77-memmap-variant-a is LOCAL ONLY. No PR exists. A commit that never lands is not a terminal state - the resuming session owns pushing it.",
+    "reported_as_found": "prototypes/out/ is untracked and PRE-DATES this session; never swept up.",
+    "lane_B_owed": "C-33's prescribed liveness discharge is OBSOLETE and is NOT yet written to BACKLOG-PROCESS.md. TaskOutput is deprecated for agent tasks and its own docs forbid the C-33 usage; transcript files stay 0 bytes with frozen mtime, verified by sampling. There is currently no in-band progress signal for a subagent - only a wall-clock bound.",
+    "scratchpad": "Throwaway probes outside the repo tree; all output transcribed into the artifacts."
   }
 }
