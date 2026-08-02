@@ -49,8 +49,8 @@
   "phase_status": "iterating",
   "iterations_per_phase": {
     "0": 0,
-    "1": 1,
-    "2": 1,
+    "1": 2,
+    "2": 2,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -139,6 +139,12 @@
       "date": "2026-08-01",
       "decision": "R-8 and R-9 ruled; revision 2 final",
       "notes": "R-8 accept the deepened stats-line scroll as carry C-77-k, rejecting a narrowed widen. R-9 render the +N more disclosure in the region list with an EXACT count over a synthetic over-threshold fixture. Both operator rulings via AskUserQuestion."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "R-10 split aggregation to batch-78; R-11 pull the ANSI scrub fix in. Revision 3.",
+      "notes": "Operator-ruled rather than iterating a third time. Phase-2 iteration would have been 3, the flow's soft cap. The split seam is measured, not judged: one fixture crosses the onset, the bound alone fixes 16 of 17, and 7 of 8 blockers travel with aggregation."
     }
   ],
   "phase1_operator_rulings": {
@@ -152,7 +158,9 @@
     "R6_rerender_selection": "PRESERVE the selection if the region still exists, else fall back to the first. No input document stated a policy. Requires TWO acceptance arms: a lone 'preserved' arm is green on an implementation that never re-selects, and a lone 'fallback' arm is green on one that always resets - neither alone distinguishes the spec from its two failure modes. Interacts with HLR-116: focus must follow selection or the keyboard story silently regresses. FOLDED: HLR-116, split into AT-B77-13 (preserve) and AT-B77-14 (fallback) per C-18, plus LLR-116.4/116.5.",
     "R7_overflow": "WIDEN THE BAR FIRST, THEN AGGREGATE. (1) Rebalance the layout: the bar gets only 21 of the 52 columns #map_grid has at 120x30 - give it a larger share via CSS, MEASURING both axes and the whole pane budget first (C-23/C-29), since a weight that fits the bar can starve a sibling off-screen. (2) Where it still overflows, merge the SMALLEST ADJACENT runs into one aggregate segment with a '+N more' disclosure, following R-TUI-098's precedent of naming only items that actually lost content. HLR-111 also needs a NORMATIVE ALLOCATION BOUND over n_runs + n_gaps vs measured width - an output-shaped predicate cannot bound an allocation (batch-74).",
     "R8_stats_fold": "ACCEPT the deepened scroll and register it as a carry (C-77-k). The widened bar is what makes regions visible - the batch's purpose - and the stats line is ALREADY below the fold at both regimes today, so this deepens an existing scroll rather than newly hiding anything (31->33 at 120x30). Narrowing the widen to protect it was REJECTED: every column surrendered lowers the ceiling on visible regions.",
-    "R9_disclosure_surface": "Render '+N more' in the REGION LIST, not the bar. Bar columns are the scarce resource the design is contending for, and the list is already the textual per-region surface. B3 holds - the row carries a COUNT, never file-derived text. AT-B77-17 observes the region list explicitly, over a SYNTHETIC over-threshold fixture (onset measured 26 runs @bar=50, 34 @bar=66), asserting an EXACT count - 'is non-empty' would be vacuous."
+    "R9_disclosure_surface": "Render '+N more' in the REGION LIST, not the bar. Bar columns are the scarce resource the design is contending for, and the list is already the textual per-region surface. B3 holds - the row carries a COUNT, never file-derived text. AT-B77-17 observes the region list explicitly, over a SYNTHETIC over-threshold fixture (onset measured 26 runs @bar=50, 34 @bar=66), asserting an EXACT count - 'is non-empty' would be vacuous.",
+    "R10_split_aggregation": "SPLIT AGGREGATION OUT TO batch-78. Measured basis: exactly ONE shipped fixture crosses the onset - examples/professional_validation/case_08_heavy_fragmentation/firmware.s19 at 801 ranges, ~30x; every other shipped fixture is <=11. The allocation bound ALONE fixes 16 of 17 with ZERO aggregation, and 7 of the 8 new blockers are in the aggregation path. REMOVE LLR-111.8, AT-B77-17 and the +N more disclosure; KEEP LLR-111.7 (floor-1 + largest-remainder), which is verified sound. HLR-111 must state its DOMAIN explicitly (n_runs + n_gaps <= bar_w) and describe out-of-domain behaviour TRUTHFULLY rather than leaving a silent hole. Carry C-77-l charters batch-78 with every measurement already paid for.",
+    "R11_pull_scrub_in": "PULL THE ANSI SCRUB FIX INTO batch-77. Security proved Inc-7 would introduce a RED gate nothing in the batch could satisfy, because C-77-h deferred the fix out of scope. safe_text (screens_directionb.py:688) is NOT frozen. C-77-h is DISCHARGED, not dropped. AT-B77-15 must also be repaired: it was MIS-VERDICTED - limb3 read GREEN because nothing rendered (zero clicks still shows _DETAIL_HINT) while the node aggregated RED off limb1, hiding it. CC-1 again, inside the acceptance written to close a security finding."
   },
   "phase1_new_findings": {
     "N-1": "THE TWO REGIMES REDDEN ON DIFFERENT LIMBS, and this corrects the QA lane. 80x24: visible>=1 True, monotone True, strict FALSE -> conjunction RED via strict. 120x30: visible>=1 FALSE, monotone True, strict TRUE -> conjunction RED via visible. At 120x30 two runs clip to 0 and 1 > 0 SATISFIES strictness, so the strict limb is GREEN at the broken regime. Consequence: AT-B77-01 must stay a SINGLE three-way conjunction - splitting it, or dropping either limb, ships one regime green. The monotone limb alone is green at both sizes and carries no falsifying power.",
@@ -191,5 +199,13 @@
     "CSS_sweep": "Five candidates measured on both axes across the whole pane. Only always-stack widens the bar 21->50 without starving a sibling.",
     "architect_self_caught_3": "(1) Its first CSS sweep compared the glance box against its TITLE (11 cols) instead of its widest CONTENT row (29) and reported 'STARVED: none' for every candidate - the C-13 starvation failure committed INSIDE the starvation detector. The corrected run also surfaced a PRE-EXISTING 1-column clip (28-col box, 29-col row) -> carry C-77-j. (2) Its own 68->68->66 settle trace is RETRACTED: those were three reads inside ONE frame plus one after a pause, not two pauses. Per-pause sequences are {(66,66,66):9, (68,66,66):3} - never two consecutive transients, agreeing with the architect reviewer's 97 traces. LLR-111.6 now counts PAUSES with one criterion instead of two. (3) The runs-vs-ranges finding briefly appeared REFUTED until it found its own fixture built random.Random(3) PER BYTE, making the 'random' half constant.",
     "honesty_notes_kept": "AT-B77-02 remains a labelled PIN ('predicted - execute at Inc-3') and AT-B77-09 cannot be RED until Inc-7. Both stated in section 9 rather than counted as discharged. Rev-1's checkmark on the C-40 row was a prediction wearing a discharge mark - the defect class this batch keeps finding."
+  },
+  "phase2_regate": {
+    "verdict": "BLOCK, but every rev-1 blocker across all three lanes DISCHARGED BY EXECUTION. architect 6 of 7 closed / 6 new; QA 4 of 4 closed / 1 new; security M-1+M-2 closed / 1 new. 7 of the 8 new blockers are in the AGGREGATION path added by R-7.",
+    "convergent_again": "Both architect (RB-1) and QA independently found the SAME new defect: the re-authored C-31 coverage guard excludes aggregates from its emitted set, so it is FALSE on a correctly-aggregating implementation. QA's minimal proof: 2 ranges -> 1 aggregate -> emitted empty -> coverage False. It compounds - AT-B77-17's count formula is GREEN identically whether 10 runs were MERGED or SILENTLY DROPPED, and the coverage clause was the only thing that could separate them.",
+    "signature_failure_third_occurrence": "A design validated on the fixture its author chose, failing on a fixture that ships in the repo. (1) The charter validated on our 5-region fixture and failed on prg.s19. (2) Rev-2 aggregation validated on a synthetic fixture and fails on case_08 (801 ranges). Rev 2 justified the synthetic fixture with 'no shipping fixture reaches the threshold' - FALSE. Each occurrence landed on whatever path was newest.",
+    "genuinely_fixed": "Bar widens 21->50; prg.s19 fits EXACTLY at both regimes (sum 66 into 66, 50 into 50), all visible, monotone, strict, outside=0, agg=0; 15 further shipped fixtures + 3 synthetic classes pass; no regime regresses. The detached-widget defect, the runs-vs-ranges guard, the vacuous 1fr ruler clause and the false ANSI docstring are all confirmed fixed by execution. All three author self-caught errors genuinely repaired.",
+    "security_X1_self_correction": "The security lane WITHDREW ITS OWN rev-1 rationale, which rev 2 had adopted: 'distorting the very layout arithmetic R-7 exists to reconcile' is FALSE on execution. A hostile payload inflated the detail body 277->708 chars with ESC present while .map-band-bar, #map_grid and #map_detail were BYTE-IDENTICAL at both regimes - #map_detail is width:36 FIXED, never content-sized. AN ATTACKER CANNOT PERTURB THE BAR THROUGH A SYMBOL NAME. I had repeated this claim to the operator TWICE and corrected it in-conversation. The finding stands on its real grounds; the rationale is withdrawn before it becomes batch-78's premise.",
+    "lanes_caught_own_probes_again": "QA's first Inc-1 probe read bar=0 everywhere because it held a PRE-RE-RENDER widget reference - its own B-3 trap, committed inside the probe verifying B-3's fix."
   }
 }
