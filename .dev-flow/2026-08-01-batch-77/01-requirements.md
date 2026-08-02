@@ -141,6 +141,35 @@ Revision 1's P-16…P-43 stand except where corrected below.
   - **Acceptance test(s):** **`AT-B77-01`** three-way conjunction (visible ∧ monotone∀ ∧ strict∃), both sizes · **`AT-B77-02`** gapless no-op at fixed container width · **`AT-B77-03`** every segment contained in the container · **`AT-B77-17`** 🆕 allocation bound holds and the aggregate disclosure count is exact
   - **Boundary catalog (QC-3):** ☑ **empty** — no ranges → zero segments, no raise, `TC-B77-01` · ☑ **boundary** — one run: strict **skipped explicitly** at `n<2`, never passed silently, `TC-B77-02` · ☑ **boundary** ⭐ — **`n_runs + n_gaps > bar_width`**: expected result now **defined** (aggregate + exact disclosure), not blank as in rev-1. Executed onset **26 runs @bar=50, 34 @bar=66**, `TC-B77-03` · ☑ **invalid** — zero-byte run, `TC-B77-04` · ☑ **error** — `total_span ≤ 0`, guarded `:1900`, `TC-B77-05` · ☑ **boundary** 🆕 — entropy-heterogeneous single range (1 range → 2 runs), `TC-B77-30`
 
+> 🔢 **`AT-B77-17` — the allocation bound and the aggregate disclosure (R-7/2, **R-9**).**
+> **Given** a **synthetic** over-threshold fixture — 26 disjoint regions of strictly increasing size,
+> alternating band, which the oracle merges into **35 runs** (no shipping fixture reaches the threshold;
+> `prg.s19` is 14 runs, and the onset is 26 @bar=50 / 34 @bar=66, so a synthetic fixture is **required**,
+> not a convenience)
+> **When** the map renders at 80×24 and at 120×30 under the widened container
+> **Then** `Σ emitted widths ≤ bar.region.width`; **and** the **region list** contains a disclosure whose
+> stated count **equals** `oracle_runs − non_aggregate_segments_emitted` — **derived, not eyeballed:**
+> `bar=66 → 35 − 33 = 2` · `bar=50 → 35 − 25 = 10`.
+> ⚠️ **"a disclosure is present" would be vacuous.** The count is the claim; presence is satisfied by any
+> placeholder. The AT asserts the **integer**, against the independent oracle, on the **region-list**
+> surface named by `LLR-111.8` — stated in the Given/When/Then so the acceptance cannot later drift to the bar.
+> **Executed pre-change, both limbs RED at both regimes:**
+> ```
+> synthetic fixture: 26 ranges -> ORACLE runs = 35
+> --- size=(80,24)  bar=66 ---   emitted segs=60 (runs=35 gaps=25)
+>     content cols=85  visible=66   [bound  Σwidths <= bar] = False      <- limb 1 RED
+>     invisible runs=8   outside=14
+>     REGION LIST rows=35   disclosure rows found=[]                      <- limb 2 RED
+> --- size=(120,30) bar=50 ---   emitted segs=60 (runs=35 gaps=25)
+>     n_runs+n_gaps=60 > bar=50 -> over threshold: True
+>     content cols=85  visible=50   [bound  Σwidths <= bar] = False      <- limb 1 RED
+>     invisible runs=17  outside=26
+>     REGION LIST rows=35   disclosure rows found=[]                      <- limb 2 RED
+> ```
+> Note the two regimes fail differently, as with `AT-B77-01`: at 80×24 the segment **count** fits
+> (`60 ≤ 66`) and only the **bound** is violated, so aggregation is not required there — the bound alone
+> repairs it. At 120×30 both fail. Report per arm (CC-1).
+
 > ⚠️ **N-1 stands, rationale tightened (arch M-1).** Executed at settled geometry, pre-change:
 > ```
 > 80×24 : visible>=1 = True    monotone = True   strict(∃) = False   -> conjunction RED
@@ -264,7 +293,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
   | **always stack** ✅ | 66 | **50** | 50 | 29 | ✅ **no** |
 - **Rationale (informative):** 80×24 already stacks via `width-narrow`, so this makes 120×30 behave like the regime that already works — a *removal* of a special case, not a new one. Every glance-shrinking candidate starves the histogram row.
   ⚠️ **Self-caught (F-1f):** my first sweep compared the glance box against its **title** (11 cols) instead of its widest **content** row (29) and reported "STARVED: none" for every candidate — the exact C-13 starvation the probe existed to detect, committed inside the detector. The table above is the corrected run.
-- **Cost, stated:** the band row grows 4 → 6 rows at 120×30, pushing `#map_stats_body` from `bottom=31/30` to `bottom=33/30`. It is **already** below the fold in the baseline at both regimes (reachable-under-scroll is the established policy for this pane). **OQ-5.**
+- **Cost, stated and ACCEPTED (R-8):** the band row grows 4 → 6 rows at 120×30, pushing `#map_stats_body` from `bottom=31/30` to `bottom=33/30`. It is **already** below the fold in the baseline at both regimes (`bottom=31/30` @120×30, `bottom=35/24` @80×24) — reachable-under-scroll is the established policy for this pane — so this deepens an existing scroll and newly hides nothing. **The widen must not be narrowed to protect it**: every column surrendered lowers the ceiling on visible regions. Registered as carry **C-77-k**.
 - **Validation:** `test (integration)` · **Threshold:** `bar.region.width == #map_grid.region.width` at both regimes; glance widest row ≤ glance width
 
 **LLR-111.1 — the width basis AND the denominator are both normative (R1, arch M-2)**
@@ -279,11 +308,12 @@ Revision 1's P-16…P-43 stand except where corrected below.
 - **Validation:** `test (integration)` + `analysis` · **Threshold:** `Σ widths + Σ markers ≤ bar.region.width` for every suite fixture **and** for `examples/case_00_public/prg.s19` specifically
 - **Acceptance:** the bound is asserted on the **emitted widths**, and separately the allocator is unit-tested over a swept run count, so the bound holds **by construction** rather than by luck on one fixture.
 
-**LLR-111.8 🆕 — aggregation past the bound, with an exact disclosure (R-7/2)**
-- **Statement:** When the number of emitted run segments plus gap markers would exceed the container width, the panel **shall** merge the smallest adjacent runs into aggregate segments until the allocation fits, and **shall** disclose the exact number of runs that lost their own segment.
+**LLR-111.8 🆕 — aggregation past the bound, disclosed IN THE REGION LIST (R-7/2, **R-9**)**
+- **Statement:** When the number of emitted run segments plus gap markers would exceed the container width, the panel **shall** merge the smallest adjacent runs into aggregate segments until the allocation fits, and **shall** render in the region list — not in the band bar — a disclosure stating the exact number of runs that lost their own segment.
+- **Surface rationale, normative per R-9 (informative here, binding in the Statement):** **bar columns are the scarce resource this entire design contends for** — spending any of them on a disclosure would work against `LLR-111.7`, which exists to ration exactly those columns. The region list is already the textual per-region surface. **B3 holds:** the disclosure row carries a **count**, never file-derived text — same class as the `N sym` integer that R-TUI-073 already permits on those rows.
 - **Precedent (`R-TUI-098`, `REQUIREMENTS.md:4988`):** that requirement discloses *"the cut hit class, the dropped count, and up to `…_MAX` of the variants whose hits were dropped, **with an explicit count of the remainder**"*. Two properties carry over: the disclosure names only items that **actually lost content** — never mere contributors — and **the count is exact even when the enumeration is bounded**.
 - **Threshold, derived not guessed:** fires when `n_runs + n_gaps·fold > bar_width`. Executed onset: **`bar=50` → 25 runs clean, 26 aggregates 1**; **`bar=66` → 33 clean, 34 aggregates 1**. Consistent with `2·n_runs − 1 > bar_w`.
-- **Acceptance:** the disclosed `N` must equal `(runs from the independent oracle) − (non-aggregate segments emitted)`, asserted against `_merge_band_runs`, **not** against the producer's own counter. ⚠️ **OQ-6:** bar or region list is undecided; both are count-only so B3 holds either way.
+- **Acceptance:** the disclosed `N` must equal `(runs from the independent `_merge_band_runs` oracle) − (non-aggregate segments emitted)`, **not** the producer's own counter. Observed on the **region list** surface (`AT-B77-17`).
 
 **LLR-111.2 — gaps fold to ONE column (R-5)**
 - **Statement:** Each unmapped gap **shall** render at exactly one column, independent of its byte size and of the container width, and **shall** remain a plain `Static` classed `map-band-seg map-band-gap` — never a `RegionRow`, never a `BandSegment`.
@@ -391,7 +421,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 | US-77-1 | runs visible, ordered, bounded, folded | `AT-B77-01` | **RED both arms** (different limbs) — executed |
 | US-77-1 | gapless no-op | `AT-B77-02` | **PIN**, gate via post-Inc-3 mutation — `predicted` |
 | US-77-1 | nothing outside the bar | `AT-B77-03` | **RED @120×30** (4 outside) — executed |
-| US-77-1 | allocation bounded + exact disclosure | `AT-B77-17` 🆕 | **RED** — executed: 60 cols into a 50-col bar on `prg.s19` |
+| US-77-1 | allocation bounded + **exact** disclosure **in the region list** | `AT-B77-17` 🆕 | **RED both limbs, both arms** — executed on a synthetic 35-run fixture: `Σwidths 85 > bar` (66 and 50) and **0 disclosure rows** in a 35-row region list |
 | US-77-2 | every label admissible + legible | `AT-072b` | **RED** — 4 of 5 unmapped — executed |
 | US-77-2 | lower bound | `AT-B77-04` | **RED**; `set() ⊆ admissible` is True — executed |
 | US-77-3 | dual readout | `AT-B77-05` | **RED** — executed |
@@ -422,7 +452,8 @@ Revision 1's P-16…P-43 stand except where corrected below.
 |---|---|---|
 | **C-77-h** 🆕 | **`safe_text`'s ANSI guarantee is asserted in shipped source and is FALSE** (`screens_directionb.py:694-697`). Executed: ESC survives, 5 invisible bytes billed as width. Fix site is **not frozen**, but a control-char filter drifts snapshot baselines. | **Lane-A carry.** `AT-B77-15` pins the behaviour meanwhile |
 | **C-77-i** 🆕 | `.dev-flow/BACKLOG-CODE.md:53` still asserts `LLR-072.3` has "ZERO definitions" / is "a dangling reference" — **false**, and live in the Lane-A queue; `PLAN.md:171-173` repeats it. | **Owned by Inc-5** (arch M-4) |
-| **C-77-j** 🆕 | The glance box (28) is **1 column narrower than its widest content row (29) today** — a pre-existing clip found while measuring R-7. `LLR-111.9` incidentally fixes it at 120×30. | Lane-A carry for the 80×24 path |
+| **C-77-j** 🆕 | **Pre-existing 1-column glance-box clip** — the box is 28, its widest content row is 29 (`'· constant/padding 3 ████ 60%'`). Found by the corrected R-7 sweep. `LLR-111.9` incidentally fixes it at 120×30 by giving the glance full width; the 80×24 path is unchanged. **Distinct from C-77-k** — different defect, same screen. | Lane-A carry |
+| **C-77-k** 🆕 | **The stats line's scroll deepens** (R-8, accepted). `LLR-111.9` moves `#map_stats_body` from `bottom=31/30` to `bottom=33/30` at 120×30. It is **already below the fold at both regimes today** (`bottom=31/30` @120×30, `bottom=35/24` @80×24), so this deepens an existing scroll and **newly hides nothing**; the line stays reachable by scrolling exactly as today. **The widen is deliberately NOT narrowed to protect it** — every column surrendered lowers the ceiling on visible regions, which is the batch's whole purpose. **Distinct from C-77-j.** | Lane-A carry |
 | **C-77-f** | `o` = open-hex descoped (R3) | Lane-A carry |
 | **C-77-g** | 2-column marker + size label descoped (R-5) | Lane-A carry |
 | **C-77-a/c/d/e** | dense `round()` drift (superseded by R1/R-7) · `REQUIREMENTS.md` not an HLR index · US-77-8 · Variant B | carried |
@@ -454,6 +485,8 @@ Revision 1's P-16…P-43 stand except where corrected below.
 | QA **M-4** | precision pinned to exactly four digits | **HLR-113 Statement** | §3 HLR-113; §4 LLR-113.1 |
 | QA **M-5** | `AT-B77-10` reuses two existing nodes | — | §3 HLR-115 |
 | sec **m-1** | inverting text style excluded | `LLR-117.2` Statement | §4 LLR-117.2 |
+| **R-8** | stats-line fold accepted, not designed around | `LLR-111.9` cost note — **no threshold change**; HLR-111 untouched | §4 LLR-111.9; §6.3 **C-77-k**; §8 OQ-5 closed |
+| **R-9** | disclosure surface fixed to the **region list**; `AT-B77-17` asserts an exact count on a synthetic fixture | **`LLR-111.8` Statement rewritten** (surface is now normative); HLR-111's aggregation clause unchanged in substance | §4 LLR-111.8; §3 `AT-B77-17` block + its RED transcript; §5.2 row; §8 OQ-6 closed |
 
 ### 6.5 Requirement amendments
 **Amendment A (`R-TUI-072`)** and **Amendment B (`LLR-072.3`)** — Before texts verbatim-verified by the architect lane. **After** texts updated to *"one tick label per emitted **run** start plus one for the last mapped byte"* (§2.9) and extended with the legibility clause (security M-1). Amendment A's parent re-read still names the duplicate at `REQUIREMENTS.md:4190-4191`.
@@ -489,8 +522,8 @@ Revision 1's P-16…P-43 stand except where corrected below.
 
 | # | Question | Blocks | Owner |
 |---|---|---|---|
-| **OQ-5** 🆕 | `LLR-111.9` pushes `#map_stats_body` from `bottom=31/30` to `bottom=33/30` at 120×30. It is **already** below the fold at both regimes in the baseline (reachable-under-scroll is the established policy for this pane), so this deepens an existing scroll rather than newly hiding it. Accept, or reclaim rows elsewhere? | Inc-1 | **OPERATOR** |
-| **OQ-6** 🆕 | Does the `+N more` aggregate disclosure render **in the bar** or **in the region list**? Both are count-only so B3 holds either way; it changes which surface `AT-B77-17` observes. | Inc-2 | **OPERATOR** |
+| ~~OQ-5~~ | ✅ **CLOSED — ruling R-8.** Accept the deepened scroll; do not narrow the widen. Registered as carry **C-77-k**, kept distinct from **C-77-j**. | landed: `LLR-111.9` cost note, §6.3 | — |
+| ~~OQ-6~~ | ✅ **CLOSED — ruling R-9.** The disclosure renders **in the region list**, never the bar. `AT-B77-17` names that surface in its Given/When/Then and asserts an **exact count** over a synthetic over-threshold fixture. | landed: `LLR-111.8` Statement, `AT-B77-17` block | — |
 | **OQ-3** | `_BAND_BAR_WIDTH` deleted outright, or retained as a pre-layout fallback? | Inc-1 | Phase 3 |
 | **OQ-4** | The focus-entry mechanism — screen-scoped binding, auto-focus, or extending the rail tab chain (⚠️ shared). | Inc-7 | Phase 3 |
 
