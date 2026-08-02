@@ -1,8 +1,8 @@
-# Requirements Document — s19_app — batch `2026-08-01-batch-77` — **REVISION 4**
+# Requirements Document — s19_app — batch `2026-08-01-batch-77` — **REVISION 5**
 
 **Objective:** Memory Map redesign — Variant A (gap-fold band bar) + cross-cutting fixes S-1…S-7
 **Branch:** `claude/batch-77-memmap-variant-a` · **Base:** `origin/main` @ `f8747b8`
-**Revision 4** supersedes revision 3 after **gate 3** (security CLEAN · QA 0 blockers · architect 3, all one defect in three places). **Revision 3** superseded revision 2 after the **Phase-2 re-gate** (architect 6 · QA 1 · security 1 new blockers) and **operator rulings R-10 (descope aggregation to batch-78) and R-11 (pull the ANSI scrub in)**.
+**Revision 5** supersedes revision 4 after the **final architect re-gate** (*"this batch does not need re-scoping. It needs an edit pass"* — 1 blocker, 1 major, 1 minor, all edits). **Revision 4** superseded revision 3 after **gate 3** (security CLEAN · QA 0 blockers · architect 3, all one defect in three places). **Revision 3** superseded revision 2 after the **Phase-2 re-gate** (architect 6 · QA 1 · security 1 new blockers) and **operator rulings R-10 (descope aggregation to batch-78) and R-11 (pull the ANSI scrub in)**.
 **All three lanes discharged every revision-1 blocker by execution.** R-7 is verified sound: the bar widens 21→50, `prg.s19` fits **exactly** at both regimes, 15 further shipped fixtures + 3 synthetic classes pass, and **no regime regresses**. That is not reopened here.
 **7 of the 8 re-gate blockers were in the AGGREGATION path**, which R-10 removes from this batch.
 **Consolidates:** `00-measurements.md` · `01-requirements-architect.md` · `01b-qa-validation.md` · `02-review-architect.md` · `02-review-qa.md` · `02-review-security.md`
@@ -26,7 +26,7 @@
 | **1** | 🆕 **The subject of every width clause is the RUN, not the range.** `_merge_band_runs` splits on band change *or* address discontinuity, so one range can yield many segments. Executed: **1 range → 2 `BandSegment`s**. Every clause, guard and oracle re-pointed. | arch **B-5**, QA **B-1** |
 | **2** | 🆕 **The bar is widened by CSS before anything is aggregated** (R-7/1). Measured: `.map-band-bar` goes **21 → 50** columns @120×30. **80×24 is unaffected (66).** | arch **B-1** |
 | **3** | 🆕 **A normative allocation bound** (`LLR-111.7`) — `Σ run widths + Σ gap markers ≤ bar.region.width`, enforced in the producer. **Widening alone does NOT fix `prg.s19`** — executed, it still leaves 5 runs invisible at bar=50. | arch **B-2** |
-| **4** | ❌ **Aggregation DESCOPED to batch-78 (R-10).** `LLR-111.8`, `AT-B77-17` and the `+N more` disclosure are **withdrawn with a record**, not deleted. **7 of the 8 re-gate blockers lived in that path**, and exactly **one** shipped fixture crosses the onset while `LLR-111.7` alone fixes the other **16**. `HLR-111` now states an explicit **domain** and describes the out-of-domain case truthfully; `C-77-l` charters batch-78 with every measurement paid for. | arch **RB-1/2/3/4/6**, QA **N-1**, sec **M-3r** |
+| **4** | ❌ **Aggregation DESCOPED to batch-78 (R-10).** `LLR-111.8`, `AT-B77-17` and the `+N more` disclosure are **withdrawn with a record**, not deleted. **7 of the 8 re-gate blockers lived in that path**, and exactly **one** shipped fixture crosses the onset while `LLR-111.7` alone fixes the other **15 of 16**. `HLR-111` now states an explicit **domain** and describes the out-of-domain case truthfully; `C-77-l` charters batch-78 with every measurement paid for. | arch **RB-1/2/3/4/6**, QA **N-1**, sec **M-3r** |
 | **5** | **Increments re-cut.** Old Inc-1a was unsatisfiable *and* regressed 80×24 (`outside 0 → 2`). Container basis, bound and fold now land in **one** increment. | arch **B-3**, QA **B-2** |
 | **6** | `LLR-115.1` (`can_focus`) **moved under HLR-116** and into the earlier increment; the duplicate focusability clause deleted. | arch **B-4** |
 | **7** | **Golden payload re-derived — twice.** rev-1's `[45,15]` summed to **60**, the retired constant; rev-2's `[50,16]` was the right basis but **the wrong method** (plain `round()`). Through the mandated `LLR-111.7` allocator it is **`[49,17]` @bar=66 and `[37,13]` @bar=50**. Every payload now names its method. | arch **B-6**, **RM-1**, **RC-M1**, QA **M-2** |
@@ -101,7 +101,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 | **P-52** 🆕 | rev-1's `LLR-112.2` overlap predicate can detect a non-collapsing ruler | ❌ **FALSE — vacuous** | `width:1fr` children **cannot overlap**. N ticks in W=50: `N=20 → max width 3` (8-char label elided); `N=60 → 10 zero-width, OVERLAPS=0`. rev-1's conjunction **GREEN at 10 invisible labels**. | **`LLR-112.2` re-authored** |
 | **P-53** 🆕 | The retired 5-tick clause has 6 citation sites | ❌ **FALSE — 8** | + `s19_app/tui/legend.py:606-614` — prose *"address ruler — 5 ticks at 0/25/50/75/100 % of span"* **plus a 5-address sample line**, in a file absent from revision 1 entirely; + `.dev-flow/2026-07-15-batch-47/06-docs/traceability-matrix.md:54` | **`LLR-112.3` → 8**; `legend.py` enters §7 |
 
-| **P-54** 🆕 | Only ONE shipped fixture crosses the aggregation onset | ✅ **TRUE** | `case_08` = **801 ranges → 801 runs**; every other shipped fixture ≤ 11 runs. `LLR-111.7` alone fixes **16 of 17** with zero aggregation. | **basis for R-10** |
+| **P-54** 🆕 | Only ONE shipped fixture crosses the **`HLR-111`** onset | ✅ **TRUE, and now DERIVED** | executed over `examples/**/*.s19` (**16** fixtures): the only exclusion is `case_08` (801 runs + 800 gaps = **1601** vs bar 66/50). **15 of 16 in domain at both regimes.** *(Earlier revisions wrote "16 of 17"; the corpus is 16.)* ⚠️ **This premise is about `HLR-111` ONLY — `HLR-112`'s membership is a different and larger exclusion set, see P-60.** | **basis for R-10** |
 | **P-55** 🆕 | Revision 2's `AT-B77-15` control-byte limb is RED today | ❌ **FALSE — it is GREEN, vacuously** | zero clicks → body still shows `_DETAIL_HINT` → no file-derived text at all → `limb3 no-ESC = True` at both sizes. The node aggregated RED off limb 1 and hid it. | **`AT-B77-15a/b` split, per-arm reporting** |
 | **P-56** 🆕 | Revision 2's recorded mutation discharges the control-byte limb | ❌ **FALSE — inert** | `remove safe_text → Text.from_markup`: `limb1 True→False`, `limb2 True→False`, **`limb3 False→False`**. `safe_text` is a no-op on ESC to begin with (P-51), so removing it cannot move limb 3. | **R-11: land the scrub, then the mutation is "revert the filter"** |
 | **P-57** 🆕 | A hostile symbol name can perturb the bar's layout arithmetic *(rev 1–2 rationale)* | ❌ **FALSE — WITHDRAWN** | body plain length **277 → 708** with ESC present, while `.map-band-bar`, `#map_grid`, `#map_detail` were **byte-identical at both regimes**. `#map_detail` is `width: 36` **fixed**; `#map_grid` takes `1fr` of the remainder. No file-derived string is an input to `LLR-111.7`. | **rationale deleted explicitly**; finding stands on the load-path reachability alone |
@@ -161,8 +161,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 > the re-gate found broken in six independent ways. R-10 removes aggregation to **batch-78**. What remains is
 > a requirement with an **explicit domain** and an **honestly described** out-of-domain case.
 >
-> **In domain — `n_runs + n_gaps ≤ bar.region.width`.** Executed: **16 of the 17 shipped fixtures** satisfy
-> this, and the allocation bound alone (`LLR-111.7`) makes them all pass with **zero aggregation**.
+> **In domain — `n_runs + n_gaps ≤ bar.region.width`.** Executed: **15 of the 16 shipped image fixtures** satisfy this, and the allocation bound alone (`LLR-111.7`) makes them all pass with **zero aggregation**. *(Derived at revision 5 by executing the membership test over `examples/**/*.s19`; earlier revisions said "16 of 17" — the corpus is **16** and the split is **15 / 1**.)*
 > `prg.s19` (14 runs, 13 gaps) fits **exactly**: `bar=66 → total 66`, `bar=50 → total 50`.
 >
 > **Out of domain — exactly ONE shipped fixture**, `examples/professional_validation/case_08_heavy_fragmentation/firmware.s19`,
@@ -186,8 +185,9 @@ Revision 1's P-16…P-43 stand except where corrected below.
 > ⚠️ **Revisions 1–3 labelled row (a) as batch-77's and it is not.** The tell is `gap_w max = 60`: gaps are
 > **unfolded**, so `LLR-111.2` had not been applied. **Two consequences, both correcting this document's own
 > claims about its own work:**
-> 1. The shipping number is **95.9 %**, not 99.5 %. The bar is still unreadable on `case_08` — 768 of 801 runs
->    paint zero columns — and **batch-77 does not fix that**.
+> 1. The shipping numbers are **95.9 % @80×24 and 96.9 % @120×30** — not 99.5 %/99.9 %. **Both regimes must be
+>    quoted wherever either is**, or the wide regime is understated: `768/801` @66 and `776/801` @50. The bar is
+>    still unreadable on `case_08` at both — and **batch-77 does not fix that**.
 > 2. Revision 3's *"it is not made worse either: the invisible-run count is identical with and without the R-7
 >    widen"* compared **two rows of the same pre-fold producer**. Against batch-77's actual producer it is
 >    **797 → 768 and 800 → 776: measurably BETTER, not identical.** The document was understating its own work.
@@ -214,14 +214,46 @@ Revision 1's P-16…P-43 stand except where corrected below.
 ### HLR-112 — every ruler label names a mapped address and is legible
 - **Traceability:** US-77-2 · **Rulings:** R4, security M-1
 - **Statement:** When the Memory Map renders, the address ruler **shall not** emit a label naming an address outside every mapped range, and **shall** emit strictly ascending, non-duplicate labels. **While the image satisfies `n_ticks ≤ ruler.region.width ÷ label_width`**, the ruler **shall** emit one tick label per emitted **run** start plus one label for the last mapped byte, and **shall not** emit any tick whose rendered width is smaller than the label it carries. If the image does not satisfy that condition, the ruler **shall** retain the first and last labels, **shall** drop interior labels rather than emit an illegible one, and **shall** render without raising.
-- **⭐ DOMAIN, added at revision 4 (arch RC-2 / QA M-4 — found independently by two lanes).** Revision 3 gave `HLR-111` a domain and left `HLR-112` with none, so its clauses 1 and 4 were **jointly unsatisfiable on a shipped fixture**: `case_08` has 801 runs, so clause 1 demands **802 ticks**; at 8 hex digits per label that needs **6416 columns** against a ruler measured at **66 / 50**, giving **0 columns per tick** — which clause 4 forbids. The two clauses contradict each other roughly 100× over. **The resolution is exactly the pattern already applied to `HLR-111`**, which is why this is a propagation miss and not a design question: the *invariants* (no unmapped address, ascending, unique) stay universal because they cost nothing; the *cardinality* and *legibility* clauses take the domain; and the out-of-domain behaviour is stated rather than left silent.
-- **Rationale (informative):** measured **4 of 5** ticks name unmapped addresses. `span_end = 0x07FFFF3E` is exclusive and unmapped; `0x07FFFF3D` is mapped (frozen-oracle verified). Per §2.9 the tick subject is the **run** start. The final clause replaces revision 1's overlap test, which was vacuous: `1fr` children **cannot overlap**; they go **zero-width**. Executed, N=60 ticks in W=50 → **10 zero-width, 0 overlaps**, and rev-1's predicate was **GREEN**.
+- **⭐ DOMAIN — added at revision 4, MEASURED at revision 5 (arch RC-2 / QA M-4 / arch RC4-2).** Revision 3 gave `HLR-111` a domain and left `HLR-112` with none, so its cardinality and legibility clauses were **jointly unsatisfiable on shipped fixtures**. The domain resolves that by the same pattern already applied to `HLR-111`: the *invariants* stay universal because they cost nothing; the *cardinality* and *legibility* clauses take the domain; out-of-domain behaviour is stated rather than left silent.
+
+  **The ceiling, DERIVED (not copied):** ruler width measured at **66 @80×24 and 50 @120×30**; tick labels measured at **8 characters** (8 hex digits, the `0x` prefix already dropped as a spent C-13.1 fallback). **A one-column separator is required** — two adjacent 8-hex labels with no gap render as an unreadable 16-digit run — so the pitch is **9** and the ceiling is `⌊(width + 1) ÷ 9⌋` = **7 ticks @80×24 and 5 @120×30**.
+  ⚠️ **The separator convention is load-bearing and therefore normative, not cosmetic.** At pitch 8 (no separator) the ceiling would be 8/6 and `case_07_stress_smoke` (6 ticks) would read as *in domain* at the wide regime. It is not. **A membership answer that changes with an unstated convention is not a membership answer** — the convention is stated in `LLR-112.2`.
+
+  **Membership across the WHOLE shipped corpus — executed over `examples/**/*.s19`, both regimes:**
+
+  | Fixture | runs | ticks | cols needed | in @80×24 (≤7) | in @120×30 (≤5) |
+  |---|---:|---:|---:|:--:|:--:|
+  | **`case_00_public/prg.s19`** ⭐ | 14 | 15 | 134 | ❌ | ❌ |
+  | `case_00_public/s19_sample.s19` | 2 | 3 | 26 | ✅ | ✅ |
+  | `case_01_basic_valid` | 3 | 4 | 35 | ✅ | ✅ |
+  | `case_02_gaps_and_patch_targets` | 4 | 5 | 44 | ✅ | ✅ |
+  | `case_03_overlapping_records` | 2 | 3 | 26 | ✅ | ✅ |
+  | `case_04_bad_checksums` | 2 | 3 | 26 | ✅ | ✅ |
+  | `case_05_dense_mixed_content` | 2 | 3 | 26 | ✅ | ✅ |
+  | `case_06_large_nested_a2l` | 3 | 4 | 35 | ✅ | ✅ |
+  | **`case_07_stress_smoke`** | 5 | 6 | 53 | ✅ | ❌ |
+  | `professional_validation/case_01_baseline_valid` | 3 | 4 | 35 | ✅ | ✅ |
+  | `professional_validation/case_02_patch_targets_and_gaps` | 4 | 5 | 44 | ✅ | ✅ |
+  | `professional_validation/case_03_overlapping_records` | 3 | 4 | 35 | ✅ | ✅ |
+  | `professional_validation/case_04_bad_checksums` | 2 | 3 | 26 | ✅ | ✅ |
+  | `professional_validation/case_05_out_of_order_and_mixed` | 4 | 5 | 44 | ✅ | ✅ |
+  | `professional_validation/case_07_cross_reference_inconsistencies` | 3 | 4 | 35 | ✅ | ✅ |
+  | **`professional_validation/case_08_heavy_fragmentation`** | 801 | 802 | 7217 | ❌ | ❌ |
+
+  **EXCLUDED — three fixtures, not one:**
+  - **`case_00_public/prg.s19` — OUT at BOTH regimes** (15 ticks vs 7/5). ⚠️ **This is the batch's showcase fixture** — the one `LLR-111.7`'s threshold names, the one every `HLR-111` demonstration uses, the one R-7 was validated against. **`HLR-111` covers it; `HLR-112` does not.** Revision 4's callout named only `case_08`, from which a reader would reasonably conclude `case_08` was the sole exclusion.
+  - **`case_07_stress_smoke` — OUT at 120×30 only** (6 ticks vs a ceiling of 5). A single-regime exclusion, invisible to any check that tests one regime.
+  - **`professional_validation/case_08_heavy_fragmentation` — OUT at BOTH** (802 ticks vs 7/5).
+
+  **`HLR-112`'s domain is materially smaller than `HLR-111`'s: 13 of 16 at both regimes versus 15 of 16.** Stating this is the point — US-77-2's delivered outcome on `prg.s19` is that every emitted label names a mapped address (the invariant holds) but the operator sees at most 7 of 15 run starts. **That is weaker than the story implies, and it is now on the page.**
+
 - **Validation:** `test`
 - **Executed verification:** `pytest tests/test_tui_map_big.py::test_at072b_ruler -v` (re-derived) + `-k b77_ruler`
 - **Numeric pass threshold:** *(universal)* 0 labels outside every mapped range (today **4**); `len(ticks) == len(set(ticks))`; strictly ascending. *(in domain)* one tick per run start plus the end label; **0 ticks with `region.width < len(label)`**. *(out of domain)* first and last labels retained, no raise.
 - **Acceptance (black-box):**
   - **Deliverable + observation:** tick labels **and each tick's `region.width`**. Membership via the frozen `address_in_sorted_ranges(addr, index)` — note the argument order (`s19_app/range_index.py:39`); revision 1's first probe had it inverted and was caught by a `TypeError`.
-  - **Acceptance test(s):** **`AT-072b`** *(re-derived, keeps its global id)* — `{ticks} ⊆ ADMISSIBLE` ∧ ascending ∧ no duplicates ∧ **no elided tick**, where `ADMISSIBLE = {f"{s:08X}" for run starts} ∪ {f"{span_end-1:08X}"}` · **`AT-B77-04`** — the `⊇` lower bound
+  - ⚠️ **FIXTURE PIN — normative, and the reason is a latent false failure (arch RC4-2c).** `AT-072b` carries the **in-domain** clause *"no elided tick"*. **Its fixture must be one that is in `HLR-112`'s domain at BOTH regimes** — i.e. **≤ 5 ticks**, which the current `_load_case_02()` (4 runs → 5 ticks) satisfies. **`prg.s19` MUST NOT be used**: at 15 ticks it is out of domain at both regimes and the node would go **RED on correct code**. The trap is latent rather than live only because Inc-4 has not re-derived the node yet, and `prg.s19` is the obvious fixture for an editor to reach for.
+  - **Acceptance test(s):** **`AT-072b`** *(re-derived, keeps its global id; **fixture pinned in domain at both regimes**)* — `{ticks} ⊆ ADMISSIBLE` ∧ ascending ∧ no duplicates ∧ **no elided tick**, where `ADMISSIBLE = {f"{s:08X}" for run starts} ∪ {f"{span_end-1:08X}"}` · **`AT-B77-04`** — the `⊇` lower bound
   - **⚠️ Why `AT-B77-04` is not optional:** executed, `set() <= admissible` is **`True`**. A subset-only predicate is GREEN on a ruler that rendered zero ticks.
   - **Boundary catalog:** ☑ empty `TC-B77-06` · ☑ one run `TC-B77-07` · ☑ **more runs than ruler columns → elision, the case rev-1 could not detect** `TC-B77-08` · ☑ two run starts rendering to one column `TC-B77-09` · ☐ error **N/A** — ticks derive from validated `ranges`/runs (LLR-041.7)
 
@@ -315,8 +347,19 @@ Revision 1's P-16…P-43 stand except where corrected below.
 > document.
 >
 > **Three repairs, all mandatory:**
-> 1. **The AT asserts its own PRECONDITION.** Limb 3 may be evaluated **only** in a run where limb 1 has
->    already established the payload is present in `#map_detail_body`.
+> 1. **BOTH ARMS ASSERT THEIR PRECONDITION AND FAIL LOUDLY IF THE GESTURE MISSED (rev 5, arch RC4-1).**
+>    Before any safety limb is evaluated, at **each** size arm, the test **asserts that `#map_detail_body`
+>    actually contains the hostile payload**. If it does not, the node **FAILS with a message naming the
+>    missed gesture** — it never proceeds to the safety limbs and never passes silently.
+>    ⚠️ **Revision 4 fixed 120×30 and left 80×24 vacuous.** Reproduced on the unpatched tree: the click point
+>    inside the row's *own reported region* resolves to a `Container` at 80×24 and a `RegionRow` at 120×30 —
+>    so the detail body stayed `_DETAIL_HINT` at the narrow arm and the safety limbs asserted over a strip
+>    with **no file-derived text at all**. That is P-55's vacuity again, at one of the two arms the gate names.
+>    **The batch already holds this lesson as §6.3 F-1(e)** — *"a setup gesture that silently misses turns a
+>    gate into a tautology"* — and applied it to `AT-B77-13`/`14`; it was not carried to the new Inc-2 arms.
+>    **The fix is detection, not a better click.** Changing the gesture only moves the failure; asserting the
+>    precondition catches it whatever the gesture does. Limb 3 remains evaluable **only** in a run where the
+>    precondition has established the payload is present.
 > 1a. ⚠️ **WORDING, corrected at revision 4 (QA M-2).** Revision 3 said *"payload verbatim"* in two places
 >    while `LLR-116.7` correctly says *preserve every **non-control** character verbatim*. **Post-scrub the ESC
 >    payload is deliberately NOT verbatim** — that is the fix working. As written, `AT-B77-15a` would have gone
@@ -372,7 +415,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 - **Statement:** While the image satisfies `n_runs + n_gaps ≤ bar.region.width`, the sum of all emitted run-segment widths and all emitted gap-marker widths **shall not** exceed the measured container width, and every emitted run segment **shall** receive at least one column. If the image does not satisfy that condition, the allocator **shall** return a width for every run without raising.
 - **⚠️ Scope added at revision 4 (arch RC-1).** Revision 3 stated both conjuncts unconditionally while §3 openly admitted the bound is arithmetically unsatisfiable out of domain (`avail = −734 / −750`). Executed on `case_08`: `1601 ≤ 66` **False**, `1601 ≤ 50` **False**. A requirement that its own document proves false is worse than one with a stated limit.
 - **Rationale (informative):** **an output-shaped predicate cannot bound an allocation** — batch-74's asset restated. `AT-B77-03` is output-shaped; it detects the overflow but cannot prevent it. Executed: with the container basis and a 1-column fold but **no** bound, `prg.s19` emits **60 columns into a 50-column bar** while leaving 5 runs invisible (P-48). With the bound — floor 1 per run, remainder by largest-remainder on mapped bytes — `prg.s19` fits **exactly** at both regimes, all runs visible, monotone and strict, with **zero** aggregation (P-49).
-- **Validation:** `test (integration)` + `analysis` · **Threshold:** `Σ widths + Σ markers ≤ bar.region.width` for **every IN-DOMAIN suite fixture** (16 of the 17 shipped) **and** for `examples/case_00_public/prg.s19` specifically. For the one out-of-domain fixture the threshold is *returns without raising*, verified by `AT-B77-18`. *(Revision 3 said "every suite fixture", which `case_08` falsifies.)*
+- **Validation:** `test (integration)` + `analysis` · **Threshold:** `Σ widths + Σ markers ≤ bar.region.width` for **every IN-DOMAIN suite fixture** (**15 of the 16** shipped image fixtures — derived, rev 5) **and** for `examples/case_00_public/prg.s19` specifically. For the one out-of-domain fixture the threshold is *returns without raising*, verified by `AT-B77-18`. *(Revision 3 said "every suite fixture", which `case_08` falsifies.)*
 - **Acceptance:** the bound is asserted on the **emitted widths**, and separately the allocator is unit-tested over a swept run count, so the bound holds **by construction** rather than by luck on one fixture.
 
 **LLR-111.8 — WITHDRAWN to batch-78 (R-10). Recorded, not deleted.**
@@ -435,7 +478,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 
 **LLR-112.1 — ticks derive from RUN starts plus the last mapped byte (R4, §2.9)** · **Statement:** `MapRuler` **shall** accept the ordered emitted-run start addresses and the last mapped byte, and **shall** emit one `.map-ruler-tick` per retained address, replacing the fixed `_TICK_COUNT = 5` percentile derivation. **Symbols:** `MapRuler:1234`, `_TICK_COUNT:1274`, `compose:1293`, construction `:2102` (signature changes). **Threshold:** 0 labels outside every mapped range (today 4 of 5); `END_LABEL == f"{span_end-1:08X}"` — executed `0x07FFFF3D` mapped **True** vs `span_end 0x07FFFF3E` mapped **False**.
 
-**LLR-112.2 — legibility, not overlap (security M-1)** · **Statement:** The ruler **shall not** emit a tick whose rendered width is less than the length of the label it carries, and **shall** retain the first and last labels in preference to any interior label when labels must be dropped. **Rationale (informative):** revision 1 asserted "0 overlapping column ranges", which **cannot fail** — `width:1fr` children partition the row and never overlap; they degrade to zero width. Executed in a synthetic `1fr` row: `N=20, W=50 → max tick width 3` (an 8-char label elided); `N=60, W=50 → 10 zero-width ticks, 0 overlaps`, and revision 1's conjunction was **GREEN**. **Sufficiency argument, re-derived at revision 4 (arch RC-2).** Revision 3 justified this predicate by saying *"`LLR-111.8`'s aggregation lowers the run count the ruler must label"* — **the one live dangling reference to the withdrawn LLR**, and, worse, the predicate's whole *sufficiency* argument. With aggregation descoped that support is gone and the predicate needs a new one, which is this: **elision is not a fallback, it is the out-of-domain behaviour itself.** `HLR-112`'s domain admits at most `ruler_width ÷ label_width` ticks — measured, **8 @66 and 6 @50** for 8-hex-digit labels. Past that the ruler *must* drop labels, and the only question is whether it drops them **legibly or silently**. This predicate is what forces the former: it fails on a ruler that renders 802 ticks at 0 columns each, which is precisely what `1fr` does by default. It needs no aggregation to be sufficient — it is the clause that makes the domain edge observable. **Geometry:** `assumed — measure at Phase 3` at the widened 50-column regime; the `0x`-prefix-drop fallback is **already spent** (`:1245-1247`).
+**LLR-112.2 — legibility, not overlap (security M-1)** · **Statement:** The ruler **shall not** emit a tick whose rendered width is less than the length of the label it carries, and **shall** retain the first and last labels in preference to any interior label when labels must be dropped. **Rationale (informative):** revision 1 asserted "0 overlapping column ranges", which **cannot fail** — `width:1fr` children partition the row and never overlap; they degrade to zero width. Executed in a synthetic `1fr` row: `N=20, W=50 → max tick width 3` (an 8-char label elided); `N=60, W=50 → 10 zero-width ticks, 0 overlaps`, and revision 1's conjunction was **GREEN**. **Sufficiency argument, re-derived at revision 4 (arch RC-2).** Revision 3 justified this predicate by saying *"`LLR-111.8`'s aggregation lowers the run count the ruler must label"* — **the one live dangling reference to the withdrawn LLR**, and, worse, the predicate's whole *sufficiency* argument. With aggregation descoped that support is gone and the predicate needs a new one, which is this: **elision is not a fallback, it is the out-of-domain behaviour itself.** `HLR-112`'s domain admits at most `ruler_width ÷ label_width` ticks — measured, **8 @66 and 6 @50** for 8-hex-digit labels. Past that the ruler *must* drop labels, and the only question is whether it drops them **legibly or silently**. This predicate is what forces the former: it fails on a ruler that renders 802 ticks at 0 columns each, which is precisely what `1fr` does by default. It needs no aggregation to be sufficient — it is the clause that makes the domain edge observable. **Separator convention (normative, rev 5):** adjacent tick labels **shall** be separated by at least one blank column, so the per-tick pitch is `len(label) + 1 = 9`. **This is not cosmetic: it decides domain membership** — at pitch 8 the ceiling is 8/6 and `case_07_stress_smoke` reads as in-domain at 120×30 when it is not. **Geometry:** ruler measured at **66 / 50**, ceiling **7 / 5**, derived at rev 5; the `0x`-prefix-drop fallback is **already spent** (`:1245-1247`).
 
 **LLR-112.3 — the retired clause is amended at EIGHT sites (arch M-3, security M-2)**
 - **Statement:** The batch **shall** record Before/After amendments for `R-TUI-072` and `LLR-072.3` and **shall** update every surviving statement of the retired 5-tick contract in shipped source, tests, `REQUIREMENTS.md`, and the batch-47 artifact set.
@@ -572,7 +615,7 @@ builds on them.** The single most important line is the fixture rule.
 | 1 | **Onset formula** | aggregation is required when `n_runs + n_gaps·fold > bar_width`, i.e. `2·n_runs − 1 > bar_w` |
 | 2 | **Measured onset** | **26 runs @bar=50** (25 clean, 26 aggregates 1) · **34 runs @bar=66** (33 clean, 34 aggregates 1) |
 | 3 | ⭐ **THE ACCEPTANCE FIXTURE, FROM THE START** | `examples/professional_validation/case_08_heavy_fragmentation/firmware.s19` — **801 ranges → 801 runs + 800 gaps = 1601 segments**, ~30× the ceiling. **It is the ONLY shipped fixture past the onset**; every other is ≤ 11 runs. **The aggregation path has now been designed TWICE against fixtures that did not represent the real one** — revision 2's synthetic 35-run fixture was chosen because no shipped fixture was believed to cross, and that premise was false. **This is the batch's signature failure recurring, and it is why R-10 descoped rather than patched.** |
-| 4 | **Out-of-domain behaviour, BOTH producers** | **pristine + CSS only:** @66 `797/801 (99.5 %)`, outside 1594; @50 `800/801 (99.9 %)`, outside 1600; `gap_w max=60`. **batch-77's producer:** @66 `768/801 (95.9 %)`, outside 1535; @50 `776/801 (96.9 %)`, outside 1551; `gap_w max=1`. Region list **801** rows, **no crash**, in every case. **batch-77 improves it and does not fix it.** ⚠️ **The degradation rule is UNSPECIFIED — these are observations of one conforming implementation, not a contract. batch-78 must specify it.** |
+| 4 | **Out-of-domain behaviour, BOTH producers** | **pristine + CSS only:** @66 `797/801 (99.5 %)`, outside 1594; @50 `800/801 (99.9 %)`, outside 1600; `gap_w max=60`. **batch-77's producer:** @66 `768/801 (95.9 %)`, outside 1535; @50 `776/801 (96.9 %)`, outside 1551; `gap_w max=1`. **Improvement: −29 runs @66 and −24 @50.** Region list **801** rows, **no crash**, in every case. **batch-77 improves it at both regimes and fixes it at neither. Quote both figures or neither — a lone "95.9 %" understates the wide regime.** ⚠️ **The degradation rule is UNSPECIFIED — these are observations of one conforming implementation, not a contract. batch-78 must specify it.** |
 | 5 | **The bound is arithmetically unsatisfiable out of domain** | `avail = bar_w − n_gaps` = **−734** @66, **−750** @50 |
 | 6 | **O(n²) cost — and time is NOT currently a stated cost axis** | merge-smallest-adjacent on the UI thread: **n=1000 → 975 merges, 31.10 ms**; **n=5000 → 4975 merges, 840.34 ms**, uncapped. `case_08` is n=801. **batch-78 must add a time budget to its constraints** (security M-3r) |
 | 7 | **An aggregate has no usable monotonicity subject** | `region_end − region_start` **includes swallowed gaps**, so it is not the aggregate's mapped size. Executed on `case_08`: monotone-by-span **False**, monotone-by-**sum of constituent run bytes** **True**; first span violation `((1988,2),(2150631108,1))`. **The subject must be the summed run bytes, and `BandSegment` does not currently expose it** (arch RB-2) |
@@ -582,7 +625,7 @@ builds on them.** The single most important line is the fixture rule.
 | 11 | **The count formula cannot distinguish merged from DROPPED** | `oracle − emitted` is GREEN identically whether runs were merged into an aggregate or **silently discarded**. batch-78 needs a separate clause that every run is *represented*, not merely *counted* (QA N-1) |
 
 **Scope note.** `LLR-111.7` (floor-1 + largest-remainder bound) stays in batch-77 — it is verified sound and
-is what makes **16 of the 17** shipped fixtures work with zero aggregation. batch-78 inherits a working
+is what makes **15 of the 16** shipped fixtures work with zero aggregation. batch-78 inherits a working
 bound and owns only the excess.
 
 ### 6.4a 🆕 PROPAGATION SWEEP (revision 4) — the root-cause fix, EVIDENCED
@@ -632,10 +675,36 @@ is the quoted anchor text.
 | **cross** | BLUF row 7 golden = `[49,17]` *(**fixed at rev 4** — had survived one revision as `[50,16]`)* | ✅ |
 | **cross** | Inc-2 gate driven by a real click, and marked `full ×3` *(**fixed at rev 4**)* | ✅ |
 
-**Executed result: 32 of 32 after two corrections.** The first run reported **2** failures. One was a bad probe
+**🆕 DERIVED-EXCLUSION ROWS (rev 5, arch RC4-2d) — the sweep no longer only confirms what it was told to look for.**
+
+Revision 4's sweep had a **hand-listed row set**: rows verified that each domain *was added*, and **no row asked
+what any domain EXCLUDES**. That is the C-31 vacuous-input-set defect wearing a control's clothing — **the fourth
+occurrence of that shape in this batch**, this time inside the control built to stop it. The rows below **compute**
+the excluded set from the fixture corpus instead of asserting a domain exists.
+
+| Declared domain | Excluded set — **COMPUTED over `examples/**/*.s19`** | Named in the document? |
+|---|---|---|
+| `HLR-111` — `n_runs + n_gaps ≤ bar_width` | **1 of 16**: `case_08` (1601 vs 66/50) | ✅ named |
+| `HLR-112` — `n_ticks ≤ ⌊(ruler_width+1)/9⌋` | **3 of 16**: `prg.s19` (15 ticks, both regimes) · `case_07_stress_smoke` (6 ticks, **@120×30 only**) · `case_08` (802 ticks, both) | ✅ **all three named at rev 5** *(rev 4 named only `case_08`)* |
+| `LLR-111.7` bound | same set as `HLR-111` — 1 of 16 | ✅ |
+| `LLR-112.2` legibility | same set as `HLR-112` — 3 of 16 | ✅ |
+
+**Two findings the derived rows produced that no hand-listed row could have:**
+1. **`prg.s19` — the showcase fixture — is outside `HLR-112` at both regimes.** Every `HLR-111` demonstration uses it; a reader would not expect it to be excluded anywhere.
+2. **`case_07_stress_smoke` is a SINGLE-REGIME exclusion** (@120×30 only), and its membership **flips with the separator convention** — invisible to any check that tests one regime or leaves the pitch unstated. That is why `LLR-112.2` now states the convention normatively.
+
+**Standing obligation for Phase 3 and batch-78: every domain this document declares carries a derived-exclusion
+row. A domain whose excluded set has not been computed has not been measured.**
+
+**Executed result at revision 5: 42 of 42 PASS**, after correcting **three genuine residues** (`P-50`'s disposition pointing at a withdrawn LLR; the `LLR-111.8` dependency inside `LLR-112.2`'s sufficiency argument; the corpus count repeated across four revisions) and **three probe-string defects of my own** (a bold-marker mismatch on the `LLR-111.7` anchor, and an exclusion filter that did not whitelist the sweep's own self-describing rows). **Recorded because the probe defects matter as much as the document ones:** a sweep whose probes are wrong reports failures that are not there — and would, on the next run, teach a reader to ignore it. The first run reported **2** failures. One was a bad probe
 string on my side (the `HLR-111` anchor). **The other was a genuine residue the sweep existed to find:** `P-50`'s
 disposition column still pointed at `LLR-111.8`, a withdrawn requirement. **That is one more propagation miss,
-caught by the mechanism rather than by a fourth review round** — which is the point of building the mechanism.
+caught by the mechanism rather than by a fourth review round** — which is the point of building the mechanism.)*
+
+**At revision 5 the sweep caught a third:** the corpus size itself. Every prior revision wrote *"16 of 17 shipped
+fixtures"*; the derived count is **16 fixtures, 15 in domain**. A figure repeated across four revisions was never
+derived — the same defect class as the golden payload and the out-of-domain figures, in the sentence describing
+how well the design works.
 
 **Standing rule for Phase 3 and for batch-78:** any change to a domain, a scope, a withdrawal or a wording
 re-runs this sweep and records the result. The cost is a minute; the alternative has cost three gate rounds.
@@ -644,7 +713,7 @@ re-runs this sweep and records the result. The cost is a minute; the alternative
 
 | Blocker | What changed | Parent re-read? | Body edit landed? |
 |---|---|---|---|
-| arch **B-1**, **B-2** | container widened (R-7/1) + normative bound + aggregation | **HLR-111 Statement rewritten**, threshold extended | §3 HLR-111; §4 **LLR-111.7/.8/.9**; `AT-B77-17` |
+| arch **B-1**, **B-2** | container widened (R-7/1) + normative bound *(aggregation added here, **later WITHDRAWN by R-10** — `LLR-111.8` and `AT-B77-17` are **not** landed edits)* | **HLR-111 Statement rewritten**, threshold extended | §3 HLR-111; §4 **LLR-111.7**, **LLR-111.9** *(not `.8` — withdrawn)*; ~~`AT-B77-17`~~ → `AT-B77-18` |7/.9** |
 | arch **B-3**, QA **B-2** | increments re-cut; basis+bound+fold land together | no threshold change | §7 |
 | arch **B-4** | `LLR-115.1` → `LLR-116.1`; duplicate clause deleted | **HLR-115 Statement** lost the focusability clause; **HLR-116** keeps it | §3 HLR-115, HLR-116; §4 |
 | arch **B-5**, QA **B-1** | subject = RUNS; C-31 guard replaced | **HLR-111 + HLR-112** both re-pointed | **§2.9**; §3 both HLRs; §4 LLR-112.1 |
@@ -703,7 +772,7 @@ re-runs this sweep and records the result. The cost is a minute; the alternative
 | **Inc-1** | **CSS widen + container basis + bound + fold + settling, TOGETHER** — `LLR-111.9`, `.1`, `.7`, `.2`, `.6`, `.3`. Owns `AT-B77-18` (out-of-domain, `case_08`). Amendment C deletion + the two AC-6 pointer tests reverted to 120×30. | `screens_directionb.py`, `styles.tcss`, `tests/test_tui_map_big.py`, `tests/test_map_click_chain.py` (4) | `AT-B77-01`, `AT-B77-03` **both arms, in domain**; `AT-B77-18` on `case_08`; full ×3 |
 | **Inc-2** 🔄 | **`LLR-116.7` — the C0/C1 **byte-class** scrub in `safe_text` + its docstring correction (R-11)**. Sequenced **early** so `LLR-116.6`'s normative clause is satisfiable before Inc-7 makes it live. Owns `AT-B77-15a/b`. | `screens_directionb.py`, `tests/test_tui_hostile_map.py` (NEW, non-frozen), `REQUIREMENTS.md` (3) | **`AT-B77-15a/b` driven by a REAL CLICK on a region row** — *not* by auto-select, which does not exist until Inc-7 — **per limb per size**; scrub-revert mutation executed; **full ×3** (this is the widest blast radius in the batch: `safe_text` has ~85 call sites across 4 modules) |
 | **Inc-3** | **`LLR-111.4` golden capture**, own commit, after the basis settles · **owns `AT-B77-02`** (arch M-5) | `tests/test_tui_map_big.py`, golden artifact, `.gitattributes` (3) | golden committed; stored blob's bytes verified |
-| **Inc-4** | **HLR-112 ruler** — code + tests + **`legend.py` site 7** | `screens_directionb.py`, `legend.py`, `tests/test_tui_map_big.py`, `tests/test_tui_snapshot.py` (4) | `AT-072b`, `AT-B77-04`; 0 "5 ticks" in source/tests |
+| **Inc-4** | **HLR-112 ruler** — code + tests + **`legend.py` site 7** | `screens_directionb.py`, `legend.py`, `tests/test_tui_map_big.py`, `tests/test_tui_snapshot.py` (4) | `AT-072b`, `AT-B77-04`; 0 "5 ticks" in source/tests. ⚠️ **`AT-072b`'s fixture must stay in `HLR-112`'s domain at both regimes (≤5 ticks) — `case_02` qualifies, `prg.s19` does NOT** |
 | **Inc-5** | **Amendments A + B + doc census** + **carry C-77-i** | `REQUIREMENTS.md`, batch-47 `01-requirements.md`, batch-47 `traceability-matrix.md`, `.dev-flow/BACKLOG-CODE.md`, `PLAN.md` (5) | **0 surviving statements** of the retired contract under `s19_app/`, `tests/`, `REQUIREMENTS.md` and `.dev-flow/2026-07-15-batch-47/`, verified by **reading each file the sweep returns** (the count is a lower bound — 9 known, ~14 more likely; `LLR-112.3`'s "artifact set" wording governs, not the integer); backlog claim corrected |
 | **Inc-6** | **HLR-113 + HLR-114** stats + legend removal; `test_at075` `e`-clause **ported** | `screens_directionb.py`, `styles.tcss`, `tests/test_tui_directionb.py`, `REQUIREMENTS.md` (4) | `AT-B77-05/06/07` |
 | **Inc-7** | **HLR-116 + HLR-117** — `LLR-116.1` focusability (moved here), post-refresh hook, resolution, **liveness**, selection style. Re-runs `AT-B77-15a/b` now that auto-select makes the payload actually render. | `screens_directionb.py`, `styles.tcss`, `tests/test_tui_map_big.py`, `REQUIREMENTS.md` (4) | `AT-B77-11/12/13/14`; `AT-B77-15a/b` re-run per limb; the two R-6 mutations executed **after** liveness lands |

@@ -45,8 +45,8 @@
     "minted_so_far": "NONE - Phase 0 mints no ids.",
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31). AT-072b is an EXISTING global id being re-derived, not minted - it keeps its number."
   },
-  "current_phase": 2,
-  "phase_status": "iterating",
+  "current_phase": 3,
+  "phase_status": "not-started",
   "iterations_per_phase": {
     "0": 0,
     "1": 2,
@@ -64,7 +64,8 @@
     "1_qa_lane": ".dev-flow/2026-08-01-batch-77/01b-qa-validation.md",
     "2_architect": ".dev-flow/2026-08-01-batch-77/02-review-architect.md",
     "2_qa": ".dev-flow/2026-08-01-batch-77/02-review-qa.md",
-    "2_security": ".dev-flow/2026-08-01-batch-77/02-review-security.md"
+    "2_security": ".dev-flow/2026-08-01-batch-77/02-review-security.md",
+    "2_architect_final": ".dev-flow/2026-08-01-batch-77/02d-review-architect-final.md"
   },
   "premise_evaluation_phase0": {
     "evaluated": 15,
@@ -151,6 +152,12 @@
       "date": "2026-08-01",
       "decision": "3-iteration soft cap reached and SURFACED; operator ruled continue to revision 4",
       "notes": "Root cause named rather than looped on: propagation - a change applied where noticed, not swept to its dependents. Both non-architect lanes are clear (security CLEAN, QA no blockers) and the architect's own disposition is edits-not-design, so continuing is evidence-based rather than optimistic. Revision 4 re-gates the ARCHITECT lane only, per the operator's choice."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "Phase 2 APPROVED at revision 5 - self-approved under the kickoff grant",
+      "notes": "Exit criteria met. Coverage: both traceability chains complete, no orphans after the R-10 removal, all ATs allocated exactly once. Certainty: every AT demonstrated RED by executed transcript; the two undischargeable ones are LABELLED PINs, not counted as discharged. Evidence: every figure re-derived on this tree, and the three I had reported wrong (LLR-072.3's existence, the case_08 percentages, the corpus count) are corrected with their provenance recorded. No axis unmet."
     }
   ],
   "phase1_operator_rulings": {
@@ -223,5 +230,20 @@
     "my_figures_wrong_a_third_time": "I reported case_08 as 99.5%/99.9% runs unseen. Those reproduce only on the PRISTINE producer + CSS alone (gaps unfolded). With batch-77's actual producer: 768/801 = 95.9% and 776/801, outside=1535/1551. THE BATCH MEASURABLY IMPROVES case_08 and the document understated its own work. Both lanes agree on the corrected figures. Underneath: the out-of-domain degradation rule is UNSPECIFIED, so those numbers are implementation-defined rather than a contract.",
     "security_clean_detail": "The scrub is a BYTE-CLASS filter, not a pattern - which is why it catches U+009B and U+009D (single-byte C1 CSI/OSC carrying no ESC, which any pattern-based filter passes). 11 evasion forms probed, 0 residual control bytes. Identity damage 0/14. AST census over 85 call sites in 4 modules: 0 literal-argument control chars. The ESC limb now genuinely flips True->False under mutation where rev 2's was False->False. Forward flag carried into revision 4 as a NORMATIVE shall: an implementer must not substitute a regex.",
     "fourth_lane_self_correction": "Security retracted its own out-of-domain probe reading 1267 ms at n=20,000 that looked quadratic - its probe was recomputing sum() per element. Fourth self-caught probe defect across the lanes this batch; every one would have been a false finding reported with a real transcript."
+  },
+  "phase2_APPROVED": {
+    "verdict": "APPROVED at revision 5 (819 lines). security CLEAN and QA NO BLOCKERS at rev 3; the architect's final re-gate returned 1 blocker + 1 major with the explicit disposition 'both substantive items are EDITS. No design work remains. This batch does not need re-scoping.' Revision 5 made exactly those edits.",
+    "rounds": "4 gate rounds, 9 review passes, 5 requirement revisions, 11 operator rulings.",
+    "propagation_sweep_now_DERIVED": "Section 6.4a is the batch's most reusable artefact. It began hand-listed - which the final re-gate correctly called the C-31 vacuous-input-set defect INSIDE the control built to stop it, the fourth occurrence of that shape in this batch. It now carries rows that COMPUTE the excluded set from examples/**/*.s19 rather than confirming a domain exists, under the standing rule: a domain whose excluded set has not been computed has not been measured. Final result 42/42 with THREE genuine residues corrected (P-50's disposition pointing at a withdrawn LLR; the LLR-111.8 dependency inside LLR-112.2; the corpus count).",
+    "corpus_count_corrected": "THE CORPUS IS 16 FIXTURES, NOT 17. Every revision since the first wrote '16 of 17'; the derived split is 15 of 16 for HLR-111. I VERIFIED THIS MYSELF: find examples -name '*.s19' | wc -l = 16. A figure repeated across four revisions and to the operator several times had never been derived by anyone. Conclusion unaffected (94% either way); the provenance was the defect.",
+    "HLR112_domain_measured": "THREE exclusions, not one. prg.s19 - THE SHOWCASE FIXTURE - is OUT at both regimes (15 ticks vs a ceiling of 7@80x24 / 5@120x30), so US-77-2's delivered outcome there is weaker than the story implies and that is now on the page. case_07_stress_smoke is OUT at 120x30 only (6 vs 5) - I found that one independently; neither the document nor the reviewer had listed it. case_08 is OUT at both (802 ticks). The 1-column separator convention is now NORMATIVE because it decides membership: at pitch 8 the ceiling reads 8/6 and case_07 looks in-domain when it is not.",
+    "latent_trap_closed": "AT-072b carries an in-domain 'no elided tick' clause and would have gone RED on CORRECT code if Inc-4 reached for prg.s19. The current node uses case_02 (in domain), so this would have surfaced mid-implementation as a mysterious failure against working code. Fixture now pinned in both the AT and Inc-4's cell, with prg.s19 explicitly forbidden.",
+    "case08_figures_FINAL": "Carry BOTH or neither. Shipped: 797/801 (99.5%) @80x24 and 800/801 (99.9%) @120x30. batch-77: 768/801 (95.9%) @80x24 and 776/801 (96.9%) @120x30. Improvement -29 and -24. A lone 95.9% understates the wide regime. I reported these wrong to the operator three times before they were derived.",
+    "carried_into_phase3": [
+      "Inc-2's precondition assertions are a SPEC statement - verify by execution at Inc-2 that both size arms fail loudly on a missed gesture, since revision 4's edit pass fixed 120x30 and left 80x24 vacuous.",
+      "LLR-116.7 mandates a byte-CLASS filter naming U+009B/U+009D. If an implementer substitutes a regex on ESC-introduced sequences, the C1 and OSC-8 holes reopen silently and every test stays green.",
+      "Re-run section 6.4a for ANY domain/scope/withdrawal/wording change - standing obligation.",
+      "AT-B77-02 is a labelled PIN (predicted - execute at Inc-3); AT-B77-09 is a PIN. Neither may be quietly upgraded to discharged."
+    ]
   }
 }
