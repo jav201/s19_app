@@ -223,11 +223,12 @@ class ScreenScaffold(Container):
         yield EmptyStatePanel()
 
 
-#: Total character width the entropy band bar is drawn across (batch-45,
-#: R-TUI-060). Fixed so each run's segment width is a deterministic function of
-#: ``round(_BAND_BAR_WIDTH * run_bytes / total_bytes)`` — independent of live
-#: layout geometry, exactly as the cell count was kept geometry-pure (LLR-041.2).
-_BAND_BAR_WIDTH = 60
+#: Columns an unmapped gap folds to, independent of its byte size and of the
+#: container width (batch-77, LLR-111.2). A gap is a separator, not a quantity:
+#: at the measured container widths a proportional gap consumed up to 60 of 66
+#: columns and floored nine mapped runs to one column each. Sizing gaps by their
+#: address span is what the fold retires.
+_BAND_GAP_FOLD = 1
 
 #: 9-glyph entropy ramp (0.0 → 8.0 bits/byte) for the At-a-glance sparkline
 #: (batch-45, R-TUI-061 / LLR-045B.2). Index 0 = a space (near-zero entropy),
@@ -235,7 +236,7 @@ _BAND_BAR_WIDTH = 60
 _ENTROPY_BAR_RAMP = " ▁▂▃▄▅▆▇█"
 
 #: Fixed histogram bar width for the At-a-glance per-band rows (LLR-045B.1) —
-#: geometry-pure like ``_BAND_BAR_WIDTH``.
+#: geometry-pure: a per-band ratio, not a share of the pane.
 _GLANCE_BAR_WIDTH = 6
 
 #: Fixed number of sparkline columns the profile is sampled to (LLR-045B.2).
@@ -486,6 +487,105 @@ def _merge_band_runs(
         else:
             runs.append((window.band, window.sample_count, window.start))
     return runs
+
+
+def _allocate_band_widths(
+    run_bytes: Sequence[int],
+    n_gaps: int,
+    bar_width: int,
+    fold: int = _BAND_GAP_FOLD,
+) -> List[int]:
+    """Apportion band-bar columns across runs, BOUNDED BY THE CONTAINER.
+
+    Summary:
+        Return one column count per run such that, in domain, the run widths
+        plus the gap markers sum to at most ``bar_width`` and every run gets at
+        least one column (batch-77, R-TUI-111 / LLR-111.7). See ``Returns`` for
+        the two degenerate cases where the sum is strictly less. The bound lives HERE,
+        in the producer, and not in a predicate over the emitted widgets: an
+        output-shaped check can detect an overflow but cannot prevent one. The
+        superseded expression sized each run independently against a fixed
+        60-column constant and floored the result at 1, so nine tiny runs each
+        claimed a column while one claimed 26 — measured, 60 columns of content
+        emitted into a 50-column bar with 5 of 14 runs left invisible.
+
+        The method is **floor-one-then-largest-remainder**: reserve one column
+        per run, then apportion the SURPLUS ``avail - n_runs`` by each run's
+        share of total mapped bytes, giving the leftover columns to the largest
+        fractional remainders. Apportioning the WHOLE of ``avail`` and clamping
+        up to 1 afterwards is a different allocator that happens to agree with
+        plain ``round()`` — the arithmetic this function exists to retire.
+
+        Ties in the fractional remainder are broken by descending mapped bytes,
+        then by ascending run index — deterministic, and biased toward the run
+        the operator is more likely to be looking for.
+
+    Args:
+        run_bytes (Sequence[int]): Mapped byte count per emitted run, in bar
+            order. May contain zeros.
+        n_gaps (int): Number of unmapped-gap markers emitted between runs.
+        bar_width (int): The container's width MEASURED at render time. May be
+            0 before first layout; that is an out-of-domain input, not an error.
+        fold (int): Columns each gap marker occupies (``_BAND_GAP_FOLD``).
+
+    Returns:
+        List[int]: One width per run, positionally aligned with ``run_bytes``.
+        Every entry is always ``>= 1``. In domain,
+        ``sum(widths) + n_gaps * fold <= bar_width`` — with EQUALITY whenever
+        there is surplus to apportion and a nonzero byte total to apportion it
+        by. It is strictly less in the two degenerate cases, which are normal
+        inputs and not errors: ``surplus == 0`` (the container holds exactly one
+        column per run and per gap) and ``total_bytes == 0`` (no byte share
+        exists, so every run falls to the floor). ``TC-B77-04`` asserts the
+        all-zero case directly. ``<=`` is what ``HLR-111``/``LLR-111.7``
+        contract; the equality is an observation about the non-degenerate path,
+        never a promise. Out of domain, one entry per run, every entry ``1``.
+
+    Data Flow:
+        - Pure arithmetic over run byte counts and one measured width. No widget,
+          no address, and no file-derived string is an input.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets`` (initial mount)
+            - ``MemoryMapPanel._resize_band_segments`` (post-refresh + resize)
+
+    Example:
+        >>> _allocate_band_widths([768, 256], 0, 66)
+        [49, 17]
+        >>> _allocate_band_widths([768, 256], 0, 50)
+        [37, 13]
+        >>> _allocate_band_widths([10, 20, 30], 2, 4)  # out of domain
+        [1, 1, 1]
+    """
+    n_runs = len(run_bytes)
+    if n_runs == 0:
+        return []
+
+    available = bar_width - n_gaps * fold
+    if available < n_runs:
+        # Out of domain: the bound is arithmetically unsatisfiable. The
+        # degradation rule is deliberately unspecified by R-TUI-111 — the only
+        # contracted properties are that this returns a width for every run
+        # without raising, and that every run stays reachable in the region
+        # list. One column each is the narrowest honest answer.
+        return [1] * n_runs
+
+    surplus = available - n_runs
+    total_bytes = sum(run_bytes)
+    if surplus <= 0 or total_bytes <= 0:
+        return [1] * n_runs
+
+    quotas = [surplus * count / total_bytes for count in run_bytes]
+    extra = [int(quota) for quota in quotas]
+    leftover = surplus - sum(extra)
+    ranked = sorted(
+        range(n_runs),
+        key=lambda i: (-(quotas[i] - extra[i]), -run_bytes[i], i),
+    )
+    for index in ranked[:leftover]:
+        extra[index] += 1
+    return [1 + count for count in extra]
 
 
 def derive_image_span(
@@ -1199,6 +1299,9 @@ class BandSegment(Static):
         classes (str): Space-joined CSS classes (``map-band-seg`` + the run's
             ``band-*`` token) — unchanged from the pre-batch-67 ``Static``, so
             the strip renders identically.
+        band_glyph (str): This run's band glyph, retained so the segment can be
+            RE-rendered at a new width when the container is measured or
+            resized (batch-77, LLR-111.1) without re-deriving the band.
 
     Data Flow:
         - Mounted by ``MemoryMapPanel._build_band_widgets``; on click posts
@@ -1209,6 +1312,7 @@ class BandSegment(Static):
             - :class:`RegionRow.Activated` (the shared message)
         Used by:
             - ``MemoryMapPanel._build_band_widgets``
+            - ``MemoryMapPanel._resize_band_segments`` (reads ``band_glyph``)
     """
 
     def __init__(
@@ -1217,10 +1321,12 @@ class BandSegment(Static):
         region_start: int,
         region_end: int,
         classes: str,
+        band_glyph: str = "",
     ) -> None:
         super().__init__(content, classes=classes)
         self.region_start = region_start
         self.region_end = region_end
+        self.band_glyph = band_glyph
 
     def on_click(self, event: events.Click) -> None:
         """Post :class:`RegionRow.Activated` for this band run's window."""
@@ -1924,9 +2030,17 @@ class MemoryMapPanel(Container):
 
         runs = _merge_band_runs(entropy_windows)
         self._run_bands = {start: band for band, _run_bytes, start in runs}
+        # The bar does not exist yet, so its width is measured from ``#map_grid``,
+        # which is mounted and whose width the bar takes in full (LLR-111.9). The
+        # post-refresh hook then re-apportions against the bar itself — required
+        # because ``grid.mount()`` is deferred and because the first frame can
+        # report width 0 before layout.
         grid.mount(
-            *self._build_band_widgets(runs, entropy_windows, span_start, span_end)
+            *self._build_band_widgets(
+                runs, entropy_windows, span_start, span_end, grid.region.width
+            )
         )
+        self.call_after_refresh(self._resize_band_segments)
 
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
         summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
@@ -1985,35 +2099,130 @@ class MemoryMapPanel(Container):
             counts[starts[slot]] += 1
         return counts
 
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-apportion the band bar when the panel's geometry changes."""
+        self._resize_band_segments()
+
+    def _resize_band_segments(self, retry: bool = False) -> None:
+        """Re-apportion the mounted band segments against the MEASURED bar.
+
+        Summary:
+            Re-run ``_allocate_band_widths`` over the segments already on screen
+            and rewrite their glyph runs (batch-77, LLR-111.1). This exists
+            because the container width is not knowable where the widgets are
+            built: ``_build_band_widgets`` runs before ``grid.mount()``, whose
+            effect is deferred, so ``.map-band-bar`` has no region yet. The
+            initial build apportions against ``#map_grid`` — the same width the
+            bar takes in full — and this hook corrects it once the bar itself is
+            measurable, and again on every resize.
+
+            Gap markers are untouched: they fold to one column independent of the
+            container width (LLR-111.2), so a resize cannot change them.
+
+            **The bar is resolved with ``.last()``, not ``query_one``.**
+            ``render_ranges`` calls ``grid.remove_children()`` and the removal is
+            DEFERRED, so during the prune window the OLD bar and the newly
+            mounted one BOTH match ``.map-band-bar``. ``query_one`` does not
+            raise there — in Textual 8.2.8 it returns the FIRST match and
+            documents only ``NoMatches``/``WrongType`` (``query_exactly_one`` is
+            the strict variant) — so it silently binds the STALE, detached bar
+            and re-apportions against a width that is not the one being painted.
+            Measured over 20 observed prune windows: ``.last()`` was the
+            surviving (newly mounted) bar 20/20, ``query_one`` 0/20. ``.last()``
+            is deterministic here because ``remove_children()`` precedes
+            ``mount()`` and ``mount()`` appends, so the new bar is always last in
+            DOM order.
+
+        Args:
+            retry (bool): True only on the single self-scheduled re-attempt made
+                when the bar measures 0. Bounds the reschedule to ONE extra
+                frame — a callback that re-armed unconditionally would spin every
+                frame for as long as the bar stayed unlaid-out.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads each mounted segment's own mapped span and band glyph, so
+              the re-apportionment consumes the same population it rewrites; no
+              parallel plan is kept that could fall out of step with the widgets.
+
+        Dependencies:
+            Uses:
+                - ``_allocate_band_widths`` / ``safe_text``
+            Used by:
+                - ``render_ranges`` (via ``call_after_refresh``), ``on_resize``,
+                  and itself (one bounded retry)
+        """
+        try:
+            bar = self.query(".map-band-bar").last()
+        except Exception:
+            # No image rendered — nothing mounted to re-apportion.
+            return
+        bar_width = bar.region.width
+        if bar_width <= 0:
+            # Not laid out yet. Nothing else schedules a re-measure, so without
+            # this the widths apportioned against ``#map_grid`` at build time
+            # would ship unchecked. One more frame, then give up and wait for a
+            # resize.
+            if not retry:
+                self.call_after_refresh(self._resize_band_segments, True)
+            return
+
+        children = list(bar.children)
+        segments = [child for child in children if isinstance(child, BandSegment)]
+        if not segments:
+            return
+        widths = _allocate_band_widths(
+            [seg.region_end - seg.region_start for seg in segments],
+            len(children) - len(segments),
+            bar_width,
+        )
+        for seg, width in zip(segments, widths):
+            # Only rewrite a segment whose width actually changed. ``update()``
+            # invalidates layout, and in the steady state the initial build
+            # already apportioned against the same measurement (#map_grid, whose
+            # width the bar takes in full), so an unconditional rewrite would
+            # relayout — and reset the region list's scroll — on every render.
+            if len(seg.render().plain) != width:
+                seg.update(safe_text(seg.band_glyph * width))
+
     def _build_band_widgets(
         self,
         runs: Sequence[Tuple[str, int, int]],
         windows: Sequence[EntropyWindow],
         span_start: int,
         span_end: int,
+        bar_width: int,
     ) -> List[Container]:
         """Build the band row (bar + glance), address ruler, region list, legend.
 
         Summary:
             Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
             R-TUI-061; extended batch-47, R-TUI-072/073): a ``.map-band-row``
-            docking the proportional ``.map-band-bar`` beside the
-            ``.at-a-glance`` panel, a NEW :class:`MapRuler` address ruler beneath
-            the band row (5 ticks, LLR-072.3), then the ``.map-region-list`` and
-            the ``.map-band-legend``. The band bar now spans the whole image
-            ADDRESS SPACE (width ∝ byte share of ``span_end - span_start``, not
-            of the mapped-bytes total), so unmapped address gaps between runs
-            render as ``╱`` hatch segments (``.map-band-gap``, LLR-072.1); a
-            contiguous image (no gap) keeps its pre-batch-47 widths (span ==
-            mapped bytes). Each region row is enriched to ``{glyph} 0x{addr}
-            {human_bytes} {microbar} {N} sym {band} ↵`` — a humanized size
-            (LLR-072.2), a size micro-bar vs the largest region (LLR-073.1), the
-            ``range_index`` symbol count (LLR-073.1) and the ``↵`` open-in-hex
-            affordance (LLR-073.2). Region rows still carry NO file-derived text
-            (band labels + counts only — security B3). Each sub-widget is
-            addressed by CLASS (re-mounted every render; an id would trip
-            ``DuplicateIds``) with markup-safe ``safe_text`` content. At
-            ``width-narrow`` the band row reflows to vertical (LLR-045B.3).
+            stacking the ``.map-band-bar`` over the ``.at-a-glance`` panel, a
+            :class:`MapRuler` address ruler beneath the band row (5 ticks,
+            LLR-072.3), then the ``.map-region-list`` and the
+            ``.map-band-legend``. Unmapped address gaps between runs render as
+            ``╱`` hatch segments (``.map-band-gap``, LLR-072.1). Each region row
+            is enriched to ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym
+            {band} ↵`` — a humanized size (LLR-072.2), a size micro-bar vs the
+            largest region (LLR-073.1), the ``range_index`` symbol count
+            (LLR-073.1) and the ``↵`` open-in-hex affordance (LLR-073.2). Region
+            rows still carry NO file-derived text (band labels + counts only —
+            security B3). Each sub-widget is addressed by CLASS (re-mounted every
+            render; an id would trip ``DuplicateIds``) with markup-safe
+            ``safe_text`` content.
+
+            batch-77 (R-TUI-111 / LLR-111.1, .2, .7) changes what the bar is
+            drawn against, on both axes. The BASIS is the measured container
+            width rather than a fixed constant, and the DENOMINATOR is the total
+            MAPPED bytes of the emitted runs rather than the image address span.
+            Both are load-bearing: swapping only the basis keeps the span
+            denominator, which is what made unmapped address space consume the
+            bar. Gaps no longer scale at all — each folds to one column — and the
+            run widths are bounded in ``_allocate_band_widths`` so the strip
+            cannot emit more columns than its container has.
 
         Args:
             runs (Sequence[Tuple[str, int, int]]): The merged
@@ -2023,6 +2232,10 @@ class MemoryMapPanel(Container):
                 windows the sparkline profile is sampled from.
             span_start (int): Inclusive image span start (``derive_image_span``).
             span_end (int): Exclusive image span end (``derive_image_span``).
+            bar_width (int): The container width to apportion, measured at render
+                time. ``0`` before first layout — a conforming out-of-domain
+                input which yields one column per run; ``_resize_band_segments``
+                re-apportions once the bar itself is measurable.
 
         Returns:
             List[Container]: ``[band_row, ruler, region_list, legend]`` ready to
@@ -2036,42 +2249,57 @@ class MemoryMapPanel(Container):
             Uses:
                 - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text`` /
                   ``human_bytes`` / ``microbar`` / ``MapRuler`` /
-                  ``_region_symbol_counts`` / ``_build_glance_widgets``
+                  ``_region_symbol_counts`` / ``_build_glance_widgets`` /
+                  ``_allocate_band_widths``
             Used by:
                 - ``render_ranges``
         """
-        total_span = max(1, span_end - span_start)
         largest_region = max(
             (run_bytes for _band, run_bytes, _start in runs), default=1
         ) or 1
         sym_counts = self._region_symbol_counts(runs)
 
+        # ONE traversal decides where gaps go, and both the allocation bound and
+        # the emission below consume that same list. Counting the gaps in a
+        # second traversal — or inferring ``n_runs - 1`` — lets the count the
+        # bound spends diverge from the count the bar draws, and the bar then
+        # overflows its container by the difference. A gap is emitted wherever a
+        # run starts above the cursor, so a LEADING gap is possible (n_gaps ==
+        # n_runs) and a trailing one never is (the loop ends at the last run).
+        gap_before: List[bool] = []
+        cursor = span_start
+        for _band, run_bytes, start in runs:
+            gap_before.append(start > cursor)
+            cursor = start + run_bytes
+        widths = _allocate_band_widths(
+            [run_bytes for _band, run_bytes, _start in runs],
+            sum(gap_before),
+            bar_width,
+        )
+
         segments: List[Static] = []
         region_rows: List[RegionRow] = []
-        cursor = span_start
-        for band, run_bytes, start in runs:
+        for index, (band, run_bytes, start) in enumerate(runs):
             token, glyph, _meaning = band_style(band)
             # Hatch the unmapped gap (if any) preceding this run — an
-            # app-supplied ``╱`` marker, NOT an entropy band (LLR-072.1).
-            if start > cursor:
-                gap_width = max(
-                    1, round(_BAND_BAR_WIDTH * (start - cursor) / total_span)
-                )
+            # app-supplied ``╱`` marker, NOT an entropy band (LLR-072.1) — at
+            # exactly one column whatever its byte size (LLR-111.2). It stays a
+            # plain Static: there is no region behind it to inspect or open.
+            if gap_before[index]:
                 segments.append(
                     Static(
-                        safe_text(_MAP_GAP_HATCH * gap_width),
+                        safe_text(_MAP_GAP_HATCH * _BAND_GAP_FOLD),
                         classes="map-band-seg map-band-gap",
                     )
                 )
-            seg_width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_span))
-            # batch-67 N4b: a MAPPED run is clickable and carries its window;
-            # the gap hatch above stays an inert Static (no region behind it).
+            # batch-67 N4b: a MAPPED run is clickable and carries its window.
             segments.append(
                 BandSegment(
-                    safe_text(glyph * seg_width),
+                    safe_text(glyph * widths[index]),
                     start,
                     start + run_bytes,
                     classes=f"map-band-seg {token}",
+                    band_glyph=glyph,
                 )
             )
             region_rows.append(
@@ -2079,7 +2307,6 @@ class MemoryMapPanel(Container):
                     band, glyph, token, run_bytes, start, largest_region, sym_counts
                 )
             )
-            cursor = start + run_bytes
 
         legend_rows: List[Static] = []
         for band in ENTROPY_BAND_LABELS:

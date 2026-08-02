@@ -772,30 +772,29 @@ DataTable > .datatable--odd-row {
     layout: vertical;
 }
 
-/* batch-45 R-TUI-061: the band bar docks BESIDE the At-a-glance panel in a
- * band row; at width-narrow (< 120) the row reflows to vertical (bar over
- * glance) so both fit the 80x24 floor (LLR-045B.3). Re-mounted per render →
- * addressed by CLASS (not id) to avoid DuplicateIds. */
+/* batch-77 LLR-111.9: the band row ALWAYS stacks — bar over glance — at every
+ * supported terminal size. This is a REMOVAL of a special case, not a new one:
+ * 80x24 already stacked via width-narrow (batch-45 LLR-045B.3), so >=120 now
+ * behaves like the regime that already worked. Docking the two side by side
+ * spent the bar's width on the glance panel: measured, the bar rendered 21
+ * columns at 120x30 against 66 at 80x24, and every column the glance takes
+ * lowers the ceiling on runs the operator can see. Every glance-shrinking
+ * alternative measured worse — the glance's widest content row is 29 columns,
+ * so 20 / 16 / 1fr all clip it. Re-mounted per render → addressed by CLASS
+ * (not id) to avoid DuplicateIds. */
 .map-band-row {
     width: 100%;
     height: auto;
-    layout: horizontal;
-}
-
-#workspace_body.width-narrow .map-band-row {
     layout: vertical;
 }
 
-/* Entropy band bar: takes the remaining row width beside the glance panel;
- * one proportional segment per merged run, each sized to its glyph content. */
+/* Entropy band bar: the full width of #map_grid, which is the basis
+ * ``_allocate_band_widths`` apportions (LLR-111.1); one segment per merged run
+ * plus a one-column marker per unmapped gap (LLR-111.2). */
 .map-band-bar {
-    width: 1fr;
+    width: 100%;
     height: 1;
     layout: horizontal;
-}
-
-#workspace_body.width-narrow .map-band-bar {
-    width: 100%;
 }
 
 .map-band-seg {
@@ -803,16 +802,11 @@ DataTable > .datatable--odd-row {
     height: 1;
 }
 
-/* "At a glance": docked beside the band bar at >=120, full-width below it when
- * narrow. Title + per-band histogram rows + a band-coloured profile sparkline. */
+/* "At a glance": full width beneath the band bar at every size (LLR-111.9).
+ * Title + per-band histogram rows + a band-coloured profile sparkline. */
 .at-a-glance {
-    width: 28;
-    height: auto;
-    margin-left: 1;
-}
-
-#workspace_body.width-narrow .at-a-glance {
     width: 100%;
+    height: auto;
     margin-left: 0;
     margin-top: 1;
 }

@@ -13,14 +13,29 @@
 
 ## 1 · Where we are
 
-**Phase 0 — story intake, AWAITING GATE.** Measurements complete and pasted in
-`00-measurements.md`. **15 premises evaluated: 9 TRUE, 4 FALSE, 1 IMPRECISE, 1 new defect found.**
-Nothing has been derived into requirements yet — Phase 1 is not started.
+**Phase 3 — IMPLEMENTATION, Inc-1 in flight.** Resumed 2026-08-01 by a fresh session from
+`.dev-flow/HANDOFF-2026-08-01-batch-77-phase3.md`, at a clean phase boundary. Phases 0, 1 and 2
+are **complete and approved**; requirements are at **revision 5** (819 lines) after 4 gate rounds,
+9 review passes and 11 operator rulings. **Zero lines of production code existed at resume.**
 
-The charter's engineering direction survives execution. Its **acceptance layer** does not:
-one drafted acceptance is provably vacuous, and the requirement id it says it amends does not exist.
-This is the project's dominant defect class (vacuous checks concentrated in specs, not code) arriving
-exactly where the charter itself warned it would.
+⚠️ **There is no Inc-0.** §4's indicative roadmap below is **superseded by requirements §7**, which
+runs **Inc-1 … Inc-9**. The golden capture is **Inc-3 by design** — a golden captured before the
+width basis settles pins the retired arithmetic, which is exactly how `[45,15]` entered revision 1.
+
+### Phase-3 entry gate — re-executed at resume, not inherited
+
+| Check | Result |
+|---|---|
+| **RC-1 base currency** | ✅ merge-base of `claude/batch-77-memmap-variant-a` == `origin/main` tip `f8747b8`; 0 unpushed; no PR yet |
+| **Flow currency (C-45)** | ⚠️ **scoped MISMATCH, non-blocking.** Aggregate `896dcca61cf68d78` vs manifest `0127a2767ff11c8a`. All 11 control-bearing command/template files byte-exact (`commands/dev-flow.md` = `307e5cd9b0eb879a` ✓). Sole divergence: `skills/dev-flow-lessons/SKILL.md` at 641 lines / `01d608bb14069613` vs the stamped 620 / `5c47db86ac2cf4ae` — **local is AHEAD**. The enforceable surface is current. Lane B already carries the re-stamp. |
+| **Toolchain** | ✅ Python 3.14.4 · pytest 8.4.2 · ruff 0.15.17 |
+| **Working tree** | ✅ clean except `prototypes/out/` — untracked, **pre-dates the batch**, reported as found and never swept (C-44) |
+| **Authorization** | ✅ **asked fresh** (per-batch, never inherited): *autonomous + merge authorized*, decision-recording *confirmed* |
+
+⚠️ **Concurrency.** A second session is live on this same branch, finishing the pre-implementation
+full-suite baseline. Its intended push is an artifact edit; this session's is code. **Rebase before
+pushing.** Do not start a competing full-suite run — two concurrent pytest runs contend for CPU and
+flake the timing-sensitive Textual geometry assertions this increment depends on.
 
 ---
 
@@ -84,11 +99,19 @@ on its own PR (per `docs/engineering-rules.md:46`).
 
 ---
 
-## 4 · Roadmap (indicative — Phase 1 owns the real increment cut)
+## 4 · Roadmap — ⛔ **SUPERSEDED. Do not execute this table.**
+
+> **The authoritative increment cut is requirements §7 (`Inc-1 … Inc-9`).** The table below is the
+> Phase-0 *indicative* sketch, kept only so the supersession is legible. **Its `Inc-0` does not exist**
+> in the approved plan: the golden capture moved to **Inc-3**, deliberately, because a golden captured
+> before the width basis settles pins the **retired** arithmetic — precisely how `[45,15]` (which sums
+> to the retired constant 60) got into revision 1. **Capturing a golden before Inc-1 lands is a known
+> defect, not a head start.** The numbering below also does not correspond to §7's: this table's
+> "Inc-2" is §7's Inc-4, and so on.
 
 | Inc | Content | Files (≤5) |
 |---|---|---|
-| Inc-0 | Byte-golden of the **dense no-gap** render, captured from the shipped producer in its own commit (the C-12 control for US-77-1) | tests |
+| ~~Inc-0~~ | ~~Byte-golden of the **dense no-gap** render~~ — **⛔ REMOVED; became §7's Inc-3, after the basis settles** | tests |
 | Inc-1 | US-77-1 gap-fold widths + budget bound | `screens_directionb.py`, `styles.tcss`, tests |
 | Inc-2 | US-77-2 ruler + `R-TUI-072` amendment + `AT-072b` re-derivation | `screens_directionb.py`, `REQUIREMENTS.md`, tests |
 | Inc-3 | US-77-3 stats + US-77-4 legend demotion | `screens_directionb.py`, `styles.tcss`, tests |
@@ -122,7 +145,223 @@ and every ledger figure states which form produced it.
 
 **Net:** for a `local_agent` under this harness there is currently **no in-band progress signal**, so C-33's *"STOP + take over once liveness cannot be confirmed"* branch is the only honest discharge, and it must be driven by a **wall-clock bound**, not by a signal. Bound adopted here: **30 min**, enforced by the monitor's timeout.
 
+#### ⚠️ F-0 is TOO STRONG, and Phase 3 measured the correction — amend it before it carries to Lane B
+
+**The claim *"there is no in-band progress signal for a subagent"* is FALSE for an implementer, and
+that matters because it is the half of C-33 that still works.** Measured this session against the
+Inc-1 implementer: a monitor polling **target-file mtime** at a 3-minute cadence tracked the agent
+through its phases and moved on a real schedule —
+
+```
+t+3m/+6m  mtime frozen at the checkout value   -> reading the 819-line spec  (correctly NOT read as a hang)
+t+9m      screens_directionb.py written        -> edit phase began
+t+12m     screens_directionb.py written again
+t+15m     test_map_click_chain.py written      -> Amendment C
+t+18m/+21m mtime frozen, 8-9 python procs live -> test phase (C-34 mandates ~3 min for one file alone)
+t+24m     test_map_click_chain.py written      -> post-run edit; liveness POSITIVELY re-confirmed
+t+27m     written again
+```
+
+> 🛑 **RETRACTION — the `python procs` column above is VACUOUS and every inference I drew from it is
+> withdrawn.** Executed at t+33m: `Get-CimInstance Win32_Process -Filter "Name='python.exe'"` returns
+> **`taskboard.exe` ×2, `desk.exe`, and five `python -m http.server` instances** — the operator's
+> ambient tooling. **There was never a single `pytest` process in any of the six samples.** The count
+> drifting 8↔10 was noise from unrelated servers, and I narrated it as *"processes went from 8 to 10,
+> which is a test run starting."* **That was a story told over noise.**
+>
+> **This is the project's own standing rule — *verify the signal actually moves before trusting it* —
+> and I invoked that rule against the transcript-size signal in the paragraph directly above, then
+> failed to apply it to the signal I had just built.** Same shape as `F-1(f)` (the starvation probe
+> that committed the starvation it existed to detect) and as the Phase-0 stats probe that queried
+> containers. **Fourth occurrence of a probe defect in this batch, first one that is mine this session.**
+>
+> **A second, independent defect in the same measurement:** I compared a **Git Bash** `stat -c %Y`
+> mtime against a **PowerShell** `Get-Date -UFormat %s` "now" and got `mtime_age = −352 min`, i.e. a
+> file modified ~6 h in the future. The mtime is fine; PS 5.1's `-UFormat %s` returns local-time-as-epoch
+> and ignores the `-0600` offset, so the two producers use **different epoch conventions**. Had I not
+> checked, "the file is in the future" was one step from a fabricated alarm. **This is C-42 in its purest
+> form — never compare a value across two producers without reconciling their encodings.**
+>
+> **What survives:** mtime alone, read from **one** producer. **What does not:** the process count, and
+> with it my claim at t+30m that the corrected takeover rule "correctly did not fire" — it did not fire
+> for the *wrong reason*, because its process-activity limb was reading noise.
+>
+> ✅ **SEQUEL — the sharpened instrument answered the question within one interval, and the answer was
+> the opposite of my inference.** The monitor was re-armed to count **`pytest`-specific** processes
+> (`Win32_Process` filtered on a `pytest` command line) instead of every `python.exe`. First reading:
+> **`pytest procs: 1`**, sustained across the next interval. **The implementer IS running tests**; my
+> t+33m census simply landed in a gap between runs, moments after it finished an edit. So *"I cannot
+> confirm any pytest has run"* was true of **my sample** and false of **the world**.
+>
+> **The lesson is the one worth carrying, and it is not "I was wrong twice."** A blunt instrument
+> produced a *false positive* (10 processes ⇒ "tests are running" — they were `http.server`) and then,
+> once distrusted, tempted a *false negative* (no pytest in one sample ⇒ "no tests have run"). **Both
+> errors came from treating a point sample as a state.** The fix was never to reason harder about the
+> readings — it was to **make the instrument name the thing it claims to measure**, after which the
+> question dissolved in three minutes. That is C-40 limb 1 (*is the declared subject actually in the
+> expression?*) applied to a monitoring probe rather than to an acceptance predicate.
+
+**This is exactly C-33's own prescribed implementer signal (*"touched-file mtime for an
+implementer"*) and it is alive and well** — *the mtime half only; see the retraction above.* What is
+dead is the *transcript-size* signal, `TaskOutput`, **and a naive process-name count**. So the
+correct scope of F-0 is narrower and more useful:
+
+| Agent kind | In-band signal | Status |
+|---|---|---|
+| **Implementer** (known target files) | target-file **mtime** | ✅ **WORKS** — verified above |
+| **Reviewer / analyst** (writes one deliverable at the very end) | none | ❌ genuinely absent — a deliverable-file watch is a *completion* detector wearing a liveness detector's label |
+
+**Consequence for the takeover rule, and it is not a relaxation.** A fixed wall-clock cutoff applied
+to an agent that has *just demonstrably progressed* would be acting on a signal that pattern-matches
+a known failure while having a different cause. The trigger is therefore **stalled mtime AND no
+process activity**, with wall-clock as the fallback **only where no signal exists** — i.e. for
+reviewers, not implementers. **The 30-minute bound stays as written for the reviewer case.**
+
 **Not a batch-77 defect and not app code — this is a process/control item. It is written into `.dev-flow/BACKLOG-PROCESS.md` at this batch's close (Lane B), per the routing rule that a carry belonging to the other lane is written there, never left as a pointer.**
+
+---
+
+## 5b · Inc-1 gate — independent predictions, recorded BEFORE the implementer reported
+
+> Written by the orchestrator at dispatch time, from the project's own controls and precedent, so
+> they can be **checked against** the increment's report instead of agreeing with it after the fact.
+> This is the batch-24 golden-double-proof discipline applied to a gate: a prediction made after
+> reading the answer proves transcription, not provenance.
+
+**① C-30 does NOT apply — the CSS change is map-scoped, and Inc-1 correctly leads the batch.**
+C-30 sequences an *app-wide* restyle **last**, because it drifts every snapshot cell and would
+suppress regression coverage for the rest of the batch. Executed check: `.map-band-row`,
+`.map-band-bar` and `.at-a-glance` are constructed **only** in `screens_directionb.py`
+(`:2098`, `:2101`, `:2226`) and styled **only** at `styles.tcss:779-818`. No other screen
+constructs them. `LLR-111.9` is therefore a **per-screen** change, which is precisely the shape
+C-30 *wants* — each functional increment drifts and marks only its own cells. **Inc-1 leading is
+correct and does not need re-sequencing.**
+
+**② C-22 per-cell snapshot-drift prediction — UPPER BOUND 2 cells, both `map`.**
+Stated per-cell with a reason, never as a flat exact count (C-22), and as a bound because a cell
+can render a change below a scroll fold and not drift at all.
+
+| Cell | Predicted | Why |
+|---|---|---|
+| `map-comfortable-120x30` | **drifts** | The band row goes horizontal → vertical, the bar widens **21 → 50**, the glance panel moves beneath it. Layout *and* content change. |
+| `map-comfortable-80x24` | **drifts** | Layout is unchanged (80×24 already stacks via `width-narrow`, bar stays 66) — but the **content** changes: the width basis moves 60 → 66, the denominator moves address-span → mapped-bytes, and gaps fold from `[8,8,16,33]` to 1 column each. ⚠️ **A prediction of "80×24 is unaffected" would be wrong** — it is unaffected in *geometry* only. |
+| every other cell | **0** | The repo's own precedent, restated twice in `tests/test_tui_snapshot.py` (`:454-455`, `:672-679`): *"no other screen renders the map body."* |
+
+**Do not regenerate these locally** — regen is canonical-CI-only under the textual 8.2.8 pin and is
+Inc-9's job. Drift is expected and reported at this gate, not fixed here.
+
+**③ C-34 is in force.** Inc-1 changes a TUI render module, so its gate must run the **FULL**
+`tests/test_tui_directionb.py` — not a `-k` subset. That file is the cross-cutting guard host
+(markup-safety source scans, rail/screen census, shared-chrome footer census). A `-k`-only gate is
+a C-19 partial-run violation in its render-specific form. The brief mandates full × 3.
+
+**④ 🆕 FINDING — `LLR-111.7`'s allocator is UNDER-SPECIFIED, and the wrong reading is silent.**
+Found mid-flight by an independent arithmetic oracle (pure Python, no app import — so it is a real
+second source, not a re-run of the code under test). Sent to the implementer before it wrote the
+allocator. **Every numeric figure in the requirement reproduced; the defect is a missing definition,
+not a wrong number.**
+
+`LLR-111.7` mandates *"floor-1 per run + largest remainder on mapped bytes"*. That admits **two
+honest readings**, and the requirement never says which:
+
+| Reading | Gapless 768/256 @bar=66 | @bar=50 |
+|---|---|---|
+| **(A)** floor 1 first, then apportion the **SURPLUS** (`avail − n_runs`) by largest remainder | **`[49,17]`** ✅ the mandated payload | **`[37,13]`** ✅ |
+| **(B)** apportion the **WHOLE** `avail` by largest remainder, then clamp up to 1 | `[50,16]` ❌ | `[38,12]` ❌ |
+| *plain `round()`* — the method the requirement explicitly calls WRONG | `[50,16]` | `[38,12]` |
+
+⚠️ **(B) is numerically identical to plain `round()` on this fixture.** So an implementer who reads
+(B) writes what looks like a principled largest-remainder allocator, produces exactly the payload
+the requirement spent a revision retiring, and **Inc-3 then captures a golden pinning it** — with
+every test green. This is the batch's own signature failure (an unstated definition is not
+re-derivable, only re-inventable) sitting in the one clause the whole increment turns on.
+
+**(A) also needs no tie-break on this fixture** — the quotas land on exactly `48.0` and `16.0`, so
+there is no fractional tie. *If an implementation needs a tie-break to reach `[49,17]`, it is (B)
+with a tie-break bolted on, not (A).* That is a cheap, decisive discriminator.
+
+**Independently confirmed by the same oracle:** out-of-domain `avail` = **−734 / −750**, 801 widths,
+content **1601**, no raise (✅ matches the requirement's row (b)) · onset **26 @bar=50, 34 @bar=66**
+(P-50 ✅) · the gapless payload is **fold-invariant** at fold 1/2/5/60, confirming P-58 that the
+retired "substitute the fold denominator" mutation was a provable no-op and that `AT-B77-02`'s
+discharging mutation must be **allocator → plain `round()`**.
+
+> 🛑 **CORRECTION — my `prg.s19` width vectors were WRONG, and the cause was mine.** I originally wrote
+> `[1,1,1,1,1,9,6,26,1,2,1,1,1,1]` @66 and `[1,1,1,1,1,6,4,16,1,1,1,1,1,1]` @50, "independently
+> confirmed." **The algorithm was right; the INPUT was not.** I fed my oracle the requirement's
+> `n_gaps = 13` instead of deriving it. **Executed by the implementer: `prg.s19` has 10 gaps, not 13** —
+> `_merge_band_runs` splits on band change **or** address discontinuity, and four of the 14 runs are
+> band changes at *contiguous* addresses, which emit no gap
+> (`gap_before = [F,T,T,T,T,T,F,F,F,T,T,T,T,T]`). Re-running my oracle at `n_gaps = 10` reproduces the
+> implementer's measured vectors **exactly at both regimes**:
+>
+> | | @bar=66 | @bar=50 |
+> |---|---|---|
+> | ❌ mine, at the spec's 13 gaps | `[…,9,6,26,…]` sum 53 + 13 = 66 | `[…,6,4,16,…]` sum 37 + 13 = 50 |
+> | ✅ **measured, at 10 gaps** | **`[…,9,7,28,…]` sum 56 + 10 = 66** | **`[…,6,4,18,…]` sum 40 + 10 = 50** |
+>
+> **Both totals hit the bar exactly, which is why a wrong gap count survived four revisions and my own
+> check** — the bound is computed from the *emitted* count, so the increment is correct either way and
+> only the per-run vector moves. **P-49's CONCLUSION holds; its FIGURES do not.**
+>
+> ⚠️ **The irony is exact and belongs on the record.** The requirement's `13` is precisely `n_runs − 1`
+> (14 − 1) — **the assumption finding ⑤ was written to forbid.** I sent ⑤ warning the implementer never
+> to infer `n_gaps` from the run count, and then, in the same session, inherited that very inference
+> from the spec into my own oracle without deriving it. **⑤ was right, and it caught the spec; it did
+> not catch me, because I never turned it on myself.** Second self-inflicted probe defect this session
+> (after the process-count signal), and the same root both times: **I derived the method carefully and
+> accepted the inputs on trust.**
+
+**Scope of the oracle, stated so it is not over-credited:** it is arithmetic only. It says nothing
+about the container-measurement path, the CSS widen, the settling helper, or whether the real
+producer feeds these run lists at all. Those remain to be established by execution against the app.
+
+**⑤ 🆕 FINDING — `n_gaps` is NOT `n_runs − 1`, and the showcase fixture hides it.**
+Sent to the implementer during its edit phase. Read from the shipped emission rule: a gap is emitted
+only `if start > cursor`, with `cursor` initialised to `span_start`. Therefore
+
+- a **LEADING** gap is possible (when `runs[0].start > span_start`) → `n_gaps` can reach `n_runs`;
+- there is **NO TRAILING** gap (the loop ends at the last run, nothing spans `cursor → span_end`).
+
+So `n_gaps ∈ [0, n_runs]` and must be **counted from the same predicate that emits it**. ⚠️ `prg.s19`
+is 14 runs / 13 gaps — every inter-run position gapped, no leading gap — **precisely the shape that
+makes `n_runs − 1` look correct on the showcase fixture.** Both the domain predicate
+(`n_runs + n_gaps ≤ bar_width`) and the allocation (`avail = bar_width − n_gaps × fold`) consume it,
+so under-counting by one makes `avail` one too large and **the bar overflows its container — which is
+P-15, the exact budget-overflow defect this increment exists to close.** It would also **evade
+`AT-B77-01`** (all runs still visible, monotone and strict) and surface only in `AT-B77-03`'s
+containment clause. Mitigation asked for: compute the gap positions **once** and let the allocator
+call and the widget emission consume that same list, so the two counts cannot diverge; and report
+measured `n_gaps` per fixture at the gate, not just totals.
+
+**⑥ CHECKED AND CLEAR — `LLR-111.9`'s threshold is NOT red-on-correct.** The threshold reads
+`bar.region.width == #map_grid.region.width`. That equality would be **false under a correct
+implementation** if `#map_grid` carried padding or a border, because the bar would then equal the
+grid's *content* width, not its *region* width — a red-on-correct acceptance of exactly the kind
+this batch has already hit twice (`AT-072b`'s fixture, `AT-B77-15a`'s "verbatim" wording). Executed:
+`#map_grid` (`styles.tcss:769-773`) is `width: 1fr; height: auto; layout: vertical;` — **no padding,
+no border**, so `region.width == content_region.width` and the threshold is satisfiable as written.
+**A negative result, recorded because a check that came back clean is evidence, not a non-event.**
+
+**⑦ CHECKED AND CLEAR — Amendment C's 160×48 → 120×30 revert keeps a non-first segment reachable.**
+The two AC-6 pointer tests ran at 160×48 for a *measured* reason: at 120×30 the bar was 21 columns,
+so segments past it were clipped and therefore unclickable, and the tests' whole rigor is that they
+click a **non-first** segment. Reverting them is only safe if the widened bar restores reachability.
+Derived from the fixture (`_two_band_loaded`, `tests/test_tui_directionb.py:3844` — outside Inc-1's
+file set, so stable): **two 256-byte ranges separated by a `0x10000` gap**, first run starting at
+`span_start` ⇒ **2 runs, 1 gap, no leading gap**. Through the (A) allocator: `bar=50 → [25,24] + 1
+gap = 50`; `bar=66 → [33,32] + 1 gap = 66`. **Both segments are ~24–33 columns wide and fully inside
+the bar at both regimes** — a non-first segment is comfortably clickable, so the revert is sound and
+the coverage it restores at the repaired regime is real. *(Note in passing: this fixture has EQUAL
+runs, which is exactly the vacuity R-2 forbids for the `LLR-111.4` golden — harmless here, because
+these tests assert click→address threading, not width discrimination. It must not be borrowed for
+Inc-3.)*
+
+> **Both ④ and ⑤ are the same species and neither is a code defect:** a quantity the specification
+> names but never defines, where the batch's own showcase fixture happens to satisfy the wrong
+> reading. That is this batch's signature failure — *a design validated against the fixture its
+> author chose* — recurring for a fourth time, now at the implementation boundary rather than in
+> the document.
 
 ---
 
@@ -137,7 +376,34 @@ and every ledger figure states which form produced it.
 | Point | Base | −D | +A | Post | Form |
 |---|---|---|---|---|---|
 | batch-76 close (`fd9124a`) | — | — | — | **2514 passed / 2 skipped / 3 xfailed** | FULL |
-| batch-77 Phase 0 | — | — | — | *not yet run* | — |
+| batch-77 Phase-3 entry, **collection** on `f8747b8` | — | — | — | **2519 collected** (reconciles: `2508 − 0 + 11 = 2519`) | collect-only |
+| batch-77 Phase-3 entry, **pass/fail** — ✅ **RE-DERIVED** | — | — | — | **2514 passed · 2 skipped · 3 xfailed · 29 snapshots passed** in 2101 s (35:01) | **FULL** |
+| **Inc-1 + review-fix pass, collection** | 2519 | 1 | 21 | **2539 collected** (reconciles: `2519 − 1 + 21 = 2539`) | collect-only |
+| **Inc-1 + review-fix pass, gate files** *(quiet machine — 0 competing pytest processes verified immediately before)* | — | — | — | `test_tui_map_big.py` **29 passed in 48.50s** · `test_tui_directionb.py` **174 passed in 254.35s (4:14)** · `test_map_click_chain.py` **7 passed in 13.91s** | FULL, per file |
+| **Frozen dual guard (C-27), both halves** | — | — | — | **3 passed, 171 deselected in 0.88s** — the `git diff --name-only main` byte-identity guard over `_ENGINE_TEST_FILES` **and** `test_tc032_no_engine_test_function_is_skipped` | `-k` on the guard host |
+
+**Ledger notes (review-fix pass).** The `−1` is the retired `test_ac6_clipped_segments_are_a_known_layout_limitation` (Amendment C) — verified absent, **0 occurrences** in `tests/test_map_click_chain.py`. The `+21` is Inc-1's 19 new nodes **plus the 2 parametrizations of Amendment D's `TC-B77-03` differing-size arm**. **2539 is READ from a `--collect-only` run, not computed**; the arithmetic is shown only as a reconciliation, per *a carried number is re-derived, not copied*. Every pass/fail figure above is read from that run's own output — **none is spliced across runs** — and all three gate files were run after confirming the `bl77` baseline had drained to 0 pytest processes, because a contended run flakes the timing-sensitive geometry assertions and cannot serve as gate evidence (D-9).
+
+> ✅ **The pre-implementation baseline is now DERIVED, not inherited (D-15 discharged).** Executed in an
+> isolated detached worktree at `f8747b8` (`C:\Users\jjgh8\bl77`), touching neither the branch nor the
+> working tree, so nothing about Inc-1 could contaminate it. **Three things it settles:**
+> 1. **It reconciles exactly with collection:** `2514 + 2 + 3 = 2519` ✓.
+> 2. **It matches batch-76's close figure exactly** — so the inherited number was *right*, and is now
+>    *re-derived*. The provenance was the defect, not the value. **This is the first figure in this
+>    session that I can say that about without a retraction attached.**
+> 3. ⭐ **All 29 snapshots PASSED at baseline.** That is the load-bearing one: it means the snapshot
+>    matrix was **fully green before Inc-1**, so any snapshot failure now is **attributable to Inc-1 by
+>    construction** rather than by argument. It confirms the parallel session's attribution premise and
+>    gives **Inc-1b** a clean basis for its C-22 per-cell marks — including the falsification test of my
+>    own two-cell prediction.
+>
+> ⚠️ **The risk D-9 named did not materialise: there were NO pre-existing failures.** The tree was green
+> at `f8747b8`, so nothing in Inc-1's gate can be a pre-existing failure wearing Inc-1's name. The
+> deferral cost a 35-minute re-run and bought certainty; recorded as the price actually paid.
+>
+> 📋 **C-44:** the worktree at `C:\Users\jjgh8\bl77` is **outside the repo tree**, registered via
+> `git worktree`. It is retained only until Inc-1b's snapshot attribution is settled, then removed with
+> `git worktree remove`. Recorded here so it cannot be forgotten.
 
 ---
 
@@ -161,6 +427,15 @@ and every ledger figure states which form produced it.
 | **R-6** | **Re-render PRESERVES the selection** if the region still exists, else falls back to the first | **OPERATOR** 2026-08-01 | No input document stated a policy. Needs **two** acceptance arms: a single "preserved" arm is green on an implementation that never re-selects, and a single "fallback" arm is green on one that always resets — neither alone distinguishes the spec from its two failure modes. Interacts with HLR-116: **focus must follow selection** or the keyboard story silently regresses. |
 | — | **Autonomy: autonomous + merge authorized**; merge gated on green CI **and** a clean final independent `qa-reviewer` pass over the whole diff vs `main`. A HIGH finding blocks and returns to the operator. | **OPERATOR** 2026-08-01, `AskUserQuestion` at kickoff — asked fresh, not inherited | |
 | — | **Decision recording confirmed** — every un-asked decision recorded in PLAN.md §8, `state.json.decisions_log`, `05-postmortem.md`, and carried to the vault at `/dev-flow-sync` | **OPERATOR** 2026-08-01 | |
+| **R-7…R-11** | Widen-then-aggregate · accept the stats fold (`C-77-k`) · `+N more` in the region list · **aggregation SPLIT to batch-78** · **ANSI scrub PULLED IN** | **OPERATOR** 2026-08-01 | Full texts in `state.json.phase1_operator_rulings`. R-10 and R-11 are what took the batch from *blocked in three lanes* to approved. |
+| — | **Authorization RE-ASKED at the Phase-3 resume** — *autonomous + merge authorized*, decision recording *confirmed* | **OPERATOR** 2026-08-01, `AskUserQuestion` at resume | Per-batch and **never inherited**. The prior session held the same grant; that grant did **not** transfer, and the handoff document explicitly said so. Asked fresh from the operator, not read from `state.json`. |
+| **D-9** | **Do NOT launch a competing full-suite baseline** while the parallel session's FULL run is in flight | **autonomous** | Two concurrent pytest runs contend for CPU and flake the timing-sensitive Textual geometry assertions Inc-1 is measured by — the same `N-2` transient (17/97 traces) `LLR-111.6` exists to defend against. The collection figure (2519) is already verified; only pass/fail is pending, and nothing in Inc-1 blocks on it. **Cost of the choice, stated: a pre-existing failure would surface mid-increment and could be mistaken for one Inc-1 caused** — mitigated because Inc-1's own gate runs the three affected files in full and the counterfactual is captured pre-change. |
+| **D-10** | **Rebase before pushing**; a second session is live on this branch | **autonomous** | The parallel session intends to push an artifact edit to `claude/batch-77-memmap-variant-a`. Its change and this session's code are mergeable, but a blind push loses one of them. Recorded because `state.json` is a known last-writer-wins hazard in this project with a near miss already on record. |
+| **D-12** | **The 5th file IS authorized for Inc-1** (`tests/test_tui_directionb.py`, 2 edits, 3 tests) | **autonomous** | The project cap is **≤5**, so this is *at* the cap, not over it — no waiver needed. The implementer stopped at 4 and reported rather than taking it silently, which was correct. **The blast radius was UNRECORDED in requirements §7** — Inc-1's file list names 4 files and the document logs only `test_at075_e_key…` (Inc-6) for this file. That is a **C-26 reverse-census miss in the SPEC**: nobody grepped the touched CSS classes across `tests/`. Two of the three failures are `LLR-111.9`'s accepted row-growth (R-8) breaking `pilot.click` targeting; one pins the retired horizontal dock. **Port, never delete** — instructed explicitly. |
+| **D-13** | **Snapshot C-22 marks land as their OWN single-file micro-increment, NOT inside Inc-1** | **autonomous** | Marking requires `tests/test_tui_snapshot.py` — a **6th** file for Inc-1, which *would* breach the cap and need an operator waiver. Splitting it needs no waiver, keeps Inc-1's diff reviewable, matches this project's own precedent (`_batch45_map_drift_marks` / `_batch47_map_drift_marks` — scoped helpers added during the batch and retired after regen), and satisfies **C-30**: each increment marks only its own cells so every untouched cell stays live as a regression guard. **Regen itself remains Inc-9, canonical CI only.** |
+| **D-14** | **Inc-1's gate evidence is PROVISIONAL until re-run on a quiet machine** | **autonomous**, prompted by the parallel session | Contention is **evidenced, not suspected**: the implementer's three runs over the same file set took **329 s / 288 s / 252 s**, and its first run surfaced **2** failures where runs 2–3 surfaced **3** (`test_b01…` "not yet surfaced"). These are the timing-sensitive geometry tests `LLR-111.6` exists to defend, and a parallel full-suite run overlapped. **Only an uncontended run's own output becomes the gate figure (C-19).** |
+| **D-15** | **A TRUE pre-implementation baseline is captured from a DETACHED WORKTREE at `f8747b8`** | **autonomous** | The parallel session's baseline is **void** (its output file never held more than a header), and the working tree now contains Inc-1, so a baseline can no longer be taken here. The only surviving figure is batch-76's close — **inherited, which is the provenance this batch exists to punish**. A detached worktree touches neither the branch nor the working tree and can run during code review. ⚠️ **Consequence of D-9 now realised and owned:** deferring the baseline cost a re-derivation, exactly the risk D-9 named. |
+| **D-11** | **Inc-1 delegated to `software-dev`; OQ-3 delegated with it, decided on executed evidence** | **autonomous** | Per D-6 and the flow's Phase-3 agent assignment. My prior analysis (that `#map_grid` is measurable *before* the mount, which would remove the need for any `_BAND_BAR_WIDTH` fallback) was handed over **as a hypothesis to verify, not as an instruction** — the batch's own signature failure is a plausible sentence nobody executed. The implementer is told to report what its clean allocator actually produces for the 768/256 payload and to **surface a mismatch with the predicted `[49,17]`/`[37,13]` rather than tune the code to the document.** |
 
 ---
 

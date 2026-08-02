@@ -3921,11 +3921,19 @@ async def _double_click_region_row(
     every test that asserts a region→hex jump drives ``pilot.double_click`` (a
     genuine chain-2 pointer event produced by Textual, not a hand-built
     ``Activated`` message). Returns the clicked row.
+
+    batch-77 LLR-111.9 grows the band row from 4 to 6 rows at 120x30 (the cost
+    R-8 accepted), which pushes the region list onto the bottom boundary of
+    ``#map_content``'s 13-row viewport. ``widget.scroll_visible()`` then judges
+    the row already visible and does not scroll — yet ``get_widget_at`` at the
+    row's own reported centre resolves to the container, so the click misses
+    the row entirely. Scrolling the OWNING viewport to the widget (``top=True``)
+    puts the row where the pointer hit-test agrees it is.
     """
     from s19_app.tui.screens_directionb import RegionRow
 
     target = next(r for r in app.query(RegionRow) if match(r))
-    target.scroll_visible(animate=False)
+    app.query_one("#map_content").scroll_to_widget(target, animate=False, top=True)
     await pilot.pause()
     await pilot.double_click(target)
     await pilot.pause()
@@ -4512,8 +4520,17 @@ def test_at073_sparkline_tracks_profile(tmp_path: Path) -> None:
 
 def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
     """Pilot-geometry: the band bar + At-a-glance fit the viewport at 120x30 AND
-    80x24, docked side-by-side when wide and stacked when narrow (LLR-045B.3,
-    C-23 — measured regions, not fr-math).
+    80x24, STACKED (bar over glance) at both sizes (LLR-045B.3, C-23 — measured
+    regions, not fr-math).
+
+    **batch-77 LLR-111.9:** stacking is now UNIVERSAL. The horizontal dock that
+    placed the glance to the RIGHT of the bar at >=120 was retired — docking
+    spent the bar's width on the glance panel (the bar measured 21 columns at
+    120x30 against 66 at 80x24), and every column the glance took lowered the
+    ceiling on runs the operator can see. Both arms therefore assert the same
+    relationship now: the glance sits below the bar, on the same left edge. The
+    ``width-narrow`` regime flag is still asserted per size — it still toggles,
+    it just no longer changes this row's layout axis.
     """
     loaded = _two_band_loaded(tmp_path)
 
@@ -4528,9 +4545,11 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
             body = app.query_one("#workspace_body")
             bar = app.query_one(".map-band-bar")
             glance = app.query_one(".at-a-glance")
+            grid = app.query_one("#map_grid")
             return {
                 "narrow": body.has_class("width-narrow"),
                 "body_right": body.region.right,
+                "grid_width": grid.region.width,
                 "bar": (bar.region.x, bar.region.y, bar.region.width, bar.region.right),
                 "glance": (
                     glance.region.x,
@@ -4551,10 +4570,34 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
         assert bright <= m["body_right"], f"{tag}: band bar overflows body; {m}"
         assert gright <= m["body_right"], f"{tag}: glance overflows body; {m}"
 
-    # Wide (>=120): NOT narrow → glance docked to the RIGHT of the bar (same row).
+        # LLR-111.9's OWN THRESHOLD, asserted at both regimes (batch-77 Inc-1).
+        # The initial allocation in ``render_ranges`` apportions against
+        # ``#map_grid.region.width`` because ``.map-band-bar`` does not exist
+        # yet at that point, while ``LLR-111.7``'s bound is stated over
+        # ``bar.region.width``. Those two are equal ONLY because the bar is
+        # ``width: 100%`` of ``#map_grid`` and ``#map_grid`` carries no padding
+        # and no border. Nothing else in the batch tests that equality, so a CSS
+        # edit adding either would go unnoticed here and every band segment
+        # would then overflow its container by exactly the difference —
+        # silently, because the post-refresh hook re-apportions against the bar
+        # and the two allocations would simply disagree.
+        assert bw == m["grid_width"], (
+            f"{tag}: LLR-111.9 threshold violated — .map-band-bar is "
+            f"{bw} columns but #map_grid is {m['grid_width']}. The initial "
+            f"allocation is computed against #map_grid and the bound is stated "
+            f"over the bar; a divergence of {m['grid_width'] - bw} column(s) "
+            f"overflows the container by that difference. Check for padding, "
+            f"border or a width other than 100% on .map-band-bar / #map_grid."
+        )
+
+    # Wide (>=120): NOT narrow, and the glance STACKS below the bar anyway —
+    # LLR-111.9 retired the horizontal dock, so the wide regime now lays out
+    # like the narrow one (same x, greater y). Re-introducing the dock, or
+    # collapsing the two onto one row, fails here.
     assert not wide["narrow"], f"120x30 must be the wide regime; {wide}"
-    assert wide["glance"][0] > wide["bar"][0], (
-        f"at 120x30 the glance must dock beside (right of) the band bar; {wide}"
+    assert wide["glance"][0] == wide["bar"][0] and wide["glance"][1] > wide["bar"][1], (
+        f"at 120x30 the glance must stack below the band bar — same x, greater "
+        f"y; the horizontal dock was retired by LLR-111.9; {wide}"
     )
     # Narrow (<120): width-narrow → glance STACKS below the band bar.
     assert narrow["narrow"], f"80x24 must be the narrow regime; {narrow}"
