@@ -150,7 +150,7 @@
       "phase": 2,
       "date": "2026-08-01",
       "decision": "3-iteration soft cap reached and SURFACED; operator ruled continue to revision 4",
-      "notes": "Root cause named rather than looped on: propagation - a change applied where noticed, not swept to its dependents. Both non-architect lanes are clear (security CLEAN, QA no blockers) and the architect's own disposition is edits-not-design, so continuing is evidence-based rather than optimistic. Revision 4 re-gates the ARCHITECT lane only, per the operator's選択."
+      "notes": "Root cause named rather than looped on: propagation - a change applied where noticed, not swept to its dependents. Both non-architect lanes are clear (security CLEAN, QA no blockers) and the architect's own disposition is edits-not-design, so continuing is evidence-based rather than optimistic. Revision 4 re-gates the ARCHITECT lane only, per the operator's choice."
     }
   ],
   "phase1_operator_rulings": {
