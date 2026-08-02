@@ -250,6 +250,35 @@ can render a change below a scroll fold and not drift at all.
 **Do not regenerate these locally** — regen is canonical-CI-only under the textual 8.2.8 pin and is
 Inc-9's job. Drift is expected and reported at this gate, not fixed here.
 
+> ✅ **RESULT — MEASURED AT Inc-1b, AND THE PREDICTION HELD ON BOTH LIMBS.** Executed at `a84ff2f`
+> on a quiet machine, *before* any mark was applied:
+> ```
+> 2 failed, 27 passed, 3 deselected in 73.64s
+> FAILED …test_tc016s_density_layout_snapshot[map-comfortable-80x24]
+> FAILED …test_tc016s_density_layout_snapshot[map-comfortable-120x30]
+> ```
+> 1. **BOTH map cells drift — the two-cell prediction is CONFIRMED and the parallel session's
+>    one-cell report is FALSIFIED.** The load-bearing half was `80x24`: the obvious call is that it is
+>    unaffected (it already stacked, its bar stays 66), and that call is **wrong**. Its *geometry* is
+>    unchanged and its *content* is not — basis 60→66, denominator address-span→mapped-bytes, gaps
+>    `[8,8,16,33]`→1 each. A content-only drift on an unchanged-geometry cell is exactly what this looks
+>    like. **Recorded in advance specifically so it could be falsified; it wasn't.**
+> 2. **No unpredicted cell drifted** — 27 of 29 passed, so nothing outside the map moved. The repo's
+>    long-standing claim (`tests/test_tui_snapshot.py:454-455`, `:672-679`) that *"no other screen
+>    renders the map body"* **HELD**, and Inc-1's map-scoped CSS did not leak into shared chrome
+>    (**C-28 clean**). This also retro-validates ①: had `LLR-111.9` been app-wide, C-30 would have
+>    forced it to sequence last.
+> 3. **Marked, not suppressed: 27 passed / 2 xfailed / 0 xpassed.** Zero `xpassed` is the check that
+>    no cell was over-marked — over-marking silently retires a live regression guard, which is the cost
+>    C-30 exists to avoid. Ledger delta **0**.
+>
+> ⚠️ **Process finding, and it is the session's recurring one a third time:** Inc-1b's pre-run
+> "is the machine quiet?" check returned 0, and a parallel `pytest tests/ -q` started **between** its
+> measurement and verification runs. **A point-in-time sample is not a lock.** It blocked on that
+> process rather than measuring under contention — correct — but the check itself cannot prevent what
+> it only observes. Same shape as the process-count probe and the single-`pilot.pause()` read: *an
+> instantaneous observation being trusted as a sustained state.*
+
 **③ C-34 is in force.** Inc-1 changes a TUI render module, so its gate must run the **FULL**
 `tests/test_tui_directionb.py` — not a `-k` subset. That file is the cross-cutting guard host
 (markup-safety source scans, rail/screen census, shared-chrome footer census). A `-k`-only gate is

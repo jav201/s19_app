@@ -882,6 +882,73 @@ def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tu
     return ()
 
 
+# batch-77 Inc-1 (R-TUI-111, Memory Map Variant A — the gap-fold band bar): the
+# band strip's segment widths are re-derived from the `.map-band-bar` container
+# measured at settled layout and apportioned over TOTAL MAPPED BYTES
+# (LLR-111.1 — both the basis and the denominator move), every unmapped gap folds
+# to exactly one column (LLR-111.2), `_allocate_band_widths` bounds the allocation
+# in the producer (LLR-111.7), and `styles.tcss` stacks the band row at EVERY size
+# (LLR-111.9). Both changes repaint the map body, so BOTH `map` scaffold cells
+# drift — MEASURED, not reasoned (the `_fdf_json_height_drift_marks:824` caveat:
+# a below-the-fold repaint can leave a cell byte-identical, so the matrix is run
+# rather than argued). The batch-77 Inc-1b snapshot run showed EXACTLY these 2
+# cells mismatched — `2 failed, 27 passed` over the 29-cell matrix — against a
+# fully green 29/29 baseline re-derived at f8747b8 in an isolated worktree, so the
+# drift is attributable to Inc-1 by construction:
+#
+#   * `map-comfortable-120x30` — LAYOUT *and* CONTENT: the CSS band row stacks
+#     (it was 3-across at this width) and the bar grows 21 -> 50 columns, so the
+#     segment run is re-apportioned over a different container entirely.
+#   * `map-comfortable-80x24` — CONTENT ONLY: this regime ALREADY stacked and the
+#     bar still measures 66 columns, so the geometry is unchanged; what moves is
+#     what fills it — the width basis 60 -> 66, the denominator address-span ->
+#     mapped-bytes, and the gap columns folded from `[8, 8, 16, 33]` to 1 each.
+#
+# Containment holds: no non-map cell moved, which re-confirms the long-standing
+# `_batch45_map_drift_marks:454` / `_batch47_map_drift_marks:675` claim that no
+# other screen renders the map body (C-28 shared-chrome clean — Inc-1's CSS is
+# map-scoped and no footer/header/rail binding changed). ONLY these two cells are
+# marked: over-marking a still-passing cell would silently suppress a live
+# regression guard under `strict=False` (the `_batch46_patch_drift_marks:518`
+# XPASS caveat). `strict=False` because a cell can render a change below the
+# scroll fold and not drift at all.
+#
+# The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml, pinned
+# textual==8.2.8) at batch-77 **Inc-9** — NEVER locally (reference_snapshot_regen_env:
+# local regen drifts unrelated baselines). RETIRE THIS MARK when that regen has
+# landed and both `map` cells match their refreshed baselines; leaving it live past
+# the regen makes each cell XPASS silently and masks future map regressions.
+def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
+    """Return the batch-77 Inc-1 gap-fold band-bar drift marks.
+
+    Both ``map`` scaffold cells (comfortable x {80x24, 120x30}) drift when the band
+    bar re-derives its widths from the measured container over mapped bytes and
+    folds every gap to one column (US-MAP Variant A, HLR-111): 120x30 by layout
+    *and* content (the row stacks, bar 21 -> 50), 80x24 by content alone (already
+    stacked, bar still 66 — the basis, denominator and gap columns moved beneath
+    it). Measured, not assumed: the Inc-1b run failed exactly these 2 of 29 cells.
+    Marked ``xfail(strict=False)`` until the canonical-CI baseline regen lands at
+    batch-77 Inc-9, then retired — the ``_batch45``/``_batch46``/``_batch47``
+    pattern.
+    """
+    del density
+    if screen == "map" and size_key in ("80x24", "120x30"):
+        return (
+            pytest.mark.xfail(
+                reason=(
+                    "batch-77 Inc-1 R-TUI-111 US-MAP Variant A: band-bar widths "
+                    "re-derived from the measured .map-band-bar over total mapped "
+                    "bytes + gaps folded to 1 column + the band row stacks at every "
+                    "size (120x30 drifts by layout AND content, bar 21->50; 80x24 by "
+                    "content only, bar still 66); SVG baseline regen pending in "
+                    "canonical CI (snapshot-regen.yml, batch-77 Inc-9)"
+                ),
+                strict=False,
+            ),
+        )
+    return ()
+
+
 # 24 cells: the 4 restyled screens x {compact, comfortable} x {3 sizes}.
 _RESTYLED_CELLS = [
     pytest.param(
@@ -950,7 +1017,8 @@ _SCAFFOLD_CELLS = [
         + _batch47_theme_drift_marks(screen, "comfortable", size_key)
         + _discoverability_drift_marks(screen, "comfortable", size_key)
         + _batch48_patch_drift_marks(screen, "comfortable", size_key)
-        + _fdf_json_height_drift_marks(screen, "comfortable", size_key),
+        + _fdf_json_height_drift_marks(screen, "comfortable", size_key)
+        + _batch77_map_drift_marks(screen, "comfortable", size_key),
     )
     for screen in _SCAFFOLD_SCREENS
     for size_key in (
