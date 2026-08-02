@@ -5655,6 +5655,67 @@ falsified it. `TC-611` pins the 2.03×/4.03× expansion that makes those two qua
   `test_at263_pin_progress_resets_to_zero_on_both_branches`,
   `test_tc571_the_failure_path_logs_a_failure_not_a_rejection`.
 
+## Memory Map redesign — Variant A — batch-77 (R-TUI-103)
+
+> **This section is OPEN.** batch-77 lands across nine increments and each one records its own
+> clauses here as it ships. What is written below is what is **in the tree**; the batch's remaining
+> clauses (`HLR-111` band-bar allocation, `HLR-112` ruler, `HLR-113` stats, `HLR-114` legend removal,
+> `HLR-115` keyboard, `HLR-116` auto-selection, `HLR-117` selection style) are **not** recorded here
+> yet and must not be read as shipped. The full batch charter is
+> `.dev-flow/2026-08-01-batch-77/01-requirements.md`.
+
+**R-TUI-103 (Inc-2 clause, `LLR-116.7`)**: `safe_text` shall remove from its input every codepoint in
+the C0 range `U+0000`–`U+001F`, the delete character `U+007F`, and every codepoint in the C1 range
+`U+0080`–`U+009F` — **selecting them as a byte CLASS, not by matching an escape-sequence pattern** —
+before composing the returned `Text`, and shall preserve every non-control character of the input
+verbatim, including square-bracket markup and URL-like substrings.
+
+**The defect: shipped source asserted a guarantee its code did not provide.** `safe_text` was
+`Text(value, style=style)`, and its docstring claimed it neutralised *"raw ANSI bytes carried in the
+never-scrubbed `ValidationIssue.symbol` — no `MarkupError`, no style/ANSI leak"*. Executed, the
+**markup half is true and the ANSI half was false**: `Text()` does not parse markup, so `sensor[red]`
+is inert — but it does not remove anything either, so `safe_text('sensor\x1b[31m_evil[red]')` returned
+the string **unchanged**, `ESC` included, billing **21** characters for **16** visible ones. The false
+half then became the premise of a later requirement revision, which is how a wrong sentence in a
+docstring turns into a wrong sentence in a specification. **The docstring is corrected in the same
+edit** so the source no longer states a guarantee ahead of the code.
+
+**Why the byte CLASS is normative and a regex over escape sequences is not sufficient.** `U+009B` is
+single-byte CSI and `U+009D` is single-byte OSC — functional equivalents of `ESC [` and `ESC ]` that
+carry **no `\x1b` at all**. A filter written as "strip `\x1b`-introduced sequences" passes both and
+reopens the hole with every test still green. Executed as a mutation of the shipped filter
+(`re.sub(r"\x1b\[[0-9;]*[a-zA-Z]", "", value)`): the `ESC` payload is removed, and `0x00`, `0x7F`,
+`0x9B` and `0x9D` still reach the painted strip at **both** regimes.  The class is closed at
+`U+009F`, so `U+00A0` (NBSP) and everything above it are ordinary characters.
+
+**Why the scrub is safe in a function with this blast radius.** `safe_text` has ~85 call sites across
+four modules, and the scrub applies to developer-supplied arguments as well as file-derived ones. An
+AST census over all **80** parsed `safe_text()` calls in `s19_app/` found **0** with a control
+character in a string-literal argument, and `build_detail_text`'s newlines are appended directly to
+the `Text`, never through `safe_text`. Identity damage across 14 legitimate symbol shapes — URLs,
+Windows paths, bracket markup, non-ASCII identifiers, NBSP, emoji — is **0**. This is a byte-class
+filter, not a shape-inference redactor, and is structurally incapable of the batch-62 failure.
+
+**What this clause deliberately does NOT claim.**
+
+(a) **It is not a claim about the whole inspector.** `LLR-116.6` states the inspector's safety
+property; this clause supplies the mechanism one layer down. Inc-7 makes `LLR-116.6` live by
+populating `#map_detail_body` on the load path with no operator input; until then the sink is
+reached by a click, which is the path the acceptance below drives.
+
+(b) **Escape payloads become visible text, and that is the intended outcome, not a residue.**
+`\x1b[31m` renders as a literal `[31m`. It is inert precisely because `Text()` does not parse markup
+— the two halves of `safe_text` are not interchangeable and neither alone is sufficient.
+
+(c) **No claim is made about control bytes reaching any surface that does not route through
+`safe_text`.** The clause binds one function.
+
+- Validation: `Automated` — `tests/test_tui_hostile_map.py`. Inspector safety, reported **per limb
+  per size** (`AT-B77-15a` limbs 1–2, `AT-B77-15b` limb 3 — an aggregate verdict is what hid the
+  original defect): `test_b77_hostile_symbol_is_literal_and_carries_no_span`,
+  `test_b77_hostile_symbol_emits_no_control_byte_into_the_strip`. Byte-class form and identity
+  preservation: `test_b77_safe_text_scrubs_the_control_byte_class_without_damaging_identity`.
+
 ## Retired ids
 
 A retired id **was** live and its verifier is gone. It is never reused, and it is recorded here

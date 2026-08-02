@@ -50,6 +50,17 @@ _P_UNBAL = "sensor[unclosed"
 _PAYLOADS = (_P_BRACKET, _P_LINK, _P_ANSI, _P_UNBAL)
 _HOSTILE = "".join(_PAYLOADS)
 
+#: batch-77 Inc-2 (LLR-116.7): ``safe_text`` deletes the C0/DEL/C1 byte class,
+#: so the verbatim subject is each payload's NON-CONTROL projection. Three of
+#: the four payloads are pure markup and project to themselves — their
+#: observable is bit-for-bit unchanged; only ``_P_ANSI`` moves.
+_CONTROL = frozenset(range(0x00, 0x20)) | frozenset(range(0x7F, 0xA0))
+
+
+def _scrub(value: str) -> str:
+    """Project ``value`` onto its non-control characters, preserving order."""
+    return "".join(ch for ch in value if ord(ch) not in _CONTROL)
+
 
 # A mixed A2L: RPM sits inside the loaded S19 image (0x1000), COOLANT is outside
 # (0x9000) — so enrichment marks one in_memory=True and one in_memory=False, and
@@ -292,6 +303,16 @@ def test_at069b_c17_card() -> None:
 
 
 def test_at069c_c17_table_name() -> None:
+    """AT-069c — the hostile NAME renders literally in the table cell.
+
+    **PORTED, batch-77 Inc-2 (LLR-116.7).** Each payload was asserted present
+    *verbatim*, ANSI included. The C0/C1 class is now removed at ``safe_text``,
+    so the subject is each payload's non-control projection — unchanged for the
+    three markup payloads, and ``'[31mX[0m'`` for ``_P_ANSI``. Both original
+    observables survive: every payload is still asserted present in the cell,
+    and the no-span claim is unchanged. The added absence clause is paired with
+    that presence loop, never asserted alone.
+    """
     for size in _SIZES:
 
         async def _observe(app: S19TuiApp, pilot: object) -> None:
@@ -304,12 +325,17 @@ def test_at069c_c17_table_name() -> None:
             assert isinstance(name_cell, Text), "table cell must be a Rich Text"
             plain = name_cell.plain
             for payload in _PAYLOADS:
-                assert payload in plain, (
-                    f"payload {payload!r} not verbatim in cell; got {plain!r}"
+                assert _scrub(payload) in plain, (
+                    f"payload {payload!r} not verbatim (non-control) in cell; "
+                    f"got {plain!r}"
                 )
             # safe_text builds a base-styled Text with NO spans → no payload span
             assert not name_cell.spans, (
                 f"hostile name cell grew spans (markup leak): {name_cell.spans!r}"
+            )
+            # LLR-116.7, co-asserted with the presence loop above.
+            assert not any(ord(ch) in _CONTROL for ch in plain), (
+                f"a control byte reached the table cell: {plain!r}"
             )
 
         _drive_bare(size, _observe)

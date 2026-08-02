@@ -125,6 +125,18 @@ MD1_REGRESSION_FIXTURES = (
 
 MD1_PAYLOADS = MD1_DISCRIMINATORS + MD1_REGRESSION_FIXTURES
 
+#: batch-77 Inc-2 (LLR-116.7): ``safe_text`` deletes the C0/DEL/C1 byte class,
+#: so a sink's verbatim subject is the payload's NON-CONTROL projection. Only
+#: the ANSI payload moves; every pure-markup payload projects to itself and its
+#: assertion is bit-for-bit unchanged.
+_CONTROL = frozenset(range(0x00, 0x20)) | frozenset(range(0x7F, 0xA0))
+
+
+def _scrub(value: str) -> str:
+    """Project ``value`` onto its non-control characters, preserving order."""
+    return "".join(ch for ch in value if ord(ch) not in _CONTROL)
+
+
 #: ``_ENTRIES_COLUMNS`` (``screens_directionb.py:2264``) — unchanged at five.
 _ENTRY_COLUMN_COUNT = 5
 
@@ -262,10 +274,19 @@ def test_at075e_c17_entries_table(tmp_path: Path) -> None:
         value_cell = cells[_VALUE_COLUMN]
 
         # (ii) verbatim — char-for-char, the payload's own brackets intact.
-        assert value_cell.plain == payload, (
-            f"payload {payload!r} must render VERBATIM in the value cell; got "
-            f"{value_cell.plain!r}. A mangled plain (e.g. 'PWNED' from "
-            "'[red]PWNED[/red]') means from_markup consumed the brackets."
+        # PORTED batch-77 Inc-2 (LLR-116.7): the subject is the payload's
+        # non-control projection, because safe_text now deletes the C0/C1
+        # class. The equality — and with it the bracket observable — is
+        # retained exactly; only the ANSI payload's expected value moves.
+        assert value_cell.plain == _scrub(payload), (
+            f"payload {payload!r} must render VERBATIM (non-control) in the "
+            f"value cell; got {value_cell.plain!r}. A mangled plain (e.g. "
+            "'PWNED' from '[red]PWNED[/red]') means from_markup consumed the "
+            "brackets."
+        )
+        # (ii-b) LLR-116.7, co-asserted with the equality above.
+        assert not any(ord(ch) in _CONTROL for ch in value_cell.plain), (
+            f"a control byte reached the value cell: {value_cell.plain!r}"
         )
 
         # (iii) no span the payload's own text produced.
@@ -595,12 +616,23 @@ def _select_label_visual(app: S19TuiApp, select_id: str) -> Content:
 
 
 def _assert_label_literal(line: Content, payload: str, site: str) -> None:
-    """Assert a Select label rendered ``payload`` literally, with no markup."""
-    assert line.plain == payload, (
-        f"{site}: the hostile option label {payload!r} must render VERBATIM; "
-        f"got {line.plain!r}. A mangled plain (e.g. 'PWNED' from "
-        "'[red]PWNED[/red]') means Content.from_markup consumed the brackets "
-        "— i.e. the label reached the sink as a bare str."
+    """Assert a Select label rendered ``payload`` literally, with no markup.
+
+    **PORTED, batch-77 Inc-2 (LLR-116.7).** The subject was ``payload``
+    verbatim, ANSI included; ``safe_text`` now removes the C0/C1 class, so it
+    is the payload's non-control projection. The equality is retained — every
+    bracket is still compared character-for-character — and the ``spans == []``
+    clause is untouched. The added absence clause is paired with that equality,
+    which is its positive co-assertion.
+    """
+    assert line.plain == _scrub(payload), (
+        f"{site}: the hostile option label {payload!r} must render VERBATIM "
+        f"in its non-control characters; got {line.plain!r}. A mangled plain "
+        "(e.g. 'PWNED' from '[red]PWNED[/red]') means Content.from_markup "
+        "consumed the brackets — i.e. the label reached the sink as a bare str."
+    )
+    assert not any(ord(ch) in _CONTROL for ch in line.plain), (
+        f"{site}: a control byte reached the option label: {line.plain!r}"
     )
     assert list(line.spans) == [], (
         f"{site}: the option label {payload!r} produced span(s) "

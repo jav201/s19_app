@@ -59,6 +59,20 @@ from tests.test_flow_execution_service import (
 
 _HOSTILE = "[bold red]sensor\x1b[31m[/]x[link=file:///etc/passwd]"
 
+#: batch-77 Inc-2 (LLR-116.7): ``safe_text`` now deletes the C0/DEL/C1 byte
+#: class, so a sink's expected plain is the payload's NON-CONTROL projection.
+#: The markup half of the payload — the part these nodes exist to prove is
+#: rendered literally — is unaffected and still asserted character-for-character.
+_CONTROL = frozenset(range(0x00, 0x20)) | frozenset(range(0x7F, 0xA0))
+
+
+def _scrub(value: str) -> str:
+    """Project ``value`` onto its non-control characters, preserving order."""
+    return "".join(ch for ch in value if ord(ch) not in _CONTROL)
+
+
+_HOSTILE_SCRUBBED = _scrub(_HOSTILE)
+
 
 # ---------------------------------------------------------------------------
 # Pilot driver: mount the app, activate rail-8, set the project, run a flow
@@ -323,10 +337,21 @@ def test_tc088_4_ribbon_encodes_footprint() -> None:
 
 def test_at088b_every_render_sink_renders_hostile_literally(tmp_path: Path) -> None:
     """AT-088b (black-box, US-088, C-17): a hostile bracket/ANSI payload placed
-    in EACH file-derived render sink renders literally — ``plain`` verbatim AND
-    ``spans == []`` per sink. The sink set is CODE-DERIVED (C-31): the number of
-    ``# SINK:`` call-site markers in ``render_result`` must equal the number of
-    sink categories this test exercises, so a new unswept sink fails the count.
+    in EACH file-derived render sink renders literally — every NON-CONTROL
+    character of ``plain`` verbatim AND ``spans == []`` per sink. The sink set
+    is CODE-DERIVED (C-31): the number of ``# SINK:`` call-site markers in
+    ``render_result`` must equal the number of sink categories this test
+    exercises, so a new unswept sink fails the count.
+
+    **PORTED, batch-77 Inc-2 (LLR-116.7).** This node asserted
+    ``plain == _HOSTILE`` — the ANSI bytes preserved *verbatim* alongside the
+    brackets. ``LLR-116.7`` supersedes the ANSI half and **removes** the C0/C1
+    class; the bracket half is untouched. Every observable survives: each sink's
+    plain is still compared character-for-character (against the non-control
+    projection), ``spans == []`` is unchanged, and the three C-31 sink-set
+    guards are unchanged. The absence claim added below is paired with that
+    equality, which is the positive co-assertion — "no control byte" alone is
+    green on an empty render.
     """
     # crafted result carrying the payload in every file-derived sink at once.
     # The written-path sink renders ``str(Path(...))``; on Windows ``Path``
@@ -335,12 +360,15 @@ def test_at088b_every_render_sink_renders_hostile_literally(tmp_path: Path) -> N
     # neutralisation is what that sink proves).
     hostile_path = Path(_HOSTILE)
     expected = {
-        "summary": _HOSTILE,
-        "finding": _HOSTILE,
-        "diagnostic": _HOSTILE,
-        "written-path": str(hostile_path),
-        "flow-diagnostic": _HOSTILE,
+        "summary": _HOSTILE_SCRUBBED,
+        "finding": _HOSTILE_SCRUBBED,
+        "diagnostic": _HOSTILE_SCRUBBED,
+        "written-path": _scrub(str(hostile_path)),
+        "flow-diagnostic": _HOSTILE_SCRUBBED,
     }
+    # The expectation must not be able to degenerate to "" — an empty expected
+    # would make the per-sink equality below a tautology.
+    assert all(len(v) > 20 for v in expected.values()), expected
     result = FlowRunResult(
         status=FLOW_STATUS_ISSUES,
         block_results=[
@@ -448,14 +476,25 @@ def test_at088b_every_render_sink_renders_hostile_literally(tmp_path: Path) -> N
     # insufficient — the batch-33/43/48 miss).
     assert set(rendered) == set(expected)
     for name, (plain, spans) in rendered.items():
+        # Presence: the non-control payload is there, character for character.
         assert plain == expected[name], (name, plain)
         assert spans == [], (name, spans)
+        # Absence (LLR-116.7), co-asserted with the equality above.
+        assert not any(ord(ch) in _CONTROL for ch in plain), (
+            f"{name}: a control byte reached the sink: {plain!r}"
+        )
 
 
 def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
     """AT-088b (LLR-088.6): the compose-list block ref-label sink
     (``_flow_block_label`` via ``#flow_blocks``) neutralises a hostile CHECK
-    ``check_doc_ref`` — the payload appears literally and injects no span."""
+    ``check_doc_ref`` — the payload appears literally and injects no span.
+
+    **PORTED, batch-77 Inc-2 (LLR-116.7).** Was ``_HOSTILE in plain``; the
+    subject is now the payload's non-control projection, because the C0/C1
+    class is removed at ``safe_text``. The containment observable and the
+    ``spans == []`` observable are both unchanged.
+    """
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
@@ -473,8 +512,21 @@ def test_at088b_check_ref_label_renders_literally(tmp_path: Path) -> None:
             )
 
     plain, spans = asyncio.run(_drive())
-    assert _HOSTILE in plain
+    # Presence: the hostile label reached the sink with its markup intact.
+    assert _HOSTILE_SCRUBBED in plain
     assert spans == []
+    # Absence (LLR-116.7), co-asserted with the containment above. Scoped to
+    # exclude U+000A: this sink is a MULTI-ROW label and ``_flow_block_label``
+    # composes the row separator itself, so a newline here is developer
+    # formatting, not file-derived. It cannot come from the payload — the
+    # payload passes through ``safe_text``, which deletes U+000A along with the
+    # rest of the class. (The single-row sinks in the node above carry no
+    # developer newline and are asserted against the full class.)
+    residual = {ord(ch) for ch in plain if ord(ch) in _CONTROL}
+    assert residual <= {0x0A}, (
+        f"a file-derived control byte reached the block-label sink: "
+        f"{sorted(hex(c) for c in residual)} in {plain!r}"
+    )
 
 
 # ===========================================================================

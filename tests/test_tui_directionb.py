@@ -3165,10 +3165,20 @@ def test_tc041_11_markup_safe_render_of_hostile_text() -> None:
     """File-derived text with markup / ANSI renders literally (LLR-041.11).
 
     Intent: the panel renders with markup enabled to colour cells, so a
-    loaded A2L/MAC symbol like ``sensor[red]`` or ``x[link=file:///]`` — or a
-    raw ANSI escape byte — must be treated as literal text, never parsed as
-    Rich markup. Otherwise it corrupts the render, injects styling, or raises
-    ``MarkupError`` and crashes the Memory Map on load (security B-1 / F2).
+    loaded A2L/MAC symbol like ``sensor[red]`` or ``x[link=file:///]`` must be
+    treated as literal text, never parsed as Rich markup. Otherwise it
+    corrupts the render, injects styling, or raises ``MarkupError`` and
+    crashes the Memory Map on load (security B-1 / F2).
+
+    **PORTED, batch-77 Inc-2 (LLR-116.7).** This node asserted
+    ``text.plain == hostile`` — ANSI bytes preserved *verbatim*, on the
+    rationale that a literal escape byte is inert. It is not inert: it is
+    handed to the terminal in the painted strip, where it is executed rather
+    than displayed. ``LLR-116.7`` supersedes that clause and **removes** the
+    C0/C1 class instead. The MARKUP half of LLR-041.11 is unchanged and is
+    still asserted below; only the ANSI clause is amended, from *preserved
+    verbatim* to *removed*, and the amendment is asserted positively rather
+    than dropped.
     """
     from rich.console import Console
 
@@ -3177,11 +3187,12 @@ def test_tc041_11_markup_safe_render_of_hostile_text() -> None:
     hostile = "sensor[red]value[/]\x1b[31mANSI\x1b[0m"
     text = safe_text(hostile)
 
-    # The literal string is preserved verbatim — brackets and ANSI as text.
-    assert text.plain == hostile
+    # Markup survives verbatim; the ANSI escape bytes are gone (LLR-116.7).
+    assert text.plain == "sensor[red]value[/][31mANSI[0m"
+    assert "\x1b" not in text.plain, "the escape byte must not survive the scrub"
 
     # Rendering never raises MarkupError and never emits a real SGR sequence
-    # from the file-derived content (the ANSI byte is literal, not active).
+    # from the file-derived content.
     console = Console(color_system=None, width=120)
     with console.capture() as capture:
         console.print(text)
