@@ -46,11 +46,11 @@
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31). AT-072b is an EXISTING global id being re-derived, not minted - it keeps its number."
   },
   "current_phase": 2,
-  "phase_status": "in-progress",
+  "phase_status": "iterating",
   "iterations_per_phase": {
     "0": 0,
-    "1": 0,
-    "2": 0,
+    "1": 1,
+    "2": 1,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -61,7 +61,10 @@
     "0": ".dev-flow/2026-08-01-batch-77/00-measurements.md",
     "1": ".dev-flow/2026-08-01-batch-77/01-requirements.md",
     "1_architect_lane": ".dev-flow/2026-08-01-batch-77/01-requirements-architect.md",
-    "1_qa_lane": ".dev-flow/2026-08-01-batch-77/01b-qa-validation.md"
+    "1_qa_lane": ".dev-flow/2026-08-01-batch-77/01b-qa-validation.md",
+    "2_architect": ".dev-flow/2026-08-01-batch-77/02-review-architect.md",
+    "2_qa": ".dev-flow/2026-08-01-batch-77/02-review-qa.md",
+    "2_security": ".dev-flow/2026-08-01-batch-77/02-review-security.md"
   },
   "premise_evaluation_phase0": {
     "evaluated": 15,
@@ -124,6 +127,12 @@
       "date": "2026-08-01",
       "decision": "Phase 1 APPROVED (self-approved under the kickoff grant) - 01-requirements.md final at 578 lines",
       "notes": "7 HLR (111-117), 20+ LLR, AT-B77-01..14, TC-B77-01..29, 6 carries, 2 section 6.5 amendments. Zero blockers: all eight raised by the two lanes are closed by operator rulings R1-R6. Exit criteria: Coverage - both traceability chains complete, no orphan. Certainty - every AT demonstrated RED by EXECUTED transcript, every predicate carries its reddening mutation. Evidence - every figure re-derived on this tree. No axis unmet, so approve rather than iterate."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "Phase 2 BLOCKED by all three lanes - iterate-to-refine to Phase 1 revision 2",
+      "notes": "12 blockers. Not a discretionary gate: the flow forces iterate when blockers exist. Two lanes independently found the runs-vs-ranges defect. The design wall (24 segments into 21 columns) needed an operator ruling and got R-7. I verified the security blocker myself and found it understated - the ANSI guarantee is asserted in shipped source and is false."
     }
   ],
   "phase1_operator_rulings": {
@@ -134,7 +143,8 @@
     "R3_keyboard": "ARROWS + ENTER ONLY; j/k/o DROPPED. All three already bound app-wide; o/j frozen in _PRE_BATCH_BINDINGS under live TC-011; k must stay the legend key or US-77-4's hint becomes false. SCOPE REDUCTION: the charter's o = open-hex keyboard affordance is DESCOPED and registered as a carry. The N4a mouse split is unchanged and remains the route to hex.",
     "R4_ruler_end": "LABEL THE LAST MAPPED BYTE (0x07FFFF3D), not the exclusive span_end (0x07FFFF3E). The two chartered clauses were mutually unsatisfiable. Also corrects my P-7: 4 of 5 ticks name unmapped addresses today, not 3.",
     "R5_fold_width": "ONE-COLUMN FOLD MARKER, ALWAYS. Measured at the reconciled 21-col container: fold=1 -> [4,4,4,3,1]; fold=2 -> [3,3,3,3,1], which collapses three runs to equal width and guts the strict limb, the load-bearing half of AT-B77-01 at 80x24 (finding N-1). DESCOPES the charter's '2-col marker + humanized size label at/above a fold threshold' (S-1) -> carry C-77-g. SECOND chartered feature descoped this batch; like the first it is registered, not dropped. FOLDED: LLR-111.2.",
-    "R6_rerender_selection": "PRESERVE the selection if the region still exists, else fall back to the first. No input document stated a policy. Requires TWO acceptance arms: a lone 'preserved' arm is green on an implementation that never re-selects, and a lone 'fallback' arm is green on one that always resets - neither alone distinguishes the spec from its two failure modes. Interacts with HLR-116: focus must follow selection or the keyboard story silently regresses. FOLDED: HLR-116, split into AT-B77-13 (preserve) and AT-B77-14 (fallback) per C-18, plus LLR-116.4/116.5."
+    "R6_rerender_selection": "PRESERVE the selection if the region still exists, else fall back to the first. No input document stated a policy. Requires TWO acceptance arms: a lone 'preserved' arm is green on an implementation that never re-selects, and a lone 'fallback' arm is green on one that always resets - neither alone distinguishes the spec from its two failure modes. Interacts with HLR-116: focus must follow selection or the keyboard story silently regresses. FOLDED: HLR-116, split into AT-B77-13 (preserve) and AT-B77-14 (fallback) per C-18, plus LLR-116.4/116.5.",
+    "R7_overflow": "WIDEN THE BAR FIRST, THEN AGGREGATE. (1) Rebalance the layout: the bar gets only 21 of the 52 columns #map_grid has at 120x30 - give it a larger share via CSS, MEASURING both axes and the whole pane budget first (C-23/C-29), since a weight that fits the bar can starve a sibling off-screen. (2) Where it still overflows, merge the SMALLEST ADJACENT runs into one aggregate segment with a '+N more' disclosure, following R-TUI-098's precedent of naming only items that actually lost content. HLR-111 also needs a NORMATIVE ALLOCATION BOUND over n_runs + n_gaps vs measured width - an output-shaped predicate cannot bound an allocation (batch-74)."
   },
   "phase1_new_findings": {
     "N-1": "THE TWO REGIMES REDDEN ON DIFFERENT LIMBS, and this corrects the QA lane. 80x24: visible>=1 True, monotone True, strict FALSE -> conjunction RED via strict. 120x30: visible>=1 FALSE, monotone True, strict TRUE -> conjunction RED via visible. At 120x30 two runs clip to 0 and 1 > 0 SATISFIES strictness, so the strict limb is GREEN at the broken regime. Consequence: AT-B77-01 must stay a SINGLE three-way conjunction - splitting it, or dropping either limb, ships one regime green. The monotone limb alone is green at both sizes and carries no falsifying power.",
@@ -157,5 +167,14 @@
     "phase0": "AWAITING GATE - 00-measurements.md and PLAN.md written; 15 premises evaluated; 7 stories classified (6 READY, 1 OUT); no ids minted; no requirements derived.",
     "next": "Phase 2 cross-agent review: architect + qa-reviewer + security-reviewer in parallel over 01-requirements.md.",
     "phase1": "APPROVED. Ids batch-scoped (no reservation PR). Two chartered features DESCOPED and registered as carries: C-77-f (o=open-hex keyboard affordance) and C-77-g (2-col fold marker + size label)."
+  },
+  "phase2_review": {
+    "verdict": "BLOCK FROM ALL THREE LANES - 12 blockers (architect 7, QA 4, security 1), plus majors. Forces iterate-to-refine per the flow; not a discretionary gate.",
+    "convergent_finding": "RUNS vs RANGES, found INDEPENDENTLY by the architect and QA lanes - the strongest signal in the set. BandSegments are RUNS from _merge_band_runs, which SPLITS ON BAND CHANGE; they are not loaded.ranges. QA measured ONE range producing FOUR BandSegments; architect measured 14 run starts vs 11 range starts on prg.s19. Consequence: the C-31 completeness guard at :144 is FALSE on shipped fixtures, holding only because our sparse fixture is entropy-HOMOGENEOUS per range - a fixture coincidence, in the very guard written to prevent fixture-shaped input sets. And visible_cols is per-SEGMENT, so when 1 range yields 4 segments the monotonicity clause has NO SUBJECT.",
+    "design_wall": "architect B-1/B-2: the specified design fails on examples/case_00_public/prg.s19, a fixture that SHIPS IN THIS REPO - 5 runs invisible at BOTH regimes, 9 and 10 segments painted outside. The cause is arithmetic: 14 runs + 10 gaps = 24 segments into a 21-column container. Onset at 6 regions; at 10 regions all widths collapse to 1 (the strict limb dies - the relocation I explicitly asked the lane to check for); above 11 runs it is impossible by counting. R1 was necessary but NOT SUFFICIENT. Resolved by operator ruling R-7.",
+    "security_blocker": "HLR-116 auto-select moves an EXISTING untrusted-text sink onto the load path with no acceptance - #map_detail_body carries A2L names and ValidationIssue text, and today a deliberate click gates it. The four NEW label surfaces are all clean (B3 holds by construction, security could not falsify it); this is an existing sink made newly REACHABLE, which is why the B3 analysis correctly missed it.",
+    "false_docstring_I_VERIFIED": "safe_text's docstring (screens_directionb.py:688) claims it neutralises 'raw ANSI bytes ... no style/ANSI leak'. EXECUTED: safe_text('sensor\u001b[31m_evil[red]') returns the string UNCHANGED - ESC survives, 21 chars billed for 16 visible. The MARKUP half is true, the ANSI half is FALSE. A false claim in SHIPPED SOURCE became this spec's premise via its 'already C-17-hardened' line. Consequence lands on this batch specifically: a hostile A2L symbol inflates rendered width by invisible bytes, distorting the layout arithmetic the batch exists to reconcile.",
+    "meta_finding": "QA: the section 9 mutation table was marked DISCHARGED with a checkmark but is a PREDICTION over code that does not exist yet. C-39/C-40 require executed transcripts. A prediction wearing a discharge mark is the exact defect class this batch keeps finding, this time inside the document written to prevent it.",
+    "confirmed_sound": "N-1 reproduced byte-for-byte by two lanes; N-2 confirmed (17/97); R-6 two-arm split correct (each mutation reddens exactly one arm) though gated on QA B-3; ID namespace clean; all 14 AT / 29 TC allocated exactly once; zero should/deberia in Statements; Amendments A/B verbatim-correct; Amendment C drops no observable; all increments <=5 files; frozen boundary 0 intersections; the four new label surfaces clean; colour discipline sound."
   }
 }
