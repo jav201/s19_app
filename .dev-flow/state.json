@@ -50,7 +50,7 @@
   "iterations_per_phase": {
     "0": 0,
     "1": 2,
-    "2": 2,
+    "2": 3,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -145,6 +145,12 @@
       "date": "2026-08-01",
       "decision": "R-10 split aggregation to batch-78; R-11 pull the ANSI scrub fix in. Revision 3.",
       "notes": "Operator-ruled rather than iterating a third time. Phase-2 iteration would have been 3, the flow's soft cap. The split seam is measured, not judged: one fixture crosses the onset, the bound alone fixes 16 of 17, and 7 of 8 blockers travel with aggregation."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "3-iteration soft cap reached and SURFACED; operator ruled continue to revision 4",
+      "notes": "Root cause named rather than looped on: propagation - a change applied where noticed, not swept to its dependents. Both non-architect lanes are clear (security CLEAN, QA no blockers) and the architect's own disposition is edits-not-design, so continuing is evidence-based rather than optimistic. Revision 4 re-gates the ARCHITECT lane only, per the operator's選択."
     }
   ],
   "phase1_operator_rulings": {
@@ -207,5 +213,15 @@
     "genuinely_fixed": "Bar widens 21->50; prg.s19 fits EXACTLY at both regimes (sum 66 into 66, 50 into 50), all visible, monotone, strict, outside=0, agg=0; 15 further shipped fixtures + 3 synthetic classes pass; no regime regresses. The detached-widget defect, the runs-vs-ranges guard, the vacuous 1fr ruler clause and the false ANSI docstring are all confirmed fixed by execution. All three author self-caught errors genuinely repaired.",
     "security_X1_self_correction": "The security lane WITHDREW ITS OWN rev-1 rationale, which rev 2 had adopted: 'distorting the very layout arithmetic R-7 exists to reconcile' is FALSE on execution. A hostile payload inflated the detail body 277->708 chars with ESC present while .map-band-bar, #map_grid and #map_detail were BYTE-IDENTICAL at both regimes - #map_detail is width:36 FIXED, never content-sized. AN ATTACKER CANNOT PERTURB THE BAR THROUGH A SYMBOL NAME. I had repeated this claim to the operator TWICE and corrected it in-conversation. The finding stands on its real grounds; the rationale is withdrawn before it becomes batch-78's premise.",
     "lanes_caught_own_probes_again": "QA's first Inc-1 probe read bar=0 everywhere because it held a PRE-RE-RENDER widget reference - its own B-3 trap, committed inside the probe verifying B-3's fix."
+  },
+  "phase2_gate3": {
+    "verdict": "security CLEAN (2 minor gate-cell fixes) | QA NO BLOCKERS (4 majors) | architect BLOCK 3, own disposition 'two edits and one small decision - no re-scoping'. R-10 and R-11 are working.",
+    "root_cause_named_at_the_cap": "PROPAGATION. Across all three gate rounds the same failure: a change is applied where it was NOTICED and not propagated to everything that depends on it. R-10's domain landed on HLR-111's Statement and the AT labels but not its LLR children and not HLR-112 at all. Earlier, a design was validated on ONE fixture rather than the fixture set. Same shape, different layer. Revision 4 must run an EVIDENCED propagation sweep in section 6.4 over R-1..R-11, not merely fix the three instances.",
+    "converged_again": "HLR-112 left universal + the dangling LLR-112.2 reference were found INDEPENDENTLY by the architect and QA lanes. Third convergence of the batch.",
+    "opposite_defects_same_gate": "Inc-2's gate is simultaneously VACUOUS (architect: before Inc-7's auto-select the detail body is _DETAIL_HINT, so AT-B77-15a/b are green on ANY implementation) and RED-ON-CORRECT (QA: LLR-116.6 and the AT block still say 'payload verbatim' while LLR-116.7 correctly says non-CONTROL characters verbatim, and post-scrub the ESC payload is deliberately not verbatim). Both true because the lanes tested different limbs. Pulling the scrub early to avoid a red gate produced a gate that can neither fail nor pass.",
+    "split_debris_found": "QA M-3: section 5.3 'Batch acceptance criteria' was DELETED between rev 2 and rev 3 (numbering jumps 5.2 -> 5.4), taking the frozen-engine diff gate, the full-suite baseline and 0-blockers-at-merge with it, with nothing in 6.4 recording a decision. Collateral from the R-10 removal - exactly the debris class I asked the lanes to hunt.",
+    "my_figures_wrong_a_third_time": "I reported case_08 as 99.5%/99.9% runs unseen. Those reproduce only on the PRISTINE producer + CSS alone (gaps unfolded). With batch-77's actual producer: 768/801 = 95.9% and 776/801, outside=1535/1551. THE BATCH MEASURABLY IMPROVES case_08 and the document understated its own work. Both lanes agree on the corrected figures. Underneath: the out-of-domain degradation rule is UNSPECIFIED, so those numbers are implementation-defined rather than a contract.",
+    "security_clean_detail": "The scrub is a BYTE-CLASS filter, not a pattern - which is why it catches U+009B and U+009D (single-byte C1 CSI/OSC carrying no ESC, which any pattern-based filter passes). 11 evasion forms probed, 0 residual control bytes. Identity damage 0/14. AST census over 85 call sites in 4 modules: 0 literal-argument control chars. The ESC limb now genuinely flips True->False under mutation where rev 2's was False->False. Forward flag carried into revision 4 as a NORMATIVE shall: an implementer must not substitute a regex.",
+    "fourth_lane_self_correction": "Security retracted its own out-of-domain probe reading 1267 ms at n=20,000 that looked quadratic - its probe was recomputing sum() per element. Fourth self-caught probe defect across the lanes this batch; every one would have been a false finding reported with a real transcript."
   }
 }
