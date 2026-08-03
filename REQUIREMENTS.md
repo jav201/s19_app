@@ -4362,6 +4362,51 @@ activation posts none.
   `test_at_r3_region_click_detail_names_a2l_symbol_literally` (detail re-wire + hostile-name literal))
 - Status: Added in batch `2026-07-14-batch-45` (US-045c / R-TUI-062, LLR-045C.1–.3). Frozen-engine
   diff = 0.
+- **Amended in batch `2026-08-01-batch-77` Inc-7** (US-77-6 / HLR-116 + HLR-117, LLR-116.1–.5,
+  LLR-117.1–.2). A region is now selected, inspected and focused **without any operator gesture**, and
+  the selected row is visually distinguishable.
+  - **Before:** `#map_detail_body` held `_DETAIL_HINT` until a real click; `RegionRow.can_focus` was
+    `False`, so `row.focus()` was a silent no-op and the arrow keys never reached the map; no row
+    carried any selection marker (measured pre-change on `case_02` at both regimes: 4 rows,
+    `can_focus` False on every one, body == `_DETAIL_HINT`, 0 markers).
+  - **After:** on every render that emits ≥1 run, a **post-refresh hook** resolves the selection to the
+    previously selected region when a region with that **start address** is present among the newly
+    rendered rows and to the first region otherwise, populates `#map_detail_body` for it, moves a
+    `map-region-selected` marker to exactly that row, and places focus on it. Matching is by ADDRESS,
+    never by index — a re-merge changes how many runs precede the selection. The hook is required
+    because `grid.mount()` is **deferred**: "after the rows are mounted" is not a synchronous point
+    inside `render_ranges`, and resolving inline reaches only the stale rows
+    `grid.remove_children()` has already scheduled for removal.
+  - Auto-selection **never** posts `OpenInHexRequested` — the single/double-click split of batch-67 N4a
+    is untouched and stays the only path to hex.
+  - The focused row is asserted **LIVE**, not merely identical: `app.focused in query(RegionRow)` **and**
+    `is_attached` **and** the start matches. Identity alone reads `True` on a fully detached widget.
+  - **Focus entry (OQ-4, decided at Inc-7): programmatic `row.focus()` from the hook, guarded on the
+    panel being displayed.** The shared rail tab chain is NOT widened (it would reorder focus on all
+    nine screens) and no `AUTO_FOCUS` is declared (it fires once at mount, not per render). The display
+    guard is load-bearing: `update_memory_map()` runs on every load/unload whatever screen is active,
+    and `Widget.focusable` consults `visible` (the `visibility` rule) and **not** `display`, while the
+    rail hides an inactive screen with `.hidden { display: none }`. Executed counterfactual at both
+    regimes: without the guard `app.focused` went `RailItem → RegionRow` on a screen that was not being
+    painted. **The selection is still resolved while hidden; only focus is withheld.**
+  - The selection style is a **background plus weight only** — no `color:` and no `text-style: reverse`.
+    `reverse` satisfies a naive "sets no `color:` property" check while swapping the band colour into
+    the background, which would destroy the entropy channel the row exists to carry. The `band-*` class
+    is never added, removed or overridden by selection.
+- Code (batch-77 Inc-7): `s19_app/tui/screens_directionb.py` (`RegionRow.can_focus`,
+  `MemoryMapPanel._apply_auto_selection` / `_select_region` / `_live_region_rows` / `_is_displayed`);
+  `s19_app/tui/styles.tcss` (`.map-region-row.map-region-selected`)
+- Validation (batch-77 Inc-7): `Automated` via `tests/test_tui_map_big.py`
+  (`test_b77_select_fresh_render_inspects_run_one_without_navigating` (AT-B77-11),
+  `test_b77_select_rerender_preserves_a_region_still_present` (AT-B77-13),
+  `test_b77_select_rerender_falls_back_when_the_region_is_gone` (AT-B77-14),
+  `test_b77_style_selected_row_differs_from_every_unselected_row` (AT-B77-12 + TC-B77-25),
+  `test_b77_style_band_token_survives_selection`,
+  `test_b77_style_selection_rule_sets_no_foreground_and_no_inversion`,
+  `test_tc_b77_21_…` / `_22_…` / `_23_…` / `_24_…` / `_29_…` / `_31_…`,
+  `test_b77_select_focus_is_not_taken_while_the_map_screen_is_hidden`) and
+  `tests/test_tui_hostile_map.py` (`AT-B77-15a`/`AT-B77-15b`, now parametrized over the `click` **and**
+  `autoselect` drives — Inc-7 is what makes the auto-select path reach that sink at all).
 
 ---
 

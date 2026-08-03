@@ -1333,6 +1333,17 @@ class RegionRow(Static):
             - ``MemoryMapPanel._build_band_widgets``
     """
 
+    #: batch-77 LLR-116.1. The row is the map's keyboard subject: the panel
+    #: focuses the auto-selected row after every render (LLR-116.5) and the
+    #: arrow keys walk the list from there (HLR-115). ``row.focus()`` is a
+    #: silent NO-OP while this is False — ``Screen.set_focus`` ignores a widget
+    #: whose ``focusable`` is False — so this is a precondition of the focus
+    #: clause, not a convenience. Checked against ``dir(Widget)``: ``can_focus``
+    #: IS a Widget class attribute (default False), so this OVERRIDES a known
+    #: name rather than shadowing an internal one (the ``_nodes``/``_context``
+    #: hazard). Same declaration form as ``IssueRow``/``CheckRow``.
+    can_focus = True
+
     class Activated(Message):
         """A region row was clicked, carrying the click-chain length.
 
@@ -2003,6 +2014,11 @@ class MemoryMapPanel(Container):
     #: image is never mislabelled "No file loaded" (fix-memmap-entropy AC-3).
     _NO_ENTROPY_TEXT = "No entropy detail for this image."
     _DETAIL_HINT = "Click a region to inspect it - double-click to open in hex."
+    #: The selection marker class (batch-77, LLR-117.1). Carried in ADDITION to
+    #: the row's ``band-*`` token, never in place of it: ``styles.tcss`` sets a
+    #: background only, so the band's foreground colour survives selection
+    #: (LLR-117.2).
+    _SELECTED_ROW_CLASS = "map-region-selected"
 
     class OpenInHexRequested(Message):
         """The operator asked to jump to the hex view at a cell's start (US-036).
@@ -2177,6 +2193,11 @@ class MemoryMapPanel(Container):
         self._a2l_tags = list(a2l_tags)
         self._mem_map = mem_map or {}
         self._run_bands = {}
+        # Read BEFORE ``_reset_detail()``, which nulls it. This is the only
+        # carrier of the prior selection across a re-render (LLR-116.4), and it
+        # is an ADDRESS, never an index — a re-merge changes how many runs
+        # precede the selected one.
+        previous_start = self._selected_cell_start
         self._reset_detail()
 
         span_start, span_end = derive_image_span(ranges)
@@ -2219,6 +2240,13 @@ class MemoryMapPanel(Container):
             )
         )
         self.call_after_refresh(self._resize_band_segments)
+        # ``grid.mount()`` is DEFERRED, so the rows are not queryable here and
+        # "after the rows are mounted" is not a synchronous point inside this
+        # method. Resolving inline is what produced the detached-focus defect:
+        # the resolution ran against the OLD row set, which
+        # ``grid.remove_children()`` had already scheduled for removal
+        # (LLR-116.2).
+        self.call_after_refresh(self._apply_auto_selection, previous_start)
 
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
         summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
@@ -2888,6 +2916,81 @@ class MemoryMapPanel(Container):
         """
         event.stop()
         start, end = event.region_start, event.region_end
+        self._select_region(start, end)
+        # N4a: inspect always, navigate only on a deliberate double click.
+        if event.chain >= 2:
+            self.post_message(self.OpenInHexRequested(start))
+
+    def _live_region_rows(self) -> List[RegionRow]:
+        """The region rows of the CURRENTLY mounted region list.
+
+        Summary:
+            ``render_ranges`` calls ``grid.remove_children()`` and the removal
+            is DEFERRED, so during the prune window the old rows and the new
+            ones are BOTH returned by ``self.query(RegionRow)`` — a panel-wide
+            query cannot tell them apart, and selecting or focusing a stale one
+            leaves the operator on a widget that is about to vanish
+            (``is_attached`` False, ``parent`` None) while every identity
+            predicate still reads True.
+
+            Resolving the list container with ``.last()`` and reading ITS
+            children is the same disambiguation ``_resize_band_segments`` uses
+            for the bar, and for the same reason: ``remove_children()`` precedes
+            ``mount()`` and ``mount()`` appends, so the surviving container is
+            always last in DOM order.
+
+        Returns:
+            List[RegionRow]: The mounted rows in ascending address order (the
+            order ``_build_band_widgets`` emitted them in), or ``[]`` when no
+            image is rendered.
+
+        Dependencies:
+            Used by:
+                - ``_apply_auto_selection`` / ``_select_region``
+        """
+        try:
+            region_list = self.query(".map-region-list").last()
+        except Exception:
+            # No image rendered — nothing mounted to select.
+            return []
+        return [
+            child for child in region_list.children if isinstance(child, RegionRow)
+        ]
+
+    def _select_region(self, start: int, end: int) -> None:
+        """Populate the inspector for ``[start, end)`` and mark its row.
+
+        Summary:
+            The single owner of "a region is selected": it stores the selection
+            address, writes ``#map_detail_body`` (the retained
+            ``build_detail_text`` body plus size, dominant band and hex peek —
+            batch-45 LLR-045C, batch-47 R-TUI-074), and moves the
+            ``_SELECTED_ROW_CLASS`` marker to the row whose ``region_start``
+            equals ``start`` (LLR-117.1, matched by ADDRESS, never by index).
+
+            It deliberately posts NOTHING. ``OpenInHexRequested`` is the click
+            handler's decision alone, which is what keeps auto-selection from
+            navigating (LLR-116.3) — the absence is structural rather than a
+            flag this method has to be trusted to read.
+
+            The marker is ADDED to the row's class list; no ``band-*`` class is
+            touched, so the entropy band channel survives selection
+            (LLR-117.2).
+
+        Args:
+            start (int): The selected run's inclusive start address.
+            end (int): The selected run's exclusive end address.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``cell_status`` / ``build_detail_text`` / ``band_style`` /
+                  ``human_bytes`` / ``_region_hex_peek`` / ``_live_region_rows``
+            Used by:
+                - ``on_region_row_activated`` (click) / ``_apply_auto_selection``
+        """
         self._selected_cell_start = start
         status = cell_status(start, end, self._ordered_ranges)
         detail = self.build_detail_text(start, end, status)
@@ -2901,9 +3004,69 @@ class MemoryMapPanel(Container):
         detail.append(self._region_hex_peek(start, end))
         body = self.query_one("#map_detail_body", Static)
         body.update(detail)
-        # N4a: inspect always, navigate only on a deliberate double click.
-        if event.chain >= 2:
-            self.post_message(self.OpenInHexRequested(start))
+        for row in self._live_region_rows():
+            row.set_class(row.region_start == start, self._SELECTED_ROW_CLASS)
+
+    def _apply_auto_selection(self, previous_start: Optional[int]) -> None:
+        """Resolve, apply and focus the selection after a render (HLR-116).
+
+        Summary:
+            Runs on the post-refresh hook ``render_ranges`` schedules, which is
+            the first point at which the newly mounted rows are queryable.
+            Resolution is ``LLR-116.4``: the previously selected region when a
+            region with that START ADDRESS is present among the new rows, the
+            first region otherwise. Address, not index — a re-merge changes how
+            many runs precede the selection, so an index would silently follow
+            a different region.
+
+            Focus then follows the resolved selection (``LLR-116.5``) so the
+            operator's arrow keys act on the map instead of resuming wherever
+            they were.
+
+        Args:
+            previous_start (Optional[int]): The selection address captured
+                before ``_reset_detail()`` cleared it, or ``None`` on a first
+                render.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads the mounted rows via ``_live_region_rows``; writes the
+              inspector, the marker class and the app focus.
+
+        Dependencies:
+            Uses:
+                - ``_live_region_rows`` / ``_select_region``
+            Used by:
+                - ``render_ranges`` (via ``call_after_refresh``)
+        """
+        rows = self._live_region_rows()
+        if not rows:
+            # No image, or the render was superseded — fabricate no selection.
+            return
+        starts = [row.region_start for row in rows]
+        index = starts.index(previous_start) if previous_start in starts else 0
+        row = rows[index]
+        self._select_region(row.region_start, row.region_end)
+        # ``focus()`` is checked against DISPLAY, not just ``focusable``.
+        # ``Widget.focusable`` consults ``visible`` (the ``visibility`` rule)
+        # and NOT ``display`` — measured against textual 8.2.8 — while the rail
+        # hides an inactive screen with ``.hidden { display: none }``. Loading a
+        # file drives ``update_memory_map()`` whatever screen the operator is
+        # on, so an unguarded focus would move the keyboard to an invisible row
+        # on every load, on all nine screens. Focus is taken only when the map
+        # is the screen actually being painted.
+        if row.focusable and self._is_displayed():
+            row.focus()
+
+    def _is_displayed(self) -> bool:
+        """True while no ancestor (or the panel itself) is ``display: none``."""
+        return all(
+            node.display
+            for node in self.ancestors_with_self
+            if isinstance(node, Widget)
+        )
 
     def _region_hex_peek(self, start: int, end: int) -> Text:
         """Render a ≤3-row hex peek at a region's start (batch-47, R-TUI-074).

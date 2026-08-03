@@ -1255,3 +1255,807 @@ def test_b77_golden_is_stored_lf_only_and_covers_both_regimes() -> None:
     assert regimes.count("80x24") == 2 and regimes.count("120x30") == 2, (
         f"the golden must carry both runs at both regimes; got {regimes}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-77 Inc-7 — HLR-116 auto-select + HLR-117 selection styling
+#
+# Shared drive helpers. Every arm below reaches the panel through the SHIPPED
+# surface (``action_show_screen("map")`` → ``update_memory_map()``), never by
+# calling the resolution hook directly: the whole point of LLR-116.2 is that
+# the resolution is DEFERRED, and a test that called it inline would be green
+# on an implementation that resolves against the stale, about-to-be-removed
+# rows.
+# ---------------------------------------------------------------------------
+_SELECTED_CLASS = "map-region-selected"
+_STYLES_TCSS = Path("s19_app/tui/styles.tcss")
+
+
+def _blocks_image(tmp_path: Path, name: str, blocks):
+    """Build a deterministic multi-run image from ``[(base, kind)]`` blocks.
+
+    ``kind`` is ``"const"`` (0xFF fill → ``constant/padding``, H == 0) or
+    ``"high"`` (a seeded permutation of 0..255 → ``high/random``, H == 8).
+    Each block is 256 bytes; bases are far enough apart that the loader derives
+    one range per block and ``_merge_band_runs`` emits one run each. The run
+    population is ASSERTED by every caller that depends on it rather than
+    assumed — a fixture that silently merged two blocks would make several of
+    the clauses below vacuous.
+    """
+    mem_map = {}
+    ranges = []
+    for index, (base, kind) in enumerate(blocks):
+        if kind == "const":
+            for offset in range(256):
+                mem_map[base + offset] = 0xFF
+        else:
+            values = list(range(256))
+            random.Random(20260801 + index).shuffle(values)
+            for offset, value in enumerate(values):
+                mem_map[base + offset] = value
+        ranges.append((base, base + 256))
+    path = tmp_path / name
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    return build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+
+def _panel(app: S19TuiApp) -> MemoryMapPanel:
+    return app.query_one("#memory_map_panel", MemoryMapPanel)
+
+
+def _live_rows(app: S19TuiApp):
+    """The rows of the CURRENTLY mounted region list, in emission order.
+
+    Deliberately NOT ``app.query(RegionRow)``: ``grid.remove_children()`` is
+    deferred, so a panel-wide query returns the stale rows alongside the fresh
+    ones during the prune window. That is the same trap the focus predicates
+    below exist to catch, and an oracle that fell into it could not detect it.
+    """
+    return _panel(app)._live_region_rows()
+
+
+def _markers(app: S19TuiApp):
+    return [row for row in _live_rows(app) if _SELECTED_CLASS in row.classes]
+
+
+def _style_triple(row):
+    """The layer that HOLDS the selection fact (P-42, executed).
+
+    ``render().spans`` is ``[]`` on these rows — the content is a plain ``Text``
+    with no style — so C-37's span route is inapplicable and ``render_line``
+    returns the base theme colour. The resolved style lives on the widget.
+    """
+    return (
+        str(row.styles.background),
+        str(row.styles.color),
+        str(row.styles.text_style),
+    )
+
+
+def _band_tokens(row):
+    return {cls for cls in row.classes if cls.startswith("band-")}
+
+
+async def _settle_selection(pilot, panel, max_pauses: int = 10) -> bool:
+    """Pause until the deferred resolution has applied, or give up.
+
+    Returns True once ``_selected_cell_start`` is set, after ONE further pause
+    for ``focus()``'s own ``call_later``. Callers asserting an ABSENCE use a
+    fixed pause count instead — no condition can signal "nothing will happen".
+    """
+    for _ in range(max_pauses):
+        await pilot.pause()
+        if panel._selected_cell_start is not None:
+            await pilot.pause()
+            return True
+    return False
+
+
+class _PostRecorder:
+    """Record every message the panel posts, then delegate to the real method.
+
+    LLR-116.3 forbids AUTO-SELECTION from posting ``OpenInHexRequested``.
+    ``post_message`` is the layer that claim is about — asserting on the app's
+    hex screen instead would also pass if the message were posted and dropped.
+    """
+
+    def __init__(self, panel: MemoryMapPanel) -> None:
+        self.posted = []
+        self._real = panel.post_message
+        panel.post_message = self._record  # type: ignore[method-assign]
+
+    def _record(self, message):
+        self.posted.append(message)
+        return self._real(message)
+
+    def open_in_hex(self):
+        return [
+            m for m in self.posted
+            if isinstance(m, MemoryMapPanel.OpenInHexRequested)
+        ]
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-11 — fresh render selects run 1 and never navigates (LLR-116.2/.3/.5)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_select_fresh_render_inspects_run_one_without_navigating(
+    tmp_path: Path, size
+) -> None:
+    """Zero clicks, zero keys: run 1 is inspected, focused LIVE, no nav posted.
+
+    Four claims in one node because three of them are only meaningful together:
+
+    - the inspector NAMES run 1 (the presence co-assertion, C-40);
+    - EXACTLY ZERO ``OpenInHexRequested`` are posted (LLR-116.3) — an absence
+      clause which, without the presence clause above, would be green on a
+      panel that did nothing at all;
+    - the recorder can SEE a post, demonstrated in the same run by driving a
+      chain-2 activation afterwards and observing 1. Without this control the
+      zero is equally consistent with a recorder that was never wired up;
+    - focus is on a row that is ATTACHED and PRESENT among the live rows, not
+      merely one whose ``region_start`` matches (LLR-116.5). Identity alone
+      reads True on a fully detached widget — measured at Phase 2:
+      ``is_attached=False``, ``parent=None``, the focused row absent from the
+      live set, and the identity threshold still True.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            recorder = _PostRecorder(panel)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            focused = app.focused
+            observed = {
+                "settled": settled,
+                "n_rows": len(rows),
+                "first_start": rows[0].region_start if rows else None,
+                "selected": panel._selected_cell_start,
+                "detail": app.query_one("#map_detail_body").render().plain,
+                "auto_nav": len(recorder.open_in_hex()),
+                "focus_is_row": isinstance(focused, RegionRow),
+                "focus_live": focused in set(rows),
+                "focus_attached": bool(focused is not None and focused.is_attached),
+                "focus_start": getattr(focused, "region_start", None),
+                "markers": [r.region_start for r in _markers(app)],
+            }
+            # Positive control for the absence clause: the SAME recorder must
+            # observe a real chain-2 activation. Driven only after every
+            # assertion subject above has been captured.
+            panel.on_region_row_activated(
+                RegionRow.Activated(
+                    rows[0].region_start, rows[0].region_end, chain=2
+                )
+            )
+            await pilot.pause()
+            observed["nav_after_double"] = len(recorder.open_in_hex())
+            return observed
+
+    got = asyncio.run(_drive())
+
+    assert got["settled"], f"{size}: the deferred resolution never ran: {got}"
+    assert got["n_rows"] >= 2, (
+        f"{size}: the fixture must render ≥2 runs or 'run 1 was selected' is "
+        f"indistinguishable from 'any run was selected'; got {got}"
+    )
+    assert got["selected"] == got["first_start"], (
+        f"{size}: a fresh render must resolve to run 1; got {got}"
+    )
+    assert f"0x{got['first_start']:08X}" in got["detail"], (
+        f"{size}: #map_detail_body must NAME run 1 — this is the presence "
+        f"co-assertion the zero-navigation clause depends on; got {got}"
+    )
+    assert got["auto_nav"] == 0, (
+        f"{size}: auto-selection must post ZERO OpenInHexRequested "
+        f"(LLR-116.3); got {got}"
+    )
+    assert got["nav_after_double"] == 1, (
+        f"{size}: CONTROL — the recorder must be able to observe a post at "
+        f"all; a chain-2 activation produced {got['nav_after_double']}, so the "
+        f"zero above would have been vacuous. {got}"
+    )
+    assert got["focus_is_row"] and got["focus_live"] and got["focus_attached"], (
+        f"{size}: focus must be on a LIVE, ATTACHED region row, not merely on "
+        f"a widget whose region_start matches (LLR-116.5); got {got}"
+    )
+    assert got["focus_start"] == got["selected"], (
+        f"{size}: the focused row's start must equal the resolved selection; "
+        f"got {got}"
+    )
+    assert got["markers"] == [got["selected"]], (
+        f"{size}: exactly one row carries the selection marker, at the "
+        f"resolved address; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-13 / AT-B77-14 — re-render resolution by ADDRESS (LLR-116.4, R-6)
+# ---------------------------------------------------------------------------
+async def _rerender(pilot, app, first, second, select_index):
+    """Render ``first``, select one of its rows, then render ``second``."""
+    await pilot.pause()
+    app.current_file = first
+    app.action_show_screen("map")
+    panel = _panel(app)
+    app.update_memory_map()
+    assert await _settle_selection(pilot, panel), "first render never resolved"
+    rows_a = _live_rows(app)
+    target = rows_a[select_index]
+    panel._select_region(target.region_start, target.region_end)
+    await pilot.pause()
+    starts_a = [r.region_start for r in rows_a]
+    app.current_file = second
+    app.update_memory_map()
+    assert await _settle_selection(pilot, panel), "re-render never resolved"
+    rows_b = _live_rows(app)
+    focused = app.focused
+    return {
+        "starts_a": starts_a,
+        "starts_b": [r.region_start for r in rows_b],
+        "pre_selected": target.region_start,
+        "selected": panel._selected_cell_start,
+        "detail": app.query_one("#map_detail_body").render().plain,
+        "focus_live": focused in set(rows_b),
+        "focus_attached": bool(focused is not None and focused.is_attached),
+        "focus_start": getattr(focused, "region_start", None),
+        "markers": [r.region_start for r in _markers(app)],
+    }
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_select_rerender_preserves_a_region_still_present(
+    tmp_path: Path, size
+) -> None:
+    """AT-B77-13 — the selection survives a re-render that still holds it.
+
+    The pre-selected run is asserted NOT to be run 1: a resolution that always
+    reset to ``ordered[0]`` would be indistinguishable from a correct one on a
+    first-row fixture.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            return await _rerender(pilot, app, loaded, loaded, -1)
+
+    got = asyncio.run(_drive())
+
+    assert len(got["starts_b"]) >= 2, f"{size}: need ≥2 runs; got {got}"
+    assert got["pre_selected"] != got["starts_b"][0], (
+        f"{size}: the preserved run must NOT be run 1, or 'preserved' and "
+        f"'reset to first' produce the same answer; got {got}"
+    )
+    assert got["pre_selected"] in got["starts_b"], (
+        f"{size}: PRECONDITION — this arm requires the region to be PRESENT "
+        f"after the re-render; got {got}"
+    )
+    assert got["selected"] == got["pre_selected"], (
+        f"{size}: a present region must be PRESERVED across a re-render "
+        f"(LLR-116.4); got {got}"
+    )
+    assert f"0x{got['pre_selected']:08X}" in got["detail"], (
+        f"{size}: the inspector must name the preserved run; got {got}"
+    )
+    assert got["focus_live"] and got["focus_attached"], (
+        f"{size}: the focused row must be LIVE and ATTACHED after the "
+        f"re-render — the remount window is exactly where a detached row "
+        f"satisfies the identity predicate; got {got}"
+    )
+    assert got["focus_start"] == got["pre_selected"], (
+        f"{size}: focus must follow the preserved selection; got {got}"
+    )
+    assert got["markers"] == [got["pre_selected"]], (
+        f"{size}: exactly one marker, on the preserved row; got {got}"
+    )
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_select_rerender_falls_back_when_the_region_is_gone(
+    tmp_path: Path, size
+) -> None:
+    """AT-B77-14 — an absent region falls back to the NEW first region.
+
+    Two disjoint images, so the previously selected address cannot survive by
+    accident. The disjointness is asserted, not assumed.
+    """
+    first = _blocks_image(
+        tmp_path, "abs_a.s19", [(0x00100000, "const"), (0x00110000, "high")]
+    )
+    second = _blocks_image(
+        tmp_path, "abs_b.s19", [(0x90000000, "const"), (0x90010000, "high")]
+    )
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            return await _rerender(pilot, app, first, second, -1)
+
+    got = asyncio.run(_drive())
+
+    assert not (set(got["starts_a"]) & set(got["starts_b"])), (
+        f"{size}: PRECONDITION — the two images must have DISJOINT run "
+        f"addresses or 'absent' is not established; got {got}"
+    )
+    assert got["pre_selected"] not in got["starts_b"], (
+        f"{size}: PRECONDITION — the selected region must be absent; got {got}"
+    )
+    assert got["selected"] == got["starts_b"][0], (
+        f"{size}: an absent region must fall back to the NEW first region "
+        f"(LLR-116.4); got {got}"
+    )
+    assert f"0x{got['starts_b'][0]:08X}" in got["detail"], (
+        f"{size}: the inspector must name the new first run; got {got}"
+    )
+    assert got["focus_live"] and got["focus_attached"], (
+        f"{size}: the focused row must be LIVE and ATTACHED; got {got}"
+    )
+    assert got["focus_start"] == got["starts_b"][0], (
+        f"{size}: focus must follow the fallback selection; got {got}"
+    )
+    assert got["markers"] == [got["starts_b"][0]], (
+        f"{size}: exactly one marker, on the new first row; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-12 — the selected row is visually distinguishable (HLR-117)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_style_selected_row_differs_from_every_unselected_row(
+    tmp_path: Path, size
+) -> None:
+    """AT-B77-12 — triple differs ∧ exactly one marker ∧ ≥2 runs (TC-B77-25).
+
+    The BACKGROUND channel is asserted separately from the whole triple, and
+    that separation is load-bearing: ``color`` ALREADY differs between rows of
+    different bands (measured pre-change on this fixture — 4 rows, 2 distinct
+    triples, zero selection styling), so "the selected row's triple differs
+    from every other row's" is satisfiable with NO selection style at all
+    whenever the selected row is the only one of its band. The background is
+    transparent on every unselected row and is what this increment adds, so it
+    is the channel that can discriminate.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            assert await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            return {
+                "n_rows": len(rows),
+                "selected": panel._selected_cell_start,
+                "markers": [r.region_start for r in _markers(app)],
+                "triples": {r.region_start: _style_triple(r) for r in rows},
+                "backgrounds": {
+                    r.region_start: str(r.styles.background) for r in rows
+                },
+            }
+
+    got = asyncio.run(_drive())
+
+    assert got["n_rows"] >= 2, (
+        f"{size}: TC-B77-25 — the fixture must render ≥2 runs; with one run "
+        f"'differs from EVERY unselected row' is vacuously true; got {got}"
+    )
+    assert got["markers"] == [got["selected"]], (
+        f"{size}: exactly one row carries the selection marker (LLR-117.1); "
+        f"got {got}"
+    )
+    sel = got["selected"]
+    others = [start for start in got["triples"] if start != sel]
+    assert others, f"{size}: no unselected row to compare against; got {got}"
+    for start in others:
+        assert got["triples"][sel] != got["triples"][start], (
+            f"{size}: the selected row's (background, color, text_style) must "
+            f"differ from EVERY unselected row's; 0x{sel:08X} vs "
+            f"0x{start:08X}; got {got}"
+        )
+        assert got["backgrounds"][sel] != got["backgrounds"][start], (
+            f"{size}: the difference must be in the BACKGROUND channel — "
+            f"`color` already differs per band, so a triple-only comparison "
+            f"can pass with no selection style applied; got {got}"
+        )
+
+
+def test_b77_style_band_token_survives_selection(tmp_path: Path) -> None:
+    """LLR-117.2 — selecting and MOVING the selection never touches ``band-*``.
+
+    Asserted across a move, not a single application: a marker that replaced
+    the band token would be invisible to a test that only ever looked at one
+    selected row, because that row's band class would already be gone at the
+    first read.
+    """
+
+    async def _drive():
+        loaded = _load_case_02()
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            assert await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            bands_first = {r.region_start: _band_tokens(r) for r in rows}
+            last = rows[-1]
+            panel._select_region(last.region_start, last.region_end)
+            await pilot.pause()
+            rows = _live_rows(app)
+            return {
+                "bands_first": bands_first,
+                "bands_second": {r.region_start: _band_tokens(r) for r in rows},
+                "markers_second": [r.region_start for r in _markers(app)],
+                "moved_to": last.region_start,
+            }
+
+    got = asyncio.run(_drive())
+
+    assert all(got["bands_first"].values()), (
+        f"PRECONDITION — every row must carry a band token to begin with, or "
+        f"'unchanged' is vacuous; got {got}"
+    )
+    assert got["bands_first"] == got["bands_second"], (
+        f"applying or moving the selection marker must not add, remove or "
+        f"override any band-* class (LLR-117.2); got {got}"
+    )
+    assert got["markers_second"] == [got["moved_to"]], (
+        f"the marker must MOVE, leaving exactly one; got {got}"
+    )
+
+
+def test_b77_style_selection_rule_sets_no_foreground_and_no_inversion() -> None:
+    """LLR-117.2's inspection arm, read from the shipped stylesheet.
+
+    Revision 1's wording — "sets no ``color:`` property" — is satisfied by
+    ``text-style: reverse``, which swaps foreground and background and so
+    repaints the band channel through the back door. Both are asserted.
+    """
+    css = _STYLES_TCSS.read_text(encoding="utf-8")
+    match = re.search(
+        r"\.map-region-row\.map-region-selected\s*\{([^}]*)\}", css
+    )
+    assert match, (
+        "the selection rule must exist in styles.tcss as "
+        ".map-region-row.map-region-selected; the runtime style assertions "
+        "would otherwise be passing on a rule from somewhere else"
+    )
+    body = match.group(1)
+    props = {
+        name.strip(): value.strip()
+        for name, value in (
+            line.split(":", 1) for line in body.split(";") if ":" in line
+        )
+    }
+
+    assert "background" in props, (
+        f"the selection must be carried by a background; got {props}"
+    )
+    assert "color" not in props, (
+        f"the selection rule must NOT set a foreground colour — that is the "
+        f"band channel (LLR-117.2); got {props}"
+    )
+    assert "reverse" not in props.get("text-style", ""), (
+        f"the selection rule must NOT use a text style that inverts "
+        f"foreground and background; `reverse` satisfies a naive no-`color:` "
+        f"check while repainting the band colour; got {props}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Boundary catalog — HLR-116
+# ---------------------------------------------------------------------------
+def test_tc_b77_21_b77_select_no_file_keeps_the_hint_and_fabricates_nothing(
+    tmp_path: Path,
+) -> None:
+    """TC-B77-21 — no file: the hint stays, no selection, focus untouched."""
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            app.update_memory_map()
+            # A fixed pause count: no condition can signal "nothing happened".
+            for _ in range(6):
+                await pilot.pause()
+            panel = _panel(app)
+            return {
+                "rows": len(_live_rows(app)),
+                "selected": panel._selected_cell_start,
+                "body": app.query_one("#map_detail_body").render().plain,
+                "hint": panel._DETAIL_HINT,
+                "focus_is_row": isinstance(app.focused, RegionRow),
+            }
+
+    got = asyncio.run(_drive())
+
+    assert got["rows"] == 0, f"no file must render no region row; got {got}"
+    assert got["selected"] is None, f"no selection may be fabricated; got {got}"
+    assert got["body"] == got["hint"], f"the hint must be retained; got {got}"
+    assert not got["focus_is_row"], f"focus must not move to a row; got {got}"
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_22_b77_select_single_run_is_selected_and_marked(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-22 — one run: it is the selection, and it carries the marker."""
+    loaded = _blocks_image(tmp_path, "one.s19", [(0x80000000, "const")])
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            return {
+                "settled": settled,
+                "n_rows": len(rows),
+                "selected": panel._selected_cell_start,
+                "markers": [r.region_start for r in _markers(app)],
+                "focus_start": getattr(app.focused, "region_start", None),
+                "focus_live": app.focused in set(rows),
+            }
+
+    got = asyncio.run(_drive())
+
+    assert got["n_rows"] == 1, (
+        f"{size}: PRECONDITION — this boundary needs exactly one run; got {got}"
+    )
+    assert got["settled"] and got["selected"] == 0x80000000, got
+    assert got["markers"] == [0x80000000], got
+    assert got["focus_start"] == 0x80000000 and got["focus_live"], got
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_23_b77_select_disjoint_file_switch_selects_the_new_first_run(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-23 — switching to a wholly different image never carries over."""
+    first = _blocks_image(
+        tmp_path, "sw_a.s19", [(0x00200000, "const"), (0x00210000, "high")]
+    )
+    second = _blocks_image(
+        tmp_path, "sw_b.s19", [(0xA0000000, "high"), (0xA0010000, "const")]
+    )
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            return await _rerender(pilot, app, first, second, 0)
+
+    got = asyncio.run(_drive())
+
+    assert not (set(got["starts_a"]) & set(got["starts_b"])), (
+        f"{size}: PRECONDITION — the images must be disjoint; got {got}"
+    )
+    assert got["selected"] == got["starts_b"][0], (
+        f"{size}: the new image's first run must be selected; got {got}"
+    )
+    assert got["markers"] == [got["starts_b"][0]], got
+    assert got["focus_live"] and got["focus_start"] == got["starts_b"][0], got
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_24_b77_select_zero_byte_window_selects_without_raising(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-24 — a zero-byte selection window inspects without raising.
+
+    ⚠️ Stated plainly rather than dressed up: the SHIPPED producer cannot emit
+    a zero-byte run — ``_merge_band_runs`` sums entropy-window sample counts,
+    each ≥1 — so this boundary is not reachable through the load path and is
+    exercised at the layer where it IS representable, the selection call. A
+    test claiming to drive it through a loaded image would be asserting over an
+    input the pipeline cannot produce.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            assert await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            start = rows[-1].region_start
+            panel._select_region(start, start)  # end == start: zero bytes
+            await pilot.pause()
+            return {
+                "selected": panel._selected_cell_start,
+                "markers": [r.region_start for r in _markers(app)],
+                "detail": app.query_one("#map_detail_body").render().plain,
+                "target": start,
+            }
+
+    got = asyncio.run(_drive())
+
+    assert got["selected"] == got["target"], got
+    assert got["markers"] == [got["target"]], (
+        f"{size}: a zero-byte window must still mark its own row by address; "
+        f"got {got}"
+    )
+    assert f"0x{got['target']:08X}" in got["detail"], got
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_29_b77_select_preserves_by_address_when_the_index_shifts(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-29 — the preserved run is no longer at its old index.
+
+    THE discriminating case for "match by address, never by index". The second
+    image prepends a run, so the preserved region moves from index 1 to index
+    2. An index-based resolution would land on a DIFFERENT region, and the
+    assertion below names which one it would have picked.
+    """
+    first = _blocks_image(
+        tmp_path, "sh_a.s19", [(0x80010000, "const"), (0x80020000, "high")]
+    )
+    second = _blocks_image(
+        tmp_path,
+        "sh_b.s19",
+        [(0x80000000, "high"), (0x80010000, "const"), (0x80020000, "high")],
+    )
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            return await _rerender(pilot, app, first, second, -1)
+
+    got = asyncio.run(_drive())
+    pre = got["pre_selected"]
+
+    assert pre in got["starts_b"], (
+        f"{size}: PRECONDITION — the run must still be present; got {got}"
+    )
+    old_index = got["starts_a"].index(pre)
+    new_index = got["starts_b"].index(pre)
+    assert old_index != new_index, (
+        f"{size}: PRECONDITION — the index must SHIFT, or address- and "
+        f"index-matching give the same answer and this node proves nothing; "
+        f"got {got}"
+    )
+    assert got["selected"] == pre, (
+        f"{size}: resolution must match by ADDRESS. An index-based resolution "
+        f"would have selected 0x{got['starts_b'][old_index]:08X} (index "
+        f"{old_index} of the new render) instead of 0x{pre:08X}; got {got}"
+    )
+    assert got["focus_start"] == pre and got["focus_live"], got
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_31_b77_select_resolution_runs_on_the_post_refresh_hook(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-31 — the resolution is DEFERRED, not inline (LLR-116.2).
+
+    ``grid.mount()`` is deferred, so "after the rows are mounted" is not a
+    synchronous point inside ``render_ranges``. This asserts the observable
+    consequence: the instant ``update_memory_map()`` returns, ZERO rows are
+    queryable and no selection exists — an inline resolution would therefore
+    have had to run against the OLD, about-to-be-removed row set, which is the
+    mechanism that produced the detached-focus defect. The selection appears
+    only after the refresh boundary.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()  # NO pause: read the synchronous instant
+            immediate = {
+                "rows": len(_live_rows(app)),
+                "any_region_row": len(app.query(RegionRow)),
+                "selected": panel._selected_cell_start,
+                "body_is_hint": (
+                    app.query_one("#map_detail_body").render().plain
+                    == panel._DETAIL_HINT
+                ),
+            }
+            settled = await _settle_selection(pilot, panel)
+            return immediate, settled, panel._selected_cell_start
+
+    immediate, settled, after = asyncio.run(_drive())
+
+    assert immediate["rows"] == 0 and immediate["any_region_row"] == 0, (
+        f"{size}: PRECONDITION — the new rows must NOT be queryable at the "
+        f"instant render_ranges returns, or 'a post-refresh hook is required' "
+        f"is not established; got {immediate}"
+    )
+    assert immediate["selected"] is None and immediate["body_is_hint"], (
+        f"{size}: the selection must NOT be applied inline — at this instant "
+        f"the only rows an inline resolution could reach are the stale ones; "
+        f"got {immediate}"
+    )
+    assert settled and after is not None, (
+        f"{size}: the post-refresh hook must then apply the selection; got "
+        f"settled={settled} after={after}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# OQ-4 — the focus-entry mechanism, and the guard it needs (LLR-116.1/.5)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_select_focus_is_not_taken_while_the_map_screen_is_hidden(
+    tmp_path: Path, size
+) -> None:
+    """Loading a file from another screen must not move focus to a hidden row.
+
+    ``update_memory_map()`` runs on every load and unload, whatever screen the
+    operator is on. ``Widget.focusable`` does NOT protect against this:
+    measured against textual 8.2.8 it consults ``visible`` (the ``visibility``
+    rule) and never ``display``, while the rail hides an inactive screen with
+    ``.hidden { display: none }`` — so an unguarded ``focus()`` moves the
+    keyboard to an invisible region row. Executed counterfactual, both regimes:
+    with the guard removed, ``app.focused`` went ``RailItem -> RegionRow``
+    while ``row.focusable`` was True and the map was not displayed.
+
+    The selection itself IS still applied — only focus is withheld — so the
+    operator finds the map already inspecting run 1 when they switch to it.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            app.current_file = loaded
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            return {
+                "settled": settled,
+                "displayed": panel._is_displayed(),
+                "row_focusable": rows[0].focusable if rows else None,
+                "selected": panel._selected_cell_start,
+                "focus_is_row": isinstance(app.focused, RegionRow),
+            }
+
+    got = asyncio.run(_drive())
+
+    assert not got["displayed"], (
+        f"{size}: PRECONDITION — the map must be hidden for this case; got {got}"
+    )
+    assert got["row_focusable"] is True, (
+        f"{size}: PRECONDITION — the rows must be focusable, or the guard is "
+        f"not what is keeping focus away and this node proves nothing; got {got}"
+    )
+    assert got["settled"] and got["selected"] is not None, (
+        f"{size}: the selection must STILL be resolved while hidden — this is "
+        f"the presence co-assertion for the absence below; got {got}"
+    )
+    assert not got["focus_is_row"], (
+        f"{size}: focus must not move to a row on a screen that is not being "
+        f"painted; got {got}"
+    )

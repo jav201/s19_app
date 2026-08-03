@@ -26,16 +26,25 @@ Summary:
       where it escapes the terminal.
 
 **Why this file drives the sink instead of reading it.**
-    There is no auto-select until Inc-7, so with zero interaction the body
-    still shows ``_DETAIL_HINT`` — no file-derived text at either regime. A
-    test that rendered and read would be **green on any implementation,
+    At Inc-2 there was no auto-select, so with zero interaction the body still
+    showed ``_DETAIL_HINT`` — no file-derived text at either regime. A test
+    that rendered and read would have been **green on any implementation,
     including one with no scrub at all**; that vacuity is exactly what an
     earlier revision of this acceptance shipped. Each arm therefore drives the
-    inspector with a real ``pilot.click`` on a region row (the shipped
-    pre-auto-select path) and then **asserts its own precondition** — that the
+    inspector explicitly and then **asserts its own precondition** — that the
     payload actually reached the body — before any safety limb is evaluated.
     The fix for a gesture that misses is *detection*, not a better gesture: a
     better click only moves the failure.
+
+**Two drive paths since Inc-7 (HLR-116), both gated.**
+    ``click`` is the original: a real ``pilot.click`` on a region row.
+    ``autoselect`` is the path Inc-7 created — the panel populates the
+    inspector for run 1 as a consequence of LOADING, with zero clicks and zero
+    keys. That is the reason ``LLR-116.6`` exists at all, so the safety limbs
+    are re-run over it: it reaches the same sink through a path no operator
+    gesture guards. Both drives keep the precondition assertion, and each names
+    ITS OWN mechanism in the failure message — an ``autoselect`` arm that
+    reported "the click missed" would send a reader to the wrong place.
 
 **Why the payload carries C1 bytes.**
     ``U+009B`` is single-byte CSI and ``U+009D`` single-byte OSC — functional
@@ -68,7 +77,7 @@ from typing import List, Tuple
 import pytest
 
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.screens_directionb import RegionRow, safe_text
+from s19_app.tui.screens_directionb import MemoryMapPanel, RegionRow, safe_text
 from tests.test_tui_directionb import _two_band_loaded
 
 _SIZES = [(80, 24), (120, 30)]
@@ -101,20 +110,29 @@ def _noncontrol(value: str) -> str:
     return "".join(ch for ch in value if ord(ch) not in _CONTROL)
 
 
+#: The two paths that reach ``#map_detail_body`` with file-derived text.
+_DRIVES = ["click", "autoselect"]
+
+
 def _drive_hostile_inspector(
-    tmp_path: Path, size: Tuple[int, int]
+    tmp_path: Path, size: Tuple[int, int], drive: str = "click"
 ) -> Tuple[str, list, List[str], str]:
-    """Render the map, real-click the hostile region row, read the inspector.
+    """Render the map, populate the inspector via ``drive``, read it back.
 
     Args:
         tmp_path (Path): pytest temp dir for the app base.
         size (Tuple[int, int]): Terminal geometry.
+        drive (str): ``"click"`` — a real ``pilot.click`` on the hostile
+            region row (the pre-Inc-7 path, still shipped). ``"autoselect"`` —
+            no gesture at all: Inc-7's post-refresh hook selects run 1, which
+            IS the hostile region, so the payload reaches the sink purely as a
+            consequence of loading the file.
 
     Returns:
         Tuple[str, list, List[str], str]: ``render().plain``, ``render().spans``,
-        the painted ``render_line`` rows, and the class name of the widget the
-        click coordinate actually resolved to (for the precondition's failure
-        message).
+        the painted ``render_line`` rows, and a mechanism note used by the
+        precondition's failure message (the widget the click resolved to, or
+        the resolved auto-selection).
     """
     loaded = _two_band_loaded(tmp_path)
 
@@ -130,23 +148,39 @@ def _drive_hostile_inspector(
             app.action_show_screen("map")
             app.update_memory_map()
             await pilot.pause()
-            row = next(
-                r for r in app.query(RegionRow) if r.region_start == _REGION_START
-            )
-            # Scroll the OWNING viewport, not the row's own ``scroll_visible``:
-            # Inc-1 (LLR-111.9) grew the band row 4 -> 6 rows at 120x30, so the
-            # region list sits at the viewport edge where ``scroll_visible``
-            # treats the row as already visible, does not scroll, and the click
-            # then lands on the container. Same pattern as
-            # ``tests/test_map_click_chain.py::_drive_clicks``.
-            app.query_one("#map_content").scroll_to_widget(
-                row, animate=False, top=True
-            )
-            await pilot.pause()
-            hit = type(app.screen.get_widget_at(*row.region.center)[0]).__name__
-            await pilot.click(row)
-            await pilot.pause()
-            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            if drive == "autoselect":
+                # ZERO gestures. Wait only for the deferred resolution.
+                for _ in range(10):
+                    await pilot.pause()
+                    if panel._selected_cell_start is not None:
+                        break
+                await pilot.pause()
+                hit = (
+                    "auto-selection resolved to "
+                    f"{panel._selected_cell_start!r}"
+                )
+            else:
+                row = next(
+                    r for r in app.query(RegionRow)
+                    if r.region_start == _REGION_START
+                )
+                # Scroll the OWNING viewport, not the row's own
+                # ``scroll_visible``: Inc-1 (LLR-111.9) grew the band row 4 ->
+                # 6 rows at 120x30, so the region list sits at the viewport
+                # edge where ``scroll_visible`` treats the row as already
+                # visible, does not scroll, and the click then lands on the
+                # container. Same pattern as
+                # ``tests/test_map_click_chain.py::_drive_clicks``.
+                app.query_one("#map_content").scroll_to_widget(
+                    row, animate=False, top=True
+                )
+                await pilot.pause()
+                widget = app.screen.get_widget_at(*row.region.center)[0]
+                hit = f"click coordinate resolved to a {type(widget).__name__}"
+                await pilot.click(row)
+                await pilot.pause()
+                await pilot.pause()
             body = app.query_one("#map_detail_body")
             rendered = body.render()
             strip = [
@@ -158,34 +192,45 @@ def _drive_hostile_inspector(
 
 
 def _assert_payload_reached_the_body(
-    size: Tuple[int, int], plain: str, strip: List[str], hit: str
+    size: Tuple[int, int], plain: str, strip: List[str], hit: str,
+    drive: str = "click",
 ) -> None:
-    """Fail loudly, naming the missed gesture, unless the payload is present.
+    """Fail loudly, naming the missed mechanism, unless the payload is present.
 
     A safety limb evaluated over a body that still shows ``_DETAIL_HINT`` is a
     tautology: there is no file-derived text for the scrub to have failed on,
     so the limb reads green on an implementation with no scrub at all. This
     runs FIRST at every size arm and never lets the limbs proceed on a run
-    where the gesture missed.
+    where the drive missed.
+
+    The message names the mechanism of THIS drive. An ``autoselect`` arm that
+    blamed a click would point a reader at code that never ran.
     """
+    mechanism = {
+        "click": (
+            f"the real pilot.click on the RegionRow at 0x{_REGION_START:08X} "
+            f"(after #map_content.scroll_to_widget)"
+        ),
+        "autoselect": (
+            f"Inc-7's post-refresh auto-selection of run 1 "
+            f"(0x{_REGION_START:08X}), which takes NO gesture at all"
+        ),
+    }[drive]
     joined = "".join(strip)
     assert strip, (
-        f"{size}: GESTURE MISSED — #map_detail_body painted ZERO rows, so the "
-        f"control-byte limb would have no subject. Expected the real "
-        f"pilot.click on the RegionRow at 0x{_REGION_START:08X} (after "
-        f"#map_content.scroll_to_widget) to populate the inspector; the click "
-        f"coordinate resolved to a {hit}."
+        f"{size}/{drive}: DRIVE MISSED — #map_detail_body painted ZERO rows, "
+        f"so the control-byte limb would have no subject. Expected "
+        f"{mechanism} to populate the inspector; {hit}."
     )
     assert _SENTINEL in plain, (
-        f"{size}: GESTURE MISSED — the hostile A2L symbol never reached "
-        f"#map_detail_body. The real pilot.click on the RegionRow at "
-        f"0x{_REGION_START:08X} did not populate the inspector (click "
-        f"coordinate resolved to a {hit}); the body still reads {plain!r}. "
-        f"The safety limbs are NOT evaluated on this run — a body showing "
-        f"_DETAIL_HINT makes them vacuously green."
+        f"{size}/{drive}: DRIVE MISSED — the hostile A2L symbol never reached "
+        f"#map_detail_body. {mechanism} did not populate the inspector "
+        f"({hit}); the body still reads {plain!r}. The safety limbs are NOT "
+        f"evaluated on this run — a body showing _DETAIL_HINT makes them "
+        f"vacuously green."
     )
     assert _SENTINEL in joined, (
-        f"{size}: GESTURE MISSED at the PAINTED layer — the symbol is in "
+        f"{size}/{drive}: DRIVE MISSED at the PAINTED layer — the symbol is in "
         f".plain but not in the painted strip, so it is laid out but clipped "
         f"or scrolled out of #map_detail_body's {len(strip)}-row region. The "
         f"control-byte limb reads the strip and would be vacuous. "
@@ -196,11 +241,12 @@ def _assert_payload_reached_the_body(
 # ---------------------------------------------------------------------------
 # AT-B77-15a — markup literal ∧ no span (HLR-116 / LLR-116.6, LLR-116.7)
 # ---------------------------------------------------------------------------
+@pytest.mark.parametrize("drive", _DRIVES)
 @pytest.mark.parametrize("size", _SIZES)
 def test_b77_hostile_symbol_is_literal_and_carries_no_span(
-    tmp_path: Path, size: Tuple[int, int]
+    tmp_path: Path, size: Tuple[int, int], drive: str
 ) -> None:
-    """AT-B77-15a — limb 1 ∧ limb 2, reported individually at this size.
+    """AT-B77-15a — limb 1 ∧ limb 2, per limb, per size, per drive.
 
     Limb 1 is *every NON-CONTROL character of the payload verbatim*, not
     *payload verbatim*. Post-scrub the ESC bytes are gone by design, so the
@@ -211,8 +257,8 @@ def test_b77_hostile_symbol_is_literal_and_carries_no_span(
     False (``[red]`` is consumed as a tag and the projection is no longer
     contiguous in ``.plain``) and limb 2 False (the tag becomes a style span).
     """
-    plain, spans, strip, hit = _drive_hostile_inspector(tmp_path, size)
-    _assert_payload_reached_the_body(size, plain, strip, hit)
+    plain, spans, strip, hit = _drive_hostile_inspector(tmp_path, size, drive)
+    _assert_payload_reached_the_body(size, plain, strip, hit, drive)
 
     expected = _noncontrol(_HOSTILE_SYMBOL)
     limb1 = expected in plain
@@ -220,26 +266,28 @@ def test_b77_hostile_symbol_is_literal_and_carries_no_span(
     verdicts = {"limb1_noncontrol_verbatim": limb1, "limb2_no_spans": limb2}
 
     assert limb1, (
-        f"{size}: LIMB 1 — every non-control character of the hostile symbol "
-        f"must survive verbatim and contiguous. Expected {expected!r} as a "
-        f"substring of the rendered plain text; got {plain!r}. "
+        f"{size}/{drive}: LIMB 1 — every non-control character of the hostile "
+        f"symbol must survive verbatim and contiguous. Expected {expected!r} "
+        f"as a substring of the rendered plain text; got {plain!r}. "
         f"per-limb={verdicts}"
     )
     assert limb2, (
-        f"{size}: LIMB 2 — a file-derived string must carry NO style span and "
-        f"no hyperlink; a span here means the payload was markup-parsed "
-        f"instead of rendered literally. spans={spans!r}. per-limb={verdicts}"
+        f"{size}/{drive}: LIMB 2 — a file-derived string must carry NO style "
+        f"span and no hyperlink; a span here means the payload was "
+        f"markup-parsed instead of rendered literally. spans={spans!r}. "
+        f"per-limb={verdicts}"
     )
 
 
 # ---------------------------------------------------------------------------
 # AT-B77-15b — no C0/C1 byte reaches the painted strip (LLR-116.7)
 # ---------------------------------------------------------------------------
+@pytest.mark.parametrize("drive", _DRIVES)
 @pytest.mark.parametrize("size", _SIZES)
 def test_b77_hostile_symbol_emits_no_control_byte_into_the_strip(
-    tmp_path: Path, size: Tuple[int, int]
+    tmp_path: Path, size: Tuple[int, int], drive: str
 ) -> None:
-    """AT-B77-15b — limb 3, at this size.
+    """AT-B77-15b — limb 3, per size, per drive.
 
     Reads the **painted strip** (``render_line``), not ``.plain``. ``.plain``
     is where the byte lives; the strip is what is handed to the terminal, and
@@ -248,8 +296,8 @@ def test_b77_hostile_symbol_emits_no_control_byte_into_the_strip(
     Mutation (executed, Inc-2): revert the filter — substituted value
     ``scrubbed`` → ``raw``. Limb 3 True → False at both sizes.
     """
-    plain, _spans, strip, hit = _drive_hostile_inspector(tmp_path, size)
-    _assert_payload_reached_the_body(size, plain, strip, hit)
+    plain, _spans, strip, hit = _drive_hostile_inspector(tmp_path, size, drive)
+    _assert_payload_reached_the_body(size, plain, strip, hit, drive)
 
     offenders = {
         (y, hex(ord(ch)))
@@ -258,9 +306,10 @@ def test_b77_hostile_symbol_emits_no_control_byte_into_the_strip(
         if ord(ch) in _CONTROL
     }
     assert not offenders, (
-        f"{size}: LIMB 3 — no C0/C1 control byte may reach the painted strip. "
-        f"Found {sorted(offenders)} as (row, codepoint). A control byte here "
-        f"is executed by the terminal, not displayed. Painted rows: {strip!r}"
+        f"{size}/{drive}: LIMB 3 — no C0/C1 control byte may reach the painted "
+        f"strip. Found {sorted(offenders)} as (row, codepoint). A control byte "
+        f"here is executed by the terminal, not displayed. Painted rows: "
+        f"{strip!r}"
     )
 
 

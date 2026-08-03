@@ -850,6 +850,18 @@ DataTable > .datatable--odd-row {
     height: 1;
 }
 
+/* The selected region row (batch-77, HLR-117 / LLR-117.2). A BACKGROUND and a
+   weight only — deliberately NO `color:` and NO `text-style: reverse`. Both of
+   those repaint the row's foreground, which is the `band-*` entropy channel:
+   `reverse` in particular satisfies a naive "sets no color property" check
+   while swapping the band colour into the background, so selecting a row would
+   destroy the one signal the row exists to carry. The band token stays on the
+   row's class list; this rule is additive. */
+.map-region-row.map-region-selected {
+    background: $rule;
+    text-style: bold;
+}
+
 #map_detail {
     width: 36;
     height: auto;
