@@ -1,228 +1,276 @@
 {
   "project": "s19_app",
   "language": "en",
-  "batch_id": "2026-07-31-batch-76",
-  "batch_objective": "Implement R-TUI-102 per the batch-75 spec, revision 2 (.dev-flow/2026-07-31-batch-75/01-requirements.md). batch-75 shipped the SPEC ONLY - descoped by operator ruling before Inc-1 - and its Inc-0..Inc-3 are registered as a P0 in BACKLOG-CODE.md. Scope: HLR-108 (document byte bound: gate emit AND _hexdump_section's put, per-variant reservation, aggregated O(1) disclosure, capped round-robin appendix), HLR-109 (_format_length at both Length sites - P3 hardening, not wire-reachable), HLR-110 (ValueError re-attribution off the operator-rejection path).",
-  "note_prior_batch": "batch-75 (R-TUI-102 spec) MERGED SPEC-ONLY: PR #180 squash 1984341. Its state at close is archived at .dev-flow/2026-07-31-batch-75/state-at-close.json - it had never been committed to its own batch dir, closed here. Phases 0-2 are INHERITED by batch-76, not re-run; the spec is the plan and is not re-authored.",
-  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (resolved from docs/engineering-rules.md:17). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
-  "route": "/dev-flow (full V-model), entering at Phase 3. Charter: .dev-flow/BACKLOG-CODE.md P0 - the owed R-TUI-102 implementation.",
+  "batch_id": "2026-08-01-batch-77",
+  "batch_objective": "Memory Map redesign - Variant A (gap-fold band bar) + cross-cutting fixes S-1..S-7, per the operator-approved charter at prototypes/memmap_variant_a.HANDOFF.md. Scope: US-77-1 gap-fold widths + column-budget bound (absorbs the NEW P-15 overflow defect), US-77-2 edge-labeled ruler (requires a section 6.5 amendment to R-TUI-072 + re-derived AT-072b), US-77-3 dual mapped/span stats, US-77-4 legend demotion, US-77-5 keyboard path, US-77-6 auto-select, US-77-7 selection styling. The charter is INPUT, not spec - everything re-derived.",
+  "note_prior_batch": "batch-76 (R-TUI-102 implementation) is FULLY CLOSED and SYNCED: PR #184 squash bc02cdd + close-out #185 f8747b8, obsidian_synced true, merge gate CLEAR on its second round. Its state at close is preserved in git history at .dev-flow/state.json@f8747b8. Nothing is inherited from it - not phases, not authorization.",
+  "note_backlog_lane": "Lane A = .dev-flow/BACKLOG-CODE.md (resolved from docs/engineering-rules.md:17 - this batch is application code). Lane B = .dev-flow/BACKLOG-PROCESS.md. .dev-flow/BACKLOG.md is a ROUTER holding no open work.",
+  "route": "/dev-flow (full V-model), entering at Phase 0. Charter INPUT: prototypes/memmap_variant_a.HANDOFF.md, operator-approved 2026-08-01.",
   "rc1": {
-    "origin_main_tip": "291bb76fb672432e33301aa8a61b54f96cf4f4af",
+    "origin_main_tip": "f8747b8",
     "merge_base_equals_tip": true,
-    "branch": "claude/batch-76-r-tui-102-impl",
-    "tree_clean": true,
-    "note": "Local main was 34 commits behind (e47b7da) after the repo move out of OneDrive; branch cut fresh off origin/main. prototypes/out/ untracked and PRE-DATES this session - reported as found, not swept (C-44).",
-    "verified_at": "2026-07-31"
+    "branch": "claude/batch-77-memmap-variant-a",
+    "tree_clean_except": "prototypes/memmap_variant_a.* (5 files) + prototypes/memmap_redesign.proposals.html are the charter's own untracked handoff files, to be COMMITTED in this batch's PR per charter section 1 (the legend_n8.* precedent). prototypes/out/ is untracked and PRE-DATES this session - reported as found, not swept (C-44).",
+    "batch_number_derivation": "77 derived from disk (.dev-flow/2026-07-31-batch-76 is highest) AND git branch -r / git ls-remote (no batch-77 anywhere). NOT from memory - this project has had two numbering collisions.",
+    "verified_at": "2026-08-01"
   },
   "flow_revision": {
     "flow_version": "2026.07.28-rev1",
     "controls": "C-1..C-45",
     "manifest_flow_hash": "0127a2767ff11c8a",
     "local_aggregate_hash": "896dcca61cf68d78",
-    "verdict": "MISMATCH, scoped and NON-BLOCKING. All 11 control-bearing command/template files are byte-exact vs the manifest. Only skills/dev-flow-lessons/SKILL.md diverges (local 641 lines / 01d608bb14069613 vs stamped 620 / 5c47db86ac2cf4ae) - local is AHEAD and the file is untracked in ~/.claude (.gitignore:3 = /*), its canonical home being jav201/claude-skills. The flow's ENFORCEABLE surface is current. Carried to Lane B: re-stamp FLOW-VERSION.md or record the catalog as deliberately outside the hash."
+    "verdict": "MISMATCH, scoped and NON-BLOCKING - RE-EXECUTED at batch-77 Phase 0 rather than inherited from batch-76's identical note, because a citation of another document is not evidence (C-43). All 11 control-bearing command/template files are byte-exact vs the manifest. Only skills/dev-flow-lessons/SKILL.md diverges (local 641 lines / 01d608bb14069613 vs stamped 620 / 5c47db86ac2cf4ae) - local is AHEAD and the file is untracked in ~/.claude, its canonical home being jav201/claude-skills. The flow's ENFORCEABLE surface is current. Lane B already carries the re-stamp item; not duplicated here."
   },
   "toolchain_entry_gate": {
     "python": "3.14.4",
     "pytest": "8.4.2",
     "ruff": "0.15.17",
-    "verified_at": "2026-07-31"
+    "verified_at": "2026-08-01"
   },
   "standing_authorization": {
-    "asked_at": "2026-07-31",
-    "asked_because": "Per-batch and NEVER inherited - operator standing rule, restated as non-negotiable #1 in the launch prompt. Asked fresh via AskUserQuestion at kickoff: not from the prompt, not from the spec, not from batch-75's grant in this same file.",
+    "asked_at": "2026-08-01",
+    "asked_because": "Per-batch and NEVER inherited - operator standing rule, restated as charter section 6 non-negotiable #1. Asked fresh via AskUserQuestion at kickoff: not from the charter, not from batch-76's grant, not from the launch prompt.",
     "autonomy_and_merge": "Autonomous + merge authorized",
     "merge_authority": true,
     "merge_precondition": "MANDATORY final independent qa-reviewer pass over the WHOLE merged diff vs main (dual traceability intact, 0 engine-frozen diffs, no cross-increment regression, every gate carry discharged) AFTER the PR is opened and CI is green. A HIGH finding BLOCKS the merge and returns to the operator.",
-    "id_guard_ruling": "Amend TC-610 (Recommended) - operator answer to the P-26 collision.",
-    "subagent_ruling": "Use subagents as the flow says - code-reviewer at each increment gate, qa-reviewer at Phase 4 and the merge gate, with C-33 liveness polling. This overrides the session harness default of not calling the Agent tool.",
-    "decision_recording": "Confirmed - every decision taken autonomously instead of asking is recorded in PLAN.md section 8, here, and in 05-postmortem.md, and carried to the vault at /dev-flow-sync."
+    "decision_recording": "Confirmed - record all four places. Every decision taken autonomously instead of asking is recorded in PLAN.md section 8, state.json decisions_log, 05-postmortem.md, and carried to the vault at /dev-flow-sync.",
+    "subagent_note": "The accepted option explicitly names the independent qa-reviewer merge pass, so subagent use is authorized by the answer itself. Recorded as D-6; overrides the session-harness default of not calling the Agent tool."
   },
   "id_allocation": {
-    "reserved_block": "AT-250..AT-279, TC-552..TC-599 (RESERVED by batch-75 in AT-TC-REGISTRY.jsonl)",
-    "spec_uses": "AT-250..AT-263, TC-552..TC-572",
-    "launch_prompt_said": "AT-256..AT-263 - off by six at the low end; the spec governs. Either way nothing unregistered is minted.",
-    "registry_high_water": "AT-281 / TC-610; next_free AT-282 / TC-611",
-    "mint_nothing_new": true
+    "authority": "AT-TC-REGISTRY.jsonl at the repo root, _meta.next_free on line 1. Do NOT grep tests/ or REQUIREMENTS.md - three honest greps have returned three different answers.",
+    "next_free_RE_DERIVED": "AT-282 / TC-613 (high_water AT-281 / TC-612), read from AT-TC-REGISTRY.jsonl line 1 _meta on 2026-08-01. 1373 rows.",
+    "my_own_stale_copy_CORRECTED": "I first recorded 'AT-282 / TC-611' by COPYING batch-76's state.json figure instead of re-deriving it from the registry. It was stale: batch-76's own merge-gate closure minted TC-611 and TC-612 AFTER that line was written, so TC next_free is 613, not 611. This is the project's 'a carried number is re-derived, never copied' rule, and I broke it in the very file that records the rule. Corrected here; recorded rather than silently overwritten.",
+    "reservation_rule": "Append RESERVED rows with reserved_by + statement and MERGE THAT TO main ON ITS OWN SMALL PR BEFORE the batch's work. A reservation on an unmerged branch prevents nothing.",
+    "batch_scoped_preference": "docs/engineering-rules.md:48 PREFERS batch-scoped ids, and the registry's own _meta.governed confirms it: 'Letter-initial bodies (AT-B64-04, ...) are batch-scoped / named-subspace ids, outside this authority by spec 2.3.' So AT-B77-nn / TC-B77-nn need NO reservation PR and cannot collide by construction. Decision D-7.",
+    "minted_so_far": "NONE - Phase 0 mints no ids.",
+    "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31). AT-072b is an EXISTING global id being re-derived, not minted - it keeps its number."
   },
-  "current_phase": 6,
-  "phase_status": "synced",
+  "current_phase": 3,
+  "phase_status": "not-started",
   "iterations_per_phase": {
     "0": 0,
-    "1": 0,
-    "2": 0,
+    "1": 2,
+    "2": 3,
     "3": 0,
     "4": 0,
     "5": 0,
     "6": 0
   },
-  "inherited_phases": {
-    "0": ".dev-flow/2026-07-31-batch-75/00-measurements.md",
-    "1": ".dev-flow/2026-07-31-batch-75/01-requirements.md (revision 2 - THE PLAN)",
-    "2": ".dev-flow/2026-07-31-batch-75/02-review.md"
-  },
   "artifacts": {
-    "plan": ".dev-flow/2026-07-31-batch-76/PLAN.md",
-    "0": ".dev-flow/2026-07-31-batch-76/00-measurements.md",
-    "3_inc0": ".dev-flow/2026-07-31-batch-76/03-increments/increment-000.md",
-    "3_inc1": ".dev-flow/2026-07-31-batch-76/03-increments/increment-001.md",
-    "3_inc2": ".dev-flow/2026-07-31-batch-76/03-increments/increment-002.md",
-    "3_inc3": ".dev-flow/2026-07-31-batch-76/03-increments/increment-003.md",
-    "3_inc4": ".dev-flow/2026-07-31-batch-76/03-increments/increment-004.md",
-    "4": ".dev-flow/2026-07-31-batch-76/04-validation.md",
-    "5": ".dev-flow/2026-07-31-batch-76/05-postmortem.md",
-    "6": ".dev-flow/2026-07-31-batch-76/06-docs/NOT-APPLICABLE.md"
+    "plan": ".dev-flow/2026-08-01-batch-77/PLAN.md",
+    "0": ".dev-flow/2026-08-01-batch-77/00-measurements.md",
+    "1": ".dev-flow/2026-08-01-batch-77/01-requirements.md",
+    "1_architect_lane": ".dev-flow/2026-08-01-batch-77/01-requirements-architect.md",
+    "1_qa_lane": ".dev-flow/2026-08-01-batch-77/01b-qa-validation.md",
+    "2_architect": ".dev-flow/2026-08-01-batch-77/02-review-architect.md",
+    "2_qa": ".dev-flow/2026-08-01-batch-77/02-review-qa.md",
+    "2_security": ".dev-flow/2026-08-01-batch-77/02-review-security.md",
+    "2_architect_final": ".dev-flow/2026-08-01-batch-77/02d-review-architect-final.md"
+  },
+  "premise_evaluation_phase0": {
+    "evaluated": 15,
+    "true": 9,
+    "false": 4,
+    "imprecise": 1,
+    "new_defects_found": 1,
+    "P-4_FALSE": "The charter's draft acceptance #1 ('every region >=1 visible bar column') is VACUOUS - measured TRUE on the pre-change tree because screens_directionb.py:2066 floors every run at max(1, ...). Invariant under the change it gates; C-40 limb 1. Replaced by width monotonicity, which is RED today.",
+    "P-5_FALSE": "S-2 says it amends LLR-072.3. That id has ZERO definitions in REQUIREMENTS.md; the only LLR-072.x hits are inside the range string 'LLR-072.1-074.3'. The clause lives in R-TUI-072 (REQUIREMENTS.md:4787). The id IS cited at tests/test_tui_map_big.py:118 - a dangling reference, and the charter's source.",
+    "P-6_FALSE": "S-2 is not a wording amendment: R-TUI-072 mandates 'exactly 5 tick labels' and is guarded by the LIVE, PASSING AT-072b (tests/test_tui_map_big.py::test_at072b_ruler, asserts len(ticks)==5). S-2 invalidates a shipped acceptance and needs a section 6.5 Before/After amendment plus an AT re-derivation.",
+    "P-15_FALSE_NEW": "NOT IN THE CHARTER. The band bar OVERFLOWS its own budget: 64 columns emitted against _BAND_BAR_WIDTH = 60, because all 9 segments independently floor at max(1, ...). Identical at 80x24 and 120x30. Folded into US-77-1 (decision D-2).",
+    "P-3_IMPRECISE": "Charter says 'all five regions in a 1-column sliver'. Measured per-run widths = [1,1,1,1,1] = 5 columns, one each. The defect is non-discrimination (256/256/256/200/62 B all render at 1 col), not invisibility.",
+    "_SUPERSEDED_READ_THIS_FIRST": "FOUR of the verdicts in THIS BLOCK were WRONG and are RETRACTED at Phase 1. See phase0_verdicts_corrected_at_phase1 for the corrected verdicts. Specifically: P-4_FALSE is RETRACTED (the acceptance is NOT vacuous - it is RED today at 120x30; I measured a pre-layout proxy). P-5_FALSE and P-6_FALSE are RETRACTED (LLR-072.3 EXISTS at .dev-flow/2026-07-15-batch-47/01-requirements.md:508 and is cited at 4 shipped-source sites; REQUIREMENTS.md defines ZERO LLR bodies so absence there proves nothing). P-15_FALSE keeps its FALSE verdict but its ATTRIBUTION is wrong (round(), not the max(1,...) floor) and it is superseded by the real defect P-16: _BAND_BAR_WIDTH was never reconciled with its container. The 'true: 9 / false: 4' counts below are AS FIRST WRITTEN and are NOT the corrected tally. Retained verbatim rather than rewritten so the correction is auditable."
   },
   "decisions_log": [
     {
       "phase": 0,
-      "date": "2026-07-31",
-      "decision": "kickoff - RC-1 PASS at 291bb76, batch 76 claimed",
-      "notes": "Local main was 34 commits behind after the repo move; read everything from origin/main. Toolchain gate passed. Batch number verified free (no artifact dir, no remote branch)."
-    },
-    {
-      "phase": 0,
-      "date": "2026-07-31",
-      "decision": "P-26 found FALSE - a NINTH false premise in this area, and the first from the registry lane rather than batch-75",
-      "notes": "BACKLOG-CODE.md's registry close note promises the reserved AT/TC block 'converts to LIVE when Inc-0..Inc-3 write the nodes'. The guard shipped WITH that note forbids it. Executed both limbs: AT-250 RESERVED->LIVE reddens test_tc610 (id_registry.py:530); citing RESERVED AT-250 in a REQUIREMENTS.md '- Validation:' bullet reddens G4 (test_tc603). Mutually unsatisfiable for this batch's own work. Both mutations restored and verified by SHA-256 returning to its pre-mutation value; guard back to 13 passed."
-    },
-    {
-      "phase": 0,
-      "date": "2026-07-31",
-      "decision": "D-4 amend TC-610 to 'reserved-or-spent-by-its-owner'",
-      "notes": "OPERATOR ruling (AskUserQuestion Q2), NOT autonomous - escalated because it changes a shipped guard. Preserves the guard's real purpose (no foreign minting inside the block) and stops it firing on the legitimate work its own docstring at :521-522 says it must not fire on."
-    },
-    {
-      "phase": 0,
-      "date": "2026-07-31",
-      "decision": "D-3 follow the spec's AT range, not the launch prompt's",
-      "notes": "Taken autonomously. Prompt said AT-256..263; spec section 3 uses AT-250..263. All of AT-250..279 are RESERVED, so neither reading mints anything unregistered. Flagged to the operator."
-    },
-    {
-      "phase": 0,
-      "date": "2026-07-31",
-      "decision": "D-2 force-checkout over 5 untracked prototypes files",
-      "notes": "Taken autonomously AFTER proving all 5 byte-identical to their origin/main blobs via git hash-object - zero information at risk. They were untracked only because local main predated the commit that added them. prototypes/out/ left in place and reported as found."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "Inc-0 + Inc-1 landed; Inc-2/Inc-3 NOT started",
-      "notes": "Three of my own acceptances were INERT on first execution, all the vacuous-FIXTURE class: TC-552 caught two before anything ran (rows=4000 against a 200-row cap), AT-254 asserted only that a ~20 B unconditional heading exists (true under any allocation, so it never tested fairness), and AT-250/252 could not see put ungated because their fixtures had no mem_map. Fixed by re-deriving fixtures from measurement and adding AT-264 and TC-573. Final matrix: 8 mutations, INERT none."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "Inc-2 and Inc-3 landed; all four increments complete",
-      "notes": "The mutation HARNESS failed three times across the batch, each reporting applied=True while proving nothing: an ambiguous anchor hit the wrong function (identical return blocks in _format_address/_format_length); a mutant landed after a return (dead code); a mutant changed the log while the node asserts the status. C-40's existing 'confirm the mutation applied' check passed in all three. Generalisation routed to Lane B: a counterfactual must be shown to move the predicate's DECLARED SUBJECT, not merely to modify the file. Also: AT-262 was folded as an assertion inside AT-260 (coverage-in-parts, forbidden by C-18) and now owns a distinct node."
-    },
-    {
-      "phase": 3,
-      "date": "2026-07-31",
-      "decision": "the three owed items landed; batch implementation complete",
-      "notes": "TC-610's amendment was NECESSARY and that is executed, not argued: reverting a single id to RESERVED reddens G4 (28 of the 42 ids are cited on '- Validation:' bullets, so G4 genuinely inspects them); restored and hash-verified. PRECISION worth recording: R-TUI-101's own convention names test FUNCTIONS, and the tokenizer does not read 'test_at250_...' as a citation - so the G4 collision only bites when a bullet cites BARE ids. It is real and I executed it, but it was avoidable by convention. The flip to LIVE is right on independent grounds: the ids are spent and have nodes, so leaving them RESERVED would make the registry assert something false."
-    },
-    {
-      "phase": 6,
-      "date": "2026-07-31",
-      "decision": "merge gate BLOCK - returned to operator",
-      "notes": "The precondition worked exactly as designed: an independent pass found four HIGH findings, two of which I verified myself by execution. The batch's shipped CODE is sound (Inc-3 confirmed clean, frozen diff 0, traceability clean, all correctness hunts clean); the defects are in ACCEPTANCE STRENGTH - the same class this batch kept finding in itself."
-    },
-    {
-      "phase": 6,
       "date": "2026-08-01",
-      "decision": "phases 4/5/6 complete; batch MERGED as bc02cdd (PR #184)",
-      "notes": "Record advanced from phase 4 / awaiting-gate. The lag was bookkeeping, not an unmet gate: 04-validation.md, 05-postmortem.md and 06-docs/NOT-APPLICABLE.md were all written, the independent merge-gate pass returned CLEAR on its second round, CI was green and the PR is merged. current_phase was set to 4 when 04 was written and never advanced as 05 and 06 followed."
+      "decision": "kickoff - RC-1 PASS at f8747b8, batch 77 claimed, authorization asked fresh",
+      "notes": "Local main synced 0/0 with origin/main. Batch number derived from disk + origin branches (no batch-77 anywhere), not from memory. Toolchain gate passed at Python 3.14.4 / pytest 8.4.2 / ruff 0.15.17. Flow currency re-executed per-file rather than inherited."
     },
     {
-      "phase": 6,
+      "phase": 0,
       "date": "2026-08-01",
-      "decision": "synced-to-obsidian",
-      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-07-31-batch-76/ - PLAN.md, 00-measurements.md, 04-validation.md, 05-postmortem.md, 06-docs/, state-at-close.json, 2026-07-31-batch-76-README.md. Phases 0-2 NOT duplicated: inherited from batch-75 and already in the vault. 03-increments not synced per the vault convention since batch-04. Visual evidence refreshed (trigger: the batch touched s19_app/tui/ in app.py and services/report_service.py): 15 gifs + 75 flattened frames from code verified byte-identical to merged main; 0 stale live assets. The 6 retired pv__case_06_large_nested_a2l files were EXCLUDED from the copy BY NAME rather than re-stamped fresh by the blanket *.gif helper. Dashboard.md already existed and was not overwritten."
+      "decision": "D-3 REPLACE the charter's draft acceptance #1 with width monotonicity",
+      "notes": "Taken autonomously. Executed the shipped render over a re-derived sparse fixture: all five regions already measure >=1 column today, so the drafted acceptance cannot go RED and would certify nothing. The discriminating property is bytes(a) > bytes(b) => cols(a) >= cols(b) with >=1 strict inequality, which IS red today because all five widths are equal. The charter's draft #2 (byte-identical dense control) is KEPT - it is the strongest thing in the drafted set."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-01",
+      "decision": "D-2 FOLD the new P-15 budget-overflow defect into US-77-1",
+      "notes": "Taken autonomously. 64 columns against a 60-column budget, found by measurement and absent from the charter. It is the same max(1, ...) expression US-77-1 rewrites; leaving a known overflow inside code being rewritten is how a defect becomes the next batch's premise."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-01",
+      "decision": "D-4 US-77-8 (Variant C ports) ruled OUT, registered as a carry",
+      "notes": "Taken autonomously. The charter marks it optional and explicitly forbids silent absorption. No measured defect motivates either idea, and the batch already carries 7 stories. Registered in Lane A, not dropped. Reversible on operator request."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-01",
+      "decision": "D-5 flow-currency mismatch ruled NON-BLOCKING",
+      "notes": "Taken autonomously after re-executing the per-file hashes: 11 of 11 control-bearing command/template files byte-exact vs the manifest; the sole divergence is the dev-flow-lessons catalog, where local is AHEAD of the stamp. The enforceable surface is current."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-01",
+      "decision": "D-6 use subagents as the flow specifies",
+      "notes": "Taken autonomously. code-reviewer at each increment gate, qa-reviewer at Phase 4 and the merge gate, with C-33 liveness polling. Justified because the operator's accepted kickoff option explicitly names the final independent qa-reviewer pass as the merge precondition."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-01",
+      "decision": "self-caught probe defect recorded rather than hidden",
+      "notes": "My first stats/inspector probe queried #map_stats and #map_detail - CONTAINERS - and got back Blank objects for both. The text lives in #map_stats_body / #map_detail_body. Taken at face value it would have produced a FALSE finding ('stats pane renders nothing'). This is C-32/C-37 landing in my own Phase-0 probe rather than in a test."
+    },
+    {
+      "phase": 1,
+      "date": "2026-08-01",
+      "decision": "Phase 1 APPROVED (self-approved under the kickoff grant) - 01-requirements.md final at 578 lines",
+      "notes": "7 HLR (111-117), 20+ LLR, AT-B77-01..14, TC-B77-01..29, 6 carries, 2 section 6.5 amendments. Zero blockers: all eight raised by the two lanes are closed by operator rulings R1-R6. Exit criteria: Coverage - both traceability chains complete, no orphan. Certainty - every AT demonstrated RED by EXECUTED transcript, every predicate carries its reddening mutation. Evidence - every figure re-derived on this tree. No axis unmet, so approve rather than iterate."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "Phase 2 BLOCKED by all three lanes - iterate-to-refine to Phase 1 revision 2",
+      "notes": "12 blockers. Not a discretionary gate: the flow forces iterate when blockers exist. Two lanes independently found the runs-vs-ranges defect. The design wall (24 segments into 21 columns) needed an operator ruling and got R-7. I verified the security blocker myself and found it understated - the ANSI guarantee is asserted in shipped source and is false."
+    },
+    {
+      "phase": 1,
+      "date": "2026-08-01",
+      "decision": "R-8 and R-9 ruled; revision 2 final",
+      "notes": "R-8 accept the deepened stats-line scroll as carry C-77-k, rejecting a narrowed widen. R-9 render the +N more disclosure in the region list with an EXACT count over a synthetic over-threshold fixture. Both operator rulings via AskUserQuestion."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "R-10 split aggregation to batch-78; R-11 pull the ANSI scrub fix in. Revision 3.",
+      "notes": "Operator-ruled rather than iterating a third time. Phase-2 iteration would have been 3, the flow's soft cap. The split seam is measured, not judged: one fixture crosses the onset, the bound alone fixes 16 of 17, and 7 of 8 blockers travel with aggregation."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "3-iteration soft cap reached and SURFACED; operator ruled continue to revision 4",
+      "notes": "Root cause named rather than looped on: propagation - a change applied where noticed, not swept to its dependents. Both non-architect lanes are clear (security CLEAN, QA no blockers) and the architect's own disposition is edits-not-design, so continuing is evidence-based rather than optimistic. Revision 4 re-gates the ARCHITECT lane only, per the operator's choice."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-01",
+      "decision": "Phase 2 APPROVED at revision 5 - self-approved under the kickoff grant",
+      "notes": "Exit criteria met. Coverage: both traceability chains complete, no orphans after the R-10 removal, all ATs allocated exactly once. Certainty: every AT demonstrated RED by executed transcript; the two undischargeable ones are LABELLED PINs, not counted as discharged. Evidence: every figure re-derived on this tree, and the three I had reported wrong (LLR-072.3's existence, the case_08 percentages, the corpus count) are corrected with their provenance recorded. No axis unmet."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-01",
+      "decision": "Handoff at the Phase-2/3 boundary; Inc-0 correctly NOT executed",
+      "notes": "The operator asked for Inc-0. Revision 5 has no Inc-0 - my own earlier roadmap had one, and executing it would have captured the byte-golden BEFORE the width basis settles, pinning the retired arithmetic. That is the defect ordering constraint 3 exists to prevent and is exactly how [45,15] entered revision 1. Reported rather than performed. Did the preparatory work owned by no increment instead: stripped raw control bytes from the requirements document and launched the full-suite baseline."
     }
   ],
-  "obsidian_synced": true,
-  "created_at": "2026-07-31T00:00:00Z",
+  "phase1_operator_rulings": {
+    "asked_at": "2026-08-01",
+    "why_escalated": "All four reverse part of the operator-approved charter. The operator had selected plain decision-recording (not escalate-everything), so these were askable rather than mandatory - escalated anyway because each changes what gets built.",
+    "R1_bar_width": "RECONCILE TO THE REAL CONTAINER, not the constant 60. The batch's central defect: .map-band-bar measures 21 cols at 120x30 and 66 at 80x24 against a 60 budget, so 2 of 5 mapped regions paint entirely outside it and are INVISIBLE. Reddens the live PIN tests/test_map_click_chain.py::test_ac6_clipped_segments_are_a_known_layout_limitation - deleting it is sanctioned by its own docstring, and the retirement must name the dropped observable (C-40 limb 2 instance ii).",
+    "R2_dense_control": "RE-BASE THE GOLDEN after the width fix. Byte-identity with today's dense render is abandoned deliberately because R1 changes it by design. New control: gap-folding is a strict no-op on gapless images at fixed container width. Fixture MUST use unequal runs (768/256 -> [45,15]); equal 512/512 -> [30,30] is invariant under any monotone re-weighting and would be vacuous.",
+    "R3_keyboard": "ARROWS + ENTER ONLY; j/k/o DROPPED. All three already bound app-wide; o/j frozen in _PRE_BATCH_BINDINGS under live TC-011; k must stay the legend key or US-77-4's hint becomes false. SCOPE REDUCTION: the charter's o = open-hex keyboard affordance is DESCOPED and registered as a carry. The N4a mouse split is unchanged and remains the route to hex.",
+    "R4_ruler_end": "LABEL THE LAST MAPPED BYTE (0x07FFFF3D), not the exclusive span_end (0x07FFFF3E). The two chartered clauses were mutually unsatisfiable. Also corrects my P-7: 4 of 5 ticks name unmapped addresses today, not 3.",
+    "R5_fold_width": "ONE-COLUMN FOLD MARKER, ALWAYS. Measured at the reconciled 21-col container: fold=1 -> [4,4,4,3,1]; fold=2 -> [3,3,3,3,1], which collapses three runs to equal width and guts the strict limb, the load-bearing half of AT-B77-01 at 80x24 (finding N-1). DESCOPES the charter's '2-col marker + humanized size label at/above a fold threshold' (S-1) -> carry C-77-g. SECOND chartered feature descoped this batch; like the first it is registered, not dropped. FOLDED: LLR-111.2.",
+    "R6_rerender_selection": "PRESERVE the selection if the region still exists, else fall back to the first. No input document stated a policy. Requires TWO acceptance arms: a lone 'preserved' arm is green on an implementation that never re-selects, and a lone 'fallback' arm is green on one that always resets - neither alone distinguishes the spec from its two failure modes. Interacts with HLR-116: focus must follow selection or the keyboard story silently regresses. FOLDED: HLR-116, split into AT-B77-13 (preserve) and AT-B77-14 (fallback) per C-18, plus LLR-116.4/116.5.",
+    "R7_overflow": "WIDEN THE BAR FIRST, THEN AGGREGATE. (1) Rebalance the layout: the bar gets only 21 of the 52 columns #map_grid has at 120x30 - give it a larger share via CSS, MEASURING both axes and the whole pane budget first (C-23/C-29), since a weight that fits the bar can starve a sibling off-screen. (2) Where it still overflows, merge the SMALLEST ADJACENT runs into one aggregate segment with a '+N more' disclosure, following R-TUI-098's precedent of naming only items that actually lost content. HLR-111 also needs a NORMATIVE ALLOCATION BOUND over n_runs + n_gaps vs measured width - an output-shaped predicate cannot bound an allocation (batch-74).",
+    "R8_stats_fold": "ACCEPT the deepened scroll and register it as a carry (C-77-k). The widened bar is what makes regions visible - the batch's purpose - and the stats line is ALREADY below the fold at both regimes today, so this deepens an existing scroll rather than newly hiding anything (31->33 at 120x30). Narrowing the widen to protect it was REJECTED: every column surrendered lowers the ceiling on visible regions.",
+    "R9_disclosure_surface": "Render '+N more' in the REGION LIST, not the bar. Bar columns are the scarce resource the design is contending for, and the list is already the textual per-region surface. B3 holds - the row carries a COUNT, never file-derived text. AT-B77-17 observes the region list explicitly, over a SYNTHETIC over-threshold fixture (onset measured 26 runs @bar=50, 34 @bar=66), asserting an EXACT count - 'is non-empty' would be vacuous.",
+    "R10_split_aggregation": "SPLIT AGGREGATION OUT TO batch-78. Measured basis: exactly ONE shipped fixture crosses the onset - examples/professional_validation/case_08_heavy_fragmentation/firmware.s19 at 801 ranges, ~30x; every other shipped fixture is <=11. The allocation bound ALONE fixes 16 of 17 with ZERO aggregation, and 7 of the 8 new blockers are in the aggregation path. REMOVE LLR-111.8, AT-B77-17 and the +N more disclosure; KEEP LLR-111.7 (floor-1 + largest-remainder), which is verified sound. HLR-111 must state its DOMAIN explicitly (n_runs + n_gaps <= bar_w) and describe out-of-domain behaviour TRUTHFULLY rather than leaving a silent hole. Carry C-77-l charters batch-78 with every measurement already paid for.",
+    "R11_pull_scrub_in": "PULL THE ANSI SCRUB FIX INTO batch-77. Security proved Inc-7 would introduce a RED gate nothing in the batch could satisfy, because C-77-h deferred the fix out of scope. safe_text (screens_directionb.py:688) is NOT frozen. C-77-h is DISCHARGED, not dropped. AT-B77-15 must also be repaired: it was MIS-VERDICTED - limb3 read GREEN because nothing rendered (zero clicks still shows _DETAIL_HINT) while the node aggregated RED off limb1, hiding it. CC-1 again, inside the acceptance written to close a security finding."
+  },
+  "phase1_new_findings": {
+    "N-1": "THE TWO REGIMES REDDEN ON DIFFERENT LIMBS, and this corrects the QA lane. 80x24: visible>=1 True, monotone True, strict FALSE -> conjunction RED via strict. 120x30: visible>=1 FALSE, monotone True, strict TRUE -> conjunction RED via visible. At 120x30 two runs clip to 0 and 1 > 0 SATISFIES strictness, so the strict limb is GREEN at the broken regime. Consequence: AT-B77-01 must stay a SINGLE three-way conjunction - splitting it, or dropping either limb, ships one regime green. The monotone limb alone is green at both sizes and carries no falsifying power.",
+    "N-2": "MAP GEOMETRY IS NOT SETTLED AFTER ONE pilot.pause(). Architect traced 68 -> 68 -> 66 at 80x24 and read 23/50 at 120x30 where the settled value is 21. I REPRODUCED IT INDEPENDENTLY: 6 trials, trial 4 read width=23 where the other five read 21 (1 in 6). Without the mandatory settling helper (LLR-111.6) every geometry acceptance is intermittently flaky, and a flaky gate is indistinguishable from a broken one. The invisibility finding survives either reading; it is the column figure that moves. Registered as risk R-7.",
+    "architect_B1_dissolved": "The dense-byte-identity-vs-budget contradiction was an artifact of reasoning about a number that is never enforced. Once R1 corrected the width basis it disappeared.",
+    "TC_011_stays_green": "R3 leaves o/j/k untouched, so the frozen _PRE_BATCH_BINDINGS guard needs no supersession - verified against tests/test_tui_directionb.py:5460-5478."
+  },
+  "phase0_verdicts_corrected_at_phase1": {
+    "summary": "FOUR of my own Phase-0 verdicts were wrong, and the pattern is ONE error, not four: I read the wrong LAYER and the wrong CORPUS, then reported the results as measurements. Each was genuinely executed - executing the wrong thing returns a plausible number, which is why it survived my own review. On every point where the charter and I disagreed, THE CHARTER WAS RIGHT.",
+    "P-5": "RETRACTED. LLR-072.3 EXISTS (.dev-flow/2026-07-15-batch-47/01-requirements.md:508), cited at 4 shipped-source sites in screens_directionb.py. I grepped REQUIREMENTS.md, which defines ZERO LLR bodies - absence there is evidence of nothing. Found by the architect lane.",
+    "P-4": "RETRACTED. The charter's draft acceptance #1 is NOT vacuous: it is RED TODAY at 120x30 (2 regions with 0 visible columns). I measured Static.render(), a pre-layout proxy (C-32). Disposition changes from REPLACE to RE-POINT AND ENLARGE - the requirement comes out larger (C-43 constructive). Found by the QA lane, verified independently by me.",
+    "P-15": "ATTRIBUTION CORRECTED. The 64-vs-60 overflow is caused by round(), not by the max(1,...) floor: on dense input the floor contributes 0 and round() alone yields 61. The budget is simply never enforced. Found by the architect lane.",
+    "P-7": "CORRECTED 3 -> 4. span_end is exclusive, so the final tick also names an unmapped address. Found by the QA lane.",
+    "irony_recorded": "I documented the C-32 wrong-layer trap as a self-catch in 00-measurements.md section 4 for the stats probe, then failed to apply it to the band-bar measurement in the same document."
+  },
+  "obsidian_synced": false,
+  "created_at": "2026-08-01T00:00:00Z",
   "progress": {
-    "branch": "claude/batch-76-r-tui-102-impl (pushed)",
-    "commits": [
-      "5f60ffe Inc-0 golden",
-      "9ee848d Inc-1 HLR-108 document gating",
-      "0b51409 Inc-2 HLR-109 _format_length",
-      "660c1b0 Inc-3 HLR-110 error re-attribution"
-    ],
-    "inc0": "DONE - golden captured from the SHIPPED producer in its own commit (C-12), 7619 B at 0.3633% of cap, deterministic, 63 hexdump lines, 0 short-circuits.",
-    "inc1": "CODE + TESTS DONE (27 nodes, all 8 counterfactual mutations RED, source hash restored). REQUIREMENTS.md and the TC-610 amendment are OWED.",
-    "inc2": "DONE - _format_length created (P-6: did not exist) + both sites. 19 nodes, 8 mutations, INERT none. In-domain renders DECIMAL to preserve AT-256 byte-identity; mutation M8 reddens TC-566 AND AT-256 together.",
-    "inc3": "DONE - generation moved outside the except-ValueError span; single shared failure helper. 8 nodes, 5 mutations, INERT none. 42 pre-existing TUI report tests still green.",
-    "pr": "#184 open, NOT merged - Inc-0..Inc-3 all landed but REQUIREMENTS.md and the TC-610 amendment are still owed.",
-    "gate_suite": "2482 passed / 2 skipped / 21 deselected / 3 xfailed, 29 snapshots, exit 0. Ledger reconciles EXACTLY: 2428 + 27 + 19 + 8 = 2482.",
-    "gate_suite_provenance": "CLEAN - no mutation harness ran after this suite was launched (only doc writes and commits). Contrast Inc-1's run A, which was contaminated and is recorded as such.",
-    "owed_items": "ALL THREE DISCHARGED at batch-76: TC-610 amended to reserved-or-spent-by-its-owner; 42 ids flipped RESERVED->LIVE with nodes+statements derived from the tree via the shared tools/id_registry library; R-TUI-102 written into REQUIREMENTS.md with its verifier column.",
-    "carve_outs": "The four R-TUI-101 wording carve-outs are DISCHARGED - folded into the R-TUI-101 section of REQUIREMENTS.md, which is where they always lived and which batch-75 never opened.",
-    "backlog": "BACKLOG-CODE.md header refreshed + P0 closed + 4 new carries registered. The mutation-harness control candidate routed to BACKLOG-PROCESS.md, not duplicated."
+    "branch": "claude/batch-77-memmap-variant-a (PUSHED to origin, 0 unpushed, no PR yet)",
+    "phase0": "AWAITING GATE - 00-measurements.md and PLAN.md written; 15 premises evaluated; 7 stories classified (6 READY, 1 OUT); no ids minted; no requirements derived.",
+    "next": "Phase 2 cross-agent review: architect + qa-reviewer + security-reviewer in parallel over 01-requirements.md.",
+    "phase1": "APPROVED. Ids batch-scoped (no reservation PR). Two chartered features DESCOPED and registered as carries: C-77-f (o=open-hex keyboard affordance) and C-77-g (2-col fold marker + size label)."
   },
-  "blocking_carry": {
-    "id_guard": "THE NEXT STEP, and it blocks the other two. tests/test_id_registry.py::test_tc610 hard-asserts AT-250..279 / TC-552..599 stay RESERVED by batch-75, while G4 requires an id to be LIVE once REQUIREMENTS.md cites it as a verifier. Mutually unsatisfiable. Operator ruled (Q2): amend TC-610 to 'reserved-or-spent-by-its-owner'. Until then the ids MUST stay RESERVED and REQUIREMENTS.md must not cite them.",
-    "proven_by": "executed at Phase 0, both limbs, restored and hash-verified"
+  "phase2_review": {
+    "verdict": "BLOCK FROM ALL THREE LANES - 12 blockers (architect 7, QA 4, security 1), plus majors. Forces iterate-to-refine per the flow; not a discretionary gate.",
+    "convergent_finding": "RUNS vs RANGES, found INDEPENDENTLY by the architect and QA lanes - the strongest signal in the set. BandSegments are RUNS from _merge_band_runs, which SPLITS ON BAND CHANGE; they are not loaded.ranges. QA measured ONE range producing FOUR BandSegments; architect measured 14 run starts vs 11 range starts on prg.s19. Consequence: the C-31 completeness guard at :144 is FALSE on shipped fixtures, holding only because our sparse fixture is entropy-HOMOGENEOUS per range - a fixture coincidence, in the very guard written to prevent fixture-shaped input sets. And visible_cols is per-SEGMENT, so when 1 range yields 4 segments the monotonicity clause has NO SUBJECT.",
+    "design_wall": "architect B-1/B-2: the specified design fails on examples/case_00_public/prg.s19, a fixture that SHIPS IN THIS REPO - 5 runs invisible at BOTH regimes, 9 and 10 segments painted outside. The cause is arithmetic: 14 runs + 10 gaps = 24 segments into a 21-column container. Onset at 6 regions; at 10 regions all widths collapse to 1 (the strict limb dies - the relocation I explicitly asked the lane to check for); above 11 runs it is impossible by counting. R1 was necessary but NOT SUFFICIENT. Resolved by operator ruling R-7.",
+    "security_blocker": "HLR-116 auto-select moves an EXISTING untrusted-text sink onto the load path with no acceptance - #map_detail_body carries A2L names and ValidationIssue text, and today a deliberate click gates it. The four NEW label surfaces are all clean (B3 holds by construction, security could not falsify it); this is an existing sink made newly REACHABLE, which is why the B3 analysis correctly missed it.",
+    "false_docstring_I_VERIFIED": "safe_text's docstring (screens_directionb.py:688) claims it neutralises 'raw ANSI bytes ... no style/ANSI leak'. EXECUTED: safe_text('sensor\u001b[31m_evil[red]') returns the string UNCHANGED - ESC survives, 21 chars billed for 16 visible. The MARKUP half is true, the ANSI half is FALSE. A false claim in SHIPPED SOURCE became this spec's premise via its 'already C-17-hardened' line. Consequence lands on this batch specifically: a hostile A2L symbol inflates rendered width by invisible bytes, distorting the layout arithmetic the batch exists to reconcile.",
+    "meta_finding": "QA: the section 9 mutation table was marked DISCHARGED with a checkmark but is a PREDICTION over code that does not exist yet. C-39/C-40 require executed transcripts. A prediction wearing a discharge mark is the exact defect class this batch keeps finding, this time inside the document written to prevent it.",
+    "confirmed_sound": "N-1 reproduced byte-for-byte by two lanes; N-2 confirmed (17/97); R-6 two-arm split correct (each mutation reddens exactly one arm) though gated on QA B-3; ID namespace clean; all 14 AT / 29 TC allocated exactly once; zero should/deberia in Statements; Amendments A/B verbatim-correct; Amendment C drops no observable; all increments <=5 files; frozen boundary 0 intersections; the four new label surfaces clean; colour discipline sound."
   },
-  "requirement_amendments": [
-    {
-      "id": "B76-A1",
-      "clause": "LLR-108.8",
-      "before": "uniform gating including the preamble",
-      "after": "uniform EXCEPT the O(1) header (181 B, flat V=1..20000); inventory/overview stay gated and disclosed",
-      "driver": "P-16 TRUE. Preamble is O(V) (62.0 then 65.0 B/variant) and hits the cap at V~32285, so literal uniformity refuses the title and contradicts AT-255. The spec's own sketch (exempt the whole preamble) was REJECTED by measurement: it would put an O(V) term in the allowance and make HLR-108's V-invariance stated-but-false.",
-      "authority": "OPERATOR-APPROVED via AskUserQuestion"
-    },
-    {
-      "id": "B76-A2",
-      "clause": "LLR-108.4",
-      "before": "charged against its own reservation",
-      "after": "and against the document budget; an admission requires BOTH",
-      "driver": "P-27 NEW+FALSE. A floored reservation over-subscribes: sum = V*max(CAP//V,floor) = 48.8x CAP at V=100000. Reservation-only gating would break the ceiling AT-250/251/252 assert.",
-      "authority": "forced, not a judgement call"
-    },
-    {
-      "id": "B76-A3",
-      "clause": "LLR-108.4 (impl)",
-      "before": "shares cut from REPORT_MAX_TOTAL_BYTES",
-      "after": "shares cut from gate.budget.remaining()",
-      "driver": "the preamble is already charged when shares are cut; at a 4000 B limit six shares of CAP//6=666 promise 3996 B against 2000 B available",
-      "authority": "found while building the AT-254 fixture"
-    }
-  ],
-  "merge_gate": {
-    "verdict": "BLOCK",
-    "ran": "final independent qa-reviewer pass over the whole diff vs main, as the kickoff merge precondition requires",
-    "high_findings": 4,
-    "H-1": "AT-252 (all 3 arms) and AT-251[V=1] stay GREEN with the byte gate fully removed. VERIFIED INDEPENDENTLY: gate -> return True gives '3 failed, 4 passed'. TC-552 guards raw>limit(4096) but the assertion's ceiling is limit+allowance(V)=52698, so the fixture sits 30-45kB BELOW the ceiling and needs no gate. This is Phase-2 blocker B-4 reproduced VERBATIM inside the revision written to close it (amendment A-4). HLR-108's F-invariance half has no working acceptance.",
-    "H-2": "The ceiling has no oracle: _ceiling() calls the product's own _disclosure_allowance. Substituting it with 1e9 keeps all 27 green. LLR-108.7/A-10 required TC-555 to recompute INDEPENDENTLY; the tautology was relocated, not removed.",
-    "H-3": "The allowance under-derives and the stated ceiling is measurably violated: note/headings terms use REPORT_CELL_CHARS (an INPUT char cap) as an EMITTED BYTE bound. Measured 4.03x on emoji ids; excess ~1000 B/variant, growing without bound in V. The chartered TC-556 (the 2.03x pin whose stated purpose was 'so the allowance is never re-derived from REPORT_CELL_CHARS') was silently repurposed to assert the reservation floor instead - and its repurposing was NOT declared, unlike TC-561's.",
-    "H-4": "AT-253's byte-equality claim is unrealized. VERIFIED INDEPENDENTLY: rendering a section COUNT under the 'bytes' label keeps all 27 green. A-6/F6 required equality with the sum of _line_bytes(refused).",
-    "medium": "M-1 REQUIREMENTS.md ships 7 non-claims against the spec's 11, dropping the 2.03x input-shaped-cap caveat that H-3 depends on. M-2 a FOURTH unrecorded amendment: the ceiling became a private V-dependent function instead of the spec's imported constant, which is what makes H-2 possible. M-3 B76-A3 has no acceptance at all.",
-    "my_own_error": "My increment-001 evidence table reported 'M1 -> AT-250/251/252 RED' and 'INERT: none'. The transcript line I was reading said '3 failed, 4 passed'. I read a per-mutant EXIT CODE as a per-arm verdict, so the mutation harness aggregated over parametrized arms and hid four green ones. This is the batch's own recurring defect landing in my evidence.",
-    "disposition": "MERGE BLOCKED and returned to the operator, per the kickoff precondition. Not fixed in-session: four HIGH findings in acceptance design deserve a fresh context, not a near-exhausted one.",
-    "closure": {
-      "commit": "fd9124a",
-      "verdict_now": "four HIGH closed; awaiting the re-run independent qa-reviewer pass",
-      "authorization": "operator granted autonomous + merge authorized, with one declared stop for the H-3(b) decision (answered: Option 3)",
-      "per_arm_counterfactual": "21/21 arms RED across 6 mutations via tools/mutation_harness.py; harness positive-controlled on dead code (reported inert AND never-executed)",
-      "H-1": "CLOSED. Reproduced per-arm: 3 RED / 4 GREEN, and the 4 green arms are exactly the arms where raw > ceiling was false. TC-552 now guards every arm against its own ceiling. Shrinking _SHRUNK_LIMIT was NOT an available branch: allowance(1)=48602 is limit-independent, so even limit=0 leaves the ceiling above every AT-252 arm. Cells widened to REPORT_BYTES_PER_CELL; rows left at 60/40 so batch-74's row cap still never fires. M1 now 7/7 RED.",
-      "H-2": "CLOSED, and the finding was UNDERSTATED: _disclosure_allowance has ZERO production call sites - a test-consumed constant living in the product module, which is the mechanical reason a 1e9 substitution passed 27 nodes. TC-555 now sandwiches it (measured floor / independently derived cap / O(V) slope floor). REJECTED the reviewer's literal remedy on measurement: a per-term-sound independent derivation is 2.5-3x the product value, and adopting it as the ceiling would have tripled the bound and weakened all 7 ceiling ATs. TC-612 carries the chartered discriminating arm, split for C-18 and DECLARED.",
-      "H-3": "CLOSED. Violation reproduced: +3747/+54200/+356922 at V=50/100/400, a flat 1009.1 B/variant, i.e. the V-invariance clause failing rather than slack absorption. TC-611 restores the node section 6 chartered as TC-556 AND corrects its constant: the charter says 2.03x but the true worst case is 4.03x (unescaped non-BMP), so both arms are pinned. Operator chose Option 3: note/headings derive from REPORT_VARIANT_ID_MAX_BYTES = 3*255 = 765, the reachable filename bound, giving slope 1068->1321 with the heading portion exactly 777 = the measured supremum - sound by construction and tight. Non-claim (h) states the domain and the measured excess outside it. Output-neutral: zero production callers, plus the AT-256 golden pin.",
-      "H-4": "CLOSED. AT-253 now parses the rendered disclosure per kind with a positional regex and asserts dict EQUALITY against refused bytes weighed independently at the seam (wrapping _EmissionGate.emit), not against _Refusals.byte_count - which would have restated TC-560. M3 RED.",
-      "handoff_propositions_re_executed": "12 evaluated, 4 did not survive execution. (P-3) 'fixture must grow OR the limit shrink' had only one branch. (P-7) md_safe on a double quote is 1.03x, not 2.03x - the double quote is not in MD_ESCAPE; the 2.03x characters are the MD_ESCAPE members. (P-8) the chartered 2.03x pin was itself under-derived; the true worst is 4.03x. (P-9) the byte-maximising reachable id is a 3-byte BMP character at 777 B, not emoji, which cost 2 UTF-16 units so only 127 fit (520 B). (P-12) the registry is at the repo ROOT, not .dev-flow/. None changed a finding's disposition; all four changed the fix.",
-      "gate_suite": "2514 passed, 2 skipped, 3 xfailed, 29 snapshots, exit 0, 1734.87s. ONE run, none discarded. Ledger reconciles on collection: 2508 - 0 + 11 = 2519. The +21 over the handoff's passed count is the 21 slow-marked tests: tui-ci.yml runs -m 'not slow' on pull requests and the full suite on pushes, so the batch's local gate evidence used the LEAN form and those 21 were in no batch-76 evidence at all. This run used the FULL form - the one a merge to main triggers - and they pass.",
-      "self_caught": "The new harness found TWO defects in tests written in this same session: TC-612's probe label was 21 characters against an 18-character maximum, so it moved the row-width term rather than cardinality and passed with the cardinality factor gutted to 1; and TC-555's total floor was inert on 4 of 5 arms against a 2x slope error, because at small V the constant terms swallow a rate error. The harness also broke its own byte-exact-restore contract on a Windows newline round-trip, and its own SHA-256 check is what caught it.",
-      "control_candidates": "CC-1 per-arm counterfactual verdicts - the strongest single-occurrence evidence in the project - registered in BACKLOG-PROCESS.md, NOT encoded (needs its own AskUserQuestion). CC-2..CC-5 in 05-postmortem.md section 7.",
-      "carry": "REPORT_VARIANT_RESERVATION_FLOOR_BYTES (report_service.py:412) carries the same character-cap-as-byte-bound pattern, and its guard TC-556 measures the marginal against a 2-character variant id - the same narrow-fixture class. NOT a live defect and outside the approved scope; registered as P3 in BACKLOG-CODE.md."
-    }
+  "phase1_revision2": {
+    "status": "final pending R-8/R-9 fold, then all three lanes re-review",
+    "R7_needed_BOTH_halves": "VERIFIED, not assumed. With the CSS widen applied but NO allocation bound, prg.s19 at bar=50 still leaves 5 runs invisible - content sums to 60 into a 50-column bar because max(1,.) floors nine tiny runs while one claims 26. With the normative bound (LLR-111.7, floor-1 + largest-remainder) prg.s19 fits EXACTLY at both regimes: all runs visible, monotone, strict, ZERO aggregation. Aggregation onset measured at 26 runs @bar=50 and 34 @bar=66, matching 2*n_runs - 1 > bar_w, so no shipping fixture triggers it.",
+    "CSS_sweep": "Five candidates measured on both axes across the whole pane. Only always-stack widens the bar 21->50 without starving a sibling.",
+    "architect_self_caught_3": "(1) Its first CSS sweep compared the glance box against its TITLE (11 cols) instead of its widest CONTENT row (29) and reported 'STARVED: none' for every candidate - the C-13 starvation failure committed INSIDE the starvation detector. The corrected run also surfaced a PRE-EXISTING 1-column clip (28-col box, 29-col row) -> carry C-77-j. (2) Its own 68->68->66 settle trace is RETRACTED: those were three reads inside ONE frame plus one after a pause, not two pauses. Per-pause sequences are {(66,66,66):9, (68,66,66):3} - never two consecutive transients, agreeing with the architect reviewer's 97 traces. LLR-111.6 now counts PAUSES with one criterion instead of two. (3) The runs-vs-ranges finding briefly appeared REFUTED until it found its own fixture built random.Random(3) PER BYTE, making the 'random' half constant.",
+    "honesty_notes_kept": "AT-B77-02 remains a labelled PIN ('predicted - execute at Inc-3') and AT-B77-09 cannot be RED until Inc-7. Both stated in section 9 rather than counted as discharged. Rev-1's checkmark on the C-40 row was a prediction wearing a discharge mark - the defect class this batch keeps finding."
+  },
+  "phase2_regate": {
+    "verdict": "BLOCK, but every rev-1 blocker across all three lanes DISCHARGED BY EXECUTION. architect 6 of 7 closed / 6 new; QA 4 of 4 closed / 1 new; security M-1+M-2 closed / 1 new. 7 of the 8 new blockers are in the AGGREGATION path added by R-7.",
+    "convergent_again": "Both architect (RB-1) and QA independently found the SAME new defect: the re-authored C-31 coverage guard excludes aggregates from its emitted set, so it is FALSE on a correctly-aggregating implementation. QA's minimal proof: 2 ranges -> 1 aggregate -> emitted empty -> coverage False. It compounds - AT-B77-17's count formula is GREEN identically whether 10 runs were MERGED or SILENTLY DROPPED, and the coverage clause was the only thing that could separate them.",
+    "signature_failure_third_occurrence": "A design validated on the fixture its author chose, failing on a fixture that ships in the repo. (1) The charter validated on our 5-region fixture and failed on prg.s19. (2) Rev-2 aggregation validated on a synthetic fixture and fails on case_08 (801 ranges). Rev 2 justified the synthetic fixture with 'no shipping fixture reaches the threshold' - FALSE. Each occurrence landed on whatever path was newest.",
+    "genuinely_fixed": "Bar widens 21->50; prg.s19 fits EXACTLY at both regimes (sum 66 into 66, 50 into 50), all visible, monotone, strict, outside=0, agg=0; 15 further shipped fixtures + 3 synthetic classes pass; no regime regresses. The detached-widget defect, the runs-vs-ranges guard, the vacuous 1fr ruler clause and the false ANSI docstring are all confirmed fixed by execution. All three author self-caught errors genuinely repaired.",
+    "security_X1_self_correction": "The security lane WITHDREW ITS OWN rev-1 rationale, which rev 2 had adopted: 'distorting the very layout arithmetic R-7 exists to reconcile' is FALSE on execution. A hostile payload inflated the detail body 277->708 chars with ESC present while .map-band-bar, #map_grid and #map_detail were BYTE-IDENTICAL at both regimes - #map_detail is width:36 FIXED, never content-sized. AN ATTACKER CANNOT PERTURB THE BAR THROUGH A SYMBOL NAME. I had repeated this claim to the operator TWICE and corrected it in-conversation. The finding stands on its real grounds; the rationale is withdrawn before it becomes batch-78's premise.",
+    "lanes_caught_own_probes_again": "QA's first Inc-1 probe read bar=0 everywhere because it held a PRE-RE-RENDER widget reference - its own B-3 trap, committed inside the probe verifying B-3's fix."
+  },
+  "phase2_gate3": {
+    "verdict": "security CLEAN (2 minor gate-cell fixes) | QA NO BLOCKERS (4 majors) | architect BLOCK 3, own disposition 'two edits and one small decision - no re-scoping'. R-10 and R-11 are working.",
+    "root_cause_named_at_the_cap": "PROPAGATION. Across all three gate rounds the same failure: a change is applied where it was NOTICED and not propagated to everything that depends on it. R-10's domain landed on HLR-111's Statement and the AT labels but not its LLR children and not HLR-112 at all. Earlier, a design was validated on ONE fixture rather than the fixture set. Same shape, different layer. Revision 4 must run an EVIDENCED propagation sweep in section 6.4 over R-1..R-11, not merely fix the three instances.",
+    "converged_again": "HLR-112 left universal + the dangling LLR-112.2 reference were found INDEPENDENTLY by the architect and QA lanes. Third convergence of the batch.",
+    "opposite_defects_same_gate": "Inc-2's gate is simultaneously VACUOUS (architect: before Inc-7's auto-select the detail body is _DETAIL_HINT, so AT-B77-15a/b are green on ANY implementation) and RED-ON-CORRECT (QA: LLR-116.6 and the AT block still say 'payload verbatim' while LLR-116.7 correctly says non-CONTROL characters verbatim, and post-scrub the ESC payload is deliberately not verbatim). Both true because the lanes tested different limbs. Pulling the scrub early to avoid a red gate produced a gate that can neither fail nor pass.",
+    "split_debris_found": "QA M-3: section 5.3 'Batch acceptance criteria' was DELETED between rev 2 and rev 3 (numbering jumps 5.2 -> 5.4), taking the frozen-engine diff gate, the full-suite baseline and 0-blockers-at-merge with it, with nothing in 6.4 recording a decision. Collateral from the R-10 removal - exactly the debris class I asked the lanes to hunt.",
+    "my_figures_wrong_a_third_time": "I reported case_08 as 99.5%/99.9% runs unseen. Those reproduce only on the PRISTINE producer + CSS alone (gaps unfolded). With batch-77's actual producer: 768/801 = 95.9% and 776/801, outside=1535/1551. THE BATCH MEASURABLY IMPROVES case_08 and the document understated its own work. Both lanes agree on the corrected figures. Underneath: the out-of-domain degradation rule is UNSPECIFIED, so those numbers are implementation-defined rather than a contract.",
+    "security_clean_detail": "The scrub is a BYTE-CLASS filter, not a pattern - which is why it catches U+009B and U+009D (single-byte C1 CSI/OSC carrying no ESC, which any pattern-based filter passes). 11 evasion forms probed, 0 residual control bytes. Identity damage 0/14. AST census over 85 call sites in 4 modules: 0 literal-argument control chars. The ESC limb now genuinely flips True->False under mutation where rev 2's was False->False. Forward flag carried into revision 4 as a NORMATIVE shall: an implementer must not substitute a regex.",
+    "fourth_lane_self_correction": "Security retracted its own out-of-domain probe reading 1267 ms at n=20,000 that looked quadratic - its probe was recomputing sum() per element. Fourth self-caught probe defect across the lanes this batch; every one would have been a false finding reported with a real transcript."
+  },
+  "phase2_APPROVED": {
+    "verdict": "APPROVED at revision 5 (819 lines). security CLEAN and QA NO BLOCKERS at rev 3; the architect's final re-gate returned 1 blocker + 1 major with the explicit disposition 'both substantive items are EDITS. No design work remains. This batch does not need re-scoping.' Revision 5 made exactly those edits.",
+    "rounds": "4 gate rounds, 9 review passes, 5 requirement revisions, 11 operator rulings.",
+    "propagation_sweep_now_DERIVED": "Section 6.4a is the batch's most reusable artefact. It began hand-listed - which the final re-gate correctly called the C-31 vacuous-input-set defect INSIDE the control built to stop it, the fourth occurrence of that shape in this batch. It now carries rows that COMPUTE the excluded set from examples/**/*.s19 rather than confirming a domain exists, under the standing rule: a domain whose excluded set has not been computed has not been measured. Final result 42/42 with THREE genuine residues corrected (P-50's disposition pointing at a withdrawn LLR; the LLR-111.8 dependency inside LLR-112.2; the corpus count).",
+    "corpus_count_corrected": "THE CORPUS IS 16 FIXTURES, NOT 17. Every revision since the first wrote '16 of 17'; the derived split is 15 of 16 for HLR-111. I VERIFIED THIS MYSELF: find examples -name '*.s19' | wc -l = 16. A figure repeated across four revisions and to the operator several times had never been derived by anyone. Conclusion unaffected (94% either way); the provenance was the defect.",
+    "HLR112_domain_measured": "THREE exclusions, not one. prg.s19 - THE SHOWCASE FIXTURE - is OUT at both regimes (15 ticks vs a ceiling of 7@80x24 / 5@120x30), so US-77-2's delivered outcome there is weaker than the story implies and that is now on the page. case_07_stress_smoke is OUT at 120x30 only (6 vs 5) - I found that one independently; neither the document nor the reviewer had listed it. case_08 is OUT at both (802 ticks). The 1-column separator convention is now NORMATIVE because it decides membership: at pitch 8 the ceiling reads 8/6 and case_07 looks in-domain when it is not.",
+    "latent_trap_closed": "AT-072b carries an in-domain 'no elided tick' clause and would have gone RED on CORRECT code if Inc-4 reached for prg.s19. The current node uses case_02 (in domain), so this would have surfaced mid-implementation as a mysterious failure against working code. Fixture now pinned in both the AT and Inc-4's cell, with prg.s19 explicitly forbidden.",
+    "case08_figures_FINAL": "Carry BOTH or neither. Shipped: 797/801 (99.5%) @80x24 and 800/801 (99.9%) @120x30. batch-77: 768/801 (95.9%) @80x24 and 776/801 (96.9%) @120x30. Improvement -29 and -24. A lone 95.9% understates the wide regime. I reported these wrong to the operator three times before they were derived.",
+    "carried_into_phase3": [
+      "Inc-2's precondition assertions are a SPEC statement - verify by execution at Inc-2 that both size arms fail loudly on a missed gesture, since revision 4's edit pass fixed 120x30 and left 80x24 vacuous.",
+      "LLR-116.7 mandates a byte-CLASS filter naming U+009B/U+009D. If an implementer substitutes a regex on ESC-introduced sequences, the C1 and OSC-8 holes reopen silently and every test stays green.",
+      "Re-run section 6.4a for ANY domain/scope/withdrawal/wording change - standing obligation.",
+      "AT-B77-02 is a labelled PIN (predicted - execute at Inc-3); AT-B77-09 is a PIN. Neither may be quietly upgraded to discharged."
+    ]
   },
   "handoff": {
-    "document": ".dev-flow/HANDOFF-2026-07-31-batch-76-merge-gate.md",
-    "reason": "Four HIGH findings in ACCEPTANCE STRENGTH (not in shipped code) surfaced at the merge gate. Handed to a fresh session rather than fixed with a near-exhausted context - fixing acceptance design badly is how these defects were introduced in the first place.",
-    "resume_at": "Close H-1..H-4, re-verify PER-ARM, re-run the independent qa-reviewer merge gate, then sync.",
-    "first_action": "ASK the operator for the authorization model. It is per-batch and never inherited - not from the handoff document, not from this file.",
-    "status": "DISCHARGED at fd9124a - all four HIGH closed per-arm; sections 2-6 executed; section 3 item 1 implemented as tools/mutation_harness.py"
+    "document": ".dev-flow/HANDOFF-2026-08-01-batch-77-phase3.md",
+    "reason": "Phases 0-2 complete and approved; Phase 3 not started. Handed to a fresh session at a CLEAN PHASE BOUNDARY rather than mid-increment, because Inc-1 is INDIVISIBLE (4 files: CSS widen + container basis + bound + fold + settling) and a partial Inc-1 is the worst available handoff state.",
+    "resume_at": "Phase 3, Inc-1. There is NO Inc-0 - PLAN.md section 4's indicative roadmap is SUPERSEDED by requirements section 7, which runs Inc-1..Inc-9. The golden capture is Inc-3 BY DESIGN: capturing it before the basis settles pins the retired arithmetic, which is exactly how [45,15] got into revision 1.",
+    "first_action": "ASK THE OPERATOR FOR THE AUTHORIZATION MODEL. Per-batch, never inherited - not from the handoff, not from this file. The previous grant (autonomous + merge authorized) DOES NOT TRANSFER.",
+    "status": "OPEN"
+  },
+  "phase3_entry_gate": {
+    "toolchain": "Python 3.14.4 / pytest 8.4.2 / ruff 0.15.17, verified 2026-08-01",
+    "collection_baseline": "2519 tests on f8747b8; reconciles with batch-76's close (2508 - 0 + 11 = 2519)",
+    "full_suite_baseline": "launched at handoff - read its own output, never splice (C-19)",
+    "no_production_code_written": true,
+    "open_questions_for_phase3": "OQ-3 (delete _BAND_BAR_WIDTH or retain as a pre-layout fallback - Inc-1) and OQ-4 (focus-entry mechanism; the rail tab chain is SHARED - Inc-7)"
+  },
+  "session_close_reconciliation_C44": {
+    "committed": "All 11 batch-77 artifacts, state.json, BACKLOG-CODE.md, and the 6 charter files - through d125ca1.",
+    "branch_NOT_pushed": "SUPERSEDED - the branch IS pushed. origin/claude/batch-77-memmap-variant-a, 0 unpushed commits. C-44 is explicit that a commit which never lands is not a terminal state, so pushing was the correct close rather than deferring it. No PR is open yet; the resuming session owns that.",
+    "reported_as_found": "prototypes/out/ is untracked and PRE-DATES this session; never swept up.",
+    "lane_B_owed": "DISCHARGED - written into .dev-flow/BACKLOG-PROCESS.md at this close, not left as a pointer, per the routing rule that a carry belonging to the other lane is WRITTEN there in that batch own close.",
+    "scratchpad": "Throwaway probes outside the repo tree; all output transcribed into the artifacts."
   }
 }

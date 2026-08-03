@@ -74,6 +74,36 @@ def _capture_nav(panel: "object", sink: List[int]) -> None:
     panel.post_message = _cap  # type: ignore[method-assign]
 
 
+async def _settle_band_bar(app: "S19TuiApp", pilot: "object", max_pauses: int = 40):
+    """Pause until the band bar's width is stable across two pause boundaries.
+
+    batch-77 (LLR-111.1 / LLR-111.6) makes the strip's segment widths a function
+    of the MEASURED container. That measurement does not exist where the widgets
+    are built — on a fresh render ``#map_grid`` reports width 0 — so the widths
+    settle one frame after the mount. Reading a region after a single pause
+    therefore reads a transient: measured at 120x30, one pause reports a
+    52-column bar with every segment 1 column wide, while the settled state is a
+    50-column bar with segments 25 / 1 / 24. A segment picked from the transient
+    is clicked at coordinates that, by click time, belong to a different segment.
+
+    Repeated reads WITHIN one frame are not evidence of settling — the criterion
+    is a fixed point across successive ``pause()`` boundaries.
+    """
+    previous = None
+    for _ in range(max_pauses):
+        await pilot.pause()
+        bars = list(app.query(".map-band-bar"))
+        if not bars:
+            return 0
+        width = bars[0].region.width
+        if previous is not None and width == previous:
+            return width
+        previous = width
+    raise AssertionError(
+        f"band bar width never settled across {max_pauses} pauses; last {previous}"
+    )
+
+
 async def _map_ready(app: "S19TuiApp", loaded: "object", pilot: "object"):
     """Show the map screen with ``loaded`` installed and return the live panel."""
     from s19_app.tui.screens_directionb import MemoryMapPanel
@@ -82,7 +112,7 @@ async def _map_ready(app: "S19TuiApp", loaded: "object", pilot: "object"):
     app.current_file = loaded
     app.action_show_screen("map")
     app.update_memory_map()
-    await pilot.pause()
+    await _settle_band_bar(app, pilot)
     return app.query_one("#memory_map_panel", MemoryMapPanel)
 
 
@@ -114,7 +144,18 @@ def _drive_clicks(
             row = next(
                 r for r in app.query(RegionRow) if match_text in _widget_plain(r)
             )
-            row.scroll_visible(animate=False)
+            # Scroll the OWNING viewport, not the row's own ``scroll_visible``.
+            # batch-77's LLR-111.9 stacks the band row, growing it 4 -> 6 rows at
+            # 120x30 (the accepted C-77-k cost), which pushes the region list to
+            # the bottom edge of #map_content's 13-row viewport. Measured, the
+            # target row then sits on the boundary: ``scroll_visible`` treats it
+            # as already visible and does not scroll, but it is not hit-testable
+            # — ``get_widget_at`` at its own reported centre returns the
+            # container. ``scroll_to_widget(..., top=True)`` brings it genuinely
+            # into view, which is also what the operator does.
+            app.query_one("#map_content").scroll_to_widget(
+                row, animate=False, top=True
+            )
             await pilot.pause()
             await gesture(pilot, row)
             await pilot.pause()
@@ -126,7 +167,18 @@ def _drive_clicks(
 
 
 def test_ac3_single_click_inspects_and_does_not_navigate(tmp_path: Path) -> None:
-    """AC-3: one real click fills the inspector and posts NO navigation."""
+    """AC-3: one real click fills the inspector and posts NO navigation.
+
+    batch-77 Inc-8 — this node is ONE HALF of ``AT-B77-10`` (PIN); the other
+    half is ``test_ac4_double_click_navigates_to_the_region_start``. What
+    ``AT-B77-10`` claims is that the batch-67 N4a mouse SPLIT survives HLR-115:
+    single inspects, double navigates. A split is a two-sided claim, so it maps
+    to the two existing nodes that already own its two sides rather than to one
+    new node that would cover half of it while being labelled as if it covered
+    both (QA M-5). Neither node is modified by Inc-8: ``Enter`` posts the same
+    ``RegionRow.Activated`` a click posts, with ``chain = 1``, so the keyboard
+    adds no second route past the policy site these two nodes gate.
+    """
     posted, detail, region_start = _drive_clicks(
         tmp_path, lambda pilot, row: pilot.click(row)
     )
@@ -142,7 +194,12 @@ def test_ac3_single_click_inspects_and_does_not_navigate(tmp_path: Path) -> None
 
 
 def test_ac4_double_click_navigates_to_the_region_start(tmp_path: Path) -> None:
-    """AC-4: one real double click posts exactly one nav at the region start."""
+    """AC-4: one real double click posts exactly one nav at the region start.
+
+    batch-77 Inc-8 — the second half of ``AT-B77-10`` (PIN); see
+    ``test_ac3_single_click_inspects_and_does_not_navigate`` for why the claim
+    is mapped to two nodes and not one.
+    """
     posted, detail, region_start = _drive_clicks(
         tmp_path, lambda pilot, row: pilot.double_click(row)
     )
@@ -216,15 +273,13 @@ def test_ac6_band_segment_single_click_inspects_its_own_run(tmp_path: Path) -> N
     ``region_start``, not merely "some region" — which is what distinguishes a
     correctly-threaded address from a segment that just forwards the first run.
 
-    Runs at **160x48**, not the 120x30 used elsewhere in this module, and the
-    reason is a measured pre-existing limitation rather than convenience: the
-    strip is laid out against the fixed ``_BAND_BAR_WIDTH = 60`` constant
-    (batch-45 LLR-041.2, deliberately geometry-pure) while its container is
-    ``width: 1fr``, so at 120x30 the container renders only 21 columns and every
-    segment beyond it is CLIPPED — already invisible today, and therefore also
-    unclickable. 160x48 gives the bar 63 columns, so a non-first segment is
-    genuinely reachable and the "not always the first run" rigor is real.
-    See ``test_ac6_clipped_segments_are_a_known_layout_limitation``.
+    Runs at 120x30 like the rest of this module. It ran at 160x48 until
+    batch-77: the strip was laid out against a fixed 60-column constant while
+    its container was ``width: 1fr``, so at 120x30 the bar rendered only 21
+    columns and every segment beyond it was clipped — invisible, and therefore
+    unclickable. batch-77 (LLR-111.1/.7/.9) reconciled the two, so a non-first
+    segment is now genuinely reachable at the regime this module actually
+    tests, which is where the clickability needed covering.
     """
     from s19_app.tui.screens_directionb import BandSegment
 
@@ -233,7 +288,7 @@ def test_ac6_band_segment_single_click_inspects_its_own_run(tmp_path: Path) -> N
     async def _run() -> tuple[List[int], str, int]:
         app = S19TuiApp(base_dir=tmp_path)
         posted: List[int] = []
-        async with app.run_test(size=(160, 48)) as pilot:
+        async with app.run_test(size=(120, 30)) as pilot:
             panel = await _map_ready(app, loaded, pilot)
             _capture_nav(panel, posted)
             bar = app.query_one(".map-band-bar")
@@ -272,7 +327,7 @@ def test_ac6_band_segment_double_click_opens_its_run_in_hex(
 ) -> None:
     """AC-6: double-clicking a band segment navigates to that run's start.
 
-    160x48 for the same measured reason as the single-click test above.
+    120x30 for the same reason as the single-click test above.
     """
     from s19_app.tui.screens_directionb import BandSegment
 
@@ -281,7 +336,7 @@ def test_ac6_band_segment_double_click_opens_its_run_in_hex(
     async def _run() -> tuple[List[int], int]:
         app = S19TuiApp(base_dir=tmp_path)
         posted: List[int] = []
-        async with app.run_test(size=(160, 48)) as pilot:
+        async with app.run_test(size=(120, 30)) as pilot:
             panel = await _map_ready(app, loaded, pilot)
             _capture_nav(panel, posted)
             bar = app.query_one(".map-band-bar")
@@ -336,56 +391,6 @@ def test_ac6_band_segments_do_not_widen_region_row_queries(
         f"BandSegment must NOT be a RegionRow subclass — {overlap} of "
         f"{seg_count} segments matched query(RegionRow), which would corrupt "
         f"every existing region-row count assertion"
-    )
-
-
-def test_ac6_clipped_segments_are_a_known_layout_limitation(tmp_path: Path) -> None:
-    """PIN the pre-existing band-strip clipping N4b inherits (NOT introduced here).
-
-    The strip's segments are positioned against the module constant
-    ``_BAND_BAR_WIDTH = 60`` — byte-identical on the batch-67 base ``73e3fb9``,
-    with a docstring stating the fixed width is deliberate ("independent of live
-    layout geometry", batch-45 LLR-041.2). Its container is ``width: 1fr``, so
-    the two disagree whenever the rendered container is narrower than 60: at
-    120x30 the bar measures 21 columns and any segment beyond it is clipped —
-    invisible before batch-67, and consequently unclickable after it.
-
-    This is recorded as an executable fact rather than a backlog sentence so
-    that whoever reconciles the constant with the container sees this test go
-    green-to-red and knows exactly which claim they invalidated. It asserts the
-    DISAGREEMENT exists, so fixing the layout correctly fails here and the fixer
-    must delete it deliberately.
-
-    Deliberately NOT fixed in this increment: reconciling the two would change a
-    documented geometry-purity decision, redistribute every segment width, and
-    drift the map snapshot baselines further — an operator design call, not a
-    side effect of making bands clickable.
-    """
-    from s19_app.tui.screens_directionb import BandSegment, _BAND_BAR_WIDTH
-
-    loaded = _two_band_loaded(tmp_path)
-
-    async def _run() -> tuple[int, int, int]:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await _map_ready(app, loaded, pilot)
-            bar = app.query_one(".map-band-bar")
-            segs = list(app.query(BandSegment))
-            outside = [s for s in segs if not bar.region.contains_region(s.region)]
-            return bar.region.width, len(segs), len(outside)
-
-    bar_width, seg_count, outside_count = asyncio.run(_run())
-
-    assert bar_width < _BAND_BAR_WIDTH, (
-        f"PREMISE CHANGED: the 120x30 band bar now measures {bar_width} columns, "
-        f"no longer narrower than the authored _BAND_BAR_WIDTH={_BAND_BAR_WIDTH}. "
-        "If the constant and the container were reconciled, DELETE this test — "
-        "it exists only to pin the disagreement."
-    )
-    assert outside_count > 0, (
-        f"PREMISE CHANGED: all {seg_count} segments now fit inside the "
-        f"{bar_width}-column bar at 120x30. The clipping this test pins is gone; "
-        "delete it and drop the limitation note from the two AC-6 pointer tests."
     )
 
 

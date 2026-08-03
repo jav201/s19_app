@@ -7,6 +7,13 @@ tests/__snapshots__/**/*.svg text eol=lf
 # same reason: the ATs undo CRLF on read, but LF-on-disk keeps the fixtures
 # byte-stable across Windows/Linux checkouts.
 tests/goldens/** text eol=lf
+# The batch-77 band-strip golden (AT-B77-02 / LLR-111.4) is EVIDENCE BYTES, not a
+# report: its content is the producer's rendered output verbatim, and AT-B77-02
+# compares it byte for byte. Evidence must not be normalized in EITHER direction --
+# `text eol=lf` rewrites the stored blob, which is the wrong fix for bytes whose
+# whole purpose is to be exactly what was captured (batch-66, .dev-flow pre-bytes).
+# This overrides the `tests/goldens/**` rule above; last matching pattern wins.
+tests/goldens/batch77/at-b77-02-gapless-band-strip.txt -text
 
 # Out-of-VCS rollback bytes (batch-66). These are byte-exact copies of files that
 # live OUTSIDE this repo (~/.claude/commands/, ~/.claude/skills/, the course on G:),

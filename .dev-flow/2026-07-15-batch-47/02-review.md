@@ -73,7 +73,7 @@ Every AT drives the shipped screen via `App.run_test()` at **both 80×24 and 120
 | AT-070c | **M1**: MAC parse-error `✗` (+ NEW fixture) | `…::test_at070c_parse_error` | 4 |
 | AT-071 | coverage strip `1 of 2` == CoverageMetrics | `…::test_at071_strip` | 4 |
 | AT-072a | map ≥2 band styles + `╱` hatch | `test_tui_map_big.py::test_at072a_bands` | 5 |
-| AT-072b | ruler exactly 5 ticks; 0%==span start, 100%==span end | `…::test_at072b_ruler` | 5 |
+| AT-072b | ruler exactly 5 ticks; 0%==span start, 100%==span end. ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). | `…::test_at072b_ruler` | 5 |
 | AT-073 | `N sym` per region == `range_index` count + `↵` | `…::test_at073_sym_count` | 5 |
 | AT-074 | inspector hex peek @ NON-first region start (+ MN-4 C-17 name literal) | `…::test_at074_inspector` | 5 |
 

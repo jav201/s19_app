@@ -24,8 +24,24 @@ Nodes in this file:
 - **TC-518** — no ``height: auto`` on the key pane (the degenerate regime).
 - **TC-516** — ``#legend_body`` is the two-pane WRAPPER, and all 9 shipped
   ``#legend_body``-rooted query sites still resolve as their own tests expect.
-- **TC-519** — ``s19_app/tui/legend.py`` is byte-identical to ``origin/main``
-  (LLR-072-7.1: the data layer is reused, never edited).
+- **TC-519** — the two-pane split RE-PARENTS the render helpers' widgets; it must
+  not reconstruct rows from text (LLR-072-7.1). Two arms: **A** — the CONSUMER
+  re-parents (``LegendScreen.compose`` splats each helper's return value directly
+  into its pane); **B** — the PRODUCERS return widgets, not text.
+
+  ⚠️ **AMENDED at batch-77 Inc-4** (§6.5 Amendment E). This index previously
+  stated the node's RETIRED predicate — *"``legend.py`` is byte-identical to
+  ``origin/main``"* — as current fact, and it was false on this very tree:
+  measured, ``git diff --stat origin/main -- s19_app/tui/legend.py`` is **8
+  insertions / 5 deletions**, so the file asserted a property its own contents
+  falsify. The retired predicate was wrong in **both** directions — too strict (a
+  legitimate data edit reddens it: ``LLR-112.3`` retires the 5-tick ruler contract
+  that ``legend.py`` states in operator-facing prose) and, which matters more, too
+  weak (``_render_card``/``_render_key`` and the ``compose`` that re-parents them
+  all live in ``screens.py``, so **it was watching a file the regression cannot
+  occur in**). The node NAME is retained despite now being inaccurate:
+  ``AT-TC-REGISTRY`` binds ``TC-519`` to that exact node path, so a rename is a
+  registry change — carried to the registry lane in ``.dev-flow/BACKLOG-CODE.md``.
 
 **AT-216 clause 4 — oracle mutation (C-32 / project engineering-rules).**
 Executed at the Inc-1 gate rather than encoded, since a permanently-mutated
@@ -51,11 +67,9 @@ from __future__ import annotations
 
 import asyncio
 import re
-import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-import pytest
 from textual.css.scalar import Unit
 from textual.geometry import Offset
 from textual.widgets import Static
@@ -698,39 +712,88 @@ def _repo_root() -> Path:
 
 
 def test_tc519_legend_module_unchanged_vs_main() -> None:
-    """TC-519 — ``git diff origin/main -- s19_app/tui/legend.py`` is empty.
+    """TC-519 — the two-pane split RE-PARENTS the render helpers' widgets.
 
     LLR-072-7.1: the two-pane split re-parents the widgets ``_render_card()`` /
-    ``_render_key()`` return; it must not reconstruct rows from text, so the data
-    module has no reason to change. Follows the ``test_engine_unchanged.py``
-    idiom (``git diff`` is line-ending / ``__pycache__`` aware).
-    """
-    repo_root = _repo_root()
-    ref = None
-    for candidate in ("origin/main", "main"):
-        probe = subprocess.run(
-            ["git", "rev-parse", "--verify", "--quiet", f"{candidate}^{{commit}}"],
-            cwd=repo_root,
-            capture_output=True,
-            text=True,
-        )
-        if probe.returncode == 0:
-            ref = candidate
-            break
-    if ref is None:
-        pytest.skip("neither 'origin/main' nor 'main' is available in this checkout")
+    ``_render_key()`` return; **it must not reconstruct rows from text.** That
+    is the invariant, and it is what the two arms below assert.
 
-    completed = subprocess.run(
-        ["git", "diff", "--name-only", ref, "--", "s19_app/tui/legend.py"],
-        cwd=repo_root,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    changed = [line for line in completed.stdout.splitlines() if line.strip()]
-    assert changed == [], (
-        f"s19_app/tui/legend.py must be reused unmodified (vs {ref}): {changed}"
-    )
+    ⚠️ **AMENDED at batch-77 Inc-4 (R-TUI-072 as amended). Before: this node asserted
+    ``git diff origin/main -- s19_app/tui/legend.py`` is EMPTY — file identity.
+    After: a predicate over the behaviour the rationale names.**
+
+    **Why the old form was wrong, and it was wrong in two directions.**
+
+    *Too strict.* batch-72 justified the file freeze with *"so the data module
+    has no reason to change"*. That was a true claim about **batch-72's own
+    scope**, not a standing property of ``legend.py``, and the node encoded it
+    as though it were the latter. **batch-77 falsifies it:** ``LLR-112.3``
+    retires the 5-tick address-ruler contract, and ``legend.py`` states that
+    contract in **prose the operator reads** — a citation site no ``LLR-072``
+    grep can find, which is why it survived to batch-77. Amending the
+    operator-facing legend is a legitimate data change with no bearing on
+    re-parenting, and the old node forbade it.
+
+    *Too weak, which matters more.* A ``git diff`` over ``legend.py`` cannot
+    fail on the regression this node exists to catch. ``_render_card`` /
+    ``_render_key`` and the ``compose`` that re-parents them all live in
+    ``screens.py`` — **not one of them is in the file the old node watched.**
+    Rewriting ``compose`` to rebuild every row from text would have left this
+    node GREEN. It was watching the wrong file.
+
+    **Arm A — the CONSUMER re-parents.** ``LegendScreen.compose`` must splat
+    each helper's return value directly into its pane. A reconstruction
+    (``*[Static(str(w.render())) for w in self._render_card()]``) makes the
+    starred value a comprehension rather than the call, and reddens here.
+
+    **Arm B — the PRODUCERS return widgets, not text.** A helper returning
+    strings would FORCE ``compose`` to reconstruct, so this is the same
+    invariant one layer up, asserted behaviourally rather than over source.
+
+    *A hash of the two helpers was considered and rejected: it reddens on any
+    edit to the producers while staying GREEN on the consumer defect, which is
+    where the regression actually lives.*
+
+    The node NAME is retained despite now being inaccurate: ``AT-TC-REGISTRY``
+    binds ``TC-519`` to this exact node path (and to ``_repo_root``, kept for
+    the same reason), so renaming is a registry change, not a test change.
+    Carried for the registry lane.
+    """
+    import ast
+    import inspect
+    import textwrap
+
+    from textual.widget import Widget
+
+    # Arm A — compose re-parents, never reconstructs.
+    tree = ast.parse(textwrap.dedent(inspect.getsource(LegendScreen.compose)))
+    splatted = {
+        node.value.func.attr
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Starred)
+        and isinstance(node.value, ast.Call)
+        and isinstance(node.value.func, ast.Attribute)
+    }
+    for helper in ("_render_card", "_render_key"):
+        assert helper in splatted, (
+            f"LegendScreen.compose must splat self.{helper}() straight into its "
+            f"pane (LLR-072-7.1 re-parenting); starred calls found: "
+            f"{sorted(splatted)}. Rebuilding rows from text is the regression "
+            f"this node exists to catch."
+        )
+
+    # Arm B — the helpers hand back widgets, so there is nothing to rebuild.
+    screen = LegendScreen(view_key="map")
+    for helper in ("_render_card", "_render_key"):
+        produced = getattr(screen, helper)()
+        assert produced, f"{helper}() produced nothing for view_key='map'"
+        non_widgets = sorted(
+            {type(item).__name__ for item in produced if not isinstance(item, Widget)}
+        )
+        assert not non_widgets, (
+            f"{helper}() must return WIDGETS for compose to re-parent, not text "
+            f"for it to rebuild (LLR-072-7.1); got {non_widgets}"
+        )
 
 
 # --------------------------------------------------------------------------- #

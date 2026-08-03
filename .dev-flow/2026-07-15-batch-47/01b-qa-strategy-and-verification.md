@@ -1,5 +1,15 @@
 # 01b — QA Strategy & Verification — batch-47 (screen-upgrades Batch A)
 
+> ⚠️ **PARTIALLY SUPERSEDED at batch `2026-08-01-batch-77` — the 5-tick address-ruler contract is RETIRED.**
+> This is a **historical process record** and is deliberately NOT rewritten: batch-47 genuinely shipped a
+> 5-tick percentile ruler and the verdicts below genuinely held against it. Rewriting a validation record
+> to describe behaviour it never validated would falsify it. Instead every surviving *statement* of the
+> retired contract carries an inline `⚠️ RETIRED at batch-77` marker at its own line, because a reader
+> lands on the statement, not on this banner. The live contract is `R-TUI-072` as amended
+> (`REQUIREMENTS.md` §6.5 Amendment A) and `LLR-072.3` as amended
+> (`01-requirements.md` §6.5 Amendment B): **one tick label per emitted run start plus one for the last
+> mapped byte**, none narrower than its label.
+
 > Companion to `01-requirements.md` (architect-owned — **not** edited here). AT ids + node paths in
 > this file are the **orchestrator-pinned canonical crosswalk** from `02-review.md` (the SINGLE source
 > of truth). Requirement ids below (`R-TUI-065..070`) remain **provisional**, derived from the stories
@@ -26,7 +36,7 @@
   CONTENT** (right glyph / bytes / string), not just non-empty output.
 - **C-29 two-axis:** every "how much fits" threshold (memstrip cell count, ruler tick spacing,
   region-row visibility) is **pilot-measured on BOTH axes** in Phase 3; ATs assert **structural
-  invariants** (≥2 distinct band styles; exactly 5 ruler ticks; a description substring present),
+  invariants** (≥2 distinct band styles; exactly 5 ruler ticks — ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A); a description substring present),
   never a hard-coded rendered row/col count.
 - **Snapshot drift is MASSIVE and expected** (app-wide theme + per-screen restyle). Regen is
   **canonical-CI-only**, a post-merge follow-up PR — never a local regen.
@@ -62,7 +72,7 @@
 | R-TUI-066 | US-WS | Workspace MID: entropy memstrip (≥2 band styles) + `╱` gap glyph; section micro-bars; classed hex bytes; loader-facts line `Loader N err · ⚠K OOO · Entry 0x…`. Facts survive MAC-merge / primary-reload (MJ-1). |
 | R-TUI-067 | US-A2L | A2L MID: zebra + colored `Text` table (every file-derived cell a Rich `Text`) + in-`in_memory` glyph column; **detail card** on row highlight (description/unit/conversion/layout/byte-order/limits). |
 | R-TUI-068 | US-MAC | MAC MID: status-glyph column ✓/⚠/✗; coverage strip `MAC→S19 X of Y` from `CoverageMetrics`. |
-| R-TUI-069 | US-MAP | Memory Map BIG: pastel bands + `╱` hatch gaps + **5-tick address ruler** + `N sym` count rows + region inspector w/ 3-row hex peek. **Amends R-TUI-041** (§6.5 before/after — architect owns the amendment). |
+| R-TUI-069 | US-MAP | Memory Map BIG: pastel bands + `╱` hatch gaps + **5-tick address ruler** ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A) + `N sym` count rows + region inspector w/ 3-row hex peek. **Amends R-TUI-041** (§6.5 before/after — architect owns the amendment). |
 | R-TUI-070 | US-A2L/US-MAC | C-17 markup-safety contract on all new untrusted-text sinks (A2L description/unit/conversion/display_identifier **and every file-derived table cell**, MAC names) — literal render, no markup parse, no style leak, no crash. |
 
 > If the architect folds R-TUI-070 into 067/068 rather than a standalone row, the C-17 ATs
@@ -129,7 +139,7 @@ are all **non-frozen** (verified against the frozen set above; none collides).
 
 | TC | Requirement facet | Method | Executed verification | Numeric pass threshold |
 |---|---|---|---|---|
-| TC-069.1 | address ruler renders exactly 5 tick labels at 0/25/50/75/100 % of span | test(pilot) | `pytest tests/test_tui_map_big.py::test_ruler_five_ticks -q` | tick-label count == 5; first==span start, last==span end (hex) |
+| TC-069.1 | address ruler renders exactly 5 tick labels at 0/25/50/75/100 % of span. ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). | test(pilot) | `pytest tests/test_tui_map_big.py::test_ruler_five_ticks -q` | tick-label count == 5; first==span start, last==span end (hex) |
 | TC-069.2 | `N sym` per region == A2L enriched-tag addresses within region span (via `range_index`, not linear) | test(unit) | `pytest tests/test_tui_map_big.py::test_sym_count -q` | count == `range_in_sorted_ranges` result for the region; call uses `address_in_sorted_ranges` |
 | TC-069.3 | region inspector on highlight → span, size, band, 3-row hex peek starting at region start | test(pilot) | `pytest tests/test_tui_map_big.py::test_inspector_hexpeek -q` | inspector first hex row address == region start; rows rendered == 3 (or fewer if region shorter — documented) |
 | TC-069.4 | band strip uses `╱` hatch on unmapped gaps + pastel band classes | test(pilot) | `pytest tests/test_tui_map_big.py::test_band_hatch -q` | `╱` count ≥ 1 for a multi-range fixture (`case_02`, 4 ranges); ≥2 distinct band classes |
@@ -200,7 +210,7 @@ and asserts the `✗` glyph the render layer maps from a parse-error record.
 | AT | Given / When / Then | Executed verification (node) | C-10 note | Fixture | Sizes |
 |---|---|---|---|---|---|
 | AT-072a | **Given** a multi-region image, **When** the map renders, **Then** the band strip shows **≥2 distinct band styles** (from `{· ░ ▒ ▓}`) AND **≥1 `╱` hatch** on an unmapped gap | `test_tui_map_big.py::test_at072a_bands` | **C-29 structural** — ≥2 distinct + ≥1 hatch, NOT a cell count | `case_02` (4 ranges) | 80×24, 120×30 |
-| AT-072b | **Given** the same image, **When** the map renders, **Then** the address ruler has **exactly 5 tick labels** and the first == span start (0%) / last == span end (100%) | `test_tui_map_big.py::test_at072b_ruler` | **C-29 structural** — exactly 5 ticks regardless of panel width; assert the boundary tick addresses | `case_02` | 80×24, 120×30 |
+| AT-072b | **Given** the same image, **When** the map renders, **Then** the address ruler has **exactly 5 tick labels** and the first == span start (0%) / last == span end (100%). ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). | `test_tui_map_big.py::test_at072b_ruler` | **C-29 structural** — exactly 5 ticks regardless of panel width; assert the boundary tick addresses | `case_02` | 80×24, 120×30 |
 | AT-073 | **Given** an A2L + S19 loaded, **When** region rows render, **Then** each row shows an `N sym` count == tags whose address ∈ that region span (== `range_index` count) with a `↵` marker | `test_tui_map_big.py::test_at073_sym_count` | asserts the COUNT content per region (via `range_index`, not linear) | S19+A2L pair | 80×24, 120×30 |
 | AT-074 | **Given** a multi-region image, **When** a **non-first** region row is activated (`RegionRow.Activated`), **Then** the inspector hex-peek's first row address == that region's start. **MN-4 sub-assertion:** a bracketed A2L symbol name surfacing in `#map_detail_body` renders **literally** (no markup parse, no crash) | `test_tui_map_big.py::test_at074_inspector` | **C-10(a)** drive a NON-DEFAULT row; assert peek moved to the selected region's start (content, not "peek non-empty") + C-17 name literal | `case_02` (4 ranges) + A2L with bracketed symbol | 80×24, 120×30 |
 
@@ -274,7 +284,7 @@ Classes: **empty · boundary · invalid · error**. Each gets an AT or TC, or is
 | Class | Coverage |
 |---|---|
 | empty | no S19 → map panel empty, ruler absent or degenerate, no crash (AT setup assertion). |
-| boundary | **single-region image** → ruler still renders **exactly 5 ticks** (TC-069.1 with a 1-range fixture) — ticks are % of span, independent of region count. **Huge-gap image** (`case_02`) → `╱` hatch present (AT-072a / TC-069.4). |
+| boundary | **single-region image** → ruler still renders **exactly 5 ticks** (TC-069.1 with a 1-range fixture) — ticks are % of span, independent of region count. ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). **Huge-gap image** (`case_02`) → `╱` hatch present (AT-072a / TC-069.4). |
 | invalid | region with 0 symbols → `0 sym` rendered (not blank) — asserted in TC-069.2. |
 | error | region shorter than 3 hex rows → inspector renders fewer rows without crash (TC-069.3 documented). Bracketed A2L symbol name in inspector → literal render (AT-074 MN-4 sub-assertion). |
 
@@ -290,7 +300,9 @@ during Phase 3, per C-29 (batch-46 origin):
 - **memstrip cell count** (`#ws_memstrip`) — width-bounded; a boxed panel gets far fewer cells than the
   prototype's full-screen strip. AT asserts **≥2 distinct band styles + ≥1 gap glyph**, never "K cells".
 - **map ruler tick spacing** — the 5 tick labels must fit the panel's inner width without overlap/clip at
-  80 cols; AT asserts **exactly 5 tick labels**, never a pixel/column spacing.
+  80 cols; AT asserts **exactly 5 tick labels**, never a pixel/column spacing. ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A).
+  ⚠️ The *overlap* half was also **vacuous**: `width: 1fr` children partition the row and cannot
+  overlap — they degrade to zero width. batch-77 replaces it with a legibility predicate.
 - **region-row visibility** — how many `RegionRow`s + the inspector + ruler fit the panel HEIGHT at 24
   rows is unknown until measured; do **not** assert "all regions visible". If the measured height cannot
   show the inspector + rows together at the 80×24 floor, **relax to reachable-under-scroll** at draft time
@@ -298,7 +310,7 @@ during Phase 3, per C-29 (batch-46 origin):
 - **A2L detail card + shrunken hex** share `#a2l_hex_pane` vertically — measure that the card does not
   starve the hex peek below the fold at 80×24 (the batch-36/46 sibling-starvation trap).
 
-ATs above deliberately assert **structural / relative invariants** (≥2 band styles; exactly 5 ticks; the
+ATs above deliberately assert **structural / relative invariants** (≥2 band styles; exactly 5 ticks — ⚠️ **RETIRED at batch-77** — the ruler now carries one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A); the
 selected tag's description substring present; entry token == exact address) that hold at any geometry.
 
 ---

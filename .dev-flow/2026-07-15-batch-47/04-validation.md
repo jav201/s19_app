@@ -50,7 +50,7 @@ below was **grep-confirmed present + collected** at HEAD `12c5d1c`; each is part
 | 15 | AT-070d | `…::test_at070d_mac_only_unchecked_glyph` (L223) | — | MAC-only parse-ok record → `·` grey (not false-green `✓`) — Inc-5 C-10 4th branch | ✓·✓·✓ |
 | 16 | AT-071 | `…::test_at071_strip` (L271) | — | `#mac_coverage_strip` contains `1 of 2` == `CoverageMetrics` | ✓·✓·n/a |
 | 17 | AT-072a | `tests/test_tui_map_big.py::test_at072a_bands` (L92) | — | band strip ≥2 styles + ≥1 `╱` hatch (`case_02`, 4 ranges) | ✓·✓·n/a |
-| 18 | AT-072b | `…::test_at072b_ruler` (L121) | — | ruler exactly 5 ticks; first==span start, last==span end | ✓·✓·n/a |
+| 18 | AT-072b | `…::test_at072b_ruler` (L121) | — | ruler exactly 5 ticks; first==span start, last==span end. ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). | ✓·✓·n/a |
 | 19 | AT-073 | `…::test_at073_sym_count` (L153) | — | per-region `N sym` == independent `range_index` oracle + `↵` | ✓·✓·✓ |
 | 20 | **AT-074 ★** | `…::test_at074_inspector` (L201) | **C-17 sub** | non-first region activate → hex peek first addr==region start; bracketed A2L symbol verbatim in `#map_detail_body` | ✓·✓·✓ |
 
@@ -103,7 +103,7 @@ every LLR still lands on ≥1 green node.
 | 071.2 | AT-071 + `test_zero_total_no_divzero` (L290, MN-3 boundary) | pilot/unit |
 | 072.1 | AT-072a (bands + `╱` hatch) | pilot |
 | 072.2 | `human_bytes` unit + AT-073/074 humanized read-outs | unit/pilot |
-| 072.3 | AT-072b (5-tick ruler + endpoint values) | pilot |
+| 072.3 | AT-072b (5-tick ruler + endpoint values. ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A).) | pilot |
 | 072.4 | §6.5 Amendment B (band-bands extension recorded) | inspection |
 | 073.1 | AT-073 (`N sym` == independent `range_index` oracle; no linear scan) | pilot/inspection |
 | 073.2 | AT-073/074 (`↵` present; `RegionRow.Activated`→`OpenInHexRequested` reused, directionb green) | pilot |
@@ -141,7 +141,7 @@ screen/handler** (`App.run_test`), not only the service API.
 | output | A2L table cells + glyph + summary | `_build_a2l_table_cells` / `#a2l_tags_summary` | observed | AT-068 / `test_summary_count` |
 | output | `A2LDetailCard` body | `_a2l_detail_card_text` | observed | AT-069 / AT-069b |
 | output | `#mac_coverage_strip` `X of Y` | `build_mac_coverage_strip` | observed | AT-071 |
-| output | `MapRuler` 5 ticks | `MapRuler` widget | observed | AT-072b |
+| output | `MapRuler` 5 ticks. ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). | `MapRuler` widget | observed | AT-072b |
 | output | `RegionRow` `N sym` + `↵` | `_build_region_row` | observed | AT-073 |
 | output | `#map_detail_body` inspector + hex peek + C-17 | `on_region_row_activated` / `_region_hex_peek` | observed | AT-074 |
 | output | app-wide theme + sev-* round-trip | `styles.tcss` + `css_class_for_severity` | observed | AT-065a / AT-065b |

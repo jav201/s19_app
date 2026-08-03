@@ -67,8 +67,16 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 152
-"""Test modules scanned at the seed commit, including this one."""
+EXPECTED_SCANNED_TEST_FILES = 153
+"""Test modules scanned, including this one.
+
+batch-77 Inc-2: 152 -> 153. ``tests/test_tui_hostile_map.py`` was added for
+``LLR-116.7``, and this guard's own failure message prescribes bumping the
+bound in the same PR so it stays a decision rather than a rubber stamp. The
+value is MEASURED, not incremented: ``scanned_test_files()`` reports 153, and
+an independent re-derivation of the same glob (``tests/**/*.py`` minus the
+four excluded directories) agrees at 153.
+"""
 
 EXPECTED_SCANNED_TOTAL = EXPECTED_SCANNED_TEST_FILES + 1  # + REQUIREMENTS.md
 

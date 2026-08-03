@@ -128,7 +128,7 @@ python -m ruff check s19_app/tui/app.py s19_app/tui/services/validation_service.
 
 ## 7. Suggested next task
 
-Inc-5 US-MAP (Memory Map BIG) — `screens_directionb.py` bands + 5-tick ruler +
+Inc-5 US-MAP (Memory Map BIG) — `screens_directionb.py` bands + 5-tick ruler ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). +
 `RegionRow` enrich + inspector hex-peek (AT-072a/072b/073/074), per the crosswalk.
 
 ---

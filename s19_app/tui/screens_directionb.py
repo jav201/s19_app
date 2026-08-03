@@ -223,11 +223,24 @@ class ScreenScaffold(Container):
         yield EmptyStatePanel()
 
 
-#: Total character width the entropy band bar is drawn across (batch-45,
-#: R-TUI-060). Fixed so each run's segment width is a deterministic function of
-#: ``round(_BAND_BAR_WIDTH * run_bytes / total_bytes)`` — independent of live
-#: layout geometry, exactly as the cell count was kept geometry-pure (LLR-041.2).
-_BAND_BAR_WIDTH = 60
+#: Columns an unmapped gap folds to, independent of its byte size and of the
+#: container width (batch-77, LLR-111.2). A gap is a separator, not a quantity:
+#: at the measured container widths a proportional gap consumed up to 60 of 66
+#: columns and floored nine mapped runs to one column each. Sizing gaps by their
+#: address span is what the fold retires.
+_BAND_GAP_FOLD = 1
+
+#: Rendered width of one address-ruler tick label — 8 hex digits, the ``0x``
+#: prefix already spent as a C-13.1 deficit-matched fallback (batch-47).
+_RULER_LABEL_WIDTH = 8
+
+#: Columns one ruler tick claims: its label plus at least one blank separator
+#: column (batch-77, LLR-112.2). The separator is NORMATIVE, not cosmetic — two
+#: adjacent 8-hex labels with no gap render as an unreadable 16-digit run, and
+#: the pitch is what decides whether an image is inside HLR-112's domain. At
+#: pitch 8 the ceiling reads 8/6 instead of 7/5 and ``case_07_stress_smoke``
+#: (6 ticks) would appear in domain at 120x30 when it is not.
+_RULER_TICK_PITCH = _RULER_LABEL_WIDTH + 1
 
 #: 9-glyph entropy ramp (0.0 → 8.0 bits/byte) for the At-a-glance sparkline
 #: (batch-45, R-TUI-061 / LLR-045B.2). Index 0 = a space (near-zero entropy),
@@ -235,7 +248,7 @@ _BAND_BAR_WIDTH = 60
 _ENTROPY_BAR_RAMP = " ▁▂▃▄▅▆▇█"
 
 #: Fixed histogram bar width for the At-a-glance per-band rows (LLR-045B.1) —
-#: geometry-pure like ``_BAND_BAR_WIDTH``.
+#: geometry-pure: a per-band ratio, not a share of the pane.
 _GLANCE_BAR_WIDTH = 6
 
 #: Fixed number of sparkline columns the profile is sampled to (LLR-045B.2).
@@ -488,6 +501,171 @@ def _merge_band_runs(
     return runs
 
 
+def _allocate_band_widths(
+    run_bytes: Sequence[int],
+    n_gaps: int,
+    bar_width: int,
+    fold: int = _BAND_GAP_FOLD,
+) -> List[int]:
+    """Apportion band-bar columns across runs, BOUNDED BY THE CONTAINER.
+
+    Summary:
+        Return one column count per run such that, in domain, the run widths
+        plus the gap markers sum to at most ``bar_width`` and every run gets at
+        least one column (batch-77, R-TUI-103 / LLR-111.7). See ``Returns`` for
+        the two degenerate cases where the sum is strictly less. The bound lives HERE,
+        in the producer, and not in a predicate over the emitted widgets: an
+        output-shaped check can detect an overflow but cannot prevent one. The
+        superseded expression sized each run independently against a fixed
+        60-column constant and floored the result at 1, so nine tiny runs each
+        claimed a column while one claimed 26 — measured, 60 columns of content
+        emitted into a 50-column bar with 5 of 14 runs left invisible.
+
+        The method is **floor-one-then-largest-remainder**: reserve one column
+        per run, then apportion the SURPLUS ``avail - n_runs`` by each run's
+        share of total mapped bytes, giving the leftover columns to the largest
+        fractional remainders. Apportioning the WHOLE of ``avail`` and clamping
+        up to 1 afterwards is a different allocator that happens to agree with
+        plain ``round()`` — the arithmetic this function exists to retire.
+
+        Ties in the fractional remainder are broken by descending mapped bytes,
+        then by ascending run index — deterministic, and biased toward the run
+        the operator is more likely to be looking for.
+
+    Args:
+        run_bytes (Sequence[int]): Mapped byte count per emitted run, in bar
+            order. May contain zeros.
+        n_gaps (int): Number of unmapped-gap markers emitted between runs.
+        bar_width (int): The container's width MEASURED at render time. May be
+            0 before first layout; that is an out-of-domain input, not an error.
+        fold (int): Columns each gap marker occupies (``_BAND_GAP_FOLD``).
+
+    Returns:
+        List[int]: One width per run, positionally aligned with ``run_bytes``.
+        Every entry is always ``>= 1``. In domain,
+        ``sum(widths) + n_gaps * fold <= bar_width`` — with EQUALITY whenever
+        there is surplus to apportion and a nonzero byte total to apportion it
+        by. It is strictly less in the two degenerate cases, which are normal
+        inputs and not errors: ``surplus == 0`` (the container holds exactly one
+        column per run and per gap) and ``total_bytes == 0`` (no byte share
+        exists, so every run falls to the floor). ``TC-B77-04`` asserts the
+        all-zero case directly. ``<=`` is what ``HLR-111``/``LLR-111.7``
+        contract; the equality is an observation about the non-degenerate path,
+        never a promise. Out of domain, one entry per run, every entry ``1``.
+
+    Data Flow:
+        - Pure arithmetic over run byte counts and one measured width. No widget,
+          no address, and no file-derived string is an input.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets`` (initial mount)
+            - ``MemoryMapPanel._resize_band_segments`` (post-refresh + resize)
+
+    Example:
+        >>> _allocate_band_widths([768, 256], 0, 66)
+        [49, 17]
+        >>> _allocate_band_widths([768, 256], 0, 50)
+        [37, 13]
+        >>> _allocate_band_widths([10, 20, 30], 2, 4)  # out of domain
+        [1, 1, 1]
+    """
+    n_runs = len(run_bytes)
+    if n_runs == 0:
+        return []
+
+    available = bar_width - n_gaps * fold
+    if available < n_runs:
+        # Out of domain: the bound is arithmetically unsatisfiable. The
+        # degradation rule is deliberately unspecified by R-TUI-103 — the only
+        # contracted properties are that this returns a width for every run
+        # without raising, and that every run stays reachable in the region
+        # list. One column each is the narrowest honest answer.
+        return [1] * n_runs
+
+    surplus = available - n_runs
+    total_bytes = sum(run_bytes)
+    if surplus <= 0 or total_bytes <= 0:
+        return [1] * n_runs
+
+    quotas = [surplus * count / total_bytes for count in run_bytes]
+    extra = [int(quota) for quota in quotas]
+    leftover = surplus - sum(extra)
+    ranked = sorted(
+        range(n_runs),
+        key=lambda i: (-(quotas[i] - extra[i]), -run_bytes[i], i),
+    )
+    for index in ranked[:leftover]:
+        extra[index] += 1
+    return [1 + count for count in extra]
+
+
+def _retained_tick_addresses(
+    addresses: Sequence[int],
+    ruler_width: int,
+    pitch: int = _RULER_TICK_PITCH,
+) -> List[int]:
+    """Drop interior ruler labels until the retained set fits legibly.
+
+    Summary:
+        Return the subset of ``addresses`` the ruler labels at the measured
+        width (batch-77, R-TUI-072 as amended / LLR-112.2). The ceiling is
+        ``(ruler_width + 1) // pitch`` — one label plus one separator column
+        each, with no separator owed after the last label. Past the ceiling the
+        ruler MUST drop labels, and the only question is whether it drops them
+        legibly or silently: ``width: 1fr`` children partition the row and
+        cannot overlap, so an un-elided ruler degrades to ZERO-WIDTH ticks
+        rather than to a visible collision. Executed at Phase 1: 60 ticks in a
+        50-column row gives 10 zero-width ticks and 0 overlaps.
+
+        The first and last labels are retained in preference to any interior
+        one — they are the image's bounds, the two an operator reads first.
+        Interior survivors are sampled evenly so a heavily elided ruler still
+        spans the image rather than labelling only its head.
+
+    Args:
+        addresses (Sequence[int]): Ordered, de-duplicated tick addresses.
+        ruler_width (int): The ruler's width MEASURED at render time. May be 0
+            before layout; that is an out-of-domain input, not an error.
+        pitch (int): Columns one tick claims (``_RULER_TICK_PITCH``).
+
+    Returns:
+        List[int]: A strictly ascending subset of ``addresses``, first and last
+        always present. At most ``max(2, (ruler_width + 1) // pitch)`` entries —
+        the floor of 2 is deliberate: out of domain HLR-112 contracts the bounds
+        labels and no raise, and a ruler that renders nothing tells the operator
+        less than one that renders two illegibly-narrow labels.
+
+    Data Flow:
+        - Pure arithmetic over addresses and one measured width. No widget and
+          no file-derived string is an input.
+
+    Dependencies:
+        Used by:
+            - ``MapRuler._reflow_ticks`` (on every Resize)
+
+    Example:
+        >>> _retained_tick_addresses([1, 2, 3, 4, 5], 66)
+        [1, 2, 3, 4, 5]
+        >>> _retained_tick_addresses(list(range(15)), 50)
+        [0, 4, 7, 10, 14]
+        >>> _retained_tick_addresses([1, 2, 3], 4)
+        [1, 3]
+    """
+    ceiling = max(2, (ruler_width + 1) // pitch)
+    if len(addresses) <= ceiling:
+        return list(addresses)
+    interior_slots = ceiling - 2
+    if interior_slots <= 0:
+        return [addresses[0], addresses[-1]]
+    step = (len(addresses) - 1) / (interior_slots + 1)
+    interior = sorted(
+        {round(step * i) for i in range(1, interior_slots + 1)}
+        - {0, len(addresses) - 1}
+    )
+    return [addresses[0]] + [addresses[i] for i in interior] + [addresses[-1]]
+
+
 def derive_image_span(
     ranges: Sequence[Tuple[int, int]],
 ) -> Tuple[int, int]:
@@ -685,16 +863,40 @@ def status_to_css_class(status: str) -> str:
     return css_class_for_severity(severity)
 
 
+#: Every codepoint ``safe_text`` deletes, selected as a BYTE CLASS: C0
+#: ``U+0000``–``U+001F``, ``DEL`` ``U+007F``, and C1 ``U+0080``–``U+009F``
+#: (LLR-116.7). Naming the class rather than an escape-sequence shape is
+#: normative and load-bearing: ``U+009B`` is single-byte CSI and ``U+009D``
+#: single-byte OSC — functional equivalents of ``ESC [`` and ``ESC ]`` that
+#: carry no ``\x1b`` at all — so a filter written as "strip ``\x1b``-introduced
+#: sequences" passes both and reopens the hole with every test still green.
+#: The class is closed at ``U+009F``: ``U+00A0`` (NBSP) and everything above it
+#: are ordinary characters and survive byte-identically.
+_CONTROL_SCRUB = dict.fromkeys((*range(0x00, 0x20), *range(0x7F, 0xA0)))
+
+
 def safe_text(value: str, style: str = "") -> Text:
-    """Build a markup-safe ``rich.text.Text`` from a possibly hostile string.
+    """Build a markup- and control-char-safe ``Text`` from a hostile string.
 
     Summary:
-        Wrap ``value`` as a ``Text`` with an explicit ``style`` so the string
-        is treated as literal content, never as Rich markup (LLR-041.11).
-        This neutralises file-derived tokens such as ``sensor[red]`` or
-        ``x[link=file:///…]`` and raw ANSI bytes carried in the never-scrubbed
-        ``ValidationIssue.symbol`` — no ``MarkupError``, no style/ANSI leak,
-        no crash of the Memory Map screen on load (security B-1 / F2).
+        Delete every C0/C1 control codepoint from ``value``
+        (:data:`_CONTROL_SCRUB`, LLR-116.7), then wrap the remainder as a
+        ``Text`` with an explicit ``style`` so it is treated as literal
+        content, never as Rich markup (LLR-041.11). Together these neutralise
+        both hostile shapes carried by the never-scrubbed
+        ``ValidationIssue.code``/``.message``/``.symbol`` and by A2L symbol
+        names: markup tokens such as ``sensor[red]`` or
+        ``x[link=file:///…]``, which survive as inert literal text, and raw
+        terminal control bytes, which are removed. No ``MarkupError``, no
+        style leak, no escape sequence reaching the painted strip
+        (security B-1 / F2).
+
+        **The two halves are not interchangeable.** ``Text()`` alone does not
+        remove a control byte — before batch-77 this function returned
+        ``'sensor\\x1b[31m_evil[red]'`` unchanged while its own docstring
+        claimed otherwise. An escape payload stripped of its introducer
+        (``\\x1b[31m`` → ``[31m``) is then inert precisely because ``Text()``
+        does not parse markup.
 
     Args:
         value (str): The (possibly untrusted, file-derived) text to render.
@@ -702,22 +904,33 @@ def safe_text(value: str, style: str = "") -> Text:
             (developer-supplied, never file-derived).
 
     Returns:
-        Text: A ``Text`` instance whose content is exactly ``value``.
+        Text: A ``Text`` whose content is ``value`` with every C0/C1 control
+        codepoint removed and every other character preserved verbatim.
 
     Data Flow:
-        - Used for every file-derived string reaching the grid or (in a later
-          increment) the detail pane; ``Text.from_markup`` is deliberately
+        - Used for every file-derived string reaching the grid, the region
+          rows or the detail pane; ``Text.from_markup`` is deliberately
           NOT used.
+        - The scrub applies to developer-supplied arguments too. That is safe
+          here: an AST census over all 80 parsed ``safe_text()`` calls in
+          ``s19_app/`` found **0** with a control character in a string
+          literal argument, and ``build_detail_text``'s newlines are appended
+          directly to the ``Text``, never through this function.
 
     Dependencies:
         Used by:
-            - ``MemoryMapPanel.render_ranges``
+            - ``MemoryMapPanel.render_ranges`` / ``build_detail_text`` /
+              ``symbol_list_text`` / ``_region_hex_peek``
 
     Example:
         >>> safe_text("sensor[red]").plain
         'sensor[red]'
+        >>> safe_text("sensor\\x1b[31m_evil[red]").plain
+        'sensor[31m_evil[red]'
+        >>> safe_text("a\\x9b31mb").plain
+        'a31mb'
     """
-    return Text(value, style=style)
+    return Text(value.translate(_CONTROL_SCRUB), style=style)
 
 
 def issues_in_window(
@@ -1100,7 +1313,7 @@ class RegionRow(Static):
         (LLR-045C.1 — no reveal-button, no two-step). Before batch-67 a single
         click did both. The row itself shows
         addr/size/band ONLY — no file-derived A2L text (security B3). A click on
-        padding/legend/empty area hits no ``RegionRow`` and is an inert no-op
+        padding/empty area hits no ``RegionRow`` and is an inert no-op
         (LLR-045C.3).
 
     Args:
@@ -1119,6 +1332,17 @@ class RegionRow(Static):
         Used by:
             - ``MemoryMapPanel._build_band_widgets``
     """
+
+    #: batch-77 LLR-116.1. The row is the map's keyboard subject: the panel
+    #: focuses the auto-selected row after every render (LLR-116.5) and the
+    #: arrow keys walk the list from there (HLR-115). ``row.focus()`` is a
+    #: silent NO-OP while this is False — ``Screen.set_focus`` ignores a widget
+    #: whose ``focusable`` is False — so this is a precondition of the focus
+    #: clause, not a convenience. Checked against ``dir(Widget)``: ``can_focus``
+    #: IS a Widget class attribute (default False), so this OVERRIDES a known
+    #: name rather than shadowing an internal one (the ``_nodes``/``_context``
+    #: hazard). Same declaration form as ``IssueRow``/``CheckRow``.
+    can_focus = True
 
     class Activated(Message):
         """A region row was clicked, carrying the click-chain length.
@@ -1168,6 +1392,55 @@ class RegionRow(Static):
             self.Activated(self.region_start, self.region_end, chain=event.chain)
         )
 
+    def on_key(self, event: events.Key) -> None:
+        """Walk the region list with the arrows; inspect with ``Enter``.
+
+        batch-77 HLR-115. Textual performs NO spatial arrow-focus of its own —
+        measured at Phase 3 with ``can_focus`` already True, ``up``/``down`` on
+        a focused row moved focus NOWHERE at either regime (C-16) — so the
+        movement is implemented here rather than inherited from the framework.
+
+        It is deliberately NOT a ``BINDINGS`` entry (LLR-115.4). A widget-scoped
+        binding SHADOWS the application binding of the same key for as long as
+        the row holds focus, and after batch-77 a region row holds focus by
+        default on every map render (LLR-116.5) — so a binding here would sit on
+        the operator's normal path. Only the three keys below are consumed;
+        every other key bubbles untouched to the application bindings, which is
+        what keeps ``j`` / ``k`` / ``o`` reaching ``dump_a2l_json`` /
+        ``show_legend`` / ``open_workarea``.
+
+        ``Enter`` posts the SAME :class:`Activated` message a click posts, with
+        ``chain = 1`` — the "inspect, do not navigate" value (LLR-115.3). The
+        single/double policy therefore stays in ``on_region_row_activated``
+        alone; the keyboard adds no second route to the inspector.
+
+        Arrow movement moves FOCUS ONLY. It deliberately does not select: the
+        operator scans the list with the arrows and commits with ``Enter``.
+        """
+        if event.key == "enter":
+            event.stop()
+            self.post_message(
+                self.Activated(self.region_start, self.region_end, chain=1)
+            )
+            return
+        if event.key not in ("up", "down"):
+            return
+        event.stop()
+        # The rows of THIS list only, in mounted order — which is the ascending
+        # address order ``_build_band_widgets`` emitted them in. A panel-wide
+        # query would also return the stale rows of a superseded render.
+        rows = [
+            child
+            for child in self.parent.children
+            if isinstance(child, RegionRow)
+        ]
+        index = rows.index(self) + (1 if event.key == "down" else -1)
+        # No wraparound: at the first row ``up`` and at the last row ``down``
+        # leave focus exactly where it is. ``0 <= index`` is what stops ``-1``
+        # from being read as "the last row".
+        if 0 <= index < len(rows):
+            rows[index].focus()
+
 
 class BandSegment(Static):
     """A clickable entropy-band segment of the map's top strip (batch-67 N4b).
@@ -1199,6 +1472,9 @@ class BandSegment(Static):
         classes (str): Space-joined CSS classes (``map-band-seg`` + the run's
             ``band-*`` token) — unchanged from the pre-batch-67 ``Static``, so
             the strip renders identically.
+        band_glyph (str): This run's band glyph, retained so the segment can be
+            RE-rendered at a new width when the container is measured or
+            resized (batch-77, LLR-111.1) without re-deriving the band.
 
     Data Flow:
         - Mounted by ``MemoryMapPanel._build_band_widgets``; on click posts
@@ -1209,6 +1485,7 @@ class BandSegment(Static):
             - :class:`RegionRow.Activated` (the shared message)
         Used by:
             - ``MemoryMapPanel._build_band_widgets``
+            - ``MemoryMapPanel._resize_band_segments`` (reads ``band_glyph``)
     """
 
     def __init__(
@@ -1217,10 +1494,12 @@ class BandSegment(Static):
         region_start: int,
         region_end: int,
         classes: str,
+        band_glyph: str = "",
     ) -> None:
         super().__init__(content, classes=classes)
         self.region_start = region_start
         self.region_end = region_end
+        self.band_glyph = band_glyph
 
     def on_click(self, event: events.Click) -> None:
         """Post :class:`RegionRow.Activated` for this band run's window."""
@@ -1231,47 +1510,139 @@ class BandSegment(Static):
         )
 
 
-class MapRuler(Horizontal):
-    """Address ruler beneath the entropy band strip (batch-47, R-TUI-072).
+class BandBar(Horizontal):
+    """The band strip, which REPORTS ITS OWN RESIZE (batch-77, LLR-111.1).
 
     Summary:
-        A single-row ruler of exactly five evenly-spaced tick labels at
-        0 / 25 / 50 / 75 / 100 % of the image address span (LLR-072.3): tick 0 %
-        is the span start and tick 100 % is the span end. Each tick is a
-        markup-safe ``.map-ruler-tick`` ``Static`` distributed by ``width: 1fr``
-        so the five labels spread across the strip without overlap at both the
-        80x24 and 120x30 regimes (C-29 two-axis pilot: the ruler spans the full
-        ``#map_grid`` content width — 66 cols @80x24, 52 cols @120x30). Labels
-        are 8 hex digits WITHOUT the ``0x`` prefix (C-13.1 deficit-matched
-        fallback: five ``0x``-prefixed labels overflow the 52-col grid @120x30;
-        dropping ``0x`` recovers 2 cols/label = 10 cols, which fits). The widget
-        is self-styled via ``DEFAULT_CSS`` (no ``styles.tcss`` edit) and carries
-        NO member named ``_nodes`` / ``_context`` (Textual internal-shadowing
-        guard — verified ``set(dir(Widget)) & {_span_start, _span_end} == ∅``).
+        A plain ``Horizontal`` holding the ``BandSegment`` runs and the ``╱`` gap
+        markers, with one addition: when it is laid out it posts
+        :class:`Measured` so the panel can re-apportion against a width that is
+        now knowable.
 
-    Args:
-        span_start (int): Inclusive image span start (0 % tick address).
-        span_end (int): Exclusive image span end (100 % tick address).
+        **This closes the hole that shipped the degenerate bar.**
+        ``_build_band_widgets`` runs before ``grid.mount()`` takes effect, so the
+        first apportionment is made against ``#map_grid``, which measures 0 at
+        that moment at both regimes — every run starts at
+        ``_allocate_band_widths``' out-of-domain ``[1] * n_runs`` floor. Pre-fix
+        the correction depended on three things, none of which is the bar
+        learning its own width:
+
+          1. ``render_ranges``' ``call_after_refresh`` — traced observing 0.
+          2. Its ONE bounded retry — traced observing 0 whenever layout takes
+             longer than one extra frame.
+          3. ``MemoryMapPanel.on_resize`` — which fires only when the PANEL is
+             resized. ``events.Resize`` is declared ``bubble=False``, so a
+             DESCENDANT's resize cannot reach the panel at all. On the dev
+             machine the panel happens to still be settling (72→70 wide, 10→42
+             tall) and its handler incidentally repaired the bar; on CI it did
+             not, and every run painted one column on an in-domain image.
+
+        A ``Message`` is used rather than a direct call because ``Message``
+        bubbles where ``Resize`` does not, so the panel hears about a descendant
+        it does not otherwise observe, and the widget stays ignorant of who is
+        listening.
+
+        This CANNOT spin, and the reason is **CSS, not the idempotence guard.**
+        The bar's width is **content-independent**: ``.map-band-bar`` is
+        ``width: 100%`` (``styles.tcss:798``) and ``Horizontal`` does not
+        scroll, so rewriting segment content can never change the bar's own
+        size and therefore never re-delivers ``Resize``. **Measured:** 14
+        segments forced to 40 columns each — 560 columns of content in a
+        66-column bar — left ``bar.region.width`` at **66** and posted **0**
+        ``Measured``. **The loop is structurally open, not merely guarded.**
+
+        ⚠️ **Changing ``.map-band-bar`` to ``width: auto`` would CLOSE that
+        loop**, and the settle path performs genuinely non-no-op passes (4–6
+        writes per render, measured), so the cycle would be live rather than
+        hypothetical.
+
+        ``_resize_band_segments``' *"rewrite only when the rendered length
+        differs"* guard is a **second line of defence**, not the reason. An
+        earlier draft of this docstring named it as the reason — which is false
+        for the case that actually occurs, since during settle the widths
+        genuinely differ, writes genuinely happen, and no spin follows anyway.
+
+        The widget carries NO member named ``_nodes`` / ``_context`` (Textual
+        internal-shadowing guard — verified
+        ``set(dir(Widget)) & {"Measured"} == ∅``).
 
     Data Flow:
-        - Built by ``MemoryMapPanel._build_band_widgets`` from the same
-          ``derive_image_span`` bounds the band bar uses; mounted as a
-          ``#map_grid`` child beneath the band row.
+        - Built by ``MemoryMapPanel._build_band_widgets``; posts
+          :class:`Measured` → ``MemoryMapPanel.on_band_bar_measured`` →
+          ``_resize_band_segments``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets``
+            - ``MemoryMapPanel.on_band_bar_measured``
+    """
+
+    class Measured(Message):
+        """The band bar has been laid out and its width is now knowable."""
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Tell the panel the bar's width changed, so it can re-apportion."""
+        self.post_message(self.Measured())
+
+
+class MapRuler(Horizontal):
+    """Address ruler beneath the entropy band strip (batch-77, R-TUI-072).
+
+    Summary:
+        A single-row ruler labelling the addresses the bar above it actually
+        draws: one markup-safe ``.map-ruler-tick`` ``Static`` per emitted RUN
+        start, plus one for the LAST MAPPED BYTE (LLR-112.1). Ticks are
+        distributed by ``width: 1fr`` and labels are 8 hex digits WITHOUT the
+        ``0x`` prefix (C-13.1 deficit-matched fallback, already spent at
+        batch-47).
+
+        **This retires the batch-47 percentile derivation** — five ticks at
+        0/25/50/75/100 % of the image address SPAN (the superseded LLR-072.3).
+        A percentile of the span is an arithmetic position, not an address the
+        image contains: measured on ``case_02`` and on ``prg.s19``, 4 of the 5
+        labels named addresses that lie in no mapped range at all, and the
+        100 % tick named the EXCLUSIVE ``span_end``, which is by construction
+        the first byte past the image. The end label is therefore
+        ``span_end - 1`` — executed on ``case_02``,
+        ``address_in_sorted_ranges(0x8001013F, index)`` is True while
+        ``0x80010140`` (its ``span_end``) is False.
+
+        The retained set is elided against the ruler's own MEASURED width
+        (``_reflow_ticks``), never a proxy: executed at Phase 3, ``#map_grid``
+        reports width 0 at the moment ``_build_band_widgets`` runs, at both
+        regimes, so no width is knowable where the widget is constructed.
+        ``compose`` therefore emits the FULL set — which is already correct
+        inside HLR-112's domain — and the first ``Resize`` narrows it if the
+        width cannot carry it.
+
+        The widget carries NO member named ``_nodes`` / ``_context`` (Textual
+        internal-shadowing guard — verified
+        ``set(dir(Widget)) & {_tick_addrs} == ∅``).
+
+    Args:
+        run_starts (Sequence[int]): Start address of every emitted run, in bar
+            order. Ties with ``last_mapped_byte`` are de-duplicated.
+        last_mapped_byte (int): Inclusive address of the image's final mapped
+            byte — ``span_end - 1``, never the exclusive ``span_end``.
+
+    Data Flow:
+        - Built by ``MemoryMapPanel._build_band_widgets`` from the SAME merged
+          runs the band bar apportions, so the ruler labels the segments the
+          operator is looking at; mounted as a ``#map_grid`` child beneath the
+          band row.
 
     Dependencies:
         Uses:
             - ``safe_text`` (markup-safe tick labels)
+            - ``_retained_tick_addresses`` (elision)
         Used by:
             - ``MemoryMapPanel._build_band_widgets``
 
     Example:
-        >>> ruler = MapRuler(0x80000000, 0x80010000)
-        >>> ruler._span_start, ruler._span_end
-        (2147483648, 2147549184)
+        >>> ruler = MapRuler([0x80000000, 0x80008000], 0x8000FFFF)
+        >>> [f"{addr:08X}" for addr in ruler._tick_addrs]
+        ['80000000', '80008000', '8000FFFF']
     """
-
-    #: Number of ruler ticks (0/25/50/75/100 %). Fixed by LLR-072.3.
-    _TICK_COUNT = 5
 
     DEFAULT_CSS = """
     MapRuler {
@@ -1285,22 +1656,28 @@ class MapRuler(Horizontal):
     }
     """
 
-    def __init__(self, span_start: int, span_end: int) -> None:
+    def __init__(
+        self, run_starts: Sequence[int], last_mapped_byte: int
+    ) -> None:
         super().__init__(classes="map-ruler")
-        self._span_start = span_start
-        self._span_end = span_end
+        # Sorted + de-duplicated here, once, so ascending-and-distinct is a
+        # property of the data rather than a promise every consumer re-checks.
+        # A single-byte run makes its start EQUAL the last mapped byte.
+        self._tick_addrs = sorted({*run_starts, last_mapped_byte})
 
     def compose(self) -> ComposeResult:
-        """Yield the five markup-safe tick labels across the span.
+        """Yield one markup-safe tick label per retained address.
 
         Summary:
-            Emit one ``.map-ruler-tick`` ``Static`` per tick at
-            ``i / (N-1)`` of the span for ``i in 0..N-1``; tick 0 is exactly the
-            span start and the final tick is exactly the span end (no rounding
-            drift at the endpoints, LLR-072.3). Labels are 8-hex-digit addresses.
+            Emit the FULL tick set. Inside HLR-112's domain that is the final
+            answer and no reflow follows; outside it, the first ``Resize``
+            elides. Composing the full set rather than an elided guess is what
+            makes in-domain correctness independent of whether a ``Resize`` ever
+            arrives — the failure mode of the alternative is a silently empty
+            ruler, which ``AT-B77-04``'s lower bound exists to forbid.
 
         Returns:
-            ComposeResult: five ``.map-ruler-tick`` ``Static`` widgets.
+            ComposeResult: one ``.map-ruler-tick`` ``Static`` per tick address.
 
         Dependencies:
             Uses:
@@ -1308,14 +1685,54 @@ class MapRuler(Horizontal):
             Used by:
                 - Textual mount pipeline
         """
-        span = self._span_end - self._span_start
-        last = self._TICK_COUNT - 1
-        for index in range(self._TICK_COUNT):
-            if index == last:
-                addr = self._span_end
-            else:
-                addr = self._span_start + span * index // last
+        for addr in self._tick_addrs:
             yield Static(safe_text(f"{addr:08X}"), classes="map-ruler-tick")
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-elide the ruler against its newly measured width."""
+        self._reflow_ticks(event.size.width)
+
+    def _reflow_ticks(self, ruler_width: int) -> None:
+        """Mount exactly the labels ``ruler_width`` can carry legibly.
+
+        Summary:
+            Reconcile the mounted ticks with
+            ``_retained_tick_addresses(self._tick_addrs, ruler_width)``
+            (LLR-112.2). The comparison against what is already mounted is
+            load-bearing, not an optimisation: a remount invalidates layout and
+            would deliver another ``Resize``, so an unconditional rewrite would
+            re-arm itself every frame. It also keeps the common path — an
+            in-domain image, where ``compose`` already emitted the right set —
+            free of any remove/mount churn at all, and ``remove_children()`` is
+            DEFERRED, so a needless churn would leave stale ticks matching
+            ``.map-ruler-tick`` for a window.
+
+        Args:
+            ruler_width (int): The width just measured for this widget.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_retained_tick_addresses`` / ``safe_text``
+            Used by:
+                - ``on_resize``
+        """
+        labels = [
+            f"{addr:08X}"
+            for addr in _retained_tick_addresses(self._tick_addrs, ruler_width)
+        ]
+        mounted = list(self.query(".map-ruler-tick"))
+        if [str(tick.render()) for tick in mounted] == labels:
+            return
+        self.remove_children()
+        self.mount(
+            *(
+                Static(safe_text(label), classes="map-ruler-tick")
+                for label in labels
+            )
+        )
 
 
 class LoadedArtifactsPanel(Container):
@@ -1662,8 +2079,8 @@ class MemoryMapPanel(Container):
 
     Summary:
         Renders the image as an ENTROPY band view (batch-45, R-TUI-060): a
-        proportional band bar + a per-region list (address · size · band) + a
-        band legend, merged by ``_merge_band_runs`` from the loader-computed
+        proportional band bar + a per-region list (address · size · band),
+        merged by ``_merge_band_runs`` from the loader-computed
         ``LoadedFile.entropy_windows`` handed to ``render_ranges``. This
         replaced the batch-27 ``sev-*`` validity cell grid (the ``MapCell`` +
         arrow-nav machinery was removed in batch-45 Inc-5; a single click on a
@@ -1686,7 +2103,7 @@ class MemoryMapPanel(Container):
           ``range_validity`` + ``entropy_windows`` from
           ``S19TuiApp.update_memory_map``, merges contiguous same-band windows
           via ``_merge_band_runs``, and mounts ``.map-band-seg`` segments (the
-          band bar) plus the ``.map-region-row`` region list, the band legend,
+          band bar) plus the ``.map-region-row`` region list
           and the docked ``.at-a-glance`` histogram/sparkline into
           ``#map_grid`` — no per-cell ``.map-cell`` widgets are mounted.
         - Clicking a region row drives ``on_region_row_activated`` → populates
@@ -1721,6 +2138,11 @@ class MemoryMapPanel(Container):
     #: image is never mislabelled "No file loaded" (fix-memmap-entropy AC-3).
     _NO_ENTROPY_TEXT = "No entropy detail for this image."
     _DETAIL_HINT = "Click a region to inspect it - double-click to open in hex."
+    #: The selection marker class (batch-77, LLR-117.1). Carried in ADDITION to
+    #: the row's ``band-*`` token, never in place of it: ``styles.tcss`` sets a
+    #: background only, so the band's foreground colour survives selection
+    #: (LLR-117.2).
+    _SELECTED_ROW_CLASS = "map-region-selected"
 
     class OpenInHexRequested(Message):
         """The operator asked to jump to the hex view at a cell's start (US-036).
@@ -1819,8 +2241,10 @@ class MemoryMapPanel(Container):
         Summary:
             Merge the loader-computed ``entropy_windows`` into contiguous
             same-band runs and render the Memory-Map body as a proportional
-            band bar + a per-region list + a band legend (batch-45, R-TUI-060 /
-            LLR-045A.2..045A.6). This REPLACES the batch-27 ``sev-*`` validity
+            band bar + a per-region list (batch-45, R-TUI-060 /
+            LLR-045A.2..045A.6; the band legend that used to sit below the list
+            moved to the ``k`` legend screen at batch-77, HLR-114). This
+            REPLACES the batch-27 ``sev-*`` validity
             cell grid — no ``MapCell`` is mounted. All input is consumed
             verbatim from the ``LoadedFile`` snapshot; no range is re-derived
             and no entropy/coverage/validation is computed here (LLR-045A.2 M4,
@@ -1867,10 +2291,10 @@ class MemoryMapPanel(Container):
               note, mount no segments/rows and blank the stats strip — never
               raise (LLR-045A.5 / LLR-041.9).
             - Otherwise merge windows via ``_merge_band_runs`` and mount the
-              band bar (``.map-band-bar``), region list (``.map-region-list``)
-              and legend (``.map-band-legend``) into ``#map_grid``; the header
-              shows a band summary. The summary is stored on ``rendered_text``.
-              These three are addressed by CLASS (not id) because they are
+              band bar (``.map-band-bar``) and region list
+              (``.map-region-list``) into ``#map_grid``; the header shows a
+              band summary. The summary is stored on ``rendered_text``.
+              Both are addressed by CLASS (not id) because they are
               re-mounted every render (an id would trip ``DuplicateIds``).
 
         Dependencies:
@@ -1893,6 +2317,11 @@ class MemoryMapPanel(Container):
         self._a2l_tags = list(a2l_tags)
         self._mem_map = mem_map or {}
         self._run_bands = {}
+        # Read BEFORE ``_reset_detail()``, which nulls it. This is the only
+        # carrier of the prior selection across a re-render (LLR-116.4), and it
+        # is an ADDRESS, never an index — a re-merge changes how many runs
+        # precede the selected one.
+        previous_start = self._selected_cell_start
         self._reset_detail()
 
         span_start, span_end = derive_image_span(ranges)
@@ -1924,9 +2353,24 @@ class MemoryMapPanel(Container):
 
         runs = _merge_band_runs(entropy_windows)
         self._run_bands = {start: band for band, _run_bytes, start in runs}
+        # The bar does not exist yet, so its width is measured from ``#map_grid``,
+        # which is mounted and whose width the bar takes in full (LLR-111.9). The
+        # post-refresh hook then re-apportions against the bar itself — required
+        # because ``grid.mount()`` is deferred and because the first frame can
+        # report width 0 before layout.
         grid.mount(
-            *self._build_band_widgets(runs, entropy_windows, span_start, span_end)
+            *self._build_band_widgets(
+                runs, entropy_windows, span_start, span_end, grid.region.width
+            )
         )
+        self.call_after_refresh(self._resize_band_segments)
+        # ``grid.mount()`` is DEFERRED, so the rows are not queryable here and
+        # "after the rows are mounted" is not a synchronous point inside this
+        # method. Resolving inline is what produced the detached-focus defect:
+        # the resolution ran against the OLD row set, which
+        # ``grid.remove_children()`` had already scheduled for removal
+        # (LLR-116.2).
+        self.call_after_refresh(self._apply_auto_selection, previous_start)
 
         total_bytes = sum(run_bytes for _band, run_bytes, _start in runs)
         summary = f"Entropy bands - {len(runs)} region(s), {total_bytes} B mapped"
@@ -1985,35 +2429,153 @@ class MemoryMapPanel(Container):
             counts[starts[slot]] += 1
         return counts
 
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-apportion the band bar when the panel's geometry changes."""
+        self._resize_band_segments()
+
+    def on_band_bar_measured(self, event: BandBar.Measured) -> None:
+        """Re-apportion when the BAR itself learns its width (LLR-111.1).
+
+        ``events.Resize`` does not bubble, so ``on_resize`` above sees only the
+        PANEL's own resizes and is blind to the one event that actually carries
+        the information. :class:`BandBar` re-emits it as a bubbling message so
+        the re-apportionment happens exactly when the width becomes knowable,
+        however many frames that takes.
+        """
+        event.stop()
+        self._resize_band_segments()
+
+    def _resize_band_segments(self, retry: bool = False) -> None:
+        """Re-apportion the mounted band segments against the MEASURED bar.
+
+        Summary:
+            Re-run ``_allocate_band_widths`` over the segments already on screen
+            and rewrite their glyph runs (batch-77, LLR-111.1). This exists
+            because the container width is not knowable where the widgets are
+            built: ``_build_band_widgets`` runs before ``grid.mount()``, whose
+            effect is deferred, so ``.map-band-bar`` has no region yet. The
+            initial build apportions against ``#map_grid`` — the same width the
+            bar takes in full — and this hook corrects it once the bar itself is
+            measurable, and again on every resize.
+
+            Gap markers are untouched: they fold to one column independent of the
+            container width (LLR-111.2), so a resize cannot change them.
+
+            **The bar is resolved with ``.last()``, not ``query_one``.**
+            ``render_ranges`` calls ``grid.remove_children()`` and the removal is
+            DEFERRED, so during the prune window the OLD bar and the newly
+            mounted one BOTH match ``.map-band-bar``. ``query_one`` does not
+            raise there — in Textual 8.2.8 it returns the FIRST match and
+            documents only ``NoMatches``/``WrongType`` (``query_exactly_one`` is
+            the strict variant) — so it silently binds the STALE, detached bar
+            and re-apportions against a width that is not the one being painted.
+            Measured over 20 observed prune windows: ``.last()`` was the
+            surviving (newly mounted) bar 20/20, ``query_one`` 0/20. ``.last()``
+            is deterministic here because ``remove_children()`` precedes
+            ``mount()`` and ``mount()`` appends, so the new bar is always last in
+            DOM order.
+
+        Args:
+            retry (bool): True only on the single self-scheduled re-attempt made
+                when the bar measures 0. Bounds the reschedule to ONE extra
+                frame — a callback that re-armed unconditionally would spin every
+                frame for as long as the bar stayed unlaid-out.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads each mounted segment's own mapped span and band glyph, so
+              the re-apportionment consumes the same population it rewrites; no
+              parallel plan is kept that could fall out of step with the widgets.
+
+        Dependencies:
+            Uses:
+                - ``_allocate_band_widths`` / ``safe_text``
+            Used by:
+                - ``render_ranges`` (via ``call_after_refresh``), ``on_resize``,
+                  and itself (one bounded retry)
+        """
+        try:
+            bar = self.query(".map-band-bar").last()
+        except Exception:
+            # No image rendered — nothing mounted to re-apportion.
+            return
+        bar_width = bar.region.width
+        if bar_width <= 0:
+            # Not laid out yet. Nothing else schedules a re-measure, so without
+            # this the widths apportioned against ``#map_grid`` at build time
+            # would ship unchecked. One more frame, then give up and wait for a
+            # resize.
+            if not retry:
+                self.call_after_refresh(self._resize_band_segments, True)
+            return
+
+        children = list(bar.children)
+        segments = [child for child in children if isinstance(child, BandSegment)]
+        if not segments:
+            return
+        widths = _allocate_band_widths(
+            [seg.region_end - seg.region_start for seg in segments],
+            len(children) - len(segments),
+            bar_width,
+        )
+        for seg, width in zip(segments, widths):
+            # Only rewrite a segment whose width actually changed. ``update()``
+            # invalidates layout, and in the steady state the initial build
+            # already apportioned against the same measurement (#map_grid, whose
+            # width the bar takes in full), so an unconditional rewrite would
+            # relayout — and reset the region list's scroll — on every render.
+            if len(seg.render().plain) != width:
+                seg.update(safe_text(seg.band_glyph * width))
+
     def _build_band_widgets(
         self,
         runs: Sequence[Tuple[str, int, int]],
         windows: Sequence[EntropyWindow],
         span_start: int,
         span_end: int,
+        bar_width: int,
     ) -> List[Container]:
-        """Build the band row (bar + glance), address ruler, region list, legend.
+        """Build the band row (bar + glance), the address ruler, the region list.
 
         Summary:
             Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
             R-TUI-061; extended batch-47, R-TUI-072/073): a ``.map-band-row``
-            docking the proportional ``.map-band-bar`` beside the
-            ``.at-a-glance`` panel, a NEW :class:`MapRuler` address ruler beneath
-            the band row (5 ticks, LLR-072.3), then the ``.map-region-list`` and
-            the ``.map-band-legend``. The band bar now spans the whole image
-            ADDRESS SPACE (width ∝ byte share of ``span_end - span_start``, not
-            of the mapped-bytes total), so unmapped address gaps between runs
-            render as ``╱`` hatch segments (``.map-band-gap``, LLR-072.1); a
-            contiguous image (no gap) keeps its pre-batch-47 widths (span ==
-            mapped bytes). Each region row is enriched to ``{glyph} 0x{addr}
-            {human_bytes} {microbar} {N} sym {band} ↵`` — a humanized size
-            (LLR-072.2), a size micro-bar vs the largest region (LLR-073.1), the
-            ``range_index`` symbol count (LLR-073.1) and the ``↵`` open-in-hex
-            affordance (LLR-073.2). Region rows still carry NO file-derived text
-            (band labels + counts only — security B3). Each sub-widget is
-            addressed by CLASS (re-mounted every render; an id would trip
-            ``DuplicateIds``) with markup-safe ``safe_text`` content. At
-            ``width-narrow`` the band row reflows to vertical (LLR-045B.3).
+            stacking the ``.map-band-bar`` over the ``.at-a-glance`` panel, a
+            :class:`MapRuler` address ruler beneath the band row (one tick per
+            run start plus the last mapped byte, batch-77 LLR-112.1 — this
+            supersedes batch-47's five span percentiles, of which four named
+            unmapped addresses), then the ``.map-region-list``. Unmapped address
+            gaps between runs render as ``╱`` hatch segments (``.map-band-gap``, LLR-072.1). Each region row
+            is enriched to ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym
+            {band} ↵`` — a humanized size (LLR-072.2), a size micro-bar vs the
+            largest region (LLR-073.1), the ``range_index`` symbol count
+            (LLR-073.1) and the ``↵`` open-in-hex affordance (LLR-073.2). Region
+            rows still carry NO file-derived text (band labels + counts only —
+            security B3). Each sub-widget is addressed by CLASS (re-mounted every
+            render; an id would trip ``DuplicateIds``) with markup-safe
+            ``safe_text`` content.
+
+            batch-77 (R-TUI-103 / LLR-111.1, .2, .7) changes what the bar is
+            drawn against, on both axes. The BASIS is the measured container
+            width rather than a fixed constant, and the DENOMINATOR is the total
+            MAPPED bytes of the emitted runs rather than the image address span.
+            Both are load-bearing: swapping only the basis keeps the span
+            denominator, which is what made unmapped address space consume the
+            bar. Gaps no longer scale at all — each folds to one column — and the
+            run widths are bounded in ``_allocate_band_widths`` so the strip
+            cannot emit more columns than its container has.
+
+            batch-77 (HLR-114 / LLR-114.1) REMOVES the ``.map-band-legend``
+            block this method used to append. The four band rows were a static
+            key — identical on every image — occupying four of the map body's
+            scarce rows, and the same key is already rendered by the ``k``
+            legend screen from the same ``ENTROPY_BANDS`` source
+            (``screens.py::LegendScreen`` via ``build_band_key_rows``). The
+            legend is therefore not deleted, only moved off the always-on
+            surface; ``ENTROPY_BAND_LABELS`` stays imported because
+            ``_band_histogram_counts`` still orders the glance by it.
 
         Args:
             runs (Sequence[Tuple[str, int, int]]): The merged
@@ -2023,10 +2585,14 @@ class MemoryMapPanel(Container):
                 windows the sparkline profile is sampled from.
             span_start (int): Inclusive image span start (``derive_image_span``).
             span_end (int): Exclusive image span end (``derive_image_span``).
+            bar_width (int): The container width to apportion, measured at render
+                time. ``0`` before first layout — a conforming out-of-domain
+                input which yields one column per run; ``_resize_band_segments``
+                re-apportions once the bar itself is measurable.
 
         Returns:
-            List[Container]: ``[band_row, ruler, region_list, legend]`` ready to
-            mount into ``#map_grid``.
+            List[Container]: ``[band_row, ruler, region_list]`` ready to mount
+            into ``#map_grid``.
 
         Data Flow:
             - Reads ``runs`` + ``windows`` + the span + ``self._a2l_tags``;
@@ -2034,44 +2600,59 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text`` /
+                - ``band_style`` / ``safe_text`` /
                   ``human_bytes`` / ``microbar`` / ``MapRuler`` /
-                  ``_region_symbol_counts`` / ``_build_glance_widgets``
+                  ``_region_symbol_counts`` / ``_build_glance_widgets`` /
+                  ``_allocate_band_widths``
             Used by:
                 - ``render_ranges``
         """
-        total_span = max(1, span_end - span_start)
         largest_region = max(
             (run_bytes for _band, run_bytes, _start in runs), default=1
         ) or 1
         sym_counts = self._region_symbol_counts(runs)
 
+        # ONE traversal decides where gaps go, and both the allocation bound and
+        # the emission below consume that same list. Counting the gaps in a
+        # second traversal — or inferring ``n_runs - 1`` — lets the count the
+        # bound spends diverge from the count the bar draws, and the bar then
+        # overflows its container by the difference. A gap is emitted wherever a
+        # run starts above the cursor, so a LEADING gap is possible (n_gaps ==
+        # n_runs) and a trailing one never is (the loop ends at the last run).
+        gap_before: List[bool] = []
+        cursor = span_start
+        for _band, run_bytes, start in runs:
+            gap_before.append(start > cursor)
+            cursor = start + run_bytes
+        widths = _allocate_band_widths(
+            [run_bytes for _band, run_bytes, _start in runs],
+            sum(gap_before),
+            bar_width,
+        )
+
         segments: List[Static] = []
         region_rows: List[RegionRow] = []
-        cursor = span_start
-        for band, run_bytes, start in runs:
+        for index, (band, run_bytes, start) in enumerate(runs):
             token, glyph, _meaning = band_style(band)
             # Hatch the unmapped gap (if any) preceding this run — an
-            # app-supplied ``╱`` marker, NOT an entropy band (LLR-072.1).
-            if start > cursor:
-                gap_width = max(
-                    1, round(_BAND_BAR_WIDTH * (start - cursor) / total_span)
-                )
+            # app-supplied ``╱`` marker, NOT an entropy band (LLR-072.1) — at
+            # exactly one column whatever its byte size (LLR-111.2). It stays a
+            # plain Static: there is no region behind it to inspect or open.
+            if gap_before[index]:
                 segments.append(
                     Static(
-                        safe_text(_MAP_GAP_HATCH * gap_width),
+                        safe_text(_MAP_GAP_HATCH * _BAND_GAP_FOLD),
                         classes="map-band-seg map-band-gap",
                     )
                 )
-            seg_width = max(1, round(_BAND_BAR_WIDTH * run_bytes / total_span))
-            # batch-67 N4b: a MAPPED run is clickable and carries its window;
-            # the gap hatch above stays an inert Static (no region behind it).
+            # batch-67 N4b: a MAPPED run is clickable and carries its window.
             segments.append(
                 BandSegment(
-                    safe_text(glyph * seg_width),
+                    safe_text(glyph * widths[index]),
                     start,
                     start + run_bytes,
                     classes=f"map-band-seg {token}",
+                    band_glyph=glyph,
                 )
             )
             region_rows.append(
@@ -2079,29 +2660,26 @@ class MemoryMapPanel(Container):
                     band, glyph, token, run_bytes, start, largest_region, sym_counts
                 )
             )
-            cursor = start + run_bytes
-
-        legend_rows: List[Static] = []
-        for band in ENTROPY_BAND_LABELS:
-            token, glyph, meaning = band_style(band)
-            legend_rows.append(
-                Static(
-                    safe_text(f"{glyph} {band} — {meaning}"),
-                    classes=f"map-legend-row {token}",
-                )
-            )
 
         # Re-mounted every render after ``grid.remove_children()`` (whose removal
         # is deferred), so these carry CLASSES, not unique IDs — an ID would trip
         # ``DuplicateIds`` when the old container is still registered at re-render
         # (the same reason the retired cell grid used ``.map-cell``, not an id).
-        band_bar = Horizontal(*segments, classes="map-band-bar")
+        # A ``BandBar``, not a bare ``Horizontal``: the initial apportionment
+        # above is made against a ``bar_width`` of 0 (``#map_grid`` is not laid
+        # out yet), so the bar MUST report its own resize or the out-of-domain
+        # floor is what ships. See :class:`BandBar`.
+        band_bar = BandBar(*segments, classes="map-band-bar")
         glance = self._build_glance_widgets(runs, windows)
         return [
             Horizontal(band_bar, glance, classes="map-band-row"),
-            MapRuler(span_start, span_end),
+            # The ruler labels what the BAR DRAWS — run starts, not percentiles
+            # of the span, and the last MAPPED byte, not the exclusive
+            # ``span_end`` (LLR-112.1). ``runs`` is the same list the bar was
+            # apportioned from three statements above, so the two surfaces
+            # cannot disagree about which regions exist.
+            MapRuler([start for _band, _run_bytes, start in runs], span_end - 1),
             Vertical(*region_rows, classes="map-region-list"),
-            Vertical(*legend_rows, classes="map-band-legend"),
         ]
 
     def _build_region_row(
@@ -2277,12 +2855,27 @@ class MemoryMapPanel(Container):
 
         Summary:
             Compose the seven-statistic strip — coverage %, bytes covered,
-            valid/invalid range counts, gap count, largest-gap bytes and total
+            valid/invalid range counts, gap count, largest gap and total
             issues — as labelled ``Text`` segments so the strip is readable and
             markup-safe (LLR-041.11 uniformity; the numbers are developer
             formatting, not file-derived, but the panel stays uniformly
             ``Text``-composed). Pure formatting of a :class:`CoverageStats` —
             no analysis (LLR-041.7).
+
+            batch-77 (R-TUI-041 as amended / HLR-113, LLR-113.1-.2) changes
+            three renderings and no arithmetic. Coverage takes **exactly four**
+            fractional digits: at ``.2f`` a sparsely-mapped image reads a flat
+            ``0.00%`` for every coverage below half a percent, which is the
+            common case here — ``case_02`` maps 93 bytes of a 2 GiB span. Four
+            digits discriminate ``0.0008%`` from ``0.0000%``; more digits buy
+            nothing an operator reads. The covered total becomes a DUAL
+            readout — mapped bytes against the image span, both through
+            ``human_bytes`` — because a bare ``1024`` answers "how much" without
+            "out of what", and the span is the number that makes it a coverage
+            figure at all. The largest gap is humanized for the same reason
+            ``67108408`` is not a size a reader can weigh, and its literal
+            ``bytes`` suffix is dropped because ``human_bytes`` already carries
+            the unit.
 
         Args:
             stats (CoverageStats): The metrics from ``coverage_stats``.
@@ -2296,17 +2889,20 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``safe_text``
+                - ``safe_text`` / ``human_bytes``
             Used by:
                 - ``_render_stats`` / (test) TC-041.8
         """
         text = Text()
-        text.append(f"Coverage: {stats.coverage_pct:.2f}%  ")
-        text.append(f"Bytes covered: {stats.covered_bytes}\n")
+        text.append(f"Coverage: {stats.coverage_pct:.4f}%  ")
+        text.append(
+            f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
+            f"{human_bytes(stats.image_span)}\n"
+        )
         text.append(f"Valid ranges: {stats.valid_count}  ")
         text.append(f"Invalid ranges: {stats.invalid_count}\n")
         text.append(f"Gaps: {stats.gap_count}  ")
-        text.append(f"Largest gap: {stats.largest_gap} bytes\n")
+        text.append(f"Largest gap: {human_bytes(stats.largest_gap)}\n")
         text.append(f"Total issues: {stats.total_issues}")
         return text
 
@@ -2460,6 +3056,81 @@ class MemoryMapPanel(Container):
         """
         event.stop()
         start, end = event.region_start, event.region_end
+        self._select_region(start, end)
+        # N4a: inspect always, navigate only on a deliberate double click.
+        if event.chain >= 2:
+            self.post_message(self.OpenInHexRequested(start))
+
+    def _live_region_rows(self) -> List[RegionRow]:
+        """The region rows of the CURRENTLY mounted region list.
+
+        Summary:
+            ``render_ranges`` calls ``grid.remove_children()`` and the removal
+            is DEFERRED, so during the prune window the old rows and the new
+            ones are BOTH returned by ``self.query(RegionRow)`` — a panel-wide
+            query cannot tell them apart, and selecting or focusing a stale one
+            leaves the operator on a widget that is about to vanish
+            (``is_attached`` False, ``parent`` None) while every identity
+            predicate still reads True.
+
+            Resolving the list container with ``.last()`` and reading ITS
+            children is the same disambiguation ``_resize_band_segments`` uses
+            for the bar, and for the same reason: ``remove_children()`` precedes
+            ``mount()`` and ``mount()`` appends, so the surviving container is
+            always last in DOM order.
+
+        Returns:
+            List[RegionRow]: The mounted rows in ascending address order (the
+            order ``_build_band_widgets`` emitted them in), or ``[]`` when no
+            image is rendered.
+
+        Dependencies:
+            Used by:
+                - ``_apply_auto_selection`` / ``_select_region``
+        """
+        try:
+            region_list = self.query(".map-region-list").last()
+        except Exception:
+            # No image rendered — nothing mounted to select.
+            return []
+        return [
+            child for child in region_list.children if isinstance(child, RegionRow)
+        ]
+
+    def _select_region(self, start: int, end: int) -> None:
+        """Populate the inspector for ``[start, end)`` and mark its row.
+
+        Summary:
+            The single owner of "a region is selected": it stores the selection
+            address, writes ``#map_detail_body`` (the retained
+            ``build_detail_text`` body plus size, dominant band and hex peek —
+            batch-45 LLR-045C, batch-47 R-TUI-074), and moves the
+            ``_SELECTED_ROW_CLASS`` marker to the row whose ``region_start``
+            equals ``start`` (LLR-117.1, matched by ADDRESS, never by index).
+
+            It deliberately posts NOTHING. ``OpenInHexRequested`` is the click
+            handler's decision alone, which is what keeps auto-selection from
+            navigating (LLR-116.3) — the absence is structural rather than a
+            flag this method has to be trusted to read.
+
+            The marker is ADDED to the row's class list; no ``band-*`` class is
+            touched, so the entropy band channel survives selection
+            (LLR-117.2).
+
+        Args:
+            start (int): The selected run's inclusive start address.
+            end (int): The selected run's exclusive end address.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``cell_status`` / ``build_detail_text`` / ``band_style`` /
+                  ``human_bytes`` / ``_region_hex_peek`` / ``_live_region_rows``
+            Used by:
+                - ``on_region_row_activated`` (click) / ``_apply_auto_selection``
+        """
         self._selected_cell_start = start
         status = cell_status(start, end, self._ordered_ranges)
         detail = self.build_detail_text(start, end, status)
@@ -2473,9 +3144,69 @@ class MemoryMapPanel(Container):
         detail.append(self._region_hex_peek(start, end))
         body = self.query_one("#map_detail_body", Static)
         body.update(detail)
-        # N4a: inspect always, navigate only on a deliberate double click.
-        if event.chain >= 2:
-            self.post_message(self.OpenInHexRequested(start))
+        for row in self._live_region_rows():
+            row.set_class(row.region_start == start, self._SELECTED_ROW_CLASS)
+
+    def _apply_auto_selection(self, previous_start: Optional[int]) -> None:
+        """Resolve, apply and focus the selection after a render (HLR-116).
+
+        Summary:
+            Runs on the post-refresh hook ``render_ranges`` schedules, which is
+            the first point at which the newly mounted rows are queryable.
+            Resolution is ``LLR-116.4``: the previously selected region when a
+            region with that START ADDRESS is present among the new rows, the
+            first region otherwise. Address, not index — a re-merge changes how
+            many runs precede the selection, so an index would silently follow
+            a different region.
+
+            Focus then follows the resolved selection (``LLR-116.5``) so the
+            operator's arrow keys act on the map instead of resuming wherever
+            they were.
+
+        Args:
+            previous_start (Optional[int]): The selection address captured
+                before ``_reset_detail()`` cleared it, or ``None`` on a first
+                render.
+
+        Returns:
+            None
+
+        Data Flow:
+            - Reads the mounted rows via ``_live_region_rows``; writes the
+              inspector, the marker class and the app focus.
+
+        Dependencies:
+            Uses:
+                - ``_live_region_rows`` / ``_select_region``
+            Used by:
+                - ``render_ranges`` (via ``call_after_refresh``)
+        """
+        rows = self._live_region_rows()
+        if not rows:
+            # No image, or the render was superseded — fabricate no selection.
+            return
+        starts = [row.region_start for row in rows]
+        index = starts.index(previous_start) if previous_start in starts else 0
+        row = rows[index]
+        self._select_region(row.region_start, row.region_end)
+        # ``focus()`` is checked against DISPLAY, not just ``focusable``.
+        # ``Widget.focusable`` consults ``visible`` (the ``visibility`` rule)
+        # and NOT ``display`` — measured against textual 8.2.8 — while the rail
+        # hides an inactive screen with ``.hidden { display: none }``. Loading a
+        # file drives ``update_memory_map()`` whatever screen the operator is
+        # on, so an unguarded focus would move the keyboard to an invisible row
+        # on every load, on all nine screens. Focus is taken only when the map
+        # is the screen actually being painted.
+        if row.focusable and self._is_displayed():
+            row.focus()
+
+    def _is_displayed(self) -> bool:
+        """True while no ancestor (or the panel itself) is ``display: none``."""
+        return all(
+            node.display
+            for node in self.ancestors_with_self
+            if isinstance(node, Widget)
+        )
 
     def _region_hex_peek(self, start: int, end: int) -> Text:
         """Render a ≤3-row hex peek at a region's start (batch-47, R-TUI-074).

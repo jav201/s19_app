@@ -764,38 +764,41 @@ DataTable > .datatable--odd-row {
 }
 
 /* batch-45 (R-TUI-060): the map body is the entropy band view (band bar +
- * region list + legend stacked vertically); the batch-27 validity cell grid
- * (and its `.map-cell` rules + MapCell class) was removed in Inc-5. */
+ * region list stacked vertically); the batch-27 validity cell grid (and its
+ * `.map-cell` rules + MapCell class) was removed in Inc-5.
+ *
+ * batch-77 HLR-114: the band LEGEND is no longer one of these children. It was
+ * MOVED, not deleted — it lives in the `k` LegendScreen — so this comment said
+ * "band bar + region list + legend" after the legend had left. */
 #map_grid {
     width: 1fr;
     height: auto;
     layout: vertical;
 }
 
-/* batch-45 R-TUI-061: the band bar docks BESIDE the At-a-glance panel in a
- * band row; at width-narrow (< 120) the row reflows to vertical (bar over
- * glance) so both fit the 80x24 floor (LLR-045B.3). Re-mounted per render →
- * addressed by CLASS (not id) to avoid DuplicateIds. */
+/* batch-77 LLR-111.9: the band row ALWAYS stacks — bar over glance — at every
+ * supported terminal size. This is a REMOVAL of a special case, not a new one:
+ * 80x24 already stacked via width-narrow (batch-45 LLR-045B.3), so >=120 now
+ * behaves like the regime that already worked. Docking the two side by side
+ * spent the bar's width on the glance panel: measured, the bar rendered 21
+ * columns at 120x30 against 66 at 80x24, and every column the glance takes
+ * lowers the ceiling on runs the operator can see. Every glance-shrinking
+ * alternative measured worse — the glance's widest content row is 29 columns,
+ * so 20 / 16 / 1fr all clip it. Re-mounted per render → addressed by CLASS
+ * (not id) to avoid DuplicateIds. */
 .map-band-row {
     width: 100%;
     height: auto;
-    layout: horizontal;
-}
-
-#workspace_body.width-narrow .map-band-row {
     layout: vertical;
 }
 
-/* Entropy band bar: takes the remaining row width beside the glance panel;
- * one proportional segment per merged run, each sized to its glyph content. */
+/* Entropy band bar: the full width of #map_grid, which is the basis
+ * ``_allocate_band_widths`` apportions (LLR-111.1); one segment per merged run
+ * plus a one-column marker per unmapped gap (LLR-111.2). */
 .map-band-bar {
-    width: 1fr;
+    width: 100%;
     height: 1;
     layout: horizontal;
-}
-
-#workspace_body.width-narrow .map-band-bar {
-    width: 100%;
 }
 
 .map-band-seg {
@@ -803,16 +806,11 @@ DataTable > .datatable--odd-row {
     height: 1;
 }
 
-/* "At a glance": docked beside the band bar at >=120, full-width below it when
- * narrow. Title + per-band histogram rows + a band-coloured profile sparkline. */
+/* "At a glance": full width beneath the band bar at every size (LLR-111.9).
+ * Title + per-band histogram rows + a band-coloured profile sparkline. */
 .at-a-glance {
-    width: 28;
-    height: auto;
-    margin-left: 1;
-}
-
-#workspace_body.width-narrow .at-a-glance {
     width: 100%;
+    height: auto;
     margin-left: 0;
     margin-top: 1;
 }
@@ -839,23 +837,33 @@ DataTable > .datatable--odd-row {
     height: 1;
 }
 
-/* Per-region list + band legend: one full-width row each. */
+/* Per-region list: one full-width row each. The `.map-band-legend` container
+   and its `.map-legend-row` children were REMOVED at batch-77 (HLR-114): the
+   band key is a static four-row block, identical on every image, and it is
+   already rendered by the `k` legend screen (whose rows carry `.legend-row`
+   and are styled separately). Nothing selects those two classes any more, so
+   the rules are deleted rather than left as dead CSS. */
 .map-region-list {
     width: 100%;
     height: auto;
     margin-top: 1;
 }
 
-.map-band-legend {
-    width: 100%;
-    height: auto;
-    margin-top: 1;
-}
-
-.map-region-row,
-.map-legend-row {
+.map-region-row {
     width: 100%;
     height: 1;
+}
+
+/* The selected region row (batch-77, HLR-117 / LLR-117.2). A BACKGROUND and a
+   weight only — deliberately NO `color:` and NO `text-style: reverse`. Both of
+   those repaint the row's foreground, which is the `band-*` entropy channel:
+   `reverse` in particular satisfies a naive "sets no color property" check
+   while swapping the band colour into the background, so selecting a row would
+   destroy the one signal the row exists to carry. The band token stays on the
+   row's class list; this rule is additive. */
+.map-region-row.map-region-selected {
+    background: $rule;
+    text-style: bold;
 }
 
 #map_detail {

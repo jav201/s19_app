@@ -598,8 +598,18 @@ def test_at084g_hostile_input_renders_literal(tmp_path: Path) -> None:
     Intent (LLR-084.8, C-17): through the shipped ``update_checks_view`` render
     path (press ``9`` with a run current), a check entry whose file-derived
     ``linkage_symbol`` and ``reason`` carry Rich-markup + ANSI payloads must
-    render VERBATIM — ``.plain`` equals the payload and ``spans == []`` (no
-    injected link/bold span, no OSC-8 escape) with no ``MarkupError``.
+    render literally — every NON-CONTROL character of ``.plain`` equal to the
+    payload and ``spans == []`` (no injected link/bold span, no OSC-8 escape)
+    with no ``MarkupError``.
+
+    **PORTED, batch-77 Inc-2 (LLR-116.7).** Both cells asserted the payload
+    *verbatim*, ANSI included, on the premise that a literal escape byte is
+    inert. It is not — it is handed to the terminal in the painted strip.
+    ``safe_text`` now removes the C0/C1 class. Every observable survives: the
+    linkage cell is still compared character-for-character (against the
+    non-control projection), the reason is still asserted present in the detail
+    cell, and both ``spans == []`` claims are unchanged. The added absence
+    clauses sit beside those positive claims, never alone.
 
     The engine never composes hostile strings into ``linkage_symbol``/``reason``
     (they are author-domain codes/hex today), so this is the WIDGET-level guard:
@@ -659,20 +669,33 @@ def test_at084g_hostile_input_renders_literal(tmp_path: Path) -> None:
 
     linkage_plain, linkage_spans, detail_plain, detail_spans = asyncio.run(_drive())
 
-    # The dedicated linkage cell renders the payload verbatim, unstyled.
-    assert linkage_plain == hostile_linkage, (
-        f"the linkage cell must render the payload verbatim; got {linkage_plain!r}"
+    # batch-77 LLR-116.7: the verbatim subject is the NON-CONTROL projection.
+    control = frozenset(range(0x00, 0x20)) | frozenset(range(0x7F, 0xA0))
+
+    def scrub(value: str) -> str:
+        return "".join(ch for ch in value if ord(ch) not in control)
+
+    # The dedicated linkage cell renders the payload literally, unstyled.
+    assert linkage_plain == scrub(hostile_linkage), (
+        f"the linkage cell must render every non-control character of the "
+        f"payload verbatim; got {linkage_plain!r}"
     )
     assert linkage_spans == [], (
         f"the linkage cell must carry NO injected spans; got {linkage_spans!r}"
     )
+    assert not any(ord(ch) in control for ch in linkage_plain), (
+        f"a control byte reached the linkage cell: {linkage_plain!r}"
+    )
     # The reason folds into the detail cell text — also literal, unstyled.
-    assert hostile_reason in detail_plain, (
-        f"the hostile reason must appear verbatim in the detail cell; "
-        f"got {detail_plain!r}"
+    assert scrub(hostile_reason) in detail_plain, (
+        f"the hostile reason must appear verbatim (non-control) in the detail "
+        f"cell; got {detail_plain!r}"
     )
     assert detail_spans == [], (
         f"the detail cell must carry NO injected spans; got {detail_spans!r}"
+    )
+    assert not any(ord(ch) in control for ch in detail_plain), (
+        f"a control byte reached the detail cell: {detail_plain!r}"
     )
 
 
