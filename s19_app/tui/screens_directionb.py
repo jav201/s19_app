@@ -1510,6 +1510,66 @@ class BandSegment(Static):
         )
 
 
+class BandBar(Horizontal):
+    """The band strip, which REPORTS ITS OWN RESIZE (batch-77, LLR-111.1).
+
+    Summary:
+        A plain ``Horizontal`` holding the ``BandSegment`` runs and the ``╱`` gap
+        markers, with one addition: when it is laid out it posts
+        :class:`Measured` so the panel can re-apportion against a width that is
+        now knowable.
+
+        **This closes the hole that shipped the degenerate bar.**
+        ``_build_band_widgets`` runs before ``grid.mount()`` takes effect, so the
+        first apportionment is made against ``#map_grid``, which measures 0 at
+        that moment at both regimes — every run starts at
+        ``_allocate_band_widths``' out-of-domain ``[1] * n_runs`` floor. Pre-fix
+        the correction depended on three things, none of which is the bar
+        learning its own width:
+
+          1. ``render_ranges``' ``call_after_refresh`` — traced observing 0.
+          2. Its ONE bounded retry — traced observing 0 whenever layout takes
+             longer than one extra frame.
+          3. ``MemoryMapPanel.on_resize`` — which fires only when the PANEL is
+             resized. ``events.Resize`` is declared ``bubble=False``, so a
+             DESCENDANT's resize cannot reach the panel at all. On the dev
+             machine the panel happens to still be settling (72→70 wide, 10→42
+             tall) and its handler incidentally repaired the bar; on CI it did
+             not, and every run painted one column on an in-domain image.
+
+        A ``Message`` is used rather than a direct call because ``Message``
+        bubbles where ``Resize`` does not, so the panel hears about a descendant
+        it does not otherwise observe, and the widget stays ignorant of who is
+        listening.
+
+        This CANNOT spin. Re-apportioning to the same widths writes nothing —
+        ``_resize_band_segments`` rewrites a segment only when its rendered
+        length actually differs — so a no-op pass invalidates no layout and
+        delivers no further ``Resize``.
+
+        The widget carries NO member named ``_nodes`` / ``_context`` (Textual
+        internal-shadowing guard — verified
+        ``set(dir(Widget)) & {"Measured"} == ∅``).
+
+    Data Flow:
+        - Built by ``MemoryMapPanel._build_band_widgets``; posts
+          :class:`Measured` → ``MemoryMapPanel.on_band_bar_measured`` →
+          ``_resize_band_segments``.
+
+    Dependencies:
+        Used by:
+            - ``MemoryMapPanel._build_band_widgets``
+            - ``MemoryMapPanel.on_band_bar_measured``
+    """
+
+    class Measured(Message):
+        """The band bar has been laid out and its width is now knowable."""
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Tell the panel the bar's width changed, so it can re-apportion."""
+        self.post_message(self.Measured())
+
+
 class MapRuler(Horizontal):
     """Address ruler beneath the entropy band strip (batch-77, R-TUI-072).
 
@@ -2358,6 +2418,18 @@ class MemoryMapPanel(Container):
         """Re-apportion the band bar when the panel's geometry changes."""
         self._resize_band_segments()
 
+    def on_band_bar_measured(self, event: BandBar.Measured) -> None:
+        """Re-apportion when the BAR itself learns its width (LLR-111.1).
+
+        ``events.Resize`` does not bubble, so ``on_resize`` above sees only the
+        PANEL's own resizes and is blind to the one event that actually carries
+        the information. :class:`BandBar` re-emits it as a bubbling message so
+        the re-apportionment happens exactly when the width becomes knowable,
+        however many frames that takes.
+        """
+        event.stop()
+        self._resize_band_segments()
+
     def _resize_band_segments(self, retry: bool = False) -> None:
         """Re-apportion the mounted band segments against the MEASURED bar.
 
@@ -2578,7 +2650,11 @@ class MemoryMapPanel(Container):
         # is deferred), so these carry CLASSES, not unique IDs — an ID would trip
         # ``DuplicateIds`` when the old container is still registered at re-render
         # (the same reason the retired cell grid used ``.map-cell``, not an id).
-        band_bar = Horizontal(*segments, classes="map-band-bar")
+        # A ``BandBar``, not a bare ``Horizontal``: the initial apportionment
+        # above is made against a ``bar_width`` of 0 (``#map_grid`` is not laid
+        # out yet), so the bar MUST report its own resize or the out-of-domain
+        # floor is what ships. See :class:`BandBar`.
+        band_bar = BandBar(*segments, classes="map-band-bar")
         glance = self._build_glance_widgets(runs, windows)
         return [
             Horizontal(band_bar, glance, classes="map-band-row"),

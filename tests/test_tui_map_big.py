@@ -34,6 +34,7 @@ from s19_app.tui.screens_directionb import (
     MemoryMapPanel,
     RegionRow,
     _allocate_band_widths,
+    _BAND_GAP_FOLD,
     _merge_band_runs,
     _retained_tick_addresses,
 )
@@ -2723,4 +2724,89 @@ def test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing(
     )
     assert got["nav_posts"] == 0, (
         f"{size}: nor post OpenInHexRequested; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-19 — the bar re-apportions on ITS OWN resize (batch-77 merge-gate fix)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_bar_reapportions_without_panel_resize_or_retry(
+    tmp_path: Path, monkeypatch, size
+) -> None:
+    """Widths still discriminate when the two INCIDENTAL correctors are gone.
+
+    WHY this node exists — it is the escape CI caught and 2547 local passes did
+    not. ``_build_band_widgets`` runs before ``grid.mount()`` takes effect, so
+    the initial apportionment is made against ``#map_grid``, which measures 0 at
+    that moment at BOTH regimes. Every run therefore starts at the allocator's
+    out-of-domain ``[1] * n_runs``, and the bar is only correct if something
+    later re-apportions it against a MEASURED width.
+
+    Pre-fix, three things could do that, and NONE of them is the bar learning
+    its own width:
+
+      1. ``render_ranges``'s ``call_after_refresh`` — observed 0 (traced).
+      2. Its ONE bounded ``retry`` — observed 0 whenever layout is slower than
+         one extra frame.
+      3. The panel's ``on_resize`` — which fires only when the PANEL's own size
+         changes. ``events.Resize`` is declared ``bubble=False``, so a
+         DESCENDANT's resize can never reach it. Locally it fires twice
+         (72→70 wide, 10→42 tall) purely because the panel is still settling,
+         and that accident is what made the bar correct on the dev machine.
+
+    This test removes accidents 2 and 3 BY NAME and leaves 1 observing 0, which
+    is what a slower machine does on its own. What must remain is the bar's own
+    ``Resize``. Pre-fix nothing remains and every run paints 1 column on an
+    IN-DOMAIN image — the exact non-discriminating bar batch-77 exists to
+    retire.
+
+    Deliberately asserts ``strict`` (∃ a bigger run painting wider), not merely
+    ``visible >= 1``: the degenerate ``[1] * n_runs`` satisfies ``visible >= 1``
+    and ``monotone`` and would pass both of those limbs.
+    """
+    loaded = _load_example(_PRG)
+
+    original = MemoryMapPanel._resize_band_segments
+
+    def _no_retry(self, retry: bool = False):
+        # Corrector 2 disabled by name. Not a reimplementation of the branch —
+        # the real function still runs for every non-retry call.
+        if retry:
+            return
+        return original(self, retry)
+
+    # Corrector 3 disabled by name.
+    monkeypatch.setattr(MemoryMapPanel, "on_resize", lambda self, event: None)
+    monkeypatch.setattr(MemoryMapPanel, "_resize_band_segments", _no_retry)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            bar_width = await _settled_bar_width(app, pilot)
+            bar = app.query_one(".map-band-bar")
+            gaps = [_visible_cols(g, bar) for g in app.query(".map-band-gap")]
+            return bar_width, _run_pairs(app), gaps
+
+    bar_width, pairs, gaps = asyncio.run(_drive())
+
+    verdicts = _limb_verdicts(pairs)
+    context = (
+        f"prg @{size}: bar={bar_width} n_runs={len(pairs)} n_gaps={len(gaps)} "
+        f"in_domain={len(pairs) + len(gaps) <= bar_width} per-limb={verdicts} "
+        f"(bytes,visible)={pairs}"
+    )
+
+    # DOMAIN FIRST, for the same reason AT-B77-01 does it: out of domain the
+    # clause below is unsatisfiable rather than false.
+    assert len(pairs) + len(gaps) <= bar_width, f"FIXTURE OUT OF DOMAIN — {context}"
+
+    assert verdicts["strict"] is True, (
+        "band bar never re-apportioned against a measured width — every run "
+        f"is painting the out-of-domain floor. {context}"
+    )
+    # Gap markers are width-independent (LLR-111.2); a resize must not touch them.
+    assert gaps and all(g == _BAND_GAP_FOLD for g in gaps), (
+        f"gap markers must stay at {_BAND_GAP_FOLD} column(s); {context}"
     )
