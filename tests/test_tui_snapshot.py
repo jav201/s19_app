@@ -952,31 +952,39 @@ def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
     *and* content (the row stacks, bar 21 -> 50), 80x24 by content alone (already
     stacked, bar still 66 — the basis, denominator and gap columns moved beneath
     it). Measured, not assumed: the Inc-1b run failed exactly these 2 of 29 cells.
-    Marked ``xfail(strict=False)`` until the canonical-CI baseline regen lands at
-    batch-77 Inc-9, then retired — the ``_batch45``/``_batch46``/``_batch47``
-    pattern.
+    ✅ **RETIRED at batch-77 Inc-9** — the canonical-CI regen has landed and both
+    cells are full green oracles again, so this returns ``()`` unconditionally
+    and the two ``map`` cells guard the map body once more.
+
+    **Why it is retired rather than left marked.** ``strict=False`` means a
+    now-passing cell reports ``xpassed``, not a failure — so a stale mark does
+    not announce itself. Leaving it would silently retire two live regression
+    guards for every batch that follows, which is the exact cost the per-cell
+    marking convention exists to bound. The retirement is the second half of
+    that convention, not an optional tidy-up.
+
+    **The regen, and its containment check.** ``snapshot-regen.yml`` run
+    ``30801949601`` on this branch (Python 3.11, textual 8.2.8 — the pinned
+    canonical env; a local regen drifts unrelated cells). It reported **exactly
+    2 changed baselines**, both ``map-comfortable``, 36 insertions / 34
+    deletions. Verified independently rather than trusted: all **29** artifact
+    baselines were copied over the local tree and ``git status`` reported the
+    **same 2** modified — which also proves the other 27 are byte-identical
+    between this tree and the canonical environment, so there is no env drift.
+
+    **The drift was predicted before Inc-1 ran and held on both limbs.** The
+    non-obvious half was ``80x24``: unchanged *geometry* (it already stacked,
+    bar still 66) but changed *content* — basis 60 → 66, denominator
+    address-span → mapped-bytes, gaps ``[8,8,16,33]`` → 1 column each. Measured
+    at Inc-1b: exactly these 2 of 29 failed, **0 xpassed**, and no cell outside
+    them drifted across five increments — re-confirming the standing claim that
+    no other screen renders the map body.
+
+    Kept as a no-op function (rather than deleted with its call site) to match
+    the ``_batch45``/``_batch46``/``_batch47`` retirement precedent, which
+    leaves the record in place for the next reader.
     """
-    del density
-    if screen == "map" and size_key in ("80x24", "120x30"):
-        return (
-            pytest.mark.xfail(
-                reason=(
-                    "batch-77 Inc-1 R-TUI-111 US-MAP Variant A: band-bar widths "
-                    "re-derived from the measured .map-band-bar over total mapped "
-                    "bytes + gaps folded to 1 column + the band row stacks at every "
-                    "size (120x30 drifts by layout AND content, bar 21->50; 80x24 by "
-                    "content only, bar still 66); PLUS Inc-4 R-TUI-072 as amended: the "
-                    "address ruler labels run starts + the last mapped byte "
-                    "instead of 5 span percentiles; PLUS Inc-6 HLR-113 + HLR-114: "
-                    "the stats strip humanizes both byte read-outs and takes 4 "
-                    "coverage digits, and the 4-row band legend is REMOVED from "
-                    "#map_grid (a row-count change, not just repainted text); "
-                    "SVG baseline regen pending in "
-                    "canonical CI (snapshot-regen.yml, batch-77 Inc-9)"
-                ),
-                strict=False,
-            ),
-        )
+    del density, screen, size_key
     return ()
 
 

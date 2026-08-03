@@ -3483,6 +3483,20 @@ def test_tc041_6_region_activation_focus_equals_region_start(
             panel.on_region_row_activated(
                 RegionRow.Activated(row.region_start, row.region_end, chain=2)
             )
+            # Drain the posted ``OpenInHexRequested`` INSIDE the app's lifetime.
+            # ``posted`` is captured synchronously by ``_cap`` at post time, so
+            # the assertion never needed this dispatch — but leaving the message
+            # in flight does harm: ``run_test.__aexit__`` dispatches it during
+            # teardown, the app handler calls ``action_show_screen("workspace")``,
+            # and ``#screen_workspace`` is already gone → ``NoMatches``, surfacing
+            # as an unrelated-looking failure in THIS node.
+            # Latent since batch-45 and reliably green until batch-77 added
+            # per-render deferred work (the auto-selection post-refresh hook, the
+            # ruler's resize elision, the segment-width recompute), which
+            # lengthens the queue enough that the message no longer drains before
+            # the context exits. Measured: 0/4 failing runs at f8747b8 vs 3/4 on
+            # batch-77 with this line absent.
+            await pilot.pause()
             return posted, row.region_start
 
     posted, region_start = asyncio.run(_drive())
@@ -4550,6 +4564,10 @@ def test_tc062_1_region_activation_posts_single_open_in_hex(tmp_path: Path) -> N
             panel.on_region_row_activated(
                 RegionRow.Activated(row.region_start, row.region_end, chain=2)
             )
+            # Drain inside the app's lifetime — same reason as TC-041.6 above:
+            # an undrained ``OpenInHexRequested`` is dispatched at teardown, when
+            # ``#screen_workspace`` no longer exists.
+            await pilot.pause()
             return none_yet, len(posted)
 
     none_yet, after_one = asyncio.run(_drive())
