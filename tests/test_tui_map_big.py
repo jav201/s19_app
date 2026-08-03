@@ -3,8 +3,9 @@
 Batch-47 Inc-6 (US-MAP / HLR-072/073/074). Each AT drives the SHIPPED map
 screen through ``App.run_test(size=…)`` at BOTH 80x24 and 120x30 and asserts
 the observed deliverable in the rendered widget content — structural invariants
-only (≥2 band styles, exactly 5 ruler ticks, first-hex-addr == region start,
-``range_index`` symbol count), never a hard-coded rendered row/col count (C-29).
+only (≥2 band styles, one ruler tick per run start plus the last mapped byte,
+first-hex-addr == region start, ``range_index`` symbol count), never a
+hard-coded rendered row/col count (C-29).
 
 Non-frozen home (verified against the 9 frozen test files). Fixtures are the
 public ``examples/`` triple + deterministic in-test builders (no client data).
@@ -28,10 +29,12 @@ from s19_app.tui.changes import emit_s19_from_mem_map
 from s19_app.tui.entropy_style import band_style
 from s19_app.tui.screens_directionb import (
     BandSegment,
+    MapRuler,
     MemoryMapPanel,
     RegionRow,
     _allocate_band_widths,
     _merge_band_runs,
+    _retained_tick_addresses,
 )
 from s19_app.tui.services.entropy_service import compute_entropy
 from s19_app.tui.services.load_service import build_loaded_s19
@@ -94,6 +97,43 @@ def _strip_text(app: S19TuiApp) -> str:
 
 def _ruler_ticks(app: S19TuiApp) -> list:
     return [str(t.render()) for t in app.query(".map-ruler-tick")]
+
+
+def _ruler_tick_widths(app: S19TuiApp) -> list:
+    """Each tick's RENDERED width, in ruler order (LLR-112.2).
+
+    Never an overlap predicate: ``width: 1fr`` children partition the row and
+    CANNOT overlap — an over-full ruler degrades to zero-width ticks instead.
+    Executed at Phase 1: 60 ticks in a 50-column row gives 10 zero-width ticks
+    and 0 overlaps, and an overlap-based conjunction reads GREEN with 10
+    invisible labels. Width-vs-label-length is the predicate that can fail.
+    """
+    return [t.region.width for t in app.query(".map-ruler-tick")]
+
+
+def _admissible_tick_labels(loaded) -> set:
+    """``{run starts} ∪ {last mapped byte}`` as 8-hex labels (HLR-112).
+
+    The end label is ``span_end - 1``: ``span_end`` is EXCLUSIVE and is by
+    construction the first byte past the image — executed on ``case_02``,
+    ``address_in_sorted_ranges(span_end, index)`` is False while
+    ``span_end - 1`` is True.
+
+    ⚠️ NOT an independent oracle, and must not be called one (§2.9 note 2).
+    This calls the SAME ``_merge_band_runs`` the producer calls, so it cannot
+    detect a defect inside that function — a wrong merge yields a wrong
+    ``expected`` and a wrong ``emitted`` that agree. What it DOES detect is a
+    ruler whose labels disagree with the runs the bar was apportioned from,
+    which is the defect this increment introduces the risk of.
+    ``_merge_band_runs`` is unchanged by batch-77 (no increment lists it), so
+    its correctness is inherited from batch-47 and is not what is being gated
+    here.
+    """
+    span_end = max(end for _start, end in loaded.ranges)
+    starts = {start for _band, _run_bytes, start in _merge_band_runs(
+        loaded.entropy_windows
+    )}
+    return {f"{start:08X}" for start in starts} | {f"{span_end - 1:08X}"}
 
 
 # ---------------------------------------------------------------------------
@@ -245,35 +285,202 @@ def test_at072a_bands(tmp_path: Path, size) -> None:
 
 
 # ---------------------------------------------------------------------------
-# AT-072b — address ruler exactly 5 ticks, endpoints == span (LLR-072.3)
+# AT-072b — every ruler label names a mapped address, legibly (HLR-112)
+#
+# FIXTURE PIN — NORMATIVE. This node MUST use ``case_02`` (4 runs -> 5 ticks)
+# and MUST NOT use ``prg.s19``. The "no elided tick" clause below is IN-DOMAIN
+# ONLY, and HLR-112's domain is ``n_ticks <= (ruler_width + 1) // 9`` = 7 ticks
+# @80x24 and 5 @120x30 (executed: ruler width 66 / 50). ``prg.s19`` needs 15
+# ticks and is out of domain at BOTH regimes, so pinning it here would redden
+# this node ON CORRECT CODE. It is the obvious fixture to reach for — it is the
+# batch's showcase everywhere else — and it is exactly wrong here.
 # ---------------------------------------------------------------------------
 @pytest.mark.parametrize("size", _SIZES)
 def test_at072b_ruler(tmp_path: Path, size) -> None:
-    """The ruler has EXACTLY 5 tick labels; tick 0 % == span start, 100 % == end.
+    """Ruler labels ⊆ run starts ∪ last mapped byte, ascending, distinct, legible.
 
-    Black-box over the shipped ``.map-ruler`` beneath the strip: exactly 5
-    ``.map-ruler-tick`` labels; the first equals the image span start and the
-    last equals the span end (``derive_image_span`` bounds, rendered as 8 hex
-    digits). C-29 structural — 5 ticks regardless of panel width.
+    Black-box over the shipped ``.map-ruler``: every ``.map-ruler-tick`` label
+    names an address that lies in some mapped range AND is either an emitted run
+    start or the last mapped byte; the labels strictly ascend with no duplicate;
+    and — the fixture being in domain at both regimes — nothing is elided and no
+    tick renders narrower than the 8-digit label it carries.
+
+    Pre-change this node asserted the retired 5-tick percentile contract, under
+    which 4 of the 5 labels named addresses in NO mapped range at either regime
+    (executed: ``20004050``/``400080A0``/``6000C0F0``/``80010140``), the last of
+    them being the EXCLUSIVE ``span_end``.
     """
     loaded = _load_case_02()
-    span_start = min(start for start, _end in loaded.ranges)
-    span_end = max(end for _start, end in loaded.ranges)
+    admissible = _admissible_tick_labels(loaded)
+    index = build_sorted_range_index(loaded.ranges)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            await _settled_bar_width(app, pilot)
+            return _ruler_ticks(app), _ruler_tick_widths(app)
+
+    ticks, widths = asyncio.run(_drive())
+    addrs = [int(label, 16) for label in ticks]
+
+    # Argument order is ``(addr, index)`` — a Phase-1 probe had it inverted and
+    # was caught only by a TypeError (s19_app/range_index.py:39).
+    outside = [t for t in ticks if not address_in_sorted_ranges(int(t, 16), index)]
+    assert not outside, f"{size}: ruler labels naming no mapped address: {outside}"
+    assert set(ticks) <= admissible, (
+        f"{size}: labels outside the admissible set "
+        f"{sorted(set(ticks) - admissible)}; ticks={ticks}"
+    )
+    assert addrs == sorted(set(addrs)), (
+        f"{size}: labels must strictly ascend with no duplicate; got {ticks}"
+    )
+    # In domain (5 ticks vs a ceiling of 7 @80x24 and 5 @120x30): nothing elided.
+    assert len(ticks) == len(admissible), (
+        f"{size}: in-domain ruler elided a tick — expected {len(admissible)}, "
+        f"got {len(ticks)}: {ticks}"
+    )
+    illegible = [
+        (label, width)
+        for label, width in zip(ticks, widths)
+        if width < len(label)
+    ]
+    assert not illegible, (
+        f"{size}: ticks rendered narrower than their label: {illegible}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-04 — the ⊇ lower bound (HLR-112)
+#
+# NOT OPTIONAL: executed, ``set() <= admissible`` is True, so AT-072b's
+# subset-only predicate is GREEN on a ruler that rendered ZERO ticks. This node
+# is the only thing standing between that and a green suite.
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_ruler_labels_every_run_start_and_the_last_byte(
+    tmp_path: Path, size
+) -> None:
+    """In domain the ruler emits a label for EVERY run start and the last byte."""
+    loaded = _load_case_02()
+    admissible = _admissible_tick_labels(loaded)
 
     async def _drive() -> list:
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=size) as pilot:
             await _prime_map(app, pilot, loaded)
+            await _settled_bar_width(app, pilot)
             return _ruler_ticks(app)
 
     ticks = asyncio.run(_drive())
-    assert len(ticks) == 5, f"{size}: ruler must have exactly 5 ticks; got {ticks}"
-    assert ticks[0] == f"{span_start:08X}", (
-        f"{size}: tick 0% must be span start {span_start:#010x}; got {ticks[0]!r}"
+    assert admissible <= set(ticks), (
+        f"{size}: ruler dropped in-domain labels "
+        f"{sorted(admissible - set(ticks))}; ticks={ticks}"
     )
-    assert ticks[-1] == f"{span_end:08X}", (
-        f"{size}: tick 100% must be span end {span_end:#010x}; got {ticks[-1]!r}"
+
+
+# ---------------------------------------------------------------------------
+# TC-B77-06 — empty image: no ruler, no raise (HLR-112 boundary)
+# ---------------------------------------------------------------------------
+def test_tc_b77_06_b77_ruler_empty_image_emits_no_tick(tmp_path: Path) -> None:
+    """With no file loaded the map renders and mounts no ruler tick."""
+
+    async def _drive() -> list:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            return _ruler_ticks(app)
+
+    assert asyncio.run(_drive()) == []
+
+
+# ---------------------------------------------------------------------------
+# TC-B77-07 — one run: start and last mapped byte, both labelled
+# ---------------------------------------------------------------------------
+def test_tc_b77_07_b77_ruler_single_run_labels_start_and_last_byte() -> None:
+    """A single run yields two ticks; a single BYTE collapses them to one.
+
+    Pure over the tick-address derivation: the start and the last mapped byte
+    are the same address for a 1-byte image, and a duplicate label would break
+    HLR-112's strictly-ascending, non-duplicate invariant.
+    """
+    assert MapRuler([0x8000], 0x80FF)._tick_addrs == [0x8000, 0x80FF]
+    assert MapRuler([0x8000], 0x8000)._tick_addrs == [0x8000]
+
+
+# ---------------------------------------------------------------------------
+# TC-B77-08 — more run starts than ruler columns: elide, keep first and last
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_08_b77_ruler_out_of_domain_elides_legibly(
+    tmp_path: Path, size
+) -> None:
+    """``prg.s19`` (15 ticks) renders without raising, first and last retained.
+
+    OUT OF DOMAIN at both regimes — 15 ticks against a ceiling of 7 @80x24 and
+    5 @120x30. HLR-112 contracts three things here and no more: the first and
+    last labels survive, interior labels are DROPPED rather than emitted
+    illegibly, and nothing raises. Which interior labels survive is NOT
+    contracted, so this node does not assert them.
+    """
+    loaded = _load_example(_PRG)
+    admissible = _admissible_tick_labels(loaded)
+    index = build_sorted_range_index(loaded.ranges)
+    first = min(admissible)
+    last = max(admissible)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await _prime_map(app, pilot, loaded)
+            bar_width = await _settled_bar_width(app, pilot)
+            ruler_width = app.query_one(".map-ruler").region.width
+            return _ruler_ticks(app), _ruler_tick_widths(app), bar_width, ruler_width
+
+    ticks, widths, bar_width, ruler_width = asyncio.run(_drive())
+    ceiling = (ruler_width + 1) // 9
+    assert len(admissible) > ceiling, (
+        f"{size}: fixture is no longer out of domain — {len(admissible)} ticks "
+        f"vs ceiling {ceiling} at ruler width {ruler_width}. This node asserts "
+        f"ELISION and would pass vacuously."
     )
+    assert ticks[0] == first, f"{size}: first label dropped; got {ticks}"
+    assert ticks[-1] == last, f"{size}: last label dropped; got {ticks}"
+    assert len(ticks) <= ceiling, (
+        f"{size}: {len(ticks)} ticks emitted into a {ruler_width}-column ruler "
+        f"(ceiling {ceiling}, bar {bar_width}); got {ticks}"
+    )
+    illegible = [
+        (label, width)
+        for label, width in zip(ticks, widths)
+        if width < len(label)
+    ]
+    assert not illegible, (
+        f"{size}: elision left ticks narrower than their label: {illegible}"
+    )
+    outside = [t for t in ticks if not address_in_sorted_ranges(int(t, 16), index)]
+    assert not outside, f"{size}: retained labels naming no mapped address: {outside}"
+    assert set(ticks) <= admissible, (
+        f"{size}: elision invented a label: {sorted(set(ticks) - admissible)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-B77-09 — a ruler too narrow for even two labels still keeps both bounds
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("width", [0, 1, 8, 17])
+def test_tc_b77_09_b77_ruler_floor_of_two_retains_both_bounds(width) -> None:
+    """Below a ceiling of 2 the retained set is exactly the first and last.
+
+    A ruler that renders nothing tells the operator less than one that renders
+    two illegibly-narrow bounds, and HLR-112's out-of-domain clause contracts
+    the bounds labels, not their legibility.
+    """
+    addrs = [0x100, 0x200, 0x300, 0x400]
+    assert _retained_tick_addresses(addrs, width) == [0x100, 0x400]
 
 
 # ---------------------------------------------------------------------------

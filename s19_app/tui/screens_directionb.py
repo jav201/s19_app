@@ -230,6 +230,18 @@ class ScreenScaffold(Container):
 #: address span is what the fold retires.
 _BAND_GAP_FOLD = 1
 
+#: Rendered width of one address-ruler tick label — 8 hex digits, the ``0x``
+#: prefix already spent as a C-13.1 deficit-matched fallback (batch-47).
+_RULER_LABEL_WIDTH = 8
+
+#: Columns one ruler tick claims: its label plus at least one blank separator
+#: column (batch-77, LLR-112.2). The separator is NORMATIVE, not cosmetic — two
+#: adjacent 8-hex labels with no gap render as an unreadable 16-digit run, and
+#: the pitch is what decides whether an image is inside HLR-112's domain. At
+#: pitch 8 the ceiling reads 8/6 instead of 7/5 and ``case_07_stress_smoke``
+#: (6 ticks) would appear in domain at 120x30 when it is not.
+_RULER_TICK_PITCH = _RULER_LABEL_WIDTH + 1
+
 #: 9-glyph entropy ramp (0.0 → 8.0 bits/byte) for the At-a-glance sparkline
 #: (batch-45, R-TUI-061 / LLR-045B.2). Index 0 = a space (near-zero entropy),
 #: index 8 = a full block (maximal entropy). Mirrors the prototype ``BARS``.
@@ -586,6 +598,72 @@ def _allocate_band_widths(
     for index in ranked[:leftover]:
         extra[index] += 1
     return [1 + count for count in extra]
+
+
+def _retained_tick_addresses(
+    addresses: Sequence[int],
+    ruler_width: int,
+    pitch: int = _RULER_TICK_PITCH,
+) -> List[int]:
+    """Drop interior ruler labels until the retained set fits legibly.
+
+    Summary:
+        Return the subset of ``addresses`` the ruler labels at the measured
+        width (batch-77, R-TUI-112 / LLR-112.2). The ceiling is
+        ``(ruler_width + 1) // pitch`` — one label plus one separator column
+        each, with no separator owed after the last label. Past the ceiling the
+        ruler MUST drop labels, and the only question is whether it drops them
+        legibly or silently: ``width: 1fr`` children partition the row and
+        cannot overlap, so an un-elided ruler degrades to ZERO-WIDTH ticks
+        rather than to a visible collision. Executed at Phase 1: 60 ticks in a
+        50-column row gives 10 zero-width ticks and 0 overlaps.
+
+        The first and last labels are retained in preference to any interior
+        one — they are the image's bounds, the two an operator reads first.
+        Interior survivors are sampled evenly so a heavily elided ruler still
+        spans the image rather than labelling only its head.
+
+    Args:
+        addresses (Sequence[int]): Ordered, de-duplicated tick addresses.
+        ruler_width (int): The ruler's width MEASURED at render time. May be 0
+            before layout; that is an out-of-domain input, not an error.
+        pitch (int): Columns one tick claims (``_RULER_TICK_PITCH``).
+
+    Returns:
+        List[int]: A strictly ascending subset of ``addresses``, first and last
+        always present. At most ``max(2, (ruler_width + 1) // pitch)`` entries —
+        the floor of 2 is deliberate: out of domain HLR-112 contracts the bounds
+        labels and no raise, and a ruler that renders nothing tells the operator
+        less than one that renders two illegibly-narrow labels.
+
+    Data Flow:
+        - Pure arithmetic over addresses and one measured width. No widget and
+          no file-derived string is an input.
+
+    Dependencies:
+        Used by:
+            - ``MapRuler._reflow_ticks`` (on every Resize)
+
+    Example:
+        >>> _retained_tick_addresses([1, 2, 3, 4, 5], 66)
+        [1, 2, 3, 4, 5]
+        >>> _retained_tick_addresses(list(range(15)), 50)
+        [0, 4, 7, 10, 14]
+        >>> _retained_tick_addresses([1, 2, 3], 4)
+        [1, 3]
+    """
+    ceiling = max(2, (ruler_width + 1) // pitch)
+    if len(addresses) <= ceiling:
+        return list(addresses)
+    interior_slots = ceiling - 2
+    if interior_slots <= 0:
+        return [addresses[0], addresses[-1]]
+    step = (len(addresses) - 1) / (interior_slots + 1)
+    interior = sorted(
+        {round(step * i) for i in range(1, interior_slots + 1)}
+        - {0, len(addresses) - 1}
+    )
+    return [addresses[0]] + [addresses[i] for i in interior] + [addresses[-1]]
 
 
 def derive_image_span(
@@ -1373,46 +1451,63 @@ class BandSegment(Static):
 
 
 class MapRuler(Horizontal):
-    """Address ruler beneath the entropy band strip (batch-47, R-TUI-072).
+    """Address ruler beneath the entropy band strip (batch-77, R-TUI-112).
 
     Summary:
-        A single-row ruler of exactly five evenly-spaced tick labels at
-        0 / 25 / 50 / 75 / 100 % of the image address span (LLR-072.3): tick 0 %
-        is the span start and tick 100 % is the span end. Each tick is a
-        markup-safe ``.map-ruler-tick`` ``Static`` distributed by ``width: 1fr``
-        so the five labels spread across the strip without overlap at both the
-        80x24 and 120x30 regimes (C-29 two-axis pilot: the ruler spans the full
-        ``#map_grid`` content width — 66 cols @80x24, 52 cols @120x30). Labels
-        are 8 hex digits WITHOUT the ``0x`` prefix (C-13.1 deficit-matched
-        fallback: five ``0x``-prefixed labels overflow the 52-col grid @120x30;
-        dropping ``0x`` recovers 2 cols/label = 10 cols, which fits). The widget
-        is self-styled via ``DEFAULT_CSS`` (no ``styles.tcss`` edit) and carries
-        NO member named ``_nodes`` / ``_context`` (Textual internal-shadowing
-        guard — verified ``set(dir(Widget)) & {_span_start, _span_end} == ∅``).
+        A single-row ruler labelling the addresses the bar above it actually
+        draws: one markup-safe ``.map-ruler-tick`` ``Static`` per emitted RUN
+        start, plus one for the LAST MAPPED BYTE (LLR-112.1). Ticks are
+        distributed by ``width: 1fr`` and labels are 8 hex digits WITHOUT the
+        ``0x`` prefix (C-13.1 deficit-matched fallback, already spent at
+        batch-47).
+
+        **This retires the batch-47 percentile derivation** — five ticks at
+        0/25/50/75/100 % of the image address SPAN (the superseded LLR-072.3).
+        A percentile of the span is an arithmetic position, not an address the
+        image contains: measured on ``case_02`` and on ``prg.s19``, 4 of the 5
+        labels named addresses that lie in no mapped range at all, and the
+        100 % tick named the EXCLUSIVE ``span_end``, which is by construction
+        the first byte past the image. The end label is therefore
+        ``span_end - 1`` — executed on ``case_02``,
+        ``address_in_sorted_ranges(0x8001013F, index)`` is True while
+        ``0x80010140`` (its ``span_end``) is False.
+
+        The retained set is elided against the ruler's own MEASURED width
+        (``_reflow_ticks``), never a proxy: executed at Phase 3, ``#map_grid``
+        reports width 0 at the moment ``_build_band_widgets`` runs, at both
+        regimes, so no width is knowable where the widget is constructed.
+        ``compose`` therefore emits the FULL set — which is already correct
+        inside HLR-112's domain — and the first ``Resize`` narrows it if the
+        width cannot carry it.
+
+        The widget carries NO member named ``_nodes`` / ``_context`` (Textual
+        internal-shadowing guard — verified
+        ``set(dir(Widget)) & {_tick_addrs} == ∅``).
 
     Args:
-        span_start (int): Inclusive image span start (0 % tick address).
-        span_end (int): Exclusive image span end (100 % tick address).
+        run_starts (Sequence[int]): Start address of every emitted run, in bar
+            order. Ties with ``last_mapped_byte`` are de-duplicated.
+        last_mapped_byte (int): Inclusive address of the image's final mapped
+            byte — ``span_end - 1``, never the exclusive ``span_end``.
 
     Data Flow:
-        - Built by ``MemoryMapPanel._build_band_widgets`` from the same
-          ``derive_image_span`` bounds the band bar uses; mounted as a
-          ``#map_grid`` child beneath the band row.
+        - Built by ``MemoryMapPanel._build_band_widgets`` from the SAME merged
+          runs the band bar apportions, so the ruler labels the segments the
+          operator is looking at; mounted as a ``#map_grid`` child beneath the
+          band row.
 
     Dependencies:
         Uses:
             - ``safe_text`` (markup-safe tick labels)
+            - ``_retained_tick_addresses`` (elision)
         Used by:
             - ``MemoryMapPanel._build_band_widgets``
 
     Example:
-        >>> ruler = MapRuler(0x80000000, 0x80010000)
-        >>> ruler._span_start, ruler._span_end
-        (2147483648, 2147549184)
+        >>> ruler = MapRuler([0x80000000, 0x80008000], 0x8000FFFF)
+        >>> [f"{addr:08X}" for addr in ruler._tick_addrs]
+        ['80000000', '80008000', '8000FFFF']
     """
-
-    #: Number of ruler ticks (0/25/50/75/100 %). Fixed by LLR-072.3.
-    _TICK_COUNT = 5
 
     DEFAULT_CSS = """
     MapRuler {
@@ -1426,22 +1521,28 @@ class MapRuler(Horizontal):
     }
     """
 
-    def __init__(self, span_start: int, span_end: int) -> None:
+    def __init__(
+        self, run_starts: Sequence[int], last_mapped_byte: int
+    ) -> None:
         super().__init__(classes="map-ruler")
-        self._span_start = span_start
-        self._span_end = span_end
+        # Sorted + de-duplicated here, once, so ascending-and-distinct is a
+        # property of the data rather than a promise every consumer re-checks.
+        # A single-byte run makes its start EQUAL the last mapped byte.
+        self._tick_addrs = sorted({*run_starts, last_mapped_byte})
 
     def compose(self) -> ComposeResult:
-        """Yield the five markup-safe tick labels across the span.
+        """Yield one markup-safe tick label per retained address.
 
         Summary:
-            Emit one ``.map-ruler-tick`` ``Static`` per tick at
-            ``i / (N-1)`` of the span for ``i in 0..N-1``; tick 0 is exactly the
-            span start and the final tick is exactly the span end (no rounding
-            drift at the endpoints, LLR-072.3). Labels are 8-hex-digit addresses.
+            Emit the FULL tick set. Inside HLR-112's domain that is the final
+            answer and no reflow follows; outside it, the first ``Resize``
+            elides. Composing the full set rather than an elided guess is what
+            makes in-domain correctness independent of whether a ``Resize`` ever
+            arrives — the failure mode of the alternative is a silently empty
+            ruler, which ``AT-B77-04``'s lower bound exists to forbid.
 
         Returns:
-            ComposeResult: five ``.map-ruler-tick`` ``Static`` widgets.
+            ComposeResult: one ``.map-ruler-tick`` ``Static`` per tick address.
 
         Dependencies:
             Uses:
@@ -1449,14 +1550,54 @@ class MapRuler(Horizontal):
             Used by:
                 - Textual mount pipeline
         """
-        span = self._span_end - self._span_start
-        last = self._TICK_COUNT - 1
-        for index in range(self._TICK_COUNT):
-            if index == last:
-                addr = self._span_end
-            else:
-                addr = self._span_start + span * index // last
+        for addr in self._tick_addrs:
             yield Static(safe_text(f"{addr:08X}"), classes="map-ruler-tick")
+
+    def on_resize(self, event: events.Resize) -> None:
+        """Re-elide the ruler against its newly measured width."""
+        self._reflow_ticks(event.size.width)
+
+    def _reflow_ticks(self, ruler_width: int) -> None:
+        """Mount exactly the labels ``ruler_width`` can carry legibly.
+
+        Summary:
+            Reconcile the mounted ticks with
+            ``_retained_tick_addresses(self._tick_addrs, ruler_width)``
+            (LLR-112.2). The comparison against what is already mounted is
+            load-bearing, not an optimisation: a remount invalidates layout and
+            would deliver another ``Resize``, so an unconditional rewrite would
+            re-arm itself every frame. It also keeps the common path — an
+            in-domain image, where ``compose`` already emitted the right set —
+            free of any remove/mount churn at all, and ``remove_children()`` is
+            DEFERRED, so a needless churn would leave stale ticks matching
+            ``.map-ruler-tick`` for a window.
+
+        Args:
+            ruler_width (int): The width just measured for this widget.
+
+        Returns:
+            None
+
+        Dependencies:
+            Uses:
+                - ``_retained_tick_addresses`` / ``safe_text``
+            Used by:
+                - ``on_resize``
+        """
+        labels = [
+            f"{addr:08X}"
+            for addr in _retained_tick_addresses(self._tick_addrs, ruler_width)
+        ]
+        mounted = list(self.query(".map-ruler-tick"))
+        if [str(tick.render()) for tick in mounted] == labels:
+            return
+        self.remove_children()
+        self.mount(
+            *(
+                Static(safe_text(label), classes="map-ruler-tick")
+                for label in labels
+            )
+        )
 
 
 class LoadedArtifactsPanel(Container):
@@ -2236,8 +2377,10 @@ class MemoryMapPanel(Container):
             Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
             R-TUI-061; extended batch-47, R-TUI-072/073): a ``.map-band-row``
             stacking the ``.map-band-bar`` over the ``.at-a-glance`` panel, a
-            :class:`MapRuler` address ruler beneath the band row (5 ticks,
-            LLR-072.3), then the ``.map-region-list`` and the
+            :class:`MapRuler` address ruler beneath the band row (one tick per
+            run start plus the last mapped byte, batch-77 LLR-112.1 — this
+            supersedes batch-47's five span percentiles, of which four named
+            unmapped addresses), then the ``.map-region-list`` and the
             ``.map-band-legend``. Unmapped address gaps between runs render as
             ``╱`` hatch segments (``.map-band-gap``, LLR-072.1). Each region row
             is enriched to ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym
@@ -2361,7 +2504,12 @@ class MemoryMapPanel(Container):
         glance = self._build_glance_widgets(runs, windows)
         return [
             Horizontal(band_bar, glance, classes="map-band-row"),
-            MapRuler(span_start, span_end),
+            # The ruler labels what the BAR DRAWS — run starts, not percentiles
+            # of the span, and the last MAPPED byte, not the exclusive
+            # ``span_end`` (LLR-112.1). ``runs`` is the same list the bar was
+            # apportioned from three statements above, so the two surfaces
+            # cannot disagree about which regions exist.
+            MapRuler([start for _band, _run_bytes, start in runs], span_end - 1),
             Vertical(*region_rows, classes="map-region-list"),
             Vertical(*legend_rows, classes="map-band-legend"),
         ]

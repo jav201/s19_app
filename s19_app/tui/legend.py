@@ -606,12 +606,14 @@ def _map_lines() -> List[LegendLine]:
         ),
         LegendLine(
             ROLE_LINE,
-            "80000000      80004000      80008000      8000C000      8000FFFF",
+            "80000000 80004000 80008000 8000A000 8000C000 8000FFFF",
         ),
         LegendLine(
             ROLE_CAPTION,
-            "address ruler — 5 ticks at 0/25/50/75/100 % of span (8-hex, "
-            "no 0x prefix)",
+            "address ruler — one tick per merged run start, plus the last "
+            "mapped byte (8-hex, no 0x prefix, ≥1 blank column between "
+            "labels); interior ticks drop when they will not fit, the first "
+            "and last always stay",
         ),
         LegendLine(ROLE_SUB, "Region row (click to inspect + jump to hex)"),
         LegendLine(

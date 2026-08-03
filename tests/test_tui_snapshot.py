@@ -667,7 +667,9 @@ def _batch47_mac_drift_marks(screen: str, density: str, size_key: str) -> tuple:
 
 # batch-47 (R-TUI-072/073/074, US-MAP Memory Map BIG): the map band strip gains
 # `╱` hatch gaps + span-proportional segment widths (LLR-072.1), a NEW MapRuler
-# 5-tick address ruler beneath the strip (LLR-072.3), and enriched region rows
+# address ruler beneath the strip (LLR-072.3 — that requirement's 5 span
+# percentiles are RETIRED at batch-77 R-TUI-112: the ruler now labels one
+# emitted RUN START plus the last mapped byte), and enriched region rows
 # (humanized size + size micro-bar + `N sym` count + `↵` affordance, LLR-072.2 /
 # 073). All repaint the map body, so BOTH map scaffold cells (80x24 + 120x30,
 # comfortable) drift. The region inspector hex peek (LLR-074) shows only on
@@ -699,7 +701,8 @@ def _batch47_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
             pytest.mark.xfail(
                 reason=(
                     "batch-47 R-TUI-072/073/074 US-MAP: band strip hatch gaps + "
-                    "span-proportional widths + 5-tick address ruler + enriched "
+                    "span-proportional widths + address ruler (batch-47's 5 span "
+                    "percentiles retired at batch-77) + enriched "
                     "region rows (size micro-bar + N sym + ↵); SVG baseline regen "
                     "pending in canonical CI (snapshot-regen.yml, batch-47 "
                     "theme+regen follow-up)"
@@ -913,6 +916,17 @@ def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tu
 # XPASS caveat). `strict=False` because a cell can render a change below the
 # scroll fold and not drift at all.
 #
+# batch-77 Inc-4 (R-TUI-112) repaints the SAME two cells and no others: the
+# MapRuler is a `#map_grid` child, so its labels move from 5 span percentiles to
+# one-per-run-start-plus-the-last-mapped-byte inside the map body. MEASURED, not
+# assumed — the Inc-4 snapshot run was `30 passed, 2 xfailed` over the 29-cell
+# matrix with `2 mismatched snapshots`, both of them these cells, and ZERO
+# XPASS. Had a cell outside these two drifted, the containment claim above would
+# have been FALSIFIED and that would be a finding, not something to mark over.
+# The `legend.py` ruler prose amended in the same increment belongs to the
+# standalone legend SCREEN, which is not in the snapshot matrix
+# (`_RESTYLED_SCREENS` + `_SCAFFOLD_SCREENS`), so it drifts nothing.
+#
 # The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml, pinned
 # textual==8.2.8) at batch-77 **Inc-9** — NEVER locally (reference_snapshot_regen_env:
 # local regen drifts unrelated baselines). RETIRE THIS MARK when that regen has
@@ -940,7 +954,9 @@ def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
                     "re-derived from the measured .map-band-bar over total mapped "
                     "bytes + gaps folded to 1 column + the band row stacks at every "
                     "size (120x30 drifts by layout AND content, bar 21->50; 80x24 by "
-                    "content only, bar still 66); SVG baseline regen pending in "
+                    "content only, bar still 66); PLUS Inc-4 R-TUI-112: the "
+                    "address ruler labels run starts + the last mapped byte "
+                    "instead of 5 span percentiles; SVG baseline regen pending in "
                     "canonical CI (snapshot-regen.yml, batch-77 Inc-9)"
                 ),
                 strict=False,
