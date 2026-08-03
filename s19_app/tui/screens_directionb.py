@@ -1542,10 +1542,25 @@ class BandBar(Horizontal):
         it does not otherwise observe, and the widget stays ignorant of who is
         listening.
 
-        This CANNOT spin. Re-apportioning to the same widths writes nothing —
-        ``_resize_band_segments`` rewrites a segment only when its rendered
-        length actually differs — so a no-op pass invalidates no layout and
-        delivers no further ``Resize``.
+        This CANNOT spin, and the reason is **CSS, not the idempotence guard.**
+        The bar's width is **content-independent**: ``.map-band-bar`` is
+        ``width: 100%`` (``styles.tcss:798``) and ``Horizontal`` does not
+        scroll, so rewriting segment content can never change the bar's own
+        size and therefore never re-delivers ``Resize``. **Measured:** 14
+        segments forced to 40 columns each — 560 columns of content in a
+        66-column bar — left ``bar.region.width`` at **66** and posted **0**
+        ``Measured``. **The loop is structurally open, not merely guarded.**
+
+        ⚠️ **Changing ``.map-band-bar`` to ``width: auto`` would CLOSE that
+        loop**, and the settle path performs genuinely non-no-op passes (4–6
+        writes per render, measured), so the cycle would be live rather than
+        hypothetical.
+
+        ``_resize_band_segments``' *"rewrite only when the rendered length
+        differs"* guard is a **second line of defence**, not the reason. An
+        earlier draft of this docstring named it as the reason — which is false
+        for the case that actually occurs, since during settle the widths
+        genuinely differ, writes genuinely happen, and no spin follows anyway.
 
         The widget carries NO member named ``_nodes`` / ``_context`` (Textual
         internal-shadowing guard — verified

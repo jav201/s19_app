@@ -6013,7 +6013,11 @@ threshold, with **0** violations.
   width (`AT-B77-02`): `test_b77_gapless_golden`. Containment (`AT-B77-03`):
   `test_b77_contain_no_segment_outside_the_bar`. Out-of-domain behaviour — renders, and the region
   list carries one row per oracle run (`AT-B77-18`):
-  `test_b77_domain_out_of_domain_renders_and_lists_every_run`.
+  `test_b77_domain_out_of_domain_renders_and_lists_every_run`. The bar re-apportions on **its own**
+  resize with both incidental correctors blinded (`AT-B77-19`):
+  `test_b77_bar_reapportions_without_panel_resize_or_retry` — the node added with the merge-gate
+  product fix, and the **fourth** instance of this batch's dangling-citation class, caught one commit
+  after the close-out repaired the third.
 
 > ⚠️ **Why this row exists, and the lineage a reader should not miss.** `HLR-111` is batch-77's
 > centrepiece and it shipped with **no row anywhere in this register** — cited from four sites in
