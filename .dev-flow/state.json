@@ -45,13 +45,13 @@
     "minted_so_far": "NONE - Phase 0 mints no ids.",
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31). AT-072b is an EXISTING global id being re-derived, not minted - it keeps its number."
   },
-  "current_phase": 3,
-  "phase_status": "not-started",
+  "current_phase": 6,
+  "phase_status": "approved",
   "iterations_per_phase": {
     "0": 0,
     "1": 2,
     "2": 3,
-    "3": 0,
+    "3": 1,
     "4": 0,
     "5": 0,
     "6": 0
@@ -65,7 +65,10 @@
     "2_architect": ".dev-flow/2026-08-01-batch-77/02-review-architect.md",
     "2_qa": ".dev-flow/2026-08-01-batch-77/02-review-qa.md",
     "2_security": ".dev-flow/2026-08-01-batch-77/02-review-security.md",
-    "2_architect_final": ".dev-flow/2026-08-01-batch-77/02d-review-architect-final.md"
+    "2_architect_final": ".dev-flow/2026-08-01-batch-77/02d-review-architect-final.md",
+    "4": ".dev-flow/2026-08-01-batch-77/04-validation.md",
+    "5": ".dev-flow/2026-08-01-batch-77/05-postmortem.md",
+    "6": ".dev-flow/2026-08-01-batch-77/06-docs/"
   },
   "premise_evaluation_phase0": {
     "evaluated": 15,
@@ -164,6 +167,30 @@
       "date": "2026-08-01",
       "decision": "Handoff at the Phase-2/3 boundary; Inc-0 correctly NOT executed",
       "notes": "The operator asked for Inc-0. Revision 5 has no Inc-0 - my own earlier roadmap had one, and executing it would have captured the byte-golden BEFORE the width basis settles, pinning the retired arithmetic. That is the defect ordering constraint 3 exists to prevent and is exactly how [45,15] entered revision 1. Reported rather than performed. Did the preparatory work owned by no increment instead: stripped raw control bytes from the requirements document and launched the full-suite baseline."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-03",
+      "decision": "Phase 3 closed - 10 increments merged via PR #186 (squash 244ecf2)",
+      "notes": "Inc-1..Inc-9 plus Inc-1b. iterations_per_phase['3'] corrected 0 -> 1: it was never incremented during execution, which the postmortem records as a finding in its own right."
+    },
+    {
+      "phase": 4,
+      "date": "2026-08-03",
+      "decision": "Phase 4 PASS-WITH-NOTES",
+      "notes": "4 notes: AT-B77-09/16 are PINs not gates; AT-B77-16's named mutation was INERT until replaced; the batch's one product defect escaped every local gate and was caught by CI; G-004 - a quoted figure (660160) had no on-disk producer. Two control candidates leave Phase 4: G-001 (a PIN's mutation must reach that PIN's own subject) and G-004 (a quoted figure must name a producer that survives the session)."
+    },
+    {
+      "phase": 5,
+      "date": "2026-08-03",
+      "decision": "Phase 5 postmortem - close batch",
+      "notes": "Defining fact: ~20 review passes found ZERO defects in shipped product code, then CI found exactly one. Recurring classes: the record-that-does-not-exist-for-a-finding-that-does (5 instances), the vacuous/inert check, and 5 quoted figures never derived. C-25 recorded as violated once by the orchestrator itself."
+    },
+    {
+      "phase": 6,
+      "date": "2026-08-03",
+      "decision": "Phase 6 docs complete - awaiting sync",
+      "notes": "traceability-matrix, functionality, executive-summary, diagrams/. Closes the postmortem's own flagged 'no diagram' gap."
     }
   ],
   "phase1_operator_rulings": {
@@ -272,5 +299,13 @@
     "reported_as_found": "prototypes/out/ is untracked and PRE-DATES this session; never swept up.",
     "lane_B_owed": "DISCHARGED - written into .dev-flow/BACKLOG-PROCESS.md at this close, not left as a pointer, per the routing rule that a carry belonging to the other lane is WRITTEN there in that batch own close.",
     "scratchpad": "Throwaway probes outside the repo tree; all output transcribed into the artifacts."
+  },
+  "merged": {
+    "pr": 186,
+    "squash_sha": "244ecf2",
+    "merged_at": "2026-08-03",
+    "base_at_merge": "f8747b8",
+    "ledger": "2514 passed / 2 skipped / 3 xfailed (baseline f8747b8) -> 2607 / 2 / 3 (close), collected 2612",
+    "note": "Phases 4-6 were produced AFTER the merge, on claude/batch-77-closeout. Recorded rather than backdated: the V-model artifacts did not gate this merge, the increment gates and two independent reviews did."
   }
 }
