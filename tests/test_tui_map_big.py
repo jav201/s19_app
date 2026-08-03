@@ -18,6 +18,7 @@ import re
 from pathlib import Path
 
 import pytest
+from textual.events import Key
 
 from s19_app.core import S19File
 from s19_app.range_index import (
@@ -1671,13 +1672,24 @@ def test_b77_style_selected_row_differs_from_every_unselected_row(
         )
 
 
-def test_b77_style_band_token_survives_selection(tmp_path: Path) -> None:
-    """LLR-117.2 — selecting and MOVING the selection never touches ``band-*``.
+def test_tc_b77_32_b77_style_band_token_survives_selection(
+    tmp_path: Path,
+) -> None:
+    """TC-B77-32 — selecting and MOVING the selection never touches ``band-*``.
 
     Asserted across a move, not a single application: a marker that replaced
     the band token would be invisible to a test that only ever looked at one
     selected row, because that row's band class would already be gone at the
-    first read.
+    first read. (LLR-117.2, behavioural arm.)
+
+    ⚠️ **Id allocation, recorded.** Inc-7 left this node and the inspection arm
+    below unlabelled because §3's boundary list allocated `TC-B77-26/27/28`
+    against HLR-117 as BARE IDS — no content was ever stated for them anywhere
+    in the batch artifacts. Retro-fitting content into ids whose intent nobody
+    recorded is minting, so those three are **WITHDRAWN — allocated without
+    content, never specified**, their numbers are not reused, and these two
+    nodes take the next free ids. Allocation stays monotonic, so a spent id can
+    never mean two things (the same rule `AT-B77-17`'s withdrawal established).
     """
 
     async def _drive():
@@ -1718,12 +1730,17 @@ def test_b77_style_band_token_survives_selection(tmp_path: Path) -> None:
     )
 
 
-def test_b77_style_selection_rule_sets_no_foreground_and_no_inversion() -> None:
-    """LLR-117.2's inspection arm, read from the shipped stylesheet.
+def test_tc_b77_33_b77_style_selection_rule_sets_no_foreground_no_inversion() -> (
+    None
+):
+    """TC-B77-33 — LLR-117.2's inspection arm, read from the stylesheet.
 
     Revision 1's wording — "sets no ``color:`` property" — is satisfied by
     ``text-style: reverse``, which swaps foreground and background and so
     repaints the band channel through the back door. Both are asserted.
+
+    Labelled at Inc-8; see ``test_tc_b77_32_…`` for the withdrawal record that
+    freed these two ids.
     """
     css = _STYLES_TCSS.read_text(encoding="utf-8")
     match = re.search(
@@ -1955,10 +1972,18 @@ def test_tc_b77_31_b77_select_resolution_runs_on_the_post_refresh_hook(
     ``grid.mount()`` is deferred, so "after the rows are mounted" is not a
     synchronous point inside ``render_ranges``. This asserts the observable
     consequence: the instant ``update_memory_map()`` returns, ZERO rows are
-    queryable and no selection exists — an inline resolution would therefore
-    have had to run against the OLD, about-to-be-removed row set, which is the
-    mechanism that produced the detached-focus defect. The selection appears
-    only after the refresh boundary.
+    queryable and no selection exists — so an inline resolution would have had
+    nothing to resolve AGAINST. In the first-render case this node actually
+    exercises there is no old row set at all: an inline resolution would find
+    **zero** rows and could only fabricate a selection or none. On a RE-render
+    the same deferral is what leaves the stale, about-to-be-removed rows as the
+    only ones reachable inline, which is the mechanism that produced the
+    detached-focus defect; that case is covered by ``TC-B77-29``. Either way
+    the selection may appear only after the refresh boundary.
+
+    *(Wording corrected at Inc-8: this docstring previously said an inline
+    resolution "would have run against the OLD row set", which is the
+    re-render mechanism, not the one measured here.)*
     """
     loaded = _load_case_02()
 
@@ -2058,4 +2083,628 @@ def test_b77_select_focus_is_not_taken_while_the_map_screen_is_hidden(
     assert not got["focus_is_row"], (
         f"{size}: focus must not move to a row on a screen that is not being "
         f"painted; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-77 Inc-8 — HLR-115: arrows walk the region list, Enter inspects
+#
+# C-16 is the reason every node below presses REAL KEYS through the pilot and
+# never calls ``row.focus()`` as a proxy. Textual performs NO spatial
+# arrow-focus of its own: measured at Phase 3 on this tree with ``can_focus``
+# already True and a row already focused, ``down``/``down``/``up`` left
+# ``app.focused.region_start`` at ``0x0`` for all three presses, at BOTH
+# regimes. A ``.focus()``-driven acceptance would have been green on that.
+# ---------------------------------------------------------------------------
+def _starts(rows):
+    return [row.region_start for row in rows]
+
+
+def _focus_start(app):
+    return getattr(app.focused, "region_start", None)
+
+
+class _ActionRecorder:
+    """Replace an app action with a recorder, keeping the binding path intact.
+
+    The claim ``AT-B77-09``/``AT-B77-16`` make is that the APPLICATION action
+    still fires, so the action itself is the layer to read. Recording is also
+    the only safe way to press ``o``: the shipped ``action_open_workarea``
+    launches Explorer as a subprocess.
+    """
+
+    def __init__(self, app: S19TuiApp, *actions: str) -> None:
+        self.invoked: list[str] = []
+        for action in actions:
+            setattr(app, f"action_{action}", self._make(action))
+
+    def _make(self, action: str):
+        def _record() -> None:
+            self.invoked.append(action)
+
+        return _record
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-08 — GATE: real arrow keys move focus, Enter inspects (LLR-115.2/.3)
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_keys_arrows_move_focus_and_enter_inspects(
+    tmp_path: Path, size
+) -> None:
+    """AT-B77-08 — ``down``/``down``/``up`` walk the list; ``Enter`` commits.
+
+    Four claims that are only meaningful together:
+
+    - the arrows move focus in ASCENDING ADDRESS ORDER — asserted against the
+      mounted order, which is separately asserted to BE ascending, so the
+      ordering is a checked precondition rather than an assumption about the
+      producer;
+    - the arrows move focus ONLY. The selection is still on run 1 after three
+      presses, which is what makes the next clause discriminating: without it,
+      an implementation that selected on every arrow would satisfy "Enter
+      inspects run 2" without ``Enter`` doing anything at all;
+    - ``Enter`` then moves the selection to the FOCUSED run — a run that is not
+      the auto-selected one, so the observation cannot be satisfied by the
+      auto-selection that ran before any key was pressed;
+    - ``Enter`` posts ``chain = 1``: ZERO ``OpenInHexRequested``. The absence
+      carries its presence co-assertion (the inspector moved) AND a positive
+      control that the recorder can see a real post (C-40).
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            observed = {
+                "settled": settled,
+                "starts": _starts(rows),
+                "auto_selected": panel._selected_cell_start,
+                "focus_before": _focus_start(app),
+                "focus_is_row": isinstance(app.focused, RegionRow),
+            }
+            recorder = _PostRecorder(panel)
+            await pilot.press("down")
+            await pilot.pause()
+            observed["focus_after_down"] = _focus_start(app)
+            await pilot.press("down")
+            await pilot.pause()
+            observed["focus_after_down2"] = _focus_start(app)
+            await pilot.press("up")
+            await pilot.pause()
+            observed["focus_after_up"] = _focus_start(app)
+            observed["selected_after_arrows"] = panel._selected_cell_start
+            observed["focus_live_after_arrows"] = app.focused in set(
+                _live_rows(app)
+            )
+
+            await pilot.press("enter")
+            await pilot.pause()
+            observed["selected_after_enter"] = panel._selected_cell_start
+            observed["markers_after_enter"] = [
+                r.region_start for r in _markers(app)
+            ]
+            observed["detail"] = app.query_one("#map_detail_body").render().plain
+            observed["nav_posts"] = len(recorder.open_in_hex())
+            # Positive control for the absence above, captured last: the SAME
+            # recorder must observe a real chain-2 activation.
+            panel.on_region_row_activated(
+                RegionRow.Activated(
+                    rows[0].region_start, rows[0].region_end, chain=2
+                )
+            )
+            await pilot.pause()
+            observed["nav_after_double"] = len(recorder.open_in_hex())
+            return observed
+
+    got = asyncio.run(_drive())
+
+    starts = got["starts"]
+    assert got["settled"] and len(starts) >= 3, (
+        f"{size}: PRECONDITION — the fixture must render >=3 runs, or "
+        f"'down, down, up' cannot distinguish movement from a no-op; got {got}"
+    )
+    assert starts == sorted(starts), (
+        f"{size}: PRECONDITION — the mounted rows must be in ascending address "
+        f"order, or 'the next row in ascending address order' and 'the next "
+        f"mounted row' are different claims; got {got}"
+    )
+    assert got["focus_is_row"] and got["focus_before"] == starts[0], (
+        f"{size}: PRECONDITION — a region row must hold focus before the first "
+        f"key press (LLR-116.5); got {got}"
+    )
+    assert got["focus_after_down"] == starts[1], (
+        f"{size}: `down` must move focus to the NEXT row by address; got {got}"
+    )
+    assert got["focus_after_down2"] == starts[2], (
+        f"{size}: a second `down` must move on again; got {got}"
+    )
+    assert got["focus_after_up"] == starts[1], (
+        f"{size}: `up` must move focus to the PREVIOUS row by address; got {got}"
+    )
+    assert got["focus_live_after_arrows"], (
+        f"{size}: the arrows must land on a row that is LIVE and mounted, not "
+        f"merely one whose region_start matches; got {got}"
+    )
+    assert got["selected_after_arrows"] == got["auto_selected"] == starts[0], (
+        f"{size}: the arrows move FOCUS only — the selection must still be on "
+        f"run 1, or `Enter`'s effect below cannot be attributed to `Enter`; "
+        f"got {got}"
+    )
+    assert got["selected_after_enter"] == starts[1], (
+        f"{size}: `Enter` must inspect the FOCUSED region; got {got}"
+    )
+    assert got["markers_after_enter"] == [starts[1]], (
+        f"{size}: exactly one marker, on the row Enter committed; got {got}"
+    )
+    assert f"0x{starts[1]:08X}" in got["detail"], (
+        f"{size}: the inspector body must NAME the region Enter committed; "
+        f"got {got}"
+    )
+    assert got["nav_posts"] == 0, (
+        f"{size}: `Enter` posts chain=1 — inspect, never navigate. "
+        f"OpenInHexRequested must not be posted (LLR-115.3); got {got}"
+    )
+    assert got["nav_after_double"] == 1, (
+        f"{size}: CONTROL — the recorder must be able to see a post at all, or "
+        f"the zero above is equally consistent with a dead recorder; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-09 — PIN: focus ON a row, no application binding is shadowed
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_keys_no_application_binding_is_shadowed_with_a_row_focused(
+    tmp_path: Path, size
+) -> None:
+    """AT-B77-09 — PIN, not a gate: ``j``/``k``/``o`` still reach the app.
+
+    This node is GREEN before and after Inc-8 and **will never be demonstrated
+    RED by the change it guards**. ``RegionRow.BINDINGS`` is ``[]`` today and
+    ``LLR-115.4`` keeps it ``[]``, so there is nothing here for the increment
+    to break. Its entire falsifiability is its NAMED MUTATION — add
+    ``Binding("k", ...)`` to ``RegionRow.BINDINGS`` and it reddens — which is
+    executed and recorded at the gate rather than implied here.
+
+    Focus ON a row is the only state in which widget-scoped shadowing can
+    occur, and after batch-77 it is the DEFAULT state, which is why this arm
+    exists separately from ``AT-B77-16``.
+
+    ``j`` and ``o`` are read at the ACTION layer: the shipped
+    ``action_open_workarea`` launches Explorer as a subprocess, so executing it
+    for real is not an option. ``k``'s outcome is both safe and observable on
+    the shipped surface, so it is asserted there — as a screen push — and is
+    pressed LAST because it changes what holds focus.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            recorder = _ActionRecorder(app, "dump_a2l_json", "open_workarea")
+            observed = {
+                "settled": settled,
+                "bindings_before": list(RegionRow.BINDINGS),
+                "focus_is_row": isinstance(app.focused, RegionRow),
+                "focus_before": _focus_start(app),
+                "selected_before": panel._selected_cell_start,
+                "stack_before": [type(s).__name__ for s in app.screen_stack],
+            }
+            await pilot.press("j")
+            await pilot.pause()
+            await pilot.press("o")
+            await pilot.pause()
+            observed["invoked"] = list(recorder.invoked)
+            observed["selected_after_jo"] = panel._selected_cell_start
+            observed["focus_after_jo"] = _focus_start(app)
+            await pilot.press("k")
+            await pilot.pause()
+            observed["stack_after_k"] = [
+                type(s).__name__ for s in app.screen_stack
+            ]
+            observed["selected_after_k"] = panel._selected_cell_start
+            observed["bindings_after"] = list(RegionRow.BINDINGS)
+            return observed
+
+    got = asyncio.run(_drive())
+
+    assert got["settled"] and got["focus_is_row"], (
+        f"{size}: PRECONDITION — a region row must hold focus, or this node "
+        f"tests the state AT-B77-16 already covers and proves nothing new; "
+        f"got {got}"
+    )
+    assert got["bindings_before"] == [] and got["bindings_after"] == [], (
+        f"{size}: LLR-115.4 — RegionRow.BINDINGS must be empty before and "
+        f"after; a widget binding on j/k/o would shadow the application "
+        f"binding for as long as a row holds focus; got {got}"
+    )
+    assert got["invoked"] == ["dump_a2l_json", "open_workarea"], (
+        f"{size}: `j` and `o` must still reach their application actions with "
+        f"a region row focused; got {got}"
+    )
+    assert got["stack_before"] == ["Screen"], (
+        f"{size}: PRECONDITION — no modal may be on the stack before `k`; "
+        f"got {got}"
+    )
+    assert got["stack_after_k"][-1] == "LegendScreen", (
+        f"{size}: `k` must still push the legend screen; got {got}"
+    )
+    assert (
+        got["selected_before"]
+        == got["selected_after_jo"]
+        == got["selected_after_k"]
+        is not None
+    ), f"{size}: none of the three keys may move the map selection; got {got}"
+    assert got["focus_after_jo"] == got["focus_before"], (
+        f"{size}: nor may they move focus off the row; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-16 — PIN: focus OFF the region list, same three keys
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_keys_no_application_binding_is_shadowed_without_row_focus(
+    tmp_path: Path, size
+) -> None:
+    """AT-B77-16 — PIN. Invariant under Inc-8 BY CONSTRUCTION.
+
+    With no region row focused there is no widget in the resolution chain that
+    could carry a binding at all, so this predicate cannot redden for the
+    change it guards — it is a PIN for the same reason ``AT-B77-09`` is, one
+    step more strongly. It is kept because the two arms answer different
+    questions: this one says the pre-batch behaviour is untouched, the other
+    says the NEW default focus state did not introduce a shadow.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            app.set_focus(None)
+            await pilot.pause()
+            recorder = _ActionRecorder(app, "dump_a2l_json", "open_workarea")
+            observed = {
+                "settled": settled,
+                "focus_is_row": isinstance(app.focused, RegionRow),
+                "selected_before": panel._selected_cell_start,
+                "stack_before": [type(s).__name__ for s in app.screen_stack],
+            }
+            await pilot.press("j")
+            await pilot.pause()
+            await pilot.press("o")
+            await pilot.pause()
+            observed["invoked"] = list(recorder.invoked)
+            await pilot.press("k")
+            await pilot.pause()
+            observed["stack_after_k"] = [
+                type(s).__name__ for s in app.screen_stack
+            ]
+            observed["selected_after"] = panel._selected_cell_start
+            return observed
+
+    got = asyncio.run(_drive())
+
+    assert got["settled"] and not got["focus_is_row"], (
+        f"{size}: PRECONDITION — no region row may hold focus, or this node is "
+        f"a duplicate of AT-B77-09; got {got}"
+    )
+    assert got["invoked"] == ["dump_a2l_json", "open_workarea"], (
+        f"{size}: `j` and `o` must reach their application actions; got {got}"
+    )
+    assert got["stack_before"] == ["Screen"], (
+        f"{size}: PRECONDITION — no modal on the stack before `k`; got {got}"
+    )
+    assert got["stack_after_k"][-1] == "LegendScreen", (
+        f"{size}: `k` must push the legend screen; got {got}"
+    )
+    assert got["selected_after"] == got["selected_before"] is not None, (
+        f"{size}: none of the three keys may move the map selection; got {got}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# TC-B77-16..20 — boundary catalog for HLR-115
+# ---------------------------------------------------------------------------
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_16_b77_keys_first_and_last_row_edges_do_not_wrap(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-16 (boundary) — at the first row ``up``, at the last ``down``.
+
+    Both edges are exercised in one node because they are one clause with two
+    ends, and because a wraparound implementation fails ONLY at the edges — the
+    interior movement AT-B77-08 asserts is identical either way. ``-1`` is a
+    legal Python index, so "the previous row" written without a lower-bound
+    guard silently means "the last row"; that is the specific defect this node
+    exists to catch, and it is asserted as ``focus unchanged``, never as
+    ``focus is not the last row``.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            observed = {"settled": settled, "starts": _starts(rows)}
+            observed["focus_at_first"] = _focus_start(app)
+            await pilot.press("up")
+            await pilot.pause()
+            observed["after_up_at_first"] = _focus_start(app)
+            for _ in range(len(rows) - 1):
+                await pilot.press("down")
+                await pilot.pause()
+            observed["focus_at_last"] = _focus_start(app)
+            await pilot.press("down")
+            await pilot.pause()
+            observed["after_down_at_last"] = _focus_start(app)
+            return observed
+
+    got = asyncio.run(_drive())
+
+    starts = got["starts"]
+    assert got["settled"] and len(starts) >= 2, (
+        f"{size}: PRECONDITION — >=2 runs, or first and last are the same row "
+        f"and the two edges are indistinguishable; got {got}"
+    )
+    assert got["focus_at_first"] == starts[0], (
+        f"{size}: PRECONDITION — focus must start on the FIRST row; got {got}"
+    )
+    assert got["after_up_at_first"] == starts[0], (
+        f"{size}: `up` at the first row must leave focus unchanged — never "
+        f"wrap to the last (index -1); got {got}"
+    )
+    assert got["focus_at_last"] == starts[-1], (
+        f"{size}: PRECONDITION — the walk must reach the LAST row, or the "
+        f"bottom edge is never exercised; got {got}"
+    )
+    assert got["after_down_at_last"] == starts[-1], (
+        f"{size}: `down` at the last row must leave focus unchanged — never "
+        f"wrap to the first; got {got}"
+    )
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_17_b77_keys_are_inert_with_no_file_loaded(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-17 (empty) — no image: the keys raise nothing, select nothing.
+
+    There is no row to focus, so the assertion is about the ABSENCE of a
+    fabricated selection, paired with its presence co-assertion: the panel is
+    still showing its hint, i.e. it rendered the empty state rather than
+    nothing at all.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            for _ in range(3):
+                await pilot.pause()
+            for key in ("down", "up", "enter"):
+                await pilot.press(key)
+                await pilot.pause()
+            return {
+                "rows": len(_live_rows(app)),
+                "any_region_row": len(app.query(RegionRow)),
+                "selected": panel._selected_cell_start,
+                "body_is_hint": (
+                    app.query_one("#map_detail_body").render().plain
+                    == panel._DETAIL_HINT
+                ),
+            }
+
+    got = asyncio.run(_drive())
+
+    assert got["rows"] == 0 and got["any_region_row"] == 0, (
+        f"{size}: PRECONDITION — no file means no region rows; got {got}"
+    )
+    assert got["body_is_hint"], (
+        f"{size}: the empty state must still be rendered — the presence "
+        f"co-assertion for the absence below; got {got}"
+    )
+    assert got["selected"] is None, (
+        f"{size}: the arrow and Enter keys must fabricate no selection with no "
+        f"image loaded; got {got}"
+    )
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_18_b77_keys_single_region_has_nowhere_to_move(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-18 (boundary) — one run: both edges land on the same row.
+
+    With a single row the first and the last row are the same widget, so this
+    is the case where an off-by-one in EITHER direction is visible as movement
+    where none is possible. ``Enter`` must still inspect it — the row being the
+    only one is not a reason for the key to be inert.
+    """
+    loaded = _blocks_image(tmp_path, "single.s19", [(0x20000, "const")])
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            rows = _live_rows(app)
+            observed = {"settled": settled, "starts": _starts(rows)}
+            await pilot.press("down")
+            await pilot.pause()
+            observed["after_down"] = _focus_start(app)
+            await pilot.press("up")
+            await pilot.pause()
+            observed["after_up"] = _focus_start(app)
+            panel._selected_cell_start = None
+            await pilot.press("enter")
+            await pilot.pause()
+            observed["selected_after_enter"] = panel._selected_cell_start
+            return observed
+
+    got = asyncio.run(_drive())
+
+    assert got["settled"] and len(got["starts"]) == 1, (
+        f"{size}: PRECONDITION — the fixture must render EXACTLY one run; "
+        f"got {got}"
+    )
+    only = got["starts"][0]
+    assert got["after_down"] == only and got["after_up"] == only, (
+        f"{size}: with one row both arrows must leave focus on it; got {got}"
+    )
+    assert got["selected_after_enter"] == only, (
+        f"{size}: `Enter` must still inspect the only region — the selection "
+        f"was cleared first so this cannot pass on the auto-selection; "
+        f"got {got}"
+    )
+
+
+def test_tc_b77_19_b77_keys_enter_on_an_invalidated_row_is_inert(
+    tmp_path: Path,
+) -> None:
+    """TC-B77-19 (invalid) — ``Enter`` on a row a re-render has detached.
+
+    This one boundary is driven by invoking the handler directly rather than
+    through the pilot, and the reason is stated rather than hidden: after a
+    re-render the panel moves focus to a LIVE row (LLR-116.5), so the shipped
+    surface CANNOT deliver a key to a detached row. Driving it through the
+    pilot would silently exercise the live row instead and the node would pass
+    without ever reaching the state it is named for.
+
+    The stale row's detachment is asserted first, so the node fails loudly if a
+    future change makes ``_live_region_rows`` return it after all.
+    """
+    first = _load_case_02()
+    second = _blocks_image(tmp_path, "disjoint.s19", [(0x900000, "high")])
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = first
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            assert await _settle_selection(pilot, panel)
+            stale = _live_rows(app)[0]
+            panel._selected_cell_start = None
+            app.current_file = second
+            app.update_memory_map()
+            assert await _settle_selection(pilot, panel)
+            observed = {
+                "stale_start": stale.region_start,
+                "stale_attached": stale.is_attached,
+                "stale_in_live": stale in set(_live_rows(app)),
+                "live_selection": panel._selected_cell_start,
+                "live_starts": _starts(_live_rows(app)),
+            }
+            raised = None
+            try:
+                stale.on_key(Key("enter", None))
+            except Exception as exc:  # pragma: no cover - the failure path
+                raised = f"{type(exc).__name__}: {exc}"
+            await pilot.pause()
+            observed["raised"] = raised
+            observed["selection_after"] = panel._selected_cell_start
+            return observed
+
+    got = asyncio.run(_drive())
+
+    assert not got["stale_attached"] and not got["stale_in_live"], (
+        f"PRECONDITION — the captured row must be DETACHED after the "
+        f"re-render, or this node is exercising a live row; got {got}"
+    )
+    assert got["stale_start"] not in got["live_starts"], (
+        f"PRECONDITION — the stale row's address must be absent from the new "
+        f"render, or an inert Enter and a working one are indistinguishable; "
+        f"got {got}"
+    )
+    assert got["raised"] is None, (
+        f"`Enter` on an invalidated row must not raise; got {got}"
+    )
+    assert got["selection_after"] == got["live_selection"], (
+        f"nor may it move the selection back to the vanished region; got {got}"
+    )
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_tc_b77_20_b77_keys_enter_with_no_focus_selects_nothing(
+    tmp_path: Path, size
+) -> None:
+    """TC-B77-20 (boundary) — ``Enter`` with focus off the region list.
+
+    The selection is cleared first so that "the selection did not change" is
+    not satisfied by the auto-selection already sitting on run 1 — without
+    that, this node would be green on an implementation where ``Enter``
+    re-committed run 1 from nowhere.
+    """
+    loaded = _load_case_02()
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app.action_show_screen("map")
+            panel = _panel(app)
+            app.update_memory_map()
+            settled = await _settle_selection(pilot, panel)
+            recorder = _PostRecorder(panel)
+            app.set_focus(None)
+            await pilot.pause()
+            panel._selected_cell_start = None
+            observed = {
+                "settled": settled,
+                "focus_is_row": isinstance(app.focused, RegionRow),
+            }
+            await pilot.press("enter")
+            await pilot.pause()
+            observed["selected_after"] = panel._selected_cell_start
+            observed["markers"] = [r.region_start for r in _markers(app)]
+            observed["nav_posts"] = len(recorder.open_in_hex())
+            return observed
+
+    got = asyncio.run(_drive())
+
+    assert got["settled"] and not got["focus_is_row"], (
+        f"{size}: PRECONDITION — no region row may hold focus; got {got}"
+    )
+    assert got["selected_after"] is None, (
+        f"{size}: `Enter` with no focused row must select nothing; got {got}"
+    )
+    assert got["nav_posts"] == 0, (
+        f"{size}: nor post OpenInHexRequested; got {got}"
     )

@@ -391,7 +391,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 - **Which layer holds the fact (P-42, executed):** `widget.styles.(background, color, text_style)`. `render().spans` is **`[]`** on these rows, so **C-37's span route is inapplicable**; `render_line` returns the base theme colour.
 - **Acceptance:** **`AT-B77-12`** — triple differs ∧ exactly one marker ∧ band token unchanged; plus an `inspection` arm on the `styles.tcss` rule.
 - **⚠️ security m-1:** revision 1's inspection arm ("sets no `color:` property") is satisfiable by `text-style: reverse`, which **does** repaint the band colour. **Strengthened** in `LLR-117.2`.
-- **Boundary:** `TC-B77-25` (**fixture must have ≥2 runs and the body must assert it** — with one run the clause is vacuously true) · `TC-B77-26` · `TC-B77-27` · `TC-B77-28`
+- **Boundary:** `TC-B77-25` (**fixture must have ≥2 runs and the body must assert it** — with one run the clause is vacuously true) · ~~`TC-B77-26`~~ · ~~`TC-B77-27`~~ · ~~`TC-B77-28`~~ **WITHDRAWN at Inc-8 — allocated without content, never specified; numbers NOT reused.** Replaced by **`TC-B77-32`** (band channel survives a selection MOVE) and **`TC-B77-33`** (the stylesheet inspection arm). Withdrawal record in §4 under `HLR-117 → LLR-117.x`.
 
 ---
 
@@ -560,6 +560,13 @@ Revision 1's P-16…P-43 stand except where corrected below.
 **LLR-117.1 — marker applied by address** · **Statement:** The panel **shall** apply a selection marker to the region row whose `region_start` equals the resolved selection, and to no other row. **Threshold:** exactly 1 (today 0), matched by address not index.
 **LLR-117.2 — the band channel survives selection (strengthened, security m-1)** · **Statement:** Applying or removing the selection marker **shall not** add, remove or override any `band-*` class on the row, and the selection style **shall not** set a foreground colour nor a text style that inverts foreground and background. **Change:** revision 1 said only "no `color:` property", which `text-style: reverse` satisfies while repainting the band colour.
 
+**`TC-B77-26` / `TC-B77-27` / `TC-B77-28` — WITHDRAWN at Inc-8. Recorded, not deleted.**
+- **Was:** nothing. That is the whole finding. The three ids appear in exactly two places — §3 `HLR-117`'s boundary list and §5.2's functional chain — **as bare ids, with no content stated for them anywhere in the batch artifacts**, at any revision. Unlike `TC-B77-25`, which carries its own fixture constraint inline, these three were allocated and never specified.
+- **Why withdrawn:** Inc-7 emitted two HLR-117 nodes beyond `AT-B77-12`/`TC-B77-25` and correctly **refused to label them `TC-B77-26/27/28`**. Retro-fitting content into an id whose intent nobody recorded is **minting under an existing number** — it makes the id mean whatever the later increment happened to write, which is precisely what a spent-id rule exists to prevent.
+- **The rule this follows is already this batch's:** `AT-B77-17` established that **a spent id is never reused, so allocation stays monotonic and an id can never mean two things** (§5.4). Withdrawing without reuse is the same rule applied to ids spent by *allocation* rather than by *specification*.
+- **What replaced them:** Inc-7's two unlabelled nodes take the next free ids — **`TC-B77-32`** (`test_tc_b77_32_b77_style_band_token_survives_selection`, LLR-117.2 behavioural arm) and **`TC-B77-33`** (`test_tc_b77_33_b77_style_selection_rule_sets_no_foreground_no_inversion`, LLR-117.2 inspection arm). **`26`/`27`/`28` are not reused.**
+- ⚠️ **This is a coverage question the withdrawal does NOT answer.** Withdrawing the ids does not establish that HLR-117's boundary catalog is complete at two entries; it establishes only that three of its entries were never real. Whether HLR-117 needs further boundaries is a separate judgement, and none is claimed here.
+
 ---
 
 ## 5. Validation strategy
@@ -597,7 +604,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 | US-77-6 | hostile input: no control byte painted | `AT-B77-15b` 🔄 | **GREEN today, VACUOUSLY** (nothing rendered — body shows `_DETAIL_HINT`); genuinely RED after Inc-7; GREEN by Inc-2's scrub. **Not listed as a gate before Inc-2.** |
 | US-77-7 | selection visible | `AT-B77-12` | **RED** — 0 markers — executed |
 
-**Functional chain:** HLR-111 → LLR-111.1…**.9** → `TC-B77-01…05`, `TC-B77-30` · HLR-112 → LLR-112.1…3 → `TC-B77-06…09` · HLR-113 → LLR-113.1…2 → `TC-B77-10…13` · HLR-114 → LLR-114.1…2 → `TC-B77-14…15` · HLR-115 → LLR-115.2…4 → `TC-B77-16…20` · HLR-116 → LLR-116.1…**.6** → `TC-B77-21…24`, `TC-B77-29`, `TC-B77-31` · HLR-117 → LLR-117.1…2 → `TC-B77-25…28`.
+**Functional chain:** HLR-111 → LLR-111.1…**.9** → `TC-B77-01…05`, `TC-B77-30` · HLR-112 → LLR-112.1…3 → `TC-B77-06…09` · HLR-113 → LLR-113.1…2 → `TC-B77-10…13` · HLR-114 → LLR-114.1…2 → `TC-B77-14…15` · HLR-115 → LLR-115.2…4 → `TC-B77-16…20` · HLR-116 → LLR-116.1…**.6** → `TC-B77-21…24`, `TC-B77-29`, `TC-B77-31` · HLR-117 → LLR-117.1…2 → `TC-B77-25`, **`TC-B77-32`, `TC-B77-33`** *(🆕 Inc-8 — `TC-B77-26/27/28` are **WITHDRAWN, allocated without content, never specified**, and their numbers are **not reused**; see the withdrawal record in §4 under `HLR-117 → LLR-117.x`)*.
 
 ### 5.3 Batch acceptance criteria — **RESTORED at revision 4 (QA M-3)**
 
@@ -617,7 +624,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 - **Descope-specific (R-10):** the batch does **not** claim `HLR-111`/`HLR-112` hold out of domain. `AT-B77-18` is the only out-of-domain gate and asserts only *no raise* + *region list complete*. `C-77-l` is present and complete at close.
 
 ### 5.4 IDs
-**Batch-scoped `AT-B77-01…16`, `AT-B77-18`, `TC-B77-01…31`.** `AT-B77-15` is **split** into `AT-B77-15a` (GATE, discharged) and `AT-B77-15b` (GATE from Inc-2). **`AT-B77-17` is WITHDRAWN with `LLR-111.8` and its id is NOT reused** — allocation stays monotonic so a spent id can never mean two things. Letter-initial bodies are outside `AT-TC-REGISTRY.jsonl` authority (`_meta.governed`, spec §2.3); **no reservation PR**. **Exception:** `AT-072b` keeps its global id as a re-derivation. New at revision 2: `AT-B77-15` (hostile input), `AT-B77-16` (shadow PIN), `AT-B77-17` (allocation bound), `TC-B77-30` (heterogeneous range), `TC-B77-31` (post-refresh hook).
+**Batch-scoped `AT-B77-01…16`, `AT-B77-18`, `TC-B77-01…33`.** *(🆕 Inc-8: high-water `TC-B77-31` → **`TC-B77-33`**; `TC-B77-26/27/28` **WITHDRAWN — allocated without content, never specified** — and like `AT-B77-17` their numbers are **not reused**, so the range is not contiguous and that is deliberate.)* `AT-B77-15` is **split** into `AT-B77-15a` (GATE, discharged) and `AT-B77-15b` (GATE from Inc-2). **`AT-B77-17` is WITHDRAWN with `LLR-111.8` and its id is NOT reused** — allocation stays monotonic so a spent id can never mean two things. Letter-initial bodies are outside `AT-TC-REGISTRY.jsonl` authority (`_meta.governed`, spec §2.3); **no reservation PR**. **Exception:** `AT-072b` keeps its global id as a re-derivation. New at revision 2: `AT-B77-15` (hostile input), `AT-B77-16` (shadow PIN), `AT-B77-17` (allocation bound), `TC-B77-30` (heterogeneous range), `TC-B77-31` (post-refresh hook).
 
 ---
 

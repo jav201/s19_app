@@ -1392,6 +1392,55 @@ class RegionRow(Static):
             self.Activated(self.region_start, self.region_end, chain=event.chain)
         )
 
+    def on_key(self, event: events.Key) -> None:
+        """Walk the region list with the arrows; inspect with ``Enter``.
+
+        batch-77 HLR-115. Textual performs NO spatial arrow-focus of its own —
+        measured at Phase 3 with ``can_focus`` already True, ``up``/``down`` on
+        a focused row moved focus NOWHERE at either regime (C-16) — so the
+        movement is implemented here rather than inherited from the framework.
+
+        It is deliberately NOT a ``BINDINGS`` entry (LLR-115.4). A widget-scoped
+        binding SHADOWS the application binding of the same key for as long as
+        the row holds focus, and after batch-77 a region row holds focus by
+        default on every map render (LLR-116.5) — so a binding here would sit on
+        the operator's normal path. Only the three keys below are consumed;
+        every other key bubbles untouched to the application bindings, which is
+        what keeps ``j`` / ``k`` / ``o`` reaching ``dump_a2l_json`` /
+        ``show_legend`` / ``open_workarea``.
+
+        ``Enter`` posts the SAME :class:`Activated` message a click posts, with
+        ``chain = 1`` — the "inspect, do not navigate" value (LLR-115.3). The
+        single/double policy therefore stays in ``on_region_row_activated``
+        alone; the keyboard adds no second route to the inspector.
+
+        Arrow movement moves FOCUS ONLY. It deliberately does not select: the
+        operator scans the list with the arrows and commits with ``Enter``.
+        """
+        if event.key == "enter":
+            event.stop()
+            self.post_message(
+                self.Activated(self.region_start, self.region_end, chain=1)
+            )
+            return
+        if event.key not in ("up", "down"):
+            return
+        event.stop()
+        # The rows of THIS list only, in mounted order — which is the ascending
+        # address order ``_build_band_widgets`` emitted them in. A panel-wide
+        # query would also return the stale rows of a superseded render.
+        rows = [
+            child
+            for child in self.parent.children
+            if isinstance(child, RegionRow)
+        ]
+        index = rows.index(self) + (1 if event.key == "down" else -1)
+        # No wraparound: at the first row ``up`` and at the last row ``down``
+        # leave focus exactly where it is. ``0 <= index`` is what stops ``-1``
+        # from being read as "the last row".
+        if 0 <= index < len(rows):
+            rows[index].focus()
+
 
 class BandSegment(Static):
     """A clickable entropy-band segment of the map's top strip (batch-67 N4b).

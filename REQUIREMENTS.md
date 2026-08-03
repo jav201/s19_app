@@ -4401,12 +4401,56 @@ activation posts none.
   `test_b77_select_rerender_preserves_a_region_still_present` (AT-B77-13),
   `test_b77_select_rerender_falls_back_when_the_region_is_gone` (AT-B77-14),
   `test_b77_style_selected_row_differs_from_every_unselected_row` (AT-B77-12 + TC-B77-25),
-  `test_b77_style_band_token_survives_selection`,
-  `test_b77_style_selection_rule_sets_no_foreground_and_no_inversion`,
+  `test_tc_b77_32_b77_style_band_token_survives_selection` (TC-B77-32 — id
+  allocated at Inc-8; see the withdrawal note below),
+  `test_tc_b77_33_b77_style_selection_rule_sets_no_foreground_no_inversion` (TC-B77-33),
   `test_tc_b77_21_…` / `_22_…` / `_23_…` / `_24_…` / `_29_…` / `_31_…`,
   `test_b77_select_focus_is_not_taken_while_the_map_screen_is_hidden`) and
   `tests/test_tui_hostile_map.py` (`AT-B77-15a`/`AT-B77-15b`, now parametrized over the `click` **and**
   `autoselect` drives — Inc-7 is what makes the auto-select path reach that sink at all).
+- **Amended in batch `2026-08-01-batch-77` Inc-8** (US-77-5 / HLR-115, LLR-115.2–.4). The region list is
+  now walkable **from the keyboard**, and the mouse split above is untouched.
+  - **Before:** with a row focused (Inc-7), `↑`/`↓` moved focus **nowhere** and `Enter` did nothing.
+    Measured pre-change at both regimes on `case_02`: `down`, `down`, `up` all left
+    `app.focused.region_start` at `0x00000000`, and `Enter` left the selection where auto-select had put
+    it. **This is C-16's premise verified rather than assumed — Textual performs no spatial arrow-focus
+    of its own, so `can_focus = True` alone buys nothing.** An acceptance written with `row.focus()`
+    instead of a real key press would have been green on exactly that state.
+  - **After:** while a region row has focus, `↑`/`↓` move focus to the previous/next row in **ascending
+    address order**; at the first row `↑` and at the last row `↓` leave focus unchanged — **no
+    wraparound**, which matters because `-1` is a legal Python index and an unguarded "previous row"
+    silently means "the last row". `Enter` posts the same `RegionRow.Activated` a click posts, with
+    **`chain = 1`**, so it inspects through the single click-policy site
+    (`on_region_row_activated`) and never navigates. The arrows move **focus only**: the selection
+    follows `Enter`, so the operator scans and then commits.
+  - **`RegionRow.BINDINGS` is `[]` and stays `[]` (LLR-115.4).** The three keys are consumed in an
+    `on_key` handler instead. This is not a style preference: a widget-scoped `BINDINGS` entry **shadows
+    the application binding of the same key for as long as the row holds focus**, and after Inc-7 a
+    region row holds focus by default on every map render — so a binding here would sit on the
+    operator's normal path. Every key other than `up`/`down`/`enter` bubbles untouched, which is what
+    keeps `j` → `dump_a2l_json`, `k` → `show_legend` and `o` → `open_workarea` reachable.
+  - **No `Binding(…, show=True)` is added (C-28).** The 14 existing footer chips already need ≈181
+    columns in the 78 available — ~2.3× oversubscribed and truncating — so a 15th would not risk
+    truncation but *guarantee* displacing an existing chip, and would drift all 29 snapshot cells
+    instead of the two this batch already owns. Discoverability is served by the existing `?` panel.
+  - **Id allocation — `TC-B77-26/27/28` are WITHDRAWN.** §3's HLR-117 boundary list allocated them as
+    bare ids with **no content stated for them anywhere in the batch artifacts**. Retro-fitting content
+    into ids whose intent nobody recorded is minting, so they are withdrawn with a record, their numbers
+    are **not reused**, and Inc-7's two unlabelled HLR-117 nodes take `TC-B77-32`/`TC-B77-33`.
+    Allocation stays monotonic, so a spent id can never mean two things — the same rule `AT-B77-17`'s
+    withdrawal established.
+- Code (batch-77 Inc-8): `s19_app/tui/screens_directionb.py` (`RegionRow.on_key`)
+- Validation (batch-77 Inc-8): `Automated` via `tests/test_tui_map_big.py`
+  (`test_b77_keys_arrows_move_focus_and_enter_inspects` (**AT-B77-08**, the gate — RED pre-change at
+  both size arms, on its assertion, against a byte-identical pre-change tree),
+  `test_b77_keys_no_application_binding_is_shadowed_with_a_row_focused` (**AT-B77-09**, PIN),
+  `test_b77_keys_no_application_binding_is_shadowed_without_row_focus` (**AT-B77-16**, PIN),
+  `test_tc_b77_16_…` / `_17_…` / `_18_…` / `_19_…` / `_20_…`) and `tests/test_map_click_chain.py`
+  (**AT-B77-10**, PIN, mapped to the two **existing** nodes `test_ac3_single_click_inspects_and_does_
+  not_navigate` + `test_ac4_double_click_navigates_to_the_region_start` — a split is a two-sided claim
+  and is not collapsed into one new node covering half of it). `TC-011`
+  (`tests/test_tui_directionb.py::test_tc011_every_pre_batch_action_keeps_a_keyboard_path`) stays green
+  and **byte-unmodified**.
 
 ---
 

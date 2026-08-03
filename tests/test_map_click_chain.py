@@ -167,7 +167,18 @@ def _drive_clicks(
 
 
 def test_ac3_single_click_inspects_and_does_not_navigate(tmp_path: Path) -> None:
-    """AC-3: one real click fills the inspector and posts NO navigation."""
+    """AC-3: one real click fills the inspector and posts NO navigation.
+
+    batch-77 Inc-8 — this node is ONE HALF of ``AT-B77-10`` (PIN); the other
+    half is ``test_ac4_double_click_navigates_to_the_region_start``. What
+    ``AT-B77-10`` claims is that the batch-67 N4a mouse SPLIT survives HLR-115:
+    single inspects, double navigates. A split is a two-sided claim, so it maps
+    to the two existing nodes that already own its two sides rather than to one
+    new node that would cover half of it while being labelled as if it covered
+    both (QA M-5). Neither node is modified by Inc-8: ``Enter`` posts the same
+    ``RegionRow.Activated`` a click posts, with ``chain = 1``, so the keyboard
+    adds no second route past the policy site these two nodes gate.
+    """
     posted, detail, region_start = _drive_clicks(
         tmp_path, lambda pilot, row: pilot.click(row)
     )
@@ -183,7 +194,12 @@ def test_ac3_single_click_inspects_and_does_not_navigate(tmp_path: Path) -> None
 
 
 def test_ac4_double_click_navigates_to_the_region_start(tmp_path: Path) -> None:
-    """AC-4: one real double click posts exactly one nav at the region start."""
+    """AC-4: one real double click posts exactly one nav at the region start.
+
+    batch-77 Inc-8 — the second half of ``AT-B77-10`` (PIN); see
+    ``test_ac3_single_click_inspects_and_does_not_navigate`` for why the claim
+    is mapped to two nodes and not one.
+    """
     posted, detail, region_start = _drive_clicks(
         tmp_path, lambda pilot, row: pilot.double_click(row)
     )
