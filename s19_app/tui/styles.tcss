@@ -764,8 +764,12 @@ DataTable > .datatable--odd-row {
 }
 
 /* batch-45 (R-TUI-060): the map body is the entropy band view (band bar +
- * region list + legend stacked vertically); the batch-27 validity cell grid
- * (and its `.map-cell` rules + MapCell class) was removed in Inc-5. */
+ * region list stacked vertically); the batch-27 validity cell grid (and its
+ * `.map-cell` rules + MapCell class) was removed in Inc-5.
+ *
+ * batch-77 HLR-114: the band LEGEND is no longer one of these children. It was
+ * MOVED, not deleted — it lives in the `k` LegendScreen — so this comment said
+ * "band bar + region list + legend" after the legend had left. */
 #map_grid {
     width: 1fr;
     height: auto;

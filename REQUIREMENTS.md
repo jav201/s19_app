@@ -5889,12 +5889,35 @@ falsified it. `TC-611` pins the 2.03×/4.03× expansion that makes those two qua
 
 ## Memory Map redesign — Variant A — batch-77 (R-TUI-103)
 
-> **This section is OPEN.** batch-77 lands across nine increments and each one records its own
-> clauses here as it ships. What is written below is what is **in the tree**; the batch's remaining
-> clauses (`HLR-111` band-bar allocation, `HLR-112` ruler, `HLR-113` stats, `HLR-114` legend removal,
-> `HLR-115` keyboard, `HLR-116` auto-selection, `HLR-117` selection style) are **not** recorded here
-> yet and must not be read as shipped. The full batch charter is
-> `.dev-flow/2026-08-01-batch-77/01-requirements.md`.
+> **This section is CLOSED.** All seven of batch-77's clauses shipped and all seven are recorded in
+> this document. **Six are recorded as Before/After amendments to the requirements they amend, not
+> here** — a clause that changes an existing contract belongs at that contract, and this section holds
+> only what batch-77 states anew. The seventh, `HLR-111`, is stated below.
+>
+> | Clause | Where it is recorded | What it amends |
+> |---|---|---|
+> | `HLR-111` band-bar allocation | **below, in this section** | nothing — a new contract |
+> | `HLR-112` ruler | `:4997` — §6.5 **Amendment A** | `R-TUI-072`, **in place** |
+> | `HLR-113` stats | `:759` | the coverage-panel render clause (`LLR-041.7` preserved) |
+> | `HLR-114` legend removal | `:4280` | the map-body composition clause |
+> | `HLR-115` keyboard | `:4411` | the region-list interaction clause |
+> | `HLR-116` + `HLR-117` auto-selection and selection style | `:4365` | the same |
+>
+> ⚠️ **Every line number in that table is as of this edit and will drift.** Locate each by the literal
+> string ``Amended in batch `2026-08-01-batch-77` ``, never by the number (C-39). The five numbers the
+> merge-gate brief carried had each already drifted — by 8 to 45 lines — before this correction was
+> written, which is the whole argument for the string.
+>
+> **What the superseded banner said, and why it had to be replaced.** Until this edit the banner read
+> *"the batch's remaining clauses … are **not** recorded here yet and must not be read as shipped"*.
+> That was **true when it was written at Inc-2**. Six clauses then shipped **and were recorded**, and
+> the banner was never carried forward — so the register spent six increments instructing its reader
+> to disbelieve six contracts that were live in the tree. A stale banner is worse than no banner: it
+> is a false statement with the register's authority behind it. This is §6.4a's propagation failure
+> (*a change applied where it was noticed and not carried to everything depending on it*) committed on
+> the register itself.
+>
+> The full batch charter is `.dev-flow/2026-08-01-batch-77/01-requirements.md`.
 
 **R-TUI-103 (Inc-2 clause, `LLR-116.7`)**: `safe_text` shall remove from its input every codepoint in
 the C0 range `U+0000`–`U+001F`, the delete character `U+007F`, and every codepoint in the C1 range
@@ -5947,6 +5970,61 @@ reached by a click, which is the path the acceptance below drives.
   original defect): `test_b77_hostile_symbol_is_literal_and_carries_no_span`,
   `test_b77_hostile_symbol_emits_no_control_byte_into_the_strip`. Byte-class form and identity
   preservation: `test_b77_safe_text_scrubs_the_control_byte_class_without_damaging_identity`.
+
+**R-TUI-103 (Inc-1 clause, `HLR-111` — the band-bar allocation)**: the entropy band bar shall
+apportion its columns across the emitted runs such that (i) the column budget is the **container's
+own width measured at render time** (`bar.region.width`), never a module constant; (ii) each run's
+share is taken over **total mapped bytes** — the sum of the emitted runs' byte counts — and not over
+the image span, so unmapped address space buys no columns; (iii) `Σ run widths + Σ gap markers ≤
+bar.region.width`, **enforced in the producer** (`_allocate_band_widths`) and not by a predicate over
+the emitted widgets; (iv) every unmapped gap between consecutive runs is folded to **exactly one
+column** whatever its byte size; and (v) every run receives **at least one** column.
+
+**Domain.** Clauses (iii)–(v) are contracted where `n_runs + n_gaps ≤ bar.region.width`. **Outside
+that domain the bound is arithmetically unsatisfiable** — `bar.region.width − n_gaps < n_runs` leaves
+fewer columns than runs — and the requirement makes exactly two promises there, both of which the
+shipped code keeps: the panel **renders without raising**, and **every run remains reachable as its
+own row in the region list**. Nothing is promised about the bar's legibility out of domain, and on
+`case_08_heavy_fragmentation` (801 runs + 800 gaps = 1601 segments) the bar is **not** readable. That
+is stated rather than fixed: batch-77 improves the out-of-domain case at both regimes (runs outside
+the container 1594 → 1535 @bar=66, 1600 → 1551 @bar=50) and **fixes it at neither**. Aggregation is
+`C-77-l`'s charter for batch-78. **Quote both regimes or neither** — a lone figure understates the
+wide one.
+
+**The strictness precondition (§6.5 Amendment D).** A sixth clause — *two runs of differing mapped
+size receive differing column counts* (`strict ∃`) — holds **only** where
+`surplus × (max_bytes − min_bytes) > total_bytes`, with `surplus = bar.region.width − n_runs −
+n_gaps`. The precondition is normative because on the containment domain alone the clause is **false
+on in-domain inputs and unsatisfiable by any allocator**: integer quantization means a size difference
+worth less than one column cannot be represented, so no implementation can discriminate those runs.
+Executed counterexample, in domain at `n_runs + n_gaps = 19 ≤ bar = 19` —
+`runs=[1,2,4,8,16,32,64,128,256,512]`, `n_gaps=9` → all widths `1`, `strict False`. The threshold is
+**tight**: the highest ratio observed on any non-strict in-domain case is exactly `1.000000000` over
+an 859 276-case sweep, so `≥` would admit failures. **Only the strictness conjunct is narrowed** —
+`visible ≥ 1`, `Σ ≤ width` and monotone-`∀` are **not**, and stay on the `≤` containment domain,
+where they hold at the boundary. Over the shipped corpus (all 16 fixtures × both regimes, re-derived
+at merge-gate close-out) 15 of 16 are in the containment domain at both regimes and **all 30
+fixture/regime pairs satisfy the precondition**, the tightest being `case_07_stress_smoke` @120×30
+(`bar=50`) at `surplus × spread = 41 × 250 = 10 250` against `total_bytes = 1 030` — **9.95×** the
+threshold, with **0** violations.
+
+- Validation: `Automated` — `tests/test_tui_map_big.py`. In-domain allocation, per limb per size
+  (`AT-B77-01`): `test_b77_width_visible_monotone_strict`. Gapless byte-golden at a fixed container
+  width (`AT-B77-02`): `test_b77_gapless_golden`. Containment (`AT-B77-03`):
+  `test_b77_contain_no_segment_outside_the_bar`. Out-of-domain behaviour — renders, and the region
+  list carries one row per oracle run (`AT-B77-18`):
+  `test_b77_domain_out_of_domain_renders_and_lists_every_run`.
+
+> ⚠️ **Why this row exists, and the lineage a reader should not miss.** `HLR-111` is batch-77's
+> centrepiece and it shipped with **no row anywhere in this register** — cited from four sites in
+> source and tests under an id, `R-TUI-111`, that was never defined here. This is the **third**
+> instance of one defect class inside a single batch: `C-77-i` (a **false claim** that an id was
+> dangling, made by grepping a corpus that cannot contain the target) → `C-77-m` (six **genuinely**
+> dangling `R-TUI-112` citations, which the batch's own record called *"`C-77-i`'s exact defect
+> committed two increments after cataloguing it"*) → this, the same defect on the headline clause,
+> found at the merge gate. **Cataloguing a defect class does not inoculate against it**, and the
+> third instance landed on the one clause the batch existed to ship. The four `R-TUI-111` citations
+> are re-pointed at `R-TUI-103` under the treatment decision **D-17** already applied to `R-TUI-112`.
 
 ## Retired ids
 

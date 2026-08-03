@@ -1146,6 +1146,22 @@ def test_b77_gapless_golden(tmp_path: Path, size) -> None:
     before it, a golden pins the RETIRED arithmetic — which is exactly how the
     ``[45,15]`` payload (summing to the deleted ``_BAND_BAR_WIDTH`` of 60)
     entered revision 1 of the requirements document.
+
+    ⚠️ **THIS NODE IS COUPLED TO THE CONTAINER CSS BY DESIGN — read a failure
+    accordingly.** Each golden record is keyed by the SETTLED bar width
+    (``80x24|66|…``, ``120x30|50|…``), because a byte-golden over a
+    container-relative allocation is meaningless without the container it was
+    allocated against. The consequence is direct: **any CSS change that moves
+    ``.map-band-bar``'s width reddens this node**, and that is the contract
+    working, not drift. ``LLR-111.1`` makes the measured container the basis, so
+    a silent width change IS a silent change to every emitted segment width —
+    the coupling is the only thing that surfaces it.
+
+    So a future editor who widens or narrows the bar should expect this node RED
+    and must **re-capture the golden deliberately**, recording the new settled
+    widths — never ``-k``-skip it, and never treat the failure as flake. If it
+    reddens with NO CSS change in the diff, that is the real alarm: the allocator
+    or the settle path moved.
     """
     loaded = _gapless_unequal_loaded(tmp_path)
 

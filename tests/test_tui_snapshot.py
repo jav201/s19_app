@@ -885,7 +885,7 @@ def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tu
     return ()
 
 
-# batch-77 Inc-1 (R-TUI-111, Memory Map Variant A — the gap-fold band bar): the
+# batch-77 Inc-1 (R-TUI-103, Memory Map Variant A — the gap-fold band bar): the
 # band strip's segment widths are re-derived from the `.map-band-bar` container
 # measured at settled layout and apportioned over TOTAL MAPPED BYTES
 # (LLR-111.1 — both the basis and the denominator move), every unmapped gap folds

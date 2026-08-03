@@ -24,8 +24,24 @@ Nodes in this file:
 - **TC-518** — no ``height: auto`` on the key pane (the degenerate regime).
 - **TC-516** — ``#legend_body`` is the two-pane WRAPPER, and all 9 shipped
   ``#legend_body``-rooted query sites still resolve as their own tests expect.
-- **TC-519** — ``s19_app/tui/legend.py`` is byte-identical to ``origin/main``
-  (LLR-072-7.1: the data layer is reused, never edited).
+- **TC-519** — the two-pane split RE-PARENTS the render helpers' widgets; it must
+  not reconstruct rows from text (LLR-072-7.1). Two arms: **A** — the CONSUMER
+  re-parents (``LegendScreen.compose`` splats each helper's return value directly
+  into its pane); **B** — the PRODUCERS return widgets, not text.
+
+  ⚠️ **AMENDED at batch-77 Inc-4** (§6.5 Amendment E). This index previously
+  stated the node's RETIRED predicate — *"``legend.py`` is byte-identical to
+  ``origin/main``"* — as current fact, and it was false on this very tree:
+  measured, ``git diff --stat origin/main -- s19_app/tui/legend.py`` is **8
+  insertions / 5 deletions**, so the file asserted a property its own contents
+  falsify. The retired predicate was wrong in **both** directions — too strict (a
+  legitimate data edit reddens it: ``LLR-112.3`` retires the 5-tick ruler contract
+  that ``legend.py`` states in operator-facing prose) and, which matters more, too
+  weak (``_render_card``/``_render_key`` and the ``compose`` that re-parents them
+  all live in ``screens.py``, so **it was watching a file the regression cannot
+  occur in**). The node NAME is retained despite now being inaccurate:
+  ``AT-TC-REGISTRY`` binds ``TC-519`` to that exact node path, so a rename is a
+  registry change — carried to the registry lane in ``.dev-flow/BACKLOG-CODE.md``.
 
 **AT-216 clause 4 — oracle mutation (C-32 / project engineering-rules).**
 Executed at the Inc-1 gate rather than encoded, since a permanently-mutated

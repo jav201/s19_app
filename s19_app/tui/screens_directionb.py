@@ -512,7 +512,7 @@ def _allocate_band_widths(
     Summary:
         Return one column count per run such that, in domain, the run widths
         plus the gap markers sum to at most ``bar_width`` and every run gets at
-        least one column (batch-77, R-TUI-111 / LLR-111.7). See ``Returns`` for
+        least one column (batch-77, R-TUI-103 / LLR-111.7). See ``Returns`` for
         the two degenerate cases where the sum is strictly less. The bound lives HERE,
         in the producer, and not in a predicate over the emitted widgets: an
         output-shaped check can detect an overflow but cannot prevent one. The
@@ -577,7 +577,7 @@ def _allocate_band_widths(
     available = bar_width - n_gaps * fold
     if available < n_runs:
         # Out of domain: the bound is arithmetically unsatisfiable. The
-        # degradation rule is deliberately unspecified by R-TUI-111 — the only
+        # degradation rule is deliberately unspecified by R-TUI-103 — the only
         # contracted properties are that this returns a width for every run
         # without raising, and that every run stays reachable in the region
         # list. One column each is the narrowest honest answer.
@@ -2470,7 +2470,7 @@ class MemoryMapPanel(Container):
             render; an id would trip ``DuplicateIds``) with markup-safe
             ``safe_text`` content.
 
-            batch-77 (R-TUI-111 / LLR-111.1, .2, .7) changes what the bar is
+            batch-77 (R-TUI-103 / LLR-111.1, .2, .7) changes what the bar is
             drawn against, on both axes. The BASIS is the measured container
             width rather than a fixed constant, and the DENOMINATOR is the total
             MAPPED bytes of the emitted runs rather than the image address span.
