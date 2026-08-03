@@ -23,7 +23,10 @@ All values are read verbatim from the `LoadedFile` snapshot handed to
 - **LLR-072.3 address ruler** — NEW `MapRuler(Horizontal)` widget mounted beneath
   the band row: exactly 5 `.map-ruler-tick` labels at 0/25/50/75/100 % of the
   span, tick 0 % == span start and tick 100 % == span end (8 hex digits, no `0x`
-  prefix). Self-styled via `DEFAULT_CSS` (no `styles.tcss` edit); ticks are
+  prefix).
+  ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the
+  last mapped byte (`R-TUI-072` §6.5 Amendment A).
+  Self-styled via `DEFAULT_CSS` (no `styles.tcss` edit); ticks are
   `width: 1fr` so they spread evenly across the strip.
 - **LLR-073.1 size micro-bar + `N sym`** — each `RegionRow` gains a
   `microbar(run_bytes / largest_region)` and an `N sym` count of
@@ -103,7 +106,7 @@ ruff check s19_app/tui/screens_directionb.py s19_app/tui/app.py tests/test_tui_m
 - **Ruler visual alignment**: at 120×30 the band bar is only 23 cols (glance
   beside it) while the ruler spans the full 52-col grid, so ticks are not
   pixel-aligned under the narrow bar. Acceptable — the ruler describes the image
-  address span, and AT-072b asserts the structural invariant (5 ticks + endpoint
+  address span, and AT-072b asserts the structural invariant (5 ticks ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A). + endpoint
   values), not pixel alignment.
 
 ## 6. Pending items
@@ -140,7 +143,7 @@ Decisions driven by the measurement:
   leave only 2 cols for 4 gaps → overlap. **C-13.1 deficit-matched fallback**:
   drop the `0x` prefix (label-trim recovers 2 cols/label = 10 cols) → 8-digit
   labels (5×8 = 40) fit 52 with `width: 1fr` distribution and no overlap.
-  Asserted structurally (exactly 5 ticks + endpoint values), never a col count.
+  Asserted structurally (exactly 5 ticks + endpoint values), never a col count. ⚠️ **RETIRED at batch-77** — one tick per emitted run start plus one for the last mapped byte (`R-TUI-072` §6.5 Amendment A).
 - **Hex-peek rows** — `#map_detail` is `height: auto` and the detail Static
   already overflows-under-scroll by the batch-45 design (build_detail_text emits
   ~7 lines into a 2-row visible pane @120×30). The peek is CONTENT reachable

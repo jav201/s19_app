@@ -242,7 +242,7 @@ Dependency order: **US-FND → {US-WS, US-A2L, US-MAC, US-MAP}** (the four scree
 
 ### HLR-072 — Memory Map: pastel bands + hatch gaps + address ruler + humanized sizes (R-TUI-072)
 - **Traceability:** US-MAP
-- **Statement:** When the Memory Map renders, the proportional strip shall color each segment by entropy band with a `╱` hatch for unmapped gaps, display humanized sizes, and render an address ruler beneath the strip with 5 tick labels at 0/25/50/75/100 % of the address span.
+- **Statement:** When the Memory Map renders, the proportional strip shall color each segment by entropy band with a `╱` hatch for unmapped gaps, display humanized sizes, and render an address ruler beneath the strip with one tick label per emitted **run** start plus one for the last mapped byte. ⚠️ **AMENDED at batch `2026-08-01-batch-77` (§6.5 Amendment A / `LLR-112.1`). Before:** "…render an address ruler beneath the strip with 5 tick labels at 0/25/50/75/100 % of the address span."
 - **Rationale:** Spatial legibility; extends the batch-45 band-bands view (R-TUI-060/041) with ruler + hatch + humanization.
 - **Validation:** `test`
 - **Executed verification:** → `01b-qa-strategy-and-verification.md`.
@@ -251,8 +251,8 @@ Dependency order: **US-FND → {US-WS, US-A2L, US-MAC, US-MAP}** (the four scree
 - **Acceptance (black-box):**
   - **Observable outcome:** the strip shows ≥2 band styles + a hatched gap; the ruler's ticks match the span endpoints.
   - **Shipped surface:** `MemoryMapPanel` (`_build_band_widgets`) + NEW ruler widget under the strip.
-  - **Deliverable + observation:** for a gapped fixture, the strip renders ≥2 of `· ░ ▒ ▓` + ≥1 `╱`; ruler tick 0 % == span start, tick 100 % == span end. Observed via Pilot text assertion.
-  - **Acceptance test(s):** `AT-072a` (≥2 band styles + `╱` hatch — `test_tui_map_big.py::test_at072a_bands`), `AT-072b` (ruler exactly 5 ticks; 0 % == span start, 100 % == span end — `…::test_at072b_ruler`).
+  - **Deliverable + observation:** for a gapped fixture, the strip renders ≥2 of `· ░ ▒ ▓` + ≥1 `╱`; every ruler label names a mapped address. ⚠️ **Before (retired at batch-77):** "ruler tick 0 % == span start, tick 100 % == span end". Observed via Pilot text assertion.
+  - **Acceptance test(s):** `AT-072a` (≥2 band styles + `╱` hatch — `test_tui_map_big.py::test_at072a_bands`), `AT-072b` (**re-derived at batch-77** — labels ⊆ run starts ∪ last mapped byte, ascending, distinct, none illegible — `…::test_at072b_ruler`). ⚠️ **Before (retired at batch-77):** "`AT-072b` (ruler exactly 5 ticks; 0 % == span start, 100 % == span end)".
   - **Boundary catalog:** ☐ empty = no file → panel shows hint, no ruler crash · ☐ boundary = single contiguous range (no gap) → no `╱`; ruler still spans start→end · ☐ invalid = N/A · ☐ error = N/A. **§6.5 amendment (R-TUI-060/041 band-bands extension).** Ruler tick spacing = **geometry claim, C-29 flagged.**
 
 ### HLR-073 — Memory Map: enriched region rows (size micro-bar + symbol count + open-in-hex) (R-TUI-073)
@@ -505,13 +505,15 @@ Dependency order: **US-FND → {US-WS, US-A2L, US-MAC, US-MAP}** (the four scree
 - **Validation:** `test (pilot)` / unit.
 - **Acceptance criteria:** a large region shows a humanized size (e.g. `64.0 KB`).
 
-**LLR-072.3 — address ruler**
+**LLR-072.3 — address ruler** — ⚠️ **AMENDED at batch `2026-08-01-batch-77` (§6.5 Amendment B). This id is LIVE, not dangling: it is defined here and cited from four shipped-source sites.**
 - **Traceability:** HLR-072
-- **Statement:** A NEW ruler widget beneath the strip shall render 5 tick labels at 0/25/50/75/100 % of the address span, tick 0 % == span start and tick 100 % == span end.
-- **Symbols:** ruler widget `NEW — created in Phase 3` (no ruler id exists today; `#map_grid`/`#map_detail`/`#map_body` present, `screens_directionb.py:1078`).
-- **Geometry:** tick spacing `assumed — pilot-measure BOTH axes of the map strip container at 80×24 AND 120×30 in Phase 3`.
+- **Statement:** A NEW ruler widget beneath the strip shall render one tick label per emitted **run** start plus one label for the last mapped byte, and shall not emit a tick whose rendered width is smaller than the label it carries.
+- **⚠️ Before (verbatim, as shipped at batch-47 and retired at batch-77):** "A NEW ruler widget beneath the strip shall render 5 tick labels at 0/25/50/75/100 % of the address span, tick 0 % == span start and tick 100 % == span end."
+- **Why retired (measured):** a percentile of the address SPAN is an arithmetic position, not an address the image contains. Executed on `case_02` and on `prg.s19`, **4 of the 5** labels named addresses lying in no mapped range at either regime, and the 100 % tick named the **exclusive** `span_end` — by construction the first byte past the image. The end label is now `span_end - 1`.
+- **Symbols:** ruler widget `NEW — created in Phase 3` (no ruler id exists today; `#map_grid`/`#map_detail`/`#map_body` present, `screens_directionb.py:1078`). **batch-77:** `MapRuler`, `screens_directionb.py:1453`.
+- **Geometry:** tick spacing `assumed — pilot-measure BOTH axes of the map strip container at 80×24 AND 120×30 in Phase 3`. **batch-77 re-measured:** ruler width **66 @80×24 / 50 @120×30**; label width 8 hex digits + a 1-column separator → pitch 9 → ceiling **7 / 5** ticks.
 - **Validation:** `test (pilot)` for tick values; `analysis` for spacing fit.
-- **Acceptance criteria:** tick 0 % / 100 % equal span endpoints; labels fit without overlap at both regimes.
+- **Acceptance criteria:** every label names a mapped address and is either an emitted run start or the last mapped byte; labels strictly ascend with no duplicate; no tick renders narrower than its label. ⚠️ **Before (retired at batch-77):** "tick 0 % / 100 % equal span endpoints; labels fit without overlap at both regimes" — the overlap half was **vacuous**: `width: 1fr` children partition the row and cannot overlap; they degrade to zero width, so the predicate was GREEN at 10 invisible labels.
 
 **LLR-072.4 — band-bands amendment**
 - **Traceability:** HLR-072
@@ -604,7 +606,7 @@ Dependency order: **US-FND → {US-WS, US-A2L, US-MAC, US-MAP}** (the four scree
 | US-MAC | AT-070c | **M1**: MAC parse-error `✗` (+ NEW fixture) | `#mac_records_list` | `…::test_at070c_parse_error` | → 01b |
 | US-MAC | AT-071 | coverage strip `1 of 2` == `CoverageMetrics` | coverage-strip Static | `…::test_at071_strip` | → 01b |
 | US-MAP | AT-072a | map ≥2 band styles + `╱` hatch | `MemoryMapPanel` | `test_tui_map_big.py::test_at072a_bands` | → 01b |
-| US-MAP | AT-072b | ruler exactly 5 ticks; 0 % == span start, 100 % == span end | ruler widget | `…::test_at072b_ruler` | → 01b |
+| US-MAP | AT-072b | ⚠️ **AMENDED at batch-77:** labels ⊆ emitted run starts ∪ last mapped byte, ascending, distinct, none narrower than its label. *Before: "ruler exactly 5 ticks; 0 % == span start, 100 % == span end"* | ruler widget | `…::test_at072b_ruler` | → 01b |
 | US-MAP | AT-073 | `N sym` per region == `range_index` count + `↵` | `RegionRow` render | `…::test_at073_sym_count` | → 01b |
 | US-MAP | AT-074 ★ | inspector hex peek @ NON-first region start (+ MN-4 C-17 name literal) | `on_region_row_activated` / `#map_detail_body` | `…::test_at074_inspector` | → 01b |
 
@@ -724,7 +726,7 @@ See §1.3. Additional: **dolphie idiom** = muted label / bright value, soft past
 
 **Amendment B — Memory-Map band-bands view extended with ruler + hatch + humanized sizes (US-MAP / HLR-072, amends R-TUI-060 / R-TUI-041)**
 - **Before:** R-TUI-060/041 — the batch-45 band-bands Memory-Map view renders entropy bands in `MemoryMapPanel` (`_build_band_widgets`, `screens_directionb.py:1284`) without an address ruler, without a `╱` hatch for gaps, and without humanized sizes; region rows carry no size micro-bar / symbol count; the inspector (`#map_detail`) carries no hex peek.
-- **After:** the view adds a `╱` hatch for unmapped gaps, an address ruler (5 ticks 0/25/50/75/100 % of span), humanized sizes, enriched region rows (size micro-bar + `N sym` via `range_index` + `↵` affordance), and a region inspector hex peek at region start.
+- **After:** the view adds a `╱` hatch for unmapped gaps, an address ruler (⚠️ **as first shipped, 5 ticks 0/25/50/75/100 % of span; RETIRED at batch-77 — now one tick per emitted run start plus one for the last mapped byte**), humanized sizes, enriched region rows (size micro-bar + `N sym` via `range_index` + `↵` affordance), and a region inspector hex peek at region start.
 - **Deleted / New tokens:** New — ruler widget, `╱` hatch, `N sym` count, size micro-bar, inspector hex peek. Deleted — none.
 - **Parent-HLR re-read:** extends R-TUI-060/041; band-style contract and `RegionRow.Activated`/`OpenInHexRequested` messages unchanged (reused, `screens_directionb.py:1009`/`:1100`).
 - **C-26 reverse-census (MN-7 — run BEFORE the map edit):** the map surfaces already carry interaction/snapshot tests that this edit will touch. Enumerate and re-run them first — in `test_tui_directionb.py`: the **`MemoryMapPanel` interaction tests (23)** and the **`RegionRow` interaction tests (9)** — plus the canonical-CI snapshot cells for the Memory-Map BIG screen. No moved/renamed leaf ids may silently drop from these (C-26 touched-symbol reverse census; census keyed on the moved leaf ids, per the batch-46 C-29/C-26 lesson).

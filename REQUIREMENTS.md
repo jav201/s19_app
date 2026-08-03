@@ -4188,7 +4188,9 @@ dimension.
   - **After:** (a) unmapped gaps render as an **app-supplied `╱` hatch** segment (`.map-band-gap`,
     `_MAP_GAP_HATCH`, `screens_directionb.py:205`/`:1580`) — NOT an entropy band, NOT from
     `entropy_style`; (b) a NEW **address ruler** (`MapRuler`, `screens_directionb.py:1103`) renders
-    beneath the strip with exactly 5 ticks at 0/25/50/75/100 % of the span; (c) sizes are **humanized**
+    beneath the strip — ⚠️ **as first shipped, with exactly 5 ticks at 0/25/50/75/100 % of the span;
+    that clause is RETIRED at batch-77, see R-TUI-072 §6.5 Amendment A. The ruler now carries one tick
+    per emitted run start plus one for the last mapped byte**; (c) sizes are **humanized**
     via `insight_style.human_bytes` (binary 1024 / `KiB…PiB`, §6.5 Amendment D) — `0x10000` reads
     `64.0 KiB`; (d) region rows gain a **size micro-bar** + an **`N sym`** count (via the frozen
     `range_index` membership primitives, read-only — never a linear scan) + an explicit **`↵`**
@@ -4787,16 +4789,20 @@ conditional pct-line. `mac_total == 0` shall render `0 of 0` with an empty micro
 **R-TUI-072**: When the Memory Map renders, the proportional band strip shall mark unmapped gaps with an
 **app-supplied `╱` hatch** segment (NOT an entropy band, NOT from `entropy_style`), display **humanized**
 sizes via `insight_style.human_bytes` (binary 1024 / `KiB…PiB`), and render a NEW **address ruler**
-beneath the strip with **exactly 5 tick labels** at 0/25/50/75/100 % of the address span — tick 0 % ==
-span start and tick 100 % == span end. Entropy band colour + texture continue to flow solely from
+beneath the strip carrying **one tick label per emitted run start plus one label for the last mapped
+byte**, emitting no tick whose rendered width is smaller than the label it carries. Entropy band colour +
+texture continue to flow solely from
 `entropy_style` (the `band-*` domain, separate from the frozen `sev-*`). This **extends** the batch-45
 band-bands view (R-TUI-060 / R-TUI-041; §6.5 Amendment B) — nothing there is superseded.
 - Code: `s19_app/tui/screens_directionb.py` (`MemoryMapPanel._build_band_widgets:1505`; `_MAP_GAP_HATCH =
   "╱"` `:205`, applied `:1580` as `.map-band-gap`; `MapRuler:1103` — a NEW widget, checked against
   `dir(Widget)` for `_nodes`/`_context` shadowing), `s19_app/tui/insight_style.py::human_bytes:68`
 - Validation: `Automated` — `tests/test_tui_map_big.py::test_at072a_bands` (AT-072a — ≥2 band styles + ≥1
-  `╱` hatch, `case_02`/4 ranges) + `::test_at072b_ruler` (AT-072b — **exactly 5** ticks; first == span
-  start, last == span end). Both pilot sizes. **Geometry (C-29, both axes MEASURED):** the real boxed
+  `╱` hatch, `case_02`/4 ranges) + `::test_at072b_ruler` (AT-072b — **re-derived at batch-77**: labels ⊆
+  emitted run starts ∪ last mapped byte, strictly ascending, distinct, no tick narrower than its label;
+  the **exactly-5-ticks** assertion is RETIRED — see the batch-77 amendment below) +
+  `::test_b77_ruler_labels_every_run_start_and_the_last_byte` (AT-B77-04 — the `⊇` bound, without which
+  the subset predicate is green on a ruler that rendered zero ticks). Both pilot sizes. **Geometry (C-29, both axes MEASURED):** the real boxed
   `#map_grid` is **66×14 @80×24 and 52×12 @120×30** — the wide regime is *narrower* (the detail pane docks
   beside the grid), so no axis was assumed and no prototype full-screen budget inherited; at the measured
   52 columns the ruler drops the `0x` tick prefix (C-13.1 fallback). The 2 `map` snapshot cells ride
@@ -4805,6 +4811,41 @@ band-bands view (R-TUI-060 / R-TUI-041; §6.5 Amendment B) — nothing there is 
   R-TUI-060 / R-TUI-041). Frozen-engine diff = 0. C-26 reverse-census run **before** the edit over the 32
   touched interaction tests (23 `MemoryMapPanel` + 9 `RegionRow` in `tests/test_tui_directionb.py`) — all
   green, changes additive.
+- **Amended in batch `2026-08-01-batch-77`** (US-77-2 / HLR-112, LLR-112.1–.3; §6.5 **Amendment A** —
+  Before → After). **The ruler clause is RETIRED and REPLACED; the hatch, humanization and entropy-band
+  clauses are untouched.** This is the first amendment to this requirement that **removes** a contract
+  rather than extending one, so the retired text is quoted verbatim rather than merely pointed at.
+  - **Before (verbatim, the ruler clause only):** "…and render a NEW **address ruler** beneath the strip
+    with **exactly 5 tick labels** at 0/25/50/75/100 % of the address span — tick 0 % == span start and
+    tick 100 % == span end."
+  - **After:** "…and render a NEW **address ruler** beneath the strip carrying **one tick label per
+    emitted run start plus one label for the last mapped byte**, emitting no tick whose rendered width is
+    smaller than the label it carries."
+  - **Deleted tokens:** "exactly 5 tick labels", "0/25/50/75/100 %", "tick 0 % == span start", "tick
+    100 % == span end", `_TICK_COUNT = 5` as a fixed contract. **New tokens:** "one tick label per
+    emitted run start", "the last mapped byte", the legibility clause.
+  - **Why (measured, not argued):** a percentile of the address SPAN is an arithmetic position, not an
+    address the image contains. Executed on `case_02` and on `prg.s19`, **4 of the 5** labels named
+    addresses lying in no mapped range at either regime
+    (`20004050`/`400080A0`/`6000C0F0`/`80010140`), and the 100 % tick named the **exclusive** `span_end`
+    — by construction the first byte past the image. The end label is therefore `span_end - 1`.
+  - **⚠️ Parent re-read — this requirement's text exists TWICE and both copies were amended.** The
+    §6.5 Amendment B "After" block under **R-TUI-060** (`REQUIREMENTS.md:4190-4191`) carries a second
+    copy of the retired clause. A census that amended only the `R-TUI-072` body would have left
+    `REQUIREMENTS.md` still asserting the retired contract, in a block a reader of R-TUI-060 lands on
+    first. **A third site — this requirement's own `Validation:` line, quoting "exactly 5 ticks" as
+    `AT-072b`'s predicate — was NOT named by `LLR-112.3`'s census table and was found by reading the
+    file.** The census table is illustrative; the Statement's wording governs.
+  - **Re-derived verifier:** `tests/test_tui_map_big.py::test_at072b_ruler` keeps its global id and its
+    node path; its `assert len(ticks) == 5` is retired. **The node was passing before this batch** — it
+    is not a broken test being fixed, it is a live acceptance being deliberately invalidated, which is
+    why this block exists. Its fixture is **PINNED to `case_02`**: `prg.s19` needs 15 ticks against a
+    ceiling of 7 @80×24 / 5 @120×30 and would redden the node on correct code.
+  - **⚠️ Open, NOT closed by this amendment:** shipped source cites **`R-TUI-112`**
+    (`screens_directionb.py:612`, `:1454`) and three test files cite it, but **no `R-TUI-112` row exists
+    in this document** (high-water is `R-TUI-102`). Under this amendment the governing id is
+    **`R-TUI-072` as amended**, so those citations are dangling. Recorded as a batch-77 carry rather
+    than resolved here — resolving it edits production source, which Inc-5 is not scoped to touch.
 
 **R-TUI-073**: When Memory Map region rows render, each `RegionRow` shall show a **size micro-bar**
 (`microbar(region_size / largest_region)`), an **`N sym`** count of A2L enriched-tag addresses falling

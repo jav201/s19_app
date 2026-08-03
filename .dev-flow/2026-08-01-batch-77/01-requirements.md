@@ -1,4 +1,11 @@
-# Requirements Document — s19_app — batch `2026-08-01-batch-77` — **REVISION 5**
+# Requirements Document — s19_app — batch `2026-08-01-batch-77` — **REVISION 7**
+
+> ⚠️ **Header hygiene, recorded not silently fixed.** This header read **REVISION 5** while the body
+> carried revision-6 content (Amendment D, the gap-count correction, the `LLR-112.3` estimate). The
+> body was edited and the header was not — the same *"applied where it was noticed, not carried to
+> everything depending on it"* failure §6.4a exists to catch, committed on the document's own first line.
+> **Revision 7** adds §6.5 **Amendment E** (`TC-519`), closes the `LLR-112.3` census with executed
+> figures, discharges carry **C-77-i** and registers **C-77-m**.
 
 **Objective:** Memory Map redesign — Variant A (gap-fold band bar) + cross-cutting fixes S-1…S-7
 **Branch:** `claude/batch-77-memmap-variant-a` · **Base:** `origin/main` @ `f8747b8`
@@ -487,19 +494,42 @@ Revision 1's P-16…P-43 stand except where corrected below.
 
 **LLR-112.3 — the retired clause is amended at EIGHT sites (arch M-3, security M-2)**
 - **Statement:** The batch **shall** record Before/After amendments for `R-TUI-072` and `LLR-072.3` and **shall** update every surviving statement of the retired 5-tick contract in shipped source, tests, `REQUIREMENTS.md`, and the batch-47 artifact set.
-- **Census, executed — 8 sites, was 6:**
-  | # | Site | Form |
-  |---|---|---|
-  | 1–4 | `screens_directionb.py:1239, :1273, :1300, :2002` | `LLR-072.3` citations |
-  | 5 | `tests/test_tui_map_big.py:118` (+ `:140` `len(ticks)==5`) | citation + assertion |
-  | 6 | `tests/test_tui_snapshot.py:670` | citation |
-  | 7 | 🆕 **`s19_app/tui/legend.py:606-614`** | **PROSE** — *"address ruler — 5 ticks at 0/25/50/75/100 % of span"* **plus a 5-address sample line**. **Matches no `LLR-072` grep.** The file appears **0 times** in revision 1. |
-  | 8 | `.dev-flow/2026-07-15-batch-47/06-docs/traceability-matrix.md:54` | verbatim restatement |
-  | 9 | 🆕 `.dev-flow/2026-07-15-batch-47/06-docs/functionality.md:173` | verbatim restatement — **a sibling of site 8 in the same folder, missed twice** |
-  | — | `REQUIREMENTS.md:4790` + the duplicate at `:4191` | the requirement text itself |
+- **Census — CLOSED at Inc-5. Executed total: 35 statement sites in 13 files** — **7 sites / 4 files** discharged at Inc-4, **28 sites / 9 files** at Inc-5. Against this document's own estimate of *"9 known, roughly 14 more"* (**≈23**), the executed figure is **52 % higher**, and it is the fourth consecutive revision whose quoted integer was low.
+  ⚠️ **Inc-5's own first draft of this line said "33 sites in 11 files" and both numbers were wrong** — 11 was the count of files *edited* (which includes `BACKLOG-CODE.md` and this document, neither a census site, and excludes Inc-4's four). Caught by re-adding the per-file column instead of trusting the summary. **A total that is not re-derived from its own table is the same defect as a threshold that is not re-derived from its claim**, committed inside the item that exists to catch it.
+
+  **Discharged before Inc-5 (Inc-4, code + tests):**
+  | # | Site | Form | State |
+  |---|---|---|---|
+  | 1–4 | `screens_directionb.py:1239, :1273, :1300, :2002` | `LLR-072.3` citations | ✅ Inc-4 |
+  | 5 | `tests/test_tui_map_big.py:118` (+ `:140` `len(ticks)==5`) | citation + assertion | ✅ Inc-4 |
+  | 6 | `tests/test_tui_snapshot.py:670` | citation | ✅ Inc-4 |
+  | 7 | **`s19_app/tui/legend.py:606-614`** | **PROSE** — matches no `LLR-072` grep; **what the operator reads** | ✅ Inc-4 |
+
+  **Discharged at Inc-5 (documents) — 28 sites: 3 in `REQUIREMENTS.md`, 25 across 8 batch-47 files:**
+  | File | Sites | Treatment |
+  |---|---:|---|
+  | `REQUIREMENTS.md` | **3** — `R-TUI-072` Statement `:4790`; the duplicate in `R-TUI-060`'s §6.5 Amendment B `:4191`; 🆕 **`R-TUI-072`'s own `Validation:` line `:4798`** | Statement amended in place + full Before/After block (**Amendment A**) |
+  | batch-47 `01-requirements.md` | **7** — `HLR-072` Statement `:245`; observation `:254`; AT list `:255`; **`LLR-072.3` Statement `:510`**; acceptance criteria `:514`; AT table `:607`; §6.5 Amendment B "After" `:727` | normative → amended in place + Before/After (**Amendment B**) |
+  | batch-47 `01b-qa-strategy…md` | **7** — `:29`, 🆕 `:65` (`**5-tick address ruler**`), `:132`, `:203`, `:277`, `:292-293`, `:301` | historical → banner + per-site marker |
+  | batch-47 `02-review.md` | **1** — `:76` | historical → per-site marker |
+  | batch-47 `03-increments/increment-05.md` | 🆕 **1** — `:131` (`5-tick ruler`) | historical → per-site marker |
+  | batch-47 `03-increments/increment-06.md` | **3** — `:24`, `:106`, `:143` | historical → per-site marker |
+  | batch-47 `04-validation.md` | **3** — `:53`, `:106`, `:144` | historical → per-site marker |
+  | batch-47 `06-docs/functionality.md` | **1** — `:173` | living doc → corrected in place |
+  | batch-47 `06-docs/traceability-matrix.md` | **2** — `:54`, 🆕 `:92` | living doc → corrected in place |
+
+- **⚠️ FOUR sites were missed by every prior census, and the misses are informative, not incidental.**
+  1. **`REQUIREMENTS.md:4798`** — `R-TUI-072`'s own `Validation:` line, quoting *"**exactly 5** ticks"* as `AT-072b`'s predicate. **It sits eight lines below the Statement the census DID name.** The census read the Statement and stopped; the requirement restates its own contract in its verification row.
+  2. **`01b:65`** and **`increment-05.md:131`** — both write **`5-tick`**, hyphenated. Every prior sweep searched `5 tick` / `exactly 5 tick`. **A hyphen defeated the census twice.**
+  3. **`traceability-matrix.md:92`** — a *second* row in a file the census already named at `:54`. Naming a file by one line number invites checking that line and closing the file.
+- **The controlling lesson, restated with its fourth and fifth pieces of evidence:** site 7 proved an **id-keyed** grep cannot find a prose restatement. Sites 1–3 above prove a **phrase-keyed** grep cannot find a hyphenation variant, and a **line-keyed** census cannot find a sibling line. **The only sweep that closed this census was: derive a superset predicate from the CLAIM (`ruler|tick` across the whole scope, 327 hits), read every hit, and classify.** That is what the Threshold mandates and it is why it is worded that way.
+- **Deliberately EXCLUDED, recorded so the exclusion is a decision rather than an oversight:**
+  - `prototypes/legend_n8.INVENTORY.md:76`, `legend_n8.kimi.NOTES.md:132`, `legend_n8.kimi.prototype.py:166`, `screen_upgrades.HANDOFF-PLAN.md:112` — **KEPT-by-operator-decision prototypes**, outside the Threshold's four roots. **Left untouched, verified untouched.**
+  - `.claude/worktrees/c3-d2-triage/` — a **detached git worktree** at `f8747b8` living under the repo root, carrying a full second copy of `s19_app/`, `tests/`, `REQUIREMENTS.md` and `.dev-flow/`, all still pre-Inc-4. Its paths are not under the Threshold's roots. ⚠️ **Recorded because a naive `grep -rn` from the repo root returns it and doubles every count** — a future census that does not exclude it will report ~66 sites and be wrong in both directions.
+  - batch-47 `05-postmortem.md`, `PLAN.md`, `executive-summary.md`, `architecture-dataflow.md` — read; each mentions *the ruler* but **states no tick count or percentile**. Not restatements. **Read and cleared, not skipped.**
 - **⚠️ Why site 7 matters most:** it is what the **operator reads**. `AT-B77-07` (legend screen unaffected) would pass **green** while the legend screen describes pre-batch behaviour. A census keyed on an id cannot find a prose restatement — **C-42 in its purest form**, and the reason the census is now derived from the *claim* rather than from the *id*.
 - **Threshold, DERIVED not counted:** **0** surviving statements of the retired 5-tick contract under `s19_app/`, `tests/`, `REQUIREMENTS.md` and `.dev-flow/2026-07-15-batch-47/`, verified by **reading each file the sweep returns** rather than grepping for the id.
-- ⚠️ **The integer was a LOWER BOUND in two consecutive revisions** (6 → 8 → 9+), and it will be wrong again: prose restatements are invisible to an id-keyed grep **by construction**, which is the whole lesson of site 7. A **ninth** site is already known — `.dev-flow/2026-07-15-batch-47/06-docs/functionality.md:173`, a sibling of site 8 in the same directory — and the batch-47 artifact set carries roughly **14** further restatements. **The Statement's "and the batch-47 artifact set" wording governs; the table below is illustrative, not exhaustive.** *(Out of scope, flagged so the exclusion is deliberate: `prototypes/legend_n8.*` and `prototypes/screen_upgrades.HANDOFF-PLAN.md` are KEPT-by-operator-decision prototypes.)*
+- ⚠️ **The integer was a LOWER BOUND in FOUR consecutive revisions — 6 → 8 → 9 → "9 + ~14" (≈23) → the executed 35.** Every revision that quoted a number quoted one it had not derived from the claim, and every one was low. **The Statement's *"and the batch-47 artifact set"* wording governs; the tables above are a RECORD of what the sweep returned, not a budget the sweep must reconcile to.** Had Inc-5 reconciled to "≈23" it would have stopped four sites short and reported a green census.
 
 ### HLR-113 → LLR-113.x
 **LLR-113.1 — dual readout, precision pinned** · **Statement:** `build_stats_text` **shall** compose the mapped total and image span through `insight_style.human_bytes` and **shall** render the coverage percentage with exactly four fractional digits. **Symbols:** `build_stats_text:2275`, the `Coverage` f-string `:2304`, `human_bytes insight_style.py:124`, `CoverageStats:966`. **Acceptance:** no new arithmetic over `ranges` (LLR-041.7 preserved).
@@ -599,7 +629,8 @@ Revision 1's P-16…P-43 stand except where corrected below.
 |---|---|---|
 | **C-77-h** | **✅ DISCHARGED at revision 3 — pulled INTO batch-77 by R-11, not dropped.** `safe_text`'s ANSI guarantee was asserted in shipped source and is FALSE (`screens_directionb.py:694-697`). Deferring it would have left `LLR-116.6`'s normative `shall not` with no verifier able to pass at close. **Now `LLR-116.7`, owned by Inc-2.** The carry is closed by implementation, not by re-filing. | **DISCHARGED — no longer a carry** |
 | **C-77-l** 🆕 | **BATCH-78 CHARTER — the aggregation path, with every measurement already paid for.** See the block below. | **Lane-A carry, chartered** |
-| **C-77-i** 🆕 | `.dev-flow/BACKLOG-CODE.md:53` still asserts `LLR-072.3` has "ZERO definitions" / is "a dangling reference" — **false**, and live in the Lane-A queue; `PLAN.md:171-173` repeats it. | **Owned by Inc-5** (arch M-4) |
+| **C-77-i** | ✅ **DISCHARGED at Inc-5.** `.dev-flow/BACKLOG-CODE.md:53` asserted `LLR-072.3` has *"ZERO definitions"* / is *"a dangling reference"*. **FALSE** — defined at `.dev-flow/2026-07-15-batch-47/01-requirements.md:508`, cited from 4 shipped-source sites. Corrected **with its reasoning**: the claim came from grepping `REQUIREMENTS.md`, which defines **zero** LLR bodies, so absence there is evidence of nothing. ⚠️ **The carry's own pointer did not reproduce:** it names `PLAN.md:171-173` as repeating the claim; those lines are the **process-count retraction**, an unrelated passage. The claim is at **`PLAN.md:82-85` and `:503`** — left as-is, both being a Phase-0 record of what was believed at the time, now corrected in the live queue a reader acts on. **A carry that mis-cites its own evidence is the defect class the carry exists to fix.** | **DISCHARGED** |
+| **C-77-m** 🆕 | **`R-TUI-112` is cited in shipped source and tests but has NO row in `REQUIREMENTS.md`** (high-water `R-TUI-102`). Sites: `screens_directionb.py:612`, `:1454`; `tests/test_legend_two_pane.py:705`; `tests/test_tui_snapshot.py:671`, `:919`, `:957`. Minted by Inc-4 in comments without a register row. Under **Amendment A** the governing id is `R-TUI-072` **as amended**, so those citations are dangling. **Two clean resolutions — operator picks:** (a) add an `R-TUI-112` row and restate Amendment A as a supersession, or (b) re-point the six citations at `R-TUI-072`. **Not resolved at Inc-5** — both touch production source, which this docs-only increment is not scoped to. ⚠️ **This is `C-77-i`'s exact defect shape, committed by this batch two increments after cataloguing it.** | Lane-A carry, **open** |
 | **C-77-j** 🆕 | **Pre-existing 1-column glance-box clip** — the box is 28, its widest content row is 29 (`'· constant/padding 3 ████ 60%'`). Found by the corrected R-7 sweep. `LLR-111.9` incidentally fixes it at 120×30 by giving the glance full width; the 80×24 path is unchanged. **Distinct from C-77-k** — different defect, same screen. | Lane-A carry |
 | **C-77-k** 🆕 | **The stats line's scroll deepens** (R-8, accepted). `LLR-111.9` moves `#map_stats_body` from `bottom=31/30` to `bottom=33/30` at 120×30. It is **already below the fold at both regimes today** (`bottom=31/30` @120×30, `bottom=35/24` @80×24), so this deepens an existing scroll and **newly hides nothing**; the line stays reachable by scrolling exactly as today. **The widen is deliberately NOT narrowed to protect it** — every column surrendered lowers the ceiling on visible regions, which is the batch's whole purpose. **Distinct from C-77-j.** | Lane-A carry |
 | **C-77-f** | `o` = open-hex descoped (R3) | Lane-A carry |
@@ -776,7 +807,9 @@ Rows cover the amendment's own surfaces (Statement, threshold, `LLR-111.7`, §6.
 | **R-9** | *(superseded by R-10)* disclosure surface fixed to the region list | — | **Moot: `LLR-111.8` withdrawn.** R-9's reasoning is preserved verbatim in the `C-77-l` charter so batch-78 inherits the decision rather than re-litigating it |
 
 ### 6.5 Requirement amendments
-**Amendment A (`R-TUI-072`)** and **Amendment B (`LLR-072.3`)** — Before texts verbatim-verified by the architect lane. **After** texts updated to *"one tick label per emitted **run** start plus one for the last mapped byte"* (§2.9) and extended with the legibility clause (security M-1). Amendment A's parent re-read still names the duplicate at `REQUIREMENTS.md:4190-4191`.
+**Amendment A (`R-TUI-072`)** and **Amendment B (`LLR-072.3`)** — ✅ **LANDED at Inc-5.** Before texts verbatim-verified by the architect lane and reproduced unchanged. **After** texts: *"one tick label per emitted **run** start plus one for the last mapped byte"* (§2.9), extended with the legibility clause (security M-1).
+- **Amendment A** is written into `REQUIREMENTS.md` at `R-TUI-072` — Statement amended in place, full Before/After block appended to Status. **Its parent re-read names the duplicate at `REQUIREMENTS.md:4190-4191` and that duplicate is amended in the same edit.** ⚠️ **It also found a THIRD site the census table did not name** — `R-TUI-072`'s own `Validation:` line, quoting *"exactly 5 ticks"* as `AT-072b`'s predicate, eight lines below the Statement. **A requirement restates its own contract in its verification row; a census that reads only Statements will miss it every time.**
+- **Amendment B** is written into `.dev-flow/2026-07-15-batch-47/01-requirements.md` at `LLR-072.3:508` — the definition whose existence carry `C-77-i` denied. Its retired *"labels fit without overlap"* acceptance criterion is recorded as **vacuous** in the same block: `width: 1fr` children partition the row and cannot overlap, so the predicate was GREEN at 10 invisible labels (P-52).
 **Amendment C** — retirement of `test_ac6_clipped_segments_are_a_known_layout_limitation`, verified by the architect lane to drop no observable. **Two additions:**
 - **Name the fixtures** in the retirement table (arch m-2): the deleted node measures `outside_count` on `_two_band_loaded` **@120×30**; `AT-B77-03` measures the same predicate on the 5-region sparse fixture **and** on `prg.s19`. Same predicate, **different fixture** — the inversion claim is now checkable rather than loose.
 - **Rule on the `160×48` size** (arch m-1): the limitation note at `tests/test_map_click_chain.py:220-227` is the **only** justification for the two AC-6 pointer tests running at `160×48` instead of `120×30`. After R1/R-7 that justification is false, and leaving it would lose the batch's only band-segment-clickability coverage at the regime R-7 repairs. **Both tests revert to `120×30` in Inc-1**, in the same edit that drops the note.
@@ -834,6 +867,27 @@ runs=[1, 4, 4]  n_gaps=0  bar=6  -> widths=[2, 2, 2]  strict=False  ratio=1.0000
 **What did NOT change:** `visible ≥ 1`, `Σ widths + Σ markers ≤ bar.region.width`, and monotone-**∀** stay on the existing `≤` containment domain. They hold at the boundary and narrowing them would be a scope loss with no evidence behind it. **`_allocate_band_widths` is not modified** — chasing the clause in the allocator would be chasing an unsatisfiable target.
 
 **Test consequence:** `TC-B77-03` is labelled "the domain edge" but its fixture is `[256] * n_runs` — all runs equal — so `differing` is `False` and the strict limb has **no subject** anywhere in its sweep. **That is why a sweep across the onset never evaluated the clause that fails.** A differing-size arm at the last in-domain point is added in Inc-1, pinning the truthful degenerate behaviour. This is the batch's registered **vacuous-fixture** defect class (batch-74), now on its own boundary test.
+
+**Amendment E 🆕 (`LLR-072-7.1`, node `TC-519`) — the guard was watching the wrong file for four batches. Executed at Inc-4 under operator ruling; recorded here because a guard amendment is a REQUIREMENT-level fact, not a test edit.**
+
+**Before (verbatim, the node's asserted predicate):**
+> `git diff origin/main -- s19_app/tui/legend.py` is empty — **file identity**.
+
+**After (verbatim, the node's asserted predicate):**
+> A two-arm **behavioural** predicate. **Arm A — the CONSUMER re-parents:** `LegendScreen.compose` splats each helper's return value directly into its pane (AST: `_render_card` and `_render_key` both appear as starred `Call`s). **Arm B — the PRODUCERS return widgets, not text:** each helper's return value is a sequence of `Widget`s.
+
+**Why — and the two directions are not symmetric.**
+
+| Direction | Claim | Verdict | Executed evidence |
+|---|---|---|---|
+| **Too strict** | batch-72's *"the data module has no reason to change"* is a standing property of `legend.py` | ❌ **FALSE** | That was a true statement about **batch-72's own scope**, encoded as though it were a standing invariant. `LLR-112.3` falsifies it: `legend.py` states the retired 5-tick contract **in prose the operator reads**, and amending it is a legitimate data change with no bearing on re-parenting. Executed now: `git diff --stat origin/main -- s19_app/tui/legend.py` → **5 insertions, 3 deletions** — the old node would be RED on a correct change. |
+| **Too weak — and this matters more** | a path-filtered diff on `legend.py` can fail on the regression the node names | ❌ **FALSE, structurally** | `_render_card` is at **`s19_app/tui/screens.py:1093`** and `_render_key` at **`:1141`**; `grep -c '_render_card\|_render_key' s19_app/tui/legend.py` → **0**. **Not one symbol the node's rationale names lives in the file the node watched.** Rewriting `compose` to rebuild every row from text would have left it GREEN. It stayed green from batch-72 to batch-77 and could not have done otherwise. |
+
+> ⚠️ **This is the strongest instance in the batch of a predicate that does not test what its LABEL claims.** The other twelve were caught by execution at a gate; this one was caught only because an unrelated requirement (`LLR-112.3`) forced an edit to the file the guard was pinning. **Nothing in four batches of green runs carried any information about the invariant.**
+
+**A hash of the two helpers was considered and REJECTED:** it reddens on any edit to the producers while staying GREEN on the consumer defect, which is where the regression actually lives — i.e. it inverts the discrimination.
+
+**The node NAME is deliberately retained despite now being inaccurate.** `AT-TC-REGISTRY` binds `TC-519` to that exact node path (and to the `_repo_root` helper, kept for the same reason), so renaming is a **registry change, not a test change**. **Carried for the registry lane** — do not rename it opportunistically in this batch.
 
 ---
 
