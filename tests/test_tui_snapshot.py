@@ -668,8 +668,8 @@ def _batch47_mac_drift_marks(screen: str, density: str, size_key: str) -> tuple:
 # batch-47 (R-TUI-072/073/074, US-MAP Memory Map BIG): the map band strip gains
 # `╱` hatch gaps + span-proportional segment widths (LLR-072.1), a NEW MapRuler
 # address ruler beneath the strip (LLR-072.3 — that requirement's 5 span
-# percentiles are RETIRED at batch-77 R-TUI-112: the ruler now labels one
-# emitted RUN START plus the last mapped byte), and enriched region rows
+# percentiles are RETIRED at batch-77 by R-TUI-072 as amended: the ruler now
+# labels one emitted RUN START plus the last mapped byte), and enriched region rows
 # (humanized size + size micro-bar + `N sym` count + `↵` affordance, LLR-072.2 /
 # 073). All repaint the map body, so BOTH map scaffold cells (80x24 + 120x30,
 # comfortable) drift. The region inspector hex peek (LLR-074) shows only on
@@ -916,8 +916,8 @@ def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tu
 # XPASS caveat). `strict=False` because a cell can render a change below the
 # scroll fold and not drift at all.
 #
-# batch-77 Inc-4 (R-TUI-112) repaints the SAME two cells and no others: the
-# MapRuler is a `#map_grid` child, so its labels move from 5 span percentiles to
+# batch-77 Inc-4 (R-TUI-072 as amended) repaints the SAME two cells and no
+# others: the MapRuler is a `#map_grid` child, so its labels move from 5 span percentiles to
 # one-per-run-start-plus-the-last-mapped-byte inside the map body. MEASURED, not
 # assumed — the Inc-4 snapshot run was `30 passed, 2 xfailed` over the 29-cell
 # matrix with `2 mismatched snapshots`, both of them these cells, and ZERO
@@ -926,6 +926,17 @@ def _discoverability_drift_marks(screen: str, density: str, size_key: str) -> tu
 # The `legend.py` ruler prose amended in the same increment belongs to the
 # standalone legend SCREEN, which is not in the snapshot matrix
 # (`_RESTYLED_SCREENS` + `_SCAFFOLD_SCREENS`), so it drifts nothing.
+#
+# batch-77 Inc-6 (HLR-113 + HLR-114) repaints the SAME two cells and no others,
+# for two reasons that are worth separating because only one of them is obvious:
+# the stats strip's three renderings change IN PLACE (`#map_stats_body`, same
+# rows, different characters), while the band legend's four `.map-legend-row`
+# widgets are REMOVED from `#map_grid` — a row-count change, which shifts
+# everything the map body draws below the region list. MEASURED, not assumed:
+# the Inc-6 run was `30 passed, 2 xfailed` over the 29-cell matrix with `2
+# mismatched snapshots`, both of them these cells, and ZERO XPASS. The legend
+# screen that now owns the band key is not in the snapshot matrix either, so
+# the destination surface drifts nothing.
 #
 # The SVG baselines regenerate in the canonical CI env (snapshot-regen.yml, pinned
 # textual==8.2.8) at batch-77 **Inc-9** — NEVER locally (reference_snapshot_regen_env:
@@ -954,9 +965,13 @@ def _batch77_map_drift_marks(screen: str, density: str, size_key: str) -> tuple:
                     "re-derived from the measured .map-band-bar over total mapped "
                     "bytes + gaps folded to 1 column + the band row stacks at every "
                     "size (120x30 drifts by layout AND content, bar 21->50; 80x24 by "
-                    "content only, bar still 66); PLUS Inc-4 R-TUI-112: the "
+                    "content only, bar still 66); PLUS Inc-4 R-TUI-072 as amended: the "
                     "address ruler labels run starts + the last mapped byte "
-                    "instead of 5 span percentiles; SVG baseline regen pending in "
+                    "instead of 5 span percentiles; PLUS Inc-6 HLR-113 + HLR-114: "
+                    "the stats strip humanizes both byte read-outs and takes 4 "
+                    "coverage digits, and the 4-row band legend is REMOVED from "
+                    "#map_grid (a row-count change, not just repainted text); "
+                    "SVG baseline regen pending in "
                     "canonical CI (snapshot-regen.yml, batch-77 Inc-9)"
                 ),
                 strict=False,

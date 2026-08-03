@@ -642,8 +642,9 @@ def _map_lines() -> List[LegendLine]:
         LegendLine(ROLE_SUB, "Coverage stats + region inspector"),
         LegendLine(
             ROLE_CAPTION,
-            "Coverage: 98.44% · Bytes covered · Valid/Invalid ranges "
-            "· Gaps · Largest gap · Total issues",
+            "Coverage: 98.4375% · Bytes covered 1.0 KiB of 128.0 MiB "
+            "· Valid/Invalid ranges · Gaps · Largest gap 64.0 MiB "
+            "· Total issues",
         ),
         LegendLine(
             ROLE_CAPTION,

@@ -702,7 +702,7 @@ def test_tc519_legend_module_unchanged_vs_main() -> None:
     ``_render_key()`` return; **it must not reconstruct rows from text.** That
     is the invariant, and it is what the two arms below assert.
 
-    ⚠️ **AMENDED at batch-77 Inc-4 (R-TUI-112). Before: this node asserted
+    ⚠️ **AMENDED at batch-77 Inc-4 (R-TUI-072 as amended). Before: this node asserted
     ``git diff origin/main -- s19_app/tui/legend.py`` is EMPTY — file identity.
     After: a predicate over the behaviour the rationale names.**
 

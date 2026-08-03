@@ -678,7 +678,9 @@ chip, address window, covering region, cell-scoped issues, region-issue count,
 and an "Open in Hex View" jump that reuses `update_hex_view(focus_address=…)`)
 (HLR-036); and a coverage stats strip (coverage %, bytes covered,
 valid/invalid range counts, gap count, largest-gap bytes, total issues)
-(HLR-037). All file-derived text is rendered markup-safe (LLR-041.11), and the
+(HLR-037) — **the strip's three byte/percentage renderings are amended at
+batch-77 Inc-6; see the amendment at the end of this row**. All file-derived
+text is rendered markup-safe (LLR-041.11), and the
 grid + detail reflow via the existing `width-narrow` breakpoint — detail beside
 the grid at ≥ 120 columns, stacked below it at < 120 (LLR-041.10). This
 supersedes/extends R-TUI-026.
@@ -754,6 +756,56 @@ supersedes/extends R-TUI-026.
   `width-narrow` two-regime reflow, the `#map_stats` coverage strip (HLR-037),
   and the batch-43 R-3 A2L-symbol region naming with its `safe_text` guard are
   all preserved.
+- **Amended in batch `2026-08-01-batch-77` Inc-6** (US-77 / HLR-113, LLR-113.1–.2 —
+  Before → After). **Three RENDERINGS change in `build_stats_text`; no arithmetic and
+  no statistic does.** `coverage_stats` is untouched, so LLR-041.7's render-only
+  contract is preserved by construction — the panel still computes no new coverage.
+  Every prior amendment to this row said the strip was "retained unchanged"; this is
+  the first that changes it, which is why the retired text is quoted verbatim.
+  - **Before (verbatim, the three lines only):**
+    `f"Coverage: {stats.coverage_pct:.2f}%  "` ·
+    `f"Bytes covered: {stats.covered_bytes}\n"` ·
+    `f"Largest gap: {stats.largest_gap} bytes\n"`
+  - **After:** `f"Coverage: {stats.coverage_pct:.4f}%  "` ·
+    `f"Bytes covered: {human_bytes(stats.covered_bytes)} of {human_bytes(stats.image_span)}\n"` ·
+    `f"Largest gap: {human_bytes(stats.largest_gap)}\n"`
+  - **Deleted tokens:** the `.2f` coverage precision, the bare `covered_bytes` integer, the
+    literal `bytes` suffix on the largest gap. **New tokens:** the `.4f` precision, the
+    `… of …` dual read-out naming the **image span**, `human_bytes` on all three byte
+    quantities.
+  - **`image_span` is newly SURFACED, not newly computed.** It has been a `CoverageStats`
+    field since batch-27 and was the coverage percentage's own denominator; the strip
+    simply never printed it.
+  - **Why (measured, not argued).** At `.2f` the percentage is not discriminating on the
+    images this tool is for: executed on a fixture mapping **1 024 bytes of a 128 MiB
+    span**, the strip read **`Coverage: 0.00%`** — the same string an image mapping a
+    thousand times less would print. At four digits it reads **`0.0008%`**. **Exactly
+    four, not "at least four":** a `.6f` implementation satisfies the looser wording while
+    reddening this row's own `test_at037`, so both the `.2f` and the `.6f` forms are
+    asserted ABSENT. The largest gap on that same fixture read **`67108408 bytes`** — a
+    number no reader can weigh — and now reads **`64.0 MiB`**.
+  - **Validation:** `tests/test_tui_directionb.py::test_b77_stats_strip_dual_readout_and_four_digit_coverage`
+    (AT-B77-05 — three limbs, each with its presence AND absence clause in the same node,
+    **both pilot sizes**) · `::test_tc_b77_10_no_file_stats_strip_is_positively_empty`
+    (TC-B77-10) · `::test_tc_b77_11_full_coverage_strip_reads_100_and_a_zero_gap`
+    (TC-B77-11) · `::test_tc_b77_12_one_byte_image_strip` (TC-B77-12) ·
+    `::test_tc_b77_13_zero_span_strip_divides_by_nothing` (TC-B77-13) · `::test_at037…`
+    re-derived in place. Every expected string is **computed through `human_bytes(...)`**,
+    never hand-typed (C-42). Counterfactuals executed per arm on a copy of the fixed tree:
+    substituting `.2f` for `.4f`, `{stats.covered_bytes}` for the dual read-out, and
+    `{stats.largest_gap} bytes` for `human_bytes(...)` each redden AT-B77-05 **and**
+    `test_at037` on their own assertion.
+  - ⚠️ **`test_tc041_9`'s vacuity is NOT claimed.** That node's `"Coverage:" not in strip`
+    is UNDECIDABLE as a vacuity claim: on the no-file path `build_stats_text` is never
+    called, so the absence it observes is unrelated to the strip's format and would survive
+    any reformatting, correct or broken. `TC-B77-10` re-derives the empty-state guarantee
+    POSITIVELY (`strip == ""`, and zero band segments) instead of asserting a vacuity that
+    cannot be demonstrated.
+  - ⚠️ **Known residual drift, NOT fixed here.** `s19_app/tui/legend.py:645` captions this
+    strip with a sample rendering — `"Coverage: 98.44% · Bytes covered · …"` — whose **two**
+    decimal places are now stale. The field NAMES the caption lists are all still correct
+    (the labels are unchanged, which is why `Bytes covered:` was kept as the label rather
+    than renamed). `legend.py` is outside Inc-6's authorised file set; carried.
 
 **R-TUI-042**: Three prototype-approved (throwaway-prototype design intent,
 implemented + verified in Textual) view enhancements, all render-only over the
@@ -4147,7 +4199,8 @@ batch-45), CHECK/CRC blocks (the CRC-into-loop seam, batch-46), multi-image scop
 **R-TUI-060**: The TUI Memory Map presents the loaded image as an **entropy band visualization** —
 a **proportional segmented band bar** (one segment per merged same-band region run, width ∝ that
 run's byte share) above a **textured per-region list** (one row per run: `{glyph} 0x{start} · {N} B ·
-{band}`), plus a **band legend** (one row per band label). Colour + texture come per entropy band from
+{band}`), plus a **band legend** (one row per band label — **the legend is REMOVED from the map body
+at batch-77; see the batch-77 Inc-6 amendment below**). Colour + texture come per entropy band from
 the NON-frozen `entropy_style` map (`band-{token}` CSS classes owned by `styles.tcss` + a distinct
 texture glyph per band — a colour-blind cue, C-10), a colour domain deliberately separate from the
 frozen `sev-*` severity classes. This REPLACES the batch-27 validity (`sev-*`) cell grid (field-audit
@@ -4162,11 +4215,13 @@ HLR-037) is retained unchanged in `#map_stats`. This supersedes/extends R-TUI-04
 dimension.
 - Code: `s19_app/tui/entropy_style.py` (NEW — band→`(class, glyph, meaning)` map, non-frozen),
   `s19_app/tui/screens_directionb.py` (`_merge_band_runs`, `RegionRow`, `MemoryMapPanel._build_band_widgets`,
-  the band-bar/region-list/legend render), `s19_app/tui/services/load_service.py` (compute-on-load in
+  the band-bar/region-list render; the legend render was REMOVED at batch-77 Inc-6),
+  `s19_app/tui/services/load_service.py` (compute-on-load in
   `build_loaded_s19`/`build_loaded_hex`), `s19_app/tui/models.py` (`LoadedFile.entropy_windows`),
   `s19_app/tui/app.py` (`update_memory_map` passes `entropy_windows` as the 5th `render_ranges` arg),
-  `s19_app/tui/styles.tcss` (`.map-band-bar` / `.map-region-list` / `.map-region-row` / `.map-band-legend`
-  + the `.band-*` colours)
+  `s19_app/tui/styles.tcss` (`.map-band-bar` / `.map-region-list` / `.map-region-row`
+  + the `.band-*` colours; the `.map-band-legend` / `.map-legend-row` rules were DELETED at
+  batch-77 Inc-6 along with the widgets that selected them)
 - Validation: `Automated` via `tests/test_tui_directionb.py`
   (`test_at069_high_region_renders_high_band`, `test_at070_constant_vs_high_bands_differ` (C-10
   two-branch), `test_at071_region_list_rows_addr_size_band`,
@@ -4222,6 +4277,45 @@ dimension.
     interaction tests in `tests/test_tui_directionb.py` (23 `MemoryMapPanel` + 9 `RegionRow`) — all
     non-frozen, all green, changes additive. The 2 `map` snapshot cells re-mark under
     `_batch47_map_drift_marks`; `_batch45_map_drift_marks` is subsumed. Frozen-engine diff = 0.
+- **Amended in batch `2026-08-01-batch-77` Inc-6** (US-77 / HLR-114, LLR-114.1–.2 — Before → After).
+  **The band legend LEAVES the map body. It is MOVED, not deleted**, so this amendment removes a
+  surface and supersedes no contract about the key itself.
+  - **Before (verbatim, the legend clause only):** "…plus a **band legend** (one row per band label)."
+    Realised as a `.map-band-legend` `Vertical` of four `.map-legend-row` `Static`s appended by
+    `MemoryMapPanel._build_band_widgets` and mounted into `#map_grid` on every render.
+  - **After:** `#map_grid` contains **no** `.map-legend-row` and **no** `.map-band-legend` widget. The
+    band key remains reachable at the `k` legend screen (`LegendScreen`, `screens.py`, rendered from
+    `ENTROPY_BANDS` via `build_band_key_rows`), which already carried the same key — the map body was
+    restating it.
+  - **Deleted tokens:** `.map-band-legend`, `.map-legend-row` (both the widgets and their `styles.tcss`
+    rules). **New tokens:** none — the destination surface predates this batch.
+  - **Why (measured, not argued):** the block was four rows of the map body, byte-identical on every
+    image, in a pane whose scarcity is this batch's whole subject (`HLR-111` is about columns and
+    `LLR-111.9` about rows). A static key does not earn always-on residency when a keypress reaches an
+    identical one.
+  - **⚠️ Blast radius, recorded rather than discovered later:**
+    `tests/test_tui_directionb.py::test_at075_e_key_opens_no_modal_map_has_legend` carried **two**
+    observables and went RED **by design**. Its `e`-key clause (AT-075's own claim — no modal is
+    pushed) is retained in place and newly paired with a `.map-band-seg >= 1` presence co-assertion,
+    because with the legend gone the node otherwise touched nothing that could distinguish a rendered
+    map from an empty one. Its band-label clause is **ported**, not dropped, to
+    `test_b77_legend_screen_still_lists_every_band` (AT-B77-07), which derives label completeness from
+    `ENTROPY_BAND_LABELS` instead of the four hand-written literals the old node used — the literal
+    list could not have failed if a fifth band were added. The node **name** is retained though it now
+    names a legend it no longer reads: `AT-075` is a shipped acceptance id bound to that node path.
+  - **Validation:** `tests/test_tui_directionb.py::test_b77_legend_is_not_resident_in_the_map_body`
+    (AT-B77-06 — absence conjoined with presence, **both pilot sizes**) ·
+    `::test_b77_legend_screen_still_lists_every_band` (AT-B77-07) ·
+    `::test_tc_b77_14_no_file_has_no_legend_and_no_strip_either` (TC-B77-14 — the no-file state reports
+    the SAME zeroes a correct removal reports, which is why AT-B77-06's presence limb is load-bearing) ·
+    `::test_tc_b77_15_legend_opened_from_the_map_and_dismissed` (TC-B77-15 — the `k` round trip leaves
+    the map rendering). Counterfactual executed on a copy of the fixed tree: re-adding the
+    `.map-band-legend` `Vertical` and its four children to `_build_band_widgets` reddens AT-B77-06 at
+    120×30 on `4 == 0`, and leaves TC-B77-14 and the ported `test_at075` GREEN — correctly, since
+    neither reads the legend.
+  - **⚠️ Queries are scoped to `#map_grid`, normatively.** An app-wide `.map-legend-row` query would
+    falsely redden whenever the legend screen is open, and app-wide residency is not what HLR-114
+    states.
 
 **R-TUI-061**: The Memory Map docks an **"At a glance"** panel beside the band bar: (a) a per-band
 **histogram** — one band-styled row per OCCUPIED band showing its REGION count (merged-run tally,
@@ -4841,11 +4935,19 @@ band-bands view (R-TUI-060 / R-TUI-041; §6.5 Amendment B) — nothing there is 
     is not a broken test being fixed, it is a live acceptance being deliberately invalidated, which is
     why this block exists. Its fixture is **PINNED to `case_02`**: `prg.s19` needs 15 ticks against a
     ceiling of 7 @80×24 / 5 @120×30 and would redden the node on correct code.
-  - **⚠️ Open, NOT closed by this amendment:** shipped source cites **`R-TUI-112`**
-    (`screens_directionb.py:612`, `:1454`) and three test files cite it, but **no `R-TUI-112` row exists
-    in this document** (high-water is `R-TUI-102`). Under this amendment the governing id is
-    **`R-TUI-072` as amended**, so those citations are dangling. Recorded as a batch-77 carry rather
-    than resolved here — resolving it edits production source, which Inc-5 is not scoped to touch.
+  - **✅ CLOSED at batch-77 Inc-6 (carry `C-77-m`, decision D-17).** Inc-4 minted **`R-TUI-112`** in
+    comments — `screens_directionb.py:612`, `:1454`; `tests/test_legend_two_pane.py:705`;
+    `tests/test_tui_snapshot.py:671`, `:919`, `:957` — while **no `R-TUI-112` row was ever added to
+    this document** (high-water `R-TUI-102`). All **six** citations are re-pointed at **`R-TUI-072`
+    as amended**; an executed grep over `s19_app/`, `tests/` and this file returns **0** remaining.
+    **No `R-TUI-112` row is created**, and that is the substantive half of the decision: Amendment A
+    above amends `R-TUI-072` **in place** rather than superseding it, so the governing id is
+    `R-TUI-072`. Minting a row for `R-TUI-112` would assert a supersession that did not happen and
+    would leave two ids owning one contract.
+    ⚠️ **Recorded because it is this batch's own defect, twice over.** The dangling id is exactly the
+    shape `C-77-i` catalogued (a citation with no register row), committed two increments after
+    cataloguing it; and the census that found it was a **doc** census, not a source one — the id had
+    been live in shipped comments for an increment before anything looked.
 
 **R-TUI-073**: When Memory Map region rows render, each `RegionRow` shall show a **size micro-bar**
 (`microbar(region_size / largest_region)`), an **`N sym`** count of A2L enriched-tag addresses falling

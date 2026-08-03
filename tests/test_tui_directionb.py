@@ -126,6 +126,7 @@ from textual.widgets import Input
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.command_bar import CommandBar
+from s19_app.tui.insight_style import human_bytes
 from s19_app.tui.models import LoadedFile
 from s19_app.tui.rail import RAIL_ENTRIES, Rail, RailItem
 from s19_app.tui.screens_directionb import EmptyStatePanel
@@ -3822,25 +3823,313 @@ def test_at037_stats_strip_matches_case_02_coverage(tmp_path: Path) -> None:
     ):
         assert label in strip, f"stats label {label!r} missing; got {strip!r}"
 
-    # Values match the hand-computed case_02 literals. batch-40 S3: the strip
-    # renders coverage to a clean 2 decimals (was an ugly .6f), matching the
-    # A-view (app.build_workspace_stats_text). AC-3.1: .2f present, no 6-dec tail.
-    assert f"Coverage: {_CASE_02_COVERAGE_PCT:.2f}%" in strip, (
-        f"coverage %% must render at .2f (TC-041.8's number); got {strip!r}"
+    # Values match the hand-computed case_02 literals. batch-40 S3 rendered
+    # coverage at .2f; batch-77 (HLR-113 / LLR-113.1) widens that to EXACTLY
+    # four fractional digits and humanizes the two byte read-outs. The .2f and
+    # .6f forms are BOTH asserted absent so the digit count is pinned from both
+    # sides — "at least four" would let a .6f implementation pass.
+    assert f"Coverage: {_CASE_02_COVERAGE_PCT:.4f}%" in strip, (
+        f"coverage %% must render at .4f (TC-041.8's number); got {strip!r}"
+    )
+    assert f"Coverage: {_CASE_02_COVERAGE_PCT:.2f}%" not in strip, (
+        f"coverage %% must NOT render the 2-decimal form; got {strip!r}"
     )
     assert f"{_CASE_02_COVERAGE_PCT:.6f}%" not in strip, (
         f"coverage %% must NOT render the 6-decimal form; got {strip!r}"
     )
-    assert f"Bytes covered: {_CASE_02_COVERED_BYTES}" in strip
+    assert (
+        f"Bytes covered: {human_bytes(_CASE_02_COVERED_BYTES)} of "
+        f"{human_bytes(_CASE_02_IMAGE_SPAN)}" in strip
+    ), f"the covered total must be a humanized dual read-out; got {strip!r}"
     assert f"Valid ranges: {_CASE_02_VALID_COUNT}" in strip
     assert f"Invalid ranges: {_CASE_02_INVALID_COUNT}" in strip
     assert f"Gaps: {_CASE_02_GAP_COUNT}" in strip
-    assert f"Largest gap: {_CASE_02_LARGEST_GAP} bytes" in strip
+    assert f"Largest gap: {human_bytes(_CASE_02_LARGEST_GAP)}" in strip
+    assert f"Largest gap: {_CASE_02_LARGEST_GAP} bytes" not in strip, (
+        f"the largest gap must be humanized, not a raw byte count; got {strip!r}"
+    )
     # Total issues == the single canonical source len(_validation_issues).
     assert f"Total issues: {issue_count}" in strip, (
         f"total issues must equal len(_validation_issues)={issue_count}; "
         f"got {strip!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-77 Inc-6 (HLR-113 / LLR-113.1-.2) — the stats strip states mapped-vs-
+# span with a DISCRIMINATING percentage.
+#
+# The defect: at .2f every sparsely-mapped image reads a flat `0.00%` and the
+# byte read-outs are raw integers a reader cannot weigh. `case_02` maps 93
+# bytes of a 2 GiB span, so it reads `0.00%` — and so would an image mapping a
+# thousand times more. Four fractional digits + `human_bytes` on the covered
+# total, the image span and the largest gap.
+#
+# EVERY expected string below is COMPUTED through `human_bytes(...)` (C-42) —
+# never hand-typed. The producers here escape and format in ways a hand-typed
+# literal silently fails to match, and a literal also re-implements the very
+# function under test.
+# ---------------------------------------------------------------------------
+
+
+def _sparse_coverage_loaded(tmp_path: Path) -> "LoadedFile":
+    """Build a SPARSELY-mapped ``LoadedFile`` through the real load pipeline.
+
+    Three small ranges scattered across a 128 MiB address span, chosen so every
+    one of HLR-113's three renderings is DISCRIMINATING — i.e. so a conforming
+    strip and the pre-batch-77 strip differ visibly on each of them:
+
+    ==================  =============  ====================  ==================
+    quantity            bytes          pre-batch-77           batch-77
+    ==================  =============  ====================  ==================
+    coverage            1024/134217728 ``0.00%``              ``0.0008%``
+    covered / span      1024, 134217728 ``1024`` (no span)    ``1.0 KiB of 128.0 MiB``
+    largest gap         67108408       ``67108408 bytes``     ``64.0 MiB``
+    ==================  =============  ====================  ==================
+
+    ``case_02`` cannot serve here: it maps 93 bytes of a 2 GiB span, which is
+    ``0.0000%`` at four digits as well as ``0.00%`` at two — the digit widening
+    is invisible on it. A fixture on which the change is invisible would make
+    AT-B77-05's coverage limb GREEN before and after.
+    """
+    from s19_app.core import S19File
+    from s19_app.tui.changes import emit_s19_from_mem_map
+    from s19_app.tui.services.load_service import build_loaded_s19
+
+    ranges = [(0, 256), (67108664, 67109176), (134217472, 134217728)]
+    mem_map: dict[int, int] = {}
+    for start, end in ranges:
+        for addr in range(start, end):
+            mem_map[addr] = (addr * 7) & 0xFF
+
+    path = tmp_path / "sparse_coverage.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    return build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+
+async def _map_stats_strip(app: "S19TuiApp", pilot: "object") -> str:
+    """Show the map, render it, and return ``#map_stats_body``'s plain text.
+
+    ``#map_stats_body``, NOT ``#map_stats``: the latter is the CONTAINER, whose
+    own render is a ``Blank`` — reading it returns no strip text at all and
+    every absence assertion below would pass vacuously against it.
+    """
+    app.action_show_screen("map")
+    app.update_memory_map()
+    await pilot.pause()
+    return str(app.query_one("#map_stats_body").render())
+
+
+def test_b77_stats_strip_dual_readout_and_four_digit_coverage(
+    tmp_path: Path,
+) -> None:
+    """Black-box: the stats strip humanizes both byte read-outs and renders
+    coverage to EXACTLY four fractional digits (AT-B77-05 / HLR-113).
+
+    Intent: the strip must let an operator tell a sparsely-mapped image from an
+    empty one and weigh the numbers it prints. Three limbs, each with its
+    presence clause and its absence clause IN THIS NODE (C-40) — an absence
+    claim alone is green on an empty strip, which is exactly the state
+    ``#map_stats_body`` is in with no file loaded:
+
+    1. **coverage** — ``0.0008%`` present, ``0.00%`` and the ``.6f`` form
+       absent. EXACTLY four, not "at least four": a ``.6f`` implementation
+       satisfies "at least" while reddening ``test_at037``.
+    2. **dual read-out** — ``1.0 KiB of 128.0 MiB`` present (mapped total AND
+       image span, both humanized), the bare integer ``1024`` absent.
+    3. **largest gap** — ``64.0 MiB`` present, ``67108408 bytes`` absent.
+
+    Both pilot sizes: the strip spans the full panel width (66 @80x24,
+    88 @120x30) and must not depend on the regime.
+
+    RED pre-change, executed at both sizes:
+    ``'Coverage: 0.00%  Bytes covered: 1024\\nValid ranges: 3  Invalid ranges: 0
+    \\nGaps: 2  Largest gap: 67108408 bytes\\nTotal issues: 0'``
+    """
+    from s19_app.tui.screens_directionb import coverage_stats
+
+    loaded = _sparse_coverage_loaded(tmp_path)
+    stats = coverage_stats(loaded.ranges, loaded.range_validity, [])
+
+    async def _drive(size: "tuple[int, int]") -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app._apply_empty_state()
+            return await _map_stats_strip(app, pilot)
+
+    for size in ((120, 30), (80, 24)):
+        strip = asyncio.run(_drive(size))
+        tag = f"{size[0]}x{size[1]}"
+
+        # Limb 1 — coverage, exactly four fractional digits.
+        assert f"Coverage: {stats.coverage_pct:.4f}%" in strip, (
+            f"{tag}: coverage must render at exactly .4f "
+            f"({stats.coverage_pct:.4f}%); got {strip!r}"
+        )
+        assert f"Coverage: {stats.coverage_pct:.2f}%" not in strip, (
+            f"{tag}: the 2-digit form collapses this image to a flat 0.00%; "
+            f"got {strip!r}"
+        )
+        assert f"Coverage: {stats.coverage_pct:.6f}%" not in strip, (
+            f"{tag}: EXACTLY four digits — .6f is over-precise; got {strip!r}"
+        )
+
+        # Limb 2 — the dual read-out: mapped total AND image span, humanized.
+        assert (
+            f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
+            f"{human_bytes(stats.image_span)}" in strip
+        ), (
+            f"{tag}: the covered total must be humanized and stated against the "
+            f"image span; got {strip!r}"
+        )
+        assert f"Bytes covered: {stats.covered_bytes}\n" not in strip, (
+            f"{tag}: the raw covered byte count must not survive; got {strip!r}"
+        )
+
+        # Limb 3 — the largest gap, humanized.
+        assert f"Largest gap: {human_bytes(stats.largest_gap)}" in strip, (
+            f"{tag}: the largest gap must be humanized; got {strip!r}"
+        )
+        assert f"{stats.largest_gap} bytes" not in strip, (
+            f"{tag}: the raw largest-gap byte count must not survive; "
+            f"got {strip!r}"
+        )
+
+        # LLR-113.1 acceptance: the panel derives NO new arithmetic over
+        # `ranges` (LLR-041.7 keeps it presentational). The strip's numbers are
+        # `coverage_stats`' fields verbatim, so an INDEPENDENTLY computed
+        # `CoverageStats` must reproduce the painted text exactly.
+        assert f"Gaps: {stats.gap_count}  " in strip, (
+            f"{tag}: gap count must be coverage_stats' own; got {strip!r}"
+        )
+
+
+def test_tc_b77_10_no_file_stats_strip_is_positively_empty(tmp_path: Path) -> None:
+    """Boundary: with no file the stats strip is EMPTY — asserted positively
+    (TC-B77-10 / HLR-113).
+
+    Intent: re-derive the empty-state guarantee that ``test_tc041_9`` states
+    NEGATIVELY (``"Coverage:" not in strip``). That negative form is not
+    load-bearing there and its vacuity is UNDECIDABLE: on the no-file path
+    ``build_stats_text`` is never called at all, so the absence it observes has
+    nothing to do with the strip's format and would survive any reformatting —
+    including a broken one. This node asserts the actual guarantee: the strip is
+    the empty string, and the map body rendered no band segment either, so the
+    empty state is a state the AT-B77-05 fixture is genuinely distinguishable
+    from.
+
+    Executed pre-change and post-change: ``strip == ''``, 0 band segments.
+    """
+
+    async def _drive() -> "tuple[str, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            strip = await _map_stats_strip(app, pilot)  # no current_file
+            return strip, len(app.query_one("#map_grid").query(".map-band-seg"))
+
+    strip, segs = asyncio.run(_drive())
+    assert strip == "", f"the no-file stats strip must be empty; got {strip!r}"
+    assert segs == 0, (
+        f"the no-file map body must render no band segment either — otherwise "
+        f"the empty state is not distinguishable from a rendered one; got {segs}"
+    )
+
+
+def test_tc_b77_11_full_coverage_strip_reads_100_and_a_zero_gap() -> None:
+    """Boundary: a fully covered image reads 100.0000%% and a ``human_bytes(0)``
+    largest gap (TC-B77-11 / HLR-113).
+
+    Intent: the upper boundary of the coverage percentage and the ZERO boundary
+    of the humanizer. ``human_bytes(0)`` is asserted through the function, not
+    as the literal ``"0 B"`` — a test that hard-codes the humanizer's zero form
+    re-implements the code under test and stops tracking it.
+
+    The dual read-out degenerates here: covered == span, so both halves print
+    the SAME string. That is the correct rendering and it is asserted, because
+    a naive implementation that prints only one number when they are equal
+    would still satisfy a looser "contains the span" check.
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel, coverage_stats
+
+    stats = coverage_stats([(0x100, 0x100100)], [True], [])
+    strip = MemoryMapPanel().build_stats_text(stats).plain
+
+    assert stats.coverage_pct == 100.0, "one contiguous range is fully covered"
+    assert "Coverage: 100.0000%" in strip, (
+        f"full coverage must render at four digits; got {strip!r}"
+    )
+    assert f"Largest gap: {human_bytes(0)}" in strip, (
+        f"no gaps → the largest gap is the humanizer's zero form "
+        f"({human_bytes(0)!r}); got {strip!r}"
+    )
+    assert (
+        f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
+        f"{human_bytes(stats.image_span)}" in strip
+    ), f"both halves print even when they are equal; got {strip!r}"
+
+
+def test_tc_b77_12_one_byte_image_strip() -> None:
+    """Boundary: a one-byte image humanizes to the sub-KiB integer form
+    (TC-B77-12 / HLR-113).
+
+    Intent: the smallest non-empty image. ``human_bytes`` switches formats
+    below 1024 (integer + ``B``, no false precision), so this is the boundary
+    where the dual read-out crosses that branch — and coverage is exactly
+    100%% over a span of 1.
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel, coverage_stats
+
+    stats = coverage_stats([(0x40, 0x41)], [True], [])
+    strip = MemoryMapPanel().build_stats_text(stats).plain
+
+    assert stats.image_span == 1 and stats.covered_bytes == 1
+    assert (
+        f"Bytes covered: {human_bytes(1)} of {human_bytes(1)}" in strip
+    ), f"a 1-byte image takes the sub-KiB integer form; got {strip!r}"
+    assert "Coverage: 100.0000%" in strip, f"got {strip!r}"
+
+
+def test_tc_b77_13_zero_span_strip_divides_by_nothing(tmp_path: Path) -> None:
+    """Boundary/error: an image whose span is 0 renders a strip and raises
+    nothing (TC-B77-13 / HLR-113 + LLR-041.9).
+
+    Intent: ``image_span == 0`` is the divide-by-zero edge, and it reaches the
+    strip on a LIVE path — ``render_ranges`` guards ``span <= 0`` by taking the
+    no-entropy branch, which still calls ``_render_stats(..., empty=False)``
+    from the real ranges (never "No file loaded"). So the humanizer and the
+    percentage must both survive a zero span through the SHIPPED panel, not
+    only in a unit call.
+
+    Both byte read-outs degenerate to the humanizer's zero form and coverage to
+    ``0.0000%`` — the guarded value, not a computed one.
+    """
+    from s19_app.tui.screens_directionb import MemoryMapPanel
+
+    async def _drive() -> str:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            await pilot.pause()
+            panel = app.query_one("#memory_map_panel", MemoryMapPanel)
+            # A zero-length range: span_end == span_start, so span == 0.
+            panel.render_ranges([(0x1000, 0x1000)], [True], entropy_windows=())
+            await pilot.pause()
+            return str(app.query_one("#map_stats_body").render())
+
+    strip = asyncio.run(_drive())
+
+    assert "Coverage: 0.0000%" in strip, (
+        f"a zero span takes the guarded 0.0 coverage, at four digits; "
+        f"got {strip!r}"
+    )
+    assert (
+        f"Bytes covered: {human_bytes(0)} of {human_bytes(0)}" in strip
+    ), f"both halves degenerate to the humanizer's zero form; got {strip!r}"
+    assert f"Largest gap: {human_bytes(0)}" in strip, f"got {strip!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -4625,17 +4914,42 @@ def test_at073b_glance_geometry_fits_and_reflows(tmp_path: Path) -> None:
 
 
 def test_at075_e_key_opens_no_modal_map_has_legend(tmp_path: Path) -> None:
-    """Black-box: pressing ``e`` opens no modal, and the map's band legend is
-    present (AT-075 / R-TUI-050/051 retire).
+    """Black-box: pressing ``e`` opens no modal, and the map is still rendered
+    behind it (AT-075 / R-TUI-050/051 retire).
 
     RED pre-delete: ``e`` was bound to ``show_entropy`` and pushed the
     ``EntropyViewerScreen`` modal (the screen stack grew).
+
+    ⚠️ **AMENDED at batch-77 Inc-6 (HLR-114). The node carried TWO
+    observables; one stayed and one moved.**
+
+    *Stayed — AT-075's own claim.* ``e`` pushes no screen and leaves no
+    ``ModalScreen`` active. That is the retire proof and it is untouched below.
+    It is now paired with a PRESENCE co-assertion (``.map-band-seg >= 1``): a
+    "nothing was pushed" claim is green on an app that rendered nothing at all,
+    and with the legend gone this node had no other reason left to touch the
+    map body.
+
+    *Moved.* The second observable — the band-label SET, read from the
+    ``.map-legend-row`` widgets resident in ``#map_grid`` — cannot be asserted
+    here any more, because HLR-114 removes those widgets from the map body. It
+    is not dropped: ``test_b77_legend_screen_still_lists_every_band``
+    (AT-B77-07) asserts the same completeness against the ``k`` legend screen,
+    which is where the band key now lives, and derives the expected labels from
+    ``ENTROPY_BAND_LABELS`` instead of the hand-written four-tuple this node
+    used. That hand-written list was itself a defect: it could not fail if a
+    fifth band were added to ``ENTROPY_BANDS`` — it would simply stop covering
+    the domain while staying green.
+
+    The node NAME is retained despite now naming a legend it no longer reads:
+    ``AT-075`` is a shipped acceptance id bound to this node path, so renaming
+    is a registry change, not a test change (same disposition as ``TC-519``).
     """
     from textual.screen import ModalScreen
 
     loaded = _two_band_loaded(tmp_path)
 
-    async def _drive() -> "tuple[int, int, bool, list]":
+    async def _drive() -> "tuple[int, int, bool, int]":
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(120, 30)) as pilot:
             await pilot.pause()
@@ -4648,17 +4962,229 @@ def test_at075_e_key_opens_no_modal_map_has_legend(tmp_path: Path) -> None:
             await pilot.pause()
             after = len(app.screen_stack)
             is_modal = isinstance(app.screen, ModalScreen)
-            legend = [_widget_plain(r) for r in app.query(".map-legend-row")]
-            return before, after, is_modal, legend
+            segs = len(app.query_one("#map_grid").query(".map-band-seg"))
+            return before, after, is_modal, segs
 
-    before, after, is_modal, legend = asyncio.run(_drive())
+    before, after, is_modal, segs = asyncio.run(_drive())
     assert after == before, (
         f"pressing 'e' must push no modal (stack {before} -> {after})"
     )
     assert not is_modal, "no ModalScreen may be active after pressing 'e'"
-    joined = " ".join(legend)
-    for band in ("constant/padding", "low", "medium", "high/random"):
-        assert band in joined, f"the map band legend must list {band!r}; got {legend}"
+    assert segs >= 1, (
+        f"the map body must actually have rendered behind the keypress, or the "
+        f"'no modal was pushed' claim above is vacuous; got {segs} band segments"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-77 Inc-6 (HLR-114 / LLR-114.1-.2) — the band legend LEAVES the map body.
+#
+# It was four static rows, identical on every image, spending four of the map
+# body's scarce rows to restate a key the `k` legend screen already renders
+# from the same `ENTROPY_BANDS` source. The legend is MOVED, not deleted, so
+# this pair of ATs is an absence claim plus a reachability claim — and the
+# absence claim is worthless without its presence co-assertion, because zero
+# legend rows is also what a map that rendered NOTHING reports (TC-B77-14).
+# ---------------------------------------------------------------------------
+
+
+def test_b77_legend_is_not_resident_in_the_map_body(tmp_path: Path) -> None:
+    """Black-box: ``#map_grid`` holds no legend widget while still holding a
+    rendered band strip (AT-B77-06 / HLR-114).
+
+    Intent: the removal must be observable AND must not be satisfiable by
+    breaking the map. Both limbs live in this node (C-40):
+
+    * **absence** — 0 ``.map-legend-row`` and 0 ``.map-band-legend`` in
+      ``#map_grid``;
+    * **presence** — >= 1 ``.map-band-seg`` in the same container, so the zero
+      above is a removal and not an empty render.
+
+    ⚠️ The queries are SCOPED TO ``#map_grid``, never to the app. An app-wide
+    ``.map-legend-row`` query would falsely redden the day the legend screen is
+    open, and an app-wide count is not what HLR-114 states — the requirement is
+    about RESIDENCY IN THE MAP BODY, not about the class existing anywhere.
+
+    RED pre-change, executed at both sizes: 4 ``.map-legend-row`` and 1
+    ``.map-band-legend`` inside ``#map_grid``, alongside 5 band segments.
+    """
+    loaded = _sparse_coverage_loaded(tmp_path)
+
+    async def _drive(size: "tuple[int, int]") -> "tuple[int, int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app._apply_empty_state()
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            grid = app.query_one("#map_grid")
+            return (
+                len(grid.query(".map-legend-row")),
+                len(grid.query(".map-band-legend")),
+                len(grid.query(".map-band-seg")),
+            )
+
+    for size in ((120, 30), (80, 24)):
+        rows, boxes, segs = asyncio.run(_drive(size))
+        tag = f"{size[0]}x{size[1]}"
+        assert segs >= 1, (
+            f"{tag}: the map body must have rendered a band strip, or the two "
+            f"zeroes below are an empty render rather than a removal; "
+            f"got {segs} segments"
+        )
+        assert rows == 0, (
+            f"{tag}: no .map-legend-row may be resident in #map_grid "
+            f"(the band key lives on the 'k' legend screen); got {rows}"
+        )
+        assert boxes == 0, (
+            f"{tag}: no .map-band-legend container may be resident in "
+            f"#map_grid; got {boxes}"
+        )
+
+
+def test_b77_legend_screen_still_lists_every_band(tmp_path: Path) -> None:
+    """Black-box: the ``k`` legend screen is reachable from the map and renders
+    the WHOLE band-label set (AT-B77-07 / HLR-114).
+
+    Intent: HLR-114 MOVES the legend, so the batch owes proof that the
+    destination still carries it. This is the node ``test_at075``'s band-label
+    clause was ported into.
+
+    Completeness is derived from ``ENTROPY_BAND_LABELS`` — the same tuple the
+    producer orders the key by — and never hand-listed, so adding a fifth band
+    to ``ENTROPY_BANDS`` without rendering it reddens here. ``test_at075``
+    listed the four labels literally and could not fail on that change.
+    """
+    from s19_app.tui.entropy_style import ENTROPY_BAND_LABELS
+    from s19_app.tui.screens import LegendScreen
+
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[bool, str]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app._apply_empty_state()
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            app.set_focus(None)  # the operator is not typing in a filter field
+            await pilot.press("k")
+            await pilot.pause()
+            opened = isinstance(app.screen, LegendScreen)
+            rows = [_widget_plain(r) for r in app.screen.query(".legend-row")]
+            return opened, " ".join(rows)
+
+    opened, joined = asyncio.run(_drive())
+
+    assert opened, "'k' must still open the legend screen from the map"
+    assert ENTROPY_BAND_LABELS, "the band-label domain must not be empty"
+    for band in ENTROPY_BAND_LABELS:
+        assert band in joined, (
+            f"the legend screen must list every entropy band; {band!r} is "
+            f"missing from {joined!r}"
+        )
+
+
+def test_tc_b77_14_no_file_has_no_legend_and_no_strip_either(
+    tmp_path: Path,
+) -> None:
+    """Boundary: with no file the map body holds zero legend widgets — and zero
+    band segments, which is why that zero proves nothing (TC-B77-14 / HLR-114).
+
+    Intent: this is the counterexample that makes AT-B77-06's presence
+    co-assertion load-bearing rather than decorative. The empty state reports
+    EXACTLY the legend counts a correct removal reports (0 and 0), so an
+    absence-only acceptance would be GREEN here — on an app that renders no map
+    at all. The node asserts both halves of that state so the claim is on the
+    page rather than in a comment.
+    """
+
+    async def _drive() -> "tuple[int, int, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            app.update_memory_map()  # no current_file → empty path
+            await pilot.pause()
+            grid = app.query_one("#map_grid")
+            return (
+                len(grid.query(".map-legend-row")),
+                len(grid.query(".map-band-legend")),
+                len(grid.query(".map-band-seg")),
+            )
+
+    rows, boxes, segs = asyncio.run(_drive())
+    assert (rows, boxes) == (0, 0), (
+        f"the no-file map body has no legend widgets; got {rows}/{boxes}"
+    )
+    assert segs == 0, (
+        f"and no band segments either — so AT-B77-06's absence limb alone "
+        f"would pass here, which is what its presence limb exists to stop; "
+        f"got {segs}"
+    )
+
+
+def test_tc_b77_15_legend_opened_from_the_map_and_dismissed(tmp_path: Path) -> None:
+    """Boundary: the legend screen opens over the map and dismisses back to a
+    map that still renders (TC-B77-15 / HLR-114).
+
+    Intent: HLR-114 leaves the map's legend reachability resting entirely on a
+    pushed modal, so the round trip is now part of the contract — an operator
+    who opens the key must get the map back. Driven through the SHIPPED surface
+    only: the ``k`` binding to open, the auto-focused Close button to dismiss
+    (C-16 — no ``.dismiss()`` proxy).
+
+    The band strip is re-counted AFTER the dismissal because the push and pop
+    drive a re-layout of the screen underneath; a map that came back empty
+    would satisfy every absence clause in this section.
+    """
+    from s19_app.tui.screens import LegendScreen
+
+    loaded = _two_band_loaded(tmp_path)
+
+    async def _drive() -> "tuple[int, bool, int, bool, int]":
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.current_file = loaded
+            app._apply_empty_state()
+            app.action_show_screen("map")
+            app.update_memory_map()
+            await pilot.pause()
+            segs_before = len(app.query_one("#map_grid").query(".map-band-seg"))
+
+            app.set_focus(None)
+            await pilot.press("k")
+            await pilot.pause()
+            opened = isinstance(app.screen, LegendScreen)
+            depth = len(app.screen_stack)
+
+            await pilot.press("enter")  # the Close button is focused on mount
+            await pilot.pause()
+            await pilot.pause()
+            closed = not isinstance(app.screen, LegendScreen)
+            grid = app.query_one("#map_grid")
+            return (
+                segs_before,
+                opened,
+                depth,
+                closed,
+                len(grid.query(".map-band-seg")),
+            )
+
+    segs_before, opened, depth, closed, segs_after = asyncio.run(_drive())
+
+    assert segs_before >= 1, "the map must render before we open the legend"
+    assert opened, f"'k' must open the legend from the map; stack depth {depth}"
+    assert closed, "the legend must dismiss back off the stack"
+    assert segs_after == segs_before, (
+        f"the map must still render its {segs_before} band segment(s) after the "
+        f"legend round trip; got {segs_after}"
+    )
 
 
 def test_at076_entropy_screen_and_action_removed() -> None:

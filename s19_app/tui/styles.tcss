@@ -833,21 +833,19 @@ DataTable > .datatable--odd-row {
     height: 1;
 }
 
-/* Per-region list + band legend: one full-width row each. */
+/* Per-region list: one full-width row each. The `.map-band-legend` container
+   and its `.map-legend-row` children were REMOVED at batch-77 (HLR-114): the
+   band key is a static four-row block, identical on every image, and it is
+   already rendered by the `k` legend screen (whose rows carry `.legend-row`
+   and are styled separately). Nothing selects those two classes any more, so
+   the rules are deleted rather than left as dead CSS. */
 .map-region-list {
     width: 100%;
     height: auto;
     margin-top: 1;
 }
 
-.map-band-legend {
-    width: 100%;
-    height: auto;
-    margin-top: 1;
-}
-
-.map-region-row,
-.map-legend-row {
+.map-region-row {
     width: 100%;
     height: 1;
 }

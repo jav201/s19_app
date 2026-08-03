@@ -609,7 +609,7 @@ def _retained_tick_addresses(
 
     Summary:
         Return the subset of ``addresses`` the ruler labels at the measured
-        width (batch-77, R-TUI-112 / LLR-112.2). The ceiling is
+        width (batch-77, R-TUI-072 as amended / LLR-112.2). The ceiling is
         ``(ruler_width + 1) // pitch`` — one label plus one separator column
         each, with no separator owed after the last label. Past the ceiling the
         ruler MUST drop labels, and the only question is whether it drops them
@@ -1313,7 +1313,7 @@ class RegionRow(Static):
         (LLR-045C.1 — no reveal-button, no two-step). Before batch-67 a single
         click did both. The row itself shows
         addr/size/band ONLY — no file-derived A2L text (security B3). A click on
-        padding/legend/empty area hits no ``RegionRow`` and is an inert no-op
+        padding/empty area hits no ``RegionRow`` and is an inert no-op
         (LLR-045C.3).
 
     Args:
@@ -1451,7 +1451,7 @@ class BandSegment(Static):
 
 
 class MapRuler(Horizontal):
-    """Address ruler beneath the entropy band strip (batch-77, R-TUI-112).
+    """Address ruler beneath the entropy band strip (batch-77, R-TUI-072).
 
     Summary:
         A single-row ruler labelling the addresses the bar above it actually
@@ -1944,8 +1944,8 @@ class MemoryMapPanel(Container):
 
     Summary:
         Renders the image as an ENTROPY band view (batch-45, R-TUI-060): a
-        proportional band bar + a per-region list (address · size · band) + a
-        band legend, merged by ``_merge_band_runs`` from the loader-computed
+        proportional band bar + a per-region list (address · size · band),
+        merged by ``_merge_band_runs`` from the loader-computed
         ``LoadedFile.entropy_windows`` handed to ``render_ranges``. This
         replaced the batch-27 ``sev-*`` validity cell grid (the ``MapCell`` +
         arrow-nav machinery was removed in batch-45 Inc-5; a single click on a
@@ -1968,7 +1968,7 @@ class MemoryMapPanel(Container):
           ``range_validity`` + ``entropy_windows`` from
           ``S19TuiApp.update_memory_map``, merges contiguous same-band windows
           via ``_merge_band_runs``, and mounts ``.map-band-seg`` segments (the
-          band bar) plus the ``.map-region-row`` region list, the band legend,
+          band bar) plus the ``.map-region-row`` region list
           and the docked ``.at-a-glance`` histogram/sparkline into
           ``#map_grid`` — no per-cell ``.map-cell`` widgets are mounted.
         - Clicking a region row drives ``on_region_row_activated`` → populates
@@ -2101,8 +2101,10 @@ class MemoryMapPanel(Container):
         Summary:
             Merge the loader-computed ``entropy_windows`` into contiguous
             same-band runs and render the Memory-Map body as a proportional
-            band bar + a per-region list + a band legend (batch-45, R-TUI-060 /
-            LLR-045A.2..045A.6). This REPLACES the batch-27 ``sev-*`` validity
+            band bar + a per-region list (batch-45, R-TUI-060 /
+            LLR-045A.2..045A.6; the band legend that used to sit below the list
+            moved to the ``k`` legend screen at batch-77, HLR-114). This
+            REPLACES the batch-27 ``sev-*`` validity
             cell grid — no ``MapCell`` is mounted. All input is consumed
             verbatim from the ``LoadedFile`` snapshot; no range is re-derived
             and no entropy/coverage/validation is computed here (LLR-045A.2 M4,
@@ -2149,10 +2151,10 @@ class MemoryMapPanel(Container):
               note, mount no segments/rows and blank the stats strip — never
               raise (LLR-045A.5 / LLR-041.9).
             - Otherwise merge windows via ``_merge_band_runs`` and mount the
-              band bar (``.map-band-bar``), region list (``.map-region-list``)
-              and legend (``.map-band-legend``) into ``#map_grid``; the header
-              shows a band summary. The summary is stored on ``rendered_text``.
-              These three are addressed by CLASS (not id) because they are
+              band bar (``.map-band-bar``) and region list
+              (``.map-region-list``) into ``#map_grid``; the header shows a
+              band summary. The summary is stored on ``rendered_text``.
+              Both are addressed by CLASS (not id) because they are
               re-mounted every render (an id would trip ``DuplicateIds``).
 
         Dependencies:
@@ -2371,7 +2373,7 @@ class MemoryMapPanel(Container):
         span_end: int,
         bar_width: int,
     ) -> List[Container]:
-        """Build the band row (bar + glance), address ruler, region list, legend.
+        """Build the band row (bar + glance), the address ruler, the region list.
 
         Summary:
             Assemble the entropy band-view sub-containers (batch-45, R-TUI-060 /
@@ -2380,9 +2382,8 @@ class MemoryMapPanel(Container):
             :class:`MapRuler` address ruler beneath the band row (one tick per
             run start plus the last mapped byte, batch-77 LLR-112.1 — this
             supersedes batch-47's five span percentiles, of which four named
-            unmapped addresses), then the ``.map-region-list`` and the
-            ``.map-band-legend``. Unmapped address gaps between runs render as
-            ``╱`` hatch segments (``.map-band-gap``, LLR-072.1). Each region row
+            unmapped addresses), then the ``.map-region-list``. Unmapped address
+            gaps between runs render as ``╱`` hatch segments (``.map-band-gap``, LLR-072.1). Each region row
             is enriched to ``{glyph} 0x{addr} {human_bytes} {microbar} {N} sym
             {band} ↵`` — a humanized size (LLR-072.2), a size micro-bar vs the
             largest region (LLR-073.1), the ``range_index`` symbol count
@@ -2402,6 +2403,16 @@ class MemoryMapPanel(Container):
             run widths are bounded in ``_allocate_band_widths`` so the strip
             cannot emit more columns than its container has.
 
+            batch-77 (HLR-114 / LLR-114.1) REMOVES the ``.map-band-legend``
+            block this method used to append. The four band rows were a static
+            key — identical on every image — occupying four of the map body's
+            scarce rows, and the same key is already rendered by the ``k``
+            legend screen from the same ``ENTROPY_BANDS`` source
+            (``screens.py::LegendScreen`` via ``build_band_key_rows``). The
+            legend is therefore not deleted, only moved off the always-on
+            surface; ``ENTROPY_BAND_LABELS`` stays imported because
+            ``_band_histogram_counts`` still orders the glance by it.
+
         Args:
             runs (Sequence[Tuple[str, int, int]]): The merged
                 ``(band_label, summed_bytes, start_addr)`` runs from
@@ -2416,8 +2427,8 @@ class MemoryMapPanel(Container):
                 re-apportions once the bar itself is measurable.
 
         Returns:
-            List[Container]: ``[band_row, ruler, region_list, legend]`` ready to
-            mount into ``#map_grid``.
+            List[Container]: ``[band_row, ruler, region_list]`` ready to mount
+            into ``#map_grid``.
 
         Data Flow:
             - Reads ``runs`` + ``windows`` + the span + ``self._a2l_tags``;
@@ -2425,7 +2436,7 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``band_style`` / ``ENTROPY_BAND_LABELS`` / ``safe_text`` /
+                - ``band_style`` / ``safe_text`` /
                   ``human_bytes`` / ``microbar`` / ``MapRuler`` /
                   ``_region_symbol_counts`` / ``_build_glance_widgets`` /
                   ``_allocate_band_widths``
@@ -2486,16 +2497,6 @@ class MemoryMapPanel(Container):
                 )
             )
 
-        legend_rows: List[Static] = []
-        for band in ENTROPY_BAND_LABELS:
-            token, glyph, meaning = band_style(band)
-            legend_rows.append(
-                Static(
-                    safe_text(f"{glyph} {band} — {meaning}"),
-                    classes=f"map-legend-row {token}",
-                )
-            )
-
         # Re-mounted every render after ``grid.remove_children()`` (whose removal
         # is deferred), so these carry CLASSES, not unique IDs — an ID would trip
         # ``DuplicateIds`` when the old container is still registered at re-render
@@ -2511,7 +2512,6 @@ class MemoryMapPanel(Container):
             # cannot disagree about which regions exist.
             MapRuler([start for _band, _run_bytes, start in runs], span_end - 1),
             Vertical(*region_rows, classes="map-region-list"),
-            Vertical(*legend_rows, classes="map-band-legend"),
         ]
 
     def _build_region_row(
@@ -2687,12 +2687,27 @@ class MemoryMapPanel(Container):
 
         Summary:
             Compose the seven-statistic strip — coverage %, bytes covered,
-            valid/invalid range counts, gap count, largest-gap bytes and total
+            valid/invalid range counts, gap count, largest gap and total
             issues — as labelled ``Text`` segments so the strip is readable and
             markup-safe (LLR-041.11 uniformity; the numbers are developer
             formatting, not file-derived, but the panel stays uniformly
             ``Text``-composed). Pure formatting of a :class:`CoverageStats` —
             no analysis (LLR-041.7).
+
+            batch-77 (R-TUI-041 as amended / HLR-113, LLR-113.1-.2) changes
+            three renderings and no arithmetic. Coverage takes **exactly four**
+            fractional digits: at ``.2f`` a sparsely-mapped image reads a flat
+            ``0.00%`` for every coverage below half a percent, which is the
+            common case here — ``case_02`` maps 93 bytes of a 2 GiB span. Four
+            digits discriminate ``0.0008%`` from ``0.0000%``; more digits buy
+            nothing an operator reads. The covered total becomes a DUAL
+            readout — mapped bytes against the image span, both through
+            ``human_bytes`` — because a bare ``1024`` answers "how much" without
+            "out of what", and the span is the number that makes it a coverage
+            figure at all. The largest gap is humanized for the same reason
+            ``67108408`` is not a size a reader can weigh, and its literal
+            ``bytes`` suffix is dropped because ``human_bytes`` already carries
+            the unit.
 
         Args:
             stats (CoverageStats): The metrics from ``coverage_stats``.
@@ -2706,17 +2721,20 @@ class MemoryMapPanel(Container):
 
         Dependencies:
             Uses:
-                - ``safe_text``
+                - ``safe_text`` / ``human_bytes``
             Used by:
                 - ``_render_stats`` / (test) TC-041.8
         """
         text = Text()
-        text.append(f"Coverage: {stats.coverage_pct:.2f}%  ")
-        text.append(f"Bytes covered: {stats.covered_bytes}\n")
+        text.append(f"Coverage: {stats.coverage_pct:.4f}%  ")
+        text.append(
+            f"Bytes covered: {human_bytes(stats.covered_bytes)} of "
+            f"{human_bytes(stats.image_span)}\n"
+        )
         text.append(f"Valid ranges: {stats.valid_count}  ")
         text.append(f"Invalid ranges: {stats.invalid_count}\n")
         text.append(f"Gaps: {stats.gap_count}  ")
-        text.append(f"Largest gap: {stats.largest_gap} bytes\n")
+        text.append(f"Largest gap: {human_bytes(stats.largest_gap)}\n")
         text.append(f"Total issues: {stats.total_issues}")
         return text
 
