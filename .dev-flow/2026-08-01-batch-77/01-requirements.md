@@ -454,7 +454,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
   numbers looked plausible and the `predicted` label was honest about *when* they were computed but silent
   about *which method* computed them. **As printed in revision 2 they would have flagged a CORRECT capture
   as wrong.** Every payload in this document now names its method.
-  **These are `predicted — execute at Inc-3`; the golden is captured from the shipped producer, never pasted from here.**
+  ✅ **EXECUTED AT Inc-3 — the label is DISCHARGED, not left standing.** The golden was captured from the shipped producer through the acceptance's own fixture and drive helpers, **never pasted from here**. Captured payload: **`[49,17]` @bar=66 and `[37,13]` @bar=50** — matching the mandated allocator and **two independent executions** of `_allocate_band_widths`. Stored at `tests/goldens/batch77/at-b77-02-gapless-band-strip.txt` (404 B · sha256 `b2805bf0…` · **0 CR bytes in the STORED BLOB**, verified via `git show :<path>`, not via the worktree file · `-text` in `.gitattributes`). *(A `predicted` label left on an executed result is the same defect as a discharge mark on a prediction — the document is false either way. Cleared at the increment that discharged it, not deferred to close.)*
 - **⚠️ C-42 encoding:** compare against the widget's runtime `render()` text — never snapshot-export bytes (`&#160;`), never a raw console `print` (my probe died on `UnicodeEncodeError` under cp1252). `-text` in `.gitattributes` if stored.
 
 **LLR-111.5 — C-40 register for HLR-111** — *(each row carries its true status; see §9)*
@@ -548,7 +548,7 @@ Revision 1's P-16…P-43 stand except where corrected below.
 | US | Outcome | AT | Pre-change verdict |
 |---|---|---|---|
 | US-77-1 | runs visible, ordered, bounded, folded | `AT-B77-01` | **RED both arms** (different limbs) — executed |
-| US-77-1 | gapless no-op | `AT-B77-02` | **PIN**, gate via post-Inc-3 mutation — `predicted` |
+| US-77-1 | gapless no-op | `AT-B77-02` | ✅ **GATE — DISCHARGED at Inc-3, executed.** allocator → plain `round()` reddens it at **both** size arms (`[49,17]→[50,16]` @66 · `[37,13]→[38,12]` @50), reddening exactly the 3 payload-asserting nodes while correctly leaving the fixture-shape and stored-encoding nodes GREEN (per-arm, CC-1). Tree restored, hash-proven `ecdca06b…`→`ecdca06b…` |
 | US-77-1 | nothing outside the bar | `AT-B77-03` | **RED @120×30** (4 outside) — executed |
 | US-77-1 | out of domain: no raise, region list complete | `AT-B77-18` 🆕 | **evaluable today** — `case_08` (801 runs) renders, 801 region rows, no raise, at both regimes |
 | US-77-2 | every label admissible + legible | `AT-072b` | **RED** — 4 of 5 unmapped — executed |

@@ -1,0 +1,4 @@
+80x24|66|band-constant map-band-seg|·················································
+80x24|66|band-high map-band-seg|▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+120x30|50|band-constant map-band-seg|·····································
+120x30|50|band-high map-band-seg|▓▓▓▓▓▓▓▓▓▓▓▓▓

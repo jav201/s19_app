@@ -25,6 +25,7 @@ from s19_app.range_index import (
 )
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.changes import emit_s19_from_mem_map
+from s19_app.tui.entropy_style import band_style
 from s19_app.tui.screens_directionb import (
     BandSegment,
     MemoryMapPanel,
@@ -815,3 +816,235 @@ def test_tc_b77_30_b77_width_one_range_yields_two_runs(tmp_path: Path) -> None:
     assert all(
         any(a <= rs < b for a, b in emitted) for rs, _ in loaded.ranges
     ), "the range-coverage clause must hold where range-equality would not"
+
+
+# ---------------------------------------------------------------------------
+# AT-B77-02 — gapless no-op golden at a fixed container width (LLR-111.4)
+# ---------------------------------------------------------------------------
+#: Golden home, mirroring ``tests/goldens/batch35/`` / ``batch71/`` / ``batch74/``.
+_B77_GOLDEN = (
+    Path(__file__).parent / "goldens" / "batch77" / "at-b77-02-gapless-band-strip.txt"
+)
+
+#: Mapped byte counts of the two runs the gapless fixture emits. UNEQUAL by
+#: requirement (LLR-111.4, R-2): through the shipped allocator an EQUAL 512/512
+#: fixture gives [33,33] @bar=66 and [25,25] @bar=50 — equal widths at each
+#: regime, invariant under any monotone re-weighting, so the golden would
+#: certify nothing. ``_two_band_loaded`` / ``_two_region_loaded`` are equal-run
+#: (256/256) fixtures and must not be borrowed for this.
+_B77_GAPLESS_RUN_BYTES = [768, 256]
+
+
+def _gapless_unequal_loaded(tmp_path: Path):
+    """A deterministic GAPLESS image whose two runs are UNEQUAL (768 / 256).
+
+    ONE contiguous range ``0x80000000..0x80000400``: 768 bytes of ``0xFF``
+    (constant/padding, 3 entropy windows) followed by a 256-byte permutation of
+    ``0..255`` (high/random, 1 window). One range means no address
+    discontinuity, so ``_merge_band_runs`` splits on the band change alone and
+    the producer emits two ``BandSegment``s with NO ``.map-band-gap`` between
+    them — the gapless precondition of LLR-111.4.
+
+    The shuffle seed does not reach the golden: a permutation of ``0..255`` has
+    H == 8.0 in every order, so the second run classifies ``high/random``
+    whatever the ordering, and the allocated widths are a function of the byte
+    COUNTS only.
+    """
+    base = 0x80000000
+    const_bytes, high_bytes = _B77_GAPLESS_RUN_BYTES
+    mem_map = {base + i: 0xFF for i in range(const_bytes)}
+    values = list(range(high_bytes))
+    random.Random(20260801).shuffle(values)
+    for i, value in enumerate(values):
+        mem_map[base + const_bytes + i] = value
+    ranges = [(base, base + const_bytes + high_bytes)]
+    path = tmp_path / "gapless_unequal.s19"
+    path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="ascii")
+    return build_loaded_s19(path, S19File(str(path)), a2l_path=None, a2l_data=None)
+
+
+def _golden_record(size, bar_width: int, classes: str, content: str) -> str:
+    """One golden line: ``COLSxROWS|BAR_WIDTH|CLASSES|CONTENT``.
+
+    ``|`` is the field separator because no class token and no band glyph
+    contains it. Classes are sorted so the record does not depend on Textual's
+    ``frozenset`` iteration order.
+    """
+    return f"{size[0]}x{size[1]}|{bar_width}|{classes}|{content}"
+
+
+def _golden_records_from_render(app: S19TuiApp, size, bar_width: int) -> list:
+    """Compose the golden records from the RENDERED ``.map-band-seg`` widgets.
+
+    Reads the widget's runtime ``render()`` text, never a snapshot export (whose
+    bytes carry ``&#160;``) and never a console ``print`` (which dies on
+    ``UnicodeEncodeError`` under cp1252) — C-42.
+    """
+    return [
+        _golden_record(
+            size, bar_width, " ".join(sorted(seg.classes)), str(seg.render())
+        )
+        for seg in app.query(".map-band-seg")
+    ]
+
+
+def _golden_records_from_allocator(loaded, size, bar_width: int) -> list:
+    """Compose the SAME records without rendering — the independent derivation.
+
+    Re-derives the payload a second way (batch-24 double-proof): the width
+    vector comes from calling ``_allocate_band_widths`` directly, and the class
+    string is rebuilt from ``band_style`` plus the producer's literal
+    ``map-band-seg`` token. Nothing here queries a widget, so agreement with the
+    captured golden proves the golden transcribes the producer's ARITHMETIC and
+    not just one render.
+
+    ``n_gaps`` is 0 by construction — the caller's fixture is a single
+    contiguous range, so no gap marker can be emitted — and
+    ``test_b77_gapless_fixture_is_unequal_and_gapless`` is what holds that true.
+    """
+    runs = _merge_band_runs(loaded.entropy_windows)
+    widths = _allocate_band_widths([n for _band, n, _start in runs], 0, bar_width)
+    records = []
+    for (band, _run_bytes, _start), width in zip(runs, widths):
+        token, glyph, _meaning = band_style(band)
+        classes = " ".join(sorted({"map-band-seg", token}))
+        records.append(_golden_record(size, bar_width, classes, glyph * width))
+    return records
+
+
+async def _drive_gapless(app: S19TuiApp, pilot, loaded, size):
+    """Render the gapless fixture and return ``(bar_width, records, n_gap_widgets)``."""
+    await _prime_map(app, pilot, loaded)
+    bar_width = await _settled_bar_width(app, pilot)
+    return (
+        bar_width,
+        _golden_records_from_render(app, size, bar_width),
+        len(list(app.query(".map-band-gap"))),
+    )
+
+
+@pytest.mark.parametrize("size", _SIZES)
+def test_b77_gapless_golden(tmp_path: Path, size) -> None:
+    """AT-B77-02: the rendered strip equals the stored golden, byte for byte.
+
+    LLR-111.4 — for a GAPLESS image at a fixed container width, the concatenated
+    ``.map-band-seg`` classes and content equal a golden captured from the
+    shipped producer. The mutation that discharges this node is substituting the
+    allocator with plain ``round(bar * b / total)``: executed, ``[49,17]`` ->
+    ``[50,16]`` @bar=66 and ``[37,13]`` -> ``[38,12]`` @bar=50, so the golden
+    reddens at both regimes.
+
+    The golden is captured AFTER the width basis settled (Inc-1). Captured
+    before it, a golden pins the RETIRED arithmetic — which is exactly how the
+    ``[45,15]`` payload (summing to the deleted ``_BAND_BAR_WIDTH`` of 60)
+    entered revision 1 of the requirements document.
+    """
+    loaded = _gapless_unequal_loaded(tmp_path)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            return await _drive_gapless(app, pilot, loaded, size)
+
+    bar_width, records, n_gap_widgets = asyncio.run(_drive())
+    prefix = f"{size[0]}x{size[1]}|"
+    expected = [
+        line
+        for line in _B77_GOLDEN.read_text(encoding="utf-8").splitlines()
+        if line.startswith(prefix)
+    ]
+
+    assert n_gap_widgets == 0, (
+        f"{size}: the fixture must render GAPLESS; got {n_gap_widgets} "
+        ".map-band-gap widget(s), which changes n_gaps and the allocation"
+    )
+    assert expected, f"{size}: the golden carries no record for this regime"
+    assert records == expected, (
+        f"{size} (settled bar {bar_width}): the rendered strip does not match "
+        f"{_B77_GOLDEN.name}\n  rendered: {records}\n  golden:   {expected}"
+    )
+
+
+def test_b77_gapless_fixture_is_unequal_and_gapless(tmp_path: Path) -> None:
+    """Guard the guard: the golden's fixture stays UNEQUAL and GAPLESS.
+
+    Both properties are preconditions of AT-B77-02 being worth anything. Equal
+    runs make the golden vacuous (R-2): the allocator gives them equal widths at
+    every regime, so the payload is invariant under any monotone re-weighting
+    and the ``round()`` mutation cannot redden it. A gap would make ``n_gaps``
+    non-zero, changing the allocation the golden pins and silently voiding the
+    "gapless no-op" the requirement names.
+    """
+    loaded = _gapless_unequal_loaded(tmp_path)
+
+    assert len(loaded.ranges) == 1, (
+        f"the fixture must be ONE contiguous range so no gap marker can be "
+        f"emitted; got {loaded.ranges}"
+    )
+    runs = _merge_band_runs(loaded.entropy_windows)
+    run_bytes = [n for _band, n, _start in runs]
+    assert run_bytes == _B77_GAPLESS_RUN_BYTES, (
+        f"the fixture must emit runs {_B77_GAPLESS_RUN_BYTES}; got {run_bytes}"
+    )
+    assert len(set(run_bytes)) == len(run_bytes), (
+        f"the runs must DIFFER in mapped bytes or the golden is vacuous; got "
+        f"{run_bytes}"
+    )
+
+
+def test_b77_gapless_golden_rederived_from_the_allocator(tmp_path: Path) -> None:
+    """Double-proof: the whole golden re-derives WITHOUT rendering anything.
+
+    A golden captured by its author alone proves transcription, not provenance
+    (batch-24). This composes every record a second, independent way — the width
+    vector straight out of ``_allocate_band_widths``, the class string rebuilt
+    from ``band_style`` — and byte-compares the assembled file against the
+    stored one.
+
+    The bar widths are read FROM the golden rather than hard-coded, so this node
+    checks the ARITHMETIC at a given container width; that those widths are the
+    real settled ones is what ``test_b77_gapless_golden`` proves. Neither node
+    is sufficient alone.
+    """
+    loaded = _gapless_unequal_loaded(tmp_path)
+    stored = _B77_GOLDEN.read_text(encoding="utf-8")
+
+    bar_widths = {}
+    for line in stored.splitlines():
+        regime, bar_width, _classes, _content = line.split("|", 3)
+        bar_widths.setdefault(regime, bar_width)
+
+    rederived = []
+    for size in _SIZES:
+        regime = f"{size[0]}x{size[1]}"
+        assert regime in bar_widths, f"the golden carries no {regime} record"
+        rederived.extend(
+            _golden_records_from_allocator(loaded, size, int(bar_widths[regime]))
+        )
+
+    assert "\n".join(rederived) + "\n" == stored, (
+        f"the allocator-composed payload does not reproduce {_B77_GOLDEN.name}"
+        f"\n  re-derived: {rederived}\n  stored:     {stored.splitlines()}"
+    )
+
+
+def test_b77_golden_is_stored_lf_only_and_covers_both_regimes() -> None:
+    """The STORED bytes — not the file handed to git — carry the golden.
+
+    ``.gitattributes`` marks this path ``-text`` so git stores it verbatim: a
+    byte-exact artifact must not be normalised in EITHER direction (``text
+    eol=lf`` is the wrong fix for evidence bytes — it rewrites the blob). That
+    only holds if the bytes on disk really are LF, which is what this asserts,
+    together with the golden covering both regimes rather than degrading to one.
+    """
+    raw = _B77_GOLDEN.read_bytes()
+
+    assert raw, "the golden must not be empty"
+    assert b"\r\n" not in raw, "the golden must be LF-only"
+    assert raw.endswith(b"\n"), "the golden must end with a newline"
+    regimes = [
+        line.split("|", 1)[0] for line in raw.decode("utf-8").splitlines()
+    ]
+    assert regimes.count("80x24") == 2 and regimes.count("120x30") == 2, (
+        f"the golden must carry both runs at both regimes; got {regimes}"
+    )
