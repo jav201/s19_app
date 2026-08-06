@@ -32,7 +32,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from textual.widgets import Input, Static
+from textual.widgets import Input, ListItem, ListView, Static
 
 from s19_app.core import S19File
 from s19_app.tui.app import S19TuiApp
@@ -42,6 +42,24 @@ from s19_app.tui.changes.io import emit_s19_from_mem_map
 def _write_s19(path: Path, mem_map: dict[int, int], ranges: list[tuple[int, int]]) -> None:
     """Write a well-formed S19 file re-readable by ``S19File`` (round-trip emitter)."""
     path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="utf-8")
+
+
+def _run_list_text(app) -> str:
+    """The ``#diff_range_list`` column as text, one row per line.
+
+    C-38 re-point (batch-78 Inc-2, HLR-122): the run list was a ``Static`` and
+    every reader here was ``str(app.query_one("#diff_range_list").render())``.
+    It is now a selectable ``ListView`` whose text lives in its ``ListItem``
+    children — a ``ListView`` renders nothing of its own, so the old form
+    silently returns an empty string and the ``in`` assertions below would go
+    from checking content to checking nothing. Both readers in this module go
+    through this helper.
+    """
+    listing = app.query_one("#diff_range_list", ListView)
+    return "\n".join(
+        " ".join(str(child.render()) for child in item.children)
+        for item in listing.query(ListItem)
+    )
 
 
 def _drive_compare(tmp_path: Path, path_a: Path, path_b: Path) -> tuple[bool, bool, bool, str, str]:
@@ -95,7 +113,7 @@ def _drive_compare(tmp_path: Path, path_a: Path, path_b: Path) -> tuple[bool, bo
                 status.has_class("sev-error"),
                 status.has_class("sev-ok"),
                 str(status.render()),
-                str(app.query_one("#diff_range_list").render()),
+                _run_list_text(app),
             )
 
     return asyncio.run(_run())
@@ -265,7 +283,7 @@ def _drive_compare_hex(tmp_path: Path, path_a: Path, path_b: Path) -> tuple[str,
             return (
                 str(app.query_one("#diff_hex_a", Static).render()),
                 str(app.query_one("#diff_hex_b", Static).render()),
-                str(app.query_one("#diff_range_list", Static).render()),
+                _run_list_text(app),
             )
 
     return asyncio.run(_run())

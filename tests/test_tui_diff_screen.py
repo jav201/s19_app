@@ -150,11 +150,101 @@ def _b78_diff_geometry(
     return asyncio.run(_drive())
 
 
-def _diff_result(runs_kinds, *, refused=False, diagnostics=None):
+# --------------------------------------------------------------------------
+# batch-78 Inc-2 — shared run-list harness for HLR-122
+# --------------------------------------------------------------------------
+
+#: The class the panel puts on a SELECTABLE run row, and the one it puts on the
+#: non-selectable header / notice rows. Read from the DOM, never re-derived
+#: from the panel's own run list, so a swap that renders context rows as
+#: selectable entries fails the reachability ATs instead of passing them.
+_B78_RUN_ENTRY = ".diff-run-entry"
+_B78_RUN_NOTE = ".diff-run-note"
+
+#: ``AT-B78-18``'s fixture size. Fixed INDEPENDENTLY of
+#: ``AbDiffPanel.DISPLAY_MAX_RUNS``: a cap predicate whose fixture and
+#: expectation both read the constant moves with it and certifies the constant
+#: rather than the capping (spec F-6 / LLR-122.3). The constant appears in this
+#: module only inside a guard, and that guard is evaluated AFTER the capture so
+#: a mutation reddens an assertion instead of raising.
+_B78_OVER_CAP_RUNS = 200
+
+
+def _b78_run_list(app):
+    """The ``#diff_range_list`` widget, resolved as the ``ListView`` it now is."""
+    from textual.widgets import ListView
+
+    return app.query_one("#diff_range_list", ListView)
+
+
+def _b78_item_text(item) -> str:
+    """The rendered text of one run-list row (its child ``Label``s)."""
+    return " ".join(str(child.render()) for child in item.children)
+
+
+def _b78_run_list_text(app) -> str:
+    """The whole run-list column as text, one row per line.
+
+    C-38 re-point: ``#diff_range_list`` was a ``Static``, so every consumer read
+    ``str(widget.render())``. A ``ListView`` renders nothing of its own — its
+    text lives in its ``ListItem`` children — so a consumer left on the old form
+    silently observes an empty string and keeps passing on ``in`` assertions
+    only by accident. Every reader in this module and in
+    ``test_tui_diff_compare_realpath.py`` goes through this form instead.
+    """
+    from textual.widgets import ListItem
+
+    return "\n".join(_b78_item_text(item) for item in _b78_run_list(app).query(ListItem))
+
+
+def _b78_run_index(item) -> int | None:
+    """The run index an entry stands for, taken from its shipped DOM id."""
+    if item is None or item.id is None or not item.id.startswith("diff_run_"):
+        return None
+    return int(item.id[len("diff_run_") :])
+
+
+def _b78_drive_compare(tmp_path: Path, size, result, *, after):
+    """Drive a real Compare through the SHIPPED button, then run ``after``.
+
+    ``compare_images`` is substituted at the app's import site so the run set is
+    the test's own fixture, but everything downstream — the button press, the
+    message, ``render_comparison``, the widget tree — is the shipped path. The
+    ATs never call ``_render_run_list`` or ``_render_run_windows``.
+
+    ``after`` is ``async (app, pilot) -> T`` and its return value is returned.
+    """
+    import s19_app.tui.app as app_mod
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            app.query_one("#diff_compare_button").press()
+            await pilot.pause()
+            await pilot.pause()
+            return await after(app, pilot)
+
+    monkey = pytest.MonkeyPatch()
+    monkey.setattr(app_mod, "compare_images", lambda *a, **k: result)
+    try:
+        return asyncio.run(_drive())
+    finally:
+        monkey.undo()
+
+
+def _diff_result(runs_kinds, *, refused=False, diagnostics=None, summary="none"):
     """Build a fake ComparisonResult for the view-layer tests.
 
     runs_kinds: list of (start, end, kind). The maps are synthetic and only
     used for the panel's hex windows (display-only).
+
+    ``summary`` is the per-image artifact-usage string the panel renders into
+    the run-list header. It is a parameter (batch-78 Inc-2) so ``TC-B78-48``
+    can drive a hostile value through the SHIPPED path rather than calling
+    ``_render_run_list`` behind the app's back.
     """
     from s19_app.compare import (
         ComparisonResult,
@@ -172,7 +262,7 @@ def _diff_result(runs_kinds, *, refused=False, diagnostics=None):
     usage = ArtifactUsage(
         a2l=ArtifactNote(status="absent"),
         mac=ArtifactNote(status="absent"),
-        summary="none",
+        summary=summary,
     )
     return ComparisonResult(
         image_a=ImageRef(label="A.s19", path=None, source_kind="external"),
@@ -210,7 +300,8 @@ def test_tc021_compare_routes_through_service(tmp_path: Path) -> None:
             await pilot.pause()
             app.query_one("#diff_compare_button").press()
             await pilot.pause()
-            range_text = str(app.query_one("#diff_range_list").render())
+            await pilot.pause()
+            range_text = _b78_run_list_text(app)
             return len(calls), range_text
 
     monkey = pytest.MonkeyPatch()
@@ -250,7 +341,7 @@ def test_tc022_render_shows_runs_and_hex_windows(tmp_path: Path) -> None:
             )
             await pilot.pause()
             return (
-                str(app.query_one("#diff_range_list").render()),
+                _b78_run_list_text(app),
                 str(app.query_one("#diff_hex_a").render()),
                 str(app.query_one("#diff_hex_b").render()),
             )
@@ -403,37 +494,72 @@ def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
 
 
 def test_tc029_display_caps_bound_on_screen_runs(tmp_path: Path) -> None:
-    """The on-screen run list is bounded by the relocated display caps (LLR-005.2/G-9).
+    """The panel's STORED run list is bounded while the header stays complete
+    (LLR-005.2 / G-9).
 
-    Intent: an over-cap comparison shows a bounded display (<= DISPLAY_MAX_RUNS)
-    while the persisted report files (I3) stay complete. The range list must
-    show the COMPLETE count and a "showing N of M" notice.
+    Intent: an over-cap comparison must leave the panel holding strictly fewer
+    runs than the comparison produced, while the header still names the
+    complete count — the display is bounded, the report is not.
+
+    REWRITTEN at batch-78 Inc-2 (spec Q-M2 / LLR-122.3), and the rewrite is the
+    point of the node. The pre-batch body read ``DISPLAY_MAX_RUNS`` on BOTH
+    sides — ``over = DISPLAY_MAX_RUNS + 50`` for the fixture and
+    ``n_displayed <= DISPLAY_MAX_RUNS`` for the expectation — so the fixture and
+    the expectation moved together and the node stayed GREEN under
+    ``DISPLAY_MAX_RUNS 128 -> 100000``::
+
+        PRE  cap=128    -> (assertion True, over=178,    stored=128)
+        MUT  cap=100000 -> (assertion True, over=100050, stored=100000)  INERT
+        POST cap=128    -> (assertion True, over=178,    stored=128)
+
+    A cap predicate that takes its expected value from the class under test
+    certifies the constant, not the capping. The fixture is now fixed at a
+    literal independent of the constant and the expectation is the
+    constant-free ``stored < total``, which the same mutation reddens.
+
+    Subject split against ``AT-B78-18``, which lands in the same increment on
+    the same clause: this node observes the panel's MODEL (``panel._runs`` and
+    the header's complete count); ``AT-B78-18`` observes the VIEW (the count of
+    selectable rows actually rendered, and the notice's own two numbers). An
+    implementation that caps its model but paints every run passes this and
+    fails that.
     """
     from s19_app.tui.screens_directionb import AbDiffPanel
 
-    over = AbDiffPanel.DISPLAY_MAX_RUNS + 50
-    runs = [(i * 16, i * 16 + 4, "changed") for i in range(over)]
+    total = _B78_OVER_CAP_RUNS
+    result = _diff_result([(i * 16, i * 16 + 4, "changed") for i in range(total)])
 
-    async def _drive() -> tuple[int, str]:
-        app = S19TuiApp(base_dir=tmp_path)
-        async with app.run_test(size=(120, 30)) as pilot:
-            await pilot.pause()
-            app.action_show_screen("diff")
-            await pilot.pause()
-            panel = app.query_one("#ab_diff_panel", AbDiffPanel)
-            panel.render_comparison(runs, {}, {}, "none", "none")
-            await pilot.pause()
-            return len(panel._runs), str(app.query_one("#diff_range_list").render())
+    async def _after(app, pilot):
+        panel = app.query_one("#ab_diff_panel", AbDiffPanel)
+        return len(panel._runs), _b78_run_list_text(app)
 
-    n_displayed, range_text = asyncio.run(_drive())
-    assert n_displayed <= AbDiffPanel.DISPLAY_MAX_RUNS, (
-        "the on-screen run list must be bounded by DISPLAY_MAX_RUNS"
+    n_stored, range_text = _b78_drive_compare(
+        tmp_path, (120, 30), result, after=_after
     )
-    assert f"Runs: {over}" in range_text, (
+
+    # ORDER IS NORMATIVE (spec Q-m2, sharpened here by execution). The
+    # substantive clauses come FIRST so the `DISPLAY_MAX_RUNS 128 -> 100000`
+    # mutation reddens THEM. Executed with the guard placed first — as spec
+    # Q-m2's wording ("evaluated after the capture") literally permits — this
+    # node went red on `fixture (200) must exceed the display cap (100000)`,
+    # which certifies only that the reader noticed the constant move. Failing
+    # after the capture is not enough; the failure has to be the CLAUSE.
+    assert n_stored < total, (
+        f"the panel must store strictly fewer runs than the comparison "
+        f"produced; stored {n_stored} of {total}"
+    )
+    assert f"Runs: {total}" in range_text, (
         "the header must report the COMPLETE run count (the file stays complete)"
     )
     assert "showing" in range_text and "of" in range_text, (
         "the panel must note that the display is capped while the report is full"
+    )
+    # C-39 applies to the GUARD, never to the expectation: nothing above reads
+    # the constant. This trailing guard exists so a fixture that no longer
+    # exceeds the cap is a loud, named failure rather than a quiet one.
+    assert total > AbDiffPanel.DISPLAY_MAX_RUNS, (
+        f"this node's fixture ({total} runs) must exceed the display cap "
+        f"({AbDiffPanel.DISPLAY_MAX_RUNS}) or it tests nothing"
     )
 
 
@@ -753,3 +879,612 @@ def test_tc_b78_37_selects_survive_compaction_no_project(tmp_path: Path) -> None
             f"truncated to its {width}-column content width) but the screen at "
             f"that span reads {painted!r}"
         )
+
+
+# --------------------------------------------------------------------------
+# batch-78 Inc-2 - HLR-122: every displayed run is reachable, and visibly so
+#
+# Node map (spec Sec.3 HLR-122 / Sec.5.3 / Sec.7 Inc-2):
+#   AT-B78-15  test_at_b78_15_every_run_reachable_by_keyboard          GATE
+#   AT-B78-16  test_at_b78_16_every_run_reachable_by_mouse             GATE  (+TC-B78-20)
+#   AT-B78-17  test_at_b78_17_exactly_one_entry_is_visibly_selected    GATE
+#   AT-B78-18  test_at_b78_18_display_caps_and_notice_survive          PIN
+#   AT-B78-19  test_at_b78_19_app_keys_survive_run_list_focus          see docstring
+#   TC-B78-17  test_tc_b78_17_empty_comparison_has_no_selectable_entry
+#   TC-B78-18  test_tc_b78_18_exactly_cap_runs_shows_no_notice
+#   TC-B78-19  test_tc_b78_19_single_run_is_selectable
+#   TC-B78-21  test_tc_b78_21_zero_length_run_is_selectable
+#   TC-B78-22  test_tc_b78_22_keys_before_any_comparison_do_not_crash
+#   TC-B78-47  test_tc_b78_47_arrows_at_the_ends_do_not_wrap
+#   TC-B78-48  test_tc_b78_48_hostile_artifact_summary_renders_verbatim
+#
+# All of these run at 132x44. That is not a convenience: Inc-1 measured the
+# diff result area at a CONTENT height of 0 at both 80x24 and 120x30 (the
+# command-bar rows are still there until Inc-10), so at those sizes no run row
+# is painted at all and a mouse or scroll acceptance would be unfalsifiable.
+# 132x44 is the size at which HLR-122's observables exist today.
+# --------------------------------------------------------------------------
+
+_B78_AT_SIZE = (132, 44)
+
+
+def _b78_focus_run_list(app, listing) -> None:
+    """Put focus on the run list and ASSERT it took (spec LLR-122.2 / rule 5).
+
+    The blur discipline runs in its mirror-image form: blur first and assert the
+    blur, then focus the list and assert the focus. Both halves are load-bearing
+    - executed on the pre-change tree, ``set_focus`` on the ``Static`` run list
+    silently did NOT take (focus landed on ``RailItem(id='rail_item_workspace')``)
+    and every key pressed afterwards was being pressed at the rail. A focus
+    acceptance with no asserted precondition is green for a reason that has
+    nothing to do with its subject.
+    """
+    app.set_focus(None)
+    assert app.focused is None, (
+        f"blur precondition: focus must be released before the list is focused, "
+        f"but it is on {app.focused!r}"
+    )
+    app.set_focus(listing)
+    assert app.focused is listing, (
+        f"focus precondition: the run list must be focusable and must actually "
+        f"hold focus; focus is on {app.focused!r}"
+    )
+
+
+def test_at_b78_15_every_run_reachable_by_keyboard(tmp_path: Path) -> None:
+    """AT-B78-15 (GATE) - the arrow keys alone reach EVERY displayed run.
+
+    Intent: HLR-122 - "the set of run indices reachable by keyboard alone shall
+    equal the full set of displayed run indices". Pre-change the run list was a
+    ``Static`` (``can_focus = False``, 0 selectable entries), so no run was
+    reachable by any means; ``_render_run_windows`` was called once with the
+    literal ``0``.
+
+    ``R`` is taken from the FIXTURE's own run list (C-31), never from the panel,
+    so an implementation that drops runs on the floor shrinks the reachable set
+    without shrinking the expectation.
+
+    Real ``pilot.press`` only - no ``.focus()`` in the assertion path, no call to
+    ``_render_run_windows``. The walk starts by pressing ``up`` past the top so
+    the first index is REACHED by a key press rather than inherited from the
+    initial selection.
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed" if i % 2 else "only_a") for i in range(6)]
+    expected = set(range(len(runs)))
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        _b78_focus_run_list(app, listing)
+        for _ in range(len(runs) + 4):
+            await pilot.press("up")
+        reached = [_b78_run_index(listing.highlighted_child)]
+        for _ in range(len(runs) + 3):
+            await pilot.press("down")
+            reached.append(_b78_run_index(listing.highlighted_child))
+        note_ids = {item.id for item in listing.query(_B78_RUN_NOTE)}
+        return reached, len(list(listing.query(_B78_RUN_ENTRY))), note_ids
+
+    reached, n_entries, note_ids = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    # C-40 presence co-assertion: with no rows at all the reachable set would be
+    # empty and every other clause here vacuous. Assert the rows exist first.
+    assert n_entries == len(runs), (
+        f"the list must present one selectable entry per displayed run; "
+        f"{n_entries} entries for {len(runs)} runs"
+    )
+    assert None not in reached, (
+        f"every keyboard stop must land on a run entry, never on a header or "
+        f"notice row; walk was {reached}"
+    )
+    assert set(reached) == expected, (
+        f"the keyboard-reachable run set must equal the displayed run set; "
+        f"reached {sorted(set(reached))}, displayed {sorted(expected)}"
+    )
+    assert note_ids == {None}, (
+        "the header / notice rows must not masquerade as run entries (they "
+        "carry no run id)"
+    )
+
+
+def test_at_b78_16_every_run_reachable_by_mouse(tmp_path: Path) -> None:
+    """AT-B78-16 (GATE) + TC-B78-20 - the mouse alone reaches every run,
+    including rows past the viewport.
+
+    Intent: HLR-122 - "the set of run indices reachable by mouse alone shall
+    equal the full set of displayed run indices", and its boundary case,
+    "entries beyond the viewport shall be reachable by scrolling". Pre-change
+    there were 0 ``ListView`` descendants under ``#diff_columns`` and nothing to
+    click.
+
+    A distinct observable from ``AT-B78-15``: real ``pilot.click`` on the row's
+    own region, with focus explicitly released first so a keyboard path cannot
+    stand in for the mouse path.
+
+    TC-B78-20 rides in this node rather than duplicating the whole 20-run drive:
+    the off-viewport clause is asserted, not assumed - the test records how many
+    targets lay OUTSIDE the list's content region before scrolling and requires
+    that count to be non-zero, so a fixture that happens to fit on screen fails
+    loudly instead of quietly testing nothing.
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(20)]
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        app.set_focus(None)
+        assert app.focused is None, "the mouse path must not start from a focused list"
+        reached, off_viewport = [], 0
+        for item in list(listing.query(_B78_RUN_ENTRY)):
+            if not listing.content_region.contains_region(item.region):
+                off_viewport += 1
+            item.scroll_visible(animate=False)
+            await pilot.pause()
+            await pilot.pause()
+            await pilot.click(item)
+            await pilot.pause()
+            reached.append(_b78_run_index(listing.highlighted_child))
+        return reached, off_viewport, listing.content_region.height
+
+    reached, off_viewport, viewport_rows = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    assert len(reached) == len(runs), (
+        f"one clickable entry per displayed run; clicked {len(reached)} of {len(runs)}"
+    )
+    assert set(reached) == set(range(len(runs))), (
+        f"the mouse-reachable run set must equal the displayed run set; "
+        f"reached {sorted(set(reached))}"
+    )
+    assert off_viewport > 0, (
+        f"TC-B78-20 needs at least one row outside the {viewport_rows}-row "
+        f"viewport before scrolling, otherwise the scroll clause is untested; "
+        f"all {len(runs)} runs fit"
+    )
+
+
+def test_at_b78_17_exactly_one_entry_is_visibly_selected(tmp_path: Path) -> None:
+    """AT-B78-17 (GATE) - exactly one entry carries the selection, and it is
+    VISIBLY distinguished.
+
+    Intent: HLR-122 - "the entry holding the selection shall be visually
+    distinguished from every other entry". A selection index that changes
+    nothing the operator can see satisfies AT-B78-15/16 completely.
+
+    The observation is the RESOLVED ``(background, color, text_style)`` triple
+    (C-37: read the layer that holds the fact - colour intent is not in the
+    rendered text), read while the list holds focus, which is the state the
+    operator is in when they are walking it.
+
+    The >= 2-row guard is asserted rather than assumed: with a single row
+    "differs from every unselected entry" is vacuously true.
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(5)]
+
+    def _triple(widget):
+        return (
+            str(widget.styles.background),
+            str(widget.styles.color),
+            str(widget.styles.text_style),
+        )
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        _b78_focus_run_list(app, listing)
+        await pilot.press("down")
+        entries = list(listing.query(_B78_RUN_ENTRY))
+        marked = [item for item in entries if item.has_class("-highlight")]
+        selected = listing.highlighted_child
+        return (
+            len(entries),
+            [_b78_run_index(m) for m in marked],
+            _b78_run_index(selected),
+            _triple(selected),
+            [_triple(item) for item in entries if item is not selected],
+        )
+
+    n_entries, marked, selected, sel_triple, other_triples = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    assert n_entries >= 2, (
+        f"the style clause needs at least two rows to discriminate; got {n_entries}"
+    )
+    assert marked == [selected], (
+        f"exactly one entry must carry the selection marker; marked {marked}, "
+        f"selection index {selected}"
+    )
+    assert all(other != sel_triple for other in other_triples), (
+        f"the selected entry must be visually distinguished: its resolved "
+        f"(background, color, text_style) is {sel_triple}, which is not "
+        f"distinct from every unselected entry's {sorted(set(other_triples))}"
+    )
+
+
+def test_at_b78_18_display_caps_and_notice_survive(tmp_path: Path) -> None:
+    """AT-B78-18 (PIN, green today) - the widget swap keeps the G-9 display
+    caps and the "showing N of M" notice.
+
+    Intent: HLR-122's preservation clause. The swap from a text ``Static`` to a
+    selectable list is exactly where a caps branch gets dropped, because the
+    capping and the notice live in the same method the swap rewrites.
+
+    Falsifiability, spec F-6 / LLR-122.3: the fixture size is fixed at a literal
+    INDEPENDENT of ``DISPLAY_MAX_RUNS``, the guard quoting the constant runs
+    AFTER the capture, and NOTHING in the expectation reads the constant. The
+    predicate is "the painted rows are fewer than the runs, and the notice's own
+    two numbers are the painted count and the total". A cap AT that expects the
+    constant certifies the constant, not the capping.
+
+    Subject split against the rewritten ``test_tc029`` (same clause, same file,
+    same increment): that node observes ``panel._runs`` and the header; this one
+    observes the RENDERED rows and the notice text.
+    """
+    import re
+
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    total = _B78_OVER_CAP_RUNS
+    result = _diff_result([(i * 16, i * 16 + 4, "changed") for i in range(total)])
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        return len(list(listing.query(_B78_RUN_ENTRY))), _b78_run_list_text(app)
+
+    painted, range_text = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, result, after=_after
+    )
+
+    # ORDER IS NORMATIVE — see the same note on `test_tc029`. The guard goes
+    # LAST so the cap mutation reddens the capping clause, not the guard.
+    assert 0 < painted < total, (
+        f"the panel must paint some but not all runs; painted {painted} of {total}"
+    )
+    notice = re.search(r"showing (\d+) of (\d+) runs", range_text)
+    assert notice is not None, (
+        f"the capped display must carry its 'showing N of M runs' notice; "
+        f"the column's first rows read {range_text.splitlines()[:4]!r} and its "
+        f"last {range_text.splitlines()[-2:]!r}"
+    )
+    assert (int(notice.group(1)), int(notice.group(2))) == (painted, total), (
+        f"the notice must name the painted count and the complete count; it "
+        f"says {notice.group(0)!r} while {painted} of {total} were painted"
+    )
+    assert total > AbDiffPanel.DISPLAY_MAX_RUNS, (
+        f"this node's fixture ({total} runs) must exceed the display cap "
+        f"({AbDiffPanel.DISPLAY_MAX_RUNS}) or it tests nothing"
+    )
+
+
+def test_at_b78_19_app_keys_survive_run_list_focus(tmp_path: Path) -> None:
+    """AT-B78-19 - with the run list focused, the application keys still fire,
+    and the list binds none of them.
+
+    Intent: HLR-122's final clause and ruling R-2/D-4. ``j`` and ``p`` are frozen
+    in ``_PRE_BATCH_BINDINGS`` under live ``TC-011`` and ``k`` is a ``show=True``
+    Footer chip, so the navigation bindings go on the WIDGET, never on the App.
+    This node is what makes that a checked property instead of an intention.
+
+    A-4 / P-47 (the spec's honest UNDECIDABLE, owned by this increment): whether
+    stock ``ListView`` bindings interact correctly with the four ``priority=True``
+    App bindings is settled here BY EXECUTION - ``ctrl+k`` is pressed with the
+    list focused and the palette must still open, and in the same run the list's
+    own ``down`` must still move the selection. Both directions are asserted, so
+    "nothing is shadowed" cannot be satisfied by a list that is simply inert.
+
+    Precondition (spec LLR-122.2, restored at revision 2): ``app.focused is``
+    the run list is ASSERTED before any key is pressed. On the pre-change tree
+    that precondition was silently FALSE - ``set_focus`` on the ``Static``
+    did not take, focus landed on ``RailItem(id='rail_item_workspace')`` and
+    ``k`` opened the Legend from there. The predicate was green without ever
+    reaching its subject.
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(4)]
+    forbidden = {"j", "k", "p", "o"}
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        _b78_focus_run_list(app, listing)
+
+        # The list's own binding surface, read from the LIVE widget's resolved
+        # binding map rather than from a class attribute: `BINDINGS` is merged
+        # at class creation into `_merged_bindings` and copied per instance, so
+        # a class-attribute read would miss everything inherited.
+        bound = set(listing._bindings.key_to_bindings)
+
+        # (1) the list's own navigation still works with focus on it
+        before = _b78_run_index(listing.highlighted_child)
+        await pilot.press("down")
+        after_down = _b78_run_index(listing.highlighted_child)
+
+        # (2) an App `show=True` chip key
+        await pilot.press("k")
+        await pilot.pause()
+        legend_open = type(app.screen).__name__ == "LegendScreen"
+        if legend_open:
+            app.pop_screen()
+            await pilot.pause()
+        _b78_focus_run_list(app, listing)
+
+        # (3) a frozen `show=False` App key - `j` -> `action_dump_a2l_json`,
+        # which with no A2L loaded appends exactly one log line (P-40b:
+        # `set_status` writes the log tail, NOT `#status_text`).
+        n_before = len(app.log_lines)
+        await pilot.press("j")
+        await pilot.pause()
+        log_delta = len(app.log_lines) - n_before
+        log_tail = app.log_lines[-1] if app.log_lines else ""
+
+        # (4) a `priority=True` App binding (A-4 / P-47)
+        _b78_focus_run_list(app, listing)
+        await pilot.press("ctrl+k")
+        await pilot.pause()
+        palette_open = app.query_one("#command_bar").palette_is_open
+
+        return bound, before, after_down, legend_open, log_delta, log_tail, palette_open
+
+    (
+        bound,
+        before,
+        after_down,
+        legend_open,
+        log_delta,
+        log_tail,
+        palette_open,
+    ) = _b78_drive_compare(tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after)
+
+    # ORDER IS NORMATIVE. The BEHAVIOURAL clauses go first so this node's
+    # declared mutation — binding `k` on the run list — reddens "the Legend no
+    # longer opens", which is the requirement. Executed with the structural
+    # census first, the mutation reddened only the census, leaving the Legend
+    # clause unproven: a node can fail for the right reason and still leave its
+    # load-bearing clause inert. Same defect as the guard ordering on
+    # `test_tc029`, one node over.
+    assert legend_open, (
+        "'k' must still open the Legend while the run list holds focus"
+    )
+    assert log_delta == 1 and "A2L" in log_tail, (
+        f"'j' must still reach its App action while the run list holds focus; "
+        f"the log grew by {log_delta}, tail was {log_tail!r}"
+    )
+    assert palette_open, (
+        "the priority=True 'ctrl+k' binding must still open the palette while "
+        "the run list holds focus (A-4 / P-47)"
+    )
+    # C-40 presence co-assertion: "the App keys still work" is satisfied by a
+    # list that swallows nothing because it does nothing. The list's own
+    # navigation must move in the same run.
+    assert after_down == before + 1, (
+        f"'down' must move the list's own selection while it holds focus; "
+        f"{before} -> {after_down}"
+    )
+    # The structural census, last: it is `inspection` evidence for LLR-122.2's
+    # "shall not include j/k/p/o", not the behaviour the requirement is about.
+    assert bound & forbidden == set(), (
+        f"the run list must bind no application-level key; it binds "
+        f"{sorted(bound & forbidden)} out of {sorted(bound)}"
+    )
+    assert {"up", "down"} <= bound, (
+        f"the run list must own its own navigation keys; it binds {sorted(bound)}"
+    )
+
+
+def test_tc_b78_17_empty_comparison_has_no_selectable_entry(tmp_path: Path) -> None:
+    """TC-B78-17 - a comparison with 0 runs renders context and nothing to select.
+
+    Intent: the empty boundary must degrade to "Runs: 0" plus the no-differing-
+    runs windows, with no phantom selectable row and no crash.
+    """
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        return (
+            len(list(listing.query(_B78_RUN_ENTRY))),
+            listing.highlighted_child,
+            _b78_run_list_text(app),
+            str(app.query_one("#diff_hex_a").render()),
+        )
+
+    n_entries, highlighted, range_text, hex_a = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result([]), after=_after
+    )
+
+    assert n_entries == 0, f"0 runs must yield 0 selectable entries, got {n_entries}"
+    assert highlighted is None, "0 runs must leave nothing selected"
+    assert "Runs: 0" in range_text, f"the header must still render; got {range_text!r}"
+    assert "no differing runs" in hex_a
+
+
+def test_tc_b78_18_exactly_cap_runs_shows_no_notice(tmp_path: Path) -> None:
+    """TC-B78-18 - exactly ``DISPLAY_MAX_RUNS`` runs paint in full, with NO notice.
+
+    Intent: the off-by-one boundary of the cap. The notice branch is
+    ``len(self._runs) < total_runs``; a ``<=`` there would emit a "showing 128
+    of 128" notice, which is both wrong and alarming.
+
+    This is the one node where quoting the constant IS the right form (C-39):
+    the subject is the cap's exact boundary, so the fixture must be exactly the
+    cap whatever its value. The expectation - "no notice, and every run painted"
+    - still reads nothing from the constant.
+    """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    total = AbDiffPanel.DISPLAY_MAX_RUNS
+    result = _diff_result([(i * 16, i * 16 + 4, "changed") for i in range(total)])
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        return len(list(listing.query(_B78_RUN_ENTRY))), _b78_run_list_text(app)
+
+    painted, range_text = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, result, after=_after
+    )
+
+    assert painted == total, (
+        f"at exactly the cap every run must paint; painted {painted} of {total}"
+    )
+    assert "showing" not in range_text, (
+        f"no elision means no notice; the column reads {range_text!r}"
+    )
+
+
+def test_tc_b78_19_single_run_is_selectable(tmp_path: Path) -> None:
+    """TC-B78-19 - a one-run comparison is still selectable.
+
+    Intent: the lower boundary. AT-B78-17's style clause is explicitly SKIPPED
+    here (it needs >= 2 rows to discriminate); what this node owns is that one
+    run still produces one reachable, highlightable entry.
+    """
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        _b78_focus_run_list(app, listing)
+        await pilot.press("down")
+        await pilot.press("up")
+        entries = list(listing.query(_B78_RUN_ENTRY))
+        return (
+            len(entries),
+            _b78_run_index(listing.highlighted_child),
+            [item.has_class("-highlight") for item in entries],
+        )
+
+    n_entries, selected, marks = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result([(0x10, 0x14, "changed")]), after=_after
+    )
+
+    assert n_entries == 1
+    assert selected == 0, f"the only run must be the selection, got {selected}"
+    assert marks == [True], "the only run must carry the selection marker"
+
+
+def test_tc_b78_21_zero_length_run_is_selectable(tmp_path: Path) -> None:
+    """TC-B78-21 - a run with ``end == start`` renders and is selectable.
+
+    Intent: the degenerate run. ``_apply_display_caps`` accumulates
+    ``end - start`` and the entry label formats both endpoints; a zero-length
+    run must not vanish from the list.
+    """
+    runs = [(0x20, 0x20, "changed"), (0x40, 0x44, "only_b")]
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        _b78_focus_run_list(app, listing)
+        reached = [_b78_run_index(listing.highlighted_child)]
+        await pilot.press("down")
+        reached.append(_b78_run_index(listing.highlighted_child))
+        return len(list(listing.query(_B78_RUN_ENTRY))), reached, _b78_run_list_text(app)
+
+    n_entries, reached, range_text = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    assert n_entries == 2, f"both runs must render, got {n_entries}"
+    assert set(reached) == {0, 1}, f"both must be reachable, reached {reached}"
+    assert "0x00000020-0x00000020" in range_text, (
+        f"the zero-length run must render both endpoints; got {range_text!r}"
+    )
+
+
+def test_tc_b78_22_keys_before_any_comparison_do_not_crash(tmp_path: Path) -> None:
+    """TC-B78-22 - arrow keys with NO comparison yet: no exception, no phantom
+    selection.
+
+    Intent: the negative case. The list exists from ``compose``, so it can be
+    focused and driven before ``render_comparison`` has ever run. It must have
+    nothing to select rather than an index into an empty model.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=_B78_AT_SIZE) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            listing = _b78_run_list(app)
+            _b78_focus_run_list(app, listing)
+            for key in ("down", "down", "up", "enter"):
+                await pilot.press(key)
+            await pilot.pause()
+            return (
+                len(list(listing.query(_B78_RUN_ENTRY))),
+                listing.highlighted_child,
+                listing.index,
+            )
+
+    n_entries, highlighted, index = asyncio.run(_drive())
+
+    assert n_entries == 0, "no comparison means no run entries"
+    assert highlighted is None, f"no comparison means no selection, got {highlighted!r}"
+    assert index is None, f"no comparison means no selection index, got {index!r}"
+
+
+def test_tc_b78_47_arrows_at_the_ends_do_not_wrap(tmp_path: Path) -> None:
+    """TC-B78-47 - ``up`` on the first entry and ``down`` on the last are
+    no-ops that neither crash nor wrap.
+
+    Intent: silent wrapping in a list the operator is walking to audit every
+    differing run is worse than a dead key - it makes "I have seen them all"
+    unknowable. Restored to the boundary catalog at spec revision 2 (Sec.5.6.2).
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(4)]
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        _b78_focus_run_list(app, listing)
+        for _ in range(len(runs) + 3):
+            await pilot.press("up")
+        first = _b78_run_index(listing.highlighted_child)
+        await pilot.press("up")
+        first_again = _b78_run_index(listing.highlighted_child)
+        for _ in range(len(runs) + 3):
+            await pilot.press("down")
+        last = _b78_run_index(listing.highlighted_child)
+        await pilot.press("down")
+        last_again = _b78_run_index(listing.highlighted_child)
+        return first, first_again, last, last_again
+
+    first, first_again, last, last_again = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    assert first == 0 and last == len(runs) - 1, (
+        f"the walk must pin at both ends; reached {first} and {last}"
+    )
+    assert first_again == first, (
+        f"'up' at the first entry must be a no-op, not a wrap to {first_again}"
+    )
+    assert last_again == last, (
+        f"'down' at the last entry must be a no-op, not a wrap to {last_again}"
+    )
+
+
+def test_tc_b78_48_hostile_artifact_summary_renders_verbatim(tmp_path: Path) -> None:
+    """TC-B78-48 - a markup-shaped artifact summary renders verbatim, with no
+    ``MarkupError``.
+
+    Intent: C-17 / LLR-122.1. The artifact-usage summaries are the one
+    file-derived string reaching this column. Pre-change they were passed
+    through ``rich.markup.escape`` into a ``markup=True`` ``Static``; the
+    widget-type swap is exactly where an escape call gets lost. The panel now
+    renders them ``markup=False`` AT CONSTRUCTION (C11), which is a sink that
+    cannot lose it.
+
+    ``[/nope]`` is included deliberately: it is an unmatched CLOSING tag, which
+    is what raises ``MarkupError`` at render rather than merely injecting a span.
+    """
+    hostile = "[red]evil[/] [/nope] [link=http://x]t[/link]"
+    result = _diff_result([(0x10, 0x14, "changed")], summary=hostile)
+
+    async def _after(app, pilot):
+        return _b78_run_list_text(app)
+
+    range_text = _b78_drive_compare(tmp_path, _B78_AT_SIZE, result, after=_after)
+
+    assert f"A artifacts: {hostile}" in range_text, (
+        f"the hostile summary must render VERBATIM, tags and all; the column "
+        f"reads {range_text!r}"
+    )
+    assert "evil" in range_text and "[red]" in range_text, (
+        "the markup must survive as literal text, not be consumed as a span"
+    )

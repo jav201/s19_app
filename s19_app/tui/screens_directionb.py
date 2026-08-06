@@ -76,6 +76,8 @@ from textual.widgets import (
     DataTable,
     Input,
     Label,
+    ListItem,
+    ListView,
     Select,
     Static,
     TextArea,
@@ -6720,9 +6722,10 @@ class AbDiffPanel(Container):
             Yield the inline image-pair selection row (two variant ``Select``
             dropdowns + two external-path ``Input``s + Compare/Report buttons
             + a no-project destination ``Input``), a status ``Static``, and the
-            three result columns (``#diff_range_list`` / ``#diff_hex_a`` /
-            ``#diff_hex_b``) reused from the placeholder. No placeholder
-            constants are composed (LLR-005.2).
+            three result columns reused from the placeholder: ``#diff_range_list``
+            (a selectable ``ListView``, HLR-122) plus the ``#diff_hex_a`` /
+            ``#diff_hex_b`` window ``Static``s. No placeholder constants are
+            composed (LLR-005.2).
 
         Args:
             None
@@ -6763,7 +6766,7 @@ class AbDiffPanel(Container):
             markup=False,
         )
         yield Horizontal(
-            Static("Runs", id="diff_range_list", markup=True),
+            ListView(id="diff_range_list"),
             Static("Image A", id="diff_hex_a", markup=False),
             Static("Image B", id="diff_hex_b", markup=False),
             id="diff_columns",
@@ -6973,32 +6976,67 @@ class AbDiffPanel(Container):
 
         Dependencies:
             Uses:
-                - ``_KIND_MARKUP`` / ``_KIND_LABEL``
+                - ``_KIND_MARKUP`` / ``_KIND_LABEL`` / ``_run_note_item``
             Used by:
                 - ``render_comparison``
         """
-        from rich.markup import escape
+        listing = self.query_one("#diff_range_list", ListView)
+        listing.clear()
 
-        lines = [
-            f"Runs: {total_runs}",
-            f"A artifacts: {escape(summary_a)}",
-            f"B artifacts: {escape(summary_b)}",
-            "",
+        items: List[ListItem] = [
+            self._run_note_item(f"Runs: {total_runs}"),
+            self._run_note_item(f"A artifacts: {summary_a}"),
+            self._run_note_item(f"B artifacts: {summary_b}"),
         ]
+        first_run_position = len(items)
         for index, (start, end, kind) in enumerate(self._runs):
             colour = self._KIND_MARKUP.get(kind, "#ffffff")
             label = self._KIND_LABEL.get(kind, kind)
-            lines.append(
-                f"[{colour}]{index:>3} 0x{start:08X}-0x{end:08X} "
-                f"{label}[/]"
+            items.append(
+                ListItem(
+                    Label(
+                        f"[{colour}]{index:>3} 0x{start:08X}-0x{end:08X} "
+                        f"{label}[/]",
+                        markup=True,
+                    ),
+                    id=f"diff_run_{index}",
+                    classes="diff-run-entry",
+                )
             )
         if len(self._runs) < total_runs:
-            lines.append("")
-            lines.append(
-                f"[#6b7280](showing {len(self._runs)} of {total_runs} runs — "
-                f"full report is complete)[/]"
+            items.append(
+                self._run_note_item(
+                    f"(showing {len(self._runs)} of {total_runs} runs — "
+                    f"full report is complete)"
+                )
             )
-        self.query_one("#diff_range_list", Static).update("\n".join(lines))
+        listing.extend(items)
+        listing.index = first_run_position if self._runs else None
+
+    @staticmethod
+    def _run_note_item(text: str) -> ListItem:
+        """Build a non-selectable header / notice row for the run list.
+
+        Summary:
+            The run count, the two artifact-usage summaries and the display-cap
+            notice are context, not runs. They ride in the same ``ListView`` so
+            they stay beside the runs they describe, but carry ``disabled=True``
+            so ``ListView.action_cursor_up`` / ``action_cursor_down`` skip them
+            — which is what keeps the keyboard-reachable set equal to the run
+            indices and nothing else (LLR-122.1).
+
+        Args:
+            text (str): The line to render. Rendered ``markup=False``.
+
+        Returns:
+            ListItem: The disabled note row.
+        """
+        # C-17: the artifact-usage summaries are the one file-derived string
+        # that reaches this column, so the note rows are markup-INERT at
+        # construction (C11) rather than escaped at the call site. The widget
+        # swap is exactly where a `rich.markup.escape` call gets lost; a
+        # `markup=False` sink cannot lose it.
+        return ListItem(Label(text, markup=False), classes="diff-run-note", disabled=True)
 
     def _render_run_windows(self, run_index: int) -> None:
         """Render the selected run's bounded hex windows for A and B.
@@ -7016,7 +7054,6 @@ class AbDiffPanel(Container):
                 - ``hexview.render_hex_view``
             Used by:
                 - ``render_comparison``
-                - ``on_data_table_row_selected`` (run selection)
         """
         from .hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 
