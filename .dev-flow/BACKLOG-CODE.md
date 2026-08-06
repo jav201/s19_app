@@ -43,6 +43,72 @@
 
 ---
 
+## 🔄 batch-78 — IN FLIGHT (opened 2026-08-06) — command-bar deletion + A2B diff master–detail
+
+> **Registered at Phase 0**, and this section is **reconciled at the close, not left as written** —
+> batch-77's own lesson was that a Phase-0 section standing unreconciled until the merge gate is a
+> queue a reader cannot act on.
+>
+> Charter INPUT: `prototypes/cmdbar_a2bdiff.HANDOFF.md` (operator-approved 2026-08-06). Branch
+> `claude/batch-78-cmdbar-a2bdiff`, cut off `origin/main` @ **`f6ff1d3`**, RC-1 PASS. Plan:
+> `.dev-flow/2026-08-06-batch-78/PLAN.md`; measurements: `00-measurements.md`.
+>
+> **Scope (operator ruling at kickoff): Lane 1 + Lane 2 only — `S-1`…`S-9`.** Lane 3 (operations
+> staged removal, `S-10`…`S-13`) is **explicitly out**, and **a handoff charter for it is a required
+> deliverable of this batch's close**. `x` does **not** become free this batch.
+>
+> **Phase-0 premise evaluation: 20 evaluated — 16 TRUE · 1 FALSE · 3 INCOMPLETE · 1 UNVERIFIED.**
+> All nine of the charter's cited `app.py` addresses are **exact to the line**. The cost is in what
+> it does not say:
+>
+> - ❌ **Nothing unmounts.** `action_show_screen` (`app.py:5817-5824`) swaps a `hidden` class, so all
+>   eight find/goto inputs resolve on **every** screen. `S-2` cannot route by presence — it must key
+>   on `_active_screen_key`.
+> - 🆕 **The bar acts on the WRONG PANE.** Executed: with A2L active, `CommandBar.Find("BOOT")`
+>   writes into the *workspace* `#search_input` and leaves `alt_search_input` empty. The bar inputs
+>   are duplicates **that silently act on the wrong pane on 9 of 10 screens** — so `S-2` fixes a
+>   latent defect, not just cosmetics.
+> - ⚠️ **10 screens exist, not 4**; only 3 own find/goto. `S-2`'s "no local find/goto" notice is the
+>   **majority path (7 of 10)**, not an edge case.
+> - ⚠️ **`Esc` does not return focus today** (`/` → `find_input`, `escape` → still `find_input`).
+>   `S-2`'s Esc clause is **net-new work** and must not be written as a control.
+> - ⚠️ **`S-3` reduces availability 10 screens → 1.** `LoadedArtifactsPanel()` is composed at
+>   `app.py:2037` inside `#screen_workspace`. Escalated to the operator at the Phase-0 gate.
+> - 💣 **29 of 29 snapshot goldens drift** — the bar is app-level chrome in every full-screen
+>   capture. **CI-only regen** (textual 8.2.8 pin). Largest mechanical cost in the batch.
+> - ✅ **`_PRE_BATCH_BINDINGS` does not pin `/` or `g`** (`tests/test_tui_directionb.py:6058-6074`,
+>   14 tuples) — re-homing them cannot trip the frozen keymap guard. Verified, not assumed.
+> - ⏳ **The width ceiling is a HYPOTHESIS, not a measurement of this tree.** 81-cell row / ≥130 /
+>   120-wrap come from the design prototype; **re-derived at Phase 1** before they may bound `S-7`
+>   (C-39 — a carried number is re-derived, not copied).
+>
+> **Blast radius (C-26 reverse-grep).** Lane 1 → `test_tui_commandbar.py`, `test_tui_directionb.py`,
+> `test_loadfilescreen_input.py`. Lane 2 → `test_tui_diff_screen.py`,
+> `test_tui_diff_compare_realpath.py`, `test_tui_directionb.py`. **Both lanes share
+> `test_tui_directionb.py`.** `command_bar_row`, `set_context_labels`, `focus_find`,
+> `diff_columns`, `DISPLAY_CONTEXT_BYTES`, `_render_run_windows` have **zero** test references today.
+>
+> **Ids: batch-scoped `AT-B78-*` / `TC-B78-*`** — no reservation PR; global `next_free` re-derived
+> as `AT-282` / `TC-613` and left untouched.
+
+  - **▸ (P1 — IN FLIGHT) `S-1`…`S-4` command-bar deletion.** Delete `#command_bar_row` (prompt,
+    Project/A2L labels, find/goto inputs) app-wide · re-home `/`·`g` to the active screen's local
+    inputs with a notice where there are none and a working `Esc` · re-home the context labels ·
+    delete the dead surface (`styles.tcss:55-102`, `CommandBar.Find/Goto`, the two adapters,
+    `focus_find/goto`). **Ctrl+K must keep working on all 10 screens**; workspace/A2L/MAC search and
+    goto behaviour is the byte-identical control.
+  - **▸ (P1 — IN FLIGHT) `S-5`…`S-9` A2B diff master–detail (variant A).** `#diff_range_list`
+    `Static` → selectable list (every run reachable by keyboard **and** mouse, visible focus,
+    scrollable past the viewport) · windows follow selection with context rows derived from pane
+    height, retiring the `DISPLAY_CONTEXT_BYTES = 16` constant as a constant · two width regimes with
+    a **required 120-col fallback** · compact selection rows · discoverability. G-9 display caps and
+    the "showing N of M" notice are preserved; **the persisted report stays complete**.
+  - **▸ (P3, NEW — batch-78 Phase 0) Diff variants B and C are backlog CANDIDATES, not scheduled.**
+    Evaluated in the design session and not chosen. **C additionally needs ~190 cols or an 8-byte row
+    mode `render_hex_view_text` does not have.** The charter fences both out explicitly.
+
+---
+
 ## ✅ batch-77 — DONE (2026-08-01, merged via PR [#186](https://github.com/jav201/s19_app/pull/186)) — Memory Map redesign, Variant A
 
 > **Registered at Phase 0.** Charter INPUT: `prototypes/memmap_variant_a.HANDOFF.md` (operator-approved 2026-08-01, Variant A + the cross-cutting fixes). Branch `claude/batch-77-memmap-variant-a`, cut off `origin/main` @ **`f8747b8`**, RC-1 PASS. Plan: `.dev-flow/2026-08-01-batch-77/PLAN.md`; measurements: `00-measurements.md`.
@@ -66,19 +132,20 @@
 
 > Written **inline, not as pointers**. Until the merge gate these lived only in `.dev-flow/2026-08-01-batch-77/01-requirements.md` §6.3 — a file no later batch reads at Phase 0 — which is how this project previously lost an explicitly-addressed one-sentence action across four consecutive batch-74 PRs that each opened this queue. A carry that is not in the live queue is not carried.
 
-- **▸ 🛑 (P1) `C-77-l` — BATCH-78 CHARTER: the aggregation path. This carry is LOAD-BEARING.** It is the **sole** reason ruling **R-10**'s removal of aggregation from batch-77 is a *scope reduction* and not a *silent drop*: the path was descoped on the explicit promise that batch-78 inherits it **fully measured**. Losing this carry retroactively converts a recorded descope into an undocumented gap. **Every measurement below is already paid for — batch-78 re-verifies, it does not re-derive.**
+- **▸ 🛑 (P1) `C-77-l` — BATCH-79 CHARTER: the aggregation path. This carry is LOAD-BEARING.** It is the **sole** reason ruling **R-10**'s removal of aggregation from batch-77 is a *scope reduction* and not a *silent drop*: the path was descoped on the explicit promise that the next batch inherits it **fully measured**. Losing this carry retroactively converts a recorded descope into an undocumented gap. **Every measurement below is already paid for — the executing batch re-verifies, it does not re-derive.**
+  > ⚠️ **RENUMBERED 78 → 79 at batch-78 Phase 0 (operator ruling, 2026-08-06).** This carry named "batch-78" before any batch had claimed that number. The `prototypes/cmdbar_a2bdiff.HANDOFF.md` charter (command-bar deletion + A2B diff master–detail) took **78**; the aggregation path is **79**. Renumbered here rather than leaving two claimants — this project has had two numbering collisions already. **The carry's content, priority and measurements are unchanged.**
   1. **Onset formula:** aggregation is required when `n_runs + n_gaps·fold > bar_width`, i.e. `2·n_runs − 1 > bar_w`.
   2. **Measured onset:** **26 runs @bar=50** (25 clean, 26 aggregates 1) · **34 runs @bar=66** (33 clean, 34 aggregates 1).
   3. ⭐ **THE ACCEPTANCE FIXTURE, FROM THE START — this is the single most important line in the carry.** `examples/professional_validation/case_08_heavy_fragmentation/firmware.s19` — **801 ranges → 801 runs + 800 gaps = 1601 segments**, ~30× the ceiling. **It is the ONLY shipped fixture past the onset**; every other is ≤ 11 runs. **The aggregation path has now been designed TWICE against fixtures that did not represent the real one** — revision 2's synthetic 35-run fixture was chosen because no shipped fixture was believed to cross, and that premise was false. This is the batch's signature failure recurring, and it is why R-10 descoped rather than patched.
-  4. **Out-of-domain behaviour, BOTH producers.** *Pristine + CSS only:* @66 `797/801 (99.5 %)`, outside 1594; @50 `800/801 (99.9 %)`, outside 1600; `gap_w max=60`. *batch-77's producer:* @66 `768/801 (95.9 %)`, outside 1535; @50 `776/801 (96.9 %)`, outside 1551; `gap_w max=1`. Improvement **−29 runs @66, −24 @50**. Region list **801** rows, **no crash**, in every case. **batch-77 improves it at both regimes and fixes it at neither. Quote both figures or neither** — a lone "95.9 %" understates the wide regime. ⚠️ **The degradation rule is UNSPECIFIED** — these are observations of one conforming implementation, not a contract. **batch-78 must specify it.**
+  4. **Out-of-domain behaviour, BOTH producers.** *Pristine + CSS only:* @66 `797/801 (99.5 %)`, outside 1594; @50 `800/801 (99.9 %)`, outside 1600; `gap_w max=60`. *batch-77's producer:* @66 `768/801 (95.9 %)`, outside 1535; @50 `776/801 (96.9 %)`, outside 1551; `gap_w max=1`. Improvement **−29 runs @66, −24 @50**. Region list **801** rows, **no crash**, in every case. **batch-77 improves it at both regimes and fixes it at neither. Quote both figures or neither** — a lone "95.9 %" understates the wide regime. ⚠️ **The degradation rule is UNSPECIFIED** — these are observations of one conforming implementation, not a contract. **batch-79 must specify it.**
   5. **The bound is arithmetically unsatisfiable out of domain:** `avail = bar_w − n_gaps` = **−734** @66, **−750** @50.
-  6. **⏱ O(n²) cost — and time is NOT currently a stated cost axis.** Merge-smallest-adjacent on the UI thread: **n=1000 → 975 merges, 31.10 ms**; **n=5000 → 4975 merges, 840.34 ms**, uncapped. `case_08` is n=801. **batch-78 must add a time budget to its constraints** (security M-3r).
+  6. **⏱ O(n²) cost — and time is NOT currently a stated cost axis.** Merge-smallest-adjacent on the UI thread: **n=1000 → 975 merges, 31.10 ms**; **n=5000 → 4975 merges, 840.34 ms**, uncapped. `case_08` is n=801. **batch-79 must add a time budget to its constraints** (security M-3r).
   7. **An aggregate has no usable monotonicity subject.** `region_end − region_start` **includes swallowed gaps**, so it is not the aggregate's mapped size. Executed on `case_08`: monotone-by-span **False**, monotone-by-**sum of constituent run bytes** **True**; first span violation `((1988,2),(2150631108,1))`. **The subject must be the summed run bytes, and `BandSegment` does not currently expose it** (arch RB-2).
-  8. **"Merge until it fits" dies exactly where strict-∃ dies.** Executed: `regions=18 → 76 runs`, both regimes, **all widths 1, strict False — the strict limb is DEAD**. The stopping rule and the discrimination requirement are in direct tension; **batch-78 must resolve which yields** (arch RB-3).
+  8. **"Merge until it fits" dies exactly where strict-∃ dies.** Executed: `regions=18 → 76 runs`, both regimes, **all widths 1, strict False — the strict limb is DEAD**. The stopping rule and the discrimination requirement are in direct tension; **batch-79 must resolve which yields** (arch RB-3).
   9. **The disclosure count is ambiguous three ways on the real fixture.** `case_08` @66: `oracle − TOTAL segments = 768` · `oracle − STANDALONE = 801` · `runs that lost a dedicated segment = 768`. @50: `776` / `801` / `776`. **Pick the definition before writing the AT, not after** (arch RB-4).
   10. **A coverage clause that excludes aggregates is FALSE on correctly-aggregating code.** QA: 2 ranges → 1 aggregate → filtered `emitted` empty → coverage `False`; 26-region fixture leaves **10** uncovered range starts @66, **15** @50. **Coverage must include aggregate spans** (QA N-1).
-  11. **The count formula cannot distinguish merged from DROPPED.** `oracle − emitted` is GREEN identically whether runs were merged into an aggregate or **silently discarded**. batch-78 needs a separate clause that every run is *represented*, not merely *counted* (QA N-1).
-  - **Scope note.** `LLR-111.7` (floor-1 + largest-remainder bound) **stays shipped in batch-77** — it is verified sound and is what makes **15 of the 16** shipped fixtures work with zero aggregation. batch-78 inherits a working bound and owns only the excess.
+  11. **The count formula cannot distinguish merged from DROPPED.** `oracle − emitted` is GREEN identically whether runs were merged into an aggregate or **silently discarded**. batch-79 needs a separate clause that every run is *represented*, not merely *counted* (QA N-1).
+  - **Scope note.** `LLR-111.7` (floor-1 + largest-remainder bound) **stays shipped in batch-77** — it is verified sound and is what makes **15 of the 16** shipped fixtures work with zero aggregation. batch-79 inherits a working bound and owns only the excess.
 - **▸ (P3) `C-77-f` — `o` = open-hex keyboard affordance DESCOPED (ruling R3).** The batch-77 story line above advertised it and it did not ship. Rows are focusable and `↑`/`↓`/`j`/`k`/`Enter` all work; there is **no keyboard route to the hex view from a region row**. Reversible; no measured defect forces it.
 - **▸ (P3) `C-77-g` — 2-column fold marker + humanized size label DESCOPED (ruling R-5).** Gaps fold to **exactly one** column carrying `╱`, with no size label. A 2-column marker would carry a legible size at the cost of one column per gap, which on a 10-gap image is 10 columns off the ceiling on visible regions — the batch's whole subject. **Reopening condition:** an operator report that gap magnitude is not readable from the stats line's largest-gap figure.
 - **▸ (P3) `C-77-j` — pre-existing 1-column glance-box clip, STILL LIVE at 80×24.** The box is 28 columns; its widest content row is 29 (`'· constant/padding 3 ████ 60%'`). Found by the corrected R-7 sweep. `LLR-111.9` incidentally fixes it **at 120×30 only**, by giving the glance full width; **the 80×24 path is unchanged and still clips**. Pre-existing, not introduced by batch-77. **Distinct from `C-77-k`** — different defect, same screen.
@@ -87,7 +154,8 @@
   ⚠️ **This carry is itself the FIFTH instance of this batch's carry/citation class, and it was live AT CLOSE.** It was raised by the post-gate re-review as F3, written into `REQUIREMENTS.md:6017`, and then existed in **neither** backlog lane — `grep -c AT-B77-19` returned **0** in this file and **0** in `BACKLOG-PROCESS.md`. Found by the Phase-5 postmortem's own reconciliation sweep, i.e. by the mechanism built to catch exactly this, one gate after the close-out repaired instances three and four. **A carry that is not in the live queue is not carried** — this project already has an incident where a one-sentence action survived four consecutive PRs that each read this file.
 - **▸ (P3, REGISTRY LANE) Two node-naming corrections in `AT-TC-REGISTRY.jsonl`, both deferred because renaming a node is a registry change, not a test edit.**
   - **`TC-519`'s node name is now inaccurate.** §6.5 **Amendment E** replaced the node's predicate — from `git diff origin/main -- s19_app/tui/legend.py` is empty (file identity) to a two-arm **behavioural** predicate (Arm A: `LegendScreen.compose` splats each helper's return directly into its pane; Arm B: the helpers return `Widget`s, not text). The node is still called `test_tc519_legend_module_unchanged_vs_main` and **nothing about it now asserts that the module is unchanged** — measured, `git diff --stat origin/main -- s19_app/tui/legend.py` is **8 insertions / 5 deletions**. The registry binds `TC-519` to that exact node path (and to `_repo_root`), so a rename must land as a coordinated registry + test change.
-  - **`AT-072b`'s registry entry names one node and the observable now spans two.** The entry is `"nodes": ["tests/test_tui_map_big.py::test_at072b_ruler"]` with the seed statement *"Seeded from the existing verifier(s): test_at072b_ruler."* That node survives and was amended in place (its retired 5-tick percentile predicate → labels ⊆ run starts ∪ last mapped byte). But its predicate is **subset-only and therefore GREEN on a ruler that renders ZERO ticks** — which is why `AT-B77-04` (`test_b77_ruler_labels_every_run_start_and_the_last_byte`, `tests/test_tui_map_big.py:362`) exists as the ⊇ lower bound. ⚠️ **Verified at the merge gate: `AT-B77-*` ids are not in the registry at all (`grep -c AT-B77 AT-TC-REGISTRY.jsonl` → 0)**, so this is not a stale-path defect — it is the open question of whether the batch-scoped ⊇ half should be promoted into the registry under `AT-072b` or minted as its own permanent id. **Decide before batch-78's registry sweep.**
+  - **`AT-072b`'s registry entry names one node and the observable now spans two.** The entry is `"nodes": ["tests/test_tui_map_big.py::test_at072b_ruler"]` with the seed statement *"Seeded from the existing verifier(s): test_at072b_ruler."* That node survives and was amended in place (its retired 5-tick percentile predicate → labels ⊆ run starts ∪ last mapped byte). But its predicate is **subset-only and therefore GREEN on a ruler that renders ZERO ticks** — which is why `AT-B77-04` (`test_b77_ruler_labels_every_run_start_and_the_last_byte`, `tests/test_tui_map_big.py:362`) exists as the ⊇ lower bound. ⚠️ **Verified at the merge gate: `AT-B77-*` ids are not in the registry at all (`grep -c AT-B77 AT-TC-REGISTRY.jsonl` → 0)**, so this is not a stale-path defect — it is the open question of whether the batch-scoped ⊇ half should be promoted into the registry under `AT-072b` or minted as its own permanent id. **Decide before the next registry sweep.**
+    > ⚠️ **STILL OPEN after batch-78 (2026-08-06).** This item's deadline read *"before batch-78's registry sweep"*, written when no batch had claimed 78. **batch-78 performs NO registry sweep** — it mints batch-scoped `AT-B78-*` / `TC-B78-*` ids, which `_meta.governed` places outside the registry's authority by spec §2.3, so the global `next_free` (`AT-282` / `TC-613`) is untouched. The deadline is re-pointed at *the next batch that actually sweeps the registry* rather than allowed to expire against a batch that never had the opportunity to discharge it.
 
 ---
 
