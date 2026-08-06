@@ -6877,7 +6877,7 @@ class AbDiffPanel(Container):
                 )
             )
 
-    def render_comparison(
+    async def render_comparison(
         self,
         runs: Sequence[Tuple[int, int, str]],
         mem_map_a: dict,
@@ -6908,18 +6908,26 @@ class AbDiffPanel(Container):
             - Apply the run-count + byte-budget display caps, store the capped
               runs + maps, render the range list, then the first run's windows.
 
+        Note:
+            **Coroutine as of batch-78 Inc-2.** The run list is now a
+            ``ListView`` whose rows are widgets carrying DOM ids, and
+            ``ListView.clear()`` only *posts* a prune — the old rows are still
+            registered when the next ``extend()`` runs. A second Compare
+            therefore raised ``DuplicateIds`` on ``diff_run_0``. The removal is
+            awaited, so callers must await this method.
+
         Dependencies:
             Uses:
                 - ``_render_run_list`` / ``_render_run_windows``
             Used by:
-                - ``S19TuiApp.on_ab_diff_panel_compare_requested``
+                - ``S19TuiApp.on_ab_diff_panel_compare_requested`` (awaits)
         """
         capped = self._apply_display_caps(runs)
         self._runs = capped
         self._mem_map_a = mem_map_a
         self._mem_map_b = mem_map_b
         self._has_result = True
-        self._render_run_list(len(runs), summary_a, summary_b)
+        await self._render_run_list(len(runs), summary_a, summary_b)
         if capped:
             self._render_run_windows(0)
         else:
@@ -6958,7 +6966,7 @@ class AbDiffPanel(Container):
             capped.append((start, end, kind))
         return capped
 
-    def _render_run_list(
+    async def _render_run_list(
         self, total_runs: int, summary_a: str, summary_b: str
     ) -> None:
         """Render the Rich-coloured run list + artifact-usage notes.
@@ -6981,7 +6989,16 @@ class AbDiffPanel(Container):
                 - ``render_comparison``
         """
         listing = self.query_one("#diff_range_list", ListView)
-        listing.clear()
+        # AWAITED, and both awaits are load-bearing (batch-78 Inc-2 review F1).
+        # `ListView.clear()` routes to `App._prune`, which only POSTS a
+        # `Prune()` message: without awaiting it the old rows are still
+        # registered when the new ones mount, and the second Compare raises
+        # `DuplicateIds` on `diff_run_0`. Awaiting the mount in turn means the
+        # rows are in `_nodes` before `index` is assigned below — otherwise
+        # `watch_index` highlights a row that is about to be pruned and, because
+        # the value does not change, never fires again, leaving NO row
+        # highlighted after a re-render.
+        await listing.clear()
 
         items: List[ListItem] = [
             self._run_note_item(f"Runs: {total_runs}"),
@@ -7010,7 +7027,7 @@ class AbDiffPanel(Container):
                     f"full report is complete)"
                 )
             )
-        listing.extend(items)
+        await listing.extend(items)
         listing.index = first_run_position if self._runs else None
 
     @staticmethod

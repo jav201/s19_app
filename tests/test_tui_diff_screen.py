@@ -224,7 +224,6 @@ def _b78_drive_compare(tmp_path: Path, size, result, *, after):
             await pilot.pause()
             app.query_one("#diff_compare_button").press()
             await pilot.pause()
-            await pilot.pause()
             return await after(app, pilot)
 
     monkey = pytest.MonkeyPatch()
@@ -300,7 +299,6 @@ def test_tc021_compare_routes_through_service(tmp_path: Path) -> None:
             await pilot.pause()
             app.query_one("#diff_compare_button").press()
             await pilot.pause()
-            await pilot.pause()
             range_text = _b78_run_list_text(app)
             return len(calls), range_text
 
@@ -332,7 +330,7 @@ def test_tc022_render_shows_runs_and_hex_windows(tmp_path: Path) -> None:
             app.action_show_screen("diff")
             await pilot.pause()
             panel = app.query_one("#ab_diff_panel")
-            panel.render_comparison(
+            await panel.render_comparison(
                 [(0x10, 0x14, "changed"), (0x20, 0x24, "only_a")],
                 {0x10: 0xAA, 0x11: 0xBB, 0x12: 0xCC, 0x13: 0xDD},
                 {0x10: 0x01, 0x11: 0x02, 0x12: 0x03, 0x13: 0x04},
@@ -1024,11 +1022,32 @@ def test_at_b78_16_every_run_reachable_by_mouse(tmp_path: Path) -> None:
             await pilot.click(item)
             await pilot.pause()
             reached.append(_b78_run_index(listing.highlighted_child))
-        return reached, off_viewport, listing.content_region.height
+        # The mouse half's NEGATIVE (review F2). Clicking only `.diff-run-entry`
+        # makes `reached` note-free by construction, so the walk above cannot
+        # tell "notes are unclickable" from "notes were never clicked" — and
+        # the mutation that makes note rows selectable left this node GREEN
+        # while reddening the keyboard node. The guarantee rests on ONE
+        # framework layer (`Widget.check_message_enabled` refusing mouse events
+        # to disabled widgets; `ListView._on_list_item__child_clicked` has no
+        # disabled check of its own), which is exactly why it needs a node.
+        before_notes = _b78_run_index(listing.highlighted_child)
+        for note in list(listing.query(_B78_RUN_NOTE)):
+            note.scroll_visible(animate=False)
+            await pilot.pause()
+            await pilot.click(note)
+            await pilot.pause()
+        after_notes = _b78_run_index(listing.highlighted_child)
+        return (
+            reached,
+            off_viewport,
+            listing.content_region.height,
+            before_notes,
+            after_notes,
+        )
 
-    reached, off_viewport, viewport_rows = _b78_drive_compare(
-        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
-    )
+    (
+        reached, off_viewport, viewport_rows, before_notes, after_notes
+    ) = _b78_drive_compare(tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after)
 
     assert len(reached) == len(runs), (
         f"one clickable entry per displayed run; clicked {len(reached)} of {len(runs)}"
@@ -1036,6 +1055,10 @@ def test_at_b78_16_every_run_reachable_by_mouse(tmp_path: Path) -> None:
     assert set(reached) == set(range(len(runs))), (
         f"the mouse-reachable run set must equal the displayed run set; "
         f"reached {sorted(set(reached))}"
+    )
+    assert after_notes == before_notes, (
+        f"a header / notice row must not be mouse-selectable; clicking every "
+        f"note row moved the selection from {before_notes} to {after_notes}"
     )
     assert off_viewport > 0, (
         f"TC-B78-20 needs at least one row outside the {viewport_rows}-row "
@@ -1487,4 +1510,110 @@ def test_tc_b78_48_hostile_artifact_summary_renders_verbatim(tmp_path: Path) -> 
     )
     assert "evil" in range_text and "[red]" in range_text, (
         "the markup must survive as literal text, not be consumed as a span"
+    )
+
+
+def test_tc_b78_49_a_second_compare_rebuilds_the_list(tmp_path: Path) -> None:
+    """TC-B78-49 - pressing Compare a SECOND time rebuilds the run list cleanly.
+
+    Intent: this is the regression node for the Inc-2 gate's HIGH finding, and
+    the defect it guards was a real product crash that twelve other new nodes
+    could not see because **not one of them pressed Compare twice**. Changing
+    the A/B selection and comparing again is the panel's primary workflow.
+
+    What went wrong, executed on the first Inc-2 implementation::
+
+        textual._node_list.DuplicateIds: Tried to insert a widget with ID
+          'diff_run_0', but a widget already exists with that ID
+
+    ``ListView.clear()`` routes to ``App._prune``, which only POSTS a ``Prune``
+    message, so the previous rows were still registered when ``extend()``
+    mounted the new ones carrying the same DOM ids. It is a REGRESSION, not a
+    latent defect: on the pre-change tree ``Static.update()`` is idempotent and
+    mints no ids, and the same double drive completes cleanly.
+
+    Removing the ids would not have been sufficient, which is why this node
+    asserts the selection too. With the rows anonymous the crash goes away but
+    ``index`` is assigned while the stale rows are still in ``_nodes``, so
+    ``watch_index`` highlights a row that is then pruned; because the VALUE does
+    not change the watcher never fires again and **no row is highlighted after
+    any re-render** - HLR-122's visual-distinction clause, silently violated.
+
+    The two fixtures have DIFFERENT run counts on purpose: with equal counts the
+    entry-count assertion is satisfied by a list that was never rebuilt at all.
+    """
+    import s19_app.tui.app as app_mod
+    from textual.widgets import ListItem
+
+    first_runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(7)]
+    second_runs = [(i * 0x100, i * 0x100 + 4, "only_b") for i in range(3)]
+    assert len(first_runs) != len(second_runs), (
+        "the two fixtures must differ in run count or the count assertion below "
+        "cannot distinguish a rebuilt list from an untouched one"
+    )
+    pending = [_diff_result(first_runs), _diff_result(second_runs)]
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=_B78_AT_SIZE) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            listing = _b78_run_list(app)
+
+            app.query_one("#diff_compare_button").press()
+            await pilot.pause()
+            first_entries = len(list(listing.query(_B78_RUN_ENTRY)))
+
+            # the SECOND compare - the press that used to raise DuplicateIds
+            app.query_one("#diff_compare_button").press()
+            await pilot.pause()
+
+            # captured BEFORE any key press, so these describe the state the
+            # second Compare left behind rather than the state the walk created
+            entries = len(list(listing.query(_B78_RUN_ENTRY)))
+            selected = _b78_run_index(listing.highlighted_child)
+            marked = [
+                _b78_run_index(item)
+                for item in listing.query(ListItem)
+                if item.has_class("-highlight")
+            ]
+
+            # pin to the top first, so index 0 is REACHED by a key press rather
+            # than inherited from the selection the re-render left behind
+            _b78_focus_run_list(app, listing)
+            for _ in range(len(second_runs) + 4):
+                await pilot.press("up")
+            walk = [_b78_run_index(listing.highlighted_child)]
+            for _ in range(len(second_runs) + 2):
+                await pilot.press("down")
+                walk.append(_b78_run_index(listing.highlighted_child))
+            return first_entries, entries, selected, marked, walk
+
+    monkey = pytest.MonkeyPatch()
+    monkey.setattr(app_mod, "compare_images", lambda *a, **k: pending.pop(0))
+    try:
+        first_entries, entries, selected, marked, walk = asyncio.run(_drive())
+    finally:
+        monkey.undo()
+
+    assert first_entries == len(first_runs), (
+        f"the first Compare must render its own run count; {first_entries} "
+        f"entries for {len(first_runs)} runs"
+    )
+    assert entries == len(second_runs), (
+        f"the second Compare must REBUILD the list to its own run count; "
+        f"{entries} entries for {len(second_runs)} runs"
+    )
+    assert selected == 0, (
+        f"after the second Compare the selection must be the first run of the "
+        f"NEW comparison, got {selected}"
+    )
+    assert marked == [0], (
+        f"exactly one row must carry the selection marker after a re-render, "
+        f"and it must be run 0; marked {marked}"
+    )
+    assert set(walk) == set(range(len(second_runs))), (
+        f"every run of the SECOND comparison must still be keyboard-reachable; "
+        f"the walk reached {walk}"
     )

@@ -4776,7 +4776,7 @@ class S19TuiApp(App):
             return ImageSource(kind=SOURCE_PROJECT_VARIANT, variant_id=variant_id)
         return ImageSource(kind=SOURCE_EXTERNAL, raw_path=raw_path)
 
-    def on_ab_diff_panel_compare_requested(
+    async def on_ab_diff_panel_compare_requested(
         self, event: AbDiffPanel.CompareRequested
     ) -> None:
         """
@@ -4830,7 +4830,10 @@ class S19TuiApp(App):
         runs = [(run.start, run.end, run.kind) for run in result.runs]
         usage_a = result.notes.get("image_a")
         usage_b = result.notes.get("image_b")
-        panel.render_comparison(
+        # AWAITED: `render_comparison` is a coroutine as of batch-78 Inc-2 —
+        # the run list's rows are widgets and their removal must complete
+        # before the next set mounts (review F1).
+        await panel.render_comparison(
             runs,
             mem_map_a,
             mem_map_b,

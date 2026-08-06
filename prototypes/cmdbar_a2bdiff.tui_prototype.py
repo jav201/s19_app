@@ -471,7 +471,8 @@ async def _drive_diff(pilot, app, variant: Optional[str]) -> None:
     mem_a, mem_b, runs, stats = _diff_fixture()
     panel = app.query_one("#ab_diff_panel")
     if variant is None:  # baseline — the shipped panel's real render path
-        panel.render_comparison(runs, mem_a, mem_b, "both (2)", "both (2)")
+        # awaited: `render_comparison` became a coroutine at batch-78 Inc-2
+        await panel.render_comparison(runs, mem_a, mem_b, "both (2)", "both (2)")
         panel.set_status(
             f"Compared variant_base vs variant_new — {len(runs)} differing runs.",
             "sev-info")

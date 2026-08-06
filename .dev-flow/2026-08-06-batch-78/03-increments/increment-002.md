@@ -22,7 +22,7 @@ the SAME defect, in the requirements' own remedy for that defect.**
 | **F-4** | **`A-4` / `P-47` settled TRUE by execution: no interaction.** Stock `ListView` binds `up`/`down`/`enter` (plus `ScrollableContainer`'s `left`/`right`/`home`/`end`/`page*`), **all `priority=False`**; the four App `priority=True` bindings are `ctrl+k`/`ctrl+d`/`ctrl+l`/`ctrl+s` — a **disjoint** key set. Asserted live in `AT-B78-19`: `ctrl+k` opens the palette with the list focused **and** `down` moves the list's own selection in the same run. | ✅ **UNDECIDABLE → TRUE** |
 | **F-5** | **`AT-B78-19` upgrades PIN → GATE.** Its precondition now holds — `set_focus` on the run list takes (`app.focused is` the `ListView`), where on the pre-change `Static` it silently landed on `RailItem(id='rail_item_workspace')`. Its declared mutation reddens it on its declared clause. | ✅ **PIN → GATE** |
 | **F-6** | **Sixth silent mutation failure this batch, and it was mine.** My first `M3` re-run patched the harness's **label** and not its **value**; the applied-check passed (token present, sha moved) because the "new" token was the *previous* new token. An applied-check verifies a substitution happened, **never that it is the one you meant**. Caught by the sha being byte-identical to the prior run. | ⚠️ **process finding** |
-| **F-7** | **§5.4/LLR-123.1's phantom is gone.** `_render_run_windows`'s docstring cited `on_data_table_row_selected` as a caller; that symbol has **0 definitions** in the module. Removed — it is a lie in the file this increment edits, and Inc-4 is the increment that will supply the real selection path. | ✅ removed |
+| **F-7** | **§5.4/LLR-123.1's phantom is gone.** `_render_run_windows`'s docstring cited `on_data_table_row_selected` as a caller; that symbol is **not a caller** of it. Removed — it is a lie in the file this increment edits, and Inc-4 is the increment that will supply the real selection path. | ✅ removed |
 
 **The C-38 census reproduced to the digit.** §5.3/LLR-122.1's *"`diff_range_list`
 8 hits / 3 files"* is exactly what disk says today: **9 hits across 3 test
@@ -583,3 +583,321 @@ file-level count from 200 to 128.
 | C12 internal-name shadowing | ✓ | **No widget subclass introduced** — `#diff_range_list` is a stock `ListView`, so no `_nodes` / `_context` member can be shadowed. |
 | Snapshot regen not attempted locally | ✓ | §4.3 — still exactly one cell, per-cell reason recorded; C9 respected; Inc-12 owns regen. |
 | Review packet attached | ✓ | this document, §§1–7 + §6b carry list |
+
+---
+---
+
+# ADDENDUM — Inc-2 gate review fixes (F1 HIGH, F2/F3 MEDIUM, F4/F5/F6 LOW)
+
+> The gate returned **BLOCKED — HIGH 1 · MEDIUM 2 · LOW 3**. The HIGH is the
+> batch's **first genuine product defect**, and this increment introduced it.
+> Route **B** taken as ruled; `app.py` authorized by the coordinator as a
+> recorded plan deviation.
+
+## A.1 BLUF — I shipped a crash, and my own risk register looked straight at it
+
+| # | Finding | Status |
+|---|---|---|
+| **F1 (HIGH)** | **The second Compare raised `DuplicateIds` on `diff_run_0`.** `ListView.clear()` only POSTS a prune, so the old rows were still registered when `extend()` mounted new ones with the same DOM ids. **Reproduced, fixed by route B, and now guarded by `TC-B78-49`.** | ✅ **closed** |
+| **F2 (MEDIUM)** | The mouse half of the reachability set-equality had no negative — `AT-B78-16` clicked only `.diff-run-entry`, so M1 left it green. **Note rows are now clicked and the selection asserted unchanged; M1 reddens it.** | ✅ **closed** |
+| **F3 (MEDIUM)** | The `sha moved` applied-check limb is weak. **Harness rewritten to a content assertion; all mutations re-executed.** ⚠️ **The stated MECHANISM does not reproduce — see A.5.** | ✅ **closed, with a correction** |
+| **F4 (LOW)** | `AT-B78-15` asserts its count clause before its walk clause. | ⚠️ **carried, not changed** — A.6 |
+| **F5 (LOW)** | Five nodes had no recorded counterfactual because the harness used `-k`. | ✅ **closed** — the harness now runs the whole module |
+| **F6 (LOW)** | *"0 definitions in the module"* over-reads. | ✅ **closed** — packet body corrected to *"not a caller"* |
+| **🆕 R-10** | **A parallel actor committed my Inc-2 work as `297990c` while I was mid-review-fix.** I did not create it. | ⚠️ **reported, not acted on** — A.8 |
+| **🆕 R-11** | **The 13-module gate run produced ONE failure, unreproduced in six later attempts including a clean re-run of the identical command (`415 passed`).** | ⚠️ **intermittent, unexplained — A.7** |
+
+**My R-1 named the mechanism and drew the wrong conclusion.** It said *"a future
+caller that reads the list synchronously inside `render_comparison` would see
+stale rows … no such caller exists."* The hazard was never a stale **read** — it
+is a stale **mount**, and the caller is the shipped Compare button. Naming a
+mechanism and then bounding it by the wrong consequence is worse than missing it,
+because it reads as though it had been considered.
+
+**Why twelve new nodes missed it: not one pressed Compare twice.** Confirmed by
+counterfactual — with route B's two awaits removed, `TC-B78-49` is the **only**
+node in the module that reddens:
+
+```
+applied CF-B: both awaits removed; post-images absent = True
+E   textual._node_list.DuplicateIds: Tried to insert a widget with ID 'diff_run_0' ...
+FAILED tests/test_tui_diff_screen.py::test_tc_b78_49_a_second_compare_rebuilds_the_list
+1 failed, 22 passed in 54.22s
+RESTORED MATCH=True
+```
+
+## A.2 F1 — the defect, reproduced, and route B
+
+**Reproduced on my own tree before fixing anything:**
+
+```
+FIRST : entries 6 index 3 hl diff_run_0
+SECOND: EXCEPTION at render_comparison
+  textual._node_list.DuplicateIds: Tried to insert a widget with ID 'diff_run_0',
+    but a widget already exists with that ID (ListItem(id='diff_run_0', ...))
+```
+
+**Confirmed a REGRESSION, not pre-existing** — the same double drive on `d771ab8`:
+
+```
+PRE-CHANGE d771ab8: two renders completed, no exception
+  range text head: Runs: 3
+```
+
+**Route B, as ruled.** `render_comparison` and `_render_run_list` are now
+coroutines; `await listing.clear()` then `await listing.extend(items)`, then the
+index assignment. **Both awaits are load-bearing** and the second is the one the
+coordinator's rejection of route C turns on: awaiting the mount means the rows
+are in `_nodes` before `index` is assigned, so `watch_index` cannot highlight a
+row that is about to be pruned and then never fire again.
+
+**Verified across three consecutive comparisons with different run counts:**
+
+```
+FIRST  fixture=6 children=9  entries=6 index=3 hl=diff_run_0 -highlight=['diff_run_0']
+SECOND fixture=3 children=6  entries=3 index=3 hl=diff_run_0 -highlight=['diff_run_0']
+THIRD  fixture=9 children=12 entries=9 index=3 hl=diff_run_0 -highlight=['diff_run_0']
+keyboard walk after 3 renders: [1,2,3,4,5,6,7,8,8,8,8,8]   (all 9 reachable)
+```
+
+**The `app.py` change is exactly what route B requires** — `async def
+on_ab_diff_panel_compare_requested` and `await panel.render_comparison(...)`,
+plus 3 comment lines. Nothing else was taken into `app.py` while it was open.
+
+**`TC-B78-49` — the mandatory regression node.** Two fixtures with **different**
+run counts (7 then 3), asserting after the second press: the entry count equals
+the *second* fixture's count, the selection is run 0, **exactly one** row carries
+`-highlight`, and every run of the second comparison is still keyboard-reachable.
+
+⚠️ **`TC-B78-49` is a NEW id beyond §5.7's `TC-B78-01…48` enumeration**, minted
+at the gate because the defect class had no node. Flagged for spec
+reconciliation rather than folded into an existing id.
+
+## A.3 The pause question, answered directly
+
+**`tests/test_tui_diff_compare_realpath.py`'s two drivers still have their
+ORIGINAL single `await pilot.pause()` after the button press — unchanged, no
+pause added.**
+
+```
+$ grep -n -A3 'diff_compare_button").press()' tests/test_tui_diff_compare_realpath.py
+104:            app.query_one("#diff_compare_button").press()
+105-            await pilot.pause()
+281:            app.query_one("#diff_compare_button").press()
+282-            await pilot.pause()
+$ python -m pytest tests/test_tui_diff_compare_realpath.py -q -p no:randomly
+6 passed in 5.35s
+```
+
+**And route B let me DELETE the two extra pauses I had added.** The pre-review
+`_b78_drive_compare` and `test_tc021` each carried a second `pilot.pause()` —
+which, in hindsight, was me accommodating the un-awaited mount exactly as the
+reviewer warns against. Both are gone and all 23 nodes pass with one pause.
+**That the padding became unnecessary is itself evidence route B is correct by
+construction rather than by timing.**
+
+## A.4 F2 — the mouse negative
+
+`AT-B78-16` now clicks every `.diff-run-note` row after the entry walk and
+asserts the selection is unchanged. Executed under M1 (`disabled True → False`),
+the mutation that makes note rows selectable — **it now reddens the mouse node,
+which it previously left green:**
+
+```
+############ MUTATION M1  note rows selectable (disabled True -> False) ############
+FAILED ...::test_at_b78_15_every_run_reachable_by_keyboard
+FAILED ...::test_at_b78_16_every_run_reachable_by_mouse        <-- NEW, was GREEN
+FAILED ...::test_tc_b78_19_single_run_is_selectable
+FAILED ...::test_tc_b78_47_arrows_at_the_ends_do_not_wrap
+FAILED ...::test_tc_b78_49_a_second_compare_rebuilds_the_list
+5 failed, 18 passed in 38.05s
+```
+
+## A.5 F3 — remedy adopted, MECHANISM corrected by measurement
+
+**The remedy is right and is implemented.** The applied-check is now
+content-based and four-limbed, on the POST-IMAGE, which works for substitutions
+and insertions alike:
+
+1. the post-image was **ABSENT** from the pre-state ← *the limb F-6 lacked*
+2. the post-image is **PRESENT** exactly once after
+3. the file's **bytes changed**
+4. the resulting **sha is unseen** this session
+
+Limb 1 is the discriminating one: F-6 was a run whose "new" token was the
+*previous* run's new token, already in the file, so `new in text` passed while
+nothing had moved. Limb 1 rejects that outright and **does not depend on line
+endings at all**.
+
+⚠️ **The stated mechanism does NOT reproduce on this host, and the inference is
+inverted.** The finding says the harness *"writes the mutated file with LF while
+the fixed tree is CRLF"*. Measured on the live tree, through the harness's exact
+read/write path:
+
+```
+BASELINE  crlf=7114 bare_lf=0 sha=667cd9c5b2254ff4
+MUTATED   crlf=7114 bare_lf=0 sha=4fb6d7685bc0ec57
+same bytes as an LF export? False   LF-export sha=d1e63d34a1855a9d
+```
+
+A no-op read/write round-trip is **byte-identical** (`IDENTICAL after no-op
+read/write? True`). `Path.write_text` with `newline=None` translates `\n` to
+`os.linesep`, so on Windows it emits CRLF. **My harness never normalised line
+endings, and the sha limb was therefore not vacuous in the way described.**
+
+The likeliest reading of the reviewer's four exact matches is the reverse of the
+one drawn: their *baseline* copy was LF (`5db68034…`) while their *mutated* files
+were written through the same Python API and came out CRLF — identical to mine.
+That explains matched mutants against an unmatched baseline without requiring my
+writer to normalise anything. **I cannot audit their pipeline and am not
+claiming to**; what I can state is what my own writer does, measured.
+
+**None of this weakens the conclusion.** The sha limb was always the weakest,
+`C-78-viii` as I first worded it was insufficient, and the content assertion is
+the correct fix. It is adopted. The correction is to the *mechanical story* the
+carry would otherwise record — and a carry that records a false mechanism sends
+the next reader to the wrong place.
+
+**A harness bug the new check exposed immediately.** Evaluating the sha limb per
+*edit* rather than per *file* aborted M6, which makes two edits to one file — the
+second legitimately sees the sha the first produced. Fixed (content limbs per
+edit, sha/bytes limbs per file). **A harness that cries wolf on a correct
+mutation is its own kind of vacuous check.**
+
+## A.6 F4 — carried, with the carry sharpened
+
+No change made, and I agree this is not a defect: under M1 — `AT-B78-15`'s
+*declared* mutation — the node reddens on the walk clause directly. But F4 is
+right that **`C-78-vii` as I worded it does not decide this case**, because the
+count clause is itself normative rather than a fixture self-check. `C-78-vii` is
+amended below to say which clause is the subject when a node carries two
+normative ones.
+
+## A.7 ⚠️ R-11 — an intermittent, unexplained failure in the gate run
+
+The 13-module gate run (adding `tests/test_tui_app.py` because `app.py` was
+touched) returned **one failure**:
+
+```
+FAILED tests/test_tui_diff_compare_realpath.py::test_at_016_4_legit_small_valid_image_is_not_flagged
+E   AssertionError: a valid small-vs-full compare must proceed to sev-ok;
+E     status was 'Select two images and press Compare.'
+1 failed, 414 passed, 1 xfailed in 744.65s (0:12:24)
+```
+
+The status is the **initial placeholder**, so the compare handler did not reach
+its `set_status` line — consistent with `pilot.pause()` returning while the
+now-awaited handler is still suspended.
+
+**It has not reproduced in six subsequent attempts, including a re-run of the
+exact failing command:**
+
+```
+realpath alone            x3 -> 6 passed, 6 passed, 6 passed
+diff_screen + realpath         -> 29 passed
+in-process probe, 25 trials each:
+    pauses=1: handler completed 25/25
+    pauses=2: handler completed 25/25
+
+$ <the identical 13-module command, re-run>
+415 passed, 1 xfailed in 740.31s (0:12:20)      <- the failing node now passes
+```
+
+**The gate command is GREEN on its second execution.** The observation stands at
+**1 failure in 2 runs of that command, 0 in six other attempts**. The node count
+reconciles exactly (414 passed + 1 failed → 415 passed), so nothing was skipped
+or renamed between the two runs.
+
+**I am not calling this benign and I am not papering over it.** The honest
+statement is: route B makes a previously synchronous handler multi-turn, one
+failure consistent with that appeared under a 12-minute loaded run, and my
+attempts to reproduce it have failed. A second `pause()` in the two realpath
+drivers would very likely mask it — **which is precisely the direction the
+coordinator ruled against** — so I have not done it unilaterally. This needs a
+ruling.
+
+## A.8 🆕 R-10 — a commit I did not make
+
+Partway through these fixes, `HEAD` moved from `d771ab8` to:
+
+```
+297990c jav201  Thu Aug 6 16:31:16 2026 -0600
+  batch-78 Inc-2 — HLR-122: selectable run list
+   .../increment-002.md | 585 +++++, screens_directionb.py | 77 +-,
+   test_tui_diff_compare_realpath.py | 24 +-, test_tui_diff_screen.py | 785 ++-
+```
+
+**I did not create this commit** — I have never run `git commit` in this session,
+and my packet says the increment was left uncommitted. It captures the
+**pre-review** state of Inc-2, i.e. the state containing the F1 crash. Reported,
+not acted on: I have not amended, reset or force-pushed anything. The working
+tree carries the review fixes on top of it.
+
+## A.9 Files modified (addendum)
+
+| File | Addendum delta | Whole increment vs `d771ab8` |
+|---|---|---|
+| `s19_app/tui/screens_directionb.py` | route B: 2 `async def`, 2 `await`, comments | **+79 / −25** |
+| `s19_app/tui/app.py` | **`async def` + `await` + 3 comment lines only** | **+5 / −2** |
+| `tests/test_tui_diff_screen.py` | `TC-B78-49`, F2 negative, 2 pauses removed, 1 `await` | **+890 / −26** |
+| `tests/test_tui_diff_compare_realpath.py` | **unchanged since the packet — no pause added** | **+21 / −3** |
+| `prototypes/cmdbar_a2bdiff.tui_prototype.py` | 1 `await` (tracked file, would break otherwise) | **+2 / −1** |
+
+**5 files — at the cap.** The coordinator authorized 4 (adding `app.py`); the
+5th is the **tracked** prototype at `:474`, which calls `render_comparison` and
+would silently never execute it once the method became a coroutine. Flagged
+rather than assumed.
+
+**Not touched:** `styles.tcss`, `tests/test_tui_directionb.py`,
+`.dev-flow/state.json`, `01-requirements.md`, the `02-review-*` files,
+`AT-TC-REGISTRY.jsonl`, `prototypes/memmap2.*`. No `git add -A`, no `git stash`.
+
+## A.10 Ledger (addendum)
+
+| Quantity | Value |
+|---|---|
+| after Inc-1 | 2612 |
+| added (`A`) | **13** (12 + `TC-B78-49`) |
+| **post = 2612 − 0 + 13** | **`2625 passed / 2 skipped / 3 xfailed`** |
+| **post, honestly** | **`2624 + 1 FAILED` snapshot cell until Inc-12; R-11 intermittent and unexplained** |
+
+```
+$ git show d771ab8:tests/test_tui_diff_screen.py | grep -c "^def test_"   -> 10
+$ grep -c "^def test_" tests/test_tui_diff_screen.py                      -> 23
+$ python -m pytest tests/test_tui_diff_screen.py -q -p no:randomly
+23 passed in 37.57s
+$ python -m pytest tests/test_tui_snapshot.py -q -p no:randomly
+1 failed, 31 passed        # still the single [diff-comfortable-120x30] cell
+```
+
+## A.11 Counterfactuals — re-executed with the corrected harness, WHOLE module
+
+Every run: post-image absent-before / present-after / bytes-changed /
+sha-unseen, restore verified by sha. **No `-k` selection (F5).**
+
+| # | Substituted VALUE | reddens |
+|---|---|---|
+| **CF-B** | route B reverted (both awaits removed) | **`TC-B78-49` ALONE** (1 failed, 22 passed) |
+| **M1** | note rows `disabled` `True` → `False` | `15`, **`16` (new)**, `TC-19`, `TC-47`, `TC-49` |
+| **M2** | `#diff_range_list` `overflow-y` `auto` → `hidden` | `16` |
+| **M3b** | highlight triple → the unselected row's | `17` |
+| **M4** | `DISPLAY_MAX_RUNS` `128` → `100000` | `18`, `tc029` |
+| **M5** | `_render_run_list(total_runs)` `len(runs)` → `len(capped)` | `18`, `tc029` |
+| **M6** | the run list binds `k` (probe: `'k' bound on the run list: True`) | `19`, on *"'k' must still open the Legend"* |
+| **M7** | note row `markup` `False` → `True` | `TC-48` |
+| **M8** | entries from `self._runs[:1]` | `15`,`16`,`17`,`18`,`19`,`TC-18`,`TC-21`,`TC-47`,`TC-49`,`tc022` |
+
+**F5 closed:** running the whole module surfaced `TC-B78-18`, `TC-B78-21` and
+`TC-B78-19` as genuinely falsifiable — previously undischarged only because the
+harness deselected them. **`TC-B78-17` (0 runs) and `TC-B78-22` (no comparison)
+remain undischarged**, which is honest for negative-boundary nodes and is stated
+rather than omitted.
+
+## A.12 Carries (amended / added)
+
+| # | Item |
+|---|---|
+| **C-78-vii** *(amended per F4)* | The subject clause must be asserted before any self-check — **and when a node carries two NORMATIVE clauses, the subject is the one the node's declared mutation targets.** `AT-B78-15` asserts its count clause before its walk clause and that is correct, because its declared mutation (M1) targets the walk. |
+| **C-78-viii** *(amended per F3, mechanism corrected)* | An applied-check must assert the **post-image was absent before and present after**, not merely present. Sha inequality is the weakest limb and must never stand alone. ⚠️ **The "harness writes LF over CRLF" mechanism did NOT reproduce here** (7114 CRLF before and after; no-op round-trip byte-identical), so the carry must record the *absent-before* limb as the fix, not line endings. |
+| **🆕 C-78-ix** | **A widget-swap increment must include a node that exercises the swapped widget's REBUILD path at least twice.** Twelve nodes, five ATs, nine mutations and a full gate suite all missed a hard crash on the panel's primary workflow, because every one of them rendered exactly once. General form: *when a change moves state from a value-update (`Static.update`) to a widget-lifecycle operation (mount/remove with identity), single-render coverage is structurally blind — identity collisions and stale-watcher bugs exist only on the second pass.* |
+| **🆕 C-78-x** | **A risk-register entry that names a real mechanism and then bounds it with "no such caller exists" must name the callers it checked.** My R-1 identified the async-clear mechanism and dismissed it against the wrong consequence class (stale read vs stale mount), which is more dangerous than not noticing it at all. |
