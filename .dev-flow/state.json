@@ -47,8 +47,8 @@
     "minted_so_far": "NONE - Phase 0 mints no ids.",
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31)."
   },
-  "current_phase": 0,
-  "phase_status": "awaiting-gate",
+  "current_phase": 2,
+  "phase_status": "in-progress",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -60,7 +60,10 @@
   },
   "artifacts": {
     "plan": ".dev-flow/2026-08-06-batch-78/PLAN.md",
-    "0": ".dev-flow/2026-08-06-batch-78/00-measurements.md"
+    "0": ".dev-flow/2026-08-06-batch-78/00-measurements.md",
+    "1": ".dev-flow/2026-08-06-batch-78/01-requirements.md",
+    "1_architect_lane": ".dev-flow/2026-08-06-batch-78/01-requirements-architect.md",
+    "1_qa_lane": ".dev-flow/2026-08-06-batch-78/01b-qa-validation.md"
   },
   "premise_evaluation_phase0": {
     "evaluated": 20,
@@ -138,8 +141,52 @@
       "date": "2026-08-06",
       "decision": "D-8 self-caught probe defect recorded rather than hidden",
       "notes": "The first focus probe blurred with 'escape', which an Input ignores, so the following 'g' was typed as text and the probe reported 'g -> find_input' on every screen. Taken at face value it would have produced a FALSE finding against action_focus_goto. Corrected probe asserts the blur; the charter's premise is TRUE."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-06",
+      "decision": "D-9 S-3 destination = OPTION C (BOTH the Loaded panel AND the app-level status bar) - OPERATOR RULING, overriding my autonomous recommendation of option B",
+      "notes": "I recommended B (status bar only) and the operator ruled C. Recorded as a ruling, not as my decision. Measured basis presented at the gate: LoadedArtifactsPanel ALREADY renders the A2L companion filename (three typed slots, safe_text-wrapped) but is composed inside #screen_workspace, so the charter's 'move the labels into the Loaded panel' is half-satisfied already and would still leave 9 of 10 screens with no project/A2L context. #workspace_status_bar is app-level chrome (yielded between #workspace_shell and Footer(), app.py:1909-1930), present on all 10 screens at zero new rows. Option C takes both surfaces. CONSEQUENCE Phase 1 must own: two update paths to keep in sync, and therefore a discriminating acceptance on EACH - a single test that observes one surface is green on an implementation that updates only that one. C-17 binds the new label: the A2L filename is file-derived, so markup=False AT CONSTRUCTION, mirroring #status_text (app.py:1916) and the #log_line_* scrub."
+    },
+    {
+      "phase": 0,
+      "date": "2026-08-06",
+      "decision": "D-10 a PARALLEL SESSION is active in this repo; its files are reported as found and left untouched (C-44)",
+      "notes": "Eight prototypes/memmap2.* files (a memory-map prototype set: tui_prototype.py + 7 capture SVGs) appeared with mtime 10:18 - the SAME MINUTE as my own 00-measurements.md - and were absent from my first git status at Phase 0. They are therefore NOT pre-existing: they were written DURING this session by another session. OPERATOR CONFIRMED at the Phase-1 kickoff: 'Los artefactos nuevos son trabajo para otra sesion, prototipos para memory map. No te corresponde.' Not added, not moved, not deleted. STANDING HAZARD for the rest of this batch: .dev-flow/state.json is a single-batch, last-writer-wins file with no owner field - re-read it immediately before EVERY edit, and if that session claims a batch number it must not be 78."
+    },
+    {
+      "phase": 1,
+      "date": "2026-08-06",
+      "decision": "P-19 RE-DERIVED before any agent was dispatched, per C-39",
+      "notes": "Taken autonomously. Handing a hypothesis to a sub-agent as if it were a measurement is how a false figure propagates into a spec; the charter itself flags these numbers as re-derivable. Result: the 81-cell hex row is EXACT. Two other figures are NOT: the rail measures 22 columns, not 24 (and collapses to 4 at 80x24, a regime the charter omits); and the shipped 3-column diff does not merely 'wrap below ~170' - it wraps at EVERY realistic width, needing a ~282-column terminal to fit three unwrapped rows, measured 49 content cells per column at 190x44. Also derived, and absent from the charter: each bordered column box costs exactly 5 cells (2 border + 2 padding + 1 margin-right). The consequence reframes S-7: a full-width window fits an unwrapped row from 120 up (87 >= 81), but a window BESIDE a 22-col list does not even at 132 (77 < 81), so the regime split is about whether the list shares the row - not about the window."
+    },
+    {
+      "phase": 1,
+      "date": "2026-08-06",
+      "decision": "Phase 1 APPROVED (self-approved under the kickoff grant) - 01-requirements.md final at 804 lines",
+      "notes": "9 HLR (118-126), 30 LLR, 31 AT-B78, 45 TC-B78, 13 increments (Inc-0..Inc-12), zero should in any Statement, zero orphans in either chain. The two lanes collided on the AT-B78 namespace and were reconciled BY SUBJECT in a 22-row table: 21 MERGED, 1 NEW, 0 RETIRED, no observable dropped. In NINE cases the QA predicate was stronger and replaced the architect's; in TWO of those it corrected an outright defect (AT-B78-05 specified #status_text, which set_status never writes - the AT would have been vacuous; AT-B78-18 quoted DISPLAY_MAX_RUNS in the shape QA had already proved INERT under a 128->100000 mutation). Exit criteria: Coverage - both chains complete, every story has an acceptance block. Certainty - mutations executed with restore confirmed by hash digest triples; 6 PINs LABELLED and none counted as discharged. Evidence - every figure carries the command that produced it, and 6 unverifiable claims are flagged assumed-verify-at-Phase-3 with named owners rather than guessed. No axis unmet, so approve rather than iterate."
+    },
+    {
+      "phase": 1,
+      "date": "2026-08-06",
+      "decision": "Phase-0 P-8 verdict CORRECTED by the fold: the deletable CSS span is :66-102, not :55-102",
+      "notes": "My Phase-0 table marked \":55-102 is precisely the deletable span\" as TRUE. The ADDRESSES were right but the CONCLUSION was wrong: #command_bar_slot (:51) and #command_bar (:61-64) both SURVIVE, because the palette lives inside them and Ctrl+K must keep working. Deleting :55-102 would have removed the styling of the container that stays. Verified independently. Third correction to my own Phase-0 work this batch, after the wrong-producer measurement and the census whose count and enumeration came from different greps."
     }
   ],
+  "phase1_rulings": {
+    "R-1_OPERATOR_s7_three_regimes": "S-7 has THREE regimes, not two. Operator-ruled 2026-08-06 after the vertical measurement, because the charter's 'a 120-col fallback is required' is an operator-approved clause and the counterexample re-opens it CONSTRUCTIVELY - the requirement comes out larger, not deleted. (1) At/above the wide breakpoint (_DIFF_WIDE_MIN = 139, content units): run list beside full-width windows. (2) At 120: the list becomes an OVERLAY on a dedicated key, the window takes full width, and the 2 visible hex rows are an explicitly-accepted paginable viewport. (3) Below the threshold where even that fails: an EXPLICIT NOTICE naming the required width/height, instead of the silently empty panel shown today. The notice regime is entered on HEIGHT as well as width - that is the whole finding - so its threshold must be DERIVED as a normative allocation bound over the measured vertical budget, never hand-picked. Closes the architect's OQ-1.",
+    "R-2_keyboard_arrows_enter": "S-5's keyboard path is ARROWS + ENTER, bound on the LIST WIDGET, not the App. Taken by me. j and p are frozen in _PRE_BATCH_BINDINGS under live TC-011; k is a show=True footer chip for the Legend; only n is free App-level. Matches batch-77 ruling R3 verbatim, which dropped j/k/o for the identical reason - the second time this project has had to strike chartered keys against the same frozen guard.",
+    "R-3_s9_enter_open_in_hex_OUT": "S-9's 'Enter posts an open-in-hex message' is OUT, on the architect's evidence: the existing handler renders current_file, which is generally NEITHER compared image, so it would silently show the wrong bytes. That is a defect, not a feature. Carried as C-78-d. The rest of S-9 (Footer + ? keymap discoverability) stays IN - the keyboard path is useless undiscovered.",
+    "R-4_increment_order_lane2_first": "Lane 2 FIRST, Lane 1 LAST. Taken by me, and it resolves a direct contradiction between the two lanes rather than averaging it. The architect's D-10 (Lane 1 first, because the result area is structurally invisible) and QA's C-30 (Lane 2 first, for snapshot coverage) cannot both hold. MEASURED: the diff result area is ALREADY VISIBLE TODAY at 132x44 with 7 hex rows, so Lane 2's acceptances are observable with zero Lane 1 work - they are simply written at 132x44 instead of 120x30. That removes the architect's premise for ordering, leaving QA's, which is decisive: S-1 drifts 29 of 29 golden cells while Lane 2 drifts 1, so Lane 1 first would xfail 28 cells from increment 1 and ship all of Lane 2 with no snapshot coverage. EXCEPTION made explicit in the increment table: S-7's fallback and notice acceptances depend on S-8 AND S-1, so those specific ATs land Lane-1-side."
+  },
+  "phase1_vertical_measurement": {
+    "why": "It decides whether S-7's chartered 120-col fallback is viable at all, and it settled the ordering conflict between the two lanes.",
+    "method": "Simulated S-8 by setting #diff_select_row_a/_b and #diff_action_row to height 1, and S-1 by hiding #command_bar_row, on the shipped tree. Read #diff_columns and #diff_hex_a heights after two pauses.",
+    "result_hex_rows": "120x30: 0 today / 0 with S-8 alone / 2 with S-8+S-1. 80x24: 0 in ALL THREE configurations. 132x44: 7 / 13 / 16.",
+    "budget_breakdown_120x30": "#ab_diff_panel h=11, consumed by diff_select_row_a 3 + diff_select_row_b 3 + diff_action_row 3 + diff_status 1 + diff_columns 1. The three 3-row rows are S-8's subject; box chrome costs 4 rows vertically (matches 132x44, where diff_columns 11 -> hex_a 7).",
+    "my_own_error_recorded": "I first DERIVED 6 rows at 120x30 by adding the six rows S-8 frees. Executed, it is 2: #diff_columns goes 1 -> 3 under S-8, not 1 -> 7, because the layout redistributes rather than handing the freed space to the results container. The architect's figure was right and my arithmetic was wrong. This is C-35 landing on me for the SECOND time in this batch (the first was measuring render_hex_view_text for a panel that calls render_hex_view) - reading the layout and computing over it separately misses their interaction, which is the exact thing C-35 exists to say.",
+    "consequence": "The charter's 'fallback at 120' delivers a 2-row window and 80x24 delivers nothing in any configuration. Escalated to the operator rather than absorbed; resolved by R-1."
+  },
   "obsidian_synced": false,
   "created_at": "2026-08-06T00:00:00Z",
   "progress": {

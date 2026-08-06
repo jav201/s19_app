@@ -186,3 +186,143 @@ than a cosmetic one.
 *(Probed with no file loaded, so `_handle_search` bails at "No file loaded." before searching.
 The routing is proven by the input write, which happens first and unconditionally. A
 loaded-image arm belongs in the Phase-1 acceptance, not here.)*
+
+---
+
+## 9 · P-19 RE-DERIVED at Phase 1 (C-39) — the ceiling holds, two other figures do not
+
+The charter's width figures came from the design prototype. *A carried number is re-derived, not
+copied.* Executed against the shipped renderer and the shipped layout on this tree.
+
+### 9.1 The hex row — charter EXACT
+
+```
+81  '  0x00001000  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  |................|'
+81  '  0x00001010  10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D 1E 1F  |................|'
+max line width = 81 cells over 5 rows
+```
+
+`render_hex_view_text` (`s19_app/tui/hexview.py:360`) over a 64-byte map. **A full hex+ASCII row
+is exactly 81 cells.** ✅ The charter's headline number is confirmed on this tree.
+
+### 9.2 Shipped layout geometry — measured, `#screen_diff` active
+
+| terminal | `#rail_slot` | `#diff_columns` | `#diff_range_list` | `#diff_hex_a` | `#diff_hex_b` |
+|---|---|---|---|---|---|
+| 80×24 | **4** | 70 | 18 | 18 | 19 |
+| 120×30 | 22 | 92 | 25 | 26 | 26 |
+| 132×44 | 22 | 104 | 29 | 30 | 30 |
+| 170×44 | 22 | 142 | 42 | 42 | 43 |
+| 190×44 | 22 | 162 | 49 | 49 | 49 |
+
+**❌ The rail is 22 columns, not 24** (charter §1). It collapses to **4** at 80×24 — a second
+regime the charter does not mention.
+
+**Chrome cost per column box, derived from the residual:** at 132, `29 + 30 + 30 = 89` against a
+`#diff_columns` of `104`; the 15-cell difference is `3 × margin-right 1` + `3 × border 2` +
+`3 × padding 2`. So `.size.width` is the **content** width and **each bordered column costs 5
+cells** (2 border + 2 padding + 1 margin). This is the constant S-7's regime arithmetic needs, and
+it is nowhere in the charter.
+
+### 9.3 ❌ The shipped 3-column diff does not wrap "below ~170" — it wraps at EVERY width
+
+An unwrapped hex row needs `81 + 5 = 86` outer cells. Three of them need `258`, i.e. a
+`#diff_columns` of 258 → a terminal of roughly **282 columns**. Measured, the widest sampled
+terminal (190×44) gives each column **49** content cells — **60 % of one row**. The charter's
+*"the shipped 3-column diff wraps below ~170"* implies a width at which it stops wrapping; **there
+is no such width at any realistic terminal size.** The defect is worse than chartered, which
+strengthens Lane 2 rather than weakening it.
+
+### 9.4 What this hands Phase 1 for S-7 — primitives, not a design
+
+- unwrapped hex row = **81** content cells; one bordered box = **+5**
+- `#diff_columns` content width = terminal − 22 (rail) − 6 (shell chrome), measured above
+- **A full-width single window fits an unwrapped row from 120 up** (92 − 5 = 87 ≥ 81) ✅
+- **A window sitting BESIDE a 22-col list does not, even at 132** (104 − 27 = 77 < 81) ❌
+
+**Therefore the 120-vs-130 regime split is not about the window — it is about whether the run list
+shares the row with it.** That is a materially different framing from the charter's, it is derived
+from measured constants rather than from the prototype's screenshots, and S-7's option pick must be
+made against it. The prototype used class-scoped selectors and inline styles for the contested
+boxes, so **its chrome cost is not necessarily the shipped 5** — Phase 1 owns re-deriving that for
+whichever regime it picks.
+
+---
+
+## 10 · ⚠️ CORRECTIONS to §5 and §9 — two of my own errors, found by the Phase-1 QA lane
+
+Recorded as corrections beside the original rather than by rewriting it, so the error is auditable
+(the batch-77 convention).
+
+### 10.1 ❌ §9.1 measured the WRONG PRODUCER — the diff panel's row is 79 cells, not 81
+
+§9.1 measured `render_hex_view_text`. **The A2B diff panel does not call it.** `_render_run_windows`
+imports and calls **`render_hex_view`** (`screens_directionb.py:7021`, used at `:7030-7031`); the
+module's own docstring says so at `:6606` and `:7016`. Both renderers exist —
+`hexview.py:330` (`render_hex_view`) and `:360` (`render_hex_view_text`). Executed:
+
+```
+render_hex_view      (DIFF PANEL) max = 79 cells
+    '0x00001000  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  |................|'
+render_hex_view_text (WORKSPACE)  max = 81 cells
+    '  0x00001000  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  |................|'
+```
+
+**The difference is exactly the two-space left indent `render_hex_view_text` adds.** So `81` is
+correct *for the workspace hex pane* — which is what the charter's §1 sentence is about — and
+**`79` is the number every Lane-2 / S-7 threshold must use.**
+
+**This is the C-32 wrong-layer trap, and I documented it in §7 of this very file before committing
+it in §9.** The same shape as batch-77's recorded irony. It survived my own review because
+executing the wrong producer returns a *plausible* number: 81 is off by 2, not by an order of
+magnitude, so nothing looked wrong. Found by the QA lane, verified independently here.
+
+### 10.2 The chrome constant is confirmed at 5 — and it settles a disagreement between the two derivations
+
+The QA lane derived the side-by-side bound as `L ≤ C − 84`; §9.4's accounting gives `L ≤ C − 89`.
+The two differ because the QA form charges chrome to the **window box only** and treats the run
+list as costing its content width alone. **Settled by measurement, not by argument:** at 132 the
+three shipped columns measure `29 + 30 + 30 = 89` content against a `#diff_columns` of `104`, so
+chrome is `15` across three boxes = **exactly 5 per box, the last one included**. The list box pays
+it too.
+
+**Canonical bound: a run list of content width `L` may share a row with an unwrapped diff window
+only where `L + 5 + 79 + 5 ≤ C`, i.e. `L ≤ C − 89`.**
+
+| terminal | `C` (`#diff_columns`) | max list width `L` beside an unwrapped window |
+|---|---|---|
+| 120×30 | 92 | **3** |
+| 132×44 | 104 | **15** |
+| 170×44 | 142 | 53 |
+
+**Both of the QA lane's conclusions survive the tighter bound, which is why this is a precision fix
+and not a reversal:** a 12-col list at 120 is impossible (`12 > 3`, and `12 > 8` on their looser
+form too), and the chartered *"22-col list + full-width windows at ≥ ~130"* does not work at 132
+either (`22 > 15`; `22 > 20` on theirs). The first width at which a 22-col list fits beside an
+unwrapped window is `C ≥ 111` → **a terminal of ≈ 139**, not 130 and not the charter's cited 132
+capture. ⚠️ **The two derivations must not both survive into the requirements** — Phase 2 settles
+on this measured one, and the S-7 option pick is re-checked against it.
+
+### 10.3 ❌ §5's Lane-1 census file list is incomplete — the counts and the list came from different patterns
+
+§5 reports `cmdbar_project → 9 files` in its per-symbol counts, then lists files produced by a
+**narrower** grep that omitted `cmdbar_project` and `cmdbar_a2l` entirely. The list is therefore
+missing real observers. Re-derived:
+
+```
+tests/test_tui_directionb.py       cmdbar_* : 2 lines    _project_label : 2
+tests/test_tui_patch_variant.py    cmdbar_* : 2 lines    _project_label : 10
+tests/test_tui_variants.py         cmdbar_* : 1 line     _project_label : 9
+tests/test_tui_app.py              cmdbar_* : 0          _project_label : 3
+```
+
+**Four files, not three** — the QA lane named two of the missing ones and did not name
+`tests/test_tui_app.py`; neither its figures nor my original list are the derived set, so the table
+above is the one to use. `#cmdbar_project` is the **observable** for `_project_label()`, which
+guards the LLR-005.5 multi-variant display form — so **S-3 owes the display *form*, not merely the
+name**, and the Lane-1 blast radius is four test files.
+
+**The generalisable lesson, which is the reusable part:** §5's counts and its file list were
+produced by two different greps and were never reconciled, so the document contradicted itself in
+adjacent lines. *A census whose count and whose enumeration come from different patterns has
+measured neither.*

@@ -8,7 +8,7 @@
 | | |
 |---|---|
 | **Batch** | `2026-08-06-batch-78` |
-| **Phase** | **0 — story intake & refinement · AWAITING GATE** |
+| **Phase** | **1 — requirements engineering · IN PROGRESS** (Phase 0 approved 2026-08-06 under the kickoff grant; no exit-criteria axis was unmet) |
 | **Branch** | `claude/batch-78-cmdbar-a2bdiff` @ `f6ff1d3` |
 | **RC-1** | ✅ PASS — merge-base == `origin/main` tip `f6ff1d3`; charter's base `061a97e` is an ancestor, 1 intervening commit, `state.json` only, **no source drift** |
 | **Flow revision** | `2026.07.28-rev1` · controls C-1…C-45 · **11/11 command+template files byte-exact**; aggregate mismatch is the `dev-flow-lessons` catalog only, where local is AHEAD → **NON-BLOCKING** (D-5) |
@@ -120,6 +120,9 @@ scope).
 | D-6 | 0 | Use subagents as the flow specifies (`code-reviewer` per increment gate, `qa-reviewer` at Phase 4 and the merge gate), with C-33 liveness polling | Taken autonomously — the accepted kickoff option names the qa-reviewer merge pass, so it is authorized by the answer itself |
 | D-7 | 0 | **Batch-scoped ids** `AT-B78-nn` / `TC-B78-nn` — no reservation PR needed | `docs/engineering-rules.md:48` prefers batch-scoped; the registry's `_meta.governed` puts letter-initial bodies outside its authority by spec §2.3, so they cannot collide by construction. Global `next_free` re-derived from the registry as **AT-282 / TC-613** (1 373 rows) and left untouched |
 | D-8 | 0 | Probe defect recorded, not hidden: revision 1 of the focus probe blurred with `escape` and produced a false `g → find_input` reading on every screen | Same class as batch-77's four self-caught lane probes; the corrected probe asserts the blur |
+| **D-9** | 0 | **S-3 destination = BOTH the Loaded panel AND `#workspace_status_bar` (option C)** | **Operator ruling**, overriding my autonomous recommendation of B (status bar only). Measured basis: `LoadedArtifactsPanel` **already** renders the A2L filename, and `#workspace_status_bar` is app-level chrome on all 10 screens at zero new rows. **Consequence Phase 1 owns: two update paths ⇒ two discriminating acceptances**, since one AT observing one surface is green on an implementation that updates only that one |
+| **D-10** | 0 | **A parallel session is active in this repo; its files are reported as found and left untouched (C-44)** | Eight `prototypes/memmap2.*` files appeared at mtime **10:18** — the same minute as my own `00-measurements.md` — and were absent from my Phase-0 `git status`. They were written **during** this session, by another. **Operator confirmed** they are a memory-map prototype set belonging elsewhere. Standing hazard: `state.json` is last-writer-wins with no owner field — re-read before every edit |
+| **D-11** | 1 | **P-19 re-derived before any agent was dispatched** | Taken autonomously (C-39). Handing a hypothesis to a sub-agent as a measurement is how a false figure propagates into a spec. **81-cell hex row: EXACT.** Rail is **22, not 24** (4 at 80×24, a regime the charter omits). The shipped 3-column diff **wraps at every realistic width**, not "below ~170" — it would need a ~282-column terminal. Derived and absent from the charter: each bordered box costs **+5** cells. **Reframes S-7: the regime split is about whether the list shares the row with the window, not about the window** |
 
 ## 9 · Pending at this gate — one question for the operator
 
