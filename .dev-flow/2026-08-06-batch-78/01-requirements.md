@@ -766,7 +766,13 @@ Every gate runs: full `tests/test_tui_directionb.py` (C-34) + `tests/test_tui_co
 - **`AT-B78-27` is now RETIRED** (absorbed into `AT-B78-26` per Q-M6.1), so the batch's retirement count is **1**, not 0. The observable is preserved, not dropped.
 
 ### 5.7 ID sizing
-**33 `AT-B78-nn` (one retired → 32 live) + 48 `TC-B78-nn` = 80 batch-scoped ids.** Revision 2 mints `AT-B78-32` (the restored App-`BINDINGS` no-regression arm), `AT-B78-33` (Inc-1's non-invariant gate), `TC-B78-46` (the routing discrimination split off `TC-B78-41`), `TC-B78-47` (the restored list-edge no-op) and `TC-B78-48` (the M10 C-17 node); **`AT-B78-27` is retired into `AT-B78-26`** and its id is permanently spent.** Outside `AT-TC-REGISTRY.jsonl`'s authority by spec §2.3 (letter-initial bodies); no reservation PR; `_meta.next_free` (`AT-282`/`TC-613`) **not** advanced.
+**33 `AT-B78-nn` (one retired → 32 live) + 49 `TC-B78-nn` = 81 batch-scoped ids.** Revision 2 mints `AT-B78-32` (the restored App-`BINDINGS` no-regression arm), `AT-B78-33` (Inc-1's non-invariant gate), `TC-B78-46` (the routing discrimination split off `TC-B78-41`), `TC-B78-47` (the restored list-edge no-op) and `TC-B78-48` (the M10 C-17 node); **`AT-B78-27` is retired into `AT-B78-26`** and its id is permanently spent.** Outside `AT-TC-REGISTRY.jsonl`'s authority by spec §2.3 (letter-initial bodies); no reservation PR; `_meta.next_free` (`AT-282`/`TC-613`) **not** advanced.
+
+> **Amendment — `TC-B78-49` minted at the Inc-2 gate (2026-08-06, orchestrator).** **Before:** `TC-B78-01…48`. **After:** `TC-B78-01…49`. **New token:** `TC-B78-49` — *a second Compare rebuilds the run list*: two consecutive comparisons with **different** run counts, asserting the entry count matches the second fixture, `index` is the first run, exactly one row carries `-highlight`, and every run of the second set is keyboard-reachable.
+>
+> **Why it was not in the increment cut.** Inc-2's gate found a HIGH: `ListView.clear()` only *posts* `Prune()`, so `extend()` re-mounted rows carrying ids that were still registered — `DuplicateIds` on the **second** Compare, the panel's primary workflow. **No node in the batch or in the pre-existing suite pressed Compare twice**, so 22 nodes were structurally blind to the defect class. Removing the route-B awaits reddens `TC-B78-49` **and nothing else**, which is the measurement that justifies a node rather than an assertion folded into an existing one (C-18: one AT, one node).
+>
+> **C-21 discharge.** The increment cut is re-reconciled: `TC-B78-49` is owned by **Inc-2**, which realized it in the same increment that introduced the defect. No other increment's AT/TC allocation moves, and §7's file map is unchanged apart from the `app.py` cell ratified for Inc-2 (route B) and `prototypes/cmdbar_a2bdiff.tui_prototype.py`, a **tracked** caller of `render_comparison` that would otherwise silently stop executing it once the method became a coroutine.
 
 ---
 
