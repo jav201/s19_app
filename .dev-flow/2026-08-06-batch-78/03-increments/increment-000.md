@@ -125,7 +125,21 @@ $ python -m pytest tests/test_tui_commandbar.py -q -p no:randomly
 14 passed in 17.35s
 ```
 
-`git show HEAD~1:tests/test_tui_commandbar.py | grep -c "^def test_"` → **13**. So **D = 0, A = 1.**
+**Node count, against PINNED SHAs.** The original evidence used `HEAD~1`, which drifted the moment
+the packet commit landed (it recorded 13 and now returns 14). *A figure whose command drifts with
+the commit graph is not re-derivable* — the same family as F-3's unstated fixture — so the base is
+named explicitly:
+
+```
+$ git show 601ea47:tests/test_tui_commandbar.py | grep -c "^def test_"   # pinned base
+13
+$ git show 6823352:tests/test_tui_commandbar.py | grep -c "^def test_"   # Inc-0 capture
+14
+$ grep -c "^def test_" tests/test_tui_commandbar.py                      # working tree
+14
+```
+
+**D = 0, A = 1.** The addendum commit adds no node — it rewrites `TC-B78-44`'s census in place.
 
 ### 4.2 Gate set — ONE run, FULL form (no marker filter)
 
@@ -201,6 +215,66 @@ tests\test_tui_commandbar.py:931: AssertionError
 Both mutations were applied in the working tree, verified applied, reverted with
 `git checkout -- <path>`, the predicate re-run **GREEN**, and `git status` re-checked clean.
 
+### 4.4b ADDENDUM — limb (b) rebuilt to fail CLOSED (review F1), five forms executed
+
+**The finding.** The first census hand-listed seven write verbs and inspected only the **receiver**.
+The independent reviewer executed five regeneration forms against it and two came back **GREEN**:
+`json.dump(rows, open(path, "w"))` and `shutil.copy(src, path)`. Both name this module's own symbol,
+so the gap was **verb-side and argument-side**, inside the scope the docstring claimed to cover.
+
+**Why this is the batch's signature defect one layer down.** A list of the verbs that *write* is a
+**vacuous input set** — only as strong as a list someone remembered, and an omission leaves the
+guard **green**. That is the same C-31 defect §6.4a's hand-filled propagation register had, and it
+landed *inside the control built to prevent regeneration*. `json.dump` is *the* idiomatic way to
+write JSON, i.e. exactly the accident being guarded against.
+
+**The fix is the same one `enum.py` used: invert it so an omission fails CLOSED.** Not two names
+appended.
+
+| | before | after |
+|---|---|---|
+| match surface | receiver only | **the whole call — receiver OR any argument** |
+| verb set | `_B78_WRITE_METHODS` — hand-listed **writes** | `_B78_NON_WRITING_CALLS` — allowlisted **non-writes**; everything else offends |
+| an unanticipated verb | **GREEN** (silent hole) | **RED** (deliberate widening required) |
+| aliasing | not handled | one level of **path-shaped** local aliasing, to a fixed point |
+
+```
+form                                     verdict
+----------------------------------------------------------------------------------------------------
+(unmodified tree)                        GREEN (census finds nothing)
+A  path.write_text(...)                  RED   ['test_tui_directionb.py:8692 write_text()']
+B  open(...).write(...)                  RED   ['test_tui_directionb.py:8692 write()', 'test_tui_directionb.py:8692 open()']
+C  json.dump(rows, open(..., 'w'))       RED   ['test_tui_directionb.py:8692 dump()', 'test_tui_directionb.py:8692 open()']
+D  shutil.copy(src, path)                RED   ['test_tui_directionb.py:8692 copy()']
+E  alias then write (local aliasing)     RED   ['test_tui_directionb.py:8694 write_bytes()', 'test_tui_directionb.py:2783 sorted()', 'test_tui_directionb.py:2783 lower()', 'test_tui_directionb.py:2440 any()', 'test_tui_directionb.py:2443 any()']
+----------------------------------------------------------------------------------------------------
+(restored tree)                          GREEN (census finds nothing)
+```
+
+Each form was appended to a real test module, **the mutation re-asserted present before running**,
+and the module restored with `git checkout --` plus a byte-equality check against the original.
+**All four reviewer forms redden; form E (my own addition, local aliasing) also reddens.**
+
+**Two things the rewrite cost, both stated rather than absorbed:**
+
+1. **The census fired on its own allowlist declaration** — `frozenset({"_b78_artifact", …})`'s string
+   literal names the reader. `frozenset` was added to the allowlist as a deliberate edit. This is the
+   fail-closed design behaving correctly, and it is why the allowlist is documented member-by-member.
+2. **Form E measured a real false positive.** Module-scoped taint bound the common name `p`, and the
+   census additionally reported three unrelated calls (`sorted`/`lower`/`any`) elsewhere in that
+   module. That is a false **positive** — a loud red test — never a false negative, and it only
+   arises once someone introduces an artifact-path alias, which is exactly when loudness is wanted.
+   **Per-function taint scoping would remove the noise and is deliberately not built:** ~25 lines of
+   scope resolution inside a test guard buys accuracy the guard's purpose does not need. Recorded in
+   the docstring as measured behaviour, so a future reader meets it as a documented property rather
+   than as a bug. **Overrule this if you disagree — it is a judgement call, not a constraint.**
+
+**Answer to the coordinator's question:** the verb set could not be *fully derived* — there is no
+enumerable universe of "calls that write" the way `enum.py` has an enumerable corpus of grep terms.
+So I inverted the polarity instead, which achieves the same property (an omission is loud, not
+silent) without pretending to a derivation. The docstring now states the exact reach and the two
+things outside it.
+
 ### 4.5 The staged blob, not the working file
 
 ```
@@ -248,7 +322,8 @@ coin-flip.
 | # | Risk | Severity | Mitigation / status |
 |---|---|---|---|
 | **R-1** | **The artifact path deviates from the spec** (`tests/goldens/batch78/` not `tests/_artifacts/`). Inc-1 / Inc-10 / Inc-11 must read the actual path. | medium | Forced by `.gitignore:14` (F-1). Recorded here and in the commit message; the paths are constants in `tests/test_tui_commandbar.py`. **Spec §7 should be amended.** |
-| **R-2** | The AST census (limb b) is a **token census** over receivers naming `b78_artifact`. A module reconstructing the path from raw literals evades it. | low | Stated in the test's own docstring rather than implied. It bounds accident, not intent. |
+| **R-2** | The AST census (limb b) is a **token census**. A module rebuilding the path from raw string literals, or passing it through a call's return value, still evades it. | low | Rebuilt to fail closed (§4.4b): whole-call matching + an allowlist of non-writing calls, so an unanticipated verb reddens. Reach and its two gaps stated exactly in the docstring. It bounds accident, not intent. |
+| **R-2b** | Module-scoped taint **over-reports** when an artifact-path alias uses a common name — measured: `p` produced 3 unrelated hits in `test_tui_directionb.py` (§4.4b). | low — **fails closed** | A false positive is a red test, never a silent pass. Per-function scoping declined as over-engineering for a test guard; documented as measured behaviour. Reversible if the reviewer prefers it built. |
 | **R-3** | The three captures use three different terminal sizes (160×40, 120×30, 132×44). A consumer driving a different size compares two layouts. | medium | The sizes are module constants (`_B78_CAPTURE_SIZE`, `_B78_PALETTE_SIZE`, `_B78_DIFF_SIZE`) and every consumer must import them. Called out in the module comment. |
 | **R-4** | The digest assertion makes any legitimate re-capture a red test. | low — **by design** | That is the freeze. A re-capture after a production edit is precisely the defect being prevented. |
 | **R-5** | `AT-B78-33` reads `content_height` from the geometry artifact; Inc-1 owns `tests/test_tui_diff_screen.py`, which does **not** import from `test_tui_commandbar.py`. | low | The artifact JSON is the contract; Inc-1 needs two lines of `json.loads(Path(...).read_text())`. Noted in §6. |
@@ -274,6 +349,22 @@ strings). No dependency added.
    `json.loads((Path(__file__).parent / "goldens" / "batch78" / "at-b78-33-diff-hex-a-height.json").read_text())["content_height"]`.
 5. **Owed at Inc-11 (spec Q-m3):** a second mutation on `_handle_goto`'s address parse — the recorded
    `find_string_in_mem → lambda: None` mutation reaches only the search half of the payload.
+6. **Open judgement call for the reviewer (§4.4b):** per-function taint scoping in the census —
+   declined as over-engineering, measured false positive documented. Overrule if you disagree.
+
+---
+
+## 6b. Batch carry list — recorded, not re-litigated
+
+Three items for the batch close. All three are **spec defects surfaced by executing the spec rather
+than reading it**, which is this batch's own stated pattern (§10.2: *every blocker in three rounds
+was in an acceptance or a control, never the measured foundation*).
+
+| # | Item | Owner |
+|---|---|---|
+| **C-78-i** | **§7's Inc-0 row names a gitignored path.** `tests/_artifacts/` is ignored at `.gitignore:14` — it is the generated pilot GIF/SVG tree. §7 must be amended to `tests/goldens/batch78/` and to a file count of 5. | batch close |
+| **C-78-ii** | **`LLR-121.2`'s digest recipe omits its fixture.** The recipe is stated; the memory it was captured against is not, so `0a159da97fa81714` is unreachable — the reviewer's 183-serialisation brute force confirmed it. Replace with `713be432b69cb2e0` and the now-committed `_b78_loaded_s19`. *An unstated fixture is an unstated definition* — the same lesson as the unstated grep pattern, recurring inside the recipe written to prevent it. | batch close |
+| **C-78-iii** | **Coordinator brief/spec divergence, recorded at the coordinator's request.** The Inc-0 brief named **two** artifacts where §7 names **three**. Followed literally, Inc-1's `AT-B78-33` gate would have had no oracle **and no way to obtain one**, because Inc-1 edits `styles.tcss` and the pre-change 132×44 height cannot be re-measured afterwards. The spec was followed over the brief. **The general form: a brief that summarises a spec is a lossy copy, and the increment plan — not the brief — is the authority on what an increment must produce.** | batch close |
 
 ---
 
@@ -317,17 +408,22 @@ with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as td:
 
 Run: `PYTHONDONTWRITEBYTECODE=1 python capture_inc0.py C:/Users/jjgh8/Github/s19_app`
 
+**Independently reproduced.** The reviewer typed this script out verbatim as pasted, ran it in a
+fresh process, and got all three artifacts **byte-identically** — which closes C-35 provenance,
+determinism and re-derivability in one execution rather than three claims.
+
 ---
 
 ## Evidence checklist
 
 | Item | ✓/✗ | Evidence |
 |---|---|---|
-| Tests / type checks / lint pass | ✓ | §4.2 — `377 passed in 416.15s`, one run, FULL form. Lint/type: repo runs neither in its gate suite. |
+| Tests / type checks / lint pass | ✓ | §4.2 — `377 passed in 416.15s`, one run, FULL form. **Re-run after the F1 census rewrite: `377 passed in 421.92s`, same nine files, one run.** Lint/type: repo runs neither in its gate suite. |
 | No secrets in code or output | ✓ | Artifacts hold fixture addresses (`4102`, `4112`) and shipped status strings only; no env, no paths outside `tmp`. |
 | No destructive commands without approval | ✓ | Only `rm -f tests/goldens/batch78/*.json` — files I created one minute earlier, immediately restored by `git checkout` and re-hashed identical (§4.5). No `git add -A`, no `git stash`, no force, no push. |
 | File count within cap | ✓ | 5 tracked files (§2), cap is 5. Deviation from §7's "(3)" stated, not absorbed. |
 | No production source changed | ✓ | `git diff 601ea47..6823352 -- s19_app/` → **empty** |
 | Every node carries a spec id | ✓ | `TC-B78-44` — the only id §7 Inc-0 allocates. No id invented. |
-| Node falsifiable, mutation applied-checked | ✓ | §4.4 — both limbs RED → reverted → GREEN, tree clean |
-| Review packet attached | ✓ | this document, §§1–7 |
+| Node falsifiable, mutation applied-checked | ✓ | §4.4 — both limbs RED → reverted → GREEN, tree clean. **§4.4b — limb (b) rebuilt to fail closed; five forms RED, unmodified tree GREEN, each mutation re-asserted present and each restore byte-checked.** |
+| Ledger evidence re-derivable | ✓ | §4.1 — commands pinned to `601ea47` / `6823352`, not `HEAD~1` (review F2) |
+| Review packet attached | ✓ | this document, §§1–7 + §6b carry list |

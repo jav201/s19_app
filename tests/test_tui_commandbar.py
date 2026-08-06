@@ -29,6 +29,7 @@ from __future__ import annotations
 import asyncio
 import ast
 import json
+import re
 from hashlib import blake2b
 from pathlib import Path
 
@@ -664,10 +665,104 @@ _B78_ROW_KEYS = frozenset(
     }
 )
 
-#: Method names that would rewrite an artifact if pointed at one.
-_B78_WRITE_METHODS = frozenset(
-    {"write_text", "write_bytes", "write", "writelines", "mkdir", "touch", "unlink"}
+#: The census below INVERTS the obvious shape, and the inversion is the point.
+#:
+#: A list of the verbs that WRITE is a vacuous input set — it is only as strong
+#: as a list someone remembered to write, and an omission leaves the guard GREEN.
+#: The first form of this census hand-listed seven write methods and inspected
+#: only the RECEIVER; executed against five regeneration forms it let two
+#: through: ``json.dump(rows, open(path, "w"))`` — the idiomatic way to write
+#: JSON, so precisely the accident the census exists to prevent — and
+#: ``shutil.copy(src, path)``. Both name this module's own symbol, so the gap
+#: was verb-side and argument-side, never receiver-naming. That is the same
+#: C-31 vacuous-input-set defect the batch's hand-filled propagation register
+#: had, one layer down, inside the control built to prevent it.
+#:
+#: So the allowlist names the calls that provably CANNOT write an artifact and
+#: everything else is an offender. An omission now makes the guard RED, and
+#: widening it is a deliberate edit rather than a silent hole. Every member
+#: below was added because it fired on the real tree, and each one either reads
+#: or is pure — none can reach a filesystem write.
+_B78_NON_WRITING_CALLS = frozenset(
+    {
+        "_b78_artifact",  # the one sanctioned reader
+        "read_text",
+        "read_bytes",
+        "loads",  # json.loads
+        "is_file",
+        "exists",
+        "blake2b",  # consumes bytes, writes nothing
+        "hexdigest",
+        "items",  # _B78_ARTIFACT_DIGESTS.items()
+        "frozenset",  # this very allowlist, whose literals name the reader
+    }
 )
+
+
+def _b78_mentions_path(segment: str, tainted: set[str]) -> bool:
+    """True when ``segment`` names the artifact directory, or an alias of it."""
+    if "b78_artifact" in segment.lower():
+        return True
+    return any(re.search(rf"\b{re.escape(name)}\b", segment) for name in tainted)
+
+
+def _b78_write_offenders(source: str) -> list[tuple[int, str]]:
+    """Every call in ``source`` not provably incapable of writing an artifact.
+
+    Matches the WHOLE call — receiver and arguments alike — because the two
+    forms that slipped the receiver-only first draft put the path in an
+    ARGUMENT: ``json.dump(rows, open(path, "w"))`` and ``shutil.copy(src, path)``.
+    """
+    tree = ast.parse(source)
+
+    # One level of local aliasing, iterated to a fixed point, so
+    # `p = _B78_ARTIFACT_DIR / n; p.write_text(...)` is still caught. Only
+    # PATH-SHAPED values propagate (a `/` join, or a bare name/attribute):
+    # tainting a call's RESULT would tag `read_bytes()` output as a path and
+    # drown the census in noise. Taint is module-scoped, so a name collision
+    # yields a FALSE POSITIVE — a red test — never a false negative.
+    tainted: set[str] = set()
+    changed = True
+    while changed:
+        changed = False
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                targets, value = node.targets, node.value
+            elif isinstance(node, (ast.AnnAssign, ast.NamedExpr)):
+                targets, value = [node.target], node.value
+            else:
+                continue
+            if value is None:
+                continue
+            path_shaped = isinstance(value, (ast.Name, ast.Attribute)) or (
+                isinstance(value, ast.BinOp) and isinstance(value.op, ast.Div)
+            )
+            if not path_shaped:
+                continue
+            segment = ast.get_source_segment(source, value) or ""
+            if not _b78_mentions_path(segment, tainted):
+                continue
+            for target in targets:
+                if isinstance(target, ast.Name) and target.id not in tainted:
+                    tainted.add(target.id)
+                    changed = True
+
+    offenders: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if not _b78_mentions_path(ast.get_source_segment(source, node) or "", tainted):
+            continue
+        func = node.func
+        if isinstance(func, ast.Attribute):
+            name = func.attr
+        elif isinstance(func, ast.Name):
+            name = func.id
+        else:
+            name = ast.get_source_segment(source, func) or "<expr>"
+        if name not in _B78_NON_WRITING_CALLS:
+            offenders.append((node.lineno, name))
+    return offenders
 
 
 def _b78_canonical_json(payload: object) -> str:
@@ -845,22 +940,43 @@ def test_tc_b78_44_pre_change_artifacts_are_frozen_on_disk() -> None:
           defect that left ``AT-B78-03`` GREEN at 36 == 36 with a whole
           ``Binding`` removed.
 
-    Falsifiable on both limbs: corrupt one stored byte and (a) reddens; add
-    ``_b78_artifact(...).write_text(...)`` to any test module and (b) reddens.
+    Falsifiable on both limbs: substitute one value in a stored artifact and (a)
+    reddens; add any of ``write_text`` / ``open(...).write`` / ``json.dump`` /
+    ``shutil.copy`` against the artifact path to a test module and (b) reddens —
+    all four executed.
 
-    Scope limit, stated rather than implied: (b) is a token census over calls
-    whose receiver names ``b78_artifact``. A module reconstructing the path
-    from raw string literals would evade it. It bounds accident, not intent.
+    Scope limit, stated exactly rather than implied. (b) is a token census. It
+    matches a call — receiver OR any argument — that names ``_B78_ARTIFACT_DIR``
+    / ``_b78_artifact``, or a local aliased from one by a path-shaped assignment
+    (`p = _B78_ARTIFACT_DIR / n`, chained to a fixed point). Within that reach it
+    is verb-agnostic and fails CLOSED: any call not on ``_B78_NON_WRITING_CALLS``
+    is an offender, so a write form nobody anticipated reddens by default. What
+    it does NOT reach: a module that rebuilds the path from raw string literals
+    (``Path("tests/goldens/batch78") / …``), or one that passes the path through
+    a function-call return value rather than a path-shaped assignment. It bounds
+    accident, not intent — and the first draft of this census proved the point by
+    letting ``json.dump`` through.
+
+    Known over-reporting, measured not assumed. Taint is MODULE-scoped, so a
+    common alias name collides: the alias-form verification bound ``p`` in
+    ``test_tui_directionb.py`` and the census additionally reported three
+    unrelated calls (``sorted``/``lower``/``any``) elsewhere in that module.
+    That is a false POSITIVE — a loud red test — never a false negative, and it
+    only occurs once someone introduces an artifact-path alias, which is
+    precisely when a loud test is wanted. Per-function taint scoping would
+    remove the noise; it is deliberately not built, because ~25 lines of scope
+    resolution inside a test guard buys accuracy the guard's purpose does not
+    need.
     """
     # --- (a) the artifacts exist, byte-for-byte, in the declared shapes -----
     for name, expected_digest in _B78_ARTIFACT_DIGESTS.items():
-        path = _B78_ARTIFACT_DIR / name
-        assert path.is_file(), (
+        artifact_path = _B78_ARTIFACT_DIR / name
+        assert artifact_path.is_file(), (
             f"Inc-0 artifact {name!r} is missing from {_B78_ARTIFACT_DIR}; it is "
             f"the only oracle its consumer has and cannot be regenerated once a "
             f"production edit has landed"
         )
-        actual_digest = blake2b(path.read_bytes(), digest_size=8).hexdigest()
+        actual_digest = blake2b(artifact_path.read_bytes(), digest_size=8).hexdigest()
         assert actual_digest == expected_digest, (
             f"{name} no longer hashes to its recorded digest "
             f"({actual_digest} != {expected_digest}). Either the artifact was "
@@ -910,18 +1026,9 @@ def test_tc_b78_44_pre_change_artifacts_are_frozen_on_disk() -> None:
     swept: list[str] = []
     offenders: list[str] = []
     for module in sorted(Path(__file__).resolve().parent.rglob("*.py")):
-        source = module.read_text(encoding="utf-8")
         swept.append(module.name)
-        for node in ast.walk(ast.parse(source)):
-            if not isinstance(node, ast.Call):
-                continue
-            if not isinstance(node.func, ast.Attribute):
-                continue
-            if node.func.attr not in _B78_WRITE_METHODS:
-                continue
-            receiver = ast.get_source_segment(source, node.func.value) or ""
-            if "b78_artifact" in receiver.lower():
-                offenders.append(f"{module.name}:{node.lineno} {node.func.attr}")
+        for lineno, call in _b78_write_offenders(module.read_text(encoding="utf-8")):
+            offenders.append(f"{module.name}:{lineno} {call}()")
 
     assert swept, "the AST census swept no modules at all — it proves nothing"
     assert "test_tui_commandbar.py" in swept, (
