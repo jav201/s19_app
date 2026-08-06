@@ -14,6 +14,14 @@ Test -> TC -> LLR map:
     test_tc024_report_trigger_invalid_dest_refused   TC-024  LLR-005.4
     test_tc029_display_caps_bound_on_screen_runs     TC-029  LLR-005.2 (G-9)
 
+batch-78 Inc-1 (HLR-125 — the control rows do not starve the result area):
+
+    test_at_b78_33_compaction_enlarges_the_result_area   AT-B78-33 / TC-B78-35
+                                                        LLR-125.1, LLR-125.2
+    test_tc_b78_34_control_rows_are_one_row_at_80x24     TC-B78-34  LLR-125.1
+    test_tc_b78_36_long_external_path_does_not_reexpand  TC-B78-36  LLR-125.1
+    test_tc_b78_37_selects_survive_compaction_no_project TC-B78-37  LLR-125.1
+
 The placeholder-supersession tests (the rewritten TC-027 family + the TC-028
 activation test) live in ``tests/test_tui_directionb.py`` next to the rest of
 the Direction B scaffold suite; this file holds the NEW HLR-005 behavior.
@@ -22,11 +30,83 @@ the Direction B scaffold suite; this file holds the NEW HLR-005 behavior.
 from __future__ import annotations
 
 import asyncio
+import json
 from pathlib import Path
 
 import pytest
 
 from s19_app.tui.app import S19TuiApp
+
+# --------------------------------------------------------------------------
+# batch-78 Inc-1 — shared geometry harness for HLR-125
+# --------------------------------------------------------------------------
+
+#: Inc-0's committed pre-change freeze. `AT-B78-33` is an INVARIANCE-BREAKING
+#: claim ("compaction strictly enlarges the result area"), so its baseline must
+#: come from a capture taken BEFORE any production edit — never from an inline
+#: literal (spec Sec.5.1 rule 10) and never from the live producer, which after
+#: this increment can only report the post-change number. The pre-change height
+#: is unrecoverable once `styles.tcss` is edited; that is why Inc-0 froze it.
+_B78_GOLDEN_DIR = Path(__file__).resolve().parent / "goldens" / "batch78"
+_B78_DIFF_HEIGHT_ARTIFACT = _B78_GOLDEN_DIR / "at-b78-33-diff-hex-a-height.json"
+
+#: The three control rows HLR-125 compacts, plus the two surfaces they starve.
+_B78_CONTROL_ROWS = ("#diff_select_row_a", "#diff_select_row_b", "#diff_action_row")
+_B78_RESULT_SURFACES = ("#diff_status", "#diff_columns", "#diff_hex_a")
+
+
+def _b78_diff_height_baseline() -> dict:
+    """Read the Inc-0 pre-change geometry artifact from disk.
+
+    Deliberately has no fallback: if the artifact is missing the consuming test
+    must go RED, not silently substitute a producer-derived number. That
+    substitution is exactly the defect (BL-1) that made ``AT-B78-03`` inert.
+    """
+    assert _B78_DIFF_HEIGHT_ARTIFACT.is_file(), (
+        f"the Inc-0 pre-change artifact is missing at {_B78_DIFF_HEIGHT_ARTIFACT}; "
+        "AT-B78-33 has no other oracle - the pre-change height cannot be "
+        "re-measured once styles.tcss is edited"
+    )
+    return json.loads(_B78_DIFF_HEIGHT_ARTIFACT.read_text(encoding="utf-8"))
+
+
+def _b78_diff_geometry(
+    base_dir: Path,
+    size: tuple[int, int],
+    *,
+    prepare=None,
+) -> dict[str, tuple[int, int]]:
+    """Measure the diff panel's widgets at BOTH layers (C-32/C-37).
+
+    Returns ``{selector: (content_height, clipped_height)}`` where the clipped
+    height is the widget's region intersected with ``#screen_diff``'s region -
+    the PAINTED layer. ``region.height`` alone reads 4 for ``#diff_hex_a`` at
+    120x30 while the box paints nothing, so a predicate on it ships the bug
+    green; the whole point of HLR-125 is the painted layer.
+
+    ``prepare`` is an optional ``async (app, pilot) -> None`` hook run after the
+    diff screen is active and before the measurement.
+    """
+    selectors = _B78_CONTROL_ROWS + _B78_RESULT_SURFACES
+
+    async def _drive() -> dict[str, tuple[int, int]]:
+        app = S19TuiApp(base_dir=base_dir)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            if prepare is not None:
+                await prepare(app, pilot)
+                await pilot.pause()
+            host = app.query_one("#screen_diff")
+            measured = {}
+            for selector in selectors:
+                widget = app.query_one(selector)
+                clipped = widget.region.intersection(host.region)
+                measured[selector] = (widget.size.height, clipped.height)
+            return measured
+
+    return asyncio.run(_drive())
 
 
 def _diff_result(runs_kinds, *, refused=False, diagnostics=None):
@@ -313,4 +393,220 @@ def test_tc029_display_caps_bound_on_screen_runs(tmp_path: Path) -> None:
     )
     assert "showing" in range_text and "of" in range_text, (
         "the panel must note that the display is capped while the report is full"
+    )
+
+
+# --------------------------------------------------------------------------
+# batch-78 Inc-1 - HLR-125: the control rows do not starve the result area
+# --------------------------------------------------------------------------
+
+
+def test_at_b78_33_compaction_enlarges_the_result_area(tmp_path: Path) -> None:
+    """AT-B78-33 / TC-B78-35 - compaction actually gives rows to the results.
+
+    Intent (WHY this is a gate and the row-height clause alone is not): an
+    implementation that shrinks the three control rows to one line each and
+    leaves the result area at zero satisfies every "height == 1" predicate and
+    delivers NOTHING to the operator - that is the precise state LLR-125.2
+    exists to forbid. So the load-bearing clause here is the strict INCREASE of
+    ``#diff_hex_a``'s content height against Inc-0's frozen pre-change capture,
+    and the three 1-row clauses ride in the SAME run so neither half can be
+    green while the other is false.
+
+    132x44 is the size at which this is observable with no Lane-1 work: the
+    result area already has content rows there today, so compaction alone moves
+    a number that is not zero on either side of the change.
+
+    The threshold is read from disk. An inline literal would be a C-36 phantom
+    the moment anything upstream of the panel's row budget moves, and - worse -
+    the pre-change value can never be re-measured after this increment edits
+    ``styles.tcss``.
+    """
+    baseline = _b78_diff_height_baseline()
+
+    # The artifact must be about the widget and the terminal this test drives;
+    # otherwise "greater than baseline" compares two different layouts (Inc-0
+    # captured three artifacts at three different sizes).
+    assert baseline["widget"] == "#diff_hex_a", (
+        "the Inc-0 artifact describes a different widget than AT-B78-33 observes"
+    )
+    size = tuple(baseline["terminal"])
+    assert len(size) == 2, "the artifact's terminal must be a (width, height) pair"
+
+    geometry = _b78_diff_geometry(tmp_path, size)
+    observed_content, observed_clipped = geometry["#diff_hex_a"]
+
+    # The gate.
+    assert observed_content > baseline["content_height"], (
+        f"compaction must give the freed rows to the result area: "
+        f"#diff_hex_a content height {observed_content} is not greater than the "
+        f"pre-change {baseline['content_height']} captured at {size} by Inc-0"
+    )
+    assert observed_clipped > baseline["clipped_height"], (
+        f"the PAINTED layer must grow too: clipped height {observed_clipped} is "
+        f"not greater than the pre-change {baseline['clipped_height']}"
+    )
+
+    # Same run, per the increment's gate: the three control rows each occupy one
+    # painted row and the status line is visible.
+    for row_id in _B78_CONTROL_ROWS:
+        assert geometry[row_id][1] == 1, (
+            f"{row_id} must paint exactly one row at {size}, measured "
+            f"{geometry[row_id][1]}"
+        )
+    assert geometry["#diff_status"][1] >= 1, (
+        f"the panel status line must be visible at {size}, measured "
+        f"{geometry['#diff_status'][1]}"
+    )
+
+    # Non-vacuity: the increase must be an increase in a result area that is
+    # actually painted, not in a box whose region grew while it paints nothing.
+    assert geometry["#diff_columns"][1] >= 3, (
+        f"the results row must paint at {size}, measured "
+        f"{geometry['#diff_columns'][1]}"
+    )
+
+
+def test_tc_b78_34_control_rows_are_one_row_at_80x24(tmp_path: Path) -> None:
+    """TC-B78-34 - the 1-row clause holds at the narrowest supported regime.
+
+    Intent: 80x24 is where the overflow is worst and where the shipped panel
+    degrades most dishonestly - measured on the pre-change tree the action row
+    paints ZERO rows, so the operator loses the Compare button itself rather
+    than merely losing results. The 1-row requirement is not a 120x30
+    convenience; it must hold at the smallest regime the snapshot matrix
+    supports.
+
+    Scope note, stated rather than implied: this node asserts ONLY the row
+    clause. At 80x24 the panel's whole content budget is 5 rows and the three
+    compacted rows plus their separators already spend 6, so ``#diff_status``
+    and ``#diff_columns`` still paint zero here. Making that case honest is
+    HLR-124's notice regime, built at Inc-5 - it is deliberately NOT asserted
+    here, because a node that pins today's zero would false-fail Inc-5.
+    """
+    geometry = _b78_diff_geometry(tmp_path, (80, 24))
+
+    for row_id in _B78_CONTROL_ROWS:
+        assert geometry[row_id][1] == 1, (
+            f"{row_id} must paint exactly one row at 80x24, measured "
+            f"{geometry[row_id][1]} (pre-change: 3 / 2 / 0 respectively)"
+        )
+
+
+def test_tc_b78_36_long_external_path_does_not_reexpand(tmp_path: Path) -> None:
+    """TC-B78-36 - a long external path does not win the row back. **PIN.**
+
+    Intent: the compacted rows hold a free-text path input. If the row's height
+    were content-derived, a path longer than the pane would wrap and silently
+    restore the three-row starvation this increment removes - and it would do so
+    only for operators who actually use external images, i.e. exactly the ones
+    the diff panel exists for.
+
+    Labelled a PIN rather than a gate, measured not assumed. Executed at Inc-1:
+    substituting `#diff_path_a/_b/_report_dest`'s `height` VALUE `1` -> `3`
+    while the row keeps `height: 1` leaves this node GREEN, because an explicit
+    row height clips the child rather than growing with it. The only mutation
+    that reddens it is one that also reverts the row height, which is
+    `AT-B78-33`'s subject, not this one. So this node cannot fail for a reason
+    peculiar to path length; it guards against a future implementation that
+    makes the row's height content-derived again. Recorded here so a later
+    reader meets the limit as a stated property rather than mistaking a green
+    tick for evidence about long paths.
+    """
+    long_path = "/" + "/".join(f"very_long_directory_segment_{i:03d}" for i in range(12))
+
+    async def _fill(app, pilot) -> None:
+        app.query_one("#diff_path_a").value = long_path
+
+    geometry = _b78_diff_geometry(tmp_path, (132, 44), prepare=_fill)
+
+    # Applied-check: a value that never landed, or one that fits, would make the
+    # assertion below true for the wrong reason.
+    row_width = 132
+    assert len(long_path) > row_width, (
+        "the fixture path must exceed the terminal width or this node proves "
+        f"nothing: {len(long_path)} <= {row_width}"
+    )
+    assert geometry["#diff_select_row_a"][1] == 1, (
+        "a long external path must not re-expand the A selection row, measured "
+        f"{geometry['#diff_select_row_a'][1]}"
+    )
+    assert geometry["#diff_hex_a"][1] > 0, (
+        "the result area must still paint while the long path is in the input"
+    )
+
+
+def test_tc_b78_37_selects_survive_compaction_no_project(tmp_path: Path) -> None:
+    """TC-B78-37 - with no project loaded the variant dropdowns still work.
+
+    Two clauses of different kinds, labelled so neither is mistaken for the
+    other. The row-height clause is a GATE (red on the pre-change tree: the row
+    paints 3). The dropdown-survival clauses are PINs - green before and after
+    the change - and their mutation is discharged and DISCRIMINATING:
+    substituting `display: none` onto `#diff_select_a/_b` reddens this node
+    alone (1 failed / 3 passed) while leaving `AT-B78-33` green, which is the
+    whole point. Compaction that deletes the control passes every height
+    predicate in this file except this one.
+
+    Intent, and this is the discriminating half: the cheapest way to buy two
+    rows back is to stop rendering the ``Select`` widgets altogether. That
+    passes every height predicate and removes the only affordance for choosing
+    an in-project variant. This node asserts the dropdown is still mounted, is
+    still displayed, still holds the external-path sentinel, and still OPENS -
+    an overlay clipped away by a one-row parent would be a compaction that
+    reports success and delivers an unusable control.
+    """
+    from textual.widgets._select import SelectOverlay
+
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    async def _drive() -> tuple[bool, bool, int, str, str, int]:
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(132, 44)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            select = app.query_one("#diff_select_a")
+            overlay = select.query_one(SelectOverlay)
+            host = app.query_one("#screen_diff")
+            select.expanded = True
+            await pilot.pause()
+            return (
+                select.display,
+                overlay.display,
+                overlay.option_count,
+                str(overlay.get_option_at_index(0).prompt),
+                str(select.value),
+                app.query_one("#diff_select_row_a")
+                .region.intersection(host.region)
+                .height,
+            )
+
+    (
+        select_shown,
+        overlay_shown,
+        option_count,
+        first_prompt,
+        value,
+        row_height,
+    ) = asyncio.run(_drive())
+
+    assert select_shown, (
+        "compaction must not hide the A variant dropdown - that would buy rows "
+        "by deleting the only in-project variant affordance"
+    )
+    assert row_height == 1, (
+        f"the A selection row must still paint one row, measured {row_height}"
+    )
+    assert value == AbDiffPanel._EXTERNAL_OPTION, (
+        "with no project loaded the dropdown must hold the external-path sentinel"
+    )
+    assert option_count == 1 and "external path" in first_prompt, (
+        f"the no-project option set must be the sentinel alone, got "
+        f"{option_count} option(s), first={first_prompt!r}"
+    )
+    assert overlay_shown, (
+        "the dropdown must still open under a one-row parent; an overlay the "
+        "compacted row clips away is an unusable control that passes every "
+        "height predicate"
     )
