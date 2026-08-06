@@ -14,6 +14,14 @@ tests/goldens/** text eol=lf
 # whole purpose is to be exactly what was captured (batch-66, .dev-flow pre-bytes).
 # This overrides the `tests/goldens/**` rule above; last matching pattern wins.
 tests/goldens/batch77/at-b77-02-gapless-band-strip.txt -text
+# The batch-78 Inc-0 pre-change artifacts are EVIDENCE BYTES for the same reason.
+# They are the only oracle AT-B78-03 / AT-B78-12 / AT-B78-33 have -- once a
+# production edit lands they cannot be re-captured -- and TC-B78-44 asserts a
+# blake2b digest over `read_bytes()`, so ANY normalization (in either direction)
+# turns the artifact into bytes that were never captured. `-text` again, not
+# `text eol=lf`: the stored blob must be exactly what the capture wrote.
+# Overrides the `tests/goldens/**` rule above; last matching pattern wins.
+tests/goldens/batch78/** -text
 
 # Out-of-VCS rollback bytes (batch-66). These are byte-exact copies of files that
 # live OUTSIDE this repo (~/.claude/commands/, ~/.claude/skills/, the course on G:),
