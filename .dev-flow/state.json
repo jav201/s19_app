@@ -48,11 +48,11 @@
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31)."
   },
   "current_phase": 2,
-  "phase_status": "in-progress",
+  "phase_status": "iterating",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
-    "2": 0,
+    "2": 1,
     "3": 0,
     "4": 0,
     "5": 0,
@@ -63,7 +63,10 @@
     "0": ".dev-flow/2026-08-06-batch-78/00-measurements.md",
     "1": ".dev-flow/2026-08-06-batch-78/01-requirements.md",
     "1_architect_lane": ".dev-flow/2026-08-06-batch-78/01-requirements-architect.md",
-    "1_qa_lane": ".dev-flow/2026-08-06-batch-78/01b-qa-validation.md"
+    "1_qa_lane": ".dev-flow/2026-08-06-batch-78/01b-qa-validation.md",
+    "2_architect": ".dev-flow/2026-08-06-batch-78/02-review-architect.md",
+    "2_qa": ".dev-flow/2026-08-06-batch-78/02-review-qa.md",
+    "2_security": ".dev-flow/2026-08-06-batch-78/02-review-security.md"
   },
   "premise_evaluation_phase0": {
     "evaluated": 20,
@@ -171,6 +174,12 @@
       "date": "2026-08-06",
       "decision": "Phase-0 P-8 verdict CORRECTED by the fold: the deletable CSS span is :66-102, not :55-102",
       "notes": "My Phase-0 table marked \":55-102 is precisely the deletable span\" as TRUE. The ADDRESSES were right but the CONCLUSION was wrong: #command_bar_slot (:51) and #command_bar (:61-64) both SURVIVE, because the palette lives inside them and Ctrl+K must keep working. Deleting :55-102 would have removed the styling of the container that stays. Verified independently. Third correction to my own Phase-0 work this batch, after the wrong-producer measurement and the census whose count and enumeration came from different greps."
+    },
+    {
+      "phase": 2,
+      "date": "2026-08-06",
+      "decision": "Phase 2 BLOCKED by architect + QA - iterate-to-refine to Phase 1 revision 2",
+      "notes": "4 blockers across two lanes (one convergent), security clean at blocker level. Not discretionary: the flow forces iterate when blockers exist. The convergent blocker is a defect I introduced myself by approving an increment plan that violates the very dependency my ruling R-4 had named. Revision 2 additionally owes the REVERSE fold audit, which my own fold brief never asked for."
     }
   ],
   "phase1_rulings": {
@@ -193,5 +202,16 @@
     "branch": "claude/batch-78-cmdbar-a2bdiff (cut off f6ff1d3, NOT yet pushed, no commits yet)",
     "phase0": "AWAITING GATE - 00-measurements.md and PLAN.md written; 20 premises evaluated; 9 stories classified (7 READY, 2 READY-WITH-DECISION, 0 OUT); backlog registered and the batch-78/79 numbering conflict resolved; no ids minted; no requirements derived; no production code touched.",
     "next": "Phase 1 requirements engineering: architect (HLR/LLR from the READY stories) + qa-reviewer (validation method + AT authoring) in parallel, after the operator answers the S-3 availability question."
+  },
+  "phase2_review": {
+    "verdict": "BLOCK - architect 3 blocker / 11 major / 8 minor; QA 1 blocker / 6 major / 8 minor; security 0 blocker / 1 major / 1 minor. Blockers force iterate-to-refine per the flow; not a discretionary gate.",
+    "convergent_finding": "THE INCREMENT ORDERING, found INDEPENDENTLY by the architect and QA lanes - the strongest signal in the set. Inc-9 schedules AT-B78-27, AT-B78-24 120x30 arm and AT-B78-25 fallback arm, all of which require US-78-1 (HLR-118) = Inc-10, which comes AFTER. Executed ladder reproduces to the digit: 120x30 content rows = [0, 0, 2] for shipped / S-8 / S-8+S-1. At Inc-9 the content height is 0, so a CORRECT implementation FAILS Inc-9 gate. THIS IS MY OWN RULING R-4 - I named the S-8+S-1 dependency and then approved an increment plan that violates it. QA added the warning that matters: the historical resolution of an unsatisfiable gate in this project is a WEAKENED ACCEPTANCE.",
+    "blocker_1_AT_B78_03_inert": "C-40 limb 1, with executed proof. The palette action set is required to be derived from app._build_palette_entries() and never hand-listed - but CommandBar is CONSTRUCTED as CommandBar(self._build_palette_entries()) (app.py:1878), so observed and expected are the SAME PRODUCER. Removing an entire Binding left the predicate GREEN at 36==36; substituting actions left it GREEN at 35==35. It is the sole evidence for D-3. This is the F-6 shape the document itself CATCHES in the QA cap AT and then COMMITS in its own.",
+    "blocker_3_Inc1_gate_invariant": "AT-B78-26 is green with the result area at zero. Replacement already executed by the reviewer: the 132x44 content increase 7 -> 13.",
+    "the_fold_was_audited_in_ONE_DIRECTION": "MY BRIEF DEFECT, not only the agent execution. I mandated a 22-row QA->canonical audit and asked for NOTHING in the architect->canonical direction, assuming a superset cannot lose its own content. It can. Verified loss: the architect own LLR-118.1 criterion \"#command_palette remains a direct child of CommandBar / must not move screens\" survives in NEITHER the merged document NOR any retirement line, and the surviving co-assertion len(query(\"#command_palette\"))==1 is satisfied WHEREVER the palette lives - while HLR-118 whole premise is that the palette must not be disturbed. Two further architect subjects overwritten at the same ids with no record. Reusable lesson: A RECONCILIATION AUDITED IN ONE DIRECTION IS NOT AUDITED.",
+    "F6_has_a_live_sibling_ON_DISK": "AT-B78-22 reads its expected span from AbDiffPanel.DISPLAY_CONTEXT_BYTES, the class under test: ctx 16 -> 64 leaves it GREEN. Worse, tests/test_tui_diff_screen.py:284 test_tc029_display_caps_bound_on_screen_runs is a LIVE REGISTRY NODE in the very file Inc-2 edits and stays GREEN under DISPLAY_MAX_RUNS 128 -> 100000. The document never names it, so as written the batch would land a hardened AT-B78-18 BESIDE AN INERT GUARD on the same clause.",
+    "false_fail_risk": "FOUR, and one fails on the UNMODIFIED tree: LLR-126.1 \"none truncated\" - at 80x24 the Footer is 78 columns and only 7 of 14 chips are fully painted TODAY, so an honest painted-layer reading fails origin/main itself. Also len(OWNING)==3 (tree derivation yields 7), HLR-124 \"literals appear 0 times\" (already 94x1 and 29x4 in test_tui_directionb.py), and AT-B78-11 == 7 against a requirement that says \"shall not increase\". A predicate that false-fails correct code is as serious as a vacuous one.",
+    "security_F1_verified_by_me": "markup=False is a PARSE FLAG performing no string transform: it closes the markup half of C-17 and NOTHING of the control half. Executed: safe_text strips 0x0 0x1b 0x7f 0x9b 0x9d to NONE; markup=False leaves all five. HLR-120 offers them as EQUIVALENTS and its Statement names the weaker one. In #loaded_panel that is a REAL REGRESSION - every existing file-derived cell there uses safe_text via _build_slot_row. Nothing would catch it: grep -rl for loaded_slots or _build_slot_row in tests/ returns ZERO files, and TC-B78-12 payload is markup-only so it is green under both arms. The security lane also created control-character .a2l filenames on THIS Windows 11 box - the platform reserves below 0x20 but NOT U+007F or U+0080-U+009F, so the vector is reachable, not theoretical.",
+    "what_SURVIVED": "The measured foundation. Reviewers independently re-executed the load-bearing figures and ALL reproduced - the 79-cell producer correction, W >= 94, the :66-102 CSS-span correction of Phase 0, the 37-action palette set, the full [0,0,2] ladder, and the 45-TC/31-AT traceability arithmetic with zero gaps. The architect confirmed the flagged H=29 at THREE widths where the document had two, discharging most of A-1. ALL SIX PINs ARE HONEST - none is a downgraded gate; the mislabels run the other way (three GATE-labelled ATs are green today, so section 9 overstates \"every AT demonstrated RED\" - it is 9 of 9 STORIES, not 31 of 31 ATs). Scope, story set, regime design and lane ordering all stand. Architect disposition: needs design work, but BOUNDED AND LOCAL, not a re-derivation."
   }
 }
