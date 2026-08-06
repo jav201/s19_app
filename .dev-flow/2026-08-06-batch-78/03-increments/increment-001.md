@@ -410,13 +410,216 @@ and no string moved.
 5. **`TC-B78-34`'s notice half is unrealized** — its boundary text says the panel "degrades to the
    HLR-124 notice rather than to nothing", which does not exist until Inc-5. Only the row clause is
    asserted here, stated in the docstring.
+6. **The 120×30 `#diff_status` visibility clause is true today and guarded by nothing for four
+   increments** (review F-C). It went 0 → 1 here and is asserted only inside `AT-B78-33`, which runs
+   at **132×44**; `AT-B78-26` does not assert it at 120×30 until **Inc-10**. Anything touching the
+   panel's row budget at Inc-2, 4, 5 or 7 can silently return it to 0 and no gate will notice.
+   Cheapest close: add the 120×30 arm to `AT-B78-26` early, or pin it at whichever of Inc-2/4/5/7
+   lands first.
+7. **The addendum's own two self-inflicted defects are worth a line in the postmortem**, not because
+   they shipped — neither did — but because both were layer confusions inside a three-line clause
+   written *to fix* a layer confusion: `render_line(0)` is not the screen, and the compositor must be
+   sampled in the state the claim is about. The batch's dominant defect class reproduced inside its
+   own remedy for the third time.
 
 ## 6b. Batch carry list
 
 | # | Item | Owner |
 |---|---|---|
 | **C-78-iv** | **The A/B variant `Select`s render at width 1, on `origin/main` and after this increment** (F-3). `Input`'s `width: 100%` inside a `Horizontal` claims the row. The dropdown opens and holds the right options, so it is invisible rather than broken — which is why no test caught it in ~70 batches. Needs a width budget across `Label(3) + Select + Input` in the two selection rows. **Out of HLR-125's scope** (vertical budget), so carried rather than folded in. | batch close / a Lane-2 successor |
-| **C-78-v** | **§5.3's declared mutation for `AT-B78-33` is inert when executed** (F-1). The general form, and it is the third instance in this batch after `AT-B78-03` and `AT-B78-22`: **a mutation names a term, and a term that is a *function of other terms* (`height: auto`) is not a subject you can substitute.** The falsifiability table should record the RESOLVED value, not the declaration. | batch close |
+| **C-78-v** | **§5.3's declared mutation for `AT-B78-33` is inert when executed** (F-1). The general form, **as sharpened by the Phase-2 reviewer and adopted** — my first wording blamed *"a term that is a function of other terms"*, which is too narrow and reads as CSS trivia. The real discriminator: **a partial revert of a multi-declaration change mutates one of N co-dependent subjects whose token has changed denotation.** `height: auto` denoted **3** on the pre-change tree and denotes **1** on the post-change tree — the same token, a different value — so reverting *to the token* reverts nothing. Therefore the falsifiability table must record **the value the declaration resolved to on the pre-change tree** (here `3`), never the declaration. This generalises past CSS: any multi-part change whose parts constrain each other has the same trap. Third instance in this batch after `AT-B78-03` and `AT-B78-22`. | batch close |
+| **C-78-vi** | **§5.1 rule 1's prescribed "painted layer" metric is wrong twice over, and the rule prescribes it to every node in the batch.** `widget.region.intersection(screen_host.region)` (a) **does not clip through intermediate ancestors** — executed at 120×30 it reads `#diff_columns` **3** and its own child `#diff_hex_a` **4**, and a child cannot paint more rows than its parent — and (b) **measures the border box**, counting a result box's 4 rows of chrome as content. Executed discriminator (mutation H, §4.7): with the boxes laid out at exactly their chrome, `#diff_hex_a` content is **0**, the prescribed metric reads **4**, the corrected metric reads **0**. The rule should read: *the widget's `content_region`, intersected through the full ancestor chain*. **Load-bearing for `AT-B78-26` at Inc-10**, whose 120×30 *"≥ 1 hex row"* clause lands on exactly this coordinate and would pass with 3 rows of border and zero hex. Fixed in Inc-1's shared harness; the requirement text is not mine to edit. | batch close — **blocks Inc-10** |
+
+---
+
+---
+
+# ADDENDUM — Phase-2 review fixes (F-A, F-B, F-C/D/E)
+
+> Inc-1 passed its gate as `c09c699` (0 HIGH · 2 MEDIUM · 3 LOW). This addendum
+> closes both MEDIUMs and the three LOWs. **No production behaviour changes** —
+> `styles.tcss`'s only edit is a comment; every functional change is in the test
+> module.
+
+## A.1 What changed
+
+| Finding | Sev | Fix |
+|---|---|---|
+| **F-A** — three of six declaration groups unreachable by any node | MEDIUM | `TC-B78-37` gains a **glyph clause**: for every child of the three compacted rows, the row's one painted line must show that child's own declared text |
+| **F-B** — the harness's `clipped` element is not a paint test | MEDIUM | `_b78_painted_content_height()` replaces `region ∩ #screen_diff.region`: the widget's **`content_region`**, intersected through the **full ancestor chain** |
+| **F-C** — the 120×30 `#diff_status` clause is unguarded for four increments | LOW | added to §6 Pending as item 6 |
+| **F-D** — `row_width = 132` duplicated in `TC-B78-36` | LOW | derived from the `size` the run actually drove |
+| **F-E** — the "id-scoped" comment covers a class selector | LOW | comment names `.diff-field-label` as the exception and bounds its blast radius |
+
+**On F-B, the reviewer's call to fix it here rather than at Inc-10 was right and the
+reason generalises:** a wrong metric inside a *shared* harness is not one wrong node,
+it is every node that will ever call it. `AT-B78-26`'s 120×30 `≥ 1` clause is the next
+caller.
+
+**The `#diff_hex_a` clipped-layer figures in this packet's §4.6 table are the OLD
+metric** and are left as recorded, because that is what was measured at the time.
+Under the corrected metric the same column reads 0 / 13 / 0 / 9 rather than 4 / 17 /
+0 / 13 — the difference is exactly the 4 rows of border-and-padding chrome the old
+form counted as content.
+
+## A.2 F-B — the corrected metric, before and after at 120×30
+
+Four candidate metrics, all executed on the compacted tree:
+
+| widget | `size.height` | §5.1 rule 1<br>`region ∩ host` | ancestor chain<br>on `region` | **`content_region` ∩ ancestors** |
+|---|---:|---:|---:|---:|
+| `#diff_columns` | 3 | 3 | 3 | **3** |
+| `#diff_range_list` | 0 | **4** | 3 | **0** |
+| `#diff_hex_a` | 0 | **4** | 3 | **0** |
+
+The prescribed form's `4` is impossible — a child painting more rows than its
+3-row parent. The ancestor walk fixes that and still reads `3`, because three
+rows of **border** genuinely are painted. Only the fourth column answers the
+question LLR-125.2 asks, *"does a hex row of content reach the operator"*: **0**.
+
+The corrected metric also repairs the C-32 case the spec's own rule was written
+for — at 80×24 `#diff_status` has `size.height` **1** and a painted content
+height of **0**.
+
+**Verified against the compositor.** The ancestor walk agrees with Textual's own
+`Screen.find_widget(w).clip` at every widget and every size, so the walk is not a
+private re-derivation of clipping.
+
+**`AT-B78-33`'s baseline had to change with it.** The Inc-0 artifact's
+`clipped_height: 11` was captured with the defective metric and is a border-box
+figure; comparing a corrected observation against it would subtract two different
+quantities and call the difference a gain. That clause is **removed**, with the
+reason written into the code. `content_height: 7` is `widget.size.height` and is
+metric-independent, so it now backs two clauses:
+
+- `observed_content > 7` — the original gate.
+- `observed_painted > 7` — **strictly stronger**, since `painted ≤ content` always.
+  A layout that grows while the operator still sees nothing fails this and passes
+  the first.
+- plus `painted == content` at 132×44: nothing clips the result area there.
+
+## A.3 F-A — the glyph clause, and the layer trap inside it
+
+The hazard, executed: restore `border: tall` to the two Buttons and
+`#diff_compare_button` becomes `Region(y=12, height=2)` inside a `height: 1` row
+with `size.height` **0** — its painted line is blank chrome and `Compare` lands
+on the clipped second row. **Every height assertion in the file stays green.**
+
+Expected text is read **from the widget** (`Button.label` / `Input.placeholder` /
+the Label's rendered content), truncated to that widget's own content width — not
+from a hand-written list that can drift out of step with `compose`.
+
+**A first attempt at this clause was itself defective, and the failure is the same
+family as F-B.** I first read `child.render_line(0)`. Under the `.diff-field-label`
+mutation (`padding: 0 1` → `1 1 0 1`) that returns `'A'` while the **screen** at
+that coordinate is blank: `render_line` indexes the widget's own rendered lines,
+not its position on the composited screen. The clause was green for a control the
+operator cannot read. Rebuilt to sample the compositor:
+`strips[row.region.y].crop(child.region.x, …)` — literally the cells the operator
+sees in the row's one line.
+
+**And that rebuild exposed a second defect in my own test, caught by running it:**
+I sampled the screen *after* opening the A dropdown, and the expanded overlay
+paints over columns 29–31 of row B — `#diff_path_b` read `'▎ternal path B'` and
+the node failed on the **fixed** tree. Sampling now happens with the dropdown
+closed; opening it is the last step. Two layer bugs inside one three-line clause,
+both found only by executing it.
+
+`#diff_select_a/_b` are **exempt with cause, in a named set** rather than by
+omission: they lay out at a content width of one column, so no glyph fits (F-3 /
+`C-78-iv`). Their survival is covered by the display / option-set / overlay clauses.
+
+## A.4 Counterfactuals — five more, each applied-checked and SHA-restored
+
+Fixed-tree `styles.tcss` SHA-256 = `449fb6501f0ea2925354fa5aed1610a75f6e52865e94b7706e77e8ef0c4d8ce7`.
+
+| # | Substituted VALUE | `AT-B78-33` | `TC-B78-34` | `TC-B78-36` | `TC-B78-37` |
+|---|---|:-:|:-:|:-:|:-:|
+| **D** | `#diff_compare_button`/`#diff_report_button` `border` `none` → `tall $border-blurred` | 🟢 | 🟢 | 🟢 | **🔴** |
+| **E** | `#diff_path_a/_b`/`#diff_report_dest` `border` `none` → `tall $border-blurred` | 🟢 | 🟢 | 🟢 | **🔴** |
+| **F** | `.diff-field-label` `padding` `0 1` → `1 1 0 1`, `height` `1` → `auto` | 🟢 | 🟢 | 🟢 | **🔴** |
+| **G** | rows' `height` `1` → `3` (whole-increment revert, corrected metric) | 🔴 | 🔴 | 🔴 | 🔴 |
+| **H** | `#diff_range_list`/`_hex_a`/`_hex_b` `height` `100%` → `4` | **🔴** | 🟢 | **🔴** | 🟢 |
+
+**All three groups F-A named as unreachable now redden, and each reddens
+`TC-B78-37` alone** — they are discriminating, not co-passengers of the gate.
+
+```
+############ MUTATION D ############
+the two Buttons' `border` VALUE `none` -> `tall $border-blurred`
+applied: True   sha 88a2945fdce0562f != fixed 449fb6501f0ea292
+    FAILED tests/test_tui_diff_screen.py::test_tc_b78_37_selects_survive_compaction_no_project
+    1 failed, 3 passed, 6 deselected in 3.67s
+############ MUTATION D REVERTED (sha MATCH) ############
+    4 passed, 6 deselected in 3.83s
+
+############ MUTATION E ############
+the three path Inputs' `border` VALUE `none` -> `tall $border-blurred`
+applied: True   sha 6aebb3e17fc4359e != fixed 449fb6501f0ea292
+    FAILED ...::test_tc_b78_37_selects_survive_compaction_no_project
+    1 failed, 3 passed, 6 deselected in 3.54s
+############ MUTATION E REVERTED (sha MATCH) ############
+    4 passed, 6 deselected in 3.67s
+
+############ MUTATION F ############
+`.diff-field-label` `padding` VALUE `0 1` -> `1 1 0 1` and `height` `1` -> `auto`
+applied: True   sha b72449ccc1716057 != fixed 449fb6501f0ea292
+    FAILED ...::test_tc_b78_37_selects_survive_compaction_no_project
+    1 failed, 3 passed, 6 deselected in 3.84s
+############ MUTATION F REVERTED (sha MATCH) ############
+    4 passed, 6 deselected in 3.49s
+```
+
+**Mutation H is the metric's own discriminator** — the configuration the reviewer
+named, reproduced at 132×44. The boxes lay out at exactly their chrome:
+
+```
+#diff_hex_a @132x44 under MUTATION H:
+   size.height (content)                  = 0
+   OLD metric  region n host              = 4
+   NEW metric  content_region n ancestors = 0
+   Inc-0 artifact baseline content_height = 7
+```
+
+`TC-B78-36`'s surviving use of the metric is `geometry["#diff_hex_a"][1] > 0`.
+Under the old metric that is `4 > 0` → **green while nothing is painted**; under
+the corrected metric it is `0 > 0` → **red**. That clause was inert and is now
+live — which is precisely F-B's charge, discharged by execution rather than by
+agreeing with it.
+
+## A.5 Test results after the addendum
+
+```
+$ python -m pytest tests/test_tui_diff_screen.py -q -p no:randomly
+..........                                                               [100%]
+10 passed in 9.32s
+
+$ python -m pytest <the same 11 modules as §4.2> -q -p no:randomly
+........................................................................ [ 22%]
+........................................................................ [ 44%]
+........................................................................ [ 66%]
+........................................................................ [ 89%]
+...................................                                      [100%]
+323 passed in 427.47s (0:07:07)
+
+$ python -m pytest tests/test_tui_snapshot.py -q -p no:randomly
+1 snapshot failed. 28 snapshots passed.
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]
+1 failed, 31 passed, 1 warning in 55.77s
+```
+
+**Ledger unchanged: `D = 0, A = 0`.** The addendum adds no node — it rewrites
+`TC-B78-37`'s body and the shared harness in place. `post` stays **2612**
+(2611 + the drifted snapshot cell until Inc-12).
+
+Snapshot drift is **still exactly one cell**, confirming the addendum changed no
+rendered output — `styles.tcss`'s only edit is a comment.
+
+```
+$ git diff --stat -- s19_app/ tests/          # addendum only, over c09c699
+ s19_app/tui/styles.tcss       |   9 +-
+ tests/test_tui_diff_screen.py | 191 ++++++++++++++++++++++++++++++++++++------
+```
 
 ---
 
@@ -446,7 +649,8 @@ that widget's type, and per C13 the id rule will outrank the new widget's `DEFAU
 | File count within cap | ✓ | 2 files — §7's planned count, cap is 5. |
 | Every node carries a spec id | ✓ | `AT-B78-33`, `TC-B78-34`, `TC-B78-35`, `TC-B78-36`, `TC-B78-37` — all from §3 / §5.3 / §5.4. **No id invented.** |
 | Gate takes its oracle from the Inc-0 artifact | ✓ | `_b78_diff_height_baseline()` reads `tests/goldens/batch78/at-b78-33-diff-hex-a-height.json`; **no fallback**, and the terminal size is read from the artifact too. Zero height literals in the module. |
-| Nodes falsifiable, mutation applied-checked | ✓ | §4.5 — six transcripts, each asserting the substituted token present **and** the SHA changed before running, each restored by SHA. **Two came back INERT and are reported as findings (F-1, F-2), not absorbed.** |
+| Nodes falsifiable, mutation applied-checked | ✓ | §4.5 — six transcripts + §A.4 — five more, each asserting the substituted token present **and** the SHA changed before running, each restored by SHA. **Two came back INERT and are reported as findings (F-1, F-2), not absorbed.** After the addendum, **every declaration group shipped in `styles.tcss` is reachable by a node**: rows → G, Buttons → D, Inputs → E, Label → F, result boxes → H. |
+| Review findings closed | ✓ | F-A (§A.3, mutations D/E/F) · F-B (§A.2, mutation H) · F-C (§6 item 6) · F-D (`size[0]`, no duplicated literal) · F-E (`styles.tcss` comment). `C-78-v` reworded to the reviewer's sharper form; `C-78-vi` opened for §5.1 rule 1. |
 | C-26 reverse grep over the whole `tests/` tree | ✓ | §4.2 — 4 modules beyond §5.2's gate suite were found by it and run. |
 | Snapshot regen not attempted locally | ✓ | §4.3 — drift recorded per-cell with its reason; C9 respected; Inc-12 owns regen. |
 | Review packet attached | ✓ | this document, §§1–7 + §6b carry list |

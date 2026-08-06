@@ -1135,9 +1135,12 @@ DataTable > .datatable--odd-row {
  * `#diff_status` and `#diff_columns` with a clipped visible height of ZERO.
  * The `margin-bottom: 1` separators are deliberately KEPT: the requirement is
  * "one rendered row per control row", not "reclaim every reclaimable row".
- * These are id-scoped on purpose (C13) — `styles.tcss` id selectors outrank a
- * widget's `DEFAULT_CSS`, which is what makes a CSS-only compaction possible
- * without touching `screens_directionb.py`'s compose. */
+ * All but one of these are id-scoped on purpose (C13) — `styles.tcss` id
+ * selectors outrank a widget's `DEFAULT_CSS`, which is what makes a CSS-only
+ * compaction possible without touching `screens_directionb.py`'s compose. The
+ * exception is `.diff-field-label`, a CLASS selector: it is applied to exactly
+ * the two `Label`s in these rows (`screens_directionb.py:6739`, `:6745`) and
+ * to nothing else in the app, so its blast radius is those two widgets. */
 #diff_select_row_a,
 #diff_select_row_b,
 #diff_action_row {

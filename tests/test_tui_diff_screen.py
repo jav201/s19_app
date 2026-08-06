@@ -70,6 +70,48 @@ def _b78_diff_height_baseline() -> dict:
     return json.loads(_B78_DIFF_HEIGHT_ARTIFACT.read_text(encoding="utf-8"))
 
 
+def _b78_painted_content_height(widget) -> int:
+    """Rows of this widget's OWN CONTENT that actually reach the screen.
+
+    Two corrections over the metric spec Sec.5.1 rule 1 prescribes
+    (``widget.region.intersection(screen_host.region)``), both measured on this
+    branch rather than reasoned about:
+
+    1. **It does not clip through intermediate ancestors.** A widget nested
+       below the screen host is clipped by every container between them, not
+       just by the host. Executed at 120x30 on the compacted tree, the
+       prescribed form reads ``#diff_columns`` 3 and its own child
+       ``#diff_hex_a`` **4** - a child cannot paint more rows than its parent,
+       so 4 is not a painted count of anything. Intersecting through the full
+       ancestor chain reads 3.
+
+    2. **It measures the BORDER box, so it counts chrome as content.** Each
+       ``#diff_*`` result box spends 4 rows on border and padding. At 120x30
+       ``#diff_hex_a`` has a content height of **0** - not one hex row reaches
+       the operator - while the ancestor-corrected border box still reads 3,
+       because three rows of BORDER are painted. Clipping the
+       ``content_region`` reads **0**, which is what LLR-125.2's "shall render
+       at least one hex row of content" is actually about.
+
+    Both layers stay available to callers: ``size.height`` is the height the
+    layout gave the content, and this is how much of it survives clipping. They
+    differ exactly where the C-32 trap lives - at 80x24 ``#diff_status`` has
+    ``size.height`` 1 and a painted content height of 0.
+
+    Reported as a requirements finding (carry C-78-vi), not silently absorbed:
+    Sec.5.1 rule 1's wording needs amending, and ``AT-B78-26``'s 120x30
+    ">= 1 hex row" clause at Inc-10 lands on exactly this coordinate.
+    """
+    from textual.widget import Widget
+
+    region = widget.content_region
+    node = widget.parent
+    while isinstance(node, Widget):
+        region = region.intersection(node.region)
+        node = node.parent
+    return region.height
+
+
 def _b78_diff_geometry(
     base_dir: Path,
     size: tuple[int, int],
@@ -78,11 +120,9 @@ def _b78_diff_geometry(
 ) -> dict[str, tuple[int, int]]:
     """Measure the diff panel's widgets at BOTH layers (C-32/C-37).
 
-    Returns ``{selector: (content_height, clipped_height)}`` where the clipped
-    height is the widget's region intersected with ``#screen_diff``'s region -
-    the PAINTED layer. ``region.height`` alone reads 4 for ``#diff_hex_a`` at
-    120x30 while the box paints nothing, so a predicate on it ships the bug
-    green; the whole point of HLR-125 is the painted layer.
+    Returns ``{selector: (content_height, painted_content_height)}``. See
+    ``_b78_painted_content_height`` for why the second element is NOT the
+    metric spec Sec.5.1 rule 1 prescribes.
 
     ``prepare`` is an optional ``async (app, pilot) -> None`` hook run after the
     diff screen is active and before the measurement.
@@ -98,12 +138,13 @@ def _b78_diff_geometry(
             if prepare is not None:
                 await prepare(app, pilot)
                 await pilot.pause()
-            host = app.query_one("#screen_diff")
             measured = {}
             for selector in selectors:
                 widget = app.query_one(selector)
-                clipped = widget.region.intersection(host.region)
-                measured[selector] = (widget.size.height, clipped.height)
+                measured[selector] = (
+                    widget.size.height,
+                    _b78_painted_content_height(widget),
+                )
             return measured
 
     return asyncio.run(_drive())
@@ -434,17 +475,34 @@ def test_at_b78_33_compaction_enlarges_the_result_area(tmp_path: Path) -> None:
     assert len(size) == 2, "the artifact's terminal must be a (width, height) pair"
 
     geometry = _b78_diff_geometry(tmp_path, size)
-    observed_content, observed_clipped = geometry["#diff_hex_a"]
+    observed_content, observed_painted = geometry["#diff_hex_a"]
 
-    # The gate.
+    # The gate, asserted on the PAINTED content layer.
+    #
+    # `baseline["clipped_height"]` (11) is deliberately NOT used. Inc-0 captured
+    # it with the metric spec Sec.5.1 rule 1 prescribes, which this module no
+    # longer uses because it is wrong twice over (see
+    # `_b78_painted_content_height`): 11 is a border-box figure that counts this
+    # widget's 4 rows of chrome, and comparing a corrected observation against
+    # it would compare two different quantities and call the difference a gain.
+    # `content_height` IS metric-independent - it is `widget.size.height` - so
+    # the pre-change 7 is a sound baseline for both clauses below.
     assert observed_content > baseline["content_height"], (
         f"compaction must give the freed rows to the result area: "
         f"#diff_hex_a content height {observed_content} is not greater than the "
         f"pre-change {baseline['content_height']} captured at {size} by Inc-0"
     )
-    assert observed_clipped > baseline["clipped_height"], (
-        f"the PAINTED layer must grow too: clipped height {observed_clipped} is "
-        f"not greater than the pre-change {baseline['clipped_height']}"
+    assert observed_painted > baseline["content_height"], (
+        f"the gained rows must actually be PAINTED, not merely laid out: "
+        f"#diff_hex_a painted content height {observed_painted} is not greater "
+        f"than the pre-change content height {baseline['content_height']}. This "
+        f"is the strictly stronger clause - painted <= content always, so a "
+        f"layout that grows while the operator still sees nothing fails here "
+        f"and passes the clause above"
+    )
+    assert observed_painted == observed_content, (
+        f"at {size} nothing should clip the result area: painted "
+        f"{observed_painted} != content {observed_content}"
     )
 
     # Same run, per the increment's gate: the three control rows each occupy one
@@ -513,19 +571,20 @@ def test_tc_b78_36_long_external_path_does_not_reexpand(tmp_path: Path) -> None:
     reader meets the limit as a stated property rather than mistaking a green
     tick for evidence about long paths.
     """
+    size = (132, 44)
     long_path = "/" + "/".join(f"very_long_directory_segment_{i:03d}" for i in range(12))
 
     async def _fill(app, pilot) -> None:
         app.query_one("#diff_path_a").value = long_path
 
-    geometry = _b78_diff_geometry(tmp_path, (132, 44), prepare=_fill)
+    geometry = _b78_diff_geometry(tmp_path, size, prepare=_fill)
 
     # Applied-check: a value that never landed, or one that fits, would make the
-    # assertion below true for the wrong reason.
-    row_width = 132
-    assert len(long_path) > row_width, (
+    # assertion below true for the wrong reason. The width comes from the size
+    # this run actually drove, not a second copy of the number.
+    assert len(long_path) > size[0], (
         "the fixture path must exceed the terminal width or this node proves "
-        f"nothing: {len(long_path)} <= {row_width}"
+        f"nothing: {len(long_path)} <= {size[0]}"
     )
     assert geometry["#diff_select_row_a"][1] == 1, (
         "a long external path must not re-expand the A selection row, measured "
@@ -555,12 +614,33 @@ def test_tc_b78_37_selects_survive_compaction_no_project(tmp_path: Path) -> None
     still displayed, still holds the external-path sentinel, and still OPENS -
     an overlay clipped away by a one-row parent would be a compaction that
     reports success and delivers an unusable control.
+
+    **The glyph clause generalises that hazard to every compacted child.**
+    Height predicates measure the row; they say nothing about what the row's one
+    painted line CONTAINS. Executed on this branch: restore ``border: tall`` to
+    the two Buttons and ``#diff_compare_button`` becomes ``y=12 h=2`` inside a
+    ``height: 1`` row with ``size.height`` **0** - its first line is blank
+    chrome and the word ``Compare`` lands on the clipped second row. Every
+    height assertion in this file stays GREEN. So each compacted child's first
+    painted line must carry its own declared text, and the expected text is read
+    FROM THE WIDGET (``Button.label`` / ``Input.placeholder`` / the Label's
+    rendered content) rather than from a hand-written list that can drift.
+
+    ``#diff_select_a/_b`` are excluded from the glyph clause with cause, not by
+    omission: they lay out at a content width of ONE column, so no glyph fits.
+    That is a pre-existing defect (measured identical on the pre-change tree,
+    carry C-78-iv) and it is out of HLR-125's vertical-budget scope. Their
+    survival is covered by the display / option-set / overlay clauses above.
     """
     from textual.widgets._select import SelectOverlay
 
     from s19_app.tui.screens_directionb import AbDiffPanel
 
-    async def _drive() -> tuple[bool, bool, int, str, str, int]:
+    #: Compacted children excluded from the glyph clause, and why. Named so the
+    #: exclusion is auditable rather than an absence.
+    glyph_exempt = {"#diff_select_a", "#diff_select_b"}
+
+    async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
         async with app.run_test(size=(132, 44)) as pilot:
             await pilot.pause()
@@ -568,18 +648,60 @@ def test_tc_b78_37_selects_survive_compaction_no_project(tmp_path: Path) -> None
             await pilot.pause()
             select = app.query_one("#diff_select_a")
             overlay = select.query_one(SelectOverlay)
-            host = app.query_one("#screen_diff")
+
+            # Sample the screen with the dropdown CLOSED, and only then open it.
+            # The expanded overlay is drawn on the screen layer and covers the
+            # rows below it - measured here: with A's dropdown open, the
+            # overlay paints over columns 29-31 of row B and `#diff_path_b`
+            # reads '▎ternal path B'. Sampling the composited screen means
+            # sampling it in the state the clause is about.
+            #
+            # Every child of the three compacted rows, with the text the widget
+            # itself declares and what the COMPOSITED SCREEN actually shows in
+            # the row's one painted line, over that child's column span.
+            #
+            # Read off the compositor, not `child.render_line(0)`. Measured on
+            # this branch: with `.diff-field-label` reverted to `padding: 1 1 0 1`
+            # the widget's own `render_line(0)` still returns 'A' while the
+            # screen at that coordinate is blank, because `render_line` indexes
+            # the widget's rendered lines and not its position on screen. A
+            # predicate on it is green for a control the operator cannot read -
+            # the same layer confusion as C-32, one level down.
+            strips = app.screen._compositor.render_strips()
+            glyphs = []
+            for row_id in _B78_CONTROL_ROWS:
+                row = app.query_one(row_id)
+                row_line = strips[row.region.y]
+                for child in row.children:
+                    name = f"#{child.id}" if child.id else f"{type(child).__name__}"
+                    if name in glyph_exempt:
+                        continue
+                    declared = getattr(child, "label", None)
+                    if declared is None:
+                        declared = getattr(child, "placeholder", None)
+                    if not declared:
+                        declared = str(child.render())
+                    span = child.region
+                    painted = "".join(
+                        seg.text
+                        for seg in row_line.crop(span.x, span.x + span.width)
+                    )
+                    glyphs.append(
+                        (name, str(declared), painted, child.size.width,
+                         child.size.height)
+                    )
+
             select.expanded = True
             await pilot.pause()
+
             return (
                 select.display,
                 overlay.display,
                 overlay.option_count,
                 str(overlay.get_option_at_index(0).prompt),
                 str(select.value),
-                app.query_one("#diff_select_row_a")
-                .region.intersection(host.region)
-                .height,
+                _b78_painted_content_height(app.query_one("#diff_select_row_a")),
+                glyphs,
             )
 
     (
@@ -589,6 +711,7 @@ def test_tc_b78_37_selects_survive_compaction_no_project(tmp_path: Path) -> None
         first_prompt,
         value,
         row_height,
+        glyphs,
     ) = asyncio.run(_drive())
 
     assert select_shown, (
@@ -610,3 +733,23 @@ def test_tc_b78_37_selects_survive_compaction_no_project(tmp_path: Path) -> None
         "compacted row clips away is an unusable control that passes every "
         "height predicate"
     )
+
+    # C-40: the sweep must have found children, or "every child paints its
+    # glyph" is vacuously true over an empty set.
+    assert len(glyphs) >= 6, (
+        f"the compacted-child sweep found only {len(glyphs)} children across "
+        f"{_B78_CONTROL_ROWS}; the glyph clause below would be near-vacuous"
+    )
+
+    for name, declared, painted, width, height in glyphs:
+        assert height >= 1, (
+            f"{name} has a content height of {height} inside a one-row row - its "
+            f"chrome has eaten the line the operator sees"
+        )
+        expected = declared[: max(width, 1)]
+        assert expected and expected in painted, (
+            f"the row's one painted line must show {name}'s own text, not its "
+            f"chrome: expected {expected!r} (the widget's declared {declared!r} "
+            f"truncated to its {width}-column content width) but the screen at "
+            f"that span reads {painted!r}"
+        )
