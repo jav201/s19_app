@@ -7055,35 +7055,122 @@ class AbDiffPanel(Container):
         # `markup=False` sink cannot lose it.
         return ListItem(Label(text, markup=False), classes="diff-run-note", disabled=True)
 
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
+        """Re-render both hex windows for the newly highlighted run (LLR-123.1).
+
+        Summary:
+            The run list is the shipped selection surface (HLR-122), and this
+            is the only thing that makes it mean anything: moving the highlight
+            re-renders the A and B windows onto the run the operator is on.
+            Before batch-78 Inc-4 ``_render_run_windows`` had a single call
+            site, ``render_comparison``'s literal ``0``, so runs 1..N were
+            unreachable however the list was driven.
+
+        Args:
+            event (ListView.Highlighted): The highlight-change event. Its
+                ``item`` is ``None`` while the list is being rebuilt, and is a
+                header / notice row for the three context lines — neither
+                stands for a run, and neither re-renders anything.
+
+        Dependencies:
+            Uses:
+                - ``_render_run_windows``
+            Used by:
+                - Textual message dispatch for ``ListView.Highlighted``
+        """
+        # The run index rides on the row's shipped DOM id (`_render_run_list`),
+        # not on the row's position: the list also carries three disabled
+        # context rows at the top and a display-cap notice at the bottom, so
+        # position and run index are not the same number.
+        item = event.item
+        if item is None or item.id is None or not item.id.startswith("diff_run_"):
+            return
+        self._render_run_windows(int(item.id[len("diff_run_") :]))
+
+    def _window_row_capacity(self) -> int:
+        """Hex rows the pane can actually paint, header row excluded (LLR-123.2).
+
+        Summary:
+            The row count is a function of the RENDERED pane, read at render
+            time — never of :attr:`DISPLAY_CONTEXT_BYTES`, which is a compile-
+            time constant and made the window identical at every terminal
+            height (executed pre-change: 132x44 and 132x60 both emitted 4
+            lines, into panes of 13 and 29 content rows).
+
+        Returns:
+            int: ``min(A, B) - 1`` content rows, floored at 0. The MINIMUM of
+            the two windows is the binding one because a diff is only readable
+            when both columns show the SAME addresses on the same screen line;
+            the two are siblings under one ``1fr`` row and measure equal
+            (executed at 132x44, 132x60, 160x40, 120x30 and 80x24), so this is
+            each window's own height wherever they agree and the honest bound
+            where a future layout makes them differ. The ``- 1`` is the header
+            line, which shares the widget with the hex rows.
+
+        Dependencies:
+            Used by:
+                - ``_render_run_windows``
+        """
+        heights = (
+            self.query_one("#diff_hex_a", Static).size.height,
+            self.query_one("#diff_hex_b", Static).size.height,
+        )
+        return max(0, min(heights) - 1)
+
     def _render_run_windows(self, run_index: int) -> None:
-        """Render the selected run's bounded hex windows for A and B.
+        """Render the selected run's pane-sized hex windows for A and B.
 
         Summary:
             Render image A's and image B's hex+ASCII windows around the
             selected run, each window respecting the ``hexview`` row caps
-            (``MAX_HEX_ROWS``). The window spans the run ± a small context.
+            (``MAX_HEX_ROWS``). The window ALWAYS spans the run ±
+            :attr:`DISPLAY_CONTEXT_BYTES` (the floor, HLR-123), and is then
+            grown to fill the rendered pane, keeping the run centred.
 
         Args:
             run_index (int): Index into :attr:`_runs` of the run to window.
 
+        Data Flow:
+            - Compute the mandatory run ± context span, then grow it to the
+              pane's capacity by splitting the surplus rows evenly above and
+              below, clamping the low edge at address 0.
+
+        Note:
+            The floor is a floor, not the value. When the pane is shorter than
+            the floor the floor still wins and the surplus rows overflow — the
+            paginable viewport that bounds them is HLR-124's, built at Inc-5.
+            The growth is therefore one-directional and this method never
+            renders FEWER rows than the pre-batch-78 window did.
+
         Dependencies:
             Uses:
-                - ``hexview.render_hex_view``
+                - ``hexview.render_hex_view`` / ``_window_row_capacity``
             Used by:
-                - ``render_comparison``
+                - ``render_comparison`` / ``on_list_view_highlighted``
         """
         from .hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 
         if not (0 <= run_index < len(self._runs)):
             return
-        start, end, _kind = self._runs[run_index]
+        start, end, kind = self._runs[run_index]
         low = max(0, start - self.DISPLAY_CONTEXT_BYTES)
         low -= low % HEX_WIDTH
         high = end + self.DISPLAY_CONTEXT_BYTES
-        row_bases = list(range(low, high, HEX_WIDTH))
+        rows = len(range(low, high, HEX_WIDTH))
+        capacity = self._window_row_capacity()
+        if capacity > rows:
+            # Centre the run: half the surplus goes above it, and whatever the
+            # address-0 clamp refuses up there is kept, not dropped — the row
+            # count stays `capacity` and the remainder simply extends downward.
+            low = max(0, low - ((capacity - rows) // 2) * HEX_WIDTH)
+            rows = capacity
+        row_bases = [low + index * HEX_WIDTH for index in range(rows)]
         text_a = render_hex_view(self._mem_map_a, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
         text_b = render_hex_view(self._mem_map_b, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
-        header = f"Run #{run_index} 0x{start:08X}-0x{end:08X}"
+        header = (
+            f"Run #{run_index} 0x{start:08X}-0x{end:08X} "
+            f"{self._KIND_LABEL.get(kind, kind)}"
+        )
         self.query_one("#diff_hex_a", Static).update(f"Image A — {header}\n{text_a}")
         self.query_one("#diff_hex_b", Static).update(f"Image B — {header}\n{text_b}")
 

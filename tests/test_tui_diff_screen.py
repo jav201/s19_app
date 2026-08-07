@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -270,7 +271,9 @@ def _b78_drive_compare(tmp_path: Path, size, result, *, after):
         monkey.undo()
 
 
-def _diff_result(runs_kinds, *, refused=False, diagnostics=None, summary="none"):
+def _diff_result(
+    runs_kinds, *, refused=False, diagnostics=None, summary="none", paths=(None, None)
+):
     """Build a fake ComparisonResult for the view-layer tests.
 
     runs_kinds: list of (start, end, kind). The maps are synthetic and only
@@ -280,6 +283,12 @@ def _diff_result(runs_kinds, *, refused=False, diagnostics=None, summary="none")
     the run-list header. It is a parameter (batch-78 Inc-2) so ``TC-B78-48``
     can drive a hostile value through the SHIPPED path rather than calling
     ``_render_run_list`` behind the app's back.
+
+    ``paths`` is the ``(path_a, path_b)`` pair the app re-parses into the hex
+    windows' memory maps (``S19TuiApp._diff_load_maps``). It is a parameter
+    (batch-78 Inc-4) so ``TC-B78-26`` can give the two sides DIFFERENT byte
+    coverage through the shipped loader; the default ``(None, None)`` leaves
+    both maps empty, which is what every pre-Inc-4 node here already assumes.
     """
     from s19_app.compare import (
         ComparisonResult,
@@ -299,9 +308,10 @@ def _diff_result(runs_kinds, *, refused=False, diagnostics=None, summary="none")
         mac=ArtifactNote(status="absent"),
         summary=summary,
     )
+    path_a, path_b = paths
     return ComparisonResult(
-        image_a=ImageRef(label="A.s19", path=None, source_kind="external"),
-        image_b=ImageRef(label="B.s19", path=None, source_kind="external"),
+        image_a=ImageRef(label="A.s19", path=path_a, source_kind="external"),
+        image_b=ImageRef(label="B.s19", path=path_b, source_kind="external"),
         runs=runs,
         stats=stats,
         notes={"image_a": usage, "image_b": usage},
@@ -1914,4 +1924,640 @@ def test_at_b78_31_written_report_is_complete_under_display_caps(
     assert total > AbDiffPanel.DISPLAY_MAX_RUNS, (
         f"this node's fixture ({total} runs) must exceed the display cap "
         f"({AbDiffPanel.DISPLAY_MAX_RUNS}) or it tests nothing"
+    )
+
+
+# --------------------------------------------------------------------------
+# batch-78 Inc-4 - HLR-123: the hex windows follow the selection and are sized
+# by the pane
+#
+# Node map (spec Sec.3 HLR-123 / Sec.4 LLR-123.1-.3 / Sec.5.3 / Sec.7 Inc-4):
+#   AT-B78-20  test_at_b78_20_selection_re_renders_both_windows        GATE
+#   AT-B78-21  test_at_b78_21_row_count_derives_from_pane_height       GATE
+#   AT-B78-22  test_at_b78_22_window_spans_the_run_plus_context        GATE
+#   TC-B78-23  test_tc_b78_23_zero_runs_keeps_the_no_runs_text
+#   TC-B78-24  test_tc_b78_24_address_zero_clamp_and_unaligned_start
+#   TC-B78-25  test_tc_b78_25_run_longer_than_the_pane_still_renders
+#   TC-B78-26  test_tc_b78_26_bytes_absent_from_one_map_render_blank
+#   TC-B78-27  test_tc_b78_27_stale_high_selection_after_a_shorter_compare
+#   TC-B78-28  test_tc_b78_28_zero_height_pane_does_not_raise
+#   TC-B78-45  test_tc_b78_45_row_count_is_not_a_function_of_the_constant
+#
+# Pre-change, `_render_run_windows` had ONE call site - `render_comparison`'s
+# literal 0 - and its row count came from `DISPLAY_CONTEXT_BYTES` alone, so the
+# window was byte-identical at every terminal height. Executed on this branch
+# before the change: 132x44 emitted 4 lines into a 13-row pane and 132x60
+# emitted 4 lines into a 29-row pane. 4 == 4, RED.
+# --------------------------------------------------------------------------
+
+#: `AT-B78-21`'s two sizes, named by spec Sec.7's Inc-4 gate. SAME WIDTH, so the
+#: only thing that can move the row count is the height: a width-driven
+#: implementation, or a hard-coded count, fails the strict inequality. A
+#: single-size test proves nothing here - `return 40` passes it.
+_B78_INC4_TALL = (132, 60)
+_B78_INC4_WIDE = (132, 44)
+
+#: A pane whose CONTENT height is 0 (executed: `#diff_hex_a.size.height == 0` at
+#: 132x24, before and after this increment). The derived capacity is therefore 0
+#: and the mandatory run +/- context floor is the whole window - which is the
+#: only regime in which `AT-B78-22`'s "exactly three addresses" is satisfiable at
+#: all. See that node's docstring: HLR-123's two clauses are jointly exact only
+#: where the pane cannot grow the window.
+_B78_INC4_SHORT = (132, 24)
+
+#: `AT-B78-22`'s fixture and its expected addresses, as LITERALS. Spec F-6 /
+#: Q-M1: rev-1 computed this span from `AbDiffPanel.DISPLAY_CONTEXT_BYTES` - the
+#: class under test - and stayed GREEN under a 4x change to it. The constant
+#: appears in this module's Inc-4 block only inside a guard, and that guard is
+#: evaluated AFTER the capture so a mutation reddens an assertion rather than
+#: raising before one runs.
+_B78_AT22_RUN = (0x1000, 0x1004, "changed")
+_B78_AT22_ADDRESSES = [0x00000FF0, 0x00001000, 0x00001010]
+
+#: One emitted hex row: `0x` + 8 upper-case hex digits + two spaces. The row
+#: address is the observable HLR-123 is about - `render_hex_view` emits exactly
+#: one such line per requested row base, so counting these counts the rows the
+#: producer was asked for, without reading the producer's inputs.
+_B78_HEX_ROW = re.compile(r"^0x([0-9A-F]{8})  ")
+
+
+def _b78_window_text(app, selector: str) -> str:
+    """The rendered text of one hex window (`#diff_hex_a` / `#diff_hex_b`)."""
+    from textual.widgets import Static
+
+    return str(app.query_one(selector, Static).render())
+
+
+def _b78_window_rows(text: str) -> list[int]:
+    """The row-base addresses a hex window emitted, in emitted order.
+
+    Only data rows count. `render_hex_view` also emits `... showing from ...` /
+    `... window limited to N rows ...` notices, and the panel prepends its own
+    `Image A - Run #n ...` header; none of those is a hex row and none matches.
+    """
+    rows = []
+    for line in text.splitlines():
+        match = _B78_HEX_ROW.match(line)
+        if match is not None:
+            rows.append(int(match.group(1), 16))
+    return rows
+
+
+def _b78_window_geometry(app) -> dict:
+    """Both windows' emitted rows + the CONTENT height each was rendered into.
+
+    Returns the two layers HLR-123 keeps apart (spec Sec.3, C-32): `rows` is
+    what the PRODUCER emitted, read off the rendered text; `content_h` is
+    `size.height`, the rows the layout gave the widget. LLR-123.2's bound is on
+    the content layer - `<= clipped` would admit four rows of invisible
+    overflow, because for these bordered boxes `clipped == content + 4`.
+    """
+    from textual.widgets import Static
+
+    text_a = _b78_window_text(app, "#diff_hex_a")
+    text_b = _b78_window_text(app, "#diff_hex_b")
+    return {
+        "rows_a": _b78_window_rows(text_a),
+        "rows_b": _b78_window_rows(text_b),
+        "lines_a": len(text_a.splitlines()),
+        "header_a": text_a.splitlines()[0] if text_a else "",
+        "header_b": text_b.splitlines()[0] if text_b else "",
+        "content_h": app.query_one("#diff_hex_a", Static).size.height,
+        "text_a": text_a,
+        "text_b": text_b,
+    }
+
+
+async def _b78_select_run(app, pilot, listing, presses: int) -> None:
+    """Walk the run-list highlight down `presses` rows with REAL key presses.
+
+    No `.focus()` in the assertion path and no call to `_render_run_windows`:
+    LLR-123.1's whole point is that the shipped selection surface drives the
+    renderer, and calling the renderer directly already worked pre-change.
+    """
+    _b78_focus_run_list(app, listing)
+    for _ in range(presses):
+        await pilot.press("down")
+
+
+def test_at_b78_20_selection_re_renders_both_windows(tmp_path: Path) -> None:
+    """AT-B78-20 (GATE) - selecting run 3 re-renders BOTH windows onto run 3.
+
+    Intent: HLR-123 / LLR-123.1 - "when the operator changes the run-list
+    selection through the shipped selection surface, both hex windows shall
+    re-render to the selected run with a header naming its index, address range
+    and classification". Pre-change `_render_run_windows` had a single call site
+    carrying the literal `0`, so runs 1..N were unreachable no matter how the
+    list was driven - Inc-2 made the list selectable and deliberately left this
+    wire unconnected.
+
+    The header clause is asserted on an EDGE, not a level (C-78-xvi): the header
+    is captured BEFORE the presses and the node requires a transition. A level
+    assertion ("the header names run 3") is also satisfied by a window that
+    never re-rendered, had the initial selection happened to be run 3, and by a
+    stale capture if the key presses never landed.
+
+    C-40 co-assertion: "the header names run 3" is green on a window that
+    rendered a header and nothing else, so the same read requires at least one
+    emitted hex row, and requires the A and B windows to have been asked for the
+    SAME addresses - a diff whose two columns disagree about which byte is on
+    which line is not a diff.
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed" if i % 2 else "only_a") for i in range(6)]
+    target = 3
+    start, end, kind = runs[target]
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        before = _b78_window_geometry(app)
+        await _b78_select_run(app, pilot, listing, target)
+        after = _b78_window_geometry(app)
+        return before, after, _b78_run_index(listing.highlighted_child)
+
+    before, after, highlighted = _b78_drive_compare(
+        tmp_path, _B78_INC4_WIDE, _diff_result(runs), after=_after
+    )
+
+    assert highlighted == target, (
+        f"precondition: the key presses must land on run {target}; the run list "
+        f"highlight is on {highlighted}"
+    )
+    assert before["header_a"] != after["header_a"], (
+        f"the A window must RE-RENDER on a selection change; its header did not "
+        f"move off {before['header_a']!r}"
+    )
+    assert before["header_b"] != after["header_b"], (
+        f"the B window must RE-RENDER on a selection change; its header did not "
+        f"move off {before['header_b']!r}"
+    )
+    for side, header in (("A", after["header_a"]), ("B", after["header_b"])):
+        assert f"Run #{target}" in header, (
+            f"the {side} window header must name the selected run index; "
+            f"header={header!r}"
+        )
+        assert f"0x{start:08X}-0x{end:08X}" in header, (
+            f"the {side} window header must name the selected run's address "
+            f"range; header={header!r}"
+        )
+        assert "changed" in header, (
+            f"the {side} window header must name the run's classification "
+            f"(LLR-123.3); run kind is {kind!r} and header={header!r}"
+        )
+    # C-40: a header-only window would satisfy every clause above.
+    assert after["rows_a"] and after["rows_b"], (
+        f"both windows must emit at least one hex row; "
+        f"A={len(after['rows_a'])} rows, B={len(after['rows_b'])} rows"
+    )
+    assert after["rows_a"] == after["rows_b"], (
+        "the A and B windows must be asked for the SAME row addresses, or the "
+        "two columns cannot be read against each other"
+    )
+    row_base = start - (start % 16)
+    assert row_base in after["rows_a"], (
+        f"the window must include the selected run's own row 0x{row_base:08X}; "
+        f"emitted 0x{after['rows_a'][0]:08X}..0x{after['rows_a'][-1]:08X}"
+    )
+    assert after["rows_a"][0] != before["rows_a"][0], (
+        f"the window must move to the selected run's neighbourhood; it still "
+        f"starts at 0x{before['rows_a'][0]:08X}"
+    )
+
+
+def test_at_b78_21_row_count_derives_from_pane_height(tmp_path: Path) -> None:
+    """AT-B78-21 (GATE) - the row count differs between two pane HEIGHTS.
+
+    Intent: HLR-123 / LLR-123.2 - "the number of hex rows each window renders
+    shall be derived from that window's rendered height at render time, shall
+    not be a compile-time constant, and shall not exceed the window's rendered
+    content height". Pre-change the count came from `DISPLAY_CONTEXT_BYTES`
+    alone, so it was a function of the RUN, not of the pane: executed on this
+    branch at the two sizes below, 4 emitted lines into a 13-row pane and 4 into
+    a 29-row pane. 4 == 4.
+
+    The gate is the STRICT INEQUALITY, and it is what "the floor is a floor, not
+    the value" means in a predicate (spec LLR-123.2): an implementation that
+    keeps the +/-16 span and ALSO reads the height passes any ">= floor" test,
+    and cannot pass this one. The `<= content height` clause is the other half -
+    it is what kills a "just render 40 rows" fix.
+
+    Both sizes are 132 columns WIDE. Only the height differs, so a count derived
+    from the width, or from the run, or from a literal, fails.
+    """
+    runs = [_B78_AT22_RUN]
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    wide = _b78_drive_compare(tmp_path, _B78_INC4_WIDE, _diff_result(runs), after=_after)
+    tall = _b78_drive_compare(tmp_path, _B78_INC4_TALL, _diff_result(runs), after=_after)
+
+    # Precondition: the two panes really are different heights in this run. If
+    # they were not, the inequality below would be a claim about nothing.
+    assert tall["content_h"] > wide["content_h"] > 0, (
+        f"precondition: {_B78_INC4_TALL} must give the window a taller CONTENT "
+        f"pane than {_B78_INC4_WIDE}; measured {tall['content_h']} and "
+        f"{wide['content_h']}"
+    )
+    assert len(wide["rows_a"]) < len(tall["rows_a"]), (
+        f"the emitted row count must DERIVE from the pane height: same width, "
+        f"panes of {wide['content_h']} and {tall['content_h']} content rows, "
+        f"but the windows emitted {len(wide['rows_a'])} and "
+        f"{len(tall['rows_a'])} rows"
+    )
+    # Per-arm verdicts (CC-1): the two sizes differ by 16 pane rows, and a
+    # single aggregate would hide which arm moved.
+    for label, measured in ((_B78_INC4_WIDE, wide), (_B78_INC4_TALL, tall)):
+        assert len(measured["rows_a"]) <= measured["content_h"], (
+            f"{label}: the window emitted {len(measured['rows_a'])} hex rows "
+            f"into a content pane of {measured['content_h']} rows - the count "
+            f"must not exceed the pane it is rendered into"
+        )
+        assert measured["lines_a"] <= measured["content_h"], (
+            f"{label}: the window emitted {measured['lines_a']} lines (header "
+            f"included) into a content pane of {measured['content_h']} rows; "
+            f"the header shares the widget with the hex rows"
+        )
+        assert measured["rows_a"] == measured["rows_b"], (
+            f"{label}: A and B must be asked for the same row addresses"
+        )
+
+
+def test_at_b78_22_window_spans_the_run_plus_context(tmp_path: Path) -> None:
+    """AT-B78-22 (GATE) - the window covers the run +/- the context, exactly.
+
+    Intent: HLR-123 - "the rendered window shall always include the selected
+    run's bytes plus `DISPLAY_CONTEXT_BYTES` of context on each side". For a run
+    at 0x1000-0x1004 that is the three row bases 0x00000FF0, 0x00001000 and
+    0x00001010, written here as LITERALS.
+
+    Why literals, and why they are the whole point (spec F-6 / Q-M1): rev-1
+    computed the expected span from `AbDiffPanel.DISPLAY_CONTEXT_BYTES` - the
+    class under test - and stayed GREEN under `16 -> 64`, because expectation
+    and observation moved together. The constant appears below only in a guard,
+    and the guard is evaluated AFTER the capture so a mutation on it reddens an
+    assertion rather than raising before one runs.
+
+    Why the exact arm runs at a pane of ZERO content rows (a spec conflict,
+    reported at the Inc-4 gate): HLR-123 requires BOTH "always include the run
+    +/- context" AND "the row count derives from the pane height". Wherever the
+    pane is taller than the +/-context floor those clauses cannot both be exact
+    - the derived count is 12 rows at 132x44 - so the "exactly three addresses"
+    threshold is satisfiable only where the pane cannot grow the window. 132x24
+    is that place (`#diff_hex_a.size.height == 0`, executed), and it is the size
+    the spec's own HLR-123 rationale measured. The second read below covers the
+    tall pane with the CONTAINMENT form, which is what the requirement's
+    "include" actually says; it is a co-assertion, not the gate.
+    """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    short = _b78_drive_compare(
+        tmp_path, _B78_INC4_SHORT, _diff_result([_B78_AT22_RUN]), after=_after
+    )
+    wide = _b78_drive_compare(
+        tmp_path, _B78_INC4_WIDE, _diff_result([_B78_AT22_RUN]), after=_after
+    )
+
+    # The guard is AFTER the capture and BEFORE the assertions (spec Q-m2): this
+    # node's declared reddening mutation is on the IMPLEMENTATION
+    # (`high = end + ctx` -> `high = end`), and this guard stays true under it,
+    # so the node reddens on the assertion below rather than on an error.
+    assert AbDiffPanel.DISPLAY_CONTEXT_BYTES == 16, (
+        f"this node's expected addresses are literals derived from a 16-byte "
+        f"context; the constant is now {AbDiffPanel.DISPLAY_CONTEXT_BYTES} and "
+        f"the literals must be re-derived rather than the assertion relaxed"
+    )
+    assert short["content_h"] == 0, (
+        f"precondition: {_B78_INC4_SHORT} must give the window a content height "
+        f"of 0 so the derived capacity cannot grow the window past the run +/- "
+        f"context floor; measured {short['content_h']}"
+    )
+    assert short["rows_a"] == _B78_AT22_ADDRESSES, (
+        f"the window must span exactly the run plus one context row on each "
+        f"side; expected {[f'0x{a:08X}' for a in _B78_AT22_ADDRESSES]}, emitted "
+        f"{[f'0x{a:08X}' for a in short['rows_a']]}"
+    )
+    assert short["rows_b"] == _B78_AT22_ADDRESSES, (
+        f"the B window must span the same rows; emitted "
+        f"{[f'0x{a:08X}' for a in short['rows_b']]}"
+    )
+    # Co-assertion, not the gate: on a pane that CAN grow the window, the same
+    # mandatory span must still be there, contiguously and in order.
+    assert _B78_AT22_ADDRESSES[0] in wide["rows_a"], (
+        f"growing the window to the pane must not drop the mandatory low "
+        f"context row; emitted {[f'0x{a:08X}' for a in wide['rows_a']]}"
+    )
+    index = wide["rows_a"].index(_B78_AT22_ADDRESSES[0])
+    assert wide["rows_a"][index : index + 3] == _B78_AT22_ADDRESSES, (
+        f"growing the window to the pane must not disturb the mandatory run "
+        f"+/- context span; emitted {[f'0x{a:08X}' for a in wide['rows_a']]}"
+    )
+
+
+def test_tc_b78_45_row_count_is_not_a_function_of_the_constant(tmp_path: Path) -> None:
+    """TC-B78-45 - two pane heights, ONE constant, two different row counts.
+
+    Intent: HLR-123's mechanism clause - "the emitted row count is no longer a
+    pure function of `DISPLAY_CONTEXT_BYTES`". AT-B78-21 asserts the counts
+    differ; this asserts the OTHER half, that nothing about the constant or the
+    run differed between the two measurements. Without it, "the counts differ"
+    is also consistent with the two arms having been given different runs.
+    """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    runs = [_B78_AT22_RUN]
+    seen_constant = []
+
+    async def _after(app, pilot):
+        seen_constant.append(AbDiffPanel.DISPLAY_CONTEXT_BYTES)
+        return _b78_window_geometry(app)
+
+    wide = _b78_drive_compare(tmp_path, _B78_INC4_WIDE, _diff_result(runs), after=_after)
+    tall = _b78_drive_compare(tmp_path, _B78_INC4_TALL, _diff_result(runs), after=_after)
+
+    assert len(set(seen_constant)) == 1, (
+        f"the context constant must be identical across both arms, or the row "
+        f"counts below are explained by it after all; observed {seen_constant}"
+    )
+    assert wide["header_a"] == tall["header_a"], (
+        f"both arms must window the SAME run, or a differing row count says "
+        f"nothing about the pane; headers {wide['header_a']!r} vs "
+        f"{tall['header_a']!r}"
+    )
+    assert len(wide["rows_a"]) != len(tall["rows_a"]), (
+        f"same run, same constant, different pane heights ({wide['content_h']} "
+        f"vs {tall['content_h']}) must produce different row counts; both "
+        f"emitted {len(wide['rows_a'])}"
+    )
+
+
+def test_tc_b78_23_zero_runs_keeps_the_no_runs_text(tmp_path: Path) -> None:
+    """TC-B78-23 (empty) - a comparison with 0 runs still says so.
+
+    Intent: HLR-123's empty boundary. The selection wire must not turn the
+    no-runs branch of `render_comparison` into a blank pane or a crash: with no
+    runs there is no selectable entry, so nothing highlights and nothing renders
+    a window.
+    """
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    measured = _b78_drive_compare(
+        tmp_path, _B78_INC4_WIDE, _diff_result([]), after=_after
+    )
+
+    assert "no differing runs" in measured["text_a"], (
+        f"the A window must state that there are no differing runs; "
+        f"text={measured['text_a']!r}"
+    )
+    assert "no differing runs" in measured["text_b"], (
+        f"the B window must state that there are no differing runs; "
+        f"text={measured['text_b']!r}"
+    )
+    assert measured["rows_a"] == [] and measured["rows_b"] == [], (
+        "a comparison with no runs must not window anything"
+    )
+
+
+def test_tc_b78_24_address_zero_clamp_and_unaligned_start(tmp_path: Path) -> None:
+    """TC-B78-24 (boundary) - the address-0 clamp and the alignment step.
+
+    Intent: HLR-123's two arithmetic boundaries, both of which are otherwise
+    covered by nothing (spec architect NEW-11 - the mutation on the alignment
+    line came back inert precisely because no acceptance exercised an unaligned
+    start).
+
+    Arm 1, the clamp: a run at address 0 has no room for a context row below it,
+    and the window must start AT 0 rather than at a negative base - while still
+    filling the pane, because the rows the clamp refuses above the run are owed
+    below it, not dropped.
+
+    Arm 2, the alignment step: a run starting at 0x1007 is not on a 16-byte row
+    boundary. Its window must still be built from aligned row bases, so the
+    emitted addresses are the same three as for an aligned 0x1000 run.
+    """
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    at_zero = _b78_drive_compare(
+        tmp_path,
+        _B78_INC4_WIDE,
+        _diff_result([(0x0000, 0x0004, "only_b")]),
+        after=_after,
+    )
+    unaligned = _b78_drive_compare(
+        tmp_path,
+        _B78_INC4_SHORT,
+        _diff_result([(0x1007, 0x100B, "changed")]),
+        after=_after,
+    )
+
+    assert at_zero["rows_a"][0] == 0, (
+        f"a run at address 0 must window from 0x00000000, not from a clamped-"
+        f"then-shifted base; first row is 0x{at_zero['rows_a'][0]:08X}"
+    )
+    assert len(at_zero["rows_a"]) <= at_zero["content_h"], (
+        f"the clamp must not push the row count past the pane; "
+        f"{len(at_zero['rows_a'])} rows into {at_zero['content_h']}"
+    )
+    assert len(at_zero["rows_a"]) == at_zero["content_h"] - 1, (
+        f"the rows the address-0 clamp refuses ABOVE the run are owed BELOW it: "
+        f"the window must still fill the pane. Pane {at_zero['content_h']}, "
+        f"header 1, emitted {len(at_zero['rows_a'])} hex rows"
+    )
+    assert unaligned["rows_a"] == _B78_AT22_ADDRESSES, (
+        f"an unaligned run start must be aligned down to a 16-byte row base; a "
+        f"run at 0x00001007 must window the same rows as one at 0x00001000, but "
+        f"emitted {[f'0x{a:08X}' for a in unaligned['rows_a']]}"
+    )
+
+
+def test_tc_b78_25_run_longer_than_the_pane_still_renders(tmp_path: Path) -> None:
+    """TC-B78-25 (boundary) - a run larger than the pane keeps its header.
+
+    Intent: HLR-123's overflow boundary. The floor is a floor: when the run
+    +/- context spans more rows than the pane can paint, the derived capacity
+    does NOT shrink the window - the mandatory span survives and the surplus
+    overflows. Bounding that overflow into a paginable viewport is HLR-124's
+    fallback regime, built at Inc-5; what this node pins is that Inc-4 does not
+    silently truncate the run in the meantime, and that the header still names
+    it.
+    """
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    start, end = 0x1000, 0x2000
+    measured = _b78_drive_compare(
+        tmp_path, _B78_INC4_WIDE, _diff_result([(start, end, "changed")]), after=_after
+    )
+
+    assert f"0x{start:08X}-0x{end:08X}" in measured["header_a"], (
+        f"the header must still name the run it could not fit; "
+        f"header={measured['header_a']!r}"
+    )
+    assert len(measured["rows_a"]) > measured["content_h"], (
+        f"precondition: this run must overflow the pane, or the node tests "
+        f"nothing; {len(measured['rows_a'])} rows into {measured['content_h']}"
+    )
+    assert measured["rows_a"][0] <= start - (start % 16), (
+        f"the mandatory low context row must survive the overflow; first row is "
+        f"0x{measured['rows_a'][0]:08X}"
+    )
+    assert measured["rows_a"][-1] >= end, (
+        f"the mandatory high context row must survive the overflow; last row is "
+        f"0x{measured['rows_a'][-1]:08X} for a run ending at 0x{end:08X}"
+    )
+
+
+def test_tc_b78_26_bytes_absent_from_one_map_render_blank(tmp_path: Path) -> None:
+    """TC-B78-26 (boundary) - a run mapped in A only renders a blank B gutter.
+
+    Intent: HLR-123's asymmetric boundary - an `only_a` run has no bytes on the
+    B side. Both windows are asked for the SAME row addresses (that is what
+    makes the two columns readable against each other), so B must render those
+    rows with an empty hex gutter rather than dropping them, going blank, or
+    falling back to A's bytes.
+
+    Driven through the shipped loader: the two sides are real on-disk S19 files,
+    re-parsed by `S19TuiApp._diff_load_maps` exactly as a real compare does.
+    """
+    from s19_app.tui.changes.io import emit_s19_from_mem_map
+
+    start, end = 0x1000, 0x1004
+    map_a = {start + i: 0xA0 + i for i in range(end - start)}
+    path_a = tmp_path / "only_a.s19"
+    path_b = tmp_path / "empty_b.s19"
+    path_a.write_text(emit_s19_from_mem_map(map_a, [(start, end)]), encoding="utf-8")
+    # B carries bytes somewhere else entirely, so its map is non-empty (an empty
+    # map is a load FAILURE to the app) but covers none of the run.
+    path_b.write_text(
+        emit_s19_from_mem_map({0x9000 + i: 0x11 for i in range(4)}, [(0x9000, 0x9004)]),
+        encoding="utf-8",
+    )
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    measured = _b78_drive_compare(
+        tmp_path,
+        _B78_INC4_SHORT,
+        _diff_result([(start, end, "only_a")], paths=(path_a, path_b)),
+        after=_after,
+    )
+
+    assert "A0 A1 A2 A3" in measured["text_a"], (
+        f"the A window must render the run's real bytes; "
+        f"text={measured['text_a']!r}"
+    )
+    assert measured["rows_a"] == measured["rows_b"], (
+        f"both windows must be asked for the same rows even when only one side "
+        f"has bytes there; A={[f'0x{a:08X}' for a in measured['rows_a']]}, "
+        f"B={[f'0x{a:08X}' for a in measured['rows_b']]}"
+    )
+    assert "A0 A1 A2 A3" not in measured["text_b"], (
+        f"the B window must not carry A's bytes; text={measured['text_b']!r}"
+    )
+    b_run_row = next(
+        line
+        for line in measured["text_b"].splitlines()
+        if line.startswith(f"0x{start:08X}  ")
+    )
+    assert b_run_row.split("  ")[1].strip() == "", (
+        f"the row B does not map must render an EMPTY hex gutter, not a dropped "
+        f"row and not other bytes; row={b_run_row!r}"
+    )
+
+
+def test_tc_b78_27_stale_high_selection_after_a_shorter_compare(tmp_path: Path) -> None:
+    """TC-B78-27 (invalid) - a selection index outside `_runs` renders nothing.
+
+    Intent: HLR-123's invalid boundary - `_render_run_windows`'s bounds guard.
+    The reachable way to aim an out-of-range index at it through the shipped
+    surface is a SECOND comparison with fewer runs while the highlight sits on a
+    high index: the list is rebuilt and every highlight event it emits while
+    doing so must land on a valid run or on nothing at all.
+    """
+    import s19_app.tui.app as app_mod
+
+    many = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(8)]
+    few = [(0x5000, 0x5004, "only_b")]
+    injected = {"result": _diff_result(many)}
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=_B78_INC4_WIDE) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            await _b78_press_compare(app, pilot)
+            listing = _b78_run_list(app)
+            await _b78_select_run(app, pilot, listing, 7)
+            high = _b78_run_index(listing.highlighted_child)
+            injected["result"] = _diff_result(few)
+            await _b78_press_compare(app, pilot)
+            listing = _b78_run_list(app)
+            return high, _b78_run_index(listing.highlighted_child), _b78_window_geometry(app)
+
+    monkey = pytest.MonkeyPatch()
+    monkey.setattr(app_mod, "compare_images", lambda *a, **k: injected["result"])
+    try:
+        high, highlighted, measured = asyncio.run(_drive())
+    finally:
+        monkey.undo()
+
+    assert high == 7, (
+        f"precondition: the first comparison's highlight must reach run 7, or "
+        f"the second comparison is not shrinking past anything; it is on {high}"
+    )
+    assert highlighted == 0, (
+        f"after a comparison with 1 run the highlight must be on run 0; it is "
+        f"on {highlighted}"
+    )
+    assert f"Run #0 0x{few[0][0]:08X}-0x{few[0][1]:08X}" in measured["header_a"], (
+        f"the window must show the SECOND comparison's only run, not a stale "
+        f"one; header={measured['header_a']!r}"
+    )
+    assert measured["rows_a"], "the rebuilt window must still emit hex rows"
+
+
+def test_tc_b78_28_zero_height_pane_does_not_raise(tmp_path: Path) -> None:
+    """TC-B78-28 (error) - selecting a run into a zero-height pane does not raise.
+
+    Intent: HLR-123's error boundary. The derived capacity is read from a live
+    widget, and at 132x24 that widget's content height is 0 - so the derivation
+    must produce a well-formed window rather than an empty row list, a negative
+    count or a raise. Selection still works; the rows are simply not painted,
+    which is the hole HLR-124's notice regime closes at Inc-5.
+    """
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(4)]
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        await _b78_select_run(app, pilot, listing, 2)
+        return _b78_run_index(listing.highlighted_child), _b78_window_geometry(app)
+
+    highlighted, measured = _b78_drive_compare(
+        tmp_path, _B78_INC4_SHORT, _diff_result(runs), after=_after
+    )
+
+    assert measured["content_h"] == 0, (
+        f"precondition: {_B78_INC4_SHORT} must give the window a content height "
+        f"of 0; measured {measured['content_h']}"
+    )
+    assert highlighted == 2, (
+        f"selection must still work with nothing painted; highlight is on "
+        f"{highlighted}"
+    )
+    assert "Run #2" in measured["header_a"], (
+        f"the producer must still emit the selected run's window into an "
+        f"unpainted pane; header={measured['header_a']!r}"
+    )
+    assert len(measured["rows_a"]) == 3, (
+        f"with no pane to fill, the mandatory run +/- context floor is the whole "
+        f"window; emitted {[f'0x{a:08X}' for a in measured['rows_a']]}"
     )
