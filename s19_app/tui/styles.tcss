@@ -1536,10 +1536,10 @@ DataTable > .datatable--odd-row {
  * across workspace, map, patch and rail.
  *
  *   .diff-wide      W >= 139  run list BESIDE the window column
- *   .diff-fallback  94 <= W < 139 and H >= 26  full-width window column; the
+ *   .diff-fallback  94 <= W < 139 and H >= 28  full-width window column; the
  *                   run list is an overlay on `f`, costing zero permanent
  *                   columns and zero permanent rows
- *   .diff-notice    W < 94 or H < 26  an explicit notice naming every
+ *   .diff-notice    W < 94 or H < 28  an explicit notice naming every
  *                   unsatisfied axis, instead of a silently empty results area
  */
 #diff_range_list,

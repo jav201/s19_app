@@ -40,7 +40,7 @@ Three module-level constants in `screens_directionb.py`, all **terminal** dimens
 |---|---|---|
 | `_DIFF_WIDE_MIN` | **139** | reproduced to the column on the real implementation: 138 → window 78 (wraps), **139 → 79** (fits) |
 | `_DIFF_MIN_W` | **94** | reproduced: a full-width window is 82 content cells at W = 94 and the notice boundary sits one column below |
-| `_DIFF_MIN_H` | **26** | **re-derived (F-2)** — the spec's 29 was a `styles.height = 1` simulation of a layout that no longer exists |
+| `_DIFF_MIN_H` | ~~26~~ → **28** | **re-derived (F-2)** — the spec's 29 was a `styles.height = 1` simulation of a layout that no longer exists. ⚠️ **Corrected at the gate:** 26 counted the window's header row; the normative metric is `LLR-125.2`'s *hex row*, which gives **28**. See the addendum's F-1. |
 
 `AbDiffPanel.apply_regime(width, height)` sets exactly one of `diff-wide` / `diff-fallback` / `diff-notice` on `#ab_diff_panel` and refreshes the notice text. `S19TuiApp._apply_diff_regime` is two lines and delivers the terminal size from `on_resize`; the arithmetic stays in the panel. **`width-narrow` is untouched** — it is toggled at 120 and read by 11 rules across workspace, map, patch and rail.
 
@@ -64,7 +64,7 @@ Executed at 160×40: `#diff_hex_a` **100** ≥ 79, run list **22** beside it.
 
 **The overlay costs nothing, open or shut.** `#diff_columns` declares `layers: base runs` in the fallback regime and the run list sits on the `runs` layer, so it gets its own layout pass over the same region. Executed at 132×44: `#diff_hex_a` is **102** cells wide with the overlay closed and **102** with it open. That is stronger than *"no PERMANENT columns"* and is asserted as an equality, because a `>= 79` clause in both states would pass an implementation that shrinks the window by ten columns while the list is up.
 
-Opened on `f`, dismissed on `escape`, both **widget-scoped on the panel** and both `show=False` — D-2 ruled out a new App-level binding and `AT-B78-32` pins `app.py`'s `BINDINGS` block at a zero-line diff. None of `f`, `escape`, `[`, `]` is bound at application level, so nothing is shadowed. `check_action` gates the overlay and paging keys on the fallback regime and gates `escape` on the overlay actually being open, so outside that state the panel does not claim the key at all.
+Opened on `f`, dismissed on `escape`, both **widget-scoped on the panel** and both `show=False` — D-2 ruled out a new App-level binding and `AT-B78-32` pins `app.py`'s `BINDINGS` block at a zero-line diff. None of `f`, `escape`, `[`, `]` is bound at application level, so nothing is shadowed. `check_action` gates the overlay key on the fallback regime and gates `escape` on the overlay actually being open, so outside that state the panel does not claim the key at all. ⚠️ **Corrected at the gate (F-2):** the paging keys were gated the same way and must not be — overflow is a property of the run against the pane, not of the regime, and the gate stranded 65 of 66 rows at 160×40. They are now active in every regime but the notice one.
 
 **The windows lose their border and vertical padding in this regime, and that is the whole reason it can deliver anything.** At 120×30 the results pane is 6 rows; two bordered boxes spend **8** of them on chrome. Borderless, each window gets 3 content rows — a header plus **2 hex rows**, which is exactly the viewport R-1's operator accepted. Horizontally nothing is lost that matters: 92 − 2 padding = **90** content cells against the spec's bordered estimate of 87.
 
@@ -324,7 +324,7 @@ FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comf
 
 | # | Risk | Severity | Mitigation / status |
 |---|---|---|---|
-| **R-1** | **`_DIFF_MIN_H = 26` is the POST-Inc-10 floor.** As the tree stands the command-bar row still spends three rows, so the same sweep gives 29, and between Inc-5 and Inc-10 the heights 26–28 select the fallback regime while painting no hex row. | ⚠️ **medium** | Deliberate, and it is the only choice available: Inc-10's file set does not include `screens_directionb.py`, so the constant cannot be lowered later. 26 is the value the shipped end state has; 29 would encode a state the batch deletes. **Stated in the constant's own docstring, not only here.** 120×30 — the headline case and the only diff snapshot cell — is unaffected: it paints 1 row today and 3 after Inc-10. |
+| **R-1** | ⛔ **SUPERSEDED — see the ADDENDUM. The floor is 28.** This row said `_DIFF_MIN_H = 26` and disclosed only the *temporary* Inc-5→Inc-10 window; the gate found that 26 also ships a **permanent** 26–27 dead zone in the end state, because it counts the header row. Original wording kept for the record: *"`_DIFF_MIN_H = 26` is the POST-Inc-10 floor. As the tree stands the command-bar row still spends three rows, so the same sweep gives 29, and between Inc-5 and Inc-10 the heights 26–28 select the fallback regime while painting no hex row."* | ⛔ **was ⚠️ medium; the gate raised it to HIGH** | The **transient** disclosure was right and is retained (now heights 28–30). What it missed is that the constant's own metric was one row too weak — see the addendum's F-1. |
 | **R-2** | **`AT-B78-25`'s pagination and 0-permanent-column clauses are observed at Inc-10, on a mechanism built here.** | low | This is §7's own split and BLK-A's lesson is about a mechanism with NO observing node. Both clauses have one here — `TC-B78-52` and `TC-B78-53` — at 132×44, which needs no Lane-1 work. Inc-10 still owns the 120×30 arms. |
 | **R-3** | **Inc-2's reachability nodes now depend on a driver step that opens the overlay** (F-4). | ⚠️ medium | The alternative is worse: without it two of them pass over an invisible list. The step drives the shipped binding with a real `pilot.press("f")` and **asserts the list became displayed**, so a regression in the overlay reddens them rather than quietly re-vacuating them. |
 | **R-4** | **`_B78_INC4_SHORT` moved 132×24 → 132×26**, changing a fixture another increment's gate uses. | low | Forced: 24 is below `_DIFF_MIN_H`, so at 132×24 the "pane whose content height is 0" that `AT-B78-22`'s docstring names no longer exists — the whole results area is hidden behind the notice. 132×26 keeps capacity 0 **and** is a state the operator is shown. `AT-B78-22` and `TC-B78-50` re-run green at the new size. ⚠️ **Not verified by me:** Inc-4's own M2 counterfactual (`high = end + ctx → high = end`) was **not** re-executed against the moved fixture. The reasoning that it still reddens — capacity is 0 at both sizes, so the floor is still the whole window and the emitted set still loses `0x00001010` — is reasoning, not a transcript. **Owed at the Inc-5 gate or by Inc-10.** |
@@ -385,3 +385,266 @@ FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comf
 | `C-78-vi` corrected painted-height helper used | ✓ | `_b78_painted_content_height`, ancestor-chain form, reused unchanged |
 | `C-78-xiii` / F9 no new driver copy | ✓ | §2 |
 | Review packet attached | ✓ | this document |
+
+---
+
+# ADDENDUM — Inc-5 gate review fixes (F-1 HIGH · F-2/F-3 MEDIUM · F-4…F-7 LOW)
+
+**Scope:** `s19_app/tui/screens_directionb.py`, `s19_app/tui/styles.tcss`, `tests/test_tui_diff_screen.py` and this document. **Still 4 files**, unchanged from the increment's own set (`app.py` needed no further edit).
+
+---
+
+## A.1 BLUF — the HIGH is one defect at three layers, and I shipped the weaker half of a spec conflict without saying the conflict existed
+
+`_DIFF_MIN_H` was defined as *"the first terminal height at which a window paints a **content row**"*. But `_render_run_windows` writes `f"Image A — {header}\n{text_a}"`, so **screen line 0 of each window is the header** — a painted content height of 1 delivers **zero bytes**. I knew this: Inc-4's `_window_row_capacity` is `min(A, B) - 1` *because of that header*, and I wrote the `- 1` myself in the increment before this one. I then defined the floor on a metric that does not subtract it.
+
+The consequence is worse than a soft edge. At H = 26–27 the panel declares the terminal deliverable, **hides the notice**, and shows a header and nothing else — **strictly worse than H = 25**, where the operator at least gets a notice explaining why. A degradation ladder whose upper rung is worse than the one below it is not a ladder.
+
+**The root cause is a conflict inside the spec that I resolved silently.** §2.8 D-1's height axis says *"at least one visible **content** row"* → 26. Normative **`LLR-125.2`** says *"shall render at least one **hex row** of content"* → **28**. I took the non-normative one and never surfaced that the document contained both. Engineering rule 7 is *surface conflicts, don't average them*, and this batch's own **BL-3** caught this exact "green with the result area still at zero" shape once already. **`LLR-125.2` governs.**
+
+**And the compounding half is the one worth carrying:** `TC-B78-31` does the **width** floor on both sides *and* asserts the consequence — *"`_DIFF_MIN_W` is only the right floor if the window is unwrapped AT it."* **Nothing did that for the height axis, which is the axis this increment changed.** F-1 and F-3 are the same one-row error in the constant and in the acceptance that should have caught it; the missing node is why neither caught the other. **The durable fix is the node at both sides of the floor, not the constant.**
+
+| # | Finding | Severity | Disposition |
+|---|---|---|---|
+| **F-1** | the floor counts the header, so 26–27 pass deliverability and paint zero hex rows | **HIGH** | ✅ fixed — floor **28**, conflict surfaced in the docstring, `TC-B78-54` minted at both sides |
+| **F-2** | `[`/`]` gated to the fallback: 65 of 66 rows unreachable at 160×40 | MEDIUM | ✅ fixed — the gate is now *not notice*; `TC-B78-52` gains a wide arm |
+| **F-3** | `AT-B78-23`'s `painted >= 1` counts the header, green at zero bytes | MEDIUM | ✅ fixed — `>= _B78_WINDOW_HEADER_ROWS + 1` |
+| **F-4** | Inc-2's ATs redden on the driver's guard, not their own subject | LOW | ✅ landed — the guard message now names the affected nodes and says it is the driver's |
+| **F-5** | a regime change did not re-derive the window's row count | LOW | ✅ fixed — `apply_regime` re-renders on an actual regime change; `TC-B78-30` asserts it |
+| **F-6** | the `LLR-119.3` correction leaves `#palette_input`'s scope unstated | LOW | ⏭ **carried to the coordinator** — it is a clause in `01-requirements.md`, which I do not write. See §A.6. |
+| **F-7** | the "unpiped transcript" claim has no committed artifact | LOW / info | ⏭ acknowledged, no action — see §A.6 |
+
+**The gap I flagged and did not close is now closed, by the reviewer.** Inc-4's `M2` against the moved `_B78_INC4_SHORT` reddens `AT-B78-22` on its own address assertion. I have re-executed it again here against the **second** move (132×28), because the fixture moved a second time under this addendum and a discharge against 132×26 does not transfer.
+
+---
+
+## A.2 F-1 — the corrected floor, with its executed ladder
+
+Metric: **visible hex rows** = `min(painted content height − header rows, emitted rows)`. Measured with the fallback layout forced (so the constant cannot decide its own measurement), the command-bar row hidden (the post-Inc-10 end state `A-1`'s quantity is defined in), and a **0x400-byte run** so the window is never the binding limit — what is measured is the pane's budget, not the run's.
+
+| H | capacity | painted | **visible hex rows** | verdict |
+|---|---|---|---|---|
+| 24 | 0 | 0 | **0** | notice |
+| 25 | 0 | 0 | **0** | notice |
+| 26 | 0 | 1 | **0** | ⛔ header only — the shipped defect |
+| 27 | 0 | 1 | **0** | ⛔ header only |
+| **28** | 1 | 2 | **1** | ✅ the floor |
+| 29 | 1 | 2 | **1** | ✅ |
+| 30 | 2 | 3 | **2** | ✅ R-1's accepted 120×30 viewport, to the row |
+| 31 | 2 | 3 | **2** | ✅ |
+
+**Identical at W = 94, 120 and 138** — the spec's width-independence claim reproduces a second time, under the corrected metric. `_DIFF_MIN_H = 28`.
+
+The transient disclosure moves with it: as the tree stands the command-bar row still spends three rows, so **between Inc-5 and Inc-10 the heights 28–30 select the fallback regime while painting no hex row.** That is stated in the constant's docstring and is the reason `TC-B78-54` reaches the end state through `_b78_hide_command_bar` — which **asserts the reclaim landed** rather than assuming it, and which becomes a no-op branch the moment Inc-10 deletes the row.
+
+**Knock-on, re-verified and not reasoned:** raising the floor to 28 put `_B78_INC4_SHORT = (132, 26)` back in the notice regime, so it moves again to **132×28**. Executed: `132×28` gives capacity **0** with the command bar present and **1** without it — and since the window only grows when `capacity > rows`, the run ± context floor of 3 rows is the whole window on **both** sides of Inc-10, so `AT-B78-22`'s exact three addresses hold either way. Inc-4's `M2` re-executed against the new site is `G5` in §A.3.
+
+---
+
+## A.3 Counterfactuals — five, applied-checked, sha-chained, restored
+
+Same discipline as the increment's own set: value substitutions that type-check, applied-checked (old token asserted absent after the write), sha-chained against the **previous** mutation as well as the baseline, restored in a `finally`, verdicts read from `subprocess.run(...).returncode`. Each arm runs the whole **11-node** Inc-5 set by exact node id (`G5` runs the three Inc-4 window nodes instead, which are its subject).
+
+```
+BASELINE sha=f4d6cf963b515325
+BASELINE Inc-5 set: green | 11 passed in 61.07s
+BASELINE Inc-4 window set: green | 3 passed in 8.56s
+
+--- G1 / TC-B78-54 (F-1) --- the corrected floor -> the shipped defect
+    substituted: '_DIFF_MIN_H = 28'  ->  '_DIFF_MIN_H = 26'
+    APPLIED=True  sha f4d6cf963b515325 -> 10cdb8beaea4609b (mutated)
+    SET  RED | 1 failed, 10 passed in 62.10s
+    reddened nodes: ['test_tc_b78_54_the_height_floor_delivers_a_hex_row']
+    E  AssertionError: _DIFF_MIN_H is only the right floor if at least one HEX ROW
+       is visible AT it: painted content height 1, of which 1 is the
+       'Image A - Run #...' header, leaving 0 hex rows. A floor that declares a
+       terminal deliverable and then shows a header and nothing else is WORSE
+       than the notice it replaces
+    POST (restored): green | 11 passed in 63.36s
+
+--- G2 / TC-B78-52 wide arm (F-2) --- paging re-gated to the fallback regime
+    substituted: 'return not self.has_class(self._REGIME_NOTICE)'
+             ->  'return self.has_class(self._REGIME_FALLBACK)'
+    APPLIED=True  sha 10cdb8beaea4609b -> a7df65db52f66dea (mutated)
+    SET  RED | 1 failed, 10 passed in 62.02s
+    reddened nodes: ['test_tc_b78_52_pagination_reaches_bytes_past_the_pane']
+    E  AssertionError: (160, 40): paging forward must move the window onto later
+       bytes; first row went 0x00000FF0 -> 0x00000FF0. A regime in which ']' is
+       inactive strands 65 of 66 rows
+    POST (restored): green | 11 passed in 62.01s
+
+--- G3 / AT-B78-23 (F-3) --- MIS-TARGETED, see below
+    substituted: '#ab_diff_panel.diff-fallback #diff_window_column { layer: base; }'
+             ->  '... { layer: base; height: 1; }'
+    APPLIED=True  sha a7df65db52f66dea -> 195e92259a876224 (mutated)
+    SET  RED | 3 failed, 8 passed in 36.90s
+    reddened nodes: ['test_tc_b78_30_...', 'test_tc_b78_52_...', 'test_tc_b78_54_...']
+    POST (restored): green | 11 passed in 55.20s
+
+--- G4 / TC-B78-30 (F-5) --- a regime change no longer re-derives the row count
+    substituted: 'if regime != previous and self._has_result:'
+             ->  'if regime != previous and False:'
+    APPLIED=True  sha 195e92259a876224 -> eac33fc81b1bd946 (mutated)
+    SET  RED | 1 failed, 10 passed in 55.37s
+    reddened nodes: ['test_tc_b78_30_a_resize_across_the_breakpoint_follows']
+    E  AssertionError: a regime change must RE-DERIVE the window's row count, not
+       only swap the layout class: the new pane has a capacity of 5 rows and the
+       window is still rendering 3
+    POST (restored): green | 11 passed in 58.25s
+
+--- G5 / AT-B78-22 at the MOVED fixture (Inc-4's M2, re-executed at 132x28) ---
+    substituted: 'high = end + self.DISPLAY_CONTEXT_BYTES'  ->  'high = end'
+    APPLIED=True  sha eac33fc81b1bd946 -> 8d6cddb14968c8bd (mutated)
+    SET  RED | 2 failed, 1 passed in 8.50s
+    reddened nodes: ['test_at_b78_22_window_spans_the_run_plus_context',
+                     'test_tc_b78_24_address_zero_clamp_and_unaligned_start']
+    E  AssertionError: the window must span exactly the run plus one context row
+       on each side; expected ['0x00000FF0', '0x00001000', '0x00001010'],
+       emitted ['0x00000FF0', '0x00001000']
+    POST (restored): green | 3 passed in 8.96s
+
+FINAL sha=f4d6cf963b515325  baseline=f4d6cf963b515325  equal=True
+```
+
+**G1 is the one that matters most, and it is stronger than it looks.** `TC-B78-54` derives its terminal sizes **from `_DIFF_MIN_H` itself**, so a naive reading says mutating the constant moves the fixture with it and the node cannot see the change — the F-6 shape. It reddens anyway, because the **consequence** clause is absolute: whatever the constant says, a hex row must be visible AT it. That is exactly why `TC-B78-31` was written that way for the width axis, and it is the property the missing height node lacked. **The node would have caught what I shipped.**
+
+**G5 closes the knock-on with a transcript instead of an argument.** `AT-B78-22` reddens on its own address assertion at the twice-moved 132×28, with the message identical to the 132×24 and 132×26 forms. `TC-B78-24` reddens with it — it shares the span subject — and both restore green.
+
+### A.3.1 G3 was mis-targeted, and that is the finding, not a footnote
+
+**G3 reddened three nodes and NOT the one it was written for.** I scoped it to `#ab_diff_panel.diff-fallback #diff_window_column` — but `AT-B78-23` runs at **160×40, which is the WIDE regime**, so the mutation could not reach its declared subject. It is **INERT for the clause it was supposed to discharge**, and the three reds it did produce made it look discharged.
+
+This is `C-78-xxiii` one turn further on: *a mutation that reddens is not evidence the clause discriminates — only that the mutation you chose was visible.* Here it was visible **in three other nodes**, which is a more convincing disguise than silence. The corrected form, `G6`, mutates the **shared** `#diff_window_column` rule that both regimes read:
+
+```
+--- G6 / AT-B78-23 (F-3), CORRECTED --- the SHARED window column gets one screen row
+    substituted: '#diff_window_column { width: 1fr; height: 100%; }'
+             ->  '#diff_window_column { width: 1fr; height: 1; }'
+    APPLIED=True  sha f4d6cf963b515325 -> b8ce7eebf881f8a1 (mutated)
+    SET  RED | 4 failed, 7 passed in 49.15s
+    reddened nodes: ['test_at_b78_23_no_wrapped_row_in_the_wide_regime',
+                     'test_tc_b78_30_...', 'test_tc_b78_52_...', 'test_tc_b78_54_...']
+    E  AssertionError: an unwrapped window that paints no HEX ROW delivers
+       nothing: screen line 0 is the 'Image A - Run #...' header, so a painted
+       content height of 1 is ZERO bytes on the operator's screen. Painted
+       height is 0
+    POST (restored): green | 11 passed in 68.62s
+FINAL sha=f4d6cf963b515325  baseline=f4d6cf963b515325  equal=True
+```
+
+**And G6 is still not the right discharge, which is the second half of the same lesson.** It drives the painted height to **0** — a state the *old* `>= 1` form would have caught too. It proves `AT-B78-23` has a live clause; it does **not** prove the clause was strengthened, which is the whole of F-3. The discriminating mutation gives the column **two** rows, so each stacked window paints **exactly 1** — the header and no hex row — the precise state the old form passed and the new one must not:
+
+
+## A.4 F-2 — the paging inversion, measured before and after
+
+`check_action` gated `page_window_down` / `page_window_up` on the fallback regime. Executed on a `0x400`-byte run, **before** the fix — reproducing the reviewer's table to the digit:
+
+```
+(160, 40)  diff-wide      capacity=1  emitted_rows=66  check_action(page)=False  ']' moved: False
+(139, 40)  diff-wide      capacity=1  emitted_rows=66  check_action(page)=False  ']' moved: False
+(132, 44)  diff-fallback  capacity=7  emitted_rows=66  check_action(page)=True   ']' moved: True
+```
+
+**The operator on the widest supported terminal saw 1 of 66 rows and had no key to reach the rest; the operator on a narrower one reached all of them.** Overflow is a property of the run against the pane, never of the regime — the wide regime's capacity is 1 at 160×40 precisely *because* the run list takes columns and the two windows still stack. The fix **removes** the condition (`return not self.has_class(self._REGIME_NOTICE)`), and `TC-B78-52` now runs both arms.
+
+## A.5 Files modified (addendum)
+
+| File | Change |
+|---|---|
+| `s19_app/tui/screens_directionb.py` | `_DIFF_MIN_H` 26 → **28** + a docstring that states the D-1 / `LLR-125.2` conflict and which clause governs · `check_action` ungates the paging keys (F-2) · `apply_regime` re-renders the windows on a real regime change (F-5) |
+| `s19_app/tui/styles.tcss` | the regime comment's floor 26 → 28 |
+| `tests/test_tui_diff_screen.py` | **`TC-B78-54`** (new) · `_B78_WINDOW_HEADER_ROWS` + `_b78_hide_command_bar` (new helpers) · `AT-B78-23` `>= 1` → `>= _B78_WINDOW_HEADER_ROWS + 1` (F-3) · `TC-B78-52` gains the wide arm (F-2) · `TC-B78-30` gains the row-count clause (F-5) · `_b78_open_run_list`'s guard message names the affected nodes (F-4) · `_B78_INC4_SHORT` 132×26 → **132×28** |
+| `increment-005.md` | this addendum + four in-place corrections (R-1 superseded, §1.2's constant table, §1.4's `check_action` sentence, the ledger) |
+
+**Still 4 files.** `app.py` needed no further edit. `.dev-flow/state.json`, `PLAN.md`, `01-requirements.md`, the `02-review-*.md` files, earlier `increment-*.md` and `AT-TC-REGISTRY.jsonl` **read, never written**; `prototypes/memmap2.*` untouched; no `git add -A`, no `git stash`.
+
+**C-26 reverse-grep:** two new module-level test symbols, `_B78_WINDOW_HEADER_ROWS` and `_b78_hide_command_bar`, each defined once, no consumer outside the owning module. **No new driver copy** — `_b78_hide_command_bar` is a `prepare`/`after` hook, not a fifth driver.
+
+## A.6 Pending items after the addendum
+
+1. **`_DIFF_MIN_H` is 28** — the coordinator owns the `01-requirements.md` correction. ⚠️ **Two clauses, not one:** §8's `A-1` row and LLR-124.1's value, **and** §2.8 D-1's height axis, whose *"at least one visible content row"* is the weaker metric that produced 26. Leaving D-1 as written keeps the contradiction alive for the next reader.
+2. **F-6 is carried to the coordinator, not silently dropped.** `LLR-119.3` governs *"the six local inputs of LLR-119.1"*, and `#palette_input` is an `Input` that holds focus on `ctrl+k` (executed) but is **not** one of the six. Whether Inc-9's `escape`-off-input handler is meant to reach it is now unstated in both directions. **Suggested clause:** *"`#palette_input` is outside LLR-119.1's six; Inc-9 must state whether its handler reaches it."* A dropped constraint should leave a question, not a silence.
+3. **F-7 acknowledged, no action.** `mutate_inc5*.py` are probes and live in the scratchpad by design (C-46 probe hygiene: probes run from outside the repo). The transcripts are corroborated, not confirmed, and the standing fix is `C-78-xx`'s — move the gate into the RC-1 pre-commit hook so shell plumbing cannot arbitrate a verdict.
+4. **`AT-B78-26` at Inc-10 must inherit the `>= 2` form, not `>= 1`.** Its clause is *"≥ 1 hex row at 120×30"*, which is the same predicate F-3 corrected here. Reading it as painted content height would repeat this defect in the increment that closes the batch's headline case.
+5. **Snapshot regen** — still exactly one cell, still Inc-12's, still CI-only.
+6. **`F9` and `C-78-xiv`** unchanged; no copy added.
+
+## A.7 Batch carry list (additions from the gate)
+
+| Id | Carry |
+|---|---|
+| **🆕 `C-78-xxvii`** | **A geometry floor must be defined in the units the operator receives, not the units the layout reports.** `_DIFF_MIN_H` was defined on *painted content rows* while the deliverable is *hex rows*, and the two differ by the header line the window renders itself. The error was invisible because both quantities are integers measured off the same widget — and it produced a regime that is **strictly worse than the one below it**, which no single-sided threshold test can see. **Ask what the operator gets at the floor, not what the widget reports.** |
+| **🆕 `C-78-xxviii`** | **A boundary constant owes a node on BOTH sides, and the upper side must assert the CONSEQUENCE.** `TC-B78-31` did this for the width axis and would have caught the height defect had it existed for the height axis. Crucially it survives mutation of the constant it is written from, because *"a hex row is visible AT the floor"* is absolute whatever the floor says. **The axis with no boundary node is the axis that ships wrong**, and the durable fix is the node, not the value. |
+| **🆕 `C-78-xxix`** | **A capability gated on a MODE strands the case the mode does not predict.** Paging was gated on the fallback regime because that is where the spec's pagination clause is written; measurement showed the *wide* regime has the smaller capacity (1 vs 7), so the gate stranded 65 of 66 rows on the widest terminal. **Gate a capability on the CONDITION that makes it necessary — here overflow of run against pane — not on the mode where someone first wrote it down.** The fix removed a condition. |
+
+```
+--- G7 --- column height 2  ->  painted 0   (still not discriminating: in the WIDE
+    regime the bordered window spends 4 rows on chrome, so a 2-row column leaves
+    nothing at all. Recorded so the value is on the record, per *record the
+    substituted VALUE*.)
+
+--- G8 / AT-B78-23 (F-3), DISCRIMINATING --- the column gets TEN rows, so each
+    bordered window box is 5 and its CONTENT is exactly 1: the header, and no hex row
+    substituted: '#diff_window_column { width: 1fr; height: 100%; }'
+             ->  '#diff_window_column { width: 1fr; height: 10; }'
+    APPLIED=True  sha f4d6cf963b515325 -> 02e245bade18b08b (mutated)
+    SET  RED | 2 failed, 9 passed in 69.94s
+    reddened nodes: ['test_at_b78_23_no_wrapped_row_in_the_wide_regime',
+                     'test_tc_b78_52_pagination_reaches_bytes_past_the_pane']
+    E  AssertionError: an unwrapped window that paints no HEX ROW delivers
+       nothing: ... Painted height is 1
+```
+
+**`Painted height is 1` is the whole discharge.** That is precisely the state the old `>= 1` form **passed** and the corrected `>= 2` form rejects — so F-3's fix is shown to be a strengthening, not merely a clause that can go red. It took **three** attempts to construct (G3 wrong regime, G7 wrong magnitude, G8 right), and each wrong one produced reds that looked like success.
+
+## A.8 Test results (addendum), re-run on the fixed tree
+
+```
+tests/test_tui_diff_screen.py tests/test_tui_diff_compare_realpath.py
+52 passed in 166.04s (0:02:46)          <- 51 + TC-B78-54
+
+tests/test_tui_directionb.py            <- C-34 guard host, ONE run, FULL form
+183 passed in 249.96s (0:04:09)
+
+tests/test_tui_snapshot.py
+1 snapshot failed. 28 snapshots passed.
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]
+1 failed, 31 passed, 1 warning in 68.51s (0:01:08)
+```
+
+**Still exactly one snapshot cell**, and still the one Inc-1 drifted. Raising the floor from 26 to 28 does not move 120×30 — it is above the floor either way — so no cell changed regime.
+
+### A.8.1 Executed behaviour at the corrected floor
+
+Measured with the fallback forced and the command bar hidden (the post-Inc-10 end state), on a run longer than any pane:
+
+| H | capacity | painted | visible hex rows |
+|---|---|---|---|
+| 26 | 0 | 1 | **0** ← was "deliverable" |
+| 27 | 0 | 1 | **0** ← was "deliverable" |
+| **28** | 1 | 2 | **1** ← the floor now |
+| 30 | 2 | 3 | **2** |
+
+Identical at **W = 94, 120 and 138**.
+
+### A.8.2 Ledger
+
+**2647 → 2648** (`D = 0`, `A = 1` — `TC-B78-54`). Collection census: `tests/test_tui_diff_screen.py` collects **46**, up from 45. Arithmetic on Inc-4's tracked figure per C-19; honestly 2647 + the one drifted snapshot cell until Inc-12.
+
+## A.9 Evidence checklist (addendum)
+
+| Item | ✓/✗ | Evidence |
+|---|---|---|
+| The HIGH is fixed by a predicate, not by prose | ✓ | `TC-B78-54`, both sides of the floor; G1 reddens it by restoring the shipped constant |
+| The new node survives mutation of the constant it derives from | ✓ | §A.3 G1 — sizes come from `_DIFF_MIN_H`, the consequence clause is absolute |
+| The spec conflict is SURFACED, not averaged | ✓ | the constant's own docstring names D-1 and `LLR-125.2` and says which governs |
+| F-2 fixed by REMOVING a condition | ✓ | §A.4; G2 reddens the wide arm with "strands 65 of 66 rows" |
+| F-3 shown to be a STRENGTHENING, not just a live clause | ✓ | §A.3 G8 — `Painted height is 1`, the exact state the old form passed |
+| Knock-on re-verified by execution, not by reasoning | ✓ | §A.3 G5 — Inc-4's `M2` at 132×28 reddens `AT-B78-22` on its address assertion |
+| Restore proof | ✓ | three harnesses, each `FINAL sha == baseline` (`f4d6cf963b515325`) |
+| Gates re-run after the fix | ✓ | §A.8 — 52 · 183 · 1-cell snapshot drift |
+| Snapshot drift unchanged and NOT regenerated | ✓ | §A.8 |
+| No secrets, no destructive commands, no `git add -A`, no `git stash` | ✓ | mutations restored by writing back saved bytes in a `finally`, never `git checkout` |
+| File count within cap | ✓ | the addendum's own diff is **3** files + this packet; `app.py` needed no further edit |
+| Files I must not write, untouched | ✓ | `state.json`, `PLAN.md`, `01-requirements.md`, `02-review-*.md`, earlier `increment-*.md`, `AT-TC-REGISTRY.jsonl`, `BACKLOG-CODE.md`, `prototypes/memmap2.*` |
+| Uncertainty surfaced | ✓ | §A.3.1 records G3 as mis-targeted and G7 as wrong-magnitude rather than quietly replacing them; §A.6 carries F-6 to the coordinator rather than deciding Inc-9's scope |

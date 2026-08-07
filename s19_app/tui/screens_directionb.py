@@ -6582,22 +6582,37 @@ _DIFF_WIDE_MIN = 139
 #: `_DIFF_MIN_W` — the first terminal width at which a FULL-width window fits an
 #: unwrapped emitted hex row (measured 93 -> 78 wrap, 94 -> 79 fit).
 _DIFF_MIN_W = 94
-#: `_DIFF_MIN_H` — the first terminal height at which a window paints a content
-#: row. **RE-DERIVED at Phase 3 against the real implementation** (spec Sec.8
-#: `A-1`, which flagged the spec's 29 as a `styles.height = 1` simulation).
-#: Measured on this branch with the fallback layout forced (so the constant
-#: cannot decide its own measurement) and with the command-bar row hidden, which
-#: is the state `A-1`'s own quantity is defined in ("post-US-78-8 + US-78-1"):
-#: 25 -> 0 painted content rows, **26 -> 1**, 27 -> 1, 28 -> 2. Width-independent,
-#: confirmed at W = 94, 120 and 138 — the spec's width-independence claim
-#: reproduces exactly; only the value moved.
+#: `_DIFF_MIN_H` — the first terminal height at which a window paints at least
+#: one **HEX ROW**. **RE-DERIVED at Phase 3 against the real implementation**
+#: (spec Sec.8 `A-1`, which flagged the spec's 29 as a `styles.height = 1`
+#: simulation).
+#:
+#: ⚠️ **The spec carries TWO metrics for this axis and they give different
+#: answers; this is the normative one.** Sec.2.8 D-1's height axis says "the
+#: window has at least one visible CONTENT row" -> 26. **`LLR-125.2`, normative,
+#: says "`#diff_hex_a` shall render at least one HEX ROW of content" -> 28.**
+#: They differ because `_render_run_windows` writes `"Image A - {header}\n{text}"`,
+#: so screen line 0 of each window is the HEADER: a painted content height of 1
+#: delivers ZERO bytes. Surfaced rather than averaged (engineering rule 7). At
+#: 26-27 the panel would declare the terminal deliverable, hide the notice and
+#: show a header and nothing else — strictly WORSE than 25, where the operator is
+#: at least told why. That is the silently empty results area HLR-124 exists to
+#: abolish, so `LLR-125.2` governs.
+#:
+#: Measured with the fallback layout forced (so the constant cannot decide its
+#: own measurement), the command-bar row hidden (the state `A-1`'s quantity is
+#: defined in — "post-US-78-8 + US-78-1") and a run longer than any pane, so the
+#: window is never the binding limit. VISIBLE HEX ROWS: 26 -> 0, 27 -> 0,
+#: **28 -> 1**, 30 -> 2. Width-independent, confirmed at W = 94, 120 and 138 —
+#: the spec's width-independence claim reproduces exactly; only the value moved.
+#: The 30 -> 2 row is R-1's accepted 120x30 viewport, to the row.
 #:
 #: ⚠️ This is the POST-Inc-10 floor, because that is the state the batch ships.
-#: As the tree stands at Inc-5 the command-bar row still spends three rows and
-#: the same sweep gives **29** — the spec's figure, reached with the bar still
-#: present. Between Inc-5 and Inc-10 the heights 26..28 therefore select the
-#: fallback regime while painting no hex row. Recorded, not hidden.
-_DIFF_MIN_H = 26
+#: As the tree stands at Inc-5 the command-bar row still spends three rows, so
+#: between Inc-5 and Inc-10 the heights 28..30 select the fallback regime while
+#: painting no hex row. Recorded, not hidden; `TC-B78-54` pins both sides of the
+#: floor in the end state the constant is defined for.
+_DIFF_MIN_H = 28
 
 
 class AbDiffPanel(Container):
@@ -6881,6 +6896,9 @@ class AbDiffPanel(Container):
             Used by:
                 - ``S19TuiApp._apply_diff_regime``
         """
+        previous = next(
+            (name for name in self._REGIME_CLASSES if self.has_class(name)), None
+        )
         regime = self._regime_for(width, height)
         for name in self._REGIME_CLASSES:
             self.set_class(name == regime, name)
@@ -6891,6 +6909,14 @@ class AbDiffPanel(Container):
         self.query_one("#diff_size_notice", Static).update(
             self._notice_text(width, height)
         )
+        if regime != previous and self._has_result:
+            # A regime change moves the pane, and `_render_run_windows` derives
+            # its row count from the pane AT RENDER TIME (LLR-123.2) — so without
+            # this the window keeps a row list computed for the old geometry.
+            # Measured: 139x40 -> 138x40 moves capacity 1 -> 5 while the rendered
+            # window does not change. AFTER the refresh, because the class is
+            # what moves the pane and the new size is not readable until it lands.
+            self.call_after_refresh(self._render_run_windows, self._selected_run)
         return regime
 
     @classmethod
@@ -6964,7 +6990,15 @@ class AbDiffPanel(Container):
         """
         if action == "close_run_overlay":
             return self.has_class(self._RUNS_OPEN)
-        if action in ("toggle_run_overlay", "page_window_down", "page_window_up"):
+        if action in ("page_window_down", "page_window_up"):
+            # Overflow is a property of the RUN against the PANE, never of the
+            # regime. Gating these to the fallback was a capability INVERSION:
+            # measured on a 0x400-byte run, the wide regime's capacity is 1 at
+            # both 160x40 and 139x40 while 132x44's is 7, so the operator on the
+            # WIDEST supported terminal saw 1 of 66 rows with no key to reach the
+            # rest, and the one on a narrower terminal reached all of them.
+            return not self.has_class(self._REGIME_NOTICE)
+        if action == "toggle_run_overlay":
             return self.has_class(self._REGIME_FALLBACK)
         return True
 

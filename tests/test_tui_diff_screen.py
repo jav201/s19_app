@@ -269,7 +269,11 @@ async def _b78_open_run_list(app, pilot) -> None:
     await pilot.pause()
     assert listing.display, (
         "the run-list overlay must open on 'f' in the fallback regime; "
-        f"#diff_range_list.display is {listing.display}"
+        f"#diff_range_list.display is {listing.display}. NOTE for triage: this "
+        "is the DRIVER's guard, not the failing node's own subject - every node "
+        "built on _b78_drive_compare reddens here when the overlay breaks, "
+        "including AT-B78-15 / -16 / -17, whose subjects are run REACHABILITY "
+        "and selection, not the overlay. Fix the overlay first, then re-read"
     )
 
 
@@ -1995,14 +1999,20 @@ _B78_INC4_WIDE = (132, 44)
 #: addresses" is satisfiable at all. See that node's docstring: HLR-123's two
 #: clauses are jointly exact only where the pane cannot grow the window.
 #:
-#: batch-78 Inc-5 moved this from 132x24 to 132x26. 132x24 still has capacity 0,
-#: but as of HLR-124 it has it for a DIFFERENT reason: 24 is below `_DIFF_MIN_H`,
-#: so the whole result area is `display: none` behind the notice and the "pane"
-#: whose height the node names no longer exists. 132x26 is the first row at which
-#: the fallback regime renders and the capacity is still 0 (executed: content
-#: height 0 today, 1 post-Inc-10; `min(A,B) - 1` is 0 in both), so the node keeps
-#: its subject AND observes a state the operator is actually shown.
-_B78_INC4_SHORT = (132, 26)
+#: batch-78 Inc-5 moved this from 132x24, and the Inc-5 gate moved it again.
+#: 132x24 still has capacity 0, but as of HLR-124 it has it for a DIFFERENT
+#: reason: 24 is below `_DIFF_MIN_H`, so the whole result area is `display: none`
+#: behind the notice and the "pane" whose height this node names no longer
+#: exists. The first draft used 132x26; raising the floor to 28 (gate F-1) put
+#: that back in the notice regime, so it moves once more to **132x28** - the
+#: first row at which the fallback regime renders under the corrected floor.
+#:
+#: Capacity is still 0 there, executed both sides of Inc-10: `132x28` gives
+#: content height 0 / capacity 0 with the command bar present and 2 / 1 without
+#: it. Either way `capacity <= 3`, and the window only GROWS when
+#: `capacity > rows`, so the run +/- context floor of 3 rows is still the whole
+#: window and `AT-B78-22`'s exact three addresses hold on both sides of Inc-10.
+_B78_INC4_SHORT = (132, 28)
 
 #: `AT-B78-22`'s fixture and its expected addresses, as LITERALS. Spec F-6 /
 #: Q-M1: rev-1 computed this span from `AbDiffPanel.DISPLAY_CONTEXT_BYTES` - the
@@ -2743,6 +2753,43 @@ _B78_INC5_WIDE = (160, 40)
 #: would be wrong precisely here.
 _B78_INC5_FLOOR = (80, 24)
 
+#: Screen lines each hex window spends on its own header before the first byte.
+#: `_render_run_windows` writes `f"Image A - {header}\n{text}"`, so line 0 is the
+#: `Image A - Run #n 0x... changed` header. Named rather than written as a bare
+#: `+ 1` because it is the entire reason a painted content height of 1 delivers
+#: ZERO bytes - the defect behind the Inc-5 gate's F-1 and F-3, which were the
+#: same one-row error in the constant and in the acceptance that should have
+#: caught it.
+_B78_WINDOW_HEADER_ROWS = 1
+
+
+async def _b78_hide_command_bar(app, pilot) -> None:
+    """Reclaim the command-bar row's three screen rows, as Inc-10 will.
+
+    `_DIFF_MIN_H` is defined in the POST-Inc-10 end state (spec Sec.8 A-1's own
+    quantity: "post-US-78-8 + US-78-1"), and Inc-10 is the increment that deletes
+    `#command_bar_row` from `CommandBar.compose`. Until it lands, a node that
+    asserts what the floor DELIVERS has to reach that state, and hiding the row
+    reclaims exactly the rows deleting it will.
+
+    The reclaim is ASSERTED, not assumed: a simulation that silently fails to
+    apply is a vacuous precondition, and this batch has now watched ten mutations
+    fail to apply. When Inc-10 lands, `#command_bar_row` no longer resolves and
+    this hook becomes the no-op branch below - the node then measures the real
+    tree with no simulation at all.
+    """
+    rows = app.query("#command_bar_row")
+    if not rows:
+        return
+    slot_before = app.query_one("#command_bar_slot").size.height
+    rows.first().display = False
+    await pilot.pause()
+    slot_after = app.query_one("#command_bar_slot").size.height
+    assert slot_after < slot_before, (
+        f"the Inc-10 simulation must actually reclaim the command bar's rows; "
+        f"#command_bar_slot height stayed at {slot_before}"
+    )
+
 
 def _b78_widest_emitted_hex_row() -> int:
     """The width of the widest row `hexview.render_hex_view` emits.
@@ -2844,9 +2891,13 @@ def test_at_b78_23_no_wrapped_row_in_the_wide_regime(tmp_path: Path) -> None:
         f"#diff_hex_a content width {measured['hex_a_width']} < widest emitted "
         f"row {widest} (measured by calling render_hex_view at test time)"
     )
-    assert measured["hex_a_painted"] >= 1, (
-        f"an unwrapped window that paints no content row delivers nothing: "
-        f"#diff_hex_a painted content height is {measured['hex_a_painted']}"
+    assert measured["hex_a_painted"] >= _B78_WINDOW_HEADER_ROWS + 1, (
+        f"an unwrapped window that paints no HEX ROW delivers nothing: screen "
+        f"line 0 is the 'Image A - Run #...' header, so a painted content height "
+        f"of 1 is ZERO bytes on the operator's screen. Painted height is "
+        f"{measured['hex_a_painted']}. (Gate F-3: the `>= 1` form this replaces "
+        f"was green at zero bytes, and passed only because 160x40 happens to "
+        f"paint 2 - a one-row margin, not a property the assertion pinned)"
     )
     assert measured["hex_a_painted_width"] >= widest, (
         f"the window must be unwrapped ON SCREEN, not merely in the layout: "
@@ -2985,10 +3036,15 @@ def test_tc_b78_30_a_resize_across_the_breakpoint_follows(tmp_path: Path) -> Non
             if name.startswith("diff-")
         )
         after_rows = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
-        return before_regimes, before_rows, after_regimes, after_rows
+        after_capacity = app.query_one("#ab_diff_panel")._window_row_capacity()
+        return (
+            before_regimes, before_rows, after_regimes, after_rows, after_capacity
+        )
 
     runs = [(0x1000, 0x1004, "changed")]
-    before_regimes, before_rows, after_regimes, after_rows = _b78_drive_compare(
+    (
+        before_regimes, before_rows, after_regimes, after_rows, after_capacity
+    ) = _b78_drive_compare(
         tmp_path, (_DIFF_WIDE_MIN, 40), _diff_result(runs), after=_after
     )
 
@@ -3004,6 +3060,18 @@ def test_tc_b78_30_a_resize_across_the_breakpoint_follows(tmp_path: Path) -> Non
     assert after_rows, (
         "the windows must not blank across a regime change; #diff_hex_a emitted "
         "no hex row after the resize"
+    )
+    # Gate F-5: the layout following is not enough - the row count is derived
+    # from the pane AT RENDER TIME (LLR-123.2), so a regime change that moves the
+    # pane and does not re-render leaves a window sized for the OLD geometry.
+    # Measured before the fix: 139x40 -> 138x40 moved capacity 1 -> 5 while the
+    # rendered window did not change at all.
+    assert len(after_rows) == after_capacity, (
+        f"a regime change must RE-DERIVE the window's row count, not only swap "
+        f"the layout class: the new pane has a capacity of {after_capacity} rows "
+        f"and the window is still rendering {len(after_rows)}. This clause is "
+        f"the one that distinguishes 'the layout followed' from 'the window "
+        f"followed'"
     )
 
 
@@ -3232,6 +3300,15 @@ def test_tc_b78_52_pagination_reaches_bytes_past_the_pane(tmp_path: Path) -> Non
     every HLR-123 acceptance sound - AT-B78-22's exact address set is read from
     an un-paged window, and a pagination that re-based page 0 would silently
     move it.
+
+    **Run at BOTH regimes, per-arm (CC-1), from the Inc-5 gate's F-2.** The first
+    draft gated `[` / `]` on the fallback regime, which was a capability
+    INVERSION: measured on this same run, the wide regime's capacity is 1 at both
+    160x40 and 139x40 while 132x44's is 7, so the operator on the WIDEST
+    supported terminal could see 1 of 66 rows with no key to reach the rest,
+    while the one on a narrower terminal reached all of them. Overflow is a
+    property of the run against the pane, never of the regime - so the fix
+    REMOVED a condition, and this arm is what keeps it removed.
     """
     long_run = (0x1000, 0x1000 + 0x400, "changed")
 
@@ -3251,43 +3328,56 @@ def test_tc_b78_52_pagination_reaches_bytes_past_the_pane(tmp_path: Path) -> Non
             await pilot.press("right_square_bracket")
         await pilot.pause()
         far = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
-        return first, capacity, paged, paged_b, back, far
+        regimes = sorted(
+            name
+            for name in app.query_one("#ab_diff_panel").classes
+            if name.startswith("diff-")
+        )
+        return first, capacity, paged, paged_b, back, far, regimes
 
-    first, capacity, paged, paged_b, back, far = _b78_drive_compare(
-        tmp_path, _B78_AT_SIZE, _diff_result([long_run]), after=_after
-    )
+    # Both regimes. The wide arm is the one F-2 added: same run, same clauses.
+    for size, expected_regime in ((_B78_AT_SIZE, "diff-fallback"), (_B78_INC5_WIDE, "diff-wide")):
+        (
+            first, capacity, paged, paged_b, back, far, regimes
+        ) = _b78_drive_compare(tmp_path, size, _diff_result([long_run]), after=_after)
 
-    assert capacity > 0, (
-        "precondition: the pane must have a positive row capacity, or paging "
-        "has no page size to move by"
-    )
-    assert len(first) > capacity, (
-        f"precondition: the run must overflow the pane, or nothing is out of "
-        f"reach and this node tests nothing; the window emitted {len(first)} "
-        f"rows into a capacity of {capacity}"
-    )
-    assert paged, "a paged window must still render rows"
-    assert paged[0] > first[0], (
-        f"paging forward must move the window onto later bytes; first row went "
-        f"0x{first[0]:08X} -> 0x{paged[0]:08X}"
-    )
-    assert paged_b == paged, (
-        "both windows must page in lockstep - a diff whose columns disagree on "
-        "the address of a screen line is not a diff"
-    )
-    assert set(paged) - set(first[:capacity]), (
-        "paging must reach rows the first page did not show"
-    )
-    assert back == first, (
-        f"paging back must return the un-paged window exactly; got "
-        f"0x{back[0]:08X}..0x{back[-1]:08X} against 0x{first[0]:08X}.."
-        f"0x{first[-1]:08X}"
-    )
-    assert far, "paging past the last page must be a no-op, not an empty window"
-    assert far[-1] <= first[-1], (
-        f"paging must stay inside the run's own window; it reached "
-        f"0x{far[-1]:08X} against a window ending at 0x{first[-1]:08X}"
-    )
+        assert regimes == [expected_regime], (
+            f"{size}: precondition - this arm must exercise the {expected_regime} "
+            f"regime, or it is not the arm it claims to be; classes {regimes}"
+        )
+        assert capacity > 0, (
+            f"{size}: precondition - the pane must have a positive row capacity, "
+            f"or paging has no page size to move by"
+        )
+        assert len(first) > capacity, (
+            f"{size}: precondition - the run must overflow the pane, or nothing "
+            f"is out of reach and this arm tests nothing; the window emitted "
+            f"{len(first)} rows into a capacity of {capacity}"
+        )
+        assert paged, f"{size}: a paged window must still render rows"
+        assert paged[0] > first[0], (
+            f"{size}: paging forward must move the window onto later bytes; "
+            f"first row went 0x{first[0]:08X} -> 0x{paged[0]:08X}. A regime in "
+            f"which ']' is inactive strands {len(first) - capacity} of "
+            f"{len(first)} rows"
+        )
+        assert paged_b == paged, (
+            f"{size}: both windows must page in lockstep - a diff whose columns "
+            f"disagree on the address of a screen line is not a diff"
+        )
+        assert set(paged) - set(first[:capacity]), (
+            f"{size}: paging must reach rows the first page did not show"
+        )
+        assert back == first, (
+            f"{size}: paging back must return the un-paged window exactly; got "
+            f"0x{back[0]:08X}..0x{back[-1]:08X} against 0x{first[0]:08X}.."
+            f"0x{first[-1]:08X}"
+        )
+        assert far, f"{size}: paging past the last page must be a no-op, not empty"
+        assert far[-1] <= first[-1], (
+            f"{size}: paging must stay inside the run's own window; it reached "
+            f"0x{far[-1]:08X} against a window ending at 0x{first[-1]:08X}"
+        )
 
 
 def test_tc_b78_53_the_overlay_reserves_no_width(tmp_path: Path) -> None:
@@ -3337,4 +3427,95 @@ def test_tc_b78_53_the_overlay_reserves_no_width(tmp_path: Path) -> None:
     assert open_width >= widest, (
         f"and the width it keeps must still be an unwrapped one: {open_width} "
         f"< {widest}"
+    )
+
+
+def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
+    """TC-B78-54 - the height floor is only right if a HEX ROW is visible AT it.
+
+    Intent: the sibling clause for `_DIFF_MIN_H` that `TC-B78-31` already carries
+    for `_DIFF_MIN_W` ("the floor is only the right floor if the window is
+    unwrapped AT it"). Minted at the Inc-5 gate, where its absence was the
+    compounding half of F-1: **the height axis was the one axis this increment
+    changed and the only regime axis with no boundary node**, and `TC-B78-32`'s
+    height arm sits at `_DIFF_MIN_H - 1` and asserts only that a notice appears.
+    Applying `TC-B78-31`'s own standard to the height axis is what surfaces the
+    defect, and it would have failed.
+
+    Why the metric is HEX ROWS and not painted content rows: `_render_run_windows`
+    writes `f"Image A - {header}\\n{text}"`, so screen line 0 is the header and a
+    painted content height of 1 delivers ZERO bytes. Shipped against the weaker
+    metric, heights 26-27 declared the terminal deliverable, HID the notice, and
+    showed a header and nothing else - strictly worse than 25, where the operator
+    is at least told why. The spec carries both metrics (Sec.2.8 D-1's "one
+    visible content row" against normative `LLR-125.2`'s "one hex row of
+    content"); `LLR-125.2` governs and this node is what holds the line.
+
+    The fixture's run is longer than any supported pane, so the window is never
+    the binding limit and what is measured is the PANE's budget, not the run's.
+    Both sides are read, as `TC-B78-31` does for the width axis.
+    """
+    long_run = [(0x1000, 0x1000 + 0x400, "changed")]
+
+    async def _measure(app, pilot):
+        from textual.widgets import Static
+
+        window = app.query_one("#diff_hex_a", Static)
+        rows = _b78_window_rows(str(window.render()))
+        painted = _b78_painted_content_height(window)
+        return {
+            "regimes": sorted(
+                name
+                for name in app.query_one("#ab_diff_panel").classes
+                if name.startswith("diff-")
+            ),
+            "notice_shown": app.query_one("#diff_size_notice").display,
+            "painted": painted,
+            "emitted": len(rows),
+            "visible_hex": max(0, min(painted - _B78_WINDOW_HEADER_ROWS, len(rows))),
+        }
+
+    async def _after(app, pilot):
+        await _b78_hide_command_bar(app, pilot)
+        return await _measure(app, pilot)
+
+    at = _b78_drive_compare(
+        tmp_path, (120, _DIFF_MIN_H), _diff_result(long_run), after=_after
+    )
+    below = _b78_regime_probe(tmp_path, (120, _DIFF_MIN_H - 1))
+
+    # Precondition: the run must overflow the pane, or the pane is not what is
+    # being measured and the floor could be an artefact of a short fixture.
+    assert at["emitted"] > at["visible_hex"], (
+        f"precondition: the fixture's run must exceed the pane at the floor, or "
+        f"this node measures the RUN and not the pane; emitted {at['emitted']}, "
+        f"visible {at['visible_hex']}"
+    )
+
+    # --- AT the floor: deliverable, and it actually delivers ---
+    assert at["regimes"] == ["diff-fallback"], (
+        f"at exactly _DIFF_MIN_H the terminal must be deliverable; classes are "
+        f"{at['regimes']}"
+    )
+    assert not at["notice_shown"], (
+        "at exactly _DIFF_MIN_H the terminal is deliverable and must NOT show "
+        "the notice"
+    )
+    assert at["visible_hex"] >= 1, (
+        f"_DIFF_MIN_H is only the right floor if at least one HEX ROW is visible "
+        f"AT it: painted content height {at['painted']}, of which "
+        f"{_B78_WINDOW_HEADER_ROWS} is the 'Image A - Run #...' header, leaving "
+        f"{at['visible_hex']} hex rows. A floor that declares a terminal "
+        f"deliverable and then shows a header and nothing else is WORSE than the "
+        f"notice it replaces"
+    )
+
+    # --- BELOW the floor: the notice, naming this axis ---
+    assert below["notice_shown"], (
+        f"one row below _DIFF_MIN_H the terminal is not deliverable and must "
+        f"show the notice; regimes {below['regimes']}"
+    )
+    assert "height" in below["notice_text"], (
+        f"the notice at the height boundary must name the height axis; "
+        f"text={below['notice_text']!r}"
     )
