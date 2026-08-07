@@ -43,11 +43,35 @@
 
 ---
 
-## 🔄 batch-78 — IN FLIGHT (opened 2026-08-06) — command-bar deletion + A2B diff master–detail
+## 🔶 batch-78 — LANE 2 SHIPPED, LANE 1 CHARTERED FORWARD (cut 2026-08-06) — A2B diff master–detail
 
-> **Registered at Phase 0**, and this section is **reconciled at the close, not left as written** —
-> batch-77's own lesson was that a Phase-0 section standing unreconciled until the merge gate is a
-> queue a reader cannot act on.
+> **RECONCILED AT THE CUT, not left as written.** The operator cut the batch at the Lane-2/Lane-1
+> boundary on token cost. **Handoff: `.dev-flow/2026-08-06-batch-78/HANDOFF.md`** — read it before
+> resuming; it carries the open HIGH, the findings that reach into the unbuilt increments, and both
+> follow-on charters.
+>
+> **✅ SHIPPED — Lane 2 in full (Inc-0…Inc-5).** The charter's original defect is **closed**:
+> `_render_run_windows` was only ever called with the literal `0`, so runs 1..N were unreachable.
+> The panel now has a selectable run list (keyboard **and** mouse), windows that follow the selection
+> with context rows derived from pane height, report completeness observed **through the written
+> file**, and three width/height regimes with an explicit insufficient-terminal notice that names
+> **which axis** failed. Ledger `2607 → 2647`.
+>
+> **❌ NOT STARTED — Lane 1 (Inc-6…Inc-12).** Fully specified in `01-requirements.md` §7; see the
+> charter below. **Do not re-derive the spec — execute it.**
+>
+> ⚠️ **ONE OPEN HIGH AT THE CUT (Inc-5 F-1).** `_DIFF_MIN_H = 26` declares heights 26–27 deliverable
+> while painting **zero hex rows**, because line 0 of each window is the header. Strictly worse than
+> 25, where the operator is at least told why. Root cause is a spec conflict resolved silently:
+> `D-1`'s *"one visible content row"* → 26 versus **normative `LLR-125.2`**'s *"one **hex row** of
+> content"* → **28**. `LLR-125.2` governs. **It blocks rather than carries because Inc-10's file set
+> excludes `screens_directionb.py`.** The durable fix is the **height-floor node asserting both
+> sides**, which does not exist — `TC-B78-31` does exactly that for the width axis.
+>
+> **Two defects reached shipped product code across six increments**, both found and fixed inside
+> their own increment's gate. Every other finding — roughly thirty — was in an acceptance, a metric,
+> a driver, a citation or the requirements document. **23 carries** are in `state.json`
+> `phase3_carries`; the ones that changed how the work was done are tabulated in the handoff §5.
 >
 > Charter INPUT: `prototypes/cmdbar_a2bdiff.HANDOFF.md` (operator-approved 2026-08-06). Branch
 > `claude/batch-78-cmdbar-a2bdiff`, cut off `origin/main` @ **`f6ff1d3`**, RC-1 PASS. Plan:
@@ -103,6 +127,15 @@
     height, retiring the `DISPLAY_CONTEXT_BYTES = 16` constant as a constant · two width regimes with
     a **required 120-col fallback** · compact selection rows · discoverability. G-9 display caps and
     the "showing N of M" notice are preserved; **the persisted report stays complete**.
+  - **▸ 🛑 (P0 — BATCH-79 CHARTER) Lane 1: command-bar deletion, `Inc-6`…`Inc-12`. FULLY SPECIFIED — execute, do not re-derive.** `01-requirements.md` §7 carries the file sets, ATs and gates; `HLR-118`…`HLR-121` and `HLR-126` are written, reviewed through **three** Phase-2 rounds and amended. Order and its reason are in the handoff §7. **Findings that reach into these unbuilt increments and must not be rediscovered:**
+    1. ❌ **The command palette has NO `escape`-to-close.** `command_bar.py` declares **no `BINDINGS`** and handles no `escape`; executed, `ctrl+k` then `escape` leaves `palette_is_open` **True**. `LLR-119.3`/`AT-B78-07` asserted *"must not shadow the palette's escape"* — **there was nothing to shadow**, and **both Phase-2 lanes accepted it** because it sounded like a property the widget would obviously have. **Inc-9 chooses a disposition in writing rather than inheriting one.**
+    2. ⚠️ **`C-78-vi` BLOCKS Inc-10:** §5.1 rule 1's painted-height metric measures the **border box** and does not clip through intermediate ancestors, so `AT-B78-26`'s 120×30 "≥1 hex row" clause would pass with **three rows of border and zero hex**. Use Inc-1's corrected helper (`content_region` through the **full** ancestor chain).
+    3. 💣 **29 of 29 snapshot goldens drift** on the bar deletion — app-level chrome in every full-screen capture. **CI-only regen.** This is the largest mechanical cost in Lane 1 and the reason Lane 2 went first.
+    4. ⚠️ **Lane-1 blast radius is 6 test files, not 3.** `#cmdbar_project` is the observable for `_project_label()` (**14** call sites) guarding the LLR-005.5 multi-variant form, so **S-3 owes the display FORM, not just the name**. `tests/test_tui_app.py` goes **blind, not red** — it monkeypatches `update_project_labels`, so **its green is not evidence**.
+    5. ⚠️ **The bar acts on the WRONG PANE today** — with A2L active, `CommandBar.Find` writes into the *workspace* `#search_input`. Nothing unmounts, so **`/`·`g` must route on `_active_screen_key`**, never on which inputs exist. **10 screens, 3 own find/goto — the notice path is 7 of 10, the majority.** And `set_status` writes the **log tail**, not `#status_text`.
+    6. ⚠️ **The deletable CSS span is `:66-102`, not `:55-102`** — `#command_bar_slot` and `#command_bar` survive to host the palette.
+    7. **Inc-0's committed artifacts are Inc-10/Inc-11's oracles** and **must be re-read from disk, never regenerated**: `AT-B78-03` was provably inert before Inc-0 because `CommandBar(self._build_palette_entries())` made observed and expected the same producer — GREEN at `36 == 36` with a whole `Binding` removed. **The temporal freeze is what breaks the circularity**, and `TC-B78-44`'s AST census reddens if any test module tries to rebuild one.
+  - **▸ 🛑 (P1 — BATCH-80 CHARTER) Lane 3: operations staged removal, `S-10`…`S-13`.** **Never in scope for batch-78** (operator ruling at kickoff); this charter was a **required deliverable of its close**. Source: `prototypes/cmdbar_a2bdiff.HANDOFF.md` §2 Lane 3. **S-10** encode the modal's known CRC as a saved Designer `.crc.json` (width 32, poly `0x04C11DB7`, init/xorout `0xFFFFFFFF`, refin=refout=true) — **open decision, do not silently pick:** op configs allow multiple regions with per-region output addresses while Designer serialization is single-output. **S-11** the Designer gains an execute path, **the first firmware write it performs**, amending `US-V6` with an explicit Before/After. **S-12** equivalence **by test, not by UI** (operator ruling — no KAT surface): byte-identical output between Designer execution and the modal's check+Write CRC path, and **this test must exist BEFORE S-13 deletes the modal**. **S-13** gated on S-10…S-12 merged and green. ⚠️ The deferred `wire-kernel-into-crc.py` item **intersects** S-10…S-12 — Phase 1 states the relationship explicitly rather than absorbing it. **`x` does not become free until S-13.**
   - **▸ (P3, NEW — batch-78 Phase 0) Diff variants B and C are backlog CANDIDATES, not scheduled.**
     Evaluated in the design session and not chosen. **C additionally needs ~190 cols or an 8-byte row
     mode `render_hex_view_text` does not have.** The charter fences both out explicitly.
