@@ -44,6 +44,34 @@ def _write_s19(path: Path, mem_map: dict[int, int], ranges: list[tuple[int, int]
     path.write_text(emit_s19_from_mem_map(mem_map, ranges), encoding="utf-8")
 
 
+async def _press_compare(app, pilot) -> None:
+    """Press Compare and wait for the HANDLER to complete, not for queue idleness.
+
+    batch-78 Inc-2 gate review F7. ``on_ab_diff_panel_compare_requested`` is now
+    a coroutine that suspends on an awaited widget removal, and
+    ``Pilot.pause()`` waits for message-queue IDLENESS — but a handler parked on
+    ``AwaitRemove`` has already DEQUEUED its message. So ``pause()`` returned
+    while the handler was still suspended and these drivers read
+    ``#diff_status`` / ``app._diff_last_result`` on the lines AFTER the await.
+    Measured under a 20 ms suspension this broke three ``AT-016`` nodes here.
+
+    ``app._diff_compare_generation`` is bumped in a ``finally`` on every exit
+    path, so this also returns on the REFUSAL branch — which matters directly
+    in this module, where ``test_at_016_3`` drives a refusal and
+    ``_diff_last_result`` is never written.
+    """
+    before = app._diff_compare_generation
+    app.query_one("#diff_compare_button").press()
+    for _ in range(500):
+        if app._diff_compare_generation > before:
+            return
+        await pilot.pause()
+    raise AssertionError(
+        "the compare handler never completed: _diff_compare_generation stayed "
+        f"at {before} across 500 pumped turns"
+    )
+
+
 def _run_list_text(app) -> str:
     """The ``#diff_range_list`` column as text, one row per line.
 
@@ -101,8 +129,7 @@ def _drive_compare(tmp_path: Path, path_a: Path, path_b: Path) -> tuple[bool, bo
             await pilot.pause()
             app.query_one("#diff_path_a", Input).value = str(path_a)
             app.query_one("#diff_path_b", Input).value = str(path_b)
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _press_compare(app, pilot)
             status = app.query_one("#diff_status", Static)
             reached_display_path = (
                 app._diff_last_result is not None
@@ -278,8 +305,7 @@ def _drive_compare_hex(tmp_path: Path, path_a: Path, path_b: Path) -> tuple[str,
             await pilot.pause()
             app.query_one("#diff_path_a", Input).value = str(path_a)
             app.query_one("#diff_path_b", Input).value = str(path_b)
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _press_compare(app, pilot)
             return (
                 str(app.query_one("#diff_hex_a", Static).render()),
                 str(app.query_one("#diff_hex_b", Static).render()),

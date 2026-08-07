@@ -901,3 +901,205 @@ rather than omitted.
 | **C-78-viii** *(amended per F3, mechanism corrected)* | An applied-check must assert the **post-image was absent before and present after**, not merely present. Sha inequality is the weakest limb and must never stand alone. ⚠️ **The "harness writes LF over CRLF" mechanism did NOT reproduce here** (7114 CRLF before and after; no-op round-trip byte-identical), so the carry must record the *absent-before* limb as the fix, not line endings. |
 | **🆕 C-78-ix** | **A widget-swap increment must include a node that exercises the swapped widget's REBUILD path at least twice.** Twelve nodes, five ATs, nine mutations and a full gate suite all missed a hard crash on the panel's primary workflow, because every one of them rendered exactly once. General form: *when a change moves state from a value-update (`Static.update`) to a widget-lifecycle operation (mount/remove with identity), single-render coverage is structurally blind — identity collisions and stale-watcher bugs exist only on the second pass.* |
 | **🆕 C-78-x** | **A risk-register entry that names a real mechanism and then bounds it with "no such caller exists" must name the callers it checked.** My R-1 identified the async-clear mechanism and dismissed it against the wrong consequence class (stale read vs stale mount), which is more dangerous than not noticing it at all. |
+
+---
+---
+
+# ADDENDUM 2 — F7 (HIGH): the completion signal
+
+> The gate returned **BLOCKED** a second time. F7 is the generalisation of my own
+> R-11 flag: route B made the compare handler a coroutine, and **`Pilot.pause()`
+> waits for message-queue idleness, not for the handler**. A handler parked on
+> `AwaitRemove` has already dequeued its message, so `pause()` returns while it
+> is still suspended and the caller reads the **un-rendered panel**.
+
+## B.1 BLUF
+
+| # | Item | Status |
+|---|---|---|
+| **F7 (HIGH)** | 14 nodes (I measure **12**) read state written after the `await`. **Fixed with a total completion signal; the 20 ms census is `0 failed`.** | ✅ **closed by census, 3 arms** |
+| **Determinism, not margin** | A 10× larger perturbation (200 ms) is **also `0 failed`**. | ✅ **proved** |
+| **Refusal branch** | `_diff_last_result` is written only on the non-refused branch, so it cannot be the signal. The counter is bumped in a **`finally`**. | ✅ **total by construction** |
+| **Absence clauses** | Enumerated below. **No node needs a new clause** — every one already carries a positive co-assertion — but that was drafting luck and is now **structural**. | ✅ **closed at the driver** |
+| **My "padding became unnecessary" claim** | **Withdrawn.** It was evidence of nothing. | ✅ **retracted, B.6** |
+| **F3 carry** | Reworded to the surviving finding: *the missing limb was "the OLD token is absent after the write"*. No LF/CRLF story. | ✅ **corrected** |
+| `TC-B78-17`, `TC-B78-22` | Still **undischarged**, still stated as such. Not upgraded. | ⚠️ **unchanged, deliberately** |
+
+## B.2 The completion-signal design, and why it covers the refusal branch
+
+```python
+async def on_ab_diff_panel_compare_requested(self, event) -> None:
+    try:
+        await self._apply_compare_request(event)
+    finally:
+        self._diff_compare_generation += 1
+```
+
+The handler's existing body moved unchanged into `_apply_compare_request` — a
+rename plus a five-line wrapper, so **not one line of compare logic was
+re-indented or edited**.
+
+**Why a `finally` and not an assignment at the end.** The handler has three exit
+paths and only one of them reaches the bottom:
+
+| Exit path | writes `_diff_last_result`? | bumps the counter? |
+|---|---|---|
+| `result.refused` → `set_status(...)` → **`return`** | ❌ **never** | ✅ |
+| load failure (`failed_sides`) | ✅ | ✅ |
+| success | ✅ | ✅ |
+| **exception** | ❌ | ✅ |
+
+This is exactly the caveat the reviewer flagged. A signal keyed on
+`_diff_last_result` would **hang forever on a refusal** — and this module has a
+node that drives one (`test_at_016_3`). A signal placed at the bottom of the
+function would hang on both the refusal and the exception. **A completion signal
+that is conditional on the happy path converts a failure into a hang, which is
+strictly worse than the race it replaces.** The `finally` makes the wait total.
+
+Test side, one helper per module:
+
+```python
+before = app._diff_compare_generation
+app.query_one("#diff_compare_button").press()
+for _ in range(500):
+    if app._diff_compare_generation > before:
+        return
+    await pilot.pause()
+raise AssertionError("the compare handler never completed ...")
+```
+
+It waits on the **handler**, not the queue. The 500-turn bound exists only so a
+genuine hang is a loud named failure instead of a stalled suite; it is not a
+timing budget, which is why a 10× larger perturbation changes nothing (B.3 arm C).
+
+Reading `app._diff_compare_generation` from tests follows this module's existing
+convention — `tests/test_tui_diff_compare_realpath.py:90` already reads
+`app._diff_last_result` directly (C-11).
+
+**Wired at all 9 Compare drivers:** 7 in `test_tui_diff_screen.py`
+(`_b78_drive_compare`, `test_tc021`, `test_tc023`, both `test_tc024`s, and both
+presses in `TC-B78-49`) and 2 in `test_tui_diff_compare_realpath.py`
+(`_drive_compare`, `_drive_compare_hex`).
+
+## B.3 The census — three arms, so `0 failed` is a result and not an artefact
+
+A census that perturbs nothing also reads `0 failed`, so the discharge is only
+meaningful beside a control that shows the defect. Perturbation injected at the
+exact point the handler already suspends — inside the awaited run-list rebuild.
+Every arm applied-checked (post-image absent-before / present-after / bytes
+changed) and restored by sha-256.
+
+| Arm | Perturbation | Completion wait | Result |
+|---|---|---|---|
+| **A — control** | 20 ms | **REMOVED** (press + one `pause`, as shipped at the first gate) | 🔴 **12 failed, 17 passed** |
+| **B — discharge** | 20 ms | in place | ✅ **29 passed, 0 failed** |
+| **C — determinism** | **200 ms (10×)** | in place | ✅ **29 passed, 0 failed** |
+
+```
+########## ARM A: sleep=0.02s  completion-wait=REMOVED ##########
+   reverted 7 completion-wait sites in test_tui_diff_screen.py
+   reverted 2 completion-wait sites in test_tui_diff_compare_realpath.py
+   screens_directionb.py: perturbation absent-before/present-after = True  sha 3bb8cb5350668623
+FAILED ...::test_tc029_display_caps_bound_on_screen_runs
+FAILED ...::test_at_b78_16_every_run_reachable_by_mouse
+FAILED ...::test_at_b78_18_display_caps_and_notice_survive
+FAILED ...::test_at_b78_19_app_keys_survive_run_list_focus
+FAILED ...::test_tc_b78_18_exactly_cap_runs_shows_no_notice
+FAILED ...::test_tc_b78_21_zero_length_run_is_selectable
+FAILED ...::test_tc_b78_48_hostile_artifact_summary_renders_verbatim
+FAILED ...::test_tc_b78_49_a_second_compare_rebuilds_the_list
+FAILED ...::test_at_016_1_two_wellformed_images_show_changed_runs
+FAILED ...::test_at_016_2_degenerate_image_is_flagged_not_silent
+FAILED ...::test_at_016_4_legit_small_valid_image_is_not_flagged
+FAILED ...::test_compare_hex_windows_render_the_differing_bytes
+12 failed, 17 passed in 49.75s
+########## ARM A REVERTED - sha MATCH=True ##########
+
+########## ARM B: sleep=0.02s  completion-wait=IN PLACE ##########
+29 passed in 63.64s
+########## ARM B REVERTED - sha MATCH=True ##########
+
+########## ARM C: sleep=0.2s  completion-wait=IN PLACE ##########
+29 passed in 68.79s
+########## ARM C REVERTED - sha MATCH=True ##########
+```
+
+**Arm C is the load-bearing one.** An extra `pause()` absorbs 20 ms and 200 ms
+alike — it would move the failure threshold, not remove it. The completion wait
+is invariant under a 10× perturbation because it is not waiting on time.
+
+**Count discrepancy, stated rather than smoothed:** the reviewer measured **14**
+failing nodes, I measure **12** over the same two modules. I have not
+reconciled the difference and am not claiming their figure is wrong — the
+directions agree and both are an order of magnitude above the gate's visible
+`1 failed`. **`test_at_016_3` is absent from my failure list too**, which
+independently reproduces their discriminator: it asserts on the refusal branch,
+written *before* the `await`, so it is immune by construction.
+
+## B.4 Absence clauses — the audit you asked for
+
+The lost-race state is the **un-rendered panel**: presence clauses fail loudly,
+absence clauses pass vacuously. Enumerating every absence-shaped clause in the
+two modules:
+
+| Node | Absence clause | Vacuous under a lost race? | Positive co-assertion in the same run |
+|---|---|---|---|
+| `TC-B78-18` | `"showing" not in range_text` | ✅ **yes** | `painted == total` |
+| `TC-B78-17` | `n_entries == 0`, `highlighted is None` | ✅ **yes** | `"Runs: 0" in range_text`, `"no differing runs" in hex_a` |
+| `AT-B78-15` | `None not in reached` | ❌ no — an un-rendered walk is all-`None` and it **fails** | `n_entries == len(runs)` |
+| `AT-B78-19` | `bound & forbidden == set()` | ❌ no — the list is composed at mount, independent of any render | `{"up","down"} <= bound` |
+| `TC-B78-22` | `n_entries == 0`, `index is None` | ❌ no — it never presses Compare, so there is no race |  — |
+| realpath `AT-016-*` | none — all presence | — | — |
+
+**Verdict: no node needs a new clause. Every absence clause already has a
+positive co-assertion in the same run — and the reviewer is right that this was
+drafting luck rather than a control.** It is now a control, and at a better
+place than per-node siblings: `_b78_press_compare` / `_press_compare` **raise a
+named `AssertionError` if the handler never completes**, so the un-rendered
+state is unreachable by any node built on the drivers, including nodes not yet
+written. That is why the fix went into the driver rather than into the two
+vulnerable nodes. Both helpers' docstrings say so, so the next author does not
+have to rediscover it. Recorded as **C-78-xii**.
+
+## B.5 `TC-B78-17` and `TC-B78-22` — still undischarged
+
+Unchanged and not quietly upgraded. Neither appears as a reddening arm in any
+mutation, which is honest for negative-boundary nodes: `TC-B78-17` asserts what
+a 0-run comparison does *not* produce and `TC-B78-22` asserts what happens with
+no comparison at all. Stated here so it stays visible.
+
+## B.6 Retraction — "the padding became unnecessary"
+
+Addendum 1 §A.3 said deleting the two extra `pause()` calls was *"evidence route
+B is correct by construction rather than by timing"*. **That is withdrawn.** The
+same measurement that produced arm A shows the module became **scheduling-
+sensitive** under route B — the pauses were removable, but their removability
+demonstrated nothing about soundness, and reading it as reassurance is precisely
+the kind of inference that let F1 through in the first place. §A.3's provenance
+claim survives: both pauses were introduced at Inc-2 and are absent at
+`d771ab8`, so removing them restored the pre-existing drivers rather than
+weakening them.
+
+## B.7 Files and ledger
+
+| File | This addendum | Whole increment vs `d771ab8` |
+|---|---|---|
+| `s19_app/tui/app.py` | wrapper + `finally` counter + the attribute | **+41 / −3** |
+| `tests/test_tui_diff_screen.py` | `_b78_press_compare`, 7 drivers wired | **+926 / -27** |
+| `tests/test_tui_diff_compare_realpath.py` | `_press_compare`, 2 drivers wired | **+47 / −5** |
+| `s19_app/tui/screens_directionb.py` | unchanged in this addendum | **+79 / −25** |
+| `prototypes/cmdbar_a2bdiff.tui_prototype.py` | unchanged in this addendum | **+2 / −1** |
+
+**Still 5 files — at the cap. No new file opened for F7.**
+
+Ledger unchanged at **`A = 13`** — F7 added no node; it changed how nine
+existing drivers wait. `post = 2612 + 13 = ` **2625** (2624 + the single
+`[diff-comfortable-120x30]` snapshot cell until Inc-12).
+
+## B.8 Carries
+
+| # | Item |
+|---|---|
+| **C-78-viii** *(reworded, final)* | An applied-check must assert **the post-image was absent before the write and present after**. That is the limb the original harness lacked and the reason a no-op passed. ⚠️ **No LF/CRLF story:** both parties re-measured, the no-op round trip is byte-identical, and the reviewer traced its LF baseline to a `git show >` redirect it had made itself. Sha inequality remains the weakest limb and must never stand alone. |
+| **🆕 C-78-xii** | **`Pilot.pause()` is not a completion wait for an `async` message handler.** It waits for message-queue idleness, and a handler suspended on an awaited DOM operation has already dequeued its message — so the queue is idle while the handler runs. Any increment that turns a Textual handler into a coroutine must publish a **total** completion signal (bumped in a `finally`, so refusal, failure and exception paths all fire) and have tests wait on **that**, never on `pause()` and never on a state field the happy path alone writes. Discharge is a perturbation census at two delays an order of magnitude apart, with a control arm. |
+| **🆕 C-78-xiii** | **An absence clause is unfalsifiable in the un-initialised state, so it must be paired with a positive co-assertion — and the pairing belongs in the shared driver, not in each node.** Under a lost race every `assert X not in text` in these modules was vacuously true. Putting the "it actually rendered" assertion into the driver protects nodes that do not exist yet; putting it in a sibling clause protects only the nodes whose author happened to think of it. |

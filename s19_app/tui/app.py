@@ -1508,6 +1508,21 @@ class S19TuiApp(App):
         #: Most recent A↔B comparison result, retained so the diff-report
         #: trigger (LLR-005.4) can report the same comparison the panel shows.
         self._diff_last_result: Optional[Any] = None
+        #: Monotonic count of COMPLETED A↔B compare requests (batch-78 Inc-2,
+        #: gate review F7). Incremented on EVERY exit path of
+        #: ``on_ab_diff_panel_compare_requested`` — refusal, load failure,
+        #: success and exception alike — so it is a TOTAL completion signal.
+        #: ``_diff_last_result`` cannot serve this purpose: it is written only
+        #: on the non-refused branch, so waiting on it would hang forever on a
+        #: refusal instead of reporting one.
+        #:
+        #: Why it exists at all: the handler became a coroutine that suspends
+        #: on an awaited widget removal, and ``Pilot.pause()`` waits for
+        #: message-queue IDLENESS. A handler parked on ``AwaitRemove`` has
+        #: already dequeued its message, so ``pause()`` returns while it is
+        #: still suspended and a reader sees the un-rendered panel. Waiting on
+        #: this counter waits on the handler, not on the queue.
+        self._diff_compare_generation: int = 0
         #: Variant id to stamp onto the next applied primary ``LoadedFile``.
         #: Set on the main thread immediately before a load dispatch and
         #: consumed by ``_apply_prepared_load`` on the main thread, so the
@@ -4777,6 +4792,29 @@ class S19TuiApp(App):
         return ImageSource(kind=SOURCE_EXTERNAL, raw_path=raw_path)
 
     async def on_ab_diff_panel_compare_requested(
+        self, event: AbDiffPanel.CompareRequested
+    ) -> None:
+        """Run a compare request and mark its completion (batch-78 Inc-2 F7).
+
+        Summary:
+            Thin wrapper around :meth:`_apply_compare_request` whose only job is
+            to bump :attr:`_diff_compare_generation` in a ``finally``, so the
+            completion signal is TOTAL — it fires on the refusal branch, the
+            load-failure branch, the success branch and on an exception. A
+            signal that only fires on the happy path turns a refusal into a
+            hang, and an exception into a hang, which is strictly worse than
+            the race it was added to remove.
+
+        Dependencies:
+            Used by:
+                - Textual message dispatch for ``AbDiffPanel``
+        """
+        try:
+            await self._apply_compare_request(event)
+        finally:
+            self._diff_compare_generation += 1
+
+    async def _apply_compare_request(
         self, event: AbDiffPanel.CompareRequested
     ) -> None:
         """

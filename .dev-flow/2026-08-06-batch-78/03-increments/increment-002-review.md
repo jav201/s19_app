@@ -386,3 +386,374 @@ implementer's. Route C avoids `app.py` entirely at the cost of re-pointing `_b78
 | Tests reviewed for intent, not behaviour | ✓ | 5 counterfactuals re-executed with a stricter applied-check; `test_tc029` rewrite confirmed to redden on its clause; F2 records the one clause that encodes no discriminating negative |
 | Verdict explicit | ✓ | **Block** — F1 |
 | Live repo tree unmodified | ✓ | all work in an isolated `git archive 297990c` export; `git status --short -- s19_app/ tests/` empty; `sha256(screens_directionb.py)` = `f74869cd773ca2f8…`, `sha256(styles.tcss)` = `449fb6501f0ea292…`; the parallel session's `prototypes/memmap2.*` untouched |
+
+---
+---
+
+# Code Review — Inc-2 **RE-GATE** (round 2)
+
+> **Range:** `297990c..c59e794` (`f9b9629` the fix, `c59e794` the spec reconciliation)
+> **Round 1 verdict was BLOCK on F1.** This round re-executes the fix, re-measures
+> the two open questions the coordinator raised, and reports one new HIGH.
+> Same method: isolated `git archive` exports (`c59e794` and, as a control arm,
+> `297990c`). Live tree untouched — `git status --short -- s19_app/ tests/` empty,
+> `sha256(screens_directionb.py) = 667cd9c5b2254ff4…`.
+
+## BLUF — **BLOCK**, on a new finding, not on the old one
+
+**F1 is properly fixed and F2 is closed.** Route B works, the regression node is a real
+gate, and `CF-B` reddens it alone exactly as reported.
+
+**F3 is WITHDRAWN — my mechanism was wrong and the author's inverse reading is right.**
+
+**R-11 is not flakiness. It is causally connected, it is reproducible on demand, and it is
+14 nodes wide, not one.** `set_status(…, "sev-ok")` and `self._diff_last_result = result`
+are both written on the lines *after* the new `await panel.render_comparison(…)`, while
+`Pilot.pause()` waits for **message-queue idleness**, not for an in-flight handler
+coroutine to finish. The fix is correct; the drivers that observe it are not.
+
+| Round-1 finding | Status |
+|---|---|
+| **F1** (HIGH) second Compare crashes | ✅ **CLOSED** — verified three ways |
+| **F2** (MEDIUM) mouse negative unverified | ✅ **CLOSED** — M1 now reddens `AT-B78-16` |
+| **F3** (MEDIUM) sha limb vacuous via LF/CRLF | ❌ **WITHDRAWN — mechanism measured FALSE** |
+| **F4** (LOW) `AT-B78-15` clause order | ✅ carried, and C-78-vii sharpened correctly |
+| **F5** (LOW) five nodes undischarged | ✅ **CLOSED** — `-k` dropped, 3 of 5 now discharged |
+| **F6** (LOW) "0 definitions" over-read | ✅ **CLOSED** — corrected to "not a caller" |
+
+| New this round | Severity |
+|---|---|
+| **F7** — the async change made 14 of 29 diff nodes scheduling-dependent | **HIGH — blocks** |
+| **F8** — §7, the declared authority, was never reconciled; the C-21 discharge asserts a consistency that does not exist | MEDIUM |
+
+**HIGH 1 · MEDIUM 1** this round.
+
+---
+
+## R-11 — VERDICT: causally connected. Do not withdraw the hypothesis; upgrade it.
+
+### The causal link is visible in the source before any measurement
+
+`s19_app/tui/app.py:4836-4854` — the awaited call, and then:
+
+```python
+await panel.render_comparison(...)          # NEW suspension point
+...
+    panel.set_status(f"Compared … {len(result.runs)} runs.", "sev-ok")   # <- 016_4 asserts this
+self._diff_last_result = result                                          # <- the driver's reached_display_path
+```
+
+`tests/test_tui_diff_compare_realpath.py:_drive_compare` presses the button, does **one**
+`pilot.pause()`, then reads `sev-ok` and `_diff_last_result`. **Every one of those reads is
+of state written after the new await.** Pre-fix, `render_comparison` was synchronous, so
+those lines executed inside the same dispatch and one pause was deterministic.
+
+`test_at_016_4` **does** reach the newly-awaited path: it is the valid-image case, so
+`result.refused` is False and control passes the early `return`. Its sibling
+`test_at_016_3` asserts `sev-error`, which is set in the refusal branch **before** the
+await — and it is one of the nodes that never fails under perturbation. That contrast is
+the discriminator: the exposed nodes are exactly the ones whose observable is written after
+the await.
+
+### Reproduced on demand, with the reported signature
+
+`Pilot.pause()` → `_wait_for_screen()` + `wait_for_idle(0)`. A handler suspended on
+`AwaitRemove` has already **dequeued** its message, so the pump can report idle while the
+coroutine is parked. Pure yields are absorbed (`await asyncio.sleep(0)` x1 and x20: 4/4 and
+6/6 green) because idle-detection drains callback turns. A **timed** suspension — which is
+what CPU contention on a 740-second 13-module run produces — is not:
+
+```
+CF-R11  +20 ms suspension inside the awaited path, driver's ONE pause, 4 iterations:
+  iter 0: RACE LOST {'sev_ok': False, 'sev_err': False, 'last_result_set': False,
+                     'status': 'Select two images and press Compare.', 'rows': 5}
+  iter 1: RACE LOST {… 'status': 'Select two images and press Compare.', 'rows': 0}
+  iter 3: RACE LOST {… 'status': 'Select two images and press Compare.', 'rows': 5}
+  -> 1/4 green; 3 would FAIL test_at_016_4
+```
+
+`'Select two images and press Compare.'` **is the placeholder the gate reported.** The
+signature matches exactly.
+
+### Control arm — the variable is the coroutine, not the delay
+
+The identical 20 ms delay inserted into the **pre-fix synchronous** `_render_run_list`
+(export of `297990c`, where `render_comparison` is not a coroutine):
+
+```
+### CONTROL (pre-fix 297990c, SYNC handler): +20ms inside _render_run_list
+extra_pauses=0: 4/4 had sev-ok after the driver's pause  -> 0 would FAIL
+```
+
+Same perturbation, same driver, same assertion: **4/4 green synchronous, 1/4 green
+asynchronous.** A synchronous handler cannot be parked mid-way, so ordering is guaranteed
+regardless of how slow it is. The async change is the cause.
+
+---
+
+## F7 — the fix made 14 of 29 diff nodes scheduling-dependent **[HIGH — BLOCKS]**
+
+- **What:** R-11 is not confined to `test_at_016_4`. Every driver that presses Compare and
+  reads post-await state behind a single `pause()` is now racy. Under the same 20 ms
+  suspension, across both diff modules:
+
+  ```
+  14 failed, 15 passed in 49.24s
+  FAILED test_tc021_compare_routes_through_service
+  FAILED test_tc029_display_caps_bound_on_screen_runs
+  FAILED test_at_b78_16_every_run_reachable_by_mouse
+  FAILED test_at_b78_18_display_caps_and_notice_survive
+  FAILED test_at_b78_19_app_keys_survive_run_list_focus
+  FAILED test_tc_b78_17_empty_comparison_has_no_selectable_entry
+  FAILED test_tc_b78_18_exactly_cap_runs_shows_no_notice
+  FAILED test_tc_b78_21_zero_length_run_is_selectable
+  FAILED test_tc_b78_48_hostile_artifact_summary_renders_verbatim
+  FAILED test_tc_b78_49_a_second_compare_rebuilds_the_list      <- the new regression node
+  FAILED test_at_016_1 / test_at_016_2 / test_at_016_4
+  FAILED test_compare_hex_windows_render_the_differing_bytes
+  ```
+
+  The gate's `1 failed, 414 passed` is the visible tip of a 14-node surface, and it did not
+  reproduce in six attempts because the margin is *usually* enough — which is precisely
+  what makes it dangerous.
+
+- **Why it is HIGH and not a nuisance:** the lost-race state is **the un-rendered panel**.
+  A node whose observable is a *presence* fails loudly (that is why `test_at_016_4` was
+  seen). A node whose observable is an **absence** passes **vacuously** — it asserts that
+  something is not there while looking at a panel that has not rendered yet.
+  `test_tc_b78_18`'s `assert "showing" not in range_text` is exactly that shape; it is
+  saved only by its sibling `assert painted == total` in the same node, which is an
+  accident of drafting, not a control. That is the false-confidence class this project
+  calls its dominant defect.
+
+- **Where:** `tests/test_tui_diff_compare_realpath.py:96-118` (`_drive_compare`) and
+  `:283-290` (`_drive_compare_hex`), each with a single `await pilot.pause()` after
+  `press()`; `tests/test_tui_diff_screen.py:222-226` (`_b78_drive_compare`) and `:295-301`
+  (`test_tc021`), each having just **lost** their second pause;
+  `tests/test_tui_diff_screen.py:1543-1555` (`TC-B78-49`, two single-pause presses).
+
+- **On the two deleted pauses — the provenance is right, the inference is not.** I verified
+  both were introduced *at Inc-2* (neither exists at `d771ab8`), so they were indeed
+  compensating for the un-awaited mount and removing them is defensible. But "padding
+  becoming unnecessary is evidence the fix is structural" does not follow: the same
+  measurement that says they are unnecessary in a quiet run says the whole module is now
+  scheduling-sensitive. They were green before removal and green after, in both cases
+  because the race was won.
+
+- **Padding is not the answer, and I measured that too.** One extra pause absorbs both a
+  20 ms and a 200 ms suspension (4/4 green each). So adding pauses back would work in
+  practice — but it buys *margin*, not *determinism*, and the coordinator already ruled
+  against that direction. The observation must become deterministic instead.
+
+- **Suggested fix — wait on the handler's own completion, not on idleness.** A shared
+  driver helper, used by both modules:
+
+  ```python
+  async def _settle_compare(app, pilot, *, max_turns: int = 20) -> None:
+      """Wait for the compare HANDLER to complete, not for the queue to go idle.
+
+      `Pilot.pause()` waits for message-queue idleness. A handler suspended on
+      `await panel.render_comparison(...)` has already dequeued its message, so
+      pause can return before `sev-ok` / `_diff_last_result` / the run list have
+      been written. Poll the handler's own terminal write instead.
+      """
+      for _ in range(max_turns):
+          await pilot.pause()
+          if app._diff_compare_seq == expected:      # see caveat
+              return
+      raise AssertionError("the compare handler did not complete within 20 turns")
+  ```
+
+  **Caveat, stated because it changes the shape of the fix:** `_diff_last_result` is the
+  obvious flag but it is written **only on the non-refused branch**, so the refusal drivers
+  (`test_at_016_2`, `test_at_016_3`) would hang on it. The clean form is a monotonic
+  counter incremented as the last statement of *both* branches of
+  `on_ab_diff_panel_compare_requested`, or a `CompareRendered` message the driver awaits —
+  either is a one-line addition to `app.py`, a file Inc-2 now legitimately owns. Whichever
+  is chosen, **`TC-B78-49` must use it too**: the node that exists to prove the second
+  Compare rebuilds the list is itself in the exposed set.
+
+- **A counterfactual is owed at the re-gate:** with the helper in place, re-run the 20 ms
+  perturbation census. The target is **0 failed**, not 14. That measurement is the
+  discharge; a green quiet run is not, and is exactly the evidence that let this through.
+
+---
+
+## F8 — §7 was never reconciled, and the C-21 discharge asserts otherwise **[MEDIUM]**
+
+- **What:** the entire `01-requirements.md` change in this range is **one hunk, in §5.7**:
+
+  ```
+  $ git diff 297990c..c59e794 -- …/01-requirements.md | grep '^@@'
+  @@ -766,7 +766,13 @@
+  ```
+
+  §7 — which the gate brief calls **the authority** — is untouched and now contradicts what
+  shipped, at `c59e794`:
+
+  | §7 says | Reality |
+  |---|---|
+  | Inc-2 Files: `screens_directionb.py`, **`styles.tcss`**, `tests/test_tui_diff_screen.py`, `tests/test_tui_diff_compare_realpath.py` **(4)** | `styles.tcss` was **never edited** (sha `449fb6501f0ea292…`, unchanged since round 1); the real set is **5**, adding `app.py` and `prototypes/cmdbar_a2bdiff.tui_prototype.py` |
+  | `\| app.py \| 5, 7, 9, 11 \|` | `app.py` was edited at **Inc-2** |
+  | `\| styles.tcss \| 1, 2, 5, 7, 10 \|` | Inc-2 does not edit it |
+  | (no row) | `prototypes/cmdbar_a2bdiff.tui_prototype.py` is a tracked production-adjacent caller, now edited at Inc-2 |
+
+- **Why it matters:** the §5.7 amendment states *"§7's file map is unchanged apart from the
+  `app.py` cell ratified for Inc-2 … and `prototypes/…`"* — but that ratification exists
+  only as prose **inside §5.7**; the cell itself was never changed. §7's map is the
+  artefact the plan's own "strictly sequential, no two increments in flight" rule is
+  enforced from, and Inc-4/5/6/7 all edit `screens_directionb.py` and `app.py`. A planner
+  reading §7 at Inc-4 will not learn that `app.py` is already in Inc-2's blast radius. The
+  `styles.tcss` cell is the **second** time this has been flagged — the round-1 packet's
+  own Pending item 3 asked for it and it is still there.
+
+- **Suggested fix:** three cell edits in §7 — Inc-2's Files cell to the real 5-file set
+  (drop `styles.tcss`, add `app.py` and the prototype); `app.py` row to `2, 5, 7, 9, 11`;
+  `styles.tcss` row to `1, 5, 7, 10`; add a `prototypes/cmdbar_a2bdiff.tui_prototype.py`
+  row naming Inc-2. Then the C-21 discharge is true as written.
+
+- **What I did verify about C-21:** the claim *"no other increment's AT/TC allocation
+  moves"* is **correct** — the single hunk touches no other increment's ids, and the §5.7
+  arithmetic is right on its own convention (32 live AT + 49 TC = 81, matching the prior
+  32 + 48 = 80).
+
+---
+
+## F3 — WITHDRAWN. My mechanism was measured FALSE.
+
+Re-measured through my own pipeline, as asked:
+
+```
+live worktree (c59e794)            crlf= 7114 bare_lf=    0 sha=667cd9c5b2254ff4
+my rev2 export (git archive)       crlf= 7114 bare_lf=    0 sha=667cd9c5b2254ff4
+my rev  export (297990c)           crlf=    0 bare_lf= 7097 sha=5db6803477edcd39
+
+no-op read_text -> write_text round trip: before=667cd9c5b2254ff4
+                                          after =667cd9c5b2254ff4  identical=True
+```
+
+**The author is right and I was wrong.** `Path.write_text(newline=None)` emits `os.linesep`
+= CRLF on this host, so a no-op round trip through the harness's exact path is
+**byte-identical** — the sha limb was **not** vacuous for the reason I gave.
+
+**The actual explanation of my four matching shas is the inverse, exactly as proposed:**
+my round-1 *baseline* was LF, not the harness's mutated files. I had restored that baseline
+with a raw `git show 297990c:… > file` redirect, which writes the blob unmodified (LF);
+my mutated files went through `Path.write_text` and came out CRLF, matching the author's
+CRLF mutated files. `git archive` is not the culprit either — it produced CRLF for `rev2`
+and my `rev` was LF only because I overwrote it. **The inference was mine, and the
+contaminated baseline was mine.**
+
+**What survives, and it is narrower than what I filed.** The limb the original harness
+lacked was not the sha limb — it was **"the OLD token is absent after the write"**. That is
+the limb that fails on a label-vs-value patch, and it is the one the implemented remedy
+adds. The carry should record that and **must not** record an LF/CRLF mechanism: it would
+send the next reader to a normalisation problem this host does not have. My round-1 §F3
+paragraph beginning *"because the harness writes the mutated file with LF"* should be
+struck from any carry text.
+
+I used the corrected form in this round's harness (old-token-absent + new-token-present +
+sha-unseen + restore-by-sha) and it behaved correctly on both mutations.
+
+---
+
+## What I verified as sound this round
+
+**F1 — CLOSED, three independent ways.**
+
+1. **Three consecutive comparisons with different run counts**, driven through the shipped
+   button on the `c59e794` export:
+
+   ```
+   compare #1 (fixture  7 runs): entries= 7 index=3 -highlight=['diff_run_0']
+   compare #2 (fixture  3 runs): entries= 3 index=3 -highlight=['diff_run_0']
+   compare #3 (fixture 11 runs): entries=11 index=3 -highlight=['diff_run_0']
+   walk after 3rd: diff_run_0 … diff_run_10          (all 11 reachable)
+   ```
+
+   No `DuplicateIds`; the entry count tracks each fixture; **exactly one** `-highlight`
+   after every re-render — the second limb of F1, which removing the ids alone did not fix.
+
+2. **`CF-B` reddens `TC-B78-49` and nothing else** — reproduced exactly as reported:
+
+   ```
+   ### CF-B  route-B awaits removed: applied sha 6b9d91cf61aa0410 != fixed 667cd9c5b2254ff4
+   ###   ['1 failed, 28 passed in 63.45s']
+   ###   RED  test_tc_b78_49_a_second_compare_rebuilds_the_list
+   ```
+
+   Both awaits are load-bearing and the node is a genuine gate, not a co-passenger.
+
+3. **Route B is minimal in `app.py`.** The whole `app.py` change is two hunks: `def` to
+   `async def` on the handler, and `panel.render_comparison(` to `await panel.render_comparison(`
+   plus a 3-line comment. **Nothing crept in** while a file outside the increment's plan
+   was open.
+
+**`TC-B78-49` is a well-built node.** Different run counts on purpose, with the reason
+asserted in the fixture guard; the state is captured **before** any key press, so it
+describes what the second Compare left behind rather than what the walk created; it pins to
+the top so index 0 is *reached*, not inherited. Its docstring records the crash, the
+mechanism and the "removing the ids is not sufficient" limb.
+
+**F2 — CLOSED.** `M1` (`disabled True -> False`) now reddens `AT-B78-16`, where in round 1
+it stayed green:
+
+```
+### M1: 5 failed, 24 passed
+###   RED  test_at_b78_15 / test_at_b78_16 / test_tc_b78_19 / test_tc_b78_47 / test_tc_b78_49
+```
+
+The added clause is the right one — it clicks every `.diff-run-note` row and asserts the
+selection is unchanged — and the comment correctly records that the guarantee rests on the
+single `Widget.check_message_enabled` layer.
+
+**F4 / F5 / F6.** F4 carried, and **C-78-vii's amendment is the right sharpening**: *"when
+a node carries two normative clauses, the subject is the one the node's declared mutation
+targets."* That resolves the ambiguity I raised without weakening the rule. F5 closed by
+dropping `-k`; `TC-B78-17` and `TC-B78-22` remain undischarged **and are stated as such**,
+which is the honest disposition for negative-boundary nodes. F6 closed — the packet now
+reads *"not a caller"*.
+
+**Ledger and bookkeeping.** `git show c59e794:tests/test_tui_diff_screen.py | grep -c '^def test_'`
+= **23** (from 10) so `A = 13`; realpath **6 -> 6**. `2612 − 0 + 13 = 2625` ✅.
+Baseline on the export: **`29 passed in 64.85s`**, zero unexpected reds.
+`git status --short tests/__snapshots__/` empty — snapshot drift is still the single
+`[diff-comfortable-120x30]` cell, no golden regenerated.
+
+**The fifth-file call was right, and the sweep is complete.**
+`prototypes/cmdbar_a2bdiff.tui_prototype.py` **is** tracked (`git ls-files --error-unmatch`
+succeeds), its `_drive_diff` **is** `async def` so the added `await` is legal, and a
+repo-wide sweep finds no other caller of `render_comparison` outside `tests/` and
+`screens_directionb.py`. Two apparent extra hits are non-source: `build/lib/…` (an
+untracked stale build copy) and `.claude/worktrees/c3-d2-triage/…` (a different branch's
+worktree). Neither is a missed caller — noting them so a later sweep does not re-raise them.
+
+---
+
+## Verdict
+
+- [ ] OK to advance
+- [ ] OK with the listed fixes applied first
+- [x] **Block — F7 must be fixed before advancing**
+
+**F1 and F2 are closed; F3 is withdrawn as my error.** The block is new and narrow: the
+production fix is right, and the harness that observes it must stop depending on winning a
+race. F8 should land in the same pass — it is four cell edits and it makes the C-21
+discharge true.
+
+**Discharge for the next re-gate:** the 20 ms perturbation census re-run to **0 failed**
+(currently 14), plus `CF-B` still reddening `TC-B78-49` alone.
+
+## Evidence checklist — round 2
+
+| Item | ✓/✗ | Evidence |
+|---|---|---|
+| Fix diff read in full | ✓ | `app.py:4779, 4833-4841`; `screens_directionb.py:6880, 6911-6930, 6969, 6992-7031`; `test_tui_diff_screen.py` −2 pauses, `AT-B78-16` +note-click clause, `TC-B78-49`; `prototypes/cmdbar_a2bdiff.tui_prototype.py:474` |
+| F1 re-verified, not accepted on report | ✓ | 3-compare transcript + `CF-B` reddening `TC-B78-49` alone + `app.py` minimality |
+| R-11 causally determined | ✓ | source ordering + 20 ms reproduction with the reported placeholder signature + sync-handler control arm 4/4 vs async 1/4 |
+| Blast radius measured, not assumed | ✓ | 14 failed / 15 passed under perturbation; `test_at_016_3` (pre-await branch) immune |
+| F3 re-measured on my own pipeline | ✓ | round-trip byte-identical; `rev2` export CRLF; **withdrawn** |
+| Correctness pass on the new code | ✓ | both awaits load-bearing (`CF-B`); `listing.index` now assigned against a settled `_nodes`; no new class, C12 still inert |
+| Simplicity / reuse | ✓ | route B is 2 production lines + docstrings; no helper duplicated; `TC-B78-49` reuses `_diff_result` / `_b78_run_index` / `_b78_focus_run_list` |
+| Verdict explicit | ✓ | **Block** — F7 |
+| Live repo tree unmodified | ✓ | `git status --short -- s19_app/ tests/` empty; `sha256 = 667cd9c5b2254ff4…`; all mutation work in isolated exports, restored and hash-verified; `prototypes/memmap2.*` untouched |

@@ -204,6 +204,43 @@ def _b78_run_index(item) -> int | None:
     return int(item.id[len("diff_run_") :])
 
 
+async def _b78_press_compare(app, pilot) -> None:
+    """Press the shipped Compare button and wait for the HANDLER to finish.
+
+    Not a pause, and not padding (batch-78 Inc-2 gate review F7).
+    ``Pilot.pause()`` waits for message-queue IDLENESS, and
+    ``on_ab_diff_panel_compare_requested`` is now a coroutine that suspends on
+    an awaited widget removal. A handler parked on ``AwaitRemove`` has already
+    DEQUEUED its message, so the queue is idle while the handler is still
+    running: ``pause()`` returns and the caller reads the un-rendered panel.
+
+    Measured under a 20 ms suspension, that race broke **14 nodes** across the
+    two diff modules. An extra ``pause()`` would not fix it — it absorbs 20 ms
+    and 200 ms alike, so it buys margin, not determinism. This waits on
+    ``app._diff_compare_generation``, which the handler bumps in a ``finally``
+    on every exit path, so the wait is TOTAL: it also returns on the REFUSAL
+    branch, where ``_diff_last_result`` is never written.
+
+    ⚠️ This is also the C-40 presence co-assertion for every node built on it.
+    The lost-race state is the UN-RENDERED panel, in which presence clauses
+    fail loudly but **absence clauses pass vacuously** (``assert "showing" not
+    in text`` is true of an empty column). Timing out here is a loud, named
+    failure, so no node downstream can be green because nothing rendered.
+    """
+    before = app._diff_compare_generation
+    app.query_one("#diff_compare_button").press()
+    for _ in range(500):
+        if app._diff_compare_generation > before:
+            return
+        await pilot.pause()
+    raise AssertionError(
+        "the compare handler never completed: _diff_compare_generation stayed "
+        f"at {before} across 500 pumped turns. Every assertion after this "
+        "point would be reading the UN-RENDERED panel, where absence clauses "
+        "pass vacuously."
+    )
+
+
 def _b78_drive_compare(tmp_path: Path, size, result, *, after):
     """Drive a real Compare through the SHIPPED button, then run ``after``.
 
@@ -222,8 +259,7 @@ def _b78_drive_compare(tmp_path: Path, size, result, *, after):
             await pilot.pause()
             app.action_show_screen("diff")
             await pilot.pause()
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
             return await after(app, pilot)
 
     monkey = pytest.MonkeyPatch()
@@ -297,8 +333,7 @@ def test_tc021_compare_routes_through_service(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("diff")
             await pilot.pause()
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
             range_text = _b78_run_list_text(app)
             return len(calls), range_text
 
@@ -370,8 +405,7 @@ def test_tc023_refused_compare_surfaces_diagnostic(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("diff")
             await pilot.pause()
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
             return str(app.query_one("#diff_status").render())
 
     monkey = pytest.MonkeyPatch()
@@ -419,8 +453,7 @@ def test_tc024_report_trigger_surfaces_paths(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("diff")
             await pilot.pause()
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
             app.query_one("#diff_report_button").press()
             # batch-68 N5: the two generators now run on a worker thread, so
             # the status is written after this handler returns. A bare pause()
@@ -468,8 +501,7 @@ def test_tc024_report_trigger_invalid_dest_refused(tmp_path: Path) -> None:
             await pilot.pause()
             app.action_show_screen("diff")
             await pilot.pause()
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
             app.query_one("#diff_report_button").press()
             # batch-68 N5: the two generators now run on a worker thread, so
             # the status is written after this handler returns. A bare pause()
@@ -1561,13 +1593,11 @@ def test_tc_b78_49_a_second_compare_rebuilds_the_list(tmp_path: Path) -> None:
             await pilot.pause()
             listing = _b78_run_list(app)
 
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
             first_entries = len(list(listing.query(_B78_RUN_ENTRY)))
 
             # the SECOND compare - the press that used to raise DuplicateIds
-            app.query_one("#diff_compare_button").press()
-            await pilot.pause()
+            await _b78_press_compare(app, pilot)
 
             # captured BEFORE any key press, so these describe the state the
             # second Compare left behind rather than the state the walk created
