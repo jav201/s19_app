@@ -1942,6 +1942,7 @@ def test_at_b78_31_written_report_is_complete_under_display_caps(
 #   TC-B78-27  test_tc_b78_27_stale_high_selection_after_a_shorter_compare
 #   TC-B78-28  test_tc_b78_28_zero_height_pane_does_not_raise
 #   TC-B78-45  test_tc_b78_45_row_count_is_not_a_function_of_the_constant
+#   TC-B78-50  test_tc_b78_50_the_surplus_rows_are_split_around_the_run  (A-6)
 #
 # Pre-change, `_render_run_windows` had ONE call site - `render_comparison`'s
 # literal 0 - and its row count came from `DISPLAY_CONTEXT_BYTES` alone, so the
@@ -2072,9 +2073,18 @@ def test_at_b78_20_selection_re_renders_both_windows(tmp_path: Path) -> None:
         before = _b78_window_geometry(app)
         await _b78_select_run(app, pilot, listing, target)
         after = _b78_window_geometry(app)
-        return before, after, _b78_run_index(listing.highlighted_child)
+        at_target = _b78_run_index(listing.highlighted_child)
+        # LLR-123.3 says "the header contains the kind label for a run of each of
+        # the three kinds". Run 3 is `changed`, and `changed` is the one key
+        # `_KIND_LABEL` maps to ITSELF - so asserting it alone leaves the mapping
+        # untested: `self._KIND_LABEL.get(kind, kind)` -> `kind` keeps that clause
+        # green. One more press lands on run 4, whose kind is `only_a` and whose
+        # label is `only A`, and that arm cannot survive the same mutation.
+        await pilot.press("down")
+        mapped = _b78_window_geometry(app)
+        return before, after, at_target, mapped, _b78_run_index(listing.highlighted_child)
 
-    before, after, highlighted = _b78_drive_compare(
+    before, after, highlighted, mapped, mapped_index = _b78_drive_compare(
         tmp_path, _B78_INC4_WIDE, _diff_result(runs), after=_after
     )
 
@@ -2102,6 +2112,30 @@ def test_at_b78_20_selection_re_renders_both_windows(tmp_path: Path) -> None:
         assert "changed" in header, (
             f"the {side} window header must name the run's classification "
             f"(LLR-123.3); run kind is {kind!r} and header={header!r}"
+        )
+    # LLR-123.3's second kind - the one whose LABEL differs from its KEY, so the
+    # mapping itself is under test rather than an identity. Both literals are
+    # written out here; deriving either from `_KIND_LABEL` would be reading the
+    # expectation off the class under test (spec F-6).
+    mapped_kind, mapped_label = "only_a", "only A"
+    assert runs[target + 1][2] == mapped_kind and mapped_label != mapped_kind, (
+        f"precondition: this arm needs a run whose kind label DIFFERS from its "
+        f"kind key, or it re-tests the identity mapping; run {target + 1} is "
+        f"{runs[target + 1][2]!r}"
+    )
+    assert mapped_index == target + 1, (
+        f"precondition: the extra press must land on run {target + 1}; the "
+        f"highlight is on {mapped_index}"
+    )
+    for side, header in (("A", mapped["header_a"]), ("B", mapped["header_b"])):
+        assert mapped_label in header, (
+            f"the {side} window header must name the run's classification "
+            f"through the kind LABEL, not its raw key; expected "
+            f"{mapped_label!r} in header={header!r}"
+        )
+        assert mapped_kind not in header, (
+            f"the {side} window header must not leak the raw kind key; "
+            f"{mapped_kind!r} is in header={header!r}"
         )
     # C-40: a header-only window would satisfy every clause above.
     assert after["rows_a"] and after["rows_b"], (
@@ -2561,3 +2595,68 @@ def test_tc_b78_28_zero_height_pane_does_not_raise(tmp_path: Path) -> None:
         f"with no pane to fill, the mandatory run +/- context floor is the whole "
         f"window; emitted {[f'0x{a:08X}' for a in measured['rows_a']]}"
     )
+
+
+def test_tc_b78_50_the_surplus_rows_are_split_around_the_run(tmp_path: Path) -> None:
+    """TC-B78-50 - the growth CENTRES the run instead of piling the surplus.
+
+    Intent: spec Sec.8's `A-6` - `LLR-123.2`'s row-centring arithmetic, which the
+    document flags `assumed - measure in Phase 3` and for which it states no
+    formula. This is the predicate that discharges it.
+
+    Why it exists as its own node, and why the Inc-4 gate review was right to
+    demand it: `TC-B78-24` pins the row COUNT (`len(rows) == content_h - 1`), and
+    BOTH one-sided splits preserve the count. Executed at the gate review,
+    `(capacity - rows) // 2` -> all surplus ABOVE and -> all surplus BELOW each
+    left **10 of 10** Inc-4 nodes GREEN. A measured number in a report is not a
+    control; the count clause pins nothing about POSITION, and position is the
+    whole of what `A-6` asks about.
+
+    The observable is the imbalance `|above - below|` around the run's own row.
+    Centred to within one row it is <= 1 (a surplus of odd size cannot split
+    evenly); either one-sided split drives it to the full surplus.
+
+    The fixture's run sits at 0x1000 - far enough from address 0 that the
+    address-0 clamp cannot bind and mask the split, which is asserted rather
+    than assumed. Both gate sizes are read, per-arm (CC-1).
+    """
+    runs = [_B78_AT22_RUN]
+    start = _B78_AT22_RUN[0]
+    run_row = start - (start % 16)
+
+    async def _after(app, pilot):
+        return _b78_window_geometry(app)
+
+    wide = _b78_drive_compare(tmp_path, _B78_INC4_WIDE, _diff_result(runs), after=_after)
+    tall = _b78_drive_compare(tmp_path, _B78_INC4_TALL, _diff_result(runs), after=_after)
+
+    for label, measured in ((_B78_INC4_WIDE, wide), (_B78_INC4_TALL, tall)):
+        rows = measured["rows_a"]
+        # Precondition 1: the window actually GREW. With no surplus there is
+        # nothing to split and every clause below is vacuous.
+        assert len(rows) > len(_B78_AT22_ADDRESSES), (
+            f"{label}: precondition - the pane must have grown the window past "
+            f"the run +/- context floor of {len(_B78_AT22_ADDRESSES)} rows; it "
+            f"emitted {len(rows)}"
+        )
+        # Precondition 2: the address-0 clamp is NOT binding here. If it were,
+        # the window would be pinned to 0 and a one-sided split would be
+        # indistinguishable from a centred one.
+        assert rows[0] > 0, (
+            f"{label}: precondition - the address-0 clamp must not bind in this "
+            f"fixture, or the split is unobservable; window starts at "
+            f"0x{rows[0]:08X}"
+        )
+        assert run_row in rows, (
+            f"{label}: the run's own row 0x{run_row:08X} must be in the window; "
+            f"emitted 0x{rows[0]:08X}..0x{rows[-1]:08X}"
+        )
+        above = rows.index(run_row)
+        below = len(rows) - above - 1
+        assert abs(above - below) <= 1, (
+            f"{label}: the surplus rows must be SPLIT around the selected run, "
+            f"not piled on one side; the run's row 0x{run_row:08X} sits at "
+            f"index {above} of {len(rows)} - {above} rows above it and {below} "
+            f"below. A one-sided split preserves the row count, so the count "
+            f"clause in TC-B78-24 cannot see this"
+        )
