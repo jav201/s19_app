@@ -295,7 +295,7 @@ QA correctly refused to pick this silently. It is decidable from the HLR-119/HLR
 - **Rationale (informative):** `_render_run_windows` (`:7003`) derives its rows from `DISPLAY_CONTEXT_BYTES = 16` alone (`:7026`, `:7028`), so the count is a function of the **run size**. Executed at two very different pane heights: `(132, 24) → 4 emitted lines at pane h=0` and `(132, 60) → 4 emitted lines at pane h=23` — **4 == 4, RED**. The mechanism works (calling `_render_run_windows(3)` directly does change the window), which is exactly why the AT must not call it.
 - **⚠️ C-29, two axes.** The row-count arm is written at **132×44**, where the pane is **11 clipped rows today** and the AT is observable **without any Lane-1 work** (R-4). It is written as a **relation** (rows track pane height), never an absolute count, because US-78-1 later adds ~3 rows to every screen and would move any absolute number.
 - **Validation:** `test` · **Executed verification:** `pytest tests/test_tui_diff_screen.py -k window -v` + full `tests/test_tui_directionb.py`
-- **Numeric pass threshold:** after selecting run 3 of 6, both headers name run **3** and its start address (today always run 0); the emitted row counts at two pane heights **differ** and each is **≤** its pane's **content** height (today 4 and 4); for a run at `0x1000–0x1004` the emitted row addresses are exactly `0x00000FF0, 0x00001000, 0x00001010` — **literals, not computed from `DISPLAY_CONTEXT_BYTES`**
+- **Numeric pass threshold:** after selecting run 3 of 6, both headers name run **3** and its start address (today always run 0); the emitted row counts at two pane heights **differ** and each is **≤** its pane's **content** height (today 4 and 4); for a run at `0x1000–0x1004` the emitted row addresses are exactly `0x00000FF0, 0x00001000, 0x00001010` **at a pane whose content height is 0** — literals, not computed from `DISPLAY_CONTEXT_BYTES`; **at any taller pane the same three addresses are CONTAINED in the emitted set**, which is the clause the derivation makes satisfiable *(amended — see §6.5 Amendment D)*
 - **Priority:** high
 - **Acceptance (black-box):**
   - **Observable outcome:** picking a run shows that run's bytes, and a taller terminal shows more of them.
@@ -879,6 +879,23 @@ GATE: PASS — 0 stale forms, 0 undispositioned hits            (exit 0)
 
 
 ### 6.5 Requirement amendments (Before / After)
+
+#### Amendment D — `HLR-123`'s numeric pass threshold (minted at the Inc-4 gate, 2026-08-06)
+
+**The defect: two of `HLR-123`'s own exactness clauses have an EMPTY INTERSECTION at the size §7 names for its gate.** Both clauses are individually right — *"always include the run ± context"* and *"the row count derives from the pane height"* — but their conjunction is unsatisfiable wherever the derived count exceeds three. At **132×44** the derived capacity is **12**, so a correct implementation emits twelve row addresses and can never emit *exactly* three.
+
+- **Before** (verbatim, §3):
+  > "for a run at `0x1000–0x1004` the emitted row addresses are exactly `0x00000FF0, 0x00001000, 0x00001010` — **literals, not computed from `DISPLAY_CONTEXT_BYTES`**"
+- **After:**
+  > "for a run at `0x1000–0x1004` the emitted row addresses are exactly `0x00000FF0, 0x00001000, 0x00001010` **at a pane whose content height is 0** — literals, not computed from `DISPLAY_CONTEXT_BYTES`; **at any taller pane the same three addresses are CONTAINED in the emitted set**"
+
+**Deleted token:** the unqualified *"exactly"*. **New tokens:** the `content height is 0` qualifier, and the containment clause.
+
+**Why this is an amendment and not a test relaxation** — the distinction matters, because relaxing a threshold to match an implementation is how a gate quietly stops gating. The literal three addresses are still asserted **exactly**, at the one pane height where exactness is satisfiable (132×24, content height 0 — the size `HLR-123`'s own rationale was measured at). At 132×44 the same three are asserted **contained**, and that containment arm is **declared inert under M2** rather than counted as a discharge: `high = end + ctx → high = end` reddens the exact arm, not the containment one. **Nothing was weakened; the unsatisfiable half was split into the two halves that are each satisfiable, and the weaker half is labelled.**
+
+**Origin.** Found by executing the threshold rather than reading it — the pattern at every increment of this batch. `AT-B78-22` would have false-failed a correct implementation at the gate's own declared size.
+
+**Carry `C-78-xviii` (Inc-4 F-2), recorded here because it explains two figures in this section that do not reproduce:** §3 records `(132,60) → pane h=23` and `132×44 → 7`; measured on this branch, **29** and **13**. Both reproduce exactly once Inc-1's `+6` rows are applied — a delta this document's own BL-2 table publishes. **A measured figure is re-derivable only with the INCREMENT it was measured at, not merely the commit.** The project's rule that a carried number is re-derived rather than copied is necessary but not sufficient: a re-derivation against the wrong tree state reproduces nothing and looks like a contradiction.
 
 #### Amendment A — `R-TUI-022` (`REQUIREMENTS.md:594-602`)
 
