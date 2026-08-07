@@ -1520,6 +1520,28 @@ DataTable > .datatable--odd-row {
     height: auto;
 }
 
+/* HLR-124 / LLR-124.2-.4 (batch-78 Inc-5) — the three width/height regimes.
+ *
+ * The shipped three-way `1fr` split gave each of the run list and the two hex
+ * windows a third of the pane: 26 cells at 120 and 39 at 160, against a hex row
+ * `hexview.render_hex_view` emits at **79**. Every hex row wrapped at every
+ * supported width. The horizontal budget only ever fits ONE window (at 160 the
+ * widest supported terminal, `#diff_columns` has 132 content cells), so the two
+ * windows STACK inside `#diff_window_column` and share the vertical axis
+ * instead.
+ *
+ * Regime classes live on `#ab_diff_panel` and are set by
+ * `AbDiffPanel.apply_regime` (LLR-124.1). They are deliberately NOT the
+ * existing `width-narrow` class, which is toggled at 120 and read by 11 rules
+ * across workspace, map, patch and rail.
+ *
+ *   .diff-wide      W >= 139  run list BESIDE the window column
+ *   .diff-fallback  94 <= W < 139 and H >= 26  full-width window column; the
+ *                   run list is an overlay on `f`, costing zero permanent
+ *                   columns and zero permanent rows
+ *   .diff-notice    W < 94 or H < 26  an explicit notice naming every
+ *                   unsatisfied axis, instead of a silently empty results area
+ */
 #diff_range_list,
 #diff_hex_a,
 #diff_hex_b {
@@ -1530,6 +1552,86 @@ DataTable > .datatable--odd-row {
     color: $fg-base;
     padding: 1;
     margin-right: 1;
+}
+
+#diff_window_column {
+    width: 1fr;
+    height: 100%;
+}
+
+/* Stacked, so each window's height is a share of the pane rather than all of
+ * it. `1fr` each rather than `50%` so an odd row count is not lost. */
+#diff_hex_a,
+#diff_hex_b {
+    width: 100%;
+    height: 1fr;
+}
+
+/* The notice is displayed only in the notice regime. */
+#diff_size_notice {
+    display: none;
+    width: 100%;
+    height: auto;
+    padding: 0 1;
+}
+
+#ab_diff_panel.diff-notice #diff_columns {
+    display: none;
+}
+
+#ab_diff_panel.diff-notice #diff_size_notice {
+    display: block;
+}
+
+/* Wide (LLR-124.2): a fixed run-list column beside the window column. The CSS
+ * `width` is the BORDER box, so 26 is 22 content cells — the list width the
+ * `L <= C - 89` bound is derived for, and the reason `_DIFF_WIDE_MIN` is 139
+ * rather than 135 (an 18-content list fits at 135). */
+#ab_diff_panel.diff-wide #diff_range_list {
+    width: 26;
+}
+
+/* Fallback (LLR-124.3): the window column takes the full content width and the
+ * run list reserves nothing. `layers` puts the overlay on its own layout pass
+ * over the same region, so opening it does not resize or re-wrap the window
+ * underneath — "without permanently reserving columns or rows" is satisfied by
+ * construction rather than by a width that happens to be small.
+ *
+ * The windows lose their border and vertical padding here, and that is the
+ * whole reason the fallback regime can deliver anything at 120x30: the pane has
+ * 6 rows there and two bordered boxes spend 8 of them on chrome. Horizontal
+ * padding is kept — 92 - 2 = 90 content cells, still well clear of 79. */
+#ab_diff_panel.diff-fallback #diff_columns {
+    layers: base runs;
+}
+
+#ab_diff_panel.diff-fallback #diff_window_column {
+    layer: base;
+}
+
+#ab_diff_panel.diff-fallback #diff_hex_a,
+#ab_diff_panel.diff-fallback #diff_hex_b {
+    border: none;
+    padding: 0 1;
+    margin-right: 0;
+}
+
+/* The overlay drops its border and vertical padding for the same reason the
+ * windows do: at 120x30 the pane is 6 rows and a bordered box spends 4 of them,
+ * leaving a list with two content rows — or, before the command bar goes at
+ * Inc-10, with ZERO, which is an overlay the operator cannot read or focus. */
+#ab_diff_panel.diff-fallback #diff_range_list {
+    display: none;
+    layer: runs;
+    width: 32;
+    height: 100%;
+    border: none;
+    padding: 0 1;
+    margin-right: 0;
+}
+
+#ab_diff_panel.diff-fallback.runs-open #diff_range_list {
+    display: block;
 }
 
 /* --- Calm Dark modal re-skin (batch-02 increment 8, LLR-015.1) -----------

@@ -242,6 +242,37 @@ async def _b78_press_compare(app, pilot) -> None:
     )
 
 
+async def _b78_open_run_list(app, pilot) -> None:
+    """Make the run list VISIBLE, through whichever surface the regime ships.
+
+    batch-78 Inc-5: below ``_DIFF_WIDE_MIN`` the run list is no longer a column
+    — it is an overlay on ``f`` that reserves no permanent width (LLR-124.3), so
+    it starts hidden. ``_B78_AT_SIZE`` is 132x44, which is on the FALLBACK side
+    of the 139 breakpoint, so every Inc-2 node that observes the list must open
+    it first.
+
+    This is not cosmetic. Without it ``AT-B78-16`` goes RED (nothing to click)
+    while ``AT-B78-15`` and ``AT-B78-17`` stay GREEN against a
+    ``display: none`` list, because ``Widget.focusable`` does not consult
+    ``display`` — the keyboard and style nodes would have kept passing over a
+    list the operator cannot see. Opened through a real ``pilot.press("f")`` on
+    the shipped panel binding, never by setting the class.
+    """
+    listing = _b78_run_list(app)
+    if listing.display:
+        return
+    # The binding lives on `AbDiffPanel`, so focus has to be inside the panel
+    # for the press to reach it. The Compare button is the panel's own shipped
+    # control and is where the operator's focus already is after a comparison.
+    app.set_focus(app.query_one("#diff_compare_button"))
+    await pilot.press("f")
+    await pilot.pause()
+    assert listing.display, (
+        "the run-list overlay must open on 'f' in the fallback regime; "
+        f"#diff_range_list.display is {listing.display}"
+    )
+
+
 def _b78_drive_compare(tmp_path: Path, size, result, *, after):
     """Drive a real Compare through the SHIPPED button, then run ``after``.
 
@@ -261,6 +292,7 @@ def _b78_drive_compare(tmp_path: Path, size, result, *, after):
             app.action_show_screen("diff")
             await pilot.pause()
             await _b78_press_compare(app, pilot)
+            await _b78_open_run_list(app, pilot)
             return await after(app, pilot)
 
     monkey = pytest.MonkeyPatch()
@@ -1958,13 +1990,19 @@ def test_at_b78_31_written_report_is_complete_under_display_caps(
 _B78_INC4_TALL = (132, 60)
 _B78_INC4_WIDE = (132, 44)
 
-#: A pane whose CONTENT height is 0 (executed: `#diff_hex_a.size.height == 0` at
-#: 132x24, before and after this increment). The derived capacity is therefore 0
-#: and the mandatory run +/- context floor is the whole window - which is the
-#: only regime in which `AT-B78-22`'s "exactly three addresses" is satisfiable at
-#: all. See that node's docstring: HLR-123's two clauses are jointly exact only
-#: where the pane cannot grow the window.
-_B78_INC4_SHORT = (132, 24)
+#: A pane whose derived CAPACITY is 0, so the mandatory run +/- context floor is
+#: the whole window - the only regime in which `AT-B78-22`'s "exactly three
+#: addresses" is satisfiable at all. See that node's docstring: HLR-123's two
+#: clauses are jointly exact only where the pane cannot grow the window.
+#:
+#: batch-78 Inc-5 moved this from 132x24 to 132x26. 132x24 still has capacity 0,
+#: but as of HLR-124 it has it for a DIFFERENT reason: 24 is below `_DIFF_MIN_H`,
+#: so the whole result area is `display: none` behind the notice and the "pane"
+#: whose height the node names no longer exists. 132x26 is the first row at which
+#: the fallback regime renders and the capacity is still 0 (executed: content
+#: height 0 today, 1 post-Inc-10; `min(A,B) - 1` is 0 in both), so the node keeps
+#: its subject AND observes a state the operator is actually shown.
+_B78_INC4_SHORT = (132, 26)
 
 #: `AT-B78-22`'s fixture and its expected addresses, as LITERALS. Spec F-6 /
 #: Q-M1: rev-1 computed this span from `AbDiffPanel.DISPLAY_CONTEXT_BYTES` - the
@@ -2660,3 +2698,643 @@ def test_tc_b78_50_the_surplus_rows_are_split_around_the_run(tmp_path: Path) -> 
             f"below. A one-sided split preserves the row count, so the count "
             f"clause in TC-B78-24 cannot see this"
         )
+
+
+# --------------------------------------------------------------------------
+# batch-78 Inc-5 - HLR-124: three width/height regimes, and no silently empty
+# panel
+#
+# Node map (spec Sec.3 HLR-124 / Sec.4 LLR-124.1-.4 / Sec.5.3 / Sec.7 Inc-5):
+#   AT-B78-23  test_at_b78_23_no_wrapped_row_in_the_wide_regime        GATE
+#   AT-B78-29  test_at_b78_29_notice_names_every_unsatisfied_axis      GATE
+#   TC-B78-29  test_tc_b78_29_the_layout_flips_exactly_once
+#   TC-B78-30  test_tc_b78_30_a_resize_across_the_breakpoint_follows
+#   TC-B78-31  test_tc_b78_31_the_width_floor_is_the_notice_boundary
+#   TC-B78-32  test_tc_b78_32_a_single_axis_failure_names_that_axis
+#   TC-B78-33  test_tc_b78_33_the_regime_applies_with_no_comparison
+#   TC-B78-51  test_tc_b78_51_escape_dismisses_without_shadowing        (A-2)
+#   TC-B78-52  test_tc_b78_52_pagination_reaches_bytes_past_the_pane
+#   TC-B78-53  test_tc_b78_53_the_overlay_reserves_no_width
+#
+# AT-B78-24 (fallback, 120x30), AT-B78-25 (the regimes are observably different)
+# and AT-B78-26 land at Inc-10, where the command-bar rows are gone and the
+# 120x30 arms have a non-zero pane to observe (spec Sec.7 BL-2).
+#
+# Sizes that stand for a REGIME BOUNDARY are written from the constants
+# (_DIFF_WIDE_MIN, _DIFF_MIN_W, _DIFF_MIN_H) and never as bare integers
+# (LLR-124.1 / spec m6): a literal here is a phantom the day a measurement moves,
+# and it is the same defect as a threshold quoting a value instead of its name.
+# 80x24 and 160x40 ARE written as literals - they are the snapshot matrix's own
+# terminal sizes (C1), not regime constants.
+# --------------------------------------------------------------------------
+
+from s19_app.tui.screens_directionb import (  # noqa: E402
+    _DIFF_MIN_H,
+    _DIFF_MIN_W,
+    _DIFF_WIDE_MIN,
+)
+
+#: The snapshot matrix's wide cell. _DIFF_WIDE_MIN <= 160, so this is the wide
+#: regime, and it is a size the operator's terminal actually takes.
+_B78_INC5_WIDE = (160, 40)
+
+#: The snapshot matrix's floor cell. Fails BOTH axes, which is why it is
+#: AT-B78-29's subject: a notice naming "the" unsatisfied axis in the singular
+#: would be wrong precisely here.
+_B78_INC5_FLOOR = (80, 24)
+
+
+def _b78_widest_emitted_hex_row() -> int:
+    """The width of the widest row `hexview.render_hex_view` emits.
+
+    DERIVED by calling the producer at test time, never written as 79 (spec
+    Sec.3 HLR-124 / C-36 / C-39). The panel renders through `render_hex_view`,
+    not `render_hex_view_text` - the two differ by a two-space indent, and
+    reading the wrong one is the batch's own F-1, found independently by three
+    lanes. Importing the same function the panel imports is what makes that
+    impossible to get wrong here.
+    """
+    from s19_app.tui.hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
+
+    base = 0x1000
+    mem_map = {address: 0xAB for address in range(base, base + 4 * HEX_WIDTH)}
+    text = render_hex_view(
+        mem_map,
+        row_bases=[base + index * HEX_WIDTH for index in range(4)],
+        max_rows=MAX_HEX_ROWS,
+    )
+    rows = [line for line in text.splitlines() if _B78_HEX_ROW.match(line)]
+    assert rows, "the width oracle must actually emit hex rows, or it measures nothing"
+    return max(len(line) for line in rows)
+
+
+def _b78_regime_probe(base_dir: Path, size, *, prepare=None):
+    """Read the regime, the notice and the result geometry at one terminal size.
+
+    No comparison is driven: HLR-124 is a LAYOUT requirement and its observables
+    - the class, the notice, `#diff_hex_a`'s width - exist with the panel empty.
+    TC-B78-33 is the node that says so explicitly.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=base_dir)
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            if prepare is not None:
+                await prepare(app, pilot)
+                await pilot.pause()
+            panel = app.query_one("#ab_diff_panel")
+            notice = app.query_one("#diff_size_notice")
+            hex_a = app.query_one("#diff_hex_a")
+            listing = _b78_run_list(app)
+            return {
+                "regimes": sorted(
+                    name for name in panel.classes if name.startswith("diff-")
+                ),
+                "notice_shown": notice.display,
+                "notice_text": str(notice.render()),
+                "columns_shown": app.query_one("#diff_columns").display,
+                "list_shown": listing.display,
+                "list_width": listing.size.width,
+                "hex_a_width": hex_a.size.width,
+                "hex_a_painted": _b78_painted_content_height(hex_a),
+                "hex_a_painted_width": hex_a.content_region.intersection(
+                    app.query_one("#screen_diff").region
+                ).width,
+            }
+
+    return asyncio.run(_drive())
+
+
+def test_at_b78_23_no_wrapped_row_in_the_wide_regime(tmp_path: Path) -> None:
+    """AT-B78-23 (GATE) - at 160x40 no emitted hex row wraps.
+
+    Intent: HLR-124 / LLR-124.2 - "in the first two regimes each hex window's
+    content width shall be at least the width of the widest row
+    `hexview.render_hex_view` emits". The shipped three-way `1fr` split gave
+    `#diff_hex_a` 39 cells at 160x40 against a 79-cell row, so every hex row
+    wrapped at every supported width and a byte column lined up nowhere.
+
+    Both quantities are MEASURED, neither is a literal: the window's width off
+    the live widget, the row width by calling the producer. A hard-coded 79 would
+    be a phantom the day HEX_WIDTH changes, and it would also hide the F-1
+    producer confusion that cost this batch three lanes' work.
+
+    C-40, and M3 is the specific trap: a width clause alone is invariant under
+    total vertical invisibility - at 120x30 on the shipped tree `#diff_hex_a`'s
+    clipped region is (width 30, height 0), so a window can be "unwrapped" while
+    painting nothing at all. The painted height >= 1 co-assertion is what makes
+    the width clause mean the operator can see a row.
+
+    The wide regime's own property rides here too: the run list is BESIDE the
+    window (LLR-124.2), which is what distinguishes this regime from the
+    fallback one where the same width clause also holds.
+    """
+    widest = _b78_widest_emitted_hex_row()
+    measured = _b78_regime_probe(tmp_path, _B78_INC5_WIDE)
+
+    assert measured["regimes"] == ["diff-wide"], (
+        f"{_B78_INC5_WIDE} is at or above the wide breakpoint and must select "
+        f"exactly the wide regime; classes are {measured['regimes']}"
+    )
+    assert measured["hex_a_width"] >= widest, (
+        f"at {_B78_INC5_WIDE} the hex window must fit an unwrapped emitted row: "
+        f"#diff_hex_a content width {measured['hex_a_width']} < widest emitted "
+        f"row {widest} (measured by calling render_hex_view at test time)"
+    )
+    assert measured["hex_a_painted"] >= 1, (
+        f"an unwrapped window that paints no content row delivers nothing: "
+        f"#diff_hex_a painted content height is {measured['hex_a_painted']}"
+    )
+    assert measured["hex_a_painted_width"] >= widest, (
+        f"the window must be unwrapped ON SCREEN, not merely in the layout: "
+        f"painted width {measured['hex_a_painted_width']} < {widest}"
+    )
+    assert measured["list_shown"] and measured["list_width"] > 0, (
+        f"the wide regime puts the run list BESIDE the window column "
+        f"(LLR-124.2); it is shown={measured['list_shown']} at width "
+        f"{measured['list_width']}"
+    )
+    assert not measured["notice_shown"], (
+        "a deliverable terminal must not show the too-small notice"
+    )
+
+
+def test_at_b78_29_notice_names_every_unsatisfied_axis(tmp_path: Path) -> None:
+    """AT-B78-29 (GATE) - at 80x24 the notice names BOTH failed axes.
+
+    Intent: HLR-124 / LLR-124.4 - "when the terminal does not satisfy the
+    deliverability condition, the panel shall render a notice naming EVERY
+    unsatisfied axis and the value each requires". On the shipped tree 80x24
+    renders nothing in its results area and says nothing about why (spec P-33 /
+    P-33b: the 120x30 golden contains no `Runs` / `Image A` / `Image B` text at
+    all). The notice closes that hole.
+
+    Why "every" and not "the": the two axes are INDEPENDENT. 80x24 fails both,
+    which is what this node tests; TC-B78-32 covers the two single-axis cases
+    where a message naming the wrong axis would be actively misleading.
+
+    The required values are quoted from the constants, never as literals (rule
+    4). The discriminating mutation is therefore NOT "blank the notice" - that
+    is the trivial one - but the MAPPING mutation C-78-xxiii names: make the
+    width branch name the height axis and confirm this node reddens.
+
+    C-40: the notice's presence is co-asserted with the results area's ABSENCE,
+    so "the panel says it is too small" cannot be green beside an empty results
+    box that is still on screen.
+    """
+    measured = _b78_regime_probe(tmp_path, _B78_INC5_FLOOR)
+    width, height = _B78_INC5_FLOOR
+    text = measured["notice_text"]
+
+    assert width < _DIFF_MIN_W and height < _DIFF_MIN_H, (
+        f"precondition: {_B78_INC5_FLOOR} must fail BOTH axes for this node to "
+        f"be about 'every' axis; floors are {_DIFF_MIN_W} x {_DIFF_MIN_H}"
+    )
+    assert measured["regimes"] == ["diff-notice"], (
+        f"a terminal failing both axes must select the notice regime; classes "
+        f"are {measured['regimes']}"
+    )
+    assert measured["notice_shown"], f"the notice must be rendered at {_B78_INC5_FLOOR}"
+    assert not measured["columns_shown"], (
+        "LLR-124.4: the notice replaces the results area, it does not sit above "
+        "an empty one"
+    )
+    assert "width" in text, f"the notice must name the failed WIDTH axis; text={text!r}"
+    assert "height" in text, (
+        f"the notice must name the failed HEIGHT axis; text={text!r}"
+    )
+    assert str(_DIFF_MIN_W) in text, (
+        f"the notice must name the columns the width axis requires; text={text!r}"
+    )
+    assert str(_DIFF_MIN_H) in text, (
+        f"the notice must name the rows the height axis requires; text={text!r}"
+    )
+    # SEC-F2 (LLR-124.4, normative): author-constant text and geometry integers
+    # only. The panel's own file-derived strings are the two image labels and the
+    # external path inputs; none of them may reach this sink.
+    assert "A.s19" not in text and "B.s19" not in text, (
+        f"no file-derived string may be interpolated into the notice; text={text!r}"
+    )
+
+
+def test_tc_b78_29_the_layout_flips_exactly_once(tmp_path: Path) -> None:
+    """TC-B78-29 - one column below the wide breakpoint, and one at it.
+
+    Intent: HLR-124's boundary catalog - the layout flips EXACTLY once, at
+    _DIFF_WIDE_MIN. Both sizes are written from the constant, so this node
+    cannot drift when the measurement does; what it pins is that the flip is
+    where the constant says, not three columns either side of it.
+
+    Both regimes keep the unwrapped-row guarantee - that is the point of the
+    breakpoint being about the LIST rather than about the window - so the
+    discriminating observable is the list, not the window width.
+    """
+    widest = _b78_widest_emitted_hex_row()
+    at = _b78_regime_probe(tmp_path, (_DIFF_WIDE_MIN, 40))
+    below = _b78_regime_probe(tmp_path, (_DIFF_WIDE_MIN - 1, 40))
+
+    assert at["regimes"] == ["diff-wide"], (
+        f"at exactly _DIFF_WIDE_MIN the layout must be wide; {at['regimes']}"
+    )
+    assert below["regimes"] == ["diff-fallback"], (
+        f"one column below _DIFF_WIDE_MIN the layout must be the fallback; "
+        f"{below['regimes']}"
+    )
+    assert at["list_shown"] and at["list_width"] > 0, (
+        "the wide regime reserves a run-list column"
+    )
+    assert not below["list_shown"], (
+        "the fallback regime reserves NO run-list column - the list is an "
+        "overlay (LLR-124.3)"
+    )
+    for label, measured in ((_DIFF_WIDE_MIN, at), (_DIFF_WIDE_MIN - 1, below)):
+        assert measured["hex_a_width"] >= widest, (
+            f"width {label}: the window must stay unwrapped on BOTH sides of the "
+            f"breakpoint; {measured['hex_a_width']} < {widest}. That is what the "
+            f"breakpoint is for - it moves the LIST, never the guarantee"
+        )
+
+
+def test_tc_b78_30_a_resize_across_the_breakpoint_follows(tmp_path: Path) -> None:
+    """TC-B78-30 - a resize across the breakpoint moves the layout with it.
+
+    Intent: HLR-124's boundary catalog - "a resize ACROSS the breakpoint after a
+    comparison is rendered: the layout follows and the windows do not blank".
+    Inc-4 deliberately added no resize handling, so this is the node that says
+    the regime is driven by the live terminal size rather than fixed at mount.
+
+    The windows-do-not-blank clause is asserted on the rendered TEXT, because a
+    regime change that dropped the hex windows' content would satisfy every
+    geometry clause in this file.
+    """
+
+    async def _after(app, pilot):
+        before_regimes = sorted(
+            name
+            for name in app.query_one("#ab_diff_panel").classes
+            if name.startswith("diff-")
+        )
+        before_rows = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+        await pilot.resize_terminal(_DIFF_WIDE_MIN - 1, 40)
+        after_regimes = sorted(
+            name
+            for name in app.query_one("#ab_diff_panel").classes
+            if name.startswith("diff-")
+        )
+        after_rows = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+        return before_regimes, before_rows, after_regimes, after_rows
+
+    runs = [(0x1000, 0x1004, "changed")]
+    before_regimes, before_rows, after_regimes, after_rows = _b78_drive_compare(
+        tmp_path, (_DIFF_WIDE_MIN, 40), _diff_result(runs), after=_after
+    )
+
+    assert before_regimes == ["diff-wide"], (
+        f"precondition: the comparison must be rendered in the WIDE regime, "
+        f"otherwise the resize crosses nothing; {before_regimes}"
+    )
+    assert after_regimes == ["diff-fallback"], (
+        f"the layout must follow a resize across the breakpoint; after the "
+        f"resize the classes are {after_regimes}"
+    )
+    assert before_rows, "precondition: the window must have emitted rows to keep"
+    assert after_rows, (
+        "the windows must not blank across a regime change; #diff_hex_a emitted "
+        "no hex row after the resize"
+    )
+
+
+def test_tc_b78_31_the_width_floor_is_the_notice_boundary(tmp_path: Path) -> None:
+    """TC-B78-31 - the notice appears exactly once, one column below the floor.
+
+    Intent: HLR-124's boundary catalog - `size=(_DIFF_MIN_W, ...)` and
+    `(_DIFF_MIN_W - 1, ...)`. _DIFF_MIN_W is the measured width at which a
+    full-width window first fits an unwrapped row (93 -> 78, 94 -> 79), so the
+    node also asserts the consequence, not only the class: AT the floor the
+    window is unwrapped, which is what makes the floor the right number rather
+    than merely a number the code and the test agree on.
+    """
+    widest = _b78_widest_emitted_hex_row()
+    at = _b78_regime_probe(tmp_path, (_DIFF_MIN_W, 40))
+    below = _b78_regime_probe(tmp_path, (_DIFF_MIN_W - 1, 40))
+
+    assert not at["notice_shown"], (
+        f"at exactly _DIFF_MIN_W the terminal is deliverable and must NOT show "
+        f"the notice; regimes {at['regimes']}"
+    )
+    assert at["hex_a_width"] >= widest, (
+        f"_DIFF_MIN_W is only the right floor if the window is unwrapped AT it: "
+        f"{at['hex_a_width']} < {widest}"
+    )
+    assert below["notice_shown"], (
+        f"one column below _DIFF_MIN_W the terminal is not deliverable and must "
+        f"show the notice; regimes {below['regimes']}"
+    )
+    assert "width" in below["notice_text"], (
+        f"the notice at the width boundary must name the width axis; "
+        f"text={below['notice_text']!r}"
+    )
+
+
+def test_tc_b78_32_a_single_axis_failure_names_that_axis(tmp_path: Path) -> None:
+    """TC-B78-32 - a one-axis failure names THAT axis and not the other.
+
+    Intent: LLR-124.4 - the two conditions are independent, so a terminal that
+    passes height and fails width must not be told about its height, and vice
+    versa. This is the node that makes "every unsatisfied axis" mean something
+    stronger than "all of them, always": it is the mapping, and C-78-xxiii is
+    explicit that a mapping is tested by mutating to the WRONG element, not by
+    blanking the output.
+
+    Both arms are read per-arm (CC-1) - a single aggregate verdict over a
+    predicate whose whole content is "these two cases differ" destroys exactly
+    the information the node carries.
+    """
+    height_only = _b78_regime_probe(tmp_path, (120, _DIFF_MIN_H - 1))
+    width_only = _b78_regime_probe(tmp_path, (_DIFF_MIN_W - 1, 40))
+
+    assert 120 >= _DIFF_MIN_W, (
+        f"precondition: the height-only arm must PASS the width axis, or it is "
+        f"not a single-axis case; 120 < {_DIFF_MIN_W}"
+    )
+    assert 40 >= _DIFF_MIN_H, (
+        f"precondition: the width-only arm must PASS the height axis; "
+        f"40 < {_DIFF_MIN_H}"
+    )
+
+    height_text = height_only["notice_text"]
+    assert height_only["notice_shown"], "the height-only arm must show the notice"
+    assert "height" in height_text, (
+        f"height-only arm: the notice must name the height axis; {height_text!r}"
+    )
+    assert "width" not in height_text, (
+        f"height-only arm: the notice must NOT name the width axis, which this "
+        f"terminal satisfies; {height_text!r}"
+    )
+
+    width_text = width_only["notice_text"]
+    assert width_only["notice_shown"], "the width-only arm must show the notice"
+    assert "width" in width_text, (
+        f"width-only arm: the notice must name the width axis; {width_text!r}"
+    )
+    assert "height" not in width_text, (
+        f"width-only arm: the notice must NOT name the height axis, which this "
+        f"terminal satisfies; {width_text!r}"
+    )
+
+
+def test_tc_b78_33_the_regime_applies_with_no_comparison(tmp_path: Path) -> None:
+    """TC-B78-33 - the regime applies before any comparison, and nothing raises.
+
+    Intent: HLR-124's boundary catalog - "no comparison rendered: the regime
+    still applies, nothing raises". The regime is a property of the terminal, not
+    of the panel's contents, and the notice regime in particular has to be right
+    on the empty panel: an operator who opens the diff screen at 80x24 and sees
+    an empty box has been told nothing, which is the defect HLR-124 exists to
+    fix - and that operator has not compared anything yet.
+
+    Every other node in this block also runs without a comparison; this one says
+    so as its subject rather than relying on it silently.
+    """
+    for size, expected in (
+        (_B78_INC5_WIDE, "diff-wide"),
+        ((_DIFF_WIDE_MIN - 1, 40), "diff-fallback"),
+        (_B78_INC5_FLOOR, "diff-notice"),
+    ):
+        measured = _b78_regime_probe(tmp_path, size)
+        assert measured["regimes"] == [expected], (
+            f"{size} with no comparison rendered must select {expected}; "
+            f"classes are {measured['regimes']}"
+        )
+        assert measured["notice_shown"] == (expected == "diff-notice"), (
+            f"{size}: notice shown={measured['notice_shown']} for regime {expected}"
+        )
+
+
+def test_tc_b78_51_escape_dismisses_without_shadowing(tmp_path: Path) -> None:
+    """TC-B78-51 - `escape` dismisses the overlay, and only where it should.
+
+    Intent: spec Sec.8's A-2 - "the fallback overlay's dismissal mechanism,
+    which must not shadow the palette's `escape`". Flagged `assumed - verify in
+    target framework at Phase 3`, and C-78-xxii is explicit that an assumed item
+    is closed by a predicate that can go red or it is not closed.
+
+    Two directions, both executed:
+
+    1. GATE. Focus inside the panel, overlay open -> `escape` dismisses it, and
+       focus returns to where it was. The focus clause is not a courtesy: these
+       bindings live on the panel, so they fire only while focus is inside it,
+       and dismissing blurs the list. Executed without the restore, `f` after
+       `escape` did nothing at all.
+    2. PIN, and labelled one. With the command palette open its input holds
+       focus, and `#palette_input` is not a descendant of `#ab_diff_panel`, so
+       the panel's binding is not in that focus chain and the overlay stays open.
+       This is invariant BY CONSTRUCTION - the reddening mutation would have to
+       move the binding to the App or the Screen, which is a structural change,
+       not a value substitution - so it is recorded as a regression pin and never
+       counted as a discharged gate.
+
+    Executed premise correction, reported rather than absorbed: A-2 and LLR-119.3
+    both speak of "the palette's `escape`-to-close". THERE IS NONE.
+    `command_bar.py` binds no key and handles no `escape`; the palette closes
+    only via `_dispatch_palette_entry` and `on_list_view_selected`
+    (`command_bar.py:279`, `:295`). Arm 2 therefore asserts what is actually
+    true - that the panel's `escape` does not reach outside the panel - which is
+    the property A-2 wanted, over a premise that does not hold.
+    """
+    from s19_app.tui.command_bar import CommandBar
+
+    async def _after(app, pilot):
+        panel = app.query_one("#ab_diff_panel")
+        bar = app.query_one(CommandBar)
+        listing = _b78_run_list(app)
+        assert panel.has_class("diff-fallback"), (
+            "precondition: the overlay exists only in the fallback regime"
+        )
+        assert listing.display, (
+            "precondition: the driver must have opened the overlay through 'f'"
+        )
+        assert app.focused is listing, (
+            f"precondition: opening the overlay must focus the list, or the "
+            f"panel's bindings are not in the focus chain; focus is {app.focused!r}"
+        )
+
+        # Arm 1 - the gate.
+        await pilot.press("escape")
+        await pilot.pause()
+        arm1 = (
+            panel.has_class("runs-open"),
+            listing.display,
+            None if app.focused is None else app.focused.id,
+            bar.palette_is_open,
+        )
+
+        # Arm 2 - the pin. Re-open, then hand focus to the palette.
+        await _b78_open_run_list(app, pilot)
+        await pilot.press("ctrl+k")
+        await pilot.pause()
+        focus_id = None if app.focused is None else app.focused.id
+        await pilot.press("escape")
+        await pilot.pause()
+        arm2 = (focus_id, panel.has_class("runs-open"), bar.palette_is_open)
+        return arm1, arm2
+
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(4)]
+    arm1, arm2 = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    open_after, shown_after, focus_after, palette_after = arm1
+    assert not open_after, "escape must dismiss the run-list overlay"
+    assert not shown_after, (
+        "dismissing must actually hide the list, not only drop the class"
+    )
+    assert focus_after == "diff_compare_button", (
+        f"dismissing must hand focus back to what held it, or the key that "
+        f"opened the overlay can never reopen it; focus is {focus_after!r}"
+    )
+    assert not palette_after, (
+        "the panel's escape must not have touched the command palette"
+    )
+
+    palette_focus, open_after_palette, palette_open = arm2
+    assert palette_focus == "palette_input", (
+        f"precondition: the palette must hold focus for this arm to be about "
+        f"shadowing at all; focus is {palette_focus!r}"
+    )
+    assert open_after_palette, (
+        "with focus in the palette the panel's escape binding must not fire - "
+        "the overlay must still be open"
+    )
+    assert palette_open, (
+        "executed premise: the palette has no escape-to-close on this branch, "
+        "so there is nothing for the overlay's escape to shadow"
+    )
+
+
+def test_tc_b78_52_pagination_reaches_bytes_past_the_pane(tmp_path: Path) -> None:
+    """TC-B78-52 - the selected run's bytes past the visible rows are reachable.
+
+    Intent: LLR-124.3 - "the selected run's bytes beyond the visible rows shall
+    be reachable by pagination". Inc-4 left this open by design (its R-6: a run
+    longer than the pane overflows invisibly) and named Inc-5 as the owner.
+
+    The fixture's run is deliberately far longer than any supported pane, so the
+    un-paged window is bounded by the run +/- context FLOOR rather than by the
+    pane, which is the only state in which anything is out of reach. The
+    precondition is asserted: with a short run the whole window fits and every
+    clause below would be vacuously true.
+
+    Page 0 is asserted to be unchanged, because that is the clause that keeps
+    every HLR-123 acceptance sound - AT-B78-22's exact address set is read from
+    an un-paged window, and a pagination that re-based page 0 would silently
+    move it.
+    """
+    long_run = (0x1000, 0x1000 + 0x400, "changed")
+
+    async def _after(app, pilot):
+        first = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+        capacity = app.query_one("#ab_diff_panel")._window_row_capacity()
+        app.set_focus(app.query_one("#diff_compare_button"))
+        await pilot.press("right_square_bracket")
+        await pilot.pause()
+        paged = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+        paged_b = _b78_window_rows(_b78_window_text(app, "#diff_hex_b"))
+        await pilot.press("left_square_bracket")
+        await pilot.pause()
+        back = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+        # Paging past the end must be a no-op, not an empty window.
+        for _ in range(200):
+            await pilot.press("right_square_bracket")
+        await pilot.pause()
+        far = _b78_window_rows(_b78_window_text(app, "#diff_hex_a"))
+        return first, capacity, paged, paged_b, back, far
+
+    first, capacity, paged, paged_b, back, far = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result([long_run]), after=_after
+    )
+
+    assert capacity > 0, (
+        "precondition: the pane must have a positive row capacity, or paging "
+        "has no page size to move by"
+    )
+    assert len(first) > capacity, (
+        f"precondition: the run must overflow the pane, or nothing is out of "
+        f"reach and this node tests nothing; the window emitted {len(first)} "
+        f"rows into a capacity of {capacity}"
+    )
+    assert paged, "a paged window must still render rows"
+    assert paged[0] > first[0], (
+        f"paging forward must move the window onto later bytes; first row went "
+        f"0x{first[0]:08X} -> 0x{paged[0]:08X}"
+    )
+    assert paged_b == paged, (
+        "both windows must page in lockstep - a diff whose columns disagree on "
+        "the address of a screen line is not a diff"
+    )
+    assert set(paged) - set(first[:capacity]), (
+        "paging must reach rows the first page did not show"
+    )
+    assert back == first, (
+        f"paging back must return the un-paged window exactly; got "
+        f"0x{back[0]:08X}..0x{back[-1]:08X} against 0x{first[0]:08X}.."
+        f"0x{first[-1]:08X}"
+    )
+    assert far, "paging past the last page must be a no-op, not an empty window"
+    assert far[-1] <= first[-1], (
+        f"paging must stay inside the run's own window; it reached "
+        f"0x{far[-1]:08X} against a window ending at 0x{first[-1]:08X}"
+    )
+
+
+def test_tc_b78_53_the_overlay_reserves_no_width(tmp_path: Path) -> None:
+    """TC-B78-53 - the run-list overlay costs the window nothing, open or shut.
+
+    Intent: LLR-124.3 - "the run list shall be presented without permanently
+    reserving columns or rows from it". The word doing the work is *permanently*,
+    but the honest reading is stronger and is what is implemented: the overlay
+    sits on its own CSS layer, so the window column keeps the full content width
+    even while the list is on top of it.
+
+    Asserted as an EQUALITY between the closed and open states, not as a
+    threshold. A `>= widest` clause in both states would pass an implementation
+    that shrinks the window by ten columns while the overlay is open, which is
+    exactly the "temporarily reserves" design this clause rules out.
+    """
+    widest = _b78_widest_emitted_hex_row()
+
+    async def _opened(app, pilot):
+        panel = app.query_one("#ab_diff_panel")
+        panel.action_close_run_overlay()
+        await pilot.pause()
+        closed_width = app.query_one("#diff_hex_a").size.width
+        await _b78_open_run_list(app, pilot)
+        listing = _b78_run_list(app)
+        return (
+            closed_width,
+            app.query_one("#diff_hex_a").size.width,
+            listing.display,
+            listing.size.width,
+        )
+
+    runs = [(i * 0x100, i * 0x100 + 4, "changed") for i in range(4)]
+    closed_width, open_width, list_shown, list_width = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_opened
+    )
+
+    assert list_shown and list_width > 0, (
+        f"precondition: the overlay must actually be showing something, or "
+        f"'costs nothing' is trivially true; shown={list_shown} "
+        f"width={list_width}"
+    )
+    assert open_width == closed_width, (
+        f"the overlay must not take columns from the window: #diff_hex_a is "
+        f"{closed_width} closed and {open_width} open"
+    )
+    assert open_width >= widest, (
+        f"and the width it keeps must still be an unwrapped one: {open_width} "
+        f"< {widest}"
+    )

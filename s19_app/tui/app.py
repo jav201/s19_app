@@ -6278,9 +6278,37 @@ class S19TuiApp(App):
             else:
                 widget.remove_class("width-narrow")
 
+    def _apply_diff_regime(self, width: int, height: int) -> None:
+        """
+        Summary:
+            Hand the terminal size to the A2B diff panel so it can select
+            HLR-124's width/height regime. The threshold arithmetic and the
+            constants live in ``AbDiffPanel`` (LLR-124.1) — this is the
+            delivery of the two integers, deliberately kept out of the panel's
+            own event surface because the panel's ``Resize`` reports the
+            PANEL's size, and the regime constants are TERMINAL dimensions.
+
+        Args:
+            width (int): Terminal width in columns.
+            height (int): Terminal height in rows.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``on_resize`` -> ``AbDiffPanel.apply_regime`` -> a CSS class on
+              ``#ab_diff_panel``.
+
+        Dependencies:
+            Used by:
+                - ``on_resize``
+        """
+        self.query_one("#ab_diff_panel", AbDiffPanel).apply_regime(width, height)
+
     def on_resize(self, event: events.Resize) -> None:
         """Update the two-regime width layout class on terminal resize."""
         self._apply_width_regime(event.size.width)
+        self._apply_diff_regime(event.size.width, event.size.height)
 
     def action_page_next_context(self) -> None:
         """
