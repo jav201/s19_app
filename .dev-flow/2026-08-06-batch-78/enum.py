@@ -65,7 +65,15 @@ TERMS: list[tuple[str, str, tuple[str, ...]]] = [
     ("AT-B78-27 retirement",     r"AT-B78-27",                             ("3.", "5.3", "5.5", "5.6", "5.7", "6.4a", "7.", "10.")),
     ("135 / 136",                r"\b13[56]\b",                            ("0", "2.7", "4.", "6.3", "6.4a", "10.")),
     ("test_tc029",               r"test_tc029",                            ("4.", "5.6", "6.4a", "7.")),
-    ("AT-B78-22 mutation",       r"DISPLAY_CONTEXT_BYTES == 16|high = end", ("3.", "6.4a", "7.")),
+    # §6.5 added at the Inc-4 gate (2026-08-06). A DELIBERATE widening, recorded
+    # rather than made silently, because widening an allowlist so a red goes away
+    # is exactly how a gate stops gating. Justification: §6.5 is where requirement
+    # amendments live, and Amendment D changes a threshold whose discharge IS this
+    # mutation ("reddens the exact arm, not the containment one"). The hit is
+    # current, correct content in a section the term list never anticipated — the
+    # same shape as C-78-xi, where the tracked terms did not cover §7's cells.
+    # Widening the RULE, not excusing the instance.
+    ("AT-B78-22 mutation",       r"DISPLAY_CONTEXT_BYTES == 16|high = end", ("3.", "6.4a", "6.5", "7.")),
     ("AT-B78-33 baseline",       r"AT-B78-33",                             ("3.", "5.3", "5.4", "5.7", "6.4a", "7.")),
     ("shall outside Statements", r"\bshall\b",                             ("0", "3.", "4.", "5.3", "5.6", "6.4a", "6.5", "9.")),
 ]
