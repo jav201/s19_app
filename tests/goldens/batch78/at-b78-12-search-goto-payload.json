@@ -1,0 +1,83 @@
+[
+  {
+    "goto": "0x1010",
+    "last_search_address": 4102,
+    "log_line_4_after_goto": "Goto 0x00001010",
+    "log_line_4_after_search": "Found at 0x00001006",
+    "per_view_goto_focus_address": 4112,
+    "query": "BOOT",
+    "screen": "workspace"
+  },
+  {
+    "goto": "0xFFFFFFFF",
+    "last_search_address": null,
+    "log_line_4_after_goto": "Address 0xFFFFFFFF not in loaded file.",
+    "log_line_4_after_search": "Search text not found.",
+    "per_view_goto_focus_address": null,
+    "query": "ZZZ_NO_MATCH",
+    "screen": "workspace"
+  },
+  {
+    "goto": "",
+    "last_search_address": null,
+    "log_line_4_after_goto": "Goto address is empty.",
+    "log_line_4_after_search": "Search text is empty.",
+    "per_view_goto_focus_address": null,
+    "query": "",
+    "screen": "workspace"
+  },
+  {
+    "goto": "0x1010",
+    "last_search_address": 4102,
+    "log_line_4_after_goto": "Goto 0x00001010",
+    "log_line_4_after_search": "Found at 0x00001006",
+    "per_view_goto_focus_address": 4112,
+    "query": "BOOT",
+    "screen": "a2l"
+  },
+  {
+    "goto": "0xFFFFFFFF",
+    "last_search_address": null,
+    "log_line_4_after_goto": "Address 0xFFFFFFFF not in loaded file.",
+    "log_line_4_after_search": "Search text not found.",
+    "per_view_goto_focus_address": null,
+    "query": "ZZZ_NO_MATCH",
+    "screen": "a2l"
+  },
+  {
+    "goto": "",
+    "last_search_address": null,
+    "log_line_4_after_goto": "Goto address is empty.",
+    "log_line_4_after_search": "Search text is empty.",
+    "per_view_goto_focus_address": null,
+    "query": "",
+    "screen": "a2l"
+  },
+  {
+    "goto": "0x1010",
+    "last_search_address": 4102,
+    "log_line_4_after_goto": "Goto 0x00001010",
+    "log_line_4_after_search": "Found at 0x00001006",
+    "per_view_goto_focus_address": 4112,
+    "query": "BOOT",
+    "screen": "mac"
+  },
+  {
+    "goto": "0xFFFFFFFF",
+    "last_search_address": null,
+    "log_line_4_after_goto": "Address 0xFFFFFFFF not in loaded file.",
+    "log_line_4_after_search": "Search text not found.",
+    "per_view_goto_focus_address": null,
+    "query": "ZZZ_NO_MATCH",
+    "screen": "mac"
+  },
+  {
+    "goto": "",
+    "last_search_address": null,
+    "log_line_4_after_goto": "Goto address is empty.",
+    "log_line_4_after_search": "Search text is empty.",
+    "per_view_goto_focus_address": null,
+    "query": "",
+    "screen": "mac"
+  }
+]

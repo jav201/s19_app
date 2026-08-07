@@ -61,6 +61,7 @@ from typing import (
 from rich.text import Text
 from textual import events
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.content import Content
 from textual.containers import (
     Container,
@@ -76,6 +77,8 @@ from textual.widgets import (
     DataTable,
     Input,
     Label,
+    ListItem,
+    ListView,
     Select,
     Static,
     TextArea,
@@ -6563,6 +6566,55 @@ class PatchEditorPanel(ScrollableContainer):
         )
 
 
+#: HLR-124 / LLR-124.1 — the three width/height regime constants. All three are
+#: TERMINAL dimensions, compared against `events.Resize.size`, exactly as the
+#: `S19TuiApp._apply_width_regime` precedent does (`app.py:6281`). Only the run
+#: LIST width is in content cells, and it is authored in `styles.tcss` as a
+#: border-box (22 content = CSS `width: 26`). They are named rather than inline
+#: so no acceptance can quote the value instead of the constant (C-39), and they
+#: are deliberately NOT the existing `width-narrow` breakpoint, which is read by
+#: 11 unrelated rules across workspace, map, patch and rail.
+#:
+#: `_DIFF_WIDE_MIN` — the first terminal width at which a 22-content-cell run
+#: list still leaves an unwrapped 79-cell window beside it, under `L <= C - 89`
+#: (measured 138 -> 78 wrap, 139 -> 79 fit).
+_DIFF_WIDE_MIN = 139
+#: `_DIFF_MIN_W` — the first terminal width at which a FULL-width window fits an
+#: unwrapped emitted hex row (measured 93 -> 78 wrap, 94 -> 79 fit).
+_DIFF_MIN_W = 94
+#: `_DIFF_MIN_H` — the first terminal height at which a window paints at least
+#: one **HEX ROW**. **RE-DERIVED at Phase 3 against the real implementation**
+#: (spec Sec.8 `A-1`, which flagged the spec's 29 as a `styles.height = 1`
+#: simulation).
+#:
+#: ⚠️ **The spec carries TWO metrics for this axis and they give different
+#: answers; this is the normative one.** Sec.2.8 D-1's height axis says "the
+#: window has at least one visible CONTENT row" -> 26. **`LLR-125.2`, normative,
+#: says "`#diff_hex_a` shall render at least one HEX ROW of content" -> 28.**
+#: They differ because `_render_run_windows` writes `"Image A - {header}\n{text}"`,
+#: so screen line 0 of each window is the HEADER: a painted content height of 1
+#: delivers ZERO bytes. Surfaced rather than averaged (engineering rule 7). At
+#: 26-27 the panel would declare the terminal deliverable, hide the notice and
+#: show a header and nothing else — strictly WORSE than 25, where the operator is
+#: at least told why. That is the silently empty results area HLR-124 exists to
+#: abolish, so `LLR-125.2` governs.
+#:
+#: Measured with the fallback layout forced (so the constant cannot decide its
+#: own measurement), the command-bar row hidden (the state `A-1`'s quantity is
+#: defined in — "post-US-78-8 + US-78-1") and a run longer than any pane, so the
+#: window is never the binding limit. VISIBLE HEX ROWS: 26 -> 0, 27 -> 0,
+#: **28 -> 1**, 30 -> 2. Width-independent, confirmed at W = 94, 120 and 138 —
+#: the spec's width-independence claim reproduces exactly; only the value moved.
+#: The 30 -> 2 row is R-1's accepted 120x30 viewport, to the row.
+#:
+#: ⚠️ This is the POST-Inc-10 floor, because that is the state the batch ships.
+#: As the tree stands at Inc-5 the command-bar row still spends three rows, so
+#: between Inc-5 and Inc-10 the heights 28..30 select the fallback regime while
+#: painting no hex row. Recorded, not hidden; `TC-B78-54` pins both sides of the
+#: floor in the end state the constant is defined for.
+_DIFF_MIN_H = 28
+
+
 class AbDiffPanel(Container):
     """Inline A↔B image-diff panel for the A2B Firmware Diff screen.
 
@@ -6643,6 +6695,32 @@ class AbDiffPanel(Container):
     #: ``Select`` sentinel for "use the external-path input instead".
     _EXTERNAL_OPTION = "__external__"
 
+    #: HLR-124's regime classes. Exactly one is set at a time; ``runs-open`` is
+    #: the fallback regime's overlay latch and rides alongside it.
+    _REGIME_WIDE = "diff-wide"
+    _REGIME_FALLBACK = "diff-fallback"
+    _REGIME_NOTICE = "diff-notice"
+    _REGIME_CLASSES = (_REGIME_WIDE, _REGIME_FALLBACK, _REGIME_NOTICE)
+    _RUNS_OPEN = "runs-open"
+
+    #: LLR-124.3's overlay + pagination keys. Widget-scoped, never App-level
+    #: (D-2 ruled out a new App binding; `AT-B78-32` pins `app.py`'s BINDINGS
+    #: block at a zero-line diff). All `show=False`: LLR-126.1 requires the
+    #: Footer's `show and enabled` set to be set-EQUAL to its pre-change set of
+    #: 14, so a shown chip here would redden `AT-B78-28` at Inc-6.
+    #:
+    #: None of these four keys is bound at application level (`app.py:1338-1392`
+    #: — `f`, `escape`, `[` and `]` are all free), so a press that reaches the
+    #: panel cannot shadow an App action. That is HLR-122's anti-shadow clause
+    #: applied one container up: these bindings sit on an ANCESTOR of the run
+    #: list, so they are in the focus chain whenever `AT-B78-19` runs.
+    BINDINGS = [
+        Binding("f", "toggle_run_overlay", "Run list", show=False),
+        Binding("escape", "close_run_overlay", "Close the run list", show=False),
+        Binding("right_square_bracket", "page_window_down", "Window page +", show=False),
+        Binding("left_square_bracket", "page_window_up", "Window page -", show=False),
+    ]
+
     class CompareRequested(Message):
         """The operator asked to compare two images (LLR-005.1).
 
@@ -6712,6 +6790,17 @@ class AbDiffPanel(Container):
         self._mem_map_b: dict = {}
         #: Whether a comparison result has been rendered (the report guard).
         self._has_result: bool = False
+        #: The run the hex windows are currently showing, so the pagination
+        #: actions can re-render it without going back through the list.
+        self._selected_run: int = 0
+        #: HLR-124's paginable viewport (LLR-124.3): which page of the selected
+        #: run's window is on screen. Reset to 0 by every selection change and
+        #: by every comparison, so the un-paged render is always what a fresh
+        #: selection shows.
+        self._window_page: int = 0
+        #: What held focus when the run-list overlay was opened, so dismissing
+        #: it does not strand the operator with no focus at all.
+        self._focus_before_overlay: Optional[Widget] = None
 
     def compose(self) -> ComposeResult:
         """Lay out the inline selection row, status line and result columns.
@@ -6719,10 +6808,20 @@ class AbDiffPanel(Container):
         Summary:
             Yield the inline image-pair selection row (two variant ``Select``
             dropdowns + two external-path ``Input``s + Compare/Report buttons
-            + a no-project destination ``Input``), a status ``Static``, and the
-            three result columns (``#diff_range_list`` / ``#diff_hex_a`` /
-            ``#diff_hex_b``) reused from the placeholder. No placeholder
-            constants are composed (LLR-005.2).
+            + a no-project destination ``Input``), a status ``Static``, the
+            result area and the regime notice.
+
+            The result area is ``#diff_range_list`` (a selectable ``ListView``,
+            HLR-122) beside ``#diff_window_column``, which STACKS the
+            ``#diff_hex_a`` / ``#diff_hex_b`` window ``Static``s. The stack is
+            HLR-124's: one emitted hex row is 79 cells and the widest supported
+            terminal offers 132 content cells, so two windows side by side
+            cannot both be unwrapped at any supported width — the horizontal
+            budget only ever fits ONE window, and the two share it vertically.
+
+            ``#diff_size_notice`` carries LLR-124.4's explicit notice and is
+            displayed only in the notice regime. No placeholder constants are
+            composed (LLR-005.2).
 
         Args:
             None
@@ -6763,11 +6862,210 @@ class AbDiffPanel(Container):
             markup=False,
         )
         yield Horizontal(
-            Static("Runs", id="diff_range_list", markup=True),
-            Static("Image A", id="diff_hex_a", markup=False),
-            Static("Image B", id="diff_hex_b", markup=False),
+            ListView(id="diff_range_list"),
+            Vertical(
+                Static("Image A", id="diff_hex_a", markup=False),
+                Static("Image B", id="diff_hex_b", markup=False),
+                id="diff_window_column",
+            ),
             id="diff_columns",
         )
+        yield Static("", id="diff_size_notice", classes="sev-warning", markup=False)
+
+    def apply_regime(self, width: int, height: int) -> str:
+        """Select and apply HLR-124's width/height regime for a terminal size.
+
+        Summary:
+            Set exactly one of the three regime classes on the panel and refresh
+            the notice text. The panel stays presentational: this reads two
+            integers and toggles CSS classes; every column and row figure lives
+            in ``styles.tcss`` (LLR-124.1's "its own class, not
+            ``width-narrow``").
+
+        Args:
+            width (int): Terminal width in columns.
+            height (int): Terminal height in rows.
+
+        Returns:
+            str: The regime class applied — one of :attr:`_REGIME_CLASSES`.
+
+        Data Flow:
+            - ``S19TuiApp.on_resize`` -> here -> CSS class -> layout.
+
+        Dependencies:
+            Used by:
+                - ``S19TuiApp._apply_diff_regime``
+        """
+        previous = next(
+            (name for name in self._REGIME_CLASSES if self.has_class(name)), None
+        )
+        regime = self._regime_for(width, height)
+        for name in self._REGIME_CLASSES:
+            self.set_class(name == regime, name)
+        if regime != self._REGIME_FALLBACK:
+            # The overlay exists only in the fallback regime; leaving the latch
+            # set would make a later fallback resize open on a stale state.
+            self.remove_class(self._RUNS_OPEN)
+        self.query_one("#diff_size_notice", Static).update(
+            self._notice_text(width, height)
+        )
+        if regime != previous and self._has_result:
+            # A regime change moves the pane, and `_render_run_windows` derives
+            # its row count from the pane AT RENDER TIME (LLR-123.2) — so without
+            # this the window keeps a row list computed for the old geometry.
+            # Measured: 139x40 -> 138x40 moves capacity 1 -> 5 while the rendered
+            # window does not change. AFTER the refresh, because the class is
+            # what moves the pane and the new size is not readable until it lands.
+            self.call_after_refresh(self._render_run_windows, self._selected_run)
+        return regime
+
+    @classmethod
+    def _regime_for(cls, width: int, height: int) -> str:
+        """Map a terminal size onto one of HLR-124's three regimes.
+
+        Summary:
+            The deliverability condition is TWO-AXIS and the axes are
+            independent — ``80x30`` passes height and fails width, ``120x24``
+            passes width and fails height — so both are tested before the wide
+            breakpoint, which is a refinement WITHIN deliverability.
+
+        Args:
+            width (int): Terminal width in columns.
+            height (int): Terminal height in rows.
+
+        Returns:
+            str: The regime class name.
+        """
+        if width < _DIFF_MIN_W or height < _DIFF_MIN_H:
+            return cls._REGIME_NOTICE
+        if width >= _DIFF_WIDE_MIN:
+            return cls._REGIME_WIDE
+        return cls._REGIME_FALLBACK
+
+    @staticmethod
+    def _notice_text(width: int, height: int) -> str:
+        """Compose LLR-124.4's notice, naming EVERY unsatisfied axis.
+
+        Summary:
+            One line per failed axis, each naming the measured value and the
+            value that axis requires. A single "terminal too small" string
+            would be wrong in each single-axis case, and a SINGULAR "the
+            unsatisfied axis" would be wrong at 80x24, which fails both.
+
+        Args:
+            width (int): Terminal width in columns.
+            height (int): Terminal height in rows.
+
+        Returns:
+            str: The notice text.
+        """
+        # SEC-F2 (normative, LLR-124.4): author-constant text and integers taken
+        # from the terminal geometry and the regime constants ONLY. No loaded
+        # path, image label or artifact name is interpolated here — "make the
+        # error message more helpful" is precisely how a file-derived string
+        # reaches a new sink, and this one is bounded before it exists.
+        lines = ["The A2B diff result windows need a larger terminal."]
+        if width < _DIFF_MIN_W:
+            lines.append(f"  width {width} - needs at least {_DIFF_MIN_W} columns")
+        if height < _DIFF_MIN_H:
+            lines.append(f"  height {height} - needs at least {_DIFF_MIN_H} rows")
+        return "\n".join(lines)
+
+    def check_action(self, action: str, parameters: Tuple[object, ...]) -> Optional[bool]:
+        """Gate the overlay / pagination keys on the regime that owns them.
+
+        Summary:
+            Returning ``False`` makes the binding inactive AND lets the key fall
+            through, which is what keeps ``escape`` from shadowing the command
+            palette's own dismissal: outside the open overlay this panel does
+            not claim the key at all (spec Sec.8 ``A-2``).
+
+        Args:
+            action (str): The action name Textual is about to run.
+            parameters (Tuple[object, ...]): Its parameters (unused).
+
+        Returns:
+            Optional[bool]: ``False`` to disable and hide the binding, ``True``
+            otherwise.
+        """
+        if action == "close_run_overlay":
+            return self.has_class(self._RUNS_OPEN)
+        if action in ("page_window_down", "page_window_up"):
+            # Overflow is a property of the RUN against the PANE, never of the
+            # regime. Gating these to the fallback was a capability INVERSION:
+            # measured on a 0x400-byte run, the wide regime's capacity is 1 at
+            # both 160x40 and 139x40 while 132x44's is 7, so the operator on the
+            # WIDEST supported terminal saw 1 of 66 rows with no key to reach the
+            # rest, and the one on a narrower terminal reached all of them.
+            return not self.has_class(self._REGIME_NOTICE)
+        if action == "toggle_run_overlay":
+            return self.has_class(self._REGIME_FALLBACK)
+        return True
+
+    def action_toggle_run_overlay(self) -> None:
+        """Show / hide the fallback regime's run-list overlay (LLR-124.3).
+
+        Summary:
+            Opening focuses the list, because an overlay the arrow keys cannot
+            drive is a picture of a run list. Closing hands focus back to
+            whatever held it, which is not a courtesy: these bindings live on
+            the PANEL, so they fire only while focus is inside it — and
+            dismissing the overlay blurs the list, which would leave focus at
+            ``None`` and make the very key that opened the overlay unable to
+            reopen it. Executed before the restore was added: open, ``escape``,
+            then ``f`` left ``runs-open`` False.
+        """
+        if self.has_class(self._RUNS_OPEN):
+            self.action_close_run_overlay()
+            return
+        self._focus_before_overlay = self.screen.focused
+        self.add_class(self._RUNS_OPEN)
+        self.query_one("#diff_range_list", ListView).focus()
+
+    def action_close_run_overlay(self) -> None:
+        """Dismiss the run-list overlay and restore focus (LLR-124.3)."""
+        self.remove_class(self._RUNS_OPEN)
+        restore, self._focus_before_overlay = self._focus_before_overlay, None
+        if restore is not None:
+            restore.focus()
+
+    def action_page_window_down(self) -> None:
+        """Page both hex windows forward over the selected run (LLR-124.3)."""
+        self._page_windows(1)
+
+    def action_page_window_up(self) -> None:
+        """Page both hex windows back over the selected run (LLR-124.3)."""
+        self._page_windows(-1)
+
+    def _page_windows(self, direction: int) -> None:
+        """Move the window viewport one page and re-render both windows.
+
+        Summary:
+            Page 0 is byte-identical to the un-paged render, so every
+            acceptance that does not page observes exactly what Inc-4 shipped;
+            the paged branch is reached only after the operator asks for it.
+            ``_render_run_windows`` clamps the page against the run's own span,
+            so paging past either end is a no-op rather than an empty window.
+
+            Both windows move together — a diff is readable only while A and B
+            show the same address on the same screen line — which they do by
+            construction here, because one page index drives one row list for
+            both.
+
+        Args:
+            direction (int): ``+1`` to page forward, ``-1`` to page back.
+
+        Note:
+            Scrolling the widget was measured first and does not work: a
+            ``Static`` with no children reports ``is_scrollable == False``, so
+            ``scroll_page_down`` is a silent no-op on these windows.
+
+        Dependencies:
+            Uses:
+                - ``_render_run_windows``
+        """
+        self._window_page = max(0, self._window_page + direction)
+        self._render_run_windows(self._selected_run)
 
     def set_variants(self, variants: Sequence[Tuple[str, str]]) -> None:
         """Prefill the A / B variant ``Select`` dropdowns (LLR-005.1).
@@ -6874,7 +7172,7 @@ class AbDiffPanel(Container):
                 )
             )
 
-    def render_comparison(
+    async def render_comparison(
         self,
         runs: Sequence[Tuple[int, int, str]],
         mem_map_a: dict,
@@ -6905,18 +7203,27 @@ class AbDiffPanel(Container):
             - Apply the run-count + byte-budget display caps, store the capped
               runs + maps, render the range list, then the first run's windows.
 
+        Note:
+            **Coroutine as of batch-78 Inc-2.** The run list is now a
+            ``ListView`` whose rows are widgets carrying DOM ids, and
+            ``ListView.clear()`` only *posts* a prune — the old rows are still
+            registered when the next ``extend()`` runs. A second Compare
+            therefore raised ``DuplicateIds`` on ``diff_run_0``. The removal is
+            awaited, so callers must await this method.
+
         Dependencies:
             Uses:
                 - ``_render_run_list`` / ``_render_run_windows``
             Used by:
-                - ``S19TuiApp.on_ab_diff_panel_compare_requested``
+                - ``S19TuiApp.on_ab_diff_panel_compare_requested`` (awaits)
         """
         capped = self._apply_display_caps(runs)
         self._runs = capped
         self._mem_map_a = mem_map_a
         self._mem_map_b = mem_map_b
         self._has_result = True
-        self._render_run_list(len(runs), summary_a, summary_b)
+        self._window_page = 0
+        await self._render_run_list(len(runs), summary_a, summary_b)
         if capped:
             self._render_run_windows(0)
         else:
@@ -6955,7 +7262,7 @@ class AbDiffPanel(Container):
             capped.append((start, end, kind))
         return capped
 
-    def _render_run_list(
+    async def _render_run_list(
         self, total_runs: int, summary_a: str, summary_b: str
     ) -> None:
         """Render the Rich-coloured run list + artifact-usage notes.
@@ -6973,63 +7280,208 @@ class AbDiffPanel(Container):
 
         Dependencies:
             Uses:
-                - ``_KIND_MARKUP`` / ``_KIND_LABEL``
+                - ``_KIND_MARKUP`` / ``_KIND_LABEL`` / ``_run_note_item``
             Used by:
                 - ``render_comparison``
         """
-        from rich.markup import escape
+        listing = self.query_one("#diff_range_list", ListView)
+        # AWAITED, and both awaits are load-bearing (batch-78 Inc-2 review F1).
+        # `ListView.clear()` routes to `App._prune`, which only POSTS a
+        # `Prune()` message: without awaiting it the old rows are still
+        # registered when the new ones mount, and the second Compare raises
+        # `DuplicateIds` on `diff_run_0`. Awaiting the mount in turn means the
+        # rows are in `_nodes` before `index` is assigned below — otherwise
+        # `watch_index` highlights a row that is about to be pruned and, because
+        # the value does not change, never fires again, leaving NO row
+        # highlighted after a re-render.
+        await listing.clear()
 
-        lines = [
-            f"Runs: {total_runs}",
-            f"A artifacts: {escape(summary_a)}",
-            f"B artifacts: {escape(summary_b)}",
-            "",
+        items: List[ListItem] = [
+            self._run_note_item(f"Runs: {total_runs}"),
+            self._run_note_item(f"A artifacts: {summary_a}"),
+            self._run_note_item(f"B artifacts: {summary_b}"),
         ]
+        first_run_position = len(items)
         for index, (start, end, kind) in enumerate(self._runs):
             colour = self._KIND_MARKUP.get(kind, "#ffffff")
             label = self._KIND_LABEL.get(kind, kind)
-            lines.append(
-                f"[{colour}]{index:>3} 0x{start:08X}-0x{end:08X} "
-                f"{label}[/]"
+            items.append(
+                ListItem(
+                    Label(
+                        f"[{colour}]{index:>3} 0x{start:08X}-0x{end:08X} "
+                        f"{label}[/]",
+                        markup=True,
+                    ),
+                    id=f"diff_run_{index}",
+                    classes="diff-run-entry",
+                )
             )
         if len(self._runs) < total_runs:
-            lines.append("")
-            lines.append(
-                f"[#6b7280](showing {len(self._runs)} of {total_runs} runs — "
-                f"full report is complete)[/]"
+            items.append(
+                self._run_note_item(
+                    f"(showing {len(self._runs)} of {total_runs} runs — "
+                    f"full report is complete)"
+                )
             )
-        self.query_one("#diff_range_list", Static).update("\n".join(lines))
+        await listing.extend(items)
+        listing.index = first_run_position if self._runs else None
+
+    @staticmethod
+    def _run_note_item(text: str) -> ListItem:
+        """Build a non-selectable header / notice row for the run list.
+
+        Summary:
+            The run count, the two artifact-usage summaries and the display-cap
+            notice are context, not runs. They ride in the same ``ListView`` so
+            they stay beside the runs they describe, but carry ``disabled=True``
+            so ``ListView.action_cursor_up`` / ``action_cursor_down`` skip them
+            — which is what keeps the keyboard-reachable set equal to the run
+            indices and nothing else (LLR-122.1).
+
+        Args:
+            text (str): The line to render. Rendered ``markup=False``.
+
+        Returns:
+            ListItem: The disabled note row.
+        """
+        # C-17: the artifact-usage summaries are the one file-derived string
+        # that reaches this column, so the note rows are markup-INERT at
+        # construction (C11) rather than escaped at the call site. The widget
+        # swap is exactly where a `rich.markup.escape` call gets lost; a
+        # `markup=False` sink cannot lose it.
+        return ListItem(Label(text, markup=False), classes="diff-run-note", disabled=True)
+
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
+        """Re-render both hex windows for the newly highlighted run (LLR-123.1).
+
+        Summary:
+            The run list is the shipped selection surface (HLR-122), and this
+            is the only thing that makes it mean anything: moving the highlight
+            re-renders the A and B windows onto the run the operator is on.
+            Before batch-78 Inc-4 ``_render_run_windows`` had a single call
+            site, ``render_comparison``'s literal ``0``, so runs 1..N were
+            unreachable however the list was driven.
+
+        Args:
+            event (ListView.Highlighted): The highlight-change event. Its
+                ``item`` is ``None`` while the list is being rebuilt, and is a
+                header / notice row for the three context lines — neither
+                stands for a run, and neither re-renders anything.
+
+        Dependencies:
+            Uses:
+                - ``_render_run_windows``
+            Used by:
+                - Textual message dispatch for ``ListView.Highlighted``
+        """
+        # The run index rides on the row's shipped DOM id (`_render_run_list`),
+        # not on the row's position: the list also carries three disabled
+        # context rows at the top and a display-cap notice at the bottom, so
+        # position and run index are not the same number.
+        item = event.item
+        if item is None or item.id is None or not item.id.startswith("diff_run_"):
+            return
+        # A new selection always starts on page 0 (LLR-124.3): the operator asked
+        # for a different run, not for a different page of the old one.
+        self._window_page = 0
+        self._render_run_windows(int(item.id[len("diff_run_") :]))
+
+    def _window_row_capacity(self) -> int:
+        """Hex rows the pane can actually paint, header row excluded (LLR-123.2).
+
+        Summary:
+            The row count is a function of the RENDERED pane, read at render
+            time — never of :attr:`DISPLAY_CONTEXT_BYTES`, which is a compile-
+            time constant and made the window identical at every terminal
+            height (executed pre-change: 132x44 and 132x60 both emitted 4
+            lines, into panes of 13 and 29 content rows).
+
+        Returns:
+            int: ``min(A, B) - 1`` content rows, floored at 0. The MINIMUM of
+            the two windows is the binding one because a diff is only readable
+            when both columns show the SAME addresses on the same screen line;
+            the two are siblings under one ``1fr`` row and measure equal
+            (executed at 132x44, 132x60, 160x40, 120x30 and 80x24), so this is
+            each window's own height wherever they agree and the honest bound
+            where a future layout makes them differ. The ``- 1`` is the header
+            line, which shares the widget with the hex rows.
+
+        Dependencies:
+            Used by:
+                - ``_render_run_windows``
+        """
+        heights = (
+            self.query_one("#diff_hex_a", Static).size.height,
+            self.query_one("#diff_hex_b", Static).size.height,
+        )
+        return max(0, min(heights) - 1)
 
     def _render_run_windows(self, run_index: int) -> None:
-        """Render the selected run's bounded hex windows for A and B.
+        """Render the selected run's pane-sized hex windows for A and B.
 
         Summary:
             Render image A's and image B's hex+ASCII windows around the
             selected run, each window respecting the ``hexview`` row caps
-            (``MAX_HEX_ROWS``). The window spans the run ± a small context.
+            (``MAX_HEX_ROWS``). The window ALWAYS spans the run ±
+            :attr:`DISPLAY_CONTEXT_BYTES` (the floor, HLR-123), and is then
+            grown to fill the rendered pane, keeping the run centred.
 
         Args:
             run_index (int): Index into :attr:`_runs` of the run to window.
 
+        Data Flow:
+            - Compute the mandatory run ± context span, then grow it to the
+              pane's capacity by splitting the surplus rows evenly above and
+              below, clamping the low edge at address 0.
+
+        Note:
+            The floor is a floor, not the value. When the pane is shorter than
+            the floor the floor still wins and the surplus rows overflow — the
+            paginable viewport that bounds them is HLR-124's, built at Inc-5.
+            The growth is therefore one-directional and this method never
+            renders FEWER rows than the pre-batch-78 window did.
+
         Dependencies:
             Uses:
-                - ``hexview.render_hex_view``
+                - ``hexview.render_hex_view`` / ``_window_row_capacity``
             Used by:
-                - ``render_comparison``
-                - ``on_data_table_row_selected`` (run selection)
+                - ``render_comparison`` / ``on_list_view_highlighted``
         """
         from .hexview import HEX_WIDTH, MAX_HEX_ROWS, render_hex_view
 
         if not (0 <= run_index < len(self._runs)):
             return
-        start, end, _kind = self._runs[run_index]
+        self._selected_run = run_index
+        start, end, kind = self._runs[run_index]
         low = max(0, start - self.DISPLAY_CONTEXT_BYTES)
         low -= low % HEX_WIDTH
         high = end + self.DISPLAY_CONTEXT_BYTES
-        row_bases = list(range(low, high, HEX_WIDTH))
+        rows = len(range(low, high, HEX_WIDTH))
+        capacity = self._window_row_capacity()
+        if capacity > rows:
+            # Centre the run: half the surplus goes above it, and whatever the
+            # address-0 clamp refuses up there is kept, not dropped — the row
+            # count stays `capacity` and the remainder simply extends downward.
+            low = max(0, low - ((capacity - rows) // 2) * HEX_WIDTH)
+            rows = capacity
+        # LLR-124.3's paginable viewport. Page 0 leaves `low` and `rows` exactly
+        # as Inc-4 computed them, so an un-paged window is byte-identical to the
+        # one HLR-123's acceptances were written against; only an operator who
+        # presses `]` reaches the branch below. The page is clamped to the run's
+        # own span and written back, so `]` at the last page is a no-op instead
+        # of an empty window.
+        if capacity > 0:
+            self._window_page = min(self._window_page, max(0, (rows - 1) // capacity))
+            if self._window_page:
+                low += self._window_page * capacity * HEX_WIDTH
+                rows = min(capacity, rows - self._window_page * capacity)
+        row_bases = [low + index * HEX_WIDTH for index in range(rows)]
         text_a = render_hex_view(self._mem_map_a, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
         text_b = render_hex_view(self._mem_map_b, row_bases=row_bases, max_rows=MAX_HEX_ROWS)
-        header = f"Run #{run_index} 0x{start:08X}-0x{end:08X}"
+        header = (
+            f"Run #{run_index} 0x{start:08X}-0x{end:08X} "
+            f"{self._KIND_LABEL.get(kind, kind)}"
+        )
         self.query_one("#diff_hex_a", Static).update(f"Image A — {header}\n{text_a}")
         self.query_one("#diff_hex_b", Static).update(f"Image B — {header}\n{text_b}")
 

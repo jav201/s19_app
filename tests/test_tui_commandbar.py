@@ -28,6 +28,9 @@ from __future__ import annotations
 
 import asyncio
 import ast
+import json
+import re
+from hashlib import blake2b
 from pathlib import Path
 
 from textual.binding import Binding
@@ -563,4 +566,478 @@ def test_tc039_typed_find_and_palette_text_not_written_to_log(
     assert secret_palette not in log_text, (
         "typed palette filter text must not be written to .s19tool/logs/ "
         "(LLR-013.3)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-78 Inc-0 — pre-change artifact capture (LLR-121.2, TC-B78-44)
+# ---------------------------------------------------------------------------
+#
+# WHY THIS EXISTS. Three later acceptance tests need an oracle for a claim of
+# the form "X is unchanged by batch-78". ``AT-B78-03`` (palette action set),
+# ``AT-B78-12`` (workspace / A2L / MAC search + go-to behaviour) and
+# ``AT-B78-33`` (the diff result area grows) are all invariance or
+# before/after claims, and such a claim has no oracle inside the post-change
+# tree.
+#
+# Phase 2 proved that concretely for ``AT-B78-03``: the palette is constructed
+# as ``CommandBar(self._build_palette_entries())`` (``app.py:1878``), so
+# comparing the observed action set against ``_build_palette_entries()``
+# compares a producer with itself. Deleting an entire ``Binding`` from
+# ``S19TuiApp.BINDINGS`` left that predicate GREEN at 36 == 36.
+#
+# What removes the circularity is the TEMPORAL FREEZE, not the capture path.
+# The artifacts below were captured from the SHIPPED surface (C-35) on the
+# pre-change tree, committed in their own commit ahead of every production edit
+# of this batch, and are re-read FROM DISK by their consumers. Nothing in the
+# test path rebuilds them: the capture helpers here PRODUCE values, the reader
+# ``_b78_artifact`` only READS, and ``test_tc_b78_44_...`` runs an AST census
+# asserting no test module writes into the artifact directory. A test that
+# regenerated an artifact would restore the exact defect this capture removes.
+#
+# BYTE FIDELITY. ``core.autocrlf=true`` on this host rewrites committed
+# evidence (batch-25 snapshots, batch-66 pre-bytes). ``tests/goldens/batch78/**
+# -text`` in ``.gitattributes`` stops that in BOTH directions, and the digests
+# below are taken over ``read_bytes()`` so a missing or wrong attribute rule
+# reddens here instead of drifting between a Windows checkout and Linux CI.
+
+_B78_ARTIFACT_DIR = Path(__file__).resolve().parent / "goldens" / "batch78"
+
+_B78_PAYLOAD_ARTIFACT = "at-b78-12-search-goto-payload.json"
+_B78_PALETTE_ARTIFACT = "at-b78-03-palette-actions.json"
+_B78_DIFF_HEIGHT_ARTIFACT = "at-b78-33-diff-hex-a-height.json"
+
+#: ``blake2b(digest_size=8)`` over each artifact file's bytes AS STORED.
+_B78_ARTIFACT_DIGESTS = {
+    _B78_PAYLOAD_ARTIFACT: "713be432b69cb2e0",
+    _B78_PALETTE_ARTIFACT: "65bfd6bf668a0249",
+    _B78_DIFF_HEIGHT_ARTIFACT: "167c7a4dd5ac5821",
+}
+
+#: Terminal sizes the three captures were taken at. Each consumer MUST drive
+#: its live capture at the same size or it compares two different layouts.
+#: 132x44 is mandated for the diff geometry by the spec's own Inc-1 gate.
+_B78_CAPTURE_SIZE = (160, 40)
+_B78_PALETTE_SIZE = (120, 30)
+_B78_DIFF_SIZE = (132, 44)
+
+#: The three screens that own local find / go-to inputs, and the shipped Button
+#: ids the capture drives — never ``_handle_search*`` directly.
+_B78_SEARCH_SURFACES = {
+    "workspace": ("search_input", "search_button", "goto_input", "goto_button"),
+    "a2l": (
+        "alt_search_input",
+        "alt_search_button",
+        "alt_goto_input",
+        "alt_goto_button",
+    ),
+    "mac": (
+        "mac_search_input",
+        "mac_search_button",
+        "mac_goto_input",
+        "mac_goto_button",
+    ),
+}
+
+_B78_GOTO_FOCUS_ATTR = {
+    "workspace": "_goto_focus_address",
+    "a2l": "_alt_goto_focus_address",
+    "mac": "_mac_goto_focus_address",
+}
+
+#: {hit, miss, empty} — the 3-case axis of the 9-row matrix.
+_B78_CASES = (
+    ("BOOT", "0x1010"),
+    ("ZZZ_NO_MATCH", "0xFFFFFFFF"),
+    ("", ""),
+)
+
+#: The seven fields of a payload row (LLR-121.2's stated row shape).
+_B78_ROW_KEYS = frozenset(
+    {
+        "screen",
+        "query",
+        "goto",
+        "log_line_4_after_search",
+        "last_search_address",
+        "log_line_4_after_goto",
+        "per_view_goto_focus_address",
+    }
+)
+
+#: The census below INVERTS the obvious shape, and the inversion is the point.
+#:
+#: A list of the verbs that WRITE is a vacuous input set — it is only as strong
+#: as a list someone remembered to write, and an omission leaves the guard GREEN.
+#: The first form of this census hand-listed seven write methods and inspected
+#: only the RECEIVER; executed against five regeneration forms it let two
+#: through: ``json.dump(rows, open(path, "w"))`` — the idiomatic way to write
+#: JSON, so precisely the accident the census exists to prevent — and
+#: ``shutil.copy(src, path)``. Both name this module's own symbol, so the gap
+#: was verb-side and argument-side, never receiver-naming. That is the same
+#: C-31 vacuous-input-set defect the batch's hand-filled propagation register
+#: had, one layer down, inside the control built to prevent it.
+#:
+#: So the allowlist names the calls that provably CANNOT write an artifact and
+#: everything else is an offender. An omission now makes the guard RED, and
+#: widening it is a deliberate edit rather than a silent hole. Every member
+#: below was added because it fired on the real tree, and each one either reads
+#: or is pure — none can reach a filesystem write.
+_B78_NON_WRITING_CALLS = frozenset(
+    {
+        "_b78_artifact",  # the one sanctioned reader
+        "read_text",
+        "read_bytes",
+        "loads",  # json.loads
+        "is_file",
+        "exists",
+        "blake2b",  # consumes bytes, writes nothing
+        "hexdigest",
+        "items",  # _B78_ARTIFACT_DIGESTS.items()
+        "frozenset",  # this very allowlist, whose literals name the reader
+    }
+)
+
+
+def _b78_mentions_path(segment: str, tainted: set[str]) -> bool:
+    """True when ``segment`` names the artifact directory, or an alias of it."""
+    if "b78_artifact" in segment.lower():
+        return True
+    return any(re.search(rf"\b{re.escape(name)}\b", segment) for name in tainted)
+
+
+def _b78_write_offenders(source: str) -> list[tuple[int, str]]:
+    """Every call in ``source`` not provably incapable of writing an artifact.
+
+    Matches the WHOLE call — receiver and arguments alike — because the two
+    forms that slipped the receiver-only first draft put the path in an
+    ARGUMENT: ``json.dump(rows, open(path, "w"))`` and ``shutil.copy(src, path)``.
+    """
+    tree = ast.parse(source)
+
+    # One level of local aliasing, iterated to a fixed point, so
+    # `p = _B78_ARTIFACT_DIR / n; p.write_text(...)` is still caught. Only
+    # PATH-SHAPED values propagate (a `/` join, or a bare name/attribute):
+    # tainting a call's RESULT would tag `read_bytes()` output as a path and
+    # drown the census in noise. Taint is module-scoped, so a name collision
+    # yields a FALSE POSITIVE — a red test — never a false negative.
+    tainted: set[str] = set()
+    changed = True
+    while changed:
+        changed = False
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                targets, value = node.targets, node.value
+            elif isinstance(node, (ast.AnnAssign, ast.NamedExpr)):
+                targets, value = [node.target], node.value
+            else:
+                continue
+            if value is None:
+                continue
+            path_shaped = isinstance(value, (ast.Name, ast.Attribute)) or (
+                isinstance(value, ast.BinOp) and isinstance(value.op, ast.Div)
+            )
+            if not path_shaped:
+                continue
+            segment = ast.get_source_segment(source, value) or ""
+            if not _b78_mentions_path(segment, tainted):
+                continue
+            for target in targets:
+                if isinstance(target, ast.Name) and target.id not in tainted:
+                    tainted.add(target.id)
+                    changed = True
+
+    offenders: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if not _b78_mentions_path(ast.get_source_segment(source, node) or "", tainted):
+            continue
+        func = node.func
+        if isinstance(func, ast.Attribute):
+            name = func.attr
+        elif isinstance(func, ast.Name):
+            name = func.id
+        else:
+            name = ast.get_source_segment(source, func) or "<expr>"
+        if name not in _B78_NON_WRITING_CALLS:
+            offenders.append((node.lineno, name))
+    return offenders
+
+
+def _b78_canonical_json(payload: object) -> str:
+    """Serialise ``payload`` in the ONE form the artifacts are stored in.
+
+    LLR-121.2 pins "sorted-key JSON with ``ensure_ascii=True``" but not the
+    separators, and a digest recipe with an unpinned serialisation is not
+    re-derivable — an unstated pattern is an unstated definition. ``indent=2``
+    plus a trailing newline is pinned here so the stored bytes, the recorded
+    digest and any future re-derivation agree exactly.
+    """
+    return json.dumps(payload, sort_keys=True, ensure_ascii=True, indent=2) + "\n"
+
+
+def _b78_artifact(name: str) -> object:
+    """Re-read an Inc-0 pre-change artifact FROM DISK.
+
+    This is the ONLY accessor consumers may use. It reads; it never writes,
+    never regenerates and never falls back to a live producer — a fallback
+    would silently restore the ``f(x) == f(x)`` shape that made ``AT-B78-03``
+    inert. A missing artifact raises, deliberately.
+    """
+    return json.loads((_B78_ARTIFACT_DIR / name).read_text(encoding="utf-8"))
+
+
+def _b78_loaded_s19(base_dir: Path) -> LoadedFile:
+    """The fixture the 9-row payload is captured against.
+
+    32 bytes at 0x1000 spelling ``BOOT`` at 0x1006, in one half-open range
+    [0x1000, 0x1020) so the go-to hit address 0x1010 falls inside it. The
+    fixture lives HERE, in the committed test module, because the artifact and
+    every later live capture must be taken against byte-identical memory —
+    the spec recorded a digest whose fixture was never written down, which is
+    why that digest is not re-derivable.
+    """
+    mem = {0x1000 + i: b for i, b in enumerate(b"\x00" * 6 + b"BOOT" + b"\x00" * 22)}
+    return LoadedFile(
+        path=base_dir / "b78.s19",
+        file_type="s19",
+        mem_map=mem,
+        row_bases=[0x1000],
+        ranges=[(0x1000, 0x1020)],
+        range_validity=[True],
+        errors=[],
+        a2l_path=None,
+        a2l_data=None,
+    )
+
+
+async def _b78_capture_row(
+    base_dir: Path, screen: str, query: str, goto: str
+) -> dict[str, object]:
+    """Capture one payload row by driving the screen's own shipped Buttons.
+
+    A fresh ``S19TuiApp`` per row on purpose: ``last_search_text`` and
+    ``last_search_address`` are app-wide and carry across screens, so a shared
+    app would make every row order-dependent and the artifact would encode the
+    traversal order rather than the behaviour.
+    """
+    search_input, search_button, goto_input, goto_button = _B78_SEARCH_SURFACES[screen]
+    app = S19TuiApp(base_dir=base_dir)
+    async with app.run_test(size=_B78_CAPTURE_SIZE) as pilot:
+        await pilot.pause()
+        app.current_file = _b78_loaded_s19(base_dir)
+        app.action_show_screen(screen)
+        await pilot.pause()
+        app.query_one(f"#{search_input}", Input).value = query
+        await pilot.pause()
+        await pilot.click(f"#{search_button}")
+        await pilot.pause()
+        log_after_search = list(app.log_lines)[-1] if app.log_lines else ""
+        last_search_address = app.last_search_address
+        app.query_one(f"#{goto_input}", Input).value = goto
+        await pilot.pause()
+        await pilot.click(f"#{goto_button}")
+        await pilot.pause()
+        log_after_goto = list(app.log_lines)[-1] if app.log_lines else ""
+        goto_focus = getattr(app, _B78_GOTO_FOCUS_ATTR[screen])
+    return {
+        "screen": screen,
+        "query": query,
+        "goto": goto,
+        "log_line_4_after_search": log_after_search,
+        "last_search_address": last_search_address,
+        "log_line_4_after_goto": log_after_goto,
+        "per_view_goto_focus_address": goto_focus,
+    }
+
+
+def b78_capture_search_goto_payload(base_dir: Path) -> list[dict[str, object]]:
+    """Capture the full 9-row search / go-to payload from the shipped surface."""
+
+    async def _drive() -> list[dict[str, object]]:
+        rows: list[dict[str, object]] = []
+        for screen in _B78_SEARCH_SURFACES:
+            for query, goto in _B78_CASES:
+                rows.append(await _b78_capture_row(base_dir, screen, query, goto))
+        return rows
+
+    return asyncio.run(_drive())
+
+
+def b78_capture_palette_actions(base_dir: Path) -> list[str]:
+    """Capture the palette action set through Ctrl+K on the shipped surface.
+
+    Read off ``CommandBar.visible_palette_actions()`` — the widget's own public
+    accessor — after a real key press, never off ``_build_palette_entries()``.
+    """
+
+    async def _drive() -> list[str]:
+        app = S19TuiApp(base_dir=base_dir)
+        async with app.run_test(size=_B78_PALETTE_SIZE) as pilot:
+            await pilot.pause()
+            app.set_focus(None)
+            await pilot.pause()
+            await pilot.press("ctrl+k")
+            await pilot.pause()
+            bar = app.query_one(CommandBar)
+            assert bar.palette_is_open, (
+                "the palette must actually be open before its action set is "
+                "captured; a closed palette would freeze a stale entry list"
+            )
+            return list(bar.visible_palette_actions())
+
+    return asyncio.run(_drive())
+
+
+def b78_capture_diff_hex_a_geometry(base_dir: Path) -> dict[str, object]:
+    """Capture the pre-change diff result-area geometry at 132x44.
+
+    Both layers are recorded (C-32/C-37): ``size.height`` is the content layer
+    ``AT-B78-33`` compares, and the region intersected with ``#screen_diff`` is
+    the painted layer — ``region.height`` alone reads non-zero for a box that
+    paints nothing.
+    """
+
+    async def _drive() -> dict[str, object]:
+        app = S19TuiApp(base_dir=base_dir)
+        async with app.run_test(size=_B78_DIFF_SIZE) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            widget = app.query_one("#diff_hex_a")
+            host = app.query_one("#screen_diff")
+            clipped = widget.region.intersection(host.region)
+            return {
+                "widget": "#diff_hex_a",
+                "terminal": list(_B78_DIFF_SIZE),
+                "content_height": widget.size.height,
+                "content_width": widget.size.width,
+                "clipped_height": clipped.height,
+                "clipped_width": clipped.width,
+            }
+
+    return asyncio.run(_drive())
+
+
+def test_tc_b78_44_pre_change_artifacts_are_frozen_on_disk() -> None:
+    """TC-B78-44 — the Inc-0 artifacts are a committed, unrebuildable freeze.
+
+    Intent: LLR-121.2 / §5.1 rule 10 — an invariance AT takes its expectation
+    from a committed PRE-CHANGE artifact, never from the live producer. That
+    holds only while two things do, and this node asserts both because they are
+    one subject (*the capture is frozen*) observed on two layers:
+
+      (a) the artifacts are on disk, byte-identical to what was captured, and
+          carry the shapes their consumers depend on — 9 rows over the seven
+          declared fields, 37 distinct palette actions, a positive 132x44
+          content height. The digest is over ``read_bytes()``, so a lost
+          ``-text`` attribute reddens here rather than drifting between hosts.
+
+      (b) nothing under ``tests/`` writes into the artifact directory. This is
+          the clause that keeps the freeze a freeze: a test that regenerated an
+          artifact at run time would restore the producer-compared-with-itself
+          defect that left ``AT-B78-03`` GREEN at 36 == 36 with a whole
+          ``Binding`` removed.
+
+    Falsifiable on both limbs: substitute one value in a stored artifact and (a)
+    reddens; add any of ``write_text`` / ``open(...).write`` / ``json.dump`` /
+    ``shutil.copy`` against the artifact path to a test module and (b) reddens —
+    all four executed.
+
+    Scope limit, stated exactly rather than implied. (b) is a token census. It
+    matches a call — receiver OR any argument — that names ``_B78_ARTIFACT_DIR``
+    / ``_b78_artifact``, or a local aliased from one by a path-shaped assignment
+    (`p = _B78_ARTIFACT_DIR / n`, chained to a fixed point). Within that reach it
+    is verb-agnostic and fails CLOSED: any call not on ``_B78_NON_WRITING_CALLS``
+    is an offender, so a write form nobody anticipated reddens by default. What
+    it does NOT reach: a module that rebuilds the path from raw string literals
+    (``Path("tests/goldens/batch78") / …``), or one that passes the path through
+    a function-call return value rather than a path-shaped assignment. It bounds
+    accident, not intent — and the first draft of this census proved the point by
+    letting ``json.dump`` through.
+
+    Known over-reporting, measured not assumed. Taint is MODULE-scoped, so a
+    common alias name collides: the alias-form verification bound ``p`` in
+    ``test_tui_directionb.py`` and the census additionally reported three
+    unrelated calls (``sorted``/``lower``/``any``) elsewhere in that module.
+    That is a false POSITIVE — a loud red test — never a false negative, and it
+    only occurs once someone introduces an artifact-path alias, which is
+    precisely when a loud test is wanted. Per-function taint scoping would
+    remove the noise; it is deliberately not built, because ~25 lines of scope
+    resolution inside a test guard buys accuracy the guard's purpose does not
+    need.
+    """
+    # --- (a) the artifacts exist, byte-for-byte, in the declared shapes -----
+    for name, expected_digest in _B78_ARTIFACT_DIGESTS.items():
+        artifact_path = _B78_ARTIFACT_DIR / name
+        assert artifact_path.is_file(), (
+            f"Inc-0 artifact {name!r} is missing from {_B78_ARTIFACT_DIR}; it is "
+            f"the only oracle its consumer has and cannot be regenerated once a "
+            f"production edit has landed"
+        )
+        actual_digest = blake2b(artifact_path.read_bytes(), digest_size=8).hexdigest()
+        assert actual_digest == expected_digest, (
+            f"{name} no longer hashes to its recorded digest "
+            f"({actual_digest} != {expected_digest}). Either the artifact was "
+            f"edited or regenerated, or the stored blob was line-ending "
+            f"normalised — check that `.gitattributes` still carries "
+            f"`tests/goldens/batch78/** -text`"
+        )
+
+    payload = _b78_artifact(_B78_PAYLOAD_ARTIFACT)
+    assert isinstance(payload, list) and len(payload) == 9, (
+        f"the search / go-to payload must hold 3 screens x 3 cases = 9 rows, got "
+        f"{len(payload) if isinstance(payload, list) else type(payload)}"
+    )
+    assert {row["screen"] for row in payload} == set(_B78_SEARCH_SURFACES), (
+        "the payload must cover exactly the three screens that own local find / "
+        "go-to inputs"
+    )
+    for row in payload:
+        assert set(row) == _B78_ROW_KEYS, (
+            f"payload row {row.get('screen')!r}/{row.get('query')!r} does not "
+            f"carry LLR-121.2's seven declared fields: {sorted(row)}"
+        )
+
+    actions = _b78_artifact(_B78_PALETTE_ARTIFACT)
+    assert isinstance(actions, list) and len(actions) == 37, (
+        f"the palette artifact must hold the 37 pre-change actions (D-3), got "
+        f"{len(actions) if isinstance(actions, list) else type(actions)}"
+    )
+    assert len(set(actions)) == len(actions), (
+        "palette action ids must be distinct; a duplicate would make a "
+        "set-equality comparison at AT-B78-03 blind to one deletion"
+    )
+
+    geometry = _b78_artifact(_B78_DIFF_HEIGHT_ARTIFACT)
+    assert geometry["terminal"] == list(_B78_DIFF_SIZE), (
+        f"the diff geometry baseline must be the 132x44 one Inc-1's gate names, "
+        f"got {geometry['terminal']}"
+    )
+    assert (
+        isinstance(geometry["content_height"], int) and geometry["content_height"] >= 1
+    ), (
+        f"a pre-change baseline of 0 rows would make AT-B78-33's strict increase "
+        f"satisfiable by any non-empty result, got {geometry['content_height']!r}"
+    )
+
+    # --- (b) no test module can rebuild an artifact -------------------------
+    swept: list[str] = []
+    offenders: list[str] = []
+    for module in sorted(Path(__file__).resolve().parent.rglob("*.py")):
+        swept.append(module.name)
+        for lineno, call in _b78_write_offenders(module.read_text(encoding="utf-8")):
+            offenders.append(f"{module.name}:{lineno} {call}()")
+
+    assert swept, "the AST census swept no modules at all — it proves nothing"
+    assert "test_tui_commandbar.py" in swept, (
+        "the AST census must include this module, the one that names the "
+        "artifact path; a sweep that misses it is vacuous"
+    )
+    assert not offenders, (
+        f"a test module writes into the Inc-0 artifact path: {offenders}. The "
+        f"artifacts are a PRE-CHANGE freeze — regenerating one at test time "
+        f"makes its consumer compare a producer with itself, which is exactly "
+        f"the defect (BL-1) this capture exists to remove."
     )

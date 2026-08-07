@@ -1508,6 +1508,21 @@ class S19TuiApp(App):
         #: Most recent A↔B comparison result, retained so the diff-report
         #: trigger (LLR-005.4) can report the same comparison the panel shows.
         self._diff_last_result: Optional[Any] = None
+        #: Monotonic count of COMPLETED A↔B compare requests (batch-78 Inc-2,
+        #: gate review F7). Incremented on EVERY exit path of
+        #: ``on_ab_diff_panel_compare_requested`` — refusal, load failure,
+        #: success and exception alike — so it is a TOTAL completion signal.
+        #: ``_diff_last_result`` cannot serve this purpose: it is written only
+        #: on the non-refused branch, so waiting on it would hang forever on a
+        #: refusal instead of reporting one.
+        #:
+        #: Why it exists at all: the handler became a coroutine that suspends
+        #: on an awaited widget removal, and ``Pilot.pause()`` waits for
+        #: message-queue IDLENESS. A handler parked on ``AwaitRemove`` has
+        #: already dequeued its message, so ``pause()`` returns while it is
+        #: still suspended and a reader sees the un-rendered panel. Waiting on
+        #: this counter waits on the handler, not on the queue.
+        self._diff_compare_generation: int = 0
         #: Variant id to stamp onto the next applied primary ``LoadedFile``.
         #: Set on the main thread immediately before a load dispatch and
         #: consumed by ``_apply_prepared_load`` on the main thread, so the
@@ -4776,7 +4791,30 @@ class S19TuiApp(App):
             return ImageSource(kind=SOURCE_PROJECT_VARIANT, variant_id=variant_id)
         return ImageSource(kind=SOURCE_EXTERNAL, raw_path=raw_path)
 
-    def on_ab_diff_panel_compare_requested(
+    async def on_ab_diff_panel_compare_requested(
+        self, event: AbDiffPanel.CompareRequested
+    ) -> None:
+        """Run a compare request and mark its completion (batch-78 Inc-2 F7).
+
+        Summary:
+            Thin wrapper around :meth:`_apply_compare_request` whose only job is
+            to bump :attr:`_diff_compare_generation` in a ``finally``, so the
+            completion signal is TOTAL — it fires on the refusal branch, the
+            load-failure branch, the success branch and on an exception. A
+            signal that only fires on the happy path turns a refusal into a
+            hang, and an exception into a hang, which is strictly worse than
+            the race it was added to remove.
+
+        Dependencies:
+            Used by:
+                - Textual message dispatch for ``AbDiffPanel``
+        """
+        try:
+            await self._apply_compare_request(event)
+        finally:
+            self._diff_compare_generation += 1
+
+    async def _apply_compare_request(
         self, event: AbDiffPanel.CompareRequested
     ) -> None:
         """
@@ -4830,7 +4868,10 @@ class S19TuiApp(App):
         runs = [(run.start, run.end, run.kind) for run in result.runs]
         usage_a = result.notes.get("image_a")
         usage_b = result.notes.get("image_b")
-        panel.render_comparison(
+        # AWAITED: `render_comparison` is a coroutine as of batch-78 Inc-2 —
+        # the run list's rows are widgets and their removal must complete
+        # before the next set mounts (review F1).
+        await panel.render_comparison(
             runs,
             mem_map_a,
             mem_map_b,
@@ -6237,9 +6278,37 @@ class S19TuiApp(App):
             else:
                 widget.remove_class("width-narrow")
 
+    def _apply_diff_regime(self, width: int, height: int) -> None:
+        """
+        Summary:
+            Hand the terminal size to the A2B diff panel so it can select
+            HLR-124's width/height regime. The threshold arithmetic and the
+            constants live in ``AbDiffPanel`` (LLR-124.1) — this is the
+            delivery of the two integers, deliberately kept out of the panel's
+            own event surface because the panel's ``Resize`` reports the
+            PANEL's size, and the regime constants are TERMINAL dimensions.
+
+        Args:
+            width (int): Terminal width in columns.
+            height (int): Terminal height in rows.
+
+        Returns:
+            None
+
+        Data Flow:
+            - ``on_resize`` -> ``AbDiffPanel.apply_regime`` -> a CSS class on
+              ``#ab_diff_panel``.
+
+        Dependencies:
+            Used by:
+                - ``on_resize``
+        """
+        self.query_one("#ab_diff_panel", AbDiffPanel).apply_regime(width, height)
+
     def on_resize(self, event: events.Resize) -> None:
         """Update the two-regime width layout class on terminal resize."""
         self._apply_width_regime(event.size.width)
+        self._apply_diff_regime(event.size.width, event.size.height)
 
     def action_page_next_context(self) -> None:
         """
