@@ -48,7 +48,7 @@
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31)."
   },
   "current_phase": 3,
-  "phase_status": "awaiting-sync",
+  "phase_status": "synced",
   "iterations_per_phase": {
     "0": 0,
     "1": 3,
