@@ -6703,6 +6703,19 @@ class AbDiffPanel(Container):
     _REGIME_CLASSES = (_REGIME_WIDE, _REGIME_FALLBACK, _REGIME_NOTICE)
     _RUNS_OPEN = "runs-open"
 
+    #: LLR-126.1's affordance text, named so the acceptance asserts the EMITTED
+    #: string rather than a re-typed copy of the requirement's wording. It is
+    #: deliberately pure ASCII: the note renders `markup=False` into a widget
+    #: the snapshot goldens capture, and an arrow glyph would put the predicate
+    #: at the mercy of the emitted encoding rather than the text.
+    #:
+    #: It names how to move the SELECTION, which is what HLR-126 asks for. The
+    #: panel's own `f` / `escape` / `[` / `]` are not selection movement — `[`
+    #: and `]` page the hex window and `f` toggles the overlay — so they belong
+    #: to the help panel's listing, not to this row. `j`/`k`/`n`/`p` are ruled
+    #: out by D-4 and are not bound.
+    _RUN_LIST_AFFORDANCE = "Keys: Up/Down move the selection, Enter opens"
+
     #: LLR-124.3's overlay + pagination keys. Widget-scoped, never App-level
     #: (D-2 ruled out a new App binding; `AT-B78-32` pins `app.py`'s BINDINGS
     #: block at a zero-line diff). All `show=False`: LLR-126.1 requires the
@@ -7300,6 +7313,22 @@ class AbDiffPanel(Container):
             self._run_note_item(f"Runs: {total_runs}"),
             self._run_note_item(f"A artifacts: {summary_a}"),
             self._run_note_item(f"B artifacts: {summary_b}"),
+            # LLR-126.1's visible affordance. It rides in the list BODY, not in
+            # `border_title`, and that is a regime decision rather than a style
+            # one: `styles.tcss:1623` gives the list `border: none` in the
+            # fallback regime, so a border-hosted affordance would be present at
+            # 132x44 and ABSENT at 120x30 — "shall carry a visible affordance"
+            # unsatisfied in a supported regime, with an acceptance green at one
+            # size and inert at the other. A body row is visible wherever the
+            # list itself is.
+            #
+            # Placed LAST among the notes so it sits immediately above the runs
+            # it describes, and built through `_run_note_item` so it inherits
+            # `disabled=True` — `action_cursor_up` / `action_cursor_down` skip
+            # it, which is what keeps LLR-122.1's keyboard-reachable set equal
+            # to the run indices. `first_run_position` is `len(items)`, so the
+            # run offset follows this addition with no second edit.
+            self._run_note_item(self._RUN_LIST_AFFORDANCE),
         ]
         first_run_position = len(items)
         for index, (start, end, kind) in enumerate(self._runs):

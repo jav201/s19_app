@@ -3519,3 +3519,323 @@ def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
         f"the notice at the height boundary must name the height axis; "
         f"text={below['notice_text']!r}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-6 -- HLR-126 discoverability (LLR-126.1)
+# ---------------------------------------------------------------------------
+
+
+def _b79_painted_text(app, widget) -> str:
+    """The text actually PAINTED in a widget's region, read from the compositor.
+
+    ``str(widget.render())`` is not usable here: the ``HelpPanel`` renders a
+    ``rich.table.Table`` object, so the string form is a repr and every ``in``
+    assertion over it is vacuous. This reads the composited screen and slices
+    the widget's own region out of it, which is what the operator sees.
+    """
+    strips = app.screen._compositor.render_strips()
+    region = widget.region
+    lines = []
+    for y in range(region.y, min(region.y + region.height, len(strips))):
+        row = "".join(segment.text for segment in strips[y])
+        lines.append(row[region.x : region.x + region.width].rstrip())
+    return "\n".join(lines)
+
+
+def _b79_help_focused_section(app) -> str:
+    """The FIRST block of the help panel -- the FOCUSED widget's own bindings.
+
+    Measured, not assumed (C-35): with the run list focused the panel paints the
+    list's own three bindings first, then a blank line, then the ancestor
+    panel's ``[`` / ``]``, then screen- and app-level blocks. The blank line is
+    the section boundary, so the negative co-assertion has something real to be
+    absent FROM -- ``AT-B78-28`` would otherwise be green on a panel that lists
+    every binding in the application.
+    """
+    from textual.widgets import HelpPanel
+
+    panel = app.screen.query_one(HelpPanel)
+    text = _b79_painted_text(app, panel)
+    # Strip the panel's painted left border before looking for blank lines. The
+    # glyph is U+258F LEFT ONE EIGHTH BLOCK, not the U+2502 box-drawing bar a
+    # reader reaches for first -- and with the wrong glyph NO line is ever
+    # blank, the whole panel reads as one section, and the positive clauses go
+    # green against every binding in the application. Not hypothetical: that is
+    # what this helper did on its first run, and the negative co-assertion in
+    # `AT-B78-28` is what caught it.
+    body = [
+        line.lstrip("▏│┃▕▐| \t").rstrip()
+        for line in text.splitlines()
+    ]
+    section: list[str] = []
+    started = False
+    for line in body:
+        if not line:
+            if started:
+                break
+            continue
+        started = True
+        section.append(line)
+    return "\n".join(section)
+
+
+def _b79_shown_keys(app) -> list[str]:
+    """The model key set: bindings that are both ``show`` and ``enabled``."""
+    return sorted(
+        key
+        for key, active in app.active_bindings.items()
+        if getattr(active.binding, "show", False) and getattr(active, "enabled", True)
+    )
+
+
+#: LLR-126.1's committed pre-change chip set (spec P-51), frozen here rather
+#: than recomputed, so the assertion is SET-EQUALITY against a constant. A
+#: containment predicate is satisfied by a superset -- executed at batch-78:
+#: ``+1 chip -> contains-all True, set-equality False`` -- so containment cannot
+#: gate "the footer-visible binding set shall be unchanged".
+_B79_COMMITTED_SHOWN_KEYS: tuple[str, ...] = (
+    "comma",
+    "ctrl+d",
+    "ctrl+k",
+    "ctrl+l",
+    "ctrl+s",
+    "g",
+    "k",
+    "minus",
+    "period",
+    "plus",
+    "q",
+    "question_mark",
+    "slash",
+    "x",
+)
+
+
+def _b79_app_binding_rows() -> frozenset:
+    """The App ``BINDINGS`` block as a comparable set of rows.
+
+    Resolved from the CLASS, not from a line range. See
+    ``test_at_b78_32_app_bindings_block_is_untouched`` for why that distinction
+    is the whole point of this node.
+    """
+    from textual.binding import Binding
+
+    from s19_app.tui.app import S19TuiApp
+
+    rows = set()
+    for entry in S19TuiApp.BINDINGS:
+        if isinstance(entry, Binding):
+            rows.add((entry.key, entry.action, entry.description, bool(entry.show)))
+        else:
+            key, action, description = entry
+            rows.add((key, action, description, True))
+    return frozenset(rows)
+
+
+#: The committed App binding set: 38 entries -- 31 written as ``Binding(...)``
+#: and 7 as bare tuples. Frozen as a COUNT plus the shown-key projection rather
+#: than 38 literal rows, because the full row set is `app.py`'s business and
+#: this batch's claim is only that Lane 1 does not disturb it.
+_B79_COMMITTED_APP_BINDING_COUNT = 38
+
+
+def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
+    """AT-B78-28 (GATE) -- LLR-126.1, all three clauses.
+
+    The operator who has never used the diff screen can find out how to walk the
+    runs without reading source: the list itself names the keys, and the help
+    panel lists them under the FOCUSED widget -- while the Footer's chip set is
+    untouched.
+
+    C-40, and it is the reason this node is shaped the way it is:
+
+    * *"the help panel names the keys"* is GREEN on a panel that lists every
+      binding in the application, so the arm reads only the FOCUSED SECTION and
+      co-asserts that a key the run list does NOT bind is absent from it. The
+      ancestor panel's ``]`` (*Window page +*) is exactly such a key: it is
+      reachable while the list is focused, it IS in the panel, and it is NOT in
+      the list's own section.
+    * The chip clause is SET-EQUALITY, never containment -- a superset satisfies
+      containment, which is the failure mode a new shown binding would produce.
+    * Assertions are on the binding DESCRIPTIONS, not on the key column: the
+      key column paints arrow GLYPHS, and a predicate over those is a predicate
+      over the emitted encoding rather than over the behaviour.
+    """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        listing.focus()
+        await pilot.pause()
+        assert app.focused is listing, (
+            f"the run list must hold focus for this AT to mean anything; "
+            f"focused={app.focused!r}"
+        )
+
+        list_text = _b78_run_list_text(app)
+        shown_before = _b79_shown_keys(app)
+
+        await pilot.press("question_mark")
+        await pilot.pause()
+        section = _b79_help_focused_section(app)
+        return list_text, shown_before, section
+
+    list_text, shown_keys, section = _b78_drive_compare(
+        tmp_path,
+        (160, 40),
+        _diff_result([(0x00, 0x0F, "changed"), (0x20, 0x2F, "added")]),
+        after=_after,
+    )
+
+    # Clause 1 -- the list carries the visible affordance, asserted against the
+    # EMITTED constant rather than a re-typed copy of the requirement's wording.
+    #
+    # C-31: reading the constant is what keeps the predicate honest about the
+    # emitted string, but it also makes the constant an ORACLE -- and an
+    # unguarded oracle is where this predicate could go vacuous. Emptied to
+    # `""`, `"" in list_text` is trivially True and the affordance could vanish
+    # with the node still green. So the oracle is guarded before it is used,
+    # against the REQUIREMENT ("naming its navigation keys"), not against its
+    # own current wording.
+    affordance = AbDiffPanel._RUN_LIST_AFFORDANCE
+    assert affordance.strip(), "the affordance constant is empty -- clause 1 would be vacuous"
+    for key_word in ("Up", "Down", "Enter"):
+        assert key_word in affordance, (
+            f"LLR-126.1's affordance must NAME the navigation keys; "
+            f"{key_word!r} missing from {affordance!r}"
+        )
+
+    assert affordance in list_text, (
+        f"the run list must carry LLR-126.1's affordance; "
+        f"expected {AbDiffPanel._RUN_LIST_AFFORDANCE!r} in:\n{list_text}"
+    )
+
+    # Clause 2 -- the help panel names the FOCUSED list's own navigation keys...
+    for description in ("Cursor up", "Cursor down", "Select"):
+        assert description in section, (
+            f"the help panel's focused section must name the run list's "
+            f"{description!r} binding; section=\n{section}"
+        )
+
+    # ...and the negative co-assertion, without which clause 2 is vacuous.
+    assert "Window page" not in section, (
+        "the focused section must list the RUN LIST's bindings, not its "
+        "ancestor panel's window paging -- if 'Window page' appears here the "
+        "section boundary was not found and the positive clauses above are "
+        f"green against the whole panel; section=\n{section}"
+    )
+
+    # Clause 3 -- the footer-visible set is UNCHANGED, by set-equality.
+    assert tuple(shown_keys) == _B79_COMMITTED_SHOWN_KEYS, (
+        f"the shown+enabled key set must be SET-EQUAL to its committed "
+        f"pre-change set of {len(_B79_COMMITTED_SHOWN_KEYS)}; "
+        f"observed {len(shown_keys)}: {shown_keys}"
+    )
+
+
+def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
+    """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
+
+    RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
+
+    The batch-78 spec realizes this as *"a zero-line ``git diff`` over
+    ``app.py:1338-1375``"*. Executed against the tree, the block is
+    ``app.py:1338-1392``: line 1375 is ``("minus", "page_prev_context",
+    "Page-")``, MID-BLOCK, and lines 1376-1392 hold six real bindings --
+    ``comma`` / ``period`` hex paging, ``pagedown`` / ``pageup`` from batch-31
+    AC-3, and ``ctrl+z`` / ``ctrl+y`` from batch-40 S2. A binding added or
+    removed among those six leaves the range-based predicate GREEN, so the guard
+    would report "untouched" for a block that was touched. It fails in the
+    safe-looking direction.
+
+    It is not drift: at ``f6ff1d3`` the block was ALREADY 1338-1392 and batch-78
+    added zero ``Binding(`` lines. The range was wrong when it was written and
+    survived three Phase-2 rounds -- because a line range looks like a
+    measurement. ``screens_directionb.py:6712`` carries the CORRECT extent in a
+    code comment, so the two artifacts disagreed and the code was right.
+
+    A corrected range would not fix this. Any edit ABOVE the block shifts it, so
+    ``1338-1392`` is one insertion away from failing the same silent way. This
+    resolves the block from the CLASS instead, which no line movement can blind,
+    and pins two independent projections of it.
+    """
+    rows = _b79_app_binding_rows()
+
+    assert len(rows) == _B79_COMMITTED_APP_BINDING_COUNT, (
+        f"the App BINDINGS block must still carry "
+        f"{_B79_COMMITTED_APP_BINDING_COUNT} entries; observed {len(rows)}. "
+        f"Lane 1 re-homes `/` and `g` onto the SCREENS (HLR-119) and deletes "
+        f"the command bar (HLR-118) -- neither touches this block."
+    )
+
+    shown = tuple(sorted(key for key, _action, _desc, show in rows if show))
+    assert shown == _B79_COMMITTED_SHOWN_KEYS, (
+        f"the App block's shown-key projection must be SET-EQUAL to the "
+        f"committed set; observed {list(shown)}"
+    )
+
+
+def test_tc_b78_38_help_panel_before_any_comparison_does_not_raise(
+    tmp_path: Path,
+) -> None:
+    """TC-B78-38 -- boundary: the help panel opens with no comparison rendered.
+
+    The run list is empty before the first Compare, so the affordance row does
+    not exist yet -- LLR-126.1's affordance rides with the runs it describes.
+    What is asserted here is that the discoverability surface is still SAFE in
+    that state: the panel mounts, paints, and lists the app's bindings.
+    """
+    from textual.widgets import HelpPanel
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            _b78_run_list(app).focus()
+            await pilot.pause()
+            await pilot.press("question_mark")
+            await pilot.pause()
+            panel = app.screen.query_one(HelpPanel)
+            return _b79_painted_text(app, panel), _b79_shown_keys(app)
+
+    text, shown = asyncio.run(_drive())
+
+    assert text.strip(), "the help panel painted nothing over an empty run list"
+    assert tuple(shown) == _B79_COMMITTED_SHOWN_KEYS, (
+        f"the chip set must be unchanged in the pre-comparison state too; "
+        f"observed {shown}"
+    )
+
+
+def test_tc_b78_39_help_panel_toggles_closed_and_reopens(tmp_path: Path) -> None:
+    """TC-B78-39 -- boundary: opened, dismissed, re-opened.
+
+    ``action_show_help_panel`` is this project's TOGGLE override (`app.py:5877`,
+    not the `:5836` the spec cites) rather than the stock mount-only action, so
+    the second press must REMOVE the panel and the third must bring it back. A
+    node that only opened it would leave the override's whole reason untested.
+    """
+    from textual.widgets import HelpPanel
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            counts = []
+            for _ in range(3):
+                await pilot.press("question_mark")
+                await pilot.pause()
+                counts.append(len(app.screen.query(HelpPanel)))
+            return counts
+
+    counts = asyncio.run(_drive())
+
+    assert counts == [1, 0, 1], (
+        f"`?` must toggle the help panel open/closed/open; mounted counts "
+        f"across three presses were {counts}"
+    )
