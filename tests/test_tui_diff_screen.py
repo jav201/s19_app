@@ -1686,66 +1686,135 @@ _B78_REPORT_FAILED = (
 
 
 async def _b78_press_report(app, pilot, dest_dir: Path) -> tuple[Path, Path]:
-    """Press the shipped Report button and wait for the WORKER to finish.
+    """Press the shipped Report button and wait for THIS press's worker to finish.
 
     Not a pause, and not ``workers.wait_for_complete()`` either (C-78-xii, one
     layer further out than Inc-2's compare driver). ``Button.press()`` only
     POSTS ``Pressed``; the handler that starts the ``@work(thread=True)`` worker
     has not run yet, so a worker-set wait taken immediately after the press
     observes an EMPTY set and returns at once - the same shape as waiting on
-    queue idleness for a suspended coroutine.
+    queue idleness for a suspended coroutine. Measured: worker set **0**
+    immediately after ``press()``, and ``wait_for_complete()`` returning in
+    **0.8 ms** against a generator sleeping 1000 ms.
 
-    The signal waited on here is the panel status, because
-    ``_start_diff_report_worker`` writes it through ``call_from_thread`` and
-    ``call_from_thread`` blocks the worker until the callback has run on the UI
-    thread. Reaching ``_B78_REPORT_OK`` therefore happens-after both files are
-    written and closed, which is exactly the precondition a re-read needs.
+    EDGE, NOT LEVEL (Inc-3 addendum F1). The first form of this driver polled
+    ``#diff_status`` for the success sentinel, which is a LEVEL: on a second
+    press the PREVIOUS press's success line already satisfies it, so the wait
+    returned after 0.8 ms with the generators still running and both globs
+    empty. The wait is now armed on an EDGE - a strictly increasing count of
+    status messages emitted AFTER the observer is installed, which is after the
+    comparison and immediately before the press. A line written by an earlier
+    press is therefore not merely unlikely to satisfy this wait; it is
+    unreachable by it.
+
+    The observer wraps ``panel.set_status`` and DELEGATES to it - it substitutes
+    nothing, and the app still writes its own surface. ``set_status`` is the
+    right signal because ``_start_diff_report_worker`` writes it through
+    ``call_from_thread``, and ``call_from_thread`` blocks the worker until the
+    callback has run on the UI thread. Observing the message therefore
+    happens-after both files are written and closed, which is exactly the
+    precondition a re-read needs.
 
     The wait is TOTAL: every failure arm of the worker is a named, loud raise,
     so the caller can never proceed on a stale or missing file.
 
-    C-78-xiii: this is also the positive co-assertion for every node built on
-    it. The lost-race state here is "no file at all", in which a completeness
-    predicate written as an absence clause would pass vacuously. Raising here
-    puts that guarantee in the DRIVER, so nodes not yet written inherit it.
+    GUARANTEE, stated exactly (C-78-xiii). For each call, this driver either
+    returns the two paths written by THAT call's worker, or raises. It holds per
+    press and is re-armed on every call, so repeated presses against one panel
+    are covered. It does NOT serialise concurrent presses: the group is
+    ``exclusive=True``, so a second press while the first worker runs cancels
+    the first, and this driver would report the surviving worker's message.
+    Nothing in this suite presses twice concurrently, and a caller that needs
+    that must arm its own wait rather than assume this one covers it.
     """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    panel = app.query_one("#ab_diff_panel", AbDiffPanel)
     app.query_one("#diff_report_dest").value = str(dest_dir)
-    app.query_one("#diff_report_button").press()
-    status = ""
-    for _ in range(750):
-        status = str(app.query_one("#diff_status").render())
-        for arm in _B78_REPORT_FAILED:
-            if arm in status:
-                raise AssertionError(
-                    f"the report worker took a FAILURE arm, so no complete file "
-                    f"exists to observe; #diff_status reads {status!r}"
-                )
-        if _B78_REPORT_OK in status:
-            written_md = sorted(dest_dir.glob("*-diff-report.md"))
-            written_html = sorted(dest_dir.glob("*-diff-report.html"))
-            assert len(written_md) == 1 and len(written_html) == 1, (
-                f"the success status was written but the destination does not "
-                f"hold exactly one report of each kind: md={written_md}, "
-                f"html={written_html}"
+
+    emitted: list[str] = []
+    shipped_set_status = panel.set_status
+
+    def _observe(message, *args, **kwargs):
+        emitted.append(str(message))
+        return shipped_set_status(message, *args, **kwargs)
+
+    # The FILE check is an edge too. Its first form asserted the destination
+    # holds exactly one report of each kind, which silently assumes the
+    # destination started empty - the same level-vs-edge mistake as the status
+    # wait, one clause down, and it fired on a CORRECT second press.
+    md_before = set(dest_dir.glob("*-diff-report.md"))
+    html_before = set(dest_dir.glob("*-diff-report.html"))
+
+    panel.set_status = _observe
+    try:
+        before = len(emitted)
+        app.query_one("#diff_report_button").press()
+        for _ in range(750):
+            if len(emitted) > before:
+                break
+            await pilot.pause(0.02)
+        else:
+            raise AssertionError(
+                f"the report worker never completed: `panel.set_status` was not "
+                f"called once across 750 pumped turns after the Report press. "
+                f"#diff_status still reads "
+                f"{str(app.query_one('#diff_status').render())!r}, which is the "
+                f"line that was there BEFORE this press. Every assertion after "
+                f"this point would be reading a file that was never written."
             )
-            return written_md[0], written_html[0]
-        await pilot.pause(0.02)
-    raise AssertionError(
-        f"the report worker never completed: #diff_status never reached "
-        f"{_B78_REPORT_OK!r} across 750 pumped turns and still reads {status!r}. "
-        f"Every assertion after this point would be reading a file that was "
-        f"never written."
+    finally:
+        del panel.set_status
+
+    message = emitted[before]
+    for arm in _B78_REPORT_FAILED:
+        if arm in message:
+            raise AssertionError(
+                f"the report worker took a FAILURE arm, so no complete file "
+                f"exists to observe; it emitted {message!r}"
+            )
+    assert _B78_REPORT_OK in message, (
+        f"the report worker emitted a status this driver does not classify, so "
+        f"it cannot know whether a complete file exists: {message!r}"
     )
+    new_md = sorted(set(dest_dir.glob("*-diff-report.md")) - md_before)
+    new_html = sorted(set(dest_dir.glob("*-diff-report.html")) - html_before)
+    assert len(new_md) == 1 and len(new_html) == 1, (
+        f"the success status was emitted but THIS press did not add exactly one "
+        f"report of each kind to the destination: new md={new_md}, new "
+        f"html={new_html} (it already held {len(md_before)} md and "
+        f"{len(html_before)} html before the press)"
+    )
+    return new_md[0], new_html[0]
 
 
 def _b78_section(text: str, heading: str, stop: str) -> str:
     """The slice of ``text`` from ``heading`` up to the next ``stop`` marker.
 
-    The run table is scoped to its own section on purpose: the hex-window dumps
-    later in both documents also carry ``0x``-prefixed addresses, and a
-    whole-document regex would count rows that are not run entries.
+    Why the run table is read section-scoped, stated as MEASURED rather than as
+    assumed (Inc-3 addendum LOW-2). The first version of this comment claimed a
+    whole-document regex "would count rows that are not run entries" because the
+    hex-window dumps also carry ``0x``-prefixed addresses. **That is false for
+    these two regexes.** Executed on a real 82 157-byte report with non-empty
+    memory maps, so the windows actually render: whole-document **200**,
+    section-scoped **200**, in both the Markdown and the HTML document. The
+    window section's ``0x`` addresses live in ``###`` headers and in hex rows,
+    and neither can match a pattern anchored on a line-initial ``| 0x`` /
+    ``<tr><td>0x``.
+
+    The scoping is kept, for the reason that survives measurement: it bounds
+    what the node can be reading to the ONE table the requirement is about, so a
+    future report layout that grows a second address table cannot silently
+    inflate the count into a false pass. That is defence in depth, not a
+    correction of a real over-count.
     """
-    start = text.index(heading)
+    start = text.find(heading)
+    assert start >= 0, (
+        f"the written report does not contain the section heading {heading!r}, "
+        f"so this node cannot locate the run table. The report layout has "
+        f"changed and this parser must be updated before its verdict means "
+        f"anything. Document begins: {text[:200]!r}"
+    )
     after = start + len(heading)
     return text[start : text.index(stop, after)] if stop in text[after:] else text[start:]
 

@@ -255,6 +255,13 @@ file, `tests/test_tui_diff_screen.py`, and `git diff --stat -- s19_app/ tests/`
 shows `1 file changed, 199 insertions(+)`. `s19_app/tui/app.py` is byte-identical
 to the baseline, verified by sha, not by `git status` alone.
 
+> ⚠️ **Amended by the addendum (LOW-3).** The two `git` readings above describe
+> the tree **at the gate**, before the increment was committed. It is now
+> `c88b0ad`, so `git status` is clean of it and `1 file changed, 199
+> insertions(+)` is a historical reading, not a live one. The load-bearing half
+> is unchanged and was re-executed against the amended driver: `app.py` returns
+> to sha `21e3ad53c3c687b9` after every mutation (§A.4).
+
 **Verdict on A.** RED, but **not a discharge**. It reddens in the driver's
 failure arm — no file was ever written — so the node's own assertion never ran.
 A mutation that prevents the subject from executing certifies the driver, not
@@ -310,9 +317,10 @@ projection, corroborated by the collection count, and is labelled as such.
 
 ## 6. Pending items
 
-1. **The increment is NOT committed.** The working tree carries
-   `tests/test_tui_diff_screen.py` modified and nothing else. Committing was not
-   requested and is not done without asking. **Owed: a go/no-go on the commit.**
+1. ~~**The increment is NOT committed.**~~ **CLOSED — committed as `c88b0ad`**
+   by the coordinator at the Inc-3 gate. *(Amended by the addendum, LOW-3: this
+   item and its "working tree carries one modified file" reading described the
+   pre-commit tree and no longer hold.)*
 2. **`LLR-122.4`'s mutation wording is wrong on disk** (F-1). `01-requirements.md`
    is off-limits to this increment, so the correction lives here and in the
    carry list. §5.3's row for `AT-B78-31` is already correct and needs nothing.
@@ -358,3 +366,332 @@ which is the same family as this increment's F-1.
 - [x] **File count within cap.** 1 file modified, §7 planned 1, cap 5.
       `git diff --stat` = `1 file changed, 199 insertions(+)`.
 - [x] **Review packet attached.** This document, §§1–7.
+
+---
+---
+
+# ADDENDUM — Inc-3 gate review fixes (F1/F2 MEDIUM, four LOW)
+
+> **Verdict received:** Inc-3 PASSED — 0 HIGH · 2 MEDIUM · 4 LOW, committed as `c88b0ad`.
+> **Both MEDIUMs are about the DRIVER, not the node.** The node's predicate, its three mutations and its ledger are unchanged and were re-executed against the amended driver.
+> **Scope of this addendum:** `tests/test_tui_diff_screen.py` (1) + this document. No production file touched, then or now.
+
+---
+
+## A.1 BLUF — the review was right, and executing its fix found a second instance of the same defect one clause further down
+
+**`_b78_press_report` waited on a LEVEL and I sold it as an inheritable
+guarantee. Fixing that exposed that my own file-existence check had the
+identical shape — and that the review's "no false green" mitigation does not
+hold in the arrangement the defect actually occurs in.**
+
+| # | Finding | Verdict |
+|---|---|---|
+| **A-1** | **The review's F1 is confirmed, and it is worse than MEDIUM-as-scoped in one arrangement.** The review judged the level wait non-HIGH because `len(written_md) == 1` catches it loudly (`md=[]`, `html=[]`). That holds for a **fresh** destination. In the arrangement the bug actually occurs in — a **second press into the same destination** — the destination already holds one md and one html, so the glob finds exactly one of each, **passes**, and hands back the FIRST press's file. Executed: press 2 returned in **1 ms** against 800 ms of generator work, `md1 == md2 == 20260807T013431Z-diff-report.md`, one file on disk. **Silent false green, not a loud catch.** | ❌ **confirmed, and the mitigation is narrower than stated** |
+| **A-2** | **My file check was a LEVEL assertion too, and only the F1 fix could reveal it.** `assert len(written_md) == 1` encodes "the destination started empty". With the wait correctly edge-triggered, the second press wrote its own file and the assertion **fired on a correct press** (`md=[…013353Z…, …013354Z…]`). Both clauses are now armed on a pre-press snapshot. **The same defect, twice, ten lines apart — I fixed the one the review named and walked straight into the other.** | ❌ **my defect, found by executing the fix** |
+| **A-3** | **F2 is confirmed as a fair charge and the census passes with a real control.** I discharged a newly minted completion wait with `call_from_thread` reasoning — F-1's own lesson turned on its author. Executed: 3 treatment arms (0 / 50 / 500 ms per generator) **all GREEN**, 3 control arms with the wait removed **all RED**. The 500 ms treatment arm takes **2.29 s** against the 0 ms arm's **1.25 s**, so the injected delay is demonstrably reaching the code the wait is about — the census is not green by not perturbing anything. | ✅ **discharged by execution** |
+| **A-4** | **Design-choice-2's stated reason is empirically false, exactly as the review says.** Measured on a real 82 157-byte report with **non-empty** memory maps so the hex windows actually render: whole-document **200**, section-scoped **200**, in both documents. The `###` window headers do carry `0x` addresses, but nothing there can match a pattern anchored on line-initial `\| 0x` / `<tr><td>0x`. **The choice is kept; the reason is replaced with one that survives measurement.** | ⚠️ **reason corrected, choice unchanged** |
+| **A-5** | **The three mutations reproduce unchanged on the amended driver.** A still reddens in the driver (now on the emitted message rather than the polled level), B on the Markdown clause, C on the HTML clause, all at `128 of 200`, first missing start `2048`. Same shas. **The driver rewrite did not weaken the discharge.** | ✅ **re-executed** |
+
+---
+
+## A.2 F1 — level vs edge, executed on both forms
+
+**The scenario both arms run:** one comparison, **two sequential Report presses
+into one destination directory**, both generators slowed to 400 ms each (so
+800 ms of real work per press).
+
+```
+---- LEVEL form (c88b0ad) (generators sleep 400 ms EACH) ----
+  press1_s      : 0.898
+  press2_s      : 0.001            <- returned in 1 ms against 800 ms of work
+  md1           : 20260807T013431Z-diff-report.md
+  md2           : 20260807T013431Z-diff-report.md      <- THE SAME FILE
+  md_on_disk    : ['20260807T013431Z-diff-report.md']
+  md1_runs      : 200
+  md2_runs      : 200              <- press 2 "verified" press 1's output
+
+---- EDGE form (addendum) (generators sleep 400 ms EACH) ----
+  press1_s      : 0.918
+  press2_s      : 0.933            <- waited out its OWN generators
+  md1           : 20260807T013433Z-diff-report.md
+  md2           : 20260807T013434Z-diff-report.md      <- distinct
+  md_on_disk    : ['20260807T013433Z-diff-report.md', '20260807T013434Z-diff-report.md']
+  md1_runs      : 200
+  md2_runs      : 200
+```
+
+**The correction to the review's severity reasoning.** The review reports the
+level form failing loudly with `md=[]`, `html=[]` — true for a **fresh**
+destination, where press 2 returns before press 2's files exist and the glob
+finds nothing. But the destination is the natural place a second report lands,
+and there it already holds press 1's pair: the glob finds `len == 1` of each,
+**passes**, and returns press 1's path. The consumer then re-reads a **stale but
+perfectly complete** file and goes green. `md2_runs: 200` in the transcript above
+is that false green, printed. The severity call (MEDIUM, not HIGH) is still right
+— nothing in this batch presses twice — but the reason has to be *"no node does
+this yet"*, not *"the glob catches it"*.
+
+### The fix
+
+Armed on an **edge**: a strictly increasing count of status messages emitted
+**after** an observer is installed, which happens after the comparison and
+immediately before the press.
+
+```python
+emitted: list[str] = []
+shipped_set_status = panel.set_status
+
+def _observe(message, *args, **kwargs):
+    emitted.append(str(message))
+    return shipped_set_status(message, *args, **kwargs)
+
+md_before = set(dest_dir.glob("*-diff-report.md"))       # A-2: the FILE check
+html_before = set(dest_dir.glob("*-diff-report.html"))   #      is an edge too
+
+panel.set_status = _observe
+try:
+    before = len(emitted)
+    app.query_one("#diff_report_button").press()
+    for _ in range(750):
+        if len(emitted) > before:
+            break
+        await pilot.pause(0.02)
+    else:
+        raise AssertionError(...)      # names the STALE line it is still seeing
+finally:
+    del panel.set_status
+```
+
+**The observer substitutes nothing** — it appends and delegates, and the app
+still writes its own `#diff_status`. `set_status` is the right signal because
+`_start_diff_report_worker` marshals it through `call_from_thread`, which blocks
+the worker until the callback has run on the UI thread; observing the message
+therefore *happens-after* both files are written and closed.
+
+**Why an edge is categorically better here, not just safer.** A line written by
+an earlier press is not merely *unlikely* to satisfy this wait — it is
+**unreachable** by it, because it was emitted before the observer existed. That
+is a structural guarantee rather than a probabilistic one, which is the whole
+difference the review is pointing at.
+
+### The docstring now states what it holds, and no more
+
+> *For each call, this driver either returns the two paths written by THAT
+> call's worker, or raises. It holds per press and is re-armed on every call, so
+> repeated presses against one panel are covered. It does NOT serialise
+> concurrent presses: the group is `exclusive=True`, so a second press while the
+> first worker runs cancels the first, and this driver would report the surviving
+> worker's message. Nothing in this suite presses twice concurrently, and a
+> caller that needs that must arm its own wait rather than assume this one covers
+> it.*
+
+The `exclusive=True` limitation is stated because it is real and I could not
+discharge it — not as a hedge. The review's point stands and is the reason this
+paragraph exists: **a driver whose promise exceeds its delivery is worse than
+one that promises nothing, because the next author reads the promise.**
+
+---
+
+## A.3 F2 — the `C-78-xii` perturbation census, with its control arm
+
+`C-78-xii` sets the bar: *a perturbation census at two delays an order of
+magnitude apart, with a control arm.* Inc-3 minted a new completion wait and
+discharged it by argument. Here it is executed. Both generators are wrapped with
+a sleep at the app's import site and otherwise untouched, so every arm still
+writes a real, complete report and the node's own 200-of-200 clauses are what go
+green.
+
+```
+=== TREATMENT: the driver's wait INTACT (tests file sha 6b7da5a1671c9a54) ===
+  generator delay    0 ms x2  ->  GREEN   1 passed in 1.25s
+  generator delay   50 ms x2  ->  GREEN   1 passed in 1.40s
+  generator delay  500 ms x2  ->  GREEN   1 passed in 2.29s
+
+=== CONTROL: the driver's wait REMOVED ===
+  substitution: 'for _ in range(750):'  ->  'for _ in range(0):'
+  post-image absent-before/present-after : True/True
+  sha fixed -> mutated: 6b7da5a1671c9a54 -> 1bdf4574073b64bb  moved=True
+  generator delay    0 ms x2  ->  RED     1 failed in 1.43s   E  AssertionError: the report worker never completed: `panel.set_status` was not called once across 750 pumped turns after the Report pre…
+  generator delay   50 ms x2  ->  RED     1 failed in 1.37s   E  AssertionError: the report worker never completed: …
+  generator delay  500 ms x2  ->  RED     1 failed in 1.36s   E  AssertionError: the report worker never completed: …
+=== CONTROL REVERTED - sha MATCH=True ===
+```
+
+**Delays are two orders of magnitude apart** (0 → 50 → 500 ms), exceeding the
+control's "one order" floor.
+
+**The census is not vacuously green.** The 500 ms arm runs in **2.29 s** against
+the 0 ms arm's **1.25 s** — a ~1.0 s difference that is exactly the two injected
+500 ms sleeps. The perturbation demonstrably reaches the code the wait is about,
+so a green arm means the wait absorbed it rather than that nothing changed.
+
+**The control arm is what makes the treatment arms mean anything.** With
+`range(750) → range(0)` the driver has no wait at all and every arm goes RED on
+the driver's own named message — including the **0 ms** arm, which proves the
+node cannot pass without the wait even when the generators are as fast as they
+ever get. Recorded as a **VALUE** substitution (`750 → 0`), not as "drop the
+loop".
+
+**The control's ordering was checked, not assumed.** It reddens on the driver's
+timeout message, not on a downstream `FileNotFoundError` — i.e. the control fails
+*at the wait*, which is the thing under test.
+
+---
+
+## A.4 The three original mutations, re-executed on the amended driver
+
+The driver changed, so the discharge had to be re-run. All three reproduce, at
+identical shas.
+
+```
+############ BASELINE (fixed tree, sha 21e3ad53c3c687b9) ############   GREEN   1 passed in 1.60s
+
+############ MUTATION A  runs=panel._runs INTO THE REPORT KWARGS (spec LLR-122.4, literal) ############
+  anchor matches: 1 | post-image absent-before/present-after: True/True
+  sha 21e3ad53c3c687b9 -> d4bf542c5d095621  moved=True
+  VERDICT: RED
+E  AssertionError: the report worker took a FAILURE arm, so no complete file exists to observe;
+   it emitted "Diff report failed: TypeError: generate_diff_report() got an unexpected keyword argument 'runs'"
+############ A REVERTED - sha MATCH=True ############
+
+############ MUTATION B  route the report off panel._runs (spec Sec.5.3, type-preserving) ############
+  sha 21e3ad53c3c687b9 -> 268bdc55f7a3fad9  moved=True | vs A d4bf542c5d095621  distinct=True
+  VERDICT: RED
+E  AssertionError: the written Markdown report must list EVERY run of the comparison, in order;
+   it lists 128 of 200. First missing start address: 2048
+############ B REVERTED - sha MATCH=True ############
+
+############ MUTATION C  cap ONLY the HTML generator's input (html clause liveness) ############
+  sha 21e3ad53c3c687b9 -> c61d5739a0ef2783  moved=True | vs A distinct=True | vs B distinct=True
+  VERDICT: RED
+E  AssertionError: the written HTML report must list EVERY run of the comparison, in order;
+   it lists 128 of 200. First missing start address: 2048
+############ C REVERTED - sha MATCH=True ############
+
+############ FINAL sha 21e3ad53c3c687b9 == baseline: True ############
+```
+
+**A's message changed shape and its verdict did not.** It now reads the emitted
+message rather than the polled level, so the transcript names the `TypeError`
+directly. It still reddens **in the driver**, so it is still **not a discharge** —
+`LLR-122.4`'s literal wording remains uncorrected on disk (`C-78-xv`).
+
+---
+
+## A.5 The four LOWs — three landed, one carried
+
+| LOW | Disposition | Evidence |
+|---|---|---|
+| **`_b78_section` raises a bare `ValueError` on a heading change; R-2's mitigation covers only row-format changes** | ✅ **LANDED** | `text.index` → `text.find` + a named assertion: *"the written report does not contain the section heading `## Runs`, so this node cannot locate the run table. The report layout has changed and this parser must be updated before its verdict means anything"*, printing the first 200 bytes of the document. R-2 is amended below to cover **both** failure modes. |
+| **Design-choice-2's rationale is empirically false** | ✅ **LANDED (reason replaced, choice kept)** | Measured: 82 157-byte report, non-empty maps so the windows render, whole-document **200** == section-scoped **200** in both documents. The comment now states this as a measurement and gives the reason that survives it: the scoping **bounds what the node can be reading to the one table the requirement is about**, so a future layout growing a second address table cannot inflate the count into a false pass. Defence in depth, not a correction of a real over-count. **The vacuous-fixture trap was avoided deliberately** — an empty memory map would have made the two counts agree for the wrong reason, so the check used populated maps. |
+| **§6.1/§4.3 describe an uncommitted tree that no longer exists** | ✅ **LANDED** | §4.3's restore proof and §6 item 1 are amended in place with dated notes pointing at `c88b0ad`; the load-bearing half (app.py returns to sha `21e3ad53c3c687b9`) is re-verified in §A.4 rather than merely re-asserted. |
+| **`LLR-122.4`'s "128 painted" half is asserted nowhere green; §4 ↔ §5.1 rule 4 tension** | ⏭ **CARRIED, deliberately** | The node asserts `0 < painted < total`, which is the *property*; it does **not** assert the literal `128`, because §5.1 rule 4 forbids an acceptance from quoting a value it could read from the class under test — that is precisely the `AT-B78-18` / F-6 defect. So the node is right and `LLR-122.4`'s numeric threshold is unsatisfiable as literally worded. **This is a requirements-document reconciliation, not a test fix**, and `01-requirements.md` is off-limits here. Registered as a batch-close item below. |
+
+---
+
+## A.6 Files modified (addendum)
+
+| File | Change | Lines |
+|---|---|---|
+| `tests/test_tui_diff_screen.py` | `_b78_press_report` re-armed on an edge (status observer + pre-press file snapshot) and its docstring rewritten to state the exact guarantee; `_b78_section` given a named failure and a measured rationale | +109 / −40 |
+| `.dev-flow/2026-08-06-batch-78/03-increments/increment-003.md` | this addendum + two in-place amendments (§4.3 restore proof, §6 item 1) | — |
+
+**2 files, cap 5. No production file touched.** `git diff --stat` reports
+`tests/test_tui_diff_screen.py | 149 ++++--- , 1 file changed, 109 insertions(+),
+40 deletions(-)`. Nothing outside these two paths was staged or modified; the
+parallel session's `prototypes/memmap2.*` files are untouched; no `git add -A`,
+no `git stash`.
+
+**C-26 reverse-grep:** the addendum mints **no new module-level symbol**, so the
+Inc-3 census stands — every `_b78_*` name this increment owns resolves only in
+`tests/test_tui_diff_screen.py`.
+
+---
+
+## A.7 Test results (addendum)
+
+### A.7.1 The node
+
+```
+tests/test_tui_diff_screen.py::test_at_b78_31_written_report_is_complete_under_display_caps PASSED [100%]
+============================== 1 passed in 1.42s ==============================
+```
+
+### A.7.2 C-34 gate + the registry guard — ONE run, FULL form
+
+```
+$ python -m pytest tests/test_tui_diff_screen.py tests/test_tui_directionb.py tests/test_id_registry.py -q --no-header
+........................................................................ [ 32%]
+........................................................................ [ 65%]
+........................................................................ [ 98%]
+....                                                                     [100%]
+220 passed in 276.49s (0:04:36)
+```
+
+**220 passed, 0 failed, 0 skipped**, FULL form, read from this single run's own
+output (C-19). `test_id_registry.py` G1–G7 is folded into the same run at the
+reviewer's prompting — **13 nodes, all green**, so `AT-B78-31` introduces no
+registry drift for Inc-11.
+
+### A.7.3 Snapshot — unchanged
+
+```
+1 failed, 31 passed, 1 warning in 68.62s (0:01:08)
+FAILED tests/test_tui_snapshot.py::test_tc016s_density_layout_snapshot[diff-comfortable-120x30]
+```
+
+The same single known cell. **No second cell moved.** Regen stays CI-only (C9);
+nothing regenerated locally.
+
+### A.7.4 Ledger — unchanged
+
+**2626 passed** (honestly 2625 + the one drifted snapshot cell). The addendum
+adds and deletes **no** node: `D = 0, A = 0`. Corroborated unchanged —
+`pytest --collect-only -q` still reports **2631 tests collected**, and
+`2626 + 2 + 3 = 2631`.
+
+---
+
+## A.8 Risks (amended)
+
+| # | Risk | Change |
+|---|---|---|
+| **R-2** *(amended)* | The parsers depend on the written documents' layout — **both** the section headings and the run-table column format. | **Widened per LOW-1.** A heading change now fails with a named assertion that says the layout moved and prints the document head; a row-format change still fails with `0 of 200`, distinguishable from a capped `128 of 200`. Both failure modes are now named rather than one being a bare `ValueError`. |
+| **R-3** *(amended)* | The 750-turn / 20 ms budget is a wall-clock bound on real I/O. | **Now measured, not estimated.** §A.3: the node completes in 2.29 s with 1.0 s of injected delay, against a ~15 s budget — a ~6× margin at the 500 ms arm and ~12× at 0 ms. The failure remains a named `AssertionError`. |
+| **🆕 R-6** | `_b78_press_report` does not serialise **concurrent** presses (`@work(exclusive=True, group="diff_report")` cancels the in-flight worker). | Stated in the docstring rather than mitigated. Nothing in the suite presses twice concurrently. A caller that needs it must arm its own wait. |
+| **R-4** *(amended)* | `TC-024`'s two nodes still carry the `press()` + `wait_for_complete()` shape. | **Left in place, and the review agrees that is right** — they are *fragile, not false* (their assertions fail loudly under a lost race), out of §7's scope, and load-bearing for nothing this batch ships. `C-78-xiv` is sharpened below to name the **comment**, not only the call. |
+
+---
+
+## A.9 Carries (amended / added)
+
+| Carry | Statement | Due |
+|---|---|---|
+| **`C-78-xiv`** *(amended per the coordinator)* | **`Button.press()` followed by `workers.wait_for_complete()` is not a completion wait** — `press()` only posts a message, so the worker that the handler creates does not exist yet and the wait returns on an empty set. Measured: worker set **0** right after `press()`; `wait_for_complete()` returning in **0.8 ms** against 1000 ms of generator sleep. ⚠️ **The load-bearing half of this carry is the FALSE COMMENT, not the call.** `tests/test_tui_diff_screen.py:458-461` reads *"the two generators now run on a worker thread, so the status is written after this handler returns. A bare `pause()` passed only because the fake generators are instant — a race this suite must not depend on."* It **names the race correctly and then asserts a remedy that is not there**. A wrong call is one reader away from being caught; a comment claiming the check was already done is what makes the next reader skip it. Both `TC-024` nodes carry it. | batch close |
+| **`C-78-xv`** *(unchanged, reviewer recommends ENCODING)* | **A declared mutation must be stated as a value substitution that TYPE-CHECKS, or it is a wish rather than a control.** `LLR-122.4`'s `runs=panel._runs` into the report kwargs raises `TypeError` at the call boundary, is swallowed by the handler's `except Exception`, and reddens the node **in its driver** instead of on its assertion. Two sections of one document worded the same mutation differently and only §5.3's was executable. Independently reproduced by the reviewer at the same shas. | batch close |
+| **🆕 `C-78-xvi`** | **A completion wait must be armed on an EDGE, and so must every clause that consumes its result.** A level ("the surface currently reads DONE") is satisfied by the *previous* operation's result, so the wait returns before its own work and hands back a stale-but-well-formed artifact — a silent false green, not a loud failure, whenever the output directory is reused. Inc-3 shipped this twice ten lines apart: the status poll **and** the `len(glob) == 1` file check, the second of which only became visible once the first was fixed. **Snapshot before the trigger; require a transition.** | batch close |
+| **🆕 `C-78-xvii`** | **A newly minted completion wait owes the `C-78-xii` census on itself, including the control arm.** Inc-3 minted one and discharged it with `call_from_thread` reasoning — which is `C-78-xv`'s defect (*a wish rather than a control*) applied to a wait instead of a mutation. The census is cheap: three delays two orders of magnitude apart plus the wait removed. **The control arm is not optional** — without it, treatment arms cannot distinguish "the wait absorbed the perturbation" from "nothing was perturbed", and the wall-clock delta between arms is the evidence that the perturbation landed. | batch close |
+| **🆕 batch-close reconciliation item** | **`LLR-122.4`'s numeric threshold ("the written file holds 200 run entries against 128 painted") is unsatisfiable as literally worded**, because §5.1 rule 4 forbids an acceptance from quoting a value readable from the class under test — the literal `128` is `DISPLAY_MAX_RUNS`. `AT-B78-31` asserts the property (`0 < painted < total`) and is correct to. **§4 and §5.1 must be reconciled at batch close**; no test change is owed. | batch close |
+| **`F9`** *(carried forward, unchanged)* | `_b78_press_compare`/`_press_compare` and `_b78_run_list_text`/`_run_list_text` remain duplicated near-copies. The addendum added no copy. | batch close |
+
+---
+
+## A.10 Evidence checklist (addendum)
+
+- [x] **Tests pass.** `220 passed in 276.49s` (C-34 + registry, one run, FULL
+      form, §A.7.2); node `1 passed in 1.42s`; snapshot unchanged at the one
+      known cell.
+- [x] **The F1 fix is proven, not asserted.** Both driver forms executed against
+      the same two-press scenario; level returns in 1 ms with a stale file, edge
+      waits 933 ms and returns its own (§A.2).
+- [x] **The F2 census is complete, control arm included.** 3 treatment GREEN /
+      3 control RED, delays two orders of magnitude apart, perturbation
+      demonstrated to land by a 1.0 s wall-clock delta (§A.3).
+- [x] **The three mutations re-executed on the amended driver**, identical shas,
+      identical verdicts; `app.py` restored to `21e3ad53c3c687b9` (§A.4).
+- [x] **No secrets** in code or transcripts; all report output under `tmp_path`.
+- [x] **No destructive commands.** No `git add -A`, no `git stash`, no reset, no
+      force. Every mutation restored and sha-verified in-process.
+- [x] **File count within cap.** 2 files (1 test + this document), cap 5, no
+      production file.
