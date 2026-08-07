@@ -51,7 +51,15 @@ TERMS: list[tuple[str, str, tuple[str, ...]]] = [
     ("status-bar height",        r"status_bar\.size\.height|<= 7\b",       ("3.", "4.", "5.3", "6.4a")),
     ("unsatisfied axis",         r"unsatisfied axis",                      ("2.8", "3.", "4.", "5.3", "6.4a")),
     ("clipped vs content bound", r"≤\*?\*? its (clipped|\*\*content\*\*)", ("3.", "4.", "5.5", "6.4a")),
-    ("footer painted count",     r"painted|none truncated|contains all",   ("1.3", "2.4", "3.", "4.", "5.3", "5.4", "6.4a")),
+    # §2.8 added at the Inc-5 gate (2026-08-06), deliberate and recorded. The hit is
+    # a FALSE POSITIVE of an over-broad regex: this term is about the FOOTER's
+    # painted-chip count (R-5), and the bare literal `painted` also matches the diff
+    # WINDOW's painted rows, which is what §2.8's corrected D-1 height axis is about.
+    # Widened rather than reworded because "painted" is the term of art the corrected
+    # metric depends on. ⚠️ CARRY: the regex should key on the Footer SUBJECT, not on
+    # the bare word — as written it will keep false-positiving on any new use of
+    # "painted", and each widening costs a little of the term's real force.
+    ("footer painted count",     r"painted|none truncated|contains all",   ("1.3", "2.4", "2.8", "3.", "4.", "5.3", "5.4", "6.4a")),
     ("footer numeral",           r"\b(7|8|12|13|14|15|16)\b(?=[^|]{0,60}(chip|Footer|painted))",
                                                                           ("1.3", "2.4", "2.7", "2.8", "3.", "4.", "5.3", "5.5", "6.4a", "9.")),
     ("fallback layout",          r"fallback",                              ("1.3", "2.6", "2.8", "3.", "4.", "5.3", "5.5", "6.4a", "7.", "8.")),
