@@ -757,3 +757,225 @@ discharge true.
 | Simplicity / reuse | ✓ | route B is 2 production lines + docstrings; no helper duplicated; `TC-B78-49` reuses `_diff_result` / `_b78_run_index` / `_b78_focus_run_list` |
 | Verdict explicit | ✓ | **Block** — F7 |
 | Live repo tree unmodified | ✓ | `git status --short -- s19_app/ tests/` empty; `sha256 = 667cd9c5b2254ff4…`; all mutation work in isolated exports, restored and hash-verified; `prototypes/memmap2.*` untouched |
+
+---
+---
+
+# Code Review — Inc-2 **FINAL RE-GATE** (round 3)
+
+> **Range:** `438fda3..7d034db` (F7 fix) and `c59e794..438fda3` (F8, §7 reconciliation)
+> Isolated `git archive 7d034db` export; live tree untouched —
+> `git status --short -- s19_app/ tests/` empty.
+
+## BLUF — **PASS.** Advance Inc-2.
+
+**F7 and F8 are closed, and I re-executed both rather than reading them.** The completion
+signal is correct, total, and — the part that matters — **invariant under a 10× increase in
+the perturbation**, which is the property an extra `pause()` cannot have. The control arm
+genuinely reddens, so the discharge is a measurement and not an artefact of a census that
+perturbs nothing.
+
+No HIGH. No MEDIUM. **One LOW**, non-blocking, plus a correction to a statement I made in
+round 1.
+
+| Finding | Status |
+|---|---|
+| **F1** (HIGH, r1) second Compare crashes | ✅ CLOSED (r2) |
+| **F2** (MEDIUM, r1) mouse negative unverified | ✅ CLOSED (r2) |
+| **F3** (MEDIUM, r1) sha limb vacuous | ❌ WITHDRAWN — my error (r2) |
+| **F4/F5/F6** (LOW, r1) | ✅ carried / closed (r2) |
+| **F7** (HIGH, r2) 14-node scheduling race | ✅ **CLOSED — three arms re-run, plus a fourth I added** |
+| **F8** (MEDIUM, r2) §7 never reconciled | ✅ **CLOSED — four cells right, false discharge recorded beside its correction** |
+| **F9** (LOW, **new**) the wait helper is duplicated across the two modules | ⚠️ recommendation only |
+
+---
+
+## 1. The census, re-run independently — four arms
+
+Applied to my own export, perturbation inserted at the same point, all files restored and
+hash-verified afterwards.
+
+| Arm | Perturbation | Completion wait | Result |
+|---|---|---|---|
+| **A — control** | 20 ms | **removed** | 🔴 **15 failed, 14 passed** |
+| **B — discharge** | 20 ms | in place | ✅ **29 passed, 0 failed** |
+| **C — determinism** | **200 ms (10×)** | in place | ✅ **29 passed, 0 failed** |
+| **D — my addition:** the gate modules that press Compare and were **not** wired | 20 ms **and** 200 ms | n/a | ✅ **18 passed, 0 failed** (both) |
+
+**Arm A is the one you flagged, and it genuinely reddens.** Stripping the wait back to
+`press(); await pilot.pause()` — leaving every call site intact, so only the wait changes —
+puts 15 of 29 nodes red. A census that perturbs nothing would read `0 failed` in arm A too;
+this one does not.
+
+**Arm C is the load-bearing result and it reproduces.** 10× the suspension, still `0
+failed`. That is the qualitative difference from padding: I measured in round 2 that one
+extra `pause()` absorbs 20 ms *and* 200 ms, so a pause-based fix would also have looked
+clean at 10× — but only because the threshold moved. Here nothing is waiting on time at
+all, so the arm is not a threshold test; it is a demonstration that the observable is no
+longer a function of scheduling.
+
+## 2. The 12 vs 14 — resolved. **Neither count is wrong; the set is a distribution.**
+
+I ran arm A **three times** on one host, one tree, one command:
+
+```
+ARM A run 1: 15 failed, 14 passed
+ARM A run 2: 15 failed, 14 passed
+ARM A run 3: 14 failed, 15 passed
+
+symmetric difference between two consecutive repeats: ['test_tc021_compare_routes_through_service']
+```
+
+**My own census disagrees with itself by one node between consecutive runs of identical
+code.** Round 2 (on `c59e794`) gave 14; round 3 gives 15, 15, 14. The author's 12 is a
+fourth sample of the same distribution.
+
+That is the informative part you asked for: **the failing set is scheduling-determined, not
+structurally determined.** A 20 ms suspension does not partition the nodes into "exposed"
+and "safe" — it puts every direct-read node near a threshold, and the ones with a little
+more incidental margin (an extra key press, a smaller fixture) flip run to run. `test_tc021`
+is the marginal node in my samples.
+
+**The invariant that carries the verdict is not the count.** It is: **control ≫ 0 in every
+sample (12, 14, 15, 15, 14) and discharge == 0 in every sample.** A count that varied while
+the *discharge* varied would be a problem; a count that varies while the discharge is
+identically zero at 20 ms and 200 ms is the signature of a fix that removed the dependency
+rather than moving the threshold. **No reconciliation is owed — the difference should be
+recorded as "the census reports a sample, not a set," which is worth carrying.**
+
+## 3. The `finally` really covers all four exits — driven, not reasoned
+
+```
+PROBE success    -> returned  generation 0->1  bumped=True  status='Compared A.s19 vs B.s19: 1 runs.'
+PROBE refusal    -> returned  generation 0->1  bumped=True  status='Compare refused: reviewer probe: refused'
+PROBE exception  -> raised RuntimeError('induced'); generation now 1  bumped=True
+```
+
+- **Refusal returns and does not hang.** This is the exit `_diff_last_result` would have
+  hung on, and the module drives it (`test_at_016_3`). Your caveat carried correctly, and
+  the author's statement of *why* — *a completion signal conditional on the happy path
+  turns a failure into a hang* — is the right generalisation.
+- **Exception bumps the counter and then propagates.** Driven two ways: through the real
+  app (an induced failure inside the awaited render surfaces as a `RuntimeError`, not a
+  25-second timeout) and directly against the wrapper with `_apply_compare_request` patched
+  to raise, which shows `generation 0 -> 1` *before* the exception leaves. **No exit hangs.**
+
+## 4. All nine drivers are wired — and the two that are not are provably immune
+
+`grep -rn 'diff_compare_button' tests/` finds **11** press sites. **9 are wired**
+(7 in `test_tui_diff_screen.py`, 2 in `test_tui_diff_compare_realpath.py`) — that is the
+count you reported, and it is exact.
+
+The other two — `tests/test_report_off_ui_thread.py:185` and
+`tests/test_tui_report_filter_surface.py:757` — are **not** wired, and both are in the gate
+suite, so I treated this as the silent hole you named and went after it. **It is not one,
+and the mechanism is decidable rather than statistical:**
+
+`MessagePump._process_messages_loop` **awaits** `_dispatch_message` for each message, and
+`_on_message` does `await invoke(method, message)`. Handlers are therefore **serialized** —
+a second message cannot be dispatched until the first handler coroutine returns. So:
+
+- the exposed sites are exactly those where the **test coroutine**, which runs *outside* the
+  pump, reads state directly after `pause()`;
+- the two unwired sites press **another button** next, and that message is queued behind the
+  compare handler. It cannot overtake it.
+
+Measured, not assumed: **arm D is `18 passed, 0 failed` at 20 ms and again at 200 ms.**
+(`_flush(pilot, count=12)` in the filter-surface module and `workers.wait_for_complete()`
+in the off-UI-thread module add further margin on top.) **The wiring is complete and the
+boundary is principled, not lucky.**
+
+## 5. The extraction is a pure rename — proved by the diff itself
+
+```
+$ git diff --numstat 438fda3..7d034db -- s19_app/tui/app.py
+38      0       s19_app/tui/app.py
+```
+
+**Zero deleted lines.** The new wrapper reuses the existing
+`async def on_ab_diff_panel_compare_requested(\n    self, event: ...)` header and the
+original `) -> None:` plus its docstring now belong to `_apply_compare_request`, so the
+whole change is additive. No line of compare logic was re-indented, moved or edited — that
+is not a claim I have to trust, it is what a 38/0 numstat means. This is a genuinely elegant
+way to make a rename reviewable, and worth carrying as a technique.
+
+## 6. Everything else on the list
+
+| Item | Verified |
+|---|---|
+| `TC-B78-17` / `TC-B78-22` still undischarged | ✅ not upgraded — packet A-table row *"Still undischarged, still stated as such. Not upgraded."* and §B.5 give the reason per node. `TC-B78-22` never presses Compare, so it is not even in the race's reach — correctly noted |
+| Ledger unchanged at **2625** | ✅ `grep -c '^def test_'` at `7d034db`: diff_screen **23**, realpath **6** — identical to `c59e794`. F7 added no node |
+| Snapshot drift | ✅ `git status --short tests/__snapshots__/` empty; still the single `[diff-comfortable-120x30]` cell |
+| §7's four cells | ✅ Inc-2 row now `screens_directionb.py`, **`app.py`**, both test modules, **`prototypes/cmdbar_a2bdiff.tui_prototype.py` (5)**, ATs column carries **`TC-B78-49`**, gate cell carries the CF-B discharge; `styles.tcss \| 1, 5, 7, 10` with `~~2~~` and the measured reason; `app.py \| **2**, 5, 7, 9, 11` with the ratification reason; new prototype row |
+| The false C-21 discharge is recorded, not overwritten | ✅ the original sentence is struck and replaced, and a ⚠️ block **states that it was false, why, and who committed it**. It goes further than I asked by finding the root cause — `enum.py`'s tracked terms do not include §7's file-map cells — and carrying that as `C-78-xi`. That is the right escalation: the control that should have caught it is now the thing being fixed |
+| Full gate suite `415 passed, 1 xfailed in 665.24s` | ⚠️ **self-report, not re-executed** (per the standing instruction on long suites). Corroborated by the 47 nodes I did execute: 29 (both diff modules, arms B and C) + 18 (arm D) |
+| HEAD moving between rounds | noted, no action — your commits, and the author has consistently and correctly said it has never run `git commit` |
+
+---
+
+## F9 — the wait helper is duplicated across the two modules **[LOW]**
+
+- **What:** `_b78_press_compare` (`tests/test_tui_diff_screen.py:207`) and `_press_compare`
+  (`tests/test_tui_diff_compare_realpath.py:47`) are two near-identical implementations of
+  the same wait. The same is true of `_b78_run_list_text` (`:185`) and `_run_list_text`
+  (`:75`), added at Inc-2.
+
+- **Why it is worth a line:** F7's defect class was *precisely* "one driver left on the old
+  wait." The structural mitigation for that class is **one** helper, not two. With two, a
+  future correction to the wait — a different signal, a different bound, a diagnostic — has
+  to be applied twice, and the census would only look at whichever module the author was
+  editing. `tests/conftest.py` already exists and already holds plain shared helper
+  functions (`make_large_s19`, `_s19_data_record`, … — 1077 lines, not fixtures only), so
+  there is an established home and no new convention would be invented.
+
+- **Not blocking, and not for this increment.** Both copies are correct today, the
+  docstrings are legitimately module-specific, and moving test helpers between modules is
+  outside Inc-2's charter. Recommend it as a batch-close item rather than a change here.
+
+- **Correction to round 1, since I hold the author to this standard.** In my round-1
+  "verified as sound" list I wrote that `_b78_run_list_text` *"is shared between the two
+  test modules rather than copied."* **That was wrong** — they were two separate helpers
+  from the start, and I did not check before praising it. The reuse assessment in round 1
+  should read: the C-38 re-point was correct and necessary, but it was implemented as a
+  duplicated helper, not a shared one.
+
+---
+
+## Verdict
+
+- [x] **OK to advance**
+- [ ] OK with the listed fixes applied first
+- [ ] Block
+
+**Inc-2 passes, and passes on a clean verdict rather than an exhausted one.** I re-ran the
+control arm because a discharge is only as good as the arm that proves the census can go
+red, and it went red 15/15/14 across three runs. Arm C reproduces at 10×. The completion
+signal is total across all four handler exits, driven not reasoned. The driver wiring is
+complete and its boundary is explained by handler serialization rather than by luck. §7 is
+actually reconciled and the false discharge is recorded beside its correction with the root
+cause escalated.
+
+**F9 is a recommendation for batch close, not a gate condition.**
+
+**Two things from this increment are worth more than the fix.** The first is the shape of
+the F7 remedy: the wait was put in the **driver** and made to *raise* on timeout, so the
+un-rendered state is unreachable by any node built on it — **including nodes not yet
+written**. That is a control, not a patch, and `C-78-xiii` states it correctly. The second
+is `C-78-xi`: the §7 miss was traced to `enum.py`'s tracked-term set rather than to the
+person who made it. Both are the batch's pattern — the defect was never in the shipped
+code, and the fix landed one layer above where the defect showed.
+
+## Evidence checklist — round 3
+
+| Item | ✓/✗ | Evidence |
+|---|---|---|
+| Fix diff read in full | ✓ | `app.py:1508-1523, 4793-4818`; `test_tui_diff_screen.py:207-240` + 7 call sites; `test_tui_diff_compare_realpath.py:47-73` + 2 call sites |
+| Census re-run, control included | ✓ | arm A 15/15/14 failed · arm B 0 · arm C (10×) 0 · arm D (unwired modules) 0 at 20 ms and 200 ms |
+| 12-vs-14 settled | ✓ | three arm-A repeats on one host disagree by one node; the set is a sample, the discharge is invariant |
+| `finally` coverage driven | ✓ | success / refusal / exception, all bump the counter; no exit hangs; exception path verified twice |
+| All press sites accounted for | ✓ | 11 found, 9 wired, 2 immune by handler serialization (`message_pump.py:634-707`), measured at 20 ms and 200 ms |
+| Extraction is a pure rename | ✓ | `git diff --numstat` = `38 0` — zero deletions |
+| Correctness pass on the new code | ✓ | `before` read prior to `press()`; bounded 500-turn loop with a named failure; per-press wait in `TC-B78-49`'s double drive; counter bumped after the full handler body |
+| Simplicity / reuse | ✓ with F9 | 5 production lines + one counter; helper duplicated across modules — recorded as LOW |
+| Verdict explicit | ✓ | **Pass** |
+| Live repo tree unmodified | ✓ | `git status --short -- s19_app/ tests/` empty; all perturbation in an isolated export, restored and hash-verified per arm; `prototypes/memmap2.*` untouched |
