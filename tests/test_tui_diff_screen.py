@@ -1647,3 +1647,202 @@ def test_tc_b78_49_a_second_compare_rebuilds_the_list(tmp_path: Path) -> None:
         f"every run of the SECOND comparison must still be keyboard-reachable; "
         f"the walk reached {walk}"
     )
+
+
+# --------------------------------------------------------------------------
+# batch-78 Inc-3 - LLR-122.4: the PERSISTED report stays complete
+#
+# Node map (spec Sec.3 HLR-122 / Sec.4 LLR-122.4 / Sec.5.3 / Sec.7 Inc-3):
+#   AT-B78-31  test_at_b78_31_written_report_is_complete_under_display_caps
+#
+# Why this node exists at all. G-9's caps (`DISPLAY_MAX_RUNS`,
+# `DISPLAY_MAX_TOTAL_BYTES`) bound the PANEL and never the report (spec C8 /
+# P-50), and that is a fact about two lines of `app.py`. Inc-2 hardened the
+# panel side; the report side had NO observer, so an edit that made the report
+# inherit the panel's capped view would have been invisible to the whole suite.
+#
+# C-12 (output-then-consume) is what makes this a control instead of a citation:
+# the node drives the SHIPPED Report button with the REAL generators, then
+# re-reads the files those generators actually wrote FROM DISK and counts the
+# runs in them. `panel._runs` is the capped view and is therefore never the
+# oracle here - it is only read as the "and the cap really was active in this
+# same run" co-assertion, which is what makes the completeness clause
+# discriminating rather than trivially true on a fixture that never capped.
+# --------------------------------------------------------------------------
+
+#: The success sentinel `_start_diff_report_worker` marshals back to the UI
+#: thread AFTER both files are closed (`app.py`, the `ok` arm).
+_B78_REPORT_OK = "Diff report written:"
+
+#: Every failure arm of that same worker. Each is a LOUD stop, never a timeout:
+#: a refused or crashed report leaves no file, and a node that waited its budget
+#: out and then failed on `FileNotFoundError` would be reporting the wrong fact.
+_B78_REPORT_FAILED = (
+    "Report refused:",
+    "HTML report refused:",
+    "Diff report failed:",
+    "No comparison yet",
+)
+
+
+async def _b78_press_report(app, pilot, dest_dir: Path) -> tuple[Path, Path]:
+    """Press the shipped Report button and wait for the WORKER to finish.
+
+    Not a pause, and not ``workers.wait_for_complete()`` either (C-78-xii, one
+    layer further out than Inc-2's compare driver). ``Button.press()`` only
+    POSTS ``Pressed``; the handler that starts the ``@work(thread=True)`` worker
+    has not run yet, so a worker-set wait taken immediately after the press
+    observes an EMPTY set and returns at once - the same shape as waiting on
+    queue idleness for a suspended coroutine.
+
+    The signal waited on here is the panel status, because
+    ``_start_diff_report_worker`` writes it through ``call_from_thread`` and
+    ``call_from_thread`` blocks the worker until the callback has run on the UI
+    thread. Reaching ``_B78_REPORT_OK`` therefore happens-after both files are
+    written and closed, which is exactly the precondition a re-read needs.
+
+    The wait is TOTAL: every failure arm of the worker is a named, loud raise,
+    so the caller can never proceed on a stale or missing file.
+
+    C-78-xiii: this is also the positive co-assertion for every node built on
+    it. The lost-race state here is "no file at all", in which a completeness
+    predicate written as an absence clause would pass vacuously. Raising here
+    puts that guarantee in the DRIVER, so nodes not yet written inherit it.
+    """
+    app.query_one("#diff_report_dest").value = str(dest_dir)
+    app.query_one("#diff_report_button").press()
+    status = ""
+    for _ in range(750):
+        status = str(app.query_one("#diff_status").render())
+        for arm in _B78_REPORT_FAILED:
+            if arm in status:
+                raise AssertionError(
+                    f"the report worker took a FAILURE arm, so no complete file "
+                    f"exists to observe; #diff_status reads {status!r}"
+                )
+        if _B78_REPORT_OK in status:
+            written_md = sorted(dest_dir.glob("*-diff-report.md"))
+            written_html = sorted(dest_dir.glob("*-diff-report.html"))
+            assert len(written_md) == 1 and len(written_html) == 1, (
+                f"the success status was written but the destination does not "
+                f"hold exactly one report of each kind: md={written_md}, "
+                f"html={written_html}"
+            )
+            return written_md[0], written_html[0]
+        await pilot.pause(0.02)
+    raise AssertionError(
+        f"the report worker never completed: #diff_status never reached "
+        f"{_B78_REPORT_OK!r} across 750 pumped turns and still reads {status!r}. "
+        f"Every assertion after this point would be reading a file that was "
+        f"never written."
+    )
+
+
+def _b78_section(text: str, heading: str, stop: str) -> str:
+    """The slice of ``text`` from ``heading`` up to the next ``stop`` marker.
+
+    The run table is scoped to its own section on purpose: the hex-window dumps
+    later in both documents also carry ``0x``-prefixed addresses, and a
+    whole-document regex would count rows that are not run entries.
+    """
+    start = text.index(heading)
+    after = start + len(heading)
+    return text[start : text.index(stop, after)] if stop in text[after:] else text[start:]
+
+
+def _b78_md_report_run_starts(text: str) -> list[int]:
+    """Every run-table start address in a written MARKDOWN diff report."""
+    import re
+
+    section = _b78_section(text, "## Runs", "\n## ")
+    return [
+        int(m.group(1), 16)
+        for m in re.finditer(
+            r"^\| 0x([0-9A-F]{8}) \| 0x[0-9A-F]{8} \|", section, re.MULTILINE
+        )
+    ]
+
+
+def _b78_html_report_run_starts(text: str) -> list[int]:
+    """Every run-table start address in a written HTML diff report."""
+    import re
+
+    section = _b78_section(text, "<h2>Runs</h2>", "</table>")
+    return [
+        int(m.group(1), 16)
+        for m in re.finditer(r"<tr><td>0x([0-9A-F]{8})</td><td>0x", section)
+    ]
+
+
+def test_at_b78_31_written_report_is_complete_under_display_caps(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-31 (PIN, green today) - the WRITTEN report holds every run of the
+    comparison while the panel paints only the capped subset (LLR-122.4, G-9).
+
+    Intent: the operator's evidence artifact must not silently inherit a
+    DISPLAY budget. The panel caps because a terminal has finite rows; the
+    report has no such constraint and is the thing that gets attached to a
+    change record. An implementation that fed the report the panel's stored
+    runs - the shortest possible edit, `runs=panel._runs` - would still render
+    a correct-looking panel, still write a well-formed report, and silently drop
+    every run past the cap.
+
+    Falsifiability: the observation is C-12 output-then-consume. Both files are
+    produced by the REAL generators through the shipped Report button and then
+    RE-READ FROM DISK; nothing in the expectation comes from `panel._runs`, from
+    the generators, or from `DISPLAY_MAX_RUNS`. The expectation is the fixture's
+    own run list, which the test authored before the app ever saw it. The
+    declared mutation (route the report off the panel's capped runs) drops the
+    written count to the cap and reddens the completeness clause itself.
+
+    Non-vacuity: a completeness claim proves nothing on a fixture that never
+    capped, so the painted count is captured IN THE SAME RUN and asserted
+    strictly smaller. The constant-quoting guard is asserted LAST (Inc-2 F-1:
+    a guard placed ahead of the substantive clauses reddens first and the
+    subject never runs).
+    """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    total = _B78_OVER_CAP_RUNS
+    runs = [(i * 16, i * 16 + 4, "changed") for i in range(total)]
+    expected_starts = [start for start, _end, _kind in runs]
+    dest_dir = tmp_path / "b78_report_dest"
+    dest_dir.mkdir()
+
+    async def _after(app, pilot):
+        md_path, html_path = await _b78_press_report(app, pilot, dest_dir)
+        painted = len(list(_b78_run_list(app).query(_B78_RUN_ENTRY)))
+        return (
+            md_path.read_text(encoding="utf-8"),
+            html_path.read_text(encoding="utf-8"),
+            painted,
+        )
+
+    md_text, html_text, painted = _b78_drive_compare(
+        tmp_path, _B78_AT_SIZE, _diff_result(runs), after=_after
+    )
+
+    md_starts = _b78_md_report_run_starts(md_text)
+    assert md_starts == expected_starts, (
+        f"the written Markdown report must list EVERY run of the comparison, "
+        f"in order; it lists {len(md_starts)} of {total}. First missing start "
+        f"address: "
+        f"{next((s for s in expected_starts if s not in set(md_starts)), None)}"
+    )
+    html_starts = _b78_html_report_run_starts(html_text)
+    assert html_starts == expected_starts, (
+        f"the written HTML report must list EVERY run of the comparison, in "
+        f"order; it lists {len(html_starts)} of {total}. First missing start "
+        f"address: "
+        f"{next((s for s in expected_starts if s not in set(html_starts)), None)}"
+    )
+    assert 0 < painted < total, (
+        f"this node is only discriminating while the PANEL is actually capping "
+        f"in the same run: it painted {painted} of {total} runs, so the "
+        f"completeness clauses above would hold trivially"
+    )
+    assert total > AbDiffPanel.DISPLAY_MAX_RUNS, (
+        f"this node's fixture ({total} runs) must exceed the display cap "
+        f"({AbDiffPanel.DISPLAY_MAX_RUNS}) or it tests nothing"
+    )
