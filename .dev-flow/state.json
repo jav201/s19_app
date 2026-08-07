@@ -198,6 +198,12 @@
       "date": "2026-08-06",
       "decision": "Phase 3 opened at Inc-0; operator reconfirmed the model (autonomous, code-reviewer at each increment gate)",
       "notes": "Baseline collected by the orchestrator before any tree change. Inc-0 is artifact capture only - no production source may change, and its artifacts are the oracles that break AT-B78-03 circularity."
+    },
+    {
+      "phase": 6,
+      "date": "2026-08-07",
+      "decision": "synced-to-obsidian",
+      "notes": "G:/My Drive/ConsultIA/Obsidian_Vaults/AI-Consulting-Brain/01 - Proyectos/s19_app/dev-flow-batches/2026-08-06-batch-78/ - 10 artifacts + state-at-close.json + README. 03-increments NOT synced (vault convention). 04/05/06 DO NOT EXIST: the batch was cut at phase 3, HANDOFF.md is the terminal artifact, and the README records every null as a missing SOURCE rather than a lost metric. Reject-checks: placeholder detect 0 live hits across 9 artifacts; empty-structure detect 27 flagged and all 27 VERIFIED as parent headings (false positives, no blocker); enum.py exit 0, read directly and not through a pipe. Visual evidence refreshed (trigger: 3 files under s19_app/tui/): 15 cases regenerated, 15 passed in 56.68s, from code byte-identical to merged main; 75 flattened frames + 15 gifs copied with the section-5 flattening helper; freshness 75/75 frames + 15/15 gifs, 0 stale; legacy nested set verified untouched at 16 dirs / 80 files. THREE THINGS FOUND AT THIS SYNC, all reported and none silently patched: (a) the retired pv__case_06 case is still physically present in the gitignored tests/_artifacts/ as a 2026-07-08 leftover, so pytest wrote 15 cases into a directory holding 16 and the section-5 blanket gif glob WOULD have re-stamped a retired asset as fresh - the by-name exclusion is load-bearing, not ceremonial, and the helper does not carry it; (b) the visual-evidence.md FOOTER stamp had drifted TWO batches behind the authoritative section-5 bullet (footer read batch-74 while section 5 read batch-77) - the second recurrence after batch-72's correction added a prose instruction to prefer section 5, which is evidence that a prose instruction is not a mechanism; the structural fix (delete the duplicate stamp, link section 5) is left to the operator; (c) HANDOFF section 5 cites C-78-xxiv, which is NOT registered in phase3_carries - the highest registered id is xxiii and ids xiv/xix/xxi are unallocated. The COUNT reconciles at 23; the ID SPACE has a hole and one orphan citation."
     }
   ],
   "phase1_rulings": {
@@ -215,7 +221,7 @@
     "my_own_error_recorded": "I first DERIVED 6 rows at 120x30 by adding the six rows S-8 frees. Executed, it is 2: #diff_columns goes 1 -> 3 under S-8, not 1 -> 7, because the layout redistributes rather than handing the freed space to the results container. The architect's figure was right and my arithmetic was wrong. This is C-35 landing on me for the SECOND time in this batch (the first was measuring render_hex_view_text for a panel that calls render_hex_view) - reading the layout and computing over it separately misses their interaction, which is the exact thing C-35 exists to say.",
     "consequence": "The charter's 'fallback at 120' delivers a 2-row window and 80x24 delivers nothing in any configuration. Escalated to the operator rather than absorbed; resolved by R-1."
   },
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-08-06T00:00:00Z",
   "progress": {
     "branch": "claude/batch-78-cmdbar-a2bdiff, pushed nowhere yet - no PR open",
