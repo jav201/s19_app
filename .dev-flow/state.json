@@ -48,7 +48,7 @@
     "note": "LLR-*, R-* and US-* are NOT covered by the registry (operator scoping ruling 2026-07-31)."
   },
   "current_phase": 3,
-  "phase_status": "awaiting-gate",
+  "phase_status": "awaiting-sync",
   "iterations_per_phase": {
     "0": 0,
     "1": 3,
@@ -299,5 +299,17 @@
     "first_action": "ASK THE OPERATOR FOR THE AUTHORIZATION MODEL. Per-batch, never inherited - not from this file, not from the handoff.",
     "token_note": "This session spent ~4.8M subagent tokens against a stated per-session budget of 30k. The orchestrator did not surface the breach until asked, which is itself a violation of the standing rule that a budget breach is surfaced rather than silently overrun. A resuming session should agree a cost model at kickoff: the cheapest form that kept the value was ONE independent reviewer per increment with the orchestrator implementing."
   },
-  "merge_gate_owed": "The kickoff grant authorised merge, with a MANDATORY final independent qa-reviewer pass over the whole diff vs main as its precondition. That pass has NOT been run - it costs tokens the operator has just asked to stop spending. The branch is therefore pushed and a PR opened, and the merge STOPS THERE pending either that pass or an explicit operator waiver. The precondition is not waived by the cut."
+  "merge_gate_owed": "The kickoff grant authorised merge, with a MANDATORY final independent qa-reviewer pass over the whole diff vs main as its precondition. That pass has NOT been run - it costs tokens the operator has just asked to stop spending. The branch is therefore pushed and a PR opened, and the merge STOPS THERE pending either that pass or an explicit operator waiver. The precondition is not waived by the cut.",
+  "merged": {
+    "pr": 189,
+    "squash_sha": "ba5f0ca",
+    "merged_at": "2026-08-07",
+    "base_at_merge": "f6ff1d3",
+    "ci": "snapshot PASS + tui-ci PASS (51m16s, full suite). mergeStateStatus CLEAN at merge.",
+    "ledger": "2607 / 2 / 3 (baseline f6ff1d3) -> 2648 at close.",
+    "scope": "LANE 2 ONLY. Lane 1 (Inc-6..Inc-12) never started and is chartered as batch-79; Lane 3 as batch-80. See HANDOFF.md.",
+    "snapshot_regen": "Inc-12 job pulled forward because the cut invalidated its assumption. Regenerated via the snapshot-regen workflow_dispatch (run 31151147263) in the canonical textual==8.2.8 environment, never locally. EXACTLY ONE of 29 cells differed - [diff-comfortable-120x30], predicted from Inc-1 onward; the other 28 returned BYTE-IDENTICAL from an environment no increment ran in, which is stronger evidence that Lane 2 changed nothing it should not have than the drift count itself.",
+    "merge_gate_waived_by_operator": "The kickoff grant made a final independent qa-reviewer pass over the whole diff the PRECONDITION for merging. That pass was NOT run. The operator waived it EXPLICITLY (\"haz el merge, cerramos la sesion\") after I stated the precondition stood unwaived and asked. Recorded as the operator decision it is, not as an omission.",
+    "ci_was_RED_when_the_merge_was_ordered": "Worth the record: when the operator said merge, the snapshot check was FAILING and they could not have known. Merging then would have left origin/main with a permanently red test until batch-79, breaking the baseline every later batch measures against. The regen was run first and the merge waited ~55 minutes for a green full suite."
+  }
 }
