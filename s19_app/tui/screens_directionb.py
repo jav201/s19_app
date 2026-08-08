@@ -1797,6 +1797,12 @@ class LoadedArtifactsPanel(Container):
         ("a2l", "A2L"),
     )
     _ABSENT_TEXT = "(none)"
+    #: LLR-120.2's absent sentinel for the project row. Bound here, in the class
+    #: body, so `render_slots`'s default argument resolves it at definition time
+    #: and the panel's "nothing loaded shows a sentinel, never a blank" contract
+    #: (TC-B78-09) holds even for a caller that omits the argument entirely --
+    #: `on_mount` is exactly such a caller.
+    _PROJECT_ABSENT = _ABSENT_TEXT
 
     class UnloadRequested(Message):
         """A slot's ``[u]`` / the footer ``[U]`` asked to unload an artifact.
@@ -1848,8 +1854,10 @@ class LoadedArtifactsPanel(Container):
         """
         self.render_slots(None)
 
-    def render_slots(self, loaded: Optional["LoadedFile"]) -> None:
-        """Rebuild the three slot rows (+ the unload-all row) from a snapshot.
+    def render_slots(
+        self, loaded: Optional["LoadedFile"], project: str = _PROJECT_ABSENT
+    ) -> None:
+        """Rebuild the project row + three slot rows (+ unload-all) from a snapshot.
 
         Summary:
             Clear ``#loaded_slots`` and re-mount one row per artifact plus the
@@ -1885,11 +1893,53 @@ class LoadedArtifactsPanel(Container):
             return
         slots.remove_children()
         rows: List[Widget] = []
+        # LLR-120.2 -- the project row. FIRST, above the artifact slots: the
+        # project is the context the three artifacts sit inside, not a fourth
+        # artifact. It is built through `safe_text` like every other
+        # file-derived cell in this panel (LLR-120.4): a project name is a
+        # DIRECTORY name on the operator's own disk, and `U+009B` / `U+009D`
+        # are single-byte C1 introducers that carry no `\x1b` and are legal
+        # Windows filename characters. A `markup=False`-only row would sit
+        # scrub-inconsistent beside scrubbed siblings, and
+        # `grep -rl "loaded_slots\|_build_slot_row" tests/` returns 0 files, so
+        # nothing in the repo would have caught it.
+        rows.append(self._build_project_row(project))
         for artifact, kind in self._SLOTS:
             present, name, summary = self._slot_state(loaded, artifact)
             rows.append(self._build_slot_row(artifact, kind, present, name, summary))
         rows.append(self._build_unload_all_row(loaded is not None))
         slots.mount(*rows)
+
+    def _build_project_row(self, project: str) -> Horizontal:
+        """Build the Loaded panel's project row (LLR-120.2).
+
+        Summary:
+            One row naming the active project, in whichever display form the
+            caller computed -- the plain name at N <= 1 variants, the
+            ``project:variant (index/total)`` form above that (LLR-120.5). The
+            FORM is the caller's business: this panel renders the string it is
+            handed and never re-derives it, which is what keeps the two context
+            surfaces from drifting apart.
+
+        Args:
+            project (str): The already-composed project string, or the absent
+                sentinel.
+
+        Returns:
+            Horizontal: the project row, shaped like a slot row so it inherits
+            the panel's existing column rhythm.
+        """
+        absent = project == self._PROJECT_ABSENT
+        kind_cell = Static(Content("project"), classes="loaded-kind")
+        detail = Static(
+            safe_text(project),
+            classes="loaded-detail loaded-absent" if absent else "loaded-detail",
+        )
+        return Horizontal(
+            kind_cell,
+            detail,
+            classes="loaded-slot loaded-slot-absent" if absent else "loaded-slot",
+        )
 
     def _slot_state(
         self, loaded: Optional["LoadedFile"], artifact: str

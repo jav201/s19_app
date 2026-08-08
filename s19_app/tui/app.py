@@ -1928,7 +1928,20 @@ class S19TuiApp(App):
             # `[red]evil[/].s19` would leak styling or raise MarkupError.
             # markup=False at CONSTRUCTION persists across `.update()` (mirrors
             # the #log_line_* scrub below).
-            Label("Ready.", id="status_text", markup=False),
+            # LLR-120.3 -- the context shares `#status_text`'s ROW rather than
+            # taking one of its own. The bar is 7 rows on all 10 screens
+            # (measured 116x7); an eighth row costs 1 row app-wide against Lane
+            # 1's 3-row reclaim, and the diff pane has 2 content rows to begin
+            # with. Two SIBLINGS in one `Horizontal`, not one shared widget:
+            # `set_status` / `set_file_status` own `#status_text` and would
+            # clobber the context on their next write.
+            Horizontal(
+                Label("Ready.", id="status_text", markup=False),
+                # LLR-120.4: written only via `safe_text`, so this constructor
+                # arg is the sentinel, never file-derived text.
+                Label("", id="status_context", markup=False),
+                id="status_line",
+            ),
             ProgressBar(total=100, id="progress_bar"),
             # batch-33 (LLR-051.8, C-17): the log lines render FILE-DERIVED
             # text (issue messages embedding verbatim {kind!r}/{fmt!r}/... ,
@@ -8715,7 +8728,7 @@ class S19TuiApp(App):
         self._refresh_loaded_panel()
         self.set_status(f"Unloaded {label}.")
 
-    def _refresh_loaded_panel(self) -> None:
+    def _refresh_loaded_panel(self, project: Optional[str] = None) -> None:
         """
         Summary:
             Drive the Workspace "Loaded" panel to redraw its three artifact
@@ -8747,7 +8760,15 @@ class S19TuiApp(App):
             panel = self.query_one("#loaded_panel", LoadedArtifactsPanel)
         except Exception:
             return
-        panel.render_slots(self.current_file)
+        # LLR-120.5: when a caller does not hand a composed string, compose it
+        # HERE from the one composer rather than letting the panel invent a
+        # form. `_apply_unload` and the load path's `_step_finalize` are such
+        # callers, and a panel-side default would show `(none)` beside a
+        # perfectly loaded project.
+        panel.render_slots(
+            self.current_file,
+            self._compose_project_label() if project is None else project,
+        )
 
     def on_loaded_artifacts_panel_unload_requested(
         self, message: "LoadedArtifactsPanel.UnloadRequested"
@@ -11394,6 +11415,74 @@ class S19TuiApp(App):
                 - Project / A2L load handlers
                 - ``_sync_loaded_file_to_project`` (variant append)
         """
+        project_name = self._compose_project_label()
+        a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
+        # LLR-120.1 -- ONE entry point drives BOTH surfaces. This replaces the
+        # single write to the command bar (which HLR-118 deletes at Inc-10).
+        #
+        # Both surfaces are fed the SAME string from the SAME composer, so
+        # LLR-120.5's two display forms cannot drift apart between them: the
+        # form is decided in `_compose_project_label` and neither sink
+        # re-derives it.
+        #
+        # `safe_text` on the status-bar sink (LLR-120.4). `markup=False` is a
+        # PARSE FLAG that performs no string transform -- executed, it leaves
+        # `0x0 0x7 0x1b 0x7f 0x9b 0x9d` byte-identical to the payload, and
+        # `U+009B` / `U+009D` are single-byte C1 introducers carrying no `\x1b`
+        # that are legal Windows filename characters. So an SGR recolour or an
+        # OSC-8 hyperlink is reachable through a hostile A2L filename or
+        # project directory name on the operator's own platform.
+        try:
+            context = self.query_one("#status_context", Label)
+        except Exception:
+            # TC-B78-13: a call before mount is a no-op, matching
+            # `_refresh_loaded_panel` / `_apply_empty_state`.
+            context = None
+        if context is not None:
+            context.update(safe_text(f"{project_name}  |  {a2l_name}"))
+        self._refresh_loaded_panel(project_name)
+        # The command-bar write SURVIVES this increment, and that is a
+        # deliberate reading of a spec contradiction rather than an oversight.
+        #
+        # `LLR-120.1` says the new writes replace "its single write to the
+        # command bar". Section 7's Inc-8 row says the 14 `_project_label()`
+        # call sites are re-pointed "WHILE BOTH SURFACES EXIST" - which is
+        # false the moment Inc-7 removes one. Executed: deleting this line
+        # reddens 10 shipped tests across `test_tui_variants.py` and
+        # `test_tui_patch_variant.py`, because `_project_label()` reads
+        # `#cmdbar_project`.
+        #
+        # Resolved toward the reading that leaves every increment green: Inc-7
+        # ADDS the two context surfaces, Inc-8 re-points the tests off the bar
+        # while all three surfaces are live, and this write dies WITH the bar
+        # at Inc-10/Inc-11, where HLR-118/HLR-121 delete it anyway. "Replacing"
+        # is discharged across Inc-7 + Inc-10, not inside Inc-7.
+        self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
+        self._refresh_patch_variant_select()
+
+    def _compose_project_label(self) -> str:
+        """Compose the active project string in whichever display form applies.
+
+        Summary:
+            LLR-120.5's two forms, decided in ONE place: the plain project name
+            when the active project holds at most one variant, and
+            ``project:variant (index/total)`` when it holds more than one. Both
+            context surfaces are handed the result of this method, so neither
+            can re-derive a form the other does not have.
+
+        Returns:
+            str: The composed project string, or ``"(none)"`` when no project is
+            active.
+
+        Data Flow:
+            - Read-only over ``current_project`` and ``_variant_set``.
+
+        Dependencies:
+            Uses:
+                - ``_variant_display_options``
+            Used by:
+                - ``update_project_labels`` and ``_refresh_loaded_panel``
+        """
         project_name = self.current_project or "(none)"
         variant_set = self._variant_set
         if (
@@ -11416,9 +11505,7 @@ class S19TuiApp(App):
                 f"{self.current_project}:{display} "
                 f"({active_index + 1}/{len(variant_set.variants)})"
             )
-        a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
-        self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
-        self._refresh_patch_variant_select()
+        return project_name
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         # The Direction B restyle retires the `#view_bar` button bar

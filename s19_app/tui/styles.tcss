@@ -494,9 +494,44 @@ DataTable > .datatable--odd-row {
     padding: 0 1;
 }
 
+/* LLR-120.3 — the context SHARES the status row instead of taking one of its
+ * own. `#status_line` is a one-row `Horizontal` holding `#status_text` (owned
+ * by `set_status` / `set_file_status`) and `#status_context` (owned by
+ * `update_project_labels`). Two widgets, one row: an eighth row on this bar
+ * costs a row on all 10 screens, and the diff pane has 2 content rows to
+ * begin with.
+ *
+ * `height: 1` is deliberate rather than `auto`. The bar's own height is
+ * `auto`, so a context string long enough to wrap would grow this row and take
+ * the bar to 8 — the exact regression `AT-B78-11` gates. Fixed at one row, an
+ * over-long context is CLIPPED, which is a display loss, not a layout
+ * regression. */
+#status_line {
+    height: 1;
+    width: 100%;
+}
+
 #workspace_status_bar #status_text {
     height: auto;
     color: $fg-base;
+    width: auto;
+}
+
+/* Right-aligned so the context reads as ambient state rather than competing
+ * with the status message at the left edge; `width: 1fr` takes whatever the
+ * status text leaves.
+ *
+ * `$fg-base`, not a dimmer tone: this stylesheet's palette is a CLOSED set of
+ * six tokens (`$accent-calm`, `$bg-base`, `$bg-panel`, `$fg-base`, `$rule`,
+ * `$odd-row`) and carries no muted foreground. Minting one would be a change
+ * to the design system on the way past, which is not this increment's scope —
+ * separation is carried by position and alignment instead. Registered as a
+ * candidate, not taken. */
+#workspace_status_bar #status_context {
+    height: 1;
+    width: 1fr;
+    color: $fg-base;
+    text-align: right;
 }
 
 #workspace_status_bar Label {
