@@ -2012,7 +2012,7 @@ _B78_INC4_WIDE = (132, 44)
 #: it. Either way `capacity <= 3`, and the window only GROWS when
 #: `capacity > rows`, so the run +/- context floor of 3 rows is still the whole
 #: window and `AT-B78-22`'s exact three addresses hold on both sides of Inc-10.
-_B78_INC4_SHORT = (132, 28)
+_B78_INC4_SHORT = (132, 27)
 
 #: `AT-B78-22`'s fixture and its expected addresses, as LITERALS. Spec F-6 /
 #: Q-M1: rev-1 computed this span from `AbDiffPanel.DISPLAY_CONTEXT_BYTES` - the
@@ -3922,4 +3922,135 @@ def test_tc_b78_39_help_panel_toggles_closed_and_reopens(tmp_path: Path) -> None
     assert counts == [1, 0, 1], (
         f"`?` must toggle the help panel open/closed/open; mounted counts "
         f"across three presses were {counts}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-10 -- the three arms BL-2 moved here (they need HLR-118's rows)
+# ---------------------------------------------------------------------------
+
+#: One hex row is 79 painted cells (16 bytes: offset + hex pairs + ASCII).
+_B79_HEX_ROW_CELLS = 79
+
+
+def _b79_diff_at(tmp_path, size):
+    """Drive a real Compare at one size and read the diff pane's geometry."""
+
+    async def _after(app, pilot):
+        panel = app.query_one("#ab_diff_panel")
+        regime = sorted(c for c in panel.classes if c.startswith("diff-"))
+        hex_a = app.query_one("#diff_hex_a")
+        return {
+            "regime": regime[0] if regime else None,
+            "hex_painted": _b78_painted_content_height(hex_a),
+            "hex_width": hex_a.content_region.width,
+            "status_painted": _b78_painted_content_height(
+                app.query_one("#diff_status")
+            ),
+            "rows": [
+                app.query_one(f"#{rid}").size.height
+                for rid in ("diff_select_row_a", "diff_select_row_b", "diff_action_row")
+            ],
+        }
+
+    return _b78_drive_compare(
+        tmp_path,
+        size,
+        _diff_result([(0x00, 0x0F, "changed"), (0x20, 0x2F, "added")]),
+        after=_after,
+    )
+
+
+def test_at_b78_26_rows_clip_to_one_status_visible_and_a_hex_row_paints(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-26 (GATE) -- the batch's headline case, as ONE node.
+
+    Three clauses in a single test, and that is normative rather than tidy
+    (`LLR-125.2`): split apart, the row-height clause is invariant under an
+    implementation that compacts the control rows and still leaves the result
+    area at zero -- executed at batch-78, compaction alone at 120x30 gave rows
+    1/1/1, `#diff_status` visible and `#diff_hex_a` content **0**. The joint
+    clause is what makes it a gate, and it absorbs the retired `AT-B78-27`.
+
+    ⚠️ **The hex clause reads the PAINTED content height, never the border
+    box.** §5.1 rule 1 prescribes `widget.region.intersection(screen_host.region)`,
+    which (a) does not clip through intermediate ancestors and (b) measures the
+    BORDER box -- so "at least one hex row" would pass at three rows of border
+    and **zero bytes** delivered. `_b78_painted_content_height` clips
+    `content_region` through the full ancestor chain, which is what the
+    requirement is actually about. Carried as `C-78-vi`.
+    """
+    at_120 = _b79_diff_at(tmp_path, (120, 30))
+
+    assert at_120["rows"] == [1, 1, 1], (
+        f"the three control rows must clip to one row each at 120x30; "
+        f"got {at_120['rows']}"
+    )
+    assert at_120["status_painted"] >= 1, (
+        f"`#diff_status` must remain visible; painted height "
+        f"{at_120['status_painted']}"
+    )
+    assert at_120["hex_painted"] >= 1, (
+        f"with the command bar removed, 120x30 must paint at least one HEX ROW "
+        f"OF CONTENT -- not one row of border. Painted content height "
+        f"{at_120['hex_painted']}"
+    )
+
+
+def test_at_b78_24_no_hex_row_wraps_in_the_fallback_regime(tmp_path: Path) -> None:
+    """AT-B78-24 (GATE) -- a hex row fits the window without wrapping.
+
+    A wrapped hex row is not a narrower view of the same data: it is two lines
+    pretending to be one, and every offset below it lies. The window must be at
+    least `79` cells wide, and the clipped height must be at least 1 -- a window
+    79 cells wide and 0 rows tall wraps nothing because it shows nothing (M3).
+    """
+    at_120 = _b79_diff_at(tmp_path, (120, 30))
+
+    assert at_120["regime"] == "diff-fallback", (
+        f"120x30 must be the fallback regime for this arm to be about the "
+        f"fallback at all; got {at_120['regime']!r}"
+    )
+    assert at_120["hex_width"] >= _B79_HEX_ROW_CELLS, (
+        f"a hex row is {_B79_HEX_ROW_CELLS} cells; the window is "
+        f"{at_120['hex_width']} and would wrap"
+    )
+    assert at_120["hex_painted"] >= 1, (
+        f"the co-assertion (M3): a window wide enough but 0 rows tall wraps "
+        f"nothing because it paints nothing; painted {at_120['hex_painted']}"
+    )
+
+
+def test_at_b78_25_the_regimes_are_observably_different(tmp_path: Path) -> None:
+    """AT-B78-25 (GATE) -- the three regimes are distinguishable, landed WHOLE.
+
+    Not split by arm (Q-M6.2): the claim is that the regimes DIFFER, and a
+    per-arm version asserts only that each size has some class, which any single
+    regime applied everywhere satisfies. Landing whole is what lets the node
+    fail on a "one regime for all widths" implementation.
+    """
+    wide = _b79_diff_at(tmp_path / "a", (160, 40))
+    fallback = _b79_diff_at(tmp_path / "b", (120, 30))
+    notice = _b79_diff_at(tmp_path / "c", (80, 24))
+
+    observed = {
+        "160x40": wide["regime"],
+        "120x30": fallback["regime"],
+        "80x24": notice["regime"],
+    }
+    assert observed == {
+        "160x40": "diff-wide",
+        "120x30": "diff-fallback",
+        "80x24": "diff-notice",
+    }, f"each size must select its own regime; got {observed}"
+
+    assert len(set(observed.values())) == 3, (
+        f"the three regimes must be DISTINCT -- one regime applied at every "
+        f"width would satisfy a per-arm check; got {observed}"
+    )
+    # And they differ in what they DELIVER, not merely in a class name.
+    assert notice["hex_painted"] == 0 < fallback["hex_painted"], (
+        f"the notice regime delivers no hex and the fallback delivers some; "
+        f"notice={notice['hex_painted']} fallback={fallback['hex_painted']}"
     )

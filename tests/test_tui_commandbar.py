@@ -2105,3 +2105,158 @@ def test_tc_b78_04_no_file_loaded_still_focuses(tmp_path: Path) -> None:
         f"focusing an owning screen's input must log NOTHING -- a notice here "
         f"would mean the owning screen fell onto the notice path; delta={delta}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-10 -- HLR-118: the command-bar row is deleted
+# ---------------------------------------------------------------------------
+
+_B79_DELETED_IDS = (
+    "command_bar_row",
+    "command_bar_prompt",
+    "cmdbar_project",
+    "cmdbar_a2l",
+    "find_input",
+    "cmdbar_goto_input",
+)
+
+
+def test_at_b78_01_the_row_is_absent_and_the_palette_survives(tmp_path: Path) -> None:
+    """AT-B78-01 (GATE) -- the row is gone, the palette host is not.
+
+    Three clauses, and the third is the one that gates:
+
+    * every one of the six deleted ids resolves nowhere, on all 10 screens;
+    * `#command_palette` is still a DIRECT child of `CommandBar` -- the widget
+      and `#command_bar_slot` exist to host it, which is why the CSS deletion is
+      `:66-103` and not `:55-102`;
+    * **`#command_bar_slot` has height 0.** Without it, an implementation that
+      deleted the row's CONTENT and left its three-row hole would satisfy both
+      clauses above while the operator still stared at an empty band. Adopted
+      wholesale from the QA lane, whose form was stronger than the author's
+      query-only one.
+    """
+    from s19_app.tui.command_bar import CommandBar
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            per_screen = {}
+            for key in list(S19TuiApp.SCREEN_CONTAINER_IDS):
+                app.action_show_screen(key)
+                await pilot.pause()
+                present = [i for i in _B79_DELETED_IDS if len(app.query(f"#{i}")) > 0]
+                per_screen[key] = (
+                    present,
+                    app.query_one("#command_bar_slot").size.height,
+                )
+            bar = app.query_one(CommandBar)
+            palette_parent = app.query_one("#command_palette").parent
+            return per_screen, (palette_parent is bar)
+
+    per_screen, palette_is_direct_child = asyncio.run(_drive())
+
+    assert len(per_screen) == 10, f"all 10 screens; got {len(per_screen)}"
+    for key, (present, slot_height) in per_screen.items():
+        assert not present, (
+            f"on {key!r} these deleted ids still resolve: {present}"
+        )
+        assert slot_height == 0, (
+            f"on {key!r} `#command_bar_slot` still spends {slot_height} rows. "
+            f"Deleting the row's CONTENT while leaving its hole is the "
+            f"implementation this clause exists to defeat."
+        )
+    assert palette_is_direct_child, (
+        "`#command_palette` must remain a DIRECT child of `CommandBar` -- the "
+        "widget survives HLR-118 precisely to host it"
+    )
+
+
+def test_at_b78_02_ctrl_k_opens_the_palette_everywhere(tmp_path: Path) -> None:
+    """AT-B78-02 (PIN) -- `Ctrl+K` still opens the palette on all 10 screens.
+
+    Labelled a PIN, not a gate: it is GREEN today and green before the change,
+    so it cannot gate `HLR-118`. It is kept because the deletion runs through
+    the widget that hosts the palette, and a regression here would be silent
+    everywhere else.
+    """
+    from s19_app.tui.command_bar import CommandBar
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            opened = {}
+            bar = app.query_one(CommandBar)
+            for key in list(S19TuiApp.SCREEN_CONTAINER_IDS):
+                app.action_show_screen(key)
+                await pilot.pause()
+                app.set_focus(None)
+                await pilot.pause()
+                await pilot.press("ctrl+k")
+                await pilot.pause()
+                opened[key] = bar.palette_is_open
+                await pilot.press("escape")
+                await pilot.pause()
+                bar.close_palette()
+                await pilot.pause()
+            return opened
+
+    opened = asyncio.run(_drive())
+
+    assert len(opened) == 10 and all(opened.values()), (
+        f"`ctrl+k` must open the palette on all 10 screens; got {opened}"
+    )
+
+
+def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-03 (GATE) -- the action set equals the Inc-0 ARTIFACT, not the producer.
+
+    ⚠️ **This node was provably INERT before Inc-0 froze the artifact, and the
+    reason is worth carrying.** `CommandBar` is constructed as
+    `CommandBar(self._build_palette_entries())`, so an implementation comparing
+    the rendered palette against `_build_palette_entries()` compares a producer
+    with ITSELF: executed, the predicate stayed GREEN at `36 == 36` with a whole
+    `Binding` removed from `S19TuiApp.BINDINGS`.
+
+    What breaks the circularity is the TEMPORAL FREEZE -- a set captured before
+    the change and read back from disk. So this reads
+    `tests/goldens/batch78/at-b78-03-palette-actions.json` and **never
+    regenerates it**; a run that rebuilds it has restored the tautology.
+    """
+    import json
+
+    from s19_app.tui.command_bar import CommandBar
+
+    frozen = json.loads(
+        Path("tests/goldens/batch78/at-b78-03-palette-actions.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    expected = frozen if isinstance(frozen, list) else frozen.get("actions", frozen)
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            bar = app.query_one(CommandBar)
+            await pilot.press("ctrl+k")
+            await pilot.pause()
+            rows = list(bar.query_one("#palette_list").children)
+            return [item.data for item in rows]
+
+    observed = asyncio.run(_drive())
+
+    assert len(expected) == 37, (
+        f"the frozen artifact must still carry 37 actions; it has "
+        f"{len(expected)} -- if this fails the artifact was REGENERATED, which "
+        f"restores the tautology this node exists to break"
+    )
+    assert observed == list(expected), (
+        f"the palette action set must equal the Inc-0 freeze.\n"
+        f"missing: {sorted(set(expected) - set(observed))}\n"
+        f"unexpected: {sorted(set(observed) - set(expected))}"
+    )
