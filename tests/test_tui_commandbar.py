@@ -571,7 +571,11 @@ def test_tc039_typed_find_and_palette_text_not_written_to_log(
             app.set_focus(None)
             await pilot.press("slash")
             await pilot.pause()
-            app.query_one("#find_input", Input).value = secret_find
+            # batch-79 Inc-10: `#find_input` is deleted with the bar row. `/`
+            # now focuses the ACTIVE screen's own input (Inc-9), and the
+            # observable this node guards -- typed text never reaches the log
+            # FILE -- is unchanged by where the text was typed.
+            app.query_one("#search_input", Input).value = secret_find
             app.post_message(CommandBar.Find(secret_find))
             await pilot.pause()
             await pilot.press("ctrl+k")

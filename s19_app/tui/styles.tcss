@@ -63,43 +63,14 @@ Screen {
     width: 100%;
 }
 
-#command_bar_row {
-    height: 3;
-    width: 100%;
-    background: $bg-panel;
-    border: round $rule;
-}
-
-#command_bar_prompt {
-    width: 3;
-    content-align: center middle;
-    color: $accent-calm;
-    text-style: bold;
-}
-
-#cmdbar_project {
-    width: auto;
-    min-width: 16;
-    content-align: left middle;
-    padding: 0 2;
-    color: $fg-base;
-}
-
-#cmdbar_a2l {
-    width: auto;
-    min-width: 16;
-    content-align: left middle;
-    padding: 0 2;
-    color: $fg-base;
-}
-
-#find_input {
-    width: 1fr;
-}
-
-#cmdbar_goto_input {
-    width: 1fr;
-}
+/* batch-79 Inc-10 (HLR-118): the `#command_bar_row` block and the five child
+ * rules it governed (`#command_bar_prompt`, `#cmdbar_project`, `#cmdbar_a2l`,
+ * `#find_input`, `#cmdbar_goto_input`) are DELETED with the row itself.
+ *
+ * The span is :66-103, NOT :55-102. `#command_bar_slot` (:51) and
+ * `#command_bar` (:61) sit above it and SURVIVE: they host the palette, which
+ * outlives the bar. Deleting from :55 would have removed the styling of the
+ * container that stays. */
 
 #command_palette {
     height: auto;

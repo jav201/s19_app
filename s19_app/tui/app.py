@@ -11656,12 +11656,13 @@ class S19TuiApp(App):
         # `test_tui_patch_variant.py`, because `_project_label()` reads
         # `#cmdbar_project`.
         #
-        # Resolved toward the reading that leaves every increment green: Inc-7
-        # ADDS the two context surfaces, Inc-8 re-points the tests off the bar
-        # while all three surfaces are live, and this write dies WITH the bar
-        # at Inc-10/Inc-11, where HLR-118/HLR-121 delete it anyway. "Replacing"
-        # is discharged across Inc-7 + Inc-10, not inside Inc-7.
-        self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
+        # batch-79 Inc-10: the command-bar write is GONE, which is the second
+        # half of LLR-120.1's "replacing". Inc-7 kept it because §7's Inc-8 row
+        # re-points the test readers "while both surfaces exist", and deleting
+        # it there reddened 10 shipped tests. It dies here, with the row it
+        # wrote into — so "replacing" was discharged across Inc-7 + Inc-10
+        # rather than inside either one, and no increment ever had to choose
+        # between a green gate and an honest one.
         self._refresh_patch_variant_select()
 
     def _compose_project_label(self) -> str:

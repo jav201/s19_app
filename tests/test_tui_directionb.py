@@ -730,6 +730,16 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
 
 
 def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
+    """batch-79 Inc-10: re-pointed from the deleted ROW onto what survives.
+
+    This asserted that `#find_input` and `#cmdbar_goto_input` were present on
+    every screen. `HLR-118` deletes both, and Inc-9 re-homed the keys onto each
+    screen's own inputs, so the old clauses now assert the opposite of the
+    requirement. The node id survives because the durable half of its
+    observable does: the PALETTE host is reachable from every screen. The
+    absence of the row is asserted positively so the deletion itself is
+    guarded.
+    """
     """The command bar is mounted and stays present on every rail screen.
 
     Intent: LLR-003.1 — the command bar (palette trigger + find input +
@@ -750,9 +760,13 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
                 seen.append(
                     (
                         key,
-                        bar.query("#find_input").first() is not None,
-                        bar.query("#cmdbar_goto_input").first() is not None,
-                        bar.query("#command_palette").first() is not None,
+                        # `len(...)`, not `.first() is not None`: `.first()`
+                        # RAISES `NoMatches` on an empty query, so the original
+                        # idiom only worked while every node it named existed.
+                        # A presence test that cannot express absence is no use
+                        # in the increment that deletes something.
+                        len(bar.query("#command_palette")) == 1,
+                        len(bar.query("#command_bar_row")) > 0,
                     )
                 )
         return seen
@@ -761,10 +775,19 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
     assert len(seen) == len(SCREEN_KEYS), (
         f"expected all {len(SCREEN_KEYS)} screens visited, got {len(seen)}"
     )
-    for key, has_find, has_goto, has_palette in seen:
-        assert has_find, f"find input missing on screen '{key}'"
-        assert has_goto, f"go-to input missing on screen '{key}'"
+    for key, has_palette, has_row in seen:
+        # What survives HLR-118 and what this node now guards: the palette host
+        # is reachable from every screen. That was always the durable half of
+        # the claim -- `Ctrl+K` is the one surface with no per-screen duplicate.
         assert has_palette, f"palette missing on screen '{key}'"
+        # And what must NOT survive. Kept as a positive assertion rather than
+        # dropping the find/go-to clauses: deleting them would have left this
+        # node unable to fail if the row came back, and a deletion nobody
+        # guards is a deletion that gets undone.
+        assert not has_row, (
+            f"`#command_bar_row` is deleted by HLR-118 but is present on "
+            f"screen '{key}'"
+        )
 
 
 # ---------------------------------------------------------------------------
