@@ -893,10 +893,19 @@ def test_tc038_project_a2l_labels_render_in_command_bar(tmp_path: Path) -> None:
             for key in SCREEN_KEYS:
                 app.action_show_screen(key)
                 await pilot.pause()
-                bar = app.query_one(CommandBar)
-                project = str(bar.query_one("#cmdbar_project").content)
-                a2l = str(bar.query_one("#cmdbar_a2l").content)
-                seen.append((key, project, a2l))
+                # batch-79 Inc-8 (LLR-121.4): re-pointed off the command bar,
+                # which `HLR-118` deletes at Inc-10. `#status_context` carries
+                # BOTH names in one cell, so both reads resolve to it and the
+                # two assertions below still discriminate — each names a
+                # different string that must be present.
+                #
+                # The node id is left alone on purpose. Renaming it to match the
+                # new surface would change its identity, and the AT/TC registry
+                # reconciliation is Inc-11's declared work, not this
+                # increment's; doing it here would split one change across two
+                # gates.
+                context = str(app.query_one("#status_context").render())
+                seen.append((key, context, context))
         return seen
 
     seen = asyncio.run(_drive())

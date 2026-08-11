@@ -53,7 +53,6 @@ from textual.widgets import Select, Static
 
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.command_bar import CommandBar
 from s19_app.tui.screens_directionb import PatchEditorPanel
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
@@ -79,10 +78,12 @@ async def _flush(pilot, count: int = 12) -> None:
         await pilot.pause()
 
 
-def _project_label(app: S19TuiApp) -> str:
-    """Rendered ``#cmdbar_project`` text — the label observable."""
-    bar = app.query_one(CommandBar)
-    return str(bar.query_one("#cmdbar_project").content)
+# batch-79 Inc-8 (LLR-121.4): re-pointed off `#cmdbar_project`, which
+# `HLR-118` deletes at Inc-10. IMPORTED rather than redefined — this module and
+# `test_tui_variants` carried BYTE-IDENTICAL copies of this helper, so the
+# observable had two homes and a re-point could have landed in one of them. One
+# definition cannot drift from itself.
+from test_tui_variants import _project_label  # noqa: E402
 
 
 def _statuses(app: S19TuiApp) -> list[str]:
@@ -307,7 +308,10 @@ def test_at035c_single_variant_disabled_placeholder(tmp_path: Path) -> None:
     (disabled, blank), label, hex_text = asyncio.run(_drive())
     assert disabled, "single-variant project must render the Select disabled"
     assert blank, "N==1 must keep the blank placeholder (F-2: no preselection)"
-    assert label == "Project: proj", (
+    # batch-79 Inc-8: was `== "Project: proj"`. The `"Project: "` prefix was the
+    # command bar's chrome and dies with the bar at Inc-10; the N==1 plain-form
+    # pin is what this node is for and is unchanged.
+    assert label == "proj", (
         f"loaded state must stay intact (plain N==1 label), got {label!r}"
     )
     assert "01 02 03 04" in hex_text, "variant a's image must still render"
