@@ -32,6 +32,49 @@
 > ⚠ **Every `report_service.py` line number below is as of `031ca8d`.** batch-63 added +47 lines to that module; the file measures 1730 lines at `e347079`. Re-derive line numbers, never copy them.
 >
 
+## 🆕 Carries returned by batch-79 (2026-08-07, Lane 1 — command-bar deletion)
+
+Registered mid-batch at operator instruction rather than at the close, so they survive a session
+boundary. batch-79 itself is **IN FLIGHT**: Inc-6…Inc-9 shipped, Inc-10…Inc-12 owed.
+
+- **▸ (P2) `git` tracks 8 `.pyc` files that `.gitignore` excludes.** `git ls-files '*.pyc'` returns
+  **8** under `s19_app/__pycache__/`, while `.gitignore:4-5` lists `__pycache__/` and `*.pyc` — they
+  were committed before the rule, and `.gitignore` does not untrack what is already tracked. They are
+  **Python 3.9 / 3.10** bytecode in a project now running **3.14**, so they are stale as well as
+  unwanted. **Two live costs, not just tidiness:** they show up as spurious `M` entries in
+  `git status` during any test run (batch-79 Inc-7 nearly committed two), and they **inflate greps over
+  `tests/`** — Inc-8's gate figure read `10` instead of `4` because six matches were binaries. Removal
+  is `git rm --cached` + a commit; **operator decision owed** because it rewrites nothing but does touch
+  files no batch has claimed.
+- **▸ (P2) `LLR-119.2`'s numeric threshold is NOT MEASURABLE as written — §6.5 amendment owed.** It
+  reads *"`len(app.log_lines)` grows by exactly 1 per key on each of the 7 screens"*. `log_lines` is a
+  **`deque(maxlen=4)`** (`app.py:1445`), so its LENGTH saturates at 4 and stops growing. Executed
+  against a CORRECT implementation across all seven notice screens: `map/issues/patch/diff` report a
+  delta of **1**, `flow/checks/crc_designer` report **0**. A node asserting the spec's literal wording
+  false-fails on whichever three screens happen to run last. batch-79 `AT-B78-05` counts the **emitted
+  notices** instead (the repo's `_statuses` idiom) paired with the rendered `#log_line_4`; the spec text
+  still needs the Before/After amendment.
+- **▸ (P2) `TC-B78-43`'s project half — §6.5 amendment owed.** The boundary catalog reads *"unload all →
+  both surfaces return to `(none)`"*. The **A2L half was right** and batch-79 fixed the defect behind it
+  (`current_a2l_path` was written in two places and cleared in none). The **project half is wrong**:
+  `_apply_unload` never touches `current_project`, and making it do so would change what unload-all
+  *means*, which is nowhere in `HLR-120`. ⚠️ **The lesson, worth the amendment on its own:** measuring
+  told the batch that catalog and code disagreed; it did **not** say which was mistaken, and the first
+  pass resolved that in favour of the code for *both halves at once*. Ask it per half.
+- **▸ (P3) The command palette has NO `escape`-to-close.** `command_bar.py` declares no `BINDINGS` and
+  handles no `escape`; re-executed at batch-79 Inc-9, `ctrl+k` then `escape` leaves `palette_is_open`
+  **True**. `LLR-119.3`/`AT-B78-07` originally asserted a constraint *"must not shadow the palette's
+  escape"* — **against nothing**. ⚠️ **Do not repeat the spec's suggested justification for deferring
+  it:** *"the bar is being deleted anyway"* is **FALSE** — `HLR-118` deletes `#command_bar_row` while
+  `#command_bar_slot` and `#command_bar` **survive to host the palette**, so the gap outlives Lane 1.
+  Deferred at Inc-9 for the reason that does hold: it is a new capability on a different widget, outside
+  `HLR-119`'s statement, and it needs its own requirement. Inc-9 pins only that its `escape` handler
+  leaves the palette exactly as it found it.
+- **▸ (P3) The three painted-Footer-children arms are unasserted.** `LLR-126.1` specifies **8** @80×24 ·
+  **13** @120×30 · **15** @160×40 under §1.3's containment rule, as a PIN at the first two sizes and a
+  GATE only at 160×40. Inc-6 shipped `AT-B78-28`'s model-key set-equality arm and **not** these. Carried
+  from Inc-6 rather than dropped.
+
 ## 🆕 Carries returned by batch-76 (2026-07-31, `R-TUI-102`)
 
 - **▸ (P2) `_applied_regions` is STILL the unbounded third producer, and it is now the ONLY thing standing between this repo and a whole-report residency claim.** batch-76 bounded the produced **file**; non-claim (a) states in writing that peak memory is untouched, because every producer is fully evaluated before its gate can refuse it. Operator-fenced for batch-75/76 by explicit ruling. **A residency acceptance stays unsatisfiable until this is bounded** — that is not a wording problem, it is the reason the claim cannot be made.
