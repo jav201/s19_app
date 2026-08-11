@@ -8712,6 +8712,25 @@ class S19TuiApp(App):
                 raise ValueError(f"unknown unload kind: {kind!r}")
 
         self.current_file = new
+        # `current_a2l_path` is the OTHER half of "which A2L is in effect", and
+        # until batch-79 nothing ever cleared it — it is written in exactly two
+        # places (`load_a2l_from_path`'s copy and the load path's
+        # `loaded.a2l_path`) and reset in none. So after an unload the app held
+        # two sources of truth for one fact: `current_file.a2l_path`, cleared
+        # here, and `current_a2l_path`, left pointing at the artifact that had
+        # just been unloaded.
+        #
+        # That divergence is PRE-EXISTING — the command bar read the stale value
+        # and the Loaded panel read the fresh one, so the two disagreed on
+        # screen. Inc-7 did not introduce it, but it moved the stale reader to
+        # `#status_context`, which sits on the same screen as the panel that
+        # contradicts it. Found by the Inc-6/Inc-7 independent review (F6).
+        #
+        # Cleared at the SOURCE rather than papered over in the display: a
+        # composer that picks between two mirrors keeps the second source alive
+        # and only hides the symptom.
+        if kind in ("all", "a2l"):
+            self.current_a2l_path = None
         # Mirror the load-path install: the MAC cache is keyed on the previous
         # records, and the empty-state panels key on `current_file is None`.
         self._invalidate_mac_view_cache()
@@ -8731,13 +8750,20 @@ class S19TuiApp(App):
     def _refresh_loaded_panel(self, project: Optional[str] = None) -> None:
         """
         Summary:
-            Drive the Workspace "Loaded" panel to redraw its three artifact
-            slots from the current ``current_file`` snapshot (unload feature
-            Inc-2). Guarded so a not-yet-mounted tree (headless unit tests) is a
-            no-op, matching ``_apply_empty_state`` / ``update_memory_map``.
+            Drive the Workspace "Loaded" panel to redraw its project row and
+            three artifact slots from the current ``current_file`` snapshot
+            (unload feature Inc-2; project row batch-79 ``LLR-120.2``). Guarded
+            so a not-yet-mounted tree (headless unit tests) is a no-op, matching
+            ``_apply_empty_state`` / ``update_memory_map``.
 
         Args:
-            None
+            project (Optional[str]): The already-composed project string to
+                render in the panel's project row — the plain name at one
+                variant, ``project:variant (index/total)`` above that. ``None``
+                means "compose it here", which is what the unload path and the
+                load path's ``_step_finalize`` pass; the string is never
+                composed by the panel itself, so both context surfaces show the
+                same form (``LLR-120.5``).
 
         Returns:
             None
@@ -8746,15 +8772,18 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Resolve ``#loaded_panel`` and call ``render_slots(current_file)``;
-              a missing widget tree is tolerated.
+            - Resolve ``#loaded_panel``; a missing widget tree is tolerated.
+            - Call ``render_slots(current_file, project)``, composing the
+              project string via ``_compose_project_label`` when the caller
+              passed ``None``.
 
         Dependencies:
             Uses:
-                - ``LoadedArtifactsPanel.render_slots``.
+                - ``LoadedArtifactsPanel.render_slots`` / ``_compose_project_label``.
             Used by:
-                - ``_apply_unload`` (post-unload refresh) and the load path's
-                  ``_step_finalize`` (post-load refresh).
+                - ``_apply_unload`` (post-unload refresh), the load path's
+                  ``_step_finalize`` (post-load refresh) and
+                  ``update_project_labels`` (``LLR-120.1``'s single entry point).
         """
         try:
             panel = self.query_one("#loaded_panel", LoadedArtifactsPanel)
@@ -11380,9 +11409,10 @@ class S19TuiApp(App):
     def update_project_labels(self) -> None:
         """
         Summary:
-            Refresh the project-name / A2L-filename context labels in the
-            persistent command bar so the project context stays visible from
-            every Direction B screen (LLR-011.3).
+            Refresh the project-name / A2L-filename context on BOTH context
+            surfaces — ``#workspace_status_bar``'s context cell and the Loaded
+            panel's project row — so the context stays visible from every
+            Direction B screen (LLR-011.3, batch-79 LLR-120.1).
 
         Args:
             None
@@ -11391,10 +11421,18 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Formats the project name and A2L filename (or a "(none)"
-              sentinel) and writes them into the command bar's context
-              labels — the command bar is the canonical home since the old
-              Status tile was dismantled in increment 7.
+            - Composes the project string via ``_compose_project_label`` and the
+              A2L filename (or a ``(none)`` sentinel), then writes BOTH to
+              ``#status_context`` through ``safe_text`` and drives
+              ``_refresh_loaded_panel`` with the same composed string. One
+              composer feeds both sinks, so the two surfaces cannot disagree
+              about the display form (LLR-120.5).
+            - The command bar's ``set_context_labels`` is still called and dies
+              with the bar at Inc-10 (HLR-118); until then all three surfaces
+              carry the same string, which is what lets Inc-8 re-point the test
+              observables while every surface is live.
+            - Returns early when ``#status_context`` cannot be resolved, so a
+              call before the tree is mounted is a no-op (TC-B78-13).
             - Multi-variant projects (LLR-005.5): when the variant set holds
               N > 1 variants, the project label reads
               ``«project»:«variant» (i/N)`` with ``i`` the 1-based index of
@@ -11408,11 +11446,15 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``CommandBar.set_context_labels``
-                - ``_variant_display_options``
+                - ``_compose_project_label`` (the single display-form composer)
+                - ``safe_text`` (LLR-120.4 — the status-bar sink is markup- AND
+                  control-character-safe)
+                - ``_refresh_loaded_panel`` (the second context surface)
+                - ``CommandBar.set_context_labels`` (dies at Inc-10)
                 - ``_refresh_patch_variant_select``
             Used by:
                 - Project / A2L load handlers
+                - ``_apply_unload`` (post-unload refresh)
                 - ``_sync_loaded_file_to_project`` (variant append)
         """
         project_name = self._compose_project_label()

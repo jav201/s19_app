@@ -1484,25 +1484,44 @@ def test_tc_b78_42_three_variants_render_the_active_index(tmp_path: Path) -> Non
 def test_tc_b78_43_unload_all_clears_the_artifact_slots_not_the_context(
     tmp_path: Path,
 ) -> None:
-    """TC-B78-43 -- negative: unload-all, RE-AUTHORED against executed behaviour.
+    """TC-B78-43 -- negative: unload-all. The spec was HALF right, not wrong.
 
-    The spec's boundary catalog reads *"unload all -> both surfaces return to
-    `(none)`"*. **Executed, that is false of BOTH halves.**
+    ⚠️ **Corrected twice, and the second correction reverses part of the
+    first.** The catalog reads *"unload all -> both surfaces return to
+    `(none)`"*. My first pass measured that as false of BOTH halves and
+    re-authored the node around the executed behaviour. The independent review
+    (F6) showed that dismissed too much: the **A2L half of the catalog was
+    RIGHT**, and what made it read as false was a defect, not a contract.
+
+    `current_a2l_path` was written in two places and cleared in none, so the app
+    held two sources of truth for "which A2L is in effect" —
+    `current_file.a2l_path` (cleared on unload) and `current_a2l_path` (not).
+    The Loaded panel read the fresh one and the context surface the stale one,
+    so after an unload they contradicted each other about the same A2L on the
+    same screen. Fixed at the source in `_apply_unload`, and this node now pins
+    both halves:
+
+    * **A2L half — returns to the sentinel.** The catalog was right.
+    * **Project half — persists.** The catalog was wrong here: `_apply_unload`
+      never touches `current_project`, and making it do so would change what
+      unload-all MEANS, which is nowhere in `HLR-120`.
+
+    The lesson is the one worth keeping: *a boundary catalog that disagrees with
+    the code is not automatically wrong.* Measuring it told me the two differed;
+    it did not tell me which one was mistaken, and I resolved that in favour of
+    the code without asking the question for each half separately.
     `action_unload_all` delegates to `_apply_unload("all")`, which clears
-    `current_file` and touches neither `current_project` nor
-    `current_a2l_path`. Measured after an unload-all with a project and an A2L
-    loaded, the status context is UNCHANGED at `'demoproj  |  ctx.a2l'`.
+    Before the fix, `_apply_unload("all")` cleared `current_file` and touched
+    neither `current_project` nor `current_a2l_path`, so the status context read
+    `'demoproj  |  ctx.a2l'` unchanged after an unload-all.
 
-    Asserting the catalog's literal wording would have false-failed a correct
-    implementation. Making it true instead would mean changing what unload-all
-    MEANS -- unloading artifacts would start deselecting the project -- which is
-    nowhere in `HLR-120`'s statement and is not this increment's to decide. So
-    the node asserts the contract that does exist: unload-all empties the
-    ARTIFACT SLOTS while the context surfaces keep naming what is still
-    selected. Owed upstream as a §6.5 Before/After amendment.
+    The project half of the catalog stays rejected — making it true would mean
+    unloading artifacts starts deselecting the project, which is nowhere in
+    `HLR-120`'s statement. That half is owed upstream as a §6.5 Before/After
+    amendment.
 
-    The presence co-assertions are load-bearing: without them, "the slots read
-    `(none)`" is satisfied by a panel that never rendered anything at all.
+    The presence co-assertions are load-bearing: without them, "the sentinel is
+    showing" is satisfied by a surface that never rendered anything at all.
     """
 
     async def _drive():
@@ -1539,7 +1558,20 @@ def test_tc_b78_43_unload_all_clears_the_artifact_slots_not_the_context(
         f"unload from a no-op; loaded={panel_loaded!r} after={panel_after!r}"
     )
 
-    # The context persists, and that is correct, not a defect.
+    # The A2L half RETURNS TO THE SENTINEL — the catalog was right about this,
+    # and the F6 fix in `_apply_unload` is what makes it true. Asserted as the
+    # name's ABSENCE plus the sentinel's presence: the sentinel alone would be
+    # satisfied by the project half's own `(none)` in a two-part string.
+    assert "ctx.a2l" not in ctx_after, (
+        f"the A2L must be gone from the context after unload-all — a stale "
+        f"`current_a2l_path` here means the two surfaces contradict each other "
+        f"about the same A2L on the same screen; after={ctx_after!r}"
+    )
+    assert "(none)" in ctx_after, (
+        f"the A2L half must render its sentinel, not a blank; after={ctx_after!r}"
+    )
+
+    # The project half PERSISTS, and that is correct, not a defect.
     assert "demoproj" in ctx_after, (
         f"the project half must PERSIST: `_apply_unload` never touches "
         f"`current_project`, so unloading artifacts does not deselect the "

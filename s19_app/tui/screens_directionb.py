@@ -1868,14 +1868,23 @@ class LoadedArtifactsPanel(Container):
         """Rebuild the project row + three slot rows (+ unload-all) from a snapshot.
 
         Summary:
-            Clear ``#loaded_slots`` and re-mount one row per artifact plus the
-            unload-all footer, reflecting ``loaded``'s present/absent state.
-            Re-mounted children carry only CLASSES (never ids), so repeated
-            renders never trip ``DuplicateIds`` (the ``MemoryMapPanel`` pattern).
+            Clear ``#loaded_slots`` and re-mount the project row, one row per
+            artifact and the unload-all footer, reflecting ``loaded``'s
+            present/absent state. Re-mounted children carry only CLASSES (never
+            ids), so repeated renders never trip ``DuplicateIds`` (the
+            ``MemoryMapPanel`` pattern).
 
         Args:
             loaded (Optional[LoadedFile]): The current snapshot, or ``None`` when
                 nothing is loaded (all three slots render ``(none)``).
+            project (str): The already-composed project string for the project
+                row (``LLR-120.2``) — the plain name at one variant,
+                ``project:variant (index/total)`` above that. The FORM is the
+                caller's: this panel renders what it is handed and never
+                re-derives it, which is what keeps the two context surfaces from
+                drifting apart (``LLR-120.5``). Defaults to the absent sentinel
+                so ``on_mount``, which passes nothing, renders ``(none)`` rather
+                than a blank.
 
         Returns:
             None
@@ -1884,13 +1893,15 @@ class LoadedArtifactsPanel(Container):
             None
 
         Data Flow:
-            - Read-only over ``loaded``; per slot compute (present, name,
-              summary) via ``_slot_state`` and build a row via ``_build_slot_row``.
+            - Read-only over ``loaded`` and ``project``; per slot compute
+              (present, name, summary) via ``_slot_state`` and build a row via
+              ``_build_slot_row``; the project row via ``_build_project_row``.
             - Tolerates a not-yet-mounted tree (headless render before compose).
 
         Dependencies:
             Uses:
-                - ``_slot_state`` / ``_build_slot_row`` / ``_build_unload_all_row``.
+                - ``_slot_state`` / ``_build_slot_row`` / ``_build_project_row``
+                  / ``_build_unload_all_row``.
             Used by:
                 - ``S19TuiApp._refresh_loaded_panel`` and ``on_mount``.
         """
