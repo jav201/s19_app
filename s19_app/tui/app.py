@@ -11432,14 +11432,27 @@ class S19TuiApp(App):
         # that are legal Windows filename characters. So an SGR recolour or an
         # OSC-8 hyperlink is reachable through a hostile A2L filename or
         # project directory name on the operator's own platform.
+        # TC-B78-13 -- a call before the tree is mounted is a NO-OP, matching
+        # `_refresh_loaded_panel` / `_apply_empty_state`.
+        #
+        # This guard is NEW BEHAVIOUR, not a restatement of existing behaviour,
+        # and the distinction is worth the line: executed against the batch base
+        # `829adc6`, `update_project_labels()` on an unmounted app raises
+        # `ScreenStackError: No screens on stack`. HLR-120's boundary catalog
+        # asserts the opposite ("before mount -> no raise"), so the catalog
+        # named a tolerance the code had never had. It is made true here rather
+        # than descoped, because it is an acceptance criterion of the very
+        # requirement this increment implements.
+        #
+        # It wraps ALL THREE sinks, not just the new one: the command-bar write
+        # below is equally unguarded, so guarding only `#status_context` would
+        # move the raise one line down and leave the catalog still false.
         try:
-            context = self.query_one("#status_context", Label)
+            self.query_one("#status_context", Label).update(
+                safe_text(f"{project_name}  |  {a2l_name}")
+            )
         except Exception:
-            # TC-B78-13: a call before mount is a no-op, matching
-            # `_refresh_loaded_panel` / `_apply_empty_state`.
-            context = None
-        if context is not None:
-            context.update(safe_text(f"{project_name}  |  {a2l_name}"))
+            return
         self._refresh_loaded_panel(project_name)
         # The command-bar write SURVIVES this increment, and that is a
         # deliberate reading of a spec contradiction rather than an oversight.

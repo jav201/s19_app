@@ -1041,3 +1041,489 @@ def test_tc_b78_44_pre_change_artifacts_are_frozen_on_disk() -> None:
         f"makes its consumer compare a producer with itself, which is exactly "
         f"the defect (BL-1) this capture exists to remove."
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-7 -- HLR-120: the project and A2L are named on every screen,
+# in both display forms, on BOTH context surfaces (LLR-120.1 .. 120.5)
+# ---------------------------------------------------------------------------
+
+from test_tui_variants import S19_A, S19_B, _flush, _make_project  # noqa: E402
+
+
+def _b79_status_context(app) -> str:
+    """The status bar's context cell, as rendered text."""
+    return str(app.query_one("#status_context").render())
+
+
+def _b79_loaded_panel(app) -> str:
+    """The Loaded panel's rows, joined.
+
+    Read through the mounted children rather than through a stored string: the
+    panel re-mounts its rows on every render, so anything cached is a snapshot
+    of a tree that no longer exists.
+    """
+    return " ".join(str(child.render()) for child in app.query("#loaded_slots Static"))
+
+
+def _b79_both_surfaces(app) -> tuple[str, str]:
+    """(status-bar context, Loaded-panel text) -- the two surfaces HLR-120 names.
+
+    Returned as a PAIR because every acceptance in this block needs both. An
+    implementation that updates only one passes a single-surface test, which is
+    the C-40 hazard the operator's two-surface ruling created.
+    """
+    return _b79_status_context(app), _b79_loaded_panel(app)
+
+
+def _b79_painted_strip(app, selector: str) -> str:
+    """Text actually PAINTED in a widget's region, read from the compositor.
+
+    `TC-B78-12` asserts over the painted strip, not over the widget's own
+    renderable: a control codepoint that a renderable still carries but the
+    compositor never paints is a different claim from the one LLR-120.4 makes.
+    """
+    widget = app.query_one(selector)
+    strips = app.screen._compositor.render_strips()
+    region = widget.region
+    out = []
+    for y in range(region.y, min(region.y + region.height, len(strips))):
+        row = "".join(segment.text for segment in strips[y])
+        out.append(row[region.x : region.x + region.width])
+    return "".join(out)
+
+
+#: `C0 ∪ {DEL} ∪ C1`, RE-DERIVED here rather than imported from
+#: `_CONTROL_SCRUB` -- the discipline `tests/test_tui_hostile_map.py:86-89`
+#: already states. Importing the production set would make the assertion
+#: "the scrub removes what the scrub removes", true for any scrub including an
+#: empty one.
+_B79_CONTROL_CLASS = frozenset(
+    chr(cp) for cp in (*range(0x00, 0x20), 0x7F, *range(0x80, 0xA0))
+)
+
+
+def test_at_b78_08_and_11_status_bar_names_both_on_every_screen(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-08 (GATE) + AT-B78-11 (PIN) -- asserted in ONE run, deliberately.
+
+    `AT-B78-08`: with a project and an A2L loaded, `#workspace_status_bar`
+    carries BOTH names on all 10 screens of `SCREEN_CONTAINER_IDS` (today 0 of
+    10).
+
+    `AT-B78-11`: the bar's height stays inside `1 <= h <= 7`. **Both bounds are
+    normative and neither alone would do.** A bare `== 7` false-fails a
+    conforming implementation that REDUCES the height; a bare `<= 7` is
+    satisfied by a COLLAPSED bar of height 0 — which is why this is asserted in
+    the SAME run as `AT-B78-08`: a height-0 bar paints nothing, so it cannot
+    satisfy the naming clause and pass the height clause at once (NEW-7).
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "demoproj", {"a.s19": S19_A})
+        a2l = tmp_path / "b79ctx.a2l"
+        a2l.write_text("/begin PROJECT p \"\" /end PROJECT\n", encoding="utf-8")
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("demoproj")
+            await _flush(pilot)
+            app.load_a2l_from_path(a2l)
+            await _flush(pilot)
+            observed = {}
+            for key in list(S19TuiApp.SCREEN_CONTAINER_IDS):
+                app.action_show_screen(key)
+                await pilot.pause()
+                observed[key] = (
+                    _b79_status_context(app),
+                    app.query_one("#workspace_status_bar").size.height,
+                )
+            return observed
+
+    observed = asyncio.run(_drive())
+
+    assert len(observed) == 10, f"all 10 screens must be visited; got {len(observed)}"
+    for screen, (text, height) in observed.items():
+        assert "demoproj" in text, (
+            f"AT-B78-08: the status bar must name the PROJECT on {screen!r}; "
+            f"context={text!r}"
+        )
+        assert "b79ctx.a2l" in text, (
+            f"AT-B78-08: the status bar must name the A2L on {screen!r}; "
+            f"context={text!r}"
+        )
+        assert 1 <= height <= 7, (
+            f"AT-B78-11: the status bar must not grow past 7 rows and must not "
+            f"collapse; on {screen!r} height={height}"
+        )
+
+
+def test_at_b78_09_loaded_panel_names_the_project(tmp_path: Path) -> None:
+    """AT-B78-09 (GATE) -- `#loaded_panel` names the active project.
+
+    The A2L clause is deliberately NOT asserted here: the panel's A2L slot
+    already renders the filename today (P-35), so an acceptance for it would be
+    green before the change and could not gate it. Only the project row is new.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "demoproj", {"a.s19": S19_A})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("demoproj")
+            await _flush(pilot)
+            return _b79_loaded_panel(app)
+
+    panel = asyncio.run(_drive())
+
+    assert "demoproj" in panel, (
+        f"AT-B78-09: the Loaded panel must name the active project; panel={panel!r}"
+    )
+
+
+def test_at_b78_30_both_display_forms_on_both_surfaces(tmp_path: Path) -> None:
+    """AT-B78-30 (GATE) -- LLR-120.5, four observations.
+
+    The re-home is of a FORM, not just a name. An implementation emitting one
+    uniform string satisfies "the project is named" on both surfaces and still
+    breaks LLR-005.3, which `tests/test_tui_variants.py:259` pins.
+
+    Plain at `N == 1` (no `(`), `proj:b (2/2)` after a real switch at `N == 2`,
+    each read on BOTH surfaces.
+    """
+
+    async def _drive_single():
+        app = S19TuiApp(base_dir=tmp_path / "one")
+        _make_project(app, "solo", {"a.s19": S19_A})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("solo")
+            await _flush(pilot)
+            return _b79_both_surfaces(app)
+
+    async def _drive_multi():
+        app = S19TuiApp(base_dir=tmp_path / "two")
+        _make_project(app, "duo", {"a.s19": S19_A, "b.s19": S19_B})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("duo")
+            await _flush(pilot)
+            return _b79_both_surfaces(app)
+
+    single_ctx, single_panel = asyncio.run(_drive_single())
+    multi_ctx, multi_panel = asyncio.run(_drive_multi())
+
+    # N == 1 -> the PLAIN name, on both surfaces. `app.py`'s branch gates the
+    # suffix on `> 1`, and an earlier draft of this spec asserted `(1/1)` — a
+    # literal that would have false-failed a correct implementation AND
+    # contradicted a shipped acceptance.
+    assert "solo" in single_ctx and "(" not in single_ctx.split("|")[0], (
+        f"AT-B78-30: a 1-variant project must render PLAIN on the status bar; "
+        f"context={single_ctx!r}"
+    )
+    assert "solo" in single_panel and "solo:" not in single_panel, (
+        f"AT-B78-30: a 1-variant project must render PLAIN in the Loaded panel; "
+        f"panel={single_panel!r}"
+    )
+
+    # N == 2 -> the suffixed form, on both surfaces.
+    assert "duo:a (1/2)" in multi_ctx, (
+        f"AT-B78-30: a 2-variant project must render `project:variant (i/N)` on "
+        f"the status bar; context={multi_ctx!r}"
+    )
+    assert "duo:a (1/2)" in multi_panel, (
+        f"AT-B78-30: a 2-variant project must render `project:variant (i/N)` in "
+        f"the Loaded panel; panel={multi_panel!r}"
+    )
+
+
+def test_at_b78_10_a_variant_switch_moves_both_surfaces(tmp_path: Path) -> None:
+    """AT-B78-10 -- the update PATH, not just the end state.
+
+    Driven through the SHIPPED affordance: `action_select_variant` opens
+    `SelectVariantScreen`, the list index moves, `#variant_ok` is pressed, and
+    activation routes through the real load worker. The AT never calls
+    `update_project_labels` directly — a test that did would pass over an
+    implementation whose load path never reaches the refresh at all.
+
+    Asserted `before != after` PER SURFACE **and** `after` equal to the expected
+    string: `before != after` alone is satisfied by any change, including a
+    wrong one, and the expected form is what LLR-120.5 actually promises.
+    """
+    from textual.widgets import Button, ListView
+
+    from s19_app.tui.screens import SelectVariantScreen
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "proj", {"a.s19": S19_A, "b.s19": S19_B})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("proj")
+            await _flush(pilot)
+            before = _b79_both_surfaces(app)
+
+            app.action_select_variant()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SelectVariantScreen)
+            screen.query_one("#variant_list", ListView).index = 1
+            await pilot.pause()
+            screen.query_one("#variant_ok", Button).press()
+            await pilot.pause()
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+
+            after = _b79_both_surfaces(app)
+            return before, after
+
+    (ctx_before, panel_before), (ctx_after, panel_after) = asyncio.run(_drive())
+
+    assert ctx_before != ctx_after, (
+        f"AT-B78-10: the status bar must MOVE on a variant switch; "
+        f"before={ctx_before!r} after={ctx_after!r}"
+    )
+    assert panel_before != panel_after, (
+        f"AT-B78-10: the Loaded panel must MOVE on a variant switch; "
+        f"before={panel_before!r} after={panel_after!r}"
+    )
+    assert "proj:b (2/2)" in ctx_after, (
+        f"AT-B78-10: the status bar must land on the EXPECTED string, not merely "
+        f"a different one; after={ctx_after!r}"
+    )
+    assert "proj:b (2/2)" in panel_after, (
+        f"AT-B78-10: the Loaded panel must land on the EXPECTED string; "
+        f"after={panel_after!r}"
+    )
+
+
+def test_tc_b78_12_hostile_a2l_name_is_control_safe_on_both_surfaces(
+    tmp_path: Path,
+) -> None:
+    """TC-B78-12 -- the control-character limb (SEC-F1), on BOTH surfaces.
+
+    The payload carries BOTH hostile shapes. That matters because the previous
+    payload `[red]evil[/].a2l` contains ZERO control characters: it certifies
+    the markup axis and is blind to the control axis, which is this batch's own
+    F-6 shape.
+
+    `markup=False` would pass a markup-only assertion and fail this one — it is
+    a PARSE FLAG that performs no string transform, so `0x1b`, `0x9b`, `0x9d`
+    reach the strip byte-identical. `U+009B` (single-byte C1 CSI) and `U+009D`
+    (single-byte C1 OSC) carry no `\\x1b` at all.
+
+    ⚠️ Measured platform bound, recorded rather than assumed: the full payload
+    is NOT creatable as a filename on Windows — `\\x1b` and `\\x7f` are illegal
+    path characters — so the state is set through the app's own attribute and
+    the SHIPPED `update_project_labels` is then driven. The sink is the subject
+    of LLR-120.4; the loader is not. The subset that IS reachable through a real
+    file on this platform (`\\x9b`, `\\x9d`, markup brackets) is exactly the
+    subset the spec's rationale calls out as legal Windows filename characters.
+    """
+    hostile = "evil\x1b[31m\x9b1m\x9d8;;http:x\x7f[red].a2l"
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "demoproj", {"a.s19": S19_A})
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("demoproj")
+            await _flush(pilot)
+            app.current_a2l_path = Path(hostile)
+            app.update_project_labels()
+            await pilot.pause()
+            return (
+                _b79_painted_strip(app, "#status_context"),
+                _b79_painted_strip(app, "#loaded_slots"),
+                _b79_status_context(app),
+            )
+
+    strip_ctx, strip_panel, rendered = asyncio.run(_drive())
+
+    # Presence co-assertion first (C-40): an absence clause over an EMPTY strip
+    # is vacuously true, so prove the payload actually reached the surface
+    # before asserting what is missing from it.
+    assert "evil" in rendered, (
+        f"the hostile name must actually REACH the surface, or the control-class "
+        f"assertion below is vacuous; rendered={rendered!r}"
+    )
+
+    for label, strip in (("#status_context", strip_ctx), ("#loaded_slots", strip_panel)):
+        leaked = sorted(_B79_CONTROL_CLASS & set(strip))
+        assert not leaked, (
+            f"TC-B78-12: no codepoint of C0 u {{DEL}} u C1 may reach {label}'s "
+            f"painted strip; leaked={[hex(ord(c)) for c in leaked]}"
+        )
+
+
+def test_tc_b78_09_nothing_loaded_shows_sentinels_not_blanks(tmp_path: Path) -> None:
+    """TC-B78-09 -- empty boundary: both surfaces show `(none)`, never a blank.
+
+    A blank is the failure this guards: it is what a surface renders when the
+    update never ran, and it is indistinguishable from "loaded nothing" to the
+    operator.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.update_project_labels()
+            await pilot.pause()
+            return _b79_both_surfaces(app)
+
+    ctx, panel = asyncio.run(_drive())
+
+    assert "(none)" in ctx, f"the status bar must show the sentinel; context={ctx!r}"
+    assert "project" in panel and "(none)" in panel, (
+        f"the Loaded panel's project row must show the sentinel, not vanish; "
+        f"panel={panel!r}"
+    )
+
+
+def test_tc_b78_10_a2l_without_a_project(tmp_path: Path) -> None:
+    """TC-B78-10 -- alternative: an A2L loaded with NO project.
+
+    The two halves are independent, and this is the arm that proves it: the A2L
+    name must appear while the project stays at its sentinel.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        a2l = tmp_path / "orphan.a2l"
+        a2l.write_text("/begin PROJECT p \"\" /end PROJECT\n", encoding="utf-8")
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.load_a2l_from_path(a2l)
+            await _flush(pilot)
+            return _b79_status_context(app)
+
+    ctx = asyncio.run(_drive())
+
+    assert "orphan.a2l" in ctx, f"the A2L half must render alone; context={ctx!r}"
+    assert "(none)" in ctx, (
+        f"the project half must stay at its sentinel with no project loaded; "
+        f"context={ctx!r}"
+    )
+
+
+def test_tc_b78_42_three_variants_render_the_active_index(tmp_path: Path) -> None:
+    """TC-B78-42 -- boundary: `N == 3`, active index 2, renders `(2/3)`.
+
+    Guards the composition arithmetic against an off-by-one that `N == 2` cannot
+    see: at two variants `(1/2)` and `(2/2)` are symmetric, so a wrong index
+    base still produces a plausible string.
+    """
+    from textual.widgets import Button, ListView
+
+    from s19_app.tui.screens import SelectVariantScreen
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(
+            app, "trio", {"a.s19": S19_A, "b.s19": S19_B, "c.s19": S19_A}
+        )
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("trio")
+            await _flush(pilot)
+            app.action_select_variant()
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SelectVariantScreen)
+            screen.query_one("#variant_list", ListView).index = 1
+            await pilot.pause()
+            screen.query_one("#variant_ok", Button).press()
+            await pilot.pause()
+            await app.workers.wait_for_complete()
+            await _flush(pilot)
+            return _b79_both_surfaces(app)
+
+    ctx, panel = asyncio.run(_drive())
+
+    assert "(2/3)" in ctx, f"the status bar must read (2/3); context={ctx!r}"
+    assert "(2/3)" in panel, f"the Loaded panel must read (2/3); panel={panel!r}"
+
+
+def test_tc_b78_43_unload_all_clears_the_artifact_slots_not_the_context(
+    tmp_path: Path,
+) -> None:
+    """TC-B78-43 -- negative: unload-all, RE-AUTHORED against executed behaviour.
+
+    The spec's boundary catalog reads *"unload all -> both surfaces return to
+    `(none)`"*. **Executed, that is false of BOTH halves.**
+    `action_unload_all` delegates to `_apply_unload("all")`, which clears
+    `current_file` and touches neither `current_project` nor
+    `current_a2l_path`. Measured after an unload-all with a project and an A2L
+    loaded, the status context is UNCHANGED at `'demoproj  |  ctx.a2l'`.
+
+    Asserting the catalog's literal wording would have false-failed a correct
+    implementation. Making it true instead would mean changing what unload-all
+    MEANS -- unloading artifacts would start deselecting the project -- which is
+    nowhere in `HLR-120`'s statement and is not this increment's to decide. So
+    the node asserts the contract that does exist: unload-all empties the
+    ARTIFACT SLOTS while the context surfaces keep naming what is still
+    selected. Owed upstream as a §6.5 Before/After amendment.
+
+    The presence co-assertions are load-bearing: without them, "the slots read
+    `(none)`" is satisfied by a panel that never rendered anything at all.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "demoproj", {"a.s19": S19_A})
+        a2l = tmp_path / "ctx.a2l"
+        a2l.write_text('/begin PROJECT p "" /end PROJECT\n', encoding="utf-8")
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app._handle_load_project("demoproj")
+            await _flush(pilot)
+            app.load_a2l_from_path(a2l)
+            await _flush(pilot)
+            loaded = _b79_both_surfaces(app)
+            app.action_unload_all()
+            await _flush(pilot)
+            return loaded, _b79_both_surfaces(app)
+
+    (ctx_loaded, panel_loaded), (ctx_after, panel_after) = asyncio.run(_drive())
+
+    # Presence co-assertions -- prove there was something to clear.
+    assert "demoproj" in ctx_loaded and "ctx.a2l" in ctx_loaded, (
+        f"both names must be present BEFORE the unload, or every assertion "
+        f"below is vacuous; loaded={ctx_loaded!r}"
+    )
+    assert "demoproj" in panel_loaded, (
+        f"the Loaded panel must name the project before the unload; "
+        f"panel={panel_loaded!r}"
+    )
+
+    # The artifact slots empty -- this is what unload-all actually contracts.
+    assert panel_after != panel_loaded, (
+        f"the Loaded panel must MOVE on unload-all, or this node cannot tell an "
+        f"unload from a no-op; loaded={panel_loaded!r} after={panel_after!r}"
+    )
+
+    # The context persists, and that is correct, not a defect.
+    assert "demoproj" in ctx_after, (
+        f"the project half must PERSIST: `_apply_unload` never touches "
+        f"`current_project`, so unloading artifacts does not deselect the "
+        f"project; after={ctx_after!r}"
+    )
+    assert "demoproj" in panel_after, (
+        f"the Loaded panel's project ROW must persist for the same reason; "
+        f"after={panel_after!r}"
+    )
+
+
+def test_tc_b78_13_update_before_mount_does_not_raise(tmp_path: Path) -> None:
+    """TC-B78-13 -- error boundary: the entry point is safe before mount.
+
+    `update_project_labels` is reachable from load handlers that can run before
+    the tree exists (headless unit tests do exactly this), so it must degrade to
+    a no-op rather than raise — matching `_refresh_loaded_panel` /
+    `_apply_empty_state`.
+    """
+    app = S19TuiApp(base_dir=tmp_path)
+    app.update_project_labels()  # must not raise
