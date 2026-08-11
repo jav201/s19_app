@@ -3637,6 +3637,50 @@ def _b79_app_binding_rows() -> frozenset:
 #: and 7 as bare tuples. Frozen as a COUNT plus the shown-key projection rather
 #: than 38 literal rows, because the full row set is `app.py`'s business and
 #: this batch's claim is only that Lane 1 does not disturb it.
+#: The committed App binding set, FULL ROWS. See the assertion in
+#: `test_at_b78_32_...` for why a count plus a key-only projection was not
+#: enough. 38 entries: 31 written as `Binding(...)`, 7 as bare tuples.
+_B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
+    ('0', "show_screen('crc_designer')", 'CRC Designer', False),
+    ('1', "show_screen('workspace')", 'Workspace', False),
+    ('2', "show_screen('a2l')", 'A2L Explorer', False),
+    ('3', "show_screen('mac')", 'MAC View', False),
+    ('4', "show_screen('map')", 'Memory Map', False),
+    ('5', "show_screen('issues')", 'Issues Report', False),
+    ('6', "show_screen('patch')", 'Patch Editor', False),
+    ('7', "show_screen('diff')", 'A2B Diff', False),
+    ('8', "show_screen('flow')", 'Flow Builder', False),
+    ('9', "show_screen('checks')", 'Checks', False),
+    ('U', 'unload_all', 'Unload all', False),
+    ('b', 'before_after_report', 'Before/After report', False),
+    ('comma', 'hex_page_prev', 'Hex-', True),
+    ('ctrl+d', 'cycle_density', 'Density', True),
+    ('ctrl+k', 'focus_palette', 'Palette', True),
+    ('ctrl+l', 'load_file', 'Load', True),
+    ('ctrl+s', 'save_project', 'Save', True),
+    ('ctrl+y', 'patch_redo', 'Redo', False),
+    ('ctrl+z', 'patch_undo', 'Undo', False),
+    ('g', 'focus_goto', 'Go-to', True),
+    ('j', 'dump_a2l_json', 'Dump A2L JSON', False),
+    ('k', 'show_legend', 'Legend', True),
+    ('l', 'load_file', 'Load file', False),
+    ('minus', 'page_prev_context', 'Page-', True),
+    ('o', 'open_workarea', 'Open workarea', False),
+    ('p', 'load_project', 'Load project', False),
+    ('pagedown', 'page_down_context', 'Page+', False),
+    ('pageup', 'page_up_context', 'Page-', False),
+    ('period', 'hex_page_next', 'Hex+', True),
+    ('plus', 'page_next_context', 'Page+', True),
+    ('q', 'quit', 'Quit', True),
+    ('question_mark', 'show_help_panel', 'Help', True),
+    ('r', 'refresh_files', 'Refresh workarea', False),
+    ('s', 'save_project', 'Save project', False),
+    ('slash', 'focus_find', 'Find', True),
+    ('t', 'view_reports', 'View reports', False),
+    ('v', 'select_variant', 'Select variant', False),
+    ('x', 'operations_view', 'Operations', True),
+})
+
 _B79_COMMITTED_APP_BINDING_COUNT = 38
 
 
@@ -3678,10 +3722,13 @@ def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
 
         await pilot.press("question_mark")
         await pilot.pause()
-        section = _b79_help_focused_section(app)
-        return list_text, shown_before, section
+        from textual.widgets import HelpPanel
 
-    list_text, shown_keys, section = _b78_drive_compare(
+        section = _b79_help_focused_section(app)
+        full_panel = _b79_painted_text(app, app.screen.query_one(HelpPanel))
+        return list_text, shown_before, section, full_panel
+
+    list_text, shown_keys, section, full_panel = _b78_drive_compare(
         tmp_path,
         (160, 40),
         _diff_result([(0x00, 0x0F, "changed"), (0x20, 0x2F, "added")]),
@@ -3700,7 +3747,12 @@ def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
     # own current wording.
     affordance = AbDiffPanel._RUN_LIST_AFFORDANCE
     assert affordance.strip(), "the affordance constant is empty -- clause 1 would be vacuous"
-    for key_word in ("Up", "Down", "Enter"):
+    # `Enter` was in this tuple until the independent review. It made the node
+    # REQUIRE a false claim: `Enter` is a no-op on this list and the spec
+    # excludes the capability three times over (P-43, HLR-126's rationale, §1.2
+    # Scope Out). A guard that pins the wrong contract actively resists its own
+    # correction, which is worse than no guard.
+    for key_word in ("Up", "Down"):
         assert key_word in affordance, (
             f"LLR-126.1's affordance must NAME the navigation keys; "
             f"{key_word!r} missing from {affordance!r}"
@@ -3719,6 +3771,18 @@ def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
         )
 
     # ...and the negative co-assertion, without which clause 2 is vacuous.
+    # The PRECONDITION comes first, and it is what makes the guard
+    # self-checking instead of size-dependent. The independent review measured
+    # this helper at all three supported sizes: at 120x30 the separator line
+    # carries a scrollbar glyph so it is NOT blank and the boundary is MISSED;
+    # at 80x24 the panel is clipped and `Window page` is absent from it
+    # entirely, so `not in section` is trivially true. A discriminator that is
+    # not present cannot discriminate — asserting it IS in the full panel turns
+    # both failure modes loud instead of silently green.
+    assert "Window page" in full_panel, (
+        "the co-assertion below is vacuous: its discriminator is not in the "
+        f"panel at all, so 'not in section' proves nothing.\npanel=\n{full_panel}"
+    )
     assert "Window page" not in section, (
         "the focused section must list the RUN LIST's bindings, not its "
         "ancestor panel's window paging -- if 'Window page' appears here the "
@@ -3761,6 +3825,26 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
     and pins two independent projections of it.
     """
     rows = _b79_app_binding_rows()
+
+    # The FULL row set, frozen. The node pinned only a count plus a key-only
+    # projection of the shown bindings until the independent review measured the
+    # blind spot: 24 of the 38 entries are `show=False`, so their key, action
+    # and description were certified by the count alone. Executed, all three of
+    # these stayed GREEN — a hidden binding's action rebound, a hidden binding's
+    # key changed, and one hidden removed while another was added. The shown
+    # projection kept only `key`, so **re-pointing `slash` or `g` to a different
+    # action — precisely what Lane 1 does at Inc-9 — was invisible too.**
+    #
+    # The spec's line-range predicate would have caught every one of those. The
+    # re-authoring is still right about range fragility, but it was not the
+    # strict improvement the Inc-6 record claimed: its counterfactual was an
+    # ADDITION, the one class a count can see. A frozen row set is a superset of
+    # both old projections and no line movement blinds it.
+    assert rows == _B79_COMMITTED_APP_BINDING_ROWS, (
+        "the App BINDINGS block must be byte-for-byte the committed set. "
+        f"Added: {sorted(rows - _B79_COMMITTED_APP_BINDING_ROWS)!r}; "
+        f"removed: {sorted(_B79_COMMITTED_APP_BINDING_ROWS - rows)!r}"
+    )
 
     assert len(rows) == _B79_COMMITTED_APP_BINDING_COUNT, (
         f"the App BINDINGS block must still carry "

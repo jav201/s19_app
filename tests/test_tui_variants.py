@@ -48,6 +48,7 @@ from textual.widgets import Button, ListView, Select, Static
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.screens import SelectVariantScreen
+from s19_app.tui.screens_directionb import LoadedArtifactsPanel
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
 S19_A = "S107100001020304DE\nS9030000FC\n"
@@ -94,7 +95,7 @@ def _project_label(app: S19TuiApp) -> str:
     """
     for row in app.query("#loaded_slots > Horizontal"):
         cells = list(row.children)
-        if cells and str(cells[0].render()).strip() == "project":
+        if cells and str(cells[0].render()).strip() == LoadedArtifactsPanel._PROJECT_KIND:
             return str(cells[1].render())
     raise AssertionError(
         "the Loaded panel has no project row — returning an empty string here "

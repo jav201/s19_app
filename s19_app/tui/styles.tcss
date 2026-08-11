@@ -511,10 +511,20 @@ DataTable > .datatable--odd-row {
     width: 100%;
 }
 
+/* `1fr`, NOT `auto`. Under `auto` this label sizes to its content and takes
+ * whatever it wants — measured, a routine `set_file_status` coexistence
+ * message ("Loaded <name>.s19 (S19+MAC: <name>.mac)") reached **93 columns on
+ * an 80-column terminal**, leaving `#status_context` 1 column wide and
+ * painting NOTHING. HLR-120's own threshold ("the status bar's text contains
+ * both on 10 of 10 screens") was false at 80x24 while the widget's
+ * `render()` still returned the full string — which is why the acceptances
+ * could not see it. `1fr` + ellipsis makes the transient MESSAGE truncate
+ * instead of the ambient CONTEXT vanishing. */
 #workspace_status_bar #status_text {
     height: auto;
     color: $fg-base;
-    width: auto;
+    width: 1fr;
+    text-overflow: ellipsis;
 }
 
 /* Right-aligned so the context reads as ambient state rather than competing
@@ -527,11 +537,17 @@ DataTable > .datatable--odd-row {
  * to the design system on the way past, which is not this increment's scope —
  * separation is carried by position and alignment instead. Registered as a
  * candidate, not taken. */
+/* `auto` with a ceiling: the context sizes to its content so it is never
+ * starved by a long status message, and `max-width` stops a long
+ * project+A2L pair from starving the message in return. The two are bounded
+ * against each other rather than one being given the remainder. */
 #workspace_status_bar #status_context {
     height: 1;
-    width: 1fr;
+    width: auto;
+    max-width: 70%;
     color: $fg-base;
     text-align: right;
+    text-overflow: ellipsis;
 }
 
 #workspace_status_bar Label {

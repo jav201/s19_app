@@ -1803,6 +1803,14 @@ class LoadedArtifactsPanel(Container):
     #: (TC-B78-09) holds even for a caller that omits the argument entirely --
     #: `on_mount` is exactly such a caller.
     _PROJECT_ABSENT = _ABSENT_TEXT
+    #: The project row's kind-cell token. `.loaded-kind` is `width: 6`, so the
+    #: obvious `"project"` CLIPS to `"projec"` and runs into the detail cell —
+    #: found by the Inc-6/Inc-7 independent review, and only visible through the
+    #: PAINTED strip; `render()` returned the full word throughout. Four
+    #: uppercase characters also match the siblings (`S19` / `MAC` / `A2L`)
+    #: rather than introducing a second style of label in one column. Named so
+    #: the acceptances match the EMITTED token instead of re-typing it.
+    _PROJECT_KIND = "PROJ"
 
     class UnloadRequested(Message):
         """A slot's ``[u]`` / the footer ``[U]`` asked to unload an artifact.
@@ -1930,7 +1938,7 @@ class LoadedArtifactsPanel(Container):
             the panel's existing column rhythm.
         """
         absent = project == self._PROJECT_ABSENT
-        kind_cell = Static(Content("project"), classes="loaded-kind")
+        kind_cell = Static(Content(self._PROJECT_KIND), classes="loaded-kind")
         detail = Static(
             safe_text(project),
             classes="loaded-detail loaded-absent" if absent else "loaded-detail",
@@ -6764,7 +6772,21 @@ class AbDiffPanel(Container):
     #: and `]` page the hex window and `f` toggles the overlay — so they belong
     #: to the help panel's listing, not to this row. `j`/`k`/`n`/`p` are ruled
     #: out by D-4 and are not bound.
-    _RUN_LIST_AFFORDANCE = "Keys: Up/Down move the selection, Enter opens"
+    #:
+    #: ⚠️ It said `, Enter opens` until the Inc-6/Inc-7 independent review, and
+    #: that clause was FALSE THREE TIMES OVER. There is no `diff_range_list`
+    #: branch in `S19TuiApp.on_list_view_selected` and no `Selected` handler on
+    #: this panel, so `Enter` is a no-op — executed, nothing observable changes.
+    #: The spec does not merely omit the capability, it EXCLUDES it: §1.2 Scope
+    #: Out, P-43 (*"it would show the wrong bytes… a defect, not a feature"*),
+    #: and HLR-126's own rationale (*"what this deliberately does not do: …post
+    #: an open-in-hex message on Enter"*, carry C-78-d). And the exclusion
+    #: reasoning directly above contradicted itself — it drops `f`/`[`/`]` for
+    #: not being selection movement while keeping `Enter`, which is not either.
+    #: An affordance that advertises a rejected capability is worse than no
+    #: affordance: it sends the operator looking for behaviour the batch decided
+    #: not to build.
+    _RUN_LIST_AFFORDANCE = "Keys: Up/Down move the selection"
 
     #: LLR-124.3's overlay + pagination keys. Widget-scoped, never App-level
     #: (D-2 ruled out a new App binding; `AT-B78-32` pins `app.py`'s BINDINGS

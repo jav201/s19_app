@@ -1052,8 +1052,21 @@ from test_tui_variants import S19_A, S19_B, _flush, _make_project  # noqa: E402
 
 
 def _b79_status_context(app) -> str:
-    """The status bar's context cell, as rendered text."""
-    return str(app.query_one("#status_context").render())
+    """The status bar's context cell, as PAINTED — not as rendered.
+
+    ⚠️ This read `str(...render())` until the Inc-6/Inc-7 independent review,
+    and the difference is the whole finding. `render()` returns what the widget
+    WOULD draw given room; the compositor decides how much room it gets. With a
+    routine `set_file_status` coexistence message at 80x24, `#status_text` sized
+    itself to 93 columns on a 78-column bar, `#status_context` got 1 column and
+    painted NOTHING — while `render()` still returned the full string. Every
+    gate below was green over an operator who could not read the context at all.
+
+    That is the class the spec names in its own section 1.3 (C-32, "a predicate
+    on `region` alone ships the bug green"). The painted oracle already existed
+    in this module for TC-B78-12; the gates simply did not use it.
+    """
+    return _b79_painted_strip(app, "#status_context")
 
 
 def _b79_loaded_panel(app) -> str:
@@ -1063,7 +1076,7 @@ def _b79_loaded_panel(app) -> str:
     panel re-mounts its rows on every render, so anything cached is a snapshot
     of a tree that no longer exists.
     """
-    return " ".join(str(child.render()) for child in app.query("#loaded_slots Static"))
+    return _b79_painted_strip(app, "#loaded_slots")
 
 
 def _b79_both_surfaces(app) -> tuple[str, str]:
@@ -1120,17 +1133,28 @@ def test_at_b78_08_and_11_status_bar_names_both_on_every_screen(
     satisfy the naming clause and pass the height clause at once (NEW-7).
     """
 
-    async def _drive():
-        app = S19TuiApp(base_dir=tmp_path)
+    async def _drive(size, base):
+        app = S19TuiApp(base_dir=base)
         _make_project(app, "demoproj", {"a.s19": S19_A})
-        a2l = tmp_path / "b79ctx.a2l"
-        a2l.write_text("/begin PROJECT p \"\" /end PROJECT\n", encoding="utf-8")
-        async with app.run_test(size=(120, 30)) as pilot:
+        a2l = base / "b79ctx.a2l"
+        a2l.write_text('/begin PROJECT p "" /end PROJECT\n', encoding="utf-8")
+        async with app.run_test(size=size) as pilot:
             await pilot.pause()
             app._handle_load_project("demoproj")
             await _flush(pilot)
             app.load_a2l_from_path(a2l)
             await _flush(pilot)
+            # A REALISTIC status message, not an idle bar. `set_file_status`
+            # runs on every real file load with `_format_coexistence_status`,
+            # whose text carries up to TWO filenames. Without it this node
+            # exercises a nearly-empty `#status_text` and cannot see the sibling
+            # starving the context — which is exactly how the 80x24 defect
+            # survived this node's first authoring.
+            app.set_file_status(
+                "Loaded ECU_calibration_release_2026_v161.s19 "
+                "(S19+MAC: ECU_calibration_release_2026_v161.mac)"
+            )
+            await pilot.pause()
             observed = {}
             for key in list(S19TuiApp.SCREEN_CONTAINER_IDS):
                 app.action_show_screen(key)
@@ -1141,22 +1165,30 @@ def test_at_b78_08_and_11_status_bar_names_both_on_every_screen(
                 )
             return observed
 
-    observed = asyncio.run(_drive())
+    # ALL THREE sizes §2.3 declares supported. Running at 120x30 alone was the
+    # second half of the same defect: it is the one size where a starved context
+    # still happens to fit.
+    for size in ((160, 40), (120, 30), (80, 24)):
+        base = tmp_path / f"s{size[0]}x{size[1]}"
+        base.mkdir()
+        observed = asyncio.run(_drive(size, base))
 
-    assert len(observed) == 10, f"all 10 screens must be visited; got {len(observed)}"
-    for screen, (text, height) in observed.items():
-        assert "demoproj" in text, (
-            f"AT-B78-08: the status bar must name the PROJECT on {screen!r}; "
-            f"context={text!r}"
+        assert len(observed) == 10, (
+            f"@{size}: all 10 screens must be visited; got {len(observed)}"
         )
-        assert "b79ctx.a2l" in text, (
-            f"AT-B78-08: the status bar must name the A2L on {screen!r}; "
-            f"context={text!r}"
-        )
-        assert 1 <= height <= 7, (
-            f"AT-B78-11: the status bar must not grow past 7 rows and must not "
-            f"collapse; on {screen!r} height={height}"
-        )
+        for screen, (text, height) in observed.items():
+            assert "demoproj" in text, (
+                f"AT-B78-08 @{size}: the status bar must name the PROJECT on "
+                f"{screen!r}; painted context={text!r}"
+            )
+            assert "b79ctx.a2l" in text, (
+                f"AT-B78-08 @{size}: the status bar must name the A2L on "
+                f"{screen!r}; painted context={text!r}"
+            )
+            assert 1 <= height <= 7, (
+                f"AT-B78-11 @{size}: the status bar must not grow past 7 rows "
+                f"and must not collapse; on {screen!r} height={height}"
+            )
 
 
 def test_at_b78_09_loaded_panel_names_the_project(tmp_path: Path) -> None:
@@ -1377,7 +1409,9 @@ def test_tc_b78_09_nothing_loaded_shows_sentinels_not_blanks(tmp_path: Path) -> 
     ctx, panel = asyncio.run(_drive())
 
     assert "(none)" in ctx, f"the status bar must show the sentinel; context={ctx!r}"
-    assert "project" in panel and "(none)" in panel, (
+    from s19_app.tui.screens_directionb import LoadedArtifactsPanel
+
+    assert LoadedArtifactsPanel._PROJECT_KIND in panel and "(none)" in panel, (
         f"the Loaded panel's project row must show the sentinel, not vanish; "
         f"panel={panel!r}"
     )
