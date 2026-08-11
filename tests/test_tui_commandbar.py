@@ -142,7 +142,22 @@ def test_tc007_palette_entry_dispatches_same_action(tmp_path: Path) -> None:
 
 
 def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
-    """``/`` moves keyboard focus to the command-bar find input (LLR-004.1)."""
+    """``/`` reaches the ACTIVE screen's find input, or notices (LLR-119.1).
+
+    ⚠️ **Re-pointed at batch-79 Inc-9, not retired.** This node asserted the
+    pre-`HLR-119` contract — *"`/` focuses the command-bar find input"*, the
+    same `#find_input` from all eight screens it drove — which is exactly the
+    behaviour `HLR-119` replaces: the bar's find wrote into the workspace pane
+    regardless of what the operator was looking at.
+
+    The node id survives because its observable does: *"`/` from every screen
+    goes somewhere well-defined."* Only the destination changed — from one
+    shared input to the active screen's own, or, on the seven screens owning
+    none, to a notice. Retiring it would have dropped a per-screen sweep that
+    `AT-B78-04` (3 owning screens) and `AT-B78-05` (7 notice screens) cover only
+    when read together, and it would have touched the AT/TC registry, which is
+    Inc-11's declared work.
+    """
 
     async def _drive() -> list[tuple[str, str]]:
         app = S19TuiApp(base_dir=tmp_path)
@@ -168,11 +183,22 @@ def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
         return seen
 
     seen = asyncio.run(_drive())
+    expected = {
+        "workspace": "search_input",
+        "a2l": "alt_search_input",
+        "mac": "mac_search_input",
+    }
     for key, focused_id in seen:
-        assert focused_id == "find_input", (
-            f"'/' should focus the find input on screen '{key}', "
-            f"focused '{focused_id}'"
-        )
+        if key in expected:
+            assert focused_id == expected[key], (
+                f"'/' must focus {key!r}'s OWN find input {expected[key]!r}, "
+                f"focused {focused_id!r}"
+            )
+        else:
+            assert focused_id == "", (
+                f"on {key!r}, which owns no find input, '/' must take no focus "
+                f"at all (the notice path); focused {focused_id!r}"
+            )
 
 
 def test_tc008_find_submission_routes_to_find_string_in_mem(tmp_path: Path) -> None:
@@ -251,7 +277,7 @@ def test_tc008_single_keys_suppressed_while_find_focused(tmp_path: Path) -> None
             app.set_focus(None)
             await pilot.press("slash")
             await pilot.pause()
-            find_input = app.query_one("#find_input", Input)
+            find_input = app.query_one("#search_input", Input)
             find_input.value = ""
             for key in ("g", "5", "period", "comma"):
                 await pilot.press(key)
@@ -279,7 +305,7 @@ def test_tc008_single_keys_suppressed_while_find_focused(tmp_path: Path) -> None
         f"g / digit / paging keys must be inserted as text into the find "
         f"input, got {typed!r}"
     )
-    assert focused_during == "find_input", (
+    assert focused_during == "search_input", (
         "typing 'g' must not steal focus to the go-to input"
     )
     assert visible_during == ["screen_workspace"], (
@@ -369,7 +395,7 @@ def test_tc009_g_focuses_goto_and_submit_has_handle_goto_effect(
         return focused, status
 
     focused, status = asyncio.run(_drive())
-    assert focused == "cmdbar_goto_input", (
+    assert focused == "goto_input", (
         f"'g' should focus the command-bar go-to input, focused {focused!r}"
     )
     assert status == "Goto 0x00001000", (
@@ -419,7 +445,7 @@ def test_tc009_single_keys_suppressed_while_goto_focused(tmp_path: Path) -> None
             app.set_focus(None)
             await pilot.press("g")
             await pilot.pause()
-            goto_input = app.query_one("#cmdbar_goto_input", Input)
+            goto_input = app.query_one("#goto_input", Input)
             goto_input.value = ""
             for key in ("4", "period", "comma"):
                 await pilot.press(key)
@@ -1593,3 +1619,485 @@ def test_tc_b78_13_update_before_mount_does_not_raise(tmp_path: Path) -> None:
     """
     app = S19TuiApp(base_dir=tmp_path)
     app.update_project_labels()  # must not raise
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-9 -- HLR-119: `/` and `g` act on the ACTIVE screen, `Esc` releases
+# ---------------------------------------------------------------------------
+
+_B79_OWNING = {"workspace", "a2l", "mac"}
+
+
+async def _b79_blurred(app, pilot) -> None:
+    """LLR-119.4's precondition, asserted rather than assumed.
+
+    A focused ``Input`` swallows a bare ``g`` as TEXT instead of dispatching the
+    binding, so every node here would measure the wrong thing if something
+    still held focus. Both Phase-1 lanes independently adopted this, and
+    Phase-0 records the self-caught defect that produced it.
+    """
+    app.set_focus(None)
+    await pilot.pause()
+    assert app.focused is None, (
+        f"the precondition failed: {app.focused!r} still holds focus, so the "
+        f"single-letter key below would be swallowed as text"
+    )
+
+
+def _b79_owning_derivation(app) -> set:
+    """The owning set, derived from the RULE rather than from the routing map.
+
+    ⚠️ Deriving it from `_FIND_GOTO_INPUTS` would make the assertion
+    "the map equals the map" — the artefact under test supplying its own
+    oracle (C-40 limb 2). This walks the real widget tree with the pattern the
+    requirement states, so the two can disagree and the node can fail.
+
+    The pattern is normative because two honest derivations disagree: "any
+    `Input` in the container" yields **7** (patch 5, diff 3, flow 1,
+    crc_designer 13 inputs, none of them find or go-to), the id pattern yields
+    **3**. An unstated grep pattern is an unstated definition.
+    """
+    import re
+
+    from textual.widgets import Input
+
+    pattern = re.compile(r"(search|goto)_input$")
+    owning = set()
+    for key, container in S19TuiApp.SCREEN_CONTAINER_IDS.items():
+        ids = [w.id for w in app.query_one(f"#{container}").query(Input) if w.id]
+        if any(pattern.search(i) for i in ids):
+            owning.add(key)
+    return owning
+
+
+def test_at_b78_04_slash_and_g_focus_the_local_inputs(tmp_path: Path) -> None:
+    """AT-B78-04 (GATE) -- on the 3 owning screens the keys focus LOCAL inputs.
+
+    Today all ten screens focus the command bar's inputs, so this is RED on the
+    pre-change tree by construction.
+
+    The owning set is asserted by SET EQUALITY against a tree-walked derivation,
+    with `len == 3` kept only as a redundant guard: a bare count would be
+    satisfied by any three screens, and the derivation that gives 3 is the one
+    the requirement states rather than the one the map asserts.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            derived = _b79_owning_derivation(app)
+            observed = {}
+            for key in sorted(_B79_OWNING):
+                app.action_show_screen(key)
+                await pilot.pause()
+                await _b79_blurred(app, pilot)
+                await pilot.press("slash")
+                await pilot.pause()
+                find_id = app.focused.id if app.focused else None
+                await _b79_blurred(app, pilot)
+                await pilot.press("g")
+                await pilot.pause()
+                goto_id = app.focused.id if app.focused else None
+                observed[key] = (find_id, goto_id)
+            return derived, observed
+
+    derived, observed = asyncio.run(_drive())
+
+    assert derived == _B79_OWNING, (
+        f"the owning set derived from the widget tree must equal "
+        f"{sorted(_B79_OWNING)}; derived {sorted(derived)}"
+    )
+    assert len(derived) == 3, f"redundant guard: expected 3, got {len(derived)}"
+
+    expected = {
+        "workspace": ("search_input", "goto_input"),
+        "a2l": ("alt_search_input", "alt_goto_input"),
+        "mac": ("mac_search_input", "mac_goto_input"),
+    }
+    for key, pair in expected.items():
+        assert observed[key] == pair, (
+            f"on {key!r}, `/` and `g` must focus that screen's OWN inputs "
+            f"{pair}; observed {observed[key]}"
+        )
+
+
+def test_at_b78_05_the_seven_non_owning_screens_notice_exactly_once(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-05 (GATE) -- the notice path, which is the MAJORITY: 7 of 10.
+
+    The gate is the notice COUNT per key, not "no exception raised" -- the
+    latter is green on an action that does nothing at all, so it is kept below
+    only as a labelled regression pin. *Exactly one* is what separates a notice
+    from a notice-per-keystroke loop.
+
+    ⚠️ **The spec's stated threshold is not measurable as written, and this node
+    uses a different oracle for a recorded reason.** `LLR-119.2` reads
+    *"`len(app.log_lines)` grows by exactly 1 per key on each of the 7
+    screens"*. Executed: `log_lines` is a `deque(maxlen=4)` (`app.py:1445`), so
+    its LENGTH saturates at 4 and stops growing after the fourth notice. Driving
+    all seven screens, the first four report a delta of 1 and the last three
+    report **0** -- with a correct implementation. A node asserting the spec's
+    literal wording would have false-failed on whichever three screens happened
+    to come last. Owed upstream as a §6.5 amendment.
+
+    The oracle is therefore the SEQUENCE of emitted notices, captured through
+    `set_status` -- the repo's established idiom (`_statuses` in
+    `tests/test_tui_patch_variant.py`) -- paired with the rendered `#log_line_4`
+    so the operator-visible deliverable is asserted too, not just the call.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            captured: list[str] = []
+            original = app.set_status
+            app.set_status = lambda message: (  # type: ignore[method-assign]
+                captured.append(message),
+                original(message),
+            )[1]
+
+            notice_screens = sorted(set(S19TuiApp.SCREEN_CONTAINER_IDS) - _B79_OWNING)
+            observed = {}
+            raised = []
+            for key in notice_screens:
+                app.action_show_screen(key)
+                await pilot.pause()
+                await _b79_blurred(app, pilot)
+                try:
+                    before = len(captured)
+                    await pilot.press("slash")
+                    await pilot.pause()
+                    slash_delta = len(captured) - before
+                    await _b79_blurred(app, pilot)
+                    mid = len(captured)
+                    await pilot.press("g")
+                    await pilot.pause()
+                    g_delta = len(captured) - mid
+                except Exception as exc:  # pragma: no cover - the pin
+                    raised.append((key, repr(exc)))
+                    continue
+                observed[key] = (slash_delta, g_delta, app.focused)
+            tail = str(app.query_one("#log_line_4").render())
+            return notice_screens, observed, raised, tail
+
+    notice_screens, observed, raised, tail = asyncio.run(_drive())
+
+    assert len(notice_screens) == 7, (
+        f"the notice path must be 7 of 10 screens; got {len(notice_screens)}: "
+        f"{notice_screens}"
+    )
+    assert len(observed) == 7, (
+        f"every non-owning screen must have been exercised; got {sorted(observed)}"
+    )
+    # The GATE: exactly one notice per key, on every non-owning screen.
+    for key, (slash_delta, g_delta, focused) in observed.items():
+        assert slash_delta == 1, (
+            f"on {key!r}, `/` must emit EXACTLY ONE notice; emitted {slash_delta}"
+        )
+        assert g_delta == 1, (
+            f"on {key!r}, `g` must emit EXACTLY ONE notice; emitted {g_delta}"
+        )
+        assert focused is None, (
+            f"on {key!r} nothing should have taken focus; focused={focused!r}"
+        )
+    # Regression PIN, labelled as such: green on an action that does nothing.
+    assert not raised, f"no key may raise on a non-owning screen; raised={raised}"
+    # The operator-visible deliverable, not merely the call: the tail NAMES the
+    # absence rather than being any line at all.
+    assert "no find" in tail.lower() or "no go-to" in tail.lower(), (
+        f"the log tail must NAME the absence; #log_line_4={tail!r}"
+    )
+
+
+def test_at_b78_06_a_find_on_a2l_does_not_write_into_the_workspace(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-06 (GATE) -- the wrong-pane defect, with `== ""` as the load-bearing half.
+
+    This is the executed defect HLR-119 exists for: with A2L active, a find used
+    to write into the WORKSPACE `#search_input` and search the workspace map.
+
+    **The `== ""` clause is the half that gates.** Asserting only that the A2L
+    input carries the text would stay green on an implementation that wrote into
+    BOTH — which is exactly what a presence-based resolution does.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("a2l")
+            await pilot.pause()
+            await _b79_blurred(app, pilot)
+            await pilot.press("slash")
+            await pilot.pause()
+            for char in "BOOT":
+                await pilot.press(char)
+            await pilot.pause()
+            return (
+                str(app.query_one("#alt_search_input", Input).value),
+                str(app.query_one("#search_input", Input).value),
+            )
+
+    a2l_value, workspace_value = asyncio.run(_drive())
+
+    assert a2l_value == "BOOT", (
+        f"the find must land in the A2L screen's own input; got {a2l_value!r}"
+    )
+    assert workspace_value == "", (
+        f"the workspace input must be UNTOUCHED -- this is the clause that fails "
+        f"on an implementation writing into both panes; got {workspace_value!r}"
+    )
+
+
+def test_at_b78_07_escape_releases_a_focused_input(tmp_path: Path) -> None:
+    """AT-B78-07 (GATE) -- `Escape` moves focus off a find/goto input.
+
+    Driven with `pilot.press("escape")` only. A node calling `.blur()` does not
+    discharge LLR-119.3 — it would pass against an application with no escape
+    handling whatsoever, which is precisely the pre-change state.
+
+    ⚠️ The palette arm is the DISPOSITION this increment owed in writing. The
+    spec asserted that this handler "must not shadow the palette's
+    `escape`-to-close"; re-executed here, the palette HAS no such mechanism, so
+    the original clause asserted a constraint against nothing. What is pinned
+    instead is the true, checkable property: the handler leaves the palette
+    exactly as it found it. Closing the palette's own dismissal is deferred as a
+    carry — it is a new capability on a different widget, outside HLR-119.
+    """
+    from s19_app.tui.command_bar import CommandBar
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            released = {}
+            for key in sorted(_B79_OWNING):
+                app.action_show_screen(key)
+                await pilot.pause()
+                await _b79_blurred(app, pilot)
+                await pilot.press("slash")
+                await pilot.pause()
+                focused_before = app.focused.id if app.focused else None
+                await pilot.press("escape")
+                await pilot.pause()
+                released[key] = (
+                    focused_before,
+                    app.focused.id if app.focused else None,
+                )
+            # The palette arm.
+            bar = app.query_one(CommandBar)
+            await pilot.press("ctrl+k")
+            await pilot.pause()
+            palette_open_before = bar.palette_is_open
+            await pilot.press("escape")
+            await pilot.pause()
+            return released, palette_open_before, bar.palette_is_open
+
+    released, palette_before, palette_after = asyncio.run(_drive())
+
+    for key, (before, after) in released.items():
+        assert before is not None, (
+            f"on {key!r} the input must have taken focus first, or the release "
+            f"assertion is vacuous"
+        )
+        assert after != before, (
+            f"on {key!r}, `escape` must move focus OFF {before!r}; it stayed"
+        )
+
+    # The palette is untouched -- neither shadowed nor accidentally improved.
+    assert palette_before is True, "the palette must be open before the escape"
+    assert palette_after is True, (
+        "this handler must leave the palette exactly as it found it. The "
+        "palette has no `escape`-to-close (command_bar.py declares no BINDINGS), "
+        "so `escape` there is a no-op both before and after this increment; a "
+        "CLOSED palette here would mean the handler reached a widget it has no "
+        "requirement to touch."
+    )
+
+
+def test_tc_b78_46_the_other_screens_input_is_still_resolvable(
+    tmp_path: Path,
+) -> None:
+    """TC-B78-46 -- the P-10 discrimination, white-box.
+
+    Routing must be by SCREEN KEY, not by which inputs exist. The way to tell
+    the two apart is to show that the workspace input is **still resolvable**
+    while A2L is active and the action nonetheless resolves the A2L input — a
+    presence-based implementation would be indistinguishable from a correct one
+    without this.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("a2l")
+            await pilot.pause()
+            resolvable = app.query_one("#search_input", Input) is not None
+            await _b79_blurred(app, pilot)
+            await pilot.press("slash")
+            await pilot.pause()
+            return resolvable, (app.focused.id if app.focused else None)
+
+    resolvable, focused = asyncio.run(_drive())
+
+    assert resolvable, (
+        "the workspace input must STILL resolve while A2L is active -- if it "
+        "did not, this node could not tell key-routing from presence-routing"
+    )
+    assert focused == "alt_search_input", (
+        f"the action must resolve the ACTIVE screen's input even though the "
+        f"other one is resolvable; focused={focused!r}"
+    )
+
+
+def test_tc_b78_05_a_second_slash_adds_no_second_notice(tmp_path: Path) -> None:
+    """TC-B78-05 -- boundary: `/` twice on a non-owning screen is idempotent.
+
+    One press, one line. The failure this guards is a notice-per-keystroke loop,
+    which "no exception raised" would never see.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("map")
+            await pilot.pause()
+            await _b79_blurred(app, pilot)
+            before = len(app.log_lines)
+            await pilot.press("slash")
+            await pilot.pause()
+            after_one = len(app.log_lines)
+            await pilot.press("slash")
+            await pilot.pause()
+            return before, after_one, len(app.log_lines)
+
+    before, after_one, after_two = asyncio.run(_drive())
+
+    assert after_one - before == 1, f"the first `/` must add one line; {after_one - before}"
+    assert after_two - after_one == 1, (
+        f"the second `/` must add exactly one more, never a burst; "
+        f"delta={after_two - after_one}"
+    )
+
+
+def test_tc_b78_06_switching_screens_re_points_the_key(tmp_path: Path) -> None:
+    """TC-B78-06 -- boundary: the key follows the NEW screen after a switch.
+
+    A resolution cached at first use, or bound to whichever input was focused,
+    would pass every single-screen node and fail here.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            await _b79_blurred(app, pilot)
+            await pilot.press("slash")
+            await pilot.pause()
+            first = app.focused.id if app.focused else None
+            # Switch WHILE the input holds focus -- the harder ordering.
+            app.action_show_screen("mac")
+            await pilot.pause()
+            await _b79_blurred(app, pilot)
+            await pilot.press("slash")
+            await pilot.pause()
+            return first, (app.focused.id if app.focused else None)
+
+    first, second = asyncio.run(_drive())
+
+    assert first == "search_input", f"expected the workspace input; got {first!r}"
+    assert second == "mac_search_input", (
+        f"after switching to MAC the key must follow the NEW screen; got {second!r}"
+    )
+
+
+def test_tc_b78_08_slash_while_the_palette_is_open_does_not_steal_focus(
+    tmp_path: Path,
+) -> None:
+    """TC-B78-08 -- negative: `/` is a literal character inside the palette.
+
+    The one place in the application where `/` must NOT be a binding. If the
+    action fired here it would yank focus out of `#palette_input` mid-typing.
+    """
+    from s19_app.tui.command_bar import CommandBar
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            await pilot.press("ctrl+k")
+            await pilot.pause()
+            bar = app.query_one(CommandBar)
+            focused_before = app.focused.id if app.focused else None
+            await pilot.press("slash")
+            await pilot.pause()
+            return bar.palette_is_open, focused_before, (
+                app.focused.id if app.focused else None
+            )
+
+    palette_open, before, after = asyncio.run(_drive())
+
+    assert palette_open, "the palette must be open for this node to mean anything"
+    assert before == "palette_input", (
+        f"the palette input must hold focus before the key; got {before!r}"
+    )
+    assert after == "palette_input", (
+        f"`/` must stay a literal character inside the palette and must not "
+        f"steal focus to a find input; focus moved to {after!r}"
+    )
+
+
+def test_tc_b78_41_focus_find_before_mount_does_not_raise(tmp_path: Path) -> None:
+    """TC-B78-41 -- error boundary: the action is safe before the tree exists.
+
+    Split off `TC-B78-46` at Phase 2: one id carrying two unrelated subjects is
+    a node that cannot say which half failed.
+    """
+    app = S19TuiApp(base_dir=tmp_path)
+    app.action_focus_find()  # must not raise
+    app.action_focus_goto()  # must not raise
+
+
+def test_tc_b78_04_no_file_loaded_still_focuses(tmp_path: Path) -> None:
+    """TC-B78-04 -- empty boundary: focus moves with nothing loaded.
+
+    The find input is a text box, not a view over the image, so an empty session
+    must still reach it. The pre-existing "No file loaded." line is a SEARCH
+    diagnostic and is unrelated to focus — asserted here as unchanged so the
+    node cannot be satisfied by an implementation that logs instead of focusing.
+    """
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("workspace")
+            await pilot.pause()
+            await _b79_blurred(app, pilot)
+            before = len(app.log_lines)
+            await pilot.press("slash")
+            await pilot.pause()
+            return (
+                app.focused.id if app.focused else None,
+                len(app.log_lines) - before,
+            )
+
+    focused, delta = asyncio.run(_drive())
+
+    assert focused == "search_input", (
+        f"focus must move even with nothing loaded; got {focused!r}"
+    )
+    assert delta == 0, (
+        f"focusing an owning screen's input must log NOTHING -- a notice here "
+        f"would mean the owning screen fell onto the notice path; delta={delta}"
+    )

@@ -5757,6 +5757,54 @@ class S19TuiApp(App):
         "crc_designer": "screen_crc_designer",
     }
 
+    #: LLR-119.1 — rail screen-key -> (find input id, go-to input id), or
+    #: ``None`` where the screen owns neither.
+    #:
+    #: **Every one of `SCREEN_CONTAINER_IDS`' ten keys appears here, and the
+    #: seven `None`s are the point.** The map could have listed only the three
+    #: owners and been shorter; then its key set would be the implementation's
+    #: own opinion of who owns an input, and an acceptance quantifying over it
+    #: would certify a completeness the code does not have (C-40 limb 2). Keyed
+    #: on all ten, `set(_FIND_GOTO_INPUTS) == set(SCREEN_CONTAINER_IDS)` is a
+    #: real assertion, and a screen added later without a decision here fails it
+    #: instead of silently joining the notice path.
+    #:
+    #: **Routing is by SCREEN KEY, never by widget presence.**
+    #: ``action_show_screen`` swaps a ``hidden`` class and nothing unmounts
+    #: (P-10), so all eight inputs resolve on every screen — a presence-based
+    #: implementation is green while wrong. That is not hypothetical: today,
+    #: with an image loaded and A2L active, a find writes into the WORKSPACE
+    #: ``#search_input`` and searches the workspace map.
+    #:
+    #: The owning set is `{workspace, a2l, mac}` — n=3 under the normative
+    #: derivation (an input id matching ``(search|goto)_input$``). A bare "any
+    #: Input in the container" count gives **7** (`patch` 5, `diff` 3, `flow` 1,
+    #: `crc_designer` 13 inputs, none of them a find or go-to), so the two
+    #: honest derivations disagree and only the stated pattern is a definition.
+    _FIND_GOTO_INPUTS: "dict[str, Optional[tuple[str, str]]]" = {
+        "workspace": ("search_input", "goto_input"),
+        "a2l": ("alt_search_input", "alt_goto_input"),
+        "mac": ("mac_search_input", "mac_goto_input"),
+        "map": None,
+        "issues": None,
+        "patch": None,
+        "diff": None,
+        "flow": None,
+        "checks": None,
+        "crc_designer": None,
+    }
+
+    #: The six find/goto input ids, DERIVED from the map above rather than
+    #: re-listed. A hand-written second copy is a set that can disagree with the
+    #: one the routing uses, and `Escape` would then release an input the
+    #: routing can focus, or vice versa.
+    _FIND_GOTO_INPUT_IDS = frozenset(
+        input_id
+        for pair in _FIND_GOTO_INPUTS.values()
+        if pair is not None
+        for input_id in pair
+    )
+
     #: N1: which ``legend.LEGEND_TABLE`` section(s) each rail screen actually
     #: paints, so the Legend modal shows only those rows. A screen absent here
     #: (Workspace / Flow / CRC-Designer) falls back to the FULL table (AC-3) —
@@ -6032,12 +6080,63 @@ class S19TuiApp(App):
         self.query_one(CommandBar).open_palette()
 
     def action_focus_find(self) -> None:
-        """Focus the command-bar find input (``/`` — LLR-004.1)."""
-        self.query_one(CommandBar).focus_find()
+        """Focus the ACTIVE screen's own find input (``/`` — LLR-119.1)."""
+        self._focus_local_input("find")
 
     def action_focus_goto(self) -> None:
-        """Focus the command-bar go-to-address input (``g`` — LLR-004.2)."""
-        self.query_one(CommandBar).focus_goto()
+        """Focus the ACTIVE screen's own go-to input (``g`` — LLR-119.1)."""
+        self._focus_local_input("goto")
+
+    def _focus_local_input(self, kind: str) -> None:
+        """Move focus to the active screen's find or go-to input (LLR-119.1/.2).
+
+        Summary:
+            Resolve the target from ``_active_screen_key`` through
+            ``_FIND_GOTO_INPUTS`` and focus it; when the active screen owns no
+            such input, append exactly one line to the log tail and return
+            without raising.
+
+        Args:
+            kind (str): ``"find"`` or ``"goto"`` — selects which half of the
+                screen's ``(find, goto)`` pair to focus.
+
+        Returns:
+            None
+
+        Raises:
+            None: a screen with no entry, an unmounted tree and an unresolvable
+                target all degrade to a notice or a no-op.
+
+        Data Flow:
+            - Read ``_active_screen_key``, look it up in ``_FIND_GOTO_INPUTS``,
+              and focus the resolved id. **Never queries which inputs exist**:
+              all eight resolve on every screen because ``action_show_screen``
+              only toggles a ``hidden`` class, so a presence-based resolution
+              would be green while writing into another pane.
+            - No entry -> ``set_status`` (the LOG TAIL, not ``#status_text``)
+              with exactly one line naming the absence. That is the majority
+              path: 7 of the 10 screens.
+
+        Dependencies:
+            Uses:
+                - ``_FIND_GOTO_INPUTS`` / ``_active_screen_key`` / ``set_status``
+            Used by:
+                - ``action_focus_find`` / ``action_focus_goto``
+        """
+        targets = self._FIND_GOTO_INPUTS.get(self._active_screen_key)
+        if targets is None:
+            self.set_status(
+                f"This screen has no {'find' if kind == 'find' else 'go-to'} "
+                f"input. Use the rail to switch to Workspace, A2L or MAC."
+            )
+            return
+        target_id = targets[0] if kind == "find" else targets[1]
+        try:
+            self.query_one(f"#{target_id}", Input).focus()
+        except Exception:
+            # TC-B78-41: before mount there is no tree to focus into. A no-op,
+            # matching `_refresh_loaded_panel` / `update_project_labels`.
+            return
 
     def action_open_settings_menu(self) -> None:
         """Open the viewer page-size settings menu (resurfaced via the palette)."""
@@ -6136,10 +6235,26 @@ class S19TuiApp(App):
         await self.run_action(event.action)
 
     def _command_bar_input_focused(self) -> bool:
-        """Return True while a command-bar ``Input`` holds keyboard focus."""
+        """Return True while a find/go-to ``Input`` holds keyboard focus.
+
+        batch-79 Inc-9 widened this from "a command-bar Input" to "any input
+        `/` or `g` can focus", and the widening is NOT cosmetic — without it
+        LLR-119.1 would have silently un-done LLR-004.5.
+
+        The suppressed set is `. , + - g q /`. While one of those is typed into
+        a focused find box it must become TEXT, not fire a paging or navigation
+        binding. That protection was keyed on the input living inside
+        `CommandBar`; the moment `/` started focusing the screens' own inputs,
+        every one of those characters would have fired its binding instead of
+        reaching the search box — the exact defect LLR-004.5 exists to prevent,
+        relocated rather than fixed. Caught by `test_tc008_single_keys_...`,
+        which is a pre-batch node this increment would otherwise have broken.
+        """
         focused = self.focused
         if not isinstance(focused, Input):
             return False
+        if focused.id in self._FIND_GOTO_INPUT_IDS:
+            return True
         try:
             command_bar = self.query_one(CommandBar)
         except Exception:
@@ -6197,6 +6312,40 @@ class S19TuiApp(App):
             Used by:
                 - Textual key-event dispatch
         """
+        # LLR-119.3 -- `Escape` releases a focused find/goto input.
+        #
+        # MECHANISM (C-16 flagged this "assumed -- verify in target framework at
+        # Phase 3"): a handler gated on the FOCUSED WIDGET'S ID, not an
+        # Input-scoped binding and not a screen-level priority binding. The six
+        # targets are stock `Input` / `OsClipboardInput` instances, so binding
+        # `escape` on them would mean subclassing six widgets to add one key;
+        # and a screen-level or app-level binding would fire on every `escape`
+        # in the application. Gating on the id set makes the handler narrow by
+        # PREDICATE rather than by placement — it cannot fire anywhere else.
+        #
+        # PALETTE DISPOSITION, written rather than inherited, as LLR-119.3
+        # requires. The palette has NO `escape`-to-close: `command_bar.py`
+        # declares no `BINDINGS` and handles no `escape`; re-executed at this
+        # increment, `ctrl+k` then `escape` leaves `palette_is_open` True. The
+        # spec's own suggested justification for deferring -- "the bar is being
+        # deleted anyway" -- is FALSE: `HLR-118` deletes `#command_bar_row`,
+        # while `#command_bar_slot` and `#command_bar` SURVIVE to host the
+        # palette, so the gap outlives Lane 1 rather than dissolving with it.
+        #
+        # Deferred anyway, for the reason that does hold: closing it is a new
+        # capability on a DIFFERENT widget, outside HLR-119's statement, and it
+        # needs its own requirement rather than being smuggled in beside this
+        # one. Registered as a carry. What this handler does guarantee is that
+        # it cannot make the palette's behaviour worse OR appear better: the
+        # palette's focused widget is `#palette_input`, which is not in the
+        # target set, so `escape` there is untouched -- asserted, not assumed.
+        if event.key == "escape":
+            focused = self.focused
+            if isinstance(focused, Input) and focused.id in self._FIND_GOTO_INPUT_IDS:
+                self.set_focus(None)
+                event.stop()
+            return
+
         if event.key not in self._COMMAND_BAR_SUPPRESSED_KEYS:
             return
         if not self._command_bar_input_focused():

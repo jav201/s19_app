@@ -6305,6 +6305,11 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
         )
 
 
+# batch-79 Inc-9: the two tc029 nodes below are RE-POINTED off the command
+# bar onto the active screen's own inputs (LLR-119.1). They are in a file
+# Inc-9 did NOT declare -- the spec's file set says app.py + test_tui_commandbar.py.
+# Recorded as a deviation rather than taken silently: HANDOFF section 4 already
+# warned that Lane 1's blast radius is 6 test files, not 3, and this is that.
 def test_tc029_command_bar_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
     """The command-bar find / go-to inputs and palette are keyboard-reachable.
 
@@ -6331,8 +6336,8 @@ def test_tc029_command_bar_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
         return find_focus, goto_focus, palette_open
 
     find_focus, goto_focus, palette_open = asyncio.run(_drive())
-    assert find_focus == "find_input", "'/' must focus the find input"
-    assert goto_focus == "cmdbar_goto_input", "'g' must focus the go-to input"
+    assert find_focus == "search_input", "'/' must focus the find input"
+    assert goto_focus == "goto_input", "'g' must focus the go-to input"
     assert palette_open, "'ctrl+k' must open the command palette"
 
 
@@ -6379,7 +6384,7 @@ def test_tc029_single_keys_suppressed_during_input_focus(tmp_path: Path) -> None
             app.set_focus(None)
             await pilot.press("slash")
             await pilot.pause()
-            find_input = app.query_one("#find_input", Input)
+            find_input = app.query_one("#search_input", Input)
             find_input.value = ""
             start_screen = _visible_screens(app)
             for key in ("g", "7", "period"):
@@ -6407,7 +6412,7 @@ def test_tc029_single_keys_suppressed_during_input_focus(tmp_path: Path) -> None
         f"single keys must be routed into the focused find input as text, "
         f"got {result['typed']!r}"
     )
-    assert result["focus_during"] == "find_input", (
+    assert result["focus_during"] == "search_input", (
         "'g' must NOT steal focus to the go-to input while find is focused"
     )
     assert result["screen_during"] == result["start_screen"], (
