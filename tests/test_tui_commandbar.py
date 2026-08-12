@@ -42,6 +42,13 @@ from s19_app.tui.models import LoadedFile
 
 _COMMAND_BAR_SOURCE = Path("s19_app/tui/command_bar.py")
 
+# batch-79 Inc-11 (HLR-121): the `CommandBar.Find` / `.Goto` messages and their
+# app-side adapters are DELETED. Nodes that posted them now drive the SURVIVING
+# path instead -- the screen's own input plus `_handle_search` / `_handle_goto`,
+# which HLR-121 requires to be unchanged. That is the point of those nodes: they
+# prove the search and go-to BEHAVIOUR survived the deletion of the surface that
+# used to reach it.
+
 
 def _loaded_s19(tmp_path: Path) -> LoadedFile:
     """Build a small in-memory ``LoadedFile`` whose memory spells 'HELLO'.
@@ -216,10 +223,12 @@ def test_tc008_find_submission_routes_to_find_string_in_mem(tmp_path: Path) -> N
         async with app.run_test() as pilot:
             await pilot.pause()
             app.current_file = _loaded_s19(tmp_path)
-            app.post_message(CommandBar.Find("HELLO"))
+            app.query_one("#search_input", Input).value = "HELLO"
+            app._handle_search()
             await pilot.pause()
             hit = list(app.log_lines)[-1] if app.log_lines else ""
-            app.post_message(CommandBar.Find("ZZZ_NO_MATCH"))
+            app.query_one("#search_input", Input).value = "ZZZ_NO_MATCH"
+            app._handle_search()
             await pilot.pause()
             miss = list(app.log_lines)[-1] if app.log_lines else ""
         return hit, miss
@@ -249,7 +258,8 @@ def test_tc008_malformed_find_uses_set_status_no_exception(tmp_path: Path) -> No
         async with app.run_test() as pilot:
             await pilot.pause()
             # No current_file -> the existing handler's no-file branch.
-            app.post_message(CommandBar.Find("anything"))
+            app.query_one("#search_input", Input).value = "anything"
+            app._handle_search()
             await pilot.pause()
             return list(app.log_lines)[-1] if app.log_lines else ""
 
@@ -389,7 +399,8 @@ def test_tc009_g_focuses_goto_and_submit_has_handle_goto_effect(
             await pilot.pause()
             focused = app.focused.id if app.focused else ""
             app.current_file = _loaded_s19(tmp_path)
-            app.post_message(CommandBar.Goto("0x1000"))
+            app.query_one("#goto_input", Input).value = "0x1000"
+            app._handle_goto()
             await pilot.pause()
             status = list(app.log_lines)[-1] if app.log_lines else ""
         return focused, status
@@ -418,7 +429,8 @@ def test_tc009_malformed_goto_uses_set_status_no_exception(tmp_path: Path) -> No
         async with app.run_test() as pilot:
             await pilot.pause()
             app.current_file = _loaded_s19(tmp_path)
-            app.post_message(CommandBar.Goto("not_an_address"))
+            app.query_one("#goto_input", Input).value = "not_an_address"
+            app._handle_goto()
             await pilot.pause()
             return list(app.log_lines)[-1] if app.log_lines else ""
 
@@ -576,7 +588,8 @@ def test_tc039_typed_find_and_palette_text_not_written_to_log(
             # observable this node guards -- typed text never reaches the log
             # FILE -- is unchanged by where the text was typed.
             app.query_one("#search_input", Input).value = secret_find
-            app.post_message(CommandBar.Find(secret_find))
+            app.query_one("#search_input", Input).value = secret_find
+            app._handle_search()
             await pilot.pause()
             await pilot.press("ctrl+k")
             await pilot.pause()

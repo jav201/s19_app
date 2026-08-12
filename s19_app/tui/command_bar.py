@@ -13,12 +13,12 @@ batch-02-direction-b-restyle, increment 4:
     keys act on the ACTIVE screen's own inputs (``HLR-119``).
 
 The command bar is a presentational widget (s19_app CLAUDE.md TUI
-architecture): it composes inputs and emits messages — ``CommandBar.Find``,
-``CommandBar.Goto`` and ``CommandBar.PaletteAction`` — and never calls the
-engine, parses an address, decodes a search string, or writes to the log
-(LLR-004.6 / LLR-004.2 / LLR-013.3). ``S19TuiApp`` owns the routing: it
-hands the find / go-to text to the existing validated ``find_string_in_mem``
-/ ``_handle_goto`` handlers and dispatches palette actions via ``run_action``.
+architecture): it composes the palette and emits ``CommandBar.PaletteAction``
+— and never calls the engine, parses an address, decodes a search string, or
+writes to the log (LLR-004.6 / LLR-013.3). ``S19TuiApp`` owns the routing and
+dispatches palette actions via ``run_action``. The ``Find`` / ``Goto`` messages
+and their app-side adapters were deleted at batch-79 Inc-11 (``HLR-121``) once
+Inc-9 re-homed the keys and Inc-10 deleted the inputs that posted them.
 """
 
 from __future__ import annotations
@@ -68,7 +68,7 @@ class PaletteEntry:
 
 
 class CommandBar(Vertical):
-    """Persistent top command bar — palette, find, go-to and context labels.
+    """Persistent top command bar — the command palette's host.
 
     Summary:
         Hosts the type-to-filter command palette (a trigger ``Input`` plus a
@@ -97,8 +97,7 @@ class CommandBar(Vertical):
           list). The bar row it used to yield is deleted (Inc-10).
         - Typing in the palette trigger filters the listed commands to the
           substring matches (LLR-003.3) — pure view-side string matching.
-        - Submitting find / go-to text, or selecting a palette command,
-          posts ``CommandBar.Find`` / ``CommandBar.Goto`` /
+        - Selecting or submitting a palette command posts
           ``CommandBar.PaletteAction``; the app does the routing.
 
     Dependencies:
@@ -112,20 +111,6 @@ class CommandBar(Vertical):
         >>> bar.id
         'command_bar'
     """
-
-    class Find(Message):
-        """Posted when find text is submitted; carries the raw typed text."""
-
-        def __init__(self, query: str) -> None:
-            super().__init__()
-            self.query = query
-
-    class Goto(Message):
-        """Posted when go-to text is submitted; carries the raw typed text."""
-
-        def __init__(self, address_text: str) -> None:
-            super().__init__()
-            self.address_text = address_text
 
     class PaletteAction(Message):
         """Posted when a palette command is chosen; carries its action id."""
@@ -216,38 +201,6 @@ class CommandBar(Vertical):
         """Return the action ids currently listed in the palette (post-filter)."""
         return [entry.action for entry in self._visible_entries]
 
-    def focus_find(self) -> None:
-        """Move keyboard focus to the find input (LLR-004.1)."""
-        self.query_one("#find_input", Input).focus()
-
-    def focus_goto(self) -> None:
-        """Move keyboard focus to the go-to-address input (LLR-004.2)."""
-        self.query_one("#cmdbar_goto_input", Input).focus()
-
-    def set_context_labels(self, project: str, a2l: str) -> None:
-        """
-        Summary:
-            Refresh the project-name / A2L-filename context labels shown in
-            the command bar (LLR-011.3).
-
-        Args:
-            project (str): Project name to display, or a "(none)" sentinel.
-            a2l (str): A2L filename to display, or a "(none)" sentinel.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Writes the two display strings into the bar's context labels;
-              reads no engine state and writes nothing to the log.
-
-        Dependencies:
-            Used by:
-                - ``S19TuiApp.update_project_labels``
-        """
-        self.query_one("#cmdbar_project", Label).update(f"Project: {project}")
-        self.query_one("#cmdbar_a2l", Label).update(f"A2L: {a2l}")
-
     def on_input_changed(self, event: Input.Changed) -> None:
         """Filter the palette command list as the user types (LLR-003.3)."""
         if event.input.id != "palette_input":
@@ -265,14 +218,14 @@ class CommandBar(Vertical):
         self._render_palette(matches)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
-        """Route a submitted find / go-to / palette input to an app message."""
-        if event.input.id == "find_input":
-            event.stop()
-            self.post_message(self.Find(event.value))
-        elif event.input.id == "cmdbar_goto_input":
-            event.stop()
-            self.post_message(self.Goto(event.value))
-        elif event.input.id == "palette_input":
+        """Route a submitted palette input to an app message.
+
+        batch-79 Inc-11 (``HLR-121``): the ``#find_input`` and
+        ``#cmdbar_goto_input`` branches are gone with the inputs themselves
+        (Inc-10) and the ``Find`` / ``Goto`` messages they posted. Only the
+        palette branch remains, because only the palette survived.
+        """
+        if event.input.id == "palette_input":
             event.stop()
             visible = self._current_filtered_entries(event.value)
             if visible:

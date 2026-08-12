@@ -6145,67 +6145,6 @@ class S19TuiApp(App):
             self._update_settings_menu()
             menu.remove_class("hidden")
 
-    def on_command_bar_find(self, event: CommandBar.Find) -> None:
-        """
-        Summary:
-            Route a command-bar find submission to the existing validated
-            search handler (LLR-004.6) without adding new decoding code.
-
-        Args:
-            event (CommandBar.Find): The find message carrying the raw
-                typed query text.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Copies the typed text into the existing ``#search_input``
-              widget that ``_handle_search`` already reads, then calls
-              ``_handle_search`` unchanged — so the search runs through the
-              existing ``find_string_in_mem`` path and reports misses /
-              malformed input via ``set_status`` exactly as today. No new
-              search or string-decoding code is introduced (S-1).
-
-        Dependencies:
-            Uses:
-                - ``_handle_search`` (which calls ``find_string_in_mem``)
-            Used by:
-                - Textual message dispatch (``CommandBar.Find`` bubbles up)
-        """
-        self.query_one("#search_input", Input).value = event.query
-        self._handle_search()
-
-    def on_command_bar_goto(self, event: CommandBar.Goto) -> None:
-        """
-        Summary:
-            Route a command-bar go-to submission to the existing validated
-            ``_handle_goto`` handler (LLR-004.2) without adding new
-            address-parsing code.
-
-        Args:
-            event (CommandBar.Goto): The go-to message carrying the raw
-                typed address text.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Copies the typed text into the existing ``#goto_input`` widget
-              that ``_handle_goto`` already reads off the widget tree, then
-              calls ``_handle_goto`` unchanged — so the address is parsed
-              and validated as today and malformed input is reported via
-              ``set_status``. No new address-parsing code is introduced
-              (S-1); ``_handle_goto``'s signature is unchanged.
-
-        Dependencies:
-            Uses:
-                - ``_handle_goto``
-            Used by:
-                - Textual message dispatch (``CommandBar.Goto`` bubbles up)
-        """
-        self.query_one("#goto_input", Input).value = event.address_text
-        self._handle_goto()
-
     async def on_command_bar_palette_action(
         self, event: CommandBar.PaletteAction
     ) -> None:
