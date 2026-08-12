@@ -6334,10 +6334,24 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
 # Recorded as a deviation rather than taken silently: HANDOFF section 4 already
 # warned that Lane 1's blast radius is 6 test files, not 3, and this is that.
 def test_tc029_command_bar_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
-    """The command-bar find / go-to inputs and palette are keyboard-reachable.
+    """Find, go-to and the palette are keyboard-reachable with no mouse.
 
-    Intent: LLR-013.1 — the three command-bar surfaces are reachable via
-    ``/`` (find), ``g`` (go-to) and ``ctrl+k`` (palette), with no mouse.
+    Intent: LLR-013.1 — ``/`` (find), ``g`` (go-to) and ``ctrl+k`` (palette)
+    each reach their surface without the mouse.
+
+    batch-79 Inc-11: the DOCSTRING is corrected, the assertions are not. This
+    node used to describe "the three command-bar surfaces"; `HLR-118` deleted
+    two of them (`#find_input`, `#cmdbar_goto_input`) and `HLR-119` re-homed
+    the keys onto each screen's OWN inputs. The assertions below still pass,
+    and they pass for a reason worth writing down: the active screen here is
+    the workspace, whose own inputs are `#search_input` / `#goto_input` — ids
+    that never belonged to the command bar. So the node kept testing something
+    true while its prose described a surface that no longer exists.
+
+    Its two siblings were re-pointed explicitly (`TC-006` at Inc-10, `TC-038`
+    at Inc-8); this one was missed because nothing about it went red. The
+    surface it now covers is the workspace's; the 3-owning-screen contract is
+    `AT-B78-04`'s.
     """
 
     async def _drive() -> tuple[str, str, bool]:

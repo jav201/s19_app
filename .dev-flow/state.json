@@ -18,14 +18,16 @@
     "result": "~/.claude clean and 0/0 vs its remote; controls C-1..C-45 current."
   },
   "standing_authorization": {
-    "asked_at": "2026-08-07 kickoff, fresh - NOT inherited from batch-78",
-    "autonomy_and_merge": "Autonomo + merge autorizado",
+    "asked_at": "2026-08-11 RESUMING-SESSION kickoff, asked FRESH. Authorization is per-batch AND per-session and was NOT inherited from the 2026-08-07 grant.",
+    "asked_at_original": "2026-08-07 kickoff, fresh - NOT inherited from batch-78",
+    "autonomy_and_merge": "Autonomo + merge autorizado (re-granted 2026-08-11)",
+    "scope_2026_08_11": "Inc-11 ONLY, then close. Inc-12 (the 29-golden snapshot regen) is canonical-CI-only and takes its own PR; it is NOT in this session's scope.",
     "merge_authority": true,
-    "merge_precondition": "SET BY THE ORCHESTRATOR, NOT BY THE OPERATOR - the operator left it unspecified. A final independent qa-reviewer pass over the WHOLE merged diff vs main must come back clean before merging, because this batch deletes app-level chrome and drifts 29 snapshot goldens. The operator may waive it; a waiver is recorded as THEIR decision, not as an omission.",
+    "merge_precondition": "KEPT AND NOW EXPLICITLY THE OPERATOR'S OWN DECISION (2026-08-11) - they were offered the waiver and declined it. A final independent qa-reviewer pass over the WHOLE batch-79 diff vs 829adc6 must come back clean before merging, because this batch deletes app-level chrome and drifts 29 snapshot goldens. It was originally SET BY THE ORCHESTRATOR when the operator left it unspecified; that gap is now closed.",
     "decision_recording_ack": "Every decision taken without asking is recorded in PLAN.md section 8, here, the post-mortem, and carried to the vault at sync."
   },
-  "current_phase": 0,
-  "phase_status": "approved",
+  "current_phase": 3,
+  "phase_status": "in-progress - Inc-6..Inc-11 COMPLETE (acceptances included); Inc-12 OWED and canonical-CI-only",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -65,7 +67,25 @@
       "phase": 0,
       "date": "2026-08-07",
       "decision": "UN-ASKED: merge precondition set by the orchestrator (independent qa-reviewer pass over the whole diff)",
-      "notes": "The operator granted merge authority without specifying the precondition. Waivable by them."
+      "notes": "The operator granted merge authority without specifying the precondition. Waivable by them. CLOSED 2026-08-11: put to the operator explicitly, who declined the waiver and KEPT it. No longer an un-asked decision."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-11",
+      "decision": "Inc-11 acceptances landed: AT-B78-12 (PIN), AT-B78-13 (GATE), AT-B78-14 (PIN, re-labelled). 5 mutation arms, 0 survivors.",
+      "notes": "The go-to mutation recorded as OWED is discharged via _apply_goto -> lambda self, view, addr: False, the shared mechanism behind all three _handle_goto* paths. Gates: 289 passed, ruff clean, ledger 2683 -> 2686 (+3). See 03-increments/increment-011.md."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-11",
+      "decision": "UN-ASKED: AT-B78-14 recorded as a PIN, contradicting the spec's section 5.3 label 'GATE - RED after deletion'",
+      "notes": "F-1. The spec's stated evidence was '4 LIVE rows name the doomed nodes'. MEASURED across 829adc6..HEAD: ZERO test nodes were deleted - Inc-8/10/11 RE-POINTED them all - so no reconciliation was ever owed and the registry was already consistent. Keeping the GATE label would have shipped a vacuous gate, this project's dominant defect class."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-11",
+      "decision": "UN-ASKED: TC-029's docstring corrected in tests/test_tui_directionb.py; assertions left untouched",
+      "notes": "F-3. test_tc029_command_bar_inputs_reachable_by_keyboard still described 'the three command-bar surfaces'; HLR-118 deleted two of them. It is green by an ID COINCIDENCE - it names #search_input/#goto_input, the WORKSPACE's own inputs, not the deleted #find_input/#cmdbar_goto_input. Never touched this batch (git log -S returns nothing) because nothing about it went red. Its two siblings WERE re-pointed explicitly."
     },
     {
       "phase": 0,
@@ -84,11 +104,16 @@
   "created_at": "2026-08-07",
   "progress": {
     "phase0": "COMPLETE - premise evaluation executed, 1 FALSE premise found and dispositioned.",
-    "phase3": "NOT STARTED - next is Inc-6 (HLR-126 discoverability + the re-authored AT-B78-32)."
+    "phase3": "Inc-6..Inc-11 COMPLETE including HLR-121's three acceptances. Inc-12 (snapshot regen) OWED and canonical-CI-only - its own PR, out of this session's scope by operator ruling 2026-08-11.",
+    "increment_record_gap": "MISSING ON DISK: increment-008.md, increment-009.md, increment-010.md. Only 006, 007, 007-entry-gate, 010-entry-gate and 011 exist. The COMMITS exist and carry detailed messages, but the flow's per-increment artifact was never written for those three. DELIBERATELY NOT reconstructed at Inc-11 - writing them from commit messages would manufacture evidence of observations nobody made. Operator decision owed."
   },
   "ledger": {
     "baseline_at_batch78_close": 2647,
-    "current": "to be measured at Inc-6 entry"
+    "baseline_at_829adc6": 2653,
+    "at_inc11_entry": 2683,
+    "current": 2686,
+    "delta_this_increment": "+3, one per new acceptance (AT-B78-12/13/14)",
+    "measurement_pattern": "total nodes reported by `python -m pytest tests/ --collect-only -q`, run from the repo root. Stated because an unstated pattern is an unstated definition."
   },
   "carried_from_batch78": {
     "findings_reaching_this_batch": "batch-78 HANDOFF section 4, eight rows. The two widest: the command palette has NO escape-to-close (LLR-119.3/AT-B78-07 asserted a constraint against a binding that never existed - Inc-9 must choose a disposition IN WRITING, not inherit one); and section 5.1 rule 1's painted-height metric measures the BORDER BOX and does not clip through intermediate ancestors, so AT-B78-26's 120x30 '>=1 hex row' clause would pass with three rows of border and zero hex - BLOCKS Inc-10, use Inc-1's corrected helper. Also: Lane-1 blast radius is 6 test files not 3, and test_tui_app.py goes BLIND not RED (it monkeypatches update_project_labels, so its green is not evidence); the bar acts on the WRONG PANE today, so / and g must route on _active_screen_key; 7 of 10 screens own no local find/goto; the deletable CSS span is :66-102 not :55-102; Widget.focusable ignores display, so a geometry change can empty an acceptance without touching it.",

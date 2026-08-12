@@ -2273,3 +2273,309 @@ def test_at_b78_03_the_palette_action_set_matches_the_frozen_artifact(
         f"missing: {sorted(set(expected) - set(observed))}\n"
         f"unexpected: {sorted(set(observed) - set(expected))}"
     )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-11 — HLR-121's three acceptances
+# ---------------------------------------------------------------------------
+#
+# `AT-B78-12` (PIN) the behaviour control · `AT-B78-13` (GATE) the
+# class-qualified AST + CSS-selector census · `AT-B78-14` (GATE) the registry
+# guard. The deletion itself landed at `23af21f`; these are its acceptances.
+
+#: The seven symbols `HLR-121` deletes, split by the module that owned them.
+#: They are written CLASS-QUALIFIED because a bare name census cannot tell
+#: `CommandBar.focus_find` from the App's `action_focus_find`, which SURVIVES
+#: and is what keeps the palette at 37 entries (D-3). A substring search for
+#: `focus_find` reports hits in four files, three of which are the preserved
+#: action -- this batch has now paid for that confusion four times.
+_B79_DELETED_ON_COMMAND_BAR = ("Find", "Goto")
+_B79_DELETED_METHODS_ON_COMMAND_BAR = (
+    "focus_find",
+    "focus_goto",
+    "set_context_labels",
+)
+_B79_DELETED_APP_ADAPTERS = ("on_command_bar_find", "on_command_bar_goto")
+
+#: The symbols that must SURVIVE. Without these the census is trivially green
+#: on a tree where nothing parsed (C-40): a walk that found no `CommandBar`
+#: class at all would report "0 definitions of the seven" and pass.
+_B79_SURVIVING_ON_COMMAND_BAR = ("visible_palette_actions",)
+_B79_SURVIVING_APP_ACTIONS = ("action_focus_find", "action_focus_goto")
+
+_B79_APP_SOURCE = Path("s19_app/tui/app.py")
+_B79_STYLES_SOURCE = Path("s19_app/tui/styles.tcss")
+_B79_REGISTRY_SOURCE = Path("AT-TC-REGISTRY.jsonl")
+
+#: `#command_bar_slot` (:51) and `#command_bar` (:61) sit ABOVE the deleted
+#: span and are RETAINED -- they host the palette, which outlives Lane 1.
+_B79_RETAINED_SELECTORS = ("#command_bar_slot", "#command_bar")
+
+
+def _b79_class_methods(tree: ast.Module, class_name: str) -> tuple[set[str], set[str]]:
+    """Return ``(method names, nested class names)`` defined on ``class_name``.
+
+    Class-qualified and DIRECT-child only: ``ast.walk`` would descend into
+    nested scopes and re-attribute an inner function to the class, which is
+    the failure mode a name-based census has.
+    """
+    methods: set[str] = set()
+    nested: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == class_name:
+            for child in node.body:
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    methods.add(child.name)
+                elif isinstance(child, ast.ClassDef):
+                    nested.add(child.name)
+    return methods, nested
+
+
+def _b79_tcss_without_comments(source: str) -> str:
+    """Strip ``/* ... */`` blocks so the selector census reads only LIVE rules.
+
+    This is load-bearing, not tidiness. `styles.tcss:66-71` is a comment that
+    NAMES all six deleted ids, as the record of what was removed. A census run
+    over the raw text finds every one of them and reports the deletion as
+    incomplete -- the fifth time in this batch that a bare text search would
+    have counted the wrong thing.
+    """
+    return re.sub(r"/\*.*?\*/", "", source, flags=re.DOTALL)
+
+
+def test_at_b78_12_search_and_goto_behaviour_matches_the_inc0_freeze(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-12 (PIN) -- the 9-row behaviour payload survives the deletion.
+
+    `HLR-121` deletes the duplicate find/go-to SURFACE and claims the
+    workspace / A2L / MAC search and go-to BEHAVIOUR is unchanged. An
+    invariance claim has no oracle inside the post-change tree, so the oracle
+    is the Inc-0 artifact: captured from the shipped Buttons before any
+    production edit of this batch, committed in its own commit, and re-read
+    here FROM DISK. It is never regenerated -- a run that rebuilt it would
+    restore the `f(x) == f(x)` shape that left `AT-B78-03` green at 36 == 36.
+
+    **The oracle is the row-by-row comparison.** The digest is a convenience
+    that localises a diff to "something moved"; it cannot say WHAT moved, so
+    it is asserted second and only after the rows agree.
+    """
+    frozen = _b78_artifact(_B78_PAYLOAD_ARTIFACT)
+
+    # Anti-regeneration guard, asserted BEFORE the comparison: if the artifact
+    # were rebuilt from the post-change tree the comparison below would be a
+    # tautology, and it would pass. These two clauses are what make it not one.
+    assert isinstance(frozen, list) and len(frozen) == 9, (
+        f"the frozen payload must still carry 9 rows (3 screens x 3 cases); "
+        f"it has {len(frozen) if isinstance(frozen, list) else type(frozen)} -- "
+        f"if this fails the artifact was REGENERATED"
+    )
+    for row in frozen:
+        assert set(row) == _B78_ROW_KEYS, (
+            f"a frozen row must carry exactly LLR-121.2's seven fields; got "
+            f"{sorted(row)}"
+        )
+
+    observed = b78_capture_search_goto_payload(tmp_path)
+
+    assert len(observed) == 9, (
+        f"the live capture must produce 9 rows, got {len(observed)}"
+    )
+
+    def _key(row: dict) -> tuple:
+        return (row["screen"], row["query"], row["goto"])
+
+    frozen_by_key = {_key(r): r for r in frozen}
+    observed_by_key = {_key(r): r for r in observed}
+
+    assert set(frozen_by_key) == set(observed_by_key), (
+        f"the 9-case matrix itself moved.\n"
+        f"missing: {sorted(set(frozen_by_key) - set(observed_by_key))}\n"
+        f"unexpected: {sorted(set(observed_by_key) - set(frozen_by_key))}"
+    )
+
+    # Keyed, not positional: comparing by index would also fail if only the
+    # TRAVERSAL ORDER changed, which is not a behaviour change and would send
+    # a reader hunting for a defect that is not there.
+    drifted: list[str] = []
+    for key, want in frozen_by_key.items():
+        got = observed_by_key[key]
+        for field in sorted(_B78_ROW_KEYS - {"screen", "query", "goto"}):
+            if want[field] != got[field]:
+                drifted.append(
+                    f"  {key} · {field}: frozen={want[field]!r} live={got[field]!r}"
+                )
+    assert not drifted, (
+        "the search / go-to behaviour changed under HLR-121. Every line below "
+        "is a field whose live value no longer equals the pre-change freeze:\n"
+        + "\n".join(drifted)
+    )
+
+    # Secondary, and only reached once the rows agree: the live capture must
+    # also SERIALISE to the stored bytes. This is the recipe LLR-121.2 pins --
+    # `blake2b(digest_size=8)` over sorted-key, `ensure_ascii=True` JSON.
+    live_digest = blake2b(
+        _b78_canonical_json(observed).encode("utf-8"), digest_size=8
+    ).hexdigest()
+    assert live_digest == _B78_ARTIFACT_DIGESTS[_B78_PAYLOAD_ARTIFACT], (
+        f"the rows compare equal but the live capture does not serialise to "
+        f"the stored bytes: live={live_digest} "
+        f"stored={_B78_ARTIFACT_DIGESTS[_B78_PAYLOAD_ARTIFACT]}"
+    )
+
+
+def test_at_b78_13_the_seven_symbols_and_six_selectors_are_gone() -> None:
+    """AT-B78-13 (GATE) -- the class-qualified AST + CSS-selector census.
+
+    `HLR-121`'s threshold: **0** definitions of the seven symbols (executed on
+    the pre-change tree: 1 each, total 7); **0** live selectors for the six
+    deleted ids; `#command_bar_slot` and `#command_bar` RETAINED.
+
+    Every absence clause here carries a presence co-assertion (C-40). Absence
+    is trivially true of a module that failed to parse, of a class that was
+    renamed, and of a stylesheet read as an empty string -- so the census
+    asserts, in the same run, that it actually FOUND `CommandBar`, found the
+    two surviving App actions, and read a non-empty stylesheet.
+    """
+    bar_tree = ast.parse(_COMMAND_BAR_SOURCE.read_text(encoding="utf-8"))
+    app_tree = ast.parse(_B79_APP_SOURCE.read_text(encoding="utf-8"))
+
+    bar_methods, bar_nested = _b79_class_methods(bar_tree, "CommandBar")
+    app_methods, _ = _b79_class_methods(app_tree, "S19TuiApp")
+
+    # --- co-assertions: the census swept something real -------------------
+    assert bar_methods or bar_nested, (
+        "the census found NO members on `CommandBar` at all -- the class was "
+        "renamed or the module did not parse. Every absence clause below "
+        "would be vacuously true"
+    )
+    for name in _B79_SURVIVING_ON_COMMAND_BAR:
+        assert name in bar_methods, (
+            f"`CommandBar.{name}` must SURVIVE HLR-121; the census resolves "
+            f"the class but not this member, so it is not reading what it "
+            f"claims to read. Found: {sorted(bar_methods)}"
+        )
+    for name in _B79_SURVIVING_APP_ACTIONS:
+        assert name in app_methods, (
+            f"`S19TuiApp.{name}` must SURVIVE -- only the CommandBar helpers "
+            f"go. This is what keeps the palette at 37 entries (D-3)"
+        )
+
+    # --- the seven deletions ----------------------------------------------
+    still_present: list[str] = []
+    for name in _B79_DELETED_ON_COMMAND_BAR:
+        if name in bar_nested:
+            still_present.append(f"CommandBar.{name} (message class)")
+    for name in _B79_DELETED_METHODS_ON_COMMAND_BAR:
+        if name in bar_methods:
+            still_present.append(f"CommandBar.{name}")
+    for name in _B79_DELETED_APP_ADAPTERS:
+        if name in app_methods:
+            still_present.append(f"S19TuiApp.{name}")
+    assert not still_present, (
+        f"HLR-121 requires a class-qualified census of 0 for all seven "
+        f"symbols; these are still defined: {still_present}"
+    )
+
+    # --- the CSS selector census ------------------------------------------
+    raw_styles = _B79_STYLES_SOURCE.read_text(encoding="utf-8")
+    assert raw_styles.strip(), "styles.tcss read as empty -- the census is vacuous"
+    live_styles = _b79_tcss_without_comments(raw_styles)
+
+    for selector in _B79_RETAINED_SELECTORS:
+        assert re.search(rf"{re.escape(selector)}\b", live_styles), (
+            f"`{selector}` must be RETAINED -- it hosts the palette, which is "
+            f"why the deleted span is :66-103 and not :55-102"
+        )
+
+    surviving_selectors = [
+        dead_id
+        for dead_id in _B79_DELETED_IDS
+        if re.search(rf"#{re.escape(dead_id)}\b", live_styles)
+    ]
+    assert not surviving_selectors, (
+        f"these deleted ids still carry LIVE style rules: "
+        f"{surviving_selectors}"
+    )
+
+    # The comment block at :66-71 names all six on purpose, as the record of
+    # what was removed. Asserting it is still there proves the strip above is
+    # doing work rather than silently matching nothing.
+    assert any(f"#{dead_id}" in raw_styles for dead_id in _B79_DELETED_IDS), (
+        "the deletion record comment naming the six ids is gone from "
+        "styles.tcss -- the comment strip in this census is now untested"
+    )
+
+
+def test_at_b78_14_no_live_registry_row_names_a_missing_node() -> None:
+    """AT-B78-14 -- every LIVE registry row names a node that exists.
+
+    `HLR-121`'s registry clause is not bookkeeping: `test_id_registry.py` G2
+    fails on a `LIVE` entry naming a node that does not exist, so a batch that
+    deletes test nodes without reconciling the registry reddens the guard.
+
+    ⚠️ **Recorded honestly: this discharges as a PIN, not the GATE the spec
+    predicted.** §5.3 expected "4 LIVE rows name the doomed nodes -- RED after
+    deletion". The executed implementation RE-POINTED those nodes onto the
+    surviving surfaces instead of deleting them (Inc-8 `TC-038`, Inc-10
+    `TC-006`, Inc-11's six posting nodes), so **zero** test nodes were removed
+    across the batch and no reconciliation was owed. The spec's premise was
+    false against the implementation that shipped, and the node is kept
+    because the guard is what makes that claim checkable rather than asserted.
+    """
+    rows = [
+        json.loads(line)
+        for line in _B79_REGISTRY_SOURCE.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    live = [row for row in rows if row.get("status") == "LIVE"]
+
+    assert len(live) > 100, (
+        f"only {len(live)} LIVE registry rows were read -- the registry did "
+        f"not load and every clause below is vacuous"
+    )
+
+    # module path -> the function/method names it actually defines
+    defined: dict[str, set[str]] = {}
+    missing: list[str] = []
+    checked = 0
+    for row in live:
+        for node in row.get("nodes", []):
+            module, _, func = node.partition("::")
+            if not func or not module.startswith("tests/"):
+                continue
+            if module not in defined:
+                path = Path(module)
+                if not path.exists():
+                    missing.append(f"{row['id']}: module {module} does not exist")
+                    defined[module] = set()
+                    continue
+                tree = ast.parse(path.read_text(encoding="utf-8"))
+                # Functions AND classes. The first form of this census
+                # collected only `FunctionDef` and reported 34 rows missing --
+                # every one a real, present symbol that happened to be a
+                # `class` (`TestSetupLoggingSurface`, `_CountingList`,
+                # `_UnsafeMarkupTextArea`). A registry node id is
+                # `module::symbol` for any of the three, so a function-only
+                # input set is the same vacuous-input-set defect this batch
+                # has now hit five times -- and it hit it INSIDE the guard
+                # written to close it.
+                defined[module] = {
+                    n.name
+                    for n in ast.walk(tree)
+                    if isinstance(
+                        n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                    )
+                }
+            checked += 1
+            if func not in defined[module]:
+                missing.append(f"{row['id']}: {node}")
+
+    assert checked > 500, (
+        f"only {checked} node references were checked; the registry carries "
+        f"far more, so the sweep is not reading what it claims to read"
+    )
+    assert not missing, (
+        f"{len(missing)} LIVE registry rows name a node that no longer "
+        f"exists:\n" + "\n".join(missing[:40])
+    )
