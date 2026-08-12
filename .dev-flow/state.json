@@ -85,7 +85,13 @@
       "phase": 3,
       "date": "2026-08-11",
       "decision": "UN-ASKED: TC-029's docstring corrected in tests/test_tui_directionb.py; assertions left untouched",
-      "notes": "F-3. test_tc029_command_bar_inputs_reachable_by_keyboard still described 'the three command-bar surfaces'; HLR-118 deleted two of them. It is green by an ID COINCIDENCE - it names #search_input/#goto_input, the WORKSPACE's own inputs, not the deleted #find_input/#cmdbar_goto_input. Never touched this batch (git log -S returns nothing) because nothing about it went red. Its two siblings WERE re-pointed explicitly."
+      "notes": "F-3, AS FIRST WRITTEN AND NOW RETRACTED IN PART. The docstring fix stands. But the explanation shipped with it was FALSE on all four counts and the merge gate caught it: I claimed the node was 'never touched this batch', 'green by an id coincidence', 'missed because nothing went red', and that 'its two siblings were re-pointed'. Inc-9 re-pointed THIS node deliberately at ae71bd6 (find_input -> search_input, cmdbar_goto_input -> goto_input) and said so in a comment FIVE LINES ABOVE the docstring I was editing. The true finding is smaller: the assertions moved and the prose lagged."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-12",
+      "decision": "ROOT CAUSE of the F-3 error, and the control candidate re-derived from it",
+      "notes": "I measured with `git log -S<node name>`. -S reports commits that change the OCCURRENCE COUNT of a string, NOT commits that edit the region. Inc-9 changed the node's assertions and never its name, so the count never moved and -S returned nothing - which I read as 'never touched'. Structurally incapable of detecting the edit I concluded had not happened: the same shape as AT-B78-32's stale range and F2's render() oracle. Correct instruments: `git log -L a,b:file`, or -S on a string that ACTUALLY CHANGED. Cheapest control: read the lines ABOVE the symbol."
     },
     {
       "phase": 0,
@@ -100,6 +106,18 @@
       "notes": "A corrected range is one insertion away from failing the same silent way. See premise_evaluation_phase0."
     }
   ],
+  "merge_gate_2026_08_12": {
+    "verdict": "BLOCK",
+    "reviewer": "independent qa-reviewer over the WHOLE diff 829adc6..HEAD, the precondition the operator KEPT unwaived on 2026-08-11",
+    "outcome": "4 HIGH, 5 MEDIUM, 5 LOW. THE PRECONDITION PAID FOR ITSELF: H-1 is a REAL PRODUCTION REGRESSION that six shipped tests catch and that NO prior session in this batch ever ran.",
+    "H-1": "CONFIRMED INDEPENDENTLY. screens_directionb.py:1955 - Inc-7 (a1ab35c) gave the new Loaded-panel project row the SAME `loaded-detail` marker class the three artifact slots use (:2059, :2069). panel.query('.loaded-detail') now returns 4 with the project at index 0, shifting every positional artifact index by one. Violates LLR-120.2 verbatim ('shall not alter the existing three artifact slots') - a clause with NO implementing assertion. MEASURED: 6 failed / 10 passed at HEAD vs 16 passed at 829adc6, in tests/test_unload_feature.py (ac1..ac5) + tests/test_help_toggle_and_a2l_panel.py. The HANDOFF's 'Everything else is green' is FALSE - it was derived from only 4 test files.",
+    "H-2": "styles.tcss #status_context - the project and A2L halves are unbounded against EACH OTHER. A long project name evicts the A2L entirely at 120x30 and 80x24. AT-B78-08 varies the STATUS message length but never the CONTEXT length, so it is blind by fixture construction (demoproj/b79ctx.a2l). At 829adc6 the command bar painted the full A2L, so this is a REGRESSION, not merely an unmet new requirement. NOT yet independently re-measured by me.",
+    "H-3": "MINE, CONFIRMED, AND FIXED at this session. See the F-3 decision entries above.",
+    "H-4": "TC-B78-12's #loaded_slots arm is VACUOUS - the hostile payload is written to current_a2l_path but the panel reads current_file.a2l_path, so it never reaches the strip the arm claims to guard. The presence co-assertion is applied only to #status_context. Exactly the arm the spec added because 'two surfaces need two arms'. NOT yet independently re-measured by me.",
+    "judged_acceptable_by_the_reviewer": "The AT-B78-14 PIN re-label (it independently confirmed ZERO test nodes deleted). The refusal to reconstruct the Inc-8/9/10 records - BUT it notes H-3 is the price of that gap: the one claim a missing Inc-9 record let through was a factual error about Inc-9's own work. The deferred palette escape. The ordering claim - deletion never preceded an observed replacement - HOLDS. The Inc-0 artifacts were NOT regenerated.",
+    "figures_it_reproduced": "ledger 2653 -> 2686 (+33) reconciles per-increment; zero test nodes deleted; 7 -> 0 class-qualified census with survivors intact; 37 palette entries frozen at ba5f0ca; 29 snapshot failures, 29 baselines, all one cause; 289 passed; all 5 mutation arms RED on their own assertions, reproduced in a worktree copy.",
+    "figure_it_corrected": "ruff is NOT clean - a pre-existing F821 Dict at app.py:5814 is present identically at base. The HANDOFF's 'ruff clean on every file this batch touched' overstates it. Not a regression."
+  },
   "obsidian_synced": false,
   "created_at": "2026-08-07",
   "progress": {

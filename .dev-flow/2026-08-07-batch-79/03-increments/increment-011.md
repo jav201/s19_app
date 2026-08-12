@@ -134,20 +134,53 @@ minutes. §4's rule holds exactly as written: *a plausible-looking count is the 
 impossible one gets checked.* Had the census been function-only over a corpus where every node
 happened to be a function, it would have been silently correct and silently fragile.
 
-### F-3 — `TC-029` describes a surface deleted two increments ago, and nothing went red.
+### F-3 — `TC-029`'s docstring outlived the surface it names. **CORRECTED — my first version of this finding was false, and the way it was false is the better lesson.**
 
-`test_tc029_command_bar_inputs_reachable_by_keyboard` claims *"the three command-bar surfaces are
-reachable"* and cites the command bar's find / go-to inputs. `HLR-118` deleted both. The node was
-**never touched in this batch** (`git log -S` over `829adc6..HEAD` returns nothing) and is green.
+**What is true.** `test_tc029_command_bar_inputs_reachable_by_keyboard` claimed *"the three
+command-bar surfaces are reachable"* and cited the command bar's find / go-to inputs, two of which
+`HLR-118` deleted. Corrected in the docstring only; the assertions are right and are left alone.
 
-It is green **by an id coincidence**: the deleted inputs were `#find_input` / `#cmdbar_goto_input`,
-while the assertions name `#search_input` / `#goto_input` — the **workspace's own** inputs
-(`app.py:2021`, `:2023`), which `HLR-119` re-homed the keys onto. So the assertions kept testing
-something true while the prose described something that no longer exists.
+**What I first wrote, and retracted at the merge gate.** I claimed the node was *"never touched in
+this batch"*, *"green by an id coincidence"*, and *"missed because nothing about it went red"* while
+*"its two siblings were re-pointed"*. **All four claims are false.** Inc-9 re-pointed this node
+deliberately at `ae71bd6`:
 
-Its two siblings were re-pointed explicitly with comments. This one was missed *because nothing about
-it went red* — the same reason the stale `AT-B78-32` line range survived three Phase-2 rounds and two
-review lanes. **Corrected in the docstring only; the assertions are right and are left alone.**
+```
+$ git show 829adc6:tests/test_tui_directionb.py | grep 'assert find_focus\|assert goto_focus'
+    assert find_focus == "find_input", ...
+    assert goto_focus == "cmdbar_goto_input", ...
+$ grep -n 'assert find_focus\|assert goto_focus' tests/test_tui_directionb.py
+6376:    assert find_focus == "search_input", ...
+6377:    assert goto_focus == "goto_input", ...
+```
+
+and said so in a comment **five lines above the docstring I was editing**:
+
+```
+# batch-79 Inc-9: the two tc029 nodes below are RE-POINTED off the command
+# bar onto the active screen's own inputs (LLR-119.1). They are in a file
+# Inc-9 did NOT declare -- ... Recorded as a deviation rather than taken silently
+```
+
+So the true finding is **smaller and duller**: Inc-9 moved the assertions and wrote the comment, and
+the docstring lagged. Prose-only. My version shipped a false history into a docstring that then
+contradicted a comment in its own file, five lines apart.
+
+**Root cause, and the part worth keeping.** I measured with `git log -S<node name>`. **`-S` reports
+commits that change the NUMBER OF OCCURRENCES of a string — not commits that edit the region.**
+Inc-9 changed the node's assertions, never its name, so the count never moved and `-S` returned
+nothing. I then read "no commits" as "never touched."
+
+That is this project's own rule biting its author: *an unstated grep pattern is an unstated
+definition.* I stated neither the pattern nor what it was capable of detecting, and it was
+**structurally incapable** of detecting the edit I concluded had not happened — the same shape as
+`AT-B78-32`'s stale range and `F2`'s `render()` oracle. The instrument was wrong for the question,
+and the answer looked clean.
+
+**The correct instruments** for "was this region edited": `git log -L <start>,<end>:<file>`, or `-S`
+on a string that actually changed (`-S'assert goto_focus == "cmdbar_goto_input"'` returns `ae71bd6`
+immediately). And the cheapest control of all: **read the lines above the symbol.** I anchored my
+read at the `def` and never looked up.
 
 ---
 
@@ -194,6 +227,12 @@ is canonical-CI-only. They are excluded above deliberately, not by accident.
   evidence of observations nobody made. Recorded as a gap for the operator.
 - **Inc-12** — the 29-golden snapshot regen, canonical CI only, its own PR.
 - The five carries registered at `682df07` in `.dev-flow/BACKLOG-CODE.md` remain open.
-- **F-3 has a generalisable half worth a control candidate:** *a node re-pointed by an increment must
-  be re-read for prose that names the deleted surface — greenness is not evidence the node still
-  describes what it tests.* Registered, not encoded (encoding needs operator approval).
+- **F-3's control candidate, RE-DERIVED from what actually happened** (the first version was
+  registered on evidence that did not occur, and the merge gate caught it):
+  *`git log -S<str>` answers "did the occurrence count of `<str>` change", NOT "was this region
+  edited". Using it to conclude a symbol was never touched is unsound whenever the edit left the
+  symbol's name intact — which is the normal case for a re-point. Use `git log -L a,b:file`, or `-S`
+  on a string that actually changed.* Registered, not encoded (encoding needs operator approval).
+- **A second, cheaper candidate from the same failure:** *read the lines ABOVE a symbol before
+  concluding anything about its history.* The record of Inc-9's re-point was five lines above the
+  docstring being edited, and anchoring the read at the `def` line missed it.

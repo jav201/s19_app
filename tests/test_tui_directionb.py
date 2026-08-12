@@ -6339,18 +6339,17 @@ def test_tc029_command_bar_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
     Intent: LLR-013.1 — ``/`` (find), ``g`` (go-to) and ``ctrl+k`` (palette)
     each reach their surface without the mouse.
 
-    batch-79 Inc-11: the DOCSTRING is corrected, the assertions are not. This
-    node used to describe "the three command-bar surfaces"; `HLR-118` deleted
-    two of them (`#find_input`, `#cmdbar_goto_input`) and `HLR-119` re-homed
-    the keys onto each screen's OWN inputs. The assertions below still pass,
-    and they pass for a reason worth writing down: the active screen here is
-    the workspace, whose own inputs are `#search_input` / `#goto_input` — ids
-    that never belonged to the command bar. So the node kept testing something
-    true while its prose described a surface that no longer exists.
+    batch-79 Inc-11: the DOCSTRING is corrected; the assertions were already
+    correct. **Inc-9 re-pointed this node** (`ae71bd6`, and the comment
+    directly above says so): the assertions moved from `#find_input` /
+    `#cmdbar_goto_input` — the command bar's ids, which `HLR-118` deletes — to
+    `#search_input` / `#goto_input`, the workspace's own. What Inc-9 left
+    behind was this docstring, which went on describing "the three command-bar
+    surfaces" after two of the three were gone.
 
-    Its two siblings were re-pointed explicitly (`TC-006` at Inc-10, `TC-038`
-    at Inc-8); this one was missed because nothing about it went red. The
-    surface it now covers is the workspace's; the 3-owning-screen contract is
+    So the lag was prose-only, and it is the batch's signature shape at its
+    smallest: the mechanism moved, the sentence beside it did not. The surface
+    covered here is the workspace's; the 3-owning-screen contract is
     `AT-B78-04`'s.
     """
 
