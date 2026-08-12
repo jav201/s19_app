@@ -118,6 +118,19 @@
     "figures_it_reproduced": "ledger 2653 -> 2686 (+33) reconciles per-increment; zero test nodes deleted; 7 -> 0 class-qualified census with survivors intact; 37 palette entries frozen at ba5f0ca; 29 snapshot failures, 29 baselines, all one cause; 289 passed; all 5 mutation arms RED on their own assertions, reproduced in a worktree copy.",
     "figure_it_corrected": "ruff is NOT clean - a pre-existing F821 Dict at app.py:5814 is present identically at base. The HANDOFF's 'ruff clean on every file this batch touched' overstates it. Not a regression."
   },
+  "merge_gate_response_2026_08_12": {
+    "authorised": "Operator ruling 2026-08-12: fix H-1 + H-2 + H-4; re-verify H-2/H-4 independently FIRST; run the FULL SUITE before every commit for the rest of the batch.",
+    "H-1_FIXED": "screens_directionb.py:1955 - the project row now carries `loaded-project-detail`, not the artifact slots' `loaded-detail`. styles.tcss lists the two together so geometry is identical and only the marker differs. MEASURED: 16 passed at base -> 6 failed/10 passed at HEAD -> 16 passed after the fix. AT-B78-09 gains LLR-120.2's MISSING predicate: len(query('.loaded-detail')) == 3, plus a C-40 co-assertion that exactly ONE `.loaded-project-detail` exists and names the project (without it, DELETING the row satisfies the arity clause).",
+    "H-2_FIXED": "RE-VERIFIED INDEPENDENTLY before fixing: A2L absent on 0/10 screens at 120x30 AND 80x24, present 10/10 at 160x40, against HLR-120's stated 10-of-10 threshold. Cause: #status_context is ONE Label holding ONE string clipped by CSS at max-width 70%, so the halves cannot be bounded against each other in the stylesheet. render() returned all 91 columns at every size while the PAINTED strip lost the A2L - the same render()-vs-painted distinction as the mid-batch review's F1/F2. Fix: _compose_context_line bounds both halves in the COMPOSER by fair share with slack redistribution; budget = bar width * _CONTEXT_MAX_SHARE, fallback 53 (the measured cell width at the narrowest supported terminal). New nodes TC-B79-01 (both halves on 10/10 at all 3 sizes) and TC-B79-02 (the constant and the stylesheet agree). NOTE: TC-B78-45 was NOT free - it belongs to HLR-123 - so the free B79 namespace was used.",
+    "H-4_FIXED": "RE-VERIFIED INDEPENDENTLY: 'evil' in #status_context = True, 'evil' in #loaded_slots = False, current_file.a2l_path = None. The payload went to current_a2l_path but the panel reads current_file.a2l_path, so the control-class clause ran over a strip that never received it. Fix: the payload now rides on the PROJECT name (the one value reaching both surfaces, and LLR-120.4's unasserted limb), and the presence co-assertion moves INSIDE the per-surface loop.",
+    "counterfactuals": "4 arms, 0 survived, 0 errored - each RESTORES the defect its fix removed and the guarding node goes RED on its OWN assertion. Inc-11 total: 9 arms, 0 survivors.",
+    "full_suite_FIRST_EVER_IN_THIS_BATCH": "29 failed, 2654 passed, 2 skipped, 3 xfailed in 45:42. ALL 29 are test_tc016s_density_layout_snapshot[*], Inc-12's canonical-CI-only regen. ZERO other failures. Collected 2688 = 2686 + 2 new nodes; ledger reconciles.",
+    "STILL_OPEN": "The gate's 5 MEDIUM and 5 LOW are NOT fixed - M-1 stale 132x28 comment vs constant 27; M-2 production docstrings naming the deleted set_context_labels and styles.tcss:55-60 which LLR-118.3 REQUIRED to be amended; M-3 six nodes on private-method calls whose Intent still says 'routes', plus a duplicated line at test_tui_commandbar.py:588-591; M-4 _apply_unload clearing current_a2l_path, outside every in-scope requirement; M-5 a docstring claiming a _FIND_GOTO_INPUTS assertion that does not exist; L-1..L-5. OPERATOR DECISION OWED."
+  },
+  "findings_F6_F7_2026_08_12": {
+    "F-6": "THE AT/TC REGISTRY IS BLIND TO ALL 106 BATCH-78/79 ACCEPTANCE NODES. Found by accident when the new TC-B79 nodes did NOT trip G1, then EXECUTED rather than inferred: _FUNC_ID_RE (tools/id_registry.py:95) requires digits immediately after at/tc, so `at_b78_09` NO MATCH while `_tc489` and `_tc016s` match. derive_named_nodes over the whole corpus derives 678 ids, of which B78/B79-shaped = 0. iter_tokens('AT-B78-12') -> governed=False conforming=False key=None, vs TC-489 -> governed=True. 106 test nodes carry the form; 0 registry rows exist for it. Batch-78 minted an id namespace OUTSIDE the project's own id grammar and every guard declines to police it SILENTLY. Lands on the Lane B finding already on record that the id GRAMMAR is undefined. Also QUALIFIES AT-B78-14: for this namespace the registry never had anything to reconcile. NOT FIXED - changing the grammar reclassifies tokens repo-wide, Lane A work, operator decision owed.",
+    "F-7": "A GATE INVOKED THROUGH A POWERSHELL PIPE REPORTED THE WRONG EXIT CODE AND SWALLOWED ITS OUTPUT. `pytest tests/ | Select-Object -Last 45` reported exit 4 (pytest 'usage error') with an EMPTY output file - no test ran that way. Re-run as `pytest ... > file 2>&1` reading $LASTEXITCODE directly: exit 1 and the real 29 failures. This is C-78-xx, already carried WITHOUT AN OWNER, now observed live at a cost of one 45-minute suite run. A gate's exit code must be read from the GATE, never from the pipeline it was piped into."
+  },
   "obsidian_synced": false,
   "created_at": "2026-08-07",
   "progress": {
@@ -129,8 +142,9 @@
     "baseline_at_batch78_close": 2647,
     "baseline_at_829adc6": 2653,
     "at_inc11_entry": 2683,
-    "current": 2686,
-    "delta_this_increment": "+3, one per new acceptance (AT-B78-12/13/14)",
+    "after_inc11_acceptances": 2686,
+    "current": 2688,
+    "delta_this_increment": "+3 for the acceptances (AT-B78-12/13/14), then +2 for the merge-gate response (TC-B79-01/02). 2683 -> 2686 -> 2688.",
     "measurement_pattern": "total nodes reported by `python -m pytest tests/ --collect-only -q`, run from the repo root. Stated because an unstated pattern is an unstated definition."
   },
   "carried_from_batch78": {

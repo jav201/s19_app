@@ -1240,6 +1240,21 @@ def test_at_b78_09_loaded_panel_names_the_project(tmp_path: Path) -> None:
     The A2L clause is deliberately NOT asserted here: the panel's A2L slot
     already renders the filename today (P-35), so an acceptance for it would be
     green before the change and could not gate it. Only the project row is new.
+
+    ⚠️ **The arity clause below is LLR-120.2's other half, and it had NO
+    implementing predicate until the merge gate found the defect it was written
+    to prevent.** The requirement says the project row *"shall not alter the
+    existing three artifact slots"*, with the stated threshold *"the three slot
+    rows' text unchanged (set equality)"*. Nothing asserted it. Inc-7 then gave
+    the project row the artifact slots' own `.loaded-detail` marker, so
+    `panel.query(".loaded-detail")` returned **4** cells with the project at
+    index 0 — shifting every positional artifact index by one and reddening six
+    shipped tests in two files that were never run in this batch.
+
+    A joined-strip containment check (`"demoproj" in panel`) **cannot see
+    arity**: the string is present either way. That is why the clause is
+    asserted over the QUERY, which is the thing the shipped readers actually
+    use.
     """
 
     async def _drive():
@@ -1249,12 +1264,146 @@ def test_at_b78_09_loaded_panel_names_the_project(tmp_path: Path) -> None:
             await pilot.pause()
             app._handle_load_project("demoproj")
             await _flush(pilot)
-            return _b79_loaded_panel(app)
+            panel_widget = app.query_one("#loaded_panel")
+            details = [
+                str(cell.render()) for cell in panel_widget.query(".loaded-detail")
+            ]
+            project_cells = [
+                str(cell.render())
+                for cell in panel_widget.query(".loaded-project-detail")
+            ]
+            return _b79_loaded_panel(app), details, project_cells
 
-    panel = asyncio.run(_drive())
+    panel, details, project_cells = asyncio.run(_drive())
 
     assert "demoproj" in panel, (
         f"AT-B78-09: the Loaded panel must name the active project; panel={panel!r}"
+    )
+
+    # LLR-120.2 — the three artifact slots are untouched.
+    assert len(details) == 3, (
+        f"AT-B78-09/LLR-120.2: `.loaded-detail` must select exactly the THREE "
+        f"artifact slots; it selected {len(details)}: {details!r}. Two shipped "
+        f"readers index this query positionally as [primary, mac, a2l], so a "
+        f"fourth cell silently re-points every one of them."
+    )
+    # Co-assertion (C-40): the project row must actually EXIST and carry its own
+    # marker. Without this, deleting the row entirely would satisfy the clause
+    # above -- absence is trivially compatible with "exactly three".
+    assert len(project_cells) == 1, (
+        f"AT-B78-09: the project row must exist and carry its OWN marker class, "
+        f"separate from the artifact slots'; found {len(project_cells)} cells"
+    )
+    assert "demoproj" in project_cells[0], (
+        f"AT-B78-09: the project row's own cell must name the project; "
+        f"got {project_cells[0]!r}"
+    )
+
+
+#: The H-2 payload. Both halves are long ENOUGH TO OVERFLOW TOGETHER at the two
+#: narrow sizes and to fit at the wide one — that spread is what makes the node
+#: discriminate rather than merely assert a truncation always happens.
+_B79_LONG_PROJECT = "ECU_calibration_release_2026_customerA_v161"
+_B79_LONG_A2L = "ASAP2_ECU_calibration_release_2026_v161.a2l"
+
+
+def test_tc_b79_01_a_long_project_cannot_evict_the_a2l(tmp_path: Path) -> None:
+    """TC-B79-01 -- the two halves of `#status_context` are bounded against EACH OTHER.
+
+    **This node exists because the merge gate found HLR-120's own threshold
+    violated at 2 of the 3 supported sizes, by a regression this batch shipped.**
+    `#status_context` is ONE `Label` holding ONE composed string, clipped by CSS
+    at `max-width: 70%`, so whichever half is written second is the half that
+    vanishes. Measured before the fix, with the payload below:
+
+        size=(120,30)  project on 10/10 screens   A2L on **0/10**
+        size=(80,24)   project on 10/10 screens   A2L on **0/10**
+        size=(160,40)  project on 10/10 screens   A2L on 10/10
+
+    against a stated threshold of *"contains both on 10 of 10 screens"*. The
+    A2L was visible before this batch, on the command bar `HLR-118` deleted — so
+    it is a REGRESSION, not merely an unmet new requirement.
+
+    **Why `AT-B78-08` could not see it.** That node varies the *status message*
+    length (the horizontal axis the independent review's F1 was about) but its
+    context fixture is `demoproj` / `b79ctx.a2l` — 8 and 10 columns, which fit
+    at every size. It was blind **by fixture construction**, not by predicate
+    design. The lesson is `AT-B78-08`'s own, one axis over: a bound between two
+    values is untested until both values are large at the same time.
+
+    The observable is the **PAINTED** strip, never `render()`: `render()`
+    returned the full 91 columns at every size while the cell was allocated 53
+    and 81. That distinction is exactly what made the four gates in F2
+    structurally incapable of seeing F1.
+    """
+
+    async def _drive(size: tuple[int, int]) -> dict[str, tuple[bool, bool]]:
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "demoproj", {"a.s19": S19_A})
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app._handle_load_project("demoproj")
+            await _flush(pilot)
+            app.current_project = _B79_LONG_PROJECT
+            app.current_a2l_path = Path(_B79_LONG_A2L)
+            app.update_project_labels()
+            await pilot.pause()
+            seen: dict[str, tuple[bool, bool]] = {}
+            for key in list(S19TuiApp.SCREEN_CONTAINER_IDS):
+                app.action_show_screen(key)
+                await pilot.pause()
+                strip = _b79_painted_strip(app, "#status_context")
+                # A discriminating fragment of each half, not the whole string:
+                # the point of the fix is that each half survives in TRUNCATED
+                # form, so asserting the full name back would forbid the fix.
+                seen[key] = ("ECU_calibration" in strip, "ASAP2_ECU" in strip)
+            return seen
+
+    for size in ((80, 24), (120, 30), (160, 40)):
+        seen = asyncio.run(_drive(size))
+        assert len(seen) == 10, f"@{size}: all 10 screens; got {len(seen)}"
+        missing_project = [k for k, (p, _) in seen.items() if not p]
+        missing_a2l = [k for k, (_, a) in seen.items() if not a]
+        # Co-assertion (C-40): BOTH halves, in the same run. Asserting only the
+        # A2L would be satisfied by a fix that evicted the project instead --
+        # the identical defect with the operands swapped.
+        assert not missing_project, (
+            f"TC-B79-01 @{size}: the project must survive on all 10 screens; "
+            f"absent on {missing_project}"
+        )
+        assert not missing_a2l, (
+            f"TC-B79-01 @{size}: a long project name must NOT evict the A2L; "
+            f"absent on {missing_a2l}. The two halves of `#status_context` are "
+            f"unbounded against each other."
+        )
+
+
+def test_tc_b79_02_the_context_budget_matches_the_stylesheet(tmp_path: Path) -> None:
+    """TC-B79-02 -- `_CONTEXT_MAX_SHARE` and `styles.tcss` agree.
+
+    The budget in `_compose_context_line` mirrors
+    `#workspace_status_bar #status_context { max-width: 70% }`. That coupling is
+    a rule stated in TWO places, which is this batch's signature defect shape --
+    so it is asserted rather than left in a comment. Change one without the
+    other and this reddens instead of the bar silently clipping again.
+    """
+    styles = _B79_STYLES_SOURCE.read_text(encoding="utf-8")
+    match = re.search(
+        r"#workspace_status_bar\s+#status_context\s*\{[^}]*?max-width:\s*(\d+)%",
+        styles,
+        flags=re.DOTALL,
+    )
+    assert match, (
+        "TC-B79-02: could not find `max-width` on "
+        "`#workspace_status_bar #status_context` in styles.tcss -- if the rule "
+        "moved, `_CONTEXT_MAX_SHARE` is now coupled to nothing and this guard "
+        "is vacuous"
+    )
+    css_share = int(match.group(1)) / 100
+    assert css_share == S19TuiApp._CONTEXT_MAX_SHARE, (
+        f"TC-B79-02: styles.tcss caps `#status_context` at {css_share:.0%} but "
+        f"`_CONTEXT_MAX_SHARE` is {S19TuiApp._CONTEXT_MAX_SHARE:.0%}. The "
+        f"composer would budget for a width the stylesheet does not give it."
     )
 
 
@@ -1396,8 +1545,24 @@ def test_tc_b78_12_hostile_a2l_name_is_control_safe_on_both_surfaces(
     of LLR-120.4; the loader is not. The subset that IS reachable through a real
     file on this platform (`\\x9b`, `\\x9d`, markup brackets) is exactly the
     subset the spec's rationale calls out as legal Windows filename characters.
+
+    ⚠️ **The `#loaded_slots` arm was VACUOUS and the merge gate found it.** The
+    payload was written to `current_a2l_path`, but the Loaded panel's A2L slot
+    reads `current_file.a2l_path` — which is `None` here. Measured:
+    `'evil' in #status_context -> True`, **`'evil' in #loaded_slots -> False`**;
+    the panel painted `A2L (none)`. So the control-class clause ran over a strip
+    that never received the payload, and passed for that reason. This is exactly
+    the arm the spec added because *"two surfaces need two arms"* — and the
+    second arm was the one certifying nothing.
+
+    Two changes close it. The payload now rides on the **project name**, which
+    is the one value that provably reaches BOTH surfaces through
+    `_compose_project_label` (and is what LLR-120.4's unasserted project limb
+    calls for). And the presence co-assertion moves **inside** the per-surface
+    loop, so neither surface can go quiet without failing.
     """
-    hostile = "evil\x1b[31m\x9b1m\x9d8;;http:x\x7f[red].a2l"
+    hostile_stem = "evil\x1b[31m\x9b1m\x9d8;;http:x\x7f[red]"
+    hostile_a2l = hostile_stem + ".a2l"
 
     async def _drive():
         app = S19TuiApp(base_dir=tmp_path)
@@ -1406,26 +1571,32 @@ def test_tc_b78_12_hostile_a2l_name_is_control_safe_on_both_surfaces(
             await pilot.pause()
             app._handle_load_project("demoproj")
             await _flush(pilot)
-            app.current_a2l_path = Path(hostile)
+            # Both hostile shapes, on both surfaces: the A2L path drives
+            # `#status_context`, the PROJECT string drives both.
+            app.current_a2l_path = Path(hostile_a2l)
+            app.current_project = hostile_stem
             app.update_project_labels()
             await pilot.pause()
             return (
                 _b79_painted_strip(app, "#status_context"),
                 _b79_painted_strip(app, "#loaded_slots"),
-                _b79_status_context(app),
             )
 
-    strip_ctx, strip_panel, rendered = asyncio.run(_drive())
+    strip_ctx, strip_panel = asyncio.run(_drive())
 
-    # Presence co-assertion first (C-40): an absence clause over an EMPTY strip
-    # is vacuously true, so prove the payload actually reached the surface
-    # before asserting what is missing from it.
-    assert "evil" in rendered, (
-        f"the hostile name must actually REACH the surface, or the control-class "
-        f"assertion below is vacuous; rendered={rendered!r}"
-    )
-
-    for label, strip in (("#status_context", strip_ctx), ("#loaded_slots", strip_panel)):
+    for label, strip in (
+        ("#status_context", strip_ctx),
+        ("#loaded_slots", strip_panel),
+    ):
+        # Presence co-assertion, per surface and BEFORE that surface's absence
+        # clause (C-40). An absence clause over a strip the payload never
+        # reached is vacuously true -- which is precisely how this arm passed
+        # while certifying nothing.
+        assert "evil" in strip, (
+            f"TC-B78-12: the hostile name must actually REACH {label}, or that "
+            f"surface's control-class assertion below is vacuous; "
+            f"strip={strip[:200]!r}"
+        )
         leaked = sorted(_B79_CONTROL_CLASS & set(strip))
         assert not leaked, (
             f"TC-B78-12: no codepoint of C0 u {{DEL}} u C1 may reach {label}'s "

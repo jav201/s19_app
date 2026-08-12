@@ -233,7 +233,14 @@ Screen {
     text-style: bold;
 }
 
-.loaded-detail {
+/* `.loaded-detail` marks the three ARTIFACT slots' detail cell. Two shipped
+ * readers select on it and index the result POSITIONALLY as
+ * [primary, mac, a2l], so the Loaded panel's project row (LLR-120.2) carries
+ * `.loaded-project-detail` instead — listed beside it here so the two keep
+ * identical geometry and only the marker differs. Adding a fourth
+ * `.loaded-detail` cell breaks those readers; it did, for six tests. */
+.loaded-detail,
+.loaded-project-detail {
     width: 1fr;
     height: 1;
     color: $fg-base;

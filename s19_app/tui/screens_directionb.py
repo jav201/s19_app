@@ -1950,9 +1950,23 @@ class LoadedArtifactsPanel(Container):
         """
         absent = project == self._PROJECT_ABSENT
         kind_cell = Static(Content(self._PROJECT_KIND), classes="loaded-kind")
+        # `loaded-project-detail`, NOT `loaded-detail`. The latter is the
+        # marker the three ARTIFACT slots carry, and two shipped readers select
+        # on it and index the result POSITIONALLY as [primary, mac, a2l]
+        # (`tests/test_unload_feature.py::_detail_texts`,
+        # `tests/test_help_toggle_and_a2l_panel.py`). Reusing it here made the
+        # query return four cells with the project at index 0, shifting every
+        # artifact index by one and reddening six shipped tests -- while
+        # violating LLR-120.2's "shall not alter the existing three artifact
+        # slots" verbatim. The row still carries `loaded-slot` for the column
+        # rhythm; nothing selects that positionally.
         detail = Static(
             safe_text(project),
-            classes="loaded-detail loaded-absent" if absent else "loaded-detail",
+            classes=(
+                "loaded-project-detail loaded-absent"
+                if absent
+                else "loaded-project-detail"
+            ),
         )
         return Horizontal(
             kind_cell,

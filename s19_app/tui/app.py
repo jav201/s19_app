@@ -11579,7 +11579,7 @@ class S19TuiApp(App):
         # move the raise one line down and leave the catalog still false.
         try:
             self.query_one("#status_context", Label).update(
-                safe_text(f"{project_name}  |  {a2l_name}")
+                safe_text(self._compose_context_line(project_name, a2l_name))
             )
         except Exception:
             return
@@ -11603,6 +11603,103 @@ class S19TuiApp(App):
         # rather than inside either one, and no increment ever had to choose
         # between a green gate and an honest one.
         self._refresh_patch_variant_select()
+
+    #: The separator between the two halves of `#status_context`.
+    _CONTEXT_SEPARATOR = "  |  "
+
+    #: Mirrors `styles.tcss`'s `#workspace_status_bar #status_context
+    #: { max-width: 70% }`. The cell is `width: auto` up to that share, so this
+    #: share IS the budget the two halves must fit inside. Kept as a named
+    #: constant rather than a literal because it is a COUPLING to the
+    #: stylesheet: `TC-B79-01` asserts the two agree, so changing one without
+    #: the other reddens instead of silently clipping again.
+    _CONTEXT_MAX_SHARE = 0.70
+
+    #: Budget used when the bar has no resolved geometry yet (pre-mount, or a
+    #: refresh during early layout). 53 is the measured cell width at the
+    #: narrowest supported terminal, 80x24 -- so the fallback is the SAFE end of
+    #: the range, never an optimistic one.
+    _CONTEXT_FALLBACK_BUDGET = 53
+
+    @staticmethod
+    def _clip_to(text: str, cap: int) -> str:
+        """Clip ``text`` to ``cap`` columns, marking the loss with an ellipsis."""
+        if cap <= 0:
+            return ""
+        if len(text) <= cap:
+            return text
+        if cap == 1:
+            return "…"
+        return text[: cap - 1] + "…"
+
+    def _compose_context_line(self, project_name: str, a2l_name: str) -> str:
+        """Compose `#status_context` with the two halves bounded against EACH OTHER.
+
+        Summary:
+            HLR-120 requires the bar to name the project AND the A2L on all 10
+            screens. The cell is one `Label` holding one string, clipped by CSS
+            at `max-width: 70%` -- so whichever half comes second is the half
+            that disappears, and nothing in the stylesheet can bound them
+            independently. This method is that bound.
+
+        Why it exists (measured, not theorised):
+            With project `ECU_calibration_release_2026_customerA_v161` and A2L
+            `ASAP2_ECU_calibration_release_2026_v161.a2l`, the composed string
+            is 91 columns while the cell is allocated **53** at 80x24 and **81**
+            at 120x30. `render()` returned the full 91 either way -- the loss is
+            in the PAINTED strip. Result: the A2L was absent on **0 of 10**
+            screens at both sizes, against a threshold of 10 of 10. It was
+            visible before this batch, on the command bar that HLR-118 deleted,
+            so this was a REGRESSION and not merely an unmet new requirement.
+
+        Allocation:
+            Fair share with slack redistribution -- each half may take half the
+            budget, and a half that needs less lends the remainder to the other.
+            Neither can evict the other, and a short name is never truncated
+            just because its partner is long.
+
+        Args:
+            project_name (str): The composed project string (already in its
+                LLR-120.5 display form).
+            a2l_name (str): The A2L filename, or the absent sentinel.
+
+        Returns:
+            str: The two halves joined by ``_CONTEXT_SEPARATOR``, each clipped
+            with a trailing ellipsis only when the budget forces it.
+        """
+        sep = self._CONTEXT_SEPARATOR
+        try:
+            bar_width = self.query_one("#workspace_status_bar").size.width
+        except Exception:
+            bar_width = 0
+        budget = (
+            int(bar_width * self._CONTEXT_MAX_SHARE)
+            if bar_width > 0
+            else self._CONTEXT_FALLBACK_BUDGET
+        )
+        avail = max(0, budget - len(sep))
+
+        if len(project_name) + len(a2l_name) <= avail:
+            return f"{project_name}{sep}{a2l_name}"
+
+        half = avail // 2
+        if len(project_name) <= half:
+            # The project fits in its share; the A2L takes the slack.
+            project_cap = len(project_name)
+            a2l_cap = avail - project_cap
+        elif len(a2l_name) <= avail - half:
+            # The A2L fits in its share; the project takes the slack.
+            a2l_cap = len(a2l_name)
+            project_cap = avail - a2l_cap
+        else:
+            # Both overflow: split evenly, so neither can evict the other.
+            project_cap = half
+            a2l_cap = avail - half
+
+        return (
+            f"{self._clip_to(project_name, project_cap)}{sep}"
+            f"{self._clip_to(a2l_name, a2l_cap)}"
+        )
 
     def _compose_project_label(self) -> str:
         """Compose the active project string in whichever display form applies.
