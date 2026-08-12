@@ -35,7 +35,42 @@
 ## 🆕 Carries returned by batch-79 (2026-08-07, Lane 1 — command-bar deletion)
 
 Registered mid-batch at operator instruction rather than at the close, so they survive a session
-boundary. batch-79 itself is **IN FLIGHT**: Inc-6…Inc-9 shipped, Inc-10…Inc-12 owed.
+boundary. batch-79 status **as of 2026-08-12**: Inc-6…Inc-11 shipped **including `HLR-121`'s three
+acceptances and the merge-gate response**; **Inc-12 owed** (the 29-golden snapshot regen, canonical
+CI only, its own PR).
+
+- **▸ (P1) The AT/TC registry is BLIND to all 106 batch-78/79 acceptance nodes — the id namespace sits
+  outside the project's own grammar.** Found at Inc-11 when two new `TC-B79-*` nodes did **not** trip
+  **G1** (*"an id on a test node that nobody registered"*). Executed, not inferred:
+
+  ```
+  _FUNC_ID_RE  test_at_b78_09_loaded_panel_names_the_project  -> NO MATCH
+               test_tc_b79_01_a_long_project_cannot_evict_... -> NO MATCH
+               test_tc489_candidate_consumption_is_r_indep... -> ['_tc489']   ✅
+  derive_named_nodes over the corpus : 678 ids, of which B78/B79-shaped = 0
+  iter_tokens("AT-B78-12") -> governed=False, conforming=False, key=None
+  iter_tokens("TC-489")    -> governed=True,  conforming=True,  key='TC-489'
+  test nodes named test_at_b7*/test_tc_b7* : 106      registry rows : 0
+  ```
+
+  `_FUNC_ID_RE` (`tools/id_registry.py:95`) requires **digits immediately after `at`/`tc`**, so
+  `at_b78_09` never parses; and because a non-conforming token is classified `governed=False`, **G3
+  and G5 skip it too**. batch-78 minted an id namespace outside the grammar and every guard declines
+  to police it **silently**. Same vacuous-input-set shape as the `_B78_NON_WRITING_CALLS` defect, two
+  layers up: an id form the regex cannot parse is indistinguishable from one that does not exist.
+  Lands on the Lane B finding already on record that **the id GRAMMAR is undefined**. **Operator
+  decision owed** — extending the regex reclassifies tokens repo-wide and could redden G1/G3/G5
+  across 678 existing ids, so it is its own batch. It also qualifies `AT-B78-14`: for this namespace
+  the registry never had anything to reconcile.
+- **▸ (P2) `M-4` from the batch-79 merge gate — `_apply_unload` now clears `current_a2l_path`, a
+  production behaviour change outside every in-scope requirement.** Landed as an F6 fix at Inc-7. It
+  reaches `save_project` (`app.py:6750`, `:6765`, `:7157`, `:7171`), the empty-state guards (`:5479`,
+  `:6717`) and `_project_stem` (`:5734`). Only its **display** effect is tested (`TC-B78-43`).
+  Concretely: unload the A2L, then save the project — the A2L is no longer copied into the workarea.
+  That is arguably correct and is **untested either way**. Owed: one acceptance on the save path, or
+  a descope to its own item. **Carried by operator ruling 2026-08-12** rather than fixed under time
+  pressure, because a test written hastily over an untested behaviour change is how vacuous
+  acceptances get made.
 
 - **▸ (P2) `git` tracks 8 `.pyc` files that `.gitignore` excludes.** `git ls-files '*.pyc'` returns
   **8** under `s19_app/__pycache__/`, while `.gitignore:4-5` lists `__pycache__/` and `*.pyc` — they

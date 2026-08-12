@@ -739,13 +739,12 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
     observable does: the PALETTE host is reachable from every screen. The
     absence of the row is asserted positively so the deletion itself is
     guarded.
-    """
-    """The command bar is mounted and stays present on every rail screen.
 
-    Intent: LLR-003.1 — the command bar (palette trigger + find input +
-    go-to input) is mounted above the rail/workspace body and remains in
-    the widget tree regardless of which of the 8 rail screens is active;
-    navigating the rail never unmounts it.
+    Intent (amended): LLR-003.1 — the command bar is mounted above the
+    rail/workspace body and remains in the widget tree regardless of which rail
+    screen is active; navigating the rail never unmounts it. It hosts the
+    palette trigger; the find and go-to inputs it used to hold were deleted by
+    `HLR-118`.
     """
 
     async def _drive() -> list[tuple[str, bool, bool, bool]]:

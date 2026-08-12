@@ -2004,14 +2004,26 @@ _B78_INC4_WIDE = (132, 44)
 #: reason: 24 is below `_DIFF_MIN_H`, so the whole result area is `display: none`
 #: behind the notice and the "pane" whose height this node names no longer
 #: exists. The first draft used 132x26; raising the floor to 28 (gate F-1) put
-#: that back in the notice regime, so it moves once more to **132x28** - the
-#: first row at which the fallback regime renders under the corrected floor.
+#: that back in the notice regime, so it moved to 132x28 - the first row at
+#: which the fallback regime rendered under the corrected floor.
 #:
-#: Capacity is still 0 there, executed both sides of Inc-10: `132x28` gives
-#: content height 0 / capacity 0 with the command bar present and 2 / 1 without
-#: it. Either way `capacity <= 3`, and the window only GROWS when
+#: batch-79 Inc-10 moved it AGAIN, to **132x27**, and the move IS the
+#: measurement. `HLR-118` returned the command bar's three rows to the pane, so
+#: `132x28` now paints content height **2**, not 0, and would no longer exercise
+#: the degenerate path this node exists for. Executed at the deletion:
+#:
+#:     132x27 -> content height 0        132x28 -> content height 2
+#:
+#: 27 is the boundary under the reclaimed layout, which is the value below.
+#: Capacity is 0 there; `capacity <= 3`, and the window only GROWS when
 #: `capacity > rows`, so the run +/- context floor of 3 rows is still the whole
-#: window and `AT-B78-22`'s exact three addresses hold on both sides of Inc-10.
+#: window and `AT-B78-22`'s exact three addresses hold.
+#:
+#: The SUBJECT is untouched: this is the feature arriving, not a regression, and
+#: the re-point keeps the degenerate path exercised rather than deleting a
+#: precondition that had become inconvenient. `AT-B78-22` asserts
+#: `short["content_h"] == 0` in its own run, so the fixture cannot drift
+#: silently even if this comment goes stale again - which it had.
 _B78_INC4_SHORT = (132, 27)
 
 #: `AT-B78-22`'s fixture and its expected addresses, as LITERALS. Spec F-6 /
@@ -2763,34 +2775,6 @@ _B78_INC5_FLOOR = (80, 24)
 _B78_WINDOW_HEADER_ROWS = 1
 
 
-async def _b78_hide_command_bar(app, pilot) -> None:
-    """Reclaim the command-bar row's three screen rows, as Inc-10 will.
-
-    `_DIFF_MIN_H` is defined in the POST-Inc-10 end state (spec Sec.8 A-1's own
-    quantity: "post-US-78-8 + US-78-1"), and Inc-10 is the increment that deletes
-    `#command_bar_row` from `CommandBar.compose`. Until it lands, a node that
-    asserts what the floor DELIVERS has to reach that state, and hiding the row
-    reclaims exactly the rows deleting it will.
-
-    The reclaim is ASSERTED, not assumed: a simulation that silently fails to
-    apply is a vacuous precondition, and this batch has now watched ten mutations
-    fail to apply. When Inc-10 lands, `#command_bar_row` no longer resolves and
-    this hook becomes the no-op branch below - the node then measures the real
-    tree with no simulation at all.
-    """
-    rows = app.query("#command_bar_row")
-    if not rows:
-        return
-    slot_before = app.query_one("#command_bar_slot").size.height
-    rows.first().display = False
-    await pilot.pause()
-    slot_after = app.query_one("#command_bar_slot").size.height
-    assert slot_after < slot_before, (
-        f"the Inc-10 simulation must actually reclaim the command bar's rows; "
-        f"#command_bar_slot height stayed at {slot_before}"
-    )
-
-
 def _b78_widest_emitted_hex_row() -> int:
     """The width of the widest row `hexview.render_hex_view` emits.
 
@@ -3476,7 +3460,13 @@ def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
         }
 
     async def _after(app, pilot):
-        await _b78_hide_command_bar(app, pilot)
+        # batch-79 Inc-11: `_b78_hide_command_bar` is deleted. It simulated the
+        # Inc-10 reclaim by hiding `#command_bar_row` while that row still
+        # existed. `HLR-118` deleted the row, so the helper's query matched
+        # nothing and it became a permanent no-op whose "the reclaim is
+        # ASSERTED, not assumed" clause could never execute again. The node now
+        # measures the real tree with no simulation at all, which is what the
+        # helper's own docstring said would happen once Inc-10 landed.
         return await _measure(app, pilot)
 
     at = _b78_drive_compare(

@@ -211,11 +211,19 @@ def test_tc008_slash_focuses_find_from_every_screen(tmp_path: Path) -> None:
 def test_tc008_find_submission_routes_to_find_string_in_mem(tmp_path: Path) -> None:
     """Submitting find text runs the existing ``find_string_in_mem`` path.
 
-    Intent: LLR-004.6 / S-1 — the find input must route to the already
-    validated search handler. A submitted ``HELLO`` against memory that
-    spells HELLO produces the existing handler's ``Found at 0x...`` status;
-    a no-match string produces the existing ``Search text not found.``
-    status. No new search function is introduced.
+    Intent: LLR-004.6 / S-1 — the already validated search HANDLER produces the
+    existing statuses. A submitted ``HELLO`` against memory that spells HELLO
+    produces ``Found at 0x...``; a no-match string produces ``Search text not
+    found.``. No new search function is introduced.
+
+    batch-79 Inc-11: this node used to post ``CommandBar.Find``, which
+    ``HLR-121`` deleted, and it now calls ``_handle_search`` directly. **The
+    Intent above is corrected to say "handler", not "routes": no routing is
+    exercised here any more.** The routing itself — the shipped Buttons through
+    ``on_button_pressed`` into ``_handle_search`` / ``_handle_goto`` — is
+    covered by ``AT-B78-12``'s 9-row matrix, which drives ``#search_button``
+    and friends for real. Claiming it here as well would be a label the
+    predicate does not earn.
     """
 
     async def _drive() -> tuple[str, str]:
@@ -331,10 +339,15 @@ def test_tc008_single_keys_suppressed_while_find_focused(tmp_path: Path) -> None
 def test_tc008_no_new_search_function_in_command_bar() -> None:
     """``command_bar.py`` adds no string-decoding / search-parsing code.
 
-    Intent: LLR-004.6 / S-1 — the command bar must route to the existing
-    ``find_string_in_mem`` handler and introduce no fresh, unguarded search
-    or decoding code path. An AST walk confirms the module defines no
+    Intent: LLR-004.6 / S-1 — ``command_bar.py`` introduces no fresh, unguarded
+    search or decoding code path. An AST walk confirms the module defines no
     search/decode function and imports nothing from the hex-search engine.
+
+    batch-79 Inc-11: the Intent no longer says the bar "routes to" the handler.
+    ``HLR-121`` deleted the messages and adapters that did the routing, so the
+    widget reaches the search path not at all. The node's own subject — that
+    this module grows no search code — is unchanged and is now, if anything,
+    easier to satisfy; it is kept because it still forbids the regression.
     """
     tree = ast.parse(_COMMAND_BAR_SOURCE.read_text(encoding="utf-8"))
     func_names = [
@@ -484,10 +497,14 @@ def test_tc009_single_keys_suppressed_while_goto_focused(tmp_path: Path) -> None
 def test_tc009_no_new_address_parser_in_command_bar() -> None:
     """``command_bar.py`` adds no address-parsing code.
 
-    Intent: LLR-004.2 / S-1 — the command bar must route to the existing
-    ``_handle_goto`` handler and introduce no fresh address-parsing path.
-    An AST walk confirms no parse/address function is defined and that
-    ``int(... , 0)`` style parsing does not appear in the module.
+    Intent: LLR-004.2 / S-1 — ``command_bar.py`` introduces no fresh
+    address-parsing path. An AST walk confirms no parse/address function is
+    defined and that ``int(... , 0)`` style parsing does not appear in the
+    module.
+
+    batch-79 Inc-11: as with ``TC-008``'s census, the Intent no longer claims
+    the bar "routes to" ``_handle_goto`` — ``HLR-121`` deleted the adapters, so
+    it reaches the go-to path not at all.
     """
     source = _COMMAND_BAR_SOURCE.read_text(encoding="utf-8")
     tree = ast.parse(source)
@@ -587,7 +604,6 @@ def test_tc039_typed_find_and_palette_text_not_written_to_log(
             # now focuses the ACTIVE screen's own input (Inc-9), and the
             # observable this node guards -- typed text never reaches the log
             # FILE -- is unchanged by where the text was typed.
-            app.query_one("#search_input", Input).value = secret_find
             app.query_one("#search_input", Input).value = secret_find
             app._handle_search()
             await pilot.pause()
@@ -1378,6 +1394,38 @@ def test_tc_b79_01_a_long_project_cannot_evict_the_a2l(tmp_path: Path) -> None:
         )
 
 
+def test_tc_b79_03_the_find_goto_map_covers_every_screen() -> None:
+    """TC-B79-03 -- `_FIND_GOTO_INPUTS` is keyed on ALL of `SCREEN_CONTAINER_IDS`.
+
+    **This node exists because the map's own docstring claimed it already did.**
+    `app.py`'s comment on `_FIND_GOTO_INPUTS` says
+    *"`set(_FIND_GOTO_INPUTS) == set(SCREEN_CONTAINER_IDS)` is a real
+    assertion"* — and the merge gate found that `grep -rn "_FIND_GOTO_INPUTS"
+    tests/` matched only a comment. The mechanism the prose named did not exist.
+
+    The claim is worth making true rather than deleting: `LLR-119.1`'s
+    acceptance criteria names exactly this set equality, and it is the guard
+    that makes a screen added later FAIL here instead of silently joining the
+    notice path. It is incidentally covered today — an 11th screen breaks
+    `AT-B78-04` or `AT-B78-05`'s `len == 7` — but incidental coverage is not
+    what the comment promised a reader.
+    """
+    assert set(S19TuiApp._FIND_GOTO_INPUTS) == set(S19TuiApp.SCREEN_CONTAINER_IDS), (
+        f"LLR-119.1: every screen must carry an explicit find/go-to decision.\n"
+        f"in SCREEN_CONTAINER_IDS but not in _FIND_GOTO_INPUTS: "
+        f"{sorted(set(S19TuiApp.SCREEN_CONTAINER_IDS) - set(S19TuiApp._FIND_GOTO_INPUTS))}\n"
+        f"in _FIND_GOTO_INPUTS but not a screen: "
+        f"{sorted(set(S19TuiApp._FIND_GOTO_INPUTS) - set(S19TuiApp.SCREEN_CONTAINER_IDS))}"
+    )
+    # Co-assertion (C-40): both sets non-empty. Two empty sets are equal, and a
+    # renamed attribute resolving to `{}` would satisfy the clause above.
+    assert len(S19TuiApp.SCREEN_CONTAINER_IDS) == 10, (
+        f"the map is quantified over 10 screens; found "
+        f"{len(S19TuiApp.SCREEN_CONTAINER_IDS)} -- if this moved, the equality "
+        f"above may be comparing two things that both shrank"
+    )
+
+
 def test_tc_b79_02_the_context_budget_matches_the_stylesheet(tmp_path: Path) -> None:
     """TC-B79-02 -- `_CONTEXT_MAX_SHARE` and `styles.tcss` agree.
 
@@ -1724,10 +1772,11 @@ def test_tc_b78_43_unload_all_clears_the_artifact_slots_not_the_context(
     the code is not automatically wrong.* Measuring it told me the two differed;
     it did not tell me which one was mistaken, and I resolved that in favour of
     the code without asking the question for each half separately.
-    `action_unload_all` delegates to `_apply_unload("all")`, which clears
-    Before the fix, `_apply_unload("all")` cleared `current_file` and touched
-    neither `current_project` nor `current_a2l_path`, so the status context read
-    `'demoproj  |  ctx.a2l'` unchanged after an unload-all.
+    `action_unload_all` delegates to `_apply_unload("all")`, which now clears
+    `current_a2l_path` alongside `current_file`. Before the fix it cleared
+    `current_file` and touched neither `current_project` nor
+    `current_a2l_path`, so the status context read `'demoproj  |  ctx.a2l'`
+    unchanged after an unload-all.
 
     The project half of the catalog stays rejected — making it true would mean
     unloading artifacts starts deselecting the project, which is nowhere in

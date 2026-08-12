@@ -133,13 +133,27 @@ not the head, because a mutation in the head passes for the wrong reason.
 | 3 | 2026-08-07 | **Merge precondition set by the orchestrator**: independent `qa-reviewer` pass over the whole diff before merge | ✅ un-asked — the operator left it unspecified and may waive it |
 | 4 | 2026-08-07 | Phases 1–2 **inherited** from batch-78 rather than re-run; Phase 0 discharges the inherited spec via premise evaluation instead | ✅ un-asked — follows the charter's "execute, do not re-derive" |
 | 5 | 2026-08-07 | `AT-B78-32` **re-authored** at `Inc-6` (extracted block + tail mutation) rather than its range corrected to `1338-1392` | ✅ un-asked — a corrected range is one insertion away from failing the same silent way |
+| 6 | 2026-08-11 | Authorization asked **fresh** for the resuming session; scope set to **Inc-11 only** | — operator ruling, asked |
+| 7 | 2026-08-11 | **Row 3's precondition put back to the operator, who declined the waiver and KEPT it** | — closes the un-asked gap in row 3 |
+| 8 | 2026-08-11 | `AT-B78-14` recorded as a **PIN**, contradicting spec §5.3's "GATE — RED after deletion" | ✅ un-asked — measured: **zero** test nodes deleted across the batch, so no reconciliation was ever owed. A GATE label would ship a vacuous gate |
+| 9 | 2026-08-11 | `TC-029`'s **docstring** corrected, assertions untouched | ✅ un-asked — **and the explanation shipped with it was FALSE; retracted at `5d9f12d`.** Inc-9 had re-pointed the node deliberately. Root cause: `git log -S<name>` reports occurrence-count changes, not region edits |
+| 10 | 2026-08-12 | Merge gate returned **BLOCK** (4 HIGH / 5 MED / 5 LOW). H-1/H-2/H-4 fixed; M-1/M-2/M-3/M-5 + all LOW fixed; **M-4 carried** | — operator ruling, asked |
+| 11 | 2026-08-12 | **Full suite before every commit** for the rest of the batch | — operator ruling, asked |
+| 12 | 2026-08-12 | `TC-B79-01/02/03` minted in the **B79** namespace | ✅ un-asked — `TC-B78-45` is **taken** (it belongs to `HLR-123`), checked before allocating |
+| 13 | 2026-08-12 | **F-6 registered as a Lane A carry, grammar left alone** | — operator ruling, asked |
 
 ## 9 · Test ledger
 
 | Point | Value |
 |---|---|
 | Baseline (batch-78 close, Inc-5) | **2647** |
-| Current | to be measured at `Inc-6` entry |
+| Base `829adc6` | **2653** |
+| Inc-11 entry | **2683** |
+| After `AT-B78-12/13/14` | **2686** |
+| After the merge-gate response | **2689** |
+
+**Stated measurement pattern** — *an unstated pattern is an unstated definition*: the total
+reported by `python -m pytest tests/ --collect-only -q`, run from the repo root.
 
 ## 10 · Out-of-scope carries
 

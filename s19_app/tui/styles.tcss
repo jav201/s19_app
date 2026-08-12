@@ -53,10 +53,18 @@ Screen {
 }
 
 /* --- Direction B command bar (batch-02 increment 4) ---------------------
- * `#command_bar` is the persistent top bar: a single-row `#command_bar_row`
- * (accent `›` prompt, project/A2L context labels, find + go-to inputs) and
- * a `#command_palette` dropdown hidden until `Ctrl+K`. LLR-003.1 / 003.2 /
- * 003.3 / 004.1 / 004.2 / 004.3 / 011.3.
+ * AMENDED at batch-79 Inc-11, as `LLR-118.3` explicitly requires.
+ *
+ * `#command_bar` is now a PALETTE HOST and nothing else: its only child is the
+ * `#command_palette` dropdown, hidden until `Ctrl+K`. LLR-003.2 / 003.3.
+ *
+ * It is no longer a "persistent top bar". The single-row `#command_bar_row`
+ * this comment used to describe — accent `›` prompt, project/A2L context
+ * labels, find and go-to inputs — was DELETED by `HLR-118` at Inc-10, and its
+ * LLR-003.1 / 004.1 / 004.2 / 004.3 / 011.3 responsibilities went with it:
+ * the context labels to `#status_context` and the Loaded panel's project row
+ * (`HLR-120`), the `/` and `g` keys to each screen's own inputs (`HLR-119`).
+ * The deletion record is the comment immediately below.
  */
 #command_bar {
     height: auto;
@@ -67,10 +75,18 @@ Screen {
  * rules it governed (`#command_bar_prompt`, `#cmdbar_project`, `#cmdbar_a2l`,
  * `#find_input`, `#cmdbar_goto_input`) are DELETED with the row itself.
  *
- * The span is :66-103, NOT :55-102. `#command_bar_slot` (:51) and
- * `#command_bar` (:61) sit above it and SURVIVE: they host the palette, which
- * outlives the bar. Deleting from :55 would have removed the styling of the
- * container that stays. */
+ * The deleted span ran from THIS comment down to (not including) the
+ * `#command_palette` rule. `#command_bar_slot` and `#command_bar` sit ABOVE it
+ * and SURVIVE: they host the palette, which outlives the bar. A deletion
+ * starting at the `#command_bar` header comment instead would have removed the
+ * styling of the container that stays — which is what the spec's original
+ * ":55-102" span would have done.
+ *
+ * batch-79 Inc-11: this paragraph used to cite the span as ":66-103" with
+ * ":51" and ":61" for the two survivors, and amending the header comment above
+ * shifted all three by nine lines the same day. Those citations are replaced
+ * with the SYMBOL NAMES deliberately — a line number is not a durable
+ * reference to a rule, and this batch has now paid for that three times. */
 
 #command_palette {
     height: auto;

@@ -5767,7 +5767,10 @@ class S19TuiApp(App):
     #: would certify a completeness the code does not have (C-40 limb 2). Keyed
     #: on all ten, `set(_FIND_GOTO_INPUTS) == set(SCREEN_CONTAINER_IDS)` is a
     #: real assertion, and a screen added later without a decision here fails it
-    #: instead of silently joining the notice path.
+    #: instead of silently joining the notice path. **That assertion is
+    #: `TC-B79-03`** — it was named here from batch-78 onward and did not exist
+    #: until batch-79 Inc-11, when the merge gate found the prose claiming a
+    #: mechanism no test implemented.
     #:
     #: **Routing is by SCREEN KEY, never by widget presence.**
     #: ``action_show_screen`` swaps a ``hidden`` class and nothing unmounts
@@ -11515,10 +11518,12 @@ class S19TuiApp(App):
               ``_refresh_loaded_panel`` with the same composed string. One
               composer feeds both sinks, so the two surfaces cannot disagree
               about the display form (LLR-120.5).
-            - The command bar's ``set_context_labels`` is still called and dies
-              with the bar at Inc-10 (HLR-118); until then all three surfaces
-              carry the same string, which is what lets Inc-8 re-point the test
-              observables while every surface is live.
+            - There are TWO sinks, not three. The command bar's
+              ``set_context_labels`` was the third; ``HLR-118`` deleted the row
+              at Inc-10 and ``HLR-121`` deleted the helper at Inc-11. It is
+              named here only as the thing that used to be here, because Inc-8
+              re-pointed the test observables off it while all three were still
+              live and that ordering is why nothing went red.
             - Returns early when ``#status_context`` cannot be resolved, so a
               call before the tree is mounted is a no-op (TC-B78-13).
             - Multi-variant projects (LLR-005.5): when the variant set holds
@@ -11538,7 +11543,8 @@ class S19TuiApp(App):
                 - ``safe_text`` (LLR-120.4 — the status-bar sink is markup- AND
                   control-character-safe)
                 - ``_refresh_loaded_panel`` (the second context surface)
-                - ``CommandBar.set_context_labels`` (dies at Inc-10)
+                - ``_compose_context_line`` (bounds the two halves against each
+                  other so neither can evict the other — see its own docstring)
                 - ``_refresh_patch_variant_select``
             Used by:
                 - Project / A2L load handlers
@@ -11574,9 +11580,10 @@ class S19TuiApp(App):
         # than descoped, because it is an acceptance criterion of the very
         # requirement this increment implements.
         #
-        # It wraps ALL THREE sinks, not just the new one: the command-bar write
-        # below is equally unguarded, so guarding only `#status_context` would
-        # move the raise one line down and leave the catalog still false.
+        # It wraps EVERY sink, not just the new one: each write below is equally
+        # unguarded, so guarding only `#status_context` would move the raise one
+        # line down and leave the catalog still false. (It wrapped THREE sinks
+        # when written; the command-bar write was the third and is gone.)
         try:
             self.query_one("#status_context", Label).update(
                 safe_text(self._compose_context_line(project_name, a2l_name))
@@ -11584,24 +11591,21 @@ class S19TuiApp(App):
         except Exception:
             return
         self._refresh_loaded_panel(project_name)
-        # The command-bar write SURVIVES this increment, and that is a
-        # deliberate reading of a spec contradiction rather than an oversight.
+        # The command-bar write is GONE, and how it went is worth keeping.
         #
-        # `LLR-120.1` says the new writes replace "its single write to the
-        # command bar". Section 7's Inc-8 row says the 14 `_project_label()`
-        # call sites are re-pointed "WHILE BOTH SURFACES EXIST" - which is
-        # false the moment Inc-7 removes one. Executed: deleting this line
-        # reddens 10 shipped tests across `test_tui_variants.py` and
-        # `test_tui_patch_variant.py`, because `_project_label()` reads
+        # `LLR-120.1` said the new writes replace "its single write to the
+        # command bar". Section 7's Inc-8 row said the 14 `_project_label()`
+        # call sites are re-pointed "WHILE BOTH SURFACES EXIST" — which is false
+        # the moment Inc-7 removes one. Executed at Inc-7: deleting the write
+        # there reddened 10 shipped tests across `test_tui_variants.py` and
+        # `test_tui_patch_variant.py`, because `_project_label()` read
         # `#cmdbar_project`.
         #
-        # batch-79 Inc-10: the command-bar write is GONE, which is the second
-        # half of LLR-120.1's "replacing". Inc-7 kept it because §7's Inc-8 row
-        # re-points the test readers "while both surfaces exist", and deleting
-        # it there reddened 10 shipped tests. It dies here, with the row it
-        # wrote into — so "replacing" was discharged across Inc-7 + Inc-10
-        # rather than inside either one, and no increment ever had to choose
-        # between a green gate and an honest one.
+        # So Inc-7 KEPT it, Inc-8 re-pointed the readers while both surfaces
+        # were live, and Inc-10 deleted it with the row it wrote into.
+        # "Replacing" was discharged across Inc-7 + Inc-10 rather than inside
+        # either one, and no increment ever had to choose between a green gate
+        # and an honest one.
         self._refresh_patch_variant_select()
 
     #: The separator between the two halves of `#status_context`.
