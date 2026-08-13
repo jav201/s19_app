@@ -286,6 +286,38 @@ that the failure mode does not live in what it discarded* — stays a registered
 **Re-litigate it after the retrofit**, which is the single best evidence generator this project will
 have for it: every normalising threshold it surfaces is a data point.
 
+### D-5 … D-8 · Prior art — OPEN, to be resolved in batch-82
+
+**This design converges with four established traditions, discovered after it was written.** That
+raises confidence — the industry reached the same shape separately and the hard way — and it means
+four things should be adopted rather than reinvented.
+
+| # | Adoption | Source | Status |
+|---|---|---|---|
+| **D-5** | Call the `⊆` rule **"balancing"** | DFD / Structured Analysis (DeMarco, Gane-Sarson, ~1979) — *vertical balancing* between levels | **Adopt.** Inventing a new name for a 45-year-old concept is debt |
+| **D-6** | **Invert the contract direction — consumer-declares, provider-verifies** | **Consumer-Driven Contracts** (Pact) | ⚠️ **OPEN — the substantive one.** See below |
+| **D-7** | Separate the **connection point** from **what flows through it** | SysML — *port* vs *item flow* | **Adopt.** The current `outputs` field conflates them |
+| **D-8** | Name the **concern** the viewpoint answers | ISO/IEC/IEEE 42010 — a viewpoint exists to address a stakeholder concern | **Adopt.** The IFC's concern is ***"who breaks if I change this?"***, and naming it sharpens the Part B trigger |
+
+**D-6 in full, because it is a real design change.** The schema as designed has the **provider** list
+its consumers. That ages badly: *a provider never learns when a new consumer appears.* Pact inverts
+it — each **consumer** declares what it needs, and the provider verifies itself against the union of
+those declarations. Applied here, `test_unload_feature.py` would declare *"I need
+`.loaded-detail` to select exactly 3, indexed positionally"*, and `loaded_panel` would verify against
+every such declaration. **Structurally more robust, and a bigger change than it looks** — it moves
+authorship from ~40 surfaces to N consumers and changes who the validator holds responsible. **Decide
+before implementation, not during.**
+
+**Other prior art, mapped for the record and NOT adopted as-is:** IEEE 1016's *Interface*,
+*Composition* and *Dependency* viewpoints (already cited by the flow); ICD practice, which is where
+the `address` field's thinking comes from; AUTOSAR PPort/RPort and ARINC 653; ISO/IEC/IEEE 29148 for
+traceability and for the *unambiguous / verifiable* characteristics that the `US-78-3` critique is
+literally an instance of.
+
+⚠️ **Caveat, stated so nobody builds on sand:** the standards above are named from working knowledge.
+Concepts and names are firm; **clause-level detail is not verified.** If batch-82 leans on 1016 or
+29148, open the documents first. *A cited standard is a figure like any other.*
+
 ### D-4 · C-45 propagation → in scope, with its own before/after record
 
 The flow is a shared, versioned asset. batch-82 owes, as declared steps:
@@ -299,7 +331,27 @@ The flow is a shared, versioned asset. batch-82 owes, as declared steps:
 6. **record before/after in the batch artifacts** — the global command lives OUTSIDE this repo and is
    not covered by its PR flow, so the repo's PR is not evidence that the flow leg landed.
 
-⚠️ Step 6 is the one that gets skipped. `BACKLOG-PROCESS.md`'s own header warns about exactly this.
+⚠️ **Step 6 is the one that gets skipped, and the operator flagged it twice.** `BACKLOG-PROCESS.md`'s
+own header warns about it: *"the global `/dev-flow` command lives OUTSIDE this repo, so that leg is
+not covered by the project PR flow and needs its own before/after record in the batch artifacts."*
+
+### The propagation is an EXIT CRITERION, not a closing chore
+
+**batch-82 does not close until all six are true and each is verified by execution, not by intent:**
+
+| # | Exit criterion | How it is verified |
+|---|---|---|
+| 1 | `dev-flow.md` **and** `fast-dev-flow.md` both carry the obligation | both files, not just the slow one — the fast flow owes **Part A only**, and that difference must be written IN it |
+| 2 | `templates/dev-flow/ifc-template.md` exists | file present in `~/.claude` |
+| 3 | `V10`–`V14` in `devflow-validate.py`, **each demonstrating RED in `--selftest`** | `--selftest` output pasted into the batch record |
+| 4 | `docs/FLOW-VERSION.md` bumped: version, `flow_hash`, controls → `C-10…C-54` | the manifest's own `sha256` command recomputes to the recorded hash |
+| 5 | **pushed to `jav201/claude-config`**, and the `jav201/agent-skills` mirror reconciled | `git -C ~/.claude status` clean **and 0/0 vs origin**, verified AFTER the push |
+| 6 | before/after of the global files recorded **in this repo's batch artifacts** | the diff of the out-of-repo files, in the increment packet |
+
+**Why criterion 5 is stated as "0/0 verified AFTER the push":** this project has already recorded the
+failure mode where a flag or a change is asserted locally and never reaches `origin` — `C-44` exists
+because of it, and batch-78 needed a follow-up PR (`#190`) purely to land a flag on `origin/main`.
+**A local edit to `~/.claude` is not a shipped control.**
 
 ---
 

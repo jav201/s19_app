@@ -47,8 +47,45 @@
   **C-45 propagation leg with its own before/after record**, because the global command is outside
   this repo and the project PR is not evidence that it landed.
 
-  ⚠️ **The flow is versioned.** Implementing this bumps `FLOW-VERSION.md` (version + `flow_hash` +
-  control count to `C-10…C-54`) and must be pushed to `jav201/claude-config`.
+  **⚠️ FOUR OPEN DECISIONS from prior art (`D-5`…`D-8`), to resolve BEFORE implementation.** The
+  design converges with four established traditions found after it was written — which raises
+  confidence and means these should be adopted, not reinvented:
+  - **`D-5`** call the `⊆` rule **"balancing"** — DFD/Structured Analysis, ~1979. **Adopt.**
+  - **`D-6`** ⚠️ **invert the contract direction to consumer-declares / provider-verifies** (Pact,
+    Consumer-Driven Contracts). **OPEN and substantive:** as designed, the *provider* lists its
+    consumers, which ages badly because **a provider never learns when a new consumer appears.**
+    Inverting moves authorship from ~40 surfaces to N consumers and changes who the validator holds
+    responsible. **Decide before implementing, not during.**
+  - **`D-7`** separate **port** from **item flow** (SysML) — `outputs` currently conflates them. **Adopt.**
+  - **`D-8`** name the **concern** the viewpoint answers (ISO/IEC/IEEE 42010): ***"who breaks if I
+    change this?"*** — which sharpens the Part B trigger. **Adopt.**
+
+  Also mapped, not adopted as-is: IEEE 1016's Interface/Composition/Dependency viewpoints (already
+  cited by the flow), ICD practice (the origin of `address` thinking), AUTOSAR PPort/RPort, and
+  ISO/IEC/IEEE 29148 — whose *unambiguous / verifiable* characteristics the `US-78-3` critique is
+  literally an instance of. ⚠️ **Standards named from working knowledge; clause-level detail is NOT
+  verified. Open the documents before leaning on them** — *a cited standard is a figure like any other.*
+
+  ### ⚠️ THE PROPAGATION IS AN EXIT CRITERION, NOT A CLOSING CHORE
+
+  **The flow lives in `jav201/claude-config`, OUTSIDE this repo, and must be kept current.** Operator
+  emphasised this twice. batch-82 does not close until all six are verified **by execution**:
+
+  1. **BOTH** `dev-flow.md` **and** `fast-dev-flow.md` carry the obligation — the fast flow owes
+     **Part A only**, and that difference must be written in it;
+  2. `templates/dev-flow/ifc-template.md` exists;
+  3. `V10`–`V14` land in `devflow-validate.py`, **each demonstrating RED in `--selftest`**, with the
+     output pasted into the batch record — *a rule that cannot go red is a vacuous check with CI authority*;
+  4. `docs/FLOW-VERSION.md` bumped — version, `flow_hash`, controls → `C-10…C-54` — and the manifest's
+     own `sha256` command recomputed to match;
+  5. **pushed to `jav201/claude-config`** and the `jav201/agent-skills` mirror reconciled, with
+     `git -C ~/.claude status` clean **and 0/0 vs origin verified AFTER the push**;
+  6. before/after of the out-of-repo files recorded **in this repo's batch artifacts**.
+
+  **Why 5 is worded that way:** this project has already shipped a change that was asserted locally
+  and never reached `origin` — `C-44` exists because of it, and batch-78 needed a follow-up PR
+  (`#190`) purely to land a flag on `origin/main`. **A local edit to `~/.claude` is not a shipped
+  control.**
 
 - **▸ (P2) `C-55` candidate — registered, NOT encoded** (operator chose C-54 alone at the
   control-encode gate; that ruling stands rather than being quietly widened).
