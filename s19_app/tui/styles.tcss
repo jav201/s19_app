@@ -522,19 +522,30 @@ DataTable > .datatable--odd-row {
 }
 
 /* Right-aligned so the context reads as ambient state rather than competing
- * with the status message at the left edge; `width: 1fr` takes whatever the
- * status text leaves.
+ * with the status message at the left edge.
+ *
+ * `auto` with a ceiling: the context sizes to its CONTENT, so it is never
+ * starved by a long status message, and `max-width` stops a long project+A2L
+ * pair from starving the message in return.
+ *
+ * ⚠️ `max-width` bounds this cell against the status MESSAGE. It cannot bound
+ * the project against the A2L — both live in one `Label` as one string, so CSS
+ * can only clip the tail, which is the A2L. That second bound is
+ * `_compose_context_line` in `app.py`, and its budget is derived from this
+ * `70%` (`_CONTEXT_MAX_SHARE`) plus the chrome inset; `TC-B79-02` asserts both
+ * couplings against the live tree.
  *
  * `$fg-base`, not a dimmer tone: this stylesheet's palette is a CLOSED set of
  * six tokens (`$accent-calm`, `$bg-base`, `$bg-panel`, `$fg-base`, `$rule`,
  * `$odd-row`) and carries no muted foreground. Minting one would be a change
  * to the design system on the way past, which is not this increment's scope —
  * separation is carried by position and alignment instead. Registered as a
- * candidate, not taken. */
-/* `auto` with a ceiling: the context sizes to its content so it is never
- * starved by a long status message, and `max-width` stops a long
- * project+A2L pair from starving the message in return. The two are bounded
- * against each other rather than one being given the remainder. */
+ * candidate, not taken.
+ *
+ * batch-79 Inc-11: this block previously opened by claiming `width: 1fr`
+ * takes whatever the status text leaves. The rule below sets `width: auto`,
+ * and a second comment saying so was stacked underneath rather than replacing
+ * it — two blocks on one rule, the first contradicting the second. Merged. */
 #workspace_status_bar #status_context {
     height: 1;
     width: auto;

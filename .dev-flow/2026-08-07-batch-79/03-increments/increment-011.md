@@ -87,7 +87,9 @@ as "the deleted operator". Every arm failed on the node's **own assertion**; non
 
 **Arm 1 is the owed one.** `find_string_in_mem` is a module-level import used by all three
 `_handle_search*` paths, so batch-78's recorded mutation could only ever reach the search half.
-`_apply_goto` (`app.py:11777`, called at `:11833`, `:11884`, `:11933`) is its exact twin on the go-to
+`S19TuiApp._apply_goto` — the single shared mechanism behind `_handle_goto`, `_handle_goto_alt` and
+`_handle_goto_mac`, resolved by NAME because every line number this batch wrote went stale — is its
+exact twin on the go-to
 side. The substitution reaches **6 of the 9 rows** — the 3 hit rows lose both `Goto 0x…` and their
 focus address, and the 3 miss rows lose the `Address … not in loaded file.` line. The 3 empty rows are
 correctly unaffected: they bail before `_apply_goto` is reached.

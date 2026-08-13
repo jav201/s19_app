@@ -34,7 +34,7 @@ from hashlib import blake2b
 from pathlib import Path
 
 from textual.binding import Binding
-from textual.widgets import Input
+from textual.widgets import Input, Label
 
 from s19_app.tui.app import S19TuiApp
 from s19_app.tui.command_bar import CommandBar
@@ -1394,6 +1394,120 @@ def test_tc_b79_01_a_long_project_cannot_evict_the_a2l(tmp_path: Path) -> None:
         )
 
 
+def test_tc_b79_04_the_context_apportionment_is_pinned(tmp_path: Path) -> None:
+    """TC-B79-04 -- the DESIGN of the context bound, not merely its worst case.
+
+    **`TC-B79-01` was not enough, and the way it fell short is its own
+    docstring's critique turned around.** It asserts that a discriminating
+    fragment of each half survives — which detects TOTAL eviction and nothing
+    else. Two arms substituted into `_compose_context_line` both came back
+    GREEN against it:
+
+        A2L starved to a fixed 10 columns, project takes the rest  -> GREEN
+        both slack branches deleted, always an even split          -> GREEN
+
+    So *fair share* and *slack redistribution* — the two properties the
+    method's docstring names as its design, and the only reason it is more than
+    a `min()` — were unasserted. That is `F-5`'s shape (a clause with no
+    implementing predicate) reproduced inside the fix written to close `F-5`.
+
+    Three axes, each of which was a live defect:
+
+    1. **Apportionment** — a half that FITS is never truncated, and a half that
+       overflows gets at least its fair share. This is what the two GREEN arms
+       above now go red on.
+    2. **Resize** (`N-1`) — the budget is read at write time, so a line
+       composed at 160x40 was stale at 80x24 and the A2L was evicted on 10 of
+       10 screens. Asserted through a real `pilot.resize_terminal`.
+    3. **Width** (`N-2`) — measured in terminal COLUMNS. A CJK name is 1 code
+       point and 2 columns, so a `len()`-based bound passed a string that
+       painted at 2x the cell.
+    """
+    from rich.cells import cell_len
+
+    sep = S19TuiApp._CONTEXT_SEPARATOR
+
+    async def _probe(size, project, a2l, resize_to=None):
+        app = S19TuiApp(base_dir=tmp_path)
+        _make_project(app, "demoproj", {"a.s19": S19_A})
+        async with app.run_test(size=size) as pilot:
+            await pilot.pause()
+            app._handle_load_project("demoproj")
+            await _flush(pilot)
+            app.current_project = project
+            app.current_a2l_path = Path(a2l)
+            app.update_project_labels()
+            await pilot.pause()
+            if resize_to is not None:
+                await pilot.resize_terminal(*resize_to)
+                await pilot.pause()
+                await pilot.pause()
+            bar_w = app.query_one("#workspace_status_bar").size.width
+            composed = str(app.query_one("#status_context", Label).render())
+            return composed, bar_w
+
+    # --- axis 1: apportionment -------------------------------------------
+    # A long project against a SHORT a2l. The short half fits, so it must come
+    # back WHOLE (slack redistribution), and the long half must get everything
+    # left over -- strictly more than an even split would give it.
+    composed, bar_w = asyncio.run(_probe((120, 30), "P" * 200, "s.a2l"))
+    left, _, right = composed.partition(sep)
+    budget = int(bar_w * S19TuiApp._CONTEXT_MAX_SHARE)
+    avail = budget - cell_len(sep)
+    assert right == "s.a2l", (
+        f"TC-B79-04: a half that FITS must never be truncated -- slack "
+        f"redistribution is the design. got {right!r}"
+    )
+    assert cell_len(left) > avail // 2, (
+        f"TC-B79-04: the overflowing half must receive the SLACK the short "
+        f"half did not use ({cell_len(left)} <= even split {avail // 2}). An "
+        f"implementation that always splits evenly passes a total-eviction "
+        f"check and fails here."
+    )
+    # Mirror it: a long A2L against a short project.
+    composed, bar_w = asyncio.run(_probe((120, 30), "proj", "A" * 200))
+    left, _, right = composed.partition(sep)
+    assert left == "proj", (
+        f"TC-B79-04: the short PROJECT half must survive whole too; got {left!r}"
+    )
+    assert cell_len(right) > avail // 2, (
+        f"TC-B79-04: the A2L must receive the slack; {cell_len(right)} <= "
+        f"{avail // 2}. A fixed per-half cap passes TC-B79-01 and fails here."
+    )
+
+    # --- axis 2: resize ---------------------------------------------------
+    for start, end in (((160, 40), (80, 24)), ((160, 40), (120, 30))):
+        composed, bar_w = asyncio.run(
+            _probe(start, _B79_LONG_PROJECT, _B79_LONG_A2L, resize_to=end)
+        )
+        budget = int(bar_w * S19TuiApp._CONTEXT_MAX_SHARE)
+        assert cell_len(composed) <= max(budget, cell_len(sep)), (
+            f"TC-B79-04: after {start} -> {end} the line must be recomposed to "
+            f"the NEW budget; {cell_len(composed)} columns against a budget of "
+            f"{budget}. The bound is applied once at write time, so without a "
+            f"recompose on resize it is stale."
+        )
+        assert "ASAP2_ECU" in composed, (
+            f"TC-B79-04: after {start} -> {end} the A2L must survive; "
+            f"composed={composed!r}"
+        )
+
+    # --- axis 3: terminal columns, not code points ------------------------
+    wide_project = "プロジェクト" * 7  # 42 code points, 84 columns
+    composed, bar_w = asyncio.run(_probe((120, 30), wide_project, _B79_LONG_A2L))
+    budget = int(bar_w * S19TuiApp._CONTEXT_MAX_SHARE)
+    assert cell_len(composed) <= budget, (
+        f"TC-B79-04: the bound is in terminal COLUMNS. This composed to "
+        f"{len(composed)} code points but {cell_len(composed)} columns against "
+        f"a budget of {budget} -- a `len()`-based measurement passes here and "
+        f"paints at up to 2x the cell width."
+    )
+    assert "ASAP2_ECU" in composed, (
+        f"TC-B79-04: a wide-character project must not evict the A2L; "
+        f"composed={composed!r}"
+    )
+
+
 def test_tc_b79_03_the_find_goto_map_covers_every_screen() -> None:
     """TC-B79-03 -- `_FIND_GOTO_INPUTS` is keyed on ALL of `SCREEN_CONTAINER_IDS`.
 
@@ -1453,6 +1567,31 @@ def test_tc_b79_02_the_context_budget_matches_the_stylesheet(tmp_path: Path) -> 
         f"`_CONTEXT_MAX_SHARE` is {S19TuiApp._CONTEXT_MAX_SHARE:.0%}. The "
         f"composer would budget for a width the stylesheet does not give it."
     )
+
+    # The SECOND half of the coupling, and the one that bit: the composer
+    # derives its budget from the TERMINAL width minus `_CONTEXT_BAR_INSET`,
+    # because the bar's own cached size is stale during a resize. That inset is
+    # a layout fact, so it is measured against the live tree rather than
+    # trusted -- a chrome change moves it and must redden here.
+    async def _bar_widths():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            seen = {}
+            for w, h in ((80, 24), (120, 30), (160, 40)):
+                await pilot.resize_terminal(w, h)
+                await pilot.pause()
+                await pilot.pause()
+                seen[w] = app.query_one("#workspace_status_bar").size.width
+            return seen
+
+    for terminal_w, bar_w in asyncio.run(_bar_widths()).items():
+        assert terminal_w - bar_w == S19TuiApp._CONTEXT_BAR_INSET, (
+            f"TC-B79-02: at terminal width {terminal_w} the status bar is "
+            f"{bar_w} columns, an inset of {terminal_w - bar_w}, but "
+            f"`_CONTEXT_BAR_INSET` is {S19TuiApp._CONTEXT_BAR_INSET}. The "
+            f"composer budgets for a width the layout does not give it."
+        )
 
 
 def test_at_b78_30_both_display_forms_on_both_surfaces(tmp_path: Path) -> None:
@@ -2361,8 +2500,10 @@ def test_at_b78_01_the_row_is_absent_and_the_palette_survives(tmp_path: Path) ->
 
     * every one of the six deleted ids resolves nowhere, on all 10 screens;
     * `#command_palette` is still a DIRECT child of `CommandBar` -- the widget
-      and `#command_bar_slot` exist to host it, which is why the CSS deletion is
-      `:66-103` and not `:55-102`;
+      and `#command_bar_slot` exist to host it, which is why the CSS deletion
+      START is the `#command_bar_row` block and NOT the `#command_bar` header
+      comment above it: deleting from the header would have removed the styling
+      of the container that stays;
     * **`#command_bar_slot` has height 0.** Without it, an implementation that
       deleted the row's CONTENT and left its three-row hole would satisfy both
       clauses above while the operator still stared at an empty band. Adopted
@@ -2554,11 +2695,15 @@ def _b79_class_methods(tree: ast.Module, class_name: str) -> tuple[set[str], set
 def _b79_tcss_without_comments(source: str) -> str:
     """Strip ``/* ... */`` blocks so the selector census reads only LIVE rules.
 
-    This is load-bearing, not tidiness. `styles.tcss:66-71` is a comment that
+    This is load-bearing, not tidiness. `styles.tcss` carries a comment that
     NAMES all six deleted ids, as the record of what was removed. A census run
     over the raw text finds every one of them and reports the deletion as
     incomplete -- the fifth time in this batch that a bare text search would
     have counted the wrong thing.
+
+    (The comment is cited by DESCRIPTION, not by line range. The range this
+    docstring used to give was invalidated within the same batch by an edit
+    nine lines above it.)
     """
     return re.sub(r"/\*.*?\*/", "", source, flags=re.DOTALL)
 
@@ -2705,7 +2850,8 @@ def test_at_b78_13_the_seven_symbols_and_six_selectors_are_gone() -> None:
     for selector in _B79_RETAINED_SELECTORS:
         assert re.search(rf"{re.escape(selector)}\b", live_styles), (
             f"`{selector}` must be RETAINED -- it hosts the palette, which is "
-            f"why the deleted span is :66-103 and not :55-102"
+            f"why the deletion starts at the `#command_bar_row` block and not "
+            f"at the `#command_bar` header above it"
         )
 
     surviving_selectors = [
@@ -2718,9 +2864,10 @@ def test_at_b78_13_the_seven_symbols_and_six_selectors_are_gone() -> None:
         f"{surviving_selectors}"
     )
 
-    # The comment block at :66-71 names all six on purpose, as the record of
-    # what was removed. Asserting it is still there proves the strip above is
-    # doing work rather than silently matching nothing.
+    # The deletion-record comment names all six on purpose. Asserting it is
+    # still there proves the strip above is doing work rather than silently
+    # matching nothing. (Cited by content, not by line range -- the range this
+    # comment used to give went stale inside the same batch.)
     assert any(f"#{dead_id}" in raw_styles for dead_id in _B79_DELETED_IDS), (
         "the deletion record comment naming the six ids is gone from "
         "styles.tcss -- the comment strip in this census is now untested"

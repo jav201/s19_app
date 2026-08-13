@@ -26,6 +26,7 @@ from textual.widgets import (
     Static,
     TextArea,
 )
+from rich.cells import cell_len, set_cell_size
 from rich.text import Text
 
 from ..compare import DIFF_KIND_DOMAIN
@@ -6410,9 +6411,30 @@ class S19TuiApp(App):
         self.query_one("#ab_diff_panel", AbDiffPanel).apply_regime(width, height)
 
     def on_resize(self, event: events.Resize) -> None:
-        """Update the two-regime width layout class on terminal resize."""
+        """Update the width/diff regimes AND recompose the context line.
+
+        The context line is the reason this handler does a third thing.
+        ``_compose_context_line`` bounds the project and A2L halves against a
+        budget derived from the status bar's width AT WRITE TIME, so a line
+        composed at one terminal size is stale at the next. Without this call
+        the ``HLR-120`` bound is applied once and never re-applied: composed at
+        160x40 and resized to 80x24, the A2L was evicted on 10 of 10 screens —
+        byte-for-byte the defect the bound was added to remove.
+
+        Recomposing here is what makes the threshold *"contains both on 10 of
+        10 screens"* unconditional rather than true only of the size the line
+        happened to be written at.
+
+        ⚠️ It goes through ``call_after_refresh``, and that is load-bearing.
+        This handler runs BEFORE the layout reflows, so a direct call reads the
+        status bar's OLD width and budgets for the size being left rather than
+        the size being entered — which recomposes to a budget that is still
+        wrong. Executed: a direct call left the full 91-column line against a
+        53-column budget at 160x40 -> 80x24, i.e. no observable change at all.
+        """
         self._apply_width_regime(event.size.width)
         self._apply_diff_regime(event.size.width, event.size.height)
+        self.call_after_refresh(self.update_project_labels)
 
     def action_page_next_context(self) -> None:
         """
@@ -11619,22 +11641,53 @@ class S19TuiApp(App):
     #: the other reddens instead of silently clipping again.
     _CONTEXT_MAX_SHARE = 0.70
 
-    #: Budget used when the bar has no resolved geometry yet (pre-mount, or a
-    #: refresh during early layout). 53 is the measured cell width at the
-    #: narrowest supported terminal, 80x24 -- so the fallback is the SAFE end of
-    #: the range, never an optimistic one.
+    #: Budget used when the terminal has no resolved width yet (pre-mount).
+    #: 53 is the measured cell width at the narrowest supported terminal,
+    #: 80x24 -- the SAFE end of the range, never an optimistic one.
     _CONTEXT_FALLBACK_BUDGET = 53
+
+    #: Columns of app chrome between the TERMINAL width and
+    #: `#workspace_status_bar`'s width. Measured at all three supported sizes:
+    #: 80 -> 76, 120 -> 116, 160 -> 156.
+    #:
+    #: The budget is derived from the TERMINAL width rather than by querying the
+    #: bar, and that is not a shortcut -- it is the only current value at the
+    #: moment it is needed. During a resize the bar's cached `size.width` is
+    #: STALE: executed at 160x40 -> 80x24, the deferred recompose read
+    #: `bar=156, #status_context=91` while `App.size.width` already read `80`.
+    #: Budgeting off the bar recomposed to the size being LEFT, which is why the
+    #: first version of the resize fix changed nothing observable.
+    #:
+    #: `TC-B79-02` asserts this inset against the live tree at all three sizes,
+    #: so a layout change reddens instead of silently re-clipping.
+    _CONTEXT_BAR_INSET = 4
 
     @staticmethod
     def _clip_to(text: str, cap: int) -> str:
-        """Clip ``text`` to ``cap`` columns, marking the loss with an ellipsis."""
+        """Clip ``text`` to ``cap`` terminal COLUMNS, marking the loss with an ellipsis.
+
+        Columns, not code points, and the distinction is the whole point.
+        The first version of this measured ``len(text)``. A CJK project name is
+        one code point and TWO columns per character, so a string that passed
+        the budget check painted up to 2x the cell width and CSS resumed
+        clipping the tail — restoring the exact eviction this bound removes,
+        on a legal Windows directory name. Measured: a 42-character CJK project
+        composed to 55 code points and **101 columns** against an 81-column
+        budget.
+
+        ``cell_len`` / ``set_cell_size`` come from ``rich``, already a hard
+        dependency via Textual, and ``set_cell_size`` handles the case a manual
+        slice cannot: a cap that falls in the MIDDLE of a double-width
+        character, where the correct result is a pad space rather than half a
+        glyph.
+        """
         if cap <= 0:
             return ""
-        if len(text) <= cap:
+        if cell_len(text) <= cap:
             return text
         if cap == 1:
             return "…"
-        return text[: cap - 1] + "…"
+        return set_cell_size(text, cap - 1) + "…"
 
     def _compose_context_line(self, project_name: str, a2l_name: str) -> str:
         """Compose `#status_context` with the two halves bounded against EACH OTHER.
@@ -11672,28 +11725,36 @@ class S19TuiApp(App):
             with a trailing ellipsis only when the budget forces it.
         """
         sep = self._CONTEXT_SEPARATOR
+        # From the TERMINAL width, never from the bar's cached size -- see
+        # `_CONTEXT_BAR_INSET`. The bar is stale mid-resize; `App.size` is not.
         try:
-            bar_width = self.query_one("#workspace_status_bar").size.width
+            terminal_width = self.size.width
         except Exception:
-            bar_width = 0
+            terminal_width = 0
+        bar_width = max(0, terminal_width - self._CONTEXT_BAR_INSET)
         budget = (
             int(bar_width * self._CONTEXT_MAX_SHARE)
             if bar_width > 0
             else self._CONTEXT_FALLBACK_BUDGET
         )
-        avail = max(0, budget - len(sep))
+        # Every measurement below is in terminal COLUMNS (`cell_len`), never in
+        # code points. `len()` under-counts double-width characters by 2x and
+        # was how the first version of this bound let a CJK name overflow.
+        avail = max(0, budget - cell_len(sep))
+        project_w = cell_len(project_name)
+        a2l_w = cell_len(a2l_name)
 
-        if len(project_name) + len(a2l_name) <= avail:
+        if project_w + a2l_w <= avail:
             return f"{project_name}{sep}{a2l_name}"
 
         half = avail // 2
-        if len(project_name) <= half:
+        if project_w <= half:
             # The project fits in its share; the A2L takes the slack.
-            project_cap = len(project_name)
+            project_cap = project_w
             a2l_cap = avail - project_cap
-        elif len(a2l_name) <= avail - half:
+        elif a2l_w <= avail - half:
             # The A2L fits in its share; the project takes the slack.
-            a2l_cap = len(a2l_name)
+            a2l_cap = a2l_w
             project_cap = avail - a2l_cap
         else:
             # Both overflow: split evenly, so neither can evict the other.

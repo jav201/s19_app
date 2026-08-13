@@ -50,8 +50,16 @@ CI only, its own PR).
   derive_named_nodes over the corpus : 678 ids, of which B78/B79-shaped = 0
   iter_tokens("AT-B78-12") -> governed=False, conforming=False, key=None
   iter_tokens("TC-489")    -> governed=True,  conforming=True,  key='TC-489'
-  test nodes named test_at_b7*/test_tc_b7* : 106      registry rows : 0
+  test nodes named test_at_b7*/test_tc_b7* : see below      registry rows : 0
   ```
+
+  **The node count is stated with its pattern and its commit, because the first version of this entry
+  was already stale in the commit that wrote it** — it said `106`, measured at `4c5aa5d`, while the
+  same commit added `TC-B79-03` and made it `107`. *A carried number is re-derived, not copied.*
+  Pattern: `grep -rh "^def test_at_b7\|^def test_tc_b7" tests/*.py | wc -l` — **108** at the Inc-11
+  close. Restricted to `tests/*.py` deliberately: a recursive grep also matches the 8 tracked `.pyc`
+  binaries carried above, which is the same inflation that made an Inc-8 gate figure read 10 for 4.
+  The figure that matters is not the count but the **0**, which no edit to the test tree changes.
 
   `_FUNC_ID_RE` (`tools/id_registry.py:95`) requires **digits immediately after `at`/`tc`**, so
   `at_b78_09` never parses; and because a non-conforming token is classified `governed=False`, **G3
@@ -62,10 +70,34 @@ CI only, its own PR).
   decision owed** — extending the regex reclassifies tokens repo-wide and could redden G1/G3/G5
   across 678 existing ids, so it is its own batch. It also qualifies `AT-B78-14`: for this namespace
   the registry never had anything to reconcile.
+- **▸ (P2) Eight `subprocess.run(..., text=True)` calls in the test tree decode with the HOST's
+  preferred encoding, not UTF-8.** `text=True` alone uses `locale.getpreferredencoding()` — **cp1252**
+  on this Windows host — so any non-cp1252 codepoint in the captured output raises
+  `UnicodeDecodeError` on a subprocess reader thread, `completed.stdout` becomes `None`, and the
+  calling guard dies with `AttributeError: 'NoneType' object has no attribute 'splitlines'` **instead
+  of reporting what it was built to report**. A guard that cannot fail loudly fails silently-adjacent:
+  the error names the wrong thing entirely.
+
+  **Observed live at batch-79 Inc-11.** Adding a CJK fixture string to `tests/test_tui_commandbar.py`
+  put byte `0x8f` into `git diff main -- s19_app/tui/app.py` and took
+  `test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff` down — a **binding-freeze guard**,
+  killed by prose in an unrelated module.
+
+  **Fixed at the one site that decodes source CONTENT** (`encoding="utf-8", errors="replace"`;
+  the guard greps for `Binding(`, pure ASCII, so `errors="replace"` cannot hide a real hit). The
+  remaining eight are lower risk because they emit paths, SHAs or `--stat` counts rather than file
+  content — `test_engine_unchanged.py` (`git diff --name-only`), `test_examples_smoke.py`
+  (`git ls-files`), `test_tui_legend.py` ×2 (`git rev-parse`, `git diff --stat`),
+  `test_tui_directionb.py` (generic `["git", *args]` — **risk depends on the caller**),
+  `test_a2l_f841_cleanup.py`, `test_flow_persistence.py`, `test_tui_workspace.py`. **Operator decision
+  owed:** sweep all eight, or leave them and accept that a non-ASCII path name or a new
+  content-producing caller re-arms it. *A narrow patch was taken deliberately; the general control is
+  what is being registered.*
 - **▸ (P2) `M-4` from the batch-79 merge gate — `_apply_unload` now clears `current_a2l_path`, a
   production behaviour change outside every in-scope requirement.** Landed as an F6 fix at Inc-7. It
-  reaches `save_project` (`app.py:6750`, `:6765`, `:7157`, `:7171`), the empty-state guards (`:5479`,
-  `:6717`) and `_project_stem` (`:5734`). Only its **display** effect is tested (`TC-B78-43`).
+  reaches `save_project`, the empty-state guards and `_project_stem` — all resolved **by name**, because
+  the line numbers first recorded here were already off by 3 in the commit that wrote them, shifted by
+  an insertion the same commit made. Only its **display** effect is tested (`TC-B78-43`).
   Concretely: unload the A2L, then save the project — the A2L is no longer copied into the workarea.
   That is arguably correct and is **untested either way**. Owed: one acceptance on the save path, or
   a descope to its own item. **Carried by operator ruling 2026-08-12** rather than fixed under time

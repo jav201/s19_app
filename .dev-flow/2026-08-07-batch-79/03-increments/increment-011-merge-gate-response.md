@@ -37,7 +37,7 @@ touched, per the operator's ruling.
 ### Mechanism
 
 Inc-7 (`a1ab35c`) gave the Loaded panel's new project row the **`loaded-detail`** marker — the same
-class the three artifact slots carry (`screens_directionb.py:2059`, `:2069`). Two shipped readers
+class the three artifact slots carry (set in `LoadedArtifactsPanel`'s slot-row builder). Two shipped readers
 select on it and index the result **positionally** as `[primary, mac, a2l]`:
 
 ```
@@ -263,10 +263,19 @@ pytest tests/test_unload_feature.py tests/test_help_toggle_and_a2l_panel.py
   -> 16 passed        (6 failed / 10 passed before the fix; 16 passed at base 829adc6)
 
 pytest tests/   [FULL SUITE — the operator's new gate, first ever run in this batch]
-  -> 29 failed, 2654 passed, 2 skipped, 3 xfailed in 2742s (45:42)
-     ALL 29 failures are `test_tc016s_density_layout_snapshot[*]` — Inc-12's
-     known, canonical-CI-only regen. ZERO other failures.
-     Collected total 2688 = 2686 + 2 (TC-B79-01, TC-B79-02). Ledger reconciles.
+  run 1 (H-1/H-2/H-4)      -> 29 failed, 2654 passed, 2 skipped, 3 xfailed  45:42
+  run 2 (M/L fixes)        -> 29 failed, 2655 passed, 2 skipped, 3 xfailed  35:02
+  run 3 (N-1..N-6)         -> 30 failed, 2655 passed  <- F-9, the binding guard
+  run 4 (F-9 fixed)        -> 29 failed, 2656 passed, 2 skipped, 3 xfailed  35:32
+
+  ALL 29 failures are `test_tc016s_density_layout_snapshot[*]` — Inc-12's
+  known, canonical-CI-only regen. ZERO other failures at run 4.
+  Collected total 2690. Ledger: 2686 -> 2688 (TC-B79-01/02) -> 2689 (TC-B79-03)
+  -> 2690 (TC-B79-04). Reconciles.
+
+  Run 3 is kept in this record deliberately. It is the only run that caught F-9,
+  and it is the second time in one session that the full suite found something
+  four targeted files could not.
 
 mutation harness -> 4 arms, 0 survived/errored  (9 for Inc-11 overall)
 
@@ -287,6 +296,115 @@ ruff check s19_app/tui/app.py s19_app/tui/screens_directionb.py \
 | `s19_app/tui/styles.tcss` | H-1 — `.loaded-project-detail` beside `.loaded-detail` |
 | `s19_app/tui/app.py` | H-2 — `_compose_context_line`, `_clip_to`, 3 constants |
 | `tests/test_tui_commandbar.py` | `AT-B78-09` arity clause · `TC-B79-01` · `TC-B79-02` · `TC-B78-12` per-surface presence |
+
+---
+
+## 7b · SECOND merge gate — BLOCK. The H-2 fix was incomplete on two axes.
+
+The re-gate verified **all 14 prior findings closed** and then blocked on the fix itself. Every
+finding below was reproduced here before being touched.
+
+### N-1 (HIGH) — the H-2 defect fully returned after a terminal resize
+
+`_compose_context_line` budgets from a width read **at write time**, and `on_resize` did not
+recompose. Executed:
+
+```
+(160,40) -> (80,24)   A2L present before: True   after: False
+(160,40) -> (120,30)  A2L present before: True   after: False
+```
+
+Byte-for-byte the H-2 symptom — the A2L absent on 10/10 screens at exactly the two sizes the first
+gate named — against `HLR-120`'s **unconditional** threshold. `TC-B79-01` could not see it: it
+composes once per fixed-size run. **Blind by scenario construction**, one axis over from the *"blind
+by fixture construction"* critique that node's own docstring levels at `AT-B78-08`.
+
+**The first fix for it did nothing, and that is the interesting part.** Calling
+`update_project_labels()` from `on_resize` changed no observable: instrumented, the handler fires and
+the deferred call runs, but reads
+
+```
+update_project_labels bar=156 ctx=91 app.size=80      <- terminal already 80, bar still 156
+```
+
+The bar's cached `size.width` is **stale mid-resize**; `App.size.width` is not. So the recompose
+budgeted for the size being *left*. The budget now derives from the terminal width minus
+`_CONTEXT_BAR_INSET` (measured 80→76, 120→116, 160→156), scheduled through `call_after_refresh`.
+
+### N-2 (MEDIUM-HIGH) — the bound was measured in code points, not columns
+
+**Self-caught before the gate reported it**, then confirmed by it. `_clip_to`'s docstring said
+*"columns"*; it measured `len()`. A 42-character CJK project composed to **55 code points and 101
+columns against an 81-column budget** — a legal Windows directory name restoring the eviction. Now
+`rich.cells.cell_len` / `set_cell_size`, which also handles a cap landing mid-glyph.
+
+### N-3 (MEDIUM) — the fix's actual design had no assertion
+
+Two arms against `TC-B79-01`, both **GREEN**: the A2L starved to a fixed 10 columns, and both slack
+branches deleted. So *fair share* and *slack redistribution* — the two properties that are the only
+reason the method is more than a `min()` — were unasserted; the node detected **total eviction** and
+nothing else. **`F-5`'s shape reproduced inside the fix written to close `F-5`.**
+
+`TC-B79-04` pins all three axes: apportionment (a half that fits is never truncated; an overflowing
+half gets strictly more than an even split), resize (through a real `pilot.resize_terminal`), and
+columns (a CJK fixture). Both previously-GREEN arms now go RED on it.
+
+### N-4 / N-5 / N-6 — the prose fixes carried their own defects
+
+- **N-4** — the commit that fixed M-2's stale comments **added a new false one**: two stacked blocks
+  on `#status_context`, the first claiming `width: 1fr`, the rule setting `width: auto`. Merged.
+- **N-5** — the line-citation fix landed in `styles.tcss` **only**, and the same commit created four
+  new stale citations by inserting lines above them. The sharpest: **`AT-B78-32`'s docstring — the
+  node re-authored specifically to argue a line range "looks like a measurement" and is "one
+  insertion away from failing the same silent way" — was itself citing `screens_directionb.py:6712`
+  for a comment that this branch had pushed to `:6822`.** All replaced with symbol names and
+  descriptions.
+- **N-6** — F-6's carried node count said `106`, and the commit that wrote it added the 107th. Now
+  stated with its **pattern and commit**, and narrowed to `tests/*.py` because a recursive grep also
+  matches the 8 tracked `.pyc` binaries — the same inflation that made an Inc-8 figure read 10 for 4.
+
+### N-7 (LOW) — degenerate widths, carried
+
+Below `bar_width <= 7` the composer returns the bare separator, and at `avail == 1` it returns
+`"  |  …"`, evicting the project. Unreachable at supported sizes; recorded rather than fixed.
+
+### F-9 — a binding-freeze guard was killed by prose in another module, and reported the wrong error
+
+The full suite after the N-fixes returned **30** failures, not the expected 29. The extra:
+`test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff`, dying with
+
+```
+AttributeError: 'NoneType' object has no attribute 'splitlines'
+```
+
+Cause: it runs `git diff main -- s19_app/tui/app.py` with `subprocess.run(..., text=True)` and **no
+`encoding`**, so Python decodes with `locale.getpreferredencoding()` — **cp1252** here. The CJK
+fixture added to `TC-B79-04` in a *different* module put byte `0x8f` in the diff, the reader thread
+raised `UnicodeDecodeError`, `stdout` came back `None`, and the guard crashed.
+
+Three things worth keeping:
+
+1. **The blast radius crossed modules through `git`.** A string literal in one test file disabled a
+   freeze guard over a different file. Nothing about the two is coupled in the source.
+2. **The guard failed in the worst available way** — not RED on its own assertion, and not silently
+   green, but with an `AttributeError` naming `splitlines`. Anyone reading that sees a broken test,
+   not "the binding census did not run".
+3. **Only the full suite could catch it.** The targeted runs used at every earlier increment of this
+   batch never touch `test_tui_patch_history_strip.py`. This is `F-4` collecting a second scalp
+   inside the same session that recorded it.
+
+Fixed at the one call that decodes source content; the other **eight** siblings are enumerated and
+carried (they emit paths, SHAs or `--stat` counts). A narrow patch taken deliberately, with the
+general control registered rather than pretended.
+
+### F-8 — the lesson that outranks all of them
+
+**Three separate fixes in this session each carried a defect of the same class they were fixing.**
+The vacuous-input-set guard used a vacuous input set (F-2). The line-citation fix created four new
+stale citations (N-5). The bound written to stop one half evicting the other had no assertion on how
+it apportions (N-3). *A fix is a change, and a change made under the pressure of a blocked gate is
+where this project's dominant defect class reproduces most reliably.* The counterfactual is not
+optional on a fix — it is the only thing that caught N-3.
 
 ---
 

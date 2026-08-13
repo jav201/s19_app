@@ -150,7 +150,8 @@ not the head, because a mutation in the head passes for the wrong reason.
 | Base `829adc6` | **2653** |
 | Inc-11 entry | **2683** |
 | After `AT-B78-12/13/14` | **2686** |
-| After the merge-gate response | **2689** |
+| After the merge-gate response | 2689 |
+| **Current** (after the SECOND gate's N-1…N-6) | **2690** |
 
 **Stated measurement pattern** — *an unstated pattern is an unstated definition*: the total
 reported by `python -m pytest tests/ --collect-only -q`, run from the repo root.

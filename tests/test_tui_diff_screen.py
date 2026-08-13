@@ -3806,8 +3806,15 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
     It is not drift: at ``f6ff1d3`` the block was ALREADY 1338-1392 and batch-78
     added zero ``Binding(`` lines. The range was wrong when it was written and
     survived three Phase-2 rounds -- because a line range looks like a
-    measurement. ``screens_directionb.py:6712`` carries the CORRECT extent in a
-    code comment, so the two artifacts disagreed and the code was right.
+    measurement. A code comment in ``screens_directionb.py`` carried the CORRECT
+    extent, so the two artifacts disagreed and the code was right.
+
+    ⚠️ batch-79 Inc-11: that sentence used to cite ``screens_directionb.py:6712``
+    -- and by the end of this batch the comment had moved to ``:6822``, because
+    the branch inserted 110 lines above it. **The docstring arguing that a line
+    range "looks like a measurement" was itself carrying a stale line number.**
+    The citation is by FILE and DESCRIPTION now; a symbol reference that cannot
+    go stale is the whole point of the node below.
 
     A corrected range would not fix this. Any edit ABOVE the block shifts it, so
     ``1338-1392`` is one insertion away from failing the same silent way. This

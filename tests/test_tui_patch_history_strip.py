@@ -677,6 +677,22 @@ def test_tc081_4_no_binding_diff() -> None:
             cwd=_repo_root(),
             capture_output=True,
             text=True,
+            # batch-79 Inc-11: `encoding` is EXPLICIT, and it is a real defect
+            # fix rather than tidiness. `text=True` alone decodes with
+            # `locale.getpreferredencoding()` -- **cp1252** on this Windows
+            # host -- so any non-cp1252 codepoint anywhere in the diff of
+            # `app.py` raises `UnicodeDecodeError` on a subprocess reader
+            # thread, `completed.stdout` comes back `None`, and this guard dies
+            # with `AttributeError: 'NoneType' object has no attribute
+            # 'splitlines'` instead of reporting a binding change.
+            #
+            # Observed exactly that way: adding a CJK string to another test
+            # module put byte 0x8f in the diff and took this node down. The
+            # guard greps for `Binding(`, which is pure ASCII, so
+            # `errors="replace"` cannot hide a real hit -- it only stops
+            # unrelated prose from silencing the guard.
+            encoding="utf-8",
+            errors="replace",
             check=True,
         )
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
