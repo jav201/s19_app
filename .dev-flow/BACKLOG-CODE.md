@@ -39,6 +39,39 @@ boundary. batch-79 status **as of 2026-08-12**: Inc-6…Inc-11 shipped **includi
 acceptances and the merge-gate response**; **Inc-12 owed** (the 29-golden snapshot regen, canonical
 CI only, its own PR).
 
+- **▸ 🛑 (P1 — BATCH-82 CHARTER) Author the Information Flow Contract for s19's surfaces — the FULL retrofit. LANE A HALF.**
+  ⚠️ **Cross-lane item, split per Amendment A.** The **control** (`C-54`: the global flow, template,
+  validator rules, propagation) is the Lane B half in
+  [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md). **Neither half is complete alone.** Design:
+  [`design/C-54-information-flow-contract.md`](design/C-54-information-flow-contract.md).
+
+  **Operator ruling 2026-08-13 — the FULL retrofit, overruling the design's own proposal**, and the
+  reason changes what the work IS:
+
+  > *"Aunque me duela, si tenemos que hacer el retrofit… parece que hay mucho potencial para
+  > requerimientos ambiguos y comportamientos perfilados a medias."*
+
+  **The deliverable is the FINDINGS, not the file.** Authoring an `address` and a `consumers` list for
+  a surface that has never declared one forces the question *"who depends on this, and how do they
+  reach it?"* onto ~40 surfaces that have never been asked it. `LLR-120.2` is one instance of that
+  question going unasked — found by accident, at the cost of a production regression and eight merge
+  gates. **This retrofit is the systematic version of the same search**, and every ambiguity it
+  surfaces is the point rather than a side effect.
+
+  **Scope:** 10 screens (`SCREEN_CONTAINER_IDS`) + their panels/views. Part A (flow) for all; Part B
+  (boundary decomposition) wherever a consumer addresses a component independently — which, in a TUI
+  selected by `query()`, is nearly everywhere.
+
+  **Staged so it cannot block the queue:** the control ships enforcing **NEW and MODIFIED surfaces
+  only** (`V13` as NOTICE). Existing surfaces stay NOTICE until their screen's stage lands, then
+  BLOCK. A large retrofit must not gate unrelated batches — that failure mode is why the design
+  originally proposed skipping it.
+
+  **Expected yield, stated as a prediction so it can be wrong:** ≥1 further address-vs-value
+  ambiguity of the `LLR-120.2` shape, and ≥1 surface whose declared behaviour has no owning
+  requirement. **If the retrofit finds neither, the control is over-priced and that finding is worth
+  recording too.**
+
 - **▸ (P1) The AT/TC registry is BLIND to all 106 batch-78/79 acceptance nodes — the id namespace sits
   outside the project's own grammar.** Found at Inc-11 when two new `TC-B79-*` nodes did **not** trip
   **G1** (*"an id on a test node that nobody registered"*). Executed, not inferred:

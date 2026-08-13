@@ -240,22 +240,66 @@ cannot go red is a vacuous check with CI authority.
 
 ---
 
-## 8 · Open decisions, owed before implementation
+## 8 · Decisions — RESOLVED 2026-08-13
 
-1. **File format.** Operator chose *machine-readable registry + validator*. Proposal:
-   `IFC.jsonl` at the repo root, matching `AT-TC-REGISTRY.jsonl`'s house idiom, which the validator
-   already knows how to read. **Not yet confirmed.**
-2. **Retrofit scope.** s19 has 10 screens and ~40 panels. Authoring all of them is its own batch.
-   Proposal: **new and modified surfaces only**, with existing ones carried — otherwise this control
-   blocks every batch until a large retrofit lands.
-3. **`C-55` candidate, registered NOT encoded** (operator chose C-54 alone): *a threshold whose oracle
-   NORMALISES something — set equality discards order, containment discards arity, concatenation
-   discards structure — must state explicitly that the failure mode does not live in what was
-   discarded.* This is the sharper half of the batch-79 finding and is currently unowned.
-4. **Propagation obligation (C-45).** The flow is a shared, versioned asset: implementing this means
-   editing `~/.claude/commands/`, bumping `docs/FLOW-VERSION.md` (version + `flow_hash` + control
-   count), pushing to `jav201/claude-config`, and recording a before/after in the batch artifacts —
-   the global command is outside this repo and is not covered by its PR flow.
+### D-1 · File format → `IFC.jsonl` at the repo root
+
+One JSON object per line, matching `AT-TC-REGISTRY.jsonl`'s house idiom, which the validator already
+reads. **Nesting is expressed by REFERENCE, never by embedding** — each record carries a `parent`
+field rather than containing its children.
+
+```
+{"kind":"component","id":"loaded_panel","parent":"screen_workspace","inputs":[…],"outputs":[…]}
+{"kind":"flow","id":"project_row","source":"…","nodes":[{"fn":"…","owner":"LLR-120.5"}],"sink":"…"}
+```
+
+**Why flat over nested:** a nested tree produces whole-subtree diffs on a one-field change, and the
+`⊆` check needs to resolve parents by id anyway. Flat records diff per component and let the
+validator build the tree itself.
+
+### D-2 · Retrofit scope → **FULL retrofit**, operator ruling, and the framing changes
+
+The design proposed new-and-modified surfaces only. **The operator overruled it and the reason
+reframes the work:**
+
+> *"Aunque me duela, si tenemos que hacer el retrofit… parece que hay mucho potencial para
+> requerimientos ambiguos y comportamientos perfilados a medias."*
+
+**So the retrofit's deliverable is not the file — it is the findings.** Authoring an `address` and a
+`consumers` list for a surface that has never declared one forces the question *"who depends on this,
+and how do they reach it?"* on ~40 surfaces that have never been asked. `LLR-120.2` is one instance
+found by accident, at the cost of a production regression. The retrofit is the systematic version of
+that same search.
+
+**Staged so it cannot block the queue:** the control ships enforcing only NEW and MODIFIED surfaces
+(`V13` as NOTICE), and the retrofit lands per-screen behind it. Existing surfaces are `NOTICE` until
+their screen's stage completes, then `BLOCK`. **A big retrofit does not gate unrelated work.**
+
+### D-3 · `C-55` → registered, NOT encoded — the operator's earlier ruling stands
+
+Asked at the control-encode gate, the operator chose **C-54 alone**. That choice is honoured here
+rather than quietly widened. `C-55` — *a threshold whose oracle NORMALISES something (set equality
+discards order, containment discards arity, concatenation discards structure) must state explicitly
+that the failure mode does not live in what it discarded* — stays a registered candidate in
+`BACKLOG-PROCESS.md`.
+
+**Re-litigate it after the retrofit**, which is the single best evidence generator this project will
+have for it: every normalising threshold it surfaces is a data point.
+
+### D-4 · C-45 propagation → in scope, with its own before/after record
+
+The flow is a shared, versioned asset. batch-82 owes, as declared steps:
+
+1. edit `~/.claude/commands/dev-flow.md` + `fast-dev-flow.md`;
+2. add `~/.claude/templates/dev-flow/ifc-template.md`;
+3. add rules `V10`–`V14` to `~/.claude/docs/tools/devflow-validate.py`, **each demonstrating RED in
+   `--selftest`**;
+4. bump `~/.claude/docs/FLOW-VERSION.md` — version, `flow_hash`, control count `C-10…C-54`;
+5. **push to `jav201/claude-config`** and verify the mirror;
+6. **record before/after in the batch artifacts** — the global command lives OUTSIDE this repo and is
+   not covered by its PR flow, so the repo's PR is not evidence that the flow leg landed.
+
+⚠️ Step 6 is the one that gets skipped. `BACKLOG-PROCESS.md`'s own header warns about exactly this.
 
 ---
 

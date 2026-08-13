@@ -6,6 +6,57 @@
 
 > **Last refresh: 2026-08-01 (batch-77 Phase-3 handoff — a CODE-lane batch routing one Lane-B carry here).** `origin/main` tip = **`f8747b8`**. batch-77's own work is reconciled in [`BACKLOG-CODE.md`](BACKLOG-CODE.md); **one item belongs to this lane and is WRITTEN here rather than left as a pointer**, per the routing rule. See the new section immediately below.
 
+## 🆕 BATCH-82 CHARTER (2026-08-13) — `C-54`, the Information Flow Contract · LANE B HALF
+
+> **Cross-lane item, split per Amendment A.** This entry owns the **control**: the global flow, the
+> template, the validator rules and the propagation. The **s19 retrofit** is the Lane A half and lives
+> in [`BACKLOG-CODE.md`](BACKLOG-CODE.md). Neither half is complete alone.
+>
+> **Batch number verified** against disk, `git ls-remote --heads origin`, and both backlogs: **80** is
+> `C-77-l` (aggregation) and **81** is Lane 3 (operations), both chartered; **82 is free**. This
+> project has had two numbering collisions — the check is not ceremonial.
+
+- **▸ (P1, CHARTERED) `C-54` — encode the Information Flow Contract into `/dev-flow` + `/fast-dev-flow`.**
+  Full design, resolved decisions and worked examples: [`design/C-54-information-flow-contract.md`](design/C-54-information-flow-contract.md).
+
+  **What it is.** *A structure for modeling the input and output of information to a system* — operator
+  framing, 2026-08-13, which replaced a UI-scoped first draft. **UI/UX is one instance**; data
+  acquisition and sensor arrays are others. The generalisation is what keeps the global flow
+  project-agnostic **by construction** rather than by discipline.
+
+  **Two structures, each terminating in its own HLRs/LLRs:**
+  - **Part A — Flow.** ALWAYS owed. Sources → transforms → sinks, **every node bound to a requirement**.
+    A node with no owner is unowned work; a requirement claiming a transform with no node is
+    unimplemented. Neither is checkable today.
+  - **Part B — Boundary decomposition.** CONDITIONAL on one agnostic trigger: *does the system's
+    boundary have components a consumer can address independently?* Declares `INPUTS ⊆ parent`,
+    `OUTPUTS ⊆ parent`, and per output: **`address`**, `cardinality`, **`consumers`**, `owner`.
+
+  **The two fields the flow has never had are `address` and `consumers`**, and they are what
+  `LLR-120.2` needed: changing an address is a breaking change *even when the value is unchanged*, and
+  naming consumers turns `shall not alter X` from unverifiable prose into a mechanical question.
+
+  **Origin, measured.** `LLR-120.2` said *"shall not alter the existing three artifact slots"* with the
+  threshold *"the three slot rows' text unchanged (set equality)"*. The implementation left every text
+  identical and broke **six shipped tests** — the failure was in the ADDRESS, and **set equality is
+  precisely the operation that discards order**. Not a vacuous check: a *misaddressed observable*.
+
+  **Scope (D-1…D-4 resolved in the design doc):** `IFC.jsonl` at the repo root, flat records with
+  parent-by-reference · validator rules `V10`–`V14`, **each demonstrating RED in `--selftest`** ·
+  `C-55` stays registered-not-encoded per the operator's earlier control-encode ruling · and the
+  **C-45 propagation leg with its own before/after record**, because the global command is outside
+  this repo and the project PR is not evidence that it landed.
+
+  ⚠️ **The flow is versioned.** Implementing this bumps `FLOW-VERSION.md` (version + `flow_hash` +
+  control count to `C-10…C-54`) and must be pushed to `jav201/claude-config`.
+
+- **▸ (P2) `C-55` candidate — registered, NOT encoded** (operator chose C-54 alone at the
+  control-encode gate; that ruling stands rather than being quietly widened).
+  *A threshold whose oracle NORMALISES something — set equality discards order, containment discards
+  arity, concatenation discards structure — must state explicitly that the failure mode does not live
+  in what it discarded.* This is the sharper half of the batch-79 finding. **Re-litigate after the
+  retrofit**, which is the best evidence generator the project will have for it.
+
 ## 🆕 Routed from batch-79 (2026-08-13) — the fix that reproduces its own defect class, and the anchor that cannot go stale
 
   - **▸ (P1, NEW) `F-8` — a FIX is where this project's dominant defect class reproduces most reliably, and no test can catch it. THIRTEEN instances in one session, across seven independent merge-gate passes.** Registered, **not encoded** (control-encode rule above).
