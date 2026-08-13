@@ -279,12 +279,22 @@ pytest tests/   [FULL SUITE — the operator's new gate, first ever run in this 
 
 mutation harness -> 4 arms, 0 survived/errored  (9 for Inc-11 overall)
 
-ruff check s19_app/tui/app.py s19_app/tui/screens_directionb.py \
-           tests/test_tui_commandbar.py tests/test_tui_directionb.py
-  -> 1 error: F821 `Dict` at app.py:5814 — PRE-EXISTING, present identically at
-     829adc6. Stated precisely because the HANDOFF's "ruff clean on every file
-     this batch touched" overstated it, as the merge gate noted.
+ruff check s19_app tests --output-format=concise     [REPO-WIDE, both trees]
+  at 829adc6 (base) -> 7 errors
+  at HEAD           -> 7 errors
+  IDENTICAL: same rules, same files, same order.
+    1x F821 `Dict`  (app.py — the line number moves with the batch's edits)
+    4x F401         (tests/test_flow_crc_ribbon.py, tests/test_flow_crc_ui.py)
+    2x E741         (tests/test_flow_crc_ui.py)
+  ZERO ruff regressions from this batch.
 ```
+
+⚠️ **The repo-wide figure is stated because every earlier claim in this batch was scoped to the
+files it touched.** "Ruff clean apart from the pre-existing `F821`" was true of those files and
+invited the reading that the repo has one ruff error; it has **seven**. The merge gate had already
+flagged the HANDOFF's *"ruff clean on every file this batch touched"* as an overstatement, and this
+is the same imprecision one layer out — a figure is only as honest as the corpus it names. Measured
+against a `git worktree` of the base rather than inferred.
 
 ---
 
