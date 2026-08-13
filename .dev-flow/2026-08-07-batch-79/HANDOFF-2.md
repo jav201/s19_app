@@ -1,7 +1,42 @@
-# batch-79 — HANDOFF #2, at the seventh-gate boundary
+# batch-79 — HANDOFF #2, at the eighth-gate boundary
 
-**Date:** 2026-08-13 · **Branch:** `claude/batch-79-cmdbar-deletion` (pushed through `b7cb966`)
+**Date:** 2026-08-13 · **Branch:** `claude/batch-79-cmdbar-deletion` (pushed through `9a4b422`)
 **Base:** `origin/main` @ **`829adc6`** · **Supersedes:** `HANDOFF.md` (written at the Inc-11 boundary, still accurate for Inc-6…Inc-10)
+
+> **This file is kept CURRENT rather than superseded by a third handoff** — one terminal artifact,
+> not three. Everything below is accurate as of `9a4b422`; the delta since the seventh gate is here.
+
+---
+
+## −1 · DELTA since the seventh gate — read this first
+
+| | |
+|---|---|
+| HEAD | **`9a4b422`** (was `b7cb966`) · working tree **clean** |
+| `f370669` | seventh-gate response: N-2 (a fifth copy of the wrong figure, split across a line break so a line-oriented sweep missed it), N-3 (`TC-B79-05`'s resolver admitted 783 names against 276 real), plus instances #10–#13 of `F-8` |
+| `9a4b422` | ⚠️ **OPERATOR AMENDED THE MERGE PRECONDITION** — see below |
+| Suite | **29 failed · 2657 passed · 2 skipped · 3 xfailed** on a quiet tree. Ledger **2691** |
+| **EIGHTH GATE** | **LAUNCHED against `9a4b422`, verdict NOT YET RECEIVED when this was written.** Check it before doing anything else |
+
+### ⚠️ The blocking criterion changed — this is the single most important thing to know
+
+The precondition is **kept**; its **blocking criterion is narrowed** (operator ruling 2026-08-13,
+recorded in `state.json.standing_authorization.merge_precondition_AMENDED_2026_08_13` and in
+`9a4b422`'s message):
+
+- **BLOCKS on:** a defect in **runtime behaviour**, or a **vacuous assertion** (a predicate that
+  cannot fail).
+- **DOES NOT BLOCK on:** prose, comments, docstrings, figures, citations, counts, records. Those are
+  **registered as carries**.
+
+**Rationale, measured:** gates 1–2 found defects in shipped code; gate 7 found a guard accepting
+exactly what it existed to reject (a vacuous assertion — *that one would still block today*). Gates
+3–7 found **zero** runtime defects and a false statement in the record every time. The loop is
+mechanical: every fix adds prose, every prose addition is new surface the next gate reads.
+
+**If the eighth gate returns PASS → merge** under the standing authorization. **If it blocks on a
+type (a) or (b) finding → fix it.** If it blocks on prose, the ruling says that is a carry, not a
+blocker — say so plainly rather than starting a ninth round.
 
 ---
 
