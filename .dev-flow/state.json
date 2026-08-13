@@ -33,7 +33,7 @@
     "merge_precondition_AMENDED_2026_08_13": "OPERATOR RULING, eighth gate: the precondition is KEPT but its BLOCKING CRITERION is narrowed. The gate blocks ONLY on (a) a defect in runtime behaviour, or (b) a vacuous assertion - a predicate that cannot fail. Findings in prose, figures, citations and records are REGISTERED AS CARRIES and do not block. RATIONALE, measured across seven passes: passes 1-2 found defects in shipped code (a production regression breaking 6 tests in two files the batch never ran; a fix that reintroduced its own defect on resize) and pass 7 found a guard that accepted exactly what it existed to reject - none of which the 2657 passing tests could see. Passes 3-7 found ZERO runtime defects and a false statement in the record every time. The loop is mechanical: each fix adds prose, each prose is new surface, the next pass reads it. Instances 10-13 of F-8 are all inside the node written to CLOSE the class, and two of them are literally 'documenting the defect created the defect'. With documentation inside the reviewed corpus, 'clean' is not reachable by editing carefully. The narrowed criterion preserves what the gate demonstrably buys and cuts the loop."
   },
   "current_phase": 3,
-  "phase_status": "in-progress - Inc-6..Inc-11 COMPLETE (acceptances included); Inc-12 OWED and canonical-CI-only",
+  "phase_status": "MERGED - Inc-6..Inc-12 COMPLETE. PR #192 squashed to f198447 on origin/main.",
   "iterations_per_phase": {
     "0": 0,
     "1": 0,
@@ -123,6 +123,12 @@
       "date": "2026-08-13",
       "decision": "GATE 8 RETURNED PASS - the merge precondition is SATISFIED for the first time in eight passes",
       "notes": "Under the operator's own narrowed criterion. 17 mutations of shipped code, 16 killed; no runtime defect and no vacuous assertion. Merging under the standing authorization granted 2026-08-11."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-13",
+      "decision": "MERGED - PR #192 squashed to f198447",
+      "notes": "Gate 8 PASS + CI green on both jobs + operator's Inc-12-first ruling followed. Vault sync is still OWED (obsidian_synced remains false)."
     }
   ],
   "merge_gate_2026_08_12": {
@@ -166,7 +172,7 @@
   "created_at": "2026-08-07",
   "progress": {
     "phase0": "COMPLETE - premise evaluation executed, 1 FALSE premise found and dispositioned.",
-    "phase3": "Inc-6..Inc-11 COMPLETE including HLR-121's three acceptances. Inc-12 (snapshot regen) OWED and canonical-CI-only - its own PR, out of this session's scope by operator ruling 2026-08-11.",
+    "phase3": "COMPLETE. Inc-6..Inc-11 shipped with HLR-121's three acceptances; Inc-12 regenerated the 29 snapshot baselines in the canonical environment (ubuntu-24.04 / py3.11 / textual 8.2.8, run 31746150346). CI green on both jobs: snapshot pass 1m45s, tui-ci pass 47m28s.",
     "increment_record_gap": "MISSING ON DISK: increment-008.md, increment-009.md, increment-010.md. Only 006, 007, 007-entry-gate, 010-entry-gate and 011 exist. The COMMITS exist and carry detailed messages, but the flow's per-increment artifact was never written for those three. DELIBERATELY NOT reconstructed at Inc-11 - writing them from commit messages would manufacture evidence of observations nobody made. Operator decision owed."
   },
   "ledger": {
@@ -193,5 +199,16 @@
     "figures": "ruff 7 = 7 at base and HEAD. The 9 modules this batch touches: 340 passed, 0 failed. TC-B79-01..05: 5 passed. Notice path exactly 7 screens 1 line each. Owning set {workspace, a2l, mac}. Status bar 7 rows on 10 screens x 3 sizes. 38 new/changed test nodes.",
     "not_verified_by_the_gate": "The full-suite figure (its run was still in flight) and the two mid-review .dev-flow commits. The suite figure IS verified by the orchestrator at 29 failed / 2657 passed on a quiet tree, and the code trees are proven identical.",
     "non_blocking_carries": "8 observations registered in BACKLOG-CODE.md. The substantive one: #status_text silently drops most of a routine load message at 80x24 - NOT an information loss, because the same string reaches the log tail and the gate verified it renders in full there. Plus: the stylesheet's ellipsis mechanism does not actually fire on text with spaces; AT-B78-28 clause 1 asserts against the renderable rather than the painted strip; and three record defects inside TC-B79-05 itself."
+  },
+  "merge_record": {
+    "pr": 192,
+    "squash": "f198447",
+    "base": "829adc6",
+    "merged_at": "2026-08-13",
+    "precondition": "SATISFIED - the eighth independent qa-reviewer pass returned PASS under the operator's narrowed criterion. Seven prior passes returned BLOCK and none was manufactured.",
+    "ci": "snapshot pass 1m45s, tui-ci pass 47m28s. The snapshot job passing is the oracle Inc-12's own commit said it could not supply for itself - local rendering diverges from the canonical env, which is why the regen is CI-only.",
+    "operator_ruling": "Inc-12 FIRST, then merge #192 (2026-08-13). Followed.",
+    "what_shipped": "HLR-118 deletes #command_bar_row + its six ids + the CSS span; HLR-119 re-homes / and g onto each screen's own inputs; HLR-120 puts project and A2L on #status_context and the Loaded panel's project row; HLR-121 deletes the seven CommandBar symbols (class-qualified AST census 7 -> 0); HLR-126 adds the run-list affordance; Inc-12 regenerates the 29 goldens.",
+    "ledger": "2683 -> 2691, reconciled step by step. Final suite: 2691 collected, 0 unexplained failures after the regen."
   }
 }
