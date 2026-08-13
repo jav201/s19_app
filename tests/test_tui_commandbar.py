@@ -2996,10 +2996,30 @@ _B79_ANCHOR_CORPUS = (
 #: `RAIL_ITEMS` is the one this batch INVENTED: it is cited now only as the
 #: counter-example in the record of that mistake, so a tree where it resolves
 #: would mean someone created it to satisfy the prose. That is worth failing on.
+#: ⚠️ **Every member must be CITED in the corpus, and the test asserts it.** The
+#: first version listed six, of which three appeared nowhere in the corpus —
+#: dead entries in a hand-maintained list, so deleting one changed nothing and
+#: the counterfactual that did so came back GREEN. That is the
+#: `_B78_NON_WRITING_CALLS` vacuous-input-set shape a third time: *an exclusion
+#: whose subject does not exist is not an exclusion, it is decoration.*
+#:
+#: ⚠️⚠️ The correction then carried its own defect, and it is worth more than the
+#: correction. The comment naming the three dead entries **cited one of them in
+#: backticks** — which made it cited, so dropping it from this set immediately
+#: reddened the "must resolve" clause. *Writing down that a symbol is not
+#: referenced is itself a reference.* The set is therefore derived from what the
+#: corpus cites in negative context, not from what a reader assumes it cites;
+#: the two symbols named above only without a class prefix are correctly absent.
+#: ⚠️⚠️⚠️ It OSCILLATED before settling, and that is the durable lesson. Listing
+#: a symbol here requires the corpus to cite it — and for one revision the
+#: comment above was that symbol's ONLY citation. Adding the entry made it
+#: valid; rewording the comment made it dead. **The input set was coupled to the
+#: prose describing it, in the same file.** *A hand-maintained list that its own
+#: documentation can feed is not stable.* The set below is exactly what the
+#: corpus cites in negative context, and this comment deliberately carries no
+#: backticked class-qualified names of its own.
 _B79_ANCHORS_MUST_NOT_RESOLVE = frozenset(
-    {"CommandBar.Find", "CommandBar.Goto", "CommandBar.focus_find",
-     "CommandBar.focus_goto", "CommandBar.set_context_labels",
-     "S19TuiApp.RAIL_ITEMS"}
+    {"CommandBar.Find", "CommandBar.focus_find", "S19TuiApp.RAIL_ITEMS"}
 )
 
 _B79_ANCHOR_RE = re.compile(r"`(S19TuiApp|CommandBar)\.([A-Za-z_][A-Za-z0-9_]*)`")
@@ -3031,26 +3051,54 @@ def test_tc_b79_05_every_cited_symbol_anchor_resolves(tmp_path: Path) -> None:
     # class attributes UNION methods UNION every `self.X` assignment target in
     # the class body.
     def _members(path: Path, cls_name: str) -> set[str]:
+        """Class-body members UNION ``self.X`` attribute targets. Nothing else.
+
+        ⚠️ The first version also added every ``ast.Name`` in ``Store`` context
+        found anywhere under the class -- which is **every local variable in
+        every method**. Measured on ``S19TuiApp``: 276 real members against
+        **783** admitted, leaking `path`, `result`, `line`, `value`, `raw`,
+        `parts`, `count`. An anchor naming any one of those locals -- a wrong
+        symbol of exactly the kind this node exists to catch -- passed. The
+        seventh merge gate found it, and the inline comment describing the
+        resolver had been accurate about the intent and wrong about the code.
+
+        ⚠️ This paragraph originally gave that example as a backticked
+        class-qualified name. **The tightened resolver immediately failed on
+        it** -- the example became a citation, and the local it named does not
+        resolve. That is the second time in this file that documenting a symbol
+        made it a subject of the very check being documented. The rule is
+        already written on the exclusion set above and it applies here too:
+        *explanatory prose inside the corpus must carry no backticked
+        class-qualified names of its own.*
+        """
         tree = ast.parse(path.read_text(encoding="utf-8"))
         out: set[str] = set()
         for node in ast.walk(tree):
-            if isinstance(node, ast.ClassDef) and node.name == cls_name:
-                for sub in ast.walk(node):
-                    if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                        out.add(sub.name)
-                    elif isinstance(sub, ast.ClassDef) and sub is not node:
-                        out.add(sub.name)
-                    elif isinstance(sub, ast.Attribute) and isinstance(
-                        sub.ctx, (ast.Store, ast.Load)
-                    ):
-                        if isinstance(sub.value, ast.Name) and sub.value.id == "self":
-                            out.add(sub.attr)
-                    elif isinstance(sub, ast.Name) and isinstance(sub.ctx, ast.Store):
-                        out.add(sub.id)
-                    elif isinstance(sub, ast.AnnAssign) and isinstance(
-                        sub.target, ast.Name
-                    ):
-                        out.add(sub.target.id)
+            if not (isinstance(node, ast.ClassDef) and node.name == cls_name):
+                continue
+            # Direct class-body members only: methods, nested classes, and
+            # class-level assignments.
+            for child in node.body:
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                    out.add(child.name)
+                elif isinstance(child, ast.Assign):
+                    for tgt in child.targets:
+                        if isinstance(tgt, ast.Name):
+                            out.add(tgt.id)
+                elif isinstance(child, ast.AnnAssign) and isinstance(
+                    child.target, ast.Name
+                ):
+                    out.add(child.target.id)
+            # Instance attributes: `self.X` anywhere inside the class. Cited
+            # attributes like `_validation_issues` and `log_lines` live only
+            # here, which is why a class-level `hasattr` was insufficient.
+            for sub in ast.walk(node):
+                if (
+                    isinstance(sub, ast.Attribute)
+                    and isinstance(sub.value, ast.Name)
+                    and sub.value.id == "self"
+                ):
+                    out.add(sub.attr)
         return out
 
     tables = {
@@ -3085,12 +3133,24 @@ def test_tc_b79_05_every_cited_symbol_anchor_resolves(tmp_path: Path) -> None:
         f"fails visibly -- which is why anchoring by symbol must be EXECUTED."
     )
 
+    # Every exclusion must have a SUBJECT. An entry naming a symbol the corpus
+    # never cites is never scanned, so removing it changes nothing -- the
+    # exclusion list would grow stale silently, which is exactly how a
+    # hand-maintained input set goes vacuous. Asserted BEFORE the clause that
+    # consumes it.
+    uncited = sorted(n for n in _B79_ANCHORS_MUST_NOT_RESOLVE if n not in resolved)
+    assert not uncited, (
+        f"these must-not-resolve entries are not cited anywhere in the corpus, "
+        f"so they exclude nothing: {uncited}. Drop them, or add the citation "
+        f"they were written for."
+    )
+
     # The negative half: the HLR-121 deletions must stay deleted.
     resurrected = sorted(
         name for name in _B79_ANCHORS_MUST_NOT_RESOLVE
         if resolved.get(name) is True
     )
     assert not resurrected, (
-        f"these symbols are cited as DELETED by HLR-121 but resolve: "
-        f"{resurrected}"
+        f"these symbols are cited as GONE (deleted by HLR-121, or never "
+        f"existent) but resolve: {resurrected}"
     )

@@ -8,7 +8,17 @@
 
 ## 🆕 Routed from batch-79 (2026-08-13) — the fix that reproduces its own defect class, and the anchor that cannot go stale
 
-  - **▸ (P1, NEW) `F-8` — a FIX is where this project's dominant defect class reproduces most reliably, and no test can catch it. EIGHT instances in one session, across five independent merge-gate passes.** Registered, **not encoded** (control-encode rule above).
+  - **▸ (P1, NEW) `F-8` — a FIX is where this project's dominant defect class reproduces most reliably, and no test can catch it. THIRTEEN instances in one session, across seven independent merge-gate passes.** Registered, **not encoded** (control-encode rule above).
+
+    ⚠️ **Four of the thirteen (10–13) are inside the single test node written to CLOSE this class.**
+    `TC-B79-05` guards that a cited symbol anchor resolves. Its exclusion set had three entries naming
+    symbols the corpus never cites; the comment correcting that **cited one of them**, making the set
+    oscillate; its resolver walked into method bodies and admitted **every local variable** (783 names
+    against 276 real), so an anchor naming a local passed the guard built to reject exactly that; and
+    the docstring explaining *that* defect gave its example as a backticked class-qualified name,
+    which the tightened resolver then failed on. **A control can reproduce the class it encodes, more
+    than once, while passing.** #11 and #13 share one mechanism worth its own line: *explanatory prose
+    inside the corpus is itself input to the check it describes.*
 
     | # | The fix | The defect it carried | Found by |
     |---|---|---|---|

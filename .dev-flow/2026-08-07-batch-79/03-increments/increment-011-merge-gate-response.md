@@ -267,6 +267,12 @@ pytest tests/   [FULL SUITE — the operator's new gate, first ever run in this 
   run 2 (M/L fixes)        -> 29 failed, 2655 passed, 2 skipped, 3 xfailed  35:02
   run 3 (N-1..N-6)         -> 30 failed, 2655 passed  <- F-9, the binding guard
   run 4 (F-9 fixed)        -> 29 failed, 2656 passed, 2 skipped, 3 xfailed  35:32
+  run 5 (TC-B79-05 added)  -> 29 failed, 2657 passed, 2 skipped, 3 xfailed  30:28
+  run 6 (gate-7 N-2/N-3)   -> 29 failed, 2657 passed, 2 skipped, 3 xfailed  36:43
+                              on a QUIET tree — the seventh gate observed that
+                              its own review ran against a tree this session was
+                              editing, so its figures and mine were taken on
+                              different trees. Accepted; hence the quiet run.
 
   ALL 29 failures are `test_tc016s_density_layout_snapshot[*]` — Inc-12's
   known, canonical-CI-only regen. ZERO other failures at run 4.
@@ -551,8 +557,8 @@ tree: key `'2'` → `show_screen('a2l')` desc `'A2L Explorer'`, key `'3'` → `s
 
 ### F-8 — the lesson that outranks all of them
 
-**NINE separate fixes in this session each carried a defect of the same class they were fixing, and
-the pattern held across all six gate passes:**
+**THIRTEEN separate fixes in this session each carried a defect of the same class they were fixing,
+and the pattern held across all seven gate passes:**
 
 | # | The fix | The defect it carried | Found by |
 |---|---|---|---|
@@ -565,6 +571,17 @@ the pattern held across all six gate passes:**
 | 7 | The citation-mechanism record (M-1b) | "+1 shift" false; the shifts are non-uniform | gate 4 |
 | 8 | The symbol-anchoring sweep (§7d) | **5 of 6 anchors named the wrong symbol; one invented** | self, then gate 5 |
 | 9 | …the `AT-B78-32` paragraph, rewritten **twice** | kept an inherited false boundary symbol and a count of six that should be **eight** | gate 6 |
+| 10 | `TC-B79-05`'s exclusion set | 3 of 6 entries named symbols the corpus never cites — deleting one changed nothing | self, by counterfactual |
+| 11 | …its correction | the comment naming the dead entries **cited one**, making it live; the set then oscillated | self, immediately |
+| 12 | `TC-B79-05`'s resolver | walked into method bodies and admitted **every local variable** — 783 names against 276 real, so `S19TuiApp.<a local>` passed | gate 7 |
+| 13 | …the docstring explaining #12 | gave its example as a backticked class-qualified name, **which the tightened resolver then failed on** | self, on the next run |
+
+⚠️ **Instances 10–13 are all inside `TC-B79-05` — the node written to close the class.** It reproduced
+the class three times before it held, and #11 and #13 are the *same* mechanism a comment apart:
+**explanatory prose inside the corpus is itself input to the check.** #12 is the one that matters
+most: the resolver's comment described the right intent and the code did something else, so the guard
+against wrong anchors **accepted wrong anchors** — and on being tightened it immediately caught a real
+one that had been hiding, which was mine.
 
 ⚠️ **This table read "FIVE … across three consecutive gate passes" until the sixth gate.** The count
 was stale by four while the prose two sections above it already discussed instances 6 and 7 — the

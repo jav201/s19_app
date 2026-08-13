@@ -51,8 +51,17 @@ insertion away from failing the same silent way.
 
 > ⚠️ **Correction to the Phase-0 record.** Phase 0 reported the block as carrying **31** entries. That was
 > the count of lines beginning `Binding(`; the block also holds **7 bare tuples**, so it carries **38**.
-> The finding is unaffected — the range still truncates the block, and 1376-1392 still holds six real
-> bindings — but the figure was partial and the frozen constant uses the correct 38.
+> The finding is unaffected — the range still truncates the block, and 1376-1392 still holds **eight
+> entries** — but the figure was partial and the frozen constant uses the correct 38.
+>
+> ⚠️ **Second correction, 2026-08-13 (seventh merge gate).** This paragraph said *"six real bindings"*,
+> and it was the **fifth** surviving copy of that wrong figure: the true count below `:1375` is
+> **eight** — 4 `Binding(` lines plus 4 bare tuples. The sweep that corrected the other four **claimed
+> zero survivors and was wrong**, because its pattern matched `six real bindings` on one line and this
+> occurrence is **split across a line break**. *A line-oriented sweep cannot see a wrapped phrase, and
+> reporting it as exhaustive is worse than not sweeping at all.* The placement is the sharp part: the
+> wrong number sat inside a block headed **"Correction"**, doing the work of justifying *"the finding
+> is unaffected"*.
 
 ## 2 · Files modified
 
