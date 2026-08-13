@@ -640,7 +640,7 @@ def test_tc039_typed_find_and_palette_text_not_written_to_log(
 # tree.
 #
 # Phase 2 proved that concretely for ``AT-B78-03``: the palette is constructed
-# as ``CommandBar(self._build_palette_entries())`` (``app.py:1878``), so
+# as ``CommandBar(self._build_palette_entries())`` in ``S19TuiApp.compose``, so
 # comparing the observed action set against ``_build_palette_entries()``
 # compares a producer with itself. Deleting an entire ``Binding`` from
 # ``S19TuiApp.BINDINGS`` left that predicate GREEN at 36 == 36.

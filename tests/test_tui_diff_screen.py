@@ -3192,8 +3192,12 @@ def test_tc_b78_51_escape_dismisses_without_shadowing(tmp_path: Path) -> None:
     Executed premise correction, reported rather than absorbed: A-2 and LLR-119.3
     both speak of "the palette's `escape`-to-close". THERE IS NONE.
     `command_bar.py` binds no key and handles no `escape`; the palette closes
-    only via `_dispatch_palette_entry` and `on_list_view_selected`
-    (`command_bar.py:279`, `:295`). Arm 2 therefore asserts what is actually
+    only via the `close_palette()` calls inside `CommandBar._dispatch_palette_entry`
+    and `CommandBar.on_list_view_selected` -- cited by SYMBOL because the line
+    numbers this sentence carried (`:279`, `:295`) were accurate at the batch
+    base and pointed **past end-of-file** by the end of it: `HLR-118` took
+    `command_bar.py` from 296 lines to 260. The batch's own headline deletion
+    invalidated them. Arm 2 therefore asserts what is actually
     true - that the panel's `escape` does not reach outside the panel - which is
     the property A-2 wanted, over a premise that does not hold.
     """
@@ -3809,8 +3813,13 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
     a measurement. A code comment in ``screens_directionb.py`` carried the
     CORRECT extent, so the two artifacts disagreed and the code was right.
 
-    **batch-79 Inc-11, third gate: EVERY line number is now gone from this
-    docstring, and it took three commits to get there.** The first pass cited
+    **batch-79 Inc-11: every LIVE citation is gone from this docstring, and it
+    took three commits to get there.** The line numbers that remain below are
+    HISTORICAL NARRATION -- they name ranges that were wrong, as the record of
+    what went wrong -- and none is a pointer a reader should follow. (An earlier
+    draft of this paragraph claimed "EVERY line number is now gone" while the
+    paragraph still contained five of them. The fourth gate caught that too.)
+    The first pass cited
     ``screens_directionb.py:6712`` for that comment; the branch pushed it to
     ``:6822``. The second pass removed that one and left the block's own range
     ``1338-1392`` in place -- and the very next commit added an import at the
@@ -3822,8 +3831,9 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
     Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
     go stale is the whole point of the node below.
 
-    A corrected range would not fix this. Any edit ABOVE the block shifts it, so
-    ``1338-1392`` is one insertion away from failing the same silent way. This
+    A corrected range would not fix this, and this batch proved it twice: any
+    edit ABOVE the block shifts it, and both "corrected" ranges were invalidated
+    within days -- one of them wrong the moment it was written. This
     resolves the block from the CLASS instead, which no line movement can blind,
     and pins two independent projections of it.
     """

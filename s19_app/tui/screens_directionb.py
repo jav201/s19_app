@@ -4844,7 +4844,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         # C-17 (Inc-1b — the THIRD site of the class the Inc-1 security review
         # measured): the option LABEL is a FILENAME read off disk
-        # (`app.py:3693` -> `_scan_patch_change_files()` over
+        # (`S19TuiApp._report_execution_results` -> `_scan_patch_change_files()` over
         # `workarea/patches/`), so anyone who can drop a file into the work
         # area names it. `Select._watch_value` hands the label to
         # `SelectCurrent.update(prompt)` (`_select.py:615`) -> a markup-enabled
@@ -4907,7 +4907,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         select = self.query_one("#patch_variant_select", Select)
         # C-17 (LLR-075.4, WIDENED — a SECOND live sink found in Phase 3):
-        # the option LABEL is project-file-derived (`app.py:3740-3742` maps
+        # the option LABEL is project-file-derived (`S19TuiApp._report_execution_results` maps
         # each `variant.variant_id` to BOTH label and value), and Textual's
         # `SelectCurrent.update(prompt)` (`_select.py:615`) hands a bare `str`
         # label to a markup-enabled `Static` -> `Content.from_markup`
@@ -5846,8 +5846,9 @@ class PatchEditorPanel(ScrollableContainer):
 
             **No sixth column is added** — this is the house idiom, not an
             invention: the A2L table folds its in-image glyph into the name
-            cell (``app.py:9548``) and the MAC table folds its status glyph
-            into the Tag cell "as its own span" (``app.py:9223-9226``), both
+            cell (``S19TuiApp._apply_prepared_load``) and the MAC table folds its
+            status glyph into the Tag cell "as its own span"
+            (``S19TuiApp._compute_mac_view_payload``), both
             keeping the column count unchanged. A leading COLUMN would instead
             shift ``Coordinate(row, 1)`` / ``(row, 2)`` under every existing
             index-reader (``tests/test_tui_patch_editor_v2.py:2578``,

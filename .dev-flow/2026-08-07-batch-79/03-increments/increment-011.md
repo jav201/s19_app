@@ -24,6 +24,7 @@ committed inside the very guard written to prevent it.
 |---|---|
 | `tests/test_tui_commandbar.py` | `AT-B78-12` (PIN), `AT-B78-13` (GATE), `AT-B78-14`; 2 helpers; 6 constants; `_B79_REGISTRY_SOURCE` extracted so the counterfactual can re-point it |
 | `tests/test_tui_directionb.py` | `TC-029` docstring corrected — **comment-only, no assertion touched** (§4) |
+| **SOURCE files** | **`0`** — tests only; no production file is touched. Declared per `C-47`, which the flow adopted at `rev12` (2026-08-10) **after** this packet was first written: the budget counts SOURCE files, tests are uncapped, and `.dev-flow/**` is outside the count |
 
 No production file is touched. The deletion shipped at `23af21f`.
 

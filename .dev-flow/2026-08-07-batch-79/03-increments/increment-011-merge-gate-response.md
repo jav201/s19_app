@@ -302,10 +302,13 @@ against a `git worktree` of the base rather than inferred.
 
 | File | Change |
 |---|---|
-| `s19_app/tui/screens_directionb.py` | H-1 — the project row's own marker class |
-| `s19_app/tui/styles.tcss` | H-1 — `.loaded-project-detail` beside `.loaded-detail` |
-| `s19_app/tui/app.py` | H-2 — `_compose_context_line`, `_clip_to`, 3 constants |
-| `tests/test_tui_commandbar.py` | `AT-B78-09` arity clause · `TC-B79-01` · `TC-B79-02` · `TC-B78-12` per-surface presence |
+| `s19_app/tui/screens_directionb.py` | H-1 — the project row's own marker class; later, symbol-anchored citations |
+| `s19_app/tui/styles.tcss` | H-1 — `.loaded-project-detail` beside `.loaded-detail`; N-4 comment merge |
+| `s19_app/tui/app.py` | H-2 — `_compose_context_line`, `_clip_to`, 4 constants; N-1 resize recompose; N-2 column measurement |
+| `tests/test_tui_commandbar.py` | `AT-B78-09` arity · `TC-B79-01…04` · `TC-B78-12` per-surface presence |
+| `tests/test_tui_diff_screen.py` | M-1, L-5, and the citation sweep |
+| `tests/test_tui_patch_history_strip.py` | F-9 — explicit `encoding="utf-8"` |
+| **SOURCE files** | **`3`** — `app.py`, `screens_directionb.py`, `styles.tcss`, as the UNION across the four commits this packet spans (`4c5aa5d`, `12191a3`, `16e0d12`, `701b456`); the largest single commit also touched 3. Under `C-47`'s cap of 4, and below the warning threshold. Tests and `.dev-flow/**` are outside the count |
 
 ---
 
@@ -451,9 +454,29 @@ specifically to close the previous instance of it.
 
 ### G-3 (MED) — the citation fix recurred, and its "correction" was wrong on arrival
 
-Five stale citations at HEAD, four written or broken by this batch. The mechanism was one line:
-`from rich.cells import cell_len, set_cell_size` at the top of `app.py`, which shifted every `app.py`
-citation by +1.
+Five stale citations at HEAD, four written or broken by this batch.
+
+> ⚠️ **RETRACTED at the fourth gate — the mechanism recorded here was false, and the false version is
+> what made the sweep under-scoped.** This paragraph said the cause was one line —
+> `from rich.cells import cell_len, set_cell_size` at the top of `app.py` — *"which shifted every
+> `app.py` citation by +1"*. Measured: `app.py` grew **11 753 → 12 163, +410 lines**, and the real
+> content-anchored shifts are **+1 / +14 / +105 / +168**:
+>
+> ```
+> BINDINGS = [              base 1338 -> head 1339   (+1)
+> def _apply_width_regime   base 6246 -> head 6351   (+105)
+> ```
+>
+> **"+1" holds only ABOVE the batch's first body edit.** That is precisely why the sweep found five
+> citations clustered near `BINDINGS` and none deeper — the wrong mechanism produced a search that
+> could only find the shallow ones, and then the record declared the class closed. A future batch
+> inheriting "an import shifts citations by +1" would under-scope its own sweep identically.
+>
+> **And the deepest one was not an `app.py` shift at all.** `tests/test_tui_diff_screen.py` cited
+> `command_bar.py:279`/`:295` for the palette-close premise — accurate at base in a 296-line file,
+> pointing **past end-of-file** at HEAD, because `HLR-118` took that file to **260 lines**. The
+> batch's own headline deletion invalidated it, and it survived in one of the three files this very
+> sweep edited.
 
 The sharp one is `AT-B78-32`'s docstring — the node re-authored across two prior commits precisely to
 remove stale citations, which closes with *"Any edit ABOVE the block shifts it, so `1338-1392` is one

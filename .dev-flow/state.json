@@ -12,10 +12,14 @@
     "batch_number_derivation": "79 derived from disk (.dev-flow/2026-08-06-batch-78 is highest) AND git ls-remote --heads origin (no batch-79 branch). BUT 79 WAS CONTESTED: BACKLOG-CODE.md:168 carries C-77-l labelled 'BATCH-79 CHARTER: the aggregation path', renumbered 78->79 by operator ruling 2026-08-06 and marked P1 LOAD-BEARING, while batch-78's HANDOFF section 7 charters Lane 1 as batch-79 and its own section 6 warns that 79 is taken. The handoff contradicts itself. OPERATOR RULING 2026-08-07: Lane 1 takes 79, C-77-l moves to 80, Lane 3 (operations) moves to 81."
   },
   "flow_currency": {
-    "checked": "2026-08-07",
-    "flow_version": "2026.07.28-rev1",
-    "flow_hash": "0127a2767ff11c8a",
-    "result": "~/.claude clean and 0/0 vs its remote; controls C-1..C-45 current."
+    "checked": "2026-08-13 - RE-VERIFIED at operator request mid-batch",
+    "flow_version": "2026.08.10-rev12",
+    "flow_hash": "41144ca54e8b944a",
+    "result": "~/.claude 0/0 vs jav201/claude-config at b3cef32; the manifest's own sha256 command recomputes 41144ca54e8b944a, matching docs/FLOW-VERSION.md exactly. The validator's V7 rule (C-45 PULL: the local flow is not the revision the manifest declares) does NOT fire.",
+    "STALE_RECORD_FOUND": "The Phase-0 check recorded flow_version 2026.07.28-rev1 / flow_hash 0127a2767ff11c8a and controls C-1..C-45. The flow advanced to rev12 ON 2026-08-10, i.e. DURING this batch. The TOOLING was current all along - only this record was stale. Also renamed: the mirror is jav201/agent-skills, not jav201/claude-skills. Control space is now C-10..C-53 (22 numbered + 5 unnumbered + META), so the remembered 'next free = C-46' is wrong.",
+    "checked_at_phase0": "2026-08-07 - flow_version 2026.07.28-rev1, flow_hash 0127a2767ff11c8a. Correct WHEN TAKEN; superseded three days later.",
+    "C-47_REMEASURE": "rev12 replaces the flat '<=5 files per increment' with '<=4 SOURCE files; tests NOT capped; product docs and every .dev-flow/** artifact outside the count' (measured over 178 packets: 67% of the increments that broke the old cap did so by writing TESTS, not by sprawling). Re-measured this session's commits under the NEW rule - bc64372: 0 source; 4c5aa5d: 3; 12191a3: 2; 16e0d12: 2; 701b456: 2. ALL WITHIN BUDGET, and more comfortably than under the old flat rule I had been counting against.",
+    "C-53_VALIDATOR": "rev12 ships docs/tools/devflow-validate.py, which did not exist at this batch's Phase 0 and which the flow now requires AT EVERY GATE. Run 2026-08-13: --selftest PASSED (every rule demonstrates it can go RED; V7/V8 are declared as NOT synthetically proven, said out loud rather than counted as covered). Against s19_app: 14 BLOCK / 229 NOTICE / 3 N-A. ALL 14 BLOCK ARE V4 ON .dev-flow/2026-05-05-batch-01/01-requirements.md (LLR-002..009) - ZERO from batch-78 or batch-79. The 229 notices are overwhelmingly V9 'packet declares no SOURCE count', which is expected of every packet written before rev12 existed."
   },
   "standing_authorization": {
     "asked_at": "2026-08-11 RESUMING-SESSION kickoff, asked FRESH. Authorization is per-batch AND per-session and was NOT inherited from the 2026-08-07 grant.",

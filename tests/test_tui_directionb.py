@@ -7040,7 +7040,7 @@ def test_sections_item_data_and_colour_preserved(tmp_path: Path) -> None:
 # the per-row `_severity_style` colouring and paging path stay unchanged and
 # cells stay `rich.text.Text` (no markup flip — batch-27 B-1 guard).
 #
-# NOTE (surface fact, verified against app.py:687-691): the A2L Explorer rail
+# NOTE (surface fact, verified against `S19TuiApp.RAIL_ITEMS`): the A2L Explorer rail
 # screen is bound to key "2" (`show_screen('a2l')`); "3" is MAC View. The
 # requirement draft's `press("3")` names the wrong surface, so these ATs drive
 # the real A2L key, "2".
