@@ -308,7 +308,7 @@ against a `git worktree` of the base rather than inferred.
 | `tests/test_tui_commandbar.py` | `AT-B78-09` arity · `TC-B79-01…04` · `TC-B78-12` per-surface presence |
 | `tests/test_tui_diff_screen.py` | M-1, L-5, and the citation sweep |
 | `tests/test_tui_patch_history_strip.py` | F-9 — explicit `encoding="utf-8"` |
-| **SOURCE files** | **`3`** — `app.py`, `screens_directionb.py`, `styles.tcss`, as the UNION across every commit this packet spans (`4c5aa5d`, `12191a3`, `16e0d12`, `701b456`, `ed96f7a`, `ca7609f`, `c879d24` and the anchor-correction commit); the largest single commit also touched 3, and per-commit counts are `3/2/2/2/0/1/0`. Under `C-47`'s cap of 4, below the warning threshold. Tests and `.dev-flow/**` are outside the count. *(The enumeration is spelled out because an earlier version named only the first four commits — correct in its figure, under-inclusive in its span.)* |
+| **SOURCE files** | **`3`** — `app.py`, `screens_directionb.py`, `styles.tcss`, as the UNION across every commit this packet spans (`4c5aa5d`, `12191a3`, `16e0d12`, `701b456`, `ed96f7a`, `ca7609f`, `c879d24` and the anchor-correction commit); plus `a6d0493` and this one; the largest single commit also touched 3, and per-commit counts are `3/2/2/2/0/1/0/1`. Under `C-47`'s cap of 4, below the warning threshold. Tests and `.dev-flow/**` are outside the count. *(Spelled out because two earlier versions were under-inclusive in the same way: the first named four of the commits, the second published seven counts for eight commits. The union figure of 3 was correct throughout — `a6d0493` touched `screens_directionb.py`, already counted.)* |
 
 ---
 
@@ -508,7 +508,12 @@ the `border: none` rule it named.
 - `N-7` was recorded in this file and **never registered in `BACKLOG-CODE.md`** — a carry that would
   have died at the batch close. Registered.
 
-## 7d · Self-caught after the fourth gate: **four of seven symbol anchors named the wrong symbol**
+## 7d · Self-caught after the fourth gate: **five of six replaced anchors named the wrong symbol**
+
+*(Denominator stated in one unit, because the sixth gate found it stated in two: **six citations** were
+replaced, and the table below has **seven rows** because one row covers a pair of symbols. Five of the
+six replacements were wrong. An earlier heading here said "four of seven" while its own table showed
+five ❌ rows.)*
 
 The fifth gate's brief contained the warning that found this: *"an anchor that names the wrong symbol
 is the same defect in a form that cannot go stale."* Checked before the gate could:
@@ -546,16 +551,26 @@ tree: key `'2'` → `show_screen('a2l')` desc `'A2L Explorer'`, key `'3'` → `s
 
 ### F-8 — the lesson that outranks all of them
 
-**FIVE separate fixes in this session each carried a defect of the same class they were fixing, and
-the pattern held across three consecutive gate passes:**
+**NINE separate fixes in this session each carried a defect of the same class they were fixing, and
+the pattern held across all six gate passes:**
 
-| The fix | The defect it carried | Found by |
-|---|---|---|
-| The vacuous-input-set guard (`AT-B78-14`) | used a vacuous input set | self, in minutes — it failed loudly |
-| The line-citation fix (N-5) | created four new stale citations | gate 2 |
-| …and its own correction (G-3) | the "corrected" range was wrong **on arrival** | gate 3 |
-| The context bound (`TC-B79-01`) | no assertion on how it apportions (N-3) | gate 2 |
-| …and its replacement (`TC-B79-04`, G-2) | left the branch production actually takes unasserted | gate 3 |
+| # | The fix | The defect it carried | Found by |
+|---|---|---|---|
+| 1 | The vacuous-input-set guard (`AT-B78-14`) | used a vacuous input set | self, in minutes — it failed loudly |
+| 2 | The context bound (`TC-B79-01`) | no assertion on how it apportions (N-3) | gate 2 |
+| 3 | The line-citation fix (N-5) | created four new stale citations | gate 2 |
+| 4 | …its own correction (G-3) | the "corrected" range was wrong **on arrival** | gate 3 |
+| 5 | …its replacement (`TC-B79-04`, G-2) | left the branch production actually takes unasserted | gate 3 |
+| 6 | The `F-9` root-cause record (G-1) | the stated cause was **physically impossible** | gate 3 |
+| 7 | The citation-mechanism record (M-1b) | "+1 shift" false; the shifts are non-uniform | gate 4 |
+| 8 | The symbol-anchoring sweep (§7d) | **5 of 6 anchors named the wrong symbol; one invented** | self, then gate 5 |
+| 9 | …the `AT-B78-32` paragraph, rewritten **twice** | kept an inherited false boundary symbol and a count of six that should be **eight** | gate 6 |
+
+⚠️ **This table read "FIVE … across three consecutive gate passes" until the sixth gate.** The count
+was stale by four while the prose two sections above it already discussed instances 6 and 7 — the
+packet contradicted itself, and `BACKLOG-PROCESS.md` carried the accurate figure. **A running tally is
+a figure like any other and goes stale the same way**, which is the ninth instance arriving inside the
+record of the first eight.
 
 *A fix is a change, and a change made under the pressure of a blocked gate is where this project's
 dominant defect class reproduces most reliably.* Three observations that follow:

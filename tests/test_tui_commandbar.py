@@ -2974,3 +2974,123 @@ def test_at_b78_14_no_live_registry_row_names_a_missing_node() -> None:
         f"{len(missing)} LIVE registry rows name a node that no longer "
         f"exists:\n" + "\n".join(missing[:40])
     )
+
+
+#: Files whose prose this batch authored or edited. The guard below is scoped to
+#: these deliberately: it is a batch-79 control, not a repo-wide sweep, and
+#: claiming the wider corpus would be the "a figure is only as honest as the
+#: corpus it names" defect this batch hit three times.
+_B79_ANCHOR_CORPUS = (
+    "tests/test_tui_commandbar.py",
+    "tests/test_tui_diff_screen.py",
+    "tests/test_tui_directionb.py",
+    "s19_app/tui/screens_directionb.py",
+    "s19_app/tui/app.py",
+)
+
+#: Anchors cited in EXPLICITLY NEGATIVE context — the sentence's point is that
+#: the symbol is GONE (`HLR-121` deleted them) or never existed. They must NOT
+#: resolve, and the guard asserts that direction instead, so the deletion is
+#: guarded too (C-40).
+#:
+#: `RAIL_ITEMS` is the one this batch INVENTED: it is cited now only as the
+#: counter-example in the record of that mistake, so a tree where it resolves
+#: would mean someone created it to satisfy the prose. That is worth failing on.
+_B79_ANCHORS_MUST_NOT_RESOLVE = frozenset(
+    {"CommandBar.Find", "CommandBar.Goto", "CommandBar.focus_find",
+     "CommandBar.focus_goto", "CommandBar.set_context_labels",
+     "S19TuiApp.RAIL_ITEMS"}
+)
+
+_B79_ANCHOR_RE = re.compile(r"`(S19TuiApp|CommandBar)\.([A-Za-z_][A-Za-z0-9_]*)`")
+
+
+def test_tc_b79_05_every_cited_symbol_anchor_resolves(tmp_path: Path) -> None:
+    """TC-B79-05 -- a cited `Class.member` anchor names something that EXISTS.
+
+    **This node exists because a sweep replacing stale line numbers with symbol
+    names got five of six wrong, and one of them — `S19TuiApp.RAIL_ITEMS` — had
+    never existed in this repository**, inside a comment that read *"surface
+    fact, verified against …"*. The sixth merge gate's observation is the reason
+    it is a committed test rather than a one-off script: *"the harness is not
+    committed … 'all 17 pass' is a claim about an ephemeral run with no artifact
+    behind it, and no committed guard."*
+
+    ⚠️ **What this does NOT cover, stated so the guard is not over-read.** It
+    proves a cited symbol RESOLVES. It cannot prove the symbol is the RIGHT one
+    for its sentence — that is semantic and needs a reader. And it only sees
+    dotted `Class.member` citations: the sixth gate's own blocking finding was a
+    BARE symbol cited against a line range, which is outside this regex by
+    construction. A guard that claimed to close the class would be the vacuous
+    kind this batch keeps finding; this one closes the half that is mechanical.
+    """
+    # `hasattr` on the CLASS is not sufficient and the first draft of this guard
+    # proved it: `_validation_issues`, `_a2l_enriched_tags` and `log_lines` are
+    # all real, all cited, and all assigned as `self.X = ...` in `__init__`, so a
+    # class-level lookup reported three false positives. Resolution is therefore
+    # class attributes UNION methods UNION every `self.X` assignment target in
+    # the class body.
+    def _members(path: Path, cls_name: str) -> set[str]:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        out: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef) and node.name == cls_name:
+                for sub in ast.walk(node):
+                    if isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        out.add(sub.name)
+                    elif isinstance(sub, ast.ClassDef) and sub is not node:
+                        out.add(sub.name)
+                    elif isinstance(sub, ast.Attribute) and isinstance(
+                        sub.ctx, (ast.Store, ast.Load)
+                    ):
+                        if isinstance(sub.value, ast.Name) and sub.value.id == "self":
+                            out.add(sub.attr)
+                    elif isinstance(sub, ast.Name) and isinstance(sub.ctx, ast.Store):
+                        out.add(sub.id)
+                    elif isinstance(sub, ast.AnnAssign) and isinstance(
+                        sub.target, ast.Name
+                    ):
+                        out.add(sub.target.id)
+        return out
+
+    tables = {
+        "S19TuiApp": _members(Path("s19_app/tui/app.py"), "S19TuiApp"),
+        "CommandBar": _members(Path("s19_app/tui/command_bar.py"), "CommandBar"),
+    }
+
+    resolved: dict[str, bool] = {}
+    for rel in _B79_ANCHOR_CORPUS:
+        text = Path(rel).read_text(encoding="utf-8", errors="replace")
+        for cls_name, member in _B79_ANCHOR_RE.findall(text):
+            resolved[f"{cls_name}.{member}"] = member in tables[cls_name]
+
+    # C-40: the corpus must be non-empty and must contain a KNOWN anchor, or
+    # every clause below is vacuously true over an empty scan.
+    assert len(resolved) >= 20, (
+        f"only {len(resolved)} dotted anchors were scanned; the corpus or the "
+        f"regex is not reading what it claims to read"
+    )
+    assert resolved.get("S19TuiApp.BINDINGS") is True, (
+        "the scan did not resolve `S19TuiApp.BINDINGS`, which is cited and does "
+        "exist -- the resolver itself is broken"
+    )
+
+    unresolved = sorted(
+        name for name, ok in resolved.items()
+        if not ok and name not in _B79_ANCHORS_MUST_NOT_RESOLVE
+    )
+    assert not unresolved, (
+        f"these cited symbol anchors do not resolve: {unresolved}. A wrong "
+        f"symbol name reads as authoritative forever, where a stale line number "
+        f"fails visibly -- which is why anchoring by symbol must be EXECUTED."
+    )
+
+    # The negative half: the HLR-121 deletions must stay deleted.
+    resurrected = sorted(
+        name for name in _B79_ANCHORS_MUST_NOT_RESOLVE
+        if resolved.get(name) is True
+    )
+    assert not resurrected, (
+        f"these symbols are cited as DELETED by HLR-121 but resolve: "
+        f"{resurrected}"
+    )

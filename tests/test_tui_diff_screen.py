@@ -3799,13 +3799,25 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
 
     The batch-78 spec realizes this as *"a zero-line ``git diff`` over
     ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
-    MID-BLOCK: the cited end line falls on the ``page_prev_context`` entry, and
-    six real bindings sit BELOW it and outside the range --
-    ``comma`` / ``period`` hex paging, ``pagedown`` / ``pageup`` from batch-31
-    AC-3, and ``ctrl+z`` / ``ctrl+y`` from batch-40 S2. A binding added or
-    removed among those six leaves the range-based predicate GREEN, so the guard
-    would report "untouched" for a block that was touched. It fails in the
-    safe-looking direction.
+    MID-BLOCK: the cited end line falls on the ``crc_designer`` screen binding,
+    and **eight** entries sit BELOW it and outside the range --
+    ``plus`` / ``minus`` context paging, ``comma`` / ``period`` hex paging,
+    ``pagedown`` / ``pageup`` from batch-31 AC-3, and ``ctrl+z`` / ``ctrl+y``
+    from batch-40 S2. An entry added or removed among those eight leaves the
+    range-based predicate GREEN, so the guard would report "untouched" for a
+    block that was touched. It fails in the safe-looking direction.
+
+    ⚠️ **That sentence said "the ``page_prev_context`` entry" and "six" until the
+    SIXTH merge gate measured it.** Both were wrong, and the second followed from
+    the first: ``page_prev_context`` is two lines LOWER than the cited boundary,
+    so believing the boundary sat there silently dropped ``plus``/``minus`` from
+    the inventory. The figure came in from Phase 0's premise table and was
+    carried through two rewrites of this very paragraph without being
+    re-executed -- including one whose stated purpose was removing false
+    references from it. *A figure inherited inside a sentence you are editing is
+    still an inherited figure.* The paragraph's THESIS is unaffected: the range
+    does stop mid-block, entries do escape the predicate, and the node's
+    assertions never depended on the count.
 
     It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
     batch-78 added zero ``Binding(`` lines. The range was wrong when it was

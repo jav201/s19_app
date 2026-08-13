@@ -20,6 +20,18 @@
     | 6 | the `F-9` root-cause record | the stated cause was **physically impossible** — the pathspec excluded the file it blamed | gate 3 |
     | 7 | the citation-mechanism record | "+1 shift" false; the real shifts are non-uniform (+1 / +105) | gate 4 |
     | 8 | the symbol-anchoring sweep | **5 of 6 anchors named the wrong symbol; one was invented** | self, then gate 5 independently |
+    | 9 | the `AT-B78-32` paragraph, rewritten **twice** — once expressly to remove false references from it | kept an inherited false boundary symbol (`page_prev_context`, actually the `crc_designer` binding two lines up) and the count of **six** it produced, which is **eight** | gate 6 |
+
+    **Instance 9 is the sharpest and arrived last.** The figure entered at Phase 0's premise table,
+    was carried into a test docstring, and survived **two rewrites of that very paragraph** — including
+    one whose stated purpose was removing false references from it. *A figure inherited inside a
+    sentence you are editing is still an inherited figure, and editing around it is not measuring it.*
+    The wrong boundary symbol also **produced** the wrong count: believing the boundary sat two lines
+    lower silently dropped `plus`/`minus` from the inventory — one false fact generating a second.
+
+    **And the tally itself went stale.** This table read "FIVE across three passes" in the increment
+    packet while the same packet's prose already discussed instances 6 and 7. *A running count of
+    defects is a figure like any other.*
 
     **The mechanism, in the fifth gate's words:** *"HIGH-1 is comments and docstrings, with no runtime surface, which is precisely why 2656 passing tests cannot see it. That is the finding's point: the batch's recurring defect class lives in exactly the region its test suite has no oracle for, which is why it has survived five gates."*
 

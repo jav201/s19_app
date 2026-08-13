@@ -18,7 +18,8 @@ an earlier batch is a *hypothesis*, not law, until it passes its own verificatio
 
 Nine premises were executed against the current tree. **Eight held exactly. One is false**, and it fails
 in the safe-looking direction: `AT-B78-32`'s line range watches 38 of the block's 55 lines and would
-leave **six real bindings unguarded** while reporting "untouched".
+leave **eight entries unguarded** while reporting "untouched". *(This said "six" until the sixth merge
+gate measured it — see §4 P-1 and §5.)*
 
 ---
 
@@ -28,7 +29,7 @@ leave **six real bindings unguarded** while reporting "untouched".
 |---|---|
 | `origin/main` tip | **`829adc6`** — batch-78's `phase_status` fix |
 | Working branch merge-base | local `main` **0/0** vs `origin/main`, tree clean apart from the parallel session's untracked `memmap2.*`, `build/`, `prototypes/out/`, `prototypes$f.png` |
-| Flow currency (C-45 PULL) | `~/.claude` clean, **0/0** vs its remote · `flow_version 2026.07.28-rev1` · `flow_hash 0127a2767ff11c8a` · controls C-1…C-45 |
+| Flow currency (C-45 PULL) | **Re-verified 2026-08-13 at operator request: `flow_version 2026.08.10-rev12` · `flow_hash 41144ca54e8b944a`**, `~/.claude` 0/0 vs `jav201/claude-config` @ `b3cef32`, and the validator's `V7` rule does not fire. ⚠️ The Phase-0 check recorded `2026.07.28-rev1` / `0127a2767ff11c8a` / C-1…C-45 — correct when taken, **superseded on 2026-08-10, during this batch**. The tooling was current throughout; only this record was stale. Control space is now **C-10…C-53** and the mirror is `jav201/agent-skills` |
 | Backlog lane (per `docs/engineering-rules.md`) | **Lane A — `.dev-flow/BACKLOG-CODE.md`** (production code + its dev flow) |
 | Batch number | **79**, free on disk **and** `git ls-remote`. See §2 — it was contested |
 
@@ -62,7 +63,7 @@ document is not evidence.**
 
 | # | Proposition | Verdict | Executed evidence |
 |---|---|---|---|
-| P-1 | The App `BINDINGS` block is `app.py:1338-1375`, and `AT-B78-32`'s zero-line `git diff` over that range certifies it untouched | ❌ **FALSE** | Block is **`app.py:1338-1392`** — 55 lines, **31** `Binding(…)` entries. `:1375` is `("minus", "page_prev_context", "Page-")`, **mid-block**. See §5 |
+| P-1 | The App `BINDINGS` block is `app.py:1338-1375`, and `AT-B78-32`'s zero-line `git diff` over that range certifies it untouched | ❌ **FALSE** | Block is **`app.py:1338-1392`** — 55 lines, **31** `Binding(…)` entries. `:1375` is the **`crc_designer` screen binding**, mid-block, with **eight** entries below it and outside the range. See §5. ⚠️ **This cell said `("minus","page_prev_context","Page-")` and "six" until the sixth merge gate measured it (2026-08-13).** `page_prev_context` is at `:1377`, two lines lower; believing the boundary sat there dropped `plus`/`minus` from the inventory. The verdict FALSE and the other three figures (`1338-1392`, 55, 31) all reproduce — only the boundary symbol and the count were wrong |
 | P-2 | `styles.tcss`: `#command_bar_slot` at `:51`, `#command_bar` at `:61-64` **survive**; the deletable span is `:66-102` | ✅ TRUE | `:51 #command_bar_slot`, `:61 #command_bar`, `:66 #command_bar_row` — all three exact |
 | P-3 | `_project_label()` has **14** call sites, and re-pointing them is `Inc-8`'s work | ✅ TRUE | 14 calls + 2 definitions = 16 raw matches. **Zero production call sites** — it is a *test helper* defined in `test_tui_patch_variant.py:82` and `test_tui_variants.py:76`. Pattern: `grep -rn '_project_label(' tests/ \| grep -vc 'def _project_label'` |
 | P-4 | `_PRE_BATCH_BINDINGS` does not pin `/` or `g`, so re-homing them cannot trip the freeze guard | ✅ TRUE | **14** frozen tuples at `test_tui_directionb.py:6058`: `l r o s p j 1 2 3 q plus minus comma period`. Neither key present |
@@ -80,10 +81,17 @@ The spec (`01-requirements.md:679`) defines `AT-B78-32` as *"the App `BINDINGS` 
 zero-line `git diff` over `app.py:1338-1375`"*, owed at `Inc-6`, with the mutation *"add any binding to
 the block"*.
 
-Measured: the block runs `1338`→`1392`. Lines `1376-1392` hold **six real bindings** —
+Measured: the block runs `1338`→`1392`, and `:1375` — the spec's cited END — is the **`crc_designer`
+screen binding**. Lines `1376-1392` hold **eight entries**: `plus`/`minus` (context paging),
 `comma`/`period` (hex paging), `pagedown`/`pageup` (batch-31 AC-3), `ctrl+z`/`ctrl+y` (batch-40 S2).
-**A binding added or removed among those six leaves the predicate GREEN**, so the guard reports
+**An entry added or removed among those eight leaves the predicate GREEN**, so the guard reports
 "untouched" for a block that was touched. It fails safe-looking, which is the expensive direction.
+
+⚠️ **This paragraph said the boundary was `("minus","page_prev_context","Page-")` and the count was
+six, until the sixth merge gate measured both (2026-08-13).** `page_prev_context` sits at `:1377`,
+two lines below the cited boundary — so believing it sat there silently dropped `plus`/`minus` from
+the inventory. **One false fact generated the second.** The verdict FALSE and every other figure
+(`1338-1392`, 55 lines, 31 `Binding(…)` entries) reproduce exactly.
 
 **It is not a drift.** At `f6ff1d3` the block was already `1338-1392`; batch-78 added no bindings. The
 range was **wrong when it was written**, and it survived three Phase-2 rounds and two independent review
@@ -151,7 +159,8 @@ not the head, because a mutation in the head passes for the wrong reason.
 | Inc-11 entry | **2683** |
 | After `AT-B78-12/13/14` | **2686** |
 | After the merge-gate response | 2689 |
-| **Current** (after the SECOND gate's N-1…N-6) | **2690** |
+| After the SECOND gate's N-1…N-6 | 2690 |
+| **Current** (after the SIXTH gate's MED-1 + `TC-B79-05`) | **2691** |
 
 **Stated measurement pattern** — *an unstated pattern is an unstated definition*: the total
 reported by `python -m pytest tests/ --collect-only -q`, run from the repo root.
