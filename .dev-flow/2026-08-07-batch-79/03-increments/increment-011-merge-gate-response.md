@@ -308,7 +308,7 @@ against a `git worktree` of the base rather than inferred.
 | `tests/test_tui_commandbar.py` | `AT-B78-09` arity · `TC-B79-01…04` · `TC-B78-12` per-surface presence |
 | `tests/test_tui_diff_screen.py` | M-1, L-5, and the citation sweep |
 | `tests/test_tui_patch_history_strip.py` | F-9 — explicit `encoding="utf-8"` |
-| **SOURCE files** | **`3`** — `app.py`, `screens_directionb.py`, `styles.tcss`, as the UNION across the four commits this packet spans (`4c5aa5d`, `12191a3`, `16e0d12`, `701b456`); the largest single commit also touched 3. Under `C-47`'s cap of 4, and below the warning threshold. Tests and `.dev-flow/**` are outside the count |
+| **SOURCE files** | **`3`** — `app.py`, `screens_directionb.py`, `styles.tcss`, as the UNION across every commit this packet spans (`4c5aa5d`, `12191a3`, `16e0d12`, `701b456`, `ed96f7a`, `ca7609f`, `c879d24` and the anchor-correction commit); the largest single commit also touched 3, and per-commit counts are `3/2/2/2/0/1/0`. Under `C-47`'s cap of 4, below the warning threshold. Tests and `.dev-flow/**` are outside the count. *(The enumeration is spelled out because an earlier version named only the first four commits — correct in its figure, under-inclusive in its span.)* |
 
 ---
 
@@ -459,13 +459,21 @@ Five stale citations at HEAD, four written or broken by this batch.
 > ⚠️ **RETRACTED at the fourth gate — the mechanism recorded here was false, and the false version is
 > what made the sweep under-scoped.** This paragraph said the cause was one line —
 > `from rich.cells import cell_len, set_cell_size` at the top of `app.py` — *"which shifted every
-> `app.py` citation by +1"*. Measured: `app.py` grew **11 753 → 12 163, +410 lines**, and the real
-> content-anchored shifts are **+1 / +14 / +105 / +168**:
+> `app.py` citation by +1"*. Measured: `app.py` grew **11 753 → 12 163, +410 lines**, and the shift is
+> **not uniform** — it grows with depth in the file. Every figure below is stated with the anchor that
+> produces it, because a shift figure without an anchor is not re-derivable, only re-inventable:
 >
 > ```
-> BINDINGS = [              base 1338 -> head 1339   (+1)
-> def _apply_width_regime   base 6246 -> head 6351   (+105)
+> git show 829adc6:s19_app/tui/app.py | grep -n 'BINDINGS = \['           -> 1338
+> git show HEAD:s19_app/tui/app.py     | grep -n 'BINDINGS = \['          -> 1339    (+1)
+> git show 829adc6:s19_app/tui/app.py | grep -n 'def _apply_width_regime' -> 6246
+> git show HEAD:s19_app/tui/app.py     | grep -n 'def _apply_width_regime'-> 6351    (+105)
 > ```
+>
+> *(An earlier draft of this retraction also quoted `+14` and `+168` with no anchor for either. They
+> were dropped rather than kept: the fifth gate flagged them under this batch's own rule — an
+> unstated pattern is an unstated definition — and a retraction of a false figure is a poor place to
+> introduce two unverifiable ones.)*
 >
 > **"+1" holds only ABOVE the batch's first body edit.** That is precisely why the sweep found five
 > citations clustered near `BINDINGS` and none deeper — the wrong mechanism produced a search that
@@ -499,6 +507,42 @@ the `border: none` rule it named.
   columns) a 53-column budget is the *optimistic* end, not the "SAFE" one it claimed.
 - `N-7` was recorded in this file and **never registered in `BACKLOG-CODE.md`** — a carry that would
   have died at the batch close. Registered.
+
+## 7d · Self-caught after the fourth gate: **four of seven symbol anchors named the wrong symbol**
+
+The fifth gate's brief contained the warning that found this: *"an anchor that names the wrong symbol
+is the same defect in a form that cannot go stale."* Checked before the gate could:
+
+| Anchor as written | Verdict | The real symbol |
+|---|---|---|
+| `S19TuiApp.RAIL_ITEMS` | ❌ **does not exist — invented** | `S19TuiApp.BINDINGS` |
+| `S19TuiApp._report_execution_results` → `_scan_patch_change_files()` | ❌ does not contain it | `S19TuiApp._scan_patch_change_files` |
+| `S19TuiApp._report_execution_results` maps `variant_id` | ❌ does not | `S19TuiApp._refresh_patch_variant_select` |
+| `S19TuiApp._apply_prepared_load` (A2L glyph in name cell) | ❌ wrong method | `S19TuiApp._build_a2l_table_cells` |
+| `S19TuiApp._compute_mac_view_payload` (MAC glyph in Tag cell) | ❌ wrong method | `S19TuiApp._populate_mac_datatable` |
+| `CommandBar._dispatch_palette_entry` / `.on_list_view_selected` | ✅ both call `close_palette()` | — |
+| `S19TuiApp.compose` holds `CommandBar(self._build_palette_entries())` | ✅ | — |
+
+**Root cause: I derived the anchors with an `awk` that took the nearest preceding `def` and never
+checked semantics.** It produced plausible method names for every line — which is precisely the
+failure mode §4 records as *"a plausible-looking count is the dangerous outcome; an impossible one
+gets checked."* Every one of the five wrong anchors *reads* correct.
+
+**And the original citation was wrong too.** `app.py:687-691`, cited for the rail-key claim, resolves
+at the batch base to `_STRIP_CELL_GLYPH` / `_STRIP_GAP_GLYPH` — nothing to do with rail bindings. So
+the line number was false *before* this batch, and replacing it by machine produced a second false
+reference. Two independent errors on one sentence.
+
+**Now verified by execution, not inspection.** A harness resolves all 17 anchors written this session
+against the AST and asserts each CONTAINS the substring its sentence claims — plus the six class
+attributes cited by name. All 17 pass. The rail claim is now re-derived and quoted from the live
+tree: key `'2'` → `show_screen('a2l')` desc `'A2L Explorer'`, key `'3'` → `show_screen('mac')` desc
+`'MAC View'`.
+
+> **The generalisable half:** *replacing a line number with a symbol removes the staleness failure
+> mode and introduces a correctness one.* A stale line number is detectable by anyone who follows it;
+> a wrong symbol name reads as authoritative forever. **A symbol anchor must be executed against the
+> tree, exactly like a figure.** Registered as a control candidate.
 
 ### F-8 — the lesson that outranks all of them
 

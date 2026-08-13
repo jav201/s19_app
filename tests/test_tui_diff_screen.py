@@ -3813,12 +3813,15 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
     a measurement. A code comment in ``screens_directionb.py`` carried the
     CORRECT extent, so the two artifacts disagreed and the code was right.
 
-    **batch-79 Inc-11: every LIVE citation is gone from this docstring, and it
-    took three commits to get there.** The line numbers that remain below are
-    HISTORICAL NARRATION -- they name ranges that were wrong, as the record of
-    what went wrong -- and none is a pointer a reader should follow. (An earlier
-    draft of this paragraph claimed "EVERY line number is now gone" while the
-    paragraph still contained five of them. The fourth gate caught that too.)
+    **batch-79 Inc-11: this docstring cites no line number as a POINTER, and it
+    took three commits to get there.** Numbers still appear below, and they are
+    NARRATION -- the record of which ranges were claimed and how each was wrong.
+    Read none of them as an address. (Two earlier drafts got this wrong in
+    opposite directions: the first claimed "EVERY line number is now gone" while
+    five remained, and the fifth gate then noted that one of the survivors,
+    ``1339-1393``, happens to be the block's CURRENT extent -- accurate today,
+    which is exactly what makes narration read as a pointer. The wording above
+    is scoped to POINTERS for that reason.)
     The first pass cited
     ``screens_directionb.py:6712`` for that comment; the branch pushed it to
     ``:6822``. The second pass removed that one and left the block's own range

@@ -6,6 +6,40 @@
 
 > **Last refresh: 2026-08-01 (batch-77 Phase-3 handoff — a CODE-lane batch routing one Lane-B carry here).** `origin/main` tip = **`f8747b8`**. batch-77's own work is reconciled in [`BACKLOG-CODE.md`](BACKLOG-CODE.md); **one item belongs to this lane and is WRITTEN here rather than left as a pointer**, per the routing rule. See the new section immediately below.
 
+## 🆕 Routed from batch-79 (2026-08-13) — the fix that reproduces its own defect class, and the anchor that cannot go stale
+
+  - **▸ (P1, NEW) `F-8` — a FIX is where this project's dominant defect class reproduces most reliably, and no test can catch it. EIGHT instances in one session, across five independent merge-gate passes.** Registered, **not encoded** (control-encode rule above).
+
+    | # | The fix | The defect it carried | Found by |
+    |---|---|---|---|
+    | 1 | the vacuous-input-set guard (`AT-B78-14`) | used a vacuous input set — `FunctionDef` only, so 34 real symbols read as missing | self, in minutes — it failed **loudly** |
+    | 2 | `TC-B79-01`, the context bound | no assertion on how it apportions | gate 2 |
+    | 3 | the line-citation sweep | created four new stale citations | gate 2 |
+    | 4 | …its correction | the "corrected" range was wrong **on arrival** | gate 3 |
+    | 5 | `TC-B79-04`, replacing #2 | left unasserted the branch production actually takes | gate 3 |
+    | 6 | the `F-9` root-cause record | the stated cause was **physically impossible** — the pathspec excluded the file it blamed | gate 3 |
+    | 7 | the citation-mechanism record | "+1 shift" false; the real shifts are non-uniform (+1 / +105) | gate 4 |
+    | 8 | the symbol-anchoring sweep | **5 of 6 anchors named the wrong symbol; one was invented** | self, then gate 5 independently |
+
+    **The mechanism, in the fifth gate's words:** *"HIGH-1 is comments and docstrings, with no runtime surface, which is precisely why 2656 passing tests cannot see it. That is the finding's point: the batch's recurring defect class lives in exactly the region its test suite has no oracle for, which is why it has survived five gates."*
+
+    **Three properties worth encoding, if approved:**
+    1. **A correction is itself a change and inherits the full risk.** Three of the eight are corrections *of* corrections. There is no terminal state reached by editing carefully — only by re-measuring.
+    2. **The counterfactual is not optional on a fix.** It is the only thing that caught #2 and #5, and in both cases the node *looked* thorough and *read* as complete.
+    3. **A green suite is not evidence about this class.** Seven of the eight sit in specs, records, acceptances or prose. The instrument that found them was an independent adversarial pass briefed to attack the author's claims.
+
+    **Evidence strength:** the highest single-session count in the project's record, every instance verified by execution, and five found by an independent reviewer.
+
+  - **▸ (P2, NEW) Symbol anchors must be EXECUTED against the tree, exactly like figures — replacing a line number with a symbol trades a *staleness* failure mode for a *correctness* one.** Registered, **not encoded**.
+
+    batch-79 replaced six stale `file.py:NNN` citations with symbol names. **Five named the wrong symbol, and one — `S19TuiApp.RAIL_ITEMS` — has never existed in this repository**, while the comment carrying it read *"surface fact, verified against …"* — asserting a verification against a symbol that does not exist.
+
+    **Root cause:** the anchors were derived by taking the nearest preceding `def` to each stale line number — *guaranteed* wrong precisely when the line number is the thing that drifted. The one anchor that survived (`S19TuiApp.compose`) is the one whose line had barely moved.
+
+    **Why it is worse than what it replaced.** A stale line number fails **visibly** — the reader lands past end-of-file or on obvious nonsense. A wrong *symbol* lands them inside a real, plausible method: following `_apply_prepared_load` for "the A2L in-image glyph fold" delivers a genuine glyph mechanism that is not the one cited. **Temporarily wrong becomes permanently wrong.**
+
+    **The discharge is cheap and exists:** a harness resolving every anchor against the AST and asserting each *contains* the substring its sentence claims. batch-79 wrote one; all 17 anchors pass. ⚠️ Carry this too: the *original* citation for the rail-key claim (`app.py:687-691`) resolved at the batch base to `_STRIP_CELL_GLYPH` — **false before the batch** — so the sweep added a second false reference to a sentence that already had one.
+
 ## 🆕 Routed from batch-77 (2026-08-01) — a control whose prescribed discharge no longer executes
 
   - **▸ (P2, NEW) `C-33`'s two named liveness mechanisms are BOTH unavailable under the current harness — the control cannot be discharged as written.** C-33 mandates never waiting passively on a delegated gate, and names two discharges: *"an active blocking wait (`TaskOutput block=true`, re-polling on timeout) OR poll\[ing] a genuine progress signal (touched-file mtime …; `TaskOutput` status)."* Both were tested at batch-77 Phase 1 and neither works:
