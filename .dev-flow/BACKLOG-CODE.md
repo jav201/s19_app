@@ -39,6 +39,49 @@ boundary. batch-79 status **as of 2026-08-12**: Inc-6…Inc-11 shipped **includi
 acceptances and the merge-gate response**; **Inc-12 owed** (the 29-golden snapshot regen, canonical
 CI only, its own PR).
 
+- **▸ (P2) `#status_text` silently drops most of a routine load message at 80×24 — batch-79's eighth merge gate, NON-BLOCKING.**
+  Measured with ordinary names and the real `_format_coexistence_status` output:
+
+  ```
+  BASE 829adc6 @80x24:  |Loaded brake_ecu_app_v12.s19 (S19+MAC: brake_ecu_app_v|   ~76 cols
+  HEAD         @80x24:  |Loaded brake_ecu_app_v12.s19 (S19+MAC:|                   38 cols, NO ellipsis
+  ```
+
+  **Not blocked, and the reason is load-bearing:** `app.py:9681-9683` sends the *same string* to
+  `set_file_status` **and** `_append_log_line`, and the gate verified the log tail two rows below
+  carries it in full at 80×24. **Nothing leaves the screen** — it is a legibility regression, not an
+  information loss.
+
+  Two related findings, same site:
+  - **The stylesheet's stated mechanism does not hold.** `#status_text`'s comment claims *"`1fr` +
+    ellipsis makes the transient MESSAGE truncate"*. Executed: `text-overflow: ellipsis` fires only
+    when the text has **no wrap point**. Every real coexistence message contains spaces, so the Label
+    wraps and rows 2+ are clipped by `#status_line { height: 1 }` — loss with **no ellipsis**. Only an
+    unbroken-token probe produced `…`. *A CSS property named in a comment is not evidence it fires.*
+  - **No separator between the two cells at 80×24**, so the strip reads as one run-on string.
+  - **Nothing asserts the status MESSAGE survives the new sizing.** `AT-B78-08/11` uses a realistic
+    message but observes only `#status_context` and the bar height. This gap is why the regression
+    reached the gate.
+
+- **▸ (P3) `AT-B78-28` clause 1 asserts the affordance against the RENDERABLE, not the painted strip — batch-79 gate 8, NON-BLOCKING.**
+  Measured: the affordance is present in `_b78_run_list_text` at every size but **truncated in the
+  painted strip at every regime** — `Keys: Up/Down move the ` at wide (list 26 cols, constant 32).
+  `Up`/`Down` stay readable so the requirement is met **in substance**, but this is the exact
+  `render()`-vs-painted distinction the batch spent several gates establishing elsewhere, **applied
+  inconsistently here**.
+
+- **▸ (P3) Three defects in `TC-B79-05`'s own record — batch-79 gate 8, NON-BLOCKING.**
+  - Its docstring pairs **two figures computed under different definitions of the same word**: *"276
+    real members against 783 admitted"*. `276` is the class-body-only count; the shipped resolver's
+    own count is **337**, because it deliberately includes `self.X` — as the paragraph directly above
+    it explains. The honest ratio is **770/337 ≈ 2.3×**, not 783/276 ≈ 2.8×. *Neither figure names its
+    commit or its definition.* Same shape as the `F-8` instances the node exists to guard against.
+  - It reads `Path("s19_app/tui/app.py")` — **relative**; the only new node with a cwd dependency.
+    Fails loudly off-root, so not vacuous.
+  - `_CONTEXT_BAR_INSET = 4` is exact at 80/120/160 and **wrong below**: at 20 columns the real inset
+    is 6, so the composer budgets 11 against a 9-column cell. Outside the supported set, and
+    `TC-B79-02` correctly asserts only the three supported sizes. Related to the carried `N-7`.
+
 - **▸ 🛑 (P1 — BATCH-82 CHARTER) Author the Information Flow Contract for s19's surfaces — the FULL retrofit. LANE A HALF.**
   ⚠️ **Cross-lane item, split per Amendment A.** The **control** (`C-54`: the global flow, template,
   validator rules, propagation) is the Lane B half in

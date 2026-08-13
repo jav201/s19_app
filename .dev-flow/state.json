@@ -117,6 +117,12 @@
       "date": "2026-08-13",
       "decision": "OPERATOR RULING: eighth gate runs with a NARROWED blocking criterion - runtime defects and vacuous assertions block; prose/figures/citations become carries",
       "notes": "Asked with the seven-pass evidence on the table. This is the operator's amendment to their own precondition, not a waiver and not an orchestrator decision."
+    },
+    {
+      "phase": 3,
+      "date": "2026-08-13",
+      "decision": "GATE 8 RETURNED PASS - the merge precondition is SATISFIED for the first time in eight passes",
+      "notes": "Under the operator's own narrowed criterion. 17 mutations of shipped code, 16 killed; no runtime defect and no vacuous assertion. Merging under the standing authorization granted 2026-08-11."
     }
   ],
   "merge_gate_2026_08_12": {
@@ -175,5 +181,17 @@
   "carried_from_batch78": {
     "findings_reaching_this_batch": "batch-78 HANDOFF section 4, eight rows. The two widest: the command palette has NO escape-to-close (LLR-119.3/AT-B78-07 asserted a constraint against a binding that never existed - Inc-9 must choose a disposition IN WRITING, not inherit one); and section 5.1 rule 1's painted-height metric measures the BORDER BOX and does not clip through intermediate ancestors, so AT-B78-26's 120x30 '>=1 hex row' clause would pass with three rows of border and zero hex - BLOCKS Inc-10, use Inc-1's corrected helper. Also: Lane-1 blast radius is 6 test files not 3, and test_tui_app.py goes BLIND not RED (it monkeypatches update_project_labels, so its green is not evidence); the bar acts on the WRONG PANE today, so / and g must route on _active_screen_key; 7 of 10 screens own no local find/goto; the deletable CSS span is :66-102 not :55-102; Widget.focusable ignores display, so a geometry change can empty an acceptance without touching it.",
     "owed_elsewhere": "C-78-xx (a gate invoked through a pipe takes the PIPELINE's exit status) is owed an owner and is process-lane work. C-78-xxiv is cited in batch-78's HANDOFF section 5 but was never registered in phase3_carries."
+  },
+  "merge_gate_8_2026_08_13": {
+    "verdict": "PASS",
+    "criterion": "the operator's NARROWED criterion - blocks only on (a) a runtime defect or (b) a vacuous assertion.",
+    "evidence": "17 mutations of SHIPPED CODE, 16 killed. The single survivor - moving the HLR-126 affordance to position 0 - is a placement preference stated in a comment, not a requirement, and its survival CONFIRMS the first_run_position = len(items) claim rather than exposing a gap.",
+    "runtime_driven": "Through Pilot against the shipped surfaces, not helpers: / and g on 10 screens (3 owners focus their own inputs, 7 non-owners emit exactly ONE notice and take no focus); LLR-004.5 suppression after the re-home ('.,+-gq/' all land as text, no binding fires); escape releases find and goto with the palette untouched; the full context lifecycle including unload-a2l, unload-all, variant switch on BOTH surfaces, and the single-variant plain form; hostile control characters in project AND a2l with zero C0/DEL/C1 on either painted surface; bar height exactly 7 on 10/10 screens at all three sizes; #command_bar_slot AND #command_bar height 0 on 10/10 (the hole is gone, not just emptied); a 10-resize storm with no pauses; degenerate sizes down to 20x10; empty state; and the HLR-126 affordance keyboard-reachable set being exactly the two run indices.",
+    "TC_B79_05_verified": "The tightening HOLDS and did NOT over-tighten. Three anchors injected into a mutation copy: a method-local correctly REJECTED; an inherited framework member via self. resolves; a real method resolves. Re-derived 337 admitted vs the loose form's 770 - it rejects 433 locals.",
+    "independence_checks": "AT-B78-04's owning set is derived by walking the REAL widget tree with the normative id pattern, not from _FIND_GOTO_INPUTS - the map cannot supply its own oracle. AT-B78-06's workspace_value == '' is the load-bearing half. AT-B78-01 co-asserts slot height 0. TC-B78-12's presence co-assertion is INSIDE the per-surface loop.",
+    "tree_integrity": "HEAD moved during the review (2d797e5, b1cf3fd). The gate proved by TREE HASH - not by inspection - that s19_app/, tests/ and tools/ are byte-identical across both. Re-verified here at 3b5b092: still identical. The PASS therefore covers exactly the code being merged.",
+    "figures": "ruff 7 = 7 at base and HEAD. The 9 modules this batch touches: 340 passed, 0 failed. TC-B79-01..05: 5 passed. Notice path exactly 7 screens 1 line each. Owning set {workspace, a2l, mac}. Status bar 7 rows on 10 screens x 3 sizes. 38 new/changed test nodes.",
+    "not_verified_by_the_gate": "The full-suite figure (its run was still in flight) and the two mid-review .dev-flow commits. The suite figure IS verified by the orchestrator at 29 failed / 2657 passed on a quiet tree, and the code trees are proven identical.",
+    "non_blocking_carries": "8 observations registered in BACKLOG-CODE.md. The substantive one: #status_text silently drops most of a routine load message at 80x24 - NOT an information loss, because the same string reaches the log tail and the gate verified it renders in full there. Plus: the stylesheet's ellipsis mechanism does not actually fire on text with spaces; AT-B78-28 clause 1 asserts against the renderable rather than the painted strip; and three record defects inside TC-B79-05 itself."
   }
 }
