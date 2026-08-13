@@ -129,6 +129,12 @@
       "date": "2026-08-13",
       "decision": "MERGED - PR #192 squashed to f198447",
       "notes": "Gate 8 PASS + CI green on both jobs + operator's Inc-12-first ruling followed. Vault sync is still OWED (obsidian_synced remains false)."
+    },
+    {
+      "phase": 6,
+      "date": "2026-08-13",
+      "decision": "synced-to-obsidian",
+      "notes": "G:\\My Drive\\ConsultIA\\Obsidian_Vaults\\AI-Consulting-Brain\u0001 - Proyectos\\s19_app\\dev-flow-batches6-08-07-batch-79\\ - PLAN, both HANDOFFs, the two Inc-11 packets, the C-54 design, state-at-close.json and the README. PREREQUISITE 2 FAILED and the sync proceeded on the operator's explicit instruction: current_phase is 3 and NONE of the artifacts the skill copies (01/02/04/05/06) exist, because this batch was cut at phase 3 by scope and its spec is INHERITED from batch-78, already in the vault. Followed the batch-78 precedent for this shape. The two Inc-11 packets were included by operator ruling against the no-03-increments convention, because with no 04/05/06 they are the only home of the F-8 record."
     }
   ],
   "merge_gate_2026_08_12": {
@@ -168,7 +174,7 @@
     "F-6": "THE AT/TC REGISTRY IS BLIND TO ALL 106 BATCH-78/79 ACCEPTANCE NODES. Found by accident when the new TC-B79 nodes did NOT trip G1, then EXECUTED rather than inferred: _FUNC_ID_RE (tools/id_registry.py:95) requires digits immediately after at/tc, so `at_b78_09` NO MATCH while `_tc489` and `_tc016s` match. derive_named_nodes over the whole corpus derives 678 ids, of which B78/B79-shaped = 0. iter_tokens('AT-B78-12') -> governed=False conforming=False key=None, vs TC-489 -> governed=True. 106 test nodes carry the form; 0 registry rows exist for it. Batch-78 minted an id namespace OUTSIDE the project's own id grammar and every guard declines to police it SILENTLY. Lands on the Lane B finding already on record that the id GRAMMAR is undefined. Also QUALIFIES AT-B78-14: for this namespace the registry never had anything to reconcile. NOT FIXED - changing the grammar reclassifies tokens repo-wide, Lane A work, operator decision owed.",
     "F-7": "A GATE INVOKED THROUGH A POWERSHELL PIPE REPORTED THE WRONG EXIT CODE AND SWALLOWED ITS OUTPUT. `pytest tests/ | Select-Object -Last 45` reported exit 4 (pytest 'usage error') with an EMPTY output file - no test ran that way. Re-run as `pytest ... > file 2>&1` reading $LASTEXITCODE directly: exit 1 and the real 29 failures. This is C-78-xx, already carried WITHOUT AN OWNER, now observed live at a cost of one 45-minute suite run. A gate's exit code must be read from the GATE, never from the pipeline it was piped into."
   },
-  "obsidian_synced": false,
+  "obsidian_synced": true,
   "created_at": "2026-08-07",
   "progress": {
     "phase0": "COMPLETE - premise evaluation executed, 1 FALSE premise found and dispositioned.",
