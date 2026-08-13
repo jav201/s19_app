@@ -6415,22 +6415,27 @@ class S19TuiApp(App):
 
         The context line is the reason this handler does a third thing.
         ``_compose_context_line`` bounds the project and A2L halves against a
-        budget derived from the status bar's width AT WRITE TIME, so a line
+        budget derived from the terminal width AT WRITE TIME, so a line
         composed at one terminal size is stale at the next. Without this call
         the ``HLR-120`` bound is applied once and never re-applied: composed at
-        160x40 and resized to 80x24, the A2L was evicted on 10 of 10 screens —
+        160x40 and resized to 80x24, the A2L was evicted on 10 of 10 screens --
         byte-for-byte the defect the bound was added to remove.
 
         Recomposing here is what makes the threshold *"contains both on 10 of
         10 screens"* unconditional rather than true only of the size the line
         happened to be written at.
 
-        ⚠️ It goes through ``call_after_refresh``, and that is load-bearing.
-        This handler runs BEFORE the layout reflows, so a direct call reads the
-        status bar's OLD width and budgets for the size being left rather than
-        the size being entered — which recomposes to a budget that is still
-        wrong. Executed: a direct call left the full 91-column line against a
-        53-column budget at 160x40 -> 80x24, i.e. no observable change at all.
+        **It goes through ``call_after_refresh``, and that is load-bearing:
+        ``App.size`` is STALE inside this handler.** ``event.size`` (which the
+        two lines above use) is the new size; ``self.size`` still reports the
+        old one until the refresh lands, and the composer reads ``self.size``.
+        Executed with a direct call instead: the full 91-column line survived
+        against a 53-column cell at 160x40 -> 80x24 -- no observable change at
+        all. ``TC-B79-04``'s resize axis reddens on that substitution.
+
+        (A reader may reasonably ask why the composer does not simply take the
+        width as an argument. It has five other call sites that have no event
+        to hand; deferring here keeps one signature and one source of truth.)
         """
         self._apply_width_regime(event.size.width)
         self._apply_diff_regime(event.size.width, event.size.height)
@@ -11641,9 +11646,21 @@ class S19TuiApp(App):
     #: the other reddens instead of silently clipping again.
     _CONTEXT_MAX_SHARE = 0.70
 
-    #: Budget used when the terminal has no resolved width yet (pre-mount).
-    #: 53 is the measured cell width at the narrowest supported terminal,
-    #: 80x24 -- the SAFE end of the range, never an optimistic one.
+    #: Last-resort budget, reached only when the terminal reports a width at or
+    #: below `_CONTEXT_BAR_INSET`. 53 is the measured cell width at the
+    #: narrowest supported terminal, 80x24.
+    #:
+    #: ⚠️ Recorded rather than claimed: this is **very nearly dead code**, and
+    #: the comment it replaces was false twice over. It said "used when the
+    #: terminal has no resolved width yet (pre-mount)" -- measured, an unmounted
+    #: `App.size` falls through to `console.size` and returns `Size(80, 25)`,
+    #: never 0, so the pre-mount path does not reach here. And the live path
+    #: cannot either: `update_project_labels` early-returns before the composer
+    #: when `#status_context` is unresolvable. It also called 53 "the SAFE end
+    #: of the range"; at the only width that can reach it (<= 4 columns) a
+    #: 53-column budget is the OPTIMISTIC end. Kept as a defined value rather
+    #: than deleted, because the alternative is an unbounded string, but it is
+    #: not a fallback anyone should reason from.
     _CONTEXT_FALLBACK_BUDGET = 53
 
     #: Columns of app chrome between the TERMINAL width and

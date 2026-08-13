@@ -6819,8 +6819,10 @@ class AbDiffPanel(Container):
     #: Footer's `show and enabled` set to be set-EQUAL to its pre-change set of
     #: 14, so a shown chip here would redden `AT-B78-28` at Inc-6.
     #:
-    #: None of these four keys is bound at application level (`app.py:1338-1392`
-    #: — `f`, `escape`, `[` and `]` are all free), so a press that reaches the
+    #: None of these four keys is bound at application level (`f`, `escape`,
+    #: `[` and `]` are all absent from `S19TuiApp.BINDINGS`; cited by SYMBOL
+    #: because the line range this comment used to give was invalidated by an
+    #: import added at the top of `app.py` in the same batch), so a press that reaches the
     #: panel cannot shadow an App action. That is HLR-122's anti-shadow clause
     #: applied one container up: these bindings sit on an ANCESTOR of the run
     #: list, so they are in the focus chain whenever `AT-B78-19` runs.
@@ -7412,8 +7414,10 @@ class AbDiffPanel(Container):
             self._run_note_item(f"B artifacts: {summary_b}"),
             # LLR-126.1's visible affordance. It rides in the list BODY, not in
             # `border_title`, and that is a regime decision rather than a style
-            # one: `styles.tcss:1623` gives the list `border: none` in the
-            # fallback regime, so a border-hosted affordance would be present at
+            # one: `styles.tcss` gives `#diff_range_list` `border: none` in the
+            # fallback regime (cited by SELECTOR -- the line number this comment
+            # carried pointed at `#diff_hex_b`, ~47 lines short of the rule it
+            # named), so a border-hosted affordance would be present at
             # 132x44 and ABSENT at 120x30 — "shall carry a visible affordance"
             # unsatisfied in a supported regime, with an acceptance green at one
             # size and inert at the other. A body row is visible wherever the

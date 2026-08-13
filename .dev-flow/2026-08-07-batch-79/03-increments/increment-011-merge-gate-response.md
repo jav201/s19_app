@@ -378,33 +378,118 @@ AttributeError: 'NoneType' object has no attribute 'splitlines'
 ```
 
 Cause: it runs `git diff main -- s19_app/tui/app.py` with `subprocess.run(..., text=True)` and **no
-`encoding`**, so Python decodes with `locale.getpreferredencoding()` — **cp1252** here. The CJK
-fixture added to `TC-B79-04` in a *different* module put byte `0x8f` in the diff, the reader thread
-raised `UnicodeDecodeError`, `stdout` came back `None`, and the guard crashed.
+`encoding`**, so Python decodes with `locale.getpreferredencoding()` — **cp1252** here. A codepoint
+cp1252 cannot map entered that diff, the reader thread raised `UnicodeDecodeError`, `stdout` came
+back `None`, and the guard crashed.
 
-Three things worth keeping:
+> ⚠️ **RETRACTED — the cause first recorded here was false, and the third gate caught it.** This
+> section said the trigger was the CJK fixture added to `TC-B79-04` in `tests/`. **That is
+> impossible**: the pathspec is `-- s19_app/tui/app.py`, which excludes `tests/` entirely.
+> Re-derived on that exact diff — CJK present: **False**; non-ASCII present: `U+00AB U+00BB U+2014
+> U+2026 U+26A0 U+FE0F`. The real trigger was **`⚠️` in `on_resize`'s docstring — in the very file
+> being diffed, added by this batch's own commit.** `U+FE0F` (VS16) encodes to `ef b8 8f`, supplying
+> the cited `0x8f`. At base `app.py` carried 9× `U+26A0` and **0× `U+FE0F`**.
+>
+> **The retraction changes the lesson, not just the detail.** *"The blast radius crossed modules
+> through git"* is false — it never left `app.py`. And the risk axis is not content-vs-paths but
+> *"does the captured output contain any non-cp1252 codepoint"*, which `⚠️` trips and which this
+> codebase's comments use everywhere.
 
-1. **The blast radius crossed modules through `git`.** A string literal in one test file disabled a
-   freeze guard over a different file. Nothing about the two is coupled in the source.
-2. **The guard failed in the worst available way** — not RED on its own assertion, and not silently
+What survives, and is worth keeping:
+
+1. **The guard failed in the worst available way** — not RED on its own assertion, and not silently
    green, but with an `AttributeError` naming `splitlines`. Anyone reading that sees a broken test,
    not "the binding census did not run".
-3. **Only the full suite could catch it.** The targeted runs used at every earlier increment of this
+2. **Only the full suite could catch it.** The targeted runs used at every earlier increment of this
    batch never touch `test_tui_patch_history_strip.py`. This is `F-4` collecting a second scalp
    inside the same session that recorded it.
+3. **A guard can be disarmed by prose.** Not across modules as first claimed, but by an ordinary
+   comment edit in the file under guard — which is a *smaller* radius and a *more likely* trigger.
 
-Fixed at the one call that decodes source content; the other **eight** siblings are enumerated and
-carried (they emit paths, SHAs or `--stat` counts). A narrow patch taken deliberately, with the
-general control registered rather than pretended.
+Fixed at the one call that decodes file content, verified live afterwards (36 089 chars, 0
+replacement characters, an injected `Binding(` line still detected); the other **eight** siblings are
+enumerated and carried. A narrow patch taken deliberately, with the general control registered.
+
+## 7c · THIRD merge gate — BLOCK. Two records were wrong and one new node was vacuous.
+
+The third pass confirmed **N-1 and N-2 survive every attack it mounted** — budget equals the painted
+cell exactly at 80/100/120/160/200, inset `= 4` at every width, `_clip_to` correct across 14 boundary
+cases including mid-double-width caps, VS16, ZWJ and combining marks. It blocked on three things.
+
+### G-1 (MED-HIGH) — **F-9's recorded cause was false.** See the retraction in §F-9 above.
+
+The operator was being asked to decide the 8-sibling sweep from a stated risk axis
+(content-vs-paths) that **was not the axis that fired**. Corrected in this file and in
+`BACKLOG-CODE.md`; the fix itself was verified correct and left alone.
+
+### G-2 (MED) — `TC-B79-04` closed two of three branches and claimed all three
+
+Asked to write an implementation that passes the new node and is still wrong, the gate produced one
+in a line: substitute `a2l_cap = 12` in the **both-overflow** branch. Reproduced here — **GREEN,
+survived**. It only reddens at `a2l_cap <= 1`, because the discriminating fragment `"ASAP2_ECU"` is
+9 characters.
+
+**And that is the branch production actually takes.** Project 42 columns, A2L 43: at 80×24
+`avail=48, half=24`; at 120×30 `avail=76, half=38` — both halves overflow at both sizes where the
+defect was measured. So axis 1 exercised only the two *slack* branches, and the effective guarantee
+was *"the A2L gets ≥ 10 of ~48 columns"* while the docstring claimed an even split.
+
+Closed by axis 1b: with both halves overflowing, neither may fall below `half - 1`.
+
+**This is F-8 recurring for the third consecutive commit** — and this time inside the node written
+specifically to close the previous instance of it.
+
+### G-3 (MED) — the citation fix recurred, and its "correction" was wrong on arrival
+
+Five stale citations at HEAD, four written or broken by this batch. The mechanism was one line:
+`from rich.cells import cell_len, set_cell_size` at the top of `app.py`, which shifted every `app.py`
+citation by +1.
+
+The sharp one is `AT-B78-32`'s docstring — the node re-authored across two prior commits precisely to
+remove stale citations, which closes with *"Any edit ABOVE the block shifts it, so `1338-1392` is one
+insertion away from failing the same silent way."* The next commit made that insertion. **And the
+"corrected" range was already wrong when it was written**: the block was `1339-1393`, never
+`1338-1392`.
+
+All line numbers are now gone from that docstring. Also corrected: `action_show_help_panel`'s line
+(accurate at base, broken by this batch), the `deque(maxlen=4)` line, the `BINDINGS` range in
+`screens_directionb.py`, and `styles.tcss:1623` — which pointed at `#diff_hex_b`, ~47 lines short of
+the `border: none` rule it named.
+
+### G-4 / G-5 / G-6 (LOW) — fixed
+
+- The `on_resize` docstring described the mechanism its own commit deleted (it said the budget comes
+  from the status bar's width; it comes from `App.size`). Corrected — and the real reason for the
+  deferral is now stated: **`App.size` is stale inside the handler while `event.size` is not.**
+- `_CONTEXT_FALLBACK_BUDGET`'s comment was false twice: an unmounted `App.size` returns `Size(80,25)`
+  rather than 0, so the "pre-mount" path never reaches it, and at the only width that can (≤ 4
+  columns) a 53-column budget is the *optimistic* end, not the "SAFE" one it claimed.
+- `N-7` was recorded in this file and **never registered in `BACKLOG-CODE.md`** — a carry that would
+  have died at the batch close. Registered.
 
 ### F-8 — the lesson that outranks all of them
 
-**Three separate fixes in this session each carried a defect of the same class they were fixing.**
-The vacuous-input-set guard used a vacuous input set (F-2). The line-citation fix created four new
-stale citations (N-5). The bound written to stop one half evicting the other had no assertion on how
-it apportions (N-3). *A fix is a change, and a change made under the pressure of a blocked gate is
-where this project's dominant defect class reproduces most reliably.* The counterfactual is not
-optional on a fix — it is the only thing that caught N-3.
+**FIVE separate fixes in this session each carried a defect of the same class they were fixing, and
+the pattern held across three consecutive gate passes:**
+
+| The fix | The defect it carried | Found by |
+|---|---|---|
+| The vacuous-input-set guard (`AT-B78-14`) | used a vacuous input set | self, in minutes — it failed loudly |
+| The line-citation fix (N-5) | created four new stale citations | gate 2 |
+| …and its own correction (G-3) | the "corrected" range was wrong **on arrival** | gate 3 |
+| The context bound (`TC-B79-01`) | no assertion on how it apportions (N-3) | gate 2 |
+| …and its replacement (`TC-B79-04`, G-2) | left the branch production actually takes unasserted | gate 3 |
+
+*A fix is a change, and a change made under the pressure of a blocked gate is where this project's
+dominant defect class reproduces most reliably.* Three observations that follow:
+
+1. **The counterfactual is not optional on a fix.** It is the only thing that caught N-3 and G-2, and
+   in both cases the node looked thorough and read as complete.
+2. **A correction is itself a change and inherits the risk.** Two of the five above are corrections
+   of corrections. There is no terminal state reached by editing carefully — only by re-measuring.
+3. **The most dangerous artifact in this session was not code.** Four of the five are prose or
+   acceptance-side, and the one that reached the operator's decision (F-9's false cause, G-1) would
+   have had them decline a sweep on a risk axis that was not the one that fired.
 
 ---
 

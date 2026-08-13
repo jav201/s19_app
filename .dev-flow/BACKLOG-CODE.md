@@ -78,21 +78,47 @@ CI only, its own PR).
   of reporting what it was built to report**. A guard that cannot fail loudly fails silently-adjacent:
   the error names the wrong thing entirely.
 
-  **Observed live at batch-79 Inc-11.** Adding a CJK fixture string to `tests/test_tui_commandbar.py`
-  put byte `0x8f` into `git diff main -- s19_app/tui/app.py` and took
-  `test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff` down — a **binding-freeze guard**,
-  killed by prose in an unrelated module.
+  **Observed live at batch-79 Inc-11**, killing
+  `test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff` — a **binding-freeze guard**.
 
-  **Fixed at the one site that decodes source CONTENT** (`encoding="utf-8", errors="replace"`;
-  the guard greps for `Binding(`, pure ASCII, so `errors="replace"` cannot hide a real hit). The
-  remaining eight are lower risk because they emit paths, SHAs or `--stat` counts rather than file
-  content — `test_engine_unchanged.py` (`git diff --name-only`), `test_examples_smoke.py`
-  (`git ls-files`), `test_tui_legend.py` ×2 (`git rev-parse`, `git diff --stat`),
+  ⚠️ **The cause first recorded here was FALSE, and the third merge gate caught it.** This entry
+  said a CJK fixture added to `tests/test_tui_commandbar.py` put byte `0x8f` into the diff. That is
+  **impossible**: the command is `git diff main -- s19_app/tui/app.py`, whose pathspec excludes
+  `tests/` entirely. Re-derived on that exact diff:
+
+  ```
+  CJK present                : False
+  non-ASCII codepoints       : U+00AB U+00BB U+2014 U+2026 U+26A0 U+FE0F
+  U+FE0F ("️", VS16) in utf-8 : ef b8 8f   <- the cited 0x8f
+  added by                   : the batch's own commit, in `on_resize`'s docstring
+  ```
+
+  The trigger was **`⚠️` in a docstring of the very file being diffed** — `U+26A0 U+FE0F`, where the
+  variation selector supplies `0x8f`. At base `app.py` held 9× `U+26A0` and **0× `U+FE0F`**; this
+  batch added the file's first one.
+
+  **Two consequences.** The lesson previously recorded — *"the blast radius crossed modules through
+  git"* — is false; it never left `app.py`. And the risk axis is **not** content-vs-paths but
+  *"does the captured output contain any non-cp1252 codepoint"* — and `⚠️` is used liberally in this
+  codebase's comments, so the axis is far easier to trip than the original note implied.
+
+  **Fixed at the one site that decodes file CONTENT** (`encoding="utf-8", errors="replace"`; the
+  guard greps for `Binding(`, pure ASCII, so `errors="replace"` cannot hide a real hit — verified
+  live: 36 089 chars read, 0 replacement characters, an injected `Binding(` line still detected).
+  The remaining eight emit paths, SHAs or `--stat` counts and were checked to read no file
+  containing `⚠️` today — `test_engine_unchanged.py` (`--name-only`), `test_examples_smoke.py`
+  (`git ls-files`), `test_tui_legend.py` ×2 (`rev-parse`, `diff --stat` on `color_policy.py`),
   `test_tui_directionb.py` (generic `["git", *args]` — **risk depends on the caller**),
-  `test_a2l_f841_cleanup.py`, `test_flow_persistence.py`, `test_tui_workspace.py`. **Operator decision
-  owed:** sweep all eight, or leave them and accept that a non-ASCII path name or a new
-  content-producing caller re-arms it. *A narrow patch was taken deliberately; the general control is
-  what is being registered.*
+  `test_a2l_f841_cleanup.py`, `test_flow_persistence.py`, `test_tui_workspace.py`. **Operator
+  decision owed:** sweep all eight, or leave them knowing one `⚠️` in a newly-diffed file re-arms it.
+  *A narrow patch was taken deliberately; the general control is what is registered here.*
+- **▸ (P3) `N-7` from the batch-79 merge gate — degenerate terminal widths breach the context budget.**
+  `_compose_context_line` returns the bare 5-column separator when the budget falls under the
+  separator's own width (`bar_width <= 7`), and at `avail == 1` returns `"  |  …"` — the project
+  evicted entirely, contradicting the method's own *"neither can evict the other"*. **Unreachable at
+  the three supported terminal sizes**, which is why it was carried rather than fixed. Registered
+  here because the third gate found it recorded in the increment file and **missing from this
+  backlog** — a carry that lives only in a batch artifact does not survive the batch close.
 - **▸ (P2) `M-4` from the batch-79 merge gate — `_apply_unload` now clears `current_a2l_path`, a
   production behaviour change outside every in-scope requirement.** Landed as an F6 fix at Inc-7. It
   reaches `save_project`, the empty-state guards and `_project_stem` — all resolved **by name**, because

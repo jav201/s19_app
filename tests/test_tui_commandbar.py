@@ -1475,6 +1475,34 @@ def test_tc_b79_04_the_context_apportionment_is_pinned(tmp_path: Path) -> None:
         f"{avail // 2}. A fixed per-half cap passes TC-B79-01 and fails here."
     )
 
+    # --- axis 1b: the BOTH-OVERFLOW branch --------------------------------
+    # The third gate's F-2: axes 1-3 above exercised only the two SLACK
+    # branches, so `else: a2l_cap = 12` survived them -- and `else` is the
+    # branch PRODUCTION takes at both sizes where the defect was measured
+    # (project 42 cols, A2L 43; at 80x24 avail=48/half=24, at 120x30
+    # avail=76/half=38 -- both halves overflow both times). The method's
+    # docstring names that branch's design as "split evenly, so neither can
+    # evict the other" and nothing tested it: the effective guarantee was
+    # "the A2L gets >= 10 of ~48 columns".
+    for size in ((80, 24), (120, 30)):
+        composed, bar_w = asyncio.run(_probe(size, _B79_LONG_PROJECT, _B79_LONG_A2L))
+        left, _, right = composed.partition(sep)
+        avail = int(bar_w * S19TuiApp._CONTEXT_MAX_SHARE) - cell_len(sep)
+        half = avail // 2
+        # Both overflow, so neither half may fall below the even split. `- 1`
+        # absorbs the odd-`avail` remainder, which the design gives to one side.
+        assert cell_len(left) >= half - 1, (
+            f"TC-B79-04 @{size}: with BOTH halves overflowing, the project must "
+            f"get its even share; got {cell_len(left)} of an even split of "
+            f"{half}. composed={composed!r}"
+        )
+        assert cell_len(right) >= half - 1, (
+            f"TC-B79-04 @{size}: with BOTH halves overflowing, the A2L must get "
+            f"its even share; got {cell_len(right)} of an even split of {half}. "
+            f"A fixed cap in the `else` branch survives every other clause in "
+            f"this node -- that is what this one exists for. composed={composed!r}"
+        )
+
     # --- axis 2: resize ---------------------------------------------------
     for start, end in (((160, 40), (80, 24)), ((160, 40), (120, 30))):
         composed, bar_w = asyncio.run(
@@ -2111,7 +2139,7 @@ def test_at_b78_05_the_seven_non_owning_screens_notice_exactly_once(
     ⚠️ **The spec's stated threshold is not measurable as written, and this node
     uses a different oracle for a recorded reason.** `LLR-119.2` reads
     *"`len(app.log_lines)` grows by exactly 1 per key on each of the 7
-    screens"*. Executed: `log_lines` is a `deque(maxlen=4)` (`app.py:1445`), so
+    screens"*. Executed: `S19TuiApp.log_lines` is a `deque(maxlen=4)`, so
     its LENGTH saturates at 4 and stops growing after the fourth notice. Driving
     all seven screens, the first four report a delta of 1 and the last three
     report **0** -- with a correct implementation. A node asserting the spec's

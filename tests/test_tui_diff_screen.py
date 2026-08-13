@@ -3794,26 +3794,32 @@ def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
     RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
 
     The batch-78 spec realizes this as *"a zero-line ``git diff`` over
-    ``app.py:1338-1375``"*. Executed against the tree, the block is
-    ``app.py:1338-1392``: line 1375 is ``("minus", "page_prev_context",
-    "Page-")``, MID-BLOCK, and lines 1376-1392 hold six real bindings --
+    ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
+    MID-BLOCK: the cited end line falls on the ``page_prev_context`` entry, and
+    six real bindings sit BELOW it and outside the range --
     ``comma`` / ``period`` hex paging, ``pagedown`` / ``pageup`` from batch-31
     AC-3, and ``ctrl+z`` / ``ctrl+y`` from batch-40 S2. A binding added or
     removed among those six leaves the range-based predicate GREEN, so the guard
     would report "untouched" for a block that was touched. It fails in the
     safe-looking direction.
 
-    It is not drift: at ``f6ff1d3`` the block was ALREADY 1338-1392 and batch-78
-    added zero ``Binding(`` lines. The range was wrong when it was written and
-    survived three Phase-2 rounds -- because a line range looks like a
-    measurement. A code comment in ``screens_directionb.py`` carried the CORRECT
-    extent, so the two artifacts disagreed and the code was right.
+    It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
+    batch-78 added zero ``Binding(`` lines. The range was wrong when it was
+    written and survived three Phase-2 rounds -- because a line range looks like
+    a measurement. A code comment in ``screens_directionb.py`` carried the
+    CORRECT extent, so the two artifacts disagreed and the code was right.
 
-    ⚠️ batch-79 Inc-11: that sentence used to cite ``screens_directionb.py:6712``
-    -- and by the end of this batch the comment had moved to ``:6822``, because
-    the branch inserted 110 lines above it. **The docstring arguing that a line
-    range "looks like a measurement" was itself carrying a stale line number.**
-    The citation is by FILE and DESCRIPTION now; a symbol reference that cannot
+    **batch-79 Inc-11, third gate: EVERY line number is now gone from this
+    docstring, and it took three commits to get there.** The first pass cited
+    ``screens_directionb.py:6712`` for that comment; the branch pushed it to
+    ``:6822``. The second pass removed that one and left the block's own range
+    ``1338-1392`` in place -- and the very next commit added an import at the
+    top of ``app.py`` and shifted the block to ``1339-1393``. The range that had
+    been "corrected" was **also wrong on arrival**.
+
+    So the docstring arguing that a line range is "one insertion away from
+    failing the same silent way" demonstrated the claim three times on itself.
+    Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
     go stale is the whole point of the node below.
 
     A corrected range would not fix this. Any edit ABOVE the block shifts it, so
@@ -3894,8 +3900,10 @@ def test_tc_b78_38_help_panel_before_any_comparison_does_not_raise(
 def test_tc_b78_39_help_panel_toggles_closed_and_reopens(tmp_path: Path) -> None:
     """TC-B78-39 -- boundary: opened, dismissed, re-opened.
 
-    ``action_show_help_panel`` is this project's TOGGLE override (`app.py:5877`,
-    not the `:5836` the spec cites) rather than the stock mount-only action, so
+    ``action_show_help_panel`` is this project's TOGGLE override -- resolved by
+    NAME, because the line number this sentence used to carry was accurate at
+    the batch base and broken by this batch's own edits -- rather than the stock
+    mount-only action, so
     the second press must REMOVE the panel and the third must bring it back. A
     node that only opened it would leave the override's whole reason untested.
     """
