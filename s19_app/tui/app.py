@@ -26,6 +26,7 @@ from textual.widgets import (
     Static,
     TextArea,
 )
+from rich.cells import cell_len, set_cell_size
 from rich.text import Text
 
 from ..compare import DIFF_KIND_DOMAIN
@@ -1928,7 +1929,20 @@ class S19TuiApp(App):
             # `[red]evil[/].s19` would leak styling or raise MarkupError.
             # markup=False at CONSTRUCTION persists across `.update()` (mirrors
             # the #log_line_* scrub below).
-            Label("Ready.", id="status_text", markup=False),
+            # LLR-120.3 -- the context shares `#status_text`'s ROW rather than
+            # taking one of its own. The bar is 7 rows on all 10 screens
+            # (measured 116x7); an eighth row costs 1 row app-wide against Lane
+            # 1's 3-row reclaim, and the diff pane has 2 content rows to begin
+            # with. Two SIBLINGS in one `Horizontal`, not one shared widget:
+            # `set_status` / `set_file_status` own `#status_text` and would
+            # clobber the context on their next write.
+            Horizontal(
+                Label("Ready.", id="status_text", markup=False),
+                # LLR-120.4: written only via `safe_text`, so this constructor
+                # arg is the sentinel, never file-derived text.
+                Label("", id="status_context", markup=False),
+                id="status_line",
+            ),
             ProgressBar(total=100, id="progress_bar"),
             # batch-33 (LLR-051.8, C-17): the log lines render FILE-DERIVED
             # text (issue messages embedding verbatim {kind!r}/{fmt!r}/... ,
@@ -5744,6 +5758,57 @@ class S19TuiApp(App):
         "crc_designer": "screen_crc_designer",
     }
 
+    #: LLR-119.1 — rail screen-key -> (find input id, go-to input id), or
+    #: ``None`` where the screen owns neither.
+    #:
+    #: **Every one of `SCREEN_CONTAINER_IDS`' ten keys appears here, and the
+    #: seven `None`s are the point.** The map could have listed only the three
+    #: owners and been shorter; then its key set would be the implementation's
+    #: own opinion of who owns an input, and an acceptance quantifying over it
+    #: would certify a completeness the code does not have (C-40 limb 2). Keyed
+    #: on all ten, `set(_FIND_GOTO_INPUTS) == set(SCREEN_CONTAINER_IDS)` is a
+    #: real assertion, and a screen added later without a decision here fails it
+    #: instead of silently joining the notice path. **That assertion is
+    #: `TC-B79-03`** — it was named here from batch-78 onward and did not exist
+    #: until batch-79 Inc-11, when the merge gate found the prose claiming a
+    #: mechanism no test implemented.
+    #:
+    #: **Routing is by SCREEN KEY, never by widget presence.**
+    #: ``action_show_screen`` swaps a ``hidden`` class and nothing unmounts
+    #: (P-10), so all eight inputs resolve on every screen — a presence-based
+    #: implementation is green while wrong. That is not hypothetical: today,
+    #: with an image loaded and A2L active, a find writes into the WORKSPACE
+    #: ``#search_input`` and searches the workspace map.
+    #:
+    #: The owning set is `{workspace, a2l, mac}` — n=3 under the normative
+    #: derivation (an input id matching ``(search|goto)_input$``). A bare "any
+    #: Input in the container" count gives **7** (`patch` 5, `diff` 3, `flow` 1,
+    #: `crc_designer` 13 inputs, none of them a find or go-to), so the two
+    #: honest derivations disagree and only the stated pattern is a definition.
+    _FIND_GOTO_INPUTS: "dict[str, Optional[tuple[str, str]]]" = {
+        "workspace": ("search_input", "goto_input"),
+        "a2l": ("alt_search_input", "alt_goto_input"),
+        "mac": ("mac_search_input", "mac_goto_input"),
+        "map": None,
+        "issues": None,
+        "patch": None,
+        "diff": None,
+        "flow": None,
+        "checks": None,
+        "crc_designer": None,
+    }
+
+    #: The six find/goto input ids, DERIVED from the map above rather than
+    #: re-listed. A hand-written second copy is a set that can disagree with the
+    #: one the routing uses, and `Escape` would then release an input the
+    #: routing can focus, or vice versa.
+    _FIND_GOTO_INPUT_IDS = frozenset(
+        input_id
+        for pair in _FIND_GOTO_INPUTS.values()
+        if pair is not None
+        for input_id in pair
+    )
+
     #: N1: which ``legend.LEGEND_TABLE`` section(s) each rail screen actually
     #: paints, so the Legend modal shows only those rows. A screen absent here
     #: (Workspace / Flow / CRC-Designer) falls back to the FULL table (AC-3) —
@@ -6019,12 +6084,63 @@ class S19TuiApp(App):
         self.query_one(CommandBar).open_palette()
 
     def action_focus_find(self) -> None:
-        """Focus the command-bar find input (``/`` — LLR-004.1)."""
-        self.query_one(CommandBar).focus_find()
+        """Focus the ACTIVE screen's own find input (``/`` — LLR-119.1)."""
+        self._focus_local_input("find")
 
     def action_focus_goto(self) -> None:
-        """Focus the command-bar go-to-address input (``g`` — LLR-004.2)."""
-        self.query_one(CommandBar).focus_goto()
+        """Focus the ACTIVE screen's own go-to input (``g`` — LLR-119.1)."""
+        self._focus_local_input("goto")
+
+    def _focus_local_input(self, kind: str) -> None:
+        """Move focus to the active screen's find or go-to input (LLR-119.1/.2).
+
+        Summary:
+            Resolve the target from ``_active_screen_key`` through
+            ``_FIND_GOTO_INPUTS`` and focus it; when the active screen owns no
+            such input, append exactly one line to the log tail and return
+            without raising.
+
+        Args:
+            kind (str): ``"find"`` or ``"goto"`` — selects which half of the
+                screen's ``(find, goto)`` pair to focus.
+
+        Returns:
+            None
+
+        Raises:
+            None: a screen with no entry, an unmounted tree and an unresolvable
+                target all degrade to a notice or a no-op.
+
+        Data Flow:
+            - Read ``_active_screen_key``, look it up in ``_FIND_GOTO_INPUTS``,
+              and focus the resolved id. **Never queries which inputs exist**:
+              all eight resolve on every screen because ``action_show_screen``
+              only toggles a ``hidden`` class, so a presence-based resolution
+              would be green while writing into another pane.
+            - No entry -> ``set_status`` (the LOG TAIL, not ``#status_text``)
+              with exactly one line naming the absence. That is the majority
+              path: 7 of the 10 screens.
+
+        Dependencies:
+            Uses:
+                - ``_FIND_GOTO_INPUTS`` / ``_active_screen_key`` / ``set_status``
+            Used by:
+                - ``action_focus_find`` / ``action_focus_goto``
+        """
+        targets = self._FIND_GOTO_INPUTS.get(self._active_screen_key)
+        if targets is None:
+            self.set_status(
+                f"This screen has no {'find' if kind == 'find' else 'go-to'} "
+                f"input. Use the rail to switch to Workspace, A2L or MAC."
+            )
+            return
+        target_id = targets[0] if kind == "find" else targets[1]
+        try:
+            self.query_one(f"#{target_id}", Input).focus()
+        except Exception:
+            # TC-B78-41: before mount there is no tree to focus into. A no-op,
+            # matching `_refresh_loaded_panel` / `update_project_labels`.
+            return
 
     def action_open_settings_menu(self) -> None:
         """Open the viewer page-size settings menu (resurfaced via the palette)."""
@@ -6032,67 +6148,6 @@ class S19TuiApp(App):
         if "hidden" in menu.classes:
             self._update_settings_menu()
             menu.remove_class("hidden")
-
-    def on_command_bar_find(self, event: CommandBar.Find) -> None:
-        """
-        Summary:
-            Route a command-bar find submission to the existing validated
-            search handler (LLR-004.6) without adding new decoding code.
-
-        Args:
-            event (CommandBar.Find): The find message carrying the raw
-                typed query text.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Copies the typed text into the existing ``#search_input``
-              widget that ``_handle_search`` already reads, then calls
-              ``_handle_search`` unchanged — so the search runs through the
-              existing ``find_string_in_mem`` path and reports misses /
-              malformed input via ``set_status`` exactly as today. No new
-              search or string-decoding code is introduced (S-1).
-
-        Dependencies:
-            Uses:
-                - ``_handle_search`` (which calls ``find_string_in_mem``)
-            Used by:
-                - Textual message dispatch (``CommandBar.Find`` bubbles up)
-        """
-        self.query_one("#search_input", Input).value = event.query
-        self._handle_search()
-
-    def on_command_bar_goto(self, event: CommandBar.Goto) -> None:
-        """
-        Summary:
-            Route a command-bar go-to submission to the existing validated
-            ``_handle_goto`` handler (LLR-004.2) without adding new
-            address-parsing code.
-
-        Args:
-            event (CommandBar.Goto): The go-to message carrying the raw
-                typed address text.
-
-        Returns:
-            None
-
-        Data Flow:
-            - Copies the typed text into the existing ``#goto_input`` widget
-              that ``_handle_goto`` already reads off the widget tree, then
-              calls ``_handle_goto`` unchanged — so the address is parsed
-              and validated as today and malformed input is reported via
-              ``set_status``. No new address-parsing code is introduced
-              (S-1); ``_handle_goto``'s signature is unchanged.
-
-        Dependencies:
-            Uses:
-                - ``_handle_goto``
-            Used by:
-                - Textual message dispatch (``CommandBar.Goto`` bubbles up)
-        """
-        self.query_one("#goto_input", Input).value = event.address_text
-        self._handle_goto()
 
     async def on_command_bar_palette_action(
         self, event: CommandBar.PaletteAction
@@ -6123,10 +6178,26 @@ class S19TuiApp(App):
         await self.run_action(event.action)
 
     def _command_bar_input_focused(self) -> bool:
-        """Return True while a command-bar ``Input`` holds keyboard focus."""
+        """Return True while a find/go-to ``Input`` holds keyboard focus.
+
+        batch-79 Inc-9 widened this from "a command-bar Input" to "any input
+        `/` or `g` can focus", and the widening is NOT cosmetic — without it
+        LLR-119.1 would have silently un-done LLR-004.5.
+
+        The suppressed set is `. , + - g q /`. While one of those is typed into
+        a focused find box it must become TEXT, not fire a paging or navigation
+        binding. That protection was keyed on the input living inside
+        `CommandBar`; the moment `/` started focusing the screens' own inputs,
+        every one of those characters would have fired its binding instead of
+        reaching the search box — the exact defect LLR-004.5 exists to prevent,
+        relocated rather than fixed. Caught by `test_tc008_single_keys_...`,
+        which is a pre-batch node this increment would otherwise have broken.
+        """
         focused = self.focused
         if not isinstance(focused, Input):
             return False
+        if focused.id in self._FIND_GOTO_INPUT_IDS:
+            return True
         try:
             command_bar = self.query_one(CommandBar)
         except Exception:
@@ -6184,6 +6255,40 @@ class S19TuiApp(App):
             Used by:
                 - Textual key-event dispatch
         """
+        # LLR-119.3 -- `Escape` releases a focused find/goto input.
+        #
+        # MECHANISM (C-16 flagged this "assumed -- verify in target framework at
+        # Phase 3"): a handler gated on the FOCUSED WIDGET'S ID, not an
+        # Input-scoped binding and not a screen-level priority binding. The six
+        # targets are stock `Input` / `OsClipboardInput` instances, so binding
+        # `escape` on them would mean subclassing six widgets to add one key;
+        # and a screen-level or app-level binding would fire on every `escape`
+        # in the application. Gating on the id set makes the handler narrow by
+        # PREDICATE rather than by placement — it cannot fire anywhere else.
+        #
+        # PALETTE DISPOSITION, written rather than inherited, as LLR-119.3
+        # requires. The palette has NO `escape`-to-close: `command_bar.py`
+        # declares no `BINDINGS` and handles no `escape`; re-executed at this
+        # increment, `ctrl+k` then `escape` leaves `palette_is_open` True. The
+        # spec's own suggested justification for deferring -- "the bar is being
+        # deleted anyway" -- is FALSE: `HLR-118` deletes `#command_bar_row`,
+        # while `#command_bar_slot` and `#command_bar` SURVIVE to host the
+        # palette, so the gap outlives Lane 1 rather than dissolving with it.
+        #
+        # Deferred anyway, for the reason that does hold: closing it is a new
+        # capability on a DIFFERENT widget, outside HLR-119's statement, and it
+        # needs its own requirement rather than being smuggled in beside this
+        # one. Registered as a carry. What this handler does guarantee is that
+        # it cannot make the palette's behaviour worse OR appear better: the
+        # palette's focused widget is `#palette_input`, which is not in the
+        # target set, so `escape` there is untouched -- asserted, not assumed.
+        if event.key == "escape":
+            focused = self.focused
+            if isinstance(focused, Input) and focused.id in self._FIND_GOTO_INPUT_IDS:
+                self.set_focus(None)
+                event.stop()
+            return
+
         if event.key not in self._COMMAND_BAR_SUPPRESSED_KEYS:
             return
         if not self._command_bar_input_focused():
@@ -6306,9 +6411,35 @@ class S19TuiApp(App):
         self.query_one("#ab_diff_panel", AbDiffPanel).apply_regime(width, height)
 
     def on_resize(self, event: events.Resize) -> None:
-        """Update the two-regime width layout class on terminal resize."""
+        """Update the width/diff regimes AND recompose the context line.
+
+        The context line is the reason this handler does a third thing.
+        ``_compose_context_line`` bounds the project and A2L halves against a
+        budget derived from the terminal width AT WRITE TIME, so a line
+        composed at one terminal size is stale at the next. Without this call
+        the ``HLR-120`` bound is applied once and never re-applied: composed at
+        160x40 and resized to 80x24, the A2L was evicted on 10 of 10 screens --
+        byte-for-byte the defect the bound was added to remove.
+
+        Recomposing here is what makes the threshold *"contains both on 10 of
+        10 screens"* unconditional rather than true only of the size the line
+        happened to be written at.
+
+        **It goes through ``call_after_refresh``, and that is load-bearing:
+        ``App.size`` is STALE inside this handler.** ``event.size`` (which the
+        two lines above use) is the new size; ``self.size`` still reports the
+        old one until the refresh lands, and the composer reads ``self.size``.
+        Executed with a direct call instead: the full 91-column line survived
+        against a 53-column cell at 160x40 -> 80x24 -- no observable change at
+        all. ``TC-B79-04``'s resize axis reddens on that substitution.
+
+        (A reader may reasonably ask why the composer does not simply take the
+        width as an argument. It has five other call sites that have no event
+        to hand; deferring here keeps one signature and one source of truth.)
+        """
         self._apply_width_regime(event.size.width)
         self._apply_diff_regime(event.size.width, event.size.height)
+        self.call_after_refresh(self.update_project_labels)
 
     def action_page_next_context(self) -> None:
         """
@@ -8699,6 +8830,25 @@ class S19TuiApp(App):
                 raise ValueError(f"unknown unload kind: {kind!r}")
 
         self.current_file = new
+        # `current_a2l_path` is the OTHER half of "which A2L is in effect", and
+        # until batch-79 nothing ever cleared it — it is written in exactly two
+        # places (`load_a2l_from_path`'s copy and the load path's
+        # `loaded.a2l_path`) and reset in none. So after an unload the app held
+        # two sources of truth for one fact: `current_file.a2l_path`, cleared
+        # here, and `current_a2l_path`, left pointing at the artifact that had
+        # just been unloaded.
+        #
+        # That divergence is PRE-EXISTING — the command bar read the stale value
+        # and the Loaded panel read the fresh one, so the two disagreed on
+        # screen. Inc-7 did not introduce it, but it moved the stale reader to
+        # `#status_context`, which sits on the same screen as the panel that
+        # contradicts it. Found by the Inc-6/Inc-7 independent review (F6).
+        #
+        # Cleared at the SOURCE rather than papered over in the display: a
+        # composer that picks between two mirrors keeps the second source alive
+        # and only hides the symptom.
+        if kind in ("all", "a2l"):
+            self.current_a2l_path = None
         # Mirror the load-path install: the MAC cache is keyed on the previous
         # records, and the empty-state panels key on `current_file is None`.
         self._invalidate_mac_view_cache()
@@ -8715,16 +8865,23 @@ class S19TuiApp(App):
         self._refresh_loaded_panel()
         self.set_status(f"Unloaded {label}.")
 
-    def _refresh_loaded_panel(self) -> None:
+    def _refresh_loaded_panel(self, project: Optional[str] = None) -> None:
         """
         Summary:
-            Drive the Workspace "Loaded" panel to redraw its three artifact
-            slots from the current ``current_file`` snapshot (unload feature
-            Inc-2). Guarded so a not-yet-mounted tree (headless unit tests) is a
-            no-op, matching ``_apply_empty_state`` / ``update_memory_map``.
+            Drive the Workspace "Loaded" panel to redraw its project row and
+            three artifact slots from the current ``current_file`` snapshot
+            (unload feature Inc-2; project row batch-79 ``LLR-120.2``). Guarded
+            so a not-yet-mounted tree (headless unit tests) is a no-op, matching
+            ``_apply_empty_state`` / ``update_memory_map``.
 
         Args:
-            None
+            project (Optional[str]): The already-composed project string to
+                render in the panel's project row — the plain name at one
+                variant, ``project:variant (index/total)`` above that. ``None``
+                means "compose it here", which is what the unload path and the
+                load path's ``_step_finalize`` pass; the string is never
+                composed by the panel itself, so both context surfaces show the
+                same form (``LLR-120.5``).
 
         Returns:
             None
@@ -8733,21 +8890,32 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Resolve ``#loaded_panel`` and call ``render_slots(current_file)``;
-              a missing widget tree is tolerated.
+            - Resolve ``#loaded_panel``; a missing widget tree is tolerated.
+            - Call ``render_slots(current_file, project)``, composing the
+              project string via ``_compose_project_label`` when the caller
+              passed ``None``.
 
         Dependencies:
             Uses:
-                - ``LoadedArtifactsPanel.render_slots``.
+                - ``LoadedArtifactsPanel.render_slots`` / ``_compose_project_label``.
             Used by:
-                - ``_apply_unload`` (post-unload refresh) and the load path's
-                  ``_step_finalize`` (post-load refresh).
+                - ``_apply_unload`` (post-unload refresh), the load path's
+                  ``_step_finalize`` (post-load refresh) and
+                  ``update_project_labels`` (``LLR-120.1``'s single entry point).
         """
         try:
             panel = self.query_one("#loaded_panel", LoadedArtifactsPanel)
         except Exception:
             return
-        panel.render_slots(self.current_file)
+        # LLR-120.5: when a caller does not hand a composed string, compose it
+        # HERE from the one composer rather than letting the panel invent a
+        # form. `_apply_unload` and the load path's `_step_finalize` are such
+        # callers, and a panel-side default would show `(none)` beside a
+        # perfectly loaded project.
+        panel.render_slots(
+            self.current_file,
+            self._compose_project_label() if project is None else project,
+        )
 
     def on_loaded_artifacts_panel_unload_requested(
         self, message: "LoadedArtifactsPanel.UnloadRequested"
@@ -11359,9 +11527,10 @@ class S19TuiApp(App):
     def update_project_labels(self) -> None:
         """
         Summary:
-            Refresh the project-name / A2L-filename context labels in the
-            persistent command bar so the project context stays visible from
-            every Direction B screen (LLR-011.3).
+            Refresh the project-name / A2L-filename context on BOTH context
+            surfaces — ``#workspace_status_bar``'s context cell and the Loaded
+            panel's project row — so the context stays visible from every
+            Direction B screen (LLR-011.3, batch-79 LLR-120.1).
 
         Args:
             None
@@ -11370,10 +11539,20 @@ class S19TuiApp(App):
             None
 
         Data Flow:
-            - Formats the project name and A2L filename (or a "(none)"
-              sentinel) and writes them into the command bar's context
-              labels — the command bar is the canonical home since the old
-              Status tile was dismantled in increment 7.
+            - Composes the project string via ``_compose_project_label`` and the
+              A2L filename (or a ``(none)`` sentinel), then writes BOTH to
+              ``#status_context`` through ``safe_text`` and drives
+              ``_refresh_loaded_panel`` with the same composed string. One
+              composer feeds both sinks, so the two surfaces cannot disagree
+              about the display form (LLR-120.5).
+            - There are TWO sinks, not three. The command bar's
+              ``set_context_labels`` was the third; ``HLR-118`` deleted the row
+              at Inc-10 and ``HLR-121`` deleted the helper at Inc-11. It is
+              named here only as the thing that used to be here, because Inc-8
+              re-pointed the test observables off it while all three were still
+              live and that ordering is why nothing went red.
+            - Returns early when ``#status_context`` cannot be resolved, so a
+              call before the tree is mounted is a no-op (TC-B78-13).
             - Multi-variant projects (LLR-005.5): when the variant set holds
               N > 1 variants, the project label reads
               ``«project»:«variant» (i/N)`` with ``i`` the 1-based index of
@@ -11387,12 +11566,245 @@ class S19TuiApp(App):
 
         Dependencies:
             Uses:
-                - ``CommandBar.set_context_labels``
-                - ``_variant_display_options``
+                - ``_compose_project_label`` (the single display-form composer)
+                - ``safe_text`` (LLR-120.4 — the status-bar sink is markup- AND
+                  control-character-safe)
+                - ``_refresh_loaded_panel`` (the second context surface)
+                - ``_compose_context_line`` (bounds the two halves against each
+                  other so neither can evict the other — see its own docstring)
                 - ``_refresh_patch_variant_select``
             Used by:
                 - Project / A2L load handlers
+                - ``_apply_unload`` (post-unload refresh)
                 - ``_sync_loaded_file_to_project`` (variant append)
+        """
+        project_name = self._compose_project_label()
+        a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
+        # LLR-120.1 -- ONE entry point drives BOTH surfaces. This replaces the
+        # single write to the command bar (which HLR-118 deletes at Inc-10).
+        #
+        # Both surfaces are fed the SAME string from the SAME composer, so
+        # LLR-120.5's two display forms cannot drift apart between them: the
+        # form is decided in `_compose_project_label` and neither sink
+        # re-derives it.
+        #
+        # `safe_text` on the status-bar sink (LLR-120.4). `markup=False` is a
+        # PARSE FLAG that performs no string transform -- executed, it leaves
+        # `0x0 0x7 0x1b 0x7f 0x9b 0x9d` byte-identical to the payload, and
+        # `U+009B` / `U+009D` are single-byte C1 introducers carrying no `\x1b`
+        # that are legal Windows filename characters. So an SGR recolour or an
+        # OSC-8 hyperlink is reachable through a hostile A2L filename or
+        # project directory name on the operator's own platform.
+        # TC-B78-13 -- a call before the tree is mounted is a NO-OP, matching
+        # `_refresh_loaded_panel` / `_apply_empty_state`.
+        #
+        # This guard is NEW BEHAVIOUR, not a restatement of existing behaviour,
+        # and the distinction is worth the line: executed against the batch base
+        # `829adc6`, `update_project_labels()` on an unmounted app raises
+        # `ScreenStackError: No screens on stack`. HLR-120's boundary catalog
+        # asserts the opposite ("before mount -> no raise"), so the catalog
+        # named a tolerance the code had never had. It is made true here rather
+        # than descoped, because it is an acceptance criterion of the very
+        # requirement this increment implements.
+        #
+        # It wraps EVERY sink, not just the new one: each write below is equally
+        # unguarded, so guarding only `#status_context` would move the raise one
+        # line down and leave the catalog still false. (It wrapped THREE sinks
+        # when written; the command-bar write was the third and is gone.)
+        try:
+            self.query_one("#status_context", Label).update(
+                safe_text(self._compose_context_line(project_name, a2l_name))
+            )
+        except Exception:
+            return
+        self._refresh_loaded_panel(project_name)
+        # The command-bar write is GONE, and how it went is worth keeping.
+        #
+        # `LLR-120.1` said the new writes replace "its single write to the
+        # command bar". Section 7's Inc-8 row said the 14 `_project_label()`
+        # call sites are re-pointed "WHILE BOTH SURFACES EXIST" — which is false
+        # the moment Inc-7 removes one. Executed at Inc-7: deleting the write
+        # there reddened 10 shipped tests across `test_tui_variants.py` and
+        # `test_tui_patch_variant.py`, because `_project_label()` read
+        # `#cmdbar_project`.
+        #
+        # So Inc-7 KEPT it, Inc-8 re-pointed the readers while both surfaces
+        # were live, and Inc-10 deleted it with the row it wrote into.
+        # "Replacing" was discharged across Inc-7 + Inc-10 rather than inside
+        # either one, and no increment ever had to choose between a green gate
+        # and an honest one.
+        self._refresh_patch_variant_select()
+
+    #: The separator between the two halves of `#status_context`.
+    _CONTEXT_SEPARATOR = "  |  "
+
+    #: Mirrors `styles.tcss`'s `#workspace_status_bar #status_context
+    #: { max-width: 70% }`. The cell is `width: auto` up to that share, so this
+    #: share IS the budget the two halves must fit inside. Kept as a named
+    #: constant rather than a literal because it is a COUPLING to the
+    #: stylesheet: `TC-B79-01` asserts the two agree, so changing one without
+    #: the other reddens instead of silently clipping again.
+    _CONTEXT_MAX_SHARE = 0.70
+
+    #: Last-resort budget, reached only when the terminal reports a width at or
+    #: below `_CONTEXT_BAR_INSET`. 53 is the measured cell width at the
+    #: narrowest supported terminal, 80x24.
+    #:
+    #: ⚠️ Recorded rather than claimed: this is **very nearly dead code**, and
+    #: the comment it replaces was false twice over. It said "used when the
+    #: terminal has no resolved width yet (pre-mount)" -- measured, an unmounted
+    #: `App.size` falls through to `console.size` and returns `Size(80, 25)`,
+    #: never 0, so the pre-mount path does not reach here. And the live path
+    #: cannot either: `update_project_labels` early-returns before the composer
+    #: when `#status_context` is unresolvable. It also called 53 "the SAFE end
+    #: of the range"; at the only width that can reach it (<= 4 columns) a
+    #: 53-column budget is the OPTIMISTIC end. Kept as a defined value rather
+    #: than deleted, because the alternative is an unbounded string, but it is
+    #: not a fallback anyone should reason from.
+    _CONTEXT_FALLBACK_BUDGET = 53
+
+    #: Columns of app chrome between the TERMINAL width and
+    #: `#workspace_status_bar`'s width. Measured at all three supported sizes:
+    #: 80 -> 76, 120 -> 116, 160 -> 156.
+    #:
+    #: The budget is derived from the TERMINAL width rather than by querying the
+    #: bar, and that is not a shortcut -- it is the only current value at the
+    #: moment it is needed. During a resize the bar's cached `size.width` is
+    #: STALE: executed at 160x40 -> 80x24, the deferred recompose read
+    #: `bar=156, #status_context=91` while `App.size.width` already read `80`.
+    #: Budgeting off the bar recomposed to the size being LEFT, which is why the
+    #: first version of the resize fix changed nothing observable.
+    #:
+    #: `TC-B79-02` asserts this inset against the live tree at all three sizes,
+    #: so a layout change reddens instead of silently re-clipping.
+    _CONTEXT_BAR_INSET = 4
+
+    @staticmethod
+    def _clip_to(text: str, cap: int) -> str:
+        """Clip ``text`` to ``cap`` terminal COLUMNS, marking the loss with an ellipsis.
+
+        Columns, not code points, and the distinction is the whole point.
+        The first version of this measured ``len(text)``. A CJK project name is
+        one code point and TWO columns per character, so a string that passed
+        the budget check painted up to 2x the cell width and CSS resumed
+        clipping the tail — restoring the exact eviction this bound removes,
+        on a legal Windows directory name. Measured: a 42-character CJK project
+        composed to 55 code points and **101 columns** against an 81-column
+        budget.
+
+        ``cell_len`` / ``set_cell_size`` come from ``rich``, already a hard
+        dependency via Textual, and ``set_cell_size`` handles the case a manual
+        slice cannot: a cap that falls in the MIDDLE of a double-width
+        character, where the correct result is a pad space rather than half a
+        glyph.
+        """
+        if cap <= 0:
+            return ""
+        if cell_len(text) <= cap:
+            return text
+        if cap == 1:
+            return "…"
+        return set_cell_size(text, cap - 1) + "…"
+
+    def _compose_context_line(self, project_name: str, a2l_name: str) -> str:
+        """Compose `#status_context` with the two halves bounded against EACH OTHER.
+
+        Summary:
+            HLR-120 requires the bar to name the project AND the A2L on all 10
+            screens. The cell is one `Label` holding one string, clipped by CSS
+            at `max-width: 70%` -- so whichever half comes second is the half
+            that disappears, and nothing in the stylesheet can bound them
+            independently. This method is that bound.
+
+        Why it exists (measured, not theorised):
+            With project `ECU_calibration_release_2026_customerA_v161` and A2L
+            `ASAP2_ECU_calibration_release_2026_v161.a2l`, the composed string
+            is 91 columns while the cell is allocated **53** at 80x24 and **81**
+            at 120x30. `render()` returned the full 91 either way -- the loss is
+            in the PAINTED strip. Result: the A2L was absent on **0 of 10**
+            screens at both sizes, against a threshold of 10 of 10. It was
+            visible before this batch, on the command bar that HLR-118 deleted,
+            so this was a REGRESSION and not merely an unmet new requirement.
+
+        Allocation:
+            Fair share with slack redistribution -- each half may take half the
+            budget, and a half that needs less lends the remainder to the other.
+            Neither can evict the other, and a short name is never truncated
+            just because its partner is long.
+
+        Args:
+            project_name (str): The composed project string (already in its
+                LLR-120.5 display form).
+            a2l_name (str): The A2L filename, or the absent sentinel.
+
+        Returns:
+            str: The two halves joined by ``_CONTEXT_SEPARATOR``, each clipped
+            with a trailing ellipsis only when the budget forces it.
+        """
+        sep = self._CONTEXT_SEPARATOR
+        # From the TERMINAL width, never from the bar's cached size -- see
+        # `_CONTEXT_BAR_INSET`. The bar is stale mid-resize; `App.size` is not.
+        try:
+            terminal_width = self.size.width
+        except Exception:
+            terminal_width = 0
+        bar_width = max(0, terminal_width - self._CONTEXT_BAR_INSET)
+        budget = (
+            int(bar_width * self._CONTEXT_MAX_SHARE)
+            if bar_width > 0
+            else self._CONTEXT_FALLBACK_BUDGET
+        )
+        # Every measurement below is in terminal COLUMNS (`cell_len`), never in
+        # code points. `len()` under-counts double-width characters by 2x and
+        # was how the first version of this bound let a CJK name overflow.
+        avail = max(0, budget - cell_len(sep))
+        project_w = cell_len(project_name)
+        a2l_w = cell_len(a2l_name)
+
+        if project_w + a2l_w <= avail:
+            return f"{project_name}{sep}{a2l_name}"
+
+        half = avail // 2
+        if project_w <= half:
+            # The project fits in its share; the A2L takes the slack.
+            project_cap = project_w
+            a2l_cap = avail - project_cap
+        elif a2l_w <= avail - half:
+            # The A2L fits in its share; the project takes the slack.
+            a2l_cap = a2l_w
+            project_cap = avail - a2l_cap
+        else:
+            # Both overflow: split evenly, so neither can evict the other.
+            project_cap = half
+            a2l_cap = avail - half
+
+        return (
+            f"{self._clip_to(project_name, project_cap)}{sep}"
+            f"{self._clip_to(a2l_name, a2l_cap)}"
+        )
+
+    def _compose_project_label(self) -> str:
+        """Compose the active project string in whichever display form applies.
+
+        Summary:
+            LLR-120.5's two forms, decided in ONE place: the plain project name
+            when the active project holds at most one variant, and
+            ``project:variant (index/total)`` when it holds more than one. Both
+            context surfaces are handed the result of this method, so neither
+            can re-derive a form the other does not have.
+
+        Returns:
+            str: The composed project string, or ``"(none)"`` when no project is
+            active.
+
+        Data Flow:
+            - Read-only over ``current_project`` and ``_variant_set``.
+
+        Dependencies:
+            Uses:
+                - ``_variant_display_options``
+            Used by:
+                - ``update_project_labels`` and ``_refresh_loaded_panel``
         """
         project_name = self.current_project or "(none)"
         variant_set = self._variant_set
@@ -11416,9 +11828,7 @@ class S19TuiApp(App):
                 f"{self.current_project}:{display} "
                 f"({active_index + 1}/{len(variant_set.variants)})"
             )
-        a2l_name = self.current_a2l_path.name if self.current_a2l_path else "(none)"
-        self.query_one(CommandBar).set_context_labels(project_name, a2l_name)
-        self._refresh_patch_variant_select()
+        return project_name
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         # The Direction B restyle retires the `#view_bar` button bar

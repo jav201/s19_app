@@ -47,8 +47,8 @@ from textual.widgets import Button, ListView, Select, Static
 
 import s19_app.tui.app as app_module
 from s19_app.tui.app import S19TuiApp
-from s19_app.tui.command_bar import CommandBar
 from s19_app.tui.screens import SelectVariantScreen
+from s19_app.tui.screens_directionb import LoadedArtifactsPanel
 
 # Minimal valid S19 images (checksums verified against s19_app.core.S19File).
 S19_A = "S107100001020304DE\nS9030000FC\n"
@@ -74,8 +74,33 @@ async def _flush(pilot, count: int = 12) -> None:
 
 
 def _project_label(app: S19TuiApp) -> str:
-    bar = app.query_one(CommandBar)
-    return str(bar.query_one("#cmdbar_project").content)
+    """The active project string, read from the Loaded panel's project row.
+
+    batch-79 Inc-8 (LLR-121.4) re-points this observable OFF the command bar,
+    which `HLR-118` deletes at Inc-10. Both surfaces are live right now, and that
+    is exactly why the move happens here: re-pointing after the deletion would
+    mean debugging a broken read and a deleted widget at the same time.
+
+    **The Loaded panel's project row, not `#status_context`.** The status bar
+    composes `project + separator + a2l`, so reading it would force this helper
+    to re-type the separator literal and split on it — and a test that re-types
+    a producer's format string is one edit away from asserting against a shape
+    the producer no longer emits. The panel's row carries the project ALONE.
+
+    ⚠️ **The `"Project: "` prefix is gone, and that is deliberate.** The old
+    `#cmdbar_project` rendered `"Project: proj"`; the prefix was the command
+    bar's own chrome, not part of the project's identity, and it dies with the
+    bar. What `LLR-005.3` actually pins — the PLAIN name with no `(1/1)` counter
+    — is unaffected and still asserted below.
+    """
+    for row in app.query("#loaded_slots > Horizontal"):
+        cells = list(row.children)
+        if cells and str(cells[0].render()).strip() == LoadedArtifactsPanel._PROJECT_KIND:
+            return str(cells[1].render())
+    raise AssertionError(
+        "the Loaded panel has no project row — returning an empty string here "
+        "would make every containment assertion over this helper vacuous"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -276,7 +301,13 @@ def test_single_s19_project_label_plain(tmp_path: Path) -> None:
             )
 
     label, variant_id = asyncio.run(_drive())
-    assert label == "Project: proj", f"single-variant label must stay plain, got {label!r}"
+    # batch-79 Inc-8: was `== "Project: proj"`. The `"Project: "` prefix was the
+    # COMMAND BAR's chrome, not the project's identity, and it dies with the bar
+    # at Inc-10. LLR-005.3's actual pin is unchanged and is what this still
+    # asserts: the PLAIN name, with no `(1/1)` counter. Kept as exact equality
+    # rather than relaxed to containment — `"proj" in label` would also pass on
+    # `"proj:a (1/2)"`, which is the very thing this node exists to forbid.
+    assert label == "proj", f"single-variant label must stay plain, got {label!r}"
     assert variant_id == "fw", "variant_id is still stamped on single-variant project loads"
 
 
@@ -310,7 +341,9 @@ def test_direct_load_variant_id_is_none(tmp_path: Path) -> None:
     variant_id, variant_set, label = asyncio.run(_drive())
     assert variant_id is None
     assert variant_set is None
-    assert label == "Project: (none)"
+    # batch-79 Inc-8: was `== "Project: (none)"` — same chrome removal as the
+    # N==1 pin above. The sentinel itself is what matters here and is unchanged.
+    assert label == "(none)"
 
 
 # ---------------------------------------------------------------------------

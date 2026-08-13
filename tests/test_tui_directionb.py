@@ -730,12 +730,21 @@ def test_tc035_ascii_fallback_mode_renders_ascii_set(tmp_path: Path) -> None:
 
 
 def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
-    """The command bar is mounted and stays present on every rail screen.
+    """batch-79 Inc-10: re-pointed from the deleted ROW onto what survives.
 
-    Intent: LLR-003.1 — the command bar (palette trigger + find input +
-    go-to input) is mounted above the rail/workspace body and remains in
-    the widget tree regardless of which of the 8 rail screens is active;
-    navigating the rail never unmounts it.
+    This asserted that `#find_input` and `#cmdbar_goto_input` were present on
+    every screen. `HLR-118` deletes both, and Inc-9 re-homed the keys onto each
+    screen's own inputs, so the old clauses now assert the opposite of the
+    requirement. The node id survives because the durable half of its
+    observable does: the PALETTE host is reachable from every screen. The
+    absence of the row is asserted positively so the deletion itself is
+    guarded.
+
+    Intent (amended): LLR-003.1 — the command bar is mounted above the
+    rail/workspace body and remains in the widget tree regardless of which rail
+    screen is active; navigating the rail never unmounts it. It hosts the
+    palette trigger; the find and go-to inputs it used to hold were deleted by
+    `HLR-118`.
     """
 
     async def _drive() -> list[tuple[str, bool, bool, bool]]:
@@ -750,9 +759,13 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
                 seen.append(
                     (
                         key,
-                        bar.query("#find_input").first() is not None,
-                        bar.query("#cmdbar_goto_input").first() is not None,
-                        bar.query("#command_palette").first() is not None,
+                        # `len(...)`, not `.first() is not None`: `.first()`
+                        # RAISES `NoMatches` on an empty query, so the original
+                        # idiom only worked while every node it named existed.
+                        # A presence test that cannot express absence is no use
+                        # in the increment that deletes something.
+                        len(bar.query("#command_palette")) == 1,
+                        len(bar.query("#command_bar_row")) > 0,
                     )
                 )
         return seen
@@ -761,10 +774,19 @@ def test_tc006_command_bar_present_on_every_screen(tmp_path: Path) -> None:
     assert len(seen) == len(SCREEN_KEYS), (
         f"expected all {len(SCREEN_KEYS)} screens visited, got {len(seen)}"
     )
-    for key, has_find, has_goto, has_palette in seen:
-        assert has_find, f"find input missing on screen '{key}'"
-        assert has_goto, f"go-to input missing on screen '{key}'"
+    for key, has_palette, has_row in seen:
+        # What survives HLR-118 and what this node now guards: the palette host
+        # is reachable from every screen. That was always the durable half of
+        # the claim -- `Ctrl+K` is the one surface with no per-screen duplicate.
         assert has_palette, f"palette missing on screen '{key}'"
+        # And what must NOT survive. Kept as a positive assertion rather than
+        # dropping the find/go-to clauses: deleting them would have left this
+        # node unable to fail if the row came back, and a deletion nobody
+        # guards is a deletion that gets undone.
+        assert not has_row, (
+            f"`#command_bar_row` is deleted by HLR-118 but is present on "
+            f"screen '{key}'"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -893,10 +915,19 @@ def test_tc038_project_a2l_labels_render_in_command_bar(tmp_path: Path) -> None:
             for key in SCREEN_KEYS:
                 app.action_show_screen(key)
                 await pilot.pause()
-                bar = app.query_one(CommandBar)
-                project = str(bar.query_one("#cmdbar_project").content)
-                a2l = str(bar.query_one("#cmdbar_a2l").content)
-                seen.append((key, project, a2l))
+                # batch-79 Inc-8 (LLR-121.4): re-pointed off the command bar,
+                # which `HLR-118` deletes at Inc-10. `#status_context` carries
+                # BOTH names in one cell, so both reads resolve to it and the
+                # two assertions below still discriminate — each names a
+                # different string that must be present.
+                #
+                # The node id is left alone on purpose. Renaming it to match the
+                # new surface would change its identity, and the AT/TC registry
+                # reconciliation is Inc-11's declared work, not this
+                # increment's; doing it here would split one change across two
+                # gates.
+                context = str(app.query_one("#status_context").render())
+                seen.append((key, context, context))
         return seen
 
     seen = asyncio.run(_drive())
@@ -6296,11 +6327,29 @@ def test_tc029_rail_items_reachable_by_keyboard(tmp_path: Path) -> None:
         )
 
 
+# batch-79 Inc-9: the two tc029 nodes below are RE-POINTED off the command
+# bar onto the active screen's own inputs (LLR-119.1). They are in a file
+# Inc-9 did NOT declare -- the spec's file set says app.py + test_tui_commandbar.py.
+# Recorded as a deviation rather than taken silently: HANDOFF section 4 already
+# warned that Lane 1's blast radius is 6 test files, not 3, and this is that.
 def test_tc029_command_bar_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
-    """The command-bar find / go-to inputs and palette are keyboard-reachable.
+    """Find, go-to and the palette are keyboard-reachable with no mouse.
 
-    Intent: LLR-013.1 — the three command-bar surfaces are reachable via
-    ``/`` (find), ``g`` (go-to) and ``ctrl+k`` (palette), with no mouse.
+    Intent: LLR-013.1 — ``/`` (find), ``g`` (go-to) and ``ctrl+k`` (palette)
+    each reach their surface without the mouse.
+
+    batch-79 Inc-11: the DOCSTRING is corrected; the assertions were already
+    correct. **Inc-9 re-pointed this node** (`ae71bd6`, and the comment
+    directly above says so): the assertions moved from `#find_input` /
+    `#cmdbar_goto_input` — the command bar's ids, which `HLR-118` deletes — to
+    `#search_input` / `#goto_input`, the workspace's own. What Inc-9 left
+    behind was this docstring, which went on describing "the three command-bar
+    surfaces" after two of the three were gone.
+
+    So the lag was prose-only, and it is the batch's signature shape at its
+    smallest: the mechanism moved, the sentence beside it did not. The surface
+    covered here is the workspace's; the 3-owning-screen contract is
+    `AT-B78-04`'s.
     """
 
     async def _drive() -> tuple[str, str, bool]:
@@ -6322,8 +6371,8 @@ def test_tc029_command_bar_inputs_reachable_by_keyboard(tmp_path: Path) -> None:
         return find_focus, goto_focus, palette_open
 
     find_focus, goto_focus, palette_open = asyncio.run(_drive())
-    assert find_focus == "find_input", "'/' must focus the find input"
-    assert goto_focus == "cmdbar_goto_input", "'g' must focus the go-to input"
+    assert find_focus == "search_input", "'/' must focus the find input"
+    assert goto_focus == "goto_input", "'g' must focus the go-to input"
     assert palette_open, "'ctrl+k' must open the command palette"
 
 
@@ -6370,7 +6419,7 @@ def test_tc029_single_keys_suppressed_during_input_focus(tmp_path: Path) -> None
             app.set_focus(None)
             await pilot.press("slash")
             await pilot.pause()
-            find_input = app.query_one("#find_input", Input)
+            find_input = app.query_one("#search_input", Input)
             find_input.value = ""
             start_screen = _visible_screens(app)
             for key in ("g", "7", "period"):
@@ -6398,7 +6447,7 @@ def test_tc029_single_keys_suppressed_during_input_focus(tmp_path: Path) -> None
         f"single keys must be routed into the focused find input as text, "
         f"got {result['typed']!r}"
     )
-    assert result["focus_during"] == "find_input", (
+    assert result["focus_during"] == "search_input", (
         "'g' must NOT steal focus to the go-to input while find is focused"
     )
     assert result["screen_during"] == result["start_screen"], (
@@ -6991,7 +7040,9 @@ def test_sections_item_data_and_colour_preserved(tmp_path: Path) -> None:
 # the per-row `_severity_style` colouring and paging path stay unchanged and
 # cells stay `rich.text.Text` (no markup flip — batch-27 B-1 guard).
 #
-# NOTE (surface fact, verified against app.py:687-691): the A2L Explorer rail
+# NOTE (surface fact, re-verified against `S19TuiApp.BINDINGS` at batch-79
+# Inc-11 — executed: key '2' -> "show_screen('a2l')" desc 'A2L Explorer',
+# key '3' -> "show_screen('mac')" desc 'MAC View'): the A2L Explorer rail
 # screen is bound to key "2" (`show_screen('a2l')`); "3" is MAC View. The
 # requirement draft's `press("3")` names the wrong surface, so these ATs drive
 # the real A2L key, "2".

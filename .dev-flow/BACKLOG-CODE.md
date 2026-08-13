@@ -32,6 +32,234 @@
 > ⚠ **Every `report_service.py` line number below is as of `031ca8d`.** batch-63 added +47 lines to that module; the file measures 1730 lines at `e347079`. Re-derive line numbers, never copy them.
 >
 
+## 🆕 Carries returned by batch-79 (2026-08-07, Lane 1 — command-bar deletion)
+
+Registered mid-batch at operator instruction rather than at the close, so they survive a session
+boundary. batch-79 status **as of 2026-08-12**: Inc-6…Inc-11 shipped **including `HLR-121`'s three
+acceptances and the merge-gate response**; **Inc-12 owed** (the 29-golden snapshot regen, canonical
+CI only, its own PR).
+
+- **▸ (P2) `#status_text` silently drops most of a routine load message at 80×24 — batch-79's eighth merge gate, NON-BLOCKING.**
+  Measured with ordinary names and the real `_format_coexistence_status` output:
+
+  ```
+  BASE 829adc6 @80x24:  |Loaded brake_ecu_app_v12.s19 (S19+MAC: brake_ecu_app_v|   ~76 cols
+  HEAD         @80x24:  |Loaded brake_ecu_app_v12.s19 (S19+MAC:|                   38 cols, NO ellipsis
+  ```
+
+  **Not blocked, and the reason is load-bearing:** `app.py:9681-9683` sends the *same string* to
+  `set_file_status` **and** `_append_log_line`, and the gate verified the log tail two rows below
+  carries it in full at 80×24. **Nothing leaves the screen** — it is a legibility regression, not an
+  information loss.
+
+  Two related findings, same site:
+  - **The stylesheet's stated mechanism does not hold.** `#status_text`'s comment claims *"`1fr` +
+    ellipsis makes the transient MESSAGE truncate"*. Executed: `text-overflow: ellipsis` fires only
+    when the text has **no wrap point**. Every real coexistence message contains spaces, so the Label
+    wraps and rows 2+ are clipped by `#status_line { height: 1 }` — loss with **no ellipsis**. Only an
+    unbroken-token probe produced `…`. *A CSS property named in a comment is not evidence it fires.*
+  - **No separator between the two cells at 80×24**, so the strip reads as one run-on string.
+  - **Nothing asserts the status MESSAGE survives the new sizing.** `AT-B78-08/11` uses a realistic
+    message but observes only `#status_context` and the bar height. This gap is why the regression
+    reached the gate.
+
+- **▸ (P3) `AT-B78-28` clause 1 asserts the affordance against the RENDERABLE, not the painted strip — batch-79 gate 8, NON-BLOCKING.**
+  Measured: the affordance is present in `_b78_run_list_text` at every size but **truncated in the
+  painted strip at every regime** — `Keys: Up/Down move the ` at wide (list 26 cols, constant 32).
+  `Up`/`Down` stay readable so the requirement is met **in substance**, but this is the exact
+  `render()`-vs-painted distinction the batch spent several gates establishing elsewhere, **applied
+  inconsistently here**.
+
+- **▸ (P3) Three defects in `TC-B79-05`'s own record — batch-79 gate 8, NON-BLOCKING.**
+  - Its docstring pairs **two figures computed under different definitions of the same word**: *"276
+    real members against 783 admitted"*. `276` is the class-body-only count; the shipped resolver's
+    own count is **337**, because it deliberately includes `self.X` — as the paragraph directly above
+    it explains. The honest ratio is **770/337 ≈ 2.3×**, not 783/276 ≈ 2.8×. *Neither figure names its
+    commit or its definition.* Same shape as the `F-8` instances the node exists to guard against.
+  - It reads `Path("s19_app/tui/app.py")` — **relative**; the only new node with a cwd dependency.
+    Fails loudly off-root, so not vacuous.
+  - `_CONTEXT_BAR_INSET = 4` is exact at 80/120/160 and **wrong below**: at 20 columns the real inset
+    is 6, so the composer budgets 11 against a 9-column cell. Outside the supported set, and
+    `TC-B79-02` correctly asserts only the three supported sizes. Related to the carried `N-7`.
+
+- **▸ 🛑 (P1 — BATCH-82 CHARTER) Author the Information Flow Contract for s19's surfaces — the FULL retrofit. LANE A HALF.**
+  ⚠️ **Cross-lane item, split per Amendment A.** The **control** (`C-54`: the global flow, template,
+  validator rules, propagation) is the Lane B half in
+  [`BACKLOG-PROCESS.md`](BACKLOG-PROCESS.md). **Neither half is complete alone.** Design:
+  [`design/C-54-information-flow-contract.md`](design/C-54-information-flow-contract.md).
+
+  **Operator ruling 2026-08-13 — the FULL retrofit, overruling the design's own proposal**, and the
+  reason changes what the work IS:
+
+  > *"Aunque me duela, si tenemos que hacer el retrofit… parece que hay mucho potencial para
+  > requerimientos ambiguos y comportamientos perfilados a medias."*
+
+  **The deliverable is the FINDINGS, not the file.** Authoring an `address` and a `consumers` list for
+  a surface that has never declared one forces the question *"who depends on this, and how do they
+  reach it?"* onto ~40 surfaces that have never been asked it. `LLR-120.2` is one instance of that
+  question going unasked — found by accident, at the cost of a production regression and eight merge
+  gates. **This retrofit is the systematic version of the same search**, and every ambiguity it
+  surfaces is the point rather than a side effect.
+
+  **Scope:** 10 screens (`SCREEN_CONTAINER_IDS`) + their panels/views. Part A (flow) for all; Part B
+  (boundary decomposition) wherever a consumer addresses a component independently — which, in a TUI
+  selected by `query()`, is nearly everywhere.
+
+  **Staged so it cannot block the queue:** the control ships enforcing **NEW and MODIFIED surfaces
+  only** (`V13` as NOTICE). Existing surfaces stay NOTICE until their screen's stage lands, then
+  BLOCK. A large retrofit must not gate unrelated batches — that failure mode is why the design
+  originally proposed skipping it.
+
+  **Expected yield, stated as a prediction so it can be wrong:** ≥1 further address-vs-value
+  ambiguity of the `LLR-120.2` shape, and ≥1 surface whose declared behaviour has no owning
+  requirement. **If the retrofit finds neither, the control is over-priced and that finding is worth
+  recording too.**
+
+- **▸ (P1) The AT/TC registry is BLIND to all 106 batch-78/79 acceptance nodes — the id namespace sits
+  outside the project's own grammar.** Found at Inc-11 when two new `TC-B79-*` nodes did **not** trip
+  **G1** (*"an id on a test node that nobody registered"*). Executed, not inferred:
+
+  ```
+  _FUNC_ID_RE  test_at_b78_09_loaded_panel_names_the_project  -> NO MATCH
+               test_tc_b79_01_a_long_project_cannot_evict_... -> NO MATCH
+               test_tc489_candidate_consumption_is_r_indep... -> ['_tc489']   ✅
+  derive_named_nodes over the corpus : 678 ids, of which B78/B79-shaped = 0
+  iter_tokens("AT-B78-12") -> governed=False, conforming=False, key=None
+  iter_tokens("TC-489")    -> governed=True,  conforming=True,  key='TC-489'
+  test nodes named test_at_b7*/test_tc_b7* : see below      registry rows : 0
+  ```
+
+  **The node count is stated with its pattern and its commit, because the first version of this entry
+  was already stale in the commit that wrote it** — it said `106`, measured at `4c5aa5d`, while the
+  same commit added `TC-B79-03` and made it `107`. *A carried number is re-derived, not copied.*
+  Pattern: `grep -rh "^def test_at_b7\|^def test_tc_b7" tests/*.py | wc -l` — **108** at the Inc-11
+  close. Restricted to `tests/*.py` deliberately: a recursive grep also matches the 8 tracked `.pyc`
+  binaries carried above, which is the same inflation that made an Inc-8 gate figure read 10 for 4.
+  The figure that matters is not the count but the **0**, which no edit to the test tree changes.
+
+  `_FUNC_ID_RE` (`tools/id_registry.py:95`) requires **digits immediately after `at`/`tc`**, so
+  `at_b78_09` never parses; and because a non-conforming token is classified `governed=False`, **G3
+  and G5 skip it too**. batch-78 minted an id namespace outside the grammar and every guard declines
+  to police it **silently**. Same vacuous-input-set shape as the `_B78_NON_WRITING_CALLS` defect, two
+  layers up: an id form the regex cannot parse is indistinguishable from one that does not exist.
+  Lands on the Lane B finding already on record that **the id GRAMMAR is undefined**. **Operator
+  decision owed** — extending the regex reclassifies tokens repo-wide and could redden G1/G3/G5
+  across 678 existing ids, so it is its own batch. It also qualifies `AT-B78-14`: for this namespace
+  the registry never had anything to reconcile.
+- **▸ (P2) Eight `subprocess.run(..., text=True)` calls in the test tree decode with the HOST's
+  preferred encoding, not UTF-8.** `text=True` alone uses `locale.getpreferredencoding()` — **cp1252**
+  on this Windows host — so any non-cp1252 codepoint in the captured output raises
+  `UnicodeDecodeError` on a subprocess reader thread, `completed.stdout` becomes `None`, and the
+  calling guard dies with `AttributeError: 'NoneType' object has no attribute 'splitlines'` **instead
+  of reporting what it was built to report**. A guard that cannot fail loudly fails silently-adjacent:
+  the error names the wrong thing entirely.
+
+  **Observed live at batch-79 Inc-11**, killing
+  `test_tui_patch_history_strip.py::test_tc081_4_no_binding_diff` — a **binding-freeze guard**.
+
+  ⚠️ **The cause first recorded here was FALSE, and the third merge gate caught it.** This entry
+  said a CJK fixture added to `tests/test_tui_commandbar.py` put byte `0x8f` into the diff. That is
+  **impossible**: the command is `git diff main -- s19_app/tui/app.py`, whose pathspec excludes
+  `tests/` entirely. Re-derived on that exact diff:
+
+  ```
+  CJK present                : False
+  non-ASCII codepoints       : U+00AB U+00BB U+2014 U+2026 U+26A0 U+FE0F
+  U+FE0F ("️", VS16) in utf-8 : ef b8 8f   <- the cited 0x8f
+  added by                   : the batch's own commit, in `on_resize`'s docstring
+  ```
+
+  The trigger was **`⚠️` in a docstring of the very file being diffed** — `U+26A0 U+FE0F`, where the
+  variation selector supplies `0x8f`. At base `app.py` held 9× `U+26A0` and **0× `U+FE0F`**; this
+  batch added the file's first one.
+
+  **Two consequences.** The lesson previously recorded — *"the blast radius crossed modules through
+  git"* — is false; it never left `app.py`. And the risk axis is **not** content-vs-paths but
+  *"does the captured output contain any non-cp1252 codepoint"* — and `⚠️` is used liberally in this
+  codebase's comments, so the axis is far easier to trip than the original note implied.
+
+  **Fixed at the one site that decodes file CONTENT** (`encoding="utf-8", errors="replace"`; the
+  guard greps for `Binding(`, pure ASCII, so `errors="replace"` cannot hide a real hit — verified
+  live: 36 089 chars read, 0 replacement characters, an injected `Binding(` line still detected).
+  The remaining eight emit paths, SHAs or `--stat` counts and were checked to read no file
+  containing `⚠️` today — `test_engine_unchanged.py` (`--name-only`), `test_examples_smoke.py`
+  (`git ls-files`), `test_tui_legend.py` ×2 (`rev-parse`, `diff --stat` on `color_policy.py`),
+  `test_tui_directionb.py` (generic `["git", *args]` — **risk depends on the caller**),
+  `test_a2l_f841_cleanup.py`, `test_flow_persistence.py`, `test_tui_workspace.py`. **Operator
+  decision owed:** sweep all eight, or leave them knowing one `⚠️` in a newly-diffed file re-arms it.
+  *A narrow patch was taken deliberately; the general control is what is registered here.*
+- **▸ (P2) batch-79's increment packets for **Inc-8, Inc-9 and Inc-10 do not exist on disk**, and are
+  deliberately NOT being reconstructed.** Only `increment-006.md`, `increment-007.md`,
+  `increment-007-entry-gate.md`, `increment-010-entry-gate.md`, `increment-011.md` and
+  `increment-011-merge-gate-response.md` were written. The commits exist (`6ed78f9`, `ae71bd6`,
+  `aa1aa72`/`1154bd8`) and carry detailed messages with gates, counterfactuals and file-set
+  deviations — but the flow's per-increment artifact was never produced.
+
+  **Operator ruling 2026-08-13: leave them absent.** Writing packets now from commit messages would
+  manufacture evidence of observations nobody made, which is the exact defect class this batch exists
+  to avoid. The second merge gate independently judged the refusal correct.
+
+  ⚠️ **But the gate also named the price, and it is not hypothetical.** `H-3` — a factual error about
+  **Inc-9's own work**, shipped into a docstring that then contradicted a comment five lines above it
+  — is the one claim a missing Inc-9 packet let through. *An increment with no packet is an increment
+  whose later claims have nothing to check them against.* Registered so the cost is on the record,
+  not just the decision.
+- **▸ (P3) `N-7` from the batch-79 merge gate — degenerate terminal widths breach the context budget.**
+  `_compose_context_line` returns the bare 5-column separator when the budget falls under the
+  separator's own width (`bar_width <= 7`), and at `avail == 1` returns `"  |  …"` — the project
+  evicted entirely, contradicting the method's own *"neither can evict the other"*. **Unreachable at
+  the three supported terminal sizes**, which is why it was carried rather than fixed. Registered
+  here because the third gate found it recorded in the increment file and **missing from this
+  backlog** — a carry that lives only in a batch artifact does not survive the batch close.
+- **▸ (P2) `M-4` from the batch-79 merge gate — `_apply_unload` now clears `current_a2l_path`, a
+  production behaviour change outside every in-scope requirement.** Landed as an F6 fix at Inc-7. It
+  reaches `save_project`, the empty-state guards and `_project_stem` — all resolved **by name**, because
+  the line numbers first recorded here were already off by 3 in the commit that wrote them, shifted by
+  an insertion the same commit made. Only its **display** effect is tested (`TC-B78-43`).
+  Concretely: unload the A2L, then save the project — the A2L is no longer copied into the workarea.
+  That is arguably correct and is **untested either way**. Owed: one acceptance on the save path, or
+  a descope to its own item. **Carried by operator ruling 2026-08-12** rather than fixed under time
+  pressure, because a test written hastily over an untested behaviour change is how vacuous
+  acceptances get made.
+
+- **▸ (P2) `git` tracks 8 `.pyc` files that `.gitignore` excludes.** `git ls-files '*.pyc'` returns
+  **8** under `s19_app/__pycache__/`, while `.gitignore:4-5` lists `__pycache__/` and `*.pyc` — they
+  were committed before the rule, and `.gitignore` does not untrack what is already tracked. They are
+  **Python 3.9 / 3.10** bytecode in a project now running **3.14**, so they are stale as well as
+  unwanted. **Two live costs, not just tidiness:** they show up as spurious `M` entries in
+  `git status` during any test run (batch-79 Inc-7 nearly committed two), and they **inflate greps over
+  `tests/`** — Inc-8's gate figure read `10` instead of `4` because six matches were binaries. Removal
+  is `git rm --cached` + a commit; **operator decision owed** because it rewrites nothing but does touch
+  files no batch has claimed.
+- **▸ (P2) `LLR-119.2`'s numeric threshold is NOT MEASURABLE as written — §6.5 amendment owed.** It
+  reads *"`len(app.log_lines)` grows by exactly 1 per key on each of the 7 screens"*. `log_lines` is a
+  **`deque(maxlen=4)`** (`app.py:1445`), so its LENGTH saturates at 4 and stops growing. Executed
+  against a CORRECT implementation across all seven notice screens: `map/issues/patch/diff` report a
+  delta of **1**, `flow/checks/crc_designer` report **0**. A node asserting the spec's literal wording
+  false-fails on whichever three screens happen to run last. batch-79 `AT-B78-05` counts the **emitted
+  notices** instead (the repo's `_statuses` idiom) paired with the rendered `#log_line_4`; the spec text
+  still needs the Before/After amendment.
+- **▸ (P2) `TC-B78-43`'s project half — §6.5 amendment owed.** The boundary catalog reads *"unload all →
+  both surfaces return to `(none)`"*. The **A2L half was right** and batch-79 fixed the defect behind it
+  (`current_a2l_path` was written in two places and cleared in none). The **project half is wrong**:
+  `_apply_unload` never touches `current_project`, and making it do so would change what unload-all
+  *means*, which is nowhere in `HLR-120`. ⚠️ **The lesson, worth the amendment on its own:** measuring
+  told the batch that catalog and code disagreed; it did **not** say which was mistaken, and the first
+  pass resolved that in favour of the code for *both halves at once*. Ask it per half.
+- **▸ (P3) The command palette has NO `escape`-to-close.** `command_bar.py` declares no `BINDINGS` and
+  handles no `escape`; re-executed at batch-79 Inc-9, `ctrl+k` then `escape` leaves `palette_is_open`
+  **True**. `LLR-119.3`/`AT-B78-07` originally asserted a constraint *"must not shadow the palette's
+  escape"* — **against nothing**. ⚠️ **Do not repeat the spec's suggested justification for deferring
+  it:** *"the bar is being deleted anyway"* is **FALSE** — `HLR-118` deletes `#command_bar_row` while
+  `#command_bar_slot` and `#command_bar` **survive to host the palette**, so the gap outlives Lane 1.
+  Deferred at Inc-9 for the reason that does hold: it is a new capability on a different widget, outside
+  `HLR-119`'s statement, and it needs its own requirement. Inc-9 pins only that its `escape` handler
+  leaves the palette exactly as it found it.
+- **▸ (P3) The three painted-Footer-children arms are unasserted.** `LLR-126.1` specifies **8** @80×24 ·
+  **13** @120×30 · **15** @160×40 under §1.3's containment rule, as a PIN at the first two sizes and a
+  GATE only at 160×40. Inc-6 shipped `AT-B78-28`'s model-key set-equality arm and **not** these. Carried
+  from Inc-6 rather than dropped.
+
 ## 🆕 Carries returned by batch-76 (2026-07-31, `R-TUI-102`)
 
 - **▸ (P2) `_applied_regions` is STILL the unbounded third producer, and it is now the ONLY thing standing between this repo and a whole-report residency claim.** batch-76 bounded the produced **file**; non-claim (a) states in writing that peak memory is untouched, because every producer is fully evaluated before its gate can refuse it. Operator-fenced for batch-75/76 by explicit ruling. **A residency acceptance stays unsatisfiable until this is bounded** — that is not a wording problem, it is the reason the claim cannot be made.
@@ -135,7 +363,7 @@
     5. ⚠️ **The bar acts on the WRONG PANE today** — with A2L active, `CommandBar.Find` writes into the *workspace* `#search_input`. Nothing unmounts, so **`/`·`g` must route on `_active_screen_key`**, never on which inputs exist. **10 screens, 3 own find/goto — the notice path is 7 of 10, the majority.** And `set_status` writes the **log tail**, not `#status_text`.
     6. ⚠️ **The deletable CSS span is `:66-102`, not `:55-102`** — `#command_bar_slot` and `#command_bar` survive to host the palette.
     7. **Inc-0's committed artifacts are Inc-10/Inc-11's oracles** and **must be re-read from disk, never regenerated**: `AT-B78-03` was provably inert before Inc-0 because `CommandBar(self._build_palette_entries())` made observed and expected the same producer — GREEN at `36 == 36` with a whole `Binding` removed. **The temporal freeze is what breaks the circularity**, and `TC-B78-44`'s AST census reddens if any test module tries to rebuild one.
-  - **▸ 🛑 (P1 — BATCH-80 CHARTER) Lane 3: operations staged removal, `S-10`…`S-13`.** **Never in scope for batch-78** (operator ruling at kickoff); this charter was a **required deliverable of its close**. Source: `prototypes/cmdbar_a2bdiff.HANDOFF.md` §2 Lane 3. **S-10** encode the modal's known CRC as a saved Designer `.crc.json` (width 32, poly `0x04C11DB7`, init/xorout `0xFFFFFFFF`, refin=refout=true) — **open decision, do not silently pick:** op configs allow multiple regions with per-region output addresses while Designer serialization is single-output. **S-11** the Designer gains an execute path, **the first firmware write it performs**, amending `US-V6` with an explicit Before/After. **S-12** equivalence **by test, not by UI** (operator ruling — no KAT surface): byte-identical output between Designer execution and the modal's check+Write CRC path, and **this test must exist BEFORE S-13 deletes the modal**. **S-13** gated on S-10…S-12 merged and green. ⚠️ The deferred `wire-kernel-into-crc.py` item **intersects** S-10…S-12 — Phase 1 states the relationship explicitly rather than absorbing it. **`x` does not become free until S-13.**
+  - **▸ 🛑 (P1 — BATCH-81 CHARTER) Lane 3: operations staged removal, `S-10`…`S-13`.** ⚠️ **Renumbered 80 → 81 at batch-79 Phase 0 (operator ruling, 2026-08-07)**, because Lane 1 took 79 and the aggregation carry `C-77-l` moved into 80. Content unchanged. **Never in scope for batch-78** (operator ruling at kickoff); this charter was a **required deliverable of its close**. Source: `prototypes/cmdbar_a2bdiff.HANDOFF.md` §2 Lane 3. **S-10** encode the modal's known CRC as a saved Designer `.crc.json` (width 32, poly `0x04C11DB7`, init/xorout `0xFFFFFFFF`, refin=refout=true) — **open decision, do not silently pick:** op configs allow multiple regions with per-region output addresses while Designer serialization is single-output. **S-11** the Designer gains an execute path, **the first firmware write it performs**, amending `US-V6` with an explicit Before/After. **S-12** equivalence **by test, not by UI** (operator ruling — no KAT surface): byte-identical output between Designer execution and the modal's check+Write CRC path, and **this test must exist BEFORE S-13 deletes the modal**. **S-13** gated on S-10…S-12 merged and green. ⚠️ The deferred `wire-kernel-into-crc.py` item **intersects** S-10…S-12 — Phase 1 states the relationship explicitly rather than absorbing it. **`x` does not become free until S-13.**
   - **▸ (P3, NEW — batch-78 Phase 0) Diff variants B and C are backlog CANDIDATES, not scheduled.**
     Evaluated in the design session and not chosen. **C additionally needs ~190 cols or an 8-byte row
     mode `render_hex_view_text` does not have.** The charter fences both out explicitly.
@@ -165,8 +393,10 @@
 
 > Written **inline, not as pointers**. Until the merge gate these lived only in `.dev-flow/2026-08-01-batch-77/01-requirements.md` §6.3 — a file no later batch reads at Phase 0 — which is how this project previously lost an explicitly-addressed one-sentence action across four consecutive batch-74 PRs that each opened this queue. A carry that is not in the live queue is not carried.
 
-- **▸ 🛑 (P1) `C-77-l` — BATCH-79 CHARTER: the aggregation path. This carry is LOAD-BEARING.** It is the **sole** reason ruling **R-10**'s removal of aggregation from batch-77 is a *scope reduction* and not a *silent drop*: the path was descoped on the explicit promise that the next batch inherits it **fully measured**. Losing this carry retroactively converts a recorded descope into an undocumented gap. **Every measurement below is already paid for — the executing batch re-verifies, it does not re-derive.**
-  > ⚠️ **RENUMBERED 78 → 79 at batch-78 Phase 0 (operator ruling, 2026-08-06).** This carry named "batch-78" before any batch had claimed that number. The `prototypes/cmdbar_a2bdiff.HANDOFF.md` charter (command-bar deletion + A2B diff master–detail) took **78**; the aggregation path is **79**. Renumbered here rather than leaving two claimants — this project has had two numbering collisions already. **The carry's content, priority and measurements are unchanged.**
+- **▸ 🛑 (P1) `C-77-l` — BATCH-80 CHARTER: the aggregation path. This carry is LOAD-BEARING.** It is the **sole** reason ruling **R-10**'s removal of aggregation from batch-77 is a *scope reduction* and not a *silent drop*: the path was descoped on the explicit promise that the next batch inherits it **fully measured**. Losing this carry retroactively converts a recorded descope into an undocumented gap. **Every measurement below is already paid for — the executing batch re-verifies, it does not re-derive.**
+  > ⚠️ **RENUMBERED AGAIN, 79 → 80, at batch-79 Phase 0 (operator ruling, 2026-08-07).** batch-78's `HANDOFF.md` **contradicted itself**: its §7 chartered its Lane-1 follow-on as "batch-79" while its own §6 warned that *"79 is taken by the aggregation carry"*. Two claimants, surfaced at batch-79's kickoff rather than silently resolved. **The operator ruled that Lane 1 (command-bar deletion) takes 79**; the aggregation path moves to **80**, and Lane 3 (operations, below) moves to **81**.
+  > ⚠️ **Prior renumbering, 78 → 79, at batch-78 Phase 0 (operator ruling, 2026-08-06)** — kept for lineage. This carry named "batch-78" before any batch had claimed that number, and the `prototypes/cmdbar_a2bdiff.HANDOFF.md` charter took **78**.
+  > **The carry's content, priority and measurements are unchanged by either renumbering.** ⚠️ **Its own body still says "batch-79 must …" in four places** (the degradation rule, the time budget, the strict-∃ tension, the represented-not-merely-counted clause) — **read those as "batch-80 must …"**. They are left as written rather than rewritten, because editing normative sentences inside a load-bearing carry to chase a number is how measurements get lost; the number is corrected here, once, at the top.
   1. **Onset formula:** aggregation is required when `n_runs + n_gaps·fold > bar_width`, i.e. `2·n_runs − 1 > bar_w`.
   2. **Measured onset:** **26 runs @bar=50** (25 clean, 26 aggregates 1) · **34 runs @bar=66** (33 clean, 34 aggregates 1).
   3. ⭐ **THE ACCEPTANCE FIXTURE, FROM THE START — this is the single most important line in the carry.** `examples/professional_validation/case_08_heavy_fragmentation/firmware.s19` — **801 ranges → 801 runs + 800 gaps = 1601 segments**, ~30× the ceiling. **It is the ONLY shipped fixture past the onset**; every other is ≤ 11 runs. **The aggregation path has now been designed TWICE against fixtures that did not represent the real one** — revision 2's synthetic 35-run fixture was chosen because no shipped fixture was believed to cross, and that premise was false. This is the batch's signature failure recurring, and it is why R-10 descoped rather than patched.

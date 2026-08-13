@@ -2004,15 +2004,27 @@ _B78_INC4_WIDE = (132, 44)
 #: reason: 24 is below `_DIFF_MIN_H`, so the whole result area is `display: none`
 #: behind the notice and the "pane" whose height this node names no longer
 #: exists. The first draft used 132x26; raising the floor to 28 (gate F-1) put
-#: that back in the notice regime, so it moves once more to **132x28** - the
-#: first row at which the fallback regime renders under the corrected floor.
+#: that back in the notice regime, so it moved to 132x28 - the first row at
+#: which the fallback regime rendered under the corrected floor.
 #:
-#: Capacity is still 0 there, executed both sides of Inc-10: `132x28` gives
-#: content height 0 / capacity 0 with the command bar present and 2 / 1 without
-#: it. Either way `capacity <= 3`, and the window only GROWS when
+#: batch-79 Inc-10 moved it AGAIN, to **132x27**, and the move IS the
+#: measurement. `HLR-118` returned the command bar's three rows to the pane, so
+#: `132x28` now paints content height **2**, not 0, and would no longer exercise
+#: the degenerate path this node exists for. Executed at the deletion:
+#:
+#:     132x27 -> content height 0        132x28 -> content height 2
+#:
+#: 27 is the boundary under the reclaimed layout, which is the value below.
+#: Capacity is 0 there; `capacity <= 3`, and the window only GROWS when
 #: `capacity > rows`, so the run +/- context floor of 3 rows is still the whole
-#: window and `AT-B78-22`'s exact three addresses hold on both sides of Inc-10.
-_B78_INC4_SHORT = (132, 28)
+#: window and `AT-B78-22`'s exact three addresses hold.
+#:
+#: The SUBJECT is untouched: this is the feature arriving, not a regression, and
+#: the re-point keeps the degenerate path exercised rather than deleting a
+#: precondition that had become inconvenient. `AT-B78-22` asserts
+#: `short["content_h"] == 0` in its own run, so the fixture cannot drift
+#: silently even if this comment goes stale again - which it had.
+_B78_INC4_SHORT = (132, 27)
 
 #: `AT-B78-22`'s fixture and its expected addresses, as LITERALS. Spec F-6 /
 #: Q-M1: rev-1 computed this span from `AbDiffPanel.DISPLAY_CONTEXT_BYTES` - the
@@ -2763,34 +2775,6 @@ _B78_INC5_FLOOR = (80, 24)
 _B78_WINDOW_HEADER_ROWS = 1
 
 
-async def _b78_hide_command_bar(app, pilot) -> None:
-    """Reclaim the command-bar row's three screen rows, as Inc-10 will.
-
-    `_DIFF_MIN_H` is defined in the POST-Inc-10 end state (spec Sec.8 A-1's own
-    quantity: "post-US-78-8 + US-78-1"), and Inc-10 is the increment that deletes
-    `#command_bar_row` from `CommandBar.compose`. Until it lands, a node that
-    asserts what the floor DELIVERS has to reach that state, and hiding the row
-    reclaims exactly the rows deleting it will.
-
-    The reclaim is ASSERTED, not assumed: a simulation that silently fails to
-    apply is a vacuous precondition, and this batch has now watched ten mutations
-    fail to apply. When Inc-10 lands, `#command_bar_row` no longer resolves and
-    this hook becomes the no-op branch below - the node then measures the real
-    tree with no simulation at all.
-    """
-    rows = app.query("#command_bar_row")
-    if not rows:
-        return
-    slot_before = app.query_one("#command_bar_slot").size.height
-    rows.first().display = False
-    await pilot.pause()
-    slot_after = app.query_one("#command_bar_slot").size.height
-    assert slot_after < slot_before, (
-        f"the Inc-10 simulation must actually reclaim the command bar's rows; "
-        f"#command_bar_slot height stayed at {slot_before}"
-    )
-
-
 def _b78_widest_emitted_hex_row() -> int:
     """The width of the widest row `hexview.render_hex_view` emits.
 
@@ -3208,8 +3192,12 @@ def test_tc_b78_51_escape_dismisses_without_shadowing(tmp_path: Path) -> None:
     Executed premise correction, reported rather than absorbed: A-2 and LLR-119.3
     both speak of "the palette's `escape`-to-close". THERE IS NONE.
     `command_bar.py` binds no key and handles no `escape`; the palette closes
-    only via `_dispatch_palette_entry` and `on_list_view_selected`
-    (`command_bar.py:279`, `:295`). Arm 2 therefore asserts what is actually
+    only via the `close_palette()` calls inside `CommandBar._dispatch_palette_entry`
+    and `CommandBar.on_list_view_selected` -- cited by SYMBOL because the line
+    numbers this sentence carried (`:279`, `:295`) were accurate at the batch
+    base and pointed **past end-of-file** by the end of it: `HLR-118` took
+    `command_bar.py` from 296 lines to 260. The batch's own headline deletion
+    invalidated them. Arm 2 therefore asserts what is actually
     true - that the panel's `escape` does not reach outside the panel - which is
     the property A-2 wanted, over a premise that does not hold.
     """
@@ -3476,7 +3464,13 @@ def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
         }
 
     async def _after(app, pilot):
-        await _b78_hide_command_bar(app, pilot)
+        # batch-79 Inc-11: `_b78_hide_command_bar` is deleted. It simulated the
+        # Inc-10 reclaim by hiding `#command_bar_row` while that row still
+        # existed. `HLR-118` deleted the row, so the helper's query matched
+        # nothing and it became a permanent no-op whose "the reclaim is
+        # ASSERTED, not assumed" clause could never execute again. The node now
+        # measures the real tree with no simulation at all, which is what the
+        # helper's own docstring said would happen once Inc-10 landed.
         return await _measure(app, pilot)
 
     at = _b78_drive_compare(
@@ -3518,4 +3512,575 @@ def test_tc_b78_54_the_height_floor_delivers_a_hex_row(tmp_path: Path) -> None:
     assert "height" in below["notice_text"], (
         f"the notice at the height boundary must name the height axis; "
         f"text={below['notice_text']!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-6 -- HLR-126 discoverability (LLR-126.1)
+# ---------------------------------------------------------------------------
+
+
+def _b79_painted_text(app, widget) -> str:
+    """The text actually PAINTED in a widget's region, read from the compositor.
+
+    ``str(widget.render())`` is not usable here: the ``HelpPanel`` renders a
+    ``rich.table.Table`` object, so the string form is a repr and every ``in``
+    assertion over it is vacuous. This reads the composited screen and slices
+    the widget's own region out of it, which is what the operator sees.
+    """
+    strips = app.screen._compositor.render_strips()
+    region = widget.region
+    lines = []
+    for y in range(region.y, min(region.y + region.height, len(strips))):
+        row = "".join(segment.text for segment in strips[y])
+        lines.append(row[region.x : region.x + region.width].rstrip())
+    return "\n".join(lines)
+
+
+def _b79_help_focused_section(app) -> str:
+    """The FIRST block of the help panel -- the FOCUSED widget's own bindings.
+
+    Measured, not assumed (C-35): with the run list focused the panel paints the
+    list's own three bindings first, then a blank line, then the ancestor
+    panel's ``[`` / ``]``, then screen- and app-level blocks. The blank line is
+    the section boundary, so the negative co-assertion has something real to be
+    absent FROM -- ``AT-B78-28`` would otherwise be green on a panel that lists
+    every binding in the application.
+    """
+    from textual.widgets import HelpPanel
+
+    panel = app.screen.query_one(HelpPanel)
+    text = _b79_painted_text(app, panel)
+    # Strip the panel's painted left border before looking for blank lines. The
+    # glyph is U+258F LEFT ONE EIGHTH BLOCK, not the U+2502 box-drawing bar a
+    # reader reaches for first -- and with the wrong glyph NO line is ever
+    # blank, the whole panel reads as one section, and the positive clauses go
+    # green against every binding in the application. Not hypothetical: that is
+    # what this helper did on its first run, and the negative co-assertion in
+    # `AT-B78-28` is what caught it.
+    body = [
+        line.lstrip("▏│┃▕▐| \t").rstrip()
+        for line in text.splitlines()
+    ]
+    section: list[str] = []
+    started = False
+    for line in body:
+        if not line:
+            if started:
+                break
+            continue
+        started = True
+        section.append(line)
+    return "\n".join(section)
+
+
+def _b79_shown_keys(app) -> list[str]:
+    """The model key set: bindings that are both ``show`` and ``enabled``."""
+    return sorted(
+        key
+        for key, active in app.active_bindings.items()
+        if getattr(active.binding, "show", False) and getattr(active, "enabled", True)
+    )
+
+
+#: LLR-126.1's committed pre-change chip set (spec P-51), frozen here rather
+#: than recomputed, so the assertion is SET-EQUALITY against a constant. A
+#: containment predicate is satisfied by a superset -- executed at batch-78:
+#: ``+1 chip -> contains-all True, set-equality False`` -- so containment cannot
+#: gate "the footer-visible binding set shall be unchanged".
+_B79_COMMITTED_SHOWN_KEYS: tuple[str, ...] = (
+    "comma",
+    "ctrl+d",
+    "ctrl+k",
+    "ctrl+l",
+    "ctrl+s",
+    "g",
+    "k",
+    "minus",
+    "period",
+    "plus",
+    "q",
+    "question_mark",
+    "slash",
+    "x",
+)
+
+
+def _b79_app_binding_rows() -> frozenset:
+    """The App ``BINDINGS`` block as a comparable set of rows.
+
+    Resolved from the CLASS, not from a line range. See
+    ``test_at_b78_32_app_bindings_block_is_untouched`` for why that distinction
+    is the whole point of this node.
+    """
+    from textual.binding import Binding
+
+    from s19_app.tui.app import S19TuiApp
+
+    rows = set()
+    for entry in S19TuiApp.BINDINGS:
+        if isinstance(entry, Binding):
+            rows.add((entry.key, entry.action, entry.description, bool(entry.show)))
+        else:
+            key, action, description = entry
+            rows.add((key, action, description, True))
+    return frozenset(rows)
+
+
+#: The committed App binding set: 38 entries -- 31 written as ``Binding(...)``
+#: and 7 as bare tuples. Frozen as a COUNT plus the shown-key projection rather
+#: than 38 literal rows, because the full row set is `app.py`'s business and
+#: this batch's claim is only that Lane 1 does not disturb it.
+#: The committed App binding set, FULL ROWS. See the assertion in
+#: `test_at_b78_32_...` for why a count plus a key-only projection was not
+#: enough. 38 entries: 31 written as `Binding(...)`, 7 as bare tuples.
+_B79_COMMITTED_APP_BINDING_ROWS: frozenset = frozenset({
+    ('0', "show_screen('crc_designer')", 'CRC Designer', False),
+    ('1', "show_screen('workspace')", 'Workspace', False),
+    ('2', "show_screen('a2l')", 'A2L Explorer', False),
+    ('3', "show_screen('mac')", 'MAC View', False),
+    ('4', "show_screen('map')", 'Memory Map', False),
+    ('5', "show_screen('issues')", 'Issues Report', False),
+    ('6', "show_screen('patch')", 'Patch Editor', False),
+    ('7', "show_screen('diff')", 'A2B Diff', False),
+    ('8', "show_screen('flow')", 'Flow Builder', False),
+    ('9', "show_screen('checks')", 'Checks', False),
+    ('U', 'unload_all', 'Unload all', False),
+    ('b', 'before_after_report', 'Before/After report', False),
+    ('comma', 'hex_page_prev', 'Hex-', True),
+    ('ctrl+d', 'cycle_density', 'Density', True),
+    ('ctrl+k', 'focus_palette', 'Palette', True),
+    ('ctrl+l', 'load_file', 'Load', True),
+    ('ctrl+s', 'save_project', 'Save', True),
+    ('ctrl+y', 'patch_redo', 'Redo', False),
+    ('ctrl+z', 'patch_undo', 'Undo', False),
+    ('g', 'focus_goto', 'Go-to', True),
+    ('j', 'dump_a2l_json', 'Dump A2L JSON', False),
+    ('k', 'show_legend', 'Legend', True),
+    ('l', 'load_file', 'Load file', False),
+    ('minus', 'page_prev_context', 'Page-', True),
+    ('o', 'open_workarea', 'Open workarea', False),
+    ('p', 'load_project', 'Load project', False),
+    ('pagedown', 'page_down_context', 'Page+', False),
+    ('pageup', 'page_up_context', 'Page-', False),
+    ('period', 'hex_page_next', 'Hex+', True),
+    ('plus', 'page_next_context', 'Page+', True),
+    ('q', 'quit', 'Quit', True),
+    ('question_mark', 'show_help_panel', 'Help', True),
+    ('r', 'refresh_files', 'Refresh workarea', False),
+    ('s', 'save_project', 'Save project', False),
+    ('slash', 'focus_find', 'Find', True),
+    ('t', 'view_reports', 'View reports', False),
+    ('v', 'select_variant', 'Select variant', False),
+    ('x', 'operations_view', 'Operations', True),
+})
+
+_B79_COMMITTED_APP_BINDING_COUNT = 38
+
+
+def test_at_b78_28_run_list_keys_are_discoverable(tmp_path: Path) -> None:
+    """AT-B78-28 (GATE) -- LLR-126.1, all three clauses.
+
+    The operator who has never used the diff screen can find out how to walk the
+    runs without reading source: the list itself names the keys, and the help
+    panel lists them under the FOCUSED widget -- while the Footer's chip set is
+    untouched.
+
+    C-40, and it is the reason this node is shaped the way it is:
+
+    * *"the help panel names the keys"* is GREEN on a panel that lists every
+      binding in the application, so the arm reads only the FOCUSED SECTION and
+      co-asserts that a key the run list does NOT bind is absent from it. The
+      ancestor panel's ``]`` (*Window page +*) is exactly such a key: it is
+      reachable while the list is focused, it IS in the panel, and it is NOT in
+      the list's own section.
+    * The chip clause is SET-EQUALITY, never containment -- a superset satisfies
+      containment, which is the failure mode a new shown binding would produce.
+    * Assertions are on the binding DESCRIPTIONS, not on the key column: the
+      key column paints arrow GLYPHS, and a predicate over those is a predicate
+      over the emitted encoding rather than over the behaviour.
+    """
+    from s19_app.tui.screens_directionb import AbDiffPanel
+
+    async def _after(app, pilot):
+        listing = _b78_run_list(app)
+        listing.focus()
+        await pilot.pause()
+        assert app.focused is listing, (
+            f"the run list must hold focus for this AT to mean anything; "
+            f"focused={app.focused!r}"
+        )
+
+        list_text = _b78_run_list_text(app)
+        shown_before = _b79_shown_keys(app)
+
+        await pilot.press("question_mark")
+        await pilot.pause()
+        from textual.widgets import HelpPanel
+
+        section = _b79_help_focused_section(app)
+        full_panel = _b79_painted_text(app, app.screen.query_one(HelpPanel))
+        return list_text, shown_before, section, full_panel
+
+    list_text, shown_keys, section, full_panel = _b78_drive_compare(
+        tmp_path,
+        (160, 40),
+        _diff_result([(0x00, 0x0F, "changed"), (0x20, 0x2F, "added")]),
+        after=_after,
+    )
+
+    # Clause 1 -- the list carries the visible affordance, asserted against the
+    # EMITTED constant rather than a re-typed copy of the requirement's wording.
+    #
+    # C-31: reading the constant is what keeps the predicate honest about the
+    # emitted string, but it also makes the constant an ORACLE -- and an
+    # unguarded oracle is where this predicate could go vacuous. Emptied to
+    # `""`, `"" in list_text` is trivially True and the affordance could vanish
+    # with the node still green. So the oracle is guarded before it is used,
+    # against the REQUIREMENT ("naming its navigation keys"), not against its
+    # own current wording.
+    affordance = AbDiffPanel._RUN_LIST_AFFORDANCE
+    assert affordance.strip(), "the affordance constant is empty -- clause 1 would be vacuous"
+    # `Enter` was in this tuple until the independent review. It made the node
+    # REQUIRE a false claim: `Enter` is a no-op on this list and the spec
+    # excludes the capability three times over (P-43, HLR-126's rationale, §1.2
+    # Scope Out). A guard that pins the wrong contract actively resists its own
+    # correction, which is worse than no guard.
+    for key_word in ("Up", "Down"):
+        assert key_word in affordance, (
+            f"LLR-126.1's affordance must NAME the navigation keys; "
+            f"{key_word!r} missing from {affordance!r}"
+        )
+
+    assert affordance in list_text, (
+        f"the run list must carry LLR-126.1's affordance; "
+        f"expected {AbDiffPanel._RUN_LIST_AFFORDANCE!r} in:\n{list_text}"
+    )
+
+    # Clause 2 -- the help panel names the FOCUSED list's own navigation keys...
+    for description in ("Cursor up", "Cursor down", "Select"):
+        assert description in section, (
+            f"the help panel's focused section must name the run list's "
+            f"{description!r} binding; section=\n{section}"
+        )
+
+    # ...and the negative co-assertion, without which clause 2 is vacuous.
+    # The PRECONDITION comes first, and it is what makes the guard
+    # self-checking instead of size-dependent. The independent review measured
+    # this helper at all three supported sizes: at 120x30 the separator line
+    # carries a scrollbar glyph so it is NOT blank and the boundary is MISSED;
+    # at 80x24 the panel is clipped and `Window page` is absent from it
+    # entirely, so `not in section` is trivially true. A discriminator that is
+    # not present cannot discriminate — asserting it IS in the full panel turns
+    # both failure modes loud instead of silently green.
+    assert "Window page" in full_panel, (
+        "the co-assertion below is vacuous: its discriminator is not in the "
+        f"panel at all, so 'not in section' proves nothing.\npanel=\n{full_panel}"
+    )
+    assert "Window page" not in section, (
+        "the focused section must list the RUN LIST's bindings, not its "
+        "ancestor panel's window paging -- if 'Window page' appears here the "
+        "section boundary was not found and the positive clauses above are "
+        f"green against the whole panel; section=\n{section}"
+    )
+
+    # Clause 3 -- the footer-visible set is UNCHANGED, by set-equality.
+    assert tuple(shown_keys) == _B79_COMMITTED_SHOWN_KEYS, (
+        f"the shown+enabled key set must be SET-EQUAL to its committed "
+        f"pre-change set of {len(_B79_COMMITTED_SHOWN_KEYS)}; "
+        f"observed {len(shown_keys)}: {shown_keys}"
+    )
+
+
+def test_at_b78_32_app_bindings_block_is_untouched(tmp_path: Path) -> None:
+    """AT-B78-32 (PIN) -- Lane 1 does not disturb the App ``BINDINGS`` block.
+
+    RE-AUTHORED at batch-79 Phase 0, and the reason is the point of the node.
+
+    The batch-78 spec realizes this as *"a zero-line ``git diff`` over
+    ``app.py:1338-1375``"*. Executed against the tree, that range STOPS
+    MID-BLOCK: the cited end line falls on the ``crc_designer`` screen binding,
+    and **eight** entries sit BELOW it and outside the range --
+    ``plus`` / ``minus`` context paging, ``comma`` / ``period`` hex paging,
+    ``pagedown`` / ``pageup`` from batch-31 AC-3, and ``ctrl+z`` / ``ctrl+y``
+    from batch-40 S2. An entry added or removed among those eight leaves the
+    range-based predicate GREEN, so the guard would report "untouched" for a
+    block that was touched. It fails in the safe-looking direction.
+
+    ⚠️ **That sentence said "the ``page_prev_context`` entry" and "six" until the
+    SIXTH merge gate measured it.** Both were wrong, and the second followed from
+    the first: ``page_prev_context`` is two lines LOWER than the cited boundary,
+    so believing the boundary sat there silently dropped ``plus``/``minus`` from
+    the inventory. The figure came in from Phase 0's premise table and was
+    carried through two rewrites of this very paragraph without being
+    re-executed -- including one whose stated purpose was removing false
+    references from it. *A figure inherited inside a sentence you are editing is
+    still an inherited figure.* The paragraph's THESIS is unaffected: the range
+    does stop mid-block, entries do escape the predicate, and the node's
+    assertions never depended on the count.
+
+    It is not drift: at ``f6ff1d3`` the block ALREADY ran past the cited end and
+    batch-78 added zero ``Binding(`` lines. The range was wrong when it was
+    written and survived three Phase-2 rounds -- because a line range looks like
+    a measurement. A code comment in ``screens_directionb.py`` carried the
+    CORRECT extent, so the two artifacts disagreed and the code was right.
+
+    **batch-79 Inc-11: this docstring cites no line number as a POINTER, and it
+    took three commits to get there.** Numbers still appear below, and they are
+    NARRATION -- the record of which ranges were claimed and how each was wrong.
+    Read none of them as an address. (Two earlier drafts got this wrong in
+    opposite directions: the first claimed "EVERY line number is now gone" while
+    five remained, and the fifth gate then noted that one of the survivors,
+    ``1339-1393``, happens to be the block's CURRENT extent -- accurate today,
+    which is exactly what makes narration read as a pointer. The wording above
+    is scoped to POINTERS for that reason.)
+    The first pass cited
+    ``screens_directionb.py:6712`` for that comment; the branch pushed it to
+    ``:6822``. The second pass removed that one and left the block's own range
+    ``1338-1392`` in place -- and the very next commit added an import at the
+    top of ``app.py`` and shifted the block to ``1339-1393``. The range that had
+    been "corrected" was **also wrong on arrival**.
+
+    So the docstring arguing that a line range is "one insertion away from
+    failing the same silent way" demonstrated the claim three times on itself.
+    Everything is cited by FILE and DESCRIPTION now; a symbol reference that cannot
+    go stale is the whole point of the node below.
+
+    A corrected range would not fix this, and this batch proved it twice: any
+    edit ABOVE the block shifts it, and both "corrected" ranges were invalidated
+    within days -- one of them wrong the moment it was written. This
+    resolves the block from the CLASS instead, which no line movement can blind,
+    and pins two independent projections of it.
+    """
+    rows = _b79_app_binding_rows()
+
+    # The FULL row set, frozen. The node pinned only a count plus a key-only
+    # projection of the shown bindings until the independent review measured the
+    # blind spot: 24 of the 38 entries are `show=False`, so their key, action
+    # and description were certified by the count alone. Executed, all three of
+    # these stayed GREEN — a hidden binding's action rebound, a hidden binding's
+    # key changed, and one hidden removed while another was added. The shown
+    # projection kept only `key`, so **re-pointing `slash` or `g` to a different
+    # action — precisely what Lane 1 does at Inc-9 — was invisible too.**
+    #
+    # The spec's line-range predicate would have caught every one of those. The
+    # re-authoring is still right about range fragility, but it was not the
+    # strict improvement the Inc-6 record claimed: its counterfactual was an
+    # ADDITION, the one class a count can see. A frozen row set is a superset of
+    # both old projections and no line movement blinds it.
+    assert rows == _B79_COMMITTED_APP_BINDING_ROWS, (
+        "the App BINDINGS block must be byte-for-byte the committed set. "
+        f"Added: {sorted(rows - _B79_COMMITTED_APP_BINDING_ROWS)!r}; "
+        f"removed: {sorted(_B79_COMMITTED_APP_BINDING_ROWS - rows)!r}"
+    )
+
+    assert len(rows) == _B79_COMMITTED_APP_BINDING_COUNT, (
+        f"the App BINDINGS block must still carry "
+        f"{_B79_COMMITTED_APP_BINDING_COUNT} entries; observed {len(rows)}. "
+        f"Lane 1 re-homes `/` and `g` onto the SCREENS (HLR-119) and deletes "
+        f"the command bar (HLR-118) -- neither touches this block."
+    )
+
+    shown = tuple(sorted(key for key, _action, _desc, show in rows if show))
+    assert shown == _B79_COMMITTED_SHOWN_KEYS, (
+        f"the App block's shown-key projection must be SET-EQUAL to the "
+        f"committed set; observed {list(shown)}"
+    )
+
+
+def test_tc_b78_38_help_panel_before_any_comparison_does_not_raise(
+    tmp_path: Path,
+) -> None:
+    """TC-B78-38 -- boundary: the help panel opens with no comparison rendered.
+
+    The run list is empty before the first Compare, so the affordance row does
+    not exist yet -- LLR-126.1's affordance rides with the runs it describes.
+    What is asserted here is that the discoverability surface is still SAFE in
+    that state: the panel mounts, paints, and lists the app's bindings.
+    """
+    from textual.widgets import HelpPanel
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            _b78_run_list(app).focus()
+            await pilot.pause()
+            await pilot.press("question_mark")
+            await pilot.pause()
+            panel = app.screen.query_one(HelpPanel)
+            return _b79_painted_text(app, panel), _b79_shown_keys(app)
+
+    text, shown = asyncio.run(_drive())
+
+    assert text.strip(), "the help panel painted nothing over an empty run list"
+    assert tuple(shown) == _B79_COMMITTED_SHOWN_KEYS, (
+        f"the chip set must be unchanged in the pre-comparison state too; "
+        f"observed {shown}"
+    )
+
+
+def test_tc_b78_39_help_panel_toggles_closed_and_reopens(tmp_path: Path) -> None:
+    """TC-B78-39 -- boundary: opened, dismissed, re-opened.
+
+    ``action_show_help_panel`` is this project's TOGGLE override -- resolved by
+    NAME, because the line number this sentence used to carry was accurate at
+    the batch base and broken by this batch's own edits -- rather than the stock
+    mount-only action, so
+    the second press must REMOVE the panel and the third must bring it back. A
+    node that only opened it would leave the override's whole reason untested.
+    """
+    from textual.widgets import HelpPanel
+
+    async def _drive():
+        app = S19TuiApp(base_dir=tmp_path)
+        async with app.run_test(size=(160, 40)) as pilot:
+            await pilot.pause()
+            app.action_show_screen("diff")
+            await pilot.pause()
+            counts = []
+            for _ in range(3):
+                await pilot.press("question_mark")
+                await pilot.pause()
+                counts.append(len(app.screen.query(HelpPanel)))
+            return counts
+
+    counts = asyncio.run(_drive())
+
+    assert counts == [1, 0, 1], (
+        f"`?` must toggle the help panel open/closed/open; mounted counts "
+        f"across three presses were {counts}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# batch-79 Inc-10 -- the three arms BL-2 moved here (they need HLR-118's rows)
+# ---------------------------------------------------------------------------
+
+#: One hex row is 79 painted cells (16 bytes: offset + hex pairs + ASCII).
+_B79_HEX_ROW_CELLS = 79
+
+
+def _b79_diff_at(tmp_path, size):
+    """Drive a real Compare at one size and read the diff pane's geometry."""
+
+    async def _after(app, pilot):
+        panel = app.query_one("#ab_diff_panel")
+        regime = sorted(c for c in panel.classes if c.startswith("diff-"))
+        hex_a = app.query_one("#diff_hex_a")
+        return {
+            "regime": regime[0] if regime else None,
+            "hex_painted": _b78_painted_content_height(hex_a),
+            "hex_width": hex_a.content_region.width,
+            "status_painted": _b78_painted_content_height(
+                app.query_one("#diff_status")
+            ),
+            "rows": [
+                app.query_one(f"#{rid}").size.height
+                for rid in ("diff_select_row_a", "diff_select_row_b", "diff_action_row")
+            ],
+        }
+
+    return _b78_drive_compare(
+        tmp_path,
+        size,
+        _diff_result([(0x00, 0x0F, "changed"), (0x20, 0x2F, "added")]),
+        after=_after,
+    )
+
+
+def test_at_b78_26_rows_clip_to_one_status_visible_and_a_hex_row_paints(
+    tmp_path: Path,
+) -> None:
+    """AT-B78-26 (GATE) -- the batch's headline case, as ONE node.
+
+    Three clauses in a single test, and that is normative rather than tidy
+    (`LLR-125.2`): split apart, the row-height clause is invariant under an
+    implementation that compacts the control rows and still leaves the result
+    area at zero -- executed at batch-78, compaction alone at 120x30 gave rows
+    1/1/1, `#diff_status` visible and `#diff_hex_a` content **0**. The joint
+    clause is what makes it a gate, and it absorbs the retired `AT-B78-27`.
+
+    ⚠️ **The hex clause reads the PAINTED content height, never the border
+    box.** §5.1 rule 1 prescribes `widget.region.intersection(screen_host.region)`,
+    which (a) does not clip through intermediate ancestors and (b) measures the
+    BORDER box -- so "at least one hex row" would pass at three rows of border
+    and **zero bytes** delivered. `_b78_painted_content_height` clips
+    `content_region` through the full ancestor chain, which is what the
+    requirement is actually about. Carried as `C-78-vi`.
+    """
+    at_120 = _b79_diff_at(tmp_path, (120, 30))
+
+    assert at_120["rows"] == [1, 1, 1], (
+        f"the three control rows must clip to one row each at 120x30; "
+        f"got {at_120['rows']}"
+    )
+    assert at_120["status_painted"] >= 1, (
+        f"`#diff_status` must remain visible; painted height "
+        f"{at_120['status_painted']}"
+    )
+    assert at_120["hex_painted"] >= 1, (
+        f"with the command bar removed, 120x30 must paint at least one HEX ROW "
+        f"OF CONTENT -- not one row of border. Painted content height "
+        f"{at_120['hex_painted']}"
+    )
+
+
+def test_at_b78_24_no_hex_row_wraps_in_the_fallback_regime(tmp_path: Path) -> None:
+    """AT-B78-24 (GATE) -- a hex row fits the window without wrapping.
+
+    A wrapped hex row is not a narrower view of the same data: it is two lines
+    pretending to be one, and every offset below it lies. The window must be at
+    least `79` cells wide, and the clipped height must be at least 1 -- a window
+    79 cells wide and 0 rows tall wraps nothing because it shows nothing (M3).
+    """
+    at_120 = _b79_diff_at(tmp_path, (120, 30))
+
+    assert at_120["regime"] == "diff-fallback", (
+        f"120x30 must be the fallback regime for this arm to be about the "
+        f"fallback at all; got {at_120['regime']!r}"
+    )
+    assert at_120["hex_width"] >= _B79_HEX_ROW_CELLS, (
+        f"a hex row is {_B79_HEX_ROW_CELLS} cells; the window is "
+        f"{at_120['hex_width']} and would wrap"
+    )
+    assert at_120["hex_painted"] >= 1, (
+        f"the co-assertion (M3): a window wide enough but 0 rows tall wraps "
+        f"nothing because it paints nothing; painted {at_120['hex_painted']}"
+    )
+
+
+def test_at_b78_25_the_regimes_are_observably_different(tmp_path: Path) -> None:
+    """AT-B78-25 (GATE) -- the three regimes are distinguishable, landed WHOLE.
+
+    Not split by arm (Q-M6.2): the claim is that the regimes DIFFER, and a
+    per-arm version asserts only that each size has some class, which any single
+    regime applied everywhere satisfies. Landing whole is what lets the node
+    fail on a "one regime for all widths" implementation.
+    """
+    wide = _b79_diff_at(tmp_path / "a", (160, 40))
+    fallback = _b79_diff_at(tmp_path / "b", (120, 30))
+    notice = _b79_diff_at(tmp_path / "c", (80, 24))
+
+    observed = {
+        "160x40": wide["regime"],
+        "120x30": fallback["regime"],
+        "80x24": notice["regime"],
+    }
+    assert observed == {
+        "160x40": "diff-wide",
+        "120x30": "diff-fallback",
+        "80x24": "diff-notice",
+    }, f"each size must select its own regime; got {observed}"
+
+    assert len(set(observed.values())) == 3, (
+        f"the three regimes must be DISTINCT -- one regime applied at every "
+        f"width would satisfy a per-arm check; got {observed}"
+    )
+    # And they differ in what they DELIVER, not merely in a class name.
+    assert notice["hex_painted"] == 0 < fallback["hex_painted"], (
+        f"the notice regime delivers no hex and the fallback delivers some; "
+        f"notice={notice['hex_painted']} fallback={fallback['hex_painted']}"
     )

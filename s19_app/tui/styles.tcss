@@ -53,53 +53,40 @@ Screen {
 }
 
 /* --- Direction B command bar (batch-02 increment 4) ---------------------
- * `#command_bar` is the persistent top bar: a single-row `#command_bar_row`
- * (accent `›` prompt, project/A2L context labels, find + go-to inputs) and
- * a `#command_palette` dropdown hidden until `Ctrl+K`. LLR-003.1 / 003.2 /
- * 003.3 / 004.1 / 004.2 / 004.3 / 011.3.
+ * AMENDED at batch-79 Inc-11, as `LLR-118.3` explicitly requires.
+ *
+ * `#command_bar` is now a PALETTE HOST and nothing else: its only child is the
+ * `#command_palette` dropdown, hidden until `Ctrl+K`. LLR-003.2 / 003.3.
+ *
+ * It is no longer a "persistent top bar". The single-row `#command_bar_row`
+ * this comment used to describe — accent `›` prompt, project/A2L context
+ * labels, find and go-to inputs — was DELETED by `HLR-118` at Inc-10, and its
+ * LLR-003.1 / 004.1 / 004.2 / 004.3 / 011.3 responsibilities went with it:
+ * the context labels to `#status_context` and the Loaded panel's project row
+ * (`HLR-120`), the `/` and `g` keys to each screen's own inputs (`HLR-119`).
+ * The deletion record is the comment immediately below.
  */
 #command_bar {
     height: auto;
     width: 100%;
 }
 
-#command_bar_row {
-    height: 3;
-    width: 100%;
-    background: $bg-panel;
-    border: round $rule;
-}
-
-#command_bar_prompt {
-    width: 3;
-    content-align: center middle;
-    color: $accent-calm;
-    text-style: bold;
-}
-
-#cmdbar_project {
-    width: auto;
-    min-width: 16;
-    content-align: left middle;
-    padding: 0 2;
-    color: $fg-base;
-}
-
-#cmdbar_a2l {
-    width: auto;
-    min-width: 16;
-    content-align: left middle;
-    padding: 0 2;
-    color: $fg-base;
-}
-
-#find_input {
-    width: 1fr;
-}
-
-#cmdbar_goto_input {
-    width: 1fr;
-}
+/* batch-79 Inc-10 (HLR-118): the `#command_bar_row` block and the five child
+ * rules it governed (`#command_bar_prompt`, `#cmdbar_project`, `#cmdbar_a2l`,
+ * `#find_input`, `#cmdbar_goto_input`) are DELETED with the row itself.
+ *
+ * The deleted span ran from THIS comment down to (not including) the
+ * `#command_palette` rule. `#command_bar_slot` and `#command_bar` sit ABOVE it
+ * and SURVIVE: they host the palette, which outlives the bar. A deletion
+ * starting at the `#command_bar` header comment instead would have removed the
+ * styling of the container that stays — which is what the spec's original
+ * ":55-102" span would have done.
+ *
+ * batch-79 Inc-11: this paragraph used to cite the span as ":66-103" with
+ * ":51" and ":61" for the two survivors, and amending the header comment above
+ * shifted all three by nine lines the same day. Those citations are replaced
+ * with the SYMBOL NAMES deliberately — a line number is not a durable
+ * reference to a rule, and this batch has now paid for that three times. */
 
 #command_palette {
     height: auto;
@@ -262,7 +249,14 @@ Screen {
     text-style: bold;
 }
 
-.loaded-detail {
+/* `.loaded-detail` marks the three ARTIFACT slots' detail cell. Two shipped
+ * readers select on it and index the result POSITIONALLY as
+ * [primary, mac, a2l], so the Loaded panel's project row (LLR-120.2) carries
+ * `.loaded-project-detail` instead — listed beside it here so the two keep
+ * identical geometry and only the marker differs. Adding a fourth
+ * `.loaded-detail` cell breaks those readers; it did, for six tests. */
+.loaded-detail,
+.loaded-project-detail {
     width: 1fr;
     height: 1;
     color: $fg-base;
@@ -494,9 +488,71 @@ DataTable > .datatable--odd-row {
     padding: 0 1;
 }
 
+/* LLR-120.3 — the context SHARES the status row instead of taking one of its
+ * own. `#status_line` is a one-row `Horizontal` holding `#status_text` (owned
+ * by `set_status` / `set_file_status`) and `#status_context` (owned by
+ * `update_project_labels`). Two widgets, one row: an eighth row on this bar
+ * costs a row on all 10 screens, and the diff pane has 2 content rows to
+ * begin with.
+ *
+ * `height: 1` is deliberate rather than `auto`. The bar's own height is
+ * `auto`, so a context string long enough to wrap would grow this row and take
+ * the bar to 8 — the exact regression `AT-B78-11` gates. Fixed at one row, an
+ * over-long context is CLIPPED, which is a display loss, not a layout
+ * regression. */
+#status_line {
+    height: 1;
+    width: 100%;
+}
+
+/* `1fr`, NOT `auto`. Under `auto` this label sizes to its content and takes
+ * whatever it wants — measured, a routine `set_file_status` coexistence
+ * message ("Loaded <name>.s19 (S19+MAC: <name>.mac)") reached **93 columns on
+ * an 80-column terminal**, leaving `#status_context` 1 column wide and
+ * painting NOTHING. HLR-120's own threshold ("the status bar's text contains
+ * both on 10 of 10 screens") was false at 80x24 while the widget's
+ * `render()` still returned the full string — which is why the acceptances
+ * could not see it. `1fr` + ellipsis makes the transient MESSAGE truncate
+ * instead of the ambient CONTEXT vanishing. */
 #workspace_status_bar #status_text {
     height: auto;
     color: $fg-base;
+    width: 1fr;
+    text-overflow: ellipsis;
+}
+
+/* Right-aligned so the context reads as ambient state rather than competing
+ * with the status message at the left edge.
+ *
+ * `auto` with a ceiling: the context sizes to its CONTENT, so it is never
+ * starved by a long status message, and `max-width` stops a long project+A2L
+ * pair from starving the message in return.
+ *
+ * ⚠️ `max-width` bounds this cell against the status MESSAGE. It cannot bound
+ * the project against the A2L — both live in one `Label` as one string, so CSS
+ * can only clip the tail, which is the A2L. That second bound is
+ * `_compose_context_line` in `app.py`, and its budget is derived from this
+ * `70%` (`_CONTEXT_MAX_SHARE`) plus the chrome inset; `TC-B79-02` asserts both
+ * couplings against the live tree.
+ *
+ * `$fg-base`, not a dimmer tone: this stylesheet's palette is a CLOSED set of
+ * six tokens (`$accent-calm`, `$bg-base`, `$bg-panel`, `$fg-base`, `$rule`,
+ * `$odd-row`) and carries no muted foreground. Minting one would be a change
+ * to the design system on the way past, which is not this increment's scope —
+ * separation is carried by position and alignment instead. Registered as a
+ * candidate, not taken.
+ *
+ * batch-79 Inc-11: this block previously opened by claiming `width: 1fr`
+ * takes whatever the status text leaves. The rule below sets `width: auto`,
+ * and a second comment saying so was stacked underneath rather than replacing
+ * it — two blocks on one rule, the first contradicting the second. Merged. */
+#workspace_status_bar #status_context {
+    height: 1;
+    width: auto;
+    max-width: 70%;
+    color: $fg-base;
+    text-align: right;
+    text-overflow: ellipsis;
 }
 
 #workspace_status_bar Label {

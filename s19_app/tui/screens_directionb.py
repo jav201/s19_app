@@ -1797,6 +1797,20 @@ class LoadedArtifactsPanel(Container):
         ("a2l", "A2L"),
     )
     _ABSENT_TEXT = "(none)"
+    #: LLR-120.2's absent sentinel for the project row. Bound here, in the class
+    #: body, so `render_slots`'s default argument resolves it at definition time
+    #: and the panel's "nothing loaded shows a sentinel, never a blank" contract
+    #: (TC-B78-09) holds even for a caller that omits the argument entirely --
+    #: `on_mount` is exactly such a caller.
+    _PROJECT_ABSENT = _ABSENT_TEXT
+    #: The project row's kind-cell token. `.loaded-kind` is `width: 6`, so the
+    #: obvious `"project"` CLIPS to `"projec"` and runs into the detail cell —
+    #: found by the Inc-6/Inc-7 independent review, and only visible through the
+    #: PAINTED strip; `render()` returned the full word throughout. Four
+    #: uppercase characters also match the siblings (`S19` / `MAC` / `A2L`)
+    #: rather than introducing a second style of label in one column. Named so
+    #: the acceptances match the EMITTED token instead of re-typing it.
+    _PROJECT_KIND = "PROJ"
 
     class UnloadRequested(Message):
         """A slot's ``[u]`` / the footer ``[U]`` asked to unload an artifact.
@@ -1848,18 +1862,29 @@ class LoadedArtifactsPanel(Container):
         """
         self.render_slots(None)
 
-    def render_slots(self, loaded: Optional["LoadedFile"]) -> None:
-        """Rebuild the three slot rows (+ the unload-all row) from a snapshot.
+    def render_slots(
+        self, loaded: Optional["LoadedFile"], project: str = _PROJECT_ABSENT
+    ) -> None:
+        """Rebuild the project row + three slot rows (+ unload-all) from a snapshot.
 
         Summary:
-            Clear ``#loaded_slots`` and re-mount one row per artifact plus the
-            unload-all footer, reflecting ``loaded``'s present/absent state.
-            Re-mounted children carry only CLASSES (never ids), so repeated
-            renders never trip ``DuplicateIds`` (the ``MemoryMapPanel`` pattern).
+            Clear ``#loaded_slots`` and re-mount the project row, one row per
+            artifact and the unload-all footer, reflecting ``loaded``'s
+            present/absent state. Re-mounted children carry only CLASSES (never
+            ids), so repeated renders never trip ``DuplicateIds`` (the
+            ``MemoryMapPanel`` pattern).
 
         Args:
             loaded (Optional[LoadedFile]): The current snapshot, or ``None`` when
                 nothing is loaded (all three slots render ``(none)``).
+            project (str): The already-composed project string for the project
+                row (``LLR-120.2``) — the plain name at one variant,
+                ``project:variant (index/total)`` above that. The FORM is the
+                caller's: this panel renders what it is handed and never
+                re-derives it, which is what keeps the two context surfaces from
+                drifting apart (``LLR-120.5``). Defaults to the absent sentinel
+                so ``on_mount``, which passes nothing, renders ``(none)`` rather
+                than a blank.
 
         Returns:
             None
@@ -1868,13 +1893,15 @@ class LoadedArtifactsPanel(Container):
             None
 
         Data Flow:
-            - Read-only over ``loaded``; per slot compute (present, name,
-              summary) via ``_slot_state`` and build a row via ``_build_slot_row``.
+            - Read-only over ``loaded`` and ``project``; per slot compute
+              (present, name, summary) via ``_slot_state`` and build a row via
+              ``_build_slot_row``; the project row via ``_build_project_row``.
             - Tolerates a not-yet-mounted tree (headless render before compose).
 
         Dependencies:
             Uses:
-                - ``_slot_state`` / ``_build_slot_row`` / ``_build_unload_all_row``.
+                - ``_slot_state`` / ``_build_slot_row`` / ``_build_project_row``
+                  / ``_build_unload_all_row``.
             Used by:
                 - ``S19TuiApp._refresh_loaded_panel`` and ``on_mount``.
         """
@@ -1885,11 +1912,67 @@ class LoadedArtifactsPanel(Container):
             return
         slots.remove_children()
         rows: List[Widget] = []
+        # LLR-120.2 -- the project row. FIRST, above the artifact slots: the
+        # project is the context the three artifacts sit inside, not a fourth
+        # artifact. It is built through `safe_text` like every other
+        # file-derived cell in this panel (LLR-120.4): a project name is a
+        # DIRECTORY name on the operator's own disk, and `U+009B` / `U+009D`
+        # are single-byte C1 introducers that carry no `\x1b` and are legal
+        # Windows filename characters. A `markup=False`-only row would sit
+        # scrub-inconsistent beside scrubbed siblings, and
+        # `grep -rl "loaded_slots\|_build_slot_row" tests/` returns 0 files, so
+        # nothing in the repo would have caught it.
+        rows.append(self._build_project_row(project))
         for artifact, kind in self._SLOTS:
             present, name, summary = self._slot_state(loaded, artifact)
             rows.append(self._build_slot_row(artifact, kind, present, name, summary))
         rows.append(self._build_unload_all_row(loaded is not None))
         slots.mount(*rows)
+
+    def _build_project_row(self, project: str) -> Horizontal:
+        """Build the Loaded panel's project row (LLR-120.2).
+
+        Summary:
+            One row naming the active project, in whichever display form the
+            caller computed -- the plain name at N <= 1 variants, the
+            ``project:variant (index/total)`` form above that (LLR-120.5). The
+            FORM is the caller's business: this panel renders the string it is
+            handed and never re-derives it, which is what keeps the two context
+            surfaces from drifting apart.
+
+        Args:
+            project (str): The already-composed project string, or the absent
+                sentinel.
+
+        Returns:
+            Horizontal: the project row, shaped like a slot row so it inherits
+            the panel's existing column rhythm.
+        """
+        absent = project == self._PROJECT_ABSENT
+        kind_cell = Static(Content(self._PROJECT_KIND), classes="loaded-kind")
+        # `loaded-project-detail`, NOT `loaded-detail`. The latter is the
+        # marker the three ARTIFACT slots carry, and two shipped readers select
+        # on it and index the result POSITIONALLY as [primary, mac, a2l]
+        # (`tests/test_unload_feature.py::_detail_texts`,
+        # `tests/test_help_toggle_and_a2l_panel.py`). Reusing it here made the
+        # query return four cells with the project at index 0, shifting every
+        # artifact index by one and reddening six shipped tests -- while
+        # violating LLR-120.2's "shall not alter the existing three artifact
+        # slots" verbatim. The row still carries `loaded-slot` for the column
+        # rhythm; nothing selects that positionally.
+        detail = Static(
+            safe_text(project),
+            classes=(
+                "loaded-project-detail loaded-absent"
+                if absent
+                else "loaded-project-detail"
+            ),
+        )
+        return Horizontal(
+            kind_cell,
+            detail,
+            classes="loaded-slot loaded-slot-absent" if absent else "loaded-slot",
+        )
 
     def _slot_state(
         self, loaded: Optional["LoadedFile"], artifact: str
@@ -4761,7 +4844,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         # C-17 (Inc-1b — the THIRD site of the class the Inc-1 security review
         # measured): the option LABEL is a FILENAME read off disk
-        # (`app.py:3693` -> `_scan_patch_change_files()` over
+        # (`S19TuiApp._scan_patch_change_files()` reads the filenames over
         # `workarea/patches/`), so anyone who can drop a file into the work
         # area names it. `Select._watch_value` hands the label to
         # `SelectCurrent.update(prompt)` (`_select.py:615`) -> a markup-enabled
@@ -4824,7 +4907,7 @@ class PatchEditorPanel(ScrollableContainer):
         """
         select = self.query_one("#patch_variant_select", Select)
         # C-17 (LLR-075.4, WIDENED — a SECOND live sink found in Phase 3):
-        # the option LABEL is project-file-derived (`app.py:3740-3742` maps
+        # the option LABEL is project-file-derived (`S19TuiApp._refresh_patch_variant_select` maps
         # each `variant.variant_id` to BOTH label and value), and Textual's
         # `SelectCurrent.update(prompt)` (`_select.py:615`) hands a bare `str`
         # label to a markup-enabled `Static` -> `Content.from_markup`
@@ -5763,8 +5846,9 @@ class PatchEditorPanel(ScrollableContainer):
 
             **No sixth column is added** — this is the house idiom, not an
             invention: the A2L table folds its in-image glyph into the name
-            cell (``app.py:9548``) and the MAC table folds its status glyph
-            into the Tag cell "as its own span" (``app.py:9223-9226``), both
+            cell (``S19TuiApp._build_a2l_table_cells``) and the MAC table folds
+            its status glyph into the Tag cell "as its own span"
+            (``S19TuiApp._populate_mac_datatable``), both
             keeping the column count unchanged. A leading COLUMN would instead
             shift ``Coordinate(row, 1)`` / ``(row, 2)`` under every existing
             index-reader (``tests/test_tui_patch_editor_v2.py:2578``,
@@ -6703,14 +6787,43 @@ class AbDiffPanel(Container):
     _REGIME_CLASSES = (_REGIME_WIDE, _REGIME_FALLBACK, _REGIME_NOTICE)
     _RUNS_OPEN = "runs-open"
 
+    #: LLR-126.1's affordance text, named so the acceptance asserts the EMITTED
+    #: string rather than a re-typed copy of the requirement's wording. It is
+    #: deliberately pure ASCII: the note renders `markup=False` into a widget
+    #: the snapshot goldens capture, and an arrow glyph would put the predicate
+    #: at the mercy of the emitted encoding rather than the text.
+    #:
+    #: It names how to move the SELECTION, which is what HLR-126 asks for. The
+    #: panel's own `f` / `escape` / `[` / `]` are not selection movement — `[`
+    #: and `]` page the hex window and `f` toggles the overlay — so they belong
+    #: to the help panel's listing, not to this row. `j`/`k`/`n`/`p` are ruled
+    #: out by D-4 and are not bound.
+    #:
+    #: ⚠️ It said `, Enter opens` until the Inc-6/Inc-7 independent review, and
+    #: that clause was FALSE THREE TIMES OVER. There is no `diff_range_list`
+    #: branch in `S19TuiApp.on_list_view_selected` and no `Selected` handler on
+    #: this panel, so `Enter` is a no-op — executed, nothing observable changes.
+    #: The spec does not merely omit the capability, it EXCLUDES it: §1.2 Scope
+    #: Out, P-43 (*"it would show the wrong bytes… a defect, not a feature"*),
+    #: and HLR-126's own rationale (*"what this deliberately does not do: …post
+    #: an open-in-hex message on Enter"*, carry C-78-d). And the exclusion
+    #: reasoning directly above contradicted itself — it drops `f`/`[`/`]` for
+    #: not being selection movement while keeping `Enter`, which is not either.
+    #: An affordance that advertises a rejected capability is worse than no
+    #: affordance: it sends the operator looking for behaviour the batch decided
+    #: not to build.
+    _RUN_LIST_AFFORDANCE = "Keys: Up/Down move the selection"
+
     #: LLR-124.3's overlay + pagination keys. Widget-scoped, never App-level
     #: (D-2 ruled out a new App binding; `AT-B78-32` pins `app.py`'s BINDINGS
     #: block at a zero-line diff). All `show=False`: LLR-126.1 requires the
     #: Footer's `show and enabled` set to be set-EQUAL to its pre-change set of
     #: 14, so a shown chip here would redden `AT-B78-28` at Inc-6.
     #:
-    #: None of these four keys is bound at application level (`app.py:1338-1392`
-    #: — `f`, `escape`, `[` and `]` are all free), so a press that reaches the
+    #: None of these four keys is bound at application level (`f`, `escape`,
+    #: `[` and `]` are all absent from `S19TuiApp.BINDINGS`; cited by SYMBOL
+    #: because the line range this comment used to give was invalidated by an
+    #: import added at the top of `app.py` in the same batch), so a press that reaches the
     #: panel cannot shadow an App action. That is HLR-122's anti-shadow clause
     #: applied one container up: these bindings sit on an ANCESTOR of the run
     #: list, so they are in the focus chain whenever `AT-B78-19` runs.
@@ -7300,6 +7413,24 @@ class AbDiffPanel(Container):
             self._run_note_item(f"Runs: {total_runs}"),
             self._run_note_item(f"A artifacts: {summary_a}"),
             self._run_note_item(f"B artifacts: {summary_b}"),
+            # LLR-126.1's visible affordance. It rides in the list BODY, not in
+            # `border_title`, and that is a regime decision rather than a style
+            # one: `styles.tcss` gives `#diff_range_list` `border: none` in the
+            # fallback regime (cited by SELECTOR -- the line number this comment
+            # carried pointed at `#diff_hex_b`, ~47 lines short of the rule it
+            # named), so a border-hosted affordance would be present at
+            # 132x44 and ABSENT at 120x30 — "shall carry a visible affordance"
+            # unsatisfied in a supported regime, with an acceptance green at one
+            # size and inert at the other. A body row is visible wherever the
+            # list itself is.
+            #
+            # Placed LAST among the notes so it sits immediately above the runs
+            # it describes, and built through `_run_note_item` so it inherits
+            # `disabled=True` — `action_cursor_up` / `action_cursor_down` skip
+            # it, which is what keeps LLR-122.1's keyboard-reachable set equal
+            # to the run indices. `first_run_position` is `len(items)`, so the
+            # run offset follows this addition with no second edit.
+            self._run_note_item(self._RUN_LIST_AFFORDANCE),
         ]
         first_run_position = len(items)
         for index, (start, end, kind) in enumerate(self._runs):
