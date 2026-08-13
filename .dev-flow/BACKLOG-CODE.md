@@ -112,6 +112,22 @@ CI only, its own PR).
   `test_a2l_f841_cleanup.py`, `test_flow_persistence.py`, `test_tui_workspace.py`. **Operator
   decision owed:** sweep all eight, or leave them knowing one `⚠️` in a newly-diffed file re-arms it.
   *A narrow patch was taken deliberately; the general control is what is registered here.*
+- **▸ (P2) batch-79's increment packets for **Inc-8, Inc-9 and Inc-10 do not exist on disk**, and are
+  deliberately NOT being reconstructed.** Only `increment-006.md`, `increment-007.md`,
+  `increment-007-entry-gate.md`, `increment-010-entry-gate.md`, `increment-011.md` and
+  `increment-011-merge-gate-response.md` were written. The commits exist (`6ed78f9`, `ae71bd6`,
+  `aa1aa72`/`1154bd8`) and carry detailed messages with gates, counterfactuals and file-set
+  deviations — but the flow's per-increment artifact was never produced.
+
+  **Operator ruling 2026-08-13: leave them absent.** Writing packets now from commit messages would
+  manufacture evidence of observations nobody made, which is the exact defect class this batch exists
+  to avoid. The second merge gate independently judged the refusal correct.
+
+  ⚠️ **But the gate also named the price, and it is not hypothetical.** `H-3` — a factual error about
+  **Inc-9's own work**, shipped into a docstring that then contradicted a comment five lines above it
+  — is the one claim a missing Inc-9 packet let through. *An increment with no packet is an increment
+  whose later claims have nothing to check them against.* Registered so the cost is on the record,
+  not just the decision.
 - **▸ (P3) `N-7` from the batch-79 merge gate — degenerate terminal widths breach the context budget.**
   `_compose_context_line` returns the bare 5-column separator when the budget falls under the
   separator's own width (`bar_width <= 7`), and at `avail == 1` returns `"  |  …"` — the project
