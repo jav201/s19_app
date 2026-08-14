@@ -31,9 +31,8 @@ independent verification pass found the same day (§6).
 | `jav201/claude-config` | `27b9870` | **rev14** | `_v15_outcome` split, severity-exact selftest |
 | `jav201/agent-skills` | `139bc92` | **rev14** | `dev-flow/FLOW-VERSION.md` |
 
-`rev13` is pushed and was verified 0/0 **after** the push, per `C-44`'s wording. **`rev14` is
-committed and NOT yet pushed** — see §5. The commit messages carry the reasoning; it is not
-repeated here.
+**All four are pushed**, each verified 0/0 with `HEAD == origin/main` **after** the push, per
+`C-44`'s wording. The commit messages carry the reasoning; it is not repeated here.
 
 **A cost that arrived immediately, exactly as rev13 predicted it would:** rev13 recorded that
 folding the validator into the aggregate means *"every future edit to the validator now obliges a
@@ -279,24 +278,20 @@ both repos and re-ran every command, including the negative control (*without* n
 aggregate does **not** match, so the old scheme is confirmed broken rather than merely asserted).
 Four claims were REFUTED; all four were in the address census, all four are corrected in §3 above.
 
-### ⚠️ What is on `origin` and what is not — check this FIRST
+### What is on `origin` — verified AFTER each push, not before
 
 ```
-~/.claude          rev13 b57f58b  PUSHED, verified 0/0 after the push
-                   rev14 27b9870  COMMITTED, NOT PUSHED
-~/.claude/skills   rev13 31a1298  PUSHED, verified 0/0 after the push
-                   rev14 139bc92  COMMITTED, NOT PUSHED
-s19_app worktree   claude/flow-version-sync-fix-8d7086
-                                  NO upstream configured
-                                  NO remote ref (git ls-remote origin <branch> -> empty)
+~/.claude          27b9870  0/0, clean, HEAD == origin/main    -> origin serves rev14
+~/.claude/skills   139bc92  0/0, clean, HEAD == origin/main    -> mirror serves rev14
+s19_app            claude/flow-version-sync-fix-8d7086, pushed with this commit
 ```
 
-**So `origin` currently declares `rev13`, which contains the `V15` defect that `rev14` fixes.**
-Anyone pulling the flow right now gets the version whose guard reports a pass and a no-op alike.
+`origin` served `rev13` — the revision carrying the `V15` defect — for the interval between the two
+pushes. It now serves `rev14` on both legs. **A `git pull` of the flow gets the fixed guard.**
 
-By this project's own standard — `C-44`, and the wording of exit criterion 6 — **a local edit to
-`~/.claude` is not a shipped control.** Three pushes are owed: both `rev14` legs and this branch.
-That is the first item in §7 for a reason.
+The wording *"verified after the push"* is not ceremony: this project has already shipped a change
+asserted locally that never reached `origin`, which is why `C-44` exists and why batch-78 needed
+`#190` purely to land a flag.
 
 **What `31a1298` actually contains:** one file, `dev-flow/FLOW-VERSION.md`, +32/−10. The mirror's
 `commands/` and `templates/` were **not** re-pushed this rev because they did not change — verified
@@ -343,7 +338,7 @@ prevent. **Re-litigate before encoding, not after.**
 | `V16` — `git -C ~/.claude/skills` clean and 0/0 | collapsed from network to local; not written |
 | unresolvable-address detector | proposed, not written — and **re-size it first**, see §3 |
 | `BACKLOG-PROCESS.md` Lane B → pointer | untouched; still carries the half that moved to `claude-config` |
-| this handoff | **untracked and unpushed** — see §5 |
+| this handoff | committed and pushed on `claude/flow-version-sync-fix-8d7086`; **no PR opened** |
 | exit criteria 1, 2, 3 (for `V10`–`V14`) | belong to the `C-54` batch, not to this one |
 
 ### Carried forward unchanged from `BATCH-82-ENTRY.md` §6
@@ -373,9 +368,11 @@ re-litigated here** — that document remains their register.
 
 ### ⚠️ Before anything else
 
-**Push the three owed legs** (§5): `claude-config` `27b9870`, `agent-skills` `139bc92`, and this
-branch. `origin` currently serves `rev13` — the revision carrying the `V15` defect. Verify 0/0
-**after** each push, not before.
+**Confirm the flow you are about to run is `rev14`** — `git -C ~/.claude pull`, then the verify
+command in `docs/FLOW-VERSION.md`. It is now reproducible on any checkout, so a mismatch is real.
+
+`claude/flow-version-sync-fix-8d7086` is on `origin` with **no PR opened**. Decide whether this
+handoff merges to `main` on its own or rides with the `BACKLOG-PROCESS.md` pointer edit (§7.6).
 
 ### Suggested skills
 
