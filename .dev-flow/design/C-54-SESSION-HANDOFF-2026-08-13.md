@@ -21,23 +21,27 @@ be a prerequisite: `C-54`'s encoding will touch both commands, a new template, t
 manifest and every packaged counterpart, in one session, under pressure to close eight exit
 criteria. That is precisely the condition under which the drift being guarded against happens.
 
-**Two revisions, not one.** `rev13` shipped the guard; `rev14` fixed a defect in it that an
-independent verification pass found the same day (§6).
+**Four revisions, not one.** Each was caused by a defect found in the previous one, and every one
+of those was found by *measuring* rather than by review.
 
-| Repo | Commit | Rev | Contents |
+| Rev | claude-config | agent-skills | What it closed |
 |---|---|---|---|
-| `jav201/claude-config` | `b57f58b` | rev13 | `devflow-validate.py` (`V15`, G2), `FLOW-VERSION.md` |
-| `jav201/agent-skills` | `31a1298` | rev13 | `dev-flow/FLOW-VERSION.md` |
-| `jav201/claude-config` | `27b9870` | **rev14** | `_v15_outcome` split, severity-exact selftest |
-| `jav201/agent-skills` | `139bc92` | **rev14** | `dev-flow/FLOW-VERSION.md` |
+| **rev13** | `b57f58b` | `31a1298` | `V15` (the guard) · validator into the aggregate · `flow_hash` made reproducible |
+| **rev14** | `27b9870` | `139bc92` | `V15` reported a pass and a no-op with the same severity |
+| **rev15** | `43d4322` | `4fe0d0e` | three inventories → one; bundle becomes **derived**; mirror finally ships the mechanism |
+| **rev16** | `e49229c` | `9df1244` | `V7` had `V15`'s defect, and rev15's "one inventory" claim was still false |
 
-**All four are pushed**, each verified 0/0 with `HEAD == origin/main` **after** the push, per
+**All eight are pushed**, each verified 0/0 with `HEAD == origin/main` **after** the push, per
 `C-44`'s wording. The commit messages carry the reasoning; it is not repeated here.
 
-**A cost that arrived immediately, exactly as rev13 predicted it would:** rev13 recorded that
-folding the validator into the aggregate means *"every future edit to the validator now obliges a
-manifest bump."* The very next edit was that edit. `rev14` is the bump, not a silent patch to
-`rev13`.
+**The cost rev13 predicted arrived immediately and kept arriving:** rev13 recorded that folding
+the validator into the aggregate means *"every future edit to the validator now obliges a manifest
+bump."* Every rev since has been that bump. That is the friction working, not failing — each one
+is a version a consumer can pull.
+
+**And they are one defect wearing four masks.** Stated once here because it is the transferable
+part: *every* finding was either **a check whose expected value is written by the same hand as the
+change**, or **a list maintained beside the list it was meant to guard.**
 
 ---
 
@@ -46,15 +50,24 @@ manifest bump."* The very next edit was that edit. `rev14` is the bump, not a si
 The global flow lives outside this repo and is not covered by its PR flow. This is that record.
 
 ```
-                    BEFORE (rev12)          AFTER (rev14)
-flow_version        2026.08.10-rev12        2026.08.13-rev14
-flow_hash           41144ca54e8b944a        4f5ba10d3ce6b104
-                                            (rev13 was d6f3d1d814e4c04f)
+                    BEFORE (rev12)          AFTER (rev16)
+flow_version        2026.08.10-rev12        2026.08.13-rev16
+flow_hash           41144ca54e8b944a        677cd8cb43b320d9
 hashing scheme      raw working-tree bytes  CR-normalised content
+hash membership     hardcoded in V7         DERIVED from the manifest table, in table order
 validator rules     V1,V2,V4…V9             + V15
 files in aggregate  19                      20 (+ devflow-validate.py)
-selftest arms       12/12                   19/19
+the bundle          hand-maintained copy    generated: --sync-bundle
+inventories         3 (none agreeing)       1 — the table
+what the mirror     18 of 20 declared       all 20, incl. the validator and ux-reviewer
+  actually ships      (no validator)
+selftest arms       12/12                   32/32
+rules unprovable    V7 and V8               V8 only
+  synthetically
 ```
+
+Intermediate hashes, for anyone reading a `PLAN.md` that cites one:
+`rev13 d6f3d1d814e4c04f` · `rev14 4f5ba10d3ce6b104` · `rev15 9798daa71763c02e`.
 
 **One tabled per-file hash moved for reasons other than an edit:**
 `commands/dev-flow.md` `57c6605ee4dfb419` → `73b54e9b1826cb73`. The file is byte-unchanged; it
@@ -264,12 +277,25 @@ templates/dev-flow/ifc-template.md                             DOES NOT EXIST
 manifest controls line                                         C-10…C-53  (NOT C-54)
 validator rules                                                V1,V2,V4…V9,V15  (NO V10–V14, NO V16)
 
-devflow-validate.py --selftest                                 19/19 PASSED
-V7  against the real tree                                      flow current (4f5ba10d3ce6b104)
-V15 against the real tree                                      18 files compared, packaged copy identical
+devflow-validate.py --selftest                                 32/32 PASSED
+V7  against the real tree                                      flow current (677cd8cb43b320d9)
+V15 against the real tree                                      20 files derived from the manifest table,
+                                                               bundle identical
 full run against s19_app                                       14 block / 227 notice
                                                                = unchanged from the recorded baseline
 ```
+
+**The consumer case, measured rather than reasoned about** — a standalone `agent-skills` clone,
+run with a foreign `HOME`, i.e. what a Kimi install actually looks like:
+
+```
+[!] V7   no ~/.claude/docs/FLOW-VERSION.md — the flow revision was NOT checked; this is not a pass
+[!] V15  no skills/dev-flow/ on this machine — the bundle was NOT checked; this is not a pass
+```
+
+Before rev16 that first line read `[-] no manifest found` — **rendered identically to its success
+line** `[-] flow current (…)`. This scenario is why rev16 exists: rev15 shipped the validator, and
+shipping it is what turned a registered defect into one a consumer would hit.
 
 The 14 blocks are the pre-existing batch-01 (May 2026) set. **No regression was introduced.**
 
@@ -281,13 +307,13 @@ Four claims were REFUTED; all four were in the address census, all four are corr
 ### What is on `origin` — verified AFTER each push, not before
 
 ```
-~/.claude          27b9870  0/0, clean, HEAD == origin/main    -> origin serves rev14
-~/.claude/skills   139bc92  0/0, clean, HEAD == origin/main    -> mirror serves rev14
+~/.claude          e49229c  0/0, clean, HEAD == origin/main    -> origin serves rev16
+~/.claude/skills   9df1244  0/0, clean, HEAD == origin/main    -> mirror serves rev16
 s19_app            claude/flow-version-sync-fix-8d7086, pushed with this commit
 ```
 
-`origin` served `rev13` — the revision carrying the `V15` defect — for the interval between the two
-pushes. It now serves `rev14` on both legs. **A `git pull` of the flow gets the fixed guard.**
+Both remotes were read back through the GitHub API, not from local refs, and both declare
+`2026.08.13-rev16`. **A `git pull` of the flow gets the fixed guards and the validator.**
 
 The wording *"verified after the push"* is not ceremony: this project has already shipped a change
 asserted locally that never reached `origin`, which is why `C-44` exists and why batch-78 needed
@@ -324,11 +350,13 @@ prevent. **Re-litigate before encoding, not after.**
 | | Defect | |
 |---|---|---|
 | **`V15` reported a pass and a no-op identically** | `SKIP` for *"packaged copy identical"* **and** for *"no `skills/dev-flow/` on this machine"*; both rendered `[-]`. A consumer mounting the mirror elsewhere got a silent green **from the rule written to stop silent greens**. A second defect sat below it: `_pair_drift({}, {})` is empty, so a tree with nothing to compare would have reported "identical" — **zero files compared is never a pass**. | ✅ **FIXED in rev14** — `_v15_outcome()` pure core, NOTICE on both no-op cases, selftest asserts **exact severity** per arm plus an explicit `PASS != NOOP` arm. 12 → 19 arms |
-| **`V7` has the identical shape** | Its success is also `SKIP`, so `[-] flow current` and `[-] no manifest found` render alike. | ❌ **not fixed** — same defect, one rule over |
-| **`skills/dev-flow/README.md` is unguarded** | 19 files on disk, `V15` pairs 18. `grep -c README devflow-validate.py` → 0. It can drift from `~/.claude/README.md` indefinitely. | ❌ |
-| **The 20-file table is verified only inward** | Every listed file was confirmed present and correctly hashed. **Nothing confirms the list is complete** — a dev-flow file that *should* be in it would never be missed. A self-consistent manifest is exactly the vacuous shape. | ❌ |
-| **No mutation test on the wired rules** | Nobody perturbed a byte and confirmed the aggregate goes red end-to-end. `V15`'s pure core has six arms; the wired rule has none. `V7` has none and says so, which is the honest part. | ❌ |
-| **Nothing enforces either rule** | No CI job, no hook, no pre-commit was found. `V7` and `V15` run **only when a human types the command.** A control that depends on someone remembering is the thing `C-53` and this whole rev exist to replace. | ❌ **the largest of these** |
+| **`V7` had the identical shape** | `[-] flow current` and `[-] no manifest found` rendered alike. **Theoretical until rev15 shipped the validator; then a consumer would read a no-op as a pass.** | ✅ **FIXED in rev16** — `_v7_outcome()`, NOTICE on not-checked, re-measured in the foreign-`HOME` scenario |
+| **`V7` kept its own hardcoded file list** | A **fourth** inventory beside the three rev15 collapsed — so rev15's own changelog claim (*"the table is the only inventory"*) was **false when written**. A new table row would have stayed outside the flow's identity. | ✅ **FIXED in rev16** — membership *and* order derived from the table |
+| **A misdiagnosis in `V7`** | A file declared but missing on disk fed the literal `None` into the aggregate; the mismatch was reported as *"you have unpushed edits, or you are behind"* — sending you to `git pull` for a missing file. | ✅ **FIXED in rev16** — own BLOCK, with an arm asserting the wording |
+| **`skills/dev-flow/README.md` was unguarded** | In no inventory; could drift indefinitely. | ✅ **rev15** — now a *declared exclusion*, named rather than absent |
+| **The table was verified only inward** | Nothing could notice a file that *should* have been listed. A self-consistent manifest is exactly the vacuous shape. | ⚠️ **half-fixed in rev15** — `V15` now BLOCKs on a bundle file in no inventory, so the *bundle* direction is covered. Nothing still checks that the **table** itself is complete against the authoring tree |
+| **No mutation test on the wired rules** | Nobody perturbed a byte and confirmed the aggregate goes red end-to-end. The pure cores have 20 arms between them; the wired rules have none. | ❌ |
+| **Nothing enforces either rule** | No CI job, no hook, no pre-commit. `V7` and `V15` run **only when a human types the command.** A control that depends on someone remembering is the thing `C-53` exists to replace. | ❌ **now the largest open item in this file** |
 
 ### Everything else
 
@@ -362,14 +390,13 @@ re-litigated here** — that document remains their register.
    pushes.** `V15` will block if the first is skipped; nothing blocks if the third is.
 6. Reduce `BACKLOG-PROCESS.md`'s Lane B entry to a pointer at `C-54-FLOW-REPO-HANDOFF.md`.
    **Reduce, not delete** — the finding and its evidence originated there.
-7. **Consider giving `V7` the same treatment `V15` got in rev14** (§6) — its success line is still
-   a `SKIP`, indistinguishable from "not checked". Deliberately left undone rather than widened
-   into rev14 unasked.
+7. **Never hand-copy into `skills/dev-flow/` again** — run `--sync-bundle`. The bundle is a build
+   output; editing it directly is the drift this whole arc removed.
 
 ### ⚠️ Before anything else
 
-**Confirm the flow you are about to run is `rev14`** — `git -C ~/.claude pull`, then the verify
-command in `docs/FLOW-VERSION.md`. It is now reproducible on any checkout, so a mismatch is real.
+**Confirm the flow you are about to run is `rev16`** — `git -C ~/.claude pull`, then the verify
+command in `docs/FLOW-VERSION.md`. It is reproducible on any checkout, so a mismatch is real.
 
 `claude/flow-version-sync-fix-8d7086` is on `origin` with **no PR opened**. Decide whether this
 handoff merges to `main` on its own or rides with the `BACKLOG-PROCESS.md` pointer edit (§7.6).
@@ -403,6 +430,20 @@ handoff merges to `main` on its own or rides with the `BACKLOG-PROCESS.md` point
   28, invented a method that does not exist here, and missed roughly half the computed selectors by
   only looking at call sites.** Nothing about the conclusion changed; everything about its size did.
 - **A rule can ship with the defect it was written to prevent.** `V15` guards against a green that
-  means nothing — and reports its own pass with the same `[-]` it uses for "not applicable". It was
+  means nothing — and reported its own pass with the same `[-]` it uses for "not applicable". It was
   not caught by writing it, nor by its own selftest, but by an independent pass asking *what would a
   fresh reader misread here?* **Budget for that pass; it is not optional on control code.**
+- **Shipping a control changes who its defects hurt.** `V7`'s ambiguous `[-]` was registered as a
+  known, tolerable flaw for two revisions. rev15 put the validator in the mirror, and the same flaw
+  became something a consumer would hit on their first run — measured, not predicted, by cloning
+  the mirror and running it with a foreign `HOME`. **Re-triage every registered defect at the moment
+  distribution widens.**
+- **A changelog claim is a testable assertion.** rev15's entry said *"the table is the only
+  inventory"*. `V7` still held a hardcoded list of the same 20 files, so the sentence was false when
+  it was written and pushed. It was caught by opening `V7` for an unrelated fix. **When a rev claims
+  to have unified something, grep for the other copies before writing the sentence** — and if one
+  turns up later, correcting the code is cheaper than leaving the record wrong.
+- **A generated artifact ends the argument.** Three inventories were reconciled twice by hand in one
+  session. Neither reconciliation held, because both left the *maintenance* manual. Deriving the
+  bundle from the canon removed the failure mode instead of re-detecting it — which is what `C-50`
+  meant by *nothing is copied*.
