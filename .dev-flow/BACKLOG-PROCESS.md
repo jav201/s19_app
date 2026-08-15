@@ -6,86 +6,33 @@
 
 > **Last refresh: 2026-08-01 (batch-77 Phase-3 handoff — a CODE-lane batch routing one Lane-B carry here).** `origin/main` tip = **`f8747b8`**. batch-77's own work is reconciled in [`BACKLOG-CODE.md`](BACKLOG-CODE.md); **one item belongs to this lane and is WRITTEN here rather than left as a pointer**, per the routing rule. See the new section immediately below.
 
-## 🆕 BATCH-82 CHARTER (2026-08-13) — `C-54`, the Information Flow Contract · LANE B HALF
+## ✅ BATCH-82 — `C-54`, the Information Flow Contract · LANE B HALF — **ENCODED 2026-08-15**
 
-> **Cross-lane item, split per Amendment A.** This entry owns the **control**: the global flow, the
-> template, the validator rules and the propagation. The **s19 retrofit** is the Lane A half and lives
-> in [`BACKLOG-CODE.md`](BACKLOG-CODE.md). Neither half is complete alone.
->
-> **Batch number verified** against disk, `git ls-remote --heads origin`, and both backlogs: **80** is
-> `C-77-l` (aggregation) and **81** is Lane 3 (operations), both chartered; **82 is free**. This
-> project has had two numbering collisions — the check is not ceremonial.
+> **Reduced to a pointer, deliberately not deleted.** The finding and its evidence originated here,
+> and a backlog that erases what it closed cannot show why a control exists. The full record moved
+> to artifacts that own it.
 
-- **▸ (P1, CHARTERED) `C-54` — encode the Information Flow Contract into `/dev-flow` + `/fast-dev-flow`.**
-  Full design, resolved decisions and worked examples: [`design/C-54-information-flow-contract.md`](design/C-54-information-flow-contract.md).
-
-  **What it is.** *A structure for modeling the input and output of information to a system* — operator
-  framing, 2026-08-13, which replaced a UI-scoped first draft. **UI/UX is one instance**; data
-  acquisition and sensor arrays are others. The generalisation is what keeps the global flow
-  project-agnostic **by construction** rather than by discipline.
-
-  **Two structures, each terminating in its own HLRs/LLRs:**
-  - **Part A — Flow.** ALWAYS owed. Sources → transforms → sinks, **every node bound to a requirement**.
-    A node with no owner is unowned work; a requirement claiming a transform with no node is
-    unimplemented. Neither is checkable today.
-  - **Part B — Boundary decomposition.** CONDITIONAL on one agnostic trigger: *does the system's
-    boundary have components a consumer can address independently?* Declares `INPUTS ⊆ parent`,
-    `OUTPUTS ⊆ parent`, and per output: **`address`**, `cardinality`, **`consumers`**, `owner`.
-
-  **The two fields the flow has never had are `address` and `consumers`**, and they are what
-  `LLR-120.2` needed: changing an address is a breaking change *even when the value is unchanged*, and
-  naming consumers turns `shall not alter X` from unverifiable prose into a mechanical question.
-
-  **Origin, measured.** `LLR-120.2` said *"shall not alter the existing three artifact slots"* with the
-  threshold *"the three slot rows' text unchanged (set equality)"*. The implementation left every text
-  identical and broke **six shipped tests** — the failure was in the ADDRESS, and **set equality is
-  precisely the operation that discards order**. Not a vacuous check: a *misaddressed observable*.
-
-  **Scope (D-1…D-4 resolved in the design doc):** `IFC.jsonl` at the repo root, flat records with
-  parent-by-reference · validator rules `V10`–`V14`, **each demonstrating RED in `--selftest`** ·
-  `C-55` stays registered-not-encoded per the operator's earlier control-encode ruling · and the
-  **C-45 propagation leg with its own before/after record**, because the global command is outside
-  this repo and the project PR is not evidence that it landed.
-
-  **⚠️ FOUR OPEN DECISIONS from prior art (`D-5`…`D-8`), to resolve BEFORE implementation.** The
-  design converges with four established traditions found after it was written — which raises
-  confidence and means these should be adopted, not reinvented:
-  - **`D-5`** call the `⊆` rule **"balancing"** — DFD/Structured Analysis, ~1979. **Adopt.**
-  - **`D-6`** ⚠️ **invert the contract direction to consumer-declares / provider-verifies** (Pact,
-    Consumer-Driven Contracts). **OPEN and substantive:** as designed, the *provider* lists its
-    consumers, which ages badly because **a provider never learns when a new consumer appears.**
-    Inverting moves authorship from ~40 surfaces to N consumers and changes who the validator holds
-    responsible. **Decide before implementing, not during.**
-  - **`D-7`** separate **port** from **item flow** (SysML) — `outputs` currently conflates them. **Adopt.**
-  - **`D-8`** name the **concern** the viewpoint answers (ISO/IEC/IEEE 42010): ***"who breaks if I
-    change this?"*** — which sharpens the Part B trigger. **Adopt.**
-
-  Also mapped, not adopted as-is: IEEE 1016's Interface/Composition/Dependency viewpoints (already
-  cited by the flow), ICD practice (the origin of `address` thinking), AUTOSAR PPort/RPort, and
-  ISO/IEC/IEEE 29148 — whose *unambiguous / verifiable* characteristics the `US-78-3` critique is
-  literally an instance of. ⚠️ **Standards named from working knowledge; clause-level detail is NOT
-  verified. Open the documents before leaning on them** — *a cited standard is a figure like any other.*
-
-  ### ⚠️ THE PROPAGATION IS AN EXIT CRITERION, NOT A CLOSING CHORE
-
-  **The flow lives in `jav201/claude-config`, OUTSIDE this repo, and must be kept current.** Operator
-  emphasised this twice. batch-82 does not close until all six are verified **by execution**:
-
-  1. **BOTH** `dev-flow.md` **and** `fast-dev-flow.md` carry the obligation — the fast flow owes
-     **Part A only**, and that difference must be written in it;
-  2. `templates/dev-flow/ifc-template.md` exists;
-  3. `V10`–`V14` land in `devflow-validate.py`, **each demonstrating RED in `--selftest`**, with the
-     output pasted into the batch record — *a rule that cannot go red is a vacuous check with CI authority*;
-  4. `docs/FLOW-VERSION.md` bumped — version, `flow_hash`, controls → `C-10…C-54` — and the manifest's
-     own `sha256` command recomputed to match;
-  5. **pushed to `jav201/claude-config`** and the `jav201/agent-skills` mirror reconciled, with
-     `git -C ~/.claude status` clean **and 0/0 vs origin verified AFTER the push**;
-  6. before/after of the out-of-repo files recorded **in this repo's batch artifacts**.
-
-  **Why 5 is worded that way:** this project has already shipped a change that was asserted locally
-  and never reached `origin` — `C-44` exists because of it, and batch-78 needed a follow-up PR
-  (`#190`) purely to land a flag on `origin/main`. **A local edit to `~/.claude` is not a shipped
-  control.**
+- **▸ ✅ (CLOSED) `C-54` — encoded into `/dev-flow` + `/fast-dev-flow` at flow `rev33`.**
+  - **What landed, with before/after and the pasted `--selftest` transcript:**
+    [`design/C-54-ENCODING-RECORD.md`](design/C-54-ENCODING-RECORD.md) — the propagation is an exit
+    criterion, not a closing chore, and that file is its evidence. The flow lives in
+    `jav201/claude-config`, outside this repo, so **a merged PR here is not evidence it landed**.
+  - **The design, decisions `D-1`…`D-8`, and the worked examples:**
+    [`design/C-54-information-flow-contract.md`](design/C-54-information-flow-contract.md).
+  - **`rev27 → rev33`** · `flow_hash 656591c996355452 → d851576cfe8f60b3` · `controls C-10…C-54` ·
+    `V10`–`V14` each demonstrating RED · selftest 85 → 136 arms.
+  - **`D-6` resolved:** the provider declares its consumers and the validator **discovers** them by
+    grepping the declared literal `address` — not Pact's inversion, because provider and consumer
+    land in the same commit here and inverting would destroy the retrofit's actual deliverable.
+  - ⚠️ **What this does NOT close.** The five rules report `SKIP` against this project, because
+    s19_app has authored no IFC. **That is the Lane A retrofit** —
+    [`BACKLOG-CODE.md`](BACKLOG-CODE.md) — and neither half is complete alone. What is demonstrated
+    is that the rules run and can go red; what is not is that the contract is correct over this
+    project's surfaces.
+  - ⚠️ **Two stale copies registered for the retrofit, not fixed by the control:** the consumer list
+    in `s19_app/tui/screens_directionb.py:1953` and in the design doc's §4 worked example each name
+    **two** readers of `.loaded-detail`; the tree has **four**. Both were accurate when written.
+    `V13` is now what notices when such a list stops being accurate.
 
 - **▸ (P2) `C-55` candidate — registered, NOT encoded** (operator chose C-54 alone at the
   control-encode gate; that ruling stands rather than being quietly widened).
