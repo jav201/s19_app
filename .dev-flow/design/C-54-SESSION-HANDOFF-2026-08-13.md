@@ -1,5 +1,20 @@
 # C-54 / batch-82 — session handoff, 2026-08-13
 
+> **HISTORICAL RECORD — frozen at `rev16`, 2026-08-13.** The flow is at `rev33`; this document
+> predates it by seventeen revisions, and not one of the nine `flow_hash` values it cites is
+> current. **Do not read §0, §1, §5 or §7 as current state.** The live state has one source and
+> it is a command, not a file:
+> `python ~/.claude/docs/tools/devflow-validate.py --map --fetch`.
+>
+> **§6 is mixed — do not read it either way.** Most of its `❌` debt was paid between `rev17` and
+> `rev33`; some was not. Which is which is deliberately not recorded here: a debt list maintained
+> beside the debt is the defect this very document diagnoses. The current register is
+> `~/.claude/docs/NEXT-SESSION.md` §4.
+>
+> **What survives re-reading unchanged is §2, §3, §4 and §8** — they measure s19_app's code and
+> this session's reasoning, neither of which the flow's revisions age. §3's AST address census is
+> the sizing input for the batch-82 retrofit.
+
 **Supersedes nothing.** Read alongside, not instead of:
 
 | Document | What it holds |
