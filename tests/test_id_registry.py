@@ -67,8 +67,14 @@ from tools.id_registry import (
 # Pointing the guard at `.dev-flow/` (865 files) or adding a directory moves
 # this number immediately, so the threshold can genuinely go red.
 # ---------------------------------------------------------------------------
-EXPECTED_SCANNED_TEST_FILES = 153
+EXPECTED_SCANNED_TEST_FILES = 154
 """Test modules scanned, including this one.
+
+batch-83 Inc-1: 153 -> 154. ``tests/test_address_census.py`` was added for the
+computed-address detector (``AT-B83-01``..``AT-B83-09``). Same discipline as the
+bump below it: the value is MEASURED, not incremented —
+``scanned_test_files()`` reports 154, and an independent re-derivation of the
+same glob (``tests/**/*.py`` minus the four excluded directories) agrees at 154.
 
 batch-77 Inc-2: 152 -> 153. ``tests/test_tui_hostile_map.py`` was added for
 ``LLR-116.7``, and this guard's own failure message prescribes bumping the

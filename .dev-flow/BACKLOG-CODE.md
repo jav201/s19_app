@@ -32,6 +32,82 @@
 > ⚠ **Every `report_service.py` line number below is as of `031ca8d`.** batch-63 added +47 lines to that module; the file measures 1730 lines at `e347079`. Re-derive line numbers, never copy them.
 >
 
+## 🆕 batch-83 close (2026-08-15) — the unresolvable-address detector
+
+**Last refresh: 2026-08-15 (batch-83 close, `/fast-dev-flow`).** `origin/main` tip at its cut =
+**`fbbeafc`** (PR [#194](https://github.com/jav201/s19_app/pull/194)). Shipped
+`tools/address_census.py` + `tests/test_address_census.py` (`AT-B83-01`..`AT-B83-09`, 19 arms, PR
+lane). Gate suite **2684 passed / 2 skipped / 21 deselected / 3 xfailed**, 29 snapshots, exit 0.
+
+**⚠ Six defects were found DURING this batch, and two of them by nothing at all.** Four were caught
+by the batch's own guards (`AT-B83-05`, `-07`, `-08`, plus code review). **Two were caught by
+neither**: the candidate filter applied in one derivation pass and not the other (surfaced only by
+comparing the rule's prediction of 40 against an output of 43), and `AddressSite.shape` left empty
+for bare names (which would have printed `0 of 183` — a plausible number from a field nobody
+filled). Both now have guards, `AT-B83-11` and `AT-B83-12`, **each shown red under its mutation
+before being accepted**. Operator instruction at the Inc-3 gate: *"si esos casos pudieron burlar la
+guarda hay que revisarlos"*.
+
+**✅ DONE — closed by this batch:**
+
+- **The stale `.fast-dev-flow/spec.md`** (batch-73 carry, P3): it held batch-69's DESIGN-ONLY spec,
+  shipped by batch-70 on 2026-07-29 and never archived. Now at
+  `.fast-dev-flow/archive/2026-07-28-batch-69-fbp2-design-spec.md`.
+- **`EXPECTED_SCANNED_TEST_FILES` 153 → 154**, measured by `scanned_test_files()` **and**
+  re-derived by an independent glob, per `TC-607`'s own instruction.
+
+**⚠ Carries returned — nothing dropped:**
+
+- **▸ (P2) The `AT-B83-06` conflict is registered but NOT resolved, and it is not this batch's to
+  resolve.** `BACKLOG-CODE.md:118` calls the registry's blindness to batch-scoped ids a **P1
+  defect**; `AT-TC-REGISTRY-SPEC.md:468` records the same blindness as **"✅ Accepted,
+  deliberately … zero recorded collisions"**, and §2.3:123 says *"New work should prefer these"*.
+  Both citations verified exact by an independent pass. batch-83 followed the spec. **Whoever owns
+  that P1 must close it or re-word it** — right now the project asserts both.
+
+- **✅ CLOSED at Inc-3 — the false positives in the derived set.** Resolved by **three rules, each
+  a rule and not a list of names**: a selector parameter must be *annotated* as accepting `str`;
+  *private* methods are excluded; *reactive hooks* (`watch_`/`validate_`/`compute_`) are excluded.
+  Measured: **48 → 40** entries, and **not one of the 8 removed is called anywhere in s19_app**.
+  The six that were a hand-maintained list survive all three.
+
+- **✅ CLOSED at Inc-3 — the one-hop indirection blind spot.** `sel = f"#{x}"` then
+  `query_one(sel)` is now DETECTED (`AT-B83-10`, `find_indirect_addresses`), not merely declared.
+  A blind spot that can be cheaply detected is unwritten code, not a limit of the design.
+  Measured today: **0 sites** — the value is that the day one appears, it is visible.
+
+- **▸ (P2) BLIND SPOT, STILL UNMEASURED: the assembled selector with no selector shape.**
+  `sel = f"{prefix}{suffix}"` matches no selector pattern *and* sits in no address argument, so it
+  escapes **both** nets — including the new one-hop detector, which keys on selector shape.
+  Nobody has sized this. **Size it before quoting the 56 as complete.**
+
+- **✅ CLOSED at Inc-3 — the gating decision now has a written trigger.** *A surface's computed
+  addresses become BLOCKING on the day that surface's IFC is written* (spec §8b), per-surface,
+  owned by the batch that writes that IFC. Same staging `C-54` chose for `V13`. It was a deferred
+  decision with no owner; now it has a condition and an owner.
+
+- **▸ (P2) 41 of 183 bare-name address arguments are NOT class-like** (`selector` ×8,
+  `_B78_RUN_ENTRY` ×12, `select_id`, `widget_id`, `container_id`, `layout_id`). Measured by
+  `tools/address_census.py`. **This is the population most likely to hold a computed selector one
+  assignment away**, and the retrofit should look there — the census reports the split but follows
+  no dataflow (zero hops, declared).
+
+- **▸ (P3) Out of scope and stated: the producer side and `.tcss`.** `id=f"log_line_{i}"` at widget
+  construction, and `add_class`/`set_classes`, are addresses nobody greps and this census does not
+  see. Neither does it read stylesheets.
+
+- **▸ (P3) By-design risks, with their reopening criteria, live in `.fast-dev-flow/spec.md` §9.**
+  Four of them (guards fail on a Textual bump; the 18 s derivation cost; the three exclusion rules;
+  the taint's unbounded false positives). **Each carries a "reopen when" condition** — a by-design
+  risk nobody can quote when its scenario fires is not documented, it is buried. Cite §9, not the
+  docstrings.
+
+**Unblocked by this batch:** **batch-82's Lane A retrofit can size itself from a command**
+(`python tools/address_census.py`) instead of from a figure pasted in a document — which is the
+defect this project has now found seven times.
+
+---
+
 ## 🆕 Carries returned by batch-79 (2026-08-07, Lane 1 — command-bar deletion)
 
 Registered mid-batch at operator instruction rather than at the close, so they survive a session
