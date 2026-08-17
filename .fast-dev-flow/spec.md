@@ -1,379 +1,189 @@
-# Quick Spec — s19_app · batch-83 · unresolvable-address detector
+# Quick Spec — s19_app · batch-84 · classifying the bare-name address arguments
 
-- **Branch:** `claude/batch-83-address-detector` (base = `origin/main` `fbbeafc`; RC-1 PASS)
-- **Flow:** `/fast-dev-flow` · supervised, no self-merge
+- **Branch:** `claude/blind-spot-assembled-selector-c2c117` (base = `origin/main` `1afccb0`)
+- **Flow:** `/fast-dev-flow` · supervised, no self-merge · artifact language English
 - **Flow revision (C-45 PULL):** `2026.08.15-rev33` · `flow_hash d851576cfe8f60b3` · 24/24 tabled
-  files agree · all 3 declared checkouts clean and `0/0` against `origin`, refs refreshed at cut.
-  Verified, not assumed — a batch run on a stale flow inherits a solved problem as an open one.
+  files agree · all 3 declared checkouts clean and `0/0` against `origin`, refs refreshed at the
+  cut with `--fetch`. Verified, not assumed.
+- **Entry document:** `.dev-flow/design/BLIND-SPOT-assembled-selector.md` (batch-83 handoff). Its
+  §0 figures were re-executed at this cut and all reproduce; see §6 below.
+- **Predecessor spec:** batch-83, CLOSED, archived to
+  `.fast-dev-flow/archive/2026-08-15-batch-83-address-census-spec.md`.
 
-> **Revision 2**, rewritten after a triple check (three independent adversarial passes plus my
-> own). Revision 1 carried **4 blocking defects and 5 major ones**; every one is listed at §10
-> with what it was, because the defects are the evidence for the criteria that replaced them.
->
-> Cut against `origin/main` = `b5c3245`. **All Textual figures are pinned to `textual 8.2.8`.**
+> **Every number in this spec is reproducible by a command named next to it.** Where a figure came
+> from a throwaway probe rather than a committed artifact, it is labelled **provisional** and the
+> batch's job is to replace it with a derived one. Nothing here is copied from a prior document —
+> that is the failure mode this project has found seven times.
 
 ---
 
 ## 1. Objective
 
-Give s19_app a detector that names every widget address no static analysis can resolve, so
-`C-54`'s IFC declares or waives them explicitly instead of omitting them without knowing.
+Classify each of the 41 bare-name address arguments by **where its value comes from**, so the P2
+assembled-selector blind spot is sized by a command instead of assumed, and the `56` computed
+addresses can be quoted with a definition.
 
 ---
 
 ## 2. User stories
 
-- As an **IFC author**, I want a list of the addresses on a surface that no static search can
-  resolve, so that I declare or waive each one instead of silently omitting it.
-- As a **batch reviewer**, I want to run one command and see every computed address in the tree
-  with its `file:line`, so that a new one is visible to me during review.
-  *(Revision 1 said "cannot enter the tree without an owner" — that is a gate, and gating is
-  non-goal 3. The story now says what this batch actually delivers: a report a human runs.)*
-- As an **IFC author**, I want the report to state plainly which sites require human judgement
-  because no tool can resolve them, so that I do not mistake a tool's silence for an absence.
-
-⚠ **The `V13` story was WITHDRAWN at Inc-3, and this is the honest version of why.** Revisions 1
-and 2 both claimed something about `V13` — first that it was "structurally blind", then that the
-report would mark what it "can neither confirm nor rule out". **`V13` lives in `claude-config`,
-and I could not measure either claim**: my attempt to size whether `V13` would reach a given
-computed site used a heuristic too loose to conclude (it answered "56 of 56 might", on a criterion
-that proved nothing). A batch does not get to assert properties of another repo's rule that it
-did not execute. What survives is verifiable and about this code alone: **these sites cannot be
-resolved by reading the call.**
+- As a **batch-82 planner**, I want the assembled selectors counted or proven absent, so that I
+  size the Lane A retrofit from a number that is complete rather than a known lower bound.
+- As a **batch reviewer**, I want each of the 41 sites to carry a classification with its evidence
+  from a committed command, so that a new assembled selector is visible on the day it appears
+  rather than at the next audit.
 
 ---
 
 ## 3. Acceptance criteria
 
-> Every criterion names the exact mutation that puts it in red. Phase B owes the **executed**
-> mutation transcript for each; a green arm alone proves nothing.
-> *(Revision 1's preamble promised this and then delivered it for 3 of 8 criteria.)*
+Each criterion names its **kill mutation** — the change that must turn the guard red. A criterion
+whose guard cannot be shown red is not accepted (batch-83 defect B4).
 
-- [ ] **`AT-B83-01` · the site is recognised.** A module containing `query_one(f"#{var}")` yields
-      a row with its `file:line` and form `fstring`.
-      *Kill:* drop `JoinedStr` from the classifier → row disappears.
+| id | Criterion | Kill mutation |
+|---|---|---|
+| `AT-B84-01` | When run over the tree, the resolver shall emit exactly one row per candidate, and the set of its site keys shall be **set-equal** to `bare_name_candidates()`'s | drop one site → set inequality (not a count) |
+| `AT-B84-02` | Every emitted row shall carry non-empty evidence: the binding's `file:line` and its kind | blank the evidence field → red |
+| `AT-B84-03` | Given a fixture holding all four outcomes, the resolver shall return `A`/`B`/`C`/`D` respectively | mutate the `B` branch → red |
+| `AT-B84-04` | Given **escape 1** (`sel = f"{prefix}{name}"; query_one(sel)`) and **escape 2** (`sel = "#" + wid; query_one(sel)`), the resolver shall classify both as **`B`** | remove `BinOp` from the assembled set → red |
+| `AT-B84-05` | Given a binding written in an **unrelated function of the same file**, the resolver shall still report it | make the walk scope-precise → red |
+| `AT-B84-06` | Given a candidate with no in-file binding, the resolver shall emit it under its own outcome and never drop it | hide it → red |
+| `AT-B84-07` | `address_origin.bare_name_candidates` shall be the **same object** as `address_census.bare_name_candidates` | reimplement the filter locally → red |
 
-- [ ] **`AT-B83-02` · a format spec is not a selector.** A module containing `f"{value:#x}"`
-      yields no row.
-      *Kill:* remove the `format_spec` exclusion → 12 phantom `#x` rows appear tree-wide.
+**Why `AT-B84-05` is a criterion and not an implementation detail.** The resolver over-collects: it
+reports any binding of the name anywhere in the file, including in functions that never reach the
+site. This is deliberate. The batch's expected headline is a **negative** result (`B` is empty), and
+a negative result is only sound if the search was over-broad. A later "improvement" to scope-precise
+resolution would silently weaken every `B = 0` claim derived from it, and nothing would fail. This
+guard is what makes that trade visible.
 
-- [ ] **`AT-B83-03` · prose is not a selector.** `f"## Variant: {n}"` and `f"... {n} more"` yield
-      no rows.
-      *Kill:* relax the criterion to bare `startswith("#")` → the selector-shaped population goes
-      **72 → 98**, both sides holding the format-spec and length exclusions constant.
+**No guard asserts a count over the tree** (handoff §4.5). `AT-B84-01` asserts set equality against
+a derived set, so it survives every legitimate change to the tree and still fails on a dropped site.
 
-- [ ] **`AT-B83-04` · the taxonomy does not collapse the hard cases.** The partition is
-      `strict f"#{name}"` / `non-Name interpolation` / `extra literal in the selector`, and
-      `f"#legend_key_pane .{cls}"` lands in the third.
-      *Kill:* group by `shape` alone, dropping the interpolation-kind check → the 2 `Subscript`
-      rows merge into `strict` and the partition reads 46/0/8 instead of 44/2/8.
+### Classification rule, fixed before the data is trusted
 
-- [ ] **`AT-B83-05` · `ADDRESS_PARAMS` IS the live derivation — set equality, both directions,
-      parameters included.** The snapshot must equal what `derive_address_params()` returns, and
-      `FIRST_POSITIONAL_SELECTOR` likewise.
-      *Kill:* add `query_exactly` to the snapshot → the second limb goes red.
-      ⚠ **Revision 1 asserted only `derived ⊆ set`, and a phantom name walked straight through**:
-      that limb says nothing about a member of `set` that is neither derived nor declared.
+A name may carry several bindings. Tie-break, biased toward *finding* the blind spot rather than
+toward a clean answer:
 
-      **The predicate, written out because "17 qualify" was never reproducible** — three
-      implementations gave 13, 16 and 17. Two passes compose:
-      1. **annotation shape** — a parameter whose annotation admits `str` in union with a
-         `type[...]` or `Widget` form. Finds the query family.
-      2. **taint, seeded by pass 1** — a parameter counts when its value reaches a sink through
-         an f-string or a local assignment, sinks grown by fixed point.
-
-      Three rules narrow it, **each a rule, not a list of names**: the parameter must be
-      *annotated*; *private* methods are out; *reactive hooks* (`watch_`/`validate_`/`compute_`)
-      are out. Result at `textual 8.2.8`: **40 methods**. Measured: the rules remove 8, and
-      **not one of the 8 is called anywhere in s19_app**.
-
-- [ ] **`AT-B83-06` · the six that used to be a hand-maintained list stay DERIVABLE.**
-      `get_child_by_id`, `get_widget_by_id`, `action_add_class/remove/toggle`, `action_focus`
-      annotate their parameter as a plain `str`, so annotation alone finds none of them.
-      *Kill:* seed taint from the raw sinks only → 5 of the 6 vanish (measured: 1 of 6 derived).
-      ✅ **The Inc-1 experiment was run and the hypothesis HELD, with a correction**: seeding from
-      `parse_selectors`/`DOMQuery` alone reaches **1 of 6**; seeding from the annotation pass
-      reaches **6 of 6** plus 23 per-id APIs nobody watched. Not circular — the seeds are
-      themselves derived. **`DECLARED_ADDRESS_APIS` is gone.**
-      ⚠ `get_child_by_type` must never enter: its parameter is `type[ExpectType]`. It was got
-      wrong twice — called nonexistent (it exists) and called a plain-`str` API (it is not).
-
-- [ ] **`AT-B83-07` · positional AND keyword arguments are scanned.** `query_one(selector=f"#{x}")`
-      and `pilot.click(widget=f"#{id}")` yield rows.
-      *Kill:* scan `node.args` only → both fixtures vanish.
-      ⚠ **The current tool has exactly this defect** (`address_census.py:370` iterates `node.args`
-      alone). Tree-wide there are **0** such calls today, which is why nothing revealed it and why
-      only a fixture can.
-
-- [ ] **`AT-B83-08` · the no-flow-tracking premise fails loudly, proven on a fixture first.**
-      A synthetic module containing `query_one("#" + name)`, `query_one("#%s" % n)` and
-      `query_one("#{}".format(n))` must put the guard in **red**. Only then is the tree-wide
-      assertion — that address arguments are exclusively `{literal, name, fstring}` — meaningful.
-      ⚠ **Revision 1 asserted only the tree-wide invariant, over a tree with 0 violations.** That
-      is the canonical vacuous shape: it passes identically with the detection logic correct,
-      broken, or unwritten. The fixture is what makes it a test.
-
-- [ ] **`AT-B83-09` · `name` arguments are split by measurement, not by adverb.** The report
-      partitions bare-name arguments into *resolves to an imported class* (type-addressing) and
-      *everything else*, and prints both.
-      *Kill:* return a single `name` bucket → the split disappears.
-      **Why it earns a criterion:** measured today, of 183 first-arguments that are bare names,
-      **142 resolve to a class-like name and 41 do not** (`selector` ×8, `_B78_RUN_ENTRY` ×12,
-      `select_id`, `widget_id`, `container_id`, `layout_id`, …). Revision 1's report called this
-      bucket "overwhelmingly type-addressing" — an adverb standing in for a number, and the 41 are
-      the population most likely to hold a computed selector one assignment away.
-
-- [ ] **`AT-B83-10` · the one-hop indirection is DETECTED, not merely declared.**
-      `sel = f"#{x}"` followed by `query_one(sel)` in the same function yields a row of form
-      `fstring-via-name`. The tree-wide arm asserts there are none.
-      *Kill:* drop the assignment lookup → the fixture row vanishes and the pattern is invisible.
-      **Why it was added at Inc-3:** revision 2 listed this as a declared blind spot. A blind spot
-      that can be cheaply detected is not a limit of the design, it is unwritten code — and a
-      declared one cannot tell you the day it starts to matter. Measured today: **0 sites**.
-
-- [ ] **`AT-B83-11` · no derived name may violate the exclusion rules.** Every entry in the
-      snapshot AND in the live derivation satisfies `is_candidate_method`.
-      *Kill:* drop the filter from the annotation pass → 3 private names reappear. **Executed
-      at Inc-4: the mutation was applied and this arm went red.**
-      ⚠ **Added because its absence let a real defect through.** The filter ran in one of two
-      passes and three private methods walked back in. Nothing failed; it surfaced only because
-      the rule predicted 40 and the output showed 43 — an arithmetic check done once, by hand.
-
-- [ ] **`AT-B83-12` · a bare-name row records WHICH name.** `shape` is populated for `name`
-      arguments, on a fixture and tree-wide.
-      *Kill:* stop assigning `site.shape = arg.id` → red. **Executed at Inc-4.**
-      ⚠ **Added because its absence would have shipped a plausible lie.** The report's class-like
-      split computed `resolves_to_class_like("")` for all 183 rows and would have printed
-      `0 of 183` — a number produced by a field nobody filled. It was caught by writing the line
-      that prints it, not by any assertion.
-
----
-
-## 3b. Information Flow Contract — Part A (C-54)
-
-**Part B is not owed here** (`/fast-dev-flow` scope). **Escalation check, run and negative:** this
-batch alters *what is carried* (a new report), never *how a consumer reaches* anything — it adds
-no selector, index, channel or offset, and modifies no existing address. The `/dev-flow` trigger
-in Phase A §5 does **not** fire. Stated explicitly because addressing is this batch's subject
-matter, which makes "it doesn't change any address" a claim worth writing down rather than
-assuming.
-
-```
-SOURCE   s19_app/**/*.py + tests/**/*.py  (228 files)   ·   installed `textual` 8.2.8
-   |
-   v
-N1  iter_python_files      enumerate + sort for determinism        owner: AT-B83-08 (tree invariant)
-N2  derive_address_apis    introspect textual -> the API set       owner: AT-B83-05, AT-B83-06
-N3  census                 parse AST; classify every arg of an     owner: AT-B83-01, 07, 08, 09
-                           address call (args AND keywords)
-N4  is_selector            the shape criterion                     owner: AT-B83-02, AT-B83-03
-    + format_spec_nodes
-N5  interpolation_kinds    strict / non-Name / extra-literal       owner: AT-B83-04
-N6  report | --json        emit                                    owner: AT-B83-09 (the name split)
-   |
-   v
-SINK     stdout table  ·  --json  ·  tests/test_address_census.py
-```
-
-**Consumers of the SINK, named:** (1) `tests/test_address_census.py`, which imports `census()` and
-asserts on shape, never on counts; (2) the IFC author in batch-82, who reads the report to size the
-retrofit; (3) a batch reviewer running the command by hand. **No automated consumer gates on it** —
-that is non-goal 3, and it is why no node above emits a severity.
-
----
-
-## 3c. Premise table (C-43)
-
-| Premise | Tier | Verdict | Executed evidence |
-|---|---|---|---|
-| `tools/address_census.py` exists, uncommitted, 495 lines | PREMISE | ✅ TRUE | `git status --porcelain` → `?? tools/address_census.py`; `wc -l` → 495 |
-| …and its `ADDRESS_APIS` holds a name that is not a Textual API | PREMISE | ✅ TRUE | `hasattr` sweep over 233 `textual.*` modules → `query_exactly` found on 0 of 564 classes |
-| …and `get_child_by_type` takes a type, not a selector | PREMISE | ✅ TRUE | `inspect.signature(Widget.get_child_by_type)` → `(self, expect_type: 'type[ExpectType]')` |
-| …and keyword arguments are never scanned | PREMISE | ✅ TRUE | `address_census.py:370` iterates `node.args` only |
-| 0 address calls pass the selector as a keyword today | PREMISE | ✅ TRUE | AST sweep over 228 files → 0 |
-| 56 computed addresses (f-string in an address argument) | PREMISE | ✅ TRUE | 5 independent measurements, 4 different API sets (9/23/24/+9 per-id) → 56 every time |
-| 0 address arguments outside `{literal, name, fstring}` | PREMISE | ✅ TRUE | AST sweep, 24-API set → `literal 1335 · name 1112 · fstring 56 · other 0` |
-| 183 bare-name first-args split 142 class-like / 41 not | PREMISE | ✅ TRUE | AST sweep; the 41 include `selector`×8, `_B78_RUN_ENTRY`×12 |
-| `textual` is 8.2.8 | PREMISE | ✅ TRUE | `textual.__version__` |
-| Batch-scoped ids owe no registry reservation | PREMISE | ✅ TRUE | `AT-TC-REGISTRY-SPEC.md:123` + `:468`; `_meta.next_free` unchanged at `AT-282`/`TC-613` |
-| The prior `.fast-dev-flow/spec.md` was stale (batch-69, shipped by batch-70) | PREMISE | ✅ TRUE | header dated 2026-07-28; last touched by `b457ef8` (batch-70, 2026-07-29). Archived this session |
-| `tools/` is the right home — the flow must not measure the product | AXIOM | ✅ TRUE | `main` tip `cf11319` titled *"encoding the flow is NOT s19_app work"*; `id_registry.py` precedent |
-| The frozen engine set is untouched by this batch | AXIOM | ✅ TRUE | no file in `_ENGINE_PATHS` appears in §8 deliverables |
-| **AST taint analysis can derive the 6 non-derivable APIs** | **HYPOTHESIS** | ❓ **UNDECIDABLE** | reported by an independent pass as executed; **I have not verified it.** Does not block: declared in writing at `AT-B83-06` as an Inc-1 experiment, and the maintained list stands if it fails |
-| `V13` would or would not reach a given computed site | PREMISE | ❓ **UNDECIDABLE** | my heuristic was too loose to conclude. Declared out of scope in writing at §9.4 — reported as *ambiguous*, never as *blind* |
-
-**Two ❓ verdicts, both declared out of scope in writing rather than left open** — which is the
-escape the control allows, and the reason each names where it is declared.
+| Condition | Outcome |
+|---|---|
+| **any** binding is assembled (`JoinedStr`, `BinOp`, `.format()`, `%`) | **B** — the blind spot, confirmed |
+| else, **any** binding is a function parameter | **C** — the caller decides |
+| **all** bindings are `Constant[str]` | **A** — resolvable by grep |
+| otherwise | **D** — sub-kind named individually, never lumped (handoff §3) |
 
 ---
 
 ## 4. Validation strategy
 
-**Synthetic fixtures** (`01`–`04`, `07`, `08`, `09`) — Python source in test strings, parsed
-in-memory. They never go stale and every one of them is shown red before green.
+`tests/test_address_origin.py` carries `AT-B84-01`..`-07` in the PR lane (not `slow`). Criteria
+`-03`..`-06` run against **synthetic fixtures** parsed in-memory, so they state a property of the
+resolver rather than a property of today's tree. `-01`, `-02` and `-07` run against the real tree.
+Every guard is shown red under its kill mutation before it is accepted, and the red output is
+quoted in the increment's review packet — a guard accepted only green is a guard nobody tested.
 
-**Introspection guards** (`05`, `06`) — run against the installed Textual, **pinned and printed**:
-`textual 8.2.8`. They fail on a dependency bump **by design**; §8 names the owner of that failure.
-
-**Explicitly not asserted: any count.** No `== 56`, no `== 2503`. A count assertion breaks on every
-legitimate change and proves nothing.
-
-**Standing rule, earned twice.** No figure enters an artifact unless re-derived by a path
-different from the one that produced it, **and no figure is quoted without the definition that
-makes it reproducible.** `2503` and `2499` are both correct — they differ by 4 `double_click`
-arguments, because they were measured under different API sets. A total without its API set is
-not a measurement.
+Closing evidence: the gate suite green, plus the classification table re-derived by the committed
+command and pasted into the close with the command that produced it.
 
 ---
 
 ## 5. Non-goals
 
-- **Authoring the IFC.** batch-82's charter.
-- **Touching `claude-config`.** `V13` stays in the flow; the detector measures the product.
-- **Gating anything.** The detector reports. No user story may imply otherwise.
-- **Any flow tracking — zero hops, not one.** `sel = f"#{x}"; query_one(sel)` is reported as form
-  `name`, and the f-string separately as `loose`. Neither is joined to the other.
-  *(Revision 1 said "deeper than one hop", implying one hop was followed. None is.)*
-- **Selectors in `.tcss`**, and the **producer** side (`id=f"log_line_{i}"` at construction,
-  `add_class`/`set_classes`). Out of scope, and listed in §9 rather than left unsaid.
-- **Resolving the address VALUE.** Recognising the *site* is the whole claim.
+- **batch-82's Lane A retrofit.** This batch produces the number that batch-82 sizes itself from.
+- **Refactoring the 41 sites into a registry.** The operator's dictionary-plus-existence-check
+  proposal is batch-82's and is better decided with this number in hand (handoff §5).
+- **A fourth net keyed on selector shape.** Explicitly forbidden by handoff §4.1 — shape-keying is
+  what left the hole. This resolver keys on origin.
+- **The producer side and `.tcss`** — `id=f"log_line_{i}"`, `add_class`, stylesheet selectors.
+  Registered P3, untouched.
+- **Chains longer than one hop.** A `C`/`D` site whose value comes from a collection is classified
+  by that fact; the collection's contents are not followed.
 
 ---
 
-## 6. Security flags
+## 6. Premise table (C-43)
 
-All unchecked. **`security_required: false`** — read-only AST over files already in the repo, plus
-introspection of an installed package. No network, no writes, no new surface.
-
----
-
-## 7. Ids
-
-Batch-scoped `AT-B83-*`, per `AT-TC-REGISTRY-SPEC.md` §2.3 and `CLAUDE.md`. **No reservation is
-owed**; `next_free` stays `AT-282` / `TC-613`.
-
-⚠ **Conflict surfaced, not averaged, and verified by an independent pass:** `BACKLOG-CODE.md:118`
-registers as **P1** that the registry is "BLIND" to batch-scoped ids; `AT-TC-REGISTRY-SPEC.md:468`
-records that same blindness as **"✅ Accepted, deliberately"**, and §2.3 line 123 says *"New work
-should prefer these"*. Both citations confirmed exact. This batch follows the spec; the backlog
-item needs closing or re-wording by its owner.
+| Premise | Tier | Verdict | Executed evidence |
+|---|---|---|---|
+| The census reproduces at this cut | PREMISE | ✅ TRUE | `python tools/address_census.py` → `literal 1335 · name 183 · fstring 56`, 16 loose, 0 indirect |
+| batch-83's guards are green | PREMISE | ✅ TRUE | `python -m pytest tests/test_address_census.py -q` → `23 passed in 18.28s` |
+| The candidate population is 41 | PREMISE | ✅ TRUE | handoff §3 snippet → `TOTAL 41`; groups identical to §3 (`_B78_RUN_ENTRY` 12 · `selector` 8 · `target` 4 · `select_id` 3 · `row` 3 · `_B78_RUN_NOTE` 2 + 9 singletons) |
+| `AT-B83-08` does **not** cover escape 2 | HYPOTHESIS (inherited from the handoff — written down ≠ verified) | ✅ TRUE | re-executed, not copied: `sel = "#" + wid; query_one(sel)` → `forms=['name'] loose=0 indirect=0`. Control `sel = f"#{x}"` → `loose=1 indirect=1`, so the probe discriminates and is not vacuous |
+| Both escapes land as an argument of form `name` | PREMISE | ✅ TRUE | same run → `shapes=['sel']` for both escapes |
+| `AT-B84-*` owes no registry reservation | PREMISE | ✅ TRUE | `.dev-flow/AT-TC-REGISTRY-SPEC.md` §2.3: batch-scoped ids are "**Outside** the allocation authority and outside the guard". `grep -rn "AT-B84-"` → one hit, the handoff's own §6 line |
+| batch-83's spec is closed and safe to archive | PREMISE | ✅ TRUE | archived file §11 → `Current phase \| **CLOSED**` |
+| The flow is current | PREMISE | ✅ TRUE | `devflow-validate.py --map --fetch` → `rev33` · `d851576cfe8f60b3` · 24/24 agree · 3 checkouts clean `0/0` |
+| **Outcome `B` is empty at this cut** | HYPOTHESIS | ✅ **TRUE — decided at Inc-1** | `python tools/address_origin.py` → `A 14 · B 0 · C 14 · D 13 · U 0`. The provisional scratchpad figure recorded at Phase A said `C 12 · D 15`; **the committed tool disagreed, and the disagreement was chased rather than overwritten.** Cause: the probe did not walk `ast.Lambda`, so the two `row` sites at `tests/test_map_click_chain.py:183,204` — parameters of `lambda pilot, row: pilot.click(row)` — were misfiled as `D`. The committed tool is strictly more complete and `B` did not move. Guarded against regression by `AT-B84-06`'s lambda case |
 
 ---
 
-## 7b. Defects this batch's own guards found — six, and the source of each
+## 7. Information Flow Contract — Part A (C-54)
 
-`tools/address_census.py` (495 lines, uncommitted) is a starting point that **carries the defects
-its own criteria exist to catch**, which is why Inc-1 writes guards first and fixes second:
+```
+SOURCE  the repository's .py files on disk (230 scanned)
+  → N1  census()                  AddressSite records          owned by AT-B83-*
+  → N2  bare_name_candidates()    the bare-name non-class-like subset   AT-B84-01, -07
+  → N3  resolve_origins()         binding kinds + evidence per candidate  AT-B84-02, -05, -06
+  → N4  classify()                A / B / C / D                AT-B84-03, -04
+SINK    the printed classification, and the BACKLOG-CODE.md line that sizes the P2
+```
 
-| Defect | Caught by | Status |
+Every node names the criterion that owns it; a node nobody owns is work nobody asked for.
+
+⚠ **`230`, not the `229` this section said at Phase A.** The batch's own new test file moved the
+count, and the spec was closed at Inc-2 without re-deriving it — the exact defect §4.6 of the entry
+document names, committed in the one file that quotes the rule. Found by the Inc-3 review, corrected
+before the batch reached history. Re-derive: `python tools/address_census.py`, first line.
+
+**Escalation check (Part B trigger).** Does this change alter *how a consumer reaches* something —
+a selector, an index, a channel, an offset — rather than what it carries? **No.** It adds a
+read-only static analysis over the repository's own source and changes no address in `s19_app`.
+Part B is not owed and the batch stays in `/fast-dev-flow`.
+
+---
+
+## 8. Detected security flags
+
+- [ ] Auth / identity
+- [ ] Secrets / config
+- [ ] External integrations
+- [ ] Sensitive data
+- [ ] Destructive DB
+- [x] ⚠ Input / attack surface — **lexical match only, declared not dropped**
+- [ ] Network / exposure
+
+**`security_required`:** `false`
+
+The scan fires on `form`, which occurs throughout this spec as *"argument form"* — an AST node
+category, not a UI form. The batch adds a read-only analyser over files already in the repository:
+no input surface, no network call, no credential, no database, no new route. The flag is recorded
+rather than suppressed so the next reader sees why it did not escalate.
+
+---
+
+## 9. Increments
+
+| # | Content | Source files |
 |---|---|---|
-| `ADDRESS_APIS` held `query_exactly` (not a Textual API) and `get_child_by_type` (takes a type) | `AT-B83-05` | ✅ fixed Inc-1 |
-| keyword arguments never scanned | `AT-B83-07` | ✅ fixed Inc-1 |
-| `_argument_form` docstring said `'type'`, returned `'name'` | code review | ✅ fixed Inc-1 |
-| census read ARGUMENTS where it should read PARAMETERS (`mount(*widgets)`) | `AT-B83-08` | ✅ fixed Inc-1 — **found by the invariant, not by review** |
-| the candidate filter was applied in the collection pass but NOT in the annotation pass, so 3 private methods walked back in through the second door | none — found by comparing the rule's prediction (40) against the output (43) | ✅ fixed Inc-3 via `is_candidate_method`, now the single definition |
-| `shape` never populated for bare-name arguments, so the class-like split would have silently read 0 of 183 | none | ✅ fixed Inc-3 |
+| Inc-1 | `bare_name_candidates()` added to `tools/address_census.py`; new `tools/address_origin.py`; new `tests/test_address_origin.py` (`AT-B84-01`..`-07`, each shown red under its mutation) | 2 |
+| Inc-2 | Re-derive the classification from the committed command; reconcile `.dev-flow/BACKLOG-CODE.md` (both P2 items); repoint the two references to batch-83's `.fast-dev-flow/spec.md §9` at the archived path; close this spec | 0 |
+
+Source-file count is **2**, under the ≤4 cap; no ⚠ owed.
+
+**Known dangling state during Inc-1, fixed in Inc-2 (approved at the Phase A gate).** Archiving
+batch-83's spec breaks two live pointers that cite `.fast-dev-flow/spec.md §9`: the handoff's §6
+table and `.dev-flow/BACKLOG-CODE.md`'s P3 by-design-risks entry. Both are repointed in Inc-2 and
+travel in the same commit, so no dangling reference reaches history.
 
 ---
 
-## 8. Deliverables and where they live
+## 10. Success criterion
 
-| Deliverable | Path | Lane |
-|---|---|---|
-| the tool | `tools/address_census.py` | — |
-| the guards | `tests/test_address_census.py` | PR lane, **not** `slow` |
-| ~~traceability row in `REQUIREMENTS.md`~~ | **WITHDRAWN at Inc-2** | — |
-
-⚠ **The `REQUIREMENTS.md` row was withdrawn on measurement, not on preference.** That file
-documents PRODUCT requirements (`R-TUI-*`, one section per behavioural surface). Executed:
-`tools/id_registry.py` — the analogous instrument, with its own guard, landed through this same
-flow — has **no entry there**. Instrumentation is not product, and adding a row would have
-invented a convention rather than followed one. Traceability for this batch lives where the
-precedent puts it: this spec, and the `AT-B83-*` ids on the guards. *This was a premise in
-revision 2's §8 that I wrote without executing — the same class of defect §10 lists twelve of.*
-
-**Report columns:** `file`, `line`, `api`, `form`, `shape`, `interp`, `note`.
-
-⚠ **`v13_ambiguous` withdrawn at Inc-2 — it would have been a vacuous column.** Every computed
-address IS a site `V13` cannot resolve; a boolean that holds the same value on every row of the
-section carries no information. Story 3's deliverable is the *"computed addresses"* section
-itself, and the report now says so in a closing line rather than in a constant column.
-
-**Dependency-drift owner:** when `AT-B83-05`/`06` fail on a Textual bump, the batch that bumps
-Textual owns re-deriving the set. Recorded here because a guard that fails with no named owner
-becomes a guard someone disables.
-
-**`census()` propagates `SyntaxError` deliberately** — a census that silently skips a file it
-could not read is the vacuous shape. Consequence, declared: any unparseable scratch `.py` under
-`tests/` fails the suite.
-
----
-
-## 8b. When this detector starts to gate — the trigger, written now (B5)
-
-The detector reports and does not block. That is non-goal 3, and leaving it at *"some day"*
-turns a deliberate decision into a forgotten one. **The activation condition, decided now:**
-
-> **A surface's computed addresses become BLOCKING on the day that surface's IFC is written.**
-> Until then, per-surface, they are reportable only.
-
-This is the same staging `C-54` already chose for `V13` (NOTICE until a screen's stage lands,
-BLOCK after). Two consequences worth stating so nobody has to re-derive them:
-
-- **A gate before the IFC exists would mean "no new computed addresses", period** — blocking
-  legitimate work with no criterion to judge it by. A control priced before it has a corpus is
-  priced blind, which is the criticism `C-54` levelled at itself.
-- **The trigger is per-surface, not global.** batch-82 lands screens one at a time; the detector
-  hardens with each, and a large retrofit never gates unrelated batches.
-
-**Owner of the transition:** the batch that writes a surface's IFC also flips that surface.
-
----
-
-## 9. Declared risks and blind spots — each with its reopening criterion (A5)
-
-> These live here, not only in docstrings, so they can be **cited from outside the code** when the
-> scenario appears. A by-design risk that nobody can quote when it fires is not documented; it is
-> buried.
-
-| Risk | Why it is accepted | **Reopen when** |
-|---|---|---|
-| The introspection guards fail on a Textual upgrade | That IS the mechanism — a guard that stays green when its subject changes is worthless | Never "fix" it; the batch that bumps Textual re-derives the snapshot. If that becomes frequent enough to be friction, revisit the snapshot-vs-live-call tradeoff |
-| The derivation costs ~18 s in the PR lane | Operator decision, measured: 0.9 % of suite wall clock, 4th slowest test behind three unrelated ones at 42/29/20 s | Suite time becomes a real constraint, or this test enters the top 2 |
-| 3 exclusion rules (annotated / non-private / non-hook) could hide a real API | Measured: removes 8, **none called anywhere in s19_app** | Any of the 8 becomes reachable from s19_app, or a new address API matches one of the exclusions |
-| The taint pass has no upper bound on false positives | Its output is a *set of APIs*, and a spurious entry only costs if s19_app calls it with an f-string | A derived API with no plausible selector semantics appears AND is called by s19_app |
-
-### Blind spots — what this batch does NOT see
-
-1. **Assembled selectors with no selector shape.** `sel = f"{prefix}{suffix}"` matches no selector
-   pattern *and* sits in no address argument. It escapes both nets. **UNMEASURED** — size it
-   before quoting the 56 as complete. *(Note: the one-hop case IS now covered — see `AT-B83-10`.)*
-2. **The producer side and `.tcss`** — `id=f"log_line_{i}"` at construction,
-   `add_class`/`set_classes`, and selectors inside stylesheets.
-3. **Chains longer than one hop.** `AT-B83-10` catches assign-then-use inside one function.
-   Helper-calls-helper is not followed.
-
-## 10. What revision 1 got wrong
-
-Recorded because these are the evidence for the criteria above, not an apology.
-
-| # | Defect | Now |
-|---|---|---|
-| B1 | `AT-B83-05` asserted one inclusion; a phantom name walked through the guard | set equality, 3 limbs |
-| B2 | claimed the 7 non-derivables annotate plain `str`; `get_child_by_type` takes a **type** | 6, listed |
-| B3 | story 2 implied a gate, contradicting non-goal 3; stories 2 and 3 had no `AT` | both rewritten to what ships |
-| B4 | preamble promised a kill mutation for every criterion; 3 of 8 had one. `AT-B83-06` was vacuous | all 9 name one; the invariant gets a red fixture |
-| M1 | "17 derivable" — three implementations gave 13, 16, 17 | predicate written out; no number quoted |
-| M2 | no figure named the Textual version | pinned to `8.2.8`, drift owner named |
-| M3 | `2503`/`1112` not reproducible by any committed artifact | rule added: no total without its API set |
-| M4 | keyword arguments unscanned, and `AT-B83-06` could not have caught it | `AT-B83-07` |
-| M5 | "one hop" implied flow tracking that does not exist | zero hops; assembled-selector escape declared |
-| m1 | "overwhelmingly type-addressing" | `AT-B83-09`: 142 vs 41, measured |
-| — | `LLR-120.2` called "the exact address form" of the computed class selector | it is not — different surface, inherited from the handoff unchecked |
-| — | `V13` called "structurally blind" | it is noisy, not blind; its own docstring says so |
-
-**None of these was caught by reading. Every one was caught by executing** — a second
-implementation, an introspection pass, a fixture, or an adversarial reader told to refute.
+Each of the 41 candidates carries a classification with its evidence, produced by a committed
+command. The report either counts the confirmed assembled selectors alongside the 56 or states why
+it cannot. **If `B` is confirmed empty, the P2 closes and the `56` becomes quotable with its
+definition** — and `AT-B84-04` is what keeps that true tomorrow, because it fails on the day an
+assembled selector enters the tree.
 
 ---
 
@@ -382,6 +192,125 @@ implementation, an introspection pass, a fixture, or an adversarial reader told 
 | Field | Value |
 |-------|-------|
 | Current phase | **CLOSED** |
-| Cut against | `origin/main` `b5c3245` · `textual 8.2.8` |
-| Started | 2026-08-15 |
+| Cut against | `origin/main` `1afccb0` |
+| Started | 2026-08-16 |
+| Closed | 2026-08-16 |
 | Promoted to /dev-flow | no |
+| Notes | Two increments, both gated by the operator. No scope drift, no promotion trigger fired |
+
+---
+
+## 12. Close
+
+### What changed
+
+`tools/address_origin.py` resolves each of the 41 bare-name address arguments to the bindings of
+its name in its own file and classifies it `A`/`B`/`C`/`D`/`U`, printing the binding's `file:line`
+on the row. `tools/address_census.py` gained `bare_name_candidates()`, which is now the single home
+of the candidate predicate — the census's own class-like note is derived as its complement rather
+than by a second filter. `tests/test_address_origin.py` carries `AT-B84-01`..`AT-B84-07`.
+
+**The measurement, re-derived from the committed command at the close:**
+
+```
+A 14   every binding is a string literal      _B78_RUN_ENTRY x12, _B78_RUN_NOTE x2
+B  0   ASSEMBLED -- the blind spot            none
+C 14   a function or lambda parameter         selector x6, select_id x3, row x2, +3
+D 13   something else, sub-kind named         target x4, selector x2, widget_id, +6
+U  0   no binding in the file                 none
+```
+
+**No bare-name address argument in the tree is assembled.** The census's `56` is complete with
+respect to this population. That bound is the claim; it is not a claim about the whole tree, and
+the tool prints its own three exclusions rather than letting a reader assume otherwise.
+
+### How it was tested
+
+- `python -m pytest tests/test_address_origin.py -q` → **21 passed** (16 at Inc-1, +3 at Inc-3,
+  +2 at Inc-4 after a second adversarial pass).
+- **11 kill mutations applied and reverted, 11 red, none vacuous** — drop a candidate (`-01`), emit
+  a binding with no location (`-02`), delete the `B` branch (`-03`), remove `concat` from
+  `ASSEMBLED_KINDS` (`-04`), make the walk scope-precise (`-05`), stop walking `ast.Lambda`, fold
+  `U` into `D`, **silently drop every `U` row from `resolve_origins`** and **ignore the augmented
+  operator** (`-06`, `-04`), re-implement the filter locally (`-07`). Source restored byte-identical
+  after every one.
+- ⚠ **Two of those ten did not exist until Inc-3, and one of them was a real vacuity.**
+  `AT-B84-06`'s "never drop it" half was asserted only against `classify`, so
+  `return [r for r in rows if r.bindings]` in `resolve_origins` passed all sixteen guards — it
+  dropped nothing, because the tree holds zero `U` rows today. A guard that holds only because
+  today's tree is empty of the case it names is the defect class this project ranks first. Found by
+  an adversarial review at Inc-3, reproduced independently before being accepted, now guarded by a
+  synthetic-tree arm that goes red under exactly that mutation.
+- ⚠ **A SECOND adversarial pass found the same defect class one arm over, and its proposed fix was
+  itself wrong.** `AT-B84-07`'s census half promised to guard the `report()` complement rewrite
+  while asserting only non-degeneracy; reverting that rewrite to a second local filter kept all 42
+  guards green. The review proposed a printed-line assertion. **It was written, executed, and
+  stayed green** — because the two expressions are the same set counted from opposite ends, so no
+  assertion over any output can separate them. The invariant is structural, so the guard is: parse
+  `address_census.py` and assert `resolves_to_class_like` is called from exactly
+  `["bare_name_candidates"]`. That one goes red. **Recorded because "the reviewer said so" was not
+  enough twice in a row** — running the proposed fix is what showed it did not work.
+- ⚠ **The kill matrix itself was re-run PER ARM, and the first two attempts at that were wrong.**
+  The original matrix derived one verdict per mutant **from the pytest exit code**, over a node set
+  containing parametrized tests — which is precisely the defect `tools/mutation_harness.py`
+  (batch-76, already on `main`) was built to eliminate: *an inert arm hides behind a sibling that
+  failed*. `AT-B84-04`'s mutation printed `2 failed, 3 passed` and was recorded as RED without
+  anyone asking which three stayed green. That harness is hard-wired to batch-76's own target, so
+  it is not a drop-in here, but its principle is not optional. Re-running per arm then found two
+  defects in the re-run itself: `-v` with `-q` suppressed every node line, so the baseline resolved
+  **0** arms and the all-green assert compared `0 == 0` and passed — a vacuity detector, vacuous;
+  and a whitespace-delimited node pattern silently dropped every **parametrized** arm, reporting a
+  live mutation as INERT. Final matrix, with an `EXPECTED_ARMS` assert so an unparsed arm aborts:
+  **44 baseline arms, 11 mutations, 11 RED, no inert arm** — and each mutation now names the arms
+  it reddens.
+- `python -m pytest tests/test_address_census.py -q` → **23 passed**; the census's printed output is
+  unchanged, `NOTE on 'name': 142 of 183`.
+- `python -m pytest -q` → **2728 passed / 2 skipped / 3 xfailed**, 29 snapshots, exit 0, 31:13.
+  (Inc-1 measured 2725 in 39:00; the delta is exactly the three arms Inc-3 added, and the wall
+  clock is machine noise, not a signal.)
+- `ruff check` → clean.
+- Manual smoke: `python tools/address_origin.py`, output read end to end.
+
+### Open risks / pending
+
+All four are registered in `.dev-flow/BACKLOG-CODE.md` under the batch-84 close, each with a
+reopening criterion; none blocks:
+
+1. **(P2)** 27 of the 41 (`C` + `D`) remain unresolved at one hop. **This is batch-82's real
+   sizing number**, not `56` and not `41`.
+2. **(P3)** `str.join` / `.replace` are outside `ASSEMBLED_KINDS` — the approved rule named four
+   forms and the code ships exactly those. No candidate binds to either today.
+3. **(P3)** The negative result depends on the walk over-collecting; `AT-B84-05` is the only guard
+   protecting it.
+4. **(P3, found in passing, not this batch's)** `.fast-dev-flow/ADR-flow-builder-tracer.md:171`
+   points at `.fast-dev-flow/spec.md` for batch-69's rationale, which batch-83 archived elsewhere.
+   Reported as found, not folded into this diff.
+
+### Security flags — handling
+
+`security_required` was **false**. The single lexical match (`form`, as *"argument form"*) is
+recorded in §8 rather than suppressed; nothing in this batch reads input, opens a route, or touches
+a credential.
+
+### Suggested commit message
+
+```
+batch-84 - the assembled selector, measured: 41 sites classified by origin, B is empty
+
+tools/address_origin.py resolves each bare-name address argument to the bindings
+of its name and classifies it A/B/C/D/U with its file:line evidence. Result over
+the tree: A 14 - B 0 - C 14 - D 13 - U 0. No address argument is assembled, so
+the census's 56 computed addresses is complete with respect to this population.
+
+The escape is now positively detected, not declared absent: AT-B84-04 classifies
+all four assembly forms as B on synthetic fixtures, so the guard fails the day
+one enters the tree. AT-B84-05 pins the walk as deliberately scope-insensitive,
+because the negative result is only sound if the search was too wide.
+
+bare_name_candidates() gives the candidate predicate one home; the census's own
+class-like note is derived as its complement. EXPECTED_SCANNED_TEST_FILES 154 ->
+155, measured by two independent paths.
+
+Closes two P2 items from the batch-83 close. Carries forward the 27 C+D sites
+that remain unresolved at one hop - which is batch-82's sizing number.
+```
